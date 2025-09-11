@@ -14,7 +14,7 @@ import { importLazyComponent } from '@cloudbeaver/core-blocks';
 
 const ConnectionFormBaseActionsLoader = importLazyComponent(() => import('./ConnectionFormBaseActions.js').then(m => m.ConnectionFormBaseActions));
 
-@injectable()
+@injectable(() => [LocalizationService, NotificationService])
 export class ConnectionFormService extends FormBaseService<IConnectionFormState, IConnectionFormProps> {
   constructor(localizationService: LocalizationService, notificationService: NotificationService) {
     super(localizationService, notificationService, 'Connection form');

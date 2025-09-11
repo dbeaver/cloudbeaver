@@ -2,6 +2,8 @@
   "name": "@cloudbeaver/plugin-navigation-tree",
   "type": "module",
   "sideEffects": [
+    "./lib/module.js",
+    "./lib/index.js",
     "src/**/*.css",
     "src/**/*.scss",
     "public/**/*"
@@ -47,6 +49,7 @@
     "@cloudbeaver/core-cli": "workspace:*",
     "@cloudbeaver/tsconfig": "workspace:*",
     "@dbeaver/cli": "workspace:*",
+    "@dbeaver/react-tests": "workspace:^",
     "@types/react": "^19",
     "typescript": "^5",
     "typescript-plugin-css-modules": "^5",

@@ -1,11 +1,11 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { injectable } from '@cloudbeaver/core-di';
 import { Executor, ExecutorInterrupter, type IExecutor } from '@cloudbeaver/core-executor';
 import { type CachedDataResourceKey, CachedResource, getCachedDataResourceLoaderState } from '@cloudbeaver/core-resource';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
@@ -13,8 +13,8 @@ import type { ILoadableState } from '@cloudbeaver/core-utils';
 
 import { UserInfoResource } from './UserInfoResource.js';
 
-@injectable()
-export class AppAuthService extends Bootstrap {
+@injectable(() => [ServerConfigResource, UserInfoResource])
+export class AppAuthService {
   get authenticated(): boolean {
     return this.serverConfigResource.configurationMode || this.userInfoResource.hasAccess();
   }
@@ -32,7 +32,6 @@ export class AppAuthService extends Bootstrap {
     private readonly serverConfigResource: ServerConfigResource,
     private readonly userInfoResource: UserInfoResource,
   ) {
-    super();
     this.auth = new Executor();
     this.userInfoResource.onDataUpdate.addHandler(this.authUser.bind(this));
   }

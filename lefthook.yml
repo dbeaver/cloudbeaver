@@ -1,10 +1,13 @@
 lefthook: |
   cd webapp
-  yarn lefthook
+  yarn dlx --quiet lefthook
 output: false
 pre-commit:
   commands:
     check-license:
+      skip:
+        - merge
+        - rebase
       root: webapp
       glob: "*.{ts,tsx}"
       exclude:

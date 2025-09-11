@@ -1,17 +1,30 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
 
-import { Group, GroupTitle, InputField, useResource, useTranslate } from '@cloudbeaver/core-blocks';
+import {
+  Group,
+  GroupTitle,
+  Link,
+  IconOrImage,
+  InputField,
+  Switch,
+  Textarea,
+  useResource,
+  useTranslate,
+  useCustomInputValidation,
+} from '@cloudbeaver/core-blocks';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 
 import type { IServerConfigurationPageState } from '../IServerConfigurationPageState.js';
 import { MIN_SESSION_EXPIRE_TIME } from './MIN_SESSION_EXPIRE_TIME.js';
+import { WEBSITE_LINKS } from '@cloudbeaver/core-links';
+import { isIp } from '@cloudbeaver/core-utils';
 
 interface Props {
   state: IServerConfigurationPageState;
@@ -20,6 +33,21 @@ interface Props {
 export const ServerConfigurationInfoForm = observer<Props>(function ServerConfigurationInfoForm({ state }) {
   const serverConfigLoader = useResource(ServerConfigurationInfoForm, ServerConfigResource, undefined);
   const translate = useTranslate();
+  const validation = useCustomInputValidation<string, HTMLTextAreaElement>(value => {
+    const currentHost = window.location.host;
+
+    if (!isIp(window.location.hostname) && value.trim() && !value.includes(currentHost)) {
+      return translate('administration_configuration_wizard_configuration_supported_hosts_warning', undefined, { host: currentHost });
+    }
+
+    return null;
+  });
+
+  function constructSupportedHostsExample() {
+    const exampleWithPort = serverConfigLoader.data?.distributed ? 'localhost' : 'localhost:5000';
+
+    return `example.com\n${exampleWithPort}\n127.0.0.1`;
+  }
 
   return (
     <Group form gap>
@@ -27,17 +55,17 @@ export const ServerConfigurationInfoForm = observer<Props>(function ServerConfig
       <InputField type="text" name="serverName" state={state.serverConfig} required medium>
         {translate('administration_configuration_wizard_configuration_server_name')}
       </InputField>
-      <InputField
+      <Textarea
+        ref={validation}
         title={translate('administration_configuration_wizard_configuration_server_url_description')}
-        type="url"
-        name="serverURL"
+        name="supportedHosts"
+        rows={3}
         state={state.serverConfig}
-        readOnly={serverConfigLoader.resource.distributed}
-        required
-        medium
+        description={translate('administration_configuration_wizard_configuration_supported_hosts_description')}
+        placeholder={constructSupportedHostsExample()}
       >
-        {translate('administration_configuration_wizard_configuration_server_url')}
-      </InputField>
+        {translate('administration_configuration_wizard_configuration_supported_hosts')}
+      </Textarea>
       <InputField
         title={translate('administration_configuration_wizard_configuration_server_session_lifetime_description')}
         type="number"
@@ -51,6 +79,39 @@ export const ServerConfigurationInfoForm = observer<Props>(function ServerConfig
       >
         {translate('administration_configuration_wizard_configuration_server_session_lifetime')}
       </InputField>
+      <Switch
+        name="forceHttps"
+        state={state.serverConfig}
+        description={
+          <div className="tw:flex-col tw:gap-1 tw:flex tw:items-start">
+            <span>{translate('administration_configuration_wizard_configuration_secure_cookies_description')}</span>
+            <Link
+              className="tw:flex tw:items-center tw:gap-2 tw:text-balance"
+              href={WEBSITE_LINKS.PROXY_CONFIGURATION_DOCUMENTATION_PAGE}
+              target="_blank"
+              rel="noreferrer"
+            >
+              <div className="tw:flex tw:items-center tw:gap-1">
+                <IconOrImage width={16} icon="/icons/documentation_link_sm.svg" />{' '}
+                {translate('administration_configuration_wizard_configuration_secure_cookies_docs')}
+              </div>
+            </Link>
+          </div>
+        }
+        mod={['primary']}
+        small
+      >
+        <div className="tw:flex tw:items-center tw:gap-1.5">
+          {translate('administration_configuration_wizard_configuration_secure_cookies')}
+          {!state.serverConfig.forceHttps && (
+            <IconOrImage
+              title={translate('administration_configuration_wizard_configuration_secure_cookies_warning')}
+              icon="/icons/warning_icon.svg"
+              width={24}
+            />
+          )}
+        </div>
+      </Switch>
     </Group>
   );
 });

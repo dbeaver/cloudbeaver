@@ -17,7 +17,7 @@ const TeamOptions = React.lazy(async () => {
   return { default: TeamOptions };
 });
 
-@injectable()
+@injectable(() => [TeamsAdministrationFormService])
 export class TeamOptionsTabService extends Bootstrap {
   constructor(private readonly teamsAdministrationFormService: TeamsAdministrationFormService) {
     super();

@@ -7,7 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { getComputed, Loader, Pane, ResizerControls, s, Split, useS, useSplitUserState } from '@cloudbeaver/core-blocks';
+import { getComputed, Loader, Pane, ResizerControls, s, Split, useExecutor, useS, useSplitUserState } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { LeftBarPanelService, SideBarPanel, SideBarPanelService } from '@cloudbeaver/core-ui';
 
@@ -25,6 +25,17 @@ export const Main = observer(function Main() {
   const sideBarDisabled = getComputed(() => sideBarPanelService.tabsContainer.getDisplayed().length === 0);
   const leftBarDisabled = getComputed(() => leftBarPanelService.tabsContainer.getDisplayed().length === 0);
 
+  useExecutor({
+    executor: sideBarPanelService.tabsContainer.onTabSelect,
+    handlers: [
+      function showPanel() {
+        if (splitRightState.mode === 'minimize' && !sideBarDisabled) {
+          splitRightState.onModeChange?.('resize');
+        }
+      },
+    ],
+  });
+
   return (
     <Loader className={s(styles, { loader: true })} suspense>
       <main className={s(styles, { space: true })}>
@@ -41,7 +52,7 @@ export const Main = observer(function Main() {
                 <RightArea />
               </Pane>
               <ResizerControls />
-              <Pane className={s(styles, { pane: true })} basis="250px" main>
+              <Pane className={s(styles, { pane: true })} basis="400px" main>
                 <Loader className={s(styles, { loader: true })} suspense>
                   <SideBarPanel container={sideBarPanelService.tabsContainer} />
                 </Loader>

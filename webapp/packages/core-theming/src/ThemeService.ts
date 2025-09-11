@@ -39,7 +39,7 @@ export interface IStyleRegistry {
   styles: Style[];
 }
 
-@injectable()
+@injectable(() => [ThemeSettingsService])
 export class ThemeService extends Bootstrap {
   get themes(): ITheme[] {
     return Array.from(this.themeMap.values());
@@ -49,11 +49,11 @@ export class ThemeService extends Bootstrap {
     return this.themeSettingsService.theme;
   }
 
-  get currentTheme(): ITheme {
-    let theme = this.themeMap.get(this.themeId);
+  get currentTheme(): ITheme | null {
+    let theme = this.themeMap.get(this.themeId) || null;
 
     if (!theme) {
-      theme = this.themeMap.get(FALLBACK_THEME_ID)!;
+      theme = this.themeMap.get(FALLBACK_THEME_ID) || null;
     }
 
     return theme;
@@ -61,8 +61,8 @@ export class ThemeService extends Bootstrap {
 
   readonly onChange: ISyncExecutor<ITheme>;
 
-  private readonly stylesRegistry: Map<Style, IStyleRegistry[]> = new Map();
-  private readonly themeMap: Map<string, ITheme> = new Map();
+  private readonly stylesRegistry: Map<Style, IStyleRegistry[]>;
+  private readonly themeMap: Map<string, ITheme>;
   private reactionDisposer: IReactionDisposer | null;
 
   constructor(private readonly themeSettingsService: ThemeSettingsService) {
@@ -70,6 +70,8 @@ export class ThemeService extends Bootstrap {
 
     this.reactionDisposer = null;
     this.onChange = new SyncExecutor();
+    this.stylesRegistry = new Map();
+    this.themeMap = new Map();
 
     makeObservable<ThemeService, 'themeMap'>(this, {
       themes: computed,
@@ -87,10 +89,10 @@ export class ThemeService extends Bootstrap {
   }
 
   override register(): void {
-    this.loadAllThemes();
+    this.registerDefaultThemes();
     this.reactionDisposer = reaction(
       () => this.currentTheme,
-      theme => this.loadTheme(theme.id),
+      theme => theme && this.loadTheme(theme.id),
       {
         fireImmediately: true,
       },
@@ -143,7 +145,9 @@ export class ThemeService extends Bootstrap {
       return;
     }
     await this.setTheme(themeId);
-    this.onChange.execute(this.currentTheme);
+    if (this.currentTheme) {
+      this.onChange.execute(this.currentTheme);
+    }
   }
 
   private async setTheme(themeId: string): Promise<void> {
@@ -165,7 +169,7 @@ export class ThemeService extends Bootstrap {
     }
   }
 
-  private loadAllThemes(): void {
+  private registerDefaultThemes(): void {
     for (const theme of themes) {
       this.themeMap.set(theme.id, theme);
     }

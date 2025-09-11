@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@ import { ServerConfigResource, SESSION_EXPIRE_MIN_TIME, SessionExpireService, Se
 import { GraphQLService } from '@cloudbeaver/core-sdk';
 
 const SessionExpireWarningDialog = importLazyComponent(() => import('./SessionExpireWarningDialog.js').then(m => m.SessionExpireWarningDialog));
-@injectable()
+@injectable(() => [CommonDialogService, SessionExpireService, ServerConfigResource, SessionResource, UserInfoResource, GraphQLService])
 export class SessionExpireWarningDialogBootstrap extends Bootstrap {
   private dialogInternalPromise: Promise<DialogueStateResult | null> | null;
   constructor(

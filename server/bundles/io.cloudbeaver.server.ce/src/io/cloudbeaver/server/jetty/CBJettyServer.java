@@ -16,12 +16,13 @@
  */
 package io.cloudbeaver.server.jetty;
 
+import graphql.GraphQL;
 import io.cloudbeaver.model.config.CBServerConfig;
 import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBConstants;
-import io.cloudbeaver.server.graphql.GraphQLEndpoint;
 import io.cloudbeaver.server.filters.ServerConfigurationTimeLimitFilter;
+import io.cloudbeaver.server.graphql.GraphQLEndpoint;
 import io.cloudbeaver.server.servlets.CBImageServlet;
 import io.cloudbeaver.server.servlets.CBStaticServlet;
 import io.cloudbeaver.server.servlets.WebStatusServlet;
@@ -30,10 +31,7 @@ import io.cloudbeaver.server.websockets.CBWebSocketServerConfigurator;
 import io.cloudbeaver.service.DBWServiceBindingServlet;
 import io.cloudbeaver.service.DBWServiceBindingWebSocket;
 import jakarta.websocket.server.ServerEndpointConfig;
-import org.eclipse.jetty.ee10.servlet.ErrorPageErrorHandler;
-import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
-import org.eclipse.jetty.ee10.servlet.ServletHolder;
-import org.eclipse.jetty.ee10.servlet.ServletMapping;
+import org.eclipse.jetty.ee10.servlet.*;
 import org.eclipse.jetty.ee10.websocket.jakarta.server.config.JakartaWebSocketServletContainerInitializer;
 import org.eclipse.jetty.server.*;
 import org.eclipse.jetty.util.resource.ResourceFactory;
@@ -48,6 +46,8 @@ import java.net.InetSocketAddress;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 public class CBJettyServer {
 
@@ -92,12 +92,14 @@ public class CBJettyServer {
             }
 
             {
+
                 // Handler configuration
                 Path contentRootPath = Path.of(serverConfiguration.getContentRoot());
                 ServletContextHandler servletContextHandler = new ServletContextHandler(ServletContextHandler.SESSIONS);
                 servletContextHandler.setBaseResourceAsPath(contentRootPath);
                 String rootURI = serverConfiguration.getRootURI();
                 servletContextHandler.setContextPath(rootURI);
+
 
                 ServletHolder staticServletHolder = new ServletHolder(
                     "static", new CBStaticServlet(Path.of(serverConfiguration.getContentRoot()))
@@ -116,17 +118,20 @@ public class CBJettyServer {
 
                 servletContextHandler.addServlet(new ServletHolder("status", new WebStatusServlet()), "/status");
 
+                GraphQLEndpoint endpoint = new GraphQLEndpoint(new ServerConfigurationTimeLimitFilter(application));
+                application.addApplicationContextValue(GraphQL.class.getName(), endpoint.getGraphQL());
+                String gqlServletPath = serverConfiguration.getServicesURI() + "gql/*";
                 servletContextHandler.addServlet(
                     new ServletHolder(
                         "graphql",
-                        new GraphQLEndpoint(new ServerConfigurationTimeLimitFilter(application))
+                        endpoint
                     ),
-                    serverConfiguration.getServicesURI() + "gql/*"
+                    gqlServletPath
                 );
                 servletContextHandler.addEventListener(new CBServerContextListener(application));
 
                 // Add extensions from services
-
+                Set<String> excludedFilterPaths = new HashSet<>();
                 CBJettyServletContext servletContext = new CBJettyServletContext(servletContextHandler);
                 for (DBWServiceBindingServlet wsd : WebServiceRegistry.getInstance()
                     .getWebServices(DBWServiceBindingServlet.class)
@@ -134,6 +139,7 @@ public class CBJettyServer {
                     if (wsd.isApplicable(this.application)) {
                         try {
                             wsd.addServlets(this.application, servletContext);
+                            excludedFilterPaths.addAll(wsd.getExcludedServletPaths(this.application));
                         } catch (DBException e) {
                             log.error(e.getMessage(), e);
                         }
@@ -152,6 +158,13 @@ public class CBJettyServer {
                         }
                     }
                 }
+                FilterHolder hostsFilter = new FilterHolder(new RequestHostFilter(
+                    application,
+                    excludedFilterPaths,
+                    Set.of(gqlServletPath)
+                ));
+                servletContextHandler.addFilter(hostsFilter, "/*", null);
+
 
                 JakartaWebSocketServletContainerInitializer.configure(servletContextHandler, (context, container) -> {
                     // Add echo endpoint to server container
@@ -231,7 +244,7 @@ public class CBJettyServer {
             && servletContextHandler.getSessionHandler() instanceof CBSessionHandler cbSessionHandler
         ) {
             cbSessionHandler.setMaxCookieAge((int) (application.getMaxSessionIdleTime() / 1000));
-            cbSessionHandler.setSecureCookies(application.getServerConfiguration().isSecureCookies());
+            cbSessionHandler.setSecureCookies(application.getServerConfiguration().isForceHttps());
         }
     }
 }

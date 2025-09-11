@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { Dependency, injectable } from '@cloudbeaver/core-di';
+import { injectable } from '@cloudbeaver/core-di';
 import {
   createSettingsAliasResolver,
   ESettingsValueType,
@@ -24,10 +24,11 @@ const settingsSchema = schema.object({
   'core.navigation-tree.deleting': schemaExtra.stringedBoolean().default(true),
 });
 
-export type NavTreeSettings = schema.infer<typeof settingsSchema>;
+export type NavTreeSettingsSchema = typeof settingsSchema;
+export type NavTreeSettings = schema.infer<NavTreeSettingsSchema>;
 
-@injectable()
-export class NavTreeSettingsService extends Dependency {
+@injectable(() => [SettingsProviderService, SettingsResolverService, SettingsManagerService])
+export class NavTreeSettingsService {
   get childrenLimit(): number {
     return this.settings.getValue('core.navigation-tree.childrenLimit');
   }
@@ -37,22 +38,21 @@ export class NavTreeSettingsService extends Dependency {
   get deleting(): boolean {
     return this.settings.getValue('core.navigation-tree.deleting');
   }
-  readonly settings: SettingsProvider<typeof settingsSchema>;
+  readonly settings: SettingsProvider<NavTreeSettingsSchema>;
 
   constructor(
     private readonly settingsProviderService: SettingsProviderService,
     private readonly settingsResolverService: SettingsResolverService,
     private readonly settingsManagerService: SettingsManagerService,
   ) {
-    super();
     this.settings = this.settingsProviderService.createSettings(settingsSchema);
     this.settingsResolverService.addResolver(
       ROOT_SETTINGS_LAYER,
       /** @deprecated Use settings instead, will be removed in 23.0.0 */
-      createSettingsAliasResolver(this.settingsResolverService, this.settings, {
+      createSettingsAliasResolver<NavTreeSettingsSchema>(this.settingsProviderService.settingsResolver, {
         'core.navigation-tree.childrenLimit': 'core.app.navigationTree.childrenLimit',
       }),
-      createSettingsAliasResolver(this.settingsResolverService, this.settings, {
+      createSettingsAliasResolver<NavTreeSettingsSchema>(this.settingsProviderService.settingsResolver, {
         'core.navigation-tree.deleting': 'core.app.metadata.deleting',
         'core.navigation-tree.editing': 'core.app.metadata.editing',
       }),
@@ -62,7 +62,7 @@ export class NavTreeSettingsService extends Dependency {
   }
 
   private registerSettings() {
-    this.settingsManagerService.registerSettings(this.settings, () => [
+    this.settingsManagerService.registerSettings<typeof settingsSchema>(() => [
       {
         key: 'core.navigation-tree.childrenLimit',
         access: {

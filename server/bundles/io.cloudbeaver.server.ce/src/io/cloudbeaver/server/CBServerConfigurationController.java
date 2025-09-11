@@ -44,8 +44,6 @@ import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.IOUtils;
 
 import java.io.*;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -66,6 +64,7 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
     protected final Path homeDirectory;
     private final Map<String, String> externalProperties = new LinkedHashMap<>();
     private final Map<String, Object> originalConfigurationProperties = new LinkedHashMap<>();
+    private String localHostAddress;
 
     protected CBServerConfigurationController(@NotNull T serverConfiguration, @NotNull Path homeDirectory) {
         super(homeDirectory);
@@ -80,6 +79,15 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
     @Override
     public void loadServerConfiguration(Path configPath) throws DBException {
         log.debug("Using configuration [" + configPath + "]");
+        // Determine address for local host
+        localHostAddress = System.getenv(CBConstants.VAR_CB_LOCAL_HOST_ADDR);
+        if (CommonUtils.isEmpty(localHostAddress)) {
+            localHostAddress = System.getProperty(CBConstants.VAR_CB_LOCAL_HOST_ADDR);
+        }
+        if (CommonUtils.isEmpty(localHostAddress) || CBConstants.HOST_127_0_0_1.equals(localHostAddress) || "::0".equals(
+            localHostAddress)) {
+            localHostAddress = CBConstants.HOST_LOCALHOST;
+        }
 
         if (!Files.exists(configPath)) {
             log.error("Configuration file " + configPath + " doesn't exist. Use defaults.");
@@ -93,6 +101,7 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
             log.debug("Runtime configuration [" + runtimeConfigPath.toAbsolutePath() + "]");
             loadConfiguration(runtimeConfigPath);
         }
+
         // Set default preferences
         PrefUtils.setDefaultPreferenceValue(DBWorkbench.getPlatform().getPreferenceStore(),
             ModelPreferences.UI_DRIVERS_HOME,
@@ -107,7 +116,8 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
         return CommonUtils.nullIfEmpty(envValue);
     }
 
-    public void loadConfiguration(Path configPath) throws DBException {
+    @NotNull
+    public Map<String, Object> loadConfiguration(Path configPath) throws DBException {
         CBAppConfig prevConfig = new CBAppConfig(appConfiguration);
         Map<String, Object> configProps = readConfiguration(configPath);
         try {
@@ -123,6 +133,7 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
         mergeOldConfiguration(prevConfig);
 
         patchConfigurationWithProperties(getServerConfiguration().getProductSettings());
+        return configProps;
     }
 
     protected void parseConfiguration(Map<String, Object> configProps) throws DBException {
@@ -159,12 +170,7 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
         if (config.getServerURL() == null) {
             String hostName = config.getServerHost();
             if (CommonUtils.isEmpty(hostName)) {
-                try {
-                    hostName = InetAddress.getLocalHost().getHostName();
-                } catch (UnknownHostException e) {
-                    log.debug("Error resolving localhost address: " + e.getMessage());
-                    hostName = CBConstants.HOST_LOCALHOST;
-                }
+                hostName = getLocalHostAddress();
             }
             config.setServerURL("http://" + hostName + ":" + config.getServerPort());
         }
@@ -531,8 +537,20 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
         copyConfigValue(
             originServerConfig,
             serverConfigProperties,
-            CBConstants.PARAM_SECURE_COOKIES,
-            serverConfig.isSecureCookies()
+            CBConstants.PARAM_FORCE_HTTPS,
+            serverConfig.isForceHttps()
+        );
+        copyConfigValue(
+            originServerConfig,
+            serverConfigProperties,
+            CBConstants.PARAM_SUPPORTED_HOSTS,
+            serverConfig.getSupportedHosts()
+        );
+        copyConfigValue(
+            originServerConfig,
+            serverConfigProperties,
+            CBConstants.PARAM_BIND_SESSION_TO_IP,
+            serverConfig.getBindSessionToIp()
         );
         var productConfigProperties = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
         Map<String, Object> oldProductRuntimeConfig = JSONUtils.getObject(originServerConfig,
@@ -653,5 +671,9 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
     @Override
     public void validateFinalServerConfiguration() throws DBException {
 
+    }
+
+    public String getLocalHostAddress() {
+        return localHostAddress;
     }
 }

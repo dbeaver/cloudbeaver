@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@ import type { IRequestEventData } from './DatabaseDataModel/IDatabaseDataModel.j
 import { DatabaseDataSourceOperation } from './DatabaseDataModel/IDatabaseDataSource.js';
 import { TableViewerStorageService } from './TableViewer/TableViewerStorageService.js';
 
-@injectable()
+@injectable(() => [CommonDialogService, TableViewerStorageService, NotificationService])
 export class DataViewerDataChangeConfirmationService {
   constructor(
     private readonly commonDialogService: CommonDialogService,

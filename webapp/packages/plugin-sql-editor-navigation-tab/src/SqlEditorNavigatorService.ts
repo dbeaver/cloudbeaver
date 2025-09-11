@@ -42,6 +42,8 @@ export interface ISQLEditorOptions {
   schemaId?: string;
   source?: string;
   query?: string;
+  dataSourceState?: Record<string, any>;
+  metadata?: Record<string, any>;
 }
 
 export interface SQLCreateAction extends SQLEditorActionContext, ISQLEditorOptions {
@@ -55,7 +57,16 @@ export interface SQLEditorAction extends SQLEditorActionContext {
   resultId: string;
 }
 
-@injectable()
+@injectable(() => [
+  NavigationTabsService,
+  NotificationService,
+  SqlEditorTabService,
+  SqlResultTabsService,
+  ConnectionInfoResource,
+  NavigationService,
+  SqlDataSourceService,
+  SqlQueryService,
+])
 export class SqlEditorNavigatorService {
   private readonly navigator: IExecutor<SQLCreateAction | SQLEditorAction>;
 
@@ -142,6 +153,8 @@ export class SqlEditorNavigatorService {
             data.name,
             data.source,
             data.query,
+            data.dataSourceState,
+            data.metadata,
           );
 
           if (tabOptions) {

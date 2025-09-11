@@ -21,7 +21,7 @@ export interface IUserMetaParameterOptions {
   required: boolean;
 }
 
-@injectable()
+@injectable(() => [GraphQLService, SessionResource, UserInfoResource])
 export class UserMetaParametersResource extends CachedDataResource<UserMetaParameter[]> {
   constructor(
     private readonly graphQLService: GraphQLService,

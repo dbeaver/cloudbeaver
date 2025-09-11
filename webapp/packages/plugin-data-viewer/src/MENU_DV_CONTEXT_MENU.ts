@@ -7,4 +7,4 @@
  */
 import { createMenu } from '@cloudbeaver/core-view';
 
-export const MENU_DV_CONTEXT_MENU = createMenu('dv-context-menu', { label: 'Data Viewer Context Menu' });
+export const MENU_DV_CONTEXT_MENU = createMenu('dv-context-menu', { label: 'Data Editor Context Menu' });

@@ -31,7 +31,9 @@ import io.cloudbeaver.service.security.bruteforce.BruteForceUtils;
 import io.cloudbeaver.service.security.bruteforce.UserLoginRecord;
 import io.cloudbeaver.service.security.db.CBDatabase;
 import io.cloudbeaver.service.security.internal.AuthAttemptSessionInfo;
+import io.cloudbeaver.service.security.internal.CBAuthSubjectRepo;
 import io.cloudbeaver.service.security.internal.SMTokenInfo;
+import io.cloudbeaver.utils.WebEventUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -54,8 +56,8 @@ import org.jkiss.dbeaver.model.security.user.*;
 import org.jkiss.dbeaver.model.sql.SQLUtils;
 import org.jkiss.dbeaver.model.websocket.event.WSUserCloseSessionsEvent;
 import org.jkiss.dbeaver.model.websocket.event.WSUserDeletedEvent;
+import org.jkiss.dbeaver.model.websocket.event.WSUserDisabledEvent;
 import org.jkiss.dbeaver.model.websocket.event.permissions.WSObjectPermissionEvent;
-import org.jkiss.dbeaver.model.websocket.event.permissions.WSSubjectPermissionEvent;
 import org.jkiss.dbeaver.model.websocket.event.session.WSAuthEvent;
 import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
@@ -102,7 +104,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         this.smConfig = smConfig;
     }
 
-    private boolean isSubjectExists(String subjectId) throws DBCException {
+    protected boolean isSubjectExists(String subjectId) throws DBCException {
         try (Connection dbCon = database.openConnection()) {
             try (PreparedStatement dbStat = dbCon.prepareStatement(
                 "SELECT 1 FROM {table_prefix}CB_AUTH_SUBJECT WHERE SUBJECT_ID=?")
@@ -130,17 +132,26 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         boolean enabled,
         @Nullable String defaultAuthRole
     ) throws DBException {
+        userId = userId.toLowerCase(); // creating new users only with lowercase
+        validateAndCreateUser(userId, metaParameters, enabled, defaultAuthRole);
+    }
+
+    protected void validateAndCreateUser(
+        @NotNull String userId,
+        @Nullable Map<String, String> metaParameters,
+        boolean enabled,
+        @Nullable String defaultAuthRole
+    ) throws DBException {
         if (CommonUtils.isEmpty(userId)) {
             throw new DBCException("Empty user name is not allowed");
         }
-        userId = userId.toLowerCase(); // creating new users only with lowercase
         if (isSubjectExists(userId)) {
             throw new DBCException("User or team '" + userId + "' already exists");
         }
         log.debug("Create user: " + userId);
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
-                createUser(dbCon, userId, metaParameters, enabled, defaultAuthRole);
+                insertUser(dbCon, userId, metaParameters, enabled, defaultAuthRole);
                 txn.commit();
             }
         } catch (SQLException e) {
@@ -151,7 +162,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
     /**
      * Creates user. Saves user id in database as it is.
      */
-    public void createUser(
+    protected void insertUser(
         @NotNull Connection dbCon,
         @NotNull String userId,
         @Nullable Map<String, String> metaParameters,
@@ -208,7 +219,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                     continue outer;
                 }
             }
-            createUser(connection, userId.toLowerCase(), metaParameters, true, authRole);
+            insertUser(connection, userId.toLowerCase(), metaParameters, true, authRole);
         }
     }
 
@@ -402,7 +413,14 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         @NotNull Connection dbCon,
         @NotNull String userId,
         @NotNull String[] teamIds
-    ) throws SQLException {
+    ) throws SQLException, DBCException {
+        String defaultTeam = getDefaultUserTeam();
+        if (ArrayUtils.contains(teamIds, defaultTeam)) {
+            throw new SMException("Cannot delete default user team: " + defaultTeam);
+        }
+        if (ArrayUtils.isEmpty(teamIds)) {
+            return;
+        }
         String deleteUserTeamsSql = "DELETE FROM {table_prefix}CB_USER_TEAM WHERE USER_ID=? " +
                 "AND TEAM_ID IN (" + SQLUtils.generateParamList(teamIds.length) + ")";
 
@@ -809,6 +827,10 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
             JDBCUtils.setStringOrNull(dbStat, 4, enabled ? null : disableReason);
             dbStat.setString(5, userId);
             dbStat.executeUpdate();
+        }
+        if (!enabled) {
+            var event = new WSUserDisabledEvent(userId);
+            application.getEventController().addEvent(event);
         }
         log.info(String.format("User updated: [userId=%s, isActive=%s, reason=%s]", userId, enabled, disableReason));
     }
@@ -1424,9 +1446,14 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         addSubjectPermissionsUpdateEvent(subjectId, null);
     }
 
+
+    public void initialize() throws DBException {
+    }
+
     private void insertPermissions(Connection dbCon, String subjectId, String[] permissionIds, String grantorId) throws SQLException {
         if (!ArrayUtils.isEmpty(permissionIds)) {
-            try (PreparedStatement dbStat = dbCon.prepareStatement(
+            try (
+                PreparedStatement dbStat = dbCon.prepareStatement(
                 "INSERT INTO {table_prefix}CB_AUTH_PERMISSIONS" +
                     "(SUBJECT_ID,PERMISSION_ID,GRANT_TIME,GRANTED_BY) VALUES(?,?,?,?)")
             ) {
@@ -1493,6 +1520,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
             throw new DBCException("Error reading user permissions", e);
         }
     }
+
 
     protected Set<String> getUserPermissions(String userId, String authRole) throws DBException {
         return getUserPermissions(userId);
@@ -1575,7 +1603,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         }
     }
 
-    private Set<String> getAnonymousUserPermissions() throws DBException {
+    protected Set<String> getAnonymousUserPermissions() throws DBException {
         var anonymousUserTeam = application.getAppConfiguration().getAnonymousUserTeam();
         return getSubjectPermissions(anonymousUserTeam);
     }
@@ -2574,7 +2602,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         @NotNull DBRProgressMonitor progressMonitor,
         @Nullable String activeUserId,
         boolean createNewUserIfNotExist,
-        String authRole,
+        @Nullable String authRole,
         SMAuthProviderCustomConfiguration providerConfig
     ) throws DBException {
         SMAuthProvider<?> smAuthProviderInstance = authProvider.getInstance();
@@ -2600,17 +2628,12 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
             userId = authProvider.isCaseInsensitive() ? userIdFromCredentials.toLowerCase() : userIdFromCredentials;
             if (!isSubjectExists(userId)) {
                 log.debug("Create user: " + userId);
-                try (Connection dbCon = database.openConnection()) {
-                    createUser(
-                        dbCon,
-                        userId,
-                        (Map<String, String>) userCredentials.get(SMStandardMeta.KEY_META_PARAMS),
-                        true,
-                        resolveUserAuthRole(null, authRole)
-                    );
-                } catch (SQLException e) {
-                    throw new DBException("Error saving user in database", e);
-                }
+                validateAndCreateUser(
+                    userId,
+                    (Map<String, String>) userCredentials.get(SMStandardMeta.KEY_META_PARAMS),
+                    true,
+                    resolveUserAuthRole(null, authRole)
+                );
             }
             setUserCredentials(userId, authProvider.getId(), userCredentials);
         } else if (userId == null) {
@@ -2990,7 +3013,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
     }
 
 
-    private void addSubjectPermissionsUpdateEvent(@NotNull String subjectId, @Nullable SMSubjectType subjectType) {
+    protected void addSubjectPermissionsUpdateEvent(@NotNull String subjectId, @Nullable SMSubjectType subjectType) {
         if (subjectType == null) {
             subjectType = getSubjectType(subjectId);
         }
@@ -2998,13 +3021,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
             log.error("Subject type is not found for subject '" + subjectId + "'");
             return;
         }
-        var event = WSSubjectPermissionEvent.update(
-            getSmSessionId(),
-            getUserId(),
-            subjectType,
-            subjectId
-        );
-        application.getEventController().addEvent(event);
+        WebEventUtils.addSubjectPermissionsUpdateEvent(subjectId, subjectType, getSmSessionId(), getUserId());
     }
 
     private void addObjectPermissionsUpdateEvent(@NotNull Set<String> objectIds, @NotNull SMObjectType objectType) {
@@ -3404,18 +3421,9 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         }
     }
 
-    private SMSubjectType getSubjectType(@NotNull String subjectId) {
+    protected SMSubjectType getSubjectType(@NotNull String subjectId) {
         try (Connection dbCon = database.openConnection()) {
-            String sqlBuilder = "SELECT SUBJECT_TYPE FROM {table_prefix}CB_AUTH_SUBJECT U WHERE SUBJECT_ID = ?";
-            try (var dbStat = dbCon.prepareStatement(sqlBuilder)) {
-                dbStat.setString(1, subjectId);
-                try (ResultSet dbResult = dbStat.executeQuery()) {
-                    if (dbResult.next()) {
-                        return SMSubjectType.fromCode(dbResult.getString(1));
-                    }
-                }
-            }
-            return null;
+            return CBAuthSubjectRepo.getInstance().getSubjectType(dbCon, subjectId);
         } catch (SQLException e) {
             log.error("Error getting all subject ids from database", e);
             return null;

@@ -17,6 +17,8 @@
     flex-shrink: 0;
   }
   & .info {
+    text-wrap: balance;
+    text-align: left;
     line-height: 1.4;
     font-weight: 500;
   }

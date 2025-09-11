@@ -10,7 +10,6 @@ import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { ClipboardService } from '@cloudbeaver/core-ui';
 import { replaceMiddle } from '@cloudbeaver/core-utils';
-import { isNotNullDefined } from '@dbeaver/js-helpers';
 import { ACTION_DELETE, ActionService, MenuBaseItem, MenuService } from '@cloudbeaver/core-view';
 import {
   DATA_CONTEXT_DV_DDM,
@@ -38,7 +37,7 @@ import { MENU_DATA_GRID_FILTERS_CUSTOM } from './MENU_DATA_GRID_FILTERS_CUSTOM.j
 
 const FilterCustomValueDialog = importLazyComponent(() => import('./FilterCustomValueDialog.js').then(m => m.FilterCustomValueDialog));
 
-@injectable()
+@injectable(() => [CommonDialogService, ClipboardService, ActionService, MenuService])
 export class DataGridContextMenuFilterService {
   constructor(
     private readonly commonDialogService: CommonDialogService,
@@ -69,12 +68,6 @@ export class DataGridContextMenuFilterService {
     await model.request(() => {
       constraints.setFilter(resultColumn.position, operator, filterValue);
     });
-
-    const whereFilter = model.requestInfo.requestFilter || model.source.options?.whereFilter;
-
-    if (isNotNullDefined(whereFilter)) {
-      constraints.setWhereFilter(whereFilter);
-    }
   }
 
   register(): void {

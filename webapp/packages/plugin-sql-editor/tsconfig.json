@@ -8,13 +8,19 @@
   },
   "references": [
     {
-      "path": "../../../common-typescript/@dbeaver/cli"
+      "path": "../../common-react/@dbeaver/react-tests"
+    },
+    {
+      "path": "../../common-typescript/@dbeaver/cli"
     },
     {
       "path": "../core-authentication"
     },
     {
       "path": "../core-blocks"
+    },
+    {
+      "path": "../core-browser"
     },
     {
       "path": "../core-cli"

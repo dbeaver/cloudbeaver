@@ -13,7 +13,7 @@ import { SettingsSource } from '@cloudbeaver/core-settings';
 import { StorageService } from '@cloudbeaver/core-storage';
 import { isNull } from '@cloudbeaver/core-utils';
 
-@injectable()
+@injectable(() => [UserInfoResource, StorageService])
 export class UserSettingsService extends SettingsSource {
   private readonly settings: Map<string, any>;
   private lastConfig: any;
@@ -88,7 +88,7 @@ export class UserSettingsService extends SettingsSource {
   restoreDefaults() {
     this.resetChanges();
     for (const key of this.getSource().keys()) {
-      this.setValue(key, null);
+      this.resetValue(key);
     }
   }
 

@@ -36,4 +36,6 @@ public interface DBWFeatureSet {
 
     boolean isEnabled();
 
+    boolean isEnabledByDefault();
+
 }

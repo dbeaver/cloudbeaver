@@ -22,7 +22,15 @@ const SearchDatabase = importLazyComponent(() => import('./SearchDatabase.js').t
 
 const formGetter = () => SearchDatabase;
 
-@injectable()
+@injectable(() => [
+  NotificationService,
+  ConnectionInfoResource,
+  IServiceProvider,
+  OptionsPanelService,
+  ConnectionFormService,
+  CommonDialogService,
+  ConnectionsManagerService,
+])
 export class ConnectionSearchService {
   hosts = 'localhost';
   databases: AdminConnectionSearchInfo[];

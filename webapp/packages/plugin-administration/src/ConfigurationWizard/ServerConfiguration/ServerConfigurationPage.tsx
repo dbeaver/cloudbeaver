@@ -88,7 +88,7 @@ export const ServerConfigurationPage: AdministrationItemContentComponent = obser
       }
     }
 
-    const saved = await formState.save();
+    const saved = await serverConfigurationFormStateManager.save();
 
     if (!saved) {
       const error = getFirstException(part.exception);
@@ -154,7 +154,7 @@ export const ServerConfigurationPage: AdministrationItemContentComponent = obser
               <Placeholder container={serverConfigurationService.pluginsContainer} configurationWizard={configurationWizard} state={part.state} />
             </Group>
             <Placeholder container={serverConfigurationService.configurationContainer} configurationWizard={configurationWizard} state={part.state} />
-            <ServerConfigurationSecurityForm serverConfig={part.state.serverConfig} />
+            <ServerConfigurationSecurityForm configurationWizard={configurationWizard} state={part.state} />
             <ServerConfigurationDriversForm initialServerConfig={part.initialState.serverConfig} serverConfig={part.state.serverConfig} />
           </Container>
         </Form>

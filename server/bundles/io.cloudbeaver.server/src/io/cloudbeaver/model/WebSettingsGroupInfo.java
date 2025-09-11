@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,15 +17,15 @@
 package io.cloudbeaver.model;
 
 import org.jkiss.code.NotNull;
+import org.jkiss.dbeaver.model.impl.PropertyDescriptor;
 import org.jkiss.dbeaver.model.impl.PropertyGroupDescriptor;
 import org.jkiss.dbeaver.model.meta.Property;
-import org.jkiss.dbeaver.registry.settings.ProductSettingDescriptor;
 
-public class WebSettingsGroupInfo {
+public class WebSettingsGroupInfo<T extends PropertyDescriptor> {
     @NotNull
-    private final PropertyGroupDescriptor<ProductSettingDescriptor> groupDescriptor;
+    private final PropertyGroupDescriptor<T> groupDescriptor;
 
-    public WebSettingsGroupInfo(@NotNull PropertyGroupDescriptor<ProductSettingDescriptor> groupDescriptor) {
+    public WebSettingsGroupInfo(@NotNull PropertyGroupDescriptor<T> groupDescriptor) {
         this.groupDescriptor = groupDescriptor;
     }
 

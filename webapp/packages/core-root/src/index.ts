@@ -5,6 +5,8 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+
+import './module.js';
 export * from './DataSynchronization/DataSynchronizationQueue.js';
 export * from './DataSynchronization/DataSynchronizationService.js';
 export * from './DataSynchronization/ISynchronizationMessage.js';
@@ -25,6 +27,7 @@ export * from './WorkspaceConfigEventHandler.js';
 export * from './SessionEventSource.js';
 export * from './QuotasService.js';
 export * from './SessionResource.js';
+export * from './Settings/SettingsTransformationService.js';
 export * from './Settings/ServerSettingsManagerService.js';
 export * from './Settings/ServerSettingsService.js';
 export * from './Settings/SESSION_SETTINGS_LAYER.js';

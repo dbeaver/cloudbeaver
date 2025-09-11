@@ -5,6 +5,8 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+
+import './module.js';
 export * from './Action/Actions/ACTION_ADD.js';
 export * from './Action/Actions/ACTION_CANCEL.js';
 export * from './Action/Actions/ACTION_COLLAPSE_ALL.js';
@@ -35,6 +37,8 @@ export * from './Action/KeyBinding/Bindings/KEY_BINDING_OPEN_IN_TAB.js';
 export * from './Action/KeyBinding/Bindings/KEY_BINDING_REDO.js';
 export * from './Action/KeyBinding/Bindings/KEY_BINDING_UNDO.js';
 export * from './Action/KeyBinding/Bindings/KEY_BINDING_SAVE.js';
+export * from './Action/KeyBinding/Bindings/KEY_BINDING_ADD.js';
+export * from './Action/KeyBinding/Bindings/KEY_BINDING_DUPLICATE.js';
 export * from './Action/KeyBinding/KeyBindingService.js';
 export * from './Action/KeyBinding/createKeyBinding.js';
 export * from './Action/ActionService.js';

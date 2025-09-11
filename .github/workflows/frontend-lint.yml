@@ -30,10 +30,10 @@ jobs:
           cache-dependency-path: "./cloudbeaver/webapp/yarn.lock"
 
       # - run: yarn install --immutable
-      #   working-directory: ./cloudbeaver/common-typescript
+      #   working-directory: ./cloudbeaver/webapp/common-typescript
 
       # - run: yarn install --immutable
-      #   working-directory: ./cloudbeaver/common-react
+      #   working-directory: ./cloudbeaver/webapp/common-react
 
       - run: |
           yarn install --immutable

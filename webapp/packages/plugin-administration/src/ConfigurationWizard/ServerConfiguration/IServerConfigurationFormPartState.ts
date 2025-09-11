@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -11,6 +11,7 @@ const ServerConfigurationFormPartStateConfigSchema = schema.object({
   adminCredentialsSaveEnabled: schema.boolean().optional(),
   adminName: schema.string().optional(),
   adminPassword: schema.string().optional(),
+  adminPasswordRepeat: schema.string().optional(),
   anonymousAccessEnabled: schema.boolean().optional(),
   authenticationEnabled: schema.boolean().optional(),
   customConnectionsEnabled: schema.boolean().optional(),
@@ -23,6 +24,9 @@ const ServerConfigurationFormPartStateConfigSchema = schema.object({
   serverName: schema.string().optional(),
   serverURL: schema.string().optional(),
   sessionExpireTime: schema.number().optional(),
+  forceHttps: schema.boolean().optional(),
+  supportedHosts: schema.string(),
+  bindSessionToIp: schema.string().optional(),
 });
 
 const ServerConfigurationFormPartStateNavigatorSchema = schema.object({
@@ -35,7 +39,10 @@ const ServerConfigurationFormPartStateNavigatorSchema = schema.object({
   showUtilityObjects: schema.boolean(),
 });
 
+export type IServerConfig = schema.infer<typeof ServerConfigurationFormPartStateConfigSchema>;
+export type INavigatorConfig = schema.infer<typeof ServerConfigurationFormPartStateNavigatorSchema>;
+
 export type IServerConfigurationFormPartState = {
-  serverConfig: schema.infer<typeof ServerConfigurationFormPartStateConfigSchema>;
-  navigatorConfig: schema.infer<typeof ServerConfigurationFormPartStateNavigatorSchema>;
+  serverConfig: IServerConfig;
+  navigatorConfig: INavigatorConfig;
 };

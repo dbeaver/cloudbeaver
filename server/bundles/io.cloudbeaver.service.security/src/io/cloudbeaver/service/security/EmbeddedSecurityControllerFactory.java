@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,7 +46,9 @@ public class EmbeddedSecurityControllerFactory<T extends ServletAuthApplication>
         SMCredentialsProvider credentialsProvider,
         SMControllerConfiguration smConfig
     ) throws DBException {
+        boolean initialization = false;
         if (DB_INSTANCE == null) {
+            initialization = true;
             synchronized (EmbeddedSecurityControllerFactory.class) {
                 if (DB_INSTANCE == null) {
                     DB_INSTANCE = createAndInitDatabaseInstance(
@@ -64,9 +66,13 @@ public class EmbeddedSecurityControllerFactory<T extends ServletAuthApplication>
                 )).schedule();
             }
         }
-        return createEmbeddedSecurityController(
+        var controller = createEmbeddedSecurityController(
             application, DB_INSTANCE, credentialsProvider, smConfig
         );
+        if (initialization) {
+            controller.initialize();
+        }
+        return controller;
     }
 
     protected @NotNull CBDatabase createAndInitDatabaseInstance(

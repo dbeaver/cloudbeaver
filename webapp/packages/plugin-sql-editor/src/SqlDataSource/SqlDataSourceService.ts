@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -14,25 +14,27 @@ import { type ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import type { ISqlEditorTabState } from '../ISqlEditorTabState.js';
 import type { ISqlDataSource } from './ISqlDataSource.js';
 import { MemorySqlDataSource } from './MemorySqlDataSource.js';
+import type { QueryDataSource } from '../QueryDataSource.js';
 
 export interface ISqlDataSourceOptions {
   name?: string;
   script?: string;
   executionContext?: IConnectionExecutionContextInfo;
+  dataSourceState?: Record<string, any>;
 }
 
-type ISqlDataSourceFactory = (editorId: string, options?: ISqlDataSourceOptions) => ISqlDataSource;
+type ISqlDataSourceFactory<TDataSource extends QueryDataSource> = (editorId: string, options?: ISqlDataSourceOptions) => ISqlDataSource<TDataSource>;
 
-interface ISqlDataSourceFabric {
+interface ISqlDataSourceFabric<TDataSource extends QueryDataSource> {
   key: string;
-  getDataSource: ISqlDataSourceFactory;
-  onDestroy?: (dataSource: ISqlDataSource, editorId: string) => Promise<void> | void;
-  onUnload?: (dataSource: ISqlDataSource, editorId: string) => Promise<void> | void;
-  canDestroy?: (dataSource: ISqlDataSource, editorId: string) => Promise<boolean> | boolean;
+  getDataSource: ISqlDataSourceFactory<TDataSource>;
+  onDestroy?: (dataSource: ISqlDataSource<TDataSource>, editorId: string) => Promise<void> | void;
+  onUnload?: (dataSource: ISqlDataSource<TDataSource>, editorId: string) => Promise<void> | void;
+  canDestroy?: (dataSource: ISqlDataSource<TDataSource>, editorId: string) => Promise<boolean> | boolean;
 }
 
 interface ISqlDataSourceProvider {
-  provider: ISqlDataSourceFabric;
+  provider: ISqlDataSourceFabric<any>;
   dataSource: ISqlDataSource;
   isActionActive: boolean;
 }
@@ -50,7 +52,7 @@ export class SqlDataSourceService {
 
   readonly onCreate: ISyncExecutor<[string, string]>;
   readonly onUpdate: ISyncExecutor<ISQLDatasourceUpdateData>;
-  private readonly dataSourceProviders: Map<string, ISqlDataSourceFabric>;
+  private readonly dataSourceProviders: Map<string, ISqlDataSourceFabric<any>>;
   private readonly providers: Map<string, ISqlDataSourceProvider>;
 
   constructor() {
@@ -76,11 +78,11 @@ export class SqlDataSourceService {
     });
   }
 
-  get(editorId: string): ISqlDataSource | undefined {
-    return this.providers.get(editorId)?.dataSource;
+  get<TDataSource extends QueryDataSource>(editorId: string): ISqlDataSource<TDataSource> | undefined {
+    return this.providers.get(editorId)?.dataSource as ISqlDataSource<TDataSource> | undefined;
   }
 
-  create(state: ISqlEditorTabState, key: string, options?: ISqlDataSourceOptions): ISqlDataSource {
+  create<TDataSource extends QueryDataSource>(state: ISqlEditorTabState, key: string, options?: ISqlDataSourceOptions): ISqlDataSource<TDataSource> {
     const editorId = state.editorId;
     const provider = this.dataSourceProviders.get(key);
 
@@ -110,7 +112,7 @@ export class SqlDataSourceService {
       this.onCreate.execute([editorId, key]);
     }
 
-    return activeProvider.dataSource;
+    return activeProvider.dataSource as unknown as ISqlDataSource<TDataSource>;
   }
 
   async executeAction<T>(editorId: string, action: (dataSource: ISqlDataSource) => Promise<T> | T, notFound: () => void): Promise<T | undefined> {
@@ -165,7 +167,7 @@ export class SqlDataSourceService {
     this.providers.delete(editorId);
   }
 
-  register(dataSourceOptions: ISqlDataSourceFabric) {
+  register<TDataSource extends QueryDataSource>(dataSourceOptions: ISqlDataSourceFabric<TDataSource>) {
     if (this.dataSourceProviders.has(dataSourceOptions.key)) {
       throw new Error(`SQL Data Source with key (${dataSourceOptions.key}) already registered`);
     }

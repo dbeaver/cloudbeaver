@@ -16,8 +16,10 @@
  */
 package io.cloudbeaver.service.sql;
 
+import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebAction;
+import io.cloudbeaver.WebObjectId;
 import io.cloudbeaver.model.WebAsyncTaskInfo;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.WebTransactionLogInfo;
@@ -90,15 +92,17 @@ public interface DBWServiceSQL extends DBWService {
     @WebAction
     void setContextDefaults(@NotNull WebSQLContextInfo sqlContext, String catalogName, String schemaName) throws DBWebException;
 
-    @WebAction
+    @WebAction(requireGlobalPermissions = DBWConstants.GLOBAL_PERMISSION_SCRIPT_EXECUTE)
     WebAsyncTaskInfo asyncExecuteQuery(
+        @NotNull WebSession webSession,
+        @WebObjectId @NotNull String projectId,
         @NotNull WebSQLContextInfo contextInfo,
         @NotNull String sql,
         @Nullable String resultId,
         @Nullable WebSQLDataFilter filter,
         @Nullable WebDataFormat dataFormat,
-        boolean readLogs,
-        @NotNull WebSession webSession) throws DBException;
+        boolean readLogs
+    ) throws DBException;
 
     @WebAction
     WebAsyncTaskInfo asyncReadDataFromContainer(
@@ -125,7 +129,7 @@ public interface DBWServiceSQL extends DBWService {
     /**
      * Updates result set data (sync function).
      */
-    @WebAction
+    @WebAction(requireGlobalPermissions = DBWConstants.GLOBAL_PERMISSION_DATA_EDITOR_EDITING)
     @Deprecated // use async function
     WebSQLExecuteInfo updateResultsDataBatch(
         @NotNull WebSQLContextInfo contextInfo,
@@ -139,7 +143,7 @@ public interface DBWServiceSQL extends DBWService {
     /**
      * Creates async task for updating results data.
      */
-    @WebAction
+    @WebAction(requireGlobalPermissions = DBWConstants.GLOBAL_PERMISSION_DATA_EDITOR_EDITING)
     WebAsyncTaskInfo asyncUpdateResultsDataBatch(
         @NotNull WebSession webSession,
         @NotNull WebSQLContextInfo contextInfo,
@@ -168,7 +172,7 @@ public interface DBWServiceSQL extends DBWService {
         @NotNull Integer lobColumnIndex,
         @NotNull WebSQLResultsRow row) throws DBWebException;
 
-    @WebAction
+    @WebAction(requireGlobalPermissions = DBWConstants.GLOBAL_PERMISSION_DATA_EDITOR_EDITING)
     String updateResultsDataBatchScript(
         @NotNull WebSQLContextInfo contextInfo,
         @NotNull String resultsId,

@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 import { useEffect, useState } from 'react';
 
-import { Combobox, Container, Group, GroupItem, GroupTitle, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { Select, Container, Group, GroupItem, GroupTitle, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { type IVersion, VersionResource } from '@cloudbeaver/core-version';
@@ -43,7 +43,7 @@ export const VersionSelector = observer<Props>(function VersionSelector({ versio
   return (
     <Container gap>
       <Group className={s(style, { group: true })} gap large>
-        <Combobox
+        <Select
           items={versions}
           keySelector={value => value.number}
           valueSelector={value => value.number}
@@ -52,7 +52,7 @@ export const VersionSelector = observer<Props>(function VersionSelector({ versio
           onSelect={value => setSelected(value)}
         >
           {translate('plugin_version_update_administration_version_selector_label')}
-        </Combobox>
+        </Select>
         {version && Instruction && (
           <GroupItem>
             <Instruction

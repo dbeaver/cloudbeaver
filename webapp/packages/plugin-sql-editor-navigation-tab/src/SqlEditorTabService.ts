@@ -54,7 +54,20 @@ import { sqlEditorTabHandlerKey } from './sqlEditorTabHandlerKey.js';
 const SqlEditorPanel = importLazyComponent(() => import('./SqlEditorPanel.js').then(m => m.SqlEditorPanel));
 const SqlEditorTab = importLazyComponent(() => import('./SqlEditorTab.js').then(m => m.SqlEditorTab));
 
-@injectable()
+@injectable(() => [
+  NavigationTabsService,
+  NotificationService,
+  SqlEditorService,
+  SqlResultTabsService,
+  ConnectionExecutionContextService,
+  ConnectionExecutionContextResource,
+  ConnectionInfoResource,
+  NavNodeInfoResource,
+  SqlDataSourceService,
+  ConnectionsManagerService,
+  ContainerResource,
+  CommonDialogService,
+])
 export class SqlEditorTabService extends Bootstrap {
   get sqlEditorTabs(): ITab<ISqlEditorTabState>[] {
     return Array.from(this.navigationTabsService.findTabs<ISqlEditorTabState>(isSQLEditorTab));
@@ -121,12 +134,20 @@ export class SqlEditorTabService extends Bootstrap {
     this.connectionExecutionContextResource.onItemDelete.addHandler(this.handleExecutionContextDelete.bind(this));
   }
 
-  createNewEditor(editorId: string, dataSourceKey: string, name?: string, source?: string, script?: string): ITabOptions<ISqlEditorTabState> | null {
+  createNewEditor(
+    editorId: string,
+    dataSourceKey: string,
+    name?: string,
+    source?: string,
+    script?: string,
+    dataSourceState?: Record<string, any>,
+    metadata?: Record<string, any>,
+  ): ITabOptions<ISqlEditorTabState> | null {
     const order = this.getFreeEditorId();
 
-    const handlerState = this.sqlEditorService.getState(editorId, dataSourceKey, order, source);
+    const handlerState = this.sqlEditorService.getState(editorId, dataSourceKey, order, source, metadata);
 
-    const datasource = this.sqlDataSourceService.create(handlerState, dataSourceKey, { name, script });
+    const datasource = this.sqlDataSourceService.create(handlerState, dataSourceKey, { name, script, dataSourceState });
 
     return {
       id: editorId,
@@ -160,7 +181,7 @@ export class SqlEditorTabService extends Bootstrap {
     return createConnectionParam(context.projectId, context.connectionId);
   }
 
-  private async handleConnectionDelete(key: ResourceKeySimple<IConnectionInfoParams>) {
+  private handleConnectionDelete(key: ResourceKeySimple<IConnectionInfoParams>) {
     const tabs = this.navigationTabsService.findTabs<ISqlEditorTabState>(
       isSQLEditorTab(tab => {
         const dataSource = this.sqlDataSourceService.get(tab.handlerState.editorId);
@@ -225,7 +246,7 @@ export class SqlEditorTabService extends Bootstrap {
     };
   }
 
-  private async handleExecutionContextUpdate(key: ResourceKeySimple<string>) {
+  private handleExecutionContextUpdate(key: ResourceKeySimple<string>) {
     const tabs = this.navigationTabsService.findTabs<ISqlEditorTabState>(
       isSQLEditorTab(tab => {
         const dataSource = this.sqlDataSourceService.get(tab.handlerState.editorId);
@@ -254,7 +275,7 @@ export class SqlEditorTabService extends Bootstrap {
     }
   }
 
-  private async handleExecutionContextDelete(key: ResourceKeySimple<string>) {
+  private handleExecutionContextDelete(key: ResourceKeySimple<string>) {
     const tabs = this.navigationTabsService.findTabs<ISqlEditorTabState>(
       isSQLEditorTab(tab => {
         const dataSource = this.sqlDataSourceService.get(tab.handlerState.editorId);
@@ -437,7 +458,7 @@ export class SqlEditorTabService extends Bootstrap {
     }
   }
 
-  private async syncDatasourceUpdate(data: ISQLDatasourceUpdateData) {
+  private syncDatasourceUpdate(data: ISQLDatasourceUpdateData) {
     const tab = this.sqlEditorTabs.find(tab => tab.handlerState.editorId === data.editorId);
 
     if (tab) {

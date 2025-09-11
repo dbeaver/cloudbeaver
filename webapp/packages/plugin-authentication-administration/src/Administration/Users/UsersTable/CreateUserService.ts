@@ -18,7 +18,7 @@ export interface IToolsContainerProps {
   param: string | null | undefined;
 }
 
-@injectable()
+@injectable(() => [IServiceProvider, AdministrationUserFormService, UsersAdministrationNavigationService])
 export class CreateUserService {
   state: AdministrationUserFormState | null;
   readonly toolsContainer: PlaceholderContainer<IToolsContainerProps>;

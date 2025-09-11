@@ -32,7 +32,7 @@ export type UserTeamGrantInfo = UndefinedToNull<AdminUserTeamGrantInfo>;
 type TeamResourceIncludes = Omit<GetTeamsListQueryVariables, 'teamId'>;
 type NewTeam = TeamInfo & { [NEW_TEAM_SYMBOL]: boolean; timestamp: number };
 
-@injectable()
+@injectable(() => [GraphQLService])
 export class TeamsResource extends CachedMapResource<string, TeamInfo, TeamResourceIncludes> {
   constructor(private readonly graphQLService: GraphQLService) {
     super();

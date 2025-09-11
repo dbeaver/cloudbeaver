@@ -9,7 +9,7 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { AdministrationTopAppBarService, WizardTopAppBarService } from '@cloudbeaver/plugin-administration';
 import { LogoLazy } from '@cloudbeaver/plugin-app-logo';
 
-@injectable()
+@injectable(() => [AdministrationTopAppBarService, WizardTopAppBarService])
 export class AppLogoAdministrationPluginBootstrap extends Bootstrap {
   constructor(
     private readonly administrationTopAppBarService: AdministrationTopAppBarService,

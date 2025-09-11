@@ -29,6 +29,7 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.model.rm.RMConstants;
+import org.jkiss.dbeaver.registry.settings.ProductSettingDescriptor;
 
 import java.util.List;
 import java.util.Map;
@@ -48,7 +49,7 @@ public interface DBWServiceCore extends DBWService {
     WebPropertyInfo[] getSystemInformationProperties(@NotNull WebSession webSession);
 
     @WebAction
-    WebProductSettings getProductSettings(@NotNull WebSession webSession);
+    WebGroupPropertiesInfo<ProductSettingDescriptor> getProductSettings(@NotNull WebSession webSession);
 
     @WebAction
     List<WebDatabaseDriverInfo> getDriverList(@NotNull WebSession webSession, String driverId) throws DBWebException;

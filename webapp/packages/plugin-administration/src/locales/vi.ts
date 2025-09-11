@@ -17,6 +17,25 @@ export default [
     'administration_configuration_wizard_configuration_message',
     'Bạn sẽ có thể thêm các dịch vụ bổ sung sau khi cấu hình server.\n\rQuản trị viên là siêu người dùng có thể cấu hình server, thiết lập kết nối cơ sở dữ liệu, quản lý người dùng khác và nhiều hơn nữa. Vui lòng ghi nhớ mật khẩu đã nhập. Không thể khôi phục mật khẩu quản trị viên tự động.',
   ],
+  ['administration_configuration_wizard_configuration_secure_cookies', 'Force HTTPS mode'],
+  [
+    'administration_configuration_wizard_configuration_secure_cookies_description',
+    'Enable force HTTPS to secure server-client communication. Recommended for production. Ensure your HTTPS proxy is properly configured for correct app functionality',
+  ],
+  [
+    'administration_configuration_wizard_configuration_secure_cookies_warning',
+    "The data won't be encrypted if forced HTTPS mode is disabled. This makes it vulnerable",
+  ],
+  ['administration_configuration_wizard_configuration_secure_cookies_docs', 'Server proxy configuration documentation'],
+  ['administration_configuration_wizard_configuration_supported_hosts', 'Allowed Server URLs'],
+  [
+    'administration_configuration_wizard_configuration_supported_hosts_description',
+    'You can specify multiple server URLs separated by a new line. An empty value means that all URLs are allowed',
+  ],
+  [
+    'administration_configuration_wizard_configuration_supported_hosts_warning',
+    'You cannot remove your current domain ({arg:host}). Open the server configuration from another allowed domain or IP-address to remove this domain.',
+  ],
   ['administration_configuration_tools_save_tooltip', 'Lưu cấu hình'],
   ['administration_configuration_tools_cancel_tooltip', 'Đặt lại thay đổi'],
   ['administration_configuration_wizard_configuration_server_info', 'Thông tin Server'],

@@ -11,7 +11,7 @@ import type { CbSessionLogEvent as ISessionLogEvent } from '@cloudbeaver/core-sd
 
 export { type ISessionLogEvent };
 
-@injectable()
+@injectable(() => [SessionEventSource])
 export class SessionLogsEventHandler extends TopicEventHandler<ISessionLogEvent, ISessionEvent> {
   constructor(sessionEventSource: SessionEventSource) {
     super(SessionEventTopic.CbSessionLog, sessionEventSource);

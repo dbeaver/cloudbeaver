@@ -12,7 +12,7 @@ import { type DatabaseAuthModel as DatabaseAuthModelBase, GraphQLService } from 
 
 export type DatabaseAuthModel = DatabaseAuthModelBase;
 
-@injectable()
+@injectable(() => [GraphQLService, ServerConfigResource])
 export class DatabaseAuthModelsResource extends CachedMapResource<string, DatabaseAuthModel> {
   constructor(
     private readonly graphQLService: GraphQLService,

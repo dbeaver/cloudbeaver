@@ -13,7 +13,7 @@ export type IWsTransactionCountEvent = WsTransactionalCountEvent;
 
 type TransactionCountEvent = IWsTransactionCountEvent;
 
-@injectable()
+@injectable(() => [SessionEventSource])
 export class TransactionLogCountEventHandler extends TopicEventHandler<TransactionCountEvent, ISessionEvent, SessionEventId, SessionEventTopic> {
   constructor(sessionEventSource: SessionEventSource) {
     super(SessionEventTopic.CbTransaction, sessionEventSource);

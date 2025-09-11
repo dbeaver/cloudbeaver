@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { Dependency, injectable } from '@cloudbeaver/core-di';
+import { injectable } from '@cloudbeaver/core-di';
 import {
   createSettingsAliasResolver,
   ESettingsValueType,
@@ -24,10 +24,11 @@ const defaultSettings = schema.object({
   'plugin.log-viewer.disabled': schemaExtra.stringedBoolean().default(false),
 });
 
-export type LogViewerSettings = schema.infer<typeof defaultSettings>;
+export type LogViewerSettingsSchema = typeof defaultSettings;
+export type LogViewerSettings = schema.infer<LogViewerSettingsSchema>;
 
-@injectable()
-export class LogViewerSettingsService extends Dependency {
+@injectable(() => [SettingsProviderService, SettingsManagerService, SettingsResolverService])
+export class LogViewerSettingsService {
   get disabled(): boolean {
     return this.settings.getValue('plugin.log-viewer.disabled');
   }
@@ -40,19 +41,18 @@ export class LogViewerSettingsService extends Dependency {
     return this.settings.getValue('plugin.log-viewer.logBatchSize');
   }
 
-  readonly settings: SettingsProvider<typeof defaultSettings>;
+  readonly settings: SettingsProvider<LogViewerSettingsSchema>;
 
   constructor(
     private readonly settingsProviderService: SettingsProviderService,
     private readonly settingsManagerService: SettingsManagerService,
     private readonly settingsResolverService: SettingsResolverService,
   ) {
-    super();
     this.settings = this.settingsProviderService.createSettings(defaultSettings);
     this.settingsResolverService.addResolver(
       ROOT_SETTINGS_LAYER,
       /** @deprecated Use settings instead, will be removed in 23.0.0 */
-      createSettingsAliasResolver(this.settingsResolverService, this.settings, {
+      createSettingsAliasResolver<LogViewerSettingsSchema>(this.settingsProviderService.settingsResolver, {
         'plugin.log-viewer.disabled': 'core.app.logViewer.disabled',
         'plugin.log-viewer.logBatchSize': 'core.app.logViewer.logBatchSize',
         'plugin.log-viewer.maxLogRecords': 'core.app.logViewer.maxLogRecords',
@@ -63,7 +63,7 @@ export class LogViewerSettingsService extends Dependency {
   }
 
   private registerSettings() {
-    this.settingsManagerService.registerSettings(this.settings, () => [
+    this.settingsManagerService.registerSettings<typeof defaultSettings>(() => [
       // {
       //   group: LOG_VIEWER_SETTINGS_GROUP,
       //   key: 'plugin.log-viewer.maxLogRecords',

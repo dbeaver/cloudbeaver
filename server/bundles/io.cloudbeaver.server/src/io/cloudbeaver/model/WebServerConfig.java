@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,7 +41,7 @@ import java.util.Map;
 public class WebServerConfig {
 
     private final WebApplication application;
-    private boolean provideSensitiveInformation = true;
+    protected boolean provideSensitiveInformation = true;
 
     public WebServerConfig(@NotNull WebApplication application) {
         this.application = application;
@@ -136,7 +136,7 @@ public class WebServerConfig {
 
     @Property
     public WebServerLanguage[] getSupportedLanguages() {
-        List<PlatformLanguageDescriptor> langs = PlatformLanguageRegistry.getInstance().getLanguages();
+        List<PlatformLanguageDescriptor> langs = new ArrayList<>(PlatformLanguageRegistry.getInstance().getLanguages());
         // FIXME: remove hardcoded ordering
         langs.sort(Comparator.comparingInt(x -> x.getCode().equals("vi") ? 1 : -1));
         WebServerLanguage[] webLangs = new WebServerLanguage[langs.size()];

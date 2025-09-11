@@ -137,6 +137,7 @@ public class WebSessionWorkspace implements DBPWorkspace {
         clearProjects();
     }
 
+    @Nullable
     @Override
     public DBPImage getResourceIcon(DBPAdaptable resourceAdapter) {
         return null;

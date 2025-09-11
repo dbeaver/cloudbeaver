@@ -9,7 +9,7 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 
 import { ClipboardService } from './ClipboardService.js';
 
-@injectable()
+@injectable(() => [ClipboardService])
 export class ClipboardBootstrap extends Bootstrap {
   constructor(private readonly clipboardService: ClipboardService) {
     super();

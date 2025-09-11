@@ -35,7 +35,7 @@ export const CONNECTION_FOLDER_NAME_VALIDATION = /^(?!\.)[^\\/:\\"'<>|?*]+$/u;
 
 export const ConnectionFolderProjectKey = resourceKeyAliasFactory('@connection-folder/project', (projectId: string) => ({ projectId }));
 
-@injectable()
+@injectable(() => [GraphQLService, SessionDataResource, AppAuthService])
 export class ConnectionFolderResource extends CachedMapResource<IConnectionFolderParam, ConnectionFolder> {
   constructor(
     private readonly graphQLService: GraphQLService,

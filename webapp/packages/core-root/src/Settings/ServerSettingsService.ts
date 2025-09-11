@@ -17,7 +17,7 @@ import { SessionPermissionsResource } from '../SessionPermissionsResource.js';
 
 export const SERVER_SETTINGS_LAYER = createSettingsLayer(PRODUCT_SETTINGS_LAYER, 'server');
 
-@injectable()
+@injectable(() => [ServerConfigResource, SessionPermissionsResource])
 export class ServerSettingsService extends SettingsSource {
   private readonly settings: Map<string, any>;
   private lastConfig: any;
@@ -34,7 +34,6 @@ export class ServerSettingsService extends SettingsSource {
     makeObservable<this, 'settings' | 'refreshConfig'>(this, {
       refreshConfig: action,
       settings: observable.shallow,
-      clear: action,
     });
   }
 
@@ -66,7 +65,7 @@ export class ServerSettingsService extends SettingsSource {
     this.update(() => {
       this.clear();
       for (const key of this.settings.keys()) {
-        this.setValue(key, null);
+        this.resetValue(key);
       }
     });
   }

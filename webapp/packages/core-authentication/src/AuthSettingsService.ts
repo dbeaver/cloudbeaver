@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@ const settingsSchema = schema.object({
 
 export type AuthSettings = schema.infer<typeof settingsSchema>;
 
-@injectable()
+@injectable(() => [SettingsProviderService, SettingsManagerService])
 export class AuthSettingsService {
   get disableAnonymousAccess(): boolean {
     return this.settings.getValue('core.authentication.disableAnonymousAccess');
@@ -32,7 +32,7 @@ export class AuthSettingsService {
   }
 
   private registerSettings() {
-    this.settingsManagerService.registerSettings(this.settings, () => [
+    this.settingsManagerService.registerSettings<typeof settingsSchema>(() => [
       // {
       //   key: 'core.authentication.disableAnonymousAccess',
       //   access: {

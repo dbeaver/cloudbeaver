@@ -5,6 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+
 export * from './Promises/CancellablePromise.js';
 export * from './Promises/cancellableTimeout.js';
 export * from './Promises/Deferred.js';
@@ -31,6 +32,7 @@ export * from './getPathName.js';
 export * from './getPathParent.js';
 export * from './getPathParents.js';
 export * from './getPathParts.js';
+export * from './isIp.js';
 export * from './GlobalConstants.js';
 export * from './ILoadableState.js';
 export * from './errorOf.js';

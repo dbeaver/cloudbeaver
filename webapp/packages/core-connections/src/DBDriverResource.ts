@@ -27,7 +27,7 @@ export const NEW_DRIVER_SYMBOL = Symbol('new-driver');
 export type NewDBDriver = DBDriver & { [NEW_DRIVER_SYMBOL]: boolean; timestamp: number };
 export type DBDriverResourceIncludes = Omit<DriverListQueryVariables, 'driverId'>;
 
-@injectable()
+@injectable(() => [ServerConfigResource, GraphQLService, WorkspaceConfigEventHandler, AppAuthService])
 export class DBDriverResource extends CachedMapResource<string, DBDriver, DBDriverResourceIncludes> {
   get enabledDrivers() {
     return this.values.filter(driver => driver.enabled).sort(this.compare);

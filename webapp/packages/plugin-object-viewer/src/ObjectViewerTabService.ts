@@ -45,7 +45,16 @@ import { objectViewerTabHandlerKey } from './objectViewerTabHandlerKey.js';
 const ObjectViewerPanel = importLazyComponent(() => import('./ObjectViewerPanel/ObjectViewerPanel.js').then(m => m.ObjectViewerPanel));
 const ObjectViewerTab = importLazyComponent(() => import('./ObjectViewerTab.js').then(m => m.ObjectViewerTab));
 
-@injectable()
+@injectable(() => [
+  NavNodeManagerService,
+  DBObjectPageService,
+  NotificationService,
+  NavigationTabsService,
+  ConnectionInfoResource,
+  ConnectionNavNodeService,
+  NavTreeResource,
+  ConnectionExecutionContextResource,
+])
 export class ObjectViewerTabService {
   readonly tabHandler: TabHandler<IObjectViewerTabState>;
 
@@ -67,6 +76,7 @@ export class ObjectViewerTabService {
       onSelect: this.selectObjectTab.bind(this),
       onClose: this.closeObjectTab.bind(this),
       canClose: this.canCloseObjectTab.bind(this),
+      onUnload: this.unloadObjectTab.bind(this),
 
       extensions: [
         projectProvider(this.getProject.bind(this)),
@@ -102,6 +112,11 @@ export class ObjectViewerTabService {
         context.tab.handlerState.objectId = data.newNodeId;
       }
     });
+  }
+
+  private async unloadObjectTab(tab: ITab<IObjectViewerTabState>) {
+    // TODO: we need to call unloadPages, but it's not implemented in the DBObjectPageService
+    await this.dbObjectPageService.closePages(tab);
   }
 
   isPageActive(tab: ITab<IObjectViewerTabState>, page: ObjectPage): boolean {

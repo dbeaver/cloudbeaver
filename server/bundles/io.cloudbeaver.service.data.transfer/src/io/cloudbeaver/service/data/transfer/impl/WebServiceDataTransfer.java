@@ -313,6 +313,7 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
             DatabaseTransferConsumer consumer = new DatabaseTransferConsumer(dataContainer);
             DatabaseConsumerSettings databaseConsumerSettings = new DatabaseConsumerSettings();
             databaseConsumerSettings.setContainer((DBSObjectContainer) dataContainer.getDataSource());
+            databaseConsumerSettings.setEnableQmLogging(true);
             consumer.setSettings(databaseConsumerSettings);
 
             StreamProducerSettings producerSettings = new StreamProducerSettings();

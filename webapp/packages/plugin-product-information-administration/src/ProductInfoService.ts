@@ -12,15 +12,15 @@ import {
   type IAdministrationItem,
 } from '@cloudbeaver/core-administration';
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
-import { Dependency, injectable } from '@cloudbeaver/core-di';
+import { injectable } from '@cloudbeaver/core-di';
 import { ServerLicenseStatusResource } from '@cloudbeaver/core-root';
 import { type ITabInfoOptions, TabsContainer } from '@cloudbeaver/core-ui';
 
 const ProductInfoDrawerItem = importLazyComponent(() => import('./ProductInfoDrawerItem.js').then(m => m.ProductInfoDrawerItem));
 const ProductInfoPage = importLazyComponent(() => import('./ProductInfoPage.js').then(m => m.ProductInfoPage));
 
-@injectable()
-export class ProductInfoService extends Dependency {
+@injectable(() => [AdministrationItemService, ServerLicenseStatusResource])
+export class ProductInfoService {
   static PAGE_NAME = 'product-info';
   readonly tabsContainer: TabsContainer<AdministrationItemContentProps>;
   private readonly administrationItem: IAdministrationItem;
@@ -29,7 +29,6 @@ export class ProductInfoService extends Dependency {
     private readonly administrationItemService: AdministrationItemService,
     private readonly serverLicenseStatusResource: ServerLicenseStatusResource,
   ) {
-    super();
     this.tabsContainer = new TabsContainer('Product information administration settings');
 
     this.administrationItem = this.administrationItemService.create({

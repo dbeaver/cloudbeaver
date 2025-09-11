@@ -62,7 +62,23 @@ import { FolderDialog } from '@cloudbeaver/plugin-projects';
 
 import { ACTION_TREE_CREATE_FOLDER } from '../Actions/ACTION_TREE_CREATE_FOLDER.js';
 
-@injectable()
+@injectable(() => [
+  LocalizationService,
+  UserInfoResource,
+  NavTreeResource,
+  ActionService,
+  MenuService,
+  ConnectionInfoResource,
+  NavNodeManagerService,
+  ConnectionFolderResource,
+  CommonDialogService,
+  NotificationService,
+  NavNodeInfoResource,
+  ProjectInfoResource,
+  ProjectsNavNodeService,
+  NavigationTreeService,
+  TreeSelectionService,
+])
 export class ConnectionFoldersBootstrap extends Bootstrap {
   constructor(
     private readonly localizationService: LocalizationService,

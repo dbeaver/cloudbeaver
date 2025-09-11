@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@ import { ElementsTreeToolsMenuService } from './ElementsTree/ElementsTreeTools/E
 
 const NavigationTreePanel = importLazyComponent(() => import('./NavigationTreePanel.js').then(m => m.NavigationTreePanel));
 
-@injectable()
+@injectable(() => [NavigationTreeSettingsService, ElementsTreeToolsMenuService, LeftBarPanelService])
 export class NavigationTreeBootstrap extends Bootstrap {
   constructor(
     private readonly navigationTreeSettingsService: NavigationTreeSettingsService,
