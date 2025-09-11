@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { injectable } from '@cloudbeaver/core-di';
-import { ACTION_EDIT, ActionService, MenuService } from '@cloudbeaver/core-view';
+import { ACTION_EDIT, ActionService, getBindingLabel, KEY_BINDING_ADD, KEY_BINDING_DUPLICATE, MenuService, type IAction } from '@cloudbeaver/core-view';
 import {
   DATA_CONTEXT_DV_DDM,
   DATA_CONTEXT_DV_DDM_RESULT_INDEX,
@@ -22,6 +22,8 @@ import {
   ResultSetSelectAction,
   ResultSetViewAction,
 } from '@cloudbeaver/plugin-data-viewer';
+import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
+import { LocalizationService } from '@cloudbeaver/core-localization';
 
 import { ACTION_DATA_GRID_EDITING_ADD_ROW } from '../Actions/Editing/ACTION_DATA_GRID_EDITING_ADD_ROW.js';
 import { ACTION_DATA_GRID_EDITING_DELETE_ROW } from '../Actions/Editing/ACTION_DATA_GRID_EDITING_DELETE_ROW.js';
@@ -32,12 +34,15 @@ import { ACTION_DATA_GRID_EDITING_REVERT_SELECTED_ROW } from '../Actions/Editing
 import { ACTION_DATA_GRID_EDITING_SET_TO_NULL } from '../Actions/Editing/ACTION_DATA_GRID_EDITING_SET_TO_NULL.js';
 import { MENU_DATA_GRID_EDITING } from './MENU_DATA_GRID_EDITING.js';
 
-@injectable(() => [ActionService, MenuService])
+@injectable(() => [ActionService, LocalizationService, MenuService])
 export class DataGridContextMenuCellEditingService {
   constructor(
     private readonly actionService: ActionService,
+    private readonly localizationService: LocalizationService,
     private readonly menuService: MenuService,
   ) { }
+
+
 
   register(): void {
     this.menuService.addCreator({
@@ -140,13 +145,7 @@ export class DataGridContextMenuCellEditingService {
           ACTION_DATA_GRID_EDITING_REVERT_SELECTED_ROW,
         ].includes(action);
       },
-      getActionInfo(context, action) {
-        if (action === ACTION_EDIT) {
-          return { ...action.info, label: 'data_grid_table_editing_open_inline_editor', icon: 'edit' };
-        }
-
-        return action.info;
-      },
+      getActionInfo: this.getActionInfo.bind(this),
       handler(context, action) {
         const model = context.get(DATA_CONTEXT_DV_DDM)!;
         const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
@@ -187,5 +186,21 @@ export class DataGridContextMenuCellEditingService {
         }
       },
     });
+  }
+
+  private getActionInfo(context: IDataContextProvider, action: IAction) {
+    const t = this.localizationService.translate;
+    if (action === ACTION_DATA_GRID_EDITING_ADD_ROW) {
+      return { ...action.info, label: 'data_grid_table_editing_row_add', tooltip: t('data_grid_table_editing_row_add') + ' (' + getBindingLabel(KEY_BINDING_ADD) + ')' };
+    }
+    if (action === ACTION_DATA_GRID_EDITING_DUPLICATE_ROW) {
+      return { ...action.info, label: 'data_grid_table_editing_row_add_copy', tooltip: t('data_grid_table_editing_row_add_copy') + ' (' + getBindingLabel(KEY_BINDING_DUPLICATE) + ')' };
+    }
+
+    if (action === ACTION_EDIT) {
+      return { ...action.info, label: t('data_grid_table_editing_open_inline_editor'), icon: 'edit' };
+    }
+
+    return action.info;
   }
 }

@@ -5,9 +5,9 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { createAction } from '../createAction.js';
+import { createKeyBinding } from '../createKeyBinding.js';
 
-export const ACTION_COLLAPSE_ALL = createAction('collapse-all', {
-  label: 'app_navigationTree_action_collapse_all',
-  icon: '/icons/collapse_sm.svg',
+export const KEY_BINDING_ADD = createKeyBinding({
+    id: 'add',
+    keys: ['alt+r'],
 });
