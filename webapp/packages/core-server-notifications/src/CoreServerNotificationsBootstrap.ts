@@ -21,7 +21,7 @@ export class CoreServerNotificationsBootstrap extends Bootstrap {
   ) {
     super();
     this.serverNotificationsEventHandler.onEvent(
-      CbServerEventId.CbUserSessionLimit,
+      CbServerEventId.CbServerNotification,
       event => {
         this.notificationService.notify(event.options, event.type);
       },

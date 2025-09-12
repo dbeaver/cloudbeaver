@@ -15,7 +15,7 @@ import {
   SessionEventTopic,
   TopicEventHandler,
 } from '@cloudbeaver/core-root';
-import { CbEventTopic, type WsUserNotificationEvent } from '@cloudbeaver/core-sdk';
+import { CbEventTopic, type WsServerNotificationEvent } from '@cloudbeaver/core-sdk';
 import { ServerNotificationsHelper } from './ServerNotificationsHelper.js';
 
 interface ServerNotificationEventMapped extends IBaseServerEvent<SessionEventId, SessionEventTopic> {
@@ -34,12 +34,12 @@ export class ServerNotificationsEventHandler extends TopicEventHandler<
     super(CbEventTopic.CbNotification, sessionEventSource);
   }
 
-  map(event: WsUserNotificationEvent): ServerNotificationEventMapped {
+  map(event: WsServerNotificationEvent): ServerNotificationEventMapped {
     return {
       id: event.id,
       topicId: event.topicId,
       options: ServerNotificationsHelper.mapEventToNotification(event),
-      type: ServerNotificationsHelper.mapNotificationType(event.eventNotificationType),
+      type: ServerNotificationsHelper.mapNotificationType(event.notificationType),
     };
   }
 }

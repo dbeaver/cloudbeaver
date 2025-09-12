@@ -7,10 +7,10 @@
  */
 
 import { ENotificationType, type INotificationOptions } from '@cloudbeaver/core-events';
-import { WsUserNotificationEventType, type WsUserNotificationEvent } from '@cloudbeaver/core-sdk';
+import { WsUserNotificationEventType, type WsServerNotificationEvent } from '@cloudbeaver/core-sdk';
 
 export const ServerNotificationsHelper = {
-  mapEventToNotification(event: WsUserNotificationEvent): INotificationOptions {
+  mapEventToNotification(event: WsServerNotificationEvent): INotificationOptions {
     return {
       message: event.message,
       title: event.title ?? '',
