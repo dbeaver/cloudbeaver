@@ -10,6 +10,21 @@
     --dbv-kit-control-outline-offset: -8px;
     position: relative;
 
+    .switchBody {
+      display: flex;
+      align-items: center;
+
+      & .fieldLabel {
+        cursor: pointer;
+        user-select: none;
+        display: block;
+        padding-left: 18px;
+        min-width: 50px;
+        white-space: pre-wrap !important;
+        font-weight: 500 !important;
+      }
+    }
+
     &::before {
       content: '';
       position: absolute;
@@ -58,17 +73,5 @@
 }
 
 .switchBody {
-  display: flex;
-  align-items: center;
   composes: theme-typography--body1 from global;
-
-  & .fieldLabel {
-    cursor: pointer;
-    user-select: none;
-    display: block;
-    padding-left: 18px;
-    min-width: 50px;
-    white-space: pre-wrap;
-    font-weight: 500;
-  }
 }
