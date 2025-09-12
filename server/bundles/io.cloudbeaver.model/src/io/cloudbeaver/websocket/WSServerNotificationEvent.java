@@ -21,22 +21,22 @@ import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.websocket.WSConstants;
 import org.jkiss.dbeaver.model.websocket.event.session.WSAbstractSessionEvent;
 
-public class WSUserNotificationEvent extends WSAbstractSessionEvent {
+public class WSServerNotificationEvent extends WSAbstractSessionEvent {
 
+    public static final String EVENT_ID = "cb_server_notification";
     private String title;
     private String message;
-    private WSUserNotificationEventType eventNotificationType;
+    private WSUserNotificationEventType notificationType;
 
-    public WSUserNotificationEvent(
-        @NotNull String eventId,
+    public WSServerNotificationEvent(
         @Nullable String title,
         @Nullable String message,
-        @NotNull WSUserNotificationEventType eventNotificationType
+        @NotNull WSUserNotificationEventType notificationType
     ) {
-        super(eventId, WSConstants.TOPIC_USER_NOTIFICATION);
+        super(EVENT_ID, WSConstants.TOPIC_USER_NOTIFICATION);
         this.title = title;
         this.message = message;
-        this.eventNotificationType = eventNotificationType;
+        this.notificationType = notificationType;
     }
 
     public String getTitle() {
@@ -47,7 +47,7 @@ public class WSUserNotificationEvent extends WSAbstractSessionEvent {
         return message;
     }
 
-    public WSUserNotificationEventType getEventNotificationType() {
-        return eventNotificationType;
+    public WSUserNotificationEventType getNotificationType() {
+        return notificationType;
     }
 }

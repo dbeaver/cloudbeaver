@@ -65,8 +65,8 @@ enum CBServerEventId {
     cb_session_task_info_updated @since(version: "24.3.1"),
     "Workspace configuration updated"
     cb_workspace_config_changed @since(version: "25.1.1"),
-    "User sessions limit reached"
-    cb_user_session_limit@since(version: "25.2.1")
+    "Server notification"
+    cb_server_notification@since(version: "25.2.1")
 }
 
 "Events sent by client"
@@ -284,12 +284,12 @@ enum WSUserNotificationEventType {
     CUSTOM
 }
 "General event for showing user notification"
-type WSUserNotificationEvent implements CBServerEvent @since(version: "25.2.1") {
+type WSServerNotificationEvent implements CBServerEvent @since(version: "25.2.1") {
     id: CBServerEventId!
     topicId: CBEventTopic!
     title: String
     message: String
-    eventNotificationType: WSUserNotificationEventType!
+    notificationType: WSUserNotificationEventType!
 }
 
 extend type Query {
