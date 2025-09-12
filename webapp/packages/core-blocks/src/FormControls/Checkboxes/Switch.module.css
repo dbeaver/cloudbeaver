@@ -5,26 +5,27 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+@layer components {
+  .field {
+    --dbv-kit-control-outline-offset: -8px;
+    position: relative;
 
-.field {
-  --dbv-kit-control-outline-offset: -8px;
-  position: relative;
+    &::before {
+      content: '';
+      position: absolute;
+      top: var(--dbv-kit-control-outline-offset);
+      left: var(--dbv-kit-control-outline-offset);
+      right: var(--dbv-kit-control-outline-offset);
+      bottom: var(--dbv-kit-control-outline-offset);
+      border-radius: var(--dbv-kit-control-border-radius);
+      border: var(--dbv-kit-control-outline-width) solid transparent;
+      pointer-events: none;
+    }
 
-  &::before {
-    content: '';
-    position: absolute;
-    top: var(--dbv-kit-control-outline-offset);
-    left: var(--dbv-kit-control-outline-offset);
-    right: var(--dbv-kit-control-outline-offset);
-    bottom: var(--dbv-kit-control-outline-offset);
-    border-radius: var(--dbv-kit-control-border-radius);
-    border: var(--dbv-kit-control-outline-width) solid transparent;
-    pointer-events: none;
-  }
-
-  &:has(.switchInput:focus-visible)::before {
-    border-color: var(--dbv-kit-control-outline-color);
-    border-width: var(--dbv-kit-control-outline-width);
+    &:has(.switchInput:focus-visible)::before {
+      border-color: var(--dbv-kit-control-outline-color);
+      border-width: var(--dbv-kit-control-outline-width);
+    }
   }
 }
 
