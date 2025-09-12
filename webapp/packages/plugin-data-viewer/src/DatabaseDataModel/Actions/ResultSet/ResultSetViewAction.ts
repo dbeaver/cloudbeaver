@@ -31,7 +31,7 @@ export class ResultSetViewAction extends DatabaseDataAction<any, IDatabaseResult
   }
 
   get columnKeys(): IResultSetColumnKey[] {
-    return this.columns.map(c => ({ index: this.data.columns.indexOf(c) }));
+    return this.columnsOrder.map(index => ({ index }));
   }
 
   get rows(): IResultSetValue[][] {

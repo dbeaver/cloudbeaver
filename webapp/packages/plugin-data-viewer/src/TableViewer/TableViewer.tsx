@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -197,7 +197,7 @@ export const TableViewer = observer<TableViewerProps, HTMLDivElement>(
 
     const isStatistics = result?.loadedFully && !result.data;
     const resultExist = dataModel.source.hasResult(resultIndex);
-    const overlay = dataModel.source.results.length > 0 && presentation.dataFormat === dataFormat;
+    const overlay = getComputed(() => dataModel.source.results.length > 0 && presentation.dataFormat === dataFormat);
     const valuePanelDisplayed =
       valuePresentation &&
       (valuePresentation.dataFormat === undefined || valuePresentation.dataFormat === dataFormat) &&

@@ -1,5 +1,20 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2025 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+
 import { forwardRef, useImperativeHandle, useMemo, useRef, useState } from 'react';
-import { DataGrid as DataGridBase, type ColumnOrColumnGroup, type CellSelectArgs, type DataGridHandle, type ColumnWidth, type ColumnWidths } from 'react-data-grid';
+import {
+  DataGrid as DataGridBase,
+  type ColumnOrColumnGroup,
+  type CellSelectArgs,
+  type DataGridHandle,
+  type ColumnWidth,
+  type ColumnWidths,
+} from 'react-data-grid';
 import { rowRenderer } from './renderers/rowRenderer.js';
 import { cellRenderer } from './renderers/cellRenderer.js';
 import { DataGridCellHeaderContext, type IDataGridHeaderCellContext } from './DataGridHeaderCellContext.js';
@@ -111,9 +126,12 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
       innerGridRef.current?.scrollToCell({ idx: position.colIdx && dndHeaderContext.getDataColIdx(position.colIdx), rowIdx: position.rowIdx });
     },
     openEditor: (position: ICellPosition) => {
-      innerGridRef.current?.selectCell({ idx: dndHeaderContext.getDataColIdx(position.colIdx), rowIdx: position.rowIdx }, {
-        enableEditor: true,
-      });
+      innerGridRef.current?.selectCell(
+        { idx: dndHeaderContext.getDataColIdx(position.colIdx), rowIdx: position.rowIdx },
+        {
+          enableEditor: true,
+        },
+      );
     },
   }));
 
@@ -126,7 +144,7 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
     }
   }
 
-  let rows = useMemo(
+  const rows = useMemo(
     () =>
       new Array<IInnerRow>(rowsCount).fill({ idx: 0 }).map((_, i) => ({
         idx: i,
@@ -142,21 +160,16 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
     onCellKeyDown?.({ colIdx: dndHeaderContext.getDataColIdx(args.column.idx), rowIdx: args.rowIdx }, event);
   }
 
-  const isMeasurementRender = columnWidths.size === 0 && columnCount.get() > 0;
-
-  if (isMeasurementRender) {
-    rows = rows.slice(0, 100);
-  }
-
   return (
     <HeaderDnDContext value={dndHeaderContext}>
       <DataGridRowContext value={{ rowCount, onScrollToBottom }}>
         <DataGridCellContext value={{ cell, cellText, cellElement, cellTooltip, onCellChange }}>
-          <DataGridCellHeaderContext value={{ headerElement, headerText, getHeaderDnD, columnSortable, onColumnSort, columnSortingState, onHeaderKeyDown }}>
+          <DataGridCellHeaderContext
+            value={{ headerElement, headerText, getHeaderDnD, columnSortable, onColumnSort, columnSortingState, onHeaderKeyDown }}
+          >
             <DataGridBase
               ref={innerGridRef}
               columns={dndHeaderContext.columns}
-              enableVirtualization={!isMeasurementRender}
               rows={rows}
               className={className}
               headerRowHeight={getHeaderHeight?.()}
