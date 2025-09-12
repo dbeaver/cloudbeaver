@@ -24,7 +24,7 @@ import { ExecutorInterrupter, type IExecutionContextProvider } from '@cloudbeave
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { OptionsPanelService } from '@cloudbeaver/core-ui';
 import { isNotNullDefined } from '@dbeaver/js-helpers';
-import { ActionService, MenuCustomItem, menuExtractItems, MenuService } from '@cloudbeaver/core-view';
+import { ActionService, MenuCustomItem, menuItemsPlaceAfter, MenuService } from '@cloudbeaver/core-view';
 import { ConnectionSchemaManagerService } from '@cloudbeaver/plugin-datasource-context-switch';
 import { MENU_APP_ACTIONS } from '@cloudbeaver/plugin-top-app-bar';
 import { MENU_TOOLS } from '@cloudbeaver/plugin-tools-panel';
@@ -81,6 +81,26 @@ export class TransactionManagerBootstrap extends Bootstrap {
   override register() {
     this.connectionsManagerService.onDisconnect.addHandler(this.disconnectHandler.bind(this));
 
+    const TRANSACTION_INFO_ITEM = new MenuCustomItem(
+      {
+        id: 'transaction-info',
+        getComponent: () => TransactionInfoAction,
+      },
+      {
+        onSelect: async () => {
+          const transaction = this.getContextTransaction();
+
+          if (transaction) {
+            await this.commonDialogService.open(TransactionLogDialog, {
+              transaction,
+              onCommit: () => this.commit(transaction),
+              onRollback: () => this.rollback(transaction),
+            });
+          }
+        },
+      },
+    );
+
     this.menuService.addCreator({
       menus: [MENU_APP_ACTIONS],
       isApplicable: () => {
@@ -105,44 +125,22 @@ export class TransactionManagerBootstrap extends Bootstrap {
         ];
 
         if (transaction && transaction.autoCommit === false) {
-          result.push(
-            new MenuCustomItem(
-              {
-                id: 'transaction-info',
-                getComponent: () => TransactionInfoAction,
-              },
-              {
-                onSelect: async () => {
-                  await this.commonDialogService.open(TransactionLogDialog, {
-                    transaction,
-                    onCommit: () => this.commit(transaction),
-                    onRollback: () => this.rollback(transaction),
-                  });
-                },
-              },
-            ),
-          );
+          result.push(TRANSACTION_INFO_ITEM);
         }
 
         return result;
       },
       orderItems: (context, items) => {
-        const actions = menuExtractItems(items, [
-          ACTION_DATASOURCE_TRANSACTION_COMMIT,
-          ACTION_DATASOURCE_TRANSACTION_ROLLBACK,
-          ACTION_DATASOURCE_TRANSACTION_COMMIT_MODE_TOGGLE,
-        ]);
-
-        const infoElementIndex = items.findIndex(item => item.id === 'transaction-info');
-
-        if (infoElementIndex !== -1) {
-          actions.push(...items.splice(infoElementIndex, 1));
-        }
-
-        if (actions.length > 0) {
-          const toolsItem = items.indexOf(MENU_TOOLS);
-          items.splice(toolsItem === -1 ? items.length : toolsItem + 1, 0, ...actions);
-        }
+        menuItemsPlaceAfter(
+          items,
+          [
+            ACTION_DATASOURCE_TRANSACTION_COMMIT,
+            ACTION_DATASOURCE_TRANSACTION_ROLLBACK,
+            ACTION_DATASOURCE_TRANSACTION_COMMIT_MODE_TOGGLE,
+            TRANSACTION_INFO_ITEM,
+          ],
+          MENU_TOOLS,
+        );
 
         return items;
       },
