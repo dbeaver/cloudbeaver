@@ -83,6 +83,9 @@
       "path": "../core-server-localization"
     },
     {
+      "path": "../core-server-notifications"
+    },
+    {
       "path": "../core-session-localization"
     },
     {

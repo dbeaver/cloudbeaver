@@ -28,6 +28,7 @@ import { coreRootManifest } from '@cloudbeaver/core-root';
 import { coreRoutingManifest } from '@cloudbeaver/core-routing';
 import { coreSDKManifest } from '@cloudbeaver/core-sdk';
 import { coreServerLocalization } from '@cloudbeaver/core-server-localization';
+import coreServerNotificationsManifest from '@cloudbeaver/core-server-notifications';
 import { coreSessionLocalization } from '@cloudbeaver/core-session-localization';
 import { coreSettingsManifest } from '@cloudbeaver/core-settings';
 import { coreSettingsLocalizationManifest } from '@cloudbeaver/core-settings-localization';
@@ -80,4 +81,5 @@ export const coreManifests: PluginManifest[] = [
   coreNavigationTree,
   coreSettingsUserManifest,
   coreTaskManagerManifest,
+  coreServerNotificationsManifest,
 ];

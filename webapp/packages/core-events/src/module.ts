@@ -11,8 +11,6 @@ import { NotificationService } from './NotificationService.js';
 import { LocaleService } from './LocaleService.js';
 import { ExceptionsCatcherService } from './ExceptionsCatcherService.js';
 import { EventsSettingsService } from './EventsSettingsService.js';
-import { ServerNotificationsService } from './ServerNotificationsService.js';
-import { ServerNotificationsEventHandler } from './ServerNotificationsEventHandler.js';
 
 ModuleRegistry.add({
   name: '@cloudbeaver/core-events',
@@ -21,8 +19,6 @@ ModuleRegistry.add({
     serviceCollection
       .addSingleton(Bootstrap, proxy(ExceptionsCatcherService))
       .addSingleton(Bootstrap, LocaleService)
-      .addSingleton(Bootstrap, ServerNotificationsService)
-      .addSingleton(ServerNotificationsEventHandler)
       .addSingleton(Dependency, proxy(EventsSettingsService))
       .addSingleton(EventsSettingsService)
       .addSingleton(NotificationService)

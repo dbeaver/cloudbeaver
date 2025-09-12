@@ -1,5 +1,5 @@
 {
-  "name": "@cloudbeaver/core-events",
+  "name": "@cloudbeaver/core-server-notifications",
   "type": "module",
   "sideEffects": [
     "./lib/module.js",
@@ -23,20 +23,16 @@
   },
   "dependencies": {
     "@cloudbeaver/core-di": "workspace:*",
-    "@cloudbeaver/core-executor": "workspace:*",
-    "@cloudbeaver/core-localization": "workspace:*",
-    "@cloudbeaver/core-sdk": "workspace:*",
-    "@cloudbeaver/core-settings": "workspace:*",
-    "@cloudbeaver/core-utils": "workspace:*",
-    "mobx": "^6",
-    "tslib": "^2"
+    "@cloudbeaver/core-events": "workspace:*",
+    "@cloudbeaver/core-root": "workspace:*",
+    "@cloudbeaver/core-sdk": "workspace:*"
   },
   "devDependencies": {
     "@cloudbeaver/core-cli": "workspace:*",
     "@cloudbeaver/tsconfig": "workspace:*",
     "@dbeaver/cli": "workspace:*",
-    "@dbeaver/react-tests": "workspace:^",
-    "typescript": "^5",
-    "vitest": "^3"
+    "rimraf": "^6",
+    "tslib": "^2",
+    "typescript": "^5"
   }
 }

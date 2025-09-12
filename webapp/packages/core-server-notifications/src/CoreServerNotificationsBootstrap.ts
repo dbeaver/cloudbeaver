@@ -7,17 +7,17 @@
  */
 
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import { NotificationService } from './NotificationService.js';
 import { ServerNotificationsEventHandler } from './ServerNotificationsEventHandler.js';
-import { CbServerEventId } from '@cloudbeaver/core-sdk';
-import { SessionResource } from '@cloudbeaver/core-root';
+import { NotificationService } from '@cloudbeaver/core-events';
 import { ServerNotificationsHelper } from './ServerNotificationsHelper.js';
+import { SessionResource } from '@cloudbeaver/core-root';
+import { CbServerEventId } from '@cloudbeaver/core-sdk';
 
-@injectable(() => [NotificationService, ServerNotificationsEventHandler, SessionResource])
-export class ServerNotificationsService extends Bootstrap {
+@injectable(() => [ServerNotificationsEventHandler, NotificationService, SessionResource])
+export class CoreServerNotificationsBootstrap extends Bootstrap {
   constructor(
-    private readonly notificationService: NotificationService,
     private readonly serverNotificationsEventHandler: ServerNotificationsEventHandler,
+    private readonly notificationService: NotificationService,
     private readonly sessionResource: SessionResource,
   ) {
     super();

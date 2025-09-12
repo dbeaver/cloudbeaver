@@ -8,9 +8,6 @@
   },
   "references": [
     {
-      "path": "../../common-react/@dbeaver/react-tests"
-    },
-    {
       "path": "../../common-typescript/@dbeaver/cli"
     },
     {
@@ -20,19 +17,16 @@
       "path": "../core-di"
     },
     {
-      "path": "../core-executor"
+      "path": "../core-di/tsconfig.json"
     },
     {
-      "path": "../core-localization"
+      "path": "../core-events"
+    },
+    {
+      "path": "../core-root"
     },
     {
       "path": "../core-sdk"
-    },
-    {
-      "path": "../core-settings"
-    },
-    {
-      "path": "../core-utils"
     }
   ],
   "include": [
