@@ -15,6 +15,8 @@ import { DataExportService } from './DataExportService.js';
 import { DataExportProcessService } from './DataExportProcessService.js';
 import { DataExportMenuService } from './DataExportMenuService.js';
 
+// force registration after import plugin
+import '@cloudbeaver/plugin-data-import';
 ModuleRegistry.add({
   name: '@cloudbeaver/plugin-data-export',
 
