@@ -9,7 +9,6 @@
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { ServerNotificationsEventHandler } from './ServerNotificationsEventHandler.js';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { ServerNotificationsHelper } from './ServerNotificationsHelper.js';
 import { SessionResource } from '@cloudbeaver/core-root';
 import { CbServerEventId } from '@cloudbeaver/core-sdk';
 
@@ -24,10 +23,7 @@ export class CoreServerNotificationsBootstrap extends Bootstrap {
     this.serverNotificationsEventHandler.onEvent(
       CbServerEventId.CbUserSessionLimit,
       event => {
-        this.notificationService.notify(
-          ServerNotificationsHelper.mapEventToNotification(event),
-          ServerNotificationsHelper.mapNotificationType(event.eventNotificationType),
-        );
+        this.notificationService.notify(event.options, event.type);
       },
       undefined,
       this.sessionResource,

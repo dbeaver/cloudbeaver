@@ -6,8 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { ENotificationType, type INotificationOptions } from '@cloudbeaver/core-events';
 import { WsUserNotificationEventType, type WsUserNotificationEvent } from '@cloudbeaver/core-sdk';
-import { type INotificationOptions, ENotificationType } from './INotification.js';
 
 export const ServerNotificationsHelper = {
   mapEventToNotification(event: WsUserNotificationEvent): INotificationOptions {
