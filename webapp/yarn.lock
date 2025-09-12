@@ -3869,6 +3869,7 @@ __metadata:
     "@cloudbeaver/plugin-navigation-tabs": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
     "@dbeaver/cli": "workspace:*"
+    "@dbeaver/js-helpers": "workspace:^"
     "@dbeaver/react-tests": "workspace:^"
     "@types/react": "npm:^19"
     mobx: "npm:^6"
@@ -4543,6 +4544,9 @@ __metadata:
     "@dbeaver/cli": "workspace:^"
     "@dbeaver/tsconfig": "workspace:^"
     async-mutex: "npm:^0"
+    p-debounce: "npm:^4.0.0"
+    p-memoize: "npm:^8.0.0"
+    quick-lru: "npm:^7.1.0"
     rimraf: "npm:^6"
     typescript: "npm:^5"
     vitest: "npm:^3"
@@ -14532,6 +14536,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"mimic-function@npm:^5.0.1":
+  version: 5.0.1
+  resolution: "mimic-function@npm:5.0.1"
+  checksum: 10c0/f3d9464dd1816ecf6bdf2aec6ba32c0728022039d992f178237d8e289b48764fee4131319e72eedd4f7f094e22ded0af836c3187a7edc4595d28dd74368fd81d
+  languageName: node
+  linkType: hard
+
 "min-indent@npm:^1.0.0":
   version: 1.0.1
   resolution: "min-indent@npm:1.0.1"
@@ -15109,6 +15120,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"p-debounce@npm:^4.0.0":
+  version: 4.0.0
+  resolution: "p-debounce@npm:4.0.0"
+  checksum: 10c0/2d50bcb53659ad4345ef59b220581ccb40d581528949d8c63547c22b418e9a92f5138617eb2f41cd03bed293ee78a3dbb9b2795f572a4044434b89f058ccdfa2
+  languageName: node
+  linkType: hard
+
 "p-limit@npm:3.1.0, p-limit@npm:^3.0.2":
   version: 3.1.0
   resolution: "p-limit@npm:3.1.0"
@@ -15158,6 +15176,16 @@ __metadata:
   version: 7.0.3
   resolution: "p-map@npm:7.0.3"
   checksum: 10c0/46091610da2b38ce47bcd1d8b4835a6fa4e832848a6682cf1652bc93915770f4617afc844c10a77d1b3e56d2472bb2d5622353fa3ead01a7f42b04fc8e744a5c
+  languageName: node
+  linkType: hard
+
+"p-memoize@npm:^8.0.0":
+  version: 8.0.0
+  resolution: "p-memoize@npm:8.0.0"
+  dependencies:
+    mimic-function: "npm:^5.0.1"
+    type-fest: "npm:^4.41.0"
+  checksum: 10c0/cd4333c42f67dee273bff855e18cb974fac61136605ae06c30e779f71fb0e390fbab5c87160dfd8b5f905154b41c3f41bcc2e9870b2ce9b5e5c2c912012261ca
   languageName: node
   linkType: hard
 
@@ -15713,6 +15741,13 @@ __metadata:
   version: 1.2.3
   resolution: "queue-microtask@npm:1.2.3"
   checksum: 10c0/900a93d3cdae3acd7d16f642c29a642aea32c2026446151f0778c62ac089d4b8e6c986811076e1ae180a694cedf077d453a11b58ff0a865629a4f82ab558e102
+  languageName: node
+  linkType: hard
+
+"quick-lru@npm:^7.1.0":
+  version: 7.1.0
+  resolution: "quick-lru@npm:7.1.0"
+  checksum: 10c0/ef2df33368a66e3d3b32a42c523fcd0939c03f6192ec7f29db36179e22f015d2c75790aa9ab530c719a0dd3fb510f972bc66acca4e92bc9f01f92f0e6c2084f2
   languageName: node
   linkType: hard
 
@@ -17988,7 +18023,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"type-fest@npm:^4.21.0, type-fest@npm:^4.26.1":
+"type-fest@npm:^4.21.0, type-fest@npm:^4.26.1, type-fest@npm:^4.41.0":
   version: 4.41.0
   resolution: "type-fest@npm:4.41.0"
   checksum: 10c0/f5ca697797ed5e88d33ac8f1fec21921839871f808dc59345c9cf67345bfb958ce41bd821165dbf3ae591cedec2bf6fe8882098dfdd8dc54320b859711a2c1e4

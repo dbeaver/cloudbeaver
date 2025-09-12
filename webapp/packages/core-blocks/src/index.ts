@@ -34,6 +34,7 @@ export * from './DisplayError.js';
 export * from './ErrorBoundary.js';
 export * from './Icon.js';
 export * from './useHotkeys.js';
+export * from './useSync.js';
 
 export * from './ItemList/ItemList.js';
 export * from './ItemList/ItemListSearch.js';

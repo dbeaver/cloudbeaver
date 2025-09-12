@@ -25,12 +25,15 @@ import { SqlDataSourceService } from './SqlDataSource/SqlDataSourceService.js';
 import { LocalStorageSqlDataSourceBootstrap } from './SqlDataSource/LocalStorage/LocalStorageSqlDataSourceBootstrap.js';
 import { MenuBootstrap } from './MenuBootstrap.js';
 import { LocaleService } from './LocaleService.js';
+import { SqlEditorModel } from './SqlEditorModel/SqlEditorModel.js';
+import { SqlEditorModelService } from './SqlEditorModel/SqlEditorModelService.js';
 
 ModuleRegistry.add({
   name: '@cloudbeaver/plugin-sql-editor',
 
   configure: serviceCollection => {
     serviceCollection
+      .addTransient(SqlEditorModel)
       .addSingleton(Bootstrap, LocaleService)
       .addSingleton(Bootstrap, proxy(LocalStorageSqlDataSourceBootstrap))
       .addSingleton(Bootstrap, proxy(MenuBootstrap))
@@ -54,6 +57,7 @@ ModuleRegistry.add({
       .addSingleton(SqlDialectInfoService)
       .addSingleton(SqlDataSourceService)
       .addSingleton(LocalStorageSqlDataSourceBootstrap)
+      .addSingleton(SqlEditorModelService)
       .addSingleton(MenuBootstrap);
   },
 });
