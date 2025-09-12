@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { injectable } from '@cloudbeaver/core-di';
-import type { ENotificationType, INotificationOptions } from '@cloudbeaver/core-events';
+import { ENotificationType, type INotificationOptions } from '@cloudbeaver/core-events';
 import {
   type IBaseServerEvent,
   type ISessionEvent,
@@ -15,8 +15,14 @@ import {
   SessionEventTopic,
   TopicEventHandler,
 } from '@cloudbeaver/core-root';
-import { CbEventTopic, type WsServerNotificationEvent } from '@cloudbeaver/core-sdk';
-import { ServerNotificationsHelper } from './ServerNotificationsHelper.js';
+import { CbEventTopic, WsUserNotificationEventType, type WsServerNotificationEvent } from '@cloudbeaver/core-sdk';
+
+const NOTIFICATION_TYPE_MAP = {
+  [WsUserNotificationEventType.Info]: ENotificationType.Info,
+  [WsUserNotificationEventType.Error]: ENotificationType.Error,
+  [WsUserNotificationEventType.Loading]: ENotificationType.Loading,
+  [WsUserNotificationEventType.Custom]: ENotificationType.Custom,
+};
 
 interface ServerNotificationEventMapped extends IBaseServerEvent<SessionEventId, SessionEventTopic> {
   options: INotificationOptions;
@@ -38,8 +44,11 @@ export class ServerNotificationsEventHandler extends TopicEventHandler<
     return {
       id: event.id,
       topicId: event.topicId,
-      options: ServerNotificationsHelper.mapEventToNotification(event),
-      type: ServerNotificationsHelper.mapNotificationType(event.notificationType),
+      options: {
+        message: event.message,
+        title: event.title ?? '',
+      },
+      type: NOTIFICATION_TYPE_MAP[event.notificationType] || ENotificationType.Info,
     };
   }
 }
