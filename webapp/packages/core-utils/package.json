@@ -28,7 +28,7 @@
     "mobx": "^6",
     "tslib": "^2",
     "underscore": "^1",
-    "uuid": "^11",
+    "uuid": "^13",
     "whatwg-mimetype": "^4",
     "zod": "^4",
     "zod-validation-error": "^4"
