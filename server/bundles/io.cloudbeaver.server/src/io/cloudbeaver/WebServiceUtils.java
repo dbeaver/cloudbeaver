@@ -41,7 +41,6 @@ import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBConstants;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
-import org.jkiss.dbeaver.model.DBPObject;
 import org.jkiss.dbeaver.model.access.DBAAuthCredentials;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPProject;
@@ -318,9 +317,11 @@ public class WebServiceUtils extends WebCommonUtils {
         return container.getName() + " [" + container.getId() + "]";
     }
 
-    public static void updateConfigAndRefreshDatabases(WebSession session, String projectId) throws DBWebException {
+    public static void refreshDatabases(WebSession session, String projectId) throws DBWebException {
         DBNProject projectNode = session.getNavigatorModelOrThrow().getRoot().getProjectNode(session.getProjectById(projectId));
-        DBNModel.updateConfigAndRefreshDatabases(projectNode.getDatabases());
+        if (projectNode != null) {
+            projectNode.getDatabases().refreshChildren();
+        }
     }
 
     public static boolean isGlobalProject(DBPProject project) {
@@ -363,7 +364,7 @@ public class WebServiceUtils extends WebCommonUtils {
     @NotNull
     public static WebPropertyInfo[] getObjectFilteredProperties(
         @NotNull WebSession session,
-        @NotNull DBPObject object,
+        @NotNull Object object,
         @Nullable WebPropertyFilter filter
     ) {
         PropertyCollector propertyCollector = new PropertyCollector(object, true);
