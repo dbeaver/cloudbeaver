@@ -277,7 +277,7 @@ type WSAIChatMessageErrorEvent implements CBServerEvent @since(version: "25.1.1"
     errorMessage: String
 }
 
-enum WSUserNotificationEventType {
+enum WSServerNotificationEventType {
     INFO
     ERROR
     LOADING
@@ -289,7 +289,7 @@ type WSServerNotificationEvent implements CBServerEvent @since(version: "25.2.1"
     topicId: CBEventTopic!
     title: String
     message: String
-    notificationType: WSUserNotificationEventType!
+    notificationType: WSServerNotificationEventType!
 }
 
 extend type Query {
