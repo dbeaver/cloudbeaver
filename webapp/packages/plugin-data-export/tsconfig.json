@@ -53,9 +53,6 @@
       "path": "../core-view"
     },
     {
-      "path": "../plugin-data-import"
-    },
-    {
       "path": "../plugin-data-viewer"
     },
     {
