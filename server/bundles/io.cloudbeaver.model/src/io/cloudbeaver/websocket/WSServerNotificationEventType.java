@@ -16,7 +16,7 @@
  */
 package io.cloudbeaver.websocket;
 
-public enum WSUserNotificationEventType {
+public enum WSServerNotificationEventType {
     INFO,
     ERROR,
     LOADING,

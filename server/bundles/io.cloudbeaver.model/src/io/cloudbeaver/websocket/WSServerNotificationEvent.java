@@ -26,12 +26,12 @@ public class WSServerNotificationEvent extends WSAbstractSessionEvent {
     public static final String EVENT_ID = "cb_server_notification";
     private String title;
     private String message;
-    private WSUserNotificationEventType notificationType;
+    private WSServerNotificationEventType notificationType;
 
     public WSServerNotificationEvent(
         @Nullable String title,
         @Nullable String message,
-        @NotNull WSUserNotificationEventType notificationType
+        @NotNull WSServerNotificationEventType notificationType
     ) {
         super(EVENT_ID, WSConstants.TOPIC_USER_NOTIFICATION);
         this.title = title;
@@ -47,7 +47,7 @@ public class WSServerNotificationEvent extends WSAbstractSessionEvent {
         return message;
     }
 
-    public WSUserNotificationEventType getNotificationType() {
+    public WSServerNotificationEventType getNotificationType() {
         return notificationType;
     }
 }
