@@ -33,12 +33,17 @@ export function SelectProvider({ children, ...props }: SelectProviderProps) {
 }
 
 export function Select({ className, ...props }: SelectProps) {
-  return <AriaSelect className={clsx('dbv-kit-select', className)} {...props} />;
+  return <AriaSelect className={clsx('dbv-kit-select', 'tw:truncate', className)} {...props} />;
 }
 
 export function SelectPopover({ children, className, ...props }: SelectPopoverProps) {
   return (
-    <AriaSelectPopover className={clsx('dbv-kit-select__popover', className)} sameWidth={props.sameWidth ?? true} portal={props.portal ?? true} {...props}>
+    <AriaSelectPopover
+      className={clsx('dbv-kit-select__popover', className)}
+      sameWidth={props.sameWidth ?? true}
+      portal={props.portal ?? true}
+      {...props}
+    >
       {children}
     </AriaSelectPopover>
   );
@@ -46,7 +51,7 @@ export function SelectPopover({ children, className, ...props }: SelectPopoverPr
 
 export function SelectItem({ children, className, ...props }: SelectItemProps) {
   return (
-    <AriaSelectItem className={clsx('dbv-kit-select__item', className)} {...props}>
+    <AriaSelectItem className={clsx('dbv-kit-select__item', 'tw:truncate', className)} {...props}>
       {children}
     </AriaSelectItem>
   );
