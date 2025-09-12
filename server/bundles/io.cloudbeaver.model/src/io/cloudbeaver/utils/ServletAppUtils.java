@@ -353,7 +353,22 @@ public class ServletAppUtils {
         if (CommonUtils.isEmpty(rootUri)) {
             return uri;
         }
-        String[] split = uri.split(rootUri);
-        return split[0];
+        rootUri = "/" + rootUri;
+        if (!uri.endsWith(rootUri)) {
+            rootUri = rootUri + "/";
+        }
+        return substringBeforeLast(uri, rootUri);
+    }
+
+    public static String substringBeforeLast(
+        @NotNull String string,
+        @NotNull String separator
+    ) {
+        if (CommonUtils.isNotEmpty(string) && CommonUtils.isNotEmpty(separator)) {
+            int pos = string.lastIndexOf(separator);
+            return pos == -1 ? string : string.substring(0, pos);
+        } else {
+            return string;
+        }
     }
 }
