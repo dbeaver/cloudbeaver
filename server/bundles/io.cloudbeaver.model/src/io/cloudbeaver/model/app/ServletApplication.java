@@ -100,4 +100,6 @@ public interface ServletApplication extends DBPApplication {
     default void getStatusInfo(Map<String, Object> infoMap) {
 
     }
+
+    boolean isAnonymousAccessEnabled();
 }

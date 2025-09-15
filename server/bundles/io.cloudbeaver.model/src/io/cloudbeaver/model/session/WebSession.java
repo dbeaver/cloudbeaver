@@ -307,7 +307,7 @@ public class WebSession extends BaseWebSession
             for (RMProject project : rmProjects) {
                 createWebProject(project);
             }
-            if (user == null && application.getAppConfiguration().isAnonymousAccessEnabled()) {
+            if (user == null && application.isAnonymousAccessEnabled()) {
                 WebProjectImpl anonymousProject = createWebProject(RMUtils.createAnonymousProject());
                 anonymousProject.setInMemory(true);
             }
@@ -399,9 +399,10 @@ public class WebSession extends BaseWebSession
 
 
     private synchronized void authAsAnonymousUser() throws DBException {
-        if (!application.getAppConfiguration().isAnonymousAccessEnabled()) {
+        if (!application.isAnonymousAccessEnabled()) {
             return;
         }
+
         SMAuthInfo authInfo = getSecurityController().authenticateAnonymousUser(this.id, getSessionParameters(), CB_SESSION_TYPE);
         updateSMSession(authInfo);
         notifySessionAuthChange();

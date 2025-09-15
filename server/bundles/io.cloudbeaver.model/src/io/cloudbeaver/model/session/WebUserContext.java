@@ -239,7 +239,7 @@ public class WebUserContext implements SMCredentialsProvider {
     }
 
     private Set<String> getDefaultPermissions() {
-        return application.getAppConfiguration().isAnonymousAccessEnabled() ? null : Set.of();
+        return application.isAnonymousAccessEnabled() ? null : Set.of();
     }
 
     public RMController getRmController() {

@@ -64,7 +64,7 @@ public class WebServerConfig {
 
     @Property
     public boolean isAnonymousAccessEnabled() {
-        return application.getAppConfiguration().isAnonymousAccessEnabled();
+        return application.isAnonymousAccessEnabled();
     }
 
     @Property
