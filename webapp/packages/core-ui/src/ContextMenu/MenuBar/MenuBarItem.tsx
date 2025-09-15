@@ -6,13 +6,13 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import React, { type HTMLAttributes, forwardRef } from 'react';
+import React, { type ButtonHTMLAttributes, forwardRef } from 'react';
 
 import { Icon, IconOrImage, Loader, registry, s, useS, useStateDelay, useTranslate } from '@cloudbeaver/core-blocks';
 
 import style from './MenuBarItem.module.css';
 
-export interface MenuBarItemProps extends Omit<React.DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement>, 'style'> {
+export interface MenuBarItemProps extends Omit<React.DetailedHTMLProps<ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement>, 'style'> {
   label?: string;
   /** @deprecated must be refactored (#1)*/
   displayLabel?: boolean;
@@ -25,7 +25,7 @@ export interface MenuBarItemProps extends Omit<React.DetailedHTMLProps<HTMLAttri
 }
 
 export const MenuBarItem = registry(
-  observer<MenuBarItemProps, HTMLDivElement>(
+  observer<MenuBarItemProps, HTMLButtonElement>(
     forwardRef(function MenuBarItem(
       { label, displayLabel = true, loading = false, hidden, icon, submenu, displaySubmenuMark, viewBox = '0 0 24 24', className, ...rest },
       ref,
@@ -37,8 +37,7 @@ export const MenuBarItem = registry(
       const title = translate(rest.title);
       const Submenu = submenu;
       const selected = rest['aria-selected'] === 'true';
-      // 'disabled' is not a valid prop for div, so we check for aria-disabled instead
-      const disabled = rest['aria-disabled'] === 'true';
+      const disabled = rest.disabled;
       const tabIndex = selected ? 0 : -1;
 
       return (
@@ -47,7 +46,7 @@ export const MenuBarItem = registry(
           aria-selected={rest['aria-selected']}
           aria-disabled={rest['aria-disabled']}
         >
-          <div ref={ref} className={s(styles, { menuBarItem: true })} tabIndex={tabIndex} {...rest} title={title} aria-label={title} role="menuitem">
+          <button ref={ref} className={s(styles, { menuBarItem: true })} tabIndex={tabIndex} {...rest} title={title} aria-label={title}>
             <div className={s(styles, { menuBarItemBox: true })}>
               {loading ? (
                 <div className={s(styles, { menuBarItemIcon: true })}>
@@ -69,12 +68,12 @@ export const MenuBarItem = registry(
                 </div>
               )}
             </div>
-          </div>
+          </button>
           {Submenu && (
             <Submenu>
-              <div className={s(styles, { menuBarItemCustomSubmenuMark: true })}>
+              <button className={s(styles, { menuBarItemCustomSubmenuMark: true })}>
                 <Icon className={s(style, { icon: true })} name="arrow" viewBox="0 0 16 16" />
-              </div>
+              </button>
             </Submenu>
           )}
         </div>

@@ -127,7 +127,7 @@ const MenuBarElement = observer<IMenuBarElementProps>(function MenuBarElement({ 
         label={item.label}
         icon={item.icon}
         title={item.tooltip}
-        aria-disabled={item.disabled}
+        disabled={item.disabled}
         className={className}
         onClick={onClick}
       />
@@ -171,7 +171,7 @@ export const MenuBarAction = registry(
         displayLabel={displayLabel}
         icon={actionInfo.icon ?? parentMenuInfo?.icon}
         title={binding ? `${title} (${binding})` : title}
-        aria-disabled={item.disabled}
+        disabled={item.disabled}
         loading={loading}
         submenu={submenu}
         className={className}
@@ -233,7 +233,7 @@ const SubMenuItem = observer<ISubMenuItemProps>(function SubMenuItem({ children,
             icon={IconComponent ? <IconComponent item={item} {...extraProps} /> : icon}
             title={tooltip}
             loading={loading}
-            aria-disabled={disabled}
+            disabled={disabled}
             displaySubmenuMark={panelAvailable}
           />
         )

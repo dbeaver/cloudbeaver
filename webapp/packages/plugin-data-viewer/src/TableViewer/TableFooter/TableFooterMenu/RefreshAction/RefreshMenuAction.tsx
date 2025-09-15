@@ -14,7 +14,7 @@ import { ACTION_REFRESH } from '@cloudbeaver/core-view';
 
 import { getRefreshState } from './getRefreshState.js';
 
-const RefreshMenuItem: typeof MenuBarItem = observer<MenuBarItemProps, HTMLDivElement>(
+const RefreshMenuItem: typeof MenuBarItem = observer<MenuBarItemProps, HTMLButtonElement>(
   forwardRef(function RefreshMenuItem(props, ref) {
     const actionProps = useParentProps(MenuBarAction);
     const refreshAction = actionProps ? getRefreshState(actionProps.context) : undefined;
