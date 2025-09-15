@@ -9,7 +9,7 @@
 import type { IMenuData } from '@cloudbeaver/core-view';
 import type { MenuProps, MenuProviderProps } from '@dbeaver/ui-kit';
 
-export interface IMenuBarNestedMenuSettings extends MenuProps {
+export interface IMenuBarNestedMenuSettings extends MenuProps<'button'> {
   onVisibleSwitch?: (visible: boolean) => void;
   placement?: MenuProviderProps['placement'];
 }

@@ -16,11 +16,18 @@ export interface IMenuItemProps extends UIKitMenuItemProps {
   selected?: boolean;
 }
 
-export const MenuItem = observer(function MenuItem({ children, selected, className, ...rest }: IMenuItemProps) {
+export const MenuItem = observer(function MenuItem({ children, selected, hidden, className, ...rest }: IMenuItemProps) {
   const styles = useS(style);
 
   return (
-    <UIKitMenu.Item aria-selected={selected} className={s(styles, { menuItem: true }, className)} {...rest}>
+    <UIKitMenu.Item
+      aria-selected={selected}
+      {...rest}
+      className={s(styles, { menuItem: true, hidden }, className)}
+      disabled={selected || rest.disabled}
+      style={{ pointerEvents: 'auto' }}
+      focusable
+    >
       {children}
     </UIKitMenu.Item>
   );

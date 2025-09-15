@@ -34,7 +34,7 @@ interface IMenuProps extends React.ButtonHTMLAttributes<any> {
   onVisibleSwitch?: (visible: boolean) => void;
 }
 
-export const Menu = observer<IMenuProps, HTMLDivElement>(
+export const Menu = observer<IMenuProps, HTMLButtonElement>(
   forwardRef(function Menu(
     {
       contextMenuPosition,
@@ -56,10 +56,10 @@ export const Menu = observer<IMenuProps, HTMLDivElement>(
     },
     ref,
   ) {
-    const innerMenuButtonRef = useRef<HTMLDivElement>(null);
+    const innerMenuButtonRef = useRef<HTMLButtonElement>(null);
     const combinedRef = useCombinedRef(ref, innerMenuButtonRef);
     const [relativePosition, setRelativePosition] = useState<{ x: number; y: number } | null>(null);
-    const menuButtonLinkRef = useRef<HTMLDivElement>(null);
+    const menuButtonLinkRef = useRef<HTMLButtonElement>(null);
     const menuPanelRef = useRef<HTMLDivElement>(null);
     const propsRef = useObjectRef({ onVisibleSwitch, visible });
     const menu = useMenuStore({
@@ -115,15 +115,15 @@ export const Menu = observer<IMenuProps, HTMLDivElement>(
       }
     });
 
-    const MenuButtonLink = 'div';
+    const MenuButtonLink = UIKitMenu.Button;
 
     if (React.isValidElement(children) && disclosure) {
       return (
         <ErrorBoundary>
           <UIKitMenu.Button
-            store={menu}
             key={relativePosition ? 'link' : 'main'}
             ref={combinedRef}
+            store={menu}
             tabIndex={0}
             className={s(styles, { menuButton: true }, className)}
             {...props}
@@ -132,8 +132,8 @@ export const Menu = observer<IMenuProps, HTMLDivElement>(
             {React.cloneElement(children, { ...(children.props as any) })}
           </UIKitMenu.Button>
           <MenuPanel
-            modal={modal}
             ref={menuPanelRef}
+            modal={modal}
             label={label}
             menu={menu}
             rtl={rtl}
@@ -152,9 +152,9 @@ export const Menu = observer<IMenuProps, HTMLDivElement>(
     return (
       <ErrorBoundary>
         <UIKitMenu.Button
-          store={menu}
           key={relativePosition ? 'link' : 'main'}
           ref={combinedRef}
+          store={menu}
           tabIndex={0}
           className={s(styles, { menuButton: true }, className)}
           {...props}
@@ -162,8 +162,8 @@ export const Menu = observer<IMenuProps, HTMLDivElement>(
           <div className={s(styles, { box: true }, className)}>{children}</div>
         </UIKitMenu.Button>
         <MenuPanel
-          modal={modal}
           ref={menuPanelRef}
+          modal={modal}
           label={label}
           menu={menu}
           rtl={rtl}

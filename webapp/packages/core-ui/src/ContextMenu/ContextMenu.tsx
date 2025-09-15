@@ -15,7 +15,7 @@ import type { IContextMenuProps } from './IContextMenuProps.js';
 import { MenuItemRenderer } from './MenuItemRenderer.js';
 
 // TODO the click doesn't work for React components as children
-export const ContextMenu = observer<IContextMenuProps, HTMLDivElement>(
+export const ContextMenu = observer<IContextMenuProps, HTMLButtonElement>(
   forwardRef(function ContextMenu(
     { contextMenuPosition, menu: menuData, disclosure, children, placement, visible, onVisibleSwitch, modal, rtl, ...props },
     ref,

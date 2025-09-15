@@ -1,6 +1,5 @@
 @layer base {
   :root {
-    --dbv-kit-menu-button-height: 100%;
     --dbv-kit-menu-button-padding-inline: 0;
 
     --dbv-kit-menu-foreground: inherit;

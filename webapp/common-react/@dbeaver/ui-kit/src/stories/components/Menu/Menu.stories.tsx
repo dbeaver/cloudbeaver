@@ -43,9 +43,6 @@ export const Docs = () => {
       <h2>CSS Variables</h2>
 
       <h3>Button</h3>
-      <p>
-        <code>--dbv-kit-menu-button-height</code>, <code>--dbv-kit-menu-button-padding-inline</code>
-      </p>
 
       <h3>Colors</h3>
       <p>

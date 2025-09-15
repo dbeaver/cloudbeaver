@@ -2,7 +2,6 @@
 
 @layer base {
   .dbv-kit-menu__button {
-    height: var(--dbv-kit-menu-button-height);
     padding-inline: var(--dbv-kit-menu-button-padding-inline);
     background-color: var(--dbv-kit-menu-background);
     color: var(--dbv-kit-menu-foreground);

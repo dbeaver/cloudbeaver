@@ -32,7 +32,7 @@ export interface IMenuPanelProps {
 }
 
 export const MenuPanel = observer<IMenuPanelProps, HTMLDivElement>(
-  forwardRef(function MenuPanel({ label, menu, submenu, panelAvailable = true, rtl, getHasBindings, hasBindings, children, className, modal }, ref) {
+  forwardRef(function MenuPanel({ label, menu, submenu, modal, panelAvailable = true, rtl, getHasBindings, hasBindings, children, className }, ref) {
     const translate = useTranslate();
     const styles = useS(style, styleMenuItemElement);
     const menuState = useStoreState(menu);
@@ -52,7 +52,13 @@ export const MenuPanel = observer<IMenuPanelProps, HTMLDivElement>(
 
     return (
       <ErrorBoundary>
-        <UIKitMenu store={menu} modal={modal} className={s(styles, { menu: true, modal, submenu }, className)} aria-label={translate(label)}>
+        <UIKitMenu
+          ref={ref}
+          store={menu}
+          modal={modal}
+          className={s(styles, { menu: true, modal, submenu }, className)}
+          aria-label={translate(label)}
+        >
           <div dir={rtl ? 'rtl' : undefined} data-s-has-bindings={hasBindings} className={s(styles, { menuBox: true })}>
             {Children.count(renderedChildren) === 0 && <MenuEmptyItem />}
             {renderedChildren}
