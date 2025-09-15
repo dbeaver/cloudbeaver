@@ -15,13 +15,13 @@ import {
   SessionEventTopic,
   TopicEventHandler,
 } from '@cloudbeaver/core-root';
-import { CbEventTopic, WsUserNotificationEventType, type WsServerNotificationEvent } from '@cloudbeaver/core-sdk';
+import { CbEventTopic, WsServerNotificationEventType, type WsServerNotificationEvent } from '@cloudbeaver/core-sdk';
 
 const NOTIFICATION_TYPE_MAP = {
-  [WsUserNotificationEventType.Info]: ENotificationType.Info,
-  [WsUserNotificationEventType.Error]: ENotificationType.Error,
-  [WsUserNotificationEventType.Loading]: ENotificationType.Loading,
-  [WsUserNotificationEventType.Custom]: ENotificationType.Custom,
+  [WsServerNotificationEventType.Info]: ENotificationType.Info,
+  [WsServerNotificationEventType.Error]: ENotificationType.Error,
+  [WsServerNotificationEventType.Loading]: ENotificationType.Loading,
+  [WsServerNotificationEventType.Custom]: ENotificationType.Custom,
 };
 
 interface ServerNotificationEventMapped extends IBaseServerEvent<SessionEventId, SessionEventTopic> {
