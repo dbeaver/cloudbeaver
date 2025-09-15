@@ -13,6 +13,8 @@ import { DataImportProcessorsResource } from './DataImportProcessorsResource.js'
 import { DataImportSettingsService } from './DataImportSettingsService.js';
 import { DataImportBootstrap } from './DataImportBootstrap.js';
 
+// force registration after export plugin
+import '@cloudbeaver/plugin-data-export';
 ModuleRegistry.add({
   name: '@cloudbeaver/plugin-data-import',
 

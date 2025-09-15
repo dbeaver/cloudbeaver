@@ -41,7 +41,6 @@ import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBConstants;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
-import org.jkiss.dbeaver.model.DBPObject;
 import org.jkiss.dbeaver.model.access.DBAAuthCredentials;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPProject;
@@ -365,7 +364,7 @@ public class WebServiceUtils extends WebCommonUtils {
     @NotNull
     public static WebPropertyInfo[] getObjectFilteredProperties(
         @NotNull WebSession session,
-        @NotNull DBPObject object,
+        @NotNull Object object,
         @Nullable WebPropertyFilter filter
     ) {
         PropertyCollector propertyCollector = new PropertyCollector(object, true);

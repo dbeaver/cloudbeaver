@@ -93,8 +93,8 @@ interface IMenuBarElementProps {
 
 const MenuBarElement = observer<IMenuBarElementProps>(function MenuBarElement({ item, menuData, nestedMenuSettings, className, rtl }) {
   const onClick = useCallback(() => {
-    item.events?.onSelect?.();
-  }, [item]);
+    item.events?.onSelect?.(menuData.context);
+  }, [item, menuData.context]);
 
   if (item.hidden) {
     return null;
@@ -147,7 +147,7 @@ export interface IMenuBarActionProps {
 }
 
 export const MenuBarAction = registry(
-  observer<IMenuBarActionProps>(function MenuBarAction({ item, parentMenuInfo, submenu, className }) {
+  observer<IMenuBarActionProps>(function MenuBarAction({ item, parentMenuInfo, submenu, context, className }) {
     const translate = useTranslate();
     const actionInfo = item.action.actionInfo;
     const loading = item.action.isLoading();
@@ -158,7 +158,7 @@ export const MenuBarAction = registry(
     const title = translate(actionInfo.tooltip ?? actionInfo.label);
 
     function handleClick() {
-      item.events?.onSelect?.();
+      item.events?.onSelect?.(context);
       item.action.activate();
     }
 
