@@ -8,12 +8,10 @@
 import { UserDataService } from '@cloudbeaver/core-authentication';
 import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
 import { injectable } from '@cloudbeaver/core-di';
-import { LocalizationService } from '@cloudbeaver/core-localization';
 import {
   ACTION_COLLAPSE_ALL,
   ACTION_FILTER,
   ActionService,
-  getBindingLabel,
   type IAction,
   KeyBindingService,
   MenuService,
@@ -27,15 +25,14 @@ import { createElementsTreeSettings, validateElementsTreeSettings } from './Navi
 import { DATA_CONTEXT_NAV_TREE_ROOT } from './NavigationTreeSettings/DATA_CONTEXT_NAV_TREE_ROOT.js';
 import { KEY_BINDING_ENABLE_FILTER } from './NavigationTreeSettings/KEY_BINDING_ENABLE_FILTER.js';
 
-@injectable(() => [ActionService, KeyBindingService, UserDataService, MenuService, LocalizationService])
+@injectable(() => [ActionService, KeyBindingService, UserDataService, MenuService])
 export class ElementsTreeToolsMenuService {
   constructor(
     private readonly actionService: ActionService,
     private readonly keyBindingService: KeyBindingService,
     private readonly userDataService: UserDataService,
     private readonly menuService: MenuService,
-    private readonly localizationService: LocalizationService,
-  ) {}
+  ) { }
 
   register() {
     this.actionService.addHandler({
@@ -52,20 +49,6 @@ export class ElementsTreeToolsMenuService {
         }
 
         return false;
-      },
-      getActionInfo: (context, action) => {
-        switch (action) {
-          case ACTION_COLLAPSE_ALL: {
-            const bindingLabel = getBindingLabel(KEY_BINDING_COLLAPSE_ALL);
-            const tooltip = this.localizationService.translate('app_navigationTree_action_collapse_all') + (bindingLabel ? ` (${bindingLabel})` : '');
-            return {
-              ...action.info,
-              tooltip,
-            };
-          }
-        }
-
-        return action.info;
       },
       handler: this.elementsTreeActionHandler.bind(this),
     });
@@ -135,7 +118,7 @@ export class ElementsTreeToolsMenuService {
     state.filter = !state.filter;
   }
 
-  private async elementsTreeActionHandler(contexts: IDataContextProvider, action: IAction) {
+  private elementsTreeActionHandler(contexts: IDataContextProvider, action: IAction) {
     const tree = contexts.get(DATA_CONTEXT_ELEMENTS_TREE);
 
     if (tree === undefined) {

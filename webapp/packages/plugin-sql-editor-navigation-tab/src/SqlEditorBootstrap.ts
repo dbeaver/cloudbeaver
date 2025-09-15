@@ -95,12 +95,7 @@ export class SqlEditorBootstrap extends Bootstrap {
       contexts: [DATA_CONTEXT_SQL_EDITOR_STATE, DATA_CONTEXT_SQL_EDITOR_TAB],
       getItems: (context, items) => [...items, ACTION_RENAME],
       orderItems: (context, items) => {
-        const actions = menuExtractItems(items, [ACTION_RENAME]);
-
-        if (actions.length > 0) {
-          items.unshift(...actions);
-        }
-
+        items.unshift(...menuExtractItems(items, [ACTION_RENAME]));
         return items;
       },
     });
@@ -119,12 +114,7 @@ export class SqlEditorBootstrap extends Bootstrap {
       },
       getItems: (context, items) => [...items, ACTION_SQL_EDITOR_OPEN],
       orderItems: (context, items) => {
-        const actions = menuExtractItems(items, [ACTION_OPEN, ACTION_SQL_EDITOR_OPEN]);
-
-        if (actions.length > 0) {
-          items.unshift(...actions);
-        }
-
+        items.unshift(...menuExtractItems(items, [ACTION_OPEN, ACTION_SQL_EDITOR_OPEN]));
         return items;
       },
     });
@@ -211,10 +201,9 @@ export class SqlEditorBootstrap extends Bootstrap {
       menus: [MENU_APP_ACTIONS],
       getItems: (context, items) => [...items, ACTION_SQL_EDITOR_NEW],
       orderItems: (context, items) => {
-        let placeIndex = items.indexOf(ACTION_SQL_EDITOR_NEW);
-
         const actionsOpen = menuExtractItems(items, [ACTION_SQL_EDITOR_NEW]);
 
+        let placeIndex = items.indexOf(ACTION_SQL_EDITOR_NEW);
         const connectionsIndex = items.indexOf(MENU_CONNECTIONS);
 
         if (connectionsIndex !== -1) {

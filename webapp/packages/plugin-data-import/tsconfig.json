@@ -47,6 +47,9 @@
       "path": "../core-view"
     },
     {
+      "path": "../plugin-data-export"
+    },
+    {
       "path": "../plugin-data-viewer"
     }
   ],

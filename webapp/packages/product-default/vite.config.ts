@@ -15,9 +15,19 @@ import packageJson from './package.json';
 export default defineConfig(
   ({ mode }): UserConfig => ({
     /*
-    Fixes https://github.com/dbeaver/cloudbeaver/issues/3308
-    ROOT_URI approach for assets doesn't work well when we serve our application not from a root folder. In that case inner Vite asset handling system add indices to CSS files using absolute path ignoring injected ROOT_URI. When using relative path in base property, we ask Vite to generate paths relatively to each file https://vite.dev/guide/build#public-base-path.  */
+      Fixes https://github.com/dbeaver/cloudbeaver/issues/3308
+      ROOT_URI approach for assets doesn't work well when we serve our application not from a root folder. 
+      In that case inner Vite asset handling system add indices to CSS files using absolute path ignoring 
+      injected ROOT_URI. When using relative path in base property, we ask Vite to generate paths relatively 
+      to each file https://vite.dev/guide/build#public-base-path. 
+    */
     base: './',
+    resolve: {
+      // resolves sass to sass-embedded package to avoid issues with builder trying to use incorrect sass package
+      alias: {
+        sass: 'sass-embedded',
+      },
+    },
     plugins: [baseConfigurationPlugin(mode, packageJson)],
   }),
 );
