@@ -87,32 +87,32 @@ export const TableError = observer<Props>(function TableError({ model, loading, 
   }, [errorInfo, model.source.error]);
 
   return (
-      <div
-        role="status"
-        aria-hidden={!error.error}
-        aria-label={error.message}
-        tabIndex={error.error ? 0 : -1}
-        className={s(style, { error: true, animated, collapsed: !errorInfo.display, errorHidden }, className)}
-      >
-        <div className={s(style, { errorBody: true })}>
-          <IconOrImage className={s(style, { iconOrImage: true })} icon={icon} title={error.message} onClick={() => errorInfo.show()} />
-          <div className={s(style, { errorMessage: true })}>{error.message}</div>
-        </div>
-        <div className={s(style, { controls: true })}>
-          <Placeholder container={dataViewerService.errorActionsContainer} model={model} />
-
-          <Button className={s(style, { button: true })} type="button" variant="secondary" onClick={() => errorInfo.hide()}>
-            {translate('ui_error_close')}
-          </Button>
-          {error.hasDetails && (
-            <Button className={s(style, { button: true })} type="button" variant="secondary" onClick={error.open}>
-              {translate('ui_errors_details')}
-            </Button>
-          )}
-          <Button className={s(style, { button: true })} type="button" onClick={onRetry}>
-            {translate('ui_processing_retry')}
-          </Button>
-        </div>
+    <div
+      role="status"
+      aria-hidden={!error.error}
+      aria-label={error.message}
+      tabIndex={error.error ? 0 : -1}
+      className={s(style, { error: true, animated, collapsed: !errorInfo.display, errorHidden }, className)}
+    >
+      <div className={s(style, { errorBody: true })}>
+        <IconOrImage className={s(style, { iconOrImage: true })} icon={icon} title={error.message} onClick={() => errorInfo.show()} />
+        <div className={s(style, { errorMessage: true })}>{error.message}</div>
       </div>
-    );
+      <div className={s(style, { controls: true })}>
+        <Placeholder container={dataViewerService.errorActionsContainer} model={model} />
+
+        <Button className={s(style, { button: true })} type="button" variant="secondary" onClick={() => errorInfo.hide()}>
+          {translate('ui_error_close')}
+        </Button>
+        {error.hasDetails && (
+          <Button className={s(style, { button: true })} type="button" variant="secondary" onClick={error.open}>
+            {translate('ui_errors_details')}
+          </Button>
+        )}
+        <Button className={s(style, { button: true })} type="button" onClick={onRetry}>
+          {translate('ui_processing_retry')}
+        </Button>
+      </div>
+    </div>
+  );
 });
