@@ -6,19 +6,13 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import React from 'react';
 import { Menu as UIKitMenu, type MenuItemProps as UIKitMenuItemProps } from '@dbeaver/ui-kit';
 
 import { s } from '../s.js';
 import { useS } from '../useS.js';
 import style from './MenuItem.module.css';
 
-export type MenuItemOptions = {
-  selected?: boolean;
-  close?: boolean;
-};
-
-export interface IMenuItemProps extends Omit<UIKitMenuItemProps, 'children' | 'className'>, React.HTMLAttributes<HTMLDivElement> {
+export interface IMenuItemProps extends UIKitMenuItemProps {
   selected?: boolean;
 }
 

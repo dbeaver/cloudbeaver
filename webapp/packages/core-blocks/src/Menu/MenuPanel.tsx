@@ -52,14 +52,12 @@ export const MenuPanel = observer<IMenuPanelProps, HTMLDivElement>(
 
     return (
       <ErrorBoundary>
-        <UIKitMenu.Provider store={menu}>
-          <UIKitMenu modal={modal} className={s(styles, { menu: true, modal, submenu }, className)} aria-label={translate(label)}>
-            <div dir={rtl ? 'rtl' : undefined} data-s-has-bindings={hasBindings} className={s(styles, { menuBox: true })}>
-              {Children.count(renderedChildren) === 0 && <MenuEmptyItem />}
-              {renderedChildren}
-            </div>
-          </UIKitMenu>
-        </UIKitMenu.Provider>
+        <UIKitMenu store={menu} modal={modal} className={s(styles, { menu: true, modal, submenu }, className)} aria-label={translate(label)}>
+          <div dir={rtl ? 'rtl' : undefined} data-s-has-bindings={hasBindings} className={s(styles, { menuBox: true })}>
+            {Children.count(renderedChildren) === 0 && <MenuEmptyItem />}
+            {renderedChildren}
+          </div>
+        </UIKitMenu>
       </ErrorBoundary>
     );
   }),

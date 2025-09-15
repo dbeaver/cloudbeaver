@@ -120,15 +120,17 @@ export const Menu = observer<IMenuProps, HTMLDivElement>(
     if (React.isValidElement(children) && disclosure) {
       return (
         <ErrorBoundary>
-          <div
+          <UIKitMenu.Button
+            store={menu}
             key={relativePosition ? 'link' : 'main'}
             ref={combinedRef}
             tabIndex={0}
             className={s(styles, { menuButton: true }, className)}
             {...props}
+            {...(children.props as any)}
           >
-            <UIKitMenu.Button store={menu}>{children}</UIKitMenu.Button>
-          </div>
+            {React.cloneElement(children, { ...(children.props as any) })}
+          </UIKitMenu.Button>
           <MenuPanel
             modal={modal}
             ref={menuPanelRef}
@@ -142,24 +144,23 @@ export const Menu = observer<IMenuProps, HTMLDivElement>(
           >
             {items}
           </MenuPanel>
-          {relativePosition && <MenuButtonLink ref={menuButtonLinkRef} className={s(styles, { menuButtonLink: true })} role="button" tabIndex={0} />}
+          {relativePosition && <MenuButtonLink ref={menuButtonLinkRef} className={s(styles, { menuButtonLink: true })} />}
         </ErrorBoundary>
       );
     }
 
     return (
       <ErrorBoundary>
-        <div
+        <UIKitMenu.Button
+          store={menu}
           key={relativePosition ? 'link' : 'main'}
           ref={combinedRef}
           tabIndex={0}
           className={s(styles, { menuButton: true }, className)}
           {...props}
         >
-          <UIKitMenu.Button store={menu}>
-            <div className={s(styles, { box: true }, className)}>{children}</div>
-          </UIKitMenu.Button>
-        </div>
+          <div className={s(styles, { box: true }, className)}>{children}</div>
+        </UIKitMenu.Button>
         <MenuPanel
           modal={modal}
           ref={menuPanelRef}
@@ -173,7 +174,7 @@ export const Menu = observer<IMenuProps, HTMLDivElement>(
         >
           {items}
         </MenuPanel>
-        {relativePosition && <MenuButtonLink ref={menuButtonLinkRef} className={s(styles, { menuButtonLink: true })} role="button" tabIndex={0} />}
+        {relativePosition && <MenuButtonLink ref={menuButtonLinkRef} className={s(styles, { menuButtonLink: true })} />}
       </ErrorBoundary>
     );
   }),
