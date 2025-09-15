@@ -408,9 +408,8 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
       menus: [MENU_APP_ACTIONS],
       getItems: (context, items) => [...items, MENU_CONNECTION_SELECTOR, MENU_CONNECTION_DATA_CONTAINER_SELECTOR],
       orderItems: (context, items) => {
-        const extracted = menuExtractItems(items, [MENU_CONNECTION_SELECTOR, MENU_CONNECTION_DATA_CONTAINER_SELECTOR]);
-
-        return [...items, ...extracted];
+        items.push(...menuExtractItems(items, [MENU_CONNECTION_SELECTOR, MENU_CONNECTION_DATA_CONTAINER_SELECTOR]));
+        return items;
       },
     });
   }

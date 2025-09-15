@@ -8,7 +8,7 @@
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
-import { MenuBaseItem, MenuService } from '@cloudbeaver/core-view';
+import { MenuBaseItem, menuExtractItems, MenuService } from '@cloudbeaver/core-view';
 import { TOP_NAV_BAR_SETTINGS_MENU } from '@cloudbeaver/plugin-settings-menu';
 
 import { AuthenticationService } from './AuthenticationService.js';
@@ -25,47 +25,37 @@ export class PluginBootstrap extends Bootstrap {
   }
 
   override register(): void {
+    const LOGIN_ITEM = new MenuBaseItem(
+      {
+        id: 'login',
+        label: 'authentication_login',
+        tooltip: 'authentication_login',
+      },
+      { onSelect: () => this.authenticationService.authUser(null, false) },
+    );
+    const LOGOUT_ITEM = new MenuBaseItem(
+      {
+        id: 'logout',
+        label: 'authentication_logout',
+        tooltip: 'authentication_logout',
+      },
+      { onSelect: () => this.authenticationService.logout() },
+    );
     this.menuService.addCreator({
       menus: [TOP_NAV_BAR_SETTINGS_MENU],
       getItems: (context, items) => {
         if (this.serverConfigResource.enabledAuthProviders.length > 0 && this.userInfoResource.isAnonymous()) {
-          return [
-            ...items,
-            new MenuBaseItem(
-              {
-                id: 'login',
-                label: 'authentication_login',
-                tooltip: 'authentication_login',
-              },
-              { onSelect: () => this.authenticationService.authUser(null, false) },
-            ),
-          ];
+          return [...items, LOGIN_ITEM];
         }
 
         if (this.userInfoResource.isAuthenticated()) {
-          return [
-            ...items,
-            new MenuBaseItem(
-              {
-                id: 'logout',
-                label: 'authentication_logout',
-                tooltip: 'authentication_logout',
-              },
-              { onSelect: () => this.authenticationService.logout() },
-            ),
-          ];
+          return [...items, LOGOUT_ITEM];
         }
 
         return items;
       },
       orderItems: (context, items) => {
-        const index = items.findIndex(item => item.id === 'logout' || item.id === 'login');
-
-        if (index > -1) {
-          const item = items.splice(index, 1);
-          items.push(item[0]!);
-        }
-
+        items.push(...menuExtractItems(items, [LOGIN_ITEM, LOGOUT_ITEM]));
         return items;
       },
     });
