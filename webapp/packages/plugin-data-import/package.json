@@ -33,6 +33,7 @@
     "@cloudbeaver/core-settings": "workspace:*",
     "@cloudbeaver/core-utils": "workspace:*",
     "@cloudbeaver/core-view": "workspace:*",
+    "@cloudbeaver/plugin-data-export": "workspace:*",
     "@cloudbeaver/plugin-data-viewer": "workspace:*",
     "mobx": "^6",
     "mobx-react-lite": "^4",

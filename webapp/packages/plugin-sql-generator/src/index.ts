@@ -11,6 +11,7 @@ import { sqlGeneratorPlugin } from './manifest.js';
 
 export * from './SqlGenerators/SqlGeneratorsResource.js';
 export * from './SqlGenerators/SqlGeneratorsBootstrap.js';
+export * from './actions/ACTION_SQL_GENERATE.js';
 
 export { sqlGeneratorPlugin };
 export default sqlGeneratorPlugin;

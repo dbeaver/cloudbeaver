@@ -48,8 +48,8 @@ export class PluginBootstrap extends Bootstrap {
       menus: [MENU_TOOLS],
       getItems: (context, items) => [...items, ACTION_RESOURCE_MANAGER_SCRIPTS],
       orderItems: (context, items) => {
-        const extracted = menuExtractItems(items, [ACTION_RESOURCE_MANAGER_SCRIPTS]);
-        return [...extracted, ...items];
+        items.unshift(...menuExtractItems(items, [ACTION_RESOURCE_MANAGER_SCRIPTS]));
+        return items;
       },
     });
 
