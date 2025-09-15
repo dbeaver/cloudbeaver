@@ -66,6 +66,7 @@ export * from './NodesManager/NavNodeContextMenuService.js';
 export * from './NodesManager/useDatabaseObjectInfo.js';
 export * from './NodesManager/useNode.js';
 export * from './NodesManager/useChildren.js';
+export * from './TreeNew/contexts/TreeContextMenuContext.js';
 
 export * from './NodesManager/NodeLinkLoader.js';
 

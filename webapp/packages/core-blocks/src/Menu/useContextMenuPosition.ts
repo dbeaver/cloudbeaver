@@ -30,9 +30,19 @@ export function useContextMenuPosition(): IContextMenuPosition {
         event.preventDefault();
         event.stopPropagation();
 
+        let x = event.clientX;
+        let y = event.clientY;
+
+        if (!x && !y) {
+          const rect = event.currentTarget.getBoundingClientRect();
+
+          x = rect.left + rect.width / 2;
+          y = rect.top + rect.height / 2;
+        }
+
         this.position = {
-          x: event.clientX,
-          y: event.clientY,
+          x,
+          y,
         };
       },
     }),
