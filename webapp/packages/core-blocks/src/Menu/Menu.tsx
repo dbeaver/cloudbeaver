@@ -48,7 +48,7 @@ export const Menu = observer<IMenuProps, HTMLDivElement>(
       panelAvailable,
       getHasBindings,
       onVisibleSwitch,
-      // modal, // not supported in AriaKit wrapper, keep for API compat
+      modal,
       submenu,
       rtl,
       className,
@@ -131,6 +131,7 @@ export const Menu = observer<IMenuProps, HTMLDivElement>(
               <UIKitMenu.Button>{children}</UIKitMenu.Button>
             </div>
             <MenuPanel
+              modal={modal}
               ref={menuPanelRef}
               label={label}
               menu={menu}
@@ -165,6 +166,7 @@ export const Menu = observer<IMenuProps, HTMLDivElement>(
             </UIKitMenu.Button>
           </div>
           <MenuPanel
+            modal={modal}
             ref={menuPanelRef}
             label={label}
             menu={menu}

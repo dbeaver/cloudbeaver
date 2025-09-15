@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { forwardRef, useState } from 'react';
+import { forwardRef } from 'react';
 
 import { getComputed, Menu, useAutoLoad, useObjectRef, useTranslate } from '@cloudbeaver/core-blocks';
 import { MenuActionItem } from '@cloudbeaver/core-view';
@@ -21,7 +21,6 @@ export const ContextMenu = observer<IContextMenuProps, HTMLDivElement>(
     ref,
   ) {
     const translate = useTranslate();
-    const [menuVisible, setMenuVisible] = useState(false);
 
     const handler = menuData.handler;
     const hidden = getComputed(() => handler?.isHidden?.(menuData.context) || false);
@@ -29,7 +28,7 @@ export const ContextMenu = observer<IContextMenuProps, HTMLDivElement>(
     const disabled = getComputed(() => loading || handler?.isDisabled?.(menuData.context) || false);
     const lazy = getComputed(() => !menuData.available || hidden);
 
-    useAutoLoad({ name: `${ContextMenu.name}(${menuData.menu.id})` }, menuData.loaders, !lazy, menuVisible, true);
+    useAutoLoad({ name: `${ContextMenu.name}(${menuData.menu.id})` }, menuData.loaders, !lazy, lazy, true);
 
     const handlers = useObjectRef(
       () => ({
@@ -38,7 +37,6 @@ export const ContextMenu = observer<IContextMenuProps, HTMLDivElement>(
           return this.menuData.items.some(item => item instanceof MenuActionItem && item.action.binding !== null);
         },
         handleVisibleSwitch(visible: boolean) {
-          setMenuVisible(visible);
           this.onVisibleSwitch?.(visible);
 
           if (visible) {
