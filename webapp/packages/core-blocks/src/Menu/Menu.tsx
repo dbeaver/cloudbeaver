@@ -120,40 +120,6 @@ export const Menu = observer<IMenuProps, HTMLDivElement>(
     if (React.isValidElement(children) && disclosure) {
       return (
         <ErrorBoundary>
-          <UIKitMenu.Provider store={menu}>
-            <div
-              key={relativePosition ? 'link' : 'main'}
-              ref={combinedRef}
-              tabIndex={0}
-              className={s(styles, { menuButton: true }, className)}
-              {...props}
-            >
-              <UIKitMenu.Button>{children}</UIKitMenu.Button>
-            </div>
-            <MenuPanel
-              modal={modal}
-              ref={menuPanelRef}
-              label={label}
-              menu={menu}
-              rtl={rtl}
-              submenu={submenu}
-              panelAvailable={panelAvailable}
-              hasBindings={hasBindings}
-              getHasBindings={getHasBindings}
-            >
-              {items}
-            </MenuPanel>
-            {relativePosition && (
-              <MenuButtonLink ref={menuButtonLinkRef} className={s(styles, { menuButtonLink: true })} role="button" tabIndex={0} />
-            )}
-          </UIKitMenu.Provider>
-        </ErrorBoundary>
-      );
-    }
-
-    return (
-      <ErrorBoundary>
-        <UIKitMenu.Provider store={menu}>
           <div
             key={relativePosition ? 'link' : 'main'}
             ref={combinedRef}
@@ -161,9 +127,7 @@ export const Menu = observer<IMenuProps, HTMLDivElement>(
             className={s(styles, { menuButton: true }, className)}
             {...props}
           >
-            <UIKitMenu.Button>
-              <div className={s(styles, { box: true }, className)}>{children}</div>
-            </UIKitMenu.Button>
+            <UIKitMenu.Button store={menu}>{children}</UIKitMenu.Button>
           </div>
           <MenuPanel
             modal={modal}
@@ -179,7 +143,37 @@ export const Menu = observer<IMenuProps, HTMLDivElement>(
             {items}
           </MenuPanel>
           {relativePosition && <MenuButtonLink ref={menuButtonLinkRef} className={s(styles, { menuButtonLink: true })} role="button" tabIndex={0} />}
-        </UIKitMenu.Provider>
+        </ErrorBoundary>
+      );
+    }
+
+    return (
+      <ErrorBoundary>
+        <div
+          key={relativePosition ? 'link' : 'main'}
+          ref={combinedRef}
+          tabIndex={0}
+          className={s(styles, { menuButton: true }, className)}
+          {...props}
+        >
+          <UIKitMenu.Button store={menu}>
+            <div className={s(styles, { box: true }, className)}>{children}</div>
+          </UIKitMenu.Button>
+        </div>
+        <MenuPanel
+          modal={modal}
+          ref={menuPanelRef}
+          label={label}
+          menu={menu}
+          rtl={rtl}
+          submenu={submenu}
+          panelAvailable={panelAvailable}
+          hasBindings={hasBindings}
+          getHasBindings={getHasBindings}
+        >
+          {items}
+        </MenuPanel>
+        {relativePosition && <MenuButtonLink ref={menuButtonLinkRef} className={s(styles, { menuButtonLink: true })} role="button" tabIndex={0} />}
       </ErrorBoundary>
     );
   }),
