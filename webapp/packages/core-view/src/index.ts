@@ -73,6 +73,7 @@ export * from './Menu/DATA_CONTEXT_SUBMENU_ITEM.js';
 export * from './Menu/IMenu.js';
 export * from './Menu/IMenuInfo.js';
 export * from './Menu/menuExtractItems.js';
+export * from './Menu/menuItemsPlaceAfter.js';
 export * from './Menu/MenuService.js';
 export * from './Menu/useMenu.js';
 export * from './Menu/useMenuContext.js';

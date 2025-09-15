@@ -44,10 +44,7 @@ export class SearchConnectionPluginBootstrap extends Bootstrap {
       menus: [MENU_CONNECTIONS, MENU_TREE_CREATE_CONNECTION],
       getItems: (context, items) => [...items, ACTION_CONNECTION_SEARCH],
       orderItems: (context, items) => {
-        const actions = menuExtractItems(items, [ACTION_CONNECTION_SEARCH]);
-
-        items.push(...actions);
-
+        items.push(...menuExtractItems(items, [ACTION_CONNECTION_SEARCH]));
         return items;
       },
     });
