@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -9,24 +9,25 @@ import { observable } from 'mobx';
 
 import { useObservableRef } from '../useObservableRef.js';
 
-export interface IContextMenuPositionCoords {
+export interface IMenuPositionCoords {
   x: number;
   y: number;
 }
 
-export interface IContextMenuPosition {
-  position: IContextMenuPositionCoords | null;
-  handleContextMenuOpen: (event: React.MouseEvent<HTMLDivElement>) => void;
+export interface IMenuPosition {
+  position: IMenuPositionCoords | null;
+  handleMenuOpen: (event: React.MouseEvent) => void;
 }
 
-export function useContextMenuPosition(): IContextMenuPosition {
-  return useObservableRef<IContextMenuPosition>(
+export function useMenuPosition(): IMenuPosition {
+  return useObservableRef<IMenuPosition>(
     () => ({
       position: null,
-      handleContextMenuOpen(event: React.MouseEvent<HTMLDivElement>) {
+      handleMenuOpen(event: React.MouseEvent) {
         if (!event.currentTarget.contains(event.target as Node)) {
           return;
         }
+
         event.preventDefault();
         event.stopPropagation();
 
@@ -48,6 +49,6 @@ export function useContextMenuPosition(): IContextMenuPosition {
     }),
     { position: observable.ref },
     false,
-    ['handleContextMenuOpen'],
+    ['handleMenuOpen'],
   );
 }

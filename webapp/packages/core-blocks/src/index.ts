@@ -69,7 +69,7 @@ export { default as MenuPanelStyles } from './Menu/MenuPanel.module.css';
 export * from './Menu/MenuSeparator.js';
 export { default as MenuSeparatorStyles } from './Menu/MenuSeparator.module.css';
 export * from './Menu/MenuStateContext.js';
-export * from './Menu/useContextMenuPosition.js';
+export * from './Menu/useMenuPosition.js';
 
 export * from './ObjectPropertyInfo/ObjectPropertyInfoForm/ObjectPropertyInfoFormLoader.js';
 export * from './ObjectPropertyInfo/useObjectPropertyCategories.js';

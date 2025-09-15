@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 import React, { forwardRef, useContext } from 'react';
 
-import { getComputed, s, TreeNodeContext, TreeNodeControl, TreeNodeName, useContextMenuPosition, useS } from '@cloudbeaver/core-blocks';
+import { getComputed, s, TreeNodeContext, TreeNodeControl, TreeNodeName, useMenuPosition, useS } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
@@ -31,7 +31,7 @@ import style from './NavigationNodeProjectControl.module.css';
 export const NavigationNodeProjectControl: NavTreeControlComponent = observer<NavTreeControlProps, HTMLDivElement>(
   forwardRef(function NavigationNodeProjectControl({ node, dndElement, dndPlaceholder, className }, ref) {
     const styles = useS(style);
-    const contextMenuPosition = useContextMenuPosition();
+    const position = useMenuPosition();
     const viewContext = useContext(CaptureViewContext);
     const elementsTreeContext = useContext(ElementsTreeContext);
     const treeNodeContext = useContext(TreeNodeContext);
@@ -60,7 +60,7 @@ export const NavigationNodeProjectControl: NavTreeControlComponent = observer<Na
     }
 
     function handleContextMenuOpen(event: React.MouseEvent<HTMLDivElement>) {
-      contextMenuPosition.handleContextMenuOpen(event);
+      position.handleMenuOpen(event);
       treeNodeContext.select();
     }
 
@@ -104,7 +104,7 @@ export const NavigationNodeProjectControl: NavTreeControlComponent = observer<Na
         </TreeNodeName>
         {!dndPlaceholder && (
           <div className={s(styles, { portal: true })} onClick={handlePortalClick}>
-            <TreeNodeMenuLoader contextMenuPosition={contextMenuPosition} node={node} selected={selected} />
+            <TreeNodeMenuLoader contextMenuPosition={position} node={node} selected={selected} />
           </div>
         )}
       </TreeNodeControl>

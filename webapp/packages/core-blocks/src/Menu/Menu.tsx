@@ -18,10 +18,10 @@ import { useS } from '../useS.js';
 import style from './Menu.module.css';
 import { MenuPanel } from './MenuPanel.js';
 import { type IMenuState, MenuStateContext } from './MenuStateContext.js';
-import type { IContextMenuPosition } from './useContextMenuPosition.js';
+import type { IMenuPosition } from './useMenuPosition.js';
 
 interface IMenuProps extends React.ButtonHTMLAttributes<any> {
-  contextMenuPosition?: IContextMenuPosition;
+  contextMenuPosition?: IMenuPosition;
   label: string;
   items: React.ReactNode | (() => React.ReactNode);
   menuRef?: React.RefObject<IMenuState | null>;
