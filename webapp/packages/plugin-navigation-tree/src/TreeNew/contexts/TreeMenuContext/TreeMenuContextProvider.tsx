@@ -18,14 +18,14 @@ interface Props {
   menu: ITreeMenu | null;
 }
 
-export const TreeMenuContextProvider = observer<PropsWithChildren<Props>>(function ({ menu, children }) {
+export const TreeMenuContextProvider = observer<PropsWithChildren<Props>>(function TreeMenuContextProvider({ menu, children }) {
   return (
     <TreeMenuContext value={menu}>
       {children}
 
       {menu && (
         <div className="tw:absolute tw:invisible">
-          <ContextMenu menu={menu.menu} contextMenuPosition={menu.position} visible={menu.visible} modal onVisibleSwitch={menu.onVisibleChange} />
+          <ContextMenu menu={menu.menu} contextMenuPosition={menu.position} modal />
         </div>
       )}
     </TreeMenuContext>

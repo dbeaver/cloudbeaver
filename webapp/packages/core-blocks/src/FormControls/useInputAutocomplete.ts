@@ -12,7 +12,7 @@ import { debounce } from '@cloudbeaver/core-utils';
 import { isNotNullDefined } from '@dbeaver/js-helpers';
 
 import type { IMenuState } from '../Menu/MenuStateContext.js';
-import type { IMenuPositionCoords } from '../Menu/useMenuPosition.js';
+import type { IContextMenuPositionCoords } from '../Menu/useContextMenuPosition.js';
 import { useObservableRef } from '../useObservableRef.js';
 import { type SearchStrategy, useSearch } from '../useSearch.js';
 
@@ -36,7 +36,7 @@ interface State {
   replaceCurrentWord: (replacement: string) => void;
   currentWord: string;
   proposals: InputAutocompleteProposal[];
-  position: IMenuPositionCoords;
+  position: IContextMenuPositionCoords;
   inputValue: string;
   menuRef: RefObject<IMenuState>;
 }
@@ -59,7 +59,7 @@ export const useInputAutocomplete = (
   const menuRef = useRef<IMenuState>(null);
   const state = useObservableRef(
     () => ({
-      position: { x: 0, y: 0 } as IMenuPositionCoords,
+      position: { x: 0, y: 0 } as IContextMenuPositionCoords,
       inputValue: '',
       isFound: false,
       selectionStart: 0 as number | null,

@@ -18,7 +18,7 @@ import {
   TreeNodeDescription,
   TreeNodeIcon,
   TreeNodeName,
-  useMenuPosition,
+  useContextMenuPosition,
   useObjectRef,
   useObservableRef,
   useS,
@@ -52,7 +52,7 @@ interface IEditingState {
 export const NavigationNodeControl: NavTreeControlComponent = observer(
   forwardRef(function NavigationNodeControl({ node, nodeInfo, dndElement, dndPlaceholder, className, onClick }, ref) {
     const styles = useS(style);
-    const postition = useMenuPosition();
+    const contextMenuPosition = useContextMenuPosition();
     const treeNodeContext = useContext(TreeNodeContext);
     const elementsTreeContext = useContext(ElementsTreeContext);
     const navNodeInfoResource = useService(NavNodeInfoResource);
@@ -126,7 +126,7 @@ export const NavigationNodeControl: NavTreeControlComponent = observer(
     }
 
     function handleContextMenuOpen(event: React.MouseEvent<HTMLDivElement>) {
-      postition.handleMenuOpen(event);
+      contextMenuPosition.handleContextMenuOpen(event);
       treeNodeContext.select();
     }
 
@@ -160,7 +160,7 @@ export const NavigationNodeControl: NavTreeControlComponent = observer(
         </TreeNodeName>
         {!editing && !dndPlaceholder && (
           <div className={s(styles, { portal: true })} onClick={handlePortalClick}>
-            <TreeNodeMenuLoader contextMenuPosition={postition} node={node} actions={nodeActions} selected={selected} />
+            <TreeNodeMenuLoader contextMenuPosition={contextMenuPosition} node={node} actions={nodeActions} selected={selected} />
           </div>
         )}
       </TreeNodeControl>

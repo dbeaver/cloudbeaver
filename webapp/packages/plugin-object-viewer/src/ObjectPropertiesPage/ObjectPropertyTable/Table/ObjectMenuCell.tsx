@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { getComputed, Icon, Link, Loader, s, StaticImage, useMenuPosition, useMouse, useS, useStateDelay } from '@cloudbeaver/core-blocks';
+import { getComputed, Icon, Link, Loader, s, StaticImage, useContextMenuPosition, useMouse, useS, useStateDelay } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource, DATA_CONTEXT_CONNECTION } from '@cloudbeaver/core-connections';
 import { useDataContextLink } from '@cloudbeaver/core-data-context';
 import { useService } from '@cloudbeaver/core-di';
@@ -36,7 +36,7 @@ export const ObjectMenuCell = observer<Props>(function ObjectMenuCell({ object }
   const mouse = useMouse<HTMLDivElement>();
   const [menuOpened, switchState] = useState(false);
   const connection = connectionsInfoResource.getConnectionForNode(node.id);
-  const position = useMenuPosition();
+  const contextMenuPosition = useContextMenuPosition();
   const connectionKey = connectionsInfoResource.getConnectionIdForNodeId(node.projectId!, node.id);
 
   useDataContextLink(menu.context, (context, id) => {
@@ -64,7 +64,7 @@ export const ObjectMenuCell = observer<Props>(function ObjectMenuCell({ object }
     });
 
   function contextMenuOpenHandler(event: React.MouseEvent<HTMLDivElement>) {
-    position.handleMenuOpen(event);
+    contextMenuPosition.handleContextMenuOpen(event);
   }
 
   const property = object.object?.properties?.[0];
@@ -83,7 +83,7 @@ export const ObjectMenuCell = observer<Props>(function ObjectMenuCell({ object }
           <div className={s(styles, { menuBox: true })}>
             <Loader suspense small fullSize>
               <ContextMenu
-                contextMenuPosition={position}
+                contextMenuPosition={contextMenuPosition}
                 menu={menu}
                 placement="auto-end"
                 hidden={menuEmpty}

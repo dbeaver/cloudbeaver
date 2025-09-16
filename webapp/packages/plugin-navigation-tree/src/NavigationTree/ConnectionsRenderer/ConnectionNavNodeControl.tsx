@@ -17,7 +17,7 @@ import {
   TreeNodeControl,
   TreeNodeIcon,
   TreeNodeName,
-  useMenuPosition,
+  useContextMenuPosition,
   useS,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
@@ -34,7 +34,7 @@ export const ConnectionNavNodeControl: NavTreeControlComponent = observer<NavTre
   forwardRef(function ConnectionNavNodeControl({ node, nodeInfo, dndElement, dndPlaceholder, className, onClick }, ref) {
     const styles = useS(style);
     const translate = useTranslate();
-    const postition = useMenuPosition();
+    const contextMenuPosition = useContextMenuPosition();
     const treeNodeContext = useContext(TreeNodeContext);
     const navNodeInfoResource = useService(NavNodeInfoResource);
     const navTreeResource = useService(NavTreeResource);
@@ -59,7 +59,7 @@ export const ConnectionNavNodeControl: NavTreeControlComponent = observer<NavTre
     }
 
     function handleContextMenuOpen(event: React.MouseEvent<HTMLDivElement>) {
-      postition.handleMenuOpen(event);
+      contextMenuPosition.handleContextMenuOpen(event);
       treeNodeContext.select();
     }
 
@@ -87,7 +87,7 @@ export const ConnectionNavNodeControl: NavTreeControlComponent = observer<NavTre
         </TreeNodeName>
         {!dndPlaceholder && (
           <div className={s(styles, { portal: true })} onClick={handlePortalClick}>
-            <TreeNodeMenuLoader contextMenuPosition={postition} node={node} selected={selected} />
+            <TreeNodeMenuLoader contextMenuPosition={contextMenuPosition} node={node} selected={selected} />
           </div>
         )}
       </TreeNodeControl>

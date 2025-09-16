@@ -9,21 +9,21 @@ import { observable } from 'mobx';
 
 import { useObservableRef } from '../useObservableRef.js';
 
-export interface IMenuPositionCoords {
+export interface IContextMenuPositionCoords {
   x: number;
   y: number;
 }
 
-export interface IMenuPosition {
-  position: IMenuPositionCoords | null;
-  handleMenuOpen: (event: React.MouseEvent) => void;
+export interface IContextMenuPosition {
+  position: IContextMenuPositionCoords | null;
+  handleContextMenuOpen: (event: React.MouseEvent) => void;
 }
 
-export function useMenuPosition(): IMenuPosition {
-  return useObservableRef<IMenuPosition>(
+export function useContextMenuPosition(): IContextMenuPosition {
+  return useObservableRef<IContextMenuPosition>(
     () => ({
       position: null,
-      handleMenuOpen(event: React.MouseEvent) {
+      handleContextMenuOpen(event: React.MouseEvent) {
         if (!event.currentTarget.contains(event.target as Node)) {
           return;
         }
@@ -34,7 +34,7 @@ export function useMenuPosition(): IMenuPosition {
         let x = event.clientX;
         let y = event.clientY;
 
-        if (!x && !y) {
+        if (x === 0 && y === 0) {
           const rect = event.currentTarget.getBoundingClientRect();
 
           x = rect.left + rect.width / 2;
@@ -49,6 +49,6 @@ export function useMenuPosition(): IMenuPosition {
     }),
     { position: observable.ref },
     false,
-    ['handleMenuOpen'],
+    ['handleContextMenuOpen'],
   );
 }

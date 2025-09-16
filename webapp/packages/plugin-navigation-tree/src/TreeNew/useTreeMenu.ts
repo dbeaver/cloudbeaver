@@ -6,20 +6,18 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { action, observable } from 'mobx';
+import { action } from 'mobx';
 import { useId } from 'react';
 
-import { useMenuPosition, useObjectRef, useObservableRef, type IMenuPosition } from '@cloudbeaver/core-blocks';
+import { useContextMenuPosition, useObjectRef, useObservableRef, type IContextMenuPosition } from '@cloudbeaver/core-blocks';
 import type { IDataContext } from '@cloudbeaver/core-data-context';
 import { DATA_CONTEXT_NAV_NODE_ID } from '@cloudbeaver/core-navigation-tree';
 import type { IMenuData } from '@cloudbeaver/core-view';
 
 export interface ITreeMenu {
   menu: IMenuData;
-  position: IMenuPosition;
-  visible: boolean;
+  position: IContextMenuPosition;
   openMenu(event: React.MouseEvent, nodeId: string): void;
-  onVisibleChange(visible: boolean): void;
 }
 
 interface ITreeMenuOptions {
@@ -31,31 +29,22 @@ export function useTreeMenu(options: ITreeMenuOptions): Readonly<ITreeMenu> {
   options = useObjectRef(options);
 
   const id = useId();
-  const position = useMenuPosition();
+  const position = useContextMenuPosition();
 
   const state = useObservableRef(
     () => ({
-      visible: false,
       openMenu(event: React.MouseEvent, nodeId: string) {
+        this.menu.context.deleteForId(this.id);
         this.menu.context.set(DATA_CONTEXT_NAV_NODE_ID, nodeId, this.id);
 
         if (options.setContext) {
           options.setContext(this.menu.context, this.id);
         }
 
-        this.position.handleMenuOpen(event);
-      },
-      onVisibleChange(visible: boolean) {
-        if (this.visible !== visible) {
-          this.visible = visible;
-
-          if (!visible) {
-            this.menu.context.deleteForId(this.id);
-          }
-        }
+        this.position.handleContextMenuOpen(event);
       },
     }),
-    { visible: observable.ref, openMenu: action.bound, onVisibleChange: action.bound },
+    { openMenu: action.bound },
     { id, menu: options.menu, position },
   );
 

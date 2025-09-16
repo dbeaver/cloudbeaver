@@ -37,7 +37,7 @@ export const InputAutocompletionMenu = observer(function InputAutocompletionMenu
   const styles = useS(style, BaseDropdownStyles);
   const contextMenuPosition = {
     position,
-    handleMenuOpen: () => {},
+    handleContextMenuOpen: () => {},
   };
 
   function handleSelect(proposal: InputAutocompleteProposal) {

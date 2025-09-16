@@ -7,7 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { getComputed, Icon, type IMenuPosition, s, useS } from '@cloudbeaver/core-blocks';
+import { getComputed, Icon, type IContextMenuPosition, s, useS } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource, DATA_CONTEXT_CONNECTION } from '@cloudbeaver/core-connections';
 import { useDataContextLink } from '@cloudbeaver/core-data-context';
 import { useService } from '@cloudbeaver/core-di';
@@ -23,7 +23,7 @@ export interface TreeNodeMenuProps {
   node: NavNode;
   actions?: INodeActions;
   selected?: boolean;
-  contextMenuPosition?: IMenuPosition;
+  contextMenuPosition?: IContextMenuPosition;
   onClose?: () => void;
 }
 
