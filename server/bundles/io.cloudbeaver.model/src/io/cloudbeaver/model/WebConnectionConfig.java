@@ -57,6 +57,7 @@ public class WebConnectionConfig {
     private boolean sharedCredentials;
     private Map<String, Object> mainPropertyValues;
     private Map<String, Object> providerProperties;
+    private Map<String, Object> externalParameters;
     private List<WebNetworkHandlerConfigInput> networkHandlersConfig;
     private DBPDriverConfigurationType configurationType;
     private String selectedSecretId;
@@ -103,6 +104,7 @@ public class WebConnectionConfig {
 
             String configType = JSONUtils.getString(params, "configurationType");
             configurationType = configType == null ? null : DBPDriverConfigurationType.valueOf(configType);
+            externalParameters = JSONUtils.getObjectOrNull(params, "externalParameters");
 
             networkHandlersConfig = new ArrayList<>();
             for (Map<String, Object> nhc : JSONUtils.getObjectList(params, "networkHandlersConfig")) {
@@ -247,5 +249,9 @@ public class WebConnectionConfig {
     @Property
     public String getDefaultSchemaName() {
         return defaultSchemaName;
+    }
+
+    public Map<String, Object> getExternalParameters() {
+        return externalParameters;
     }
 }
