@@ -21,11 +21,9 @@ import io.cloudbeaver.WebObjectId;
 import io.cloudbeaver.model.WebConnectionConfig;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.WebNetworkHandlerConfigInput;
-import io.cloudbeaver.model.WebPropertyInfo;
 import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
-import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
@@ -98,5 +96,4 @@ public interface ConnectionController {
 
     void validateConnection(DBPDataSourceContainer dataSourceContainer) throws DBWebException;
 
-    WebPropertyInfo[] getExternalInfo(WebSession webSession);
 }

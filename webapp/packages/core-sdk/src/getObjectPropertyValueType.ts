@@ -16,7 +16,7 @@ export function getObjectPropertyValueType(property: ObjectPropertyInfo): Object
     return 'password';
   }
 
-  if (dataType === 'integer') {
+  if (dataType === 'integer' || dataType === 'int') {
     return 'number';
   }
 
