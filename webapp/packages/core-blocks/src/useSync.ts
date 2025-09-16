@@ -14,7 +14,7 @@ interface ISyncHook {
   markOutdated(): void;
 }
 
-export function useSync(callback: () => void | Promise<void>): ISyncHook {
+export function useSync(callback: () => void | Promise<void>, canSync = true): ISyncHook {
   const [syncMutex] = useState(() => new mutex.Mutex());
   const [outdated, setOutdated] = useState(false);
   const [delayedOutdated, setDelayedOutdated] = useState(false);
@@ -36,21 +36,24 @@ export function useSync(callback: () => void | Promise<void>): ISyncHook {
     }
   }
 
+  const data = useObjectRef(() => ({
+    markOutdated,
+    markUpdated,
+  }));
+
   useEffect(() => {
-    if (outdated && !syncMutex.isLocked()) {
+    if (outdated && !syncMutex.isLocked() && canSync) {
       syncMutex
         .runExclusive(async () => {
           try {
             await callback();
           } finally {
-            markUpdated();
+            data.markUpdated();
           }
         })
         .catch(error => console.error(error));
     }
   });
 
-  return useObjectRef(() => ({
-    markOutdated,
-  }));
+  return data;
 }
