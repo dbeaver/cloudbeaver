@@ -203,7 +203,7 @@ export class TableFooterMenuService {
       case ACTION_DUPLICATE:
         return { ...action.info, label: '', icon: '/icons/data_add_copy_sm.svg', tooltip: t('data_viewer_action_edit_add_copy') + ' (' + getBindingLabel(KEY_BINDING_DUPLICATE) + ')' };
       case ACTION_DELETE:
-        return { ...action.info, label: '', icon: '/icons/data_delete_sm.svg', tooltip: t('data_viewer_action_edit_delete') };
+        return { ...action.info, label: '', icon: '/icons/data_delete_sm.svg', tooltip: t('data_viewer_action_edit_delete') + ' (Delete)' };
       case ACTION_REVERT:
         return { ...action.info, label: '', icon: '/icons/data_revert_sm.svg', tooltip: t('data_viewer_action_edit_revert') };
       case ACTION_SAVE:
