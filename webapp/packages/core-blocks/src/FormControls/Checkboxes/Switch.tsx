@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -73,7 +73,7 @@ export const Switch: SwitchType = observer(function Switch({
   }
 
   return (
-    <Field title={rest.title}>
+    <Field title={rest.title} className={s(styles, { field: true }, className)}>
       <div className={styles['switchBody']}>
         <div className={s(styles, { switchControl: true, disabled: disabled, checked: checkboxState.checked })}>
           <div className={styles['switchControlTrack']} />

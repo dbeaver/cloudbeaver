@@ -38,15 +38,15 @@ export const ObjectPropertyTable = observer<ObjectPropertyTableProps>(function O
   const allData = dbObjectLoader.resource.get(pagination.allPages).filter(isDefined);
   const { nodes, duplicates } = navNodeViewService.filterDuplicates(allData.map(node => node?.id) || []);
 
-  const objects = allData.filter(node => nodes.includes(node.id)) as DBObject[];
+  const objects = allData.filter(node => nodes.has(node.id)) as DBObject[];
 
   useEffect(() => {
-    navNodeViewService.logDuplicates(objectId, duplicates);
+    navNodeViewService.logDuplicates(objectId, Array.from(duplicates));
   });
 
   return (
     <>
-      {nodes.length === 0 ? (
+      {nodes.size === 0 ? (
         <TextPlaceholder>{translate('plugin_object_viewer_table_no_items')}</TextPlaceholder>
       ) : (
         <div className={s(styles, { box: true }, className)}>
