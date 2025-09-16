@@ -12,7 +12,7 @@ import { Icon, IconOrImage, Loader, registry, s, useS, useStateDelay, useTransla
 
 import style from './MenuBarItem.module.css';
 
-export interface MenuBarItemProps extends Omit<React.DetailedHTMLProps<ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement>, 'style'> {
+export interface MenuBarItemProps extends Omit<React.DetailedHTMLProps<ButtonHTMLAttributes<HTMLDivElement>, HTMLDivElement>, 'style'> {
   label?: string;
   /** @deprecated must be refactored (#1)*/
   displayLabel?: boolean;
@@ -25,7 +25,7 @@ export interface MenuBarItemProps extends Omit<React.DetailedHTMLProps<ButtonHTM
 }
 
 export const MenuBarItem = registry(
-  observer<MenuBarItemProps, HTMLButtonElement>(
+  observer<MenuBarItemProps, HTMLDivElement>(
     forwardRef(function MenuBarItem(
       { label, displayLabel = true, loading = false, hidden, icon, submenu, displaySubmenuMark, viewBox = '0 0 24 24', className, ...rest },
       ref,
@@ -46,7 +46,7 @@ export const MenuBarItem = registry(
           aria-selected={rest['aria-selected']}
           aria-disabled={rest['aria-disabled']}
         >
-          <button ref={ref} className={s(styles, { menuBarItem: true })} tabIndex={tabIndex} {...rest} title={title} aria-label={title}>
+          <div ref={ref} className={s(styles, { menuBarItem: true })} tabIndex={tabIndex} {...rest} title={title} aria-label={title}>
             <div className={s(styles, { menuBarItemBox: true })}>
               {loading ? (
                 <div className={s(styles, { menuBarItemIcon: true })}>
@@ -68,12 +68,12 @@ export const MenuBarItem = registry(
                 </div>
               )}
             </div>
-          </button>
+          </div>
           {Submenu && (
             <Submenu>
-              <button className={s(styles, { menuBarItemCustomSubmenuMark: true })}>
+              <div className={s(styles, { menuBarItemCustomSubmenuMark: true })}>
                 <Icon className={s(style, { icon: true })} name="arrow" viewBox="0 0 16 16" />
-              </button>
+              </div>
             </Submenu>
           )}
         </div>
