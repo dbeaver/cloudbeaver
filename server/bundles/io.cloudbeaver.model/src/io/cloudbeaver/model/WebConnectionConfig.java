@@ -56,6 +56,7 @@ public class WebConnectionConfig {
     private boolean saveCredentials;
     private boolean sharedCredentials;
     private Map<String, Object> mainPropertyValues;
+    private Map<String, Object> expertSettingsValues;
     private Map<String, Object> providerProperties;
     private Map<String, Object> externalParameters;
     private List<WebNetworkHandlerConfigInput> networkHandlersConfig;
@@ -72,16 +73,12 @@ public class WebConnectionConfig {
         if (!CommonUtils.isEmpty(params)) {
             connectionId = JSONUtils.getString(params, "connectionId");
             driverId = JSONUtils.getString(params, "driverId");
-            readOnly = JSONUtils.getBoolean(params, "readOnly");
 
             host = JSONUtils.getString(params, "host");
             port = JSONUtils.getString(params, "port");
             serverName = JSONUtils.getString(params, "serverName");
             databaseName = JSONUtils.getString(params, "databaseName");
             url = JSONUtils.getString(params, "url");
-
-            keepAliveInterval = JSONUtils.getInteger(params, "keepAliveInterval", -1);
-            defaultAutoCommit = JSONUtils.getBoolean(params, "autocommit", true);
 
             name = JSONUtils.getString(params, "name");
             description = JSONUtils.getString(params, "description");
@@ -99,8 +96,18 @@ public class WebConnectionConfig {
 
             mainPropertyValues = JSONUtils.getObjectOrNull(params, "mainPropertyValues");
             providerProperties = JSONUtils.getObjectOrNull(params, "providerProperties");
-            defaultCatalogName = JSONUtils.getString(params, "defaultCatalogName");
-            defaultSchemaName = JSONUtils.getString(params, "defaultSchemaName");
+
+            expertSettingsValues = JSONUtils.getObjectOrNull(params, "expertSettingsValues");
+            keepAliveInterval = JSONUtils.getInteger(
+                expertSettingsValues != null ? expertSettingsValues : params, WebExpertSettingsProperties.PROP_KEEP_ALIVE_INTERVAL, -1);
+            readOnly = JSONUtils.getBoolean(
+                expertSettingsValues != null ? expertSettingsValues : params, WebExpertSettingsProperties.PROP_READ_ONLY);
+            defaultAutoCommit = JSONUtils.getBoolean(
+                expertSettingsValues != null ? expertSettingsValues : params, WebExpertSettingsProperties.PROP_AUTO_COMMIT, true);
+            defaultCatalogName = JSONUtils.getString(
+                expertSettingsValues != null ? expertSettingsValues : params, WebExpertSettingsProperties.PROP_DEFAULT_CATALOG);
+            defaultSchemaName = JSONUtils.getString(
+                expertSettingsValues != null ? expertSettingsValues : params, WebExpertSettingsProperties.PROP_DEFAULT_SCHEMA);
 
             String configType = JSONUtils.getString(params, "configurationType");
             configurationType = configType == null ? null : DBPDriverConfigurationType.valueOf(configType);
@@ -219,6 +226,11 @@ public class WebConnectionConfig {
     @Property
     public Map<String, Object> getMainPropertyValues() {
         return mainPropertyValues;
+    }
+
+    @Property
+    public Map<String, Object> getExpertSettingsValues() {
+        return expertSettingsValues;
     }
 
     @Property
