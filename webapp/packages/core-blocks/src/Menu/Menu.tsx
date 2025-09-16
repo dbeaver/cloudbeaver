@@ -74,6 +74,10 @@ export const Menu = observer<IMenuProps, HTMLButtonElement>(
     }
 
     useLayoutEffect(() => {
+      if (!menuVisible && contextMenuPosition?.position) {
+        contextMenuPosition.position = null;
+      }
+
       propsRef.onVisibleSwitch?.(menuVisible);
     }, [menuVisible]);
 
@@ -84,6 +88,18 @@ export const Menu = observer<IMenuProps, HTMLButtonElement>(
 
       return undefined;
     }
+
+    useLayoutEffect(() => {
+      if (!contextMenuPosition?.position) {
+        return;
+      }
+
+      if (menuVisible) {
+        return;
+      }
+
+      store.show();
+    }, [contextMenuPosition?.position, menuVisible]);
 
     if (React.isValidElement(children) && disclosure) {
       return (
