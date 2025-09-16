@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import React, { forwardRef, useLayoutEffect, useRef, useState } from 'react';
+import React, { forwardRef, useLayoutEffect, useRef } from 'react';
 import { Menu as UIKitMenu, useMenuStore, useStoreState, type MenuProviderProps } from '@dbeaver/ui-kit';
 
 import { ErrorBoundary } from '../ErrorBoundary.js';
@@ -21,7 +21,7 @@ import type { IContextMenuPosition } from './useContextMenuPosition.js';
 interface IMenuProps extends React.ButtonHTMLAttributes<any> {
   contextMenuPosition?: IContextMenuPosition;
   label: string;
-  items: React.ReactNode | (() => React.ReactNode);
+  items: React.ReactNode;
   disclosure?: boolean;
   placement?: MenuProviderProps['placement'];
   submenu?: boolean;
@@ -56,17 +56,15 @@ export const Menu = observer<IMenuProps, HTMLButtonElement>(
     },
     ref,
   ) {
-    const innerMenuButtonRef = useRef<HTMLButtonElement>(null);
-    const combinedRef = useCombinedRef(ref, innerMenuButtonRef);
-    const [relativePosition, setRelativePosition] = useState<{ x: number; y: number } | null>(null);
-    const menuButtonLinkRef = useRef<HTMLButtonElement>(null);
-    const menuPanelRef = useRef<HTMLDivElement>(null);
+    const buttonRef = useRef<HTMLButtonElement>(null);
+    const combinedRef = useCombinedRef(ref, buttonRef);
+    const menuRef = useRef<HTMLDivElement>(null);
     const propsRef = useObjectRef({ onVisibleSwitch, visible });
-    const menu = useMenuStore({
+    const store = useMenuStore({
       placement,
       defaultOpen: visible,
     });
-    const storeState = useStoreState(menu);
+    const storeState = useStoreState(store);
     const styles = useS(style);
 
     let menuVisible = !!storeState.open;
@@ -76,54 +74,23 @@ export const Menu = observer<IMenuProps, HTMLButtonElement>(
     }
 
     useLayoutEffect(() => {
-      if (!menuVisible) {
-        setRelativePosition(null);
-      }
-
       propsRef.onVisibleSwitch?.(menuVisible);
     }, [menuVisible]);
 
-    useLayoutEffect(() => {
-      if (!contextMenuPosition?.position) {
-        return;
+    function getAnchorRect() {
+      if (contextMenuPosition?.position) {
+        return () => contextMenuPosition.position;
       }
 
-      if (menuVisible) {
-        menu.setOpen(false);
-        return;
-      }
-
-      if (innerMenuButtonRef.current) {
-        menu.setOpen(true);
-
-        const boxSize = innerMenuButtonRef.current.getBoundingClientRect();
-        setRelativePosition({
-          x: contextMenuPosition.position.x - boxSize.x,
-          y: contextMenuPosition.position.y - boxSize.y,
-        });
-
-        contextMenuPosition.position = null;
-      }
-    }, [contextMenuPosition?.position, menuVisible]);
-
-    useLayoutEffect(() => {
-      if (relativePosition) {
-        if (menuButtonLinkRef.current) {
-          menuButtonLinkRef.current.style.left = `${relativePosition.x}px`;
-          menuButtonLinkRef.current.style.top = `${relativePosition.y}px`;
-        }
-      }
-    });
-
-    const MenuButtonLink = UIKitMenu.Button;
+      return undefined;
+    }
 
     if (React.isValidElement(children) && disclosure) {
       return (
         <ErrorBoundary>
           <UIKitMenu.Button
-            key={relativePosition ? 'link' : 'main'}
             ref={combinedRef}
-            store={menu}
+            store={store}
             tabIndex={0}
             className={s(styles, { menuButton: true }, className)}
             {...props}
@@ -132,49 +99,42 @@ export const Menu = observer<IMenuProps, HTMLButtonElement>(
             {React.cloneElement(children, { ...(children.props as any) })}
           </UIKitMenu.Button>
           <MenuPanel
-            ref={menuPanelRef}
+            ref={menuRef}
             modal={modal}
             label={label}
-            menu={menu}
+            menu={store}
             rtl={rtl}
             submenu={submenu}
+            getAnchorRect={getAnchorRect()}
             panelAvailable={panelAvailable}
             hasBindings={hasBindings}
             getHasBindings={getHasBindings}
           >
             {items}
           </MenuPanel>
-          {relativePosition && <MenuButtonLink ref={menuButtonLinkRef} className={s(styles, { menuButtonLink: true })} />}
         </ErrorBoundary>
       );
     }
 
     return (
       <ErrorBoundary>
-        <UIKitMenu.Button
-          key={relativePosition ? 'link' : 'main'}
-          ref={combinedRef}
-          store={menu}
-          tabIndex={0}
-          className={s(styles, { menuButton: true }, className)}
-          {...props}
-        >
+        <UIKitMenu.Button ref={combinedRef} store={store} tabIndex={0} className={s(styles, { menuButton: true }, className)} {...props}>
           <div className={s(styles, { box: true }, className)}>{children}</div>
         </UIKitMenu.Button>
         <MenuPanel
-          ref={menuPanelRef}
+          ref={menuRef}
           modal={modal}
           label={label}
-          menu={menu}
+          menu={store}
           rtl={rtl}
           submenu={submenu}
+          getAnchorRect={getAnchorRect()}
           panelAvailable={panelAvailable}
           hasBindings={hasBindings}
           getHasBindings={getHasBindings}
         >
           {items}
         </MenuPanel>
-        {relativePosition && <MenuButtonLink ref={menuButtonLinkRef} className={s(styles, { menuButtonLink: true })} />}
       </ErrorBoundary>
     );
   }),

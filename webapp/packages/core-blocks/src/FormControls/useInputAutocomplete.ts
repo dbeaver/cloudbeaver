@@ -196,8 +196,8 @@ export const useInputAutocomplete = (
     document.body.removeChild(span);
 
     state.position = {
-      x: spanRect.width + letterWidth,
-      y: spanRect.height + CONTEXT_INPUT_OFFSET_Y,
+      x: inputElement.getBoundingClientRect().x + spanRect.width + letterWidth,
+      y: inputElement.getBoundingClientRect().y + spanRect.height + CONTEXT_INPUT_OFFSET_Y,
     };
   }, [state.inputValue]);
 
