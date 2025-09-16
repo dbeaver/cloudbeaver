@@ -60,11 +60,9 @@ export const ContextMenu = observer<IContextMenuProps, HTMLButtonElement>(
         ref={ref}
         label={translate(menuData.menu.info.label)}
         title={translate(menuData.menu.info.tooltip)}
-        items={() =>
-          menuData.items.map(item => (
-            <MenuItemRenderer key={item.id} item={item} menuData={menuData} rtl={rtl} modal={modal} onItemClose={handlers.handleItemClose} />
-          ))
-        }
+        items={menuData.items.map(item => (
+          <MenuItemRenderer key={item.id} item={item} menuData={menuData} rtl={rtl} modal={modal} onItemClose={handlers.handleItemClose} />
+        ))}
         rtl={rtl}
         modal={modal}
         visible={visible}

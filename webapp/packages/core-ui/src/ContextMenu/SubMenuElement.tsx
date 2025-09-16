@@ -88,11 +88,9 @@ export const SubMenuElement = observer<ISubMenuElementProps, HTMLButtonElement>(
         {...rest}
         ref={ref}
         label={subMenuData.menu.info.label}
-        items={() =>
-          subMenuData.items.map(item => (
-            <MenuItemRenderer key={item.id} item={item} menuData={subMenuData} rtl={rtl} modal={modal} onItemClose={handlers.handleItemClose} />
-          ))
-        }
+        items={subMenuData.items.map(item => (
+          <MenuItemRenderer key={item.id} item={item} menuData={subMenuData} rtl={rtl} modal={modal} onItemClose={handlers.handleItemClose} />
+        ))}
         rtl={rtl}
         modal={modal}
         placement={rtl ? 'left-start' : 'right-start'}
