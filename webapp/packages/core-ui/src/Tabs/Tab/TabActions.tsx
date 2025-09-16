@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -31,10 +31,7 @@ export const TabActions = observer(function TabActions({ tabId, canClose, state,
     <div className={s(styles, { tabActions: true }, className)}>
       {canClose && <TabAction iconName="cross-bold" title="ui_close" onClick={handleClose} />}
       <TabMenu tabId={tabId} state={state} menuContext={menuContext}>
-        {/* TODO use TabAction but resolve ContextMenu issue first */}
-        <div className={s(styles, { tabAction: true })}>
-          <Icon className={s(styles, { icon: true })} name="dots" viewBox="0 0 32 32" />
-        </div>
+        <TabAction iconName="dots" />
       </TabMenu>
     </div>
   );
