@@ -7,17 +7,9 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { Container, Expandable, FieldCheckbox, Flex, Group, InputField, useTranslate } from '@cloudbeaver/core-blocks';
+import { Container, Expandable, Group, ObjectPropertyInfoForm, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
-
-const MAX_KEEP_ALIVE_INTERVAL = 32767;
-const DEFAULT_CONFIG: ConnectionConfig = {
-  keepAliveInterval: 0,
-  autocommit: true,
-  defaultCatalogName: '',
-  defaultSchemaName: '',
-  readOnly: false,
-};
+import { DBDriverExpertSettingsResource } from '@cloudbeaver/core-connections';
 
 interface Props {
   config: ConnectionConfig;
@@ -27,70 +19,17 @@ interface Props {
 
 export const AdvancedPropertiesForm = observer<Props>(function AdvancedPropertiesForm({ config, disabled, readonly }) {
   const translate = useTranslate();
+  const properties = useResource(AdvancedPropertiesForm, DBDriverExpertSettingsResource, config.driverId ?? null);
+
+  if (!properties.data?.length) {
+    return null;
+  }
 
   return (
     <Group form gap>
       <Expandable label={translate('connections_connection_expert_settings')}>
         <Container wrap gap>
-          <InputField
-            type="number"
-            minLength={1}
-            min={0}
-            max={MAX_KEEP_ALIVE_INTERVAL}
-            name="keepAliveInterval"
-            readOnly={readonly || disabled}
-            title={translate('connections_connection_keep_alive_tooltip')}
-            state={config}
-            defaultState={DEFAULT_CONFIG}
-          >
-            {translate('connections_connection_keep_alive')}
-          </InputField>
-
-          <FieldCheckbox
-            name="autocommit"
-            state={config}
-            defaultChecked={DEFAULT_CONFIG.autocommit}
-            title={translate('connections_connection_autocommit')}
-            disabled={disabled}
-            readOnly={readonly}
-          >
-            {translate('connections_connection_autocommit')}
-          </FieldCheckbox>
-
-          <FieldCheckbox
-            name="readOnly"
-            state={config}
-            defaultChecked={DEFAULT_CONFIG.readOnly}
-            title={translate('connections_connection_read_only')}
-            disabled={disabled}
-            readOnly={readonly}
-          >
-            {translate('connections_connection_read_only')}
-          </FieldCheckbox>
-
-          <Flex gap="xs">
-            <InputField
-              name="defaultCatalogName"
-              readOnly={readonly || disabled}
-              title={translate('connections_connection_default_catalog')}
-              state={config}
-              defaultState={DEFAULT_CONFIG}
-              fill
-            >
-              {translate('connections_connection_default_catalog')}
-            </InputField>
-
-            <InputField
-              name="defaultSchemaName"
-              readOnly={readonly || disabled}
-              title={translate('connections_connection_default_schema')}
-              state={config}
-              defaultState={DEFAULT_CONFIG}
-              fill
-            >
-              {translate('connections_connection_default_schema')}
-            </InputField>
-          </Flex>
+          <ObjectPropertyInfoForm state={config.expertSettingsValues} properties={properties.data} disabled={disabled} readOnly={readonly} />
         </Container>
       </Expandable>
     </Group>
