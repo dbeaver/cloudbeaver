@@ -6,6 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 
+.menuBarItemGroup {
+  height: 100%;
+}
+
 .topMenuBar .menuBarItemGroup .menuBarItem {
   background: none;
   border: none;
