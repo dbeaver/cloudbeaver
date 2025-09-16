@@ -15,6 +15,7 @@ import { s } from '../s.js';
 import { useS } from '../useS.js';
 import { useStateDelay } from '../useStateDelay.js';
 import style from './MenuItemElement.module.css';
+import { Menu } from '@dbeaver/ui-kit';
 
 interface IMenuItemElementProps {
   label: string;
@@ -45,7 +46,7 @@ export const MenuItemElement = observer<IMenuItemElementProps>(function MenuItem
   loading = useStateDelay(loading, 300);
 
   return (
-    <div className={s(styles, { menuPanelItem: true })} title={tooltip ? translate(tooltip) : title}>
+    <Menu.Item className={s(styles, { menuPanelItem: true })} title={tooltip ? translate(tooltip) : title}>
       <div className={s(styles, { menuItemIcon: true })}>
         <Loader className={s(styles, { loader: true })} suspense small fullSize>
           {typeof icon === 'string' ? <IconOrImage className={s(styles, { iconOrImage: true })} icon={icon} /> : icon}
@@ -65,6 +66,6 @@ export const MenuItemElement = observer<IMenuItemElementProps>(function MenuItem
         {loading && <Loader className={s(styles, { loader: true })} small fullSize />}
         {panelAvailable !== false && menu && !loading && <Icon name="context-menu-submenu" viewBox="0 0 6 7" className={s(styles, { icon: true })} />}
       </div>
-    </div>
+    </Menu.Item>
   );
 });
