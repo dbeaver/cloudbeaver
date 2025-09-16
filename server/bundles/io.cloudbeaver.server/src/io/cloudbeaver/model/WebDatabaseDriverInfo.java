@@ -18,10 +18,7 @@ package io.cloudbeaver.model;
 
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebServiceUtils;
-import io.cloudbeaver.model.app.WebAppConfiguration;
 import io.cloudbeaver.model.session.WebSession;
-import io.cloudbeaver.model.utils.ConfigurationUtils;
-import io.cloudbeaver.server.WebAppUtils;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBConstants;
@@ -39,8 +36,6 @@ import org.jkiss.utils.CommonUtils;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Stream;
 
 /**
  * Web driver configuration
@@ -257,29 +252,14 @@ public class WebDatabaseDriverInfo {
 
     @Property
     public WebPropertyInfo[] getProviderProperties() {
-        WebPropertyInfo[] additionalWebProperty = Optional.of(WebAppUtils.getWebApplication())
-            .filter(app -> app.getAppConfiguration().isSecretManagerEnabled())
-            .map(app -> app.getConnectionController().getExternalInfo(webSession))
-            .orElse(new WebPropertyInfo[0]);
-
-        WebPropertyInfo[] providerProperties = Arrays.stream(driver.getProviderPropertyDescriptors())
+        return Arrays.stream(driver.getProviderPropertyDescriptors())
             .map(p -> new WebPropertyInfo(webSession, p, null))
             .toArray(WebPropertyInfo[]::new);
-
-        return Stream.concat(
-            Arrays.stream(additionalWebProperty),
-            Arrays.stream(providerProperties)
-        ).toArray(WebPropertyInfo[]::new);
     }
 
     @Property
     public boolean isEnabled() {
-        WebAppConfiguration config = WebAppUtils.getWebApplication().getAppConfiguration();
-        return ConfigurationUtils.isDriverEnabled(
-            driver,
-            config.getEnabledDrivers(),
-            config.getDisabledDrivers()
-            );
+        return WebServiceUtils.isDriverEnabled(driver);
     }
 
     @Property
