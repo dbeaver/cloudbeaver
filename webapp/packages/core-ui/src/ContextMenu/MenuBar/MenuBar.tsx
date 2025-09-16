@@ -21,11 +21,13 @@ import {
   useListKeyboardNavigation,
   useMergeRefs,
   useS,
+  useTranslate,
 } from '@cloudbeaver/core-blocks';
 import { type IDataContext, useDataContextLink } from '@cloudbeaver/core-data-context';
 import {
   DATA_CONTEXT_MENU_NESTED,
   DATA_CONTEXT_SUBMENU_ITEM,
+  getBindingLabel,
   type IMenuActionItem,
   type IMenuData,
   type IMenuInfo,
@@ -91,8 +93,8 @@ interface IMenuBarElementProps {
 
 const MenuBarElement = observer<IMenuBarElementProps>(function MenuBarElement({ item, menuData, nestedMenuSettings, className, rtl }) {
   const onClick = useCallback(() => {
-    item.events?.onSelect?.();
-  }, [item]);
+    item.events?.onSelect?.(menuData.context);
+  }, [item, menuData.context]);
 
   if (item.hidden) {
     return null;
@@ -145,15 +147,18 @@ export interface IMenuBarActionProps {
 }
 
 export const MenuBarAction = registry(
-  observer<IMenuBarActionProps>(function MenuBarAction({ item, parentMenuInfo, submenu, className }) {
+  observer<IMenuBarActionProps>(function MenuBarAction({ item, parentMenuInfo, submenu, context, className }) {
+    const translate = useTranslate();
     const actionInfo = item.action.actionInfo;
     const loading = item.action.isLoading();
 
     /** @deprecated must be refactored (#1)*/
     const displayLabel = item.action.isLabelVisible();
+    const binding = item.action.binding ? getBindingLabel(item.action.binding.binding) : null;
+    const title = translate(actionInfo.tooltip ?? actionInfo.label);
 
     function handleClick() {
-      item.events?.onSelect?.();
+      item.events?.onSelect?.(context);
       item.action.activate();
     }
 
@@ -165,7 +170,7 @@ export const MenuBarAction = registry(
         label={actionInfo.label}
         displayLabel={displayLabel}
         icon={actionInfo.icon ?? parentMenuInfo?.icon}
-        title={actionInfo.tooltip ?? parentMenuInfo?.tooltip}
+        title={binding ? `${title} (${binding})` : title}
         disabled={item.disabled}
         loading={loading}
         submenu={submenu}
