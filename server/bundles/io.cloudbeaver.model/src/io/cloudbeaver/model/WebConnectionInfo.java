@@ -418,6 +418,17 @@ public class WebConnectionInfo {
     }
 
     @Property
+    public Map<String, Object> getExpertSettingsValues() {
+        Map<String, Object> expertSettings = new LinkedHashMap<>();
+        expertSettings.put(WebExpertSettingsProperties.PROP_AUTO_COMMIT, isAutocommit());
+        expertSettings.put(WebExpertSettingsProperties.PROP_KEEP_ALIVE_INTERVAL, getKeepAliveInterval());
+        expertSettings.put(WebExpertSettingsProperties.PROP_READ_ONLY, isReadOnly());
+        expertSettings.put(WebExpertSettingsProperties.PROP_DEFAULT_CATALOG, getDefaultCatalogName());
+        expertSettings.put(WebExpertSettingsProperties.PROP_DEFAULT_SCHEMA, getDefaultSchemaName());
+        return expertSettings;
+    }
+
+    @Property
     public Map<String, String> getProviderProperties() {
         return dataSourceContainer.getConnectionConfiguration().getProviderProperties();
     }

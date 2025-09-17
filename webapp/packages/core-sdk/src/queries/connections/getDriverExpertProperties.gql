@@ -1,0 +1,7 @@
+query getDriverExpertProperties($driverId: ID) {
+  drivers: driverList(id: $driverId) {
+    expertSettingsProperties {
+        ...DriverPropertyInfo
+    }
+  }
+}
