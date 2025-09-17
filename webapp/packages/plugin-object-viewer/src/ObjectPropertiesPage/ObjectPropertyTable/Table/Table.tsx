@@ -83,7 +83,7 @@ export const Table = observer<TableProps>(function Table({ objects, hasNextPage,
 
       if (type === 'checkbox') {
         const value = getObjectPropertyValue(property);
-        return <Checkbox className={s(styles, { boolean: true })} disabled size="small" checked={value} />;
+        return <Checkbox className={s(styles, { boolean: true })} size="small" checked={value} disabled />;
       }
 
       return getObjectPropertyDisplayValue(property);
