@@ -21,6 +21,8 @@ export default [
   ['sql_editor_shortcut_open_editor_in_new_tab', '在单独的浏览器标签下打开SQL编辑器'],
   ['sql_editor_shortcut_undo', '撤销'],
   ['sql_editor_shortcut_redo', '重做'],
+  ['sql_editor_shortcut_find', '查找'],
+  ['sql_editor_shortcut_comment_uncomment_selection', '注释/取消注释所选内容'],
 
   ['navigation_tree_shortcut_enable_filter', '启用过滤'],
 ];

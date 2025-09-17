@@ -21,6 +21,8 @@ export default [
   ['sql_editor_shortcut_open_editor_in_new_tab', 'Open SQL Editor in the separate browser Tab'],
   ['sql_editor_shortcut_undo', 'Undo'],
   ['sql_editor_shortcut_redo', 'Redo'],
+  ['sql_editor_shortcut_find', 'Find'],
+  ['sql_editor_shortcut_comment_uncomment_selection', 'Comment/Uncomment selection'],
 
   ['navigation_tree_shortcut_enable_filter', 'Enable filtering'],
 
