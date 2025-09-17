@@ -187,13 +187,13 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
         }
 
         try {
-          await this.executeQueryAction(await this.executeQueryAction(this.model.cursorSegment, () => this.model.getResolvedSegment()), query =>
-            this.sqlQueryService.executeEditorQuery(this.state, query.query, false),
-          );
+          const segment = await this.model.getResolvedSegment();
+          await this.executeQueryAction(segment, query => this.sqlQueryService.executeEditorQuery(this.state, query.query, false));
         } catch {}
       },
 
       async loadDatabaseDataModels(): Promise<void> {
+        await this.model.getResolvedSegment();
         await this.executeQueryAction(
           this.model.cursorSegment,
           () => {
@@ -228,9 +228,8 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
         }
 
         try {
-          await this.executeQueryAction(await this.executeQueryAction(this.model.cursorSegment, () => this.model.getResolvedSegment()), query =>
-            this.sqlExecutionPlanService.executeExecutionPlan(this.state, query.query),
-          );
+          const segment = await this.model.getResolvedSegment();
+          await this.executeQueryAction(segment, query => this.sqlExecutionPlanService.executeExecutionPlan(this.state, query.query));
         } catch {}
       },
 
