@@ -87,6 +87,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
   const required = property.required && !readonly;
   const value = getObjectPropertyValue(property);
   const defaultValue = getObjectPropertyDefaultValue(property);
+  const hint = property.hint === property.displayName ? undefined : property.hint;
 
   if (controlType === 'link') {
     return (
@@ -178,7 +179,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
         title={property.description}
         disabled={disabled}
         readOnly={readonly}
-        description={property.hint}
+        description={hint}
         className={className}
       >
         {property.displayName ?? ''}
@@ -253,7 +254,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
         state={state}
         defaultState={defaultState || { [property.id!]: defaultValue }}
         autoHide={autoHide}
-        description={property.hint}
+        description={hint}
         placeholder={passwordSavedMessage}
         readOnly={readonly || disabled}
         autoComplete={RESERVED_KEYWORDS.includes(autofillToken) ? autofillToken : `${autofillToken} ${property.id}`}
@@ -275,7 +276,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
       name={property.id!}
       value={value}
       defaultValue={defaultValue}
-      description={property.hint}
+      description={hint}
       placeholder={passwordSavedMessage}
       readOnly={readonly || disabled}
       autoComplete={RESERVED_KEYWORDS.includes(autofillToken) ? autofillToken : `${autofillToken} ${property.id}`}
