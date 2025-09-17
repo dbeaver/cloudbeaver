@@ -193,6 +193,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
       },
 
       async loadDatabaseDataModels(): Promise<void> {
+        // force script parsing, cursorSegment depends on it
         await this.model.getResolvedSegment();
         await this.executeQueryAction(
           this.model.cursorSegment,
