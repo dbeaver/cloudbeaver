@@ -351,6 +351,9 @@ type DriverInfo {
     """
     providerProperties: [ObjectPropertyInfo!]!
 
+    "Expert driver settings properties. Returns properties (like keep-alive interval) that are not often used and can be hidden in UI"
+    expertSettingsProperties: [ObjectPropertyInfo!]! @since(version: "25.2.1")
+
     "False for drivers which do not support authentication."
     anonymousAccess: Boolean
     "Default auth model that is used for this driver (see authModels)"
@@ -485,6 +488,9 @@ type ConnectionInfo {
 
     "Main connection properties. Contains host, port, database, server name fields"
     mainPropertyValues: Object @since(version: "24.1.2")
+
+    "Expert connection settings. Contains expert settings properties (like keep-alive interval or auto-commit) that are not often used"
+    expertSettingsValues: Object @since(version: "25.2.1")
 
     "Connection keep-alive interval in seconds"
     keepAliveInterval: Int!
@@ -672,6 +678,9 @@ input ConnectionConfig {
     "Host, port, serverName, databaseName are also stored in mainPropertyValues for custom pages"
     mainPropertyValues: Object @since(version: "24.1.2")
 
+    "Keep-alive, auto-commit, read-only and other expert settings are stored in expertSettingsValues"
+    expertSettingsValues: Object @since(version: "25.2.1")
+
     "Sets connection URL jdbc:{driver}://{host}[:{port}]/[{database}]"
     url: String
 
@@ -679,13 +688,13 @@ input ConnectionConfig {
     properties: Object
 
     "Set keep-alive interval"
-    keepAliveInterval: Int
+    keepAliveInterval: Int @deprecated(reason: "25.2.1 use expertPropertyValues instead")
 
     "Sets auto-commit connection state"
-    autocommit: Boolean
+    autocommit: Boolean @deprecated(reason: "25.2.1 use expertPropertyValues instead")
 
     "Sets read-only connection state"
-    readOnly: Boolean
+    readOnly: Boolean @deprecated(reason: "25.2.1 use expertPropertyValues instead")
 
     # User credentials
 
@@ -721,9 +730,9 @@ input ConnectionConfig {
     "Configuration type (MANUAL, URL)"
     configurationType: DriverConfigurationType
     "Sets catalog name for the connection"
-    defaultCatalogName: String @since(version: "25.0.5")
+    defaultCatalogName: String @since(version: "25.0.5") @deprecated(reason: "25.2.1 use expertPropertyValues instead")
     "Sets schema name for the connection"
-    defaultSchemaName: String @since(version: "25.0.5")
+    defaultSchemaName: String @since(version: "25.0.5") @deprecated(reason: "25.2.1 use expertPropertyValues instead")
 }
 
 ####################################################

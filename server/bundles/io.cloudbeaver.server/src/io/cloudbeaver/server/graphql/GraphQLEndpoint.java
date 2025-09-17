@@ -32,7 +32,6 @@ import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.model.apilog.ApiCallInterceptor;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.registry.WebServiceRegistry;
-import io.cloudbeaver.server.HttpConstants;
 import io.cloudbeaver.server.WebAppUtils;
 import io.cloudbeaver.service.DBWBindingContext;
 import io.cloudbeaver.service.DBWServiceBindingGraphQL;
@@ -46,6 +45,7 @@ import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.utils.CommonUtils;
+import org.jkiss.utils.HttpConstants;
 import org.jkiss.utils.IOUtils;
 
 import java.io.IOException;
@@ -146,7 +146,7 @@ public class GraphQLEndpoint extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String contentType = request.getContentType();
-        if (CommonUtils.isEmpty(contentType) || !contentType.startsWith(HttpConstants.TYPE_JSON)) {
+        if (CommonUtils.isEmpty(contentType) || !contentType.startsWith(HttpConstants.CONTENT_TYPE_JSON)) {
             String error = "Bad request," + (CommonUtils.isEmpty(contentType)
                 ? " content type is missing"
                 : " incorrect content type:" + contentType);
