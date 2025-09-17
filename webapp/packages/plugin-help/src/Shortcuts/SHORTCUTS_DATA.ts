@@ -91,7 +91,7 @@ export const SQL_EDITOR_SHORTCUTS: IShortcut[] = [
     code: transformKeys(KEY_BINDING_SQL_EDITOR_FORMAT),
   },
   {
-    label: 'sql_editor_shortcut_save_as_script',
+    label: 'sql_editor_shortcut_save',
     code: transformKeys(KEY_BINDING_SQL_EDITOR_SAVE_AS_SCRIPT),
   },
   {

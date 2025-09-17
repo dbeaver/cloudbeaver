@@ -1,5 +1,5 @@
 export default [
-  ['plugin_sql_editor_navigation_tab_resource_save_script_title', 'Lưu dưới dạng script'],
+  ['plugin_sql_editor_navigation_tab_resource_save_script_title', 'Lưu'],
   ['plugin_sql_editor_navigation_tab_script_state_renaming', 'Đang đổi tên script...'],
   ['plugin_sql_editor_navigation_tab_script_state_reading', 'Đang đọc script...'],
   ['plugin_sql_editor_navigation_tab_script_state_saving', 'Đang lưu script...'],
