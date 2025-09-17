@@ -54,6 +54,7 @@ export * from './localization/useTranslate.js';
 export * from './ConnectionImageWithMask/ConnectionImageWithMask.js';
 export { default as ConnectionImageWithMaskSvgStyles } from './ConnectionImageWithMask/ConnectionImageWithMaskSvg.module.css';
 
+export * from './Menu/AriaKit/MenuAriaKit.js';
 export * from './Menu/Menu.js';
 export { default as MenuStyles } from './Menu/Menu.module.css';
 export * from './Menu/MenuBarSmallItem.js';

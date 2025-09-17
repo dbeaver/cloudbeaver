@@ -1,0 +1,11 @@
+@layer components {
+  .dbv-kit-menu__popover {
+    --dbv-kit-menu-popover-foreground: var(--theme-input-color);
+    --dbv-kit-menu-popover-background: var(--theme-input-background);
+  }
+
+  .dbv-kit-menu__button {
+    --dbv-kit-menu-background: var(--theme-input-background);
+    --dbv-kit-menu-foreground: var(--theme-input-color);
+  }
+}

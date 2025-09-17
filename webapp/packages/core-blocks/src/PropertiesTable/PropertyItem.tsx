@@ -18,7 +18,7 @@ import { s } from '../s.js';
 import { useS } from '../useS.js';
 import type { IProperty } from './IProperty.js';
 import classes from './PropertyItem.module.css';
-import { PropertyValueSelector } from './PropertyValueSelector.js';
+import { MenuAriaKit } from '../Menu/AriaKit/MenuAriaKit.js';
 
 interface Props {
   property: IProperty;
@@ -38,7 +38,6 @@ export const PropertyItem = observer<Props>(function PropertyItem({ property, va
   const propertyValue = value !== undefined ? value : property.defaultValue;
   const [menuOpen, setMenuOpen] = useState(false);
   const keyInputRef = useRef<HTMLInputElement>(null);
-  const [valueRef, setValueRef] = useState<HTMLDivElement | null>(null);
 
   const handleKeyChange = useCallback((key: string) => onNameChange(property.id, key), [property]);
   const handleValueChange = useCallback((value: string) => onValueChange(property.id, value), [property]);
@@ -73,7 +72,7 @@ export const PropertyItem = observer<Props>(function PropertyItem({ property, va
           {property.displayName || property.key}
         </ShadowInput>
       </div>
-      <div ref={setValueRef} className={s(styles, { value: true })} title={String(propertyValue)}>
+      <div className={s(styles, { value: true })} title={String(propertyValue)}>
         <ShadowInput
           className={s(styles, { shadowInput: true, edited })}
           type="text"
@@ -102,16 +101,13 @@ export const PropertyItem = observer<Props>(function PropertyItem({ property, va
         )}
         {!readOnly && property.validValues && property.validValues.length > 0 && (
           <div className={s(styles, { select: true })}>
-            <PropertyValueSelector
+            <MenuAriaKit
+              buttonElement={<Icon className={s(styles, { icon: true, focus })} name="arrow" viewBox="0 0 16 16" />}
               className={s(styles, { propertyValueSelector: true })}
-              propertyName={property.id}
-              values={property.validValues}
-              container={valueRef}
-              onSelect={handleValueChange}
+              items={property.validValues.map(value => ({ label: value, value }))}
+              onChange={handleValueChange}
               onSwitch={setMenuOpen}
-            >
-              <Icon className={s(styles, { icon: true, focus })} name="arrow" viewBox="0 0 16 16" />
-            </PropertyValueSelector>
+            />
           </div>
         )}
       </div>

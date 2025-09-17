@@ -42,3 +42,5 @@ export { Radio, RadioGroup, useRadioContext, useRadioStore, type RadioProviderPr
 export { Icon, type IconProps } from './Icon/Icon.js';
 export * from './utils/clsx.js';
 export * from './ComponentProvider.js';
+export * from './Menu/Menu.js';
+export * from './Menu/MenuField.js';
