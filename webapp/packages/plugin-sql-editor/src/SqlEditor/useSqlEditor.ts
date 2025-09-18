@@ -13,7 +13,7 @@ import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { SyncExecutor } from '@cloudbeaver/core-executor';
-import type { SqlCompletionProposal, SqlDialectInfo, SqlScriptInfoFragment } from '@cloudbeaver/core-sdk';
+import type { SqlCompletionProposal, SqlScriptInfoFragment } from '@cloudbeaver/core-sdk';
 import { createLastPromiseGetter, type LastPromiseGetter, throttleAsync } from '@cloudbeaver/core-utils';
 
 import type { ISqlEditorTabState } from '../ISqlEditorTabState.js';
@@ -29,7 +29,6 @@ import { SqlResultTabsService } from '../SqlResultTabs/SqlResultTabsService.js';
 import type { ISQLEditorData } from './ISQLEditorData.js';
 import { SqlEditorSettingsService } from '../SqlEditorSettingsService.js';
 import { SqlEditorModelService } from '../SqlEditorModel/SqlEditorModelService.js';
-import type { ISqlEditorModel } from '../SqlEditorModel/ISqlEditorModel.js';
 
 interface ISQLEditorDataPrivate extends ISQLEditorData {
   readonly sqlDialectInfoService: SqlDialectInfoService;
@@ -66,20 +65,22 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
   const sqlEditorSettingsService = useService(SqlEditorSettingsService);
   const sqlEditorModelService = useService(SqlEditorModelService);
 
+  const model = sqlEditorModelService.getOrCreate(state);
+
+  const key = getComputed(() => {
+    const executionContext = model.dataSource?.executionContext;
+    if (executionContext) {
+      const context = connectionExecutionContextService.get(executionContext.id)?.context;
+      if (context) {
+        return createConnectionParam(context.projectId, context.connectionId);
+      }
+    }
+    return null;
+  });
+  const connectionDialectLoader = useResource(useSqlEditor, ConnectionDialectResource, key);
+
   const data = useObservableRef<ISQLEditorDataPrivate>(
     () => ({
-      get model(): ISqlEditorModel {
-        return sqlEditorModelService.getOrCreate(this.state);
-      },
-      get dialect(): SqlDialectInfo | undefined {
-        const executionContext = this.model.dataSource?.executionContext;
-        if (!executionContext) {
-          return undefined;
-        }
-
-        return this.sqlDialectInfoService.getDialectInfo(createConnectionParam(executionContext.projectId, executionContext.connectionId));
-      },
-
       get readonly(): boolean {
         return this.executingScript || this.readonlyState || !!this.model.dataSource?.isReadonly() || !this.editing;
       },
@@ -331,10 +332,12 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
       executeQueryNewTab: action.bound,
       showExecutionPlan: action.bound,
       executeScript: action.bound,
-      dialect: computed,
       isDisabled: computed,
       value: computed,
       readonly: computed,
+      state: observable.ref,
+      model: observable.ref,
+      dialect: observable.ref,
       hintsLimitIsMet: observable.ref,
       readonlyState: observable,
       executingScript: observable,
@@ -342,6 +345,8 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
     },
     {
       state,
+      model,
+      dialect: connectionDialectLoader.tryGetData,
       connectionExecutionContextService,
       sqlQueryService,
       sqlDialectInfoService,
@@ -354,27 +359,14 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
     },
   );
 
-  const key = getComputed(() => {
-    const executionContext = data.model.dataSource?.executionContext;
-    if (executionContext) {
-      const context = data.connectionExecutionContextService.get(executionContext.id)?.context;
-      if (context) {
-        return createConnectionParam(context.projectId, context.connectionId);
-      }
-    }
-    return null;
-  });
-
   useExecutor({
-    executor: data.model.dataSource?.onDatabaseModelUpdate,
+    executor: model.dataSource?.onDatabaseModelUpdate,
     handlers: [
       function updateDatabaseModels() {
         data.loadDatabaseDataModels();
       },
     ],
   });
-
-  useResource(useSqlEditor, ConnectionDialectResource, key);
 
   return data;
 }
