@@ -10,6 +10,7 @@ import './module.js';
 export * from './Clipboard/ClipboardBootstrap.js';
 export * from './Clipboard/ClipboardService.js';
 
+export * from './ContextMenu/ContextMenuAriaKit/ContextMenuAriaKit.js';
 export * from './ContextMenu/ContextMenuLazy.js';
 export * from './ContextMenu/IContextMenuItemProps.js';
 export * from './ContextMenu/MenuBar/MenuBarLazy.js';

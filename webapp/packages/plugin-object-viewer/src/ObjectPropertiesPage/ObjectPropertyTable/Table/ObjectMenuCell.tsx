@@ -10,7 +10,7 @@ import { ConnectionInfoResource, DATA_CONTEXT_CONNECTION } from '@cloudbeaver/co
 import { useDataContextLink } from '@cloudbeaver/core-data-context';
 import { useService } from '@cloudbeaver/core-di';
 import { DATA_CONTEXT_NAV_NODE, NavNodeManagerService, type DBObject } from '@cloudbeaver/core-navigation-tree';
-import { ContextMenu } from '@cloudbeaver/core-ui';
+import { ContextMenuAriaKit } from '@cloudbeaver/core-ui';
 import { MENU_NAV_TREE, useNode } from '@cloudbeaver/plugin-navigation-tree';
 import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
@@ -82,17 +82,12 @@ export const ObjectMenuCell = observer<Props>(function ObjectMenuCell({ object }
         {!menuEmpty && (
           <div className={s(styles, { menuBox: true })}>
             <Loader suspense small fullSize>
-              <ContextMenu
+              <ContextMenuAriaKit
                 contextMenuPosition={contextMenuPosition}
                 menu={menu}
-                placement="auto-end"
-                hidden={menuEmpty}
-                modal
-                disclosure
-                onVisibleSwitch={switchState}
-              >
-                <Icon className={s(styles, { menuIcon: true })} name="snack" viewBox="0 0 16 10" />
-              </ContextMenu>
+                buttonElement={<Icon className={s(styles, { menuIcon: true })} name="snack" viewBox="0 0 16 10" />}
+                onSwitch={switchState}
+              />
             </Loader>
           </div>
         )}

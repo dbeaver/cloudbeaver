@@ -14,20 +14,19 @@
  */
 import { observer } from 'mobx-react-lite';
 import { forwardRef, useEffect } from 'react';
-import { MenuField, useMenuStore, useStoreState, type MenuFieldProps, type MenuItemData, type MenuStoreProps } from '@dbeaver/ui-kit';
+import { MenuField, useMenuStore, useStoreState, type MenuFieldProps, type MenuStoreProps } from '@dbeaver/ui-kit';
 
 import { ErrorBoundary } from '../../ErrorBoundary.js';
 import type { IContextMenuPosition } from '../useContextMenuPosition.js';
 import './MenuAriaKit.css';
 
-export interface IMenuAriaKitProps<Value = string> extends MenuFieldProps<Value, MenuItemData<Value>> {
+export interface IMenuAriaKitProps<Item> extends MenuFieldProps<Item> {
   contextMenuPosition?: IContextMenuPosition;
-  modal?: boolean;
   menuStoreProps?: MenuStoreProps;
 }
 
-export const MenuAriaKit = observer<IMenuAriaKitProps>(
-  forwardRef(function MenuAriaKit({ contextMenuPosition, items, menuStoreProps, ...props }) {
+export const MenuAriaKit = observer(
+  forwardRef(function MenuAriaKit<Item>({ contextMenuPosition, items, menuStoreProps, ...props }: IMenuAriaKitProps<Item>) {
     const store = useMenuStore(menuStoreProps);
     const storeState = useStoreState(store);
     const menuVisible = !!storeState.open;
@@ -47,7 +46,7 @@ export const MenuAriaKit = observer<IMenuAriaKitProps>(
 
       store.show();
       contextMenuPosition.position = null;
-    }, [contextMenuPosition?.position, menuVisible]);
+    }, [contextMenuPosition?.position]);
 
     return (
       <ErrorBoundary>
@@ -55,4 +54,4 @@ export const MenuAriaKit = observer<IMenuAriaKitProps>(
       </ErrorBoundary>
     );
   }),
-);
+) as <Item>(props: IMenuAriaKitProps<Item> & React.RefAttributes<HTMLButtonElement>) => React.ReactElement;

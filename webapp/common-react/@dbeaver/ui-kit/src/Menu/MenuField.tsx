@@ -19,15 +19,15 @@ export interface MenuItemData<T> {
 
 type PropertyGetter<ItemType, ValueType> = (item: ItemType) => ValueType;
 
-export interface MenuFieldProps<T, ItemType = MenuItemData<T>> {
+export interface MenuFieldProps<T> {
   /** Options array - can be MenuItemData objects or arbitrary objects */
-  items: ItemType[];
+  items: T[];
 
   /**
    * Function to extract label or render content from items
    * Example: (item) => item.firstName + ' ' + item.lastName
    */
-  itemRender: PropertyGetter<ItemType, React.ReactNode>;
+  itemRender: PropertyGetter<T, React.ReactNode>;
 
   onSwitch?: (open: boolean) => void;
 
@@ -61,7 +61,7 @@ export interface MenuFieldProps<T, ItemType = MenuItemData<T>> {
   id?: string;
 }
 
-export function MenuField<T, ItemType extends {} = MenuItemData<T>>({
+export function MenuField<T>({
   items,
   onSwitch,
   itemRender,
@@ -75,7 +75,7 @@ export function MenuField<T, ItemType extends {} = MenuItemData<T>>({
   buttonElement,
   store,
   id,
-}: MenuFieldProps<T, ItemType>): React.ReactElement {
+}: MenuFieldProps<T>): React.ReactElement {
   const storeState = useStoreState(store);
 
   const isOpen = storeState?.open ?? false;
