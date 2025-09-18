@@ -20,13 +20,13 @@ import { ErrorBoundary } from '../../ErrorBoundary.js';
 import type { IContextMenuPosition } from '../useContextMenuPosition.js';
 import './MenuAriaKit.css';
 
-interface IMenuProps<Value extends string> extends MenuFieldProps<Value, MenuItemData<Value>> {
+export interface IMenuAriaKitProps<Value = string> extends MenuFieldProps<Value, MenuItemData<Value>> {
   contextMenuPosition?: IContextMenuPosition;
   modal?: boolean;
   menuStoreProps?: MenuStoreProps;
 }
 
-export const MenuAriaKit = observer<IMenuProps<string>>(
+export const MenuAriaKit = observer<IMenuAriaKitProps>(
   forwardRef(function MenuAriaKit({ contextMenuPosition, items, menuStoreProps, ...props }) {
     const store = useMenuStore(menuStoreProps);
     const storeState = useStoreState(store);

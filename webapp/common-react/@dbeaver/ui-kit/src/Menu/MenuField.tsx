@@ -7,7 +7,7 @@
  */
 
 import clsx from 'clsx';
-import { MenuProvider, Menu, MenuButton, MenuItem, MenuButtonArrow, useMenuStore, useStoreState, type MenuProps } from './Menu.js';
+import { MenuProvider, Menu, MenuButton, MenuButtonArrow, useMenuStore, useStoreState, type MenuProps } from './Menu.js';
 import './MenuField.css';
 import { useLayoutEffect } from 'react';
 
@@ -24,24 +24,10 @@ export interface MenuFieldProps<T, ItemType = MenuItemData<T>> {
   items: ItemType[];
 
   /**
-   * Function to extract value from items
-   * Example: (item) => item.id
-   */
-  itemValue?: PropertyGetter<ItemType, T>;
-
-  /**
    * Function to extract label or render content from items
    * Example: (item) => item.firstName + ' ' + item.lastName
    */
-  itemRender?: PropertyGetter<ItemType, React.ReactNode>;
-
-  /**
-   * Function to extract disabled state
-   * Example: (item) => !item.isActive
-   */
-  itemDisabled?: PropertyGetter<ItemType, boolean>;
-
-  onChange?: (value: T) => void;
+  itemRender: PropertyGetter<ItemType, React.ReactNode>;
 
   onSwitch?: (open: boolean) => void;
 
@@ -75,22 +61,10 @@ export interface MenuFieldProps<T, ItemType = MenuItemData<T>> {
   id?: string;
 }
 
-// Utility function to get value by it's key or using getter function
-function getValueByPath<Item, Value>(item: Item, getter: PropertyGetter<Item, Value> | undefined, defaultGetter: (item: Item) => Value): Value {
-  return getter ? getter(item) : defaultGetter(item);
-}
-
-function isNonNullObject(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null;
-}
-
 export function MenuField<T, ItemType extends {} = MenuItemData<T>>({
   items,
-  onChange,
-  itemValue,
   onSwitch,
   itemRender,
-  itemDisabled,
   getAnchorRect,
   label,
   noItemsPlaceholder = 'No items',
@@ -103,21 +77,6 @@ export function MenuField<T, ItemType extends {} = MenuItemData<T>>({
   id,
 }: MenuFieldProps<T, ItemType>): React.ReactElement {
   const storeState = useStoreState(store);
-
-  const getItemValue = (item: ItemType): T =>
-    getValueByPath<ItemType, T>(item, itemValue, i =>
-      isNonNullObject(i) && 'value' in i ? (i as unknown as MenuItemData<T>).value : (i as unknown as T),
-    );
-
-  const renderItem = (item: ItemType): React.ReactNode =>
-    getValueByPath<ItemType, React.ReactNode>(item, itemRender, i =>
-      isNonNullObject(i) && 'label' in i ? (i as unknown as MenuItemData<T>).label : String(i),
-    );
-
-  const isItemDisabled = (item: ItemType): boolean =>
-    getValueByPath<ItemType, boolean>(item, itemDisabled, i =>
-      isNonNullObject(i) && 'disabled' in i ? Boolean((i as unknown as MenuItemData<T>).disabled) : false,
-    );
 
   const isOpen = storeState?.open ?? false;
 
@@ -134,15 +93,7 @@ export function MenuField<T, ItemType extends {} = MenuItemData<T>>({
         </MenuButton>
         {description && <span className="dbv-kit-menu__description">{description}</span>}
         <Menu getAnchorRect={getAnchorRect}>
-          {items.length === 0 ? (
-            <div className="dbv-kit-menu__empty">{noItemsPlaceholder}</div>
-          ) : (
-            items.map(item => (
-              <MenuItem key={String(getItemValue(item))} disabled={isItemDisabled(item)} onClick={() => onChange?.(getItemValue(item))}>
-                {renderItem(item)}
-              </MenuItem>
-            ))
-          )}
+          {items.length === 0 ? <div className="dbv-kit-menu__empty">{noItemsPlaceholder}</div> : items.map(itemRender)}
         </Menu>
       </MenuProvider>
     </div>

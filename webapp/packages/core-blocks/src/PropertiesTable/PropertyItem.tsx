@@ -19,6 +19,7 @@ import { useS } from '../useS.js';
 import type { IProperty } from './IProperty.js';
 import classes from './PropertyItem.module.css';
 import { MenuAriaKit } from '../Menu/AriaKit/MenuAriaKit.js';
+import { Menu } from '@dbeaver/ui-kit';
 
 interface Props {
   property: IProperty;
@@ -105,7 +106,11 @@ export const PropertyItem = observer<Props>(function PropertyItem({ property, va
               buttonElement={<Icon className={s(styles, { icon: true, focus })} name="arrow" viewBox="0 0 16 16" />}
               className={s(styles, { propertyValueSelector: true })}
               items={property.validValues.map(value => ({ label: value, value }))}
-              onChange={handleValueChange}
+              itemRender={item => (
+                <Menu.Item key={item.value} disabled={item.disabled} onClick={() => handleValueChange(item.value)}>
+                  {item.label}
+                </Menu.Item>
+              )}
               onSwitch={setMenuOpen}
             />
           </div>
