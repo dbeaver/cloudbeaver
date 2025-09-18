@@ -288,7 +288,7 @@ public class WebServiceRM implements DBWServiceRM {
             );
             return project.getRMProject();
         } catch (DBException e) {
-            throw new DBWebException("Error creating project", e);
+            throw new DBWebException("Error updating project", e);
         }
     }
 

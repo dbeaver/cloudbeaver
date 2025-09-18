@@ -79,6 +79,12 @@ public abstract class BaseWebProjectImpl extends BaseProjectImpl implements RMCo
 
     @NotNull
     @Override
+    public String getDisplayName() {
+        return getName();
+    }
+
+    @NotNull
+    @Override
     public Path getAbsolutePath() {
         return path;
     }

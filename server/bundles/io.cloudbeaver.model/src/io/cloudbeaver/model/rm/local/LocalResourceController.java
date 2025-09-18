@@ -302,6 +302,7 @@ public class LocalResourceController extends BaseLocalResourceController {
 
     @Override
     public RMProject updateProject(@NotNull String projectId, @NotNull RMProjectInfo projectInfo) throws DBException {
+        validateProjectName(projectId, projectInfo.getName());
         try (var projectLock = lockController.lock(projectId, "updateProject")) {
             RMLocalProject project = getWebProject(projectId, false);
             Path targetPath = getProjectPath(projectId);
@@ -313,6 +314,16 @@ public class LocalResourceController extends BaseLocalResourceController {
             }
             project.updateProject(projectInfo.getName(), projectInfo.getDescription());
             return WebRMUtils.createRmProjectFromWebProject(project);
+        }
+    }
+
+    private void validateProjectName(@NotNull String projectId, @Nullable String name) throws DBException {
+        boolean duplicatedName = Arrays.stream(listAllSharedProjects())
+            .filter(p -> !p.getId().equals(projectId))
+            .map(RMProject::getName)
+            .noneMatch(n -> n.equalsIgnoreCase(name));
+        if (!duplicatedName) {
+            throw new DBException("Project name '" + name + "' is already used");
         }
     }
 
