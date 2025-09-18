@@ -342,14 +342,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
               )}
             </Group>
           )}
-          {driver?.providerProperties && (
-            <ProviderPropertiesForm
-              config={optionsPart.state}
-              properties={driver.providerProperties}
-              disabled={formState.isDisabled}
-              readonly={readonly}
-            />
-          )}
+          {driver?.providerProperties && <ProviderPropertiesForm formState={formState} properties={driver.providerProperties} readonly={readonly} />}
 
           <AdvancedPropertiesForm config={optionsPart.state} disabled={formState.isDisabled} readonly={readonly} />
         </Container>
