@@ -278,6 +278,7 @@ public class LocalResourceController extends BaseLocalResourceController {
             }
         }
         validateResourcePath(name);
+        validateProjectName(null, name);
         RMProject project;
         var projectPath = sharedProjectsPath.resolve(name);
         if (Files.exists(projectPath)) {
@@ -317,7 +318,7 @@ public class LocalResourceController extends BaseLocalResourceController {
         }
     }
 
-    private void validateProjectName(@NotNull String projectId, @Nullable String name) throws DBException {
+    private void validateProjectName(@Nullable String projectId, @Nullable String name) throws DBException {
         boolean duplicatedName = Arrays.stream(listAllSharedProjects())
             .filter(p -> !p.getId().equals(projectId))
             .map(RMProject::getName)
