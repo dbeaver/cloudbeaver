@@ -14,6 +14,7 @@ import {
   ConnectionInfoProviderPropertiesResource,
   ConnectionInfoResource,
   DatabaseAuthModelsResource,
+  DBDriverExpertSettingsResource,
   DBDriverResource,
 } from '@cloudbeaver/core-connections';
 import { ProjectInfoResource } from '@cloudbeaver/core-projects';
@@ -37,6 +38,7 @@ export function getConnectionFormOptionsPart(formState: IFormState<IConnectionFo
     const connectionInfoAuthPropertiesResource = di.getService(ConnectionInfoAuthPropertiesResource);
     const connectionInfoCustomOptionsResource = di.getService(ConnectionInfoCustomOptionsResource);
     const connectionInfoProviderPropertiesResource = di.getService(ConnectionInfoProviderPropertiesResource);
+    const dbDriverExpertSettingsResource = di.getService(DBDriverExpertSettingsResource);
 
     return new ConnectionFormOptionsPart(
       formState,
@@ -50,6 +52,7 @@ export function getConnectionFormOptionsPart(formState: IFormState<IConnectionFo
       localizationService,
       commonDialogService,
       notificationService,
+      dbDriverExpertSettingsResource,
     );
   });
 }
