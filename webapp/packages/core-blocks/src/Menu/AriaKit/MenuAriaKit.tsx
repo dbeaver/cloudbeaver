@@ -20,13 +20,13 @@ import { ErrorBoundary } from '../../ErrorBoundary.js';
 import type { IContextMenuPosition } from '../useContextMenuPosition.js';
 import './MenuAriaKit.css';
 
-export interface IMenuAriaKitProps<Item> extends MenuFieldProps<Item> {
+export interface IMenuAriaKitProps<Item> extends Omit<MenuFieldProps<Item>, 'store' | 'getAnchorRect'> {
   contextMenuPosition?: IContextMenuPosition;
   menuStoreProps?: MenuStoreProps;
 }
 
 export const MenuAriaKit = observer(
-  forwardRef(function MenuAriaKit<Item>({ contextMenuPosition, items, menuStoreProps, ...props }: IMenuAriaKitProps<Item>) {
+  forwardRef(function MenuAriaKit<Item>({ contextMenuPosition, menuStoreProps, ...props }: IMenuAriaKitProps<Item>) {
     const store = useMenuStore(menuStoreProps);
     const storeState = useStoreState(store);
     const menuVisible = !!storeState.open;
@@ -50,7 +50,7 @@ export const MenuAriaKit = observer(
 
     return (
       <ErrorBoundary>
-        <MenuField store={store} items={items} getAnchorRect={getAnchorRect()} {...props} />
+        <MenuField store={store} getAnchorRect={getAnchorRect()} {...props} />
       </ErrorBoundary>
     );
   }),

@@ -36,6 +36,7 @@ import {
   useMenuContext,
   useStoreState,
   type MenuStoreProps,
+  type MenuArrowProps,
 } from '@ariakit/react';
 import clsx from 'clsx';
 
@@ -48,6 +49,10 @@ export function MenuProvider({ children, ...props }: MenuProviderProps): ReactEl
 
 export function MenuButton({ className, ...props }: MenuButtonProps): ReactElement {
   return <AriaMenuButton className={clsx('dbv-kit-menu__button', className)} {...props} />;
+}
+
+export function MenuButtonArrow({ className, ...props }: MenuArrowProps): ReactElement {
+  return <AriaMenuButtonArrow className={clsx('dbv-kit-menu__button-arrow', className)} {...props} />;
 }
 
 export function Menu({ children, className, ...props }: MenuProps): ReactElement {
@@ -122,8 +127,6 @@ export function MenuItemRadio({ children, className, ...props }: MenuItemRadioPr
   );
 }
 
-export const MenuButtonArrow = AriaMenuButtonArrow;
-
 export {
   useMenuStore,
   useStoreState,
@@ -141,6 +144,7 @@ export {
   type MenuItemCheckboxProps,
   type MenuItemRadioProps,
   type MenuStoreProps,
+  type MenuArrowProps,
 };
 
 Menu.Provider = MenuProvider;
@@ -155,4 +159,3 @@ Menu.GroupLabel = MenuGroupLabel;
 Menu.ItemCheckbox = MenuItemCheckbox;
 Menu.ItemRadio = MenuItemRadio;
 Menu.ButtonArrow = MenuButtonArrow;
-Menu.Menu = Menu;

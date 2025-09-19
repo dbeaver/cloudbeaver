@@ -7,9 +7,9 @@
  */
 
 import clsx from 'clsx';
-import { MenuProvider, Menu, MenuButton, MenuButtonArrow, useMenuStore, useStoreState, type MenuProps } from './Menu.js';
+import { Menu, useMenuStore, useStoreState, type MenuProps } from './Menu.js';
 import './MenuField.css';
-import { useLayoutEffect } from 'react';
+import { useEffect } from 'react';
 
 export interface MenuItemData<T> {
   value: T;
@@ -52,7 +52,7 @@ export interface MenuFieldProps<T> {
 
   getAnchorRect?: MenuProps['getAnchorRect'];
 
-  store?: ReturnType<typeof useMenuStore>;
+  store: ReturnType<typeof useMenuStore>;
 
   'aria-labelledby'?: string;
 
@@ -80,22 +80,22 @@ export function MenuField<T>({
 
   const isOpen = storeState?.open ?? false;
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     onSwitch?.(isOpen);
   }, [isOpen, onSwitch]);
 
   return (
     <div className={clsx('dbv-kit-menu-field', className)}>
-      <MenuProvider store={store}>
+      <Menu.Provider store={store}>
         {label && <label className={clsx('dbv-kit-menu__label', required && 'dbv-kit-menu__label--required')}>{label}</label>}
-        <MenuButton id={id} disabled={disabled}>
-          {buttonElement ?? <MenuButtonArrow className="dbv-kit-menu__arrow-icon" />}
-        </MenuButton>
+        <Menu.Button id={id} disabled={disabled}>
+          {buttonElement ?? <Menu.ButtonArrow className="dbv-kit-menu__arrow-icon" />}
+        </Menu.Button>
         {description && <span className="dbv-kit-menu__description">{description}</span>}
         <Menu getAnchorRect={getAnchorRect}>
           {items.length === 0 ? <div className="dbv-kit-menu__empty">{noItemsPlaceholder}</div> : items.map(itemRender)}
         </Menu>
-      </MenuProvider>
+      </Menu.Provider>
     </div>
   );
 }
