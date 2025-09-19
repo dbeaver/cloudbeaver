@@ -564,8 +564,6 @@ type ConnectionInfo {
 
     "List of tools that can be used with this connection. Returns empty list if no tools are available"
     tools: [String!]! @since(version: "24.1.3")
-
-    connectionSettings: Object @since(version: "25.2.1")
 }
 
 type ConnectionFolderInfo {

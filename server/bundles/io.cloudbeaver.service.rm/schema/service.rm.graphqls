@@ -67,8 +67,8 @@ extend type Query {
         resourcePath: String!
     ): String!
 
-    "Returns project settings"
-    rmProjectSettings(projectId: ID!): Object @since(version: "25.2.1")
+    "Returns project settings that are specified for a current user"
+    rmUserProjectSettings(projectId: ID!): Object @since(version: "25.2.1")
 }
 
 extend type Mutation {
@@ -126,8 +126,8 @@ extend type Mutation {
     "Sets resource property by name. If value is null then removes the property (e.g., sets relation between resource and connection)."
     rmSetResourceProperty(projectId: String!, resourcePath: String!, name: ID!, value: String): Boolean!
 
-    "Adds project settings (e.g. enables simple view for a project)"
-    rmAddProjectSettings(projectId: ID!, settings: Object!): Boolean! @since(version: "25.2.1")
-    "Deletes project settings"
-    rmDeleteProjectSettings(projectId: ID!, settingIds: [String!]!): Boolean! @since(version: "25.2.1")
+    "Adds project settings (e.g. enables simple view for a project) for a current user"
+    rmAddUserProjectSettings(projectId: ID!, settings: Object!): Boolean! @since(version: "25.2.1")
+    "Deletes project settings that are specified for a current user"
+    rmDeleteUserProjectSettings(projectId: ID!, settingIds: [String!]!): Boolean! @since(version: "25.2.1")
 }

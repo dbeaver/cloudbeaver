@@ -65,7 +65,7 @@ public class WebServiceBindingRM extends WebServiceBindingBase<DBWServiceRM> {
                 env.getArgument("subjectId")
             ))
             .dataFetcher(
-                "rmProjectSettings", env -> getService(env).getProjectSettings(
+                "rmUserProjectSettings", env -> getService(env).getProjectSettings(
                     getWebSession(env),
                     env.getArgument("projectId"),
                     env.getArgument("settingId")
@@ -132,14 +132,14 @@ public class WebServiceBindingRM extends WebServiceBindingBase<DBWServiceRM> {
                 env.getArgument("permissions")
             ))
             .dataFetcher(
-                "rmAddProjectSettings", env -> getService(env).addProjectSettings(
+                "rmAddUserProjectSettings", env -> getService(env).addProjectSettings(
                     getWebSession(env),
                     env.getArgument("projectId"),
                     env.getArgument("settings")
                 )
             )
             .dataFetcher(
-                "rmDeleteProjectSettings", env -> getService(env).deleteProjectSettings(
+                "rmDeleteUserProjectSettings", env -> getService(env).deleteProjectSettings(
                     getWebSession(env),
                     env.getArgument("projectId"),
                     env.getArgument("settingIds")
