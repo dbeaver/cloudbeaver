@@ -5,4 +5,4 @@ if [[ $# -eq 0 ]] ;
   then
     CLI_OPTS='-help'
 fi
-source run-server.sh
+source run-cloudbeaver-server.sh
