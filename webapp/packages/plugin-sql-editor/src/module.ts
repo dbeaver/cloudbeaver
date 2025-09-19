@@ -26,7 +26,7 @@ import { LocalStorageSqlDataSourceBootstrap } from './SqlDataSource/LocalStorage
 import { MenuBootstrap } from './MenuBootstrap.js';
 import { LocaleService } from './LocaleService.js';
 
-ModuleRegistry.add({
+export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-sql-editor',
 
   configure: serviceCollection => {

@@ -19,7 +19,7 @@ import { WizardTopAppBarService } from './AdministrationScreen/ConfigurationWiza
 import { AdministrationScreenServiceBootstrap } from './AdministrationScreen/AdministrationScreenServiceBootstrap.js';
 import { AdministrationViewService } from './Administration/AdministrationViewService.js';
 
-ModuleRegistry.add({
+export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-administration',
 
   configure: serviceCollection => {

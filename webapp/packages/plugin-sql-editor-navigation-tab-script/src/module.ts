@@ -13,7 +13,7 @@ import { PluginBootstrap } from './PluginBootstrap.js';
 import { LocaleService } from './LocaleService.js';
 import { ResourceEditorSettingsService } from './ResourceEditorSettingsService.js';
 
-ModuleRegistry.add({
+export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-sql-editor-navigation-tab-script',
 
   configure: serviceCollection => {

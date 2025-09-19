@@ -23,7 +23,7 @@ import { ConnectionDriverPropertiesTabService } from './ConnectionForm/DriverPro
 import { ConnectionFormService } from './ConnectionForm/ConnectionFormService.js';
 import { ConnectionAuthService } from './ConnectionAuthService.js';
 
-ModuleRegistry.add({
+export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-connections',
 
   configure: serviceCollection => {

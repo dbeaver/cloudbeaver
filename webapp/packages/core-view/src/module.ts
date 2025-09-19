@@ -13,7 +13,7 @@ import { LocaleService } from './LocaleService.js';
 import { KeyBindingService } from './Action/KeyBinding/KeyBindingService.js';
 import { ActionService } from './Action/ActionService.js';
 
-ModuleRegistry.add({
+export default ModuleRegistry.add({
   name: '@cloudbeaver/core-view',
 
   configure: serviceCollection => {

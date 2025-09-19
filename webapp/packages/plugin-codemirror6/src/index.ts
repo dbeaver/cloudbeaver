@@ -39,4 +39,3 @@ export const MSSQLLoader = createComplexLoader(async () => (await import('@codem
 export const SQLiteLoader = createComplexLoader(async () => (await import('@codemirror/lang-sql')).SQLite);
 export const CassandraLoader = createComplexLoader(async () => (await import('@codemirror/lang-sql')).Cassandra);
 export const PLSQLLoader = createComplexLoader(async () => (await import('@codemirror/lang-sql')).PLSQL);
-export { manifest as codemirror6Manifest } from './manifest.js';

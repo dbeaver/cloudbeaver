@@ -7,7 +7,3 @@
  */
 
 import './module.js';
-import { dvResultSetGroupingPlugin } from './manifest.js';
-
-export { dvResultSetGroupingPlugin };
-export default dvResultSetGroupingPlugin;

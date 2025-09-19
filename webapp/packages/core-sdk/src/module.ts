@@ -10,7 +10,7 @@ import { ModuleRegistry } from '@cloudbeaver/core-di';
 import { GraphQLService } from './GraphQLService.js';
 import { EnvironmentService } from './EnvironmentService.js';
 
-ModuleRegistry.add({
+export default ModuleRegistry.add({
   name: '@cloudbeaver/core-sdk',
 
   configure: serviceCollection => {
