@@ -75,6 +75,11 @@
     font-weight: var(--dbv-kit-menu-font-weight);
     font-size: var(--dbv-kit-menu-font-size);
 
+    &:hover:not([aria-disabled='true']) {
+      background-color: var(--dbv-kit-menu-item-hover-background);
+      color: var(--dbv-kit-menu-item-hover-foreground);
+    }
+
     &[aria-disabled='true'] {
       opacity: var(--dbv-kit-control-disabled-opacity);
       user-select: none;

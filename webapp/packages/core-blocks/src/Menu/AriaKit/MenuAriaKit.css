@@ -8,4 +8,9 @@
     --dbv-kit-menu-background: transparent;
     --dbv-kit-menu-foreground: inherit;
   }
+
+  .dbv-kit-menu__item {
+    --dbv-kit-menu-item-hover-background: var(--theme-background);
+    --dbv-kit-menu-item-hover-foreground: var(--theme-input-color);
+  }
 }
