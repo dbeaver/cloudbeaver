@@ -35,12 +35,10 @@ export const VirtualFolderPanel: NavNodeTransformViewComponent = observer(functi
   const allData = dbObjectLoader.resource.get(pagination.allPages).filter(isDefined);
   const { nodes, duplicates } = navNodeViewService.filterDuplicates(allData.map(node => node?.id) || []);
 
-  const objects = allData.filter(
-    object => object && nodes.includes(object.id) && navNodeInfoResource.get(object.id)?.nodeType === nodeType,
-  ) as DBObject[];
+  const objects = allData.filter(object => object && nodes.has(object.id) && navNodeInfoResource.get(object.id)?.nodeType === nodeType) as DBObject[];
 
   useEffect(() => {
-    navNodeViewService.logDuplicates(nodeId, duplicates);
+    navNodeViewService.logDuplicates(nodeId, Array.from(duplicates));
   });
 
   return (

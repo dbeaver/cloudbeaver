@@ -67,4 +67,8 @@ public class WebSQLCompletionProposal {
         return null;
     }
 
+    public CompletionProposalBase getProposal() {
+        return proposal;
+    }
+
 }

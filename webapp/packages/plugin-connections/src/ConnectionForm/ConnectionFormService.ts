@@ -8,17 +8,23 @@
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { LocalizationService } from '@cloudbeaver/core-localization';
-import { FormBaseService } from '@cloudbeaver/core-ui';
+import { FormBaseService, type IFormState } from '@cloudbeaver/core-ui';
 import type { IConnectionFormProps, IConnectionFormState } from './IConnectionFormState.js';
-import { importLazyComponent } from '@cloudbeaver/core-blocks';
+import { importLazyComponent, PlaceholderContainer } from '@cloudbeaver/core-blocks';
 
 const ConnectionFormBaseActionsLoader = importLazyComponent(() => import('./ConnectionFormBaseActions.js').then(m => m.ConnectionFormBaseActions));
 
+export type ProviderPropertiesContainerFormProps = {
+  formState: IFormState<IConnectionFormState>;
+};
+
 @injectable(() => [LocalizationService, NotificationService])
 export class ConnectionFormService extends FormBaseService<IConnectionFormState, IConnectionFormProps> {
+  readonly providerPropertiesContainer: PlaceholderContainer<ProviderPropertiesContainerFormProps>;
+
   constructor(localizationService: LocalizationService, notificationService: NotificationService) {
     super(localizationService, notificationService, 'Connection form');
-
+    this.providerPropertiesContainer = new PlaceholderContainer<ProviderPropertiesContainerFormProps>();
     this.actionsContainer.add(ConnectionFormBaseActionsLoader);
   }
 }
