@@ -476,7 +476,7 @@ public class WebServiceRM implements DBWServiceRM {
             if (project == null) {
                 throw new DBWebException("Project '" + projectId + "' not found");
             }
-            webSession.getSecurityController().addObjectSettings(
+            webSession.getSecurityController().setObjectSettings(
                 projectId,
                 SMObjectType.project,
                 settings

@@ -105,7 +105,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
     }
 
     @Override
-    public void addObjectSettings(
+    public void setObjectSettings(
         @NotNull String objectId,
         @NotNull SMObjectType objectType,
         @NotNull Map<String, Object> settings
