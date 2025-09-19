@@ -36,13 +36,13 @@ export const MenuItemRenderer = observer<IMenuItemRendererProps>(function MenuIt
   const translate = useTranslate();
   const onClick = useCallback(
     (keepMenuOpen = true) => {
-      item.events?.onSelect?.();
+      item.events?.onSelect?.(menuData.context);
 
       if (!(item instanceof MenuSubMenuItem) && keepMenuOpen) {
         onItemClose?.();
       }
     },
-    [item, onItemClose],
+    [item, onItemClose, menuData.context],
   );
 
   if (isMenuCustomItem(item)) {

@@ -62,5 +62,7 @@ export * from './NetworkHandlerResource.js';
 export * from './useConnectionInfo.js';
 export * from './useDBDriver.js';
 export * from './USER_NAME_PROPERTY_ID.js';
+export * from './parseConnectionKey.js';
+export * from './DBDriverExpertSettingsResource.js';
 
 export { manifest as coreConnectionsManifest } from './manifest.js';
