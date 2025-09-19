@@ -8,9 +8,6 @@
   },
   "references": [
     {
-      "path": "../../common-react/@dbeaver/ui-kit"
-    },
-    {
       "path": "../../common-typescript/@dbeaver/js-helpers"
     },
     {
@@ -57,8 +54,5 @@
     "../core-blocks/src/useAuthenticationAction.ts",
     "../core-blocks/src/AuthenticationProviderLoader.ts"
   ],
-  "exclude": [
-    "**/node_modules",
-    "lib/**/*"
-  ]
+  "exclude": ["**/node_modules", "lib/**/*"]
 }
