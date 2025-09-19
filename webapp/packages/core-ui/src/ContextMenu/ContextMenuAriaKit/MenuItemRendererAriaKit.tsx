@@ -13,6 +13,7 @@ import {
   type IMenuData,
   type IMenuItem,
   isMenuCustomItem,
+  MenuActionItem,
   MenuBaseItem,
   MenuCheckboxItem,
   MenuRadioItem,
@@ -65,12 +66,28 @@ export const MenuItemRendererAriaKit = observer<IMenuItemRendererAriaKitProps>(f
     return <AriaMenuSeparator />;
   }
 
+  if (item instanceof MenuActionItem) {
+    return (
+      <AriaMenuItem hidden={item.hidden} disabled={item.disabled} title={item.action.actionInfo.tooltip} onClick={() => onClick()}>
+        {translate(item.action.actionInfo.label)}
+      </AriaMenuItem>
+    );
+  }
+
   if (item instanceof MenuBaseItem) {
     const IconComponent = item.iconComponent?.();
     const extraProps = item.getExtraProps?.();
 
     return (
-      <AriaMenuItem aria-label={translate(item.label)} hidden={item.hidden} disabled={item.disabled} onClick={() => onClick()}>
+      <AriaMenuItem
+        id={item.id}
+        aria-label={translate(item.label)}
+        hidden={item.hidden}
+        disabled={item.disabled}
+        style={{ pointerEvents: 'auto' }}
+        focusable
+        onClick={() => onClick()}
+      >
         {IconComponent ? <IconComponent item={item} {...extraProps} /> : item.icon}
         {translate(item.label)}
       </AriaMenuItem>
@@ -81,6 +98,7 @@ export const MenuItemRendererAriaKit = observer<IMenuItemRendererAriaKitProps>(f
     return (
       <AriaMenuItemCheckbox
         hidden={item.hidden}
+        id={item.id}
         aria-label={translate(item.label)}
         disabled={item.disabled}
         name={item.id}
@@ -97,6 +115,7 @@ export const MenuItemRendererAriaKit = observer<IMenuItemRendererAriaKitProps>(f
     return (
       <AriaMenuItemRadio
         hidden={item.hidden}
+        id={item.id}
         aria-label={translate(item.label)}
         disabled={item.disabled}
         name={item.id}
@@ -106,18 +125,6 @@ export const MenuItemRendererAriaKit = observer<IMenuItemRendererAriaKitProps>(f
       >
         {translate(item.label)}
       </AriaMenuItemRadio>
-    );
-  }
-
-  if (item instanceof MenuBaseItem) {
-    const IconComponent = item.iconComponent?.();
-    const extraProps = item.getExtraProps?.();
-
-    return (
-      <AriaMenuItem aria-label={translate(item.label)} hidden={item.hidden} disabled={item.disabled} onClick={() => onClick()}>
-        {IconComponent ? <IconComponent item={item} {...extraProps} /> : item.icon}
-        {translate(item.label)}
-      </AriaMenuItem>
     );
   }
 

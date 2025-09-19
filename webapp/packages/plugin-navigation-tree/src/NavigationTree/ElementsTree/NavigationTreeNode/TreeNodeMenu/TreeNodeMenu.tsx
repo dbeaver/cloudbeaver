@@ -12,7 +12,7 @@ import { ConnectionInfoResource, DATA_CONTEXT_CONNECTION } from '@cloudbeaver/co
 import { useDataContextLink } from '@cloudbeaver/core-data-context';
 import { useService } from '@cloudbeaver/core-di';
 import { DATA_CONTEXT_NAV_NODE, type INodeActions, type NavNode } from '@cloudbeaver/core-navigation-tree';
-import { ContextMenu } from '@cloudbeaver/core-ui';
+import { ContextMenuAriaKit } from '@cloudbeaver/core-ui';
 import { useMenu } from '@cloudbeaver/core-view';
 
 import { MENU_NAV_TREE } from '../../MENU_NAV_TREE.js';
@@ -49,14 +49,12 @@ export const TreeNodeMenu = observer<TreeNodeMenuProps>(function TreeNodeMenu({ 
   }
 
   return (
-    <ContextMenu
+    <ContextMenuAriaKit
       menu={menu}
       className={s(styles, { contextMenu: true, selected })}
       contextMenuPosition={contextMenuPosition}
-      modal
-      onVisibleSwitch={handleVisibleSwitch}
-    >
-      <Icon className={s(styles, { icon: true })} name="snack" viewBox="0 0 16 10" />
-    </ContextMenu>
+      buttonElement={<Icon className={s(styles, { icon: true })} name="snack" viewBox="0 0 16 10" />}
+      onSwitch={handleVisibleSwitch}
+    />
   );
 });

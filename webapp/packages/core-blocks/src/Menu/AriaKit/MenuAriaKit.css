@@ -5,7 +5,7 @@
   }
 
   .dbv-kit-menu__button {
-    --dbv-kit-menu-background: var(--theme-input-background);
-    --dbv-kit-menu-foreground: var(--theme-input-color);
+    --dbv-kit-menu-background: transparent;
+    --dbv-kit-menu-foreground: inherit;
   }
 }

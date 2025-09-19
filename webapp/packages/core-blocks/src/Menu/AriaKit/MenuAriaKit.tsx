@@ -13,7 +13,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { forwardRef, useEffect } from 'react';
+import { useEffect } from 'react';
 import { MenuField, useMenuStore, useStoreState, type MenuFieldProps, type MenuStoreProps } from '@dbeaver/ui-kit';
 
 import { ErrorBoundary } from '../../ErrorBoundary.js';
@@ -25,33 +25,30 @@ export interface IMenuAriaKitProps<Item> extends Omit<MenuFieldProps<Item>, 'sto
   menuStoreProps?: MenuStoreProps;
 }
 
-export const MenuAriaKit = observer(
-  forwardRef(function MenuAriaKit<Item>({ contextMenuPosition, menuStoreProps, ...props }: IMenuAriaKitProps<Item>) {
-    const store = useMenuStore(menuStoreProps);
-    const storeState = useStoreState(store);
-    const menuVisible = !!storeState.open;
+export const MenuAriaKit = observer(function MenuAriaKit<Item>({ contextMenuPosition, menuStoreProps, ...props }: IMenuAriaKitProps<Item>) {
+  const store = useMenuStore(menuStoreProps);
+  const storeState = useStoreState(store);
+  const menuVisible = !!storeState.open;
 
-    function getAnchorRect() {
-      if (!contextMenuPosition?.position) {
-        return;
-      }
-
-      return () => contextMenuPosition.position;
+  function getAnchorRect() {
+    if (!contextMenuPosition?.position) {
+      return;
     }
 
-    useEffect(() => {
-      if (!contextMenuPosition?.position || menuVisible) {
-        return;
-      }
+    return () => contextMenuPosition.position;
+  }
 
-      store.show();
-      contextMenuPosition.position = null;
-    }, [contextMenuPosition?.position]);
+  useEffect(() => {
+    if (!contextMenuPosition?.position || menuVisible) {
+      return;
+    }
 
-    return (
-      <ErrorBoundary>
-        <MenuField store={store} getAnchorRect={getAnchorRect()} {...props} />
-      </ErrorBoundary>
-    );
-  }),
-) as <Item>(props: IMenuAriaKitProps<Item> & React.RefAttributes<HTMLButtonElement>) => React.ReactElement;
+    store.show();
+  }, [contextMenuPosition?.position]);
+
+  return (
+    <ErrorBoundary>
+      <MenuField store={store} getAnchorRect={getAnchorRect()} {...props} />
+    </ErrorBoundary>
+  );
+}) as <Item>(props: IMenuAriaKitProps<Item> & React.RefAttributes<HTMLButtonElement>) => React.ReactElement;

@@ -86,8 +86,6 @@
   }
 
   .dbv-kit-menu__separator {
-    height: 1px;
-    margin: 0.25rem 0;
     background-color: var(--dbv-kit-menu-separator-color);
   }
 

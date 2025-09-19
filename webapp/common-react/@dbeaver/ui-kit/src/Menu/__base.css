@@ -20,8 +20,8 @@
     --dbv-kit-menu-popover-shadow: var(--tw-shadow-md);
     --dbv-kit-menu-popover-max-height: 18rem;
 
-    --dbv-kit-menu-item-padding-inline: calc(var(--tw-spacing) * 3);
-    --dbv-kit-menu-item-padding-block: var(--tw-spacing);
+    --dbv-kit-menu-item-padding-inline: calc(var(--tw-spacing) * 5);
+    --dbv-kit-menu-item-padding-block: calc(var(--tw-spacing) * 1.4);
     --dbv-kit-menu-item-hover-background: var(--tw-color-gray-200);
     --dbv-kit-menu-item-hover-foreground: var(--dbv-kit-menu-foreground);
     --dbv-kit-menu-item-selected-background: var(--dbv-kit-color-primary-100);
