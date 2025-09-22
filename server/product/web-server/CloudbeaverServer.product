@@ -2,7 +2,7 @@
 <?pde version="3.5"?>
 
 <product name="CloudBeaver ce Server" uid="io.cloudbeaver.product" id="io.cloudbeaver.product.ce.product"
-    application="io.cloudbeaver.product.ce.application" version="25.2.1.qualifier" useFeatures="true"
+    application="io.cloudbeaver.product.ce.application" version="25.2.2.qualifier" useFeatures="true"
     includeLaunchers="false">
 
     <configIni use="default">
@@ -12,7 +12,7 @@
         <programArgsMac></programArgsMac>
         <vmArgs>
             -Dfile.encoding=UTF-8 
-            --add-modules=ALL-SYSTEM
+            --add-modules=ALL-DEFAULT
             --add-opens=java.base/java.io=ALL-UNNAMED
             --add-opens=java.base/java.lang=ALL-UNNAMED
             --add-opens=java.base/java.lang.reflect=ALL-UNNAMED

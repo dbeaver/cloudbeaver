@@ -62,12 +62,12 @@ public class WebSessionPreferenceStore extends AbstractUserPreferenceStore {
     }
 
     @Override
-    public String getDefaultString(String name) {
+    public String getDefaultString(@NotNull String name) {
         return parentStore.getDefaultString(name);
     }
 
     @Override
-    public boolean isDefault(String name) {
+    public boolean isDefault(@NotNull String name) {
         return !userPreferences.containsKey(name) && parentStore.isDefault(name);
     }
 
@@ -77,7 +77,7 @@ public class WebSessionPreferenceStore extends AbstractUserPreferenceStore {
     }
 
     @Override
-    public void setToDefault(String name) {
+    public void setToDefault(@NotNull String name) {
         throw new RuntimeException("Not implemented");
     }
 
