@@ -98,4 +98,5 @@ public class CBConstants {
 
     public static final String BIND_SESSION_ENABLE = "enable";
     public static final String BIND_SESSION_DISABLE = "disable";
+    public static final String DEFAULT_CLOUD_PROJECT_NAME = "GlobalConfiguration";
 }

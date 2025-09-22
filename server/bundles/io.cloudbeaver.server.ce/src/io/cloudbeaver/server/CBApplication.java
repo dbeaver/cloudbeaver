@@ -505,9 +505,10 @@ public abstract class CBApplication<T extends CBServerConfig>
         return "";
     }
 
+    @Nullable
     @Override
     public String getDefaultProjectName() {
-        return "GlobalConfiguration";
+        return CBConstants.DEFAULT_CLOUD_PROJECT_NAME;
     }
 
     public boolean isDevelMode() {
