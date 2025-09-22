@@ -11,7 +11,7 @@
   font-weight: 500;
 }
 .fieldLabel:not(:empty) {
-  margin-bottom: 10px;
+  padding-bottom: 10px;
 }
 .inputContainer {
   position: relative;

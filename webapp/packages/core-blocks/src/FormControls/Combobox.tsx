@@ -166,7 +166,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
           required={rest.required}
           htmlFor={inputId}
           title={title}
-          className={clsx('theme-typography--body1', 'tw:block tw:font-medium!', inline ? 'tw:mr-2' : 'tw:mb-2.5')}
+          className={clsx('theme-typography--body1', 'tw:block tw:font-medium!', inline ? 'tw:mr-2' : 'tw:pb-2.5')}
         >
           {children}
         </FieldLabel>
