@@ -43,6 +43,8 @@
 }
 
 .remove {
+  width: 24px;
+  height: 24px;
   position: relative;
   flex: 0 0 auto;
   align-items: center;
@@ -50,14 +52,7 @@
   opacity: 0;
 }
 
-.select {
-  flex: 0 0 auto;
-  align-items: center;
-  display: flex;
-}
-
-.remove,
-.select {
+.remove {
   margin: 0 2px;
 }
 
@@ -77,10 +72,6 @@
   width: 100%;
   outline: none;
 
-  &.edited {
-    font-weight: 600;
-  }
-
   &:global([readonly]),
   &:not(:focus):not([data-focus='true']) {
     background: transparent !important;
@@ -94,24 +85,11 @@
   display: block;
 }
 
-.select .icon,
-.select .iconOrImage {
-  &.focus {
-    transform: rotate(180deg);
-  }
-}
-
 .button {
   background: transparent;
   outline: none;
   padding: 4px;
   cursor: pointer;
-}
-
-.button,
-.propertyValueSelector {
-  composes: theme-form-element-radius from global;
-  overflow: hidden;
 }
 
 .error {

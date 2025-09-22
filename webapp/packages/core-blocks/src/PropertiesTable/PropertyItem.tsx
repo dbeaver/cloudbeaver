@@ -6,9 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { useCallback, useLayoutEffect, useRef, useState } from 'react';
-
-import { isNotNullDefined } from '@dbeaver/js-helpers';
+import { useCallback, useLayoutEffect, useRef } from 'react';
 
 import { ShadowInput } from '../FormControls/ShadowInput.js';
 import { Icon } from '../Icon.js';
@@ -18,8 +16,8 @@ import { s } from '../s.js';
 import { useS } from '../useS.js';
 import type { IProperty } from './IProperty.js';
 import classes from './PropertyItem.module.css';
-import { MenuAriaKit } from '../Menu/AriaKit/MenuAriaKit.js';
-import { Menu } from '@dbeaver/ui-kit';
+import { Combobox } from '../FormControls/Combobox.js';
+import { isNotNullDefined } from '@dbeaver/js-helpers';
 
 interface Props {
   property: IProperty;
@@ -37,7 +35,6 @@ export const PropertyItem = observer<Props>(function PropertyItem({ property, va
   const isDeletable = !readOnly && !property.displayName;
   const edited = value !== undefined && value !== property.defaultValue;
   const propertyValue = value !== undefined ? value : property.defaultValue;
-  const [menuOpen, setMenuOpen] = useState(false);
   const keyInputRef = useRef<HTMLInputElement>(null);
 
   const handleKeyChange = useCallback((key: string) => onNameChange(property.id, key), [property]);
@@ -53,7 +50,6 @@ export const PropertyItem = observer<Props>(function PropertyItem({ property, va
     }
   }, [property]);
 
-  const focus = menuOpen;
   const keyPlaceholder = String(property.keyPlaceholder);
   const valuePlaceholder = isNotNullDefined(property.valuePlaceholder) ? String(property.valuePlaceholder) : '';
 
@@ -74,44 +70,19 @@ export const PropertyItem = observer<Props>(function PropertyItem({ property, va
         </ShadowInput>
       </div>
       <div className={s(styles, { value: true })} title={String(propertyValue)}>
-        <ShadowInput
-          className={s(styles, { shadowInput: true, edited })}
-          type="text"
-          name={`${property.id}_value`}
-          placeholder={valuePlaceholder}
-          autoComplete="none"
-          readOnly={readOnly}
-          data-focus={focus}
-          onChange={handleValueChange}
-        >
-          {propertyValue}
-        </ShadowInput>
-        {edited && !isDeletable && (
-          <div className={s(styles, { remove: true })} title={translate('core_blocks_properties_table_item_reset')}>
-            <button className={s(styles, { button: true })} type="button" onClick={handleRevert}>
-              <IconOrImage className={s(styles, { iconOrImage: true })} icon="/icons/data_revert_all_sm.svg" viewBox="0 0 16 16" />
-            </button>
-          </div>
+        {!readOnly && property.validValues && property.validValues.length > 0 && (
+          <Combobox value={value || valuePlaceholder} items={property.validValues} tiny fill onSelect={handleValueChange} />
         )}
+        <div className={s(styles, { remove: true })} title={translate('core_blocks_properties_table_item_reset')}>
+          <button hidden={!edited || isDeletable} className={s(styles, { button: true })} type="button" onClick={handleRevert}>
+            <IconOrImage className={s(styles, { iconOrImage: true })} icon="/icons/data_revert_all_sm.svg" viewBox="0 0 16 16" />
+          </button>
+        </div>
         {isDeletable && (
           <div className={s(styles, { remove: true })} title={translate('core_blocks_properties_table_item_remove')}>
             <button className={s(styles, { button: true })} type="button" onClick={handleRemove}>
               <Icon className={s(styles, { icon: true })} name="reject" viewBox="0 0 11 11" />
             </button>
-          </div>
-        )}
-        {!readOnly && property.validValues && property.validValues.length > 0 && (
-          <div className={s(styles, { select: true })}>
-            <MenuAriaKit
-              buttonElement={<Icon className={s(styles, { icon: true, focus })} name="arrow" viewBox="0 0 16 16" />}
-              className={s(styles, { propertyValueSelector: true })}
-              items={property.validValues.map(item => (
-                <Menu.Item key={item} onClick={() => handleValueChange(item)}>
-                  {item}
-                </Menu.Item>
-              ))}
-              onSwitch={setMenuOpen}
-            />
           </div>
         )}
       </div>
