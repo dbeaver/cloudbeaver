@@ -134,6 +134,7 @@ export default [
   ['ui_type', 'Type'],
   ['ui_field_is_required', 'Please fill in this field'],
   ['ui_delete_confirmation_message', 'You are about to delete "{arg:item}". Are you sure?'],
+  ['ui_not_selected', 'Not selected'],
 
   ['root_permission_denied', 'Non hai i permessi'],
   ['app_root_session_expire_warning_title', 'La sessione sta per scadere'],
