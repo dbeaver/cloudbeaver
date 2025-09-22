@@ -74,8 +74,10 @@ export const PropertyItem = observer<Props>(function PropertyItem({ property, va
           <Combobox
             value={value}
             defaultValue={valuePlaceholder}
-            placeholder={property.defaultValue}
+            name={`${property.id}_value`}
+            placeholder={valuePlaceholder}
             items={property.validValues}
+            readOnly={readOnly}
             tiny
             fill
             allowCustomValue
