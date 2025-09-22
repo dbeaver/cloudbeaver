@@ -17,10 +17,7 @@ export default [
   ['sql_editor_shortcut_execute_script', 'Выполнить скрипт'],
   ['sql_editor_shortcut_show_execution_plan', 'Показать план выполнения'],
   ['sql_editor_shortcut_format', 'Форматировать скрипт'],
-  ['sql_editor_shortcut_save', 'Сохранить'],
   ['sql_editor_shortcut_open_editor_in_new_tab', 'Открыть SQL редактор в новой бразуерной вкладке'],
-  ['sql_editor_shortcut_undo', 'Отменить'],
-  ['sql_editor_shortcut_redo', 'Повторить'],
   ['sql_editor_shortcut_find', 'Найти'],
   ['sql_editor_shortcut_comment_uncomment_selection', 'Закомментировать/раскомментировать выделение'],
 

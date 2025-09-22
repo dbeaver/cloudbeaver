@@ -101,15 +101,15 @@ export const SQL_EDITOR_SHORTCUTS: IShortcut[] = [
     code: transformKeys(KEY_BINDING_SQL_EDITOR_FORMAT),
   },
   {
-    label: 'sql_editor_shortcut_save',
+    label: 'ui_processing_save',
     code: transformKeys(KEY_BINDING_SQL_EDITOR_SAVE_AS_SCRIPT),
   },
   {
-    label: 'sql_editor_shortcut_undo',
+    label: 'ui_undo',
     code: transformKeys(KEY_BINDING_UNDO),
   },
   {
-    label: 'sql_editor_shortcut_redo',
+    label: 'ui_redo',
     code: transformKeys(KEY_BINDING_REDO),
   },
   {
