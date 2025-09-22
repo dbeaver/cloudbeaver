@@ -9,3 +9,4 @@
 import './module.js';
 
 export * from './DevToolsService.js';
+export * from './menu/MENU_DEVTOOLS.js';
