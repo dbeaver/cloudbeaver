@@ -18,9 +18,10 @@ package io.cloudbeaver.model.session;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.jkiss.code.Nullable;
+import org.jkiss.utils.HttpConstants;
 
 public class WebHttpRequestInfo {
-    public static final String USER_AGENT = "User-Agent";
+    public static final String USER_AGENT = HttpConstants.HEADER_USER_AGENT;
 
     @Nullable
     private final String id;
