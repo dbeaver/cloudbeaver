@@ -198,6 +198,7 @@ public abstract class BaseServletApplication extends BaseApplicationImpl impleme
         }
     }
 
+    @NotNull
     @Override
     public Object start(IApplicationContext context) {
         initializeApplicationServices();
@@ -210,8 +211,9 @@ public abstract class BaseServletApplication extends BaseApplicationImpl impleme
             startServer();
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            return EXIT_ERROR_UNSPECIFIED;
         }
-        return null;
+        return EXIT_OK;
     }
 
     protected abstract void startServer() throws DBException;
