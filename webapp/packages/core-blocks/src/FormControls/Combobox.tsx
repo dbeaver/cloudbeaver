@@ -6,17 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { useCallback, useContext, useId, useState } from 'react';
-import {
-  ComboboxInput,
-  ComboboxItem,
-  clsx,
-  Spinner,
-  ComboboxPopover,
-  ComboboxDisclosure,
-  ComboboxProvider,
-  type ComboboxProviderProps,
-} from '@dbeaver/ui-kit';
+import { useCallback, useContext, useEffect, useId, useState } from 'react';
+import { ComboboxInput, ComboboxItem, clsx, Spinner, ComboboxPopover, ComboboxDisclosure, ComboboxProvider } from '@dbeaver/ui-kit';
 
 import { filterLayoutFakeProps, getLayoutProps } from '../Containers/filterLayoutFakeProps.js';
 import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps.js';
@@ -102,8 +93,19 @@ export const Combobox: ComboboxType = observer(function Combobox({
   const selectedItem = items.find((item, index) => keySelector(item, index) === selectedKey);
   const [inputValue, setInputValue] = useState<string | null>(null);
 
-  const selectedValue = selectedItem ? valueSelector(selectedItem) : '';
+  const selectedValue = (function () {
+    if (selectedItem) {
+      return valueSelector(selectedItem);
+    }
+
+    if (allowCustomValue) {
+      return String(selectedKey);
+    }
+
+    return '';
+  })();
   const displayValue = inputValue ?? selectedValue;
+  const isSelectedExistingItem = items.some((item, index) => keySelector(item, index) === selectedKey);
 
   const filteredItems = items
     .map((item, index) => {
@@ -113,7 +115,8 @@ export const Combobox: ComboboxType = observer(function Combobox({
       const itemIcon = iconSelector?.(item);
       const itemDisabled = isDisabled?.(item);
 
-      const isVisible = inputValue === null || !inputValue.trim() || itemValue.toLowerCase().includes(inputValue.trim().toLowerCase());
+      const isVisible =
+        !displayValue || isSelectedExistingItem || !displayValue.trim() || itemValue.toLowerCase().includes(displayValue.trim().toLowerCase());
 
       return {
         item,
@@ -128,10 +131,12 @@ export const Combobox: ComboboxType = observer(function Combobox({
     })
     .filter(({ isVisible }) => isVisible);
 
-  const handleSelect: ComboboxProviderProps['setSelectedValue'] = useCallback(
+  const handleSelect = useCallback(
     (selectedValue: string | string[]) => {
-      const item = items.find((item, idx) => keySelector(item, idx) === selectedValue);
-      if (!item || selectedValue === selectedKey) {
+      const isItemExists = !!items.find((item, idx) => keySelector(item, idx) === selectedValue);
+      const isSameSelected = selectedValue === selectedKey;
+
+      if (!allowCustomValue && (!isItemExists || isSameSelected)) {
         return;
       }
 
@@ -145,7 +150,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
         context.change(selectedValue as string, name);
       }
     },
-    [items, selectedKey, state, onSelect, context, keySelector, name],
+    [items, selectedKey, state, onSelect, allowCustomValue, context, keySelector, name],
   );
 
   const icon = selectedItem && iconSelector?.(selectedItem);
@@ -160,6 +165,26 @@ export const Combobox: ComboboxType = observer(function Combobox({
       comboboxDefaultValue = valueSelector(defaultItem);
     }
   }
+
+  function onChange(event: React.ChangeEvent<HTMLInputElement>) {
+    if (allowCustomValue) {
+      handleSelect(event.target.value);
+    }
+  }
+
+  function onBlur() {
+    if (allowCustomValue) {
+      handleSelect(displayValue);
+      return;
+    }
+
+    setInputValue(null);
+  }
+
+  // Reset transient input when external selection changes
+  useEffect(() => {
+    setInputValue(null);
+  }, [selectedKey]);
 
   return (
     <Field {...layoutProps} className={clsx(className, inline && 'tw:flex tw:items-center')}>
@@ -189,7 +214,8 @@ export const Combobox: ComboboxType = observer(function Combobox({
             className={clsx('theme-typography--caption  tw:tracking-normal!', icon || loading ? 'tw:pl-8!' : '', 'tw:pr-6!')}
             title={title}
             id={inputId}
-            onBlur={() => setInputValue(null)}
+            onBlur={onBlur}
+            onChange={onChange}
             {...rest}
           />
           {loading ? (
