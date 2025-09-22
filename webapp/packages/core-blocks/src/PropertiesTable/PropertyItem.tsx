@@ -105,12 +105,11 @@ export const PropertyItem = observer<Props>(function PropertyItem({ property, va
             <MenuAriaKit
               buttonElement={<Icon className={s(styles, { icon: true, focus })} name="arrow" viewBox="0 0 16 16" />}
               className={s(styles, { propertyValueSelector: true })}
-              items={property.validValues}
-              itemRender={item => (
+              items={property.validValues.map(item => (
                 <Menu.Item key={item} onClick={() => handleValueChange(item)}>
                   {item}
                 </Menu.Item>
-              )}
+              ))}
               onSwitch={setMenuOpen}
             />
           </div>
