@@ -483,32 +483,8 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
         }
         return;
       }
-      case 'Delete': {
-        if (!canEdit) {
-          return;
-        }
+      case 'Delete':
         event.preventGridDefault();
-
-        const filteredRows = activeRows.filter(cell => tableData.editor.getElementState(cell) !== DatabaseEditChangeType.delete);
-
-        if (filteredRows.length > 0) {
-          const editor = tableData.editor;
-          const firstRow = filteredRows[0]!;
-          const editingState = tableData.editor.getElementState(firstRow);
-
-          editor.delete(...filteredRows);
-
-          if (editingState === DatabaseEditChangeType.add) {
-            if (rowIdx - 1 > 0) {
-              handlers.selectCell({ colIdx, rowIdx: rowIdx - 1 });
-            }
-          } else {
-            if (rowIdx + 1 < tableData.rows.length) {
-              handlers.selectCell({ colIdx, rowIdx: rowIdx + 1 });
-            }
-          }
-        }
-      }
     }
   };
 

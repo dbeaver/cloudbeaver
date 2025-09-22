@@ -14,9 +14,12 @@ import {
   ACTION_REVERT,
   ACTION_SAVE,
   ActionService,
+  DATA_CONTEXT_MENU,
   getBindingLabel,
   KEY_BINDING_ADD,
+  KEY_BINDING_DELETE,
   KEY_BINDING_DUPLICATE,
+  KeyBindingService,
   MenuService,
   type IAction,
 } from '@cloudbeaver/core-view';
@@ -31,17 +34,30 @@ import { DATA_CONTEXT_DV_DDM_RESULT_INDEX } from '../../../DatabaseDataModel/Dat
 import { DATA_CONTEXT_DV_PRESENTATION, DataViewerPresentationType } from '../../../DatabaseDataModel/DataContext/DATA_CONTEXT_DV_PRESENTATION.js';
 import type { IDatabaseDataModel } from '../../../DatabaseDataModel/IDatabaseDataModel.js';
 import { DATA_VIEWER_DATA_MODEL_ACTIONS_MENU } from './DATA_VIEWER_DATA_MODEL_ACTIONS_MENU.js';
+import { DataViewerViewService } from '../../DataViewerViewService.js';
 
-@injectable(() => [ActionService, LocalizationService, MenuService])
+@injectable(() => [ActionService, KeyBindingService, DataViewerViewService, LocalizationService, MenuService])
 export class TableFooterMenuService {
   constructor(
     private readonly actionService: ActionService,
+    private readonly keyBindingService: KeyBindingService,
+    private readonly dataViewerViewService: DataViewerViewService,
     private readonly localizationService: LocalizationService,
     private readonly menuService: MenuService,
-  ) { }
+  ) {}
 
   register(): void {
     this.registerEditingActions();
+    this.keyBindingService.addKeyBindingHandler({
+      id: 'table-footer-delete',
+      binding: KEY_BINDING_DELETE,
+      contexts: [DATA_CONTEXT_DV_DDM, DATA_CONTEXT_DV_DDM_RESULT_INDEX],
+      isBindingApplicable(context, action) {
+        return action === ACTION_DELETE;
+      },
+      handler: this.tableFooterMenuActionHandler.bind(this),
+    });
+    this.dataViewerViewService.registerAction(ACTION_DELETE);
   }
 
   private registerEditingActions() {
@@ -62,11 +78,14 @@ export class TableFooterMenuService {
     this.actionService.addHandler({
       id: 'data-base-editing-handler',
       contexts: [DATA_CONTEXT_DV_DDM, DATA_CONTEXT_DV_DDM_RESULT_INDEX],
-      menus: [DATA_VIEWER_DATA_MODEL_ACTIONS_MENU],
       actions: [ACTION_ADD, ACTION_DUPLICATE, ACTION_DELETE, ACTION_REVERT, ACTION_SAVE, ACTION_CANCEL],
       isActionApplicable(context, action) {
         const model = context.get(DATA_CONTEXT_DV_DDM)!;
         const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
+        const currentMenu = context.getOwn(DATA_CONTEXT_MENU);
+        if (currentMenu !== undefined && currentMenu !== DATA_VIEWER_DATA_MODEL_ACTIONS_MENU) {
+          return false;
+        }
 
         if (model.isReadonly(resultIndex)) {
           return false;
@@ -185,25 +204,34 @@ export class TableFooterMenuService {
         break;
       }
       case ACTION_SAVE:
-        model.save().catch(() => { });
+        model.save().catch(() => {});
         break;
       case ACTION_CANCEL: {
         editor.clear();
         break;
       }
     }
-
   }
 
   private tableFooterMenuGetActionInfo(context: IDataContextProvider, action: IAction) {
     const t = this.localizationService.translate;
     switch (action) {
       case ACTION_ADD:
-        return { ...action.info, label: '', icon: '/icons/data_add_sm.svg', tooltip: t('data_viewer_action_edit_add') + ' (' + getBindingLabel(KEY_BINDING_ADD) + ')' };
+        return {
+          ...action.info,
+          label: '',
+          icon: '/icons/data_add_sm.svg',
+          tooltip: t('data_viewer_action_edit_add') + ' (' + getBindingLabel(KEY_BINDING_ADD) + ')',
+        };
       case ACTION_DUPLICATE:
-        return { ...action.info, label: '', icon: '/icons/data_add_copy_sm.svg', tooltip: t('data_viewer_action_edit_add_copy') + ' (' + getBindingLabel(KEY_BINDING_DUPLICATE) + ')' };
+        return {
+          ...action.info,
+          label: '',
+          icon: '/icons/data_add_copy_sm.svg',
+          tooltip: t('data_viewer_action_edit_add_copy') + ' (' + getBindingLabel(KEY_BINDING_DUPLICATE) + ')',
+        };
       case ACTION_DELETE:
-        return { ...action.info, label: '', icon: '/icons/data_delete_sm.svg', tooltip: t('data_viewer_action_edit_delete') + ' (Delete)' };
+        return { ...action.info, label: '', icon: '/icons/data_delete_sm.svg', tooltip: t('data_viewer_action_edit_delete') };
       case ACTION_REVERT:
         return { ...action.info, label: '', icon: '/icons/data_revert_sm.svg', tooltip: t('data_viewer_action_edit_revert') };
       case ACTION_SAVE:
