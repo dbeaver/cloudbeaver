@@ -71,7 +71,7 @@ export const PropertyItem = observer<Props>(function PropertyItem({ property, va
       </div>
       <div className={s(styles, { value: true })} title={String(propertyValue)}>
         {!readOnly && property.validValues && property.validValues.length > 0 && (
-          <Combobox value={value || valuePlaceholder} items={property.validValues} tiny fill onSelect={handleValueChange} />
+          <Combobox value={value || valuePlaceholder} items={property.validValues} tiny fill allowCustomValue onSelect={handleValueChange} />
         )}
         <div className={s(styles, { remove: true })} title={translate('core_blocks_properties_table_item_reset')}>
           <button hidden={!edited || isDeletable} className={s(styles, { button: true })} type="button" onClick={handleRevert}>
