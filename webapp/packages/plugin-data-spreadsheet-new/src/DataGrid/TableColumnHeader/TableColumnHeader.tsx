@@ -80,7 +80,7 @@ export const TableColumnHeader = observer<Props>(function TableColumnHeader({ co
         {dataReadonly && colIdx === 0 && (
           <div className={s(styles, { readonlyStatus: true, independent: true }, 'rdg-table-header__readonly-status')} />
         )}
-        <div className="tw:grid tw:grid-cols-[auto_1fr] tw:grid-rows-[auto_auto] tw:h-full tw:w-full">
+        <div className="tw:grid tw:grid-cols-[auto_1fr] tw:grid-rows-2 tw:h-full tw:w-full">
           <div
             style={{ height: !tableDataContext.hasDescription ? HEADER_HEIGHT : 'auto' }}
             className="tw:gap-1 tw:col-start-1 tw:col-end-2 tw:row-start-1 tw:row-end-2 tw:flex tw:items-center tw:justify-center tw:truncate"
