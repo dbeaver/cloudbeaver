@@ -18,6 +18,7 @@ package io.cloudbeaver.server;
 
 import io.cloudbeaver.utils.ServletAppUtils;
 import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.impl.preferences.AbstractPreferenceStore;
 import org.jkiss.dbeaver.model.preferences.DBPPreferenceStore;
 
@@ -34,37 +35,37 @@ public class WebServerPreferenceStore extends AbstractPreferenceStore {
     }
 
     @Override
-    public boolean contains(String name) {
+    public boolean contains(@NotNull String name) {
         return productConf().containsKey(name) || parentStore.contains(name);
     }
 
     @Override
-    public boolean getBoolean(String name) {
+    public boolean getBoolean(@NotNull String name) {
         return toBoolean(getString(name));
     }
 
     @Override
-    public double getDouble(String name) {
+    public double getDouble(@NotNull String name) {
         return toDouble(getString(name));
     }
 
     @Override
-    public float getFloat(String name) {
+    public float getFloat(@NotNull String name) {
         return toFloat(getString(name));
     }
 
     @Override
-    public int getInt(String name) {
+    public int getInt(@NotNull String name) {
         return toInt(getString(name));
     }
 
     @Override
-    public long getLong(String name) {
+    public long getLong(@NotNull String name) {
         return toLong(getString(name));
     }
 
     @Override
-    public String getString(String name) {
+    public String getString(@NotNull String name) {
         Object value = productConf().get(name);
         if (value == null) {
             return parentStore.getString(name);
@@ -73,38 +74,38 @@ public class WebServerPreferenceStore extends AbstractPreferenceStore {
     }
 
     @Override
-    public boolean getDefaultBoolean(String name) {
+    public boolean getDefaultBoolean(@NotNull String name) {
         return getBoolean(name);
     }
 
     @Override
-    public double getDefaultDouble(String name) {
+    public double getDefaultDouble(@NotNull String name) {
         return getDouble(name);
     }
 
     @Override
-    public float getDefaultFloat(String name) {
+    public float getDefaultFloat(@NotNull String name) {
         return getFloat(name);
     }
 
     @Override
-    public int getDefaultInt(String name) {
+    public int getDefaultInt(@NotNull String name) {
         return getInt(name);
     }
 
     @Override
-    public long getDefaultLong(String name) {
+    public long getDefaultLong(@NotNull String name) {
         return getLong(name);
     }
 
     @Override
-    public String getDefaultString(String name) {
+    public String getDefaultString(@NotNull String name) {
         // TODO: split product.conf and runtime.product.conf
         return getString(name);
     }
 
     @Override
-    public boolean isDefault(String name) {
+    public boolean isDefault(@NotNull String name) {
         return true;
     }
 
@@ -114,68 +115,68 @@ public class WebServerPreferenceStore extends AbstractPreferenceStore {
     }
 
     @Override
-    public void setDefault(String name, double value) {
+    public void setDefault(@NotNull String name, double value) {
         setDefault(name, String.valueOf(value));
     }
 
     @Override
-    public void setDefault(String name, float value) {
+    public void setDefault(@NotNull String name, float value) {
         setDefault(name, String.valueOf(value));
     }
 
     @Override
-    public void setDefault(String name, int value) {
+    public void setDefault(@NotNull String name, int value) {
         setDefault(name, String.valueOf(value));
     }
 
     @Override
-    public void setDefault(String name, long value) {
+    public void setDefault(@NotNull String name, long value) {
         setDefault(name, String.valueOf(value));
     }
 
     @Override
-    public void setDefault(String name, String defaultObject) {
+    public void setDefault(@NotNull String name, @Nullable String defaultObject) {
         // do not store global default properties in product.conf
         this.parentStore.setDefault(name, defaultObject);
     }
 
     @Override
-    public void setDefault(String name, boolean value) {
+    public void setDefault(@NotNull String name, boolean value) {
         setDefault(name, String.valueOf(value));
     }
 
     @Override
-    public void setToDefault(String name) {
+    public void setToDefault(@NotNull String name) {
         parentStore.setToDefault(name);
     }
 
     @Override
-    public void setValue(String name, double value) {
+    public void setValue(@NotNull String name, double value) {
         parentStore.setValue(name, value);
     }
 
     @Override
-    public void setValue(String name, float value) {
+    public void setValue(@NotNull String name, float value) {
         parentStore.setValue(name, value);
     }
 
     @Override
-    public void setValue(String name, int value) {
+    public void setValue(@NotNull String name, int value) {
         parentStore.setValue(name, value);
     }
 
     @Override
-    public void setValue(String name, long value) {
+    public void setValue(@NotNull String name, long value) {
         parentStore.setValue(name, value);
     }
 
     @Override
-    public void setValue(String name, String value) {
+    public void setValue(@NotNull String name, @Nullable String value) {
         parentStore.setValue(name, value);
     }
 
     @Override
-    public void setValue(String name, boolean value) {
+    public void setValue(@NotNull String name, boolean value) {
         parentStore.setValue(name, value);
     }
 
