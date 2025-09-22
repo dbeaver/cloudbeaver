@@ -45,45 +45,6 @@ export const Default: Story = {
   },
 };
 
-export const Documentation: Story = {
-  render: () => (
-    <div>
-      <h1>Button</h1>
-      <p>The Button component is a simple button that can be used in different contexts. It has several visual parameters that can be customized.</p>
-      <h2>Class names</h2>
-      <p>
-        <code>.dbv-kit-button</code> - the main class name for the button component. <br />
-        <code>.dbv-kit-button--primary</code> - the class name for the primary variant. <br />
-        <code>.dbv-kit-button--secondary</code> - the class name for the secondary variant. <br />
-        <code>.dbv-kit-button--danger</code> - the class name for the danger variant. <br />
-        <code>.dbv-kit-button--small</code> - the class name for the small size. <br />
-        <code>.dbv-kit-button--medium</code> - the class name for the medium size. <br />
-        <code>.dbv-kit-button--large</code> - the class name for the large size. <br />
-        <code>.dbv-kit-button--xlarge</code> - the class name for the extra large size. <br />
-        <hr></hr>
-        <code>.dbv-kit-button__icon</code> - the class name for the icon component. <br />
-        <code>.dbv-kit-button__icon--start</code> - the class name for the icon with placement="start". <br />
-        <code>.dbv-kit-button__icon--end</code> - the class name for the icon with placement="end". <br />
-      </p>
-      <p>
-        Underlying components docs: <br />
-        <a target="_blank" href="https://ariakit.org/reference/button">
-          https://ariakit.org/reference/button
-        </a>
-      </p>
-      <h3>Props:</h3>
-      <dl>
-        <dt className="tw:font-bold">variant</dt>
-        <dd>primary | secondary | danger</dd>
-        <dt className="tw:font-bold">size</dt>
-        <dd>small | medium | large | xlarge</dd>
-        <dt className="tw:font-bold">loading</dt>
-        <dd>boolean</dd>
-      </dl>
-    </div>
-  ),
-};
-
 export const Variants = () => (
   <div>
     <h3 className="tw:text-lg tw:my-2">Variants</h3>
