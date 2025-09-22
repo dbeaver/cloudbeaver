@@ -257,6 +257,10 @@ public class WebDatabaseDriverInfo {
             .toArray(WebPropertyInfo[]::new);
     }
 
+    public WebPropertyInfo[] getExpertSettingsProperties() {
+        return WebServiceUtils.getObjectFilteredProperties(webSession, new WebExpertSettingsProperties(driver), null);
+    }
+
     @Property
     public boolean isEnabled() {
         return WebServiceUtils.isDriverEnabled(driver);
