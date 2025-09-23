@@ -4394,7 +4394,6 @@ __metadata:
     "@cloudbeaver/tsconfig": "workspace:*"
     "@dbeaver/ui-kit": "workspace:^"
     "@storybook/addon-docs": "npm:^9"
-    "@storybook/addon-onboarding": "npm:^9"
     "@storybook/react-vite": "npm:^9"
     "@tailwindcss/vite": "npm:4.0.7"
     "@types/react": "npm:^19"
@@ -7239,15 +7238,6 @@ __metadata:
   peerDependencies:
     storybook: ^9.1.7
   checksum: 10c0/81f530b1230c60d344662aedb4839baa099da287c0188e8d5e10ab8cac0b02bb747e7d6475dbb1a85cba0cb5c475b8d48936355dd359020652ccbaba7d664aa0
-  languageName: node
-  linkType: hard
-
-"@storybook/addon-onboarding@npm:^9":
-  version: 9.1.7
-  resolution: "@storybook/addon-onboarding@npm:9.1.7"
-  peerDependencies:
-    storybook: ^9.1.7
-  checksum: 10c0/e77916321358e1077d2145d43dc4c87cb6a886932c32bf00a81fe4c47d3e3ae9d47e5afd154d3739415c0b0465c10951b722bb0e9f1b9d92528d97a8bfda0465
   languageName: node
   linkType: hard
 
