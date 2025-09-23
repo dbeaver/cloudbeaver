@@ -489,7 +489,49 @@ public class WebServiceCore implements DBWServiceCore {
         @NotNull Map<String, Object> connectionConfig
     ) throws DBWebException {
         WebSessionProjectImpl project = getProjectById(webSession, projectId);
-        DataSourceDescriptor testDataSource = project.getDataSourceContainerFromInput(connectionConfig);
+        WebConnectionConfig configInput = project.getConnectionConfigInput(connectionConfig);
+
+        DataSourceDescriptor dataSource = (DataSourceDescriptor) WebDataSourceUtils.getLocalOrGlobalDataSource(
+            webSession, projectId, configInput.getConnectionId());
+
+        DataSourceDescriptor testDataSource;
+        if (dataSource != null) {
+            try {
+                // Check that creds are saved to trigger secrets resolve
+                dataSource.isCredentialsSaved();
+            } catch (DBException e) {
+                throw new DBWebException("Can't determine whether datasource credentials are saved", e);
+            }
+
+            testDataSource = (DataSourceDescriptor) dataSource.createCopy(dataSource.getRegistry());
+            WebDataSourceUtils.setConnectionConfiguration(
+                testDataSource.getDriver(),
+                testDataSource.getConnectionConfiguration(),
+                configInput
+            );
+            if (configInput.getSelectedSecretId() != null) {
+                try {
+                    dataSource.listSharedCredentials()
+                        .stream()
+                        .filter(secret -> configInput.getSelectedSecretId().equals(secret.getSubjectId()))
+                        .findFirst()
+                        .ifPresent(testDataSource::setSelectedSharedCredentials);
+
+                } catch (DBException e) {
+                    throw new DBWebException("Failed to load secret value: " + configInput.getSelectedSecretId());
+                }
+            }
+            WebDataSourceUtils.saveAuthProperties(
+                testDataSource,
+                testDataSource.getConnectionConfiguration(),
+                configInput.getCredentials(),
+                true,
+                false,
+                true
+            );
+        } else {
+            testDataSource = project.getDataSourceContainerFromInput(connectionConfig);
+        }
         validateDriverLibrariesPresence(testDataSource);
         webSession.provideAuthParameters(
             webSession.getProgressMonitor(),
