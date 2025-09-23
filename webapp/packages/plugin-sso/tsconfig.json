@@ -9,9 +9,6 @@
   "references": [
     {
       "path": "../core-cli"
-    },
-    {
-      "path": "../core-di"
     }
   ],
   "include": [

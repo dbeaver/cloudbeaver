@@ -12,6 +12,9 @@
   },
   "references": [
     {
+      "path": "../../common-react/@dbeaver/react-tests"
+    },
+    {
       "path": "../core-cli"
     },
     {

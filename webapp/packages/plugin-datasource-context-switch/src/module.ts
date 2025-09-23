@@ -12,7 +12,7 @@ import { LocaleService } from './LocaleService.js';
 import { ConnectionSchemaManagerService } from './ConnectionSchemaManager/ConnectionSchemaManagerService.js';
 import { ConnectionSchemaManagerBootstrap } from './ConnectionSchemaManager/ConnectionSchemaManagerBootstrap.js';
 
-ModuleRegistry.add({
+export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-datasource-context-switch',
 
   configure: serviceCollection => {

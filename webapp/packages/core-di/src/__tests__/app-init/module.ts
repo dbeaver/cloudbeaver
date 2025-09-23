@@ -6,18 +6,11 @@
  * you may not use this file except in compliance with the License.
  */
 import { ModuleRegistry, proxy } from '@wroud/di';
-import type { PluginManifest } from '../../PluginManifest.js';
 import { TestService } from './TestService.js';
 import { TestBootstrap } from './TestBootstrap.js';
 import { Bootstrap } from '../../Bootstrap.js';
 
-export const manifest: PluginManifest = {
-  info: {
-    name: 'Sample Manifest',
-  },
-};
-
-ModuleRegistry.add({
+export default ModuleRegistry.add({
   name: 'test-manifest',
   configure(serviceCollection) {
     serviceCollection.addSingleton(TestService).addSingleton(Bootstrap, proxy(TestBootstrap)).addSingleton(TestBootstrap);

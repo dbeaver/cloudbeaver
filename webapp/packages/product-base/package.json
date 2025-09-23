@@ -11,6 +11,7 @@
   "license": "Apache-2.0",
   "exports": {
     ".": "./lib/index.js",
+    "./module": "./lib/module.js",
     "./*.js": "./lib/*.js",
     "./*": "./*"
   },
@@ -26,13 +27,14 @@
   "devDependencies": {
     "@cloudbeaver/core-cli": "workspace:*",
     "@cloudbeaver/tsconfig": "workspace:*",
-    "@tailwindcss/vite": "4.0.7",
     "@types/fs-extra": "^11",
     "@types/node": "^22",
+    "rimraf": "^6",
     "tslib": "^2",
     "typescript": "^5"
   },
   "dependencies": {
+    "@tailwindcss/vite": "4.0.7",
     "@vitejs/plugin-react": "^5",
     "@wroud/vite-plugin-asset-resolver": "^0",
     "@wroud/vite-plugin-tsc": "^0",

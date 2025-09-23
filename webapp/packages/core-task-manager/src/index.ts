@@ -7,10 +7,6 @@
  */
 
 import './module.js';
-import { coreTaskManagerManifest } from './manifest.js';
 
 export * from './ITaskDescriptor.js';
 export * from './TaskManagerService.js';
-
-export { coreTaskManagerManifest };
-export default coreTaskManagerManifest;

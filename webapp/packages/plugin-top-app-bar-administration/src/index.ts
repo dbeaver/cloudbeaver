@@ -7,7 +7,3 @@
  */
 
 import './module.js';
-import { administrationTopAppBarPlugin } from './manifest.js';
-
-export { administrationTopAppBarPlugin };
-export default administrationTopAppBarPlugin;

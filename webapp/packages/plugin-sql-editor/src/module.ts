@@ -28,7 +28,7 @@ import { LocaleService } from './LocaleService.js';
 import { SqlEditorModel } from './SqlEditorModel/SqlEditorModel.js';
 import { SqlEditorModelService } from './SqlEditorModel/SqlEditorModelService.js';
 
-ModuleRegistry.add({
+export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-sql-editor',
 
   configure: serviceCollection => {

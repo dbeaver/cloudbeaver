@@ -7,8 +7,5 @@
  */
 
 import './module.js';
-import { productPlugin } from './manifest.js';
 
 export { default as ProductInfoDialogStyles } from './ProductInfoDialog.module.css';
-
-export default productPlugin;

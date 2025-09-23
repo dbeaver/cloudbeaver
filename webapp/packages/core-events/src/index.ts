@@ -14,4 +14,3 @@ export * from './INotification.js';
 export * from './UIError.js';
 export * from './ExceptionsCatcherService.js';
 export * from './EventsSettingsService.js';
-export * from './manifest.js';

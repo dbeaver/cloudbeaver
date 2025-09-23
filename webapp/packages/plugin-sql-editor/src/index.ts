@@ -7,7 +7,6 @@
  */
 
 import './module.js';
-import { sqlEditorPluginManifest } from './manifest.js';
 
 export * from './actions/bindings/KEY_BINDING_SQL_EDITOR_EXECUTE_NEW.js';
 export * from './actions/bindings/KEY_BINDING_SQL_EDITOR_EXECUTE_SCRIPT.js';
@@ -52,5 +51,3 @@ export * from './SqlEditorService.js';
 export * from './SqlEditorSettingsService.js';
 export * from './SqlEditorView.js';
 export * from './SqlResultTabs/SqlQueryService.js';
-
-export default sqlEditorPluginManifest;
