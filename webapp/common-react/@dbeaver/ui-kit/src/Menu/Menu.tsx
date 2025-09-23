@@ -37,6 +37,7 @@ import {
   useStoreState,
   type MenuStoreProps,
   type MenuArrowProps,
+  MenuItemCheck,
 } from '@ariakit/react';
 import clsx from 'clsx';
 
@@ -114,6 +115,7 @@ export function MenuGroupLabel({ children, className, ...props }: MenuGroupLabel
 export function MenuItemCheckbox({ children, className, ...props }: MenuItemCheckboxProps): ReactElement {
   return (
     <AriaMenuItemCheckbox className={clsx('dbv-kit-menu__item dbv-kit-menu__item--checkbox', className)} {...props}>
+      <MenuItemCheck />
       {children}
     </AriaMenuItemCheckbox>
   );
@@ -122,6 +124,7 @@ export function MenuItemCheckbox({ children, className, ...props }: MenuItemChec
 export function MenuItemRadio({ children, className, ...props }: MenuItemRadioProps): ReactElement {
   return (
     <AriaMenuItemRadio className={clsx('dbv-kit-menu__item dbv-kit-menu__item--radio', className)} {...props}>
+      <MenuItemCheck />
       {children}
     </AriaMenuItemRadio>
   );

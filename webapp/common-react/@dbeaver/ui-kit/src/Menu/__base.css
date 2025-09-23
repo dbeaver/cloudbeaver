@@ -1,6 +1,7 @@
 @layer base {
   :root {
-    --dbv-kit-menu-button-padding-inline: 0;
+    --dbv-kit-menu-button-padding-inline: calc(var(--tw-spacing) * 3);
+    --dbv-kit-menu-button-padding-block: var(--tw-spacing);
     --dbv-kit-menu-foreground: var(--dbv-kit-color-foreground);
     --dbv-kit-menu-background: var(--dbv-kit-color-background);
     --dbv-kit-menu-disabled-foreground: var(--dbv-kit-control-disabled-foreground);

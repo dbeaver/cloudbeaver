@@ -3,6 +3,7 @@
 @layer base {
   .dbv-kit-menu__button {
     padding-inline: var(--dbv-kit-menu-button-padding-inline);
+    padding-block: var(--dbv-kit-menu-button-padding-block);
     background-color: var(--dbv-kit-menu-background);
     color: var(--dbv-kit-menu-foreground);
     border-color: var(--dbv-kit-menu-border-color);
@@ -63,15 +64,13 @@
     }
   }
 
-  .dbv-kit-menu__item {
+  .dbv-kit-menu__item,
+  .dbv-kit-menu__dismiss {
     display: block;
     width: 100%;
     padding-inline: var(--dbv-kit-menu-item-padding-inline);
     padding-block: var(--dbv-kit-menu-item-padding-block);
-    text-align: left;
     cursor: pointer;
-    border: none;
-    background: none;
     font-weight: var(--dbv-kit-menu-font-weight);
     font-size: var(--dbv-kit-menu-font-size);
 
@@ -95,15 +94,24 @@
   }
 
   .dbv-kit-menu__heading {
-    padding: 0.25rem var(--dbv-kit-menu-item-padding-inline);
-    font-weight: var(--tw-font-weight-medium);
+    margin-block: 0 !important;
+    font-size: calc(var(--dbv-kit-menu-font-size) * 1.2) !important;
+    padding: 0 var(--dbv-kit-menu-item-padding-inline);
+    font-weight: var(--tw-font-weight-bold) !important;
     color: var(--tw-color-gray-500);
   }
 
   .dbv-kit-menu__description {
-    padding: 0.25rem var(--dbv-kit-menu-item-padding-inline);
+    margin-block: 0 !important;
+    padding: 0 var(--dbv-kit-menu-item-padding-inline);
     color: var(--tw-color-gray-500);
-    font-size: calc(var(--dbv-kit-menu-font-size) * 0.9);
+    font-size: calc(var(--dbv-kit-menu-font-size) * 0.8) !important;
+  }
+
+  .dbv-kit-menu__item--checkbox,
+  .dbv-kit-menu__item--radio {
+    display: inline-flex;
+    align-items: center;
   }
 
   .dbv-kit-menu__group {
