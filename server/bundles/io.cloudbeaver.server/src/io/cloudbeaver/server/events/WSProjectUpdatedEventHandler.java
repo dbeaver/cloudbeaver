@@ -55,7 +55,7 @@ public class WSProjectUpdatedEventHandler extends WSAbstractProjectEventHandler<
     @Override
     protected boolean isAcceptableInSession(@NotNull BaseWebSession activeUserSession, @NotNull WSProjectUpdateEvent event) {
         return !WSWebUtils.isSessionIdEquals(activeUserSession, event.getSessionId()) &&
-            (event.getId().equals(WSProjectUpdateEvent.REMOVED) ||
+            (!event.getId().equals(WSProjectUpdateEvent.ADDED) ||
             activeUserSession.getUserContext().hasPermission(DBWConstants.PERMISSION_ADMIN));
     }
 }

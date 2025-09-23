@@ -983,7 +983,7 @@ public class WebSession extends BaseWebSession
         super.updateSessionProject(projectId, rmProjectInfo);
         var project = getProjectById(projectId);
         if (project == null) {
-            throw new DBException("Project not found: " + projectId);
+            return;
         }
         project.updateProjectInfo(rmProjectInfo.getName(), rmProjectInfo.getDescription());
     }
