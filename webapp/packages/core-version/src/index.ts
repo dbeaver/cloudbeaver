@@ -7,7 +7,6 @@
  */
 
 import './module.js';
-export { manifest as coreVersionManifest } from './manifest.js';
 
 export * from './VersionResource.js';
 export * from './VersionService.js';

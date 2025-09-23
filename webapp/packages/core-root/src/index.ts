@@ -47,4 +47,3 @@ export * from './WindowEventsService.js';
 export * from './ServerLicenseStatusResource.js';
 export * from './AsyncTask/AsyncTask.js';
 export * from './AsyncTask/AsyncTaskInfoService.js';
-export * from './manifest.js';

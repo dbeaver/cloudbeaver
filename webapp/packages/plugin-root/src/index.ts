@@ -7,8 +7,5 @@
  */
 
 import './module.js';
-import { rootPlugin } from './manifest.js';
 
 export { default as ServerNodeChangedDialogStyles } from './ServerNodeChangedDialog/ServerNodeChangedDialog.module.css';
-
-export default rootPlugin;

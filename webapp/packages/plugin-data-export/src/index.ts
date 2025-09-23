@@ -7,7 +7,6 @@
  */
 
 import './module.js';
-export * from './manifest.js';
 
 export * from './DataExportMenuService.js';
 export * from './DataExportService.js';

@@ -15,7 +15,7 @@ import { DataExportService } from './DataExportService.js';
 import { DataExportProcessService } from './DataExportProcessService.js';
 import { DataExportMenuService } from './DataExportMenuService.js';
 
-ModuleRegistry.add({
+export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-data-export',
 
   configure: serviceCollection => {

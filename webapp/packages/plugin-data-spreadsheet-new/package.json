@@ -12,7 +12,8 @@
   "description": "",
   "license": "Apache-2.0",
   "exports": {
-    ".": "./lib/index.js"
+    ".": "./lib/index.js",
+    "./module": "./lib/module.js"
   },
   "scripts": {
     "build": "tsc -b",
@@ -28,7 +29,6 @@
     "@cloudbeaver/core-di": "workspace:*",
     "@cloudbeaver/core-dialogs": "workspace:*",
     "@cloudbeaver/core-events": "workspace:*",
-    "@cloudbeaver/core-executor": "workspace:*",
     "@cloudbeaver/core-localization": "workspace:*",
     "@cloudbeaver/core-sdk": "workspace:*",
     "@cloudbeaver/core-settings": "workspace:*",
@@ -37,24 +37,22 @@
     "@cloudbeaver/core-view": "workspace:*",
     "@cloudbeaver/plugin-data-grid": "workspace:*",
     "@cloudbeaver/plugin-data-viewer": "workspace:*",
-    "@dbeaver/js-helpers": "workspace:^",
-    "@dbeaver/result-set-api": "workspace:^",
-    "@dbeaver/ui-kit": "workspace:^",
-    "@popperjs/core": "^2",
+    "@dbeaver/result-set-api": "workspace:*",
+    "@dbeaver/ui-kit": "workspace:*",
     "mobx": "^6",
     "mobx-react-lite": "^4",
     "react": "^19",
     "react-dom": "^19",
-    "react-popper": "^2",
     "tslib": "^2"
   },
   "devDependencies": {
     "@cloudbeaver/core-cli": "workspace:*",
     "@cloudbeaver/tsconfig": "workspace:*",
     "@dbeaver/cli": "workspace:*",
-    "@dbeaver/react-tests": "workspace:^",
+    "@dbeaver/react-tests": "workspace:*",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "rimraf": "^6",
     "typescript": "^5",
     "typescript-plugin-css-modules": "^5",
     "vitest": "^3"

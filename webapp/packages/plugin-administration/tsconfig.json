@@ -56,9 +56,6 @@
       "path": "../core-routing"
     },
     {
-      "path": "../core-sdk"
-    },
-    {
       "path": "../core-ui"
     },
     {

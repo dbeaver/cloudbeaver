@@ -16,7 +16,7 @@ import { NavNodeMetadataViewBootstrap } from './ObjectPropertiesPage/NavNodeView
 import { DBObjectPageService } from './ObjectPage/DBObjectPageService.js';
 import { LocaleService } from './LocaleService.js';
 
-ModuleRegistry.add({
+export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-object-viewer',
 
   configure: serviceCollection => {

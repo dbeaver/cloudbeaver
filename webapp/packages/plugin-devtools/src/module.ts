@@ -10,7 +10,7 @@ import { ModuleRegistry, Bootstrap } from '@cloudbeaver/core-di';
 import { PluginBootstrap } from './PluginBootstrap.js';
 import { DevToolsService } from './DevToolsService.js';
 
-ModuleRegistry.add({
+export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-devtools',
 
   configure: serviceCollection => {
