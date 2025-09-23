@@ -16,21 +16,25 @@
  */
 package io.cloudbeaver.server.graphql;
 
+import com.google.gson.Gson;
+import graphql.schema.*;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.WebAppUtils;
 import io.cloudbeaver.server.WebApplication;
 import jakarta.servlet.http.HttpServletRequest;
 import org.jkiss.code.Nullable;
+import org.jkiss.dbeaver.Log;
 import org.jkiss.utils.CommonUtils;
+import org.jkiss.utils.GsonUtils;
 
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class GraphQLLoggerUtil {
 
-    public static final String LOG_API_GRAPHQL_DEBUG_PARAMETER = "log.api.graphql.debug";
-    private static final Set<String> PROHIBITED_VARIABLES =
-        Set.of("password", "config", "parameters", "settings", "licenseText", "credentials", "username");
+    private static final Log log = Log.getLog(GraphQLLoggerUtil.class);
+    private static final String SENSITIVE = "sensitive";
+    private static final Gson gson = GsonUtils.gsonBuilder().create();
 
     public static String getUserId(HttpServletRequest request) {
         WebSession session = getWebSession(request);
@@ -63,43 +67,120 @@ public class GraphQLLoggerUtil {
             .findWebSession(request);
     }
 
-    public static String buildLoggerMessage(String sessionId, String userId, Map<String, Object> variables) {
+    public static String buildLoggerMessage(String sessionId, String userId, GraphQLSchema schema, String operationName,
+                                            Map<String, Object> variables
+    ) {
         StringBuilder loggerMessage = new StringBuilder(" [user: ").append(userId)
             .append(", sessionId: ").append(sessionId).append("]");
 
-        if (WebAppUtils.getWebPlatform().getPreferenceStore().getBoolean(LOG_API_GRAPHQL_DEBUG_PARAMETER)
-                && variables != null
-        ) {
-            loggerMessage.append(" [variables] ");
-            String parsedVariables = parseVarialbes(variables);
-            if (CommonUtils.isNotEmpty(parsedVariables)) {
-                loggerMessage.append(parseVarialbes(variables));
-            }
+//        if (!WebAppUtils.getWebPlatform().getPreferenceStore().getBoolean(LOG_API_GRAPHQL_DEBUG_PARAMETER)) {
+//            return loggerMessage.toString();
+//        }
+        loggerMessage.append(" [variables] ");
+        String parsedVariables = parseVariables(schema, operationName, variables);
+        if (CommonUtils.isNotEmpty(parsedVariables)) {
+            loggerMessage.append(parsedVariables);
         }
         return loggerMessage.toString();
     }
 
-    private static String parseVarialbes(Map<String, Object> map) {
+    public static String parseVariables(GraphQLSchema schema, String operationName, Map<String, Object> variables) {
         StringBuilder result = new StringBuilder();
 
-        for (Map.Entry<String, Object> entry : map.entrySet()) {
-            String key = entry.getKey();
-            Object value = entry.getValue();
+        GraphQLFieldDefinition field = null;
+        GraphQLObjectType queryType = schema.getQueryType();
+        if (queryType != null) {
+            field = queryType.getFieldDefinition(operationName);
+        }
+        if (field == null) {
+            GraphQLObjectType mutationType = schema.getMutationType();
+            if (mutationType != null) {
+                field = mutationType.getFieldDefinition(operationName);
+            }
+        }
+        if (field == null) {
+            log.warn("GraphQL field not found: " + operationName);
+            return "";
+        }
 
-            boolean isProhibited = PROHIBITED_VARIABLES.stream()
-                .anyMatch(prohibitedKey -> key.toLowerCase().contains(prohibitedKey.toLowerCase()));
+        for (GraphQLArgument argument : field.getArguments()) {
+            String argName = argument.getName();
 
-            if (isProhibited) {
-                result.append(key).append(": ").append("******** ");
+            Object varValue = variables != null ? variables.get(argName) : null;
+
+            if (hasSensitive(argument)) {
+                result.append(argName).append(": ").append("******** ");
                 continue;
             }
 
-            if (value instanceof Map) {
-                result.append(parseVarialbes((Map<String, Object>) value));
-            } else {
-                result.append(key).append(": ").append(value).append(" ");
-            }
+            GraphQLInputType inputType = argument.getType();
+            String masked = maskValue(inputType, varValue);
+            result.append(argName).append(": ").append(masked).append(" ");
         }
+
         return result.toString().trim();
+    }
+
+    private static String maskValue(GraphQLInputType type, Object value) {
+        GraphQLType unwrapped = (type instanceof GraphQLNonNull nn) ? nn.getWrappedType() : type;;
+
+        if (unwrapped instanceof GraphQLList listType) {
+            if (value == null) return "null";
+            if (!(value instanceof Collection<?> col)) {
+                return serializeValue(value);
+            }
+            GraphQLInputType elemType = (GraphQLInputType) listType.getWrappedType();
+            List<String> items = new ArrayList<>(col.size());
+            for (Object v : col) {
+                items.add(maskValue(elemType, v));
+            }
+            return "[" + String.join(", ", items) + "]";
+        }
+
+        if (unwrapped instanceof GraphQLInputObjectType objType) {
+
+            if (hasSensitive(objType)) {
+                return "********";
+            }
+            if (value == null) return "null";
+            if (!(value instanceof Map<?, ?> map)) {
+                return serializeValue(value);
+            }
+
+            Map<String, String> pieces = new LinkedHashMap<>();
+            for (GraphQLInputObjectField f : objType.getFieldDefinitions()) {
+                String name = f.getName();
+                Object fieldVal = map.get(name);
+
+                if (hasSensitive(f)) {
+                    pieces.put(name, "********");
+                } else {
+                    pieces.put(name, maskValue(f.getType(), fieldVal));
+                }
+            }
+
+            return "{" + pieces.entrySet().stream()
+                .map(e -> e.getKey() + ": " + e.getValue())
+                .collect(Collectors.joining(", ")) + "}";
+        }
+
+        return serializeValue(value);
+    }
+
+    private static boolean hasSensitive(GraphQLDirectiveContainer container) {
+        return container.getAppliedDirectives().stream().anyMatch(d -> SENSITIVE.equals(d.getName()));
+    }
+
+    private static String serializeValue(Object v) {
+        if (v == null) {
+            return "null";
+        }
+        if (v instanceof String s) {
+            return "\"" + s + "\"";
+        }
+        if (v instanceof Number || v instanceof Boolean) {
+            return String.valueOf(v);
+        }
+        return gson.toJson(v);
     }
 }

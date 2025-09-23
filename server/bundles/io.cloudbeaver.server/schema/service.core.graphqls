@@ -648,7 +648,7 @@ input NetworkHandlerConfigInput {
     "Sets user name for the network handler (SSH)"
     userName: String
     "Sets user password for the network handler (SSH)"
-    password: String
+    password: String @sensitive
     "Sets private key for the network handler (SSH)"
     key: String @deprecated(reason: "use secured properties")
     "Sets a flag that indicates if the password should be saved in the secure storage"
@@ -779,7 +779,7 @@ extend type Query {
 
 extend type Mutation {
     "Initialize session"
-    openSession(defaultLocale: String): SessionInfo!
+    openSession(defaultLocale: String @sensitive): SessionInfo!
 
     "Destroy session"
     closeSession: Boolean

@@ -20,7 +20,8 @@ import com.google.gson.*;
 import graphql.*;
 import graphql.execution.*;
 import graphql.execution.instrumentation.Instrumentation;
-import graphql.language.SourceLocation;
+import graphql.language.*;
+import graphql.parser.Parser;
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.GraphQLSchema;
 import graphql.schema.PropertyDataFetcherHelper;
@@ -246,18 +247,28 @@ public class GraphQLEndpoint extends HttpServlet {
         if (operationName != null) {
             contextBuilder.operationName(operationName);
         }
-        String sessionId = GraphQLLoggerUtil.getSmSessionId(request);
-        String userId = GraphQLLoggerUtil.getUserId(request);
-        String loggerMessage = GraphQLLoggerUtil.buildLoggerMessage(sessionId, userId, variables);
-        if (operationName != null) {
-            log.debug("API > " + operationName + loggerMessage);
-        } else if (DEBUG) {
-            log.debug("API > " + query + loggerMessage);
-        }
-        LocalDateTime startTime = LocalDateTime.now();
         ExecutionInput executionInput = contextBuilder.build();
         ExecutionResult executionResult = null;
         Exception executionException = null;
+        String sessionId = GraphQLLoggerUtil.getSmSessionId(request);
+        String userId = GraphQLLoggerUtil.getUserId(request);
+        GraphQLSchema schema = graphQL.getGraphQLSchema();
+        List<String> serverOperationNames = resolveServerOperationName(schema, operationName, query);
+        if (serverOperationNames != null) {
+            String loggerMessageResult = "";
+            for (String serverOperationName : serverOperationNames) {
+                //fixme message concat if multiple operations
+                loggerMessageResult = loggerMessageResult.concat(
+                    GraphQLLoggerUtil.buildLoggerMessage(sessionId, userId, schema, serverOperationName, variables));
+            }
+            if (operationName != null) {
+                log.debug("API > " + operationName + loggerMessageResult);
+            } else if (DEBUG) {
+                log.debug("API > " + query + loggerMessageResult);
+            }
+        }
+        LocalDateTime startTime = LocalDateTime.now();
+
         try {
             executionResult = graphQL.execute(executionInput);
         } catch (Exception e) {
@@ -288,6 +299,27 @@ public class GraphQLEndpoint extends HttpServlet {
             response.setContentType(GraphQLConstants.CONTENT_TYPE_JSON_UTF8);
             response.getWriter().print(resString);
         }
+    }
+
+    private List<String> resolveServerOperationName(GraphQLSchema schema, String operationName, String queryText) {
+
+        Document doc = Parser.parse(queryText);
+        OperationDefinition targetOp = doc.getDefinitionsOfType(OperationDefinition.class).stream()
+            .filter(op -> operationName == null || operationName.equals(op.getName()))
+            .findFirst()
+            .orElse(null);
+        if (targetOp != null) {
+            //fixme there is could be multiple selections like in query with fragments
+            List<Selection> selections = targetOp.getSelectionSet().getSelections();
+            List<String> operationNames = new ArrayList<>();
+            for (Selection selection : selections) {
+                if (selection instanceof Field f) {
+                    operationNames.add(f.getName());
+                }
+            }
+            return operationNames;
+        }
+        return null;
     }
 
 
