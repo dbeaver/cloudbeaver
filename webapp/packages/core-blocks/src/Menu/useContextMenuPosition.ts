@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -16,23 +16,34 @@ export interface IContextMenuPositionCoords {
 
 export interface IContextMenuPosition {
   position: IContextMenuPositionCoords | null;
-  handleContextMenuOpen: (event: React.MouseEvent<HTMLDivElement>) => void;
+  handleContextMenuOpen: (event: React.MouseEvent) => void;
 }
 
 export function useContextMenuPosition(): IContextMenuPosition {
   return useObservableRef<IContextMenuPosition>(
     () => ({
       position: null,
-      handleContextMenuOpen(event: React.MouseEvent<HTMLDivElement>) {
+      handleContextMenuOpen(event: React.MouseEvent) {
         if (!event.currentTarget.contains(event.target as Node)) {
           return;
         }
+
         event.preventDefault();
         event.stopPropagation();
 
+        let x = event.clientX;
+        let y = event.clientY;
+
+        if (x === 0 && y === 0) {
+          const rect = event.currentTarget.getBoundingClientRect();
+
+          x = rect.left + rect.width / 2;
+          y = rect.top + rect.height / 2;
+        }
+
         this.position = {
-          x: event.clientX,
-          y: event.clientY,
+          x,
+          y,
         };
       },
     }),

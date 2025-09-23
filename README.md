@@ -25,6 +25,11 @@ You can see a live demo of CloudBeaver here: https://demo.cloudbeaver.io
 
 ## Changelog
 
+### 25.2.1 2025-09-22
+- Autocomplete values in SQL Editor are ordered alphabetically to simplify object search.
+- "Show all databases" setting was added on the connection page for MySQL and MariaDB.
+- Different bug fixes and enhancements have been made.
+
 ### 25.2.0 2025-09-01
 ### Changes since 25.1.0:
 - Administration:
