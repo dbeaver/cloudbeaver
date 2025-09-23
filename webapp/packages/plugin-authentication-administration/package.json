@@ -12,7 +12,8 @@
   "description": "",
   "license": "Apache-2.0",
   "exports": {
-    ".": "./lib/index.js"
+    ".": "./lib/index.js",
+    "./module": "./lib/module.js"
   },
   "scripts": {
     "build": "tsc -b",
@@ -40,8 +41,8 @@
     "@cloudbeaver/core-view": "workspace:*",
     "@cloudbeaver/plugin-administration": "workspace:*",
     "@cloudbeaver/plugin-authentication": "workspace:*",
-    "@dbeaver/js-helpers": "workspace:^",
-    "@dbeaver/ui-kit": "workspace:^",
+    "@dbeaver/js-helpers": "workspace:*",
+    "@dbeaver/ui-kit": "workspace:*",
     "mobx": "^6",
     "mobx-react-lite": "^4",
     "react": "^19",
@@ -53,6 +54,7 @@
     "@cloudbeaver/core-cli": "workspace:*",
     "@cloudbeaver/tsconfig": "workspace:*",
     "@types/react": "^19",
+    "rimraf": "^6",
     "typescript": "^5",
     "typescript-plugin-css-modules": "^5"
   }

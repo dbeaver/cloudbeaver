@@ -30,6 +30,7 @@
     "eslint-config-prettier": "^10",
     "eslint-plugin-react": "^7",
     "eslint-plugin-react-hooks": "^5",
+    "eslint-plugin-storybook": "^9",
     "typescript-eslint": "^8"
   }
 }

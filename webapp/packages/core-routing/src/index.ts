@@ -7,7 +7,6 @@
  */
 
 import './module.js';
-export * from './manifest.js';
 export * from './Screen/IScreen.js';
 export * from './Screen/ScreenService.js';
 export * from './RouterService.js';

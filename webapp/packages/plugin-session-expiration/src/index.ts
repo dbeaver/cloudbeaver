@@ -7,7 +7,3 @@
  */
 
 import './module.js';
-import { sessionExpirationPlugin } from './manifest.js';
-
-export { sessionExpirationPlugin };
-export default sessionExpirationPlugin;

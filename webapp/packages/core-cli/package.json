@@ -40,18 +40,17 @@
   },
   "dependencies": {
     "glob": "^11",
+    "js-yaml": "^4",
     "tslib": "^2"
   },
   "devDependencies": {
     "@cloudbeaver/tsconfig": "workspace:*",
-    "@swc/core": "^1",
     "@types/js-yaml": "^4",
     "@types/node": "^22",
     "enquirer": "^2",
     "execa": "^9",
     "glob": "^11",
     "hygen": "^6",
-    "js-yaml": "^4",
     "typescript": "^5"
   }
 }

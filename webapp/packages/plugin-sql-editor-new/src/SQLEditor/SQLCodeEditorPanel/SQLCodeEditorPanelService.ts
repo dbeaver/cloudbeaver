@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ export class SQLCodeEditorPanelService {
       key: 'sql-editor',
       icon: '/icons/sql_script_sm.svg',
       name: 'sql_editor_script_editor',
-      isHidden: (_, props) => props?.data.dataSource?.hasFeature(ESqlDataSourceFeatures.script) !== true,
+      isHidden: (_, props) => props?.data.model.dataSource?.hasFeature(ESqlDataSourceFeatures.script) !== true,
       panel: () => SQLCodeEditorPanel,
     });
   }

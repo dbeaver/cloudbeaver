@@ -11,7 +11,7 @@ import { SettingsAdministrationService } from './SettingsAdministrationService.j
 import { SettingsAdministrationPluginBootstrap } from './SettingsAdministrationPluginBootstrap.js';
 import { LocaleService } from './LocaleService.js';
 
-ModuleRegistry.add({
+export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-settings-administration',
 
   configure: serviceCollection => {

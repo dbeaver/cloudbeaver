@@ -33,4 +33,3 @@ export * from './Resource/ResourceKeyAlias.js';
 export * from './Resource/ResourceKeyList.js';
 export * from './Resource/ResourceKeyListAlias.js';
 export * from './Resource/ResourceKeyUtils.js';
-export { coreResourceManifest } from './manifest.js';

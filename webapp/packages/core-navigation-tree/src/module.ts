@@ -15,7 +15,7 @@ import { DBObjectResource } from './NodesManager/DBObjectResource.js';
 import { NavTreeSettingsService } from './NavTreeSettingsService.js';
 import { LocaleService } from './LocaleService.js';
 
-ModuleRegistry.add({
+export default ModuleRegistry.add({
   name: '@cloudbeaver/core-navigation-tree',
 
   configure: serviceCollection => {

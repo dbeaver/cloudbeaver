@@ -8,4 +8,3 @@
 
 export * from './WebsiteLinks.js';
 export * from './GithubLinks.js';
-export * from './manifest.js';

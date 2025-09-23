@@ -7,6 +7,5 @@
  */
 
 import './module.js';
-export { dataImportPluginManifest } from './manifest.js';
 
 export * from './DataImportSettingsService.js';

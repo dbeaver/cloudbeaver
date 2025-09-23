@@ -12,7 +12,7 @@ import { ServiceWorkerBootstrap } from './ServiceWorkerBootstrap.js';
 import { LocalStorageSaveService } from './LocalStorageSaveService.js';
 import { IndexedDBService } from './IndexedDB/IndexedDBService.js';
 
-ModuleRegistry.add({
+export default ModuleRegistry.add({
   name: '@cloudbeaver/core-browser',
 
   configure: serviceCollection => {
