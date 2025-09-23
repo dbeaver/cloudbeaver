@@ -30,3 +30,21 @@
   composes: theme-background-surface theme-text-on-surface theme-border-color-background from global;
   border-top: 1px solid;
 }
+
+.boolean {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &[data-disabled] {
+    opacity: 1;
+  }
+}
+
+@layer components {
+  .boolean {
+    composes: checkbox-markup-theme--tertiary from global;
+    --dbv-kit-checkbox-border-width: 1px;
+    --dbv-kit-checkbox-check-size: 0.8;
+  }
+}
