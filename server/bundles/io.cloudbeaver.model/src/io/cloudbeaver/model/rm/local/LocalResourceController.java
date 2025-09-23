@@ -279,23 +279,21 @@ public class LocalResourceController extends BaseLocalResourceController {
         }
         validateResourcePath(name);
         validateProjectName(null, name);
-        RMProject project;
         var projectPath = sharedProjectsPath.resolve(name);
         if (Files.exists(projectPath)) {
             throw new DBException("Project '" + name + "' already exists");
         }
-        project = makeProjectFromPath(projectPath, Set.of(), RMProjectType.SHARED, false);
-        if (project == null) {
-            throw new DBException("Project '" + name + "' not created");
-        }
+        RMLocalProject webProject = new RMLocalProject(workspace, new SessionContextImpl(null), projectPath, RMProjectType.SHARED);
+        webProject.updateProject(name, description);
+        RMProject rmProject = createRmProjectFromWebProject(projectPath, webProject, new String[0]);
         try {
-            log.debug("Creating project '" + project.getId() + "'");
+            log.debug("Creating project '" + rmProject.getId() + "'");
             Files.createDirectories(projectPath);
             if (ServletAppUtils.getServletApplication().isMultiNode()) {
                 createResourceTypeFolders(projectPath);
             }
-            fireRmProjectAddEvent(project);
-            return project;
+            fireRmProjectAddEvent(rmProject);
+            return rmProject;
         } catch (IOException e) {
             throw new DBException("Error creating project path", e);
         }
@@ -995,24 +993,7 @@ public class LocalResourceController extends BaseLocalResourceController {
             .toArray(String[]::new);
 
         RMLocalProject webProject = new RMLocalProject(workspace, new SessionContextImpl(null), path, type);
-        RMProject project = WebRMUtils.createRmProjectFromWebProject(webProject);
-        project.setProjectPermissions(allProjectPermissions);
-        if (Files.exists(path)) {
-            try {
-                project.setCreateTime(
-                    OffsetDateTime.ofInstant(Files.getLastModifiedTime(path).toInstant(), ZoneId.of("UTC")).toInstant().toEpochMilli());
-            } catch (IOException e) {
-                log.error(e);
-            }
-        }
-        // Resource types
-        project.setResourceTypes(ResourceTypeRegistry.getInstance().getResourceTypes()
-            .stream()
-            .filter(ResourceTypeDescriptor::isManagable)
-            .map(RMResourceType::new)
-            .toArray(RMResourceType[]::new));
-
-        return project;
+        return createRmProjectFromWebProject(path, webProject, allProjectPermissions);
     }
 
     private void createResourceTypeFolders(Path path) {
@@ -1274,5 +1255,28 @@ public class LocalResourceController extends BaseLocalResourceController {
         return RMProjectType.USER.getPrefix().equals(rmProjectName.getPrefix()) &&
             rmProjectName.name.equals(userId);
     }
+
+    @NotNull
+    private static RMProject createRmProjectFromWebProject(Path path, RMLocalProject webProject, String[] allProjectPermissions) {
+        RMProject project = WebRMUtils.createRmProjectFromWebProject(webProject);
+        project.setProjectPermissions(allProjectPermissions);
+        if (Files.exists(path)) {
+            try {
+                project.setCreateTime(
+                    OffsetDateTime.ofInstant(Files.getLastModifiedTime(path).toInstant(), ZoneId.of("UTC")).toInstant().toEpochMilli());
+            } catch (IOException e) {
+                log.error(e);
+            }
+        }
+        // Resource types
+        project.setResourceTypes(ResourceTypeRegistry.getInstance().getResourceTypes()
+            .stream()
+            .filter(ResourceTypeDescriptor::isManagable)
+            .map(RMResourceType::new)
+            .toArray(RMResourceType[]::new));
+
+        return project;
+    }
+
 
 }
