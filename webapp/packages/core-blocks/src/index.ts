@@ -34,6 +34,7 @@ export * from './DisplayError.js';
 export * from './ErrorBoundary.js';
 export * from './Icon.js';
 export * from './useHotkeys.js';
+export * from './useSync.js';
 
 export * from './ItemList/ItemList.js';
 export * from './ItemList/ItemListSearch.js';
@@ -252,7 +253,6 @@ export * from './useUserData.js';
 export * from './useListKeyboardNavigation.js';
 export * from './useMergeRefs.js';
 export * from './usePasswordValidation.js';
-export * from './manifest.js';
 export * from './importLazyComponent.js';
 export * from './ClickableLoader.js';
 export * from './FormControls/TagsComboboxLoader.js';

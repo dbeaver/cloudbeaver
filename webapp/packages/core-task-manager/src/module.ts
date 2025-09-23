@@ -9,7 +9,7 @@
 import { ModuleRegistry } from '@cloudbeaver/core-di';
 import { TaskManagerService } from './TaskManagerService.js';
 
-ModuleRegistry.add({
+export default ModuleRegistry.add({
   name: '@cloudbeaver/core-task-manager',
 
   configure: serviceCollection => {

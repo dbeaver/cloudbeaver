@@ -11,7 +11,7 @@ import { ProductInfoService } from './ProductInfoService.js';
 import { LocaleService } from './LocaleService.js';
 import { ProductInfoNavigationService } from './ProductInfoNavigationService.js';
 
-ModuleRegistry.add({
+export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-product-information-administration',
 
   configure: serviceCollection => {

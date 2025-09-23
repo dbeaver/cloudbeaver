@@ -7,8 +7,5 @@
  */
 
 import './module.js';
-import { customConnectionPluginManifest } from './manifest.js';
-
-export default customConnectionPluginManifest;
 
 export * from './CustomConnectionSettingsService.js';

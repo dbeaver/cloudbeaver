@@ -7,6 +7,3 @@
  */
 
 import './module.js';
-import { userProfileAdministrationPlugin } from './manifest.js';
-
-export default userProfileAdministrationPlugin;

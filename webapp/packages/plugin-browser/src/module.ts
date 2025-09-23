@@ -10,7 +10,7 @@ import { Bootstrap, IPreloadService, ModuleRegistry } from '@cloudbeaver/core-di
 import { PluginBrowserPreloadingBootstrap } from './PluginBrowserPreloadingBootstrap.js';
 import { LocaleService } from './LocaleService.js';
 
-ModuleRegistry.add({
+export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-browser',
 
   configure: serviceCollection => {
