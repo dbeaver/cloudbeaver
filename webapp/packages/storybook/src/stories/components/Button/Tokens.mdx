@@ -1,0 +1,86 @@
+
+
+# Button CSS Tokens
+
+This UI kit uses several CSS tokens to style buttons.
+
+## Common buttons tokens
+
+### Size and space
+
+- `--dbv-kit-btn-height:` var(--dbv-kit-control-height-medium) - Default button height
+- `--dbv-kit-btn-padding-inline:` --spacing(2.5) - Medium button inline paddings, other sizes are calculated based on that variable
+- `--dbv-kit-btn-gap:` calc(var(--dbv-kit-btn-padding-inline) /4) - Gap between button elements (mostly text and icon)
+- `--dbv-kit-btn-outline-offset:` 1px - Button outline offset
+
+### Basic colors
+
+- `--dbv-kit-btn-foreground:` var(--color-white) - Default button text color
+- `--dbv-kit-btn-background:` var(--dbv-kit-color-primary-600) - Default button background color
+- `--dbv-kit-btn-background-hover:` var(--dbv-kit-color-primary-700) - Button hover background color
+- `--dbv-kit-btn-background-active:` var(--dbv-kit-color-primary-800) - Button active background color
+
+### Border
+
+- `--dbv-kit-btn-border-width:` 1px - Button border width
+- `--dbv-kit-btn-border-color:` transparent; --dbv-kit-btn-border-style: solid - Button border color and style
+- `--dbv-kit-btn-border-radius:` var(--radius-md) - Button border radius
+
+### Font
+
+- `--dbv-kit-btn-font-weight:` var(--font-weight-normal) - Button font weight
+- `--dbv-kit-btn-font-size:` calc(var(--dbv-kit-font-size-base) * 0.875) - Button font size, default for medium-sized button, other sizes calculated based on that value
+
+### Loader
+
+- `--dbv-kit-btn-loader-base-color:` var(--tw-color-white) - This color used in loader to mix with other button colors like `color: color-mix(in srgb, var(--dbv-kit-btn-foreground) 25%, var(--dbv-kit-btn-loader-base-color))`. It should be light in light mode and one of the dark colors for dark theme.
+- `--dbv-kit-btn-loader-animation:` var(--animate-spin) - Button loader animation
+
+### Others
+
+- `--dbv-kit-btn-disabled-opacity:` 0.5 - Button opacity when disabled
+
+## Specific buttons tokens
+
+### Button Sizes
+
+The `--dbv-kit-btn-*-height` tokens are used to define the height of buttons for different size variants. Default buttons use `--control-height-*` variable as the base height.
+
+- Small button height: `--dbv-kit-btn-small-height`
+- Medium button height: `--dbv-kit-btn-medium-height`
+- Large button height: `--dbv-kit-btn-large-height`
+- Extra large button height: `--dbv-kit-btn-xlarge-height`
+
+### Button Padding
+
+The `--dbv-kit-btn-*-padding-inline` tokens are used to define the padding of buttons for different size variants.
+
+- Small button padding: `--dbv-kit-btn-small-padding-inline`
+- Medium button padding: `--dbv-kit-btn-medium-padding-inline`
+- Large button padding: `--dbv-kit-btn-large-padding-inline`
+- Extra large button padding: `--dbv-kit-btn-xlarge-padding-inline`
+
+### Button Colors
+
+- Primary button background: `--dbv-kit-btn-primary-background`
+- Primary button background (hover): `--dbv-kit-btn-primary-background-hover`
+- Primary button background (active): `--dbv-kit-btn-primary-background-active`
+- Secondary button background: `--dbv-kit-btn-secondary-background`
+- Secondary button background (hover): `--dbv-kit-btn-secondary-background-hover`
+- Secondary button background (active): `--dbv-kit-btn-secondary-background-active`
+- Secondary button border color: `--dbv-kit-btn-secondary-border-color`
+- Danger button background: `--dbv-kit-btn-danger-background`
+- Danger button background (hover): `--dbv-kit-btn-danger-background-hover`
+- Danger button background (active): `--dbv-kit-btn-danger-background-active`
+
+The `--dbv-kit-btn-*-background` and `--dbv-kit-btn-*-foreground` tokens are used to define the background and text color of buttons for different variants (primary, secondary, danger).
+
+To set another background or text color for your button, you can override the respective `--dbv-kit-btn-*` tokens in your CSS.
+
+### Button Borders
+
+Button border width: `--dbv-kit-btn-border-width`
+
+The `--dbv-kit-btn-border-width` token is used to define the border width of buttons.
+
+To change the border size of your button, you can override the `--dbv-kit-btn-border-width` token in your CSS.
