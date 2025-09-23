@@ -16,7 +16,7 @@ import { LocaleService } from './LocaleService.js';
 import { ClipboardBootstrap } from './Clipboard/ClipboardBootstrap.js';
 import { ClipboardService } from './Clipboard/ClipboardService.js';
 
-ModuleRegistry.add({
+export default ModuleRegistry.add({
   name: '@cloudbeaver/core-ui',
 
   configure: serviceCollection => {

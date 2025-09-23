@@ -9,6 +9,3 @@
 import './module.js';
 export * from './ACTION_LINK_OBJECT.js';
 export * from './KEY_BINDING_LINK_OBJECT.js';
-import { objectViewerNavTreeLinkPlugin } from './manifest.js';
-export { objectViewerNavTreeLinkPlugin };
-export default objectViewerNavTreeLinkPlugin;

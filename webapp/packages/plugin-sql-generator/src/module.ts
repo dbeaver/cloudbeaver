@@ -13,7 +13,7 @@ import { ScriptPreviewService } from './ScriptPreview/ScriptPreviewService.js';
 import { LocaleService } from './LocaleService.js';
 import { GeneratorMenuBootstrap } from './GeneratorMenuBootstrap.js';
 
-ModuleRegistry.add({
+export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-sql-generator',
 
   configure: serviceCollection => {

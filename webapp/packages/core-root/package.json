@@ -13,6 +13,7 @@
   "license": "Apache-2.0",
   "exports": {
     ".": "./lib/index.js",
+    "./module": "./lib/module.js",
     "./*": "./lib/*"
   },
   "scripts": {
@@ -41,7 +42,9 @@
     "@cloudbeaver/core-sdk": "workspace:*",
     "@cloudbeaver/tests-runner": "workspace:*",
     "@cloudbeaver/tsconfig": "workspace:*",
+    "@dbeaver/react-tests": "workspace:*",
     "msw": "^2",
+    "rimraf": "^6",
     "typescript": "^5",
     "vitest": "^3"
   }

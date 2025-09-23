@@ -11,7 +11,7 @@ import { VersionService } from './VersionService.js';
 import { VersionResource } from './VersionResource.js';
 import { VersionLocaleService } from './VersionLocaleService.js';
 
-ModuleRegistry.add({
+export default ModuleRegistry.add({
   name: '@cloudbeaver/core-version',
 
   configure: serviceCollection => {

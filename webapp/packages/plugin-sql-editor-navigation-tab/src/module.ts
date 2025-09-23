@@ -12,7 +12,7 @@ import { SqlEditorNavigatorService } from './SqlEditorNavigatorService.js';
 import { SqlEditorBootstrap } from './SqlEditorBootstrap.js';
 import { LocaleService } from './LocaleService.js';
 
-ModuleRegistry.add({
+export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-sql-editor-navigation-tab',
 
   configure: serviceCollection => {

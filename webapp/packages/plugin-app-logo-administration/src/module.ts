@@ -9,7 +9,7 @@
 import { Bootstrap, ModuleRegistry } from '@cloudbeaver/core-di';
 import { AppLogoAdministrationPluginBootstrap } from './PluginBootstrap.js';
 
-ModuleRegistry.add({
+export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-app-logo-administration',
 
   configure: serviceCollection => {
