@@ -7,7 +7,6 @@
  */
 
 import './module.js';
-export * from './manifest.js';
 export * from './NAVIGATION_TREE_SETTINGS_GROUP.js';
 export * from './NavTreeSettingsService.js';
 

@@ -7,13 +7,9 @@
  */
 
 import './module.js';
-import { navigationTreeRMPlugin } from './manifest.js';
 
 export * from './NavNodes/getResourceKeyFromNodeId.js';
 export * from './NavNodes/getResourceNodeId.js';
 export * from './NavNodes/getRmProjectNodeId.js';
 export * from './Tree/ResourceManagerTree.js';
 export * from './NavResourceNodeService.js';
-
-export { navigationTreeRMPlugin };
-export default navigationTreeRMPlugin;

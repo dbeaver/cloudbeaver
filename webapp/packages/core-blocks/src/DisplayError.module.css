@@ -19,6 +19,7 @@
   display: flex;
   margin: auto;
   padding: 16px 24px;
+  gap: 8px;
   flex-direction: column;
   align-items: center;
 }
@@ -29,4 +30,17 @@
 .details {
   padding: 8px 16px;
   white-space: pre-wrap;
+  font-size: 14px;
+
+  & summary {
+    cursor: pointer;
+    margin-bottom: 8px;
+  }
+
+  & code {
+    display: block;
+    font-size: 12px;
+    overflow: auto;
+    height: 250px;
+  }
 }

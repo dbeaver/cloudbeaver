@@ -18,7 +18,7 @@ import { ElementsTreeToolsMenuService } from './NavigationTree/ElementsTree/Elem
 import { ElementsTreeService } from './NavigationTree/ElementsTree/ElementsTreeService.js';
 import { LocaleService } from './LocaleService.js';
 
-ModuleRegistry.add({
+export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-navigation-tree',
 
   configure: serviceCollection => {

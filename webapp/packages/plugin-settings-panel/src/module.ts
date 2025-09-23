@@ -10,7 +10,7 @@ import { Bootstrap, ModuleRegistry } from '@cloudbeaver/core-di';
 import { SettingsPanelPluginBootstrap } from './SettingsPanelPluginBootstrap.js';
 import { LocaleService } from './LocaleService.js';
 
-ModuleRegistry.add({
+export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-settings-panel',
 
   configure: serviceCollection => {

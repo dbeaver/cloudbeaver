@@ -10,7 +10,7 @@ import { Bootstrap, ModuleRegistry } from '@cloudbeaver/core-di';
 import { CoreServerNotificationsBootstrap } from './CoreServerNotificationsBootstrap.js';
 import { ServerNotificationsEventHandler } from './ServerNotificationsEventHandler.js';
 
-ModuleRegistry.add({
+export default ModuleRegistry.add({
   name: '@cloudbeaver/core-server-notifications',
 
   configure: serviceCollection => {

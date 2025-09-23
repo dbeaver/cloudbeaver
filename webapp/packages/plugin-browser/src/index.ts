@@ -7,7 +7,3 @@
  */
 
 import './module.js';
-import { browserPlugin } from './manifest.js';
-
-export default browserPlugin;
-export { browserPlugin };

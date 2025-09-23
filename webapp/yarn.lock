@@ -1402,8 +1402,9 @@ __metadata:
     "@cloudbeaver/core-utils": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
     "@dbeaver/cli": "workspace:*"
-    "@dbeaver/js-helpers": "workspace:^"
+    "@dbeaver/js-helpers": "workspace:*"
     mobx: "npm:^6"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
   languageName: unknown
@@ -1429,12 +1430,13 @@ __metadata:
     "@cloudbeaver/core-utils": "workspace:*"
     "@cloudbeaver/core-version": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
-    "@dbeaver/ui-kit": "workspace:^"
+    "@dbeaver/ui-kit": "workspace:*"
     "@types/react": "npm:^19"
     mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
     react: "npm:^19"
     react-dom: "npm:^19"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
@@ -1460,8 +1462,8 @@ __metadata:
     "@cloudbeaver/tests-runner": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
     "@dbeaver/cli": "workspace:*"
-    "@dbeaver/js-helpers": "workspace:^"
-    "@dbeaver/react-tests": "workspace:^"
+    "@dbeaver/js-helpers": "workspace:*"
+    "@dbeaver/react-tests": "workspace:*"
     mobx: "npm:^6"
     msw: "npm:^2"
     rimraf: "npm:^6"
@@ -1491,7 +1493,7 @@ __metadata:
     "@cloudbeaver/tsconfig": "workspace:*"
     "@dbeaver/cli": "workspace:*"
     "@dbeaver/js-helpers": "workspace:*"
-    "@dbeaver/react-tests": "workspace:^"
+    "@dbeaver/react-tests": "workspace:*"
     "@dbeaver/ui-kit": "workspace:*"
     "@testing-library/jest-dom": "npm:^6"
     "@testing-library/react": "npm:^16"
@@ -1506,6 +1508,7 @@ __metadata:
     react-minisearch: "npm:^7"
     reakit: "npm:^1"
     reakit-utils: "npm:^0"
+    rimraf: "npm:^6"
     subscript: "npm:^9"
     tslib: "npm:^2"
     typescript: "npm:^5"
@@ -1518,49 +1521,18 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/core-bootstrap@workspace:packages/core-bootstrap"
   dependencies:
-    "@cloudbeaver/core-administration": "workspace:*"
     "@cloudbeaver/core-app": "workspace:*"
-    "@cloudbeaver/core-authentication": "workspace:*"
     "@cloudbeaver/core-blocks": "workspace:*"
-    "@cloudbeaver/core-browser": "workspace:*"
-    "@cloudbeaver/core-browser-cookies": "workspace:*"
-    "@cloudbeaver/core-browser-settings": "workspace:*"
     "@cloudbeaver/core-cli": "workspace:*"
-    "@cloudbeaver/core-client-activity": "workspace:*"
-    "@cloudbeaver/core-connections": "workspace:*"
     "@cloudbeaver/core-di": "workspace:*"
-    "@cloudbeaver/core-dialogs": "workspace:*"
-    "@cloudbeaver/core-events": "workspace:*"
     "@cloudbeaver/core-executor": "workspace:*"
-    "@cloudbeaver/core-links": "workspace:*"
-    "@cloudbeaver/core-localization": "workspace:*"
-    "@cloudbeaver/core-navigation-tree": "workspace:*"
-    "@cloudbeaver/core-product": "workspace:*"
-    "@cloudbeaver/core-projects": "workspace:*"
-    "@cloudbeaver/core-resource": "workspace:*"
-    "@cloudbeaver/core-resource-manager": "workspace:*"
-    "@cloudbeaver/core-root": "workspace:*"
-    "@cloudbeaver/core-routing": "workspace:*"
-    "@cloudbeaver/core-sdk": "workspace:*"
-    "@cloudbeaver/core-server-localization": "workspace:*"
-    "@cloudbeaver/core-server-notifications": "workspace:*"
-    "@cloudbeaver/core-session-localization": "workspace:*"
-    "@cloudbeaver/core-settings": "workspace:*"
-    "@cloudbeaver/core-settings-localization": "workspace:*"
-    "@cloudbeaver/core-settings-user": "workspace:*"
-    "@cloudbeaver/core-storage": "workspace:*"
-    "@cloudbeaver/core-task-manager": "workspace:*"
-    "@cloudbeaver/core-theming": "workspace:*"
-    "@cloudbeaver/core-ui": "workspace:*"
-    "@cloudbeaver/core-version": "workspace:*"
-    "@cloudbeaver/core-version-update": "workspace:*"
-    "@cloudbeaver/core-view": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
     "@types/react": "npm:^19"
     "@types/react-dom": "npm:^19"
     mobx: "npm:^6"
     react: "npm:^19"
     react-dom: "npm:^19"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
@@ -1576,6 +1548,7 @@ __metadata:
     "@cloudbeaver/core-di": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
     "@dbeaver/cli": "workspace:*"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
   languageName: unknown
@@ -1592,7 +1565,8 @@ __metadata:
     "@cloudbeaver/core-utils": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
     "@dbeaver/cli": "workspace:*"
-    "@dbeaver/react-tests": "workspace:^"
+    "@dbeaver/react-tests": "workspace:*"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
     vitest: "npm:^3"
@@ -1611,6 +1585,7 @@ __metadata:
     "@dbeaver/cli": "workspace:*"
     dexie: "npm:^4"
     mobx: "npm:^6"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
     vite: "npm:^7"
@@ -1629,7 +1604,6 @@ __metadata:
   resolution: "@cloudbeaver/core-cli@workspace:packages/core-cli"
   dependencies:
     "@cloudbeaver/tsconfig": "workspace:*"
-    "@swc/core": "npm:^1"
     "@types/js-yaml": "npm:^4"
     "@types/node": "npm:^22"
     enquirer: "npm:^2"
@@ -1658,8 +1632,9 @@ __metadata:
     "@cloudbeaver/core-executor": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
     "@dbeaver/cli": "workspace:*"
-    "@dbeaver/react-tests": "workspace:^"
+    "@dbeaver/react-tests": "workspace:*"
     mobx: "npm:^6"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
     vitest: "npm:^3"
@@ -1688,10 +1663,11 @@ __metadata:
     "@cloudbeaver/core-settings": "workspace:*"
     "@cloudbeaver/core-utils": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
-    "@dbeaver/js-helpers": "workspace:^"
+    "@dbeaver/js-helpers": "workspace:*"
     "@types/react": "npm:^19"
     mobx: "npm:^6"
     react: "npm:^19"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
   languageName: unknown
@@ -1708,6 +1684,7 @@ __metadata:
     "@types/react": "npm:^19"
     mobx: "npm:^6"
     react: "npm:^19"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
   languageName: unknown
@@ -1721,12 +1698,12 @@ __metadata:
     "@cloudbeaver/core-executor": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
     "@dbeaver/cli": "workspace:*"
-    "@dbeaver/react-tests": "workspace:^"
+    "@dbeaver/react-tests": "workspace:*"
     "@types/react": "npm:^19"
-    "@wroud/di": "npm:^0"
+    "@wroud/di": "npm:^0.18.3"
     "@wroud/di-react": "npm:^0"
-    mobx: "npm:^6"
     react: "npm:^19"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
     vitest: "npm:^3"
@@ -1742,6 +1719,7 @@ __metadata:
     "@cloudbeaver/core-utils": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
     mobx: "npm:^6"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
   languageName: unknown
@@ -1760,8 +1738,9 @@ __metadata:
     "@cloudbeaver/core-utils": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
     "@dbeaver/cli": "workspace:*"
-    "@dbeaver/react-tests": "workspace:^"
+    "@dbeaver/react-tests": "workspace:*"
     mobx: "npm:^6"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
     vitest: "npm:^3"
@@ -1776,6 +1755,7 @@ __metadata:
     "@cloudbeaver/tsconfig": "workspace:*"
     "@dbeaver/cli": "workspace:*"
     mobx: "npm:^6"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
   languageName: unknown
@@ -1787,6 +1767,7 @@ __metadata:
   dependencies:
     "@cloudbeaver/core-cli": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
   languageName: unknown
@@ -1797,9 +1778,9 @@ __metadata:
   resolution: "@cloudbeaver/core-links@workspace:packages/core-links"
   dependencies:
     "@cloudbeaver/core-cli": "workspace:*"
-    "@cloudbeaver/core-di": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
     "@dbeaver/cli": "workspace:*"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
   languageName: unknown
@@ -1814,8 +1795,9 @@ __metadata:
     "@cloudbeaver/core-executor": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
     "@dbeaver/cli": "workspace:*"
-    "@dbeaver/react-tests": "workspace:^"
+    "@dbeaver/react-tests": "workspace:*"
     mobx: "npm:^6"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
     vitest: "npm:^3"
@@ -1840,12 +1822,12 @@ __metadata:
     "@cloudbeaver/core-settings": "workspace:*"
     "@cloudbeaver/core-ui": "workspace:*"
     "@cloudbeaver/core-utils": "workspace:*"
-    "@cloudbeaver/tests-runner": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
     "@dbeaver/cli": "workspace:*"
-    "@dbeaver/js-helpers": "workspace:^"
-    "@dbeaver/react-tests": "workspace:^"
+    "@dbeaver/js-helpers": "workspace:*"
+    "@dbeaver/react-tests": "workspace:*"
     mobx: "npm:^6"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
     vitest: "npm:^3"
@@ -1867,6 +1849,7 @@ __metadata:
     react: "npm:^19"
     react-dom: "npm:^19"
     reakit: "npm:^1"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
@@ -1882,6 +1865,7 @@ __metadata:
     "@cloudbeaver/core-settings": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
     mobx: "npm:^6"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
   languageName: unknown
@@ -1904,6 +1888,7 @@ __metadata:
     "@cloudbeaver/core-utils": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
     mobx: "npm:^6"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
   languageName: unknown
@@ -1926,6 +1911,7 @@ __metadata:
     "@cloudbeaver/core-utils": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
     mobx: "npm:^6"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
   languageName: unknown
@@ -1936,13 +1922,13 @@ __metadata:
   resolution: "@cloudbeaver/core-resource@workspace:packages/core-resource"
   dependencies:
     "@cloudbeaver/core-cli": "workspace:*"
-    "@cloudbeaver/core-di": "workspace:*"
     "@cloudbeaver/core-executor": "workspace:*"
     "@cloudbeaver/core-utils": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
     "@dbeaver/cli": "workspace:*"
-    "@dbeaver/react-tests": "workspace:^"
+    "@dbeaver/react-tests": "workspace:*"
     mobx: "npm:^6"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
     vitest: "npm:^3"
@@ -1966,8 +1952,10 @@ __metadata:
     "@cloudbeaver/core-utils": "workspace:*"
     "@cloudbeaver/tests-runner": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
+    "@dbeaver/react-tests": "workspace:*"
     mobx: "npm:^6"
     msw: "npm:^2"
+    rimraf: "npm:^6"
     rxjs: "npm:^7"
     tslib: "npm:^2"
     typescript: "npm:^5"
@@ -1985,6 +1973,7 @@ __metadata:
     "@cloudbeaver/core-utils": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
     mobx: "npm:^6"
+    rimraf: "npm:^6"
     router5: "npm:^8"
     router5-plugin-browser: "npm:^8"
     tslib: "npm:^2"
@@ -2015,6 +2004,7 @@ __metadata:
     graphql-request: "npm:^7"
     graphql-tag: "npm:^2"
     mobx: "npm:^6"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
   languageName: unknown
@@ -2030,6 +2020,7 @@ __metadata:
     "@cloudbeaver/core-root": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
     "@dbeaver/cli": "workspace:*"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
   languageName: unknown
@@ -2063,6 +2054,7 @@ __metadata:
     "@cloudbeaver/core-settings-localization": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
     "@dbeaver/cli": "workspace:*"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
   languageName: unknown
@@ -2079,8 +2071,9 @@ __metadata:
     "@cloudbeaver/core-utils": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
     "@dbeaver/cli": "workspace:*"
-    "@dbeaver/react-tests": "workspace:^"
+    "@dbeaver/react-tests": "workspace:*"
     mobx: "npm:^6"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
     vitest: "npm:^3"
@@ -2102,6 +2095,7 @@ __metadata:
     "@cloudbeaver/tsconfig": "workspace:*"
     "@dbeaver/cli": "workspace:*"
     mobx: "npm:^6"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
   languageName: unknown
@@ -2119,9 +2113,10 @@ __metadata:
     "@cloudbeaver/tests-runner": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
     "@dbeaver/cli": "workspace:*"
-    "@dbeaver/js-helpers": "workspace:^"
-    "@dbeaver/react-tests": "workspace:^"
+    "@dbeaver/js-helpers": "workspace:*"
+    "@dbeaver/react-tests": "workspace:*"
     mobx: "npm:^6"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
     vitest: "npm:^3"
@@ -2137,6 +2132,7 @@ __metadata:
     "@cloudbeaver/core-di": "workspace:*"
     "@cloudbeaver/core-executor": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
   languageName: unknown
@@ -2152,6 +2148,7 @@ __metadata:
     "@cloudbeaver/core-utils": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
     mobx: "npm:^6"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
   languageName: unknown
@@ -2170,7 +2167,7 @@ __metadata:
     "@cloudbeaver/core-utils": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
     "@dbeaver/cli": "workspace:*"
-    "@dbeaver/react-tests": "workspace:^"
+    "@dbeaver/react-tests": "workspace:*"
     "@dbeaver/ui-kit": "workspace:^"
     "@fontsource/roboto": "npm:^5"
     "@material/button": "npm:^4"
@@ -2183,6 +2180,7 @@ __metadata:
     "@material/theme": "npm:^4"
     "@material/typography": "npm:^4"
     mobx: "npm:^6"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
@@ -2206,7 +2204,7 @@ __metadata:
     "@cloudbeaver/core-utils": "workspace:*"
     "@cloudbeaver/core-view": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
-    "@dbeaver/js-helpers": "workspace:^"
+    "@dbeaver/js-helpers": "workspace:*"
     "@types/react": "npm:^19"
     mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
@@ -2215,6 +2213,7 @@ __metadata:
     react-dnd-html5-backend: "npm:^16"
     react-dom: "npm:^19"
     reakit: "npm:^1"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
@@ -2229,7 +2228,7 @@ __metadata:
     "@cloudbeaver/tests-runner": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
     "@dbeaver/cli": "workspace:*"
-    "@dbeaver/react-tests": "workspace:^"
+    "@dbeaver/react-tests": "workspace:*"
     "@timohausmann/quadtree-ts": "npm:^2"
     "@types/md5": "npm:^2"
     "@types/underscore": "npm:^1"
@@ -2238,6 +2237,7 @@ __metadata:
     fast-deep-equal: "npm:^3"
     md5: "npm:^2"
     mobx: "npm:^6"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
     underscore: "npm:^1"
@@ -2262,6 +2262,7 @@ __metadata:
     "@types/react": "npm:^19"
     mobx: "npm:^6"
     react: "npm:^19"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
   languageName: unknown
@@ -2282,6 +2283,7 @@ __metadata:
     "@types/semver": "npm:^7"
     mobx: "npm:^6"
     react: "npm:^19"
+    rimraf: "npm:^6"
     semver: "npm:^7"
     tslib: "npm:^2"
     typescript: "npm:^5"
@@ -2300,12 +2302,13 @@ __metadata:
     "@cloudbeaver/core-localization": "workspace:*"
     "@cloudbeaver/core-utils": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
-    "@dbeaver/js-helpers": "workspace:^"
+    "@dbeaver/js-helpers": "workspace:*"
     "@types/react": "npm:^19"
     mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
     react: "npm:^19"
     react-dom: "npm:^19"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
@@ -2356,19 +2359,19 @@ __metadata:
     "@cloudbeaver/core-resource": "workspace:*"
     "@cloudbeaver/core-root": "workspace:*"
     "@cloudbeaver/core-routing": "workspace:*"
-    "@cloudbeaver/core-sdk": "workspace:*"
     "@cloudbeaver/core-ui": "workspace:*"
     "@cloudbeaver/core-utils": "workspace:*"
     "@cloudbeaver/core-view": "workspace:*"
     "@cloudbeaver/plugin-settings-menu": "workspace:*"
     "@cloudbeaver/plugin-top-app-bar": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
-    "@dbeaver/js-helpers": "workspace:^"
+    "@dbeaver/js-helpers": "workspace:*"
     "@types/react": "npm:^19"
     mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
     react: "npm:^19"
     react-dom: "npm:^19"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
@@ -2384,6 +2387,7 @@ __metadata:
     "@cloudbeaver/plugin-administration": "workspace:*"
     "@cloudbeaver/plugin-app-logo": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
   languageName: unknown
@@ -2407,6 +2411,7 @@ __metadata:
     mobx-react-lite: "npm:^4"
     react: "npm:^19"
     react-dom: "npm:^19"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
   languageName: unknown
@@ -2437,14 +2442,15 @@ __metadata:
     "@cloudbeaver/plugin-administration": "workspace:*"
     "@cloudbeaver/plugin-authentication": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
-    "@dbeaver/js-helpers": "workspace:^"
-    "@dbeaver/ui-kit": "workspace:^"
+    "@dbeaver/js-helpers": "workspace:*"
+    "@dbeaver/ui-kit": "workspace:*"
     "@types/react": "npm:^19"
     mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
     react: "npm:^19"
     react-dom: "npm:^19"
     reakit: "npm:^1"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
@@ -2478,6 +2484,7 @@ __metadata:
     mobx-react-lite: "npm:^4"
     react: "npm:^19"
     react-dom: "npm:^19"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
@@ -2493,6 +2500,7 @@ __metadata:
     "@cloudbeaver/core-di": "workspace:*"
     "@cloudbeaver/core-localization": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
   languageName: unknown
@@ -2521,7 +2529,7 @@ __metadata:
     "@codemirror/search": "npm:^6"
     "@codemirror/state": "npm:^6"
     "@codemirror/view": "npm:^6"
-    "@dbeaver/ui-kit": "workspace:^"
+    "@dbeaver/ui-kit": "workspace:*"
     "@lezer/common": "npm:^1"
     "@lezer/highlight": "npm:^1"
     "@types/react": "npm:^19"
@@ -2530,6 +2538,7 @@ __metadata:
     mobx-react-lite: "npm:^4"
     react: "npm:^19"
     react-dom: "npm:^19"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
@@ -2564,6 +2573,7 @@ __metadata:
     mobx-react-lite: "npm:^4"
     react: "npm:^19"
     react-dom: "npm:^19"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
@@ -2597,6 +2607,7 @@ __metadata:
     mobx-react-lite: "npm:^4"
     react: "npm:^19"
     react-dom: "npm:^19"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
@@ -2624,12 +2635,12 @@ __metadata:
     "@cloudbeaver/core-utils": "workspace:*"
     "@cloudbeaver/plugin-connections": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
-    "@dbeaver/js-helpers": "workspace:^"
     "@types/react": "npm:^19"
     mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
     react: "npm:^19"
     react-dom: "npm:^19"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
@@ -2665,13 +2676,14 @@ __metadata:
     "@cloudbeaver/plugin-projects": "workspace:*"
     "@cloudbeaver/plugin-top-app-bar": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
-    "@dbeaver/jdbc-uri-parser": "workspace:^"
-    "@dbeaver/js-helpers": "workspace:^"
+    "@dbeaver/jdbc-uri-parser": "workspace:*"
+    "@dbeaver/js-helpers": "workspace:*"
     "@types/react": "npm:^19"
     mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
     react: "npm:^19"
     react-dom: "npm:^19"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
@@ -2683,13 +2695,13 @@ __metadata:
   resolution: "@cloudbeaver/plugin-d3js@workspace:packages/plugin-d3js"
   dependencies:
     "@cloudbeaver/core-cli": "workspace:*"
-    "@cloudbeaver/core-di": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
     "@dbeaver/cli": "workspace:*"
     "@types/d3": "npm:^7"
     "@types/d3-drag": "npm:^3"
     d3: "npm:^7"
     d3-drag: "npm:^3"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
   languageName: unknown
@@ -2702,9 +2714,7 @@ __metadata:
     "@cloudbeaver/core-cli": "workspace:*"
     "@cloudbeaver/core-di": "workspace:*"
     "@cloudbeaver/core-localization": "workspace:*"
-    "@cloudbeaver/core-root": "workspace:*"
     "@cloudbeaver/core-settings": "workspace:*"
-    "@cloudbeaver/core-utils": "workspace:*"
     "@cloudbeaver/plugin-data-import": "workspace:*"
     "@cloudbeaver/plugin-data-viewer": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
@@ -2742,6 +2752,7 @@ __metadata:
     mobx-react-lite: "npm:^4"
     react: "npm:^19"
     react-dom: "npm:^19"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
@@ -2758,12 +2769,13 @@ __metadata:
     "@cloudbeaver/tsconfig": "workspace:*"
     "@dbeaver/cli": "workspace:*"
     "@dbeaver/react-data-grid": "workspace:*"
-    "@dbeaver/ui-kit": "workspace:^"
+    "@dbeaver/ui-kit": "workspace:*"
     "@types/react": "npm:^19"
     mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
     react: "npm:^19"
     react-dom: "npm:^19"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
@@ -2795,6 +2807,7 @@ __metadata:
     mobx-react-lite: "npm:^4"
     react: "npm:^19"
     react-dom: "npm:^19"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
@@ -2812,7 +2825,6 @@ __metadata:
     "@cloudbeaver/core-di": "workspace:*"
     "@cloudbeaver/core-dialogs": "workspace:*"
     "@cloudbeaver/core-events": "workspace:*"
-    "@cloudbeaver/core-executor": "workspace:*"
     "@cloudbeaver/core-localization": "workspace:*"
     "@cloudbeaver/core-sdk": "workspace:*"
     "@cloudbeaver/core-settings": "workspace:*"
@@ -2823,18 +2835,16 @@ __metadata:
     "@cloudbeaver/plugin-data-viewer": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
     "@dbeaver/cli": "workspace:*"
-    "@dbeaver/js-helpers": "workspace:^"
-    "@dbeaver/react-tests": "workspace:^"
-    "@dbeaver/result-set-api": "workspace:^"
-    "@dbeaver/ui-kit": "workspace:^"
-    "@popperjs/core": "npm:^2"
+    "@dbeaver/react-tests": "workspace:*"
+    "@dbeaver/result-set-api": "workspace:*"
+    "@dbeaver/ui-kit": "workspace:*"
     "@types/react": "npm:^19"
     "@types/react-dom": "npm:^19"
     mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
     react: "npm:^19"
     react-dom: "npm:^19"
-    react-popper: "npm:^2"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
@@ -2866,6 +2876,7 @@ __metadata:
     mobx-react-lite: "npm:^4"
     react: "npm:^19"
     react-dom: "npm:^19"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
@@ -2890,6 +2901,7 @@ __metadata:
     mobx-react-lite: "npm:^4"
     react: "npm:^19"
     react-dom: "npm:^19"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
@@ -2924,15 +2936,16 @@ __metadata:
     "@cloudbeaver/plugin-object-viewer": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
     "@dbeaver/cli": "workspace:*"
-    "@dbeaver/js-helpers": "workspace:^"
-    "@dbeaver/react-tests": "workspace:^"
-    "@dbeaver/result-set-api": "workspace:^"
+    "@dbeaver/js-helpers": "workspace:*"
+    "@dbeaver/react-tests": "workspace:*"
+    "@dbeaver/result-set-api": "workspace:*"
     "@types/react": "npm:^19"
     mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
     react: "npm:^19"
     react-dom: "npm:^19"
     reflect-metadata: "npm:^0"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
@@ -2966,6 +2979,7 @@ __metadata:
     mobx-react-lite: "npm:^4"
     react: "npm:^19"
     react-dom: "npm:^19"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
@@ -2998,12 +3012,13 @@ __metadata:
     "@cloudbeaver/plugin-tools-panel": "workspace:*"
     "@cloudbeaver/plugin-top-app-bar": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
-    "@dbeaver/js-helpers": "workspace:^"
+    "@dbeaver/js-helpers": "workspace:*"
     "@types/react": "npm:^19"
     mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
     react: "npm:^19"
     react-dom: "npm:^19"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
@@ -3036,6 +3051,7 @@ __metadata:
     mobx-react-lite: "npm:^4"
     react: "npm:^19"
     react-dom: "npm:^19"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
@@ -3063,6 +3079,7 @@ __metadata:
     mobx-react-lite: "npm:^4"
     react: "npm:^19"
     react-dom: "npm:^19"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
@@ -3093,6 +3110,7 @@ __metadata:
     react: "npm:^19"
     react-dom: "npm:^19"
     react-leaflet: "npm:^5"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
@@ -3126,8 +3144,12 @@ __metadata:
     "@cloudbeaver/plugin-top-app-bar": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
     "@types/react": "npm:^19"
+    "@types/react-dom": "npm:^19"
+    mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
     react: "npm:^19"
+    react-dom: "npm:^19"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
@@ -3143,6 +3165,7 @@ __metadata:
     "@cloudbeaver/plugin-administration": "workspace:*"
     "@cloudbeaver/plugin-holidays": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
   languageName: unknown
@@ -3163,6 +3186,7 @@ __metadata:
     mobx-react-lite: "npm:^4"
     react: "npm:^19"
     react-dom: "npm:^19"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
@@ -3179,6 +3203,7 @@ __metadata:
     "@cloudbeaver/core-utils": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
     mobx: "npm:^6"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
   languageName: unknown
@@ -3202,12 +3227,13 @@ __metadata:
     "@cloudbeaver/plugin-tools-panel": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
     "@dbeaver/cli": "workspace:*"
-    "@dbeaver/react-tests": "workspace:^"
+    "@dbeaver/react-tests": "workspace:*"
     "@types/react": "npm:^19"
     mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
     react: "npm:^19"
     react-dom: "npm:^19"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
@@ -3231,7 +3257,6 @@ __metadata:
     "@cloudbeaver/core-localization": "workspace:*"
     "@cloudbeaver/core-projects": "workspace:*"
     "@cloudbeaver/core-resource": "workspace:*"
-    "@cloudbeaver/core-root": "workspace:*"
     "@cloudbeaver/core-settings": "workspace:*"
     "@cloudbeaver/core-storage": "workspace:*"
     "@cloudbeaver/core-ui": "workspace:*"
@@ -3243,6 +3268,7 @@ __metadata:
     mobx-react-lite: "npm:^4"
     react: "npm:^19"
     react-dom: "npm:^19"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
@@ -3270,6 +3296,7 @@ __metadata:
     mobx-react-lite: "npm:^4"
     react: "npm:^19"
     react-dom: "npm:^19"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
@@ -3301,12 +3328,13 @@ __metadata:
     "@cloudbeaver/plugin-resource-manager": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
     "@dbeaver/cli": "workspace:*"
-    "@dbeaver/js-helpers": "workspace:^"
+    "@dbeaver/js-helpers": "workspace:*"
     "@types/react": "npm:^19"
     mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
     react: "npm:^19"
     react-dom: "npm:^19"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
@@ -3336,13 +3364,14 @@ __metadata:
     "@cloudbeaver/core-view": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
     "@dbeaver/cli": "workspace:*"
-    "@dbeaver/js-helpers": "workspace:^"
-    "@dbeaver/react-tests": "workspace:^"
+    "@dbeaver/js-helpers": "workspace:*"
+    "@dbeaver/react-tests": "workspace:*"
     "@types/react": "npm:^19"
     mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
     react: "npm:^19"
     react-dom: "npm:^19"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
@@ -3362,6 +3391,7 @@ __metadata:
     "@cloudbeaver/plugin-datasource-context-switch": "workspace:*"
     "@cloudbeaver/plugin-navigation-tree": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
   languageName: unknown
@@ -3391,13 +3421,15 @@ __metadata:
     "@cloudbeaver/plugin-navigation-tabs": "workspace:*"
     "@cloudbeaver/plugin-navigation-tree": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
-    "@dbeaver/js-helpers": "workspace:^"
+    "@dbeaver/js-helpers": "workspace:*"
+    "@dbeaver/ui-kit": "workspace:*"
     "@types/react": "npm:^19"
     mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
     react: "npm:^19"
     react-dom: "npm:^19"
     reakit: "npm:^1"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
@@ -3424,6 +3456,7 @@ __metadata:
     mobx-react-lite: "npm:^4"
     react: "npm:^19"
     react-dom: "npm:^19"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
@@ -3452,6 +3485,7 @@ __metadata:
     mobx-react-lite: "npm:^4"
     react: "npm:^19"
     react-dom: "npm:^19"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
@@ -3476,6 +3510,7 @@ __metadata:
     mobx-react-lite: "npm:^4"
     react: "npm:^19"
     react-dom: "npm:^19"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
@@ -3497,6 +3532,7 @@ __metadata:
     mobx-react-lite: "npm:^4"
     react: "npm:^19"
     react-dom: "npm:^19"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
   languageName: unknown
@@ -3531,6 +3567,7 @@ __metadata:
     mobx-react-lite: "npm:^4"
     react: "npm:^19"
     react-dom: "npm:^19"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
   languageName: unknown
@@ -3553,8 +3590,9 @@ __metadata:
     "@cloudbeaver/core-utils": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
     "@dbeaver/cli": "workspace:*"
-    "@dbeaver/react-tests": "workspace:^"
+    "@dbeaver/react-tests": "workspace:*"
     mobx: "npm:^6"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
     vitest: "npm:^3"
@@ -3580,6 +3618,7 @@ __metadata:
     mobx-react-lite: "npm:^4"
     react: "npm:^19"
     react-dom: "npm:^19"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
@@ -3607,6 +3646,115 @@ __metadata:
     mobx-react-lite: "npm:^4"
     react: "npm:^19"
     react-dom: "npm:^19"
+    rimraf: "npm:^6"
+    tslib: "npm:^2"
+    typescript: "npm:^5"
+  languageName: unknown
+  linkType: soft
+
+"@cloudbeaver/plugin-set-common@workspace:*, @cloudbeaver/plugin-set-common@workspace:packages/plugin-set-common":
+  version: 0.0.0-use.local
+  resolution: "@cloudbeaver/plugin-set-common@workspace:packages/plugin-set-common"
+  dependencies:
+    "@cloudbeaver/core-administration": "workspace:*"
+    "@cloudbeaver/core-app": "workspace:*"
+    "@cloudbeaver/core-authentication": "workspace:*"
+    "@cloudbeaver/core-blocks": "workspace:*"
+    "@cloudbeaver/core-browser": "workspace:*"
+    "@cloudbeaver/core-browser-cookies": "workspace:*"
+    "@cloudbeaver/core-browser-settings": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-client-activity": "workspace:*"
+    "@cloudbeaver/core-connections": "workspace:*"
+    "@cloudbeaver/core-dialogs": "workspace:*"
+    "@cloudbeaver/core-events": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-navigation-tree": "workspace:*"
+    "@cloudbeaver/core-product": "workspace:*"
+    "@cloudbeaver/core-projects": "workspace:*"
+    "@cloudbeaver/core-resource-manager": "workspace:*"
+    "@cloudbeaver/core-root": "workspace:*"
+    "@cloudbeaver/core-routing": "workspace:*"
+    "@cloudbeaver/core-sdk": "workspace:*"
+    "@cloudbeaver/core-server-localization": "workspace:*"
+    "@cloudbeaver/core-server-notifications": "workspace:*"
+    "@cloudbeaver/core-session-localization": "workspace:*"
+    "@cloudbeaver/core-settings": "workspace:*"
+    "@cloudbeaver/core-settings-localization": "workspace:*"
+    "@cloudbeaver/core-settings-user": "workspace:*"
+    "@cloudbeaver/core-storage": "workspace:*"
+    "@cloudbeaver/core-task-manager": "workspace:*"
+    "@cloudbeaver/core-theming": "workspace:*"
+    "@cloudbeaver/core-ui": "workspace:*"
+    "@cloudbeaver/core-version": "workspace:*"
+    "@cloudbeaver/core-version-update": "workspace:*"
+    "@cloudbeaver/core-view": "workspace:*"
+    "@cloudbeaver/plugin-administration": "workspace:*"
+    "@cloudbeaver/plugin-app-logo": "workspace:*"
+    "@cloudbeaver/plugin-app-logo-administration": "workspace:*"
+    "@cloudbeaver/plugin-authentication": "workspace:*"
+    "@cloudbeaver/plugin-authentication-administration": "workspace:*"
+    "@cloudbeaver/plugin-browser": "workspace:*"
+    "@cloudbeaver/plugin-codemirror6": "workspace:*"
+    "@cloudbeaver/plugin-connection-custom": "workspace:*"
+    "@cloudbeaver/plugin-connection-search": "workspace:*"
+    "@cloudbeaver/plugin-connections": "workspace:*"
+    "@cloudbeaver/plugin-connections-administration": "workspace:*"
+    "@cloudbeaver/plugin-data-export": "workspace:*"
+    "@cloudbeaver/plugin-data-grid": "workspace:*"
+    "@cloudbeaver/plugin-data-import": "workspace:*"
+    "@cloudbeaver/plugin-data-spreadsheet-new": "workspace:*"
+    "@cloudbeaver/plugin-data-viewer": "workspace:*"
+    "@cloudbeaver/plugin-data-viewer-result-set-grouping": "workspace:*"
+    "@cloudbeaver/plugin-data-viewer-result-trace-details": "workspace:*"
+    "@cloudbeaver/plugin-datasource-context-switch": "workspace:*"
+    "@cloudbeaver/plugin-datasource-transaction-manager": "workspace:*"
+    "@cloudbeaver/plugin-ddl-viewer": "workspace:*"
+    "@cloudbeaver/plugin-devtools": "workspace:*"
+    "@cloudbeaver/plugin-gis-viewer": "workspace:*"
+    "@cloudbeaver/plugin-help": "workspace:*"
+    "@cloudbeaver/plugin-holidays": "workspace:*"
+    "@cloudbeaver/plugin-holidays-administration": "workspace:*"
+    "@cloudbeaver/plugin-localization": "workspace:*"
+    "@cloudbeaver/plugin-log-viewer": "workspace:*"
+    "@cloudbeaver/plugin-navigation-tabs": "workspace:*"
+    "@cloudbeaver/plugin-navigation-tree": "workspace:*"
+    "@cloudbeaver/plugin-navigation-tree-filters": "workspace:*"
+    "@cloudbeaver/plugin-navigation-tree-rm": "workspace:*"
+    "@cloudbeaver/plugin-object-viewer": "workspace:*"
+    "@cloudbeaver/plugin-object-viewer-nav-tree-link": "workspace:*"
+    "@cloudbeaver/plugin-product": "workspace:*"
+    "@cloudbeaver/plugin-product-information-administration": "workspace:*"
+    "@cloudbeaver/plugin-projects": "workspace:*"
+    "@cloudbeaver/plugin-resource-manager": "workspace:*"
+    "@cloudbeaver/plugin-resource-manager-administration": "workspace:*"
+    "@cloudbeaver/plugin-resource-manager-scripts": "workspace:*"
+    "@cloudbeaver/plugin-root": "workspace:*"
+    "@cloudbeaver/plugin-session-expiration": "workspace:*"
+    "@cloudbeaver/plugin-settings-administration": "workspace:*"
+    "@cloudbeaver/plugin-settings-default-administration": "workspace:*"
+    "@cloudbeaver/plugin-settings-menu": "workspace:*"
+    "@cloudbeaver/plugin-settings-menu-administration": "workspace:*"
+    "@cloudbeaver/plugin-settings-panel": "workspace:*"
+    "@cloudbeaver/plugin-sql-editor": "workspace:*"
+    "@cloudbeaver/plugin-sql-editor-navigation-tab": "workspace:*"
+    "@cloudbeaver/plugin-sql-editor-navigation-tab-script": "workspace:*"
+    "@cloudbeaver/plugin-sql-editor-new": "workspace:*"
+    "@cloudbeaver/plugin-sql-editor-screen": "workspace:*"
+    "@cloudbeaver/plugin-sql-generator": "workspace:*"
+    "@cloudbeaver/plugin-system-information-administration": "workspace:*"
+    "@cloudbeaver/plugin-task-manager": "workspace:*"
+    "@cloudbeaver/plugin-theme": "workspace:*"
+    "@cloudbeaver/plugin-tools-panel": "workspace:*"
+    "@cloudbeaver/plugin-top-app-bar": "workspace:*"
+    "@cloudbeaver/plugin-top-app-bar-administration": "workspace:*"
+    "@cloudbeaver/plugin-user-profile": "workspace:*"
+    "@cloudbeaver/plugin-user-profile-administration": "workspace:*"
+    "@cloudbeaver/plugin-user-profile-settings": "workspace:*"
+    "@cloudbeaver/plugin-version": "workspace:*"
+    "@cloudbeaver/plugin-version-update-administration": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
   languageName: unknown
@@ -3622,7 +3770,6 @@ __metadata:
     "@cloudbeaver/core-di": "workspace:*"
     "@cloudbeaver/core-events": "workspace:*"
     "@cloudbeaver/core-localization": "workspace:*"
-    "@cloudbeaver/core-root": "workspace:*"
     "@cloudbeaver/core-settings": "workspace:*"
     "@cloudbeaver/core-ui": "workspace:*"
     "@cloudbeaver/plugin-settings-panel": "workspace:*"
@@ -3633,25 +3780,23 @@ __metadata:
     mobx-react-lite: "npm:^4"
     react: "npm:^19"
     react-dom: "npm:^19"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/plugin-settings-default-administration@workspace:^, @cloudbeaver/plugin-settings-default-administration@workspace:packages/plugin-settings-default-administration":
+"@cloudbeaver/plugin-settings-default-administration@workspace:*, @cloudbeaver/plugin-settings-default-administration@workspace:packages/plugin-settings-default-administration":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-settings-default-administration@workspace:packages/plugin-settings-default-administration"
   dependencies:
-    "@cloudbeaver/core-authentication": "workspace:*"
     "@cloudbeaver/core-cli": "workspace:*"
     "@cloudbeaver/core-di": "workspace:*"
     "@cloudbeaver/core-localization": "workspace:*"
     "@cloudbeaver/core-root": "workspace:*"
-    "@cloudbeaver/core-settings": "workspace:*"
-    "@cloudbeaver/core-utils": "workspace:*"
     "@cloudbeaver/plugin-settings-administration": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
-    mobx: "npm:^6"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
   languageName: unknown
@@ -3664,6 +3809,7 @@ __metadata:
     "@cloudbeaver/core-cli": "workspace:*"
     "@cloudbeaver/core-di": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
   languageName: unknown
@@ -3685,6 +3831,7 @@ __metadata:
     mobx-react-lite: "npm:^4"
     react: "npm:^19"
     react-dom: "npm:^19"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
   languageName: unknown
@@ -3704,13 +3851,14 @@ __metadata:
     "@cloudbeaver/plugin-navigation-tree": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
     "@dbeaver/cli": "workspace:*"
-    "@dbeaver/js-helpers": "workspace:^"
-    "@dbeaver/ui-kit": "workspace:^"
+    "@dbeaver/js-helpers": "workspace:*"
+    "@dbeaver/ui-kit": "workspace:*"
     "@types/react": "npm:^19"
     mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
     react: "npm:^19"
     react-dom: "npm:^19"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
@@ -3746,8 +3894,9 @@ __metadata:
     "@cloudbeaver/plugin-sql-editor": "workspace:*"
     "@cloudbeaver/plugin-sql-editor-navigation-tab": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
-    "@dbeaver/js-helpers": "workspace:^"
+    "@dbeaver/js-helpers": "workspace:*"
     mobx: "npm:^6"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
   languageName: unknown
@@ -3785,6 +3934,7 @@ __metadata:
     mobx-react-lite: "npm:^4"
     react: "npm:^19"
     react-dom: "npm:^19"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
@@ -3812,6 +3962,7 @@ __metadata:
     mobx-react-lite: "npm:^4"
     react: "npm:^19"
     react-dom: "npm:^19"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
@@ -3844,6 +3995,7 @@ __metadata:
     mobx-react-lite: "npm:^4"
     react: "npm:^19"
     react-dom: "npm:^19"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
   languageName: unknown
@@ -3878,12 +4030,14 @@ __metadata:
     "@cloudbeaver/plugin-navigation-tabs": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
     "@dbeaver/cli": "workspace:*"
-    "@dbeaver/react-tests": "workspace:^"
+    "@dbeaver/js-helpers": "workspace:^"
+    "@dbeaver/react-tests": "workspace:*"
     "@types/react": "npm:^19"
     mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
     react: "npm:^19"
     react-dom: "npm:^19"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
@@ -3917,6 +4071,7 @@ __metadata:
     mobx-react-lite: "npm:^4"
     react: "npm:^19"
     react-dom: "npm:^19"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
@@ -3928,8 +4083,8 @@ __metadata:
   resolution: "@cloudbeaver/plugin-sso@workspace:packages/plugin-sso"
   dependencies:
     "@cloudbeaver/core-cli": "workspace:*"
-    "@cloudbeaver/core-di": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
   languageName: unknown
@@ -3956,9 +4111,9 @@ __metadata:
     mobx-react-lite: "npm:^4"
     react: "npm:^19"
     react-dom: "npm:^19"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
-    typescript-plugin-css-modules: "npm:^5"
   languageName: unknown
   linkType: soft
 
@@ -3973,6 +4128,7 @@ __metadata:
     "@cloudbeaver/core-localization": "workspace:*"
     "@cloudbeaver/core-task-manager": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
   languageName: unknown
@@ -3985,6 +4141,7 @@ __metadata:
     "@cloudbeaver/core-cli": "workspace:*"
     "@cloudbeaver/core-di": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
   languageName: unknown
@@ -4010,6 +4167,7 @@ __metadata:
     mobx-react-lite: "npm:^4"
     react: "npm:^19"
     react-dom: "npm:^19"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
@@ -4028,6 +4186,7 @@ __metadata:
     "@cloudbeaver/tsconfig": "workspace:*"
     "@types/react": "npm:^19"
     react: "npm:^19"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
   languageName: unknown
@@ -4050,6 +4209,7 @@ __metadata:
     mobx-react-lite: "npm:^4"
     react: "npm:^19"
     react-dom: "npm:^19"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
@@ -4065,6 +4225,7 @@ __metadata:
     "@cloudbeaver/plugin-administration": "workspace:*"
     "@cloudbeaver/plugin-user-profile": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
   languageName: unknown
@@ -4093,6 +4254,7 @@ __metadata:
     mobx-react-lite: "npm:^4"
     react: "npm:^19"
     react-dom: "npm:^19"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
   languageName: unknown
@@ -4119,12 +4281,13 @@ __metadata:
     "@cloudbeaver/plugin-authentication": "workspace:*"
     "@cloudbeaver/plugin-top-app-bar": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
-    "@dbeaver/js-helpers": "workspace:^"
+    "@dbeaver/js-helpers": "workspace:*"
     "@types/react": "npm:^19"
     mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
     react: "npm:^19"
     react-dom: "npm:^19"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
@@ -4153,6 +4316,7 @@ __metadata:
     react: "npm:^19"
     react-dom: "npm:^19"
     react-markdown: "npm:^10"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
@@ -4166,6 +4330,7 @@ __metadata:
     "@cloudbeaver/core-cli": "workspace:*"
     "@cloudbeaver/core-di": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
   languageName: unknown
@@ -4184,6 +4349,7 @@ __metadata:
     "@wroud/vite-plugin-asset-resolver": "npm:^0"
     "@wroud/vite-plugin-tsc": "npm:^0"
     fs-extra: "npm:^11"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
     vite: "npm:^7"
@@ -4202,72 +4368,8 @@ __metadata:
     "@cloudbeaver/core-di": "workspace:*"
     "@cloudbeaver/core-localization": "workspace:*"
     "@cloudbeaver/core-version-update": "workspace:*"
-    "@cloudbeaver/plugin-administration": "workspace:*"
-    "@cloudbeaver/plugin-app-logo": "workspace:*"
-    "@cloudbeaver/plugin-app-logo-administration": "workspace:*"
-    "@cloudbeaver/plugin-authentication": "workspace:*"
-    "@cloudbeaver/plugin-authentication-administration": "workspace:*"
-    "@cloudbeaver/plugin-browser": "workspace:*"
-    "@cloudbeaver/plugin-codemirror6": "workspace:*"
-    "@cloudbeaver/plugin-connection-custom": "workspace:*"
-    "@cloudbeaver/plugin-connection-search": "workspace:*"
-    "@cloudbeaver/plugin-connections": "workspace:*"
-    "@cloudbeaver/plugin-connections-administration": "workspace:*"
     "@cloudbeaver/plugin-data-editor-public-settings": "workspace:*"
-    "@cloudbeaver/plugin-data-export": "workspace:*"
-    "@cloudbeaver/plugin-data-grid": "workspace:*"
-    "@cloudbeaver/plugin-data-import": "workspace:*"
-    "@cloudbeaver/plugin-data-spreadsheet-new": "workspace:*"
-    "@cloudbeaver/plugin-data-viewer": "workspace:*"
-    "@cloudbeaver/plugin-data-viewer-result-set-grouping": "workspace:*"
-    "@cloudbeaver/plugin-data-viewer-result-trace-details": "workspace:*"
-    "@cloudbeaver/plugin-datasource-context-switch": "workspace:*"
-    "@cloudbeaver/plugin-datasource-transaction-manager": "workspace:*"
-    "@cloudbeaver/plugin-ddl-viewer": "workspace:*"
-    "@cloudbeaver/plugin-devtools": "workspace:*"
-    "@cloudbeaver/plugin-gis-viewer": "workspace:*"
-    "@cloudbeaver/plugin-help": "workspace:*"
-    "@cloudbeaver/plugin-holidays": "workspace:*"
-    "@cloudbeaver/plugin-holidays-administration": "workspace:*"
-    "@cloudbeaver/plugin-localization": "workspace:*"
-    "@cloudbeaver/plugin-log-viewer": "workspace:*"
-    "@cloudbeaver/plugin-navigation-tabs": "workspace:*"
-    "@cloudbeaver/plugin-navigation-tree": "workspace:*"
-    "@cloudbeaver/plugin-navigation-tree-filters": "workspace:*"
-    "@cloudbeaver/plugin-navigation-tree-rm": "workspace:*"
-    "@cloudbeaver/plugin-object-viewer": "workspace:*"
-    "@cloudbeaver/plugin-object-viewer-nav-tree-link": "workspace:*"
-    "@cloudbeaver/plugin-product": "workspace:*"
-    "@cloudbeaver/plugin-product-information-administration": "workspace:*"
-    "@cloudbeaver/plugin-projects": "workspace:*"
-    "@cloudbeaver/plugin-resource-manager": "workspace:*"
-    "@cloudbeaver/plugin-resource-manager-administration": "workspace:*"
-    "@cloudbeaver/plugin-resource-manager-scripts": "workspace:*"
-    "@cloudbeaver/plugin-root": "workspace:*"
-    "@cloudbeaver/plugin-session-expiration": "workspace:*"
-    "@cloudbeaver/plugin-settings-administration": "workspace:*"
-    "@cloudbeaver/plugin-settings-default-administration": "workspace:^"
-    "@cloudbeaver/plugin-settings-menu": "workspace:*"
-    "@cloudbeaver/plugin-settings-menu-administration": "workspace:*"
-    "@cloudbeaver/plugin-settings-panel": "workspace:*"
-    "@cloudbeaver/plugin-sql-editor": "workspace:*"
-    "@cloudbeaver/plugin-sql-editor-navigation-tab": "workspace:*"
-    "@cloudbeaver/plugin-sql-editor-navigation-tab-script": "workspace:*"
-    "@cloudbeaver/plugin-sql-editor-new": "workspace:*"
-    "@cloudbeaver/plugin-sql-editor-screen": "workspace:*"
-    "@cloudbeaver/plugin-sql-generator": "workspace:*"
-    "@cloudbeaver/plugin-sso": "workspace:*"
-    "@cloudbeaver/plugin-system-information-administration": "workspace:*"
-    "@cloudbeaver/plugin-task-manager": "workspace:*"
-    "@cloudbeaver/plugin-theme": "workspace:*"
-    "@cloudbeaver/plugin-tools-panel": "workspace:*"
-    "@cloudbeaver/plugin-top-app-bar": "workspace:*"
-    "@cloudbeaver/plugin-top-app-bar-administration": "workspace:*"
-    "@cloudbeaver/plugin-user-profile": "workspace:*"
-    "@cloudbeaver/plugin-user-profile-administration": "workspace:*"
-    "@cloudbeaver/plugin-user-profile-settings": "workspace:*"
-    "@cloudbeaver/plugin-version": "workspace:*"
-    "@cloudbeaver/plugin-version-update-administration": "workspace:*"
+    "@cloudbeaver/plugin-set-common": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
     "@types/react": "npm:^19"
     react: "npm:^19"
@@ -4309,8 +4411,8 @@ __metadata:
     "@cloudbeaver/core-cli": "workspace:*"
     "@cloudbeaver/core-di": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
-    "@dbeaver/cli": "workspace:^"
-    "@dbeaver/react-tests": "workspace:^"
+    "@dbeaver/cli": "workspace:*"
+    "@dbeaver/react-tests": "workspace:*"
     "@testing-library/dom": "npm:^10"
     "@testing-library/jest-dom": "npm:^6"
     "@testing-library/react": "npm:^16"
@@ -4319,6 +4421,7 @@ __metadata:
     mobx: "npm:^6"
     react: "npm:^19"
     react-dom: "npm:^19"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
     vitest: "npm:^3"
@@ -4534,7 +4637,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@dbeaver/jdbc-uri-parser@workspace:^, @dbeaver/jdbc-uri-parser@workspace:common-typescript/@dbeaver/jdbc-uri-parser":
+"@dbeaver/jdbc-uri-parser@workspace:*, @dbeaver/jdbc-uri-parser@workspace:common-typescript/@dbeaver/jdbc-uri-parser":
   version: 0.0.0-use.local
   resolution: "@dbeaver/jdbc-uri-parser@workspace:common-typescript/@dbeaver/jdbc-uri-parser"
   dependencies:
@@ -4552,6 +4655,9 @@ __metadata:
     "@dbeaver/cli": "workspace:^"
     "@dbeaver/tsconfig": "workspace:^"
     async-mutex: "npm:^0"
+    p-debounce: "npm:^4.0.0"
+    p-memoize: "npm:^8.0.0"
+    quick-lru: "npm:^7.1.0"
     rimraf: "npm:^6"
     typescript: "npm:^5"
     vitest: "npm:^3"
@@ -4599,7 +4705,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@dbeaver/react-tests@workspace:^, @dbeaver/react-tests@workspace:common-react/@dbeaver/react-tests":
+"@dbeaver/react-tests@workspace:*, @dbeaver/react-tests@workspace:^, @dbeaver/react-tests@workspace:common-react/@dbeaver/react-tests":
   version: 0.0.0-use.local
   resolution: "@dbeaver/react-tests@workspace:common-react/@dbeaver/react-tests"
   dependencies:
@@ -4617,7 +4723,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@dbeaver/result-set-api@workspace:^, @dbeaver/result-set-api@workspace:common-typescript/@dbeaver/result-set-api":
+"@dbeaver/result-set-api@workspace:*, @dbeaver/result-set-api@workspace:common-typescript/@dbeaver/result-set-api":
   version: 0.0.0-use.local
   resolution: "@dbeaver/result-set-api@workspace:common-typescript/@dbeaver/result-set-api"
   dependencies:
@@ -6592,7 +6698,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@popperjs/core@npm:^2, @popperjs/core@npm:^2.5.4":
+"@popperjs/core@npm:^2.5.4":
   version: 2.11.8
   resolution: "@popperjs/core@npm:2.11.8"
   checksum: 10c0/4681e682abc006d25eb380d0cf3efc7557043f53b6aea7a5057d0d1e7df849a00e281cd8ea79c902a35a414d7919621fc2ba293ecec05f413598e0b23d5a1e63
@@ -7137,7 +7243,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@swc/core@npm:^1, @swc/core@npm:^1.12.11":
+"@swc/core@npm:^1.12.11":
   version: 1.13.5
   resolution: "@swc/core@npm:1.13.5"
   dependencies:
@@ -8401,10 +8507,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wroud/di@npm:^0":
-  version: 0.18.2
-  resolution: "@wroud/di@npm:0.18.2"
-  checksum: 10c0/1c5e80e398e1931163b6f095acc797056aecaf8740254c0ddcbf5850671d311c92bc1e6f3e3c4ac3c754e710dcd2e7c1ee1b1ba022edec66ca5beba061b2d8e0
+"@wroud/di@npm:^0, @wroud/di@npm:^0.18.3":
+  version: 0.18.3
+  resolution: "@wroud/di@npm:0.18.3"
+  checksum: 10c0/88f806e0c18ea0d4330c0db13bff65287471e7a568f969ecf52383def3804c6deac7332f4b28c3b4d1ec7d13d0c2869ce06b231a04861106d175f6419107b468
   languageName: node
   linkType: hard
 
@@ -14551,6 +14657,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"mimic-function@npm:^5.0.1":
+  version: 5.0.1
+  resolution: "mimic-function@npm:5.0.1"
+  checksum: 10c0/f3d9464dd1816ecf6bdf2aec6ba32c0728022039d992f178237d8e289b48764fee4131319e72eedd4f7f094e22ded0af836c3187a7edc4595d28dd74368fd81d
+  languageName: node
+  linkType: hard
+
 "min-indent@npm:^1.0.0":
   version: 1.0.1
   resolution: "min-indent@npm:1.0.1"
@@ -15129,6 +15242,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"p-debounce@npm:^4.0.0":
+  version: 4.0.0
+  resolution: "p-debounce@npm:4.0.0"
+  checksum: 10c0/2d50bcb53659ad4345ef59b220581ccb40d581528949d8c63547c22b418e9a92f5138617eb2f41cd03bed293ee78a3dbb9b2795f572a4044434b89f058ccdfa2
+  languageName: node
+  linkType: hard
+
 "p-limit@npm:3.1.0, p-limit@npm:^3.0.2":
   version: 3.1.0
   resolution: "p-limit@npm:3.1.0"
@@ -15178,6 +15298,16 @@ __metadata:
   version: 7.0.3
   resolution: "p-map@npm:7.0.3"
   checksum: 10c0/46091610da2b38ce47bcd1d8b4835a6fa4e832848a6682cf1652bc93915770f4617afc844c10a77d1b3e56d2472bb2d5622353fa3ead01a7f42b04fc8e744a5c
+  languageName: node
+  linkType: hard
+
+"p-memoize@npm:^8.0.0":
+  version: 8.0.0
+  resolution: "p-memoize@npm:8.0.0"
+  dependencies:
+    mimic-function: "npm:^5.0.1"
+    type-fest: "npm:^4.41.0"
+  checksum: 10c0/cd4333c42f67dee273bff855e18cb974fac61136605ae06c30e779f71fb0e390fbab5c87160dfd8b5f905154b41c3f41bcc2e9870b2ce9b5e5c2c912012261ca
   languageName: node
   linkType: hard
 
@@ -15736,6 +15866,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"quick-lru@npm:^7.1.0":
+  version: 7.1.0
+  resolution: "quick-lru@npm:7.1.0"
+  checksum: 10c0/ef2df33368a66e3d3b32a42c523fcd0939c03f6192ec7f29db36179e22f015d2c75790aa9ab530c719a0dd3fb510f972bc66acca4e92bc9f01f92f0e6c2084f2
+  languageName: node
+  linkType: hard
+
 "randombytes@npm:^2.1.0":
   version: 2.1.0
   resolution: "randombytes@npm:2.1.0"
@@ -15799,13 +15936,6 @@ __metadata:
   peerDependencies:
     react: ^19.1.1
   checksum: 10c0/8c91198510521299c56e4e8d5e3a4508b2734fb5e52f29eeac33811de64e76fe586ad32c32182e2e84e070d98df67125da346c3360013357228172dbcd20bcdd
-  languageName: node
-  linkType: hard
-
-"react-fast-compare@npm:^3.0.1":
-  version: 3.2.2
-  resolution: "react-fast-compare@npm:3.2.2"
-  checksum: 10c0/0bbd2f3eb41ab2ff7380daaa55105db698d965c396df73e6874831dbafec8c4b5b08ba36ff09df01526caa3c61595247e3269558c284e37646241cba2b90a367
   languageName: node
   linkType: hard
 
@@ -15894,20 +16024,6 @@ __metadata:
     minisearch: ^7.1.0
     react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
   checksum: 10c0/0f6f1bb0aef84fe58cacc1fdf8fca460017f2ede20db667e0da35580d43f4e96dfc974dabac2c6cbd75ca2021efe263916f604f14a0a4e9e2229a9f261c4a349
-  languageName: node
-  linkType: hard
-
-"react-popper@npm:^2":
-  version: 2.3.0
-  resolution: "react-popper@npm:2.3.0"
-  dependencies:
-    react-fast-compare: "npm:^3.0.1"
-    warning: "npm:^4.0.2"
-  peerDependencies:
-    "@popperjs/core": ^2.0.0
-    react: ^16.8.0 || ^17 || ^18
-    react-dom: ^16.8.0 || ^17 || ^18
-  checksum: 10c0/23f93540537ca4c035425bb8d5e51b11131fbc921d7ac1d041d0ae557feac8c877f3a012d36b94df8787803f52ed81e6df9257ac9e58719875f7805518d6db3f
   languageName: node
   linkType: hard
 
@@ -18015,7 +18131,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"type-fest@npm:^4.21.0, type-fest@npm:^4.26.1":
+"type-fest@npm:^4.21.0, type-fest@npm:^4.26.1, type-fest@npm:^4.41.0":
   version: 4.41.0
   resolution: "type-fest@npm:4.41.0"
   checksum: 10c0/f5ca697797ed5e88d33ac8f1fec21921839871f808dc59345c9cf67345bfb958ce41bd821165dbf3ae591cedec2bf6fe8882098dfdd8dc54320b859711a2c1e4
@@ -18748,15 +18864,6 @@ __metadata:
   version: 2.2.8
   resolution: "w3c-keyname@npm:2.2.8"
   checksum: 10c0/37cf335c90efff31672ebb345577d681e2177f7ff9006a9ad47c68c5a9d265ba4a7b39d6c2599ceea639ca9315584ce4bd9c9fbf7a7217bfb7a599e71943c4c4
-  languageName: node
-  linkType: hard
-
-"warning@npm:^4.0.2":
-  version: 4.0.3
-  resolution: "warning@npm:4.0.3"
-  dependencies:
-    loose-envify: "npm:^1.0.0"
-  checksum: 10c0/aebab445129f3e104c271f1637fa38e55eb25f968593e3825bd2f7a12bd58dc3738bb70dc8ec85826621d80b4acfed5a29ebc9da17397c6125864d72301b937e
   languageName: node
   linkType: hard
 

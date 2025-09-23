@@ -7,7 +7,6 @@
  */
 
 import './module.js';
-export * from './manifest.js';
 
 export * from './NavigationTabs/NavigationTabsService.js';
 export * from './NavigationTabs/TabNavigationContext.js';

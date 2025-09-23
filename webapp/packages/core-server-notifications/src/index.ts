@@ -7,7 +7,3 @@
  */
 
 import './module.js';
-import { coreServerNotificationsManifest } from './manifest.js';
-
-export default coreServerNotificationsManifest;
-export { coreServerNotificationsManifest };

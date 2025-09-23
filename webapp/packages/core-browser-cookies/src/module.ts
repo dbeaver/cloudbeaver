@@ -9,7 +9,7 @@
 import { ModuleRegistry } from '@cloudbeaver/core-di';
 import { CookiesService } from './CookiesService.js';
 
-ModuleRegistry.add({
+export default ModuleRegistry.add({
   name: '@cloudbeaver/core-browser-cookies',
 
   configure: serviceCollection => {
