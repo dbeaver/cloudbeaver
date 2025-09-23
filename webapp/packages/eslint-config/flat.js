@@ -5,6 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { defineConfig } from 'eslint/config';
 import cloudbeaverPlugin from '@cloudbeaver/eslint-plugin';
 import pluginReact from 'eslint-plugin-react';
 import reactHooks from 'eslint-plugin-react-hooks';
@@ -12,8 +13,10 @@ import tseslint from 'typescript-eslint';
 import eslint from '@eslint/js';
 import stylistic from '@stylistic/eslint-plugin';
 import eslintConfigPrettier from 'eslint-config-prettier';
+import storybook from 'eslint-plugin-storybook';
 
-export default tseslint.config(
+export default defineConfig(
+  storybook.configs['flat/recommended'],
   eslint.configs.recommended,
   tseslint.configs.recommended,
   pluginReact.configs.flat.recommended,
@@ -238,6 +241,6 @@ export default tseslint.config(
   },
   {
     files: ['**/*.cjs'],
-    ignores: ['**/lib'],
+    ignores: ['**/lib', '!.storybook'],
   },
 );
