@@ -24,10 +24,13 @@ import { useTree } from './useTree.js';
 import { useTreeDnD } from './useTreeDnD.js';
 import type { ITreeSelection } from './useTreeSelection.js';
 import { useTreeVirtualization } from './useTreeVirtualization.js';
+import { TreeMenuContextProvider } from './contexts/TreeMenuContext/TreeMenuContextProvider.js';
+import type { ITreeMenu } from './useTreeMenu.js';
 
 export interface NavigationTreeNewProps {
   data: ITreeData;
   selection?: ITreeSelection;
+  menu?: ITreeMenu;
   nodeRenderers?: INodeRenderer[];
   emptyPlaceholder?: NodeEmptyPlaceholderComponent;
   className?: string;
@@ -40,6 +43,7 @@ export interface NavigationTreeNewProps {
 export const Tree = observer<NavigationTreeNewProps>(function Tree({
   data,
   selection,
+  menu,
   nodeRenderers,
   emptyPlaceholder,
   className,
@@ -69,7 +73,9 @@ export const Tree = observer<NavigationTreeNewProps>(function Tree({
             <TreeVirtualizationContext.Provider value={mountOptimization}>
               <TreeContext.Provider value={tree}>
                 <TreeDnDContext.Provider value={treeDnD}>
-                  <NodeChildren nodeId={data.rootId} offsetHeight={0} emptyPlaceholder={emptyPlaceholder} root />
+                  <TreeMenuContextProvider menu={menu ?? null}>
+                    <NodeChildren nodeId={data.rootId} offsetHeight={0} emptyPlaceholder={emptyPlaceholder} root />
+                  </TreeMenuContextProvider>
                 </TreeDnDContext.Provider>
               </TreeContext.Provider>
             </TreeVirtualizationContext.Provider>

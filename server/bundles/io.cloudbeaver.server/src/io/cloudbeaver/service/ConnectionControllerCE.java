@@ -20,7 +20,6 @@ import io.cloudbeaver.*;
 import io.cloudbeaver.model.WebConnectionConfig;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.WebNetworkHandlerConfigInput;
-import io.cloudbeaver.model.WebPropertyInfo;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.utils.ServletAppUtils;
 import io.cloudbeaver.utils.WebDataSourceUtils;
@@ -480,10 +479,6 @@ public class ConnectionControllerCE implements ConnectionController {
 
     @Override
     public void validateConnection(DBPDataSourceContainer dataSourceContainer) throws DBWebException {
-    }
-
-    public WebPropertyInfo[] getExternalInfo(WebSession session) {
-        return null;
     }
 
 
