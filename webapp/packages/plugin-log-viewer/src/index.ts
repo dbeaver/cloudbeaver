@@ -7,11 +7,7 @@
  */
 
 import './module.js';
-import { logViewerPlugin } from './manifest.js';
 
 export * from './LogViewer/LogViewerBootstrap.js';
 export * from './LogViewer/LogViewerService.js';
 export * from './LogViewer/LogViewerSettingsService.js';
-
-export { logViewerPlugin };
-export default logViewerPlugin;

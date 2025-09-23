@@ -7,7 +7,6 @@
  */
 
 import './module.js';
-import { connectionPlugin } from './manifest.js';
 
 export * from './ConnectionAuthentication/IConnectionAuthenticationConfig.js';
 export * from './ConnectionAuthentication/ConnectionAuthenticationFormLoader.js';
@@ -34,5 +33,3 @@ export * from './PluginConnectionsSettingsService.js';
 export * from './ConnectionShieldLazy.js';
 export * from './Actions/ACTION_TREE_CREATE_CONNECTION.js';
 export * from './Actions/MENU_TREE_CREATE_CONNECTION.js';
-
-export default connectionPlugin;

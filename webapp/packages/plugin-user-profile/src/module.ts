@@ -14,7 +14,7 @@ import { UserProfileFormAuthenticationPartBootstrap } from './UserProfileForm/Us
 import { PluginBootstrap } from './PluginBootstrap.js';
 import { LocaleService } from './LocaleService.js';
 
-ModuleRegistry.add({
+export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-user-profile',
 
   configure: serviceCollection => {

@@ -7,7 +7,6 @@
  */
 
 import './module.js';
-export * from './manifest.js';
 export * from './AdministrationItem/AdministrationItemService.js';
 export * from './AdministrationItem/filterConfigurationWizard.js';
 export * from './AdministrationItem/IAdministrationItem.js';

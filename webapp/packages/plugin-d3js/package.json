@@ -12,7 +12,8 @@
   "description": "The plugin reexports d3js library and contains utility functions and components for d3js",
   "license": "Apache-2.0",
   "exports": {
-    ".": "./lib/index.js"
+    ".": "./lib/index.js",
+    "./module": "./lib/module.js"
   },
   "scripts": {
     "build": "tsc -b",
@@ -22,7 +23,6 @@
     "validate-dependencies": "core-cli-validate-dependencies"
   },
   "dependencies": {
-    "@cloudbeaver/core-di": "workspace:*",
     "d3": "^7",
     "d3-drag": "^3",
     "tslib": "^2"
@@ -33,6 +33,7 @@
     "@dbeaver/cli": "workspace:*",
     "@types/d3": "^7",
     "@types/d3-drag": "^3",
+    "rimraf": "^6",
     "typescript": "^5"
   }
 }

@@ -7,6 +7,3 @@
  */
 
 import './module.js';
-import { sqlEditorPagePluginManifest } from './manifest.js';
-
-export default sqlEditorPagePluginManifest;

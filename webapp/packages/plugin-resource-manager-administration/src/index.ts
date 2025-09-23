@@ -7,6 +7,3 @@
  */
 
 import './module.js';
-import { resourceManagerAdministrationPlugin } from './manifest.js';
-
-export default resourceManagerAdministrationPlugin;

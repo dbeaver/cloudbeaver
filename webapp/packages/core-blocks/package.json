@@ -12,7 +12,8 @@
   "description": "",
   "license": "Apache-2.0",
   "exports": {
-    ".": "./lib/index.js"
+    ".": "./lib/index.js",
+    "./module": "./lib/module.js"
   },
   "scripts": {
     "build": "tsc -b",
@@ -57,13 +58,14 @@
     "@cloudbeaver/tests-runner": "workspace:*",
     "@cloudbeaver/tsconfig": "workspace:*",
     "@dbeaver/cli": "workspace:*",
-    "@dbeaver/react-tests": "workspace:^",
+    "@dbeaver/react-tests": "workspace:*",
     "@testing-library/jest-dom": "^6",
     "@testing-library/react": "^16",
     "@types/react": "^19",
     "mobx": "^6",
     "react": "^19",
     "react-dom": "^19",
+    "rimraf": "^6",
     "typescript": "^5",
     "typescript-plugin-css-modules": "^5",
     "vitest": "^3"

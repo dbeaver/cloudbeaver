@@ -7,15 +7,13 @@
  */
 import { configure } from 'mobx';
 
-import { App, type PluginManifest } from '@cloudbeaver/core-di';
+import { App, type IModule } from '@cloudbeaver/core-di';
 import { executionExceptionContext, SyncExecutor } from '@cloudbeaver/core-executor';
 
-import { coreManifests } from './manifest.js';
-
-export async function bootstrap(plugins: PluginManifest[]): Promise<App> {
+export async function bootstrap(modules: IModule[]): Promise<App> {
   configure({ enforceActions: 'never' });
 
-  const app = new App([...coreManifests, ...plugins]);
+  const app = new App(modules);
   (window as any).internalRestartApp = () => app.restart();
   let exception: Error | null = null;
 
@@ -26,7 +24,7 @@ export async function bootstrap(plugins: PluginManifest[]): Promise<App> {
   }
 
   const { renderLayout } = await import('./renderLayout.js');
-  const render = renderLayout();
+  const render = renderLayout(app);
   const unmountExecutor = new SyncExecutor();
 
   unmountExecutor.addHandler(() => render.unmount());

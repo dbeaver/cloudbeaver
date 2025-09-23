@@ -7,7 +7,6 @@
  */
 
 import './module.js';
-export * from './manifest.js';
 
 export * from './ConnectionSchemaManager/ConnectionSchemaManagerBootstrap.js';
 export * from './ConnectionSchemaManager/ConnectionSchemaManagerService.js';
