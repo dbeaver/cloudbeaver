@@ -7,8 +7,5 @@
  */
 
 import './module.js';
-import { manifest } from './manifest.js';
 
 export * from './KEY_BINDING_SQL_EDITOR_SAVE_AS_SCRIPT.js';
-
-export default manifest;

@@ -17,4 +17,3 @@ export * from './ProjectInfoResource.js';
 export * from './ProjectsService.js';
 export * from './NAV_NODE_TYPE_PROJECT.js';
 export * from './NavTree/getProjectNodeId.js';
-export { manifest as coreProjectsManifest } from './manifest.js';

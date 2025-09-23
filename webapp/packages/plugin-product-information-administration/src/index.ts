@@ -7,10 +7,6 @@
  */
 
 import './module.js';
-import { productInformationPlugin } from './manifest.js';
 
 export * from './ProductInfoNavigationService.js';
 export * from './ProductInfoService.js';
-
-export { productInformationPlugin };
-export default productInformationPlugin;

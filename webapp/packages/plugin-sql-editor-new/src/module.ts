@@ -11,7 +11,7 @@ import { PluginBootstrap } from './PluginBootstrap.js';
 import { SQLCodeEditorPanelService } from './SQLEditor/SQLCodeEditorPanel/SQLCodeEditorPanelService.js';
 import { LocaleService } from './LocaleService.js';
 
-ModuleRegistry.add({
+export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-sql-editor-new',
 
   configure: serviceCollection => {

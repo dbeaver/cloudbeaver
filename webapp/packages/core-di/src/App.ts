@@ -11,8 +11,7 @@ import { Executor, type IExecutor } from '@cloudbeaver/core-executor';
 import { Bootstrap } from './Bootstrap.js';
 import { Dependency } from './Dependency.js';
 import { IServiceProvider } from './IServiceProvider.js';
-import type { PluginManifest } from './PluginManifest.js';
-import { ModuleRegistry, ServiceContainerBuilder } from '@wroud/di';
+import { ModuleRegistry, ServiceContainerBuilder, type IModule } from '@wroud/di';
 import { IPreloadService } from './IPreloadService.js';
 
 export interface IStartData {
@@ -22,13 +21,13 @@ export interface IStartData {
 
 export class App {
   readonly onStart: IExecutor<IStartData>;
-  private readonly plugins: PluginManifest[];
+  private readonly modules: IModule[];
 
   private builder: ServiceContainerBuilder | null;
   private serviceProvider: IServiceProvider | null;
 
-  constructor(plugins: PluginManifest[] = []) {
-    this.plugins = plugins;
+  constructor(plugins: IModule[] = []) {
+    this.modules = plugins;
     this.onStart = new Executor<IStartData>(undefined, () => true);
     this.serviceProvider = null;
     this.builder = null;
@@ -58,8 +57,8 @@ export class App {
     this.builder = null;
   }
 
-  addPlugin(manifest: PluginManifest): void {
-    this.plugins.push(manifest);
+  addModule(module: IModule): void {
+    this.modules.push(module);
   }
 
   getServiceProvider(): IServiceProvider | null {
@@ -71,9 +70,23 @@ export class App {
     if (!this.builder) {
       this.builder = new ServiceContainerBuilder();
       this.builder.addSingleton(App, this);
+      let modulesToLoad = [...this.modules];
+      const requiredModules = new Set(ModuleRegistry);
 
-      for (const module of ModuleRegistry) {
+      if (this.modules.length === 0) {
+        modulesToLoad = [...requiredModules];
+      }
+
+      for (const module of modulesToLoad) {
         await module.configure(this.builder);
+        requiredModules.delete(module);
+      }
+
+      if (requiredModules.size > 0) {
+        console.warn(
+          'Some required modules were not added to the application: ',
+          [...requiredModules].map(m => m.name).sort((a, b) => a.localeCompare(b)),
+        );
       }
 
       await this.builder.validate();

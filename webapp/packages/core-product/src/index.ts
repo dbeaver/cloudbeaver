@@ -8,4 +8,3 @@
 
 import './module.js';
 export * from './ProductSettingsService.js';
-export * from './manifest.js';

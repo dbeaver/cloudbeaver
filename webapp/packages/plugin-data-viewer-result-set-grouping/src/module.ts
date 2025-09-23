@@ -10,7 +10,7 @@ import { ModuleRegistry, Bootstrap } from '@cloudbeaver/core-di';
 import { LocaleService } from './LocaleService.js';
 import { DVResultSetGroupingPluginBootstrap } from './DVResultSetGroupingPluginBootstrap.js';
 
-ModuleRegistry.add({
+export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-data-viewer-result-set-grouping',
 
   configure: serviceCollection => {

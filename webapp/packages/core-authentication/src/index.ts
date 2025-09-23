@@ -8,7 +8,6 @@
 
 import './module.js';
 
-export * from './manifest.js';
 export * from './ELMRole.js';
 export * from './AppAuthService.js';
 export * from './AUTH_PROVIDER_LOCAL_ID.js';

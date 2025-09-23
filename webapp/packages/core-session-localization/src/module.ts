@@ -9,7 +9,7 @@
 import { Dependency, ModuleRegistry } from '@cloudbeaver/core-di';
 import { SessionLocalizationService } from './SessionLocalizationService.js';
 
-ModuleRegistry.add({
+export default ModuleRegistry.add({
   name: '@cloudbeaver/core-session-localization',
 
   configure: serviceCollection => {

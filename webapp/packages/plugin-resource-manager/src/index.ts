@@ -7,9 +7,6 @@
  */
 
 import './module.js';
-import { resourceManagerPlugin } from './manifest.js';
-
-export default resourceManagerPlugin;
 
 export * from './ResourceManagerSettingsService.js';
 export * from './RESOURCE_NAME_REGEX.js';

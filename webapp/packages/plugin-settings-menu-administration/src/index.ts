@@ -7,6 +7,3 @@
  */
 
 import './module.js';
-import { settingsMenuAdministrationPlugin } from './manifest.js';
-
-export default settingsMenuAdministrationPlugin;
