@@ -66,6 +66,7 @@ export class UserProfileSettingsPluginBootstrap extends Bootstrap {
 
     this.actionService.addHandler({
       id: 'settings',
+      menus: [TOP_NAV_BAR_SETTINGS_MENU],
       actions: [ACTION_SETTINGS],
       getActionInfo(context, action) {
         return {
