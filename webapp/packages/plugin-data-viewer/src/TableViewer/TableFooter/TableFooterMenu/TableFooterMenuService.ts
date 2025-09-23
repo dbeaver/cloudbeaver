@@ -15,7 +15,6 @@ import {
   ACTION_SAVE,
   ActionService,
   DATA_CONTEXT_MENU,
-  getBindingLabel,
   KEY_BINDING_ADD,
   KEY_BINDING_DELETE,
   KEY_BINDING_DUPLICATE,
