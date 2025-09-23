@@ -4012,7 +4012,7 @@ __metadata:
     "@cloudbeaver/plugin-navigation-tabs": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
     "@dbeaver/cli": "workspace:*"
-    "@dbeaver/js-helpers": "workspace:*"
+    "@dbeaver/js-helpers": "workspace:^"
     "@dbeaver/react-tests": "workspace:*"
     "@types/react": "npm:^19"
     mobx: "npm:^6"
@@ -4630,7 +4630,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@dbeaver/js-helpers@workspace:*, @dbeaver/js-helpers@workspace:common-typescript/@dbeaver/js-helpers":
+"@dbeaver/js-helpers@workspace:*, @dbeaver/js-helpers@workspace:^, @dbeaver/js-helpers@workspace:common-typescript/@dbeaver/js-helpers":
   version: 0.0.0-use.local
   resolution: "@dbeaver/js-helpers@workspace:common-typescript/@dbeaver/js-helpers"
   dependencies:
