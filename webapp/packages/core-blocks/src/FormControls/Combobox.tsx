@@ -174,6 +174,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
       <ComboboxProvider
         value={displayValue}
         setValue={setInputValue}
+        selectedValue={selectedValue}
         defaultValue={comboboxDefaultValue}
         defaultSelectedValue={comboboxDefaultSelectedValue}
         setSelectedValue={handleSelect}
