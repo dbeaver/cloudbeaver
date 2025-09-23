@@ -6,8 +6,4 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { coreManifests } from './manifest.js';
-
 export * from './bootstrap.js';
-
-export default coreManifests;

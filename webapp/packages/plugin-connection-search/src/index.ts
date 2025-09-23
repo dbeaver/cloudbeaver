@@ -7,8 +7,5 @@
  */
 
 import './module.js';
-import { connectionSearchPlugin } from './manifest.js';
-
-export default connectionSearchPlugin;
 
 export * from './ConnectionSearchSettingsService.js';

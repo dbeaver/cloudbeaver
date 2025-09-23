@@ -7,6 +7,5 @@
  */
 
 import './module.js';
-export { datasourceTransactionManagerPlugin } from './manifest.js';
 
 export { TransactionManagerSettingsService } from './TransactionManagerSettingsService.js';

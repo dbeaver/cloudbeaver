@@ -1,10 +1,11 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { isArraysEqual } from '@cloudbeaver/core-utils';
 import { action, computed, makeObservable, observable } from 'mobx';
 
 export interface IQueryInfo {
@@ -39,9 +40,12 @@ export class SQLParser {
   private _scripts: ISQLScriptSegment[];
   private script: string;
 
+  private lastParsingArgs: any[];
+
   constructor() {
     this._scripts = [];
     this.script = '';
+    this.lastParsingArgs = [];
 
     makeObservable<this, '_scripts' | 'script'>(this, {
       actualScript: computed,
@@ -55,8 +59,36 @@ export class SQLParser {
     });
   }
 
+  parse<Args extends any[], TResult extends Promise<IQueryInfo[]> | IQueryInfo[]>(
+    parser: (script: string, ...args: Args) => TResult,
+    ...args: Args
+  ): TResult extends Promise<any> ? Promise<void> : void {
+    const parsingScript = this.actualScript;
+    const parsingArgs = [parsingScript, parser, ...args];
+
+    if (isArraysEqual(this.lastParsingArgs, parsingArgs)) {
+      return undefined as any;
+    }
+    const result = parser(parsingScript, ...args);
+
+    const applyResult = (queries: IQueryInfo[]) => {
+      if (this.actualScript === parsingScript) {
+        this.setQueries(queries);
+        this.lastParsingArgs = parsingArgs;
+      }
+    };
+
+    if (result instanceof Promise) {
+      return result.then(applyResult) as any;
+    }
+
+    applyResult(result);
+
+    return undefined as any;
+  }
+
   getScriptSegment(): ISQLScriptSegment {
-    const script = this.script || '';
+    const script = this.actualScript || '';
 
     return {
       query: script,
@@ -70,12 +102,8 @@ export class SQLParser {
       return this.getQueryAtPos(begin);
     }
 
-    if (end === -1) {
-      end = begin;
-    }
-
     return {
-      query: (this.script || '').substring(begin, end),
+      query: this.actualScript.substring(begin, end),
       begin,
       end,
     };
@@ -103,7 +131,7 @@ export class SQLParser {
 
   setQueries(queries: IQueryInfo[]): this {
     this._scripts = queries.map<ISQLScriptSegment>(query => ({
-      query: this.script.substring(query.start, query.end),
+      query: this.actualScript.substring(query.start, query.end),
       begin: query.start,
       end: query.end,
     }));

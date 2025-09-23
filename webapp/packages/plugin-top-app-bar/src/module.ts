@@ -10,7 +10,7 @@ import { Bootstrap, ModuleRegistry } from '@cloudbeaver/core-di';
 import { TopNavService } from './TopNavBar/TopNavService.js';
 import { PluginBootstrap } from './PluginBootstrap.js';
 
-ModuleRegistry.add({
+export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-top-app-bar',
 
   configure: serviceCollection => {

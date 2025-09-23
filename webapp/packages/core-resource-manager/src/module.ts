@@ -14,7 +14,7 @@ import { ResourceManagerResource } from './ResourceManagerResource.js';
 import { PluginBootstrap } from './PluginBootstrap.js';
 import { LocaleService } from './LocaleService.js';
 
-ModuleRegistry.add({
+export default ModuleRegistry.add({
   name: '@cloudbeaver/core-resource-manager',
 
   configure: serviceCollection => {

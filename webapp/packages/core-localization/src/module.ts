@@ -9,7 +9,7 @@
 import { Bootstrap, ModuleRegistry, proxy } from '@cloudbeaver/core-di';
 import { LocalizationService } from './LocalizationService.js';
 
-ModuleRegistry.add({
+export default ModuleRegistry.add({
   name: '@cloudbeaver/core-localization',
 
   configure: serviceCollection => {
