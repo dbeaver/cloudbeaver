@@ -7,7 +7,3 @@
  */
 
 import './module.js';
-import { taskManagerPluginManifest } from './manifest.js';
-
-export { taskManagerPluginManifest };
-export default taskManagerPluginManifest;

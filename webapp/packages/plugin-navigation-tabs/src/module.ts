@@ -12,7 +12,7 @@ import { NavigationTabsService } from './NavigationTabs/NavigationTabsService.js
 import { PluginBootstrap } from './PluginBootstrap.js';
 import { LocaleService } from './LocaleService.js';
 
-ModuleRegistry.add({
+export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-navigation-tabs',
 
   configure: serviceCollection => {

@@ -12,7 +12,8 @@
   "description": "",
   "license": "Apache-2.0",
   "exports": {
-    ".": "./lib/index.js"
+    ".": "./lib/index.js",
+    "./module": "./lib/module.js"
   },
   "scripts": {
     "build": "tsc -b",
@@ -44,13 +45,14 @@
     "@cloudbeaver/plugin-resource-manager-scripts": "workspace:*",
     "@cloudbeaver/plugin-sql-editor": "workspace:*",
     "@cloudbeaver/plugin-sql-editor-navigation-tab": "workspace:*",
-    "@dbeaver/js-helpers": "workspace:^",
+    "@dbeaver/js-helpers": "workspace:*",
     "mobx": "^6",
     "tslib": "^2"
   },
   "devDependencies": {
     "@cloudbeaver/core-cli": "workspace:*",
     "@cloudbeaver/tsconfig": "workspace:*",
+    "rimraf": "^6",
     "typescript": "^5"
   }
 }

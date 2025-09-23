@@ -11,7 +11,7 @@ import { AppScreenService } from './AppScreen/AppScreenService.js';
 import { AppScreenBootstrap } from './AppScreen/AppScreenBootstrap.js';
 import { AppLocaleService } from './AppLocaleService.js';
 
-ModuleRegistry.add({
+export default ModuleRegistry.add({
   name: '@cloudbeaver/core-app',
 
   configure: serviceCollection => {

@@ -7,7 +7,3 @@
  */
 
 import './module.js';
-import { appLogoAdministrationPlugin } from './manifest.js';
-
-export { appLogoAdministrationPlugin };
-export default appLogoAdministrationPlugin;

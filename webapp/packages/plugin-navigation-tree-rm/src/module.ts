@@ -12,7 +12,7 @@ import { NavTreeRMContextMenuBootstrap } from './NavTreeRMContextMenuBootstrap.j
 import { NavResourceNodeService } from './NavResourceNodeService.js';
 import { LocaleService } from './LocaleService.js';
 
-ModuleRegistry.add({
+export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-navigation-tree-rm',
 
   configure: serviceCollection => {

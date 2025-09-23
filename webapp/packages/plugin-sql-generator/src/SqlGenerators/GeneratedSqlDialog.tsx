@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { computed, observable } from 'mobx';
+import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
 
@@ -21,15 +21,15 @@ import {
   useClipboard,
   useErrorDetails,
   useObservableRef,
+  useResource,
   useS,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
-import { ConnectionInfoResource, createConnectionParam } from '@cloudbeaver/core-connections';
+import { ConnectionDialectResource, ConnectionInfoResource, createConnectionParam } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import type { DialogComponentProps } from '@cloudbeaver/core-dialogs';
-import { GQLErrorCatcher, type SqlDialectInfo } from '@cloudbeaver/core-sdk';
+import { GQLErrorCatcher } from '@cloudbeaver/core-sdk';
 import { useCodemirrorExtensions } from '@cloudbeaver/plugin-codemirror6';
-import { SqlDialectInfoService } from '@cloudbeaver/plugin-sql-editor';
 import { SQLCodeEditorLoader, useSqlDialectExtension } from '@cloudbeaver/plugin-sql-editor-new';
 
 import style from './GeneratedSqlDialog.module.css';
@@ -45,7 +45,6 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<Payload>>(functi
   const copy = useClipboard();
   const styles = useS(style);
 
-  const sqlDialectInfoService = useService(SqlDialectInfoService);
   const sqlGeneratorsResource = useService(SqlGeneratorsResource);
   const connectionInfoResource = useService(ConnectionInfoResource);
   const connection = connectionInfoResource.getConnectionForNode(payload.pathId);
@@ -55,13 +54,6 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<Payload>>(functi
       query: '',
       loading: true,
       error: new GQLErrorCatcher(),
-      get dialect(): SqlDialectInfo | undefined {
-        if (!this.connection?.connected) {
-          return;
-        }
-
-        return this.sqlDialectInfoService.getDialectInfo(createConnectionParam(this.connection));
-      },
       async load() {
         this.error.clear();
 
@@ -78,12 +70,12 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<Payload>>(functi
       query: observable.ref,
       loading: observable.ref,
       connection: observable.ref,
-      dialect: computed,
     },
-    { connection, sqlDialectInfoService },
+    { connection },
   );
+  const connectionDialectResource = useResource(GeneratedSqlDialog, ConnectionDialectResource, connection ? createConnectionParam(connection) : null);
+  const sqlDialect = useSqlDialectExtension(connectionDialectResource.data);
 
-  const sqlDialect = useSqlDialectExtension(state.dialect);
   const extensions = useCodemirrorExtensions();
   extensions.set(...sqlDialect);
   const error = useErrorDetails(state.error.exception);
@@ -91,17 +83,6 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<Payload>>(functi
   useEffect(() => {
     state.load();
   }, []);
-
-  useEffect(() => {
-    if (!connection) {
-      return;
-    }
-
-    sqlDialectInfoService.loadSqlDialectInfo(createConnectionParam(connection)).catch(exception => {
-      console.error(exception);
-      console.warn(`Can't get dialect for connection: '${connection.id}'. Default dialect will be used`);
-    });
-  });
 
   return (
     <CommonDialogWrapper size="large">

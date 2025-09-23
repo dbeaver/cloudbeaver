@@ -44,6 +44,7 @@ import {
   type ISqlEditorTabState,
   SQL_EDITOR_TAB_STATE_SCHEMA,
   SqlDataSourceService,
+  SqlEditorModelService,
   SqlEditorService,
   SqlResultTabsService,
 } from '@cloudbeaver/plugin-sql-editor';
@@ -67,6 +68,7 @@ const SqlEditorTab = importLazyComponent(() => import('./SqlEditorTab.js').then(
   ConnectionsManagerService,
   ContainerResource,
   CommonDialogService,
+  SqlEditorModelService,
 ])
 export class SqlEditorTabService extends Bootstrap {
   get sqlEditorTabs(): ITab<ISqlEditorTabState>[] {
@@ -89,6 +91,7 @@ export class SqlEditorTabService extends Bootstrap {
     private readonly connectionsManagerService: ConnectionsManagerService,
     private readonly containerResource: ContainerResource,
     private readonly commonDialogService: CommonDialogService,
+    private readonly sqlEditorModelService: SqlEditorModelService,
   ) {
     super();
 
@@ -305,6 +308,7 @@ export class SqlEditorTabService extends Bootstrap {
 
   private async handleTabRestore(tab: ITab<ISqlEditorTabState>): Promise<boolean> {
     if (!SQL_EDITOR_TAB_STATE_SCHEMA.safeParse(tab.handlerState).success) {
+      await this.sqlEditorModelService.destroy(tab.handlerState.editorId);
       await this.sqlDataSourceService.destroy(tab.handlerState.editorId);
       return false;
     }
@@ -531,12 +535,14 @@ export class SqlEditorTabService extends Bootstrap {
   }
 
   private async handleTabUnload(editorTab: ITab<ISqlEditorTabState>) {
+    await this.sqlEditorModelService.unload(editorTab.handlerState.editorId);
     await this.sqlDataSourceService.unload(editorTab.handlerState.editorId);
 
     this.sqlResultTabsService.removeResultTabs(editorTab.handlerState);
   }
 
   private async handleTabCloseSilent(editorTab: ITab<ISqlEditorTabState>) {
+    await this.sqlEditorModelService.destroySilent(editorTab.handlerState.editorId);
     const dataSource = this.sqlDataSourceService.get(editorTab.handlerState.editorId);
 
     if (dataSource?.executionContext) {
@@ -548,6 +554,8 @@ export class SqlEditorTabService extends Bootstrap {
   }
 
   private async handleTabClose(editorTab: ITab<ISqlEditorTabState>) {
+    await this.sqlEditorModelService.destroy(editorTab.handlerState.editorId);
+
     const dataSource = this.sqlDataSourceService.get(editorTab.handlerState.editorId);
 
     if (dataSource?.executionContext) {

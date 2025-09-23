@@ -10,7 +10,7 @@ import { Bootstrap, ModuleRegistry } from '@cloudbeaver/core-di';
 import { LocaleService } from './LocaleService.js';
 import { NavigationTreeFiltersBootstrap } from './NavigationTreeFiltersBootstrap.js';
 
-ModuleRegistry.add({
+export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-navigation-tree-filters',
 
   configure: serviceCollection => {

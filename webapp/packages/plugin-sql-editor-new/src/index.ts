@@ -7,9 +7,6 @@
  */
 
 import './module.js';
-import { sqlEditorNewPlugin } from './manifest.js';
-
-export default sqlEditorNewPlugin;
 
 export * from './SQLEditor/SQLCodeEditor/SQLCodeEditorLoader.js';
 export * from './SQLEditor/useSqlDialectAutocompletion.js';

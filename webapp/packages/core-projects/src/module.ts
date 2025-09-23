@@ -12,7 +12,7 @@ import { ProjectInfoResource } from './ProjectInfoResource.js';
 import { ProjectInfoEventHandler } from './ProjectInfoEventHandler.js';
 import { LocaleService } from './LocaleService.js';
 
-ModuleRegistry.add({
+export default ModuleRegistry.add({
   name: '@cloudbeaver/core-projects',
 
   configure: serviceCollection => {

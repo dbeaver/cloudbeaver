@@ -7,9 +7,6 @@
  */
 
 import './module.js';
-import { manifest } from './manifest.js';
-
-export default manifest;
 
 export * from './AdministrationScreen/AdministrationTopAppBar/AdministrationTopAppBarService.js';
 export * from './AdministrationScreen/ConfigurationWizard/WizardTopAppBar/WizardTopAppBarService.js';

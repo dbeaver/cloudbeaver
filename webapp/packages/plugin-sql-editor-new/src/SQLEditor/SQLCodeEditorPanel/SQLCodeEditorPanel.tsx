@@ -86,11 +86,11 @@ export const SQLCodeEditorPanel: TabContainerPanelComponent<ISqlEditorModeProps>
   });
 
   function applyIncoming() {
-    data.dataSource?.applyIncoming();
+    data.model.dataSource?.applyIncoming();
   }
 
   function keepCurrent() {
-    data.dataSource?.keepCurrent();
+    data.model.dataSource?.keepCurrent();
   }
 
   return (
@@ -99,8 +99,8 @@ export const SQLCodeEditorPanel: TabContainerPanelComponent<ISqlEditorModeProps>
         ref={setEditorRef}
         getValue={() => data.value}
         cursor={{
-          anchor: data.cursor.anchor,
-          head: data.cursor.head,
+          anchor: data.model.cursor.anchor,
+          head: data.model.cursor.head,
         }}
         incomingValue={data.incomingValue}
         extensions={extensions}

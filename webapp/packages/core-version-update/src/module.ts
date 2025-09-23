@@ -10,7 +10,7 @@ import { ModuleRegistry, Bootstrap } from '@cloudbeaver/core-di';
 import { VersionUpdateLocaleService } from './LocaleService.js';
 import { VersionUpdateService } from './VersionUpdateService.js';
 
-ModuleRegistry.add({
+export default ModuleRegistry.add({
   name: '@cloudbeaver/core-version-update',
 
   configure: serviceCollection => {
