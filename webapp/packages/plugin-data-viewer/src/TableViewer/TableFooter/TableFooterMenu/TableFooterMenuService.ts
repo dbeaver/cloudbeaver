@@ -19,6 +19,7 @@ import {
   KEY_BINDING_ADD,
   KEY_BINDING_DELETE,
   KEY_BINDING_DUPLICATE,
+  KEY_BINDING_CANCEL,
   KeyBindingService,
   MenuService,
   type IAction,
@@ -57,7 +58,38 @@ export class TableFooterMenuService {
       },
       handler: this.tableFooterMenuActionHandler.bind(this),
     });
-    this.dataViewerViewService.registerAction(ACTION_DELETE);
+
+    this.keyBindingService.addKeyBindingHandler({
+      id: 'table-footer-cancel',
+      binding: KEY_BINDING_CANCEL,
+      contexts: [DATA_CONTEXT_DV_DDM, DATA_CONTEXT_DV_DDM_RESULT_INDEX],
+      isBindingApplicable(context, action) {
+        return action === ACTION_CANCEL;
+      },
+      handler: this.tableFooterMenuActionHandler.bind(this),
+    });
+
+    this.keyBindingService.addKeyBindingHandler({
+      id: 'table-footer-add',
+      binding: KEY_BINDING_ADD,
+      contexts: [DATA_CONTEXT_DV_DDM, DATA_CONTEXT_DV_DDM_RESULT_INDEX],
+      isBindingApplicable(context, action) {
+        return action === ACTION_ADD;
+      },
+      handler: this.tableFooterMenuActionHandler.bind(this),
+    });
+
+    this.keyBindingService.addKeyBindingHandler({
+      id: 'table-footer-duplicate',
+      binding: KEY_BINDING_DUPLICATE,
+      contexts: [DATA_CONTEXT_DV_DDM, DATA_CONTEXT_DV_DDM_RESULT_INDEX],
+      isBindingApplicable(context, action) {
+        return action === ACTION_DUPLICATE;
+      },
+      handler: this.tableFooterMenuActionHandler.bind(this),
+    });
+
+    this.dataViewerViewService.registerAction(ACTION_DELETE, ACTION_CANCEL, ACTION_ADD, ACTION_DUPLICATE);
   }
 
   private registerEditingActions() {
@@ -221,14 +253,14 @@ export class TableFooterMenuService {
           ...action.info,
           label: '',
           icon: '/icons/data_add_sm.svg',
-          tooltip: t('data_viewer_action_edit_add') + ' (' + getBindingLabel(KEY_BINDING_ADD) + ')',
+          tooltip: t('data_viewer_action_edit_add'),
         };
       case ACTION_DUPLICATE:
         return {
           ...action.info,
           label: '',
           icon: '/icons/data_add_copy_sm.svg',
-          tooltip: t('data_viewer_action_edit_add_copy') + ' (' + getBindingLabel(KEY_BINDING_DUPLICATE) + ')',
+          tooltip: t('data_viewer_action_edit_add_copy'),
         };
       case ACTION_DELETE:
         return { ...action.info, label: '', icon: '/icons/data_delete_sm.svg', tooltip: t('data_viewer_action_edit_delete') };
