@@ -6,26 +6,21 @@
  * you may not use this file except in compliance with the License.
  */
 
-import tailwindcss from '@tailwindcss/vite';
 import { defineConfig } from 'vite';
-import { assetResolverPlugin } from '@wroud/vite-plugin-asset-resolver';
+import react from '@vitejs/plugin-react';
 import { tscPlugin } from '@wroud/vite-plugin-tsc';
-import svgr from 'vite-plugin-svgr';
+import { assetResolverPlugin } from '@wroud/vite-plugin-asset-resolver';
+import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
-  server: {
-    fs: {
-      strict: false,
-    },
-  },
   plugins: [
-    svgr(),
-    tailwindcss(),
-    assetResolverPlugin(),
+    react(),
     tscPlugin({
       tscArgs: ['-b'],
-      enableOverlay: true,
       prebuild: true,
+      enableOverlay: true,
     }),
+    assetResolverPlugin(),
+    tailwindcss(),
   ],
 });
