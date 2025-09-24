@@ -33,7 +33,6 @@ export const PropertyItem = observer<Props>(function PropertyItem({ property, va
   const translate = useTranslate();
   const isDeletable = !readOnly && !property.displayName;
   const edited = value !== undefined && value !== property.defaultValue;
-  const propertyValue = value !== undefined ? value : property.defaultValue;
   const keyInputRef = useRef<HTMLInputElement>(null);
 
   const handleKeyChange = useCallback((key: string) => onNameChange(property.id, key), [property]);
