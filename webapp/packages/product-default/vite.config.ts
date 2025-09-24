@@ -22,12 +22,6 @@ export default defineConfig(
       to each file https://vite.dev/guide/build#public-base-path. 
     */
     base: './',
-    resolve: {
-      // resolves sass to sass-embedded package to avoid issues with builder trying to use incorrect sass package
-      alias: {
-        sass: 'sass-embedded',
-      },
-    },
     plugins: [baseConfigurationPlugin(mode, packageJson)],
   }),
 );
