@@ -1,7 +1,5 @@
 @layer base {
   :root {
-    --dbv-kit-menu-button-padding-inline: calc(var(--tw-spacing) * 3);
-    --dbv-kit-menu-button-padding-block: var(--tw-spacing);
     --dbv-kit-menu-foreground: var(--dbv-kit-color-foreground);
     --dbv-kit-menu-background: var(--dbv-kit-color-background);
     --dbv-kit-menu-disabled-foreground: var(--dbv-kit-control-disabled-foreground);
@@ -20,6 +18,7 @@
     --dbv-kit-menu-popover-foreground: var(--dbv-kit-color-foreground);
     --dbv-kit-menu-popover-shadow: var(--tw-shadow-md);
     --dbv-kit-menu-popover-max-height: 18rem;
+    --dbv-kit-menu-popover-max-width: 20rem;
 
     --dbv-kit-menu-item-padding-inline: calc(var(--tw-spacing) * 5);
     --dbv-kit-menu-item-padding-block: calc(var(--tw-spacing) * 1.4);

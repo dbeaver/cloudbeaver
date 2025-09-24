@@ -1,41 +1,11 @@
 @import './__base.css';
 
 @layer base {
-  .dbv-kit-menu__button {
-    padding-inline: var(--dbv-kit-menu-button-padding-inline);
-    padding-block: var(--dbv-kit-menu-button-padding-block);
-    background-color: var(--dbv-kit-menu-background);
-    color: var(--dbv-kit-menu-foreground);
-    border-color: var(--dbv-kit-menu-border-color);
-    border-radius: var(--dbv-kit-menu-border-radius);
-    border-width: var(--dbv-kit-menu-border-width);
-    border-style: var(--dbv-kit-menu-border-style);
-    font-weight: var(--dbv-kit-menu-font-weight);
-    font-size: var(--dbv-kit-menu-font-size);
-    outline-width: var(--dbv-kit-control-outline-width);
-    outline-color: var(--dbv-kit-control-outline-color);
-    cursor: pointer;
-
-    &:hover:not(:disabled) {
-      border-color: var(--dbv-kit-menu-hover-border-color);
-    }
-
-    &[aria-disabled='true'] {
-      opacity: var(--dbv-kit-control-disabled-opacity);
-      color: var(--dbv-kit-menu-disabled-foreground);
-      background-color: var(--dbv-kit-menu-disabled-background);
-    }
-
-    &:focus-visible {
-      outline-style: solid;
-      outline-offset: var(--dbv-kit-control-outline-offset);
-    }
-  }
-
   .dbv-kit-menu__popover {
     z-index: 1000;
     min-width: max-content;
     max-height: var(--dbv-kit-menu-popover-max-height);
+    max-width: var(--dbv-kit-menu-popover-max-width);
     overflow-y: auto;
     overflow-x: hidden;
     background-color: var(--dbv-kit-menu-popover-background);
@@ -68,6 +38,7 @@
   .dbv-kit-menu__dismiss {
     display: block;
     width: 100%;
+    max-width: var(--dbv-kit-menu-popover-max-width);
     padding-inline: var(--dbv-kit-menu-item-padding-inline);
     padding-block: var(--dbv-kit-menu-item-padding-block);
     cursor: pointer;

@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { Menu, useMenuStore } from '@dbeaver/ui-kit';
+import { Button, Menu, useMenuStore } from '@dbeaver/ui-kit';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Fragment, useMemo, useState } from 'react';
 
@@ -20,14 +20,16 @@ type Story = StoryObj<typeof meta>;
 export const Basic: Story = {
   render: () => (
     <Menu.Provider>
-      <Menu.Button className="tw:inline-flex tw:items-center">
-        Open menu
-        <Menu.ButtonArrow />
+      <Menu.Button>
+        <Button variant="primary">
+          Open menu
+          <Menu.ButtonArrow />
+        </Button>
       </Menu.Button>
       <Menu>
         <Menu.Item>Action 1</Menu.Item>
         <Menu.Item>Action 2</Menu.Item>
-        <Menu.Item>Action 3</Menu.Item>
+        <Menu.Item>Action 3 which demonstrates a very long text that should be wrapped on next line if it does not fit the item container</Menu.Item>
       </Menu>
     </Menu.Provider>
   ),
@@ -35,9 +37,11 @@ export const Basic: Story = {
 
 export const WithHeadingAndDescription = () => (
   <Menu.Provider>
-    <Menu.Button className="tw:inline-flex tw:items-center">
-      Info menu
-      <Menu.ButtonArrow />
+    <Menu.Button>
+      <Button variant="primary">
+        Info menu
+        <Menu.ButtonArrow />
+      </Button>
     </Menu.Button>
     <Menu>
       <Menu.Heading>Section title</Menu.Heading>
@@ -53,9 +57,11 @@ export const WithHeadingAndDescription = () => (
 
 export const WithGroups = () => (
   <Menu.Provider>
-    <Menu.Button className="tw:inline-flex tw:items-center">
-      Grouped menu
-      <Menu.ButtonArrow />
+    <Menu.Button>
+      <Button variant="primary">
+        Grouped menu
+        <Menu.ButtonArrow />
+      </Button>
     </Menu.Button>
     <Menu>
       <Menu.Group>
@@ -76,9 +82,11 @@ export const WithGroups = () => (
 
 export const WithDisabledItems = () => (
   <Menu.Provider>
-    <Menu.Button className="tw:inline-flex tw:items-center">
-      Disabled items
-      <Menu.ButtonArrow />
+    <Menu.Button>
+      <Button variant="primary">
+        Disabled items
+        <Menu.ButtonArrow />
+      </Button>
     </Menu.Button>
     <Menu>
       <Menu.Item>Enabled</Menu.Item>
@@ -96,9 +104,11 @@ export const CheckboxItems = () => {
 
   return (
     <Menu.Provider>
-      <Menu.Button className="tw:inline-flex tw:items-center">
-        Preferences
-        <Menu.ButtonArrow />
+      <Menu.Button>
+        <Button variant="primary">
+          Preferences
+          <Menu.ButtonArrow />
+        </Button>
       </Menu.Button>
       <Menu>
         <Menu.ItemCheckbox
@@ -125,9 +135,11 @@ export const RadioGroup = () => {
 
   return (
     <Menu.Provider>
-      <Menu.Button className="tw:inline-flex tw:items-center">
-        Theme: {theme}
-        <Menu.ButtonArrow />
+      <Menu.Button>
+        <Button variant="primary">
+          Theme: {theme}
+          <Menu.ButtonArrow />
+        </Button>
       </Menu.Button>
       <Menu>
         <Menu.ItemRadio value="system" name="theme" checked={theme === 'system'} onChange={() => setTheme('system')}>
@@ -158,9 +170,11 @@ export const ControlledStore = () => {
         </button>
       </div>
       <Menu.Provider store={store}>
-        <Menu.Button className="tw:inline-flex tw:items-center">
-          Controlled menu
-          <Menu.ButtonArrow />
+        <Menu.Button>
+          <Button variant="primary">
+            Controlled menu
+            <Menu.ButtonArrow />
+          </Button>
         </Menu.Button>
         <Menu gutter={8}>
           <Menu.Item>One</Menu.Item>
@@ -175,9 +189,11 @@ export const WithoutPortal = () => (
   <div className="tw:p-8 tw:border tw:rounded tw:max-w-sm">
     <p className="tw:mb-2">Menu rendered inside container (portal=false)</p>
     <Menu.Provider>
-      <Menu.Button className="tw:inline-flex tw:items-center">
-        Local menu
-        <Menu.ButtonArrow />
+      <Menu.Button>
+        <Button variant="primary">
+          Local menu
+          <Menu.ButtonArrow />
+        </Button>
       </Menu.Button>
       <Menu portal={false}>
         <Menu.Item>Aligned tight</Menu.Item>
@@ -192,9 +208,11 @@ export const LongListScrollable = () => {
 
   return (
     <Menu.Provider>
-      <Menu.Button className="tw:inline-flex tw:items-center">
-        Many items
-        <Menu.ButtonArrow />
+      <Menu.Button>
+        <Button variant="primary">
+          Many items
+          <Menu.ButtonArrow />
+        </Button>
       </Menu.Button>
       <Menu>
         {items.map(label => (
@@ -207,9 +225,11 @@ export const LongListScrollable = () => {
 
 export const MixedContent = () => (
   <Menu.Provider>
-    <Menu.Button className="tw:inline-flex tw:items-center">
-      Mixed content
-      <Menu.ButtonArrow />
+    <Menu.Button>
+      <Button variant="primary">
+        Mixed content
+        <Menu.ButtonArrow />
+      </Button>
     </Menu.Button>
     <Menu>
       <Menu.Heading>Profile</Menu.Heading>
