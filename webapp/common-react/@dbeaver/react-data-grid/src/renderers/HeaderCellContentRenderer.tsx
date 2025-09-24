@@ -1,3 +1,11 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2025 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+
 import { memo, use } from 'react';
 import { useDrag, useDrop, type DnDStoreProvider } from '@dbeaver/react-dnd';
 import { DataGridCellHeaderContext } from '../DataGridHeaderCellContext.js';
@@ -72,13 +80,13 @@ export const HeaderCellContentRenderer = memo(function HeaderCellContentRenderer
 
   return (
     <div
-      onKeyDown={onKeyDown}
       tabIndex={tabIndex}
       className="tw:w-full tw:h-full tw:content-center tw:flex tw:items-center tw:justify-between tw:gap-1 tw:outline-none tw:group"
       {...drag.props}
       {...drop.props}
+      onKeyDown={onKeyDown}
     >
-      <span className="tw:overflow-hidden tw:h-full tw:text-ellipsis">{headerElement ?? getHeaderText ?? ''}</span>
+      <span className="tw:overflow-hidden tw:text-ellipsis">{headerElement ?? getHeaderText ?? ''}</span>
       {isColumnSortable && onColumnSort && <OrderButton sortState={sortingState} onClick={handleSort} />}
     </div>
   );

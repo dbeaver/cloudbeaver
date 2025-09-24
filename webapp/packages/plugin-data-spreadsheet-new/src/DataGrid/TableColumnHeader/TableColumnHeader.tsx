@@ -7,6 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
+import { clsx } from '@dbeaver/ui-kit';
 
 import { getComputed, s, StaticImage, useS } from '@cloudbeaver/core-blocks';
 
@@ -15,7 +16,6 @@ import { DataGridSelectionContext } from '../DataGridSelection/DataGridSelection
 import { TableDataContext } from '../TableDataContext.js';
 import style from './TableColumnHeader.module.css';
 import { useTableColumnDnD } from './useTableColumnDnD.js';
-import { HEADER_HEIGHT } from '../DataGridTable.js';
 
 interface Props {
   colIdx: number;
@@ -80,11 +80,13 @@ export const TableColumnHeader = observer<Props>(function TableColumnHeader({ co
         {dataReadonly && colIdx === 0 && (
           <div className={s(styles, { readonlyStatus: true, independent: true }, 'rdg-table-header__readonly-status')} />
         )}
-        <div className="tw:grid tw:grid-cols-[auto_1fr] tw:grid-rows-[auto_auto] tw:h-full tw:w-full">
-          <div
-            style={{ height: !tableDataContext.hasDescription ? HEADER_HEIGHT : 'auto' }}
-            className="tw:gap-1 tw:col-start-1 tw:col-end-2 tw:row-start-1 tw:row-end-2 tw:flex tw:items-center tw:justify-center tw:truncate"
-          >
+        <div
+          className={clsx(
+            'tw:grid tw:grid-cols-[auto_1fr] tw:h-full tw:w-full',
+            tableDataContext.hasDescription ? 'tw:grid-rows-2' : 'tw:grid-rows-1',
+          )}
+        >
+          <div className="tw:gap-1 tw:col-start-1 tw:col-end-2 tw:row-start-1 tw:row-end-2 tw:flex tw:items-center tw:justify-center tw:truncate">
             {icon && (
               <div className={s(styles, { icon: true })}>
                 <StaticImage icon={icon} className={s(styles, { staticImage: true })} />
