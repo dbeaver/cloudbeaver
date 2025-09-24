@@ -118,5 +118,11 @@ public abstract class BaseWebProjectImpl extends BaseProjectImpl implements RMCo
     public void updateProjectInfo(@Nullable String newName, @Nullable String description) {
         this.project.setName(newName);
         this.project.setDescription(description);
+        RMEventManager.fireEvent(
+            new RMEvent(
+                RMEvent.Action.PROJECT_UPDATE,
+                project
+            )
+        );
     }
 }
