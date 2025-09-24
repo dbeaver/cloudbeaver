@@ -8,4 +8,3 @@
 
 import './module.js';
 export * from './ClientActivityService.js';
-export * from './manifest.js';

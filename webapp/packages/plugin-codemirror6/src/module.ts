@@ -9,7 +9,7 @@
 import { ModuleRegistry, Bootstrap } from '@cloudbeaver/core-di';
 import { LocaleService } from './LocaleService.js';
 
-ModuleRegistry.add({
+export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-codemirror6',
 
   configure: serviceCollection => {

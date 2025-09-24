@@ -7,9 +7,6 @@
  */
 
 import './module.js';
-import { userProfilePlugin } from './manifest.js';
-
-export default userProfilePlugin;
 
 export * from './UserProfileTabsService.js';
 export * from './UserProfileOptionsPanelService.js';

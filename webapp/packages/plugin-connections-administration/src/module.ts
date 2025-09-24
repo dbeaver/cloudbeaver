@@ -9,7 +9,7 @@
 import { Bootstrap, ModuleRegistry } from '@cloudbeaver/core-di';
 import { ConnectionFormAccessTabBootstrap } from './ConnectionFormAccess/ConnectionFormAccessTabBootstrap.js';
 
-ModuleRegistry.add({
+export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-connections-administration',
 
   configure: serviceCollection => {

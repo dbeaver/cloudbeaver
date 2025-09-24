@@ -9,7 +9,7 @@
 import { ModuleRegistry, Bootstrap } from '@cloudbeaver/core-di';
 import { HolidayAdministrationBootstrap } from './PluginBootstrap.js';
 
-ModuleRegistry.add({
+export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-holidays-administration',
 
   configure: serviceCollection => {

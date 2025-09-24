@@ -7,7 +7,3 @@
  */
 
 import './module.js';
-import { navigationTreeFiltersPlugin } from './manifest.js';
-
-export { navigationTreeFiltersPlugin };
-export default navigationTreeFiltersPlugin;

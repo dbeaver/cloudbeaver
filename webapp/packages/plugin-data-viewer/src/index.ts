@@ -7,7 +7,6 @@
  */
 
 import './module.js';
-export * from './manifest.js';
 
 export * from './DatabaseDataModel/Actions/Document/DocumentDataAction.js';
 export * from './DatabaseDataModel/Actions/Document/DocumentEditAction.js';

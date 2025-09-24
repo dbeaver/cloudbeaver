@@ -15,7 +15,7 @@ import { DataImportBootstrap } from './DataImportBootstrap.js';
 
 // force registration after export plugin
 import '@cloudbeaver/plugin-data-export';
-ModuleRegistry.add({
+export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-data-import',
 
   configure: serviceCollection => {

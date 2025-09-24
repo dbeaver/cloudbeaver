@@ -9,7 +9,7 @@
 import { Dependency, ModuleRegistry } from '@cloudbeaver/core-di';
 import { ServerLocalizationService } from './ServerLocalizationService.js';
 
-ModuleRegistry.add({
+export default ModuleRegistry.add({
   name: '@cloudbeaver/core-server-localization',
 
   configure: serviceCollection => {

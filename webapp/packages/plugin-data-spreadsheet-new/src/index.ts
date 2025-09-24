@@ -7,5 +7,4 @@
  */
 
 import './module.js';
-export * from './manifest.js';
 export * from './DataGrid/DATA_GRID_BINDINGS.js';

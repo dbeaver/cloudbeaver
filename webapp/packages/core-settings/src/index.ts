@@ -7,7 +7,6 @@
  */
 
 import './module.js';
-export * from './manifest.js';
 export * from './createSettingsOverrideResolver.js';
 export * from './createSettingsAliasResolver.js';
 export * from './SettingsScopeType.js';

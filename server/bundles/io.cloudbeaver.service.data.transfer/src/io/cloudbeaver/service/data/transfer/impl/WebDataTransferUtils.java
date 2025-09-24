@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@ package io.cloudbeaver.service.data.transfer.impl;
 import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
-import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
 import org.jkiss.dbeaver.tools.transfer.registry.DataTransferProcessorDescriptor;
 import org.jkiss.utils.CommonUtils;
 
@@ -32,9 +31,7 @@ class WebDataTransferUtils {
 
 
     public static String getProcessorFileExtension(DataTransferProcessorDescriptor processor) {
-        DBPPropertyDescriptor extProperty = processor.getProperty("extension");
-        String ext = extProperty == null ? processor.getAppFileExtension() : CommonUtils.toString(extProperty.getDefaultValue(), null);
-        return CommonUtils.isEmpty(ext) ? "data" : ext;
+        return processor.getProcessorFileExtension();
     }
 
     public static String getProcessorFileExtension(DataTransferProcessorDescriptor processor, Map<String, Object> processorProperties) {
@@ -42,7 +39,7 @@ class WebDataTransferUtils {
             return CommonUtils.toString(processorProperties.get(EXTENSION), "data");
         }
 
-        return getProcessorFileExtension(processor);
+        return processor.getProcessorFileExtension();
     }
 
     public static String normalizeFileName(

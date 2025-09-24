@@ -10,7 +10,7 @@ import { Bootstrap, ModuleRegistry } from '@cloudbeaver/core-di';
 import { ObjectViewerNavTreeLinkMenuService } from './ObjectViewerNavTreeLinkMenuService.js';
 import { LocaleService } from './LocaleService.js';
 
-ModuleRegistry.add({
+export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-object-viewer-nav-tree-link',
 
   configure: serviceCollection => {

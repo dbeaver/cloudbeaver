@@ -11,7 +11,7 @@ import { SystemInformationResource } from './SystemInformationResource.js';
 import { SystemInformationBootstrap } from './SystemInformationBootstrap.js';
 import { LocaleService } from './LocaleService.js';
 
-ModuleRegistry.add({
+export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-system-information-administration',
 
   configure: serviceCollection => {

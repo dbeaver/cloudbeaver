@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -36,11 +36,19 @@ export const DisplayError = observer<Props>(function DisplayError({ root, childr
         {root && <AppRefreshButton />}
         {children}
         {error && (
-          <div className={s(styles, { details: true })}>
-            {error.toString()}
-            {stack && <br />}
-            {stack}
-          </div>
+          <details className={s(styles, { details: true })}>
+            <summary>Details</summary>
+            <p>
+              {error.toString()}
+              {stack && (
+                <>
+                  <br />
+                  <br />
+                </>
+              )}
+              <code>{stack}</code>
+            </p>
+          </details>
         )}
       </div>
     </div>
