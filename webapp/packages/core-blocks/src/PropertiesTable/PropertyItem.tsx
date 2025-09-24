@@ -70,6 +70,7 @@ export const PropertyItem = observer<Props>(function PropertyItem({ property, va
         <Combobox
           value={value}
           title={value}
+          defaultValue={property.defaultValue}
           name={`${property.id}_value`}
           placeholder={valuePlaceholder}
           items={property.validValues || []}
