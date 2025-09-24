@@ -5,8 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-.container,
-.button {
+.container {
   composes: theme-ripple from global;
 }
 
@@ -14,6 +13,7 @@
   box-sizing: border-box;
   display: inline-flex;
   padding: 0px 1px;
+  min-height: 36px;
 }
 
 .name,
@@ -25,11 +25,6 @@
   box-sizing: border-box;
   flex: 1;
   padding: 4px 0;
-
-  & .shadowInput {
-    height: 24px;
-    padding: 0 36px 0 12px;
-  }
 }
 
 .value,
@@ -42,54 +37,9 @@
   width: 276px;
 }
 
-.remove {
-  width: 24px;
-  height: 24px;
-  position: relative;
-  flex: 0 0 auto;
-  align-items: center;
-  display: flex;
-  opacity: 0;
-}
-
-.remove {
-  margin: 0 2px;
-}
-
-.container:hover .remove {
-  opacity: 1;
-}
-
-.shadowInput {
-  composes: theme-background-surface from global;
-}
-
-.name .shadowInput,
-.value .shadowInput {
-  box-sizing: border-box;
-  font: inherit;
-  color: inherit;
-  width: 100%;
-  outline: none;
-
-  &:global([readonly]),
-  &:not(:focus):not([data-focus='true']) {
-    background: transparent !important;
-    border: solid 2px transparent !important;
-  }
-}
-
-.icon,
-.iconOrImage {
-  height: 16px;
-  display: block;
-}
-
-.button {
-  background: transparent;
-  outline: none;
-  padding: 4px;
-  cursor: pointer;
+.actions {
+  margin: 0 4px;
+  min-width: 28px;
 }
 
 .error {
