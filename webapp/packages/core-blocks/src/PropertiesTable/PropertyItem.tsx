@@ -58,6 +58,7 @@ export const PropertyItem = observer<Props>(function PropertyItem({ property, va
         <Input
           ref={keyInputRef}
           value={property.displayName || property.key}
+          title={property.displayName || property.key}
           type="text"
           name={property.id}
           placeholder={keyPlaceholder}
