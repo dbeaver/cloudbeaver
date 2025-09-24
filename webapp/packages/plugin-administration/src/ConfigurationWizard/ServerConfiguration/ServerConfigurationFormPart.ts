@@ -10,9 +10,15 @@ import { ADMIN_USERNAME_MIN_LENGTH, AUTH_PROVIDER_LOCAL_ID, AuthProvidersResourc
 import { DEFAULT_NAVIGATOR_VIEW_SETTINGS } from '@cloudbeaver/core-connections';
 import { ExecutorInterrupter, type IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
-import { DefaultNavigatorSettingsResource, PasswordPolicyResource, ProductInfoResource, ServerConfigResource } from '@cloudbeaver/core-root';
+import {
+  DefaultNavigatorSettingsResource,
+  PasswordPolicyResource,
+  ProductInfoResource,
+  ServerConfigResource,
+  type IServerConfigInput,
+} from '@cloudbeaver/core-root';
 import { FormPart, formValidationContext, type IFormState } from '@cloudbeaver/core-ui';
-import { isIp, isObjectsEqual, isValuesEqual } from '@cloudbeaver/core-utils';
+import { isIp, isObjectsEqual, isValuesEqual, sha256 } from '@cloudbeaver/core-utils';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 
 import { MIN_SESSION_EXPIRE_TIME } from './Form/MIN_SESSION_EXPIRE_TIME.js';
@@ -114,7 +120,7 @@ export class ServerConfigurationFormPart extends FormPart<IServerConfigurationFo
 
     // Exclude adminPasswordRepeat from server payload as it's only for client-side validation
     const { adminPasswordRepeat, ...serverConfigToSave } = this.state.serverConfig;
-    await this.serverConfigResource.save({
+    const config: IServerConfigInput = {
       ...serverConfigToSave,
       supportedHosts: Array.from(
         new Set(
@@ -124,7 +130,13 @@ export class ServerConfigurationFormPart extends FormPart<IServerConfigurationFo
             .filter(Boolean),
         ),
       ),
-    });
+    };
+
+    if (config.adminPassword) {
+      config.adminPassword = await sha256(config.adminPassword);
+    }
+
+    await this.serverConfigResource.save(config);
   }
 
   protected override async loader() {

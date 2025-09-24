@@ -9,5 +9,7 @@
 import { Sha256 } from '@aws-crypto/sha256-browser';
 
 export async function sha256(str: string): Promise<string> {
-  return new Sha256(str).digest().toString();
+  const hash = await new Sha256(str).digest();
+  const decoder = new TextDecoder('utf-8');
+  return decoder.decode(hash);
 }

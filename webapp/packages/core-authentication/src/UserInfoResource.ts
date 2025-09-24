@@ -104,6 +104,7 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void> 
   }
 
   async login(provider: string, { credentials, configurationId, linkUser, forceSessionsLogout }: ILoginOptions): Promise<AuthInfo> {
+    // TODO password can be md5 or sha256 hash. First send sha256 hash, if the server returns an error, send md5 hash.
     let processedCredentials: Record<string, any> | undefined;
 
     if (credentials) {
@@ -233,6 +234,8 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void> 
   }
 
   async updateLocalPassword(oldPassword: string, newPassword: string): Promise<void> {
+    // TODO oldPassword can be md5 or sha256 hash. New password should be sha256 hash only.
+
     await this.performUpdate(undefined, [], async () => {
       await this.graphQLService.sdk.authChangeLocalPassword({
         oldPassword: this.authProviderService.hashValue(oldPassword),

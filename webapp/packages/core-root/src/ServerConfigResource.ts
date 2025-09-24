@@ -16,6 +16,7 @@ import { ServerConfigEventHandler } from './ServerConfigEventHandler.js';
 export const FEATURE_GIT_ID = 'git';
 
 export type ServerConfig = ServerConfigFragment;
+export type IServerConfigInput = ServerConfigInput;
 
 @injectable(() => [GraphQLService, DataSynchronizationService, ServerConfigEventHandler])
 export class ServerConfigResource extends CachedDataResource<ServerConfig | null> {
