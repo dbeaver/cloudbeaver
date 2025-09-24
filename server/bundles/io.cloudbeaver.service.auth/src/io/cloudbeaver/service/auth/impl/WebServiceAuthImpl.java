@@ -254,6 +254,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
                     }
                 }
             }
+            cbApp.getSessionManager().closeSession(webSession.getSessionId());
             return new WebLogoutInfo(logoutUrls);
         } catch (DBException e) {
             throw new DBWebException("User logout failed", e);
