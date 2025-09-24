@@ -6,10 +6,11 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { Sha256 } from '@aws-crypto/sha256-browser';
+export async function sha256(message: string): Promise<string> {
+  const msgUint8 = new TextEncoder().encode(message);
+  const hashBuffer = await window.crypto.subtle.digest('SHA-256', msgUint8);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 
-export async function sha256(str: string): Promise<string> {
-  const hash = await new Sha256(str).digest();
-  const decoder = new TextDecoder('utf-8');
-  return decoder.decode(hash);
+  return hashHex;
 }
