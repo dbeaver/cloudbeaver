@@ -53,12 +53,11 @@ export const PropertyItem = observer<Props>(function PropertyItem({ property, va
   const valuePlaceholder = isNotNullDefined(property.valuePlaceholder) ? String(property.valuePlaceholder) : '';
 
   return (
-    <div className={s(styles, { container: true })}>
-      <div className={s(styles, { name: true, error })} title={property.description}>
+    <div className={s(styles, { container: true })} title={property.description}>
+      <div className={s(styles, { name: true, error })}>
         <Input
           ref={keyInputRef}
           value={property.displayName || property.key}
-          title={property.displayName || property.key}
           type="text"
           name={property.id}
           placeholder={keyPlaceholder}
@@ -68,9 +67,10 @@ export const PropertyItem = observer<Props>(function PropertyItem({ property, va
           onChange={e => handleKeyChange(e.target.value)}
         />
       </div>
-      <div className={s(styles, { value: true })} title={String(propertyValue)}>
+      <div className={s(styles, { value: true })}>
         <Combobox
           value={value}
+          title={value}
           name={`${property.id}_value`}
           placeholder={valuePlaceholder}
           items={property.validValues || []}
