@@ -7,7 +7,6 @@
  */
 
 import './module.js';
-export * from './manifest.js';
 export * from './ComponentStyle.js';
 export * from './ThemeService.js';
 export * from './themeUtils.js';

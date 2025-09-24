@@ -9,7 +9,7 @@
 import { Bootstrap, ModuleRegistry } from '@cloudbeaver/core-di';
 import { BlocksLocaleService } from './BlocksLocaleService.js';
 
-ModuleRegistry.add({
+export default ModuleRegistry.add({
   name: '@cloudbeaver/core-blocks',
 
   configure: serviceCollection => {

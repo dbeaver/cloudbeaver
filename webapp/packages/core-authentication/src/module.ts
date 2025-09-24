@@ -31,7 +31,7 @@ import { AuthConfigurationsResource } from './AuthConfigurationsResource.js';
 import { AuthConfigurationParametersResource } from './AuthConfigurationParametersResource.js';
 import { AppAuthService } from './AppAuthService.js';
 
-ModuleRegistry.add({
+export default ModuleRegistry.add({
   name: '@cloudbeaver/core-authentication',
 
   configure: serviceCollection => {

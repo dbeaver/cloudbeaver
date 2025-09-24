@@ -11,7 +11,7 @@ import { WindowsService } from './WindowsService.js';
 import { ScreenService } from './Screen/ScreenService.js';
 import { RouterService } from './RouterService.js';
 
-ModuleRegistry.add({
+export default ModuleRegistry.add({
   name: '@cloudbeaver/core-routing',
 
   configure: serviceCollection => {

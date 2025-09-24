@@ -14,7 +14,7 @@ import { TransactionLogCountResource } from './TransactionLog/TransactionLogCoun
 import { LocaleService } from './LocaleService.js';
 import { TransactionLogCountEventHandler } from './TransactionLog/TransactionLogCountEventHandler.js';
 
-ModuleRegistry.add({
+export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-datasource-transaction-manager',
 
   configure: serviceCollection => {

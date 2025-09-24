@@ -14,7 +14,7 @@ import { AdministrationScreenService } from './AdministrationScreen/Administrati
 import { AdministrationLocaleService } from './AdministrationLocaleService.js';
 import { AdministrationItemService } from './AdministrationItem/AdministrationItemService.js';
 
-ModuleRegistry.add({
+export default ModuleRegistry.add({
   name: '@cloudbeaver/core-administration',
 
   configure: serviceCollection => {

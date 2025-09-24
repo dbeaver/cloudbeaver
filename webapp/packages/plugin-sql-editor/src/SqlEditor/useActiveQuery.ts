@@ -40,7 +40,7 @@ export function useActiveQuery(state: ISQLEditorData): void {
           return;
         }
 
-        const segment = await sqlEditorData.getResolvedSegment();
+        const segment = await sqlEditorData.model.getResolvedSegment();
         let query = data.update.query.trim();
 
         if (segment) {
@@ -65,7 +65,7 @@ export function useActiveQuery(state: ISQLEditorData): void {
                 head: firstQueryPart.length,
               });
             } else {
-              sqlEditorData.setScript(query, undefined, sqlEditorData.cursor);
+              sqlEditorData.setScript(query, undefined, sqlEditorData.model.cursor);
             }
             break;
           case 'append':

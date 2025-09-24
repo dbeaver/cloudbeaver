@@ -12,7 +12,7 @@ import { SearchConnectionPluginBootstrap } from './SearchConnectionPluginBootstr
 import { LocaleService } from './LocaleService.js';
 import { ConnectionSearchSettingsService } from './ConnectionSearchSettingsService.js';
 
-ModuleRegistry.add({
+export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-connection-search',
 
   configure: serviceCollection => {

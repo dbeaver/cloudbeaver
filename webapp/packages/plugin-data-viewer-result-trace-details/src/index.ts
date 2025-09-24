@@ -7,7 +7,3 @@
  */
 
 import './module.js';
-import { dataViewerResultTraceDetailsPlugin } from './manifest.js';
-
-export default dataViewerResultTraceDetailsPlugin;
-export { dataViewerResultTraceDetailsPlugin };

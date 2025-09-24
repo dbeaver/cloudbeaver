@@ -13,6 +13,7 @@
   "license": "Apache-2.0",
   "exports": {
     ".": "./lib/index.js",
+    "./module": "./lib/module.js",
     "./*": "./lib/*"
   },
   "scripts": {
@@ -34,17 +35,19 @@
     "@cloudbeaver/core-settings": "workspace:*",
     "@cloudbeaver/core-storage": "workspace:*",
     "@cloudbeaver/core-utils": "workspace:*",
-    "@dbeaver/js-helpers": "workspace:^",
+    "@dbeaver/js-helpers": "workspace:*",
     "mobx": "^6",
     "tslib": "^2"
   },
   "devDependencies": {
     "@cloudbeaver/core-cli": "workspace:*",
+    "@cloudbeaver/core-root": "workspace:*",
     "@cloudbeaver/core-sdk": "workspace:*",
+    "@cloudbeaver/core-settings": "workspace:*",
     "@cloudbeaver/tests-runner": "workspace:*",
     "@cloudbeaver/tsconfig": "workspace:*",
     "@dbeaver/cli": "workspace:*",
-    "@dbeaver/react-tests": "workspace:^",
+    "@dbeaver/react-tests": "workspace:*",
     "msw": "^2",
     "rimraf": "^6",
     "typescript": "^5",

@@ -7,7 +7,6 @@
  */
 
 import './module.js';
-export * from './manifest.js';
 export * from './LocalizationService.js';
 export * from './Locale.js';
 export * from './TLocalizationToken.js';

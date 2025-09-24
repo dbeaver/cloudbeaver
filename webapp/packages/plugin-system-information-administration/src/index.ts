@@ -7,7 +7,3 @@
  */
 
 import './module.js';
-import { pluginSystemInformationAdministrationManifest } from './manifest.js';
-
-export { pluginSystemInformationAdministrationManifest };
-export default pluginSystemInformationAdministrationManifest;

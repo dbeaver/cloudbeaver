@@ -7,10 +7,6 @@
  */
 
 import './module.js';
-import { holidaysPlugin } from './manifest.js';
 
 export * from './HolidaysService.js';
 export * from './HolidayActionButtonLazy.js';
-
-export { holidaysPlugin };
-export default holidaysPlugin;
