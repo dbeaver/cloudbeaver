@@ -33,7 +33,7 @@ export function useTreeMenu(options: ITreeMenuOptions): Readonly<ITreeMenu> {
 
   const state = useObservableRef(
     () => ({
-      openMenu(event: React.MouseEvent, nodeId: string) {
+      openMenu(event: React.MouseEvent<HTMLDivElement, MouseEvent>, nodeId: string) {
         this.menu.context.deleteForId(this.id);
         this.menu.context.set(DATA_CONTEXT_NAV_NODE_ID, nodeId, this.id);
 
