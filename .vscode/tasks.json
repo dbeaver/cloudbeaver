@@ -136,6 +136,15 @@
         "cwd": "${workspaceFolder}/webapp/common-react/@dbeaver/ui-kit"
       },
       "args": ["docs"]
+    },
+    {
+      "label": "Run Storybook",
+      "type": "shell",
+      "command": "yarn",
+      "options": {
+        "cwd": "${workspaceFolder}/webapp/packages/storybook"
+      },
+      "args": ["storybook"]
     }
   ],
   "inputs": [

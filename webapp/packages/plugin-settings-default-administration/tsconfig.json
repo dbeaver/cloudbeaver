@@ -12,9 +12,6 @@
   ],
   "references": [
     {
-      "path": "../core-authentication"
-    },
-    {
       "path": "../core-cli"
     },
     {
@@ -25,12 +22,6 @@
     },
     {
       "path": "../core-root"
-    },
-    {
-      "path": "../core-settings"
-    },
-    {
-      "path": "../core-utils"
     },
     {
       "path": "../plugin-settings-administration"

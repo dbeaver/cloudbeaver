@@ -7,8 +7,6 @@
  */
 
 import './module.js';
-import { manifest } from './manifest.js';
 
 export * from './AuthenticationService.js';
 export * from './Dialog/AuthDialogService.js';
-export default manifest;

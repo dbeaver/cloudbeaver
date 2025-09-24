@@ -13,7 +13,7 @@ import { SqlEditorScreenBootstrap } from './Screen/SqlEditorScreenBootstrap.js';
 import { SqlEditorScreenService } from './Screen/SqlEditorScreenService.js';
 import { LocaleService } from './LocaleService.js';
 
-ModuleRegistry.add({
+export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-sql-editor-screen',
 
   configure: serviceCollection => {

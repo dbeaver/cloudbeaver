@@ -15,7 +15,8 @@ to: <%= name %>/package.json
   "description": "",
   "license": "Apache-2.0",
   "exports": {
-    ".": "./lib/index.js"
+    ".": "./lib/index.js",
+    "./module": "./lib/module.js"
   },
   "scripts": {
     "build": "tsc -b",

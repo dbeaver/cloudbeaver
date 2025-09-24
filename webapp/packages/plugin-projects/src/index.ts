@@ -7,9 +7,6 @@
  */
 
 import './module.js';
-import { manifest } from './manifest.js';
 
 export * from './FolderDialog.js';
 export * from './ProjectSelect.js';
-
-export default manifest;

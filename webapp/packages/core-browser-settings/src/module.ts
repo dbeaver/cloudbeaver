@@ -10,7 +10,7 @@ import { Bootstrap, Dependency, ModuleRegistry, proxy } from '@cloudbeaver/core-
 import { LocaleService } from './LocaleService.js';
 import { BrowserSettingsService } from './BrowserSettingsService.js';
 
-ModuleRegistry.add({
+export default ModuleRegistry.add({
   name: '@cloudbeaver/core-browser-settings',
 
   configure: serviceCollection => {

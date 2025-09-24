@@ -7,12 +7,9 @@
  */
 
 import './module.js';
-import { toolsPanelPlugin } from './manifest.js';
 
 export * from './Menu/MENU_TOOLS.js';
 export * from './ToolsPanel/ToolsPanelService.js';
 export * from './ToolsPanel/ToolsPanelLazy.js';
 export * from './ToolsPanelSettingsService.js';
 export * from './TOOLS_PANEL_SETTINGS_GROUP.js';
-
-export default toolsPanelPlugin;

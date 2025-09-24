@@ -7,7 +7,6 @@
  */
 
 import './module.js';
-export * from './manifest.js';
 
 export * from './NavigationTree/ElementsTree/ElementsTreeTools/NavigationTreeSettings/createElementsTreeSettings.js';
 export * from './NavigationTree/ElementsTree/ElementsTreeTools/NavigationTreeSettings/DATA_CONTEXT_NAV_TREE_ROOT.js';
@@ -66,6 +65,8 @@ export * from './NodesManager/NavNodeContextMenuService.js';
 export * from './NodesManager/useDatabaseObjectInfo.js';
 export * from './NodesManager/useNode.js';
 export * from './NodesManager/useChildren.js';
+export * from './TreeNew/contexts/TreeMenuContext/TreeMenuContext.js';
+export * from './TreeNew/useTreeMenu.js';
 
 export * from './NodesManager/NodeLinkLoader.js';
 

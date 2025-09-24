@@ -6,8 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 export const KNOWN_PEER_DEPS_MAP: Record<string, string[]> = {
+  'react-leaflet': ['leaflet'],
   'mobx-react-lite': ['mobx', 'react-dom'],
-  '@testing-library/react': ['@testing-library/dom', 'react-dom'],
+  '@testing-library/react': ['@testing-library/jest-dom', 'react-dom'],
   '@typescript-eslint/eslint-plugin': ['typescript'],
   'react-minisearch': ['minisearch'],
 };

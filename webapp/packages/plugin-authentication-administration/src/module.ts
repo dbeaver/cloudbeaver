@@ -30,7 +30,7 @@ import { GrantedConnectionsTabService } from './Administration/Users/Teams/Teams
 import { TeamsAdministrationNavService } from './Administration/Users/Teams/TeamsAdministrationNavService.js';
 import { TeamsAdministrationService } from './Administration/Users/Teams/TeamsAdministrationService.js';
 
-ModuleRegistry.add({
+export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-authentication-administration',
 
   configure: serviceCollection => {

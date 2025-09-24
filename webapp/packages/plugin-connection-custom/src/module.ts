@@ -11,7 +11,7 @@ import { LocaleService } from './LocaleService.js';
 import { CustomConnectionSettingsService } from './CustomConnectionSettingsService.js';
 import { CustomConnectionPluginBootstrap } from './CustomConnectionPluginBootstrap.js';
 
-ModuleRegistry.add({
+export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-connection-custom',
 
   configure: serviceCollection => {

@@ -12,7 +12,8 @@
   "description": "",
   "license": "Apache-2.0",
   "exports": {
-    ".": "./lib/index.js"
+    ".": "./lib/index.js",
+    "./module": "./lib/module.js"
   },
   "scripts": {
     "build": "tsc -b",
@@ -31,6 +32,7 @@
     "@cloudbeaver/core-cli": "workspace:*",
     "@cloudbeaver/tsconfig": "workspace:*",
     "@dbeaver/cli": "workspace:*",
+    "rimraf": "^6",
     "typescript": "^5"
   }
 }

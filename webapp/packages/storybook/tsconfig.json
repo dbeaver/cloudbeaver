@@ -1,0 +1,8 @@
+{
+  "files": [],
+  "references": [
+    {
+      "path": "../../common-react/@dbeaver/ui-kit"
+    }
+  ]
+}

@@ -10,7 +10,7 @@ import { ModuleRegistry, Bootstrap } from '@cloudbeaver/core-di';
 import { PluginDataEditorPublicSettingsBootstrap } from './PluginDataEditorPublicSettingsBootstrap.js';
 import { LocaleService } from './LocaleService.js';
 
-ModuleRegistry.add({
+export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-data-editor-public-settings',
 
   configure: serviceCollection => {

@@ -12,7 +12,8 @@
   "description": "",
   "license": "Apache-2.0",
   "exports": {
-    ".": "./lib/index.js"
+    ".": "./lib/index.js",
+    "./module": "./lib/module.js"
   },
   "scripts": {
     "build": "tsc -b",
@@ -21,19 +22,16 @@
     "validate-dependencies": "core-cli-validate-dependencies"
   },
   "dependencies": {
-    "@cloudbeaver/core-authentication": "workspace:*",
     "@cloudbeaver/core-di": "workspace:*",
     "@cloudbeaver/core-localization": "workspace:*",
     "@cloudbeaver/core-root": "workspace:*",
-    "@cloudbeaver/core-settings": "workspace:*",
-    "@cloudbeaver/core-utils": "workspace:*",
     "@cloudbeaver/plugin-settings-administration": "workspace:*",
-    "mobx": "^6",
     "tslib": "^2"
   },
   "devDependencies": {
     "@cloudbeaver/core-cli": "workspace:*",
     "@cloudbeaver/tsconfig": "workspace:*",
+    "rimraf": "^6",
     "typescript": "^5"
   }
 }
