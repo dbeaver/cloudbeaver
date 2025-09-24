@@ -71,7 +71,6 @@ export const PropertyItem = observer<Props>(function PropertyItem({ property, va
       <div className={s(styles, { value: true })} title={String(propertyValue)}>
         <Combobox
           value={value}
-          defaultValue={valuePlaceholder}
           name={`${property.id}_value`}
           placeholder={valuePlaceholder}
           items={property.validValues || []}
