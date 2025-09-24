@@ -40,6 +40,18 @@ export function validateDependencies(currentPackageRoot: string) {
 
   packageLogger.log('info', true, `Analyzing ${currentPackage['name']}`);
 
+  const isUseRimraf = Object.values(currentPackage.scripts || {}).some(script => script.includes('rimraf'));
+
+  if (isUseRimraf) {
+    devDependencies.add('rimraf');
+  }
+
+  const isUseDbeaverCli = Object.values(currentPackage.scripts || {}).some(script => script.includes('dbeaver-test'));
+
+  if (isUseDbeaverCli) {
+    devDependencies.add('@dbeaver/cli');
+  }
+
   const isUseCoreCli = Object.values(currentPackage.scripts || {}).some(script => script.includes('core-cli'));
 
   if (isUseCoreCli && currentPackage.name !== '@cloudbeaver/core-cli') {
@@ -74,6 +86,9 @@ export function validateDependencies(currentPackageRoot: string) {
 
     if (isCSSModuleFileRegex) {
       devDependencies.add('typescript-plugin-css-modules');
+    }
+    if (isTestFile) {
+      devDependencies.add('@dbeaver/react-tests');
     }
 
     if (isTSXFileRegex) {

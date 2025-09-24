@@ -7,5 +7,4 @@
  */
 
 import './module.js';
-export * from './manifest.js';
 export * from './StorageService.js';

@@ -7,9 +7,6 @@
  */
 
 import './module.js';
-import { resourceManagerScriptsPlugin } from './manifest.js';
-
-export default resourceManagerScriptsPlugin;
 
 export * from './ResourceManagerScriptsService.js';
 export * from './SaveScriptDialog.js';

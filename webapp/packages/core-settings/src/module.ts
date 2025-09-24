@@ -13,7 +13,7 @@ import { SettingsProviderService } from './SettingsProviderService.js';
 import { SettingsManagerService } from './SettingsManager/SettingsManagerService.js';
 import { LocaleService } from './LocaleService.js';
 
-ModuleRegistry.add({
+export default ModuleRegistry.add({
   name: '@cloudbeaver/core-settings',
 
   configure: serviceCollection => {

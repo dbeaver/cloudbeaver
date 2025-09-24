@@ -11,7 +11,7 @@ echo "Starting Cloudbeaver Server"
 
 exec java ${JAVA_OPTS} \
   -Dfile.encoding=UTF-8 \
-  --add-modules=ALL-SYSTEM \
+  --add-modules=ALL-DEFAULT \
   --add-opens=java.base/java.io=ALL-UNNAMED \
   --add-opens=java.base/java.lang=ALL-UNNAMED \
   --add-opens=java.base/java.lang.reflect=ALL-UNNAMED \
@@ -36,6 +36,6 @@ exec java ${JAVA_OPTS} \
   -jar ${launcherJar} \
   -product io.cloudbeaver.product.ce.product \
   -web-config conf/cloudbeaver.conf \
-  ${CLI_OPTS} \
+  "$@" \
   -nl en \
   -registryMultiLanguage

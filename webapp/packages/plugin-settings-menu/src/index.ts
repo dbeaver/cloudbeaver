@@ -7,9 +7,6 @@
  */
 
 import './module.js';
-import { settingsMenuPlugin } from './manifest.js';
-
-export default settingsMenuPlugin;
 
 export * from './SettingsMenu/SettingsMenu.js';
 export * from './SettingsMenu/TOP_NAV_BAR_SETTINGS_MENU.js';

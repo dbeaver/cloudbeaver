@@ -161,11 +161,6 @@ export class MenuBootstrap extends Bootstrap {
       id: 'sql-editor-actions-more',
       actions: [ACTION_DOWNLOAD, ACTION_UPLOAD],
       contexts: [DATA_CONTEXT_SQL_EDITOR_DATA, DATA_CONTEXT_SQL_EDITOR_STATE],
-      isHidden: context => {
-        const data = context.get(DATA_CONTEXT_SQL_EDITOR_DATA)!;
-
-        return data.activeSegmentMode.activeSegmentMode;
-      },
       isDisabled: (context, action) => {
         const state = context.get(DATA_CONTEXT_SQL_EDITOR_STATE)!;
 
@@ -217,10 +212,7 @@ export class MenuBootstrap extends Bootstrap {
     this.menuService.addCreator({
       menus: [SQL_EDITOR_ACTIONS_MENU],
       contexts: [DATA_CONTEXT_SQL_EDITOR_DATA, DATA_CONTEXT_SQL_EDITOR_STATE],
-      getItems: (context, items) => [
-        ...items,
-        ...EXECUTIONS_ACTIONS,
-      ],
+      getItems: (context, items) => [...items, ...EXECUTIONS_ACTIONS],
     });
 
     this.keyBindingService.addKeyBindingHandler({
@@ -242,12 +234,7 @@ export class MenuBootstrap extends Bootstrap {
 
     this.actionService.addHandler({
       id: 'sql-editor-actions',
-      actions: [
-        ...EXECUTIONS_ACTIONS,
-        ACTION_SQL_EDITOR_FORMAT,
-        ACTION_REDO,
-        ACTION_UNDO,
-      ],
+      actions: [...EXECUTIONS_ACTIONS, ACTION_SQL_EDITOR_FORMAT, ACTION_REDO, ACTION_UNDO],
       contexts: [DATA_CONTEXT_SQL_EDITOR_DATA],
       isActionApplicable: (contexts, action): boolean => {
         const sqlEditorData = contexts.get(DATA_CONTEXT_SQL_EDITOR_DATA)!;
@@ -256,25 +243,21 @@ export class MenuBootstrap extends Bootstrap {
           return false;
         }
 
-        if (
-          !sqlEditorData.isExecutionAllowed &&
-          EXECUTIONS_ACTIONS.includes(action)
-        ) {
+        if (!sqlEditorData.isExecutionAllowed && EXECUTIONS_ACTIONS.includes(action)) {
           return false;
         }
 
         if (action === ACTION_SQL_EDITOR_FORMAT) {
-          return !!sqlEditorData.dataSource?.hasFeature(ESqlDataSourceFeatures.script) && !sqlEditorData.activeSegmentMode.activeSegmentMode;
+          return !!sqlEditorData.model.dataSource?.hasFeature(ESqlDataSourceFeatures.script);
         }
 
         if (action === ACTION_SQL_EDITOR_SHOW_EXECUTION_PLAN) {
-          return !!sqlEditorData.dataSource?.hasFeature(ESqlDataSourceFeatures.query) &&
-            !!sqlEditorData.dialect?.supportsExplainExecutionPlan;
+          return !!sqlEditorData.model.dataSource?.hasFeature(ESqlDataSourceFeatures.query) && !!sqlEditorData.dialect?.supportsExplainExecutionPlan;
         }
 
         // TODO we have to add check for output action ?
         if (
-          !sqlEditorData.dataSource?.hasFeature(ESqlDataSourceFeatures.query) &&
+          !sqlEditorData.model.dataSource?.hasFeature(ESqlDataSourceFeatures.query) &&
           [ACTION_SQL_EDITOR_EXECUTE, ACTION_SQL_EDITOR_EXECUTE_NEW, ACTION_SQL_EDITOR_SHOW_EXECUTION_PLAN].includes(action)
         ) {
           return false;
@@ -402,24 +385,16 @@ export class MenuBootstrap extends Bootstrap {
         data.executeQueryNewTab();
         break;
       case ACTION_SQL_EDITOR_EXECUTE_SCRIPT:
-        if (data.activeSegmentMode.activeSegmentMode) {
-          return;
-        }
-
         data.executeScript();
         break;
       case ACTION_SQL_EDITOR_FORMAT:
-        if (data.activeSegmentMode.activeSegmentMode) {
-          return;
-        }
-
         data.formatScript();
         break;
       case ACTION_UNDO:
-        data.dataSource?.history.undo();
+        data.model.dataSource?.history.undo();
         break;
       case ACTION_REDO:
-        data.dataSource?.history.redo();
+        data.model.dataSource?.history.redo();
         break;
       case ACTION_SQL_EDITOR_SHOW_EXECUTION_PLAN:
         data.showExecutionPlan();

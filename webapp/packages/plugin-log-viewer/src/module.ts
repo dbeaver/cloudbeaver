@@ -14,7 +14,7 @@ import { LogViewerBootstrap } from './LogViewer/LogViewerBootstrap.js';
 import { LogViewerSettingsService } from './LogViewer/LogViewerSettingsService.js';
 import { LocaleService } from './LocaleService.js';
 
-ModuleRegistry.add({
+export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-log-viewer',
 
   configure: serviceCollection => {

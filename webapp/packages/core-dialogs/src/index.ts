@@ -8,4 +8,3 @@
 
 import './module.js';
 export * from './CommonDialog/CommonDialogService.js';
-export * from './manifest.js';

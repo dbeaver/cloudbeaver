@@ -13,7 +13,7 @@ import { ThemeService } from './ThemeService.js';
 import { LocaleService } from './LocaleService.js';
 import { SystemThemeService } from './SystemThemeService.js';
 
-ModuleRegistry.add({
+export default ModuleRegistry.add({
   name: '@cloudbeaver/core-theming',
 
   configure: serviceCollection => {

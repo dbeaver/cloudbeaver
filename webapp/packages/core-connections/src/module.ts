@@ -34,7 +34,7 @@ import { ConnectionExecutionContextResource } from './ConnectionExecutionContext
 import { ConnectionDialectResource } from './ConnectionDialectResource.js';
 import { DBDriverExpertSettingsResource } from './DBDriverExpertSettingsResource.js';
 
-ModuleRegistry.add({
+export default ModuleRegistry.add({
   name: '@cloudbeaver/core-connections',
 
   configure: serviceCollection => {
