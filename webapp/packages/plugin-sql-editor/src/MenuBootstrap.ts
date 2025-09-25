@@ -206,7 +206,7 @@ export class MenuBootstrap extends Bootstrap {
 
         return !!dataSource?.hasFeature(ESqlDataSourceFeatures.script);
       },
-      getItems: (context, items) => [...items, ACTION_SAVE],
+      getItems: (context, items) => [ACTION_SAVE, ...items],
     });
 
     this.menuService.addCreator({
