@@ -219,6 +219,10 @@ public class CBStaticServlet extends DefaultServlet {
         if (pathInContext.startsWith("/")) {
             pathInContext = pathInContext.substring(1);
         }
+        if (pathInContext.contains("..")) {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND);
+            return;
+        }
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         Path filePath = contentRoot.resolve(pathInContext);
         try (InputStream fis = Files.newInputStream(filePath)) {

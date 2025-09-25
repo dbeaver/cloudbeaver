@@ -30,7 +30,7 @@ import org.jkiss.utils.CommonUtils;
 /**
  * Web service implementation
  */
-public class WebServiceBindingFS extends WebServiceBindingBase<DBWServiceFS> implements DBWServiceBindingServlet<CBApplication> {
+public class WebServiceBindingFS extends WebServiceBindingBase<DBWServiceFS> implements DBWServiceBindingServlet<CBApplication<?>> {
 
     private static final String SCHEMA_FILE_NAME = "schema/service.fs.graphqls";
 
@@ -117,7 +117,7 @@ public class WebServiceBindingFS extends WebServiceBindingBase<DBWServiceFS> imp
     }
 
     @Override
-    public void addServlets(CBApplication application, DBWServletContext servletContext) throws DBException {
+    public void addServlets(CBApplication<?> application, DBWServletContext servletContext) throws DBException {
         if (!application.isMultiuser()) {
             return;
         }
