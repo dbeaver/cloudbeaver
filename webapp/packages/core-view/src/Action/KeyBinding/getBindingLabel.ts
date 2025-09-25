@@ -27,8 +27,8 @@ const FORMAT_SHORTCUT_KEYS_MAP: Record<string, string> = {
   right: '→',
   pageup: 'pageup',
   pagedown: 'pagedown',
-  del: '⌦',
-  delete: '⌦',
+  del: 'delete',
+  delete: 'delete',
 };
 const SOURCE_DIVIDER_REGEXP = /\+/gi;
 const APPLIED_DIVIDER = ' + ';
