@@ -17,10 +17,9 @@ export default [
   ['sql_editor_shortcut_execute_script', 'Thực thi kịch bản'],
   ['sql_editor_shortcut_show_execution_plan', 'Hiển thị kế hoạch thực thi'],
   ['sql_editor_shortcut_format', 'Định dạng kịch bản'],
-  ['sql_editor_shortcut_save_as_script', 'Lưu dưới dạng kịch bản'],
   ['sql_editor_shortcut_open_editor_in_new_tab', 'Mở Trình chỉnh sửa SQL trong tab riêng biệt'],
-  ['sql_editor_shortcut_undo', 'Hoàn tác'],
-  ['sql_editor_shortcut_redo', 'Làm lại'],
+  ['sql_editor_shortcut_find', 'Tìm kiếm'],
+  ['sql_editor_shortcut_comment_uncomment_selection', 'Bình luận/Bỏ bình luận lựa chọn'],
 
   ['navigation_tree_shortcut_enable_filter', 'Bật lọc'],
 
