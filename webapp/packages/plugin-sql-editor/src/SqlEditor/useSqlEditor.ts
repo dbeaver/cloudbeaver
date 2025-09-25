@@ -48,7 +48,7 @@ interface ISQLEditorDataPrivate extends ISQLEditorData {
   state: ISqlEditorTabState;
   reactionDisposer: IReactionDisposer | null;
   hintsLimitIsMet: boolean;
-  loadDatabaseDataModels(): Promise<void>;
+  loadDatabaseDataModels(): void;
 }
 
 const MAX_HINTS_LIMIT = 200;
@@ -193,19 +193,10 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
         } catch {}
       },
 
-      async loadDatabaseDataModels(): Promise<void> {
-        // force script parsing, cursorSegment depends on it
-        await this.model.getResolvedSegment();
-        await this.executeQueryAction(
-          this.model.cursorSegment,
-          () => {
-            if (this.model.dataSource?.databaseModels.length) {
-              this.sqlQueryService.initDatabaseDataModels(this.state);
-            }
-          },
-          true,
-          true,
-        );
+      loadDatabaseDataModels(): void {
+        if (this.model.dataSource?.databaseModels.length) {
+          this.sqlQueryService.initDatabaseDataModels(this.state);
+        }
       },
 
       async executeQueryNewTab(): Promise<void> {
