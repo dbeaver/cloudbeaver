@@ -22,6 +22,7 @@ import io.cloudbeaver.auth.SMSignOutLinkProvider;
 import io.cloudbeaver.auth.provider.local.LocalAuthProvider;
 import io.cloudbeaver.model.WebAsyncTaskInfo;
 import io.cloudbeaver.model.WebPropertyInfo;
+import io.cloudbeaver.model.app.ServletApplication;
 import io.cloudbeaver.model.session.WebAuthInfo;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.session.WebSessionAuthProcessor;
@@ -223,9 +224,12 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
             throw new DBWebException("Not logged in");
         }
         try {
-            List<WebAuthInfo> removedInfos = webSession.removeAuthInfo(providerId);
-            List<String> logoutUrls = new ArrayList<>();
+            List<WebAuthInfo> removedInfos = webSession.removeAuthInfo(providerId, false);
             var cbApp = CBApplication.getInstance();
+            cbApp.getSessionManager().closeSession(webSession.getSessionId(), false);
+            webSession.resetUserState();
+
+            List<String> logoutUrls = new ArrayList<>();
             String origin = ServletAppUtils.getOriginFromRequest(httpRequest);
             for (WebAuthInfo removedInfo : removedInfos) {
                 if (removedInfo.getAuthProviderDescriptor()
@@ -254,7 +258,6 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
                     }
                 }
             }
-            cbApp.getSessionManager().closeSession(webSession.getSessionId());
             return new WebLogoutInfo(logoutUrls);
         } catch (DBException e) {
             throw new DBWebException("User logout failed", e);
@@ -264,7 +267,12 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
     @Override
     public WebUserInfo activeUser(@NotNull WebSession webSession) throws DBWebException {
         if (webSession.getUser() == null) {
-            if (!webSession.getApplication().isAnonymousAccessEnabled()) {
+            ServletApplication application = webSession.getApplication();
+            if (application.getAppConfiguration().isAnonymousAccessEnabled() && webSession.isAuthorizedInSecurityManager()) {
+                SMUser anonymous = new SMUser("anonymous", true, null);
+                return new WebUserInfo(webSession, new WebUser(anonymous));
+            }
+            if (!application.isAnonymousAccessEnabled()) {
                 return null;
             }
             SMUser anonymous = new SMUser("anonymous", true, null);
