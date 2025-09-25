@@ -7,10 +7,6 @@
  */
 
 import './module.js';
-import { devToolsPlugin } from './manifest.js';
-
-export { devToolsPlugin };
-export default devToolsPlugin;
 
 export * from './DevToolsService.js';
 export * from './menu/MENU_DEVTOOLS.js';

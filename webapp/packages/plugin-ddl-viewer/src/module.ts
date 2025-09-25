@@ -12,7 +12,7 @@ import { DdlViewerBootstrap } from './DdlViewerBootstrap.js';
 import { DdlResource } from './DdlViewer/DdlResource.js';
 import { DDLViewerFooterService } from './DdlViewer/DDLViewerFooterService.js';
 
-ModuleRegistry.add({
+export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-ddl-viewer',
 
   configure: serviceCollection => {

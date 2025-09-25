@@ -23,13 +23,7 @@
       "path": "../core-localization"
     },
     {
-      "path": "../core-root"
-    },
-    {
       "path": "../core-settings"
-    },
-    {
-      "path": "../core-utils"
     },
     {
       "path": "../plugin-data-import"

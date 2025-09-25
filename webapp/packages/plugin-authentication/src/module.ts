@@ -13,7 +13,7 @@ import { AuthDialogService } from './Dialog/AuthDialogService.js';
 import { AuthenticationService } from './AuthenticationService.js';
 import { AuthenticationLocaleService } from './AuthenticationLocaleService.js';
 
-ModuleRegistry.add({
+export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-authentication',
 
   configure: serviceCollection => {

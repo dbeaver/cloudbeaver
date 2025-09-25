@@ -7,7 +7,6 @@
  */
 
 import './module.js';
-import { sqlEditorPluginManifest } from './manifest.js';
 
 export * from './actions/bindings/KEY_BINDING_SQL_EDITOR_EXECUTE_NEW.js';
 export * from './actions/bindings/KEY_BINDING_SQL_EDITOR_EXECUTE_SCRIPT.js';
@@ -34,13 +33,13 @@ export * from './SqlEditor/ISQLEditorData.js';
 export * from './SqlEditor/DATA_CONTEXT_SQL_EDITOR_DATA.js';
 export * from './SqlEditor/SQL_EDITOR_ACTIONS_MENU.js';
 export * from './SqlEditor/SQL_EDITOR_TOOLS_MENU.js';
-export * from './SqlEditor/SQLEditorModeContext.js';
 export * from './SqlEditor/SqlEditorStateContext.js';
 export * from './SqlResultTabs/DATA_CONTEXT_SQL_EDITOR_RESULT_ID.js';
 export * from './SqlResultTabs/SqlResultTabsService.js';
 export * from './SqlResultTabs/OutputLogs/OutputLogsEventHandler.js';
 export * from './SqlResultTabs/OutputLogs/OutputLogsResource.js';
 export * from './SqlResultTabs/OutputLogs/OutputLogsService.js';
+export * from './SqlEditorModel/SqlEditorModelService.js';
 export * from './DATA_CONTEXT_SQL_EDITOR_STATE.js';
 export * from './getSqlEditorName.js';
 export * from './QueryDataSource.js';
@@ -52,5 +51,3 @@ export * from './SqlEditorService.js';
 export * from './SqlEditorSettingsService.js';
 export * from './SqlEditorView.js';
 export * from './SqlResultTabs/SqlQueryService.js';
-
-export default sqlEditorPluginManifest;

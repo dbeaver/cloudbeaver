@@ -20,7 +20,7 @@ import org.apache.commons.cli.CommandLine;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.cli.ApplicationInstanceController;
 import org.jkiss.dbeaver.model.cli.ApplicationInstanceServer;
-import org.jkiss.dbeaver.model.cli.CliProcessResult;
+import org.jkiss.dbeaver.model.cli.CLIProcessResult;
 
 import java.io.IOException;
 
@@ -31,7 +31,7 @@ public class CloudBeaverInstanceServer extends ApplicationInstanceServer<Applica
 
     @NotNull
     @Override
-    public CliProcessResult handleCommandLine(@NotNull String[] args) {
+    public CLIProcessResult handleCommandLine(@NotNull String[] args) {
         CommandLine cmd = CloudBeaverCommandLine.getInstance().getCommandLine(args);
         try {
             return CloudBeaverCommandLine.getInstance().executeCommandLineCommands(
@@ -40,7 +40,7 @@ public class CloudBeaverInstanceServer extends ApplicationInstanceServer<Applica
                 false
             );
         } catch (Exception e) {
-            return new CliProcessResult(CliProcessResult.PostAction.ERROR, "Error executing command: " + e.getMessage());
+            return new CLIProcessResult(CLIProcessResult.PostAction.ERROR, "Error executing command: " + e.getMessage());
         }
     }
 }

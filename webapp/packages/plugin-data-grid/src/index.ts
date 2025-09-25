@@ -7,10 +7,6 @@
  */
 
 import './module.js';
-import { dataGridPlugin } from './manifest.js';
-
-export default dataGridPlugin;
-export { dataGridPlugin };
 
 export { DataGrid } from './DataGridLazy.js';
 

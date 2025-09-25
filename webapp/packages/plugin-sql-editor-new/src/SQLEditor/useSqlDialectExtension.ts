@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ const codemirrorComplexLoader = createComplexLoader(() => import('@cloudbeaver/p
 const SQL_EDITOR_COMPARTMENT = new Compartment();
 
 export function useSqlDialectExtension(dialectInfo: SqlDialectInfo | undefined): [Compartment, Extension] {
+  //TODO: probably we need to refactor it to lazy approach without triggering suspense
   const { SQLDialect, SQL_EDITOR } = useComplexLoader(codemirrorComplexLoader);
   const loader = getDialectLoader(dialectInfo?.name);
   const dialect = useComplexLoader(loader);

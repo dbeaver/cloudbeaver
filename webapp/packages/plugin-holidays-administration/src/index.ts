@@ -7,7 +7,3 @@
  */
 
 import './module.js';
-import { holidaysAdministrationPlugin } from './manifest.js';
-
-export { holidaysAdministrationPlugin };
-export default holidaysAdministrationPlugin;

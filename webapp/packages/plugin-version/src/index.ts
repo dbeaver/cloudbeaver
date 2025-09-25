@@ -7,6 +7,3 @@
  */
 
 import './module.js';
-import { versionPlugin } from './manifest.js';
-
-export default versionPlugin;

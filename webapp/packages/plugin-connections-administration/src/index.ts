@@ -7,6 +7,3 @@
  */
 
 import './module.js';
-import { connectionPlugin } from './manifest.js';
-
-export default connectionPlugin;

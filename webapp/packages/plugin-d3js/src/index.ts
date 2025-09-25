@@ -6,10 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { pluginD3js } from './manifest.js';
-
-export default pluginD3js;
-
 export {
   select,
   line,

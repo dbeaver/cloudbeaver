@@ -12,7 +12,7 @@ import { LocaleService } from './LocaleService.js';
 import { ExceptionsCatcherService } from './ExceptionsCatcherService.js';
 import { EventsSettingsService } from './EventsSettingsService.js';
 
-ModuleRegistry.add({
+export default ModuleRegistry.add({
   name: '@cloudbeaver/core-events',
 
   configure: serviceCollection => {

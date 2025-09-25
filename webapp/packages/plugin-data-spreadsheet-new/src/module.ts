@@ -15,7 +15,7 @@ import { DataGridContextMenuOrderService } from './DataGrid/DataGridContextMenu/
 import { DataGridContextMenuFilterService } from './DataGrid/DataGridContextMenu/DataGridContextMenuFilter/DataGridContextMenuFilterService.js';
 import { DataGridContextMenuCellEditingService } from './DataGrid/DataGridContextMenu/DataGridContextMenuCellEditingService.js';
 
-ModuleRegistry.add({
+export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-data-spreadsheet-new',
 
   configure: serviceCollection => {

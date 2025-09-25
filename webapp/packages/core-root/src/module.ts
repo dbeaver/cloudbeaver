@@ -40,7 +40,7 @@ import { DataSynchronizationService } from './DataSynchronization/DataSynchroniz
 import { AsyncTaskInfoService } from './AsyncTask/AsyncTaskInfoService.js';
 import { AsyncTaskInfoEventHandler } from './AsyncTask/AsyncTaskInfoEventHandler.js';
 
-ModuleRegistry.add({
+export default ModuleRegistry.add({
   name: '@cloudbeaver/core-root',
 
   configure: serviceCollection => {

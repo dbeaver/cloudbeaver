@@ -7,9 +7,6 @@
  */
 
 import './module.js';
-import { manifest } from './manifest.js';
-
-export default manifest;
 
 export * from './Administration/Users/UsersAdministrationNavigationService.js';
 export * from './Administration/Users/UsersTable/CreateUserService.js';

@@ -10,6 +10,5 @@ import './module.js';
 export * from './IndexedDB/IndexedDBService.js';
 export * from './IndexedDB/IndexedDB.js';
 export * from './LocalStorageSaveService.js';
-export * from './manifest.js';
 export * from './promptForFiles.js';
 export * from './ServiceWorkerService.js';

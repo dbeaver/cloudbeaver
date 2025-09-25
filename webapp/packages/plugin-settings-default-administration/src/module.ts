@@ -10,7 +10,7 @@ import { Bootstrap, ModuleRegistry } from '@cloudbeaver/core-di';
 import { SettingsDefaultAdministrationBootstrap } from './SettingsDefaultBootstrap.js';
 import { LocaleService } from './LocaleService.js';
 
-ModuleRegistry.add({
+export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-settings-default-administration',
 
   configure: serviceCollection => {
