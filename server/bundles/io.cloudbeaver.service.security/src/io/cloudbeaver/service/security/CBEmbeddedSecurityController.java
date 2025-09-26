@@ -3157,6 +3157,12 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                 objectType.name(),
                 objectId
             );
+            JDBCUtils.executeStatement(
+                dbCon,
+                "DELETE FROM {table_prefix}CB_OBJECT_SETTINGS WHERE OBJECT_TYPE=? AND OBJECT_ID=?",
+                objectType.name(),
+                objectId
+            );
 
         } catch (SQLException e) {
             throw new DBCException("Error deleting object permissions", e);
