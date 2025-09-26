@@ -16,6 +16,7 @@
  */
 package io.cloudbeaver.model;
 
+import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebProjectImpl;
 import io.cloudbeaver.model.app.BaseWebAppConfiguration;
 import io.cloudbeaver.model.session.WebSession;
@@ -317,6 +318,10 @@ public class WebConnectionInfo {
         return !dataSourceContainer.isConnected() &&
             !(dataSourceContainer.isCredentialsSaved() || isAuthPropertiesEmpty()) &&
             !dataSourceContainer.getDriver().isAnonymousAccess();
+    }
+
+    public void validateConnection() throws DBWebException {
+
     }
 
     // we don't show non-secured properties in FE when connecting to DB without saved credentials

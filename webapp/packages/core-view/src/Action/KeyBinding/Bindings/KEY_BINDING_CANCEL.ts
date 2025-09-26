@@ -5,10 +5,10 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { createKeyBinding } from '@cloudbeaver/core-view';
+import { createKeyBinding } from '../createKeyBinding.js';
 
-export const KEY_BINDING_SQL_EDITOR_SAVE_AS_SCRIPT = createKeyBinding({
-  id: 'save-as-script',
-  keys: 'mod+s',
+export const KEY_BINDING_CANCEL = createKeyBinding({
+  id: 'cancel',
+  keys: ['Escape'],
   preventDefault: true,
 });
