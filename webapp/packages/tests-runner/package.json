@@ -6,6 +6,7 @@
   "license": "Apache-2.0",
   "exports": {
     ".": "./lib/index.js",
+    "./module": "./lib/module.js",
     "./*": "./lib/*.js"
   },
   "scripts": {
@@ -17,10 +18,15 @@
   },
   "dependencies": {
     "@cloudbeaver/core-di": "workspace:*",
+    "@dbeaver/react-tests": "workspace:*",
+    "@testing-library/dom": "^10",
+    "@testing-library/jest-dom": "^6",
+    "@testing-library/react": "^16",
     "mobx": "^6",
     "react": "^19",
     "react-dom": "^19",
-    "tslib": "^2"
+    "tslib": "^2",
+    "vitest": "^3"
   },
   "sideEffects": [
     "./lib/module.js",
@@ -32,13 +38,11 @@
   "devDependencies": {
     "@cloudbeaver/core-cli": "workspace:*",
     "@cloudbeaver/tsconfig": "workspace:*",
-    "@dbeaver/cli": "workspace:^",
-    "@dbeaver/react-tests": "workspace:^",
-    "@testing-library/dom": "^10",
-    "@testing-library/jest-dom": "^6",
-    "@testing-library/react": "^16",
+    "@dbeaver/cli": "workspace:*",
+    "@dbeaver/react-tests": "workspace:*",
     "@types/node": "^22",
     "@types/react": "^19",
+    "rimraf": "^6",
     "typescript": "^5",
     "vitest": "^3"
   }

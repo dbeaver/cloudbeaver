@@ -9,7 +9,7 @@
 import { ModuleRegistry } from '@cloudbeaver/core-di';
 import { StorageService } from './StorageService.js';
 
-ModuleRegistry.add({
+export default ModuleRegistry.add({
   name: '@cloudbeaver/core-storage',
 
   configure: serviceCollection => {

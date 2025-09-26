@@ -7,6 +7,3 @@
  */
 
 import './module.js';
-import { localizationPlugin } from './manifest.js';
-
-export default localizationPlugin;

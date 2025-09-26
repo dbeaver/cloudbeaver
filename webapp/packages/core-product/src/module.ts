@@ -9,7 +9,7 @@
 import { ModuleRegistry } from '@cloudbeaver/core-di';
 import { ProductSettingsService } from './ProductSettingsService.js';
 
-ModuleRegistry.add({
+export default ModuleRegistry.add({
   name: '@cloudbeaver/core-product',
 
   configure: serviceCollection => {

@@ -29,7 +29,7 @@ import { DataViewerDataChangeConfirmationService } from './DataViewerDataChangeC
 import { DataViewerBootstrap } from './DataViewerBootstrap.js';
 import { DataPresentationService } from './DataPresentationService.js';
 
-ModuleRegistry.add({
+export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-data-viewer',
 
   configure: serviceCollection => {

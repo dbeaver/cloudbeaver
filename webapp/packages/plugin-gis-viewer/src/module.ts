@@ -10,7 +10,7 @@ import { ModuleRegistry, Bootstrap } from '@cloudbeaver/core-di';
 import { LocaleService } from './LocaleService.js';
 import { GISViewerBootstrap } from './GISViewerBootstrap.js';
 
-ModuleRegistry.add({
+export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-gis-viewer',
 
   configure: serviceCollection => {

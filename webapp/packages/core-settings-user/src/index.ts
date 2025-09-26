@@ -7,6 +7,5 @@
  */
 
 import './module.js';
-export * from './manifest.js';
 
 export * from './UserSettingsService.js';

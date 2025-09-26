@@ -92,5 +92,3 @@ export * from './SideBarPanel/SideBarPanelLoader.js';
 export * from './SideBarPanel/SideBarPanelService.js';
 
 export * from './Screens/AppScreen/BaseOptionsPanelService.js';
-
-export { manifest as coreUIManifest } from './manifest.js';
