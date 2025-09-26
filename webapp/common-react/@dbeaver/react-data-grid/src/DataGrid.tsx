@@ -163,21 +163,21 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
   }
 
   // We need to patch auto-size width to avoid extremely large columns on table initialization
-  columnWidths.forEach((column, key) => {
+  for (const [key, column] of columnWidths) {
     const isMeasured = column.type === 'measured';
-    const current = columnWidths.get(key);
+    const isAutoSized = getHeaderWidth?.(Number(key)) === 'auto';
+    const isOversized = column.width > MAX_AUTO_SIZE_WIDTH;
 
-    if (!current || !isMeasured) {
-      return;
+    if (isAutoSized || !isMeasured || !isOversized) {
+      continue;
     }
 
-    if (column.width > MAX_AUTO_SIZE_WIDTH) {
-      (columnWidths as Map<string, ColumnWidth>).set(key, {
-        ...current,
-        width: MAX_AUTO_SIZE_WIDTH,
-      });
-    }
-  });
+    (columnWidths as Map<string, ColumnWidth>).set(key, {
+      ...column,
+      type: 'resized',
+      width: MAX_AUTO_SIZE_WIDTH,
+    });
+  }
 
   return (
     <HeaderDnDContext value={dndHeaderContext}>
