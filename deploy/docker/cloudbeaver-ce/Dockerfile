@@ -16,6 +16,6 @@ EXPOSE 8978
 RUN find /opt/cloudbeaver -type d -exec chmod 775 {} \;
 WORKDIR /opt/cloudbeaver/
 
-RUN chmod +x "run-server.sh" "/opt/cloudbeaver/launch-product.sh"
+RUN chmod +x "run-cloudbeaver-server.sh" "/opt/cloudbeaver/launch-product.sh"
 
 ENTRYPOINT ["./launch-product.sh"]
