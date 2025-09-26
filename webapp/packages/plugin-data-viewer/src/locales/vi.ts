@@ -18,7 +18,7 @@ export default [
   ['data_viewer_action_auto_refresh_menu_stop_tooltip', 'Dừng làm mới dữ liệu tự động'],
   ['data_viewer_action_auto_refresh_menu_configure_tooltip', 'Cấu hình cài đặt làm mới tự động'],
   ['data_viewer_action_auto_refresh_interval_tooltip', 'Đặt khoảng thời gian làm mới tự động thành {arg:interval}'],
-  ['data_viewer_action_edit_delete', 'Xóa mục đã chọn'],
+  ['data_viewer_action_edit_delete', 'Xóa các hàng đã chọn'],
   ['data_viewer_action_edit_add', 'Thêm'],
   ['data_viewer_action_edit_add_copy', 'Sao chép'],
   ['data_viewer_action_edit_revert', 'Hủy mục đã chọn'],

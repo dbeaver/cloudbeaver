@@ -29,8 +29,12 @@ export function useTreeFilter(options: ITreeFilterOptions = {}): Readonly<ITreeF
   options = useObjectRef(options);
   const matchCache = new Map<string, boolean>();
 
-  function hasMatchingDescendant(
-    treeData: ITreeData, nodeId: string, filter: string, matchFn: (treeData: ITreeData, nodeId: string) => boolean): boolean {
+  function matchesOrHasMatchingDescendant(
+    treeData: ITreeData,
+    nodeId: string,
+    filter: string,
+    matchFn: (treeData: ITreeData, nodeId: string) => boolean,
+  ): boolean {
     const cacheKey = `${nodeId}:${filter}`;
     if (matchCache.has(cacheKey)) {
       return matchCache.get(cacheKey)!;
@@ -43,7 +47,7 @@ export function useTreeFilter(options: ITreeFilterOptions = {}): Readonly<ITreeF
 
     const children = treeData.getUnfilteredChildren(nodeId);
     for (const childId of children) {
-      if (hasMatchingDescendant(treeData, childId, filter, matchFn)) {
+      if (matchesOrHasMatchingDescendant(treeData, childId, filter, matchFn)) {
         matchCache.set(cacheKey, true);
         return true;
       }
@@ -94,8 +98,8 @@ export function useTreeFilter(options: ITreeFilterOptions = {}): Readonly<ITreeF
           return state;
         }
 
-        if (hasMatchingDescendant(treeData, nodeId, filter, this.isNodeMatched.bind(this))) {
-          return { ...state, expanded: true };
+        if (matchesOrHasMatchingDescendant(treeData, nodeId, filter, this.isNodeMatched.bind(this))) {
+          return { ...state };
         }
 
         return state;
