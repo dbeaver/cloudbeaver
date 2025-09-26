@@ -8,112 +8,19 @@
   },
   "references": [
     {
-      "path": "../core-administration"
-    },
-    {
       "path": "../core-app"
-    },
-    {
-      "path": "../core-authentication"
     },
     {
       "path": "../core-blocks"
     },
     {
-      "path": "../core-browser"
-    },
-    {
-      "path": "../core-browser-cookies"
-    },
-    {
-      "path": "../core-browser-settings"
-    },
-    {
       "path": "../core-cli"
-    },
-    {
-      "path": "../core-client-activity"
-    },
-    {
-      "path": "../core-connections"
     },
     {
       "path": "../core-di"
     },
     {
-      "path": "../core-dialogs"
-    },
-    {
-      "path": "../core-events"
-    },
-    {
       "path": "../core-executor"
-    },
-    {
-      "path": "../core-links"
-    },
-    {
-      "path": "../core-localization"
-    },
-    {
-      "path": "../core-navigation-tree"
-    },
-    {
-      "path": "../core-product"
-    },
-    {
-      "path": "../core-projects"
-    },
-    {
-      "path": "../core-resource"
-    },
-    {
-      "path": "../core-resource-manager"
-    },
-    {
-      "path": "../core-root"
-    },
-    {
-      "path": "../core-routing"
-    },
-    {
-      "path": "../core-sdk"
-    },
-    {
-      "path": "../core-server-localization"
-    },
-    {
-      "path": "../core-session-localization"
-    },
-    {
-      "path": "../core-settings"
-    },
-    {
-      "path": "../core-settings-localization"
-    },
-    {
-      "path": "../core-settings-user"
-    },
-    {
-      "path": "../core-storage"
-    },
-    {
-      "path": "../core-task-manager"
-    },
-    {
-      "path": "../core-theming"
-    },
-    {
-      "path": "../core-ui"
-    },
-    {
-      "path": "../core-version"
-    },
-    {
-      "path": "../core-version-update"
-    },
-    {
-      "path": "../core-view"
     }
   ],
   "include": [

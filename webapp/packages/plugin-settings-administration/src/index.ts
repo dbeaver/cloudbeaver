@@ -7,8 +7,4 @@
  */
 
 import './module.js';
-import { settingsAdministrationPlugin } from './manifest.js';
 export { SettingsAdministrationService } from './SettingsAdministrationService.js';
-
-export { settingsAdministrationPlugin };
-export default settingsAdministrationPlugin;

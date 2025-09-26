@@ -12,7 +12,8 @@
   "description": "",
   "license": "Apache-2.0",
   "exports": {
-    ".": "./lib/index.js"
+    ".": "./lib/index.js",
+    "./module": "./lib/module.js"
   },
   "scripts": {
     "build": "tsc -b",
@@ -29,6 +30,7 @@
     "tslib": "^2",
     "underscore": "^1",
     "uuid": "^13",
+    "vitest": "^3",
     "whatwg-mimetype": "^4",
     "zod": "^4",
     "zod-validation-error": "^4"
@@ -38,11 +40,12 @@
     "@cloudbeaver/tests-runner": "workspace:*",
     "@cloudbeaver/tsconfig": "workspace:*",
     "@dbeaver/cli": "workspace:*",
-    "@dbeaver/react-tests": "workspace:^",
+    "@dbeaver/react-tests": "workspace:*",
     "@types/md5": "^2",
     "@types/underscore": "^1",
     "@types/uuid": "^10",
     "@types/whatwg-mimetype": "^3",
+    "rimraf": "^6",
     "typescript": "^5",
     "vitest": "^3",
     "zod": "^4"

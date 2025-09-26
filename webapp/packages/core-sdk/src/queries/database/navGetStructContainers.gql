@@ -16,5 +16,7 @@ query navGetStructContainers($projectId: ID!, $connectionId: ID!, $catalogId: ID
     }
     supportsCatalogChange
     supportsSchemaChange
+    defaultCatalog
+    defaultSchema
   }
 }

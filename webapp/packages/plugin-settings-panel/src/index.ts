@@ -7,7 +7,5 @@
  */
 
 import './module.js';
-import { settingsPanelPlugin } from './manifest.js';
 
 export * from './SettingsPanel/SettingsLazy.js';
-export default settingsPanelPlugin;

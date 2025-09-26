@@ -92,10 +92,10 @@
       "label": "Run Backend CE",
       "type": "shell",
       "windows": {
-        "command": "./run-server.bat"
+        "command": "./run-cloudbeaver-server.bat"
       },
       "osx": {
-        "command": "./run-server.sh"
+        "command": "./run-cloudbeaver-server.sh"
       },
       "options": {
         "cwd": "${workspaceFolder}/deploy/cloudbeaver"
@@ -136,6 +136,15 @@
         "cwd": "${workspaceFolder}/webapp/common-react/@dbeaver/ui-kit"
       },
       "args": ["docs"]
+    },
+    {
+      "label": "Run Storybook",
+      "type": "shell",
+      "command": "yarn",
+      "options": {
+        "cwd": "${workspaceFolder}/webapp/packages/storybook"
+      },
+      "args": ["storybook"]
     }
   ],
   "inputs": [
