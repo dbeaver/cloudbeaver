@@ -2305,6 +2305,7 @@ __metadata:
     eslint-plugin-react: "npm:^7"
     eslint-plugin-react-hooks: "npm:^5"
     eslint-plugin-storybook: "npm:^9"
+    storybook: "npm:^9"
     typescript-eslint: "npm:^8"
   languageName: unknown
   linkType: soft

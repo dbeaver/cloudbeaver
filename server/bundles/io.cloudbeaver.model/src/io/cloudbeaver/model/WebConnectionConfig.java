@@ -16,11 +16,11 @@
  */
 package io.cloudbeaver.model;
 
+import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.connection.DBPDriverConfigurationType;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.meta.Property;
-import org.jkiss.utils.CommonUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,7 +58,6 @@ public class WebConnectionConfig {
     private Map<String, Object> mainPropertyValues;
     private Map<String, Object> expertSettingsValues;
     private Map<String, Object> providerProperties;
-    private Map<String, Object> externalParameters;
     private List<WebNetworkHandlerConfigInput> networkHandlersConfig;
     private DBPDriverConfigurationType configurationType;
     private String selectedSecretId;
@@ -69,54 +68,52 @@ public class WebConnectionConfig {
     public WebConnectionConfig() {
     }
 
-    public WebConnectionConfig(Map<String, Object> params) {
-        if (!CommonUtils.isEmpty(params)) {
-            connectionId = JSONUtils.getString(params, "connectionId");
-            driverId = JSONUtils.getString(params, "driverId");
+    public WebConnectionConfig(@NotNull Map<String, Object> params) {
+        connectionId = JSONUtils.getString(params, "connectionId");
+        driverId = JSONUtils.getString(params, "driverId");
 
-            host = JSONUtils.getString(params, "host");
-            port = JSONUtils.getString(params, "port");
-            serverName = JSONUtils.getString(params, "serverName");
-            databaseName = JSONUtils.getString(params, "databaseName");
-            url = JSONUtils.getString(params, "url");
+        host = JSONUtils.getString(params, "host");
+        port = JSONUtils.getString(params, "port");
+        serverName = JSONUtils.getString(params, "serverName");
+        databaseName = JSONUtils.getString(params, "databaseName");
+        url = JSONUtils.getString(params, "url");
 
-            name = JSONUtils.getString(params, "name");
-            description = JSONUtils.getString(params, "description");
-            folder = JSONUtils.getString(params, "folder");
+        name = JSONUtils.getString(params, "name");
+        description = JSONUtils.getString(params, "description");
+        folder = JSONUtils.getString(params, "folder");
 
-            properties = JSONUtils.getObjectOrNull(params, "properties");
-            userName = JSONUtils.getString(params, "userName");
-            userPassword = JSONUtils.getString(params, "userPassword");
-            selectedSecretId = JSONUtils.getString(params, "selectedSecretId");
+        properties = JSONUtils.getObjectOrNull(params, "properties");
+        userName = JSONUtils.getString(params, "userName");
+        userPassword = JSONUtils.getString(params, "userPassword");
+        selectedSecretId = JSONUtils.getString(params, "selectedSecretId");
 
-            authModelId = JSONUtils.getString(params, "authModelId");
-            credentials = JSONUtils.getObjectOrNull(params, "credentials");
-            saveCredentials = JSONUtils.getBoolean(params, "saveCredentials");
-            sharedCredentials = JSONUtils.getBoolean(params, "sharedCredentials");
+        authModelId = JSONUtils.getString(params, "authModelId");
+        credentials = JSONUtils.getObjectOrNull(params, "credentials");
+        saveCredentials = JSONUtils.getBoolean(params, "saveCredentials");
+        sharedCredentials = JSONUtils.getBoolean(params, "sharedCredentials");
 
-            mainPropertyValues = JSONUtils.getObjectOrNull(params, "mainPropertyValues");
-            providerProperties = JSONUtils.getObjectOrNull(params, "providerProperties");
+        mainPropertyValues = JSONUtils.getObjectOrNull(params, "mainPropertyValues");
+        providerProperties = JSONUtils.getObjectOrNull(params, "providerProperties");
+        expertSettingsValues = JSONUtils.getObjectOrNull(params, "expertSettingsValues");
+        keepAliveInterval = JSONUtils.getInteger(
+            expertSettingsValues != null ? expertSettingsValues : params, WebExpertSettingsProperties.PROP_KEEP_ALIVE_INTERVAL, -1);
+        readOnly = JSONUtils.getBoolean(
+            expertSettingsValues != null ? expertSettingsValues : params, WebExpertSettingsProperties.PROP_READ_ONLY);
+        defaultAutoCommit = JSONUtils.getBoolean(
+            expertSettingsValues != null ? expertSettingsValues : params, WebExpertSettingsProperties.PROP_AUTO_COMMIT, true);
+        defaultCatalogName = JSONUtils.getString(
+            expertSettingsValues != null ? expertSettingsValues : params, WebExpertSettingsProperties.PROP_DEFAULT_CATALOG);
+        defaultSchemaName = JSONUtils.getString(
+            expertSettingsValues != null ? expertSettingsValues : params,
+            WebExpertSettingsProperties.PROP_DEFAULT_SCHEMA
+        );
 
-            expertSettingsValues = JSONUtils.getObjectOrNull(params, "expertSettingsValues");
-            keepAliveInterval = JSONUtils.getInteger(
-                expertSettingsValues != null ? expertSettingsValues : params, WebExpertSettingsProperties.PROP_KEEP_ALIVE_INTERVAL, -1);
-            readOnly = JSONUtils.getBoolean(
-                expertSettingsValues != null ? expertSettingsValues : params, WebExpertSettingsProperties.PROP_READ_ONLY);
-            defaultAutoCommit = JSONUtils.getBoolean(
-                expertSettingsValues != null ? expertSettingsValues : params, WebExpertSettingsProperties.PROP_AUTO_COMMIT, true);
-            defaultCatalogName = JSONUtils.getString(
-                expertSettingsValues != null ? expertSettingsValues : params, WebExpertSettingsProperties.PROP_DEFAULT_CATALOG);
-            defaultSchemaName = JSONUtils.getString(
-                expertSettingsValues != null ? expertSettingsValues : params, WebExpertSettingsProperties.PROP_DEFAULT_SCHEMA);
+        String configType = JSONUtils.getString(params, "configurationType");
+        configurationType = configType == null ? null : DBPDriverConfigurationType.valueOf(configType);
 
-            String configType = JSONUtils.getString(params, "configurationType");
-            configurationType = configType == null ? null : DBPDriverConfigurationType.valueOf(configType);
-            externalParameters = JSONUtils.getObjectOrNull(params, "externalParameters");
-
-            networkHandlersConfig = new ArrayList<>();
-            for (Map<String, Object> nhc : JSONUtils.getObjectList(params, "networkHandlersConfig")) {
-                networkHandlersConfig.add(new WebNetworkHandlerConfigInput(nhc));
-            }
+        networkHandlersConfig = new ArrayList<>();
+        for (Map<String, Object> nhc : JSONUtils.getObjectList(params, "networkHandlersConfig")) {
+            networkHandlersConfig.add(new WebNetworkHandlerConfigInput(nhc));
         }
     }
 
@@ -261,9 +258,5 @@ public class WebConnectionConfig {
     @Property
     public String getDefaultSchemaName() {
         return defaultSchemaName;
-    }
-
-    public Map<String, Object> getExternalParameters() {
-        return externalParameters;
     }
 }

@@ -17,10 +17,9 @@ export default [
   ['sql_editor_shortcut_execute_script', 'Execute script'],
   ['sql_editor_shortcut_show_execution_plan', 'Show Execution plan'],
   ['sql_editor_shortcut_format', 'Format script'],
-  ['sql_editor_shortcut_save_as_script', 'Save as script'],
   ['sql_editor_shortcut_open_editor_in_new_tab', 'Open SQL Editor in the separate browser Tab'],
-  ['sql_editor_shortcut_undo', 'Undo'],
-  ['sql_editor_shortcut_redo', 'Redo'],
+  ['sql_editor_shortcut_find', 'Find'],
+  ['sql_editor_shortcut_comment_uncomment_selection', 'Comment/Uncomment selection'],
 
   ['navigation_tree_shortcut_enable_filter', 'Enable filtering'],
 ];
