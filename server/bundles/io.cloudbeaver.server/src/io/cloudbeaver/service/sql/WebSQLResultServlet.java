@@ -85,7 +85,7 @@ public class WebSQLResultServlet extends WebServiceServletBase {
         while (valuePath.startsWith("/")) {
             valuePath = valuePath.substring(1);
         }
-        Path dataFile = WebSQLDataLOBReceiver.DATA_EXPORT_FOLDER.resolve(valuePath);
+        Path dataFile = WebSQLDataLOBReceiver.DATA_EXPORT_FOLDER.resolve(valuePath).normalize();
         if (!dataFile.startsWith(WebSQLDataLOBReceiver.DATA_EXPORT_FOLDER)) {
             throw new DBWebException("Bad result value ID");
         }
