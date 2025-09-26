@@ -1,11 +1,14 @@
 package io.cloudbeaver.model;
 
 import org.jkiss.code.NotNull;
+import org.jkiss.dbeaver.ModelPreferences;
+import org.jkiss.dbeaver.ModelPreferences.OrderingPolicy;
 import org.jkiss.dbeaver.model.DBPObject;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.model.connection.DBPDriverConstants;
 import org.jkiss.dbeaver.model.meta.IPropertyValueValidator;
 import org.jkiss.dbeaver.model.meta.Property;
+import org.jkiss.dbeaver.model.preferences.DBPPreferenceStore;
 import org.jkiss.utils.CommonUtils;
 
 /**
@@ -17,6 +20,7 @@ public class WebExpertSettingsProperties implements DBPObject {
     public static final String PROP_KEEP_ALIVE_INTERVAL = "keepAliveInterval";
     public static final String PROP_DEFAULT_CATALOG = "defaultCatalogName";
     public static final String PROP_DEFAULT_SCHEMA = "defaultSchemaName";
+    public static final String PROP_DEFAULT_ORDERING = "defaultOrdering";
 
     private final DBPDriver driver;
 
@@ -49,6 +53,10 @@ public class WebExpertSettingsProperties implements DBPObject {
         return null;
     }
 
+    @Property(order = 6, id = PROP_DEFAULT_ORDERING)
+    public OrderingPolicy getDefaultOrdering() {
+        return null;
+    }
 
     public static class KeepAliveIntervalFieldValidator implements IPropertyValueValidator<WebExpertSettingsProperties, Object> {
         @Override

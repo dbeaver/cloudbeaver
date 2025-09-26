@@ -64,6 +64,7 @@ public class WebConnectionConfig {
     private boolean defaultAutoCommit;
     private String defaultCatalogName;
     private String defaultSchemaName;
+    private String defaultOrdering;
 
     public WebConnectionConfig() {
     }
@@ -106,6 +107,10 @@ public class WebConnectionConfig {
         defaultSchemaName = JSONUtils.getString(
             expertSettingsValues != null ? expertSettingsValues : params,
             WebExpertSettingsProperties.PROP_DEFAULT_SCHEMA
+        );
+        defaultOrdering = JSONUtils.getString(
+            expertSettingsValues != null ? expertSettingsValues : params,
+            WebExpertSettingsProperties.PROP_DEFAULT_ORDERING
         );
 
         String configType = JSONUtils.getString(params, "configurationType");
@@ -258,5 +263,10 @@ public class WebConnectionConfig {
     @Property
     public String getDefaultSchemaName() {
         return defaultSchemaName;
+    }
+
+    @Property
+    public String getDefaultOrdering() {
+        return defaultOrdering;
     }
 }
