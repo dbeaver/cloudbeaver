@@ -57,6 +57,8 @@ export interface DataGridRef {
   openEditor: (position: ICellPosition) => void;
 }
 
+const MAX_AUTO_SIZE_WIDTH = 350;
+
 export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid(
   {
     headerElement,
@@ -159,6 +161,23 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
   function handleCellKeyDown(args: CellSelectArgs<IInnerRow, unknown>, event: DataGridCellKeyboardEvent) {
     onCellKeyDown?.({ colIdx: dndHeaderContext.getDataColIdx(args.column.idx), rowIdx: args.rowIdx }, event);
   }
+
+  // We need to patch auto-size width to avoid extremely large columns on table initialization
+  columnWidths.forEach((column, key) => {
+    const isMeasured = column.type === 'measured';
+    const current = columnWidths.get(key);
+
+    if (!current || !isMeasured) {
+      return;
+    }
+
+    if (column.width > MAX_AUTO_SIZE_WIDTH) {
+      (columnWidths as Map<string, ColumnWidth>).set(key, {
+        ...current,
+        width: MAX_AUTO_SIZE_WIDTH,
+      });
+    }
+  });
 
   return (
     <HeaderDnDContext value={dndHeaderContext}>
