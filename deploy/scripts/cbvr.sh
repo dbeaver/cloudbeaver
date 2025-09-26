@@ -6,4 +6,4 @@ if [[ $# -eq 0 ]] ;
 fi
 set -- "$@" -cli-mode
 
-source run-server.sh "$@"
+source run-cloudbeaver-server.sh "$@"

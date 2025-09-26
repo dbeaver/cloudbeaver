@@ -323,8 +323,17 @@ public class WebServiceNavigator implements DBWServiceNavigator {
 
         WebStructContainers structContainers = new WebStructContainers();
 
-        structContainers.setSupportsCatalogChange(contextDefaults != null && contextDefaults.supportsCatalogChange());
-        structContainers.setSupportsSchemaChange(contextDefaults != null && contextDefaults.supportsSchemaChange());
+        if (contextDefaults != null) {
+            structContainers.setSupportsCatalogChange(contextDefaults.supportsCatalogChange());
+            structContainers.setSupportsSchemaChange(contextDefaults.supportsSchemaChange());
+            if (contextDefaults.getDefaultSchema() != null) {
+                structContainers.setDefaultSchema(contextDefaults.getDefaultSchema().getName());
+            }
+            if (contextDefaults.getDefaultCatalog() != null) {
+                structContainers.setDefaultCatalog(contextDefaults.getDefaultCatalog().getName());
+            }
+        }
+
 
         DBRProgressMonitor monitor = connection.getSession().getProgressMonitor();
         List<? extends DBSObject> dbsObjects = this.getCatalogs(
