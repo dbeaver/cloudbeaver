@@ -18,7 +18,7 @@ export default [
   ['data_viewer_action_auto_refresh_menu_stop_tooltip', 'Остановить автоматическое обновление данных'],
   ['data_viewer_action_auto_refresh_menu_configure_tooltip', 'Настроить параметры автоматического обновления'],
   ['data_viewer_action_auto_refresh_interval_tooltip', 'Установить интервал автоматического обновления в {arg:interval}'],
-  ['data_viewer_action_edit_delete', 'Удалить'],
+  ['data_viewer_action_edit_delete', 'Удалить выбранные строки'],
   ['data_viewer_action_edit_add', 'Добавить'],
   ['data_viewer_action_edit_add_copy', 'Дублировать'],
   ['data_viewer_action_edit_revert', 'Отменить'],
