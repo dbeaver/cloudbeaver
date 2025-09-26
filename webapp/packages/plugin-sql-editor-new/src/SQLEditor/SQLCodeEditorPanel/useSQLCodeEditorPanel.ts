@@ -28,7 +28,7 @@ export function useSQLCodeEditorPanel(data: ISQLEditorData, editor: IEditor) {
       highlightActiveQuery() {
         this.editor.clearActiveQueryHighlight();
 
-        const segment = this.data.activeSegment;
+        const segment = this.data.model.cursorSegment;
 
         if (segment) {
           this.editor.highlightActiveQuery(segment.begin, segment.end);
@@ -52,7 +52,7 @@ export function useSQLCodeEditorPanel(data: ISQLEditorData, editor: IEditor) {
   );
 
   useExecutor({
-    executor: data.onUpdate,
+    executor: data.model.onUpdate,
     handlers: [updateHighlight],
   });
 

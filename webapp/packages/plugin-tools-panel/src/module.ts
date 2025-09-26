@@ -12,7 +12,7 @@ import { PluginBootstrap } from './PluginBootstrap.js';
 import { ToolsPanelService } from './ToolsPanel/ToolsPanelService.js';
 import { LocaleService } from './LocaleService.js';
 
-ModuleRegistry.add({
+export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-tools-panel',
 
   configure: serviceCollection => {

@@ -12,7 +12,8 @@
   "description": "",
   "license": "Apache-2.0",
   "exports": {
-    ".": "./lib/index.js"
+    ".": "./lib/index.js",
+    "./module": "./lib/module.js"
   },
   "scripts": {
     "clean": "rimraf node_modules",
@@ -26,6 +27,7 @@
   "dependencies": {
     "@cloudbeaver/core-di": "workspace:*",
     "@cloudbeaver/core-utils": "workspace:*",
+    "@graphql-typed-document-node/core": "^3",
     "axios": "^1",
     "graphql": "^16",
     "graphql-request": "^7",
@@ -43,10 +45,10 @@
     "@graphql-codegen/typescript-graphql-files-modules": "^3",
     "@graphql-codegen/typescript-graphql-request": "^6",
     "@graphql-codegen/typescript-operations": "^4",
-    "@graphql-typed-document-node/core": "^3",
     "@parcel/watcher": "^2",
     "graphql": "^16",
     "graphql-tag": "^2",
+    "rimraf": "^6",
     "typescript": "^5"
   }
 }

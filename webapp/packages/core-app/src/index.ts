@@ -15,6 +15,3 @@ export * from './AppLocaleService.js';
 
 // components
 export * from './BodyLazy.js';
-
-// Interfaces
-export * from './manifest.js';

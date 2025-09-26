@@ -15,4 +15,3 @@ export * from './DataContext/IDataContextProvider.js';
 export * from './DataContext/useDataContext.js';
 export * from './DataContext/DataContextGetter.js';
 export * from './DataContext/useDataContextLink.js';
-export { coreDataContextManifest } from './manifest.js';

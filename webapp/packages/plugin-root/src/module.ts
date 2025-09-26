@@ -13,7 +13,7 @@ import { NetworkStateNotificationBootstrap } from './NetworkStateNotification/Ne
 import { LocaleService } from './LocaleService.js';
 import { DataSynchronizationResolverBootstrap } from './DataSynchronization/DataSynchronizationResolverBootstrap.js';
 
-ModuleRegistry.add({
+export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-root',
 
   configure: serviceCollection => {

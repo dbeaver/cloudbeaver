@@ -10,7 +10,7 @@ import { ModuleRegistry, Bootstrap } from '@cloudbeaver/core-di';
 import { UserProfileSettingsPluginBootstrap } from './UserProfileSettingsPluginBootstrap.js';
 import { LocaleService } from './LocaleService.js';
 
-ModuleRegistry.add({
+export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-user-profile-settings',
 
   configure: serviceCollection => {

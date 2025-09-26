@@ -10,7 +10,7 @@ Running server
 ========================
   1. View and modify server configuration before the first start.
      Validate init-data.conf - you won't be able to change these parameters after the first server start.
-  2. Execute run-server.sh script in the root directory.
+  2. Execute run-cloudbeaver-server.sh script in the root directory.
 
 Command line parameters
 ========================

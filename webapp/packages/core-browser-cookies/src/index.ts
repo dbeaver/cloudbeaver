@@ -8,4 +8,3 @@
 
 import './module.js';
 export * from './CookiesService.js';
-export * from './manifest.js';

@@ -11,7 +11,7 @@ import { SettingsUserBootstrap } from './SettingsUserBootstrap.js';
 import { UserSettingsService } from './UserSettingsService.js';
 import { LocaleService } from './LocaleService.js';
 
-ModuleRegistry.add({
+export default ModuleRegistry.add({
   name: '@cloudbeaver/core-settings-user',
 
   configure: serviceCollection => {

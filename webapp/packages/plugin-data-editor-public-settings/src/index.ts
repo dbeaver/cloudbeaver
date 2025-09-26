@@ -7,8 +7,3 @@
  */
 
 import './module.js';
-
-import { pluginDataEditorPublicSettingsManifest } from './manifest.js';
-
-export default pluginDataEditorPublicSettingsManifest;
-export { pluginDataEditorPublicSettingsManifest };

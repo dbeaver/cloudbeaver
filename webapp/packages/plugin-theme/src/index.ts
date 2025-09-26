@@ -7,6 +7,3 @@
  */
 
 import './module.js';
-import { themePlugin } from './manifest.js';
-
-export default themePlugin;

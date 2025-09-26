@@ -22,13 +22,12 @@
   }
 
   .dbv-kit-combobox__item {
-    --tw-leading: 1;
-
     display: flex;
     align-items: center;
     padding-inline: calc(var(--tw-spacing) * 3);
     padding-block: calc(var(--tw-spacing) * 2);
     gap: calc(var(--tw-spacing) * 2);
+    letter-spacing: var(--tw-tracking-normal);
     line-height: 1.25;
   }
 }

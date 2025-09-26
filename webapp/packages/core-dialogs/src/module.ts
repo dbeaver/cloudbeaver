@@ -9,7 +9,7 @@
 import { ModuleRegistry } from '@cloudbeaver/core-di';
 import { CommonDialogService } from './CommonDialog/CommonDialogService.js';
 
-ModuleRegistry.add({
+export default ModuleRegistry.add({
   name: '@cloudbeaver/core-dialogs',
 
   configure: serviceCollection => {
