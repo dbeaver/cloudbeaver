@@ -31,6 +31,7 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.ModelPreferences;
 import org.jkiss.dbeaver.model.DBConstants;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.access.DBAAuthCredentials;
@@ -43,6 +44,7 @@ import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.model.impl.auth.AuthModelDatabaseNativeCredentials;
 import org.jkiss.dbeaver.model.net.DBWHandlerConfiguration;
 import org.jkiss.dbeaver.model.net.ssh.SSHConstants;
+import org.jkiss.dbeaver.model.preferences.DBPPreferenceStore;
 import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceDisconnectEvent;
 import org.jkiss.dbeaver.registry.network.NetworkHandlerDescriptor;
 import org.jkiss.dbeaver.registry.network.NetworkHandlerRegistry;
@@ -340,6 +342,16 @@ public class WebDataSourceUtils {
                 dsConfig.updateHandler(handlerConfig);
             }
         }
+    }
+
+    public static void setConnectionPreferences(
+        @NotNull DBPPreferenceStore store,
+        @NotNull WebConnectionConfig config
+    ) {
+        store.setValue(
+            ModelPreferences.RESULT_SET_ORDERING_POLICY,
+            config.getDefaultOrdering().toString()
+        );
     }
 
     public static void setMainProperties(@NotNull DBPConnectionConfiguration dsConfig, @NotNull WebConnectionConfig config) {

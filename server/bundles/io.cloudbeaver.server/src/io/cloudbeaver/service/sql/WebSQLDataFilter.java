@@ -101,6 +101,7 @@ public class WebSQLDataFilter {
         return webFilter;
     }
 
+    @NotNull
     public DBDDataFilter makeDataFilter(@Nullable WebSQLResultsInfo resultInfo) throws DBException {
         DBDDataFilter dataFilter = new DBDDataFilter();
         dataFilter.setWhere(where);

@@ -29,6 +29,8 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.ModelPreferences;
+import org.jkiss.dbeaver.ModelPreferences.OrderingPolicy;
 import org.jkiss.dbeaver.model.*;
 import org.jkiss.dbeaver.model.admin.sessions.DBAServerSessionManager;
 import org.jkiss.dbeaver.model.app.DBPProject;
@@ -39,6 +41,7 @@ import org.jkiss.dbeaver.model.impl.auth.AuthModelDatabaseNative;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.model.navigator.DBNDataSource;
+import org.jkiss.dbeaver.model.preferences.DBPPreferenceStore;
 import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
 import org.jkiss.dbeaver.model.preferences.DBPPropertySource;
 import org.jkiss.dbeaver.model.rm.RMConstants;
@@ -430,6 +433,7 @@ public class WebConnectionInfo {
         expertSettings.put(WebExpertSettingsProperties.PROP_READ_ONLY, isReadOnly());
         expertSettings.put(WebExpertSettingsProperties.PROP_DEFAULT_CATALOG, getDefaultCatalogName());
         expertSettings.put(WebExpertSettingsProperties.PROP_DEFAULT_SCHEMA, getDefaultSchemaName());
+        expertSettings.put(WebExpertSettingsProperties.PROP_DEFAULT_ORDERING, getDefaultOrdering());
         return expertSettings;
     }
 
@@ -517,6 +521,16 @@ public class WebConnectionInfo {
     public String getDefaultSchemaName() {
         DBPConnectionConfiguration connectionConfiguration = dataSourceContainer.getConnectionConfiguration();
         return connectionConfiguration.getBootstrap().getDefaultSchemaName();
+    }
+
+    @Property
+    public OrderingPolicy getDefaultOrdering() {
+        DBPPreferenceStore store = dataSourceContainer.getPreferenceStore();
+        return CommonUtils.valueOf(
+            OrderingPolicy.class,
+            store.getString(ModelPreferences.RESULT_SET_ORDERING_POLICY),
+            OrderingPolicy.DEFAULT
+        );
     }
 
     @Property

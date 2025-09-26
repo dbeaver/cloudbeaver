@@ -22,6 +22,7 @@ import io.cloudbeaver.utils.ServletAppUtils;
 import io.cloudbeaver.utils.WebDataSourceUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.ModelPreferences;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
@@ -78,6 +79,10 @@ public class WebConnectionConfigInputHandler<T extends WebConnectionConfig, C ex
         WebDataSourceUtils.setConnectionConfiguration(
             dataSource.getDriver(),
             dataSource.getConnectionConfiguration(),
+            input
+        );
+        WebDataSourceUtils.setConnectionPreferences(
+            dataSource.getPreferenceStore(),
             input
         );
         WebDataSourceUtils.saveAuthProperties(

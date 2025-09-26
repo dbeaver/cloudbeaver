@@ -18,9 +18,11 @@ package io.cloudbeaver.model;
 
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
+import org.jkiss.dbeaver.ModelPreferences.OrderingPolicy;
 import org.jkiss.dbeaver.model.connection.DBPDriverConfigurationType;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.meta.Property;
+import org.jkiss.utils.CommonUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,6 +66,7 @@ public class WebConnectionConfig {
     private boolean defaultAutoCommit;
     private String defaultCatalogName;
     private String defaultSchemaName;
+    private OrderingPolicy defaultOrdering;
 
     public WebConnectionConfig() {
     }
@@ -106,6 +109,15 @@ public class WebConnectionConfig {
         defaultSchemaName = JSONUtils.getString(
             expertSettingsValues != null ? expertSettingsValues : params,
             WebExpertSettingsProperties.PROP_DEFAULT_SCHEMA
+        );
+        String defaultOrderingString = JSONUtils.getString(
+            expertSettingsValues != null ? expertSettingsValues : params,
+            WebExpertSettingsProperties.PROP_DEFAULT_ORDERING
+        );
+        defaultOrdering = CommonUtils.valueOf(
+            OrderingPolicy.class,
+            defaultOrderingString,
+            OrderingPolicy.DEFAULT
         );
 
         String configType = JSONUtils.getString(params, "configurationType");
@@ -258,5 +270,10 @@ public class WebConnectionConfig {
     @Property
     public String getDefaultSchemaName() {
         return defaultSchemaName;
+    }
+
+    @Property
+    public OrderingPolicy getDefaultOrdering() {
+        return defaultOrdering;
     }
 }

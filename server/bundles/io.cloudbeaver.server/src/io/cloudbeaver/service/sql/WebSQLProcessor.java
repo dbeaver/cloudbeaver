@@ -27,6 +27,8 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.ModelPreferences;
+import org.jkiss.dbeaver.ModelPreferences.OrderingPolicy;
 import org.jkiss.dbeaver.model.DBPDataKind;
 import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.DBUtils;
@@ -41,6 +43,7 @@ import org.jkiss.dbeaver.model.impl.AbstractExecutionSource;
 import org.jkiss.dbeaver.model.impl.DefaultServerOutputReader;
 import org.jkiss.dbeaver.model.navigator.DBNDatabaseItem;
 import org.jkiss.dbeaver.model.navigator.DBNNode;
+import org.jkiss.dbeaver.model.preferences.DBPPreferenceStore;
 import org.jkiss.dbeaver.model.qm.QMUtils;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.sql.*;
@@ -180,13 +183,19 @@ public class WebSQLProcessor implements WebSessionProvider {
         DBCExecutionContext context = getExecutionContext(dataContainer);
 
         try {
-            final DBDDataFilter dataFilter = filter.makeDataFilter((resultId == null ? null : contextInfo.getResults(resultId)));
+            WebSQLResultsInfo resultsInfo = resultId == null ? null : contextInfo.getResults(resultId);
+            final DBDDataFilter dataFilter = filter.makeDataFilter(resultsInfo);
+            DBPDataSource dataSource = context.getDataSource();
+
             if (dataFilter.hasFilters()) {
-                sql = context.getDataSource().getSQLDialect().addFiltersToQuery(
-                    monitor,
-                    context.getDataSource(),
-                    sql,
-                    dataFilter);
+                sql = dataSource.getSQLDialect().addFiltersToQuery(monitor, dataSource, sql, dataFilter);
+            } else if (resultsInfo != null) {
+                applyDefaultOrdering(
+                    dataSource.getContainer().getPreferenceStore(),
+                    resultsInfo,
+                    dataFilter
+                );
+                sql = dataSource.getSQLDialect().addFiltersToQuery(monitor, dataSource, sql, dataFilter);
             }
 
             final WebSQLDataFilter webDataFilter = filter;
@@ -237,7 +246,6 @@ public class WebSQLProcessor implements WebSessionProvider {
                             {
                                 SqlOutputLogReaderJob sqlOutputLogReaderJob = null;
                                 if (readLogs) {
-                                    DBPDataSource dataSource = context.getDataSource();
                                     DBCServerOutputReader dbcServerOutputReader = DBUtils.getAdapter(DBCServerOutputReader.class, dataSource);
                                     if (dbcServerOutputReader == null) {
                                         dbcServerOutputReader = new DefaultServerOutputReader();
@@ -1228,5 +1236,28 @@ public class WebSQLProcessor implements WebSessionProvider {
             }
         }
         return convertInputCellValue(dbcSession, allAttributes, cellRow, withoutExecution);
+    }
+
+    private void applyDefaultOrdering(
+        @NotNull DBPPreferenceStore store,
+        @NotNull WebSQLResultsInfo resultsInfo,
+        @NotNull DBDDataFilter dataFilter
+    ) {
+        OrderingPolicy orderingPolicy = CommonUtils.valueOf(
+            OrderingPolicy.class,
+            store.getString(ModelPreferences.RESULT_SET_ORDERING_POLICY),
+            OrderingPolicy.DEFAULT
+        );
+        DBDRowIdentifier rowIdentifier = resultsInfo.getDefaultRowIdentifier();
+
+        if (orderingPolicy != OrderingPolicy.DEFAULT && rowIdentifier != null && !rowIdentifier.isIncomplete()) {
+            for (DBDAttributeBinding binding : rowIdentifier.getAttributes()) {
+                DBDAttributeConstraint constraint = dataFilter.getConstraint(binding);
+                if (constraint != null) {
+                    constraint.setOrderPosition(dataFilter.getMaxOrderingPosition() + 1);
+                    constraint.setOrderDescending(orderingPolicy == OrderingPolicy.PRIMARY_KEY_DESC);
+                }
+            }
+        }
     }
 }
