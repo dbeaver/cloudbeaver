@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -42,8 +42,10 @@ export const ChangePassword = observer(function ChangePassword() {
       oldPassword: '',
       password: '',
       repeatedPassword: '',
+      shouldRehash: false,
     },
     {
+      shouldRehash: observable.ref,
       oldPassword: observable.ref,
       password: observable.ref,
       repeatedPassword: observable.ref,
@@ -65,10 +67,12 @@ export const ChangePassword = observer(function ChangePassword() {
   const form = useForm({
     async onSubmit() {
       try {
-        await userInfoResource.updateLocalPassword(state.oldPassword, state.password);
+        await userInfoResource.updateLocalPassword(state.oldPassword, state.password, state.shouldRehash);
         resetForm();
         notificationService.logSuccess({ title: 'plugin_user_profile_authentication_change_password_success' });
       } catch (exception) {
+        // TODO cleanup when backend adds logic
+        state.shouldRehash = true;
         if (exception instanceof Error) {
           notificationService.logException(exception);
         }
@@ -79,6 +83,7 @@ export const ChangePassword = observer(function ChangePassword() {
   function resetForm() {
     state.oldPassword = '';
     state.password = '';
+    state.shouldRehash = false;
     state.repeatedPassword = '';
     form.ref?.reset();
   }

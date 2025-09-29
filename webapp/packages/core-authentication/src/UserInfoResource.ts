@@ -17,6 +17,7 @@ import { AUTH_PROVIDER_LOCAL_ID } from './AUTH_PROVIDER_LOCAL_ID.js';
 import { AuthProviderService } from './AuthProviderService.js';
 import type { ELMRole } from './ELMRole.js';
 import type { IAuthCredentials } from './IAuthCredentials.js';
+import { md5, sha256 } from '@cloudbeaver/core-utils';
 
 export type UserLogoutInfo = AuthLogoutQuery['result'];
 
@@ -233,14 +234,21 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void> 
     return this.data;
   }
 
-  async updateLocalPassword(oldPassword: string, newPassword: string): Promise<void> {
-    // TODO oldPassword can be md5 or sha256 hash. New password should be sha256 hash only.
+  async updateLocalPassword(oldPassword: string, newPassword: string, shouldRehash: boolean = false): Promise<void> {
+    const oldPasswordHash = await this.authProviderService.hashValue(oldPassword, 'md5');
+    const newPasswordHash = await this.authProviderService.hashValue(newPassword, 'md5');
+    const credentials: Record<string, string> = {
+      oldPassword: oldPasswordHash,
+      newPassword: newPasswordHash,
+    };
+
+    if (shouldRehash) {
+      credentials['oldPasswordSha256'] = await this.authProviderService.hashValue(oldPassword, 'sha256');
+    }
 
     await this.performUpdate(undefined, [], async () => {
-      await this.graphQLService.sdk.authChangeLocalPassword({
-        oldPassword: this.authProviderService.hashValue(oldPassword),
-        newPassword: this.authProviderService.hashValue(newPassword),
-      });
+      // TODO cleanup when backend adds logic
+      await this.graphQLService.sdk.authChangeLocalPassword(credentials as any);
     });
   }
 
