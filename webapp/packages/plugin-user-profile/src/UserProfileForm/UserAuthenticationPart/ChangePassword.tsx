@@ -42,10 +42,8 @@ export const ChangePassword = observer(function ChangePassword() {
       oldPassword: '',
       password: '',
       repeatedPassword: '',
-      shouldRehash: false,
     },
     {
-      shouldRehash: observable.ref,
       oldPassword: observable.ref,
       password: observable.ref,
       repeatedPassword: observable.ref,
@@ -64,18 +62,23 @@ export const ChangePassword = observer(function ChangePassword() {
     return null;
   });
 
+  async function updatePassword(shouldRehash: boolean = false) {
+    await userInfoResource.updateLocalPassword(state.oldPassword, state.password, shouldRehash);
+    resetForm();
+    notificationService.logSuccess({ title: 'plugin_user_profile_authentication_change_password_success' });
+  }
+
   const form = useForm({
     async onSubmit() {
       try {
-        await userInfoResource.updateLocalPassword(state.oldPassword, state.password, state.shouldRehash);
-        resetForm();
-        notificationService.logSuccess({ title: 'plugin_user_profile_authentication_change_password_success' });
+        await updatePassword();
       } catch (exception) {
         // TODO cleanup when backend adds logic
-        state.shouldRehash = true;
         if (exception instanceof Error) {
           notificationService.logException(exception);
         }
+
+        await updatePassword(true);
       }
     },
   });
@@ -83,7 +86,6 @@ export const ChangePassword = observer(function ChangePassword() {
   function resetForm() {
     state.oldPassword = '';
     state.password = '';
-    state.shouldRehash = false;
     state.repeatedPassword = '';
     form.ref?.reset();
   }
