@@ -89,7 +89,7 @@ export class AuthProviderService {
         const value = credentialsProcessed.credentials[parameter.id];
 
         if (typeof value === 'string') {
-          credentialsProcessed.credentials[parameter.id] = await this.hashValue(value, 'md5');
+          credentialsProcessed.credentials[parameter.id] = await this.hashValue(value, 'sha256');
         }
       }
     }

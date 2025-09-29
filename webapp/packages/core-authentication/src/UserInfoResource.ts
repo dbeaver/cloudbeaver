@@ -17,7 +17,6 @@ import { AUTH_PROVIDER_LOCAL_ID } from './AUTH_PROVIDER_LOCAL_ID.js';
 import { AuthProviderService } from './AuthProviderService.js';
 import type { ELMRole } from './ELMRole.js';
 import type { IAuthCredentials } from './IAuthCredentials.js';
-import { md5, sha256 } from '@cloudbeaver/core-utils';
 
 export type UserLogoutInfo = AuthLogoutQuery['result'];
 
