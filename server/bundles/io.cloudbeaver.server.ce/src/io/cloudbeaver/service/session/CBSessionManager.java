@@ -36,8 +36,6 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.auth.SMAuthInfo;
 import org.jkiss.dbeaver.model.security.user.SMAuthPermissions;
 import org.jkiss.dbeaver.model.websocket.event.WSAbstractEvent;
-import org.jkiss.dbeaver.model.websocket.event.WSUserDeletedEvent;
-import org.jkiss.dbeaver.model.websocket.event.WSUserDisabledEvent;
 import org.jkiss.dbeaver.model.websocket.event.session.WSSessionStateEvent;
 import org.jkiss.utils.CommonUtils;
 
@@ -72,13 +70,19 @@ public class CBSessionManager implements WebAppSessionManager {
 
     @Override
     public BaseWebSession closeSession(@NotNull String sessionId) {
+        return closeSession(sessionId, true);
+    }
+
+    @Override
+    public BaseWebSession closeSession(@NotNull String sessionId, boolean sendSessionExpiredEvent) {
         BaseWebSession webSession;
         synchronized (sessionMap) {
             webSession = sessionMap.remove(sessionId);
         }
         if (webSession != null) {
             log.debug("> Close session '" + sessionId + "'");
-            webSession.close();
+            webSession.close(true, sendSessionExpiredEvent);
+
             return webSession;
         }
         return null;

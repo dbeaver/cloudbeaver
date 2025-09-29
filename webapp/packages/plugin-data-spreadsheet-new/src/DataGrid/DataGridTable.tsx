@@ -451,7 +451,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
     return <TextPlaceholder>{translate('data_grid_table_empty_placeholder')}</TextPlaceholder>;
   }
 
-  const handleCellKeyDown: DataGridProps['onCellKeyDown'] = ({ rowIdx, colIdx }, event) => {
+  const handleCellKeyDown: DataGridProps['onCellKeyDown'] = (_, event) => {
     gridSelectedCellCopy.onKeydownHandler(event);
     const cell = selectionAction.getFocusedElement();
 
@@ -459,56 +459,11 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
       return;
     }
 
-    // we can't edit table cells if table doesn't have row identifier, but we can edit just added/duplicated rows before insert (CB-6063)
-    const canEdit = model.hasElementIdentifier(resultIndex) || tableData.editor.getElementState(cell) === DatabaseEditChangeType.add;
-    const activeElements = selectionAction.getActiveElements();
-    const activeRows = selectionAction.getActiveRows();
-
     switch (event.code) {
-      case 'Escape': {
-        if (!canEdit) {
-          return;
-        }
-        tableData.editor.revert(...activeElements);
-        return;
-      }
-      case 'KeyR': {
-        if (event.altKey) {
-          if (event.shiftKey) {
-            tableData.editor.duplicate(...activeRows);
-          } else {
-            tableData.editor.add(cell);
-          }
-          return;
-        }
-        return;
-      }
-      case 'Delete': {
-        if (!canEdit) {
-          return;
-        }
+      case 'KeyR':
+      case 'Escape':
+      case 'Delete':
         event.preventGridDefault();
-
-        const filteredRows = activeRows.filter(cell => tableData.editor.getElementState(cell) !== DatabaseEditChangeType.delete);
-
-        if (filteredRows.length > 0) {
-          const editor = tableData.editor;
-          const firstRow = filteredRows[0]!;
-          const editingState = tableData.editor.getElementState(firstRow);
-
-          editor.delete(...filteredRows);
-
-          if (editingState === DatabaseEditChangeType.add) {
-            if (rowIdx - 1 > 0) {
-              handlers.selectCell({ colIdx, rowIdx: rowIdx - 1 });
-            }
-          } else {
-            if (rowIdx + 1 < tableData.rows.length) {
-              handlers.selectCell({ colIdx, rowIdx: rowIdx + 1 });
-            }
-          }
-        }
-      }
     }
   };
 

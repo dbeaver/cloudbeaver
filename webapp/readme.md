@@ -55,12 +55,12 @@ Welcome! Follow these steps to install and run the frontend dev server.
 
    *For macOS/Linux:*
    ```bash
-   ./run-server.sh
+   ./run-cloudbeaver-server.sh
    ```
 
    *For Windows:*
    ```bash
-   ./run-server.bat
+   ./run-cloudbeaver-server.bat
    ```
 
 4. **Navigate to the Webapp Directory**

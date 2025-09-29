@@ -7,9 +7,6 @@
  */
 
 import './module.js';
-import { sqlEditorTabPluginManifest } from './manifest.js';
-
-export default sqlEditorTabPluginManifest;
 
 export { DATA_CONTEXT_SQL_EDITOR_TAB } from './DATA_CONTEXT_SQL_EDITOR_TAB.js';
 export { ACTION_SQL_EDITOR_OPEN } from './ACTION_SQL_EDITOR_OPEN.js';

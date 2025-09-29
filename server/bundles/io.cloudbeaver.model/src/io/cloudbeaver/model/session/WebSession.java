@@ -49,10 +49,7 @@ import org.jkiss.dbeaver.model.fs.DBFFileSystemManager;
 import org.jkiss.dbeaver.model.meta.Association;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.navigator.DBNModel;
-import org.jkiss.dbeaver.model.rm.RMController;
-import org.jkiss.dbeaver.model.rm.RMProject;
-import org.jkiss.dbeaver.model.rm.RMProjectType;
-import org.jkiss.dbeaver.model.rm.RMUtils;
+import org.jkiss.dbeaver.model.rm.*;
 import org.jkiss.dbeaver.model.runtime.AbstractJob;
 import org.jkiss.dbeaver.model.runtime.BaseProgressMonitor;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
@@ -307,7 +304,7 @@ public class WebSession extends BaseWebSession
             for (RMProject project : rmProjects) {
                 createWebProject(project);
             }
-            if (user == null && application.getAppConfiguration().isAnonymousAccessEnabled()) {
+            if (user == null && application.isAnonymousAccessEnabled()) {
                 WebProjectImpl anonymousProject = createWebProject(RMUtils.createAnonymousProject());
                 anonymousProject.setInMemory(true);
             }
@@ -327,6 +324,7 @@ public class WebSession extends BaseWebSession
         } else {
             sessionProject = createSessionProject(project);
         }
+        sessionProject.refreshProjectSettings();
         // do not load data sources for anonymous project
         if (project.getType() == RMProjectType.USER && userContext.getUser() == null) {
             sessionProject.setInMemory(true);
@@ -399,9 +397,10 @@ public class WebSession extends BaseWebSession
 
 
     private synchronized void authAsAnonymousUser() throws DBException {
-        if (!application.getAppConfiguration().isAnonymousAccessEnabled()) {
+        if (!application.isAnonymousAccessEnabled()) {
             return;
         }
+
         SMAuthInfo authInfo = getSecurityController().authenticateAnonymousUser(this.id, getSessionParameters(), CB_SESSION_TYPE);
         updateSMSession(authInfo);
         notifySessionAuthChange();
@@ -794,7 +793,7 @@ public class WebSession extends BaseWebSession
         }
     }
 
-    public List<WebAuthInfo> removeAuthInfo(String providerId) throws DBException {
+    public List<WebAuthInfo> removeAuthInfo(String providerId, boolean needResetUserState) throws DBException {
         List<WebAuthInfo> oldInfo;
         if (providerId == null) {
             oldInfo = clearAuthTokens();
@@ -807,10 +806,14 @@ public class WebSession extends BaseWebSession
                 oldInfo = List.of();
             }
         }
-        if (authTokens.isEmpty()) {
+        if (authTokens.isEmpty() && needResetUserState) {
             resetUserState();
         }
         return oldInfo;
+    }
+
+    public List<WebAuthInfo> removeAuthInfo(String providerId) throws DBException {
+        return removeAuthInfo(providerId, true);
     }
 
     public List<DBACredentialsProvider> getContextCredentialsProviders() {
@@ -979,6 +982,16 @@ public class WebSession extends BaseWebSession
         super.addSessionProject(projectId);
         var rmProject = getRmController().getProject(projectId, false, false);
         createWebProject(rmProject);
+    }
+
+    @Override
+    public void updateSessionProject(@NotNull String projectId, @NotNull RMProjectInfo rmProjectInfo) throws DBException {
+        super.updateSessionProject(projectId, rmProjectInfo);
+        var project = getProjectById(projectId);
+        if (project == null) {
+            return;
+        }
+        project.updateProjectInfo(rmProjectInfo.getName(), rmProjectInfo.getDescription());
     }
 
     @Override

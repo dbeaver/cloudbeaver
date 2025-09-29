@@ -10,7 +10,7 @@ import { Bootstrap, ModuleRegistry, proxy } from '@cloudbeaver/core-di';
 import { HolidaysService } from './HolidaysService.js';
 import { ChristmasService } from './Christmas/ChristmasService.js';
 
-ModuleRegistry.add({
+export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-holidays',
 
   configure: serviceCollection => {

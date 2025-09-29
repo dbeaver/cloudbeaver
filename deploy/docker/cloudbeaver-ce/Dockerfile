@@ -16,8 +16,8 @@ RUN find /opt/cloudbeaver -type d -exec chmod 775 {} \;
 RUN chown -R dbeaver:dbeaver /opt/cloudbeaver
 WORKDIR /opt/cloudbeaver/
 
-RUN chmod +x "run-server.sh"
+RUN chmod +x "run-cloudbeaver-server.sh"
 
 USER dbeaver
 
-ENTRYPOINT ["./run-server.sh"]
+ENTRYPOINT ["./run-cloudbeaver-server.sh"]

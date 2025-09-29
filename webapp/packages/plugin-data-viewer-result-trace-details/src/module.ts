@@ -11,7 +11,7 @@ import { LocaleService } from './LocaleService.js';
 import { DVResultTraceDetailsService } from './DVResultTraceDetailsService.js';
 import { DVResultTraceDetailsBootstrap } from './DVResultTraceDetailsBootstrap.js';
 
-ModuleRegistry.add({
+export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-data-viewer-result-trace-details',
 
   configure: serviceCollection => {

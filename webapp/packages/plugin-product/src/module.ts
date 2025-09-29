@@ -10,7 +10,7 @@ import { Bootstrap, ModuleRegistry } from '@cloudbeaver/core-di';
 import { ProductBootstrap } from './ProductBootstrap.js';
 import { LocaleService } from './LocaleService.js';
 
-ModuleRegistry.add({
+export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-product',
 
   configure: serviceCollection => {

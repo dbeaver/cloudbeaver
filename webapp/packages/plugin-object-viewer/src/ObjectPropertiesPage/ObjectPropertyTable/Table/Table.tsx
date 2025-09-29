@@ -14,7 +14,8 @@ import { useService } from '@cloudbeaver/core-di';
 import { type DBObject, NavTreeResource } from '@cloudbeaver/core-navigation-tree';
 import { useTabLocalState } from '@cloudbeaver/core-ui';
 import { DataGrid, useCreateGridReactiveValue } from '@cloudbeaver/plugin-data-grid';
-import { getObjectPropertyDisplayValue } from '@cloudbeaver/core-sdk';
+import { getObjectPropertyDisplayValue, getObjectPropertyType, getObjectPropertyValue } from '@cloudbeaver/core-sdk';
+import { Checkbox } from '@dbeaver/ui-kit';
 
 import { ObjectPropertyTableFooter } from '../ObjectPropertyTableFooter.js';
 import classes from './Table.module.css';
@@ -76,7 +77,19 @@ export const Table = observer<TableProps>(function Table({ objects, hasNextPage,
     }
 
     const property = objects[rowIdx]?.object?.properties?.[colIdx];
-    return property ? getObjectPropertyDisplayValue(property) : '';
+
+    if (property) {
+      const type = getObjectPropertyType(property);
+
+      if (type === 'checkbox') {
+        const value = getObjectPropertyValue(property);
+        return <Checkbox className={s(styles, { boolean: true })} size="small" checked={value} disabled />;
+      }
+
+      return getObjectPropertyDisplayValue(property);
+    }
+
+    return '';
   }
   const cell = useCreateGridReactiveValue(getCell, (onValueChange, rowIdx, colIdx) => reaction(() => getCell(rowIdx, colIdx), onValueChange), [
     objects,

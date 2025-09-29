@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { getOS, OperatingSystem } from '@cloudbeaver/core-utils';
-import { getCommonAndOSSpecificKeys, type IKeyBinding, KEY_BINDING_OPEN_IN_TAB, KEY_BINDING_REDO, KEY_BINDING_UNDO } from '@cloudbeaver/core-view';
+import { createKeyBinding, getCommonAndOSSpecificKeys, type IKeyBinding, KEY_BINDING_OPEN_IN_TAB, KEY_BINDING_REDO, KEY_BINDING_UNDO } from '@cloudbeaver/core-view';
 import {
   KEY_BINDING_ADD_NEW_ROW,
   KEY_BINDING_DUPLICATE_ROW,
@@ -22,6 +22,16 @@ import {
   KEY_BINDING_SQL_EDITOR_SHOW_EXECUTION_PLAN,
 } from '@cloudbeaver/plugin-sql-editor';
 import { KEY_BINDING_SQL_EDITOR_SAVE_AS_SCRIPT } from '@cloudbeaver/plugin-sql-editor-navigation-tab-script';
+
+const KEY_BINDING_SQL_EDITOR_COMMENT = createKeyBinding({
+  id: 'sql-editor-comment',
+  keys: ['mod+/'],
+});
+
+const KEY_BINDING_SQL_EDITOR_FIND = createKeyBinding({
+  id: 'sql-editor-find',
+  keys: ['mod+f'],
+});
 
 import type { IShortcut } from './IShortcut.js';
 
@@ -91,16 +101,24 @@ export const SQL_EDITOR_SHORTCUTS: IShortcut[] = [
     code: transformKeys(KEY_BINDING_SQL_EDITOR_FORMAT),
   },
   {
-    label: 'sql_editor_shortcut_save_as_script',
+    label: 'ui_processing_save',
     code: transformKeys(KEY_BINDING_SQL_EDITOR_SAVE_AS_SCRIPT),
   },
   {
-    label: 'sql_editor_shortcut_undo',
+    label: 'ui_undo',
     code: transformKeys(KEY_BINDING_UNDO),
   },
   {
-    label: 'sql_editor_shortcut_redo',
+    label: 'ui_redo',
     code: transformKeys(KEY_BINDING_REDO),
+  },
+  {
+    label: 'sql_editor_shortcut_find',
+    code: transformKeys(KEY_BINDING_SQL_EDITOR_FIND),
+  },
+  {
+    label: 'sql_editor_shortcut_comment_uncomment_selection',
+    code: transformKeys(KEY_BINDING_SQL_EDITOR_COMMENT),
   },
   {
     label: 'sql_editor_shortcut_open_editor_in_new_tab',

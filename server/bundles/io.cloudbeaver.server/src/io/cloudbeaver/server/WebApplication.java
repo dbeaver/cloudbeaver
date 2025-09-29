@@ -21,7 +21,6 @@ import io.cloudbeaver.model.app.ServletApplication;
 import io.cloudbeaver.model.app.WebAppConfiguration;
 import io.cloudbeaver.model.app.WebServerConfiguration;
 import io.cloudbeaver.registry.WebDriverRegistry;
-import io.cloudbeaver.service.ConnectionController;
 import org.jkiss.code.NotNull;
 
 import java.net.InetAddress;
@@ -52,7 +51,5 @@ public interface WebApplication extends ServletApplication {
     String getLicenseStatus();
 
     WebServerConfig getWebServerConfig();
-
-    ConnectionController getConnectionController();
 
 }

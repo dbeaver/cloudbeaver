@@ -8,4 +8,3 @@
 
 import './module.js';
 export * from './BrowserSettingsService.js';
-export * from './manifest.js';
