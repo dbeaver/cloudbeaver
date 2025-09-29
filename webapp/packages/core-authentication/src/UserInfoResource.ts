@@ -236,7 +236,7 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void> 
 
   async updateLocalPassword(oldPassword: string, newPassword: string, shouldRehash: boolean = false): Promise<void> {
     const oldPasswordHash = await this.authProviderService.hashValue(oldPassword, 'sha256');
-    const newPasswordHash = await this.authProviderService.hashValue(newPassword, 'md5');
+    const newPasswordHash = await this.authProviderService.hashValue(newPassword, 'sha256');
     const credentials: Record<string, string> = {
       oldPassword: oldPasswordHash,
       newPassword: newPasswordHash,
