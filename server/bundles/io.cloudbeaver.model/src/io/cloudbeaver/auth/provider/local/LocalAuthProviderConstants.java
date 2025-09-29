@@ -23,4 +23,5 @@ public class LocalAuthProviderConstants {
     public static final String CRED_USER = "user";
     public static final String CRED_DISPLAY_NAME = "displayName";
     public static final String CRED_PASSWORD = "password";
+    public static final String CRED_PASSWORD_MD5 = "passwordMd5";
 }

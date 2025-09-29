@@ -313,7 +313,7 @@ public class CBDatabase extends InternalDB<WebDatabaseConfig> {
 
             Map<String, Object> credentials = new LinkedHashMap<>();
             credentials.put(LocalAuthProviderConstants.CRED_USER, adminUser.getUserId());
-            credentials.put(LocalAuthProviderConstants.CRED_PASSWORD, clientPassword);
+            credentials.put(LocalAuthProviderConstants.CRED_PASSWORD_MD5, clientPassword);
 
             WebAuthProviderDescriptor authProvider = WebAuthProviderRegistry.getInstance()
                 .getAuthProvider(LocalAuthProviderConstants.PROVIDER_ID);

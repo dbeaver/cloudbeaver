@@ -47,6 +47,7 @@ import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
 import org.jkiss.dbeaver.model.security.SMConstants;
 import org.jkiss.dbeaver.model.security.SMController;
 import org.jkiss.dbeaver.model.security.SMSubjectType;
+import org.jkiss.dbeaver.model.security.exception.SMInvalidCredentialException;
 import org.jkiss.dbeaver.model.security.exception.SMTooManySessionsException;
 import org.jkiss.dbeaver.model.security.user.SMUser;
 import org.jkiss.utils.CommonUtils;
@@ -88,6 +89,8 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
             }
         } catch (SMTooManySessionsException e) {
             throw new DBWebException("User authentication failed", e.getErrorType(), e);
+        } catch (SMInvalidCredentialException e) {
+            throw new DBWebException("Invalid credentials", e.getErrorType(), e);
         } catch (Exception e) {
             throw new DBWebException("User authentication failed", e);
         }

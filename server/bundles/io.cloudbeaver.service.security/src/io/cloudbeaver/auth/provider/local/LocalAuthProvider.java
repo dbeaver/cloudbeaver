@@ -23,12 +23,15 @@ import io.cloudbeaver.registry.WebAuthProviderRegistry;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.model.auth.Argon2IdHasher;
 import org.jkiss.dbeaver.model.auth.AuthPropertyEncryption;
 import org.jkiss.dbeaver.model.auth.SMAuthProvider;
 import org.jkiss.dbeaver.model.auth.SMSession;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
+import org.jkiss.dbeaver.model.security.SMAdminController;
 import org.jkiss.dbeaver.model.security.SMAuthProviderCustomConfiguration;
 import org.jkiss.dbeaver.model.security.SMController;
+import org.jkiss.dbeaver.model.security.exception.SMInvalidCredentialException;
 import org.jkiss.utils.CommonUtils;
 
 import java.util.Map;
@@ -40,6 +43,7 @@ public class LocalAuthProvider implements SMAuthProvider<LocalAuthSession>, SMBr
 
     public static final String PROVIDER_ID = LocalAuthProviderConstants.PROVIDER_ID;
     public static final String CRED_USER = LocalAuthProviderConstants.CRED_USER;
+    public static final String CRED_PASSWORD_MD_5 = LocalAuthProviderConstants.CRED_PASSWORD_MD5;
     public static final String CRED_PASSWORD = LocalAuthProviderConstants.CRED_PASSWORD;
 
     @NotNull
@@ -59,22 +63,50 @@ public class LocalAuthProvider implements SMAuthProvider<LocalAuthSession>, SMBr
             throw new DBException("Invalid user name or password");
         }
 
-        String storedPasswordHash = CommonUtils.toString(storedCredentials.get(CRED_PASSWORD), null);
-        if (CommonUtils.isEmpty(storedPasswordHash)) {
-            throw new DBException("User has no password (login restricted)");
-        }
-        String clientPassword = CommonUtils.toString(userCredentials.get(CRED_PASSWORD), null);
-        if (CommonUtils.isEmpty(clientPassword)) {
-            throw new DBException("No user password provided");
-        }
-        String clientPasswordHash = AuthPropertyEncryption.hash.encrypt(userName, clientPassword);
-        // we also need to check a hash with lower case (CB-5833)
-        String clientPasswordHashLowerCase = AuthPropertyEncryption.hash.encrypt(userName.toLowerCase(), clientPassword);
-        if (!storedPasswordHash.equals(clientPasswordHash) && !clientPasswordHashLowerCase.equals(storedPasswordHash)) {
-            throw new DBException("Invalid user name or password");
+        String passwordSha = CommonUtils.toString(userCredentials.get(LocalAuthProviderConstants.CRED_PASSWORD), null);
+        if (CommonUtils.isNotEmpty(CommonUtils.toString(userCredentials.get(CRED_PASSWORD_MD_5), null))) {
+            validatePasswordMd5(userCredentials, storedCredentials);
+            if (securityController instanceof SMAdminController adminController) {
+                adminController.setUserCredentials(userName, authProvider.getId(), userCredentials);
+            } else {
+                throw new DBException("User password hash update is not supported in current context");
+            }
+        } else {
+            validatePasswordSha(passwordSha, storedCredentials);
         }
 
         return activeUserId == null ? userName : activeUserId;
+    }
+
+    private void validatePasswordSha(String passwordSha, Map<String, Object> storedCredentials) throws DBException {
+        try {
+            if (!Argon2IdHasher.verify(CommonUtils.toString(storedCredentials.get(LocalAuthProviderConstants.CRED_PASSWORD)), passwordSha)) {
+                throw new SMInvalidCredentialException("Invalid user name or password");
+            }
+        } catch (Exception e) {
+            throw new SMInvalidCredentialException("Invalid user name or password");
+        }
+    }
+
+    private void validatePasswordMd5(@NotNull Map<String, Object> userCredentials,
+                                     Map<String, Object> storedCredentials
+    ) throws DBException {
+        String storedPasswordHash = CommonUtils.toString(storedCredentials.get(LocalAuthProviderConstants.CRED_PASSWORD), null);
+        if (CommonUtils.isEmpty(storedPasswordHash)) {
+            throw new SMInvalidCredentialException("User has no password (login restricted)");
+        }
+        String clientPassword = CommonUtils.toString(userCredentials.get(CRED_PASSWORD_MD_5), null);
+        if (CommonUtils.isEmpty(clientPassword)) {
+            throw new SMInvalidCredentialException("No user password provided");
+        }
+        String userName = CommonUtils.toString(userCredentials.get(CRED_USER));
+        String clientPasswordHash = AuthPropertyEncryption.hashMd5.encrypt(userName, clientPassword);
+        // we also need to check a hash with lower case (CB-5833)
+        //fixme(?) there is checking phc string, not only hash
+        String clientPasswordHashLowerCase = AuthPropertyEncryption.hashMd5.encrypt(userName.toLowerCase(), clientPassword);
+        if (!storedPasswordHash.equals(clientPasswordHash) && !clientPasswordHashLowerCase.equals(storedPasswordHash)) {
+            throw new SMInvalidCredentialException("Invalid user name or password");
+        }
     }
 
     @Override
@@ -110,7 +142,7 @@ public class LocalAuthProvider implements SMAuthProvider<LocalAuthSession>, SMBr
         if (CommonUtils.isEmpty(storedCredentials)) {
             throw new DBException("Invalid user name or password");
         }
-        String storedPasswordHash = CommonUtils.toString(storedCredentials.get(CRED_PASSWORD), null);
+        String storedPasswordHash = CommonUtils.toString(storedCredentials.get(CRED_PASSWORD_MD_5), null);
         if (CommonUtils.isEmpty(storedPasswordHash)) {
             throw new DBException("User has no saved credentials");
         }
@@ -124,7 +156,7 @@ public class LocalAuthProvider implements SMAuthProvider<LocalAuthSession>, SMBr
 
         //String newPasswordHash = WebAuthProviderPropertyEncryption.hash.encrypt(userName, newPassword);
 
-        storedCredentials.put(CRED_PASSWORD, newPassword);
+        storedCredentials.put(CRED_PASSWORD_MD_5, newPassword);
         smController.setCurrentUserCredentials(authProvider.getId(), storedCredentials);
         return true;
     }
