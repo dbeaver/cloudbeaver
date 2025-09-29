@@ -7,7 +7,7 @@
  */
 .notifications {
   composes: theme-typography from global;
-  position: absolute;
+  position: fixed;
   bottom: 0;
   left: 0;
   max-height: 329px;
