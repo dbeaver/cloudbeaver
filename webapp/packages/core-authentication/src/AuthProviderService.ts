@@ -70,7 +70,7 @@ export class AuthProviderService {
     return md5(value).toUpperCase();
   }
 
-  async processCredentials(providerId: string, credentials: IAuthCredentials): Promise<IAuthCredentials> {
+  async processCredentials(providerId: string, credentials: IAuthCredentials, shouldRehash: boolean = false): Promise<IAuthCredentials> {
     const provider = await this.authProvidersResource.load(providerId);
 
     if (!provider) {
@@ -90,6 +90,10 @@ export class AuthProviderService {
 
         if (typeof value === 'string') {
           credentialsProcessed.credentials[parameter.id] = await this.hashValue(value, 'sha256');
+
+          if (shouldRehash) {
+            credentialsProcessed.credentials[`${parameter.id}Md5`] = await this.hashValue(value, 'md5');
+          }
         }
       }
     }

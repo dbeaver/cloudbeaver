@@ -49,6 +49,7 @@ interface IState {
   activeConfiguration: AuthProviderConfiguration | null;
   credentials: IAuthCredentials;
   tabIds: string[];
+  shouldRehash: boolean;
   isTooManySessions: boolean;
   forceSessionsLogout: boolean;
   switchAuthMode: (tabId: string | null, resetError?: boolean) => void;
@@ -120,6 +121,7 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
         profile: '0',
         credentials: {},
       },
+      shouldRehash: false,
       isTooManySessions: false,
       forceSessionsLogout: false,
       switchAuthMode(tabId: string | null, resetError = true): void {
@@ -170,6 +172,7 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
       activeProvider: observable.ref,
       activeConfiguration: observable.ref,
       credentials: observable,
+      shouldRehash: observable.ref,
       isTooManySessions: observable.ref,
       forceSessionsLogout: observable.ref,
       switchAuthMode: action.bound,
@@ -238,10 +241,15 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
               },
               forceSessionsLogout: state.forceSessionsLogout,
               linkUser,
+              shouldRehash: state.shouldRehash,
             });
+            state.shouldRehash = false;
           }
         } catch (exception: any) {
           const gqlError = errorOf(exception, GQLError);
+
+          // TODO cleanup when backend adds logic
+          state.shouldRehash = true;
 
           if (gqlError?.errorCode === EServerErrorCode.tooManySessions) {
             state.isTooManySessions = true;

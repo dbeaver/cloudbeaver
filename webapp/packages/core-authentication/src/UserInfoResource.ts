@@ -25,6 +25,7 @@ export interface ILoginOptions {
   configurationId?: string;
   linkUser?: boolean;
   forceSessionsLogout?: boolean;
+  shouldRehash?: boolean;
 }
 
 export type IFederatedLoginOptions = Omit<ILoginOptions, 'credentials'>;
@@ -103,12 +104,12 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void> 
     return this.data.authTokens.some(token => token.authProvider === providerId);
   }
 
-  async login(provider: string, { credentials, configurationId, linkUser, forceSessionsLogout }: ILoginOptions): Promise<AuthInfo> {
+  async login(provider: string, { credentials, configurationId, linkUser, forceSessionsLogout, shouldRehash }: ILoginOptions): Promise<AuthInfo> {
     // TODO password can be md5 or sha256 hash. First send sha256 hash, if the server returns an error, send md5 hash.
     let processedCredentials: Record<string, any> | undefined;
 
     if (credentials) {
-      const processed = await this.authProviderService.processCredentials(provider, credentials);
+      const processed = await this.authProviderService.processCredentials(provider, credentials, shouldRehash);
       processedCredentials = processed.credentials;
     }
 
