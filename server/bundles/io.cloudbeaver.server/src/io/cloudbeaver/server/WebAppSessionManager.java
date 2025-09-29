@@ -34,6 +34,8 @@ public interface WebAppSessionManager {
 
     BaseWebSession closeSession(@NotNull String sessionId);
 
+    BaseWebSession closeSession(@NotNull String sessionId, boolean sendSessionExpiredEvent);
+
     @NotNull
     WebSession getWebSession(
         @NotNull HttpServletRequest request,
