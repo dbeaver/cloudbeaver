@@ -18,7 +18,7 @@ export default [
   ['data_viewer_action_auto_refresh_menu_stop_tooltip', '停止自动刷新数据'],
   ['data_viewer_action_auto_refresh_menu_configure_tooltip', '配置自动刷新'],
   ['data_viewer_action_auto_refresh_interval_tooltip', '自动刷新间隔设置为 {arg:interval}'],
-  ['data_viewer_action_edit_delete', '删除选中'],
+  ['data_viewer_action_edit_delete', '删除选中行'],
   ['data_viewer_action_edit_add', '添加'],
   ['data_viewer_action_edit_add_copy', '复制并添加行'],
   ['data_viewer_action_edit_revert', '还原选中'],

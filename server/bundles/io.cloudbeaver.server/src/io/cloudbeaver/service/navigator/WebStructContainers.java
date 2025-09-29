@@ -16,6 +16,7 @@
  */
 package io.cloudbeaver.service.navigator;
 
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.Log;
 
 import java.util.ArrayList;
@@ -34,6 +35,8 @@ public class WebStructContainers {
     private List<WebNavigatorNodeInfo> schemaList = new ArrayList<>();
     private boolean supportsCatalogChange = false;
     private boolean supportsSchemaChange = false;
+    private String defaultCatalog = null;
+    private String defaultSchema = null;
 
     public Boolean getSupportsCatalogChange() {
         return supportsCatalogChange;
@@ -73,5 +76,23 @@ public class WebStructContainers {
 
     public void setSupportsSchemaChange(boolean support) {
         this.supportsSchemaChange = support;
+    }
+
+    @Nullable
+    public String getDefaultCatalog() {
+        return defaultCatalog;
+    }
+
+    public void setDefaultCatalog(@Nullable String defaultCatalog) {
+        this.defaultCatalog = defaultCatalog;
+    }
+
+    @Nullable
+    public String getDefaultSchema() {
+        return defaultSchema;
+    }
+
+    public void setDefaultSchema(@Nullable String defaultSchema) {
+        this.defaultSchema = defaultSchema;
     }
 }

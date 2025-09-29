@@ -35,6 +35,7 @@ import io.cloudbeaver.service.DBWServiceServerConfigurator;
 import io.cloudbeaver.service.admin.*;
 import io.cloudbeaver.service.security.SMUtils;
 import io.cloudbeaver.utils.ServletAppUtils;
+import io.cloudbeaver.utils.WebDataSourceUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
@@ -701,7 +702,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             // driver is removed from disabled list
             // we need to enable if it is embedded
             try {
-                DBPDriver driver = WebServiceUtils.getDriverById(driverId);
+                DBPDriver driver = WebDataSourceUtils.getDriverById(driverId);
                 if (driver.isEmbedded()) {
                     enabledIds.add(driverId);
                 }
