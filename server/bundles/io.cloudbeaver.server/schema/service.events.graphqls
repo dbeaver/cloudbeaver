@@ -45,6 +45,8 @@ enum CBServerEventId {
 
     "Resource manager project added"
     cb_rm_project_added,
+    "Resource manager project added"
+    cb_rm_project_updated,
     "Resource manager project removed"
     cb_rm_project_removed,
 

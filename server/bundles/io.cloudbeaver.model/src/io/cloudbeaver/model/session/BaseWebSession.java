@@ -30,6 +30,7 @@ import org.jkiss.dbeaver.model.auth.SMSessionContext;
 import org.jkiss.dbeaver.model.auth.impl.AbstractSessionPersistent;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.security.user.SMTeam;
+import org.jkiss.dbeaver.model.rm.RMProjectInfo;
 import org.jkiss.dbeaver.model.websocket.event.WSEvent;
 import org.jkiss.dbeaver.model.websocket.event.WSEventDeleteTempFile;
 import org.jkiss.dbeaver.model.websocket.event.session.WSSessionExpiredEvent;
@@ -232,6 +233,11 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
     public void addSessionProject(@NotNull String projectId) throws DBException {
         userContext.getAccessibleProjectIds().add(projectId);
     }
+
+    public void updateSessionProject(@NotNull String projectId, @NotNull RMProjectInfo rmProjectInfo) throws DBException {
+
+    }
+
 
     public void removeSessionProject(@Nullable String projectId) throws DBException {
         userContext.getAccessibleProjectIds().remove(projectId);
