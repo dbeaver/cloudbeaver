@@ -158,18 +158,27 @@ export class ProjectsService {
     );
 
     this.projectInfoEventHandler.onEvent<IProjectInfoEvent>(
+      ServerEventId.CbRmProjectUpdated,
+      e => {
+        this.projectInfoResource.markOutdated(e.projectId);
+      },
+      undefined,
+      this.projectInfoResource,
+    );
+
+    this.projectInfoEventHandler.onEvent<IProjectInfoEvent>(
       ServerEventId.CbRmProjectRemoved,
-      key => {
-        if (this.activeProjectIds.includes(key.projectId)) {
-          const project = this.projectInfoResource.get(key.projectId);
+      e => {
+        if (this.activeProjectIds.includes(e.projectId)) {
+          const project = this.projectInfoResource.get(e.projectId);
 
           this.dataSynchronizationService.requestSynchronization('project', project?.name ?? '').then(state => {
             if (state) {
-              this.projectInfoResource.delete(key.projectId);
+              this.projectInfoResource.delete(e.projectId);
             }
           });
         } else {
-          this.projectInfoResource.delete(key.projectId);
+          this.projectInfoResource.delete(e.projectId);
         }
       },
       undefined,

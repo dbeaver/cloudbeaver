@@ -17,18 +17,14 @@
 package io.cloudbeaver;
 
 import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
+import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.app.DBPWorkspace;
 import org.jkiss.dbeaver.model.auth.SMSessionContext;
 import org.jkiss.dbeaver.model.impl.app.BaseProjectImpl;
-import org.jkiss.dbeaver.model.rm.RMController;
-import org.jkiss.dbeaver.model.rm.RMControllerProvider;
-import org.jkiss.dbeaver.model.rm.RMProject;
-import org.jkiss.dbeaver.model.rm.RMProjectType;
-import org.jkiss.utils.CommonUtils;
-import org.jkiss.utils.Pair;
+import org.jkiss.dbeaver.model.rm.*;
 
 import java.nio.file.Path;
-import java.util.Collection;
 
 public abstract class BaseWebProjectImpl extends BaseProjectImpl implements RMControllerProvider {
 
@@ -83,6 +79,12 @@ public abstract class BaseWebProjectImpl extends BaseProjectImpl implements RMCo
 
     @NotNull
     @Override
+    public String getDisplayName() {
+        return getName();
+    }
+
+    @NotNull
+    @Override
     public Path getAbsolutePath() {
         return path;
     }
@@ -102,52 +104,25 @@ public abstract class BaseWebProjectImpl extends BaseProjectImpl implements RMCo
         return false;
     }
 
-    /**
-     * Method for Bulk Update of resources properties paths
-     *
-     * @param oldToNewPaths collection of OldPath to NewPath pairs
-     */
-    public void moveResourcePropertiesBatch(@NotNull Collection<Pair<String, String>> oldToNewPaths) {
-        loadMetadata();
-        synchronized (metadataSync) {
-            for (var pathsPair : oldToNewPaths) {
-                final var oldResourcePath = CommonUtils.normalizeResourcePath(pathsPair.getFirst());
-                final var newResourcePath = CommonUtils.normalizeResourcePath(pathsPair.getSecond());
-                final var resProps = resourceProperties.remove(oldResourcePath);
-                if (resProps != null) {
-                    resourceProperties.put(newResourcePath, resProps);
-                }
-            }
-        }
-        flushMetadata();
-    }
-
-    /**
-     * Method for Bulk Remove of resources properties
-     */
-    public boolean resetResourcesPropertiesBatch(@NotNull Collection<String> resourcesPaths) {
-        loadMetadata();
-        boolean propertiesChanged = false;
-        synchronized (metadataSync) {
-            for (var resourcePath : resourcesPaths) {
-                var removedProperties = resourceProperties.remove(CommonUtils.normalizeResourcePath(resourcePath));
-                if (removedProperties != null) {
-                    propertiesChanged = true;
-                }
-            }
-        }
-        if (propertiesChanged) {
-            flushMetadata();
-        }
-        return propertiesChanged;
-    }
-
-    public Path getMetadataFilePath() {
-        return getMetadataPath().resolve(METADATA_STORAGE_FILE);
-    }
-
     @Override
     public boolean isPrivateProject() {
         return RMProjectType.USER.equals(getRMProject().getType());
+    }
+
+    @Override
+    public void updateProject(@Nullable String newName, @Nullable String description) throws DBException {
+        RMProject rmProject = getResourceController().updateProject(this.getId(), new RMProjectInfo(newName, description));
+        updateProjectInfo(rmProject.getName(), rmProject.getDescription());
+    }
+
+    public void updateProjectInfo(@Nullable String newName, @Nullable String description) {
+        this.project.setName(newName);
+        this.project.setDescription(description);
+        RMEventManager.fireEvent(
+            new RMEvent(
+                RMEvent.Action.PROJECT_UPDATE,
+                project
+            )
+        );
     }
 }

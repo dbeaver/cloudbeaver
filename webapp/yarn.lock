@@ -2019,6 +2019,23 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@cloudbeaver/core-server-notifications@workspace:*, @cloudbeaver/core-server-notifications@workspace:packages/core-server-notifications":
+  version: 0.0.0-use.local
+  resolution: "@cloudbeaver/core-server-notifications@workspace:packages/core-server-notifications"
+  dependencies:
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-events": "workspace:*"
+    "@cloudbeaver/core-root": "workspace:*"
+    "@cloudbeaver/core-sdk": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
+    "@dbeaver/cli": "workspace:*"
+    rimraf: "npm:^6"
+    tslib: "npm:^2"
+    typescript: "npm:^5"
+  languageName: unknown
+  linkType: soft
+
 "@cloudbeaver/core-session-localization@workspace:*, @cloudbeaver/core-session-localization@workspace:packages/core-session-localization":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/core-session-localization@workspace:packages/core-session-localization"
@@ -3655,6 +3672,7 @@ __metadata:
     "@cloudbeaver/core-routing": "workspace:*"
     "@cloudbeaver/core-sdk": "workspace:*"
     "@cloudbeaver/core-server-localization": "workspace:*"
+    "@cloudbeaver/core-server-notifications": "workspace:*"
     "@cloudbeaver/core-session-localization": "workspace:*"
     "@cloudbeaver/core-settings": "workspace:*"
     "@cloudbeaver/core-settings-localization": "workspace:*"
