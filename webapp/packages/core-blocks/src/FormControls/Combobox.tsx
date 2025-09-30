@@ -74,7 +74,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
   description,
   allowCustomValue = false,
   keySelector = v => v,
-  valueSelector = v => v,
+  valueSelector = v => v as string,
   iconSelector,
   titleSelector,
   isDisabled,
@@ -82,14 +82,14 @@ export const Combobox: ComboboxType = observer(function Combobox({
   onSelect,
   onChange,
   ...rest
-}: ControlledProps<any, any> | ObjectProps<any, any, any>) {
+}: ControlledProps<unknown, unknown> | ObjectProps<unknown, string, Record<string, unknown>>) {
   const layoutProps = getLayoutProps(rest);
   const inputId = useId();
   rest = filterLayoutFakeProps(rest);
   const translate = useTranslate();
   const context = useContext(FormContext);
 
-  let selectedKey: string | string[] = controlledValue ?? defaultValue ?? undefined;
+  let selectedKey: unknown = controlledValue ?? defaultValue ?? undefined;
   if (state && name !== undefined && name in state) {
     selectedKey = state[name];
   }
@@ -97,7 +97,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
   const selectedItem = items.find((item, index) => keySelector(item, index) === selectedKey);
   const [internalInputValue, setInternalInputValue] = useState<string | null>(null);
 
-  const inputValue = allowCustomValue ? controlledValue : internalInputValue;
+  const inputValue: string | null = allowCustomValue ? ((selectedKey ?? null) as string | null) : internalInputValue;
   const selectedValue = selectedItem ? valueSelector(selectedItem) : '';
   const displayValue = inputValue ?? selectedValue;
 
@@ -132,11 +132,11 @@ export const Combobox: ComboboxType = observer(function Combobox({
         return;
       }
 
-      if (state) {
+      if (name !== undefined && state) {
         state[name] = selectedValue;
       }
       if (onSelect) {
-        onSelect(selectedValue, name, selectedKey);
+        onSelect(selectedValue, name as undefined, selectedKey);
       }
       if (context) {
         context.change(selectedValue as string, name);
@@ -145,10 +145,10 @@ export const Combobox: ComboboxType = observer(function Combobox({
     [items, selectedKey, state, onSelect, context, keySelector, name],
   );
 
-  const icon = selectedItem && iconSelector?.(selectedItem);
+  const icon: string | React.ReactElement | undefined = selectedItem ? iconSelector?.(selectedItem) : undefined;
 
   const comboboxDefaultSelectedValue = defaultValue;
-  let comboboxDefaultValue = undefined;
+  let comboboxDefaultValue: string | undefined = undefined;
 
   if (comboboxDefaultSelectedValue !== undefined) {
     const defaultItem = items.find((item, index) => keySelector(item, index) === comboboxDefaultSelectedValue);
@@ -177,7 +177,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
     return false;
   }
 
-  const displayPopover = !allowCustomValue || items.length > 1;
+  const displayPopover = !allowCustomValue || items.length > 0;
 
   return (
     <Field {...layoutProps} className={clsx(className, inline && 'tw:flex tw:items-center')}>
@@ -196,7 +196,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
         setValue={setInputValue}
         selectedValue={selectedValue}
         defaultValue={comboboxDefaultValue}
-        defaultSelectedValue={comboboxDefaultSelectedValue}
+        defaultSelectedValue={comboboxDefaultSelectedValue as string}
         setSelectedValue={handleSelect}
       >
         <div className="tw:relative tw:flex tw:flex-1 tw:items-center tw:gap-2">

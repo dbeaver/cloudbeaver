@@ -70,7 +70,7 @@ export const PropertyItem = observer<Props>(function PropertyItem({ property, va
           title={value}
           name={`${property.id}_value`}
           placeholder={property.valuePlaceholder}
-          items={property.validValues || [property.defaultValue]}
+          items={property.validValues || []}
           readOnly={readOnly}
           size="small"
           tiny
