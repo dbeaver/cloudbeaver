@@ -26,10 +26,10 @@ import clsx from 'clsx';
 import './Combobox.css';
 
 export interface ComboboxProps extends Omit<AriaComboboxProps, 'size'> {
-    size?: 'small' | 'medium' | 'large' | 'xlarge';
+  size?: 'small' | 'medium' | 'large' | 'xlarge';
 }
 
-export function ComboboxInput({size, ...props}: ComboboxProps) {
+export function ComboboxInput({ size, ...props }: ComboboxProps) {
   return <Combobox {...props} className={clsx('dbv-kit-combobox', `dbv-kit-combobox--${size ?? 'medium'}`, props.className)} autoSelect />;
 }
 
@@ -42,7 +42,7 @@ export interface ComboboxPopoverProps extends AriaComboboxPopoverProps {
  */
 export function ComboboxPopover({ children, className, ...props }: ComboboxPopoverProps) {
   return (
-    <AriaComboboxPopover gutter={8} portal sameWidth unmountOnHide className={clsx('dbv-kit-combobox__popover', className)} {...props}>
+    <AriaComboboxPopover gutter={8} className={clsx('dbv-kit-combobox__popover', className)} portal sameWidth unmountOnHide {...props}>
       {children}
     </AriaComboboxPopover>
   );
