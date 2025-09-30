@@ -15,7 +15,6 @@ import { useS } from '../useS.js';
 import type { IProperty } from './IProperty.js';
 import classes from './PropertyItem.module.css';
 import { Combobox } from '../FormControls/Combobox.js';
-import { isNotNullDefined } from '@dbeaver/js-helpers';
 import { ActionIconButton } from '../ActionIconButton.js';
 
 interface Props {
