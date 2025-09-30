@@ -218,7 +218,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
             displayPopover && (
               <ComboboxDisclosure
                 disabled={disabled || loading || readOnly}
-                className="tw:absolute tw:right-2 tw:top-[50%] tw:-translate-y-1/2 tw:*:fill-none! tw:cursor-pointer"
+                className="tw:absolute tw:right-2 tw:top-[50%] tw:-translate-y-1/2 tw:[&>svg]:fill-none! tw:text-sm! tw:cursor-pointer"
               />
             )
           )}
