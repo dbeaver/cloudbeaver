@@ -15,8 +15,6 @@
 }
 .inputContainer {
   position: relative;
-
-  --dbv-kit-control-outline-offset: -2px;
 }
 .loaderContainer,
 .iconContainer {
