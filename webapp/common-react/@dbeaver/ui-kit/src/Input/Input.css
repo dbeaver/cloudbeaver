@@ -20,7 +20,7 @@
     font-size: var(--dbv-kit-input-font-size);
     height: var(--dbv-kit-input-height);
 
-    &:not(:disabled):hover {
+    &:not(:disabled):not(:focus-visible):hover {
       border-color: var(--dbv-kit-color-control-hover);
     }
 
@@ -31,12 +31,6 @@
 
     &::placeholder {
       color: var(--dbv-kit-input-placeholder-foreground);
-    }
-
-    &:focus-visible,
-    &[data-focus-visible] {
-      outline: var(--dbv-kit-control-outline-width) solid var(--dbv-kit-control-outline-color);
-      outline-offset: var(--dbv-kit-control-outline-offset);
     }
   }
 
