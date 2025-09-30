@@ -95,7 +95,7 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
   ref,
 ) {
   const [columnWidths, setColumnWidths] = useState<ColumnWidths>(() => new Map<string, ColumnWidth>());
-  const [pinnedColumns] = useState<Set<number>>(new Set());
+  const [pinnedColumns, setPinnedColumns] = useState<Set<number>>(new Set());
   const rowsCount = useGridReactiveValue(rowCount);
   const columnsCount = useGridReactiveValue(columnCount);
 
@@ -165,11 +165,15 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
   }
 
   function pinColumn(colIdx: number) {
-    pinnedColumns.add(colIdx);
+    setPinnedColumns(prev => new Set(prev).add(colIdx));
   }
 
   function unpinColumn(colIdx: number) {
-    pinnedColumns.delete(colIdx);
+    setPinnedColumns(prev => new Set([...prev].filter(c => c !== colIdx)));
+  }
+
+  function isColumnPinned(colIdx: number) {
+    return pinnedColumns.has(colIdx);
   }
 
   // We need to patch auto-size width to avoid extremely large columns on table initialization
@@ -204,6 +208,7 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
               onHeaderKeyDown,
               pinColumn,
               unpinColumn,
+              isColumnPinned,
             }}
           >
             <DataGridBase

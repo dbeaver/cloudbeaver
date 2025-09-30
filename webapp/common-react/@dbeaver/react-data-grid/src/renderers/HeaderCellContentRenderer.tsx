@@ -12,6 +12,7 @@ import { DataGridCellHeaderContext } from '../DataGridHeaderCellContext.js';
 import { useGridReactiveValue } from '../useGridReactiveValue.js';
 import { HeaderDnDContext } from '../useHeaderDnD.js';
 import { OrderButton } from './OrderButton.js';
+import { PinButton } from './PinButton.js';
 
 interface Props {
   colIdx: number;
@@ -63,7 +64,9 @@ export const HeaderCellContentRenderer = memo(function HeaderCellContentRenderer
   });
 
   function handleSort(e: React.MouseEvent<HTMLElement> | React.KeyboardEvent<HTMLElement>) {
-    if (!onColumnSort) return;
+    if (!onColumnSort) {
+      return;
+    }
 
     const nextSortState = sortingState === 'asc' ? 'desc' : sortingState === 'desc' ? null : 'asc';
     onColumnSort(colIdx, nextSortState, e.ctrlKey || e.metaKey);
@@ -78,6 +81,15 @@ export const HeaderCellContentRenderer = memo(function HeaderCellContentRenderer
     }
   }
 
+  function togglePin() {
+    if (cellHeaderContext?.isColumnPinned?.(colIdx)) {
+      cellHeaderContext?.unpinColumn?.(colIdx);
+      return;
+    }
+
+    cellHeaderContext?.pinColumn?.(colIdx);
+  }
+
   return (
     <div
       tabIndex={tabIndex}
@@ -87,7 +99,10 @@ export const HeaderCellContentRenderer = memo(function HeaderCellContentRenderer
       onKeyDown={onKeyDown}
     >
       <span className="tw:overflow-hidden tw:text-ellipsis">{headerElement ?? getHeaderText ?? ''}</span>
-      {isColumnSortable && onColumnSort && <OrderButton sortState={sortingState} onClick={handleSort} />}
+      <div className="tw:flex tw:items-center tw:gap-0.5">
+        {isColumnSortable && onColumnSort && <OrderButton sortState={sortingState} onClick={handleSort} />}
+        <PinButton isPinned={!!cellHeaderContext?.isColumnPinned?.(colIdx)} onClick={togglePin} />
+      </div>
     </div>
   );
 });
