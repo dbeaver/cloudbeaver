@@ -48,13 +48,12 @@ export const PropertyItem = observer<Props>(function PropertyItem({ property, va
     }
   }, [property]);
 
-  const valuePlaceholder = isNotNullDefined(property.valuePlaceholder) ? String(property.valuePlaceholder) : '';
-
   return (
-    <div className={s(styles, { container: true })} title={property.description}>
+    <div className={s(styles, { container: true })}>
       <div className={s(styles, { name: true, error })}>
         <Input
           ref={keyInputRef}
+          title={property.description}
           value={property.displayName || property.key}
           type="text"
           name={property.id}
@@ -70,7 +69,7 @@ export const PropertyItem = observer<Props>(function PropertyItem({ property, va
           value={value}
           title={value}
           name={`${property.id}_value`}
-          placeholder={valuePlaceholder}
+          placeholder={property.valuePlaceholder}
           items={property.validValues || []}
           readOnly={readOnly}
           size="small"
