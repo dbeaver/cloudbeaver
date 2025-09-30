@@ -48,7 +48,6 @@ export const PropertyItem = observer<Props>(function PropertyItem({ property, va
     }
   }, [property]);
 
-  const keyPlaceholder = String(property.keyPlaceholder);
   const valuePlaceholder = isNotNullDefined(property.valuePlaceholder) ? String(property.valuePlaceholder) : '';
 
   return (
@@ -59,7 +58,7 @@ export const PropertyItem = observer<Props>(function PropertyItem({ property, va
           value={property.displayName || property.key}
           type="text"
           name={property.id}
-          placeholder={keyPlaceholder}
+          placeholder={property.keyPlaceholder}
           readOnly={!isDeletable}
           autoComplete="none"
           size="small"
