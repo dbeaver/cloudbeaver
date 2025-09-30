@@ -1680,7 +1680,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
 
     @Override
     public SMAuthInfo authenticateAnonymousUser(@NotNull String appSessionId, @NotNull Map<String, Object> sessionParameters, @NotNull SMSessionType sessionType) throws DBException {
-        if (!application.getAppConfiguration().isAnonymousAccessEnabled()) {
+        if (!application.isAnonymousAccessEnabled()) {
             throw new SMException("Anonymous access restricted");
         }
         try (Connection dbCon = database.openConnection()) {

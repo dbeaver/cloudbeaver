@@ -66,7 +66,9 @@ enum CBServerEventId {
     "Session async task info updated"
     cb_session_task_info_updated @since(version: "24.3.1"),
     "Workspace configuration updated"
-    cb_workspace_config_changed @since(version: "25.1.1")
+    cb_workspace_config_changed @since(version: "25.1.1"),
+    "Server notification"
+    cb_server_notification@since(version: "25.2.1")
 }
 
 "Events sent by client"
@@ -98,6 +100,7 @@ enum CBEventTopic {
     cb_transaction @since(version: "24.3.3"),
     cb_workspace_configuration @since(version: "25.1.1")
     cb_ai @since(version: "25.1.1")
+    cb_notification @since(version: "25.2.1")
 }
 
 "Base server event interface"
@@ -274,6 +277,21 @@ type WSAIChatMessageErrorEvent implements CBServerEvent @since(version: "25.1.1"
     conversationId: ID!
     messageId: ID!
     errorMessage: String
+}
+
+enum WSServerNotificationEventType {
+    INFO
+    ERROR
+    LOADING
+    CUSTOM
+}
+"General event for showing user notification"
+type WSServerNotificationEvent implements CBServerEvent @since(version: "25.2.1") {
+    id: CBServerEventId!
+    topicId: CBEventTopic!
+    title: String
+    message: String
+    notificationType: WSServerNotificationEventType!
 }
 
 extend type Query {

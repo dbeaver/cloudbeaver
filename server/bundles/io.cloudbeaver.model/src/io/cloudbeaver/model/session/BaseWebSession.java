@@ -58,7 +58,7 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
     protected volatile long lastAccessTime;
 
     private final List<CBWebSessionEventHandler> sessionEventHandlers = new CopyOnWriteArrayList<>();
-    private WebSessionEventsFilter eventsFilter = new WebSessionEventsFilter();
+    private WebSessionEventsFilter eventsFilter;
     private final WebSessionWorkspace workspace;
 
     public BaseWebSession(@NotNull String id, @NotNull ServletApplication application) throws DBException {
@@ -69,6 +69,7 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
         this.workspace = createWebWorkspace();
         this.workspace.getAuthContext().addSession(this);
         this.userContext = createUserContext();
+        this.eventsFilter = new WebSessionEventsFilter(this);
     }
 
     @NotNull

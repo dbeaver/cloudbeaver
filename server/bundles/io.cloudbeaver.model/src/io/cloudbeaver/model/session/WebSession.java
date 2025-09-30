@@ -304,7 +304,7 @@ public class WebSession extends BaseWebSession
             for (RMProject project : rmProjects) {
                 createWebProject(project);
             }
-            if (user == null && application.getAppConfiguration().isAnonymousAccessEnabled()) {
+            if (user == null && application.isAnonymousAccessEnabled()) {
                 WebProjectImpl anonymousProject = createWebProject(RMUtils.createAnonymousProject());
                 anonymousProject.setInMemory(true);
             }
@@ -397,9 +397,10 @@ public class WebSession extends BaseWebSession
 
 
     private synchronized void authAsAnonymousUser() throws DBException {
-        if (!application.getAppConfiguration().isAnonymousAccessEnabled()) {
+        if (!application.isAnonymousAccessEnabled()) {
             return;
         }
+
         SMAuthInfo authInfo = getSecurityController().authenticateAnonymousUser(this.id, getSessionParameters(), CB_SESSION_TYPE);
         updateSMSession(authInfo);
         notifySessionAuthChange();
@@ -792,7 +793,7 @@ public class WebSession extends BaseWebSession
         }
     }
 
-    public List<WebAuthInfo> removeAuthInfo(String providerId) throws DBException {
+    public List<WebAuthInfo> removeAuthInfo(String providerId, boolean needResetUserState) throws DBException {
         List<WebAuthInfo> oldInfo;
         if (providerId == null) {
             oldInfo = clearAuthTokens();
@@ -805,10 +806,14 @@ public class WebSession extends BaseWebSession
                 oldInfo = List.of();
             }
         }
-        if (authTokens.isEmpty()) {
+        if (authTokens.isEmpty() && needResetUserState) {
             resetUserState();
         }
         return oldInfo;
+    }
+
+    public List<WebAuthInfo> removeAuthInfo(String providerId) throws DBException {
+        return removeAuthInfo(providerId, true);
     }
 
     public List<DBACredentialsProvider> getContextCredentialsProviders() {

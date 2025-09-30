@@ -281,4 +281,9 @@ public abstract class BaseServletApplication extends BaseApplicationImpl impleme
     public ApplicationInstanceController getInstanceServer() {
         return instanceServer;
     }
+
+    @Override
+    public boolean isAnonymousAccessEnabled() {
+        return getAppConfiguration().isAnonymousAccessEnabled();
+    }
 }
