@@ -1885,6 +1885,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                     && authProviderDescriptor.getInstance() instanceof SMBruteForceProtected bruteforceProtected) {
                     Object inputUsername = bruteforceProtected.getInputUsername(authData);
                     if (inputUsername != null) {
+                        bruteforceProtected.processUserCredBeforeAuthAttempt(authData);
                         BruteForceUtils.checkBruteforce(smConfig,
                             getLatestUserLogins(dbCon, authProviderId, inputUsername.toString()));
                     }

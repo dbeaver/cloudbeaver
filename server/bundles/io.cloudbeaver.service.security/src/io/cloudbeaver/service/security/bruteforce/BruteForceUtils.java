@@ -40,7 +40,8 @@ public class BruteForceUtils {
         checkLoginInterval(oldestLoginAttempt.time(), smConfig.getMinimumLoginTimeout());
 
         long errorsCount = latestLoginAttempts.stream()
-            .filter(authAttemptSessionInfo -> authAttemptSessionInfo.smAuthStatus() == SMAuthStatus.ERROR).count();
+            .filter(authAttemptSessionInfo -> authAttemptSessionInfo.smAuthStatus() == SMAuthStatus.ERROR)
+            .count();
 
         boolean shouldBlock = errorsCount >= smConfig.getMaxFailedLogin();
         if (shouldBlock) {

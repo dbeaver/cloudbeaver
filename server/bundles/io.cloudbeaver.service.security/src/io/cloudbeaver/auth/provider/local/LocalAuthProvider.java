@@ -165,4 +165,14 @@ public class LocalAuthProvider implements SMAuthProvider<LocalAuthSession>, SMBr
     public Object getInputUsername(@NotNull Map<String, Object> cred) {
         return cred.get("user");
     }
+
+    @Override
+    public void processUserCredBeforeAuthAttempt(@NotNull Map<String, Object> cred) {
+        if (cred.get(CRED_PASSWORD_MD_5) != null) {
+            cred.put("authLocalType", "legacy");
+        } else {
+            cred.put("authLocalType", "new");
+        }
+
+    }
 }

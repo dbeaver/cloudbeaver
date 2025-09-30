@@ -22,4 +22,8 @@ import java.util.Map;
 
 public interface SMBruteForceProtected {
     Object getInputUsername(@NotNull Map<String, Object> cred);
+
+    default void processUserCredBeforeAuthAttempt(@NotNull Map<String, Object> cred) {
+
+    }
 }
