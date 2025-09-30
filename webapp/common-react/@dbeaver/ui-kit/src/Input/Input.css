@@ -58,7 +58,6 @@
   /* Sizes */
 
   .dbv-kit-input--small {
-    --dbv-kit-control-outline-offset: 0px;
     --dbv-kit-input-height: var(--dbv-kit-input-small-height);
     --dbv-kit-input-padding: var(--dbv-kit-input-small-padding);
     --dbv-kit-input-font-size: var(--dbv-kit-input-small-font-size);
@@ -72,14 +71,12 @@
   }
 
   .dbv-kit-input--large {
-    --dbv-kit-control-outline-offset: -2px;
     --dbv-kit-input-height: var(--dbv-kit-input-large-height);
     --dbv-kit-input-padding: var(--dbv-kit-input-large-padding);
     --dbv-kit-input-font-size: var(--dbv-kit-input-large-font-size);
   }
 
   .dbv-kit-input--xlarge {
-    --dbv-kit-control-outline-offset: -2px;
     --dbv-kit-input-height: var(--dbv-kit-input-xlarge-height);
     --dbv-kit-input-padding: var(--dbv-kit-input-xlarge-padding);
     --dbv-kit-input-font-size: var(--dbv-kit-input-xlarge-font-size);
