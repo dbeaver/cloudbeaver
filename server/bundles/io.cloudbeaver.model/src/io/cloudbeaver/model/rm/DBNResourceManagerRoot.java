@@ -19,7 +19,6 @@ package io.cloudbeaver.model.rm;
 
 import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.code.NotNull;
-import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPHiddenObject;
@@ -141,6 +140,9 @@ public class DBNResourceManagerRoot extends DBNNode implements DBPHiddenObject, 
             case PROJECT_ADD:
                 addProjectNode(event.getProject());
                 break;
+            case PROJECT_UPDATE:
+                updateProjectNode(event.getProject());
+                break;
         }
     }
 
@@ -186,5 +188,15 @@ public class DBNResourceManagerRoot extends DBNNode implements DBPHiddenObject, 
 
     private void addProjectNode(RMProject project) {
         projects = ArrayUtils.add(DBNResourceManagerProject.class, projects, new DBNResourceManagerProject(this, project));
+    }
+
+    private void updateProjectNode(@NotNull RMProject project) {
+        var projectNode = getProjectNode(project);
+        projectNode.ifPresent(
+            dbnResourceManagerProject -> {
+                dbnResourceManagerProject.getProject().setName(project.getName());
+                dbnResourceManagerProject.getProject().setDescription(project.getDescription());
+            }
+        );
     }
 }

@@ -1,0 +1,5 @@
+mutation updateProject($projectId: ID!, $projectName: String, $description: String) {
+  project: rmUpdateProject(projectId: $projectId, projectName: $projectName, description: $description) {
+    ...SharedProject
+  }
+}

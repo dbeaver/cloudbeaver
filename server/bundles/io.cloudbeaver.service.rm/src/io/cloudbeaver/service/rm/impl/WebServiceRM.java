@@ -31,6 +31,7 @@ import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.rm.RMProject;
+import org.jkiss.dbeaver.model.rm.RMProjectInfo;
 import org.jkiss.dbeaver.model.rm.RMResource;
 import org.jkiss.dbeaver.model.secret.DBSSecretController;
 import org.jkiss.dbeaver.model.security.*;
@@ -267,6 +268,31 @@ public class WebServiceRM implements DBWServiceRM {
     }
 
     @Override
+    public RMProject updateProject(
+        @NotNull WebSession session,
+        @NotNull String projectId,
+        @Nullable String name,
+        @Nullable String description
+    ) throws DBWebException {
+        try {
+            var project = session.getProjectById(projectId);
+            if (project == null) {
+                throw new DBException("Project not found: " + projectId);
+            }
+            RMProjectInfo projectInfo = new RMProjectInfo(name, description);
+            RMProject rmProject = getResourceController(session).updateProject(projectId, projectInfo);
+            project.updateProject(rmProject.getName(), rmProject.getDescription());
+
+            ServletAppUtils.getServletApplication().getEventController().addEvent(
+                WSProjectUpdateEvent.update(session.getSessionId(), session.getUserId(), rmProject.getId(), projectInfo)
+            );
+            return project.getRMProject();
+        } catch (DBException e) {
+            throw new DBWebException("Error updating project", e);
+        }
+    }
+
+    @Override
     public boolean deleteProject(@NotNull WebSession session, @NotNull String projectId) throws DBWebException {
         try {
             var project = session.getProjectById(projectId);
@@ -440,6 +466,72 @@ public class WebServiceRM implements DBWServiceRM {
             return sm.getSubjectObjectPermissionGrants(subjectId, SMObjectType.project);
         } catch (DBException e) {
             throw new DBWebException("Error reading project permission grants", e);
+        }
+    }
+
+    @NotNull
+    @Override
+    public Map<String, Object> getProjectSettings(
+        @NotNull WebSession webSession,
+        @NotNull String projectId,
+        @Nullable String settingId
+    ) throws DBWebException {
+        try {
+            var project = webSession.getProjectById(projectId);
+            if (project == null) {
+                throw new DBWebException("Project '" + projectId + "' not found");
+            }
+            return webSession.getSecurityController().getObjectSettings(
+                projectId,
+                SMObjectType.project,
+                settingId
+            );
+        } catch (DBException e) {
+            throw new DBWebException("Error getting project settings", e);
+        }
+    }
+
+    @Override
+    public boolean addProjectSettings(
+        @NotNull WebSession webSession,
+        @NotNull String projectId,
+        @NotNull Map<String, Object> settings
+    ) throws DBWebException {
+        try {
+            var project = webSession.getProjectById(projectId);
+            if (project == null) {
+                throw new DBWebException("Project '" + projectId + "' not found");
+            }
+            webSession.getSecurityController().setObjectSettings(
+                projectId,
+                SMObjectType.project,
+                settings
+            );
+            return true;
+        } catch (DBException e) {
+            throw new DBWebException("Error adding object settings", e);
+        }
+    }
+
+    @Override
+    public boolean deleteProjectSettings(
+        @NotNull WebSession webSession,
+        @NotNull String projectId,
+        @Nullable List<String> settings
+    ) throws DBWebException {
+        try {
+            var project = webSession.getProjectById(projectId);
+            if (project == null) {
+                throw new DBWebException("Project '" + projectId + "' not found");
+            }
+            webSession.getSecurityController().deleteObjectSettings(
+                projectId,
+                SMObjectType.project,
+                settings == null ? null : new HashSet<>(settings)
+            );
+            return true;
+        } catch (DBException e) {
+            throw new DBWebException("Error deleting object settings", e);
         }
     }
 

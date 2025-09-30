@@ -1,0 +1,39 @@
+{
+  "name": "@cloudbeaver/core-server-notifications",
+  "type": "module",
+  "sideEffects": [
+    "./lib/module.js",
+    "./lib/index.js",
+    "src/**/*.css",
+    "src/**/*.scss",
+    "public/**/*"
+  ],
+  "version": "0.1.0",
+  "description": "",
+  "license": "Apache-2.0",
+  "exports": {
+    ".": "./lib/index.js",
+    "./module": "./lib/module.js"
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "clean": "rimraf --glob lib",
+    "lint": "eslint ./src/ --ext .ts,.tsx",
+    "test": "dbeaver-test",
+    "validate-dependencies": "core-cli-validate-dependencies"
+  },
+  "dependencies": {
+    "@cloudbeaver/core-di": "workspace:*",
+    "@cloudbeaver/core-events": "workspace:*",
+    "@cloudbeaver/core-root": "workspace:*",
+    "@cloudbeaver/core-sdk": "workspace:*"
+  },
+  "devDependencies": {
+    "@cloudbeaver/core-cli": "workspace:*",
+    "@cloudbeaver/tsconfig": "workspace:*",
+    "@dbeaver/cli": "workspace:*",
+    "rimraf": "^6",
+    "tslib": "^2",
+    "typescript": "^5"
+  }
+}
