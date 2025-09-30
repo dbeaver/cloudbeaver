@@ -107,6 +107,12 @@
     --dbv-kit-combobox-font-size: var(--dbv-kit-combobox-small-font-size);
   }
 
+  .dbv-kit-combobox--medium {
+    --dbv-kit-combobox-height: var(--dbv-kit-combobox-medium-height);
+    --dbv-kit-combobox-padding: var(--dbv-kit-combobox-medium-padding);
+    --dbv-kit-combobox-font-size: var(--dbv-kit-combobox-medium-font-size);
+  }
+
   .dbv-kit-combobox--large {
     --dbv-kit-combobox-height: var(--dbv-kit-combobox-large-height);
     --dbv-kit-combobox-padding: var(--dbv-kit-combobox-large-padding);
