@@ -177,7 +177,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
     return false;
   }
 
-  const displayPopover = !allowCustomValue || items.length > 0;
+  const displayPopover = !allowCustomValue || items.length > 1;
 
   return (
     <Field {...layoutProps} className={clsx(className, inline && 'tw:flex tw:items-center')}>

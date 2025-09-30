@@ -66,10 +66,11 @@ export const PropertyItem = observer<Props>(function PropertyItem({ property, va
       <div className={s(styles, { value: true })}>
         <Combobox
           value={value}
+          defaultValue={property.defaultValue}
           title={value}
           name={`${property.id}_value`}
           placeholder={property.valuePlaceholder}
-          items={property.validValues || []}
+          items={property.validValues || [property.defaultValue]}
           readOnly={readOnly}
           size="small"
           tiny
