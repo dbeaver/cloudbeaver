@@ -17,11 +17,9 @@
 package io.cloudbeaver.service.core;
 
 import graphql.TypeResolutionEnvironment;
-import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.idl.TypeRuntimeWiring;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebServiceUtils;
-import io.cloudbeaver.model.WebConnectionConfig;
 import io.cloudbeaver.model.WebNetworkHandlerConfigInput;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.WebAppSessionManager;
@@ -105,16 +103,20 @@ public class WebServiceBindingCore extends WebServiceBindingBase<DBWServiceCore>
             .dataFetcher("changeSessionLanguage", env -> getService(env).changeSessionLanguage(getWebSession(env), env.getArgument("locale")))
 
             .dataFetcher("createConnection", env -> getService(env).createConnection(
-                getWebSession(env), getProjectReference(env), getConnectionConfig(env)))
+                getWebSession(env), getProjectReference(env), env.getArgument("config"))
+            )
             .dataFetcher("updateConnection", env -> getService(env).updateConnection(
-                getWebSession(env), getProjectReference(env), getConnectionConfig(env)))
+                getWebSession(env), getProjectReference(env), env.getArgument("config"))
+            )
             .dataFetcher("deleteConnection", env -> getService(env).deleteConnection(
                 getWebSession(env), getProjectReference(env), env.getArgument("id")))
             .dataFetcher("copyConnectionFromNode", env -> getService(env).copyConnectionFromNode(
                 getWebSession(env),
                 getProjectReference(env),
                 env.getArgument("nodePath"),
-                new WebConnectionConfig(env.getArgument("config"))))
+                    env.getArgument("config")
+                )
+            )
             .dataFetcher("initConnection", env -> {
                     List<Map<String, Object>> networkCredentials = env.getArgument("networkCredentials");
                     List<WebNetworkHandlerConfigInput> nhc = null;
@@ -134,7 +136,7 @@ public class WebServiceBindingCore extends WebServiceBindingBase<DBWServiceCore>
                 }
             )
             .dataFetcher("testConnection", env -> getService(env).testConnection(
-                getWebSession(env), getProjectReference(env), getConnectionConfig(env)
+                getWebSession(env), getProjectReference(env), env.getArgument("config")
             ))
             .dataFetcher("testNetworkHandler", env -> getService(env).testNetworkHandler(
                 getWebSession(env), new WebNetworkHandlerConfigInput(env.getArgument("config"))
@@ -176,9 +178,5 @@ public class WebServiceBindingCore extends WebServiceBindingBase<DBWServiceCore>
         model.getRuntimeWiring().type(TypeRuntimeWiring.newTypeWiring("AsyncTaskResult").typeResolver(TypeResolutionEnvironment::getObject)
         );
 
-    }
-
-    private WebConnectionConfig getConnectionConfig(DataFetchingEnvironment env) {
-        return new WebConnectionConfig(env.getArgument("config"));
     }
 }

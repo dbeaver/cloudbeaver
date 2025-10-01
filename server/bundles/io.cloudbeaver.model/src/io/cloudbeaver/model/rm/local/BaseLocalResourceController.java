@@ -99,7 +99,7 @@ public abstract class BaseLocalResourceController implements RMController {
         @NotNull String propName,
         @NotNull Object propValue
     ) throws DBException {
-        BaseWebProjectImpl webProject = getWebProject(projectId, false);
+        RMLocalProject webProject = getWebProject(projectId, false);
         doFileWriteOperation(projectId, webProject.getMetadataFilePath(),
             () -> {
                 log.debug("Updating value for property '" + propName + "' in project '" + projectId + "'");
@@ -284,7 +284,7 @@ public abstract class BaseLocalResourceController implements RMController {
         }
     }
 
-    protected abstract BaseWebProjectImpl getWebProject(String projectId, boolean refresh) throws DBException;
+    protected abstract RMLocalProject getWebProject(String projectId, boolean refresh) throws DBException;
 
     protected abstract <T> T doFileWriteOperation(String projectId, Path file, RMFileOperation<T> operation)
         throws DBException;

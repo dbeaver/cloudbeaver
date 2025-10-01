@@ -63,6 +63,12 @@
     --dbv-kit-input-font-size: var(--dbv-kit-input-small-font-size);
   }
 
+  .dbv-kit-input--medium {
+    --dbv-kit-input-height: var(--dbv-kit-input-medium-height);
+    --dbv-kit-input-padding: var(--dbv-kit-input-medium-padding);
+    --dbv-kit-input-font-size: var(--dbv-kit-input-medium-font-size);
+  }
+
   .dbv-kit-input--large {
     --dbv-kit-input-height: var(--dbv-kit-input-large-height);
     --dbv-kit-input-padding: var(--dbv-kit-input-large-padding);

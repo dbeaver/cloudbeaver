@@ -119,6 +119,8 @@ type DatabaseStructContainers {
     schemaList: [ NavigatorNodeInfo! ]!
     supportsCatalogChange: Boolean!
     supportsSchemaChange: Boolean!
+    defaultCatalog: String @since(version: "25.2.2")
+    defaultSchema: String @since(version: "25.2.2")
 }
 
 ####################################################

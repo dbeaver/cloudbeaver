@@ -55,6 +55,7 @@ export * from './localization/useTranslate.js';
 export * from './ConnectionImageWithMask/ConnectionImageWithMask.js';
 export { default as ConnectionImageWithMaskSvgStyles } from './ConnectionImageWithMask/ConnectionImageWithMaskSvg.module.css';
 
+export * from './Menu/AriaKit/MenuAriaKit.js';
 export * from './Menu/Menu.js';
 export { default as MenuStyles } from './Menu/Menu.module.css';
 export * from './Menu/MenuBarSmallItem.js';
@@ -187,7 +188,6 @@ export * from './FormControls/InputFiles.js';
 export * from './FormControls/InputFileTextContent.js';
 export * from './FormControls/Radio.js';
 export * from './FormControls/RadioGroup.js';
-export * from './FormControls/ShadowInput.js';
 export * from './FormControls/Form.js';
 export * from './FormControls/Textarea.js';
 export * from './FormControls/useCapsLockTracker.js';

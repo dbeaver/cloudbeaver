@@ -89,8 +89,9 @@ export const TableError = observer<Props>(function TableError({ model, loading, 
   return (
     <div
       role="status"
+      aria-hidden={!error.error}
       aria-label={error.message}
-      tabIndex={0}
+      tabIndex={error.error ? 0 : -1}
       className={s(style, { error: true, animated, collapsed: !errorInfo.display, errorHidden }, className)}
     >
       <div className={s(style, { errorBody: true })}>
