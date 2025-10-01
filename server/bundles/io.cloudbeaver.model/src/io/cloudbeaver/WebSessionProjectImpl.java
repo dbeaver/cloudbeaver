@@ -42,8 +42,8 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class WebSessionProjectImpl extends WebProjectImpl {
     private static final Log log = Log.getLog(WebSessionProjectImpl.class);
@@ -245,6 +245,10 @@ public class WebSessionProjectImpl extends WebProjectImpl {
     }
 
     public void refreshProjectSettings() throws DBException {
+        if (webSession.getUser() == null) {
+            projectSettings.clear();
+            return;
+        }
         Map<String, Object> loadedSettings = webSession.getSecurityController().getObjectSettings(
             getId(),
             SMObjectType.project,

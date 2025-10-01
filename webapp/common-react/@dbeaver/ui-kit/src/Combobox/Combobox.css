@@ -1,4 +1,5 @@
 @import './_base.css';
+@import './_sizes.css';
 
 @layer base {
   .dbv-kit-combobox {
@@ -95,5 +96,32 @@
   .dbv-kit-combobox__empty {
     gap: 0.5rem;
     padding: 0.5rem;
+  }
+
+  /* ---------------------------- */
+  /* Sizes */
+
+  .dbv-kit-combobox--small {
+    --dbv-kit-combobox-height: var(--dbv-kit-combobox-small-height);
+    --dbv-kit-combobox-padding: var(--dbv-kit-combobox-small-padding);
+    --dbv-kit-combobox-font-size: var(--dbv-kit-combobox-small-font-size);
+  }
+
+  .dbv-kit-combobox--medium {
+    --dbv-kit-combobox-height: var(--dbv-kit-combobox-medium-height);
+    --dbv-kit-combobox-padding: var(--dbv-kit-combobox-medium-padding);
+    --dbv-kit-combobox-font-size: var(--dbv-kit-combobox-medium-font-size);
+  }
+
+  .dbv-kit-combobox--large {
+    --dbv-kit-combobox-height: var(--dbv-kit-combobox-large-height);
+    --dbv-kit-combobox-padding: var(--dbv-kit-combobox-large-padding);
+    --dbv-kit-combobox-font-size: var(--dbv-kit-combobox-large-font-size);
+  }
+
+  .dbv-kit-combobox--xlarge {
+    --dbv-kit-combobox-height: var(--dbv-kit-combobox-xlarge-height);
+    --dbv-kit-combobox-padding: var(--dbv-kit-combobox-xlarge-padding);
+    --dbv-kit-combobox-font-size: var(--dbv-kit-combobox-xlarge-font-size);
   }
 }
