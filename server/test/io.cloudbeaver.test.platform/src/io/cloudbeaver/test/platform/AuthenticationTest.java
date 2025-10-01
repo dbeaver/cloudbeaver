@@ -82,7 +82,7 @@ public class AuthenticationTest extends CloudbeaverMockTest {
     private Map<String, Object> getUserCredentials(@NotNull String userId) throws Exception {
         return Map.of(
             LocalAuthProvider.CRED_USER, userId,
-            LocalAuthProvider.CRED_PASSWORD, SecurityUtils.makeDigest("test")
+            LocalAuthProvider.CRED_PASSWORD, SecurityUtils.makeDigestSha("test")
         );
     }
 

@@ -36,7 +36,7 @@ public class CEAppStarter {
     private static final String SERVER_STATUS_URL = SERVER_URL + "/status";
     private static final Map<String, Object> TEST_CREDENTIALS = Map.of(
         LocalAuthProvider.CRED_USER, "test",
-        LocalAuthProvider.CRED_PASSWORD, SecurityUtils.makeDigest("test")
+        LocalAuthProvider.CRED_PASSWORD, SecurityUtils.makeDigestSha("test")
     );
 
     private static CBApplication<?> testApp;
@@ -95,6 +95,7 @@ public class CEAppStarter {
         @NotNull WebGQLClient client,
         @NotNull Map<String, Object> credentials
     ) throws Exception {
+        System.out.println("Authenticate user creds:"+ String.join(",", credentials.entrySet().stream().map(e -> e.getKey() + "=" + e.getValue()).toArray(String[]::new)));
         return client.sendQuery(
             WebGQLClient.GQL_AUTHENTICATE,
             Map.of(

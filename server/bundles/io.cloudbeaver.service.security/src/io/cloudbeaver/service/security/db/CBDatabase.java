@@ -32,7 +32,6 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
-import org.jkiss.dbeaver.model.auth.Argon2IdHasher;
 import org.jkiss.dbeaver.model.auth.AuthInfo;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.model.impl.app.ApplicationRegistry;
@@ -310,11 +309,13 @@ public class CBDatabase extends InternalDB<WebDatabaseConfig> {
 
         if (!CommonUtils.isEmpty(adminPassword)) {
             // This is how client password will be transmitted from client
-            String clientPassword = Argon2IdHasher.hash(adminPassword);
-
+            System.out.println("Admin name: " + adminName);
+            System.out.println("Admin password: " + adminPassword);
+            //String clientPassword = Argon2IdHasher.hash(adminPassword);
+            //System.out.println("Admin hashed password: " + clientPassword + "\n\n");
             Map<String, Object> credentials = new LinkedHashMap<>();
             credentials.put(LocalAuthProviderConstants.CRED_USER, adminUser.getUserId());
-            credentials.put(LocalAuthProviderConstants.CRED_PASSWORD, clientPassword);
+            credentials.put(LocalAuthProviderConstants.CRED_PASSWORD, adminPassword);
 
             WebAuthProviderDescriptor authProvider = WebAuthProviderRegistry.getInstance()
                 .getAuthProvider(LocalAuthProviderConstants.PROVIDER_ID);
