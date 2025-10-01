@@ -55,6 +55,7 @@ import { useGridSelectedCellsCopy } from './useGridSelectedCellsCopy.js';
 import { useTableData } from './useTableData.js';
 import { TableColumnHeader } from './TableColumnHeader/TableColumnHeader.js';
 import { TableIndexColumnHeader } from './TableColumnHeader/TableIndexColumnHeader.js';
+import { TableHeaderCellIcon } from './TableHeaderCellIcon.js';
 
 const ROW_HEIGHT = 24;
 export const HEADER_HEIGHT = 32;
@@ -324,10 +325,24 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
     return <TableColumnHeader colIdx={colIdx} />;
   }
 
+  function getHeaderCellIcons(colIdx: number) {
+    if (colIdx === 0) {
+      return null;
+    }
+
+    return <TableHeaderCellIcon colIdx={colIdx} />;
+  }
+
   const headerElement = useCreateGridReactiveValue(
     getHeaderElement,
     (onValueChange, colIdx) => reaction(() => getHeaderElement(colIdx), onValueChange),
     [tableData],
+  );
+
+  const headerCellIcons = useCreateGridReactiveValue(
+    getHeaderCellIcons,
+    (onValueChange, colIdx) => reaction(() => getHeaderCellIcons(colIdx), onValueChange),
+    [],
   );
 
   function getCellElement(rowIdx: number, colIdx: number, props: HTMLAttributes<HTMLDivElement>, renderDefaultCell: IDataGridCellRenderer) {
@@ -487,6 +502,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
               cellElement={cellElement}
               getCellEditable={isCellEditable}
               headerElement={headerElement}
+              headerCellIcons={headerCellIcons}
               getHeaderHeight={() => headerHeight}
               getHeaderWidth={getHeaderWidth}
               getHeaderPinned={getHeaderPinned}

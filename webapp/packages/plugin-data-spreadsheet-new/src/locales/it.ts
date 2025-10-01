@@ -3,6 +3,8 @@ export default [
   ['data_grid_table_editing_set_to_null', 'Imposta a NULL'],
   ['data_grid_table_editing_open_inline_editor', "Apri l'editor contestuale"],
   ['data_grid_table_order', 'Ordinamento'],
+  ['data_grid_table_pin_column', 'Pin'],
+  ['data_grid_table_unpin_column', 'Unpin'],
   ['data_grid_table_open_value_panel', 'Mostra nel pannello dei valori'],
   ['data_grid_table_filter', 'Filtri'],
   ['data_grid_table_filter_cell_value', 'Valore della cella'],

@@ -8,6 +8,8 @@ export default [
   ['data_grid_table_editing_row_delete', 'Delete current row'],
   ['data_grid_table_editing_row_revert', 'Revert value'],
   ['data_grid_table_order', 'Sorting'],
+  ['data_grid_table_pin_column', 'Pin'],
+  ['data_grid_table_unpin_column', 'Unpin'],
   ['data_grid_table_open_value_panel', 'Show in value panel'],
   ['data_grid_table_filter', 'Filters'],
   ['data_grid_table_filter_cell_value', 'Cell value'],

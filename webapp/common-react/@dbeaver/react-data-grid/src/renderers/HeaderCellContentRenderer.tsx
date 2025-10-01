@@ -12,7 +12,6 @@ import { DataGridCellHeaderContext } from '../DataGridHeaderCellContext.js';
 import { useGridReactiveValue } from '../useGridReactiveValue.js';
 import { HeaderDnDContext } from '../useHeaderDnD.js';
 import { OrderButton } from './OrderButton.js';
-import { PinButton } from './PinButton.js';
 
 interface Props {
   colIdx: number;
@@ -23,6 +22,7 @@ export const HeaderCellContentRenderer = memo(function HeaderCellContentRenderer
   const dndHeaderContext = use(HeaderDnDContext);
   const cellHeaderContext = use(DataGridCellHeaderContext);
   const headerElement = useGridReactiveValue(cellHeaderContext?.headerElement, colIdx);
+  const headerCellIcons = useGridReactiveValue(cellHeaderContext?.headerCellIcons, colIdx);
   const getHeaderText = useGridReactiveValue(headerElement ? undefined : cellHeaderContext?.headerText, colIdx);
   const isColumnSortable = useGridReactiveValue(cellHeaderContext?.columnSortable, colIdx);
   const onColumnSort = cellHeaderContext?.onColumnSort;
@@ -81,15 +81,6 @@ export const HeaderCellContentRenderer = memo(function HeaderCellContentRenderer
     }
   }
 
-  function togglePin() {
-    if (cellHeaderContext?.isColumnPinned?.(colIdx)) {
-      cellHeaderContext?.unpinColumn?.(colIdx);
-      return;
-    }
-
-    cellHeaderContext?.pinColumn?.(colIdx);
-  }
-
   return (
     <div
       tabIndex={tabIndex}
@@ -101,7 +92,7 @@ export const HeaderCellContentRenderer = memo(function HeaderCellContentRenderer
       <span className="tw:overflow-hidden tw:text-ellipsis">{headerElement ?? getHeaderText ?? ''}</span>
       <div className="tw:flex tw:items-center tw:gap-0.5">
         {isColumnSortable && onColumnSort && <OrderButton sortState={sortingState} onClick={handleSort} />}
-        <PinButton isPinned={!!cellHeaderContext?.isColumnPinned?.(colIdx)} onClick={togglePin} />
+        {headerCellIcons}
       </div>
     </div>
   );

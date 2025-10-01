@@ -7,6 +7,8 @@ export default [
   ['data_grid_table_editing_row_delete', 'Aktuelle Zeile löschen'],
   ['data_grid_table_editing_row_revert', 'Wert zurückkehren'],
   ['data_grid_table_order', 'Sortierung'],
+  ['data_grid_table_pin_column', 'Pin'],
+  ['data_grid_table_unpin_column', 'Unpin'],
   ['data_grid_table_filter_cell_value', 'Zellwert'],
   ['data_grid_table_filter_reset_all_filters', 'Alle Filter zurücksetzen'],
   ['data_grid_table_disable_order', 'Deaktiviert'],

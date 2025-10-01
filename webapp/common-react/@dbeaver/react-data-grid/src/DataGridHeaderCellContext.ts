@@ -11,6 +11,7 @@ import type { IGridReactiveValue } from './IGridReactiveValue.js';
 
 export interface IDataGridHeaderCellContext {
   headerElement?: IGridReactiveValue<React.ReactNode, [colIdx: number]>;
+  headerCellIcons?: IGridReactiveValue<React.ReactNode, [colIdx: number]>;
   headerText?: IGridReactiveValue<string, [colIdx: number]>;
   getHeaderOrder?: () => number[];
   getHeaderWidth?: (colIdx: number) => number | string | null;

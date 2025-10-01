@@ -1,6 +1,15 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2025 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+
 export * from './DataGrid.js';
 export * from './DataGridCellContext.js';
 export * from './DataGridCellInnerContext.js';
+export * from './DataGridHeaderCellContext.js';
 export * from './IGridReactiveValue.js';
 export * from './useCreateGridReactiveValue.js';
 export * from './useGridReactiveValue.js';
