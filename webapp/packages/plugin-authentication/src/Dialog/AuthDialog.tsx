@@ -88,7 +88,7 @@ export const AuthDialog: DialogComponent<IAuthOptions, null> = observer(function
 
   async function login(linkUser: boolean, provider?: AuthProvider, configuration?: AuthProviderConfiguration) {
     async function attemptLogin(shouldRehash: boolean = false) {
-      await dialogData.login(linkUser, provider, configuration);
+      await dialogData.login(linkUser, provider, configuration, shouldRehash);
       resolveDialog();
     }
 
