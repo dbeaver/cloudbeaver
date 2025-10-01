@@ -69,6 +69,10 @@ enum CBServerEventId {
     cb_workspace_config_changed @since(version: "25.1.1"),
     "Server notification"
     cb_server_notification@since(version: "25.2.1")
+
+    "Query confirmations"
+    cb_query_confirmation@since(version: "25.2.2")
+    cb_query_ai_confirmation@since(version: "25.2.2")
 }
 
 "Events sent by client"
@@ -76,7 +80,8 @@ enum CBClientEventId {
     cb_client_topic_subscribe,
     cb_client_topic_unsubscribe,
     cb_client_projects_active,
-    cb_client_session_ping
+    cb_client_session_ping,
+    cb_client_query_confirmation@since(version: "25.2.2")
 }
 
 "Client subscribes on topic to receive only related events"
@@ -101,6 +106,7 @@ enum CBEventTopic {
     cb_workspace_configuration @since(version: "25.1.1")
     cb_ai @since(version: "25.1.1")
     cb_notification @since(version: "25.2.1")
+    cb_query_confirmation @since(version: "25.2.2")
 }
 
 "Base server event interface"
@@ -292,6 +298,33 @@ type WSServerNotificationEvent implements CBServerEvent @since(version: "25.2.1"
     title: String
     message: String
     notificationType: WSServerNotificationEventType!
+}
+
+enum WSServerQueryCategory {
+    READ,
+    UPDATE,
+    MODIFY_SCHEMA,
+    UNKNOWN
+}
+
+type WSServerQueryConfirmationEvent implements CBServerEvent @since(version: "25.2.2") {
+    id: CBServerEventId!
+    topicId: CBEventTopic!
+    categories: [WSServerQueryCategory!]!
+}
+
+type WSServerAIQueryConfirmationEvent implements CBServerEvent @since(version: "25.2.2") {
+    id: CBServerEventId!
+    topicId: CBEventTopic!
+    categories: [WSServerQueryCategory!]!
+    query: String!
+}
+
+type CBClientQueryConfirmationEvent implements CBClientEvent @since(version: "25.2.2") {
+    id: CBClientEventId!
+    topicId: CBEventTopic
+    confirmed: Boolean!
+    skipConfirmations: Boolean!
 }
 
 extend type Query {
