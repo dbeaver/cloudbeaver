@@ -39,7 +39,7 @@ interface IData {
   federatedProviders: AuthProvider[];
   tabIds: string[];
 
-  login: (linkUser: boolean, provider?: AuthProvider, configuration?: AuthProviderConfiguration, shouldRehash?: boolean) => Promise<void>;
+  login: (linkUser: boolean, provider?: AuthProvider, configuration?: AuthProviderConfiguration, hasOldHash?: boolean) => Promise<void>;
   federatedLogin: (provider: AuthProvider, configuration: AuthProviderConfiguration) => Promise<void>;
 }
 
@@ -198,7 +198,7 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
         }
         return false;
       },
-      async login(linkUser: boolean, provider?: AuthProvider, configuration?: AuthProviderConfiguration, shouldRehash?: boolean): Promise<void> {
+      async login(linkUser: boolean, provider?: AuthProvider, configuration?: AuthProviderConfiguration, hasOldHash?: boolean): Promise<void> {
         provider = (provider || state.activeProvider) ?? undefined;
         configuration = (configuration || state.activeConfiguration) ?? undefined;
 
@@ -238,7 +238,7 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
               },
               forceSessionsLogout: state.forceSessionsLogout,
               linkUser,
-              shouldRehash,
+              hasOldHash,
             });
           }
         } catch (exception: any) {

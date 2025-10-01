@@ -25,7 +25,7 @@ export interface ILoginOptions {
   configurationId?: string;
   linkUser?: boolean;
   forceSessionsLogout?: boolean;
-  shouldRehash?: boolean;
+  hasOldHash?: boolean;
 }
 
 export type IFederatedLoginOptions = Omit<ILoginOptions, 'credentials'>;
@@ -104,12 +104,11 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void> 
     return this.data.authTokens.some(token => token.authProvider === providerId);
   }
 
-  async login(provider: string, { credentials, configurationId, linkUser, forceSessionsLogout, shouldRehash }: ILoginOptions): Promise<AuthInfo> {
-    // TODO password can be md5 or sha256 hash. First send sha256 hash, if the server returns an error, send md5 hash.
+  async login(provider: string, { credentials, configurationId, linkUser, forceSessionsLogout, hasOldHash }: ILoginOptions): Promise<AuthInfo> {
     let processedCredentials: Record<string, any> | undefined;
 
     if (credentials) {
-      const processed = await this.authProviderService.processCredentials(provider, credentials, shouldRehash);
+      const processed = await this.authProviderService.processCredentials(provider, credentials, hasOldHash);
       processedCredentials = processed.credentials;
     }
 
@@ -234,7 +233,7 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void> 
     return this.data;
   }
 
-  async updateLocalPassword(oldPassword: string, newPassword: string, shouldRehash: boolean = false): Promise<void> {
+  async updateLocalPassword(oldPassword: string, newPassword: string, hasOldHash: boolean = false): Promise<void> {
     const oldPasswordHash = await this.authProviderService.hashValue(oldPassword, 'sha256');
     const newPasswordHash = await this.authProviderService.hashValue(newPassword, 'sha256');
     const credentials: Record<string, string> = {
@@ -242,7 +241,7 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void> 
       newPassword: newPasswordHash,
     };
 
-    if (shouldRehash) {
+    if (hasOldHash) {
       credentials['oldPasswordMd5'] = await this.authProviderService.hashValue(oldPassword, 'md5');
     }
 

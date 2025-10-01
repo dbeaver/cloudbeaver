@@ -62,8 +62,8 @@ export const ChangePassword = observer(function ChangePassword() {
     return null;
   });
 
-  async function updatePassword(shouldRehash: boolean = false) {
-    await userInfoResource.updateLocalPassword(state.oldPassword, state.password, shouldRehash);
+  async function updatePassword(hasOldHash: boolean = false) {
+    await userInfoResource.updateLocalPassword(state.oldPassword, state.password, hasOldHash);
     resetForm();
     notificationService.logSuccess({ title: 'plugin_user_profile_authentication_change_password_success' });
   }
