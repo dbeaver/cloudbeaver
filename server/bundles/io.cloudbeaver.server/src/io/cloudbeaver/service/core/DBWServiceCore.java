@@ -181,7 +181,7 @@ public interface DBWServiceCore extends DBWService {
     WebConnectionFolderInfo createConnectionFolder(
         @NotNull WebSession session,
         @Nullable @WebObjectId String projectId,
-        @NotNull String parentNodePath,
+        @Nullable String parentNodePath,
         @NotNull String newName) throws DBWebException;
 
     @WebProjectAction(requireProjectPermissions = {RMConstants.PERMISSION_PROJECT_DATASOURCES_EDIT})

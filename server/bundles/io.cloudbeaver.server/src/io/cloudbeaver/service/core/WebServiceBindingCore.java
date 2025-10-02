@@ -162,7 +162,7 @@ public class WebServiceBindingCore extends WebServiceBindingBase<DBWServiceCore>
             .dataFetcher("createConnectionFolder", env -> getService(env).createConnectionFolder(
                 getWebSession(env),
                 getProjectReference(env),
-                getArgumentVal(env, "parentFolderPath"),
+                getArgument(env, "parentFolderPath"),
                 getArgumentVal(env, "folderName")
             ))
             .dataFetcher("renameConnectionFolder", env -> getService(env).renameConnectionFolder(
