@@ -62,7 +62,6 @@ const MAX_AUTO_SIZE_WIDTH = 350;
 export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid(
   {
     headerElement,
-    headerCellIcons,
     getHeaderWidth,
     headerText,
     getHeaderOrder,
@@ -201,7 +200,6 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
           <DataGridCellHeaderContext
             value={{
               headerElement,
-              headerCellIcons,
               headerText,
               getHeaderDnD,
               columnSortable,

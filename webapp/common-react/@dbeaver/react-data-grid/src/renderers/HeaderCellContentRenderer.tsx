@@ -22,7 +22,6 @@ export const HeaderCellContentRenderer = memo(function HeaderCellContentRenderer
   const dndHeaderContext = use(HeaderDnDContext);
   const cellHeaderContext = use(DataGridCellHeaderContext);
   const headerElement = useGridReactiveValue(cellHeaderContext?.headerElement, colIdx);
-  const headerCellIcons = useGridReactiveValue(cellHeaderContext?.headerCellIcons, colIdx);
   const getHeaderText = useGridReactiveValue(headerElement ? undefined : cellHeaderContext?.headerText, colIdx);
   const isColumnSortable = useGridReactiveValue(cellHeaderContext?.columnSortable, colIdx);
   const onColumnSort = cellHeaderContext?.onColumnSort;
@@ -64,9 +63,7 @@ export const HeaderCellContentRenderer = memo(function HeaderCellContentRenderer
   });
 
   function handleSort(e: React.MouseEvent<HTMLElement> | React.KeyboardEvent<HTMLElement>) {
-    if (!onColumnSort) {
-      return;
-    }
+    if (!onColumnSort) return;
 
     const nextSortState = sortingState === 'asc' ? 'desc' : sortingState === 'desc' ? null : 'asc';
     onColumnSort(colIdx, nextSortState, e.ctrlKey || e.metaKey);
@@ -90,10 +87,7 @@ export const HeaderCellContentRenderer = memo(function HeaderCellContentRenderer
       onKeyDown={onKeyDown}
     >
       <span className="tw:overflow-hidden tw:text-ellipsis">{headerElement ?? getHeaderText ?? ''}</span>
-      <div className="tw:flex tw:items-center tw:gap-0.5">
-        {isColumnSortable && onColumnSort && <OrderButton sortState={sortingState} onClick={handleSort} />}
-        {headerCellIcons}
-      </div>
+      {isColumnSortable && onColumnSort && <OrderButton sortState={sortingState} onClick={handleSort} />}
     </div>
   );
 });
