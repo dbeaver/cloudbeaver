@@ -10,9 +10,7 @@ import { useCallback, useLayoutEffect, useMemo, useRef, type HTMLAttributes } fr
 import { reaction } from 'mobx';
 
 import { getComputed, s, TextPlaceholder, useObjectRef, useS, useTranslate } from '@cloudbeaver/core-blocks';
-// import { useService } from '@cloudbeaver/core-di';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
-// import { ClipboardService } from '@cloudbeaver/core-ui';
 import { useCaptureViewContext } from '@cloudbeaver/core-view';
 import {
   DataGrid,

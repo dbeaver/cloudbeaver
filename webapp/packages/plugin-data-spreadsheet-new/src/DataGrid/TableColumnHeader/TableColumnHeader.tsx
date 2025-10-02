@@ -16,6 +16,9 @@ import { DataGridSelectionContext } from '../DataGridSelection/DataGridSelection
 import { TableDataContext } from '../TableDataContext.js';
 import style from './TableColumnHeader.module.css';
 import { useTableColumnDnD } from './useTableColumnDnD.js';
+import { DataGridCellHeaderContext } from '@cloudbeaver/plugin-data-grid';
+import { DATA_CONTEXT_TABLE_COLUMN } from './DATA_CONTEXT_TABLE_COLUMN.js';
+import { useCaptureViewContext } from '@cloudbeaver/core-view';
 
 interface Props {
   colIdx: number;
@@ -35,6 +38,11 @@ export const TableColumnHeader = observer<Props>(function TableColumnHeader({ co
 
   const dataReadonly = getComputed(() => model.isReadonly(resultIndex));
   const hasElementIdentifier = getComputed(() => model.hasElementIdentifier(resultIndex));
+  const dataGridCellHeaderContext = useContext(DataGridCellHeaderContext);
+
+  useCaptureViewContext((context, id) => {
+    context.set(DATA_CONTEXT_TABLE_COLUMN, dataGridCellHeaderContext, id);
+  });
 
   let icon: string | undefined;
   let columnName: string | undefined;

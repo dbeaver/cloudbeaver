@@ -16,10 +16,12 @@ import {
   DATA_CONTEXT_DV_DDM_RESULT_INDEX,
   DATA_CONTEXT_DV_SIMPLE,
   DatabaseDataConstraintAction,
+  DatabaseSelectAction,
   DataPresentationService,
   isResultSetDataSource,
   MENU_DV_CONTEXT_MENU,
   ResultSetDataSource,
+  type IResultSetElementKey,
 } from '@cloudbeaver/plugin-data-viewer';
 
 import { DataGridContextMenuCellEditingService } from './DataGrid/DataGridContextMenu/DataGridContextMenuCellEditingService.js';
@@ -27,6 +29,10 @@ import { DataGridContextMenuFilterService } from './DataGrid/DataGridContextMenu
 import { DataGridContextMenuOrderService } from './DataGrid/DataGridContextMenu/DataGridContextMenuOrderService.js';
 import { DataGridContextMenuSaveContentService } from './DataGrid/DataGridContextMenu/DataGridContextMenuSaveContentService.js';
 import { DataGridSettingsService } from './DataGridSettingsService.js';
+import { ACTION_DATA_GRID_PIN_COLUMN } from './DataGrid/Actions/Pin/ACTION_DATA_GRID_PIN_COLUMN.js';
+import { ACTION_DATA_GRID_UNPIN_COLUMN } from './DataGrid/Actions/Pin/ACTION_DATA_GRID_UNPIN_COLUMN.js';
+import { DATA_CONTEXT_TABLE_COLUMN } from './DataGrid/TableColumnHeader/DATA_CONTEXT_TABLE_COLUMN.js';
+import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
 
 const VALUE_TEXT_PRESENTATION_ID = 'value-text-presentation';
 
@@ -78,14 +84,14 @@ export class SpreadsheetBootstrap extends Bootstrap {
     this.menuService.addCreator({
       root: true,
       menus: [MENU_DV_CONTEXT_MENU],
-      contexts: [DATA_CONTEXT_DV_SIMPLE, DATA_CONTEXT_DV_ACTIONS, DATA_CONTEXT_DV_DDM, DATA_CONTEXT_DV_DDM_RESULT_INDEX],
-      getItems: (context, items) => [ACTION_OPEN, ...items, ACTION_DELETE],
+      contexts: [DATA_CONTEXT_DV_SIMPLE, DATA_CONTEXT_DV_ACTIONS, DATA_CONTEXT_DV_DDM, DATA_CONTEXT_DV_DDM_RESULT_INDEX, DATA_CONTEXT_TABLE_COLUMN],
+      getItems: (context, items) => [ACTION_OPEN, ...items, ACTION_DELETE, ACTION_DATA_GRID_PIN_COLUMN, ACTION_DATA_GRID_UNPIN_COLUMN],
     });
 
     this.actionService.addHandler({
       id: 'data-grid-key-base-handler',
       menus: [MENU_DV_CONTEXT_MENU],
-      contexts: [DATA_CONTEXT_DV_SIMPLE, DATA_CONTEXT_DV_ACTIONS, DATA_CONTEXT_DV_DDM, DATA_CONTEXT_DV_DDM_RESULT_INDEX],
+      contexts: [DATA_CONTEXT_DV_SIMPLE, DATA_CONTEXT_DV_ACTIONS, DATA_CONTEXT_DV_DDM, DATA_CONTEXT_DV_DDM_RESULT_INDEX, DATA_CONTEXT_TABLE_COLUMN],
       getActionInfo: (context, action) => {
         if (action === ACTION_OPEN) {
           return { ...action.info, label: 'data_grid_table_open_value_panel', icon: 'value-panel' };
@@ -95,11 +101,31 @@ export class SpreadsheetBootstrap extends Bootstrap {
           return { ...action.info, label: 'data_grid_table_delete_filters_and_orders', icon: 'erase' };
         }
 
+        if (action === ACTION_DATA_GRID_PIN_COLUMN) {
+          return { ...action.info, label: 'data_grid_table_pin_column' };
+        }
+
+        if (action === ACTION_DATA_GRID_UNPIN_COLUMN) {
+          return { ...action.info, label: 'data_grid_table_unpin_column' };
+        }
+
         return action.info;
       },
       isActionApplicable: (context, action): boolean => {
         const model = context.get(DATA_CONTEXT_DV_DDM)!;
         const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
+        // TODO bug: incorrect column index arrives
+        const columnIndex = getColumnIdFromContext(context);
+        const columnContext = context.get(DATA_CONTEXT_TABLE_COLUMN);
+        const isPinnedColumn = columnContext?.isColumnPinned?.(columnIndex);
+
+        if (action === ACTION_DATA_GRID_PIN_COLUMN) {
+          return isPinnedColumn === false;
+        }
+
+        if (action === ACTION_DATA_GRID_UNPIN_COLUMN) {
+          return isPinnedColumn === true;
+        }
 
         if (action === ACTION_OPEN) {
           const actions = context.get(DATA_CONTEXT_DV_ACTIONS);
@@ -119,7 +145,7 @@ export class SpreadsheetBootstrap extends Bootstrap {
           return constraints.orderConstraints.length > 0 || constraints.filterConstraints.length > 0;
         }
 
-        return [ACTION_OPEN, ACTION_DELETE].includes(action);
+        return [ACTION_OPEN, ACTION_DELETE, ACTION_DATA_GRID_PIN_COLUMN, ACTION_DATA_GRID_UNPIN_COLUMN].includes(action);
       },
       handler: async (context, action) => {
         if (action === ACTION_OPEN) {
@@ -127,6 +153,26 @@ export class SpreadsheetBootstrap extends Bootstrap {
 
           if (actions) {
             actions.setValuePresentation(VALUE_TEXT_PRESENTATION_ID);
+          }
+        }
+
+        if (action === ACTION_DATA_GRID_PIN_COLUMN) {
+          const columnContext = context.get(DATA_CONTEXT_TABLE_COLUMN);
+          // TODO bug: incorrect column index arrives
+          const columnIndex = getColumnIdFromContext(context);
+
+          if (columnContext) {
+            columnContext.pinColumn?.(columnIndex);
+          }
+        }
+
+        if (action === ACTION_DATA_GRID_UNPIN_COLUMN) {
+          const columnContext = context.get(DATA_CONTEXT_TABLE_COLUMN);
+          // TODO bug: incorrect column index arrives
+          const columnIndex = getColumnIdFromContext(context);
+
+          if (columnContext) {
+            columnContext.unpinColumn?.(columnIndex);
           }
         }
 
@@ -144,4 +190,14 @@ export class SpreadsheetBootstrap extends Bootstrap {
       },
     });
   }
+}
+
+function getColumnIdFromContext(context: IDataContextProvider): number {
+  const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
+  const model = context.get(DATA_CONTEXT_DV_DDM)!;
+  const source = model.source as unknown as ResultSetDataSource;
+  const selectAction = source.getActionImplementation(resultIndex, DatabaseSelectAction);
+  const elementKey = selectAction?.getActiveElements()[0] as IResultSetElementKey;
+
+  return elementKey?.column.index;
 }

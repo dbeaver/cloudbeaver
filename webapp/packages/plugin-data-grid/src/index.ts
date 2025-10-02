@@ -19,6 +19,7 @@ export {
   NullFormatter,
   NumberFormatter,
   BlobFormatter,
+  type IDataGridHeaderCellContext,
   type IGridReactiveValue,
   type DataGridRef,
   type ICellPosition,
