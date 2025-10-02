@@ -1,0 +1,47 @@
+# Menu CSS Tokens
+
+This UI kit uses several CSS tokens to style menus (trigger, popover, items).
+
+## Common menu tokens
+
+### Size and space
+
+- `--dbv-kit-menu-popover-max-height:` 18rem - Max height of the popover; enables scrolling
+- `--dbv-kit-menu-popover-max-width:` 20rem - Maximum width for the popover
+- `--dbv-kit-menu-item-padding-inline:` calc(var(--tw-spacing) \* 5) - Inline paddings for menu items
+- `--dbv-kit-menu-item-padding-block:` calc(var(--tw-spacing) \* 1.4) - Block paddings for menu items
+
+### Basic colors
+
+- `--dbv-kit-menu-foreground:` var(--dbv-kit-color-foreground) - Default text color
+- `--dbv-kit-menu-background:` var(--dbv-kit-color-background) - Default background color
+- `--dbv-kit-menu-popover-foreground:` var(--dbv-kit-color-foreground) - Popover text color
+- `--dbv-kit-menu-popover-background:` var(--dbv-kit-color-background) - Popover background color
+- `--dbv-kit-menu-item-hover-background:` var(--tw-color-gray-200) - Hover background for items
+- `--dbv-kit-menu-item-hover-foreground:` var(--dbv-kit-menu-foreground) - Hover text color for items
+- `--dbv-kit-menu-item-selected-background:` var(--dbv-kit-color-primary-100) - Selected item background
+- `--dbv-kit-menu-separator-color:` var(--dbv-kit-color-control-inactive) - Separator color
+
+### Border
+
+- `--dbv-kit-menu-border-width:` var(--dbv-kit-control-border-width) - Border width for trigger and popover
+- `--dbv-kit-menu-border-color:` var(--dbv-kit-color-control-inactive) - Border color for trigger and popover
+- `--dbv-kit-menu-border-style:` none - Border style for trigger and popover
+- `--dbv-kit-menu-border-radius:` var(--dbv-kit-control-border-radius) - Border radius for trigger and popover
+- `--dbv-kit-menu-hover-border-color:` var(--dbv-kit-color-control-hover) - Trigger border color on hover
+
+### Font
+
+- `--dbv-kit-menu-font-weight:` var(--tw-font-weight-normal) - Font weight for trigger and items
+- `--dbv-kit-menu-font-size:` calc(var(--dbv-kit-font-size-base) \* 0.875) - Base font size for trigger and items
+
+### Popover
+
+- `--dbv-kit-menu-popover-shadow:` var(--tw-shadow-md) - Popover shadow
+
+### Disabled state tokens
+
+- `--dbv-kit-menu-disabled-foreground:` var(--dbv-kit-control-disabled-foreground) - Disabled trigger text color
+- `--dbv-kit-menu-disabled-background:` var(--dbv-kit-control-disabled-background) - Disabled trigger background color
+
+These tokens can be overridden in your theme to customize menu appearance.

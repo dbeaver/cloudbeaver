@@ -1,0 +1,31 @@
+@layer base {
+  :root {
+    --dbv-kit-menu-foreground: var(--dbv-kit-color-foreground);
+    --dbv-kit-menu-background: var(--dbv-kit-color-background);
+    --dbv-kit-menu-disabled-foreground: var(--dbv-kit-control-disabled-foreground);
+    --dbv-kit-menu-disabled-background: var(--dbv-kit-control-disabled-background);
+
+    --dbv-kit-menu-border-width: var(--dbv-kit-control-border-width);
+    --dbv-kit-menu-border-color: var(--dbv-kit-color-control-inactive);
+    --dbv-kit-menu-border-style: none;
+    --dbv-kit-menu-border-radius: var(--dbv-kit-control-border-radius);
+    --dbv-kit-menu-hover-border-color: var(--dbv-kit-color-control-hover);
+
+    --dbv-kit-menu-font-weight: var(--tw-font-weight-normal);
+    --dbv-kit-menu-font-size: calc(var(--dbv-kit-font-size-base) * 0.875);
+
+    --dbv-kit-menu-popover-background: var(--dbv-kit-color-background);
+    --dbv-kit-menu-popover-foreground: var(--dbv-kit-color-foreground);
+    --dbv-kit-menu-popover-shadow: var(--tw-shadow-md);
+    --dbv-kit-menu-popover-max-height: 18rem;
+    --dbv-kit-menu-popover-max-width: 20rem;
+
+    --dbv-kit-menu-item-padding-inline: calc(var(--tw-spacing) * 5);
+    --dbv-kit-menu-item-padding-block: calc(var(--tw-spacing) * 1.4);
+    --dbv-kit-menu-item-hover-background: var(--tw-color-gray-200);
+    --dbv-kit-menu-item-hover-foreground: var(--dbv-kit-menu-foreground);
+    --dbv-kit-menu-item-selected-background: var(--dbv-kit-color-primary-100);
+
+    --dbv-kit-menu-separator-color: var(--dbv-kit-color-control-inactive);
+  }
+}
