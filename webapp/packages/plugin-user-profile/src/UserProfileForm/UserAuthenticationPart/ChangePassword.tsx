@@ -62,23 +62,16 @@ export const ChangePassword = observer(function ChangePassword() {
     return null;
   });
 
-  async function updatePassword(hasOldHash: boolean = false) {
-    await userInfoResource.updateLocalPassword(state.oldPassword, state.password, hasOldHash);
-    resetForm();
-    notificationService.logSuccess({ title: 'plugin_user_profile_authentication_change_password_success' });
-  }
-
   const form = useForm({
     async onSubmit() {
       try {
-        await updatePassword();
+        await userInfoResource.updateLocalPassword(state.oldPassword, state.password);
+        resetForm();
+        notificationService.logSuccess({ title: 'plugin_user_profile_authentication_change_password_success' });
       } catch (exception) {
-        // TODO cleanup when backend adds logic
         if (exception instanceof Error) {
           notificationService.logException(exception);
         }
-
-        await updatePassword(true);
       }
     },
   });
