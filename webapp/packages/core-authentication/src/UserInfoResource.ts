@@ -233,21 +233,17 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void> 
     return this.data;
   }
 
-  async updateLocalPassword(oldPassword: string, newPassword: string, hasOldHash: boolean = false): Promise<void> {
-    const oldPasswordHash = await this.authProviderService.hashValue(oldPassword, 'sha256');
-    const newPasswordHash = await this.authProviderService.hashValue(newPassword, 'sha256');
-    const credentials: Record<string, string> = {
-      oldPassword: oldPasswordHash,
-      newPassword: newPasswordHash,
-    };
-
-    if (hasOldHash) {
-      credentials['oldPasswordMd5'] = await this.authProviderService.hashValue(oldPassword, 'md5');
-    }
-
+  async updateLocalPassword(oldPassword: string, newPassword: string): Promise<void> {
     await this.performUpdate(undefined, [], async () => {
-      // TODO cleanup when backend adds logic
-      await this.graphQLService.sdk.authChangeLocalPassword(credentials as any);
+      const [oldPasswordHash, newPasswordHash] = await Promise.all([
+        this.authProviderService.hashValue(oldPassword, 'sha256'),
+        this.authProviderService.hashValue(newPassword, 'sha256'),
+      ]);
+
+      await this.graphQLService.sdk.authChangeLocalPassword({
+        oldPassword: oldPasswordHash,
+        newPassword: newPasswordHash,
+      });
     });
   }
 
