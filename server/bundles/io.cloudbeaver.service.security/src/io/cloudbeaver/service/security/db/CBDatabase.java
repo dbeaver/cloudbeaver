@@ -75,7 +75,7 @@ public class CBDatabase extends InternalDB<WebDatabaseConfig> {
     private static final int CURRENT_SCHEMA_VERSION = 26;
     private static final String SCHEMA_ID = "CB_CE";
 
-    private static final SQLSchemaConfig SCHEMA_CREATE_CONFIG = new SQLSchwemaConfig(
+    private static final SQLSchemaConfig SCHEMA_CREATE_CONFIG = new SQLSchemaConfig(
         SCHEMA_ID,
         "db/cb_schema_create",
         "db/cb_schema_update_",
