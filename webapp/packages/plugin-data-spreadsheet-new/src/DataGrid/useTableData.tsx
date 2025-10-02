@@ -27,7 +27,7 @@ import type { IColumnInfo, ITableData } from './TableDataContext.js';
 import { useService } from '@cloudbeaver/core-di';
 import { DataGridSettingsService } from '../DataGridSettingsService.js';
 
-export interface ITableDataPrivate extends ITableData {
+interface ITableDataPrivate extends ITableData {
   dataGridSettingsService: DataGridSettingsService;
   gridDIVElement: React.RefObject<HTMLDivElement | null>;
 }
