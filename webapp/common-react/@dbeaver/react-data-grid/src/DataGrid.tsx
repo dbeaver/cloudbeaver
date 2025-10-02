@@ -95,7 +95,6 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
   ref,
 ) {
   const [columnWidths, setColumnWidths] = useState<ColumnWidths>(() => new Map<string, ColumnWidth>());
-  const [pinnedColumns, setPinnedColumns] = useState<Set<number>>(new Set());
   const rowsCount = useGridReactiveValue(rowCount);
   const columnsCount = useGridReactiveValue(columnCount);
 
@@ -105,7 +104,6 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
     .fill(null as any)
     .map((_, i): ColumnOrColumnGroup<IInnerRow, unknown> => {
       const width = getHeaderWidth?.(i) ?? 'max-content';
-
       return {
         key: getColumnKey?.(i) ?? String(i),
         name: '',
@@ -113,7 +111,7 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
         width,
         minWidth: 26,
         editable: row => getCellEditable?.(row.idx, i) ?? false,
-        frozen: getHeaderPinned?.(i) || pinnedColumns.has(i),
+        frozen: getHeaderPinned?.(i),
         renderHeaderCell: mapRenderHeaderCell(i),
         renderCell: mapCellContentRenderer(i),
         renderEditCell: mapEditCellRenderer(i),
@@ -164,18 +162,6 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
     onCellKeyDown?.({ colIdx: dndHeaderContext.getDataColIdx(args.column.idx), rowIdx: args.rowIdx }, event);
   }
 
-  function pinColumn(colIdx: number) {
-    setPinnedColumns(prev => new Set(prev).add(colIdx));
-  }
-
-  function unpinColumn(colIdx: number) {
-    setPinnedColumns(prev => new Set([...prev].filter(c => c !== colIdx)));
-  }
-
-  function isColumnPinned(colIdx: number) {
-    return pinnedColumns.has(colIdx);
-  }
-
   // We need to patch auto-size width to avoid extremely large columns on table initialization
   for (const [key, column] of columnWidths) {
     const isMeasured = column.type === 'measured';
@@ -198,18 +184,7 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
       <DataGridRowContext value={{ rowCount, onScrollToBottom }}>
         <DataGridCellContext value={{ cell, cellText, cellElement, cellTooltip, onCellChange }}>
           <DataGridCellHeaderContext
-            value={{
-              headerElement,
-              headerText,
-              getHeaderDnD,
-              columnSortable,
-              onColumnSort,
-              columnSortingState,
-              onHeaderKeyDown,
-              pinColumn,
-              unpinColumn,
-              isColumnPinned,
-            }}
+            value={{ headerElement, headerText, getHeaderDnD, columnSortable, onColumnSort, columnSortingState, onHeaderKeyDown }}
           >
             <DataGridBase
               ref={innerGridRef}

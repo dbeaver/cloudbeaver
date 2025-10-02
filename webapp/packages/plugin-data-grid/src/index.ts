@@ -12,14 +12,12 @@ export { DataGrid } from './DataGridLazy.js';
 
 export {
   DataGridCellInnerContext,
-  DataGridCellHeaderContext,
   useCreateGridReactiveValue,
   BooleanFormatter,
   DateFormatter,
   NullFormatter,
   NumberFormatter,
   BlobFormatter,
-  type IDataGridHeaderCellContext,
   type IGridReactiveValue,
   type DataGridRef,
   type ICellPosition,

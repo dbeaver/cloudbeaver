@@ -31,8 +31,9 @@ import { DataGridContextMenuSaveContentService } from './DataGrid/DataGridContex
 import { DataGridSettingsService } from './DataGridSettingsService.js';
 import { ACTION_DATA_GRID_PIN_COLUMN } from './DataGrid/Actions/Pin/ACTION_DATA_GRID_PIN_COLUMN.js';
 import { ACTION_DATA_GRID_UNPIN_COLUMN } from './DataGrid/Actions/Pin/ACTION_DATA_GRID_UNPIN_COLUMN.js';
-import { DATA_CONTEXT_TABLE_COLUMN } from './DataGrid/TableColumnHeader/DATA_CONTEXT_TABLE_COLUMN.js';
 import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
+import { CONTEXT_DATA_GRID } from './DataGrid/CONTEXT_DATA_GRID.js';
+import { CONTEXT_DATA_GRID_TABLE_DATA } from './DataGrid/CONTEXT_DATA_GRID_TABLE_DATA.js';
 
 const VALUE_TEXT_PRESENTATION_ID = 'value-text-presentation';
 
@@ -84,14 +85,28 @@ export class SpreadsheetBootstrap extends Bootstrap {
     this.menuService.addCreator({
       root: true,
       menus: [MENU_DV_CONTEXT_MENU],
-      contexts: [DATA_CONTEXT_DV_SIMPLE, DATA_CONTEXT_DV_ACTIONS, DATA_CONTEXT_DV_DDM, DATA_CONTEXT_DV_DDM_RESULT_INDEX, DATA_CONTEXT_TABLE_COLUMN],
+      contexts: [
+        DATA_CONTEXT_DV_SIMPLE,
+        DATA_CONTEXT_DV_ACTIONS,
+        DATA_CONTEXT_DV_DDM,
+        DATA_CONTEXT_DV_DDM_RESULT_INDEX,
+        CONTEXT_DATA_GRID,
+        CONTEXT_DATA_GRID_TABLE_DATA,
+      ],
       getItems: (context, items) => [ACTION_OPEN, ...items, ACTION_DELETE, ACTION_DATA_GRID_PIN_COLUMN, ACTION_DATA_GRID_UNPIN_COLUMN],
     });
 
     this.actionService.addHandler({
       id: 'data-grid-key-base-handler',
       menus: [MENU_DV_CONTEXT_MENU],
-      contexts: [DATA_CONTEXT_DV_SIMPLE, DATA_CONTEXT_DV_ACTIONS, DATA_CONTEXT_DV_DDM, DATA_CONTEXT_DV_DDM_RESULT_INDEX, DATA_CONTEXT_TABLE_COLUMN],
+      contexts: [
+        DATA_CONTEXT_DV_SIMPLE,
+        DATA_CONTEXT_DV_ACTIONS,
+        DATA_CONTEXT_DV_DDM,
+        DATA_CONTEXT_DV_DDM_RESULT_INDEX,
+        CONTEXT_DATA_GRID,
+        CONTEXT_DATA_GRID_TABLE_DATA,
+      ],
       getActionInfo: (context, action) => {
         if (action === ACTION_OPEN) {
           return { ...action.info, label: 'data_grid_table_open_value_panel', icon: 'value-panel' };
@@ -114,17 +129,15 @@ export class SpreadsheetBootstrap extends Bootstrap {
       isActionApplicable: (context, action): boolean => {
         const model = context.get(DATA_CONTEXT_DV_DDM)!;
         const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
-        // TODO bug: incorrect column index arrives
         const columnIndex = getColumnIdFromContext(context);
-        const columnContext = context.get(DATA_CONTEXT_TABLE_COLUMN);
-        const isPinnedColumn = columnContext?.isColumnPinned?.(columnIndex);
+        const dataGrid = context.get(CONTEXT_DATA_GRID);
 
-        if (action === ACTION_DATA_GRID_PIN_COLUMN) {
-          return isPinnedColumn === false;
+        if (action === ACTION_DATA_GRID_PIN_COLUMN && columnIndex !== undefined) {
+          return dataGrid?.isColumnPinned?.(columnIndex) === false;
         }
 
-        if (action === ACTION_DATA_GRID_UNPIN_COLUMN) {
-          return isPinnedColumn === true;
+        if (action === ACTION_DATA_GRID_UNPIN_COLUMN && columnIndex !== undefined) {
+          return dataGrid?.isColumnPinned?.(columnIndex) === true;
         }
 
         if (action === ACTION_OPEN) {
@@ -157,22 +170,20 @@ export class SpreadsheetBootstrap extends Bootstrap {
         }
 
         if (action === ACTION_DATA_GRID_PIN_COLUMN) {
-          const columnContext = context.get(DATA_CONTEXT_TABLE_COLUMN);
-          // TODO bug: incorrect column index arrives
+          const dataGrid = context.get(CONTEXT_DATA_GRID);
           const columnIndex = getColumnIdFromContext(context);
 
-          if (columnContext) {
-            columnContext.pinColumn?.(columnIndex);
+          if (dataGrid && columnIndex !== undefined) {
+            dataGrid.pinColumn?.(columnIndex);
           }
         }
 
         if (action === ACTION_DATA_GRID_UNPIN_COLUMN) {
-          const columnContext = context.get(DATA_CONTEXT_TABLE_COLUMN);
-          // TODO bug: incorrect column index arrives
+          const dataGrid = context.get(CONTEXT_DATA_GRID);
           const columnIndex = getColumnIdFromContext(context);
 
-          if (columnContext) {
-            columnContext.unpinColumn?.(columnIndex);
+          if (dataGrid && columnIndex !== undefined) {
+            dataGrid.unpinColumn?.(columnIndex);
           }
         }
 
@@ -192,12 +203,14 @@ export class SpreadsheetBootstrap extends Bootstrap {
   }
 }
 
-function getColumnIdFromContext(context: IDataContextProvider): number {
+// TODO still has a bug with incorrect index when unpin
+function getColumnIdFromContext(context: IDataContextProvider): number | undefined {
   const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
   const model = context.get(DATA_CONTEXT_DV_DDM)!;
   const source = model.source as unknown as ResultSetDataSource;
   const selectAction = source.getActionImplementation(resultIndex, DatabaseSelectAction);
   const elementKey = selectAction?.getActiveElements()[0] as IResultSetElementKey;
+  const tableData = context.get(CONTEXT_DATA_GRID_TABLE_DATA)!;
 
-  return elementKey?.column.index;
+  return tableData.getColumnIndexFromColumnKey(elementKey.column);
 }

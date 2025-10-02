@@ -6,13 +6,11 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { useCallback, useLayoutEffect, useMemo, useRef, type HTMLAttributes } from 'react';
+import { useCallback, useLayoutEffect, useMemo, useRef, useState, type HTMLAttributes } from 'react';
 import { reaction } from 'mobx';
 
 import { getComputed, s, TextPlaceholder, useObjectRef, useS, useTranslate } from '@cloudbeaver/core-blocks';
-// import { useService } from '@cloudbeaver/core-di';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
-// import { ClipboardService } from '@cloudbeaver/core-ui';
 import { useCaptureViewContext } from '@cloudbeaver/core-view';
 import {
   DataGrid,
@@ -55,6 +53,8 @@ import { useGridSelectedCellsCopy } from './useGridSelectedCellsCopy.js';
 import { useTableData } from './useTableData.js';
 import { TableColumnHeader } from './TableColumnHeader/TableColumnHeader.js';
 import { TableIndexColumnHeader } from './TableColumnHeader/TableIndexColumnHeader.js';
+import { CONTEXT_DATA_GRID_TABLE_DATA } from './CONTEXT_DATA_GRID_TABLE_DATA.js';
+import { CONTEXT_DATA_GRID } from './CONTEXT_DATA_GRID.js';
 
 const ROW_HEIGHT = 24;
 export const HEADER_HEIGHT = 32;
@@ -76,12 +76,39 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
   const focusedCell = useRef<ICellPosition | null>(null);
   const focusSyncRef = useRef<ICellPosition | null>(null);
   const dataGridRef = useRef<DataGridRef>(null);
+  const [pinnedColumns, setPinnedColumns] = useState<Set<number>>(new Set());
 
   const selectionAction = (model.source as unknown as ResultSetDataSource).getAction(resultIndex, ResultSetSelectAction);
   const viewAction = (model.source as unknown as ResultSetDataSource).getAction(resultIndex, ResultSetViewAction);
 
   const tableData = useTableData(model as unknown as IDatabaseDataModel<ResultSetDataSource>, resultIndex, dataGridDivRef);
   const gridSelectionContext = useGridSelectionContext(tableData, selectionAction);
+
+  const pinColumn = useCallback(
+    (colIdx: number) => {
+      if (pinnedColumns.has(colIdx)) {
+        return;
+      }
+
+      setPinnedColumns(new Set(pinnedColumns).add(colIdx));
+    },
+    [pinnedColumns],
+  );
+
+  const unpinColumn = useCallback(
+    (colIdx: number) => {
+      if (!pinnedColumns.has(colIdx)) {
+        return;
+      }
+
+      const newPinned = new Set(pinnedColumns);
+      newPinned.delete(colIdx);
+      setPinnedColumns(newPinned);
+    },
+    [pinnedColumns],
+  );
+
+  const isColumnPinned = useCallback((colIdx: number) => pinnedColumns.has(colIdx), [pinnedColumns]);
 
   const restoreFocus = useCallback(
     function restoreFocus() {
@@ -171,6 +198,8 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
 
   useCaptureViewContext((context, id) => {
     context.set(DATA_CONTEXT_DV_PRESENTATION, { type: DataViewerPresentationType.Data }, id);
+    context.set(CONTEXT_DATA_GRID, gridContext, id);
+    context.set(CONTEXT_DATA_GRID_TABLE_DATA, tableData, id);
   });
 
   useLayoutEffect(() => {
@@ -254,8 +283,11 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
       isGridInFocus,
       getDataGridApi: () => dataGridRef.current,
       focus: restoreFocus,
+      pinColumn,
+      unpinColumn,
+      isColumnPinned,
     }),
-    [model, actions, resultIndex, simple, dataGridRef, restoreFocus],
+    [model, actions, resultIndex, simple, dataGridRef, restoreFocus, pinColumn, unpinColumn, isColumnPinned],
   );
 
   const columnsCount = useCreateGridReactiveValue(
@@ -303,7 +335,8 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
     if (colIdx === 0) {
       return true;
     }
-    return false;
+
+    return isColumnPinned(colIdx);
   }
 
   function getHeaderResizable(colIdx: number) {

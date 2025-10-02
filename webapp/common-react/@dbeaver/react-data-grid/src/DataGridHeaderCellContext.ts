@@ -23,9 +23,6 @@ export interface IDataGridHeaderCellContext {
   columnSortable?: IGridReactiveValue<boolean, [colIdx: number]>;
   onColumnSort?: (colIdx: number, order: 'asc' | 'desc' | null, isMultiple: boolean) => void;
   onHeaderKeyDown?: (event: React.KeyboardEvent) => void;
-  pinColumn?: (colIdx: number) => void;
-  unpinColumn?: (colIdx: number) => void;
-  isColumnPinned?: (colIdx: number) => boolean;
 }
 
 export const DataGridCellHeaderContext = createContext<IDataGridHeaderCellContext | null>(null);

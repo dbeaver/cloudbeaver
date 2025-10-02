@@ -5,7 +5,8 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { createDataContext } from '@cloudbeaver/core-data-context';
-import type { IDataGridHeaderCellContext } from '@cloudbeaver/plugin-data-grid';
 
-export const DATA_CONTEXT_TABLE_COLUMN = createDataContext<IDataGridHeaderCellContext>('data-viewer-database-column');
+import { createDataContext } from '@cloudbeaver/core-data-context';
+import type { IDataGridContext } from './DataGridContext.js';
+
+export const CONTEXT_DATA_GRID = createDataContext<IDataGridContext>('data-grid-context');
