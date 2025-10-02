@@ -28,7 +28,6 @@ import io.cloudbeaver.registry.WebAuthProviderDescriptor;
 import io.cloudbeaver.registry.WebAuthProviderRegistry;
 import io.cloudbeaver.registry.WebMetaParametersRegistry;
 import io.cloudbeaver.service.security.bruteforce.BruteForceUtils;
-import io.cloudbeaver.service.security.bruteforce.UserLoginRecord;
 import io.cloudbeaver.service.security.db.CBDatabase;
 import io.cloudbeaver.service.security.internal.AuthAttemptSessionInfo;
 import io.cloudbeaver.service.security.internal.CBAuthSubjectRepo;
@@ -1855,14 +1854,25 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         WebAuthProviderDescriptor authProviderDescriptor
     ) {
         SMAuthCredentialsProfile credProfile = getCredentialProfileByParameters(authProviderDescriptor, userIdentifyingCredentials.keySet());
-        return userIdentifyingCredentials.entrySet()
+        Map<String, Object> filteredUserData = userIdentifyingCredentials.entrySet()
             .stream()
             .filter((cred) -> {
                 AuthPropertyDescriptor property = credProfile.getCredentialParameter(cred.getKey());
-
                 return property != null && property.getEncryption() == AuthPropertyEncryption.none;
             })
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+        if (smConfig.isCheckBruteforce()
+            && authProviderDescriptor.getInstance() instanceof SMBruteForceProtected bruteforceProtected) {
+            Map<String, Object> resultFilteredUserData = bruteforceProtected.processUserCredBeforeAuthAttempt(
+                userIdentifyingCredentials,
+                filteredUserData
+            );
+            if (resultFilteredUserData != null) {
+                return resultFilteredUserData;
+            }
+        }
+        return filteredUserData;
     }
 
     private String createNewAuthAttempt(
@@ -1885,9 +1895,8 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                     && authProviderDescriptor.getInstance() instanceof SMBruteForceProtected bruteforceProtected) {
                     Object inputUsername = bruteforceProtected.getInputUsername(authData);
                     if (inputUsername != null) {
-                        bruteforceProtected.processUserCredBeforeAuthAttempt(authData);
                         BruteForceUtils.checkBruteforce(smConfig,
-                            getLatestUserLogins(dbCon, authProviderId, inputUsername.toString()));
+                            getLatestUserLogins(dbCon, authProviderId, inputUsername.toString()), bruteforceProtected);
                     }
                 }
                 try (PreparedStatement dbStat = dbCon.prepareStatement(
@@ -1948,14 +1957,15 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         try (PreparedStatement dbStat = dbCon.prepareStatement(
             "SELECT" +
                 "    attempt.AUTH_STATUS," +
-                "    attempt.CREATE_TIME" +
+                "    attempt.CREATE_TIME," +
+                "    info.AUTH_STATE" +
                 " FROM" +
                 "    {table_prefix}CB_AUTH_ATTEMPT attempt" +
                 "        JOIN" +
                 "    {table_prefix}CB_AUTH_ATTEMPT_INFO info ON attempt.AUTH_ID = info.AUTH_ID" +
                 " WHERE AUTH_PROVIDER_ID = ? AND AUTH_USERNAME = ? AND attempt.CREATE_TIME > ?" +
                 " ORDER BY attempt.CREATE_TIME DESC " +
-                database.getDialect().getOffsetLimitQueryPart(0, smConfig.getMaxFailedLogin())
+                database.getDialect().getOffsetLimitQueryPart(0, smConfig.getMaxFailedLogin() * 2)
         )) {
             dbStat.setString(1, authProviderId);
             dbStat.setString(2, inputLogin);
@@ -1965,8 +1975,8 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                 while (dbResult.next()) {
                     UserLoginRecord loginDto = new UserLoginRecord(
                         SMAuthStatus.valueOf(dbResult.getString(1)),
-                        dbResult.getTimestamp(2).toLocalDateTime()
-                    );
+                        dbResult.getTimestamp(2).toLocalDateTime(),
+                        gson.fromJson(dbResult.getString(3), Map.class));
                     userLoginRecords.add(loginDto);
                 }
             }

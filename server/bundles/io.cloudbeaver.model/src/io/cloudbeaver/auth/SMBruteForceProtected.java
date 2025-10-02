@@ -16,14 +16,27 @@
  */
 package io.cloudbeaver.auth;
 
+import io.cloudbeaver.model.config.SMControllerConfiguration;
 import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 
+import java.util.List;
 import java.util.Map;
 
 public interface SMBruteForceProtected {
     Object getInputUsername(@NotNull Map<String, Object> cred);
 
-    default void processUserCredBeforeAuthAttempt(@NotNull Map<String, Object> cred) {
-
+    @Nullable
+    default Map<String, Object> processUserCredBeforeAuthAttempt(
+        @NotNull Map<String, Object> credBeforeFiltering,
+        @NotNull Map<String, Object> credAfterFiltering
+    ) {
+        return null;
     }
+
+    @Nullable
+    default Boolean shouldBeBlocked(SMControllerConfiguration smConfig, List<UserLoginRecord> userLoginRecords) {
+        return null;
+    }
+
 }

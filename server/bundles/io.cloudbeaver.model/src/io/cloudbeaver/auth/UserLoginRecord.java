@@ -14,11 +14,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.cloudbeaver.service.security.bruteforce;
+package io.cloudbeaver.auth;
 
 import org.jkiss.dbeaver.model.auth.SMAuthStatus;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.Map;
 
-public record UserLoginRecord(SMAuthStatus smAuthStatus, LocalDateTime time) {
+public record UserLoginRecord(SMAuthStatus smAuthStatus,
+    LocalDateTime time,
+    Map<String, Object> authState
+) {
+
+    public UserLoginRecord(SMAuthStatus smAuthStatus, LocalDateTime time) {
+        this(smAuthStatus, time, Collections.emptyMap());
+    }
+
+    public UserLoginRecord(SMAuthStatus smAuthStatus, LocalDateTime time, Map<String, Object> authState) {
+        this.smAuthStatus = smAuthStatus;
+        this.time = time;
+        this.authState = authState;
+    }
 }

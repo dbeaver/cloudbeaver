@@ -16,6 +16,8 @@
  */
 package io.cloudbeaver.service.security.bruteforce;
 
+import io.cloudbeaver.auth.SMBruteForceProtected;
+import io.cloudbeaver.auth.UserLoginRecord;
 import io.cloudbeaver.model.config.SMControllerConfiguration;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
@@ -30,20 +32,28 @@ public class BruteForceUtils {
 
     private static final Log log = Log.getLog(BruteForceUtils.class);
 
-    public static void checkBruteforce(SMControllerConfiguration smConfig, List<UserLoginRecord> latestLoginAttempts)
+    public static void checkBruteforce(SMControllerConfiguration smConfig, List<UserLoginRecord> latestLoginAttempts,
+                                       SMBruteForceProtected bruteforceProtectedAuthProvider
+    )
         throws DBException {
         if (latestLoginAttempts.isEmpty()) {
             return;
         }
 
-        var oldestLoginAttempt = latestLoginAttempts.get(latestLoginAttempts.size() - 1);
-        checkLoginInterval(oldestLoginAttempt.time(), smConfig.getMinimumLoginTimeout());
+        var oldestLoginAttempt = latestLoginAttempts.getLast();
+        //fixme to remove (?) currently we send two authrequests almost simultaneously
+        //checkLoginInterval(oldestLoginAttempt.time(), smConfig.getMinimumLoginTimeout());
 
         long errorsCount = latestLoginAttempts.stream()
             .filter(authAttemptSessionInfo -> authAttemptSessionInfo.smAuthStatus() == SMAuthStatus.ERROR)
             .count();
 
         boolean shouldBlock = errorsCount >= smConfig.getMaxFailedLogin();
+        Boolean shouldBeBlockedByAuthProvider = bruteforceProtectedAuthProvider.shouldBeBlocked(smConfig, latestLoginAttempts);
+        shouldBlock = shouldBeBlockedByAuthProvider != null
+            ? shouldBeBlockedByAuthProvider
+            : shouldBlock;
+
         if (shouldBlock) {
             int blockPeriod = smConfig.getBlockLoginPeriod();
             LocalDateTime unblockTime = oldestLoginAttempt.time().plusSeconds(blockPeriod);

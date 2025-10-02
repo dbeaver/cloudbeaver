@@ -17,6 +17,8 @@
 package io.cloudbeaver.auth.provider.local;
 
 import io.cloudbeaver.auth.SMBruteForceProtected;
+import io.cloudbeaver.auth.UserLoginRecord;
+import io.cloudbeaver.model.config.SMControllerConfiguration;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.registry.WebAuthProviderDescriptor;
 import io.cloudbeaver.registry.WebAuthProviderRegistry;
@@ -34,6 +36,8 @@ import org.jkiss.dbeaver.model.security.SMController;
 import org.jkiss.dbeaver.model.security.exception.SMInvalidCredentialException;
 import org.jkiss.utils.CommonUtils;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -45,6 +49,9 @@ public class LocalAuthProvider implements SMAuthProvider<LocalAuthSession>, SMBr
     public static final String CRED_USER = LocalAuthProviderConstants.CRED_USER;
     public static final String CRED_PASSWORD_MD_5 = LocalAuthProviderConstants.CRED_PASSWORD_MD5;
     public static final String CRED_PASSWORD = LocalAuthProviderConstants.CRED_PASSWORD;
+    public static final String AUTH_LOCAL_TYPE = "authLocalType";
+    public static final String LEGACY_AUTH_LOCAL_TYPE = "legacy";
+    public static final String NEW_AUTH_LOCAL_TYPE = "new";
 
     @NotNull
     @Override
@@ -142,7 +149,7 @@ public class LocalAuthProvider implements SMAuthProvider<LocalAuthSession>, SMBr
         if (CommonUtils.isEmpty(storedCredentials)) {
             throw new DBException("Invalid user name or password");
         }
-        String storedPasswordHash = CommonUtils.toString(storedCredentials.get(CRED_PASSWORD_MD_5), null);
+        String storedPasswordHash = CommonUtils.toString(storedCredentials.get(CRED_PASSWORD), null);
         if (CommonUtils.isEmpty(storedPasswordHash)) {
             throw new DBException("User has no saved credentials");
         }
@@ -156,7 +163,7 @@ public class LocalAuthProvider implements SMAuthProvider<LocalAuthSession>, SMBr
 
         //String newPasswordHash = WebAuthProviderPropertyEncryption.hash.encrypt(userName, newPassword);
 
-        storedCredentials.put(CRED_PASSWORD_MD_5, newPassword);
+        storedCredentials.put(CRED_PASSWORD, newPassword);
         smController.setCurrentUserCredentials(authProvider.getId(), storedCredentials);
         return true;
     }
@@ -166,13 +173,35 @@ public class LocalAuthProvider implements SMAuthProvider<LocalAuthSession>, SMBr
         return cred.get("user");
     }
 
-    @Override
-    public void processUserCredBeforeAuthAttempt(@NotNull Map<String, Object> cred) {
-        if (cred.get(CRED_PASSWORD_MD_5) != null) {
-            cred.put("authLocalType", "legacy");
-        } else {
-            cred.put("authLocalType", "new");
-        }
 
+    @Override
+    public Map<String, Object> processUserCredBeforeAuthAttempt(
+        @NotNull Map<String, Object> credBefore,
+        @NotNull Map<String, Object> credAfter
+    ) {
+        HashMap<String, Object> result = new HashMap<>(credAfter);
+        if (credBefore.get(CRED_PASSWORD_MD_5) != null) {
+            result.put(AUTH_LOCAL_TYPE, LEGACY_AUTH_LOCAL_TYPE);
+        } else {
+            result.put(AUTH_LOCAL_TYPE, NEW_AUTH_LOCAL_TYPE);
+        }
+        return result;
+    }
+
+    @Nullable
+    @Override
+    public Boolean shouldBeBlocked(SMControllerConfiguration smConfig, List<UserLoginRecord> userLoginRecords) {
+
+        long countNewAuthTypeAttempts = userLoginRecords.stream()
+            .filter(userLoginRecord -> NEW_AUTH_LOCAL_TYPE.equals(userLoginRecord.authState().get(AUTH_LOCAL_TYPE)))
+            .count();
+        long countLegacyAuthTypeAttempts = userLoginRecords.stream()
+            .filter(userLoginRecord -> LEGACY_AUTH_LOCAL_TYPE.equals(userLoginRecord.authState().get(AUTH_LOCAL_TYPE)))
+            .count();
+        int maxFailedLogin = smConfig.getMaxFailedLogin();
+        if (countNewAuthTypeAttempts == maxFailedLogin && countLegacyAuthTypeAttempts + 1 == maxFailedLogin) {
+            return false;
+        }
+        return countNewAuthTypeAttempts >= maxFailedLogin || countLegacyAuthTypeAttempts >= maxFailedLogin;
     }
 }
