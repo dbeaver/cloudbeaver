@@ -44,6 +44,7 @@ export * from './isSameDay.js';
 export * from './isValuesEqual.js';
 export * from './md5.js';
 export * from './sha256.js';
+export * from './createHash.js';
 export * from './MetadataMap.js';
 export * from './OrderedMap.js';
 export * from './parseJSONFlat.js';

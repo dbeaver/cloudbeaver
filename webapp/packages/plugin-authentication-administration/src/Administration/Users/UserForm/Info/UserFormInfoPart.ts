@@ -11,7 +11,7 @@ import type { AdminUser, AuthRolesResource, UserMetaParameter, UsersMetaParamete
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import type { ServerConfigResource } from '@cloudbeaver/core-root';
 import { FormMode, FormPart, formValidationContext, type IFormState } from '@cloudbeaver/core-ui';
-import { isArraysEqual, isObjectsEqual, isValuesEqual, sha256 } from '@cloudbeaver/core-utils';
+import { isArraysEqual, isObjectsEqual, isValuesEqual } from '@cloudbeaver/core-utils';
 import { isDefined } from '@dbeaver/js-helpers';
 
 import type { IUserFormState } from '../AdministrationUserFormService.js';
@@ -141,10 +141,9 @@ export class UserFormInfoPart extends FormPart<IUserFormInfoState, IUserFormStat
     const password = this.state.password;
 
     if (password) {
-      const passwordHash = await sha256(this.state.password);
       await this.usersResource.updateCredentials(this.state.userId, {
         profile: '0',
-        credentials: { password: passwordHash },
+        credentials: { password: this.state.password },
       });
     }
   }

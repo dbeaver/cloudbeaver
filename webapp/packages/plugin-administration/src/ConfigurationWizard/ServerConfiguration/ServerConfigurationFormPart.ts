@@ -18,7 +18,7 @@ import {
   type IServerConfigInput,
 } from '@cloudbeaver/core-root';
 import { FormPart, formValidationContext, type IFormState } from '@cloudbeaver/core-ui';
-import { isIp, isObjectsEqual, isValuesEqual, sha256 } from '@cloudbeaver/core-utils';
+import { createHash, isIp, isObjectsEqual, isValuesEqual } from '@cloudbeaver/core-utils';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 
 import { MIN_SESSION_EXPIRE_TIME } from './Form/MIN_SESSION_EXPIRE_TIME.js';
@@ -133,7 +133,7 @@ export class ServerConfigurationFormPart extends FormPart<IServerConfigurationFo
     };
 
     if (config.adminPassword) {
-      config.adminPassword = await sha256(config.adminPassword);
+      config.adminPassword = await createHash(config.adminPassword, 'sha256');
     }
 
     await this.serverConfigResource.save(config);

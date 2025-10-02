@@ -17,6 +17,7 @@ import { AUTH_PROVIDER_LOCAL_ID } from './AUTH_PROVIDER_LOCAL_ID.js';
 import { AuthProviderService } from './AuthProviderService.js';
 import type { ELMRole } from './ELMRole.js';
 import type { IAuthCredentials } from './IAuthCredentials.js';
+import { createHash } from '@cloudbeaver/core-utils';
 
 export type UserLogoutInfo = AuthLogoutQuery['result'];
 
@@ -235,10 +236,7 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void> 
 
   async updateLocalPassword(oldPassword: string, newPassword: string): Promise<void> {
     await this.performUpdate(undefined, [], async () => {
-      const [oldPasswordHash, newPasswordHash] = await Promise.all([
-        this.authProviderService.hashValue(oldPassword, 'sha256'),
-        this.authProviderService.hashValue(newPassword, 'sha256'),
-      ]);
+      const [oldPasswordHash, newPasswordHash] = await Promise.all([createHash(oldPassword, 'sha256'), createHash(newPassword, 'sha256')]);
 
       await this.graphQLService.sdk.authChangeLocalPassword({
         oldPassword: oldPasswordHash,

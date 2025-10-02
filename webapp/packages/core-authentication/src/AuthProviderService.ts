@@ -7,7 +7,7 @@
  */
 import { injectable } from '@cloudbeaver/core-di';
 import { Executor, type IExecutor } from '@cloudbeaver/core-executor';
-import { md5, sha256, uuid } from '@cloudbeaver/core-utils';
+import { createHash, uuid } from '@cloudbeaver/core-utils';
 
 import { type AuthProvider, AuthProvidersResource } from './AuthProvidersResource.js';
 import type { IAuthCredentials } from './IAuthCredentials.js';
@@ -61,15 +61,6 @@ export class AuthProviderService {
     return provider.get();
   }
 
-  async hashValue(value: string, type: 'md5' | 'sha256'): Promise<string> {
-    if (type === 'sha256') {
-      const hash = await sha256(value);
-      return hash.toUpperCase();
-    }
-
-    return md5(value).toUpperCase();
-  }
-
   async processCredentials(providerId: string, credentials: IAuthCredentials, hasOldHash: boolean = false): Promise<IAuthCredentials> {
     const provider = await this.authProvidersResource.load(providerId);
 
@@ -89,10 +80,10 @@ export class AuthProviderService {
         const value = credentialsProcessed.credentials[parameter.id];
 
         if (typeof value === 'string') {
-          credentialsProcessed.credentials[parameter.id] = await this.hashValue(value, 'sha256');
+          credentialsProcessed.credentials[parameter.id] = await createHash(value, 'sha256');
 
           if (hasOldHash) {
-            credentialsProcessed.credentials[`${parameter.id}Md5`] = await this.hashValue(value, 'md5');
+            credentialsProcessed.credentials[`${parameter.id}Md5`] = await createHash(value, 'md5');
           }
         }
       }
