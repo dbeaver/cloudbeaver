@@ -143,7 +143,7 @@ export class UserFormInfoPart extends FormPart<IUserFormInfoState, IUserFormStat
     if (password) {
       await this.usersResource.updateCredentials(this.state.userId, {
         profile: '0',
-        credentials: { password: this.state.password },
+        credentials: { password },
       });
     }
   }
