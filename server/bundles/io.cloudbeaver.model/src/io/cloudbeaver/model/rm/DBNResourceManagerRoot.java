@@ -19,6 +19,7 @@ package io.cloudbeaver.model.rm;
 
 import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPHiddenObject;
@@ -49,6 +50,7 @@ public class DBNResourceManagerRoot extends DBNNode implements DBPHiddenObject, 
         return resourceController;
     }
 
+    @NotNull
     @Override
     public String getNodeType() {
         return "rm";
@@ -60,16 +62,19 @@ public class DBNResourceManagerRoot extends DBNNode implements DBPHiddenObject, 
         return "rm";
     }
 
+    @NotNull
     @Override
     public String getNodeDisplayName() {
         return "resources";
     }
 
+    @Nullable
     @Override
     public String getNodeDescription() {
         return "Resources";
     }
 
+    @Nullable
     @Override
     public DBPImage getNodeIcon() {
         return null;
@@ -80,6 +85,7 @@ public class DBNResourceManagerRoot extends DBNNode implements DBPHiddenObject, 
         return true;
     }
 
+    @NotNull
     @Override
     public DBNResourceManagerProject[] getChildren(@NotNull DBRProgressMonitor monitor) throws DBException {
         if (projects == null && !monitor.isForceCacheUsage()) {
@@ -109,6 +115,7 @@ public class DBNResourceManagerRoot extends DBNNode implements DBPHiddenObject, 
         return projects;
     }
 
+    @NotNull
     @Deprecated
     @Override
     public String getNodeItemPath() {
@@ -116,8 +123,9 @@ public class DBNResourceManagerRoot extends DBNNode implements DBPHiddenObject, 
         return NodePathType.ext.getPrefix() + getNodeDisplayName();
     }
 
+    @Nullable
     @Override
-    public DBNNode refreshNode(DBRProgressMonitor monitor, Object source) throws DBException {
+    public DBNNode refreshNode(@NotNull DBRProgressMonitor monitor, @Nullable Object source) throws DBException {
         projects = null;
         return this;
     }
