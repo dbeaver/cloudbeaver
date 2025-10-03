@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -11,15 +11,10 @@ import { useObservableRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import type { DynamicTraceProperty, GetSqlDynamicTraceMutation } from '@cloudbeaver/core-sdk';
 import { type ILoadableState, isContainsException } from '@cloudbeaver/core-utils';
-import {
-  DatabaseMetadataAction,
-  type IDatabaseDataModel,
-  type IResultSetElementKey,
-  ResultSetCacheAction,
-  ResultSetDataSource,
-} from '@cloudbeaver/plugin-data-viewer';
+import { IDatabaseDataMetadataAction, type IDatabaseDataModel, type IGridDataKey, ResultSetDataSource } from '@cloudbeaver/plugin-data-viewer';
 
 import { DVResultTraceDetailsService } from './DVResultTraceDetailsService.js';
+import { IDatabaseDataCacheAction } from '../../plugin-data-viewer/src/DatabaseDataModel/Actions/IDatabaseDataCacheAction.js';
 
 type ResultTraceDetailsPromise = Promise<GetSqlDynamicTraceMutation>;
 
@@ -31,7 +26,7 @@ interface State extends ILoadableState {
   readonly trace: DynamicTraceProperty[] | undefined;
   model: IDatabaseDataModel<ResultSetDataSource>;
   resultIndex: number;
-  cache: ResultSetCacheAction;
+  cache: IDatabaseDataCacheAction;
   metadataState: MetadataState;
 }
 
@@ -39,15 +34,15 @@ const RESULT_TRACE_DETAILS_CACHE_KEY = Symbol('@cache/ResultTraceDetails');
 const RESULT_TRACE_DETAILS_METADATA_KEY = 'result-trace-details-panel';
 // @TODO Probably we want to implement a cache behavior that will only use Scope Key as sometimes we want
 // a cache that only exists as long as result exists but dont want to specify row/column indexes
-const FAKE_ELEMENT_KEY: IResultSetElementKey = {
+const FAKE_ELEMENT_KEY: IGridDataKey = {
   column: { index: Number.MAX_SAFE_INTEGER },
   row: { index: Number.MAX_SAFE_INTEGER, subIndex: Number.MAX_SAFE_INTEGER },
 };
 
 export function useResultTraceDetails(model: IDatabaseDataModel<ResultSetDataSource>, resultIndex: number) {
   const dvResultTraceDetailsService = useService(DVResultTraceDetailsService);
-  const cache = model.source.getAction(resultIndex, ResultSetCacheAction);
-  const metadataAction = model.source.getAction(resultIndex, DatabaseMetadataAction);
+  const cache = model.source.getAction(resultIndex, IDatabaseDataCacheAction);
+  const metadataAction = model.source.getAction(resultIndex, IDatabaseDataMetadataAction);
 
   const metadataState = metadataAction.get(RESULT_TRACE_DETAILS_METADATA_KEY, () =>
     observable<MetadataState>({

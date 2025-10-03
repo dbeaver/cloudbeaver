@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -13,17 +13,21 @@ import wellknown, { type GeoJSONGeometry } from 'wellknown';
 import { TextPlaceholder, useTranslate } from '@cloudbeaver/core-blocks';
 import {
   type IDatabaseDataModel,
-  type IResultSetElementKey,
-  ResultSetDataKeysUtils,
+  type IGridDataKey,
+  type IResultSetValue,
+  GridDataKeysUtils,
+  GridSelectAction,
+  GridViewAction,
+  IDatabaseDataSelectAction,
+  IDatabaseDataViewAction,
   ResultSetDataSource,
-  ResultSetSelectAction,
-  ResultSetViewAction,
 } from '@cloudbeaver/plugin-data-viewer';
 
 import { CrsInput } from './CrsInput.js';
 import classes from './GISValuePresentation.module.css';
 import { type CrsKey, type IAssociatedValue, type IGeoJSONFeature, LeafletMap } from './LeafletMap.js';
 import { ResultSetGISAction } from './ResultSetGISAction.js';
+import type { SqlResultColumn } from '@cloudbeaver/core-sdk';
 
 proj4.defs('EPSG:3395', '+title=World Mercator +proj=merc +lon_0=0 +k=1 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs');
 
@@ -80,9 +84,9 @@ interface Props {
 export const GISValuePresentation = observer<Props>(function GISValuePresentation({ model, resultIndex }) {
   const translate = useTranslate();
 
-  const selection = model.source.getAction(resultIndex, ResultSetSelectAction);
+  const selection = model.source.getAction(resultIndex, IDatabaseDataSelectAction, GridSelectAction);
   const gis = model.source.getAction(resultIndex, ResultSetGISAction);
-  const view = model.source.getAction(resultIndex, ResultSetViewAction);
+  const view = model.source.getAction(resultIndex, IDatabaseDataViewAction, GridViewAction);
 
   const parsedGISData: IGeoJSONFeature[] = [];
   const activeElements = selection.getActiveElements();
@@ -124,21 +128,23 @@ export const GISValuePresentation = observer<Props>(function GISValuePresentatio
   }
 
   const getAssociatedValues = useCallback(
-    (cell: IResultSetElementKey): IAssociatedValue[] => {
+    (cell: IGridDataKey): IAssociatedValue[] => {
       const values: IAssociatedValue[] = [];
 
       for (const column of view.columnKeys) {
-        if (ResultSetDataKeysUtils.isEqual(column, cell.column)) {
+        if (GridDataKeysUtils.isEqual(column, cell.column)) {
           continue;
         }
 
         const value = view.getCellValue({ ...cell, column });
-        const columnInfo = view.getColumn(column);
+        //TODO: fix column info abstraction
+        const columnInfo = view.getColumn(column) as SqlResultColumn | undefined;
 
         if (value && columnInfo?.name) {
           values.push({
             key: columnInfo.name,
-            value,
+            // TODO: fix value abstraction
+            value: value as IResultSetValue,
           });
         }
       }

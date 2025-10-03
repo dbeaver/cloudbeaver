@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -11,16 +11,17 @@ import { type DataTypeLogicalOperation, ResultDataFormat, type SqlDataFilterCons
 
 import { DatabaseDataAction } from '../DatabaseDataAction.js';
 import type { IDatabaseDataOptions } from '../IDatabaseDataOptions.js';
-import type { IDatabaseDataSource } from '../IDatabaseDataSource.js';
+import { IDatabaseDataSource } from '../IDatabaseDataSource.js';
 import type { IDatabaseResultSet } from '../IDatabaseResultSet.js';
 import { EOrder, type Order } from '../Order.js';
-import { databaseDataAction } from './DatabaseDataActionDecorator.js';
 import type { IDatabaseDataConstraintAction } from './IDatabaseDataConstraintAction.js';
+import { injectable } from '@cloudbeaver/core-di';
+import { IDatabaseDataResult } from '../IDatabaseDataResult.js';
 
 export const IS_NULL_ID = 'IS_NULL';
 export const IS_NOT_NULL_ID = 'IS_NOT_NULL';
 
-@databaseDataAction()
+@injectable(() => [IDatabaseDataSource, IDatabaseDataResult])
 export class DatabaseDataConstraintAction
   extends DatabaseDataAction<IDatabaseDataOptions, IDatabaseResultSet>
   implements IDatabaseDataConstraintAction<IDatabaseResultSet>
@@ -47,8 +48,8 @@ export class DatabaseDataConstraintAction
     return this.source.options.constraints.filter(isFilterConstraint);
   }
 
-  constructor(source: IDatabaseDataSource<any, IDatabaseResultSet>) {
-    super(source);
+  constructor(source: IDatabaseDataSource, result: IDatabaseDataResult) {
+    super(source as unknown as IDatabaseDataSource<any, IDatabaseResultSet>, result as IDatabaseResultSet);
     makeObservable(this, {
       orderConstraints: computed,
       filterConstraints: computed,

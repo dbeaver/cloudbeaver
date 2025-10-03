@@ -49,7 +49,7 @@ export const BooleanFormatter = observer<ICellFormatterProps>(function BooleanFo
 
     const nextValue = !resultColumn.required && value === false ? null : !booleanValue;
 
-    tableDataContext.editor.set(cell, nextValue);
+    tableDataContext.editor?.set(cell, nextValue);
   }
 
   return (

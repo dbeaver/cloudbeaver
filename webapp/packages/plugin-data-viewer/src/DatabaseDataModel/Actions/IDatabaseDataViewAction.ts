@@ -5,15 +5,15 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { createService } from '@cloudbeaver/core-di';
+
 import type { IDatabaseDataAction } from '../IDatabaseDataAction.js';
 import type { IDatabaseDataResult } from '../IDatabaseDataResult.js';
+import { createService } from '@cloudbeaver/core-di';
 
-export interface IDatabaseDataResultAction<TKey = unknown, TResult extends IDatabaseDataResult = IDatabaseDataResult>
+export interface IDatabaseDataViewAction<TKey = unknown, TValue = unknown, TResult extends IDatabaseDataResult = IDatabaseDataResult>
   extends IDatabaseDataAction<any, TResult> {
-  readonly empty: boolean;
-  getIdentifier(key: TKey): string;
-  serialize(key: TKey): string;
+  has(cell: TKey): boolean;
+  get: (key: TKey) => TValue | undefined;
 }
 
-export const IDatabaseDataResultAction = createService<IDatabaseDataResultAction>('IDatabaseDataResultAction');
+export const IDatabaseDataViewAction = createService<IDatabaseDataViewAction>('IDatabaseDataViewAction');
