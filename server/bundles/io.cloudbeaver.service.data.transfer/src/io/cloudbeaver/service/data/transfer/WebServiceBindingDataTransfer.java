@@ -47,17 +47,17 @@ public class WebServiceBindingDataTransfer extends WebServiceBindingBase<DBWServ
                 env -> getService(env).getAvailableImportStreamProcessors(getWebSession(env)))
             .dataFetcher("dataTransferExportDataFromContainer", env -> getService(env).dataTransferExportDataFromContainer(
                 WebServiceBindingSQL.getSQLProcessor(env),
-                env.getArgument("containerNodePath"),
-                new WebDataTransferParameters(env.getArgument("parameters"))
+                getArgument(env, "containerNodePath"),
+                new WebDataTransferParameters(getArgument(env, "parameters"))
             ))
             .dataFetcher("dataTransferExportDataFromResults", env -> getService(env).dataTransferExportDataFromResults(
                 WebServiceBindingSQL.getSQLContext(env),
-                env.getArgument("resultsId"),
-                new WebDataTransferParameters(env.getArgument("parameters"))
+                getArgument(env, "resultsId"),
+                new WebDataTransferParameters(getArgument(env, "parameters"))
             ))
             .dataFetcher("dataTransferRemoveDataFile", env -> getService(env).dataTransferRemoveDataFile(
                 getWebSession(env),
-                env.getArgument("dataFileId")
+                getArgument(env, "dataFileId")
             ))
             .dataFetcher("dataTransferDefaultExportSettings", env -> getService(env).defaultExportSettings())
         ;

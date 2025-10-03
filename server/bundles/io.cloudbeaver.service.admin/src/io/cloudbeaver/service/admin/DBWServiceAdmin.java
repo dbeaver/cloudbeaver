@@ -74,39 +74,63 @@ public interface DBWServiceAdmin extends DBWService {
     List<String> listTeamRoles();
 
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
-    boolean deleteUser(@NotNull WebSession webSession, String userName) throws DBWebException;
+    boolean deleteUser(@NotNull WebSession webSession, @NotNull String userName) throws DBWebException;
 
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
     @NotNull
-    AdminTeamInfo createTeam(@NotNull WebSession webSession, String teamId, String teamName, String description) throws DBWebException;
+    AdminTeamInfo createTeam(
+        @NotNull WebSession webSession,
+        @NotNull String teamId,
+        @NotNull String teamName,
+        @Nullable String description
+    ) throws DBWebException;
 
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
     @NotNull
-    AdminTeamInfo updateTeam(@NotNull WebSession webSession, String teamId, String teamName, String description) throws DBWebException;
+    AdminTeamInfo updateTeam(
+        @NotNull WebSession webSession,
+        @NotNull String teamId,
+        @NotNull String teamName,
+        @Nullable String description
+    ) throws DBWebException;
 
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
-    boolean deleteTeam(@NotNull WebSession webSession, String teamId, boolean force) throws DBWebException;
+    boolean deleteTeam(@NotNull WebSession webSession, @NotNull String teamId, boolean force) throws DBWebException;
 
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
-    boolean grantUserTeam(@NotNull WebSession webSession, String user, String team) throws DBWebException;
+    boolean grantUserTeam(@NotNull WebSession webSession, @NotNull String user, @NotNull String team) throws DBWebException;
 
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
-    boolean revokeUserTeam(@NotNull WebSession webSession, String user, String team) throws DBWebException;
+    boolean revokeUserTeam(@NotNull WebSession webSession, @NotNull String user, @NotNull String team) throws DBWebException;
 
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
-    List<AdminPermissionInfo> setSubjectPermissions(@NotNull WebSession webSession, String subjectID, List<String> permissions) throws DBWebException;
+    @NotNull
+    List<AdminPermissionInfo> setSubjectPermissions(
+        @NotNull WebSession webSession,
+        @NotNull String subjectID,
+        @NotNull List<String> permissions
+    ) throws DBWebException;
 
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
-    boolean setUserCredentials(@NotNull WebSession webSession, @NotNull String userID, @NotNull String providerId, @NotNull Map<String, Object> credentials) throws DBWebException;
+    boolean setUserCredentials(
+        @NotNull WebSession webSession,
+        @NotNull String userID,
+        @NotNull String providerId,
+        @NotNull Map<String, Object> credentials
+    ) throws DBWebException;
 
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
-    boolean deleteUserCredentials(@NotNull WebSession webSession, @NotNull String userId, @NotNull String providerId) throws DBWebException;
+    boolean deleteUserCredentials(
+        @NotNull WebSession webSession,
+        @NotNull String userId,
+        @NotNull String providerId
+    ) throws DBWebException;
 
     ////////////////////////////////////////////////////////////////////
     // Connection management
 
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
-    List<AdminConnectionSearchInfo> searchConnections(WebSession webSession, List<String> hostNames) throws DBWebException;
+    List<AdminConnectionSearchInfo> searchConnections(WebSession webSession, @NotNull List<String> hostNames) throws DBWebException;
 
     ////////////////////////////////////////////////////////////////////
     // Features
@@ -129,7 +153,8 @@ public interface DBWServiceAdmin extends DBWService {
         @NotNull String providerId,
         @NotNull String id,
         @NotNull String displayName,
-        boolean disabled, @Nullable String iconURL,
+        boolean disabled,
+        @Nullable String iconURL,
         @Nullable String description,
         @Nullable Map<String, Object> parameters) throws DBWebException;
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
@@ -139,12 +164,12 @@ public interface DBWServiceAdmin extends DBWService {
     // Server configuration
 
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
-    boolean configureServer(WebSession webSession, Map<String, Object> params) throws DBWebException;
+    boolean configureServer(@NotNull WebSession webSession, @NotNull Map<String, Object> params) throws DBWebException;
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
-    boolean setDefaultNavigatorSettings(WebSession webSession, DBNBrowseSettings settings) throws DBWebException;
+    boolean setDefaultNavigatorSettings(@NotNull WebSession webSession, @NotNull DBNBrowseSettings settings) throws DBWebException;
 
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
-    boolean updateProductConfiguration(WebSession webSession, Map<String, Object> productConfiguration) throws DBWebException;
+    boolean updateProductConfiguration(@NotNull WebSession webSession, @NotNull Map<String, Object> productConfiguration) throws DBWebException;
 
     ////////////////////////////////////////////////////////////////////
     // Permissions
@@ -153,7 +178,7 @@ public interface DBWServiceAdmin extends DBWService {
     SMDataSourceGrant[] getConnectionSubjectAccess(
         @NotNull WebSession webSession,
         @Nullable String projectId,
-        String connectionId) throws DBWebException;
+        @NotNull String connectionId) throws DBWebException;
 
     @Deprecated
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
@@ -191,26 +216,50 @@ public interface DBWServiceAdmin extends DBWService {
     // User meta parameters
 
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
-    WebPropertyInfo saveUserMetaParameter(WebSession webSession, String id, String displayName, String description, Boolean required) throws
-        DBWebException;
+    WebPropertyInfo saveUserMetaParameter(
+        @NotNull WebSession webSession,
+        @NotNull String id,
+        @NotNull String displayName,
+        @Nullable String description,
+        @Nullable Boolean required
+    ) throws DBWebException;
 
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
-    Boolean deleteUserMetaParameter(WebSession webSession, String id) throws DBWebException;
+    Boolean deleteUserMetaParameter(@NotNull WebSession webSession, @NotNull String id) throws DBWebException;
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
-    Boolean setUserMetaParameterValues(WebSession webSession, String userId, Map<String, String> parameters) throws DBWebException;
-    @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
-    Boolean setTeamMetaParameterValues(WebSession webSession, String teamId, Map<String, String> parameters) throws DBWebException;
+    Boolean setUserMetaParameterValues(
+        @NotNull WebSession webSession,
+        @NotNull String userId,
+        @NotNull Map<String, String> parameters
+    ) throws DBWebException;
 
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
-    Boolean enableUser(WebSession webSession, String userId, Boolean enabled) throws DBWebException;
+    Boolean setTeamMetaParameterValues(
+        @NotNull WebSession webSession,
+        @NotNull String teamId,
+        @NotNull Map<String, String> parameters
+    ) throws DBWebException;
 
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
-    Boolean setUserAuthRole(WebSession webSession, String userId, String authRole) throws DBWebException;
+    Boolean enableUser(
+        @NotNull WebSession webSession,
+        @NotNull String userId,
+        @NotNull Boolean enabled
+    ) throws DBWebException;
+
+    @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
+    Boolean setUserAuthRole(
+        @NotNull WebSession webSession,
+        @NotNull String userId,
+        @NotNull String authRole
+    ) throws DBWebException;
 
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
     Boolean setUserTeamRole(
-        @NotNull WebSession webSession, @NotNull String userId,
-        @NotNull String teamId, @Nullable String teamRole
+        @NotNull WebSession webSession,
+        @NotNull String userId,
+        @NotNull String teamId,
+        @Nullable String teamRole
     ) throws DBWebException;
 
 }
