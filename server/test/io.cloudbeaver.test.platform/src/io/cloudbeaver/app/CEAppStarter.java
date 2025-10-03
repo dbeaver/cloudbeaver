@@ -95,7 +95,6 @@ public class CEAppStarter {
         @NotNull WebGQLClient client,
         @NotNull Map<String, Object> credentials
     ) throws Exception {
-        System.out.println("Authenticate user creds:"+ String.join(",", credentials.entrySet().stream().map(e -> e.getKey() + "=" + e.getValue()).toArray(String[]::new)));
         return client.sendQuery(
             WebGQLClient.GQL_AUTHENTICATE,
             Map.of(
