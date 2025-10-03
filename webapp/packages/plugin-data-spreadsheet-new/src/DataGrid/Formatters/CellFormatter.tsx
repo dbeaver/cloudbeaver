@@ -45,6 +45,15 @@ export const CellFormatter = observer<Props>(function CellFormatter({ rowIdx, co
         context.getDataGridApi()?.openEditor({ colIdx, rowIdx });
       }
     },
+    unpinColumn(key) {
+      context.unpinColumn(key);
+    },
+    pinColumn(key) {
+      context.pinColumn(key);
+    },
+    isPinnedColumn(key) {
+      return context.isColumnPinned(key);
+    },
   });
 
   function handleCellMenuStateSwitch(visible: boolean): void {

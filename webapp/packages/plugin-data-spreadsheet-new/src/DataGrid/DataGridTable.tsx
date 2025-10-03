@@ -39,6 +39,7 @@ import {
   DatabaseDataConstraintAction,
   getNextOrder,
   isResultSetDataModel,
+  type IResultSetColumnKey,
 } from '@cloudbeaver/plugin-data-viewer';
 
 import { CellRenderer } from './CellRenderer/CellRenderer.js';
@@ -53,8 +54,6 @@ import { useGridSelectedCellsCopy } from './useGridSelectedCellsCopy.js';
 import { useTableData } from './useTableData.js';
 import { TableColumnHeader } from './TableColumnHeader/TableColumnHeader.js';
 import { TableIndexColumnHeader } from './TableColumnHeader/TableIndexColumnHeader.js';
-import { CONTEXT_DATA_GRID_TABLE_DATA } from './CONTEXT_DATA_GRID_TABLE_DATA.js';
-import { CONTEXT_DATA_GRID } from './CONTEXT_DATA_GRID.js';
 
 const ROW_HEIGHT = 24;
 export const HEADER_HEIGHT = 32;
@@ -76,7 +75,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
   const focusedCell = useRef<ICellPosition | null>(null);
   const focusSyncRef = useRef<ICellPosition | null>(null);
   const dataGridRef = useRef<DataGridRef>(null);
-  const [pinnedColumns, setPinnedColumns] = useState<Set<number>>(new Set());
+  const [pinnedColumns, setPinnedColumns] = useState<Set<string>>(new Set());
 
   const selectionAction = (model.source as unknown as ResultSetDataSource).getAction(resultIndex, ResultSetSelectAction);
   const viewAction = (model.source as unknown as ResultSetDataSource).getAction(resultIndex, ResultSetViewAction);
@@ -84,31 +83,32 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
   const tableData = useTableData(model as unknown as IDatabaseDataModel<ResultSetDataSource>, resultIndex, dataGridDivRef);
   const gridSelectionContext = useGridSelectionContext(tableData, selectionAction);
 
-  const pinColumn = useCallback(
-    (colIdx: number) => {
-      if (pinnedColumns.has(colIdx)) {
-        return;
+  const pinColumn = useCallback((colIdx: IResultSetColumnKey) => {
+    setPinnedColumns(prev => {
+      const key = ResultSetDataKeysUtils.serialize(colIdx);
+
+      if (prev.has(key)) {
+        return prev;
+      }
+      return new Set(prev).add(key);
+    });
+  }, []);
+
+  const unpinColumn = useCallback((colIdx: IResultSetColumnKey) => {
+    setPinnedColumns(prev => {
+      const key = ResultSetDataKeysUtils.serialize(colIdx);
+
+      if (!prev.has(key)) {
+        return prev;
       }
 
-      setPinnedColumns(new Set(pinnedColumns).add(colIdx));
-    },
-    [pinnedColumns],
-  );
+      const newSet = new Set(prev);
+      newSet.delete(key);
+      return newSet;
+    });
+  }, []);
 
-  const unpinColumn = useCallback(
-    (colIdx: number) => {
-      if (!pinnedColumns.has(colIdx)) {
-        return;
-      }
-
-      const newPinned = new Set(pinnedColumns);
-      newPinned.delete(colIdx);
-      setPinnedColumns(newPinned);
-    },
-    [pinnedColumns],
-  );
-
-  const isColumnPinned = useCallback((colIdx: number) => pinnedColumns.has(colIdx), [pinnedColumns]);
+  const isColumnPinned = useCallback((colIdx: IResultSetColumnKey) => pinnedColumns.has(ResultSetDataKeysUtils.serialize(colIdx)), [pinnedColumns]);
 
   const restoreFocus = useCallback(
     function restoreFocus() {
@@ -198,8 +198,6 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
 
   useCaptureViewContext((context, id) => {
     context.set(DATA_CONTEXT_DV_PRESENTATION, { type: DataViewerPresentationType.Data }, id);
-    context.set(CONTEXT_DATA_GRID, gridContext, id);
-    context.set(CONTEXT_DATA_GRID_TABLE_DATA, tableData, id);
   });
 
   useLayoutEffect(() => {
@@ -336,7 +334,13 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
       return true;
     }
 
-    return isColumnPinned(colIdx);
+    const column = tableData.getColumn(colIdx);
+
+    if (!column?.key) {
+      return false;
+    }
+
+    return isColumnPinned(column.key);
   }
 
   function getHeaderResizable(colIdx: number) {

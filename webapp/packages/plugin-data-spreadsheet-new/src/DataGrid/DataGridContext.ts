@@ -8,7 +8,7 @@
 import { createContext } from 'react';
 
 import type { DataGridRef } from '@cloudbeaver/plugin-data-grid';
-import type { IDatabaseDataModel, IDataTableActions } from '@cloudbeaver/plugin-data-viewer';
+import type { IDatabaseDataModel, IDataTableActions, IResultSetColumnKey } from '@cloudbeaver/plugin-data-viewer';
 
 export interface IColumnResizeInfo {
   column: number;
@@ -23,9 +23,9 @@ export interface IDataGridContext {
   isGridInFocus: () => boolean;
   getDataGridApi: () => DataGridRef | null;
   focus: () => void;
-  pinColumn: (columnIndex: number) => void;
-  unpinColumn: (columnIndex: number) => void;
-  isColumnPinned: (columnIndex: number) => boolean;
+  pinColumn: (columnKey: IResultSetColumnKey) => void;
+  unpinColumn: (columnIndex: IResultSetColumnKey) => void;
+  isColumnPinned: (columnIndex: IResultSetColumnKey) => boolean;
 }
 
 export const DataGridContext = createContext<IDataGridContext>(undefined as any);
