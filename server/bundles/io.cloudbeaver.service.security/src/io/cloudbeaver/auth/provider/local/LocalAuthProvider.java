@@ -109,7 +109,6 @@ public class LocalAuthProvider implements SMAuthProvider<LocalAuthSession>, SMBr
         String userName = CommonUtils.toString(userCredentials.get(CRED_USER));
         String clientPasswordHash = AuthPropertyEncryption.hashMd5.encrypt(userName, clientPassword);
         // we also need to check a hash with lower case (CB-5833)
-        //fixme(?) there is checking phc string, not only hash
         String clientPasswordHashLowerCase = AuthPropertyEncryption.hashMd5.encrypt(userName.toLowerCase(), clientPassword);
         if (!storedPasswordHash.equals(clientPasswordHash) && !clientPasswordHashLowerCase.equals(storedPasswordHash)) {
             throw new SMInvalidCredentialException("Invalid user name or password");
@@ -156,12 +155,9 @@ public class LocalAuthProvider implements SMAuthProvider<LocalAuthSession>, SMBr
         if (CommonUtils.isEmpty(oldPassword)) {
             throw new DBException("No user password provided");
         }
-        String oldPasswordHash = AuthPropertyEncryption.hash.encrypt(userName, oldPassword);
-        if (!storedPasswordHash.equals(oldPasswordHash)) {
+        if (!Argon2IdHasher.verify(storedPasswordHash, oldPassword)) {
             throw new DBException("Invalid user name or password");
         }
-
-        //String newPasswordHash = WebAuthProviderPropertyEncryption.hash.encrypt(userName, newPassword);
 
         storedCredentials.put(CRED_PASSWORD, newPassword);
         smController.setCurrentUserCredentials(authProvider.getId(), storedCredentials);
