@@ -126,15 +126,15 @@ export class SpreadsheetBootstrap extends Bootstrap {
       isActionApplicable: (context, action): boolean => {
         const model = context.get(DATA_CONTEXT_DV_DDM)!;
         const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
-        const dataContextResultKey = context.get(DATA_CONTEXT_DV_RESULT_KEY);
-        const presentationActions = context.get(DATA_CONTEXT_DV_PRESENTATION_ACTIONS);
+        const dataContextResultKey = context.get(DATA_CONTEXT_DV_RESULT_KEY)!;
+        const presentationActions = context.get(DATA_CONTEXT_DV_PRESENTATION_ACTIONS)!;
 
-        if (action === ACTION_DATA_GRID_PIN_COLUMN && dataContextResultKey?.column) {
-          return presentationActions?.isPinnedColumn?.(dataContextResultKey.column) === false;
+        if (action === ACTION_DATA_GRID_PIN_COLUMN && dataContextResultKey.column) {
+          return presentationActions.isPinnedColumn(dataContextResultKey.column) === false;
         }
 
-        if (action === ACTION_DATA_GRID_UNPIN_COLUMN && dataContextResultKey?.column) {
-          return presentationActions?.isPinnedColumn?.(dataContextResultKey.column) === true;
+        if (action === ACTION_DATA_GRID_UNPIN_COLUMN && dataContextResultKey.column) {
+          return presentationActions.isPinnedColumn(dataContextResultKey.column) === true;
         }
 
         if (action === ACTION_OPEN) {
