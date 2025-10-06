@@ -37,6 +37,7 @@ public class CloudBeaverInstanceServer extends ApplicationInstanceServer<Applica
             return CloudBeaverCommandLine.getInstance().executeCommandLineCommands(
                 cmd,
                 this,
+                false,
                 false
             );
         } catch (Exception e) {

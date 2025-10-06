@@ -119,7 +119,7 @@ public interface DBWServiceCore extends DBWService {
         @NotNull WebSession webSession,
         @Nullable String projectId,
         @NotNull String connectionId,
-        @NotNull Map<String, Object> authProperties,
+        @Nullable Map<String, Object> authProperties,
         @Nullable List<WebNetworkHandlerConfigInput> networkCredentials,
         boolean saveCredentials,
         boolean sharedCredentials,
@@ -130,31 +130,37 @@ public interface DBWServiceCore extends DBWService {
     WebConnectionInfo createConnection(
         @NotNull WebSession webSession,
         @Nullable @WebObjectId String projectId,
-        @NotNull WebConnectionConfig connectionConfig
+        @NotNull Map<String, Object> connectionConfig
     ) throws DBWebException;
 
     @WebProjectAction(requireProjectPermissions = {RMConstants.PERMISSION_PROJECT_DATASOURCES_EDIT})
     WebConnectionInfo updateConnection(
         @NotNull WebSession webSession,
         @Nullable @WebObjectId String projectId,
-        @NotNull WebConnectionConfig connectionConfig) throws DBWebException;
+        @NotNull Map<String, Object> connectionConfig
+    ) throws DBWebException;
 
     @WebProjectAction(requireProjectPermissions = {RMConstants.PERMISSION_PROJECT_DATASOURCES_EDIT})
     boolean deleteConnection(
         @NotNull WebSession webSession,
         @Nullable @WebObjectId String projectId,
-        @NotNull String connectionId) throws DBWebException;
+        @NotNull String connectionId
+    ) throws DBWebException;
 
     @WebProjectAction(requireProjectPermissions = {RMConstants.PERMISSION_PROJECT_DATASOURCES_EDIT})
     WebConnectionInfo copyConnectionFromNode(
         @NotNull WebSession webSession,
         @Nullable @WebObjectId String projectId,
         @NotNull String nodePath,
-        @NotNull WebConnectionConfig config) throws DBWebException;
+        @NotNull Map<String, Object> connectionConfig
+    ) throws DBWebException;
 
     @WebAction
     WebConnectionInfo testConnection(
-        @NotNull WebSession webSession, @Nullable String projectId, @NotNull WebConnectionConfig connectionConfig) throws DBWebException;
+        @NotNull WebSession webSession,
+        @Nullable String projectId,
+        @NotNull Map<String, Object> connectionConfig
+    ) throws DBWebException;
 
     @WebAction
     WebNetworkEndpointInfo testNetworkHandler(@NotNull WebSession webSession, @NotNull WebNetworkHandlerConfigInput nhConfig) throws DBWebException;
@@ -175,7 +181,7 @@ public interface DBWServiceCore extends DBWService {
     WebConnectionFolderInfo createConnectionFolder(
         @NotNull WebSession session,
         @Nullable @WebObjectId String projectId,
-        @NotNull String parentNodePath,
+        @Nullable String parentNodePath,
         @NotNull String newName) throws DBWebException;
 
     @WebProjectAction(requireProjectPermissions = {RMConstants.PERMISSION_PROJECT_DATASOURCES_EDIT})

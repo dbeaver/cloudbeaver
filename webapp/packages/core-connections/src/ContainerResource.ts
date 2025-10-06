@@ -28,6 +28,8 @@ export interface IStructContainers {
   schemaList: ObjectContainer[];
   supportsCatalogChange: boolean;
   supportsSchemaChange: boolean;
+  defaultCatalog: string | undefined;
+  defaultSchema: string | undefined;
   activeCatalog: string | undefined;
 }
 
@@ -131,6 +133,8 @@ export class ContainerResource extends CachedMapResource<ObjectContainerParams, 
           schemaList: navGetStructContainers.schemaList,
           supportsCatalogChange: navGetStructContainers.supportsCatalogChange,
           supportsSchemaChange: navGetStructContainers.supportsSchemaChange,
+          defaultCatalog: navGetStructContainers.defaultCatalog,
+          defaultSchema: navGetStructContainers.defaultSchema,
           activeCatalog: catalogId || undefined,
         },
       );

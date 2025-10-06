@@ -1,12 +1,6 @@
 @import url('@dbeaver/ui-kit/index.css');
 @import url('react-data-grid/lib/styles.css') layer(components);
 
-@layer components.rdg.MeasuringCell {
-  [data-measuring-cell] {
-    max-width: var(--rdg-max-auto-size, 350px);
-  }
-}
-
 @layer components.rdg.Cell {
   .rdg {
     --dbv-kit-icon-btn-outline-width: 1px;

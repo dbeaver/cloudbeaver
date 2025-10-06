@@ -18,7 +18,7 @@ export default [
   ['data_viewer_action_auto_refresh_menu_stop_tooltip', 'Stop auto-refreshing data'],
   ['data_viewer_action_auto_refresh_menu_configure_tooltip', 'Configure auto-refresh settings'],
   ['data_viewer_action_auto_refresh_interval_tooltip', 'Set auto-refresh interval to {arg:interval}'],
-  ['data_viewer_action_edit_delete', 'Supprimer la sélection'],
+  ['data_viewer_action_edit_delete', 'Supprimer les lignes sélectionnées'],
   ['data_viewer_action_edit_add', 'Ajouter'],
   ['data_viewer_action_edit_add_copy', 'Dupliquer'],
   ['data_viewer_action_edit_revert', 'Annuler la sélection'],

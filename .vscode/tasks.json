@@ -92,10 +92,10 @@
       "label": "Run Backend CE",
       "type": "shell",
       "windows": {
-        "command": "./run-server.bat"
+        "command": "./run-cloudbeaver-server.bat"
       },
       "osx": {
-        "command": "./run-server.sh"
+        "command": "./run-cloudbeaver-server.sh"
       },
       "options": {
         "cwd": "${workspaceFolder}/deploy/cloudbeaver"
