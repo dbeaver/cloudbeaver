@@ -15,10 +15,10 @@ import { ResultSetDataAction } from './ResultSetDataAction.js';
 import { ResultSetEditAction } from './ResultSetEditAction.js';
 import type { IResultSetValue } from './ResultSetFormatAction.js';
 import { GridViewAction } from '../Grid/GridViewAction.js';
-import type { GridEditAction } from '../Grid/GridEditAction.js';
 import { injectable } from '@cloudbeaver/core-di';
 import { IDatabaseDataResult } from '../../IDatabaseDataResult.js';
 import type { IGridColumnKey, IGridDataKey } from '../Grid/IGridDataKey.js';
+import type { IDatabaseDataEditAction } from '../IDatabaseDataEditAction.js';
 
 @injectable(() => [IDatabaseDataSource, IDatabaseDataResult, ResultSetDataAction, ResultSetEditAction])
 export class ResultSetViewAction extends GridViewAction<SqlResultColumn, SqlResultRowMetaData, IGridDataKey, IResultSetValue, IDatabaseResultSet> {
@@ -29,7 +29,7 @@ export class ResultSetViewAction extends GridViewAction<SqlResultColumn, SqlResu
       source as unknown as IDatabaseDataSource<unknown, IDatabaseResultSet>,
       result as IDatabaseResultSet,
       data,
-      editor as GridEditAction<SqlResultColumn, SqlResultRowMetaData, IGridDataKey, IResultSetValue, IDatabaseResultSet>,
+      editor as unknown as IDatabaseDataEditAction,
     );
   }
 
