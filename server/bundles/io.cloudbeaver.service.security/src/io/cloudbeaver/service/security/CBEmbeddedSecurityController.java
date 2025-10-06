@@ -2456,8 +2456,9 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
 
                 if (userIdFromCreds == null) {
                     var error = "Invalid user credentials";
-                    updateAuthStatus(authId, SMAuthStatus.ERROR, dbStoredUserData, error, null);
-                    return SMAuthInfo.error(authId, error, isMainAuthSession, null, authInfo.getAppSessionId());
+                    String errorCode = "invalidCredentials";
+                    updateAuthStatus(authId, SMAuthStatus.ERROR, dbStoredUserData, error, errorCode);
+                    return SMAuthInfo.error(authId, error, isMainAuthSession, errorCode, authInfo.getAppSessionId());
                 }
 
                 if (autoAssign != null && !CommonUtils.isEmpty(autoAssign.getExternalTeamIds())) {

@@ -64,7 +64,7 @@ public class WebSessionAuthProcessor {
                 case SUCCESS:
                     return finishWebSessionAuthorization(smAuthInfo);
                 case ERROR:
-                    var e = new DBException(smAuthInfo.getError());
+                    var e = new DBWebException(smAuthInfo.getError(), smAuthInfo.getErrorCode());
                     webSession.addSessionError(e);
                     throw e;
                 case IN_PROGRESS:

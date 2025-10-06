@@ -92,6 +92,10 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
         } catch (SMInvalidCredentialException e) {
             throw new DBWebException("Invalid credentials", e.getErrorType(), e);
         } catch (Exception e) {
+            //need to save errorCode
+            if (e.getCause() instanceof DBWebException dbwe) {
+                throw dbwe;
+            }
             throw new DBWebException("User authentication failed", e);
         }
     }
