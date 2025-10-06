@@ -110,6 +110,29 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
 
   const isColumnPinned = useCallback((colIdx: IResultSetColumnKey) => pinnedColumns.has(ResultSetDataKeysUtils.serialize(colIdx)), [pinnedColumns]);
 
+  const getHeaderOrder = useCallback(() => {
+    const pinnedColumns: number[] = [];
+    const unpinnedColumns: number[] = [];
+    const indexColumnId = 0;
+
+    if (!tableData.columns.length) {
+      return [];
+    }
+
+    // first column is index column, always pinned so skip it
+    for (let i = 1; i < tableData.columns.length; i++) {
+      const column = tableData.columns[i];
+      if (column?.key && isColumnPinned(column.key)) {
+        pinnedColumns.push(i);
+        continue;
+      }
+
+      unpinnedColumns.push(i);
+    }
+
+    return [indexColumnId, ...pinnedColumns, ...unpinnedColumns];
+  }, [tableData.columns, isColumnPinned]);
+
   const restoreFocus = useCallback(
     function restoreFocus() {
       const gridDiv = gridContainerRef.current;
@@ -528,6 +551,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
               getHeaderWidth={getHeaderWidth}
               getHeaderPinned={getHeaderPinned}
               getHeaderResizable={getHeaderResizable}
+              getHeaderOrder={getHeaderOrder}
               getRowHeight={() => ROW_HEIGHT}
               getColumnKey={getColumnKey}
               columnCount={columnsCount}
