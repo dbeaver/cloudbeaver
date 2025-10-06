@@ -36,7 +36,7 @@ public class WebDataSourceConnectEventListener implements DBPEventListener {
     }
 
     @Override
-    public void handleDataSourceEvent(DBPEvent event) {
+    public void handleDataSourceEvent(@NotNull DBPEvent event) {
         if (!(event.getObject() instanceof DBPDataSourceContainer container)) {
             return;
         }

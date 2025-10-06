@@ -252,6 +252,7 @@ public class WebConnectionInfo {
     }
 
     @Property
+    @NotNull
     public String[] getFeatures() {
         List<String> features = new ArrayList<>();
 
@@ -281,11 +282,13 @@ public class WebConnectionInfo {
     }
 
     @Property
+    @NotNull
     public DBNBrowseSettings getNavigatorSettings() {
         return dataSourceContainer.getNavigatorSettings();
     }
 
     @Property
+    @NotNull
     public List<WebDataFormat> getSupportedDataFormats() {
         List<WebDataFormat> formats = new ArrayList<>();
         formats.add(WebDataFormat.resultset);
@@ -300,11 +303,13 @@ public class WebConnectionInfo {
     }
 
     @Property
+    @NotNull
     public WebConnectionOriginInfo getOrigin() {
         return new WebConnectionOriginInfo(session, dataSourceContainer, dataSourceContainer.getOrigin());
     }
 
     @Property
+    @NotNull
     public DBPDriverConfigurationType getConfigurationType() {
         DBPDriverConfigurationType configurationType = dataSourceContainer.getConnectionConfiguration().getConfigurationType();
         if (configurationType == null) {
@@ -330,6 +335,7 @@ public class WebConnectionInfo {
     }
 
     @Property
+    @NotNull
     public String getAuthModel() {
         String authModelId = dataSourceContainer.getConnectionConfiguration().getAuthModelId();
         if (CommonUtils.isEmpty(authModelId)) {
@@ -339,6 +345,7 @@ public class WebConnectionInfo {
     }
 
     @Property
+    @NotNull
     public WebPropertyInfo[] getAuthProperties() {
         String authModelId = getAuthModel();
         DBPAuthModelDescriptor authModel = DBWorkbench.getPlatform().getDataSourceProviderRegistry().getAuthModel(authModelId);
@@ -361,6 +368,7 @@ public class WebConnectionInfo {
     }
 
     @Property
+    @NotNull
     public List<WebNetworkHandlerConfig> getNetworkHandlersConfig() {
         var registry = NetworkHandlerRegistry.getInstance();
         return dataSourceContainer.getConnectionConfiguration()
@@ -375,20 +383,23 @@ public class WebConnectionInfo {
     }
 
     @Property
+    @Nullable
     public Map<String, Object> getCredentials() {
         //dataSourceContainer.getConnectionConfiguration().getCredentialsProvider().getCredentials();
         return null;
     }
 
+    @Nullable
     public Map<String, Object> getSavedAuthProperties() {
         return savedAuthProperties;
     }
 
+    @Nullable
     public List<WebNetworkHandlerConfigInput> getSavedNetworkCredentials() {
         return savedNetworkCredentials;
     }
 
-    public void setSavedCredentials(Map<String, Object> authProperties, List<WebNetworkHandlerConfigInput> networkCredentials) {
+    public void setSavedCredentials(@Nullable Map<String, Object> authProperties, @Nullable List<WebNetworkHandlerConfigInput> networkCredentials) {
         this.savedAuthProperties = authProperties;
         this.savedNetworkCredentials = networkCredentials;
     }
@@ -413,6 +424,7 @@ public class WebConnectionInfo {
     }
 
     @Property
+    @NotNull
     public Map<String, String> getMainPropertyValues() {
         Map<String, String> mainProperties = new LinkedHashMap<>();
         mainProperties.put(DBConstants.PROP_HOST, getHost());
@@ -468,7 +480,7 @@ public class WebConnectionInfo {
         return dataSourceContainer.getRequiredExternalAuth();
     }
 
-    private boolean hasProjectPermission(RMProjectPermission projectPermission) {
+    private boolean hasProjectPermission(@NotNull RMProjectPermission projectPermission) {
         DBPProject project = dataSourceContainer.getProject();
         if (!(project instanceof WebProjectImpl webProject)) {
             return false;
@@ -508,18 +520,21 @@ public class WebConnectionInfo {
     }
 
     @Property
+    @Nullable
     public String getDefaultCatalogName() {
         DBPConnectionConfiguration connectionConfiguration = dataSourceContainer.getConnectionConfiguration();
         return connectionConfiguration.getBootstrap().getDefaultCatalogName();
     }
 
     @Property
+    @Nullable
     public String getDefaultSchemaName() {
         DBPConnectionConfiguration connectionConfiguration = dataSourceContainer.getConnectionConfiguration();
         return connectionConfiguration.getBootstrap().getDefaultSchemaName();
     }
 
     @Property
+    @NotNull
     public List<WebSecretInfo> getSharedSecrets() throws DBException {
         return dataSourceContainer.listSharedCredentials()
             .stream()
@@ -527,8 +542,8 @@ public class WebConnectionInfo {
             .collect(Collectors.toList());
     }
 
-    @NotNull
     @Property
+    @NotNull
     public List<String> getTools() {
         if (!session.hasPermission(RMConstants.PERMISSION_DATABASE_DEVELOPER)) {
             return List.of();
