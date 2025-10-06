@@ -7,7 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 import { useCallback, useContext, useId, useState } from 'react';
-import { ComboboxInput, ComboboxItem, clsx, Spinner, ComboboxPopover, ComboboxDisclosure, ComboboxProvider } from '@dbeaver/ui-kit';
+import { ComboboxInput, ComboboxItem, clsx, Spinner, ComboboxPopover, ComboboxDisclosure, ComboboxProvider, ComboboxCancel } from '@dbeaver/ui-kit';
 
 import { filterLayoutFakeProps, getLayoutProps } from '../Containers/filterLayoutFakeProps.js';
 import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps.js';
@@ -35,6 +35,7 @@ export type ComboboxBaseProps<TKey, TValue> = Omit<
     isDisabled?: (item: TValue) => boolean;
     inline?: boolean;
     allowCustomValue?: boolean;
+    allowClear?: boolean;
     size?: 'small' | 'medium' | 'large';
     onChange?: (value: string | null) => void;
   };
@@ -73,6 +74,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
   inline,
   description,
   allowCustomValue = false,
+  allowClear = false,
   keySelector = v => v,
   valueSelector = v => v as string,
   iconSelector,
@@ -169,6 +171,19 @@ export const Combobox: ComboboxType = observer(function Combobox({
     }
   }
 
+  function handleClear() {
+    setInputValue(null);
+    if (name !== undefined && state) {
+      state[name] = undefined;
+    }
+    if (onSelect) {
+      onSelect(undefined as any, name as undefined, selectedKey);
+    }
+    if (context) {
+      context.change('', name);
+    }
+  }
+
   function handleSetValueOnClick() {
     if (allowCustomValue) {
       return true;
@@ -205,7 +220,11 @@ export const Combobox: ComboboxType = observer(function Combobox({
             disabled={disabled || loading || readOnly}
             readOnly={readOnly}
             placeholder={rest.placeholder}
-            className={clsx('theme-typography--caption  tw:tracking-normal!', icon || loading ? 'tw:pl-8!' : '', 'tw:pr-6!')}
+            className={clsx(
+              'theme-typography--caption  tw:tracking-normal!',
+              icon || loading ? 'tw:pl-8!' : '',
+              displayValue ? 'tw:pr-12!' : 'tw:pr-6!',
+            )}
             title={title}
             id={inputId}
             size={size}
@@ -215,12 +234,20 @@ export const Combobox: ComboboxType = observer(function Combobox({
           {loading ? (
             <Spinner size="small" className="tw:absolute tw:right-2 tw:top-[50%] tw:-translate-y-1/2" />
           ) : (
-            displayPopover && (
-              <ComboboxDisclosure
-                disabled={disabled || loading || readOnly}
-                className="tw:absolute tw:right-2 tw:top-[50%] tw:-translate-y-1/2 tw:[&>svg]:fill-none! tw:text-sm! tw:cursor-pointer"
-              />
-            )
+            <>
+              {displayValue && allowClear && !disabled && !readOnly && (
+                <ComboboxCancel
+                  className="tw:absolute tw:right-8 tw:top-[50%] tw:-translate-y-1/2 tw:[&>svg]:fill-none! tw:text-sm! tw:cursor-pointer tw:opacity-50 hover:tw:opacity-100"
+                  onClick={handleClear}
+                />
+              )}
+              {displayPopover && (
+                <ComboboxDisclosure
+                  disabled={disabled || loading || readOnly}
+                  className="tw:absolute tw:right-2 tw:top-[50%] tw:-translate-y-1/2 tw:[&>svg]:fill-none! tw:text-sm! tw:cursor-pointer"
+                />
+              )}
+            </>
           )}
           {icon && <div className="tw:absolute tw:left-3 tw:w-4 tw:h-4">{typeof icon === 'string' ? <IconOrImage icon={icon} /> : icon}</div>}
           {displayPopover && (
