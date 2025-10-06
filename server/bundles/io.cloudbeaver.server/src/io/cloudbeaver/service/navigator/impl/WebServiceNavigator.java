@@ -157,7 +157,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
     @Override
     public List<WebNavigatorNodeInfo> getNavigatorNodeParents(
         @NotNull WebSession session,
-        String nodePath
+        @NotNull String nodePath
     ) throws DBWebException {
         try {
             DBRProgressMonitor monitor = session.getProgressMonitor();
