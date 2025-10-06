@@ -17,7 +17,6 @@
 package io.cloudbeaver.service.metadata;
 
 import graphql.schema.DataFetchingEnvironment;
-import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.service.DBWBindingContext;
 import io.cloudbeaver.service.WebServiceBindingBase;
@@ -37,12 +36,12 @@ public class WebServiceBindingMetadata extends WebServiceBindingBase<DBWServiceM
     }
 
     @Override
-    public void bindWiring(DBWBindingContext model) throws DBWebException {
+    public void bindWiring(DBWBindingContext model) {
         model.getQueryType()
             .dataFetcher("metadataGetNodeDDL", env -> getService(env).getNodeDDL(
                 getWebSession(env),
                 getNodeFromPath(env),
-                env.getArgument("options"))
+                getArgument(env, "options"))
             ).dataFetcher("metadataGetNodeExtendedDDL", env -> getService(env).getNodeExtendedDDL(
                 getWebSession(env),
                 getNodeFromPath(env)
@@ -51,7 +50,7 @@ public class WebServiceBindingMetadata extends WebServiceBindingBase<DBWServiceM
 
     private DBNNode getNodeFromPath(DataFetchingEnvironment env) throws DBException {
         WebSession webSession = getWebSession(env);
-        String nodePath = env.getArgument("nodeId");
+        String nodePath = getArgument(env, "nodeId");
         if (nodePath == null) {
             throw new DBException("Node path is null");
         }

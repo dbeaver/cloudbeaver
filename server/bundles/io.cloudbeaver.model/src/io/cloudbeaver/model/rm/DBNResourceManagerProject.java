@@ -60,26 +60,31 @@ public class DBNResourceManagerProject extends DBNAbstractResourceManagerNode {
         return project.getId();
     }
 
+    @NotNull
     @Override
     public String getNodeType() {
         return "rm.project";
     }
 
+    @NotNull
     @Override
     public String getNodeDisplayName() {
         return project.getDisplayName();
     }
 
+    @NotNull
     @Override
-    public String getLocalizedName(String locale) {
+    public String getLocalizedName(@NotNull String locale) {
         return getNodeDisplayName();
     }
 
+    @Nullable
     @Override
     public String getNodeDescription() {
         return project.getDescription();
     }
 
+    @Nullable
     @Override
     public DBPImage getNodeIcon() {
         return DBIcon.PROJECT;
@@ -90,6 +95,7 @@ public class DBNResourceManagerProject extends DBNAbstractResourceManagerNode {
         return true;
     }
 
+    @NotNull
     @Override
     public DBNResourceManagerResource[] getChildren(@NotNull DBRProgressMonitor monitor) throws DBException {
         if (children == null && !monitor.isForceCacheUsage()) {
@@ -109,14 +115,16 @@ public class DBNResourceManagerProject extends DBNAbstractResourceManagerNode {
         return ((DBNResourceManagerRoot) getParentNode()).getResourceController();
     }
 
+    @NotNull
     @Deprecated
     @Override
     public String getNodeItemPath() {
         return getParentNode().getNodeItemPath() + "/" + getName();
     }
 
+    @Nullable
     @Override
-    public DBNNode refreshNode(DBRProgressMonitor monitor, Object source) throws DBException {
+    public DBNNode refreshNode(@NotNull DBRProgressMonitor monitor, @Nullable Object source) throws DBException {
         children = null;
         return this;
     }
@@ -141,6 +149,7 @@ public class DBNResourceManagerProject extends DBNAbstractResourceManagerNode {
         return project;
     }
 
+    @NotNull
     @Override
     public String toString() {
         return getNodeDisplayName();
