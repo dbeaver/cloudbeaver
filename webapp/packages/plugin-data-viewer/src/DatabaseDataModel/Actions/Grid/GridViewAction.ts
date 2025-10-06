@@ -19,8 +19,9 @@ import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 import { injectable } from '@cloudbeaver/core-di';
 import type { IDatabaseDataViewAction } from '../IDatabaseDataViewAction.js';
 import { IDatabaseDataResultAction } from '../IDatabaseDataResultAction.js';
+import { IDatabaseDataEditAction } from '../IDatabaseDataEditAction.js';
 
-@injectable(() => [IDatabaseDataSource, IDatabaseDataResult, IDatabaseDataResultAction, GridEditAction])
+@injectable(() => [IDatabaseDataSource, IDatabaseDataResult, IDatabaseDataResultAction, IDatabaseDataEditAction])
 export class GridViewAction<
     TColumn = unknown,
     TRow = unknown,
@@ -51,16 +52,17 @@ export class GridViewAction<
 
   private columnsOrder: number[];
   protected readonly data: GridDataResultAction<TColumn, TRow, TKey, TCell, TResult>;
+  protected readonly editor?: GridEditAction<TColumn, TRow, TKey, TCell, TResult>;
 
   constructor(
     source: IDatabaseDataSource<any, TResult>,
     result: TResult,
     data: IDatabaseDataResultAction<TKey, TResult>,
-    protected readonly editor?: GridEditAction<TColumn, TRow, TKey, TCell, TResult>,
+    editor?: IDatabaseDataEditAction,
   ) {
     super(source, result);
     this.data = data as GridDataResultAction<TColumn, TRow, TKey, TCell, TResult>;
-    this.editor = editor;
+    this.editor = editor as GridEditAction<TColumn, TRow, TKey, TCell, TResult> | undefined;
     this.columnsOrder = this.data.columns.map((key, index) => index);
 
     makeObservable<this, 'columnsOrder'>(this, {
