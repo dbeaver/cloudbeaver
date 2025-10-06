@@ -811,6 +811,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         }
     }
 
+    @NotNull
     @Override
     public Map<String, Object> getCurrentUserParameters() throws DBCException {
         String userId = getUserIdOrThrow();
@@ -1211,6 +1212,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         return getUserCredentials(getUserIdOrThrow(), authProviderId);
     }
 
+    @NotNull
     @Override
     public String[] getCurrentUserLinkedProviders() throws DBException {
         return getUserLinkedProviders(getUserIdOrThrow());
@@ -1630,7 +1632,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
     // Sessions
 
     @Override
-    public boolean isSessionPersisted(String id) throws DBException {
+    public boolean isSessionPersisted(@NotNull String id) throws DBException {
         try (Connection dbCon = database.openConnection()) {
             try (PreparedStatement dbStat = dbCon.prepareStatement("SELECT 1 FROM {table_prefix}CB_SESSION WHERE SESSION_ID=?")) {
                 dbStat.setString(1, id);
@@ -1646,6 +1648,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         }
     }
 
+    @NotNull
     private String createSmSession(
         @NotNull String appSessionId,
         @Nullable String userId,
@@ -1677,6 +1680,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         }
     }
 
+    @NotNull
     @Override
     public SMAuthInfo authenticateAnonymousUser(@NotNull String appSessionId, @NotNull Map<String, Object> sessionParameters, @NotNull SMSessionType sessionType) throws DBException {
         if (!application.isAnonymousAccessEnabled()) {
@@ -1708,6 +1712,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         return getSubjectPermissions(anonymousUserTeam);
     }
 
+    @NotNull
     @Override
     public SMAuthInfo authenticate(
         @NotNull String appSessionId,
@@ -2068,6 +2073,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         }
     }
 
+    @NotNull
     @Override
     public SMAuthInfo getAuthStatus(@NotNull String authId) throws DBException {
         var smAuthInfo = getAuthStatus(authId, false);
@@ -2915,6 +2921,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         return new SMAuthPermissions(userId, sessionId, permissions);
     }
 
+    @NotNull
     @Override
     public SMAuthProviderDescriptor[] getAvailableAuthProviders() throws DBException {
         ServletAuthConfiguration appConfiguration = application.getAuthConfiguration();

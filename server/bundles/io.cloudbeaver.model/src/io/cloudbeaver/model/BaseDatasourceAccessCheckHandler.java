@@ -10,7 +10,7 @@ import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 public abstract class BaseDatasourceAccessCheckHandler implements DBPDataSourceHandler {
     @Override
     public void beforeConnect(
-        DBRProgressMonitor monitor,
+        @NotNull DBRProgressMonitor monitor,
         @NotNull DBPDataSourceContainer dataSourceContainer
     ) throws DBException {
         if (isDriverDisabled(dataSourceContainer.getDriver())) {
@@ -20,7 +20,7 @@ public abstract class BaseDatasourceAccessCheckHandler implements DBPDataSourceH
 
     @Override
     public void beforeDisconnect(
-        DBRProgressMonitor monitor,
+        @NotNull DBRProgressMonitor monitor,
         @NotNull DBPDataSourceContainer dataSourceContainer
     ) throws DBException {
 
