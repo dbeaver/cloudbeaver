@@ -36,6 +36,8 @@
 }
 
 .container .grid {
+  --rdg-cell-frozen-box-shadow: 2px 0 0 0 var(--theme-primary) !important;
+
   width: 100%;
   :global(.rdg-table-header__readonly-status) {
     background-color: var(--data-grid-readonly-status-color) !important;
