@@ -56,6 +56,7 @@ public abstract class BaseServletPlatform extends BasePlatformImpl {
         return folder;
     }
 
+    @NotNull
     public abstract ServletApplication getApplication();
 
     private void initTempFolder(@NotNull DBRProgressMonitor monitor) {

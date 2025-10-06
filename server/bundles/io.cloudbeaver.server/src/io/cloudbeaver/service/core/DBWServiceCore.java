@@ -119,7 +119,7 @@ public interface DBWServiceCore extends DBWService {
         @NotNull WebSession webSession,
         @Nullable String projectId,
         @NotNull String connectionId,
-        @NotNull Map<String, Object> authProperties,
+        @Nullable Map<String, Object> authProperties,
         @Nullable List<WebNetworkHandlerConfigInput> networkCredentials,
         boolean saveCredentials,
         boolean sharedCredentials,
@@ -181,7 +181,7 @@ public interface DBWServiceCore extends DBWService {
     WebConnectionFolderInfo createConnectionFolder(
         @NotNull WebSession session,
         @Nullable @WebObjectId String projectId,
-        @NotNull String parentNodePath,
+        @Nullable String parentNodePath,
         @NotNull String newName) throws DBWebException;
 
     @WebProjectAction(requireProjectPermissions = {RMConstants.PERMISSION_PROJECT_DATASOURCES_EDIT})
