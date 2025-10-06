@@ -198,9 +198,10 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
         }
         return false;
       },
-      async login(linkUser: boolean, provider?: AuthProvider, configuration?: AuthProviderConfiguration, hasOldHash?: boolean): Promise<void> {
+      async login(linkUser: boolean, provider?: AuthProvider, configuration?: AuthProviderConfiguration): Promise<void> {
         provider = (provider || state.activeProvider) ?? undefined;
         configuration = (configuration || state.activeConfiguration) ?? undefined;
+        const isFederatedLogin = !!provider?.federated && !!configuration;
 
         if (!provider || this.authenticating) {
           return;
@@ -223,8 +224,8 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
         try {
           this.state.setActiveProvider(provider, configuration ?? null);
 
-          if (provider.federated && configuration) {
-            await this.federatedLogin(provider, configuration);
+          if (isFederatedLogin) {
+            await this.federatedLogin(provider, configuration!);
           } else {
             await authInfoService.login(provider.id, {
               configurationId: configuration?.id,
@@ -238,14 +239,33 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
               },
               forceSessionsLogout: state.forceSessionsLogout,
               linkUser,
-              hasOldHash,
             });
           }
         } catch (exception: any) {
           const gqlError = errorOf(exception, GQLError);
+          const shouldReloginWithOldHash = !isFederatedLogin && gqlError?.errorCode === EServerErrorCode.invalidCredentials;
 
           if (gqlError?.errorCode === EServerErrorCode.tooManySessions) {
             state.isTooManySessions = true;
+          }
+
+          if (shouldReloginWithOldHash) {
+            try {
+              await authInfoService.login(provider.id, {
+                configurationId: configuration?.id,
+                credentials: {
+                  ...state.credentials,
+                  credentials: {
+                    ...state.credentials.credentials,
+                    user: state.credentials.credentials['user']?.trim(),
+                    password: state.credentials.credentials['password']?.trim(),
+                  },
+                },
+                forceSessionsLogout: state.forceSessionsLogout,
+                linkUser,
+                hasOldHash: true,
+              });
+            } catch {}
           }
 
           if (this.destroyed) {

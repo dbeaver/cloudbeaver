@@ -87,16 +87,11 @@ export const AuthDialog: DialogComponent<IAuthOptions, null> = observer(function
   }
 
   async function login(linkUser: boolean, provider?: AuthProvider, configuration?: AuthProviderConfiguration) {
-    async function attemptLogin(hasOldHash: boolean = false) {
-      await dialogData.login(linkUser, provider, configuration, hasOldHash);
-      resolveDialog();
-    }
-
     try {
-      await attemptLogin();
-    } catch {
-      await attemptLogin(true);
-    }
+      await dialogData.login(linkUser, provider, configuration);
+
+      resolveDialog();
+    } catch {}
   }
 
   function navToSettings() {
