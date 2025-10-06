@@ -24,7 +24,7 @@
   },
   "dependencies": {
     "@cloudbeaver/core-executor": "workspace:*",
-    "@wroud/di": "^0.19",
+    "@wroud/di": "^0",
     "@wroud/di-react": "^0",
     "react": "^19",
     "tslib": "^2"

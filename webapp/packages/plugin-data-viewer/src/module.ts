@@ -101,8 +101,6 @@ export default ModuleRegistry.add({
       .addScoped(DocumentDataAction)
       .addScoped(DocumentEditAction)
 
-      // .addScoped(
-      //   GridDataResultAction)
       .addScoped(GridEditAction)
       .addScoped(GridViewAction)
 
