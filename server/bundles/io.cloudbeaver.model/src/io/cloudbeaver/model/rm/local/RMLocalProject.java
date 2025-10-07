@@ -18,22 +18,15 @@ package io.cloudbeaver.model.rm.local;
 
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
-import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPWorkspace;
 import org.jkiss.dbeaver.model.auth.SMSessionContext;
-import org.jkiss.dbeaver.model.impl.app.BaseProjectImpl;
 import org.jkiss.dbeaver.model.rm.RMProjectType;
 import org.jkiss.dbeaver.model.rm.RMUtils;
-import org.jkiss.dbeaver.registry.DataSourceRegistry;
-import org.jkiss.utils.CommonUtils;
-import org.jkiss.utils.Pair;
+import org.jkiss.dbeaver.registry.project.LocalProjectImpl;
 
 import java.nio.file.Path;
-import java.util.Collection;
 
-public class RMLocalProject extends BaseProjectImpl {
-    @NotNull
-    private final Path projectPath;
+public class RMLocalProject extends LocalProjectImpl {
     @NotNull
     private final RMProjectType projectType;
 
@@ -43,11 +36,9 @@ public class RMLocalProject extends BaseProjectImpl {
         @NotNull Path projectPath,
         @NotNull RMProjectType type
     ) {
-        super(workspace, sessionContext);
-        this.projectPath = projectPath;
+        super(workspace, sessionContext, projectPath);
         this.projectType = type;
     }
-
 
     @Override
     public boolean isVirtual() {
@@ -60,88 +51,8 @@ public class RMLocalProject extends BaseProjectImpl {
         return RMUtils.makeProjectIdFromPath(projectPath, projectType);
     }
 
-    @NotNull
-    @Override
-    public String getName() {
-        Object projectName = this.getProjectProperty(PROP_PROJECT_NAME);
-        if (projectName != null) {
-            return projectName.toString();
-        }
-        return projectPath.getFileName().toString();
-    }
-
-    @NotNull
-    @Override
-    public Path getAbsolutePath() {
-        return projectPath;
-    }
-
-    @Override
-    public boolean isOpen() {
-        return true;
-    }
-
-    @Override
-    public void ensureOpen() {
-
-    }
-
-    @Override
-    public boolean isUseSecretStorage() {
-        return false;
-    }
-
-    public Path getMetadataFilePath() {
-        return getMetadataPath().resolve(METADATA_STORAGE_FILE);
-    }
-
-    /**
-     * Method for Bulk Update of resources properties paths
-     *
-     * @param oldToNewPaths collection of OldPath to NewPath pairs
-     */
-    public void moveResourcePropertiesBatch(@NotNull Collection<Pair<String, String>> oldToNewPaths) {
-        loadMetadata();
-        synchronized (metadataSync) {
-            for (var pathsPair : oldToNewPaths) {
-                final var oldResourcePath = CommonUtils.normalizeResourcePath(pathsPair.getFirst());
-                final var newResourcePath = CommonUtils.normalizeResourcePath(pathsPair.getSecond());
-                final var resProps = resourceProperties.remove(oldResourcePath);
-                if (resProps != null) {
-                    resourceProperties.put(newResourcePath, resProps);
-                }
-            }
-        }
-        flushMetadata();
-    }
-
-    /**
-     * Method for Bulk Remove of resources properties
-     */
-    public boolean resetResourcesPropertiesBatch(@NotNull Collection<String> resourcesPaths) {
-        loadMetadata();
-        boolean propertiesChanged = false;
-        synchronized (metadataSync) {
-            for (var resourcePath : resourcesPaths) {
-                var removedProperties = resourceProperties.remove(CommonUtils.normalizeResourcePath(resourcePath));
-                if (removedProperties != null) {
-                    propertiesChanged = true;
-                }
-            }
-        }
-        if (propertiesChanged) {
-            flushMetadata();
-        }
-        return propertiesChanged;
-    }
 
     public boolean canUpdateProjectName() {
         return RMProjectType.SHARED.equals(projectType);
-    }
-
-    @NotNull
-    @Override
-    protected DBPDataSourceRegistry createDataSourceRegistry() {
-        return new DataSourceRegistry<>(this);
     }
 }
