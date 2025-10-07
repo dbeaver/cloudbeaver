@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -90,13 +90,13 @@ export const ChangePassword = observer(function ChangePassword() {
         const context = contexts.getContext(userProfileContext);
 
         if ((state.oldPassword || state.password || state.repeatedPassword) && !context.force) {
-          const result = await commonDialogService.open(ConfirmationDialog, {
+          const { status } = await commonDialogService.open(ConfirmationDialog, {
             title: 'plugin_user_profile_authentication_change_password_cancel_title',
             message: 'plugin_user_profile_authentication_change_password_cancel_message',
             confirmActionText: 'ui_processing_ok',
           });
 
-          if (result === DialogueStateResult.Rejected) {
+          if (status === DialogueStateResult.Rejected) {
             ExecutorInterrupter.interrupt(contexts);
           }
         }

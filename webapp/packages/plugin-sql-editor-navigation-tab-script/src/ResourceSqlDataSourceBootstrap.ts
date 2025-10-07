@@ -151,14 +151,14 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
             name = getSqlEditorName(tab.handlerState, dataSource);
           }
 
-          const result = await this.commonDialogService.open(ConfirmationDialog, {
+          const { status } = await this.commonDialogService.open(ConfirmationDialog, {
             title: 'plugin_sql_editor_navigation_tab_resource_save_script_error_confirmation_title',
             message: 'plugin_sql_editor_navigation_tab_resource_save_script_error_confirmation_message',
             subTitle: name,
             confirmActionText: 'ui_close',
           });
 
-          if (result === DialogueStateResult.Rejected) {
+          if (status === DialogueStateResult.Rejected) {
             return false;
           }
         }

@@ -116,6 +116,9 @@
       "path": "../plugin-app-logo-administration"
     },
     {
+      "path": "../plugin-async-task-confirmation"
+    },
+    {
       "path": "../plugin-authentication"
     },
     {
@@ -246,6 +249,9 @@
     },
     {
       "path": "../plugin-settings-panel"
+    },
+    {
+      "path": "../plugin-sql-async-task-confirmation"
     },
     {
       "path": "../plugin-sql-editor"

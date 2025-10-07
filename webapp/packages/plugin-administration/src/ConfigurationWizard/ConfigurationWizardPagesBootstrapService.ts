@@ -120,12 +120,12 @@ export class ConfigurationWizardPagesBootstrapService extends Bootstrap {
         }
 
         if (!configurationWizard && state?.isChanged) {
-          const result = await this.commonDialogService.open(ConfirmationDialog, {
+          const { status } = await this.commonDialogService.open(ConfirmationDialog, {
             title: 'ui_save_reminder',
             message: 'ui_are_you_sure',
           });
 
-          if (result === DialogueStateResult.Rejected) {
+          if (status === DialogueStateResult.Rejected) {
             return false;
           }
         }

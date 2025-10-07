@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -72,23 +72,21 @@ export class DataImportBootstrap extends Bootstrap {
             throw new Error('Execution context must be provided');
           }
 
-          const state = await this.commonDialogService.open(DataImportDialogLazy, { tableName: model.name ?? model.id });
+          const { status, result: dialogResult } = await this.commonDialogService.open(DataImportDialogLazy, { tableName: model.name ?? model.id });
 
-          if (state === DialogueStateResult.Rejected || state === DialogueStateResult.Resolved) {
-            return;
-          }
+          if (status === DialogueStateResult.Resolved && dialogResult) {
+            const success = await this.dataImportService.importData(
+              executionContext.connectionId,
+              executionContext.id,
+              executionContext.projectId,
+              result.id,
+              dialogResult.processorId,
+              dialogResult.file,
+            );
 
-          const success = await this.dataImportService.importData(
-            executionContext.connectionId,
-            executionContext.id,
-            executionContext.projectId,
-            result.id,
-            state.processorId,
-            state.file,
-          );
-
-          if (success) {
-            await model.refresh();
+            if (success) {
+              await model.refresh();
+            }
           }
         }
       },

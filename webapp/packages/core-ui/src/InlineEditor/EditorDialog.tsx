@@ -31,8 +31,11 @@ export const EditorDialog: DialogComponent<string, string> = observer(function E
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [value, setValue] = useState(payload);
   const handleChange = useCallback((event: ChangeEvent<HTMLTextAreaElement>) => setValue(event.target.value), []);
-  const handleApply = useCallback(() => resolveDialog(value), [value, resolveDialog]);
   const translate = useTranslate();
+
+  function handleApply() {
+    resolveDialog(value);
+  }
 
   useEffect(() => {
     setTimeout(() => textareaRef.current?.focus(), 100);
@@ -45,7 +48,7 @@ export const EditorDialog: DialogComponent<string, string> = observer(function E
         <textarea ref={textareaRef} className={s(styles, { textarea: true })} value={value} onChange={handleChange} />
       </CommonDialogBody>
       <CommonDialogFooter className={s(styles, { footer: true })}>
-        <Button type="button" variant="secondary" onClick={rejectDialog}>
+        <Button type="button" variant="secondary" onClick={() => rejectDialog()}>
           {translate('app_shared_inlineEditor_dialog_cancel')}
         </Button>
         <Button type="button" onClick={handleApply}>

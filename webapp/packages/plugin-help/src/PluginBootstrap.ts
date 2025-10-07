@@ -103,7 +103,7 @@ export class PluginBootstrap extends Bootstrap {
       handler: async (context, action) => {
         switch (action) {
           case ACTION_APP_HELP: {
-            await this.commonDialogService.open(ShortcutsDialog, null);
+            await this.commonDialogService.open(ShortcutsDialog, undefined);
             break;
           }
         }

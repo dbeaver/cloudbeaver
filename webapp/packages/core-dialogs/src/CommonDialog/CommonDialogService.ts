@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,16 @@ export interface DialogOptions {
   persistent?: boolean;
 }
 
-export interface DialogComponentProps<TPayload, TResult = DialogueStateResult> {
+export interface DialogComponentProps<TPayload = void, TResult = void> {
   visible: boolean;
   payload: TPayload;
   options?: DialogOptions;
   resolveDialog: (result?: TResult) => void;
-  rejectDialog: () => void; // the dialog was closed by cancel button or backdrop click
+  rejectDialog: (result?: TResult) => void; // the dialog was closed by cancel button or backdrop click
   className?: string;
 }
 
-export type DialogComponent<TPayload, TResult = DialogueStateResult> = React.FC<DialogComponentProps<TPayload, TResult>>;
+export type DialogComponent<TPayload = void, TResult = void> = React.FC<DialogComponentProps<TPayload, TResult>>;
 
 export enum DialogueStateResult {
   Resolved,
@@ -35,8 +35,13 @@ export interface DialogInternal<TResult> {
   component: DialogComponent<any, any>;
   payload: any;
   options?: DialogOptions;
-  resolve: (result: TResult | DialogueStateResult) => void;
-  promise: Promise<TResult | DialogueStateResult>;
+  resolve: (result: DialogResult<TResult>) => void;
+  promise: Promise<DialogResult<TResult>>;
+}
+
+export interface DialogResult<TResult = void> {
+  status: DialogueStateResult;
+  result?: TResult;
 }
 
 @injectable()
@@ -44,14 +49,10 @@ export class CommonDialogService {
   dialogs: Array<DialogInternal<any>> = observable([], { deep: false });
 
   // note that if dialog is closed by user it will be resolved with DialogueStateResult.Rejected
-  open<TPayload, TResult>(
-    component: DialogComponent<TPayload, TResult>,
-    payload: TPayload,
-    options?: DialogOptions,
-  ): Promise<TResult | DialogueStateResult> {
-    let _resolve: (value: TResult | DialogueStateResult) => void;
+  open<TPayload, TResult>(component: DialogComponent<TPayload, TResult>, payload: TPayload, options?: DialogOptions): Promise<DialogResult<TResult>> {
+    let _resolve: (value: DialogResult<TResult>) => void;
 
-    const promise = new Promise<TResult | DialogueStateResult>(resolve => {
+    const promise = new Promise<DialogResult<TResult>>(resolve => {
       _resolve = resolve;
     });
 
@@ -68,11 +69,11 @@ export class CommonDialogService {
     return promise;
   }
 
-  rejectDialog(promise: Promise<any>): void {
+  rejectDialog<TResult>(promise: Promise<DialogResult<TResult>>, result?: TResult): void {
     const dialog = this.dialogs.find(internal => internal.promise === promise);
 
     if (dialog) {
-      dialog.resolve(DialogueStateResult.Rejected);
+      dialog.resolve({ status: DialogueStateResult.Rejected, result });
       this.removeDialog(dialog);
     }
   }
@@ -86,11 +87,14 @@ export class CommonDialogService {
     });
   }
 
-  resolveDialog<TResult>(promise: Promise<TResult | DialogueStateResult>, result?: TResult): void {
+  resolveDialog<TResult>(promise: Promise<DialogResult<TResult>>, result?: TResult): void {
     const dialog = this.dialogs.find(internal => internal.promise === promise);
 
     if (dialog) {
-      dialog.resolve(result ?? DialogueStateResult.Resolved);
+      dialog.resolve({
+        status: DialogueStateResult.Resolved,
+        result,
+      });
       this.removeDialog(dialog);
     }
   }

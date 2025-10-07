@@ -23,7 +23,7 @@ import { RouterService } from '@cloudbeaver/core-routing';
 
 import style from './ServerNodeChangedDialog.module.css';
 
-export const ServerNodeChangedDialog: DialogComponent<null, null> = observer(function ServerNodeChangedDialog({ rejectDialog }) {
+export const ServerNodeChangedDialog: DialogComponent = observer(function ServerNodeChangedDialog({ rejectDialog }) {
   const styles = useS(style);
   const routerService = useService(RouterService);
   const translate = useTranslate();
@@ -38,7 +38,7 @@ export const ServerNodeChangedDialog: DialogComponent<null, null> = observer(fun
         <p className={s(styles, { text: true })}>{translate('app_root_server_node_changed_message')}</p>
       </CommonDialogBody>
       <CommonDialogFooter className={s(styles, { footer: true })}>
-        <Button type="button" variant="secondary" onClick={rejectDialog}>
+        <Button type="button" variant="secondary" onClick={() => rejectDialog()}>
           {translate('ui_processing_cancel')}
         </Button>
         <Button type="button" onClick={reload}>

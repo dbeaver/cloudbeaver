@@ -207,12 +207,12 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
         }
 
         if (state.isTooManySessions && state.forceSessionsLogout) {
-          const result = await commonDialogService.open(ConfirmationDialog, {
+          const { status } = await commonDialogService.open(ConfirmationDialog, {
             title: 'authentication_auth_force_session_logout_popup_title',
             message: 'authentication_auth_force_session_logout_popup_message',
           });
 
-          if (result === DialogueStateResult.Rejected) {
+          if (status === DialogueStateResult.Rejected) {
             throw new UIError('Force session logout confirmation dialog rejected');
           }
         }

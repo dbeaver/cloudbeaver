@@ -94,13 +94,13 @@ export class NavNodeContextMenuService extends Bootstrap {
         message = message + '\n' + this.localizationService.translate('app_navigationTree_node_folder_delete_confirmation');
       }
 
-      const result = await this.commonDialogService.open(ConfirmationDialogDelete, {
+      const { status } = await this.commonDialogService.open(ConfirmationDialogDelete, {
         title: 'ui_data_delete_confirmation',
         message,
         confirmActionText: 'ui_delete',
       });
 
-      if (result === DialogueStateResult.Rejected) {
+      if (status === DialogueStateResult.Rejected) {
         ExecutorInterrupter.interrupt(contexts);
       }
     });
@@ -162,7 +162,7 @@ export class NavNodeContextMenuService extends Bootstrap {
             if (actions?.rename) {
               actions.rename(save);
             } else {
-              const result = await this.commonDialogService.open(RenameDialog, {
+              const { status, result } = await this.commonDialogService.open(RenameDialog, {
                 name,
                 subTitle: name,
                 objectName: node.nodeType || 'Object',
@@ -170,7 +170,7 @@ export class NavNodeContextMenuService extends Bootstrap {
                 validation: name => name.trim().length > 0,
               });
 
-              if (result !== DialogueStateResult.Rejected && result !== DialogueStateResult.Resolved) {
+              if (status === DialogueStateResult.Resolved && result !== undefined) {
                 save(result);
               }
             }

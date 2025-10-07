@@ -108,7 +108,7 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<Payload>>(functi
             <Button variant="secondary" onClick={() => copy(state.query, true)}>
               {translate('ui_copy_to_clipboard')}
             </Button>
-            <Button onClick={rejectDialog}>{translate('ui_close')}</Button>
+            <Button onClick={() => rejectDialog()}>{translate('ui_close')}</Button>
           </div>
         </div>
       </CommonDialogFooter>

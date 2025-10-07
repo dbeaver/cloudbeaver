@@ -30,9 +30,9 @@ export class ServerNodeChangedDialogBootstrap extends Bootstrap {
   }
 
   private async handleServerNodeChanged(): Promise<void> {
-    const state = await this.commonDialogService.open(ServerNodeChangedDialog, null);
+    const { status } = await this.commonDialogService.open(ServerNodeChangedDialog, undefined);
 
-    if (state === DialogueStateResult.Rejected) {
+    if (status === DialogueStateResult.Rejected) {
       this.notificationService.customNotification(
         () => ActionSnackbar,
         {

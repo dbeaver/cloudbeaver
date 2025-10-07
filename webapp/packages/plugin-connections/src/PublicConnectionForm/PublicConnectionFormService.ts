@@ -184,23 +184,23 @@ export class PublicConnectionFormService {
       return true;
     }
 
-    const result = await this.commonDialogService.open(ConfirmationDialog, {
+    const { status } = await this.commonDialogService.open(ConfirmationDialog, {
       title: 'plugin_connections_connection_edit_cancel_title',
       message: 'plugin_connections_connection_edit_cancel_message',
       confirmActionText: 'ui_processing_ok',
     });
 
-    return result !== DialogueStateResult.Rejected;
+    return status !== DialogueStateResult.Rejected;
   }
 
   private async tryReconnect(connectionKey: IConnectionInfoParams) {
-    const result = await this.commonDialogService.open(ConfirmationDialog, {
+    const { status } = await this.commonDialogService.open(ConfirmationDialog, {
       title: 'plugin_connections_connection_edit_reconnect_title',
       message: 'plugin_connections_connection_edit_reconnect_message',
       confirmActionText: 'ui_reconnect',
     });
 
-    if (result === DialogueStateResult.Rejected) {
+    if (status === DialogueStateResult.Rejected) {
       return;
     }
 

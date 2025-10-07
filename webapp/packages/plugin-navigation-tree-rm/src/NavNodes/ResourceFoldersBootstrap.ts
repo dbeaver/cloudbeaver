@@ -215,7 +215,7 @@ export class ResourceFoldersBootstrap extends Bootstrap {
           }
         }
 
-        const result = await this.commonDialogService.open(FolderDialog, {
+        const { status, result } = await this.commonDialogService.open(FolderDialog, {
           value: this.localizationService.translate('ui_folder_new'),
           projectId: targetNode.projectId,
           folder: path,
@@ -246,7 +246,7 @@ export class ResourceFoldersBootstrap extends Bootstrap {
           },
         });
 
-        if (result !== DialogueStateResult.Rejected && result !== DialogueStateResult.Resolved) {
+        if (status === DialogueStateResult.Resolved && result !== undefined) {
           try {
             const root = this.getResourceTypeFolder(result.projectId, resourceTypeId);
             const key = getRmResourcePath(result.projectId, result.folder ?? root);

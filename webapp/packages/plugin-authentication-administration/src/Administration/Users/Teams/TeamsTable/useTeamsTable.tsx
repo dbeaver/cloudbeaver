@@ -69,13 +69,13 @@ export function useTeamsTable(): Readonly<State> {
         const message = `${translate('administration_teams_delete_confirmation')}${teamNames}.\n\n${translate(
           'administration_teams_delete_confirmation_users_note',
         )}.\n\n${translate('ui_are_you_sure')}`;
-        const result = await dialogService.open(ConfirmationDialogDelete, {
+        const { status } = await dialogService.open(ConfirmationDialogDelete, {
           title: 'ui_data_delete_confirmation',
           message,
           confirmActionText: 'ui_delete',
         });
 
-        if (result === DialogueStateResult.Rejected) {
+        if (status === DialogueStateResult.Rejected) {
           return;
         }
 

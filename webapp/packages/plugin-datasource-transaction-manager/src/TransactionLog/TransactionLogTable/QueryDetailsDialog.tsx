@@ -29,7 +29,7 @@ export const QueryDetailsDialog: DialogComponent<IPayload> = observer(function Q
         <SQLCodeEditorLoader value={props.payload.text} extensions={extensions} readonly />
       </CommonDialogBody>
       <CommonDialogFooter>
-        <Button variant="secondary" onClick={props.rejectDialog}>
+        <Button variant="secondary" onClick={() => props.rejectDialog()}>
           {translate('ui_stepper_back')}
         </Button>
       </CommonDialogFooter>

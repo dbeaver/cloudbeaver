@@ -56,7 +56,7 @@ export class AuthenticationService extends Bootstrap {
   configureAuthProvider: (() => void) | null;
   configureIdentityProvider: (() => void) | null;
 
-  private authPromise: Promise<DialogueStateResult | null> | null;
+  private authPromise: Promise<DialogueStateResult> | null;
 
   constructor(
     private readonly screenService: ScreenService,
@@ -180,12 +180,12 @@ export class AuthenticationService extends Bootstrap {
 
     this.authPromise = this.authDialogService
       .showLoginForm(persistent, options)
-      .then(async state => {
-        if (state === DialogueStateResult.Rejected) {
-          return state;
+      .then(async ({ status }) => {
+        if (status === DialogueStateResult.Rejected) {
+          return status;
         }
         await this.onLogin.execute('after');
-        return state;
+        return status;
       })
       .finally(() => {
         this.authPromise = null;

@@ -69,7 +69,7 @@ export const DeleteUserDialog: DialogComponent<IPayload> = function DeleteUserDi
         </Container>
       </CommonDialogBody>
       <CommonDialogFooter>
-        <Button variant="secondary" onClick={props.rejectDialog}>
+        <Button variant="secondary" onClick={() => props.rejectDialog()}>
           {translate('ui_processing_cancel')}
         </Button>
         <Fill />

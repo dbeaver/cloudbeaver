@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ export abstract class TopicEventHandler<
   private readonly serverSubject?: Observable<TEvent>;
   private readonly subject: Subject<TEvent>;
   constructor(
-    topic: string,
+    readonly topic: string,
     private readonly emitter: IServerEventEmitter<SourceEvent>,
   ) {
     this.onInit = new SyncExecutor();
@@ -103,7 +103,7 @@ export abstract class TopicEventHandler<
   }
 
   emit<T extends SourceEvent>(event: T): this {
-    this.emitter.emit(event);
+    this.emitter.emit({ topicId: this.topic, ...event });
     return this;
   }
 

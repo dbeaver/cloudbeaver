@@ -37,6 +37,7 @@ import coreUi from '@cloudbeaver/core-ui/module';
 import coreVersion from '@cloudbeaver/core-version/module';
 import coreVersionUpdate from '@cloudbeaver/core-version-update/module';
 import coreView from '@cloudbeaver/core-view/module';
+import coreServerNotifications from '@cloudbeaver/core-server-notifications/module';
 
 import pluginAdministration from '@cloudbeaver/plugin-administration/module';
 import pluginAppLogo from '@cloudbeaver/plugin-app-logo/module';
@@ -102,7 +103,8 @@ import pluginVersionUpdateAdministration from '@cloudbeaver/plugin-version-updat
 import pluginSystemInformationAdministration from '@cloudbeaver/plugin-system-information-administration/module';
 import pluginSettingsDefaultAdministration from '@cloudbeaver/plugin-settings-default-administration/module';
 import pluginCodemirror6 from '@cloudbeaver/plugin-codemirror6/module';
-import coreServerNotifications from '@cloudbeaver/core-server-notifications/module';
+import pluginAsyncTaskConfirmation from '@cloudbeaver/plugin-async-task-confirmation/module';
+import pluginSqlAsyncTaskConfirmation from '@cloudbeaver/plugin-sql-async-task-confirmation/module';
 
 const core = [
   coreRouting, // important, should be first because the router starts in load phase first after all plugins register phase
@@ -205,4 +207,6 @@ export const commonSet = [
   pluginSystemInformationAdministration,
   pluginSettingsDefaultAdministration,
   pluginCodemirror6,
+  pluginAsyncTaskConfirmation,
+  pluginSqlAsyncTaskConfirmation,
 ];

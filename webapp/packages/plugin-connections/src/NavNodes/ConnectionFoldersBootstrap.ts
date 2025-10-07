@@ -127,13 +127,13 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
         return;
       }
 
-      const result = await this.commonDialogService.open(ConfirmationDialogDelete, {
+      const { status } = await this.commonDialogService.open(ConfirmationDialogDelete, {
         title: 'ui_data_delete_confirmation',
         message: this.localizationService.translate('plugin_connections_connection_folder_delete_confirmation', undefined, { name: nodes }),
         confirmActionText: 'ui_delete',
       });
 
-      if (result === DialogueStateResult.Rejected) {
+      if (status === DialogueStateResult.Rejected) {
         ExecutorInterrupter.interrupt(contexts);
       } else {
         deleteContext.confirm();
@@ -316,7 +316,7 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
           parentFolderParam = getConnectionFolderIdFromNodeId(targetNode.folderId);
         }
 
-        const result = await this.commonDialogService.open(FolderDialog, {
+        const { status, result } = await this.commonDialogService.open(FolderDialog, {
           value: this.localizationService.translate('ui_folder_new_default_name'),
           projectId: targetNode.projectId,
           folder: parentFolderParam?.folderId,
@@ -343,7 +343,7 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
           },
         });
 
-        if (result !== DialogueStateResult.Rejected && result !== DialogueStateResult.Resolved) {
+        if (status == DialogueStateResult.Resolved && result) {
           try {
             await this.connectionFolderResource.create(result.projectId, result.name, result.folder);
             this.navTreeResource.markOutdated(

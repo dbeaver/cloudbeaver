@@ -30,9 +30,9 @@ export class SessionExpiredDialogBootstrap extends Bootstrap {
   }
 
   private async handleSessionExpired(): Promise<void> {
-    const state = await this.commonDialogService.open(SessionExpiredDialog, null);
+    const { status } = await this.commonDialogService.open(SessionExpiredDialog, null);
 
-    if (state === DialogueStateResult.Rejected) {
+    if (status === DialogueStateResult.Rejected) {
       this.notificationService.customNotification(
         () => ActionSnackbar,
         {

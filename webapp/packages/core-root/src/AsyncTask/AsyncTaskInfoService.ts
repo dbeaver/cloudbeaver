@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,20 @@ import type { Unsubscribe } from '../ServerEventEmitter/IServerEventEmitter.js';
 import { ServerEventId } from '../SessionEventSource.js';
 import { AsyncTask } from './AsyncTask.js';
 import { AsyncTaskInfoEventHandler } from './AsyncTaskInfoEventHandler.js';
+import { Executor, type IExecutor } from '@cloudbeaver/core-executor';
+
+export interface IBaseAsyncTaskEvent {
+  id: string;
+  taskId: string;
+}
 
 @injectable(() => [GraphQLService, AsyncTaskInfoEventHandler])
 export class AsyncTaskInfoService extends Disposable {
+  readonly onExecuteEvent: IExecutor<IBaseAsyncTaskEvent>;
+
   private readonly tasks: Map<string, AsyncTask>;
   private readonly taskIdAliases: Map<string, string>;
-  private readonly pendingEvents: Map<string, WsAsyncTaskInfo>;
+  private readonly pendingEvents: Map<string, IBaseAsyncTaskEvent[]>;
   private connection: Subscription | null;
   private onEventUnsubscribe: Unsubscribe | null;
 
@@ -32,9 +40,10 @@ export class AsyncTaskInfoService extends Disposable {
     this.taskIdAliases = new Map();
     this.pendingEvents = new Map();
     this.connection = null;
+    this.onExecuteEvent = new Executor();
     this.handleEvent = this.handleEvent.bind(this);
 
-    this.onEventUnsubscribe = asyncTaskInfoEventHandler.onEvent<WsAsyncTaskInfo>(ServerEventId.CbSessionTaskInfoUpdated, this.handleEvent);
+    this.onEventUnsubscribe = asyncTaskInfoEventHandler.on<IBaseAsyncTaskEvent>(this.handleEvent);
   }
 
   private async updateTask(task: AsyncTask, data: WsAsyncTaskInfo) {
@@ -52,15 +61,21 @@ export class AsyncTaskInfoService extends Disposable {
     }
   }
 
-  private async handleEvent(data: WsAsyncTaskInfo) {
+  private async handleEvent(data: IBaseAsyncTaskEvent) {
     const task = this.getTask(data.taskId);
 
     if (!task) {
-      this.pendingEvents.set(data.taskId, data);
+      let pendingEvents = this.pendingEvents.get(data.taskId) ?? [];
+
+      if (data.id === ServerEventId.CbSessionTaskInfoUpdated) {
+        pendingEvents = pendingEvents.filter(e => e.id !== data.id);
+      }
+
+      this.pendingEvents.set(data.taskId, pendingEvents.concat(data));
       return;
     }
 
-    await this.updateTask(task, data);
+    await this.executeEvent(task, data);
   }
 
   override dispose(): void {
@@ -79,10 +94,13 @@ export class AsyncTaskInfoService extends Disposable {
 
       this.taskIdAliases.set(info.id, task.id);
 
-      const pendingEvent = this.pendingEvents.get(info.id);
-      if (pendingEvent) {
+      const pendingEvents = this.pendingEvents.get(info.id);
+      if (pendingEvents) {
         this.pendingEvents.delete(info.id);
-        this.updateTask(task, pendingEvent);
+
+        for (const pendingEvent of pendingEvents) {
+          this.executeEvent(task, pendingEvent);
+        }
       }
     });
 
@@ -91,6 +109,17 @@ export class AsyncTaskInfoService extends Disposable {
     }
 
     return task;
+  }
+
+  private async executeEvent(task: AsyncTask, event: IBaseAsyncTaskEvent): Promise<void> {
+    switch (event.id) {
+      case ServerEventId.CbSessionTaskInfoUpdated:
+        await this.updateTask(task, event as WsAsyncTaskInfo);
+        break;
+      default:
+        await this.onExecuteEvent.execute(event);
+        break;
+    }
   }
 
   private getTask(taskId: string): AsyncTask | undefined {

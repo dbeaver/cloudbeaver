@@ -325,22 +325,20 @@ export class DataGridContextMenuFilterService {
               },
               {
                 onSelect: async () => {
-                  const customValue = await this.commonDialogService.open(FilterCustomValueDialog, {
+                  const { status, result } = await this.commonDialogService.open(FilterCustomValueDialog, {
                     defaultValue: displayString,
                     inputTitle: title + ':',
                   });
 
-                  if (customValue === DialogueStateResult.Rejected || customValue === DialogueStateResult.Resolved) {
-                    return;
+                  if (status === DialogueStateResult.Resolved && result !== undefined) {
+                    await this.applyFilter(
+                      model as unknown as IDatabaseDataModel<ResultSetDataSource>,
+                      resultIndex,
+                      key.column,
+                      operation.id,
+                      result,
+                    );
                   }
-
-                  await this.applyFilter(
-                    model as unknown as IDatabaseDataModel<ResultSetDataSource>,
-                    resultIndex,
-                    key.column,
-                    operation.id,
-                    customValue,
-                  );
                 },
               },
             );

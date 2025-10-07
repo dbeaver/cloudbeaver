@@ -58,7 +58,7 @@ export const DVGroupingColumnEditorDialog = observer<DialogComponentProps<Payloa
     setFunctions(functions.filter(column => column !== name));
   }
 
-  async function submit() {
+  function submit() {
     grouping.setColumns(columns);
     grouping.setFunctions(functions);
     resolveDialog();
@@ -93,7 +93,7 @@ export const DVGroupingColumnEditorDialog = observer<DialogComponentProps<Payloa
       </CommonDialogBody>
       <CommonDialogFooter>
         <div className={s(style, { footerContainer: true })}>
-          <Button variant="secondary" onClick={rejectDialog}>
+          <Button variant="secondary" onClick={() => rejectDialog()}>
             {translate('ui_close')}
           </Button>
           <Button onClick={submit}>{translate('ui_apply')}</Button>

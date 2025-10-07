@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -79,12 +79,12 @@ export const InlineEditor = observer<InlineEditorProps, HTMLInputElement>(
     }, []);
 
     const handlePopup = useCallback(async () => {
-      const newValue = await commonDialogService.open(EditorDialog, props.value);
-      if (newValue === DialogueStateResult.Rejected || newValue === DialogueStateResult.Resolved) {
-        props.onReject?.();
-      } else {
-        props.onChange(newValue);
+      const { status, result } = await commonDialogService.open(EditorDialog, props.value);
+      if (status === DialogueStateResult.Resolved && result !== undefined) {
+        props.onChange(result);
         props.onSave?.();
+      } else {
+        props.onReject?.();
       }
     }, []);
 

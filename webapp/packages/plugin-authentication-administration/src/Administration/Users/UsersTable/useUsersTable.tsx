@@ -78,13 +78,13 @@ export function useUsersTable(filters: IUserFilters) {
         const userNames = deletionList.map(name => `"${name}"`).join(', ');
         const message = `${translate('authentication_administration_users_delete_confirmation')}${userNames}. ${translate('ui_are_you_sure')}`;
 
-        const result = await commonDialogService.open(ConfirmationDialogDelete, {
+        const { status } = await commonDialogService.open(ConfirmationDialogDelete, {
           title: 'ui_data_delete_confirmation',
           message,
           confirmActionText: 'ui_delete',
         });
 
-        if (result === DialogueStateResult.Rejected) {
+        if (status === DialogueStateResult.Rejected) {
           return;
         }
 

@@ -26,7 +26,7 @@ import { Shortcut } from './Shortcut.js';
 import { DATA_VIEWER_SHORTCUTS, NAVIGATION_TREE_SHORTCUTS, SQL_EDITOR_SHORTCUTS } from './SHORTCUTS_DATA.js';
 import style from './ShortcutsDialog.module.css';
 
-export const ShortcutsDialog: DialogComponent<null> = function ShortcutsDialog({ rejectDialog }) {
+export const ShortcutsDialog: DialogComponent = function ShortcutsDialog({ rejectDialog }) {
   const translate = useTranslate();
   const styles = useS(style);
 
@@ -68,7 +68,7 @@ export const ShortcutsDialog: DialogComponent<null> = function ShortcutsDialog({
         </Container>
       </CommonDialogBody>
       <CommonDialogFooter>
-        <Button className={s(styles, { button: true })} type="button" variant="secondary" onClick={rejectDialog}>
+        <Button className={s(styles, { button: true })} type="button" variant="secondary" onClick={() => rejectDialog()}>
           {translate('ui_close')}
         </Button>
       </CommonDialogFooter>

@@ -99,7 +99,7 @@ export class NavTreeRMContextMenuBootstrap extends Bootstrap {
             if (actions?.rename) {
               actions.rename(save);
             } else {
-              const result = await this.commonDialogService.open(RenameDialog, {
+              const { status, result } = await this.commonDialogService.open(RenameDialog, {
                 name: key.name ?? '',
                 subTitle: key.name,
                 objectName: node.nodeType || 'Object',
@@ -107,7 +107,7 @@ export class NavTreeRMContextMenuBootstrap extends Bootstrap {
                 validation: name => name.trim().length > 0,
               });
 
-              if (result !== DialogueStateResult.Rejected && result !== DialogueStateResult.Resolved) {
+              if (status === DialogueStateResult.Resolved && result !== undefined) {
                 save(result);
               }
             }

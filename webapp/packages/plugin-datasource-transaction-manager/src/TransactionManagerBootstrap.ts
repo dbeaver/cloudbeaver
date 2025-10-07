@@ -256,16 +256,16 @@ export class TransactionManagerBootstrap extends Bootstrap {
 
           if (transaction?.autoCommit === false) {
             const connectionData = this.connectionInfoResource.get(connectionKey);
-            const state = await this.commonDialogService.open(ConfirmationDialog, {
+            const { status, result } = await this.commonDialogService.open(ConfirmationDialog, {
               title: `${this.localizationService.translate('plugin_datasource_transaction_manager_commit')} (${connectionData?.name ?? context.id})`,
               message: 'plugin_datasource_transaction_manager_commit_confirmation_message',
               confirmActionText: 'plugin_datasource_transaction_manager_commit',
-              extraStatus: 'no',
+              showExtraAction: true,
             });
 
-            if (state === DialogueStateResult.Resolved) {
+            if (status === DialogueStateResult.Resolved) {
               await this.commit(transaction, () => ExecutorInterrupter.interrupt(contexts));
-            } else if (state === DialogueStateResult.Rejected) {
+            } else if (!result?.isExtraAction) {
               ExecutorInterrupter.interrupt(contexts);
             }
           }

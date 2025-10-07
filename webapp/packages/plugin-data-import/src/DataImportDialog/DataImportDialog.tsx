@@ -60,7 +60,7 @@ export const DataImportDialog: DialogComponent<IDataImportDialogPayload, IDataIm
       </CommonDialogBody>
 
       <CommonDialogFooter>
-        <Button type="button" variant="secondary" onClick={rejectDialog}>
+        <Button type="button" variant="secondary" onClick={() => rejectDialog()}>
           {translate('ui_processing_cancel')}
         </Button>
         <Fill />
