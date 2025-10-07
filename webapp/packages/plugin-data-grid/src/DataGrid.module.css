@@ -21,18 +21,18 @@
   border: none !important;
   color-scheme: inherit !important;
 
-  :global(.rdg-cell:not(.rdg-editor-container)) {
+  :global(.rdg-cell) {
     outline: 0 !important;
 
     &[aria-selected='true'] {
-      border: 1px solid #808080 !important;
+      box-shadow: inset 0 0 0 1px #808080;
     }
   }
 
   :global(.rdg-cell-editing) {
     overflow: visible;
     height: 24px;
-    border: none !important;
+    box-shadow: none !important;
   }
 }
 
