@@ -34,14 +34,10 @@
     height: 24px;
     border: none !important;
   }
-
-  :global(.rdg-editor-container) {
-    border: none !important;
-  }
 }
 
 .dataGrid:focus-within {
-  :global(.rdg-cell:not(.rdg-editor-container)[aria-selected='true']) {
-    border: 1px solid var(--rdg-selection-color) !important;
+  :global(.rdg-cell[aria-selected='true']) {
+    box-shadow: inset 0 0 0 1px var(--rdg-selection-color) !important;
   }
 }

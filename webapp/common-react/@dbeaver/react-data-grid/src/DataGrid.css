@@ -5,4 +5,10 @@
   .rdg {
     --dbv-kit-icon-btn-outline-width: 1px;
   }
+
+  .rdg-cell-frozen {
+    &:nth-last-child(1 of &) {
+      border-inline-end-width: 3px;
+    }
+  }
 }
