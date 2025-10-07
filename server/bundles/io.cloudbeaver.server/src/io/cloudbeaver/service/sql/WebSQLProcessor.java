@@ -1283,7 +1283,7 @@ public class WebSQLProcessor implements WebSessionProvider {
         webSession.addSessionEvent(createConfirmationEvent(asyncTask, query));
 
         try {
-            Boolean isConfirmed = confirmationFuture.get(3, TimeUnit.SECONDS);
+            Boolean isConfirmed = confirmationFuture.get(30, TimeUnit.SECONDS);
             return isConfirmed != null && isConfirmed;
         } catch (TimeoutException e) {
             throw new DBWebException("Query confirmation timeout");
