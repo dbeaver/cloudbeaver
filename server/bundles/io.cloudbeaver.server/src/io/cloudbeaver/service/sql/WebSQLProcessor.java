@@ -23,8 +23,6 @@ import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.session.WebSessionProvider;
 import io.cloudbeaver.server.WebAppUtils;
 import io.cloudbeaver.server.jobs.SqlOutputLogReaderJob;
-import io.cloudbeaver.websocket.WSServerSessionTaskConfirmationRequestEvent;
-import io.cloudbeaver.websocket.WSServerSessionTaskQueryConfirmationRequestEvent;
 import org.eclipse.jface.text.Document;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
@@ -53,6 +51,8 @@ import org.jkiss.dbeaver.model.sql.parser.SQLScriptParser;
 import org.jkiss.dbeaver.model.struct.*;
 import org.jkiss.dbeaver.model.websocket.event.WSEvent;
 import org.jkiss.dbeaver.model.websocket.event.WSTransactionalCountEvent;
+import org.jkiss.dbeaver.model.websocket.event.session.WSSessionTaskConfirmationRequestEvent;
+import org.jkiss.dbeaver.model.websocket.event.session.WSSessionTaskQueryConfirmationRequestEvent;
 import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
@@ -1305,11 +1305,11 @@ public class WebSQLProcessor implements WebSessionProvider {
 
         WSEvent confirmationEvent;
         if (query != null) {
-            confirmationEvent = new WSServerSessionTaskQueryConfirmationRequestEvent(
+            confirmationEvent = new WSSessionTaskQueryConfirmationRequestEvent(
                 asyncTask.getId(), title, message, query
             );
         } else {
-            confirmationEvent = new WSServerSessionTaskConfirmationRequestEvent(
+            confirmationEvent = new WSSessionTaskConfirmationRequestEvent(
                 asyncTask.getId(), title, message
             );
         }
