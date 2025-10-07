@@ -1282,16 +1282,7 @@ public class WebSQLProcessor implements WebSessionProvider {
             CompletableFuture<Boolean> confirmationFuture = new CompletableFuture<>();
             webSession.setAttribute(attributeName, confirmationFuture);
 
-            String title = "Confirm query execution";
-            String message = "The query you're about to execute can modify existing data or schema.\nDo you want to continue?";
-
-            WSEvent confirmationEvent;
-            if (query != null) {
-                confirmationEvent = new WSServerSessionTaskQueryConfirmationRequestEvent(title, message, query);
-            } else {
-                confirmationEvent = new WSServerSessionTaskConfirmationRequestEvent(title, message);
-            }
-            webSession.addSessionEvent(confirmationEvent);
+            webSession.addSessionEvent(createConfirmationEvent(asyncTask, query));
 
             try {
                 Boolean isConfirmed = confirmationFuture.get(30, TimeUnit.SECONDS);
@@ -1305,5 +1296,23 @@ public class WebSQLProcessor implements WebSessionProvider {
             log.error("Failed to request query execution confirmation. Skipping confirmation", e);
             return true;
         }
+    }
+
+    @NotNull
+    private WSEvent createConfirmationEvent(@NotNull WebAsyncTaskInfo asyncTask, @Nullable String query) {
+        String title = "Confirm query execution";
+        String message = "The query you're about to execute can modify existing data or schema.\nDo you want to continue?";
+
+        WSEvent confirmationEvent;
+        if (query != null) {
+            confirmationEvent = new WSServerSessionTaskQueryConfirmationRequestEvent(
+                asyncTask.getId(), title, message, query
+            );
+        } else {
+            confirmationEvent = new WSServerSessionTaskConfirmationRequestEvent(
+                asyncTask.getId(), title, message
+            );
+        }
+        return confirmationEvent;
     }
 }

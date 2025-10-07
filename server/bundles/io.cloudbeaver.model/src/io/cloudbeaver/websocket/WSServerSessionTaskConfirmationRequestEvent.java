@@ -8,17 +8,23 @@ public class WSServerSessionTaskConfirmationRequestEvent extends WSAbstractSessi
 
     public static final String ID = "cb_session_task_confirmation_request";
 
+    private final String taskId;
     private final String title;
     private final String message;
 
     public WSServerSessionTaskConfirmationRequestEvent(
+        @NotNull String taskId,
         @NotNull String title,
-        @NotNull
-        String message
+        @NotNull String message
     ) {
         super(ID, WSConstants.TOPIC_SESSION_TASK);
+        this.taskId = taskId;
         this.title = title;
         this.message = message;
+    }
+
+    public String getTaskId() {
+        return taskId;
     }
 
     public String getTitle() {
