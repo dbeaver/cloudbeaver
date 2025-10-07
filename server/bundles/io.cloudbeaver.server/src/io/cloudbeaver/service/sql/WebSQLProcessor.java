@@ -17,11 +17,14 @@
 package io.cloudbeaver.service.sql;
 
 import io.cloudbeaver.DBWebException;
+import io.cloudbeaver.model.WebAsyncTaskInfo;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.session.WebSessionProvider;
 import io.cloudbeaver.server.WebAppUtils;
 import io.cloudbeaver.server.jobs.SqlOutputLogReaderJob;
+import io.cloudbeaver.websocket.WSServerSessionTaskConfirmationRequestEvent;
+import io.cloudbeaver.websocket.WSServerSessionTaskQueryConfirmationRequestEvent;
 import org.eclipse.jface.text.Document;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
@@ -48,6 +51,7 @@ import org.jkiss.dbeaver.model.sql.parser.SQLParserContext;
 import org.jkiss.dbeaver.model.sql.parser.SQLRuleManager;
 import org.jkiss.dbeaver.model.sql.parser.SQLScriptParser;
 import org.jkiss.dbeaver.model.struct.*;
+import org.jkiss.dbeaver.model.websocket.event.WSEvent;
 import org.jkiss.dbeaver.model.websocket.event.WSTransactionalCountEvent;
 import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.utils.ArrayUtils;
@@ -59,6 +63,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -166,6 +172,7 @@ public class WebSQLProcessor implements WebSessionProvider {
         @Nullable WebSQLDataFilter filter,
         @Nullable WebDataFormat dataFormat,
         @NotNull WebSession webSession,
+        @NotNull WebAsyncTaskInfo asyncTask,
         boolean readLogs
     ) throws DBWebException, DBCException {
         if (filter == null) {
@@ -202,9 +209,11 @@ public class WebSQLProcessor implements WebSessionProvider {
 
             SQLScriptElement element = SQLScriptParser.extractActiveQuery(parserContext, 0, sql.length());
 
+            boolean needsConfirmationPreview = false;
             if (element instanceof SQLControlCommand command) {
                 SQLControlResult controlResult = dataContainer.getScriptContext().executeControlCommand(monitor, command);
                 if (controlResult.getTransformed() != null) {
+                    needsConfirmationPreview = true;
                     element = controlResult.getTransformed();
                 } else {
                     WebSQLQueryResults stats = new WebSQLQueryResults(webSession, dataFormat);
@@ -212,6 +221,13 @@ public class WebSQLProcessor implements WebSessionProvider {
                 }
             }
             if (element instanceof SQLQuery mainQuery) {
+                boolean isConfirmed = confirmQueryIfNeeded(mainQuery.getScriptElements(), asyncTask, needsConfirmationPreview);
+                if (!isConfirmed) {
+                    executeInfo.setResults(new WebSQLQueryResults[0]);
+                    executeInfo.setStatusMessage("Query execution stopped: Not confirmed");
+                    return executeInfo;
+                }
+
                 DBExecUtils.tryExecuteRecover(monitor, connection.getDataSource(), param -> {
                     try (DBCSession session = context.openSession(monitor, resolveQueryPurpose(dataFilter), "Execute SQL")) {
                         List<SQLScriptElement> sqlQueries = mainQuery.getScriptElements();
@@ -1228,5 +1244,66 @@ public class WebSQLProcessor implements WebSessionProvider {
             }
         }
         return convertInputCellValue(dbcSession, allAttributes, cellRow, withoutExecution);
+    }
+
+    // TODO: Move to to AIUtils#confirmExecutionIfNeeded when confirmation preference config will be added to CB
+    private boolean confirmQueryIfNeeded(
+        @NotNull List<SQLScriptElement> sqlQueries,
+        @NotNull WebAsyncTaskInfo asyncTask,
+        boolean needsPreview
+    ) {
+        Boolean skipConfirmations = webSession.getAttribute(WebSQLConstants.SKIP_TASK_CONFIRMATIONS_ATTR);
+        if (skipConfirmations != null && skipConfirmations) {
+            return true;
+        }
+
+        Set<SQLQueryCategory> categories = SQLQueryCategory.categorizeScript(sqlQueries);
+        boolean needsConfirmation = categories.contains(SQLQueryCategory.DDL) ||
+            categories.contains(SQLQueryCategory.DML) ||
+            categories.contains(SQLQueryCategory.UNKNOWN);
+        if (!needsConfirmation) {
+            return true;
+        }
+
+        String queryPreview = needsPreview ?
+            sqlQueries.stream()
+                .map(SQLScriptElement::getText)
+                .collect(Collectors.joining("\n\n"))
+            : null;
+        return requestConfirmation(asyncTask, queryPreview);
+    }
+
+    private boolean requestConfirmation(
+        @NotNull WebAsyncTaskInfo asyncTask,
+        @Nullable String query
+    ) {
+        try {
+            String attributeName = WebSQLConstants.TASK_CONFIRMATION_ATTR_PREFIX + asyncTask.getId();
+            CompletableFuture<Boolean> confirmationFuture = new CompletableFuture<>();
+            webSession.setAttribute(attributeName, confirmationFuture);
+
+            String title = "Confirm query execution";
+            String message = "The query you're about to execute can modify existing data or schema.\nDo you want to continue?";
+
+            WSEvent confirmationEvent;
+            if (query != null) {
+                confirmationEvent = new WSServerSessionTaskQueryConfirmationRequestEvent(title, message, query);
+            } else {
+                confirmationEvent = new WSServerSessionTaskConfirmationRequestEvent(title, message);
+            }
+            webSession.addSessionEvent(confirmationEvent);
+
+            try {
+                Boolean isConfirmed = confirmationFuture.get(30, TimeUnit.SECONDS);
+                return isConfirmed != null && isConfirmed;
+            } catch (Exception e) {
+                log.error("Failed to receive query execution confirmation", e);
+                webSession.removeAttribute(attributeName);
+                return false;
+            }
+        } catch (Exception e) {
+            log.error("Failed to request query execution confirmation. Skipping confirmation", e);
+            return true;
+        }
     }
 }

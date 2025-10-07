@@ -279,6 +279,7 @@ public class WebSQLUtils {
         @Nullable WebDataFormat dataFormat,
         boolean readLogs
     ) {
+        final WebAsyncTaskInfo task = webSession.createAsyncTask("SQL execute");
         WebAsyncTaskProcessor<String> runnable = new WebAsyncTaskProcessor<>() {
             @Override
             public void run(DBRProgressMonitor monitor) throws InvocationTargetException {
@@ -286,7 +287,8 @@ public class WebSQLUtils {
                     monitor.beginTask("Execute query", 1);
                     monitor.subTask("Process query " + sql);
                     WebSQLExecuteInfo executeResults = contextInfo.getProcessor().processQuery(
-                        monitor, contextInfo, sql, resultId, filter, dataFormat, webSession, readLogs);
+                        monitor, contextInfo, sql, resultId, filter, dataFormat, webSession, task, readLogs
+                    );
                     this.result = executeResults.getStatusMessage();
                     this.extendedResults = executeResults;
                 } catch (Throwable e) {
@@ -296,6 +298,6 @@ public class WebSQLUtils {
                 }
             }
         };
-        return webSession.createAndRunAsyncTask("SQL execute", runnable);
+        return webSession.runAsyncTask(task, runnable);
     }
 }

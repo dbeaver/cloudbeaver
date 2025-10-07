@@ -19,6 +19,7 @@ package io.cloudbeaver.server.websockets;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.session.BaseWebSession;
 import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.websocket.CBSessionTaskConfirmationEvent;
 import io.cloudbeaver.websocket.CBWebSessionEventHandler;
 import jakarta.websocket.*;
 import org.jkiss.code.Nullable;
@@ -107,6 +108,17 @@ public class CBEventsWebSocket extends CBAbstractWebSocket implements CBWebSessi
                 case WSSessionPingClientEvent.ID: {
                     if (webSession instanceof WebSession session) {
                         session.updateInfo(true);
+                    }
+                    break;
+                }
+                case CBSessionTaskConfirmationEvent.ID: {
+                    if (webSession instanceof WebSession session) {
+                        var taskConfirmationEvent = (CBSessionTaskConfirmationEvent) clientEvent;
+                        session.handleTaskConfirmation(
+                            taskConfirmationEvent.getTaskId(),
+                            taskConfirmationEvent.isConfirmed(),
+                            taskConfirmationEvent.isSkipConfirmations()
+                        );
                     }
                     break;
                 }
