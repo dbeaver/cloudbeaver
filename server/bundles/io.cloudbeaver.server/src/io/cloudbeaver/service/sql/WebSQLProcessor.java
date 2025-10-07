@@ -65,6 +65,7 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -223,9 +224,7 @@ public class WebSQLProcessor implements WebSessionProvider {
             if (element instanceof SQLQuery mainQuery) {
                 boolean isConfirmed = confirmQueryIfNeeded(mainQuery.getScriptElements(), asyncTask, needsConfirmationPreview);
                 if (!isConfirmed) {
-                    executeInfo.setResults(new WebSQLQueryResults[0]);
-                    executeInfo.setStatusMessage("Query execution stopped: Not confirmed");
-                    return executeInfo;
+                    throw new DBWebException("Query execution cancelled by user");
                 }
 
                 DBExecUtils.tryExecuteRecover(monitor, connection.getDataSource(), param -> {
@@ -1251,7 +1250,7 @@ public class WebSQLProcessor implements WebSessionProvider {
         @NotNull List<SQLScriptElement> sqlQueries,
         @NotNull WebAsyncTaskInfo asyncTask,
         boolean needsPreview
-    ) {
+    ) throws DBWebException {
         Boolean skipConfirmations = webSession.getAttribute(WebSQLConstants.SKIP_TASK_CONFIRMATIONS_ATTR);
         if (skipConfirmations != null && skipConfirmations) {
             return true;
@@ -1276,30 +1275,30 @@ public class WebSQLProcessor implements WebSessionProvider {
     private boolean requestConfirmation(
         @NotNull WebAsyncTaskInfo asyncTask,
         @Nullable String query
-    ) {
+    ) throws DBWebException {
+        String attributeName = WebSQLConstants.TASK_CONFIRMATION_ATTR_PREFIX + asyncTask.getId();
+        CompletableFuture<Boolean> confirmationFuture = new CompletableFuture<>();
+        webSession.setAttribute(attributeName, confirmationFuture);
+
+        webSession.addSessionEvent(createConfirmationEvent(asyncTask, query));
+
         try {
-            String attributeName = WebSQLConstants.TASK_CONFIRMATION_ATTR_PREFIX + asyncTask.getId();
-            CompletableFuture<Boolean> confirmationFuture = new CompletableFuture<>();
-            webSession.setAttribute(attributeName, confirmationFuture);
-
-            webSession.addSessionEvent(createConfirmationEvent(asyncTask, query));
-
-            try {
-                Boolean isConfirmed = confirmationFuture.get(30, TimeUnit.SECONDS);
-                return isConfirmed != null && isConfirmed;
-            } catch (Exception e) {
-                log.error("Failed to receive query execution confirmation", e);
-                webSession.removeAttribute(attributeName);
-                return false;
-            }
+            Boolean isConfirmed = confirmationFuture.get(3, TimeUnit.SECONDS);
+            return isConfirmed != null && isConfirmed;
+        } catch (TimeoutException e) {
+            throw new DBWebException("Query confirmation timeout");
         } catch (Exception e) {
-            log.error("Failed to request query execution confirmation. Skipping confirmation", e);
-            return true;
+            throw new DBWebException("Error when processing confirmation response", e);
+        } finally {
+            webSession.removeAttribute(attributeName);
         }
     }
 
     @NotNull
-    private WSEvent createConfirmationEvent(@NotNull WebAsyncTaskInfo asyncTask, @Nullable String query) {
+    private WSEvent createConfirmationEvent(
+        @NotNull WebAsyncTaskInfo asyncTask,
+        @Nullable String query
+    ) {
         String title = "Confirm query execution";
         String message = "The query you're about to execute can modify existing data or schema.\nDo you want to continue?";
 
