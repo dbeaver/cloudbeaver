@@ -21,23 +21,27 @@
   border: none !important;
   color-scheme: inherit !important;
 
-  :global(.rdg-cell) {
+  :global(.rdg-cell:not(.rdg-editor-container)) {
     outline: 0 !important;
 
     &[aria-selected='true'] {
-      outline: #808080 solid 1px !important;
+      border: 1px solid #808080 !important;
     }
   }
 
   :global(.rdg-cell-editing) {
     overflow: visible;
     height: 24px;
-    box-shadow: none !important;
+    border: none !important;
+  }
+
+  :global(.rdg-editor-container) {
+    border: none !important;
   }
 }
 
 .dataGrid:focus-within {
-  :global(.rdg-cell[aria-selected='true']) {
-    outline: var(--rdg-selection-color) solid 1px !important;
+  :global(.rdg-cell:not(.rdg-editor-container)[aria-selected='true']) {
+    border: 1px solid var(--rdg-selection-color) !important;
   }
 }
