@@ -238,7 +238,7 @@ export class TableFooterMenuService {
         model.save().catch(() => {});
         break;
       case ACTION_CANCEL: {
-        editor.clear();
+        editor.revert(...selectedElements);
         break;
       }
     }
