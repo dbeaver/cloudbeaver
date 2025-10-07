@@ -302,6 +302,7 @@ type WSServerNotificationEvent implements CBServerEvent @since(version: "25.2.1"
 type WSServerSessionTaskConfirmationRequestEvent implements CBServerEvent @since(version: "25.2.2") {
     id: CBServerEventId!
     topicId: CBEventTopic!
+    taskId: ID!
     title: String!
     message: String!
 }
@@ -309,6 +310,7 @@ type WSServerSessionTaskConfirmationRequestEvent implements CBServerEvent @since
 type WSServerSessionTaskQueryConfirmationRequestEvent implements CBServerEvent @since(version: "25.2.2") {
     id: CBServerEventId!
     topicId: CBEventTopic!
+    taskId: ID!
     title: String!
     message: String!
     query: String!
