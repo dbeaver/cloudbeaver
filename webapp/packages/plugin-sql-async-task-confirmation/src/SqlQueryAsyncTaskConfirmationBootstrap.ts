@@ -32,6 +32,7 @@ export class SqlQueryAsyncTaskConfirmationBootstrap extends Bootstrap {
     const { status, result } = await this.commonDialogService.open(ConfirmationDialog, {
       title: confirmationEvent.title,
       message: confirmationEvent.message,
+      icon: '/icons/warning_icon_sm.svg',
       showSkipConfirmations: true,
       children: () => renderQueryForConfirmation(confirmationEvent.query),
     });

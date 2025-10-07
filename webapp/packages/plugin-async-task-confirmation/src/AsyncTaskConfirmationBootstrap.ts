@@ -35,6 +35,7 @@ export class AsyncTaskConfirmationBootstrap extends Bootstrap {
       observable({
         title: confirmationEvent.title,
         message: confirmationEvent.message,
+        icon: '/icons/warning_icon_sm.svg',
         showSkipConfirmations: true,
       }),
     );
