@@ -34,15 +34,15 @@ public interface DBWServiceNavigator extends DBWService {
     @WebAction
     List<WebNavigatorNodeInfo> getNavigatorNodeChildren(
         @NotNull WebSession session,
-        String parentPath,
-        Integer offset,
-        Integer limit,
-        Boolean onlyFolders) throws DBWebException;
+        @NotNull String parentPath,
+        @Nullable Integer offset,
+        @Nullable Integer limit,
+        @Nullable Boolean onlyFolders) throws DBWebException;
 
     @WebAction
     List<WebNavigatorNodeInfo> getNavigatorNodeParents(
         @NotNull WebSession session,
-        String nodePath) throws DBWebException;
+        @NotNull String nodePath) throws DBWebException;
 
     @WebAction
     WebNavigatorNodeInfo getNavigatorNodeInfo(

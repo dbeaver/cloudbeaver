@@ -16,7 +16,6 @@
  */
 package io.cloudbeaver.service.rm;
 
-import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.service.DBWBindingContext;
 import io.cloudbeaver.service.WebServiceBindingBase;
 import io.cloudbeaver.service.rm.impl.WebServiceRM;
@@ -36,74 +35,74 @@ public class WebServiceBindingRM extends WebServiceBindingBase<DBWServiceRM> {
     }
 
     @Override
-    public void bindWiring(DBWBindingContext model) throws DBWebException {
+    public void bindWiring(DBWBindingContext model) {
         model.getQueryType()
             .dataFetcher("rmListProjects",
                 env -> getService(env).listProjects(getWebSession(env)))
             .dataFetcher("rmListSharedProjects",
                 env -> getService(env).listSharedProjects(getWebSession(env)))
             .dataFetcher("rmProject",
-                env -> getService(env).getProject(getWebSession(env), env.getArgument("projectId")))
+                env -> getService(env).getProject(getWebSession(env), getArgumentVal(env, "projectId")))
             .dataFetcher("rmListResources",
                 env -> getService(env).listResources(getWebSession(env),
-                    env.getArgument("projectId"),
-                    env.getArgument("folder"),
-                    env.getArgument("nameMask"),
-                    CommonUtils.toBoolean(env.getArgument("readProperties")),
-                    CommonUtils.toBoolean(env.getArgument("readHistory"))))
+                    getArgumentVal(env, "projectId"),
+                    getArgument(env, "folder"),
+                    getArgument(env, "nameMask"),
+                    CommonUtils.toBoolean(getArgument(env, "readProperties")),
+                    CommonUtils.toBoolean(getArgument(env, "readHistory"))))
             .dataFetcher("rmReadResourceAsString",
                 env -> getService(env).readResourceAsString(getWebSession(env),
-                    env.getArgument("projectId"),
-                    env.getArgument("resourcePath")))
+                    getArgumentVal(env, "projectId"),
+                    getArgumentVal(env, "resourcePath")))
             .dataFetcher("rmListProjectPermissions", env -> getService(env).listProjectPermissions())
             .dataFetcher("rmListProjectGrantedPermissions", env -> getService(env).listProjectGrantedPermissions(
                 getWebSession(env),
-                env.getArgument("projectId")
+                getArgumentVal(env, "projectId")
             ))
             .dataFetcher("rmListSubjectProjectsPermissionGrants", env -> getService(env).listSubjectProjectsPermissionGrants(
                 getWebSession(env),
-                env.getArgument("subjectId")
+                getArgumentVal(env, "subjectId")
             ))
             .dataFetcher(
                 "rmUserProjectSettings", env -> getService(env).getProjectSettings(
                     getWebSession(env),
-                    env.getArgument("projectId"),
-                    env.getArgument("settingId")
+                    getArgumentVal(env, "projectId"),
+                    getArgument(env, "settingId")
                 )
             )
         ;
         model.getMutationType()
             .dataFetcher("rmCreateResource",
                 env -> getService(env).createResource(getWebSession(env),
-                    env.getArgument("projectId"),
-                    env.getArgument("resourcePath"),
-                    CommonUtils.toBoolean(env.getArgument("isFolder"))))
+                    getArgumentVal(env, "projectId"),
+                    getArgumentVal(env, "resourcePath"),
+                    CommonUtils.toBoolean(getArgument(env, "isFolder"))))
             .dataFetcher("rmMoveResource",
                 env -> getService(env).moveResource(getWebSession(env),
-                    env.getArgument("projectId"),
-                    env.getArgument("oldResourcePath"),
-                    env.getArgument("newResourcePath")))
+                    getArgumentVal(env, "projectId"),
+                    getArgumentVal(env, "oldResourcePath"),
+                    getArgumentVal(env, "newResourcePath")))
             .dataFetcher("rmDeleteResource",
                 env -> getService(env).deleteResource(getWebSession(env),
-                    env.getArgument("projectId"),
-                    env.getArgument("resourcePath")))
+                    getArgumentVal(env, "projectId"),
+                    getArgumentVal(env, "resourcePath")))
             .dataFetcher("rmWriteResourceStringContent",
                 env -> getService(env).writeResourceStringContent(getWebSession(env),
-                    env.getArgument("projectId"),
-                    env.getArgument("resourcePath"),
-                    env.getArgument("data"),
-                    env.getArgument("forceOverwrite")))
+                    getArgumentVal(env, "projectId"),
+                    getArgumentVal(env, "resourcePath"),
+                    getArgumentVal(env, "data"),
+                    getArgumentVal(env, "forceOverwrite")))
             .dataFetcher("rmCreateProject", env -> getService(env).createProject(
                 getWebSession(env),
-                env.getArgument("projectName"),
-                env.getArgument("description")
+                getArgumentVal(env, "projectName"),
+                getArgument(env, "description")
             ))
             .dataFetcher(
                 "rmUpdateProject", env -> getService(env).updateProject(
                     getWebSession(env),
                     getProjectReference(env),
-                    env.getArgument("projectName"),
-                    env.getArgument("description")
+                    getArgument(env, "projectName"),
+                    getArgument(env, "description")
                 )
             )
             .dataFetcher("rmDeleteProject", env -> getService(env).deleteProject(
@@ -112,45 +111,45 @@ public class WebServiceBindingRM extends WebServiceBindingBase<DBWServiceRM> {
             ))
             .dataFetcher("rmSetProjectPermissions", env -> getService(env).setProjectPermissions(
                 getWebSession(env),
-                env.getArgument("projectId"),
-                new RMSubjectProjectPermissions(env.getArgument("permissions"))
+                getArgumentVal(env, "projectId"),
+                new RMSubjectProjectPermissions(getArgumentVal(env, "permissions"))
             ))
             .dataFetcher("rmSetResourceProperty", env -> getService(env).setResourceProperty(
                 getWebSession(env),
-                env.getArgument("projectId"),
-                env.getArgument("resourcePath"),
-                env.getArgument("name"),
-                env.getArgument("value")
+                getArgumentVal(env, "projectId"),
+                getArgumentVal(env, "resourcePath"),
+                getArgumentVal(env, "name"),
+                getArgument(env, "value")
             ))
             .dataFetcher("rmSetSubjectProjectPermissions", env -> getService(env).setSubjectProjectPermissions(
                 getWebSession(env),
-                env.getArgument("subjectId"),
-                new RMProjectPermissions(env.getArgument("permissions"))
+                getArgumentVal(env, "subjectId"),
+                new RMProjectPermissions(getArgumentVal(env, "permissions"))
             ))
             .dataFetcher("rmAddProjectsPermissions", env -> getService(env).addProjectsPermissions(
                 getWebSession(env),
-                env.getArgument("projectIds"),
-                env.getArgument("subjectIds"),
-                env.getArgument("permissions")
+                getArgumentVal(env, "projectIds"),
+                getArgumentVal(env, "subjectIds"),
+                getArgumentVal(env, "permissions")
             ))
             .dataFetcher("rmDeleteProjectsPermissions", env -> getService(env).deleteProjectsPermissions(
                 getWebSession(env),
-                env.getArgument("projectIds"),
-                env.getArgument("subjectIds"),
-                env.getArgument("permissions")
+                getArgumentVal(env, "projectIds"),
+                getArgumentVal(env, "subjectIds"),
+                getArgumentVal(env, "permissions")
             ))
             .dataFetcher(
                 "rmAddUserProjectSettings", env -> getService(env).addProjectSettings(
                     getWebSession(env),
-                    env.getArgument("projectId"),
-                    env.getArgument("settings")
+                    getArgumentVal(env, "projectId"),
+                    getArgumentVal(env, "settings")
                 )
             )
             .dataFetcher(
                 "rmDeleteUserProjectSettings", env -> getService(env).deleteProjectSettings(
                     getWebSession(env),
-                    env.getArgument("projectId"),
-                    env.getArgument("settingIds")
+                    getArgumentVal(env, "projectId"),
+                    getArgument(env, "settingIds")
                 )
             )
 

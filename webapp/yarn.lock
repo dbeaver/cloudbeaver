@@ -4704,7 +4704,7 @@ __metadata:
     "@types/react": "npm:^19"
     "@types/react-dom": "npm:^19"
     react: "npm:^19"
-    react-data-grid: "file:./artifacts"
+    react-data-grid: "npm:7.0.0-beta.57"
     react-dom: "npm:^19"
     rimraf: "npm:^6"
     typescript: "npm:^5"
@@ -16520,15 +16520,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-data-grid@file:./artifacts::locator=%40dbeaver%2Freact-data-grid%40workspace%3Acommon-react%2F%40dbeaver%2Freact-data-grid":
-  version: 7.0.0-beta.55
-  resolution: "react-data-grid@file:./artifacts#./artifacts::hash=2f312f&locator=%40dbeaver%2Freact-data-grid%40workspace%3Acommon-react%2F%40dbeaver%2Freact-data-grid"
+"react-data-grid@npm:7.0.0-beta.57":
+  version: 7.0.0-beta.57
+  resolution: "react-data-grid@npm:7.0.0-beta.57"
   dependencies:
     clsx: "npm:^2.0.0"
   peerDependencies:
     react: ^19.0
     react-dom: ^19.0
-  checksum: 10c0/f0f3685c1ebcd3e0d3f33f189016a541eee963db1beb3f751209ef6eeb39497a08e1a583900a42a596b017e5daf6935d9ab9cd444e3b16ed905399e941eeadbb
+  checksum: 10c0/7094f73f2f491bcca2cc069b81bb56aa774f20c869fd5b737598c93c539a07971477bd64ced0a12ba3e08dbdd9d50771ea4b60afa6b2c4ddacea5a1dac6eb9f6
   languageName: node
   linkType: hard
 

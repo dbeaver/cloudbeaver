@@ -49,21 +49,25 @@ public class DBNResourceManagerResource extends DBNAbstractResourceManagerNode {
         this.resource = resource;
     }
 
+    @NotNull
     @Override
     public String getNodeType() {
         return "rm.resource";
     }
 
+    @NotNull
     @Override
     public String getNodeDisplayName() {
         return resource.getName();
     }
 
+    @Nullable
     @Override
     public String getNodeDescription() {
         return null;
     }
 
+    @Nullable
     @Override
     public DBPImage getNodeIcon() {
         if (resource.isFolder()) {
@@ -109,6 +113,7 @@ public class DBNResourceManagerResource extends DBNAbstractResourceManagerNode {
         return resource.isFolder();
     }
 
+    @NotNull
     @Override
     public DBNNode[] getChildren(@NotNull DBRProgressMonitor monitor) throws DBException {
         if (children == null && !monitor.isForceCacheUsage()) {
@@ -154,14 +159,16 @@ public class DBNResourceManagerResource extends DBNAbstractResourceManagerNode {
         throw new DBException("Can't detect resource root node");
     }
 
+    @NotNull
     @Deprecated
     @Override
     public String getNodeItemPath() {
         return getParentNode().getNodeItemPath() + "/" + getNodeDisplayName();
     }
 
+    @Nullable
     @Override
-    public DBNNode refreshNode(DBRProgressMonitor monitor, Object source) throws DBException {
+    public DBNNode refreshNode(@NotNull DBRProgressMonitor monitor, @Nullable Object source) throws DBException {
         this.children = null;
         return super.refreshNode(monitor, source);
     }
@@ -171,7 +178,7 @@ public class DBNResourceManagerResource extends DBNAbstractResourceManagerNode {
     }
 
     @Override
-    public void rename(DBRProgressMonitor monitor, String newName) throws DBException {
+    public void rename(@NotNull DBRProgressMonitor monitor, @NotNull String newName) throws DBException {
         String resourceName = resource.getName();
         try {
             if (newName.indexOf('.') == -1) {
@@ -192,6 +199,7 @@ public class DBNResourceManagerResource extends DBNAbstractResourceManagerNode {
         }
     }
 
+    @NotNull
     @Override
     public String toString() {
         return getNodeDisplayName();

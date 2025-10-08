@@ -13,7 +13,6 @@ import {
   Group,
   GroupTitle,
   ObjectPropertyInfoForm,
-  Placeholder,
   useObjectPropertyCategories,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
@@ -21,8 +20,6 @@ import { type DriverPropertyInfoFragment, getObjectPropertyType } from '@cloudbe
 import type { IFormState } from '@cloudbeaver/core-ui';
 import type { IConnectionFormState } from '../IConnectionFormState.js';
 import { getConnectionFormOptionsPart } from './getConnectionFormOptionsPart.js';
-import { useService } from '@cloudbeaver/core-di';
-import { ConnectionFormService } from '../ConnectionFormService.js';
 
 type DriverPropertyInfo = DriverPropertyInfoFragment;
 
@@ -37,7 +34,6 @@ export const ProviderPropertiesForm = observer<Props>(function ProviderPropertie
   const config = getConnectionFormOptionsPart(formState).state;
   const disabled = formState.isDisabled;
   const supportedProperties = properties.filter(property => property.supportedConfigurationTypes?.some(type => type === config.configurationType));
-  const connectionFormService = useService(ConnectionFormService);
 
   const { categories, isUncategorizedExists } = useObjectPropertyCategories(supportedProperties);
 
@@ -50,7 +46,6 @@ export const ProviderPropertiesForm = observer<Props>(function ProviderPropertie
 
   return (
     <Group form gap>
-      <Placeholder container={connectionFormService.providerPropertiesContainer} formState={formState} />
       {isUncategorizedExists && (
         <>
           <GroupTitle>{translate('ui_settings')}</GroupTitle>

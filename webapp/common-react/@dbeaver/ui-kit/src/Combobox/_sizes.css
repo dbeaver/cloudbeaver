@@ -1,0 +1,23 @@
+@layer base {
+  :root {
+    /* Small combobox */
+    --dbv-kit-combobox-small-padding: calc(var(--dbv-kit-combobox-padding) * 0.5);
+    --dbv-kit-combobox-small-font-size: calc(var(--dbv-kit-combobox-font-size) * 0.875);
+    --dbv-kit-combobox-small-height: var(--dbv-kit-control-height-small);
+
+    /* Medium combobox */
+    --dbv-kit-combobox-medium-padding: var(--dbv-kit-combobox-padding);
+    --dbv-kit-combobox-medium-font-size: var(--dbv-kit-combobox-font-size);
+    --dbv-kit-combobox-medium-height: var(--dbv-kit-control-height-medium);
+
+    /* Large combobox */
+    --dbv-kit-combobox-large-padding: calc(var(--dbv-kit-combobox-padding) * 1.25);
+    --dbv-kit-combobox-large-font-size: calc(var(--dbv-kit-combobox-font-size) * 1.125);
+    --dbv-kit-combobox-large-height: var(--dbv-kit-control-height-large);
+
+    /* Extra large combobox */
+    --dbv-kit-combobox-xlarge-padding: calc(var(--dbv-kit-combobox-padding) * 1.5);
+    --dbv-kit-combobox-xlarge-font-size: calc(var(--dbv-kit-combobox-font-size) * 1.25);
+    --dbv-kit-combobox-xlarge-height: var(--dbv-kit-control-height-xlarge);
+  }
+}

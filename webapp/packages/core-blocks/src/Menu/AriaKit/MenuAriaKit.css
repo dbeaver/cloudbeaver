@@ -1,0 +1,28 @@
+@layer components {
+  .dbv-kit-menu__container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .dbv-kit-menu__empty {
+    padding: 0.5rem;
+    color: var(--tw-color-gray-500);
+    text-align: center;
+  }
+
+  .dbv-kit-menu__popover {
+    --dbv-kit-menu-popover-foreground: var(--theme-input-color);
+    --dbv-kit-menu-popover-background: var(--theme-input-background);
+  }
+
+  .dbv-kit-menu__button {
+    --dbv-kit-menu-background: transparent;
+    --dbv-kit-menu-foreground: inherit;
+  }
+
+  .dbv-kit-menu__item {
+    --dbv-kit-menu-item-hover-background: var(--theme-background);
+    --dbv-kit-menu-item-hover-foreground: var(--theme-input-color);
+  }
+}

@@ -1,7 +1,7 @@
 module.exports = [
   'react-data-grid',
   'react-markdown',
-  'react-window',
+  'virtua',
   'react-dnd',
   'react-dnd-html5-backend',
   '@popperjs',
