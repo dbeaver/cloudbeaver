@@ -81,12 +81,13 @@ public class WebSQLQueryDataContainer implements DBSDataContainer, DBPContextPro
         return queryDataContainer.getDescription();
     }
 
-    @Nullable
+    @NotNull
     @Override
     public DBPDataSource getDataSource() {
         return dataSource;
     }
 
+    @NotNull
     @Override
     public String[] getSupportedFeatures() {
         return queryDataContainer.getSupportedFeatures();

@@ -1271,7 +1271,7 @@ public class LocalResourceController extends BaseLocalResourceController {
         // Resource types
         project.setResourceTypes(ResourceTypeRegistry.getInstance().getResourceTypes()
             .stream()
-            .filter(ResourceTypeDescriptor::isManagable)
+            .filter(ResourceTypeDescriptor::isManageable)
             .map(RMResourceType::new)
             .toArray(RMResourceType[]::new));
 
