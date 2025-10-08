@@ -94,16 +94,14 @@ export const ConfirmationDialog: DialogComponent<ConfirmationDialogPayload, Conf
         <Translate token={message} />
         {children && children?.()}
         {showSkipConfirmations && (
-          <>
-            <br />
-            <br />
+          <div className="tw:mt-4">
             <Checkbox
               name="skipConfirmations"
               label={translate('ui_processing_skip_confirmations')}
               checked={skipConfirmations}
               onChange={setSkipConfirmations}
             />
-          </>
+          </div>
         )}
       </CommonDialogBody>
       <CommonDialogFooter className={s(styles, { footer: true })}>

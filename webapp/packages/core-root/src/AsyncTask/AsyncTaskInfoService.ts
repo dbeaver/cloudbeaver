@@ -14,7 +14,7 @@ import type { Unsubscribe } from '../ServerEventEmitter/IServerEventEmitter.js';
 import { ServerEventId } from '../SessionEventSource.js';
 import { AsyncTask } from './AsyncTask.js';
 import { AsyncTaskInfoEventHandler } from './AsyncTaskInfoEventHandler.js';
-import { Executor, type IExecutor } from '@cloudbeaver/core-executor';
+import { Executor, SyncExecutor, type IExecutor, type ISyncExecutor } from '@cloudbeaver/core-executor';
 
 export interface IBaseAsyncTaskEvent {
   id: string;
@@ -24,6 +24,7 @@ export interface IBaseAsyncTaskEvent {
 @injectable(() => [GraphQLService, AsyncTaskInfoEventHandler])
 export class AsyncTaskInfoService extends Disposable {
   readonly onExecuteEvent: IExecutor<IBaseAsyncTaskEvent>;
+  readonly onTaskUpdated: ISyncExecutor<AsyncTask>;
 
   private readonly tasks: Map<string, AsyncTask>;
   private readonly taskIdAliases: Map<string, string>;
@@ -41,6 +42,7 @@ export class AsyncTaskInfoService extends Disposable {
     this.pendingEvents = new Map();
     this.connection = null;
     this.onExecuteEvent = new Executor();
+    this.onTaskUpdated = new SyncExecutor();
     this.handleEvent = this.handleEvent.bind(this);
 
     this.onEventUnsubscribe = asyncTaskInfoEventHandler.on<IBaseAsyncTaskEvent>(this.handleEvent);
@@ -88,6 +90,7 @@ export class AsyncTaskInfoService extends Disposable {
 
     this.tasks.set(task.id, task);
     task.onStatusChange.addHandler(info => {
+      this.onTaskUpdated.execute(task);
       if (this.taskIdAliases.get(info.id)) {
         return;
       }

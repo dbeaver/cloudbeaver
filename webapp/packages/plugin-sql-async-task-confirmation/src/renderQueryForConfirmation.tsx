@@ -19,5 +19,5 @@ const RenderQuery = observer(function RenderQuery({ query }: { query: string }) 
   const extensions = useCodemirrorExtensions();
   extensions.set(...sqlDialect);
 
-  return <SQLCodeEditorLoader value={query} extensions={extensions} readonly />;
+  return <SQLCodeEditorLoader className="tw:max-h-56 tw:mt-4" value={query} extensions={extensions} readonly />;
 });
