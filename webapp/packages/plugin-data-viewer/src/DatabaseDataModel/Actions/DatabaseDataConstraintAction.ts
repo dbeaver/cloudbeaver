@@ -50,6 +50,8 @@ export class DatabaseDataConstraintAction
 
   constructor(source: IDatabaseDataSource, result: IDatabaseDataResult) {
     super(source as unknown as IDatabaseDataSource<any, IDatabaseResultSet>, result as IDatabaseResultSet);
+    updateConstraintsForResult(source as unknown as IDatabaseDataSource<any, IDatabaseResultSet>, result as IDatabaseResultSet);
+
     makeObservable(this, {
       orderConstraints: computed,
       filterConstraints: computed,
@@ -253,35 +255,38 @@ export class DatabaseDataConstraintAction
     return currentConstraint.orderAsc ? EOrder.asc : EOrder.desc;
   }
 
-  override updateResults(results: IDatabaseResultSet[]): void {
-    const nextResult = results[this.resultIndex];
-    if (!this.source.options || results.length !== this.source.results.length || !nextResult) {
+  override updateResult(result: IDatabaseResultSet): void {
+    updateConstraintsForResult(this.source, result);
+  }
+}
+
+function updateConstraintsForResult(source: IDatabaseDataSource<IDatabaseDataOptions, IDatabaseResultSet>, result: IDatabaseResultSet) {
+  if (!source.options) {
+    return;
+  }
+
+  for (const constraint of source.options.constraints) {
+    const prevColumn = result.data?.columns?.find(column => column.position === constraint.attributePosition);
+
+    if (!prevColumn) {
       return;
     }
 
-    for (const constraint of this.source.options.constraints) {
-      const prevColumn = this.result.data?.columns?.find(column => column.position === constraint.attributePosition);
+    let column = result.data?.columns?.find(column => column.position === prevColumn.position);
 
-      if (!prevColumn) {
-        return;
-      }
+    if (!column || column.label !== prevColumn.label) {
+      column = result.data?.columns?.find(column => column.label === prevColumn.label);
+    }
 
-      let column = nextResult.data?.columns?.find(column => column.position === prevColumn.position);
+    if (column && prevColumn.position !== column.position) {
+      const prevConstraint = source.prevOptions?.constraints.find(
+        prevConstraint => prevConstraint.attributePosition === constraint.attributePosition,
+      );
 
-      if (!column || column.label !== prevColumn.label) {
-        column = nextResult.data?.columns?.find(column => column.label === prevColumn.label);
-      }
+      constraint.attributePosition = column.position;
 
-      if (column && prevColumn.position !== column.position) {
-        const prevConstraint = this.source.prevOptions?.constraints.find(
-          prevConstraint => prevConstraint.attributePosition === constraint.attributePosition,
-        );
-
-        constraint.attributePosition = column.position;
-
-        if (prevConstraint) {
-          prevConstraint.attributePosition = constraint.attributePosition;
-        }
+      if (prevConstraint) {
+        prevConstraint.attributePosition = constraint.attributePosition;
       }
     }
   }

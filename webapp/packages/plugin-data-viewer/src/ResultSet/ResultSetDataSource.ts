@@ -151,6 +151,10 @@ export abstract class ResultSetDataSource<TOptions = IDatabaseDataOptions> exten
     return this;
   }
 
+  override hasElementIdentifier(resultIndex: number): boolean {
+    return this.getResult(resultIndex)?.data?.hasRowIdentifier === true;
+  }
+
   protected getPreviousResultId(prevResults: IDatabaseResultSet[], context: IConnectionExecutionContextInfo) {
     let resultId: string | undefined;
 

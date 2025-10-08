@@ -55,27 +55,8 @@ export abstract class GridDataResultAction<
     } as TKey;
   }
 
-  insertRow(row: IGridRowKey, value: TCell[], shift = 0): IGridRowKey | undefined {
-    if (this.result.data?.rowsWithMetaData) {
-      const index = row.index + shift;
-      this.result.data.rowsWithMetaData.splice(index, 0, { data: value, metaData: {} });
-
-      return { index, subIndex: 0 };
-    }
-
-    return undefined;
-  }
-
-  removeRow(row: IGridRowKey, shift = 0): IGridRowKey | undefined {
-    if (this.result.data?.rowsWithMetaData) {
-      const index = row.index + shift;
-      this.result.data.rowsWithMetaData.splice(index, 1);
-
-      return { index: index - 1, subIndex: 0 };
-    }
-    return undefined;
-  }
-
+  abstract insertRow(row: IGridRowKey, value: TCell[], shift?: number): IGridRowKey | undefined;
+  abstract removeRow(row: IGridRowKey, shift?: number): IGridRowKey | undefined;
   abstract setRowValue(row: IGridRowKey, value: TCell[], shift?: number): void;
   abstract getRowValue(row: IGridRowKey): TCell[] | undefined;
 

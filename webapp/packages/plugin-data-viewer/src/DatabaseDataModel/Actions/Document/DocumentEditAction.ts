@@ -132,7 +132,7 @@ export class DocumentEditAction<
     for (const [id] of this.editedElements) {
       const document = rows[rowIndex]?.[0];
 
-      if (document) {
+      if (document !== undefined) {
         this.data.set(id, document);
       }
       rowIndex++;
@@ -145,7 +145,7 @@ export class DocumentEditAction<
     for (const [id] of this.editedElements) {
       const document = rows[rowIndex]?.[0];
 
-      if (document) {
+      if (document !== undefined) {
         this.data.set(id, document);
       }
       rowIndex++;

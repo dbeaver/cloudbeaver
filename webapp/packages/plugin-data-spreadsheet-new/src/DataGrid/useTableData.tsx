@@ -113,13 +113,13 @@ export function useTableData(
         return this.columns.slice(firstIndex, lastIndex + 1);
       },
       getEditionState(key) {
-        return this.editor?.getElementState(key) || null;
+        return this.editor?.getElementState(key) ?? null;
       },
       inBounds(position) {
         return this.view.has(position);
       },
       isCellEdited(key) {
-        return this.editor?.isElementEdited(key) || false;
+        return this.editor?.isElementEdited(key) ?? false;
       },
       isIndexColumn(columnKey) {
         return columnKey.key === null;

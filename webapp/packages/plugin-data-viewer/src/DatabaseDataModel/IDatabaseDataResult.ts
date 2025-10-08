@@ -14,7 +14,7 @@ export interface IDatabaseDataResult {
   dataFormat: ResultDataFormat;
   loadedFully: boolean;
   count: number;
-  data: any;
+  data: unknown;
 }
 
 export const IDatabaseDataResult = createService<IDatabaseDataResult>('IDatabaseDataResult');

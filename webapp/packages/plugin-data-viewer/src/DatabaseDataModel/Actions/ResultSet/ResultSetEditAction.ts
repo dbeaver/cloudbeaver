@@ -43,6 +43,10 @@ export class ResultSetEditAction extends GridEditAction<SqlResultColumn, SqlResu
     protected override readonly data: ResultSetDataAction,
   ) {
     super(source as unknown as IDatabaseDataSource<unknown, IDatabaseResultSet>, result as IDatabaseResultSet, data);
+
+    if ((result as IDatabaseResultSet).data?.singleEntity) {
+      this.features = ['add', 'delete', 'revert'];
+    }
   }
 
   override set(key: IGridDataKey, value: IResultSetValue): void {
@@ -165,6 +169,14 @@ export class ResultSetEditAction extends GridEditAction<SqlResultColumn, SqlResu
         }
         return value;
       });
+    }
+  }
+
+  override updateResult(result: IDatabaseResultSet, index: number): void {
+    super.updateResult(result, index);
+
+    if (result.data?.singleEntity) {
+      this.features = ['add', 'delete', 'revert'];
     }
   }
 }

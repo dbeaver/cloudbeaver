@@ -59,7 +59,6 @@ export class GridEditAction<
     super(source, result);
     this.editorData = new Map();
     this.data = data as GridDataResultAction<TColumn, TRow, TKey, TCell, TResult>;
-    this.features = [];
 
     makeObservable<this, 'editorData'>(this, {
       editorData: observable,
@@ -451,14 +450,6 @@ export class GridEditAction<
         revert: true,
         value: revertedAdditions,
       });
-    }
-  }
-
-  override updateResult(result: TResult, index: number): void {
-    super.updateResult(result, index);
-
-    if (result.data?.singleEntity) {
-      this.features = ['add', 'delete', 'revert'];
     }
   }
 

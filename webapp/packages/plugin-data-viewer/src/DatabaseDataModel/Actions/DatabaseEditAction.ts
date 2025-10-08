@@ -17,6 +17,7 @@ import type {
   IDatabaseDataEditActionData,
   IDatabaseDataEditApplyActionData,
 } from './IDatabaseDataEditAction.js';
+import { makeObservable, observable } from 'mobx';
 
 export abstract class DatabaseEditAction<
     TKey = unknown,
@@ -38,6 +39,10 @@ export abstract class DatabaseEditAction<
     this.action = new SyncExecutor();
     this.applyAction = new SyncExecutor();
     this.features = [];
+
+    makeObservable<this, 'features'>(this, {
+      features: observable.shallow,
+    });
   }
 
   hasFeature(feature: keyof this): boolean {

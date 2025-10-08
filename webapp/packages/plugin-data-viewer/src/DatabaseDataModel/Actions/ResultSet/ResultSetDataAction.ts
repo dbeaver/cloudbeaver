@@ -39,6 +39,27 @@ export class ResultSetDataAction extends GridDataResultAction<
     super(source as unknown as IDatabaseDataSource<unknown, IDatabaseResultSet>, result as IDatabaseResultSet);
   }
 
+  insertRow(row: IGridRowKey, value: IResultSetValue[], shift = 0): IGridRowKey | undefined {
+    if (this.result.data?.rowsWithMetaData) {
+      const index = row.index + shift;
+      this.result.data.rowsWithMetaData.splice(index, 0, { data: value, metaData: {} });
+
+      return { index, subIndex: 0 };
+    }
+
+    return undefined;
+  }
+
+  removeRow(row: IGridRowKey, shift = 0): IGridRowKey | undefined {
+    if (this.result.data?.rowsWithMetaData) {
+      const index = row.index + shift;
+      this.result.data.rowsWithMetaData.splice(index, 1);
+
+      return { index: index - 1, subIndex: 0 };
+    }
+    return undefined;
+  }
+
   setRowValue(row: IGridRowKey, value: IResultSetValue[], shift = 0): void {
     if (this.result.data?.rowsWithMetaData) {
       this.result.data.rowsWithMetaData[row.index + shift] = { data: value, metaData: this.getRowMetadata(row) };
