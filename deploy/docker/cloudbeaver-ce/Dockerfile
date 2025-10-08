@@ -18,6 +18,4 @@ WORKDIR /opt/cloudbeaver/
 
 RUN chmod +x "run-cloudbeaver-server.sh"
 
-USER dbeaver
-
 ENTRYPOINT ["./run-cloudbeaver-server.sh"]
