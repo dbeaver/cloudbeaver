@@ -128,9 +128,9 @@ export const Combobox: ComboboxType = observer(function Combobox({
     .filter(({ isVisible }) => isVisible);
 
   const handleSelect = useCallback(
-    (selectedValue: string | string[]) => {
+    (selectedValue: string | string[] | null) => {
       const item = items.find((item, idx) => keySelector(item, idx) === selectedValue);
-      if (!item || selectedValue === selectedKey) {
+      if ((!item || selectedValue === selectedKey) && !allowClear) {
         return;
       }
 
@@ -141,10 +141,10 @@ export const Combobox: ComboboxType = observer(function Combobox({
         onSelect(selectedValue, name as undefined, selectedKey);
       }
       if (context) {
-        context.change(selectedValue as string, name);
+        context.change(typeof selectedValue === 'string' ? selectedValue : '', name);
       }
     },
-    [items, selectedKey, state, onSelect, context, keySelector, name],
+    [items, selectedKey, allowClear, name, state, onSelect, context, keySelector],
   );
 
   const icon: string | React.ReactElement | undefined = selectedItem ? iconSelector?.(selectedItem) : undefined;
@@ -168,19 +168,6 @@ export const Combobox: ComboboxType = observer(function Combobox({
   function handleBlur() {
     if (!allowCustomValue) {
       setInputValue(null);
-    }
-  }
-
-  function handleClear() {
-    setInputValue(null);
-    if (name !== undefined && state) {
-      state[name] = undefined;
-    }
-    if (onSelect) {
-      onSelect(undefined as any, name as undefined, selectedKey);
-    }
-    if (context) {
-      context.change('', name);
     }
   }
 
@@ -237,8 +224,8 @@ export const Combobox: ComboboxType = observer(function Combobox({
             <>
               {displayValue && allowClear && !disabled && !readOnly && (
                 <ComboboxCancel
-                  className="tw:absolute tw:right-8 tw:top-[50%] tw:-translate-y-1/2 tw:[&>svg]:fill-none! tw:text-sm! tw:cursor-pointer tw:opacity-50 hover:tw:opacity-100"
-                  onClick={handleClear}
+                  className="tw:absolute tw:right-8 tw:top-[50%] tw:-translate-y-1/2 tw:cursor-pointer tw:hover:bg-gray-200 tw:rounded"
+                  onClick={() => handleSelect(null)}
                 />
               )}
               {displayPopover && (
