@@ -16,6 +16,7 @@
  */
 package io.cloudbeaver.service.fs.impl;
 
+import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.fs.FSUtils;
 import io.cloudbeaver.model.session.WebSession;
@@ -30,6 +31,7 @@ import org.jkiss.dbeaver.model.navigator.fs.DBNFileSystem;
 import org.jkiss.dbeaver.model.navigator.fs.DBNFileSystems;
 import org.jkiss.dbeaver.model.navigator.fs.DBNPathBase;
 import org.jkiss.dbeaver.registry.fs.FileSystemProviderRegistry;
+import org.jkiss.dbeaver.runtime.DBWorkbench;
 
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -147,6 +149,7 @@ public class WebServiceFS implements DBWServiceFS {
         boolean forceOverwrite
     )
         throws DBWebException {
+        validateEditPermissions(webSession);
         try {
             DBNPathBase node = FSUtils.getNodeByPath(webSession, nodePath);
             Path filePath = node.getPath();
@@ -167,6 +170,7 @@ public class WebServiceFS implements DBWServiceFS {
         @NotNull String parentPath,
         @NotNull String fileName
     ) throws DBWebException {
+        validateEditPermissions(webSession);
         try {
             DBNPathBase parentNode = FSUtils.getNodeByPath(webSession, parentPath);
             if (!Files.isDirectory(parentNode.getPath())) {
@@ -187,6 +191,7 @@ public class WebServiceFS implements DBWServiceFS {
         @NotNull String oldNodePath,
         @NotNull String parentNodePath
     ) throws DBWebException {
+        validateEditPermissions(webSession);
         try {
             DBNPathBase oldNode = FSUtils.getNodeByPath(webSession, oldNodePath);
             DBNPathBase oldParentNode = (DBNPathBase) oldNode.getParentNode();
@@ -212,6 +217,7 @@ public class WebServiceFS implements DBWServiceFS {
         @NotNull String nodePath,
         @NotNull String newName
     ) throws DBWebException {
+        validateEditPermissions(webSession);
         validateFilename(newName);
         try {
             DBNPathBase node = FSUtils.getNodeByPath(webSession, nodePath);
@@ -228,6 +234,7 @@ public class WebServiceFS implements DBWServiceFS {
         @NotNull String oldNodePath,
         @NotNull String parentNodePath
     ) throws DBWebException {
+        validateEditPermissions(webSession);
         try {
             DBNPathBase oldNode = FSUtils.getNodeByPath(webSession, oldNodePath);
             String fileName = oldNode.getName();
@@ -251,6 +258,7 @@ public class WebServiceFS implements DBWServiceFS {
         @NotNull String parentPath,
         @NotNull String folderName
     ) throws DBWebException {
+        validateEditPermissions(webSession);
         try {
             DBNPathBase parentNode = FSUtils.getNodeByPath(webSession, parentPath);
             if (!Files.isDirectory(parentNode.getPath())) {
@@ -270,6 +278,7 @@ public class WebServiceFS implements DBWServiceFS {
         @NotNull WebSession webSession,
         @NotNull String nodePath
     ) throws DBWebException {
+        validateEditPermissions(webSession);
         try {
             DBNPathBase node = FSUtils.getNodeByPath(webSession, nodePath);
             Path path = node.getPath();
@@ -287,6 +296,12 @@ public class WebServiceFS implements DBWServiceFS {
 
         if (matcher.find()) {
             throw new DBWebException(String.format("File %s contains forbidden symbols", filename));
+        }
+    }
+    
+    private void validateEditPermissions(@NotNull WebSession webSession) throws DBWebException {
+        if (DBWorkbench.isDistributed() && !webSession.hasPermission(DBWConstants.PERMISSION_FS_RESOURCE_EDIT)) {
+            throw new DBWebException("Permission denied");
         }
     }
 }
