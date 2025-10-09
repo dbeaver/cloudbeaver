@@ -18,6 +18,7 @@ package io.cloudbeaver.service.navigator.impl;
 
 
 import io.cloudbeaver.BaseWebProjectImpl;
+import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.model.WebCommandContext;
@@ -44,6 +45,7 @@ import org.jkiss.dbeaver.model.exec.DBCExecutionContext;
 import org.jkiss.dbeaver.model.exec.DBCExecutionContextDefaults;
 import org.jkiss.dbeaver.model.exec.DBExecUtils;
 import org.jkiss.dbeaver.model.navigator.*;
+import org.jkiss.dbeaver.model.navigator.fs.DBNPathBase;
 import org.jkiss.dbeaver.model.navigator.meta.DBXTreeItem;
 import org.jkiss.dbeaver.model.rm.RMControllerProvider;
 import org.jkiss.dbeaver.model.rm.RMProject;
@@ -596,6 +598,8 @@ public class WebServiceNavigator implements DBWServiceNavigator {
             return SMUtils.hasProjectPermission(session, rmProject, RMProjectPermission.DATA_SOURCES_EDIT);
         } else if (node instanceof DBNAbstractResourceManagerNode) {
             return SMUtils.hasProjectPermission(session, rmProject, RMProjectPermission.RESOURCE_EDIT);
+        } else if (node instanceof DBNPathBase) {
+            return !DBWorkbench.isDistributed() || session.hasPermission(DBWConstants.PERMISSION_FS_RESOURCE_EDIT);
         }
         return true;
     }

@@ -224,10 +224,8 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
             throw new DBWebException("Not logged in");
         }
         try {
-            List<WebAuthInfo> removedInfos = webSession.removeAuthInfo(providerId, false);
+            List<WebAuthInfo> removedInfos = webSession.removeAuthInfo(providerId);
             var cbApp = CBApplication.getInstance();
-            cbApp.getSessionManager().closeSession(webSession.getSessionId(), false);
-            webSession.resetUserState();
 
             List<String> logoutUrls = new ArrayList<>();
             String origin = ServletAppUtils.getOriginFromRequest(httpRequest);
@@ -268,11 +266,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
     public WebUserInfo activeUser(@NotNull WebSession webSession) throws DBWebException {
         if (webSession.getUser() == null) {
             ServletApplication application = webSession.getApplication();
-            if (application.getAppConfiguration().isAnonymousAccessEnabled() && webSession.isAuthorizedInSecurityManager()) {
-                SMUser anonymous = new SMUser("anonymous", true, null);
-                return new WebUserInfo(webSession, new WebUser(anonymous));
-            }
-            if (!application.isAnonymousAccessEnabled()) {
+            if (!application.getAppConfiguration().isAnonymousAccessEnabled() || !webSession.isAuthorizedInSecurityManager()) {
                 return null;
             }
             SMUser anonymous = new SMUser("anonymous", true, null);
