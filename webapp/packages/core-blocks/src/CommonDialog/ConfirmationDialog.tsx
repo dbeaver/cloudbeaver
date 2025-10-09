@@ -93,8 +93,10 @@ export const ConfirmationDialog: DialogComponent<ConfirmationDialogPayload, Conf
       <CommonDialogBody>
         <Translate token={message} />
         {children && children?.()}
+      </CommonDialogBody>
+      <CommonDialogFooter className={s(styles, { footer: true })}>
         {showSkipConfirmations && (
-          <div className="tw:mt-4">
+          <div className="tw:w-full tw:flex tw:justify-start">
             <Checkbox
               name="skipConfirmations"
               label={translate('ui_processing_skip_confirmations')}
@@ -103,8 +105,6 @@ export const ConfirmationDialog: DialogComponent<ConfirmationDialogPayload, Conf
             />
           </div>
         )}
-      </CommonDialogBody>
-      <CommonDialogFooter className={s(styles, { footer: true })}>
         <Button type="button" variant="secondary" onClick={reject}>
           <Translate token={cancelActionText || 'ui_processing_cancel'} />
         </Button>

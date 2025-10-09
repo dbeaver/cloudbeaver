@@ -45,7 +45,7 @@ export class SqlQueryAsyncTaskConfirmationBootstrap extends Bootstrap {
       message: confirmationEvent.message,
       icon: '/icons/warning_icon_sm.svg',
       showSkipConfirmations: true,
-      size: 'medium',
+      size: 'large',
       children: () => renderQueryForConfirmation(confirmationEvent.query),
     });
 
@@ -66,7 +66,7 @@ export class SqlQueryAsyncTaskConfirmationBootstrap extends Bootstrap {
 
   private handleTaskUpdated(task: AsyncTask) {
     if (!task.info?.running && task.info?.id) {
-      const confirmationPromise = this.pendingConfirmations.get(task.id);
+      const confirmationPromise = this.pendingConfirmations.get(task.info.id);
       if (!confirmationPromise) {
         return;
       }
