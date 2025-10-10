@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { useCallback, useMemo, useRef, useState, type HTMLAttributes } from 'react';
+import { useCallback, useLayoutEffect, useMemo, useRef, useState, type HTMLAttributes } from 'react';
 import { reaction } from 'mobx';
 
 import { getComputed, s, TextPlaceholder, useObjectRef, useS, useTranslate } from '@cloudbeaver/core-blocks';
@@ -22,15 +22,20 @@ import {
 } from '@cloudbeaver/plugin-data-grid';
 import {
   DATA_CONTEXT_DV_PRESENTATION,
+  type DatabaseDataSelectActionsData,
   DatabaseEditChangeType,
   DatabaseSelectAction,
   DataViewerPresentationType,
   type IDatabaseDataModel,
   type IDataPresentationProps,
+  type IResultSetEditActionData,
+  type IResultSetElementKey,
+  type IResultSetPartialKey,
   isBooleanValuePresentationAvailable,
   ResultSetDataKeysUtils,
   ResultSetDataSource,
   ResultSetSelectAction,
+  ResultSetViewAction,
   DatabaseDataConstraintAction,
   getNextOrder,
   isResultSetDataModel,
@@ -73,6 +78,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
   const [pinnedColumns, setPinnedColumns] = useState<Set<string>>(new Set());
 
   const selectionAction = (model.source as unknown as ResultSetDataSource).getAction(resultIndex, ResultSetSelectAction);
+  const viewAction = (model.source as unknown as ResultSetDataSource).getAction(resultIndex, ResultSetViewAction);
 
   const tableData = useTableData(model as unknown as IDatabaseDataModel<ResultSetDataSource>, resultIndex, dataGridDivRef);
   const gridSelectionContext = useGridSelectionContext(tableData, selectionAction);
@@ -146,6 +152,35 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
         dataGridRef.current?.selectCell(pos);
       }
     },
+    focusCell(key: Partial<IResultSetElementKey> | null, initial = false) {
+      if ((!key?.column || !key?.row) && initial) {
+        const selectedElements = selectionAction.getSelectedElements();
+
+        if (selectedElements.length > 0) {
+          key = selectedElements[0]!;
+        } else {
+          key = { column: viewAction.columnKeys[0], row: viewAction.rowKeys[0] };
+        }
+        selectionAction.focus(key as IResultSetElementKey);
+      }
+
+      if (!key?.column || !key?.row) {
+        if (initial) {
+          focusSyncRef.current = { colIdx: 0, rowIdx: -1 };
+          this.selectCell(focusSyncRef.current);
+        } else {
+          focusSyncRef.current = null;
+        }
+        return;
+      }
+
+      const colIdx = tableData.getColumnIndexFromColumnKey(key.column!);
+      const rowIdx = tableData.getRowIndexFromKey(key.row!);
+
+      focusSyncRef.current = { colIdx, rowIdx };
+
+      this.selectCell({ colIdx, rowIdx });
+    },
   }));
 
   const gridSelectedCellCopy = useGridSelectedCellsCopy(tableData, selectionAction as unknown as DatabaseSelectAction, gridSelectionContext);
@@ -164,6 +199,46 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
   useCaptureViewContext((context, id) => {
     context.set(DATA_CONTEXT_DV_PRESENTATION, { type: DataViewerPresentationType.Data }, id);
   });
+
+  useLayoutEffect(() => {
+    function syncEditor(data: IResultSetEditActionData) {
+      const editor = tableData.editor;
+      if (data.resultId !== editor.result.id || !data.value || data.value.length === 0 || data.type === DatabaseEditChangeType.delete) {
+        return;
+      }
+
+      const key = data.value[data.value.length - 1]!.key;
+
+      const colIdx = tableData.getColumnIndexFromColumnKey(key.column);
+      const rowIdx = tableData.getRowIndexFromKey(key.row);
+
+      if (selectionAction.isFocused(key)) {
+        dataGridRef.current?.scrollToCell({ colIdx });
+        return;
+      }
+
+      handlers.selectCell({ colIdx, rowIdx });
+    }
+
+    tableData.editor.action.addHandler(syncEditor);
+
+    function syncFocus(data: DatabaseDataSelectActionsData<IResultSetPartialKey>) {
+      if (data.type === 'focus') {
+        // TODO: we need this delay to update focus after render rows update
+        setTimeout(() => {
+          handlers.focusCell(data.key);
+          setTimeout(() => restoreFocus(), 1);
+        }, 1);
+      }
+    }
+
+    selectionAction.actions.addHandler(syncFocus);
+    handlers.focusCell(selectionAction.getFocusedElement(), true);
+
+    return () => {
+      tableData.editor.action.removeHandler(syncEditor);
+    };
+  }, [tableData.editor, selectionAction, handlers, tableData, restoreFocus]);
 
   const handleFocusChange = (position: ICellPosition) => {
     focusedCell.current = position;
