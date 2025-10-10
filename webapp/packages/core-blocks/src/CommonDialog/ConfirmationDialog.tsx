@@ -105,16 +105,16 @@ export const ConfirmationDialog: DialogComponent<ConfirmationDialogPayload, Conf
             />
           </div>
         )}
-        <Button type="button" variant="secondary" onClick={reject}>
+        <Button type="button" variant="secondary" className="tw:shrink-0" onClick={reject}>
           <Translate token={cancelActionText || 'ui_processing_cancel'} />
         </Button>
         <Fill />
         {showExtraAction && (
-          <Button type="button" variant="secondary" onClick={extraAction}>
+          <Button type="button" variant="secondary" className="tw:shrink-0" onClick={extraAction}>
             <Translate token={extraActionText || 'ui_no'} />
           </Button>
         )}
-        <Button type="button" onClick={resolve}>
+        <Button type="button" className="tw:shrink-0" onClick={resolve}>
           <Translate token={confirmActionText || 'ui_processing_ok'} />
         </Button>
       </CommonDialogFooter>
