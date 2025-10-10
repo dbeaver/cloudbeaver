@@ -23,6 +23,7 @@ import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.session.WebSessionProvider;
 import io.cloudbeaver.server.WebAppUtils;
 import io.cloudbeaver.server.jobs.SqlOutputLogReaderJob;
+import io.cloudbeaver.service.sql.messages.WebSQLMessages;
 import org.eclipse.jface.text.Document;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
@@ -68,6 +69,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+
+import static io.cloudbeaver.service.sql.WebSQLConstants.TASK_CONFIRMATION_TIMEOUT_SECONDS;
 
 /**
  * Web SQL processor.
@@ -1283,7 +1286,7 @@ public class WebSQLProcessor implements WebSessionProvider {
         webSession.addSessionEvent(createConfirmationEvent(asyncTask, query));
 
         try {
-            Boolean isConfirmed = confirmationFuture.get(30, TimeUnit.SECONDS);
+            Boolean isConfirmed = confirmationFuture.get(TASK_CONFIRMATION_TIMEOUT_SECONDS, TimeUnit.SECONDS);
             return isConfirmed != null && isConfirmed;
         } catch (TimeoutException e) {
             throw new DBWebException("Query confirmation timeout");
@@ -1299,8 +1302,8 @@ public class WebSQLProcessor implements WebSessionProvider {
         @NotNull WebAsyncTaskInfo asyncTask,
         @Nullable String query
     ) {
-        String title = "Confirm query execution";
-        String message = "The query you're about to execute can modify existing data or schema.\nDo you want to continue?";
+        String title = WebSQLMessages.model_web_sql_confirmation_title;
+        String message = WebSQLMessages.model_web_sql_confirmation_message;
 
         WSEvent confirmationEvent;
         if (query != null) {
