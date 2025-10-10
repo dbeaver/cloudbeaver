@@ -6,7 +6,15 @@
  * you may not use this file except in compliance with the License.
  */
 import { injectable } from '@cloudbeaver/core-di';
-import { ACTION_EDIT, ActionService, getBindingLabel, KEY_BINDING_ADD, KEY_BINDING_DUPLICATE, MenuService, type IAction } from '@cloudbeaver/core-view';
+import {
+  ACTION_EDIT,
+  ActionService,
+  getBindingLabel,
+  KEY_BINDING_ADD,
+  KEY_BINDING_DUPLICATE,
+  MenuService,
+  type IAction,
+} from '@cloudbeaver/core-view';
 import {
   DATA_CONTEXT_DV_DDM,
   DATA_CONTEXT_DV_DDM_RESULT_INDEX,
@@ -40,9 +48,7 @@ export class DataGridContextMenuCellEditingService {
     private readonly actionService: ActionService,
     private readonly localizationService: LocalizationService,
     private readonly menuService: MenuService,
-  ) { }
-
-
+  ) {}
 
   register(): void {
     this.menuService.addCreator({
@@ -160,7 +166,7 @@ export class DataGridContextMenuCellEditingService {
 
         switch (action) {
           case ACTION_EDIT:
-            actions.edit(key);
+            actions.edit();
             break;
           case ACTION_DATA_GRID_EDITING_SET_TO_NULL:
             editor.set(key, null);
@@ -191,10 +197,18 @@ export class DataGridContextMenuCellEditingService {
   private getActionInfo(context: IDataContextProvider, action: IAction) {
     const t = this.localizationService.translate;
     if (action === ACTION_DATA_GRID_EDITING_ADD_ROW) {
-      return { ...action.info, label: 'data_grid_table_editing_row_add', tooltip: t('data_grid_table_editing_row_add') + ' (' + getBindingLabel(KEY_BINDING_ADD) + ')' };
+      return {
+        ...action.info,
+        label: 'data_grid_table_editing_row_add',
+        tooltip: t('data_grid_table_editing_row_add') + ' (' + getBindingLabel(KEY_BINDING_ADD) + ')',
+      };
     }
     if (action === ACTION_DATA_GRID_EDITING_DUPLICATE_ROW) {
-      return { ...action.info, label: 'data_grid_table_editing_row_add_copy', tooltip: t('data_grid_table_editing_row_add_copy') + ' (' + getBindingLabel(KEY_BINDING_DUPLICATE) + ')' };
+      return {
+        ...action.info,
+        label: 'data_grid_table_editing_row_add_copy',
+        tooltip: t('data_grid_table_editing_row_add_copy') + ' (' + getBindingLabel(KEY_BINDING_DUPLICATE) + ')',
+      };
     }
 
     if (action === ACTION_EDIT) {

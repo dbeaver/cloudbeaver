@@ -10,11 +10,10 @@ import { use, useContext } from 'react';
 import { DataGridCellInnerContext } from '@cloudbeaver/plugin-data-grid';
 
 import { getComputed, s, useObjectRef, useS } from '@cloudbeaver/core-blocks';
-import type { IDataPresentationActions, IResultSetElementKey } from '@cloudbeaver/plugin-data-viewer';
+import type { IDataPresentationActions } from '@cloudbeaver/plugin-data-viewer';
 
 import { CellContext } from '../CellRenderer/CellContext.js';
 import { DataGridContext } from '../DataGridContext.js';
-import { TableDataContext } from '../TableDataContext.js';
 import style from './CellFormatter.module.css';
 import { CellFormatterFactory } from './CellFormatterFactory.js';
 import { CellMenu } from './Menu/CellMenu.js';
@@ -26,8 +25,7 @@ interface Props {
 
 export const CellFormatter = observer<Props>(function CellFormatter({ rowIdx, colIdx }) {
   const context = useContext(DataGridContext);
-  const tableDataContext = useContext(TableDataContext);
-  const innerCellContext = use(DataGridCellInnerContext);
+  const innerCellContext = use(DataGridCellInnerContext)!;
   const cellContext = useContext(CellContext);
 
   const cell = cellContext.cell;
@@ -36,14 +34,9 @@ export const CellFormatter = observer<Props>(function CellFormatter({ rowIdx, co
   );
   const styles = useS(style);
 
-  const spreadsheetActions = useObjectRef<IDataPresentationActions<IResultSetElementKey>>({
-    edit(position) {
-      const colIdx = tableDataContext.getColumnIndexFromColumnKey(position.column);
-      const rowIdx = tableDataContext.getRowIndexFromKey(position.row);
-
-      if (colIdx !== -1) {
-        context.getDataGridApi()?.openEditor({ colIdx, rowIdx });
-      }
+  const spreadsheetActions = useObjectRef<IDataPresentationActions>({
+    edit() {
+      context.getDataGridApi()?.openEditor({ rowIdx: innerCellContext.rowIdx, colIdx: innerCellContext.colIdx });
     },
     unpinColumn(key) {
       context.unpinColumn(key);

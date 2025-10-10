@@ -9,11 +9,12 @@
 import { forwardRef, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import {
   DataGrid as DataGridBase,
-  type ColumnOrColumnGroup,
   type CellSelectArgs,
   type DataGridHandle,
   type ColumnWidth,
   type ColumnWidths,
+  type Column,
+  type ColumnOrColumnGroup,
 } from 'react-data-grid';
 import { rowRenderer } from './renderers/rowRenderer.js';
 import { cellRenderer } from './renderers/cellRenderer.js';
@@ -100,23 +101,21 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
 
   const rowsCountRef = useRef(rowsCount);
   const innerGridRef = useRef<DataGridHandle>(null);
-  const columns = new Array<ColumnOrColumnGroup<IInnerRow, unknown>>(columnsCount)
-    .fill(null as any)
-    .map((_, i): ColumnOrColumnGroup<IInnerRow, unknown> => {
-      const width = getHeaderWidth?.(i) ?? 'max-content';
-      return {
-        key: getColumnKey?.(i) ?? String(i),
-        name: '',
-        resizable: getHeaderResizable?.(i) ?? true,
-        width,
-        minWidth: 26,
-        editable: row => getCellEditable?.(row.idx, i) ?? false,
-        frozen: getHeaderPinned?.(i),
-        renderHeaderCell: mapRenderHeaderCell(i),
-        renderCell: mapCellContentRenderer(i),
-        renderEditCell: mapEditCellRenderer(i),
-      };
-    });
+  const columns = new Array<ColumnOrColumnGroup<IInnerRow, unknown>>(columnsCount).fill(null as any).map((_, i) => {
+    const width = getHeaderWidth?.(i) ?? 'max-content';
+    return {
+      key: getColumnKey?.(i) ?? String(i),
+      name: '',
+      resizable: getHeaderResizable?.(i) ?? true,
+      width,
+      minWidth: 26,
+      editable: row => getCellEditable?.(row.idx, i) ?? false,
+      frozen: getHeaderPinned?.(i),
+      renderHeaderCell: mapRenderHeaderCell(i),
+      renderCell: mapCellContentRenderer(i),
+      renderEditCell: mapEditCellRenderer(i),
+    } as Column<IInnerRow, unknown>;
+  });
 
   const dndHeaderContext = useHeaderDnD({ columns, onReorder: onHeaderReorder, getCanDrag: getHeaderDnD, getHeaderOrder });
 
@@ -155,11 +154,11 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
   );
 
   function handleCellFocus(args: CellSelectArgs<IInnerRow, unknown>) {
-    onFocus?.({ colIdx: dndHeaderContext.getDataColIdx(args.column.idx), rowIdx: args.rowIdx });
+    onFocus?.({ colIdx: dndHeaderContext.getDataColIdxByKey(args.column.key), rowIdx: args.rowIdx });
   }
 
   function handleCellKeyDown(args: CellSelectArgs<IInnerRow, unknown>, event: DataGridCellKeyboardEvent) {
-    onCellKeyDown?.({ colIdx: dndHeaderContext.getDataColIdx(args.column.idx), rowIdx: args.rowIdx }, event);
+    onCellKeyDown?.({ colIdx: dndHeaderContext.getDataColIdxByKey(args.column.key), rowIdx: args.rowIdx }, event);
   }
 
   // We need to patch auto-size width to avoid extremely large columns on table initialization

@@ -8,8 +8,8 @@
 
 import type { IResultSetColumnKey } from '../DatabaseDataModel/Actions/ResultSet/IResultSetDataKey.js';
 
-export interface IDataPresentationActions<TKey> {
-  edit: (key: TKey) => void;
+export interface IDataPresentationActions {
+  edit: () => void;
   pinColumn: (key: IResultSetColumnKey) => void;
   unpinColumn: (key: IResultSetColumnKey) => void;
   isPinnedColumn: (key: IResultSetColumnKey) => boolean;
