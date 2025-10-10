@@ -40,7 +40,7 @@ export * from './Action/KeyBinding/Bindings/KEY_BINDING_SAVE.js';
 export * from './Action/KeyBinding/Bindings/KEY_BINDING_ADD.js';
 export * from './Action/KeyBinding/Bindings/KEY_BINDING_DUPLICATE.js';
 export * from './Action/KeyBinding/Bindings/KEY_BINDING_DELETE.js';
-export * from './Action/KeyBinding/Bindings/KEY_BINDING_CANCEL.js';
+export * from './Action/KeyBinding/Bindings/KEY_BINDING_REVERT.js';
 export * from './Action/KeyBinding/KeyBindingService.js';
 export * from './Action/KeyBinding/createKeyBinding.js';
 export * from './Action/ActionService.js';

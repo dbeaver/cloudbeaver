@@ -32,6 +32,8 @@ public interface DBWConstants {
     String PERMISSION_SQL_RESULT_UPDATE = "sql-result-update";
     String PERMISSION_SQL_EXECUTE_QUERY = "sql-execute-query";
 
+    String PERMISSION_FS_RESOURCE_EDIT = "fs-resource-edit";
+
     String GLOBAL_PERMISSION_SCRIPT_EXECUTE = "permission.sql.script.execution";
     String GLOBAL_PERMISSION_DATA_EDITOR_IMPORT = "permission.data-editor.import";
     String GLOBAL_PERMISSION_DATA_EDITOR_EDITING = "permission.data-editor.editing";
