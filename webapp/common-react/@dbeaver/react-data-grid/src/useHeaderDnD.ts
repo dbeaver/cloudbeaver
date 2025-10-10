@@ -6,13 +6,13 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { Column } from 'react-data-grid';
+import type { Column, ColumnOrColumnGroup } from 'react-data-grid';
 import type { IInnerRow } from './IInnerRow.js';
 import { createContext, useId, useMemo, useState } from 'react';
 import { reorderArray } from './reorderArray.js';
 
 interface IHeaderDnDOptions {
-  columns: Array<Column<IInnerRow, unknown>>;
+  columns: Array<ColumnOrColumnGroup<IInnerRow, unknown>>;
   getCanDrag?: (colIdx: number) => boolean;
   onReorder?: (from: number, to: number) => void;
   getHeaderOrder?: () => number[];
@@ -20,7 +20,7 @@ interface IHeaderDnDOptions {
 
 interface IHeaderDnD {
   id: string;
-  columns: Array<Column<IInnerRow, unknown>>;
+  columns: Array<ColumnOrColumnGroup<IInnerRow, unknown>>;
   getDataColIdx: (virtualColIdx: number) => number;
   getVirtualColIdx: (dataColIdx: number) => number;
   getDataColIdxByKey: (key: string) => number;
@@ -31,13 +31,17 @@ interface IHeaderDnD {
 
 export const HeaderDnDContext = createContext<IHeaderDnD | null>(null);
 
+function isColumn(column: ColumnOrColumnGroup<IInnerRow, unknown>): column is Column<IInnerRow, unknown> {
+  return (column as Column<IInnerRow, unknown>).key !== undefined;
+}
+
 export function useHeaderDnD({ columns, getCanDrag, onReorder, getHeaderOrder }: IHeaderDnDOptions): IHeaderDnD {
   const id = useId();
   const [activeDnDElement, setActiveDnDElement] = useState<number | null>(null);
   const [dragOverElement, setDragOverElement] = useState<[number, boolean] | null>(null);
 
   function getDataColIdxByKey(key: string) {
-    const columnIndex = columns.findIndex(col => col.key === key);
+    const columnIndex = columns.filter(isColumn).findIndex(col => col.key === key);
 
     if (columnIndex === -1) {
       throw new Error(`Column with key '${key}' not found`);
