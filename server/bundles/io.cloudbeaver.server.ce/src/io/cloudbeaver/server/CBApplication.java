@@ -400,6 +400,9 @@ public abstract class CBApplication<T extends CBServerConfig>
                 getAppConfiguration(),
                 null
             );
+            if (!isMultiNode()) {
+                grantPermissionsToConnections();
+            }
         } catch (Exception e) {
             log.error("Error loading server auto configuration", e);
         }

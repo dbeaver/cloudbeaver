@@ -793,7 +793,7 @@ public class WebSession extends BaseWebSession
         }
     }
 
-    public List<WebAuthInfo> removeAuthInfo(String providerId, boolean needResetUserState) throws DBException {
+    public List<WebAuthInfo> removeAuthInfo(String providerId) throws DBException {
         List<WebAuthInfo> oldInfo;
         if (providerId == null) {
             oldInfo = clearAuthTokens();
@@ -806,14 +806,10 @@ public class WebSession extends BaseWebSession
                 oldInfo = List.of();
             }
         }
-        if (authTokens.isEmpty() && needResetUserState) {
+        if (authTokens.isEmpty()) {
             resetUserState();
         }
         return oldInfo;
-    }
-
-    public List<WebAuthInfo> removeAuthInfo(String providerId) throws DBException {
-        return removeAuthInfo(providerId, true);
     }
 
     public List<DBACredentialsProvider> getContextCredentialsProviders() {

@@ -18,7 +18,7 @@ import {
   KEY_BINDING_ADD,
   KEY_BINDING_DELETE,
   KEY_BINDING_DUPLICATE,
-  KEY_BINDING_CANCEL,
+  KEY_BINDING_REVERT,
   KeyBindingService,
   MenuService,
   type IAction,
@@ -59,11 +59,11 @@ export class TableFooterMenuService {
     });
 
     this.keyBindingService.addKeyBindingHandler({
-      id: 'table-footer-cancel',
-      binding: KEY_BINDING_CANCEL,
+      id: 'table-footer-revert',
+      binding: KEY_BINDING_REVERT,
       contexts: [DATA_CONTEXT_DV_DDM, DATA_CONTEXT_DV_DDM_RESULT_INDEX],
       isBindingApplicable(context, action) {
-        return action === ACTION_CANCEL;
+        return action === ACTION_REVERT;
       },
       handler: this.tableFooterMenuActionHandler.bind(this),
     });
@@ -88,7 +88,7 @@ export class TableFooterMenuService {
       handler: this.tableFooterMenuActionHandler.bind(this),
     });
 
-    this.dataViewerViewService.registerAction(ACTION_DELETE, ACTION_CANCEL, ACTION_ADD, ACTION_DUPLICATE);
+    this.dataViewerViewService.registerAction(ACTION_DELETE, ACTION_REVERT, ACTION_ADD, ACTION_DUPLICATE);
   }
 
   private registerEditingActions() {
