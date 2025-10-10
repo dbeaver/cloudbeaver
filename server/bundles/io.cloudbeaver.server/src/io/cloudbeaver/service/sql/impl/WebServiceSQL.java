@@ -492,7 +492,8 @@ public class WebServiceSQL implements DBWServiceSQL {
         @Nullable String resultId,
         @Nullable WebSQLDataFilter filter,
         @Nullable WebDataFormat dataFormat,
-        boolean readLogs
+        boolean readLogs,
+        boolean useEvents
     ) throws DBException {
         if (DBWorkbench.isDistributed() && !webSession.hasPermission(DBWConstants.PERMISSION_SQL_EXECUTE_QUERY)) {
             throw new DBWebException("Permission denied");
@@ -504,7 +505,8 @@ public class WebServiceSQL implements DBWServiceSQL {
             resultId,
             filter,
             dataFormat,
-            readLogs
+            readLogs,
+            useEvents
         );
     }
 

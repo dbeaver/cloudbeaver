@@ -177,7 +177,8 @@ public class WebSQLProcessor implements WebSessionProvider {
         @Nullable WebDataFormat dataFormat,
         @NotNull WebSession webSession,
         @NotNull WebAsyncTaskInfo asyncTask,
-        boolean readLogs
+        boolean readLogs,
+        boolean useEvents
     ) throws DBWebException, DBCException {
         if (filter == null) {
             // Use default filter
@@ -225,9 +226,11 @@ public class WebSQLProcessor implements WebSessionProvider {
                 }
             }
             if (element instanceof SQLQuery mainQuery) {
-                boolean isConfirmed = confirmQueryIfNeeded(mainQuery.getScriptElements(), asyncTask, needsConfirmationPreview);
-                if (!isConfirmed) {
-                    throw new DBWebException("Query execution cancelled by user");
+                if (useEvents) {
+                    boolean isConfirmed = confirmQueryIfNeeded(mainQuery.getScriptElements(), asyncTask, needsConfirmationPreview);
+                    if (!isConfirmed) {
+                        throw new DBWebException("Query execution cancelled by user");
+                    }
                 }
 
                 DBExecUtils.tryExecuteRecover(monitor, connection.getDataSource(), param -> {

@@ -277,7 +277,8 @@ public class WebSQLUtils {
         @Nullable String resultId,
         @Nullable WebSQLDataFilter filter,
         @Nullable WebDataFormat dataFormat,
-        boolean readLogs
+        boolean readLogs,
+        boolean useEvents
     ) {
         final WebAsyncTaskInfo task = webSession.createAsyncTask("SQL execute");
         WebAsyncTaskProcessor<String> runnable = new WebAsyncTaskProcessor<>() {
@@ -287,7 +288,7 @@ public class WebSQLUtils {
                     monitor.beginTask("Execute query", 1);
                     monitor.subTask("Process query " + sql);
                     WebSQLExecuteInfo executeResults = contextInfo.getProcessor().processQuery(
-                        monitor, contextInfo, sql, resultId, filter, dataFormat, webSession, task, readLogs
+                        monitor, contextInfo, sql, resultId, filter, dataFormat, webSession, task, readLogs, useEvents
                     );
                     this.result = executeResults.getStatusMessage();
                     this.extendedResults = executeResults;
