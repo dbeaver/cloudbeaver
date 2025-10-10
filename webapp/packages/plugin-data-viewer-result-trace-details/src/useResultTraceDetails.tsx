@@ -11,10 +11,15 @@ import { useObservableRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import type { DynamicTraceProperty, GetSqlDynamicTraceMutation } from '@cloudbeaver/core-sdk';
 import { type ILoadableState, isContainsException } from '@cloudbeaver/core-utils';
-import { IDatabaseDataMetadataAction, type IDatabaseDataModel, type IGridDataKey, ResultSetDataSource } from '@cloudbeaver/plugin-data-viewer';
+import {
+  IDatabaseDataMetadataAction,
+  type IDatabaseDataModel,
+  type IGridDataKey,
+  ResultSetDataSource,
+  IDatabaseDataCacheAction,
+} from '@cloudbeaver/plugin-data-viewer';
 
 import { DVResultTraceDetailsService } from './DVResultTraceDetailsService.js';
-import { IDatabaseDataCacheAction } from '../../plugin-data-viewer/src/DatabaseDataModel/Actions/IDatabaseDataCacheAction.js';
 
 type ResultTraceDetailsPromise = Promise<GetSqlDynamicTraceMutation>;
 
@@ -41,7 +46,7 @@ const FAKE_ELEMENT_KEY: IGridDataKey = {
 
 export function useResultTraceDetails(model: IDatabaseDataModel<ResultSetDataSource>, resultIndex: number) {
   const dvResultTraceDetailsService = useService(DVResultTraceDetailsService);
-  const cache = model.source.getAction(resultIndex, IDatabaseDataCacheAction);
+  const cache = model.source.tryGetAction(resultIndex, IDatabaseDataCacheAction);
   const metadataAction = model.source.getAction(resultIndex, IDatabaseDataMetadataAction);
 
   const metadataState = metadataAction.get(RESULT_TRACE_DETAILS_METADATA_KEY, () =>
@@ -54,7 +59,7 @@ export function useResultTraceDetails(model: IDatabaseDataModel<ResultSetDataSou
   const state = useObservableRef<State>(
     () => ({
       get trace(): DynamicTraceProperty[] | undefined {
-        return this.cache.get(FAKE_ELEMENT_KEY, RESULT_TRACE_DETAILS_CACHE_KEY);
+        return this.cache?.get(FAKE_ELEMENT_KEY, RESULT_TRACE_DETAILS_CACHE_KEY);
       },
       get promise(): ResultTraceDetailsPromise | null {
         return this.metadataState.promise;
@@ -91,7 +96,9 @@ export function useResultTraceDetails(model: IDatabaseDataModel<ResultSetDataSou
 
           const { trace } = await this.metadataState.promise;
 
-          this.cache.set(FAKE_ELEMENT_KEY, RESULT_TRACE_DETAILS_CACHE_KEY, trace);
+          if (this.cache) {
+            cache.set(FAKE_ELEMENT_KEY, RESULT_TRACE_DETAILS_CACHE_KEY, trace);
+          }
         } catch (exception: any) {
           this.metadataState.exception = exception;
         } finally {
@@ -103,6 +110,7 @@ export function useResultTraceDetails(model: IDatabaseDataModel<ResultSetDataSou
       promise: computed,
       exception: computed,
       trace: computed,
+      cache: observable.ref,
       model: observable.ref,
     },
     { model, resultIndex, cache, metadataState },
