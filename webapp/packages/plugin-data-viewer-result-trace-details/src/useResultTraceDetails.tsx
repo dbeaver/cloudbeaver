@@ -97,7 +97,7 @@ export function useResultTraceDetails(model: IDatabaseDataModel<ResultSetDataSou
           const { trace } = await this.metadataState.promise;
 
           if (this.cache) {
-            cache.set(FAKE_ELEMENT_KEY, RESULT_TRACE_DETAILS_CACHE_KEY, trace);
+            this.cache.set(FAKE_ELEMENT_KEY, RESULT_TRACE_DETAILS_CACHE_KEY, trace);
           }
         } catch (exception: any) {
           this.metadataState.exception = exception;
