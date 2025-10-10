@@ -8,3 +8,7 @@
 .switchControl {
   composes: theme-switch_primary from global;
 }
+
+.fieldLabel {
+  font-weight: 500;
+}
