@@ -7,8 +7,8 @@
  */
 import { createKeyBinding } from '../createKeyBinding.js';
 
-export const KEY_BINDING_CANCEL = createKeyBinding({
-  id: 'cancel',
+export const KEY_BINDING_REVERT = createKeyBinding({
+  id: 'revert',
   keys: ['Escape'],
   preventDefault: true,
 });

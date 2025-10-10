@@ -22,12 +22,10 @@ import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.CBConstants;
 import io.cloudbeaver.service.WebServiceServletBase;
 import jakarta.servlet.MultipartConfigElement;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.Part;
-import org.eclipse.jetty.ee10.servlet.ServletContextRequest;
+import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.utils.CommonUtils;
@@ -37,7 +35,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.UUID;
 import java.util.regex.Pattern;
 
 @MultipartConfig
@@ -57,44 +54,41 @@ public class WebSQLResultServlet extends WebServiceServletBase {
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        request.setAttribute(ServletContextRequest.MULTIPART_CONFIG_ELEMENT, MULTI_PART_CONFIG);
-        String fileName = UUID.randomUUID().toString();
-        for (Part part : request.getParts()) {
-            part.write(WebSQLDataLOBReceiver.DATA_EXPORT_FOLDER + "/" + fileName);
+    protected void processServiceRequest(
+        WebSession session,
+        HttpServletRequest request,
+        HttpServletResponse response
+    ) throws DBException, IOException {
+        if (!request.getMethod().equals("GET")) {
+            return;
         }
-        response.addHeader("fileName", fileName);
+        Path dataFile = getDataFile(request);
+        session.addInfoMessage("Download LOB file ...");
+        response.setHeader("Content-Type", "application/octet-stream");
+        response.setHeader("Content-Disposition", "attachment; filename=\"" + dataFile.getFileName().toString() + "\"");
+        response.setHeader("Content-Length", String.valueOf(Files.size(dataFile)));
+        response.setDateHeader("Expires", System.currentTimeMillis() + CBConstants.STATIC_CACHE_SECONDS * 1000);
+        response.setHeader("Cache-Control", "public, max-age=" + CBConstants.STATIC_CACHE_SECONDS);
+
+        try (InputStream is = Files.newInputStream(dataFile)) {
+            IOUtils.copyStream(is, response.getOutputStream());
+        }
+        Files.deleteIfExists(dataFile);
     }
 
-    @Override
-    protected void processServiceRequest(WebSession session, HttpServletRequest request, HttpServletResponse response) throws DBException, IOException {
-        if (request.getMethod().equals("POST")) {
-            try {
-                doPost(request, response);
-            } catch (Exception e) {
-                throw new DBWebException("Servlet exception ", e);
-            }
-        } else {
-            String valuePath = request.getPathInfo();
-            if (CommonUtils.isEmpty(valuePath)) {
-                throw new DBWebException("Result value ID not specified");
-            }
-            while (valuePath.startsWith("/")) {
-                valuePath = valuePath.substring(1);
-            }
-
-            Path dataFile = WebSQLDataLOBReceiver.DATA_EXPORT_FOLDER.resolve(valuePath);
-            session.addInfoMessage("Download LOB file ...");
-            response.setHeader("Content-Type", "application/octet-stream");
-            response.setHeader("Content-Disposition", "attachment; filename=\"" + dataFile.getFileName().toString() + "\"");
-            response.setHeader("Content-Length", String.valueOf(Files.size(dataFile)));
-            response.setDateHeader("Expires", System.currentTimeMillis() + CBConstants.STATIC_CACHE_SECONDS * 1000);
-            response.setHeader("Cache-Control", "public, max-age=" + CBConstants.STATIC_CACHE_SECONDS);
-
-            try (InputStream is = Files.newInputStream(dataFile)) {
-                IOUtils.copyStream(is, response.getOutputStream());
-            }
-            Files.deleteIfExists(dataFile);
+    @NotNull
+    private Path getDataFile(HttpServletRequest request) throws DBWebException {
+        String valuePath = request.getPathInfo();
+        if (CommonUtils.isEmpty(valuePath)) {
+            throw new DBWebException("Result value ID not specified");
         }
+        while (valuePath.startsWith("/")) {
+            valuePath = valuePath.substring(1);
+        }
+        Path dataFile = WebSQLDataLOBReceiver.DATA_EXPORT_FOLDER.resolve(valuePath).normalize();
+        if (!dataFile.startsWith(WebSQLDataLOBReceiver.DATA_EXPORT_FOLDER)) {
+            throw new DBWebException("Bad result value ID");
+        }
+        return dataFile;
     }
 }
