@@ -24,6 +24,7 @@
   },
   "dependencies": {
     "@timohausmann/quadtree-ts": "^2",
+    "canvg": "^4",
     "fast-deep-equal": "^3",
     "md5": "^2",
     "mobx": "^6",
