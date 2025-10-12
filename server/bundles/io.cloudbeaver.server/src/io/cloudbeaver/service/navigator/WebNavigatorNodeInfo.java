@@ -70,7 +70,7 @@ public class WebNavigatorNodeInfo {
     @Property
     @Deprecated(forRemoval = true)
     public String getId() {
-        return node.getNodeItemPath();
+        return node.getNodeUri();
     }
 
     @Property
