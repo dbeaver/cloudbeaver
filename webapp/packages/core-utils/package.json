@@ -43,7 +43,7 @@
     "@dbeaver/react-tests": "workspace:*",
     "@types/md5": "^2",
     "@types/underscore": "^1",
-    "@types/uuid": "^10",
+    "@types/uuid": "^11",
     "@types/whatwg-mimetype": "^3",
     "rimraf": "^6",
     "typescript": "^5",
