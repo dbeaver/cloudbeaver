@@ -6,6 +6,14 @@
     --dbv-kit-icon-btn-outline-width: 1px;
   }
 
+  .rdg-header-dragging {
+    opacity: 0.5;
+  }
+
+  .rdg-header-drag-over {
+    background-color: aliceblue;
+  }
+
   @media (prefers-color-scheme: dark) {
     .rdg-cell-frozen {
       &:nth-last-child(1 of &) {

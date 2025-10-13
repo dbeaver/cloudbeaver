@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { forwardRef, useImperativeHandle, useMemo, useRef, useState } from 'react';
+import { forwardRef, useImperativeHandle, useMemo, useRef, useState, useEffect } from 'react';
 import {
   DataGrid as DataGridBase,
   type ColumnOrColumnGroup,
@@ -119,6 +119,50 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
     });
 
   const dndHeaderContext = useHeaderDnD({ columns, onReorder: onHeaderReorder, getCanDrag: getHeaderDnD, getHeaderOrder });
+
+  useEffect(() => {
+    const gridElement = innerGridRef.current?.element;
+    if (!gridElement) {
+      return;
+    }
+
+    function handleDragStart(event: DragEvent) {
+      const target = event.target as HTMLElement;
+      const headerCell = target.closest('[role="columnheader"]');
+      if (headerCell) {
+        headerCell.classList.add('rdg-header-dragging');
+      }
+    }
+
+    function handleDragOver(event: DragEvent) {
+      const headerCells = gridElement?.querySelectorAll('[role="columnheader"]');
+      headerCells?.forEach(cell => {
+        cell.classList.remove('rdg-header-drag-over');
+      });
+      const target = event.target as HTMLElement;
+      const headerCell = target.closest('[role="columnheader"]');
+      if (headerCell) {
+        headerCell.classList.add('rdg-header-drag-over');
+      }
+    }
+
+    function handleDragEnd() {
+      const headerCells = gridElement?.querySelectorAll('[role="columnheader"]');
+      headerCells?.forEach(cell => {
+        cell.classList.remove('rdg-header-dragging', 'rdg-header-drag-over');
+      });
+    }
+
+    gridElement.addEventListener('dragstart', handleDragStart, true);
+    gridElement.addEventListener('dragover', handleDragOver, true);
+    gridElement.addEventListener('dragend', handleDragEnd, true);
+
+    return () => {
+      gridElement.removeEventListener('dragstart', handleDragStart, true);
+      gridElement.removeEventListener('dragover', handleDragOver, true);
+      gridElement.removeEventListener('dragend', handleDragEnd, true);
+    };
+  }, []);
 
   useImperativeHandle(ref, () => ({
     selectCell: (position: ICellPosition) => {
