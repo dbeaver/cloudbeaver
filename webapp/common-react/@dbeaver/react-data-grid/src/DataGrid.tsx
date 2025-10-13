@@ -131,6 +131,7 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
       const headerCell = target.closest('[role="columnheader"]');
       if (headerCell) {
         headerCell.classList.add('rdg-header-dragging');
+        headerCell.querySelector('div[draggable="true"]')?.classList.add('tw:p-1');
       }
     }
 
