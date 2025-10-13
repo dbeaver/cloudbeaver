@@ -11,10 +11,10 @@ import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dial
 import { NotificationService } from '@cloudbeaver/core-events';
 import { executorHandlerFilter, ExecutorInterrupter, type IExecutionContextProvider } from '@cloudbeaver/core-executor';
 
-import { DatabaseEditAction } from './DatabaseDataModel/Actions/DatabaseEditAction.js';
 import type { IRequestEventData } from './DatabaseDataModel/IDatabaseDataModel.js';
 import { DatabaseDataSourceOperation } from './DatabaseDataModel/IDatabaseDataSource.js';
 import { TableViewerStorageService } from './TableViewer/TableViewerStorageService.js';
+import { IDatabaseDataEditAction } from './DatabaseDataModel/Actions/IDatabaseDataEditAction.js';
 
 @injectable(() => [CommonDialogService, TableViewerStorageService, NotificationService])
 export class DataViewerDataChangeConfirmationService {
@@ -47,7 +47,7 @@ export class DataViewerDataChangeConfirmationService {
 
       try {
         for (let resultIndex = 0; resultIndex < results.length; resultIndex++) {
-          const editor = model.source.getActionImplementation(resultIndex, DatabaseEditAction);
+          const editor = model.source.getAction(resultIndex, IDatabaseDataEditAction);
 
           if (editor?.isEdited() && !model.isDisabled(resultIndex)) {
             if (confirmationContext.confirmed) {

@@ -30,17 +30,18 @@ import {
   DataViewerPresentationType,
   type IDatabaseDataModel,
   type IDataPresentationProps,
-  type IResultSetEditActionData,
-  type IResultSetElementKey,
-  type IResultSetPartialKey,
   isBooleanValuePresentationAvailable,
-  ResultSetDataKeysUtils,
+  GridDataKeysUtils,
   ResultSetDataSource,
-  ResultSetSelectAction,
-  ResultSetViewAction,
-  DatabaseDataConstraintAction,
   getNextOrder,
   isResultSetDataModel,
+  IDatabaseDataSelectAction,
+  IDatabaseDataViewAction,
+  IDatabaseDataConstraintAction,
+  GridSelectAction,
+  GridViewAction,
+  type IGridEditActionData,
+  type IGridDataKey,
 } from '@cloudbeaver/plugin-data-viewer';
 
 import { CellRenderer } from './CellRenderer/CellRenderer.js';
@@ -77,8 +78,8 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
   const focusSyncRef = useRef<ICellPosition | null>(null);
   const dataGridRef = useRef<DataGridRef>(null);
 
-  const selectionAction = (model.source as unknown as ResultSetDataSource).getAction(resultIndex, ResultSetSelectAction);
-  const viewAction = (model.source as unknown as ResultSetDataSource).getAction(resultIndex, ResultSetViewAction);
+  const selectionAction = model.source.getAction(resultIndex, IDatabaseDataSelectAction, GridSelectAction);
+  const viewAction = model.source.getAction(resultIndex, IDatabaseDataViewAction, GridViewAction);
 
   const tableData = useTableData(model as unknown as IDatabaseDataModel<ResultSetDataSource>, resultIndex, dataGridDivRef);
   const gridSelectionContext = useGridSelectionContext(tableData, selectionAction);
@@ -125,7 +126,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
         dataGridRef.current?.selectCell(pos);
       }
     },
-    focusCell(key: Partial<IResultSetElementKey> | null, initial = false) {
+    focusCell(key: Partial<IGridDataKey> | null, initial = false) {
       if ((!key?.column || !key?.row) && initial) {
         const selectedElements = selectionAction.getSelectedElements();
 
@@ -134,7 +135,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
         } else {
           key = { column: viewAction.columnKeys[0], row: viewAction.rowKeys[0] };
         }
-        selectionAction.focus(key as IResultSetElementKey);
+        selectionAction.focus(key as IGridDataKey);
       }
 
       if (!key?.column || !key?.row) {
@@ -174,9 +175,9 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
   });
 
   useLayoutEffect(() => {
-    function syncEditor(data: IResultSetEditActionData) {
+    function syncEditor(data: IGridEditActionData) {
       const editor = tableData.editor;
-      if (data.resultId !== editor.result.id || !data.value || data.value.length === 0 || data.type === DatabaseEditChangeType.delete) {
+      if (data.resultId !== editor?.result.id || !data.value || data.value.length === 0 || data.type === DatabaseEditChangeType.delete) {
         return;
       }
 
@@ -193,9 +194,9 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
       handlers.selectCell({ colIdx, rowIdx });
     }
 
-    tableData.editor.action.addHandler(syncEditor);
+    tableData.editor?.action.addHandler(syncEditor);
 
-    function syncFocus(data: DatabaseDataSelectActionsData<IResultSetPartialKey>) {
+    function syncFocus(data: DatabaseDataSelectActionsData<Partial<IGridDataKey>>) {
       if (data.type === 'focus') {
         // TODO: we need this delay to update focus after render rows update
         setTimeout(() => {
@@ -209,7 +210,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
     handlers.focusCell(selectionAction.getFocusedElement(), true);
 
     return () => {
-      tableData.editor.action.removeHandler(syncEditor);
+      tableData.editor?.action.removeHandler(syncEditor);
     };
   }, [tableData.editor, selectionAction, handlers, tableData, restoreFocus]);
 
@@ -345,7 +346,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
     if (!isResultSetDataModel(model)) {
       return false;
     }
-    const constraintsAction = (model.source as unknown as ResultSetDataSource).tryGetAction(resultIndex, DatabaseDataConstraintAction);
+    const constraintsAction = model.source.tryGetAction(resultIndex, IDatabaseDataConstraintAction);
     return (
       Boolean(tableData.getColumn(colIdx) && constraintsAction?.supported && isResultSetDataModel(model) && !model.isDisabled(resultIndex)) &&
       colIdx !== 0
@@ -362,7 +363,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
     if (!isResultSetDataModel(model)) {
       return null;
     }
-    const constraintsAction = (model.source as unknown as ResultSetDataSource).tryGetAction(resultIndex, DatabaseDataConstraintAction);
+    const constraintsAction = model.source.tryGetAction(resultIndex, IDatabaseDataConstraintAction);
     const column = tableData.getColumn(colIdx)?.key;
     if (!column || !constraintsAction?.supported) {
       return null;
@@ -386,7 +387,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
     if (!resultColumn) {
       return;
     }
-    const constraintsAction = (model.source as unknown as ResultSetDataSource).tryGetAction(resultIndex, DatabaseDataConstraintAction);
+    const constraintsAction = model.source.tryGetAction(resultIndex, IDatabaseDataConstraintAction);
     const currentOrder = constraintsAction!.getOrder(resultColumn.position);
     const nextOrder = getNextOrder(currentOrder);
     model.request(() => {
@@ -402,7 +403,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
       return;
     }
 
-    tableData.editor.set({ row, column }, value);
+    tableData.editor?.set({ row, column }, value);
   }
 
   function isCellEditable(rowIdx: number, colIdx: number): boolean {
@@ -441,7 +442,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
     const column = tableData.columns[colIdx];
 
     if (column?.key) {
-      return ResultSetDataKeysUtils.serialize(column.key);
+      return GridDataKeysUtils.serialize(column.key);
     }
 
     return `_${String(colIdx)}`;
@@ -497,7 +498,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
               rowCount={rowsCount}
               columnSortable={columnSortable}
               columnSortingState={columnSortingState}
-              getRowId={rowIdx => (tableData.rows[rowIdx] ? ResultSetDataKeysUtils.serialize(tableData.rows[rowIdx]) : '')}
+              getRowId={rowIdx => (tableData.rows[rowIdx] ? GridDataKeysUtils.serialize(tableData.rows[rowIdx]) : '')}
               onFocus={handleFocusChange}
               onScrollToBottom={handleScrollToBottom}
               onColumnSort={handleSort}

@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -8,18 +8,22 @@
 import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
-import { DatabaseDataAction } from '../DatabaseDataAction.js';
-import type { IDatabaseDataSource } from '../IDatabaseDataSource.js';
-import { databaseDataAction } from './DatabaseDataActionDecorator.js';
-import type { IDatabaseDataMetadataAction } from './IDatabaseDataMetadataAction.js';
+import { DatabaseDataAction } from '../../DatabaseDataAction.js';
+import { IDatabaseDataSource } from '../../IDatabaseDataSource.js';
+import type { IDatabaseDataMetadataAction } from '../IDatabaseDataMetadataAction.js';
+import { IDatabaseDataResult } from '../../IDatabaseDataResult.js';
+import { injectable } from '@cloudbeaver/core-di';
 
-@databaseDataAction()
-export class DatabaseMetadataAction<TKey> extends DatabaseDataAction<any, any> implements IDatabaseDataMetadataAction<TKey, any> {
+@injectable(() => [IDatabaseDataSource, IDatabaseDataResult])
+export class DatabaseMetadataAction<TKey, TResult extends IDatabaseDataResult>
+  extends DatabaseDataAction<any, TResult>
+  implements IDatabaseDataMetadataAction<TKey, TResult>
+{
   static dataFormat: ResultDataFormat[] | null = null;
   readonly metadata: MetadataMap<string, any>;
 
-  constructor(source: IDatabaseDataSource<any, any>) {
-    super(source);
+  constructor(source: IDatabaseDataSource<any, TResult>, result: TResult) {
+    super(source, result);
     this.metadata = new MetadataMap();
   }
 

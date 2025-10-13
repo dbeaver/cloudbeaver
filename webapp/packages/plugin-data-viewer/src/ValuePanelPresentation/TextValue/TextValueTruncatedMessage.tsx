@@ -14,26 +14,26 @@ import { isResultSetContentValue } from '@dbeaver/result-set-api';
 import { bytesToSize } from '@cloudbeaver/core-utils';
 import { isNotNullDefined } from '@dbeaver/js-helpers';
 
-import type { IResultSetElementKey } from '../../DatabaseDataModel/Actions/ResultSet/IResultSetDataKey.js';
 import { isResultSetBlobValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetBlobValue.js';
 import { ResultSetDataContentAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetDataContentAction.js';
-import { ResultSetFormatAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction.js';
 import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel.js';
 import { ResultSetDataSource } from '../../ResultSet/ResultSetDataSource.js';
 import { QuotaPlaceholder } from '../QuotaPlaceholder.js';
 import { MAX_BLOB_PREVIEW_SIZE } from './MAX_BLOB_PREVIEW_SIZE.js';
+import { IDatabaseDataFormatAction } from '../../DatabaseDataModel/Actions/IDatabaseDataFormatAction.js';
+import type { IGridDataKey } from '../../DatabaseDataModel/Actions/Grid/IGridDataKey.js';
 
 interface Props {
   resultIndex: number;
   model: IDatabaseDataModel<ResultSetDataSource>;
-  elementKey: IResultSetElementKey;
+  elementKey: IGridDataKey;
 }
 
 export const TextValueTruncatedMessage = observer<Props>(function TextValueTruncatedMessage({ model, resultIndex, elementKey }) {
   const translate = useTranslate();
   const notificationService = useService(NotificationService);
   const contentAction = model.source.getAction(resultIndex, ResultSetDataContentAction);
-  const formatAction = model.source.getAction(resultIndex, ResultSetFormatAction);
+  const formatAction = model.source.getAction(resultIndex, IDatabaseDataFormatAction);
   const contentValue = formatAction.get(elementKey);
   let isTruncated = contentAction.isTextTruncated(elementKey);
   const isCacheLoaded = !!contentAction.retrieveFullTextFromCache(elementKey);
