@@ -13,21 +13,21 @@ import { isResultSetContentValue } from '@dbeaver/result-set-api';
 import { blobToBase64, removeMetadataFromDataURL } from '@cloudbeaver/core-utils';
 import { isNotNullDefined } from '@dbeaver/js-helpers';
 
-import type { IResultSetElementKey } from '../../DatabaseDataModel/Actions/ResultSet/IResultSetDataKey.js';
 import { isResultSetBlobValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetBlobValue.js';
 import type { ResultSetDataContentAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetDataContentAction.js';
-import type { ResultSetEditAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetEditAction.js';
-import type { ResultSetFormatAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction.js';
 import { formatText } from './formatText.js';
 import { MAX_BLOB_PREVIEW_SIZE } from './MAX_BLOB_PREVIEW_SIZE.js';
+import type { IDatabaseDataEditAction } from '../../DatabaseDataModel/Actions/IDatabaseDataEditAction.js';
+import type { IDatabaseDataFormatAction } from '../../DatabaseDataModel/Actions/IDatabaseDataFormatAction.js';
+import type { IGridDataKey } from '../../DatabaseDataModel/Actions/Grid/IGridDataKey.js';
 
 interface IUseTextValueArgs {
   dataFormat: ResultDataFormat | null;
   contentType: string;
-  elementKey?: IResultSetElementKey;
+  elementKey?: IGridDataKey;
   contentAction: ResultSetDataContentAction;
-  formatAction: ResultSetFormatAction;
-  editAction: ResultSetEditAction;
+  formatAction: IDatabaseDataFormatAction;
+  editAction: IDatabaseDataEditAction;
 }
 
 type ValueGetter = () => string;

@@ -7,7 +7,7 @@
  */
 import { createContext } from 'react';
 
-import type { DatabaseEditChangeType, IResultSetElementKey } from '@cloudbeaver/plugin-data-viewer';
+import type { DatabaseEditChangeType, IGridDataKey } from '@cloudbeaver/plugin-data-viewer';
 
 import type { IColumnInfo } from '../TableDataContext.js';
 import type { ICellPosition } from '@cloudbeaver/plugin-data-grid';
@@ -17,7 +17,7 @@ export interface ICellContext {
   isFocused: boolean;
   isSelected: boolean;
   column: IColumnInfo;
-  cell: IResultSetElementKey | undefined;
+  cell: IGridDataKey | undefined;
   position: ICellPosition;
   editionState: DatabaseEditChangeType | null;
   isMenuVisible: boolean;

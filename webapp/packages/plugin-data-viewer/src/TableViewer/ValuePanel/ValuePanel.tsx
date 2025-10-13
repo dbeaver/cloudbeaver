@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -13,15 +13,15 @@ import { useService } from '@cloudbeaver/core-di';
 import { TabList, TabPanelList, TabPanelStyles, TabsState, TabStyles } from '@cloudbeaver/core-ui';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
-import { DatabaseDataResultAction } from '../../DatabaseDataModel/Actions/DatabaseDataResultAction.js';
-import { DatabaseMetadataAction } from '../../DatabaseDataModel/Actions/DatabaseMetadataAction.js';
-import { DatabaseSelectAction } from '../../DatabaseDataModel/Actions/DatabaseSelectAction.js';
 import type { DataPresentationComponent } from '../../DataPresentationService.js';
 import { DataValuePanelService } from './DataValuePanelService.js';
 import styles from './shared/ValuePanel.module.css';
 import ValuePanelEditorTabPanel from './shared/ValuePanelEditorTabPanel.module.css';
 import ValuePanelEditorTabs from './shared/ValuePanelEditorTabs.module.css';
 import ValuePanelTab from './shared/ValuePanelTab.module.css';
+import { IDatabaseDataSelectAction } from '../../DatabaseDataModel/Actions/IDatabaseDataSelectAction.js';
+import { IDatabaseDataResultAction } from '../../DatabaseDataModel/Actions/IDatabaseDataResultAction.js';
+import { IDatabaseDataMetadataAction } from '../../DatabaseDataModel/Actions/IDatabaseDataMetadataAction.js';
 
 const tabListRegistry: StyleRegistry = [[TabStyles, { mode: 'append', styles: [ValuePanelTab] }]];
 
@@ -32,9 +32,9 @@ const tabPanelListRegistry: StyleRegistry = [
 
 export const ValuePanel: DataPresentationComponent = observer(function ValuePanel({ dataFormat, model, resultIndex }) {
   const service = useService(DataValuePanelService);
-  const selectAction = model.source.getActionImplementation(resultIndex, DatabaseSelectAction);
-  const dataResultAction = model.source.getActionImplementation(resultIndex, DatabaseDataResultAction);
-  const metadataAction = model.source.getAction(resultIndex, DatabaseMetadataAction);
+  const selectAction = model.source.tryGetAction(resultIndex, IDatabaseDataSelectAction);
+  const dataResultAction = model.source.tryGetAction(resultIndex, IDatabaseDataResultAction);
+  const metadataAction = model.source.getAction(resultIndex, IDatabaseDataMetadataAction);
   const activeElements = selectAction?.getActiveElements();
   let elementKey: string | null = null;
   const style = useS(styles);
