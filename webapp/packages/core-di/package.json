@@ -24,7 +24,7 @@
   },
   "dependencies": {
     "@cloudbeaver/core-executor": "workspace:*",
-    "@wroud/di": "^0.18.3",
+    "@wroud/di": "^0",
     "@wroud/di-react": "^0",
     "react": "^19",
     "tslib": "^2"
@@ -35,7 +35,7 @@
     "@dbeaver/cli": "workspace:*",
     "@dbeaver/react-tests": "workspace:*",
     "@types/react": "^19",
-    "@wroud/di": "^0.18.3",
+    "@wroud/di": "^0",
     "rimraf": "^6",
     "typescript": "^5",
     "vitest": "^3"

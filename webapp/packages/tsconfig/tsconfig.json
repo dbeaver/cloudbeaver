@@ -10,9 +10,6 @@
     "jsx": "react-jsx",
     "allowArbitraryExtensions": true,
     "useDefineForClassFields": false, // leads to "TypeError: Cannot redefine property requestInfo" in QueryDataSource.ts
-    /* legacy decorators */
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
     // project references
     "incremental": true,
     "declaration": true,
