@@ -16,6 +16,7 @@
  */
 package io.cloudbeaver.service.fs.model;
 
+import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.fs.FSUtils;
 import io.cloudbeaver.model.session.WebSession;
@@ -32,6 +33,7 @@ import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.navigator.fs.DBNPathBase;
+import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.IOUtils;
 
@@ -48,7 +50,7 @@ public class WebFSServlet extends WebServiceServletBase {
     private static final String PARAM_PROJECT_ID = "projectId";
     private final DBWServiceFS fs;
 
-    public WebFSServlet(CBApplication application, DBWServiceFS fs) {
+    public WebFSServlet(CBApplication<?> application, DBWServiceFS fs) {
         super(application);
         this.fs = fs;
     }
@@ -60,6 +62,10 @@ public class WebFSServlet extends WebServiceServletBase {
             return;
         }
         if (request.getMethod().equals("POST")) {
+            if (DBWorkbench.isDistributed() && !session.hasPermission(DBWConstants.PERMISSION_SQL_RESULT_UPDATE)) {
+                response.sendError(HttpServletResponse.SC_FORBIDDEN, "Permission denied.");
+                return;
+            }
             doPost(session, request, response);
         } else {
             doGet(session, request, response);
@@ -111,7 +117,7 @@ public class WebFSServlet extends WebServiceServletBase {
         Map<String, Object> variables = super.getVariables(request);
         try {
             for (Part part : request.getParts()) {
-                if (part.getSubmittedFileName()!= null && !part.getSubmittedFileName().isEmpty()) {
+                if (part.getSubmittedFileName() != null && !part.getSubmittedFileName().isEmpty()) {
                     variables.put("fileName", part.getSubmittedFileName());
                     break;
                 }

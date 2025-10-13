@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -12,11 +12,12 @@ import {
   DATA_CONTEXT_DV_DDM,
   DATA_CONTEXT_DV_DDM_RESULT_INDEX,
   DATA_CONTEXT_DV_DDM_RS_COLUMN_KEY,
+  GridViewAction,
   type IDatabaseDataModel,
-  type IResultSetColumnKey,
+  IDatabaseDataViewAction,
+  type IGridColumnKey,
   isResultSetDataModel,
   ResultSetDataSource,
-  ResultSetViewAction,
 } from '@cloudbeaver/plugin-data-viewer';
 
 type TableColumnInsertPositionSide = 'left' | 'right' | null;
@@ -28,12 +29,12 @@ interface TableColumnDnD {
   side: TableColumnInsertPositionSide;
 }
 
-export function useTableColumnDnD(model: IDatabaseDataModel, resultIndex: number, columnKey: IResultSetColumnKey | null): TableColumnDnD {
+export function useTableColumnDnD(model: IDatabaseDataModel, resultIndex: number, columnKey: IGridColumnKey | null): TableColumnDnD {
   const context = useDataContext();
-  let resultSetViewAction: ResultSetViewAction | undefined;
+  let resultSetViewAction: GridViewAction | undefined;
 
   if (isResultSetDataModel(model)) {
-    resultSetViewAction = (model.source as ResultSetDataSource).tryGetAction(resultIndex, ResultSetViewAction);
+    resultSetViewAction = (model.source as ResultSetDataSource).tryGetAction(resultIndex, IDatabaseDataViewAction, GridViewAction);
   }
 
   useDataContextLink(context, (context, id) => {

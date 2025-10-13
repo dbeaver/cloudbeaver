@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -10,15 +10,17 @@ import {
   DATA_CONTEXT_DV_DDM,
   DATA_CONTEXT_DV_DDM_RESULT_INDEX,
   DATA_CONTEXT_DV_DDM_RS_COLUMN_KEY,
+  GridDataResultAction,
   type IDatabaseDataModel,
-  type IResultSetColumnKey,
+  IDatabaseDataResultAction,
+  type IGridColumnKey,
   isResultSetDataSource,
-  ResultSetDataAction,
   ResultSetDataSource,
 } from '@cloudbeaver/plugin-data-viewer';
 
 import type { IGroupingQueryState } from './IGroupingQueryState.js';
 import type { IGroupingDataModel } from './useGroupingDataModel.js';
+import type { SqlResultColumn } from '@cloudbeaver/core-sdk';
 
 interface IGroupingQueryResult {
   dndBox: IDNDBox;
@@ -30,13 +32,14 @@ export function useGroupingDnDColumns(
   sourceModel: IDatabaseDataModel<any>,
   groupingModel: IGroupingDataModel,
 ): IGroupingQueryResult {
-  async function dropItem(source: ResultSetDataSource, resultIndex: number, columnKey: IResultSetColumnKey | null, outside: boolean) {
+  function dropItem(source: ResultSetDataSource, resultIndex: number, columnKey: IGridColumnKey | null, outside: boolean) {
     if (!columnKey) {
       return;
     }
 
-    const resultSetDataAction = source.getAction(resultIndex, ResultSetDataAction);
-    const name = resultSetDataAction.getColumn(columnKey)?.name;
+    const resultSetDataAction = source.getAction(resultIndex, IDatabaseDataResultAction, GridDataResultAction);
+    //TODO: fix column abstraction
+    const name = (resultSetDataAction.getColumn(columnKey) as SqlResultColumn | undefined)?.name;
 
     if (!name) {
       return;
@@ -59,7 +62,7 @@ export function useGroupingDnDColumns(
 
       return isResultSetDataSource(model.source) && context.has(DATA_CONTEXT_DV_DDM_RS_COLUMN_KEY) && model === sourceModel;
     },
-    onDrop: async context => {
+    onDrop: context => {
       const model = context.get(DATA_CONTEXT_DV_DDM)!;
       const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
       const columnKey = context.get(DATA_CONTEXT_DV_DDM_RS_COLUMN_KEY)!;
@@ -74,7 +77,7 @@ export function useGroupingDnDColumns(
 
       return context.has(DATA_CONTEXT_DV_DDM_RS_COLUMN_KEY) && model?.id === groupingModel.model.id && isResultSetDataSource(model.source);
     },
-    onDrop: async context => {
+    onDrop: context => {
       const model = context.get(DATA_CONTEXT_DV_DDM)!;
       const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
       const columnKey = context.get(DATA_CONTEXT_DV_DDM_RS_COLUMN_KEY)!;

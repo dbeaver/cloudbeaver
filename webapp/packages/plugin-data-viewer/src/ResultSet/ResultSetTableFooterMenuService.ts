@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -10,8 +10,6 @@ import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ActionService, MenuService } from '@cloudbeaver/core-view';
 
-import { DatabaseDataConstraintAction } from '../DatabaseDataModel/Actions/DatabaseDataConstraintAction.js';
-import { DatabaseMetadataAction } from '../DatabaseDataModel/Actions/DatabaseMetadataAction.js';
 import { DATA_CONTEXT_DV_DDM } from '../DatabaseDataModel/DataContext/DATA_CONTEXT_DV_DDM.js';
 import { DATA_CONTEXT_DV_DDM_RESULT_INDEX } from '../DatabaseDataModel/DataContext/DATA_CONTEXT_DV_DDM_RESULT_INDEX.js';
 import { type IDatabaseDataModel } from '../DatabaseDataModel/IDatabaseDataModel.js';
@@ -20,6 +18,8 @@ import { DATA_VIEWER_DATA_MODEL_ACTIONS_MENU } from '../TableViewer/TableFooter/
 import { ACTION_COUNT_TOTAL_ELEMENTS } from './ACTION_COUNT_TOTAL_ELEMENTS.js';
 import { isResultSetDataModel } from './isResultSetDataModel.js';
 import { ResultSetDataSource } from './ResultSetDataSource.js';
+import { IDatabaseDataMetadataAction } from '../DatabaseDataModel/Actions/IDatabaseDataMetadataAction.js';
+import { IDatabaseDataConstraintAction } from '../DatabaseDataModel/Actions/IDatabaseDataConstraintAction.js';
 
 interface IResultSetActionsMetadata {
   totalCount: {
@@ -68,7 +68,7 @@ export class ResultSetTableFooterMenuService {
         if (!result) {
           return false;
         }
-        const constraint = model.source.tryGetAction(resultIndex, DatabaseDataConstraintAction);
+        const constraint = model.source.tryGetAction(resultIndex, IDatabaseDataConstraintAction);
 
         switch (action) {
           case ACTION_COUNT_TOTAL_ELEMENTS: {
@@ -183,7 +183,7 @@ export class ResultSetTableFooterMenuService {
   private getState(context: IDataContextProvider) {
     const model = context.get(DATA_CONTEXT_DV_DDM)!;
     const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
-    const metadataAction = model.source.getAction(resultIndex, DatabaseMetadataAction);
+    const metadataAction = model.source.getAction(resultIndex, IDatabaseDataMetadataAction);
     return metadataAction.get<IResultSetActionsMetadata>('result-set-database-metadata', () => ({ totalCount: { loading: false } }));
   }
 }

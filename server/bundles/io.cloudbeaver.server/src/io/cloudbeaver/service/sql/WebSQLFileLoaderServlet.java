@@ -19,6 +19,7 @@ package io.cloudbeaver.service.sql;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.app.ServletApplication;
 import io.cloudbeaver.model.session.WebSession;
@@ -33,6 +34,7 @@ import org.eclipse.jetty.ee10.servlet.ServletContextRequest;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
+import org.jkiss.dbeaver.runtime.DBWorkbench;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -71,6 +73,10 @@ public class WebSQLFileLoaderServlet extends WebServiceServletBase {
     ) throws DBException, IOException {
         if (!session.isAuthorizedInSecurityManager()) {
             response.sendError(HttpServletResponse.SC_FORBIDDEN, "Update for users only");
+            return;
+        }
+        if (DBWorkbench.isDistributed() && !session.hasPermission(DBWConstants.PERMISSION_SQL_RESULT_UPDATE)) {
+            response.sendError(HttpServletResponse.SC_FORBIDDEN, "Permission denied");
             return;
         }
 

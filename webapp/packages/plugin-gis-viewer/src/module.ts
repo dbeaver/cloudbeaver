@@ -9,11 +9,16 @@
 import { ModuleRegistry, Bootstrap } from '@cloudbeaver/core-di';
 import { LocaleService } from './LocaleService.js';
 import { GISViewerBootstrap } from './GISViewerBootstrap.js';
+import { ResultSetGISAction } from './ResultSetGISAction.js';
 
 export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-gis-viewer',
 
   configure: serviceCollection => {
-    serviceCollection.addSingleton(Bootstrap, GISViewerBootstrap).addSingleton(Bootstrap, LocaleService);
+    serviceCollection
+      .addSingleton(Bootstrap, GISViewerBootstrap)
+      .addSingleton(Bootstrap, LocaleService)
+
+      .addScoped(ResultSetGISAction);
   },
 });
