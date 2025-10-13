@@ -15,18 +15,22 @@ import {
   DATA_CONTEXT_DV_DDM,
   DATA_CONTEXT_DV_DDM_RESULT_INDEX,
   DATA_CONTEXT_DV_RESULT_KEY,
-  DatabaseDataConstraintAction,
+  IDatabaseDataConstraintAction,
   type IDatabaseDataModel,
-  type IResultSetColumnKey,
+  type IGridColumnKey,
   IS_NOT_NULL_ID,
   IS_NULL_ID,
   isFilterConstraint,
   isResultSetDataSource,
   nullOperationsFilter,
-  ResultSetDataAction,
+  IDatabaseDataResultAction,
   ResultSetDataSource,
-  ResultSetFormatAction,
   wrapOperationArgument,
+  GridDataResultAction,
+  ResultSetDataAction,
+  IDatabaseDataFormatAction,
+  IDatabaseDataViewAction,
+  GridViewAction,
 } from '@cloudbeaver/plugin-data-viewer';
 
 import { ACTION_DATA_GRID_FILTERS_RESET_ALL } from '../../Actions/Filters/ACTION_DATA_GRID_FILTERS_RESET_ALL.js';
@@ -34,6 +38,7 @@ import { MENU_DATA_GRID_FILTERS } from './MENU_DATA_GRID_FILTERS.js';
 import { MENU_DATA_GRID_FILTERS_CELL_VALUE } from './MENU_DATA_GRID_FILTERS_CELL_VALUE.js';
 import { MENU_DATA_GRID_FILTERS_CLIPBOARD } from './MENU_DATA_GRID_FILTERS_CLIPBOARD.js';
 import { MENU_DATA_GRID_FILTERS_CUSTOM } from './MENU_DATA_GRID_FILTERS_CUSTOM.js';
+import type { SqlResultColumn } from '@cloudbeaver/core-sdk';
 
 const FilterCustomValueDialog = importLazyComponent(() => import('./FilterCustomValueDialog.js').then(m => m.FilterCustomValueDialog));
 
@@ -49,7 +54,7 @@ export class DataGridContextMenuFilterService {
   private async applyFilter(
     model: IDatabaseDataModel<ResultSetDataSource>,
     resultIndex: number,
-    column: IResultSetColumnKey,
+    column: IGridColumnKey,
     operator: string,
     filterValue?: any,
   ) {
@@ -57,9 +62,10 @@ export class DataGridContextMenuFilterService {
       return;
     }
 
-    const constraints = model.source.getAction(resultIndex, DatabaseDataConstraintAction);
-    const data = model.source.getAction(resultIndex, ResultSetDataAction);
-    const resultColumn = data.getColumn(column);
+    const constraints = model.source.getAction(resultIndex, IDatabaseDataConstraintAction);
+    const data = model.source.getAction(resultIndex, IDatabaseDataResultAction, GridDataResultAction);
+    // TODO: fix column abstraction
+    const resultColumn = data.getColumn(column) as SqlResultColumn | undefined;
 
     if (!resultColumn) {
       throw new Error(`Failed to get result column info for the following column index: "${column.index}"`);
@@ -78,13 +84,11 @@ export class DataGridContextMenuFilterService {
         const model = context.get(DATA_CONTEXT_DV_DDM)!;
         const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
 
-        const source = model.source as unknown as ResultSetDataSource;
-
-        if (!isResultSetDataSource(source)) {
+        if (!isResultSetDataSource(model.source)) {
           return false;
         }
 
-        const constraints = source.getAction(resultIndex, DatabaseDataConstraintAction);
+        const constraints = model.source.getAction(resultIndex, IDatabaseDataConstraintAction);
         return constraints.supported && !model.isDisabled(resultIndex);
       },
       getItems: (context, items) => [...items, MENU_DATA_GRID_FILTERS],
@@ -97,8 +101,7 @@ export class DataGridContextMenuFilterService {
         const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
         const key = context.get(DATA_CONTEXT_DV_RESULT_KEY)!;
 
-        const source = model.source as unknown as ResultSetDataSource;
-        const data = source.getAction(resultIndex, ResultSetDataAction);
+        const data = model.source.getAction(resultIndex, IDatabaseDataResultAction, ResultSetDataAction);
         const resultColumn = data.getColumn(key.column);
 
         const supportedOperations = data.getColumnOperations(key.column);
@@ -155,19 +158,19 @@ export class DataGridContextMenuFilterService {
         const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
         const key = context.get(DATA_CONTEXT_DV_RESULT_KEY)!;
 
-        const source = model.source as unknown as ResultSetDataSource;
-        const data = source.getAction(resultIndex, ResultSetDataAction);
+        const data = model.source.getAction(resultIndex, IDatabaseDataResultAction, GridDataResultAction);
 
         if (action === ACTION_DELETE) {
-          const constraints = source.getAction(resultIndex, DatabaseDataConstraintAction);
-          const resultColumn = data.getColumn(key.column);
+          const constraints = model.source.getAction(resultIndex, IDatabaseDataConstraintAction);
+          // TODO: fix column abstraction
+          const resultColumn = data.getColumn(key.column) as SqlResultColumn | undefined;
           const currentConstraint = resultColumn ? constraints.get(resultColumn.position) : undefined;
 
           return !currentConstraint || !isFilterConstraint(currentConstraint);
         }
 
         if (action === ACTION_DATA_GRID_FILTERS_RESET_ALL) {
-          const constraints = source.getAction(resultIndex, DatabaseDataConstraintAction);
+          const constraints = model.source.getAction(resultIndex, IDatabaseDataConstraintAction);
           return constraints.filterConstraints.length === 0 && !model.requestInfo.requestFilter;
         }
 
@@ -179,9 +182,9 @@ export class DataGridContextMenuFilterService {
         const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
         const key = context.get(DATA_CONTEXT_DV_RESULT_KEY)!;
 
-        const source = model.source as unknown as ResultSetDataSource;
-        const data = source.getAction(resultIndex, ResultSetDataAction);
-        const resultColumn = data.getColumn(key.column);
+        const data = model.source.getAction(resultIndex, IDatabaseDataResultAction, GridDataResultAction);
+        // TODO: fix column abstraction
+        const resultColumn = data.getColumn(key.column) as SqlResultColumn | undefined;
 
         if (action === ACTION_DELETE) {
           return {
@@ -198,12 +201,12 @@ export class DataGridContextMenuFilterService {
         const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
         const key = context.get(DATA_CONTEXT_DV_RESULT_KEY)!;
 
-        const source = model.source as unknown as ResultSetDataSource;
-        const data = source.getAction(resultIndex, ResultSetDataAction);
+        const data = model.source.getAction(resultIndex, IDatabaseDataResultAction, GridDataResultAction);
 
         if (action === ACTION_DELETE) {
-          const constraints = source.getAction(resultIndex, DatabaseDataConstraintAction);
-          const resultColumn = data.getColumn(key.column);
+          const constraints = model.source.getAction(resultIndex, IDatabaseDataConstraintAction);
+          // TODO: fix column abstraction
+          const resultColumn = data.getColumn(key.column) as SqlResultColumn | undefined;
 
           if (!resultColumn) {
             throw new Error(`Failed to get result column info for the following column index: "${key.column.index}"`);
@@ -215,7 +218,7 @@ export class DataGridContextMenuFilterService {
         }
 
         if (action === ACTION_DATA_GRID_FILTERS_RESET_ALL) {
-          const constraints = source.getAction(resultIndex, DatabaseDataConstraintAction);
+          const constraints = model.source.getAction(resultIndex, IDatabaseDataConstraintAction);
 
           await model.request(() => {
             constraints.deleteDataFilters();
@@ -231,8 +234,7 @@ export class DataGridContextMenuFilterService {
         const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
         const key = context.get(DATA_CONTEXT_DV_RESULT_KEY)!;
 
-        const source = model.source as unknown as ResultSetDataSource;
-        const data = source.getAction(resultIndex, ResultSetDataAction);
+        const data = model.source.getAction(resultIndex, IDatabaseDataResultAction, ResultSetDataAction);
 
         if (model.isDisabled(resultIndex)) {
           return false;
@@ -246,9 +248,8 @@ export class DataGridContextMenuFilterService {
         const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
         const key = context.get(DATA_CONTEXT_DV_RESULT_KEY)!;
 
-        const source = model.source as unknown as ResultSetDataSource;
-        const format = source.getAction(resultIndex, ResultSetFormatAction);
-        const data = source.getAction(resultIndex, ResultSetDataAction);
+        const format = model.source.getAction(resultIndex, IDatabaseDataFormatAction);
+        const data = model.source.getAction(resultIndex, IDatabaseDataResultAction, ResultSetDataAction);
 
         const cellValue = format.getText(key);
         const supportedOperations = data.getColumnOperations(key.column);
@@ -291,11 +292,11 @@ export class DataGridContextMenuFilterService {
         const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
         const key = context.get(DATA_CONTEXT_DV_RESULT_KEY)!;
 
-        const source = model.source as unknown as ResultSetDataSource;
-        const data = source.getAction(resultIndex, ResultSetDataAction);
+        const data = model.source.getAction(resultIndex, IDatabaseDataResultAction, ResultSetDataAction);
+        const view = model.source.getAction(resultIndex, IDatabaseDataViewAction, GridViewAction);
 
         const supportedOperations = data.getColumnOperations(key.column);
-        const cellValue = data.getCellValue(key);
+        const cellValue = view.getCellValue(key);
 
         return cellValue !== undefined && supportedOperations.length > 0;
       },
@@ -304,9 +305,8 @@ export class DataGridContextMenuFilterService {
         const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
         const key = context.get(DATA_CONTEXT_DV_RESULT_KEY)!;
 
-        const source = model.source as unknown as ResultSetDataSource;
-        const data = source.getAction(resultIndex, ResultSetDataAction);
-        const format = source.getAction(resultIndex, ResultSetFormatAction);
+        const data = model.source.getAction(resultIndex, IDatabaseDataResultAction, ResultSetDataAction);
+        const format = model.source.getAction(resultIndex, IDatabaseDataFormatAction);
 
         const supportedOperations = data.getColumnOperations(key.column);
         const columnLabel = data.getColumn(key.column)?.label || '';
@@ -367,8 +367,7 @@ export class DataGridContextMenuFilterService {
         const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
         const key = context.get(DATA_CONTEXT_DV_RESULT_KEY)!;
 
-        const source = model.source as unknown as ResultSetDataSource;
-        const data = source.getAction(resultIndex, ResultSetDataAction);
+        const data = model.source.getAction(resultIndex, IDatabaseDataResultAction, ResultSetDataAction);
         const supportedOperations = data.getColumnOperations(key.column);
 
         return this.clipboardService.clipboardAvailable && this.clipboardService.state !== 'denied' && supportedOperations.length > 0;
@@ -378,8 +377,7 @@ export class DataGridContextMenuFilterService {
         const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
         const key = context.get(DATA_CONTEXT_DV_RESULT_KEY)!;
 
-        const source = model.source as unknown as ResultSetDataSource;
-        const data = source.getAction(resultIndex, ResultSetDataAction);
+        const data = model.source.getAction(resultIndex, IDatabaseDataResultAction, ResultSetDataAction);
         const supportedOperations = data.getColumnOperations(key.column);
         const columnLabel = data.getColumn(key.column)?.label || '';
 
