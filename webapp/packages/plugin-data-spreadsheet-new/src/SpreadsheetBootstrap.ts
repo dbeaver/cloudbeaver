@@ -15,11 +15,10 @@ import {
   DATA_CONTEXT_DV_DDM,
   DATA_CONTEXT_DV_DDM_RESULT_INDEX,
   DATA_CONTEXT_DV_SIMPLE,
-  DatabaseDataConstraintAction,
   DataPresentationService,
+  IDatabaseDataConstraintAction,
   isResultSetDataSource,
   MENU_DV_CONTEXT_MENU,
-  ResultSetDataSource,
 } from '@cloudbeaver/plugin-data-viewer';
 
 import { DataGridContextMenuCellEditingService } from './DataGrid/DataGridContextMenu/DataGridContextMenuCellEditingService.js';
@@ -109,13 +108,11 @@ export class SpreadsheetBootstrap extends Bootstrap {
         }
 
         if (action === ACTION_DELETE) {
-          const source = model.source as unknown as ResultSetDataSource;
-
           if (!isResultSetDataSource(model.source)) {
             return false;
           }
 
-          const constraints = source.getAction(resultIndex, DatabaseDataConstraintAction);
+          const constraints = model.source.getAction(resultIndex, IDatabaseDataConstraintAction);
           return constraints.orderConstraints.length > 0 || constraints.filterConstraints.length > 0;
         }
 
@@ -134,8 +131,7 @@ export class SpreadsheetBootstrap extends Bootstrap {
           const model = context.get(DATA_CONTEXT_DV_DDM)!;
           const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
 
-          const source = model.source as unknown as ResultSetDataSource;
-          const constraints = source.getAction(resultIndex, DatabaseDataConstraintAction);
+          const constraints = model.source.getAction(resultIndex, IDatabaseDataConstraintAction);
 
           await model.request(() => {
             constraints.deleteData();
