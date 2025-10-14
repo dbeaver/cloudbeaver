@@ -214,11 +214,11 @@ public class WebSQLProcessor implements WebSessionProvider {
 
             SQLScriptElement element = SQLScriptParser.extractActiveQuery(parserContext, 0, sql.length());
 
-            boolean needsConfirmationPreview = false;
+            boolean isGenerated = false;
             if (element instanceof SQLControlCommand command) {
                 SQLControlResult controlResult = dataContainer.getScriptContext().executeControlCommand(monitor, command);
                 if (controlResult.getTransformed() != null) {
-                    needsConfirmationPreview = true;
+                    isGenerated = true;
                     element = controlResult.getTransformed();
                 } else {
                     WebSQLQueryResults stats = new WebSQLQueryResults(webSession, dataFormat);
@@ -227,7 +227,7 @@ public class WebSQLProcessor implements WebSessionProvider {
             }
             if (element instanceof SQLQuery mainQuery) {
                 if (useEvents) {
-                    boolean isConfirmed = confirmQueryIfNeeded(mainQuery.getScriptElements(), asyncTask, needsConfirmationPreview);
+                    boolean isConfirmed = confirmQueryIfNeeded(mainQuery.getScriptElements(), asyncTask, isGenerated);
                     if (!isConfirmed) {
                         throw new DBWebException("Query execution cancelled by user");
                     }
@@ -1251,26 +1251,31 @@ public class WebSQLProcessor implements WebSessionProvider {
         return convertInputCellValue(dbcSession, allAttributes, cellRow, withoutExecution);
     }
 
-    // TODO: Move to to AIUtils#confirmExecutionIfNeeded when confirmation preference config will be added to CB
+    // TODO: Refactor to unify with desktop when confirmation settings will be added
     private boolean confirmQueryIfNeeded(
         @NotNull List<SQLScriptElement> sqlQueries,
         @NotNull WebAsyncTaskInfo asyncTask,
-        boolean needsPreview
+        boolean isGenerated
     ) throws DBWebException {
         Boolean skipConfirmations = webSession.getAttribute(WebSQLConstants.SKIP_TASK_CONFIRMATIONS_ATTR);
         if (skipConfirmations != null && skipConfirmations) {
             return true;
         }
 
-        Set<SQLQueryCategory> categories = SQLQueryCategory.categorizeScript(sqlQueries);
-        boolean needsConfirmation = categories.contains(SQLQueryCategory.DDL) ||
-            categories.contains(SQLQueryCategory.DML) ||
-            categories.contains(SQLQueryCategory.UNKNOWN);
+        boolean needsConfirmation;
+        if (isGenerated) {
+            Set<SQLQueryCategory> categories = SQLQueryCategory.categorizeScript(sqlQueries);
+            needsConfirmation = categories.contains(SQLQueryCategory.DDL) ||
+                categories.contains(SQLQueryCategory.DML) ||
+                categories.contains(SQLQueryCategory.UNKNOWN);
+        } else {
+            needsConfirmation = sqlQueries.stream().anyMatch(this::isDangerous);
+        }
         if (!needsConfirmation) {
             return true;
         }
 
-        String queryPreview = needsPreview ?
+        String queryPreview = isGenerated ?
             sqlQueries.stream()
                 .map(SQLScriptElement::getText)
                 .collect(Collectors.joining("\n\n"))
@@ -1319,5 +1324,13 @@ public class WebSQLProcessor implements WebSessionProvider {
             );
         }
         return confirmationEvent;
+    }
+
+    private boolean isDangerous(SQLScriptElement scriptElement) {
+        if (scriptElement instanceof SQLQuery sqlQuery) {
+            return sqlQuery.isDeleteUpdateDangerous() || sqlQuery.isDropTableDangerous();
+        } else {
+            return false;
+        }
     }
 }
