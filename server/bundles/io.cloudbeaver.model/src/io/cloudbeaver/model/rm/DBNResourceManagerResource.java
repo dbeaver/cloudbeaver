@@ -113,7 +113,7 @@ public class DBNResourceManagerResource extends DBNAbstractResourceManagerNode {
         return resource.isFolder();
     }
 
-    @NotNull
+    @Nullable
     @Override
     public DBNNode[] getChildren(@NotNull DBRProgressMonitor monitor) throws DBException {
         if (children == null && !monitor.isForceCacheUsage()) {
