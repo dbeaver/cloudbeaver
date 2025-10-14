@@ -9,7 +9,7 @@ export default [
   ['ui_stepper_next', 'Avanti'],
   ['ui_stepper_finish', 'Termina'],
   ['ui_load_more', 'Carica altro'],
-  ['ui_processing_skip_confirmations', 'Non mostrare più questo messaggio'],
+  ['ui_processing_skip_confirmations', 'Non chiedere più'],
   ['ui_processing_connecting', 'Collegamento...'],
   ['ui_processing_loading', 'Caricamento...'],
   ['ui_processing_cancel', 'Annulla'],
