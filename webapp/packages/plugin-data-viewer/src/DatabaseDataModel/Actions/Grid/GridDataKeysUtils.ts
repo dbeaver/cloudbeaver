@@ -1,19 +1,19 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import type { IResultSetColumnKey, IResultSetElementKey, IResultSetRowKey } from './IResultSetDataKey.js';
+import type { IGridColumnKey, IGridDataKey, IGridRowKey } from './IGridDataKey.js';
 
-export type SerializableKey = IResultSetColumnKey | IResultSetRowKey;
+export type SerializableKey = IGridColumnKey | IGridRowKey;
 
-export const ResultSetDataKeysUtils = {
-  serializeElementKey(elementKey: IResultSetElementKey): string {
+export const GridDataKeysUtils = {
+  serializeElementKey(elementKey: IGridDataKey): string {
     return this.serialize(elementKey.column) + '.' + this.serialize(elementKey.row);
   },
-  isElementsKeyEqual(a: IResultSetElementKey, b: IResultSetElementKey) {
+  isElementsKeyEqual(a: IGridDataKey, b: IGridDataKey): boolean {
     return this.isEqual(a.column, b.column) && this.isEqual(a.row, b.row);
   },
   serialize(key: SerializableKey): string {
@@ -37,7 +37,7 @@ export const ResultSetDataKeysUtils = {
       return false;
     }
 
-    if (keyA && (a as IResultSetRowKey).subIndex !== (b as IResultSetRowKey).subIndex) {
+    if (keyA && (a as IGridRowKey).subIndex !== (b as IGridRowKey).subIndex) {
       return false;
     }
 
