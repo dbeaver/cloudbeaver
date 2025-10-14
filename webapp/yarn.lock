@@ -9818,7 +9818,7 @@ __metadata:
     "@types/react-dom": "npm:^19"
     concurrently: "npm:^9"
     eslint: "npm:^9.30.1"
-    happy-dom: "npm:^18"
+    happy-dom: "npm:^20"
     mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
     msw: "npm:^2"
@@ -9923,7 +9923,7 @@ __metadata:
     "@dbeaver/prettier-config": "workspace:^"
     "@dbeaver/react-tests": "workspace:^"
     "@wroud/ts-template": "npm:^0"
-    happy-dom: "npm:^18"
+    happy-dom: "npm:^20"
     prettier: "npm:^3.6.2"
     rimraf: "npm:^6"
     vitest: "npm:^3"
@@ -12353,14 +12353,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"happy-dom@npm:^18":
-  version: 18.0.1
-  resolution: "happy-dom@npm:18.0.1"
+"happy-dom@npm:^20":
+  version: 20.0.0
+  resolution: "happy-dom@npm:20.0.0"
   dependencies:
     "@types/node": "npm:^20.0.0"
     "@types/whatwg-mimetype": "npm:^3.0.2"
     whatwg-mimetype: "npm:^3.0.0"
-  checksum: 10c0/10f2115f5001fdaf1aedcbda89c15248a1c2e43a25d7e774cb641a35bf6763cef9097b438ef3c2248ab59a0ef33b3e88cb94da096f2bb0fc109ba3f43f7c66d4
+  checksum: 10c0/a205da48f3c98ae2b2bcb73c8f673fea66296cd2fc081065fcd5fa42b4411546c1b8f7c26ef2ca5adf0bdd1ced9aff4f429a3a4f5e6bce7724eec2747bef1a49
   languageName: node
   linkType: hard
 
