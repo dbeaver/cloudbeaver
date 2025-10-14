@@ -93,3 +93,6 @@ export * from './bindFunctions.js';
 export * from './getDomainFromUrl.js';
 export * from './isNumber.js';
 export * from './getSubjectDifferences.js';
+export * from './html2canvas.js';
+export * from './downloadCanvasAsPng.js';
+export * from './downloadCanvasAsSvg.js';

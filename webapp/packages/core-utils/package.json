@@ -46,6 +46,7 @@
     "@types/underscore": "^1",
     "@types/uuid": "^10",
     "@types/whatwg-mimetype": "^3",
+    "html2canvas": "^1",
     "rimraf": "^6",
     "typescript": "^5",
     "vitest": "^3",
