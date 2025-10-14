@@ -18,7 +18,7 @@ import {
   KEY_BINDING_ADD,
   KEY_BINDING_DELETE,
   KEY_BINDING_DUPLICATE,
-  KEY_BINDING_CANCEL,
+  KEY_BINDING_REVERT,
   KeyBindingService,
   MenuService,
   type IAction,
@@ -26,15 +26,14 @@ import {
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
 
-import { DatabaseEditAction } from '../../../DatabaseDataModel/Actions/DatabaseEditAction.js';
-import { DatabaseSelectAction } from '../../../DatabaseDataModel/Actions/DatabaseSelectAction.js';
-import { DatabaseEditChangeType } from '../../../DatabaseDataModel/Actions/IDatabaseDataEditAction.js';
+import { DatabaseEditChangeType, IDatabaseDataEditAction } from '../../../DatabaseDataModel/Actions/IDatabaseDataEditAction.js';
 import { DATA_CONTEXT_DV_DDM } from '../../../DatabaseDataModel/DataContext/DATA_CONTEXT_DV_DDM.js';
 import { DATA_CONTEXT_DV_DDM_RESULT_INDEX } from '../../../DatabaseDataModel/DataContext/DATA_CONTEXT_DV_DDM_RESULT_INDEX.js';
 import { DATA_CONTEXT_DV_PRESENTATION, DataViewerPresentationType } from '../../../DatabaseDataModel/DataContext/DATA_CONTEXT_DV_PRESENTATION.js';
 import type { IDatabaseDataModel } from '../../../DatabaseDataModel/IDatabaseDataModel.js';
 import { DATA_VIEWER_DATA_MODEL_ACTIONS_MENU } from './DATA_VIEWER_DATA_MODEL_ACTIONS_MENU.js';
 import { DataViewerViewService } from '../../DataViewerViewService.js';
+import { IDatabaseDataSelectAction } from '../../../DatabaseDataModel/Actions/IDatabaseDataSelectAction.js';
 
 @injectable(() => [ActionService, KeyBindingService, DataViewerViewService, LocalizationService, MenuService])
 export class TableFooterMenuService {
@@ -59,11 +58,11 @@ export class TableFooterMenuService {
     });
 
     this.keyBindingService.addKeyBindingHandler({
-      id: 'table-footer-cancel',
-      binding: KEY_BINDING_CANCEL,
+      id: 'table-footer-revert',
+      binding: KEY_BINDING_REVERT,
       contexts: [DATA_CONTEXT_DV_DDM, DATA_CONTEXT_DV_DDM_RESULT_INDEX],
       isBindingApplicable(context, action) {
-        return action === ACTION_CANCEL;
+        return action === ACTION_REVERT;
       },
       handler: this.tableFooterMenuActionHandler.bind(this),
     });
@@ -88,7 +87,7 @@ export class TableFooterMenuService {
       handler: this.tableFooterMenuActionHandler.bind(this),
     });
 
-    this.dataViewerViewService.registerAction(ACTION_DELETE, ACTION_CANCEL, ACTION_ADD, ACTION_DUPLICATE);
+    this.dataViewerViewService.registerAction(ACTION_DELETE, ACTION_REVERT, ACTION_ADD, ACTION_DUPLICATE);
   }
 
   private registerEditingActions() {
@@ -122,7 +121,7 @@ export class TableFooterMenuService {
           return false;
         }
 
-        const editor = model.source.getActionImplementation(resultIndex, DatabaseEditAction);
+        const editor = model.source.tryGetAction(resultIndex, IDatabaseDataEditAction);
 
         if (!editor) {
           return false;
@@ -157,7 +156,7 @@ export class TableFooterMenuService {
             return selectedElements.length === 0;
           }
           case ACTION_DELETE: {
-            const editor = model.source.getActionImplementation(resultIndex, DatabaseEditAction);
+            const editor = model.source.tryGetAction(resultIndex, IDatabaseDataEditAction);
             const selectedElements = getActiveElements(model, resultIndex);
 
             const canEdit =
@@ -170,7 +169,7 @@ export class TableFooterMenuService {
             return selectedElements.length === 0 || !selectedElements.some(key => editor.getElementState(key) !== DatabaseEditChangeType.delete);
           }
           case ACTION_REVERT: {
-            const editor = model.source.getActionImplementation(resultIndex, DatabaseEditAction);
+            const editor = model.source.tryGetAction(resultIndex, IDatabaseDataEditAction);
 
             if (!editor) {
               return true;
@@ -193,7 +192,7 @@ export class TableFooterMenuService {
           }
           case ACTION_SAVE:
           case ACTION_CANCEL: {
-            const editor = model.source.getActionImplementation(resultIndex, DatabaseEditAction);
+            const editor = model.source.tryGetAction(resultIndex, IDatabaseDataEditAction);
 
             return !editor?.isEdited();
           }
@@ -209,12 +208,12 @@ export class TableFooterMenuService {
   private tableFooterMenuActionHandler(context: IDataContextProvider, action: IAction) {
     const model = context.get(DATA_CONTEXT_DV_DDM)!;
     const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
-    const editor = model.source.getActionImplementation(resultIndex, DatabaseEditAction);
+    const editor = model.source.tryGetAction(resultIndex, IDatabaseDataEditAction);
 
     if (!editor) {
       return;
     }
-    const select = model.source.getActionImplementation(resultIndex, DatabaseSelectAction);
+    const select = model.source.tryGetAction(resultIndex, IDatabaseDataSelectAction);
     const selectedElements = getActiveElements(model, resultIndex);
 
     switch (action) {
@@ -276,7 +275,7 @@ export class TableFooterMenuService {
 }
 
 function getActiveElements(model: IDatabaseDataModel, resultIndex: number): unknown[] {
-  const select = model.source.getActionImplementation(resultIndex, DatabaseSelectAction);
+  const select = model.source.tryGetAction(resultIndex, IDatabaseDataSelectAction);
 
   return select?.getActiveElements() ?? [];
 }

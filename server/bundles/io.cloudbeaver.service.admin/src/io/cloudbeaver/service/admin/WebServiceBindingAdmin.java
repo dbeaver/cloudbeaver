@@ -16,7 +16,6 @@
  */
 package io.cloudbeaver.service.admin;
 
-import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.graphql.GraphQLEndpoint;
@@ -33,7 +32,7 @@ import org.jkiss.utils.CommonUtils;
  * Web service implementation
  */
 public class WebServiceBindingAdmin extends WebServiceBindingBase<DBWServiceAdmin>
-                implements DBWServiceBindingServlet<CBApplication> {
+                implements DBWServiceBindingServlet<CBApplication<?>> {
 
     private static final String SCHEMA_FILE_NAME = "schema/service.admin.graphqls";
 
@@ -42,21 +41,21 @@ public class WebServiceBindingAdmin extends WebServiceBindingBase<DBWServiceAdmi
     }
 
     @Override
-    public void bindWiring(DBWBindingContext model) throws DBWebException {
+    public void bindWiring(DBWBindingContext model) {
         model.getQueryType()
             .dataFetcher(
                 "adminUserInfo",
-                env -> getService(env).getUserById(getWebSession(env), env.getArgument("userId"))
+                env -> getService(env).getUserById(getWebSession(env), getArgumentVal(env, "userId"))
             )
             .dataFetcher(
                 "listUsers",
                 env -> getService(env).listUsers(
                     getWebSession(env),
-                    new AdminUserInfoFilter(env.getArgument("filter"), env.getArgument("page"))
+                    new AdminUserInfoFilter(getArgumentVal(env, "filter"), getArgumentVal(env, "page"))
                 )
             )
             .dataFetcher("listTeams",
-                env -> getService(env).listTeams(getWebSession(env), env.getArgument("teamId")))
+                env -> getService(env).listTeams(getWebSession(env), getArgument(env, "teamId")))
             .dataFetcher("listPermissions",
                 env -> getService(env).listPermissions(getWebSession(env)))
             .dataFetcher("listAuthRoles",
@@ -68,141 +67,141 @@ public class WebServiceBindingAdmin extends WebServiceBindingBase<DBWServiceAdmi
             .dataFetcher("createUser",
                 env -> getService(env).createUser(
                     getWebSession(env),
-                    env.getArgument("userId"),
-                    env.getArgument("enabled"),
-                    env.getArgument("authRole")
+                    getArgument(env, "userId"),
+                    getArgumentVal(env, "enabled"),
+                    getArgument(env, "authRole")
                 ))
             .dataFetcher("deleteUser",
-                env -> getService(env).deleteUser(getWebSession(env), env.getArgument("userId")))
+                env -> getService(env).deleteUser(getWebSession(env), getArgumentVal(env, "userId")))
             .dataFetcher("createTeam",
                 env -> getService(env).createTeam(
                     getWebSession(env),
-                    env.getArgument("teamId"),
-                    env.getArgument("teamName"),
-                    env.getArgument("description")))
+                    getArgumentVal(env, "teamId"),
+                    getArgumentVal(env, "teamName"),
+                    getArgument(env, "description")))
             .dataFetcher("updateTeam",
                 env -> getService(env).updateTeam(
                     getWebSession(env),
-                    env.getArgument("teamId"),
-                    env.getArgument("teamName"),
-                    env.getArgument("description")))
+                    getArgumentVal(env, "teamId"),
+                    getArgumentVal(env, "teamName"),
+                    getArgument(env, "description")))
             .dataFetcher("deleteTeam",
                 env -> getService(env).deleteTeam(
                     getWebSession(env),
-                    env.getArgument("teamId"),
-                    CommonUtils.toBoolean(env.getArgument("force"))))
+                    getArgumentVal(env, "teamId"),
+                    CommonUtils.toBoolean(getArgument(env, "force"))))
 
             .dataFetcher("grantUserTeam",
-                env -> getService(env).grantUserTeam(getWebSession(env), env.getArgument("userId"), env.getArgument("teamId")))
+                env -> getService(env).grantUserTeam(getWebSession(env), getArgumentVal(env, "userId"), getArgumentVal(env, "teamId")))
             .dataFetcher("revokeUserTeam",
-                env -> getService(env).revokeUserTeam(getWebSession(env), env.getArgument("userId"), env.getArgument("teamId")))
+                env -> getService(env).revokeUserTeam(getWebSession(env), getArgumentVal(env, "userId"), getArgumentVal(env, "teamId")))
             .dataFetcher("setSubjectPermissions",
-                env -> getService(env).setSubjectPermissions(getWebSession(env), env.getArgument("subjectId"), env.getArgument("permissions")))
+                env -> getService(env).setSubjectPermissions(getWebSession(env), getArgumentVal(env, "subjectId"), getArgumentVal(env, "permissions")))
             .dataFetcher("setUserCredentials",
                 env -> getService(env).setUserCredentials(getWebSession(env),
-                    env.getArgument("userId"),
-                    env.getArgument("providerId"),
-                    env.getArgument("credentials")))
+                    getArgumentVal(env, "userId"),
+                    getArgumentVal(env, "providerId"),
+                    getArgumentVal(env, "credentials")))
             .dataFetcher("deleteUserCredentials",
-                env -> getService(env).deleteUserCredentials(getWebSession(env), env.getArgument("userId"), env.getArgument("providerId")))
+                env -> getService(env).deleteUserCredentials(getWebSession(env), getArgumentVal(env, "userId"), getArgumentVal(env, "providerId")))
             .dataFetcher("enableUser",
-                env -> getService(env).enableUser(getWebSession(env), env.getArgument("userId"), env.getArgument("enabled")))
+                env -> getService(env).enableUser(getWebSession(env), getArgumentVal(env, "userId"), getArgumentVal(env, "enabled")))
             .dataFetcher("setUserAuthRole",
-                env -> getService(env).setUserAuthRole(getWebSession(env), env.getArgument("userId"), env.getArgument("authRole")))
+                env -> getService(env).setUserAuthRole(getWebSession(env), getArgumentVal(env, "userId"), getArgumentVal(env, "authRole")))
             .dataFetcher("setUserTeamRole",
                 env -> getService(env).setUserTeamRole(
                     getWebSession(env),
-                    env.getArgument("userId"),
-                    env.getArgument("teamId"),
-                    env.getArgument("teamRole")
+                    getArgumentVal(env, "userId"),
+                    getArgumentVal(env, "teamId"),
+                    getArgument(env, "teamRole")
                 )
             )
-            .dataFetcher("searchConnections", env -> getService(env).searchConnections(getWebSession(env), env.getArgument("hostNames")))
+            .dataFetcher("searchConnections", env -> getService(env).searchConnections(getWebSession(env), getArgumentVal(env, "hostNames")))
             .dataFetcher("getConnectionSubjectAccess",
                 env -> getService(env).getConnectionSubjectAccess(
                     getWebSession(env),
                     getProjectReference(env),
-                    env.getArgument("connectionId")))
+                    getArgumentVal(env, "connectionId")))
             .dataFetcher("setConnectionSubjectAccess",
                 env -> getService(env).setConnectionSubjectAccess(
                     getWebSession(env),
                     getProjectReference(env),
-                    env.getArgument("connectionId"),
-                    env.getArgument("subjects")))
+                    getArgumentVal(env, "connectionId"),
+                    getArgumentVal(env, "subjects")))
             .dataFetcher("addConnectionsAccess",
                 env -> getService(env).addConnectionsAccess(
                     getWebSession(env),
                     getProjectReference(env),
-                    env.getArgument("connectionIds"),
-                    env.getArgument("subjects")))
+                    getArgumentVal(env, "connectionIds"),
+                    getArgumentVal(env, "subjects")))
             .dataFetcher("deleteConnectionsAccess",
                 env -> getService(env).deleteConnectionsAccess(
                     getWebSession(env),
                     getProjectReference(env),
-                    env.getArgument("connectionIds"),
-                    env.getArgument("subjects")))
+                    getArgumentVal(env, "connectionIds"),
+                    getArgumentVal(env, "subjects")))
 
         .dataFetcher("getSubjectConnectionAccess",
-            env -> getService(env).getSubjectConnectionAccess(getWebSession(env), env.getArgument("subjectId")))
+            env -> getService(env).getSubjectConnectionAccess(getWebSession(env), getArgumentVal(env, "subjectId")))
         .dataFetcher("setSubjectConnectionAccess",
-            env -> getService(env).setSubjectConnectionAccess(getWebSession(env), env.getArgument("subjectId"), env.getArgument("connections")))
+            env -> getService(env).setSubjectConnectionAccess(getWebSession(env), getArgumentVal(env, "subjectId"), getArgumentVal(env, "connections")))
 
         .dataFetcher("listFeatureSets",
             env -> getService(env).listFeatureSets(getWebSession(env)))
 
         .dataFetcher("listAuthProviderConfigurationParameters",
-            env -> getService(env).listAuthProviderConfigurationParameters(getWebSession(env), env.getArgument("providerId")))
+            env -> getService(env).listAuthProviderConfigurationParameters(getWebSession(env), getArgumentVal(env, "providerId")))
         .dataFetcher("listAuthProviderConfigurations",
             env -> getService(env).listAuthProviderConfigurations(
                 GraphQLEndpoint.getServletRequestOrThrow(env),
-                getWebSession(env), env.getArgument("providerId"))
+                getWebSession(env), getArgument(env, "providerId"))
         )
         .dataFetcher("saveAuthProviderConfiguration",
             env -> getService(env).saveAuthProviderConfiguration(
                 GraphQLEndpoint.getServletRequestOrThrow(env),
                 getWebSession(env),
-                env.getArgument("providerId"),
-                env.getArgument("id"),
-                env.getArgument("displayName"),
-                CommonUtils.toBoolean((Boolean)env.getArgument("disabled")),
-                env.getArgument("iconURL"),
-                env.getArgument("description"), env.getArgument("parameters")
+                getArgumentVal(env, "providerId"),
+                getArgumentVal(env, "id"),
+                getArgumentVal(env, "displayName"),
+                CommonUtils.toBoolean(getArgument(env, "disabled")),
+                getArgument(env, "iconURL"),
+                getArgument(env, "description"), getArgument(env, "parameters")
             ))
         .dataFetcher("deleteAuthProviderConfiguration",
-            env -> getService(env).deleteAuthProviderConfiguration(getWebSession(env), env.getArgument("id")))
+            env -> getService(env).deleteAuthProviderConfiguration(getWebSession(env), getArgumentVal(env, "id")))
 
             .dataFetcher("saveUserMetaParameter",
                 env -> getService(env).saveUserMetaParameter(
                     getWebSession(env),
-                    env.getArgument("id"),
-                    env.getArgument("displayName"),
-                    env.getArgument("description"),
-                    env.getArgument("required")))
+                    getArgumentVal(env, "id"),
+                    getArgumentVal(env, "displayName"),
+                    getArgument(env, "description"),
+                    getArgument(env, "required")))
 
             .dataFetcher("deleteUserMetaParameter",
                 env -> getService(env).deleteUserMetaParameter(
                     getWebSession(env),
-                    env.getArgument("id")))
+                    getArgumentVal(env, "id")))
 
             .dataFetcher("setUserMetaParameterValues",
                 env -> getService(env).setUserMetaParameterValues(
                     getWebSession(env),
-                    env.getArgument("userId"),
-                    env.getArgument("parameters")))
+                    getArgumentVal(env, "userId"),
+                    getArgumentVal(env, "parameters")))
             .dataFetcher("setTeamMetaParameterValues",
                 env -> getService(env).setTeamMetaParameterValues(
                     getWebSession(env),
-                    env.getArgument("teamId"),
-                    env.getArgument("parameters")))
+                    getArgumentVal(env, "teamId"),
+                    getArgumentVal(env, "parameters")))
 
             .dataFetcher("configureServer",
-                env -> getService(env).configureServer(getWebSession(env), env.getArgument("configuration")))
+                env -> getService(env).configureServer(getWebSession(env), getArgumentVal(env, "configuration")))
         .dataFetcher("setDefaultNavigatorSettings",
-            env -> getService(env).setDefaultNavigatorSettings(getWebSession(env), WebServiceUtils.parseNavigatorSettings(env.getArgument("settings"))))
+            env -> getService(env).setDefaultNavigatorSettings(getWebSession(env), WebServiceUtils.parseNavigatorSettings(getArgument(env, "settings"))))
         ;
         model.getMutationType()
             .dataFetcher("adminUpdateProductConfiguration",
-                env -> getService(env).updateProductConfiguration(getWebSession(env), env.getArgument("configuration")));
+                env -> getService(env).updateProductConfiguration(getWebSession(env), getArgumentVal(env, "configuration")));
     }
 
     @Override

@@ -18,6 +18,7 @@ package io.cloudbeaver.service.navigator.impl;
 
 
 import io.cloudbeaver.BaseWebProjectImpl;
+import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.model.WebCommandContext;
@@ -44,6 +45,7 @@ import org.jkiss.dbeaver.model.exec.DBCExecutionContext;
 import org.jkiss.dbeaver.model.exec.DBCExecutionContextDefaults;
 import org.jkiss.dbeaver.model.exec.DBExecUtils;
 import org.jkiss.dbeaver.model.navigator.*;
+import org.jkiss.dbeaver.model.navigator.fs.DBNPathBase;
 import org.jkiss.dbeaver.model.navigator.meta.DBXTreeItem;
 import org.jkiss.dbeaver.model.rm.RMControllerProvider;
 import org.jkiss.dbeaver.model.rm.RMProject;
@@ -157,7 +159,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
     @Override
     public List<WebNavigatorNodeInfo> getNavigatorNodeParents(
         @NotNull WebSession session,
-        String nodePath
+        @NotNull String nodePath
     ) throws DBWebException {
         try {
             DBRProgressMonitor monitor = session.getProgressMonitor();
@@ -323,8 +325,17 @@ public class WebServiceNavigator implements DBWServiceNavigator {
 
         WebStructContainers structContainers = new WebStructContainers();
 
-        structContainers.setSupportsCatalogChange(contextDefaults != null && contextDefaults.supportsCatalogChange());
-        structContainers.setSupportsSchemaChange(contextDefaults != null && contextDefaults.supportsSchemaChange());
+        if (contextDefaults != null) {
+            structContainers.setSupportsCatalogChange(contextDefaults.supportsCatalogChange());
+            structContainers.setSupportsSchemaChange(contextDefaults.supportsSchemaChange());
+            if (contextDefaults.getDefaultSchema() != null) {
+                structContainers.setDefaultSchema(contextDefaults.getDefaultSchema().getName());
+            }
+            if (contextDefaults.getDefaultCatalog() != null) {
+                structContainers.setDefaultCatalog(contextDefaults.getDefaultCatalog().getName());
+            }
+        }
+
 
         DBRProgressMonitor monitor = connection.getSession().getProgressMonitor();
         List<? extends DBSObject> dbsObjects = this.getCatalogs(
@@ -453,12 +464,14 @@ public class WebServiceNavigator implements DBWServiceNavigator {
     @NotNull
     private String renameConnectionFolder(@NotNull WebSession session, DBNNode node, @NotNull String newName) throws DBException {
         WebConnectionFolderUtils.validateConnectionFolder(newName);
-        List<String> siblings = Arrays.stream(
-            ((DBNLocalFolder) node).getLogicalParent().getChildren(session.getProgressMonitor()))
-            .filter(n -> n instanceof DBNLocalFolder)
-            .map(DBNNode::getName).toList();
-        if (siblings.contains(newName)) {
-            throw new DBWebException("Name " + newName + " is unavailable or invalid");
+        DBNNode[] children = ((DBNLocalFolder) node).getLogicalParent().getChildren(session.getProgressMonitor());
+        if (children != null) {
+            List<String> siblings = Arrays.stream(children)
+                .filter(n -> n instanceof DBNLocalFolder)
+                .map(DBNNode::getName).toList();
+            if (siblings.contains(newName)) {
+                throw new DBWebException("Name " + newName + " is unavailable or invalid");
+            }
         }
         node.rename(session.getProgressMonitor(), newName);
         return node.getName();
@@ -587,6 +600,8 @@ public class WebServiceNavigator implements DBWServiceNavigator {
             return SMUtils.hasProjectPermission(session, rmProject, RMProjectPermission.DATA_SOURCES_EDIT);
         } else if (node instanceof DBNAbstractResourceManagerNode) {
             return SMUtils.hasProjectPermission(session, rmProject, RMProjectPermission.RESOURCE_EDIT);
+        } else if (node instanceof DBNPathBase) {
+            return !DBWorkbench.isDistributed() || session.hasPermission(DBWConstants.PERMISSION_FS_RESOURCE_EDIT);
         }
         return true;
     }

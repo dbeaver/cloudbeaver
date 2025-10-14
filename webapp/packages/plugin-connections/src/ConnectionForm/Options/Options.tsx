@@ -36,6 +36,7 @@ import {
   useAuthenticationAction,
   useAutoLoad,
   Text,
+  Placeholder,
 } from '@cloudbeaver/core-blocks';
 import {
   ConnectionInfoAuthPropertiesResource,
@@ -62,6 +63,7 @@ import { ParametersForm } from './ParametersForm.js';
 import { ProviderPropertiesForm } from './ProviderPropertiesForm.js';
 import { getConnectionFormOptionsPart } from './getConnectionFormOptionsPart.js';
 import type { IConnectionFormProps } from '../IConnectionFormState.js';
+import { ConnectionFormService } from '../ConnectionFormService.js';
 
 const PROFILE_AUTH_MODEL_ID = 'profile';
 
@@ -100,6 +102,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
   const connectionInfoOriginResource = useResource(Options, ConnectionInfoOriginResource, optionsPart.connectionKey);
   const connectionInfoAuthPropertiesResource = useResource(Options, ConnectionInfoAuthPropertiesResource, optionsPart.connectionKey);
   const configurationTypeLabel = translate('connections_connection_configuration');
+  const connectionFormService = useService(ConnectionFormService);
 
   //@TODO it's here until the profile implementation in the CloudBeaver
   const readonly = formState.isDisabled || formState.isReadOnly || connectionInfoAuthResource.data?.authModel === PROFILE_AUTH_MODEL_ID;
@@ -342,6 +345,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
               )}
             </Group>
           )}
+          <Placeholder container={connectionFormService.providerPropertiesContainer} formState={formState} />
           {driver?.providerProperties && <ProviderPropertiesForm formState={formState} properties={driver.providerProperties} readonly={readonly} />}
 
           <AdvancedPropertiesForm config={optionsPart.state} disabled={formState.isDisabled} readonly={readonly} />

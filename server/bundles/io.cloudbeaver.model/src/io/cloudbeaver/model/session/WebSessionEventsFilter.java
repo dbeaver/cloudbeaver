@@ -21,18 +21,37 @@ import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.websocket.event.WSEvent;
 import org.jkiss.dbeaver.model.websocket.event.WSProjectResourceEvent;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 public class WebSessionEventsFilter {
+    private final BaseWebSession session;
     private final Set<String> subscribedEventTopics = new CopyOnWriteArraySet<>();
     private final Set<String> subscribedProjectIds = new CopyOnWriteArraySet<>();
+    private final Map<String, List<WebTopicActivityListener>> topicActivityListeners = new ConcurrentHashMap<>();
+    private final Set<String> handledStartTopics = new CopyOnWriteArraySet<>();
+
+    public WebSessionEventsFilter(BaseWebSession session) {
+        this.session = session;
+    }
 
     public void subscribeOnEventTopic(@Nullable String topic) {
         if (topic == null) {
             return;
         }
         subscribedEventTopics.add(topic);
+
+        topicActivityListeners
+            .getOrDefault(topic, List.of()).stream()
+            .filter(listener -> !handledStartTopics.contains(listener.getTopicName()))
+            .forEach(listener -> {
+                listener.handelStartSubscriptionTopic(session);
+                handledStartTopics.add(topic);
+            });
     }
 
     public void unsubscribeFromEventTopic(@Nullable String topic) {
@@ -66,5 +85,11 @@ public class WebSessionEventsFilter {
         }
 
         return true;
+    }
+    
+    public void addTopicSubscribeListener(WebTopicActivityListener listener) {
+        topicActivityListeners
+            .computeIfAbsent(listener.getTopicName(), k -> new CopyOnWriteArrayList<>())
+            .add(listener);
     }
 }

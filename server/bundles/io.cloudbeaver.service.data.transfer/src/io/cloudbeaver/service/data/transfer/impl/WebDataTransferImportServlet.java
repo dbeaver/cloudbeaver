@@ -39,6 +39,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
+import org.jkiss.dbeaver.runtime.DBWorkbench;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -70,6 +71,10 @@ public class WebDataTransferImportServlet extends WebServiceServletBase {
     ) throws IOException, DBWebException {
         if (!session.isAuthorizedInSecurityManager()) {
             response.sendError(HttpServletResponse.SC_FORBIDDEN, "Import for users only");
+            return;
+        }
+        if (DBWorkbench.isDistributed() && !session.hasPermission(DBWConstants.PERMISSION_SQL_RESULT_UPDATE)) {
+            response.sendError(HttpServletResponse.SC_FORBIDDEN, "Permission denied");
             return;
         }
         if (!session.hasPermission(DBWConstants.GLOBAL_PERMISSION_DATA_EDITOR_IMPORT)) {

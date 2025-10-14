@@ -36,7 +36,7 @@ public class LocalSessionHandler extends AbstractActionSessionHandler {
 
     @Override
     public boolean handleSessionAuth(WebSession webSession) throws DBException, IOException {
-        if (webSession.getUser() == null && !CBApplication.getInstance().getAppConfiguration().isAnonymousAccessEnabled()) {
+        if (webSession.getUser() == null && !CBApplication.getInstance().isAnonymousAccessEnabled()) {
             return false;
         }
         executeAction(webSession);

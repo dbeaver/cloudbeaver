@@ -22,7 +22,7 @@ import io.cloudbeaver.auth.SMSignOutLinkProvider;
 import io.cloudbeaver.auth.provider.local.LocalAuthProvider;
 import io.cloudbeaver.model.WebAsyncTaskInfo;
 import io.cloudbeaver.model.WebPropertyInfo;
-import io.cloudbeaver.model.app.ServletAppConfiguration;
+import io.cloudbeaver.model.app.ServletApplication;
 import io.cloudbeaver.model.session.WebAuthInfo;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.session.WebSessionAuthProcessor;
@@ -225,8 +225,9 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
         }
         try {
             List<WebAuthInfo> removedInfos = webSession.removeAuthInfo(providerId);
-            List<String> logoutUrls = new ArrayList<>();
             var cbApp = CBApplication.getInstance();
+
+            List<String> logoutUrls = new ArrayList<>();
             String origin = ServletAppUtils.getOriginFromRequest(httpRequest);
             for (WebAuthInfo removedInfo : removedInfos) {
                 if (removedInfo.getAuthProviderDescriptor()
@@ -264,8 +265,8 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
     @Override
     public WebUserInfo activeUser(@NotNull WebSession webSession) throws DBWebException {
         if (webSession.getUser() == null) {
-            ServletAppConfiguration appConfiguration = webSession.getApplication().getAppConfiguration();
-            if (!appConfiguration.isAnonymousAccessEnabled()) {
+            ServletApplication application = webSession.getApplication();
+            if (!application.getAppConfiguration().isAnonymousAccessEnabled() || !webSession.isAuthorizedInSecurityManager()) {
                 return null;
             }
             SMUser anonymous = new SMUser("anonymous", true, null);
