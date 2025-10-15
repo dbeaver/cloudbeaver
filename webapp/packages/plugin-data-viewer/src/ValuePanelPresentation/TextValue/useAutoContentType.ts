@@ -9,20 +9,21 @@ import { useService } from '@cloudbeaver/core-di';
 import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 import { isResultSetContentValue } from '@dbeaver/result-set-api';
 
-import type { IResultSetElementKey } from '../../DatabaseDataModel/Actions/ResultSet/IResultSetDataKey.js';
 import { isResultSetBlobValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetBlobValue.js';
-import type { IResultSetValue, ResultSetFormatAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction.js';
+import type { IResultSetValue } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction.js';
 import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel.js';
 import { ResultSetDataSource } from '../../ResultSet/ResultSetDataSource.js';
 import { TextValuePresentationService } from './TextValuePresentationService.js';
+import type { IDatabaseDataFormatAction } from '../../DatabaseDataModel/Actions/IDatabaseDataFormatAction.js';
+import type { IGridDataKey } from '../../DatabaseDataModel/Actions/Grid/IGridDataKey.js';
 
 interface Args {
   resultIndex: number;
   model: IDatabaseDataModel<ResultSetDataSource>;
   dataFormat: ResultDataFormat | null;
   currentContentType: string | null;
-  elementKey?: IResultSetElementKey;
-  formatAction: ResultSetFormatAction;
+  elementKey?: IGridDataKey;
+  formatAction: IDatabaseDataFormatAction;
 }
 
 const DEFAULT_CONTENT_TYPE = 'text/plain';

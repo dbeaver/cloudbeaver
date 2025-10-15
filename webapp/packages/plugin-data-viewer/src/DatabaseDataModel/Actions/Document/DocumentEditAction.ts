@@ -9,24 +9,29 @@ import { makeObservable, observable } from 'mobx';
 
 import { ResultDataFormat, type SqlResultRow, type AsyncUpdateResultsDataBatchMutationVariables } from '@cloudbeaver/core-sdk';
 
-import type { IDatabaseDataSource } from '../../IDatabaseDataSource.js';
+import { IDatabaseDataSource } from '../../IDatabaseDataSource.js';
 import type { IDatabaseResultSet } from '../../IDatabaseResultSet.js';
-import { databaseDataAction } from '../DatabaseDataActionDecorator.js';
 import { DatabaseEditAction } from '../DatabaseEditAction.js';
-import { DatabaseEditChangeType } from '../IDatabaseDataEditAction.js';
+import { DatabaseEditChangeType, type IDatabaseDataEditApplyActionData } from '../IDatabaseDataEditAction.js';
 import { DocumentDataAction } from './DocumentDataAction.js';
 import type { IDatabaseDataDocument } from './IDatabaseDataDocument.js';
 import type { IDocumentElementKey } from './IDocumentElementKey.js';
+import { injectable } from '@cloudbeaver/core-di';
+import { IDatabaseDataResult } from '../../IDatabaseDataResult.js';
 
-@databaseDataAction()
-export class DocumentEditAction extends DatabaseEditAction<IDocumentElementKey, IDatabaseDataDocument, IDatabaseResultSet> {
+@injectable(() => [IDatabaseDataSource, IDatabaseDataResult, DocumentDataAction])
+export class DocumentEditAction<
+  TKey extends IDocumentElementKey = IDocumentElementKey,
+  TValue extends IDatabaseDataDocument = IDatabaseDataDocument,
+  TResult extends IDatabaseResultSet = IDatabaseResultSet,
+> extends DatabaseEditAction<TKey, TValue, IDatabaseDataEditApplyActionData, TResult> {
   static override dataFormat = [ResultDataFormat.Document];
 
-  readonly editedElements: Map<number, IDatabaseDataDocument>;
-  private readonly data: DocumentDataAction;
+  readonly editedElements: Map<number, TValue>;
+  private readonly data: DocumentDataAction<TKey, TValue, TResult>;
 
-  constructor(source: IDatabaseDataSource<any, IDatabaseResultSet>, data: DocumentDataAction) {
-    super(source);
+  constructor(source: IDatabaseDataSource, result: IDatabaseDataResult, data: DocumentDataAction<TKey, TValue, TResult>) {
+    super(source as unknown as IDatabaseDataSource<unknown, TResult>, result as TResult);
     this.editedElements = new Map();
     this.data = data;
 
@@ -39,7 +44,7 @@ export class DocumentEditAction extends DatabaseEditAction<IDocumentElementKey, 
     return this.editedElements.size > 0;
   }
 
-  isElementEdited(key: IDocumentElementKey): boolean {
+  isElementEdited(key: TKey): boolean {
     if (!this.editedElements.has(key.index)) {
       return false;
     }
@@ -49,7 +54,7 @@ export class DocumentEditAction extends DatabaseEditAction<IDocumentElementKey, 
     return !this.compare(value, this.get(key));
   }
 
-  getElementState(key: IDocumentElementKey): DatabaseEditChangeType | null {
+  getElementState(key: TKey): DatabaseEditChangeType | null {
     if (this.isElementEdited(key)) {
       return DatabaseEditChangeType.update;
     }
@@ -57,11 +62,11 @@ export class DocumentEditAction extends DatabaseEditAction<IDocumentElementKey, 
     return null;
   }
 
-  get(key: IDocumentElementKey): IDatabaseDataDocument | undefined {
+  get(key: TKey): TValue | undefined {
     return this.editedElements.get(key.index);
   }
 
-  set(key: IDocumentElementKey, value: IDatabaseDataDocument, prevValue?: IDatabaseDataDocument): void {
+  set(key: TKey, value: TValue, prevValue?: TValue): void {
     if (!prevValue) {
       prevValue = this.get(key);
 
@@ -88,19 +93,19 @@ export class DocumentEditAction extends DatabaseEditAction<IDocumentElementKey, 
     this.removeUnchanged(key);
   }
 
-  add(key: IDocumentElementKey): void {
+  add(key: TKey): void {
     throw new Error('Not implemented');
   }
 
-  duplicate(key: IDocumentElementKey): void {
+  duplicate(key: TKey): void {
     throw new Error('Not implemented');
   }
 
-  delete(key: IDocumentElementKey): void {
+  delete(key: TKey): void {
     throw new Error('Not implemented');
   }
 
-  setData(key: IDocumentElementKey, value: string): void {
+  setData(key: TKey, value: string): void {
     let previousValue = this.get(key);
 
     if (!previousValue) {
@@ -121,36 +126,34 @@ export class DocumentEditAction extends DatabaseEditAction<IDocumentElementKey, 
     );
   }
 
-  applyPartialUpdate(result: IDatabaseResultSet): void {
+  applyPartialUpdate(resultId: string | null, rows: TValue[][]): void {
     let rowIndex = 0;
 
     for (const [id] of this.editedElements) {
-      const row = result.data?.rowsWithMetaData?.[rowIndex];
-      const value = row?.data;
+      const document = rows[rowIndex]?.[0];
 
-      if (value !== undefined) {
-        this.data.set(id, value[0]);
+      if (document !== undefined) {
+        this.data.set(id, document);
       }
       rowIndex++;
     }
   }
 
-  applyUpdate(result: IDatabaseResultSet): void {
+  applyUpdate(resultId: string | null, rows: TValue[][]): void {
     let rowIndex = 0;
 
     for (const [id] of this.editedElements) {
-      const row = result.data?.rowsWithMetaData?.[rowIndex];
-      const value = row?.data;
+      const document = rows[rowIndex]?.[0];
 
-      if (value !== undefined) {
-        this.data.set(id, value[0]);
+      if (document !== undefined) {
+        this.data.set(id, document);
       }
       rowIndex++;
     }
     this.clear();
   }
 
-  revert(key: IDocumentElementKey): void {
+  revert(key: TKey): void {
     this.editedElements.delete(key.index);
 
     this.action.execute({
@@ -190,13 +193,13 @@ export class DocumentEditAction extends DatabaseEditAction<IDocumentElementKey, 
     }
   }
 
-  private removeUnchanged(key: IDocumentElementKey) {
+  private removeUnchanged(key: TKey) {
     if (!this.isElementEdited(key)) {
       this.revert(key);
     }
   }
 
-  private compare(documentA: IDatabaseDataDocument | undefined, documentB: IDatabaseDataDocument | undefined) {
+  private compare(documentA: TValue | undefined, documentB: TValue | undefined) {
     return documentA?.data === documentB?.data;
   }
 }

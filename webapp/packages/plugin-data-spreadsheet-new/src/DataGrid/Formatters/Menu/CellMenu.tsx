@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import {
   type IDatabaseDataModel,
   type IDataPresentationActions,
   type IDataTableActions,
-  type IResultSetElementKey,
+  type IGridDataKey,
   MENU_DV_CONTEXT_MENU,
 } from '@cloudbeaver/plugin-data-viewer';
 
@@ -31,9 +31,9 @@ import classes from './CellMenu.module.css';
 interface Props {
   model: IDatabaseDataModel;
   actions: IDataTableActions;
-  spreadsheetActions: IDataPresentationActions<IResultSetElementKey>;
+  spreadsheetActions: IDataPresentationActions<IGridDataKey>;
   resultIndex: number;
-  cellKey: IResultSetElementKey;
+  cellKey: IGridDataKey;
   simple: boolean;
   onStateSwitch?: (state: boolean) => void;
 }

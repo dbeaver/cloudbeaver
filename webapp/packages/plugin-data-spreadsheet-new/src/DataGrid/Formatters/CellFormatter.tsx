@@ -10,7 +10,7 @@ import { use, useContext } from 'react';
 import { DataGridCellInnerContext } from '@cloudbeaver/plugin-data-grid';
 
 import { getComputed, s, useObjectRef, useS } from '@cloudbeaver/core-blocks';
-import type { IDataPresentationActions, IResultSetElementKey } from '@cloudbeaver/plugin-data-viewer';
+import type { IDataPresentationActions, IGridDataKey } from '@cloudbeaver/plugin-data-viewer';
 
 import { CellContext } from '../CellRenderer/CellContext.js';
 import { DataGridContext } from '../DataGridContext.js';
@@ -36,7 +36,7 @@ export const CellFormatter = observer<Props>(function CellFormatter({ rowIdx, co
   );
   const styles = useS(style);
 
-  const spreadsheetActions = useObjectRef<IDataPresentationActions<IResultSetElementKey>>({
+  const spreadsheetActions = useObjectRef<IDataPresentationActions<IGridDataKey>>({
     edit(position) {
       const colIdx = tableDataContext.getColumnIndexFromColumnKey(position.column);
       const rowIdx = tableDataContext.getRowIndexFromKey(position.row);

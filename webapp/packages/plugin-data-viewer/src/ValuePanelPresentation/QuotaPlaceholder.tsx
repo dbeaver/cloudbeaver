@@ -11,15 +11,15 @@ import { Container, Link, s, usePermission, useS, useTranslate } from '@cloudbea
 import { WEBSITE_LINKS } from '@cloudbeaver/core-links';
 import { EAdminPermission } from '@cloudbeaver/core-root';
 
-import type { IResultSetElementKey } from '../DatabaseDataModel/Actions/ResultSet/IResultSetDataKey.js';
 import { ResultSetDataContentAction } from '../DatabaseDataModel/Actions/ResultSet/ResultSetDataContentAction.js';
 import type { IDatabaseDataModel } from '../DatabaseDataModel/IDatabaseDataModel.js';
 import { ResultSetDataSource } from '../ResultSet/ResultSetDataSource.js';
 import styles from './QuotaPlaceholder.module.css';
+import type { IGridDataKey } from '../DatabaseDataModel/Actions/Grid/IGridDataKey.js';
 
 interface Props {
   className?: string;
-  elementKey: IResultSetElementKey | undefined;
+  elementKey: IGridDataKey | undefined;
   model: IDatabaseDataModel<ResultSetDataSource>;
   resultIndex: number;
   keepSize?: boolean;

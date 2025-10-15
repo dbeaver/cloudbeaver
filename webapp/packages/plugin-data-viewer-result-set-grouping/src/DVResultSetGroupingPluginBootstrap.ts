@@ -8,22 +8,22 @@
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
-import { ResultDataFormat } from '@cloudbeaver/core-sdk';
+import { ResultDataFormat, type SqlResultColumn } from '@cloudbeaver/core-sdk';
 import { ActionService, MenuService } from '@cloudbeaver/core-view';
 import {
   DATA_CONTEXT_DV_DDM,
   DATA_CONTEXT_DV_DDM_RESULT_INDEX,
   DATA_CONTEXT_DV_PRESENTATION,
   DATA_VIEWER_DATA_MODEL_ACTIONS_MENU,
-  DatabaseDataResultAction,
   DataPresentationService,
   DataPresentationType,
   DataViewerPresentationType,
+  GridDataResultAction,
   type IDatabaseDataModel,
+  IDatabaseDataResultAction,
+  IDatabaseDataSelectAction,
   isResultSetDataSource,
-  ResultSetDataAction,
   ResultSetDataSource,
-  ResultSetSelectAction,
 } from '@cloudbeaver/plugin-data-viewer';
 
 import { ACTION_DATA_VIEWER_GROUPING_CLEAR } from './Actions/ACTION_DATA_VIEWER_GROUPING_CLEAR.js';
@@ -113,11 +113,12 @@ export class DVResultSetGroupingPluginBootstrap extends Bootstrap {
             const format = model.source.getResult(resultIndex)?.dataFormat;
 
             if (format === ResultDataFormat.Resultset) {
-              const selectionAction = model.source.getAction(resultIndex, ResultSetSelectAction);
-              const dataAction = model.source.getAction(resultIndex, ResultSetDataAction);
+              const selectionAction = model.source.getAction(resultIndex, IDatabaseDataSelectAction);
+              const dataAction = model.source.getAction(resultIndex, IDatabaseDataResultAction, GridDataResultAction);
 
               return !grouping.getColumns().some(name => {
-                const key = dataAction.findColumnKey(column => column.name === name);
+                // TODO: fix column abstraction
+                const key = dataAction.findColumnKey(column => (column as SqlResultColumn).name === name);
 
                 if (!key) {
                   return false;
@@ -143,11 +144,12 @@ export class DVResultSetGroupingPluginBootstrap extends Bootstrap {
           case ACTION_DATA_VIEWER_GROUPING_REMOVE_COLUMN: {
             const model = context.get(DATA_CONTEXT_DV_DDM)! as unknown as IDatabaseDataModel<ResultSetDataSource>;
             const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
-            const selectionAction = model.source.getAction(resultIndex, ResultSetSelectAction);
-            const dataAction = model.source.getAction(resultIndex, ResultSetDataAction);
+            const selectionAction = model.source.getAction(resultIndex, IDatabaseDataSelectAction);
+            const dataAction = model.source.getAction(resultIndex, IDatabaseDataResultAction, GridDataResultAction);
 
             const columnsToRemove = grouping.getColumns().filter(name => {
-              const key = dataAction.findColumnKey(column => column.name === name);
+              // TODO: fix column abstraction
+              const key = dataAction.findColumnKey(column => (column as SqlResultColumn).name === name);
 
               if (!key) {
                 return false;
@@ -196,7 +198,7 @@ export class DVResultSetGroupingPluginBootstrap extends Bootstrap {
           return true;
         }
 
-        const data = source.getActionImplementation(resultIndex, DatabaseDataResultAction);
+        const data = source.tryGetAction(resultIndex, IDatabaseDataResultAction);
         return data?.empty ?? true;
       },
       getPresentationComponent: () => DVResultSetGroupingPresentation,

@@ -15,16 +15,17 @@ import { download, getMIME, isImageFormat, isValidUrl } from '@cloudbeaver/core-
 import { isResultSetBinaryValue } from '@dbeaver/result-set-api';
 
 import { createResultSetBlobValue } from '../../DatabaseDataModel/Actions/ResultSet/createResultSetBlobValue.js';
-import type { IResultSetElementKey } from '../../DatabaseDataModel/Actions/ResultSet/IResultSetDataKey.js';
 import { isResultSetBlobValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetBlobValue.js';
 import { isResultSetFileValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetFileValue.js';
 import { ResultSetDataContentAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetDataContentAction.js';
-import { ResultSetEditAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetEditAction.js';
-import { ResultSetFormatAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction.js';
-import { ResultSetSelectAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction.js';
 import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel.js';
 import { DataViewerService } from '../../DataViewerService.js';
 import { ResultSetDataSource } from '../../ResultSet/ResultSetDataSource.js';
+import { IDatabaseDataSelectAction } from '../../DatabaseDataModel/Actions/IDatabaseDataSelectAction.js';
+import { IDatabaseDataFormatAction } from '../../DatabaseDataModel/Actions/IDatabaseDataFormatAction.js';
+import { IDatabaseDataEditAction } from '../../DatabaseDataModel/Actions/IDatabaseDataEditAction.js';
+import { GridSelectAction } from '../../DatabaseDataModel/Actions/Grid/GridSelectAction.js';
+import type { IGridDataKey } from '../../DatabaseDataModel/Actions/Grid/IGridDataKey.js';
 
 interface Props {
   model: IDatabaseDataModel<ResultSetDataSource>;
@@ -34,14 +35,14 @@ interface Props {
 export function useValuePanelImageValue({ model, resultIndex }: Props) {
   const notificationService = useService(NotificationService);
   const dataViewerService = useService(DataViewerService);
-  const selectAction = model.source.getAction(resultIndex, ResultSetSelectAction);
-  const formatAction = model.source.getAction(resultIndex, ResultSetFormatAction);
+  const selectAction = model.source.getAction(resultIndex, IDatabaseDataSelectAction, GridSelectAction);
+  const formatAction = model.source.getAction(resultIndex, IDatabaseDataFormatAction);
   const contentAction = model.source.getAction(resultIndex, ResultSetDataContentAction);
-  const editAction = model.source.getAction(resultIndex, ResultSetEditAction);
+  const editAction = model.source.getAction(resultIndex, IDatabaseDataEditAction);
 
   return useObservableRef(
     () => ({
-      get selectedCell(): IResultSetElementKey | undefined {
+      get selectedCell(): IGridDataKey | undefined {
         return this.selectAction.getActiveElements()?.[0];
       },
       get cellValue() {
