@@ -18,31 +18,20 @@ package io.cloudbeaver.model.cli;
 
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
-import org.jkiss.dbeaver.model.cli.ApplicationCommandLine;
 import org.jkiss.dbeaver.model.cli.ApplicationInstanceController;
 import org.jkiss.dbeaver.model.cli.CLIRunMeta;
 import org.jkiss.dbeaver.model.cli.CommandLineContext;
+import org.jkiss.dbeaver.model.cli.command.AbstractTopLevelCommand;
+import picocli.CommandLine;
 
-public class CloudBeaverCommandLine extends ApplicationCommandLine<ApplicationInstanceController> {
-    private static CloudBeaverCommandLine INSTANCE = null;
-
-    private CloudBeaverCommandLine() {
-        super();
-    }
-
-    @Override
-    protected CloudBeaverTopLevelCommand createTopLevelCommand(
-        @Nullable ApplicationInstanceController applicationInstanceController,
+@CommandLine.Command(name = "cbvr", description = "CloudBeaver Top Level Command")
+public class CloudBeaverTopLevelCommand extends AbstractTopLevelCommand {
+    protected CloudBeaverTopLevelCommand(
+        @Nullable ApplicationInstanceController controller,
         @NotNull CommandLineContext context,
-        @NotNull CLIRunMeta runMeta
-    ) {
-        return new CloudBeaverTopLevelCommand(applicationInstanceController, context, runMeta);
-    }
+        @NotNull CLIRunMeta meta
 
-    public synchronized static CloudBeaverCommandLine getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new CloudBeaverCommandLine();
-        }
-        return INSTANCE;
+    ) {
+        super(controller, context, meta);
     }
 }
