@@ -12,18 +12,19 @@ import { isResultSetContentValue } from '@dbeaver/result-set-api';
 import { isResultSetBlobValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetBlobValue.js';
 import type { IResultSetValue } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction.js';
 import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel.js';
-import { ResultSetDataSource } from '../../ResultSet/ResultSetDataSource.js';
-import { TextValuePresentationService } from './TextValuePresentationService.js';
 import type { IDatabaseDataFormatAction } from '../../DatabaseDataModel/Actions/IDatabaseDataFormatAction.js';
 import type { IGridDataKey } from '../../DatabaseDataModel/Actions/Grid/IGridDataKey.js';
+import { isResultSetDataModel } from '../../ResultSet/isResultSetDataModel.js';
+import { DataValuePanelService } from '../../TableViewer/ValuePanel/DataValuePanelService.js';
+import type { IDatabaseDataSource } from '../../DatabaseDataModel/IDatabaseDataSource.js';
 
 interface Args {
   resultIndex: number;
-  model: IDatabaseDataModel<ResultSetDataSource>;
+  model: IDatabaseDataModel<IDatabaseDataSource>;
   dataFormat: ResultDataFormat | null;
   currentContentType: string | null;
   elementKey?: IGridDataKey;
-  formatAction: IDatabaseDataFormatAction;
+  formatAction?: IDatabaseDataFormatAction;
 }
 
 const DEFAULT_CONTENT_TYPE = 'text/plain';
@@ -55,9 +56,14 @@ function preprocessDefaultContentType(contentType: string | null | undefined) {
   return DEFAULT_CONTENT_TYPE;
 }
 
-export function useAutoContentType({ dataFormat, model, formatAction, resultIndex, currentContentType, elementKey }: Args) {
-  const textValuePresentationService = useService(TextValuePresentationService);
-  const activeTabs = textValuePresentationService.tabs.getDisplayed({
+export function useAutoContentType({ dataFormat, model, formatAction, resultIndex, currentContentType, elementKey }: Args): string {
+  const dataValuePanelService = useService(DataValuePanelService);
+
+  if (!formatAction || !isResultSetDataModel(model)) {
+    return currentContentType ?? DEFAULT_CONTENT_TYPE;
+  }
+
+  const activeTabs = dataValuePanelService.tabs.getDisplayed({
     dataFormat: dataFormat,
     model,
     resultIndex: resultIndex,
