@@ -9,7 +9,7 @@
 //@ts-ignore
 import { Canvg } from 'canvg';
 
-import { blobToBase64, download, svgToDataUri, uriToBlob } from '@cloudbeaver/core-utils';
+import { blobToBase64, download, svgToDataUri, transformClassesToStyles, uriToBlob } from '@cloudbeaver/core-utils';
 
 import type { ISaveImageOptions } from './ISaveImageOptions.js';
 import { type IPreparedSVG, prepareSvg } from './prepareSvg.js';
@@ -62,6 +62,7 @@ async function convertToPng(source: IPreparedSVG) {
 }
 
 export async function saveSvgAsPng(el: SVGSVGElement, name: string, options: ISaveImageOptions): Promise<void> {
+  transformClassesToStyles(el);
   const preparedSvg = await prepareSvg(el, options);
   const uri = await convertToPng(preparedSvg);
   const blob = uriToBlob(uri);
