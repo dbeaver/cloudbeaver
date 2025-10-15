@@ -19,6 +19,7 @@ package io.cloudbeaver;
 import io.cloudbeaver.model.WebConnectionConfig;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.utils.ServletAppUtils;
 import io.cloudbeaver.utils.WebDataSourceUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
@@ -252,6 +253,7 @@ public class WebSessionProjectImpl extends WebProjectImpl {
         Map<String, Object> loadedSettings = webSession.getSecurityController().getObjectSettings(
             getId(),
             SMObjectType.project,
+            ServletAppUtils.getServletApplication().getAppConfiguration().getDefaultUserTeam(),
             null
         );
         projectSettings.clear();
@@ -359,7 +361,7 @@ public class WebSessionProjectImpl extends WebProjectImpl {
 
     @NotNull
     protected WebConnectionConfigInputHandler getInputConfigHandler(@NotNull Map<String, Object> configMap) {
-        return new WebConnectionConfigInputHandler<>(getDataSourceRegistry(), getConnectionConfigInput(configMap));
+        return new WebConnectionConfigInputHandler<>(getDataSourceRegistry(), getConnectionConfigInput(configMap), webSession);
     }
 
 

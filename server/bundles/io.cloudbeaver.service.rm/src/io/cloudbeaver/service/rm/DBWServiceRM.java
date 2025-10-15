@@ -214,4 +214,29 @@ public interface DBWServiceRM extends DBWService {
         @NotNull @WebObjectId String projectId,
         @Nullable List<String> settings
     ) throws DBWebException;
+
+    @NotNull
+    @WebProjectAction(requireProjectPermissions = DBWConstants.PERMISSION_ADMIN)
+    Map<String, Object> getProjectSettings(
+        @NotNull WebSession webSession,
+        @NotNull @WebObjectId String projectId,
+        @NotNull String subjectId,
+        @Nullable String settingId
+    ) throws DBWebException;
+
+    @WebProjectAction(requireProjectPermissions = DBWConstants.PERMISSION_ADMIN)
+    boolean addProjectSettings(
+        @NotNull WebSession webSession,
+        @NotNull @WebObjectId String projectId,
+        @NotNull String subjectId,
+        @NotNull Map<String, Object> settings
+    ) throws DBWebException;
+
+    @WebProjectAction(requireProjectPermissions = DBWConstants.PERMISSION_ADMIN)
+    boolean deleteProjectSettings(
+        @NotNull WebSession webSession,
+        @NotNull @WebObjectId String projectId,
+        @NotNull String subjectId,
+        @Nullable List<String> settings
+    ) throws DBWebException;
 }

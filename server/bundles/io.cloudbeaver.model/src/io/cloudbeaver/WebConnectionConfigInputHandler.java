@@ -17,25 +17,32 @@
 package io.cloudbeaver;
 
 import io.cloudbeaver.model.WebConnectionConfig;
-import io.cloudbeaver.model.app.WebAppConfiguration;
+import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.utils.ServletAppUtils;
 import io.cloudbeaver.utils.WebDataSourceUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
+import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
+import org.jkiss.dbeaver.model.security.SMObjectType;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
+import org.jkiss.dbeaver.registry.DataSourceNavigatorSettings;
 import org.jkiss.utils.CommonUtils;
+
+import java.util.Map;
 
 public class WebConnectionConfigInputHandler<T extends WebConnectionConfig, C extends DataSourceDescriptor> {
     private static final Log log = Log.getLog(WebConnectionConfigInputHandler.class);
     protected final T input;
     protected final DBPDataSourceRegistry registry;
+    protected final WebSession webSession;
 
-    public WebConnectionConfigInputHandler(@NotNull DBPDataSourceRegistry registry, T configInput) {
+    public WebConnectionConfigInputHandler(@NotNull DBPDataSourceRegistry registry, T configInput, WebSession webSession) {
         this.registry = registry;
         this.input = configInput;
+        this.webSession = webSession;
     }
 
     public C createDataSourceContainer() throws DBWebException {
@@ -47,9 +54,7 @@ public class WebConnectionConfigInputHandler<T extends WebConnectionConfig, C ex
 
         C newDataSource = createDataSourceContainerFromInput(driver);
 
-        if (ServletAppUtils.getServletApplication().getAppConfiguration() instanceof WebAppConfiguration webAppConfiguration) {
-            newDataSource.setNavigatorSettings(webAppConfiguration.getDefaultNavigatorSettings());
-        }
+        presetNavigatorSettings(newDataSource);
 
         WebDataSourceUtils.saveAuthProperties(
             newDataSource,
@@ -59,6 +64,29 @@ public class WebConnectionConfigInputHandler<T extends WebConnectionConfig, C ex
             input.isSharedCredentials()
         );
         return newDataSource;
+    }
+
+    private <C extends DataSourceDescriptor> void presetNavigatorSettings(C newDataSource) {
+//        if (ServletAppUtils.getServletApplication().getAppConfiguration() instanceof WebAppConfiguration webAppConfiguration) {
+//            newDataSource.setNavigatorSettings(webAppConfiguration.getDefaultNavigatorSettings());
+//        }
+        try {
+            DBPProject project = newDataSource.getProject();
+            String projectId = project.getId();
+            Map<String, Object> projectNavigatorSettings = webSession.getUserContext().getSecurityController().getObjectSettings(
+                projectId, SMObjectType.project,
+                ServletAppUtils.getServletApplication().getAppConfiguration().getDefaultUserTeam(),
+                DataSourceNavigatorSettings.getSettingsKeySet()
+            );
+            if (!CommonUtils.isEmpty(projectNavigatorSettings)) {
+                DataSourceNavigatorSettings navigatorSettings = new DataSourceNavigatorSettings();
+                navigatorSettings.loadSettings(projectNavigatorSettings);
+                newDataSource.setNavigatorSettings(navigatorSettings);
+            }
+        } catch (Exception e) {
+            log.warn("Error loading navigator settings", e);
+        }
+
     }
 
     public void updateDataSource(@NotNull C dataSource) throws DBWebException {
