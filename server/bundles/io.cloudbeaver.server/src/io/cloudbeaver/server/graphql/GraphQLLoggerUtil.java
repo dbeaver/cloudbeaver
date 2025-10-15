@@ -16,7 +16,7 @@
  */
 package io.cloudbeaver.server.graphql;
 
-import io.cloudbeaver.model.log.Sensitive;
+import io.cloudbeaver.WebParameterSensitive;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.WebAppUtils;
 import io.cloudbeaver.server.WebApplication;
@@ -27,6 +27,7 @@ import org.jkiss.utils.CommonUtils;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.util.Map;
 import java.util.Set;
 
 public class GraphQLLoggerUtil {
@@ -66,6 +67,35 @@ public class GraphQLLoggerUtil {
             .findWebSession(request);
     }
 
+    public static String buildLoggerMessage(String sessionId, String userId, Map<String, Object> variables, String operationName) {
+        StringBuilder loggerMessage = new StringBuilder(" [user: ").append(userId)
+            .append(", sessionId: ").append(sessionId).append("]");
+
+        if (true
+            && variables != null
+        ) {
+            loggerMessage.append(" [variables] ");
+            String parsedVariables = parseVarialbes(variables, operationName);
+            if (CommonUtils.isNotEmpty(parsedVariables)) {
+                loggerMessage.append(parseVarialbes(variables, operationName));
+            }
+        }
+        return loggerMessage.toString();
+    }
+    private static String parseVarialbes(Map<String, Object> variables, String operationName) {
+        StringBuilder sb = new StringBuilder();
+        for (Map.Entry<String, Object> entry : variables.entrySet()) {
+            sb.append(entry.getKey()).append(": ");
+            if (PROHIBITED_VARIABLES.contains(entry.getKey().toLowerCase())) {
+                sb.append("**** ");
+                System.out.println("masking variable " + entry.getKey() + " for operation " + operationName);
+            } else {
+                sb.append(entry.getValue()).append(" ");
+            }
+        }
+        return sb.toString().trim();
+    }
+
     public static String buildLoggerMessage(String sessionId, String userId, Method method, Object[] args) {
         StringBuilder loggerMessage = new StringBuilder(" [user: ").append(userId)
             .append(", sessionId: ").append(sessionId).append("]");
@@ -93,7 +123,7 @@ public class GraphQLLoggerUtil {
 
             sb.append(name).append(": ");
 
-            if (params[i].isAnnotationPresent(Sensitive.class)) {
+            if (params[i].isAnnotationPresent(WebParameterSensitive.class)) {
                 sb.append("**** ");
             } else if (value != null && !isSimple(value.getClass())) {
                 sb.append("{ ");
@@ -101,7 +131,7 @@ public class GraphQLLoggerUtil {
                     field.setAccessible(true);
                     sb.append(field.getName()).append(": ");
                     try {
-                        if (field.isAnnotationPresent(Sensitive.class)) {
+                        if (field.isAnnotationPresent(WebParameterSensitive.class)) {
                             sb.append("**** ");
                         } else {
                             sb.append(field.get(value)).append(" ");
