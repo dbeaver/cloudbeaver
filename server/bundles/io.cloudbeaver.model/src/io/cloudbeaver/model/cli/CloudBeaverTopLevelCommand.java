@@ -24,7 +24,7 @@ import org.jkiss.dbeaver.model.cli.CommandLineContext;
 import org.jkiss.dbeaver.model.cli.command.AbstractTopLevelCommand;
 import picocli.CommandLine;
 
-@CommandLine.Command(name = "cbvr", description = "CloudBeaver Top Level Command")
+@CommandLine.Command(name = "cbvr", description = "CloudBeaver Top Level Command", mixinStandardHelpOptions = true)
 public class CloudBeaverTopLevelCommand extends AbstractTopLevelCommand {
     protected CloudBeaverTopLevelCommand(
         @Nullable ApplicationInstanceController controller,
