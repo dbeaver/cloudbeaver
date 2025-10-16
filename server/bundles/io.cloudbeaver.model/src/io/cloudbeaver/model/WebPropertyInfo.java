@@ -19,7 +19,6 @@ package io.cloudbeaver.model;
 import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
-import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.*;
 import org.jkiss.dbeaver.model.connection.DBPDriverConfigurationType;
 import org.jkiss.dbeaver.model.impl.ProviderPropertyDescriptor;
@@ -128,13 +127,13 @@ public class WebPropertyInfo {
     }
 
     @Property
-    public Object getDefaultValue() throws DBException {
+    public Object getDefaultValue() {
         var defaultValue = property.getDefaultValue() == null ? this.defaultValue : property.getDefaultValue();
         return defaultValue == null ? getValue() : defaultValue;
     }
 
     @Property
-    public Object getValue() throws DBException {
+    public Object getValue() {
         Object value = propertySource == null ? null : propertySource.getPropertyValue(session.getProgressMonitor(), property.getId());
         if (property instanceof ObjectPropertyDescriptor) {
             ObjectPropertyDescriptor opd = (ObjectPropertyDescriptor) property;
