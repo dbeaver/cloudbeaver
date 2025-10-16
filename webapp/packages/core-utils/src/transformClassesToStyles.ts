@@ -53,6 +53,16 @@ export function transformClassesToStyles(node: SVGSVGElement) {
     if (containerElements.includes(tagName)) {
       transformClassesToStyles(child);
     } else if (tagName in relevantStyles) {
+      for (const attribute of Array.from(child.attributes)) {
+        const hasVariable = attribute.value.includes('var(') && attribute.value.includes(')');
+
+        if (hasVariable) {
+          const varName = extractVariableValue(attribute.value);
+          const computedColor = getComputedStyle(document.body).getPropertyValue(varName).trim();
+          child.setAttribute(attribute.name, computedColor);
+        }
+      }
+
       const styleDeclaration = window.getComputedStyle(child);
 
       let styleString = child.style.cssText;
@@ -72,4 +82,12 @@ export function transformClassesToStyles(node: SVGSVGElement) {
       child.setAttribute('style', styleString);
     }
   }
+}
+
+function extractVariableValue(value: string): string {
+  if (value.startsWith('var(') && value.endsWith(')')) {
+    return value.slice(4, -1).trim();
+  }
+
+  return value;
 }
