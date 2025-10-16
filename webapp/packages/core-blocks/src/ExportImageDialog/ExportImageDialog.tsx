@@ -50,7 +50,6 @@ interface State extends IExportImageOptions {
   error: Error | null;
 }
 
-// TODO refactor to use translate
 export const ExportImageDialog = observer<DialogComponentProps<ExportImagePayload, null>>(function ExportImageDialog(props) {
   const translate = useTranslate();
   const styles = useS(style);
@@ -97,7 +96,7 @@ export const ExportImageDialog = observer<DialogComponentProps<ExportImagePayloa
 
   return (
     <CommonDialogWrapper size="small">
-      <CommonDialogHeader title="plugin_erd_viewer_erd_export_dialog_title" onReject={props.rejectDialog} />
+      <CommonDialogHeader title="core_blocks_export_image_dialog_title" onReject={props.rejectDialog} />
       <CommonDialogBody>
         <Container>
           <Container small gap>
@@ -112,12 +111,12 @@ export const ExportImageDialog = observer<DialogComponentProps<ExportImagePayloa
               name="format"
               onSelect={onFormatSelect}
             >
-              {translate('plugin_erd_viewer_erd_export_format')}
+              {translate('core_blocks_export_image_dialog_format')}
             </Select>
             <FieldCheckbox
               state={state}
               name="transparent"
-              label={translate('plugin_erd_viewer_erd_export_options_background')}
+              label={translate('core_blocks_export_image_dialog_transparent_background')}
               onChange={onTransparentOptionChange}
             />
           </Container>
@@ -131,7 +130,7 @@ export const ExportImageDialog = observer<DialogComponentProps<ExportImagePayloa
           {translate('app_shared_inlineEditor_dialog_cancel')}
         </Button>
         <Button type="button" onClick={onExportHandler}>
-          {translate('plugin_erd_viewer_erd_export_as_img')}
+          {translate('ui_export')}
         </Button>
       </CommonDialogFooter>
     </CommonDialogWrapper>

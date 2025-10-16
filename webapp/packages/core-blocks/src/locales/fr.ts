@@ -12,4 +12,7 @@ export default [
   ['core_blocks_exception_message_error_title', "Impossible d'afficher le contenu"],
   ['core_blocks_exception_message_error_message', 'Quelque chose a mal tourné.'],
   ['core_blocks_custom_input_validation_error', "La valeur du champ n'est pas valide"],
+  ['core_blocks_export_image_dialog_title', "Exporter l'image"],
+  ['core_blocks_export_image_dialog_format', 'Format de fichier'],
+  ['core_blocks_export_image_dialog_transparent_background', 'Fond transparent'],
 ];

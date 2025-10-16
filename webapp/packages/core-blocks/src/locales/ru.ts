@@ -10,4 +10,7 @@ export default [
   ['combobox_no_results_placeholder', 'Нет совпадений'],
   ['combobox_select_placeholder', 'Выберите опцию'],
   ['core_blocks_custom_input_validation_error', 'Значение не валидно'],
+  ['core_blocks_export_image_dialog_title', 'Экспорт изображения'],
+  ['core_blocks_export_image_dialog_format', 'Формат файла'],
+  ['core_blocks_export_image_dialog_transparent_background', 'Прозрачный фон'],
 ];

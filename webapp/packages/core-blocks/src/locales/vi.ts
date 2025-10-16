@@ -13,4 +13,7 @@ export default [
   ['core_blocks_exception_message_error_title', 'Không thể hiển thị nội dung'],
   ['core_blocks_exception_message_error_message', 'Đã xảy ra lỗi.'],
   ['core_blocks_custom_input_validation_error', 'Giá trị trường không hợp lệ'],
+  ['core_blocks_export_image_dialog_title', 'Xuất hình ảnh'],
+  ['core_blocks_export_image_dialog_format', 'Định dạng tệp'],
+  ['core_blocks_export_image_dialog_transparent_background', 'Nền trong suốt'],
 ];
