@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -106,6 +106,17 @@ export class SharedProjectsResource extends CachedMapResource<string, SharedProj
     });
 
     (project as SharedProjectNew)[newSymbol] = true;
+
+    this.set(project.id, project as SharedProject);
+
+    return this.get(project.id)!;
+  }
+
+  async update(config: IProjectConfig): Promise<SharedProject> {
+    const { project } = await this.graphQLService.sdk.updateProject({
+      projectId: config.id,
+      projectName: config.name,
+    });
 
     this.set(project.id, project as SharedProject);
 

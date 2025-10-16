@@ -24,10 +24,14 @@ You can see a live demo of CloudBeaver here: https://demo.cloudbeaver.io
 [Database access instructions](https://github.com/dbeaver/cloudbeaver/wiki/Demo-Server)
 
 ## Changelog
+### 25.2.2 2025-10-06
+- Replaced true/false text with intuitive checkboxes for boolean values in the metadata editor, making editing easier and faster;
+- Keyboard navigation was improved across the application. Additional shortcuts are available in the main info panel (top-right corner). To help you discover them faster, relevant keyboard shortcuts are also shown directly in the tooltips of Data Editor buttons;
+- Fixed an issue in the Data Editor where resizing one column in a wide table would cause previously resized columns to revert to their original width. Users can resize multiple columns as intended.
 
 ### 25.2.1 2025-09-22
-- Autocomplete values in SQL Editor are ordered alphabetically to simplify object search.
-- "Show all databases" setting was added on the connection page for MySQL and MariaDB.
+- Autocomplete values in SQL Editor are ordered alphabetically to simplify object search;
+- "Show all databases" setting was added on the connection page for MySQL and MariaDB;
 - Different bug fixes and enhancements have been made.
 
 ### 25.2.0 2025-09-01

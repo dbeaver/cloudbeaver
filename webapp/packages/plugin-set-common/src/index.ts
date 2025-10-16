@@ -102,6 +102,7 @@ import pluginVersionUpdateAdministration from '@cloudbeaver/plugin-version-updat
 import pluginSystemInformationAdministration from '@cloudbeaver/plugin-system-information-administration/module';
 import pluginSettingsDefaultAdministration from '@cloudbeaver/plugin-settings-default-administration/module';
 import pluginCodemirror6 from '@cloudbeaver/plugin-codemirror6/module';
+import coreServerNotifications from '@cloudbeaver/core-server-notifications/module';
 
 const core = [
   coreRouting, // important, should be first because the router starts in load phase first after all plugins register phase
@@ -135,6 +136,7 @@ const core = [
   coreNavigationTree,
   coreSettingsUser,
   coreTaskManager,
+  coreServerNotifications,
 ];
 
 export const commonSet = [

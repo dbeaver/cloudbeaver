@@ -30,6 +30,7 @@ import org.jkiss.dbeaver.model.app.DBPDataSourceRegistryCache;
 import org.jkiss.dbeaver.model.navigator.DBNModel;
 import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.rm.RMUtils;
+import org.jkiss.dbeaver.model.security.SMObjectType;
 import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceEvent;
 import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceProperty;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
@@ -42,11 +43,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class WebSessionProjectImpl extends WebProjectImpl {
     private static final Log log = Log.getLog(WebSessionProjectImpl.class);
     protected final WebSession webSession;
     private final Map<String, WebConnectionInfo> connections = new HashMap<>();
+    private final Map<String, Object> projectSettings = new ConcurrentHashMap<>();
     private boolean registryIsLoaded = false;
 
     public WebSessionProjectImpl(
@@ -239,6 +242,20 @@ public class WebSessionProjectImpl extends WebProjectImpl {
             }
         }
         return sendDataSourceUpdatedEvent;
+    }
+
+    public void refreshProjectSettings() throws DBException {
+        if (webSession.getUser() == null) {
+            projectSettings.clear();
+            return;
+        }
+        Map<String, Object> loadedSettings = webSession.getSecurityController().getObjectSettings(
+            getId(),
+            SMObjectType.project,
+            null
+        );
+        projectSettings.clear();
+        projectSettings.putAll(loadedSettings);
     }
 
     @NotNull

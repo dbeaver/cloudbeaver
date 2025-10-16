@@ -92,6 +92,7 @@ public class WebConnectionConfigInputHandler<T extends WebConnectionConfig, C ex
             input.isSaveCredentials(),
             input.isSharedCredentials()
         );
+        dataSource.setConnectionReadOnly(input.isReadOnly());
     }
 
     @NotNull

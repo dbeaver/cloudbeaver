@@ -14,9 +14,6 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { type TabContainerPanelComponent, TabList, TabsState, TabStyles, useTabLocalState } from '@cloudbeaver/core-ui';
 
 import { ResultSetDataContentAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetDataContentAction.js';
-import { ResultSetEditAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetEditAction.js';
-import { ResultSetFormatAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction.js';
-import { ResultSetSelectAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction.js';
 import { DataViewerService } from '../../DataViewerService.js';
 import { isResultSetDataModel } from '../../ResultSet/isResultSetDataModel.js';
 import type { IDataValuePanelProps } from '../../TableViewer/ValuePanel/DataValuePanelService.js';
@@ -29,6 +26,10 @@ import { TextValuePresentationService } from './TextValuePresentationService.js'
 import { TextValueTruncatedMessage } from './TextValueTruncatedMessage.js';
 import { useAutoContentType } from './useAutoContentType.js';
 import { useTextValueGetter } from './useTextValueGetter.js';
+import { IDatabaseDataSelectAction } from '../../DatabaseDataModel/Actions/IDatabaseDataSelectAction.js';
+import { IDatabaseDataFormatAction } from '../../DatabaseDataModel/Actions/IDatabaseDataFormatAction.js';
+import { IDatabaseDataEditAction } from '../../DatabaseDataModel/Actions/IDatabaseDataEditAction.js';
+import { GridSelectAction } from '../../DatabaseDataModel/Actions/Grid/GridSelectAction.js';
 
 const tabRegistry: StyleRegistry = [[TabStyles, { mode: 'append', styles: [TextValuePresentationTab] }]];
 
@@ -46,12 +47,12 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
   const textValuePresentationService = useService(TextValuePresentationService);
   const dataViewerService = useService(DataViewerService);
   const style = useS(styles, TextValuePresentationTab);
-  const selectAction = model.source.getAction(resultIndex, ResultSetSelectAction);
-  const formatAction = model.source.getAction(resultIndex, ResultSetFormatAction);
+  const selectAction = model.source.getAction(resultIndex, IDatabaseDataSelectAction, GridSelectAction);
+  const formatAction = model.source.getAction(resultIndex, IDatabaseDataFormatAction);
   const activeElements = selectAction.getActiveElements();
   const firstSelectedCell = activeElements.length ? activeElements[0] : undefined;
   const contentAction = model.source.getAction(resultIndex, ResultSetDataContentAction);
-  const editAction = model.source.getAction(resultIndex, ResultSetEditAction);
+  const editAction = model.source.getAction(resultIndex, IDatabaseDataEditAction);
 
   const state = useTabLocalState(() =>
     observable({
@@ -105,7 +106,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
     }
   }
 
-  async function selectTabHandler(tabId: string) {
+  function selectTabHandler(tabId: string) {
     // currentContentType may be selected automatically we don't want to change state in this case
     if (tabId !== contentType) {
       state.setContentType(tabId);

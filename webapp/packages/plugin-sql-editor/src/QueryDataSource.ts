@@ -151,7 +151,7 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
           const responseResult = this.transformResults(executionContextInfo, response.results, 0).find(newResult => newResult.id === result.id);
 
           if (responseResult) {
-            editor.applyUpdate(responseResult);
+            editor.applyUpdate(responseResult.id, responseResult.data?.rowsWithMetaData?.map(r => r.data) || []);
           }
         }
 
@@ -270,7 +270,7 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
   private transformResults(executionContextInfo: IConnectionExecutionContextInfo, results: SqlQueryResults[], limit: number): IDatabaseResultSet[] {
     return results.map<IDatabaseResultSet>((result, index) => ({
       id: result.resultSet?.id || null,
-      uniqueResultId: `${executionContextInfo.connectionId}_${executionContextInfo.id}_${index}`,
+      uniqueResultId: `${executionContextInfo.connectionId}_${executionContextInfo.id}_${result.dataFormat}_${index}`,
       projectId: executionContextInfo.projectId,
       connectionId: executionContextInfo.connectionId,
       contextId: executionContextInfo.id,

@@ -1,0 +1,90 @@
+# Menu
+
+The Menu component is a set of composable primitives to build accessible menus (context menus, dropdowns) based on Ariakit.
+
+## Usage
+
+The component exposes a compound API. You can use either named exports or the static properties on `Menu`:
+
+```
+<Menu.Provider>
+  <Menu.Button>
+    Open menu
+    <Menu.ButtonArrow />
+  </Menu.Button>
+  <Menu>
+    <Menu.Item>Action 1</Menu.Item>
+  </Menu>
+</Menu.Provider>
+```
+
+## Class names
+
+- `.dbv-kit-menu__button` - the class name for the trigger button.
+- `.dbv-kit-menu__button-arrow` - the class name for the arrow inside the trigger button.
+- `.dbv-kit-menu__popover` - the class name for the popover container.
+- `.dbv-kit-menu__item` - the class name for a menu item.
+- `.dbv-kit-menu__item--checkbox` - the class name modifier for a checkbox item.
+- `.dbv-kit-menu__item--radio` - the class name modifier for a radio item.
+- `.dbv-kit-menu__separator` - the class name for a separator.
+- `.dbv-kit-menu__heading` - the class name for a section heading.
+- `.dbv-kit-menu__description` - the class name for a section description.
+- `.dbv-kit-menu__dismiss` - the class name for a dismiss/close action.
+- `.dbv-kit-menu__group` - the class name for a group wrapper.
+- `.dbv-kit-menu__group-label` - the class name for a group label.
+
+Underlying components docs:  
+[https://ariakit.org/components/menu](https://ariakit.org/components/menu)
+
+### Props:
+
+All components are thin wrappers around Ariakit and accept the same props as their Ariakit counterparts. The following defaults/modifiers are applied:
+
+**Menu**  
+Inherits Ariakit `Menu` props. Defaults applied by UI Kit: `portal = true`, `gutter = 4`.
+
+**MenuButton**  
+Inherits Ariakit `MenuButton` props.
+
+**MenuButtonArrow**  
+Inherits Ariakit `MenuButtonArrow` props.
+
+**MenuItem**  
+Inherits Ariakit `MenuItem` props.
+
+**MenuItemCheckbox**  
+Inherits Ariakit `MenuItemCheckbox` props. Includes a check indicator rendered via `MenuItemCheck`.
+
+**MenuItemRadio**  
+Inherits Ariakit `MenuItemRadio` props. Includes a check indicator rendered via `MenuItemCheck`.
+
+**MenuSeparator**  
+Inherits Ariakit `MenuSeparator` props.
+
+**MenuHeading**  
+Inherits Ariakit `MenuHeading` props.
+
+**MenuDescription**  
+Inherits Ariakit `MenuDescription` props.
+
+**MenuDismiss**  
+Inherits Ariakit `MenuDismiss` props.
+
+**MenuGroup**  
+Inherits Ariakit `MenuGroup` props.
+
+**MenuGroupLabel**  
+Inherits Ariakit `MenuGroupLabel` props.
+
+**MenuProvider**  
+Inherits Ariakit `MenuProvider` props and provides the menu store context.
+
+You can access `MenuProvider` as a named export or via the compound API `Menu.Provider`.
+
+### Hooks
+
+The following hooks are re-exported for advanced scenarios:
+
+- `useMenuStore` — create or control a menu store programmatically
+- `useStoreState` — read derived state from a store
+- `useMenuContext` — access the current menu context/store

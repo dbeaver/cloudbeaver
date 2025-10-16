@@ -11,6 +11,8 @@
 .fieldLabel {
   composes: theme-typography--body2 from global;
 }
+
+/* overrides bold label style from SwitchDense.module.css because of specificity */
 .switchBody .fieldLabel {
   font-weight: initial;
 }

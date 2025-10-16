@@ -38,61 +38,61 @@ public class WebServiceBindingNavigator extends WebServiceBindingBase<DBWService
         model.getQueryType()
             .dataFetcher("navNodeChildren", env -> getService(env).getNavigatorNodeChildren(
                 getWebSession(env),
-                env.getArgument("parentPath"),
-                env.getArgument("offset"),
-                env.getArgument("limit"),
-                env.getArgument("onlyFolders")
+                getArgumentVal(env, "parentPath"),
+                getArgument(env, "offset"),
+                getArgument(env, "limit"),
+                getArgument(env, "onlyFolders")
             ))
             .dataFetcher("navNodeParents", env -> getService(env).getNavigatorNodeParents(
                 getWebSession(env),
-                env.getArgument("nodePath")
+                getArgumentVal(env, "nodePath")
             ))
             .dataFetcher("navNodeInfo", env -> getService(env).getNavigatorNodeInfo(
                 getWebSession(env),
-                env.getArgument("nodePath")
+                getArgumentVal(env, "nodePath")
             ))
             .dataFetcher("navRefreshNode", env -> getService(env).refreshNavigatorNode(
                 getWebSession(env),
-                env.getArgument("nodePath"),
+                getArgumentVal(env, "nodePath"),
                 false
             ) != null)
             .dataFetcher("navGetStructContainers", env -> getService(env).getStructContainers(
                 getProjectReference(env),
                 getWebConnection(env),
-                env.getArgument("contextId"),
-                env.getArgument("catalog")
+                getArgument(env, "contextId"),
+                getArgument(env, "catalog")
 
             ));
         model.getMutationType()
             .dataFetcher("navReloadNode", env -> getService(env).refreshNavigatorNode(
                 getWebSession(env),
-                env.getArgument("nodePath"),
+                getArgumentVal(env, "nodePath"),
                 true
             ))
             .dataFetcher("navSetFolderFilter", env -> getService(env).setNavigatorNodeFilter(
                 getWebSession(env),
-                env.getArgument("nodePath"),
-                env.getArgument("include"),
-                env.getArgument("exclude")
+                getArgumentVal(env, "nodePath"),
+                getArgument(env, "include"),
+                getArgument(env, "exclude")
             ))
             .dataFetcher("navRenameNode", env -> getService(env).renameNode(
                 getWebSession(env),
-                env.getArgument("nodePath"),
-                env.getArgument("newName")
+                getArgumentVal(env, "nodePath"),
+                getArgumentVal(env, "newName")
             ))
             .dataFetcher("navDeleteNodes", env -> getService(env).deleteNodes(
                 getWebSession(env),
-                env.getArgument("nodePaths")
+                getArgumentVal(env, "nodePaths")
             ))
             .dataFetcher("navMoveNodesToFolder", env -> getService(env).moveNodesToFolder(
                 getWebSession(env),
-                env.getArgument("nodePaths"),
-                env.getArgument("folderPath")
+                getArgumentVal(env, "nodePaths"),
+                getArgumentVal(env, "folderPath")
             ));
 
         model.getRuntimeWiring().type(TypeRuntimeWiring.newTypeWiring("DatabaseObjectInfo")
             .dataFetcher("properties", env -> {
-                Map<String, Object> filterProps = env.getArgument("filter");
+                Map<String, Object> filterProps = getArgument(env, "filter");
                 WebPropertyFilter filter = filterProps == null ? null : new WebPropertyFilter(filterProps);
                 return ((WebDatabaseObjectInfo)env.getSource()).filterProperties(filter);
             })
