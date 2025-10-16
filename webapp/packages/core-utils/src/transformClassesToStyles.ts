@@ -55,11 +55,12 @@ export function transformClassesToStyles(node: SVGSVGElement) {
     } else if (tagName in relevantStyles) {
       for (const attribute of Array.from(child.attributes)) {
         const hasVariable = attribute.value.includes('var(') && attribute.value.includes(')');
+        const isRelevantAttribute = relevantStyles[tagName]!.includes(attribute.name);
+        const varName = extractVariableValue(attribute.value);
+        const computedValue = getComputedStyle(document.body).getPropertyValue(varName).trim();
 
-        if (hasVariable) {
-          const varName = extractVariableValue(attribute.value);
-          const computedColor = getComputedStyle(document.body).getPropertyValue(varName).trim();
-          child.setAttribute(attribute.name, computedColor);
+        if (hasVariable && isRelevantAttribute && computedValue) {
+          child.setAttribute(attribute.name, computedValue);
         }
       }
 

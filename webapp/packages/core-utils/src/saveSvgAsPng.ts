@@ -62,7 +62,16 @@ async function convertToPng(source: IPreparedSVG) {
 }
 
 export async function saveSvgAsPng(el: SVGSVGElement, name: string, options: ISaveImageOptions): Promise<void> {
+  // Make element part of DOM to get correct dimensions and styles
+  el.style.display = 'none';
+  document.body.appendChild(el);
+
   transformClassesToStyles(el);
+
+  // Removes element from DOM to not affect current document
+  document.body.removeChild(el);
+  el.style.removeProperty('display');
+
   const preparedSvg = await prepareSvg(el, options);
   const uri = await convertToPng(preparedSvg);
   const blob = uriToBlob(uri);
