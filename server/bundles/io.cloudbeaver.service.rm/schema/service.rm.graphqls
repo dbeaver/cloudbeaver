@@ -71,7 +71,7 @@ extend type Query {
     rmUserProjectSettings(projectId: ID!): Object @since(version: "25.2.1")
 
     "Returns project settings that are specified for a subject"
-    rmAdminUserProjectSettings(projectId: ID!, subjectID: String!): Object @since(version: "25.2.3")
+    rmAdminUserProjectSettings(projectId: ID!, subjectId: String!): Object @since(version: "25.2.3")
 }
 
 extend type Mutation {
