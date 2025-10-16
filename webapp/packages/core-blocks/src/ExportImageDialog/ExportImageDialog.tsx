@@ -24,6 +24,7 @@ import {
   useS,
   useTranslate,
   useObservableRef,
+  InputField,
 } from '@cloudbeaver/core-blocks';
 import type { DialogComponentProps } from '@cloudbeaver/core-dialogs';
 
@@ -100,6 +101,9 @@ export const ExportImageDialog = observer<DialogComponentProps<ExportImagePayloa
       <CommonDialogBody>
         <Container>
           <Container small gap>
+            <InputField state={state} name="fileName">
+              {translate('ui_name')}
+            </InputField>
             <Select
               items={EXPORT_FORMATS}
               keySelector={value => value}
