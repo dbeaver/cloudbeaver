@@ -35,7 +35,7 @@ export function excludeElements(parentNode: SVGSVGElement, selector: string) {
   });
 }
 
-export function transformClassesToStyles(node: SVGSVGElement) {
+function preprocessClassesToStyles(node: SVGSVGElement) {
   const containerElements: string[] = ['svg', 'g', 'defs', 'marker', 'symbol'];
   const relevantStyles: Record<string, string[]> = {
     rect: ['fill', 'stroke', 'stroke-width', 'width', 'height', 'transform-box', 'transform-origin'],
@@ -51,7 +51,7 @@ export function transformClassesToStyles(node: SVGSVGElement) {
     const tagName = child.tagName;
 
     if (containerElements.includes(tagName)) {
-      transformClassesToStyles(child);
+      preprocessClassesToStyles(child);
     } else if (tagName in relevantStyles) {
       for (const attribute of Array.from(child.attributes)) {
         const hasVariable = attribute.value.includes('var(') && attribute.value.includes(')');
@@ -91,4 +91,16 @@ function extractVariableValue(value: string): string {
   }
 
   return value;
+}
+
+export function transformClassesToStyles(el: SVGSVGElement): void {
+  // Make element part of DOM to get correct dimensions and styles
+  el.style.display = 'none';
+  document.body.appendChild(el);
+
+  preprocessClassesToStyles(el);
+
+  // Removes element from DOM to not affect current document
+  document.body.removeChild(el);
+  el.style.removeProperty('display');
 }
