@@ -1302,7 +1302,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                 PreparedStatement dbStat = dbCon.prepareStatement("SELECT SETTING_ID,SETTING_VALUE " +
                     "FROM {table_prefix}CB_OBJECT_SETTINGS " +
                     "WHERE OBJECT_ID=? AND OBJECT_TYPE=? "
-                    + subjectId == null ? "" : " AND SUBJECT_ID=?" +
+                    + (subjectId == null ? "" : " AND SUBJECT_ID=?") +
                     (CommonUtils.isEmpty(settingIds) ? "" : " AND SETTING_ID IN (" + SQLUtils.generateParamList(settingIds.size()) + ")"))
             ) {
                 int index = 1;
