@@ -54,12 +54,12 @@ import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.IOUtils;
 import org.jkiss.utils.Pair;
+import org.jkiss.utils.StandardConstants;
 
 import java.io.IOException;
 import java.nio.file.*;
 import java.text.MessageFormat;
 import java.time.OffsetDateTime;
-import java.time.ZoneId;
 import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -1262,8 +1262,10 @@ public class LocalResourceController extends BaseLocalResourceController {
         project.setProjectPermissions(allProjectPermissions);
         if (Files.exists(path)) {
             try {
-                project.setCreateTime(
-                    OffsetDateTime.ofInstant(Files.getLastModifiedTime(path).toInstant(), ZoneId.of("UTC")).toInstant().toEpochMilli());
+                project.setCreateTime(OffsetDateTime.ofInstant(
+                    Files.getLastModifiedTime(path).toInstant(),
+                    StandardConstants.ZONE_ID_UTC
+                ).toInstant().toEpochMilli());
             } catch (IOException e) {
                 log.error(e);
             }

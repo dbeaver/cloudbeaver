@@ -17,11 +17,11 @@
 package io.cloudbeaver.utils;
 
 import org.jkiss.dbeaver.model.DBConstants;
+import org.jkiss.utils.StandardConstants;
 
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
 public class CBModelConstants {
     public static final DateTimeFormatter ISO_DATE_FORMAT = DateTimeFormatter.ofPattern(DBConstants.DEFAULT_ISO_TIMESTAMP_FORMAT)
-        .withZone(ZoneId.of("UTC"));
+        .withZone(StandardConstants.ZONE_ID_UTC);
 }
