@@ -114,17 +114,6 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         setObjectSettings(objectId, objectType, userId, settings);
     }
 
-//    @NotNull
-//    @Override
-//    public Map<String, Object> getObjectSettings(
-//        @NotNull String objectId,
-//        @NotNull SMObjectType objectType,
-//        @NotNull String subjectId,
-//        @Nullable Set<String> settingIds
-//    ) throws DBException {
-//        return getObjectSettings(objectId, objectType, subjectId, settingIds);
-//    }
-
     @Override
     public void deleteObjectSettings(
         @NotNull String objectId,
