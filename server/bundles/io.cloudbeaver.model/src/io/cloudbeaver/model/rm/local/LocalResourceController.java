@@ -1278,5 +1278,14 @@ public class LocalResourceController extends BaseLocalResourceController {
         return project;
     }
 
-
+    @NotNull
+    @Override
+    public Map<String, Object> getObjectSettings(
+        @NotNull String objectId,
+        @NotNull SMObjectType objectType,
+        @NotNull String subjectId,
+        @Nullable Set<String> settingIds
+    ) throws DBException {
+        return getSecurityController().getObjectSettings(objectId, objectType, subjectId, settingIds);
+    }
 }
