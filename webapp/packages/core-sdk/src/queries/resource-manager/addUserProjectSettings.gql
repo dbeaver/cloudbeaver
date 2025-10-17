@@ -1,0 +1,3 @@
+mutation addUserProjectSettings($projectId: ID!, $settings: Object!) {
+  rmAddUserProjectSettings(projectId: $projectId, settings: $settings)
+}
