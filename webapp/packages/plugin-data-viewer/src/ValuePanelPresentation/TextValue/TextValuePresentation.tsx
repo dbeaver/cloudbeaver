@@ -30,6 +30,9 @@ import { IDatabaseDataSelectAction } from '../../DatabaseDataModel/Actions/IData
 import { IDatabaseDataFormatAction } from '../../DatabaseDataModel/Actions/IDatabaseDataFormatAction.js';
 import { IDatabaseDataEditAction } from '../../DatabaseDataModel/Actions/IDatabaseDataEditAction.js';
 import { GridSelectAction } from '../../DatabaseDataModel/Actions/Grid/GridSelectAction.js';
+import type { IDatabaseValueHolder } from '../../DatabaseDataModel/Actions/IDatabaseValueHolder.js';
+import type { IGridDataKey } from '../../DatabaseDataModel/Actions/Grid/IGridDataKey.js';
+import type { IResultSetValue } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction.js';
 
 const tabRegistry: StyleRegistry = [[TabStyles, { mode: 'append', styles: [TextValuePresentationTab] }]];
 
@@ -67,25 +70,27 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
       },
     }),
   );
+  const cellHolder = (firstSelectedCell ? formatAction.get(firstSelectedCell) : undefined) as
+    | IDatabaseValueHolder<IGridDataKey, IResultSetValue>
+    | undefined;
   const contentType = useAutoContentType({
     dataFormat,
     model,
     resultIndex,
     currentContentType: state.currentContentType,
-    elementKey: firstSelectedCell,
-    formatAction,
+    value: cellHolder?.value,
   });
   const textValueGetter = useTextValueGetter({
+    cellHolder,
     contentAction,
     editAction,
     formatAction,
     dataFormat,
     contentType,
-    elementKey: firstSelectedCell,
   });
   const autoLineWrapping = getDefaultLineWrapping(contentType);
   const lineWrapping = state.lineWrapping ?? autoLineWrapping;
-  const isReadonly = isTextValueReadonly({ model, resultIndex, contentAction, cell: firstSelectedCell, formatAction, editAction });
+  const isReadonly = isTextValueReadonly({ model, resultIndex, contentAction, cellHolder, formatAction, editAction });
   const canSave = firstSelectedCell && contentAction.isDownloadable(firstSelectedCell) && dataViewerService.canExportData;
 
   function valueChangeHandler(newValue: string) {

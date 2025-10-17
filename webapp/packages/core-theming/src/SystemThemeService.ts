@@ -42,6 +42,9 @@ export class SystemThemeService extends Bootstrap {
       get class(): string {
         return systemThemeService.dynamicTheme?.class || '';
       },
+      get type() {
+        return systemThemeService.dynamicTheme?.type || 'light';
+      },
       loaded: false,
       async loader() {
         await systemThemeService.updateSystemTheme();
@@ -99,9 +102,9 @@ export class SystemThemeService extends Bootstrap {
     const isDark = window.matchMedia(DARK_QUERY).matches;
 
     if (isDark) {
-      return this.themeService.themes.find(theme => theme.id === 'dark') || this.themeService.themes[0] || null;
+      return this.themeService.themes.find(theme => theme.type === 'dark') || this.themeService.themes[0] || null;
     }
 
-    return this.themeService.themes.find(theme => theme.id === 'light') || this.themeService.themes[0] || null;
+    return this.themeService.themes.find(theme => theme.type === 'light') || this.themeService.themes[0] || null;
   }
 }

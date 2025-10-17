@@ -31,6 +31,7 @@ export type SelectBaseProps<TKey, TValue> = Omit<
     description?: string;
     placeholder?: string;
     keySelector?: (item: TValue, index: number) => TKey;
+    serializedKeySelector?: (key: TKey) => string;
     valueSelector?: (item: TValue) => string;
     titleSelector?: (item: TValue) => string | undefined;
     iconSelector?: (item: TValue) => string | React.ReactElement | undefined;
@@ -77,6 +78,7 @@ export const Select: SelectType = observer(function Select({
   id,
   keySelector = v => v,
   valueSelector = v => v,
+  serializedKeySelector,
   iconSelector,
   titleSelector,
   isDisabled,
@@ -183,6 +185,7 @@ export const Select: SelectType = observer(function Select({
         id={inputId}
         aria-label={children || title}
         itemValue={itemValue}
+        itemValueSerialized={serializedKeySelector}
         itemRender={itemRender}
         itemDisabled={itemDisabled}
         name={name}

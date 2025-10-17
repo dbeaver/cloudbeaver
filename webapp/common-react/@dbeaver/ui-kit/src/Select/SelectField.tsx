@@ -24,6 +24,12 @@ export interface SelectFieldProps<T, ItemType = SelectItem<T>> {
   items: ItemType[];
 
   /**
+   * Function to extract serialized value from items
+   * Example: (key) => JSON.stringify(key)
+   */
+  itemValueSerialized?: PropertyGetter<T, string>;
+
+  /**
    * Function to extract value from items
    * Example: (item) => item.id
    */
@@ -91,6 +97,7 @@ export function SelectField<T, ItemType extends {} = SelectItem<T>>({
   value,
   onChange,
   itemValue,
+  itemValueSerialized,
   itemRender,
   itemDisabled,
   label,
@@ -109,6 +116,9 @@ export function SelectField<T, ItemType extends {} = SelectItem<T>>({
   const getItemValue = (item: ItemType): T =>
     getValueByPath<ItemType, T>(item, itemValue, i => ('value' in i ? (i as unknown as SelectItem<T>).value : (i as unknown as T)));
 
+  const getItemValueSerialized = (item: ItemType): string =>
+    getValueByPath<T, string>(getItemValue(item), itemValueSerialized, key => JSON.stringify(key));
+
   const renderItem = (item: ItemType): React.ReactNode =>
     getValueByPath<ItemType, React.ReactNode>(item, itemRender, i => ('label' in i ? (i as unknown as SelectItem<T>).label : String(i)));
 
@@ -122,20 +132,30 @@ export function SelectField<T, ItemType extends {} = SelectItem<T>>({
     return firstEnabledItem ? getItemValue(firstEnabledItem) : undefined;
   });
 
-  const handleChange = (newValue: T) => {
-    setSelectedValue(newValue);
-    onChange?.(newValue);
+  const handleChange = (newValue: string | string[]) => {
+    // TODO: add support for multi-select
+
+    const newItem = items.find(item => getItemValueSerialized(item) === newValue);
+    if (!newItem) {
+      return;
+    }
+    const newItemValue = getItemValue(newItem);
+    setSelectedValue(newItemValue);
+    onChange?.(newItemValue);
   };
 
   const currentValue = value !== undefined ? value : selectedValue;
-
-  const selectedItem = items.find(item => getItemValue(item) === currentValue);
-
+  const currentValueSerialized = currentValue !== undefined 
+    ? (itemValueSerialized ? itemValueSerialized(currentValue) : JSON.stringify(currentValue)) 
+    : undefined;
+  const selectedItem = currentValue !== undefined 
+    ? items.find(item => getItemValueSerialized(item) === currentValueSerialized) 
+    : undefined;
   const displayValue = selectedRender ? selectedRender(currentValue, selectedItem) : selectedItem ? renderItem(selectedItem) : '';
 
   return (
     <div className={clsx('dbv-kit-select-field', className)}>
-      <SelectProvider value={currentValue as any} setValue={val => handleChange(val as T)} store={store}> 
+      <SelectProvider value={currentValueSerialized} setValue={val => handleChange(val)} store={store}> 
         {label && <SelectLabel className={clsx(required && 'dbv-kit-select__label--required')}>{label}</SelectLabel>}
 
         <Select id={id} name={name} disabled={disabled} required={required}>
@@ -150,8 +170,8 @@ export function SelectField<T, ItemType extends {} = SelectItem<T>>({
           ) : (
             items.map(item => (
               <SelectItem
-                key={String(getItemValue(item))}
-                value={getItemValue(item) as any}
+                key={getItemValueSerialized(item)}
+                value={getItemValueSerialized(item)}
                 disabled={isItemDisabled(item)}
               >
                 {renderItem(item)}

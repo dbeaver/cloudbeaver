@@ -29,7 +29,7 @@ export interface ITheme {
   name: string;
   id: string;
   class: string;
-  type?: 'light' | 'dark';
+  type: 'light' | 'dark';
   loaded: boolean;
   loader: () => Promise<void>;
 }

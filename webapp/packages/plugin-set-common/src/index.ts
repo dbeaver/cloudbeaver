@@ -103,6 +103,7 @@ import pluginSystemInformationAdministration from '@cloudbeaver/plugin-system-in
 import pluginSettingsDefaultAdministration from '@cloudbeaver/plugin-settings-default-administration/module';
 import pluginCodemirror6 from '@cloudbeaver/plugin-codemirror6/module';
 import coreServerNotifications from '@cloudbeaver/core-server-notifications/module';
+import pluginDataViewerConditionalFormatting from '@cloudbeaver/plugin-data-viewer-conditional-formatting/module';
 
 const core = [
   coreRouting, // important, should be first because the router starts in load phase first after all plugins register phase
@@ -205,4 +206,5 @@ export const commonSet = [
   pluginSystemInformationAdministration,
   pluginSettingsDefaultAdministration,
   pluginCodemirror6,
+  pluginDataViewerConditionalFormatting,
 ];

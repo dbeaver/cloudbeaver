@@ -14,16 +14,13 @@ import type { IResultSetValue } from '../../DatabaseDataModel/Actions/ResultSet/
 import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel.js';
 import { ResultSetDataSource } from '../../ResultSet/ResultSetDataSource.js';
 import { TextValuePresentationService } from './TextValuePresentationService.js';
-import type { IDatabaseDataFormatAction } from '../../DatabaseDataModel/Actions/IDatabaseDataFormatAction.js';
-import type { IGridDataKey } from '../../DatabaseDataModel/Actions/Grid/IGridDataKey.js';
 
 interface Args {
+  value: IResultSetValue | undefined;
   resultIndex: number;
   model: IDatabaseDataModel<ResultSetDataSource>;
   dataFormat: ResultDataFormat | null;
   currentContentType: string | null;
-  elementKey?: IGridDataKey;
-  formatAction: IDatabaseDataFormatAction;
 }
 
 const DEFAULT_CONTENT_TYPE = 'text/plain';
@@ -55,15 +52,14 @@ function preprocessDefaultContentType(contentType: string | null | undefined) {
   return DEFAULT_CONTENT_TYPE;
 }
 
-export function useAutoContentType({ dataFormat, model, formatAction, resultIndex, currentContentType, elementKey }: Args) {
+export function useAutoContentType({ dataFormat, model, value, resultIndex, currentContentType }: Args) {
   const textValuePresentationService = useService(TextValuePresentationService);
   const activeTabs = textValuePresentationService.tabs.getDisplayed({
     dataFormat: dataFormat,
     model,
     resultIndex: resultIndex,
   });
-  const contentValue = elementKey ? formatAction.get(elementKey) : null;
-  const contentValueType = getContentTypeFromResultSetValue(contentValue);
+  const contentValueType = getContentTypeFromResultSetValue(value ?? null);
   const defaultContentType = preprocessDefaultContentType(contentValueType);
 
   if (currentContentType === null) {

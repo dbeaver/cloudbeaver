@@ -20,11 +20,13 @@ import { MAX_BLOB_PREVIEW_SIZE } from './MAX_BLOB_PREVIEW_SIZE.js';
 import type { IDatabaseDataEditAction } from '../../DatabaseDataModel/Actions/IDatabaseDataEditAction.js';
 import type { IDatabaseDataFormatAction } from '../../DatabaseDataModel/Actions/IDatabaseDataFormatAction.js';
 import type { IGridDataKey } from '../../DatabaseDataModel/Actions/Grid/IGridDataKey.js';
+import type { IResultSetValue } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction.js';
+import type { IDatabaseValueHolder } from '../../DatabaseDataModel/Actions/IDatabaseValueHolder.js';
 
 interface IUseTextValueArgs {
+  cellHolder: IDatabaseValueHolder<IGridDataKey, IResultSetValue> | undefined;
   dataFormat: ResultDataFormat | null;
   contentType: string;
-  elementKey?: IGridDataKey;
   contentAction: ResultSetDataContentAction;
   formatAction: IDatabaseDataFormatAction;
   editAction: IDatabaseDataEditAction;
@@ -32,22 +34,21 @@ interface IUseTextValueArgs {
 
 type ValueGetter = () => string;
 
-export function useTextValueGetter({ contentType, elementKey, formatAction, contentAction, editAction }: IUseTextValueArgs): ValueGetter {
+export function useTextValueGetter({ cellHolder, contentType, formatAction, contentAction, editAction }: IUseTextValueArgs): ValueGetter {
   const suspense = useSuspense();
-  const contentValue = elementKey ? formatAction.get(elementKey) : null;
-  const limitInfo = elementKey ? contentAction.getLimitInfo(elementKey) : null;
+  const limitInfo = cellHolder !== undefined ? contentAction.getLimitInfo(cellHolder) : null;
   const observedContentValue = useObservableRef(
     {
-      contentValue,
+      holder: cellHolder,
       limitInfo,
     },
-    { contentValue: observable.ref, limitInfo: observable.ref },
+    { holder: observable.ref, limitInfo: observable.ref },
   );
 
   const parsedBlobValueGetter = suspense.observedValue(
     'value-blob',
     () => ({
-      blob: isResultSetBlobValue(observedContentValue.contentValue) ? observedContentValue.contentValue.blob : null,
+      blob: isResultSetBlobValue(observedContentValue.holder?.value) ? observedContentValue.holder.value.blob : null,
       limit: observedContentValue.limitInfo?.limit,
     }),
     async ({ blob, limit }) => {
@@ -67,27 +68,26 @@ export function useTextValueGetter({ contentType, elementKey, formatAction, cont
   function valueGetter() {
     let value = '';
 
-    if (!isNotNullDefined(elementKey)) {
+    if (!isNotNullDefined(cellHolder)) {
       return value;
     }
 
-    const contentValue = formatAction.get(elementKey);
-    const isBinary = formatAction.isBinary(elementKey);
-    const cachedFullText = contentAction.retrieveFullTextFromCache(elementKey);
+    const isBinary = formatAction.isBinary(cellHolder);
+    const cachedFullText = contentAction.retrieveFullTextFromCache(cellHolder.key);
 
-    if (isBinary && isResultSetContentValue(contentValue)) {
-      if (contentValue.binary) {
-        value = atob(contentValue.binary);
-      } else if (contentValue.text) {
-        value = contentValue.text;
+    if (isBinary && isResultSetContentValue(cellHolder.value)) {
+      if (cellHolder.value.binary) {
+        value = atob(cellHolder.value.binary);
+      } else if (cellHolder.value.text) {
+        value = cellHolder.value.text;
       }
-    } else if (isResultSetBlobValue(contentValue)) {
+    } else if (isResultSetBlobValue(cellHolder.value)) {
       value = atob(parsedBlobValueGetter() ?? '');
     } else {
-      value = cachedFullText || formatAction.getText(elementKey);
+      value = cachedFullText || formatAction.getText(cellHolder);
     }
 
-    if (!editAction.isElementEdited(elementKey) || isBinary) {
+    if (!editAction.isElementEdited(cellHolder.key) || isBinary) {
       value = formatText(contentType, value);
     }
 

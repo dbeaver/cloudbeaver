@@ -27,9 +27,10 @@ export const TextFormatter = observer<ICellFormatterProps>(function TextFormatte
   }
 
   const formatter = tableDataContext.format;
-  const nullValue = getComputed(() => formatter.get(cellContext.cell!) === null);
-  const textValue = getComputed(() => formatter.getText(cellContext.cell!));
-  const displayValue = getComputed(() => formatter.getDisplayString(cellContext.cell!));
+  const valueHolder = getComputed(() => formatter.get(cellContext.cell!));
+  const nullValue = getComputed(() => formatter.isNull(valueHolder));
+  const textValue = getComputed(() => formatter.getText(valueHolder));
+  const displayValue = getComputed(() => formatter.getDisplayString(valueHolder));
 
   if (nullValue) {
     return <GridNullFormatter />;

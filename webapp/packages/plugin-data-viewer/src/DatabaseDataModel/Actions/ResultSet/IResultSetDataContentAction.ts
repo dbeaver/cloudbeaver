@@ -7,11 +7,13 @@
  */
 
 import type { IGridDataKey } from '../Grid/IGridDataKey.js';
+import type { IDatabaseValueHolder } from '../IDatabaseValueHolder.js';
+import type { IResultSetValue } from './ResultSetFormatAction.js';
 
 export interface IResultSetDataContentAction {
   isLoading: (element: IGridDataKey) => boolean;
-  isBlobTruncated: (element: IGridDataKey) => boolean;
-  isTextTruncated: (element: IGridDataKey) => boolean;
+  isBlobTruncated: (holder: IDatabaseValueHolder<IGridDataKey, IResultSetValue>) => boolean;
+  isTextTruncated: (holder: IDatabaseValueHolder<IGridDataKey, IResultSetValue>) => boolean;
   isDownloadable: (element: IGridDataKey) => boolean;
   resolveFileDataUrl: (element: IGridDataKey) => Promise<Blob>;
   retrieveBlobFromCache: (element: IGridDataKey) => Blob | undefined;

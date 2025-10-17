@@ -251,7 +251,7 @@ export class DataGridContextMenuFilterService {
         const format = model.source.getAction(resultIndex, IDatabaseDataFormatAction);
         const data = model.source.getAction(resultIndex, IDatabaseDataResultAction, ResultSetDataAction);
 
-        const cellValue = format.getText(key);
+        const cellValue = format.getText(format.get(key));
         const supportedOperations = data.getColumnOperations(key.column);
         const columnLabel = data.getColumn(key.column)?.label || '';
 
@@ -310,7 +310,7 @@ export class DataGridContextMenuFilterService {
 
         const supportedOperations = data.getColumnOperations(key.column);
         const columnLabel = data.getColumn(key.column)?.label || '';
-        const displayString = format.getText(key);
+        const displayString = format.getText(format.get(key));
 
         const filters = supportedOperations
           .filter(operation => !nullOperationsFilter(operation))

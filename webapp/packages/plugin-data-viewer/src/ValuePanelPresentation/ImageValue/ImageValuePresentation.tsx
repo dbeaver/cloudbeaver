@@ -81,7 +81,7 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
             />
           )}
           {isTruncatedMessageDisplay && (
-            <QuotaPlaceholder model={data.model} resultIndex={data.resultIndex} elementKey={data.selectedCell}>
+            <QuotaPlaceholder model={data.model} resultIndex={data.resultIndex} holder={data.cellHolder}>
               {isDownloadable && (
                 <Button variant="secondary" disabled={loading} loading={isCacheDownloading} loader onClick={data.loadFullImage}>
                   {`${translate('ui_view')} (${valueSize})`}

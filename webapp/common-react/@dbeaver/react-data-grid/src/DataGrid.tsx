@@ -42,6 +42,7 @@ export interface DataGridCellKeyboardEvent extends React.KeyboardEvent<HTMLDivEl
 export interface DataGridProps extends IDataGridCellContext, IDataGridRowContext, IDataGridHeaderCellContext, React.PropsWithChildren {
   getRowHeight?: (rowIdx: number) => number;
   getRowId?: (rowIdx: number) => React.Key;
+  getRowClass?: (rowIdx: number) => string | null;
   columnCount: IGridReactiveValue<number, []>;
   getColumnKey?: (colIdx: number) => string;
   onScroll?: (event: React.UIEvent<HTMLDivElement>) => void;
@@ -81,6 +82,7 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
     rowCount,
     getRowId,
     getRowHeight,
+    getRowClass,
     onHeaderReorder,
     onScroll,
     onScrollToBottom,
@@ -194,6 +196,7 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
               headerRowHeight={getHeaderHeight?.()}
               rowHeight={getRowHeight ? row => getRowHeight(row.idx) : undefined}
               rowKeyGetter={getRowId ? row => getRowId(row.idx) : undefined}
+              rowClass={getRowClass ? row => getRowClass(row.idx) : undefined}
               columnWidths={columnWidths}
               renderers={{
                 renderRow: rowRenderer,

@@ -140,11 +140,11 @@ export const GISValuePresentation = observer<Props>(function GISValuePresentatio
         //TODO: fix column info abstraction
         const columnInfo = view.getColumn(column) as SqlResultColumn | undefined;
 
-        if (value && columnInfo?.name) {
+        if (value.value && columnInfo?.name) {
           values.push({
             key: columnInfo.name,
             // TODO: fix value abstraction
-            value: value as IResultSetValue,
+            value: value.value as IResultSetValue,
           });
         }
       }

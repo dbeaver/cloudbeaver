@@ -29,7 +29,7 @@ const EVENT_KEY_CODE = {
 };
 
 function getCellCopyValue(tableData: ITableData, key: IGridDataKey): string {
-  return tableData.format.getText(key);
+  return tableData.format.getText(tableData.format.get(key));
 }
 
 function getSelectedCellsValue(tableData: ITableData, selectedCells: Map<string, IGridDataKey[]>) {

@@ -37,6 +37,7 @@
     "@cloudbeaver/core-view": "workspace:*",
     "@cloudbeaver/plugin-data-grid": "workspace:*",
     "@cloudbeaver/plugin-data-viewer": "workspace:*",
+    "@cloudbeaver/plugin-data-viewer-conditional-formatting": "workspace:*",
     "@dbeaver/result-set-api": "workspace:*",
     "@dbeaver/ui-kit": "workspace:*",
     "mobx": "^6",

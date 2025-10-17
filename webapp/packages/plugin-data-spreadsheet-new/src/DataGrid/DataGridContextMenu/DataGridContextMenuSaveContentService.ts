@@ -61,7 +61,7 @@ export class DataGridContextMenuSaveContentService {
 
         if (action === ACTION_UPLOAD) {
           return (
-            !format.isBinary(key) ||
+            !format.isBinary(format.get(key)) ||
             model.isReadonly(resultIndex) ||
             (format.isReadOnly(key) && editor.getElementState(key) !== DatabaseEditChangeType.add)
           );
