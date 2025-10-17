@@ -2227,7 +2227,6 @@ __metadata:
     "@types/underscore": "npm:^1"
     "@types/uuid": "npm:^10"
     "@types/whatwg-mimetype": "npm:^3"
-    canvg: "npm:^4"
     dom-to-image: "npm:^2"
     fast-deep-equal: "npm:^3"
     md5: "npm:^2"
@@ -8239,13 +8238,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/raf@npm:^3.4.0":
-  version: 3.4.3
-  resolution: "@types/raf@npm:3.4.3"
-  checksum: 10c0/dea835f0daa399c51db9137f5337dc08a2b4a5f61f645658966ecabaebbbd0fd59551f384a1141e14e22a1cc5a591da7d4d88c60a525ad1399108b6dd2641d75
-  languageName: node
-  linkType: hard
-
 "@types/react-dom@npm:^19":
   version: 19.1.9
   resolution: "@types/react-dom@npm:19.1.9"
@@ -9539,19 +9531,6 @@ __metadata:
   version: 1.0.30001741
   resolution: "caniuse-lite@npm:1.0.30001741"
   checksum: 10c0/45746f896205a61a8eeb85a32aeca243ebce640cd6eb80d04949d9389a13f4659c737860300d7b988057599f0958c55eeab74ec02ce9ef137feb7d006e75fec1
-  languageName: node
-  linkType: hard
-
-"canvg@npm:^4":
-  version: 4.0.3
-  resolution: "canvg@npm:4.0.3"
-  dependencies:
-    "@types/raf": "npm:^3.4.0"
-    raf: "npm:^3.4.1"
-    rgbcolor: "npm:^1.0.1"
-    stackblur-canvas: "npm:^2.0.0"
-    svg-pathdata: "npm:^6.0.3"
-  checksum: 10c0/ae73842020becda78a61428a967c42131fd0a73a474af19c5a622a7acf41fb38097f6d3b0201676f5f7aa0dad65cde4c78b6d0288ed36f69c6e2caf2f8e6bf70
   languageName: node
   linkType: hard
 
@@ -15978,13 +15957,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"performance-now@npm:^2.1.0":
-  version: 2.1.0
-  resolution: "performance-now@npm:2.1.0"
-  checksum: 10c0/22c54de06f269e29f640e0e075207af57de5052a3d15e360c09b9a8663f393f6f45902006c1e71aa8a5a1cdfb1a47fe268826f8496d6425c362f00f5bc3e85d9
-  languageName: node
-  linkType: hard
-
 "picocolors@npm:1.1.1, picocolors@npm:^1, picocolors@npm:^1.1.1":
   version: 1.1.1
   resolution: "picocolors@npm:1.1.1"
@@ -16272,15 +16244,6 @@ __metadata:
   version: 7.1.0
   resolution: "quick-lru@npm:7.1.0"
   checksum: 10c0/ef2df33368a66e3d3b32a42c523fcd0939c03f6192ec7f29db36179e22f015d2c75790aa9ab530c719a0dd3fb510f972bc66acca4e92bc9f01f92f0e6c2084f2
-  languageName: node
-  linkType: hard
-
-"raf@npm:^3.4.1":
-  version: 3.4.1
-  resolution: "raf@npm:3.4.1"
-  dependencies:
-    performance-now: "npm:^2.1.0"
-  checksum: 10c0/337f0853c9e6a77647b0f499beedafea5d6facfb9f2d488a624f88b03df2be72b8a0e7f9118a3ff811377d534912039a3311815700d2b6d2313f82f736f9eb6e
   languageName: node
   linkType: hard
 
@@ -16978,13 +16941,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"rgbcolor@npm:^1.0.1":
-  version: 1.0.1
-  resolution: "rgbcolor@npm:1.0.1"
-  checksum: 10c0/13af06c523351bac2854b85a22d1dfafd9310efd898e9bd96c8706f9aa09a3ddc8392ab00ae03d12950782164a97677f21834ffd84ffebf76ae106add319f956
-  languageName: node
-  linkType: hard
-
 "rimraf@npm:^6":
   version: 6.0.1
   resolution: "rimraf@npm:6.0.1"
@@ -17672,13 +17628,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"stackblur-canvas@npm:^2.0.0":
-  version: 2.7.0
-  resolution: "stackblur-canvas@npm:2.7.0"
-  checksum: 10c0/df290d0629056d5bb43d37548d0b24cb8593c79d742650e68489abf61013db578c9980724c2508bb738d107204f2e2494ab94c3cf69d6b725caa9c63b8c7e272
-  languageName: node
-  linkType: hard
-
 "statuses@npm:>= 1.5.0 < 2, statuses@npm:^1.5.0":
   version: 1.5.0
   resolution: "statuses@npm:1.5.0"
@@ -18044,13 +17993,6 @@ __metadata:
   version: 2.0.4
   resolution: "svg-parser@npm:2.0.4"
   checksum: 10c0/02f6cb155dd7b63ebc2f44f36365bc294543bebb81b614b7628f1af3c54ab64f7e1cec20f06e252bf95bdde78441ae295a412c68ad1678f16a6907d924512b7a
-  languageName: node
-  linkType: hard
-
-"svg-pathdata@npm:^6.0.3":
-  version: 6.0.3
-  resolution: "svg-pathdata@npm:6.0.3"
-  checksum: 10c0/1ba4ad2fa81e86df37d6e78d3be9e664bbedf97773b725a863a85db384285be32dc37d9c0d61e477d89594ee95b967d2c53d6bee2d76420aab670ab4124a38b9
   languageName: node
   linkType: hard
 

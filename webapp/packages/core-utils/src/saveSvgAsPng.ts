@@ -6,66 +6,13 @@
  * you may not use this file except in compliance with the License.
  */
 
-//@ts-ignore
-import { Canvg } from 'canvg';
-
-import { blobToBase64, download, svgToDataUri, transformClassesToStyles, uriToBlob } from '@cloudbeaver/core-utils';
+import { domToImage, download, transformClassesToStyles } from '@cloudbeaver/core-utils';
 
 import type { ISaveImageOptions } from './ISaveImageOptions.js';
-import { type IPreparedSVG, prepareSvg } from './prepareSvg.js';
-
-const pixelRatio = 2;
-const encoderType = 'image/png';
-const quality = 0.8;
-
-async function convertToPng(source: IPreparedSVG) {
-  const canvas = document.createElement('canvas');
-  const context = canvas.getContext('2d')!;
-
-  canvas.width = source.width * pixelRatio;
-  canvas.height = source.height * pixelRatio;
-  canvas.style.width = `${canvas.width}px`;
-  canvas.style.height = `${canvas.height}px`;
-
-  context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
-
-  const svgXml = svgToDataUri(source.src);
-
-  const canvg = await Canvg.from(context, svgXml, {
-    scaleWidth: canvas.width,
-    scaleHeight: canvas.height,
-  });
-
-  await canvg.render();
-
-  const blob: Blob | null = await new Promise(resolve => {
-    canvas.toBlob(
-      result => {
-        resolve(result);
-      },
-      encoderType,
-      quality,
-    );
-  });
-
-  if (!blob) {
-    throw new Error('Something went wrong, please try select another file format');
-  }
-
-  const png = await blobToBase64(blob);
-
-  if (!png) {
-    throw new Error("Can't convert blob to data");
-  }
-
-  return png;
-}
+import { prepareSvg } from './prepareSvg.js';
 
 export async function saveSvgAsPng(el: SVGSVGElement, name: string, options: ISaveImageOptions): Promise<void> {
   transformClassesToStyles(el);
-  const preparedSvg = await prepareSvg(el, options);
-  const uri = await convertToPng(preparedSvg);
-  const blob = uriToBlob(uri);
-
-  download(blob, name);
+  await prepareSvg(el, options);
+  domToImage.toPng(el, options).then(dataUrl => download(dataUrl, `${name}.png`));
 }

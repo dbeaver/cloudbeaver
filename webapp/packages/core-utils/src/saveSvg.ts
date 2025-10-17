@@ -6,16 +6,13 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { download, svgToDataUri, transformClassesToStyles, uriToBlob } from '@cloudbeaver/core-utils';
+import { domToImage, download, transformClassesToStyles } from '@cloudbeaver/core-utils';
 
 import type { ISaveImageOptions } from './ISaveImageOptions.js';
 import { prepareSvg } from './prepareSvg.js';
 
 export async function saveSvg(el: SVGSVGElement, name: string, options: ISaveImageOptions): Promise<void> {
   transformClassesToStyles(el);
-  const preparedSvg = await prepareSvg(el, options);
-  const uri = svgToDataUri(preparedSvg.src);
-  const blob = uriToBlob(uri);
-
-  download(blob, name);
+  await prepareSvg(el, options);
+  domToImage.toSvg(el, options).then(dataUrl => download(dataUrl, `${name}.svg`));
 }

@@ -7,7 +7,6 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useCallback } from 'react';
 
 import {
   Button,
@@ -53,7 +52,6 @@ interface State extends IExportImageOptions {
 export const ExportImageDialog = observer<DialogComponentProps<ExportImagePayload, null>>(function ExportImageDialog(props) {
   const translate = useTranslate();
   const styles = useS(style);
-
   const state = useObservableRef<State>(
     () => ({
       format: 'SVG',
@@ -80,20 +78,6 @@ export const ExportImageDialog = observer<DialogComponentProps<ExportImagePayloa
     }
   };
 
-  const onFormatSelect = useCallback(
-    (format: ExportFormat) => {
-      state.format = format;
-    },
-    [state],
-  );
-
-  const onTransparentOptionChange = useCallback(
-    (transparent: boolean) => {
-      state.transparent = transparent;
-    },
-    [state],
-  );
-
   return (
     <CommonDialogWrapper size="small">
       <CommonDialogHeader title="core_blocks_export_image_dialog_title" onReject={props.rejectDialog} />
@@ -103,22 +87,10 @@ export const ExportImageDialog = observer<DialogComponentProps<ExportImagePayloa
             <InputField state={state} name="fileName">
               {translate('ui_name')}
             </InputField>
-            <Select
-              items={EXPORT_FORMATS}
-              keySelector={value => value}
-              valueSelector={value => value}
-              state={state}
-              name="format"
-              onSelect={onFormatSelect}
-            >
+            <Select items={EXPORT_FORMATS} keySelector={value => value} valueSelector={value => value} state={state} name="format">
               {translate('core_blocks_export_image_dialog_format')}
             </Select>
-            <FieldCheckbox
-              state={state}
-              name="transparent"
-              label={translate('core_blocks_export_image_dialog_transparent_background')}
-              onChange={onTransparentOptionChange}
-            />
+            <FieldCheckbox state={state} name="transparent" label={translate('core_blocks_export_image_dialog_transparent_background')} />
           </Container>
         </Container>
         {errorDetails.name && (

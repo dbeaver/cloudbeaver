@@ -8,12 +8,6 @@
 
 import type { ISaveImageOptions } from './ISaveImageOptions.js';
 
-export interface IPreparedSVG {
-  src: string;
-  width: number;
-  height: number;
-}
-
 interface ICachedImage {
   promise: Promise<string | null>;
   elements: SVGImageElement[];
@@ -79,7 +73,7 @@ async function inlineImages(el: SVGSVGElement) {
   }
 }
 
-export async function prepareSvg(el: SVGSVGElement, options: ISaveImageOptions): Promise<IPreparedSVG> {
+export async function prepareSvg(el: SVGSVGElement, options: ISaveImageOptions): Promise<void> {
   await inlineImages(el);
 
   const bgColor = options.backgroundColor || el.style.backgroundColor;
@@ -119,11 +113,4 @@ export async function prepareSvg(el: SVGSVGElement, options: ISaveImageOptions):
 
   defs.appendChild(style);
   el.insertBefore(defs, el.firstChild);
-
-  const outer = document.createElement('div');
-
-  outer.appendChild(el);
-  const src = outer.innerHTML.replace(/NS\d+:href/gi, `xmlns:xlink=${xlink} xlink:href`);
-
-  return { src, width: options.width, height: options.height };
 }
