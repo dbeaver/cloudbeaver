@@ -94,3 +94,4 @@ export * from './getDomainFromUrl.js';
 export * from './isNumber.js';
 export * from './getSubjectDifferences.js';
 export * from './transformClassesToStyles.js';
+export * from './domToImage.js';

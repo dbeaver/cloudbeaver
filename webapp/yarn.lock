@@ -2228,6 +2228,7 @@ __metadata:
     "@types/uuid": "npm:^10"
     "@types/whatwg-mimetype": "npm:^3"
     canvg: "npm:^4"
+    dom-to-image: "npm:^2"
     fast-deep-equal: "npm:^3"
     md5: "npm:^2"
     mobx: "npm:^6"
@@ -10849,6 +10850,13 @@ __metadata:
   version: 0.6.3
   resolution: "dom-accessibility-api@npm:0.6.3"
   checksum: 10c0/10bee5aa514b2a9a37c87cd81268db607a2e933a050074abc2f6fa3da9080ebed206a320cbc123567f2c3087d22292853bdfdceaffdd4334ffe2af9510b29360
+  languageName: node
+  linkType: hard
+
+"dom-to-image@npm:^2":
+  version: 2.6.0
+  resolution: "dom-to-image@npm:2.6.0"
+  checksum: 10c0/6c77851d2f301d2a4bbc3fa3f9d6f152bcc4f2a20b57185b9fa1fd81244c0c9a0c7f6deffb30461bba57d83f8b37d905fb5440d9bcda5b7221b968001a2c94fe
   languageName: node
   linkType: hard
 
