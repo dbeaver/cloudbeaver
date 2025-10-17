@@ -475,7 +475,14 @@ public class WebServiceRM implements DBWServiceRM {
 
         try {
             validateProject(webSession, projectId);
-            webSession.getSecurityController().setObjectSettings(
+            //fixme transactional
+            SMController securityController = webSession.getSecurityController();
+            securityController.deleteObjectSettings(
+                projectId,
+                SMObjectType.project,
+                settings.keySet()
+            );
+            securityController.setObjectSettings(
                 projectId,
                 SMObjectType.project,
                 settings
@@ -550,7 +557,15 @@ public class WebServiceRM implements DBWServiceRM {
     ) throws DBWebException {
         try {
             validateProject(webSession, projectId);
-            webSession.getAdminSecurityController().setObjectSettings(
+            //fixme transactional
+            SMAdminController adminSecurityController = webSession.getAdminSecurityController();
+            adminSecurityController.deleteObjectSettings(
+                projectId,
+                SMObjectType.project,
+                subjectId,
+                settings.keySet()
+            );
+            adminSecurityController.setObjectSettings(
                 projectId,
                 SMObjectType.project,
                 subjectId,
