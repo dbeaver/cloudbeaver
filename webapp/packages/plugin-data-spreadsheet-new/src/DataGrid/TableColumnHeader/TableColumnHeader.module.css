@@ -47,19 +47,21 @@
 .dragging {
   opacity: 0.5;
 }
-.header:before {
+.dndBox:before {
   position: absolute;
   z-index: 10;
   height: 100%;
   border-left: solid 2px var(--theme-primary);
 }
-[data-s-rearrange='left']:before {
-  content: '';
-  left: 0;
-}
-[data-s-rearrange='right']:before {
-  content: '';
-  right: 0;
+.dndBox {
+  &[data-s-rearrange='left']:before {
+    content: '';
+    left: 0;
+  }
+  &[data-s-rearrange='right']:before {
+    content: '';
+    right: 0;
+  }
 }
 .description {
   composes: theme-typography--caption from global;

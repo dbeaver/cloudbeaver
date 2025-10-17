@@ -75,7 +75,7 @@ export const TableColumnHeader = observer<Props>(function TableColumnHeader({ co
       ref={dnd.setRef}
       title={columnTooltip}
       data-s-rearrange={dnd.side}
-      className={s(styles, { dragging: dnd.data.state.isDragging }, 'tw:h-full')}
+      className={s(styles, { dragging: dnd.data.state.isDragging, dndBox: true }, 'tw:h-full')}
       onClick={handleClick}
     >
       <div className={s(styles, { header: true })}>
