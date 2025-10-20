@@ -603,7 +603,7 @@ export function isNewConnection(connection: Connection | NewConnection): connect
   return (connection as NewConnection)[NEW_CONNECTION_SYMBOL];
 }
 
-export function compareConnectionsInfo(a: DatabaseConnection, b: DatabaseConnection): number {
+export function compareConnectionsInfo<T extends Pick<DatabaseConnection, 'name'>>(a: T, b: T): number {
   return a.name.localeCompare(b.name);
 }
 

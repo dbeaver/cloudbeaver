@@ -323,6 +323,6 @@ export function isNewUser(user: AdminUser): boolean {
   return NEW_USER_SYMBOL in user && user[NEW_USER_SYMBOL] === true;
 }
 
-export function compareUsers(a: AdminUser, b: AdminUser): number {
+export function compareUsers<T extends Pick<AdminUser, 'userId'>>(a: T, b: T): number {
   return a.userId.localeCompare(b.userId);
 }

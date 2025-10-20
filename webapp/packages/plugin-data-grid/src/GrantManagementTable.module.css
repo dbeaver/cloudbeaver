@@ -1,0 +1,10 @@
+.table {
+  height: 100%;
+  overflow: auto;
+  border: 1px solid var(--theme-background);
+  max-width: 100%;
+
+  :global(.rdg-cell.edited) {
+    background-color: color-mix(in srgb, var(--theme-primary) 50%, white);
+  }
+}

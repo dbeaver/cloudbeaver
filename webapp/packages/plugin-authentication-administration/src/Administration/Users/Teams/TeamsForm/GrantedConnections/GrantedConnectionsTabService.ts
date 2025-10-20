@@ -1,10 +1,11 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { isGlobalProject, ProjectInfoResource } from '@cloudbeaver/core-projects';
@@ -13,7 +14,7 @@ import { CachedMapAllKey, getCachedMapResourceLoaderState } from '@cloudbeaver/c
 import { TeamsAdministrationFormService } from '../TeamsAdministrationFormService.js';
 import { getGrantedConnectionsFormPart } from './getGrantedConnectionsFormPart.js';
 
-const GrantedConnections = importLazyComponent(() => import('./GrantedConnections.js').then(module => module.GrantedConnections));
+const ConnectionManagement = importLazyComponent(() => import('./ConnectionManagement.js').then(module => module.ConnectionManagement));
 
 @injectable(() => [ProjectInfoResource, TeamsAdministrationFormService])
 export class GrantedConnectionsTabService extends Bootstrap {
@@ -33,7 +34,7 @@ export class GrantedConnectionsTabService extends Bootstrap {
       name: 'administration_teams_team_granted_connections_tab_title',
       title: 'administration_teams_team_granted_connections_tab_title',
       order: 3,
-      panel: () => GrantedConnections,
+      panel: () => ConnectionManagement,
       isHidden: () => !this.isEnabled(),
       stateGetter: props => () => getGrantedConnectionsFormPart(props.formState),
       getLoader: () => getCachedMapResourceLoaderState(this.projectInfoResource, () => CachedMapAllKey),

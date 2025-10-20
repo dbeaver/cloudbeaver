@@ -25,3 +25,5 @@ export {
   type IDataGridCellProps,
   type DataGridProps,
 } from '@dbeaver/react-data-grid';
+
+export * from './GrantManagementTableLazy.js';

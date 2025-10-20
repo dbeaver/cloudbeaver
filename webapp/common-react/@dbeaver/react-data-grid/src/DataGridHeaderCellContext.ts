@@ -3,7 +3,7 @@ import type { IGridReactiveValue } from './IGridReactiveValue.js';
 
 export interface IDataGridHeaderCellContext {
   headerElement?: IGridReactiveValue<React.ReactNode, [colIdx: number]>;
-  headerText?: IGridReactiveValue<string, [colIdx: number]>;
+  headerText?: IGridReactiveValue<string | React.ReactNode, [colIdx: number]>;
   getHeaderOrder?: () => number[];
   getHeaderWidth?: (colIdx: number) => number | string | null;
   getHeaderResizable?: (colIdx: number) => boolean;

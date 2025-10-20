@@ -26,6 +26,7 @@
   "dependencies": {
     "@cloudbeaver/core-blocks": "workspace:*",
     "@cloudbeaver/core-di": "workspace:*",
+    "@cloudbeaver/core-localization": "workspace:*",
     "@dbeaver/react-data-grid": "workspace:*",
     "@dbeaver/ui-kit": "workspace:*",
     "mobx": "^6",
