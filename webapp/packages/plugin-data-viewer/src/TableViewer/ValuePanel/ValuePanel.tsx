@@ -79,9 +79,6 @@ export const ValuePanel: DataPresentationComponent = observer(function ValuePane
 
   if (displayed.length > 0 && !hasCurrentTab) {
     currentTabId = hasOnlyTextRepresentations ? autoContentType : displayed[0]!.key;
-    if (currentTabId !== state.currentTabId) {
-      state.setCurrentTabId(currentTabId);
-    }
   }
 
   return (
