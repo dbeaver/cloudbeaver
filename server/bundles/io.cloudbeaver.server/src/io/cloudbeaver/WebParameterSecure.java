@@ -27,5 +27,5 @@ import java.lang.annotation.Target;
  */
 @Target(value = {ElementType.METHOD, ElementType.FIELD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface WebParameterSensitive {
+public @interface WebParameterSecure {
 }

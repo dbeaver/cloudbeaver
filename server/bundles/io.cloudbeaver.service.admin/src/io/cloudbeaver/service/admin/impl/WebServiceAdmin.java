@@ -363,7 +363,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     public boolean setUserCredentials(@NotNull WebSession webSession,
                                       @NotNull String userID,
                                       @NotNull String providerId,
-                                      @WebParameterSensitive @NotNull Map<String, Object> credentials
+                                      @WebParameterSecure @NotNull Map<String, Object> credentials
     ) throws DBWebException {
         WebAuthProviderDescriptor authProvider = WebAuthProviderRegistry.getInstance().getAuthProvider(providerId);
         if (authProvider == null) {

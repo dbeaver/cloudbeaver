@@ -113,7 +113,7 @@ public interface DBWServiceAdmin extends DBWService {
         @NotNull WebSession webSession,
         @NotNull String userID,
         @NotNull String providerId,
-        @WebParameterSensitive @NotNull Map<String, Object> credentials
+        @WebParameterSecure @NotNull Map<String, Object> credentials
     ) throws DBWebException;
 
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)

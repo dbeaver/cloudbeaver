@@ -16,7 +16,7 @@
  */
 package io.cloudbeaver.server.graphql;
 
-import io.cloudbeaver.WebParameterSensitive;
+import io.cloudbeaver.WebParameterSecure;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.WebAppUtils;
 import io.cloudbeaver.server.WebApplication;
@@ -97,7 +97,7 @@ public class GraphQLLoggerUtil {
                 //we already log sessionId
                 continue;
             }
-            if (params[i].isAnnotationPresent(WebParameterSensitive.class)) {
+            if (params[i].isAnnotationPresent(WebParameterSecure.class)) {
                 joiner.add("****");
                 continue;
             }
@@ -121,7 +121,7 @@ public class GraphQLLoggerUtil {
                     }
 
                     try {
-                        fields.add(f.isAnnotationPresent(WebParameterSensitive.class) ? "****" : String.valueOf(f.get(value)));
+                        fields.add(f.isAnnotationPresent(WebParameterSecure.class) ? "****" : String.valueOf(f.get(value)));
                     } catch (IllegalAccessException e) {
                         fields.add("<err>");
                     }
