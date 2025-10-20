@@ -348,7 +348,6 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
             HttpServletRequest request = this.env.getGraphQlContext().get("request");
             String sessionId = GraphQLLoggerUtil.getSmSessionId(request);
             String userId = GraphQLLoggerUtil.getUserId(request);
-
             String loggerMessage = GraphQLLoggerUtil.buildLoggerMessage(sessionId, userId, method, args);
 
             log.debug("API > " + method.getName() + loggerMessage);

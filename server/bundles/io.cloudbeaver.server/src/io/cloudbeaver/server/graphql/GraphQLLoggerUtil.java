@@ -155,14 +155,14 @@ public class GraphQLLoggerUtil {
 
     private static List<Field> getAllInstanceFields(Class<?> type) {
         List<Field> out = new ArrayList<>();
-        Set<String> seen = new HashSet<>(); // чтобы не дублировать скрытые/переопределённые имена
+        Set<String> seen = new HashSet<>();
 
         for (Class<?> c = type; c != null && c != Object.class; c = c.getSuperclass()) {
             for (Field f : c.getDeclaredFields()) {
                 int m = f.getModifiers();
-                if (Modifier.isStatic(m) || f.isSynthetic()) continue; // пропускаем static и синтетические
+                if (Modifier.isStatic(m) || f.isSynthetic()) continue;
                 if (seen.add(f.getName())) {
-                    out.add(f); // сначала добавим поля подкласса, затем родителя
+                    out.add(f);
                 }
             }
         }
