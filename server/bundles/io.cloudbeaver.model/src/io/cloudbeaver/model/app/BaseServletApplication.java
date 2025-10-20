@@ -41,6 +41,7 @@ import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.dbeaver.utils.RuntimeUtils;
 import org.jkiss.utils.CommonUtils;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -204,7 +205,7 @@ public abstract class BaseServletApplication extends BaseApplicationImpl impleme
         initializeApplicationServices();
         try {
             try {
-                this.instanceServer = new CloudBeaverInstanceServer();
+                this.instanceServer = createInstanceServer();
             } catch (Exception e) {
                 log.error("Error initializing instance server", e);
             }
@@ -214,6 +215,10 @@ public abstract class BaseServletApplication extends BaseApplicationImpl impleme
             return EXIT_ERROR_UNSPECIFIED;
         }
         return EXIT_OK;
+    }
+
+    protected CloudBeaverInstanceServer createInstanceServer() throws IOException {
+        return new CloudBeaverInstanceServer();
     }
 
     protected abstract void startServer() throws DBException;

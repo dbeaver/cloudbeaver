@@ -22,12 +22,17 @@ import org.jkiss.dbeaver.model.cli.ApplicationCommandLine;
 import org.jkiss.dbeaver.model.cli.ApplicationInstanceController;
 import org.jkiss.dbeaver.model.cli.CLIRunMeta;
 import org.jkiss.dbeaver.model.cli.CommandLineContext;
+import org.jkiss.dbeaver.model.cli.model.CommandLineAuthenticator;
+import picocli.CommandLine;
 
 public class CloudBeaverCommandLine extends ApplicationCommandLine<ApplicationInstanceController> {
-    private static CloudBeaverCommandLine INSTANCE = null;
 
-    private CloudBeaverCommandLine() {
+    @Nullable
+    private final CommandLineAuthenticator authenticator;
+
+    public CloudBeaverCommandLine(@Nullable CommandLineAuthenticator authenticator) {
         super();
+        this.authenticator = authenticator;
     }
 
     @Override
@@ -39,10 +44,13 @@ public class CloudBeaverCommandLine extends ApplicationCommandLine<ApplicationIn
         return new CloudBeaverTopLevelCommand(applicationInstanceController, context, runMeta);
     }
 
-    public synchronized static CloudBeaverCommandLine getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new CloudBeaverCommandLine();
-        }
-        return INSTANCE;
+    @NotNull
+    @Override
+    protected CommandLine initCommandLine(
+        @Nullable ApplicationInstanceController applicationInstanceController,
+        @NotNull CommandLineContext context,
+        @NotNull CLIRunMeta runMeta
+    ) {
+        return super.initCommandLine(applicationInstanceController, context, runMeta);
     }
 }
