@@ -351,9 +351,7 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
 
             String loggerMessage = GraphQLLoggerUtil.buildLoggerMessage(sessionId, userId, method, args);
 
-            if (method.getName() != null) {
-                log.debug("API > " + method.getName() + loggerMessage);
-            }
+            log.debug("API > " + method.getName() + loggerMessage);
 
             setLogContext(method, args);
         }

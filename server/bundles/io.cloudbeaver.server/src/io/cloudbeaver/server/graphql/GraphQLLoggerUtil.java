@@ -26,15 +26,16 @@ import org.jkiss.utils.CommonUtils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class GraphQLLoggerUtil {
 
     public static final String LOG_API_GRAPHQL_DEBUG_PARAMETER = "log.api.graphql.debug";
-    private static final Set<String> PROHIBITED_VARIABLES =
-        Set.of("password", "config", "parameters", "settings", "licenseText", "credentials", "username");
 
     public static String getUserId(HttpServletRequest request) {
         WebSession session = getWebSession(request);
@@ -67,47 +68,17 @@ public class GraphQLLoggerUtil {
             .findWebSession(request);
     }
 
-    public static String buildLoggerMessage(String sessionId, String userId, Map<String, Object> variables, String operationName) {
-        StringBuilder loggerMessage = new StringBuilder(" [user: ").append(userId)
-            .append(", sessionId: ").append(sessionId).append("]");
-
-        if (true
-            && variables != null
-        ) {
-            loggerMessage.append(" [variables] ");
-            String parsedVariables = parseVarialbes(variables, operationName);
-            if (CommonUtils.isNotEmpty(parsedVariables)) {
-                loggerMessage.append(parseVarialbes(variables, operationName));
-            }
-        }
-        return loggerMessage.toString();
-    }
-    private static String parseVarialbes(Map<String, Object> variables, String operationName) {
-        StringBuilder sb = new StringBuilder();
-        for (Map.Entry<String, Object> entry : variables.entrySet()) {
-            sb.append(entry.getKey()).append(": ");
-            if (PROHIBITED_VARIABLES.contains(entry.getKey().toLowerCase())) {
-                sb.append("**** ");
-                System.out.println("masking variable " + entry.getKey() + " for operation " + operationName);
-            } else {
-                sb.append(entry.getValue()).append(" ");
-            }
-        }
-        return sb.toString().trim();
-    }
-
     public static String buildLoggerMessage(String sessionId, String userId, Method method, Object[] args) {
         StringBuilder loggerMessage = new StringBuilder(" [user: ").append(userId)
             .append(", sessionId: ").append(sessionId).append("]");
 
-//        if (WebAppUtils.getWebPlatform().getPreferenceStore().getBoolean(LOG_API_GRAPHQL_DEBUG_PARAMETER)
-        if (true
-        ) {
-            loggerMessage.append(" [variables] ");
+        if (WebAppUtils.getWebPlatform().getPreferenceStore().getBoolean(LOG_API_GRAPHQL_DEBUG_PARAMETER)) {
+            loggerMessage.append("(");
             String parsedVariables = maskArgsToString(method, args);
             if (CommonUtils.isNotEmpty(parsedVariables)) {
                 loggerMessage.append(parsedVariables);
             }
+            loggerMessage.append(")");
         }
         return loggerMessage.toString();
     }
@@ -115,35 +86,61 @@ public class GraphQLLoggerUtil {
     public static String maskArgsToString(Method method, Object[] args) {
         StringBuilder sb = new StringBuilder();
         Parameter[] params = method.getParameters();
+        if (params == null || params.length == 0 || args == null || args.length == 0) {
+            return "";
+        }
 
-        for (int i = 0; i < params.length; i++) {
+        boolean isFirst = true;
+        for (int i = 0; i < args.length; i++) {
             //fixme can't get real parameter names without -parameters compiler option
-            String name = params[i].getName();
-            Object value = (args != null && i < args.length) ? args[i] : null;
-
-            sb.append(name).append(": ");
+            if (i >= params.length) {
+                break;
+            }
+            Object value = args[i];
+            if (value instanceof WebSession) {
+                //we already logged sessionId
+                continue;
+            }
+            if (!isFirst) {
+                sb.append(", ");
+            }
 
             if (params[i].isAnnotationPresent(WebParameterSensitive.class)) {
-                sb.append("**** ");
+                sb.append("****");
             } else if (value != null && !isSimple(value.getClass())) {
-                sb.append("{ ");
-                for (Field field : value.getClass().getDeclaredFields()) {
+                sb.append("{");
+                //todo handle nested objects (?)
+                boolean isNestedFirst = true;
+                for (Field field : getAllInstanceFields(value.getClass())) {
+                    boolean accessible = field.canAccess(value) || field.trySetAccessible();
+                    if (!accessible) {
+                        continue;
+                    }
+
                     field.setAccessible(true);
-                    sb.append(field.getName()).append(": ");
+                    if (isNestedFirst) {
+                        isNestedFirst = false;
+                    } else {
+                        sb.append(", ");
+                    }
                     try {
                         if (field.isAnnotationPresent(WebParameterSensitive.class)) {
-                            sb.append("**** ");
+                            sb.append("****");
                         } else {
-                            sb.append(field.get(value)).append(" ");
+                            sb.append(field.get(value));
                         }
                     } catch (IllegalAccessException e) {
-                        sb.append("<err> ");
+                        sb.append("<err>");
                     }
                 }
-                sb.append("} ");
+                sb.append("}");
             } else {
-                sb.append(value).append(" ");
+                if(value instanceof String stringValue && CommonUtils.isEmpty(stringValue)){
+                    continue;
+                }
+                sb.append(value);
             }
+            isFirst = false;
         }
         return sb.toString().trim();
     }
@@ -155,4 +152,21 @@ public class GraphQLLoggerUtil {
             || Boolean.class.equals(cls)
             || Enum.class.isAssignableFrom(cls);
     }
+
+    private static List<Field> getAllInstanceFields(Class<?> type) {
+        List<Field> out = new ArrayList<>();
+        Set<String> seen = new HashSet<>(); // чтобы не дублировать скрытые/переопределённые имена
+
+        for (Class<?> c = type; c != null && c != Object.class; c = c.getSuperclass()) {
+            for (Field f : c.getDeclaredFields()) {
+                int m = f.getModifiers();
+                if (Modifier.isStatic(m) || f.isSynthetic()) continue; // пропускаем static и синтетические
+                if (seen.add(f.getName())) {
+                    out.add(f); // сначала добавим поля подкласса, затем родителя
+                }
+            }
+        }
+        return out;
+    }
+
 }

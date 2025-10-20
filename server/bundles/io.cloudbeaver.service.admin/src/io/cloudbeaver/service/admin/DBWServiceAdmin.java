@@ -16,10 +16,7 @@
  */
 package io.cloudbeaver.service.admin;
 
-import io.cloudbeaver.DBWConstants;
-import io.cloudbeaver.DBWFeatureSet;
-import io.cloudbeaver.DBWebException;
-import io.cloudbeaver.WebAction;
+import io.cloudbeaver.*;
 import io.cloudbeaver.model.WebPropertyInfo;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.registry.WebAuthProviderConfiguration;
@@ -116,7 +113,7 @@ public interface DBWServiceAdmin extends DBWService {
         @NotNull WebSession webSession,
         @NotNull String userID,
         @NotNull String providerId,
-        @NotNull Map<String, Object> credentials
+        @WebParameterSensitive @NotNull Map<String, Object> credentials
     ) throws DBWebException;
 
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
