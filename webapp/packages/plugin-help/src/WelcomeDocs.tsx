@@ -24,7 +24,7 @@ export const WelcomeDocs = observer(function WelcomeDocs() {
       rel="noreferrer"
       before={<IconOrImage icon="/icons/documentation_link.svg" />}
       description={translate('plugin_help_welcome_docs_description', undefined, {
-        product: serverConfigResource.distributed ? 'DBeaver Team Edition' : 'CloudBeaver',
+        product: serverConfigResource.distributed ? translate('product_full_name') : 'CloudBeaver',
       })}
       className="tw:text-inherit! tw:no-underline! tw:cursor-pointer tw:rounded-sm tw:overflow-hidden"
       big

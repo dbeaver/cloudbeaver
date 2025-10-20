@@ -22,7 +22,7 @@ interface Props {
   className?: string;
 }
 
-export const FormattingPreview = observer(function FormattingPreview({ rule, state, text, className }: Props) {
+export const FormattingPreview = observer<Props>(function FormattingPreview({ rule, state, text, className }) {
   const themeService = useService(ThemeService);
   const themeType = themeService.currentTheme?.type;
   const surfaceColor = getSurfaceColor(themeType);

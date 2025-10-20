@@ -6,7 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
+import type { ThemeType } from '@cloudbeaver/core-theming';
+
 // TODO: implement universal color palette for conditional coloring and use it instead
-export function getSurfaceColor(themeType: 'dark' | 'light' | undefined): string {
+export function getSurfaceColor(themeType: ThemeType | undefined): string {
   return themeType === 'dark' ? '#25252d' : '#ffffff';
 }

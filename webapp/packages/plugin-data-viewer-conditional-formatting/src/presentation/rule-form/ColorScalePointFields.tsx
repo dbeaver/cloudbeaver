@@ -15,7 +15,7 @@ interface Props {
   valueParam?: IFormatRuleParameter;
   colorParam?: IFormatRuleParameter;
   defaultColorValue?: string;
-  state: any;
+  state: Record<string, any>;
   valueDisabled: boolean;
   colorMapState?: (state: any) => any;
   colorDisabled?: boolean;

@@ -80,9 +80,9 @@ export interface SelectFieldProps<T, ItemType = SelectItem<T>> {
 
   autoFocusItemsOnShow?: boolean;
 
-  'aria-labelledby'?: string, 
+  'aria-labelledby'?: string;
 
-  'aria-label'?: string
+  'aria-label'?: string;
 
   id?: string;
 }
@@ -145,22 +145,23 @@ export function SelectField<T, ItemType extends {} = SelectItem<T>>({
   };
 
   const currentValue = value !== undefined ? value : selectedValue;
-  const currentValueSerialized = currentValue !== undefined 
-    ? (itemValueSerialized ? itemValueSerialized(currentValue) : JSON.stringify(currentValue)) 
-    : undefined;
-  const selectedItem = currentValue !== undefined 
-    ? items.find(item => getItemValueSerialized(item) === currentValueSerialized) 
-    : undefined;
+  let currentValueSerialized = undefined;
+
+  if (currentValue !== undefined) {
+    currentValueSerialized = itemValueSerialized ? itemValueSerialized(currentValue) : JSON.stringify(currentValue);
+  }
+
+  const selectedItem = currentValue !== undefined ? items.find(item => getItemValueSerialized(item) === currentValueSerialized) : undefined;
   const displayValue = selectedRender ? selectedRender(currentValue, selectedItem) : selectedItem ? renderItem(selectedItem) : '';
 
   return (
     <div className={clsx('dbv-kit-select-field', className)}>
-      <SelectProvider value={currentValueSerialized} setValue={val => handleChange(val)} store={store}> 
+      <SelectProvider value={currentValueSerialized} setValue={val => handleChange(val)} store={store}>
         {label && <SelectLabel className={clsx(required && 'dbv-kit-select__label--required')}>{label}</SelectLabel>}
 
         <Select id={id} name={name} disabled={disabled} required={required}>
           {displayValue}
-          {arrowIcon ?? <Select.Arrow className='dbv-kit-select__arrow-icon' />}
+          {arrowIcon ?? <Select.Arrow className="dbv-kit-select__arrow-icon" />}
         </Select>
         {description && <span className="dbv-kit-select__description">{description}</span>}
 
@@ -169,11 +170,7 @@ export function SelectField<T, ItemType extends {} = SelectItem<T>>({
             <div className="dbv-kit-select__empty">{noItemsPlaceholder}</div>
           ) : (
             items.map(item => (
-              <SelectItem
-                key={getItemValueSerialized(item)}
-                value={getItemValueSerialized(item)}
-                disabled={isItemDisabled(item)}
-              >
+              <SelectItem key={getItemValueSerialized(item)} value={getItemValueSerialized(item)} disabled={isItemDisabled(item)}>
                 {renderItem(item)}
               </SelectItem>
             ))
