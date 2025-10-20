@@ -11,12 +11,12 @@ import { observer } from 'mobx-react-lite';
 import type { IFormatRuleParameter } from '../../formatting/IFormatRule.js';
 
 interface Props {
+  state: Record<string, any>;
+  valueDisabled: boolean;
   typeParam?: IFormatRuleParameter;
   valueParam?: IFormatRuleParameter;
   colorParam?: IFormatRuleParameter;
   defaultColorValue?: string;
-  state: Record<string, any>;
-  valueDisabled: boolean;
   colorMapState?: (state: any) => any;
   colorDisabled?: boolean;
 }
