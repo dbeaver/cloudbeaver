@@ -8,37 +8,29 @@
 
 import { observer } from 'mobx-react-lite';
 
-import {
-  Button,
-  Select,
-  CommonDialogBody,
-  CommonDialogFooter,
-  CommonDialogHeader,
-  CommonDialogWrapper,
-  Container,
-  ErrorMessage,
-  FieldCheckbox,
-  s,
-  useErrorDetails,
-  useS,
-  useTranslate,
-  useObservableRef,
-  InputField,
-} from '@cloudbeaver/core-blocks';
 import type { DialogComponentProps } from '@cloudbeaver/core-dialogs';
 
-import style from './ExportImageDialog.module.css';
 import { observable } from 'mobx';
+import { EXPORT_IMAGE_FORMATS, type ExportImageFormat } from './ExportImageFormats.js';
+import { useTranslate } from '../localization/useTranslate.js';
+import { useObservableRef } from '../useObservableRef.js';
+import { CommonDialogBody } from '../CommonDialog/CommonDialog/CommonDialogBody.js';
+import { CommonDialogFooter } from '../CommonDialog/CommonDialog/CommonDialogFooter.js';
+import { CommonDialogHeader } from '../CommonDialog/CommonDialog/CommonDialogHeader.js';
+import { CommonDialogWrapper } from '../CommonDialog/CommonDialog/CommonDialogWrapper.js';
+import { Container } from '../Containers/Container.js';
+import { ErrorMessage } from '../ErrorMessage.js';
+import { FieldCheckbox } from '../FormControls/Checkboxes/FieldCheckbox.js';
+import { InputField } from '../FormControls/InputField/InputField.js';
+import { useErrorDetails } from '../useErrorDetails.js';
+import { Select } from '../FormControls/Select.js';
+import { Button } from '../Button.js';
 
 export interface IExportImageOptions {
-  format: ExportFormat;
+  format: ExportImageFormat;
   transparent: boolean;
   fileName: string;
 }
-
-type ExportFormat = 'SVG' | 'PNG';
-
-export const EXPORT_FORMATS: ExportFormat[] = ['SVG', 'PNG'];
 
 export interface ExportImagePayload {
   onExport: (options: IExportImageOptions) => void;
@@ -51,7 +43,6 @@ interface State extends IExportImageOptions {
 
 export const ExportImageDialog = observer<DialogComponentProps<ExportImagePayload, null>>(function ExportImageDialog(props) {
   const translate = useTranslate();
-  const styles = useS(style);
   const state = useObservableRef<State>(
     () => ({
       format: 'SVG',
@@ -87,7 +78,7 @@ export const ExportImageDialog = observer<DialogComponentProps<ExportImagePayloa
             <InputField state={state} name="fileName">
               {translate('ui_name')}
             </InputField>
-            <Select items={EXPORT_FORMATS} keySelector={value => value} valueSelector={value => value} state={state} name="format">
+            <Select items={EXPORT_IMAGE_FORMATS} keySelector={value => value} valueSelector={value => value} state={state} name="format">
               {translate('core_blocks_export_image_dialog_format')}
             </Select>
             <FieldCheckbox state={state} name="transparent" label={translate('core_blocks_export_image_dialog_transparent_background')} />
@@ -97,7 +88,7 @@ export const ExportImageDialog = observer<DialogComponentProps<ExportImagePayloa
           <ErrorMessage text={errorDetails.message || errorDetails.name} hasDetails={errorDetails.hasDetails} onShowDetails={errorDetails.open} />
         )}
       </CommonDialogBody>
-      <CommonDialogFooter className={s(styles, { footer: true })}>
+      <CommonDialogFooter className="tw:justify-end tw:items-center tw:gap-[24px]">
         <Button type="button" variant="secondary" onClick={props.rejectDialog}>
           {translate('app_shared_inlineEditor_dialog_cancel')}
         </Button>

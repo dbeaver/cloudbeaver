@@ -6,6 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { importLazyComponent } from '../importLazyComponent.js';
+export type ExportImageFormat = 'SVG' | 'PNG';
 
-export const ExportImageDialogLazy = importLazyComponent(() => import('./ExportImageDialog.js').then(m => m.ExportImageDialog));
+export const EXPORT_IMAGE_FORMATS: ExportImageFormat[] = ['SVG', 'PNG'];
