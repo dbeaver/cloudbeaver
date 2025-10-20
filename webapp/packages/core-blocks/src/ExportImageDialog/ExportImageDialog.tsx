@@ -33,7 +33,7 @@ export interface IExportImageOptions {
 }
 
 export interface ExportImagePayload {
-  onExport: (options: IExportImageOptions) => void;
+  export: (options: IExportImageOptions) => Promise<void>;
   defaultFileName: string;
 }
 
@@ -60,14 +60,14 @@ export const ExportImageDialog = observer<DialogComponentProps<ExportImagePayloa
   );
   const errorDetails = useErrorDetails(state.error);
 
-  const onExportHandler = () => {
+  async function onExportHandler() {
     try {
-      props.payload.onExport(state);
+      await props.payload.export(state);
       props.resolveDialog();
     } catch (error: any) {
       state.error = error;
     }
-  };
+  }
 
   return (
     <CommonDialogWrapper size="small">
