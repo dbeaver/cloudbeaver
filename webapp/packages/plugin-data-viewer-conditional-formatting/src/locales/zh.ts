@@ -1,4 +1,6 @@
 export default [
+  ['plugin_data_viewer_conditional_formatting_presentation_title', '条件格式化'],
+
   ['plugin_data_viewer_conditional_formatting_all_columns', '所有列'],
   ['plugin_data_viewer_conditional_formatting_format_rules', '格式规则'],
   ['plugin_data_viewer_conditional_formatting_column', '列'],

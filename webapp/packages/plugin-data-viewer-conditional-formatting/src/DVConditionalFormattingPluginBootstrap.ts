@@ -27,8 +27,8 @@ export class DVConditionalFormattingPluginBootstrap extends Bootstrap {
     this.dataPresentationService.add({
       id: 'conditional-formatting-presentation',
       type: DataPresentationType.toolsPanel,
-      title: 'Conditional formatting',
-      icon: '/icons/plugin_data_viewer_result_set_grouping_m.svg',
+      title: 'plugin_data_viewer_conditional_formatting_presentation_title',
+      icon: '/icons/conditional_formatting_sm.svg',
       hidden: (dataFormat, model, resultIndex) => {
         if (!model.source.hasResult(resultIndex)) {
           return true;

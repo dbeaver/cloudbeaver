@@ -1,4 +1,6 @@
 export default [
+  ['plugin_data_viewer_conditional_formatting_presentation_title', 'Условное форматирование'],
+
   ['plugin_data_viewer_conditional_formatting_all_columns', 'Все столбцы'],
   ['plugin_data_viewer_conditional_formatting_format_rules', 'Правила форматирования'],
   ['plugin_data_viewer_conditional_formatting_column', 'Столбец'],

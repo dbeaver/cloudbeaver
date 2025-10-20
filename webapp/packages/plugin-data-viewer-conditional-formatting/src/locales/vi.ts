@@ -1,4 +1,6 @@
 export default [
+  ['plugin_data_viewer_conditional_formatting_presentation_title', 'Định dạng có điều kiện'],
+
   ['plugin_data_viewer_conditional_formatting_all_columns', 'Tất cả các cột'],
   ['plugin_data_viewer_conditional_formatting_format_rules', 'Quy tắc định dạng'],
   ['plugin_data_viewer_conditional_formatting_column', 'Cột'],

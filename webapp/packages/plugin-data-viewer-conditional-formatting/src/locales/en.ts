@@ -1,4 +1,6 @@
 export default [
+  ['plugin_data_viewer_conditional_formatting_presentation_title', 'Conditional formatting'],
+
   ['plugin_data_viewer_conditional_formatting_all_columns', 'All columns'],
   ['plugin_data_viewer_conditional_formatting_format_rules', 'Format rules'],
   ['plugin_data_viewer_conditional_formatting_column', 'Column'],
