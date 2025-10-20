@@ -28,10 +28,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class GraphQLLoggerUtil {
 
@@ -69,80 +66,72 @@ public class GraphQLLoggerUtil {
     }
 
     public static String buildLoggerMessage(String sessionId, String userId, Method method, Object[] args) {
-        StringBuilder loggerMessage = new StringBuilder(" [user: ").append(userId)
-            .append(", sessionId: ").append(sessionId).append("]");
+        StringBuilder sb = new StringBuilder(64)
+            .append(" [user: ").append(userId)
+            .append(", sessionId: ").append(sessionId)
+            .append("]");
 
         if (WebAppUtils.getWebPlatform().getPreferenceStore().getBoolean(LOG_API_GRAPHQL_DEBUG_PARAMETER)) {
-            loggerMessage.append("(");
-            String parsedVariables = maskArgsToString(method, args);
-            if (CommonUtils.isNotEmpty(parsedVariables)) {
-                loggerMessage.append(parsedVariables);
+            sb.append('(');
+            String text = maskArgsToString(method, args);
+            if (CommonUtils.isNotEmpty(text)) {
+                sb.append(text);
             }
-            loggerMessage.append(")");
+            sb.append(')');
         }
-        return loggerMessage.toString();
+        return sb.toString();
     }
 
     public static String maskArgsToString(Method method, Object[] args) {
-        StringBuilder sb = new StringBuilder();
         Parameter[] params = method.getParameters();
-        if (params == null || params.length == 0 || args == null || args.length == 0) {
+        if (params.length == 0 || args == null || args.length == 0) {
             return "";
         }
 
-        boolean isFirst = true;
-        for (int i = 0; i < args.length; i++) {
-            //fixme can't get real parameter names without -parameters compiler option
-            if (i >= params.length) {
-                break;
-            }
+        int limit = Math.min(args.length, params.length);
+        StringJoiner joiner = new StringJoiner(", ");
+
+        for (int i = 0; i < limit; i++) {
             Object value = args[i];
             if (value instanceof WebSession) {
-                //we already logged sessionId
+                //we already log sessionId
                 continue;
             }
-            if (!isFirst) {
-                sb.append(", ");
+            if (params[i].isAnnotationPresent(WebParameterSensitive.class)) {
+                joiner.add("****");
+                continue;
+            }
+            if (value instanceof String sv && CommonUtils.isEmpty(sv)) {
+                continue;
             }
 
-            if (params[i].isAnnotationPresent(WebParameterSensitive.class)) {
-                sb.append("****");
-            } else if (value != null && !isSimple(value.getClass())) {
-                sb.append("{");
-                //todo handle nested objects (?)
-                boolean isNestedFirst = true;
-                for (Field field : getAllInstanceFields(value.getClass())) {
-                    boolean accessible = field.canAccess(value) || field.trySetAccessible();
-                    if (!accessible) {
+            if (value != null && !isSimple(value.getClass())) {
+                StringJoiner fields = new StringJoiner(", ");
+                for (Field f : getAllInstanceFields(value.getClass())) {
+                    boolean acc = f.canAccess(value);
+                    if (!acc) {
+                        try {
+                            acc = f.trySetAccessible();
+                        } catch (Exception ignore) {
+                            acc = false;
+                        }
+                    }
+                    if (!acc) {
                         continue;
                     }
 
-                    field.setAccessible(true);
-                    if (isNestedFirst) {
-                        isNestedFirst = false;
-                    } else {
-                        sb.append(", ");
-                    }
                     try {
-                        if (field.isAnnotationPresent(WebParameterSensitive.class)) {
-                            sb.append("****");
-                        } else {
-                            sb.append(field.get(value));
-                        }
+                        fields.add(f.isAnnotationPresent(WebParameterSensitive.class) ? "****" : String.valueOf(f.get(value)));
                     } catch (IllegalAccessException e) {
-                        sb.append("<err>");
+                        fields.add("<err>");
                     }
                 }
-                sb.append("}");
+                joiner.add("{" + fields + "}");
             } else {
-                if(value instanceof String stringValue && CommonUtils.isEmpty(stringValue)){
-                    continue;
-                }
-                sb.append(value);
+                joiner.add(String.valueOf(value));
             }
-            isFirst = false;
         }
-        return sb.toString().trim();
+        return joiner.toString();
     }
 
     private static boolean isSimple(Class<?> cls) {
