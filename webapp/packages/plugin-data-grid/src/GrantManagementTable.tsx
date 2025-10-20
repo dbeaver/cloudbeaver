@@ -13,7 +13,9 @@ import { action, computed, observable, reaction } from 'mobx';
 import { Button, clsx } from '@dbeaver/ui-kit';
 import type { TLocalizationToken } from '@cloudbeaver/core-localization';
 import { Checkbox, Filter, s, useObjectRef, useObservableRef, useS, useTranslate } from '@cloudbeaver/core-blocks';
-import { DataGrid, useCreateGridReactiveValue, type IDataGridCellRenderer } from '@cloudbeaver/plugin-data-grid';
+import { useCreateGridReactiveValue, type IDataGridCellRenderer } from '@dbeaver/react-data-grid';
+
+import { DataGrid } from './DataGridLazy.js';
 
 import classes from './GrantManagementTable.module.css';
 
