@@ -76,21 +76,6 @@ export const ColorScaleRuleForm = observer<Props>(function ColorScaleRuleForm({ 
         valueDisabled={max.valueDisabled}
       />
 
-      {onAddRule && (
-        <GroupItem>
-          <Button
-            icon="add_sm"
-            iconPlacement="start"
-            aria-label={t('plugin_data_viewer_conditional_formatting_add_another_rule')}
-            type="button"
-            variant="secondary"
-            onClick={onAddRule}
-          >
-            {t('plugin_data_viewer_conditional_formatting_add_another_rule')}
-          </Button>
-        </GroupItem>
-      )}
-
       {onDelete && (
         <GroupItem>
           <Button icon="delete" iconPlacement="start" type="button" variant="secondary" onClick={onDelete}>

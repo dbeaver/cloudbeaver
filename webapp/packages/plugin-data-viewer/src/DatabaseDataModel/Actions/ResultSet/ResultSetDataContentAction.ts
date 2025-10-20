@@ -136,7 +136,7 @@ export class ResultSetDataContentAction extends DatabaseDataAction<any, IDatabas
   }
 
   isDownloadable(element: IGridDataKey): boolean {
-    return !!this.result.data?.hasRowIdentifier && isResultSetContentValue(this.format.get(element));
+    return !!this.result.data?.hasRowIdentifier && isResultSetContentValue(this.format.get(element).value);
   }
 
   retrieveFullTextFromCache(element: IGridDataKey): string | undefined {

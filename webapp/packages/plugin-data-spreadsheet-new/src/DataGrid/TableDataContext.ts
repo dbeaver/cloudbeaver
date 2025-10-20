@@ -44,7 +44,7 @@ export interface ITableData {
   getRow: (rowIndex: number) => IGridRowKey | undefined;
   getColumn: (columnIndex: number) => IColumnInfo | undefined;
   getColumnByDataIndex: (key: IGridColumnKey) => IColumnInfo;
-  getCellValue: (key: IGridDataKey) => IDatabaseValueHolder<IGridDataKey, IResultSetValue>;
+  getCellHolder: (key: IGridDataKey) => IDatabaseValueHolder<IGridDataKey, IResultSetValue>;
   getColumnInfo: (key: IGridColumnKey) => SqlResultColumn | undefined;
   getColumnsInRange: (startIndex: number, endIndex: number) => Array<IColumnInfo>;
   getColumnIndexFromColumnKey: (column: IGridColumnKey) => number;

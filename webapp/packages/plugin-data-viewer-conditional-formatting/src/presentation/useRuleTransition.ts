@@ -14,20 +14,30 @@ const ANIMATION_DURATION = 300;
 interface UseRuleTransitionResult {
   isAnimating: boolean;
   previousRule: IFormatRuleState | null;
+  direction: 'left' | 'right';
 }
 
-export function useRuleTransition(selectedRule: IFormatRuleState | null): UseRuleTransitionResult {
+interface PrevRuleRef {
+  rule: IFormatRuleState;
+  index: number;
+}
+
+export function useRuleTransition(rules: IFormatRuleState[], selectedRule: IFormatRuleState | null): UseRuleTransitionResult {
   const [isAnimating, setIsAnimating] = useState(true);
   const [previousRule, setPreviousRule] = useState<IFormatRuleState | null>(null);
-  const prevRuleRef = useRef<IFormatRuleState | null>(selectedRule);
+  const [direction, setDirection] = useState<'left' | 'right'>('left');
+  const selectedRuleIndex = rules.findIndex(r => r.id === selectedRule?.id);
+  const prevRuleRef = useRef<PrevRuleRef | null>(selectedRule ? { rule: selectedRule, index: selectedRuleIndex } : null);
 
   useLayoutEffect(() => {
-    if (prevRuleRef.current !== selectedRule) {
+    if (prevRuleRef.current?.rule.id !== selectedRule?.id) {
       if (!prevRuleRef.current) {
-        prevRuleRef.current = selectedRule;
+        prevRuleRef.current = { rule: selectedRule!, index: selectedRuleIndex };
         return undefined;
       }
-      setPreviousRule(prevRuleRef.current);
+      setPreviousRule(prevRuleRef.current.rule);
+
+      setDirection(selectedRuleIndex >= prevRuleRef.current.index ? 'left' : 'right');
 
       setIsAnimating(false);
       requestAnimationFrame(() => {
@@ -38,11 +48,11 @@ export function useRuleTransition(selectedRule: IFormatRuleState | null): UseRul
         setPreviousRule(null);
       }, ANIMATION_DURATION);
 
-      prevRuleRef.current = selectedRule;
+      prevRuleRef.current = selectedRule ? { rule: selectedRule, index: selectedRuleIndex } : null;
       return () => clearTimeout(timer);
     }
     return undefined;
   }, [selectedRule]);
 
-  return { isAnimating, previousRule };
+  return { isAnimating, previousRule, direction };
 }

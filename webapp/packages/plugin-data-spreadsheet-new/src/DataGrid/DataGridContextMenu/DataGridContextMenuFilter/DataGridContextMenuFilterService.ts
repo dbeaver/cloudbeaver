@@ -296,9 +296,9 @@ export class DataGridContextMenuFilterService {
         const view = model.source.getAction(resultIndex, IDatabaseDataViewAction, GridViewAction);
 
         const supportedOperations = data.getColumnOperations(key.column);
-        const cellValue = view.getCellValue(key);
+        const cellHolder = view.getCellHolder(key);
 
-        return cellValue !== undefined && supportedOperations.length > 0;
+        return cellHolder.value !== undefined && supportedOperations.length > 0;
       },
       getItems: (context, items) => {
         const model = context.get(DATA_CONTEXT_DV_DDM)!;

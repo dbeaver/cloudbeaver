@@ -96,9 +96,9 @@ export function useTableData(
         // TODO: fix column abstraction
         return this.data.getColumn(key) as SqlResultColumn | undefined;
       },
-      getCellValue(key) {
+      getCellHolder(key) {
         // TODO: fix cell value abstraction
-        return this.view.getCellValue(key) as IDatabaseValueHolder<IGridDataKey, IResultSetValue>;
+        return this.view.getCellHolder(key) as IDatabaseValueHolder<IGridDataKey, IResultSetValue>;
       },
       getColumnIndexFromColumnKey(columnKey) {
         return this.columns.findIndex(column => column.key !== null && GridDataKeysUtils.isEqual(columnKey, column.key));

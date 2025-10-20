@@ -27,7 +27,7 @@ export const CellFormatterFactory = observer<ICellFormatterProps>(function CellF
     formatterRef.current = TextFormatter;
 
     if (cellContext.cell) {
-      const holder = tableDataContext.getCellValue(cellContext.cell);
+      const holder = tableDataContext.getCellHolder(cellContext.cell);
       const isBlob = tableDataContext.format.isBinary(holder);
 
       if (isBlob) {
@@ -35,7 +35,7 @@ export const CellFormatterFactory = observer<ICellFormatterProps>(function CellF
       } else {
         const resultColumn = tableDataContext.getColumnInfo(cellContext.cell.column);
 
-        if (resultColumn && isBooleanValuePresentationAvailable(holder, resultColumn)) {
+        if (resultColumn && isBooleanValuePresentationAvailable(holder.value, resultColumn)) {
           formatterRef.current = BooleanFormatter;
         }
       }

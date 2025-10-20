@@ -19,23 +19,17 @@ export function getMiddleColor(minColor: string, maxColor: string): string {
   // Parse first color
   ctx.fillStyle = minColor;
   ctx.fillRect(0, 0, 1, 1);
-  const data1 = ctx.getImageData(0, 0, 1, 1).data;
-  const r1 = data1[0] ?? 0;
-  const g1 = data1[1] ?? 0;
-  const b1 = data1[2] ?? 0;
+  const [r1, g1, b1] = ctx.getImageData(0, 0, 1, 1).data;
 
   // Parse second color
   ctx.fillStyle = maxColor;
   ctx.fillRect(0, 0, 1, 1);
-  const data2 = ctx.getImageData(0, 0, 1, 1).data;
-  const r2 = data2[0] ?? 0;
-  const g2 = data2[1] ?? 0;
-  const b2 = data2[2] ?? 0;
+  const [r2, g2, b2] = ctx.getImageData(0, 0, 1, 1).data;
 
   // Calculate middle values
-  const rMid = Math.round((r1 + r2) / 2);
-  const gMid = Math.round((g1 + g2) / 2);
-  const bMid = Math.round((b1 + b2) / 2);
+  const rMid = Math.round((r1! + r2!) / 2);
+  const gMid = Math.round((g1! + g2!) / 2);
+  const bMid = Math.round((b1! + b2!) / 2);
 
   // Return as hex color
   return `#${rMid.toString(16).padStart(2, '0')}${gMid.toString(16).padStart(2, '0')}${bMid.toString(16).padStart(2, '0')}`;

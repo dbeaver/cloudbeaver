@@ -178,7 +178,7 @@ export class ResultSetFormatAction
   }
 
   get(key: IGridDataKey): IDatabaseValueHolder<IGridDataKey, IResultSetValue> {
-    return this.view.getCellValue(key);
+    return this.view.getCellHolder(key);
   }
 
   getText(holder: IDatabaseValueHolder<IGridDataKey, IResultSetValue>): string {

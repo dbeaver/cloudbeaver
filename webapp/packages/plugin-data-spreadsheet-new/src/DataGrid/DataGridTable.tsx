@@ -430,7 +430,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
       return false;
     }
 
-    const holder = tableData.getCellValue(cell);
+    const holder = tableData.getCellHolder(cell);
     if (tableData.format.isBinary(holder) || tableData.format.isGeometry(holder) || tableData.dataContent.isTextTruncated(holder)) {
       return false;
     }

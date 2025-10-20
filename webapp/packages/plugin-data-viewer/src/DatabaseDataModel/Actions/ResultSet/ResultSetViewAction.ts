@@ -34,10 +34,10 @@ export class ResultSetViewAction extends GridViewAction<SqlResultColumn, SqlResu
   }
 
   getContent(cell: IGridDataKey): IResultSetComplexValue | null {
-    const value = this.getCellValue(cell);
+    const holder = this.getCellHolder(cell);
 
-    if (isResultSetContentValue(value)) {
-      return value;
+    if (isResultSetContentValue(holder.value)) {
+      return holder.value;
     }
 
     return null;

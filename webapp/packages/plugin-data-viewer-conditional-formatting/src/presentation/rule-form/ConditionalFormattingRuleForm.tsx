@@ -17,12 +17,11 @@ import type { IColumnInfo } from '../../formatting/IColumnInfo.js';
 interface Props {
   columns: IColumnInfo[];
   state: IFormatRuleState;
-  onAddRule?: () => void;
   onBack?: () => void;
   onDelete?: () => void;
 }
 
-export const ConditionalFormattingRuleForm = observer<Props>(function ConditionalFormattingRuleForm({ columns, state, onAddRule, onBack, onDelete }) {
+export const ConditionalFormattingRuleForm = observer<Props>(function ConditionalFormattingRuleForm({ columns, state, onBack, onDelete }) {
   const t = useTranslate();
   const handleTabChange = ({ tabId }: ITabData) => {
     state.type = tabId === 'scale' ? 'scale' : 'single';
@@ -42,10 +41,10 @@ export const ConditionalFormattingRuleForm = observer<Props>(function Conditiona
           {onBack && <ActionIconButton name="cross" title={t('ui_close')} onClick={onBack} />}
         </TabList>
         <TabPanel tabId="single">
-          <SingleColorRuleForm columns={columns} state={state} onAddRule={onAddRule} onDelete={onDelete} />
+          <SingleColorRuleForm columns={columns} state={state} onDelete={onDelete} />
         </TabPanel>
         <TabPanel tabId="scale">
-          <ColorScaleRuleForm columns={columns} state={state} onAddRule={onAddRule} onDelete={onDelete} />
+          <ColorScaleRuleForm columns={columns} state={state} onDelete={onDelete} />
         </TabPanel>
       </TabsState>
     </div>

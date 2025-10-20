@@ -149,14 +149,14 @@ export class GridViewAction<
       return undefined;
     }
 
-    return this.getCellValue(key);
+    return this.getCellHolder(key);
   }
 
   getRow(row: IGridRowKey): TCell[] {
     return this.mapRow(row);
   }
 
-  getCellValue(cell: TKey): IDatabaseValueHolder<TKey, TCell> {
+  getCellHolder(cell: TKey): IDatabaseValueHolder<TKey, TCell> {
     if (cell.column.index < 0 || cell.column.index >= this.data.columns.length) {
       throw new Error('Cell is out of range');
     }

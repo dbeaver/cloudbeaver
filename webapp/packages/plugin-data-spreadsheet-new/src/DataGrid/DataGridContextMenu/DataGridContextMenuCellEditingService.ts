@@ -97,7 +97,7 @@ export class DataGridContextMenuCellEditingService {
         const editor = model.source.getAction(resultIndex, IDatabaseDataEditAction);
         const select = model.source.tryGetAction(resultIndex, IDatabaseDataSelectAction);
 
-        const cellHolder = view.getCellValue(key);
+        const cellHolder = view.getCellHolder(key);
 
         // TODO: fix column abstraction
         const column = view.getColumn(key.column) as SqlResultColumn | undefined;

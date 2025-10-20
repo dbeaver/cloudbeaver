@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { Button, Container, Group, GroupItem, useTranslate } from '@cloudbeaver/core-blocks';
+import { ActionIconButton, Button, Container, Group, GroupItem, useTranslate } from '@cloudbeaver/core-blocks';
 import { GridViewAction, IDatabaseDataViewAction, type DataPresentationComponent } from '@cloudbeaver/plugin-data-viewer';
 import { observer } from 'mobx-react-lite';
 import { ConditionalFormattingRuleForm } from './rule-form/ConditionalFormattingRuleForm.js';
@@ -27,7 +27,7 @@ export const ConditionalFormattingPresentation: DataPresentationComponent = obse
   const viewAction = model.source.getAction(resultIndex, IDatabaseDataViewAction, GridViewAction);
   const t = useTranslate();
 
-  const { isAnimating, previousRule } = useRuleTransition(selectedRule);
+  const ruleTransition = useRuleTransition(conditionalFormattingAction.rules, selectedRule);
 
   function handleAddRule() {
     const rule = conditionalFormattingAction?.createRule();
@@ -38,8 +38,19 @@ export const ConditionalFormattingPresentation: DataPresentationComponent = obse
     setSelectedRule(null);
   }
 
-  function handleDeleteRule(state: IFormatRuleState) {
-    conditionalFormattingAction?.deleteRule(state.id);
+  function handleDeleteRule(state: IFormatRuleState, selectNext: boolean = true) {
+    if (selectNext) {
+      const currentIndex = conditionalFormattingAction.rules.findIndex(r => r.id === state.id);
+      if (currentIndex !== -1) {
+        const rules = conditionalFormattingAction.rules;
+        const nextRule = rules[currentIndex + 1] || rules[currentIndex - 1];
+        setSelectedRule(nextRule || null);
+      }
+    } else {
+      setSelectedRule(null);
+    }
+
+    conditionalFormattingAction.deleteRule(state.id);
   }
 
   const columns: IColumnInfo[] = [
@@ -55,38 +66,42 @@ export const ConditionalFormattingPresentation: DataPresentationComponent = obse
       {selectedRule ? (
         <div className="tw:relative tw:flex-1 tw:flex tw:flex-col tw:overflow-hidden">
           <div className="tw:flex tw:overflow-auto">
-            {conditionalFormattingAction.rules.map(state => (
-              <FormattingRule
-                key={state.id}
-                columns={columns}
-                state={state}
-                selected={selectedRule.id === state.id}
-                preview
-                onSelect={() => setSelectedRule(state)}
-                onDelete={() => handleDeleteRule(state)}
+            <div className="tw:flex tw:overflow-auto">
+              {conditionalFormattingAction.rules.map(state => (
+                <FormattingRule
+                  key={state.id}
+                  columns={columns}
+                  state={state}
+                  selected={selectedRule.id === state.id}
+                  preview
+                  onSelect={() => setSelectedRule(state)}
+                  onDelete={() => handleDeleteRule(state)}
+                />
+              ))}
+            </div>
+            <div className="tw:flex tw:items-center tw:shrink-0 tw:overflow-hidden">
+              <ActionIconButton
+                name="add"
+                viewBox="0 0 24 24"
+                title={t('plugin_data_viewer_conditional_formatting_add_another_rule')}
+                onClick={handleAddRule}
               />
-            ))}
+            </div>
           </div>
           <div className="tw:relative tw:flex-1 tw:overflow-hidden">
-            {previousRule && (
+            {ruleTransition.previousRule && (
               <div
-                key={previousRule.id}
+                key={ruleTransition.previousRule.id}
                 style={{
                   position: 'absolute',
                   display: 'flex',
                   width: '100%',
                   height: '100%',
-                  transform: isAnimating ? 'translateX(-100%)' : 'translateX(0)',
+                  transform: ruleTransition.isAnimating ? `translateX(${ruleTransition.direction === 'left' ? '-100%' : '100%'})` : 'translateX(0)',
                   transition: 'transform 0.3s ease-out',
                 }}
               >
-                <ConditionalFormattingRuleForm
-                  columns={columns}
-                  state={previousRule}
-                  onAddRule={handleAddRule}
-                  onBack={handleBack}
-                  onDelete={() => handleDeleteRule(previousRule)}
-                />
+                <ConditionalFormattingRuleForm columns={columns} state={ruleTransition.previousRule} onBack={handleBack} />
               </div>
             )}
             <div
@@ -96,14 +111,13 @@ export const ConditionalFormattingPresentation: DataPresentationComponent = obse
                 display: 'flex',
                 width: '100%',
                 height: '100%',
-                transform: isAnimating ? 'translateX(0)' : 'translateX(100%)',
+                transform: ruleTransition.isAnimating ? 'translateX(0)' : `translateX(${ruleTransition.direction === 'left' ? '100%' : '-100%'})`,
                 transition: 'transform 0.3s ease-out',
               }}
             >
               <ConditionalFormattingRuleForm
                 columns={columns}
                 state={selectedRule}
-                onAddRule={handleAddRule}
                 onBack={handleBack}
                 onDelete={() => handleDeleteRule(selectedRule)}
               />
@@ -119,7 +133,7 @@ export const ConditionalFormattingPresentation: DataPresentationComponent = obse
                 columns={columns}
                 state={state}
                 onSelect={() => setSelectedRule(state)}
-                onDelete={() => handleDeleteRule(state)}
+                onDelete={() => handleDeleteRule(state, false)}
               />
             ))}
             {conditionalFormattingAction.rules.length === 0 && <div>{t('plugin_data_viewer_conditional_formatting_no_rules')}</div>}

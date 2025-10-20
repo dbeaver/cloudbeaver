@@ -47,9 +47,9 @@ export class ImageValuePresentationBootstrap extends Bootstrap {
 
           const firstSelectedCell = activeElements[0]!;
 
-          const cellValue = view.getCellValue(firstSelectedCell);
+          const cellHolder = view.getCellHolder(firstSelectedCell);
 
-          return !isImageValuePresentationAvailable(cellValue.value);
+          return !isImageValuePresentationAvailable(cellHolder.value);
         }
 
         return true;

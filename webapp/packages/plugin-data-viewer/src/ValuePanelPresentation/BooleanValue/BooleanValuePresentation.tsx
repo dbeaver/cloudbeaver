@@ -46,8 +46,8 @@ export const BooleanValuePresentation: TabContainerPanelComponent<IDataValuePane
   }
 
   const firstSelectedCell = activeElements[0]!;
-  const cellValue = viewAction.getCellValue(firstSelectedCell);
-  const value = preprocessBooleanValue(cellValue);
+  const cellHolder = viewAction.getCellHolder(firstSelectedCell);
+  const value = preprocessBooleanValue(cellHolder.value);
 
   if (!isDefined(value)) {
     return <TextPlaceholder>{translate('data_viewer_presentation_value_boolean_placeholder')}</TextPlaceholder>;

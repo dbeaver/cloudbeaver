@@ -15,6 +15,7 @@ import { ALL_COLUMNS } from '../formatting/ALL_COLUMNS.js';
 import type { IColumnInfo } from '../formatting/IColumnInfo.js';
 import { observer } from 'mobx-react-lite';
 import { clsx } from '@dbeaver/ui-kit';
+import { useLayoutEffect, useRef } from 'react';
 
 interface Props {
   columns: IColumnInfo[];
@@ -26,8 +27,17 @@ interface Props {
 }
 
 export const FormattingRule = observer(function FormattingRule({ columns, state, preview, selected, onSelect, onDelete }: Props) {
+  const ref = useRef<HTMLDivElement>(null);
   const t = useTranslate();
   const rule = state.type === 'scale' ? COLOR_SCALE_RULE : DEFAULT_FORMAT_RULES.find(r => r.id === state.ruleId);
+
+  useLayoutEffect(() => {
+    if (selected) {
+      requestAnimationFrame(() => {
+        ref.current?.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' });
+      });
+    }
+  }, [selected]);
 
   if (!rule) {
     return null;
@@ -50,6 +60,7 @@ export const FormattingRule = observer(function FormattingRule({ columns, state,
   if (preview) {
     return (
       <Cell
+        ref={ref}
         before={<FormattingPreview state={state} rule={rule} text="A" />}
         className={clsx('tw:rounded-(--theme-group-element-radius) tw:overflow-hidden tw:cursor-pointer theme-ripple-selectable tw:shrink-0', {
           'tw:before:bg-(--theme-primary)!': selected,
@@ -64,6 +75,7 @@ export const FormattingRule = observer(function FormattingRule({ columns, state,
 
   return (
     <Cell
+      ref={ref}
       before={<FormattingPreview state={state} rule={rule} text="A" />}
       description={description}
       after={<ActionIconButton name="delete" title={t('ui_delete')} onClick={handleClick} />}
