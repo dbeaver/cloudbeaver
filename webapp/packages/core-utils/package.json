@@ -24,8 +24,8 @@
   },
   "dependencies": {
     "@timohausmann/quadtree-ts": "^2",
-    "dom-to-image": "^2",
     "fast-deep-equal": "^3",
+    "html-to-image": "^1",
     "md5": "^2",
     "mobx": "^6",
     "tslib": "^2",

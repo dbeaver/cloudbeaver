@@ -12,7 +12,7 @@ module.exports = [
   'joint',
   'backbone',
   'lodash',
-  'domToImage',
+  'html-to-image',
   'dagre',
   'svg-pathdata',
   '@emotion',

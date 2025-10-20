@@ -2227,8 +2227,8 @@ __metadata:
     "@types/underscore": "npm:^1"
     "@types/uuid": "npm:^10"
     "@types/whatwg-mimetype": "npm:^3"
-    dom-to-image: "npm:^2"
     fast-deep-equal: "npm:^3"
+    html-to-image: "npm:^1"
     md5: "npm:^2"
     mobx: "npm:^6"
     rimraf: "npm:^6"
@@ -10832,13 +10832,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dom-to-image@npm:^2":
-  version: 2.6.0
-  resolution: "dom-to-image@npm:2.6.0"
-  checksum: 10c0/6c77851d2f301d2a4bbc3fa3f9d6f152bcc4f2a20b57185b9fa1fd81244c0c9a0c7f6deffb30461bba57d83f8b37d905fb5440d9bcda5b7221b968001a2c94fe
-  languageName: node
-  linkType: hard
-
 "dot-case@npm:^2.1.0":
   version: 2.1.1
   resolution: "dot-case@npm:2.1.1"
@@ -12652,6 +12645,13 @@ __metadata:
   dependencies:
     react-is: "npm:^16.7.0"
   checksum: 10c0/fe0889169e845d738b59b64badf5e55fa3cf20454f9203d1eb088df322d49d4318df774828e789898dcb280e8a5521bb59b3203385662ca5e9218a6ca5820e74
+  languageName: node
+  linkType: hard
+
+"html-to-image@npm:^1":
+  version: 1.11.13
+  resolution: "html-to-image@npm:1.11.13"
+  checksum: 10c0/03bd7192d87b99499e37ff12a8e2b41ddce4cf8e33a93dfadff18df0f213434c7f1ba8328db2158f4805da07b7aec3c90aec3152908281153217e86784218b10
   languageName: node
   linkType: hard
 
