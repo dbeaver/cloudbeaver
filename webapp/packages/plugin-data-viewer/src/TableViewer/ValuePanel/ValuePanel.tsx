@@ -24,7 +24,7 @@ import { IDatabaseDataResultAction } from '../../DatabaseDataModel/Actions/IData
 import { IDatabaseDataMetadataAction } from '../../DatabaseDataModel/Actions/IDatabaseDataMetadataAction.js';
 import { IDatabaseDataFormatAction } from '../../DatabaseDataModel/Actions/IDatabaseDataFormatAction.js';
 import type { IGridDataKey } from '../../DatabaseDataModel/Actions/Grid/IGridDataKey.js';
-import { useAutoContentType } from '../../ValuePanelPresentation/TextValue/useAutoContentType.js';
+import { useContentType } from '../../ValuePanelPresentation/TextValue/useContentType.js';
 
 const tabListRegistry: StyleRegistry = [[TabStyles, { mode: 'append', styles: [ValuePanelTab] }]];
 
@@ -61,25 +61,14 @@ export const ValuePanel: DataPresentationComponent = observer(function ValuePane
   );
 
   const displayed = service.getDisplayed({ dataFormat, model, resultIndex });
-  const hasOnlyTextRepresentations = displayed.length > 0 && displayed.every(tab => tab.options?.contentType);
 
-  const formatAction = hasOnlyTextRepresentations ? model.source.tryGetAction(resultIndex, IDatabaseDataFormatAction) : undefined;
-  const autoContentType = useAutoContentType({
-    dataFormat,
+  const currentTabId = useContentType({
     model: model as any,
-    resultIndex,
-    currentContentType: state.currentTabId || null,
+    currentContentType: state.currentTabId,
     elementKey: activeElements && activeElements.length > 0 ? activeElements[0] : undefined,
-    formatAction,
+    formatAction: model.source.tryGetAction(resultIndex, IDatabaseDataFormatAction),
+    displayed,
   });
-
-  let currentTabId = state.currentTabId;
-
-  const hasCurrentTab = currentTabId && displayed.some(tab => tab.key === currentTabId);
-
-  if (displayed.length > 0 && !hasCurrentTab) {
-    currentTabId = hasOnlyTextRepresentations ? autoContentType : displayed[0]!.key;
-  }
 
   return (
     <TabsState

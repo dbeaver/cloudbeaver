@@ -56,7 +56,7 @@ export class TextValuePresentationBootstrap extends Bootstrap {
         key: presentation.key,
         options: {
           dataFormat: [ResultDataFormat.Resultset],
-          contentType: presentation.key,
+          isTextPresentation: true,
         },
         name: presentation.name,
         order: Number.MAX_SAFE_INTEGER,

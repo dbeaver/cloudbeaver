@@ -13,7 +13,7 @@ import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataMo
 
 export interface IDataValuePanelOptions {
   dataFormat: ResultDataFormat[];
-  contentType?: string;
+  isTextPresentation?: boolean;
 }
 
 export interface IDataValuePanelProps {
