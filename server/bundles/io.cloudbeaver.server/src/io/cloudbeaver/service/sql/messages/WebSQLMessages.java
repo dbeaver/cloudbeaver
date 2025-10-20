@@ -21,8 +21,12 @@ import org.eclipse.osgi.util.NLS;
 public class WebSQLMessages extends NLS {
     static final String BUNDLE_NAME = "io.cloudbeaver.service.sql.messages.WebSQLResources"; //$NON-NLS-1$
 
-    public static String model_web_sql_confirmation_title;
-    public static String model_web_sql_confirmation_message;
+    public static String model_web_ai_query_confirmation_title;
+    public static String model_web_ai_query_confirmation_message;
+    public static String model_web_dangerous_update_confirmation_title;
+    public static String model_web_dangerous_update_confirmation_message;
+    public static String model_web_drop_query_confirmation_title;
+    public static String model_web_drop_query_confirmation_message;
 
     static {
         NLS.initializeMessages(BUNDLE_NAME, WebSQLMessages.class);

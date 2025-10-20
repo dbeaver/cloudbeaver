@@ -63,6 +63,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.text.MessageFormat;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
@@ -1253,7 +1254,7 @@ public class WebSQLProcessor implements WebSessionProvider {
 
     // TODO: Refactor to unify with desktop when confirmation settings will be added
     private boolean confirmQueryIfNeeded(
-        @NotNull List<SQLScriptElement> sqlQueries,
+        @NotNull List<SQLScriptElement> scriptElements,
         @NotNull WebAsyncTaskInfo asyncTask,
         boolean isGenerated
     ) throws DBWebException {
@@ -1262,36 +1263,62 @@ public class WebSQLProcessor implements WebSessionProvider {
             return true;
         }
 
-        boolean needsConfirmation;
+        boolean hasGeneratedUpdates = false;
+        boolean hasDangerousUpdates = false;
+        boolean hasDropStatement = false;
+        String title = null;
+        String message = null;
+        String queryPreview = null;
         if (isGenerated) {
-            Set<SQLQueryCategory> categories = SQLQueryCategory.categorizeScript(sqlQueries);
-            needsConfirmation = categories.contains(SQLQueryCategory.DDL) ||
+            Set<SQLQueryCategory> categories = SQLQueryCategory.categorizeScript(scriptElements);
+            hasGeneratedUpdates = categories.contains(SQLQueryCategory.DDL) ||
                 categories.contains(SQLQueryCategory.DML) ||
                 categories.contains(SQLQueryCategory.UNKNOWN);
+            title = WebSQLMessages.model_web_ai_query_confirmation_title;
+            message = WebSQLMessages.model_web_ai_query_confirmation_message;
+            queryPreview = scriptElements.stream()
+                .map(SQLScriptElement::getText)
+                .collect(Collectors.joining("\n\n"));
         } else {
-            needsConfirmation = sqlQueries.stream().anyMatch(this::isDangerous);
-        }
-        if (!needsConfirmation) {
-            return true;
+            for (SQLScriptElement scriptElement : scriptElements) {
+                if (scriptElement instanceof SQLQuery sqlQuery) {
+                    if (sqlQuery.isDeleteUpdateDangerous()) {
+                        hasDangerousUpdates = true;
+                        title = WebSQLMessages.model_web_dangerous_update_confirmation_title;
+                        message = MessageFormat.format(
+                            WebSQLMessages.model_web_dangerous_update_confirmation_message,
+                            sqlQuery.getType().name()
+                        );
+                        break;
+                    }
+                    if (sqlQuery.isDropTableDangerous()) {
+                        hasDropStatement = true;
+                        title = WebSQLMessages.model_web_drop_query_confirmation_title;
+                        message = WebSQLMessages.model_web_drop_query_confirmation_message;
+                        break;
+                    }
+                }
+            }
         }
 
-        String queryPreview = isGenerated ?
-            sqlQueries.stream()
-                .map(SQLScriptElement::getText)
-                .collect(Collectors.joining("\n\n"))
-            : null;
-        return requestConfirmation(asyncTask, queryPreview);
+        if (!hasGeneratedUpdates && !hasDangerousUpdates && !hasDropStatement) {
+            return true;
+        } else {
+            return requestConfirmation(asyncTask, queryPreview, title, message);
+        }
     }
 
     private boolean requestConfirmation(
         @NotNull WebAsyncTaskInfo asyncTask,
-        @Nullable String query
+        @Nullable String query,
+        @NotNull String title,
+        @NotNull String message
     ) throws DBWebException {
         String attributeName = WebSQLConstants.TASK_CONFIRMATION_ATTR_PREFIX + asyncTask.getId();
         CompletableFuture<Boolean> confirmationFuture = new CompletableFuture<>();
         webSession.setAttribute(attributeName, confirmationFuture);
 
-        webSession.addSessionEvent(createConfirmationEvent(asyncTask, query));
+        webSession.addSessionEvent(createConfirmationEvent(asyncTask, query, title, message));
 
         try {
             Boolean isConfirmed = confirmationFuture.get(TASK_CONFIRMATION_TIMEOUT_SECONDS, TimeUnit.SECONDS);
@@ -1308,11 +1335,10 @@ public class WebSQLProcessor implements WebSessionProvider {
     @NotNull
     private WSEvent createConfirmationEvent(
         @NotNull WebAsyncTaskInfo asyncTask,
-        @Nullable String query
+        @Nullable String query,
+        @NotNull String title,
+        @NotNull String message
     ) {
-        String title = WebSQLMessages.model_web_sql_confirmation_title;
-        String message = WebSQLMessages.model_web_sql_confirmation_message;
-
         WSEvent confirmationEvent;
         if (query != null) {
             confirmationEvent = new WSSessionTaskQueryConfirmationRequestEvent(
@@ -1324,13 +1350,5 @@ public class WebSQLProcessor implements WebSessionProvider {
             );
         }
         return confirmationEvent;
-    }
-
-    private boolean isDangerous(SQLScriptElement scriptElement) {
-        if (scriptElement instanceof SQLQuery sqlQuery) {
-            return sqlQuery.isDeleteUpdateDangerous() || sqlQuery.isDropTableDangerous();
-        } else {
-            return false;
-        }
     }
 }
