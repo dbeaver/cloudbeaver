@@ -6,18 +6,20 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { useMemo } from 'react';
+import { useDeferredValue, useMemo, useState } from 'react';
 import { observer } from 'mobx-react-lite';
-import { action, computed, observable, reaction } from 'mobx';
+import { reaction } from 'mobx';
 
 import { Button, clsx } from '@dbeaver/ui-kit';
 import type { TLocalizationToken } from '@cloudbeaver/core-localization';
-import { Checkbox, Filter, s, useObservableRef, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { Filter, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useCreateGridReactiveValue, type IDataGridCellRenderer } from '@dbeaver/react-data-grid';
 
 import { DataGrid } from './DataGridLazy.js';
-
+import { useTableSelection } from './useTableSelection.js';
 import classes from './GrantManagementTable.module.css';
+import { TableSelectionContext } from './TableSelectionContext.js';
+import { TableRowSelect } from './TableRowSelect.js';
 
 interface IColumn {
   key: string;
@@ -28,24 +30,6 @@ const DEFAULT_COLUMNS: IColumn[] = [
   { key: 'select', label: '' },
   { key: 'status', label: 'ui_granted' },
 ];
-
-interface IState<T> {
-  readonly _items: T[];
-  readonly selectedCount: number;
-  readonly itemsCount: number;
-  filter: string;
-  selected: Set<string>;
-  select(id: string): void;
-  grant(): void;
-  revoke(): void;
-  selectAll(): void;
-  isGranted: (item: T) => boolean;
-  onGrant: (ids: string[]) => void;
-  onRevoke: (ids: string[]) => void;
-  getItemId: (item: T) => string;
-  isManageable?: (item: T) => boolean;
-  isVisible?: (item: T, filter: string) => boolean;
-}
 
 export interface IGrantManagementTableProps<T> {
   items: T[];
@@ -77,91 +61,40 @@ export const GrantManagementTable = observer(function GrantManagementTable<T>({
   const translate = useTranslate();
   const styles = useS(classes);
 
-  const state: IState<T> = useObservableRef(
-    () => ({
-      get _items() {
-        if (!this.filter) {
-          return this.items;
-        }
+  const [filter, setFilter] = useState('');
+  const deferredFilter = useDeferredValue(filter);
 
-        return this.isVisible ? this.items.filter(item => this.isVisible?.(item, this.filter)) : this.items;
-      },
-      get selectedCount() {
-        const manageable = [];
+  const _items = useMemo(() => {
+    if (deferredFilter) {
+      return isVisible ? items.filter(item => isVisible(item, deferredFilter)) : items;
+    }
 
-        for (const id of this.selected) {
-          const item = this._items.find(i => this.getItemId(i) === id);
+    return items;
+  }, [isVisible, items, deferredFilter]);
 
-          if (item && this.isManageable?.(item)) {
-            manageable.push(id);
-          }
-        }
+  const keys = useMemo(() => _items.filter(i => isManageable?.(i) === true).map(getItemId), [_items, getItemId, isManageable]);
+  const selection = useTableSelection(keys);
 
-        return manageable.length;
-      },
-      get itemsCount() {
-        const manageable = this.isManageable ? this._items.filter(this.isManageable) : this._items;
-        return manageable.length;
-      },
-      filter: '',
-      selected: new Set<string>(),
-      select(id: string) {
-        if (this.selected.has(id)) {
-          this.selected.delete(id);
-        } else {
-          this.selected.add(id);
-        }
-      },
-      grant() {
-        const granted = Array.from(this.selected).filter(id => {
-          const item = this._items.find(i => this.getItemId(i) === id);
-          return item && !this.isGranted(item);
-        });
-        this.onGrant(granted);
-        this.selected.clear();
-      },
-      revoke() {
-        const revoked = Array.from(this.selected).filter(id => {
-          const item = this._items.find(i => this.getItemId(i) === id);
-          return item && this.isGranted(item);
-        });
-        this.onRevoke(revoked);
-        this.selected.clear();
-      },
-      selectAll() {
-        const isAll = this.itemsCount > 0 && this.itemsCount === this.selectedCount;
+  function grant() {
+    const prev = _items.filter(item => isGranted(item)).map(getItemId);
+    const granted = selection.list.filter(id => !prev.includes(id));
 
-        for (const item of this._items) {
-          if (this.isManageable?.(item)) {
-            const id = this.getItemId(item);
+    onGrant(granted);
+    selection.clear();
+  }
 
-            if (isAll) {
-              this.selected.delete(id);
-            } else {
-              this.selected.add(id);
-            }
-          }
-        }
-      },
-    }),
-    {
-      _items: computed,
-      selectedCount: computed,
-      itemsCount: computed,
-      filter: observable.ref,
-      selected: observable,
-      select: action.bound,
-      grant: action.bound,
-      revoke: action.bound,
-      selectAll: action.bound,
-    },
-    { items, isManageable, isVisible, isGranted, onGrant, onRevoke, getItemId },
-  );
+  function revoke() {
+    const prev = _items.filter(item => isGranted(item)).map(getItemId);
+    const revoked = selection.list.filter(id => prev.includes(id));
+
+    onRevoke(revoked);
+    selection.clear();
+  }
 
   const _columns = useMemo(() => [...DEFAULT_COLUMNS, ...columns], [columns]);
 
   function _getCell(rowIdx: number, colIdx: number) {
-    const row = state._items[rowIdx] as T;
+    const row = _items[rowIdx] as T;
     const column = _columns[colIdx];
 
     if (!row || !column) {
@@ -169,13 +102,7 @@ export const GrantManagementTable = observer(function GrantManagementTable<T>({
     }
 
     if (column.key === 'select') {
-      return (
-        <Checkbox
-          disabled={isManageable?.(row) === false}
-          checked={state.selected.has(getItemId(row))}
-          onChange={() => state.select(getItemId(row))}
-        />
-      );
+      return <TableRowSelect id={getItemId(row)} disabled={isManageable?.(row) === false} />;
     }
 
     if (column.key === 'status') {
@@ -187,7 +114,7 @@ export const GrantManagementTable = observer(function GrantManagementTable<T>({
   }
 
   const cell = useCreateGridReactiveValue(_getCell, (onValueChange, rowIds, colIdx) => reaction(() => _getCell(rowIds, colIdx), onValueChange), [
-    state,
+    _items,
     _columns,
     isGranted,
     isManageable,
@@ -196,7 +123,7 @@ export const GrantManagementTable = observer(function GrantManagementTable<T>({
   ]);
 
   function getCellElement(rowIdx: number, colIdx: number, props: React.HTMLAttributes<HTMLDivElement>, renderDefaultCell: IDataGridCellRenderer) {
-    const row = state._items[rowIdx];
+    const row = _items[rowIdx];
 
     if (!row) {
       return null;
@@ -211,7 +138,7 @@ export const GrantManagementTable = observer(function GrantManagementTable<T>({
     getCellElement,
     (onValueChange, rowIdx, colIdx, props, renderDefaultCell) =>
       reaction(() => getCellElement(rowIdx, colIdx, props, renderDefaultCell), onValueChange),
-    [state, isEdited],
+    [_items, isEdited],
   );
 
   const columnsCount = useCreateGridReactiveValue(
@@ -221,9 +148,9 @@ export const GrantManagementTable = observer(function GrantManagementTable<T>({
   );
 
   const rowsCount = useCreateGridReactiveValue(
-    () => state._items.length,
-    onValueChange => reaction(() => state._items.length, onValueChange),
-    [state._items],
+    () => _items.length,
+    onValueChange => reaction(() => _items.length, onValueChange),
+    [_items],
   );
 
   function getHeaderText(colIdx: number) {
@@ -232,9 +159,7 @@ export const GrantManagementTable = observer(function GrantManagementTable<T>({
 
   function getHeaderElement(colIdx: number) {
     if (colIdx === 0) {
-      const indeterminate = state.selectedCount > 0 && state.itemsCount !== state.selectedCount;
-      const checked = state.itemsCount > 0 && state.itemsCount === state.selectedCount;
-      return <Checkbox disabled={state.itemsCount === 0} checked={checked} indeterminate={indeterminate} onChange={state.selectAll} />;
+      return <TableRowSelect isRoot />;
     }
 
     return getHeaderText(colIdx);
@@ -243,7 +168,7 @@ export const GrantManagementTable = observer(function GrantManagementTable<T>({
   const headerElement = useCreateGridReactiveValue(
     getHeaderElement,
     (onValueChange, colIdx) => reaction(() => getHeaderElement(colIdx), onValueChange),
-    [_columns, state],
+    [_columns],
   );
 
   const headerText = useCreateGridReactiveValue(getHeaderText, (onValueChange, colIdx) => reaction(() => getHeaderText(colIdx), onValueChange), [
@@ -253,33 +178,35 @@ export const GrantManagementTable = observer(function GrantManagementTable<T>({
   return (
     <div className="tw:flex-1 tw:flex tw:flex-col tw:gap-2 tw:max-w-max tw:overflow-auto">
       <div className="tw:flex tw:items-center tw:gap-6">
-        <Filter state={state} name="filter" placeholder={translate('ui_search')} />
+        <Filter value={filter} placeholder={translate('ui_search')} onChange={setFilter} />
 
-        {state.selectedCount > 0 && (
+        {selection.selected.length > 0 && (
           <div className="tw:shrink-0 tw:flex tw:items-center tw:gap-2">
-            <div className="tw:text-(--theme-text-hint-on-light)">{state.selectedCount} selected</div>
-            <Button disabled={disabled} variant="secondary" size="small" onClick={state.grant}>
+            <div className="tw:text-(--theme-text-hint-on-light)">{selection.selected.length} selected</div>
+            <Button disabled={disabled} variant="secondary" size="small" onClick={grant}>
               {translate('ui_grant')}
             </Button>
-            <Button disabled={disabled} variant="secondary" size="small" onClick={state.revoke}>
+            <Button disabled={disabled} variant="secondary" size="small" onClick={revoke}>
               {translate('ui_revoke')}
             </Button>
           </div>
         )}
       </div>
-      <div className={s(styles, { table: true })}>
-        <DataGrid
-          columnCount={columnsCount}
-          rowCount={rowsCount}
-          getHeaderResizable={colIdx => colIdx > 1}
-          getRowHeight={() => 32}
-          getHeaderPinned={colIdx => colIdx <= 1}
-          headerElement={headerElement}
-          headerText={headerText}
-          cell={cell}
-          cellElement={cellElement}
-        />
-      </div>
+      <TableSelectionContext value={selection}>
+        <div className={s(styles, { table: true })}>
+          <DataGrid
+            columnCount={columnsCount}
+            rowCount={rowsCount}
+            getHeaderResizable={colIdx => colIdx > 1}
+            getRowHeight={() => 32}
+            getHeaderPinned={colIdx => colIdx <= 1}
+            headerElement={headerElement}
+            headerText={headerText}
+            cell={cell}
+            cellElement={cellElement}
+          />
+        </div>
+      </TableSelectionContext>
     </div>
   );
 });
