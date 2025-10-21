@@ -72,7 +72,11 @@ export const GrantManagementTable = observer(function GrantManagementTable<T>({
     return items;
   }, [isVisible, items, deferredFilter]);
 
-  const keys = useMemo(() => _items.filter(i => isManageable?.(i) === true).map(getItemId), [_items, getItemId, isManageable]);
+  const keys = useMemo(() => {
+    const filtered = isManageable ? _items.filter(isManageable) : _items;
+    return filtered.map(getItemId);
+  }, [_items, getItemId, isManageable]);
+
   const selection = useTableSelection(keys);
 
   function grant() {
