@@ -16,11 +16,10 @@ import type { IColumnInfo } from '../../formatting/IColumnInfo.js';
 interface Props {
   columns: IColumnInfo[];
   state: IFormatRuleState;
-  onAddRule?: () => void;
   onDelete?: () => void;
 }
 
-export const SingleColorRuleForm = observer<Props>(function SingleColorRuleForm({ columns, state, onAddRule, onDelete }) {
+export const SingleColorRuleForm = observer<Props>(function SingleColorRuleForm({ columns, state, onDelete }) {
   const t = useTranslate();
 
   const rule = DEFAULT_FORMAT_RULES.find(r => r.id === state.ruleId);

@@ -20,11 +20,10 @@ import { ColorScalePointFields } from './ColorScalePointFields.js';
 interface Props {
   columns: IColumnInfo[];
   state: IFormatRuleState;
-  onAddRule?: () => void;
   onDelete?: () => void;
 }
 
-export const ColorScaleRuleForm = observer<Props>(function ColorScaleRuleForm({ columns, state, onAddRule, onDelete }) {
+export const ColorScaleRuleForm = observer<Props>(function ColorScaleRuleForm({ columns, state, onDelete }) {
   const t = useTranslate();
   const { min, mid, max } = useColorScaleParameters(COLOR_SCALE_RULE, state);
 
