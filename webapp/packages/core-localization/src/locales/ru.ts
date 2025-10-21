@@ -70,6 +70,7 @@ export default [
   ['ui_page_not_found', 'Страница не найдена'],
   ['ui_revoke', 'Запретить'],
   ['ui_grant', 'Разрешить'],
+  ['ui_granted', 'Разрешено'],
   ['ui_edit', 'Редактировать'],
   ['ui_open_in_tab', 'Открыть во вкладке'],
   ['ui_rename', 'Переименовать'],

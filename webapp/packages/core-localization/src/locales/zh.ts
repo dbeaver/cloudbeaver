@@ -71,6 +71,7 @@ export default [
   ['ui_page_not_found', '找不到页面'],
   ['ui_revoke', '撤销'],
   ['ui_grant', '授予'],
+  ['ui_granted', 'Granted'],
   ['ui_edit', '编辑'],
   ['ui_open_in_tab', '在选项卡中打开'],
   ['ui_create', '新建'],

@@ -51,13 +51,13 @@ export const UserManagement: TabContainerPanelComponent<TeamFormProps> = observe
     return <Alert className="tw:h-max">{translate('plugin_authentication_administration_team_default_users_tooltip')}</Alert>;
   }
 
-  function isGranted(id: string) {
-    return tabState.state.grantedUsers.some(user => user.userId === id);
+  function isGranted(user: AdminUser) {
+    return tabState.state.grantedUsers.some(u => u.userId === user.userId);
   }
 
-  function isEdited(id: string) {
-    const initial = tabState.initialState.grantedUsers.find(grantedUser => grantedUser.userId === id);
-    const current = tabState.state.grantedUsers.find(grantedUser => grantedUser.userId === id);
+  function isEdited(user: AdminUser) {
+    const initial = tabState.initialState.grantedUsers.find(grantedUser => grantedUser.userId === user.userId);
+    const current = tabState.state.grantedUsers.find(grantedUser => grantedUser.userId === user.userId);
 
     return !initial !== !current || initial?.teamRole !== current?.teamRole;
   }
@@ -121,12 +121,13 @@ export const UserManagement: TabContainerPanelComponent<TeamFormProps> = observe
     return user.userId;
   }
 
-  const items = (usersLoader.data.filter(user => user?.enabled) as AdminUser[]).map(user => ({ id: user.userId, ...user })).sort(compareUsers);
+  const items = (usersLoader.data.filter(user => user?.enabled) as AdminUser[]).sort(compareUsers);
 
   return (
     <GrantManagementTable
       items={items}
       columns={columns}
+      getItemId={item => item.userId}
       isGranted={isGranted}
       isEdited={isEdited}
       isVisible={(user, filter) => user.userId.toLowerCase().includes(filter.toLowerCase())}

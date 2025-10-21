@@ -68,6 +68,7 @@ export default [
   ['ui_page_not_found', 'Page non trouvée'],
   ['ui_revoke', 'Révoquer'],
   ['ui_grant', 'Accorder'],
+  ['ui_granted', 'Granted'],
   ['ui_edit', 'Modifier'],
   ['ui_open_in_tab', 'Ouvrir dans un onglet'],
   ['ui_rename', 'Renommer'],

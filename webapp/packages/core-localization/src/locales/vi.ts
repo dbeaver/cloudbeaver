@@ -74,6 +74,7 @@ export default [
   ['ui_page_not_found', 'Không tìm thấy trang'],
   ['ui_revoke', 'Thu hồi'],
   ['ui_grant', 'Cấp quyền'],
+  ['ui_granted', 'Granted'],
   ['ui_edit', 'Chỉnh sửa'],
   ['ui_open_in_tab', 'Mở trong tab'],
   ['ui_rename', 'Đổi tên'],

@@ -57,12 +57,12 @@ export const ConnectionManagement: TabContainerPanelComponent<TeamFormProps> = o
     return null;
   }
 
-  function isGranted(id: string) {
-    return tabState.state.grantedSubjects.includes(id);
+  function isGranted(connection: DatabaseConnectionCustomOptionsFragment) {
+    return tabState.state.grantedSubjects.includes(connection.id);
   }
 
-  function isEdited(id: string) {
-    return tabState.initialState.grantedSubjects.includes(id) !== isGranted(id);
+  function isEdited(connection: DatabaseConnectionCustomOptionsFragment) {
+    return tabState.initialState.grantedSubjects.includes(connection.id) !== isGranted(connection);
   }
 
   function getCell(connection: DatabaseConnectionCustomOptionsFragment, colKey: string) {
@@ -110,6 +110,7 @@ export const ConnectionManagement: TabContainerPanelComponent<TeamFormProps> = o
       <GrantManagementTable
         items={items}
         columns={COLUMNS}
+        getItemId={item => item.id}
         isGranted={isGranted}
         isEdited={isEdited}
         isVisible={(item, filter) => item.name.toLowerCase().includes(filter.toLowerCase())}
