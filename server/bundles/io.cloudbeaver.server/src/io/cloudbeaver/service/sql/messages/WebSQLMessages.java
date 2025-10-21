@@ -23,10 +23,6 @@ public class WebSQLMessages extends NLS {
 
     public static String model_web_ai_query_confirmation_title;
     public static String model_web_ai_query_confirmation_message;
-    public static String model_web_dangerous_update_confirmation_title;
-    public static String model_web_dangerous_update_confirmation_message;
-    public static String model_web_drop_query_confirmation_title;
-    public static String model_web_drop_query_confirmation_message;
 
     static {
         NLS.initializeMessages(BUNDLE_NAME, WebSQLMessages.class);

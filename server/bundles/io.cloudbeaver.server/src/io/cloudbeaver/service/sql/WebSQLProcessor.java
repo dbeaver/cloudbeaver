@@ -54,6 +54,9 @@ import org.jkiss.dbeaver.model.websocket.event.WSEvent;
 import org.jkiss.dbeaver.model.websocket.event.WSTransactionalCountEvent;
 import org.jkiss.dbeaver.model.websocket.event.session.WSSessionTaskConfirmationRequestEvent;
 import org.jkiss.dbeaver.model.websocket.event.session.WSSessionTaskQueryConfirmationRequestEvent;
+import org.jkiss.dbeaver.registry.confirmation.ConfirmationConstants;
+import org.jkiss.dbeaver.registry.confirmation.ConfirmationDescriptor;
+import org.jkiss.dbeaver.registry.confirmation.ConfirmationRegistry;
 import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
@@ -1284,17 +1287,22 @@ public class WebSQLProcessor implements WebSessionProvider {
                 if (scriptElement instanceof SQLQuery sqlQuery) {
                     if (sqlQuery.isDeleteUpdateDangerous()) {
                         hasDangerousUpdates = true;
-                        title = WebSQLMessages.model_web_dangerous_update_confirmation_title;
+                        ConfirmationDescriptor descriptor = ConfirmationRegistry.getInstance()
+                            .getConfirmation(ConfirmationConstants.CONFIRM_DANGER_SQL);
+                        title = descriptor.getTitle();
                         message = MessageFormat.format(
-                            WebSQLMessages.model_web_dangerous_update_confirmation_message,
-                            sqlQuery.getType().name()
+                            descriptor.getMessage(),
+                            sqlQuery.getType().name(),
+                            "" // TODO fill with tablename
                         );
                         break;
                     }
                     if (sqlQuery.isDropTableDangerous()) {
                         hasDropStatement = true;
-                        title = WebSQLMessages.model_web_drop_query_confirmation_title;
-                        message = WebSQLMessages.model_web_drop_query_confirmation_message;
+                        ConfirmationDescriptor descriptor = ConfirmationRegistry.getInstance()
+                            .getConfirmation(ConfirmationConstants.CONFIRM_DANGER_SQL);
+                        title = descriptor.getTitle();
+                        message = descriptor.getMessage();
                         break;
                     }
                 }
