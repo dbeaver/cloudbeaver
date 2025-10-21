@@ -1290,17 +1290,18 @@ public class WebSQLProcessor implements WebSessionProvider {
                         ConfirmationDescriptor descriptor = ConfirmationRegistry.getInstance()
                             .getConfirmation(ConfirmationConstants.CONFIRM_DANGER_SQL);
                         title = descriptor.getTitle();
+                        var entityMetadata = sqlQuery.getEntityMetadata(false);
                         message = MessageFormat.format(
                             descriptor.getMessage(),
                             sqlQuery.getType().name(),
-                            "" // TODO fill with tablename
+                            entityMetadata != null ? entityMetadata.getEntityName() : null
                         );
                         break;
                     }
                     if (sqlQuery.isDropTableDangerous()) {
                         hasDropStatement = true;
                         ConfirmationDescriptor descriptor = ConfirmationRegistry.getInstance()
-                            .getConfirmation(ConfirmationConstants.CONFIRM_DANGER_SQL);
+                            .getConfirmation(ConfirmationConstants.CONFIRM_DROP_SQL);
                         title = descriptor.getTitle();
                         message = descriptor.getMessage();
                         break;
