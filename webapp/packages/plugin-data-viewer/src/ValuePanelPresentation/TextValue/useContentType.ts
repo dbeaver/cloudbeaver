@@ -6,16 +6,12 @@
  * you may not use this file except in compliance with the License.
  */
 import type { ITabInfo } from '@cloudbeaver/core-ui';
-import { isResultSetContentValue } from '@dbeaver/result-set-api';
-
-import { isResultSetBlobValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetBlobValue.js';
-import type { IResultSetValue } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction.js';
 import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel.js';
 import type { IDatabaseDataFormatAction } from '../../DatabaseDataModel/Actions/IDatabaseDataFormatAction.js';
 import type { IGridDataKey } from '../../DatabaseDataModel/Actions/Grid/IGridDataKey.js';
-import { isResultSetDataModel } from '../../ResultSet/isResultSetDataModel.js';
 import type { IDatabaseDataSource } from '../../DatabaseDataModel/IDatabaseDataSource.js';
 import type { IDataValuePanelOptions, IDataValuePanelProps } from '../../TableViewer/ValuePanel/DataValuePanelService.js';
+import { useAutoContentType } from './useAutoContentType.js';
 
 interface UseContentTypeArgs {
   model: IDatabaseDataModel<IDatabaseDataSource>;
@@ -27,54 +23,18 @@ interface UseContentTypeArgs {
 
 const DEFAULT_CONTENT_TYPE = 'text/plain';
 
-function getContentTypeFromResultSetValue(contentValue: IResultSetValue) {
-  if (isResultSetContentValue(contentValue)) {
-    return contentValue.contentType;
-  }
-
-  if (isResultSetBlobValue(contentValue)) {
-    return contentValue.blob.type;
-  }
-
-  return null;
-}
-
-function preprocessDefaultContentType(contentType: string | null | undefined) {
-  if (contentType) {
-    switch (contentType) {
-      case 'text/json':
-        return 'application/json';
-      case 'application/octet-stream':
-        return 'application/octet-stream;type=base64';
-      default:
-        return contentType;
-    }
-  }
-
-  return DEFAULT_CONTENT_TYPE;
-}
-
 export function useContentType({ model, formatAction, currentContentType, elementKey, displayed }: UseContentTypeArgs): string {
+  const autoContentType = useAutoContentType({ displayed, formatAction, model, elementKey });
   if (displayed.length === 0) {
-    return currentContentType ?? DEFAULT_CONTENT_TYPE;
-  }
-  const isEnableAutoType = displayed.every(tab => tab.options?.isTextPresentation);
-
-  if (isEnableAutoType && formatAction && isResultSetDataModel(model)) {
-    const contentValue = elementKey ? formatAction.get(elementKey) : null;
-    const contentValueType = getContentTypeFromResultSetValue(contentValue);
-    const defaultContentType = preprocessDefaultContentType(contentValueType);
-
-    if (!currentContentType) {
-      currentContentType = defaultContentType;
-    }
+    return currentContentType || DEFAULT_CONTENT_TYPE;
   }
 
+  currentContentType = currentContentType || autoContentType;
   const hasCurrentTab = currentContentType && displayed.some(tab => tab.key === currentContentType);
 
   if (!hasCurrentTab) {
-    currentContentType = isEnableAutoType && currentContentType ? currentContentType : displayed[0]!.key;
+    currentContentType = currentContentType || displayed[0]!.key;
   }
 
-  return currentContentType ?? DEFAULT_CONTENT_TYPE;
+  return currentContentType || DEFAULT_CONTENT_TYPE;
 }
