@@ -62,6 +62,7 @@ public class ServletSystemInformationCollector<T extends ServletApplication> imp
     private DBPConnectionInformation smDatabaseInfo;
     private String workspacePath;
     private final DeploymentType deploymentType;
+    private boolean internalDatabaseInfoCollected = false;
 
     public ServletSystemInformationCollector(@NotNull T application) {
         this.application = application;
@@ -158,7 +159,15 @@ public class ServletSystemInformationCollector<T extends ServletApplication> imp
     /**
      * Collects info about internal databases.
      */
-    public void collectInternalDatabaseUseInformation() throws DBException {
+    public synchronized void collectInternalDatabaseUseInformation() throws DBException {
+        if (internalDatabaseInfoCollected) {
+            return;
+        }
+        collectInternalDatabaseInfo();
+        this.internalDatabaseInfoCollected = true;
+    }
+
+    protected void collectInternalDatabaseInfo() throws DBException {
         this.smDatabaseInfo = application.getAdminSecurityController(new NoAuthCredentialsProvider())
             .getInternalDatabaseInformation();
     }
