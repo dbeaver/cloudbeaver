@@ -13,7 +13,7 @@ import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { TeamsAdministrationFormService } from '../TeamsAdministrationFormService.js';
 import { getGrantedUsersFormPart } from './getGrantedUsersFormPart.js';
 
-const UserManagement = importLazyComponent(() => import('./UserManagement.js').then(m => m.UserManagement));
+const GrantedUsersTable = importLazyComponent(() => import('./GrantedUsersTable.js').then(m => m.GrantedUsersTable));
 
 @injectable(() => [TeamsAdministrationFormService])
 export class GrantedUsersTabService extends Bootstrap {
@@ -31,7 +31,7 @@ export class GrantedUsersTabService extends Bootstrap {
       title: 'administration_teams_team_granted_users_tab_title',
       order: 2,
       stateGetter: props => () => getGrantedUsersFormPart(props.formState),
-      panel: () => UserManagement,
+      panel: () => GrantedUsersTable,
     });
   }
 }

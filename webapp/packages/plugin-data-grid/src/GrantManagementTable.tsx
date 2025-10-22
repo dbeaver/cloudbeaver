@@ -64,23 +64,23 @@ export const GrantManagementTable = observer(function GrantManagementTable<T>({
   const [filter, setFilter] = useState('');
   const deferredFilter = useDeferredValue(filter);
 
-  const _items = useMemo(() => {
-    if (deferredFilter) {
-      return isVisible ? items.filter(item => isVisible(item, deferredFilter)) : items;
+  const visibleItems = useMemo(() => {
+    if (isVisible) {
+      return items.filter(item => isVisible(item, deferredFilter));
     }
 
     return items;
   }, [isVisible, items, deferredFilter]);
 
   const keys = useMemo(() => {
-    const filtered = isManageable ? _items.filter(isManageable) : _items;
+    const filtered = isManageable ? visibleItems.filter(isManageable) : visibleItems;
     return filtered.map(getItemId);
-  }, [_items, getItemId, isManageable]);
+  }, [visibleItems, getItemId, isManageable]);
 
   const selection = useTableSelection(keys);
 
   function grant() {
-    const prev = _items.filter(item => isGranted(item)).map(getItemId);
+    const prev = visibleItems.filter(item => isGranted(item)).map(getItemId);
     const granted = selection.list.filter(id => !prev.includes(id));
 
     onGrant(granted);
@@ -88,7 +88,7 @@ export const GrantManagementTable = observer(function GrantManagementTable<T>({
   }
 
   function revoke() {
-    const prev = _items.filter(item => isGranted(item)).map(getItemId);
+    const prev = visibleItems.filter(item => isGranted(item)).map(getItemId);
     const revoked = selection.list.filter(id => prev.includes(id));
 
     onRevoke(revoked);
@@ -98,7 +98,7 @@ export const GrantManagementTable = observer(function GrantManagementTable<T>({
   const _columns = useMemo(() => [...DEFAULT_COLUMNS, ...columns], [columns]);
 
   function _getCell(rowIdx: number, colIdx: number) {
-    const row = _items[rowIdx] as T;
+    const row = visibleItems[rowIdx] as T;
     const column = _columns[colIdx];
 
     if (!row || !column) {
@@ -122,7 +122,7 @@ export const GrantManagementTable = observer(function GrantManagementTable<T>({
   }
 
   const cell = useCreateGridReactiveValue(_getCell, (onValueChange, rowIds, colIdx) => reaction(() => _getCell(rowIds, colIdx), onValueChange), [
-    _items,
+    visibleItems,
     _columns,
     isGranted,
     isManageable,
@@ -131,7 +131,7 @@ export const GrantManagementTable = observer(function GrantManagementTable<T>({
   ]);
 
   function getCellElement(rowIdx: number, colIdx: number, props: React.HTMLAttributes<HTMLDivElement>, renderDefaultCell: IDataGridCellRenderer) {
-    const row = _items[rowIdx];
+    const row = visibleItems[rowIdx];
 
     if (!row) {
       return null;
@@ -146,7 +146,7 @@ export const GrantManagementTable = observer(function GrantManagementTable<T>({
     getCellElement,
     (onValueChange, rowIdx, colIdx, props, renderDefaultCell) =>
       reaction(() => getCellElement(rowIdx, colIdx, props, renderDefaultCell), onValueChange),
-    [_items, isEdited],
+    [visibleItems, isEdited],
   );
 
   const columnsCount = useCreateGridReactiveValue(
@@ -156,9 +156,9 @@ export const GrantManagementTable = observer(function GrantManagementTable<T>({
   );
 
   const rowsCount = useCreateGridReactiveValue(
-    () => _items.length,
-    onValueChange => reaction(() => _items.length, onValueChange),
-    [_items],
+    () => visibleItems.length,
+    onValueChange => reaction(() => visibleItems.length, onValueChange),
+    [visibleItems],
   );
 
   function getHeaderText(colIdx: number) {
@@ -176,11 +176,12 @@ export const GrantManagementTable = observer(function GrantManagementTable<T>({
   const headerElement = useCreateGridReactiveValue(
     getHeaderElement,
     (onValueChange, colIdx) => reaction(() => getHeaderElement(colIdx), onValueChange),
-    [_columns],
+    [_columns, translate],
   );
 
   const headerText = useCreateGridReactiveValue(getHeaderText, (onValueChange, colIdx) => reaction(() => getHeaderText(colIdx), onValueChange), [
     _columns,
+    translate,
   ]);
 
   return (

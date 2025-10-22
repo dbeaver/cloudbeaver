@@ -25,23 +25,26 @@ import {
 import type { TeamFormProps } from '../TeamsAdministrationFormService.js';
 import type { GrantedUsersFormPart } from './GrantedUsersFormPart.js';
 
-const COLUMNS = [{ key: 'userId', label: 'administration_teams_team_granted_users_user_id' }];
+const USER_ID_COLUMN = { key: 'userId', label: 'administration_teams_team_granted_users_user_id' };
+const TEAM_ROLE_COLUMN = { key: 'teamRole', label: 'plugin_authentication_administration_team_user_team_role_supervisor' };
 
-export const UserManagement: TabContainerPanelComponent<TeamFormProps> = observer(function UserManagement({ tabId, formState }) {
+const COLUMNS = [USER_ID_COLUMN];
+
+export const GrantedUsersTable: TabContainerPanelComponent<TeamFormProps> = observer(function GrantedUsersTable({ tabId, formState }) {
   const translate = useTranslate();
   const tabState = useTabState<GrantedUsersFormPart>();
 
   const { selected } = useTab(tabId);
 
-  const serverConfigResource = useResource(UserManagement, ServerConfigResource, undefined, { active: selected });
+  const serverConfigResource = useResource(GrantedUsersTable, ServerConfigResource, undefined, { active: selected });
   const isDefaultTeam = formState.state.teamId === serverConfigResource.data?.defaultUserTeam;
 
-  const teamRolesResource = useResource(UserManagement, TeamRolesResource, undefined);
-  const usersLoader = useResource(UserManagement, UsersResource, CachedResourceOffsetPageListKey(0, 1000).setParent(UsersResourceFilterKey()), {
+  const teamRolesResource = useResource(GrantedUsersTable, TeamRolesResource, undefined);
+  const usersLoader = useResource(GrantedUsersTable, UsersResource, CachedResourceOffsetPageListKey(0, 1000).setParent(UsersResourceFilterKey()), {
     active: selected && !isDefaultTeam,
   });
 
-  useAutoLoad(UserManagement, tabState, selected && !tabState.isLoaded() && !isDefaultTeam);
+  useAutoLoad(GrantedUsersTable, tabState, selected && !tabState.isLoaded() && !isDefaultTeam);
 
   if (!selected) {
     return null;
@@ -73,13 +76,11 @@ export const UserManagement: TabContainerPanelComponent<TeamFormProps> = observe
   const columns = [...COLUMNS];
 
   if (teamRolesResource.data.length > 0) {
-    columns.push({ key: 'teamRole', label: 'plugin_authentication_administration_team_user_team_role_supervisor' });
+    columns.push(TEAM_ROLE_COLUMN);
   }
 
   function getCell(user: AdminUser, colKey: string) {
-    const column = columns.find(c => c.key === colKey)!;
-
-    if (column.key === 'userId') {
+    if (colKey === USER_ID_COLUMN.key) {
       const isMe = usersLoader.resource.isActiveUser(user.userId);
 
       let name = user.userId;
@@ -101,7 +102,7 @@ export const UserManagement: TabContainerPanelComponent<TeamFormProps> = observe
       );
     }
 
-    if (column.key === 'teamRole') {
+    if (colKey === TEAM_ROLE_COLUMN.key) {
       const granted = tabState.state.grantedUsers.find(grantedUser => grantedUser.userId === user.userId);
 
       if (granted) {

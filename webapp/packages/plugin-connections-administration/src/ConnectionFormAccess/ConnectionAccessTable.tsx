@@ -18,39 +18,31 @@ import { GrantManagementTable } from '@cloudbeaver/plugin-data-grid';
 
 import { getConnectionFormAccessPart } from './getConnectionFormAccessPart.js';
 
-const COLUMNS = [
-  { key: 'name', label: 'connections_connection_access_user_or_team_name' },
-  { key: 'description', label: 'connections_connection_description' },
-];
+const NAME_COLUMN = { key: 'name', label: 'connections_connection_access_user_or_team_name' };
+const DESCRIPTION_COLUMN = { key: 'description', label: 'connections_connection_description' };
 
-export const ConnectionAccessManagement: TabContainerPanelComponent<IConnectionFormProps> = observer(function ConnectionAccessManagement({
-  tabId,
-  formState,
-}) {
+const COLUMNS = [NAME_COLUMN, DESCRIPTION_COLUMN];
+
+export const ConnectionAccessTable: TabContainerPanelComponent<IConnectionFormProps> = observer(function ConnectionAccessTable({ tabId, formState }) {
   const translate = useTranslate();
   const { selected } = useTab(tabId);
   const accessPart = getConnectionFormAccessPart(formState);
 
-  useAutoLoad(ConnectionAccessManagement, accessPart, selected);
+  useAutoLoad(ConnectionAccessTable, accessPart, selected);
 
-  const userLoader = useResource(
-    ConnectionAccessManagement,
-    UsersResource,
-    CachedResourceOffsetPageListKey(0, 1000).setParent(UsersResourceFilterKey()),
-    {
-      active: selected,
-    },
-  );
+  const userLoader = useResource(ConnectionAccessTable, UsersResource, CachedResourceOffsetPageListKey(0, 1000).setParent(UsersResourceFilterKey()), {
+    active: selected,
+  });
 
-  const teamLoader = useResource(ConnectionAccessManagement, TeamsResource, CachedMapAllKey, { active: selected });
+  const teamLoader = useResource(ConnectionAccessTable, TeamsResource, CachedMapAllKey, { active: selected });
 
   const optionsPart = getConnectionFormOptionsPart(formState);
   const connectionParam =
     optionsPart.state.connectionId !== undefined ? createConnectionParam(formState.state.projectId, optionsPart.state.connectionId) : null;
-  const connectionInfoResource = useResource(ConnectionAccessManagement, ConnectionInfoResource, connectionParam, {
+  const connectionInfoResource = useResource(ConnectionAccessTable, ConnectionInfoResource, connectionParam, {
     active: selected,
   });
-  const originInfoResource = useResource(ConnectionAccessManagement, ConnectionInfoOriginResource, connectionParam, {
+  const originInfoResource = useResource(ConnectionAccessTable, ConnectionInfoOriginResource, connectionParam, {
     active: selected,
   });
 
@@ -83,7 +75,7 @@ export const ConnectionAccessManagement: TabContainerPanelComponent<IConnectionF
     const isTeam = 'teamId' in item;
     const name = isTeam ? item.teamName : item.userId;
 
-    if (colKey === 'name') {
+    if (colKey === NAME_COLUMN.key) {
       return (
         <div className="tw:flex tw:items-center tw:gap-2">
           <StaticImage className="tw:w-4" icon={isTeam ? '/icons/team.svg' : '/icons/user.svg'} />
@@ -94,7 +86,7 @@ export const ConnectionAccessManagement: TabContainerPanelComponent<IConnectionF
       );
     }
 
-    if (colKey === 'description') {
+    if (colKey === DESCRIPTION_COLUMN.key) {
       const description = isTeam ? item.description : '';
       return (
         <span className="tw:truncate" title={description}>

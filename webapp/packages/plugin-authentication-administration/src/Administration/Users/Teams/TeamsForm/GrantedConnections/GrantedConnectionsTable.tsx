@@ -28,30 +28,30 @@ import { GrantManagementTable } from '@cloudbeaver/plugin-data-grid';
 import type { TeamFormProps } from '../TeamsAdministrationFormService.js';
 import type { GrantedConnectionsFormPart } from './GrantedConnectionsFormPart.js';
 
-const COLUMNS = [
-  { key: 'name', label: 'connections_connection_name' },
-  { key: 'address', label: 'connections_connection_address' },
-];
+const NAME_COLUMN = { key: 'name', label: 'connections_connection_name' };
+const ADDRESS_COLUMN = { key: 'address', label: 'connections_connection_address' };
 
-export const ConnectionManagement: TabContainerPanelComponent<TeamFormProps> = observer(function ConnectionManagement({ tabId, formState }) {
+const COLUMNS = [NAME_COLUMN, ADDRESS_COLUMN];
+
+export const GrantedConnectionsTable: TabContainerPanelComponent<TeamFormProps> = observer(function GrantedConnectionsTable({ tabId, formState }) {
   const translate = useTranslate();
   const tabState = useTabState<GrantedConnectionsFormPart>();
   const { selected } = useTab(tabId);
 
-  const driverLoader = useResource(ConnectionManagement, DBDriverResource, CachedMapAllKey, { active: selected });
+  const driverLoader = useResource(GrantedConnectionsTable, DBDriverResource, CachedMapAllKey, { active: selected });
 
-  const projects = useResource(ConnectionManagement, ProjectInfoResource, CachedMapAllKey);
+  const projects = useResource(GrantedConnectionsTable, ProjectInfoResource, CachedMapAllKey);
 
   const loaded = tabState.isLoaded();
   const key = ConnectionInfoProjectKey(...(projects.data as Array<ProjectInfo | undefined>).filter(isGlobalProject).map(project => project.id));
 
-  const connectionLoader = useResource(ConnectionManagement, ConnectionInfoCustomOptionsResource, key, { active: selected });
-  const connectionsOriginLoader = useResource(ConnectionManagement, ConnectionInfoOriginResource, key, { active: selected });
+  const connectionLoader = useResource(GrantedConnectionsTable, ConnectionInfoCustomOptionsResource, key, { active: selected });
+  const connectionsOriginLoader = useResource(GrantedConnectionsTable, ConnectionInfoOriginResource, key, { active: selected });
 
   const connections = connectionLoader.data as ConnectionInfoCustomOptions[];
   const connectionsOrigins = (connectionsOriginLoader.data ?? []) as ConnectionInfoOrigin[];
 
-  useAutoLoad(ConnectionManagement, tabState, selected && !loaded);
+  useAutoLoad(GrantedConnectionsTable, tabState, selected && !loaded);
 
   if (!selected) {
     return null;
@@ -66,10 +66,9 @@ export const ConnectionManagement: TabContainerPanelComponent<TeamFormProps> = o
   }
 
   function getCell(connection: DatabaseConnectionCustomOptionsFragment, colKey: string) {
-    const column = COLUMNS.find(c => c.key === colKey)!;
-    const driver = driverLoader.data.find(d => d?.id === connection.driverId);
+    if (colKey === NAME_COLUMN.key) {
+      const driver = driverLoader.data.find(d => d?.id === connection.driverId);
 
-    if (column.key === 'name') {
       return (
         <div title={connection.name} className="tw:font-medium tw:flex tw:items-center tw:gap-2">
           {driver?.icon && <StaticImage className="tw:w-4" icon={driver.icon} />}
@@ -78,7 +77,7 @@ export const ConnectionManagement: TabContainerPanelComponent<TeamFormProps> = o
       );
     }
 
-    if (column.key === 'address') {
+    if (colKey === ADDRESS_COLUMN.key) {
       return (
         <div className="tw:text-(--theme-text-hint-on-light)">
           {connection.host}:{connection.port}
