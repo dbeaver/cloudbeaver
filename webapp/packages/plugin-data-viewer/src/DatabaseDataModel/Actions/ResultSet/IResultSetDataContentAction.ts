@@ -14,7 +14,7 @@ export interface IResultSetDataContentAction {
   isLoading: (element: IGridDataKey) => boolean;
   isBlobTruncated: (holder: IDatabaseValueHolder<IGridDataKey, IResultSetValue>) => boolean;
   isTextTruncated: (holder: IDatabaseValueHolder<IGridDataKey, IResultSetValue>) => boolean;
-  isDownloadable: (element: IGridDataKey) => boolean;
+  isDownloadable: (holder: IDatabaseValueHolder<IGridDataKey, IResultSetValue>) => boolean;
   resolveFileDataUrl: (element: IGridDataKey) => Promise<Blob>;
   retrieveBlobFromCache: (element: IGridDataKey) => Blob | undefined;
   downloadFileData: (element: IGridDataKey) => Promise<void>;

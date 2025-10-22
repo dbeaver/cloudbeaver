@@ -98,8 +98,8 @@ export function useValuePanelImageValue({ model, resultIndex }: Props) {
           return false;
         }
 
-        if (this.truncated && this.selectedCell) {
-          return this.contentAction.isDownloadable(this.selectedCell);
+        if (this.truncated && this.cellHolder) {
+          return this.contentAction.isDownloadable(this.cellHolder);
         }
 
         return this.staticSrc && !this.truncated;
