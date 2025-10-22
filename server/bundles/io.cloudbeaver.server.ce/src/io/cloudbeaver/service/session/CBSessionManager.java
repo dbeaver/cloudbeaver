@@ -304,14 +304,11 @@ public class CBSessionManager implements WebAppSessionManager {
     }
 
     public void expireIdleSessions() {
-        long maxSessionIdleTime = application.getMaxSessionIdleTime();
-
         List<BaseWebSession> expiredList = new ArrayList<>();
         synchronized (sessionMap) {
             for (Iterator<BaseWebSession> iterator = sessionMap.values().iterator(); iterator.hasNext(); ) {
                 var session = iterator.next();
-                long idleMillis = System.currentTimeMillis() - session.getLastAccessTimeMillis();
-                if (idleMillis >= maxSessionIdleTime) {
+                if (!session.isValid()) {
                     iterator.remove();
                     expiredList.add(session);
                 }

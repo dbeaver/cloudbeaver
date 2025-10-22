@@ -190,6 +190,10 @@ public class WebUserContext implements SMCredentialsProvider {
         return isAuthorizedInSecurityManager() && getUser() != null;
     }
 
+    public synchronized boolean isAnonymousUserAuthorizedInSM() {
+        return isAuthorizedInSecurityManager() && getUser() == null;
+    }
+
     @Nullable
     public synchronized WebUser getUser() {
         return user;
