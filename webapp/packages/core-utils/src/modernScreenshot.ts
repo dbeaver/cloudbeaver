@@ -6,8 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
-import * as htmlToImage from 'html-to-image';
+import * as modernScreenshot from 'modern-screenshot';
+import type { Options } from 'modern-screenshot';
 
-type HtmlToImageOptions = Parameters<(typeof htmlToImage)['toPng']>[1];
-
-export { htmlToImage, type HtmlToImageOptions };
+export { modernScreenshot };
+export type { Options as IScreenshotOptions };
