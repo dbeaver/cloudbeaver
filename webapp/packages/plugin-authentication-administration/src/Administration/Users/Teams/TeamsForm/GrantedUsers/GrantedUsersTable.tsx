@@ -39,12 +39,13 @@ export const GrantedUsersTable: TabContainerPanelComponent<TeamFormProps> = obse
   const serverConfigResource = useResource(GrantedUsersTable, ServerConfigResource, undefined, { active: selected });
   const isDefaultTeam = formState.state.teamId === serverConfigResource.data?.defaultUserTeam;
 
-  const teamRolesResource = useResource(GrantedUsersTable, TeamRolesResource, undefined);
+  const active = selected && !isDefaultTeam;
+  const teamRolesResource = useResource(GrantedUsersTable, TeamRolesResource, undefined, { active });
   const usersLoader = useResource(GrantedUsersTable, UsersResource, CachedResourceOffsetPageListKey(0, 1000).setParent(UsersResourceFilterKey()), {
-    active: selected && !isDefaultTeam,
+    active,
   });
 
-  useAutoLoad(GrantedUsersTable, tabState, selected && !tabState.isLoaded() && !isDefaultTeam);
+  useAutoLoad(GrantedUsersTable, tabState, active);
 
   if (!selected) {
     return null;

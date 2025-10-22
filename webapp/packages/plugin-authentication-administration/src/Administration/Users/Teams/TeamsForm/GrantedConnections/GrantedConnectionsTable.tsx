@@ -39,8 +39,7 @@ export const GrantedConnectionsTable: TabContainerPanelComponent<TeamFormProps> 
   const { selected } = useTab(tabId);
 
   const driverLoader = useResource(GrantedConnectionsTable, DBDriverResource, CachedMapAllKey, { active: selected });
-
-  const projects = useResource(GrantedConnectionsTable, ProjectInfoResource, CachedMapAllKey);
+  const projects = useResource(GrantedConnectionsTable, ProjectInfoResource, CachedMapAllKey, { active: selected });
 
   const loaded = tabState.isLoaded();
   const key = ConnectionInfoProjectKey(...(projects.data as Array<ProjectInfo | undefined>).filter(isGlobalProject).map(project => project.id));

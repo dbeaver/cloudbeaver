@@ -17,19 +17,19 @@ import { useCreateGridReactiveValue, type IDataGridCellRenderer } from '@dbeaver
 
 import { DataGrid } from './DataGridLazy.js';
 import { useTableSelection } from './useTableSelection.js';
-import classes from './GrantManagementTable.module.css';
 import { TableSelectionContext } from './TableSelectionContext.js';
 import { TableRowSelect } from './TableRowSelect.js';
+import classes from './GrantManagementTable.module.css';
 
 interface IColumn {
   key: string;
   label: TLocalizationToken;
 }
 
-const DEFAULT_COLUMNS: IColumn[] = [
-  { key: 'select', label: '' },
-  { key: 'status', label: 'ui_granted' },
-];
+const SELECT_COLUMN = { key: 'select', label: '' };
+const STATUS_COLUMN = { key: 'status', label: 'ui_granted' };
+
+const DEFAULT_COLUMNS: IColumn[] = [SELECT_COLUMN, STATUS_COLUMN];
 
 export interface IGrantManagementTableProps<T> {
   items: T[];
@@ -105,11 +105,11 @@ export const GrantManagementTable = observer(function GrantManagementTable<T>({
       return null;
     }
 
-    if (column.key === 'select') {
+    if (column.key === SELECT_COLUMN.key) {
       return <TableRowSelect id={getItemId(row)} disabled={isManageable?.(row) === false} />;
     }
 
-    if (column.key === 'status') {
+    if (column.key === STATUS_COLUMN.key) {
       const granted = isGranted(row);
       return (
         <div
