@@ -61,7 +61,7 @@ public interface DBWServiceDataTransfer extends DBWService {
         @NotNull WebSQLResultsInfo webSQLResultsInfo,
         @NotNull WebSession webSession) throws DBWebException;
 
-    @WebAction(requireGlobalPermissions = RMConstants.GLOBAL_PERMISSION_DATA_EDITOR_EXPORT)
+    @WebAction(requireGlobalPermissions = RMConstants.PERMISSION_DATA_EDITOR_EXPORT)
     WebAsyncTaskInfo dataTransferExportDataFromResults(
         WebSQLContextInfo sqlContextInfo,
         String resultsId,
