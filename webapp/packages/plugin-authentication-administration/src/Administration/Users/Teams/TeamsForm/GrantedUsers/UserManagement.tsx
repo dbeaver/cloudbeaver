@@ -118,7 +118,7 @@ export const UserManagement: TabContainerPanelComponent<TeamFormProps> = observe
       return <span className="tw:flex tw:justify-center">-</span>;
     }
 
-    return user.userId;
+    return null;
   }
 
   const items = (usersLoader.data.filter(user => user?.enabled) as AdminUser[]).sort(compareUsers);

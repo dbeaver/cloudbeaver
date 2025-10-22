@@ -111,7 +111,11 @@ export const GrantManagementTable = observer(function GrantManagementTable<T>({
 
     if (column.key === 'status') {
       const granted = isGranted(row);
-      return <div className={`tw:m-auto tw:h-2 tw:w-2 tw:rounded-full tw:bg-[var(--${granted ? 'theme-positive' : 'theme-background'})]`} />;
+      return (
+        <div
+          className={clsx('tw:m-auto tw:h-2 tw:w-2 tw:rounded-full tw:bg-[var(--theme-background)]', granted && 'tw:bg-[var(--theme-positive)]')}
+        />
+      );
     }
 
     return getCell?.(row, column.key) ?? getItemId(row);

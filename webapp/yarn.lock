@@ -2630,6 +2630,7 @@ __metadata:
     "@cloudbeaver/core-ui": "workspace:*"
     "@cloudbeaver/core-utils": "workspace:*"
     "@cloudbeaver/plugin-connections": "workspace:*"
+    "@cloudbeaver/plugin-data-grid": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
     "@types/react": "npm:^19"
     mobx: "npm:^6"

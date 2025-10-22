@@ -86,7 +86,7 @@ export const ConnectionManagement: TabContainerPanelComponent<TeamFormProps> = o
       );
     }
 
-    return connection.id;
+    return null;
   }
 
   const isCloud = connectionsOrigins.some(connectionOrigin => isCloudConnection(connectionOrigin.origin));
