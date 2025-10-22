@@ -13,8 +13,8 @@ export default [
 
   ['plugin_data_viewer_conditional_formatting_parameter_color', 'Colore'],
   ['plugin_data_viewer_conditional_formatting_parameter_value', 'Valore della formula'],
-  ['plugin_data_viewer_conditional_formatting_parameter_font_weight', 'Gras'],
-  ['plugin_data_viewer_conditional_formatting_parameter_font_style', 'Italique'],
+  ['plugin_data_viewer_conditional_formatting_parameter_font_weight', 'Grassetto'],
+  ['plugin_data_viewer_conditional_formatting_parameter_font_style', 'Corsivo'],
   ['plugin_data_viewer_conditional_formatting_parameter_text_decoration', 'Decorazione del testo'],
   ['plugin_data_viewer_conditional_formatting_parameter_text_decoration_none', 'Nessuna'],
   ['plugin_data_viewer_conditional_formatting_parameter_text_decoration_underline', 'Sottolineato'],
