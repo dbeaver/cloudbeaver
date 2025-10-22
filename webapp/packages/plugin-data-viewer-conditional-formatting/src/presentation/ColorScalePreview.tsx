@@ -8,7 +8,7 @@
 
 import { memo } from 'react';
 import { clsx } from '@dbeaver/ui-kit';
-import { getColorMix } from '../getColorMix.js';
+import { getColorMix } from '../utils/getColorMix.js';
 
 interface Props extends React.PropsWithChildren {
   leftColor: string;

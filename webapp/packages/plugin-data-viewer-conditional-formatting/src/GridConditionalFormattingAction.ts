@@ -24,11 +24,14 @@ import { COLOR_SCALE_RULE, DEFAULT_FORMAT_RULES } from './formatting/DEFAULT_FOR
 import type { ICellFormatting } from './formatting/ICellFormatting.js';
 import { getValueForRuleParameter } from './formatting/getValueForRuleParameter.js';
 import { ALL_COLUMNS } from './formatting/ALL_COLUMNS.js';
-import type { IFormatRule, IFormatRuleMatchValueGetter } from './formatting/IFormatRule.js';
-import { clamp, getColorMix } from './getColorMix.js';
+import type { IFormatRuleMatchValueGetter } from './formatting/IFormatRule.js';
+import { getColorMix } from './utils/getColorMix.js';
 import { uuid } from '@cloudbeaver/core-utils';
 import { getSurfaceColor } from './getSurfaceColor.js';
 import { ThemeService } from '@cloudbeaver/core-theming';
+import { normalize } from './utils/normalize.js';
+import { resolveStopValue } from './utils/resolveStopValue.js';
+import { clamp } from './utils/clamp.js';
 
 @injectable(() => [
   IDatabaseDataSource,
@@ -138,17 +141,17 @@ export class GridConditionalFormattingAction<
         const dataMin = sortedValues[0] ?? 0;
         const dataMax = sortedValues[sortedValues.length - 1] ?? 0;
 
-        const minValue = this.resolveStopValue(ruleData, rule, 'min', dataMin, dataMax, sortedValues)!;
-        const maxValue = this.resolveStopValue(ruleData, rule, 'max', dataMin, dataMax, sortedValues)!;
-        const midValue = this.resolveStopValue(ruleData, rule, 'mid', dataMin, dataMax, sortedValues);
+        const minValue = resolveStopValue(ruleData, rule, 'min', dataMin, dataMax, sortedValues)!;
+        const maxValue = resolveStopValue(ruleData, rule, 'max', dataMin, dataMax, sortedValues)!;
+        const midValue = resolveStopValue(ruleData, rule, 'mid', dataMin, dataMax, sortedValues);
 
         const themeType = this.themeService.currentTheme?.type;
         const minColor = getValueForRuleParameter<string>(rule.parameters, ruleData.formatting, 'min-color', getSurfaceColor(themeType));
         const maxColor = getValueForRuleParameter<string>(rule.parameters, ruleData.formatting, 'max-color', '#00FF00');
 
         if (midValue === null) {
-          const t = normalize(cellValue, minValue, maxValue);
-          formatting.backgroundColor = getColorMix(minColor, maxColor, t);
+          const ratio = normalize(cellValue, minValue, maxValue);
+          formatting.backgroundColor = getColorMix(minColor, maxColor, ratio);
           formatted = true;
         } else {
           const midColor = getValueForRuleParameter<string>(rule.parameters, ruleData.formatting, 'mid-color', '#FFFF00');
@@ -173,6 +176,7 @@ export class GridConditionalFormattingAction<
       }
     }
 
+    // do not use Object.keys() it's slow
     return formatted ? formatting : null;
   }
 
@@ -189,63 +193,8 @@ export class GridConditionalFormattingAction<
     return cached;
   }
 
-  private resolveStopValue(
-    rule: IFormatRule,
-    state: IFormatRuleState,
-    kind: 'mid' | 'min' | 'max',
-    dataMin: number,
-    dataMax: number,
-    sorted: number[],
-  ): number | null {
-    const type = getValueForRuleParameter<'none' | 'min-value' | 'max-value' | 'number' | 'percent' | 'percentile'>(
-      state.parameters,
-      rule.parameters,
-      `${kind}-type`,
-    );
-
-    if (type === 'min-value') {
-      return dataMin;
-    }
-
-    if (type === 'max-value') {
-      return dataMax;
-    }
-
-    if (type === 'none') {
-      return null;
-    }
-
-    const value = parseFloat(getValueForRuleParameter<string>(state.parameters, rule.parameters, `${kind}-value`, '0'));
-    if (type === 'number') {
-      return value;
-    }
-    if (type === 'percent') {
-      return dataMin + (value / 100) * (dataMax - dataMin);
-    }
-    return this.getPercentile(sorted, value / 100);
-  }
-
-  private getPercentile(sorted: number[], percentile: number): number {
-    const n = sorted.length;
-    if (n === 1) {
-      return sorted[0]!;
-    }
-    const idx = (n - 1) * percentile;
-    const lo = Math.floor(idx);
-    const hi = Math.ceil(idx);
-    const t = idx - lo;
-    return (1 - t) * sorted[lo]! + t * sorted[hi]!;
-  }
-
   override updateResult(result: TResult, index: number): void {
     super.updateResult(result, index);
     this.sortedValueCache.clear();
   }
-}
-
-function normalize(x: number, a: number, b: number): number {
-  if (a === b) {
-    return 0.5;
-  }
-  return clamp((x - a) / (b - a), 0, 1);
 }
