@@ -44,7 +44,8 @@ public class CloudBeaverInstanceServer extends ApplicationInstanceServer<Applica
             return commandLine.executeCommandLineCommands(
                 this,
                 false,
-                false
+                false,
+                args
             );
         } catch (Exception e) {
             return new CLIProcessResult(CLIProcessResult.PostAction.ERROR, "Error executing command: " + e.getMessage());
