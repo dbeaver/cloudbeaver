@@ -21,19 +21,19 @@ import { TableSelectionContext } from './TableSelectionContext.js';
 import { TableRowSelect } from './TableRowSelect.js';
 import classes from './GrantManagementTable.module.css';
 
-interface IColumn {
+export interface IGrantManagementTableColumn {
   key: string;
   label: TLocalizationToken;
 }
 
-const SELECT_COLUMN = { key: 'select', label: '' };
-const STATUS_COLUMN = { key: 'status', label: 'ui_granted' };
+const SELECT_COLUMN: IGrantManagementTableColumn = { key: 'gmt_select', label: '' };
+const STATUS_COLUMN: IGrantManagementTableColumn = { key: 'gmt_status', label: 'ui_granted' };
 
-const DEFAULT_COLUMNS: IColumn[] = [SELECT_COLUMN, STATUS_COLUMN];
+const DEFAULT_COLUMNS: IGrantManagementTableColumn[] = [SELECT_COLUMN, STATUS_COLUMN];
 
 export interface IGrantManagementTableProps<T> {
   items: T[];
-  columns: IColumn[];
+  columns: IGrantManagementTableColumn[];
   getItemId: (item: T) => string;
   isGranted: (item: T) => boolean;
   isEdited: (item: T) => boolean;
@@ -118,7 +118,7 @@ export const GrantManagementTable = observer(function GrantManagementTable<T>({
       );
     }
 
-    return getCell?.(row, column.key) ?? getItemId(row);
+    return getCell?.(row, column.key) ?? null;
   }
 
   const cell = useCreateGridReactiveValue(_getCell, (onValueChange, rowIds, colIdx) => reaction(() => _getCell(rowIds, colIdx), onValueChange), [

@@ -23,15 +23,15 @@ import type { DatabaseConnectionCustomOptionsFragment } from '@cloudbeaver/core-
 import { Alert, StaticImage, useAutoLoad, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 import { isGlobalProject, ProjectInfoResource, type ProjectInfo } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
-import { GrantManagementTable } from '@cloudbeaver/plugin-data-grid';
+import { GrantManagementTable, type IGrantManagementTableColumn } from '@cloudbeaver/plugin-data-grid';
 
 import type { TeamFormProps } from '../TeamsAdministrationFormService.js';
 import type { GrantedConnectionsFormPart } from './GrantedConnectionsFormPart.js';
 
-const NAME_COLUMN = { key: 'name', label: 'connections_connection_name' };
-const ADDRESS_COLUMN = { key: 'address', label: 'connections_connection_address' };
+const NAME_COLUMN: IGrantManagementTableColumn = { key: 'name', label: 'connections_connection_name' };
+const ADDRESS_COLUMN: IGrantManagementTableColumn = { key: 'address', label: 'connections_connection_address' };
 
-const COLUMNS = [NAME_COLUMN, ADDRESS_COLUMN];
+const COLUMNS: IGrantManagementTableColumn[] = [NAME_COLUMN, ADDRESS_COLUMN];
 
 export const GrantedConnectionsTable: TabContainerPanelComponent<TeamFormProps> = observer(function GrantedConnectionsTable({ tabId, formState }) {
   const translate = useTranslate();

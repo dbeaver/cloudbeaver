@@ -14,14 +14,14 @@ import { getConnectionFormOptionsPart, type IConnectionFormProps } from '@cloudb
 import { CachedMapAllKey, CachedResourceOffsetPageListKey } from '@cloudbeaver/core-resource';
 import { TeamsResource, UsersResource, UsersResourceFilterKey, type AdminUser, type TeamInfo } from '@cloudbeaver/core-authentication';
 import { ConnectionInfoOriginResource, ConnectionInfoResource, createConnectionParam, isCloudConnection } from '@cloudbeaver/core-connections';
-import { GrantManagementTable } from '@cloudbeaver/plugin-data-grid';
+import { GrantManagementTable, type IGrantManagementTableColumn } from '@cloudbeaver/plugin-data-grid';
 
 import { getConnectionFormAccessPart } from './getConnectionFormAccessPart.js';
 
-const NAME_COLUMN = { key: 'name', label: 'connections_connection_access_user_or_team_name' };
-const DESCRIPTION_COLUMN = { key: 'description', label: 'connections_connection_description' };
+const NAME_COLUMN: IGrantManagementTableColumn = { key: 'name', label: 'connections_connection_access_user_or_team_name' };
+const DESCRIPTION_COLUMN: IGrantManagementTableColumn = { key: 'description', label: 'connections_connection_description' };
 
-const COLUMNS = [NAME_COLUMN, DESCRIPTION_COLUMN];
+const COLUMNS: IGrantManagementTableColumn[] = [NAME_COLUMN, DESCRIPTION_COLUMN];
 
 export const ConnectionAccessTable: TabContainerPanelComponent<IConnectionFormProps> = observer(function ConnectionAccessTable({ tabId, formState }) {
   const translate = useTranslate();

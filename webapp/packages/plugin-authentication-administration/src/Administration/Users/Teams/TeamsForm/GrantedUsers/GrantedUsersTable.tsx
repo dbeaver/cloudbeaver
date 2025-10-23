@@ -11,7 +11,7 @@ import { observer } from 'mobx-react-lite';
 import { useTab, useTabState, type TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 import { Alert, Checkbox, StaticImage, useAutoLoad, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 import { CachedResourceOffsetPageListKey } from '@cloudbeaver/core-resource';
-import { GrantManagementTable } from '@cloudbeaver/plugin-data-grid';
+import { GrantManagementTable, type IGrantManagementTableColumn } from '@cloudbeaver/plugin-data-grid';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import {
   compareUsers,
@@ -25,10 +25,13 @@ import {
 import type { TeamFormProps } from '../TeamsAdministrationFormService.js';
 import type { GrantedUsersFormPart } from './GrantedUsersFormPart.js';
 
-const USER_ID_COLUMN = { key: 'userId', label: 'administration_teams_team_granted_users_user_id' };
-const TEAM_ROLE_COLUMN = { key: 'teamRole', label: 'plugin_authentication_administration_team_user_team_role_supervisor' };
+const USER_ID_COLUMN: IGrantManagementTableColumn = { key: 'userId', label: 'administration_teams_team_granted_users_user_id' };
+const TEAM_ROLE_COLUMN: IGrantManagementTableColumn = {
+  key: 'teamRole',
+  label: 'plugin_authentication_administration_team_user_team_role_supervisor',
+};
 
-const COLUMNS = [USER_ID_COLUMN];
+const COLUMNS: IGrantManagementTableColumn[] = [USER_ID_COLUMN];
 
 export const GrantedUsersTable: TabContainerPanelComponent<TeamFormProps> = observer(function GrantedUsersTable({ tabId, formState }) {
   const translate = useTranslate();
