@@ -9,6 +9,8 @@
 .tabList {
   composes: theme-background-secondary theme-border-color-background theme-text-on-secondary from global;
   position: relative;
+  overflow: auto;
+
   &:before {
     content: '';
     position: absolute;
