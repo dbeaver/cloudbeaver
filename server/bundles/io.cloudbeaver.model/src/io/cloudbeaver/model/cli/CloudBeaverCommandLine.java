@@ -18,10 +18,7 @@ package io.cloudbeaver.model.cli;
 
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
-import org.jkiss.dbeaver.model.cli.ApplicationCommandLine;
-import org.jkiss.dbeaver.model.cli.ApplicationInstanceController;
-import org.jkiss.dbeaver.model.cli.CLIRunMeta;
-import org.jkiss.dbeaver.model.cli.CommandLineContext;
+import org.jkiss.dbeaver.model.cli.*;
 import org.jkiss.dbeaver.model.cli.model.CommandLineAuthenticator;
 import picocli.CommandLine;
 
@@ -41,6 +38,9 @@ public class CloudBeaverCommandLine extends ApplicationCommandLine<ApplicationIn
         @NotNull CommandLineContext context,
         @NotNull CLIRunMeta runMeta
     ) {
+        if (authenticator != null) {
+            context.setContextParameter(CLIConstants.CONTEXT_PARAM_AUTHENTICATOR, authenticator);
+        }
         return new CloudBeaverTopLevelCommand(applicationInstanceController, context, runMeta);
     }
 
