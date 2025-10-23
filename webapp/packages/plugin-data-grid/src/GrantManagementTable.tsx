@@ -61,6 +61,7 @@ export const GrantManagementTable = observer(function GrantManagementTable<T>({
   const translate = useTranslate();
   const styles = useS(classes);
 
+  const [sort, setSort] = useState<'asc' | 'desc' | null>('desc');
   const [filter, setFilter] = useState('');
   const deferredFilter = useDeferredValue(filter);
 
@@ -71,6 +72,24 @@ export const GrantManagementTable = observer(function GrantManagementTable<T>({
 
     return items;
   }, [isVisible, items, deferredFilter]);
+
+  const sortedItems = useMemo(() => {
+    if (sort) {
+      return visibleItems.slice().sort((a, b) => {
+        const aGranted = isGranted(a);
+        const bGranted = isGranted(b);
+
+        if (aGranted === bGranted) {
+          return 0;
+        }
+
+        const granted = sort === 'asc' ? aGranted : !aGranted;
+        return granted ? 1 : -1;
+      });
+    }
+
+    return visibleItems;
+  }, [visibleItems, sort, isGranted]);
 
   const keys = useMemo(() => {
     const filtered = isManageable ? visibleItems.filter(isManageable) : visibleItems;
@@ -98,7 +117,7 @@ export const GrantManagementTable = observer(function GrantManagementTable<T>({
   const _columns = useMemo(() => [...DEFAULT_COLUMNS, ...columns], [columns]);
 
   function _getCell(rowIdx: number, colIdx: number) {
-    const row = visibleItems[rowIdx] as T;
+    const row = sortedItems[rowIdx] as T;
     const column = _columns[colIdx];
 
     if (!row || !column) {
@@ -122,7 +141,7 @@ export const GrantManagementTable = observer(function GrantManagementTable<T>({
   }
 
   const cell = useCreateGridReactiveValue(_getCell, (onValueChange, rowIds, colIdx) => reaction(() => _getCell(rowIds, colIdx), onValueChange), [
-    visibleItems,
+    sortedItems,
     _columns,
     isGranted,
     isManageable,
@@ -131,7 +150,7 @@ export const GrantManagementTable = observer(function GrantManagementTable<T>({
   ]);
 
   function getCellElement(rowIdx: number, colIdx: number, props: React.HTMLAttributes<HTMLDivElement>, renderDefaultCell: IDataGridCellRenderer) {
-    const row = visibleItems[rowIdx];
+    const row = sortedItems[rowIdx];
 
     if (!row) {
       return null;
@@ -146,7 +165,7 @@ export const GrantManagementTable = observer(function GrantManagementTable<T>({
     getCellElement,
     (onValueChange, rowIdx, colIdx, props, renderDefaultCell) =>
       reaction(() => getCellElement(rowIdx, colIdx, props, renderDefaultCell), onValueChange),
-    [visibleItems, isEdited],
+    [sortedItems, isEdited],
   );
 
   const columnsCount = useCreateGridReactiveValue(
@@ -184,6 +203,36 @@ export const GrantManagementTable = observer(function GrantManagementTable<T>({
     translate,
   ]);
 
+  function getColumnSortable(colIdx: number) {
+    return colIdx === 1;
+  }
+
+  const columnSortable = useCreateGridReactiveValue(
+    getColumnSortable,
+    (onValueChange, colIdx) => reaction(() => getColumnSortable(colIdx), onValueChange),
+    [],
+  );
+
+  function getColumnSortingState(colIdx: number) {
+    if (colIdx === 1) {
+      return sort;
+    }
+
+    return null;
+  }
+
+  const columnSortingState = useCreateGridReactiveValue(
+    getColumnSortingState,
+    (onValueChange, colIdx) => reaction(() => getColumnSortingState(colIdx), onValueChange),
+    [sort],
+  );
+
+  function handleSort(colIdx: number, order: 'asc' | 'desc' | null) {
+    if (colIdx === 1) {
+      setSort(order);
+    }
+  }
+
   return (
     <div className="tw:flex-1 tw:flex tw:flex-col tw:gap-2 tw:max-w-max tw:overflow-auto">
       <div className="tw:flex tw:items-center tw:gap-6">
@@ -213,6 +262,9 @@ export const GrantManagementTable = observer(function GrantManagementTable<T>({
             headerText={headerText}
             cell={cell}
             cellElement={cellElement}
+            columnSortable={columnSortable}
+            columnSortingState={columnSortingState}
+            onColumnSort={handleSort}
           />
         </div>
       </TableSelectionContext>
