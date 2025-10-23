@@ -21,6 +21,7 @@ import org.eclipse.osgi.util.NLS;
 public class WebSQLMessages extends NLS {
     static final String BUNDLE_NAME = "io.cloudbeaver.service.sql.messages.WebSQLResources"; //$NON-NLS-1$
 
+    // TODO: add localizations
     public static String model_web_ai_query_confirmation_title;
     public static String model_web_ai_query_confirmation_message;
 

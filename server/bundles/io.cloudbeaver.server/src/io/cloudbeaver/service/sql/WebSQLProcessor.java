@@ -74,8 +74,6 @@ import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-import static io.cloudbeaver.service.sql.WebSQLConstants.TASK_CONFIRMATION_TIMEOUT_SECONDS;
-
 /**
  * Web SQL processor.
  */
@@ -1289,10 +1287,10 @@ public class WebSQLProcessor implements WebSessionProvider {
                         hasDangerousUpdates = true;
                         ConfirmationDescriptor descriptor = ConfirmationRegistry.getInstance()
                             .getConfirmation(ConfirmationConstants.CONFIRM_DANGER_SQL);
-                        title = descriptor.getTitle();
+                        title = descriptor.getLocalizedTitle(webSession.getLocale());
                         var entityMetadata = sqlQuery.getEntityMetadata(false);
                         message = MessageFormat.format(
-                            descriptor.getMessage(),
+                            descriptor.getLocalizedMessage(webSession.getLocale()),
                             sqlQuery.getType().name(),
                             entityMetadata != null ? entityMetadata.getEntityName() : null
                         );
@@ -1302,8 +1300,8 @@ public class WebSQLProcessor implements WebSessionProvider {
                         hasDropStatement = true;
                         ConfirmationDescriptor descriptor = ConfirmationRegistry.getInstance()
                             .getConfirmation(ConfirmationConstants.CONFIRM_DROP_SQL);
-                        title = descriptor.getTitle();
-                        message = descriptor.getMessage();
+                        title = descriptor.getLocalizedTitle(webSession.getLocale());
+                        message = descriptor.getLocalizedMessage(webSession.getLocale());
                         break;
                     }
                 }
@@ -1330,7 +1328,7 @@ public class WebSQLProcessor implements WebSessionProvider {
         webSession.addSessionEvent(createConfirmationEvent(asyncTask, query, title, message));
 
         try {
-            Boolean isConfirmed = confirmationFuture.get(TASK_CONFIRMATION_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+            Boolean isConfirmed = confirmationFuture.get(WebSQLConstants.TASK_CONFIRMATION_TIMEOUT_SECONDS, TimeUnit.SECONDS);
             return isConfirmed != null && isConfirmed;
         } catch (TimeoutException e) {
             throw new DBWebException("Query confirmation timeout");
