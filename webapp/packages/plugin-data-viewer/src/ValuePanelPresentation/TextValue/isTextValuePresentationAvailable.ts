@@ -9,9 +9,9 @@ import { isResultSetBinaryValue } from '@dbeaver/result-set-api';
 import { isResultSetBlobValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetBlobValue.js';
 import { ResultSetSelectAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction.js';
 import { ResultSetViewAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetViewAction.js';
-import { type ITextValuePanelProps } from './TextValuePresentationService.js';
+import type { IDataValuePanelProps } from '../../TableViewer/ValuePanel/DataValuePanelService.js';
 
-export function isBlobPresentationAvailable(context: ITextValuePanelProps | undefined): boolean {
+export function isBlobPresentationAvailable(context: IDataValuePanelProps | undefined): boolean {
   const source = context?.model.source;
   if (!context || !source?.hasResult(context.resultIndex)) {
     return true;

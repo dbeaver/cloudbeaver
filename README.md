@@ -24,6 +24,12 @@ You can see a live demo of CloudBeaver here: https://demo.cloudbeaver.io
 [Database access instructions](https://github.com/dbeaver/cloudbeaver/wiki/Demo-Server)
 
 ## Changelog
+
+### 25.2.3 2025-10-20
+- Added visualization for column reordering in the Data Editor;
+- Fixed the critical issue with duplicating the execution of queries executed by a shortcut in the SQL Editor;
+- Fixed the critical vulnerability (CVE-2025-61927) in the Happy DOM library. The library was updated to version 20.0.2.
+
 ### 25.2.2 2025-10-06
 - Replaced true/false text with intuitive checkboxes for boolean values in the metadata editor, making editing easier and faster;
 - Keyboard navigation was improved across the application. Additional shortcuts are available in the main info panel (top-right corner). To help you discover them faster, relevant keyboard shortcuts are also shown directly in the tooltips of Data Editor buttons;
