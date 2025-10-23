@@ -5,25 +5,23 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { useService } from '@cloudbeaver/core-di';
-import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
+import type { ITabInfo } from '@cloudbeaver/core-ui';
 import { isResultSetContentValue } from '@dbeaver/result-set-api';
 
 import { isResultSetBlobValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetBlobValue.js';
 import type { IResultSetValue } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction.js';
 import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel.js';
-import { ResultSetDataSource } from '../../ResultSet/ResultSetDataSource.js';
-import { TextValuePresentationService } from './TextValuePresentationService.js';
 import type { IDatabaseDataFormatAction } from '../../DatabaseDataModel/Actions/IDatabaseDataFormatAction.js';
 import type { IGridDataKey } from '../../DatabaseDataModel/Actions/Grid/IGridDataKey.js';
+import { isResultSetDataModel } from '../../ResultSet/isResultSetDataModel.js';
+import type { IDatabaseDataSource } from '../../DatabaseDataModel/IDatabaseDataSource.js';
+import type { IDataValuePanelOptions, IDataValuePanelProps } from '../../TableViewer/ValuePanel/DataValuePanelService.js';
 
-interface Args {
-  resultIndex: number;
-  model: IDatabaseDataModel<ResultSetDataSource>;
-  dataFormat: ResultDataFormat | null;
-  currentContentType: string | null;
+interface UseAutoContentTypeArgs {
+  model: IDatabaseDataModel<IDatabaseDataSource>;
   elementKey?: IGridDataKey;
-  formatAction: IDatabaseDataFormatAction;
+  formatAction?: IDatabaseDataFormatAction;
+  displayed: Array<ITabInfo<IDataValuePanelProps, IDataValuePanelOptions>>;
 }
 
 const DEFAULT_CONTENT_TYPE = 'text/plain';
@@ -55,24 +53,16 @@ function preprocessDefaultContentType(contentType: string | null | undefined) {
   return DEFAULT_CONTENT_TYPE;
 }
 
-export function useAutoContentType({ dataFormat, model, formatAction, resultIndex, currentContentType, elementKey }: Args) {
-  const textValuePresentationService = useService(TextValuePresentationService);
-  const activeTabs = textValuePresentationService.tabs.getDisplayed({
-    dataFormat: dataFormat,
-    model,
-    resultIndex: resultIndex,
-  });
+export function useAutoContentType({ displayed, formatAction, model, elementKey }: UseAutoContentTypeArgs): string | null {
+  const isAllTextType = displayed.every(tab => tab.options?.isTextPresentation);
+  const isAutoType = isAllTextType && formatAction && isResultSetDataModel(model);
+
+  if (!isAutoType) {
+    return null;
+  }
+
   const contentValue = elementKey ? formatAction.get(elementKey) : null;
   const contentValueType = getContentTypeFromResultSetValue(contentValue);
-  const defaultContentType = preprocessDefaultContentType(contentValueType);
 
-  if (currentContentType === null) {
-    currentContentType = defaultContentType;
-  }
-
-  if (activeTabs.length > 0 && !activeTabs.some(tab => tab.key === currentContentType)) {
-    currentContentType = activeTabs[0]!.key;
-  }
-
-  return currentContentType;
+  return preprocessDefaultContentType(contentValueType);
 }
