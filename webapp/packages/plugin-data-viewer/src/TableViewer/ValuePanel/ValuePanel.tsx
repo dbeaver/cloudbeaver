@@ -22,6 +22,9 @@ import ValuePanelTab from './shared/ValuePanelTab.module.css';
 import { IDatabaseDataSelectAction } from '../../DatabaseDataModel/Actions/IDatabaseDataSelectAction.js';
 import { IDatabaseDataResultAction } from '../../DatabaseDataModel/Actions/IDatabaseDataResultAction.js';
 import { IDatabaseDataMetadataAction } from '../../DatabaseDataModel/Actions/IDatabaseDataMetadataAction.js';
+import { IDatabaseDataFormatAction } from '../../DatabaseDataModel/Actions/IDatabaseDataFormatAction.js';
+import type { IGridDataKey } from '../../DatabaseDataModel/Actions/Grid/IGridDataKey.js';
+import { useContentType } from '../../ValuePanelPresentation/TextValue/useContentType.js';
 
 const tabListRegistry: StyleRegistry = [[TabStyles, { mode: 'append', styles: [ValuePanelTab] }]];
 
@@ -35,7 +38,7 @@ export const ValuePanel: DataPresentationComponent = observer(function ValuePane
   const selectAction = model.source.tryGetAction(resultIndex, IDatabaseDataSelectAction);
   const dataResultAction = model.source.tryGetAction(resultIndex, IDatabaseDataResultAction);
   const metadataAction = model.source.getAction(resultIndex, IDatabaseDataMetadataAction);
-  const activeElements = selectAction?.getActiveElements();
+  const activeElements = selectAction?.getActiveElements() as IGridDataKey[] | undefined;
   let elementKey: string | null = null;
   const style = useS(styles);
 
@@ -58,13 +61,14 @@ export const ValuePanel: DataPresentationComponent = observer(function ValuePane
   );
 
   const displayed = service.getDisplayed({ dataFormat, model, resultIndex });
-  let currentTabId = state.currentTabId;
 
-  const hasCurrentTabCells = currentTabId && displayed.some(tab => tab.key === currentTabId);
-
-  if (displayed.length > 0 && !hasCurrentTabCells) {
-    currentTabId = displayed[0]!.key;
-  }
+  const currentTabId = useContentType({
+    model: model as any,
+    currentContentType: state.currentTabId,
+    elementKey: activeElements && activeElements.length > 0 ? activeElements[0] : undefined,
+    formatAction: model.source.tryGetAction(resultIndex, IDatabaseDataFormatAction),
+    displayed,
+  });
 
   return (
     <TabsState
