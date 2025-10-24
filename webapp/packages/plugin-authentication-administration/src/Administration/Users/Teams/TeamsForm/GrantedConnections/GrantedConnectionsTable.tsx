@@ -77,9 +77,19 @@ export const GrantedConnectionsTable: TabContainerPanelComponent<TeamFormProps> 
     }
 
     if (colKey === ADDRESS_COLUMN.key) {
+      let value = '';
+
+      if (connection.host) {
+        value += connection.host;
+      }
+
+      if (connection.port) {
+        value += `:${connection.port}`;
+      }
+
       return (
-        <div className="tw:text-(--theme-text-hint-on-light)">
-          {connection.host}:{connection.port}
+        <div title={value} className="tw:text-(--theme-text-hint-on-light) tw:truncate">
+          {value}
         </div>
       );
     }

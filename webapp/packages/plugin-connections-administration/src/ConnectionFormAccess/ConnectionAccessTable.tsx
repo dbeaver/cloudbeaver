@@ -50,12 +50,17 @@ export const ConnectionAccessTable: TabContainerPanelComponent<IConnectionFormPr
     return null;
   }
 
-  const users = userLoader.data as AdminUser[];
-  const teams = teamLoader.data as TeamInfo[];
   const connectionInfo = connectionInfoResource.data;
   const originInfo = originInfoResource.data;
 
   const cloud = connectionInfo && originInfo?.origin ? isCloudConnection(originInfo.origin) : false;
+
+  if (cloud) {
+    return <Alert className="tw:h-max tw:m-4">{translate('cloud_connections_access_placeholder')}</Alert>;
+  }
+
+  const users = userLoader.data as AdminUser[];
+  const teams = teamLoader.data as TeamInfo[];
   const items: Array<AdminUser | TeamInfo> = [...users, ...teams];
 
   function isGranted(item: AdminUser | TeamInfo) {
@@ -112,7 +117,6 @@ export const ConnectionAccessTable: TabContainerPanelComponent<IConnectionFormPr
 
   return (
     <div className="tw:flex tw:flex-col tw:gap-4 tw:overflow-auto tw:p-4">
-      {cloud && <Alert>{translate('cloud_connections_access_placeholder')}</Alert>}
       <GrantManagementTable
         items={items}
         columns={COLUMNS}
