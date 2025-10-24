@@ -314,9 +314,13 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
             }
             for (String possibleUserId : List.of(userId, userId.toLowerCase())) {
                 if (isSubjectExists(possibleUserId)) {
-                    log.info("User already exist : " + possibleUserId);
-                    setUserAuthRole(connection, possibleUserId, authRole);
-                    enableUser(connection, possibleUserId, true, null, null);
+                    if (getSubjectType(possibleUserId) == SMSubjectType.team) {
+                        log.error("Cannot import user '%s': a team with this name already exists.".formatted(possibleUserId));
+                    } else {
+                        log.info("User already exist : " + possibleUserId);
+                        setUserAuthRole(connection, possibleUserId, authRole);
+                        enableUser(connection, possibleUserId, true, null, null);
+                    }
                     continue outer;
                 }
             }
