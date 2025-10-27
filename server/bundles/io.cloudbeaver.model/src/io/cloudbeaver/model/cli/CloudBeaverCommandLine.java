@@ -16,20 +16,41 @@
  */
 package io.cloudbeaver.model.cli;
 
-import org.jkiss.dbeaver.model.cli.ApplicationCommandLine;
-import org.jkiss.dbeaver.model.cli.ApplicationInstanceController;
+import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
+import org.jkiss.dbeaver.model.cli.*;
+import org.jkiss.dbeaver.model.cli.model.CommandLineAuthenticator;
+import picocli.CommandLine;
 
 public class CloudBeaverCommandLine extends ApplicationCommandLine<ApplicationInstanceController> {
-    private static CloudBeaverCommandLine INSTANCE = null;
 
-    private CloudBeaverCommandLine() {
+    @Nullable
+    private final CommandLineAuthenticator authenticator;
+
+    public CloudBeaverCommandLine(@Nullable CommandLineAuthenticator authenticator) {
         super();
+        this.authenticator = authenticator;
     }
 
-    public synchronized static CloudBeaverCommandLine getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new CloudBeaverCommandLine();
+    @Override
+    protected CloudBeaverTopLevelCommand createTopLevelCommand(
+        @Nullable ApplicationInstanceController applicationInstanceController,
+        @NotNull CommandLineContext context,
+        @NotNull CLIRunMeta runMeta
+    ) {
+        if (authenticator != null) {
+            context.setContextParameter(CLIConstants.CONTEXT_PARAM_AUTHENTICATOR, authenticator);
         }
-        return INSTANCE;
+        return new CloudBeaverTopLevelCommand(applicationInstanceController, context, runMeta);
+    }
+
+    @NotNull
+    @Override
+    protected CommandLine initCommandLine(
+        @Nullable ApplicationInstanceController applicationInstanceController,
+        @NotNull CommandLineContext context,
+        @NotNull CLIRunMeta runMeta
+    ) {
+        return super.initCommandLine(applicationInstanceController, context, runMeta);
     }
 }
