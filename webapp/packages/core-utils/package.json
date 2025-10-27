@@ -27,6 +27,7 @@
     "fast-deep-equal": "^3",
     "md5": "^2",
     "mobx": "^6",
+    "modern-screenshot": "^4",
     "tslib": "^2",
     "underscore": "^1",
     "uuid": "^13",
