@@ -20,6 +20,7 @@ package io.cloudbeaver.service.core.impl;
 import io.cloudbeaver.*;
 import io.cloudbeaver.model.*;
 import io.cloudbeaver.model.app.ServletApplication;
+import io.cloudbeaver.model.app.ServletSystemInformationCollector;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.registry.WebHandlerRegistry;
 import io.cloudbeaver.registry.WebSessionHandlerDescriptor;
@@ -89,10 +90,13 @@ public class WebServiceCore implements DBWServiceCore {
 
     @Override
     public WebPropertyInfo[] getSystemInformationProperties(@NotNull WebSession webSession) {
-        return WebCommonUtils.getObjectProperties(
-            webSession,
-            WebAppUtils.getWebApplication().getSystemInformationCollector()
-        );
+        ServletSystemInformationCollector<?> collector = WebAppUtils.getWebApplication().getSystemInformationCollector();
+        try {
+            collector.collectInternalDatabaseUseInformation();
+        } catch (DBException e) {
+            log.error("Error collecting system information", e);
+        }
+        return WebCommonUtils.getObjectProperties(webSession, collector);
     }
 
     @Override
