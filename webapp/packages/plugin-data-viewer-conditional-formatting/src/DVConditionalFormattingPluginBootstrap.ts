@@ -30,10 +30,11 @@ export class DVConditionalFormattingPluginBootstrap extends Bootstrap {
       title: 'plugin_data_viewer_conditional_formatting_presentation_title',
       icon: '/icons/conditional_formatting_sm.svg',
       hidden: (dataFormat, model, resultIndex) => {
-        if (!model.source.hasResult(resultIndex)) {
+        if (!model.source.hasResult(resultIndex) || true) {
           return true;
         }
 
+        //@ts-expect-error feature disabled for now
         const data = model.source.tryGetAction(resultIndex, IDatabaseDataResultAction, GridDataResultAction);
         return data?.empty ?? true;
       },
