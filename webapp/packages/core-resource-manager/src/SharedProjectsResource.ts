@@ -147,50 +147,29 @@ export class SharedProjectsResource extends CachedMapResource<string, SharedProj
     }
   }
 
-  getProjectSettings(projectId: string, subjectId?: string) {
-    if (subjectId) {
-      return this.graphQLService.sdk.getAdminUserProjectSettings({
-        projectId,
-        subjectId,
-      });
-    } else {
-      return this.graphQLService.sdk.getUserProjectSettings({
-        projectId,
-      });
-    }
+  getProjectSettings(projectId: string, subjectId: string) {
+    return this.graphQLService.sdk.getAdminUserProjectSettings({
+      projectId,
+      subjectId,
+    });
   }
 
-  async setProjectSettings(projectId: string, settings: Record<string, any>, subjectId?: string): Promise<void> {
-    if (subjectId) {
-      await this.graphQLService.sdk.adminAddUserProjectSettings({
-        projectId,
-        subjectId,
-        settings,
-      });
-    } else {
-      await this.graphQLService.sdk.addUserProjectSettings({
-        projectId,
-        settings,
-      });
-    }
+  async setProjectSettings(projectId: string, settings: Record<string, any>, subjectId: string): Promise<void> {
+    await this.graphQLService.sdk.adminAddUserProjectSettings({
+      projectId,
+      subjectId,
+      settings,
+    });
 
     this.markOutdated(projectId);
   }
 
-  async deleteProjectSettings(projectId: string, settingIds: string[], subjectId?: string): Promise<void> {
-    if (subjectId) {
-      await this.graphQLService.sdk.adminDeleteUserProjectSettings({
-        projectId,
-        subjectId,
-        settingIds,
-      });
-    } else {
-      await this.graphQLService.sdk.deleteUserProjectSettings({
-        projectId,
-        settingIds,
-      });
-    }
-
+  async deleteProjectSettings(projectId: string, settingIds: string[], subjectId: string): Promise<void> {
+    await this.graphQLService.sdk.adminDeleteUserProjectSettings({
+      projectId,
+      subjectId,
+      settingIds,
+    });
     this.markOutdated(projectId);
   }
 
