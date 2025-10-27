@@ -1,6 +1,7 @@
 package io.cloudbeaver.model;
 
 import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.DBPObject;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.model.connection.DBPDriverConstants;
@@ -52,35 +53,35 @@ public class WebExpertSettingsProperties implements DBPObject {
 
     public static class KeepAliveIntervalFieldValidator implements IPropertyValueValidator<WebExpertSettingsProperties, Object> {
         @Override
-        public boolean isValidValue(WebExpertSettingsProperties object, Object value) throws IllegalArgumentException {
+        public boolean isValidValue(@NotNull WebExpertSettingsProperties object, @Nullable Object value) throws IllegalArgumentException {
             return CommonUtils.toBoolean(!object.driver.isEmbedded(), true);
         }
     }
 
     public static class AutoCommitFieldValidator implements IPropertyValueValidator<WebExpertSettingsProperties, Object> {
         @Override
-        public boolean isValidValue(WebExpertSettingsProperties object, Object value) throws IllegalArgumentException {
+        public boolean isValidValue(@NotNull WebExpertSettingsProperties object, @Nullable Object value) throws IllegalArgumentException {
             return CommonUtils.toBoolean(object.driver.getDriverParameter(DBPDriverConstants.PARAM_SUPPORTS_TRANSACTIONS), true);
         }
     }
 
     public static class ReadOnlyFieldValidator implements IPropertyValueValidator<WebExpertSettingsProperties, Object> {
         @Override
-        public boolean isValidValue(WebExpertSettingsProperties object, Object value) throws IllegalArgumentException {
+        public boolean isValidValue(@NotNull WebExpertSettingsProperties object, @Nullable Object value) throws IllegalArgumentException {
             return CommonUtils.toBoolean(object.driver.getDriverParameter(DBPDriverConstants.PARAM_SUPPORTS_READ_ONLY_MODE), true);
         }
     }
 
     public static class DefaultCatalogFieldVisibleValidator implements IPropertyValueValidator<WebExpertSettingsProperties, Object> {
         @Override
-        public boolean isValidValue(WebExpertSettingsProperties object, Object value) throws IllegalArgumentException {
+        public boolean isValidValue(@NotNull WebExpertSettingsProperties object, @Nullable Object value) throws IllegalArgumentException {
             return CommonUtils.toBoolean(object.driver.getDriverParameter(DBPDriverConstants.PARAM_SUPPORTS_CATALOG_SELECTION), true);
         }
     }
 
     public static class DefaultSchemaFieldVisibleValidator implements IPropertyValueValidator<WebExpertSettingsProperties, Object> {
         @Override
-        public boolean isValidValue(WebExpertSettingsProperties object, Object value) throws IllegalArgumentException {
+        public boolean isValidValue(@NotNull WebExpertSettingsProperties object, @Nullable Object value) throws IllegalArgumentException {
             return CommonUtils.toBoolean(object.driver.getDriverParameter(DBPDriverConstants.PARAM_SUPPORTS_SCHEMA_SELECTION), true);
         }
     }

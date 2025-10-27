@@ -2230,6 +2230,7 @@ __metadata:
     fast-deep-equal: "npm:^3"
     md5: "npm:^2"
     mobx: "npm:^6"
+    modern-screenshot: "npm:^4"
     rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
@@ -12354,13 +12355,13 @@ __metadata:
   linkType: hard
 
 "happy-dom@npm:^20":
-  version: 20.0.0
-  resolution: "happy-dom@npm:20.0.0"
+  version: 20.0.2
+  resolution: "happy-dom@npm:20.0.2"
   dependencies:
     "@types/node": "npm:^20.0.0"
     "@types/whatwg-mimetype": "npm:^3.0.2"
     whatwg-mimetype: "npm:^3.0.0"
-  checksum: 10c0/a205da48f3c98ae2b2bcb73c8f673fea66296cd2fc081065fcd5fa42b4411546c1b8f7c26ef2ca5adf0bdd1ced9aff4f429a3a4f5e6bce7724eec2747bef1a49
+  checksum: 10c0/d4449e087cb7566fb493f9e6ee99221c64177732bf944ec3e2f464033107832c637e201e3e78e81a8b35871d41aa510806f3f1a2f18b924fc6120226f337a845
   languageName: node
   linkType: hard
 
@@ -15157,6 +15158,13 @@ __metadata:
   version: 6.13.7
   resolution: "mobx@npm:6.13.7"
   checksum: 10c0/3ae7f8c586a48a0a2b9b4900871455bc93d3878bdff70b6820ba830c6b883d7f8a0222aa2a0fec7201d25f38a19cb340e62a18a3939182a676dc35d857f35dd6
+  languageName: node
+  linkType: hard
+
+"modern-screenshot@npm:^4":
+  version: 4.6.6
+  resolution: "modern-screenshot@npm:4.6.6"
+  checksum: 10c0/0632cdd89db1a7c0b2d8e78d3e05daca77a62d14ee172f6480da3b2de97fd37938c6ed71041271014a601fe2bcb470d01a78c10456ef7ac59a8674b82c64d0a1
   languageName: node
   linkType: hard
 

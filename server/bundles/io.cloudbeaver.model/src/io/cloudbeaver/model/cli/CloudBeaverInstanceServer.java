@@ -16,7 +16,7 @@
  */
 package io.cloudbeaver.model.cli;
 
-import org.apache.commons.cli.CommandLine;
+
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.cli.ApplicationInstanceController;
 import org.jkiss.dbeaver.model.cli.ApplicationInstanceServer;
@@ -25,20 +25,27 @@ import org.jkiss.dbeaver.model.cli.CLIProcessResult;
 import java.io.IOException;
 
 public class CloudBeaverInstanceServer extends ApplicationInstanceServer<ApplicationInstanceController> {
+    private final CloudBeaverCommandLine commandLine;
+
     public CloudBeaverInstanceServer() throws IOException {
         super(ApplicationInstanceController.class);
+        this.commandLine = new CloudBeaverCommandLine(null);
+    }
+
+    protected CloudBeaverInstanceServer(@NotNull CloudBeaverCommandLine commandLine) throws IOException {
+        super(ApplicationInstanceController.class);
+        this.commandLine = commandLine;
     }
 
     @NotNull
     @Override
     public CLIProcessResult handleCommandLine(@NotNull String[] args) {
-        CommandLine cmd = CloudBeaverCommandLine.getInstance().getCommandLine(args);
         try {
-            return CloudBeaverCommandLine.getInstance().executeCommandLineCommands(
-                cmd,
+            return commandLine.executeCommandLineCommands(
                 this,
                 false,
-                false
+                false,
+                args
             );
         } catch (Exception e) {
             return new CLIProcessResult(CLIProcessResult.PostAction.ERROR, "Error executing command: " + e.getMessage());
