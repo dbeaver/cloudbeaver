@@ -19,6 +19,8 @@ export { default as ConfirmationDialogStyles } from './CommonDialog/Confirmation
 export * from './CommonDialog/ConfirmationDialogDelete.js';
 export * from './CommonDialog/RenameDialog.js';
 export * from './CommonDialog/DialogsPortal.js';
+export * from './ExportImageDialog/ExportImageDialogLazy.js';
+export * from './ExportImageDialog/ExportImageFormats.js';
 
 export * from './ErrorDetailsDialog/ErrorDetailsDialog.js';
 
