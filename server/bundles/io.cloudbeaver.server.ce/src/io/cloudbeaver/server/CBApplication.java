@@ -314,11 +314,6 @@ public abstract class CBApplication<T extends CBServerConfig>
             }
             grantPermissionsToConnections();
         }
-        try {
-            this.systemInformationCollector.collectInternalDatabaseUseInformation();
-        } catch (DBException e) {
-            log.error("Error collecting system information", e);
-        }
 
         eventController.scheduleCheckJob();
 
