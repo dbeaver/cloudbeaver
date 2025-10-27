@@ -345,7 +345,7 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
         // Perform any checks before action call
         protected void beforeWebActionCall(WebAction webAction, Method method, Object[] args) throws DBException {
 
-            HttpServletRequest request = this.env.getGraphQlContext().get("request");
+            HttpServletRequest request = GraphQLEndpoint.getServletRequestOrThrow(this.env);
             String sessionId = GraphQLLoggerUtil.getSmSessionId(request);
             String userId = GraphQLLoggerUtil.getUserId(request);
             String loggerMessage = GraphQLLoggerUtil.buildLoggerMessage(sessionId, userId, method, args);

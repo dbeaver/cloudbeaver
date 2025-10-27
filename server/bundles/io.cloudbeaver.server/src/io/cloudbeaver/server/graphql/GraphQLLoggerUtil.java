@@ -24,16 +24,16 @@ import io.cloudbeaver.server.WebAppUtils;
 import io.cloudbeaver.server.WebApplication;
 import jakarta.servlet.http.HttpServletRequest;
 import org.jkiss.code.Nullable;
+import org.jkiss.dbeaver.Log;
 import org.jkiss.utils.CommonUtils;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
-import java.util.*;
+import java.util.StringJoiner;
 
 public class GraphQLLoggerUtil {
 
+    private static final Log log = Log.getLog(GraphQLLoggerUtil.class);
     public static final String LOG_API_GRAPHQL_DEBUG_PARAMETER = "log.api.graphql.debug";
     public static final Gson GSON = new GsonBuilder().create();
     public static final String MASK_STRING = "****";
@@ -110,12 +110,13 @@ public class GraphQLLoggerUtil {
             }
 
             if (value != null && !isSimple(value.getClass())) {
+                String stringValue;
                 try {
-                    String json = GSON.toJson(value);
-                    joiner.add(json);
+                    stringValue = GSON.toJson(value);
                 } catch (Exception e) {
-                    // ignore
+                    stringValue = value.toString();
                 }
+                joiner.add(stringValue);
             } else {
                 joiner.add(String.valueOf(value));
             }
@@ -129,22 +130,6 @@ public class GraphQLLoggerUtil {
             || CharSequence.class.isAssignableFrom(cls)
             || Boolean.class.equals(cls)
             || Enum.class.isAssignableFrom(cls);
-    }
-
-    private static List<Field> getAllInstanceFields(Class<?> type) {
-        List<Field> out = new ArrayList<>();
-        Set<String> seen = new HashSet<>();
-
-        for (Class<?> c = type; c != null && c != Object.class; c = c.getSuperclass()) {
-            for (Field f : c.getDeclaredFields()) {
-                int m = f.getModifiers();
-                if (Modifier.isStatic(m) || f.isSynthetic()) continue;
-                if (seen.add(f.getName())) {
-                    out.add(f);
-                }
-            }
-        }
-        return out;
     }
 
 }
