@@ -16,6 +16,8 @@
  */
 package io.cloudbeaver.server.graphql;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import io.cloudbeaver.WebParameterSecure;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.WebAppUtils;
@@ -33,6 +35,8 @@ import java.util.*;
 public class GraphQLLoggerUtil {
 
     public static final String LOG_API_GRAPHQL_DEBUG_PARAMETER = "log.api.graphql.debug";
+    public static final Gson GSON = new GsonBuilder().create();
+    public static final String MASK_STRING = "****";
 
     public static String getUserId(HttpServletRequest request) {
         WebSession session = getWebSession(request);
@@ -98,7 +102,7 @@ public class GraphQLLoggerUtil {
                 continue;
             }
             if (params[i].isAnnotationPresent(WebParameterSecure.class)) {
-                joiner.add("****");
+                joiner.add(MASK_STRING);
                 continue;
             }
             if (value instanceof String sv && CommonUtils.isEmpty(sv)) {
@@ -106,27 +110,12 @@ public class GraphQLLoggerUtil {
             }
 
             if (value != null && !isSimple(value.getClass())) {
-                StringJoiner fields = new StringJoiner(", ");
-                for (Field f : getAllInstanceFields(value.getClass())) {
-                    boolean acc = f.canAccess(value);
-                    if (!acc) {
-                        try {
-                            acc = f.trySetAccessible();
-                        } catch (Exception ignore) {
-                            acc = false;
-                        }
-                    }
-                    if (!acc) {
-                        continue;
-                    }
-
-                    try {
-                        fields.add(f.isAnnotationPresent(WebParameterSecure.class) ? "****" : String.valueOf(f.get(value)));
-                    } catch (IllegalAccessException e) {
-                        fields.add("<err>");
-                    }
+                try {
+                    String json = GSON.toJson(value);
+                    joiner.add(json);
+                } catch (Exception e) {
+                    // ignore
                 }
-                joiner.add("{" + fields + "}");
             } else {
                 joiner.add(String.valueOf(value));
             }
