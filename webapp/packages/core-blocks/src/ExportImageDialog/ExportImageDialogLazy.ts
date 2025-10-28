@@ -6,18 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-.coloredContainer {
-  flex: 1;
-  height: 100%;
-  box-sizing: border-box;
-}
+import { importLazyComponent } from '../importLazyComponent.js';
 
-.group {
-  max-height: 100%;
-  position: relative;
-  overflow: auto !important;
-}
-
-.loader {
-  z-index: 2;
-}
+export const ExportImageDialog = importLazyComponent(() => import('./ExportImageDialog.js').then(m => m.ExportImageDialog));
