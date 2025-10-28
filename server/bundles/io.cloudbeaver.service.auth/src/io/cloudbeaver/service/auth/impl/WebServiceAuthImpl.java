@@ -128,7 +128,6 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
             WebAsyncTaskInfo authTask = webSession.createAsyncTask(providerId + " authentication");
             authTask.setRunning(true);
             authTask.setJob(job);
-            // cancels a task if it takes too long
             new WebAsyncAuthTimeoutJob(webSession, authTask, job).schedule(DEFAULT_TIMEOUT_MILLISECONDS);
             return new WebAsyncAuthStatus(smAuthInfo.getRedirectUrl(), authTask);
         } catch (SMTooManySessionsException e) {

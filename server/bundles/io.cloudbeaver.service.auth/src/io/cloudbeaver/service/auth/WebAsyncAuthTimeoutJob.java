@@ -25,7 +25,6 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.jkiss.code.NotNull;
 
 public class WebAsyncAuthTimeoutJob extends Job {
-
     @NotNull
     private final WebSession webSession;
     @NotNull
@@ -41,8 +40,9 @@ public class WebAsyncAuthTimeoutJob extends Job {
     }
 
 
+    @NotNull
     @Override
-    protected IStatus run(IProgressMonitor monitor) {
+    protected IStatus run(@NotNull IProgressMonitor monitor) {
         if (asyncInfo.isRunning()) {
             authJob.cancelJob(webSession, asyncInfo, "Authentication timeout exceeded");
         }
