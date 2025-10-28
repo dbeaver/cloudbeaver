@@ -499,7 +499,7 @@ public class WebServiceRM implements DBWServiceRM {
     throws DBWebException {
         try {
             validateProject(webSession, projectId);
-            //todo accumulate settings from user and team
+            //todo accumulate settings from user and team. For now just return team settings
             return webSession.getSecurityController().getObjectSettings(
                 projectId,
                 SMObjectType.project,
