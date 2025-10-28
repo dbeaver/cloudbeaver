@@ -6,7 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-.staticImage {
-  display: flex;
-  width: 24px;
-}
+import { importLazyComponent } from '@cloudbeaver/core-blocks';
+
+export const GrantManagementTable = importLazyComponent(() => import('./GrantManagementTable.js').then(m => m.GrantManagementTable));
