@@ -125,14 +125,14 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
       delete state.networkHandlersConfig;
     }
 
-    const result = await this.commonDialogService.open(ConnectionAuthenticationDialogLoader, {
+    const { status } = await this.commonDialogService.open(ConnectionAuthenticationDialogLoader, {
       config: state,
       authModelId: state.authModelId ?? null,
       networkHandlers: this.formState.state.requiredNetworkHandlersIds,
       projectId: this.formState.state.projectId,
     });
 
-    if (result === DialogueStateResult.Rejected) {
+    if (status === DialogueStateResult.Rejected) {
       return null;
     }
 

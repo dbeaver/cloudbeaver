@@ -465,13 +465,13 @@ export class MenuBootstrap extends Bootstrap {
 
     const prevScript = dataSource.script.trim();
     if (prevScript) {
-      const result = await this.commonDialogService.open(ScriptImportDialog, null);
+      const { status, result } = await this.commonDialogService.open(ScriptImportDialog, null);
 
-      if (result === DialogueStateResult.Rejected) {
+      if (status === DialogueStateResult.Rejected) {
         return;
       }
 
-      if (result !== DialogueStateResult.Resolved && result) {
+      if (result) {
         this.downloadSql(state);
       }
     }

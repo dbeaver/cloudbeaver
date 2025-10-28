@@ -15,7 +15,7 @@ import { getConnectionFormAccessPart } from './getConnectionFormAccessPart.js';
 import { getCachedDataResourceLoaderState, getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
 
-const ConnectionFormAccess = importLazyComponent(() => import('./ConnectionFormAccess.js').then(m => m.ConnectionFormAccess));
+const ConnectionAccessTable = importLazyComponent(() => import('./ConnectionAccessTable.js').then(m => m.ConnectionAccessTable));
 
 @injectable(() => [ConnectionFormService, AdministrationScreenService, SessionPermissionsResource, PermissionsService, ProjectInfoResource])
 export class ConnectionFormAccessTabBootstrap extends Bootstrap {
@@ -49,7 +49,7 @@ export class ConnectionFormAccessTabBootstrap extends Bootstrap {
 
         return !optionsPart?.state.driverId || this.administrationScreenService.isConfigurationMode;
       },
-      panel: () => ConnectionFormAccess,
+      panel: () => ConnectionAccessTable,
     });
   }
 
