@@ -35,7 +35,16 @@
       "path": "../core-sdk"
     },
     {
+      "path": "../core-settings"
+    },
+    {
+      "path": "../core-utils"
+    },
+    {
       "path": "../plugin-codemirror6"
+    },
+    {
+      "path": "../plugin-sql-editor"
     },
     {
       "path": "../plugin-sql-editor-new"
