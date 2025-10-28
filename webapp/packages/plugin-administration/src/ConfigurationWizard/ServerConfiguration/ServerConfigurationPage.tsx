@@ -78,12 +78,12 @@ export const ServerConfigurationPage: AdministrationItemContentComponent = obser
     }
 
     if (changed) {
-      const result = await commonDialogService.open(ConfirmationDialog, {
+      const { status } = await commonDialogService.open(ConfirmationDialog, {
         title: 'administration_server_configuration_save_confirmation_title',
         message: 'administration_server_configuration_save_confirmation_message',
       });
 
-      if (result === DialogueStateResult.Rejected) {
+      if (status === DialogueStateResult.Rejected) {
         return;
       }
     }

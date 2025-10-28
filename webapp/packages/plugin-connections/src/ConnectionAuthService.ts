@@ -113,13 +113,13 @@ export class ConnectionAuthService {
       .map(handler => handler.id);
 
     if (connectionAuthProperties.authNeeded || (connectionAuthProperties.credentialsSaved && resetCredentials) || networkHandlers.length > 0) {
-      const result = await this.commonDialogService.open(DatabaseAuthDialog, {
+      const { status } = await this.commonDialogService.open(DatabaseAuthDialog, {
         connection: key,
         networkHandlers,
         resetCredentials,
       });
 
-      if (resetCredentials && isConnectedInitially && result === DialogueStateResult.Rejected) {
+      if (resetCredentials && isConnectedInitially && status === DialogueStateResult.Rejected) {
         await this.connectionInfoResource.init(key);
       }
     } else {
