@@ -4772,6 +4772,18 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@dbeaver/react-translate@workspace:^, @dbeaver/react-translate@workspace:common-react/@dbeaver/react-translate":
+  version: 0.0.0-use.local
+  resolution: "@dbeaver/react-translate@workspace:common-react/@dbeaver/react-translate"
+  dependencies:
+    "@dbeaver/tsconfig": "workspace:^"
+    "@types/react": "npm:^19"
+    react: "npm:^19"
+    rimraf: "npm:^6"
+    typescript: "npm:^5"
+  languageName: unknown
+  linkType: soft
+
 "@dbeaver/result-set-api@workspace:*, @dbeaver/result-set-api@workspace:common-typescript/@dbeaver/result-set-api":
   version: 0.0.0-use.local
   resolution: "@dbeaver/result-set-api@workspace:common-typescript/@dbeaver/result-set-api"
@@ -4798,6 +4810,7 @@ __metadata:
   resolution: "@dbeaver/ui-kit@workspace:common-react/@dbeaver/ui-kit"
   dependencies:
     "@ariakit/react": "npm:^0"
+    "@dbeaver/react-translate": "workspace:^"
     "@dbeaver/tsconfig": "workspace:^"
     "@ladle/react": "npm:^5"
     "@tailwindcss/vite": "npm:4.0.7"

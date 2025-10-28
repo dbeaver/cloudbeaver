@@ -11,7 +11,7 @@ export default [
   ['plugin_data_viewer_conditional_formatting_select_rule', '选择规则'],
   ['plugin_data_viewer_conditional_formatting_format_cells_if', '格式化单元格如果...'],
 
-  ['plugin_data_viewer_conditional_formatting_parameter_color', '颜色'],
+  ['plugin_data_viewer_conditional_formatting_parameter_background_color', '颜色'],
   ['plugin_data_viewer_conditional_formatting_parameter_value', '公式值'],
   ['plugin_data_viewer_conditional_formatting_parameter_font_weight', '加粗'],
   ['plugin_data_viewer_conditional_formatting_parameter_font_style', '斜体'],

@@ -26,14 +26,16 @@ export const FormattingPreview = observer<Props>(function FormattingPreview({ ru
   const themeService = useService(ThemeService);
   const themeType = themeService.currentTheme?.type;
   const surfaceColor = getSurfaceColor(themeType);
+  let color: string | undefined;
   let leftColor: string;
   let midColor: string | undefined;
   let rightColor: string;
   let fontStyle: 'normal' | 'italic' | undefined;
   let fontWeight: 'normal' | 'bold' | undefined;
-  let textDecoration: 'none' | 'underline' | 'overline' | 'line-through' | undefined;
+  let textDecoration: 'none' | 'underline' | 'overline' | 'line-through' | string | undefined;
 
   if (state.type === 'single') {
+    color = getValueForRuleParameter(state.parameters, rule.formatting, 'text-color', 'inherit');
     leftColor = midColor = rightColor = getValueForRuleParameter(state.parameters, rule.formatting, 'background-color', '#000000');
     fontStyle = getValueForRuleParameter<boolean>(state.parameters, rule.formatting, 'font-style') ? 'italic' : undefined;
     fontWeight = getValueForRuleParameter<boolean>(state.parameters, rule.formatting, 'font-weight') ? 'bold' : undefined;
@@ -50,6 +52,7 @@ export const FormattingPreview = observer<Props>(function FormattingPreview({ ru
 
   return (
     <ColorScalePreview
+      color={color}
       leftColor={leftColor}
       midColor={midColor}
       rightColor={rightColor}

@@ -11,7 +11,7 @@ export default [
   ['plugin_data_viewer_conditional_formatting_select_rule', 'Выберите правило'],
   ['plugin_data_viewer_conditional_formatting_format_cells_if', 'Форматировать ячейки, если...'],
 
-  ['plugin_data_viewer_conditional_formatting_parameter_color', 'Цвет'],
+  ['plugin_data_viewer_conditional_formatting_parameter_background_color', 'Цвет'],
   ['plugin_data_viewer_conditional_formatting_parameter_value', 'Значение формулы'],
   ['plugin_data_viewer_conditional_formatting_parameter_font_weight', 'Жирный'],
   ['plugin_data_viewer_conditional_formatting_parameter_font_style', 'Курсив'],

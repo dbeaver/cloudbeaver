@@ -11,7 +11,7 @@ export default [
   ['plugin_data_viewer_conditional_formatting_select_rule', 'Sélectionner une règle'],
   ['plugin_data_viewer_conditional_formatting_format_cells_if', 'Formater les cellules si...'],
 
-  ['plugin_data_viewer_conditional_formatting_parameter_color', 'Couleur'],
+  ['plugin_data_viewer_conditional_formatting_parameter_background_color', 'Couleur'],
   ['plugin_data_viewer_conditional_formatting_parameter_value', 'Valeur de la formule'],
   ['plugin_data_viewer_conditional_formatting_parameter_font_weight', 'Gras'],
   ['plugin_data_viewer_conditional_formatting_parameter_font_style', 'Italique'],
