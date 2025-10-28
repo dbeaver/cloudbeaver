@@ -223,12 +223,12 @@ export const ReactCodemirror = observer<IReactCodeMirrorProps, IEditorRef>(
         }
 
         if (transaction.changes) {
-          view.dispatch({ changes: transaction.changes });
+          view.dispatch({ changes: transaction.changes, annotations: transaction.annotations });
           isInitialScriptOpening.current = false;
         }
 
         if (transaction.selection) {
-          view.dispatch({ selection: transaction.selection });
+          view.dispatch({ selection: transaction.selection, annotations: transaction.annotations });
         }
       }
     });

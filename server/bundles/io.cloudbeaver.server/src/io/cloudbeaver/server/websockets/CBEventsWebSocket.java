@@ -25,10 +25,7 @@ import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.websocket.event.WSClientEvent;
 import org.jkiss.dbeaver.model.websocket.event.WSEvent;
-import org.jkiss.dbeaver.model.websocket.event.client.WSSessionPingClientEvent;
-import org.jkiss.dbeaver.model.websocket.event.client.WSSubscribeOnTopicClientEvent;
-import org.jkiss.dbeaver.model.websocket.event.client.WSUnsubscribeFromTopicClientEvent;
-import org.jkiss.dbeaver.model.websocket.event.client.WSUpdateActiveProjectsClientEvent;
+import org.jkiss.dbeaver.model.websocket.event.client.*;
 import org.jkiss.dbeaver.model.websocket.event.session.WSAccessTokenExpiredEvent;
 import org.jkiss.dbeaver.model.websocket.event.session.WSSocketConnectedEvent;
 import org.jkiss.utils.CommonUtils;
@@ -107,6 +104,17 @@ public class CBEventsWebSocket extends CBAbstractWebSocket implements CBWebSessi
                 case WSSessionPingClientEvent.ID: {
                     if (webSession instanceof WebSession session) {
                         session.updateInfo(true);
+                    }
+                    break;
+                }
+                case WSSessionTaskConfirmationEvent.ID: {
+                    if (webSession instanceof WebSession session) {
+                        var taskConfirmationEvent = (WSSessionTaskConfirmationEvent) clientEvent;
+                        session.handleTaskConfirmation(
+                            taskConfirmationEvent.getTaskId(),
+                            taskConfirmationEvent.isConfirmed(),
+                            taskConfirmationEvent.isSkipConfirmations()
+                        );
                     }
                     break;
                 }
