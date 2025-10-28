@@ -73,7 +73,7 @@ export const UserFormOriginInfoPanel: TabContainerPanelComponent<UserFormProps> 
   }
 
   async function deleteHandler() {
-    const result = await commonDialogService.open(ConfirmationDialog, {
+    const { status } = await commonDialogService.open(ConfirmationDialog, {
       title: 'ui_data_delete_confirmation',
       message: translate('authentication_administration_user_delete_credentials_confirmation_message', undefined, {
         originName: origin?.displayName,
@@ -82,7 +82,7 @@ export const UserFormOriginInfoPanel: TabContainerPanelComponent<UserFormProps> 
       confirmActionText: 'ui_delete',
     });
 
-    if (result !== DialogueStateResult.Rejected) {
+    if (status !== DialogueStateResult.Rejected) {
       try {
         await userInfoLoader.resource.deleteCredentials(state.userId!, origin!.type!);
         notificationService.logSuccess({ title: 'authentication_administration_user_delete_credentials_success' });

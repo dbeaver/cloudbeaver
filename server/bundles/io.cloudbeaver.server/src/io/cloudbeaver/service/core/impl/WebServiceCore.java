@@ -339,6 +339,7 @@ public class WebServiceCore implements DBWServiceCore {
             if (e instanceof DBCConnectException) {
                 Throwable rootCause = CommonUtils.getRootCause(e);
                 if (rootCause instanceof ClassNotFoundException) {
+                    log.error(e);
                     throwDriverNotFoundException(dataSourceContainer);
                 }
             }
@@ -554,6 +555,7 @@ public class WebServiceCore implements DBWServiceCore {
                 if (ct.getConnectError() instanceof DBCConnectException error) {
                     Throwable rootCause = CommonUtils.getRootCause(error);
                     if (rootCause instanceof ClassNotFoundException) {
+                        log.error(error);
                         throwDriverNotFoundException(testDataSource);
                     }
                 }
@@ -634,7 +636,7 @@ public class WebServiceCore implements DBWServiceCore {
         WebConnectionInfo connectionInfo = project.getWebConnectionInfo(connectionId);
 
         DBPDataSourceContainer dataSourceContainer = connectionInfo.getDataSourceContainer();
-        boolean disconnected = WebDataSourceUtils.disconnectDataSource(webSession, dataSourceContainer);
+        WebDataSourceUtils.disconnectDataSource(webSession, dataSourceContainer);
         return connectionInfo;
     }
 
@@ -754,8 +756,7 @@ public class WebServiceCore implements DBWServiceCore {
         }
     }
 
-    @NotNull
-    private static String throwDriverNotFoundException(@NotNull DBPDataSourceContainer container) throws DBWebException {
+    private static void throwDriverNotFoundException(@NotNull DBPDataSourceContainer container) throws DBWebException {
         throw new DBWebException("Driver files for %s are not found. Please ask the administrator to download it."
             .formatted(container.getDriver().getName()));
     }

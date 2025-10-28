@@ -5,11 +5,11 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import type { DialogComponent, DialogueStateResult } from '@cloudbeaver/core-dialogs';
+import type { DialogComponent } from '@cloudbeaver/core-dialogs';
 
-import { ConfirmationDialog, type ConfirmationDialogPayload } from '../CommonDialog/ConfirmationDialog.js';
+import { ConfirmationDialog, type ConfirmationDialogPayload, type ConfirmationDialogResult } from '../CommonDialog/ConfirmationDialog.js';
 
-export const ConfirmationDialogDelete: DialogComponent<ConfirmationDialogPayload, DialogueStateResult | string> = function ConfirmationDialogDelete({
+export const ConfirmationDialogDelete: DialogComponent<ConfirmationDialogPayload, ConfirmationDialogResult> = function ConfirmationDialogDelete({
   payload,
   ...rest
 }) {
