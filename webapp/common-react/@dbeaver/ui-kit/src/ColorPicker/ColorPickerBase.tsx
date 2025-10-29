@@ -10,7 +10,6 @@ import { useCallback, useDeferredValue, useId, useImperativeHandle, useRef, type
 import './ColorPicker.css';
 import { Popover } from '../Popover/Popover.js';
 import { ColorGrid } from './ColorGrid.js';
-import { rgbToHex } from './colorUtils.js';
 import { Button, ButtonIcon } from '../Button/Button.js';
 import { ColorIndicator } from './ColorIndicator.js';
 import { COLOR_PALETTE, type ColorInfo } from './colorPalette.js';
@@ -18,6 +17,7 @@ import { useColorPalette } from './useColorPalette.js';
 import { IconButton } from '../IconButton/IconButton.js';
 import { useTranslate } from '@dbeaver/react-translate';
 import { Icon } from '../Icon/Icon.js';
+import { normalizeColorToHex } from './colorUtils.js';
 
 export type ColorPickerProps = Omit<ComponentPropsWithRef<'input'>, 'size' | 'value' | 'onChange' | 'type'> & {
   value: string;
@@ -53,7 +53,7 @@ export const ColorPickerBase: React.FC<ColorPickerProps> = function ColorPicker(
       return;
     }
 
-    const hexColor = rgbToHex(color);
+    const hexColor = normalizeColorToHex(color);
     const nativeValueSetter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')?.set;
     nativeValueSetter?.call(input, hexColor);
     input.dispatchEvent(new Event('input', { bubbles: true }));

@@ -7,30 +7,30 @@
  */
 
 import { useMemo } from 'react';
-import { normalizeColorToHex, rgbToHex } from './colorUtils.js';
+import { normalizeColorToHex } from './colorUtils.js';
 import { COLOR_PALETTE, type ColorInfo } from './colorPalette.js';
 
 export interface UseColorPaletteResult {
   palette: ColorInfo[][];
   paletteColorsHex: Set<string>;
   isSelected: (targetColor: string) => boolean;
-  isCustomColor: (color: string | number | readonly string[] | undefined) => boolean;
+  isCustomColor: (color: string) => boolean;
 }
 
 export function useColorPalette(value: string | undefined, palette: ColorInfo[][] = COLOR_PALETTE): UseColorPaletteResult {
-  const normalized = normalizeColorToHex(value);
-  const paletteColorsHex = useMemo(() => new Set(palette.flat().map(color => rgbToHex(color.rgb))), [palette]);
+  const normalized = value !== undefined ? normalizeColorToHex(value) : undefined;
+  const paletteColorsHex = useMemo(() => new Set(palette.flat().map(color => normalizeColorToHex(color.rgb))), [palette]);
 
   const isSelected = useMemo(
     () => (targetColor: string) => {
-      const targetHex = rgbToHex(targetColor);
+      const targetHex = normalizeColorToHex(targetColor);
       return normalized === targetHex;
     },
     [normalized],
   );
 
   const isCustomColor = useMemo(
-    () => (color: string | number | readonly string[] | undefined) => {
+    () => (color: string) => {
       if (!color) {
         return false;
       }

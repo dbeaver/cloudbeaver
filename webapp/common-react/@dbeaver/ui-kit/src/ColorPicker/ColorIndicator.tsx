@@ -6,8 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { ColorConvert } from '@dbeaver/js-helpers';
 import clsx from 'clsx';
-import { isLightColor } from './isLightColor.js';
 import { memo } from 'react';
 
 interface Props {
@@ -16,7 +16,7 @@ interface Props {
 }
 
 export const ColorIndicator = memo(function ColorIndicator({ color, isSelected }: Props) {
-  const isLight = isLightColor(color);
+  const isLight = ColorConvert(color).isLight();
   const selectedMark = isLight ? 'dbv-kit-color-picker__color--selected-light' : 'dbv-kit-color-picker__color--selected-dark';
 
   return (

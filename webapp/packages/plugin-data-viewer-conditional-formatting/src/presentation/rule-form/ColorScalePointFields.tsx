@@ -68,7 +68,7 @@ export const ColorScalePointFields = observer<Props>(function ColorScalePointFie
         </InputField>
       )}
       {colorParam && (
-        <FormFieldDescription label="&nbsp;" keepSize tiny>
+        <div className="tw:flex tw:flex-none! tw:items-end">
           <ColorPicker
             name={colorParam.key}
             value={mappedColor}
@@ -76,22 +76,7 @@ export const ColorScalePointFields = observer<Props>(function ColorScalePointFie
             disabled={colorDisabled}
             onChange={color => (state[colorParam.key] = color)}
           />
-        </FormFieldDescription>
-        // <InputField
-        //   type={colorParam.type}
-        //   name={colorParam.key}
-        //   state={state}
-        //   defaultState={{ [colorParam.key]: colorParam.default ?? defaultColorValue }}
-        //   defaultValue={(colorParam.default ?? defaultColorValue) as string}
-        //   placeholder={t(colorParam.name)}
-        //   mapState={colorMapState}
-        //   disabled={colorDisabled}
-        //   className="tw:w-16"
-        //   keepSize
-        //   tiny
-        // >
-        //   {t(colorParam.name)}
-        // </InputField>
+        </div>
       )}
     </Container>
   );
