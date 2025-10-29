@@ -11,9 +11,7 @@ import { ServerConfigurationAdministrationNavService, ServerConfigurationService
 import { AuthenticationService } from '@cloudbeaver/plugin-authentication';
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
 
-const AuthenticationProviders = importLazyComponent(() =>
-  import('./Administration/ServerConfiguration/AuthenticationProviders.js').then(m => m.AuthenticationProviders),
-);
+const AnonymousAccess = importLazyComponent(() => import('./Administration/ServerConfiguration/AnonymousAccess.js').then(m => m.AnonymousAccess));
 
 @injectable(() => [ServerConfigurationService, ServerConfigurationAdministrationNavService, AuthenticationService])
 export class PluginBootstrap extends Bootstrap {
@@ -26,7 +24,7 @@ export class PluginBootstrap extends Bootstrap {
   }
 
   override register(): void {
-    this.serverConfigurationService.configurationContainer.add(AuthenticationProviders, 0);
+    this.serverConfigurationService.securitySettingsContainer.add(AnonymousAccess, 0);
     this.authenticationService.setConfigureAuthProvider(() => this.serverConfigurationAdministrationNavService.navToSettings());
   }
 }
