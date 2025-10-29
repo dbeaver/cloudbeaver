@@ -36,13 +36,13 @@ export const TeamEdit = observer<Props>(function TeamEdit({ item }) {
     handlers: [
       async function closeHandler(event, contexts) {
         if (formState.isChanged && event === 'before') {
-          const result = await commonDialogService.open(ConfirmationDialog, {
+          const { status } = await commonDialogService.open(ConfirmationDialog, {
             title: 'ui_save_reminder',
             message: 'ui_are_you_sure',
             confirmActionText: 'ui_yes',
           });
 
-          if (result === DialogueStateResult.Rejected) {
+          if (status === DialogueStateResult.Rejected) {
             ExecutorInterrupter.interrupt(contexts);
           }
         }

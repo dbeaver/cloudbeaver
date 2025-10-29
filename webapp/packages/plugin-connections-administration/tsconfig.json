@@ -54,6 +54,9 @@
     },
     {
       "path": "../plugin-connections"
+    },
+    {
+      "path": "../plugin-data-grid"
     }
   ],
   "include": [

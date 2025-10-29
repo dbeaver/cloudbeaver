@@ -66,6 +66,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -586,8 +587,11 @@ public class WebSession extends BaseWebSession
 
     public WebAsyncTaskInfo createAndRunAsyncTask(@NotNull String taskName, @NotNull WebAsyncTaskProcessor<?> runnable) {
         WebAsyncTaskInfo asyncTask = createAsyncTask(taskName);
+        return runAsyncTask(asyncTask, runnable);
+    }
 
-        AbstractJob job = new AbstractJob(taskName) {
+    public WebAsyncTaskInfo runAsyncTask(@NotNull WebAsyncTaskInfo asyncTask, @NotNull WebAsyncTaskProcessor<?> runnable) {
+        AbstractJob job = new AbstractJob(asyncTask.getName()) {
             @Override
             protected IStatus run(DBRProgressMonitor monitor) {
                 int curTaskCount = taskCount.incrementAndGet();
@@ -1017,6 +1021,25 @@ public class WebSession extends BaseWebSession
     @Nullable
     public WebSessionGlobalProjectImpl getGlobalProject() {
         return globalProject;
+    }
+
+    public void handleTaskConfirmation(
+        @NotNull String taskId,
+        boolean confirmed,
+        boolean skipConfirmations
+    ) {
+        String attributeName = WebSQLConstants.TASK_CONFIRMATION_ATTR_PREFIX + taskId;
+        if (confirmed && skipConfirmations) {
+            setAttribute(WebSQLConstants.SKIP_TASK_CONFIRMATIONS_ATTR, Boolean.TRUE);
+        }
+
+        CompletableFuture<Boolean> confirmationFuture = getAttribute(attributeName);
+        if (confirmationFuture != null) {
+            confirmationFuture.complete(confirmed);
+            removeAttribute(attributeName);
+        } else {
+            log.error("Received unexpected confirmation event for taskId: " + taskId);
+        }
     }
 
     private class SessionProgressMonitor extends BaseProgressMonitor {

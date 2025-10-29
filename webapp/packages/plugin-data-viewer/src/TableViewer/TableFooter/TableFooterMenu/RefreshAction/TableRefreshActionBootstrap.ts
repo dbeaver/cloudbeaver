@@ -175,9 +175,9 @@ export class TableRefreshActionBootstrap extends Bootstrap {
       stopOnError: state.stopOnError,
     });
 
-    const result = await this.commonDialogService.open(AutoRefreshSettingsDialog, { state: stateCopy });
+    const { status } = await this.commonDialogService.open(AutoRefreshSettingsDialog, { state: stateCopy });
 
-    if (result === DialogueStateResult.Resolved) {
+    if (status === DialogueStateResult.Resolved) {
       let interval = stateCopy.interval;
 
       if (typeof interval === 'string') {

@@ -41,7 +41,7 @@ interface State extends IExportImageOptions {
   error: Error | null;
 }
 
-export const ExportImageDialog = observer<DialogComponentProps<ExportImagePayload, null>>(function ExportImageDialog(props) {
+export const ExportImageDialog = observer<DialogComponentProps<ExportImagePayload>>(function ExportImageDialog(props) {
   const translate = useTranslate();
   const state = useObservableRef<State>(
     () => ({
@@ -89,7 +89,7 @@ export const ExportImageDialog = observer<DialogComponentProps<ExportImagePayloa
         )}
       </CommonDialogBody>
       <CommonDialogFooter className="tw:justify-end tw:items-center tw:gap-[24px]">
-        <Button type="button" variant="secondary" onClick={props.rejectDialog}>
+        <Button type="button" variant="secondary" onClick={() => props.rejectDialog()}>
           {translate('app_shared_inlineEditor_dialog_cancel')}
         </Button>
         <Button type="button" onClick={onExportHandler}>
