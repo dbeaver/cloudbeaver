@@ -9,6 +9,7 @@ export default [
   ['ui_stepper_next', 'Tiếp theo'],
   ['ui_stepper_finish', 'Hoàn tất'],
   ['ui_load_more', 'Tải thêm'],
+  ['ui_processing_skip_confirmations', 'Đừng hỏi tôi nữa'],
   ['ui_processing_connecting', 'Đang kết nối...'],
   ['ui_processing_loading', 'Đang tải...'],
   ['ui_processing_cancel', 'Hủy'],

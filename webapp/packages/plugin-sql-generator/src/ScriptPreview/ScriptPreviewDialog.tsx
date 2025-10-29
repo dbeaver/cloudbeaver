@@ -70,7 +70,7 @@ export const ScriptPreviewDialog = observer<DialogComponentProps<Payload>>(funct
         <Button variant="secondary" onClick={() => copy(payload.script, true)}>
           {translate('ui_copy_to_clipboard')}
         </Button>
-        <Button onClick={rejectDialog}>{translate('ui_close')}</Button>
+        <Button onClick={() => rejectDialog()}>{translate('ui_close')}</Button>
       </CommonDialogFooter>
     </CommonDialogWrapper>
   );

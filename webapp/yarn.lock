@@ -2413,6 +2413,32 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@cloudbeaver/plugin-async-task-confirmation@workspace:^, @cloudbeaver/plugin-async-task-confirmation@workspace:packages/plugin-async-task-confirmation":
+  version: 0.0.0-use.local
+  resolution: "@cloudbeaver/plugin-async-task-confirmation@workspace:packages/plugin-async-task-confirmation"
+  dependencies:
+    "@cloudbeaver/core-blocks": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-dialogs": "workspace:*"
+    "@cloudbeaver/core-events": "workspace:*"
+    "@cloudbeaver/core-executor": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-root": "workspace:*"
+    "@cloudbeaver/core-sdk": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
+    "@types/react": "npm:^19"
+    mobx: "npm:^6"
+    mobx-react-lite: "npm:^4"
+    react: "npm:^19"
+    react-dom: "npm:^19"
+    rimraf: "npm:^6"
+    tslib: "npm:^2"
+    typescript: "npm:^5"
+    typescript-plugin-css-modules: "npm:^5"
+  languageName: unknown
+  linkType: soft
+
 "@cloudbeaver/plugin-authentication-administration@workspace:*, @cloudbeaver/plugin-authentication-administration@workspace:packages/plugin-authentication-administration":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-authentication-administration@workspace:packages/plugin-authentication-administration"
@@ -3690,6 +3716,7 @@ __metadata:
     "@cloudbeaver/plugin-administration": "workspace:*"
     "@cloudbeaver/plugin-app-logo": "workspace:*"
     "@cloudbeaver/plugin-app-logo-administration": "workspace:*"
+    "@cloudbeaver/plugin-async-task-confirmation": "workspace:^"
     "@cloudbeaver/plugin-authentication": "workspace:*"
     "@cloudbeaver/plugin-authentication-administration": "workspace:*"
     "@cloudbeaver/plugin-browser": "workspace:*"
@@ -3734,6 +3761,7 @@ __metadata:
     "@cloudbeaver/plugin-settings-menu": "workspace:*"
     "@cloudbeaver/plugin-settings-menu-administration": "workspace:*"
     "@cloudbeaver/plugin-settings-panel": "workspace:*"
+    "@cloudbeaver/plugin-sql-async-task-confirmation": "workspace:^"
     "@cloudbeaver/plugin-sql-editor": "workspace:*"
     "@cloudbeaver/plugin-sql-editor-navigation-tab": "workspace:*"
     "@cloudbeaver/plugin-sql-editor-navigation-tab-script": "workspace:*"
@@ -3851,6 +3879,34 @@ __metadata:
     "@dbeaver/cli": "workspace:*"
     "@dbeaver/js-helpers": "workspace:*"
     "@dbeaver/ui-kit": "workspace:*"
+    "@types/react": "npm:^19"
+    mobx: "npm:^6"
+    mobx-react-lite: "npm:^4"
+    react: "npm:^19"
+    react-dom: "npm:^19"
+    rimraf: "npm:^6"
+    tslib: "npm:^2"
+    typescript: "npm:^5"
+    typescript-plugin-css-modules: "npm:^5"
+  languageName: unknown
+  linkType: soft
+
+"@cloudbeaver/plugin-sql-async-task-confirmation@workspace:^, @cloudbeaver/plugin-sql-async-task-confirmation@workspace:packages/plugin-sql-async-task-confirmation":
+  version: 0.0.0-use.local
+  resolution: "@cloudbeaver/plugin-sql-async-task-confirmation@workspace:packages/plugin-sql-async-task-confirmation"
+  dependencies:
+    "@cloudbeaver/core-blocks": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-dialogs": "workspace:*"
+    "@cloudbeaver/core-events": "workspace:*"
+    "@cloudbeaver/core-executor": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-root": "workspace:*"
+    "@cloudbeaver/core-sdk": "workspace:*"
+    "@cloudbeaver/plugin-codemirror6": "workspace:*"
+    "@cloudbeaver/plugin-sql-editor-new": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     "@types/react": "npm:^19"
     mobx: "npm:^6"
     mobx-react-lite: "npm:^4"

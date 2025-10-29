@@ -133,13 +133,13 @@ export class ConnectionSearchService {
       return true;
     }
 
-    const result = await this.commonDialogService.open(ConfirmationDialog, {
+    const { status } = await this.commonDialogService.open(ConfirmationDialog, {
       title: 'plugin_connections_connection_edit_cancel_title',
       message: 'plugin_connections_connection_edit_cancel_message',
       confirmActionText: 'ui_processing_ok',
     });
 
-    return result !== DialogueStateResult.Rejected;
+    return status !== DialogueStateResult.Rejected;
   }
 
   change(hosts: string): void {

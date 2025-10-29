@@ -17,11 +17,13 @@
 package io.cloudbeaver.service.sql;
 
 import io.cloudbeaver.DBWebException;
+import io.cloudbeaver.model.WebAsyncTaskInfo;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.session.WebSessionProvider;
 import io.cloudbeaver.server.WebAppUtils;
 import io.cloudbeaver.server.jobs.SqlOutputLogReaderJob;
+import io.cloudbeaver.service.sql.messages.WebSQLMessages;
 import org.eclipse.jface.text.Document;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
@@ -48,7 +50,13 @@ import org.jkiss.dbeaver.model.sql.parser.SQLParserContext;
 import org.jkiss.dbeaver.model.sql.parser.SQLRuleManager;
 import org.jkiss.dbeaver.model.sql.parser.SQLScriptParser;
 import org.jkiss.dbeaver.model.struct.*;
+import org.jkiss.dbeaver.model.websocket.event.WSEvent;
 import org.jkiss.dbeaver.model.websocket.event.WSTransactionalCountEvent;
+import org.jkiss.dbeaver.model.websocket.event.session.WSSessionTaskConfirmationRequestEvent;
+import org.jkiss.dbeaver.model.websocket.event.session.WSSessionTaskQueryConfirmationRequestEvent;
+import org.jkiss.dbeaver.registry.confirmation.ConfirmationConstants;
+import org.jkiss.dbeaver.registry.confirmation.ConfirmationDescriptor;
+import org.jkiss.dbeaver.registry.confirmation.ConfirmationRegistry;
 import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
@@ -58,7 +66,11 @@ import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.text.MessageFormat;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -166,7 +178,9 @@ public class WebSQLProcessor implements WebSessionProvider {
         @Nullable WebSQLDataFilter filter,
         @Nullable WebDataFormat dataFormat,
         @NotNull WebSession webSession,
-        boolean readLogs
+        @NotNull WebAsyncTaskInfo asyncTask,
+        boolean readLogs,
+        boolean useEvents
     ) throws DBWebException, DBCException {
         if (filter == null) {
             // Use default filter
@@ -202,9 +216,11 @@ public class WebSQLProcessor implements WebSessionProvider {
 
             SQLScriptElement element = SQLScriptParser.extractActiveQuery(parserContext, 0, sql.length());
 
+            boolean isGenerated = false;
             if (element instanceof SQLControlCommand command) {
                 SQLControlResult controlResult = dataContainer.getScriptContext().executeControlCommand(monitor, command);
                 if (controlResult.getTransformed() != null) {
+                    isGenerated = true;
                     element = controlResult.getTransformed();
                 } else {
                     WebSQLQueryResults stats = new WebSQLQueryResults(webSession, dataFormat);
@@ -212,6 +228,13 @@ public class WebSQLProcessor implements WebSessionProvider {
                 }
             }
             if (element instanceof SQLQuery mainQuery) {
+                if (useEvents) {
+                    boolean isConfirmed = confirmQueryIfNeeded(mainQuery.getScriptElements(), asyncTask, isGenerated);
+                    if (!isConfirmed) {
+                        throw new DBWebException("Query execution cancelled by user");
+                    }
+                }
+
                 DBExecUtils.tryExecuteRecover(monitor, connection.getDataSource(), param -> {
                     try (DBCSession session = context.openSession(monitor, resolveQueryPurpose(dataFilter), "Execute SQL")) {
                         List<SQLScriptElement> sqlQueries = mainQuery.getScriptElements();
@@ -1228,5 +1251,111 @@ public class WebSQLProcessor implements WebSessionProvider {
             }
         }
         return convertInputCellValue(dbcSession, allAttributes, cellRow, withoutExecution);
+    }
+
+    // TODO: Refactor to unify with desktop when confirmation settings will be added
+    private boolean confirmQueryIfNeeded(
+        @NotNull List<SQLScriptElement> scriptElements,
+        @NotNull WebAsyncTaskInfo asyncTask,
+        boolean isGenerated
+    ) throws DBWebException {
+        Boolean skipConfirmations = webSession.getAttribute(WebSQLConstants.SKIP_TASK_CONFIRMATIONS_ATTR);
+        if (skipConfirmations != null && skipConfirmations) {
+            return true;
+        }
+
+        boolean hasGeneratedUpdates = false;
+        boolean hasDangerousUpdates = false;
+        boolean hasDropStatement = false;
+        String title = null;
+        String message = null;
+        String queryPreview = null;
+        if (isGenerated) {
+            Set<SQLQueryCategory> categories = SQLQueryCategory.categorizeScript(scriptElements);
+            hasGeneratedUpdates = categories.contains(SQLQueryCategory.DDL) ||
+                categories.contains(SQLQueryCategory.DML) ||
+                categories.contains(SQLQueryCategory.UNKNOWN);
+            title = WebSQLMessages.model_web_ai_query_confirmation_title;
+            message = WebSQLMessages.model_web_ai_query_confirmation_message;
+            queryPreview = scriptElements.stream()
+                .map(SQLScriptElement::getText)
+                .collect(Collectors.joining("\n\n"));
+        } else {
+            for (SQLScriptElement scriptElement : scriptElements) {
+                if (scriptElement instanceof SQLQuery sqlQuery) {
+                    if (sqlQuery.isDeleteUpdateDangerous()) {
+                        hasDangerousUpdates = true;
+                        ConfirmationDescriptor descriptor = ConfirmationRegistry.getInstance()
+                            .getConfirmation(ConfirmationConstants.CONFIRM_DANGER_SQL);
+                        title = descriptor.getLocalizedTitle(webSession.getLocale());
+                        var entityMetadata = sqlQuery.getEntityMetadata(false);
+                        message = MessageFormat.format(
+                            descriptor.getLocalizedMessage(webSession.getLocale()),
+                            sqlQuery.getType().name(),
+                            entityMetadata != null ? entityMetadata.getEntityName() : null
+                        );
+                        break;
+                    }
+                    if (sqlQuery.isDropTableDangerous()) {
+                        hasDropStatement = true;
+                        ConfirmationDescriptor descriptor = ConfirmationRegistry.getInstance()
+                            .getConfirmation(ConfirmationConstants.CONFIRM_DROP_SQL);
+                        title = descriptor.getLocalizedTitle(webSession.getLocale());
+                        message = descriptor.getLocalizedMessage(webSession.getLocale());
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (!hasGeneratedUpdates && !hasDangerousUpdates && !hasDropStatement) {
+            return true;
+        } else {
+            return requestConfirmation(asyncTask, queryPreview, title, message);
+        }
+    }
+
+    private boolean requestConfirmation(
+        @NotNull WebAsyncTaskInfo asyncTask,
+        @Nullable String query,
+        @NotNull String title,
+        @NotNull String message
+    ) throws DBWebException {
+        String attributeName = WebSQLConstants.TASK_CONFIRMATION_ATTR_PREFIX + asyncTask.getId();
+        CompletableFuture<Boolean> confirmationFuture = new CompletableFuture<>();
+        webSession.setAttribute(attributeName, confirmationFuture);
+
+        webSession.addSessionEvent(createConfirmationEvent(asyncTask, query, title, message));
+
+        try {
+            Boolean isConfirmed = confirmationFuture.get(WebSQLConstants.TASK_CONFIRMATION_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+            return isConfirmed != null && isConfirmed;
+        } catch (TimeoutException e) {
+            throw new DBWebException("Query confirmation timeout");
+        } catch (Exception e) {
+            throw new DBWebException("Error when processing confirmation response", e);
+        } finally {
+            webSession.removeAttribute(attributeName);
+        }
+    }
+
+    @NotNull
+    private WSEvent createConfirmationEvent(
+        @NotNull WebAsyncTaskInfo asyncTask,
+        @Nullable String query,
+        @NotNull String title,
+        @NotNull String message
+    ) {
+        WSEvent confirmationEvent;
+        if (query != null) {
+            confirmationEvent = new WSSessionTaskQueryConfirmationRequestEvent(
+                asyncTask.getId(), title, message, query
+            );
+        } else {
+            confirmationEvent = new WSSessionTaskConfirmationRequestEvent(
+                asyncTask.getId(), title, message
+            );
+        }
+        return confirmationEvent;
     }
 }

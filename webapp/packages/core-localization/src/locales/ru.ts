@@ -7,6 +7,7 @@ export default [
   ['ui_system_theme', 'Устройство'],
   ['ui_stepper_back', 'Назад'],
   ['ui_load_more', 'Загрузить ещё'],
+  ['ui_processing_skip_confirmations', 'Не спрашивайте меня снова'],
   ['ui_processing_connecting', 'Подключение...'],
   ['ui_processing_loading', 'Загрузка...'],
   ['ui_processing_cancel', 'Отменить'],
