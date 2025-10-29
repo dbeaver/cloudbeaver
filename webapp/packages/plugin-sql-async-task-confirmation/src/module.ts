@@ -9,13 +9,11 @@
 import { Bootstrap, ModuleRegistry } from '@cloudbeaver/core-di';
 import { LocaleService } from './LocaleService.js';
 import { SqlQueryAsyncTaskConfirmationBootstrap } from './SqlQueryAsyncTaskConfirmationBootstrap.js';
-import { SqlQueryConfirmationSettingsBootstrap } from './SqlQueryConfirmationSettingsBootstrap.js';
 
 export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-sql-async-task-confirmation',
 
   configure: serviceCollection => {
     serviceCollection.addSingleton(Bootstrap, SqlQueryAsyncTaskConfirmationBootstrap).addSingleton(Bootstrap, LocaleService);
-    serviceCollection.addSingleton(Bootstrap, SqlQueryConfirmationSettingsBootstrap);
   },
 });

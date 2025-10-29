@@ -8,7 +8,6 @@
 
 import './module.js';
 
-export * from './SQL_EDITOR_SETTINGS_GROUP.js';
 export * from './actions/bindings/KEY_BINDING_SQL_EDITOR_EXECUTE_NEW.js';
 export * from './actions/bindings/KEY_BINDING_SQL_EDITOR_EXECUTE_SCRIPT.js';
 export * from './actions/bindings/KEY_BINDING_SQL_EDITOR_EXECUTE.js';
