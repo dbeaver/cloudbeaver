@@ -29,6 +29,7 @@ import org.jkiss.dbeaver.model.impl.AbstractDescriptor;
 import org.jkiss.dbeaver.model.impl.PropertyDescriptor;
 import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
 import org.jkiss.dbeaver.model.security.SMAuthCredentialsProfile;
+import org.jkiss.dbeaver.model.security.SMAuthProviderCustomConfiguration;
 import org.jkiss.dbeaver.model.security.SMAuthProviderDescriptor;
 import org.jkiss.dbeaver.model.security.SMSubjectType;
 import org.jkiss.utils.ArrayUtils;
@@ -61,6 +62,8 @@ public class WebAuthProviderDescriptor extends AbstractDescriptor {
     private final String[] requiredFeatures;
     private final boolean isRequired;
     private String[] types;
+    @Nullable
+    private final SMAuthProviderCustomConfiguration defaultConfiguration;
 
     public WebAuthProviderDescriptor(IConfigurationElement cfg) {
         super(cfg);
@@ -98,6 +101,25 @@ public class WebAuthProviderDescriptor extends AbstractDescriptor {
 
         String typesAttr = cfg.getAttribute(WebRegistryConstant.ATTR_CATEGORIES);
         this.types = CommonUtils.isEmpty(typesAttr) ? new String[0] : typesAttr.split(",");
+        IConfigurationElement[] defaultConfigurations = cfg.getChildren(WebRegistryConstant.TAG_DEFAULT_CONFIGURATION);
+        if (defaultConfigurations != null && defaultConfigurations.length > 0) {
+            if (defaultConfigurations.length > 1) {
+                throw new IllegalStateException("Multiple default configuration elements defined for auth provider " + getId());
+            }
+            IConfigurationElement defaultConfiguration = defaultConfigurations[0];
+
+            this.defaultConfiguration = SMAuthProviderCustomConfiguration.builder()
+                .id(defaultConfiguration.getAttribute(WebRegistryConstant.ATTR_ID))
+                .provider(getId())
+                .displayName(defaultConfiguration.getAttribute(WebRegistryConstant.ATTR_LABEL))
+                .disabled(CommonUtils.toBoolean(defaultConfiguration.getAttribute(WebRegistryConstant.ATTR_DISABLED)))
+                .iconURL(defaultConfiguration.getAttribute(WebRegistryConstant.ATTR_ICON))
+                .description(defaultConfiguration.getAttribute(WebRegistryConstant.ATTR_DESCRIPTION))
+                .parameters(new HashMap<>())
+                .build();
+        } else {
+            this.defaultConfiguration = null;
+        }
     }
 
     @NotNull
@@ -238,5 +260,10 @@ public class WebAuthProviderDescriptor extends AbstractDescriptor {
         } catch (DBException e) {
             return false;
         }
+    }
+
+    @Nullable
+    public SMAuthProviderCustomConfiguration getDefaultConfiguration() {
+        return defaultConfiguration;
     }
 }

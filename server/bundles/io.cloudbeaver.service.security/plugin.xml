@@ -7,13 +7,19 @@
                 caseInsensitive="true"
                 description="Local name/password based authentication"
                 class="io.cloudbeaver.auth.provider.local.LocalAuthProvider"
-                icon="platform:/plugin/org.jkiss.dbeaver.model/icons/tree/key.svg">
+                icon="platform:/plugin/org.jkiss.dbeaver.model/icons/tree/key.svg"
+                autoCreateConfiguration="true">
             <credentials>
                 <propertyGroup label="General">
                     <property id="user" label="User name" type="string" description="User name" admin="true" user="true" identifying="true" required="true"/>
                     <property id="password" label="User password" type="string" description="User password" encryption="hash" admin="true" user="true" required="true"/>
                 </propertyGroup>
             </credentials>
+            <defaultConfiguration id="local"
+                                  label="local"
+                                  disabled="false"
+                                  iconURL=""
+                                  description="configuration of local provider"/>
 
         </authProvider>
         <authProvider id="reverseProxy" label="Reverse proxy"
