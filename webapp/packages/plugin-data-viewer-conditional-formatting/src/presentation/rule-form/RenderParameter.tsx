@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { FieldCheckbox, InputField, Select, useTranslate, FormFieldDescription } from '@cloudbeaver/core-blocks';
+import { FieldCheckbox, InputField, Select, useTranslate } from '@cloudbeaver/core-blocks';
 import type { IFormatRuleParameter } from '../../formatting/IFormatRule.js';
 import { ColorPicker } from '@dbeaver/ui-kit';
 import { observer } from 'mobx-react-lite';
@@ -46,14 +46,14 @@ export const RenderParameter = observer<Props>(function RenderParameter({ parame
 
   if (parameter.type === 'color') {
     return (
-      <FormFieldDescription label="&nbsp;" tiny>
+      <div className="tw:flex tw:flex-none! tw:items-end">
         <ColorPicker
           name={parameter.key}
           value={state[parameter.key] || ''}
           defaultValue={parameter.default as string}
           onChange={color => (state[parameter.key] = color)}
         />
-      </FormFieldDescription>
+      </div>
     );
   }
 

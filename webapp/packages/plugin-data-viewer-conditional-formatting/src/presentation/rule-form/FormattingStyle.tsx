@@ -37,24 +37,16 @@ export const FormattingStyle = observer<Props>(function FormattingStyle({ rule, 
 
   const color = getValueForRuleParameter<string>(state.parameters, rule.parameters, TEXT_COLOR_PARAMETER.key, 'inherit');
   const backgroundColor = getValueForRuleParameter<string>(state.parameters, rule.parameters, BACKGROUND_COLOR_PARAMETER.key, 'transparent');
-  const fontWeight = getValueForRuleParameter<boolean>(state.parameters, rule.parameters, FONT_WEIGHT_PARAMETER.key);
-  const fontStyle = getValueForRuleParameter<boolean>(state.parameters, rule.parameters, FONT_STYLE_PARAMETER.key);
+  const isBold = getValueForRuleParameter<boolean>(state.parameters, rule.parameters, FONT_WEIGHT_PARAMETER.key);
+  const isItalic = getValueForRuleParameter<boolean>(state.parameters, rule.parameters, FONT_STYLE_PARAMETER.key);
   const textDecoration = getValueForRuleParameter<string | string[]>(state.parameters, rule.parameters, TEXT_DECORATION_PARAMETER.key);
 
   function toggleFontWeight() {
-    if (fontWeight) {
-      state.parameters[FONT_WEIGHT_PARAMETER.key] = false;
-    } else {
-      state.parameters[FONT_WEIGHT_PARAMETER.key] = true;
-    }
+    state.parameters[FONT_WEIGHT_PARAMETER.key] = !isBold;
   }
 
   function toggleFontStyle() {
-    if (fontStyle) {
-      state.parameters[FONT_STYLE_PARAMETER.key] = false;
-    } else {
-      state.parameters[FONT_STYLE_PARAMETER.key] = true;
-    }
+    state.parameters[FONT_STYLE_PARAMETER.key] = !isItalic;
   }
 
   const isTextDecorationMulti = Array.isArray(textDecoration);
@@ -83,28 +75,43 @@ export const FormattingStyle = observer<Props>(function FormattingStyle({ rule, 
         color={color}
         leftColor={backgroundColor}
         rightColor={backgroundColor}
-        fontStyle={fontStyle ? 'italic' : 'normal'}
-        fontWeight={fontWeight ? 'bold' : 'normal'}
+        fontStyle={isItalic ? 'italic' : 'normal'}
+        fontWeight={isBold ? 'bold' : 'normal'}
         textDecoration={textDecoration}
         className="tw:border-none! tw:rounded-none!"
       >
-        Default
+        {t('plugin_data_viewer_conditional_formatting_style_text_sample')}
       </ColorScalePreview>
       <div className="tw:p-0.5 tw:gap-0.5 tw:flex tw:border-t theme-border-color-background">
         {fontWeightParameter && (
-          <IconButton aria-label={t('Bold')} style={{ fontWeight: 'bold' }} data-active={fontWeight} size="small" onClick={toggleFontWeight}>
+          <IconButton
+            title={t('plugin_data_viewer_conditional_formatting_parameter_font_weight')}
+            aria-label={t('plugin_data_viewer_conditional_formatting_parameter_font_weight')}
+            style={{ fontWeight: 'bold' }}
+            data-active={isBold}
+            size="small"
+            onClick={toggleFontWeight}
+          >
             B
           </IconButton>
         )}
         {fontStyleParameter && (
-          <IconButton aria-label={t('Italic')} style={{ fontStyle: 'italic' }} data-active={fontStyle} size="small" onClick={toggleFontStyle}>
+          <IconButton
+            title={t('plugin_data_viewer_conditional_formatting_parameter_font_style')}
+            aria-label={t('plugin_data_viewer_conditional_formatting_parameter_font_style')}
+            style={{ fontStyle: 'italic' }}
+            data-active={isItalic}
+            size="small"
+            onClick={toggleFontStyle}
+          >
             I
           </IconButton>
         )}
         {textDecorationParameter && (
           <>
             <IconButton
-              aria-label={t('Underline')}
+              title={t('plugin_data_viewer_conditional_formatting_parameter_text_decoration_underline')}
+              aria-label={t('plugin_data_viewer_conditional_formatting_parameter_text_decoration_underline')}
               style={{ textDecoration: 'underline' }}
               data-active={isUnderlineActive}
               size="small"
@@ -113,7 +120,8 @@ export const FormattingStyle = observer<Props>(function FormattingStyle({ rule, 
               U
             </IconButton>
             <IconButton
-              aria-label={t('Strikethrough')}
+              title={t('plugin_data_viewer_conditional_formatting_parameter_text_decoration_line_through')}
+              aria-label={t('plugin_data_viewer_conditional_formatting_parameter_text_decoration_line_through')}
               style={{ textDecoration: 'line-through' }}
               data-active={isStrikethroughActive}
               size="small"
@@ -130,6 +138,7 @@ export const FormattingStyle = observer<Props>(function FormattingStyle({ rule, 
             value={state.parameters[colorParameter.key] || '#000000'}
             defaultValue={colorParameter.default as string}
             size="small"
+            title={t('plugin_data_viewer_conditional_formatting_parameter_text_color')}
             onChange={color => (state.parameters[colorParameter.key] = color)}
           />
         )}
@@ -141,6 +150,7 @@ export const FormattingStyle = observer<Props>(function FormattingStyle({ rule, 
             value={state.parameters[backgroundColorParameter.key] || 'transparent'}
             defaultValue={backgroundColorParameter.default as string}
             size="small"
+            title={t('plugin_data_viewer_conditional_formatting_parameter_background_color')}
             onChange={color => (state.parameters[backgroundColorParameter.key] = color)}
           />
         )}

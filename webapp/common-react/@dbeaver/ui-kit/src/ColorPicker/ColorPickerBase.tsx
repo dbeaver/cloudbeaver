@@ -34,6 +34,7 @@ export const ColorPickerBase: React.FC<ColorPickerProps> = function ColorPicker(
   size,
   className,
   palette = COLOR_PALETTE,
+  title,
   'aria-label': ariaLabel,
   style,
   onChange,
@@ -72,6 +73,7 @@ export const ColorPickerBase: React.FC<ColorPickerProps> = function ColorPicker(
           <IconButton
             aria-labelledby={id}
             aria-label={ariaLabel ?? t('dbeaver_ui_kit_color_picker_select_color', 'Select color')}
+            title={title}
             size={size}
             className={className}
             style={style}

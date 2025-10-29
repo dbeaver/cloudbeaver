@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { Container, FormFieldDescription, InputField, Select, useTranslate } from '@cloudbeaver/core-blocks';
+import { Container, InputField, Select, useTranslate } from '@cloudbeaver/core-blocks';
 import { observer } from 'mobx-react-lite';
 import type { IFormatRuleParameter } from '../../formatting/IFormatRule.js';
 import { ColorPicker } from '@dbeaver/ui-kit';
@@ -72,6 +72,7 @@ export const ColorScalePointFields = observer<Props>(function ColorScalePointFie
           <ColorPicker
             name={colorParam.key}
             value={mappedColor}
+            title={t(colorParam.name)}
             defaultValue={(colorParam.default ?? defaultColorValue) as string}
             disabled={colorDisabled}
             onChange={color => (state[colorParam.key] = color)}
