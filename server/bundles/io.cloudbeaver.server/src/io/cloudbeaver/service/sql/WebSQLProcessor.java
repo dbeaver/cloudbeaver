@@ -1282,14 +1282,14 @@ public class WebSQLProcessor implements WebSessionProvider {
                 .collect(Collectors.joining("\n\n"));
         } else {
             WebSessionPreferenceStore store = webSession.getUserPreferenceStore();
-            boolean confirmDangerousQueries = store.getBoolean(WebSQLConstants.CONFIRM_DANGEROUS_QUERIES_PREFERENCE, true);
-            boolean confirmDropQueries = store.getBoolean(WebSQLConstants.CONFIRM_DROP_QUERIES_PREFERENCE, true);
+            boolean confirmDangerousQueries = store.getBoolean(ConfirmationConstants.CONFIRM_DANGER_SQL_KEY);
+            boolean confirmDropQueries = store.getBoolean(ConfirmationConstants.CONFIRM_DROP_SQL_KEY);
             for (SQLScriptElement scriptElement : scriptElements) {
                 if (scriptElement instanceof SQLQuery sqlQuery) {
                     if (confirmDangerousQueries && sqlQuery.isDeleteUpdateDangerous()) {
                         hasDangerousUpdates = true;
                         ConfirmationDescriptor descriptor = ConfirmationRegistry.getInstance()
-                            .getConfirmation(ConfirmationConstants.CONFIRM_DANGER_SQL);
+                            .getConfirmation(ConfirmationConstants.CONFIRM_DANGER_SQL_ID);
                         title = descriptor.getLocalizedTitle(webSession.getLocale());
                         var entityMetadata = sqlQuery.getEntityMetadata(false);
                         message = MessageFormat.format(
@@ -1302,7 +1302,7 @@ public class WebSQLProcessor implements WebSessionProvider {
                     if (confirmDropQueries && sqlQuery.isDropTableDangerous()) {
                         hasDropStatement = true;
                         ConfirmationDescriptor descriptor = ConfirmationRegistry.getInstance()
-                            .getConfirmation(ConfirmationConstants.CONFIRM_DROP_SQL);
+                            .getConfirmation(ConfirmationConstants.CONFIRM_DROP_SQL_ID);
                         title = descriptor.getLocalizedTitle(webSession.getLocale());
                         message = descriptor.getLocalizedMessage(webSession.getLocale());
                         break;
