@@ -25,3 +25,7 @@ export {
   type IDataGridCellProps,
   type DataGridProps,
 } from '@dbeaver/react-data-grid';
+
+export { GrantManagementTable } from './GrantManagementTableLazy.js';
+
+export type { IGrantManagementTableColumn } from './GrantManagementTable.js';

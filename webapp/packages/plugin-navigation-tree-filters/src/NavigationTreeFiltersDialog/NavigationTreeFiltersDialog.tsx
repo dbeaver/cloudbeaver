@@ -88,7 +88,7 @@ export const NavigationTreeFiltersDialog = observer<DialogComponentProps<Payload
       </CommonDialogBody>
       <CommonDialogFooter>
         <div className={s(style, { footerContainer: true })}>
-          <Button variant="secondary" onClick={rejectDialog}>
+          <Button variant="secondary" onClick={() => rejectDialog()}>
             {translate('ui_close')}
           </Button>
           <Button onClick={submit}>{translate('ui_apply')}</Button>

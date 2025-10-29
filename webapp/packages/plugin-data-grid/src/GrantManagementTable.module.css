@@ -1,0 +1,22 @@
+.table {
+  height: 100%;
+  overflow: auto;
+  border: 1px solid var(--theme-background);
+  max-width: 100%;
+
+  :global(.rdg-cell.edited > *) {
+    position: inherit;
+  }
+
+  :global(.rdg-cell.edited::before) {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-color: rgba(255, 153, 0, 0.3);
+  }
+
+  :global(.rdg-cell-frozen::before) {
+    background-color: unset;
+  }
+}
