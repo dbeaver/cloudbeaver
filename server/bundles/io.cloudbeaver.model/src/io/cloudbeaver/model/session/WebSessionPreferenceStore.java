@@ -85,4 +85,13 @@ public class WebSessionPreferenceStore extends AbstractUserPreferenceStore {
     public void save() throws IOException {
         throw new RuntimeException("Not implemented");
     }
+
+    public boolean getBoolean(@NotNull String name, boolean defaultValue) {
+        String value = getString(name);
+        if (value == null || value.isEmpty()) {
+            return defaultValue;
+        } else {
+            return toBoolean(value);
+        }
+    }
 }
