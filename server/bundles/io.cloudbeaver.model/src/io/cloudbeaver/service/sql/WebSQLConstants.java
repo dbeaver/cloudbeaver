@@ -45,4 +45,7 @@ public class WebSQLConstants {
     public static final String ATTR_SRID = "srid";
     public static final String ATTR_PROPERTIES = "properties";
 
+    public static final String TASK_CONFIRMATION_ATTR_PREFIX = "session_task_confirmation_";
+    public static final String SKIP_TASK_CONFIRMATIONS_ATTR = "skip_session_task_confirmations";
+    public static final int TASK_CONFIRMATION_TIMEOUT_SECONDS = 30;
 }

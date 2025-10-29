@@ -101,7 +101,8 @@ public interface DBWServiceSQL extends DBWService {
         @Nullable String resultId,
         @Nullable WebSQLDataFilter filter,
         @Nullable WebDataFormat dataFormat,
-        boolean readLogs
+        boolean readLogs,
+        boolean useEvents
     ) throws DBException;
 
     @WebAction
