@@ -13,7 +13,7 @@ import { getComputed, useObjectRef, useObservableRef } from '@cloudbeaver/core-b
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { clsx } from '@dbeaver/ui-kit';
 import { type IDataGridCellRenderer, type ICellPosition } from '@cloudbeaver/plugin-data-grid';
-import { DatabaseEditChangeType, type IResultSetElementKey, type IResultSetRowKey } from '@cloudbeaver/plugin-data-viewer';
+import { DatabaseEditChangeType, type IGridDataKey, type IGridRowKey } from '@cloudbeaver/plugin-data-viewer';
 
 import { DataGridContext } from '../DataGridContext.js';
 import { DataGridSelectionContext } from '../DataGridSelection/DataGridSelectionContext.js';
@@ -42,10 +42,10 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
       get column(): IColumnInfo {
         return this.tableDataContext.getColumn(this.colIdx)!;
       },
-      get row(): IResultSetRowKey | undefined {
+      get row(): IGridRowKey | undefined {
         return this.tableDataContext.getRow(this.rowIdx);
       },
-      get cell(): IResultSetElementKey | undefined {
+      get cell(): IGridDataKey | undefined {
         if (this.column.key === null || this.row === undefined) {
           return undefined;
         }

@@ -21,14 +21,16 @@ import {
   DATA_CONTEXT_DV_PRESENTATION_ACTIONS,
   DATA_CONTEXT_DV_RESULT_KEY,
   DatabaseEditChangeType,
+  GridEditAction,
+  GridSelectAction,
+  GridViewAction,
+  IDatabaseDataEditAction,
+  IDatabaseDataFormatAction,
+  IDatabaseDataSelectAction,
+  IDatabaseDataViewAction,
   isBooleanValuePresentationAvailable,
   isResultSetDataSource,
   ResultSetDataContentAction,
-  ResultSetDataSource,
-  ResultSetEditAction,
-  ResultSetFormatAction,
-  ResultSetSelectAction,
-  ResultSetViewAction,
 } from '@cloudbeaver/plugin-data-viewer';
 import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
 import { LocalizationService } from '@cloudbeaver/core-localization';
@@ -41,6 +43,7 @@ import { ACTION_DATA_GRID_EDITING_REVERT_ROW } from '../Actions/Editing/ACTION_D
 import { ACTION_DATA_GRID_EDITING_REVERT_SELECTED_ROW } from '../Actions/Editing/ACTION_DATA_GRID_EDITING_REVERT_SELECTED_ROW.js';
 import { ACTION_DATA_GRID_EDITING_SET_TO_NULL } from '../Actions/Editing/ACTION_DATA_GRID_EDITING_SET_TO_NULL.js';
 import { MENU_DATA_GRID_EDITING } from './MENU_DATA_GRID_EDITING.js';
+import type { SqlResultColumn } from '@cloudbeaver/core-sdk';
 
 @injectable(() => [ActionService, LocalizationService, MenuService])
 export class DataGridContextMenuCellEditingService {
@@ -85,15 +88,16 @@ export class DataGridContextMenuCellEditingService {
         const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
         const key = context.get(DATA_CONTEXT_DV_RESULT_KEY)!;
 
-        const source = model.source as unknown as ResultSetDataSource;
-        const format = source.getAction(resultIndex, ResultSetFormatAction);
-        const view = source.getAction(resultIndex, ResultSetViewAction);
-        const content = source.getAction(resultIndex, ResultSetDataContentAction);
-        const editor = source.getAction(resultIndex, ResultSetEditAction);
-        const select = source.getActionImplementation(resultIndex, ResultSetSelectAction);
+        const format = model.source.getAction(resultIndex, IDatabaseDataFormatAction);
+        const view = model.source.getAction(resultIndex, IDatabaseDataViewAction, GridViewAction);
+        const content = model.source.getAction(resultIndex, ResultSetDataContentAction);
+        const editor = model.source.getAction(resultIndex, IDatabaseDataEditAction);
+        const select = model.source.tryGetAction(resultIndex, IDatabaseDataSelectAction);
 
         const cellValue = view.getCellValue(key);
-        const column = view.getColumn(key.column);
+
+        // TODO: fix column abstraction
+        const column = view.getColumn(key.column) as SqlResultColumn | undefined;
         const isComplex = format.isBinary(key) || format.isGeometry(key);
         const isTruncated = content.isTextTruncated(key);
         const selectedElements = select?.getSelectedElements() || [];
@@ -113,7 +117,7 @@ export class DataGridContextMenuCellEditingService {
         }
 
         if (action === ACTION_DATA_GRID_EDITING_SET_TO_NULL) {
-          return cellValue !== undefined && !(format.isReadOnly(key) && !canEdit) && !view.getColumn(key.column)?.required && !format.isNull(key);
+          return cellValue !== undefined && !(format.isReadOnly(key) && !canEdit) && !column?.required && !format.isNull(key);
         }
 
         if (action === ACTION_DATA_GRID_EDITING_ADD_ROW || action === ACTION_DATA_GRID_EDITING_DUPLICATE_ROW) {
@@ -158,9 +162,8 @@ export class DataGridContextMenuCellEditingService {
         const actions = context.get(DATA_CONTEXT_DV_PRESENTATION_ACTIONS)!;
         const key = context.get(DATA_CONTEXT_DV_RESULT_KEY)!;
 
-        const source = model.source as unknown as ResultSetDataSource;
-        const editor = source.getAction(resultIndex, ResultSetEditAction);
-        const select = source.getActionImplementation(resultIndex, ResultSetSelectAction);
+        const editor = model.source.getAction(resultIndex, IDatabaseDataEditAction, GridEditAction);
+        const select = model.source.tryGetAction(resultIndex, IDatabaseDataSelectAction, GridSelectAction);
 
         const selectedElements = select?.getSelectedElements() || [];
 

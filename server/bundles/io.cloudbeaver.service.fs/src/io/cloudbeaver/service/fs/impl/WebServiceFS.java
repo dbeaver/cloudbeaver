@@ -63,10 +63,14 @@ public class WebServiceFS implements DBWServiceFS {
             }
             DBNFileSystems dbnFileSystems = projectNode.getExtraNode(DBNFileSystems.class);
             var fsRegistry = FileSystemProviderRegistry.getInstance();
-            return Arrays.stream(dbnFileSystems.getChildren(webSession.getProgressMonitor()))
+            DBNFileSystem[] children = dbnFileSystems.getChildren(webSession.getProgressMonitor());
+            if (children == null) {
+                return new FSFileSystem[0];
+            }
+            return Arrays.stream(children)
                 .map(fs -> new FSFileSystem(
                         FSUtils.makeUniqueFsId(fs.getFileSystem()),
-                    fs.getNodeUri(),
+                        fs.getNodeUri(),
                         fsRegistry.getProvider(fs.getFileSystem().getProviderId()).getRequiredAuth()
                     )
                 )
@@ -118,6 +122,9 @@ public class WebServiceFS implements DBWServiceFS {
         try {
             DBNPathBase folderPath = FSUtils.getNodeByPath(webSession, parentPath);
             var children = folderPath.getChildren(webSession.getProgressMonitor());
+            if (children == null) {
+                return new FSFile[0];
+            }
             return Arrays.stream(children)
                 .filter(c -> c instanceof DBNPathBase)
                 .map(c -> (DBNPathBase) c)

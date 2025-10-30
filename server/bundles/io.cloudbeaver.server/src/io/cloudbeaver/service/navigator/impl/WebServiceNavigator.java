@@ -464,12 +464,14 @@ public class WebServiceNavigator implements DBWServiceNavigator {
     @NotNull
     private String renameConnectionFolder(@NotNull WebSession session, DBNNode node, @NotNull String newName) throws DBException {
         WebConnectionFolderUtils.validateConnectionFolder(newName);
-        List<String> siblings = Arrays.stream(
-            ((DBNLocalFolder) node).getLogicalParent().getChildren(session.getProgressMonitor()))
-            .filter(n -> n instanceof DBNLocalFolder)
-            .map(DBNNode::getName).toList();
-        if (siblings.contains(newName)) {
-            throw new DBWebException("Name " + newName + " is unavailable or invalid");
+        DBNNode[] children = ((DBNLocalFolder) node).getLogicalParent().getChildren(session.getProgressMonitor());
+        if (children != null) {
+            List<String> siblings = Arrays.stream(children)
+                .filter(n -> n instanceof DBNLocalFolder)
+                .map(DBNNode::getName).toList();
+            if (siblings.contains(newName)) {
+                throw new DBWebException("Name " + newName + " is unavailable or invalid");
+            }
         }
         node.rename(session.getProgressMonitor(), newName);
         return node.getName();

@@ -12,6 +12,7 @@ import {
   ComboboxPopover as AriaComboboxPopover,
   ComboboxItem as AriaComboboxItem,
   ComboboxDisclosure,
+  ComboboxCancel,
   ComboboxValue,
   type ComboboxValueProps,
   type ComboboxProviderProps,
@@ -29,7 +30,7 @@ export interface ComboboxProps extends Omit<AriaComboboxProps, 'size'> {
   size?: 'small' | 'medium' | 'large' | 'xlarge';
 }
 
-export function ComboboxInput({ size, ...props }: ComboboxProps) {
+export function ComboboxInput({ size, ...props }: ComboboxProps): React.JSX.Element {
   return <Combobox {...props} className={clsx('dbv-kit-combobox', `dbv-kit-combobox--${size ?? 'medium'}`, props.className)} autoSelect />;
 }
 
@@ -40,7 +41,7 @@ export interface ComboboxPopoverProps extends AriaComboboxPopoverProps {
 /**
  * ComboboxPopover - Wrapper around AriaKit's popover with default styles
  */
-export function ComboboxPopover({ children, className, ...props }: ComboboxPopoverProps) {
+export function ComboboxPopover({ children, className, ...props }: ComboboxPopoverProps): React.JSX.Element {
   return (
     <AriaComboboxPopover gutter={8} className={clsx('dbv-kit-combobox__popover', className)} portal sameWidth unmountOnHide {...props}>
       {children}
@@ -48,7 +49,7 @@ export function ComboboxPopover({ children, className, ...props }: ComboboxPopov
   );
 }
 
-export function ComboboxItem(props: ComboboxItemProps) {
+export function ComboboxItem(props: ComboboxItemProps): React.JSX.Element {
   return <AriaComboboxItem {...props} className={clsx('dbv-kit-combobox__item', props.className)} />;
 }
 
@@ -57,6 +58,7 @@ export {
   useComboboxStore,
   useStoreState,
   ComboboxDisclosure,
+  ComboboxCancel,
   ComboboxValue,
   ComboboxProvider,
   type ComboboxProviderProps,

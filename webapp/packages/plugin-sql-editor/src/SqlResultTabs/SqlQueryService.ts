@@ -15,10 +15,10 @@ import { GraphQLService } from '@cloudbeaver/core-sdk';
 import {
   DatabaseDataAccessMode,
   DatabaseDataModel,
-  DatabaseEditAction,
   DataViewerDataChangeConfirmationService,
   DataViewerService,
   DataViewerSettingsService,
+  IDatabaseDataEditAction,
   type IDatabaseDataModel,
   TableViewerStorageService,
 } from '@cloudbeaver/plugin-data-viewer';
@@ -337,7 +337,7 @@ export class SqlQueryService {
       if (stage === 'request') {
         const activeGroupId = this.sqlQueryResultService.getSelectedGroup(editorState)?.groupId;
         for (const result of model.source.getResults()) {
-          const editor = model.source.getActionImplementation(result, DatabaseEditAction);
+          const editor = model.source.tryGetAction(result, IDatabaseDataEditAction);
 
           const edited = editor?.isEdited() && model.source.executionContext?.context;
 

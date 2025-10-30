@@ -314,11 +314,6 @@ public abstract class CBApplication<T extends CBServerConfig>
             }
             grantPermissionsToConnections();
         }
-        try {
-            this.systemInformationCollector.collectInternalDatabaseUseInformation();
-        } catch (DBException e) {
-            log.error("Error collecting system information", e);
-        }
 
         eventController.scheduleCheckJob();
 
@@ -400,6 +395,9 @@ public abstract class CBApplication<T extends CBServerConfig>
                 getAppConfiguration(),
                 null
             );
+            if (!isMultiNode()) {
+                grantPermissionsToConnections();
+            }
         } catch (Exception e) {
             log.error("Error loading server auto configuration", e);
         }

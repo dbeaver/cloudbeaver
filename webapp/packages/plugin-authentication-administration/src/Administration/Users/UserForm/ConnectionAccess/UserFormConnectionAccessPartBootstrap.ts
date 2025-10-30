@@ -14,9 +14,7 @@ import { AdministrationUserFormService } from '../AdministrationUserFormService.
 import { getUserFormConnectionAccessPart } from './getUserFormConnectionAccessPart.js';
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
 
-const UserFormConnectionAccessPanel = importLazyComponent(() =>
-  import('./UserFormConnectionAccessPanel.js').then(m => m.UserFormConnectionAccessPanel),
-);
+const UserConnectionAccessTable = importLazyComponent(() => import('./UserConnectionAccessTable.js').then(m => m.UserConnectionAccessTable));
 
 @injectable(() => [AdministrationUserFormService, ProjectInfoResource])
 export class UserFormConnectionAccessPartBootstrap extends Bootstrap {
@@ -33,7 +31,7 @@ export class UserFormConnectionAccessPartBootstrap extends Bootstrap {
       name: 'authentication_administration_user_connections_access',
       title: 'authentication_administration_user_connections_access',
       order: 3,
-      panel: () => UserFormConnectionAccessPanel,
+      panel: () => UserConnectionAccessTable,
       isHidden: () => !this.projectInfoResource.values.some(isGlobalProject),
       stateGetter: props => () => getUserFormConnectionAccessPart(props.formState),
       getLoader: () => getCachedMapResourceLoaderState(this.projectInfoResource, () => CachedMapAllKey),

@@ -6,11 +6,11 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { IResultSetColumnKey } from '../DatabaseDataModel/Actions/ResultSet/IResultSetDataKey.js';
+import type { IGridColumnKey } from '../DatabaseDataModel/Actions/Grid/IGridDataKey.js';
 
 export interface IDataPresentationActions {
   edit: () => void;
-  pinColumn: (key: IResultSetColumnKey) => void;
-  unpinColumn: (key: IResultSetColumnKey) => void;
-  isPinnedColumn: (key: IResultSetColumnKey) => boolean;
+  pinColumn: (key: IGridColumnKey) => void;
+  unpinColumn: (key: IGridColumnKey) => void;
+  isPinnedColumn: (key: IGridColumnKey) => boolean;
 }

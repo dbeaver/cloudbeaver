@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -12,7 +12,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { GeoJSON, LayersControl, MapContainer, TileLayer, type TileLayerProps } from 'react-leaflet';
 
 import { s, useS, useSplit, useTranslate } from '@cloudbeaver/core-blocks';
-import type { IResultSetElementKey, IResultSetValue } from '@cloudbeaver/plugin-data-viewer';
+import type { IGridDataKey, IResultSetValue } from '@cloudbeaver/plugin-data-viewer';
 
 import styles from './LeafletMap.module.css';
 import './styles/base.scss';
@@ -24,7 +24,7 @@ export interface IAssociatedValue {
 
 interface IFeatureProperties {
   srid: number;
-  associatedCell: IResultSetElementKey;
+  associatedCell: IGridDataKey;
 }
 
 export interface IGeoJSONFeature extends GeoJSON.Feature<GeoJSON.GeometryObject, IFeatureProperties> {
@@ -42,7 +42,7 @@ export type CrsKey = 'Simple' | 'EPSG:3857' | 'EPSG:4326' | 'EPSG:3395' | 'EPSG:
 interface Props {
   geoJSON: IGeoJSONFeature[];
   crsKey: CrsKey;
-  getAssociatedValues: (cell: IResultSetElementKey) => IAssociatedValue[];
+  getAssociatedValues: (cell: IGridDataKey) => IAssociatedValue[];
 }
 
 const baseTiles: Record<'street' | 'topography', IBaseTile> = {

@@ -22,7 +22,7 @@ import {
   type IDatabaseDataModel,
   type IDataPresentationActions,
   type IDataTableActions,
-  type IResultSetElementKey,
+  type IGridDataKey,
   MENU_DV_CONTEXT_MENU,
 } from '@cloudbeaver/plugin-data-viewer';
 
@@ -33,7 +33,7 @@ interface Props {
   actions: IDataTableActions;
   spreadsheetActions: IDataPresentationActions;
   resultIndex: number;
-  cellKey: IResultSetElementKey;
+  cellKey: IGridDataKey;
   simple: boolean;
   onStateSwitch?: (state: boolean) => void;
 }

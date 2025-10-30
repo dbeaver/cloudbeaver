@@ -16,6 +16,7 @@ import { DataGridSelectionContext } from '../DataGridSelection/DataGridSelection
 import { TableDataContext } from '../TableDataContext.js';
 import style from './TableColumnHeader.module.css';
 import { useTableColumnDnD } from './useTableColumnDnD.js';
+import type { SqlResultColumn } from '@cloudbeaver/core-sdk';
 
 interface Props {
   colIdx: number;
@@ -43,7 +44,8 @@ export const TableColumnHeader = observer<Props>(function TableColumnHeader({ co
   let columnDescription: string | undefined;
 
   if (columnInfo.key !== null) {
-    const column = tableDataContext.data.getColumn(columnInfo.key);
+    // TODO: fix column abstraction
+    const column = tableDataContext.data.getColumn(columnInfo.key) as SqlResultColumn | undefined;
 
     if (column) {
       columnName = column.label!;
@@ -73,7 +75,7 @@ export const TableColumnHeader = observer<Props>(function TableColumnHeader({ co
       ref={dnd.setRef}
       title={columnTooltip}
       data-s-rearrange={dnd.side}
-      className={s(styles, { dragging: dnd.data.state.isDragging }, 'tw:h-full')}
+      className={s(styles, { dragging: dnd.data.state.isDragging, dndBox: true }, 'tw:h-full')}
       onClick={handleClick}
     >
       <div className={s(styles, { header: true })}>

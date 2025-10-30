@@ -16,6 +16,22 @@ import type { GraphQLService } from '@cloudbeaver/core-sdk';
 import { DatabaseDataSource } from '../DatabaseDataModel/DatabaseDataSource.js';
 import { type IDatabaseDataOptions } from '../DatabaseDataModel/IDatabaseDataOptions.js';
 import type { IDatabaseResultSet } from '../DatabaseDataModel/IDatabaseResultSet.js';
+import { DatabaseDataConstraintAction } from '../DatabaseDataModel/Actions/DatabaseDataConstraintAction.js';
+import { DocumentDataAction } from '../DatabaseDataModel/Actions/Document/DocumentDataAction.js';
+import { DocumentEditAction } from '../DatabaseDataModel/Actions/Document/DocumentEditAction.js';
+import { IDatabaseDataCacheAction } from '../DatabaseDataModel/Actions/IDatabaseDataCacheAction.js';
+import { IDatabaseDataConstraintAction } from '../DatabaseDataModel/Actions/IDatabaseDataConstraintAction.js';
+import { IDatabaseDataEditAction } from '../DatabaseDataModel/Actions/IDatabaseDataEditAction.js';
+import { IDatabaseDataFormatAction } from '../DatabaseDataModel/Actions/IDatabaseDataFormatAction.js';
+import { IDatabaseDataResultAction } from '../DatabaseDataModel/Actions/IDatabaseDataResultAction.js';
+import { IDatabaseDataViewAction } from '../DatabaseDataModel/Actions/IDatabaseDataViewAction.js';
+import { ResultSetCacheAction } from '../DatabaseDataModel/Actions/ResultSet/ResultSetCacheAction.js';
+import { ResultSetDataAction } from '../DatabaseDataModel/Actions/ResultSet/ResultSetDataAction.js';
+import { ResultSetEditAction } from '../DatabaseDataModel/Actions/ResultSet/ResultSetEditAction.js';
+import { ResultSetFormatAction } from '../DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction.js';
+import { ResultSetSelectAction } from '../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction.js';
+import { ResultSetViewAction } from '../DatabaseDataModel/Actions/ResultSet/ResultSetViewAction.js';
+import { IDatabaseDataSelectAction } from '../DatabaseDataModel/Actions/IDatabaseDataSelectAction.js';
 
 export abstract class ResultSetDataSource<TOptions = IDatabaseDataOptions> extends DatabaseDataSource<TOptions, IDatabaseResultSet> {
   executionContext: IConnectionExecutionContext | null;
@@ -31,6 +47,18 @@ export abstract class ResultSetDataSource<TOptions = IDatabaseDataOptions> exten
     this.totalCountRequestTask = null;
     this.executionContext = null;
     this.keepExecutionContextOnDispose = false;
+
+    this.actions
+      .registerAction(IDatabaseDataResultAction, DocumentDataAction)
+      .registerAction(IDatabaseDataEditAction, DocumentEditAction)
+
+      .registerAction(IDatabaseDataResultAction, ResultSetDataAction)
+      .registerAction(IDatabaseDataEditAction, ResultSetEditAction)
+      .registerAction(IDatabaseDataViewAction, ResultSetViewAction)
+      .registerAction(IDatabaseDataSelectAction, ResultSetSelectAction)
+      .registerAction(IDatabaseDataFormatAction, ResultSetFormatAction)
+      .registerAction(IDatabaseDataCacheAction, ResultSetCacheAction)
+      .registerAction(IDatabaseDataConstraintAction, DatabaseDataConstraintAction);
 
     makeObservable(this, {
       totalCountRequestTask: observable.ref,
@@ -121,6 +149,10 @@ export abstract class ResultSetDataSource<TOptions = IDatabaseDataOptions> exten
     this.executionContext = context;
     this.setOutdated();
     return this;
+  }
+
+  override hasElementIdentifier(resultIndex: number): boolean {
+    return this.getResult(resultIndex)?.data?.hasRowIdentifier === true;
   }
 
   protected getPreviousResultId(prevResults: IDatabaseResultSet[], context: IConnectionExecutionContextInfo) {

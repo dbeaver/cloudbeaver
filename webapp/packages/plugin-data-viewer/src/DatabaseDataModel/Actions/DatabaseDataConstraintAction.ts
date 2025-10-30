@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -11,16 +11,17 @@ import { type DataTypeLogicalOperation, ResultDataFormat, type SqlDataFilterCons
 
 import { DatabaseDataAction } from '../DatabaseDataAction.js';
 import type { IDatabaseDataOptions } from '../IDatabaseDataOptions.js';
-import type { IDatabaseDataSource } from '../IDatabaseDataSource.js';
+import { IDatabaseDataSource } from '../IDatabaseDataSource.js';
 import type { IDatabaseResultSet } from '../IDatabaseResultSet.js';
 import { EOrder, type Order } from '../Order.js';
-import { databaseDataAction } from './DatabaseDataActionDecorator.js';
 import type { IDatabaseDataConstraintAction } from './IDatabaseDataConstraintAction.js';
+import { injectable } from '@cloudbeaver/core-di';
+import { IDatabaseDataResult } from '../IDatabaseDataResult.js';
 
 export const IS_NULL_ID = 'IS_NULL';
 export const IS_NOT_NULL_ID = 'IS_NOT_NULL';
 
-@databaseDataAction()
+@injectable(() => [IDatabaseDataSource, IDatabaseDataResult])
 export class DatabaseDataConstraintAction
   extends DatabaseDataAction<IDatabaseDataOptions, IDatabaseResultSet>
   implements IDatabaseDataConstraintAction<IDatabaseResultSet>
@@ -47,8 +48,10 @@ export class DatabaseDataConstraintAction
     return this.source.options.constraints.filter(isFilterConstraint);
   }
 
-  constructor(source: IDatabaseDataSource<any, IDatabaseResultSet>) {
-    super(source);
+  constructor(source: IDatabaseDataSource, result: IDatabaseDataResult) {
+    super(source as unknown as IDatabaseDataSource<any, IDatabaseResultSet>, result as IDatabaseResultSet);
+    updateConstraintsForResult(source as unknown as IDatabaseDataSource<any, IDatabaseResultSet>, result as IDatabaseResultSet);
+
     makeObservable(this, {
       orderConstraints: computed,
       filterConstraints: computed,
@@ -252,35 +255,38 @@ export class DatabaseDataConstraintAction
     return currentConstraint.orderAsc ? EOrder.asc : EOrder.desc;
   }
 
-  override updateResults(results: IDatabaseResultSet[]): void {
-    const nextResult = results[this.resultIndex];
-    if (!this.source.options || results.length !== this.source.results.length || !nextResult) {
+  override updateResult(result: IDatabaseResultSet): void {
+    updateConstraintsForResult(this.source, result);
+  }
+}
+
+function updateConstraintsForResult(source: IDatabaseDataSource<IDatabaseDataOptions, IDatabaseResultSet>, result: IDatabaseResultSet) {
+  if (!source.options) {
+    return;
+  }
+
+  for (const constraint of source.options.constraints) {
+    const prevColumn = result.data?.columns?.find(column => column.position === constraint.attributePosition);
+
+    if (!prevColumn) {
       return;
     }
 
-    for (const constraint of this.source.options.constraints) {
-      const prevColumn = this.result.data?.columns?.find(column => column.position === constraint.attributePosition);
+    let column = result.data?.columns?.find(column => column.position === prevColumn.position);
 
-      if (!prevColumn) {
-        return;
-      }
+    if (!column || column.label !== prevColumn.label) {
+      column = result.data?.columns?.find(column => column.label === prevColumn.label);
+    }
 
-      let column = nextResult.data?.columns?.find(column => column.position === prevColumn.position);
+    if (column && prevColumn.position !== column.position) {
+      const prevConstraint = source.prevOptions?.constraints.find(
+        prevConstraint => prevConstraint.attributePosition === constraint.attributePosition,
+      );
 
-      if (!column || column.label !== prevColumn.label) {
-        column = nextResult.data?.columns?.find(column => column.label === prevColumn.label);
-      }
+      constraint.attributePosition = column.position;
 
-      if (column && prevColumn.position !== column.position) {
-        const prevConstraint = this.source.prevOptions?.constraints.find(
-          prevConstraint => prevConstraint.attributePosition === constraint.attributePosition,
-        );
-
-        constraint.attributePosition = column.position;
-
-        if (prevConstraint) {
-          prevConstraint.attributePosition = constraint.attributePosition;
-        }
+      if (prevConstraint) {
+        prevConstraint.attributePosition = constraint.attributePosition;
       }
     }
   }

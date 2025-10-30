@@ -115,15 +115,17 @@ public class WebFSServlet extends WebServiceServletBase {
     @Override
     protected Map<String, Object> getVariables(HttpServletRequest request) {
         Map<String, Object> variables = super.getVariables(request);
-        try {
-            for (Part part : request.getParts()) {
-                if (part.getSubmittedFileName() != null && !part.getSubmittedFileName().isEmpty()) {
-                    variables.put("fileName", part.getSubmittedFileName());
-                    break;
+        if (request.getMethod().equals("POST")) {
+            try {
+                for (Part part : request.getParts()) {
+                    if (part.getSubmittedFileName() != null && !part.getSubmittedFileName().isEmpty()) {
+                        variables.put("fileName", part.getSubmittedFileName());
+                        break;
+                    }
                 }
+            } catch (Exception e) {
+                log.debug("Failed to get fileName from request for logging", e);
             }
-        } catch (Exception e) {
-            log.debug("Failed to get fileName from request for logging", e);
         }
         return variables;
     }

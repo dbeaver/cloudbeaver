@@ -540,6 +540,12 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
             //it's a hack. Otherwise password will be written to database
             authParameters.remove(LdapConstants.CRED_PASSWORD);
 
+            String referralHandlingMode = ldapSettings.getReferralHandlingMode();
+            environment.put(Context.REFERRAL, referralHandlingMode);
+            if ("follow".equalsIgnoreCase(referralHandlingMode)) {
+                environment.put("java.naming.ldap.referral.limit", "5");
+            }
+
             context = initConnection(environment);
 
             String searchFilter = "(member=" + fullDN + ")";
@@ -548,7 +554,12 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
 
             searchResults = context.search(ldapSettings.getBaseDN(), searchFilter, searchControls);
             while (searchResults.hasMore()) {
-                result.add(searchResults.next().getName());
+                try {
+                    SearchResult next = searchResults.next();
+                    result.add(next.getName());
+                } catch (Exception e) {
+                    log.error("Failed fetch user group. Skipping...", e);
+                }
             }
         } catch (Exception e) {
             log.error("Group not found", e);

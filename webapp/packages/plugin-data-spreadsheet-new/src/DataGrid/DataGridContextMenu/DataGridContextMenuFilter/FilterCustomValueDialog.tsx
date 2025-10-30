@@ -71,7 +71,7 @@ export const FilterCustomValueDialog: DialogComponent<IPayload, string | number>
             {translate('ui_clipboard')}
           </Button>
         )}
-        <Button type="button" variant="secondary" onClick={rejectDialog}>
+        <Button type="button" variant="secondary" onClick={() => rejectDialog()}>
           {translate('ui_processing_cancel')}
         </Button>
         <Button type="button" onClick={handleApply}>

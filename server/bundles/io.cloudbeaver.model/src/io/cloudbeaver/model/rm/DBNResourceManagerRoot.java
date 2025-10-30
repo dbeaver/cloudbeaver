@@ -85,7 +85,7 @@ public class DBNResourceManagerRoot extends DBNNode implements DBPHiddenObject, 
         return true;
     }
 
-    @NotNull
+    @Nullable
     @Override
     public DBNResourceManagerProject[] getChildren(@NotNull DBRProgressMonitor monitor) throws DBException {
         if (projects == null && !monitor.isForceCacheUsage()) {

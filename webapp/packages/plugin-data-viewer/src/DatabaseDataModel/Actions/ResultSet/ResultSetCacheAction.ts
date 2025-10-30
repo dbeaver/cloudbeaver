@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -10,27 +10,29 @@ import { action, makeObservable, observable } from 'mobx';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
 import { DatabaseDataAction } from '../../DatabaseDataAction.js';
-import type { IDatabaseDataSource } from '../../IDatabaseDataSource.js';
+import { IDatabaseDataSource } from '../../IDatabaseDataSource.js';
 import type { IDatabaseResultSet } from '../../IDatabaseResultSet.js';
-import { databaseDataAction } from '../DatabaseDataActionDecorator.js';
 import type { IDatabaseDataCacheAction } from '../IDatabaseDataCacheAction.js';
-import type { IResultSetElementKey, IResultSetRowKey } from './IResultSetDataKey.js';
 import { ResultSetDataAction } from './ResultSetDataAction.js';
+import { injectable } from '@cloudbeaver/core-di';
+import { IDatabaseDataResult } from '../../IDatabaseDataResult.js';
+import type { IGridDataKey, IGridRowKey } from '../Grid/IGridDataKey.js';
 
-@databaseDataAction()
+@injectable(() => [IDatabaseDataSource, IDatabaseDataResult, ResultSetDataAction])
 export class ResultSetCacheAction
   extends DatabaseDataAction<any, IDatabaseResultSet>
-  implements IDatabaseDataCacheAction<IResultSetElementKey, IDatabaseResultSet>
+  implements IDatabaseDataCacheAction<IGridDataKey, IDatabaseResultSet>
 {
   static dataFormat = [ResultDataFormat.Resultset];
 
   private readonly cache: Map<string, Map<symbol, any>>;
 
   constructor(
-    source: IDatabaseDataSource<any, IDatabaseResultSet>,
+    source: IDatabaseDataSource,
+    result: IDatabaseDataResult,
     private readonly data: ResultSetDataAction,
   ) {
-    super(source);
+    super(source as unknown as IDatabaseDataSource<unknown, IDatabaseResultSet>, result as IDatabaseResultSet);
 
     this.cache = new Map();
 
@@ -44,7 +46,7 @@ export class ResultSetCacheAction
     });
   }
 
-  get<T>(key: IResultSetElementKey, scope: symbol): T | undefined {
+  get<T>(key: IGridDataKey, scope: symbol): T | undefined {
     const keyCache = this.getKeyCache(key);
     if (!keyCache) {
       return;
@@ -53,7 +55,7 @@ export class ResultSetCacheAction
     return keyCache.get(scope);
   }
 
-  getRow<T>(key: IResultSetRowKey, scope: symbol): T | undefined {
+  getRow<T>(key: IGridRowKey, scope: symbol): T | undefined {
     const keyCache = this.getRowCache(key);
     if (!keyCache) {
       return;
@@ -62,7 +64,7 @@ export class ResultSetCacheAction
     return keyCache.get(scope);
   }
 
-  has(key: IResultSetElementKey, scope: symbol) {
+  has(key: IGridDataKey, scope: symbol): boolean {
     const keyCache = this.getKeyCache(key);
 
     if (!keyCache) {
@@ -72,7 +74,7 @@ export class ResultSetCacheAction
     return keyCache.has(scope);
   }
 
-  hasRow(key: IResultSetRowKey, scope: symbol) {
+  hasRow(key: IGridRowKey, scope: symbol): boolean {
     const keyCache = this.getRowCache(key);
 
     if (!keyCache) {
@@ -82,19 +84,19 @@ export class ResultSetCacheAction
     return keyCache.has(scope);
   }
 
-  set<T>(key: IResultSetElementKey, scope: symbol, value: T) {
+  set<T>(key: IGridDataKey, scope: symbol, value: T): void {
     const keyCache = this.getOrCreateKeyCache(key);
 
     keyCache.set(scope, value);
   }
 
-  setRow<T>(key: IResultSetRowKey, scope: symbol, value: T) {
+  setRow<T>(key: IGridRowKey, scope: symbol, value: T): void {
     const keyCache = this.getOrCreateRowKeyCache(key);
 
     keyCache.set(scope, value);
   }
 
-  delete(key: IResultSetElementKey, scope: symbol) {
+  delete(key: IGridDataKey, scope: symbol): void {
     const keyCache = this.getKeyCache(key);
 
     if (keyCache) {
@@ -102,13 +104,13 @@ export class ResultSetCacheAction
     }
   }
 
-  deleteAll(scope: symbol) {
+  deleteAll(scope: symbol): void {
     for (const [, keyCache] of this.cache) {
       keyCache.delete(scope);
     }
   }
 
-  deleteRow(key: IResultSetRowKey, scope: symbol) {
+  deleteRow(key: IGridRowKey, scope: symbol): void {
     const keyCache = this.getRowCache(key);
 
     if (keyCache) {
@@ -116,7 +118,7 @@ export class ResultSetCacheAction
     }
   }
 
-  override afterResultUpdate() {
+  override afterResultUpdate(): void {
     this.cache.clear();
   }
 
@@ -124,23 +126,23 @@ export class ResultSetCacheAction
     this.cache.clear();
   }
 
-  private serializeRowKey(key: IResultSetRowKey) {
+  private serializeRowKey(key: IGridRowKey) {
     return 'row:' + this.data.serializeRowKey(key);
   }
 
-  private serializeKey(key: IResultSetElementKey) {
+  private serializeKey(key: IGridDataKey) {
     return this.data.serialize(key);
   }
 
-  private getKeyCache(key: IResultSetElementKey) {
+  private getKeyCache(key: IGridDataKey) {
     return this.cache.get(this.serializeKey(key));
   }
 
-  private getRowCache(key: IResultSetRowKey) {
+  private getRowCache(key: IGridRowKey) {
     return this.cache.get(this.serializeRowKey(key));
   }
 
-  private getOrCreateKeyCache(key: IResultSetElementKey) {
+  private getOrCreateKeyCache(key: IGridDataKey) {
     let keyCache = this.getKeyCache(key);
 
     if (!keyCache) {
@@ -151,7 +153,7 @@ export class ResultSetCacheAction
     return keyCache;
   }
 
-  private getOrCreateRowKeyCache(key: IResultSetRowKey) {
+  private getOrCreateRowKeyCache(key: IGridRowKey) {
     let keyCache = this.getRowCache(key);
 
     if (!keyCache) {

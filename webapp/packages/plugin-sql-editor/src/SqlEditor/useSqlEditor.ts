@@ -234,14 +234,14 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
         const processableTabs = this.state.tabs.filter(tab => tab.id !== OUTPUT_LOGS_TAB_ID);
 
         if (processableTabs.length > 0) {
-          const result = await this.commonDialogService.open(ConfirmationDialog, {
+          const { status, result } = await this.commonDialogService.open(ConfirmationDialog, {
             title: 'sql_editor_close_result_tabs_dialog_title',
             message: `Do you want to close ${processableTabs.length} tabs before executing script?`,
             confirmActionText: 'ui_yes',
-            extraStatus: 'no',
+            showExtraAction: true,
           });
 
-          if (result === DialogueStateResult.Resolved) {
+          if (status === DialogueStateResult.Resolved) {
             const state = await this.sqlResultTabsService.canCloseResultTabs(this.state);
 
             if (!state) {
@@ -249,7 +249,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
             }
 
             this.sqlResultTabsService.removeResultTabs(this.state, [OUTPUT_LOGS_TAB_ID]);
-          } else if (result === DialogueStateResult.Rejected) {
+          } else if (!result?.isExtraAction) {
             return;
           }
         }

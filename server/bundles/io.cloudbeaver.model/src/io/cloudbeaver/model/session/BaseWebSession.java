@@ -254,8 +254,12 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
     @Property
     public long getRemainingTime() {
         if (application instanceof ServletAuthApplication authApplication) {
-            return authApplication.getMaxSessionIdleTime() + lastAccessTime - System.currentTimeMillis();
+            return getMaxSessionIdleTime(authApplication) + lastAccessTime - System.currentTimeMillis();
         }
         return Integer.MAX_VALUE;
+    }
+
+    protected long getMaxSessionIdleTime(@NotNull ServletAuthApplication authApplication) {
+        return authApplication.getMaxSessionIdleTime();
     }
 }

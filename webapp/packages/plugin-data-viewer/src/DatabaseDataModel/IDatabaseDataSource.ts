@@ -1,16 +1,15 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import type { IServiceProvider } from '@cloudbeaver/core-di';
-import type { IExecutor } from '@cloudbeaver/core-executor';
+import { createService, type IServiceProvider, type SingleServiceType } from '@cloudbeaver/core-di';
+import type { IExecutor, ISyncExecutor } from '@cloudbeaver/core-executor';
 import { type TLocalizationToken } from '@cloudbeaver/core-localization';
 import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
-import type { IDatabaseDataActionClass, IDatabaseDataActionInterface } from './IDatabaseDataAction.js';
 import type { IDatabaseDataActions } from './IDatabaseDataActions.js';
 import type { IDatabaseDataResult } from './IDatabaseDataResult.js';
 
@@ -66,6 +65,7 @@ export interface IDatabaseDataSource<TOptions = unknown, TResult extends IDataba
   readonly cancelled: boolean;
   readonly serviceProvider: IServiceProvider;
   readonly onOperation: IExecutor<IDatabaseDataSourceOperationEvent>;
+  readonly onResultsUpdate: ISyncExecutor<TResult[]>;
 
   isError: () => boolean;
   isOutdated: () => boolean;
@@ -78,15 +78,14 @@ export interface IDatabaseDataSource<TOptions = unknown, TResult extends IDataba
 
   hasResult: (resultIndex: number) => boolean;
 
-  tryGetAction: (<T extends IDatabaseDataActionClass<TOptions, TResult, any>>(resultIndex: number, action: T) => InstanceType<T> | undefined) &
-    (<T extends IDatabaseDataActionClass<TOptions, TResult, any>>(result: TResult, action: T) => InstanceType<T> | undefined);
-  getAction: (<T extends IDatabaseDataActionClass<TOptions, TResult, any>>(resultIndex: number, action: T) => InstanceType<T>) &
-    (<T extends IDatabaseDataActionClass<TOptions, TResult, any>>(result: TResult, action: T) => InstanceType<T>);
-  getActionImplementation: (<T extends IDatabaseDataActionInterface<TOptions, TResult, any>>(
-    resultIndex: number,
-    action: T,
-  ) => InstanceType<T> | undefined) &
-    (<T extends IDatabaseDataActionInterface<TOptions, TResult, any>>(result: TResult, action: T) => InstanceType<T> | undefined);
+  tryGetAction<T>(resultIndex: number, action: SingleServiceType<T, any[]>): T | undefined;
+  tryGetAction<T>(result: TResult, action: SingleServiceType<T, any[]>): T | undefined;
+  tryGetAction<T>(resultIndex: number, action: SingleServiceType<unknown>, implementation: SingleServiceType<T, any[]>): T | undefined;
+  tryGetAction<T>(result: TResult, action: SingleServiceType<unknown>, implementation: SingleServiceType<T, any[]>): T | undefined;
+  getAction<T>(resultIndex: number, action: SingleServiceType<T, any[]>): T;
+  getAction<T>(result: TResult, action: SingleServiceType<T, any[]>): T;
+  getAction<T>(resultIndex: number, action: SingleServiceType<unknown>, implementation: SingleServiceType<T, any[]>): T;
+  getAction<T>(result: TResult, action: SingleServiceType<unknown>, implementation: SingleServiceType<T, any[]>): T;
 
   getResult: (index: number) => TResult | null;
   getResults: () => TResult[];
@@ -117,3 +116,5 @@ export interface IDatabaseDataSource<TOptions = unknown, TResult extends IDataba
   canSafelyDispose: () => Promise<boolean>;
   dispose: () => Promise<void>;
 }
+
+export const IDatabaseDataSource = createService<IDatabaseDataSource>('IDatabaseDataSource');

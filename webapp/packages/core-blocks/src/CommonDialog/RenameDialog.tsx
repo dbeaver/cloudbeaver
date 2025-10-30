@@ -115,7 +115,7 @@ export const RenameDialog: DialogComponent<RenameDialogPayload, string> = observ
         </Form>
       </CommonDialogBody>
       <CommonDialogFooter className={s(styles, { footer: true })}>
-        <Button type="button" variant="secondary" onClick={rejectDialog}>
+        <Button type="button" variant="secondary" onClick={() => rejectDialog()}>
           {translate('ui_processing_cancel')}
         </Button>
         <Fill />

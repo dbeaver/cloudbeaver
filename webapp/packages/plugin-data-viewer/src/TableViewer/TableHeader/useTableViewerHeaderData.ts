@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -10,9 +10,10 @@ import { computed } from 'mobx';
 import { type InputAutocompleteProposal, useObservableRef } from '@cloudbeaver/core-blocks';
 import type { SqlResultColumn } from '@cloudbeaver/core-sdk';
 
-import { ResultSetViewAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetViewAction.js';
 import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel.js';
 import { isResultSetDataModel } from '../../ResultSet/isResultSetDataModel.js';
+import { IDatabaseDataViewAction } from '../../DatabaseDataModel/Actions/IDatabaseDataViewAction.js';
+import { GridViewAction } from '../../DatabaseDataModel/Actions/Grid/GridViewAction.js';
 
 interface Props {
   model: IDatabaseDataModel;
@@ -73,13 +74,14 @@ export function useTableViewerHeaderData({ model, resultIndex }: Props): Readonl
           return [];
         }
 
-        const view = model.source.tryGetAction(resultIndex, ResultSetViewAction);
+        const view = model.source.tryGetAction(resultIndex, IDatabaseDataViewAction, GridViewAction);
 
         if (!view) {
           return [];
         }
 
-        return view?.columns ?? [];
+        // TODO: fix column abstraction
+        return (view?.columns as SqlResultColumn[] | undefined) ?? [];
       },
       get hintProposals() {
         return [...BASE_HINTS].concat(

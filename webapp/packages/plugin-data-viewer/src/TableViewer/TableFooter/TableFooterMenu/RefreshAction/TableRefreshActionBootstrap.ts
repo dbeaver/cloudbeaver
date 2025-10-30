@@ -15,7 +15,7 @@ import { LocalizationService } from '@cloudbeaver/core-localization';
 import { declensionOfNumber } from '@cloudbeaver/core-utils';
 import { ACTION_REFRESH, ActionService, MenuBaseItem, menuExtractItems, MenuSeparatorItem, MenuService } from '@cloudbeaver/core-view';
 
-import { type IDatabaseRefreshState } from '../../../../DatabaseDataModel/Actions/DatabaseRefreshAction.js';
+import { type IDatabaseRefreshState } from '../../../../DatabaseDataModel/Actions/General/DatabaseRefreshAction.js';
 import { DATA_CONTEXT_DV_DDM } from '../../../../DatabaseDataModel/DataContext/DATA_CONTEXT_DV_DDM.js';
 import { DATA_CONTEXT_DV_DDM_RESULT_INDEX } from '../../../../DatabaseDataModel/DataContext/DATA_CONTEXT_DV_DDM_RESULT_INDEX.js';
 import { DATA_VIEWER_DATA_MODEL_ACTIONS_MENU } from '../DATA_VIEWER_DATA_MODEL_ACTIONS_MENU.js';
@@ -175,9 +175,9 @@ export class TableRefreshActionBootstrap extends Bootstrap {
       stopOnError: state.stopOnError,
     });
 
-    const result = await this.commonDialogService.open(AutoRefreshSettingsDialog, { state: stateCopy });
+    const { status } = await this.commonDialogService.open(AutoRefreshSettingsDialog, { state: stateCopy });
 
-    if (result === DialogueStateResult.Resolved) {
+    if (status === DialogueStateResult.Resolved) {
       let interval = stateCopy.interval;
 
       if (typeof interval === 'string') {

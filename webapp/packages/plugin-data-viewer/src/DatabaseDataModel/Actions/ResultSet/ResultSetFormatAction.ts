@@ -9,16 +9,18 @@ import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 import { isResultSetContentValue, isResultSetComplexValue, type IResultSetComplexValue } from '@dbeaver/result-set-api';
 
 import { DatabaseDataAction } from '../../DatabaseDataAction.js';
-import type { IDatabaseDataSource } from '../../IDatabaseDataSource.js';
+import { IDatabaseDataSource } from '../../IDatabaseDataSource.js';
 import type { IDatabaseResultSet } from '../../IDatabaseResultSet.js';
-import { databaseDataAction } from '../DatabaseDataActionDecorator.js';
-import { DatabaseEditChangeType } from '../IDatabaseDataEditAction.js';
+import { DatabaseEditChangeType, IDatabaseDataEditAction } from '../IDatabaseDataEditAction.js';
 import type { IDatabaseDataFormatAction } from '../IDatabaseDataFormatAction.js';
-import type { IResultSetColumnKey, IResultSetElementKey, IResultSetPartialKey } from './IResultSetDataKey.js';
 import { isResultSetFileValue } from './isResultSetFileValue.js';
 import { isResultSetGeometryValue } from './isResultSetGeometryValue.js';
 import { ResultSetEditAction } from './ResultSetEditAction.js';
 import { ResultSetViewAction } from './ResultSetViewAction.js';
+import { injectable } from '@cloudbeaver/core-di';
+import { IDatabaseDataResult } from '../../IDatabaseDataResult.js';
+import { IDatabaseDataViewAction } from '../IDatabaseDataViewAction.js';
+import type { IGridColumnKey, IGridDataKey } from '../Grid/IGridDataKey.js';
 
 export type IResultSetValue =
   | string
@@ -30,23 +32,25 @@ export type IResultSetValue =
 
 const DISPLAY_STRING_LENGTH = 200;
 
-@databaseDataAction()
+@injectable(() => [IDatabaseDataSource, IDatabaseDataResult, IDatabaseDataViewAction, IDatabaseDataEditAction])
 export class ResultSetFormatAction
   extends DatabaseDataAction<any, IDatabaseResultSet>
-  implements IDatabaseDataFormatAction<IResultSetElementKey, IDatabaseResultSet>
+  implements IDatabaseDataFormatAction<IGridDataKey, IDatabaseResultSet>
 {
   static dataFormat = [ResultDataFormat.Resultset];
-
   private readonly view: ResultSetViewAction;
-  private readonly edit: ResultSetEditAction;
+  private readonly edit?: ResultSetEditAction;
 
-  constructor(source: IDatabaseDataSource<any, IDatabaseResultSet>, view: ResultSetViewAction, edit: ResultSetEditAction) {
-    super(source);
-    this.view = view;
-    this.edit = edit;
+  constructor(source: IDatabaseDataSource, result: IDatabaseDataResult, view: IDatabaseDataViewAction, edit?: IDatabaseDataEditAction) {
+    super(source as unknown as IDatabaseDataSource<unknown, IDatabaseResultSet>, result as IDatabaseResultSet);
+    this.view = view as any as ResultSetViewAction;
+    this.edit = edit as ResultSetEditAction | undefined;
   }
 
-  isReadOnly(key: IResultSetPartialKey): boolean {
+  isReadOnly(key: Partial<IGridDataKey>): boolean {
+    if (!this.edit) {
+      return true;
+    }
     let readonly = false;
 
     if (key.column) {
@@ -55,17 +59,17 @@ export class ResultSetFormatAction
 
     if (key.column && key.row) {
       if (!readonly) {
-        readonly = this.edit.getElementState(key as IResultSetElementKey) === DatabaseEditChangeType.delete;
+        readonly = this.edit.getElementState(key as IGridDataKey) === DatabaseEditChangeType.delete;
       }
     }
 
     return readonly;
   }
-  isNull(key: IResultSetElementKey): boolean {
+  isNull(key: IGridDataKey): boolean {
     return this.get(key) === null;
   }
 
-  isBinary(key: IResultSetPartialKey): boolean {
+  isBinary(key: Partial<IGridDataKey>): boolean {
     if (!key.column) {
       return false;
     }
@@ -76,7 +80,7 @@ export class ResultSetFormatAction
     }
 
     if (key.row) {
-      const value = this.get(key as IResultSetElementKey);
+      const value = this.get(key as IGridDataKey);
 
       if (isResultSetFileValue(value)) {
         return true;
@@ -90,7 +94,7 @@ export class ResultSetFormatAction
     return false;
   }
 
-  isGeometry(key: IResultSetPartialKey) {
+  isGeometry(key: Partial<IGridDataKey>): boolean {
     if (key.column) {
       const column = this.view.getColumn(key.column);
       if (column?.dataKind?.toLocaleLowerCase() === 'geometry') {
@@ -99,14 +103,14 @@ export class ResultSetFormatAction
     }
 
     if (key.row) {
-      const value = this.get(key as IResultSetElementKey);
+      const value = this.get(key as IGridDataKey);
       return isResultSetComplexValue(value) && value.$type === 'geometry';
     }
 
     return false;
   }
 
-  isText(key: IResultSetPartialKey): boolean {
+  isText(key: Partial<IGridDataKey>): boolean {
     if (!key?.column) {
       return false;
     }
@@ -118,7 +122,7 @@ export class ResultSetFormatAction
     }
 
     if (key.row && !this.isBinary(key)) {
-      const value = this.get(key as IResultSetElementKey);
+      const value = this.get(key as IGridDataKey);
 
       if (isResultSetContentValue(value)) {
         return value.text !== undefined;
@@ -132,7 +136,7 @@ export class ResultSetFormatAction
     return this.view.columns.map(column => column.name!).filter(name => name !== undefined);
   }
 
-  getLongestCells(column?: IResultSetColumnKey, offset = 0, count?: number): string[] {
+  getLongestCells(column?: IGridColumnKey, offset = 0, count?: number): string[] {
     const cells: string[] = [];
     const columns = column ? [column] : this.view.columnKeys;
     count ??= this.view.rowKeys.length;
@@ -152,11 +156,11 @@ export class ResultSetFormatAction
     return cells;
   }
 
-  get(key: IResultSetElementKey): IResultSetValue {
+  get(key: IGridDataKey): IResultSetValue {
     return this.view.getCellValue(key);
   }
 
-  getText(key: IResultSetElementKey): string {
+  getText(key: IGridDataKey): string {
     const value = this.get(key);
 
     if (value === null) {
@@ -204,7 +208,7 @@ export class ResultSetFormatAction
     return value;
   }
 
-  getDisplayString(key: IResultSetElementKey): string {
+  getDisplayString(key: IGridDataKey): string {
     const value = this.get(key);
 
     if (value === null) {

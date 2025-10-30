@@ -16,11 +16,10 @@ import {
   DATA_CONTEXT_DV_RESULT_KEY,
   DatabaseEditChangeType,
   DataViewerService,
+  IDatabaseDataEditAction,
+  IDatabaseDataFormatAction,
   isResultSetDataSource,
   ResultSetDataContentAction,
-  ResultSetDataSource,
-  ResultSetEditAction,
-  ResultSetFormatAction,
 } from '@cloudbeaver/plugin-data-viewer';
 
 @injectable(() => [NotificationService, DataViewerService, ActionService, MenuService])
@@ -52,10 +51,9 @@ export class DataGridContextMenuSaveContentService {
         const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
         const key = context.get(DATA_CONTEXT_DV_RESULT_KEY)!;
 
-        const source = model.source as unknown as ResultSetDataSource;
-        const content = source.getAction(resultIndex, ResultSetDataContentAction);
-        const format = source.getAction(resultIndex, ResultSetFormatAction);
-        const editor = source.getAction(resultIndex, ResultSetEditAction);
+        const content = model.source.getAction(resultIndex, ResultSetDataContentAction);
+        const format = model.source.getAction(resultIndex, IDatabaseDataFormatAction);
+        const editor = model.source.getAction(resultIndex, IDatabaseDataEditAction);
 
         if (action === ACTION_DOWNLOAD) {
           return !content.isDownloadable(key) || !this.dataViewerService.canExportData;
@@ -76,8 +74,7 @@ export class DataGridContextMenuSaveContentService {
         const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
         const key = context.get(DATA_CONTEXT_DV_RESULT_KEY)!;
 
-        const source = model.source as unknown as ResultSetDataSource;
-        const content = source.getAction(resultIndex, ResultSetDataContentAction);
+        const content = model.source.getAction(resultIndex, ResultSetDataContentAction);
 
         if (action === ACTION_DOWNLOAD || action === ACTION_UPLOAD) {
           return model.isLoading() || content.isLoading(key);
@@ -90,9 +87,8 @@ export class DataGridContextMenuSaveContentService {
         const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
         const key = context.get(DATA_CONTEXT_DV_RESULT_KEY)!;
 
-        const source = model.source as unknown as ResultSetDataSource;
-        const content = source.getAction(resultIndex, ResultSetDataContentAction);
-        const edit = source.getAction(resultIndex, ResultSetEditAction);
+        const content = model.source.getAction(resultIndex, ResultSetDataContentAction);
+        const edit = model.source.getAction(resultIndex, IDatabaseDataEditAction);
 
         if (action === ACTION_DOWNLOAD) {
           try {

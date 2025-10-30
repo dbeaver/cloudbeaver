@@ -36,6 +36,7 @@ public class LdapSettings {
     private final String filter;
     private final String loginAttribute;
     private final LdapSslSetting ldapSslSetting;
+    private final String referralHandlingMode;
 
 
     public LdapSettings(
@@ -56,6 +57,7 @@ public class LdapSettings {
             providerConfiguration.getParameter(LdapConstants.PARAM_SSL_ENABLE),
             providerConfiguration.getParameter(LdapConstants.PARAM_SSL_CERT)
         );
+        this.referralHandlingMode = providerConfiguration.getParameterOrDefault(LdapConstants.PARAM_REFERRAL_HANDLING,  "ignore");
     }
 
 
@@ -108,5 +110,9 @@ public class LdapSettings {
     @NotNull
     public SMAuthProviderCustomConfiguration getProviderConfiguration() {
         return providerConfiguration;
+    }
+
+    public String getReferralHandlingMode() {
+        return referralHandlingMode;
     }
 }

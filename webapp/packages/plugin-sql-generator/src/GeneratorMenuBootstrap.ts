@@ -13,8 +13,8 @@ import {
   DATA_CONTEXT_DV_DDM_RESULT_INDEX,
   DATA_CONTEXT_DV_PRESENTATION,
   DATA_VIEWER_DATA_MODEL_ACTIONS_MENU,
-  DatabaseEditAction,
   DataViewerPresentationType,
+  IDatabaseDataEditAction,
   type IDatabaseDataModel,
   isResultSetDataSource,
   ResultSetDataSource,
@@ -68,7 +68,7 @@ export class GeneratorMenuBootstrap extends Bootstrap {
         if (model.isLoading() || model.isDisabled(resultIndex) || !model.source.hasResult(resultIndex)) {
           return true;
         }
-        const editor = model.source.getActionImplementation(resultIndex, DatabaseEditAction);
+        const editor = model.source.tryGetAction(resultIndex, IDatabaseDataEditAction);
         return !editor?.isEdited();
       },
       handler: context => {

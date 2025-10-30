@@ -10,46 +10,47 @@ import { createContext } from 'react';
 import type { SqlResultColumn } from '@cloudbeaver/core-sdk';
 import type {
   DatabaseEditChangeType,
-  IResultSetColumnKey,
-  IResultSetElementKey,
-  IResultSetRowKey,
+  GridDataResultAction,
+  GridEditAction,
+  GridViewAction,
+  IDatabaseDataFormatAction,
+  IDatabaseResultSet,
+  IGridColumnKey,
+  IGridDataKey,
+  IGridRowKey,
   IResultSetValue,
-  ResultSetDataAction,
   ResultSetDataContentAction,
-  ResultSetEditAction,
-  ResultSetFormatAction,
-  ResultSetViewAction,
 } from '@cloudbeaver/plugin-data-viewer';
 
 export interface IColumnInfo {
-  key: IResultSetColumnKey | null;
+  key: IGridColumnKey | null;
 }
 
 export interface ITableData {
-  format: ResultSetFormatAction;
+  format: IDatabaseDataFormatAction<Partial<IGridDataKey>, IDatabaseResultSet>;
   dataContent: ResultSetDataContentAction;
-  data: ResultSetDataAction;
-  editor: ResultSetEditAction;
+  data: GridDataResultAction;
+  editor: GridEditAction | undefined;
+  view: GridViewAction;
   hasDescription: boolean;
-  view: ResultSetViewAction;
   columns: Array<IColumnInfo>;
-  columnKeys: IResultSetColumnKey[];
-  rows: IResultSetRowKey[];
+  columnKeys: IGridColumnKey[];
+  rows: IGridRowKey[];
   gridDiv: HTMLDivElement | null;
-  inBounds: (position: IResultSetElementKey) => boolean;
-  getRow: (rowIndex: number) => IResultSetRowKey | undefined;
+  inBounds: (position: IGridDataKey) => boolean;
+  getRow: (rowIndex: number) => IGridRowKey | undefined;
   getColumn: (columnIndex: number) => IColumnInfo | undefined;
-  getColumnByDataIndex: (key: IResultSetColumnKey) => IColumnInfo;
-  getCellValue: (key: IResultSetElementKey) => IResultSetValue | undefined;
-  getColumnInfo: (key: IResultSetColumnKey) => SqlResultColumn | undefined;
+  getColumnByDataIndex: (key: IGridColumnKey) => IColumnInfo;
+  getCellValue: (key: IGridDataKey) => IResultSetValue | undefined;
+  getColumnInfo: (key: IGridColumnKey) => SqlResultColumn | undefined;
   getColumnsInRange: (startIndex: number, endIndex: number) => Array<IColumnInfo>;
-  getColumnIndexFromColumnKey: (column: IResultSetColumnKey) => number;
-  getRowIndexFromKey: (row: IResultSetRowKey) => number;
-  getEditionState: (key: IResultSetElementKey) => DatabaseEditChangeType | null;
-  isCellEdited: (key: IResultSetElementKey) => boolean;
+  getColumnIndexFromColumnKey: (column: IGridColumnKey) => number;
+  getRowIndexFromKey: (row: IGridRowKey) => number;
+  getEditionState: (key: IGridDataKey) => DatabaseEditChangeType | null;
+  isCellEdited: (key: IGridDataKey) => boolean;
   isIndexColumn: (columnKey: IColumnInfo) => boolean;
   isIndexColumnInRange: (columnsRange: Array<IColumnInfo>) => boolean;
-  isCellReadonly: (key: IResultSetElementKey) => boolean;
+  isCellReadonly: (key: IGridDataKey) => boolean;
 }
 
 export const TableDataContext = createContext<ITableData>(undefined as any);

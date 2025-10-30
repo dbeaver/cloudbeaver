@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -14,9 +14,9 @@ import { copyToClipboard } from '@cloudbeaver/core-utils';
 import {
   DatabaseSelectAction,
   DataViewerService,
-  type IResultSetColumnKey,
-  type IResultSetElementKey,
-  ResultSetDataKeysUtils,
+  type IGridColumnKey,
+  type IGridDataKey,
+  GridDataKeysUtils,
   ResultSetSelectAction,
   useDataViewerCopyHandler,
 } from '@cloudbeaver/plugin-data-viewer';
@@ -28,16 +28,16 @@ const EVENT_KEY_CODE = {
   C: 'KeyC',
 };
 
-function getCellCopyValue(tableData: ITableData, key: IResultSetElementKey): string {
+function getCellCopyValue(tableData: ITableData, key: IGridDataKey): string {
   return tableData.format.getText(key);
 }
 
-function getSelectedCellsValue(tableData: ITableData, selectedCells: Map<string, IResultSetElementKey[]>) {
-  const orderedSelectedCells = new Map<string, IResultSetElementKey[]>(
+function getSelectedCellsValue(tableData: ITableData, selectedCells: Map<string, IGridDataKey[]>) {
+  const orderedSelectedCells = new Map<string, IGridDataKey[]>(
     [...selectedCells].sort((a, b) => tableData.getRowIndexFromKey(a[1]![0]!.row) - tableData.getRowIndexFromKey(b[1]![0]!.row)),
   );
 
-  const selectedColumns: IResultSetColumnKey[] = [];
+  const selectedColumns: IGridColumnKey[] = [];
   for (const rowSelection of orderedSelectedCells.values()) {
     for (const cell of rowSelection) {
       selectedColumns.push(cell.column);
@@ -48,11 +48,11 @@ function getSelectedCellsValue(tableData: ITableData, selectedCells: Map<string,
   for (const rowSelection of orderedSelectedCells.values()) {
     const rowCellsValues: string[] = [];
     for (const column of tableData.view.columnKeys) {
-      if (!selectedColumns.some(columnKey => ResultSetDataKeysUtils.isEqual(columnKey, column))) {
+      if (!selectedColumns.some(columnKey => GridDataKeysUtils.isEqual(columnKey, column))) {
         continue;
       }
 
-      const cellKey = rowSelection.find(key => ResultSetDataKeysUtils.isEqual(key.column, column));
+      const cellKey = rowSelection.find(key => GridDataKeysUtils.isEqual(key.column, column));
 
       if (cellKey) {
         rowCellsValues.push(getCellCopyValue(tableData, cellKey));

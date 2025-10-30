@@ -11,21 +11,26 @@ import { useObservableRef } from '@cloudbeaver/core-blocks';
 import {
   DatabaseEditChangeType,
   type IDatabaseDataModel,
-  type IResultSetColumnKey,
-  type IResultSetElementKey,
-  type IResultSetRowKey,
-  ResultSetDataAction,
   ResultSetDataContentAction,
-  ResultSetDataKeysUtils,
+  GridDataKeysUtils,
   ResultSetDataSource,
-  ResultSetEditAction,
-  ResultSetFormatAction,
-  ResultSetViewAction,
+  IDatabaseDataResultAction,
+  IDatabaseDataEditAction,
+  IDatabaseDataViewAction,
+  IDatabaseDataFormatAction,
+  GridDataResultAction,
+  GridEditAction,
+  GridViewAction,
+  type IResultSetValue,
+  type IGridRowKey,
+  type IGridColumnKey,
+  type IGridDataKey,
 } from '@cloudbeaver/plugin-data-viewer';
 
 import type { IColumnInfo, ITableData } from './TableDataContext.js';
 import { useService } from '@cloudbeaver/core-di';
 import { DataGridSettingsService } from '../DataGridSettingsService.js';
+import type { SqlResultColumn } from '@cloudbeaver/core-sdk';
 
 interface ITableDataPrivate extends ITableData {
   dataGridSettingsService: DataGridSettingsService;
@@ -37,10 +42,10 @@ export function useTableData(
   resultIndex: number,
   gridDIVElement: React.RefObject<HTMLDivElement | null>,
 ): ITableData {
-  const format = model.source.getAction(resultIndex, ResultSetFormatAction);
-  const data = model.source.getAction(resultIndex, ResultSetDataAction);
-  const editor = model.source.getAction(resultIndex, ResultSetEditAction);
-  const view = model.source.getAction(resultIndex, ResultSetViewAction);
+  const format = model.source.getAction(resultIndex, IDatabaseDataFormatAction);
+  const data = model.source.getAction(resultIndex, IDatabaseDataResultAction, GridDataResultAction);
+  const editor = model.source.tryGetAction(resultIndex, IDatabaseDataEditAction, GridEditAction);
+  const view = model.source.getAction(resultIndex, IDatabaseDataViewAction, GridViewAction);
   const dataContent = model.source.getAction(resultIndex, ResultSetDataContentAction);
   const dataGridSettingsService = useService(DataGridSettingsService);
 
@@ -49,10 +54,10 @@ export function useTableData(
       get gridDiv(): HTMLDivElement | null {
         return this.gridDIVElement.current;
       },
-      get columnKeys(): IResultSetColumnKey[] {
+      get columnKeys(): IGridColumnKey[] {
         return this.view.columnKeys;
       },
-      get rows(): IResultSetRowKey[] {
+      get rows(): IGridRowKey[] {
         return this.view.rowKeys;
       },
       get columns() {
@@ -72,7 +77,8 @@ export function useTableData(
           return false;
         }
 
-        return Boolean(this.data?.columns?.some(column => column.description));
+        // TODO: fix column abstraction
+        return Boolean(this.data?.columns?.some(column => (column as SqlResultColumn).description));
       },
       getRow(rowIndex) {
         return this.rows[rowIndex];
@@ -81,19 +87,21 @@ export function useTableData(
         return this.columns[columnIndex];
       },
       getColumnByDataIndex(key) {
-        return this.columns.find(column => column.key !== null && ResultSetDataKeysUtils.isEqual(column.key, key))!;
+        return this.columns.find(column => column.key !== null && GridDataKeysUtils.isEqual(column.key, key))!;
       },
       getColumnInfo(key) {
-        return this.data.getColumn(key);
+        // TODO: fix column abstraction
+        return this.data.getColumn(key) as SqlResultColumn | undefined;
       },
       getCellValue(key) {
-        return this.view.getCellValue(key);
+        // TODO: fix cell value abstraction
+        return this.view.getCellValue(key) as IResultSetValue | undefined;
       },
       getColumnIndexFromColumnKey(columnKey) {
-        return this.columns.findIndex(column => column.key !== null && ResultSetDataKeysUtils.isEqual(columnKey, column.key));
+        return this.columns.findIndex(column => column.key !== null && GridDataKeysUtils.isEqual(columnKey, column.key));
       },
       getRowIndexFromKey(rowKey) {
-        return this.rows.findIndex(row => ResultSetDataKeysUtils.isEqual(rowKey, row));
+        return this.rows.findIndex(row => GridDataKeysUtils.isEqual(rowKey, row));
       },
       getColumnsInRange(startIndex, endIndex): IColumnInfo[] {
         if (startIndex === endIndex) {
@@ -105,13 +113,13 @@ export function useTableData(
         return this.columns.slice(firstIndex, lastIndex + 1);
       },
       getEditionState(key) {
-        return this.editor.getElementState(key);
+        return this.editor?.getElementState(key) ?? null;
       },
       inBounds(position) {
         return this.view.has(position);
       },
       isCellEdited(key) {
-        return this.editor.isElementEdited(key);
+        return this.editor?.isElementEdited(key) ?? false;
       },
       isIndexColumn(columnKey) {
         return columnKey.key === null;
@@ -122,12 +130,12 @@ export function useTableData(
       isReadOnly() {
         return dataContent.source.isReadonly(resultIndex);
       },
-      isCellReadonly(key: IResultSetElementKey) {
+      isCellReadonly(key: IGridDataKey) {
         if (!key.column) {
           return true;
         }
 
-        return model.isReadonly(resultIndex) || (this.format.isReadOnly(key) && this.editor.getElementState(key) !== DatabaseEditChangeType.add);
+        return model.isReadonly(resultIndex) || (this.format.isReadOnly(key) && this.editor?.getElementState(key) !== DatabaseEditChangeType.add);
       },
     }),
     {

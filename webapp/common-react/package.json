@@ -16,7 +16,7 @@
     "@dbeaver/prettier-config": "workspace:^",
     "@dbeaver/react-tests": "workspace:^",
     "@wroud/ts-template": "^0",
-    "happy-dom": "^18",
+    "happy-dom": "^20",
     "prettier": "^3.6.2",
     "rimraf": "^6",
     "vitest": "^3"
