@@ -19,6 +19,7 @@ import {
   useCreateGridReactiveValue,
   type DataGridRef,
   type ICellPosition,
+  type IDataGridRowRenderer,
   type IDataGridCellRenderer,
   type DataGridProps,
 } from '@cloudbeaver/plugin-data-grid';
@@ -56,6 +57,7 @@ import { useGridSelectedCellsCopy } from './useGridSelectedCellsCopy.js';
 import { useTableData } from './useTableData.js';
 import { TableColumnHeader } from './TableColumnHeader/TableColumnHeader.js';
 import { TableIndexColumnHeader } from './TableColumnHeader/TableIndexColumnHeader.js';
+import { clsx } from '@dbeaver/ui-kit';
 
 const ROW_HEIGHT = 24;
 export const HEADER_HEIGHT = 32;
@@ -378,13 +380,16 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
     [tableData, model],
   );
 
-  function getRowClass(rowIdx: number) {
-    const focusedElement = gridSelectionContext.getFocusedElementPosition();
-    if (focusedElement?.rowIdx === rowIdx) {
-      return 'rdg-row-custom-highlighted';
-    }
-    return null;
+  function getRowElement(rowIdx: number, props: HTMLAttributes<HTMLDivElement>, renderDefaultRow: IDataGridRowRenderer) {
+    const isFocused = getComputed(() => gridSelectionContext.getFocusedElementPosition()?.rowIdx === rowIdx);
+    return renderDefaultRow({ className: clsx(props.className, isFocused && 'rdg-row-custom-highlighted') });
   }
+
+  const rowElement = useCreateGridReactiveValue(
+    getRowElement,
+    (onValueChange, rowIdx, props, renderDefaultRow) => reaction(() => getRowElement(rowIdx, props, renderDefaultRow), onValueChange),
+    [],
+  );
 
   function handleSort(colIdx: number, order: 'asc' | 'desc' | null, isMultiple: boolean) {
     const column = tableData.getColumn(colIdx)?.key;
@@ -494,6 +499,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
               cell={cell}
               cellText={cellText}
               cellElement={cellElement}
+              rowElement={rowElement}
               getCellEditable={isCellEditable}
               headerElement={headerElement}
               getHeaderHeight={() => headerHeight}
@@ -501,7 +507,6 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
               getHeaderPinned={getHeaderPinned}
               getHeaderResizable={getHeaderResizable}
               getRowHeight={() => ROW_HEIGHT}
-              getRowClass={getRowClass}
               getColumnKey={getColumnKey}
               columnCount={columnsCount}
               rowCount={rowsCount}

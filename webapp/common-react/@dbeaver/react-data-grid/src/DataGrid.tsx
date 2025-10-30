@@ -79,6 +79,7 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
     getCellEditable,
     columnCount,
     getColumnKey,
+    rowElement,
     rowCount,
     getRowId,
     getRowHeight,
@@ -183,7 +184,7 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
 
   return (
     <HeaderDnDContext value={dndHeaderContext}>
-      <DataGridRowContext value={{ rowCount, onScrollToBottom }}>
+      <DataGridRowContext value={{ rowElement, rowCount, onScrollToBottom }}>
         <DataGridCellContext value={{ cell, cellText, cellElement, cellTooltip, onCellChange }}>
           <DataGridCellHeaderContext
             value={{ headerElement, headerText, getHeaderDnD, columnSortable, onColumnSort, columnSortingState, onHeaderKeyDown }}
