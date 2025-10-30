@@ -276,13 +276,21 @@ public class CBAppConfig extends BaseWebAppConfiguration implements ServletAuthC
     }
 
     @Override
+    @Deprecated
     public String[] getEnabledAuthProviders() {
-        if (enabledAuthProviders == null) {
-            // No config - enable all providers (+backward compatibility)
-            return WebAuthProviderRegistry.getInstance().getAuthProviders()
-                .stream().map(WebAuthProviderDescriptor::getId).toArray(String[]::new);
-        }
-        return enabledAuthProviders;
+        //all enabled
+        return WebAuthProviderRegistry.getInstance().getAuthProviders()
+            .stream()
+            .map(WebAuthProviderDescriptor::getId)
+            .toArray(String[]::new);
+//        if (enabledAuthProviders == null) {
+//            // No config - enable all providers (+backward compatibility)
+//            return WebAuthProviderRegistry.getInstance().getAuthProviders()
+//                .stream()
+//                .map(WebAuthProviderDescriptor::getId)
+//                .toArray(String[]::new);
+//        }
+//        return enabledAuthProviders;
     }
 
     public void setEnabledAuthProviders(String[] enabledAuthProviders) {

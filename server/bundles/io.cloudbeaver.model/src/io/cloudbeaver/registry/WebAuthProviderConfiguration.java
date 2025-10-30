@@ -19,7 +19,6 @@ package io.cloudbeaver.registry;
 import io.cloudbeaver.auth.CBAuthConstants;
 import io.cloudbeaver.auth.SMAuthProviderFederated;
 import io.cloudbeaver.auth.SMSignOutLinkProvider;
-import io.cloudbeaver.utils.ServletAppUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
@@ -67,6 +66,10 @@ public class WebAuthProviderConfiguration {
 
     public boolean isDisabled() {
         return config.isDisabled();
+    }
+
+    public boolean isDefault() {
+        return config.isDefault();
     }
 
     public String getIconURL() {

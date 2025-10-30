@@ -19,7 +19,8 @@
                                   label="local"
                                   disabled="false"
                                   iconURL=""
-                                  description="configuration of local provider"/>
+                                  description="configuration of local provider"
+                                  isDefault="true"/>
 
         </authProvider>
         <authProvider id="reverseProxy" label="Reverse proxy"

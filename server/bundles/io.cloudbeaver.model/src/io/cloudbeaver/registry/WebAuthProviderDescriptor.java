@@ -116,6 +116,7 @@ public class WebAuthProviderDescriptor extends AbstractDescriptor {
                 .iconURL(defaultConfiguration.getAttribute(WebRegistryConstant.ATTR_ICON))
                 .description(defaultConfiguration.getAttribute(WebRegistryConstant.ATTR_DESCRIPTION))
                 .parameters(new HashMap<>())
+                .isDefault(CommonUtils.toBoolean(defaultConfiguration.getAttribute(WebRegistryConstant.ATTR_IS_DEFAULT)))
                 .build();
         } else {
             this.defaultConfiguration = null;
