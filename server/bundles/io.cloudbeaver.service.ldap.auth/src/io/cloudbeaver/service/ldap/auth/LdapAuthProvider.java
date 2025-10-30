@@ -548,14 +548,16 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
 
             context = initConnection(environment);
 
-            String searchFilter = "(member=" + fullDN + ")";
+            String searchFilter = "(member={0})";
             SearchControls searchControls = new SearchControls();
             searchControls.setSearchScope(SearchControls.SUBTREE_SCOPE);
-
-            searchResults = context.search(ldapSettings.getBaseDN(), searchFilter, searchControls);
+            searchResults = context.search(ldapSettings.getBaseDN(), searchFilter, new Object[] {fullDN}, searchControls);
             while (searchResults.hasMore()) {
                 try {
                     SearchResult next = searchResults.next();
+                    //add full dn
+                    result.add(next.getNameInNamespace());
+                    //add relative dn to base dn
                     result.add(next.getName());
                 } catch (Exception e) {
                     log.error("Failed fetch user group. Skipping...", e);
