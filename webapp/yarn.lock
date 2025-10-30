@@ -1945,6 +1945,7 @@ __metadata:
     "@cloudbeaver/core-utils": "workspace:*"
     "@cloudbeaver/tests-runner": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
+    "@dbeaver/js-helpers": "workspace:*"
     "@dbeaver/react-tests": "workspace:*"
     mobx: "npm:^6"
     msw: "npm:^2"
