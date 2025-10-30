@@ -37,7 +37,6 @@ export interface ObjectPropertyFormProps extends ILayoutSizeProps {
   emptyPlaceholder?: string;
   canShowPassword?: boolean;
   disableAutoCompleteForPasswords?: boolean;
-  onChange?: () => void;
   isSaved?: (property: ObjectPropertyInfo) => boolean;
   geLayoutSize?: (property: ObjectPropertyInfo) => ILayoutSizeProps;
   onFocus?: (name: string) => void;
@@ -60,7 +59,6 @@ export const ObjectPropertyInfoForm = observer<ObjectPropertyFormProps>(function
   hideEmptyPlaceholder,
   emptyPlaceholder = 'core_blocks_object_property_info_form_empty_placeholder',
   canShowPassword,
-  onChange,
   isSaved,
   geLayoutSize,
   onFocus,
@@ -107,7 +105,6 @@ export const ObjectPropertyInfoForm = observer<ObjectPropertyFormProps>(function
             showRememberTip={showRememberTip}
             canShowPassword={canShowPassword}
             saved={isSaved?.(property)}
-            onChange={onChange}
             onFocus={handleFocus}
           />
         );

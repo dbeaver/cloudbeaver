@@ -45,7 +45,6 @@ interface RenderFieldProps {
   className?: string;
   canShowPassword?: boolean;
   onFocus?: (event: React.FocusEvent<HTMLInputElement>) => void;
-  onChange?: () => void;
 }
 
 export const RenderField = observer<RenderFieldProps>(function RenderField({
@@ -62,7 +61,6 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
   className,
   canShowPassword,
   onFocus,
-  onChange,
   readOnly,
 }) {
   const translate = useTranslate();
@@ -94,7 +92,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
   if (controlType === 'link') {
     return (
       <FormFieldDescription label={property.displayName} className={className}>
-        <Link href={state?.[property.id!]} target="_blank" rel="noopener noreferrer" onChange={onChange}>
+        <Link href={state?.[property.id!]} target="_blank" rel="noopener noreferrer">
           {property.description}
         </Link>
       </FormFieldDescription>
@@ -125,7 +123,6 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
           disabled={disabled || readonly}
           className={className}
           groupGap
-          onChange={onChange}
         >
           {property.displayName ?? ''}
         </FieldCheckbox>
@@ -141,7 +138,6 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
         disabled={disabled || readonly}
         className={className}
         groupGap
-        onChange={onChange}
       >
         {property.displayName ?? ''}
       </FieldCheckbox>
@@ -165,7 +161,6 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
           readOnly={readonly}
           description={property.hint}
           className={className}
-          onSelect={onChange}
         >
           {property.displayName ?? ''}
         </Select>
@@ -186,7 +181,6 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
         readOnly={readonly}
         description={hint}
         className={className}
-        onSelect={onChange}
       >
         {property.displayName ?? ''}
       </Select>
@@ -267,7 +261,6 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
         className={className}
         canShowPassword={canShowPassword}
         onFocus={onFocus}
-        onChange={onChange}
       >
         {property.displayName}
       </InputField>
@@ -290,7 +283,6 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
       className={className}
       canShowPassword={canShowPassword}
       onFocus={onFocus}
-      onChange={onChange}
     >
       {property.displayName}
     </InputField>
