@@ -10,9 +10,6 @@ import { createContext } from 'react';
 
 export interface IDataGridCellInnerContext {
   isFocused: boolean;
-  dataColIdx: number;
-  colIdx: number;
-  rowIdx: number;
 }
 
 export const DataGridCellInnerContext = createContext<IDataGridCellInnerContext | null>(null);

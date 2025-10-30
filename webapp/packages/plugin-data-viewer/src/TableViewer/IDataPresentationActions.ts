@@ -6,10 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { IGridColumnKey } from '../DatabaseDataModel/Actions/Grid/IGridDataKey.js';
+import type { IGridColumnKey, IGridDataKey } from '../DatabaseDataModel/Actions/Grid/IGridDataKey.js';
 
 export interface IDataPresentationActions {
-  edit: () => void;
+  edit: (position: IGridDataKey) => void;
   pinColumn: (key: IGridColumnKey) => void;
   unpinColumn: (key: IGridColumnKey) => void;
   isPinnedColumn: (key: IGridColumnKey) => boolean;

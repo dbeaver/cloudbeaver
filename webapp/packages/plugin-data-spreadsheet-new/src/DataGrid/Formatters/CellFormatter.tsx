@@ -17,6 +17,7 @@ import { DataGridContext } from '../DataGridContext.js';
 import style from './CellFormatter.module.css';
 import { CellFormatterFactory } from './CellFormatterFactory.js';
 import { CellMenu } from './Menu/CellMenu.js';
+import { TableDataContext } from '../TableDataContext.js';
 
 interface Props {
   rowIdx: number;
@@ -25,7 +26,8 @@ interface Props {
 
 export const CellFormatter = observer<Props>(function CellFormatter({ rowIdx, colIdx }) {
   const context = useContext(DataGridContext);
-  const innerCellContext = use(DataGridCellInnerContext)!;
+  const tableDataContext = useContext(TableDataContext);
+  const innerCellContext = use(DataGridCellInnerContext);
   const cellContext = useContext(CellContext);
 
   const cell = cellContext.cell;
@@ -35,8 +37,13 @@ export const CellFormatter = observer<Props>(function CellFormatter({ rowIdx, co
   const styles = useS(style);
 
   const spreadsheetActions = useObjectRef<IDataPresentationActions>({
-    edit() {
-      context.getDataGridApi()?.openEditor({ rowIdx: innerCellContext.rowIdx, colIdx: innerCellContext.colIdx });
+    edit(position) {
+      const colIdx = tableDataContext.getColumnIndexFromColumnKey(position.column);
+      const rowIdx = tableDataContext.getRowIndexFromKey(position.row);
+
+      if (colIdx !== -1) {
+        context.getDataGridApi()?.openEditor({ colIdx, rowIdx });
+      }
     },
     unpinColumn(key) {
       context.unpinColumn(key);

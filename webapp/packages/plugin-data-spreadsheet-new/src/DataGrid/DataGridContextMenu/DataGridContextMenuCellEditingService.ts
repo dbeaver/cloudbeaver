@@ -169,7 +169,7 @@ export class DataGridContextMenuCellEditingService {
 
         switch (action) {
           case ACTION_EDIT:
-            actions.edit();
+            actions.edit(key);
             break;
           case ACTION_DATA_GRID_EDITING_SET_TO_NULL:
             editor.set(key, null);

@@ -103,9 +103,6 @@ export const BaseCell = memo(function BaseCell<TRow, TSummaryRow>(props: CellRen
 
   const cellElement = useGridReactiveValue(cellContext?.cellElement, rowIdx, dataColIdx, mappedProps, renderDefaultCell);
 
-  const innerCellContext = useMemo<IDataGridCellInnerContext>(
-    () => ({ isFocused: props.isCellSelected, dataColIdx, rowIdx, colIdx: virtualColIdx }),
-    [props.isCellSelected, dataColIdx, rowIdx, virtualColIdx],
-  );
+  const innerCellContext = useMemo<IDataGridCellInnerContext>(() => ({ isFocused: props.isCellSelected }), [props.isCellSelected]);
   return <DataGridCellInnerContext value={innerCellContext}>{cellElement ?? <Cell title={tooltip} {...props} />}</DataGridCellInnerContext>;
 }) as <TRow, TSummaryRow>(props: CellRendererProps<TRow, TSummaryRow>) => React.ReactNode;
