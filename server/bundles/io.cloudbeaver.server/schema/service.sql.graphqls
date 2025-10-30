@@ -362,6 +362,7 @@ extend type Mutation {
         filter: SQLDataFilter,
         dataFormat: ResultDataFormat,   # requested data format. May be ignored by server
         readLogs: Boolean               # added 23.2.1
+        isInteractive: Boolean          # Support WS events requested by server, e.g. confirmations. Added in 23.2.3
     ): AsyncTaskInfo!
 
     "Creates async task for reading data from the container node"

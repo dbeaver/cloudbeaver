@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -29,13 +29,13 @@ export class NavResourceNodeService {
   }
 
   async delete(key: string) {
-    const result = await this.commonDialogService.open(ConfirmationDialogDelete, {
+    const { status } = await this.commonDialogService.open(ConfirmationDialogDelete, {
       title: 'ui_data_delete_confirmation',
       message: this.localizationService.translate('plugin_navigation_tree_rm_delete_confirmation_message', undefined, { name: getPathName(key) }),
       confirmActionText: 'ui_delete',
     });
 
-    if (result === DialogueStateResult.Rejected) {
+    if (status === DialogueStateResult.Rejected) {
       return;
     }
 
