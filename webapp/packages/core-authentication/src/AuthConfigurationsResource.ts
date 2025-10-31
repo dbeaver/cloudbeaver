@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,12 @@ import {
   ResourceKeyUtils,
 } from '@cloudbeaver/core-resource';
 import { EAdminPermission, SessionPermissionsResource } from '@cloudbeaver/core-root';
-import { type AdminAuthProviderConfiguration, type GetAuthProviderConfigurationsQueryVariables, GraphQLService } from '@cloudbeaver/core-sdk';
+import {
+  type AdminAuthProviderConfiguration,
+  type GetAuthProviderConfigurationsQueryVariables,
+  GraphQLService,
+  type SaveAuthProviderConfigurationQueryVariables,
+} from '@cloudbeaver/core-sdk';
 
 import type { AuthProviderConfiguration } from './AuthProvidersResource.js';
 
@@ -39,7 +44,7 @@ export class AuthConfigurationsResource extends CachedMapResource<string, AuthCo
     permissionsResource.require(this, EAdminPermission.admin).outdateResource(this);
   }
 
-  async saveConfiguration(config: AuthConfiguration): Promise<AuthConfiguration> {
+  async saveConfiguration(config: SaveAuthProviderConfigurationQueryVariables): Promise<AuthConfiguration> {
     await this.performUpdate(config.id, [], async () => {
       const response = await this.graphQLService.sdk.saveAuthProviderConfiguration(config);
 

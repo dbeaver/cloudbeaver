@@ -1,17 +1,5 @@
 query getAuthProviderConfigurations($providerId: ID) {
   configurations: listAuthProviderConfigurations(providerId: $providerId) {
-    providerId
-    id
-    displayName
-    disabled
-    iconURL
-    description
-    parameters
-    signInLink
-    signOutLink
-    redirectLink
-    metadataLink
-    acsLink
-    entityIdLink
+    ...AdminAuthProviderConfigurationInfo
   }
 }
