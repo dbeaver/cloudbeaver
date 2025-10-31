@@ -8,12 +8,12 @@
 import { makeObservable, observable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
-import { createSettingsLayer, ROOT_SETTINGS_LAYER, SettingsSource } from '@cloudbeaver/core-settings';
+import { createSettingsLayer, ROOT_SETTINGS_LAYER, EditableSettingsSource } from '@cloudbeaver/core-settings';
 
 export const PRODUCT_SETTINGS_LAYER = createSettingsLayer(ROOT_SETTINGS_LAYER, 'product');
 
 @injectable()
-export class ProductSettingsService extends SettingsSource {
+export class ProductSettingsService extends EditableSettingsSource {
   private readonly settings: Map<string, any>;
 
   constructor() {

@@ -30,22 +30,12 @@ export class ServerDefaultSettingsService extends SettingsSource {
   }
 
   override has(key: string): boolean {
-    return this.settings.has(key) || super.has(key);
-  }
-
-  isOverrideDefaults(): boolean {
-    return this.settings.size > 0;
-  }
-
-  isReadOnly(_key: string): boolean {
-    return true;
+    return this.settings.has(key);
   }
 
   getValue(key: string): any {
     return this.settings.get(key);
   }
-
-  async save(): Promise<void> {}
 
   protected getSnapshot(): any {
     return Object.fromEntries(this.settings);
@@ -53,7 +43,6 @@ export class ServerDefaultSettingsService extends SettingsSource {
 
   private refreshDefaults() {
     this.update(() => {
-      this.clear();
       this.settings.clear();
 
       const settings = this.serverSettingsResource.data?.settings || [];
