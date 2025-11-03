@@ -31,6 +31,9 @@ import {
   isBooleanValuePresentationAvailable,
   isResultSetDataSource,
   ResultSetDataContentAction,
+  type IDatabaseValueHolder,
+  type IGridDataKey,
+  type IResultSetValue,
 } from '@cloudbeaver/plugin-data-viewer';
 import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
 import { LocalizationService } from '@cloudbeaver/core-localization';
@@ -94,12 +97,12 @@ export class DataGridContextMenuCellEditingService {
         const editor = model.source.getAction(resultIndex, IDatabaseDataEditAction);
         const select = model.source.tryGetAction(resultIndex, IDatabaseDataSelectAction);
 
-        const cellValue = view.getCellValue(key);
+        const cellHolder = view.getCellHolder(key);
 
         // TODO: fix column abstraction
         const column = view.getColumn(key.column) as SqlResultColumn | undefined;
-        const isComplex = format.isBinary(key) || format.isGeometry(key);
-        const isTruncated = content.isTextTruncated(key);
+        const isComplex = format.isBinary(cellHolder) || format.isGeometry(cellHolder);
+        const isTruncated = content.isTextTruncated(cellHolder as IDatabaseValueHolder<IGridDataKey, IResultSetValue>);
         const selectedElements = select?.getSelectedElements() || [];
         // If we somehow added a new row, we can always edit it
         const canEdit = editor.getElementState(key) === DatabaseEditChangeType.add;
@@ -109,15 +112,15 @@ export class DataGridContextMenuCellEditingService {
         }
 
         if (action === ACTION_EDIT) {
-          if (!column || cellValue === undefined || (format.isReadOnly(key) && !canEdit) || isComplex || isTruncated) {
+          if (!column || cellHolder.value === undefined || (format.isReadOnly(key) && !canEdit) || isComplex || isTruncated) {
             return false;
           }
 
-          return !isBooleanValuePresentationAvailable(cellValue, column);
+          return !isBooleanValuePresentationAvailable(cellHolder.value, column);
         }
 
         if (action === ACTION_DATA_GRID_EDITING_SET_TO_NULL) {
-          return cellValue !== undefined && !(format.isReadOnly(key) && !canEdit) && !column?.required && !format.isNull(key);
+          return cellHolder.value !== undefined && !(format.isReadOnly(key) && !canEdit) && !column?.required && !format.isNull(cellHolder);
         }
 
         if (action === ACTION_DATA_GRID_EDITING_ADD_ROW || action === ACTION_DATA_GRID_EDITING_DUPLICATE_ROW) {

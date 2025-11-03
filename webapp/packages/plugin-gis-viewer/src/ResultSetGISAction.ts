@@ -36,9 +36,9 @@ export class ResultSetGISAction
   }
 
   isGISFormat(cell: IGridDataKey): boolean {
-    const value = this.view.getCellValue(cell);
+    const cellHolder = this.view.getCellHolder(cell);
 
-    return isResultSetGeometryValue(value);
+    return isResultSetGeometryValue(cellHolder.value);
   }
 
   getGISDataFor(cells: IGridDataKey[]): IGridDataKey[] {
@@ -46,12 +46,12 @@ export class ResultSetGISAction
   }
 
   getCellValue(cell: IGridDataKey): IResultSetGeometryValue | undefined {
-    const value = this.view.getCellValue(cell);
+    const cellHolder = this.view.getCellHolder(cell);
 
-    if (!isResultSetGeometryValue(value)) {
+    if (!isResultSetGeometryValue(cellHolder.value)) {
       return undefined;
     }
 
-    return value;
+    return cellHolder.value;
   }
 }

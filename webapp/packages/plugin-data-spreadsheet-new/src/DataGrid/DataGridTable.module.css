@@ -55,17 +55,18 @@
     border-bottom-color: var(--theme-positive) !important;
   }
 
-  :global(.rdg-cell-custom-highlighted-row) {
-    background: var(--data-grid-selected-row-color) !important;
+  :global(.rdg-row-custom-highlighted) {
+    background: var(--data-grid-selected-row-color);
 
-    &:global(.rdg-cell:first-child::before) {
-      position: absolute;
+    & :global(.rdg-cell:first-child::before) {
       content: '';
-      top: 0;
+      position: absolute;
       left: 0;
-      width: 2px;
+      top: 0;
+      width: 100%;
       height: 100%;
-      background-color: var(--data-grid-index-cell-border-color);
+      z-index: -1;
+      border-left: 2px solid var(--data-grid-index-cell-border-color);
     }
   }
 
