@@ -232,7 +232,7 @@ public class WebSQLProcessor implements WebSessionProvider {
                 if (useEvents) {
                     boolean isConfirmed = confirmQueryIfNeeded(mainQuery.getScriptElements(), asyncTask, isGenerated);
                     if (!isConfirmed) {
-                        throw new DBWebException("Query execution cancelled by user");
+                        throw new DBWebException("Query execution was cancelled by user");
                     }
                 }
 
