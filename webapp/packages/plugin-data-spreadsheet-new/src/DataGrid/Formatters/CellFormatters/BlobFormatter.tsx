@@ -30,7 +30,7 @@ export const BlobFormatter = observer<ICellFormatterProps>(function BlobFormatte
   }
 
   const formatter = tableDataContext.format;
-  const rawValue = getComputed(() => formatter.get(cell));
+  const rawValue = getComputed(() => formatter.get(cell).value);
 
   const nullValue = isResultSetContentValue(rawValue) ? rawValue.text === 'null' : rawValue === null;
 
