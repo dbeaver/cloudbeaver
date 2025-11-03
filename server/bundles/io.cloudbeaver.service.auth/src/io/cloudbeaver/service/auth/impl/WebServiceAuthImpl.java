@@ -62,7 +62,7 @@ import java.util.Map;
 public class WebServiceAuthImpl implements DBWServiceAuth {
 
     private static final Log log = Log.getLog(WebServiceAuthImpl.class);
-    public static final String CONFIG_TEMP_ADMIN_USER_ID = "temp_config_admin";
+    private static final long DEFAULT_TIMEOUT_MILLISECONDS = 5 * 60 * 1000;
 
     @Override
     public WebAuthStatus authLogin(
@@ -120,11 +120,15 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
             if (CommonUtils.isEmpty(smAuthInfo.getRedirectUrl())) {
                 throw new DBWebException("Missing redirect URL");
             }
+            WebAsyncAuthJob job = new WebAsyncAuthJob(
+                providerId + " authentication job",
+                smAuthInfo.getAuthAttemptId(),
+                linkWithActiveUser
+            );
             WebAsyncTaskInfo authTask = webSession.createAsyncTask(providerId + " authentication");
             authTask.setRunning(true);
-            authTask.setJob(
-                new WebAsyncAuthJob(providerId + " authentication job", smAuthInfo.getAuthAttemptId(), linkWithActiveUser)
-            );
+            authTask.setJob(job);
+            new WebAsyncAuthTimeoutJob(webSession, authTask, job).schedule(DEFAULT_TIMEOUT_MILLISECONDS);
             return new WebAsyncAuthStatus(smAuthInfo.getRedirectUrl(), authTask);
         } catch (SMTooManySessionsException e) {
             throw new DBWebException("User authentication failed", e.getErrorType(), e);
