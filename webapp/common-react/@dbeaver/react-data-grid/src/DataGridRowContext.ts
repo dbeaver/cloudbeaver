@@ -9,19 +9,14 @@
 import { createContext } from 'react';
 import type { IGridReactiveValue } from './IGridReactiveValue.js';
 
-export interface IDataGridRowProps extends React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
-
-}
+export interface IDataGridRowProps extends React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement> {}
 
 export interface IDataGridRowRenderer {
-  (propsOverride: Partial<IDataGridRowProps> & { [key: string]: any }): React.ReactNode;
+  (propsOverride: Partial<IDataGridRowProps>): React.ReactNode;
 }
 
 export interface IDataGridRowContext {
-  rowElement?: IGridReactiveValue<
-    React.ReactNode,
-    [rowIdx: number, props: IDataGridRowProps, renderDefaultRow: IDataGridRowRenderer]
-  >;
+  rowElement?: IGridReactiveValue<React.ReactNode, [rowIdx: number, props: IDataGridRowProps, renderDefaultRow: IDataGridRowRenderer]>;
   rowCount: IGridReactiveValue<number, []>;
   onScrollToBottom?: () => void;
 }

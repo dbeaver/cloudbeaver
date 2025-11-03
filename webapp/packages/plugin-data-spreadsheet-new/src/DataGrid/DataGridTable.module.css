@@ -59,6 +59,13 @@
     background: var(--data-grid-selected-row-color);
 
     & :global(.rdg-cell:first-child::before) {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
       border-left: 2px solid var(--data-grid-index-cell-border-color);
     }
   }
