@@ -161,10 +161,6 @@ export const Combobox: ComboboxType = observer(function Combobox({
   }
 
   function setInputValue(value: string | null) {
-    if (name !== undefined && state) {
-      state[name] = value;
-    }
-
     setInternalInputValue(value);
     onChange?.(value);
   }
