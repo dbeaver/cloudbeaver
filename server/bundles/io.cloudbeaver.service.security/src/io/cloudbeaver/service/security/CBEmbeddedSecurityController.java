@@ -2611,6 +2611,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         List<SMTeam> result = new ArrayList<>();
         for (SMTeam team : allTeams) {
             String teamGroupId = team.getMetaParameters().get(externalGroupParameterName);
+            //fixme здесь надо игнорить регистр
             if (CommonUtils.equalObjects(teamGroupId, groupId)) {
                 result.add(team);
             }
