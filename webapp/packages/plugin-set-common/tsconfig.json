@@ -116,6 +116,9 @@
       "path": "../plugin-app-logo-administration"
     },
     {
+      "path": "../plugin-async-task-confirmation"
+    },
+    {
       "path": "../plugin-authentication"
     },
     {
@@ -153,6 +156,9 @@
     },
     {
       "path": "../plugin-data-viewer"
+    },
+    {
+      "path": "../plugin-data-viewer-conditional-formatting"
     },
     {
       "path": "../plugin-data-viewer-result-set-grouping"
@@ -246,6 +252,9 @@
     },
     {
       "path": "../plugin-settings-panel"
+    },
+    {
+      "path": "../plugin-sql-async-task-confirmation"
     },
     {
       "path": "../plugin-sql-editor"

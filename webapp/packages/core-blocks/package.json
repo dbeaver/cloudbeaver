@@ -45,6 +45,7 @@
     "react-hotkeys-hook": "^5",
     "react-minisearch": "^7",
     "reakit": "^1",
+    "reakit-system": "^0",
     "reakit-utils": "^0",
     "subscript": "^9",
     "tslib": "^2"

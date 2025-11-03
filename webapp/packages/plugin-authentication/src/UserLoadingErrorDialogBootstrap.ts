@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -19,18 +19,23 @@ export class UserLoadingErrorDialogBootstrap extends Bootstrap {
     private readonly notificationService: NotificationService,
   ) {
     super();
-    userInfoResource.onException.addHandler(this.handleException.bind(this));
+    this.handleException = this.handleException.bind(this);
+    userInfoResource.onException.addHandler(this.handleException);
   }
 
   private async handleException(exception: Error) {
     this.notificationService.logException(exception, 'plugin_authentication_user_loading_error');
-    const result = await this.commonDialogService.open(ConfirmationDialog, {
+    const { status } = await this.commonDialogService.open(ConfirmationDialog, {
       title: 'plugin_authentication_loading_error_dialog_title',
       message: 'plugin_authentication_loading_error_dialog_message',
     });
 
-    if (result === DialogueStateResult.Resolved) {
+    if (status === DialogueStateResult.Resolved) {
       await this.userInfoResource.logout();
     }
+  }
+
+  protected override dispose(): Promise<void> | void {
+    this.userInfoResource.onException.removeHandler(this.handleException);
   }
 }

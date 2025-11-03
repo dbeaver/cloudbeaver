@@ -26,6 +26,7 @@ import { IDatabaseDataCacheAction } from '../IDatabaseDataCacheAction.js';
 import { IDatabaseDataFormatAction } from '../IDatabaseDataFormatAction.js';
 import { IDatabaseDataResultAction } from '../IDatabaseDataResultAction.js';
 import type { IGridDataKey } from '../Grid/IGridDataKey.js';
+import type { IDatabaseValueHolder } from '../IDatabaseValueHolder.js';
 
 const RESULT_VALUE_PATH = 'sql-result-value';
 const CONTENT_CACHE_KEY = Symbol('content-cache-key');
@@ -85,9 +86,9 @@ export class ResultSetDataContentAction extends DatabaseDataAction<any, IDatabas
     });
   }
 
-  getLimitInfo(elementKey: IGridDataKey) {
-    const isTextColumn = this.format.isText(elementKey);
-    const isBlob = this.format.isBinary(elementKey);
+  getLimitInfo(holder: IDatabaseValueHolder<IGridDataKey, IResultSetValue>) {
+    const isTextColumn = this.format.isText(holder);
+    const isBlob = this.format.isBinary(holder);
     const result = {
       limit: undefined as number | undefined,
       limitWithSize: undefined as string | undefined,
@@ -112,20 +113,20 @@ export class ResultSetDataContentAction extends DatabaseDataAction<any, IDatabas
     return this.getCache(element)?.loading ?? false;
   }
 
-  isBlobTruncated(elementKey: IGridDataKey): boolean {
-    const limit = this.getLimitInfo(elementKey).limit;
-    const content = this.format.get(elementKey);
+  isBlobTruncated(holder: IDatabaseValueHolder<IGridDataKey, IResultSetValue>): boolean {
+    const limit = this.getLimitInfo(holder).limit;
+    const content = holder.value;
 
-    if (!isNotNullDefined(limit) || !isResultSetContentValue(content) || !this.format.isBinary(elementKey)) {
+    if (!isNotNullDefined(limit) || !isResultSetContentValue(content) || !this.format.isBinary(holder)) {
       return false;
     }
 
     return (content.contentLength ?? 0) > limit;
   }
 
-  isTextTruncated(elementKey: IGridDataKey): boolean {
-    const limit = this.getLimitInfo(elementKey).limit;
-    const content = this.format.get(elementKey);
+  isTextTruncated(holder: IDatabaseValueHolder<IGridDataKey, IResultSetValue>): boolean {
+    const limit = this.getLimitInfo(holder).limit;
+    const content = holder.value;
 
     if (!isNotNullDefined(limit) || !isResultSetContentValue(content)) {
       return false;
@@ -134,8 +135,8 @@ export class ResultSetDataContentAction extends DatabaseDataAction<any, IDatabas
     return (content.contentLength ?? 0) > limit;
   }
 
-  isDownloadable(element: IGridDataKey): boolean {
-    return !!this.result.data?.hasRowIdentifier && isResultSetContentValue(this.format.get(element));
+  isDownloadable(holder: IDatabaseValueHolder<IGridDataKey, IResultSetValue>): boolean {
+    return !!this.result.data?.hasRowIdentifier && isResultSetContentValue(holder.value);
   }
 
   retrieveFullTextFromCache(element: IGridDataKey): string | undefined {
