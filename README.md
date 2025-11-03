@@ -25,7 +25,7 @@ You can see a live demo of CloudBeaver here: https://demo.cloudbeaver.io
 
 ## Changelog
 
-### 25.2.3 2025-11-03
+### 25.2.4 2025-11-03
 - A confirmation prompt has been added for potentially dangerous queries in the SQL Editor to help prevent unintended execution. You can customize this behavior in Preferences > SQL Editor;
 - The value panel in the Data Editor has been redesigned to provide users with more space for viewing and editing data. Tab buttons for different data type visualizations are now aligned on a single level, creating a cleaner layout;
 - Permission configuration for connections was simplified, providing a clearer appearance and improved performance.
