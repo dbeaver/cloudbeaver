@@ -1,3 +1,11 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2025 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+
 import { memo, use, useMemo } from 'react';
 import { Cell, type CellRendererProps } from 'react-data-grid';
 import { DataGridCellContext, type IDataGridCellRenderer } from './DataGridCellContext.js';
@@ -77,19 +85,17 @@ export const BaseCell = memo(function BaseCell<TRow, TSummaryRow>(props: CellRen
 
   const renderDefaultCell = useMemo<IDataGridCellRenderer>(
     () =>
-      ({ onClick, onDoubleClick, onContextMenu, ...rest }) => {
-        return (
-          <Cell
-            {...props}
-            title={tooltip}
-            onCellClick={(_, event) => onClick?.(event)}
-            onCellDoubleClick={(_, event) => onDoubleClick?.(event)}
-            onCellContextMenu={(_, event) => onContextMenu?.(event)}
-            {...rest}
-            isCellSelected={props.isCellSelected || rest.isFocused || false}
-          />
-        );
-      },
+      ({ onClick, onDoubleClick, onContextMenu, ...rest }) => (
+        <Cell
+          {...props}
+          title={tooltip}
+          onCellClick={(_, event) => onClick?.(event)}
+          onCellDoubleClick={(_, event) => onDoubleClick?.(event)}
+          onCellContextMenu={(_, event) => onContextMenu?.(event)}
+          {...rest}
+          isCellSelected={props.isCellSelected || rest.isFocused || false}
+        />
+      ),
     [...Object.values(props), tooltip],
   );
 

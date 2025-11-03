@@ -16,15 +16,15 @@ export const WelcomeNewConnection = observer(function WelcomeNewConnection() {
   const customConnectionPluginBootstrap = useService(CustomConnectionPluginBootstrap);
   const translate = useTranslate();
   return (
-    <button aria-label={translate(ACTION_CONNECTION_CUSTOM.info.tooltip)} onClick={() => customConnectionPluginBootstrap.openConnectionsDialog()}>
-      <Cell
-        before={<IconOrImage icon="/icons/plugin_connection_new.svg" />}
-        description={translate(ACTION_CONNECTION_CUSTOM.info.tooltip)}
-        className="tw:cursor-pointer tw:rounded-sm tw:overflow-hidden"
-        big
-      >
-        {translate(ACTION_CONNECTION_CUSTOM.info.label)}
-      </Cell>
-    </button>
+    <Cell
+      before={<IconOrImage icon="/icons/plugin_connection_new.svg" />}
+      description={translate(ACTION_CONNECTION_CUSTOM.info.tooltip)}
+      aria-label={translate(ACTION_CONNECTION_CUSTOM.info.tooltip)}
+      className="tw:cursor-pointer tw:rounded-sm tw:overflow-hidden"
+      big
+      onClick={() => customConnectionPluginBootstrap.openConnectionsDialog()}
+    >
+      {translate(ACTION_CONNECTION_CUSTOM.info.label)}
+    </Cell>
   );
 });

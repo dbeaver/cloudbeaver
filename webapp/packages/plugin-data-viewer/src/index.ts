@@ -33,6 +33,7 @@ export * from './DatabaseDataModel/Actions/DatabaseDataConstraintAction.js';
 export * from './DatabaseDataModel/Actions/ResultSet/ResultSetDataAction.js';
 export * from './DatabaseDataModel/Actions/Grid/GridDataKeysUtils.js';
 export * from './DatabaseDataModel/Actions/Grid/GridDataResultAction.js';
+export * from './DatabaseDataModel/Actions/IDatabaseValueHolder.js';
 export * from './DatabaseDataModel/Actions/Grid/GridEditAction.js';
 export * from './DatabaseDataModel/Actions/Grid/GridViewAction.js';
 export * from './DatabaseDataModel/Actions/Grid/IGridDataKey.js';

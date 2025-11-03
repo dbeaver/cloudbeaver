@@ -19,6 +19,7 @@ import {
   useCreateGridReactiveValue,
   type DataGridRef,
   type ICellPosition,
+  type IDataGridRowRenderer,
   type IDataGridCellRenderer,
   type DataGridProps,
 } from '@cloudbeaver/plugin-data-grid';
@@ -56,6 +57,7 @@ import { useGridSelectedCellsCopy } from './useGridSelectedCellsCopy.js';
 import { useTableData } from './useTableData.js';
 import { TableColumnHeader } from './TableColumnHeader/TableColumnHeader.js';
 import { TableIndexColumnHeader } from './TableColumnHeader/TableIndexColumnHeader.js';
+import { clsx } from '@dbeaver/ui-kit';
 
 const ROW_HEIGHT = 24;
 export const HEADER_HEIGHT = 32;
@@ -284,7 +286,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
       return '';
     }
 
-    return tableData.format.getText({ row, column });
+    return tableData.format.getText(tableData.format.get({ row, column }));
   }
 
   const cellText = useCreateGridReactiveValue(
@@ -378,6 +380,17 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
     [tableData, model],
   );
 
+  function getRowElement(rowIdx: number, props: HTMLAttributes<HTMLDivElement>, renderDefaultRow: IDataGridRowRenderer) {
+    const isFocused = getComputed(() => gridSelectionContext.getFocusedElementPosition()?.rowIdx === rowIdx);
+    return renderDefaultRow({ className: clsx(props.className, isFocused && 'rdg-row-custom-highlighted') });
+  }
+
+  const rowElement = useCreateGridReactiveValue(
+    getRowElement,
+    (onValueChange, rowIdx, props, renderDefaultRow) => reaction(() => getRowElement(rowIdx, props, renderDefaultRow), onValueChange),
+    [],
+  );
+
   function handleSort(colIdx: number, order: 'asc' | 'desc' | null, isMultiple: boolean) {
     const column = tableData.getColumn(colIdx)?.key;
     if (!column) {
@@ -422,18 +435,18 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
       return false;
     }
 
-    if (tableData.format.isBinary(cell) || tableData.format.isGeometry(cell) || tableData.dataContent.isTextTruncated(cell)) {
+    const holder = tableData.getCellHolder(cell);
+    if (tableData.format.isBinary(holder) || tableData.format.isGeometry(holder) || tableData.dataContent.isTextTruncated(holder)) {
       return false;
     }
 
     const resultColumn = tableData.getColumnInfo(cell.column);
-    const value = tableData.getCellValue(cell);
 
-    if (!resultColumn || value === undefined) {
+    if (!resultColumn || holder.value === undefined) {
       return false;
     }
 
-    const handleByBooleanFormatter = isBooleanValuePresentationAvailable(value, resultColumn);
+    const handleByBooleanFormatter = isBooleanValuePresentationAvailable(holder.value, resultColumn);
 
     return !(handleByBooleanFormatter || tableData.isCellReadonly(cell));
   }
@@ -486,6 +499,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
               cell={cell}
               cellText={cellText}
               cellElement={cellElement}
+              rowElement={rowElement}
               getCellEditable={isCellEditable}
               headerElement={headerElement}
               getHeaderHeight={() => headerHeight}

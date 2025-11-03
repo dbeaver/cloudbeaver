@@ -9,11 +9,12 @@
 import type { IDatabaseDataAction } from '../IDatabaseDataAction.js';
 import type { IDatabaseDataResult } from '../IDatabaseDataResult.js';
 import { createService } from '@cloudbeaver/core-di';
+import type { IDatabaseValueHolder } from './IDatabaseValueHolder.js';
 
 export interface IDatabaseDataViewAction<TKey = unknown, TValue = unknown, TResult extends IDatabaseDataResult = IDatabaseDataResult>
   extends IDatabaseDataAction<any, TResult> {
   has(cell: TKey): boolean;
-  get: (key: TKey) => TValue | undefined;
+  get: (key: TKey) => IDatabaseValueHolder<TKey, TValue> | undefined;
 }
 
 export const IDatabaseDataViewAction = createService<IDatabaseDataViewAction>('IDatabaseDataViewAction');

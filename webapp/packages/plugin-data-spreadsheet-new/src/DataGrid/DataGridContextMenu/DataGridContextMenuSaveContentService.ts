@@ -54,14 +54,15 @@ export class DataGridContextMenuSaveContentService {
         const content = model.source.getAction(resultIndex, ResultSetDataContentAction);
         const format = model.source.getAction(resultIndex, IDatabaseDataFormatAction);
         const editor = model.source.getAction(resultIndex, IDatabaseDataEditAction);
+        const cellHolder = format.get(key);
 
         if (action === ACTION_DOWNLOAD) {
-          return !content.isDownloadable(key) || !this.dataViewerService.canExportData;
+          return !content.isDownloadable(cellHolder) || !this.dataViewerService.canExportData;
         }
 
         if (action === ACTION_UPLOAD) {
           return (
-            !format.isBinary(key) ||
+            !format.isBinary(cellHolder) ||
             model.isReadonly(resultIndex) ||
             (format.isReadOnly(key) && editor.getElementState(key) !== DatabaseEditChangeType.add)
           );
