@@ -71,8 +71,9 @@ enum CBServerEventId {
     cb_server_notification@since(version: "25.2.1")
 
     "Session task confirmations"
-    cb_session_task_confirmation_request@since(version: "25.2.2")
-    cb_session_task_query_confirmation_request@since(version: "25.2.2")
+    cb_session_task_confirmation_request @since(version: "25.2.2")
+    cb_session_task_query_confirmation_request @since(version: "25.2.2")
+    cb_session_task_query_params_confirmation_request @since(version: "25.2.5")
 }
 
 "Events sent by client"
@@ -81,7 +82,8 @@ enum CBClientEventId {
     cb_client_topic_unsubscribe,
     cb_client_projects_active,
     cb_client_session_ping,
-    cb_client_session_task_confirmation@since(version: "25.2.2")
+    cb_client_session_task_confirmation @since(version: "25.2.2")
+    cb_client_session_task_with_parameters_confirmation @since(version: "25.2.5")
 }
 
 "Client subscribes on topic to receive only related events"

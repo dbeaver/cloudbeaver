@@ -118,6 +118,16 @@ public class CBEventsWebSocket extends CBAbstractWebSocket implements CBWebSessi
                     }
                     break;
                 }
+                case WSSessionTaskWithParametersConfirmationEvent.ID: {
+                    if (webSession instanceof WebSession session) {
+                        var taskParamsConfirmationEvent = (WSSessionTaskWithParametersConfirmationEvent) clientEvent;
+                        session.handleTaskConfirmationWithParameters(
+                            taskParamsConfirmationEvent.getTaskId(),
+                            taskParamsConfirmationEvent.getParameters()
+                        );
+                    }
+                    break;
+                }
                 default:
                     var e = new DBWebException("Unknown websocket client event: " + clientEvent.getId());
                     log.error(e.getMessage(), e);

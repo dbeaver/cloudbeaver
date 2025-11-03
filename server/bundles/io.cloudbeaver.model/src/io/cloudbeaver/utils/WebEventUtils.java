@@ -30,7 +30,7 @@ import org.jkiss.dbeaver.model.websocket.event.datasource.WSDatasourceFolderEven
 import org.jkiss.dbeaver.model.websocket.event.permissions.WSSubjectPermissionEvent;
 import org.jkiss.dbeaver.model.websocket.event.resource.WSResourceProperty;
 import org.jkiss.dbeaver.model.websocket.event.resource.WSResourceUpdatedEvent;
-import org.jkiss.dbeaver.model.websocket.event.session.WSSessionTaskInfoEvent;
+import org.jkiss.dbeaver.model.websocket.event.session.task.WSSessionTaskInfoEvent;
 
 import java.util.List;
 
