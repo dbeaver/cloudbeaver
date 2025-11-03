@@ -27,5 +27,15 @@
     --dbv-kit-btn-danger-background-active: var(--tw-color-red-800);
     --dbv-kit-btn-danger-border-color: transparent;
     --dbv-kit-btn-danger-color-outline: var(--tw-color-red-300);
+
+    /* Ghost Button */
+    --dbv-kit-btn-ghost-foreground: var(--dbv-kit-color-primary-600);
+    --dbv-kit-btn-ghost-foreground-hover: var(--dbv-kit-color-primary-600);
+    --dbv-kit-btn-ghost-foreground-active: var(--dbv-kit-color-primary-600);
+    --dbv-kit-btn-ghost-background: transparent;
+    --dbv-kit-btn-ghost-background-hover: var(--dbv-kit-color-primary-50);
+    --dbv-kit-btn-ghost-background-active: var(--dbv-kit-color-primary-100);
+    --dbv-kit-btn-ghost-border-color: transparent;
+    --dbv-kit-btn-ghost-border-color-hover: var(--dbv-kit-color-primary-600);
   }
 }
