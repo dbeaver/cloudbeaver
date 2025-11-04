@@ -105,6 +105,7 @@ import pluginSettingsDefaultAdministration from '@cloudbeaver/plugin-settings-de
 import pluginCodemirror6 from '@cloudbeaver/plugin-codemirror6/module';
 import pluginAsyncTaskConfirmation from '@cloudbeaver/plugin-async-task-confirmation/module';
 import pluginSqlAsyncTaskConfirmation from '@cloudbeaver/plugin-sql-async-task-confirmation/module';
+import pluginDataViewerConditionalFormatting from '@cloudbeaver/plugin-data-viewer-conditional-formatting/module';
 
 const core = [
   coreRouting, // important, should be first because the router starts in load phase first after all plugins register phase
@@ -209,4 +210,5 @@ export const commonSet = [
   pluginCodemirror6,
   pluginAsyncTaskConfirmation,
   pluginSqlAsyncTaskConfirmation,
+  pluginDataViewerConditionalFormatting,
 ];

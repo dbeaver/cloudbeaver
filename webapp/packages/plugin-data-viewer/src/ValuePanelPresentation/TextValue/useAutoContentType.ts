@@ -61,8 +61,8 @@ export function useAutoContentType({ displayed, formatAction, model, elementKey 
     return null;
   }
 
-  const contentValue = elementKey ? formatAction.get(elementKey) : null;
-  const contentValueType = getContentTypeFromResultSetValue(contentValue);
+  const cellHolder = elementKey ? formatAction.get(elementKey) : null;
+  const contentValueType = getContentTypeFromResultSetValue(cellHolder?.value as IResultSetValue);
 
   return preprocessDefaultContentType(contentValueType);
 }

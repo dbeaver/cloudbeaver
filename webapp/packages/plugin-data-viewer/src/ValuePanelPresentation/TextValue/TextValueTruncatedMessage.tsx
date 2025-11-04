@@ -34,22 +34,22 @@ export const TextValueTruncatedMessage = observer<Props>(function TextValueTrunc
   const notificationService = useService(NotificationService);
   const contentAction = model.source.getAction(resultIndex, ResultSetDataContentAction);
   const formatAction = model.source.getAction(resultIndex, IDatabaseDataFormatAction);
-  const contentValue = formatAction.get(elementKey);
-  let isTruncated = contentAction.isTextTruncated(elementKey);
+  const holder = formatAction.get(elementKey);
+  let isTruncated = contentAction.isTextTruncated(holder);
   const isCacheLoaded = !!contentAction.retrieveFullTextFromCache(elementKey);
-  const limitInfo = elementKey ? contentAction.getLimitInfo(elementKey) : null;
+  const limitInfo = contentAction.getLimitInfo(holder);
 
-  if (isResultSetBlobValue(contentValue)) {
-    isTruncated ||= contentValue.blob.size > (limitInfo?.limit ?? MAX_BLOB_PREVIEW_SIZE);
+  if (isResultSetBlobValue(holder.value)) {
+    isTruncated ||= holder.value.blob.size > (limitInfo?.limit ?? MAX_BLOB_PREVIEW_SIZE);
   }
 
   if (!isTruncated || isCacheLoaded) {
     return null;
   }
 
-  const isTextColumn = formatAction.isText(elementKey);
+  const isTextColumn = formatAction.isText(holder);
   const valueSize =
-    isResultSetContentValue(contentValue) && isNotNullDefined(contentValue.contentLength) ? bytesToSize(contentValue.contentLength) : undefined;
+    isResultSetContentValue(holder.value) && isNotNullDefined(holder.value.contentLength) ? bytesToSize(holder.value.contentLength) : undefined;
 
   async function pasteFullText() {
     try {
@@ -60,7 +60,7 @@ export const TextValueTruncatedMessage = observer<Props>(function TextValueTrunc
   }
 
   return (
-    <QuotaPlaceholder model={model} resultIndex={resultIndex} elementKey={elementKey} keepSize>
+    <QuotaPlaceholder model={model} resultIndex={resultIndex} holder={holder} keepSize>
       {isTextColumn && (
         <Container keepSize>
           <Button variant="secondary" disabled={model.isLoading()} onClick={pasteFullText}>

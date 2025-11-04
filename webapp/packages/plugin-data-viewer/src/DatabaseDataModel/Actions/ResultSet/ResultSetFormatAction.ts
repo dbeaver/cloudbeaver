@@ -21,6 +21,8 @@ import { injectable } from '@cloudbeaver/core-di';
 import { IDatabaseDataResult } from '../../IDatabaseDataResult.js';
 import { IDatabaseDataViewAction } from '../IDatabaseDataViewAction.js';
 import type { IGridColumnKey, IGridDataKey } from '../Grid/IGridDataKey.js';
+import { isNumber } from '@cloudbeaver/core-utils';
+import type { IDatabaseValueHolder } from '../IDatabaseValueHolder.js';
 
 export type IResultSetValue =
   | string
@@ -35,7 +37,7 @@ const DISPLAY_STRING_LENGTH = 200;
 @injectable(() => [IDatabaseDataSource, IDatabaseDataResult, IDatabaseDataViewAction, IDatabaseDataEditAction])
 export class ResultSetFormatAction
   extends DatabaseDataAction<any, IDatabaseResultSet>
-  implements IDatabaseDataFormatAction<IGridDataKey, IDatabaseResultSet>
+  implements IDatabaseDataFormatAction<IGridDataKey, IResultSetValue, IDatabaseResultSet>
 {
   static dataFormat = [ResultDataFormat.Resultset];
   private readonly view: ResultSetViewAction;
@@ -65,67 +67,85 @@ export class ResultSetFormatAction
 
     return readonly;
   }
-  isNull(key: IGridDataKey): boolean {
-    return this.get(key) === null;
+
+  isNull({ value }: IDatabaseValueHolder<IGridDataKey, IResultSetValue>): boolean {
+    return value === null;
   }
 
-  isBinary(key: Partial<IGridDataKey>): boolean {
-    if (!key.column) {
+  isBinary(holder: IDatabaseValueHolder<Partial<IGridDataKey>, IResultSetValue>): boolean {
+    if (!holder.key.column) {
       return false;
     }
 
-    const column = this.view.getColumn(key.column);
+    const column = this.view.getColumn(holder.key.column);
     if (column?.dataKind?.toLocaleLowerCase() === 'binary') {
       return true;
     }
 
-    if (key.row) {
-      const value = this.get(key as IGridDataKey);
-
-      if (isResultSetFileValue(value)) {
+    if (holder.key.row) {
+      if (isResultSetFileValue(holder.value)) {
         return true;
       }
 
-      if (isResultSetContentValue(value)) {
-        return value.binary !== undefined;
+      if (isResultSetContentValue(holder.value)) {
+        return holder.value.binary !== undefined;
       }
     }
 
     return false;
   }
 
-  isGeometry(key: Partial<IGridDataKey>): boolean {
-    if (key.column) {
-      const column = this.view.getColumn(key.column);
+  isGeometry(holder: IDatabaseValueHolder<Partial<IGridDataKey>, any>): boolean {
+    if (holder.key.column) {
+      const column = this.view.getColumn(holder.key.column);
       if (column?.dataKind?.toLocaleLowerCase() === 'geometry') {
         return true;
       }
     }
 
-    if (key.row) {
-      const value = this.get(key as IGridDataKey);
-      return isResultSetComplexValue(value) && value.$type === 'geometry';
+    if (holder.key.row) {
+      return isResultSetComplexValue(holder.value) && holder.value.$type === 'geometry';
     }
 
     return false;
   }
 
-  isText(key: Partial<IGridDataKey>): boolean {
-    if (!key?.column) {
+  isNumber(holder: IDatabaseValueHolder<Partial<IGridDataKey>, any>): boolean {
+    if (!holder.key?.column) {
       return false;
     }
 
-    const column = this.view.getColumn(key.column);
+    const column = this.view.getColumn(holder.key.column);
+
+    if (column?.dataKind?.toLocaleLowerCase() === 'numeric') {
+      return true;
+    }
+
+    if (holder.key.row && !this.isBinary(holder)) {
+      if (isResultSetContentValue(holder.value)) {
+        return holder.value.text !== undefined && isNumber(holder.value.text);
+      }
+
+      return isNumber(holder.value);
+    }
+
+    return false;
+  }
+
+  isText(holder: IDatabaseValueHolder<Partial<IGridDataKey>, any>): boolean {
+    if (!holder.key?.column) {
+      return false;
+    }
+
+    const column = this.view.getColumn(holder.key.column);
 
     if (column?.dataKind?.toLocaleLowerCase() === 'string') {
       return true;
     }
 
-    if (key.row && !this.isBinary(key)) {
-      const value = this.get(key as IGridDataKey);
-
-      if (isResultSetContentValue(value)) {
-        return value.text !== undefined;
+    if (holder.key.row && !this.isBinary(holder)) {
+      if (isResultSetContentValue(holder.value)) {
+        return holder.value.text !== undefined;
       }
     }
 
@@ -144,7 +164,8 @@ export class ResultSetFormatAction
     for (let rowIndex = offset; rowIndex < offset + count; rowIndex++) {
       for (let columnIndex = 0; columnIndex < columns.length; columnIndex++) {
         const key = { row: this.view.rowKeys[rowIndex]!, column: columns[columnIndex]! };
-        const displayString = this.getDisplayString(key);
+        const holder = this.get(key);
+        const displayString = this.getDisplayString(holder);
         const current = cells[columnIndex] ?? '';
 
         if (displayString.length > current.length) {
@@ -156,102 +177,148 @@ export class ResultSetFormatAction
     return cells;
   }
 
-  get(key: IGridDataKey): IResultSetValue {
-    return this.view.getCellValue(key);
+  get(key: IGridDataKey): IDatabaseValueHolder<IGridDataKey, IResultSetValue> {
+    return this.view.getCellHolder(key);
   }
 
-  getText(key: IGridDataKey): string {
-    const value = this.get(key);
-
-    if (value === null) {
+  getText(holder: IDatabaseValueHolder<IGridDataKey, IResultSetValue>): string {
+    if (holder.value === null) {
       return '';
     }
 
-    if (isResultSetContentValue(value)) {
-      if (value.text !== undefined) {
-        return value.text;
+    if (isResultSetContentValue(holder.value)) {
+      if (holder.value.text !== undefined) {
+        return holder.value.text;
       }
 
       return '';
     }
 
-    if (isResultSetGeometryValue(value)) {
-      if (value.text !== undefined) {
-        return value.text;
+    if (isResultSetGeometryValue(holder.value)) {
+      if (holder.value.text !== undefined) {
+        return holder.value.text;
       }
 
       return '';
     }
 
-    if (isResultSetComplexValue(value)) {
-      if (value.value !== undefined) {
-        if (typeof value.value === 'object' && value.value !== null) {
-          return JSON.stringify(value.value);
+    if (isResultSetComplexValue(holder.value)) {
+      if (holder.value.value !== undefined) {
+        if (typeof holder.value.value === 'object' && holder.value.value !== null) {
+          return JSON.stringify(holder.value.value);
         }
-        return String(value.value);
+        return String(holder.value.value);
       }
       return '';
     }
 
-    if (this.isBinary(key)) {
+    if (this.isBinary(holder)) {
       return '';
     }
 
-    if (value !== null && typeof value === 'object') {
-      return JSON.stringify(value);
+    if (holder.value !== null && typeof holder.value === 'object') {
+      return JSON.stringify(holder.value);
     }
 
-    if (typeof value === 'number' || typeof value === 'boolean') {
-      return String(value);
+    if (typeof holder.value === 'number' || typeof holder.value === 'boolean') {
+      return String(holder.value);
     }
 
-    return value;
+    return holder.value;
   }
 
-  getDisplayString(key: IGridDataKey): string {
-    const value = this.get(key);
+  getNumber(holder: IDatabaseValueHolder<IGridDataKey, IResultSetValue>): number {
+    if (holder.value === null) {
+      return NaN;
+    }
 
-    if (value === null) {
+    if (isResultSetContentValue(holder.value)) {
+      if (holder.value.text !== undefined) {
+        return parseFloat(holder.value.text);
+      }
+
+      return NaN;
+    }
+
+    if (isResultSetGeometryValue(holder.value)) {
+      if (holder.value.text !== undefined) {
+        return parseFloat(holder.value.text);
+      }
+
+      return NaN;
+    }
+
+    if (isResultSetComplexValue(holder.value)) {
+      if (holder.value.value !== undefined) {
+        if (typeof holder.value.value === 'object' && holder.value.value !== null) {
+          return NaN;
+        }
+        return parseFloat(holder.value.value);
+      }
+      return NaN;
+    }
+
+    if (this.isBinary(holder)) {
+      return NaN;
+    }
+
+    if (holder.value !== null && typeof holder.value === 'object') {
+      return NaN;
+    }
+
+    if (typeof holder.value === 'number') {
+      return holder.value;
+    }
+
+    if (typeof holder.value === 'boolean') {
+      return NaN;
+    }
+
+    return parseFloat(holder.value);
+  }
+
+  getDisplayString(holder: IDatabaseValueHolder<IGridDataKey, IResultSetValue>): string {
+    if (holder.value === null) {
       return '[null]';
     }
 
-    if (isResultSetGeometryValue(value)) {
-      if (value.text !== undefined) {
-        return this.truncateText(String(value.text), DISPLAY_STRING_LENGTH);
+    if (isResultSetGeometryValue(holder.value)) {
+      if (holder.value.text !== undefined) {
+        return this.truncateText(String(holder.value.text), DISPLAY_STRING_LENGTH);
       }
 
       return '[null]';
     }
 
-    if (this.isBinary(key)) {
-      if (isResultSetContentValue(value) && value.text === 'null') {
+    if (this.isBinary(holder)) {
+      if (isResultSetContentValue(holder.value) && holder.value.text === 'null') {
         return '[null]';
       }
 
       return '[blob]';
     }
 
-    if (isResultSetContentValue(value)) {
-      if (value.text !== undefined) {
-        return this.truncateText(String(value.text), DISPLAY_STRING_LENGTH);
+    if (isResultSetContentValue(holder.value)) {
+      if (holder.value.text !== undefined) {
+        return this.truncateText(String(holder.value.text), DISPLAY_STRING_LENGTH);
       }
 
       return '[null]';
     }
 
-    if (isResultSetComplexValue(value)) {
-      if (value.value !== undefined) {
-        if (typeof value.value === 'object' && value.value !== null) {
-          return JSON.stringify(value.value);
+    if (isResultSetComplexValue(holder.value)) {
+      if (holder.value.value !== undefined) {
+        if (typeof holder.value.value === 'object' && holder.value.value !== null) {
+          return JSON.stringify(holder.value.value);
         }
 
-        return String(value.value);
+        return String(holder.value.value);
       }
 
       return '[null]';
     }
 
-    return this.truncateText(String(value), DISPLAY_STRING_LENGTH);
+    return this.truncateText(String(holder.value), DISPLAY_STRING_LENGTH);
   }
 
   truncateText(text: string, length: number): string {

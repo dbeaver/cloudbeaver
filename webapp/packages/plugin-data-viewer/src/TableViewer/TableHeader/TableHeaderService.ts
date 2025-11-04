@@ -5,9 +5,8 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import React from 'react';
 
-import { PlaceholderContainer } from '@cloudbeaver/core-blocks';
+import { importLazyComponent, PlaceholderContainer } from '@cloudbeaver/core-blocks';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { ActionService, DATA_CONTEXT_MENU, MenuService } from '@cloudbeaver/core-view';
 
@@ -19,14 +18,8 @@ import { isResultSetDataSource, ResultSetDataSource } from '../../ResultSet/Resu
 import { DATA_VIEWER_DATA_MODEL_TOOLS_MENU } from './DATA_VIEWER_DATA_MODEL_TOOLS_MENU.js';
 import { IDatabaseDataConstraintAction } from '../../DatabaseDataModel/Actions/IDatabaseDataConstraintAction.js';
 
-export const TableWhereFilter = React.lazy(async () => {
-  const { TableWhereFilter } = await import('./TableWhereFilter.js');
-  return { default: TableWhereFilter };
-});
-export const TableHeaderMenu = React.lazy(async () => {
-  const { TableHeaderMenu } = await import('./TableHeaderMenu.js');
-  return { default: TableHeaderMenu };
-});
+export const TableWhereFilter = importLazyComponent(() => import('./TableWhereFilter.js').then(module => module.TableWhereFilter));
+export const TableHeaderMenu = importLazyComponent(() => import('./TableHeaderMenu.js').then(module => module.TableHeaderMenu));
 
 export interface ITableHeaderPlaceholderProps {
   model: IDatabaseDataModel;
