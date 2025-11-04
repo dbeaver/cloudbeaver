@@ -153,7 +153,7 @@ public interface DBWServiceAdmin extends DBWService {
         boolean disabled,
         @Nullable String iconURL,
         @Nullable String description,
-        @Nullable Map<String, Object> parameters) throws DBWebException;
+        @WebParameterSecure @Nullable Map<String, Object> parameters) throws DBWebException;
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
     boolean deleteAuthProviderConfiguration(@NotNull WebSession webSession, @NotNull String id) throws DBWebException;
 

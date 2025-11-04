@@ -16,6 +16,7 @@
  */
 package io.cloudbeaver.service;
 
+import graphql.GraphQLContext;
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.idl.SchemaParser;
 import graphql.schema.idl.TypeDefinitionRegistry;
@@ -345,7 +346,11 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
         // Perform any checks before action call
         protected void beforeWebActionCall(WebAction webAction, Method method, Object[] args) throws DBException {
 
-            HttpServletRequest request = GraphQLEndpoint.getServletRequestOrThrow(this.env);
+            GraphQLContext graphQlContext = this.env.getGraphQlContext();
+            HttpServletRequest request = graphQlContext.get("request");
+            if (request == null) {
+                return;
+            }
             String sessionId = GraphQLLoggerUtil.getSmSessionId(request);
             String userId = GraphQLLoggerUtil.getUserId(request);
             String loggerMessage = GraphQLLoggerUtil.buildLoggerMessage(sessionId, userId, method, args);

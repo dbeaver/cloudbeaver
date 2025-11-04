@@ -127,7 +127,7 @@ public interface DBWServiceCore extends DBWService {
     WebConnectionInfo createConnection(
         @NotNull WebSession webSession,
         @Nullable @WebObjectId String projectId,
-        @NotNull Map<String, Object> connectionConfig
+        @WebParameterSecure @NotNull Map<String, Object> connectionConfig
     ) throws DBWebException;
 
     @WebProjectAction(requireProjectPermissions = {RMConstants.PERMISSION_PROJECT_DATASOURCES_EDIT})
