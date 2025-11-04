@@ -75,6 +75,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 /**
@@ -201,14 +202,12 @@ public class WebSQLProcessor implements WebSessionProvider {
             final DBDDataFilter dataFilter = filter.makeDataFilter(resultsInfo);
             DBPDataSource dataSource = context.getDataSource();
 
+            DBPPreferenceStore store = dataSource.getContainer().getPreferenceStore();
+            boolean defaultOrderingConfigured = isDefaultOrderingConfigured(store);
+            if (defaultOrderingConfigured && resultsInfo != null && !dataFilter.hasFilters()) {
+                applyDefaultOrdering(dataFilter, resultsInfo, store);
+            }
             if (dataFilter.hasFilters()) {
-                sql = dataSource.getSQLDialect().addFiltersToQuery(monitor, dataSource, sql, dataFilter);
-            } else if (resultsInfo != null) {
-                applyDefaultOrdering(
-                    dataSource.getContainer().getPreferenceStore(),
-                    resultsInfo,
-                    dataFilter
-                );
                 sql = dataSource.getSQLDialect().addFiltersToQuery(monitor, dataSource, sql, dataFilter);
             }
 
@@ -309,6 +308,14 @@ public class WebSQLProcessor implements WebSessionProvider {
             } else {
                 executeInfo.setResults(new WebSQLQueryResults[0]);
             }
+
+            if (defaultOrderingConfigured && resultsInfo == null &&
+                !dataFilter.hasFilters() && executeInfo.getResults().length == 1
+            ) {
+                String resultSetId = executeInfo.getResults()[0].getResultSet().getId();
+                // Make the second request with initialized resultSet to apply default ordering
+                return processQuery(monitor, contextInfo, sql, resultSetId, filter, dataFormat, webSession, asyncTask, readLogs, useEvents);
+            }
         } catch (DBException e) {
             throw new DBWebException("Error executing query", e);
         }
@@ -340,7 +347,16 @@ public class WebSQLProcessor implements WebSessionProvider {
         WebSQLExecuteInfo executeInfo = new WebSQLExecuteInfo();
 
         DBCExecutionContext executionContext = DBUtils.getOrOpenDefaultContext(dataContainer, false);
-        DBDDataFilter dataFilter = filter.makeDataFilter((resultId == null ? null : contextInfo.getResults(resultId)));
+        WebSQLResultsInfo resultsInfo = resultId == null ? null : contextInfo.getResults(resultId);
+        DBDDataFilter dataFilter = filter.makeDataFilter(resultsInfo);
+
+        DBPPreferenceStore store = dataContainer.getDataSource().getContainer().getPreferenceStore();
+        boolean defaultOrderingConfigured = isDefaultOrderingConfigured(store);
+        if (defaultOrderingConfigured && resultsInfo != null && !dataFilter.hasFilters()) {
+            applyDefaultOrdering(dataFilter, resultsInfo, store);
+        }
+
+        AtomicReference<String> resultSetId = new AtomicReference<>(null);
         DBExecUtils.tryExecuteRecover(monitor, connection.getDataSource(), param -> {
             try (DBCSession session = executionContext.openSession(monitor, resolveQueryPurpose(dataFilter), "Read data from container")) {
                 try (WebSQLQueryDataReceiver dataReceiver = new WebSQLQueryDataReceiver(contextInfo, dataContainer, dataFormat)) {
@@ -357,6 +373,7 @@ public class WebSQLProcessor implements WebSessionProvider {
 
                     WebSQLQueryResults results = new WebSQLQueryResults(webSession, dataFormat);
                     WebSQLQueryResultSet resultSet = dataReceiver.getResultSet();
+                    resultSetId.set(resultSet.getId());
                     results.setResultSet(resultSet);
 
                     executeInfo.setResults(new WebSQLQueryResults[]{results});
@@ -371,6 +388,11 @@ public class WebSQLProcessor implements WebSessionProvider {
                 }
             }
         });
+        if (defaultOrderingConfigured && resultId == null && resultSetId.get() != null) {
+            // Make the second request with initialized resultSet to apply default ordering
+            return readDataFromContainer(contextInfo, monitor, dataContainer, resultSetId.get(), filter, dataFormat);
+        }
+
         return executeInfo;
     }
 
@@ -1261,10 +1283,21 @@ public class WebSQLProcessor implements WebSessionProvider {
         return convertInputCellValue(dbcSession, allAttributes, cellRow, withoutExecution);
     }
 
+    private boolean isDefaultOrderingConfigured(
+        @NotNull DBPPreferenceStore store
+    ) {
+        OrderingPolicy orderingPolicy = CommonUtils.valueOf(
+            OrderingPolicy.class,
+            store.getString(ModelPreferences.RESULT_SET_ORDERING_POLICY),
+            OrderingPolicy.DEFAULT
+        );
+        return orderingPolicy != OrderingPolicy.DEFAULT;
+    }
+
     private void applyDefaultOrdering(
-        @NotNull DBPPreferenceStore store,
+        @NotNull DBDDataFilter dataFilter,
         @NotNull WebSQLResultsInfo resultsInfo,
-        @NotNull DBDDataFilter dataFilter
+        @NotNull DBPPreferenceStore store
     ) {
         OrderingPolicy orderingPolicy = CommonUtils.valueOf(
             OrderingPolicy.class,
@@ -1274,13 +1307,14 @@ public class WebSQLProcessor implements WebSessionProvider {
         DBDRowIdentifier rowIdentifier = resultsInfo.getDefaultRowIdentifier();
 
         if (orderingPolicy != OrderingPolicy.DEFAULT && rowIdentifier != null && !rowIdentifier.isIncomplete()) {
+            List<DBDAttributeConstraint> constraints = new ArrayList<>();
             for (DBDAttributeBinding binding : rowIdentifier.getAttributes()) {
-                DBDAttributeConstraint constraint = dataFilter.getConstraint(binding);
-                if (constraint != null) {
-                    constraint.setOrderPosition(dataFilter.getMaxOrderingPosition() + 1);
-                    constraint.setOrderDescending(orderingPolicy == OrderingPolicy.PRIMARY_KEY_DESC);
-                }
+                DBDAttributeConstraint constraint = new DBDAttributeConstraint(binding);
+                constraint.setOrderPosition(dataFilter.getMaxOrderingPosition() + 1);
+                constraint.setOrderDescending(orderingPolicy == OrderingPolicy.PRIMARY_KEY_DESC);
+                constraints.add(constraint);
             }
+            dataFilter.addConstraints(constraints);
         }
     }
 

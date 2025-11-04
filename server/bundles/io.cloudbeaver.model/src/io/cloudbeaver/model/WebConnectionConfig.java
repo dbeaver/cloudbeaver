@@ -114,11 +114,7 @@ public class WebConnectionConfig {
             expertSettingsValues != null ? expertSettingsValues : params,
             WebExpertSettingsProperties.PROP_DEFAULT_ORDERING
         );
-        defaultOrdering = CommonUtils.valueOf(
-            OrderingPolicy.class,
-            defaultOrderingString,
-            OrderingPolicy.DEFAULT
-        );
+        defaultOrdering = OrderingPolicy.fromString(defaultOrderingString, OrderingPolicy.DEFAULT);
 
         String configType = JSONUtils.getString(params, "configurationType");
         configurationType = configType == null ? null : DBPDriverConfigurationType.valueOf(configType);

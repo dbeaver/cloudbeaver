@@ -350,7 +350,7 @@ public class WebDataSourceUtils {
     ) {
         store.setValue(
             ModelPreferences.RESULT_SET_ORDERING_POLICY,
-            config.getDefaultOrdering().toString()
+            config.getDefaultOrdering().name()
         );
     }
 
