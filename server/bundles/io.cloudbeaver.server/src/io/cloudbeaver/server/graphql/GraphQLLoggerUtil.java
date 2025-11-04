@@ -16,6 +16,7 @@
  */
 package io.cloudbeaver.server.graphql;
 
+import io.cloudbeaver.model.log.Sensitive;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.WebAppUtils;
 import io.cloudbeaver.server.WebApplication;
@@ -23,7 +24,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.jkiss.code.Nullable;
 import org.jkiss.utils.CommonUtils;
 
-import java.util.Map;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.util.Set;
 
 public class GraphQLLoggerUtil {
@@ -63,43 +66,63 @@ public class GraphQLLoggerUtil {
             .findWebSession(request);
     }
 
-    public static String buildLoggerMessage(String sessionId, String userId, Map<String, Object> variables) {
+    public static String buildLoggerMessage(String sessionId, String userId, Method method, Object[] args) {
         StringBuilder loggerMessage = new StringBuilder(" [user: ").append(userId)
             .append(", sessionId: ").append(sessionId).append("]");
 
-        if (WebAppUtils.getWebPlatform().getPreferenceStore().getBoolean(LOG_API_GRAPHQL_DEBUG_PARAMETER)
-                && variables != null
+//        if (WebAppUtils.getWebPlatform().getPreferenceStore().getBoolean(LOG_API_GRAPHQL_DEBUG_PARAMETER)
+        if (true
         ) {
             loggerMessage.append(" [variables] ");
-            String parsedVariables = parseVarialbes(variables);
+            String parsedVariables = maskArgsToString(method, args);
             if (CommonUtils.isNotEmpty(parsedVariables)) {
-                loggerMessage.append(parseVarialbes(variables));
+                loggerMessage.append(parsedVariables);
             }
         }
         return loggerMessage.toString();
     }
 
-    private static String parseVarialbes(Map<String, Object> map) {
-        StringBuilder result = new StringBuilder();
+    public static String maskArgsToString(Method method, Object[] args) {
+        StringBuilder sb = new StringBuilder();
+        Parameter[] params = method.getParameters();
 
-        for (Map.Entry<String, Object> entry : map.entrySet()) {
-            String key = entry.getKey();
-            Object value = entry.getValue();
+        for (int i = 0; i < params.length; i++) {
+            //fixme can't get real parameter names without -parameters compiler option
+            String name = params[i].getName();
+            Object value = (args != null && i < args.length) ? args[i] : null;
 
-            boolean isProhibited = PROHIBITED_VARIABLES.stream()
-                .anyMatch(prohibitedKey -> key.toLowerCase().contains(prohibitedKey.toLowerCase()));
+            sb.append(name).append(": ");
 
-            if (isProhibited) {
-                result.append(key).append(": ").append("******** ");
-                continue;
-            }
-
-            if (value instanceof Map) {
-                result.append(parseVarialbes((Map<String, Object>) value));
+            if (params[i].isAnnotationPresent(Sensitive.class)) {
+                sb.append("**** ");
+            } else if (value != null && !isSimple(value.getClass())) {
+                sb.append("{ ");
+                for (Field field : value.getClass().getDeclaredFields()) {
+                    field.setAccessible(true);
+                    sb.append(field.getName()).append(": ");
+                    try {
+                        if (field.isAnnotationPresent(Sensitive.class)) {
+                            sb.append("**** ");
+                        } else {
+                            sb.append(field.get(value)).append(" ");
+                        }
+                    } catch (IllegalAccessException e) {
+                        sb.append("<err> ");
+                    }
+                }
+                sb.append("} ");
             } else {
-                result.append(key).append(": ").append(value).append(" ");
+                sb.append(value).append(" ");
             }
         }
-        return result.toString().trim();
+        return sb.toString().trim();
+    }
+
+    private static boolean isSimple(Class<?> cls) {
+        return cls.isPrimitive()
+            || Number.class.isAssignableFrom(cls)
+            || CharSequence.class.isAssignableFrom(cls)
+            || Boolean.class.equals(cls)
+            || Enum.class.isAssignableFrom(cls);
     }
 }

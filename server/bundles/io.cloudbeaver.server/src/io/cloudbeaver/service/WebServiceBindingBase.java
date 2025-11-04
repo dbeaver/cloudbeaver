@@ -27,9 +27,11 @@ import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.session.WebSessionProvider;
 import io.cloudbeaver.server.WebAppUtils;
 import io.cloudbeaver.server.graphql.GraphQLEndpoint;
+import io.cloudbeaver.server.graphql.GraphQLLoggerUtil;
 import io.cloudbeaver.service.security.SMUtils;
 import io.cloudbeaver.utils.ServletAppUtils;
 import io.cloudbeaver.utils.WebDataSourceUtils;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
@@ -340,16 +342,26 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
                 }
             }
         }
+        // Perform any checks before action call
+        protected void beforeWebActionCall(WebAction webAction, Method method, Object[] args) throws DBException {
 
-    }
+            HttpServletRequest request = this.env.getGraphQlContext().get("request");
+            String sessionId = GraphQLLoggerUtil.getSmSessionId(request);
+            String userId = GraphQLLoggerUtil.getUserId(request);
 
-    // Perform any checks before action call
-    protected void beforeWebActionCall(WebAction webAction, Method method, Object[] args) throws DBException {
-        setLogContext(method, args);
-    }
+            String loggerMessage = GraphQLLoggerUtil.buildLoggerMessage(sessionId, userId, method, args);
 
-    protected void afterWebActionCall(WebAction webAction, Method method, Object[] args) throws DBException {
-        Log.setContext(null);
+            if (method.getName() != null) {
+                log.debug("API > " + method.getName() + loggerMessage);
+            }
+
+            setLogContext(method, args);
+        }
+
+        protected void afterWebActionCall(WebAction webAction, Method method, Object[] args) throws DBException {
+            Log.setContext(null);
+        }
+
     }
 
     protected void setLogContext(Method method, @Nullable Object[] args) {
