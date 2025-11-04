@@ -54,14 +54,15 @@ export class NavigationTabsService extends View<ITab> {
   }
 
   get tabIdList(): string[] {
-    return Array.from(this.tabsMap.values())
-      .filter(
-        tab =>
-          this.getTabMetadata(tab.id).restored &&
-          tab.userId === this.userInfoResource.getId() &&
-          (tab.projectId === null || this.projectsService.activeProjects.some(project => project.id === tab.projectId)),
-      )
-      .map(tab => tab.id);
+    return this.userTabsState.tabs.filter(tabId => {
+      const tab = this.tabsMap.get(tabId);
+      return (
+        tab &&
+        this.getTabMetadata(tab.id).restored &&
+        tab.userId === this.userInfoResource.getId() &&
+        (tab.projectId === null || this.projectsService.activeProjects.some(project => project.id === tab.projectId))
+      );
+    });
   }
 
   get history(): INavigatorHistory {
@@ -336,8 +337,10 @@ export class NavigationTabsService extends View<ITab> {
       }
     }
 
-    tabs.splice(fromIndex, 1);
-    tabs.splice(toIndex, 0, tabId);
+    const newTabs = [...tabs];
+    newTabs.splice(fromIndex, 1);
+    newTabs.splice(toIndex, 0, tabId);
+    this.userTabsState.tabs = newTabs;
 
     this.onTabReorder.execute({ tabId, fromIndex, toIndex });
     this.onStateUpdate.execute();
