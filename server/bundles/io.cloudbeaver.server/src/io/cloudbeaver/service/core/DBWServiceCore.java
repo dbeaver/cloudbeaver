@@ -16,10 +16,7 @@
  */
 package io.cloudbeaver.service.core;
 
-import io.cloudbeaver.DBWebException;
-import io.cloudbeaver.WebAction;
-import io.cloudbeaver.WebObjectId;
-import io.cloudbeaver.WebProjectAction;
+import io.cloudbeaver.*;
 import io.cloudbeaver.model.*;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.service.DBWService;
@@ -119,7 +116,7 @@ public interface DBWServiceCore extends DBWService {
         @NotNull WebSession webSession,
         @Nullable String projectId,
         @NotNull String connectionId,
-        @Nullable Map<String, Object> authProperties,
+        @WebParameterSecure @Nullable Map<String, Object> authProperties,
         @Nullable List<WebNetworkHandlerConfigInput> networkCredentials,
         boolean saveCredentials,
         boolean sharedCredentials,
@@ -130,7 +127,7 @@ public interface DBWServiceCore extends DBWService {
     WebConnectionInfo createConnection(
         @NotNull WebSession webSession,
         @Nullable @WebObjectId String projectId,
-        @NotNull Map<String, Object> connectionConfig
+        @WebParameterSecure @NotNull Map<String, Object> connectionConfig
     ) throws DBWebException;
 
     @WebProjectAction(requireProjectPermissions = {RMConstants.PERMISSION_PROJECT_DATASOURCES_EDIT})
