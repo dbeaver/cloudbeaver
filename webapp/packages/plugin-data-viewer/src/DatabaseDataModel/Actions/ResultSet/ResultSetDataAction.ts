@@ -39,6 +39,10 @@ export class ResultSetDataAction extends GridDataResultAction<
     super(source as unknown as IDatabaseDataSource<unknown, IDatabaseResultSet>, result as IDatabaseResultSet);
   }
 
+  override getColumnName(key: IGridColumnKey): string | undefined {
+    return this.getColumn(key)?.name;
+  }
+
   insertRow(row: IGridRowKey, value: IResultSetValue[], shift = 0): IGridRowKey | undefined {
     if (this.result.data?.rowsWithMetaData) {
       const index = row.index + shift;

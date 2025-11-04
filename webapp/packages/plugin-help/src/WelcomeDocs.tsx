@@ -17,21 +17,19 @@ export const WelcomeDocs = observer(function WelcomeDocs() {
   const translate = useTranslate();
   const serverConfigResource = useService(ServerConfigResource);
   return (
-    <a
+    <Cell
+      as="a"
       href={WEBSITE_LINKS.getDocumentationPage(serverConfigResource.distributed, GlobalConstants.version)}
       target="_blank"
       rel="noreferrer"
-      className="tw:text-inherit! tw:no-underline!"
+      before={<IconOrImage icon="/icons/documentation_link.svg" />}
+      description={translate('plugin_help_welcome_docs_description', undefined, {
+        product: serverConfigResource.distributed ? translate('product_full_name') : 'CloudBeaver',
+      })}
+      className="tw:text-inherit! tw:no-underline! tw:cursor-pointer tw:rounded-sm tw:overflow-hidden"
+      big
     >
-      <Cell
-        before={<IconOrImage icon="/icons/documentation_link.svg" />}
-        description={translate('plugin_help_welcome_docs_description', undefined, {
-          product: serverConfigResource.distributed ? 'DBeaver Team Edition' : 'CloudBeaver',
-        })}
-        big
-      >
-        {translate('plugin_help_welcome_docs_label')}
-      </Cell>
-    </a>
+      {translate('plugin_help_welcome_docs_label')}
+    </Cell>
   );
 });

@@ -25,11 +25,13 @@ import './styles/UiInput.css';
 import { FALLBACK_THEME_ID, themes } from './themes.js';
 import { ThemeSettingsService } from './ThemeSettingsService.js';
 
+export type ThemeType = 'light' | 'dark';
+
 export interface ITheme {
   name: string;
   id: string;
   class: string;
-  type?: 'light' | 'dark';
+  type: ThemeType;
   loaded: boolean;
   loader: () => Promise<void>;
 }

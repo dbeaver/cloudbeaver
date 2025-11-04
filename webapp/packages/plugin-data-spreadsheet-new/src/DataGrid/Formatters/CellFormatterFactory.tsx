@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -27,19 +27,16 @@ export const CellFormatterFactory = observer<ICellFormatterProps>(function CellF
     formatterRef.current = TextFormatter;
 
     if (cellContext.cell) {
-      const isBlob = tableDataContext.format.isBinary(cellContext.cell);
+      const holder = tableDataContext.getCellHolder(cellContext.cell);
+      const isBlob = tableDataContext.format.isBinary(holder);
 
       if (isBlob) {
         formatterRef.current = BlobFormatter;
       } else {
-        const value = tableDataContext.getCellValue(cellContext.cell);
-        if (value !== undefined) {
-          const resultColumn = tableDataContext.getColumnInfo(cellContext.cell.column);
-          const rawValue = tableDataContext.format.get(cellContext.cell);
+        const resultColumn = tableDataContext.getColumnInfo(cellContext.cell.column);
 
-          if (resultColumn && isBooleanValuePresentationAvailable(rawValue, resultColumn)) {
-            formatterRef.current = BooleanFormatter;
-          }
+        if (resultColumn && isBooleanValuePresentationAvailable(holder.value, resultColumn)) {
+          formatterRef.current = BooleanFormatter;
         }
       }
     } else {

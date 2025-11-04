@@ -158,6 +158,9 @@
       "path": "../plugin-data-viewer"
     },
     {
+      "path": "../plugin-data-viewer-conditional-formatting"
+    },
+    {
       "path": "../plugin-data-viewer-result-set-grouping"
     },
     {
