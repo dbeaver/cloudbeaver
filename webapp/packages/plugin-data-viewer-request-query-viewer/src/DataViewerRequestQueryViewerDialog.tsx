@@ -14,7 +14,6 @@ import {
   CommonDialogFooter,
   CommonDialogHeader,
   CommonDialogWrapper,
-  Fill,
   useResource,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
@@ -68,11 +67,10 @@ export const DataViewerRequestQueryViewerDialog: DialogComponent<IPayload> = obs
       <CommonDialogBody noBodyPadding noOverflow>
         <SQLCodeEditorLoader value={props.payload.query} extensions={extensions} readonly />
       </CommonDialogBody>
-      <CommonDialogFooter>
+      <CommonDialogFooter className="tw:flex tw:justify-between">
         <Button variant="secondary" onClick={() => props.rejectDialog()}>
           {translate('ui_cancel')}
         </Button>
-        <Fill />
         <Button onClick={openSqlEditor}>
           {translate('ui_open')} {translate('sql_editor_script_editor')}
         </Button>

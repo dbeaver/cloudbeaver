@@ -15,7 +15,7 @@ import { isResultSetDataSource, type ITableHeaderPlaceholderProps } from '@cloud
 import { Button, ButtonIcon } from '@dbeaver/ui-kit';
 
 import { DataViewerRequestQueryViewerDialog } from './DataViewerRequestQueryViewerDialog.js';
-import classes from './TableRequestQueryViewer.module.css';
+import classes from './DataViewerRequestQueryViewer.module.css';
 
 export const DataViewerRequestQueryViewer: PlaceholderComponent<ITableHeaderPlaceholderProps> = observer(function DataViewerRequestQueryViewer({
   model,
@@ -40,12 +40,12 @@ export const DataViewerRequestQueryViewer: PlaceholderComponent<ITableHeaderPlac
       variant="ghost"
       size="small"
       title={`${translate('plugin_data_viewer_request_query_viewer_description')}\n\n${model.requestInfo.originalQuery}`}
-      className={s(style, { button: true }, 'tw:mr-1!')}
+      className={s(style, { button: true }, 'tw:mr-1! tw:shrink-0')}
       disabled={model.isLoading() || model.isDisabled(resultIndex)}
       onClick={() => commonDialogService.open(DataViewerRequestQueryViewerDialog, { query: model.requestInfo.originalQuery, connectionKey })}
     >
-      <ButtonIcon placement="end">
-        <IconOrImage className="tw:h-4 tw:w-4 tw:mr-1" icon="sql-script-preview" />
+      <ButtonIcon placement="start">
+        <IconOrImage className="tw:h-4 tw:w-4" icon="sql-script-preview" />
       </ButtonIcon>
       {translate('plugin_data_viewer_request_query_viewer_title')}
     </Button>
