@@ -26,9 +26,9 @@ export function isBlobPresentationAvailable(context: IDataValuePanelProps | unde
 
     const firstSelectedCell = activeElements[0]!;
 
-    const cellValue = view.getCellValue(firstSelectedCell);
+    const cellHolder = view.getCellHolder(firstSelectedCell);
 
-    return isResultSetBinaryValue(cellValue) || isResultSetBlobValue(cellValue);
+    return isResultSetBinaryValue(cellHolder.value) || isResultSetBlobValue(cellHolder.value);
   }
 
   return false;

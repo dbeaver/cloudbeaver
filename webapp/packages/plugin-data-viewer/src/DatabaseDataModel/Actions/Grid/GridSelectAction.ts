@@ -53,7 +53,7 @@ export class GridSelectAction<
     source: IDatabaseDataSource<unknown, TResult>,
     result: TResult,
     data: IDatabaseDataResultAction<TKey, TResult>,
-    view: IDatabaseDataViewAction<TKey, TCell, TResult>,
+    view: IDatabaseDataViewAction<any, TCell, TResult>,
     edit?: IDatabaseDataEditAction<unknown, TCell, IDatabaseDataEditApplyActionData, TResult>,
   ) {
     super(source, result);

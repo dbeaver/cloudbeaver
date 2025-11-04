@@ -21,6 +21,7 @@ import {
   GridDataResultAction,
   GridEditAction,
   GridViewAction,
+  type IDatabaseValueHolder,
   type IResultSetValue,
   type IGridRowKey,
   type IGridColumnKey,
@@ -31,6 +32,7 @@ import type { IColumnInfo, ITableData } from './TableDataContext.js';
 import { useService } from '@cloudbeaver/core-di';
 import { DataGridSettingsService } from '../DataGridSettingsService.js';
 import type { SqlResultColumn } from '@cloudbeaver/core-sdk';
+import { GridConditionalFormattingAction } from '@cloudbeaver/plugin-data-viewer-conditional-formatting';
 
 interface ITableDataPrivate extends ITableData {
   dataGridSettingsService: DataGridSettingsService;
@@ -42,6 +44,7 @@ export function useTableData(
   resultIndex: number,
   gridDIVElement: React.RefObject<HTMLDivElement | null>,
 ): ITableData {
+  const formatting = model.source.getAction(resultIndex, GridConditionalFormattingAction);
   const format = model.source.getAction(resultIndex, IDatabaseDataFormatAction);
   const data = model.source.getAction(resultIndex, IDatabaseDataResultAction, GridDataResultAction);
   const editor = model.source.tryGetAction(resultIndex, IDatabaseDataEditAction, GridEditAction);
@@ -93,9 +96,9 @@ export function useTableData(
         // TODO: fix column abstraction
         return this.data.getColumn(key) as SqlResultColumn | undefined;
       },
-      getCellValue(key) {
+      getCellHolder(key) {
         // TODO: fix cell value abstraction
-        return this.view.getCellValue(key) as IResultSetValue | undefined;
+        return this.view.getCellHolder(key) as IDatabaseValueHolder<IGridDataKey, IResultSetValue>;
       },
       getColumnIndexFromColumnKey(columnKey) {
         return this.columns.findIndex(column => column.key !== null && GridDataKeysUtils.isEqual(columnKey, column.key));
@@ -143,6 +146,7 @@ export function useTableData(
       rows: computed,
       columnKeys: computed,
       hasDescription: computed,
+      formatting: observable.ref,
       format: observable.ref,
       dataContent: observable.ref,
       data: observable.ref,
@@ -151,6 +155,7 @@ export function useTableData(
       gridDIVElement: observable.ref,
     },
     {
+      formatting,
       format,
       dataContent,
       data,
