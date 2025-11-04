@@ -99,6 +99,7 @@ export class NavigationTabsService extends View<ITab> {
   readonly navigationTabContext: () => ITabNavigationContext;
   readonly onTabSelect: ISyncExecutor<ITab>;
   readonly onTabClose: ISyncExecutor<ITab | undefined>;
+  readonly onTabReorder: ISyncExecutor<{ tabId: string; fromIndex: number; toIndex: number }>;
   readonly onInit: ISyncExecutor<boolean>;
   readonly onStateUpdate: ISyncExecutor;
   readonly welcomeContainer: PlaceholderContainer;
@@ -128,6 +129,7 @@ export class NavigationTabsService extends View<ITab> {
 
     this.onTabSelect = new SyncExecutor();
     this.onTabClose = new SyncExecutor();
+    this.onTabReorder = new SyncExecutor();
     this.onInit = new SyncExecutor();
     this.onStateUpdate = new SyncExecutor();
     this.metadata = new MetadataMap<string, ITabMetadata>(() => ({ restored: false }));
@@ -148,6 +150,7 @@ export class NavigationTabsService extends View<ITab> {
       openTab: action,
       selectTab: action,
       closeTab: action,
+      reorderTab: action,
       registerTabHandler: action,
       updateHandlerState: action,
       unloadTabs: action,
@@ -295,6 +298,55 @@ export class NavigationTabsService extends View<ITab> {
     if (ResourceKeyUtils.isIntersect(key, this.history.currentId)) {
       this.selectTab(this.history.history.shift() ?? '', skipHandlers);
     }
+  }
+
+  reorderTab(tabId: string, target: number): boolean;
+  reorderTab(tabId: string, target: { tabId: string; position: 'before' | 'after' }): boolean;
+  reorderTab(tabId: string, target: number | { tabId: string; position: 'before' | 'after' }): boolean {
+    const tabs = this.userTabsState.tabs;
+    const fromIndex = tabs.indexOf(tabId);
+
+    if (fromIndex === -1) {
+      return false;
+    }
+
+    let toIndex: number;
+
+    if (typeof target === 'number') {
+      toIndex = target;
+
+      if (toIndex < 0 || toIndex > tabs.length - 1 || fromIndex === toIndex) {
+        return false;
+      }
+
+      if (fromIndex < toIndex) {
+        toIndex--;
+      }
+    } else {
+      const targetIndex = tabs.indexOf(target.tabId);
+
+      if (targetIndex === -1 || tabId === target.tabId) {
+        return false;
+      }
+
+      toIndex = target.position === 'before' ? targetIndex : targetIndex + 1;
+
+      if (fromIndex < targetIndex && target.position === 'after') {
+        toIndex--;
+      }
+    }
+
+    tabs.splice(fromIndex, 1);
+    tabs.splice(toIndex, 0, tabId);
+
+    this.onTabReorder.execute({ tabId, fromIndex, toIndex });
+    this.onStateUpdate.execute();
+
+    return true;
+  }
+
+  getTabPosition(tabId: string): number {
+    return this.userTabsState.tabs.indexOf(tabId);
   }
 
   registerTabHandler<TState>(options: TabHandlerOptions<TState>): TabHandler<TState> {
