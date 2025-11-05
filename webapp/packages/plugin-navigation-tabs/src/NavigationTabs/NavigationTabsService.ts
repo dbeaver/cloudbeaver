@@ -18,6 +18,7 @@ import { StorageService } from '@cloudbeaver/core-storage';
 import { isArraysEqual, MetadataMap, TempMap } from '@cloudbeaver/core-utils';
 import { ACTION_OPEN_IN_TAB, type IActiveView, View } from '@cloudbeaver/core-view';
 import { PlaceholderContainer } from '@cloudbeaver/core-blocks';
+import { reorderArray } from '@dbeaver/js-helpers';
 
 import type { ITab, ITabMetadata } from './ITab.js';
 import { TabHandler, type TabHandlerEvent, type TabHandlerOptions, type TabSyncHandlerEvent } from './TabHandler.js';
@@ -100,7 +101,6 @@ export class NavigationTabsService extends View<ITab> {
   readonly navigationTabContext: () => ITabNavigationContext;
   readonly onTabSelect: ISyncExecutor<ITab>;
   readonly onTabClose: ISyncExecutor<ITab | undefined>;
-  readonly onTabReorder: ISyncExecutor<{ tabId: string; fromIndex: number; toIndex: number }>;
   readonly onInit: ISyncExecutor<boolean>;
   readonly onStateUpdate: ISyncExecutor;
   readonly welcomeContainer: PlaceholderContainer;
@@ -130,7 +130,6 @@ export class NavigationTabsService extends View<ITab> {
 
     this.onTabSelect = new SyncExecutor();
     this.onTabClose = new SyncExecutor();
-    this.onTabReorder = new SyncExecutor();
     this.onInit = new SyncExecutor();
     this.onStateUpdate = new SyncExecutor();
     this.metadata = new MetadataMap<string, ITabMetadata>(() => ({ restored: false }));
@@ -301,48 +300,15 @@ export class NavigationTabsService extends View<ITab> {
     }
   }
 
-  reorderTab(tabId: string, target: number): boolean;
-  reorderTab(tabId: string, target: { tabId: string; position: 'before' | 'after' }): boolean;
-  reorderTab(tabId: string, target: number | { tabId: string; position: 'before' | 'after' }): boolean {
+  reorderTab(tabId: string, target: { tabId: string; position: 'before' | 'after' }): boolean {
     const tabs = this.userTabsState.tabs;
-    const fromIndex = tabs.indexOf(tabId);
+    const result = reorderArray(tabs, tabId, { item: target.tabId, position: target.position });
 
-    if (fromIndex === -1) {
+    if (tabs === result) {
       return false;
     }
 
-    let toIndex: number;
-
-    if (typeof target === 'number') {
-      toIndex = target;
-
-      if (toIndex < 0 || toIndex > tabs.length - 1 || fromIndex === toIndex) {
-        return false;
-      }
-
-      if (fromIndex < toIndex) {
-        toIndex--;
-      }
-    } else {
-      const targetIndex = tabs.indexOf(target.tabId);
-
-      if (targetIndex === -1 || tabId === target.tabId) {
-        return false;
-      }
-
-      toIndex = target.position === 'before' ? targetIndex : targetIndex + 1;
-
-      if (fromIndex < targetIndex && target.position === 'after') {
-        toIndex--;
-      }
-    }
-
-    const newTabs = [...tabs];
-    newTabs.splice(fromIndex, 1);
-    newTabs.splice(toIndex, 0, tabId);
-    this.userTabsState.tabs = newTabs;
-
-    this.onTabReorder.execute({ tabId, fromIndex, toIndex });
+    this.userTabsState.tabs = result;
     this.onStateUpdate.execute();
 
     return true;

@@ -9,6 +9,7 @@ import { action, makeObservable, observable, runInAction } from 'mobx';
 
 import type { MetadataMap, MetadataValueGetter, schema } from '@cloudbeaver/core-utils';
 import { SyncExecutor } from '@cloudbeaver/core-executor';
+import { reorderArray } from '@dbeaver/js-helpers';
 
 import type { ITabInfo, ITabInfoOptions, ITabsContainer } from './ITabsContainer.js';
 
@@ -136,32 +137,19 @@ export class TabsContainer<TProps = void, TOptions extends Record<string, any> |
     });
   }
 
-  reorder(draggedTabId: string, targetTabId: string, position: 'before' | 'after', props?: TProps): void {
-    const displayed = this.getDisplayed(props);
-    const draggedIndex = displayed.findIndex(info => info.key === draggedTabId);
-    const targetIndex = displayed.findIndex(info => info.key === targetTabId);
+  reorder(draggedTabId: string, targetTabId: string, position: 'before' | 'after'): void {
+    const displayed = this.getDisplayed().map(info => info.key);
+    const result = reorderArray(displayed, draggedTabId, { item: targetTabId, position });
 
-    if (draggedIndex === -1 || targetIndex === -1 || draggedIndex === targetIndex) {
+    if (displayed === result) {
       return;
     }
-
-    const reordered = [...displayed];
-    const draggedInfo = reordered[draggedIndex];
-
-    if (!draggedInfo) {
-      return;
-    }
-
-    reordered.splice(draggedIndex, 1);
-
-    const insertIndex = position === 'before' ? targetIndex : targetIndex + 1;
-    reordered.splice(insertIndex, 0, draggedInfo);
 
     runInAction(() => {
-      reordered.forEach((info, index) => {
-        const existingInfo = this.tabInfoMap.get(info.key);
+      result.forEach((key, index) => {
+        const existingInfo = this.tabInfoMap.get(key);
         if (existingInfo) {
-          this.tabInfoMap.set(info.key, {
+          this.tabInfoMap.set(key, {
             ...existingInfo,
             order: index,
           });
