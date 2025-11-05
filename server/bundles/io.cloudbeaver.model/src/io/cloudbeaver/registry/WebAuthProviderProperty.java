@@ -62,13 +62,4 @@ public class WebAuthProviderProperty extends LocalizedPropertyDescriptor impleme
     public String getReadOnlyExpression() {
         return readOnlyExpr;
     }
-
-    @Override
-    public String getPropertyId() {
-        if (authProviderId != null) {
-            return "prop.auth.model." + authProviderId + "." + this.getId();
-        } else {
-            return "prop.auth.model." + this.getId();
-        }
-    }
 }
