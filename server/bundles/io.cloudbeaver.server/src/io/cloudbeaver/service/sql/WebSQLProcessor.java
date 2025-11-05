@@ -1282,8 +1282,8 @@ public class WebSQLProcessor implements WebSessionProvider {
                 .collect(Collectors.joining("\n\n"));
         } else {
             WebSessionPreferenceStore store = webSession.getUserPreferenceStore();
-            boolean confirmDangerousQueries = store.getBoolean(ConfirmationConstants.CONFIRM_DANGER_SQL_KEY);
-            boolean confirmDropQueries = store.getBoolean(ConfirmationConstants.CONFIRM_DROP_SQL_KEY);
+            boolean confirmDangerousQueries = store.getUserPreferenceBoolean(ConfirmationConstants.CONFIRM_DANGER_SQL_KEY, true);
+            boolean confirmDropQueries = store.getUserPreferenceBoolean(ConfirmationConstants.CONFIRM_DROP_SQL_KEY, true);
             for (SQLScriptElement scriptElement : scriptElements) {
                 if (scriptElement instanceof SQLQuery sqlQuery) {
                     if (confirmDangerousQueries && sqlQuery.isDeleteUpdateDangerous()) {
