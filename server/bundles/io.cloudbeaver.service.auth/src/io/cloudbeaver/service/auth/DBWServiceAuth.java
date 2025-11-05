@@ -18,6 +18,7 @@ package io.cloudbeaver.service.auth;
 
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebAction;
+import io.cloudbeaver.WebParameterSecure;
 import io.cloudbeaver.model.WebPropertyInfo;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.service.DBWService;
@@ -77,7 +78,11 @@ public interface DBWServiceAuth extends DBWService {
     WebAuthProviderInfo[] getAuthProviders(@NotNull HttpServletRequest request) throws DBWebException;
 
     @WebAction()
-    boolean changeLocalPassword(@NotNull WebSession webSession, @NotNull String oldPassword, @NotNull String newPassword) throws DBWebException;
+    boolean changeLocalPassword(
+        @NotNull WebSession webSession,
+        @WebParameterSecure @NotNull String oldPassword,
+        @WebParameterSecure @NotNull String newPassword
+    ) throws DBWebException;
 
     @WebAction(authRequired = false)
     WebPropertyInfo[] listUserProfileProperties(@NotNull WebSession webSession);
