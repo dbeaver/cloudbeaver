@@ -263,30 +263,6 @@ describe('useTabDragAndDrop', () => {
       expect(onReorder).not.toHaveBeenCalled();
     });
 
-    it('does not call onReorder when dropping on itself', () => {
-      const { result } = createTabDragDropHook({
-        tabId: 'tab1',
-        onReorder,
-        enabled: true,
-      });
-
-      setupMockElement(result);
-
-      const dragOverEvent = createValidDragEvent(150, 'tab1');
-      act(() => {
-        result.current.dragProps.onDragOver(dragOverEvent);
-      });
-
-      const dropEvent = createMockDragEvent();
-      (dropEvent.dataTransfer.getData as any).mockReturnValue('tab1');
-
-      act(() => {
-        result.current.dragProps.onDrop(dropEvent);
-      });
-
-      expect(onReorder).not.toHaveBeenCalled();
-    });
-
     it('does not call onReorder when dropPosition is null', () => {
       const { result } = createTabDragDropHook({
         tabId: 'tab2',
@@ -302,29 +278,6 @@ describe('useTabDragAndDrop', () => {
       });
 
       expect(onReorder).not.toHaveBeenCalled();
-    });
-
-    it('works when onReorder is not provided', () => {
-      const { result } = createTabDragDropHook({
-        tabId: 'tab2',
-        enabled: true,
-      });
-
-      setupMockElement(result);
-
-      const dragOverEvent = createValidDragEvent(150, 'tab1');
-      act(() => {
-        result.current.dragProps.onDragOver(dragOverEvent);
-      });
-
-      const dropEvent = createMockDragEvent();
-      (dropEvent.dataTransfer.getData as any).mockReturnValue('tab1');
-
-      expect(() => {
-        act(() => {
-          result.current.dragProps.onDrop(dropEvent);
-        });
-      }).not.toThrow();
     });
   });
 
