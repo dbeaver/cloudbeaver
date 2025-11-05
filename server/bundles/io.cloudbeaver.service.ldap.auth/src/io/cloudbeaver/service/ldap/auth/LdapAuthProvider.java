@@ -39,6 +39,7 @@ import org.jkiss.dbeaver.model.security.SMController;
 import org.jkiss.utils.CommonUtils;
 
 import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyStore;
 import java.security.SecureRandom;
 import java.security.cert.Certificate;
@@ -48,6 +49,8 @@ import javax.naming.Context;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.directory.*;
+import javax.naming.ldap.LdapName;
+import javax.naming.ldap.Rdn;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManagerFactory;
 
@@ -306,18 +309,22 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
 
     @NotNull
     private String findUserNameFromDN(@NotNull String fullUserDN, @NotNull LdapSettings ldapSettings)
-        throws DBException {
-        String userId = null;
-        for (String dn : fullUserDN.split(",")) {
-            if (dn.startsWith(ldapSettings.getUserIdentifierAttr() + "=")) {
-                userId = dn.split("=")[1];
-                break;
+    throws DBException {
+        try {
+            LdapName ldapDN = new LdapName(fullUserDN);
+            for (Rdn rdn : ldapDN.getRdns()) {
+                if (rdn.getType().equalsIgnoreCase(ldapSettings.getUserIdentifierAttr())) {
+                    Object v = rdn.getValue();
+                    if (v instanceof byte[]) {
+                        return new String((byte[]) v, StandardCharsets.UTF_8);
+                    }
+                    return String.valueOf(v);
+                }
             }
-        }
-        if (userId == null) {
             throw new DBException("Failed to determine userId from user DN: " + fullUserDN);
+        } catch (Exception e) {
+            throw new DBException("Invalid user DN: " + fullUserDN, e);
         }
-        return userId;
     }
 
     @NotNull
@@ -548,14 +555,16 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
 
             context = initConnection(environment);
 
-            String searchFilter = "(member=" + fullDN + ")";
+            String searchFilter = "(member={0})";
             SearchControls searchControls = new SearchControls();
             searchControls.setSearchScope(SearchControls.SUBTREE_SCOPE);
-
-            searchResults = context.search(ldapSettings.getBaseDN(), searchFilter, searchControls);
+            searchResults = context.search(ldapSettings.getBaseDN(), searchFilter, new Object[] {fullDN}, searchControls);
             while (searchResults.hasMore()) {
                 try {
                     SearchResult next = searchResults.next();
+                    //add full dn
+                    result.add(next.getNameInNamespace());
+                    //add relative dn to base dn
                     result.add(next.getName());
                 } catch (Exception e) {
                     log.error("Failed fetch user group. Skipping...", e);

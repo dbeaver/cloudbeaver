@@ -16,21 +16,27 @@
  */
 package io.cloudbeaver.server.graphql;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import io.cloudbeaver.WebParameterSecure;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.WebAppUtils;
 import io.cloudbeaver.server.WebApplication;
 import jakarta.servlet.http.HttpServletRequest;
 import org.jkiss.code.Nullable;
+import org.jkiss.dbeaver.Log;
 import org.jkiss.utils.CommonUtils;
 
-import java.util.Map;
-import java.util.Set;
+import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
+import java.util.StringJoiner;
 
 public class GraphQLLoggerUtil {
 
+    private static final Log log = Log.getLog(GraphQLLoggerUtil.class);
     public static final String LOG_API_GRAPHQL_DEBUG_PARAMETER = "log.api.graphql.debug";
-    private static final Set<String> PROHIBITED_VARIABLES =
-        Set.of("password", "config", "parameters", "settings", "licenseText", "credentials", "username");
+    public static final Gson GSON = new GsonBuilder().create();
+    public static final String MASK_STRING = "****";
 
     public static String getUserId(HttpServletRequest request) {
         WebSession session = getWebSession(request);
@@ -63,43 +69,67 @@ public class GraphQLLoggerUtil {
             .findWebSession(request);
     }
 
-    public static String buildLoggerMessage(String sessionId, String userId, Map<String, Object> variables) {
-        StringBuilder loggerMessage = new StringBuilder(" [user: ").append(userId)
-            .append(", sessionId: ").append(sessionId).append("]");
+    public static String buildLoggerMessage(String sessionId, String userId, Method method, Object[] args) {
+        StringBuilder sb = new StringBuilder(64)
+            .append(" [user: ").append(userId)
+            .append(", sessionId: ").append(sessionId)
+            .append("]");
 
-        if (WebAppUtils.getWebPlatform().getPreferenceStore().getBoolean(LOG_API_GRAPHQL_DEBUG_PARAMETER)
-                && variables != null
-        ) {
-            loggerMessage.append(" [variables] ");
-            String parsedVariables = parseVarialbes(variables);
-            if (CommonUtils.isNotEmpty(parsedVariables)) {
-                loggerMessage.append(parseVarialbes(variables));
+        if (WebAppUtils.getWebPlatform().getPreferenceStore().getBoolean(LOG_API_GRAPHQL_DEBUG_PARAMETER)) {
+            sb.append('(');
+            String text = maskArgsToString(method, args);
+            if (CommonUtils.isNotEmpty(text)) {
+                sb.append(text);
             }
+            sb.append(')');
         }
-        return loggerMessage.toString();
+        return sb.toString();
     }
 
-    private static String parseVarialbes(Map<String, Object> map) {
-        StringBuilder result = new StringBuilder();
+    public static String maskArgsToString(Method method, Object[] args) {
+        Parameter[] params = method.getParameters();
+        if (params.length == 0 || args == null || args.length == 0) {
+            return "";
+        }
 
-        for (Map.Entry<String, Object> entry : map.entrySet()) {
-            String key = entry.getKey();
-            Object value = entry.getValue();
+        int limit = Math.min(args.length, params.length);
+        StringJoiner joiner = new StringJoiner(", ");
 
-            boolean isProhibited = PROHIBITED_VARIABLES.stream()
-                .anyMatch(prohibitedKey -> key.toLowerCase().contains(prohibitedKey.toLowerCase()));
-
-            if (isProhibited) {
-                result.append(key).append(": ").append("******** ");
+        for (int i = 0; i < limit; i++) {
+            Object value = args[i];
+            if (value instanceof WebSession) {
+                //we already log sessionId
+                continue;
+            }
+            if (params[i].isAnnotationPresent(WebParameterSecure.class)) {
+                joiner.add(MASK_STRING);
+                continue;
+            }
+            if (value instanceof String sv && CommonUtils.isEmpty(sv)) {
                 continue;
             }
 
-            if (value instanceof Map) {
-                result.append(parseVarialbes((Map<String, Object>) value));
+            if (value != null && !isSimple(value.getClass())) {
+                String stringValue;
+                try {
+                    stringValue = GSON.toJson(value);
+                } catch (Exception e) {
+                    stringValue = value.toString();
+                }
+                joiner.add(stringValue);
             } else {
-                result.append(key).append(": ").append(value).append(" ");
+                joiner.add(String.valueOf(value));
             }
         }
-        return result.toString().trim();
+        return joiner.toString();
     }
+
+    private static boolean isSimple(Class<?> cls) {
+        return cls.isPrimitive()
+            || Number.class.isAssignableFrom(cls)
+            || CharSequence.class.isAssignableFrom(cls)
+            || Boolean.class.equals(cls)
+            || Enum.class.isAssignableFrom(cls);
+    }
+
 }

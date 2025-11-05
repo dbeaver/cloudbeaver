@@ -34,7 +34,7 @@ export class DVConditionalFormattingPluginBootstrap extends Bootstrap {
           return true;
         }
 
-        //@ts-expect-error feature disabled for now
+        // @ts-expect-error feature disabled for now
         const data = model.source.tryGetAction(resultIndex, IDatabaseDataResultAction, GridDataResultAction);
         return data?.empty ?? true;
       },

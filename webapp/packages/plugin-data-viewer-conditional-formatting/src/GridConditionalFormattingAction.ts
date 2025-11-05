@@ -121,14 +121,16 @@ export class GridConditionalFormattingAction<
 
       if (rule.type === 'single') {
         if (ruleData.match(valueGetter, rule.parameters)) {
+          formatting.color = getValueForRuleParameter<string>(rule.parameters, ruleData.formatting, 'text-color');
           formatting.backgroundColor = getValueForRuleParameter<string>(rule.parameters, ruleData.formatting, 'background-color');
           formatting.fontStyle = getValueForRuleParameter<boolean>(rule.parameters, ruleData.formatting, 'font-style') ? 'italic' : undefined;
           formatting.fontWeight = getValueForRuleParameter<boolean>(rule.parameters, ruleData.formatting, 'font-weight') ? 'bold' : undefined;
-          formatting.textDecoration = getValueForRuleParameter<'none' | 'underline' | 'overline' | 'line-through'>(
+          const textDecoration = getValueForRuleParameter<'none' | 'underline' | 'overline' | 'line-through'>(
             rule.parameters,
             ruleData.formatting,
             'text-decoration',
           );
+          formatting.textDecoration = Array.isArray(textDecoration) ? textDecoration.join(' ') : textDecoration;
           formatted = true;
         }
       } else if (this.format.isNumber(holder)) {
