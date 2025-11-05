@@ -11,5 +11,5 @@ export interface ICellFormatting {
   color?: string;
   fontWeight?: 'normal' | 'bold';
   fontStyle?: 'normal' | 'italic';
-  textDecoration?: 'none' | 'underline' | 'overline' | 'line-through';
+  textDecoration?: 'none' | 'underline' | 'overline' | 'line-through' | string;
 }

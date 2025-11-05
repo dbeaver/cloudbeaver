@@ -1,6 +1,8 @@
 export default [
   ['plugin_data_viewer_conditional_formatting_presentation_title', 'Formattazione condizionale'],
 
+  ['plugin_data_viewer_conditional_formatting_style_text_sample', 'Par défaut'],
+
   ['plugin_data_viewer_conditional_formatting_all_columns', 'Tutte le colonne'],
   ['plugin_data_viewer_conditional_formatting_format_rules', 'Regole di formattazione'],
   ['plugin_data_viewer_conditional_formatting_column', 'Colonna'],
@@ -11,7 +13,8 @@ export default [
   ['plugin_data_viewer_conditional_formatting_select_rule', 'Seleziona regola'],
   ['plugin_data_viewer_conditional_formatting_format_cells_if', 'Formatta celle se...'],
 
-  ['plugin_data_viewer_conditional_formatting_parameter_color', 'Colore'],
+  ['plugin_data_viewer_conditional_formatting_parameter_text_color', 'Colore del testo'],
+  ['plugin_data_viewer_conditional_formatting_parameter_background_color', 'Colore di sfondo'],
   ['plugin_data_viewer_conditional_formatting_parameter_value', 'Valore della formula'],
   ['plugin_data_viewer_conditional_formatting_parameter_font_weight', 'Grassetto'],
   ['plugin_data_viewer_conditional_formatting_parameter_font_style', 'Corsivo'],

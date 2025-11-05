@@ -19,6 +19,7 @@
     justify-content: center;
     align-items: center;
     white-space: nowrap;
+    height: 100%;
     transition: opacity 0.2s ease-in-out;
     gap: var(--dbv-kit-btn-gap);
   }

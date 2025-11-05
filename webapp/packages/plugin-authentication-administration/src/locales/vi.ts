@@ -77,7 +77,7 @@ export default [
     'Cho phép người dùng xác thực. Nếu không, chỉ truy cập ẩn danh được bật',
   ],
   ['administration_identity_providers_tab_title', 'Nhà cung cấp Danh tính'],
-  ['administration_identity_providers_provider', 'Nhà cung cấp'],
+  ['administration_identity_providers_provider', 'Loại nhà cung cấp'],
   ['administration_identity_providers_provider_id', 'ID'],
   ['administration_identity_providers_provider_configuration_name', 'Tên Cấu hình'],
   ['administration_identity_providers_provider_configuration_disabled', 'Đã tắt'],

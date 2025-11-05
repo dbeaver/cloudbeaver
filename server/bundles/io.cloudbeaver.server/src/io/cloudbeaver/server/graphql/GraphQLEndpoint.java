@@ -246,14 +246,7 @@ public class GraphQLEndpoint extends HttpServlet {
         if (operationName != null) {
             contextBuilder.operationName(operationName);
         }
-        String sessionId = GraphQLLoggerUtil.getSmSessionId(request);
         String userId = GraphQLLoggerUtil.getUserId(request);
-        String loggerMessage = GraphQLLoggerUtil.buildLoggerMessage(sessionId, userId, variables);
-        if (operationName != null) {
-            log.debug("API > " + operationName + loggerMessage);
-        } else if (DEBUG) {
-            log.debug("API > " + query + loggerMessage);
-        }
         LocalDateTime startTime = LocalDateTime.now();
         ExecutionInput executionInput = contextBuilder.build();
         ExecutionResult executionResult = null;

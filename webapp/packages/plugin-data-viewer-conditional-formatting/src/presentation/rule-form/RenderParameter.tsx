@@ -8,13 +8,15 @@
 
 import { FieldCheckbox, InputField, Select, useTranslate } from '@cloudbeaver/core-blocks';
 import type { IFormatRuleParameter } from '../../formatting/IFormatRule.js';
+import { ColorPicker } from '@dbeaver/ui-kit';
+import { observer } from 'mobx-react-lite';
 
 interface Props {
   parameter: IFormatRuleParameter;
   state: Record<string, any>;
 }
 
-export function RenderParameter({ parameter, state }: Props) {
+export const RenderParameter = observer<Props>(function RenderParameter({ parameter, state }) {
   const t = useTranslate();
 
   if (parameter.type === 'boolean') {
@@ -42,6 +44,19 @@ export function RenderParameter({ parameter, state }: Props) {
     );
   }
 
+  if (parameter.type === 'color') {
+    return (
+      <div className="tw:flex tw:flex-none! tw:items-end">
+        <ColorPicker
+          name={parameter.key}
+          value={state[parameter.key] || ''}
+          defaultValue={parameter.default as string}
+          onChange={color => (state[parameter.key] = color)}
+        />
+      </div>
+    );
+  }
+
   return (
     <InputField
       key={parameter.key}
@@ -56,4 +71,4 @@ export function RenderParameter({ parameter, state }: Props) {
       {t(parameter.name)}
     </InputField>
   );
-}
+});

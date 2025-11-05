@@ -1,6 +1,8 @@
 export default [
   ['plugin_data_viewer_conditional_formatting_presentation_title', 'Условное форматирование'],
 
+  ['plugin_data_viewer_conditional_formatting_style_text_sample', 'По умолчанию'],
+
   ['plugin_data_viewer_conditional_formatting_all_columns', 'Все столбцы'],
   ['plugin_data_viewer_conditional_formatting_format_rules', 'Правила форматирования'],
   ['plugin_data_viewer_conditional_formatting_column', 'Столбец'],
@@ -11,7 +13,8 @@ export default [
   ['plugin_data_viewer_conditional_formatting_select_rule', 'Выберите правило'],
   ['plugin_data_viewer_conditional_formatting_format_cells_if', 'Форматировать ячейки, если...'],
 
-  ['plugin_data_viewer_conditional_formatting_parameter_color', 'Цвет'],
+  ['plugin_data_viewer_conditional_formatting_parameter_text_color', 'Цвет текста'],
+  ['plugin_data_viewer_conditional_formatting_parameter_background_color', 'Цвет фона'],
   ['plugin_data_viewer_conditional_formatting_parameter_value', 'Значение формулы'],
   ['plugin_data_viewer_conditional_formatting_parameter_font_weight', 'Жирный'],
   ['plugin_data_viewer_conditional_formatting_parameter_font_style', 'Курсив'],
