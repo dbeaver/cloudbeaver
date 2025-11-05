@@ -326,6 +326,23 @@ type WSSessionTaskConfirmationEvent implements CBClientEvent @since(version: "25
     skipConfirmations: Boolean!
 }
 
+type WSSessionTaskQueryParamsConfirmationEvent implements CBServerEvent @since(version: "25.2.5") {
+    id: CBServerEventId!
+    topicId: CBEventTopic!
+    taskId: ID!
+    title: String!
+    message: String!
+    query: String!
+    parameters: Object!
+}
+
+type WSSessionTaskWithParametersConfirmationEvent implements CBClientEvent @since(version: "25.2.5") {
+    id: CBClientEventId!
+    topicId: CBEventTopic
+    taskId: ID!
+    parameters: Object!
+}
+
 extend type Query {
     emptyEvent: Boolean
 }
