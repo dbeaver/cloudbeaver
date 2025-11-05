@@ -49,11 +49,12 @@ export class ServerDefaultSettingsService extends SettingsSource {
 
       for (const property of settings) {
         const key = property.id;
-        const defaultValue = getObjectPropertyDefaultValue(property);
 
         if (!key) {
           continue;
         }
+
+        const defaultValue = getObjectPropertyDefaultValue(property);
 
         if (isNotNullDefined(defaultValue)) {
           this.settings.set(key, defaultValue);
