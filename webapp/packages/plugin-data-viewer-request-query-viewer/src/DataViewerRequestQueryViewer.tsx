@@ -11,7 +11,8 @@ import { observer } from 'mobx-react-lite';
 import { IconOrImage, s, useS, useTranslate, type PlaceholderComponent } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
-import { isResultSetDataSource, type ITableHeaderPlaceholderProps } from '@cloudbeaver/plugin-data-viewer';
+import { isResultSetDataSource, type IDataContainerOptions, type ITableHeaderPlaceholderProps } from '@cloudbeaver/plugin-data-viewer';
+import { type IDataQueryOptions } from '@cloudbeaver/plugin-sql-editor';
 import { Button, ButtonIcon } from '@dbeaver/ui-kit';
 
 import { DataViewerRequestQueryViewerDialog } from './DataViewerRequestQueryViewerDialog.js';
@@ -24,25 +25,36 @@ export const DataViewerRequestQueryViewer: PlaceholderComponent<ITableHeaderPlac
   const style = useS(classes);
   const translate = useTranslate();
   const commonDialogService = useService(CommonDialogService);
+  const source = model.source;
 
-  if (!isResultSetDataSource(model.source)) {
+  if (!isResultSetDataSource<IDataContainerOptions & IDataQueryOptions>(source)) {
     throw new Error('DataViewerRequestQueryViewer can be used only with ResultSetDataSource');
   }
 
-  const connectionKey = model.source.options?.connectionKey;
+  const connectionKey = source.options?.connectionKey;
 
   if (!connectionKey) {
     throw new Error('connectionKey is not provided');
+  }
+
+  let query = model.requestInfo.originalQuery;
+
+  if (!query && source.options?.query) {
+    query = source.options.query;
+  }
+
+  if (!query) {
+    return null;
   }
 
   return (
     <Button
       variant="ghost"
       size="small"
-      title={`${translate('plugin_data_viewer_request_query_viewer_description')}\n\n${model.requestInfo.originalQuery}`}
+      title={`${translate('plugin_data_viewer_request_query_viewer_description')}\n\n${query}`}
       className={s(style, { button: true }, 'tw:mr-1! tw:shrink-0')}
       disabled={model.isLoading() || model.isDisabled(resultIndex)}
-      onClick={() => commonDialogService.open(DataViewerRequestQueryViewerDialog, { query: model.requestInfo.originalQuery, connectionKey })}
+      onClick={() => commonDialogService.open(DataViewerRequestQueryViewerDialog, { query, connectionKey })}
     >
       <ButtonIcon placement="start">
         <IconOrImage className="tw:h-4 tw:w-4" icon="sql-script-preview" />
