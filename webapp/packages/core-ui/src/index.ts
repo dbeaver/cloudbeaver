@@ -48,6 +48,7 @@ export * from './Screens/AppScreen/OptionsPanelService.js';
 
 export * from './Tabs/ITab.js';
 export * from './Tabs/TabContext.js';
+export * from './Tabs/useTabDragAndDrop.js';
 export * from './Tabs/TabListLoader.js';
 export * from './Tabs/TabPanelLoader.js';
 export * from './Tabs/TabPanelListLoader.js';

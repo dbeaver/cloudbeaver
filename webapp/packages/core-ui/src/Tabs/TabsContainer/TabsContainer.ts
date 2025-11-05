@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { makeObservable, observable } from 'mobx';
+import { action, makeObservable, observable, runInAction } from 'mobx';
 
 import type { MetadataMap, MetadataValueGetter, schema } from '@cloudbeaver/core-utils';
 import { SyncExecutor } from '@cloudbeaver/core-executor';
@@ -36,6 +36,7 @@ export class TabsContainer<TProps = void, TOptions extends Record<string, any> |
     makeObservable<TabsContainer<TProps, TOptions>, 'currentTabId'>(this, {
       tabInfoMap: observable.shallow,
       currentTabId: observable,
+      reorder: action,
     });
   }
 
@@ -132,6 +133,40 @@ export class TabsContainer<TProps = void, TOptions extends Record<string, any> |
     this.tabInfoMap.set(tabInfo.key, {
       ...tabInfo,
       order: tabInfo.order ?? Number.MAX_SAFE_INTEGER,
+    });
+  }
+
+  reorder(draggedTabId: string, targetTabId: string, position: 'before' | 'after', props?: TProps): void {
+    const displayed = this.getDisplayed(props);
+    const draggedIndex = displayed.findIndex(info => info.key === draggedTabId);
+    const targetIndex = displayed.findIndex(info => info.key === targetTabId);
+
+    if (draggedIndex === -1 || targetIndex === -1 || draggedIndex === targetIndex) {
+      return;
+    }
+
+    const reordered = [...displayed];
+    const draggedInfo = reordered[draggedIndex];
+
+    if (!draggedInfo) {
+      return;
+    }
+
+    reordered.splice(draggedIndex, 1);
+
+    const insertIndex = position === 'before' ? targetIndex : targetIndex + 1;
+    reordered.splice(insertIndex, 0, draggedInfo);
+
+    runInAction(() => {
+      reordered.forEach((info, index) => {
+        const existingInfo = this.tabInfoMap.get(info.key);
+        if (existingInfo) {
+          this.tabInfoMap.set(info.key, {
+            ...existingInfo,
+            order: index,
+          });
+        }
+      });
     });
   }
 }

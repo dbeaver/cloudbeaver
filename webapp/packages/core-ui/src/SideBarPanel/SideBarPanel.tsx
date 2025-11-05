@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -44,7 +44,7 @@ export const SideBarPanel = observer<SideBarPanelProps>(function SideBarPanel({ 
   const style = useS(styles);
   return (
     <SContext registry={sideBarPanelRegistry}>
-      <TabsState container={container} currentTabId={container.selectedId} lazy onChange={tab => container.select(tab.tabId, tab.props)}>
+      <TabsState container={container} currentTabId={container.selectedId} lazy reorderable onChange={tab => container.select(tab.tabId, tab.props)}>
         <div className={s(style, { box: true })}>
           <TabList className={s(style, { tabList: true })} underline />
           <div className={s(style, { contentBox: true })}>

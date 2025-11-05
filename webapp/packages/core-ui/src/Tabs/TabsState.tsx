@@ -36,9 +36,11 @@ export type TabsStateProps<T = Record<string, any>> = ExtractContainerProps<T> &
     autoSelect?: boolean;
     tabList?: string[];
     enabledBaseActions?: boolean;
+    reorderable?: boolean;
     canClose?: (tab: ITabData<T>) => boolean;
     onChange?: (tab: ITabData<T>) => void;
     onClose?: (tab: ITabData<T>) => void;
+    onReorder?: (draggedTabId: string, targetTabId: string, position: 'before' | 'after') => void;
   }>;
 
 export const TabsState = observer(function TabsState<T = Record<string, any>>({
@@ -53,13 +55,16 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
   manual,
   tabList,
   enabledBaseActions,
+  reorderable,
   onChange: onOpen,
   onClose,
   canClose,
+  onReorder: onReorderProp,
   ...rest
 }: TabsStateProps<T>): React.ReactElement | null {
   const context = useDataContext();
   const props = useMemo(() => rest as any as T, [...Object.values(rest)]);
+
   let displayed: string[] = [];
 
   if (container) {
@@ -81,6 +86,8 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
     manual,
   });
 
+  const onReorder = onReorderProp || (container?.reorder ? container.reorder.bind(container) : undefined);
+
   const dynamic = useObjectRef(
     () => ({
       selectedId: state.selectedId,
@@ -89,6 +96,8 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
       canClose,
       open: onOpen,
       close: onClose,
+      reorder: onReorder,
+      reorderable,
       props,
       tabsState,
       container,
@@ -222,6 +231,9 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
           }
         }
       },
+      reorder(draggedTabId: string, targetTabId: string, position: 'before' | 'after') {
+        dynamic.reorder?.(draggedTabId, targetTabId, position);
+      },
     }),
     {
       state: observable.ref,
@@ -234,6 +246,7 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
       closable: observable.ref,
       tabList: observable.ref,
       enabledBaseActions: observable.ref,
+      reorderable: observable.ref,
       getTabInfo: action.bound,
       getTabState: action.bound,
       getLocalState: action.bound,
@@ -242,6 +255,7 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
       closeAll: action.bound,
       closeAllToTheDirection: action.bound,
       closeOthers: action.bound,
+      reorder: action.bound,
     },
     {
       state,
@@ -254,6 +268,7 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
       closable,
       tabList,
       enabledBaseActions,
+      reorderable,
     },
   );
 

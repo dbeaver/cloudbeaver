@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -60,7 +60,7 @@ export const ToolsPanel = observer(function ToolsPanel() {
   }
 
   return (
-    <TabsState currentTabId={state.selectedTabId} container={toolsPanelService.tabsContainer} lazy onChange={handleTabChange}>
+    <TabsState currentTabId={state.selectedTabId} container={toolsPanelService.tabsContainer} lazy reorderable onChange={handleTabChange}>
       <div className={s(style, { box: true })}>
         <TabList className={s(style, { tabList: true })} underline />
         <div className={s(style, { contentBox: true })}>
