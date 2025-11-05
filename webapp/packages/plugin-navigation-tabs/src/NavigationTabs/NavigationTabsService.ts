@@ -300,18 +300,16 @@ export class NavigationTabsService extends View<ITab> {
     }
   }
 
-  reorderTab(tabId: string, target: { tabId: string; position: 'before' | 'after' }): boolean {
+  reorderTab(tabId: string, target: { tabId: string; position: 'before' | 'after' }): void {
     const tabs = this.userTabsState.tabs;
     const result = reorderArray(tabs, tabId, { item: target.tabId, position: target.position });
 
     if (tabs === result) {
-      return false;
+      return;
     }
 
     this.userTabsState.tabs = result;
     this.onStateUpdate.execute();
-
-    return true;
   }
 
   getTabPosition(tabId: string): number {
