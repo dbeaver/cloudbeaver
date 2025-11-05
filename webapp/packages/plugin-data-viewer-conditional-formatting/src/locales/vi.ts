@@ -1,6 +1,8 @@
 export default [
   ['plugin_data_viewer_conditional_formatting_presentation_title', 'Định dạng có điều kiện'],
 
+  ['plugin_data_viewer_conditional_formatting_style_text_sample', 'Mặc định'],
+
   ['plugin_data_viewer_conditional_formatting_all_columns', 'Tất cả các cột'],
   ['plugin_data_viewer_conditional_formatting_format_rules', 'Quy tắc định dạng'],
   ['plugin_data_viewer_conditional_formatting_column', 'Cột'],
@@ -11,7 +13,8 @@ export default [
   ['plugin_data_viewer_conditional_formatting_select_rule', 'Chọn quy tắc'],
   ['plugin_data_viewer_conditional_formatting_format_cells_if', 'Định dạng ô nếu...'],
 
-  ['plugin_data_viewer_conditional_formatting_parameter_color', 'Màu sắc'],
+  ['plugin_data_viewer_conditional_formatting_parameter_text_color', 'Màu chữ'],
+  ['plugin_data_viewer_conditional_formatting_parameter_background_color', 'Màu nền'],
   ['plugin_data_viewer_conditional_formatting_parameter_value', 'Giá trị của công thức'],
   ['plugin_data_viewer_conditional_formatting_parameter_font_weight', 'Đậm'],
   ['plugin_data_viewer_conditional_formatting_parameter_font_style', 'Nghiêng'],

@@ -1,0 +1,14 @@
+@layer base {
+  :root {
+    --dbv-kit-popover-height: var(--popover-available-height);
+
+    --dbv-kit-popover-border-width: var(--dbv-kit-control-border-width);
+    --dbv-kit-popover-border-color: var(--dbv-kit-color-control-inactive);
+    --dbv-kit-popover-border-style: solid;
+    --dbv-kit-popover-border-radius: var(--dbv-kit-control-border-radius);
+
+    --dbv-kit-popover-content-background: var(--dbv-kit-color-background);
+    --dbv-kit-popover-content-foreground: var(--dbv-kit-color-foreground);
+    --dbv-kit-popover-content-shadow: var(--tw-shadow-md);
+  }
+}

@@ -20,7 +20,7 @@
     cursor: pointer;
 
     &:focus-visible,
-    &[data-focus-visible] {
+    &[data-focus-visible='true'] {
       outline: var(--dbv-kit-icon-btn-outline-width) solid var(--dbv-kit-icon-btn-outline-color);
       outline-offset: var(--dbv-kit-icon-btn-outline-offset);
     }
@@ -33,7 +33,7 @@
     }
 
     &:active,
-    &[data-active] {
+    &[data-active='true'] {
       color: var(--dbv-kit-icon-btn-foreground-active);
       background-color: var(--dbv-kit-icon-btn-background-active);
     }
