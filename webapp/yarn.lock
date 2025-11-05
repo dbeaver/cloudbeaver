@@ -2046,6 +2046,7 @@ __metadata:
     "@cloudbeaver/core-di": "workspace:*"
     "@cloudbeaver/core-localization": "workspace:*"
     "@cloudbeaver/core-root": "workspace:*"
+    "@cloudbeaver/core-settings": "workspace:*"
     "@cloudbeaver/core-settings-localization": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
     "@dbeaver/cli": "workspace:*"
