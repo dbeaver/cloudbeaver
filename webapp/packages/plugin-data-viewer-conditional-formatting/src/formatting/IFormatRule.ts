@@ -8,6 +8,9 @@
 
 import type { TranslateFn } from '@cloudbeaver/core-localization';
 
+type DefaultValueType = string | number | boolean;
+export type FormatRuleValueType = DefaultValueType | DefaultValueType[];
+
 export interface IFormatRuleParameterOption {
   label: string;
   value: string;
@@ -17,7 +20,7 @@ export interface IFormatRuleParameter {
   name: string;
   key: string;
   type: 'string' | 'number' | 'color' | 'boolean' | 'select';
-  default?: string | number | boolean;
+  default?: FormatRuleValueType;
   options?: IFormatRuleParameterOption[];
 }
 

@@ -1,0 +1,34 @@
+@import './_base.css';
+
+@layer base {
+  .dbv-kit-popover__content {
+    z-index: 1000;
+    min-width: 100%;
+    max-height: var(--dbv-kit-popover-height);
+    overflow-y: auto;
+    background-color: var(--dbv-kit-popover-content-background);
+    color: var(--dbv-kit-popover-content-foreground);
+    border-color: var(--dbv-kit-popover-border-color);
+    border-radius: var(--dbv-kit-popover-border-radius);
+    border-width: var(--dbv-kit-popover-border-width);
+    border-style: var(--dbv-kit-popover-border-style);
+    box-shadow: var(--dbv-kit-popover-content-shadow);
+    outline: 0;
+
+    @media (prefers-reduced-motion: no-preference) {
+      opacity: 0;
+      transform-origin: top;
+      transition-property: opacity, scale, translate;
+      transition-timing-function: var(--tw-ease-in-out);
+      transition-duration: 150ms;
+      scale: 0.95;
+      translate: 0 -0.5rem;
+
+      &[data-enter] {
+        opacity: 1;
+        scale: 1;
+        translate: 0;
+      }
+    }
+  }
+}

@@ -4763,6 +4763,7 @@ __metadata:
     "@dbeaver/cli": "workspace:^"
     "@dbeaver/tsconfig": "workspace:^"
     async-mutex: "npm:^0"
+    color: "npm:^5.0.2"
     p-debounce: "npm:^4.0.0"
     p-memoize: "npm:^8.0.0"
     quick-lru: "npm:^7.1.0"
@@ -4831,6 +4832,18 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@dbeaver/react-translate@workspace:^, @dbeaver/react-translate@workspace:common-react/@dbeaver/react-translate":
+  version: 0.0.0-use.local
+  resolution: "@dbeaver/react-translate@workspace:common-react/@dbeaver/react-translate"
+  dependencies:
+    "@dbeaver/tsconfig": "workspace:^"
+    "@types/react": "npm:^19"
+    react: "npm:^19"
+    rimraf: "npm:^6"
+    typescript: "npm:^5"
+  languageName: unknown
+  linkType: soft
+
 "@dbeaver/result-set-api@workspace:*, @dbeaver/result-set-api@workspace:common-typescript/@dbeaver/result-set-api":
   version: 0.0.0-use.local
   resolution: "@dbeaver/result-set-api@workspace:common-typescript/@dbeaver/result-set-api"
@@ -4857,6 +4870,8 @@ __metadata:
   resolution: "@dbeaver/ui-kit@workspace:common-react/@dbeaver/ui-kit"
   dependencies:
     "@ariakit/react": "npm:^0"
+    "@dbeaver/js-helpers": "workspace:*"
+    "@dbeaver/react-translate": "workspace:^"
     "@dbeaver/tsconfig": "workspace:^"
     "@ladle/react": "npm:^5"
     "@tailwindcss/vite": "npm:4.0.7"
@@ -9954,10 +9969,45 @@ __metadata:
   languageName: node
   linkType: hard
 
+"color-convert@npm:^3.0.1":
+  version: 3.1.2
+  resolution: "color-convert@npm:3.1.2"
+  dependencies:
+    color-name: "npm:^2.0.0"
+  checksum: 10c0/5b83147015024931a06b57b197d09fc1f67f2efc93dfea5f042aba4788a95b13aebe511b0a929e0e837e442fd91a60c27de8e6761ff30e1a1e2fb634cca8a976
+  languageName: node
+  linkType: hard
+
+"color-name@npm:^2.0.0":
+  version: 2.0.2
+  resolution: "color-name@npm:2.0.2"
+  checksum: 10c0/40372a581fdeca099b824b6a14dac095387ae83457ed0fafe6f37053515c1094365f0d26b5f29df941be748051b490a0aa3f2ea0c29126a90ab2add482942701
+  languageName: node
+  linkType: hard
+
 "color-name@npm:~1.1.4":
   version: 1.1.4
   resolution: "color-name@npm:1.1.4"
   checksum: 10c0/a1a3f914156960902f46f7f56bc62effc6c94e84b2cae157a526b1c1f74b677a47ec602bf68a61abfa2b42d15b7c5651c6dbe72a43af720bc588dff885b10f95
+  languageName: node
+  linkType: hard
+
+"color-string@npm:^2.0.0":
+  version: 2.1.2
+  resolution: "color-string@npm:2.1.2"
+  dependencies:
+    color-name: "npm:^2.0.0"
+  checksum: 10c0/d1d3e8123b2a6a6715e539b347ce000925305946092d566697bb872b1b8951a8699a842b4e5e6324733bef7e4cd3517c50aeecf2a6aae12efc7ca5697ac95178
+  languageName: node
+  linkType: hard
+
+"color@npm:^5.0.2":
+  version: 5.0.2
+  resolution: "color@npm:5.0.2"
+  dependencies:
+    color-convert: "npm:^3.0.1"
+    color-string: "npm:^2.0.0"
+  checksum: 10c0/a5eeee197651a5fe84ab578a8477827e2c2e56b82832aae2b6c60469240be3bc1f03f99686223b1c4e48107c9e20b980475524faab7e6bab1cb9104313910f0e
   languageName: node
   linkType: hard
 

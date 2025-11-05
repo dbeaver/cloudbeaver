@@ -79,7 +79,7 @@ export default [
   ],
 
   ['administration_identity_providers_tab_title', 'Провайдеры идентификации'],
-  ['administration_identity_providers_provider', 'Провайдер'],
+  ['administration_identity_providers_provider', 'Тип провайдера'],
   ['administration_identity_providers_provider_id', 'Идентификатор'],
   ['administration_identity_providers_provider_configuration_name', 'Название конфигурации'],
   ['administration_identity_providers_provider_configuration_disabled', 'Отключена'],
