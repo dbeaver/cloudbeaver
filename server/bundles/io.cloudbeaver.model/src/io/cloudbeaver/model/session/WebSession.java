@@ -560,6 +560,10 @@ public class WebSession extends BaseWebSession
         if (job instanceof CustomCancelableJob cancelableJob) {
             cancelableJob.cancelJob(this, taskInfo);
         }
+        CompletableFuture<?> future = getAttribute(getTaskConfirmationAttributeName(taskId));
+        if (future != null) {
+            future.cancel(false);
+        }
         if (job != null) {
             job.cancel();
         }
