@@ -22,8 +22,8 @@ import { LocalizationService } from '@cloudbeaver/core-localization';
 import { EObjectFeature, NodeManagerUtils } from '@cloudbeaver/core-navigation-tree';
 import { ProjectsService } from '@cloudbeaver/core-projects';
 import { getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
-import { OptionsPanelService } from '@cloudbeaver/core-ui';
-import { MenuBaseItem, menuExtractItems, MenuSeparatorItem, MenuService } from '@cloudbeaver/core-view';
+import { ContextMenuSearchItem, DATA_CONTEXT_MENU_SEARCH, OptionsPanelService } from '@cloudbeaver/core-ui';
+import { MenuBaseItem, menuExtractItems, MenuSeparatorItem, MenuService, getMenuCreatorItemLabel } from '@cloudbeaver/core-view';
 import { MENU_APP_ACTIONS } from '@cloudbeaver/plugin-top-app-bar';
 
 import { ConnectionSchemaManagerService } from './ConnectionSchemaManagerService.js';
@@ -124,7 +124,9 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
       menus: [MENU_CONNECTION_SELECTOR],
       isApplicable: () => this.connectionsManagerService.hasAnyConnection() && this.connectionSchemaManagerService.isConnectionChangeable,
       getItems: (context, items) => {
-        items = [...items];
+        const filter = context.get(DATA_CONTEXT_MENU_SEARCH);
+        items = [new ContextMenuSearchItem(), ...items];
+
         const userProjectId = this.projectsService.userProject?.id;
         const activeProjectId = this.connectionSchemaManagerService.activeProjectId;
 
@@ -176,6 +178,18 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
               },
             ),
           );
+        }
+
+        if (filter) {
+          const filtered = items.filter(item => {
+            if (item instanceof ContextMenuSearchItem) {
+              return true;
+            }
+
+            return getMenuCreatorItemLabel(item).toLowerCase().includes(filter.toLowerCase());
+          });
+
+          return filtered;
         }
 
         return items;
@@ -251,7 +265,9 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
         (this.connectionSchemaManagerService.isObjectCatalogChangeable || this.connectionSchemaManagerService.isObjectSchemaChangeable) &&
         !!this.connectionSchemaManagerService.objectContainerList,
       getItems: (context, items) => {
-        items = [...items];
+        const filter = context.get(DATA_CONTEXT_MENU_SEARCH);
+
+        items = [new ContextMenuSearchItem(), ...items];
 
         if (!this.connectionSchemaManagerService.objectContainerList) {
           return [];
@@ -388,6 +404,18 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
               ),
             );
           }
+        }
+
+        if (filter) {
+          const filtered = items.filter(item => {
+            if (item instanceof ContextMenuSearchItem) {
+              return true;
+            }
+
+            return getMenuCreatorItemLabel(item).toLowerCase().includes(filter.toLowerCase());
+          });
+
+          return filtered;
         }
 
         return items;

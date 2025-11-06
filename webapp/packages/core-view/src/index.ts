@@ -89,3 +89,4 @@ export * from './View/useActiveView.js';
 export * from './View/useCaptureViewContext.js';
 export * from './View/View.js';
 export * from './View/ViewService.js';
+export * from './Menu/getMenuItemLabel.js';
