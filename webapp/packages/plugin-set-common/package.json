@@ -72,6 +72,7 @@
     "@cloudbeaver/plugin-data-spreadsheet-new": "workspace:*",
     "@cloudbeaver/plugin-data-viewer": "workspace:*",
     "@cloudbeaver/plugin-data-viewer-conditional-formatting": "workspace:*",
+    "@cloudbeaver/plugin-data-viewer-request-query-viewer": "workspace:*",
     "@cloudbeaver/plugin-data-viewer-result-set-grouping": "workspace:*",
     "@cloudbeaver/plugin-data-viewer-result-trace-details": "workspace:*",
     "@cloudbeaver/plugin-datasource-context-switch": "workspace:*",
