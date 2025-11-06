@@ -70,7 +70,7 @@ export default [
   ],
 
   ['administration_identity_providers_tab_title', '身份提供者'],
-  ['administration_identity_providers_provider', '提供者'],
+  ['administration_identity_providers_provider', '提供者类型'],
   ['administration_identity_providers_provider_id', 'ID'],
   ['administration_identity_providers_provider_configuration_name', '配置名称'],
   ['administration_identity_providers_provider_configuration_disabled', '已禁用'],

@@ -16,10 +16,7 @@
  */
 package io.cloudbeaver.service.admin;
 
-import io.cloudbeaver.DBWConstants;
-import io.cloudbeaver.DBWFeatureSet;
-import io.cloudbeaver.DBWebException;
-import io.cloudbeaver.WebAction;
+import io.cloudbeaver.*;
 import io.cloudbeaver.model.WebPropertyInfo;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.registry.WebAuthProviderConfiguration;
@@ -116,7 +113,7 @@ public interface DBWServiceAdmin extends DBWService {
         @NotNull WebSession webSession,
         @NotNull String userID,
         @NotNull String providerId,
-        @NotNull Map<String, Object> credentials
+        @WebParameterSecure @NotNull Map<String, Object> credentials
     ) throws DBWebException;
 
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
@@ -156,7 +153,7 @@ public interface DBWServiceAdmin extends DBWService {
         boolean disabled,
         @Nullable String iconURL,
         @Nullable String description,
-        @Nullable Map<String, Object> parameters) throws DBWebException;
+        @WebParameterSecure @Nullable Map<String, Object> parameters) throws DBWebException;
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
     boolean deleteAuthProviderConfiguration(@NotNull WebSession webSession, @NotNull String id) throws DBWebException;
 
