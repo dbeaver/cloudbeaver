@@ -1,6 +1,8 @@
 export default [
   ['plugin_data_viewer_conditional_formatting_presentation_title', '条件格式化'],
 
+  ['plugin_data_viewer_conditional_formatting_style_text_sample', '默认'],
+
   ['plugin_data_viewer_conditional_formatting_all_columns', '所有列'],
   ['plugin_data_viewer_conditional_formatting_format_rules', '格式规则'],
   ['plugin_data_viewer_conditional_formatting_column', '列'],
@@ -11,7 +13,8 @@ export default [
   ['plugin_data_viewer_conditional_formatting_select_rule', '选择规则'],
   ['plugin_data_viewer_conditional_formatting_format_cells_if', '格式化单元格如果...'],
 
-  ['plugin_data_viewer_conditional_formatting_parameter_color', '颜色'],
+  ['plugin_data_viewer_conditional_formatting_parameter_text_color', '文本颜色'],
+  ['plugin_data_viewer_conditional_formatting_parameter_background_color', '背景颜色'],
   ['plugin_data_viewer_conditional_formatting_parameter_value', '公式值'],
   ['plugin_data_viewer_conditional_formatting_parameter_font_weight', '加粗'],
   ['plugin_data_viewer_conditional_formatting_parameter_font_style', '斜体'],
