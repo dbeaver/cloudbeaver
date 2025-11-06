@@ -377,33 +377,35 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
           }
 
           for (const schema of catalogData.schemaList) {
-            const title = NodeManagerUtils.concatSchemaAndCatalog(catalog.name, schema.name);
-            const excluded = !!filter && !title.toLowerCase().includes(filter.toLowerCase());
-
-            if (!schema.name || excluded) {
+            if (!schema.name) {
               continue;
             }
 
-            items.push(
-              new MenuBaseItem(
-                {
-                  id: title,
-                  label: title,
-                  tooltip: title,
-                  icon: '/icons/plugin_datasource_context_switch_schema_sm.svg',
-                },
-                {
-                  onSelect: async () => {
-                    await this.connectionSchemaManagerService.selectSchema(schema.name!, catalog.name!);
+            const title = NodeManagerUtils.concatSchemaAndCatalog(catalog.name, schema.name);
+            const excluded = !!filter && !title.toLowerCase().includes(filter.toLowerCase());
+
+            if (!excluded) {
+              items.push(
+                new MenuBaseItem(
+                  {
+                    id: title,
+                    label: title,
+                    tooltip: title,
+                    icon: '/icons/plugin_datasource_context_switch_schema_sm.svg',
                   },
-                },
-                {
-                  isDisabled: () =>
-                    this.connectionSchemaManagerService.currentObjectSchemaId === schema.name &&
-                    this.connectionSchemaManagerService.currentObjectCatalogId === catalog.name,
-                },
-              ),
-            );
+                  {
+                    onSelect: async () => {
+                      await this.connectionSchemaManagerService.selectSchema(schema.name!, catalog.name!);
+                    },
+                  },
+                  {
+                    isDisabled: () =>
+                      this.connectionSchemaManagerService.currentObjectSchemaId === schema.name &&
+                      this.connectionSchemaManagerService.currentObjectCatalogId === catalog.name,
+                  },
+                ),
+              );
+            }
           }
         }
 
