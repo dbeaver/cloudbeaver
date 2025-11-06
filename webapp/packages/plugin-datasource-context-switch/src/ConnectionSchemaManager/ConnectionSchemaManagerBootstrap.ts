@@ -23,7 +23,7 @@ import { EObjectFeature, NodeManagerUtils } from '@cloudbeaver/core-navigation-t
 import { ProjectsService } from '@cloudbeaver/core-projects';
 import { getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
 import { ContextMenuSearchItem, DATA_CONTEXT_MENU_SEARCH, OptionsPanelService } from '@cloudbeaver/core-ui';
-import { MenuBaseItem, menuExtractItems, MenuSeparatorItem, MenuService, getMenuCreatorItemLabel } from '@cloudbeaver/core-view';
+import { MenuBaseItem, menuExtractItems, MenuSeparatorItem, MenuService } from '@cloudbeaver/core-view';
 import { MENU_APP_ACTIONS } from '@cloudbeaver/plugin-top-app-bar';
 
 import { ConnectionSchemaManagerService } from './ConnectionSchemaManagerService.js';
@@ -143,6 +143,10 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
               return false;
             }
 
+            if (filter) {
+              return connection.name.toLowerCase().includes(filter.toLowerCase());
+            }
+
             return true;
           })
           .sort((a, b) => {
@@ -178,18 +182,6 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
               },
             ),
           );
-        }
-
-        if (filter) {
-          const filtered = items.filter(item => {
-            if (item instanceof ContextMenuSearchItem) {
-              return true;
-            }
-
-            return getMenuCreatorItemLabel(item).toLowerCase().includes(filter.toLowerCase());
-          });
-
-          return filtered;
         }
 
         return items;
@@ -321,24 +313,28 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
 
           previousSelected = selected;
 
-          items.push(
-            new MenuBaseItem(
-              {
-                id: title,
-                label: title,
-                tooltip: title,
-                icon: '/icons/plugin_datasource_context_switch_schema_sm.svg',
-              },
-              {
-                onSelect: async () => {
-                  await this.connectionSchemaManagerService.selectSchema(title);
+          const excluded = !!filter && !title.toLowerCase().includes(filter.toLowerCase());
+
+          if (!excluded) {
+            items.push(
+              new MenuBaseItem(
+                {
+                  id: title,
+                  label: title,
+                  tooltip: title,
+                  icon: '/icons/plugin_datasource_context_switch_schema_sm.svg',
                 },
-              },
-              {
-                isDisabled: () => this.connectionSchemaManagerService.currentObjectSchemaId === title,
-              },
-            ),
-          );
+                {
+                  onSelect: async () => {
+                    await this.connectionSchemaManagerService.selectSchema(title);
+                  },
+                },
+                {
+                  isDisabled: () => this.connectionSchemaManagerService.currentObjectSchemaId === title,
+                },
+              ),
+            );
+          }
         }
 
         for (const catalogData of catalogList) {
@@ -356,32 +352,37 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
           previousSelected = selected;
 
           if (catalogData.schemaList.length === 0) {
-            items.push(
-              new MenuBaseItem(
-                {
-                  id: catalog.name,
-                  label: catalog.name,
-                  tooltip: catalog.name,
-                  icon: '/icons/plugin_datasource_context_switch_database_sm.svg',
-                },
-                {
-                  onSelect: async () => {
-                    await this.connectionSchemaManagerService.selectCatalog(catalog.name!);
+            const excluded = !!filter && !catalog.name.toLowerCase().includes(filter.toLowerCase());
+
+            if (!excluded) {
+              items.push(
+                new MenuBaseItem(
+                  {
+                    id: catalog.name,
+                    label: catalog.name,
+                    tooltip: catalog.name,
+                    icon: '/icons/plugin_datasource_context_switch_database_sm.svg',
                   },
-                },
-                {
-                  isDisabled: () => this.connectionSchemaManagerService.currentObjectCatalogId === catalog.name,
-                },
-              ),
-            );
+                  {
+                    onSelect: async () => {
+                      await this.connectionSchemaManagerService.selectCatalog(catalog.name!);
+                    },
+                  },
+                  {
+                    isDisabled: () => this.connectionSchemaManagerService.currentObjectCatalogId === catalog.name,
+                  },
+                ),
+              );
+            }
           }
 
           for (const schema of catalogData.schemaList) {
-            if (!schema.name) {
+            const title = NodeManagerUtils.concatSchemaAndCatalog(catalog.name, schema.name);
+            const excluded = !!filter && !title.toLowerCase().includes(filter.toLowerCase());
+
+            if (!schema.name || excluded) {
               continue;
             }
-
-            const title = NodeManagerUtils.concatSchemaAndCatalog(catalog.name, schema.name);
 
             items.push(
               new MenuBaseItem(
@@ -404,18 +405,6 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
               ),
             );
           }
-        }
-
-        if (filter) {
-          const filtered = items.filter(item => {
-            if (item instanceof ContextMenuSearchItem) {
-              return true;
-            }
-
-            return getMenuCreatorItemLabel(item).toLowerCase().includes(filter.toLowerCase());
-          });
-
-          return filtered;
         }
 
         return items;
