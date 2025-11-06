@@ -20,6 +20,7 @@ import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.WebAsyncTaskInfo;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.service.sql.messages.WebSQLMessages;
+import io.cloudbeaver.websocket.event.task.WSSessionTaskQueryParamsConfirmationEvent;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.Log;
@@ -30,7 +31,6 @@ import org.jkiss.dbeaver.model.sql.SQLQuery;
 import org.jkiss.dbeaver.model.sql.SQLQueryParameter;
 import org.jkiss.dbeaver.model.sql.SQLScriptContext;
 import org.jkiss.dbeaver.model.websocket.event.WSEvent;
-import org.jkiss.dbeaver.model.websocket.event.session.task.WSSessionTaskQueryParamsConfirmationEvent;
 
 import java.util.LinkedHashMap;
 import java.util.List;
