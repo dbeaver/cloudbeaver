@@ -25,7 +25,7 @@ import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.data.DBDDataReceiver;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
-import org.jkiss.dbeaver.model.sql.SQLParametersProvider;
+import org.jkiss.dbeaver.model.sql.SQLParametersProviderBase;
 import org.jkiss.dbeaver.model.sql.SQLQuery;
 import org.jkiss.dbeaver.model.sql.SQLQueryParameter;
 import org.jkiss.dbeaver.model.sql.SQLScriptContext;
@@ -38,7 +38,7 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
-public class WebSQLParametersProvider implements SQLParametersProvider {
+public class WebSQLParametersProvider extends SQLParametersProviderBase {
     private static final Log log = Log.getLog(WebSQLParametersProvider.class);
     @NotNull
     private final WebSession webSession;
@@ -50,37 +50,18 @@ public class WebSQLParametersProvider implements SQLParametersProvider {
         this.taskInfo = taskInfo;
     }
 
-
     @Nullable
     @Override
-    public Boolean prepareStatementParameters(
+    protected Boolean collectAndAssignVariables(
         @NotNull SQLScriptContext scriptContext,
         @NotNull SQLQuery sqlStatement,
         @NotNull List<SQLQueryParameter> parameters,
-        @NotNull Supplier<DBDDataReceiver> dataReceiverSupplier,
-        boolean useDefaults
+        @NotNull Supplier<DBDDataReceiver> dataReceiverSupplier
     ) {
-        for (SQLQueryParameter param : parameters) {
-            String paramName = param.getName();
-            Object defValue = useDefaults ? scriptContext.getParameterDefaultValue(paramName) : null;
-            if (defValue != null || scriptContext.hasVariable(paramName)) {
-                assignVariable(scriptContext, param, paramName, defValue);
-            } else {
-                paramName = param.getVarName();
-                defValue = useDefaults ? scriptContext.getParameterDefaultValue(paramName) : null;
-                if (defValue != null || scriptContext.hasVariable(paramName)) {
-                    assignVariable(scriptContext, param, paramName, defValue);
-                } else {
-                    if (!useDefaults) {
-                        param.setVariableSet(false);
-                    }
-                }
-            }
-        }
         Map<String, Object> unsetParams = new LinkedHashMap<>();
-
         for (SQLQueryParameter param : parameters) {
             if (!param.isVariableSet()) {
+                // Empty value for now, maybe in future we can set some defaults here
                 unsetParams.put(param.getName(), "");
             }
         }
@@ -89,9 +70,13 @@ public class WebSQLParametersProvider implements SQLParametersProvider {
         }
 
         CompletableFuture<Map<String, Object>> completableFuture = new CompletableFuture<>();
-
         WSEvent event = new WSSessionTaskQueryParamsConfirmationEvent(
-            taskInfo.getId(), WebSQLMessages.model_web_dialog_sql_param_title, "", sqlStatement.getText(), unsetParams);
+            taskInfo.getId(),
+            WebSQLMessages.model_web_dialog_sql_param_title,
+            "",
+            sqlStatement.getText(),
+            unsetParams
+        );
         try {
             Map<String, Object> response = WebSQLUtils.requestConfirmation(webSession, taskInfo, event, completableFuture);
             // Save values back to script context
@@ -109,12 +94,5 @@ public class WebSQLParametersProvider implements SQLParametersProvider {
             log.error("Error getting SQL parameter values: " + e.getMessage(), e);
             return false;
         }
-    }
-
-    private void assignVariable(@NotNull SQLScriptContext scriptContext, SQLQueryParameter param, String paramName, Object defValue) {
-        Object varValue = defValue != null ? defValue : scriptContext.getVariable(paramName);
-        String strValue = varValue == null ? null : varValue.toString();
-        param.setValue(strValue);
-        param.setVariableSet(true);
     }
 }
