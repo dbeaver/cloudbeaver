@@ -48,6 +48,7 @@
     "@cloudbeaver/core-settings-localization": "workspace:*",
     "@cloudbeaver/core-settings-user": "workspace:*",
     "@cloudbeaver/core-storage": "workspace:*",
+    "@cloudbeaver/core-support": "workspace:*",
     "@cloudbeaver/core-task-manager": "workspace:*",
     "@cloudbeaver/core-theming": "workspace:*",
     "@cloudbeaver/core-ui": "workspace:*",

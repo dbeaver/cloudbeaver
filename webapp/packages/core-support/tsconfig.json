@@ -8,10 +8,10 @@
   },
   "references": [
     {
-      "path": "../core-blocks"
+      "path": "../../common-typescript/@dbeaver/cli"
     },
     {
-      "path": "../core-bootstrap"
+      "path": "../core-blocks"
     },
     {
       "path": "../core-cli"
@@ -20,19 +20,10 @@
       "path": "../core-di"
     },
     {
+      "path": "../core-links"
+    },
+    {
       "path": "../core-localization"
-    },
-    {
-      "path": "../core-support"
-    },
-    {
-      "path": "../core-version-update"
-    },
-    {
-      "path": "../plugin-data-editor-public-settings"
-    },
-    {
-      "path": "../plugin-set-common"
     }
   ],
   "include": [

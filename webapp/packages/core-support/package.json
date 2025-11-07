@@ -1,16 +1,15 @@
 {
-  "name": "@cloudbeaver/product-default-impl",
+  "name": "@cloudbeaver/core-support",
   "type": "module",
   "sideEffects": [
+    "./lib/module.js",
     "./lib/index.js",
-    "./lib/module.js",
-    "./lib/module.js",
     "src/**/*.css",
     "src/**/*.scss",
     "public/**/*"
   ],
   "version": "0.1.0",
-  "description": "CloudBeaver Community",
+  "description": "",
   "license": "Apache-2.0",
   "exports": {
     ".": "./lib/index.js",
@@ -20,26 +19,21 @@
     "build": "tsc -b",
     "clean": "rimraf --glob lib",
     "lint": "eslint ./src/ --ext .ts,.tsx",
+    "test": "dbeaver-test",
     "validate-dependencies": "core-cli-validate-dependencies"
   },
   "dependencies": {
     "@cloudbeaver/core-blocks": "workspace:*",
-    "@cloudbeaver/core-bootstrap": "workspace:*",
     "@cloudbeaver/core-di": "workspace:*",
+    "@cloudbeaver/core-links": "workspace:*",
     "@cloudbeaver/core-localization": "workspace:*",
-    "@cloudbeaver/core-support": "workspace:*",
-    "@cloudbeaver/core-version-update": "workspace:*",
-    "@cloudbeaver/plugin-data-editor-public-settings": "workspace:*",
-    "@cloudbeaver/plugin-set-common": "workspace:*",
     "react": "^19",
     "tslib": "^2"
-  },
-  "product": {
-    "name": "CloudBeaver Community"
   },
   "devDependencies": {
     "@cloudbeaver/core-cli": "workspace:*",
     "@cloudbeaver/tsconfig": "workspace:*",
+    "@dbeaver/cli": "workspace:*",
     "@types/react": "^19",
     "rimraf": "^6",
     "typescript": "^5"
