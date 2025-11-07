@@ -42,8 +42,14 @@ export interface ObjectPropertyFormProps extends ILayoutSizeProps {
   onFocus?: (name: string) => void;
 }
 
-function getAutocompleteParam(property: ObjectPropertyInfo, prefix: string, disabled: boolean): string {
-  if (property.features.includes('password')) {
+function getAutocompleteParam(property: ObjectPropertyInfo, prefix: string, disabledForPasswords: boolean): string {
+  const isPasswordField = property.features.includes('password');
+
+  if (isPasswordField && disabledForPasswords) {
+    return 'off';
+  }
+
+  if (isPasswordField) {
     return prefix ? prefix + ' current-password' : 'current-password';
   }
 
@@ -51,9 +57,6 @@ function getAutocompleteParam(property: ObjectPropertyInfo, prefix: string, disa
     return prefix ? prefix + ' username' : 'username';
   }
 
-  if (property.features.includes('password') && disabled) {
-    return 'off';
-  }
   return 'on';
 }
 
