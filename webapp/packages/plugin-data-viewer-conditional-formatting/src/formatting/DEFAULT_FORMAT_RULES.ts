@@ -8,21 +8,21 @@
 
 import type { IFormatRule, IFormatRuleParameter } from './IFormatRule.js';
 
-const FONT_WEIGHT_PARAMETER: IFormatRuleParameter = {
+export const FONT_WEIGHT_PARAMETER: IFormatRuleParameter = {
   name: 'plugin_data_viewer_conditional_formatting_parameter_font_weight',
   key: 'font-weight',
   type: 'boolean',
   default: false,
 };
 
-const FONT_STYLE_PARAMETER: IFormatRuleParameter = {
+export const FONT_STYLE_PARAMETER: IFormatRuleParameter = {
   name: 'plugin_data_viewer_conditional_formatting_parameter_font_style',
   key: 'font-style',
   type: 'boolean',
   default: false,
 };
 
-const TEXT_DECORATION_PARAMETER: IFormatRuleParameter = {
+export const TEXT_DECORATION_PARAMETER: IFormatRuleParameter = {
   name: 'plugin_data_viewer_conditional_formatting_parameter_text_decoration',
   key: 'text-decoration',
   type: 'select',
@@ -35,14 +35,21 @@ const TEXT_DECORATION_PARAMETER: IFormatRuleParameter = {
   ],
 };
 
-const COLOR_PARAMETER: IFormatRuleParameter = {
-  name: 'plugin_data_viewer_conditional_formatting_parameter_color',
+export const TEXT_COLOR_PARAMETER: IFormatRuleParameter = {
+  name: 'plugin_data_viewer_conditional_formatting_parameter_text_color',
+  key: 'text-color',
+  type: 'color',
+  default: '#000000',
+};
+
+export const BACKGROUND_COLOR_PARAMETER: IFormatRuleParameter = {
+  name: 'plugin_data_viewer_conditional_formatting_parameter_background_color',
   key: 'background-color',
   type: 'color',
   default: '#57bb8a',
 };
 
-const VALUE_PARAMETER: IFormatRuleParameter = {
+export const VALUE_PARAMETER: IFormatRuleParameter = {
   name: 'plugin_data_viewer_conditional_formatting_parameter_value',
   key: 'value',
   type: 'string',
@@ -53,7 +60,8 @@ export const DEFAULT_FORMAT_RULES: IFormatRule[] = [
     id: 'is-empty',
     name: 'plugin_data_viewer_conditional_formatting_rule_is_empty',
     formatting: {
-      ['background-color']: COLOR_PARAMETER,
+      ['text-color']: TEXT_COLOR_PARAMETER,
+      ['background-color']: BACKGROUND_COLOR_PARAMETER,
       ['font-weight']: FONT_WEIGHT_PARAMETER,
       ['font-style']: FONT_STYLE_PARAMETER,
       ['text-decoration']: TEXT_DECORATION_PARAMETER,
@@ -64,7 +72,8 @@ export const DEFAULT_FORMAT_RULES: IFormatRule[] = [
     id: 'is-not-empty',
     name: 'plugin_data_viewer_conditional_formatting_rule_is_not_empty',
     formatting: {
-      ['background-color']: COLOR_PARAMETER,
+      ['text-color']: TEXT_COLOR_PARAMETER,
+      ['background-color']: BACKGROUND_COLOR_PARAMETER,
       ['font-weight']: FONT_WEIGHT_PARAMETER,
       ['font-style']: FONT_STYLE_PARAMETER,
       ['text-decoration']: TEXT_DECORATION_PARAMETER,
@@ -79,7 +88,8 @@ export const DEFAULT_FORMAT_RULES: IFormatRule[] = [
       value: VALUE_PARAMETER,
     },
     formatting: {
-      ['background-color']: COLOR_PARAMETER,
+      ['text-color']: TEXT_COLOR_PARAMETER,
+      ['background-color']: BACKGROUND_COLOR_PARAMETER,
       ['font-weight']: FONT_WEIGHT_PARAMETER,
       ['font-style']: FONT_STYLE_PARAMETER,
       ['text-decoration']: TEXT_DECORATION_PARAMETER,
@@ -95,7 +105,8 @@ export const DEFAULT_FORMAT_RULES: IFormatRule[] = [
       value: VALUE_PARAMETER,
     },
     formatting: {
-      ['background-color']: COLOR_PARAMETER,
+      ['text-color']: TEXT_COLOR_PARAMETER,
+      ['background-color']: BACKGROUND_COLOR_PARAMETER,
       ['font-weight']: FONT_WEIGHT_PARAMETER,
       ['font-style']: FONT_STYLE_PARAMETER,
       ['text-decoration']: TEXT_DECORATION_PARAMETER,
@@ -111,7 +122,8 @@ export const DEFAULT_FORMAT_RULES: IFormatRule[] = [
       value: VALUE_PARAMETER,
     },
     formatting: {
-      ['background-color']: COLOR_PARAMETER,
+      ['text-color']: TEXT_COLOR_PARAMETER,
+      ['background-color']: BACKGROUND_COLOR_PARAMETER,
       ['font-weight']: FONT_WEIGHT_PARAMETER,
       ['font-style']: FONT_STYLE_PARAMETER,
       ['text-decoration']: TEXT_DECORATION_PARAMETER,
@@ -127,7 +139,8 @@ export const DEFAULT_FORMAT_RULES: IFormatRule[] = [
       value: VALUE_PARAMETER,
     },
     formatting: {
-      ['background-color']: COLOR_PARAMETER,
+      ['text-color']: TEXT_COLOR_PARAMETER,
+      ['background-color']: BACKGROUND_COLOR_PARAMETER,
       ['font-weight']: FONT_WEIGHT_PARAMETER,
       ['font-style']: FONT_STYLE_PARAMETER,
       ['text-decoration']: TEXT_DECORATION_PARAMETER,
@@ -143,7 +156,8 @@ export const DEFAULT_FORMAT_RULES: IFormatRule[] = [
       value: VALUE_PARAMETER,
     },
     formatting: {
-      ['background-color']: COLOR_PARAMETER,
+      ['text-color']: TEXT_COLOR_PARAMETER,
+      ['background-color']: BACKGROUND_COLOR_PARAMETER,
       ['font-weight']: FONT_WEIGHT_PARAMETER,
       ['font-style']: FONT_STYLE_PARAMETER,
       ['text-decoration']: TEXT_DECORATION_PARAMETER,
@@ -209,17 +223,17 @@ export const COLOR_SCALE_RULE: IFormatRule = {
   },
   formatting: {
     ['min-color']: {
-      ...COLOR_PARAMETER,
+      ...BACKGROUND_COLOR_PARAMETER,
       key: 'min-color',
       default: undefined,
     },
     ['mid-color']: {
-      ...COLOR_PARAMETER,
+      ...BACKGROUND_COLOR_PARAMETER,
       key: 'mid-color',
       default: undefined,
     },
     ['max-color']: {
-      ...COLOR_PARAMETER,
+      ...BACKGROUND_COLOR_PARAMETER,
       key: 'max-color',
     },
   },

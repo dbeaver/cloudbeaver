@@ -18,7 +18,7 @@ interface Props extends React.PropsWithChildren {
   color?: string;
   fontWeight?: 'normal' | 'bold';
   fontStyle?: 'normal' | 'italic';
-  textDecoration?: 'none' | 'underline' | 'overline' | 'line-through';
+  textDecoration?: 'none' | 'underline' | 'overline' | 'line-through' | string | string[];
 }
 
 export const ColorScalePreview = memo<Props>(function ColorScalePreview({
@@ -48,7 +48,7 @@ export const ColorScalePreview = memo<Props>(function ColorScalePreview({
         color,
         fontWeight,
         fontStyle,
-        textDecoration,
+        textDecoration: Array.isArray(textDecoration) ? textDecoration.join(' ') : textDecoration,
       }}
     >
       {children}

@@ -12,7 +12,7 @@ import { ButtonRoot, type ButtonRootProps } from './ButtonRoot.js';
 import './Button.css';
 
 export interface ButtonProps extends ButtonRootProps {
-  variant?: 'primary' | 'secondary' | 'danger';
+  variant?: 'primary' | 'secondary' | 'ghost' | 'danger';
   size?: ControlSize;
 }
 

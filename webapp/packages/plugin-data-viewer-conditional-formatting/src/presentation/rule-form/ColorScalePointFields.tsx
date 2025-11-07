@@ -9,6 +9,7 @@
 import { Container, InputField, Select, useTranslate } from '@cloudbeaver/core-blocks';
 import { observer } from 'mobx-react-lite';
 import type { IFormatRuleParameter } from '../../formatting/IFormatRule.js';
+import { ColorPicker } from '@dbeaver/ui-kit';
 
 interface Props {
   state: Record<string, any>;
@@ -32,6 +33,9 @@ export const ColorScalePointFields = observer<Props>(function ColorScalePointFie
   colorDisabled,
 }) {
   const t = useTranslate();
+
+  const colorValue = state[colorParam?.key || ''] || (colorParam ? (colorParam.default ?? defaultColorValue) : undefined);
+  const mappedColor = colorMapState ? colorMapState({ [colorParam?.key || '']: colorValue }) : colorValue;
   return (
     <Container gap>
       {typeParam && (
@@ -64,21 +68,16 @@ export const ColorScalePointFields = observer<Props>(function ColorScalePointFie
         </InputField>
       )}
       {colorParam && (
-        <InputField
-          type={colorParam.type}
-          name={colorParam.key}
-          state={state}
-          defaultState={{ [colorParam.key]: colorParam.default ?? defaultColorValue }}
-          defaultValue={(colorParam.default ?? defaultColorValue) as string}
-          placeholder={t(colorParam.name)}
-          mapState={colorMapState}
-          disabled={colorDisabled}
-          className="tw:w-16"
-          keepSize
-          tiny
-        >
-          {t(colorParam.name)}
-        </InputField>
+        <div className="tw:flex tw:flex-none! tw:items-end">
+          <ColorPicker
+            name={colorParam.key}
+            value={mappedColor}
+            title={t(colorParam.name)}
+            defaultValue={(colorParam.default ?? defaultColorValue) as string}
+            disabled={colorDisabled}
+            onChange={color => (state[colorParam.key] = color)}
+          />
+        </div>
       )}
     </Container>
   );

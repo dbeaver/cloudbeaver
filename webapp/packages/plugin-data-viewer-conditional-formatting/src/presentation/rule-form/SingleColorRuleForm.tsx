@@ -12,6 +12,7 @@ import { DEFAULT_FORMAT_RULES } from '../../formatting/DEFAULT_FORMAT_RULES.js';
 import type { IFormatRuleState } from '../../formatting/IFormatRuleState.js';
 import { RenderParameter } from './RenderParameter.js';
 import type { IColumnInfo } from '../../formatting/IColumnInfo.js';
+import { FormattingStyle } from './FormattingStyle.js';
 
 interface Props {
   columns: IColumnInfo[];
@@ -28,9 +29,11 @@ export const SingleColorRuleForm = observer<Props>(function SingleColorRuleForm(
     <Group gap overflow>
       <GroupTitle>{t('plugin_data_viewer_conditional_formatting_format_rules')}</GroupTitle>
       {columns && (
-        <Select items={columns} name="column" state={state} keySelector={item => item.key} valueSelector={item => t(item.name)} zeroBasis tiny>
-          {t('plugin_data_viewer_conditional_formatting_column')}
-        </Select>
+        <GroupItem>
+          <Select items={columns} name="column" state={state} keySelector={item => item.key} valueSelector={item => t(item.name)} zeroBasis small>
+            {t('plugin_data_viewer_conditional_formatting_column')}
+          </Select>
+        </GroupItem>
       )}
       <Select
         name="ruleId"
@@ -39,16 +42,15 @@ export const SingleColorRuleForm = observer<Props>(function SingleColorRuleForm(
         keySelector={item => item.id}
         valueSelector={item => t(item.name)}
         placeholder={t('plugin_data_viewer_conditional_formatting_select_rule')}
-        tiny
+        small
       >
         {t('plugin_data_viewer_conditional_formatting_format_cells_if')}
       </Select>
       {Object.values(rule?.parameters ?? {}).map(param => (
         <RenderParameter key={param.key} parameter={param} state={state.parameters} />
       ))}
-      {Object.values(rule?.formatting ?? {}).map(param => (
-        <RenderParameter key={param.key} parameter={param} state={state.parameters} />
-      ))}
+
+      <FormattingStyle rule={rule!} state={state} />
 
       {onDelete && (
         <GroupItem>

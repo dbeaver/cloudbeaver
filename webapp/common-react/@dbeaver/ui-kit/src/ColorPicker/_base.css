@@ -1,0 +1,6 @@
+@layer base {
+  :root {
+    --dbv-kit-color-picker-border-color: var(--dbv-kit-color-control-inactive);
+    --dbv-kit-color-picker-padding: calc(var(--tw-spacing) * 2.5);
+  }
+}

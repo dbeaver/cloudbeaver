@@ -32,6 +32,8 @@
   },
   "dependencies": {
     "@ariakit/react": "^0",
+    "@dbeaver/js-helpers": "workspace:*",
+    "@dbeaver/react-translate": "workspace:^",
     "clsx": "^2",
     "react": "^19",
     "react-dom": "^19"

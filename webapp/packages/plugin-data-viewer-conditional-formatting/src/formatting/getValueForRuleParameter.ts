@@ -6,20 +6,20 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { IFormatRuleParameter } from './IFormatRule.js';
+import type { FormatRuleValueType, IFormatRuleParameter } from './IFormatRule.js';
 
-export function getValueForRuleParameter<T extends string | boolean | number>(
+export function getValueForRuleParameter<T extends FormatRuleValueType>(
   state: Record<string, any>,
   parameters: Record<string, IFormatRuleParameter> | undefined,
   key: string,
   fallback: T,
 ): T;
-export function getValueForRuleParameter<T extends string | boolean | number>(
+export function getValueForRuleParameter<T extends FormatRuleValueType>(
   state: Record<string, any>,
   parameters: Record<string, IFormatRuleParameter> | undefined,
   key: string,
 ): T | undefined;
-export function getValueForRuleParameter<T extends string | boolean | number>(
+export function getValueForRuleParameter<T extends FormatRuleValueType>(
   state: Record<string, any>,
   parameters: Record<string, IFormatRuleParameter> | undefined,
   key: string,
