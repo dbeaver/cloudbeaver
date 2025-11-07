@@ -298,7 +298,9 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
       this.currentQueryParameters && isArraysEqual(Object.keys(this.currentQueryParameters), Object.keys(queryParamsEvent.parameters));
 
     if (!canUseQueryParameters) {
-      const parametersState = observable({ ...queryParamsEvent.parameters, ...this.previousQueryParameters });
+      const parametersState = observable({
+        ...Object.fromEntries(Object.entries(queryParamsEvent.parameters).map(([key, value]) => [key, this.previousQueryParameters?.[key] ?? value])),
+      });
       // TODO: this UI thing should be moved outside of the `plugin-sql-editor` package to use sql editor component for preview
       const dialogPromise = this.commonDialogService.open(ConfirmationDialog, {
         title: queryParamsEvent.title,
