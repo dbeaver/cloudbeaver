@@ -1,3 +1,11 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2025 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+
 import clsx from 'clsx';
 
 type IconNames =
@@ -11,7 +19,9 @@ type IconNames =
   | 'cross'
   | 'sort-unknown'
   | 'arrow-up'
-  | 'arrow-down';
+  | 'arrow-down'
+  | 'no-color'
+  | 'fill-color';
 
 export interface IconProps {
   name: IconNames;
