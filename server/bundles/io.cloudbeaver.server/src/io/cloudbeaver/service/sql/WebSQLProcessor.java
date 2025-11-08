@@ -1101,7 +1101,12 @@ public class WebSQLProcessor implements WebSessionProvider {
         executeInfo.setFullQuery(dbStat.getQueryString());
     }
 
-    private void setResultFilterText(@NotNull DBSDataContainer dataContainer, @NotNull DBPDataSource dataSource, @NotNull WebSQLExecuteInfo executeInfo, @NotNull DBDDataFilter filter) throws DBException {
+    private void setResultFilterText(
+        @NotNull DBSDataContainer dataContainer,
+        @NotNull DBPDataSource dataSource,
+        @NotNull WebSQLExecuteInfo executeInfo,
+        @NotNull DBDDataFilter filter
+    ) throws DBException {
         if (!filter.getConstraints().isEmpty() || !CommonUtils.isEmpty(filter.getWhere())) {
             StringBuilder where = new StringBuilder();
             SQLUtils.appendConditionString(
@@ -1114,8 +1119,13 @@ public class WebSQLProcessor implements WebSessionProvider {
         }
     }
 
-    private void readResultSet(@NotNull DBCSession session, @NotNull DBCResultSet dbResult, @NotNull WebSQLDataFilter filter, @NotNull WebSQLQueryDataReceiver dataReceiver) throws DBCException {
-        dataReceiver.fetchStart(session, dbResult, filter.getOffset(), filter.getLimit());
+    private void readResultSet(
+        @NotNull DBCSession session,
+        @NotNull DBCResultSet dbResult,
+        @NotNull WebSQLDataFilter filter,
+        @NotNull WebSQLQueryDataReceiver dataReceiver
+    ) throws DBException {
+        DBDDataReceiver.startFetchWorkflow(dataReceiver, session, dbResult, filter.getOffset(), filter.getLimit());
         int rowCount = 0;
         while (dbResult.nextRow()) {
             if (rowCount > filter.getLimit()) {
@@ -1125,7 +1135,6 @@ public class WebSQLProcessor implements WebSessionProvider {
             dataReceiver.fetchRow(session, dbResult);
             rowCount++;
         }
-        dataReceiver.fetchEnd(session, dbResult);
     }
 
     /**
