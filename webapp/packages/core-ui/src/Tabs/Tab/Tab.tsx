@@ -33,10 +33,11 @@ export const Tab = observer<TabProps>(function Tab({ after, ...props }) {
     isDragging,
     dropPosition,
     dragProps,
+    dropProps,
   } = useTabDragAndDrop({
     tabId,
     enabled: tab.state.reorderable ?? false,
-    onReorder: tab.state.reorder ?? undefined,
+    onReorder: tab.state.reorder ?? null,
   });
 
   function onMouseUpHandler(event: React.MouseEvent<HTMLDivElement>) {
@@ -57,6 +58,7 @@ export const Tab = observer<TabProps>(function Tab({ after, ...props }) {
         })}
         onMouseUp={onMouseUpHandler}
         {...dragProps}
+        {...dropProps}
       >
         <div className={s(styles, { tabInner: true, tabInnerSelected: tab.selected })}>
           <TabActions

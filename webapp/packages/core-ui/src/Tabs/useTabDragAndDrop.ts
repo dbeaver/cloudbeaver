@@ -6,133 +6,100 @@
  * you may not use this file except in compliance with the License.
  */
 import { useRef, useState } from 'react';
+import { useDrag, useDrop } from '@dbeaver/react-dnd';
 
 export interface ITabDragAndDropOptions {
   tabId: string;
-  dndType?: string;
-  onReorder?: (draggedTabId: string, targetTabId: string, position: 'before' | 'after') => void;
+  onReorder: ((draggedTabId: string, targetTabId: string, position: 'before' | 'after') => void) | null;
   enabled?: boolean;
 }
 
 export interface ITabDragAndDropResult {
   ref: React.RefObject<HTMLDivElement | null>;
   isDragging: boolean;
-  dropPosition: 'before' | 'after' | null;
+  dropPosition: 'before' | 'after' | undefined;
   dragProps: {
-    draggable: boolean;
-    onDragStart: (event: React.DragEvent<HTMLDivElement>) => void;
-    onDragEnd: (event: React.DragEvent<HTMLDivElement>) => void;
-    onDragOver: (event: React.DragEvent<HTMLDivElement>) => void;
-    onDragEnter: (event: React.DragEvent<HTMLDivElement>) => void;
-    onDragLeave: (event: React.DragEvent<HTMLDivElement>) => void;
-    onDrop: (event: React.DragEvent<HTMLDivElement>) => void;
+    draggable?: boolean;
+    onDrag: (event: React.DragEvent<HTMLElement>) => void;
+    onDragStart: (event: React.DragEvent<HTMLElement>) => void;
+    onDragEnd: (event: React.DragEvent<HTMLElement>) => void;
+  };
+  dropProps: {
+    onDrop: (event: React.DragEvent<HTMLElement>) => void;
+    onDragOver: (event: React.DragEvent<HTMLElement>) => void;
+    onDragEnter: (event: React.DragEvent<HTMLElement>) => void;
+    onDragLeave: (event: React.DragEvent<HTMLElement>) => void;
   };
 }
 
-const DEFAULT_DND_TYPE = 'application/x-cloudbeaver-tab';
-
-export function useTabDragAndDrop({ tabId, dndType = DEFAULT_DND_TYPE, onReorder, enabled = true }: ITabDragAndDropOptions): ITabDragAndDropResult {
+export function useTabDragAndDrop({ tabId, onReorder, enabled = true }: ITabDragAndDropOptions): ITabDragAndDropResult {
   const ref = useRef<HTMLDivElement>(null);
-  const [isDragging, setIsDragging] = useState(false);
-  const [dropPosition, setDropPosition] = useState<'before' | 'after' | null>(null);
-  const draggedTabIdRef = useRef<string | null>(null);
+  const [dropPosition, setDropPosition] = useState<'before' | 'after' | undefined>(undefined);
 
   const onReorderRef = useRef(onReorder);
   onReorderRef.current = onReorder;
 
-  const handleDragStart = (event: React.DragEvent<HTMLDivElement>) => {
-    if (!enabled) {
-      return;
-    }
+  const { isDragging, props: dragProps } = useDrag({
+    draggable: enabled,
+    onDragStart: (event, store) => {
+      event.stopPropagation();
+      store.setData('dbeaver-tab-id', tabId);
+    },
+  });
 
-    setIsDragging(true);
-    event.stopPropagation();
-    event.dataTransfer.effectAllowed = 'move';
-    event.dataTransfer.setData(dndType, tabId);
-    event.dataTransfer.setData('text/plain', tabId);
-    draggedTabIdRef.current = tabId;
-  };
-
-  const handleDragEnd = () => {
-    setIsDragging(false);
-    setDropPosition(null);
-    draggedTabIdRef.current = null;
-  };
-
-  const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
-    if (!enabled || !event.dataTransfer.types.includes(dndType) || !ref.current) {
-      return;
-    }
-
-    event.preventDefault();
-    event.stopPropagation();
-    event.dataTransfer.dropEffect = 'move';
-
-    const rect = ref.current.getBoundingClientRect();
-    const midpoint = rect.left + rect.width / 2;
-    const position = event.clientX < midpoint ? 'before' : 'after';
-
-    if (dropPosition !== position) {
-      setDropPosition(position);
-    }
-  };
-
-  const handleDragEnter = (event: React.DragEvent<HTMLDivElement>) => {
-    if (!enabled) {
-      return;
-    }
-
-    if (event.dataTransfer.types.includes(dndType)) {
+  const { props: dropProps } = useDrop({
+    canDrop: (event, store) => {
+      const draggedTabId = store?.getData('dbeaver-tab-id');
+      return enabled && draggedTabId !== tabId;
+    },
+    onDragOver: event => {
       event.preventDefault();
-    }
-  };
+      event.stopPropagation();
+      if (!ref.current) {
+        return;
+      }
 
-  const handleDragLeave = (event: React.DragEvent<HTMLDivElement>) => {
-    if (!enabled || !ref.current) {
-      return;
-    }
+      const rect = ref.current.getBoundingClientRect();
+      const midpoint = rect.left + rect.width / 2;
+      const position = event.clientX < midpoint ? 'before' : 'after';
 
-    const rect = ref.current.getBoundingClientRect();
-    const x = event.clientX;
-    const y = event.clientY;
+      if (dropPosition !== position) {
+        setDropPosition(position);
+      }
+    },
+    onDragLeave: event => {
+      if (!ref.current) {
+        return;
+      }
 
-    const isOutside = x < rect.left || x > rect.right || y < rect.top || y > rect.bottom;
+      const rect = ref.current.getBoundingClientRect();
+      const x = event.clientX;
+      const y = event.clientY;
 
-    if (isOutside) {
-      setDropPosition(null);
-    }
-  };
+      const isOutside = x < rect.left || x > rect.right || y < rect.top || y > rect.bottom;
 
-  const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
-    if (!enabled) {
-      return;
-    }
+      if (isOutside) {
+        setDropPosition(undefined);
+      }
+    },
+    onDrop: (event, store) => {
+      event.preventDefault();
+      event.stopPropagation();
+      const draggedTabId = store?.getData('dbeaver-tab-id');
 
-    event.preventDefault();
-    event.stopPropagation();
-    setIsDragging(false);
+      if (draggedTabId && draggedTabId !== tabId && dropPosition && onReorderRef.current) {
+        onReorderRef.current(draggedTabId, tabId, dropPosition);
+      }
 
-    const draggedTabId = event.dataTransfer.getData(dndType) || event.dataTransfer.getData('text/plain');
-
-    if (draggedTabId && draggedTabId !== tabId && dropPosition && onReorderRef.current) {
-      onReorderRef.current(draggedTabId, tabId, dropPosition);
-    }
-
-    setDropPosition(null);
-  };
+      setDropPosition(undefined);
+    },
+  });
 
   return {
     ref,
     isDragging,
     dropPosition,
-    dragProps: {
-      draggable: enabled,
-      onDragStart: handleDragStart,
-      onDragEnd: handleDragEnd,
-      onDragOver: handleDragOver,
-      onDragEnter: handleDragEnter,
-      onDragLeave: handleDragLeave,
-      onDrop: handleDrop,
-    },
+    dragProps,
+    dropProps,
   };
 }
