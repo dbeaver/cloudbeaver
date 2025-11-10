@@ -102,4 +102,41 @@ describe('reorderArray', () => {
       expect(result).toEqual([objArray[1], objArray[0], objArray[2]]);
     });
   });
+
+  describe('with from and to indices', () => {
+    test('should move element forward', () => {
+      const result = reorderArray(array, 0, 2);
+      expect(result).toEqual(['b', 'c', 'a', 'd', 'e']);
+    });
+
+    test('should move element backward', () => {
+      const result = reorderArray(array, 3, 1);
+      expect(result).toEqual(['a', 'd', 'b', 'c', 'e']);
+    });
+
+    test('should move to start', () => {
+      const result = reorderArray(array, 4, 0);
+      expect(result).toEqual(['e', 'a', 'b', 'c', 'd']);
+    });
+
+    test('should move to end', () => {
+      const result = reorderArray(array, 0, 4);
+      expect(result).toEqual(['b', 'c', 'd', 'e', 'a']);
+    });
+
+    test('should return original array when from index is out of bounds', () => {
+      const result = reorderArray(array, -1, 2);
+      expect(result).toBe(array);
+    });
+
+    test('should return original array when to index is out of bounds', () => {
+      const result = reorderArray(array, 0, 10);
+      expect(result).toBe(array);
+    });
+
+    test('should handle same from and to', () => {
+      const result = reorderArray(array, 2, 2);
+      expect(result).toEqual(array);
+    });
+  });
 });

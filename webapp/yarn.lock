@@ -4829,6 +4829,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@dbeaver/react-data-grid@workspace:common-react/@dbeaver/react-data-grid"
   dependencies:
+    "@dbeaver/js-helpers": "workspace:*"
     "@dbeaver/react-dnd": "workspace:^"
     "@dbeaver/tsconfig": "workspace:^"
     "@dbeaver/ui-kit": "workspace:^"
