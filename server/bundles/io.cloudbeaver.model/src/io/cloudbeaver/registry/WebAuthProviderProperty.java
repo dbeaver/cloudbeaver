@@ -17,12 +17,18 @@
 package io.cloudbeaver.registry;
 
 import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.Platform;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.DBPConditionalProperty;
 import org.jkiss.dbeaver.model.impl.LocalizedPropertyDescriptor;
+import org.jkiss.dbeaver.utils.RuntimeUtils;
+import org.osgi.framework.Bundle;
 
 public class WebAuthProviderProperty extends LocalizedPropertyDescriptor implements DBPConditionalProperty {
+
+    private static final String WEB_AUTH_PROPERTY_PREFIX = "prop.auth.model.";
+
     private final String[] requiredFeatures;
     @Nullable
     private final String type;
@@ -30,6 +36,7 @@ public class WebAuthProviderProperty extends LocalizedPropertyDescriptor impleme
     private final String authProviderId;
     private final String hideExpr;
     private final String readOnlyExpr;
+    private final Bundle bundle;
 
     public WebAuthProviderProperty(String category, IConfigurationElement config, String authProviderId) {
         super(category, config);
@@ -39,6 +46,7 @@ public class WebAuthProviderProperty extends LocalizedPropertyDescriptor impleme
         this.type = config.getAttribute("type");
         this.hideExpr = config.getAttribute("hideExpr");
         this.readOnlyExpr = config.getAttribute("readOnlyExpr");
+        this.bundle = extractBundle(config);
     }
 
     @NotNull
@@ -61,5 +69,36 @@ public class WebAuthProviderProperty extends LocalizedPropertyDescriptor impleme
     @Override
     public String getReadOnlyExpression() {
         return readOnlyExpr;
+    }
+
+    @NotNull
+    @Override
+    public String getLocalizedName(@NotNull String locale) {
+        return RuntimeUtils.getBundleLocalization(bundle, locale).getString(getPropertyId());
+    }
+
+    @Nullable
+    @Override
+    public String getLocalizedDescription(@NotNull String locale) {
+        return RuntimeUtils.getBundleLocalization(bundle, locale).getString(getPropertyId() + "." + ATTR_DESCRIPTION);
+    }
+
+    private String getPropertyId() {
+        if (authProviderId != null) {
+            return WEB_AUTH_PROPERTY_PREFIX + authProviderId + "." + this.getId();
+        } else {
+            return WEB_AUTH_PROPERTY_PREFIX + this.getId();
+        }
+    }
+
+    @NotNull
+    private Bundle extractBundle(@NotNull IConfigurationElement config) {
+        final Bundle bundle;
+        String bundleName = config.getContributor().getName();
+        bundle = Platform.getBundle(bundleName);
+        if (bundle == null) {
+            throw new IllegalStateException("Bundle '" + bundleName + "' not found");
+        }
+        return bundle;
     }
 }
