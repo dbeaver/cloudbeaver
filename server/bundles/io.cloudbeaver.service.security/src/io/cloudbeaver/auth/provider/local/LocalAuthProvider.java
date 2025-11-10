@@ -101,6 +101,11 @@ public class LocalAuthProvider implements SMAuthProvider<LocalAuthSession>, SMBr
 
     }
 
+    @Override
+    public boolean supportsOpeningSessionAsChild() {
+        return false;
+    }
+
     public static boolean changeUserPassword(@NotNull WebSession webSession, @NotNull String oldPassword, @NotNull String newPassword) throws DBException {
         String userName = webSession.getUser().getUserId();
 
