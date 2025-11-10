@@ -315,26 +315,28 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
 
           const excluded = !!filter && !title.toLowerCase().includes(filter.toLowerCase());
 
-          if (!excluded) {
-            items.push(
-              new MenuBaseItem(
-                {
-                  id: title,
-                  label: title,
-                  tooltip: title,
-                  icon: '/icons/plugin_datasource_context_switch_schema_sm.svg',
-                },
-                {
-                  onSelect: async () => {
-                    await this.connectionSchemaManagerService.selectSchema(title);
-                  },
-                },
-                {
-                  isDisabled: () => this.connectionSchemaManagerService.currentObjectSchemaId === title,
-                },
-              ),
-            );
+          if (excluded) {
+            continue;
           }
+
+          items.push(
+            new MenuBaseItem(
+              {
+                id: title,
+                label: title,
+                tooltip: title,
+                icon: '/icons/plugin_datasource_context_switch_schema_sm.svg',
+              },
+              {
+                onSelect: async () => {
+                  await this.connectionSchemaManagerService.selectSchema(title);
+                },
+              },
+              {
+                isDisabled: () => this.connectionSchemaManagerService.currentObjectSchemaId === title,
+              },
+            ),
+          );
         }
 
         for (const catalogData of catalogList) {
@@ -354,26 +356,28 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
           if (catalogData.schemaList.length === 0) {
             const excluded = !!filter && !catalog.name.toLowerCase().includes(filter.toLowerCase());
 
-            if (!excluded) {
-              items.push(
-                new MenuBaseItem(
-                  {
-                    id: catalog.name,
-                    label: catalog.name,
-                    tooltip: catalog.name,
-                    icon: '/icons/plugin_datasource_context_switch_database_sm.svg',
-                  },
-                  {
-                    onSelect: async () => {
-                      await this.connectionSchemaManagerService.selectCatalog(catalog.name!);
-                    },
-                  },
-                  {
-                    isDisabled: () => this.connectionSchemaManagerService.currentObjectCatalogId === catalog.name,
-                  },
-                ),
-              );
+            if (excluded) {
+              continue;
             }
+
+            items.push(
+              new MenuBaseItem(
+                {
+                  id: catalog.name,
+                  label: catalog.name,
+                  tooltip: catalog.name,
+                  icon: '/icons/plugin_datasource_context_switch_database_sm.svg',
+                },
+                {
+                  onSelect: async () => {
+                    await this.connectionSchemaManagerService.selectCatalog(catalog.name!);
+                  },
+                },
+                {
+                  isDisabled: () => this.connectionSchemaManagerService.currentObjectCatalogId === catalog.name,
+                },
+              ),
+            );
           }
 
           for (const schema of catalogData.schemaList) {
@@ -384,28 +388,30 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
             const title = NodeManagerUtils.concatSchemaAndCatalog(catalog.name, schema.name);
             const excluded = !!filter && !title.toLowerCase().includes(filter.toLowerCase());
 
-            if (!excluded) {
-              items.push(
-                new MenuBaseItem(
-                  {
-                    id: title,
-                    label: title,
-                    tooltip: title,
-                    icon: '/icons/plugin_datasource_context_switch_schema_sm.svg',
-                  },
-                  {
-                    onSelect: async () => {
-                      await this.connectionSchemaManagerService.selectSchema(schema.name!, catalog.name!);
-                    },
-                  },
-                  {
-                    isDisabled: () =>
-                      this.connectionSchemaManagerService.currentObjectSchemaId === schema.name &&
-                      this.connectionSchemaManagerService.currentObjectCatalogId === catalog.name,
-                  },
-                ),
-              );
+            if (excluded) {
+              continue;
             }
+
+            items.push(
+              new MenuBaseItem(
+                {
+                  id: title,
+                  label: title,
+                  tooltip: title,
+                  icon: '/icons/plugin_datasource_context_switch_schema_sm.svg',
+                },
+                {
+                  onSelect: async () => {
+                    await this.connectionSchemaManagerService.selectSchema(schema.name!, catalog.name!);
+                  },
+                },
+                {
+                  isDisabled: () =>
+                    this.connectionSchemaManagerService.currentObjectSchemaId === schema.name &&
+                    this.connectionSchemaManagerService.currentObjectCatalogId === catalog.name,
+                },
+              ),
+            );
           }
         }
 
