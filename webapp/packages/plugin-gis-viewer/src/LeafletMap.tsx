@@ -126,7 +126,7 @@ export const LeafletMap: React.FC<Props> = function LeafletMap({ geoJSON, crsKey
             continue;
           }
 
-          popupContent += '<tr><td>' + key + '</td><td>' + value + '</td></tr>';
+          popupContent += '<tr><td style="padding-right: 8px;">' + key + '</td><td>' + value + '</td></tr>';
         }
         popupContent += '</table>';
         layer.bindPopup(popupContent, popupOption);
