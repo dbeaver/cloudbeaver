@@ -10,11 +10,11 @@ import { observer } from 'mobx-react-lite';
 import { useEffect, useMemo, useState } from 'react';
 import { useTabState } from 'reakit';
 
-import { useAutoLoad, useExecutor, useObjectRef, useObservableRef } from '@cloudbeaver/core-blocks';
+import { useAutoLoad, useExecutor, useObjectRef, useObservableRef, useUserData } from '@cloudbeaver/core-blocks';
 import { useDataContext } from '@cloudbeaver/core-data-context';
 import { Executor, ExecutorInterrupter } from '@cloudbeaver/core-executor';
 import { MetadataMap, type MetadataValueGetter, schema } from '@cloudbeaver/core-utils';
-import { isDefined, isNotNullDefined } from '@dbeaver/js-helpers';
+import { isDefined, isNotNullDefined, reorderArray } from '@dbeaver/js-helpers';
 
 import type { ITabData, ITabInfo, ITabsContainer } from './TabsContainer/ITabsContainer.js';
 import { type ITabsContext, type TabDirection, TabsContext } from './TabsContext.js';
@@ -86,7 +86,33 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
     manual,
   });
 
-  const onReorder = onReorderProp || (container?.reorder ? container.reorder.bind(container) : undefined);
+  const tabOrderKey = container ? `tabs-order-${container.areaLabel}` : 'tabs-no-persist';
+  const tabsPersisted = useUserData(
+    tabOrderKey,
+    () => ({}) as Record<string, number>,
+    order => {
+      if (container) {
+        container.applyOrder(order);
+      }
+    },
+  );
+
+  const onReorder =
+    onReorderProp ||
+    ((draggedTabId: string, targetTabId: string, position: 'before' | 'after') => {
+      if (container) {
+        const result = reorderArray(displayed, draggedTabId, { item: targetTabId, position });
+        const orderMap = result.reduce(
+          (acc, tabId, index) => {
+            acc[tabId] = index;
+            return acc;
+          },
+          {} as Record<string, number>,
+        );
+        Object.assign(tabsPersisted, orderMap);
+        container.applyOrder(orderMap);
+      }
+    });
 
   const dynamic = useObjectRef(
     () => ({
@@ -160,7 +186,7 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
       tabId: currentSelectedId,
       props,
     });
-  }, [currentSelectedId]);
+  }, [currentSelectedId, dynamic.selectedId, openExecutor, props]);
 
   const value = useObservableRef<ITabsContext<T>>(
     () => ({

@@ -5,11 +5,10 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { action, makeObservable, observable, runInAction } from 'mobx';
+import { makeObservable, observable } from 'mobx';
 
 import type { MetadataMap, MetadataValueGetter, schema } from '@cloudbeaver/core-utils';
 import { SyncExecutor } from '@cloudbeaver/core-executor';
-import { reorderArray } from '@dbeaver/js-helpers';
 
 import type { ITabInfo, ITabInfoOptions, ITabsContainer } from './ITabsContainer.js';
 
@@ -37,7 +36,6 @@ export class TabsContainer<TProps = void, TOptions extends Record<string, any> |
     makeObservable<TabsContainer<TProps, TOptions>, 'currentTabId'>(this, {
       tabInfoMap: observable.shallow,
       currentTabId: observable,
-      reorder: action,
     });
   }
 
@@ -137,24 +135,15 @@ export class TabsContainer<TProps = void, TOptions extends Record<string, any> |
     });
   }
 
-  reorder(draggedTabId: string, targetTabId: string, position: 'before' | 'after'): void {
-    const displayed = this.getDisplayed().map(info => info.key);
-    const result = reorderArray(displayed, draggedTabId, { item: targetTabId, position });
-
-    if (displayed === result) {
-      return;
-    }
-
-    runInAction(() => {
-      result.forEach((key, index) => {
-        const existingInfo = this.tabInfoMap.get(key);
-        if (existingInfo) {
-          this.tabInfoMap.set(key, {
-            ...existingInfo,
-            order: index,
-          });
-        }
-      });
+  applyOrder(tabsOrderMap: Record<string, number>): void {
+    Object.entries(tabsOrderMap).forEach(([tabId, index]) => {
+      const existingInfo = this.tabInfoMap.get(tabId);
+      if (existingInfo) {
+        this.tabInfoMap.set(tabId, {
+          ...existingInfo,
+          order: index,
+        });
+      }
     });
   }
 }
