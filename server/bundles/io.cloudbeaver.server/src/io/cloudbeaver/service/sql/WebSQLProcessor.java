@@ -1078,7 +1078,6 @@ public class WebSQLProcessor implements WebSessionProvider {
                     try (WebSQLQueryDataReceiver dataReceiver = new WebSQLQueryDataReceiver(contextInfo, dataContainer, dataFormat)) {
                         readResultSet(dbStat.getSession(), resultSet, webDataFilter, dataReceiver);
                         results.setResultSet(dataReceiver.getResultSet());
-                        dataReceiver.getResultSet().getResultsInfo().setQueryText(resultSet.getSourceStatement().getQueryString());
                     }
                 }
                 resultList.add(results);
