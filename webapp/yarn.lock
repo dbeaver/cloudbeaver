@@ -4842,7 +4842,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@dbeaver/react-dnd@workspace:*, @dbeaver/react-dnd@workspace:^, @dbeaver/react-dnd@workspace:common-react/@dbeaver/react-dnd":
+"@dbeaver/react-dnd@workspace:^, @dbeaver/react-dnd@workspace:common-react/@dbeaver/react-dnd":
   version: 0.0.0-use.local
   resolution: "@dbeaver/react-dnd@workspace:common-react/@dbeaver/react-dnd"
   dependencies:
@@ -4912,7 +4912,6 @@ __metadata:
   dependencies:
     "@ariakit/react": "npm:^0"
     "@dbeaver/js-helpers": "workspace:*"
-    "@dbeaver/react-dnd": "workspace:*"
     "@dbeaver/react-translate": "workspace:^"
     "@dbeaver/tsconfig": "workspace:^"
     "@ladle/react": "npm:^5"
