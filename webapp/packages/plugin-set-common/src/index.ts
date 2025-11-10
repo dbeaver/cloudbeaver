@@ -59,6 +59,7 @@ import pluginDataViewerResultSetGrouping from '@cloudbeaver/plugin-data-viewer-r
 import pluginDataViewerResultTraceDetails from '@cloudbeaver/plugin-data-viewer-result-trace-details/module';
 import pluginDatasourceContextSwitch from '@cloudbeaver/plugin-datasource-context-switch/module';
 import pluginDatasourceTransactionManager from '@cloudbeaver/plugin-datasource-transaction-manager/module';
+import pluginDataViewerRequestQueryViewer from '@cloudbeaver/plugin-data-viewer-request-query-viewer/module';
 import pluginDdlViewer from '@cloudbeaver/plugin-ddl-viewer/module';
 import pluginDevTools from '@cloudbeaver/plugin-devtools/module';
 import pluginGisViewer from '@cloudbeaver/plugin-gis-viewer/module';
@@ -160,6 +161,7 @@ export const commonSet = [
   pluginDataViewer,
   pluginDataViewerResultTraceDetails,
   pluginDataViewerResultSetGrouping,
+  pluginDataViewerRequestQueryViewer,
   pluginGisViewer,
   pluginDdlViewer,
   pluginObjectViewer,
