@@ -950,9 +950,7 @@ public class WebSQLProcessor implements WebSessionProvider {
         DBCExecutionContext executionContext = getExecutionContext(dataContainer);
         try (DBCSession session = executionContext.openSession(monitor, DBCExecutionPurpose.USER, "Generate data update batches")) {
             DBDDataFilter dataFilter = new DBDDataFilter();
-            if (!resultsInfo.isSingleRow()) {
-                addKeyAttributes(resultsInfo, row, dataContainer, session, dataFilter);
-            }
+            addKeyAttributes(resultsInfo, row, dataContainer, session, dataFilter);
             WebExecutionSource executionSource = new WebExecutionSource(dataContainer, executionContext, this);
             dataContainer.readData(
                 executionSource, session, dataReceiver, dataFilter,
