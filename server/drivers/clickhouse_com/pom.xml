@@ -18,7 +18,7 @@
         <dependency>
             <groupId>com.clickhouse</groupId>
             <artifactId>clickhouse-jdbc</artifactId>
-            <version>0.9.3</version>
+            <version>0.8.5</version>
             <classifier>http</classifier>
             <exclusions>
                 <exclusion>
@@ -30,7 +30,7 @@
         <dependency>
             <groupId>org.apache.httpcomponents.client5</groupId>
             <artifactId>httpclient5</artifactId>
-            <version>5.4.4</version>
+            <version>5.3.1</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.slf4j</groupId>
