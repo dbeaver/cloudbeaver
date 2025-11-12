@@ -92,3 +92,5 @@ export * from './SideBarPanel/SideBarPanelLoader.js';
 export * from './SideBarPanel/SideBarPanelService.js';
 
 export * from './Screens/AppScreen/BaseOptionsPanelService.js';
+export * from './ContextMenu/ContextMenuSearch/ContextMenuSearchItem.js';
+export * from './ContextMenu/ContextMenuSearch/DATA_CONTEXT_MENU_SEARCH.js';

@@ -16,6 +16,7 @@
  */
 package io.cloudbeaver.service;
 
+import graphql.GraphQLContext;
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.idl.SchemaParser;
 import graphql.schema.idl.TypeDefinitionRegistry;
@@ -27,9 +28,11 @@ import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.session.WebSessionProvider;
 import io.cloudbeaver.server.WebAppUtils;
 import io.cloudbeaver.server.graphql.GraphQLEndpoint;
+import io.cloudbeaver.server.graphql.GraphQLLoggerUtil;
 import io.cloudbeaver.service.security.SMUtils;
 import io.cloudbeaver.utils.ServletAppUtils;
 import io.cloudbeaver.utils.WebDataSourceUtils;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
@@ -340,16 +343,27 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
                 }
             }
         }
+        // Perform any checks before action call
+        protected void beforeWebActionCall(WebAction webAction, Method method, Object[] args) throws DBException {
 
-    }
+            GraphQLContext graphQlContext = this.env.getGraphQlContext();
+            HttpServletRequest request = graphQlContext.get("request");
+            if (request == null) {
+                return;
+            }
+            String sessionId = GraphQLLoggerUtil.getSmSessionId(request);
+            String userId = GraphQLLoggerUtil.getUserId(request);
+            String loggerMessage = GraphQLLoggerUtil.buildLoggerMessage(sessionId, userId, method, args);
 
-    // Perform any checks before action call
-    protected void beforeWebActionCall(WebAction webAction, Method method, Object[] args) throws DBException {
-        setLogContext(method, args);
-    }
+            log.debug("API > " + method.getName() + loggerMessage);
 
-    protected void afterWebActionCall(WebAction webAction, Method method, Object[] args) throws DBException {
-        Log.setContext(null);
+            setLogContext(method, args);
+        }
+
+        protected void afterWebActionCall(WebAction webAction, Method method, Object[] args) throws DBException {
+            Log.setContext(null);
+        }
+
     }
 
     protected void setLogContext(Method method, @Nullable Object[] args) {

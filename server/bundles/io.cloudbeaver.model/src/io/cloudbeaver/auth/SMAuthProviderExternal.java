@@ -74,4 +74,8 @@ public interface SMAuthProviderExternal<AUTH_SESSION extends SMSession> extends 
      */
     default void postAuthentication() {}
 
+    @Override
+    default boolean supportsOpeningSessionAsChild() {
+        return true;
+    }
 }

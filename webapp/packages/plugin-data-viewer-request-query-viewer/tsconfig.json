@@ -1,0 +1,70 @@
+{
+  "extends": "@cloudbeaver/tsconfig/tsconfig.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "lib",
+    "tsBuildInfoFile": "lib/tsconfig.tsbuildinfo",
+    "composite": true
+  },
+  "references": [
+    {
+      "path": "../../common-react/@dbeaver/react-tests"
+    },
+    {
+      "path": "../../common-react/@dbeaver/ui-kit"
+    },
+    {
+      "path": "../../common-typescript/@dbeaver/cli"
+    },
+    {
+      "path": "../../common-typescript/@dbeaver/js-helpers"
+    },
+    {
+      "path": "../core-blocks"
+    },
+    {
+      "path": "../core-cli"
+    },
+    {
+      "path": "../core-connections"
+    },
+    {
+      "path": "../core-di"
+    },
+    {
+      "path": "../core-dialogs"
+    },
+    {
+      "path": "../core-localization"
+    },
+    {
+      "path": "../core-navigation-tree"
+    },
+    {
+      "path": "../plugin-codemirror6"
+    },
+    {
+      "path": "../plugin-data-viewer"
+    },
+    {
+      "path": "../plugin-sql-editor"
+    },
+    {
+      "path": "../plugin-sql-editor-navigation-tab"
+    },
+    {
+      "path": "../plugin-sql-editor-new"
+    }
+  ],
+  "include": [
+    "__custom_mocks__/**/*",
+    "src/**/*",
+    "src/**/*.json",
+    "src/**/*.css",
+    "src/**/*.scss"
+  ],
+  "exclude": [
+    "**/node_modules",
+    "lib/**/*"
+  ]
+}
