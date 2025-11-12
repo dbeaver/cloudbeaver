@@ -104,7 +104,7 @@ public class WebSQLQueryDataContainer implements DBSDataContainer, DBPContextPro
         long maxRows,
         long flags,
         int fetchSize
-    ) throws DBCException {
+    ) throws DBException {
         return queryDataContainer.readData(source, session, dataReceiver, dataFilter, firstRow, maxRows, flags, fetchSize);
     }
 

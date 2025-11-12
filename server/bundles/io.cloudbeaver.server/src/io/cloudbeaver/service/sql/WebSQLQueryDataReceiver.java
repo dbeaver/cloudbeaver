@@ -162,6 +162,7 @@ class WebSQLQueryDataReceiver implements DBDDataReceiver {
         webResultSet.setReadOnlyInfo(contextInfo.getProcessor().getExecutionContext());
 
         WebSQLResultsInfo resultsInfo = contextInfo.saveResult(dataContainer, trace, bindings, rows.size() == 1);
+        resultsInfo.setQueryText(resultSet.getSourceStatement().getQueryString());
         webResultSet.setResultsInfo(resultsInfo);
 
         boolean isSingleEntity = DBExecUtils.detectSingleSourceTable(bindings) != null;
@@ -232,6 +233,6 @@ class WebSQLQueryDataReceiver implements DBDDataReceiver {
 
     @Override
     public void close() {
-        rows.clear();
+        // no-op
     }
 }
