@@ -31,6 +31,7 @@ export const Tab = observer<TabProps>(function Tab({ after, ...props }) {
   const {
     ref: dragRef,
     isDragging,
+    dropAllowed,
     dropPosition,
     dragProps,
     dropProps,
@@ -53,8 +54,8 @@ export const Tab = observer<TabProps>(function Tab({ after, ...props }) {
         className={s(styles, {
           tabOuter: true,
           dragging: isDragging,
-          dropBefore: dropPosition === 'before',
-          dropAfter: dropPosition === 'after',
+          dropBefore: dropAllowed && dropPosition === 'before',
+          dropAfter: dropAllowed && dropPosition === 'after',
         })}
         onMouseUp={onMouseUpHandler}
         {...dragProps}

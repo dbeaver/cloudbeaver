@@ -17,6 +17,7 @@ export interface ITabDragAndDropOptions {
 export interface ITabDragAndDropResult {
   ref: React.RefObject<HTMLDivElement | null>;
   isDragging: boolean;
+  dropAllowed: boolean;
   dropPosition: 'before' | 'after' | undefined;
   dragProps: {
     draggable?: boolean;
@@ -35,6 +36,7 @@ export interface ITabDragAndDropResult {
 export function useTabDragAndDrop({ tabId, stateKey, onReorder }: ITabDragAndDropOptions): ITabDragAndDropResult {
   const ref = useRef<HTMLDivElement>(null);
   const [dropPosition, setDropPosition] = useState<'before' | 'after' | undefined>(undefined);
+  const [dropAllowed, setDropAllowed] = useState(false);
 
   const onReorderRef = useRef(onReorder);
   onReorderRef.current = onReorder;
@@ -53,7 +55,9 @@ export function useTabDragAndDrop({ tabId, stateKey, onReorder }: ITabDragAndDro
       const draggedTabId = store?.getData('dbeaver-tab-id');
       const draggedStateKey = store?.getData('dbeaver-tab-state-key');
 
-      return !!stateKey && draggedTabId !== tabId && draggedStateKey === stateKey;
+      const allowed = !!stateKey && draggedTabId !== tabId && draggedStateKey === stateKey;
+      setDropAllowed(allowed);
+      return allowed;
     },
     onDragOver: event => {
       event.preventDefault();
@@ -101,6 +105,7 @@ export function useTabDragAndDrop({ tabId, stateKey, onReorder }: ITabDragAndDro
   return {
     ref,
     isDragging,
+    dropAllowed,
     dropPosition,
     dragProps,
     dropProps,
