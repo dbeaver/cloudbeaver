@@ -10,11 +10,11 @@ import { observer } from 'mobx-react-lite';
 import { useEffect, useMemo, useState } from 'react';
 import { useTabState } from 'reakit';
 
-import { useAutoLoad, useExecutor, useObjectRef, useObservableRef, useUserData } from '@cloudbeaver/core-blocks';
+import { useAutoLoad, useExecutor, useObjectRef, useObservableRef } from '@cloudbeaver/core-blocks';
 import { useDataContext } from '@cloudbeaver/core-data-context';
 import { Executor, ExecutorInterrupter } from '@cloudbeaver/core-executor';
 import { MetadataMap, type MetadataValueGetter, schema } from '@cloudbeaver/core-utils';
-import { isDefined, isNotNullDefined, reorderArray } from '@dbeaver/js-helpers';
+import { isDefined, isNotNullDefined } from '@dbeaver/js-helpers';
 
 import type { ITabData, ITabInfo, ITabsContainer } from './TabsContainer/ITabsContainer.js';
 import { type ITabsContext, type TabDirection, TabsContext } from './TabsContext.js';
@@ -36,7 +36,7 @@ export type TabsStateProps<T = Record<string, any>> = ExtractContainerProps<T> &
     autoSelect?: boolean;
     tabList?: string[];
     enabledBaseActions?: boolean;
-    reorderable?: boolean;
+    reorderStateKey?: string;
     canClose?: (tab: ITabData<T>) => boolean;
     onChange?: (tab: ITabData<T>) => void;
     onClose?: (tab: ITabData<T>) => void;
@@ -55,11 +55,11 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
   manual,
   tabList,
   enabledBaseActions,
-  reorderable,
+  reorderStateKey,
   onChange: onOpen,
   onClose,
   canClose,
-  onReorder: onReorderProp,
+  onReorder,
   ...rest
 }: TabsStateProps<T>): React.ReactElement | null {
   const context = useDataContext();
@@ -86,34 +86,6 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
     manual,
   });
 
-  const tabOrderKey = container ? `tabs-order-${container.areaLabel}` : 'tabs-no-persist';
-  const tabsPersisted = useUserData(
-    tabOrderKey,
-    () => ({}) as Record<string, number>,
-    order => {
-      if (container) {
-        container.applyOrder(order);
-      }
-    },
-  );
-
-  const onReorder =
-    onReorderProp ||
-    ((draggedTabId: string, targetTabId: string, position: 'before' | 'after') => {
-      if (container) {
-        const result = reorderArray(displayed, draggedTabId, { item: targetTabId, position });
-        const orderMap = result.reduce(
-          (acc, tabId, index) => {
-            acc[tabId] = index;
-            return acc;
-          },
-          {} as Record<string, number>,
-        );
-        Object.assign(tabsPersisted, orderMap);
-        container.applyOrder(orderMap);
-      }
-    });
-
   const dynamic = useObjectRef(
     () => ({
       selectedId: state.selectedId,
@@ -123,7 +95,6 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
       open: onOpen,
       close: onClose,
       reorder: onReorder,
-      reorderable,
       props,
       tabsState,
       container,
@@ -260,6 +231,7 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
       reorder(draggedTabId: string, targetTabId: string, position: 'before' | 'after') {
         dynamic.reorder?.(draggedTabId, targetTabId, position);
       },
+      reorderStateKey,
     }),
     {
       state: observable.ref,
@@ -272,7 +244,7 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
       closable: observable.ref,
       tabList: observable.ref,
       enabledBaseActions: observable.ref,
-      reorderable: observable.ref,
+      reorderStateKey: observable.ref,
       getTabInfo: action.bound,
       getTabState: action.bound,
       getLocalState: action.bound,
@@ -294,7 +266,7 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
       closable,
       tabList,
       enabledBaseActions,
-      reorderable,
+      reorderStateKey,
     },
   );
 

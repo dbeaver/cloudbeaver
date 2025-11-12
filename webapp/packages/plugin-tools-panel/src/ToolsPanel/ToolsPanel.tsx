@@ -11,7 +11,7 @@ import { useRef } from 'react';
 
 import { s, useS, useUserData } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { type ITabData, TabList, TabPanelList, TabsState } from '@cloudbeaver/core-ui';
+import { type ITabData, TabList, TabPanelList, TabsState, useTabOrderPersistence } from '@cloudbeaver/core-ui';
 import { isArraysEqual } from '@cloudbeaver/core-utils';
 
 import styles from './ToolsPanel.module.css';
@@ -26,6 +26,8 @@ export const ToolsPanel = observer(function ToolsPanel() {
   const style = useS(styles);
 
   const state = useUserData<IToolsState>('tools', () => ({ selectedTabId: undefined }));
+  const tabsStateKey = 'tools-panel';
+  const onReorder = useTabOrderPersistence(tabsStateKey, toolsPanelService.tabsContainer);
   const tabs = toolsPanelService.tabsContainer.getIdList();
   const prevTabs = useRef<string[]>(tabs);
   const equal = isArraysEqual(prevTabs.current, tabs);
@@ -60,7 +62,14 @@ export const ToolsPanel = observer(function ToolsPanel() {
   }
 
   return (
-    <TabsState currentTabId={state.selectedTabId} container={toolsPanelService.tabsContainer} lazy reorderable onChange={handleTabChange}>
+    <TabsState
+      currentTabId={state.selectedTabId}
+      container={toolsPanelService.tabsContainer}
+      reorderStateKey={tabsStateKey}
+      lazy
+      onChange={handleTabChange}
+      onReorder={onReorder}
+    >
       <div className={s(style, { box: true })}>
         <TabList className={s(style, { tabList: true })} underline />
         <div className={s(style, { contentBox: true })}>

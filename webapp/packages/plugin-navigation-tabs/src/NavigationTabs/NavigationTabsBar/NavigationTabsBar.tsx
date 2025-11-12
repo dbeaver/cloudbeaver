@@ -110,9 +110,9 @@ export const NavigationTabsBar = observer<Props>(function NavigationTabsBar({ cl
           }
           tabList={navigation.tabIdList}
           multipleRows={navigationSettings.hasMultipleRows}
+          reorderStateKey="navigation-tabs-bar"
           autoSelect
           enabledBaseActions
-          reorderable
           onChange={handleTabChange}
           onReorder={handleReorder}
         >

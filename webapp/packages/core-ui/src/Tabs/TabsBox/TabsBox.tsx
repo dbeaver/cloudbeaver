@@ -38,7 +38,7 @@ type TabsBoxProps = PropsWithChildren<{
   enabledBaseActions?: boolean;
   autoSelect?: boolean;
   className?: string;
-  reorderable?: boolean;
+  reorderStateKey?: string;
   onChange?: (tab: ITabData<any>) => void;
   onReorder?: (draggedTabId: string, targetTabId: string, position: 'before' | 'after') => void;
 }>;
@@ -51,7 +51,6 @@ export const TabsBox = forwardRef<HTMLDivElement, TabsBoxProps>(function TabsBox
     currentTabId,
     tabs,
     tabIndex,
-    reorderable,
     localState,
     tabsClassName,
     tabList,
@@ -62,6 +61,7 @@ export const TabsBox = forwardRef<HTMLDivElement, TabsBoxProps>(function TabsBox
     onChange,
     multipleRows,
     onReorder,
+    reorderStateKey,
   },
   ref,
 ) {
@@ -75,7 +75,7 @@ export const TabsBox = forwardRef<HTMLDivElement, TabsBoxProps>(function TabsBox
         tabList={tabList}
         autoSelect={autoSelect}
         enabledBaseActions={enabledBaseActions}
-        reorderable={reorderable}
+        reorderStateKey={reorderStateKey}
         onReorder={onReorder}
         onChange={onChange}
       >

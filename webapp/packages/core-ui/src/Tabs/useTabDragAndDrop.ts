@@ -10,8 +10,8 @@ import { useDrag, useDrop } from '@dbeaver/react-dnd';
 
 export interface ITabDragAndDropOptions {
   tabId: string;
+  stateKey: string | undefined;
   onReorder: ((draggedTabId: string, targetTabId: string, position: 'before' | 'after') => void) | null;
-  enabled?: boolean;
 }
 
 export interface ITabDragAndDropResult {
@@ -32,7 +32,7 @@ export interface ITabDragAndDropResult {
   };
 }
 
-export function useTabDragAndDrop({ tabId, onReorder, enabled = true }: ITabDragAndDropOptions): ITabDragAndDropResult {
+export function useTabDragAndDrop({ tabId, stateKey, onReorder }: ITabDragAndDropOptions): ITabDragAndDropResult {
   const ref = useRef<HTMLDivElement>(null);
   const [dropPosition, setDropPosition] = useState<'before' | 'after' | undefined>(undefined);
 
@@ -40,17 +40,20 @@ export function useTabDragAndDrop({ tabId, onReorder, enabled = true }: ITabDrag
   onReorderRef.current = onReorder;
 
   const { isDragging, props: dragProps } = useDrag({
-    draggable: enabled,
+    draggable: !!stateKey,
     onDragStart: (event, store) => {
       event.stopPropagation();
       store.setData('dbeaver-tab-id', tabId);
+      store.setData('dbeaver-tab-state-key', stateKey);
     },
   });
 
   const { props: dropProps } = useDrop({
     canDrop: (event, store) => {
       const draggedTabId = store?.getData('dbeaver-tab-id');
-      return enabled && draggedTabId !== tabId;
+      const draggedStateKey = store?.getData('dbeaver-tab-state-key');
+
+      return !!stateKey && draggedTabId !== tabId && draggedStateKey === stateKey;
     },
     onDragOver: event => {
       event.preventDefault();

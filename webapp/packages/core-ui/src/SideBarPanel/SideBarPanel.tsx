@@ -18,6 +18,7 @@ import { TabsState } from '../Tabs/TabsState.js';
 import styles from './shared/SideBarPanel.module.css';
 import SideBarPanelTab from './shared/SideBarPanelTab.module.css';
 import SideBarPanelTabPanel from './shared/SideBarPanelTabPanel.module.css';
+import { useTabOrderPersistence } from '../Tabs/useTabOrderPersistence.js';
 
 export interface SideBarPanelProps {
   container: TabsContainer;
@@ -42,9 +43,18 @@ const sideBarPanelRegistry: StyleRegistry = [
 
 export const SideBarPanel = observer<SideBarPanelProps>(function SideBarPanel({ container }) {
   const style = useS(styles);
+  const reorderStateKey = 'side-bar-panel';
+  const onReorder = useTabOrderPersistence(reorderStateKey, container);
   return (
     <SContext registry={sideBarPanelRegistry}>
-      <TabsState container={container} currentTabId={container.selectedId} lazy reorderable onChange={tab => container.select(tab.tabId, tab.props)}>
+      <TabsState
+        container={container}
+        currentTabId={container.selectedId}
+        reorderStateKey={reorderStateKey}
+        lazy
+        onChange={tab => container.select(tab.tabId, tab.props)}
+        onReorder={onReorder}
+      >
         <div className={s(style, { box: true })}>
           <TabList className={s(style, { tabList: true })} underline />
           <div className={s(style, { contentBox: true })}>
