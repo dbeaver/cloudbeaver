@@ -110,7 +110,7 @@ public class WebServiceSQL implements DBWServiceSQL {
 
     @Override
     @NotNull
-    public WebSQLDialectInfo getDialectInfo(@NotNull WebConnectionInfo connectionInfo) throws DBWebException {
+    public WebSQLDialectInfo getDialectInfo(@NotNull WebConnectionInfo connectionInfo) {
         DBPDataSourceContainer dataSourceContainer = connectionInfo.getDataSourceContainer();
         SQLDialect dialect = getSqlDialectFromConnection(dataSourceContainer);
         return new WebSQLDialectInfo(dataSourceContainer.getDataSource(), dialect);
@@ -400,21 +400,16 @@ public class WebServiceSQL implements DBWServiceSQL {
         DBExecUtils.tryExecuteRecover(
             monitor,
             contextInfo.getProcessor().getConnection().getDataSource(),
-            monitor1 -> {
-                try {
-                    result[0] = contextInfo.getProcessor().updateResultsDataBatch(
-                        monitor1, contextInfo, resultsId, updatedRows, deletedRows, addedRows, dataFormat);
-                } catch (Exception e) {
-                    throw new InvocationTargetException(e);
-                }
-            }
+            monitor1 ->
+                result[0] = contextInfo.getProcessor().updateResultsDataBatch(
+                    monitor1, contextInfo, resultsId, updatedRows, deletedRows, addedRows, dataFormat)
         );
         return result[0];
     }
 
     @FunctionalInterface
     private interface ThrowableFunction<T, R> {
-        R apply(T obj) throws Exception;
+        R apply(T obj) throws DBException;
     }
 
     @Override
@@ -437,9 +432,6 @@ public class WebServiceSQL implements DBWServiceSQL {
         @NotNull Integer lobColumnIndex,
         @NotNull WebSQLResultsRow row
     ) throws DBWebException {
-        if (row == null) {
-            throw new DBWebException("Results row is not found");
-        }
         WebSQLProcessor processor = contextInfo.getProcessor();
         ThrowableFunction<DBRProgressMonitor, String> function = monitor -> processor.readStringValue(
             monitor, contextInfo, resultsId, lobColumnIndex, row);
@@ -457,13 +449,7 @@ public class WebServiceSQL implements DBWServiceSQL {
             DBExecUtils.tryExecuteRecover(
                 processor.getWebSession().getProgressMonitor(),
                 processor.getConnection().getDataSource(),
-                monitor -> {
-                    try {
-                        result.append(function.apply(monitor));
-                    } catch (Exception e) {
-                        throw new InvocationTargetException(e);
-                    }
-                }
+                monitor -> result.append(function.apply(monitor))
             );
             return result.toString();
         } catch (DBException e) {
@@ -476,7 +462,8 @@ public class WebServiceSQL implements DBWServiceSQL {
         try {
             return contextInfo.getProcessor().generateResultsDataUpdateScript(
                 contextInfo.getProcessor().getWebSession().getProgressMonitor(),
-                contextInfo, resultsId, updatedRows, deletedRows, addedRows, dataFormat);
+                contextInfo, resultsId, updatedRows, deletedRows, addedRows
+            );
         } catch (DBException e) {
             throw new DBWebException("Error genering update script", e);
         }
@@ -516,10 +503,11 @@ public class WebServiceSQL implements DBWServiceSQL {
         @NotNull String nodePath,
         @Nullable String resultId,
         @Nullable WebSQLDataFilter filter,
-        @Nullable WebDataFormat dataFormat) throws DBWebException {
-        WebAsyncTaskProcessor<String> runnable = new WebAsyncTaskProcessor<String>() {
+        @Nullable WebDataFormat dataFormat
+    ) {
+        WebAsyncTaskProcessor<String> runnable = new WebAsyncTaskProcessor<>() {
             @Override
-            public void run(DBRProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+            public void run(DBRProgressMonitor monitor) throws InvocationTargetException {
                 try {
                     monitor.beginTask("Read data", 1);
                     monitor.subTask("Extra data from " + nodePath);
@@ -533,7 +521,8 @@ public class WebServiceSQL implements DBWServiceSQL {
                         dataContainer,
                         resultId,
                         filter != null ? filter : new WebSQLDataFilter(),
-                        dataFormat);
+                        dataFormat
+                    );
                     this.result = executeResults.getStatusMessage();
                     this.extendedResults = executeResults;
                 } catch (Throwable e) {
@@ -564,24 +553,25 @@ public class WebServiceSQL implements DBWServiceSQL {
     @Override
     public WebSQLExecuteInfo asyncGetQueryResults(@NotNull WebSession webSession, @NotNull String taskId) throws DBWebException {
         WebAsyncTaskInfo taskStatus = webSession.asyncTaskStatus(taskId, false);
-        if (taskStatus != null) {
-            return (WebSQLExecuteInfo) taskStatus.getExtendedResult();
-        }
-        return null;
+        return (WebSQLExecuteInfo) taskStatus.getExtendedResult();
     }
 
     ////////////////////////////////////////////////////
     // Explain plan
 
     @Override
-    public WebAsyncTaskInfo asyncSqlExplainExecutionPlan(@NotNull WebSQLContextInfo contextInfo, @NotNull String sql, @NotNull Map<String, Object> configuration) throws DBException {
-        WebAsyncTaskProcessor<String> runnable = new WebAsyncTaskProcessor<String>() {
+    public WebAsyncTaskInfo asyncSqlExplainExecutionPlan(
+        @NotNull WebSQLContextInfo contextInfo,
+        @NotNull String sql,
+        @NotNull Map<String, Object> configuration
+    ) {
+        WebAsyncTaskProcessor<String> runnable = new WebAsyncTaskProcessor<>() {
             @Override
-            public void run(DBRProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+            public void run(DBRProgressMonitor monitor) throws InvocationTargetException {
                 try {
                     monitor.beginTask("Explain execution plan", 1);
                     monitor.subTask("Explain query [" + sql + "] execution plan");
-                    WebSQLExecutionPlan executeResults = contextInfo.getProcessor().explainExecutionPlan(monitor, contextInfo, sql, configuration);
+                    WebSQLExecutionPlan executeResults = contextInfo.getProcessor().explainExecutionPlan(monitor, sql, configuration);
                     this.result = "Execution plan explain has been scheduled";
                     this.extendedResults = executeResults;
                 } catch (Throwable e) {
@@ -597,14 +587,11 @@ public class WebServiceSQL implements DBWServiceSQL {
     @Override
     public WebSQLExecutionPlan asyncSqlExplainExecutionPlanResult(@NotNull WebSession webSession, @NotNull String taskId) throws DBWebException {
         WebAsyncTaskInfo taskStatus = webSession.asyncTaskStatus(taskId, false);
-        if (taskStatus != null) {
-            return (WebSQLExecutionPlan) taskStatus.getExtendedResult();
-        }
-        return null;
+        return (WebSQLExecutionPlan) taskStatus.getExtendedResult();
     }
 
     @Override
-    public WebSQLScriptInfo parseSqlScript(@NotNull WebConnectionInfo connectionInfo, @NotNull String sqlScript) throws DBWebException {
+    public WebSQLScriptInfo parseSqlScript(@NotNull WebConnectionInfo connectionInfo, @NotNull String sqlScript) {
         SQLDialect dialect = getSqlDialectFromConnection(connectionInfo.getDataSourceContainer());
         List<SQLScriptElement> queries = SQLScriptParser.parseScript(
             connectionInfo.getDataSource(),
@@ -618,7 +605,7 @@ public class WebServiceSQL implements DBWServiceSQL {
     }
 
     @Override
-    public WebSQLQueryInfo parseSqlQuery(@NotNull WebConnectionInfo connectionInfo, @NotNull String sqlScript, int cursorPosition) throws DBWebException {
+    public WebSQLQueryInfo parseSqlQuery(@NotNull WebConnectionInfo connectionInfo, @NotNull String sqlScript, int cursorPosition) {
         SQLDialect dialect = getSqlDialectFromConnection(connectionInfo.getDataSourceContainer());
         SQLScriptElement query = SQLScriptParser.parseQuery(
             connectionInfo.getDataSource(),
@@ -661,14 +648,20 @@ public class WebServiceSQL implements DBWServiceSQL {
     }
 
     @Override
-    public WebAsyncTaskInfo getRowDataCount(@NotNull WebSession webSession, @NotNull WebSQLContextInfo contextInfo, @NotNull String resultsId) throws DBWebException {
-        WebAsyncTaskProcessor<String> runnable = new WebAsyncTaskProcessor<String>() {
+    public WebAsyncTaskInfo getRowDataCount(@NotNull WebSession webSession, @NotNull WebSQLContextInfo contextInfo, @NotNull String resultsId) {
+        WebAsyncTaskProcessor<String> runnable = new WebAsyncTaskProcessor<>() {
             @Override
-            public void run(DBRProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+            public void run(DBRProgressMonitor monitor) throws InvocationTargetException {
                 try {
                     monitor.beginTask("Get row data count", 1);
                     WebSQLResultsInfo results = contextInfo.getResults(resultsId);
-                    long rowCount = DBUtils.readRowCount(monitor, contextInfo.getProcessor().getExecutionContext(), results.getDataContainer(), null, this);
+                    long rowCount = DBUtils.readRowCount(
+                        monitor,
+                        contextInfo.getProcessor().getExecutionContext(),
+                        results.getDataContainer(),
+                        null,
+                        this
+                    );
                     this.result = "Row data count completed";
                     this.extendedResults = rowCount;
                 } catch (Throwable e) {
@@ -685,19 +678,16 @@ public class WebServiceSQL implements DBWServiceSQL {
     @Nullable
     public Long getRowDataCountResult(@NotNull WebSession webSession, @NotNull String taskId) throws DBWebException {
         WebAsyncTaskInfo taskStatus = webSession.asyncTaskStatus(taskId, false);
-        if (taskStatus != null) {
-            return (Long) taskStatus.getExtendedResult();
-        }
-        return null;
+        return (Long) taskStatus.getExtendedResult();
     }
 
     @Override
-    public WebAsyncTaskInfo asyncSqlSetAutoCommit(@NotNull WebSession webSession, @NotNull WebSQLContextInfo contextInfo, boolean autoCommit) throws DBWebException {
+    public WebAsyncTaskInfo asyncSqlSetAutoCommit(@NotNull WebSession webSession, @NotNull WebSQLContextInfo contextInfo, boolean autoCommit) {
         return contextInfo.setAutoCommit(autoCommit);
     }
 
     @Override
-    public WebAsyncTaskInfo asyncSqlRollbackTransaction(@NotNull WebSession webSession, @NotNull WebSQLContextInfo contextInfo) throws DBWebException {
+    public WebAsyncTaskInfo asyncSqlRollbackTransaction(@NotNull WebSession webSession, @NotNull WebSQLContextInfo contextInfo) {
         return contextInfo.rollbackTransaction();
     }
 

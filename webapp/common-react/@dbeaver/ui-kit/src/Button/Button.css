@@ -136,6 +136,23 @@
     }
   }
 
+  .dbv-kit-button--ghost {
+    --dbv-kit-btn-foreground: var(--dbv-kit-btn-ghost-foreground);
+    --dbv-kit-btn-foreground-hover: var(--dbv-kit-btn-ghost-foreground-hover);
+    --dbv-kit-btn-foreground-active: var(--dbv-kit-btn-ghost-foreground-active);
+
+    --dbv-kit-btn-background: var(--dbv-kit-btn-ghost-background);
+    --dbv-kit-btn-background-hover: var(--dbv-kit-btn-ghost-background-hover);
+    --dbv-kit-btn-background-active: var(--dbv-kit-btn-ghost-background-active);
+    --dbv-kit-btn-border-color: var(--dbv-kit-btn-ghost-border-color);
+
+    --dbv-kit-btn-loader-color: var(--dbv-kit-btn-ghost-foreground);
+
+    &:disabled {
+      color: var(--dbv-kit-control-disabled-foreground);
+    }
+  }
+
   /* ---------------------------- */
   /* Loader */
 
@@ -157,6 +174,10 @@
 
   /* ---------------------------- */
   /* Icon */
+
+  .dbv-kit-button:disabled .dbv-kit-button__icon {
+    opacity: 0.5;
+  }
 
   .dbv-kit-button__icon {
     display: flex;
