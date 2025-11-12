@@ -11,51 +11,43 @@ export interface ReorderItemTarget<T> {
   position: 'before' | 'after';
 }
 
+function reorderByIndices<T>(arr: T[], from: number, to: number): T[] {
+  if (from < 0 || from >= arr.length || to < 0 || to >= arr.length || from === to) {
+    return arr;
+  }
+  const newArray = [...arr];
+  const item = newArray.splice(from, 1)[0]!;
+  newArray.splice(to, 0, item);
+  return newArray;
+}
+
+function getInsertIndex(fromIndex: number, targetIndex: number, position?: 'before' | 'after'): number {
+  if (position === undefined) {
+    return targetIndex;
+  }
+  let insertIndex = position === 'before' ? targetIndex : targetIndex + 1;
+  if (fromIndex < targetIndex) {
+    insertIndex--;
+  }
+  return insertIndex;
+}
+
 export function reorderArray<T>(array: T[], from: number, to: number): T[];
 export function reorderArray<T>(array: T[], sourceItem: T, target: number): T[];
 export function reorderArray<T>(array: T[], sourceItem: T, target: ReorderItemTarget<T>): T[];
 export function reorderArray<T>(array: T[], sourceItemOrFrom: T | number, targetOrTo: number | ReorderItemTarget<T>): T[] {
-  if (typeof sourceItemOrFrom === 'number' && typeof targetOrTo === 'number') {
-    if (sourceItemOrFrom < 0 || sourceItemOrFrom >= array.length || targetOrTo < 0 || targetOrTo >= array.length || sourceItemOrFrom === targetOrTo) {
-      return array;
-    }
-    const newArray = [...array];
+  const fromIndex = typeof sourceItemOrFrom === 'number' && typeof targetOrTo === 'number' ? sourceItemOrFrom : array.indexOf(sourceItemOrFrom as T);
+  let targetIndex, position;
 
-    newArray.splice(sourceItemOrFrom, 1);
-    newArray.splice(targetOrTo, 0, array[sourceItemOrFrom]!);
-    return newArray;
+  if (typeof targetOrTo === 'number') {
+    targetIndex = targetOrTo;
+    position = undefined;
   } else {
-    const sourceItem = sourceItemOrFrom as T;
-    const target = targetOrTo as number | ReorderItemTarget<T>;
-    const fromIndex = array.indexOf(sourceItem);
-    let finalTargetIndex: number;
-
-    if (typeof target === 'number') {
-      finalTargetIndex = target;
-    } else {
-      finalTargetIndex = array.indexOf(target.item);
-    }
-
-    if (fromIndex === -1 || finalTargetIndex === -1 || fromIndex === finalTargetIndex) {
-      return array;
-    }
-
-    const reordered = [...array];
-
-    let insertIndex: number;
-
-    if (typeof target === 'number') {
-      insertIndex = finalTargetIndex;
-    } else {
-      insertIndex = target.position === 'before' ? finalTargetIndex : finalTargetIndex + 1;
-      if (fromIndex < finalTargetIndex) {
-        insertIndex--;
-      }
-    }
-
-    reordered.splice(fromIndex, 1);
-    reordered.splice(insertIndex, 0, sourceItem);
-
-    return reordered;
+    targetIndex = array.indexOf(targetOrTo.item);
+    position = targetOrTo.position;
   }
+
+  const insertIndex = getInsertIndex(fromIndex, targetIndex, position);
+
+  return reorderByIndices(array, fromIndex, insertIndex);
 }
