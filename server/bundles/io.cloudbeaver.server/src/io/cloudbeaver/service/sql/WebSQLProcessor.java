@@ -20,6 +20,7 @@ import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.WebAsyncTaskInfo;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.model.session.WebSessionPreferenceStore;
 import io.cloudbeaver.model.session.WebSessionProvider;
 import io.cloudbeaver.server.WebAppUtils;
 import io.cloudbeaver.server.jobs.SqlOutputLogReaderJob;
@@ -62,7 +63,6 @@ import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -231,7 +231,7 @@ public class WebSQLProcessor implements WebSessionProvider {
                 if (useEvents) {
                     boolean isConfirmed = confirmQueryIfNeeded(mainQuery.getScriptElements(), asyncTask, isGenerated);
                     if (!isConfirmed) {
-                        throw new DBWebException("Query execution cancelled by user");
+                        throw new DBWebException("Query execution was cancelled by user");
                     }
                 }
 
@@ -292,8 +292,6 @@ public class WebSQLProcessor implements WebSessionProvider {
                                     sqlOutputLogReaderJob.join();
                                 }
                                 fillQueryResults(contextInfo, dataContainer, dbStat, hasResultSet, executeInfo, webDataFilter, dataFilter, dataFormat);
-                            } catch (DBException e) {
-                                throw new InvocationTargetException(e);
                             }
                         }
                     }
@@ -358,8 +356,6 @@ public class WebSQLProcessor implements WebSessionProvider {
                         resultSet.getResultsInfo().setQueryText(statistics.getQueryText());
                         executeInfo.setStatusMessage(resultSet.getRowsWithMetaData().size() + " row(s) fetched");
                     }
-                } catch (DBException e) {
-                    throw new InvocationTargetException(e);
                 }
             }
         });
@@ -902,8 +898,6 @@ public class WebSQLProcessor implements WebSessionProvider {
                     DBCQueryPlannerConfiguration planConfig = new DBCQueryPlannerConfiguration();
                     planConfig.getParameters().putAll(configuration);
                     dbcPlan[0] = planner.planQueryExecution(session, sql, planConfig);
-                } catch (DBException e) {
-                    throw new InvocationTargetException(e);
                 }
             });
         } catch (DBException e) {
@@ -950,9 +944,7 @@ public class WebSQLProcessor implements WebSessionProvider {
         DBCExecutionContext executionContext = getExecutionContext(dataContainer);
         try (DBCSession session = executionContext.openSession(monitor, DBCExecutionPurpose.USER, "Generate data update batches")) {
             DBDDataFilter dataFilter = new DBDDataFilter();
-            if (!resultsInfo.isSingleRow()) {
-                addKeyAttributes(resultsInfo, row, dataContainer, session, dataFilter);
-            }
+            addKeyAttributes(resultsInfo, row, dataContainer, session, dataFilter);
             WebExecutionSource executionSource = new WebExecutionSource(dataContainer, executionContext, this);
             dataContainer.readData(
                 executionSource, session, dataReceiver, dataFilter,
@@ -1259,7 +1251,6 @@ public class WebSQLProcessor implements WebSessionProvider {
         return convertInputCellValue(dbcSession, allAttributes, cellRow, withoutExecution);
     }
 
-    // TODO: Refactor to unify with desktop when confirmation settings will be added
     private boolean confirmQueryIfNeeded(
         @NotNull List<SQLScriptElement> scriptElements,
         @NotNull WebAsyncTaskInfo asyncTask,
@@ -1287,25 +1278,28 @@ public class WebSQLProcessor implements WebSessionProvider {
                 .map(SQLScriptElement::getText)
                 .collect(Collectors.joining("\n\n"));
         } else {
+            WebSessionPreferenceStore store = webSession.getUserPreferenceStore();
+            boolean confirmDangerousQueries = store.getUserPreferenceBoolean(ConfirmationConstants.CONFIRM_DANGER_SQL_KEY, true);
+            boolean confirmDropQueries = store.getUserPreferenceBoolean(ConfirmationConstants.CONFIRM_DROP_SQL_KEY, true);
             for (SQLScriptElement scriptElement : scriptElements) {
                 if (scriptElement instanceof SQLQuery sqlQuery) {
-                    if (sqlQuery.isDeleteUpdateDangerous()) {
+                    if (confirmDangerousQueries && sqlQuery.isDeleteUpdateDangerous()) {
                         hasDangerousUpdates = true;
                         ConfirmationDescriptor descriptor = ConfirmationRegistry.getInstance()
-                            .getConfirmation(ConfirmationConstants.CONFIRM_DANGER_SQL);
+                            .getConfirmation(ConfirmationConstants.CONFIRM_DANGER_SQL_ID);
                         title = descriptor.getLocalizedTitle(webSession.getLocale());
                         var entityMetadata = sqlQuery.getEntityMetadata(false);
                         message = MessageFormat.format(
                             descriptor.getLocalizedMessage(webSession.getLocale()),
                             sqlQuery.getType().name(),
-                            entityMetadata != null ? entityMetadata.getEntityName() : null
+                            entityMetadata != null ? entityMetadata.getEntityName() : "multiple tables"
                         );
                         break;
                     }
-                    if (sqlQuery.isDropTableDangerous()) {
+                    if (confirmDropQueries && sqlQuery.isDropTableDangerous()) {
                         hasDropStatement = true;
                         ConfirmationDescriptor descriptor = ConfirmationRegistry.getInstance()
-                            .getConfirmation(ConfirmationConstants.CONFIRM_DROP_SQL);
+                            .getConfirmation(ConfirmationConstants.CONFIRM_DROP_SQL_ID);
                         title = descriptor.getLocalizedTitle(webSession.getLocale());
                         message = descriptor.getLocalizedMessage(webSession.getLocale());
                         break;

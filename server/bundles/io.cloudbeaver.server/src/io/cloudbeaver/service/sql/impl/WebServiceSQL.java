@@ -400,21 +400,16 @@ public class WebServiceSQL implements DBWServiceSQL {
         DBExecUtils.tryExecuteRecover(
             monitor,
             contextInfo.getProcessor().getConnection().getDataSource(),
-            monitor1 -> {
-                try {
-                    result[0] = contextInfo.getProcessor().updateResultsDataBatch(
-                        monitor1, contextInfo, resultsId, updatedRows, deletedRows, addedRows, dataFormat);
-                } catch (Exception e) {
-                    throw new InvocationTargetException(e);
-                }
-            }
+            monitor1 ->
+                result[0] = contextInfo.getProcessor().updateResultsDataBatch(
+                    monitor1, contextInfo, resultsId, updatedRows, deletedRows, addedRows, dataFormat)
         );
         return result[0];
     }
 
     @FunctionalInterface
     private interface ThrowableFunction<T, R> {
-        R apply(T obj) throws Exception;
+        R apply(T obj) throws DBException;
     }
 
     @Override
@@ -454,13 +449,7 @@ public class WebServiceSQL implements DBWServiceSQL {
             DBExecUtils.tryExecuteRecover(
                 processor.getWebSession().getProgressMonitor(),
                 processor.getConnection().getDataSource(),
-                monitor -> {
-                    try {
-                        result.append(function.apply(monitor));
-                    } catch (Exception e) {
-                        throw new InvocationTargetException(e);
-                    }
-                }
+                monitor -> result.append(function.apply(monitor))
             );
             return result.toString();
         } catch (DBException e) {

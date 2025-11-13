@@ -39,6 +39,7 @@ import { DefaultNavigatorSettingsResource } from './DefaultNavigatorSettingsReso
 import { DataSynchronizationService } from './DataSynchronization/DataSynchronizationService.js';
 import { AsyncTaskInfoService } from './AsyncTask/AsyncTaskInfoService.js';
 import { AsyncTaskInfoEventHandler } from './AsyncTask/AsyncTaskInfoEventHandler.js';
+import { ServerDefaultSettingsService } from './Settings/ServerDefaultSettingsService.js';
 
 export default ModuleRegistry.add({
   name: '@cloudbeaver/core-root',
@@ -65,6 +66,7 @@ export default ModuleRegistry.add({
       .addSingleton(Dependency, proxy(ServerSettingsResource))
       .addSingleton(AsyncTaskInfoEventHandler)
       .addSingleton(ServerSettingsService)
+      .addSingleton(ServerDefaultSettingsService)
       .addSingleton(WorkspaceConfigEventHandler)
       .addSingleton(WindowEventsService)
       .addSingleton(ServerSettingsResource)
