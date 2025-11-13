@@ -164,7 +164,7 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
     }
 
     @NotNull
-    public static WebConnectionInfo getWebConnection(@NotNull WebSession session, @NotNull String projectId, @NotNull String connectionId) throws DBWebException {
+    public static WebConnectionInfo getWebConnection(@NotNull WebSession session, @Nullable String projectId, @NotNull String connectionId) throws DBWebException {
         return WebDataSourceUtils.getWebConnectionInfo(session, projectId, connectionId);
     }
 

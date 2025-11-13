@@ -75,7 +75,6 @@ export const SettingField = observer<Props>(function SettingField({ resolver, se
   if (setting.type === ESettingsValueType.Checkbox) {
     return (
       <FieldCheckbox
-        id={String(setting.key)}
         checked={value}
         label={name}
         title={name}
@@ -92,7 +91,6 @@ export const SettingField = observer<Props>(function SettingField({ resolver, se
     const options = setting.options?.map(option => ({ ...option, name: translate(option.name) })) || [];
     return (
       <Select
-        id={String(setting.key)}
         items={options}
         keySelector={value => value.value}
         valueSelector={value => value.name}
@@ -111,15 +109,7 @@ export const SettingField = observer<Props>(function SettingField({ resolver, se
 
   if (setting.type === ESettingsValueType.Textarea) {
     return (
-      <Textarea
-        id={String(setting.key)}
-        title={value}
-        labelTooltip={description}
-        value={value}
-        disabled={disabled}
-        readOnly={readOnly}
-        onChange={handleChange}
-      >
+      <Textarea title={value} labelTooltip={description} value={value} disabled={disabled} readOnly={readOnly} onChange={handleChange}>
         {name}
       </Textarea>
     );
@@ -128,7 +118,6 @@ export const SettingField = observer<Props>(function SettingField({ resolver, se
   return (
     <InputField
       ref={customValidation}
-      id={String(setting.key)}
       type="text"
       title={value}
       labelTooltip={description}
