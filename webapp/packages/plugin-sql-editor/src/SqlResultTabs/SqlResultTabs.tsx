@@ -80,8 +80,15 @@ export const SqlResultTabs = observer<Props>(function SqlDataResult({ state, onT
   }
 
   function handleReorder(draggedTabId: string, targetTabId: string, position: 'before' | 'after') {
-    const reorderedTabs = reorderArray(state.tabs, state.tabs.find(t => t.id === draggedTabId)!, {
-      item: state.tabs.find(t => t.id === targetTabId)!,
+    const draggedTab = state.tabs.find(t => t.id === draggedTabId);
+    const targetTab = state.tabs.find(t => t.id === targetTabId);
+
+    if (!draggedTab || !targetTab) {
+      return;
+    }
+
+    const reorderedTabs = reorderArray(state.tabs, draggedTab, {
+      item: targetTab,
       position,
     });
 
