@@ -134,16 +134,4 @@ export class TabsContainer<TProps = void, TOptions extends Record<string, any> |
       order: tabInfo.order ?? Number.MAX_SAFE_INTEGER,
     });
   }
-
-  applyOrder(tabsOrderMap: Record<string, number>): void {
-    Object.entries(tabsOrderMap).forEach(([tabId, index]) => {
-      const existingInfo = this.tabInfoMap.get(tabId);
-      if (existingInfo) {
-        this.tabInfoMap.set(tabId, {
-          ...existingInfo,
-          order: index,
-        });
-      }
-    });
-  }
 }

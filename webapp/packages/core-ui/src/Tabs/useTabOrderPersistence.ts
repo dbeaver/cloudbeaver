@@ -5,28 +5,33 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useUserData } from '@cloudbeaver/core-blocks';
 import { reorderArray } from '@dbeaver/js-helpers';
 
-import type { ITabsContainer } from './TabsContainer/ITabsContainer.js';
+interface ITabOrderPersistenceResult {
+  sortTabs: (tabs: string[]) => string[];
+  onReorder: (draggedTabId: string, targetTabId: string, position: 'before' | 'after') => void;
+  persistenceKey: string;
+}
 
-export function useTabOrderPersistence(
-  persistenceKey: string,
-  container: ITabsContainer<any, any>,
-): (draggedTabId: string, targetTabId: string, position: 'before' | 'after') => void {
+export function useTabOrderPersistence(persistenceKey: string, getTabIds: () => string[]): ITabOrderPersistenceResult {
   const tabOrderKey = `tabs-order-${persistenceKey}`;
-  const displayed = container.getIdList();
-  const tabsPersisted = useUserData(
-    tabOrderKey,
-    () => ({}) as Record<string, number>,
-    order => {
-      container.applyOrder(order);
-    },
+  const tabsPersisted = useUserData(tabOrderKey, () => ({}) as Record<string, number>);
+
+  const sortTabs = useCallback(
+    (tabs: string[]): string[] =>
+      tabs.toSorted((a, b) => {
+        const orderA = tabsPersisted[a] ?? Number.MAX_SAFE_INTEGER;
+        const orderB = tabsPersisted[b] ?? Number.MAX_SAFE_INTEGER;
+        return orderA - orderB;
+      }),
+    [tabsPersisted],
   );
 
   const onReorder = useCallback(
     (draggedTabId: string, targetTabId: string, position: 'before' | 'after') => {
+      const displayed = getTabIds();
       const result = reorderArray(displayed, draggedTabId, { item: targetTabId, position });
       const orderMap = result.reduce(
         (acc, tabId, index) => {
@@ -36,10 +41,16 @@ export function useTabOrderPersistence(
         {} as Record<string, number>,
       );
       Object.assign(tabsPersisted, orderMap);
-      container.applyOrder(orderMap);
     },
-    [container, displayed, tabsPersisted],
+    [getTabIds, tabsPersisted],
   );
 
-  return onReorder;
+  return useMemo(
+    () => ({
+      sortTabs,
+      onReorder,
+      persistenceKey: tabOrderKey,
+    }),
+    [sortTabs, onReorder, tabOrderKey],
+  );
 }

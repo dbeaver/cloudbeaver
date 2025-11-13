@@ -62,5 +62,4 @@ export interface ITabsContainer<TProps = void, TOptions extends Record<string, a
   setTabState: <T>(state: MetadataMap<string, any>, tabId: string, value: T) => T;
   getDisplayed: (props?: TProps) => Array<ITabInfo<TProps, TOptions>>;
   getIdList: (props?: TProps) => string[];
-  applyOrder: (tabsOrderMap: Record<string, number>) => void;
 }
