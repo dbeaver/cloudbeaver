@@ -39,6 +39,7 @@ export interface ITabsContext<T = Record<string, any>> {
   closeAllToTheDirection: (tabId: string, direction: TabDirection) => Promise<void>;
   closeOthers: (tabId: string) => Promise<void>;
   reorder?: (draggedTabId: string, targetTabId: string, position: 'before' | 'after') => void;
+  /* This key is required to enable tabs reorder */
   reorderStateKey?: string;
 }
 
