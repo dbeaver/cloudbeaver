@@ -67,9 +67,6 @@ export function useTab(
       get closable() {
         return this.state.canClose(this.tabId);
       },
-      get reorderStateKey() {
-        return this.state.reorderStateKey;
-      },
       getInfo() {
         return this.state.getTabInfo(this.tabId);
       },
