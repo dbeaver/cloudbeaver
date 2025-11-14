@@ -49,18 +49,16 @@ export function useUsersTable(filters: IUserFilters) {
         return pagination.hasNextPage;
       },
       get users() {
-        const filteredUsers = this.usersLoader.resource.get(UsersResourceFilterKey(searchFilter, enabledStateFilter)).filter(isDefined);
-        const paginatedUsers = usersResource.get(pagination.allPages).filter(isDefined);
-        const usersMap = new Map<string, AdminUser>();
-
-        // guarantees unique users when filters are changed
-        for (const user of [...filteredUsers, ...paginatedUsers]) {
-          usersMap.set(user.userId, user);
-        }
-
-        const allUsers = Array.from(usersMap.values()).sort(compareUsers);
-        const newUsers: AdminUserNew[] = allUsers.filter(isNewUser).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
-        const existingUsers: AdminUser[] = allUsers.filter(user => !isNewUser(user));
+        const filteredUsers = this.usersLoader.resource
+          .get(UsersResourceFilterKey(searchFilter, enabledStateFilter))
+          .filter(isDefined)
+          .sort(compareUsers);
+        const paginatedUsers = usersResource.get(pagination.allPages).filter(isDefined).sort(compareUsers);
+        const allUsers = Array.from([...filteredUsers, ...paginatedUsers].values());
+        const allUsersUniqueMap = new Map<string, AdminUser | AdminUserNew>(allUsers.map(user => [user.userId, user]));
+        const allUsersUnique: (AdminUser | AdminUserNew)[] = Array.from(allUsersUniqueMap.values());
+        const newUsers: AdminUserNew[] = allUsersUnique.filter(isNewUser).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+        const existingUsers: AdminUser[] = allUsersUnique.filter(user => !isNewUser(user));
 
         return filters.filterUsers([...newUsers, ...existingUsers]);
       },
