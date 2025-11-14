@@ -26,9 +26,7 @@ export const ToolsPanel = observer(function ToolsPanel() {
   const style = useS(styles);
 
   const state = useUserData<IToolsState>('tools', () => ({ selectedTabId: undefined }));
-  const { onReorder, sortTabs, persistenceKey } = useTabOrderPersistence(toolsPanelService.tabsContainer.areaLabel, () =>
-    toolsPanelService.tabsContainer.getIdList(),
-  );
+  const { onReorder, sortTabs, persistenceKey } = useTabOrderPersistence('dbeaver-tools-panel', () => toolsPanelService.tabsContainer.getIdList());
   const tabs = toolsPanelService.tabsContainer.getIdList();
   const prevTabs = useRef<string[]>(tabs);
   const equal = isArraysEqual(prevTabs.current, tabs);
