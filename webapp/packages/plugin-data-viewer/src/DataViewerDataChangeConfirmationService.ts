@@ -62,12 +62,13 @@ export class DataViewerDataChangeConfirmationService {
               });
 
               if (status === DialogueStateResult.Resolved) {
+                await model.save();
+              } else {
                 if (result?.isExtraAction) {
                   editor.clear();
-                } else {
-                  await model.save();
+                  return;
                 }
-              } else {
+
                 ExecutorInterrupter.interrupt(contexts);
               }
             }
