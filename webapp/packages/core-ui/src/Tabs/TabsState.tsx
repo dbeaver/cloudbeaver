@@ -163,7 +163,7 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
       tabId: currentSelectedId,
       props,
     });
-  }, [currentSelectedId, dynamic.selectedId, openExecutor, props]);
+  }, [currentSelectedId]);
 
   const value = useObservableRef<ITabsContext<T>>(
     () => ({
