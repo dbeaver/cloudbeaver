@@ -7,7 +7,7 @@
  */
 import { describe, expect, test } from 'vitest';
 
-import { reorderArray } from './reorderArray.js';
+import { reorderArray, reorderArrayWithOrder } from './reorderArray.js';
 
 describe('reorderArray', () => {
   const array = ['a', 'b', 'c', 'd', 'e'];
@@ -138,5 +138,84 @@ describe('reorderArray', () => {
       const result = reorderArray(array, 2, 2);
       expect(result).toEqual(array);
     });
+  });
+});
+
+describe('reorderArrayWithOrder', () => {
+  test('should reorder items and update order property when moving item after target', () => {
+    const items = [
+      { id: '1', order: 0 },
+      { id: '2', order: 1 },
+      { id: '3', order: 2 },
+      { id: '4', order: 3 },
+    ];
+
+    reorderArrayWithOrder(items, '1', '3', 'after'); // 2, 3, 1, 4
+
+    expect(items.find(item => item.id === '1')?.order).toBe(2);
+    expect(items.find(item => item.id === '2')?.order).toBe(0);
+    expect(items.find(item => item.id === '3')?.order).toBe(1);
+    expect(items.find(item => item.id === '4')?.order).toBe(3);
+  });
+
+  test('should reorder items and update order property when moving item before target', () => {
+    const items = [
+      { id: '1', order: 0 },
+      { id: '2', order: 1 },
+      { id: '3', order: 2 },
+      { id: '4', order: 3 },
+    ];
+
+    reorderArrayWithOrder(items, '4', '2', 'before'); // 1, 4, 2, 3
+
+    expect(items.find(item => item.id === '1')?.order).toBe(0);
+    expect(items.find(item => item.id === '2')?.order).toBe(2);
+    expect(items.find(item => item.id === '3')?.order).toBe(3);
+    expect(items.find(item => item.id === '4')?.order).toBe(1);
+  });
+
+  test('should handle unsorted array by order', () => {
+    const items = [
+      { id: 'a', order: 2 },
+      { id: 'b', order: 0 },
+      { id: 'c', order: 1 },
+    ];
+
+    reorderArrayWithOrder(items, 'a', 'c', 'before'); // b, a, c
+
+    expect(items.find(item => item.id === 'b')?.order).toBe(0);
+    expect(items.find(item => item.id === 'a')?.order).toBe(1);
+    expect(items.find(item => item.id === 'c')?.order).toBe(2);
+  });
+
+  test('should mutate the original array', () => {
+    const items = [
+      { id: 'a', order: 0 },
+      { id: 'b', order: 1 },
+      { id: 'c', order: 2 },
+    ];
+
+    const originalRef = items;
+    reorderArrayWithOrder(items, 'c', 'a', 'before');
+
+    expect(items).toBe(originalRef);
+  });
+
+  test('should work with custom property names using options', () => {
+    const items = [
+      { key: 'x', position: 0 },
+      { key: 'y', position: 1 },
+      { key: 'z', position: 2 },
+    ];
+
+    reorderArrayWithOrder(items, 'z', 'x', 'after', {
+      getId: item => item.key,
+      getOrder: item => item.position,
+      setOrder: (item, order) => { item.position = order; },
+    });
+
+    expect(items.find(item => item.key === 'x')?.position).toBe(0);
+    expect(items.find(item => item.key === 'y')?.position).toBe(2);
+    expect(items.find(item => item.key === 'z')?.position).toBe(1);
   });
 });

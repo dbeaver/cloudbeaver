@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { getComputed, s, SContext, type StyleRegistry, TextPlaceholder, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { type ITabData, TabIconStyles, TabList, TabListStyles, TabPanel, TabsState, TabStyles } from '@cloudbeaver/core-ui';
-import { reorderArray } from '@dbeaver/js-helpers';
+import { reorderArrayWithOrder } from '@dbeaver/js-helpers';
 
 import type { ISqlEditorTabState } from '../ISqlEditorTabState.js';
 import { ESqlDataSourceFeatures } from '../SqlDataSource/ESqlDataSourceFeatures.js';
@@ -80,22 +80,7 @@ export const SqlResultTabs = observer<Props>(function SqlDataResult({ state, onT
   }
 
   function handleReorder(draggedTabId: string, targetTabId: string, position: 'before' | 'after') {
-    const draggedTab = state.tabs.find(t => t.id === draggedTabId);
-    const targetTab = state.tabs.find(t => t.id === targetTabId);
-
-    if (!draggedTab || !targetTab) {
-      return;
-    }
-
-    const reorderedTabs = reorderArray(state.tabs, draggedTab, {
-      item: targetTab,
-      position,
-    });
-
-    state.tabs = reorderedTabs.map((tab, index) => ({
-      ...tab,
-      order: index,
-    }));
+    reorderArrayWithOrder(state.tabs, draggedTabId, targetTabId, position);
   }
 
   if (!state.tabs.length) {
