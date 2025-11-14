@@ -8,17 +8,19 @@
 import { useRef, useState } from 'react';
 import { useDrag, useDrop } from '@dbeaver/react-dnd';
 
+type DragPosition = 'before' | 'after';
+
 export interface ITabDragAndDropOptions {
   tabId: string;
   stateKey: string | undefined;
-  onReorder: ((draggedTabId: string, targetTabId: string, position: 'before' | 'after') => void) | null;
+  onReorder: ((draggedTabId: string, targetTabId: string, position: DragPosition) => void) | null;
 }
 
 export interface ITabDragAndDropResult {
   ref: React.RefObject<HTMLDivElement | null>;
   isDragging: boolean;
   dropAllowed: boolean;
-  dropPosition: 'before' | 'after' | undefined;
+  dropPosition: DragPosition | undefined;
   dragProps: {
     draggable?: boolean;
     onDrag: (event: React.DragEvent<HTMLElement>) => void;
@@ -38,7 +40,7 @@ const DRAG_TAB_STATE_KEY = 'dbeaver-tab-state-key';
 
 export function useTabDragAndDrop({ tabId, stateKey, onReorder }: ITabDragAndDropOptions): ITabDragAndDropResult {
   const ref = useRef<HTMLDivElement>(null);
-  const [dropPosition, setDropPosition] = useState<'before' | 'after' | undefined>(undefined);
+  const [dropPosition, setDropPosition] = useState<DragPosition | undefined>(undefined);
   const [dropAllowed, setDropAllowed] = useState(false);
 
   const onReorderRef = useRef(onReorder);
