@@ -22,6 +22,7 @@ import { useTabOrderPersistence } from '../Tabs/useTabOrderPersistence.js';
 
 export interface SideBarPanelProps {
   container: TabsContainer;
+  panelId: string;
 }
 
 const sideBarPanelRegistry: StyleRegistry = [
@@ -41,9 +42,9 @@ const sideBarPanelRegistry: StyleRegistry = [
   ],
 ];
 
-export const SideBarPanel = observer<SideBarPanelProps>(function SideBarPanel({ container }) {
+export const SideBarPanel = observer<SideBarPanelProps>(function SideBarPanel({ container, panelId }) {
   const style = useS(styles);
-  const { onReorder, sortTabs, persistenceKey } = useTabOrderPersistence(container.areaLabel, () => container.getIdList());
+  const { onReorder, sortTabs, persistenceKey } = useTabOrderPersistence(panelId, () => container.getIdList());
   return (
     <SContext registry={sideBarPanelRegistry}>
       <TabsState
