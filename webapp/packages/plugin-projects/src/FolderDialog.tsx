@@ -167,7 +167,6 @@ export const FolderDialog: DialogComponent<FolderDialogPayload, IFolderDialogRes
       <CommonDialogBody>
         <Form ref={focusedRef} onSubmit={resolveHandler}>
           <Container center gap>
-            {selectProject && <ProjectSelect value={state.projectId} filter={filterProject} onChange={projectId => state.setProjectId(projectId)} />}
             <InputField
               name="value"
               state={state}
@@ -178,6 +177,7 @@ export const FolderDialog: DialogComponent<FolderDialogPayload, IFolderDialogRes
             >
               {translate('ui_name')}
             </InputField>
+            {selectProject && <ProjectSelect value={state.projectId} filter={filterProject} onChange={projectId => state.setProjectId(projectId)} />}
           </Container>
         </Form>
       </CommonDialogBody>
