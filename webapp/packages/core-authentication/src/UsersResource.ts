@@ -36,12 +36,12 @@ import { AuthInfoService } from './AuthInfoService.js';
 import { AuthProviderService } from './AuthProviderService.js';
 import type { IAuthCredentials } from './IAuthCredentials.js';
 
-const NEW_USER_SYMBOL = Symbol('new-user');
+export const NEW_USER_SYMBOL = Symbol('new-user');
 
 export type AdminUser = AdminUserInfoFragment;
 export type AdminUserOrigin = AdminUserInfoFragment['origins'][number];
 
-type AdminUserNew = AdminUser & { [NEW_USER_SYMBOL]: boolean };
+export type AdminUserNew = AdminUser & { [NEW_USER_SYMBOL]: boolean; createdAt: string };
 export type UserResourceIncludes = Omit<GetUsersListQueryVariables, 'userId' | 'page' | 'filter'>;
 
 interface IUserResourceFilterOptions {
@@ -148,6 +148,7 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
 
     const newUser = user as unknown as AdminUserNew;
     newUser[NEW_USER_SYMBOL] = true;
+    newUser.createdAt = new Date().toISOString();
     this.set(user.userId, newUser);
 
     return this.get(user.userId)!;
@@ -155,7 +156,12 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
 
   cleanNewFlags(): void {
     for (const user of this.data.values()) {
-      (user as AdminUserNew)[NEW_USER_SYMBOL] = false;
+      if (!isNewUser(user)) {
+        continue;
+      }
+
+      user[NEW_USER_SYMBOL] = false;
+      user.createdAt = '';
     }
   }
 
@@ -319,8 +325,8 @@ export function isLocalUser(user: AdminUser): boolean {
   return user.origins.some(origin => origin.type === AUTH_PROVIDER_LOCAL_ID);
 }
 
-export function isNewUser(user: AdminUser): boolean {
-  return NEW_USER_SYMBOL in user && user[NEW_USER_SYMBOL] === true;
+export function isNewUser(user: AdminUser): user is AdminUserNew {
+  return NEW_USER_SYMBOL in user && user[NEW_USER_SYMBOL] === true && 'createdAt' in user && Boolean(user.createdAt);
 }
 
 export function compareUsers<T extends Pick<AdminUser, 'userId'>>(a: T, b: T): number {

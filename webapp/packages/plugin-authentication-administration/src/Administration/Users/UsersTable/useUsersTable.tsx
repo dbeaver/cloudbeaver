@@ -7,7 +7,7 @@
  */
 import { action, computed, observable } from 'mobx';
 
-import { type AdminUser, compareUsers, UsersResource, UsersResourceFilterKey } from '@cloudbeaver/core-authentication';
+import { type AdminUser, type AdminUserNew, compareUsers, isNewUser, UsersResource, UsersResourceFilterKey } from '@cloudbeaver/core-authentication';
 import { ConfirmationDialogDelete, TableState, useObservableRef, useOffsetPagination, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
@@ -49,13 +49,20 @@ export function useUsersTable(filters: IUserFilters) {
         return pagination.hasNextPage;
       },
       get users() {
-        const users = Array.from(
-          new Set([
-            ...this.usersLoader.resource.get(UsersResourceFilterKey(searchFilter, enabledStateFilter)),
-            ...usersResource.get(pagination.allPages).filter(isDefined).sort(compareUsers),
-          ]),
-        );
-        return filters.filterUsers(users.filter(isDefined));
+        const filteredUsers = this.usersLoader.resource.get(UsersResourceFilterKey(searchFilter, enabledStateFilter)).filter(isDefined);
+        const paginatedUsers = usersResource.get(pagination.allPages).filter(isDefined);
+        const usersMap = new Map<string, AdminUser>();
+
+        // guarantees unique users when filters are changed
+        for (const user of [...filteredUsers, ...paginatedUsers]) {
+          usersMap.set(user.userId, user);
+        }
+
+        const allUsers = Array.from(usersMap.values()).sort(compareUsers);
+        const newUsers: AdminUserNew[] = allUsers.filter(isNewUser).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+        const existingUsers: AdminUser[] = allUsers.filter(user => !isNewUser(user));
+
+        return filters.filterUsers([...newUsers, ...existingUsers]);
       },
       async update() {
         try {
