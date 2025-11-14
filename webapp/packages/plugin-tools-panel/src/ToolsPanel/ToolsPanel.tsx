@@ -26,8 +26,9 @@ export const ToolsPanel = observer(function ToolsPanel() {
   const style = useS(styles);
 
   const state = useUserData<IToolsState>('tools', () => ({ selectedTabId: undefined }));
-  const tabsStateKey = 'tools-panel';
-  const onReorder = useTabOrderPersistence(tabsStateKey, toolsPanelService.tabsContainer);
+  const { onReorder, sortTabs, persistenceKey } = useTabOrderPersistence(toolsPanelService.tabsContainer.areaLabel, () =>
+    toolsPanelService.tabsContainer.getIdList(),
+  );
   const tabs = toolsPanelService.tabsContainer.getIdList();
   const prevTabs = useRef<string[]>(tabs);
   const equal = isArraysEqual(prevTabs.current, tabs);
@@ -65,7 +66,8 @@ export const ToolsPanel = observer(function ToolsPanel() {
     <TabsState
       currentTabId={state.selectedTabId}
       container={toolsPanelService.tabsContainer}
-      reorderStateKey={tabsStateKey}
+      reorderStateKey={persistenceKey}
+      sortFunction={sortTabs}
       lazy
       onChange={handleTabChange}
       onReorder={onReorder}

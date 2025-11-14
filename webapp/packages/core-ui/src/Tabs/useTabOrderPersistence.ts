@@ -31,7 +31,7 @@ export function useTabOrderPersistence(persistenceKey: string, getTabIds: () => 
 
   const onReorder = useCallback(
     (draggedTabId: string, targetTabId: string, position: 'before' | 'after') => {
-      const displayed = getTabIds();
+      const displayed = sortTabs(getTabIds());
       const result = reorderArray(displayed, draggedTabId, { item: targetTabId, position });
       const orderMap = result.reduce(
         (acc, tabId, index) => {
@@ -42,7 +42,7 @@ export function useTabOrderPersistence(persistenceKey: string, getTabIds: () => 
       );
       Object.assign(tabsPersisted, orderMap);
     },
-    [getTabIds, tabsPersisted],
+    [getTabIds, sortTabs, tabsPersisted],
   );
 
   return useMemo(

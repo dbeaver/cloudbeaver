@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -61,7 +61,14 @@ export const TabList = observer<React.PropsWithChildren<TabListProps>>(function 
   className = s(componentStyle, { tabList: true, vertical, rotated, underline, big }, className);
 
   if (state.container) {
-    const displayed = state.container.getDisplayed(state.props);
+    let displayed = state.container.getDisplayed(state.props);
+
+    if (state.sortFunction) {
+      const displayedMap = new Map(displayed.map(tab => [tab.key, tab]));
+      const sortedIds = state.sortFunction([...displayedMap.keys()]);
+      displayed = sortedIds.map(id => displayedMap.get(id)!);
+    }
+
     return (
       <SContext registry={registry}>
         <BaseTabList {...props} className={className} {...state.state} aria-label={translate(props['aria-label'] ?? state.container.areaLabel)}>

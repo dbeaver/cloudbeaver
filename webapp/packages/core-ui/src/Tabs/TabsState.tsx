@@ -37,6 +37,7 @@ export type TabsStateProps<T = Record<string, any>> = ExtractContainerProps<T> &
     tabList?: string[];
     enabledBaseActions?: boolean;
     reorderStateKey?: string;
+    sortFunction?: (tabs: string[]) => string[];
     canClose?: (tab: ITabData<T>) => boolean;
     onChange?: (tab: ITabData<T>) => void;
     onClose?: (tab: ITabData<T>) => void;
@@ -56,6 +57,7 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
   tabList,
   enabledBaseActions,
   reorderStateKey,
+  sortFunction,
   onChange: onOpen,
   onClose,
   canClose,
@@ -71,6 +73,10 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
     displayed = container.getIdList(props);
   } else if (tabList) {
     displayed = tabList;
+  }
+
+  if (sortFunction) {
+    displayed = sortFunction(displayed);
   }
 
   const closable = !!onClose;
@@ -232,6 +238,7 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
         dynamic.reorder?.(draggedTabId, targetTabId, position);
       },
       reorderStateKey,
+      sortFunction,
     }),
     {
       state: observable.ref,
@@ -245,6 +252,7 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
       tabList: observable.ref,
       enabledBaseActions: observable.ref,
       reorderStateKey: observable.ref,
+      sortFunction: observable.ref,
       getTabInfo: action.bound,
       getTabState: action.bound,
       getLocalState: action.bound,
@@ -267,6 +275,7 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
       tabList,
       enabledBaseActions,
       reorderStateKey,
+      sortFunction,
     },
   );
 

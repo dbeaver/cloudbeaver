@@ -43,14 +43,14 @@ const sideBarPanelRegistry: StyleRegistry = [
 
 export const SideBarPanel = observer<SideBarPanelProps>(function SideBarPanel({ container }) {
   const style = useS(styles);
-  const reorderStateKey = 'side-bar-panel';
-  const onReorder = useTabOrderPersistence(reorderStateKey, container);
+  const { onReorder, sortTabs, persistenceKey } = useTabOrderPersistence(container.areaLabel, () => container.getIdList());
   return (
     <SContext registry={sideBarPanelRegistry}>
       <TabsState
         container={container}
         currentTabId={container.selectedId}
-        reorderStateKey={reorderStateKey}
+        reorderStateKey={persistenceKey}
+        sortFunction={sortTabs}
         lazy
         onChange={tab => container.select(tab.tabId, tab.props)}
         onReorder={onReorder}
