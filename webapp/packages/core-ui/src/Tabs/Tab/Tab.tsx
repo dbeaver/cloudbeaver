@@ -37,7 +37,7 @@ export const Tab = observer<TabProps>(function Tab({ after, ...props }) {
     dropProps,
   } = useTabDragAndDrop({
     tabId,
-    stateKey: tab.reorderStateKey || undefined,
+    stateKey: tab.reorderStateKey,
     onReorder: tab.state.reorder ?? null,
   });
 
