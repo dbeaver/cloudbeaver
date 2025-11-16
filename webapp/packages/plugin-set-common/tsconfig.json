@@ -89,6 +89,9 @@
       "path": "../core-storage"
     },
     {
+      "path": "../core-support"
+    },
+    {
       "path": "../core-task-manager"
     },
     {
