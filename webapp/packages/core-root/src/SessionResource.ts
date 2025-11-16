@@ -76,15 +76,17 @@ export class SessionResource extends CachedDataResource<SessionState | null> {
 
   async changeLanguage(locale: string): Promise<void> {
     await this.load();
-    //TODO we check "!locale" because of the bug described in CB-6048, should be removed when fixed
-    if (this.data?.locale === locale || !locale) {
-      return;
-    }
-    await this.graphQLService.sdk.changeSessionLanguage({ locale });
 
-    if (this.data) {
-      this.data.locale = locale;
-    }
+    this.performUpdate(undefined, [], async () => {
+      if (this.data?.locale === locale) {
+        return;
+      }
+      await this.graphQLService.sdk.changeSessionLanguage({ locale });
+
+      if (this.data) {
+        this.data.locale = locale;
+      }
+    });
 
     this.markOutdated();
   }
