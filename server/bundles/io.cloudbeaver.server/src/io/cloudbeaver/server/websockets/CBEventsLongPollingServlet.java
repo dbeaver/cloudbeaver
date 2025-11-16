@@ -168,7 +168,10 @@ public class CBEventsLongPollingServlet extends HttpServlet {
         );
 
         try {
-            WebHeadlessSession headless = createHeadlessSession(sm, info, req);
+
+            String token = req.getHeader(WSConstants.WS_AUTH_HEADER);
+
+            WebHeadlessSession headless = sm.getHeadlessSession(token, info, true);
             if (headless != null) {
                 return headless;
             } else  {
@@ -186,20 +189,6 @@ public class CBEventsLongPollingServlet extends HttpServlet {
         return req.getHeader(WSConstants.WS_SESSION_HEADER);
     }
 
-
-    @Nullable
-    private WebHeadlessSession createHeadlessSession(
-        @NotNull WebAppSessionManager sm,
-        @NotNull WebHttpRequestInfo info,
-        @NotNull HttpServletRequest req
-    ) throws DBException {
-
-        String token = req.getHeader(WSConstants.WS_AUTH_HEADER);
-        if (CommonUtils.isEmpty(token)) {
-            return null;
-        }
-        return sm.getHeadlessSession(token, info, true);
-    }
 
     @NotNull
     private CBEventsLongPolling getOrCreatePollSession(@NotNull BaseWebSession ws) {
