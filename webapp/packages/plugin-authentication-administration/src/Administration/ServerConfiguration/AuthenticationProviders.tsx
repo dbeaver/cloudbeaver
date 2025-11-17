@@ -73,9 +73,8 @@ export const AuthenticationProviders: PlaceholderComponent<IConfigurationPlaceho
 
         if (serverConfig.enabledAuthProviders?.length) {
           serverConfig.enabledAuthProviders = serverConfig.enabledAuthProviders.filter(providerId => {
-            const provider = providers.resource.get(providerId)!;
-
-            return !provider.requiredFeatures.some(feat => !serverConfig.enabledFeatures?.includes(feat));
+            const provider = providers.resource.get(providerId);
+            return !provider?.requiredFeatures.some(feat => !serverConfig.enabledFeatures?.includes(feat));
           });
         }
       },
