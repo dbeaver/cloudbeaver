@@ -268,7 +268,7 @@ public class WebSessionProjectImpl extends WebProjectImpl {
         if (CommonUtils.isEmpty(configMap)) {
             throw new DBWebException("Connection configuration parameters are missing");
         }
-        DBPDataSourceContainer newDataSource = getDataSourceContainerFromInput(configMap);
+        DBPDataSourceContainer newDataSource = getDataSourceContainerFromInput(getConnectionConfigInput(configMap));
         return addDataSourceToProject(newDataSource);
     }
 
@@ -302,7 +302,7 @@ public class WebSessionProjectImpl extends WebProjectImpl {
         webSession.addInfoMessage("Update connection - " + WebDataSourceUtils.getConnectionContainerInfo(dataSource));
 
         DBPDataSourceRegistry registry = getDataSourceRegistry();
-        getInputConfigHandler(configMap).updateDataSource(dataSource);
+        getInputConfigHandler(config).updateDataSource(dataSource);
         connectionInfo.setCredentialsSavedInSession(null);
         try {
             registry.updateDataSource(dataSource);
@@ -348,8 +348,8 @@ public class WebSessionProjectImpl extends WebProjectImpl {
     }
 
     @NotNull
-    public DataSourceDescriptor getDataSourceContainerFromInput(@NotNull Map<String, Object> configMap) throws DBWebException {
-        return getInputConfigHandler(configMap).createDataSourceContainer();
+    public DataSourceDescriptor getDataSourceContainerFromInput(@NotNull WebConnectionConfig configInput) throws DBWebException {
+        return getInputConfigHandler(configInput).createDataSourceContainer();
     }
 
     @NotNull
@@ -358,8 +358,8 @@ public class WebSessionProjectImpl extends WebProjectImpl {
     }
 
     @NotNull
-    protected WebConnectionConfigInputHandler getInputConfigHandler(@NotNull Map<String, Object> configMap) {
-        return new WebConnectionConfigInputHandler<>(getDataSourceRegistry(), getConnectionConfigInput(configMap));
+    protected WebConnectionConfigInputHandler getInputConfigHandler(@NotNull WebConnectionConfig configInput) {
+        return new WebConnectionConfigInputHandler<>(getDataSourceRegistry(), configInput);
     }
 
 
