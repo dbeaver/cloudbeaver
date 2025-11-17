@@ -9,12 +9,12 @@ import { makeObservable, observable } from 'mobx';
 
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
-import { SettingsSource } from '@cloudbeaver/core-settings';
+import { EditableSettingsSource } from '@cloudbeaver/core-settings';
 import { StorageService } from '@cloudbeaver/core-storage';
 import { isNull } from '@cloudbeaver/core-utils';
 
 @injectable(() => [UserInfoResource, StorageService])
-export class UserSettingsService extends SettingsSource {
+export class UserSettingsService extends EditableSettingsSource {
   private readonly settings: Map<string, any>;
   private lastConfig: any;
   private localSettings: Map<string, any>;

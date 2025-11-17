@@ -20,6 +20,7 @@ import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.impl.preferences.AbstractUserPreferenceStore;
 import org.jkiss.dbeaver.model.preferences.DBPPreferenceStore;
+import org.jkiss.utils.CommonUtils;
 
 import java.io.IOException;
 import java.util.Map;
@@ -84,5 +85,14 @@ public class WebSessionPreferenceStore extends AbstractUserPreferenceStore {
     @Override
     public void save() throws IOException {
         throw new RuntimeException("Not implemented");
+    }
+
+    public boolean getUserPreferenceBoolean(@NotNull String name, boolean fallbackValue) {
+        String value = CommonUtils.toString(userPreferences.get(name));
+        if (value.isEmpty()) {
+            return fallbackValue;
+        } else {
+            return toBoolean(value);
+        }
     }
 }

@@ -15,6 +15,9 @@
       "path": "../../common-react/@dbeaver/react-tests"
     },
     {
+      "path": "../../common-typescript/@dbeaver/js-helpers"
+    },
+    {
       "path": "../core-cli"
     },
     {
