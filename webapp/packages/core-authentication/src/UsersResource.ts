@@ -36,7 +36,7 @@ import { AuthInfoService } from './AuthInfoService.js';
 import { AuthProviderService } from './AuthProviderService.js';
 import type { IAuthCredentials } from './IAuthCredentials.js';
 
-export const NEW_USER_SYMBOL = Symbol('new-user');
+const NEW_USER_SYMBOL = Symbol('new-user');
 
 export type AdminUser = AdminUserInfoFragment;
 export type AdminUserOrigin = AdminUserInfoFragment['origins'][number];

@@ -25,7 +25,7 @@ interface State {
   users: AdminUser[];
   loadableState: ILoadableState;
   loadMore(): void;
-  update: () => Promise<void>;
+  update: () => void;
   delete: () => Promise<void>;
 }
 
@@ -62,7 +62,7 @@ export function useUsersTable(filters: IUserFilters) {
 
         return filters.filterUsers([...newUsers, ...existingUsers]);
       },
-      async update() {
+      update() {
         try {
           pagination.refresh();
           notificationService.logSuccess({ title: 'authentication_administration_tools_refresh_success' });
