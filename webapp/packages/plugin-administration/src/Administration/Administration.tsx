@@ -31,6 +31,7 @@ import { useService } from '@cloudbeaver/core-di';
 import { OptionsPanelService, TabList, TabListStyles, TabsState, TabStyles } from '@cloudbeaver/core-ui';
 import type { ILoadableState } from '@cloudbeaver/core-utils';
 import { CaptureView } from '@cloudbeaver/core-view';
+import { SupportService } from '@cloudbeaver/core-support';
 
 import { AdministrationCaptureViewContext } from './AdministrationCaptureViewContext.js';
 import { AdministrationViewService } from './AdministrationViewService.js';
@@ -93,6 +94,7 @@ export const Administration = observer<React.PropsWithChildren<Props>>(function 
   const administrationViewService = useService(AdministrationViewService);
   const administrationItemService = useService(AdministrationItemService);
   const optionsPanelService = useService(OptionsPanelService);
+  const supportService = useService(SupportService);
 
   const OptionsPanel = optionsPanelService.getPanelComponent();
   const visibleItems = administrationItemService.getActiveItems(configurationWizard);
@@ -109,6 +111,8 @@ export const Administration = observer<React.PropsWithChildren<Props>>(function 
     optionsPanelService.close();
   }
 
+  const SupportInstruction = supportService.supportInstruction?.();
+
   return (
     <CaptureView view={administrationViewService} className={s(styles, { captureView: true })}>
       <AdministrationCaptureViewContext />
@@ -124,6 +128,12 @@ export const Administration = observer<React.PropsWithChildren<Props>>(function 
                 onSelect={onItemSelect}
               />
             ))}
+
+            {SupportInstruction && (
+              <div className="tw:mt-auto tw:p-2">
+                <SupportInstruction />
+              </div>
+            )}
           </TabList>
         </SContext>
         <div ref={contentRef} className={s(styles, { contentContainer: true })}>
