@@ -36,6 +36,7 @@ import coreTheming from '@cloudbeaver/core-theming/module';
 import coreUi from '@cloudbeaver/core-ui/module';
 import coreVersion from '@cloudbeaver/core-version/module';
 import coreVersionUpdate from '@cloudbeaver/core-version-update/module';
+import coreSupport from '@cloudbeaver/core-support/module';
 import coreView from '@cloudbeaver/core-view/module';
 import coreServerNotifications from '@cloudbeaver/core-server-notifications/module';
 
@@ -131,6 +132,7 @@ const core = [
   coreView,
   coreVersion,
   coreVersionUpdate,
+  coreSupport,
   coreConnections,
   coreAdministration,
   coreDialogs,
