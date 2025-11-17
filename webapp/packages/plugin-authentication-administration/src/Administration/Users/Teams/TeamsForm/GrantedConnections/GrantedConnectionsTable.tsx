@@ -22,6 +22,8 @@ import {
 import type { DatabaseConnectionCustomOptionsFragment } from '@cloudbeaver/core-sdk';
 import { Alert, StaticImage, useAutoLoad, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 import { isGlobalProject, ProjectInfoResource, type ProjectInfo } from '@cloudbeaver/core-projects';
+import { EAdminPermission } from '@cloudbeaver/core-root';
+import { TeamsResource } from '@cloudbeaver/core-authentication';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import { GrantManagementTable, type IGrantManagementTableColumn } from '@cloudbeaver/plugin-data-grid';
 
@@ -46,6 +48,7 @@ export const GrantedConnectionsTable: TabContainerPanelComponent<TeamFormProps> 
 
   const connectionLoader = useResource(GrantedConnectionsTable, ConnectionInfoCustomOptionsResource, key, { active: selected });
   const connectionsOriginLoader = useResource(GrantedConnectionsTable, ConnectionInfoOriginResource, key, { active: selected });
+  const teamLoader = useResource(GrantedConnectionsTable, TeamsResource, formState.state.teamId, { active: selected });
 
   const connections = connectionLoader.data as ConnectionInfoCustomOptions[];
   const connectionsOrigins = (connectionsOriginLoader.data ?? []) as ConnectionInfoOrigin[];
@@ -54,6 +57,12 @@ export const GrantedConnectionsTable: TabContainerPanelComponent<TeamFormProps> 
 
   if (!selected) {
     return null;
+  }
+
+  const fullAccess = teamLoader.data?.teamPermissions.includes(EAdminPermission.admin);
+
+  if (fullAccess) {
+    return <Alert className="tw:h-max">{translate('connections_connection_access_admin_info')}</Alert>;
   }
 
   function isGranted(connection: DatabaseConnectionCustomOptionsFragment) {
