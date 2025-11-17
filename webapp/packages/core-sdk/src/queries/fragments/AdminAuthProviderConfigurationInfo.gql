@@ -1,0 +1,16 @@
+fragment AdminAuthProviderConfigurationInfo on AdminAuthProviderConfiguration {
+  providerId
+  id
+  displayName
+  disabled
+  isDefault
+  iconURL
+  description
+  parameters
+  signInLink
+  signOutLink
+  redirectLink
+  metadataLink
+  acsLink
+  entityIdLink
+}

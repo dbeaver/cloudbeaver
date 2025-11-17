@@ -32,8 +32,11 @@ public class WebRegistryConstant {
     public static final String ATTR_REQUIRED_FEATURES = "requiredFeatures";
     public static final String ATTR_CATEGORIES = "categories";
     public static final String ATTR_SERVICE_PROVIDER = "serviceProvider";
+    public static final String ATTR_DISABLED = "disabled";
+    public static final String ATTR_IS_DEFAULT = "isDefault";
 
     public static final String TAG_CONFIGURATION = "configuration";
     public static final String TAG_CREDENTIALS = "credentials";
     public static final String TAG_META_PARAMETERS = "metaParameters";
+    public static final String TAG_DEFAULT_CONFIGURATION = "defaultConfiguration";
 }

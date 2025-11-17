@@ -24,6 +24,7 @@ import io.cloudbeaver.model.config.CBAppConfig;
 import io.cloudbeaver.model.config.CBServerConfig;
 import io.cloudbeaver.model.config.PasswordPolicyConfiguration;
 import io.cloudbeaver.model.config.SMControllerConfiguration;
+import io.cloudbeaver.registry.WebAuthProviderRegistry;
 import io.cloudbeaver.utils.ServletAppUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
@@ -223,6 +224,8 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
                 appConfiguration.getAuthCustomConfigurations().stream()
             )
             .collect(Collectors.toCollection(LinkedHashSet::new));
+        Set<SMAuthProviderCustomConfiguration> mandatoryConfigurations = WebAuthProviderRegistry.getInstance().getMandatoryConfigurations();
+        mergedAuthProviders.addAll(mandatoryConfigurations);
         appConfiguration.setAuthProvidersConfigurations(mergedAuthProviders);
     }
 

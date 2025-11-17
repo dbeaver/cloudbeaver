@@ -21,11 +21,13 @@ import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.impl.PropertyDescriptor;
+import org.jkiss.dbeaver.model.security.SMAuthProviderCustomConfiguration;
 import org.jkiss.dbeaver.registry.RegistryConstants;
 import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class WebAuthProviderRegistry {
 
@@ -120,4 +122,11 @@ public class WebAuthProviderRegistry {
         return authProviders.get(id);
     }
 
+    public Set<SMAuthProviderCustomConfiguration> getMandatoryConfigurations() {
+        return authProviders.values()
+            .stream()
+            .map(WebAuthProviderDescriptor::getDefaultConfiguration)
+            .filter(Objects::nonNull)
+            .collect(Collectors.toSet());
+    }
 }

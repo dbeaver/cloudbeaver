@@ -134,6 +134,7 @@ public class CBStaticServlet extends DefaultServlet {
         }
         CBAppConfig appConfig = application.getAppConfiguration();
         String[] authProviders = appConfig.getEnabledAuthProviders();
+        //fixme there is no single auth provider
         if (authProviders.length == 1) {
             String authProviderId = authProviders[0];
             WebAuthProviderDescriptor authProvider = WebAuthProviderRegistry.getInstance().getAuthProvider(authProviderId);
