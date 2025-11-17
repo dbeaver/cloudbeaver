@@ -40,7 +40,7 @@ export class ConnectionOriginInfoTabService extends Bootstrap {
         const key = optionsPart?.connectionKey;
 
         if (!key) {
-          console.error('Cannot load connection origin info: connection key is not defined');
+          console.warn('Cannot load connection origin info: connection key is not defined');
           return [];
         }
 
