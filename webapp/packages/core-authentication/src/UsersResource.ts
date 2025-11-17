@@ -41,7 +41,7 @@ const NEW_USER_SYMBOL = Symbol('new-user');
 export type AdminUser = AdminUserInfoFragment;
 export type AdminUserOrigin = AdminUserInfoFragment['origins'][number];
 
-export type AdminUserNew = AdminUser & { [NEW_USER_SYMBOL]: boolean; createdAt: string };
+type AdminUserNew = AdminUser & { [NEW_USER_SYMBOL]: boolean; createdAt: number };
 export type UserResourceIncludes = Omit<GetUsersListQueryVariables, 'userId' | 'page' | 'filter'>;
 
 interface IUserResourceFilterOptions {
@@ -148,7 +148,7 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
 
     const newUser = user as unknown as AdminUserNew;
     newUser[NEW_USER_SYMBOL] = true;
-    newUser.createdAt = new Date().toISOString();
+    newUser.createdAt = Date.now();
     this.set(user.userId, newUser);
 
     return this.get(user.userId)!;
@@ -161,7 +161,7 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
       }
 
       user[NEW_USER_SYMBOL] = false;
-      user.createdAt = '';
+      user.createdAt = 0;
     }
   }
 
@@ -346,7 +346,7 @@ export function sortByNewUsers(a: AdminUser, b: AdminUser): number {
   }
 
   if (aIsNew && bIsNew) {
-    return b.createdAt.localeCompare(a.createdAt);
+    return b.createdAt - a.createdAt;
   }
 
   return 0;

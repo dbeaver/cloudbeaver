@@ -7,14 +7,7 @@
  */
 import { action, computed, observable } from 'mobx';
 
-import {
-  type AdminUser,
-  type AdminUserNew,
-  sortUsersById,
-  sortByNewUsers,
-  UsersResource,
-  UsersResourceFilterKey,
-} from '@cloudbeaver/core-authentication';
+import { type AdminUser, sortUsersById, sortByNewUsers, UsersResource, UsersResourceFilterKey } from '@cloudbeaver/core-authentication';
 import { ConfirmationDialogDelete, TableState, useObservableRef, useOffsetPagination, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
@@ -56,13 +49,17 @@ export function useUsersTable(filters: IUserFilters) {
         return pagination.hasNextPage;
       },
       get users() {
-        const filteredUsers = this.usersLoader.resource.get(UsersResourceFilterKey(searchFilter, enabledStateFilter));
-        const paginatedUsers = usersResource.get(pagination.allPages);
-        const allUsers = Array.from([...filteredUsers, ...paginatedUsers].values()).filter(isDefined);
-        const allUsersUniqueMap = new Map<string, AdminUser | AdminUserNew>(allUsers.map(user => [user.userId, user]));
-        const allUsersUnique: (AdminUser | AdminUserNew)[] = Array.from(allUsersUniqueMap.values());
-
-        return filters.filterUsers(allUsersUnique.sort(sortUsersById).sort(sortByNewUsers));
+        return filters.filterUsers(
+          Array.from(
+            new Set([
+              ...this.usersLoader.resource.get(UsersResourceFilterKey(searchFilter, enabledStateFilter)),
+              ...usersResource.get(pagination.allPages),
+            ]),
+          )
+            .filter(isDefined)
+            .sort(sortUsersById)
+            .sort(sortByNewUsers),
+        );
       },
       update() {
         try {
