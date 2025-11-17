@@ -7,7 +7,14 @@
  */
 import { action, computed, observable } from 'mobx';
 
-import { type AdminUser, type AdminUserNew, compareUsers, isNewUser, UsersResource, UsersResourceFilterKey } from '@cloudbeaver/core-authentication';
+import {
+  type AdminUser,
+  type AdminUserNew,
+  sortUsersById,
+  sortByNewUsers,
+  UsersResource,
+  UsersResourceFilterKey,
+} from '@cloudbeaver/core-authentication';
 import { ConfirmationDialogDelete, TableState, useObservableRef, useOffsetPagination, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
@@ -49,18 +56,13 @@ export function useUsersTable(filters: IUserFilters) {
         return pagination.hasNextPage;
       },
       get users() {
-        const filteredUsers = this.usersLoader.resource
-          .get(UsersResourceFilterKey(searchFilter, enabledStateFilter))
-          .filter(isDefined)
-          .sort(compareUsers);
-        const paginatedUsers = usersResource.get(pagination.allPages).filter(isDefined).sort(compareUsers);
-        const allUsers = Array.from([...filteredUsers, ...paginatedUsers].values());
+        const filteredUsers = this.usersLoader.resource.get(UsersResourceFilterKey(searchFilter, enabledStateFilter));
+        const paginatedUsers = usersResource.get(pagination.allPages);
+        const allUsers = Array.from([...filteredUsers, ...paginatedUsers].values()).filter(isDefined);
         const allUsersUniqueMap = new Map<string, AdminUser | AdminUserNew>(allUsers.map(user => [user.userId, user]));
         const allUsersUnique: (AdminUser | AdminUserNew)[] = Array.from(allUsersUniqueMap.values());
-        const newUsers: AdminUserNew[] = allUsersUnique.filter(isNewUser).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
-        const existingUsers: AdminUser[] = allUsersUnique.filter(user => !isNewUser(user));
 
-        return filters.filterUsers([...newUsers, ...existingUsers]);
+        return filters.filterUsers(allUsersUnique.sort(sortUsersById).sort(sortByNewUsers));
       },
       update() {
         try {

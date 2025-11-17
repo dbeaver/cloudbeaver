@@ -91,7 +91,7 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
     this.aliases.add(UsersResourceNewUsers, () => {
       const orderedKeys = this.entries
         .filter(k => isNewUser(k[1]))
-        .sort((a, b) => compareUsers(a[1], b[1]))
+        .sort((a, b) => sortUsersById(a[1], b[1]))
         .map(([key]) => key);
       return resourceKeyList(orderedKeys);
     });
@@ -325,10 +325,29 @@ export function isLocalUser(user: AdminUser): boolean {
   return user.origins.some(origin => origin.type === AUTH_PROVIDER_LOCAL_ID);
 }
 
-export function isNewUser(user: AdminUser): user is AdminUserNew {
+export function isNewUser(user: AdminUser | AdminUserNew): user is AdminUserNew {
   return NEW_USER_SYMBOL in user && user[NEW_USER_SYMBOL] === true && 'createdAt' in user && Boolean(user.createdAt);
 }
 
-export function compareUsers<T extends Pick<AdminUser, 'userId'>>(a: T, b: T): number {
+export function sortUsersById<T extends Pick<AdminUser, 'userId'>>(a: T, b: T): number {
   return a.userId.localeCompare(b.userId);
+}
+
+export function sortByNewUsers(a: AdminUser, b: AdminUser): number {
+  const aIsNew = isNewUser(a);
+  const bIsNew = isNewUser(b);
+
+  if (aIsNew && !bIsNew) {
+    return -1;
+  }
+
+  if (!aIsNew && bIsNew) {
+    return 1;
+  }
+
+  if (aIsNew && bIsNew) {
+    return b.createdAt.localeCompare(a.createdAt);
+  }
+
+  return 0;
 }
