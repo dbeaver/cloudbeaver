@@ -46,7 +46,7 @@ export const ServerConfigurationInfoForm = observer<Props>(function ServerConfig
   function constructSupportedHostsExample() {
     const exampleWithPort = serverConfigLoader.data?.distributed ? 'localhost' : 'localhost:5000';
 
-    return `example.com\n${exampleWithPort}\n127.0.0.1`;
+    return `example.com\n${exampleWithPort}`;
   }
 
   return (
