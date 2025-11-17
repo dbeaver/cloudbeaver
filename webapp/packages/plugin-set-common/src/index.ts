@@ -36,6 +36,7 @@ import coreTheming from '@cloudbeaver/core-theming/module';
 import coreUi from '@cloudbeaver/core-ui/module';
 import coreVersion from '@cloudbeaver/core-version/module';
 import coreVersionUpdate from '@cloudbeaver/core-version-update/module';
+import coreSupport from '@cloudbeaver/core-support/module';
 import coreView from '@cloudbeaver/core-view/module';
 import coreServerNotifications from '@cloudbeaver/core-server-notifications/module';
 
@@ -59,6 +60,7 @@ import pluginDataViewerResultSetGrouping from '@cloudbeaver/plugin-data-viewer-r
 import pluginDataViewerResultTraceDetails from '@cloudbeaver/plugin-data-viewer-result-trace-details/module';
 import pluginDatasourceContextSwitch from '@cloudbeaver/plugin-datasource-context-switch/module';
 import pluginDatasourceTransactionManager from '@cloudbeaver/plugin-datasource-transaction-manager/module';
+import pluginDataViewerRequestQueryViewer from '@cloudbeaver/plugin-data-viewer-request-query-viewer/module';
 import pluginDdlViewer from '@cloudbeaver/plugin-ddl-viewer/module';
 import pluginDevTools from '@cloudbeaver/plugin-devtools/module';
 import pluginGisViewer from '@cloudbeaver/plugin-gis-viewer/module';
@@ -105,6 +107,7 @@ import pluginSettingsDefaultAdministration from '@cloudbeaver/plugin-settings-de
 import pluginCodemirror6 from '@cloudbeaver/plugin-codemirror6/module';
 import pluginAsyncTaskConfirmation from '@cloudbeaver/plugin-async-task-confirmation/module';
 import pluginSqlAsyncTaskConfirmation from '@cloudbeaver/plugin-sql-async-task-confirmation/module';
+import pluginDataViewerConditionalFormatting from '@cloudbeaver/plugin-data-viewer-conditional-formatting/module';
 
 const core = [
   coreRouting, // important, should be first because the router starts in load phase first after all plugins register phase
@@ -129,6 +132,7 @@ const core = [
   coreView,
   coreVersion,
   coreVersionUpdate,
+  coreSupport,
   coreConnections,
   coreAdministration,
   coreDialogs,
@@ -159,6 +163,7 @@ export const commonSet = [
   pluginDataViewer,
   pluginDataViewerResultTraceDetails,
   pluginDataViewerResultSetGrouping,
+  pluginDataViewerRequestQueryViewer,
   pluginGisViewer,
   pluginDdlViewer,
   pluginObjectViewer,
@@ -209,4 +214,5 @@ export const commonSet = [
   pluginCodemirror6,
   pluginAsyncTaskConfirmation,
   pluginSqlAsyncTaskConfirmation,
+  pluginDataViewerConditionalFormatting,
 ];

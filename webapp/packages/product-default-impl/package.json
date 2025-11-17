@@ -27,6 +27,7 @@
     "@cloudbeaver/core-bootstrap": "workspace:*",
     "@cloudbeaver/core-di": "workspace:*",
     "@cloudbeaver/core-localization": "workspace:*",
+    "@cloudbeaver/core-support": "workspace:*",
     "@cloudbeaver/core-version-update": "workspace:*",
     "@cloudbeaver/plugin-data-editor-public-settings": "workspace:*",
     "@cloudbeaver/plugin-set-common": "workspace:*",

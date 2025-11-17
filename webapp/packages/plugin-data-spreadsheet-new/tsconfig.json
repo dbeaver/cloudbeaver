@@ -63,6 +63,9 @@
     },
     {
       "path": "../plugin-data-viewer"
+    },
+    {
+      "path": "../plugin-data-viewer-conditional-formatting"
     }
   ],
   "include": [

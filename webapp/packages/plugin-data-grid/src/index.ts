@@ -21,6 +21,7 @@ export {
   type IGridReactiveValue,
   type DataGridRef,
   type ICellPosition,
+  type IDataGridRowRenderer,
   type IDataGridCellRenderer,
   type IDataGridCellProps,
   type DataGridProps,

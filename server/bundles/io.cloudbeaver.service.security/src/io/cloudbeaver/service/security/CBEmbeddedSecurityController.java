@@ -2472,6 +2472,13 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                 if (autoAssign != null && CommonUtils.isNotEmpty(autoAssign.getAuthRoleAssignReason())) {
                     log.info(activeUserId + " authenticated with role " + autoAssign.getAuthRole() + ", reason: " + autoAssign.getAuthRoleAssignReason());
                 }
+            } else {
+                SMAuthProvider<?> authProviderInstance = authProvider.getInstance();
+                if (!authProviderInstance.supportsOpeningSessionAsChild()) {
+                    var error = "Auth provider '" + authProviderId + "' doesn't support opening as a child session";
+                    updateAuthStatus(authId, SMAuthStatus.ERROR, dbStoredUserData, error, null);
+                    return SMAuthInfo.error(authId, error, isMainAuthSession, null, authInfo.getAppSessionId());
+                }
             }
             dbStoredUserData.put(
                 authConfiguration,

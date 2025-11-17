@@ -77,7 +77,7 @@ export default [
   ],
 
   ['administration_identity_providers_tab_title', 'Identity Providers'],
-  ['administration_identity_providers_provider', 'Provider'],
+  ['administration_identity_providers_provider', 'Provider Type'],
   ['administration_identity_providers_provider_id', 'ID'],
   ['administration_identity_providers_provider_configuration_name', 'Configuration Name'],
   ['administration_identity_providers_provider_configuration_disabled', 'Disabled'],
