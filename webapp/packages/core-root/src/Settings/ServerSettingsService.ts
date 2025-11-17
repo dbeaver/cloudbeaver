@@ -9,7 +9,7 @@ import { action, makeObservable, observable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 import { PRODUCT_SETTINGS_LAYER } from '@cloudbeaver/core-product';
-import { createSettingsLayer, SettingsSource } from '@cloudbeaver/core-settings';
+import { createSettingsLayer, EditableSettingsSource } from '@cloudbeaver/core-settings';
 
 import { EAdminPermission } from '../EAdminPermission.js';
 import { ServerConfigResource } from '../ServerConfigResource.js';
@@ -18,7 +18,7 @@ import { SessionPermissionsResource } from '../SessionPermissionsResource.js';
 export const SERVER_SETTINGS_LAYER = createSettingsLayer(PRODUCT_SETTINGS_LAYER, 'server');
 
 @injectable(() => [ServerConfigResource, SessionPermissionsResource])
-export class ServerSettingsService extends SettingsSource {
+export class ServerSettingsService extends EditableSettingsSource {
   private readonly settings: Map<string, any>;
   private lastConfig: any;
 

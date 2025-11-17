@@ -20,6 +20,7 @@ export * from './SettingsResolverService.js';
 export * from './SettingsProvider.js';
 export * from './SettingsProviderService.js';
 export * from './SettingsSource.js';
+export * from './EditableSettingsSource.js';
 export * from './SettingsManager/ESettingsValueType.js';
 export * from './SettingsManager/ISettingDescription.js';
 export * from './SettingsManager/SettingsGroup.js';
