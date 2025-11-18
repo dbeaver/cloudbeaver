@@ -263,7 +263,7 @@ export class ConnectionMenuBootstrap extends Bootstrap {
       connection = await this.connectionInfoResource.changeConnectionView(createConnectionParam(connection), settings);
 
       if (connection.nodePath) {
-        await this.navNodeManagerService.refreshNode(connection.nodePath);
+        await this.navNodeManagerService.refreshTree(connection.nodePath);
       }
     } catch (exception: any) {
       this.notificationService.logException(exception);
