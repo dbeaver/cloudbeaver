@@ -7,7 +7,7 @@
  */
 import { action, computed, observable } from 'mobx';
 
-import { type AdminUser, sortUsersById, sortByNewUsers, UsersResource, UsersResourceFilterKey } from '@cloudbeaver/core-authentication';
+import { type AdminUser, compareUsers, sortByNewUsers, UsersResource, UsersResourceFilterKey } from '@cloudbeaver/core-authentication';
 import { ConfirmationDialogDelete, TableState, useObservableRef, useOffsetPagination, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
@@ -57,7 +57,7 @@ export function useUsersTable(filters: IUserFilters) {
             ]),
           )
             .filter(isDefined)
-            .sort(sortUsersById)
+            .sort(compareUsers)
             .sort(sortByNewUsers),
         );
       },

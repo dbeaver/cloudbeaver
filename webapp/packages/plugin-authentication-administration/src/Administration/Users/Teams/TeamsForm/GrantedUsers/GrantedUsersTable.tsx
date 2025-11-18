@@ -14,7 +14,7 @@ import { CachedResourceOffsetPageListKey } from '@cloudbeaver/core-resource';
 import { GrantManagementTable, type IGrantManagementTableColumn } from '@cloudbeaver/plugin-data-grid';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import {
-  sortUsersById,
+  compareUsers,
   TeamRolesResource,
   USER_TEAM_ROLE_SUPERVISOR,
   UsersResource,
@@ -126,7 +126,7 @@ export const GrantedUsersTable: TabContainerPanelComponent<TeamFormProps> = obse
     return null;
   }
 
-  const items = (usersLoader.data.filter(user => user?.enabled) as AdminUser[]).sort(sortUsersById);
+  const items = (usersLoader.data.filter(user => user?.enabled) as AdminUser[]).sort(compareUsers);
 
   return (
     <GrantManagementTable
