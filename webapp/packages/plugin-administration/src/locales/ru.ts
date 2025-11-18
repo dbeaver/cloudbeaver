@@ -18,7 +18,7 @@ export default [
   ['administration_configuration_wizard_configuration_supported_hosts', 'Разрешённые URL сервера'],
   [
     'administration_configuration_wizard_configuration_supported_hosts_description',
-    'Вы можете указать несколько URL серверов, разделенных новой строкой. Пустое значение означает, что все URL разрешены',
+    'Вы можете указать несколько URL серверов, разделенных новой строкой. Пустое значение означает, что все URL разрешены. Доступ с IP-адресов всегда разрешен.',
   ],
   [
     'administration_configuration_wizard_configuration_supported_hosts_warning',

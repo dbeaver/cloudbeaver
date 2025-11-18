@@ -13,7 +13,7 @@ export default [
   ['core_blocks_exception_message_error_title', '无法显示内容'],
   ['core_blocks_exception_message_error_message', '出现错误.'],
   ['core_blocks_custom_input_validation_error', '字段值无效'],
-  ['core_blocks_export_image_dialog_title', '导出图像'],
+  ['core_blocks_export_image_dialog_title', '导出为图片'],
   ['core_blocks_export_image_dialog_format', '文件格式'],
   ['core_blocks_export_image_dialog_transparent_background', '透明背景'],
 ];
