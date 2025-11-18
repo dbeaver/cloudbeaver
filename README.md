@@ -25,6 +25,11 @@ You can see a live demo of CloudBeaver here: https://demo.cloudbeaver.io
 
 ## Changelog
 
+### 25.2.5 2025-11-17
+- A "Show SQL" button has been added to the Data Editor and the grouping panel, enabling users to inspect the exact SQL query behind displayed results—helping validate data transformations, debug query logic, and ensure analytical accuracy;
+- The search option has been added to the default catalog/schema selector in the SQL Editor's main toolbar;
+- The SQL Server driver has been updated to version 13.2.1.
+
 ### 25.2.4 2025-11-03
 - A confirmation prompt has been added for potentially dangerous queries in the SQL Editor to help prevent unintended execution. You can customize this behavior in Preferences > SQL Editor;
 - The value panel in the Data Editor has been redesigned to provide users with more space for viewing and editing data. Tab buttons for different data type visualizations are now aligned on a single level, creating a cleaner layout;
