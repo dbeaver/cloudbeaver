@@ -11,7 +11,7 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 
 import { ConnectionFormService } from '../ConnectionFormService.js';
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
-import { CachedMapAllKey, getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
+import { getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
 import { getConnectionFormOptionsPart } from '../Options/getConnectionFormOptionsPart.js';
 export const ConnectionFormAuthenticationAction = importLazyComponent(() =>
   import('./ConnectionFormAuthenticationAction.js').then(m => m.ConnectionFormAuthenticationAction),
@@ -35,7 +35,17 @@ export class ConnectionOriginInfoTabService extends Bootstrap {
       order: 3,
       tab: () => OriginInfoTab,
       panel: () => OriginInfo,
-      getLoader: () => getCachedMapResourceLoaderState(this.connectionInfoOriginResource, () => CachedMapAllKey),
+      getLoader: (context, props) => {
+        const optionsPart = props?.formState ? getConnectionFormOptionsPart(props.formState) : null;
+        const key = optionsPart?.connectionKey;
+
+        if (!key) {
+          console.warn('Cannot load connection origin info: connection key is not defined');
+          return [];
+        }
+
+        return getCachedMapResourceLoaderState(this.connectionInfoOriginResource, () => key);
+      },
       isHidden: (tabId, props) => {
         const optionsPart = props?.formState ? getConnectionFormOptionsPart(props.formState) : null;
         const key = optionsPart?.connectionKey;
