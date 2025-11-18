@@ -25,7 +25,10 @@ export abstract class BaseSqlDataSource<TDataSource extends QueryDataSource = Qu
   static key = 'base';
 
   abstract get name(): string | null;
-  message?: string;
+  get message(): string | undefined {
+    return undefined;
+  }
+  loadingMessage?: string;
 
   abstract get script(): string;
   abstract get baseScript(): string;
@@ -93,7 +96,7 @@ export abstract class BaseSqlDataSource<TDataSource extends QueryDataSource = Qu
     this.incomingScript = undefined;
     this.incomingExecutionContext = null;
     this.exception = undefined;
-    this.message = undefined;
+    this.loadingMessage = undefined;
     this.outdated = true;
     this.editing = true;
     this.innerCursorState = { anchor: 0, head: 0 };
@@ -144,7 +147,8 @@ export abstract class BaseSqlDataSource<TDataSource extends QueryDataSource = Qu
       databaseModels: observable.ref,
       exception: observable.ref,
       outdated: observable.ref,
-      message: observable.ref,
+      message: computed,
+      loadingMessage: observable.ref,
       editing: observable.ref,
       innerCursorState: observable.ref,
       incomingScript: observable.ref,

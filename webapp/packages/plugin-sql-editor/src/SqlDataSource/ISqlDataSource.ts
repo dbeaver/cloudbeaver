@@ -34,6 +34,7 @@ export interface ISqlDataSource<TDataSource extends QueryDataSource = QueryDataS
   readonly icon?: string;
   readonly emptyPlaceholder?: string;
   readonly message?: string;
+  readonly loadingMessage?: string;
 
   readonly sourceKey: string;
   readonly projectId: string | null;
