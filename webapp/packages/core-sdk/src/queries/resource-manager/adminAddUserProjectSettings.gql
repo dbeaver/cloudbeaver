@@ -1,0 +1,3 @@
+mutation adminAddUserProjectSettings($projectId: ID!, $subjectId: String!, $settings: Object!) {
+  rmAdminAddUserProjectSettings(projectId: $projectId, subjectId: $subjectId, settings: $settings)
+}

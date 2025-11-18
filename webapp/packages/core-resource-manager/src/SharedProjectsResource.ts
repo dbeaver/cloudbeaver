@@ -147,6 +147,32 @@ export class SharedProjectsResource extends CachedMapResource<string, SharedProj
     }
   }
 
+  getProjectSettings(projectId: string, subjectId: string) {
+    return this.graphQLService.sdk.getAdminUserProjectSettings({
+      projectId,
+      subjectId,
+    });
+  }
+
+  async setProjectSettings(projectId: string, settings: Record<string, any>, subjectId: string): Promise<void> {
+    await this.graphQLService.sdk.adminAddUserProjectSettings({
+      projectId,
+      subjectId,
+      settings,
+    });
+
+    this.markOutdated(projectId);
+  }
+
+  async deleteProjectSettings(projectId: string, settingIds: string[], subjectId: string): Promise<void> {
+    await this.graphQLService.sdk.adminDeleteUserProjectSettings({
+      projectId,
+      subjectId,
+      settingIds,
+    });
+    this.markOutdated(projectId);
+  }
+
   protected async loader(key: ResourceKey<string>): Promise<Map<string, SharedProject>> {
     const all = this.aliases.isAlias(key, CachedMapAllKey);
 

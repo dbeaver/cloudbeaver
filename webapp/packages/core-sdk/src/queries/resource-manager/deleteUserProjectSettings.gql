@@ -1,0 +1,3 @@
+mutation deleteUserProjectSettings($projectId: ID!, $settingIds: [String!]!) {
+  rmDeleteUserProjectSettings(projectId: $projectId, settingIds: $settingIds)
+}

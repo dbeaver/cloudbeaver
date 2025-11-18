@@ -469,22 +469,79 @@ public class WebServiceRM implements DBWServiceRM {
         }
     }
 
+    @Override
+    public boolean addProjectSettings(@NotNull WebSession webSession, @NotNull String projectId, @NotNull Map<String, Object> settings)
+    throws DBWebException {
+
+        try {
+            validateProject(webSession, projectId);
+            //fixme transactional
+            SMController securityController = webSession.getSecurityController();
+            securityController.deleteObjectSettings(
+                projectId,
+                SMObjectType.project,
+                settings.keySet()
+            );
+            securityController.setObjectSettings(
+                projectId,
+                SMObjectType.project,
+                settings
+            );
+            return true;
+        } catch (DBException e) {
+            throw new DBWebException("Error adding object settings", e);
+        }
+    }
+
+    @NotNull
+    @Override
+    public Map<String, Object> getProjectSettings(@NotNull WebSession webSession, @NotNull String projectId, @Nullable String settingId)
+    throws DBWebException {
+        try {
+            validateProject(webSession, projectId);
+            //todo accumulate settings from user and team. For now just return team settings
+            return webSession.getSecurityController().getObjectSettings(
+                projectId,
+                SMObjectType.project,
+                ServletAppUtils.getServletApplication().getAppConfiguration().getDefaultUserTeam(),
+                settingId == null ? null : Set.of(settingId)
+            );
+        } catch (DBException e) {
+            throw new DBWebException("Error getting project settings", e);
+        }
+    }
+
+    @Override
+    public boolean deleteProjectSettings(@NotNull WebSession webSession, @NotNull String projectId, @Nullable List<String> settings)
+    throws DBWebException {
+        try {
+            validateProject(webSession, projectId);
+            webSession.getSecurityController().deleteObjectSettings(
+                projectId,
+                SMObjectType.project,
+                settings == null ? null : new HashSet<>(settings)
+            );
+            return true;
+        } catch (DBException e) {
+            throw new DBWebException("Error deleting object settings", e);
+        }
+    }
+
     @NotNull
     @Override
     public Map<String, Object> getProjectSettings(
         @NotNull WebSession webSession,
         @NotNull String projectId,
+        @Nullable String subjectId,
         @Nullable String settingId
     ) throws DBWebException {
         try {
-            var project = webSession.getProjectById(projectId);
-            if (project == null) {
-                throw new DBWebException("Project '" + projectId + "' not found");
-            }
+            validateProject(webSession, projectId);
             return webSession.getSecurityController().getObjectSettings(
                 projectId,
                 SMObjectType.project,
-                settingId
+                subjectId,
+                settingId == null ? null : Set.of(settingId)
             );
         } catch (DBException e) {
             throw new DBWebException("Error getting project settings", e);
@@ -495,16 +552,23 @@ public class WebServiceRM implements DBWServiceRM {
     public boolean addProjectSettings(
         @NotNull WebSession webSession,
         @NotNull String projectId,
+        @NotNull String subjectId,
         @NotNull Map<String, Object> settings
     ) throws DBWebException {
         try {
-            var project = webSession.getProjectById(projectId);
-            if (project == null) {
-                throw new DBWebException("Project '" + projectId + "' not found");
-            }
-            webSession.getSecurityController().setObjectSettings(
+            validateProject(webSession, projectId);
+            //fixme transactional
+            SMAdminController adminSecurityController = webSession.getAdminSecurityController();
+            adminSecurityController.deleteObjectSettings(
                 projectId,
                 SMObjectType.project,
+                subjectId,
+                settings.keySet()
+            );
+            adminSecurityController.setObjectSettings(
+                projectId,
+                SMObjectType.project,
+                subjectId,
                 settings
             );
             return true;
@@ -517,21 +581,27 @@ public class WebServiceRM implements DBWServiceRM {
     public boolean deleteProjectSettings(
         @NotNull WebSession webSession,
         @NotNull String projectId,
+        @NotNull String subjectId,
         @Nullable List<String> settings
     ) throws DBWebException {
         try {
-            var project = webSession.getProjectById(projectId);
-            if (project == null) {
-                throw new DBWebException("Project '" + projectId + "' not found");
-            }
-            webSession.getSecurityController().deleteObjectSettings(
+            validateProject(webSession, projectId);
+            webSession.getAdminSecurityController().deleteObjectSettings(
                 projectId,
                 SMObjectType.project,
+                subjectId,
                 settings == null ? null : new HashSet<>(settings)
             );
             return true;
         } catch (DBException e) {
             throw new DBWebException("Error deleting object settings", e);
+        }
+    }
+
+    private void validateProject(@NotNull WebSession webSession, @NotNull String projectId) throws DBWebException {
+        var project = webSession.getProjectById(projectId);
+        if (project == null) {
+            throw new DBWebException("Project '" + projectId + "' not found");
         }
     }
 

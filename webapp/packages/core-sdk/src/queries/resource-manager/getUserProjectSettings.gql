@@ -1,0 +1,3 @@
+query getUserProjectSettings($projectId: ID!) {
+  rmUserProjectSettings(projectId: $projectId)
+}

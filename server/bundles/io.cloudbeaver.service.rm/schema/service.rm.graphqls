@@ -69,6 +69,9 @@ extend type Query {
 
     "Returns project settings that are specified for a current user"
     rmUserProjectSettings(projectId: ID!): Object @since(version: "25.2.1")
+
+    "Returns project settings that are specified for a subject"
+    rmAdminUserProjectSettings(projectId: ID!, subjectId: String!): Object @since(version: "25.2.3")
 }
 
 extend type Mutation {
@@ -137,4 +140,9 @@ extend type Mutation {
     rmAddUserProjectSettings(projectId: ID!, settings: Object!): Boolean! @since(version: "25.2.1")
     "Deletes project settings that are specified for a current user"
     rmDeleteUserProjectSettings(projectId: ID!, settingIds: [String!]!): Boolean! @since(version: "25.2.1")
+
+    "Adds project settings (e.g. enables simple view for a project) for a subject"
+    rmAdminAddUserProjectSettings(projectId: ID!, subjectId:String!, settings: Object!): Boolean! @since(version: "25.2.3")
+    "Deletes project settings that are specified for a subject"
+    rmAdminDeleteUserProjectSettings(projectId: ID!, subjectId:String!, settingIds: [String!]!): Boolean! @since(version: "25.2.3")
 }

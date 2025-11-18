@@ -1,0 +1,3 @@
+query getAdminUserProjectSettings($projectId: ID!, $subjectId: String!) {
+  rmAdminUserProjectSettings(projectId: $projectId, subjectId: $subjectId)
+}

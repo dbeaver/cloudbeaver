@@ -1277,6 +1277,4 @@ public class LocalResourceController extends BaseLocalResourceController {
 
         return project;
     }
-
-
 }
