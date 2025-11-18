@@ -333,7 +333,7 @@ export function compareUsers<T extends Pick<AdminUser, 'userId'>>(a: T, b: T): n
   return a.userId.localeCompare(b.userId);
 }
 
-export function sortByNewUsers(a: AdminUser, b: AdminUser): number {
+export function compareNewUsers(a: AdminUser, b: AdminUser): number {
   const aIsNew = isNewUser(a);
   const bIsNew = isNewUser(b);
 
