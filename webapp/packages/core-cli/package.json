@@ -42,9 +42,6 @@
     "js-yaml": "^4",
     "tslib": "^2"
   },
-  "resolutions": {
-    "glob": "^11.1"
-  },
   "devDependencies": {
     "@cloudbeaver/tsconfig": "workspace:*",
     "@types/js-yaml": "^4",
