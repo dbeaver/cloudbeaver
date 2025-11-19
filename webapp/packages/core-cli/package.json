@@ -49,6 +49,7 @@
     "@types/node": "^22",
     "enquirer": "^2",
     "execa": "^9",
+    "glob": "^11.1",
     "hygen": "^6",
     "typescript": "^5"
   }
