@@ -47,7 +47,7 @@ export class SQLParser {
     this.script = '';
     this.lastParsingArgs = [];
 
-    makeObservable<this, '_scripts' | 'script'>(this, {
+    makeObservable<this, '_scripts' | 'script' | 'getQueryAtPos'>(this, {
       actualScript: computed,
       _scripts: observable.ref,
       script: observable.ref,
@@ -109,22 +109,6 @@ export class SQLParser {
     };
   }
 
-  getQueryAtPos(position: number): ISQLScriptSegment | undefined {
-    const script = this._scripts.find(script => script.begin <= position && script.end > position);
-
-    if (script) {
-      return script;
-    }
-
-    const closestScripts = this._scripts.filter(script => script.begin <= position);
-
-    if (closestScripts.length > 0) {
-      return closestScripts[closestScripts.length - 1];
-    }
-
-    return undefined;
-  }
-
   setScript(script: string): void {
     this.script = script;
   }
@@ -137,5 +121,19 @@ export class SQLParser {
     }));
 
     return this;
+  }
+
+  private getQueryAtPos(position: number): ISQLScriptSegment | undefined {
+    const script = this._scripts.find(script => script.begin <= position && script.end > position);
+
+    if (script) {
+      return script;
+    }
+
+    return {
+      query: this.actualScript.substring(position, position),
+      begin: position,
+      end: position,
+    };
   }
 }
