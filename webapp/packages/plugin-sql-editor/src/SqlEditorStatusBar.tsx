@@ -29,7 +29,7 @@ export const SqlEditorStatusBar = observer<Props>(function SqlEditorStatusBar({ 
     >
       {dataSource?.message && (
         <div className={s(styles, { statusPosition: true }, 'tw:p-2')}>
-          <Alert title={t(dataSource?.message)} />
+          <Alert title={t(dataSource.message)} />
         </div>
       )}
     </Loader>

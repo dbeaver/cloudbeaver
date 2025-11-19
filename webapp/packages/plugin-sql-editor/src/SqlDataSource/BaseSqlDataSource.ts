@@ -17,6 +17,7 @@ import { ESqlDataSourceFeatures } from './ESqlDataSourceFeatures.js';
 import type { ISetScriptData, ISqlDataSource, ISqlDataSourceKey, ISqlEditorCursor } from './ISqlDataSource.js';
 import type { ISqlDataSourceHistory } from './SqlDataSourceHistory/ISqlDataSourceHistory.js';
 import { SqlDataSourceHistory } from './SqlDataSourceHistory/SqlDataSourceHistory.js';
+import type { TLocalizationToken } from '@cloudbeaver/core-localization';
 
 const SOURCE_HISTORY = 'history';
 
@@ -25,10 +26,10 @@ export abstract class BaseSqlDataSource<TDataSource extends QueryDataSource = Qu
   static key = 'base';
 
   abstract get name(): string | null;
-  get message(): string | undefined {
+  get message(): TLocalizationToken | undefined {
     return undefined;
   }
-  loadingMessage?: string;
+  loadingMessage?: TLocalizationToken;
 
   abstract get script(): string;
   abstract get baseScript(): string;

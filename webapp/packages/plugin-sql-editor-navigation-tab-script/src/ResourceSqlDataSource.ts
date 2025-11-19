@@ -24,6 +24,7 @@ import { SCRIPTS_TYPE_ID } from '@cloudbeaver/plugin-resource-manager-scripts';
 import { BaseSqlDataSource, ESqlDataSourceFeatures, SqlEditorService, type ISqlEditorCursor } from '@cloudbeaver/plugin-sql-editor';
 
 import type { IResourceSqlDataSourceState } from './IResourceSqlDataSourceState.js';
+import type { TLocalizationToken } from '@cloudbeaver/core-localization';
 
 interface IResourceActions {
   rename(dataSource: ResourceSqlDataSource, key: string, name: string): Promise<string>;
@@ -96,7 +97,7 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
     return isNotNullDefined(projectId) && resourceProjectId !== projectId && resourceProjectId !== userProjectId;
   }
 
-  override get message(): string | undefined {
+  override get message(): TLocalizationToken | undefined {
     if (this.isReadonly()) {
       return 'plugin_sql_editor_navigation_tab_script_state_readonly';
     }
