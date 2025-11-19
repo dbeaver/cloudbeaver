@@ -11,7 +11,7 @@
             <configuration>
                 <propertyGroup label="LDAP" description="LDAP authentication">
                     <property id="ldap-host" label="%ldap-host" type="string" description="%ldap-host.description" required="true"/>
-                    <property id="ldap-port" label="%ldap-port" type="integer" defaultValue="389" required="true" description="%ldap-port.description"/>
+                    <property id="ldap-port" label="%ldap-port" type="string" defaultValue="389" required="true" description="%ldap-port.description"/>
                     <property id="ldap-identifier-attr" label="%ldap-identifier-attr"
                               defaultValue="cn"
                               required="true"
