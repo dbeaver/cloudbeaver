@@ -7,7 +7,7 @@
  */
 import { action, computed, observable } from 'mobx';
 
-import { type AdminUser, compareUsers, UsersResource, UsersResourceFilterKey } from '@cloudbeaver/core-authentication';
+import { type AdminUser, compareUsers, compareNewUsers, UsersResource, UsersResourceFilterKey } from '@cloudbeaver/core-authentication';
 import { ConfirmationDialogDelete, TableState, useObservableRef, useOffsetPagination, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
@@ -25,7 +25,7 @@ interface State {
   users: AdminUser[];
   loadableState: ILoadableState;
   loadMore(): void;
-  update: () => Promise<void>;
+  update: () => void;
   delete: () => Promise<void>;
 }
 
@@ -49,15 +49,19 @@ export function useUsersTable(filters: IUserFilters) {
         return pagination.hasNextPage;
       },
       get users() {
-        const users = Array.from(
-          new Set([
-            ...this.usersLoader.resource.get(UsersResourceFilterKey(searchFilter, enabledStateFilter)),
-            ...usersResource.get(pagination.allPages).filter(isDefined).sort(compareUsers),
-          ]),
+        return filters.filterUsers(
+          Array.from(
+            new Set([
+              ...this.usersLoader.resource.get(UsersResourceFilterKey(searchFilter, enabledStateFilter)),
+              ...usersResource.get(pagination.allPages),
+            ]),
+          )
+            .filter(isDefined)
+            .sort(compareUsers)
+            .sort(compareNewUsers),
         );
-        return filters.filterUsers(users.filter(isDefined));
       },
-      async update() {
+      update() {
         try {
           pagination.refresh();
           notificationService.logSuccess({ title: 'authentication_administration_tools_refresh_success' });
