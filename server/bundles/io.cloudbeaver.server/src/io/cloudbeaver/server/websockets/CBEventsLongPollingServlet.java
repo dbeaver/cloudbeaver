@@ -156,7 +156,6 @@ public class CBEventsLongPollingServlet extends HttpServlet {
 
     @NotNull
     private BaseWebSession resolveSession(@NotNull HttpServletRequest req) {
-        WebAppSessionManager sm = WebAppUtils.getWebApplication().getSessionManager();
 
         String sid = getSessionId(req);
 
@@ -171,7 +170,7 @@ public class CBEventsLongPollingServlet extends HttpServlet {
 
             String token = req.getHeader(WSConstants.WS_AUTH_HEADER);
 
-            WebHeadlessSession headless = sm.getHeadlessSession(token, info, true);
+            WebHeadlessSession headless = getHeadlessSession(token, info);
             if (headless != null) {
                 return headless;
             } else  {
@@ -179,9 +178,18 @@ public class CBEventsLongPollingServlet extends HttpServlet {
             }
         } catch (DBException e) {
             log.error("Error resolving headless session", e);
+        } catch (RuntimeException e) {
+            log.error("Unexpected error resolving headless session", e);
+        } catch (Exception e) {
+            log.error("Unexpected checked exception resolving headless session", e);
         }
 
         throw new BadMessageException("No web session found for long-poll request");
+    }
+
+    protected WebHeadlessSession getHeadlessSession(String token, WebHttpRequestInfo info) throws DBException {
+        WebAppSessionManager sm = WebAppUtils.getWebApplication().getSessionManager();
+        return sm.getHeadlessSession(token, info, true);
     }
 
     @Nullable
