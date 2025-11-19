@@ -161,7 +161,7 @@ export function SelectField<T, ItemType extends {} = SelectItem<T>>({
 
         <Select id={id} name={name} disabled={disabled} required={required}>
           {displayValue}
-          {arrowIcon ?? <Select.Arrow className="dbv-kit-select__arrow-icon" />}
+          {arrowIcon ?? <Select.Arrow className="dbv-kit-select__arrow-icon tw:text-sm!" />}
         </Select>
         {description && <span className="dbv-kit-select__description">{description}</span>}
 
