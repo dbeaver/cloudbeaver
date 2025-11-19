@@ -155,7 +155,7 @@ public class CBEventsLongPollingServlet extends HttpServlet {
     }
 
     @NotNull
-    private BaseWebSession resolveSession(@NotNull HttpServletRequest req) {
+    protected BaseWebSession resolveSession(@NotNull HttpServletRequest req) {
 
         String sid = getSessionId(req);
 

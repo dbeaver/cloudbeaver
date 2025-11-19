@@ -8,6 +8,7 @@ import io.cloudbeaver.server.WebAppSessionManager;
 import io.cloudbeaver.server.websockets.CBEventsLongPollingServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import org.eclipse.jetty.http.BadMessageException;
+import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.websocket.WSConstants;
 import org.jkiss.junit.osgi.annotation.RunWithApplication;
@@ -43,11 +44,15 @@ public class CBEventsLongPollingServletTest extends CloudbeaverMockTest {
         protected WebHeadlessSession getHeadlessSession(String token, WebHttpRequestInfo info) throws DBException {
             return sessionManager.getHeadlessSession(token, info, true);
         }
+
+        @NotNull
+        protected BaseWebSession resolveSession(@NotNull HttpServletRequest req) {
+            return super.resolveSession(req);
+        }
     }
 
     @Test
     public void testResolveSessionReturnsHeadless() throws Exception {
-        CBEventsLongPollingServlet servlet = new TestServlet();
 
         Mockito.when(request.getHeader(WSConstants.WS_AUTH_HEADER)).thenReturn("token-123");
         Mockito.when(request.getHeader(WSConstants.WS_SESSION_HEADER)).thenReturn("sid-555");
@@ -59,7 +64,7 @@ public class CBEventsLongPollingServletTest extends CloudbeaverMockTest {
                 ArgumentMatchers.any(WebHttpRequestInfo.class), ArgumentMatchers.eq(true)))
             .thenReturn(headlessSession);
 
-        BaseWebSession resolved = invokeResolve(servlet, request);
+        BaseWebSession resolved = invokeResolve(new TestServlet(), request);
 
         Assert.assertSame(headlessSession, resolved);
     }
@@ -74,8 +79,7 @@ public class CBEventsLongPollingServletTest extends CloudbeaverMockTest {
                 ArgumentMatchers.any(), ArgumentMatchers.anyBoolean()))
             .thenReturn(null);
 
-        CBEventsLongPollingServlet servlet = new TestServlet();
-        invokeResolve(servlet, request);
+        invokeResolve(new TestServlet(), request);
     }
 
     @Test(expected = BadMessageException.class)
@@ -89,21 +93,10 @@ public class CBEventsLongPollingServletTest extends CloudbeaverMockTest {
                 ArgumentMatchers.any(WebHttpRequestInfo.class), ArgumentMatchers.eq(true)))
             .thenThrow(new RuntimeException("Get HeadlessSession failed"));
 
-        CBEventsLongPollingServlet servlet = new TestServlet();
-        invokeResolve(servlet, request);
+        invokeResolve(new TestServlet(), request);
     }
 
-    private BaseWebSession invokeResolve(CBEventsLongPollingServlet servlet, HttpServletRequest req) throws Exception {
-        var m = CBEventsLongPollingServlet.class.getDeclaredMethod("resolveSession", HttpServletRequest.class);
-        m.setAccessible(true);
-        try {
-            return (BaseWebSession) m.invoke(servlet, req);
-        } catch (InvocationTargetException e) {
-            Throwable cause = e.getCause();
-            if (cause instanceof Exception ex) {
-                throw ex;
-            }
-            throw e;
-        }
+    private BaseWebSession invokeResolve(TestServlet servlet, HttpServletRequest req) throws Exception {
+        return servlet.resolveSession(req);
     }
 }
