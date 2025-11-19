@@ -126,7 +126,9 @@ export function SelectField<T, ItemType extends {} = SelectItem<T>>({
     getValueByPath<ItemType, boolean>(item, itemDisabled, i => ('disabled' in i ? Boolean((i as unknown as SelectItem<T>).disabled) : false));
 
   const [selectedValue, setSelectedValue] = useState<T | undefined>(() => {
-    if (value !== undefined) return value;
+    if (value !== undefined) {
+      return value;
+    }
 
     const firstEnabledItem = items.find(item => !isItemDisabled(item));
     return firstEnabledItem ? getItemValue(firstEnabledItem) : undefined;
