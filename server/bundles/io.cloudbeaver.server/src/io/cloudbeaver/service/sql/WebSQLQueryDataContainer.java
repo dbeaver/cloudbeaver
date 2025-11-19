@@ -26,6 +26,7 @@ import org.jkiss.dbeaver.model.DBUtils;
 import org.jkiss.dbeaver.model.data.DBDDataFilter;
 import org.jkiss.dbeaver.model.data.DBDDataReceiver;
 import org.jkiss.dbeaver.model.exec.*;
+import org.jkiss.dbeaver.model.runtime.VoidProgressMonitor;
 import org.jkiss.dbeaver.model.sql.SQLQuery;
 import org.jkiss.dbeaver.model.sql.SQLScriptContext;
 import org.jkiss.dbeaver.model.sql.SQLSyntaxManager;
@@ -111,7 +112,18 @@ public class WebSQLQueryDataContainer implements DBSDataContainer, DBPContextPro
     @Override
     public long countData(@NotNull DBCExecutionSource source, @NotNull DBCSession session, @Nullable DBDDataFilter dataFilter, long flags) throws DBCException {
         try {
-            SQLQuery countQuery = new SQLQueryTransformerCount().transformQuery(dataSource, syntaxManager, new SQLQuery(dataSource, query));
+            String filteredQuery = dataFilter == null ? query : getDataSource().getSQLDialect().addFiltersToQuery(
+                new VoidProgressMonitor(),
+                getDataSource(),
+                query,
+                dataFilter
+            );
+
+            SQLQuery countQuery = new SQLQueryTransformerCount().transformQuery(
+                dataSource,
+                syntaxManager,
+                new SQLQuery(dataSource, filteredQuery)
+            );
             return DBUtils.countDataFromQuery(source, session, countQuery);
         } catch (DBException e) {
             throw new DBCException("Error executing row count", e);
