@@ -8,6 +8,15 @@
   },
   "references": [
     {
+      "path": "../../common-react/@dbeaver/react-dnd"
+    },
+    {
+      "path": "../../common-react/@dbeaver/react-tests"
+    },
+    {
+      "path": "../../common-typescript/@dbeaver/cli"
+    },
+    {
       "path": "../../common-typescript/@dbeaver/js-helpers"
     },
     {

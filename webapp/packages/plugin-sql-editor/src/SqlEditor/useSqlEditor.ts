@@ -180,7 +180,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
         }
       },
 
-      async executeQuery(): Promise<void> {
+      async executeQuery(inNewTab = false): Promise<void> {
         const isQuery = this.model.dataSource?.hasFeature(ESqlDataSourceFeatures.query);
 
         if (!isQuery || !this.isExecutionAllowed) {
@@ -189,7 +189,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
 
         try {
           const segment = await this.model.getResolvedSegment();
-          await this.executeQueryAction(segment, query => this.sqlQueryService.executeEditorQuery(this.state, query.query, false));
+          await this.executeQueryAction(segment, query => this.sqlQueryService.executeEditorQuery(this.state, query.query, inNewTab));
         } catch {}
       },
 
@@ -197,20 +197,6 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
         if (this.model.dataSource?.databaseModels.length) {
           this.sqlQueryService.initDatabaseDataModels(this.state);
         }
-      },
-
-      async executeQueryNewTab(): Promise<void> {
-        const isQuery = this.model.dataSource?.hasFeature(ESqlDataSourceFeatures.query);
-
-        if (!isQuery || !this.isExecutionAllowed) {
-          return;
-        }
-
-        try {
-          await this.executeQueryAction(await this.executeQueryAction(this.model.cursorSegment, () => this.model.getResolvedSegment()), query =>
-            this.sqlQueryService.executeEditorQuery(this.state, query.query, true),
-          );
-        } catch {}
       },
 
       async showExecutionPlan(): Promise<void> {
@@ -320,7 +306,6 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
       getHintProposals: action.bound,
       formatScript: action.bound,
       executeQuery: action.bound,
-      executeQueryNewTab: action.bound,
       showExecutionPlan: action.bound,
       executeScript: action.bound,
       isDisabled: computed,
