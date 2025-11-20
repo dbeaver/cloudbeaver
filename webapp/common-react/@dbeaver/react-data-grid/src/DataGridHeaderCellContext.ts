@@ -1,3 +1,11 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2025 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+
 import { createContext } from 'react';
 import type { IGridReactiveValue } from './IGridReactiveValue.js';
 
@@ -15,6 +23,7 @@ export interface IDataGridHeaderCellContext {
   columnSortable?: IGridReactiveValue<boolean, [colIdx: number]>;
   onColumnSort?: (colIdx: number, order: 'asc' | 'desc' | null, isMultiple: boolean) => void;
   onHeaderKeyDown?: (event: React.KeyboardEvent) => void;
+  orderButtonTitle?: string;
 }
 
 export const DataGridCellHeaderContext = createContext<IDataGridHeaderCellContext | null>(null);

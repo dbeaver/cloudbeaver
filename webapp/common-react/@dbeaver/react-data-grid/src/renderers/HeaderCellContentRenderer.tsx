@@ -27,6 +27,7 @@ export const HeaderCellContentRenderer = memo(function HeaderCellContentRenderer
   const onColumnSort = cellHeaderContext?.onColumnSort;
   const onHeaderKeyDown = cellHeaderContext?.onHeaderKeyDown;
   const sortingState = useGridReactiveValue(cellHeaderContext?.columnSortingState, colIdx);
+  const orderButtonTitle = cellHeaderContext?.orderButtonTitle;
 
   const draggable = dndHeaderContext?.getCanDrag?.(colIdx) ?? false;
   const drag = useDrag({
@@ -63,7 +64,9 @@ export const HeaderCellContentRenderer = memo(function HeaderCellContentRenderer
   });
 
   function handleSort(e: React.MouseEvent<HTMLElement> | React.KeyboardEvent<HTMLElement>) {
-    if (!onColumnSort) return;
+    if (!onColumnSort) {
+      return;
+    }
 
     const nextSortState = sortingState === 'asc' ? 'desc' : sortingState === 'desc' ? null : 'asc';
     onColumnSort(colIdx, nextSortState, e.ctrlKey || e.metaKey);
@@ -87,7 +90,7 @@ export const HeaderCellContentRenderer = memo(function HeaderCellContentRenderer
       onKeyDown={onKeyDown}
     >
       <span className="tw:overflow-hidden tw:text-ellipsis">{headerElement ?? getHeaderText ?? ''}</span>
-      {isColumnSortable && onColumnSort && <OrderButton sortState={sortingState} onClick={handleSort} />}
+      {isColumnSortable && onColumnSort && <OrderButton sortState={sortingState} title={orderButtonTitle} onClick={handleSort} />}
     </div>
   );
 });

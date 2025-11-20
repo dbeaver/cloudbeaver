@@ -10,9 +10,7 @@ import { useCallback, useLayoutEffect, useMemo, useRef, type HTMLAttributes } fr
 import { reaction } from 'mobx';
 
 import { getComputed, s, TextPlaceholder, useObjectRef, useS, useTranslate } from '@cloudbeaver/core-blocks';
-// import { useService } from '@cloudbeaver/core-di';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
-// import { ClipboardService } from '@cloudbeaver/core-ui';
 import { useCaptureViewContext } from '@cloudbeaver/core-view';
 import {
   DataGrid,
@@ -58,20 +56,13 @@ import { useTableData } from './useTableData.js';
 import { TableColumnHeader } from './TableColumnHeader/TableColumnHeader.js';
 import { TableIndexColumnHeader } from './TableColumnHeader/TableIndexColumnHeader.js';
 import { clsx } from '@dbeaver/ui-kit';
+import { getOS, OperatingSystem } from '@cloudbeaver/core-utils';
 
 const ROW_HEIGHT = 24;
 export const HEADER_HEIGHT = 32;
 export const HEADER_WITH_DESC_HEIGHT = 42;
 
-export const DataGridTable = observer<IDataPresentationProps>(function DataGridTable({
-  model,
-  actions,
-  resultIndex,
-  simple,
-  className,
-  dataFormat,
-  ...rest
-}) {
+export const DataGridTable = observer<IDataPresentationProps>(function DataGridTable({ model, actions, resultIndex, simple, className, ...rest }) {
   const translate = useTranslate();
   const styles = useS(classes);
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
@@ -85,6 +76,8 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
 
   const tableData = useTableData(model as unknown as IDatabaseDataModel<ResultSetDataSource>, resultIndex, dataGridDivRef);
   const gridSelectionContext = useGridSelectionContext(tableData, selectionAction);
+  const multiSortModifier = getOS() === OperatingSystem.macOS ? '⌘CMD' : 'CTRL';
+  const orderButtonTitle = translate('data_grid_table_tooltip_column_header_order', undefined, { modifier: multiSortModifier });
 
   const restoreFocus = useCallback(
     function restoreFocus() {
@@ -512,6 +505,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
               rowCount={rowsCount}
               columnSortable={columnSortable}
               columnSortingState={columnSortingState}
+              orderButtonTitle={orderButtonTitle}
               getRowId={rowIdx => (tableData.rows[rowIdx] ? GridDataKeysUtils.serialize(tableData.rows[rowIdx]) : '')}
               onFocus={handleFocusChange}
               onScrollToBottom={handleScrollToBottom}
