@@ -12,6 +12,7 @@ import { Tab as BaseTab } from 'reakit';
 import { getComputed, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
 
 import { TabContext } from '../TabContext.js';
+import { useTabDragAndDrop } from '../useTabDragAndDrop.js';
 import style from './Tab.module.css';
 import { TabActions } from './TabActions.js';
 import type { TabProps } from './TabProps.js';
@@ -27,6 +28,19 @@ export const Tab = observer<TabProps>(function Tab({ after, ...props }) {
   const styles = useS(style);
   const canClose = getComputed(() => !!onClose || (tab.closable && tab.state.closable));
 
+  const {
+    ref: dragRef,
+    isDragging,
+    dropAllowed,
+    dropPosition,
+    dragProps,
+    dropProps,
+  } = useTabDragAndDrop({
+    tabId,
+    stateKey: tab.state.reorderStateKey,
+    onReorder: tab.state.reorder ?? null,
+  });
+
   function onMouseUpHandler(event: React.MouseEvent<HTMLDivElement>) {
     if (event.button === 1 && canClose) {
       tab.handleClose(event);
@@ -35,7 +49,18 @@ export const Tab = observer<TabProps>(function Tab({ after, ...props }) {
 
   return (
     <TabContext.Provider value={tabContext}>
-      <div className={s(styles, { tabOuter: true })} onMouseUp={onMouseUpHandler}>
+      <div
+        ref={dragRef}
+        className={s(styles, {
+          tabOuter: true,
+          dragging: isDragging,
+          dropBefore: dropAllowed && dropPosition === 'before',
+          dropAfter: dropAllowed && dropPosition === 'after',
+        })}
+        onMouseUp={onMouseUpHandler}
+        {...dragProps}
+        {...dropProps}
+      >
         <div className={s(styles, { tabInner: true, tabInnerSelected: tab.selected })}>
           <TabActions
             className={s(styles, { actions: true })}
