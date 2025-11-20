@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -10,6 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { getComputed, s, SContext, type StyleRegistry, TextPlaceholder, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { type ITabData, TabIconStyles, TabList, TabListStyles, TabPanel, TabsState, TabStyles } from '@cloudbeaver/core-ui';
+import { reorderArrayWithOrder } from '@dbeaver/js-helpers';
 
 import type { ISqlEditorTabState } from '../ISqlEditorTabState.js';
 import { ESqlDataSourceFeatures } from '../SqlDataSource/ESqlDataSourceFeatures.js';
@@ -78,6 +79,10 @@ export const SqlResultTabs = observer<Props>(function SqlDataResult({ state, onT
     return true;
   }
 
+  function handleReorder(draggedTabId: string, targetTabId: string, position: 'before' | 'after') {
+    reorderArrayWithOrder(state.tabs, draggedTabId, targetTabId, position);
+  }
+
   if (!state.tabs.length) {
     return (
       <TextPlaceholder className={s(style, { textPlaceholder: true })}>
@@ -95,9 +100,11 @@ export const SqlResultTabs = observer<Props>(function SqlDataResult({ state, onT
         currentTabId={state.currentTabId}
         tabList={tabList}
         canClose={handleCanClose}
+        reorderStateKey="sql-result-tabs"
         enabledBaseActions
         onChange={handleSelect}
         onClose={handleClose}
+        onReorder={handleReorder}
       >
         <SContext registry={registry}>
           <TabList className={s(style, { tabListNotExecutable: !executable })} aria-label="SQL Results">

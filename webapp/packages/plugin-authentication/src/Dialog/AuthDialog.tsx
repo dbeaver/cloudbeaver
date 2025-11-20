@@ -53,7 +53,7 @@ export const AuthDialog: DialogComponent<IAuthOptions> = observer(function AuthD
   const translate = useTranslate();
   const state = dialogData.state;
 
-  const additional = userInfo.data !== null && state.activeProvider?.id !== undefined && !userInfo.hasToken(state.activeProvider.id);
+  const additional = userInfo.isAuthenticated() && state.activeProvider?.id !== undefined && !userInfo.hasToken(state.activeProvider.id);
 
   const showTabs = getComputed(() => dialogData.tabIds.length > 1);
   const emptyTabs = getComputed(() => dialogData.tabIds.length === 0);
