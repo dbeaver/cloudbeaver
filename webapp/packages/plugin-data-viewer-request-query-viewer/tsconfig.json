@@ -41,6 +41,12 @@
       "path": "../core-navigation-tree"
     },
     {
+      "path": "../core-settings"
+    },
+    {
+      "path": "../core-utils"
+    },
+    {
       "path": "../plugin-codemirror6"
     },
     {
