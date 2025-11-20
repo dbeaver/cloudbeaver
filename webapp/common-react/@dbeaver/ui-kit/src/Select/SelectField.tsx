@@ -126,7 +126,9 @@ export function SelectField<T, ItemType extends {} = SelectItem<T>>({
     getValueByPath<ItemType, boolean>(item, itemDisabled, i => ('disabled' in i ? Boolean((i as unknown as SelectItem<T>).disabled) : false));
 
   const [selectedValue, setSelectedValue] = useState<T | undefined>(() => {
-    if (value !== undefined) return value;
+    if (value !== undefined) {
+      return value;
+    }
 
     const firstEnabledItem = items.find(item => !isItemDisabled(item));
     return firstEnabledItem ? getItemValue(firstEnabledItem) : undefined;
@@ -161,7 +163,7 @@ export function SelectField<T, ItemType extends {} = SelectItem<T>>({
 
         <Select id={id} name={name} disabled={disabled} required={required}>
           {displayValue}
-          {arrowIcon ?? <Select.Arrow className="dbv-kit-select__arrow-icon" />}
+          {arrowIcon ?? <Select.Arrow className="dbv-kit-select__arrow-icon tw:text-sm!" />}
         </Select>
         {description && <span className="dbv-kit-select__description">{description}</span>}
 

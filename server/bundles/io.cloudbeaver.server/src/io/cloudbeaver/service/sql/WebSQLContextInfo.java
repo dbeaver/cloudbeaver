@@ -69,7 +69,7 @@ public class WebSQLContextInfo implements WebSessionProvider {
     private final transient WebSQLProcessor processor;
     private final String id;
     private final String projectId;
-    private final Map<String, WebSQLResultsInfo> resultInfoMap = new HashMap<>();
+    private final transient Map<String, WebSQLResultsInfo> resultInfoMap = new HashMap<>();
 
     private final AtomicInteger resultId = new AtomicInteger();
 

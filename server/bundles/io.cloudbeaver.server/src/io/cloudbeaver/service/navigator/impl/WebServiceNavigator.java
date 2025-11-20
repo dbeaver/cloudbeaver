@@ -17,10 +17,7 @@
 package io.cloudbeaver.service.navigator.impl;
 
 
-import io.cloudbeaver.BaseWebProjectImpl;
-import io.cloudbeaver.DBWConstants;
-import io.cloudbeaver.DBWebException;
-import io.cloudbeaver.WebServiceUtils;
+import io.cloudbeaver.*;
 import io.cloudbeaver.model.WebCommandContext;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.rm.DBNAbstractResourceManagerNode;
@@ -111,6 +108,14 @@ public class WebServiceNavigator implements DBWServiceNavigator {
             Set<String> nodeIds = new HashSet<>(); // filter duplicate node ids
 
             for (DBNNode node : nodeChildren) {
+                // TODO: find a better way to filter out empty folder nodes for non-admin users
+                if (node instanceof DBNLocalFolder localFolderNode &&
+                    localFolderNode.getDataSourceRegistry() instanceof WebGlobalProjectRegistryProxy globalProjectRegistryProxy
+                ) {
+                    if (!globalProjectRegistryProxy.getAllFolders().contains(localFolderNode.getFolder())) {
+                        continue;
+                    }
+                }
                 if (node instanceof DBNDatabaseFolder folderNode && CommonUtils.isEmpty(folderNode.getMeta().getChildren(null))) {
                     // Skip empty folders. Folder may become empty if their nested elements are provided by UI plugins.
                     continue;
