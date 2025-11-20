@@ -124,7 +124,7 @@ export class SQLParser {
   }
 
   private getQueryAtPos(position: number): ISQLScriptSegment | undefined {
-    const script = this._scripts.find(script => script.begin <= position && script.end > position);
+    const script = this._scripts.find(script => script.begin <= position && script.end >= position);
 
     if (script) {
       return script;

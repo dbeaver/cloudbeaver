@@ -26,7 +26,7 @@ interface Props {
 
 export const DisplayError = observer<Props>(function DisplayError({ root, children, error, errorInfo, className }) {
   const styles = useS(style);
-  const stack = errorInfo?.componentStack || error?.stack;
+  const stack = error?.stack;
 
   return (
     <div role="alert" tabIndex={0} className={s(styles, { error: true, root }, className)}>
@@ -39,14 +39,13 @@ export const DisplayError = observer<Props>(function DisplayError({ root, childr
           <details className={s(styles, { details: true })}>
             <summary>Details</summary>
             <p>
-              {error.toString()}
-              {stack && (
+              {stack ? <code>{stack}</code> : error.toString()}
+              {errorInfo?.componentStack && (
                 <>
                   <br />
-                  <br />
+                  <code>{errorInfo.componentStack}</code>
                 </>
               )}
-              <code>{stack}</code>
             </p>
           </details>
         )}

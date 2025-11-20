@@ -66,4 +66,28 @@
 
 .tabOuter {
   display: block;
+  position: relative;
+}
+
+.dragging {
+  opacity: 0.5;
+}
+
+.dropBefore::before,
+.dropAfter::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background-color: var(--theme-primary);
+  animation: var(--tw-animate-pulse);
+}
+
+.dropBefore::before {
+  left: -1px;
+}
+
+.dropAfter::after {
+  right: -1px;
 }

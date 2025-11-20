@@ -180,6 +180,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
   }
 
   const displayPopover = !allowCustomValue || items.length > 0;
+  const hasCancelButton = displayValue && allowClear && !disabled && !readOnly;
 
   return (
     <Field {...layoutProps} className={clsx(className, inline && 'tw:flex tw:items-center')}>
@@ -210,7 +211,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
             className={clsx(
               'theme-typography--caption  tw:tracking-normal!',
               icon || loading ? 'tw:pl-8!' : '',
-              displayValue ? 'tw:pr-12!' : 'tw:pr-6!',
+              hasCancelButton ? 'tw:pr-12!' : 'tw:pr-6!',
             )}
             title={title}
             id={inputId}
@@ -222,7 +223,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
             <Spinner size="small" className="tw:absolute tw:right-2 tw:top-[50%] tw:-translate-y-1/2" />
           ) : (
             <>
-              {displayValue && allowClear && !disabled && !readOnly && (
+              {hasCancelButton && (
                 <ComboboxCancel
                   className="tw:absolute tw:right-8 tw:top-[50%] tw:-translate-y-1/2 tw:cursor-pointer tw:hover:bg-gray-200 tw:rounded"
                   onClick={() => handleSelect(null)}
