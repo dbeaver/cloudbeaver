@@ -39,8 +39,7 @@ export interface ISQLEditorData {
   setScript(query: string, source?: string, cursor?: ISqlEditorCursor): void;
   setCursor(begin: number, end?: number): void;
   formatScript(): Promise<void>;
-  executeQuery(): Promise<void>;
-  executeQueryNewTab(): Promise<void>;
+  executeQuery(inNewTab?: boolean): Promise<void>;
   showExecutionPlan(): Promise<void>;
   executeScript(): Promise<void>;
   getHintProposals(position: number, simple: boolean): Promise<SQLProposal[]>;
