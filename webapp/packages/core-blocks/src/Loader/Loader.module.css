@@ -15,7 +15,9 @@
     --dbv-kit-spinner-xlarge-height: 80px;
   }
 
-  .spinnerSecondary {
+  .spinnerSecondary,
+  :global(.secondary),
+  :global(.secondary) svg {
     --dbv-kit-spinner-stroke-color: var(--theme-on-primary);
   }
 
