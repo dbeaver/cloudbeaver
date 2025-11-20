@@ -1,0 +1,25 @@
+@import './_base.css';
+
+@layer base {
+  .dbv-kit-disclosure__disclosure {
+    border: none;
+    border-radius: var(--dbv-kit-disclosure-border-radius);
+    padding: 0;
+    margin: 0;
+    background: var(--dbv-kit-disclosure-background);
+    color: var(--dbv-kit-disclosure-foreground);
+    font: inherit;
+    outline: var(--dbv-kit-disclosure-outline-color);
+    outline-offset: var(--dbv-kit-disclosure-outline-offset);
+    outline-width: var(--dbv-kit-disclosure-outline-width);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: var(--dbv-kit-disclosure-gap);
+    max-width: max-content;
+
+    &[data-focus-visible] {
+      outline-style: solid;
+    }
+  }
+}
