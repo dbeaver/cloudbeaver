@@ -61,7 +61,6 @@ export default defineConfig(
       'no-constant-condition': 'off',
       'space-before-blocks': 'error',
       'func-names': ['error', 'always'],
-      'no-restricted-syntax': ['error', 'ArrowFunctionExpression'],
       'no-console': ['warn', { allow: ['warn', 'error'] }],
       'no-unsafe-finally': 'error',
       'require-await': 'error',

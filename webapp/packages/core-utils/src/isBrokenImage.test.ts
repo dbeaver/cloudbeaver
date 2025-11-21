@@ -10,10 +10,10 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { isImageBroken } from './isBrokenImage.js';
 
-describe('isImageBroken', function isImageBrokenDescribe() {
+describe('isImageBroken', () => {
   const OriginalImage = globalThis.Image;
 
-  afterEach(function afterEachCleanup() {
+  afterEach(() => {
     if (OriginalImage) {
       globalThis.Image = OriginalImage;
     } else {
@@ -22,7 +22,7 @@ describe('isImageBroken', function isImageBrokenDescribe() {
     vi.restoreAllMocks();
   });
 
-  it('should return false if image loads successfully', async function shouldReturnFalseIfImageLoadsSuccessfully() {
+  it('should return false if image loads successfully', async () => {
     const srcSpy = vi.fn();
 
     class MockImage {
@@ -33,7 +33,7 @@ describe('isImageBroken', function isImageBrokenDescribe() {
         // eslint-disable-next-line @typescript-eslint/no-this-alias
         const thisRef = this;
         srcSpy(value);
-        setTimeout(function mockImageSrc() {
+        setTimeout(() => {
           thisRef.onload?.();
         }, 0);
       }
@@ -45,7 +45,7 @@ describe('isImageBroken', function isImageBrokenDescribe() {
     expect(srcSpy).toHaveBeenCalledWith('https://example.com/ok.png');
   });
 
-  it('should return true if image loading fails', async function shouldReturnTrueIfImageLoadingFails() {
+  it('should return true if image loading fails', async () => {
     const srcSpy = vi.fn();
 
     class MockImage {
@@ -56,7 +56,7 @@ describe('isImageBroken', function isImageBrokenDescribe() {
         // eslint-disable-next-line @typescript-eslint/no-this-alias
         const thisRef = this;
         srcSpy(value);
-        setTimeout(function mockImageSrc() {
+        setTimeout(() => {
           thisRef.onerror?.();
         }, 0);
       }
