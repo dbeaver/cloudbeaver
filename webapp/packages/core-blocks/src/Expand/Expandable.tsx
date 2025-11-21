@@ -19,18 +19,20 @@ interface Props {
   disabled?: boolean;
 }
 
-export const Expandable = observer(({ label, defaultExpanded, disabled, children }: Props) => (
-  <div>
-    <DisclosureProvider defaultOpen={defaultExpanded}>
-      <Disclosure disabled={disabled}>
-        <IconOrImage className="disclosure-icon" icon="arrow" />
-        <h2 className="theme-typography--body2 disclosure-label">{label}</h2>
-      </Disclosure>
-      <DisclosureContent>
-        <div>
-          <div className="disclosure-content-inner"> {children}</div>
-        </div>
-      </DisclosureContent>
-    </DisclosureProvider>
-  </div>
-));
+export const Expandable = observer(function Expandable({ label, defaultExpanded, disabled, children }: Props) {
+  return (
+    <div>
+      <DisclosureProvider defaultOpen={defaultExpanded}>
+        <Disclosure disabled={disabled}>
+          <IconOrImage className="disclosure-icon" icon="arrow" />
+          <h2 className="theme-typography--body2 disclosure-label">{label}</h2>
+        </Disclosure>
+        <DisclosureContent>
+          <div>
+            <div className="disclosure-content-inner"> {children}</div>
+          </div>
+        </DisclosureContent>
+      </DisclosureProvider>
+    </div>
+  );
+});
