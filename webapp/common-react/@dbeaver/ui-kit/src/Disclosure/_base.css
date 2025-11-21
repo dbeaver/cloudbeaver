@@ -2,7 +2,7 @@
   :root {
     --dbv-kit-disclosure-height: var(--dbv-kit-control-height-medium);
     --dbv-kit-disclosure-icon-size: 16px;
-    --dbv-kit-disclosure-gap: 8px;
+    --dbv-kit-disclosure-gap: calc(var(--tw-spacing) * 2);
     --dbv-kit-disclosure-foreground: var(--tw-color-slate-800);
     --dbv-kit-disclosure-background: transparent;
     --dbv-kit-disclosure-border-radius: var(--dbv-kit-control-border-radius);
