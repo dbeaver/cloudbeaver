@@ -467,10 +467,8 @@ export class MenuBootstrap extends Bootstrap {
       const payload = {
         title: 'ui_changes_might_be_lost',
         message: 'sql_editor_upload_script_unsaved_changes_dialog_message',
-        showExtraAction: false,
+        showExtraAction: true,
         confirmActionText: 'ui_yes',
-        extraActionText: 'ui_no',
-        cancelActionText: 'ui_processing_cancel',
       };
 
       const { status, result } = await this.commonDialogService.open(ConfirmationDialog, payload);
