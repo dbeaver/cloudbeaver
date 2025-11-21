@@ -7,7 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { Select, usePermission, useResource } from '@cloudbeaver/core-blocks';
+import { Select, usePermission, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 import { DatabaseAuthModelsResource } from '@cloudbeaver/core-connections';
 import { CachedResourceListEmptyKey, resourceKeyList } from '@cloudbeaver/core-resource';
 import { EAdminPermission } from '@cloudbeaver/core-root';
@@ -31,6 +31,7 @@ export const ConnectionAuthModelSelector = observer<Props>(function ConnectionAu
   disabled,
 }) {
   const adminPermission = usePermission(EAdminPermission.admin);
+  const t = useTranslate();
 
   const authModelsLoader = useResource(
     ConnectionAuthModelSelector,
@@ -53,6 +54,7 @@ export const ConnectionAuthModelSelector = observer<Props>(function ConnectionAu
       titleSelector={model => model.description}
       readOnly={readonly || readonlyAuthModelId}
       disabled={disabled}
+      aria-label={t('plugin_connections_connection_form_part_main_auth_model')}
       tiny
       fill
       onSelect={onAuthModelChange}

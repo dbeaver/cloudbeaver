@@ -13,7 +13,8 @@
     "react": "^19",
     "react-dom": "^19",
     "mobx": "^6",
-    "mobx-react-lite": "^4"
+    "mobx-react-lite": "^4",
+    "glob": "^11.1"
   },
   "scripts": {
     "test": "dbeaver-test",

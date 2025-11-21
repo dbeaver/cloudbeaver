@@ -10,7 +10,7 @@ import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { ClipboardService } from '@cloudbeaver/core-ui';
 import { replaceMiddle } from '@cloudbeaver/core-utils';
-import { ACTION_DELETE, ActionService, MenuBaseItem, MenuService } from '@cloudbeaver/core-view';
+import { ActionService, MenuBaseItem, MenuService } from '@cloudbeaver/core-view';
 import {
   DATA_CONTEXT_DV_DDM,
   DATA_CONTEXT_DV_DDM_RESULT_INDEX,
@@ -39,16 +39,19 @@ import { MENU_DATA_GRID_FILTERS_CELL_VALUE } from './MENU_DATA_GRID_FILTERS_CELL
 import { MENU_DATA_GRID_FILTERS_CLIPBOARD } from './MENU_DATA_GRID_FILTERS_CLIPBOARD.js';
 import { MENU_DATA_GRID_FILTERS_CUSTOM } from './MENU_DATA_GRID_FILTERS_CUSTOM.js';
 import type { SqlResultColumn } from '@cloudbeaver/core-sdk';
+import { ACTION_DATA_GRID_FILTER_DELETE_FOR_COLUMN } from '../../Actions/Filters/ACTION_DATA_GRID_FILTER_DELETE_FOR_COLUMN.js';
+import { LocalizationService } from '@cloudbeaver/core-localization';
 
 const FilterCustomValueDialog = importLazyComponent(() => import('./FilterCustomValueDialog.js').then(m => m.FilterCustomValueDialog));
 
-@injectable(() => [CommonDialogService, ClipboardService, ActionService, MenuService])
+@injectable(() => [CommonDialogService, ClipboardService, ActionService, MenuService, LocalizationService])
 export class DataGridContextMenuFilterService {
   constructor(
     private readonly commonDialogService: CommonDialogService,
     private readonly clipboardService: ClipboardService,
     private readonly actionService: ActionService,
     private readonly menuService: MenuService,
+    private readonly localizationService: LocalizationService,
   ) {}
 
   private async applyFilter(
@@ -77,6 +80,7 @@ export class DataGridContextMenuFilterService {
   }
 
   register(): void {
+    const localizationService = this.localizationService;
     this.menuService.addCreator({
       root: true,
       contexts: [DATA_CONTEXT_DV_DDM, DATA_CONTEXT_DV_DDM_RESULT_INDEX, DATA_CONTEXT_DV_RESULT_KEY],
@@ -134,7 +138,7 @@ export class DataGridContextMenuFilterService {
           MENU_DATA_GRID_FILTERS_CUSTOM,
           MENU_DATA_GRID_FILTERS_CLIPBOARD,
           ...result,
-          ACTION_DELETE,
+          ACTION_DATA_GRID_FILTER_DELETE_FOR_COLUMN,
           ACTION_DATA_GRID_FILTERS_RESET_ALL,
         ];
       },
@@ -151,7 +155,7 @@ export class DataGridContextMenuFilterService {
           return false;
         }
 
-        return [ACTION_DELETE, ACTION_DATA_GRID_FILTERS_RESET_ALL].includes(action);
+        return [ACTION_DATA_GRID_FILTER_DELETE_FOR_COLUMN, ACTION_DATA_GRID_FILTERS_RESET_ALL].includes(action);
       },
       isHidden: (context, action) => {
         const model = context.get(DATA_CONTEXT_DV_DDM)!;
@@ -160,7 +164,7 @@ export class DataGridContextMenuFilterService {
 
         const data = model.source.getAction(resultIndex, IDatabaseDataResultAction, GridDataResultAction);
 
-        if (action === ACTION_DELETE) {
+        if (action === ACTION_DATA_GRID_FILTER_DELETE_FOR_COLUMN) {
           const constraints = model.source.getAction(resultIndex, IDatabaseDataConstraintAction);
           // TODO: fix column abstraction
           const resultColumn = data.getColumn(key.column) as SqlResultColumn | undefined;
@@ -181,16 +185,14 @@ export class DataGridContextMenuFilterService {
         const model = context.get(DATA_CONTEXT_DV_DDM)!;
         const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
         const key = context.get(DATA_CONTEXT_DV_RESULT_KEY)!;
-
         const data = model.source.getAction(resultIndex, IDatabaseDataResultAction, GridDataResultAction);
         // TODO: fix column abstraction
         const resultColumn = data.getColumn(key.column) as SqlResultColumn | undefined;
 
-        if (action === ACTION_DELETE) {
+        if (action === ACTION_DATA_GRID_FILTER_DELETE_FOR_COLUMN) {
           return {
             ...action.info,
-            icon: 'filter-reset',
-            label: `Delete filter for "${resultColumn?.name ?? '?'}"`,
+            label: localizationService.translate('data_grid_table_filter_delete_for_column', undefined, { column: resultColumn?.name ?? '' }),
           };
         }
 
@@ -203,7 +205,7 @@ export class DataGridContextMenuFilterService {
 
         const data = model.source.getAction(resultIndex, IDatabaseDataResultAction, GridDataResultAction);
 
-        if (action === ACTION_DELETE) {
+        if (action === ACTION_DATA_GRID_FILTER_DELETE_FOR_COLUMN) {
           const constraints = model.source.getAction(resultIndex, IDatabaseDataConstraintAction);
           // TODO: fix column abstraction
           const resultColumn = data.getColumn(key.column) as SqlResultColumn | undefined;

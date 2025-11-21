@@ -46,21 +46,24 @@ export const MenuItemElement = observer<IMenuItemElementProps>(function MenuItem
 
   return (
     <div className={s(styles, { menuPanelItem: true })} title={tooltip ? translate(tooltip) : title}>
-      <div className={s(styles, { menuItemIcon: true })}>
-        <Loader className={s(styles, { loader: true })} suspense small fullSize>
-          {typeof icon === 'string' ? <IconOrImage className={s(styles, { iconOrImage: true })} icon={icon} /> : icon}
-        </Loader>
-      </div>
-      {displayLabel ? (
-        <div className={s(styles, { menuItemText: true })} title={title}>
-          {title}
+      <div className={s(styles, { menuItemMain: true })}>
+        <div className={s(styles, { menuItemIcon: true })}>
+          <Loader className={s(styles, { loader: true })} suspense small fullSize>
+            {typeof icon === 'string' ? <IconOrImage className={s(styles, { iconOrImage: true })} icon={icon} /> : icon}
+          </Loader>
         </div>
-      ) : (
-        <div />
-      )}
-      <div className={s(styles, { menuItemBinding: true })} title={binding}>
-        {binding}
+        {displayLabel ? (
+          <div className={s(styles, { menuItemText: true })} title={title}>
+            {title}
+          </div>
+        ) : (
+          <div />
+        )}
+        <div className={s(styles, { menuItemBinding: true })} title={binding}>
+          {binding}
+        </div>
       </div>
+
       <div className={s(styles, { menuItemContent: true })}>
         {loading && <Loader className={s(styles, { loader: true })} small fullSize />}
         {panelAvailable !== false && menu && !loading && <Icon name="context-menu-submenu" viewBox="0 0 6 7" className={s(styles, { icon: true })} />}

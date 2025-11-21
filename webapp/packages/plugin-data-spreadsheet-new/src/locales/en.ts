@@ -13,6 +13,7 @@ export default [
   ['data_grid_table_filter_cell_value', 'Cell value'],
   ['data_grid_table_filter_custom_value', 'Custom'],
   ['data_grid_table_filter_reset_all_filters', 'Reset all filters'],
+  ['data_grid_table_filter_delete_for_column', 'Delete filter for "{arg:column}"'],
   ['data_grid_table_disable_order', 'Disabled'],
   ['data_grid_table_disable_all_orders', 'Disable all'],
   ['data_grid_table_delete_filters_and_orders', 'Reset filters / sorting'],

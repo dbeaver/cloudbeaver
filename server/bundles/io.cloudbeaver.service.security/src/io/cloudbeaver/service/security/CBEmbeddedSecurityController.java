@@ -2577,7 +2577,8 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                 .flatMap(externalTeamId -> findTeamByExternalTeamId(
                     allTeams,
                     externalTeamIdMetadataFieldName,
-                    externalTeamId
+                    externalTeamId,
+                    authProvider.isCaseInsensitive()
                 ).stream())
                 .map(SMTeam::getTeamId)
                 .toArray(String[]::new);
@@ -2614,15 +2615,27 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
     }
 
     @NotNull
-    private List<SMTeam> findTeamByExternalTeamId(SMTeam[] allTeams, String externalGroupParameterName, String groupId) {
+    private List<SMTeam> findTeamByExternalTeamId(
+        SMTeam[] allTeams,
+        String externalGroupParameterName,
+        String groupId,
+        boolean isCaseInsensitive
+    ) {
         List<SMTeam> result = new ArrayList<>();
         for (SMTeam team : allTeams) {
             String teamGroupId = team.getMetaParameters().get(externalGroupParameterName);
-            if (CommonUtils.equalObjects(teamGroupId, groupId)) {
+            if (matchesGroupId(teamGroupId, groupId, isCaseInsensitive)) {
                 result.add(team);
             }
         }
         return result;
+    }
+
+    private boolean matchesGroupId(String teamGroupId, String groupId, boolean isCaseInsensitive) {
+        if (isCaseInsensitive) {
+            return teamGroupId != null && teamGroupId.equalsIgnoreCase(groupId);
+        }
+        return CommonUtils.equalObjects(teamGroupId, groupId);
     }
 
 

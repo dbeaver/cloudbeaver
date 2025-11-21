@@ -418,10 +418,10 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
     private String buildFullUserDN(String userName, LdapSettings ldapSettings) {
         String fullUserDN = userName;
 
-        if (!fullUserDN.startsWith(ldapSettings.getUserIdentifierAttr())) {
+        if (!CommonUtils.startsWithIgnoreCase(fullUserDN, ldapSettings.getUserIdentifierAttr())) {
             fullUserDN = String.join("=", ldapSettings.getUserIdentifierAttr(), userName);
         }
-        if (CommonUtils.isNotEmpty(ldapSettings.getBaseDN()) && !fullUserDN.endsWith(ldapSettings.getBaseDN())) {
+        if (CommonUtils.isNotEmpty(ldapSettings.getBaseDN()) && !CommonUtils.endsWithIgnoreCase(fullUserDN, ldapSettings.getBaseDN())) {
             fullUserDN = String.join(",", fullUserDN, ldapSettings.getBaseDN());
         }
 

@@ -33,7 +33,7 @@ export const Driver = observer<Props>(function Driver({ driver, onSelect }) {
   return (
     <ListItem title={driver.description} onClick={select}>
       <ListItemIcon className={s(styles, { icon: true })}>
-        <StaticImage icon={driver.icon} className={s(styles, { staticImage: true })} />
+        <StaticImage role="presentation" icon={driver.icon} className={s(styles, { staticImage: true })} />
         {!driver.driverInstalled && (
           <div className={s(styles, { indicator: true })} title={translate('core_connections_connection_driver_not_installed')}>
             <IconOrImage icon="/icons/info_icon_sm.svg" />
