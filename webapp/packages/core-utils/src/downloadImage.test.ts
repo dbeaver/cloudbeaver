@@ -14,34 +14,36 @@ import { download } from './download.js';
 import { isImageBroken } from './isBrokenImage.js';
 import { BROKEN_IMAGE_ERROR_MESSAGE, downloadPng, downloadSvg } from './downloadImage.js';
 
-vi.mock('modern-screenshot', () => ({
-  domToForeignObjectSvg: vi.fn(),
-  domToPng: vi.fn(),
-}));
+vi.mock('modern-screenshot', function modernScreenshotMock() {
+  return {
+    domToForeignObjectSvg: vi.fn(),
+    domToPng: vi.fn(),
+  };
+});
 
-vi.mock('./download.js', () => ({
-  download: vi.fn(),
-}));
+vi.mock('./download.js', function downloadMock() {
+  return { download: vi.fn() };
+});
 
-vi.mock('./isBrokenImage.js', () => ({
-  isImageBroken: vi.fn(),
-}));
+vi.mock('./isBrokenImage.js', function isBrokenImageMock() {
+  return { isImageBroken: vi.fn() };
+});
 
 const mockedDownload = vi.mocked(download);
 const mockedIsImageBroken = vi.mocked(isImageBroken);
 const mockedModernScreenshot = vi.mocked(modernScreenshot);
 
-describe('downloadImage', () => {
+describe('downloadImage', function downloadImageDescribe() {
   const options = { backgroundColor: '#fff', width: 100, height: 100 } as Options;
 
-  afterEach(() => {
+  afterEach(function cleanupMocks() {
     mockedDownload.mockClear();
     mockedIsImageBroken.mockReset();
     mockedModernScreenshot.domToForeignObjectSvg.mockReset();
     mockedModernScreenshot.domToPng.mockReset();
   });
 
-  it('should convert DOM to SVG blob and trigger download when image is valid', async () => {
+  it('should convert DOM to SVG blob and trigger download when image is valid', async function testDownloadSvgValid() {
     const element = document.createElement('div');
     const svgElement = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     const createObjectURLSpy = vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob://svg');
@@ -64,7 +66,7 @@ describe('downloadImage', () => {
     }
   });
 
-  it('should throw error when generated SVG is broken', async () => {
+  it('should throw error when generated SVG is broken', async function testDownloadSvgBroken() {
     const element = document.createElement('div');
     const svgElement = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     const createObjectURLSpy = vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob://svg');
@@ -81,17 +83,17 @@ describe('downloadImage', () => {
   });
 });
 
-describe('downloadPng', () => {
+describe('downloadPng', function downloadPngDescribe() {
   const options = { backgroundColor: '#fff', width: 100, height: 100 } as Options;
 
-  afterEach(() => {
+  afterEach(function cleanupMocks() {
     mockedDownload.mockClear();
     mockedIsImageBroken.mockReset();
     mockedModernScreenshot.domToForeignObjectSvg.mockReset();
     mockedModernScreenshot.domToPng.mockReset();
   });
 
-  it('should download PNG when image is valid', async () => {
+  it('should download PNG when image is valid', async function testDownloadPngValid() {
     const element = document.createElement('div');
     const pngData = 'data:image/png;base64,abc';
     mockedModernScreenshot.domToPng.mockResolvedValue(pngData);
@@ -104,7 +106,7 @@ describe('downloadPng', () => {
     expect(mockedDownload).toHaveBeenCalledWith(pngData, 'diagram.png');
   });
 
-  it('should throw error when generated PNG is broken', async () => {
+  it('should throw error when generated PNG is broken', async function testDownloadPngBroken() {
     const element = document.createElement('div');
     const pngData = 'data:image/png;base64,abc';
     mockedModernScreenshot.domToPng.mockResolvedValue(pngData);
