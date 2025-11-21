@@ -26,7 +26,6 @@ import org.jkiss.dbeaver.model.DBUtils;
 import org.jkiss.dbeaver.model.data.DBDDataFilter;
 import org.jkiss.dbeaver.model.data.DBDDataReceiver;
 import org.jkiss.dbeaver.model.exec.*;
-import org.jkiss.dbeaver.model.runtime.VoidProgressMonitor;
 import org.jkiss.dbeaver.model.sql.SQLQuery;
 import org.jkiss.dbeaver.model.sql.SQLScriptContext;
 import org.jkiss.dbeaver.model.sql.SQLSyntaxManager;
@@ -113,7 +112,7 @@ public class WebSQLQueryDataContainer implements DBSDataContainer, DBPContextPro
     public long countData(@NotNull DBCExecutionSource source, @NotNull DBCSession session, @Nullable DBDDataFilter dataFilter, long flags) throws DBCException {
         try {
             String filteredQuery = dataFilter == null ? query : getDataSource().getSQLDialect().addFiltersToQuery(
-                new VoidProgressMonitor(),
+                session.getProgressMonitor(),
                 getDataSource(),
                 query,
                 dataFilter
