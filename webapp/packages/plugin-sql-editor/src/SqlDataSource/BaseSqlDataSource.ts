@@ -17,6 +17,7 @@ import { ESqlDataSourceFeatures } from './ESqlDataSourceFeatures.js';
 import type { ISetScriptData, ISqlDataSource, ISqlDataSourceKey, ISqlEditorCursor } from './ISqlDataSource.js';
 import type { ISqlDataSourceHistory } from './SqlDataSourceHistory/ISqlDataSourceHistory.js';
 import { SqlDataSourceHistory } from './SqlDataSourceHistory/SqlDataSourceHistory.js';
+import type { TLocalizationToken } from '@cloudbeaver/core-localization';
 
 const SOURCE_HISTORY = 'history';
 
@@ -25,7 +26,10 @@ export abstract class BaseSqlDataSource<TDataSource extends QueryDataSource = Qu
   static key = 'base';
 
   abstract get name(): string | null;
-  message?: string;
+  get message(): TLocalizationToken | undefined {
+    return undefined;
+  }
+  loadingMessage?: TLocalizationToken;
 
   abstract get script(): string;
   abstract get baseScript(): string;
@@ -93,7 +97,7 @@ export abstract class BaseSqlDataSource<TDataSource extends QueryDataSource = Qu
     this.incomingScript = undefined;
     this.incomingExecutionContext = null;
     this.exception = undefined;
-    this.message = undefined;
+    this.loadingMessage = undefined;
     this.outdated = true;
     this.editing = true;
     this.innerCursorState = { anchor: 0, head: 0 };
@@ -144,7 +148,8 @@ export abstract class BaseSqlDataSource<TDataSource extends QueryDataSource = Qu
       databaseModels: observable.ref,
       exception: observable.ref,
       outdated: observable.ref,
-      message: observable.ref,
+      message: computed,
+      loadingMessage: observable.ref,
       editing: observable.ref,
       innerCursorState: observable.ref,
       incomingScript: observable.ref,

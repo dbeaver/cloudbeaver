@@ -26,7 +26,7 @@ export const Alert = observer<PropsWithChildren<Props>>(function Alert({ title, 
 
   return (
     <div className={s(styles, { alert: true }, className)} role="alert">
-      <IconOrImage icon="/icons/info_icon_sm.svg" />
+      <IconOrImage icon="/icons/info_icon_sm.svg" className="tw:mt-0.5" />
       <div className={s(styles, { body: true })}>
         <h3 className={s(styles, { title: true })}>{title ?? translate('ui_information')}</h3>
         {children}
