@@ -7,7 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { Combobox, usePermission, useResource, useTranslate } from '@cloudbeaver/core-blocks';
+import { Select, usePermission, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 import { DatabaseAuthModelsResource } from '@cloudbeaver/core-connections';
 import { CachedResourceListEmptyKey, resourceKeyList } from '@cloudbeaver/core-resource';
 import { EAdminPermission } from '@cloudbeaver/core-root';
@@ -46,7 +46,7 @@ export const ConnectionAuthModelSelector = observer<Props>(function ConnectionAu
   }
 
   return (
-    <Combobox
+    <Select
       value={authModelCredentialsState.authModelId}
       items={availableAuthModels}
       keySelector={model => model.id}

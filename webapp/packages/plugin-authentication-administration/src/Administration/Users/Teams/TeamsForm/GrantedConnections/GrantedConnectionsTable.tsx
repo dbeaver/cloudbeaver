@@ -22,11 +22,13 @@ import {
 import type { DatabaseConnectionCustomOptionsFragment } from '@cloudbeaver/core-sdk';
 import { Alert, StaticImage, useAutoLoad, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 import { isGlobalProject, ProjectInfoResource, type ProjectInfo } from '@cloudbeaver/core-projects';
+import { EAdminPermission } from '@cloudbeaver/core-root';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import { GrantManagementTable, type IGrantManagementTableColumn } from '@cloudbeaver/plugin-data-grid';
 
 import type { TeamFormProps } from '../TeamsAdministrationFormService.js';
 import type { GrantedConnectionsFormPart } from './GrantedConnectionsFormPart.js';
+import { getTeamOptionsFormPart } from '../Options/getTeamOptionsFormPart.js';
 
 const NAME_COLUMN: IGrantManagementTableColumn = { key: 'name', label: 'connections_connection_name' };
 const ADDRESS_COLUMN: IGrantManagementTableColumn = { key: 'address', label: 'connections_connection_address' };
@@ -36,6 +38,7 @@ const COLUMNS: IGrantManagementTableColumn[] = [NAME_COLUMN, ADDRESS_COLUMN];
 export const GrantedConnectionsTable: TabContainerPanelComponent<TeamFormProps> = observer(function GrantedConnectionsTable({ tabId, formState }) {
   const translate = useTranslate();
   const tabState = useTabState<GrantedConnectionsFormPart>();
+  const teamOptionsPart = getTeamOptionsFormPart(formState);
   const { selected } = useTab(tabId);
 
   const driverLoader = useResource(GrantedConnectionsTable, DBDriverResource, CachedMapAllKey, { active: selected });
@@ -51,9 +54,15 @@ export const GrantedConnectionsTable: TabContainerPanelComponent<TeamFormProps> 
   const connectionsOrigins = (connectionsOriginLoader.data ?? []) as ConnectionInfoOrigin[];
 
   useAutoLoad(GrantedConnectionsTable, tabState, selected && !loaded);
+  useAutoLoad(GrantedConnectionsTable, teamOptionsPart);
 
   if (!selected) {
     return null;
+  }
+  const fullAccess = teamOptionsPart.state.teamPermissions.includes(EAdminPermission.admin);
+
+  if (fullAccess) {
+    return <Alert className="tw:h-max">{translate('connections_connection_access_admin_info')}</Alert>;
   }
 
   function isGranted(connection: DatabaseConnectionCustomOptionsFragment) {

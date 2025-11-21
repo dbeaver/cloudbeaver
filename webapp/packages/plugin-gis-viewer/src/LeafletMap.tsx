@@ -116,9 +116,8 @@ export const LeafletMap: React.FC<Props> = function LeafletMap({ geoJSON, crsKey
     (feature: IGeoJSONFeature, layer: leaflet.Layer) => {
       const associatedValues = getAssociatedValues(feature.properties.associatedCell);
       if (associatedValues.length > 0) {
-        let popupContent = '';
+        const table = document.createElement('table');
 
-        popupContent += '<table>';
         for (let i = 0; i < associatedValues.length; i++) {
           const { key, value } = associatedValues[i]!;
 
@@ -126,10 +125,20 @@ export const LeafletMap: React.FC<Props> = function LeafletMap({ geoJSON, crsKey
             continue;
           }
 
-          popupContent += '<tr><td>' + key + '</td><td>' + value + '</td></tr>';
+          const tr = document.createElement('tr');
+
+          const tdKey = document.createElement('td');
+          tdKey.style.paddingRight = '8px';
+          tdKey.textContent = String(key);
+
+          const tdValue = document.createElement('td');
+          tdValue.textContent = String(value);
+
+          tr.appendChild(tdKey);
+          tr.appendChild(tdValue);
+          table.appendChild(tr);
         }
-        popupContent += '</table>';
-        layer.bindPopup(popupContent, popupOption);
+        layer.bindPopup(table.outerHTML, popupOption);
       }
     },
     [getAssociatedValues],
