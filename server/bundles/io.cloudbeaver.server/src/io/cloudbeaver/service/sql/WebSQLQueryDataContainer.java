@@ -111,7 +111,18 @@ public class WebSQLQueryDataContainer implements DBSDataContainer, DBPContextPro
     @Override
     public long countData(@NotNull DBCExecutionSource source, @NotNull DBCSession session, @Nullable DBDDataFilter dataFilter, long flags) throws DBCException {
         try {
-            SQLQuery countQuery = new SQLQueryTransformerCount().transformQuery(dataSource, syntaxManager, new SQLQuery(dataSource, query));
+            String filteredQuery = dataFilter == null ? query : getDataSource().getSQLDialect().addFiltersToQuery(
+                session.getProgressMonitor(),
+                getDataSource(),
+                query,
+                dataFilter
+            );
+
+            SQLQuery countQuery = new SQLQueryTransformerCount().transformQuery(
+                dataSource,
+                syntaxManager,
+                new SQLQuery(dataSource, filteredQuery)
+            );
             return DBUtils.countDataFromQuery(source, session, countQuery);
         } catch (DBException e) {
             throw new DBCException("Error executing row count", e);
