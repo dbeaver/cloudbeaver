@@ -2,7 +2,7 @@
   .dbv-kit-disclosure__disclosure {
     outline-offset: var(--dbv-kit-disclosure-outline-offset) !important;
 
-    &[aria-expanded='true'] .dbv-kit-disclosure__icon {
+    &[aria-expanded='true'] .disclosure-icon {
       transform: rotate(0deg);
     }
   }
@@ -24,11 +24,11 @@
     }
   }
 
-  .dbv-kit-disclosure__content-inner {
+  .disclosure-content-inner {
     padding-top: 24px;
   }
 
-  .dbv-kit-disclosure__icon {
+  .disclosure-icon {
     display: flex;
     box-sizing: border-box;
     flex-shrink: 0;
@@ -40,7 +40,7 @@
     transform: rotate(-90deg);
   }
 
-  .dbv-kit-disclosure__label {
+  .disclosure-label {
     font-weight: 400;
     margin: 0;
     text-transform: uppercase !important;

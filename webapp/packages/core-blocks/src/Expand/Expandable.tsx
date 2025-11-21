@@ -23,12 +23,12 @@ export const Expandable = observer(({ label, defaultExpanded, disabled, children
   <div>
     <DisclosureProvider defaultOpen={defaultExpanded}>
       <Disclosure disabled={disabled}>
-        <IconOrImage className="dbv-kit-disclosure__icon" icon="arrow" />
-        <h2 className="theme-typography--body2 dbv-kit-disclosure__label">{label}</h2>
+        <IconOrImage className="disclosure-icon" icon="arrow" />
+        <h2 className="theme-typography--body2 disclosure-label">{label}</h2>
       </Disclosure>
       <DisclosureContent>
         <div>
-          <div className="dbv-kit-disclosure__content-inner"> {children}</div>
+          <div className="disclosure-content-inner"> {children}</div>
         </div>
       </DisclosureContent>
     </DisclosureProvider>
