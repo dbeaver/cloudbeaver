@@ -16,22 +16,17 @@
  */
 package io.cloudbeaver.model.cli;
 
-import org.jkiss.code.NotNull;
-import org.jkiss.code.Nullable;
-import org.jkiss.dbeaver.model.cli.ApplicationInstanceController;
-import org.jkiss.dbeaver.model.cli.CLIRunMeta;
-import org.jkiss.dbeaver.model.cli.CommandLineContext;
-import org.jkiss.dbeaver.model.cli.command.AbstractTopLevelCommand;
 import picocli.CommandLine;
 
-@CommandLine.Command(name = "cbvr", description = "CloudBeaver commands")
-public class CloudBeaverTopLevelCommand extends AbstractTopLevelCommand {
-    protected CloudBeaverTopLevelCommand(
-        @Nullable ApplicationInstanceController controller,
-        @NotNull CommandLineContext context,
-        @NotNull CLIRunMeta meta
-
-    ) {
-        super(controller, context, meta);
-    }
+/**
+ * CloudBeaver specific mixin options
+ */
+public class CloudBeaverMixin {
+    @CommandLine.Option(
+        names = {"-web-config"},
+        arity = "1",
+        hidden = true,
+        scope = CommandLine.ScopeType.INHERIT
+    )
+    private String webConfig;
 }

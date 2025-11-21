@@ -65,6 +65,16 @@ export const NavigationTabsBar = observer<Props>(function NavigationTabsBar({ cl
     handleSelect(tab.tabId);
   }
 
+  const handleReorder = useCallback(
+    (draggedTabId: string, targetTabId: string, position: 'before' | 'after') => {
+      navigation.reorderTab(draggedTabId, {
+        tabId: targetTabId,
+        position,
+      });
+    },
+    [navigation],
+  );
+
   useExecutor({
     executor: userInfoResource.onUserChange,
     postHandlers: [unloadTabs, restoreTabs],
@@ -100,9 +110,11 @@ export const NavigationTabsBar = observer<Props>(function NavigationTabsBar({ cl
           }
           tabList={navigation.tabIdList}
           multipleRows={navigationSettings.hasMultipleRows}
+          reorderStateKey="navigation-tabs-bar"
           autoSelect
           enabledBaseActions
           onChange={handleTabChange}
+          onReorder={handleReorder}
         >
           {navigation.tabIdList.map(tabId => (
             <TabPanel key={tabId} tabId={tabId} lazy>

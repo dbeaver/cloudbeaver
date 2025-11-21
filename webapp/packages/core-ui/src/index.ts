@@ -48,6 +48,7 @@ export * from './Screens/AppScreen/OptionsPanelService.js';
 
 export * from './Tabs/ITab.js';
 export * from './Tabs/TabContext.js';
+export * from './Tabs/useTabDragAndDrop.js';
 export * from './Tabs/TabListLoader.js';
 export * from './Tabs/TabPanelLoader.js';
 export * from './Tabs/TabPanelListLoader.js';
@@ -58,6 +59,7 @@ export * from './Tabs/TabsContext.js';
 export * from './Tabs/TabsStateLoader.js';
 export * from './Tabs/useTabState.js';
 export * from './Tabs/useTabLocalState.js';
+export * from './Tabs/useTabOrderPersistence.js';
 export { default as TabStyles } from './Tabs/Tab/Tab.module.css';
 export { default as TabTitleStyles } from './Tabs/Tab/TabTitle.module.css';
 export { default as TabVerticalRotatedStyles } from './Tabs/Tab/TabVerticalRotated.module.css';

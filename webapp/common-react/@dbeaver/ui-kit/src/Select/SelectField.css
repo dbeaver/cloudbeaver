@@ -24,4 +24,8 @@
     color: var(--tw-color-gray-500);
     font-size: var(--dbv-kit-select-font-size);
   }
+
+  .dbv-kit-select[aria-disabled='true'] .dbv-kit-select__arrow-icon {
+    color: var(--dbv-kit-select-disabled-foreground);
+  }
 }
