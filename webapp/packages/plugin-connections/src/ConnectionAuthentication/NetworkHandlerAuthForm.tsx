@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -77,7 +77,12 @@ export const NetworkHandlerAuthForm = observer<Props>(function NetworkHandlerAut
       )}
       {ssh && keyAuth && <SSHKeyUploader state={state} disabled={disabled} />}
       {!ssh && (
-        <ObjectPropertyInfoForm state={state.secureProperties} properties={properties ?? []} autofillToken="new-password" hideEmptyPlaceholder />
+        <ObjectPropertyInfoForm
+          state={state.secureProperties}
+          properties={properties ?? []}
+          autocompleteSectionName="section-auth"
+          hideEmptyPlaceholder
+        />
       )}
       {allowSaveCredentials && (
         <FieldCheckbox

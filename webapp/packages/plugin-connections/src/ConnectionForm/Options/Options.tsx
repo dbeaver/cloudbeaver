@@ -219,13 +219,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
                 )}
               </Container>
               {optionsPart.state.configurationType === DriverConfigurationType.Url && (
-                <InputField
-                  type="text"
-                  name="url"
-                  state={optionsPart.state}
-                  readOnly={readonly || formState.isDisabled}
-                  autoComplete={`section-${optionsPart.state.driverId || 'driver'} section-jdbc`}
-                >
+                <InputField type="text" name="url" state={optionsPart.state} readOnly={readonly || formState.isDisabled}>
                   {translate('plugin_connections_connection_form_part_main_url_jdbc')}
                 </InputField>
               )}
@@ -262,16 +256,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
                 autoHide
                 onChange={setProject}
               />
-              <InputField
-                type="text"
-                name="folder"
-                state={optionsPart.state}
-                autoComplete={`section-${optionsPart.state.driverId || 'driver'} section-folder`}
-                autoHide
-                readOnly
-                tiny
-                fill
-              >
+              <InputField type="text" name="folder" state={optionsPart.state} autoHide readOnly tiny fill>
                 {translate('plugin_connections_connection_form_part_main_folder')}
               </InputField>
             </Container>
