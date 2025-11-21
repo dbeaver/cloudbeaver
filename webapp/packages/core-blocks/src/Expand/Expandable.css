@@ -47,14 +47,12 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
-    @layer components {
-      .dbv-kit-disclosure__content {
-        transition: none !important;
-      }
+    .dbv-kit-disclosure__content {
+      transition: none !important;
+    }
 
-      .disclosure-icon {
-        transition: none !important;
-      }
+    .disclosure-icon {
+      transition: none !important;
     }
   }
 }
