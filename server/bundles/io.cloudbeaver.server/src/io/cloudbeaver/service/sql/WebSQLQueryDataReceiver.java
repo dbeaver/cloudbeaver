@@ -19,6 +19,7 @@ package io.cloudbeaver.service.sql;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.utils.ServletAppUtils;
 import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataKind;
@@ -41,9 +42,14 @@ import java.util.stream.Collectors;
 class WebSQLQueryDataReceiver implements DBDDataReceiver {
     private static final Log log = Log.getLog(WebSQLQueryDataReceiver.class);
 
+    @NotNull
     private final WebSQLContextInfo contextInfo;
+    @NotNull
     private final DBSDataContainer dataContainer;
+    @Nullable
     private final WebDataFormat dataFormat;
+    @Nullable
+    private final DBDDataFilter dataFilter;
     private final WebSQLQueryResultSet webResultSet = new WebSQLQueryResultSet();
 
     private DBDAttributeBinding[] bindings;
@@ -51,10 +57,16 @@ class WebSQLQueryDataReceiver implements DBDDataReceiver {
     private List<WebSQLQueryResultSetRow> rows = new ArrayList<>();
     private final Number rowLimit;
 
-    WebSQLQueryDataReceiver(WebSQLContextInfo contextInfo, DBSDataContainer dataContainer, WebDataFormat dataFormat) {
+    WebSQLQueryDataReceiver(
+        @NotNull WebSQLContextInfo contextInfo,
+        @NotNull DBSDataContainer dataContainer,
+        @Nullable WebDataFormat dataFormat,
+        @Nullable DBDDataFilter dataFilter
+    ) {
         this.contextInfo = contextInfo;
         this.dataContainer = dataContainer;
         this.dataFormat = dataFormat;
+        this.dataFilter = dataFilter;
         rowLimit = ServletAppUtils.getServletApplication()
             .getAppConfiguration()
             .getResourceQuota(WebSQLConstants.QUOTA_PROP_ROW_LIMIT);
@@ -162,6 +174,7 @@ class WebSQLQueryDataReceiver implements DBDDataReceiver {
         webResultSet.setReadOnlyInfo(contextInfo.getProcessor().getExecutionContext());
 
         WebSQLResultsInfo resultsInfo = contextInfo.saveResult(dataContainer, trace, bindings, rows.size() == 1);
+        resultsInfo.setDataFilter(dataFilter);
         resultsInfo.setQueryText(resultSet.getSourceStatement().getQueryString());
         webResultSet.setResultsInfo(resultsInfo);
 
