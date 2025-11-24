@@ -8,3 +8,4 @@
 
 import './module.js';
 
+export * from './DataViewerRequestQueryViewerSettingsService.js';

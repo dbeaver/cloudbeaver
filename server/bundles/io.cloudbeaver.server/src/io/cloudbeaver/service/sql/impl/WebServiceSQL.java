@@ -659,7 +659,7 @@ public class WebServiceSQL implements DBWServiceSQL {
                         monitor,
                         contextInfo.getProcessor().getExecutionContext(),
                         results.getDataContainer(),
-                        null,
+                        results.getDataFilter(),
                         this
                     );
                     this.result = "Row data count completed";
