@@ -6,11 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { describe, expect, test, vitest } from 'vitest';
+import { afterEach, beforeEach, describe, expect, test, vitest } from 'vitest';
 import { renderHook } from '@testing-library/react';
-
-import * as coreUtils from '@cloudbeaver/core-utils';
-
 import { useObjectRef } from './useObjectRef.js';
 
 vitest.mock('@cloudbeaver/core-utils', () => ({
@@ -18,11 +15,23 @@ vitest.mock('@cloudbeaver/core-utils', () => ({
 }));
 
 describe('useObjectRef', () => {
+  let bindFunctionsMock: ReturnType<typeof vitest.fn>;
+
+  beforeEach(async () => {
+    const { bindFunctions } = await import('@cloudbeaver/core-utils');
+
+    bindFunctionsMock = bindFunctions as ReturnType<typeof vitest.fn>;
+  });
+
+  afterEach(() => {
+    vitest.clearAllMocks();
+  });
+
   test('should initialize', () => {
     const { result } = renderHook(() =>
       useObjectRef({
         count: 0,
-        increment: function (this: { count: number }) {
+        increment: function increment(this: { count: number }) {
           this.count++;
         },
       }),
@@ -39,13 +48,11 @@ describe('useObjectRef', () => {
   });
 
   test('should bind ref functions', () => {
-    const bindFunctions = vitest.spyOn(coreUtils, 'bindFunctions');
-
     renderHook(() =>
       useObjectRef(
         () => ({
           count: 0,
-          increment: function (this: { count: number }) {
+          increment: function increment(this: { count: number }) {
             this.count++;
           },
         }),
@@ -54,18 +61,15 @@ describe('useObjectRef', () => {
       ),
     );
 
-    expect(bindFunctions).toHaveBeenCalledTimes(1);
-    bindFunctions.mockClear();
+    expect(bindFunctionsMock).toHaveBeenCalledTimes(1);
   });
 
   test('should merge update to bind', () => {
-    const bindFunctions = vitest.spyOn(coreUtils, 'bindFunctions');
-
     renderHook(() =>
       useObjectRef(
         () => ({
           count: 0,
-          increment: function (this: { count: number }) {
+          increment: function increment(this: { count: number }) {
             this.count++;
           },
         }),
@@ -76,8 +80,7 @@ describe('useObjectRef', () => {
       ),
     );
 
-    expect(bindFunctions).toHaveBeenCalledTimes(1);
-    bindFunctions.mockClear();
+    expect(bindFunctionsMock).toHaveBeenCalledTimes(1);
   });
 
   test('should update ref via initial state method', () => {
@@ -88,7 +91,7 @@ describe('useObjectRef', () => {
       initialProps: {
         update: {
           count: 0,
-          increment: function () {
+          increment: function increment(this: { count: number }) {
             this.count++;
           },
         },
