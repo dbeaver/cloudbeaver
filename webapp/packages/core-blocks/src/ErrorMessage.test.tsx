@@ -10,13 +10,19 @@ import { expect, describe, it, vi } from 'vitest';
 import { ErrorMessage } from './ErrorMessage.js';
 import { renderInApp } from '@cloudbeaver/tests-runner';
 
-vi.mock('./s', () => ({
-  s: (...args: any[]) => args.join(' '),
-}));
+vi.mock('./s', async () => {
+  const { sMock } = await import('./tests/sMock.js');
+  return {
+    s: vi.fn(sMock),
+  };
+});
 
-vi.mock('./useS', () => ({
-  useS: vi.fn(),
-}));
+vi.mock('./useS', async () => {
+  const { useSMock } = await import('./tests/useSMock.js');
+  return {
+    useS: vi.fn(useSMock),
+  };
+});
 
 vi.mock('./localization/useTranslate', () => ({
   useTranslate: () => (key: string) => key,

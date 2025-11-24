@@ -10,13 +10,19 @@ import { describe, expect, it, vi } from 'vitest';
 import { TextPlaceholder } from './TextPlaceholder.js';
 import { renderInApp } from '@cloudbeaver/tests-runner';
 
-vi.mock('./s', () => ({
-  s: (...args: any[]) => args.join(' '),
-}));
+vi.mock('./s', async () => {
+  const { sMock } = await import('./tests/sMock.js');
+  return {
+    s: vi.fn(sMock),
+  };
+});
 
-vi.mock('./useS', () => ({
-  useS: vi.fn(),
-}));
+vi.mock('./useS', async () => {
+  const { useSMock } = await import('./tests/useSMock.js');
+  return {
+    useS: vi.fn(useSMock),
+  };
+});
 
 describe('TextPlaceholder Component', () => {
   it('renders children correctly', async () => {
