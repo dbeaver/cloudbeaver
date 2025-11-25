@@ -1305,7 +1305,7 @@ public class WebSQLProcessor implements WebSessionProvider {
                         );
                         break;
                     }
-                    if (confirmDropQueries && sqlQuery.isDropTableDangerous()) {
+                    if (confirmDropQueries && sqlQuery.isDropDangerous()) {
                         hasDropStatement = true;
                         ConfirmationDescriptor descriptor = ConfirmationRegistry.getInstance()
                             .getConfirmation(ConfirmationConstants.CONFIRM_DROP_SQL_ID);
