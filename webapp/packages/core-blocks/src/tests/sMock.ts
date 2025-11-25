@@ -17,7 +17,7 @@ export function sMock(styles?: Record<string, string>, options?: Record<string, 
     });
   }
 
-  if (inputs) {
+  if (inputs.length) {
     classes.push(...inputs.filter(Boolean));
   }
 

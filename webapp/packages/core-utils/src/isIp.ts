@@ -15,10 +15,10 @@ export function isIp(host: string): boolean {
 
   const trimmedHost = host.trim();
 
-  return isIpv4(trimmedHost) || isIPv6(trimmedHost);
+  return isIPv4(trimmedHost) || isIPv6(trimmedHost);
 }
 
-function isIpv4(host: string): boolean {
+function isIPv4(host: string): boolean {
   return IPV4_REGEX.test(host);
 }
 

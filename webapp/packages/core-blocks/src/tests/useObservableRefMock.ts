@@ -6,8 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
-export function useObservableRefMock(_init: any, _observed: any, update: any): Record<string, any> {
-  const state = _init();
+export function useObservableRefMock(init: any, _observed: any, update: any): Record<string, any> {
+  const state = init();
 
   if (update) {
     for (const [key, value] of Object.entries(update)) {
