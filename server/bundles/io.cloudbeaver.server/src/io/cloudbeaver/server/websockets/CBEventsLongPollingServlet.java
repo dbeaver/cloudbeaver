@@ -22,6 +22,7 @@ import io.cloudbeaver.model.session.WebHttpRequestInfo;
 import io.cloudbeaver.server.CBConstants;
 import io.cloudbeaver.server.WebAppSessionManager;
 import io.cloudbeaver.server.WebAppUtils;
+import io.cloudbeaver.utils.ServletAppUtils;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -66,13 +67,13 @@ public class CBEventsLongPollingServlet extends HttpServlet {
 
     @Override
     protected void doOptions(@NotNull HttpServletRequest req, @NotNull HttpServletResponse resp) {
-        addCorsHeaders(resp);
+        addCorsHeaders(req, resp);
         resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
     }
 
     @Override
     protected void doGet(@NotNull HttpServletRequest req, @NotNull HttpServletResponse resp) throws IOException {
-        addCorsHeaders(resp);
+        addCorsHeaders(req, resp);
 
         BaseWebSession ws = resolveSession(req);
         resp.setHeader(WSConstants.WS_SESSION_HEADER, ws.getSessionId());
@@ -92,15 +93,14 @@ public class CBEventsLongPollingServlet extends HttpServlet {
             WSUtils.clientGson.toJson(Map.of("events", events), resp.getWriter());
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            log.warn("Long-poll interrupted", e);
-            resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            log.debug("Long-poll interrupted (likely client disconnected)", e);
+            resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
         }
-
     }
 
     @Override
     protected void doPost(@NotNull HttpServletRequest req, @NotNull HttpServletResponse resp) throws IOException {
-        addCorsHeaders(resp);
+        addCorsHeaders(req, resp);
 
         BaseWebSession ws = resolveSession(req);
         resp.setHeader(WSConstants.WS_SESSION_HEADER, ws.getSessionId());
@@ -148,10 +148,22 @@ public class CBEventsLongPollingServlet extends HttpServlet {
         return running;
     }
 
-    private void addCorsHeaders(@NotNull HttpServletResponse resp) {
-        resp.setHeader("Access-Control-Allow-Origin", "*");
+    private void addCorsHeaders(@NotNull HttpServletRequest req, @NotNull HttpServletResponse resp) {
+        String origin = req.getHeader("Origin");
+        boolean develMode = ServletAppUtils.getServletApplication().getServerConfiguration().isDevelMode();
+        if (!develMode || origin == null) {
+            return;
+        }
+
+        resp.setHeader("Access-Control-Allow-Origin", origin);
+        resp.setHeader("Access-Control-Allow-Credentials", "true");
+
+        String reqHeaders = req.getHeader("Access-Control-Request-Headers");
+        if (reqHeaders != null) {
+            resp.setHeader("Access-Control-Allow-Headers", reqHeaders);
+        }
+
         resp.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-        resp.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, " + WSConstants.WS_AUTH_HEADER);
     }
 
     @NotNull
@@ -176,12 +188,8 @@ public class CBEventsLongPollingServlet extends HttpServlet {
             } else  {
                 log.trace("Couldn't create headless session");
             }
-        } catch (DBException e) {
-            log.error("Error resolving headless session", e);
-        } catch (RuntimeException e) {
-            log.error("Unexpected error resolving headless session", e);
         } catch (Exception e) {
-            log.error("Unexpected checked exception resolving headless session", e);
+            log.error("Error resolving headless session", e);
         }
 
         throw new BadMessageException("No web session found for long-poll request");
