@@ -7,5 +7,15 @@
  */
 
 export function useObservableRefMock(_init: any, _observed: any, update: any): Record<string, any> {
-  return { ...update, ..._init() };
+  const state = _init();
+
+  if (update) {
+    for (const [key, value] of Object.entries(update)) {
+      if (!(key in state) || state[key] !== value) {
+        state[key] = value;
+      }
+    }
+  }
+
+  return state;
 }
