@@ -473,14 +473,10 @@ export class MenuBootstrap extends Bootstrap {
 
       const { status, result } = await this.commonDialogService.open(ConfirmationDialog, payload);
 
-      if (status === DialogueStateResult.Rejected && !result?.isExtraAction) {
-        return;
-      }
-
-      const shouldDownload = status === DialogueStateResult.Resolved;
-
-      if (shouldDownload) {
+      if (status === DialogueStateResult.Resolved) {
         this.downloadSql(state);
+      } else if (!result?.isExtraAction) {
+        return;
       }
     }
 
