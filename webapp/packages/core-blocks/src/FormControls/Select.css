@@ -38,6 +38,10 @@
     --dbv-kit-control-outline-offset: -2px;
   }
 
+  .dbv-kit-select__arrow-icon {
+    --dbv-kit-select-disabled-foreground: var(--theme-input-color-disabled);
+  }
+
   .dbv-kit-select {
     padding-left: 12px;
     padding-right: 6px;
