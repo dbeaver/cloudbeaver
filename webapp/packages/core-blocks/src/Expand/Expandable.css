@@ -1,5 +1,6 @@
 @layer components {
   .dbv-kit-disclosure__disclosure {
+    --dbv-kit-disclosure-foreground: var(--theme-text-on-surface);
     outline-offset: var(--dbv-kit-disclosure-outline-offset) !important;
 
     &[aria-expanded='true'] .disclosure-icon {

@@ -229,12 +229,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
                   onClick={() => handleSelect(null)}
                 />
               )}
-              {displayPopover && (
-                <ComboboxDisclosure
-                  disabled={disabled || loading || readOnly}
-                  className="tw:absolute tw:right-2 tw:top-[50%] tw:-translate-y-1/2 tw:[&>svg]:fill-none! tw:text-sm! tw:cursor-pointer"
-                />
-              )}
+              {displayPopover && <ComboboxDisclosure disabled={disabled || loading || readOnly} className="cb-combobox__disclosure-icon" />}
             </>
           )}
           {icon && <div className="tw:absolute tw:left-3 tw:w-4 tw:h-4">{typeof icon === 'string' ? <IconOrImage icon={icon} /> : icon}</div>}
