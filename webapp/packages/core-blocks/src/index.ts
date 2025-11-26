@@ -158,6 +158,8 @@ export * from './FormControls/Checkboxes/useCheckboxState.js';
 export * from './FormControls/Filter.js';
 export { default as BaseDropdownStyles } from './FormControls/BaseDropdown.module.css';
 export { default as FilterStyles } from './FormControls/Filter.module.css';
+export * from './FormControls/Input.js';
+export { default as InputStyles } from './FormControls/Input.module.css';
 export * from './Fill.js';
 
 export * from './Containers/Container.js';

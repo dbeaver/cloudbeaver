@@ -10,23 +10,23 @@ import React, { forwardRef, useCallback, useId, useLayoutEffect, useRef, useStat
 
 import { isNotNullDefined } from '@dbeaver/js-helpers';
 
-import { filterLayoutFakeProps, getLayoutProps } from '../../Containers/filterLayoutFakeProps.js';
-import type { ILayoutSizeProps } from '../../Containers/ILayoutSizeProps.js';
-import { Icon } from '../../Icon.js';
-import { useTranslate } from '../../localization/useTranslate.js';
-import { s } from '../../s.js';
-import { useCombinedHandler } from '../../useCombinedHandler.js';
-import { useCombinedRef } from '../../useCombinedRef.js';
-import { useS } from '../../useS.js';
-import { useStateDelay } from '../../useStateDelay.js';
-import { Field } from '../Field.js';
-import { FieldDescription } from '../FieldDescription.js';
-import { FieldLabel } from '../FieldLabel.js';
-import { useCapsLockTracker } from '../useCapsLockTracker.js';
-import inputFieldStyle from './InputField.module.css';
-import { IconButton, Input, Spinner, type InputProps } from '@dbeaver/ui-kit';
+import { filterLayoutFakeProps, getLayoutProps } from '../Containers/filterLayoutFakeProps.js';
+import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps.js';
+import { Icon } from '../Icon.js';
+import { useTranslate } from '../localization/useTranslate.js';
+import { s } from '../s.js';
+import { useCombinedHandler } from '../useCombinedHandler.js';
+import { useCombinedRef } from '../useCombinedRef.js';
+import { useS } from '../useS.js';
+import { useStateDelay } from '../useStateDelay.js';
+import { Field } from './Field.js';
+import { FieldDescription } from './FieldDescription.js';
+import { FieldLabel } from './FieldLabel.js';
+import { useCapsLockTracker } from './useCapsLockTracker.js';
+import inputStyle from './Input.module.css';
+import { IconButton, Input as AriakitInput, Spinner, type InputProps as UiKitInputProps } from '@dbeaver/ui-kit';
 
-export type InputFieldBaseProps = Omit<InputProps, 'onChange'> &
+export type InputProps = Omit<UiKitInputProps, 'onChange'> &
   ILayoutSizeProps & {
     size?: 'small' | 'medium' | 'large';
     value?: string;
@@ -40,7 +40,7 @@ export type InputFieldBaseProps = Omit<InputProps, 'onChange'> &
     onChange?: (value: string, name?: string) => any;
   };
 
-export const InputFieldBase = observer<InputFieldBaseProps, HTMLInputElement>(
+export const Input = observer<InputProps, HTMLInputElement>(
   forwardRef(function InputFieldBase(
     {
       name,
@@ -70,7 +70,7 @@ export const InputFieldBase = observer<InputFieldBaseProps, HTMLInputElement>(
     const translate = useTranslate();
     const layoutProps = getLayoutProps(rest);
     rest = filterLayoutFakeProps(rest);
-    const styles = useS(inputFieldStyle);
+    const styles = useS(inputStyle);
     loading = useStateDelay(loading ?? false, 300);
 
     const revealPassword = useCallback(() => {
@@ -121,7 +121,7 @@ export const InputFieldBase = observer<InputFieldBaseProps, HTMLInputElement>(
           {children}
         </FieldLabel>
         <div className={s(styles, { inputContainer: true })}>
-          <Input
+          <AriakitInput
             ref={mergedRef}
             {...rest}
             id={inputId}
