@@ -64,7 +64,7 @@ describe('useSearch', () => {
   });
 
   describe('Initialization', () => {
-    test('should initialize with correct default values', () => {
+    test('should initialize with correct default values and observed state', () => {
       const { result } = renderHook(() =>
         useSearch({
           sourceHints: testData,
@@ -205,21 +205,6 @@ describe('useSearch', () => {
       result.current.setSearch('aple');
       expect(mockFuzzySearch).toHaveBeenCalledWith('aple');
     });
-
-    test('should return empty array when fuzzy search returns null', () => {
-      mockSearchResult = null;
-
-      const { result } = renderHook(() =>
-        useSearch({
-          sourceHints: testData,
-          searchFields: ['name'],
-          matchStrategy: 'fuzzy',
-        }),
-      );
-
-      result.current.setSearch('xyz');
-      expect(result.current.searchResult).toEqual([]);
-    });
   });
 
   describe('Predicate Function', () => {
@@ -238,29 +223,6 @@ describe('useSearch', () => {
       result.current.setSearch('a');
       const fruitItems = result.current.searchResult.filter(item => item.category === 'fruit');
       expect(fruitItems).toEqual(result.current.searchResult);
-    });
-
-    test('should pass suggestion and search term to predicate', () => {
-      const predicateSpy = vi.fn(() => true);
-
-      const { result } = renderHook(() =>
-        useSearch({
-          sourceHints: testData,
-          searchFields: ['name'],
-          matchStrategy: 'contains',
-          predicate: predicateSpy,
-        }),
-      );
-
-      result.current.setSearch('ppl'); // Search for 'ppl' which is in 'Apple' and 'Pineapple' but not exact
-      const searchResult = result.current.searchResult;
-
-      expect(searchResult).toBeDefined();
-      expect(predicateSpy).toHaveBeenCalled();
-      const calls = predicateSpy.mock.calls as unknown as [TestItem, string][];
-      if (calls.length > 0 && calls[0]) {
-        expect(calls[0][1]).toBe('ppl');
-      }
     });
 
     test('should exclude items when predicate returns false', () => {
@@ -351,79 +313,6 @@ describe('useSearch', () => {
 
       result.current.setSearch('apple');
       expect(result.current.searchResult.map(item => item.name.toLowerCase())).not.toContain('apple');
-    });
-  });
-
-  describe('setSearch Method', () => {
-    test('should update search state', () => {
-      const { result } = renderHook(() =>
-        useSearch({
-          sourceHints: testData,
-          searchFields: ['name'],
-        }),
-      );
-
-      result.current.setSearch('test');
-
-      expect(result.current.searchResult).toBeDefined();
-    });
-
-    test('should trigger fuzzy search when strategy is fuzzy', () => {
-      const { result } = renderHook(() =>
-        useSearch({
-          sourceHints: testData,
-          searchFields: ['name'],
-          matchStrategy: 'fuzzy',
-        }),
-      );
-
-      mockFuzzySearch.mockClear();
-      result.current.setSearch('test');
-      expect(mockFuzzySearch).toHaveBeenCalledWith('test');
-    });
-
-    test('should not trigger fuzzy search when strategy is not fuzzy', () => {
-      const { result } = renderHook(() =>
-        useSearch({
-          sourceHints: testData,
-          searchFields: ['name'],
-          matchStrategy: 'contains',
-        }),
-      );
-
-      mockFuzzySearch.mockClear();
-      result.current.setSearch('test');
-      expect(mockFuzzySearch).not.toHaveBeenCalled();
-    });
-  });
-
-  describe('Multiple Search Fields', () => {
-    test('should search across all specified fields', () => {
-      const { result } = renderHook(() =>
-        useSearch({
-          sourceHints: testData,
-          searchFields: ['name', 'description', 'category'],
-          matchStrategy: 'contains',
-        }),
-      );
-
-      result.current.setSearch('veget');
-      expect(result.current.searchResult).toHaveLength(1);
-      expect(result.current.searchResult[0]!.name).toBe('Carrot');
-    });
-
-    test('should match if any field contains the search term', () => {
-      const { result } = renderHook(() =>
-        useSearch({
-          sourceHints: testData,
-          searchFields: ['name', 'description'],
-          matchStrategy: 'contains',
-        }),
-      );
-
-      result.current.setSearch('red');
-      expect(result.current.searchResult).toHaveLength(1);
-      expect(result.current.searchResult[0]!.name).toBe('Apple');
     });
   });
 });

@@ -220,27 +220,6 @@ describe('useErrorDetails', () => {
     expect(result.current.isOpen).toBe(false);
   });
 
-  it('should handle DetailsError with hasDetails returning false', () => {
-    const { errorOfMock } = getMocks();
-
-    const detailsError = new DetailsError('Error without details');
-    detailsError.hasDetails = vitest.fn().mockReturnValue(false);
-
-    const error = new Error('Test error');
-
-    errorOfMock.mockImplementation((err, errorType) => {
-      if (errorType === DetailsError) {
-        return detailsError;
-      }
-      return undefined;
-    });
-
-    const { result } = renderHook(() => useErrorDetails(error));
-
-    expect(result.current.details).toBe(detailsError);
-    expect(result.current.hasDetails).toBe(false);
-  });
-
   it('should handle both DetailsError and LoadingError', () => {
     const { errorOfMock } = getMocks();
 

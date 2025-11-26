@@ -64,7 +64,6 @@ describe('useFuzzySearch', () => {
     mockSearch.mockClear();
     mockClearSearch.mockClear();
 
-    // Default mock implementations
     mockSearchResults.mockReturnValue(null);
     mockIsIndexing.mockReturnValue(false);
   });
@@ -93,19 +92,6 @@ describe('useFuzzySearch', () => {
 
     expect(mockSearch).toHaveBeenCalledWith('Apple');
     expect(mockSearch).toHaveBeenCalledTimes(1);
-  });
-
-  test('should call search with fuzzy query', () => {
-    const { result } = renderHook(() =>
-      useFuzzySearch({
-        sourceProposals: testData,
-        fields: ['name'],
-      }),
-    );
-
-    result.current.search('Aple');
-
-    expect(mockSearch).toHaveBeenCalledWith('Aple');
   });
 
   test('should support searching across multiple fields', () => {

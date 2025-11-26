@@ -6,12 +6,16 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { isImageBroken } from './isBrokenImage.js';
 
 describe('isImageBroken', () => {
   const OriginalImage = globalThis.Image;
+
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
 
   afterEach(() => {
     if (OriginalImage) {
@@ -20,6 +24,7 @@ describe('isImageBroken', () => {
       delete (globalThis as Record<string, unknown>)['Image'];
     }
     vi.restoreAllMocks();
+    vi.useRealTimers();
   });
 
   it('should return false if image loads successfully', async () => {
@@ -36,6 +41,7 @@ describe('isImageBroken', () => {
         setTimeout(() => {
           thisRef.onload?.();
         }, 0);
+        vi.runAllTimers();
       }
     }
 
@@ -59,6 +65,7 @@ describe('isImageBroken', () => {
         setTimeout(() => {
           thisRef.onerror?.();
         }, 0);
+        vi.runAllTimers();
       }
     }
 

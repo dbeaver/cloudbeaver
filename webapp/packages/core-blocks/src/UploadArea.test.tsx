@@ -62,7 +62,7 @@ describe('UploadArea', () => {
     expect(label).toHaveClass('custom-class');
   });
 
-  it('should handle onChange event', async () => {
+  it('should handle onChange event', () => {
     const handleChange = vi.fn();
     const { container } = renderInApp(<UploadArea onChange={handleChange}>Upload File</UploadArea>);
     const input = container.querySelector('input[type="file"]') as HTMLInputElement;
@@ -72,13 +72,13 @@ describe('UploadArea', () => {
       value: fileList,
       writable: true,
     });
+
     fireEvent.change(input);
-    await vi.waitFor(() => {
-      expect(handleChange).toHaveBeenCalled();
-    });
+
+    expect(handleChange).toHaveBeenCalled();
   });
 
-  it('should reset input value when reset is true', async () => {
+  it('should reset input value when reset is true', () => {
     const handleChange = vi.fn();
     const { container } = renderInApp(
       <UploadArea reset onChange={handleChange}>
@@ -93,10 +93,9 @@ describe('UploadArea', () => {
       writable: true,
     });
     fireEvent.change(input);
-    await vi.waitFor(() => {
-      expect(handleChange).toHaveBeenCalled();
-      expect(input.value).toBe('');
-    });
+
+    expect(handleChange).toHaveBeenCalled();
+    expect(input.value).toBe('');
   });
 
   it('should apply disabled state correctly', () => {
@@ -152,7 +151,7 @@ describe('UploadArea', () => {
     expect(input.files).toBe(fileList);
   });
 
-  it('should handle async onChange event', async () => {
+  it('should handle async onChange event', () => {
     vi.useFakeTimers();
 
     const handleChange = vi.fn(async () => {
@@ -166,9 +165,7 @@ describe('UploadArea', () => {
 
     vi.runAllTimers();
 
-    await vi.waitFor(() => {
-      expect(handleChange).toHaveBeenCalled();
-    });
+    expect(handleChange).toHaveBeenCalled();
 
     vi.useRealTimers();
   });
