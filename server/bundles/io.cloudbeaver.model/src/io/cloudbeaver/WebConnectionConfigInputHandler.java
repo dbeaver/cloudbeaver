@@ -25,6 +25,7 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
+import org.jkiss.dbeaver.model.runtime.VoidProgressMonitor;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
 import org.jkiss.utils.CommonUtils;
 
@@ -52,6 +53,7 @@ public class WebConnectionConfigInputHandler<T extends WebConnectionConfig, C ex
         }
 
         WebDataSourceUtils.saveAuthProperties(
+            new VoidProgressMonitor(),
             newDataSource,
             newDataSource.getConnectionConfiguration(),
             input.getCredentials(),
@@ -81,6 +83,7 @@ public class WebConnectionConfigInputHandler<T extends WebConnectionConfig, C ex
             input
         );
         WebDataSourceUtils.saveAuthProperties(
+            new VoidProgressMonitor(),
             dataSource,
             dataSource.getConnectionConfiguration(),
             input.getCredentials(),
