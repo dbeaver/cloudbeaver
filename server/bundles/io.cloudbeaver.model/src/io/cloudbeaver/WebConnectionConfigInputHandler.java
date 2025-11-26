@@ -18,6 +18,7 @@ package io.cloudbeaver;
 
 import io.cloudbeaver.model.WebConnectionConfig;
 import io.cloudbeaver.model.app.WebAppConfiguration;
+import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.utils.ServletAppUtils;
 import io.cloudbeaver.utils.WebDataSourceUtils;
 import org.jkiss.code.NotNull;
@@ -25,7 +26,6 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
-import org.jkiss.dbeaver.model.runtime.VoidProgressMonitor;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
 import org.jkiss.utils.CommonUtils;
 
@@ -33,8 +33,10 @@ public class WebConnectionConfigInputHandler<T extends WebConnectionConfig, C ex
     private static final Log log = Log.getLog(WebConnectionConfigInputHandler.class);
     protected final T input;
     protected final DBPDataSourceRegistry registry;
+    protected final WebSession webSession;
 
-    public WebConnectionConfigInputHandler(@NotNull DBPDataSourceRegistry registry, T configInput) {
+    public WebConnectionConfigInputHandler(@NotNull WebSession webSession, @NotNull DBPDataSourceRegistry registry, T configInput) {
+        this.webSession = webSession;
         this.registry = registry;
         this.input = configInput;
     }
@@ -53,7 +55,7 @@ public class WebConnectionConfigInputHandler<T extends WebConnectionConfig, C ex
         }
 
         WebDataSourceUtils.saveAuthProperties(
-            new VoidProgressMonitor(),
+            webSession.getProgressMonitor(),
             newDataSource,
             newDataSource.getConnectionConfiguration(),
             input.getCredentials(),
@@ -83,7 +85,7 @@ public class WebConnectionConfigInputHandler<T extends WebConnectionConfig, C ex
             input
         );
         WebDataSourceUtils.saveAuthProperties(
-            new VoidProgressMonitor(),
+            webSession.getProgressMonitor(),
             dataSource,
             dataSource.getConnectionConfiguration(),
             input.getCredentials(),
