@@ -13,8 +13,10 @@
     height: 26px;
     width: 80px;
     box-sizing: border-box;
-    padding: 4px 7px;
-    font-size: 13px;
-    line-height: 24px;
+    outline: none;
+
+    & input {
+      padding: 4px 7px;
+    }
   }
 }
