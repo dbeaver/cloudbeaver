@@ -10,6 +10,7 @@ import { use } from 'react';
 import classes from './TextEditor.module.css';
 import { DataGridCellContext } from '../DataGridCellContext.js';
 import { useGridReactiveValue } from '../useGridReactiveValue.js';
+import { Input } from '@dbeaver/ui-kit';
 
 function autoFocusAndSelect(input: HTMLInputElement | null) {
   input?.focus();
@@ -28,9 +29,9 @@ export function TextEditor({ rowIdx, colIdx, onClose }: IProps) {
   const value = useGridReactiveValue(cellContext?.cellText, rowIdx, colIdx) ?? '';
 
   return (
-    <input
-      className={classes['editor']}
+    <Input
       ref={autoFocusAndSelect}
+      className={classes['editor']}
       value={value}
       onChange={event => cellContext?.onCellChange?.(rowIdx, colIdx, event.target.value)}
       onBlur={() => onClose()}
