@@ -51,12 +51,14 @@ public class WebTestUtils {
         Class<?> cls = target.getClass();
         Field f = null;
         while (cls != null) {
-            try {
-                f = cls.getDeclaredField(fieldName);
-                break;
-            } catch (NoSuchFieldException e) {
-                cls = cls.getSuperclass();
+            Field[] fields = cls.getDeclaredFields();
+            for (Field field : fields) {
+                if (field.getName().equals(fieldName)) {
+                    f = field;
+                    break;
+                }
             }
+            cls = cls.getSuperclass();
         }
         if (f == null) {
             throw new NoSuchFieldException(fieldName);

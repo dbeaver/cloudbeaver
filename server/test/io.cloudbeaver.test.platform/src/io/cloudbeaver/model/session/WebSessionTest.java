@@ -33,7 +33,7 @@ public class WebSessionTest extends CloudbeaverMockTest {
 
     @Test
     public void localeAndBasicAttributes() throws Exception {
-        WebSession session = new WebSession(mockRequestInfo(), mockApplication(), Collections.emptyMap());
+        WebSession session = new WebSession(getFakeRequestInfo(), mockApplication(), Collections.emptyMap());
         // Locale
         session.setLocale("ru");
         Assert.assertEquals("ru", session.getLocale());
@@ -65,20 +65,20 @@ public class WebSessionTest extends CloudbeaverMockTest {
 
     @Test
     public void asyncTaskStatusNotFound() throws Exception {
-        WebSession session = new WebSession(mockRequestInfo(), mockApplication(), Collections.emptyMap());
+        WebSession session = new WebSession(getFakeRequestInfo(), mockApplication(), Collections.emptyMap());
         Assert.assertThrows(
             "DBWebException must be thrown for unknown async task",
             DBWebException.class, () -> session.asyncTaskStatus("nonexistent-task", false)
         );
     }
 
-    private WebHttpRequestInfo mockRequestInfo() {
-        WebHttpRequestInfo req = Mockito.mock(WebHttpRequestInfo.class);
-        Mockito.when(req.getId()).thenReturn("test-session-id");
-        Mockito.when(req.getLocale()).thenReturn("en");
-        Mockito.when(req.getLastRemoteAddress()).thenReturn("127.0.0.1");
-        Mockito.when(req.getLastRemoteUserAgent()).thenReturn("JUnit");
-        return req;
+    private WebHttpRequestInfo getFakeRequestInfo() {
+        return new WebHttpRequestInfo(
+            "test-session-id",
+            "en",
+            "127.0.0.1",
+            "JUnit"
+        );
     }
 
     private ServletAuthApplication mockApplication() {
