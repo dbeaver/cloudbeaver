@@ -8,19 +8,7 @@
 import { observer } from 'mobx-react-lite';
 import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useRef } from 'react';
 
-import {
-  Icon,
-  IconOrImage,
-  Input,
-  InputStyles,
-  Loader,
-  s,
-  SContext,
-  useObjectRef,
-  useS,
-  useTranslate,
-  type StyleRegistry,
-} from '@cloudbeaver/core-blocks';
+import { Icon, IconOrImage, Input, Loader, s, useObjectRef, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 
@@ -48,16 +36,6 @@ export interface InlineEditorProps extends Omit<React.InputHTMLAttributes<HTMLIn
   onDoubleClick?: (event: React.MouseEvent<HTMLDivElement>) => void;
   className?: string;
 }
-
-const styleRegistry: StyleRegistry = [
-  [
-    InputStyles,
-    {
-      mode: 'append',
-      styles: [styles],
-    },
-  ],
-];
 
 export const InlineEditor = observer<InlineEditorProps, HTMLInputElement>(
   forwardRef(function InlineEditor(
@@ -136,20 +114,18 @@ export const InlineEditor = observer<InlineEditorProps, HTMLInputElement>(
     return (
       <div className={s(style, { editor: true, specific: true, editorActive: active }, className)} onClick={onClick} onDoubleClick={onDoubleClick}>
         <div className={s(style, { editorContainer: true })}>
-          <SContext registry={styleRegistry}>
-            <Input
-              ref={inputRef}
-              className={s(style, { input: true })}
-              lang="en"
-              value={value}
-              autoComplete="off"
-              disabled={disabled}
-              onChange={handleChange}
-              onKeyDown={handleKeyDown}
-              {...rest}
-              size="small"
-            />
-          </SContext>
+          <Input
+            ref={inputRef}
+            className={s(style, { input: true })}
+            lang="en"
+            value={value}
+            autoComplete="off"
+            disabled={disabled}
+            onChange={handleChange}
+            onKeyDown={handleKeyDown}
+            {...rest}
+            size="small"
+          />
         </div>
         <div
           className={s(style, {

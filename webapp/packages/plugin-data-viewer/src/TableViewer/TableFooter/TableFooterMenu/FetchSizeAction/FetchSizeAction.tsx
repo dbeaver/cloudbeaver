@@ -8,23 +8,13 @@
 import { observer } from 'mobx-react-lite';
 import { useEffect, useRef, useState } from 'react';
 
-import { Container, Form, getComputed, Input, InputStyles, s, SContext, useS, type StyleRegistry } from '@cloudbeaver/core-blocks';
+import { Container, Form, getComputed, Input, s, useS } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { type ICustomMenuItemComponent } from '@cloudbeaver/core-view';
 
 import { DATA_CONTEXT_DV_DDM } from '../../../../DatabaseDataModel/DataContext/DATA_CONTEXT_DV_DDM.js';
 import { DataViewerSettingsService } from '../../../../DataViewerSettingsService.js';
 import styles from './FetchSizeAction.module.css';
-
-const styleRegistry: StyleRegistry = [
-  [
-    InputStyles,
-    {
-      mode: 'append',
-      styles: [styles],
-    },
-  ],
-];
 
 export const FetchSizeAction: ICustomMenuItemComponent = observer(function FetchSizeAction({ context }) {
   const model = context.get(DATA_CONTEXT_DV_DDM)!;
@@ -57,21 +47,19 @@ export const FetchSizeAction: ICustomMenuItemComponent = observer(function Fetch
   return (
     <Container className={s(style, { count: true })} keepSize noGrow center>
       <Form contents onSubmit={handleChange}>
-        <SContext registry={styleRegistry}>
-          <Input
-            ref={ref}
-            className={s(style, { input: true })}
-            type="number"
-            value={limit}
-            disabled={disabled}
-            min={dataViewerSettingsService.minFetchSize}
-            max={dataViewerSettingsService.maxFetchSize}
-            size="small"
-            tiny
-            onChange={value => setLimit(value)}
-            onBlur={handleChange}
-          />
-        </SContext>
+        <Input
+          ref={ref}
+          className={s(style, { input: true })}
+          type="number"
+          value={limit}
+          disabled={disabled}
+          min={dataViewerSettingsService.minFetchSize}
+          max={dataViewerSettingsService.maxFetchSize}
+          size="small"
+          tiny
+          onChange={value => setLimit(value)}
+          onBlur={handleChange}
+        />
       </Form>
     </Container>
   );

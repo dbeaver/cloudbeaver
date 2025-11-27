@@ -13,10 +13,10 @@
     height: 26px;
     width: 80px;
     box-sizing: border-box;
-    outline: none;
 
     & input {
       padding: 4px 7px;
+      outline: none;
     }
   }
 }
