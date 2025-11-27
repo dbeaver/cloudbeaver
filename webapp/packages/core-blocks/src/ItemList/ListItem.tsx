@@ -20,7 +20,7 @@ export const ListItem: React.FC<React.PropsWithChildren<Props>> = function ListI
   const styles = useS(style);
 
   return (
-    <Clickable as="div" title={title} className={s(styles, { listItem: true }, className)} focusable onClick={onClick}>
+    <Clickable render={<div />} title={title} className={s(styles, { listItem: true }, className)} focusable onClick={onClick}>
       {children}
     </Clickable>
   );

@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ export const UserInfo = observer<Props>(function UserInfo({ info }) {
 
   return (
     <Clickable
-      as="div"
+      render={<div />}
       className={s(style, { user: true })}
       title={translate('plugin_user_profile_menu')}
       onClick={() => userProfileOptionsPanelService.open()}
