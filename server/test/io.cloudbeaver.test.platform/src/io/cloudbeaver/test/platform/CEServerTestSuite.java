@@ -18,8 +18,11 @@
 package io.cloudbeaver.test.platform;
 
 import io.cloudbeaver.app.CEAppStarter;
+import io.cloudbeaver.model.navigator.WebNavigatorNodeInfoTest;
 import io.cloudbeaver.model.rm.RMNIOTest;
 import io.cloudbeaver.model.rm.lock.RMLockTest;
+import io.cloudbeaver.model.session.WebSessionProjectTest;
+import io.cloudbeaver.model.session.WebSessionTest;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
@@ -34,7 +37,10 @@ import org.junit.runners.Suite;
         ResourceManagerTest.class,
         RMLockTest.class,
         RMNIOTest.class,
-        NoSessionTest.class
+        NoSessionTest.class,
+        WebSessionTest.class,
+        WebSessionProjectTest.class,
+        WebNavigatorNodeInfoTest.class
     }
 )
 public class CEServerTestSuite {
