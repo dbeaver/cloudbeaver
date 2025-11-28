@@ -13,19 +13,8 @@ import { FormContext } from '../FormContext.js';
 import { isFormStateControl } from '../isFormStateControl.js';
 import { Input, type InputProps } from '../Input.js';
 import { InputFieldState, type InputFieldStateProps } from './InputFieldState.js';
-import InputFieldStyles from './InputField.module.css';
-import InputStyles from '../Input.module.css';
-import { SContext, type StyleRegistry } from '../../SContext.js';
-
-const styleRegistry: StyleRegistry = [
-  [
-    InputStyles,
-    {
-      mode: 'append',
-      styles: [InputFieldStyles],
-    },
-  ],
-];
+import './InputField.css';
+import { clsx } from '@dbeaver/ui-kit';
 
 interface InputFieldType {
   (props: InputProps & React.RefAttributes<HTMLInputElement>): React.ReactElement<any, any> | null;
@@ -35,7 +24,7 @@ interface InputFieldType {
 }
 
 export const InputField: InputFieldType = observer<InputProps | InputFieldStateProps<any, any>, HTMLInputElement>(
-  forwardRef(function InputField({ onChange, onKeyDown, ...rest }, ref) {
+  forwardRef(function InputField({ onChange, onKeyDown, className, ...rest }, ref) {
     const context = useContext(FormContext);
 
     const handleChange = useCombinedHandler(onChange, context?.change);
@@ -43,16 +32,16 @@ export const InputField: InputFieldType = observer<InputProps | InputFieldStateP
 
     if (isFormStateControl(rest)) {
       return (
-        <SContext registry={styleRegistry}>
-          <InputFieldState {...rest} ref={ref} onChange={handleChange} onKeyDown={handleKeyDown} />
-        </SContext>
+        <InputFieldState
+          {...rest}
+          ref={ref}
+          className={clsx('theme-typography--body1', className)}
+          onChange={handleChange}
+          onKeyDown={handleKeyDown}
+        />
       );
     }
 
-    return (
-      <SContext registry={styleRegistry}>
-        <Input {...rest} ref={ref} onChange={handleChange} onKeyDown={handleKeyDown} />
-      </SContext>
-    );
+    return <Input {...rest} ref={ref} className={clsx('theme-typography--body1', className)} onChange={handleChange} onKeyDown={handleKeyDown} />;
   }),
 ) as InputFieldType;

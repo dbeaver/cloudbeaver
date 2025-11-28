@@ -1,0 +1,56 @@
+@layer components {
+  .cb-input__field {
+    & .cb-input {
+      font-size: 12px;
+    }
+
+    & .cb-input__field-label {
+      display: block;
+      font-weight: 500 !important;
+    }
+
+    & .cb-input__field-label:not(:empty) {
+      padding-bottom: 10px;
+    }
+
+    & .cb-input__input-container {
+      position: relative;
+
+      --dbv-kit-control-outline-offset: -2px;
+    }
+
+    & .cb-input__loader-container,
+    & .cb-input__icon-container {
+      position: absolute;
+      right: 4px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 24px;
+      height: 24px;
+
+      --dbv-kit-icon-btn-outline-offset: -2px;
+    }
+
+    & .cb-input__custom-icon-container {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      --dbv-kit-icon-btn-outline-offset: -2px;
+      right: 6px;
+      width: 24px;
+      height: 24px;
+      cursor: auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    & .cb-input[disabled] + .cb-input__icon-container {
+      cursor: auto;
+    }
+
+    & .cb-input:not(:only-child) {
+      padding-right: 32px !important;
+    }
+  }
+}

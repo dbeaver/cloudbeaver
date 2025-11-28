@@ -159,7 +159,6 @@ export * from './FormControls/Filter.js';
 export { default as BaseDropdownStyles } from './FormControls/BaseDropdown.module.css';
 export { default as FilterStyles } from './FormControls/Filter.module.css';
 export * from './FormControls/Input.js';
-export { default as InputStyles } from './FormControls/Input.module.css';
 export * from './Fill.js';
 
 export * from './Containers/Container.js';
@@ -187,7 +186,6 @@ export * from './FormControls/ComboboxLoader.js';
 export * from './FormControls/FormContext.js';
 export * from './FormControls/FormFieldDescription.js';
 export * from './FormControls/InputField/InputField.js';
-export { default as InputFieldStyles } from './FormControls/InputField/InputField.module.css';
 export * from './FormControls/InputFiles.js';
 export * from './FormControls/InputFileTextContent.js';
 export * from './FormControls/Radio.js';
