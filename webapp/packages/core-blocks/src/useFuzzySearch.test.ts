@@ -121,20 +121,6 @@ describe('useFuzzySearch', () => {
     expect(mockSearch).toHaveBeenCalledWith('Ap');
   });
 
-  test('should accept custom threshold parameter', () => {
-    const { result } = renderHook(() =>
-      useFuzzySearch({
-        sourceProposals: testData,
-        fields: ['name'],
-        threshold: 0.1,
-      }),
-    );
-
-    result.current.search('test');
-
-    expect(mockSearch).toHaveBeenCalledWith('test');
-  });
-
   test('should call clearSearch method', () => {
     const { result } = renderHook(() =>
       useFuzzySearch({

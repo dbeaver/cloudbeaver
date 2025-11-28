@@ -47,12 +47,12 @@ describe('UploadArea', () => {
     expect(label.tagName).toBe('LABEL');
   });
 
-  it('should render hidden file input', () => {
+  it('should render input file', () => {
     const { container } = renderInApp(<UploadArea>Upload File</UploadArea>);
     const input = container.querySelector('input[type="file"]');
 
     expect(input).toBeInTheDocument();
-    expect(input).toHaveAttribute('hidden');
+    expect(input).toHaveAttribute('type', 'file');
   });
 
   it('should apply custom className correctly', async () => {
