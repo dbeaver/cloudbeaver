@@ -53,7 +53,7 @@
       min-height: unset !important;
 
       & input {
-        padding: 0 8px;
+        padding: calc(2 * var(--tw-spacing));
         outline: none;
         border: none;
         height: 22px;
