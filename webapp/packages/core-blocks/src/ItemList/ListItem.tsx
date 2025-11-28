@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { Clickable } from '../Clickable.js';
+import { Focusable } from '../Focusable.js';
 import { s } from '../s.js';
 import { useS } from '../useS.js';
 import style from './ItemList.module.css';
@@ -20,8 +20,8 @@ export const ListItem: React.FC<React.PropsWithChildren<Props>> = function ListI
   const styles = useS(style);
 
   return (
-    <Clickable render={<div />} title={title} className={s(styles, { listItem: true }, className)} focusable onClick={onClick}>
+    <Focusable title={title} className={s(styles, { listItem: true }, className)} focusable onClick={onClick}>
       {children}
-    </Clickable>
+    </Focusable>
   );
 };

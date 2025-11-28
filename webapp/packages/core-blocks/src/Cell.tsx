@@ -11,7 +11,7 @@ import style from './Cell.module.css';
 import { Container } from './Containers/Container.js';
 import { s } from './s.js';
 import { useS } from './useS.js';
-import { Clickable, type ClickableProps } from './Clickable.js';
+import { Focusable, type ClickableProps } from './Focusable.js';
 
 interface Props extends ClickableProps {
   description?: React.ReactNode | string;
@@ -21,14 +21,13 @@ interface Props extends ClickableProps {
   big?: boolean;
   className?: string;
   children?: React.ReactNode;
-  render?: React.ReactElement;
 }
 
 export const Cell = observer(function Cell({ render, before, after, description, className, ripple = true, big, children, ...rest }: Props) {
   const styles = useS(style);
 
   return (
-    <Clickable {...rest} render={render ?? <div />} className={s(styles, { ripple, big }, className)}>
+    <Focusable {...rest} className={s(styles, { ripple, big }, className)}>
       <Container className={s(styles, { main: true })} gap parent center dense>
         {before && (
           <Container className={s(styles, { before: true })} keepSize>
@@ -47,6 +46,6 @@ export const Cell = observer(function Cell({ render, before, after, description,
           </Container>
         )}
       </Container>
-    </Clickable>
+    </Focusable>
   );
 });

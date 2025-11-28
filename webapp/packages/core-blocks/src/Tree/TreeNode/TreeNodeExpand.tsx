@@ -11,7 +11,7 @@ import { useContext } from 'react';
 import { EventContext } from '@cloudbeaver/core-events';
 import { Spinner } from '@dbeaver/ui-kit';
 
-import { Clickable } from '../../Clickable.js';
+import { Focusable } from '../../Focusable.js';
 import { getComputed } from '../../getComputed.js';
 import { Icon } from '../../Icon.js';
 import { useTranslate } from '../../localization/useTranslate.js';
@@ -48,7 +48,7 @@ export const TreeNodeExpand = observer<Props>(function TreeNodeExpand({ leaf, bi
   );
   const expandable = getComputed(() => !loading && (!leaf || context.externalExpanded));
 
-  async function handleExpand(event: React.MouseEvent<HTMLButtonElement>) {
+  async function handleExpand(event: React.MouseEvent<HTMLDivElement>) {
     EventContext.set(event, EventTreeNodeExpandFlag);
 
     if (!leaf && !disabled) {
@@ -56,7 +56,7 @@ export const TreeNodeExpand = observer<Props>(function TreeNodeExpand({ leaf, bi
     }
   }
 
-  function handleDbClick(event: React.MouseEvent<HTMLButtonElement>) {
+  function handleDbClick(event: React.MouseEvent<HTMLDivElement>) {
     EventContext.set(event, EventTreeNodeExpandFlag);
   }
 
@@ -91,8 +91,7 @@ export const TreeNodeExpand = observer<Props>(function TreeNodeExpand({ leaf, bi
   const title = translate('ui_expand');
 
   return (
-    <Clickable
-      render={<div />}
+    <Focusable
       role="button"
       title={title}
       aria-label={title}
@@ -104,6 +103,6 @@ export const TreeNodeExpand = observer<Props>(function TreeNodeExpand({ leaf, bi
     >
       {loading && <Spinner size="small" active />}
       {expandable && <Icon name={iconName} className={s(styles, { icon: true })} viewBox={viewBox} />}
-    </Clickable>
+    </Focusable>
   );
 });

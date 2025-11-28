@@ -1,0 +1,109 @@
+# Focusable
+
+The Focusable component is a primitive that makes any element focusable and keyboard-navigable based on Ariakit.
+
+## Usage
+
+The Focusable component is a simple wrapper that can be used to make any element accessible via keyboard navigation:
+
+```tsx
+<Focusable>This element can receive focus</Focusable>
+```
+
+You can customize the rendered element using the `render` prop:
+
+```tsx
+<Focusable render={<div />}>Custom div element</Focusable>
+```
+
+## When to use
+
+Use the `Focusable` component when you need to:
+
+- Make a non-interactive element keyboard-accessible
+- Create custom interactive components that need focus management
+- Build composite widgets that require focus traversal
+- Implement keyboard navigation in custom UI patterns
+
+**Note:** For clickable elements, consider using the `Button` or `Command` components instead, as they provide additional interaction semantics.
+
+## Accessibility
+
+The Focusable component ensures proper keyboard accessibility by:
+
+- Making the element part of the tab order (unless disabled)
+- Supporting standard keyboard navigation (Tab/Shift+Tab)
+- Providing proper focus management
+- Respecting the `disabled` state
+- Supporting `autoFocus` for automatic focus on mount
+
+## Class names
+
+The Focusable component doesn't add any predefined class names. You can apply your own styling via the `className` prop.
+
+Common focus styling pattern:
+
+```tsx
+<Focusable className="focus:outline-none focus:ring-2 focus:ring-blue-500">Focusable element</Focusable>
+```
+
+Underlying component docs:  
+[https://ariakit.org/reference/focusable](https://ariakit.org/reference/focusable)
+
+## Props
+
+The Focusable component is a thin wrapper around Ariakit's `Focusable` and accepts all the same props:
+
+**render**  
+`ReactElement | ((props: FocusableProps) => ReactElement)`  
+Allows rendering as a different element. Can be a React element or a render function.
+
+**autoFocus**  
+`boolean`  
+When `true`, the element will be automatically focused when mounted.
+
+**disabled**  
+`boolean`  
+When `true`, the element cannot receive focus and is removed from the tab order.
+
+**onFocusVisible**  
+`(event: FocusEvent) => void`  
+Callback fired when the element receives focus via keyboard navigation.
+
+**focusable**  
+`boolean`  
+Determines whether the element is focusable. Defaults to `true`.
+
+All standard HTML attributes and React props are also supported and passed through to the underlying element.
+
+## Examples
+
+### Basic usage
+
+```tsx
+<Focusable>Focusable content</Focusable>
+```
+
+### With custom element
+
+```tsx
+<Focusable render={<span />}>Focusable span</Focusable>
+```
+
+### With auto-focus
+
+```tsx
+<Focusable autoFocus>This receives focus on mount</Focusable>
+```
+
+### Disabled state
+
+```tsx
+<Focusable disabled>Cannot receive focus</Focusable>
+```
+
+### With custom styling
+
+```tsx
+<Focusable className="p-4 border rounded focus:outline-none focus:ring-2">Styled focusable element</Focusable>
+```

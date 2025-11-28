@@ -27,7 +27,7 @@ interface Props {
 }
 
 export const FormattingRule = observer<Props>(function FormattingRule({ columns, state, preview, selected, onSelect, onDelete }) {
-  const ref = useRef<HTMLButtonElement>(null);
+  const ref = useRef<HTMLDivElement>(null);
   const t = useTranslate();
   const rule = state.type === 'scale' ? COLOR_SCALE_RULE : DEFAULT_FORMAT_RULES.find(r => r.id === state.ruleId);
 
