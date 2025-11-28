@@ -5,10 +5,10 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { Focusable as UiKitFocusable, type FocusableProps } from '@dbeaver/ui-kit';
+import { Focusable as UiKitFocusable, type FocusableProps as UiKitFocusableProps } from '@dbeaver/ui-kit';
 
-export type ClickableProps = FocusableProps;
+export type FocusableProps = UiKitFocusableProps;
 
-export function Focusable(props: ClickableProps): React.ReactElement {
+export function Focusable(props: FocusableProps): React.ReactElement {
   return <UiKitFocusable {...props} />;
 }

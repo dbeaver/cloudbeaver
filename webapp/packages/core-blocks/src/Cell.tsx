@@ -11,9 +11,9 @@ import style from './Cell.module.css';
 import { Container } from './Containers/Container.js';
 import { s } from './s.js';
 import { useS } from './useS.js';
-import { Focusable, type ClickableProps } from './Focusable.js';
+import { Focusable, type FocusableProps } from './Focusable.js';
 
-interface Props extends ClickableProps {
+interface Props extends FocusableProps {
   description?: React.ReactNode | string;
   before?: React.ReactElement;
   after?: React.ReactElement;
