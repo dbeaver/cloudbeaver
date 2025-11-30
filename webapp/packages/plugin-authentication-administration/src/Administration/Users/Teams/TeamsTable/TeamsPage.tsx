@@ -37,7 +37,7 @@ export const TeamsPage = observer<Props>(function TeamsPage({ param }) {
   const create = param === 'create';
 
   return (
-    <ColoredContainer vertical wrap gap parent>
+    <ColoredContainer vertical wrap gap parent maximum>
       <Group box keepSize>
         <ToolsPanel rounded>
           <ToolsAction
@@ -70,7 +70,7 @@ export const TeamsPage = observer<Props>(function TeamsPage({ param }) {
         </ToolsPanel>
       </Group>
 
-      <Container overflow gap>
+      <Container overflow gap maximum>
         {create && (
           <Group box>
             <CreateTeam />
