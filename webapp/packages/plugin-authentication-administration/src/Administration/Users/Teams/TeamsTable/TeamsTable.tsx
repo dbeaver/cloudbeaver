@@ -1,18 +1,9 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2019-2025 DBeaver Corp
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
- * All Rights Reserved
- *
- * NOTICE:  All information contained herein is, and remains
- * the property of DBeaver Corp and its suppliers, if any.
- * The intellectual and technical concepts contained
- * herein are proprietary to DBeaver Corp and its suppliers
- * and may be covered by U.S. and Foreign Patents,
- * patents in process, and are protected by trade secret or copyright law.
- * Dissemination of this information or reproduction of this material
- * is strictly forbidden unless prior written permission is obtained
- * from DBeaver Corp.
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
  */
 
 import { observer } from 'mobx-react-lite';
@@ -86,6 +77,7 @@ export const TeamsTable = observer<Props>(function TeamsTable({ teams }) {
   const cell = useCreateGridReactiveValue(getCell, (onValueChange, rowIdx, colIdx) => reaction(() => getCell(rowIdx, colIdx), onValueChange), [
     COLUMNS,
     teams,
+    teamsTableOptionsPanelService,
   ]);
 
   function getHeaderText(colIdx: number) {
