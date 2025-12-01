@@ -11,7 +11,7 @@ import React, { forwardRef, useContext } from 'react';
 import { useCombinedHandler } from '../../useCombinedHandler.js';
 import { FormContext } from '../FormContext.js';
 import { isFormStateControl } from '../isFormStateControl.js';
-import { Input, type InputProps } from '../Input.js';
+import { InputFieldBase, type InputProps } from './InputFieldBase.js';
 import { InputFieldState, type InputFieldStateProps } from './InputFieldState.js';
 import './InputField.css';
 import { clsx } from '@dbeaver/ui-kit';
@@ -42,6 +42,8 @@ export const InputField: InputFieldType = observer<InputProps | InputFieldStateP
       );
     }
 
-    return <Input {...rest} ref={ref} className={clsx('theme-typography--body1', className)} onChange={handleChange} onKeyDown={handleKeyDown} />;
+    return (
+      <InputFieldBase {...rest} ref={ref} className={clsx('theme-typography--body1', className)} onChange={handleChange} onKeyDown={handleKeyDown} />
+    );
   }),
 ) as InputFieldType;

@@ -8,13 +8,14 @@
 import { observer } from 'mobx-react-lite';
 import { useEffect, useRef, useState } from 'react';
 
-import { Container, Form, getComputed, Input, s, useS } from '@cloudbeaver/core-blocks';
+import { Container, Form, getComputed, s, useS } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { type ICustomMenuItemComponent } from '@cloudbeaver/core-view';
 
 import { DATA_CONTEXT_DV_DDM } from '../../../../DatabaseDataModel/DataContext/DATA_CONTEXT_DV_DDM.js';
 import { DataViewerSettingsService } from '../../../../DataViewerSettingsService.js';
 import styles from './FetchSizeAction.module.css';
+import { Input } from '@dbeaver/ui-kit';
 
 export const FetchSizeAction: ICustomMenuItemComponent = observer(function FetchSizeAction({ context }) {
   const model = context.get(DATA_CONTEXT_DV_DDM)!;
@@ -56,8 +57,7 @@ export const FetchSizeAction: ICustomMenuItemComponent = observer(function Fetch
           min={dataViewerSettingsService.minFetchSize}
           max={dataViewerSettingsService.maxFetchSize}
           size="small"
-          tiny
-          onChange={value => setLimit(value)}
+          onChange={event => setLimit(event.target.value)}
           onBlur={handleChange}
         />
       </Form>

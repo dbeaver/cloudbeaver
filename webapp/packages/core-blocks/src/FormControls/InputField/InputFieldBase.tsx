@@ -10,17 +10,17 @@ import React, { forwardRef, useCallback, useId, useLayoutEffect, useRef, useStat
 
 import { isNotNullDefined } from '@dbeaver/js-helpers';
 
-import { filterLayoutFakeProps, getLayoutProps } from '../Containers/filterLayoutFakeProps.js';
-import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps.js';
-import { Icon } from '../Icon.js';
-import { useTranslate } from '../localization/useTranslate.js';
-import { useCombinedHandler } from '../useCombinedHandler.js';
-import { useCombinedRef } from '../useCombinedRef.js';
-import { useStateDelay } from '../useStateDelay.js';
-import { Field } from './Field.js';
-import { FieldDescription } from './FieldDescription.js';
-import { FieldLabel } from './FieldLabel.js';
-import { useCapsLockTracker } from './useCapsLockTracker.js';
+import { filterLayoutFakeProps, getLayoutProps } from '../../Containers/filterLayoutFakeProps.js';
+import type { ILayoutSizeProps } from '../../Containers/ILayoutSizeProps.js';
+import { Icon } from '../../Icon.js';
+import { useTranslate } from '../../localization/useTranslate.js';
+import { useCombinedHandler } from '../../useCombinedHandler.js';
+import { useCombinedRef } from '../../useCombinedRef.js';
+import { useStateDelay } from '../../useStateDelay.js';
+import { Field } from '../Field.js';
+import { FieldDescription } from '../FieldDescription.js';
+import { FieldLabel } from '../FieldLabel.js';
+import { useCapsLockTracker } from '../useCapsLockTracker.js';
 import './Input.css';
 import { IconButton, Input as UiKitInput, Spinner, type InputProps as UiKitInputProps, clsx } from '@dbeaver/ui-kit';
 
@@ -38,7 +38,7 @@ export type InputProps = Omit<UiKitInputProps, 'onChange'> &
     onChange?: (value: string, name?: string) => any;
   };
 
-export const Input = observer<InputProps, HTMLInputElement>(
+export const InputFieldBase = observer<InputProps, HTMLInputElement>(
   forwardRef(function InputFieldBase(
     {
       name,

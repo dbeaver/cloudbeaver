@@ -10,8 +10,8 @@ import { SearchQuery } from '@codemirror/search';
 import { observer } from 'mobx-react-lite';
 import { useImperativeHandle, useRef, useState } from 'react';
 
-import { Icon, Input, useTranslate } from '@cloudbeaver/core-blocks';
-import { clsx, IconButton, Icon as UIKitIcon } from '@dbeaver/ui-kit';
+import { Icon, useTranslate } from '@cloudbeaver/core-blocks';
+import { clsx, IconButton, Input, Icon as UIKitIcon } from '@dbeaver/ui-kit';
 
 import './SearchPanel.css';
 
@@ -119,7 +119,7 @@ export const SearchPanel = observer(function SearchPanel({
             placeholder={translate('plugin_codemirror_search_input_placeholder')}
             main-field="true"
             onKeyDown={handleInputKeyDown}
-            onChange={value => onQueryChange(value)}
+            onChange={event => onQueryChange(event.target.value)}
           />
           <div className="tw:absolute tw:top-1/2 tw:-translate-y-1/2 tw:right-2 tw:flex tw:gap-1">
             <IconButton
@@ -165,7 +165,7 @@ export const SearchPanel = observer(function SearchPanel({
               value={queryState.replace}
               placeholder={translate('plugin_codemirror_search_replace')}
               onKeyDown={handleReplaceKeyDown}
-              onChange={value => onReplaceChange(value)}
+              onChange={event => onReplaceChange(event.target.value)}
             />
           </div>
         )}

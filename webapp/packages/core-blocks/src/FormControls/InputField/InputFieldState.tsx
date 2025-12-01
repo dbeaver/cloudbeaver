@@ -10,7 +10,7 @@ import React, { forwardRef } from 'react';
 
 import type { IFormStateControl } from '../IFormStateControl.js';
 import { useFormStateControl } from '../useFormStateControl.js';
-import { Input, type InputProps } from '../Input.js';
+import { InputFieldBase, type InputProps } from './InputFieldBase.js';
 
 export type InputFieldStateProps<TState extends Record<string, any>, TKey extends keyof TState> = Omit<InputProps, 'value'> &
   IFormStateControl<TState, TKey>;
@@ -31,6 +31,6 @@ export const InputFieldState: InputFieldType = observer<InputFieldStateProps<any
 
     const defaultValue = rest.type === 'password' ? null : controlState.defaultStringValue;
 
-    return <Input {...rest} ref={ref} name={name} value={controlState.stringValue ?? defaultValue ?? ''} onChange={controlState.onChange} />;
+    return <InputFieldBase {...rest} ref={ref} name={name} value={controlState.stringValue ?? defaultValue ?? ''} onChange={controlState.onChange} />;
   }),
 ) as InputFieldType;

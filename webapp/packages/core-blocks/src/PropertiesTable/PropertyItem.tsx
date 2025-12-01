@@ -7,6 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 import { useCallback, useLayoutEffect, useRef } from 'react';
+import { Input } from '@dbeaver/ui-kit';
 
 import { useTranslate } from '../localization/useTranslate.js';
 import { s } from '../s.js';
@@ -15,7 +16,6 @@ import type { IProperty } from './IProperty.js';
 import classes from './PropertyItem.module.css';
 import { Combobox } from '../FormControls/Combobox.js';
 import { ActionIconButton } from '../ActionIconButton.js';
-import { InputField } from '../FormControls/InputField/InputField.js';
 
 interface Props {
   property: IProperty;
@@ -50,7 +50,7 @@ export const PropertyItem = observer<Props>(function PropertyItem({ property, va
   return (
     <div className={s(styles, { container: true })}>
       <div className={s(styles, { name: true, error })}>
-        <InputField
+        <Input
           ref={keyInputRef}
           title={property.description}
           value={property.displayName}
@@ -61,8 +61,7 @@ export const PropertyItem = observer<Props>(function PropertyItem({ property, va
           readOnly={!isDeletable}
           autoComplete="none"
           size="small"
-          fill
-          onChange={value => handleKeyChange(value)}
+          onChange={e => handleKeyChange(e.target.value)}
         />
       </div>
       <div className={s(styles, { value: true })}>

@@ -6,14 +6,15 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useRef } from 'react';
+import React, { type ChangeEvent, forwardRef, useCallback, useEffect, useImperativeHandle, useRef } from 'react';
 
-import { Icon, IconOrImage, Input, Loader, s, useObjectRef, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { Icon, IconOrImage, Loader, s, useObjectRef, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 
 import { EditorDialog } from './EditorDialog.js';
 import styles from './InlineEditor.module.css';
+import { Input } from '@dbeaver/ui-kit';
 
 export type InlineEditorControls = 'right' | 'top' | 'bottom' | 'inside';
 
@@ -74,8 +75,8 @@ export const InlineEditor = observer<InlineEditorProps, HTMLInputElement>(
 
     const commonDialogService = useService(CommonDialogService);
 
-    const handleChange = useCallback((value: string) => {
-      props.onChange(value);
+    const handleChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
+      props.onChange(event.target.value);
     }, []);
 
     const handlePopup = useCallback(async () => {
