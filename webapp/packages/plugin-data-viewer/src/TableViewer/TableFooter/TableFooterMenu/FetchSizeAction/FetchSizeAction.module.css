@@ -13,10 +13,7 @@
     height: 26px;
     width: 80px;
     box-sizing: border-box;
-
-    & input {
-      padding: calc(2 * var(--tw-spacing));
-      outline: none;
-    }
+    padding: calc(2 * var(--tw-spacing));
+    outline: none;
   }
 }
