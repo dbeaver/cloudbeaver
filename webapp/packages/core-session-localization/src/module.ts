@@ -6,13 +6,13 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { Dependency, ModuleRegistry } from '@cloudbeaver/core-di';
-import { SessionLocalizationService } from './SessionLocalizationService.js';
+import { Bootstrap, ModuleRegistry } from '@cloudbeaver/core-di';
+import { SessionLocalizationBootstrap } from './SessionLocalizationBootstrap.js';
 
 export default ModuleRegistry.add({
   name: '@cloudbeaver/core-session-localization',
 
   configure: serviceCollection => {
-    serviceCollection.addSingleton(Dependency, SessionLocalizationService);
+    serviceCollection.addSingleton(Bootstrap, SessionLocalizationBootstrap);
   },
 });

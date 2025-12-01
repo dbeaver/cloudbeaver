@@ -20,6 +20,7 @@ import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.WebAsyncTaskInfo;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.model.session.WebSessionPreferenceStore;
 import io.cloudbeaver.model.session.WebSessionProvider;
 import io.cloudbeaver.server.WebAppUtils;
 import io.cloudbeaver.server.jobs.SqlOutputLogReaderJob;
@@ -62,7 +63,6 @@ import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -236,7 +236,7 @@ public class WebSQLProcessor implements WebSessionProvider {
                         dataContainer.getScriptContext().fillQueryParameters(mainQuery, () -> null, true) &&
                             confirmDangerousQueryIfNeeded(mainQuery.getScriptElements(), asyncTask, isGenerated);
                     if (!isConfirmed) {
-                        throw new DBWebException("Query execution cancelled by user");
+                        throw new DBWebException("Query execution was cancelled by user");
                     }
                 }
 
@@ -297,8 +297,6 @@ public class WebSQLProcessor implements WebSessionProvider {
                                     sqlOutputLogReaderJob.join();
                                 }
                                 fillQueryResults(contextInfo, dataContainer, dbStat, hasResultSet, executeInfo, webDataFilter, dataFilter, dataFormat);
-                            } catch (DBException e) {
-                                throw new InvocationTargetException(e);
                             }
                         }
                     }
@@ -340,7 +338,9 @@ public class WebSQLProcessor implements WebSessionProvider {
         DBDDataFilter dataFilter = filter.makeDataFilter((resultId == null ? null : contextInfo.getResults(resultId)));
         DBExecUtils.tryExecuteRecover(monitor, connection.getDataSource(), param -> {
             try (DBCSession session = executionContext.openSession(monitor, resolveQueryPurpose(dataFilter), "Read data from container")) {
-                try (WebSQLQueryDataReceiver dataReceiver = new WebSQLQueryDataReceiver(contextInfo, dataContainer, dataFormat)) {
+                try (
+                    WebSQLQueryDataReceiver dataReceiver = new WebSQLQueryDataReceiver(contextInfo, dataContainer, dataFormat, dataFilter)
+                ) {
                     DBCStatistics statistics = dataContainer.readData(
                         new WebExecutionSource(dataContainer, executionContext, this),
                         session,
@@ -357,14 +357,12 @@ public class WebSQLProcessor implements WebSessionProvider {
                     results.setResultSet(resultSet);
 
                     executeInfo.setResults(new WebSQLQueryResults[]{results});
-                    setResultFilterText(dataContainer, session.getDataSource(), executeInfo, dataFilter);
+                    setResultFilterText(session.getDataSource(), executeInfo, dataFilter);
                     executeInfo.setFullQuery(statistics.getQueryText());
                     if (resultSet != null && resultSet.getRowsWithMetaData() != null && resultSet.getResultsInfo() != null) {
                         resultSet.getResultsInfo().setQueryText(statistics.getQueryText());
                         executeInfo.setStatusMessage(resultSet.getRowsWithMetaData().size() + " row(s) fetched");
                     }
-                } catch (DBException e) {
-                    throw new InvocationTargetException(e);
                 }
             }
         });
@@ -404,7 +402,7 @@ public class WebSQLProcessor implements WebSessionProvider {
         for (var rowIdentifier : rowIdentifierList) {
             Map<DBSDataManipulator.ExecuteBatch, Object[]> resultBatches = new LinkedHashMap<>();
             DBSDataManipulator dataManipulator = generateUpdateResultsDataBatch(
-                monitor, resultsInfo, rowIdentifier, updatedRows, deletedRows, addedRows, dataFormat, resultBatches, keyReceiver);
+                monitor, resultsInfo, rowIdentifier, updatedRows, deletedRows, addedRows, resultBatches, keyReceiver);
 
             DBCExecutionContext executionContext = getExecutionContext(dataManipulator);
             try (DBCSession session = executionContext.openSession(monitor, DBCExecutionPurpose.USER, "Update data in container")) {
@@ -505,7 +503,7 @@ public class WebSQLProcessor implements WebSessionProvider {
         @NotNull Set<WebSQLQueryResultSetRow> newResultSetRows,
         @Nullable WebDataFormat dataFormat,
         @NotNull DBRProgressMonitor monitor)
-        throws DBCException {
+        throws DBException {
         try (DBCSession session = getExecutionContext().openSession(
             monitor,
             DBCExecutionPurpose.UTIL,
@@ -581,9 +579,8 @@ public class WebSQLProcessor implements WebSessionProvider {
         @NotNull String resultsId,
         @Nullable List<WebSQLResultsRow> updatedRows,
         @Nullable List<WebSQLResultsRow> deletedRows,
-        @Nullable List<WebSQLResultsRow> addedRows,
-        @Nullable WebDataFormat dataFormat) throws DBException
-    {
+        @Nullable List<WebSQLResultsRow> addedRows
+    ) throws DBException {
         Map<DBSDataManipulator.ExecuteBatch, Object[]> resultBatches = new LinkedHashMap<>();
 
 
@@ -599,7 +596,7 @@ public class WebSQLProcessor implements WebSessionProvider {
         StringBuilder sqlBuilder = new StringBuilder();
         for (var rowIdentifier : rowIdentifierList) {
             DBSDataManipulator dataManipulator = generateUpdateResultsDataBatch(
-                monitor, resultsInfo, rowIdentifier, updatedRows, deletedRows, addedRows, dataFormat, resultBatches, null);
+                monitor, resultsInfo, rowIdentifier, updatedRows, deletedRows, addedRows, resultBatches, null);
 
             List<DBEPersistAction> actions = new ArrayList<>();
 
@@ -625,7 +622,6 @@ public class WebSQLProcessor implements WebSessionProvider {
         @Nullable List<WebSQLResultsRow> updatedRows,
         @Nullable List<WebSQLResultsRow> deletedRows,
         @Nullable List<WebSQLResultsRow> addedRows,
-        @Nullable WebDataFormat dataFormat,
         @NotNull Map<DBSDataManipulator.ExecuteBatch, Object[]> resultBatches,
         @Nullable DBDDataReceiver keyReceiver)
         throws DBException
@@ -885,7 +881,6 @@ public class WebSQLProcessor implements WebSessionProvider {
     @NotNull
     public WebSQLExecutionPlan explainExecutionPlan(
         @NotNull DBRProgressMonitor monitor,
-        @NotNull WebSQLContextInfo contextInfo,
         @NotNull String sql,
         @NotNull Map<String, Object> configuration) throws DBWebException {
 
@@ -910,8 +905,6 @@ public class WebSQLProcessor implements WebSessionProvider {
                     DBCQueryPlannerConfiguration planConfig = new DBCQueryPlannerConfiguration();
                     planConfig.getParameters().putAll(configuration);
                     dbcPlan[0] = planner.planQueryExecution(session, sql, planConfig);
-                } catch (DBException e) {
-                    throw new InvocationTargetException(e);
                 }
             });
         } catch (DBException e) {
@@ -951,16 +944,14 @@ public class WebSQLProcessor implements WebSessionProvider {
     private void readCellDataValue(
         @NotNull DBRProgressMonitor monitor,
         @NotNull WebSQLResultsInfo resultsInfo,
-        @Nullable WebSQLResultsRow row,
+        @NotNull WebSQLResultsRow row,
         @NotNull WebSQLCellValueReceiver dataReceiver
     ) throws DBException {
         DBSDataContainer dataContainer = resultsInfo.getDataContainer();
         DBCExecutionContext executionContext = getExecutionContext(dataContainer);
         try (DBCSession session = executionContext.openSession(monitor, DBCExecutionPurpose.USER, "Generate data update batches")) {
             DBDDataFilter dataFilter = new DBDDataFilter();
-            if (!resultsInfo.isSingleRow()) {
-                addKeyAttributes(resultsInfo, row, dataContainer, session, dataFilter);
-            }
+            addKeyAttributes(resultsInfo, row, dataContainer, session, dataFilter);
             WebExecutionSource executionSource = new WebExecutionSource(dataContainer, executionContext, this);
             dataContainer.readData(
                 executionSource, session, dataReceiver, dataFilter,
@@ -970,12 +961,16 @@ public class WebSQLProcessor implements WebSessionProvider {
 
     private void addKeyAttributes(
         @NotNull WebSQLResultsInfo resultsInfo,
-        @Nullable WebSQLResultsRow row,
+        @NotNull WebSQLResultsRow row,
         @NotNull DBSDataContainer dataContainer,
         @NotNull DBCSession session,
         @NotNull DBDDataFilter dataFilter
     ) throws DBException {
-        DBDAttributeBinding[] keyAttributes = resultsInfo.getDefaultRowIdentifier().getAttributes().toArray(new DBDAttributeBinding[0]);
+        DBDRowIdentifier rowIdentifier = resultsInfo.getDefaultRowIdentifier();
+        if (rowIdentifier == null || rowIdentifier.isIncomplete()) {
+            return;
+        }
+        DBDAttributeBinding[] keyAttributes = rowIdentifier.getAttributes().toArray(new DBDAttributeBinding[0]);
         Object[] rowValues = new Object[keyAttributes.length];
         List<DBDAttributeConstraint> constraints = new ArrayList<>();
         for (int i = 0; i < keyAttributes.length; i++) {
@@ -1079,10 +1074,16 @@ public class WebSQLProcessor implements WebSessionProvider {
                     if (resultSet == null) {
                         break;
                     }
-                    try (WebSQLQueryDataReceiver dataReceiver = new WebSQLQueryDataReceiver(contextInfo, dataContainer, dataFormat)) {
+                    try (
+                        WebSQLQueryDataReceiver dataReceiver = new WebSQLQueryDataReceiver(
+                            contextInfo,
+                            dataContainer,
+                            dataFormat,
+                            dataFilter
+                        )
+                    ) {
                         readResultSet(dbStat.getSession(), resultSet, webDataFilter, dataReceiver);
                         results.setResultSet(dataReceiver.getResultSet());
-                        dataReceiver.getResultSet().getResultsInfo().setQueryText(resultSet.getSourceStatement().getQueryString());
                     }
                 }
                 resultList.add(results);
@@ -1102,11 +1103,15 @@ public class WebSQLProcessor implements WebSessionProvider {
         }
         executeInfo.setResults(resultList.toArray(new WebSQLQueryResults[0]));
 
-        setResultFilterText(dataContainer, dbStat.getSession().getDataSource(), executeInfo, dataFilter);
+        setResultFilterText(dbStat.getSession().getDataSource(), executeInfo, dataFilter);
         executeInfo.setFullQuery(dbStat.getQueryString());
     }
 
-    private void setResultFilterText(@NotNull DBSDataContainer dataContainer, @NotNull DBPDataSource dataSource, @NotNull WebSQLExecuteInfo executeInfo, @NotNull DBDDataFilter filter) throws DBException {
+    private void setResultFilterText(
+        @NotNull DBPDataSource dataSource,
+        @NotNull WebSQLExecuteInfo executeInfo,
+        @NotNull DBDDataFilter filter
+    ) throws DBException {
         if (!filter.getConstraints().isEmpty() || !CommonUtils.isEmpty(filter.getWhere())) {
             StringBuilder where = new StringBuilder();
             SQLUtils.appendConditionString(
@@ -1119,8 +1124,13 @@ public class WebSQLProcessor implements WebSessionProvider {
         }
     }
 
-    private void readResultSet(@NotNull DBCSession session, @NotNull DBCResultSet dbResult, @NotNull WebSQLDataFilter filter, @NotNull WebSQLQueryDataReceiver dataReceiver) throws DBCException {
-        dataReceiver.fetchStart(session, dbResult, filter.getOffset(), filter.getLimit());
+    private void readResultSet(
+        @NotNull DBCSession session,
+        @NotNull DBCResultSet dbResult,
+        @NotNull WebSQLDataFilter filter,
+        @NotNull WebSQLQueryDataReceiver dataReceiver
+    ) throws DBException {
+        DBDDataReceiver.startFetchWorkflow(dataReceiver, session, dbResult, filter.getOffset(), filter.getLimit());
         int rowCount = 0;
         while (dbResult.nextRow()) {
             if (rowCount > filter.getLimit()) {
@@ -1130,7 +1140,6 @@ public class WebSQLProcessor implements WebSessionProvider {
             dataReceiver.fetchRow(session, dbResult);
             rowCount++;
         }
-        dataReceiver.fetchEnd(session, dbResult);
     }
 
     /**
@@ -1168,7 +1177,6 @@ public class WebSQLProcessor implements WebSessionProvider {
                 if (keyValue == null) {
                     continue;
                 }
-                boolean updated = false;
                 if (!CommonUtils.isEmpty(keyAttribute.getName())) {
                     DBDAttributeBinding binding = DBUtils.findObject(resultsAttributes, keyAttribute.getName());
                     if (binding != null) {
@@ -1239,8 +1247,7 @@ public class WebSQLProcessor implements WebSessionProvider {
 
     private Object setCellRowValue(Object cellRow, WebSession webSession, DBCSession dbcSession, DBDAttributeBinding allAttributes, boolean withoutExecution)
         throws DBException {
-        if (cellRow instanceof Map<?, ?>) {
-            Map<String, Object> variables = (Map<String, Object>) cellRow;
+        if (cellRow instanceof Map<?, ?> variables) {
             if (variables.get(FILE_ID) != null) {
                 Path path = WebAppUtils.getWebPlatform()
                     .getTempFolder(webSession.getProgressMonitor(), TEMP_FILE_FOLDER)
@@ -1258,7 +1265,6 @@ public class WebSQLProcessor implements WebSessionProvider {
         return convertInputCellValue(dbcSession, allAttributes, cellRow, withoutExecution);
     }
 
-    // TODO: Refactor to unify with desktop when confirmation settings will be added
     private boolean confirmDangerousQueryIfNeeded(
         @NotNull List<SQLScriptElement> scriptElements,
         @NotNull WebAsyncTaskInfo asyncTask,
@@ -1286,25 +1292,28 @@ public class WebSQLProcessor implements WebSessionProvider {
                 .map(SQLScriptElement::getText)
                 .collect(Collectors.joining("\n\n"));
         } else {
+            WebSessionPreferenceStore store = webSession.getUserPreferenceStore();
+            boolean confirmDangerousQueries = store.getUserPreferenceBoolean(ConfirmationConstants.CONFIRM_DANGER_SQL_KEY, true);
+            boolean confirmDropQueries = store.getUserPreferenceBoolean(ConfirmationConstants.CONFIRM_DROP_SQL_KEY, true);
             for (SQLScriptElement scriptElement : scriptElements) {
                 if (scriptElement instanceof SQLQuery sqlQuery) {
-                    if (sqlQuery.isDeleteUpdateDangerous()) {
+                    if (confirmDangerousQueries && sqlQuery.isDeleteUpdateDangerous()) {
                         hasDangerousUpdates = true;
                         ConfirmationDescriptor descriptor = ConfirmationRegistry.getInstance()
-                            .getConfirmation(ConfirmationConstants.CONFIRM_DANGER_SQL);
+                            .getConfirmation(ConfirmationConstants.CONFIRM_DANGER_SQL_ID);
                         title = descriptor.getLocalizedTitle(webSession.getLocale());
                         var entityMetadata = sqlQuery.getEntityMetadata(false);
                         message = MessageFormat.format(
                             descriptor.getLocalizedMessage(webSession.getLocale()),
                             sqlQuery.getType().name(),
-                            entityMetadata != null ? entityMetadata.getEntityName() : null
+                            entityMetadata != null ? entityMetadata.getEntityName() : "multiple tables"
                         );
                         break;
                     }
-                    if (sqlQuery.isDropTableDangerous()) {
+                    if (confirmDropQueries && sqlQuery.isDropDangerous()) {
                         hasDropStatement = true;
                         ConfirmationDescriptor descriptor = ConfirmationRegistry.getInstance()
-                            .getConfirmation(ConfirmationConstants.CONFIRM_DROP_SQL);
+                            .getConfirmation(ConfirmationConstants.CONFIRM_DROP_SQL_ID);
                         title = descriptor.getLocalizedTitle(webSession.getLocale());
                         message = descriptor.getLocalizedMessage(webSession.getLocale());
                         break;

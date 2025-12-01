@@ -23,13 +23,23 @@ import org.jkiss.dbeaver.model.cli.model.CommandLineAuthenticator;
 import picocli.CommandLine;
 
 public class CloudBeaverCommandLine extends ApplicationCommandLine<ApplicationInstanceController> {
-
     @Nullable
     private final CommandLineAuthenticator authenticator;
+    private final CloudBeaverMixin mixin;
 
     public CloudBeaverCommandLine(@Nullable CommandLineAuthenticator authenticator) {
         super();
         this.authenticator = authenticator;
+        this.mixin = new CloudBeaverMixin();
+    }
+
+    public CloudBeaverCommandLine(
+        @Nullable CommandLineAuthenticator authenticator,
+        @NotNull CloudBeaverMixin mixin
+    ) {
+        super();
+        this.authenticator = authenticator;
+        this.mixin = mixin;
     }
 
     @Override
@@ -51,6 +61,8 @@ public class CloudBeaverCommandLine extends ApplicationCommandLine<ApplicationIn
         @NotNull CommandLineContext context,
         @NotNull CLIRunMeta runMeta
     ) {
-        return super.initCommandLine(applicationInstanceController, context, runMeta);
+        var cmd = super.initCommandLine(applicationInstanceController, context, runMeta);
+        cmd.addMixin("cloudbeaver", mixin);
+        return cmd;
     }
 }

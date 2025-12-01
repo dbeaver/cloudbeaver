@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -11,7 +11,7 @@ import { useRef } from 'react';
 
 import { s, useS, useUserData } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { type ITabData, TabList, TabPanelList, TabsState } from '@cloudbeaver/core-ui';
+import { type ITabData, TabList, TabPanelList, TabsState, useTabOrderPersistence } from '@cloudbeaver/core-ui';
 import { isArraysEqual } from '@cloudbeaver/core-utils';
 
 import styles from './ToolsPanel.module.css';
@@ -26,6 +26,7 @@ export const ToolsPanel = observer(function ToolsPanel() {
   const style = useS(styles);
 
   const state = useUserData<IToolsState>('tools', () => ({ selectedTabId: undefined }));
+  const { onReorder, sortTabs, persistenceKey } = useTabOrderPersistence('dbeaver-tools-panel', () => toolsPanelService.tabsContainer.getIdList());
   const tabs = toolsPanelService.tabsContainer.getIdList();
   const prevTabs = useRef<string[]>(tabs);
   const equal = isArraysEqual(prevTabs.current, tabs);
@@ -60,7 +61,15 @@ export const ToolsPanel = observer(function ToolsPanel() {
   }
 
   return (
-    <TabsState currentTabId={state.selectedTabId} container={toolsPanelService.tabsContainer} lazy onChange={handleTabChange}>
+    <TabsState
+      currentTabId={state.selectedTabId}
+      container={toolsPanelService.tabsContainer}
+      reorderStateKey={persistenceKey}
+      sortFunction={sortTabs}
+      lazy
+      onChange={handleTabChange}
+      onReorder={onReorder}
+    >
       <div className={s(style, { box: true })}>
         <TabList className={s(style, { tabList: true })} underline />
         <div className={s(style, { contentBox: true })}>

@@ -36,6 +36,7 @@ export const WEBSITE_LINKS = {
   LATEST_COMMUNITY_VERSION_PAGE: 'https://dbeaver.com/product/cloudbeaver-ce-version.json',
   TEAM_ARCHIVE: 'https://dbeaver.com/downloads-team',
   CONTACT_PAGE: 'https://dbeaver.com/contact/',
+  TECH_SUPPORT_PAGE: 'https://dbeaver.com/tickets/',
 
   getTeamArchiveById(id: string): string {
     return `${WEBSITE_LINKS.TEAM_ARCHIVE}/${id}`;

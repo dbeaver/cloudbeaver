@@ -7,16 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import {
-  Button,
-  CommonDialogBody,
-  CommonDialogFooter,
-  CommonDialogHeader,
-  CommonDialogWrapper,
-  Container,
-  Fill,
-  useTranslate,
-} from '@cloudbeaver/core-blocks';
+import { Button, CommonDialogBody, CommonDialogFooter, CommonDialogHeader, CommonDialogWrapper, useTranslate } from '@cloudbeaver/core-blocks';
 import type { DialogComponent } from '@cloudbeaver/core-dialogs';
 
 import { DataImportFileSelector } from './DataImportFileSelector.js';
@@ -63,9 +54,8 @@ export const DataImportDialog: DialogComponent<IDataImportDialogPayload, IDataIm
         <Button type="button" variant="secondary" onClick={() => rejectDialog()}>
           {translate('ui_processing_cancel')}
         </Button>
-        <Fill />
         {dialog.state.step === EDataImportDialogStep.File && (
-          <Container noWrap keepSize gap>
+          <div className="tw:flex tw:ml-auto tw:gap-2">
             <Button type="button" variant="secondary" onClick={dialog.stepBack}>
               {translate('ui_stepper_back')}
             </Button>
@@ -76,7 +66,7 @@ export const DataImportDialog: DialogComponent<IDataImportDialogPayload, IDataIm
             >
               {translate('ui_import')}
             </Button>
-          </Container>
+          </div>
         )}
       </CommonDialogFooter>
     </CommonDialogWrapper>

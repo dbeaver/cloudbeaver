@@ -71,7 +71,7 @@ public class WebSQLExecuteInfo {
     @Property
     public String getOriginalQuery() {
         //TODO implement
-        return null;
+        return null; // should return the original query without data filters
     }
 
     @Property

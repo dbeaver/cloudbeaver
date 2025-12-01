@@ -32,6 +32,7 @@
     "@cloudbeaver/core-sdk": "workspace:*",
     "@cloudbeaver/core-settings": "workspace:*",
     "@cloudbeaver/core-utils": "workspace:*",
+    "@dbeaver/js-helpers": "workspace:*",
     "mobx": "^6",
     "rxjs": "^7",
     "tslib": "^2"
