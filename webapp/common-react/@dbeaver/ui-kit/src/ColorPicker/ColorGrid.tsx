@@ -10,7 +10,7 @@ import { ColorIndicator } from './ColorIndicator.js';
 import { type UseColorPaletteResult } from './useColorPalette.js';
 import { memo } from 'react';
 import { useTranslate } from '@dbeaver/react-translate';
-import { Focusable } from '../Focusable/Focusable.js';
+import { Command } from '../Command/Command.js';
 
 interface ColorGridProps {
   colorPalette: UseColorPaletteResult;
@@ -28,8 +28,9 @@ export const ColorGrid: React.FC<ColorGridProps> = memo(function ColorGrid({ col
             const label = t('dbeaver_ui_kit_color_picker_color_label_' + color.label.replace(' ', '_'), color.label);
 
             return (
-              <Focusable
+              <Command
                 key={color.label}
+                render={<div />}
                 role="gridcell"
                 aria-selected={isSelected}
                 aria-label={label}
@@ -38,7 +39,7 @@ export const ColorGrid: React.FC<ColorGridProps> = memo(function ColorGrid({ col
                 onClick={() => onColorSelect(color.rgb)}
               >
                 <ColorIndicator color={color.rgb} isSelected={isSelected} />
-              </Focusable>
+              </Command>
             );
           })}
         </div>
