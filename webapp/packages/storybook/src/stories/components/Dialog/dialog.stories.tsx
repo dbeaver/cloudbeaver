@@ -113,3 +113,32 @@ export function SmallSize(): JSX.Element {
     </>
   );
 }
+
+export function SlideVariant(): JSX.Element {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <>
+      <Button onClick={() => setOpen(true)}>Open Slide Panel</Button>
+      <Dialog open={open} data-variant="slide" onClose={() => setOpen(false)}>
+        <div className="tw:p-6">
+          <DialogHeading>Slide Panel</DialogHeading>
+          <DialogDescription>
+            This is a slide panel that appears from the right side of the screen, covering almost the entire viewport (leaving 120px on the left).
+            <br />
+            <br />
+            Perfect for detailed forms, settings panels, or any content that needs more space than a regular dialog.
+          </DialogDescription>
+          <div className="tw:mt-4 tw:flex tw:gap-2">
+            <Button variant="primary" onClick={() => setOpen(false)}>
+              Save Changes
+            </Button>
+            <Button variant="secondary" onClick={() => setOpen(false)}>
+              Cancel
+            </Button>
+          </div>
+        </div>
+      </Dialog>
+    </>
+  );
+}

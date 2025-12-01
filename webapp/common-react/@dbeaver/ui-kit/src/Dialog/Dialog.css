@@ -2,7 +2,7 @@
 
 @layer base {
   [data-backdrop] {
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: var(--dbv-kit-dialog-backdrop-background);
   }
 
   .dbv-kit-dialog__content {
@@ -55,6 +55,33 @@
       min-width: var(--dbv-kit-dialog-large-width);
       min-height: var(--dbv-kit-dialog-large-height);
       max-height: max(var(--app-height, 100vh) - 48px, var(--dbv-kit-dialog-large-height));
+    }
+
+    /* Slide variant (side panel from right) */
+    &[data-variant='slide'] {
+      top: 0;
+      left: auto;
+      right: 0;
+      transform: translateX(0);
+      width: var(--dbv-kit-dialog-slide-width);
+      max-width: var(--dbv-kit-dialog-slide-max-width);
+      height: 100%;
+      max-height: 100%;
+      min-width: 0;
+      min-height: 0;
+      border-radius: 0;
+
+      @media (prefers-reduced-motion: no-preference) {
+        opacity: 1;
+        transform: translateX(100%);
+        transition-property: transform;
+        transition-timing-function: var(--dbv-kit-dialog-slide-transition-timing);
+        transition-duration: var(--dbv-kit-dialog-slide-transition-duration);
+
+        &[data-enter] {
+          transform: translateX(0);
+        }
+      }
     }
   }
 

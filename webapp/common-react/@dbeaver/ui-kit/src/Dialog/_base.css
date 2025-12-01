@@ -17,6 +17,16 @@
     --dbv-kit-dialog-large-height: 468px;
     --dbv-kit-dialog-max-width: 748px;
 
+    /* Slide variant (side panel) */
+    --dbv-kit-dialog-slide-width: calc(100% - 120px);
+    --dbv-kit-dialog-slide-max-width: none;
+    --dbv-kit-dialog-slide-offset: 120px;
+    --dbv-kit-dialog-slide-transition-duration: 300ms;
+    --dbv-kit-dialog-slide-transition-timing: ease-in-out;
+
+    /* Backdrop */
+    --dbv-kit-dialog-backdrop-background: rgba(0, 0, 0, 0.5);
+
     /* Heading */
     --dbv-kit-dialog-heading-margin: 0;
     --dbv-kit-dialog-heading-font-size: 1.25rem;

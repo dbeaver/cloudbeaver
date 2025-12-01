@@ -64,6 +64,31 @@ The Dialog component supports three predefined sizes via the `data-size` attribu
 <Dialog data-size="large">...</Dialog>
 ```
 
+## Variants
+
+### Slide Variant (Side Panel)
+
+The Dialog also supports a `slide` variant that creates a side panel appearing from the right:
+
+```tsx
+<Dialog data-variant="slide">
+  <div className="tw:p-6">
+    <DialogHeading>Settings Panel</DialogHeading>
+    <DialogDescription>Configure your preferences here...</DialogDescription>
+  </div>
+</Dialog>
+```
+
+**Slide variant features:**
+
+- Slides in from the right side of the screen
+- Takes up `calc(100% - 120px)` width, leaving 120px margin on the left
+- Full viewport height
+- Slower animation: 300ms vs 150ms
+- Perfect for settings panels, detailed forms, or content requiring more space
+
+**Note:** When using `data-variant="slide"`, the `data-size` attribute is ignored.
+
 ## Class names
 
 - `.dbv-kit-dialog__content` - the main class name for the dialog container.
@@ -90,6 +115,16 @@ The Dialog component supports customization through CSS variables.
 --dbv-kit-dialog-medium-height             /* 396px */
 --dbv-kit-dialog-large-width               /* 720px */
 --dbv-kit-dialog-large-height              /* 556px */
+
+/* Slide variant */
+--dbv-kit-dialog-slide-width               /* calc(100% - 120px) */
+--dbv-kit-dialog-slide-max-width           /* none */
+--dbv-kit-dialog-slide-offset              /* 120px */
+--dbv-kit-dialog-slide-transition-duration /* 300ms */
+--dbv-kit-dialog-slide-transition-timing   /* ease-in-out */
+
+/* Backdrop */
+--dbv-kit-dialog-backdrop-background       /* rgba(0, 0, 0, 0.5) */
 
 /* Heading */
 --dbv-kit-dialog-heading-margin            /* 0 0 16px */
