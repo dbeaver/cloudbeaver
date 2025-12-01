@@ -10,9 +10,9 @@ import React, { forwardRef } from 'react';
 
 import type { IFormStateControl } from '../IFormStateControl.js';
 import { useFormStateControl } from '../useFormStateControl.js';
-import { InputFieldBase, type InputProps } from './InputFieldBase.js';
+import { InputFieldBase, type InputFieldBaseProps } from './InputFieldBase.js';
 
-export type InputFieldStateProps<TState extends Record<string, any>, TKey extends keyof TState> = Omit<InputProps, 'value'> &
+export type InputFieldStateProps<TState extends Record<string, any>, TKey extends keyof TState> = Omit<InputFieldBaseProps, 'value'> &
   IFormStateControl<TState, TKey>;
 
 interface InputFieldType {

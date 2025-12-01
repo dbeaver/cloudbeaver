@@ -1,0 +1,44 @@
+.fieldLabel {
+  display: block;
+  composes: theme-typography--body1 from global;
+  font-weight: 500;
+}
+.fieldLabel:not(:empty) {
+  padding-bottom: 10px;
+}
+.inputContainer {
+  position: relative;
+
+  --dbv-kit-control-outline-offset: -2px;
+}
+.loaderContainer,
+.iconContainer {
+  position: absolute;
+  right: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 24px;
+  height: 24px;
+
+  --dbv-kit-icon-btn-outline-offset: -2px;
+}
+
+.customIconContainer {
+  composes: iconContainer;
+  right: 6px;
+  width: 24px;
+  height: 24px;
+  cursor: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.input[disabled] + .iconContainer {
+  cursor: auto;
+}
+.input:not(:only-child) {
+  padding-right: 32px !important;
+}
+.input {
+  font-size: 12px;
+}

@@ -11,39 +11,27 @@ import React, { forwardRef, useContext } from 'react';
 import { useCombinedHandler } from '../../useCombinedHandler.js';
 import { FormContext } from '../FormContext.js';
 import { isFormStateControl } from '../isFormStateControl.js';
-import { InputFieldBase, type InputProps } from './InputFieldBase.js';
+import { InputFieldBase, type InputFieldBaseProps } from './InputFieldBase.js';
 import { InputFieldState, type InputFieldStateProps } from './InputFieldState.js';
-import './InputField.css';
-import { clsx } from '@dbeaver/ui-kit';
 
 interface InputFieldType {
-  (props: InputProps & React.RefAttributes<HTMLInputElement>): React.ReactElement<any, any> | null;
+  (props: InputFieldBaseProps & React.RefAttributes<HTMLInputElement>): React.ReactElement<any, any> | null;
   <TState extends Record<string, any>, TKey extends keyof TState>(
     props: InputFieldStateProps<TState, TKey> & React.RefAttributes<HTMLInputElement>,
   ): React.ReactElement<any, any> | null;
 }
 
-export const InputField: InputFieldType = observer<InputProps | InputFieldStateProps<any, any>, HTMLInputElement>(
-  forwardRef(function InputField({ onChange, onKeyDown, className, ...rest }, ref) {
+export const InputField: InputFieldType = observer<InputFieldBaseProps | InputFieldStateProps<any, any>, HTMLInputElement>(
+  forwardRef(function InputField({ onChange, onKeyDown, ...rest }, ref) {
     const context = useContext(FormContext);
 
     const handleChange = useCombinedHandler(onChange, context?.change);
     const handleKeyDown = useCombinedHandler(onKeyDown, context?.keyDown);
 
     if (isFormStateControl(rest)) {
-      return (
-        <InputFieldState
-          {...rest}
-          ref={ref}
-          className={clsx('theme-typography--body1', className)}
-          onChange={handleChange}
-          onKeyDown={handleKeyDown}
-        />
-      );
+      return <InputFieldState {...rest} ref={ref} onChange={handleChange} onKeyDown={handleKeyDown} />;
     }
 
-    return (
-      <InputFieldBase {...rest} ref={ref} className={clsx('theme-typography--body1', className)} onChange={handleChange} onKeyDown={handleKeyDown} />
-    );
+    return <InputFieldBase {...rest} ref={ref} onChange={handleChange} onKeyDown={handleKeyDown} />;
   }),
 ) as InputFieldType;
