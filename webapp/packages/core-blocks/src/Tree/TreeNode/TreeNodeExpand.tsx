@@ -48,7 +48,7 @@ export const TreeNodeExpand = observer<Props>(function TreeNodeExpand({ leaf, bi
   );
   const expandable = getComputed(() => !loading && (!leaf || context.externalExpanded));
 
-  async function handleExpand(event: React.MouseEvent<HTMLButtonElement>) {
+  async function handleExpand(event: React.MouseEvent<HTMLDivElement>) {
     EventContext.set(event, EventTreeNodeExpandFlag);
 
     if (!leaf && !disabled) {
@@ -56,7 +56,7 @@ export const TreeNodeExpand = observer<Props>(function TreeNodeExpand({ leaf, bi
     }
   }
 
-  function handleDbClick(event: React.MouseEvent<HTMLButtonElement>) {
+  function handleDbClick(event: React.MouseEvent<HTMLDivElement>) {
     EventContext.set(event, EventTreeNodeExpandFlag);
   }
 
@@ -92,15 +92,13 @@ export const TreeNodeExpand = observer<Props>(function TreeNodeExpand({ leaf, bi
 
   return (
     <Clickable
-      render={<div />}
+      render={<div onClick={handleExpand} onDoubleClick={handleDbClick} />}
       role="button"
       title={title}
       aria-label={title}
       className={s(styles, { treeNodeExpand: true, expanded: context.expanded }, className)}
       focusable={expandable}
       disabled={disabled || !expandable}
-      onClick={handleExpand}
-      onDoubleClick={handleDbClick}
     >
       {loading && <Spinner size="small" active />}
       {expandable && <Icon name={iconName} className={s(styles, { icon: true })} viewBox={viewBox} />}
