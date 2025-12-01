@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import { observer } from 'mobx-react-lite';
 import { reaction } from 'mobx';
 
@@ -42,13 +42,19 @@ export const UsersTable = observer<Props>(function UsersTable({ users, isManagea
   const usersAdministrationService = useService(UsersAdministrationService);
   const usersResource = useService(UsersResource);
 
-  if (displayAuthRole) {
-    const isRole = COLUMNS.find(c => c.key === ROLE_COLUMN.key);
+  const columns = useMemo(() => {
+    const result = [...COLUMNS];
 
-    if (!isRole) {
-      COLUMNS.push(ROLE_COLUMN);
+    if (displayAuthRole) {
+      const isRole = result.find(c => c.key === ROLE_COLUMN.key);
+
+      if (!isRole) {
+        result.push(ROLE_COLUMN);
+      }
     }
-  }
+
+    return result;
+  }, [displayAuthRole]);
 
   const enableUser = useCallback(
     async (userId: AdminUserInfoFragment['userId'], enabled: boolean) => {
@@ -61,7 +67,7 @@ export const UsersTable = observer<Props>(function UsersTable({ users, isManagea
     [usersResource, notificationService],
   );
 
-  const columnsCount = useCreateGridReactiveValue(() => COLUMNS.length, null, [COLUMNS]);
+  const columnsCount = useCreateGridReactiveValue(() => columns.length, null, [columns]);
   const rowsCount = useCreateGridReactiveValue(
     () => users.length,
     onValueChange => reaction(() => users.length, onValueChange),
@@ -70,7 +76,7 @@ export const UsersTable = observer<Props>(function UsersTable({ users, isManagea
 
   function getCell(rowIdx: number, colIdx: number) {
     const row = users[rowIdx];
-    const column = COLUMNS[colIdx];
+    const column = columns[colIdx];
 
     if (!row || !column) {
       return null;
@@ -126,7 +132,7 @@ export const UsersTable = observer<Props>(function UsersTable({ users, isManagea
   }
 
   const cell = useCreateGridReactiveValue(getCell, (onValueChange, rowIdx, colIdx) => reaction(() => getCell(rowIdx, colIdx), onValueChange), [
-    COLUMNS,
+    columns,
     users,
     usersResource,
     usersTableOptionsPanelService,
@@ -135,11 +141,11 @@ export const UsersTable = observer<Props>(function UsersTable({ users, isManagea
   ]);
 
   function getHeaderText(colIdx: number) {
-    return translate(COLUMNS[colIdx]?.label) ?? '';
+    return translate(columns[colIdx]?.label) ?? '';
   }
 
   const headerText = useCreateGridReactiveValue(getHeaderText, (onValueChange, colIdx) => reaction(() => getHeaderText(colIdx), onValueChange), [
-    COLUMNS,
+    columns,
     translate,
   ]);
 

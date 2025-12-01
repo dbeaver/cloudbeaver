@@ -40,12 +40,6 @@ export const UsersPage = observer<Props>(function UsersPage({ param }) {
   const loading = table.loadableState.isLoading();
   const isManageable = !administrationUsersManagementService.externalUserProviderEnabled;
 
-  function loadMore() {
-    if (table.hasMore) {
-      table.loadMore();
-    }
-  }
-
   return (
     <ColoredContainer vertical wrap gap parent maximum>
       <Group keepSize box>
@@ -64,7 +58,7 @@ export const UsersPage = observer<Props>(function UsersPage({ param }) {
         <Placeholder container={createUserService.toolsContainer} param={param} />
 
         <div className="tw:h-full tw:relative">
-          <UsersTable users={table.users} isManageable={isManageable} displayAuthRole={displayAuthRole} onLoadMore={loadMore} />
+          <UsersTable users={table.users} isManageable={isManageable} displayAuthRole={displayAuthRole} onLoadMore={table.loadMore} />
           <Spinner className="tw:absolute tw:bottom-4 tw:right-8" active={loading} />
         </div>
       </Container>
