@@ -30,8 +30,10 @@ import type { JSX } from 'react';
 
 import './Dialog.css';
 
-function Dialog({ className, ...props }: DialogProps): JSX.Element {
-  return <AriakitDialog className={clsx('dbv-kit-dialog__content', className)} {...props} />;
+function Dialog({ className, backdrop, ...props }: DialogProps): JSX.Element {
+  const backdropElement = backdrop === true ? <div className="dbv-kit-dialog__backdrop" /> : backdrop;
+
+  return <AriakitDialog className={clsx('dbv-kit-dialog__content', className)} backdrop={backdropElement} {...props} />;
 }
 
 function DialogDisclosure({ className, ...props }: DialogDisclosureProps): JSX.Element {
