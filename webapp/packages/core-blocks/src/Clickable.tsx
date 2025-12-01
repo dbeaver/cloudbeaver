@@ -7,8 +7,8 @@
  */
 import { Command, type CommandProps } from '@dbeaver/ui-kit';
 
-export interface ClickableProps extends CommandProps {}
+export type { CommandProps as ClickableProps };
 
-export function Clickable(props: ClickableProps): React.ReactElement {
+export function Clickable(props: CommandProps): React.ReactElement {
   return <Command {...props} />;
 }
