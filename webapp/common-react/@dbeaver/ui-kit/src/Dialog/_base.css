@@ -1,0 +1,51 @@
+@layer base {
+  :root {
+    /* Dialog container */
+    --dbv-kit-dialog-content-background: #ffffff;
+    --dbv-kit-dialog-content-foreground: #353535;
+    --dbv-kit-dialog-content-border-radius: 0.25rem;
+    --dbv-kit-dialog-content-shadow:
+      0px 11px 15px -7px rgba(0, 0, 0, 0.2), 0px 24px 38px 3px rgba(0, 0, 0, 0.14), 0px 9px 46px 8px rgba(0, 0, 0, 0.12);
+    --dbv-kit-dialog-content-padding: 0;
+
+    /* Dialog sizes */
+    --dbv-kit-dialog-small-width: 404px;
+    --dbv-kit-dialog-small-height: 262px;
+    --dbv-kit-dialog-medium-width: 576px;
+    --dbv-kit-dialog-medium-height: 374px;
+    --dbv-kit-dialog-large-width: 720px;
+    --dbv-kit-dialog-large-height: 468px;
+    --dbv-kit-dialog-max-width: 748px;
+
+    /* Heading */
+    --dbv-kit-dialog-heading-margin: 0;
+    --dbv-kit-dialog-heading-font-size: 1.25rem;
+    --dbv-kit-dialog-heading-font-weight: 400;
+    --dbv-kit-dialog-heading-line-height: 2rem;
+    --dbv-kit-dialog-heading-color: var(--dbv-kit-dialog-content-foreground);
+
+    /* Description */
+    --dbv-kit-dialog-description-margin: 0;
+    --dbv-kit-dialog-description-font-size: 0.875rem;
+    --dbv-kit-dialog-description-color: inherit;
+
+    /* Disclosure */
+    --dbv-kit-dialog-disclosure-background: transparent;
+    --dbv-kit-dialog-disclosure-foreground: inherit;
+
+    /* Dismiss */
+    --dbv-kit-dialog-dismiss-background: #f2f2f2;
+    --dbv-kit-dialog-dismiss-foreground: #353535;
+    --dbv-kit-dialog-dismiss-hover-background: #e5e5e5;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --dbv-kit-dialog-content-background: hsl(240deg, 10%, 16%);
+      --dbv-kit-dialog-content-foreground: #ffffff;
+      --dbv-kit-dialog-dismiss-background: hsl(240deg, 10%, 18%);
+      --dbv-kit-dialog-dismiss-foreground: #cbcbcb;
+      --dbv-kit-dialog-dismiss-hover-background: hsl(240deg, 10%, 22%);
+    }
+  }
+}
