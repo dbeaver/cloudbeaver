@@ -835,6 +835,8 @@ extend type Mutation {
 
     "Change navigator settings for connection"
     setConnectionNavigatorSettings( id: ID!, projectId: ID, settings: NavigatorSettingsInput!): ConnectionInfo!
+    "Sets to default navigator settings for connection"
+    clearConnectionNavigatorSettings(projectId: ID!, id: ID! ): ConnectionInfo! @since(version: "25.3.1")
 
     #### Generic async functions
 

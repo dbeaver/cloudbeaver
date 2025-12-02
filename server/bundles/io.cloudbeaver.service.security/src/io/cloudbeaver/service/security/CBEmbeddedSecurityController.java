@@ -106,6 +106,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
 
     @Override
     public void setObjectSettings(
+        @NotNull String projectId,
         @NotNull String objectId,
         @NotNull SMObjectType objectType,
         @NotNull Map<String, Object> settings
@@ -113,20 +114,21 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         String userId = getUserIdOrThrow();
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
-                deleteObjectSettings(objectId, objectType, settings.keySet());
+                deleteObjectSettings(projectId, objectId, objectType, settings.keySet());
                 try (
                     PreparedStatement dbStat = dbCon.prepareStatement(
                         "INSERT INTO {table_prefix}CB_OBJECT_SETTINGS" +
-                            "(OBJECT_ID,OBJECT_TYPE,SUBJECT_ID,SETTING_ID,SETTING_VALUE,UPDATED_BY,UPDATE_TIME) " +
-                            "VALUES(?,?,?,?,?,?,CURRENT_TIMESTAMP)")
+                            "(PROJECT_ID,OBJECT_ID,OBJECT_TYPE,SUBJECT_ID,SETTING_ID,SETTING_VALUE,UPDATED_BY,UPDATE_TIME) " +
+                            "VALUES(?,?,?,?,?,?,?,CURRENT_TIMESTAMP)")
                 ) {
                     for (Map.Entry<String, Object> entry : settings.entrySet()) {
-                        dbStat.setString(1, objectId);
-                        dbStat.setString(2, objectType.name());
-                        dbStat.setString(3, userId);
-                        dbStat.setString(4, entry.getKey());
-                        dbStat.setString(5, CommonUtils.toString(entry.getValue()));
-                        dbStat.setString(6, userId);
+                        dbStat.setString(1, projectId);
+                        dbStat.setString(2, objectId);
+                        dbStat.setString(3, objectType.name());
+                        dbStat.setString(4, userId);
+                        dbStat.setString(5, entry.getKey());
+                        dbStat.setString(6, CommonUtils.toString(entry.getValue()));
+                        dbStat.setString(7, userId);
                         dbStat.addBatch();
                     }
                     dbStat.executeBatch();
@@ -140,35 +142,44 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
 
     @NotNull
     @Override
-    public Map<String, Object> getObjectSettings(
+    public List<SMObjectSettings> getObjectSettings(
+        @NotNull String projectId,
         @NotNull String objectId,
         @NotNull SMObjectType objectType,
         @Nullable String settingId
     ) throws DBException {
         String userId = getUserIdOrThrow();
         try (Connection dbCon = database.openConnection()) {
+            boolean isAllProjectSettings = SMObjectType.project.equals(objectType) && projectId.equals(objectId);
             try (
-                PreparedStatement dbStat = dbCon.prepareStatement("SELECT SETTING_ID,SETTING_VALUE " +
+                PreparedStatement dbStat = dbCon.prepareStatement("SELECT OBJECT_ID,SETTING_ID,SETTING_VALUE " +
                     "FROM {table_prefix}CB_OBJECT_SETTINGS " +
-                    "WHERE OBJECT_ID=? AND OBJECT_TYPE=? AND SUBJECT_ID=?" +
+                    "WHERE PROJECT_ID=? AND SUBJECT_ID=?" +
+                    (isAllProjectSettings ? "" : " AND OBJECT_ID=? AND OBJECT_TYPE=?") +
                     (settingId == null ? "" : " AND SETTING_ID=?"))
             ) {
                 int index = 1;
-                dbStat.setString(index++, objectId);
-                dbStat.setString(index++, objectType.name());
+                dbStat.setString(index++, projectId);
                 dbStat.setString(index++, userId);
+                if (!isAllProjectSettings) {
+                    dbStat.setString(index++, objectId);
+                    dbStat.setString(index++, objectType.name());
+                }
                 if (settingId != null) {
                     dbStat.setString(index++, settingId);
                 }
                 try (ResultSet dbResult = dbStat.executeQuery()) {
-                    Map<String, Object> result = new LinkedHashMap<>();
+                    Map<String, Map<String, Object>> settingsByObjectId = new LinkedHashMap<String, Map<String, Object>>();
                     while (dbResult.next()) {
-                        result.put(
+                        Map<String, Object> objectSettings = settingsByObjectId.computeIfAbsent(
                             dbResult.getString(1),
-                            dbResult.getString(2)
+                            k -> new LinkedHashMap<>()
                         );
+                        objectSettings.put(dbResult.getString(2), dbResult.getString(3));
                     }
-                    return result;
+                    return settingsByObjectId.entrySet().stream()
+                        .map(entry -> new SMObjectSettings(entry.getKey(), entry.getValue()))
+                        .toList();
                 }
             }
         } catch (SQLException e) {
@@ -178,18 +189,20 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
 
     @Override
     public void deleteObjectSettings(
+        @NotNull String projectId,
         @NotNull String objectId,
         @NotNull SMObjectType objectType,
         @Nullable Set<String> settingIds
     ) throws DBException {
         String userId = getUserIdOrThrow();
-        String sql = "DELETE FROM {table_prefix}CB_OBJECT_SETTINGS WHERE OBJECT_ID=? AND OBJECT_TYPE=? AND SUBJECT_ID=?";
+        String sql = "DELETE FROM {table_prefix}CB_OBJECT_SETTINGS WHERE PROJECT_ID=? AND OBJECT_ID=? AND OBJECT_TYPE=? AND SUBJECT_ID=?";
         if (settingIds != null && !settingIds.isEmpty()) {
             sql += " AND SETTING_ID IN (" + SQLUtils.generateParamList(settingIds.size()) + ")";
         }
         try (Connection dbCon = database.openConnection()) {
             try (PreparedStatement dbStat = dbCon.prepareStatement(sql)) {
                 int index = 1;
+                dbStat.setString(index++, projectId);
                 dbStat.setString(index++, objectId);
                 dbStat.setString(index++, objectType.name());
                 dbStat.setString(index++, userId);

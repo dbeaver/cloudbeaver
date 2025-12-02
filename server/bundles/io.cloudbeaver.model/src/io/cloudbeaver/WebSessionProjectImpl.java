@@ -30,10 +30,12 @@ import org.jkiss.dbeaver.model.app.DBPDataSourceRegistryCache;
 import org.jkiss.dbeaver.model.navigator.DBNModel;
 import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.rm.RMUtils;
+import org.jkiss.dbeaver.model.security.SMObjectSettings;
 import org.jkiss.dbeaver.model.security.SMObjectType;
 import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceEvent;
 import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceProperty;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
+import org.jkiss.dbeaver.registry.DataSourceNavigatorSettings;
 import org.jkiss.dbeaver.registry.DataSourceRegistry;
 import org.jkiss.dbeaver.runtime.jobs.DisconnectJob;
 import org.jkiss.utils.CommonUtils;
@@ -49,7 +51,7 @@ public class WebSessionProjectImpl extends WebProjectImpl {
     private static final Log log = Log.getLog(WebSessionProjectImpl.class);
     protected final WebSession webSession;
     private final Map<String, WebConnectionInfo> connections = new HashMap<>();
-    private final Map<String, Object> projectSettings = new ConcurrentHashMap<>();
+    private final Map<String, Map<String, Object>> projectSettings = new ConcurrentHashMap<>();
     private boolean registryIsLoaded = false;
 
     public WebSessionProjectImpl(
@@ -106,6 +108,12 @@ public class WebSessionProjectImpl extends WebProjectImpl {
     private synchronized void addDataSourcesToCache() {
         if (registryIsLoaded) {
             return;
+        }
+        try {
+            refreshProjectSettings();
+        } catch (DBException e) {
+            webSession.addSessionError(e);
+            log.error("Error refreshing settings for project " + getId(), e);
         }
         getDataSourceRegistry().getDataSources().forEach(this::addConnection);
         Throwable lastError = getDataSourceRegistry().getLastError();
@@ -166,10 +174,19 @@ public class WebSessionProjectImpl extends WebProjectImpl {
     @NotNull
     public synchronized WebConnectionInfo addConnection(@NotNull DBPDataSourceContainer dataSourceContainer) {
         WebConnectionInfo connection = createConnectionInfo(dataSourceContainer);
+        setCustomConnectionSettings(connection);
         synchronized (connections) {
             connections.put(dataSourceContainer.getId(), connection);
         }
         return connection;
+    }
+
+    private void setCustomConnectionSettings(@NotNull WebConnectionInfo connection) {
+        Map<String, Object> connectionSettings = projectSettings.get(connection.getId());
+        if (connectionSettings != null) {
+            DataSourceNavigatorSettings customSettings = DataSourceNavigatorSettings.fromMap(connectionSettings);
+            ((DataSourceDescriptor) connection.getDataSourceContainer()).setCustomNavigatorSettings(customSettings);
+        }
     }
 
     /**
@@ -249,13 +266,14 @@ public class WebSessionProjectImpl extends WebProjectImpl {
             projectSettings.clear();
             return;
         }
-        Map<String, Object> loadedSettings = webSession.getSecurityController().getObjectSettings(
+        List<SMObjectSettings> loadedSettings = webSession.getSecurityController().getObjectSettings(
+            getId(),
             getId(),
             SMObjectType.project,
             null
         );
         projectSettings.clear();
-        projectSettings.putAll(loadedSettings);
+        loadedSettings.forEach(smObject -> projectSettings.put(smObject.objectId(), smObject.settings()));
     }
 
     @NotNull

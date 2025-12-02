@@ -46,7 +46,6 @@ import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.model.exec.DBCConnectException;
-import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.model.navigator.DBNDataSource;
 import org.jkiss.dbeaver.model.navigator.DBNModel;
 import org.jkiss.dbeaver.model.navigator.DBNNode;
@@ -59,7 +58,9 @@ import org.jkiss.dbeaver.model.rm.RMProjectType;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.secret.DBSSecretController;
 import org.jkiss.dbeaver.model.secret.DBSSecretValue;
+import org.jkiss.dbeaver.model.security.SMObjectType;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
+import org.jkiss.dbeaver.registry.DataSourceNavigatorSettings;
 import org.jkiss.dbeaver.registry.DataSourceProviderRegistry;
 import org.jkiss.dbeaver.registry.network.NetworkHandlerDescriptor;
 import org.jkiss.dbeaver.registry.network.NetworkHandlerRegistry;
@@ -718,12 +719,50 @@ public class WebServiceCore implements DBWServiceCore {
 
     @Override
     public WebConnectionInfo setConnectionNavigatorSettings(
-        WebSession webSession, @Nullable String projectId, String id, DBNBrowseSettings settings
+        @NotNull WebSession webSession,
+        @Nullable String projectId,
+        @NotNull String id,
+        @NotNull DataSourceNavigatorSettings settings
     ) throws DBWebException {
         WebConnectionInfo connectionInfo = WebDataSourceUtils.getWebConnectionInfo(webSession, projectId, id);
         DataSourceDescriptor dataSourceDescriptor = ((DataSourceDescriptor) connectionInfo.getDataSourceContainer());
-        dataSourceDescriptor.setNavigatorSettings(settings);
-        dataSourceDescriptor.persistConfiguration();
+        try {
+            if (webSession.isAuthorizedInSecurityManager()) {
+                // save in sm database for authenticated users
+                webSession.getSecurityController().setObjectSettings(
+                    connectionInfo.getProjectId(),
+                    connectionInfo.getId(),
+                    SMObjectType.datasource,
+                    settings.toMap()
+                );
+            }
+            dataSourceDescriptor.setCustomNavigatorSettings(settings);
+        } catch (DBException e) {
+            throw new DBWebException("Error saving custom navigator settings", e);
+        }
+        return connectionInfo;
+    }
+
+    @Override
+    public WebConnectionInfo clearConnectionNavigatorSettings(@NotNull WebSession webSession, @NotNull String projectId, @NotNull String id)
+    throws DBWebException {
+        WebConnectionInfo connectionInfo = WebDataSourceUtils.getWebConnectionInfo(webSession, projectId, id);
+        DataSourceDescriptor dataSourceDescriptor = ((DataSourceDescriptor) connectionInfo.getDataSourceContainer());
+        try {
+            if (webSession.isAuthorizedInSecurityManager()) {
+                DataSourceNavigatorSettings customSettings = dataSourceDescriptor.getNavigatorSettings();
+                // save in sm database for authenticated users
+                webSession.getSecurityController().deleteObjectSettings(
+                    connectionInfo.getProjectId(),
+                    connectionInfo.getId(),
+                    SMObjectType.datasource,
+                    customSettings.toMap().keySet()
+                );
+            }
+            dataSourceDescriptor.setCustomNavigatorSettings(null);
+        } catch (DBException e) {
+            throw new DBWebException("Error deleting custom navigator settings", e);
+        }
         return connectionInfo;
     }
 
