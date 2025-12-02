@@ -35,8 +35,8 @@ public class WebSessionTest extends CloudbeaverMockTest {
     public void localeAndBasicAttributes() throws Exception {
         WebSession session = new WebSession(getFakeRequestInfo(), mockApplication(), Collections.emptyMap());
         // Locale
-        session.setLocale("ru");
-        Assert.assertEquals("ru", session.getLocale());
+        session.setLocale("test-locale");
+        Assert.assertEquals("test-locale", session.getLocale());
         session.setLocale(null);
         Assert.assertEquals(Locale.getDefault().getLanguage(), session.getLocale());
 
