@@ -40,24 +40,30 @@ export abstract class BaseOptionsPanelService<T> {
   }
 
   async open(itemId: T): Promise<boolean> {
-    if (this.optionsPanelService.isOpen(this.panelGetter)) {
+    if (this.isOpen()) {
       return true;
     }
 
+    this.itemId = itemId;
+
     const state = await this.optionsPanelService.open(this.panelGetter);
 
-    if (state) {
-      this.itemId = itemId;
+    if (!state) {
+      this.itemId = null;
     }
 
     return state;
   }
 
   async close(): Promise<void> {
-    if (!this.optionsPanelService.isOpen(this.panelGetter)) {
+    if (!this.isOpen()) {
       return;
     }
 
     await this.optionsPanelService.close();
+  }
+
+  isOpen(): boolean {
+    return this.optionsPanelService.isOpen(this.panelGetter);
   }
 }
