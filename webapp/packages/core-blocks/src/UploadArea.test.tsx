@@ -6,7 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 import { describe, expect, it, vi } from 'vitest';
-import { fireEvent } from '@testing-library/react';
 import { createRef } from 'react';
 import { renderInApp } from '@cloudbeaver/tests-runner';
 import { UploadArea } from './UploadArea.js';
@@ -62,37 +61,28 @@ describe('UploadArea', () => {
     expect(label).toHaveClass('custom-class');
   });
 
-  it('should handle onChange event', () => {
+  it('should handle onChange event', async () => {
     const handleChange = vi.fn();
-    const { container } = renderInApp(<UploadArea onChange={handleChange}>Upload File</UploadArea>);
+    const { container, user } = renderInApp(<UploadArea onChange={handleChange}>Upload File</UploadArea>);
     const input = container.querySelector('input[type="file"]') as HTMLInputElement;
 
-    const { fileList } = createTestFileList();
-    Object.defineProperty(input, 'files', {
-      value: fileList,
-      writable: true,
-    });
-
-    fireEvent.change(input);
+    const { file } = createTestFileList();
+    await user.upload(input, file);
 
     expect(handleChange).toHaveBeenCalled();
   });
 
-  it('should reset input value when reset is true', () => {
+  it('should reset input value when reset is true', async () => {
     const handleChange = vi.fn();
-    const { container } = renderInApp(
+    const { container, user } = renderInApp(
       <UploadArea reset onChange={handleChange}>
         Upload File
       </UploadArea>,
     );
     const input = container.querySelector('input[type="file"]') as HTMLInputElement;
 
-    const { fileList } = createTestFileList();
-    Object.defineProperty(input, 'files', {
-      value: fileList,
-      writable: true,
-    });
-    fireEvent.change(input);
+    const { file } = createTestFileList();
+    await user.upload(input, file);
 
     expect(handleChange).toHaveBeenCalled();
     expect(input.value).toBe('');
@@ -151,19 +141,16 @@ describe('UploadArea', () => {
     expect(input.files).toBe(fileList);
   });
 
-  it('should handle async onChange event', () => {
-    vi.useFakeTimers();
-
+  it('should handle async onChange event', async () => {
     const handleChange = vi.fn(async () => {
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await Promise.resolve();
     });
 
-    const { container } = renderInApp(<UploadArea onChange={handleChange}>Upload File</UploadArea>);
+    const { container, user } = renderInApp(<UploadArea onChange={handleChange}>Upload File</UploadArea>);
     const input = container.querySelector('input[type="file"]') as HTMLInputElement;
 
-    fireEvent.change(input);
-
-    vi.runAllTimers();
+    const { file } = createTestFileList();
+    await user.upload(input, file);
 
     expect(handleChange).toHaveBeenCalled();
 
