@@ -69,16 +69,17 @@ export const RightArea = observer<Props>(function RightArea({ className }) {
         <Dialog
           portal={false}
           unmountOnHide={false}
+          animated={false}
           open={optionsPanelService.active}
           className="tw:w-full tw:h-full tw:overflow-visible! tw:bg-transparent!"
           onClose={close}
         >
-          <IconButton aria-label="Close panel" className={s(styles, { iconBtn: true })} onClick={close}>
-            <Icon name="cross" viewBox="0 0 24 24" />
-          </IconButton>
           <Loader className={s(styles, { loader: true })} suspense>
             <OptionsPanel />
           </Loader>
+          <IconButton size="small" aria-label="Close panel" className={s(styles, { iconBtn: true })} onClick={close}>
+            <Icon name="cross" viewBox="0 0 24 24" />
+          </IconButton>
         </Dialog>
       </SlideElement>
     </SlideBox>
