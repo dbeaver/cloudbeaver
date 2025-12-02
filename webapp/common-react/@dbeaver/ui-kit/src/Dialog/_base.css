@@ -18,9 +18,6 @@
     --dbv-kit-dialog-max-width: 748px;
 
     /* Slide variant (side panel) */
-    --dbv-kit-dialog-slide-width: calc(100% - 120px);
-    --dbv-kit-dialog-slide-max-width: none;
-    --dbv-kit-dialog-slide-offset: 120px;
     --dbv-kit-dialog-slide-transition-duration: 300ms;
     --dbv-kit-dialog-slide-transition-timing: ease-in-out;
 

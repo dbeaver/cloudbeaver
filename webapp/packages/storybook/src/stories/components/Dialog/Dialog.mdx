@@ -1,7 +1,3 @@
-import { Meta } from '@storybook/blocks';
-
-<Meta title="Components/Dialog" />
-
 # Dialog
 
 The Dialog component is a modal window built on top of [Ariakit Dialog](https://ariakit.org/components/dialog) that follows the WAI-ARIA Dialog Pattern.
@@ -71,7 +67,7 @@ The Dialog component supports three predefined sizes via the `data-size` attribu
 The Dialog also supports a `slide` variant that creates a side panel appearing from the right:
 
 ```tsx
-<Dialog data-variant="slide">
+<Dialog data-variant="slide" portal={false}>
   <div className="tw:p-6">
     <DialogHeading>Settings Panel</DialogHeading>
     <DialogDescription>Configure your preferences here...</DialogDescription>
@@ -82,8 +78,8 @@ The Dialog also supports a `slide` variant that creates a side panel appearing f
 **Slide variant features:**
 
 - Slides in from the right side of the screen
-- Takes up `calc(100% - 120px)` width, leaving 120px margin on the left
-- Full viewport height
+- Fills 100% width and height of the parent container
+- Use `portal={false}` to render within parent instead of body
 - Slower animation: 300ms vs 150ms
 - Perfect for settings panels, detailed forms, or content requiring more space
 
@@ -117,9 +113,6 @@ The Dialog component supports customization through CSS variables.
 --dbv-kit-dialog-large-height              /* 556px */
 
 /* Slide variant */
---dbv-kit-dialog-slide-width               /* calc(100% - 120px) */
---dbv-kit-dialog-slide-max-width           /* none */
---dbv-kit-dialog-slide-offset              /* 120px */
 --dbv-kit-dialog-slide-transition-duration /* 300ms */
 --dbv-kit-dialog-slide-transition-timing   /* ease-in-out */
 
