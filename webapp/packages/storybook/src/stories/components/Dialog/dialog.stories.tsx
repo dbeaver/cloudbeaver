@@ -6,7 +6,19 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { Dialog, DialogDescription, DialogDisclosure, DialogDismiss, DialogHeading, DialogProvider, useDialogStore, Button } from '@dbeaver/ui-kit';
+import {
+  Dialog,
+  DialogBody,
+  DialogDescription,
+  DialogDisclosure,
+  DialogDismiss,
+  DialogFooter,
+  DialogHeader,
+  DialogHeading,
+  DialogProvider,
+  useDialogStore,
+  Button,
+} from '@dbeaver/ui-kit';
 import { Meta } from '@storybook/react-vite';
 import { useState } from 'react';
 
@@ -22,12 +34,21 @@ export function Default(): JSX.Element {
   return (
     <>
       <Button onClick={() => setOpen(true)}>Open Dialog</Button>
-      <Dialog open={open} onClose={() => setOpen(false)} data-size="medium">
-        <DialogHeading>Dialog Title</DialogHeading>
-        <DialogDescription>This is a simple dialog component with basic content.</DialogDescription>
-        <div className="tw:mt-4">
-          <DialogDismiss>Close</DialogDismiss>
-        </div>
+      <Dialog open={open} data-size="medium" onClose={() => setOpen(false)}>
+        <DialogHeader>
+          <DialogHeading>Dialog Title</DialogHeading>
+        </DialogHeader>
+        <DialogBody>
+          <DialogDescription>This is a simple dialog component with basic content using the new layout system.</DialogDescription>
+        </DialogBody>
+        <DialogFooter>
+          <Button variant="secondary" onClick={() => setOpen(false)}>
+            Cancel
+          </Button>
+          <Button variant="primary" onClick={() => setOpen(false)}>
+            Confirm
+          </Button>
+        </DialogFooter>
       </Dialog>
     </>
   );
@@ -42,11 +63,15 @@ export function WithProvider(): JSX.Element {
         <Button>Open Dialog with Provider</Button>
       </DialogDisclosure>
       <Dialog data-size="medium">
-        <DialogHeading>Dialog with Provider</DialogHeading>
-        <DialogDescription>This dialog is managed by DialogProvider using useDialogStore hook.</DialogDescription>
-        <div className="tw:mt-4">
+        <DialogHeader>
+          <DialogHeading>Dialog with Provider</DialogHeading>
+        </DialogHeader>
+        <DialogBody>
+          <DialogDescription>This dialog is managed by DialogProvider using useDialogStore hook.</DialogDescription>
+        </DialogBody>
+        <DialogFooter>
           <DialogDismiss>Close</DialogDismiss>
-        </div>
+        </DialogFooter>
       </Dialog>
     </DialogProvider>
   );
@@ -58,17 +83,21 @@ export function WithMultipleActions(): JSX.Element {
   return (
     <>
       <Button onClick={() => setOpen(true)}>Open Dialog</Button>
-      <Dialog open={open} onClose={() => setOpen(false)} data-size="medium">
-        <DialogHeading>Confirm Action</DialogHeading>
-        <DialogDescription>Are you sure you want to proceed with this action? This action cannot be undone.</DialogDescription>
-        <div className="tw:mt-4 tw:flex tw:gap-2 tw:justify-end">
+      <Dialog open={open} data-size="medium" onClose={() => setOpen(false)}>
+        <DialogHeader>
+          <DialogHeading>Confirm Action</DialogHeading>
+        </DialogHeader>
+        <DialogBody>
+          <DialogDescription>Are you sure you want to proceed with this action? This action cannot be undone.</DialogDescription>
+        </DialogBody>
+        <DialogFooter>
           <Button variant="secondary" onClick={() => setOpen(false)}>
             Cancel
           </Button>
           <Button variant="danger" onClick={() => setOpen(false)}>
             Confirm
           </Button>
-        </div>
+        </DialogFooter>
       </Dialog>
     </>
   );
@@ -80,18 +109,22 @@ export function WithScrollableContent(): JSX.Element {
   return (
     <>
       <Button onClick={() => setOpen(true)}>Open Dialog with Scroll</Button>
-      <Dialog open={open} onClose={() => setOpen(false)} data-size="large">
-        <DialogHeading>Long Content Dialog</DialogHeading>
-        <DialogDescription>
-          {Array.from({ length: 20 }, (_, i) => (
-            <div key={i} className="tw:py-2">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-            </div>
-          ))}
-        </DialogDescription>
-        <div className="tw:mt-4">
+      <Dialog open={open} data-size="large" onClose={() => setOpen(false)}>
+        <DialogHeader>
+          <DialogHeading>Long Content Dialog</DialogHeading>
+        </DialogHeader>
+        <DialogBody>
+          <DialogDescription>
+            {Array.from({ length: 20 }, (_, i) => (
+              <div key={i} className="tw:py-2">
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+              </div>
+            ))}
+          </DialogDescription>
+        </DialogBody>
+        <DialogFooter>
           <DialogDismiss>Close</DialogDismiss>
-        </div>
+        </DialogFooter>
       </Dialog>
     </>
   );
@@ -103,12 +136,16 @@ export function SmallSize(): JSX.Element {
   return (
     <>
       <Button onClick={() => setOpen(true)}>Open Small Dialog</Button>
-      <Dialog open={open} onClose={() => setOpen(false)} data-size="small">
-        <DialogHeading>Small Dialog</DialogHeading>
-        <DialogDescription>This is a small dialog (404x262px)</DialogDescription>
-        <div className="tw:mt-4">
+      <Dialog open={open} data-size="small" onClose={() => setOpen(false)}>
+        <DialogHeader>
+          <DialogHeading>Small Dialog</DialogHeading>
+        </DialogHeader>
+        <DialogBody>
+          <DialogDescription>This is a small dialog (404x262px)</DialogDescription>
+        </DialogBody>
+        <DialogFooter>
           <DialogDismiss>Close</DialogDismiss>
-        </div>
+        </DialogFooter>
       </Dialog>
     </>
   );
@@ -138,6 +175,101 @@ export function SlideVariant(): JSX.Element {
             </Button>
           </div>
         </div>
+      </Dialog>
+    </>
+  );
+}
+
+export function NestedDialogs(): JSX.Element {
+  const [formValue, setFormValue] = useState('');
+  const [formOpen, setFormOpen] = useState(false);
+  const [warningOpen, setWarningOpen] = useState(false);
+
+  // Reset the form value whenever the dialog is closed
+  if (!formOpen && formValue) {
+    setFormValue('');
+  }
+
+  return (
+    <>
+      <Button onClick={() => setFormOpen(true)}>Create Post</Button>
+      <Dialog
+        autoFocusOnShow={!warningOpen}
+        open={formOpen}
+        data-size="medium"
+        backdrop
+        onClose={event => {
+          // If there's unsaved content, show warning dialog instead of closing
+          if (formValue.trim()) {
+            event.preventDefault();
+            setWarningOpen(true);
+          } else {
+            setFormOpen(false);
+          }
+        }}
+      >
+        <DialogHeader>
+          <DialogHeading>Create Post</DialogHeading>
+        </DialogHeader>
+        <DialogBody>
+          <form
+            onSubmit={event => {
+              event.preventDefault();
+              setFormOpen(false);
+            }}
+          >
+            <label className="tw:block">
+              <span className="tw:text-sm tw:font-medium tw:mb-2 tw:block">What's on your mind?</span>
+              <textarea
+                rows={5}
+                className="tw:w-full tw:px-3 tw:py-2 tw:border tw:border-gray-300 tw:rounded tw:resize-none focus:tw:outline-none focus:tw:ring-2 focus:tw:ring-blue-500"
+                placeholder="Share your thoughts..."
+                value={formValue}
+                autoFocus
+                onChange={event => setFormValue(event.target.value)}
+              />
+            </label>
+          </form>
+        </DialogBody>
+        <DialogFooter>
+          <Button variant="secondary" onClick={() => setFormOpen(false)}>
+            Cancel
+          </Button>
+          <Button variant="primary" disabled={!formValue.trim()} onClick={() => setFormOpen(false)}>
+            Post
+          </Button>
+        </DialogFooter>
+
+        {/* Nested warning dialog */}
+        <Dialog open={warningOpen} data-size="small" backdrop onClose={() => setWarningOpen(false)}>
+          <DialogHeader>
+            <DialogHeading>Save post?</DialogHeading>
+          </DialogHeader>
+          <DialogBody>
+            <DialogDescription>You can save this to send later from your drafts, or discard it.</DialogDescription>
+          </DialogBody>
+          <DialogFooter>
+            <Button
+              variant="secondary"
+              onClick={() => {
+                setFormValue('');
+                setWarningOpen(false);
+                setFormOpen(false);
+              }}
+            >
+              Discard
+            </Button>
+            <Button
+              variant="primary"
+              onClick={() => {
+                setWarningOpen(false);
+                setFormOpen(false);
+              }}
+            >
+              Save Draft
+            </Button>
+          </DialogFooter>
+        </Dialog>
       </Dialog>
     </>
   );

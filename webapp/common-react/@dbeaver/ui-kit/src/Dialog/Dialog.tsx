@@ -26,7 +26,7 @@ import {
   useDialogStore,
 } from '@ariakit/react';
 import clsx from 'clsx';
-import type { JSX } from 'react';
+import type { ComponentPropsWithoutRef, JSX } from 'react';
 
 import './Dialog.css';
 
@@ -38,6 +38,18 @@ function Dialog({ className, backdrop, ...props }: DialogProps): JSX.Element {
 
 function DialogDisclosure({ className, ...props }: DialogDisclosureProps): JSX.Element {
   return <AriakitDialogDisclosure className={clsx('dbv-kit-dialog__disclosure', className)} {...props} />;
+}
+
+function DialogHeader({ className, ...props }: ComponentPropsWithoutRef<'div'>): JSX.Element {
+  return <div className={clsx('dbv-kit-dialog__header', className)} {...props} />;
+}
+
+function DialogBody({ className, ...props }: ComponentPropsWithoutRef<'div'>): JSX.Element {
+  return <div className={clsx('dbv-kit-dialog__body', className)} {...props} />;
+}
+
+function DialogFooter({ className, ...props }: ComponentPropsWithoutRef<'div'>): JSX.Element {
+  return <div className={clsx('dbv-kit-dialog__footer', className)} {...props} />;
 }
 
 function DialogHeading({ className, ...props }: DialogHeadingProps): JSX.Element {
@@ -55,6 +67,9 @@ function DialogDismiss({ className, ...props }: DialogDismissProps): JSX.Element
 export {
   Dialog,
   DialogDisclosure,
+  DialogHeader,
+  DialogBody,
+  DialogFooter,
   DialogHeading,
   DialogDescription,
   DialogDismiss,

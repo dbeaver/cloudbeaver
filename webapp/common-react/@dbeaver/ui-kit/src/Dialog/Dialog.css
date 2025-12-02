@@ -26,7 +26,7 @@
     z-index: 1000;
     display: flex;
     flex-direction: column;
-    padding: var(--dbv-kit-dialog-content-padding);
+    padding: 0;
     background-color: var(--dbv-kit-dialog-content-background);
     color: var(--dbv-kit-dialog-content-foreground);
     border: none;
@@ -101,6 +101,27 @@
         }
       }
     }
+  }
+
+  .dbv-kit-dialog__header {
+    flex-shrink: 0;
+    padding: var(--dbv-kit-dialog-header-padding);
+    border-bottom: var(--dbv-kit-dialog-header-border-bottom);
+  }
+
+  .dbv-kit-dialog__body {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    padding: var(--dbv-kit-dialog-body-padding);
+  }
+
+  .dbv-kit-dialog__footer {
+    flex-shrink: 0;
+    padding: var(--dbv-kit-dialog-footer-padding);
+    border-top: var(--dbv-kit-dialog-footer-border-top);
+    display: flex;
+    gap: var(--dbv-kit-dialog-footer-gap);
+    justify-content: flex-end;
   }
 
   .dbv-kit-dialog__disclosure {

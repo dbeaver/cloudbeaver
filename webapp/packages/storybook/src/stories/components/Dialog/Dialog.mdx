@@ -2,37 +2,67 @@
 
 The Dialog component is a modal window built on top of [Ariakit Dialog](https://ariakit.org/components/dialog) that follows the WAI-ARIA Dialog Pattern.
 
-The Dialog provides minimal Ariakit primitives. Layout structure (header, body, footer) should be implemented at the application level (e.g., in CommonDialog).
+The Dialog provides a complete layout system with `DialogHeader`, `DialogBody`, and `DialogFooter` components that create a proper structure:
+
+- **Header** sticks to the top
+- **Body** takes all available space and scrolls when needed
+- **Footer** sticks to the bottom
 
 ## Usage
 
 The component exposes a flexible API that can be used with state management or with `DialogProvider`:
 
 ```tsx
-import { Dialog, DialogHeading, DialogDescription, DialogDismiss, DialogProvider, useDialogStore } from '@dbeaver/ui-kit';
+import {
+  Dialog,
+  DialogHeader,
+  DialogBody,
+  DialogFooter,
+  DialogHeading,
+  DialogDescription,
+  DialogDismiss,
+  DialogProvider,
+  useDialogStore,
+  Button,
+} from '@dbeaver/ui-kit';
 
 // Using state
 const [open, setOpen] = useState(false);
 
 <Dialog open={open} onClose={() => setOpen(false)} data-size="medium">
-  <DialogHeading>Dialog Title</DialogHeading>
-  <DialogDescription>Dialog content goes here</DialogDescription>
-  <div className="tw:mt-4">
-    <DialogDismiss>Close</DialogDismiss>
-  </div>
+  <DialogHeader>
+    <DialogHeading>Dialog Title</DialogHeading>
+  </DialogHeader>
+  <DialogBody>
+    <DialogDescription>Dialog content goes here</DialogDescription>
+  </DialogBody>
+  <DialogFooter>
+    <Button variant="secondary" onClick={() => setOpen(false)}>
+      Cancel
+    </Button>
+    <Button variant="primary" onClick={() => setOpen(false)}>
+      Confirm
+    </Button>
+  </DialogFooter>
 </Dialog>;
 
 // Using DialogProvider
 const dialog = useDialogStore();
 
 <DialogProvider store={dialog}>
-  <DialogDisclosure>Open Dialog</DialogDisclosure>
+  <DialogDisclosure>
+    <Button>Open Dialog</Button>
+  </DialogDisclosure>
   <Dialog data-size="medium">
-    <DialogHeading>Title</DialogHeading>
-    <DialogDescription>Content</DialogDescription>
-    <div className="tw:mt-4">
+    <DialogHeader>
+      <DialogHeading>Title</DialogHeading>
+    </DialogHeader>
+    <DialogBody>
+      <DialogDescription>Content</DialogDescription>
+    </DialogBody>
+    <DialogFooter>
       <DialogDismiss>Close</DialogDismiss>
-    </div>
+    </DialogFooter>
   </Dialog>
 </DialogProvider>;
 ```
@@ -41,6 +71,9 @@ const dialog = useDialogStore();
 
 - **Dialog** - Main dialog container, renders a modal window
 - **DialogDisclosure** - Button to open the dialog (requires DialogProvider)
+- **DialogHeader** - Header container that sticks to the top, typically contains DialogHeading
+- **DialogBody** - Scrollable body container that fills available space
+- **DialogFooter** - Footer container that sticks to the bottom, typically contains action buttons
 - **DialogHeading** - Dialog heading/title element (accessible label)
 - **DialogDescription** - Dialog description element (accessible description)
 - **DialogDismiss** - Button to close the dialog
@@ -89,6 +122,9 @@ The Dialog also supports a `slide` variant that creates a side panel appearing f
 
 - `.dbv-kit-dialog__content` - the main class name for the dialog container.
 - `.dbv-kit-dialog__disclosure` - the class name for the disclosure/trigger button.
+- `.dbv-kit-dialog__header` - the class name for the header container.
+- `.dbv-kit-dialog__body` - the class name for the scrollable body container.
+- `.dbv-kit-dialog__footer` - the class name for the footer container.
 - `.dbv-kit-dialog__heading` - the class name for the heading element.
 - `.dbv-kit-dialog__description` - the class name for the description element.
 - `.dbv-kit-dialog__dismiss` - the class name for the dismiss/close button.
@@ -97,9 +133,20 @@ The Dialog also supports a `slide` variant that creates a side panel appearing f
 
 The Dialog component supports customization through CSS variables.
 
-### CSS Variables
-
 ```css
+/* Container */
+--dbv-kit-dialog-content-background        /* #ffffff */
+--dbv-kit-dialog-content-foreground        /* #353535 */
+--dbv-kit-dialog-content-shadow            /* elevation-z10 */
+--dbv-kit-dialog-content-border-radius     /* 0.25rem */
+
+/* Layout */
+--dbv-kit-dialog-header-padding            /* 1rem 1.5rem */
+--dbv-kit-dialog-header-border-bottom      /* 1px solid rgba(0, 0, 0, 0.12) */
+--dbv-kit-dialog-body-padding              /* 1.5rem */
+--dbv-kit-dialog-footer-padding            /* 1rem 1.5rem */
+--dbv-kit-dialog-footer-border-top         /* 1px solid rgba(0, 0, 0, 0.12) */
+--dbv-kit-dialog-footer-gap                /* 0.75rem */
 /* Container */
 --dbv-kit-dialog-background                /* var(--theme-surface) */
 --dbv-kit-dialog-box-shadow                /* var(--elevation-z10) */
