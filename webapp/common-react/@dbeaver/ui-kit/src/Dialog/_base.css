@@ -4,16 +4,14 @@
     --dbv-kit-dialog-content-background: #ffffff;
     --dbv-kit-dialog-content-foreground: #353535;
     --dbv-kit-dialog-content-border-radius: 0.25rem;
-    --dbv-kit-dialog-content-shadow:
-      0px 11px 15px -7px rgba(0, 0, 0, 0.2), 0px 24px 38px 3px rgba(0, 0, 0, 0.14), 0px 9px 46px 8px rgba(0, 0, 0, 0.12);
-    --dbv-kit-dialog-content-padding: 0;
+    --dbv-kit-dialog-content-shadow: 0 6px 6px -3px #0003, 0 10px 14px 1px #00000024, 0 4px 18px 3px #0000001f;
 
     /* Dialog layout */
     --dbv-kit-dialog-header-padding: 1rem 1.5rem;
-    --dbv-kit-dialog-header-border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+    --dbv-kit-dialog-header-border-bottom: none;
     --dbv-kit-dialog-body-padding: 1.5rem;
     --dbv-kit-dialog-footer-padding: 1rem 1.5rem;
-    --dbv-kit-dialog-footer-border-top: 1px solid rgba(0, 0, 0, 0.12);
+    --dbv-kit-dialog-footer-border-top: none;
     --dbv-kit-dialog-footer-gap: 0.75rem;
 
     /* Dialog sizes */
@@ -30,7 +28,7 @@
     --dbv-kit-dialog-slide-transition-timing: ease-in-out;
 
     /* Backdrop */
-    --dbv-kit-dialog-backdrop-background: rgba(0, 0, 0, 0.5);
+    --dbv-kit-dialog-backdrop-background: #0000007a;
 
     /* Heading */
     --dbv-kit-dialog-heading-margin: 0;
