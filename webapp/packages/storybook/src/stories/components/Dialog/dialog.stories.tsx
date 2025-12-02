@@ -20,7 +20,7 @@ import {
   Button,
 } from '@dbeaver/ui-kit';
 import { Meta } from '@storybook/react-vite';
-import { useState } from 'react';
+import { JSX, useState } from 'react';
 
 const meta = {
   component: Dialog,
@@ -270,6 +270,35 @@ export function NestedDialogs(): JSX.Element {
             </Button>
           </DialogFooter>
         </Dialog>
+      </Dialog>
+    </>
+  );
+}
+
+export function WithoutAnimation(): JSX.Element {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <>
+      <Button onClick={() => setOpen(true)}>Open Dialog (No Animation)</Button>
+      <Dialog open={open} animated={false} data-size="medium" onClose={() => setOpen(false)}>
+        <DialogHeader>
+          <DialogHeading>Dialog Without Animation</DialogHeading>
+        </DialogHeader>
+        <DialogBody>
+          <DialogDescription>
+            This dialog has animations disabled using the <code>animated={'{false}'}</code> prop. This is useful when combining the dialog with other
+            animations (e.g., SlideElement) to avoid animation conflicts.
+          </DialogDescription>
+        </DialogBody>
+        <DialogFooter>
+          <Button variant="secondary" onClick={() => setOpen(false)}>
+            Cancel
+          </Button>
+          <Button variant="primary" onClick={() => setOpen(false)}>
+            Confirm
+          </Button>
+        </DialogFooter>
       </Dialog>
     </>
   );

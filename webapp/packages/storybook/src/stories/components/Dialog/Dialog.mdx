@@ -210,7 +210,16 @@ All components are thin wrappers around Ariakit:
 
 ### Dialog
 
-Inherits Ariakit `Dialog` props. Accepts `open`, `onClose`, `modal`, `portal`, `data-size`, and other standard dialog properties.
+Inherits Ariakit `Dialog` props. Accepts the following properties:
+
+- `open` - Controls dialog visibility
+- `onClose` - Callback when dialog is closed
+- `modal` - Whether the dialog is modal (default: true)
+- `portal` - Whether to render in a portal (default: true)
+- `animated` - Whether to animate dialog appearance (default: true). Set to `false` to disable animations, useful when combining with other animations. Note: animations are automatically disabled when user has `prefers-reduced-motion: reduce` enabled.
+- `data-size` - Dialog size: `'small'`, `'medium'`, or `'large'`
+- `data-variant` - Dialog variant: `'slide'` for side panel
+- Other standard Ariakit dialog properties
 
 ### DialogHeading
 
@@ -242,12 +251,10 @@ The Dialog component follows the [WAI-ARIA Dialog Pattern](https://www.w3.org/WA
 - Backdrop click closes the dialog
 - `DialogHeading` provides accessible label via `aria-labelledby`
 - `DialogDescription` provides accessible description via `aria-describedby`
-
-- Focus is automatically trapped within the dialog
-- The backdrop can be clicked to close the modal
-- Keyboard support for Escape key to close
+- **Animations automatically disabled** when user has `prefers-reduced-motion: reduce` setting enabled
 - Proper ARIA attributes for screen readers
 - Support for both modal and modeless dialogs
+- Keyboard navigation support
 
 ## Underlying Components
 

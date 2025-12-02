@@ -30,10 +30,14 @@ import type { ComponentPropsWithoutRef, JSX } from 'react';
 
 import './Dialog.css';
 
-function Dialog({ className, backdrop, ...props }: DialogProps): JSX.Element {
-  const backdropElement = backdrop === true ? <div className="dbv-kit-dialog__backdrop" /> : backdrop;
+interface ExtendedDialogProps extends DialogProps {
+  animated?: boolean;
+}
 
-  return <AriakitDialog className={clsx('dbv-kit-dialog__content', className)} backdrop={backdropElement} {...props} />;
+function Dialog({ className, backdrop, animated = true, ...props }: ExtendedDialogProps): JSX.Element {
+  const backdropElement = backdrop === true ? <div className="dbv-kit-dialog__backdrop" data-animated={animated} /> : backdrop;
+
+  return <AriakitDialog className={clsx('dbv-kit-dialog__content', className)} backdrop={backdropElement} data-animated={animated} {...props} />;
 }
 
 function DialogDisclosure({ className, ...props }: DialogDisclosureProps): JSX.Element {
@@ -76,7 +80,7 @@ export {
   DialogProvider,
   useDialogStore,
   useDialogContext,
-  type DialogProps,
+  type ExtendedDialogProps as DialogProps,
   type DialogProviderProps,
   type DialogDisclosureProps,
   type DialogHeadingProps,
