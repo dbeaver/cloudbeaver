@@ -42,19 +42,7 @@ export const UsersTable = observer<Props>(function UsersTable({ users, isManagea
   const usersAdministrationService = useService(UsersAdministrationService);
   const usersResource = useService(UsersResource);
 
-  const columns = useMemo(() => {
-    const result = [...COLUMNS];
-
-    if (displayAuthRole) {
-      const isRole = result.find(c => c.key === ROLE_COLUMN.key);
-
-      if (!isRole) {
-        result.push(ROLE_COLUMN);
-      }
-    }
-
-    return result;
-  }, [displayAuthRole]);
+  const columns = useMemo(() => (displayAuthRole ? [...COLUMNS, ROLE_COLUMN] : COLUMNS), [displayAuthRole]);
 
   const enableUser = useCallback(
     async (userId: AdminUserInfoFragment['userId'], enabled: boolean) => {
