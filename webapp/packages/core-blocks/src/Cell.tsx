@@ -11,9 +11,9 @@ import style from './Cell.module.css';
 import { Container } from './Containers/Container.js';
 import { s } from './s.js';
 import { useS } from './useS.js';
-import { Clickable, type ClickableProps } from './Clickable.js';
+import { Command, type CommandProps } from '@dbeaver/ui-kit';
 
-interface Props extends ClickableProps {
+interface Props extends CommandProps {
   description?: React.ReactNode | string;
   before?: React.ReactElement;
   after?: React.ReactElement;
@@ -28,7 +28,7 @@ export const Cell = observer(function Cell({ render, before, after, description,
   const styles = useS(style);
 
   return (
-    <Clickable {...rest} render={render ?? <div />} className={s(styles, { ripple, big }, className)}>
+    <Command {...rest} render={render ?? <div />} className={s(styles, { ripple, big }, className)}>
       <Container className={s(styles, { main: true })} gap parent center dense>
         {before && (
           <Container className={s(styles, { before: true })} keepSize>
@@ -47,6 +47,6 @@ export const Cell = observer(function Cell({ render, before, after, description,
           </Container>
         )}
       </Container>
-    </Clickable>
+    </Command>
   );
 });
