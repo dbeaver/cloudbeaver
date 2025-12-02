@@ -41,4 +41,9 @@ describe('ErrorMessage', () => {
     const { getByText } = renderInApp(<ErrorMessage text="error" />);
     await vi.waitFor(() => expect(getByText('error')).toBeInTheDocument());
   });
+
+  it('should have role="status"', async () => {
+    const { getByRole } = renderInApp(<ErrorMessage text="error" />);
+    await vi.waitFor(() => expect(getByRole('status')).toBeInTheDocument());
+  });
 });

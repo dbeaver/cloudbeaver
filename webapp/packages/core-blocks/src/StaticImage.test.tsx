@@ -51,29 +51,29 @@ describe('StaticImage', () => {
   });
 
   test('should render img element when icon is provided', () => {
-    const { container } = renderInApp(<StaticImage icon="/image.png" />);
-    const img = container.querySelector('img');
+    const { getByRole } = renderInApp(<StaticImage icon="/image.png" />);
+    const img = getByRole('img');
     expect(img).toBeInTheDocument();
   });
 
   test('should use valid URL as-is', () => {
     const validUrl = 'https://example.com/image.png';
-    const { container } = renderInApp(<StaticImage icon={validUrl} />);
-    const img = container.querySelector('img');
+    const { getByRole } = renderInApp(<StaticImage icon={validUrl} />);
+    const img = getByRole('img');
     expect(img).toHaveAttribute('src', validUrl);
   });
 
   test('should convert relative path to absolute URL', () => {
     const relativePath = '/icons/test.png';
-    const { container } = renderInApp(<StaticImage icon={relativePath} />);
-    const img = container.querySelector('img');
+    const { getByRole } = renderInApp(<StaticImage icon={relativePath} />);
+    const img = getByRole('img');
     expect(img).toHaveAttribute('src', `/absolute${relativePath}`);
   });
 
   test('should pass title prop as alt and title attributes', () => {
     const title = 'Test Image';
-    const { container } = renderInApp(<StaticImage icon="/image.png" title={title} />);
-    const img = container.querySelector('img');
+    const { getByRole } = renderInApp(<StaticImage icon="/image.png" title={title} />);
+    const img = getByRole('img');
     expect(img).toHaveAttribute('alt', title);
     expect(img).toHaveAttribute('title', title);
   });
@@ -87,37 +87,37 @@ describe('StaticImage', () => {
 
   test('should pass className prop', () => {
     const className = 'custom-class';
-    const { container } = renderInApp(<StaticImage icon="/image.png" className={className} />);
-    const img = container.querySelector('img');
+    const { getByRole } = renderInApp(<StaticImage icon="/image.png" className={className} />);
+    const img = getByRole('img');
     expect(img).toHaveClass(className);
   });
 
   test('should handle onClick event', () => {
     const handleClick = vi.fn();
-    const { container } = renderInApp(<StaticImage icon="/image.png" onClick={handleClick} />);
-    const img = container.querySelector('img');
+    const { getByRole } = renderInApp(<StaticImage icon="/image.png" onClick={handleClick} />);
+    const img = getByRole('img');
 
     fireEvent.click(img!);
     expect(handleClick).toHaveBeenCalledTimes(1);
   });
 
   test('should pass additional img props', () => {
-    const { container } = renderInApp(<StaticImage icon="/image.png" id="test-id" loading="lazy" crossOrigin="anonymous" />);
-    const img = container.querySelector('img');
+    const { getByRole } = renderInApp(<StaticImage icon="/image.png" id="test-id" loading="lazy" crossOrigin="anonymous" />);
+    const img = getByRole('img');
     expect(img).toHaveAttribute('id', 'test-id');
     expect(img).toHaveAttribute('loading', 'lazy');
     expect(img).toHaveAttribute('crossOrigin', 'anonymous');
   });
 
   test('should apply block class when block prop is true', () => {
-    const { container } = renderInApp(<StaticImage icon="/image.png" block />);
-    const img = container.querySelector('img');
+    const { getByRole } = renderInApp(<StaticImage icon="/image.png" block />);
+    const img = getByRole('img');
     expect(img).toHaveClass('block');
   });
 
   test('should not apply block class when block prop is false', () => {
-    const { container } = renderInApp(<StaticImage icon="/image.png" block={false} />);
-    const img = container.querySelector('img');
+    const { getByRole } = renderInApp(<StaticImage icon="/image.png" block={false} />);
+    const img = getByRole('img');
     expect(img).not.toHaveClass('block');
   });
 });

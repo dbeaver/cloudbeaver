@@ -24,54 +24,48 @@ vi.mock('@cloudbeaver/core-utils', () => ({
 
 vi.mock('./Icon.js', () => ({
   Icon: vi.fn(({ ...props }) => (
-    <svg {...props} data-testid="mock-icon" {...props}>
+    <svg {...props} role="svg">
       <use href={`/icons/icons.svg#${props.name}`} />
     </svg>
   )),
 }));
 
 vi.mock('./StaticImage.js', () => ({
-  StaticImage: vi.fn(({ ...props }) => <img {...props} data-testid="mock-static-image" />),
+  StaticImage: vi.fn(({ ...props }) => <img {...props} />),
 }));
-
-const STATIC_IMAGE_TEST_ID = 'mock-static-image';
-const ICON_TEST_ID = 'mock-icon';
 
 describe('IconOrImage', () => {
   test('should render StaticImage for platform: prefixed icon', () => {
-    const { queryByTestId } = renderInApp(<IconOrImage icon="platform:/image.png" />);
-    expect(queryByTestId(STATIC_IMAGE_TEST_ID)).toBeInTheDocument();
-    expect(queryByTestId(ICON_TEST_ID)).not.toBeInTheDocument();
+    const { getByRole } = renderInApp(<IconOrImage icon="platform:/image.png" />);
+    expect(getByRole('img')).toHaveAttribute('icon', 'platform:/image.png');
   });
 
   test('should render StaticImage for / prefixed icon', () => {
-    const { queryByTestId } = renderInApp(<IconOrImage icon="/image.jpg" />);
-    expect(queryByTestId(STATIC_IMAGE_TEST_ID)).toBeInTheDocument();
-    expect(queryByTestId(ICON_TEST_ID)).not.toBeInTheDocument();
+    const { getByRole } = renderInApp(<IconOrImage icon="/image.jpg" />);
+    expect(getByRole('img')).toHaveAttribute('icon', '/image.jpg');
   });
 
   test('should render StaticImage for valid URL', () => {
-    const { queryByTestId } = renderInApp(<IconOrImage icon="https://example.com/image.png" />);
-    expect(queryByTestId(STATIC_IMAGE_TEST_ID)).toBeInTheDocument();
-    expect(queryByTestId(ICON_TEST_ID)).not.toBeInTheDocument();
+    const { getByRole } = renderInApp(<IconOrImage icon="https://example.com/image.png" />);
+    expect(getByRole('img')).toHaveAttribute('icon', 'https://example.com/image.png');
   });
 
   test('should render Icon for regular icon name', () => {
-    const { queryByTestId } = renderInApp(<IconOrImage icon="test" />);
-    expect(queryByTestId(ICON_TEST_ID)).toBeInTheDocument();
-    expect(queryByTestId(STATIC_IMAGE_TEST_ID)).not.toBeInTheDocument();
+    const { getByRole } = renderInApp(<IconOrImage icon="test" />);
+    const svg = getByRole('svg');
+    expect(svg).toHaveAttribute('name', 'test');
   });
 
   test('should render Icon when svg prop is true even for platform: icon', () => {
-    const { queryByTestId } = renderInApp(<IconOrImage icon="platform:/image.png" svg />);
-    expect(queryByTestId(ICON_TEST_ID)).toBeInTheDocument();
-    expect(queryByTestId(STATIC_IMAGE_TEST_ID)).not.toBeInTheDocument();
+    const { getByRole } = renderInApp(<IconOrImage icon="platform:/image.png" svg />);
+    const svg = getByRole('svg');
+    expect(svg).toHaveAttribute('name', 'platform:/image.png');
   });
 
   test('should render Icon when svg prop is true even for URL', () => {
-    const { queryByTestId } = renderInApp(<IconOrImage icon="https://example.com/image.png" svg />);
-    expect(queryByTestId(ICON_TEST_ID)).toBeInTheDocument();
-    expect(queryByTestId(STATIC_IMAGE_TEST_ID)).not.toBeInTheDocument();
+    const { getByRole } = renderInApp(<IconOrImage icon="https://example.com/image.png" svg />);
+    const svg = getByRole('svg');
+    expect(svg).toHaveAttribute('name', 'https://example.com/image.png');
   });
 
   test('should pass all props to StaticImage', () => {
@@ -83,8 +77,8 @@ describe('IconOrImage', () => {
       width: 24,
       onClick: handleClick,
     };
-    const { getByTestId } = renderInApp(<IconOrImage {...props} />);
-    const element = getByTestId(STATIC_IMAGE_TEST_ID);
+    const { getByRole } = renderInApp(<IconOrImage {...props} />);
+    const element = getByRole('img');
 
     expect(element).toHaveClass(props.className!);
     expect(element).toHaveAttribute('title', props.title!);
@@ -104,8 +98,8 @@ describe('IconOrImage', () => {
       width: 24,
       onClick: handleClick,
     };
-    const { getByTestId } = renderInApp(<IconOrImage {...props} />);
-    const element = getByTestId(ICON_TEST_ID);
+    const { getByRole } = renderInApp(<IconOrImage {...props} />);
+    const element = getByRole('svg');
 
     expect(element).toHaveAttribute('name', props.icon);
     expect(element).toHaveClass(props.className!);
@@ -118,8 +112,8 @@ describe('IconOrImage', () => {
   });
 
   test('should use default viewBox for Icon when not provided', () => {
-    const { getByTestId } = renderInApp(<IconOrImage icon="test" />);
-    const element = getByTestId(ICON_TEST_ID);
+    const { getByRole } = renderInApp(<IconOrImage icon="svg" />);
+    const element = getByRole('svg');
     expect(element).toHaveAttribute('viewBox', '0 0 32 32');
   });
 });
