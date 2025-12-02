@@ -373,9 +373,6 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
         @NotNull WebSession webSession,
         @NotNull Map<String, Object> parameters
     ) throws DBWebException {
-        if (webSession.getUser() == null) {
-            throw new DBWebException("Preferences cannot be changed for anonymous user");
-        }
         try {
             webSession.getUserContext().getPreferenceStore().updatePreferenceValues(parameters);
             return new WebUserInfo(webSession, webSession.getUser());
