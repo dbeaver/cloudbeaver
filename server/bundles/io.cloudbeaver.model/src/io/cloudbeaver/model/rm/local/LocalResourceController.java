@@ -38,7 +38,7 @@ import org.jkiss.dbeaver.model.impl.app.BaseProjectImpl;
 import org.jkiss.dbeaver.model.impl.auth.SessionContextImpl;
 import org.jkiss.dbeaver.model.navigator.DBNLocalFolder;
 import org.jkiss.dbeaver.model.rm.*;
-import org.jkiss.dbeaver.model.security.SMController;
+import org.jkiss.dbeaver.model.security.SMAdminController;
 import org.jkiss.dbeaver.model.security.SMObjectType;
 import org.jkiss.dbeaver.model.sql.DBQuotaException;
 import org.jkiss.dbeaver.model.websocket.event.MessageType;
@@ -78,7 +78,7 @@ public class LocalResourceController extends BaseLocalResourceController {
     private final Path userProjectsPath;
     private final Path sharedProjectsPath;
     private final String globalProjectName;
-    private Supplier<SMController> smControllerSupplier;
+    private Supplier<SMAdminController> smControllerSupplier;
     protected final List<RMFileOperationHandler> fileHandlers;
 
     private final Map<String, RMLocalProject> projectRegistries = new LinkedHashMap<>();
@@ -89,7 +89,7 @@ public class LocalResourceController extends BaseLocalResourceController {
         Path rootPath,
         Path userProjectsPath,
         Path sharedProjectsPath,
-        Supplier<SMController> smControllerSupplier
+        Supplier<SMAdminController> smControllerSupplier
     ) throws DBException {
         super(workspace, new FileLockController(ServletAppUtils.getServletApplication().getApplicationInstanceId()));
         this.credentialsProvider = credentialsProvider;
@@ -102,7 +102,7 @@ public class LocalResourceController extends BaseLocalResourceController {
         this.fileHandlers = RMFileOperationHandlersRegistry.getInstance().getFileHandlers();
     }
 
-    protected SMController getSecurityController() {
+    protected SMAdminController getSecurityController() {
         return smControllerSupplier.get();
     }
 
@@ -339,6 +339,7 @@ public class LocalResourceController extends BaseLocalResourceController {
                 log.debug("Deleting project '" + projectId + "'");
                 IOUtils.deleteDirectory(targetPath);
                 getSecurityController().deleteAllObjectPermissions(projectId, SMObjectType.project);
+                getSecurityController().deleteAllObjectSettings(projectId, projectId, SMObjectType.project);
                 synchronized (projectRegistries) {
                     projectRegistries.remove(projectId);
                 }
@@ -1183,7 +1184,7 @@ public class LocalResourceController extends BaseLocalResourceController {
     public static Builder builder(
         SMCredentialsProvider credentialsProvider,
         DBPWorkspace workspace,
-        Supplier<SMController> smControllerSupplier
+        Supplier<SMAdminController> smControllerSupplier
     ) {
         return new Builder(workspace, credentialsProvider, smControllerSupplier);
     }
@@ -1195,7 +1196,7 @@ public class LocalResourceController extends BaseLocalResourceController {
 
     public static class Builder {
         protected final SMCredentialsProvider credentialsProvider;
-        protected final Supplier<SMController> smController;
+        protected final Supplier<SMAdminController> smController;
         protected final DBPWorkspace workspace;
 
         protected Path rootPath;
@@ -1204,7 +1205,7 @@ public class LocalResourceController extends BaseLocalResourceController {
 
         protected Builder(
             DBPWorkspace workspace, SMCredentialsProvider credentialsProvider,
-            Supplier<SMController> smControllerSupplier
+            Supplier<SMAdminController> smControllerSupplier
         ) {
             this.workspace = workspace;
             this.credentialsProvider = credentialsProvider;

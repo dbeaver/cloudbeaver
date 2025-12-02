@@ -218,6 +218,32 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         }
     }
 
+    @Override
+    public void deleteAllObjectSettings(
+        @NotNull String projectId,
+        @NotNull String objectId,
+        @NotNull SMObjectType objectType
+    ) throws DBException {
+        boolean projectDeleted = SMObjectType.project.equals(objectType) && projectId.equals(objectId);
+        String sql = "DELETE FROM {table_prefix}CB_OBJECT_SETTINGS WHERE PROJECT_ID=?";
+        if (!projectDeleted) {
+            sql += " AND OBJECT_ID=? AND OBJECT_TYPE=?";
+        }
+        try (Connection dbCon = database.openConnection()) {
+            try (PreparedStatement dbStat = dbCon.prepareStatement(sql)) {
+                int index = 1;
+                dbStat.setString(index++, projectId);
+                if (!projectDeleted) {
+                    dbStat.setString(index++, objectId);
+                    dbStat.setString(index++, objectType.name());
+                }
+                dbStat.executeUpdate();
+            }
+        } catch (SQLException e) {
+            throw new DBCException("Error while deleting object settings", e);
+        }
+    }
+
     protected boolean isSubjectExists(String subjectId) throws DBCException {
         try (Connection dbCon = database.openConnection()) {
             try (PreparedStatement dbStat = dbCon.prepareStatement(
@@ -3198,12 +3224,6 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         try (Connection dbCon = database.openConnection()) {
             JDBCUtils.executeStatement(dbCon,
                 "DELETE FROM {table_prefix}CB_OBJECT_PERMISSIONS WHERE OBJECT_TYPE=? AND OBJECT_ID=?",
-                objectType.name(),
-                objectId
-            );
-            JDBCUtils.executeStatement(
-                dbCon,
-                "DELETE FROM {table_prefix}CB_OBJECT_SETTINGS WHERE OBJECT_TYPE=? AND OBJECT_ID=?",
                 objectType.name(),
                 objectId
             );
