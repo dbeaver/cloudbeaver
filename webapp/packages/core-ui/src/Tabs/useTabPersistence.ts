@@ -14,12 +14,12 @@ import { isArraysEqual } from '@cloudbeaver/core-utils';
 
 import type { TabsContainer } from './TabsContainer/TabsContainer.js';
 
-interface ITabPersistenseState {
+interface ITabPersistenceState {
   selectedTabId: string | undefined;
 }
 
 export function useTabPersistence(panelId: string, container: TabsContainer) {
-  const state = useUserData<ITabPersistenseState>(panelId, () => ({ selectedTabId: undefined }));
+  const state = useUserData<ITabPersistenceState>(panelId, () => ({ selectedTabId: undefined }));
 
   const tabs = container.getIdList();
   const prevTabs = useRef<string[]>(tabs);

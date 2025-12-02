@@ -20,13 +20,15 @@ const panelGetter = () => UserProfileOptionsPanel;
 
 @injectable(() => [OptionsPanelService, UserInfoResource, UserProfileTabsService])
 export class UserProfileOptionsPanelService extends BaseOptionsPanelService<string | null> {
-  readonly onOpen: ISyncExecutor<void> = new SyncExecutor();
+  readonly onOpen: ISyncExecutor;
 
   constructor(
     optionsPanelService: OptionsPanelService,
     private readonly userInfoResource: UserInfoResource,
   ) {
     super(optionsPanelService, panelGetter);
+
+    this.onOpen = new SyncExecutor();
     this.userInfoResource.onDataUpdate.addHandler(this.userUpdateHandler.bind(this));
   }
 
