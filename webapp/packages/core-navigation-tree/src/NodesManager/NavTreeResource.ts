@@ -480,6 +480,11 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
 
       const preloaded = await this.preloadParents(nodeId);
       const parents = this.navNodeInfoResource.getParents(nodeId);
+      const isAllParentsLoaded = parents.every(parentId => this.navNodeInfoResource.has(parentId) && this.navNodeInfoResource.isLoaded(parentId));
+
+      if (isAllParentsLoaded) {
+        return;
+      }
 
       if (!preloaded) {
         const cause = new DetailsError(`Entity not found:\n"${nodeId}"\nPath:\n${parents.map(parent => `"${parent}"`).join('\n')}`);

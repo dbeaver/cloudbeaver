@@ -82,6 +82,12 @@ export class DBObjectResource extends CachedMapResource<string, DBObject> {
 
       for (const nodeId of key) {
         const preloaded = await this.navTreeResource.preloadParents(nodeId);
+        const parents = this.navNodeInfoResource.getParents(nodeId);
+        const isAllParentsLoaded = parents.every(parentId => this.navNodeInfoResource.has(parentId) && this.navNodeInfoResource.isLoaded(parentId));
+
+        if (isAllParentsLoaded) {
+          continue;
+        }
 
         if (!preloaded) {
           throw new DetailsError('Not found: ' + nodeId);
@@ -96,7 +102,7 @@ export class DBObjectResource extends CachedMapResource<string, DBObject> {
 
       await this.navTreeResource.load(resourceKeyList(parents));
 
-      if (key.length > 0 && !navNodeInfoResource.has(key)) {
+      if (key.length > 0 && !this.navNodeInfoResource.has(key)) {
         ExecutorInterrupter.interrupt(context);
         const cause = new DetailsError(`Entity not found: ${key.toString()}`);
         throw this.markError(cause, key);
