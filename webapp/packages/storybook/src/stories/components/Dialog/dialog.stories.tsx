@@ -219,7 +219,7 @@ export function NestedDialogs(): JSX.Element {
             }}
           >
             <label className="tw:block">
-              <span className="tw:text-sm tw:font-medium tw:mb-2 tw:block">What's on your mind?</span>
+              <span className="tw:text-sm tw:font-medium tw:mb-2 tw:block">What&apos;s on your mind?</span>
               <textarea
                 rows={5}
                 className="tw:w-full tw:px-3 tw:py-2 tw:border tw:border-gray-300 tw:rounded tw:resize-none focus:tw:outline-none focus:tw:ring-2 focus:tw:ring-blue-500"
