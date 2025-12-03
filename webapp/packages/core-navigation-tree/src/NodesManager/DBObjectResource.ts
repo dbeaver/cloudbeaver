@@ -25,7 +25,7 @@ import {
 import { DetailsError, GraphQLService } from '@cloudbeaver/core-sdk';
 
 import type { DBObject } from './EntityTypes.js';
-import { NavNodeInfoResource } from './NavNodeInfoResource.js';
+import { NavNodeInfoResource, ROOT_NODE_PATH } from './NavNodeInfoResource.js';
 import { NavTreeResource } from './NavTreeResource.js';
 
 export const DBObjectParentKey = resourceKeyListAliasFactory('@db-object/parent', (parentId: string) => ({ parentId }));
@@ -83,10 +83,18 @@ export class DBObjectResource extends CachedMapResource<string, DBObject> {
       for (const nodeId of key) {
         const preloaded = await this.navTreeResource.preloadParents(nodeId);
         const parents = this.navNodeInfoResource.getParents(nodeId);
-        const isAllParentsLoaded = parents.every(parentId => this.navNodeInfoResource.has(parentId) && this.navNodeInfoResource.isLoaded(parentId));
+        const rootParentId = parents.filter(nodeId => nodeId !== ROOT_NODE_PATH)[0];
 
-        if (isAllParentsLoaded) {
-          continue;
+        if (rootParentId) {
+          await this.navTreeResource.load(rootParentId);
+
+          const isAllParentsLoaded = this.navTreeResource.isLoaded(
+            CachedResourceOffsetPageKey(0, 0).setParent(CachedResourceOffsetPageTargetKey(rootParentId)),
+          );
+
+          if (isAllParentsLoaded) {
+            continue;
+          }
         }
 
         if (!preloaded) {

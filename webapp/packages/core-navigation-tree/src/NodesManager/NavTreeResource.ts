@@ -480,10 +480,16 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
 
       const preloaded = await this.preloadParents(nodeId);
       const parents = this.navNodeInfoResource.getParents(nodeId);
-      const isAllParentsLoaded = parents.every(parentId => this.navNodeInfoResource.has(parentId) && this.navNodeInfoResource.isLoaded(parentId));
+      const rootParentId = parents.filter(nodeId => nodeId !== ROOT_NODE_PATH)[0];
 
-      if (isAllParentsLoaded) {
-        return;
+      if (rootParentId) {
+        await this.load(rootParentId);
+
+        const isAllParentsLoaded = this.isLoaded(CachedResourceOffsetPageKey(0, 0).setParent(CachedResourceOffsetPageTargetKey(rootParentId)));
+
+        if (isAllParentsLoaded) {
+          return;
+        }
       }
 
       if (!preloaded) {
