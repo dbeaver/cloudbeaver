@@ -45,3 +45,4 @@ export { Icon, type IconProps } from './Icon/Icon.js';
 export * from './utils/clsx.js';
 export * from './ComponentProvider.js';
 export * from './Menu/Menu.js';
+export * from './Disclosure/Disclosure.js';

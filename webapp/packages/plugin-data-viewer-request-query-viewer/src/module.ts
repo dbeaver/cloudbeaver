@@ -10,6 +10,7 @@ import { Bootstrap, ModuleRegistry, proxy } from '@cloudbeaver/core-di';
 
 import { DataViewerRequestQueryViewerBootstrap } from './DataViewerRequestQueryViewerBootstrap.js';
 import { LocaleService } from './LocaleService.js';
+import { DataViewerRequestQueryViewerSettingsService } from './DataViewerRequestQueryViewerSettingsService.js';
 
 export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-data-viewer-request-query-viewer',
@@ -18,6 +19,7 @@ export default ModuleRegistry.add({
     serviceCollection
       .addSingleton(Bootstrap, proxy(DataViewerRequestQueryViewerBootstrap))
       .addSingleton(Bootstrap, LocaleService)
-      .addSingleton(DataViewerRequestQueryViewerBootstrap);
+      .addSingleton(DataViewerRequestQueryViewerBootstrap)
+      .addSingleton(DataViewerRequestQueryViewerSettingsService);
   },
 });

@@ -31,5 +31,7 @@
     --dbv-kit-select-item-hover-background: var(--tw-color-gray-200);
     --dbv-kit-select-item-hover-foreground: var(--dbv-kit-select-foreground);
     --dbv-kit-select-item-selected-background: var(--dbv-kit-color-primary-100);
+
+    --dbv-kit-select-disabled-arrow-icon-opacity: 0.5;
   }
 }

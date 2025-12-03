@@ -28,15 +28,13 @@ import { Link } from '../../Link.js';
 import { useTranslate } from '../../localization/useTranslate.js';
 import { evaluate } from '../evaluate.js';
 
-const RESERVED_KEYWORDS = ['no', 'off', 'new-password'];
-
 interface RenderFieldProps {
   property: ObjectPropertyInfo;
   state?: Record<string, any>;
   context?: Record<string, any>;
   defaultState?: Record<string, any>;
   editable?: boolean;
-  autofillToken?: string;
+  autocomplete?: string;
   disabled?: boolean;
   readOnly?: boolean;
   autoHide?: boolean;
@@ -53,7 +51,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
   defaultState,
   context,
   editable = true,
-  autofillToken = '',
+  autocomplete = '',
   disabled,
   autoHide,
   showRememberTip,
@@ -257,7 +255,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
         description={hint}
         placeholder={passwordSavedMessage}
         readOnly={readonly || disabled}
-        autoComplete={RESERVED_KEYWORDS.includes(autofillToken) ? autofillToken : `${autofillToken} ${property.id}`}
+        autoComplete={autocomplete}
         className={className}
         canShowPassword={canShowPassword}
         onFocus={onFocus}
@@ -279,7 +277,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
       description={hint}
       placeholder={passwordSavedMessage}
       readOnly={readonly || disabled}
-      autoComplete={RESERVED_KEYWORDS.includes(autofillToken) ? autofillToken : `${autofillToken} ${property.id}`}
+      autoComplete={autocomplete}
       className={className}
       canShowPassword={canShowPassword}
       onFocus={onFocus}

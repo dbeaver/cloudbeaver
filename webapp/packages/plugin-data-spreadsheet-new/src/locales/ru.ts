@@ -13,6 +13,7 @@ export default [
   ['data_grid_table_filter_cell_value', 'Значение ячейки'],
   ['data_grid_table_filter_custom_value', 'Произвольный'],
   ['data_grid_table_filter_reset_all_filters', 'Сбросить все фильтры'],
+  ['data_grid_table_filter_delete_for_column', 'Удалить фильтр для "{arg:column}"'],
   ['data_grid_table_disable_order', 'Отключена'],
   ['data_grid_table_disable_all_orders', 'Отменить сортировку всех колонок'],
   ['data_grid_table_delete_filters_and_orders', 'Отменить фильтры / сортировки'],

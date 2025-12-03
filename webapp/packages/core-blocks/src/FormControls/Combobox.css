@@ -31,3 +31,23 @@
     line-height: 1.25;
   }
 }
+
+@layer base.components {
+  .cb-combobox__disclosure-icon {
+    position: absolute;
+    right: calc(var(--tw-spacing) * 2);
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: var(--tw-text-sm);
+    line-height: var(--tw-leading, var(--tw-text-sm--line-height));
+    cursor: pointer;
+
+    & > svg {
+      fill: none !important;
+    }
+
+    &[aria-disabled='true'] {
+      color: var(--theme-input-color-disabled);
+    }
+  }
+}

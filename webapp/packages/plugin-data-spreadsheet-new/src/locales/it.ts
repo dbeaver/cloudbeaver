@@ -8,6 +8,7 @@ export default [
   ['data_grid_table_filter_cell_value', 'Valore della cella'],
   ['data_grid_table_filter_custom_value', 'Custom'],
   ['data_grid_table_filter_reset_all_filters', 'Reimposta tutti i filtri'],
+  ['data_grid_table_filter_delete_for_column', 'Elimina filtro per "{arg:column}"'],
   ['data_grid_table_disable_order', 'Disabilitato'],
   ['data_grid_table_disable_all_orders', 'Disabilita tutto'],
   ['data_grid_table_delete_filters_and_orders', "Reimposta i filtri / l'ordinamento"],

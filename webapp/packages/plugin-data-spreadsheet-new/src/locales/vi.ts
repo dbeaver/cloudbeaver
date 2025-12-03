@@ -13,6 +13,7 @@ export default [
   ['data_grid_table_filter_cell_value', 'Giá trị ô'],
   ['data_grid_table_filter_custom_value', 'Tùy chỉnh'],
   ['data_grid_table_filter_reset_all_filters', 'Đặt lại tất cả bộ lọc'],
+  ['data_grid_table_filter_delete_for_column', 'Xóa bộ lọc cho "{arg:column}"'],
   ['data_grid_table_disable_order', 'Đã tắt'],
   ['data_grid_table_disable_all_orders', 'Tắt tất cả'],
   ['data_grid_table_delete_filters_and_orders', 'Đặt lại bộ lọc / sắp xếp'],
