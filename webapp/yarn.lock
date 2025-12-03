@@ -1664,6 +1664,7 @@ __metadata:
     rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
+    vitest: "npm:^3"
   languageName: unknown
   linkType: soft
 
