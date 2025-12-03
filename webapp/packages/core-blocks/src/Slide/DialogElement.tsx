@@ -7,7 +7,7 @@
  */
 
 import { Dialog, IconButton } from '@dbeaver/ui-kit';
-import { SlideElement, Icon, Loader, s, useS } from '@cloudbeaver/core-blocks';
+import { SlideElement, Icon, Loader, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
 
 interface RightPanelProps {
   children?: React.ReactNode;
@@ -20,6 +20,7 @@ import style from './DialogElement.module.css';
 //TODO: introduced to support legacy layout, to be removed later in https://github.com/dbeaver/pro/issues/7696
 export function DialogElement({ children, isOpen, onClose }: RightPanelProps): React.ReactElement {
   const styles = useS(style);
+  const t = useTranslate();
   return (
     <SlideElement>
       <Dialog
@@ -35,7 +36,12 @@ export function DialogElement({ children, isOpen, onClose }: RightPanelProps): R
         <Loader className={s(styles, { loader: true })} suspense>
           {children}
         </Loader>
-        <IconButton size="small" aria-label="Close panel" className={s(styles, { iconBtn: true })} onClick={onClose}>
+        <IconButton
+          size="small"
+          aria-label={t('core_blocks_dialog_element_close_tooltip')}
+          className={s(styles, { iconBtn: true })}
+          onClick={onClose}
+        >
           <Icon name="cross" viewBox="0 0 24 24" />
         </IconButton>
       </Dialog>
