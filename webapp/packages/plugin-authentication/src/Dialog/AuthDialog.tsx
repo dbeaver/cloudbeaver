@@ -149,12 +149,7 @@ export const AuthDialog: DialogComponent<IAuthOptions> = observer(function AuthD
         state.switchAuthMode(tabData.tabId);
       }}
     >
-      <CommonDialogWrapper
-        className={s(styles, { wrapper: true })}
-        size="large"
-        aria-label={translate('authentication_login_dialog_title')}
-        autofocus={false}
-      >
+      <CommonDialogWrapper className={s(styles, { wrapper: true })} size="large" aria-label={translate('authentication_login_dialog_title')}>
         <CommonDialogHeader
           title={dialogTitle}
           tooltip={tooltip}

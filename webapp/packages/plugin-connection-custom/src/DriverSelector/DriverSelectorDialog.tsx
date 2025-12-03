@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ export const DriverSelectorDialog: DialogComponent<Payload> = observer(function 
   });
 
   return (
-    <CommonDialogWrapper size="large" autofocus={false} fixedSize>
+    <CommonDialogWrapper size="large" fixedSize>
       <CommonDialogHeader title={translate('plugin_connections_new_connection_dialog_title')} />
       <CommonDialogBody noBodyPadding noOverflow>
         <DriverSelector className={s(style, { driverSelector: true })} drivers={dialog.drivers} onSelect={dialog.select} />
