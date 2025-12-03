@@ -96,6 +96,7 @@ export * from './PropertiesTable/IProperty.js';
 export * from './Slide/SlideBox.js';
 export * from './Slide/SlideElement.js';
 export * from './Slide/SlideOverlay.js';
+export * from './Slide/DialogElement.js';
 
 export * from './Split/SplitControls.js';
 export * from './Split/Pane.js';

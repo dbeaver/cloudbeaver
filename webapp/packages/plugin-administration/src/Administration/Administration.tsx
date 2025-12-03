@@ -15,8 +15,6 @@ import {
   type IAdministrationItemRoute,
 } from '@cloudbeaver/core-administration';
 import {
-  Icon,
-  Loader,
   s,
   SContext,
   SlideBox,
@@ -27,13 +25,13 @@ import {
   ToolsPanelStyles,
   useAutoLoad,
   useS,
+  DialogElement,
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { OptionsPanelService, TabList, TabListStyles, TabsState, TabStyles } from '@cloudbeaver/core-ui';
 import type { ILoadableState } from '@cloudbeaver/core-utils';
 import { CaptureView } from '@cloudbeaver/core-view';
 import { SupportService } from '@cloudbeaver/core-support';
-import { Dialog, IconButton } from '@dbeaver/ui-kit';
 
 import { AdministrationCaptureViewContext } from './AdministrationCaptureViewContext.js';
 import { AdministrationViewService } from './AdministrationViewService.js';
@@ -148,26 +146,11 @@ export const Administration = observer<React.PropsWithChildren<Props>>(function 
                 </div>
               </SlideElement>
               <SlideOverlay onClick={close} />
-              <SlideElement className={s(styles, { slideElement: true })}>
-                <Dialog
-                  portal={false}
-                  unmountOnHide={false}
-                  animated={false}
-                  data-size="free"
-                  open={optionsPanelService.active}
-                  className="tw:w-full tw:h-full tw:overflow-visible! tw:bg-transparent!"
-                  onClose={close}
-                >
-                  <Loader className={s(styles, { loader: true })} suspense>
-                    <div className={s(styles, { content: true })}>
-                      <OptionsPanel />
-                    </div>
-                  </Loader>
-                  <IconButton size="small" aria-label="Close panel" className={s(styles, { iconBtn: true })} onClick={close}>
-                    <Icon name="cross" viewBox="0 0 24 24" />
-                  </IconButton>
-                </Dialog>
-              </SlideElement>
+              <DialogElement isOpen={optionsPanelService.active} onClose={close}>
+                <div className={s(styles, { content: true })}>
+                  <OptionsPanel />
+                </div>
+              </DialogElement>
             </SlideBox>
           </SContext>
         </div>

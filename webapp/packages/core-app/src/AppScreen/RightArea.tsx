@@ -8,7 +8,6 @@
 import { observer } from 'mobx-react-lite';
 
 import {
-  Icon,
   Loader,
   Pane,
   Placeholder,
@@ -20,13 +19,13 @@ import {
   Split,
   useS,
   useSplitUserState,
+  DialogElement,
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { OptionsPanelService } from '@cloudbeaver/core-ui';
 
 import { AppScreenService } from './AppScreenService.js';
 import style from './RightArea.module.css';
-import { Dialog, IconButton } from '@dbeaver/ui-kit';
 
 interface Props {
   className?: string;
@@ -64,25 +63,9 @@ export const RightArea = observer<Props>(function RightArea({ className }) {
         </Split>
       </SlideElement>
       <SlideOverlay onClick={close} />
-
-      <SlideElement>
-        <Dialog
-          portal={false}
-          unmountOnHide={false}
-          animated={false}
-          data-size="free"
-          open={optionsPanelService.active}
-          className="tw:w-full tw:h-full tw:overflow-visible! tw:bg-transparent!"
-          onClose={close}
-        >
-          <Loader className={s(styles, { loader: true })} suspense>
-            <OptionsPanel />
-          </Loader>
-          <IconButton size="small" aria-label="Close panel" className={s(styles, { iconBtn: true })} onClick={close}>
-            <Icon name="cross" viewBox="0 0 24 24" />
-          </IconButton>
-        </Dialog>
-      </SlideElement>
+      <DialogElement isOpen={optionsPanelService.active} onClose={close}>
+        <OptionsPanel />
+      </DialogElement>
     </SlideBox>
   );
 });
