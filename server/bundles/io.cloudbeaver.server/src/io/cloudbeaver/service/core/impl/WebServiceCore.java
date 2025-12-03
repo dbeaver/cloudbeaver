@@ -744,8 +744,11 @@ public class WebServiceCore implements DBWServiceCore {
     }
 
     @Override
-    public WebConnectionInfo clearConnectionNavigatorSettings(@NotNull WebSession webSession, @NotNull String projectId, @NotNull String id)
-    throws DBWebException {
+    public WebConnectionInfo clearConnectionNavigatorSettings(
+        @NotNull WebSession webSession,
+        @NotNull String projectId,
+        @NotNull String id
+    ) throws DBWebException {
         WebConnectionInfo connectionInfo = WebDataSourceUtils.getWebConnectionInfo(webSession, projectId, id);
         DataSourceDescriptor dataSourceDescriptor = ((DataSourceDescriptor) connectionInfo.getDataSourceContainer());
         try {

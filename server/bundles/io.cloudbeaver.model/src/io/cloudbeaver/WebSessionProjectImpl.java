@@ -41,10 +41,7 @@ import org.jkiss.dbeaver.runtime.jobs.DisconnectJob;
 import org.jkiss.utils.CommonUtils;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class WebSessionProjectImpl extends WebProjectImpl {
@@ -89,6 +86,36 @@ public class WebSessionProjectImpl extends WebProjectImpl {
     @Override
     public DBNModel getNavigatorModel() {
         return webSession.getNavigatorModel();
+    }
+
+    public Map<String, Object> getObjectSettings(@NotNull String objectId) {
+        return projectSettings.get(objectId);
+    }
+
+    public void deleteObjectSettings(@NotNull String objectId, @NotNull List<String> settingIds) throws DBException {
+        webSession.getSecurityController().deleteObjectSettings(
+            getId(),
+            objectId,
+            SMObjectType.datasource,
+            new LinkedHashSet<>(settingIds)
+        );
+        for (String settingId : settingIds) {
+            Map<String, Object> settings = projectSettings.get(objectId);
+            if (settings != null) {
+                settings.remove(settingId);
+            }
+        }
+    }
+
+    public void setObjectSettings(@NotNull String objectId, Map<String, Object> settingsToSet) throws DBException {
+        webSession.getSecurityController().setObjectSettings(
+            getId(),
+            objectId,
+            SMObjectType.datasource,
+            settingsToSet
+        );
+        Map<String, Object> settings = projectSettings.computeIfAbsent(objectId, k -> new HashMap<>());
+        settings.putAll(settingsToSet);
     }
 
     @NotNull
