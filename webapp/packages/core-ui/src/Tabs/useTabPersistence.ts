@@ -6,11 +6,12 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { useCallback, useMemo, useRef } from 'react';
-import { untracked, action } from 'mobx';
+import { useCallback, useRef } from 'react';
+import { runInAction } from 'mobx';
 
 import { useUserData, useExecutor } from '@cloudbeaver/core-blocks';
 import { isArraysEqual } from '@cloudbeaver/core-utils';
+import { isDefined } from '@dbeaver/js-helpers';
 
 import type { TabsContainer } from './TabsContainer/TabsContainer.js';
 
@@ -41,31 +42,31 @@ export function useTabPersistence(panelId: string, container: TabsContainer) {
     ],
   });
 
-  untracked(
-    action(() => {
-      if (!equal) {
-        for (const id of tabs) {
-          if (!prevTabs.current.includes(id)) {
-            state.selectedTabId = id;
-            break;
-          }
-        }
-
-        prevTabs.current = tabs;
-      }
-
-      if (state.selectedTabId) {
-        if (!tabs.includes(state.selectedTabId)) {
-          if (tabs.length > 0) {
-            state.selectedTabId = tabs[0];
-          } else {
-            state.selectedTabId = undefined;
-          }
+  runInAction(() => {
+    if (!equal) {
+      for (const id of tabs) {
+        if (!prevTabs.current.includes(id)) {
+          state.selectedTabId = id;
+          break;
         }
       }
-    }),
-  );
 
-  const result = useMemo(() => ({ selectedTabId: state.selectedTabId, selectTab }), [state.selectedTabId, selectTab]);
-  return result;
+      prevTabs.current = tabs;
+    }
+
+    if (isDefined(state.selectedTabId)) {
+      if (!tabs.includes(state.selectedTabId)) {
+        if (tabs.length > 0) {
+          state.selectedTabId = tabs[0];
+        } else {
+          state.selectedTabId = undefined;
+        }
+      }
+    }
+  });
+
+  return {
+    selectedTabId: state.selectedTabId,
+    selectTab,
+  };
 }

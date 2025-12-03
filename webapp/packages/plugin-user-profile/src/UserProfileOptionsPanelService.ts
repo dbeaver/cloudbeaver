@@ -19,7 +19,7 @@ const UserProfileOptionsPanel = importLazyComponent(() => import('./UserProfileO
 const panelGetter = () => UserProfileOptionsPanel;
 
 @injectable(() => [OptionsPanelService, UserInfoResource, UserProfileTabsService])
-export class UserProfileOptionsPanelService extends BaseOptionsPanelService<string | null> {
+export class UserProfileOptionsPanelService extends BaseOptionsPanelService<string | undefined> {
   readonly onOpen: ISyncExecutor;
 
   constructor(
@@ -32,7 +32,7 @@ export class UserProfileOptionsPanelService extends BaseOptionsPanelService<stri
     this.userInfoResource.onDataUpdate.addHandler(this.userUpdateHandler.bind(this));
   }
 
-  override async open(tabId: string | null): Promise<boolean> {
+  override async open(tabId?: string): Promise<boolean> {
     const state = await super.open(tabId);
 
     if (state) {

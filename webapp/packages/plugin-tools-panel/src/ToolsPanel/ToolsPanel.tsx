@@ -15,7 +15,7 @@ import { TabList, TabPanelList, TabsState, useTabOrderPersistence, useTabPersist
 import styles from './ToolsPanel.module.css';
 import { ToolsPanelService } from './ToolsPanelService.js';
 
-const PANEL_ID = 'dbeaver-tools-panel';
+const PANEL_ID = 'tools-panel';
 
 export const ToolsPanel = observer(function ToolsPanel() {
   const toolsPanelService = useService(ToolsPanelService);

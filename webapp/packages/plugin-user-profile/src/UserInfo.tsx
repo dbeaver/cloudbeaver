@@ -28,7 +28,7 @@ export const UserInfo = observer<Props>(function UserInfo({ info }) {
       as="div"
       className={s(style, { user: true })}
       title={translate('plugin_user_profile_menu')}
-      onClick={() => userProfileOptionsPanelService.open(null)}
+      onClick={() => userProfileOptionsPanelService.open()}
     >
       <IconOrImage className={s(style, { iconOrImage: true })} icon="/icons/plugin_user_profile_m.svg" />
       <div className={s(style, { userName: true })}>{info.displayName || info.userId}</div>

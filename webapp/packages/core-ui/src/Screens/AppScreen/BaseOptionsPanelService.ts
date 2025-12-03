@@ -44,13 +44,9 @@ export abstract class BaseOptionsPanelService<T> {
       return true;
     }
 
-    this.itemId = itemId;
-
-    const state = await this.optionsPanelService.open(this.panelGetter);
-
-    if (!state) {
-      this.itemId = null;
-    }
+    const state = await this.optionsPanelService.open(this.panelGetter, () => {
+      this.itemId = itemId;
+    });
 
     return state;
   }
