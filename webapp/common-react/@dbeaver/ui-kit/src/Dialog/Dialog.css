@@ -96,6 +96,13 @@
       max-height: max(var(--app-height, 100vh) - 48px, var(--dbv-kit-dialog-large-height));
     }
 
+    &[data-size='free'] {
+      min-width: auto;
+      min-height: auto;
+      max-width: calc(100vw - 48px);
+      max-height: calc(100vh - 48px);
+    }
+
     /* Slide variant (side panel from right) */
     &[data-variant='slide'] {
       position: absolute;

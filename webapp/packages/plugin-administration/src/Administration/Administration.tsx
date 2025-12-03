@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@ import {
   type IAdministrationItemRoute,
 } from '@cloudbeaver/core-administration';
 import {
+  Icon,
   Loader,
   s,
   SContext,
@@ -32,6 +33,7 @@ import { OptionsPanelService, TabList, TabListStyles, TabsState, TabStyles } fro
 import type { ILoadableState } from '@cloudbeaver/core-utils';
 import { CaptureView } from '@cloudbeaver/core-view';
 import { SupportService } from '@cloudbeaver/core-support';
+import { Dialog, IconButton } from '@dbeaver/ui-kit';
 
 import { AdministrationCaptureViewContext } from './AdministrationCaptureViewContext.js';
 import { AdministrationViewService } from './AdministrationViewService.js';
@@ -139,19 +141,32 @@ export const Administration = observer<React.PropsWithChildren<Props>>(function 
         <div ref={contentRef} className={s(styles, { contentContainer: true })}>
           {children}
           <SContext registry={adminPageRegistry}>
-            <SlideBox className={s(styles, { slideBox: true })} open={optionsPanelService.active} onClose={close}>
+            <SlideBox className={s(styles, { slideBox: true })} open={optionsPanelService.active}>
               <SlideElement className={s(styles, { slideElement: true })}>
                 <div className={s(styles, { content: true })}>
                   <ItemContent activeScreen={activeScreen} configurationWizard={configurationWizard} />
                 </div>
-                <SlideOverlay onClick={close} />
               </SlideElement>
+              <SlideOverlay onClick={close} />
               <SlideElement className={s(styles, { slideElement: true })}>
-                <Loader className={s(styles, { loader: true })} suspense>
-                  <div className={s(styles, { content: true })}>
-                    <OptionsPanel />
-                  </div>
-                </Loader>
+                <Dialog
+                  portal={false}
+                  unmountOnHide={false}
+                  animated={false}
+                  data-size="free"
+                  open={optionsPanelService.active}
+                  className="tw:w-full tw:h-full tw:overflow-visible! tw:bg-transparent!"
+                  onClose={close}
+                >
+                  <Loader className={s(styles, { loader: true })} suspense>
+                    <div className={s(styles, { content: true })}>
+                      <OptionsPanel />
+                    </div>
+                  </Loader>
+                  <IconButton size="small" aria-label="Close panel" className={s(styles, { iconBtn: true })} onClick={close}>
+                    <Icon name="cross" viewBox="0 0 24 24" />
+                  </IconButton>
+                </Dialog>
               </SlideElement>
             </SlideBox>
           </SContext>

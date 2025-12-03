@@ -70,6 +70,7 @@ export const RightArea = observer<Props>(function RightArea({ className }) {
           portal={false}
           unmountOnHide={false}
           animated={false}
+          data-size="free"
           open={optionsPanelService.active}
           className="tw:w-full tw:h-full tw:overflow-visible! tw:bg-transparent!"
           onClose={close}
