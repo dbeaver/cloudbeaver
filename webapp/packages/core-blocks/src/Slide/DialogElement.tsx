@@ -23,8 +23,9 @@ export function DialogElement({ children, isOpen, onClose }: RightPanelProps): R
   return (
     <SlideElement>
       <Dialog
-        portal={false}
-        unmountOnHide={false}
+        modal={false}
+        backdrop={false}
+        autoFocusOnShow={false}
         animated={false}
         data-size="free"
         open={isOpen}
