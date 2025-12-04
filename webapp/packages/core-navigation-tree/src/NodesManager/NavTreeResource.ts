@@ -164,7 +164,7 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
   }
 
   async refreshTree(navNodeId: string, silent = false): Promise<void> {
-    this.performUpdate(navNodeId, [], async () => {
+    await this.performUpdate(navNodeId, [], async () => {
       await this.graphQLService.sdk.navRefreshNode({
         nodePath: navNodeId,
       });
@@ -177,7 +177,7 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
   }
 
   async refreshNode(navNodeId: string, silent = false): Promise<void> {
-    this.performUpdate(navNodeId, [], async () => {
+    await this.performUpdate(navNodeId, [], async () => {
       await this.graphQLService.sdk.navRefreshNode({
         nodePath: navNodeId,
       });
@@ -284,7 +284,7 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
       include,
     });
 
-    this.refreshNode(nodePath);
+    await this.refreshNode(nodePath);
   }
 
   async changeName(node: NavNode, name: string): Promise<string> {
