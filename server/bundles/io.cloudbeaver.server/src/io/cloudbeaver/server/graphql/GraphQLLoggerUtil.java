@@ -22,9 +22,11 @@ import io.cloudbeaver.WebParameterSecure;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.WebAppUtils;
 import io.cloudbeaver.server.WebApplication;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
+import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
-import org.jkiss.dbeaver.Log;
 import org.jkiss.utils.CommonUtils;
 
 import java.lang.reflect.Method;
@@ -33,12 +35,12 @@ import java.util.StringJoiner;
 
 public class GraphQLLoggerUtil {
 
-    private static final Log log = Log.getLog(GraphQLLoggerUtil.class);
     public static final String LOG_API_GRAPHQL_DEBUG_PARAMETER = "log.api.graphql.debug";
     public static final Gson GSON = new GsonBuilder().create();
     public static final String MASK_STRING = "****";
 
-    public static String getUserId(HttpServletRequest request) {
+    @Nullable
+    public static String getUserId(@NotNull HttpServletRequest request) {
         WebSession session = getWebSession(request);
         if (session == null) {
             return null;
@@ -50,7 +52,8 @@ public class GraphQLLoggerUtil {
         return userId;
     }
 
-    public static String getSmSessionId(HttpServletRequest request) {
+    @Nullable
+    public static String getSmSessionId(@NotNull HttpServletRequest request) {
         WebSession session = getWebSession(request);
         if (session == null) {
             return null;
@@ -59,7 +62,7 @@ public class GraphQLLoggerUtil {
     }
 
     @Nullable
-    public static WebSession getWebSession(HttpServletRequest request) {
+    public static WebSession getWebSession(@NotNull HttpServletRequest request) {
         if (request.getSession() == null) {
             return null;
         }
@@ -69,10 +72,16 @@ public class GraphQLLoggerUtil {
             .findWebSession(request);
     }
 
-    public static String buildLoggerMessage(String sessionId, String userId, Method method, Object[] args) {
+    @NotNull
+    public static String buildLoggerMessage(
+        @NotNull String sessionId,
+        @NotNull String userId,
+        @NotNull Method method,
+        @NotNull Object[] args
+    ) {
         StringBuilder sb = new StringBuilder(64)
-            .append(" [user: ").append(userId)
-            .append(", sessionId: ").append(sessionId)
+            .append(" [").append(userId)
+            .append(", session: ").append(sessionId)
             .append("]");
 
         if (WebAppUtils.getWebPlatform().getPreferenceStore().getBoolean(LOG_API_GRAPHQL_DEBUG_PARAMETER)) {
@@ -86,7 +95,8 @@ public class GraphQLLoggerUtil {
         return sb.toString();
     }
 
-    public static String maskArgsToString(Method method, Object[] args) {
+    @NotNull
+    public static String maskArgsToString(@NotNull Method method, @Nullable Object[] args) {
         Parameter[] params = method.getParameters();
         if (params.length == 0 || args == null || args.length == 0) {
             return "";
@@ -97,7 +107,7 @@ public class GraphQLLoggerUtil {
 
         for (int i = 0; i < limit; i++) {
             Object value = args[i];
-            if (value instanceof WebSession) {
+            if (value instanceof WebSession || value instanceof ServletRequest || value instanceof ServletResponse) {
                 //we already log sessionId
                 continue;
             }

@@ -47,6 +47,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class CBJettyServer {
@@ -195,11 +196,15 @@ public class CBJettyServer {
                     log.debug("\t" + sm.getServletName() + ": " + Arrays.toString(sm.getPathSpecs())); //$NON-NLS-1$
                 }
 
-                log.debug("Active websocket mappings:");
-                for (String mapping : webSocketContext.getMappings()) {
-                    log.debug("\t" + mapping);
+                List<String> wsMappings = webSocketContext.getMappings();
+                if (!wsMappings.isEmpty()) {
+                    log.debug("Active websocket mappings:");
+                    for (String mapping : wsMappings) {
+                        log.debug("\t" + mapping);
+                    }
+                } else {
+                    log.debug("No websocket mappings");
                 }
-
             }
 
             boolean forwardProxy = application.getAppConfiguration().isEnabledForwardProxy();
