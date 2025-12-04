@@ -19,6 +19,7 @@ import {
   CachedResourceOffsetPageTargetKey,
   getOffsetPageKeyInfo,
   type ICachedResourceMetadata,
+  hasMorePagesForNode,
   isResourceAlias,
   isResourceKeyList,
   ResourceError,
@@ -131,6 +132,8 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
     if (parents.length === 0) {
       return true;
     }
+
+    const hasMorePagesForRootNode = hasMorePagesForNode(this.offsetPagination, parents[0]!);
     parents = [...parents];
 
     let parent: string | undefined;
@@ -138,9 +141,11 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
 
     while (parents.length > 0) {
       const next = parents.shift()!;
-      if (parent !== undefined && !children.includes(next)) {
+
+      if (parent !== undefined && !children.includes(next) && hasMorePagesForRootNode) {
         return false;
       }
+
       await this.scheduler.waitRelease(next);
 
       if (this.isLoadable(next)) {
@@ -151,7 +156,7 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
       parent = next;
     }
 
-    if (nextNode !== undefined && !children.includes(nextNode)) {
+    if (nextNode !== undefined && !children.includes(nextNode) && hasMorePagesForRootNode) {
       return false;
     }
 
