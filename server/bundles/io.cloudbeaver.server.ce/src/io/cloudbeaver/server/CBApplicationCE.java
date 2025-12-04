@@ -77,6 +77,7 @@ public class CBApplicationCE extends CBApplication<CBServerConfig> {
 
 
 
+    @NotNull
     @Override
     public RMController createResourceController(@NotNull SMCredentialsProvider credentialsProvider,
                                                  @NotNull DBPWorkspace workspace) throws DBException {
