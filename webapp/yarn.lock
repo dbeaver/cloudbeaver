@@ -2890,6 +2890,7 @@ __metadata:
     "@cloudbeaver/tsconfig": "workspace:*"
     "@dbeaver/cli": "workspace:*"
     "@dbeaver/react-tests": "workspace:*"
+    "@dbeaver/react-translate": "workspace:*"
     "@dbeaver/result-set-api": "workspace:*"
     "@dbeaver/ui-kit": "workspace:*"
     "@types/react": "npm:^19"
@@ -4857,6 +4858,7 @@ __metadata:
   dependencies:
     "@dbeaver/js-helpers": "workspace:*"
     "@dbeaver/react-dnd": "workspace:^"
+    "@dbeaver/react-translate": "workspace:^"
     "@dbeaver/tsconfig": "workspace:^"
     "@dbeaver/ui-kit": "workspace:^"
     "@types/react": "npm:^19"
@@ -4900,7 +4902,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@dbeaver/react-translate@workspace:^, @dbeaver/react-translate@workspace:common-react/@dbeaver/react-translate":
+"@dbeaver/react-translate@workspace:*, @dbeaver/react-translate@workspace:^, @dbeaver/react-translate@workspace:common-react/@dbeaver/react-translate":
   version: 0.0.0-use.local
   resolution: "@dbeaver/react-translate@workspace:common-react/@dbeaver/react-translate"
   dependencies:

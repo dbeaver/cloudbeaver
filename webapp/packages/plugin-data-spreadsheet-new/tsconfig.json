@@ -11,6 +11,9 @@
       "path": "../../common-react/@dbeaver/react-tests"
     },
     {
+      "path": "../../common-react/@dbeaver/react-translate"
+    },
+    {
       "path": "../../common-react/@dbeaver/ui-kit"
     },
     {
