@@ -24,6 +24,7 @@ import io.cloudbeaver.model.app.BaseServletApplication;
 import io.cloudbeaver.model.app.ServletAuthApplication;
 import io.cloudbeaver.model.app.ServletAuthConfiguration;
 import io.cloudbeaver.model.app.ServletSystemInformationCollector;
+import io.cloudbeaver.model.cli.CloudBeaverInstanceServer;
 import io.cloudbeaver.model.config.CBAppConfig;
 import io.cloudbeaver.model.config.CBServerConfig;
 import io.cloudbeaver.registry.WebDriverRegistry;
@@ -86,6 +87,7 @@ public abstract class CBApplication<T extends CBServerConfig>
      */
     private static final long CONFIGURATION_MODE_SESSION_IDLE_TIME = 60 * 60 * 1000 * 24 * 7;
 
+    private CloudBeaverInstanceServer instanceServer;
 
     static {
         Log.setDefaultDebugStream(System.out);
@@ -199,6 +201,11 @@ public abstract class CBApplication<T extends CBServerConfig>
 
     @Override
     protected void startServer() {
+        try {
+            this.instanceServer = createInstanceServer();
+        } catch (Exception e) {
+            log.error("Error initializing instance server", e);
+        }
         try {
             if (!loadServerConfiguration()) {
                 return;
@@ -794,5 +801,9 @@ public abstract class CBApplication<T extends CBServerConfig>
     @Nullable
     public <T> T getApplicationContextValue(@NotNull String key) {
         return (T) applicationContext.get(key);
+    }
+
+    protected CloudBeaverInstanceServer createInstanceServer() throws IOException {
+        return new CloudBeaverInstanceServer();
     }
 }

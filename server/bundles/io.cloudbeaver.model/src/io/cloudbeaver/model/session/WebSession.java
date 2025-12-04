@@ -441,7 +441,7 @@ public class WebSession extends BaseWebSession
     }
 
     public synchronized void updateInfo(boolean isOldHttpSessionUsed) {
-        log.debug("Update session lifetime " + getSessionId() + " for user " + getUserId());
+        log.trace("Update session lifetime " + getSessionId() + " for user " + getUserId());
         touchSession();
         if (isOldHttpSessionUsed) {
             try {
