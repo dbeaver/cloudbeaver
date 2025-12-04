@@ -127,10 +127,6 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
     );
   }
 
-  private isNodeLoadedInAnyPage(nodeId: string): boolean {
-    return this.isLoaded(CachedResourceOffsetPageKey(0, 0).setParent(CachedResourceOffsetPageTargetKey(nodeId)));
-  }
-
   async preloadNodeParents(parents: string[], nextNode?: string): Promise<boolean> {
     if (parents.length === 0) {
       return true;
@@ -142,11 +138,9 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
 
     while (parents.length > 0) {
       const next = parents.shift()!;
-
-      if (parent !== undefined && !children.includes(next) && !this.isNodeLoadedInAnyPage(next)) {
+      if (parent !== undefined && !children.includes(next)) {
         return false;
       }
-
       await this.scheduler.waitRelease(next);
 
       if (this.isLoadable(next)) {
@@ -157,7 +151,7 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
       parent = next;
     }
 
-    if (nextNode !== undefined && !children.includes(nextNode) && this.isNodeLoadedInAnyPage(nextNode)) {
+    if (nextNode !== undefined && !children.includes(nextNode)) {
       return false;
     }
 
@@ -165,7 +159,7 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
   }
 
   async refreshTree(navNodeId: string, silent = false): Promise<void> {
-    await this.performUpdate(navNodeId, [], async () => {
+    this.performUpdate(navNodeId, [], async () => {
       await this.graphQLService.sdk.navRefreshNode({
         nodePath: navNodeId,
       });
@@ -178,7 +172,7 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
   }
 
   async refreshNode(navNodeId: string, silent = false): Promise<void> {
-    await this.performUpdate(navNodeId, [], async () => {
+    this.performUpdate(navNodeId, [], async () => {
       await this.graphQLService.sdk.navRefreshNode({
         nodePath: navNodeId,
       });
@@ -278,14 +272,14 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
     await this.onNodeMove.execute({ key, target });
   }
 
-  async setFilter(nodePath: string, include?: string[], exclude?: string[]): Promise<void> {
+  async setFilter(nodePath: string, include?: string[], exclude?: string[]) {
     await this.graphQLService.sdk.navSetFolderFilter({
       nodePath,
       exclude,
       include,
     });
 
-    await this.refreshNode(nodePath);
+    this.refreshNode(nodePath);
   }
 
   async changeName(node: NavNode, name: string): Promise<string> {
