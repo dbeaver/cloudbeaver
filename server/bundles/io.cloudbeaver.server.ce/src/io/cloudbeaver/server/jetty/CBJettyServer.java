@@ -26,6 +26,7 @@ import io.cloudbeaver.server.graphql.GraphQLEndpoint;
 import io.cloudbeaver.server.servlets.CBImageServlet;
 import io.cloudbeaver.server.servlets.CBStaticServlet;
 import io.cloudbeaver.server.servlets.WebStatusServlet;
+import io.cloudbeaver.server.websockets.CBEventsLongPollingServlet;
 import io.cloudbeaver.server.websockets.CBEventsWebSocket;
 import io.cloudbeaver.server.websockets.CBWebSocketServerConfigurator;
 import io.cloudbeaver.service.DBWServiceBindingServlet;
@@ -53,6 +54,7 @@ import java.util.Set;
 public class CBJettyServer {
 
     private static final Log log = Log.getLog(CBJettyServer.class);
+
     static {
         // Set Jetty log level to WARN
         System.setProperty("org.eclipse.jetty.util.log.class", "org.eclipse.jetty.util.log.StdErrLog");
@@ -118,6 +120,9 @@ public class CBJettyServer {
                 servletContextHandler.addServlet(imagesServletHolder, serverConfiguration.getServicesURI() + "images/*");
 
                 servletContextHandler.addServlet(new ServletHolder("status", new WebStatusServlet()), "/status");
+
+                ServletHolder eventsServletHolder = new ServletHolder("events", new CBEventsLongPollingServlet());
+                servletContextHandler.addServlet(eventsServletHolder, serverConfiguration.getServicesURI() + "events/*");
 
                 GraphQLEndpoint endpoint = new GraphQLEndpoint(new ServerConfigurationTimeLimitFilter(application));
                 application.addApplicationContextValue(GraphQL.class.getName(), endpoint.getGraphQL());
