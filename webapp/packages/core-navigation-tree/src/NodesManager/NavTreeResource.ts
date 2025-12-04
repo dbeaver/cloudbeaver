@@ -127,6 +127,10 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
     );
   }
 
+  private isNodeLoadedInAnyPage(nodeId: string): boolean {
+    return this.isLoaded(CachedResourceOffsetPageKey(0, 0).setParent(CachedResourceOffsetPageTargetKey(nodeId)));
+  }
+
   async preloadNodeParents(parents: string[], nextNode?: string): Promise<boolean> {
     if (parents.length === 0) {
       return true;
@@ -138,9 +142,11 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
 
     while (parents.length > 0) {
       const next = parents.shift()!;
-      if (parent !== undefined && !children.includes(next)) {
+
+      if (parent !== undefined && !children.includes(next) && !this.isNodeLoadedInAnyPage(next)) {
         return false;
       }
+
       await this.scheduler.waitRelease(next);
 
       if (this.isLoadable(next)) {
@@ -151,7 +157,7 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
       parent = next;
     }
 
-    if (nextNode !== undefined && !children.includes(nextNode)) {
+    if (nextNode !== undefined && !children.includes(nextNode) && this.isNodeLoadedInAnyPage(nextNode)) {
       return false;
     }
 
@@ -480,17 +486,6 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
 
       const preloaded = await this.preloadParents(nodeId);
       const parents = this.navNodeInfoResource.getParents(nodeId);
-      const rootParentId = parents.filter(nodeId => nodeId !== ROOT_NODE_PATH)[0];
-
-      if (rootParentId) {
-        await this.load(rootParentId);
-
-        const isAllParentsLoaded = this.isLoaded(CachedResourceOffsetPageKey(0, 0).setParent(CachedResourceOffsetPageTargetKey(rootParentId)));
-
-        if (isAllParentsLoaded) {
-          return;
-        }
-      }
 
       if (!preloaded) {
         const cause = new DetailsError(`Entity not found:\n"${nodeId}"\nPath:\n${parents.map(parent => `"${parent}"`).join('\n')}`);

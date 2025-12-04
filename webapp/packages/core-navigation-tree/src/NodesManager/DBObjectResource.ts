@@ -25,7 +25,7 @@ import {
 import { DetailsError, GraphQLService } from '@cloudbeaver/core-sdk';
 
 import type { DBObject } from './EntityTypes.js';
-import { NavNodeInfoResource, ROOT_NODE_PATH } from './NavNodeInfoResource.js';
+import { NavNodeInfoResource } from './NavNodeInfoResource.js';
 import { NavTreeResource } from './NavTreeResource.js';
 
 export const DBObjectParentKey = resourceKeyListAliasFactory('@db-object/parent', (parentId: string) => ({ parentId }));
@@ -82,20 +82,6 @@ export class DBObjectResource extends CachedMapResource<string, DBObject> {
 
       for (const nodeId of key) {
         const preloaded = await this.navTreeResource.preloadParents(nodeId);
-        const parents = this.navNodeInfoResource.getParents(nodeId);
-        const rootParentId = parents.filter(nodeId => nodeId !== ROOT_NODE_PATH)[0];
-
-        if (rootParentId) {
-          await this.navTreeResource.load(rootParentId);
-
-          const isAllParentsLoaded = this.navTreeResource.isLoaded(
-            CachedResourceOffsetPageKey(0, 0).setParent(CachedResourceOffsetPageTargetKey(rootParentId)),
-          );
-
-          if (isAllParentsLoaded) {
-            continue;
-          }
-        }
 
         if (!preloaded) {
           throw new DetailsError('Not found: ' + nodeId);
@@ -110,7 +96,7 @@ export class DBObjectResource extends CachedMapResource<string, DBObject> {
 
       await this.navTreeResource.load(resourceKeyList(parents));
 
-      if (key.length > 0 && !this.navNodeInfoResource.has(key)) {
+      if (key.length > 0 && !navNodeInfoResource.has(key)) {
         ExecutorInterrupter.interrupt(context);
         const cause = new DetailsError(`Entity not found: ${key.toString()}`);
         throw this.markError(cause, key);
