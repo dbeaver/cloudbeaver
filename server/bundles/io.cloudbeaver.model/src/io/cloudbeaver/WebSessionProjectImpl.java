@@ -25,6 +25,7 @@ import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
+import org.jkiss.dbeaver.model.DBPObjectSettingsProvider;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistryCache;
 import org.jkiss.dbeaver.model.navigator.DBNModel;
@@ -35,7 +36,6 @@ import org.jkiss.dbeaver.model.security.SMObjectType;
 import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceEvent;
 import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceProperty;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
-import org.jkiss.dbeaver.registry.DataSourceNavigatorSettings;
 import org.jkiss.dbeaver.registry.DataSourceRegistry;
 import org.jkiss.dbeaver.runtime.jobs.DisconnectJob;
 import org.jkiss.utils.CommonUtils;
@@ -44,12 +44,14 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class WebSessionProjectImpl extends WebProjectImpl {
+public class WebSessionProjectImpl extends WebProjectImpl implements DBPObjectSettingsProvider {
     private static final Log log = Log.getLog(WebSessionProjectImpl.class);
     protected final WebSession webSession;
     private final Map<String, WebConnectionInfo> connections = new HashMap<>();
-    private final Map<String, Map<String, Object>> projectSettings = new ConcurrentHashMap<>();
+    private final Map<String, Map<String, String>> projectSettings = new ConcurrentHashMap<>();
     private boolean registryIsLoaded = false;
+    private boolean projectSettingsLoaded = false;
+    private final Object lock = new Object();
 
     public WebSessionProjectImpl(
         @NotNull WebSession webSession,
@@ -88,8 +90,24 @@ public class WebSessionProjectImpl extends WebProjectImpl {
         return webSession.getNavigatorModel();
     }
 
-    public Map<String, Object> getObjectSettings(@NotNull String objectId) {
+    @Nullable
+    public Map<String, String> getObjectSettings(@NotNull String objectId) {
+        synchronized (lock) {
+            if (!projectSettingsLoaded) {
+                loadProjectSettings();
+            }
+            projectSettingsLoaded = true;
+        }
         return projectSettings.get(objectId);
+    }
+
+    private void loadProjectSettings() {
+        try {
+            refreshProjectSettings();
+        } catch (DBException e) {
+            webSession.addSessionError(e);
+            log.error("Error refreshing settings for project " + getId(), e);
+        }
     }
 
     public void deleteObjectSettings(@NotNull String objectId, @NotNull List<String> settingIds) throws DBException {
@@ -100,7 +118,7 @@ public class WebSessionProjectImpl extends WebProjectImpl {
             new LinkedHashSet<>(settingIds)
         );
         for (String settingId : settingIds) {
-            Map<String, Object> settings = projectSettings.get(objectId);
+            Map<String, String> settings = projectSettings.get(objectId);
             if (settings != null) {
                 settings.remove(settingId);
             }
@@ -114,8 +132,10 @@ public class WebSessionProjectImpl extends WebProjectImpl {
             SMObjectType.datasource,
             settingsToSet
         );
-        Map<String, Object> settings = projectSettings.computeIfAbsent(objectId, k -> new HashMap<>());
-        settings.putAll(settingsToSet);
+        Map<String, String> settings = projectSettings.computeIfAbsent(objectId, k -> new HashMap<>());
+        for (Map.Entry<String, Object> entry : settingsToSet.entrySet()) {
+            settings.put(entry.getKey(), CommonUtils.toString(entry.getValue()));
+        }
     }
 
     @NotNull
@@ -136,12 +156,6 @@ public class WebSessionProjectImpl extends WebProjectImpl {
         if (registryIsLoaded) {
             return;
         }
-        try {
-            refreshProjectSettings();
-        } catch (DBException e) {
-            webSession.addSessionError(e);
-            log.error("Error refreshing settings for project " + getId(), e);
-        }
         getDataSourceRegistry().getDataSources().forEach(this::addConnection);
         Throwable lastError = getDataSourceRegistry().getLastError();
         if (lastError != null) {
@@ -158,6 +172,9 @@ public class WebSessionProjectImpl extends WebProjectImpl {
         synchronized (this.connections) {
             conCopy = new HashMap<>(this.connections);
             this.connections.clear();
+        }
+        synchronized (this.projectSettings) {
+            this.projectSettings.clear();
         }
 
         for (WebConnectionInfo connectionInfo : conCopy.values()) {
@@ -201,19 +218,10 @@ public class WebSessionProjectImpl extends WebProjectImpl {
     @NotNull
     public synchronized WebConnectionInfo addConnection(@NotNull DBPDataSourceContainer dataSourceContainer) {
         WebConnectionInfo connection = createConnectionInfo(dataSourceContainer);
-        setCustomConnectionSettings(connection);
         synchronized (connections) {
             connections.put(dataSourceContainer.getId(), connection);
         }
         return connection;
-    }
-
-    private void setCustomConnectionSettings(@NotNull WebConnectionInfo connection) {
-        Map<String, Object> connectionSettings = projectSettings.get(connection.getId());
-        if (connectionSettings != null) {
-            DataSourceNavigatorSettings customSettings = DataSourceNavigatorSettings.fromMap(connectionSettings);
-            ((DataSourceDescriptor) connection.getDataSourceContainer()).setCustomNavigatorSettings(customSettings);
-        }
     }
 
     /**
@@ -289,8 +297,8 @@ public class WebSessionProjectImpl extends WebProjectImpl {
     }
 
     public void refreshProjectSettings() throws DBException {
+        projectSettings.clear();
         if (webSession.getUser() == null) {
-            projectSettings.clear();
             return;
         }
         List<SMObjectSettings> loadedSettings = webSession.getSecurityController().getObjectSettings(
@@ -299,7 +307,6 @@ public class WebSessionProjectImpl extends WebProjectImpl {
             SMObjectType.project,
             null
         );
-        projectSettings.clear();
         loadedSettings.forEach(smObject -> projectSettings.put(smObject.objectId(), smObject.settings()));
     }
 
@@ -379,6 +386,7 @@ public class WebSessionProjectImpl extends WebProjectImpl {
         DBPDataSourceRegistry registry = getDataSourceRegistry();
         registry.removeDataSource(dataSourceContainer);
         try {
+            deleteAllDataSourceSettings(dataSourceContainer);
             registry.checkForErrors();
         } catch (DBException e) {
             try {
@@ -390,6 +398,15 @@ public class WebSessionProjectImpl extends WebProjectImpl {
         }
         removeConnection(dataSourceContainer);
         return connectionInfo;
+    }
+
+    private void deleteAllDataSourceSettings(DBPDataSourceContainer dataSourceContainer) throws DBException {
+        webSession.getSecurityController().deleteObjectSettings(
+            getId(),
+            dataSourceContainer.getId(),
+            SMObjectType.datasource,
+            null
+        );
     }
 
     @NotNull

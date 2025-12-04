@@ -169,9 +169,9 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                     dbStat.setString(index++, settingId);
                 }
                 try (ResultSet dbResult = dbStat.executeQuery()) {
-                    Map<String, Map<String, Object>> settingsByObjectId = new LinkedHashMap<String, Map<String, Object>>();
+                    Map<String, Map<String, String>> settingsByObjectId = new LinkedHashMap<>();
                     while (dbResult.next()) {
-                        Map<String, Object> objectSettings = settingsByObjectId.computeIfAbsent(
+                        Map<String, String> objectSettings = settingsByObjectId.computeIfAbsent(
                             dbResult.getString(1),
                             k -> new LinkedHashMap<>()
                         );
@@ -219,28 +219,41 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
     }
 
     @Override
-    public void deleteAllObjectSettings(
-        @NotNull String projectId,
+    public void deleteObject(
+        @Nullable String projectId,
         @NotNull String objectId,
         @NotNull SMObjectType objectType
     ) throws DBException {
-        boolean projectDeleted = SMObjectType.project.equals(objectType) && projectId.equals(objectId);
+        try (Connection dbCon = database.openConnection()) {
+            try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
+                deleteAllObjectPermissions(dbCon, objectId, objectType);
+                deleteAllObjectSettings(dbCon, projectId, objectId, objectType);
+                txn.commit();
+            }
+        } catch (SQLException e) {
+            throw new DBCException("Error while deleting object settings", e);
+        }
+    }
+
+    private void deleteAllObjectSettings(
+        @NotNull Connection connection,
+        @Nullable String projectId,
+        @NotNull String objectId,
+        @NotNull SMObjectType objectType
+    ) throws SQLException {
+        boolean projectDeleted = SMObjectType.project.equals(objectType) && objectId.equals(projectId);
         String sql = "DELETE FROM {table_prefix}CB_OBJECT_SETTINGS WHERE PROJECT_ID=?";
         if (!projectDeleted) {
             sql += " AND OBJECT_ID=? AND OBJECT_TYPE=?";
         }
-        try (Connection dbCon = database.openConnection()) {
-            try (PreparedStatement dbStat = dbCon.prepareStatement(sql)) {
-                int index = 1;
-                dbStat.setString(index++, projectId);
-                if (!projectDeleted) {
-                    dbStat.setString(index++, objectId);
-                    dbStat.setString(index++, objectType.name());
-                }
-                dbStat.executeUpdate();
+        try (PreparedStatement dbStat = connection.prepareStatement(sql)) {
+            int index = 1;
+            dbStat.setString(index++, projectId);
+            if (!projectDeleted) {
+                dbStat.setString(index++, objectId);
+                dbStat.setString(index++, objectType.name());
             }
-        } catch (SQLException e) {
-            throw new DBCException("Error while deleting object settings", e);
+            dbStat.executeUpdate();
         }
     }
 
@@ -3222,15 +3235,23 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
     @Override
     public void deleteAllObjectPermissions(@NotNull String objectId, @NotNull SMObjectType objectType) throws DBException {
         try (Connection dbCon = database.openConnection()) {
-            JDBCUtils.executeStatement(dbCon,
-                "DELETE FROM {table_prefix}CB_OBJECT_PERMISSIONS WHERE OBJECT_TYPE=? AND OBJECT_ID=?",
-                objectType.name(),
-                objectId
-            );
-
+            deleteAllObjectPermissions(dbCon, objectId, objectType);
         } catch (SQLException e) {
             throw new DBCException("Error deleting object permissions", e);
         }
+    }
+
+    private void deleteAllObjectPermissions(
+        @NotNull Connection connection,
+        @NotNull String objectId,
+        @NotNull SMObjectType objectType
+    ) throws SQLException {
+        JDBCUtils.executeStatement(
+            connection,
+            "DELETE FROM {table_prefix}CB_OBJECT_PERMISSIONS WHERE OBJECT_TYPE=? AND OBJECT_ID=?",
+            objectType.name(),
+            objectId
+        );
     }
 
     @Override
