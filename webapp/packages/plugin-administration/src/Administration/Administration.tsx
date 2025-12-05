@@ -25,7 +25,7 @@ import {
   ToolsPanelStyles,
   useAutoLoad,
   useS,
-  DialogElement,
+  SlidePanel,
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { OptionsPanelService, TabList, TabListStyles, TabsState, TabStyles } from '@cloudbeaver/core-ui';
@@ -146,11 +146,11 @@ export const Administration = observer<React.PropsWithChildren<Props>>(function 
                 </div>
               </SlideElement>
               <SlideOverlay onClick={close} />
-              <DialogElement isOpen={optionsPanelService.active} onClose={close}>
+              <SlidePanel isOpen={optionsPanelService.active} onClose={close}>
                 <div className={s(styles, { content: true })}>
                   <OptionsPanel />
                 </div>
-              </DialogElement>
+              </SlidePanel>
             </SlideBox>
           </SContext>
         </div>

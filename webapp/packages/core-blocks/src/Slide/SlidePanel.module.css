@@ -13,6 +13,10 @@
   color: var(--theme-on-surface);
   overflow: hidden;
   align-items: center;
+
+  &:hover {
+    background-color: var(--dbv-kit-btn-secondary-background-hover);
+  }
 }
 
 .loader {

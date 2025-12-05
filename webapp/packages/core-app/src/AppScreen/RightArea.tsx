@@ -19,7 +19,7 @@ import {
   Split,
   useS,
   useSplitUserState,
-  DialogElement,
+  SlidePanel,
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { OptionsPanelService } from '@cloudbeaver/core-ui';
@@ -63,9 +63,9 @@ export const RightArea = observer<Props>(function RightArea({ className }) {
         </Split>
       </SlideElement>
       <SlideOverlay onClick={close} />
-      <DialogElement isOpen={optionsPanelService.active} onClose={close}>
+      <SlidePanel isOpen={optionsPanelService.active} onClose={close}>
         <OptionsPanel />
-      </DialogElement>
+      </SlidePanel>
     </SlideBox>
   );
 });
