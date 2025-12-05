@@ -15,9 +15,9 @@ import SlideBoxOverlayStyles from './SlideOverlay.module.css';
 
 interface Props {
   className?: string;
+  open?: boolean;
   children?: React.ReactNode;
   onClose?: () => void;
-  open?: boolean;
 }
 
 export const SlideBox = observer<Props>(function SlideBox({ children, open, className, onClose }) {
@@ -27,7 +27,7 @@ export const SlideBox = observer<Props>(function SlideBox({ children, open, clas
 
   const divRef = useRef<HTMLDivElement>(null);
   const ref = useHotkeys('escape', () => onClose?.(), { enabled: open });
-  const mergedRef = useMergeRefs(divRef, ref);
+  const mergedRefs = useMergeRefs(ref, divRef);
 
   useEffect(() => {
     const div = divRef.current;
@@ -52,7 +52,7 @@ export const SlideBox = observer<Props>(function SlideBox({ children, open, clas
 
   return (
     <div
-      ref={mergedRef}
+      ref={mergedRefs}
       className={s(slideBoxStyles, { slideBox: true }, s(slideBoxElementStyles, { open }), s(slideBoxOverlayStyles, { open }), className)}
     >
       {children}
