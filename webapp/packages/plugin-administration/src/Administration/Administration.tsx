@@ -140,7 +140,7 @@ export const Administration = observer<React.PropsWithChildren<Props>>(function 
           {children}
           <SContext registry={adminPageRegistry}>
             <SlideBox className={s(styles, { slideBox: true })} open={optionsPanelService.active}>
-              <SlideElement className={s(styles, { slideElement: true })}>
+              <SlideElement inert={optionsPanelService.active} className={s(styles, { slideElement: true })}>
                 <div className={s(styles, { content: true })}>
                   <ItemContent activeScreen={activeScreen} configurationWizard={configurationWizard} />
                 </div>
