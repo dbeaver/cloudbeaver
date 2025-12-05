@@ -63,7 +63,9 @@ export const HeaderCellContentRenderer = memo(function HeaderCellContentRenderer
   });
 
   function handleSort(e: React.MouseEvent<HTMLElement> | React.KeyboardEvent<HTMLElement>) {
-    if (!onColumnSort) return;
+    if (!onColumnSort) {
+      return;
+    }
 
     const nextSortState = sortingState === 'asc' ? 'desc' : sortingState === 'desc' ? null : 'asc';
     onColumnSort(colIdx, nextSortState, e.ctrlKey || e.metaKey);
