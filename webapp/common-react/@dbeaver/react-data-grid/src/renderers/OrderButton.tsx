@@ -24,7 +24,7 @@ export function OrderButton({ sortState, onClick, tabIndex, hasMultiSorting }: O
 
   const iconSrc = sortState === 'asc' ? svgSortAsc : sortState === 'desc' ? svgSortDesc : svgSortUnknown;
   const titleToken = hasMultiSorting ? 'react_data_grid_order_button_multiple' : 'react_data_grid_order_button';
-  const titleDefault = hasMultiSorting ? 'Click to sort. Hold CTRL/CMD + click for multiple sorting' : 'Sort By Column';
+  const titleDefault = hasMultiSorting ? 'Click to sort. Hold CTRL/CMD + click for multi-sort' : 'Sort By Column';
 
   return (
     <IconButton
