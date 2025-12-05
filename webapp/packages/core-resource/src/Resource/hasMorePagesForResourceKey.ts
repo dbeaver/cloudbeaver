@@ -10,7 +10,7 @@ import type { CachedResource } from './CachedResource.js';
 import { CachedResourceOffsetPageKey, CachedResourceOffsetPageTargetKey } from './CachedResourceOffsetPageKeys.js';
 import type { ICachedResourceMetadata } from './ICachedResourceMetadata.js';
 
-export function isResourceHasMorePagesForKey<
+export function hasMorePagesForResourceKey<
   TData,
   TValue,
   TKey,

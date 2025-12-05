@@ -19,7 +19,7 @@ import {
   CachedResourceOffsetPageTargetKey,
   getOffsetPageKeyInfo,
   type ICachedResourceMetadata,
-  isResourceHasMorePagesForKey,
+  hasMorePagesForResourceKey,
   isResourceAlias,
   isResourceKeyList,
   ResourceError,
@@ -154,7 +154,7 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
         children = this.get(next) || [];
       }
       parent = next;
-      isParentHasMoreData = isResourceHasMorePagesForKey(this, next);
+      isParentHasMoreData = hasMorePagesForResourceKey(this, next);
     }
 
     if (nextNode !== undefined && !children.includes(nextNode) && !isParentHasMoreData) {

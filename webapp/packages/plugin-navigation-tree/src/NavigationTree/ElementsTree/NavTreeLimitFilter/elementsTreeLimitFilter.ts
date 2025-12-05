@@ -7,7 +7,7 @@
  */
 import type { NavTreeResource } from '@cloudbeaver/core-navigation-tree';
 import type { IElementsTreeFilter } from '../useElementsTree.js';
-import { isResourceHasMorePagesForKey } from '@cloudbeaver/core-resource';
+import { hasMorePagesForResourceKey } from '@cloudbeaver/core-resource';
 
 export const NAVIGATION_TREE_LIMIT = {
   limit: 'nav-tree://limit',
@@ -15,7 +15,7 @@ export const NAVIGATION_TREE_LIMIT = {
 
 export function elementsTreeLimitFilter(navTreeResource: NavTreeResource): IElementsTreeFilter {
   return (tree, filter, node, children) => {
-    if (isResourceHasMorePagesForKey(navTreeResource, node.id)) {
+    if (hasMorePagesForResourceKey(navTreeResource, node.id)) {
       return [...children, NAVIGATION_TREE_LIMIT.limit];
     }
 
