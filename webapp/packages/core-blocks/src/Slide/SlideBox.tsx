@@ -15,8 +15,8 @@ import SlideBoxOverlayStyles from './SlideOverlay.module.css';
 
 interface Props {
   className?: string;
-  open?: boolean;
   children?: React.ReactNode;
+  open?: boolean;
   onClose?: () => void;
 }
 
