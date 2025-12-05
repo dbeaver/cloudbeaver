@@ -13,6 +13,8 @@ import { DisplayError, ErrorBoundary, Loader, s } from '@cloudbeaver/core-blocks
 import { App, AppContext, HideAppLoadingScreen, IServiceProvider, ServiceProvider } from '@cloudbeaver/core-di';
 
 import styles from './renderLayout.module.css';
+import { TranslateContext } from '@dbeaver/react-translate';
+import { LocalizationService } from '@cloudbeaver/core-localization';
 
 interface IRender {
   initRoot(): Root;
@@ -48,16 +50,22 @@ export function renderLayout(app: App): IRender {
     renderApp(serviceProvider: IServiceProvider | null) {
       this.initRoot().render(
         <AppContext value={app}>
-          <ErrorBoundary fallback={<HideAppLoadingScreen />} simple>
-            <ServiceProvider provider={serviceProvider!}>
-              <ErrorBoundary fallback={<HideAppLoadingScreen />} root>
-                <Suspense fallback={<Loader className={s(styles, { loader: true })} />}>
-                  <BodyLazy />
-                  <HideAppLoadingScreen />
-                </Suspense>
-              </ErrorBoundary>
-            </ServiceProvider>
-          </ErrorBoundary>
+          <TranslateContext.Provider
+            value={{
+              translate: serviceProvider!.getService(LocalizationService).translate,
+            }}
+          >
+            <ErrorBoundary fallback={<HideAppLoadingScreen />} simple>
+              <ServiceProvider provider={serviceProvider!}>
+                <ErrorBoundary fallback={<HideAppLoadingScreen />} root>
+                  <Suspense fallback={<Loader className={s(styles, { loader: true })} />}>
+                    <BodyLazy />
+                    <HideAppLoadingScreen />
+                  </Suspense>
+                </ErrorBoundary>
+              </ServiceProvider>
+            </ErrorBoundary>
+          </TranslateContext.Provider>
         </AppContext>,
       );
     },

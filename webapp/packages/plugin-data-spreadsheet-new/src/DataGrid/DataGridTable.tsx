@@ -58,7 +58,6 @@ import { useTableData } from './useTableData.js';
 import { TableColumnHeader } from './TableColumnHeader/TableColumnHeader.js';
 import { TableIndexColumnHeader } from './TableColumnHeader/TableIndexColumnHeader.js';
 import { clsx } from '@dbeaver/ui-kit';
-import { TranslateContext } from '@dbeaver/react-translate';
 
 const ROW_HEIGHT = 24;
 export const HEADER_HEIGHT = 32;
@@ -486,44 +485,43 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
     <DataGridContext.Provider value={gridContext}>
       <DataGridSelectionContext.Provider value={gridSelectionContext}>
         <TableDataContext.Provider value={tableData}>
-          <TranslateContext.Provider value={{ translate }}>
-            <div
-              ref={setContainersRef}
-              tabIndex={-1}
-              {...rest}
-              className={s(styles, { container: true }, className)}
-              onMouseDown={onMouseDownHandler}
-              onMouseMove={onMouseMoveHandler}
-            >
-              <DataGrid
-                ref={dataGridRef}
-                className={s(styles, { grid: true }, className)}
-                cell={cell}
-                cellText={cellText}
-                cellElement={cellElement}
-                rowElement={rowElement}
-                getCellEditable={isCellEditable}
-                headerElement={headerElement}
-                getHeaderHeight={() => headerHeight}
-                getHeaderWidth={getHeaderWidth}
-                getHeaderPinned={getHeaderPinned}
-                getHeaderResizable={getHeaderResizable}
-                getRowHeight={() => ROW_HEIGHT}
-                getColumnKey={getColumnKey}
-                columnCount={columnsCount}
-                rowCount={rowsCount}
-                columnSortable={columnSortable}
-                columnSortingState={columnSortingState}
-                getRowId={rowIdx => (tableData.rows[rowIdx] ? GridDataKeysUtils.serialize(tableData.rows[rowIdx]) : '')}
-                onFocus={handleFocusChange}
-                onScrollToBottom={handleScrollToBottom}
-                onColumnSort={handleSort}
-                onCellChange={handleCellChange}
-                onCellKeyDown={handleCellKeyDown}
-                onHeaderKeyDown={gridSelectedCellCopy.onKeydownHandler}
-              />
-            </div>
-          </TranslateContext.Provider>
+          <div
+            ref={setContainersRef}
+            tabIndex={-1}
+            {...rest}
+            className={s(styles, { container: true }, className)}
+            onMouseDown={onMouseDownHandler}
+            onMouseMove={onMouseMoveHandler}
+          >
+            <DataGrid
+              ref={dataGridRef}
+              className={s(styles, { grid: true }, className)}
+              cell={cell}
+              cellText={cellText}
+              cellElement={cellElement}
+              rowElement={rowElement}
+              getCellEditable={isCellEditable}
+              headerElement={headerElement}
+              getHeaderHeight={() => headerHeight}
+              getHeaderWidth={getHeaderWidth}
+              getHeaderPinned={getHeaderPinned}
+              getHeaderResizable={getHeaderResizable}
+              getRowHeight={() => ROW_HEIGHT}
+              getColumnKey={getColumnKey}
+              columnCount={columnsCount}
+              rowCount={rowsCount}
+              columnSortable={columnSortable}
+              columnSortingState={columnSortingState}
+              getRowId={rowIdx => (tableData.rows[rowIdx] ? GridDataKeysUtils.serialize(tableData.rows[rowIdx]) : '')}
+              hasMultiSorting
+              onFocus={handleFocusChange}
+              onScrollToBottom={handleScrollToBottom}
+              onColumnSort={handleSort}
+              onCellChange={handleCellChange}
+              onCellKeyDown={handleCellKeyDown}
+              onHeaderKeyDown={gridSelectedCellCopy.onKeydownHandler}
+            />
+          </div>
         </TableDataContext.Provider>
       </DataGridSelectionContext.Provider>
     </DataGridContext.Provider>

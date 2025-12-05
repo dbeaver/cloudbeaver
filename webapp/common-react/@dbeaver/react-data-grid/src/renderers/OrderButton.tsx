@@ -13,23 +13,26 @@ interface OrderButtonProps {
   sortState?: 'asc' | 'desc' | null;
   onClick: (e: React.MouseEvent<HTMLElement>) => void;
   tabIndex?: number;
+  hasMultiSorting?: boolean;
 }
 
-export function OrderButton({ sortState, onClick, tabIndex }: OrderButtonProps) {
+export function OrderButton({ sortState, onClick, tabIndex, hasMultiSorting }: OrderButtonProps) {
   const svgSortAsc = 'sort-asc';
   const svgSortDesc = 'sort-desc';
   const svgSortUnknown = 'sort-unknown';
   const translate = useTranslate();
 
   const iconSrc = sortState === 'asc' ? svgSortAsc : sortState === 'desc' ? svgSortDesc : svgSortUnknown;
+  const titleToken = hasMultiSorting ? 'react_data_grid_order_button_multiple' : 'react_data_grid_order_button';
+  const titleDefault = hasMultiSorting ? 'Click to sort. Hold CTRL/CMD + click for multiple sorting' : 'Sort By Column';
 
   return (
     <IconButton
       variant="secondary"
       size="small"
       tabIndex={tabIndex}
-      title={translate('react_data_grid_order_button', 'Sort by column')}
-      aria-label={translate('react_data_grid_order_button', 'Sort by column')}
+      title={translate(titleToken, titleDefault)}
+      aria-label={translate(titleToken, titleDefault)}
       className={clsx(
         'tw:opacity-0 tw:group-focus:opacity-100 tw:focus:opacity-100 tw:group-hover:opacity-100 tw:hover:opacity-100 tw:outline-offset-0',
         sortState && 'tw:opacity-100',
