@@ -49,10 +49,10 @@ public class CBSessionManager implements WebAppSessionManager {
 
     private static final Log log = Log.getLog(CBSessionManager.class);
 
-    private final CBApplication application;
+    private final CBApplication<?> application;
     private final Map<String, BaseWebSession> sessionMap = new HashMap<>();
 
-    public CBSessionManager(CBApplication application) {
+    public CBSessionManager(CBApplication<?> application) {
         this.application = application;
     }
 
@@ -88,7 +88,7 @@ public class CBSessionManager implements WebAppSessionManager {
         return null;
     }
 
-    protected CBApplication getApplication() {
+    protected CBApplication<?> getApplication() {
         return application;
     }
 
@@ -264,7 +264,7 @@ public class CBSessionManager implements WebAppSessionManager {
     }
 
     @NotNull
-    protected Map<String, DBWSessionHandler> getSessionHandlers() {
+    protected Map<String, DBWSessionHandler<WebSession>> getSessionHandlers() {
         return WebHandlerRegistry.getInstance().getSessionHandlers()
             .stream()
             .collect(Collectors.toMap(WebSessionHandlerDescriptor::getId, WebSessionHandlerDescriptor::getInstance));

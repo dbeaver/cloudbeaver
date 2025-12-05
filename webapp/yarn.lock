@@ -2944,6 +2944,8 @@ __metadata:
     "@cloudbeaver/core-dialogs": "workspace:*"
     "@cloudbeaver/core-localization": "workspace:*"
     "@cloudbeaver/core-navigation-tree": "workspace:*"
+    "@cloudbeaver/core-settings": "workspace:*"
+    "@cloudbeaver/core-utils": "workspace:*"
     "@cloudbeaver/plugin-codemirror6": "workspace:*"
     "@cloudbeaver/plugin-data-viewer": "workspace:*"
     "@cloudbeaver/plugin-sql-editor": "workspace:*"

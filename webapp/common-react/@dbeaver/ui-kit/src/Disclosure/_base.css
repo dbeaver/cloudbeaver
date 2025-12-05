@@ -1,0 +1,13 @@
+@layer base {
+  :root {
+    --dbv-kit-disclosure-height: var(--dbv-kit-control-height-medium);
+    --dbv-kit-disclosure-icon-size: 16px;
+    --dbv-kit-disclosure-gap: calc(var(--tw-spacing) * 2);
+    --dbv-kit-disclosure-foreground: var(--tw-color-slate-800);
+    --dbv-kit-disclosure-background: transparent;
+    --dbv-kit-disclosure-border-radius: var(--dbv-kit-control-border-radius);
+    --dbv-kit-disclosure-outline-offset: var(--dbv-kit-control-outline-offset);
+    --dbv-kit-disclosure-outline-color: var(--dbv-kit-control-outline-color);
+    --dbv-kit-disclosure-outline-width: var(--dbv-kit-control-outline-width);
+  }
+}

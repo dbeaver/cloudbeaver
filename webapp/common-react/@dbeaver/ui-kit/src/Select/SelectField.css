@@ -27,5 +27,6 @@
 
   .dbv-kit-select[aria-disabled='true'] .dbv-kit-select__arrow-icon {
     color: var(--dbv-kit-select-disabled-foreground);
+    opacity: var(--dbv-kit-select-disabled-arrow-icon-opacity);
   }
 }

@@ -10,13 +10,18 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { isResultSetDataSource, TableHeaderService } from '@cloudbeaver/plugin-data-viewer';
 
+import { DataViewerRequestQueryViewerSettingsService } from './DataViewerRequestQueryViewerSettingsService.js';
+
 export const DataViewerRequestQueryViewer = importLazyComponent(() =>
   import('./DataViewerRequestQueryViewer.js').then(m => m.DataViewerRequestQueryViewer),
 );
 
-@injectable(() => [TableHeaderService])
+@injectable(() => [TableHeaderService, DataViewerRequestQueryViewerSettingsService])
 export class DataViewerRequestQueryViewerBootstrap extends Bootstrap {
-  constructor(private readonly tableHeaderService: TableHeaderService) {
+  constructor(
+    private readonly tableHeaderService: TableHeaderService,
+    private readonly dataViewerRequestQueryViewerSettingsService: DataViewerRequestQueryViewerSettingsService,
+  ) {
     super();
   }
 
@@ -24,7 +29,7 @@ export class DataViewerRequestQueryViewerBootstrap extends Bootstrap {
     this.tableHeaderService.tableHeaderPlaceholder.add(
       DataViewerRequestQueryViewer,
       Number.MIN_SAFE_INTEGER,
-      props => !isResultSetDataSource(props.model.source),
+      props => !isResultSetDataSource(props.model.source) || this.dataViewerRequestQueryViewerSettingsService.disabled,
     );
   }
 }

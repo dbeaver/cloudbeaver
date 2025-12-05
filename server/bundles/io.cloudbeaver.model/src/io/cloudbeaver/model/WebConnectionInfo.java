@@ -341,6 +341,16 @@ public class WebConnectionInfo {
         if (CommonUtils.isEmpty(authModelId)) {
             authModelId = AuthModelDatabaseNative.ID;
         }
+
+        // Patch auth model
+        DBPAuthModelDescriptor authModel = DBWorkbench.getPlatform().getDataSourceProviderRegistry().getAuthModel(authModelId);
+        if (authModel != null) {
+            DBPAuthModelDescriptor amReplace = authModel.getReplacedBy(dataSourceContainer.getDriver());
+            if (amReplace != null && amReplace != authModel) {
+                return amReplace.getId();
+            }
+        }
+
         return authModelId;
     }
 
