@@ -4562,7 +4562,7 @@ __metadata:
     "@cloudbeaver/tsconfig": "workspace:*"
     "@dbeaver/ui-kit": "workspace:^"
     "@storybook/addon-docs": "npm:^9"
-    "@storybook/addon-storysource": "npm:^8.6.14"
+    "@storybook/addon-storysource": "npm:^8"
     "@storybook/react-vite": "npm:^9"
     "@tailwindcss/vite": "npm:4.0.7"
     "@types/react": "npm:^19"
@@ -7237,7 +7237,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@storybook/addon-storysource@npm:^8.6.14":
+"@storybook/addon-storysource@npm:^8":
   version: 8.6.14
   resolution: "@storybook/addon-storysource@npm:8.6.14"
   dependencies:
