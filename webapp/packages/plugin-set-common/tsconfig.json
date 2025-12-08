@@ -89,6 +89,9 @@
       "path": "../core-storage"
     },
     {
+      "path": "../core-support"
+    },
+    {
       "path": "../core-task-manager"
     },
     {
@@ -156,6 +159,12 @@
     },
     {
       "path": "../plugin-data-viewer"
+    },
+    {
+      "path": "../plugin-data-viewer-conditional-formatting"
+    },
+    {
+      "path": "../plugin-data-viewer-request-query-viewer"
     },
     {
       "path": "../plugin-data-viewer-result-set-grouping"

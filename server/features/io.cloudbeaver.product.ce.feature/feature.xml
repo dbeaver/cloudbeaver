@@ -2,7 +2,7 @@
 <feature
         id="io.cloudbeaver.product.ce.feature"
         label="%featureName"
-        version="25.2.5.qualifier"
+        version="25.3.1.qualifier"
         provider-name="%providerName"
         plugin="io.cloudbeaver.product.ce">
 
@@ -21,6 +21,6 @@
     <includes id="io.cloudbeaver.server.feature" version="0.0.0"/>
     <includes id="io.cloudbeaver.ce.drivers.feature" version="0.0.0"/>
 
-    <plugin id="io.cloudbeaver.product.ce" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
+    <plugin id="io.cloudbeaver.product.ce" version="0.0.0"/>
 
 </feature>

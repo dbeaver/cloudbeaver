@@ -39,6 +39,7 @@ import org.jkiss.dbeaver.model.security.SMController;
 import org.jkiss.utils.CommonUtils;
 
 import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyStore;
 import java.security.SecureRandom;
 import java.security.cert.Certificate;
@@ -48,6 +49,8 @@ import javax.naming.Context;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.directory.*;
+import javax.naming.ldap.LdapName;
+import javax.naming.ldap.Rdn;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManagerFactory;
 
@@ -306,18 +309,22 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
 
     @NotNull
     private String findUserNameFromDN(@NotNull String fullUserDN, @NotNull LdapSettings ldapSettings)
-        throws DBException {
-        String userId = null;
-        for (String dn : fullUserDN.split(",")) {
-            if (dn.startsWith(ldapSettings.getUserIdentifierAttr() + "=")) {
-                userId = dn.split("=")[1];
-                break;
+    throws DBException {
+        try {
+            LdapName ldapDN = new LdapName(fullUserDN);
+            for (Rdn rdn : ldapDN.getRdns()) {
+                if (rdn.getType().equalsIgnoreCase(ldapSettings.getUserIdentifierAttr())) {
+                    Object v = rdn.getValue();
+                    if (v instanceof byte[]) {
+                        return new String((byte[]) v, StandardCharsets.UTF_8);
+                    }
+                    return String.valueOf(v);
+                }
             }
-        }
-        if (userId == null) {
             throw new DBException("Failed to determine userId from user DN: " + fullUserDN);
+        } catch (Exception e) {
+            throw new DBException("Invalid user DN: " + fullUserDN, e);
         }
-        return userId;
     }
 
     @NotNull
@@ -411,10 +418,10 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
     private String buildFullUserDN(String userName, LdapSettings ldapSettings) {
         String fullUserDN = userName;
 
-        if (!fullUserDN.startsWith(ldapSettings.getUserIdentifierAttr())) {
+        if (!CommonUtils.startsWithIgnoreCase(fullUserDN, ldapSettings.getUserIdentifierAttr())) {
             fullUserDN = String.join("=", ldapSettings.getUserIdentifierAttr(), userName);
         }
-        if (CommonUtils.isNotEmpty(ldapSettings.getBaseDN()) && !fullUserDN.endsWith(ldapSettings.getBaseDN())) {
+        if (CommonUtils.isNotEmpty(ldapSettings.getBaseDN()) && !CommonUtils.endsWithIgnoreCase(fullUserDN, ldapSettings.getBaseDN())) {
             fullUserDN = String.join(",", fullUserDN, ldapSettings.getBaseDN());
         }
 
@@ -526,7 +533,6 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
     @NotNull
     private List<String> getGroupForMember(String fullDN, LdapSettings ldapSettings, Map<String, Object> authParameters) {
         DirContext context = null;
-        NamingEnumeration<SearchResult> searchResults = null;
         List<String> result = new ArrayList<>();
         try {
             Map<String, String> environment = creteAuthEnvironment(ldapSettings);
@@ -547,20 +553,12 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
             }
 
             context = initConnection(environment);
-
-            String searchFilter = "(member=" + fullDN + ")";
-            SearchControls searchControls = new SearchControls();
-            searchControls.setSearchScope(SearchControls.SUBTREE_SCOPE);
-
-            searchResults = context.search(ldapSettings.getBaseDN(), searchFilter, searchControls);
-            while (searchResults.hasMore()) {
-                try {
-                    SearchResult next = searchResults.next();
-                    result.add(next.getName());
-                } catch (Exception e) {
-                    log.error("Failed fetch user group. Skipping...", e);
-                }
-            }
+            List<String> groupsByMemberOfAttribute = findGroupsByMemberOfAttribute(fullDN, context);
+            log.debug("Found " + groupsByMemberOfAttribute.size() + " groups by memberOf attribute");
+            result.addAll(groupsByMemberOfAttribute);
+            List<String> groupsByMemberAttribute = findGroupsByMemberAttribute(fullDN, ldapSettings, context);
+            log.debug("Found " + groupsByMemberAttribute.size() + " groups by member attribute");
+            result.addAll(groupsByMemberAttribute);
         } catch (Exception e) {
             log.error("Group not found", e);
         } finally {
@@ -568,11 +566,68 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
                 if (context != null) {
                     context.close();
                 }
-                if (searchResults != null) {
-                    searchResults.close();
-                }
             } catch (Exception e) {
                 log.error("Close resource of ldap group search failed", e);
+            }
+        }
+        return result;
+    }
+
+    private List<String> findGroupsByMemberOfAttribute(String fullDN, DirContext context) throws NamingException {
+        List<String> result = new ArrayList<>();
+        SearchControls memberOfSearch = new SearchControls();
+        memberOfSearch.setSearchScope(SearchControls.OBJECT_SCOPE);
+        memberOfSearch.setTimeLimit(30_000);
+        memberOfSearch.setReturningAttributes(new String[] {"*", "+"});
+        NamingEnumeration<SearchResult> userRecord = context.search(fullDN, "(objectClass=*)", memberOfSearch);
+        try {
+            if (userRecord.hasMore()) {
+                SearchResult userResult = userRecord.next();
+                Attributes userAttributes = userResult.getAttributes();
+                Attribute memberOfAttr = userAttributes.get("memberOf");
+                if (memberOfAttr != null) {
+                    NamingEnumeration<?> groups = memberOfAttr.getAll();
+                    while (groups.hasMore()) {
+                        String groupDN = String.valueOf(groups.next());
+                        result.add(groupDN);
+                    }
+                }
+            }
+        } finally {
+            if (userRecord != null) {
+                userRecord.close();
+            }
+        }
+
+        return result;
+    }
+
+    private List<String> findGroupsByMemberAttribute(String fullDN, LdapSettings ldapSettings, DirContext context) throws NamingException {
+        List<String> result = new ArrayList<>();
+        String searchFilter = "(member={0})";
+        SearchControls searchControls = new SearchControls();
+        searchControls.setSearchScope(SearchControls.SUBTREE_SCOPE);
+        NamingEnumeration<SearchResult> searchResults = context.search(
+            ldapSettings.getBaseDN(),
+            searchFilter,
+            new Object[] {fullDN},
+            searchControls
+        );
+        try {
+            while (searchResults.hasMore()) {
+                try {
+                    SearchResult next = searchResults.next();
+                    //add full dn
+                    result.add(next.getNameInNamespace());
+                    //add relative dn to base dn
+                    result.add(next.getName());
+                } catch (Exception e) {
+                    log.error("Failed fetch user group. Skipping...", e);
+                }
+            }
+        } finally {
+            if (searchResults != null) {
+                searchResults.close();
             }
         }
         return result;

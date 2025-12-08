@@ -69,6 +69,16 @@
       @include mdc-theme-prop(border-color, negative, false);
     }
 
+    &[type='color'] {
+      padding: 0;
+      &::-webkit-color-swatch-wrapper {
+        padding: 0;
+      }
+      &::-webkit-color-swatch {
+        border: none;
+      }
+    }
+
     &:focus,
     &[data-focus='true'] {
       @include mdc-theme-prop(border-color, primary, false);

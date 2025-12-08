@@ -9,7 +9,7 @@
 import type { Column, ColumnOrColumnGroup } from 'react-data-grid';
 import type { IInnerRow } from './IInnerRow.js';
 import { createContext, useId, useMemo, useState } from 'react';
-import { reorderArray } from './reorderArray.js';
+import { reorderArray } from '@dbeaver/js-helpers';
 
 interface IHeaderDnDOptions {
   columns: Array<ColumnOrColumnGroup<IInnerRow, unknown>>;

@@ -14,6 +14,7 @@ import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events
 import { clsx } from '@dbeaver/ui-kit';
 import { type IDataGridCellRenderer, type ICellPosition } from '@cloudbeaver/plugin-data-grid';
 import { DatabaseEditChangeType, type IGridDataKey, type IGridRowKey } from '@cloudbeaver/plugin-data-viewer';
+import { isObjectsEqual } from '@cloudbeaver/core-utils';
 
 import { DataGridContext } from '../DataGridContext.js';
 import { DataGridSelectionContext } from '../DataGridSelection/DataGridSelectionContext.js';
@@ -36,6 +37,7 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
     () => ({
       isHovered: false,
       isMenuVisible: false,
+      isFocused: false,
       get position(): ICellPosition {
         return { colIdx: this.colIdx, rowIdx: this.rowIdx };
       },
@@ -51,18 +53,8 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
         }
         return { row: this.row, column: this.column.key };
       },
-      get isFocused(): boolean {
-        return this.props['aria-selected'] === 'true';
-      },
       get isSelected(): boolean {
         return this.selectionContext.isSelected(this.position.rowIdx, this.position.colIdx) || false;
-      },
-      get hasFocusedElementInRow(): boolean {
-        const focusedElement = this.focusedElementPosition;
-        return focusedElement?.rowIdx === this.position.rowIdx;
-      },
-      get focusedElementPosition() {
-        return this.selectionContext.getFocusedElementPosition();
       },
       get editionState(): DatabaseEditChangeType | null {
         if (!this.cell) {
@@ -84,29 +76,22 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
       setMenuVisibility: action,
       colIdx: observable.ref,
       rowIdx: observable.ref,
+      isFocused: observable.ref,
       row: computed,
       column: computed,
       position: computed,
       cell: computed,
-      hasFocusedElementInRow: computed,
-      focusedElementPosition: computed,
       isSelected: computed,
       editionState: computed,
       tableDataContext: observable.ref,
       selectionContext: observable.ref,
-      props: observable.ref,
       setHover: action.bound,
     },
-    { colIdx, rowIdx, tableDataContext, selectionContext, props },
-  );
-
-  const isDatabaseActionApplied = getComputed(() =>
-    [DatabaseEditChangeType.add, DatabaseEditChangeType.delete, DatabaseEditChangeType.update].includes(cellContext.editionState!),
+    { colIdx, rowIdx, tableDataContext, selectionContext, isFocused: props['aria-selected'] === 'true' },
   );
 
   const classes = getComputed(() =>
     clsx({
-      'rdg-cell-custom-highlighted-row': cellContext.hasFocusedElementInRow && !isDatabaseActionApplied,
       'rdg-cell-custom-selected': cellContext.isSelected,
       'rdg-cell-custom-added': cellContext.editionState === DatabaseEditChangeType.add,
       'rdg-cell-custom-deleted': cellContext.editionState === DatabaseEditChangeType.delete,
@@ -147,10 +132,16 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
     ['mouseUp', 'mouseDown'],
   );
 
+  const formatting = getComputed(
+    () => (cellContext.cell !== undefined ? tableDataContext.formatting.getFormatting(cellContext.cell) : null),
+    isObjectsEqual,
+  );
+
   return (
     <CellContext.Provider value={cellContext}>
       {renderDefaultCell({
         className: classes,
+        style: formatting || undefined,
         'data-row-index': rowIdx,
         'data-column-index': colIdx,
         onMouseDown: state.mouseDown,

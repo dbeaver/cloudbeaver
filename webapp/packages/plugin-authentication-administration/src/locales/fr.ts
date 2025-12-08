@@ -80,7 +80,7 @@ export default [
   ],
 
   ['administration_identity_providers_tab_title', "Fournisseurs d'identité"],
-  ['administration_identity_providers_provider', 'Fournisseur'],
+  ['administration_identity_providers_provider', 'Type de fournisseur'],
   ['administration_identity_providers_provider_id', 'ID'],
   ['administration_identity_providers_provider_configuration_name', 'Nom de la configuration'],
   ['administration_identity_providers_provider_configuration_disabled', 'Désactivé'],

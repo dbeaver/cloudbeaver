@@ -1,0 +1,9 @@
+@layer components {
+  .dbv-kit-popover__content {
+    --dbv-kit-popover-border-width: 2px;
+    --dbv-kit-popover-border-color: var(--theme-input-border);
+
+    --dbv-kit-popover-content-background: var(--theme-surface);
+    --dbv-kit-popover-content-foreground: var(--theme-text-on-surface);
+  }
+}

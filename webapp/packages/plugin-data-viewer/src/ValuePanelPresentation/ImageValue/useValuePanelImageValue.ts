@@ -45,12 +45,15 @@ export function useValuePanelImageValue({ model, resultIndex }: Props) {
       get selectedCell(): IGridDataKey | undefined {
         return this.selectAction.getActiveElements()?.[0];
       },
-      get cellValue() {
+      get cellHolder() {
         if (this.selectedCell === undefined) {
           return null;
         }
 
         return this.formatAction.get(this.selectedCell);
+      },
+      get cellValue() {
+        return this.cellHolder?.value ?? null;
       },
       get src(): string | Blob | null {
         if (isResultSetBlobValue(this.cellValue)) {
@@ -95,24 +98,24 @@ export function useValuePanelImageValue({ model, resultIndex }: Props) {
           return false;
         }
 
-        if (this.truncated && this.selectedCell) {
-          return this.contentAction.isDownloadable(this.selectedCell);
+        if (this.truncated && this.cellHolder) {
+          return this.contentAction.isDownloadable(this.cellHolder);
         }
 
         return this.staticSrc && !this.truncated;
       },
       get canUpload() {
-        if (!this.selectedCell) {
+        if (!this.cellHolder) {
           return false;
         }
-        return this.formatAction.isBinary(this.selectedCell);
+        return this.formatAction.isBinary(this.cellHolder);
       },
       get truncated() {
         if (isResultSetFileValue(this.cellValue)) {
           return false;
         }
 
-        return this.selectedCell && this.contentAction.isBlobTruncated(this.selectedCell);
+        return this.cellHolder && this.contentAction.isBlobTruncated(this.cellHolder);
       },
       async download() {
         try {

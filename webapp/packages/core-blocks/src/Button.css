@@ -33,6 +33,14 @@
     --dbv-kit-btn-danger-background-hover: color-mix(in srgb, var(--theme-negative), white 10%);
     --dbv-kit-btn-danger-background-active: color-mix(in srgb, var(--theme-negative), white 25%);
 
+    --dbv-kit-btn-ghost-foreground: var(--theme-link-color);
+    --dbv-kit-btn-ghost-foreground-hover: var(--theme-link-color);
+    --dbv-kit-btn-ghost-foreground-active: var(--theme-link-color);
+    --dbv-kit-btn-ghost-background: transparent;
+    --dbv-kit-btn-ghost-background-hover: color-mix(in srgb, transparent, var(--theme-primary) 5%);
+    --dbv-kit-btn-ghost-background-active: color-mix(in srgb, transparent, var(--theme-primary) 20%);
+    --dbv-kit-btn-ghost-border-color: transparent;
+
     min-width: 64px;
 
     font-family: Roboto, sans-serif;

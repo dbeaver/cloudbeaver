@@ -20,6 +20,7 @@ import { injectable } from '@cloudbeaver/core-di';
 import type { IDatabaseDataViewAction } from '../IDatabaseDataViewAction.js';
 import { IDatabaseDataResultAction } from '../IDatabaseDataResultAction.js';
 import { IDatabaseDataEditAction } from '../IDatabaseDataEditAction.js';
+import type { IDatabaseValueHolder } from '../IDatabaseValueHolder.js';
 
 @injectable(() => [IDatabaseDataSource, IDatabaseDataResult, IDatabaseDataResultAction, IDatabaseDataEditAction])
 export class GridViewAction<
@@ -143,28 +144,32 @@ export class GridViewAction<
     return { row, column };
   }
 
-  get(key: TKey): TCell | undefined {
+  get(key: TKey): IDatabaseValueHolder<TKey, TCell> | undefined {
     if (!this.has(key)) {
       return undefined;
     }
 
-    return this.getCellValue(key);
+    return this.getCellHolder(key);
   }
 
   getRow(row: IGridRowKey): TCell[] {
     return this.mapRow(row);
   }
 
-  getCellValue(cell: TKey): TCell {
+  getCellHolder(cell: TKey): IDatabaseValueHolder<TKey, TCell> {
     if (cell.column.index < 0 || cell.column.index >= this.data.columns.length) {
       throw new Error('Cell is out of range');
     }
 
-    return this.mapRow(cell.row)[cell.column.index]!;
+    return { value: this.mapRow(cell.row)[cell.column.index]!, key: cell };
   }
 
   getColumn(key: IGridColumnKey): TColumn | undefined {
     return this.mapColumn(key);
+  }
+
+  getColumnName(key: IGridColumnKey): string | undefined {
+    return this.data.getColumnName(key);
   }
 
   protected mapRow(row: IGridRowKey): TCell[] {

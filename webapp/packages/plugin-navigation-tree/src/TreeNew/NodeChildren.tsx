@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -72,15 +72,17 @@ const NodeChildrenObserved = observer<Props>(function NodeChildren({ nodeId, emp
       elements.push(<div key={lastId} style={{ height: postFillHeight }} />);
     }
 
-    if (elements.length === 0 && emptyPlaceholder) {
-      const EmptyPlaceholder = emptyPlaceholder;
-      elements.push(<EmptyPlaceholder key="empty" root={root} />);
-    }
-
     return elements;
   }
 
-  return <TreeNodeNested root={root}>{renderChildren()}</TreeNodeNested>;
+  const renderedChildren = renderChildren();
+
+  if (renderedChildren.length === 0 && emptyPlaceholder) {
+    const EmptyPlaceholder = emptyPlaceholder;
+    return <EmptyPlaceholder root={root} />;
+  }
+
+  return <TreeNodeNested root={root}>{renderedChildren}</TreeNodeNested>;
 });
 
 export const NodeChildren = NodeChildrenObserved;

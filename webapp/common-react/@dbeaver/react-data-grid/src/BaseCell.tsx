@@ -85,19 +85,17 @@ export const BaseCell = memo(function BaseCell<TRow, TSummaryRow>(props: CellRen
 
   const renderDefaultCell = useMemo<IDataGridCellRenderer>(
     () =>
-      ({ onClick, onDoubleClick, onContextMenu, ...rest }) => {
-        return (
-          <Cell
-            {...props}
-            title={tooltip}
-            onCellClick={(_, event) => onClick?.(event)}
-            onCellDoubleClick={(_, event) => onDoubleClick?.(event)}
-            onCellContextMenu={(_, event) => onContextMenu?.(event)}
-            {...rest}
-            isCellSelected={props.isCellSelected || rest.isFocused || false}
-          />
-        );
-      },
+      ({ onClick, onDoubleClick, onContextMenu, ...rest }) => (
+        <Cell
+          {...props}
+          title={tooltip}
+          onCellClick={(_, event) => onClick?.(event)}
+          onCellDoubleClick={(_, event) => onDoubleClick?.(event)}
+          onCellContextMenu={(_, event) => onContextMenu?.(event)}
+          {...rest}
+          isCellSelected={props.isCellSelected || rest.isFocused || false}
+        />
+      ),
     [...Object.values(props), tooltip],
   );
 

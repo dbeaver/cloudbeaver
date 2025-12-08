@@ -86,10 +86,12 @@ public class CBServerConfig implements WebServerConfiguration {
         return contentRoot;
     }
 
+    @NotNull
     public String getRootURI() {
         return rootURI;
     }
 
+    @NotNull
     public String getServicesURI() {
         return serviceURI;
     }

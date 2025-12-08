@@ -11,6 +11,7 @@ export default [
   ['data_grid_table_unpin_column', 'Unpin Column'],
   ['data_grid_table_filter_cell_value', 'Zellwert'],
   ['data_grid_table_filter_reset_all_filters', 'Alle Filter zurücksetzen'],
+  ['data_grid_table_filter_delete_for_column', 'Filter für "{arg:column}" löschen'],
   ['data_grid_table_disable_order', 'Deaktiviert'],
   ['data_grid_table_disable_all_orders', 'Alle deaktivieren'],
   ['data_grid_table_delete_filters_and_orders', 'Filter / Sortierung zurücksetzen'],
