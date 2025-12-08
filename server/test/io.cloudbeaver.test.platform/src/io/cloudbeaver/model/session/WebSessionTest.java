@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.app.ServletAuthApplication;
 import org.jkiss.dbeaver.model.websocket.event.WSEventController;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -31,9 +32,15 @@ import java.util.function.Function;
 
 public class WebSessionTest extends CloudbeaverMockTest {
 
+    private WebSession session;
+
+    @Before
+    public void initWebSession() throws Exception {
+        session = new WebSession(getFakeRequestInfo(), mockApplication(), Collections.emptyMap());
+    }
+
     @Test
     public void localeAndBasicAttributes() throws Exception {
-        WebSession session = new WebSession(getFakeRequestInfo(), mockApplication(), Collections.emptyMap());
         // Locale
         session.setLocale("test-locale");
         Assert.assertEquals("test-locale", session.getLocale());
@@ -65,7 +72,6 @@ public class WebSessionTest extends CloudbeaverMockTest {
 
     @Test
     public void asyncTaskStatusNotFound() throws Exception {
-        WebSession session = new WebSession(getFakeRequestInfo(), mockApplication(), Collections.emptyMap());
         Assert.assertThrows(
             "DBWebException must be thrown for unknown async task",
             DBWebException.class, () -> session.asyncTaskStatus("nonexistent-task", false)

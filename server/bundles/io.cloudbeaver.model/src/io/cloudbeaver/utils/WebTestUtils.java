@@ -63,7 +63,9 @@ public class WebTestUtils {
         if (f == null) {
             throw new NoSuchFieldException(fieldName);
         }
+        boolean isAccessible = f.canAccess(target);
         f.setAccessible(true);
         f.set(target, value);
+        f.setAccessible(isAccessible);
     }
 }
