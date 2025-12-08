@@ -9,6 +9,7 @@ Bundle-RequiredExecutionEnvironment: JavaSE-21
 Bundle-ActivationPolicy: lazy
 Bundle-Activator: io.cloudbeaver.server.CBPlatformActivator
 Require-Bundle: io.cloudbeaver.server;visibility:=reexport,
+ io.cloudbeaver.model.cli;visibility:=reexport,
  com.google.guava
 Export-Package: io.cloudbeaver,
  io.cloudbeaver.model,

@@ -109,7 +109,7 @@ public class WebSessionWorkspace implements DBPWorkspace {
 
     @Nullable
     @Override
-    public WebSessionProjectImpl getProjectById(@NotNull String projectId) {
+    public WebSessionProjectImpl getProjectById(@Nullable String projectId) {
         if (projectId == null) {
             return activeProject;
         }
