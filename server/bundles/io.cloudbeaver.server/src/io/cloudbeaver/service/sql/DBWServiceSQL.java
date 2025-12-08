@@ -216,7 +216,8 @@ public interface DBWServiceSQL extends DBWService {
         @Nullable List<String> functions,
         @Nullable Boolean showDuplicatesOnly,
         @Nullable WebSQLDataFilter filter,
-        @Nullable WebDataFormat dataFormat
+        @Nullable WebDataFormat dataFormat,
+        boolean isInteractive
     ) throws DBException;
 
     @WebAction

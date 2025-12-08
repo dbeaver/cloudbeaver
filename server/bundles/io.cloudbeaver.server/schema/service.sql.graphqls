@@ -350,6 +350,7 @@ extend type Query {
         showDuplicatesOnly: Boolean,
         filter: SQLDataFilter,
         dataFormat: ResultDataFormat,
+        isInteractive: Boolean
     ): AsyncTaskInfo! @since(version: "25.3.1")
 }
 

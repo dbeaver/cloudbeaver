@@ -114,7 +114,8 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL>
                         getArgument(env, "functions"),
                         getArgument(env, "showDuplicatesOnly"),
                         getDataFilter(env),
-                        getDataFormat(env)
+                        getDataFormat(env),
+                        CommonUtils.toBoolean(getArgument(env, "isInteractive"))
                     )
             )
         ;

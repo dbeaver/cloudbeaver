@@ -655,7 +655,8 @@ public class WebServiceSQL implements DBWServiceSQL {
         @Nullable List<String> functions,
         @Nullable Boolean showDuplicatesOnly,
         @Nullable WebSQLDataFilter filter,
-        @Nullable WebDataFormat dataFormat
+        @Nullable WebDataFormat dataFormat,
+        boolean isInteractive
     ) throws DBException {
         String generateGroupByQuery = generateGroupByQuery(contextInfo, resultsId, columnsList, functions, showDuplicatesOnly);
         return asyncExecuteQuery(
@@ -667,7 +668,7 @@ public class WebServiceSQL implements DBWServiceSQL {
             filter,
             dataFormat,
             false,
-            false
+            isInteractive
         );
     }
 
