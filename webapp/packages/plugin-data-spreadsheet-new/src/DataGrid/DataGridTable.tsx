@@ -513,7 +513,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
               columnSortable={columnSortable}
               columnSortingState={columnSortingState}
               getRowId={rowIdx => (tableData.rows[rowIdx] ? GridDataKeysUtils.serialize(tableData.rows[rowIdx]) : '')}
-              hasMultiSorting
+              columnSortingMultiple
               onFocus={handleFocusChange}
               onScrollToBottom={handleScrollToBottom}
               onColumnSort={handleSort}

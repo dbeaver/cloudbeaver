@@ -13,18 +13,18 @@ interface OrderButtonProps {
   sortState?: 'asc' | 'desc' | null;
   onClick: (e: React.MouseEvent<HTMLElement>) => void;
   tabIndex?: number;
-  hasMultiSorting?: boolean;
+  columnSortingMultiple?: boolean;
 }
 
-export function OrderButton({ sortState, onClick, tabIndex, hasMultiSorting }: OrderButtonProps) {
+export function OrderButton({ sortState, onClick, tabIndex, columnSortingMultiple }: OrderButtonProps) {
   const svgSortAsc = 'sort-asc';
   const svgSortDesc = 'sort-desc';
   const svgSortUnknown = 'sort-unknown';
   const translate = useTranslate();
 
   const iconSrc = sortState === 'asc' ? svgSortAsc : sortState === 'desc' ? svgSortDesc : svgSortUnknown;
-  const titleToken = hasMultiSorting ? 'react_data_grid_order_button_multiple' : 'react_data_grid_order_button';
-  const titleDefault = hasMultiSorting ? 'Click to sort. Hold CTRL/CMD + click for multi-sort' : 'Sort By Column';
+  const titleToken = columnSortingMultiple ? 'react_data_grid_order_button_multiple' : 'react_data_grid_order_button';
+  const titleDefault = columnSortingMultiple ? 'Click to sort. Hold CTRL/CMD + click for multi-sort' : 'Sort By Column';
 
   return (
     <IconButton

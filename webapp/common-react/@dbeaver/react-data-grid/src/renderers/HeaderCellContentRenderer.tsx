@@ -90,7 +90,7 @@ export const HeaderCellContentRenderer = memo(function HeaderCellContentRenderer
     >
       <span className="tw:overflow-hidden tw:text-ellipsis">{headerElement ?? getHeaderText ?? ''}</span>
       {isColumnSortable && onColumnSort && (
-        <OrderButton sortState={sortingState} hasMultiSorting={cellHeaderContext.hasMultiSorting} onClick={handleSort} />
+        <OrderButton sortState={sortingState} columnSortingMultiple={cellHeaderContext.columnSortingMultiple} onClick={handleSort} />
       )}
     </div>
   );

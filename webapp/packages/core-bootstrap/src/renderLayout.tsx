@@ -13,7 +13,7 @@ import { DisplayError, ErrorBoundary, Loader, s } from '@cloudbeaver/core-blocks
 import { App, AppContext, HideAppLoadingScreen, IServiceProvider, ServiceProvider } from '@cloudbeaver/core-di';
 
 import styles from './renderLayout.module.css';
-import { TranslateContext } from '@dbeaver/react-translate';
+import { defaultTranslateFn, TranslateContext } from '@dbeaver/react-translate';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 
 interface IRender {
@@ -48,11 +48,13 @@ export function renderLayout(app: App): IRender {
       }
     },
     renderApp(serviceProvider: IServiceProvider | null) {
+      const translate = serviceProvider?.getService(LocalizationService).translate || defaultTranslateFn;
+
       this.initRoot().render(
         <AppContext value={app}>
           <TranslateContext.Provider
             value={{
-              translate: serviceProvider!.getService(LocalizationService).translate,
+              translate,
             }}
           >
             <ErrorBoundary fallback={<HideAppLoadingScreen />} simple>

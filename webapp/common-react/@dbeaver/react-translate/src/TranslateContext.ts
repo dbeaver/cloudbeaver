@@ -9,6 +9,10 @@
 import { createContext } from 'react';
 import type { LocalizationToken } from './LocalizationToken.js';
 
+export function defaultTranslateFn<T extends LocalizationToken | undefined>(token: T, fallback?: T): T {
+  return fallback || token;
+}
+
 export type TranslateFn = <T extends LocalizationToken | undefined>(token: T, fallback?: T, args?: Record<string | number, any>) => T;
 export const TranslateContext = createContext<{ translate: TranslateFn }>({
   translate: (key, fallback) => fallback || key,
