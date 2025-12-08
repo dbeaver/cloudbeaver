@@ -21,6 +21,9 @@ export type MenuItemOptions = CompositeItemOptions & {
   close?: boolean;
 };
 
+/**
+ * @deprecated use the @dbeaver/ui-kit package instead
+ */
 export const MenuItem: ReakitProxyComponent<'button', MenuItemOptions> = observer<ReakitProxyComponentOptions<'button', MenuItemOptions>>(
   function MenuItem({ children, hidden, selected, close, onClick, className, ...rest }) {
     const menu = useContext(MenuStateContext);

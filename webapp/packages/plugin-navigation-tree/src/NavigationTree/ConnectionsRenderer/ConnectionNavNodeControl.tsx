@@ -59,7 +59,7 @@ export const ConnectionNavNodeControl: NavTreeControlComponent = observer<NavTre
     }
 
     function handleContextMenuOpen(event: React.MouseEvent<HTMLDivElement>) {
-      contextMenuPosition.handleContextMenuOpen(event);
+      contextMenuPosition.open(event);
       treeNodeContext.select();
     }
 
