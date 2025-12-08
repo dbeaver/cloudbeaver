@@ -18,4 +18,8 @@ WORKDIR /opt/cloudbeaver/
 
 RUN chmod +x "run-cloudbeaver-server.sh" "/opt/cloudbeaver/launch-product.sh"
 
+RUN chown -R dbeaver:dbeaver "workspace"
+
+USER dbeaver
+
 ENTRYPOINT ["./launch-product.sh"]
