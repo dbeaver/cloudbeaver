@@ -25,4 +25,17 @@ describe('getConnectionFolderIdFromNodeId', () => {
     const id = '';
     expect(getConnectionFolderIdFromNodeId(id)).toEqual(undefined);
   });
+
+  test('should return undefined if no projectId and folderId', () => {
+    const id = 'folder://';
+    expect(getConnectionFolderIdFromNodeId(id)).toEqual(undefined);
+  });
+
+  test('should return undefined if folderId is not passed', () => {
+    const id = 'folder://u_cbadmin/';
+    expect(getConnectionFolderIdFromNodeId(id)).toEqual({
+      projectId: 'u_cbadmin',
+      folderId: '',
+    });
+  });
 });
