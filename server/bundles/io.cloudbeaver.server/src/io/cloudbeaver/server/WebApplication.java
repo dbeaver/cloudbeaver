@@ -31,25 +31,32 @@ import java.util.Map;
  * Base interface for applications with web ui
  */
 public interface WebApplication extends ServletApplication {
+    @NotNull
     WebServerConfiguration getServerConfiguration();
 
+    @NotNull
     WebAppSessionManager getSessionManager();
 
+    @NotNull
     WebDriverRegistry getDriverRegistry();
 
+    @NotNull
     WebAppConfiguration getAppConfiguration();
 
     @NotNull
     Map<String, Object> getProductConfiguration();
 
+    @NotNull
     List<InetAddress> getLocalInetAddresses();
 
+    @NotNull
     Map<String, String> getInitActions();
 
     boolean isLicenseValid();
 
     String getLicenseStatus();
 
+    @NotNull
     WebServerConfig getWebServerConfig();
 
 }
