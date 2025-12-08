@@ -29,14 +29,14 @@
 
     <includes id="org.jkiss.dbeaver.runtime.feature" version="0.0.0"/>
 
-    <plugin id="io.cloudbeaver.model" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
+    <plugin id="io.cloudbeaver.model" version="0.0.0"/>
 
     <!-- 3rd party deps -->
-    <plugin id="com.ibm.icu.base" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
-    <plugin id="com.google.gson" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
+    <plugin id="com.ibm.icu.base" version="0.0.0"/>
+    <plugin id="com.google.gson" version="0.0.0"/>
     <!-- Logging -->
 
-    <plugin id="io.cloudbeaver.slf4j" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
+    <plugin id="io.cloudbeaver.slf4j" version="0.0.0"/>
 
 
 </feature>
