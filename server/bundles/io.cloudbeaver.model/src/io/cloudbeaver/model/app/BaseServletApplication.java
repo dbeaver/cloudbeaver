@@ -57,6 +57,7 @@ public abstract class BaseServletApplication extends BaseApplicationImpl impleme
     private static final Log log = Log.getLog(BaseServletApplication.class);
 
     private String instanceId;
+
     @Override
     public RMController createResourceController(
         @NotNull SMCredentialsProvider credentialsProvider,
@@ -159,6 +160,7 @@ public abstract class BaseServletApplication extends BaseApplicationImpl impleme
      * Method returns VoidSecretController instance.
      * Advanced apps may implement it differently.
      */
+    @NotNull
     @Override
     public DBSSecretController getSecretController(
         @NotNull SMCredentialsProvider credentialsProvider,
@@ -210,6 +212,7 @@ public abstract class BaseServletApplication extends BaseApplicationImpl impleme
 
     protected abstract void startServer() throws DBException;
 
+    @NotNull
     @Override
     public synchronized String getApplicationInstanceId() throws DBException {
         if (instanceId == null) {
@@ -234,6 +237,7 @@ public abstract class BaseServletApplication extends BaseApplicationImpl impleme
         return BaseWorkspaceImpl.readWorkspaceIdProperty();
     }
 
+    @NotNull
     @Override
     public Path getWorkspaceDirectory() {
         return getServerConfigurationController().getWorkspacePath();
@@ -248,6 +252,7 @@ public abstract class BaseServletApplication extends BaseApplicationImpl impleme
         }
     }
 
+    @NotNull
     @Override
     public WSEventController getEventController() {
         return null;
