@@ -17,6 +17,7 @@
 
 package io.cloudbeaver.registry;
 
+import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.service.DBWSessionHandler;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.jkiss.code.NotNull;
@@ -31,7 +32,7 @@ public class WebSessionHandlerDescriptor extends AbstractContextDescriptor {
     public static final String EXTENSION_ID = "io.cloudbeaver.servlet.handler"; //$NON-NLS-1$
 
     private final String id;
-    private final DBWSessionHandler instance;
+    private final DBWSessionHandler<WebSession> instance;
 
     public WebSessionHandlerDescriptor(IConfigurationElement config) throws DBException {
         super(config);
@@ -45,7 +46,7 @@ public class WebSessionHandlerDescriptor extends AbstractContextDescriptor {
         return id;
     }
 
-    public DBWSessionHandler getInstance() {
+    public DBWSessionHandler<WebSession> getInstance() {
         return instance;
     }
 

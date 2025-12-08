@@ -17,8 +17,6 @@
 package io.cloudbeaver.server;
 
 import io.cloudbeaver.auth.NoAuthCredentialsProvider;
-import io.cloudbeaver.model.CBWebServerConfig;
-import io.cloudbeaver.model.WebServerConfig;
 import io.cloudbeaver.model.config.CBServerConfig;
 import io.cloudbeaver.model.rm.local.LocalResourceController;
 import io.cloudbeaver.service.security.CBEmbeddedSecurityController;
@@ -79,6 +77,7 @@ public class CBApplicationCE extends CBApplication<CBServerConfig> {
 
 
 
+    @NotNull
     @Override
     public RMController createResourceController(@NotNull SMCredentialsProvider credentialsProvider,
                                                  @NotNull DBPWorkspace workspace) throws DBException {

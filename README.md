@@ -25,62 +25,36 @@ You can see a live demo of CloudBeaver here: https://demo.cloudbeaver.io
 
 ## Changelog
 
-### 25.2.5 2025-11-17
-- A "Show SQL" button has been added to the Data Editor and the grouping panel, enabling users to inspect the exact SQL query behind displayed results—helping validate data transformations, debug query logic, and ensure analytical accuracy;
-- The search option has been added to the default catalog/schema selector in the SQL Editor's main toolbar;
-- The SQL Server driver has been updated to version 13.2.1.
-
-### 25.2.4 2025-11-03
-- A confirmation prompt has been added for potentially dangerous queries in the SQL Editor to help prevent unintended execution. You can customize this behavior in Preferences > SQL Editor;
-- The value panel in the Data Editor has been redesigned to provide users with more space for viewing and editing data. Tab buttons for different data type visualizations are now aligned on a single level, creating a cleaner layout;
-- Permission configuration for connections was simplified, providing a clearer appearance and improved performance.
-
-### 25.2.3 2025-10-20
-- Added visualization for column reordering in the Data Editor;
-- Fixed the critical issue with duplicating the execution of queries executed by a shortcut in the SQL Editor;
-- Fixed the critical vulnerability (CVE-2025-61927) in the Happy DOM library. The library was updated to version 20.0.2.
-
-### 25.2.2 2025-10-06
-- Replaced true/false text with intuitive checkboxes for boolean values in the metadata editor, making editing easier and faster;
-- Keyboard navigation was improved across the application. Additional shortcuts are available in the main info panel (top-right corner). To help you discover them faster, relevant keyboard shortcuts are also shown directly in the tooltips of Data Editor buttons;
-- Fixed an issue in the Data Editor where resizing one column in a wide table would cause previously resized columns to revert to their original width. Users can resize multiple columns as intended.
-
-### 25.2.1 2025-09-22
-- Autocomplete values in SQL Editor are ordered alphabetically to simplify object search;
-- "Show all databases" setting was added on the connection page for MySQL and MariaDB;
-- Different bug fixes and enhancements have been made.
-
-### 25.2.0 2025-09-01
-### Changes since 25.1.0:
-- Administration:
-  -    Added support for multiple server URLs to accommodate different access policies for internal and external users, improving flexibility in network-restricted environments. To set it up, use the Allowed Server URLs field in the Server configuration within the Administration section;
-  -    Added the Force HTTPS mode setting in Server Configuration to enforce redirecting from HTTP to HTTPS. This setting helps avoid a potential man-in-the-middle attack. This setting is turned off by default. Please remember to configure your proxy before enabling;
-  -    Added the CLOUDBEAVER_BIND_SESSION_TO_IP option to improve session security by linking user sessions to their IP address. It is disabled by default. When enabled, this helps protect against certain types of session hijacking attacks, where an attacker could try to take over a user’s session. Note: Users will be logged out automatically on the IP address change (switching networks or using mobile data);
-  -    A password confirmation field has been added for administrators in the Easy Config section to prevent accidental misconfigurations.
-- SQL Editor:
-  -    Changed the default engine used for autocompletion in the SQL Editor. This Semantic engine offers improved suggestions for database objects, keywords, and functions. You can switch back to the Legacy engine in Preferences > SQL Editor;
-  -    A “Clear” button was added to the output panel.
-- Data Editor:
-  -    Column descriptions were added in the Data Editor under column names to provide more metadata context. You can disable this in Preferences > Data Viewer;
-  -    Added an ability to review the script before execution when users edit tables without primary keys.
-- General:
-  -    Added a new welcome screen for a freshly opened application. This screen contains shortcuts to create a new connection, open SQL Editor, or documentation;
-  -    Added a search panel for SQL Editor and Value panel: press Ctrl/Cmd + F to open a panel that allows searching and replacing by keyword or regular expression;
-  -    Changed the data transfer mechanism to avoid intermediate file creation. The parameter dataExportFileSizeLimit was removed from the server configuration as deprecated;
-  -    The CloudBeaver default theme matches the device theme by default now. You can change this behavior in user preferences under the Theme section;
-  -    Added the option to display tabs across multiple rows, allowing you to see all tabs without scrolling. You can enable this in Preferences > Interface;
-  -    Improved dark theme accessibility by enhancing color contrast across the app for better readability and compliance with accessibility standards;
-  -    The database navigator now automatically hides empty folders in shared projects, reducing visual clutter and speeding up the process of finding active connections.
-- Databases and drivers:
-  -    Clickhouse: fixed the presentation of tuples and map data types in the Data Editor;
-  -    Databend database support has been added (thanks to @hantmac);
-  -    DuckDB: driver has been updated to version 1.3;
-  -    MySQL: Improved performance when retrieving foreign keys metadata;
-  -    PostgreSQL: fixed misplaced comment for table DDL generation.
-
+### 25.3.0 2025-12-01
+### Changes since 25.2.0:
+  - Administration:
+    - Permission configuration for connections has been simplified, providing a clearer appearance and improved performance;
+    - LDAP authentication now supports case-insensitive Distinguished Names (DNs), allowing login with mixed-case DNS.
+  - Security:
+    - Fixed a security issue in the Spatial Viewer for the HTML content to prevent a third-party script execution;
+    - Fixed the critical vulnerability (CVE-2025-61927) in the Happy DOM library. The library was updated to version 20.0.2.
+  - SQL Editor:
+    - A confirmation prompt has been added to the SQL Editor to prevent accidental execution of potentially dangerous queries. You can customize this behavior in Preferences > SQL Editor;
+    - A search field has been added to the catalog/schema selector on the main toolbar for easy navigation;
+    - Alphabetical order has been added to the autocomplete values in the SQL Editor to simplify object search;
+    - Added support for temporary tables in semantic analysis.
+  - Data Editor:
+    - The ability to review the database query after applying filters and sorting in the Data Editor, Grouping panel, and Result sets has been added. The new Show SQL button is placed on the Filter panel;
+    - The value panel in the Data Editor has been redesigned to give users more space for viewing and editing data. Tab buttons for different data type visualizations are now aligned on a single level, creating a cleaner layout;
+    - Added visualization for column reordering in the Data Editor;
+    - Fixed an issue in the Data Editor where resizing one column in a wide table caused previously resized columns to revert to their original width. Users can resize multiple columns as intended.
+  - General:
+    - A reorder tabs option has been added to the application, allowing users to set editor tabs in custom positions;
+    - Keyboard navigation has been improved across the application. Additional shortcuts are available in the main info panel (top-right corner) to help discover them faster. Relevant keyboard shortcuts are also shown in the tooltips of Data Editor buttons;
+    - Boolean values have been replaced with intuitive checkboxes instead of the true/false text in the metadata editor, making editing easier and faster;
+    - The database navigator now automatically hides empty subfolders in shared projects, reducing visual clutter;
+  - Databases and drivers:
+    - ClickHouse: query canceling support has been added;
+    - DuckDB: fixed an issue where catalog selection was lost upon disconnection;
+    - PostgreSQL: fixed support for GIS data types;
+    - SQL Server: the driver has been updated to version 13.2.1;
+    - The "Show all databases" setting has been added on the connection page for MySQL and MariaDB.
 ## Contribution
 As a community-driven open-source project, we warmly welcome contributions through GitHub pull requests. 
 
 [We are happy to reward](https://dbeaver.com/help-dbeaver/) our most active contributors every major sprint.
-The most significant contribution to our code for the major release 25.2.0 was made by:
-1. [hantmac](https://github.com/hantmac) - added support for Databend in CloudBeaver Community Edition.
