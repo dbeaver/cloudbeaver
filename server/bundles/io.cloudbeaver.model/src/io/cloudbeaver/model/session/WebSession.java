@@ -840,7 +840,7 @@ public class WebSession extends BaseWebSession
             // uncommented because we had the problem with non-native auth models
             // (for example, can't connect to DynamoDB if credentials are not saved)
             DBAAuthCredentials credentials = configuration.getAuthModel().loadCredentials(dataSourceContainer, configuration);
-            WebDataSourceUtils.updateCredentialsFromProperties(credentials, configuration.getAuthProperties());
+            WebDataSourceUtils.updateCredentialsFromProperties(this.progressMonitor, credentials, configuration.getAuthProperties());
 
             configuration.getAuthModel().provideCredentials(dataSourceContainer, configuration, credentials);
         } catch (DBException e) {
