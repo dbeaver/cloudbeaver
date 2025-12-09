@@ -1500,7 +1500,6 @@ __metadata:
     react-hotkeys-hook: "npm:^5"
     react-minisearch: "npm:^7"
     reakit: "npm:^1"
-    reakit-system: "npm:^0"
     reakit-utils: "npm:^0"
     rimraf: "npm:^6"
     subscript: "npm:^9"
@@ -4432,6 +4431,7 @@ __metadata:
     "@cloudbeaver/plugin-top-app-bar": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
     "@dbeaver/js-helpers": "workspace:*"
+    "@dbeaver/ui-kit": "workspace:*"
     "@types/react": "npm:^19"
     mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
@@ -16588,7 +16588,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"reakit-system@npm:^0, reakit-system@npm:^0.15.2":
+"reakit-system@npm:^0.15.2":
   version: 0.15.2
   resolution: "reakit-system@npm:0.15.2"
   dependencies:
