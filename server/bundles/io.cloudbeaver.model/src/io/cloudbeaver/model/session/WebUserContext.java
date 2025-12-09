@@ -63,11 +63,14 @@ public class WebUserContext implements SMCredentialsProvider {
     private SMAdminController adminSecurityController;
     private DBSSecretController secretController;
     private RMController rmController;
-    private DBFileController fileController;
-    private Set<String> accessibleProjectIds = new HashSet<>();
+    private final DBFileController fileController;
+    private final Set<String> accessibleProjectIds = new HashSet<>();
     private final WebSessionPreferenceStore preferenceStore;
 
-    public WebUserContext(ServletApplication application, DBPWorkspace workspace) throws DBException {
+    public WebUserContext(
+        @NotNull ServletApplication application,
+        @NotNull DBPWorkspace workspace
+    ) throws DBException {
         this.application = application;
         this.workspace = workspace;
         this.securityController = application.createSecurityController(this);
@@ -84,7 +87,7 @@ public class WebUserContext implements SMCredentialsProvider {
      * @return - true if context changed
      * @throws DBException - if user already authorized and new token come from another user
      */
-    public synchronized boolean refresh(SMAuthInfo smAuthInfo) throws DBException {
+    public synchronized boolean refresh(@NotNull SMAuthInfo smAuthInfo) throws DBException {
         if (smAuthInfo.getAuthPermissions() == null && !isAuthorizedInSecurityManager()) {
             throw new DBCException("Required information about session permissions is missing");
         }
@@ -242,10 +245,12 @@ public class WebUserContext implements SMCredentialsProvider {
         return smSessionId;
     }
 
+    @Nullable
     private Set<String> getDefaultPermissions() {
         return application.isAnonymousAccessEnabled() ? null : Set.of();
     }
 
+    @NotNull
     public RMController getRmController() {
         return rmController;
     }

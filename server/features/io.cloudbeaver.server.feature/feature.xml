@@ -30,24 +30,24 @@
     <includes id="org.jkiss.dbeaver.db.feature" version="0.0.0"/>
 
     <plugin id="org.jkiss.dbeaver.launcher" version="0.0.0"/>
-    <plugin id="io.cloudbeaver.server" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
-    <plugin id="io.cloudbeaver.server.ce" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
-    <plugin id="io.cloudbeaver.service.admin" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
-    <plugin id="io.cloudbeaver.service.auth" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
-    <plugin id="io.cloudbeaver.service.data.transfer" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
-    <plugin id="io.cloudbeaver.service.metadata" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
-    <plugin id="io.cloudbeaver.service.fs" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
-    <plugin id="io.cloudbeaver.service.rm" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
-    <plugin id="io.cloudbeaver.service.rm.nio" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
+    <plugin id="io.cloudbeaver.server" version="0.0.0"/>
+    <plugin id="io.cloudbeaver.server.ce" version="0.0.0"/>
+    <plugin id="io.cloudbeaver.service.admin" version="0.0.0"/>
+    <plugin id="io.cloudbeaver.service.auth" version="0.0.0"/>
+    <plugin id="io.cloudbeaver.service.data.transfer" version="0.0.0"/>
+    <plugin id="io.cloudbeaver.service.metadata" version="0.0.0"/>
+    <plugin id="io.cloudbeaver.service.fs" version="0.0.0"/>
+    <plugin id="io.cloudbeaver.service.rm" version="0.0.0"/>
+    <plugin id="io.cloudbeaver.service.rm.nio" version="0.0.0"/>
 
-    <plugin id="io.cloudbeaver.service.security" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
-    <plugin id="io.cloudbeaver.service.ldap.auth" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
+    <plugin id="io.cloudbeaver.service.security" version="0.0.0"/>
+    <plugin id="io.cloudbeaver.service.ldap.auth" version="0.0.0"/>
 
     <!-- Extra plugins -->
-    <plugin id="org.jkiss.dbeaver.data.office" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
-    <plugin id="org.jkiss.bundle.apache.poi" download-size="0" install-size="0" version="0.0.0"/>
-    <plugin id="org.jkiss.dbeaver.net.ssh" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
-    <plugin id="org.jkiss.dbeaver.net.ssh.sshj" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
-    <plugin id="org.jkiss.bundle.graphql" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
+    <plugin id="org.jkiss.dbeaver.data.office" version="0.0.0"/>
+    <plugin id="org.jkiss.bundle.apache.poi" version="0.0.0"/>
+    <plugin id="org.jkiss.dbeaver.net.ssh" version="0.0.0"/>
+    <plugin id="org.jkiss.dbeaver.net.ssh.sshj" version="0.0.0"/>
+    <plugin id="org.jkiss.bundle.graphql" version="0.0.0"/>
 
 </feature>
