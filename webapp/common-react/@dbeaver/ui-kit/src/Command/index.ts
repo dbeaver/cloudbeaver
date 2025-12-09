@@ -6,4 +6,4 @@
  * you may not use this file except in compliance with the License.
  */
 
-export { Command } from '@ariakit/react';
+export { Command, type CommandProps } from './Command.js';
