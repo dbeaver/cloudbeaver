@@ -360,7 +360,7 @@ public class WebSessionProjectImpl extends WebProjectImpl {
 
     @NotNull
     protected WebConnectionConfigInputHandler getInputConfigHandler(@NotNull WebConnectionConfig configInput) {
-        return new WebConnectionConfigInputHandler<>(getDataSourceRegistry(), configInput);
+        return new WebConnectionConfigInputHandler<>(webSession, getDataSourceRegistry(), configInput);
     }
 
 
