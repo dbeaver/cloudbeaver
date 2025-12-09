@@ -14,7 +14,7 @@
     "react-dom": "^19",
     "mobx": "^6",
     "mobx-react-lite": "^4",
-    "glob": "^11.1"
+    "glob": "^13"
   },
   "scripts": {
     "test": "dbeaver-test",
