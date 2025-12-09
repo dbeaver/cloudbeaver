@@ -51,6 +51,7 @@ public class WebHttpRequestInfo {
         this.lastRemoteUserAgent = lastRemoteUserAgent;
     }
 
+    @Nullable
     public String getId() {
         return id;
     }

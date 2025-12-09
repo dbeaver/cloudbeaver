@@ -16,7 +16,6 @@
  */
 package io.cloudbeaver.model.app;
 
-import io.cloudbeaver.model.cli.CloudBeaverInstanceServer;
 import io.cloudbeaver.model.log.SLF4JLogHandler;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.equinox.app.IApplicationContext;
@@ -28,7 +27,6 @@ import org.jkiss.dbeaver.model.DBFileController;
 import org.jkiss.dbeaver.model.app.DBPWorkspace;
 import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
 import org.jkiss.dbeaver.model.auth.SMSessionContext;
-import org.jkiss.dbeaver.model.cli.ApplicationInstanceController;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.impl.app.ApplicationRegistry;
 import org.jkiss.dbeaver.model.impl.app.BaseApplicationImpl;
@@ -41,7 +39,6 @@ import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.dbeaver.utils.RuntimeUtils;
 import org.jkiss.utils.CommonUtils;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -60,7 +57,7 @@ public abstract class BaseServletApplication extends BaseApplicationImpl impleme
     private static final Log log = Log.getLog(BaseServletApplication.class);
 
     private String instanceId;
-    private CloudBeaverInstanceServer instanceServer;
+
     @Override
     public RMController createResourceController(
         @NotNull SMCredentialsProvider credentialsProvider,
@@ -163,6 +160,7 @@ public abstract class BaseServletApplication extends BaseApplicationImpl impleme
      * Method returns VoidSecretController instance.
      * Advanced apps may implement it differently.
      */
+    @NotNull
     @Override
     public DBSSecretController getSecretController(
         @NotNull SMCredentialsProvider credentialsProvider,
@@ -204,11 +202,6 @@ public abstract class BaseServletApplication extends BaseApplicationImpl impleme
     public Object start(IApplicationContext context) {
         initializeApplicationServices();
         try {
-            try {
-                this.instanceServer = createInstanceServer();
-            } catch (Exception e) {
-                log.error("Error initializing instance server", e);
-            }
             startServer();
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -217,12 +210,9 @@ public abstract class BaseServletApplication extends BaseApplicationImpl impleme
         return EXIT_OK;
     }
 
-    protected CloudBeaverInstanceServer createInstanceServer() throws IOException {
-        return new CloudBeaverInstanceServer();
-    }
-
     protected abstract void startServer() throws DBException;
 
+    @NotNull
     @Override
     public synchronized String getApplicationInstanceId() throws DBException {
         if (instanceId == null) {
@@ -247,6 +237,7 @@ public abstract class BaseServletApplication extends BaseApplicationImpl impleme
         return BaseWorkspaceImpl.readWorkspaceIdProperty();
     }
 
+    @NotNull
     @Override
     public Path getWorkspaceDirectory() {
         return getServerConfigurationController().getWorkspacePath();
@@ -261,6 +252,7 @@ public abstract class BaseServletApplication extends BaseApplicationImpl impleme
         }
     }
 
+    @NotNull
     @Override
     public WSEventController getEventController() {
         return null;
@@ -279,12 +271,6 @@ public abstract class BaseServletApplication extends BaseApplicationImpl impleme
         } catch (Exception e) {
             log.error("Failed close " + name, e);
         }
-    }
-
-    @Nullable
-    @Override
-    public ApplicationInstanceController getInstanceServer() {
-        return instanceServer;
     }
 
     @Override
