@@ -18,12 +18,13 @@ package io.cloudbeaver.server.websockets;
 
 import io.cloudbeaver.model.session.BaseWebSession;
 import io.cloudbeaver.websocket.CBWebSessionEventHandler;
-import io.cloudbeaver.websocket.event.client.*;
 import jakarta.websocket.*;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.websocket.event.WSEvent;
+import org.jkiss.dbeaver.model.websocket.event.session.WSAccessTokenExpiredEvent;
+import org.jkiss.dbeaver.model.websocket.event.session.WSSocketConnectedEvent;
 
 import java.time.Duration;
 
