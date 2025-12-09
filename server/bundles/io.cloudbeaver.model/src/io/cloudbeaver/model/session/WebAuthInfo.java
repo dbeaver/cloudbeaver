@@ -41,6 +41,7 @@ public class WebAuthInfo implements SMSessionPrincipal, WebUserAuthToken {
 
     private final WebSession session;
     private final WebUser user;
+    @NotNull
     private final WebAuthProviderDescriptor authProvider;
     private String authProviderConfigurationId;
     @NotNull
@@ -71,6 +72,7 @@ public class WebAuthInfo implements SMSessionPrincipal, WebUserAuthToken {
         this.loginTime = loginTime;
     }
 
+    @NotNull
     @Property
     public OffsetDateTime getLoginTime() {
         return loginTime;
@@ -91,16 +93,19 @@ public class WebAuthInfo implements SMSessionPrincipal, WebUserAuthToken {
         return new WebUserOriginInfo(session, user, authProvider);
     }
 
+    @NotNull
     @Property
     public String getUserId() {
         return userIdentity.getId();
     }
 
+    @NotNull
     @Property
     public String getDisplayName() {
         return userIdentity.getDisplayName();
     }
 
+    @NotNull
     @Property
     public String getAuthProvider() {
         return authProvider.getId();
@@ -138,13 +143,11 @@ public class WebAuthInfo implements SMSessionPrincipal, WebUserAuthToken {
     }
 
     void closeAuth() {
-        if (authProvider != null && authSession != null) {
-            try {
-                SMAuthProvider authProviderInstance = this.authProvider.getInstance();
-                authProviderInstance.closeSession(session, authSession);
-            } catch (Exception e) {
-                log.error(e);
-            }
+        try {
+            SMAuthProvider authProviderInstance = this.authProvider.getInstance();
+            authProviderInstance.closeSession(session, authSession);
+        } catch (Exception e) {
+            log.error(e);
         }
     }
 

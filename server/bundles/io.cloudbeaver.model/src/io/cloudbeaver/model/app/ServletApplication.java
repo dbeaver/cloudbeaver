@@ -17,6 +17,7 @@
 package io.cloudbeaver.model.app;
 
 import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.DBFileController;
 import org.jkiss.dbeaver.model.app.DBPApplication;
@@ -42,14 +43,19 @@ public interface ServletApplication extends DBPApplication {
         return false;
     }
 
+    @NotNull
     ServletAppConfiguration getAppConfiguration();
 
+    @NotNull
     ServletServerConfiguration getServerConfiguration();
 
+    @NotNull
     Path getDataDirectory(boolean create);
 
+    @NotNull
     Path getWorkspaceDirectory();
 
+    @NotNull
     Path getHomeDirectory();
 
     boolean isMultiNode();
@@ -58,30 +64,38 @@ public interface ServletApplication extends DBPApplication {
 
     SMAdminController getAdminSecurityController(@NotNull SMCredentialsProvider credentialsProvider) throws DBException;
 
+    @NotNull
     DBSSecretController getSecretController(
         @NotNull SMCredentialsProvider credentialsProvider,
         SMSessionContext smSessionContext
     ) throws DBException;
 
+    @NotNull
     RMController createResourceController(
         @NotNull SMCredentialsProvider credentialsProvider,
         @NotNull DBPWorkspace workspace
     ) throws DBException;
 
+    @NotNull
     DBFileController createFileController(@NotNull SMCredentialsProvider credentialsProvider);
 
+    @Nullable
     String getServerURL();
 
+    @NotNull
     default String getServicesURI() {
         return "/";
     }
 
+    @NotNull
     default String getRootURI() {
         return "";
     }
 
+    @NotNull
     String getApplicationInstanceId() throws DBException;
 
+    @NotNull
     WSEventController getEventController();
 
     /**
@@ -94,10 +108,10 @@ public interface ServletApplication extends DBPApplication {
     /**
      * Collector that contains information about system.
      */
-    @NotNull
-    ServletSystemInformationCollector getSystemInformationCollector();
+    @Nullable
+    ServletSystemInformationCollector<?> getSystemInformationCollector();
 
-    default void getStatusInfo(Map<String, Object> infoMap) {
+    default void getStatusInfo(@NotNull Map<String, Object> infoMap) {
 
     }
 
