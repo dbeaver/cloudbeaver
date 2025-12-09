@@ -10,7 +10,7 @@ import { ColorIndicator } from './ColorIndicator.js';
 import { type UseColorPaletteResult } from './useColorPalette.js';
 import { memo } from 'react';
 import { useTranslate } from '@dbeaver/react-translate';
-import { Command } from '../Command.js';
+import { Command } from '../Command/Command.js';
 
 interface ColorGridProps {
   colorPalette: UseColorPaletteResult;

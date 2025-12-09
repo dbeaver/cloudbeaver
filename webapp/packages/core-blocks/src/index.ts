@@ -255,7 +255,6 @@ export * from './useListKeyboardNavigation.js';
 export * from './useMergeRefs.js';
 export * from './usePasswordValidation.js';
 export * from './importLazyComponent.js';
-export * from './ClickableLoader.js';
 export * from './FormControls/TagsComboboxLoader.js';
 export * from './Flex/Flex.js';
 export * from './FormControls/useInputAutocomplete.js';
