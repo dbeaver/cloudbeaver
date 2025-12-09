@@ -533,7 +533,7 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
     @NotNull
     private List<String> getGroupForMember(String fullDN, LdapSettings ldapSettings, Map<String, Object> authParameters) {
         DirContext context = null;
-        Set<String> result = new HashSet<>();
+        Set<String> result = new LinkedHashSet<>();
         try {
             Map<String, String> environment = creteAuthEnvironment(ldapSettings);
             if (CommonUtils.isEmpty(ldapSettings.getBindUserDN())) {
