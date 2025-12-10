@@ -60,6 +60,7 @@ export * from './Tabs/TabsStateLoader.js';
 export * from './Tabs/useTabState.js';
 export * from './Tabs/useTabLocalState.js';
 export * from './Tabs/useTabOrderPersistence.js';
+export * from './Tabs/useTabPersistence.js';
 export { default as TabStyles } from './Tabs/Tab/Tab.module.css';
 export { default as TabTitleStyles } from './Tabs/Tab/TabTitle.module.css';
 export { default as TabVerticalRotatedStyles } from './Tabs/Tab/TabVerticalRotated.module.css';

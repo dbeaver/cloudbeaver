@@ -5,69 +5,33 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { action, untracked } from 'mobx';
-import { observer } from 'mobx-react-lite';
-import { useRef } from 'react';
 
-import { s, useS, useUserData } from '@cloudbeaver/core-blocks';
+import { observer } from 'mobx-react-lite';
+
+import { s, useS } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { type ITabData, TabList, TabPanelList, TabsState, useTabOrderPersistence } from '@cloudbeaver/core-ui';
-import { isArraysEqual } from '@cloudbeaver/core-utils';
+import { TabList, TabPanelList, TabsState, useTabOrderPersistence, useTabPersistence } from '@cloudbeaver/core-ui';
 
 import styles from './ToolsPanel.module.css';
 import { ToolsPanelService } from './ToolsPanelService.js';
 
-interface IToolsState {
-  selectedTabId: string | undefined;
-}
+const PANEL_ID = 'tools-panel';
 
 export const ToolsPanel = observer(function ToolsPanel() {
   const toolsPanelService = useService(ToolsPanelService);
   const style = useS(styles);
 
-  const state = useUserData<IToolsState>('tools', () => ({ selectedTabId: undefined }));
-  const { onReorder, sortTabs, persistenceKey } = useTabOrderPersistence('dbeaver-tools-panel', () => toolsPanelService.tabsContainer.getIdList());
-  const tabs = toolsPanelService.tabsContainer.getIdList();
-  const prevTabs = useRef<string[]>(tabs);
-  const equal = isArraysEqual(prevTabs.current, tabs);
-
-  untracked(
-    action(() => {
-      if (!equal) {
-        for (const id of tabs) {
-          if (!prevTabs.current.includes(id)) {
-            state.selectedTabId = id;
-            break;
-          }
-        }
-
-        prevTabs.current = tabs;
-      }
-
-      if (state.selectedTabId) {
-        if (!tabs.includes(state.selectedTabId)) {
-          if (tabs.length > 0) {
-            state.selectedTabId = tabs[0];
-          } else {
-            state.selectedTabId = undefined;
-          }
-        }
-      }
-    }),
-  );
-
-  function handleTabChange(tab: ITabData) {
-    state.selectedTabId = tab.tabId;
-  }
+  const { onReorder, sortTabs, persistenceKey } = useTabOrderPersistence(PANEL_ID, () => toolsPanelService.tabsContainer.getIdList());
+  const { selectedTabId, selectTab } = useTabPersistence(PANEL_ID, toolsPanelService.tabsContainer);
 
   return (
     <TabsState
-      currentTabId={state.selectedTabId}
+      currentTabId={selectedTabId}
       container={toolsPanelService.tabsContainer}
       reorderStateKey={persistenceKey}
       sortFunction={sortTabs}
       lazy
-      onChange={handleTabChange}
+      onChange={tab => selectTab(tab.tabId)}
       onReorder={onReorder}
     >
       <div className={s(style, { box: true })}>
