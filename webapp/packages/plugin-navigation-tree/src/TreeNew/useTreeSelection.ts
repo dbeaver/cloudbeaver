@@ -17,6 +17,7 @@ export interface ITreeSelectionOptions {
   onSelectionChange?: (selectedNodeIds: Record<string, INodeSelection>) => void;
   multipleSelection?: boolean;
   expandOnSelect?: boolean;
+  selectChildren?: boolean;
 }
 
 export interface INodeSelection {
@@ -108,8 +109,7 @@ async function setSelectionWithLoad(
         const batch = children.slice(i, i + BATCH_SIZE);
 
         const batchPromises = batch.map(childId =>
-          setSelectionWithLoad(treeData, selectionMap, childId, shouldSelect, expandOnSelect)
-            .catch(() => [])
+          setSelectionWithLoad(treeData, selectionMap, childId, shouldSelect, expandOnSelect).catch(() => []),
         );
 
         const batchResults = await Promise.all(batchPromises);
@@ -156,8 +156,9 @@ export function useTreeSelection(treeData: ITreeData, options: ITreeSelectionOpt
         }
 
         const node = treeData.getNode(nodeId);
+        const selectChildren = options.selectChildren ?? true;
 
-        if (node.leaf) {
+        if (node.leaf || !selectChildren) {
           internalState.set(nodeId, { selected: shouldSelect, indeterminate: false });
         } else {
           await setSelectionWithLoad(treeData, internalState, nodeId, shouldSelect, options.expandOnSelect);
