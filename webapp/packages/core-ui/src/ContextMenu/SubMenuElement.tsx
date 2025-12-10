@@ -31,7 +31,7 @@ import { type HovercardStoreState, MenuItem } from '@dbeaver/ui-kit';
 import { useService } from '@cloudbeaver/core-di';
 import { MenuActionElement } from './MenuActionElement.js';
 import { MenuContext, type IMenuContext } from './MenuContext.js';
-import { use, useMemo } from 'react';
+import { use, useCallback, useMemo } from 'react';
 
 interface ISubMenuElementProps extends Omit<React.ButtonHTMLAttributes<any>, 'style'> {
   menuData: IMenuData;
@@ -90,13 +90,16 @@ export const SubMenuElement = observer<ISubMenuElementProps>(function SubMenuEle
   }
   const menuContext = useMemo<IMenuContext>(() => ({ menu: subMenuData, rtl: parent?.rtl }), [subMenuData, parent]);
 
+  const handleClick = useCallback(
+    function handleClick() {
+      subMenu.events?.onSelect?.(menuData.context);
+    },
+    [menuData, subMenu],
+  );
+
   // TODO: need to be fixed, in case when menu depend on data from loaders this may be always true
   if (hidden && !action) {
     return null;
-  }
-
-  function handleClick() {
-    subMenu.events?.onSelect?.(menuData.context);
   }
 
   if (actionItem) {
@@ -183,12 +186,12 @@ export const SubMenuElement = observer<ISubMenuElementProps>(function SubMenuEle
               tooltip={tooltip}
               loading={loading}
               style={{ pointerEvents: 'auto' }}
+              aria-label={translate(subMenu.label)}
               displaySubmenuMark
             />
           }
         />
       }
-      aria-label={translate(subMenu.label)}
       disabled={disabled}
       onClick={handleClick}
     />

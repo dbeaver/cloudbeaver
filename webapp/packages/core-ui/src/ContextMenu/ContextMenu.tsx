@@ -9,7 +9,6 @@ import { observer } from 'mobx-react-lite';
 import React, { use, useLayoutEffect, useMemo } from 'react';
 
 import { MenuItemElement, useAutoLoad, useObjectRef, useTranslate } from '@cloudbeaver/core-blocks';
-import { MenuActionItem } from '@cloudbeaver/core-view';
 import type { IContextMenuProps } from './IContextMenuProps.js';
 import { MenuButton, MenuProvider, Menu, type HovercardStoreState, useMenuStore, useStoreState } from '@dbeaver/ui-kit';
 import { RenderMenuItems } from './RenderMenuItems.js';
@@ -47,8 +46,12 @@ export const ContextMenu = observer<IContextMenuNewProps>(function ContextMenuIn
 
   const handlers = useObjectRef(
     () => ({
-      hasBindings() {
-        return this.menuData.items.some(item => item instanceof MenuActionItem && item.action.binding !== null);
+      getAnchorRect() {
+        if (this.contextMenuPosition?.position) {
+          return this.contextMenuPosition.position;
+        }
+
+        return null;
       },
       handleVisibleSwitch(visible: boolean) {
         this.onVisibleSwitch?.(visible);
@@ -61,7 +64,7 @@ export const ContextMenu = observer<IContextMenuNewProps>(function ContextMenuIn
       },
     }),
     { menuData, handler, onVisibleSwitch, contextMenuPosition },
-    ['hasBindings', 'handleVisibleSwitch'],
+    ['getAnchorRect', 'handleVisibleSwitch'],
   );
 
   const showAtPosition = !!contextMenuPosition?.position;
@@ -70,14 +73,6 @@ export const ContextMenu = observer<IContextMenuNewProps>(function ContextMenuIn
       menu.show();
     }
   }, [showAtPosition, menu]);
-
-  function getAnchorRect() {
-    if (contextMenuPosition?.position) {
-      return contextMenuPosition.position;
-    }
-
-    return null;
-  }
 
   const menuContext = useMemo<IMenuContext>(() => ({ menu: menuData, rtl: isRtl }), [menuData, isRtl]);
 
@@ -89,7 +84,7 @@ export const ContextMenu = observer<IContextMenuNewProps>(function ContextMenuIn
         </MenuButton>
         <Menu
           aria-label={translate(menuData.menu.info.label)}
-          getAnchorRect={contextMenuPosition ? getAnchorRect : undefined}
+          getAnchorRect={contextMenuPosition ? handlers.getAnchorRect : undefined}
           shift={shift}
           gutter={gutter}
           dir={isRtl ? 'rtl' : 'ltr'}
