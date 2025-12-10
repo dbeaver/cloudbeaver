@@ -57,11 +57,11 @@ export function createLazyLoader<T>(factory: () => Promise<T>): ILazyLoader<T> {
   let promise: Promise<T> | null = null;
   const listeners = new Set<() => void>();
 
-  const notify = () => {
+  function notify() {
     listeners.forEach(listener => listener());
-  };
+  }
 
-  const load = () => {
+  function load() {
     // Already loaded or loading
     if (state.data !== null || promise !== null) {
       return;
@@ -86,14 +86,14 @@ export function createLazyLoader<T>(factory: () => Promise<T>): ILazyLoader<T> {
         promise = null; // Allow retry on error
         notify();
       });
-  };
+  }
 
-  const refresh = () => {
+  function refresh() {
     promise = null;
     state = { data: null, loading: false, error: null };
     load();
     notify();
-  };
+  }
 
   return {
     subscribe(onStoreChange: () => void) {
