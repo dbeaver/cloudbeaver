@@ -14,7 +14,7 @@ import { ActionService, menuExtractItems, MenuService } from '@cloudbeaver/core-
 import { MENU_TOOLS } from '@cloudbeaver/plugin-tools-panel';
 
 import { ACTION_RESOURCE_MANAGER_SCRIPTS } from './Actions/ACTION_RESOURCE_MANAGER_SCRIPTS.js';
-import { ResourceManagerScriptsService } from './ResourceManagerScriptsService.js';
+import { ResourceManagerScriptsService, SCRIPTS_TAB_ID } from './ResourceManagerScriptsService.js';
 
 const ResourceManagerScripts = importLazyComponent(() => import('./ResourceManagerScripts.js').then(m => m.ResourceManagerScripts));
 
@@ -33,7 +33,7 @@ export class PluginBootstrap extends Bootstrap {
   override register(): void | Promise<void> {
     this.registerMenu();
     this.sideBarPanelService.tabsContainer.add({
-      key: 'resource-manager-scripts-tab',
+      key: SCRIPTS_TAB_ID,
       order: 0,
       name: 'plugin_resource_manager_scripts_title',
       isHidden: () => !this.resourceManagerScriptsService.active,
