@@ -294,7 +294,7 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
         let previousSelected: boolean | null = null;
 
         for (const schema of schemaList) {
-          const schemaName = schema.name || '';
+          const schemaName = schema.name?.trim() || '';
           if (!schemaName) {
             continue;
           }
@@ -335,7 +335,7 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
 
         for (const catalogData of catalogList) {
           const catalog = catalogData.catalog;
-          const catalogName = catalog.name || '';
+          const catalogName = catalog.name?.trim() || '';
           if (!catalogName) {
             continue;
           }
@@ -365,7 +365,7 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
                 },
                 {
                   onSelect: async () => {
-                    await this.connectionSchemaManagerService.selectCatalog(catalogName!);
+                    await this.connectionSchemaManagerService.selectCatalog(catalogName);
                   },
                 },
                 {

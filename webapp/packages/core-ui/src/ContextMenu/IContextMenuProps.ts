@@ -22,7 +22,6 @@ export interface IContextMenuProps extends Omit<ButtonHTMLAttributes<any>, 'chil
   contextMenuPosition?: IContextMenuPosition;
   menu: IMenuData;
   placement?: MenuInitialState['placement'];
-  modal?: boolean;
   visible?: boolean;
   rtl?: boolean;
   children?: React.ReactNode;

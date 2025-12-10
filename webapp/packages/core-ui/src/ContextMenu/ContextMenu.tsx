@@ -30,7 +30,6 @@ export const ContextMenu = observer<IContextMenuNewProps>(function ContextMenuIn
   placement,
   visible,
   onVisibleSwitch,
-  modal = true,
   rtl,
   shift,
   gutter,
@@ -91,7 +90,6 @@ export const ContextMenu = observer<IContextMenuNewProps>(function ContextMenuIn
         <Menu
           aria-label={translate(menuData.menu.info.label)}
           getAnchorRect={contextMenuPosition ? getAnchorRect : undefined}
-          modal={modal}
           shift={shift}
           gutter={gutter}
           dir={isRtl ? 'rtl' : 'ltr'}
