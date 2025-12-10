@@ -21,21 +21,13 @@ export class TabsContainer<TProps = void, TOptions extends Record<string, any> |
     return Array.from(this.tabInfoMap.values()).sort((a, b) => a.order - b.order);
   }
 
-  get selectedId(): string | null {
-    return this.currentTabId;
-  }
-
-  private currentTabId: string | null;
-
   constructor(areaLabel: string) {
     this.tabInfoMap = new Map();
-    this.currentTabId = null;
     this.areaLabel = areaLabel;
     this.onTabSelect = new SyncExecutor();
 
-    makeObservable<TabsContainer<TProps, TOptions>, 'currentTabId'>(this, {
+    makeObservable<TabsContainer<TProps, TOptions>>(this, {
       tabInfoMap: observable.shallow,
-      currentTabId: observable,
     });
   }
 
@@ -43,12 +35,7 @@ export class TabsContainer<TProps = void, TOptions extends Record<string, any> |
     return this.tabInfoMap.has(tabId);
   }
 
-  select(tabId: string | null, props: TProps): void {
-    if (tabId === null) {
-      this.currentTabId = tabId;
-      return;
-    }
-
+  select(tabId: string, props: TProps): void {
     const info = this.getDisplayedTabInfo(tabId, props);
 
     if (!info) {
@@ -60,7 +47,6 @@ export class TabsContainer<TProps = void, TOptions extends Record<string, any> |
       props,
     });
 
-    this.currentTabId = tabId;
     this.onTabSelect.execute(tabId);
   }
 
