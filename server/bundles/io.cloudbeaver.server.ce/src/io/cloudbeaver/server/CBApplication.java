@@ -24,6 +24,7 @@ import io.cloudbeaver.model.app.BaseServletApplication;
 import io.cloudbeaver.model.app.ServletAuthApplication;
 import io.cloudbeaver.model.app.ServletAuthConfiguration;
 import io.cloudbeaver.model.app.ServletSystemInformationCollector;
+import io.cloudbeaver.model.cli.CloudBeaverInstanceServer;
 import io.cloudbeaver.model.config.CBAppConfig;
 import io.cloudbeaver.model.config.CBServerConfig;
 import io.cloudbeaver.registry.WebDriverRegistry;
@@ -86,6 +87,7 @@ public abstract class CBApplication<T extends CBServerConfig>
      */
     private static final long CONFIGURATION_MODE_SESSION_IDLE_TIME = 60 * 60 * 1000 * 24 * 7;
 
+    private CloudBeaverInstanceServer instanceServer;
 
     static {
         Log.setDefaultDebugStream(System.out);
@@ -119,6 +121,7 @@ public abstract class CBApplication<T extends CBServerConfig>
         this.homeDirectory = new File(initHomeFolder());
     }
 
+    @Nullable
     public String getServerURL() {
         return getServerConfiguration().getServerURL();
     }
@@ -138,15 +141,18 @@ public abstract class CBApplication<T extends CBServerConfig>
         return getServerConfiguration().getServerName();
     }
 
+    @NotNull
     public String getRootURI() {
         return getServerConfiguration().getRootURI();
     }
 
+    @NotNull
     public String getServicesURI() {
         return getServerConfiguration().getServicesURI();
     }
 
 
+    @NotNull
     public Path getHomeDirectory() {
         return homeDirectory.toPath();
     }
@@ -170,10 +176,12 @@ public abstract class CBApplication<T extends CBServerConfig>
      * @return max session idle time from server configuration, may differ from {@link #getMaxSessionIdleTime()}
      */
 
+    @NotNull
     public CBAppConfig getAppConfiguration() {
         return getServerConfigurationController().getAppConfiguration();
     }
 
+    @NotNull
     public T getServerConfiguration() {
         return getServerConfigurationController().getServerConfiguration();
     }
@@ -199,6 +207,11 @@ public abstract class CBApplication<T extends CBServerConfig>
 
     @Override
     protected void startServer() {
+        try {
+            this.instanceServer = createInstanceServer();
+        } catch (Exception e) {
+            log.error("Error initializing instance server", e);
+        }
         try {
             if (!loadServerConfiguration()) {
                 return;
@@ -227,10 +240,7 @@ public abstract class CBApplication<T extends CBServerConfig>
         Location instanceLoc = Platform.getInstanceLocation();
         try {
             if (!instanceLoc.isSet()) { // always false?
-                URL wsLocationURL = new URL(
-                    "file",  //$NON-NLS-1$
-                    null,
-                    getWorkspaceDirectory().toAbsolutePath().toString());
+                URL wsLocationURL = getWorkspaceDirectory().toUri().toURL();
                 instanceLoc.set(wsLocationURL, true);
             }
         } catch (Exception e) {
@@ -341,6 +351,7 @@ public abstract class CBApplication<T extends CBServerConfig>
         getAppConfiguration().setEnabledFeatures(enabledFeatures.toArray(new String[0]));
     }
 
+    @NotNull
     protected ServletSystemInformationCollector<?> createSystemInformationCollector() {
         return new ServletSystemInformationCollector<>(this);
     }
@@ -519,6 +530,7 @@ public abstract class CBApplication<T extends CBServerConfig>
         return getServerConfigurationController().getLocalHostAddress();
     }
 
+    @NotNull
     public List<InetAddress> getLocalInetAddresses() {
         return localInetAddresses;
     }
@@ -667,6 +679,7 @@ public abstract class CBApplication<T extends CBServerConfig>
         return null;
     }
 
+    @NotNull
     public CBSessionManager getSessionManager() {
         if (sessionManager == null) {
             sessionManager = createSessionManager();
@@ -691,6 +704,7 @@ public abstract class CBApplication<T extends CBServerConfig>
         return List.of();
     }
 
+    @NotNull
     @Override
     public WSEventController getEventController() {
         return eventController;
@@ -772,17 +786,18 @@ public abstract class CBApplication<T extends CBServerConfig>
         initActions.remove(actionId);
     }
 
+    @NotNull
     public Map<String, String> getInitActions() {
         return Map.copyOf(initActions);
     }
 
+    @NotNull
     @Override
     public WebServerConfig getWebServerConfig() {
         return new CBWebServerConfig(this);
     }
 
     @NotNull
-    @Override
     public ServletSystemInformationCollector<?> getSystemInformationCollector() {
         return systemInformationCollector;
     }
@@ -794,5 +809,9 @@ public abstract class CBApplication<T extends CBServerConfig>
     @Nullable
     public <T> T getApplicationContextValue(@NotNull String key) {
         return (T) applicationContext.get(key);
+    }
+
+    protected CloudBeaverInstanceServer createInstanceServer() throws IOException {
+        return new CloudBeaverInstanceServer();
     }
 }

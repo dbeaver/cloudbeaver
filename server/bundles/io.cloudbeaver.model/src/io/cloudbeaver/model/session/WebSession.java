@@ -45,7 +45,6 @@ import org.jkiss.dbeaver.model.access.DBACredentialsProvider;
 import org.jkiss.dbeaver.model.auth.*;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.exec.DBCException;
-import org.jkiss.dbeaver.model.fs.DBFFileSystemManager;
 import org.jkiss.dbeaver.model.meta.Association;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.navigator.DBNModel;
@@ -82,7 +81,6 @@ public class WebSession extends BaseWebSession
 
     public static final SMSessionType CB_SESSION_TYPE = new SMSessionType("CloudBeaver");
     private static final String WEB_SESSION_AUTH_CONTEXT_TYPE = "web-session";
-    private static final String ATTR_LOCALE = "locale";
     private static final AtomicInteger TASK_ID = new AtomicInteger();
 
     public static String RUNTIME_PARAM_AUTH_INFOS = "auth-infos";
@@ -105,15 +103,16 @@ public class WebSession extends BaseWebSession
 
     private DBNModel navigatorModel;
     private final DBRProgressMonitor progressMonitor = new SessionProgressMonitor();
-    private final Map<String, DBWSessionHandler> sessionHandlers;
+    private final Map<String, DBWSessionHandler<WebSession>> sessionHandlers;
     private final WebDataSourceConnectEventListener connectListener = new WebDataSourceConnectEventListener(this);
 
     public WebSession(
         @NotNull WebHttpRequestInfo requestInfo,
         @NotNull ServletAuthApplication application,
-        @NotNull Map<String, DBWSessionHandler> sessionHandlers
+        @NotNull Map<String, DBWSessionHandler<WebSession>> sessionHandlers
     ) throws DBException {
-        this(requestInfo.getId(),
+        this(
+            Objects.requireNonNull(requestInfo.getId()),
             CommonUtils.toString(requestInfo.getLocale()),
             application,
             sessionHandlers,
@@ -126,8 +125,8 @@ public class WebSession extends BaseWebSession
         @NotNull String id,
         @Nullable String locale,
         @NotNull ServletApplication application,
-        @NotNull Map<String, DBWSessionHandler> sessionHandlers,
-        @NotNull String remoteAddr
+        @NotNull Map<String, DBWSessionHandler<WebSession>> sessionHandlers,
+        @Nullable String remoteAddr
     ) throws DBException {
         super(id, application);
         if (CommonUtils.isEmpty(remoteAddr)) {
@@ -152,7 +151,7 @@ public class WebSession extends BaseWebSession
             if (authTokens.isEmpty()) {
                 return null;
             }
-            return authTokens.get(0);
+            return authTokens.getFirst();
         }
     }
 
@@ -310,7 +309,7 @@ public class WebSession extends BaseWebSession
                 anonymousProject.setInMemory(true);
             }
             if (workspace.getActiveProject() == null && !workspace.getProjects().isEmpty()) {
-                workspace.setActiveProject(workspace.getProjects().get(0));
+                workspace.setActiveProject(workspace.getProjects().getFirst());
             }
         } catch (DBException e) {
             addSessionError(e);
@@ -440,7 +439,7 @@ public class WebSession extends BaseWebSession
     }
 
     public synchronized void updateInfo(boolean isOldHttpSessionUsed) {
-        log.debug("Update session lifetime " + getSessionId() + " for user " + getUserId());
+        log.trace("Update session lifetime " + getSessionId() + " for user " + getUserId());
         touchSession();
         if (isOldHttpSessionUsed) {
             try {
@@ -568,8 +567,7 @@ public class WebSession extends BaseWebSession
 
     public WebAsyncTaskInfo createAsyncTask(@NotNull String taskName) {
         int taskId = TASK_ID.incrementAndGet();
-        WebAsyncTaskInfo asyncTask = getAsyncTask(String.valueOf(taskId), taskName, true);
-        return asyncTask;
+        return getAsyncTask(String.valueOf(taskId), taskName, true);
     }
 
     public List<WebAsyncTaskInfo> findTasksByJob(@NotNull Class<? extends AbstractJob> jobClass) {
@@ -723,7 +721,7 @@ public class WebSession extends BaseWebSession
                 }
                 return null;
             }
-            return authTokens.isEmpty() ? null : authTokens.get(0);
+            return authTokens.isEmpty() ? null : authTokens.getFirst();
         }
     }
 
@@ -766,10 +764,7 @@ public class WebSession extends BaseWebSession
             if (oldAuthInfo != null) {
                 removeAuthInfo(oldAuthInfo);
             }
-            SMSession authSession = authInfo.getAuthSession();
-            if (authSession != null) {
-                getSessionContext().addSession(authSession);
-            }
+            getSessionContext().addSession(authInfo.getAuthSession());
         }
         synchronized (authTokens) {
             Collections.addAll(authTokens, tokens);
@@ -845,7 +840,7 @@ public class WebSession extends BaseWebSession
             // uncommented because we had the problem with non-native auth models
             // (for example, can't connect to DynamoDB if credentials are not saved)
             DBAAuthCredentials credentials = configuration.getAuthModel().loadCredentials(dataSourceContainer, configuration);
-            WebDataSourceUtils.updateCredentialsFromProperties(credentials, configuration.getAuthProperties());
+            WebDataSourceUtils.updateCredentialsFromProperties(this.progressMonitor, credentials, configuration.getAuthProperties());
 
             configuration.getAuthModel().provideCredentials(dataSourceContainer, configuration, credentials);
         } catch (DBException e) {
@@ -885,7 +880,7 @@ public class WebSession extends BaseWebSession
     }
 
     private <T> boolean isAuthInfoInstanceOf(WebAuthInfo authInfo, Class<T> adapter) {
-        if (authInfo != null && authInfo.getAuthSession() != null) {
+        if (authInfo != null) {
             return adapter.isInstance(authInfo.getAuthSession());
         }
         return false;
@@ -1001,15 +996,6 @@ public class WebSession extends BaseWebSession
             return;
         }
         deleteSessionProject(project);
-    }
-
-    @NotNull
-    public DBFFileSystemManager getFileSystemManager(String projectId) throws DBException {
-        var project = getProjectById(projectId);
-        if (project == null) {
-            throw new DBException("Project not found: " + projectId);
-        }
-        return project.getFileSystemManager();
     }
 
     @NotNull

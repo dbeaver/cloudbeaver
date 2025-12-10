@@ -294,6 +294,7 @@ public class WebSessionProjectImpl extends WebProjectImpl implements DBPObjectSe
         return sendDataSourceUpdatedEvent;
     }
 
+    // TODO: load project settings on project load
     public void refreshProjectSettings() throws DBException {
         if (webSession.getUser() == null) {
             return;
@@ -419,7 +420,7 @@ public class WebSessionProjectImpl extends WebProjectImpl implements DBPObjectSe
 
     @NotNull
     protected WebConnectionConfigInputHandler getInputConfigHandler(@NotNull WebConnectionConfig configInput) {
-        return new WebConnectionConfigInputHandler<>(getDataSourceRegistry(), configInput);
+        return new WebConnectionConfigInputHandler<>(webSession, getDataSourceRegistry(), configInput);
     }
 
 
