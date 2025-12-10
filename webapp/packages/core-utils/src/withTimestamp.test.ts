@@ -5,14 +5,22 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { describe, expect, it, vitest } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { withTimestamp } from './withTimestamp.js';
 
 describe('withTimestamp', () => {
+  const mockDate = new Date('2020-09-09T14:13:20');
+  const DateMock = class {
+    constructor() {
+      return mockDate;
+    }
+  } as any;
+  Object.setPrototypeOf(DateMock, Date);
+  Object.setPrototypeOf(DateMock.prototype, Date.prototype);
+
   it('should generate a value with timestamp at the end', () => {
-    const mockDate = new Date('2020-09-09T14:13:20');
-    const spy = vitest.spyOn(globalThis, 'Date').mockImplementation(() => mockDate);
+    const spy = vi.spyOn(globalThis, 'Date').mockImplementation(DateMock);
 
     const value = 'value';
     const expectedValue = `${value} 2020-09-09 14-13-20`;

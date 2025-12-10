@@ -17,7 +17,7 @@ beforeAll(() => {
 describe('getTextFileReadingProcess', () => {
   let file: File;
   let mockFileReader: Partial<FileReader>;
-  let fileReaderMock: MockInstance<(this: FileReader) => FileReader>;
+  let fileReaderMock: MockInstance<new (fileReader: FileReader) => FileReader>;
 
   beforeEach(() => {
     file = new File(['file content'], 'test.txt', { type: 'text/plain' });
@@ -29,7 +29,9 @@ describe('getTextFileReadingProcess', () => {
       onabort: null,
     };
 
-    fileReaderMock = vitest.spyOn(window, 'FileReader').mockImplementation(() => mockFileReader as FileReader);
+    fileReaderMock = vitest.spyOn(window, 'FileReader').mockImplementation(function FileReader() {
+      return mockFileReader;
+    });
   });
 
   afterEach(() => {

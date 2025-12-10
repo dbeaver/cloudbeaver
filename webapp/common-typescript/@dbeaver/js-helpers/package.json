@@ -29,7 +29,7 @@
     "@dbeaver/tsconfig": "workspace:^",
     "rimraf": "^6",
     "typescript": "^5",
-    "vitest": "^3"
+    "vitest": "^4"
   },
   "dependencies": {
     "async-mutex": "^0",
