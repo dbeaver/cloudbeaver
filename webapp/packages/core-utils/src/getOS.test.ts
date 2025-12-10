@@ -9,7 +9,7 @@ import { describe, expect, it, vitest } from 'vitest';
 
 import { getOS, OperatingSystem } from './getOS.js';
 
-describe.sequential('getOS', () => {
+describe('getOS', () => {
   it('should return windowsOS', () => {
     vitest.spyOn(window.navigator, 'userAgent', 'get').mockReturnValue('Windows 11');
     expect(getOS()).toBe(OperatingSystem.windowsOS);

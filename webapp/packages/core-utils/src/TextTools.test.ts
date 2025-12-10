@@ -16,7 +16,7 @@ function getLength(value: string): number {
   return TEXT_WIDTH + (value.length - 1) * LETTER_SPACING;
 }
 
-describe.sequential('TextTools', () => {
+describe('TextTools', () => {
   let mockContext: Mocked<CanvasRenderingContext2D>;
   let createElementMock: MockInstance<typeof document.createElement>;
 

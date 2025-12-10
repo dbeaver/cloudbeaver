@@ -9,7 +9,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 
 import { getCookies } from './getCookies.js';
 
-describe.sequential('getCookies', () => {
+describe('getCookies', () => {
   beforeEach(() => {
     // mock the `document.cookie` property
     Object.defineProperty(document, 'cookie', {

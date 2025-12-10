@@ -9,7 +9,7 @@ import { afterEach, beforeEach, describe, expect, it, vitest, type MockInstance 
 
 import { openCenteredPopup } from './openCenteredPopup.js';
 
-describe.sequential('openCenteredPopup', () => {
+describe('openCenteredPopup', () => {
   let windowSpy: MockInstance;
   const params = {
     url: 'http://localhost:3000',
