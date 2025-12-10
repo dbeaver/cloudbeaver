@@ -56,7 +56,7 @@ function createResolver(settings: Record<any, any>) {
   });
 }
 
-export function resetDeprecatedSettings() {
+function resetDeprecatedSettings() {
   beforeEach(() => {
     DEPRECATED_SETTINGS.clear();
   });
