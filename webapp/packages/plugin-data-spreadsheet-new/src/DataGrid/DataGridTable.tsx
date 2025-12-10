@@ -391,19 +391,22 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
     [],
   );
 
-  function handleSort(colIdx: number, order: 'asc' | 'desc' | null, isMultiple: boolean) {
+  async function handleSort(colIdx: number, order: 'asc' | 'desc' | null, isMultiple: boolean) {
     const column = tableData.getColumn(colIdx)?.key;
     if (!column) {
       return;
     }
+
     const resultColumn = tableData.getColumnInfo(column);
-    if (!resultColumn) {
+
+    if (!resultColumn || model.isLoading()) {
       return;
     }
+
     const constraintsAction = model.source.tryGetAction(resultIndex, IDatabaseDataConstraintAction);
     const currentOrder = constraintsAction!.getOrder(resultColumn.position);
     const nextOrder = getNextOrder(currentOrder);
-    model.request(() => {
+    await model.request(() => {
       constraintsAction!.setOrder(resultColumn.position, nextOrder, isMultiple);
     });
   }

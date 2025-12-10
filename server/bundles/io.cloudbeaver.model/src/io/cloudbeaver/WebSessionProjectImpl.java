@@ -244,6 +244,7 @@ public class WebSessionProjectImpl extends WebProjectImpl {
         return sendDataSourceUpdatedEvent;
     }
 
+    // TODO: load project settings on project load
     public void refreshProjectSettings() throws DBException {
         if (webSession.getUser() == null) {
             projectSettings.clear();
@@ -359,7 +360,7 @@ public class WebSessionProjectImpl extends WebProjectImpl {
 
     @NotNull
     protected WebConnectionConfigInputHandler getInputConfigHandler(@NotNull WebConnectionConfig configInput) {
-        return new WebConnectionConfigInputHandler<>(getDataSourceRegistry(), configInput);
+        return new WebConnectionConfigInputHandler<>(webSession, getDataSourceRegistry(), configInput);
     }
 
 

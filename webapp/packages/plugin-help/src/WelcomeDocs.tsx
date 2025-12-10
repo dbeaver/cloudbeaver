@@ -18,10 +18,9 @@ export const WelcomeDocs = observer(function WelcomeDocs() {
   const serverConfigResource = useService(ServerConfigResource);
   return (
     <Cell
-      as="a"
-      href={WEBSITE_LINKS.getDocumentationPage(serverConfigResource.distributed, GlobalConstants.version)}
-      target="_blank"
-      rel="noreferrer"
+      render={
+        <a href={WEBSITE_LINKS.getDocumentationPage(serverConfigResource.distributed, GlobalConstants.version)} target="_blank" rel="noreferrer" />
+      }
       before={<IconOrImage icon="/icons/documentation_link.svg" />}
       description={translate('plugin_help_welcome_docs_description', undefined, {
         product: serverConfigResource.distributed ? translate('product_full_name') : 'CloudBeaver',
