@@ -37,7 +37,7 @@
     "@dbeaver/react-dnd": "workspace:^",
     "@dbeaver/ui-kit": "workspace:^",
     "react": "^19",
-    "react-data-grid": "7.0.0-beta.57",
+    "react-data-grid": "7.0.0-beta.59",
     "react-dom": "^19"
   }
 }

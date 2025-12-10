@@ -4844,7 +4844,7 @@ __metadata:
     "@types/react": "npm:^19"
     "@types/react-dom": "npm:^19"
     react: "npm:^19"
-    react-data-grid: "npm:7.0.0-beta.57"
+    react-data-grid: "npm:7.0.0-beta.59"
     react-dom: "npm:^19"
     rimraf: "npm:^6"
     typescript: "npm:^5"
@@ -7808,8 +7808,8 @@ __metadata:
   linkType: hard
 
 "@theguild/federation-composition@npm:^0.21.0":
-  version: 0.21.0
-  resolution: "@theguild/federation-composition@npm:0.21.0"
+  version: 0.21.1
+  resolution: "@theguild/federation-composition@npm:0.21.1"
   dependencies:
     constant-case: "npm:^3.0.4"
     debug: "npm:4.4.3"
@@ -7817,7 +7817,7 @@ __metadata:
     lodash.sortby: "npm:^4.7.0"
   peerDependencies:
     graphql: ^16.0.0
-  checksum: 10c0/5f2b45f986cf9e341d3c5b2e89d1ef7bb54051a455c56babca81ac2c1c81829d207c892fe482c1ae10cd7c53e34d8d32bb4f8d27435d9901e532328e2ac22d98
+  checksum: 10c0/9eb422dfb29807d8a1da52d57e3ae411d1cabc4e8e804cf083627cdfc9ebe0c206aaca168171c8f593ed755d87cd799f69bd975acfd11a05a2d13f70d5a75687
   languageName: node
   linkType: hard
 
@@ -9406,11 +9406,11 @@ __metadata:
   linkType: hard
 
 "baseline-browser-mapping@npm:^2.9.0":
-  version: 2.9.5
-  resolution: "baseline-browser-mapping@npm:2.9.5"
+  version: 2.9.6
+  resolution: "baseline-browser-mapping@npm:2.9.6"
   bin:
     baseline-browser-mapping: dist/cli.js
-  checksum: 10c0/581bd4f578a1b5ccd48ad0155f760c412803f02e97259deec99150b87c95766266b607b09aefa65da96dc5b925165706d675f10413630e767391e26a4f7afcdf
+  checksum: 10c0/9d9bae544342c02200e0a489d4caf3611a2a517d0d7a8c97e1dd7d640ac18d2784710bf08375b5951fb9034bd18d902b50797d90218a33b88e6244ae917f881f
   languageName: node
   linkType: hard
 
@@ -16309,15 +16309,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-data-grid@npm:7.0.0-beta.57":
-  version: 7.0.0-beta.57
-  resolution: "react-data-grid@npm:7.0.0-beta.57"
-  dependencies:
-    clsx: "npm:^2.0.0"
+"react-data-grid@npm:7.0.0-beta.59":
+  version: 7.0.0-beta.59
+  resolution: "react-data-grid@npm:7.0.0-beta.59"
   peerDependencies:
-    react: ^19.0
-    react-dom: ^19.0
-  checksum: 10c0/7094f73f2f491bcca2cc069b81bb56aa774f20c869fd5b737598c93c539a07971477bd64ced0a12ba3e08dbdd9d50771ea4b60afa6b2c4ddacea5a1dac6eb9f6
+    react: ^19.2
+    react-dom: ^19.2
+  checksum: 10c0/b48da72e4e2d7562727354301fffd8433a06659e536effecae8a410a8e44e84e3368cde1970f98945ecd221e45ecbf4e4baa562e42fe32e5a9ff74a36a910633
   languageName: node
   linkType: hard
 
@@ -17243,8 +17241,8 @@ __metadata:
   linkType: hard
 
 "sass@npm:^1, sass@npm:^1.70.0":
-  version: 1.95.0
-  resolution: "sass@npm:1.95.0"
+  version: 1.95.1
+  resolution: "sass@npm:1.95.1"
   dependencies:
     "@parcel/watcher": "npm:^2.4.1"
     chokidar: "npm:^4.0.0"
@@ -17255,7 +17253,7 @@ __metadata:
       optional: true
   bin:
     sass: sass.js
-  checksum: 10c0/5f4093eb6fe569d65fbf30baf1fdd36b499ebc90a2f36fedf64aea2f5a72889a9df34cc96cd7cb640a10156708c9b8894b6f89953f26b57b44b96731e9c27fb5
+  checksum: 10c0/458c65e961eb67a64b15c9e78897543f5af98b40ecd3a6a4f10d12fcf8fc17af029602ce9897ad48b1a4404083969575db28b78249e11ecdf54dbe9ea7fda594
   languageName: node
   linkType: hard
 
