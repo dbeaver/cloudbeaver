@@ -14,7 +14,7 @@ beforeAll(() => {
   addKnownError(/Error: Read error/);
 });
 
-describe('getTextFileReadingProcess', () => {
+describe.sequential('getTextFileReadingProcess', () => {
   let file: File;
   let mockFileReader: Partial<FileReader>;
   let fileReaderMock: MockInstance<new (fileReader: FileReader) => FileReader>;

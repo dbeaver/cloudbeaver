@@ -10,7 +10,7 @@ import { renderHook } from '@testing-library/react';
 
 import { type IScrollState, useControlledScroll } from './useControlledScroll.js';
 
-describe('useControlledScroll', () => {
+describe.sequential('useControlledScroll', () => {
   let element: HTMLDivElement;
   let scrollState: IScrollState;
 

@@ -12,7 +12,7 @@ import * as isValidUrlModule from './isValidUrl.js';
 
 type WindowSpyType = MockInstance;
 
-describe('GlobalConstants', () => {
+describe.sequential('GlobalConstants', () => {
   let windowSpy: WindowSpyType;
 
   beforeEach(() => {

@@ -9,7 +9,7 @@ import { afterAll, beforeEach, describe, expect, it, vitest } from 'vitest';
 
 import { copyToClipboard } from './copyToClipboard.js';
 
-describe('copyToClipboard', () => {
+describe.sequential('copyToClipboard', () => {
   const originalExecCommand = document.execCommand;
 
   beforeEach(() => {
