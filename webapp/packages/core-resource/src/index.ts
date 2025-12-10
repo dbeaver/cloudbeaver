@@ -19,6 +19,7 @@ export {
   getNextPageOffset,
   type ICachedResourceOffsetPageOptions,
 } from './Resource/CachedResourceOffsetPageKeys.js';
+export * from './Resource/hasMorePagesForResourceKey.js';
 export * from './Resource/getOffsetPageKeyInfo.js';
 export * from './Resource/CachedTreeResource/CachedTreeResource.js';
 export * from './Resource/CachedTreeResource/ICachedTreeMoveData.js';
