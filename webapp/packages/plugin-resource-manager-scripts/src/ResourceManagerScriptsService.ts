@@ -14,6 +14,7 @@ import type { ProjectInfo } from '@cloudbeaver/core-projects';
 import { getRmResourceKey, ResourceManagerResource } from '@cloudbeaver/core-resource-manager';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { ResourceManagerService } from '@cloudbeaver/plugin-resource-manager';
+import { SideBarPanelService } from '@cloudbeaver/core-ui';
 
 import { ResourceManagerScriptsSettingsService } from './ResourceManagerScriptsSettingsService.js';
 import { SCRIPTS_TYPE_ID } from './SCRIPTS_TYPE_ID.js';
@@ -31,7 +32,16 @@ interface IResourceProperties {
   'default-schema'?: string;
 }
 
-@injectable(() => [UserDataService, ServerConfigResource, ResourceManagerService, ResourceManagerResource, ResourceManagerScriptsSettingsService])
+export const SCRIPTS_TAB_ID = 'resource-manager-scripts-tab';
+
+@injectable(() => [
+  UserDataService,
+  ServerConfigResource,
+  ResourceManagerService,
+  ResourceManagerResource,
+  ResourceManagerScriptsSettingsService,
+  SideBarPanelService,
+])
 export class ResourceManagerScriptsService {
   get active() {
     return this.enabled && this.settings.active;
@@ -51,6 +61,7 @@ export class ResourceManagerScriptsService {
     private readonly resourceManagerService: ResourceManagerService,
     private readonly resourceManagerResource: ResourceManagerResource,
     private readonly resourceManagerScriptsSettingsService: ResourceManagerScriptsSettingsService,
+    private readonly sideBarPanelService: SideBarPanelService,
   ) {
     this.togglePanel = this.togglePanel.bind(this);
 
@@ -63,6 +74,10 @@ export class ResourceManagerScriptsService {
 
   togglePanel() {
     this.settings.active = !this.settings.active;
+  }
+
+  selectTab() {
+    this.sideBarPanelService.tabsContainer.select(SCRIPTS_TAB_ID);
   }
 
   getRootFolder(project: ProjectInfo) {

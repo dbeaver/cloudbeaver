@@ -373,6 +373,7 @@ public class WebServiceCore implements DBWServiceCore {
         if (saveCredentials) {
             // Save all passed credentials in the datasource container
             WebDataSourceUtils.saveAuthProperties(
+                webSession.getProgressMonitor(),
                 dataSourceContainer,
                 dataSourceContainer.getConnectionConfiguration(),
                 authProperties,
@@ -529,6 +530,7 @@ public class WebServiceCore implements DBWServiceCore {
                 }
             }
             WebDataSourceUtils.saveAuthProperties(
+                webSession.getProgressMonitor(),
                 testDataSource,
                 testDataSource.getConnectionConfiguration(),
                 configInput.getCredentials(),
