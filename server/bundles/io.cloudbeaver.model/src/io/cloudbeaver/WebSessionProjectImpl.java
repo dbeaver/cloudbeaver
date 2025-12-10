@@ -48,9 +48,8 @@ public class WebSessionProjectImpl extends WebProjectImpl implements DBPObjectSe
     private static final Log log = Log.getLog(WebSessionProjectImpl.class);
     protected final WebSession webSession;
     private final Map<String, WebConnectionInfo> connections = new HashMap<>();
-    private final Map<String, Map<String, String>> projectSettings = new ConcurrentHashMap<>();
+    private Map<String, Map<String, String>> projectSettings;
     private boolean registryIsLoaded = false;
-    private boolean projectSettingsLoaded = false;
     private final Object lock = new Object();
 
     public WebSessionProjectImpl(
@@ -93,10 +92,9 @@ public class WebSessionProjectImpl extends WebProjectImpl implements DBPObjectSe
     @Nullable
     public Map<String, String> getObjectSettings(@NotNull String objectId) {
         synchronized (lock) {
-            if (!projectSettingsLoaded) {
+            if (projectSettings == null) {
                 loadProjectSettings();
             }
-            projectSettingsLoaded = true;
         }
         return projectSettings.get(objectId);
     }
@@ -297,10 +295,10 @@ public class WebSessionProjectImpl extends WebProjectImpl implements DBPObjectSe
     }
 
     public void refreshProjectSettings() throws DBException {
-        projectSettings.clear();
         if (webSession.getUser() == null) {
             return;
         }
+        this.projectSettings = new ConcurrentHashMap<>();
         List<SMObjectSettings> loadedSettings = webSession.getSecurityController().getObjectSettings(
             getId(),
             getId(),
