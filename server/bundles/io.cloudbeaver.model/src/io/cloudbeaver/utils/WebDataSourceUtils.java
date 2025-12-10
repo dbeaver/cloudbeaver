@@ -16,10 +16,6 @@
  */
 package io.cloudbeaver.utils;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.InstanceCreator;
-import com.google.gson.Strictness;
 import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebSessionProjectImpl;
@@ -34,7 +30,6 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBConstants;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.access.DBAAuthCredentials;
-import org.jkiss.dbeaver.model.access.DBAAuthCredentialsWithComplexProperties;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
@@ -43,7 +38,9 @@ import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.model.impl.auth.AuthModelDatabaseNativeCredentials;
 import org.jkiss.dbeaver.model.net.DBWHandlerConfiguration;
 import org.jkiss.dbeaver.model.net.ssh.SSHConstants;
+import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceDisconnectEvent;
+import org.jkiss.dbeaver.registry.DataSourceUtils;
 import org.jkiss.dbeaver.registry.network.NetworkHandlerDescriptor;
 import org.jkiss.dbeaver.registry.network.NetworkHandlerRegistry;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
@@ -211,31 +208,30 @@ public class WebDataSourceUtils {
         return webSession.getAccessibleProjectById(projectId).getWebConnectionInfo(connectionId);
     }
 
-
-    public static void updateCredentialsFromProperties(@NotNull DBAAuthCredentials credentials, @NotNull Map<String, ?> properties) {
-        InstanceCreator<DBAAuthCredentials> credTypeAdapter = type -> credentials;
-        Gson credGson = new GsonBuilder()
-            .setStrictness(Strictness.LENIENT)
-            .registerTypeAdapter(credentials.getClass(), credTypeAdapter)
-            .create();
-
-        if (credentials instanceof DBAAuthCredentialsWithComplexProperties complexProperties) {
-            complexProperties.updateCredentialsFromComplexProperties(properties);
+    public static void updateCredentialsFromProperties(
+        @NotNull DBRProgressMonitor progressMonitor,
+        @NotNull DBAAuthCredentials credentials,
+        @Nullable Map<String, ?> properties
+    ) {
+        if (properties == null) {
+            return;
         }
-        credGson.fromJson(credGson.toJsonTree(properties), credentials.getClass());
+        DataSourceUtils.updateCredentialsFromProperties(progressMonitor, credentials, properties);
     }
 
     public static void saveAuthProperties(
+        @NotNull DBRProgressMonitor progressMonitor,
         @NotNull DBPDataSourceContainer dataSourceContainer,
         @NotNull DBPConnectionConfiguration configuration,
         @Nullable Map<String, Object> authProperties,
         boolean saveCredentials,
         boolean sharedCredentials
     ) {
-        saveAuthProperties(dataSourceContainer, configuration, authProperties, saveCredentials, sharedCredentials, false);
+        saveAuthProperties(progressMonitor, dataSourceContainer, configuration, authProperties, saveCredentials, sharedCredentials, false);
     }
 
     public static void saveAuthProperties(
+        @NotNull DBRProgressMonitor progressMonitor,
         @NotNull DBPDataSourceContainer dataSourceContainer,
         @NotNull DBPConnectionConfiguration configuration,
         @Nullable Map<String, Object> authProperties,
@@ -271,7 +267,7 @@ public class WebDataSourceUtils {
                 configuration.setAuthProperties(currentAuthProps);
             }
             if (!authProperties.isEmpty()) {
-                updateCredentialsFromProperties(credentials, authProperties);
+                updateCredentialsFromProperties(progressMonitor, credentials, authProperties);
             }
 
             configuration.getAuthModel().saveCredentials(dataSourceContainer, configuration, credentials);
