@@ -19,18 +19,13 @@ describe('Icon', () => {
     (globalThis as any)._ROOT_URI_ = undefined;
   });
 
-  test('icons.svg#name', () => {
+  test('should render with "icons.svg#name" path', () => {
     const { getByTestId } = renderInApp(<Icon data-testid="Icon" name="test" />);
     expect(getByTestId('Icon').querySelector('use')).toHaveAttribute('href', '/path/icons/icons.svg#test');
   });
 
-  test('/image.jpg', () => {
+  test('should render with custom absolute path', () => {
     const { getByTestId } = renderInApp(<Icon data-testid="Icon" name="/image.jpg" />);
     expect(getByTestId('Icon').querySelector('use')).toHaveAttribute('href', '/path/image.jpg');
-  });
-
-  test('{_ROOT_URI_}/icons.svg#name', () => {
-    const { getByTestId } = renderInApp(<Icon data-testid="Icon" name="test" />);
-    expect(getByTestId('Icon').querySelector('use')).toHaveAttribute('href', '/path/icons/icons.svg#test');
   });
 });
