@@ -18,6 +18,7 @@ package io.cloudbeaver;
 
 import io.cloudbeaver.model.WebConnectionConfig;
 import io.cloudbeaver.model.app.WebAppConfiguration;
+import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.utils.ServletAppUtils;
 import io.cloudbeaver.utils.WebDataSourceUtils;
 import org.jkiss.code.NotNull;
@@ -32,8 +33,10 @@ public class WebConnectionConfigInputHandler<T extends WebConnectionConfig, C ex
     private static final Log log = Log.getLog(WebConnectionConfigInputHandler.class);
     protected final T input;
     protected final DBPDataSourceRegistry registry;
+    protected final WebSession webSession;
 
-    public WebConnectionConfigInputHandler(@NotNull DBPDataSourceRegistry registry, T configInput) {
+    public WebConnectionConfigInputHandler(@NotNull WebSession webSession, @NotNull DBPDataSourceRegistry registry, T configInput) {
+        this.webSession = webSession;
         this.registry = registry;
         this.input = configInput;
     }
@@ -52,6 +55,7 @@ public class WebConnectionConfigInputHandler<T extends WebConnectionConfig, C ex
         }
 
         WebDataSourceUtils.saveAuthProperties(
+            webSession.getProgressMonitor(),
             newDataSource,
             newDataSource.getConnectionConfiguration(),
             input.getCredentials(),
@@ -81,6 +85,7 @@ public class WebConnectionConfigInputHandler<T extends WebConnectionConfig, C ex
             input
         );
         WebDataSourceUtils.saveAuthProperties(
+            webSession.getProgressMonitor(),
             dataSource,
             dataSource.getConnectionConfiguration(),
             input.getCredentials(),

@@ -533,7 +533,7 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
     @NotNull
     private List<String> getGroupForMember(String fullDN, LdapSettings ldapSettings, Map<String, Object> authParameters) {
         DirContext context = null;
-        List<String> result = new ArrayList<>();
+        Set<String> result = new LinkedHashSet<>();
         try {
             Map<String, String> environment = creteAuthEnvironment(ldapSettings);
             if (CommonUtils.isEmpty(ldapSettings.getBindUserDN())) {
@@ -570,7 +570,7 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
                 log.error("Close resource of ldap group search failed", e);
             }
         }
-        return result;
+        return new ArrayList<>(result);
     }
 
     private List<String> findGroupsByMemberOfAttribute(String fullDN, DirContext context) throws NamingException {
