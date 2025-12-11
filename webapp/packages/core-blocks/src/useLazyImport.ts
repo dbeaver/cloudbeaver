@@ -75,7 +75,6 @@ export function createLazyLoader<T>(factory: () => Promise<T>): ILazyLoader<T> {
     promise
       .then(data => {
         state = { data, loading: false, error: null };
-        notify();
       })
       .catch((cause: Error) => {
         state = {
@@ -84,6 +83,8 @@ export function createLazyLoader<T>(factory: () => Promise<T>): ILazyLoader<T> {
           error: new LoadingError(() => refresh(), "Can't load element", { cause }),
         };
         promise = null; // Allow retry on error
+      })
+      .finally(() => {
         notify();
       });
   }
