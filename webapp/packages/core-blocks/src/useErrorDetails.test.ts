@@ -12,6 +12,7 @@ import { DetailsError } from '@cloudbeaver/core-sdk';
 import { LoadingError } from '@cloudbeaver/core-utils';
 import * as coreUtils from '@cloudbeaver/core-utils';
 import { useErrorDetails } from './useErrorDetails.js';
+// eslint-disable-next-line @cloudbeaver/no-sync-component-import
 import { ErrorDetailsDialog } from './ErrorDetailsDialog/ErrorDetailsDialog.js';
 
 vitest.mock('@cloudbeaver/core-di', () => ({

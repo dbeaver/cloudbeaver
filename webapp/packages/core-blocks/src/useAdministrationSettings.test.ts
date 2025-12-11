@@ -20,10 +20,14 @@ vitest.mock('./usePermission', () => ({
   usePermission: vitest.fn(),
 }));
 
-vitest.mock('@cloudbeaver/core-root', () => ({
-  ServerConfigResource: vitest.fn(),
-  EAdminPermission: { admin: 'admin' },
-}));
+vitest.mock('@cloudbeaver/core-root', async importOriginal => {
+  const actual = (await importOriginal()) as object;
+
+  return {
+    ...actual,
+    ServerConfigResource: vitest.fn(),
+  };
+});
 
 describe('useAdministrationSettings', () => {
   let mockUsePermission: ReturnType<typeof vitest.fn>;
