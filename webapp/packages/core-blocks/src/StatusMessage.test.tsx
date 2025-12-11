@@ -18,13 +18,6 @@ vi.mock('./localization/useTranslate', () => ({
   useTranslate: () => (key: string) => key,
 }));
 
-vi.mock('./s', async () => {
-  const { sMock } = await import('./tests/sMock.js');
-  return {
-    s: vi.fn(sMock),
-  };
-});
-
 vi.mock('./IconOrImage', () => ({
   IconOrImage: (props: any) => <svg {...props} />,
 }));
@@ -32,13 +25,6 @@ vi.mock('./IconOrImage', () => ({
 vi.mock('./Link', () => ({
   Link: (props: any) => <a {...props} />,
 }));
-
-vi.mock('./useS', async () => {
-  const { useSMock } = await import('./tests/useSMock.js');
-  return {
-    useS: vi.fn(useSMock),
-  };
-});
 
 vi.mock('./useErrorDetails', () => ({
   useErrorDetails: (exception: Error | null) => ({

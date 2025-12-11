@@ -10,20 +10,6 @@ import { describe, expect, it, vi } from 'vitest';
 import { Cell } from './Cell.js';
 import { renderInApp } from '@cloudbeaver/tests-runner';
 
-vi.mock('./s', async () => {
-  const { sMock } = await import('./tests/sMock.js');
-  return {
-    s: vi.fn(sMock),
-  };
-});
-
-vi.mock('./useS', async () => {
-  const { useSMock } = await import('./tests/useSMock.js');
-  return {
-    useS: vi.fn(useSMock),
-  };
-});
-
 vi.mock('./Containers/Container', () => ({
   Container: (props: any) => <div>{props.children}</div>,
 }));

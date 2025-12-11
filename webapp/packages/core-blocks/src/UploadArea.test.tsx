@@ -23,20 +23,6 @@ function createTestFileList(name = 'test.txt', content = 'content', type = 'text
   return { file, fileList };
 }
 
-vi.mock('./s', async () => {
-  const { sMock } = await import('./tests/sMock.js');
-  return {
-    s: vi.fn(sMock),
-  };
-});
-
-vi.mock('./useS', async () => {
-  const { useSMock } = await import('./tests/useSMock.js');
-  return {
-    useS: vi.fn(useSMock),
-  };
-});
-
 describe('UploadArea', () => {
   it('should render children correctly', async () => {
     const { getByText } = renderInApp(<UploadArea>Upload File</UploadArea>);

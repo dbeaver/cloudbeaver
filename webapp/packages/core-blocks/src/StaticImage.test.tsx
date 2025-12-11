@@ -6,45 +6,20 @@
  * you may not use this file except in compliance with the License.
  */
 import { fireEvent } from '@testing-library/react';
-import { describe, expect, test, vi } from 'vitest';
-
+import { afterAll, beforeAll, describe, expect, test, vi } from 'vitest';
 import { renderInApp } from '@cloudbeaver/tests-runner';
-
 import { StaticImage } from './StaticImage.js';
-
-vi.mock('@cloudbeaver/core-utils', () => ({
-  isValidUrl: vi.fn((url: string) => {
-    try {
-      new URL(url);
-      return true;
-    } catch {
-      return false;
-    }
-  }),
-  GlobalConstants: {
-    absoluteUrl: vi.fn((path: string) => `/absolute${path}`),
-  },
-}));
-
-vi.mock('./useS.js', async () => {
-  const { useSMock } = await import('./tests/useSMock.js');
-  return {
-    useS: vi.fn(() =>
-      useSMock({
-        block: 'block',
-      }),
-    ),
-  };
-});
-
-vi.mock('./s.js', async () => {
-  const { sMock } = await import('./tests/sMock.js');
-  return {
-    s: vi.fn(sMock),
-  };
-});
+import * as sModule from './s.js';
 
 describe('StaticImage', () => {
+  beforeAll(() => {
+    (globalThis as any)._ROOT_URI_ = '/absolute';
+  });
+
+  afterAll(() => {
+    (globalThis as any)._ROOT_URI_ = undefined;
+  });
+
   test('should return null when icon is not provided', () => {
     const { container } = renderInApp(<StaticImage />);
     expect(container.firstChild).toBeNull();
@@ -110,14 +85,14 @@ describe('StaticImage', () => {
   });
 
   test('should apply block class when block prop is true', () => {
-    const { getByRole } = renderInApp(<StaticImage icon="/image.png" block />);
-    const img = getByRole('img');
-    expect(img).toHaveClass('block');
+    const sMock = vi.spyOn(sModule, 's');
+    renderInApp(<StaticImage icon="/image.png" block />);
+    expect(sMock).toHaveBeenCalledWith({}, { block: true }, undefined);
   });
 
   test('should not apply block class when block prop is false', () => {
-    const { getByRole } = renderInApp(<StaticImage icon="/image.png" block={false} />);
-    const img = getByRole('img');
-    expect(img).not.toHaveClass('block');
+    const sMock = vi.spyOn(sModule, 's');
+    renderInApp(<StaticImage icon="/image.png" block={false} />);
+    expect(sMock).toHaveBeenCalledWith({}, { block: false }, undefined);
   });
 });

@@ -17,8 +17,6 @@ interface TestItem {
   category: string;
 }
 
-const useObservableRefSpy = vi.fn();
-
 const mockSearchResults = vi.fn();
 const mockIsIndexing = vi.fn();
 const mockRemoveAll = vi.fn();
@@ -37,17 +35,6 @@ vi.mock('react-minisearch', () => ({
   })),
 }));
 
-vi.mock('./useObservableRef', async () => {
-  const useObservableRefMockModule = await import('./tests/useObservableRefMock.js');
-
-  return {
-    useObservableRef: (init: any, observed: any, update: any, bind?: any) => {
-      useObservableRefSpy(init, observed, update, bind);
-      return useObservableRefMockModule.useObservableRefMock(init, observed, update);
-    },
-  };
-});
-
 describe('useFuzzySearch', () => {
   const testData: TestItem[] = [
     { name: 'Apple', description: 'A red fruit', category: 'fruit' },
@@ -56,7 +43,6 @@ describe('useFuzzySearch', () => {
   ];
 
   beforeEach(() => {
-    useObservableRefSpy.mockClear();
     mockSearchResults.mockClear();
     mockIsIndexing.mockClear();
     mockRemoveAll.mockClear();
@@ -194,9 +180,6 @@ describe('useFuzzySearch', () => {
         fields: ['name', 'description'],
       }),
     );
-
-    // Verify useObservableRef was called
-    expect(useObservableRefSpy).toHaveBeenCalled();
 
     // Verify the returned state has all required properties
     expect(result.current).toHaveProperty('searchResult');

@@ -10,14 +10,6 @@ import { renderHook } from '@testing-library/react';
 
 import { useCombinedHandler } from './useCombinedHandler.js';
 
-vi.mock('./useObjectRef', () => ({
-  useObjectRef: vi.fn((_, options) => ({
-    handler: vi.fn((...args: any[]) => {
-      options.handlers.forEach((handler: any) => handler?.(...args));
-    }),
-  })),
-}));
-
 describe('useCombinedHandler', () => {
   test('should call all provided handlers', () => {
     const handler1 = vi.fn();

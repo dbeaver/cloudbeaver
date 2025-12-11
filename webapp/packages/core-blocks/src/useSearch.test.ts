@@ -17,7 +17,6 @@ interface TestItem {
   category: string;
 }
 
-const useObservableRefSpy = vi.fn();
 const useFuzzySearchSpy = vi.fn();
 
 const mockFuzzySearch = vi.fn();
@@ -35,17 +34,6 @@ vi.mock('./useFuzzySearch', () => ({
   }),
 }));
 
-vi.mock('./useObservableRef', async () => {
-  const useObservableRefMockModule = await import('./tests/useObservableRefMock.js');
-
-  return {
-    useObservableRef: (init: any, observed: any, update: any, bind?: any) => {
-      useObservableRefSpy(init, observed, update, bind);
-      return useObservableRefMockModule.useObservableRefMock(init, observed, update);
-    },
-  };
-});
-
 describe('useSearch', () => {
   const testData: TestItem[] = [
     { name: 'Apple', description: 'A red fruit', category: 'fruit' },
@@ -57,7 +45,6 @@ describe('useSearch', () => {
   ];
 
   beforeEach(() => {
-    useObservableRefSpy.mockClear();
     useFuzzySearchSpy.mockClear();
     mockFuzzySearch.mockClear();
     mockSearchResult = null;
@@ -73,7 +60,6 @@ describe('useSearch', () => {
       );
 
       expect(result.current.searchResult).toEqual([]);
-      expect(useObservableRefSpy).toHaveBeenCalled();
     });
 
     test('should initialize fuzzy search when matchStrategy is fuzzy', () => {

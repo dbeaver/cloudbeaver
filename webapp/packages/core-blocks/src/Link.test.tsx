@@ -15,20 +15,6 @@ vi.mock('./IconOrImage', () => ({
   IconOrImage: (props: any) => <svg {...props}>{props.children}</svg>,
 }));
 
-vi.mock('./s', async () => {
-  const { sMock } = await import('./tests/sMock.js');
-  return {
-    s: vi.fn(sMock),
-  };
-});
-
-vi.mock('./useS', async () => {
-  const { useSMock } = await import('./tests/useSMock.js');
-  return {
-    useS: vi.fn(useSMock),
-  };
-});
-
 describe('Link', () => {
   it('should render link and children correctly', async () => {
     const { getByText, getByRole } = renderInApp(<Link href="#">Test Link</Link>);
