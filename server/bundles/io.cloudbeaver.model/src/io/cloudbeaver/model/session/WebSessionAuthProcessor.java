@@ -181,7 +181,7 @@ public class WebSessionAuthProcessor {
             return newAuthInfos;
         } catch (DBException e) {
             if (resetUserStateOnError) {
-                webSession.resetUserState(false);
+                webSession.resetUserState();
             }
             throw new DBWebException("User authentication failed", e);
         }
