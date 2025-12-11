@@ -11,17 +11,6 @@ import { describe, expect, test, vi } from 'vitest';
 import { IconOrImage, type IconOrImageProps } from './IconOrImage.js';
 import { renderInApp } from '@cloudbeaver/tests-runner';
 
-vi.mock('@cloudbeaver/core-utils', () => ({
-  isValidUrl: vi.fn((url: string) => {
-    try {
-      new URL(url);
-      return true;
-    } catch {
-      return false;
-    }
-  }),
-}));
-
 vi.mock('./Icon.js', () => ({
   Icon: vi.fn(({ ...props }) => (
     <svg {...props} role="svg">

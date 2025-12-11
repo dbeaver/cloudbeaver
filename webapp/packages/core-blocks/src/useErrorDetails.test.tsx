@@ -18,11 +18,6 @@ vitest.mock('@cloudbeaver/core-di', () => ({
   useService: vitest.fn(),
 }));
 
-vitest.mock('@cloudbeaver/core-utils', () => ({
-  errorOf: vitest.fn(),
-  LoadingError: vitest.fn(),
-}));
-
 vitest.mock('./ErrorDetailsDialog/ErrorDetailsDialog.js', () => ({
   ErrorDetailsDialog: vitest.fn(),
 }));

@@ -12,8 +12,6 @@ import type { IExecutorHandler, IExecutorHandlersCollection } from '@cloudbeaver
 
 import { useExecutor } from './useExecutor.js';
 
-vitest.mock('@cloudbeaver/core-executor', () => ({}));
-
 describe('useExecutor', () => {
   let mockExecutor: IExecutorHandlersCollection<any>;
 
