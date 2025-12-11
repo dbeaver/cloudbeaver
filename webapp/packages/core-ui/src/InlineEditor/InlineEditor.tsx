@@ -14,6 +14,7 @@ import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dial
 
 import { EditorDialog } from './EditorDialog.js';
 import styles from './InlineEditor.module.css';
+import { Input } from '@dbeaver/ui-kit';
 
 export type InlineEditorControls = 'right' | 'top' | 'bottom' | 'inside';
 
@@ -114,7 +115,7 @@ export const InlineEditor = observer<InlineEditorProps, HTMLInputElement>(
     return (
       <div className={s(style, { editor: true, specific: true, editorActive: active }, className)} onClick={onClick} onDoubleClick={onDoubleClick}>
         <div className={s(style, { editorContainer: true })}>
-          <input
+          <Input
             ref={inputRef}
             className={s(style, { input: true })}
             lang="en"
@@ -124,6 +125,7 @@ export const InlineEditor = observer<InlineEditorProps, HTMLInputElement>(
             onChange={handleChange}
             onKeyDown={handleKeyDown}
             {...rest}
+            size="small"
           />
         </div>
         <div

@@ -1,6 +1,7 @@
 mutation updateUserPreferences($preferences: Object!) {
   user: setUserPreferences(preferences: $preferences) {
     userId
+    isAnonymous
     displayName
     authRole
     linkedAuthProviders
