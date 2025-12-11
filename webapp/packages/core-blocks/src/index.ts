@@ -185,7 +185,6 @@ export * from './FormControls/ComboboxLoader.js';
 export * from './FormControls/FormContext.js';
 export * from './FormControls/FormFieldDescription.js';
 export * from './FormControls/InputField/InputField.js';
-export { default as InputFieldStyles } from './FormControls/InputField/InputField.module.css';
 export * from './FormControls/InputFiles.js';
 export * from './FormControls/InputFileTextContent.js';
 export * from './FormControls/Radio.js';
