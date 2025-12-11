@@ -78,8 +78,8 @@ export function parseJdbcUri(jdbcUrl: string | undefined | null): JdbcUri {
   // Handle URL-like formats (most JDBC URLs)
   if (subname.startsWith('//')) {
     // Extract query string if present
-    const queryMatch = subname.match(/\?(.+)$/);
-    const queryString = queryMatch?.[1];
+    const queryStart = subname.indexOf('?');
+    const queryString = queryStart !== -1 ? subname.substring(queryStart + 1) : undefined;
     const queryParams = parseQueryParams(queryString);
 
     // Strip query string for further parsing

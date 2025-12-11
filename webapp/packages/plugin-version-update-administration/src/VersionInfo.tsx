@@ -33,9 +33,9 @@ export const VersionInfo = observer<Props>(function VersionInfo({ item }) {
             <ReactMarkdown
               components={{
                 p: ({ node, ...props }) => <p className="tw:mb-4" {...props} />,
-                ul: ({ node, ...props }) => <ul className="tw:list-disc tw:flex tw:flex-col tw:gap-4" {...props} />,
-                ol: ({ node, ...props }) => <ol className="tw:list-decimal tw:flex tw:flex-col tw:gap-4" {...props} />,
-                li: ({ node, ...props }) => <li className="tw:ml-4" {...props} />,
+                ul: ({ node, ...props }) => <ul className="tw:[&_ul_li]:ml-7 tw:list-disc tw:[&_ul]:list-[circle]" {...props} />,
+                ol: ({ node, ...props }) => <ol className="tw:[&_ol_li]:ml-7 tw:list-decimal" {...props} />,
+                li: ({ node, ...props }) => <li className="tw:ml-4 tw:[&+&]:mt-1" {...props} />,
               }}
             >
               {version.releaseNotes}

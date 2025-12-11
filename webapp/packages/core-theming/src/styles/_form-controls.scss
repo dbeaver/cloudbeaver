@@ -52,7 +52,7 @@
     padding: 7px 12px;
     width: 100%;
     border: 2px solid;
-    outline: none;
+    outline: none !important;
     border-radius: $theme-form-element-radius;
 
     @include mdc-theme-prop(color, input-color, false);
