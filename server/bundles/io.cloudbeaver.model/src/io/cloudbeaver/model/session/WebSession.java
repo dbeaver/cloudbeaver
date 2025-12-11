@@ -84,6 +84,7 @@ public class WebSession extends BaseWebSession
     private static final AtomicInteger TASK_ID = new AtomicInteger();
 
     public static String RUNTIME_PARAM_AUTH_INFOS = "auth-infos";
+    public static String RUNTIME_PARAM_ORIGIN = "origin";
     private final AtomicInteger taskCount = new AtomicInteger();
 
     private final String lastRemoteAddr;
@@ -91,6 +92,7 @@ public class WebSession extends BaseWebSession
 
     private String locale;
     private boolean cacheExpired;
+    private String origin;
 
     protected WebSessionGlobalProjectImpl globalProject;
     private final List<WebServerMessage> sessionMessages = new ArrayList<>();
@@ -269,6 +271,10 @@ public class WebSession extends BaseWebSession
     @NotNull
     public DBPEventListener getDataSourceConnectListener() {
         return connectListener;
+    }
+
+    public void updateOrigin(@NotNull String originFromRequest) {
+        this.origin = originFromRequest;
     }
 
     private void initNavigatorModel() {
@@ -828,6 +834,7 @@ public class WebSession extends BaseWebSession
                 contextCredentialsProvider.provideAuthParameters(monitor, dataSourceContainer, configuration);
             }
             configuration.setRuntimeAttribute(RUNTIME_PARAM_AUTH_INFOS, getAllAuthInfo());
+            configuration.setRuntimeAttribute(RUNTIME_PARAM_ORIGIN, this.origin);
 
             WebSessionProjectImpl project = getProjectById(dataSourceContainer.getProject().getId());
             if (project != null) {
