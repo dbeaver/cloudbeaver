@@ -10,11 +10,12 @@ import { useCallback, useMemo } from 'react';
 import { observer } from 'mobx-react-lite';
 import { reaction } from 'mobx';
 
-import { FieldCheckbox, Link, Placeholder, useTranslate } from '@cloudbeaver/core-blocks';
+import { FieldCheckbox, Link, Placeholder, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import type { AdminUserInfoFragment } from '@cloudbeaver/core-sdk';
 import { UsersResource } from '@cloudbeaver/core-authentication';
 import { NotificationService } from '@cloudbeaver/core-events';
+import { ADMINISTRATION_TABLE_DEFAULT_ROW_HEIGHT, AdministrationTableStyles } from '@cloudbeaver/core-administration';
 import { DataGrid, useCreateGridReactiveValue } from '@cloudbeaver/plugin-data-grid';
 
 import { UsersTableOptionsPanelService } from './UsersTableOptionsPanelService.js';
@@ -37,12 +38,23 @@ const COLUMNS = [ID_COLUMN, TEAM_COLUMN, ENABLED_COLUMN, AUTH_COLUMN];
 
 export const UsersTable = observer<Props>(function UsersTable({ users, isManageable, displayAuthRole, onLoadMore }) {
   const translate = useTranslate();
+  const styles = useS(AdministrationTableStyles);
   const notificationService = useService(NotificationService);
   const usersTableOptionsPanelService = useService(UsersTableOptionsPanelService);
   const usersAdministrationService = useService(UsersAdministrationService);
   const usersResource = useService(UsersResource);
 
-  const columns = useMemo(() => (displayAuthRole ? [...COLUMNS, ROLE_COLUMN] : COLUMNS), [displayAuthRole]);
+  const columns = useMemo(() => {
+    if (displayAuthRole) {
+      const result = [...COLUMNS];
+      const teamIndex = COLUMNS.findIndex(column => column.key === TEAM_COLUMN.key);
+
+      result.splice(teamIndex + 1, 0, ROLE_COLUMN);
+      return result;
+    }
+
+    return COLUMNS;
+  }, [displayAuthRole]);
 
   const enableUser = useCallback(
     async (userId: AdminUserInfoFragment['userId'], enabled: boolean) => {
@@ -143,10 +155,11 @@ export const UsersTable = observer<Props>(function UsersTable({ users, isManagea
         columnCount={columnsCount}
         rowCount={rowsCount}
         getHeaderResizable={colIdx => colIdx > 0}
-        getRowHeight={() => 32}
+        getRowHeight={() => ADMINISTRATION_TABLE_DEFAULT_ROW_HEIGHT}
         getHeaderPinned={colIdx => colIdx <= 0}
         headerText={headerText}
         cell={cell}
+        className={s(styles, { table: true })}
         onScrollToBottom={onLoadMore}
       />
     </div>

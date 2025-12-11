@@ -9,9 +9,10 @@
 import { observer } from 'mobx-react-lite';
 import { reaction } from 'mobx';
 
-import { Link, useTranslate } from '@cloudbeaver/core-blocks';
+import { Link, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import type { TeamInfo } from '@cloudbeaver/core-authentication';
+import { ADMINISTRATION_TABLE_DEFAULT_ROW_HEIGHT, AdministrationTableStyles } from '@cloudbeaver/core-administration';
 import { DataGrid, useCreateGridReactiveValue, TableRowSelect } from '@cloudbeaver/plugin-data-grid';
 
 import { TeamsTableOptionsPanelService } from './TeamsTableOptionsPanelService.js';
@@ -29,6 +30,7 @@ const COLUMNS = [SELECT_COLUMN, ID_COLUMN, NAME_COLUMN, DESCRIPTION_COLUMN];
 
 export const TeamsTable = observer<Props>(function TeamsTable({ teams }) {
   const translate = useTranslate();
+  const styles = useS(AdministrationTableStyles);
   const teamsTableOptionsPanelService = useService(TeamsTableOptionsPanelService);
 
   const columnsCount = useCreateGridReactiveValue(() => COLUMNS.length, null, [COLUMNS]);
@@ -109,11 +111,12 @@ export const TeamsTable = observer<Props>(function TeamsTable({ teams }) {
         columnCount={columnsCount}
         rowCount={rowsCount}
         getHeaderResizable={colIdx => colIdx > 0}
-        getRowHeight={() => 32}
+        getRowHeight={() => ADMINISTRATION_TABLE_DEFAULT_ROW_HEIGHT}
         getHeaderPinned={colIdx => colIdx <= 0}
         headerText={headerText}
         headerElement={headerElement}
         cell={cell}
+        className={s(styles, { table: true })}
       />
     </div>
   );
