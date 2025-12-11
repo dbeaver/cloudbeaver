@@ -73,9 +73,9 @@ public class WebSessionAuthProcessor {
                     throw new DBException("Unexpected authorization status: " + authStatus);
             }
         } catch (Exception e) {
-            if (resetUserStateOnError) {
-                webSession.resetUserState();
-            }
+//            if (resetUserStateOnError) {
+//                webSession.resetUserState();
+//            }
             throw new DBException(e.getMessage(), e);
         }
     }
