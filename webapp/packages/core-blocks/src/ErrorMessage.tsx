@@ -18,7 +18,7 @@ interface Props {
   hasDetails?: boolean;
   text: string;
   className?: string;
-  onShowDetails?: () => void;
+  onShowDetails?: () => Promise<void> | void;
 }
 
 export const ErrorMessage = observer<Props>(function ErrorMessage({ text, className, hasDetails, onShowDetails }) {

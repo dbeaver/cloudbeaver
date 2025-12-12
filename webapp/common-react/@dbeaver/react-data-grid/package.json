@@ -35,6 +35,7 @@
   "dependencies": {
     "@dbeaver/js-helpers": "workspace:*",
     "@dbeaver/react-dnd": "workspace:^",
+    "@dbeaver/react-translate": "workspace:^",
     "@dbeaver/ui-kit": "workspace:^",
     "react": "^19",
     "react-data-grid": "7.0.0-beta.57",
