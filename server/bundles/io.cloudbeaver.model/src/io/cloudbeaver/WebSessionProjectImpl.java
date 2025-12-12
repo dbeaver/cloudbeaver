@@ -294,7 +294,6 @@ public class WebSessionProjectImpl extends WebProjectImpl implements DBPObjectSe
         return sendDataSourceUpdatedEvent;
     }
 
-    // TODO: load project settings on project load
     public void refreshProjectSettings() throws DBException {
         if (webSession.getUser() == null) {
             return;
