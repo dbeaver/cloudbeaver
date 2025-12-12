@@ -61,6 +61,7 @@ import org.jkiss.dbeaver.model.secret.DBSSecretValue;
 import org.jkiss.dbeaver.model.security.SMObjectType;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
 import org.jkiss.dbeaver.registry.DataSourceNavigatorSettings;
+import org.jkiss.dbeaver.registry.DataSourceNavigatorSettingsUtils;
 import org.jkiss.dbeaver.registry.DataSourceProviderRegistry;
 import org.jkiss.dbeaver.registry.network.NetworkHandlerDescriptor;
 import org.jkiss.dbeaver.registry.network.NetworkHandlerRegistry;
@@ -730,12 +731,13 @@ public class WebServiceCore implements DBWServiceCore {
         DataSourceDescriptor dataSourceDescriptor = ((DataSourceDescriptor) connectionInfo.getDataSourceContainer());
         try {
             if (webSession.isAuthorizedInSecurityManager()) {
+                String serialized = DataSourceNavigatorSettingsUtils.serializeSettingsToJson(settings);
                 // save in sm database for authenticated users
                 webSession.getSecurityController().setObjectSettings(
                     connectionInfo.getProjectId(),
                     connectionInfo.getId(),
                     SMObjectType.datasource,
-                    settings.toMap()
+                    Map.of(DataSourceNavigatorSettingsUtils.PARAM_ID_NAVIGATOR_SETTINGS, serialized)
                 );
             }
             dataSourceDescriptor.setCustomNavigatorSettings(settings);
@@ -761,7 +763,7 @@ public class WebServiceCore implements DBWServiceCore {
                     connectionInfo.getProjectId(),
                     connectionInfo.getId(),
                     SMObjectType.datasource,
-                    customSettings.toMap().keySet()
+                    Set.of(DataSourceNavigatorSettingsUtils.PARAM_ID_NAVIGATOR_SETTINGS)
                 );
             }
             dataSourceDescriptor.setCustomNavigatorSettings(null);

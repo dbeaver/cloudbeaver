@@ -171,8 +171,8 @@ public class WebSessionProjectImpl extends WebProjectImpl implements DBPObjectSe
             conCopy = new HashMap<>(this.connections);
             this.connections.clear();
         }
-        synchronized (this.projectSettings) {
-            this.projectSettings.clear();
+        synchronized (lock) {
+            this.projectSettings = null;
         }
 
         for (WebConnectionInfo connectionInfo : conCopy.values()) {
