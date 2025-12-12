@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,9 @@ export const DDLViewerTabPanel: NavNodeTransformViewComponent = observer(functio
   const connectionDialectResource = useResource(DDLViewerTabPanel, ConnectionDialectResource, connectionParam);
   const sqlDialect = useSqlDialectExtension(connectionDialectResource.data);
   const extensions = useCodemirrorExtensions();
-  extensions.set(...sqlDialect);
+  if (sqlDialect) {
+    extensions.set(...sqlDialect);
+  }
   const ddlData = ddlResource.data;
 
   useDataContextLink(menu.context, (context, id) => {
