@@ -26,6 +26,8 @@
     "@cloudbeaver/core-blocks": "workspace:*",
     "@cloudbeaver/core-di": "workspace:*",
     "@cloudbeaver/core-executor": "workspace:*",
+    "@cloudbeaver/core-localization": "workspace:*",
+    "@dbeaver/react-translate": "workspace:*",
     "mobx": "^6",
     "react": "^19",
     "react-dom": "^19",

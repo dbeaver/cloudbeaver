@@ -31,7 +31,7 @@ export * from './ComponentsRegistry/IComponentsTreeNodeValidator.js';
 export * from './ComponentsRegistry/useParentProps.js';
 
 export * from './AppRefreshButton.js';
-export * from './ComplexLoader.js';
+export * from './useLazyImport.js';
 export * from './DisplayError.js';
 export * from './ErrorBoundary.js';
 export * from './Icon.js';

@@ -8,6 +8,9 @@
   },
   "references": [
     {
+      "path": "../../common-react/@dbeaver/react-translate"
+    },
+    {
       "path": "../core-app"
     },
     {
@@ -21,6 +24,9 @@
     },
     {
       "path": "../core-executor"
+    },
+    {
+      "path": "../core-localization"
     }
   ],
   "include": [
