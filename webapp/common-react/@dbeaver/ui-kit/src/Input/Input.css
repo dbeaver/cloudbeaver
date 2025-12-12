@@ -20,7 +20,7 @@
     font-size: var(--dbv-kit-input-font-size);
     height: var(--dbv-kit-input-height);
 
-    &:not(:disabled):hover {
+    &:not(:disabled):not(:focus-visible):not([data-focus-visible]):hover {
       border-color: var(--dbv-kit-color-control-hover);
     }
 
