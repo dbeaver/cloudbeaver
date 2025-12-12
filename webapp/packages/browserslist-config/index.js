@@ -1,1 +1,1 @@
-module.exports = ['defaults', 'not IE 11'];
+module.exports = ['since 2023-01-01', 'not dead'];
