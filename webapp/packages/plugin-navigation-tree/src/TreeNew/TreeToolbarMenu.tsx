@@ -20,12 +20,12 @@ interface Props {
   className?: string;
 }
 
-export const TreeToolbarMenu = observer<Props>(function TreeToolbarMenu({ toolbar }) {
+export const TreeToolbarMenu = observer<Props>(function TreeToolbarMenu({ toolbar, className }) {
   const menu = useMenu({ menu: MENU_TREE_TOOLBAR });
 
   useDataContextLink(menu.context, (context, id) => {
     context.set(DATA_CONTEXT_TREE_TOOLBAR, toolbar, id);
   });
 
-  return <MenuBar menu={menu} />;
+  return <MenuBar menu={menu} className={className} />;
 });
