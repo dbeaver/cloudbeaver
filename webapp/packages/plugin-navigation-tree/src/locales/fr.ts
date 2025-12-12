@@ -38,4 +38,5 @@ export default [
   ['plugin_navigation_tree_settings_projects_title', 'Grouper par projet'],
   ['plugin_navigation_tree_settings_disable', 'Disable'],
   ['plugin_navigation_tree_settings_disable_description', 'Disable navigation tree for all users'],
+  ['plugin_navigation_tree_toolbar_menu_title', "Menu de la barre d'outils de l'arbre"],
 ];

@@ -120,6 +120,7 @@ export const Filter = observer<ControlledProps | ObjectsProps<any, any>>(functio
         name={name}
         value={value}
         size={smallSize ? 'small' : 'medium'}
+        autoFocus
         onChange={handleChange}
         onKeyDown={handleKeyDown}
       />

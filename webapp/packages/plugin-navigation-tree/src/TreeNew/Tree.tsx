@@ -8,6 +8,7 @@
 import { observer } from 'mobx-react-lite';
 
 import type { IDataContext } from '@cloudbeaver/core-data-context';
+import { clsx } from '@dbeaver/ui-kit';
 
 import { NodeSizeCacheContext } from './contexts/NodeSizeCacheContext.js';
 import { TreeContext } from './contexts/TreeContext.js';
@@ -17,8 +18,10 @@ import { TreeSelectionContext } from './contexts/TreeSelectionContext.js';
 import { TreeVirtualizationContext } from './contexts/TreeVirtualizationContext.js';
 import type { INodeRenderer } from './INodeRenderer.js';
 import type { ITreeData } from './ITreeData.js';
+import type { ITreeToolbar } from './ITreeToolbar.js';
 import { NodeChildren } from './NodeChildren.js';
 import type { NodeEmptyPlaceholderComponent } from './NodeEmptyPlaceholderComponent.js';
+import { TreeToolbar } from './TreeToolbar.js';
 import { useNodeSizeCache } from './useNodeSizeCache.js';
 import { useTree } from './useTree.js';
 import { useTreeDnD } from './useTreeDnD.js';
@@ -31,6 +34,7 @@ export interface NavigationTreeNewProps {
   data: ITreeData;
   selection?: ITreeSelection;
   menu?: ITreeMenu;
+  toolbar?: ITreeToolbar;
   nodeRenderers?: INodeRenderer[];
   emptyPlaceholder?: NodeEmptyPlaceholderComponent;
   className?: string;
@@ -44,6 +48,7 @@ export const Tree = observer<NavigationTreeNewProps>(function Tree({
   data,
   selection,
   menu,
+  toolbar,
   nodeRenderers,
   emptyPlaceholder,
   className,
@@ -66,22 +71,25 @@ export const Tree = observer<NavigationTreeNewProps>(function Tree({
   });
 
   return (
-    <div ref={mountOptimization.setRootRef} className={className} style={{ overflow: 'auto', position: 'relative' }}>
-      <NodeSizeCacheContext.Provider value={elementsSizeCache}>
-        <TreeDataContext.Provider value={data}>
-          <TreeSelectionContext.Provider value={selection}>
-            <TreeVirtualizationContext.Provider value={mountOptimization}>
-              <TreeContext.Provider value={tree}>
-                <TreeDnDContext.Provider value={treeDnD}>
-                  <TreeMenuContextProvider menu={menu ?? null}>
-                    <NodeChildren nodeId={data.rootId} offsetHeight={0} emptyPlaceholder={emptyPlaceholder} root />
-                  </TreeMenuContextProvider>
-                </TreeDnDContext.Provider>
-              </TreeContext.Provider>
-            </TreeVirtualizationContext.Provider>
-          </TreeSelectionContext.Provider>
-        </TreeDataContext.Provider>
-      </NodeSizeCacheContext.Provider>
+    <div className={clsx('tw:flex tw:flex-col', className)}>
+      {toolbar && <TreeToolbar toolbar={toolbar} />}
+      <div ref={mountOptimization.setRootRef} className="tw:flex-1" style={{ overflow: 'auto', position: 'relative' }}>
+        <NodeSizeCacheContext.Provider value={elementsSizeCache}>
+          <TreeDataContext.Provider value={data}>
+            <TreeSelectionContext.Provider value={selection}>
+              <TreeVirtualizationContext.Provider value={mountOptimization}>
+                <TreeContext.Provider value={tree}>
+                  <TreeDnDContext.Provider value={treeDnD}>
+                    <TreeMenuContextProvider menu={menu ?? null}>
+                      <NodeChildren nodeId={data.rootId} offsetHeight={0} emptyPlaceholder={emptyPlaceholder} root />
+                    </TreeMenuContextProvider>
+                  </TreeDnDContext.Provider>
+                </TreeContext.Provider>
+              </TreeVirtualizationContext.Provider>
+            </TreeSelectionContext.Provider>
+          </TreeDataContext.Provider>
+        </NodeSizeCacheContext.Provider>
+      </div>
     </div>
   );
 });

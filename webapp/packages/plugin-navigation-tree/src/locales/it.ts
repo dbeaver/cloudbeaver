@@ -35,4 +35,5 @@ export default [
   ['plugin_navigation_tree_settings_projects_title', 'Group by Project'],
   ['plugin_navigation_tree_settings_disable', 'Disable'],
   ['plugin_navigation_tree_settings_disable_description', 'Disable navigation tree for all users'],
+  ['plugin_navigation_tree_toolbar_menu_title', "Menu della barra degli strumenti dell'albero"],
 ];
