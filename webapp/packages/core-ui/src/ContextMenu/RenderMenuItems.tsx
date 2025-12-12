@@ -17,6 +17,7 @@ interface IRenderMenuItemsProps {
   menu: IMenuData;
   onlyIcons?: boolean;
   placement?: HovercardStoreState['placement'];
+  showSubmenuOnHover?: boolean;
   menuComponent: React.FC<IContextMenuNewProps>;
   itemComponent: React.FC<IMenuItemElementProps>;
   groupComponent: React.FC<IMenuItemGroupElementProps>;
@@ -27,6 +28,7 @@ export const RenderMenuItems = observer<IRenderMenuItemsProps>(function RenderMe
   menu,
   onlyIcons,
   placement,
+  showSubmenuOnHover,
   menuComponent,
   itemComponent,
   groupComponent,
@@ -41,6 +43,7 @@ export const RenderMenuItems = observer<IRenderMenuItemsProps>(function RenderMe
           menuData={menu}
           onlyIcons={onlyIcons}
           placement={placement}
+          showSubmenuOnHover={showSubmenuOnHover}
           menuComponent={menuComponent}
           itemComponent={itemComponent}
           groupComponent={groupComponent}

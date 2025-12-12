@@ -214,6 +214,7 @@ export * from './TimerIcon.js';
 export * from './InfoItem.js';
 export * from './Iframe.js';
 export * from './Code.js';
+export * from './useHover.js';
 export * from './useControlledScroll.js';
 export * from './useClipboard.js';
 export * from './useCombinedHandler.js';

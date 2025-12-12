@@ -17,6 +17,7 @@ import { type IMenuContext, MenuContext } from './MenuContext.js';
 export interface IContextMenuNewProps extends Omit<IContextMenuProps, 'placement'> {
   render?: React.ReactElement;
   placement?: HovercardStoreState['placement'];
+  showOnHover?: boolean;
   ref?: React.ForwardedRef<HTMLButtonElement>;
   shift?: number;
   gutter?: number;
@@ -75,6 +76,10 @@ export const ContextMenu = observer<IContextMenuNewProps>(function ContextMenuIn
   }, [showAtPosition, menu]);
 
   const menuContext = useMemo<IMenuContext>(() => ({ menu: menuData, rtl: isRtl }), [menuData, isRtl]);
+
+  if (handler?.isHidden?.(menuData.context)) {
+    return null;
+  }
 
   return (
     <MenuContext value={menuContext}>

@@ -40,6 +40,7 @@ export const MenuBar = observer<IMenuBarProps>(function MenuBar({ menu, compact 
               menu={menu}
               onlyIcons={compact}
               placement="bottom-start"
+              showSubmenuOnHover={false}
               menuComponent={ContextMenu}
               itemComponent={MenuBarItem}
               groupComponent={MenuBarGroup}

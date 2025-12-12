@@ -35,6 +35,7 @@ import { SubMenuElement } from './SubMenuElement.js';
 export interface IRenderMenuItemProps extends React.ButtonHTMLAttributes<any> {
   item: IMenuItem;
   menuData: IMenuData;
+  showSubmenuOnHover?: boolean;
   onlyIcons?: boolean;
   placement?: HovercardStoreState['placement'];
   menuComponent: React.FC<IContextMenuNewProps>;
@@ -46,6 +47,7 @@ export interface IRenderMenuItemProps extends React.ButtonHTMLAttributes<any> {
 export const RenderMenuItem = observer<IRenderMenuItemProps>(function RenderMenuItem({
   item,
   menuData,
+  showSubmenuOnHover,
   onlyIcons,
   placement,
   menuComponent,
@@ -75,6 +77,7 @@ export const RenderMenuItem = observer<IRenderMenuItemProps>(function RenderMenu
         menuData={menuData}
         onlyIcons={onlyIcons}
         placement={placement}
+        showSubmenuOnHover={showSubmenuOnHover}
         menuComponent={menuComponent}
         itemComponent={MenuItemElement}
         groupComponent={MenuItemGroupElement}

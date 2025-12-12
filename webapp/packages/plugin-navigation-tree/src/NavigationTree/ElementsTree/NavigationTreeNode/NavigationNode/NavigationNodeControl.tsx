@@ -19,6 +19,8 @@ import {
   TreeNodeIcon,
   TreeNodeName,
   useContextMenuPosition,
+  useHover,
+  useMergeRefs,
   useObjectRef,
   useObservableRef,
   useS,
@@ -59,6 +61,8 @@ export const NavigationNodeControl: NavTreeControlComponent = observer(
     const navTreeResource = useService(NavTreeResource);
     const error = getComputed(() => !!navNodeInfoResource.getException(node.id) || !!navTreeResource.getException(node.id));
     const selected = treeNodeContext.selected;
+    const hoverHook = useHover();
+    const mergedRef = useMergeRefs(hoverHook.ref, ref);
     const editingState = useObservableRef<IEditingState>(
       () => ({
         saving: false,
@@ -133,10 +137,11 @@ export const NavigationNodeControl: NavTreeControlComponent = observer(
     const { editing, saving } = editingState;
 
     const attributes = { [DATA_ATTRIBUTE_NODE_EDITING]: editing };
+    const mountMenu = (selected || hoverHook.isHovered) && !editing && !dndPlaceholder;
 
     return (
       <TreeNodeControl
-        ref={ref}
+        ref={mergedRef}
         {...attributes}
         className={s(styles, { treeNodeControl: true, dragging: !!dndElement, editing }, className)}
         onClick={onClick}
@@ -158,7 +163,7 @@ export const NavigationNodeControl: NavTreeControlComponent = observer(
             )}
           </Loader>
         </TreeNodeName>
-        {!editing && !dndPlaceholder && (
+        {mountMenu && (
           <div className={s(styles, { portal: true })} onClick={handlePortalClick}>
             <TreeNodeMenuLoader contextMenuPosition={contextMenuPosition} node={node} actions={nodeActions} selected={selected} />
           </div>

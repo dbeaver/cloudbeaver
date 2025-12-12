@@ -37,6 +37,7 @@ interface ISubMenuElementProps extends Omit<React.ButtonHTMLAttributes<any>, 'st
   menuData: IMenuData;
   subMenu: IMenuSubMenuItem;
   onlyIcons?: boolean;
+  showSubmenuOnHover?: boolean;
   placement?: HovercardStoreState['placement'];
   menuComponent: React.FC<IContextMenuNewProps>;
   itemComponent: React.FC<IMenuItemElementProps>;
@@ -49,6 +50,7 @@ export const SubMenuElement = observer<ISubMenuElementProps>(function SubMenuEle
   subMenu,
   placement,
   onlyIcons,
+  showSubmenuOnHover,
   menuComponent,
   itemComponent: MenuItemElement,
   groupComponent: MenuItemGroupElement,
@@ -70,7 +72,9 @@ export const SubMenuElement = observer<ISubMenuElementProps>(function SubMenuEle
   const hidden = getComputed(() => subMenuData.items.every(item => item.hidden) || handler?.isHidden?.(subMenuData.context));
   const IconComponent = handler?.iconComponent?.() ?? subMenu.iconComponent?.();
   const extraProps = handler?.getExtraProps?.() ?? (subMenu.getExtraProps?.() as any);
-  const loading = getComputed(() => handler?.isLoading?.(subMenuData.context) || subMenuData.loaders.some(loader => loader.isLoading()) || false);
+  // TODO: fix, this triggers `Cannot update a component (`SubMenuElement`) while rendering a different component`
+  //       and if getComputed used update will be skipped
+  const loading = handler?.isLoading?.(subMenuData.context) || subMenuData.loaders.some(loader => loader.isLoading()) || false;
   /** @deprecated must be refactored (#1)*/
   const displayLabel = getComputed(() => handler?.isLabelVisible?.(subMenuData.context, subMenuData.menu) ?? true);
   const info = handler?.getInfo?.(subMenuData.context, subMenuData.menu);
@@ -120,6 +124,7 @@ export const SubMenuElement = observer<ISubMenuElementProps>(function SubMenuEle
           render={<MenuItemGroupArrowElement title={label ?? tooltip} style={{ pointerEvents: 'auto' }} />}
           id={subMenu.id}
           aria-label={translate(subMenu.label)}
+          showOnHover={showSubmenuOnHover}
           disabled={disabled}
           onClick={handleClick}
         />
@@ -192,6 +197,7 @@ export const SubMenuElement = observer<ISubMenuElementProps>(function SubMenuEle
           }
         />
       }
+      showOnHover={showSubmenuOnHover}
       disabled={disabled}
       onClick={handleClick}
     />
