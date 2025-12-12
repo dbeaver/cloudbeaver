@@ -24,6 +24,7 @@ import io.cloudbeaver.server.WebAppSessionManager;
 import io.cloudbeaver.server.WebAppUtils;
 import io.cloudbeaver.utils.ServletAppUtils;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -40,6 +41,7 @@ import org.jkiss.dbeaver.model.websocket.event.session.WSSocketConnectedEvent;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.HttpConstants;
+import org.jkiss.utils.rest.RpcConstants;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -104,12 +106,13 @@ public class CBEventsLongPollingServlet extends HttpServlet {
 
         BaseWebSession ws = resolveSession(req);
         resp.setHeader(WSConstants.WS_SESSION_HEADER, ws.getSessionId());
+        resp.addCookie(new Cookie(CBConstants.CB_SESSION_COOKIE_NAME, ws.getSessionId()));
 
         CBEventsLongPolling ps = getOrCreatePollSession(ws);
 
         String json = new String(req.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
         if (CommonUtils.isEmpty(json)) {
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Empty payload");
+            sendError(resp, HttpServletResponse.SC_BAD_REQUEST, "Empty payload");
             return;
         }
 
@@ -202,9 +205,21 @@ public class CBEventsLongPollingServlet extends HttpServlet {
 
     @Nullable
     private String getSessionId(@NotNull HttpServletRequest req) {
-        return req.getHeader(WSConstants.WS_SESSION_HEADER);
-    }
+        String sid = req.getHeader(WSConstants.WS_SESSION_HEADER);
+        if (!CommonUtils.isEmpty(sid)) {
+            return sid;
+        }
 
+        if (req.getCookies() != null) {
+            for (var cookie : req.getCookies()) {
+                if (CBConstants.CB_SESSION_COOKIE_NAME.equals(cookie.getName())) {
+                    return cookie.getValue();
+                }
+            }
+        }
+
+        return null;
+    }
 
     @NotNull
     private CBEventsLongPolling getOrCreatePollSession(@NotNull BaseWebSession ws) {
@@ -224,5 +239,23 @@ public class CBEventsLongPollingServlet extends HttpServlet {
             return ps;
         });
     }
+
+    public static void sendError(
+        @NotNull HttpServletResponse resp,
+        int status,
+        @NotNull String message
+    ) throws IOException {
+
+        resp.setStatus(status);
+        resp.setContentType(CBConstants.APPLICATION_JSON);
+
+        Map<String, Object> error = Map.of(
+            "error", message,
+            "status", status
+        );
+
+        RpcConstants.COMPACT_GSON.toJson(error, resp.getWriter());
+    }
+
 
 }

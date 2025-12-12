@@ -41,8 +41,12 @@ export const SQLCodeEditorPanel: TabContainerPanelComponent<ISqlEditorModeProps>
   const autocompletion = useSqlDialectAutocompletion(data);
   const sqlDialect = useSqlDialectExtension(data.dialect);
 
-  extensions.set(...autocompletion);
-  extensions.set(...sqlDialect);
+  if (autocompletion) {
+    extensions.set(...autocompletion);
+  }
+  if (sqlDialect) {
+    extensions.set(...sqlDialect);
+  }
 
   const dndBox = useDNDBox({
     canDrop: context => context.has(DATA_CONTEXT_NAV_NODE),

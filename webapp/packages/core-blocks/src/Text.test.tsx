@@ -10,14 +10,6 @@ import { describe, expect, it, vi } from 'vitest';
 import { Text } from './Text.js';
 import { renderInApp } from '@cloudbeaver/tests-runner';
 
-vi.mock('./s', () => ({
-  s: (...args: any[]) => args.join(' '),
-}));
-
-vi.mock('./useS', () => ({
-  useS: vi.fn(),
-}));
-
 describe('Text Component', () => {
   it('renders children correctly', async () => {
     const { getByText } = renderInApp(<Text>Hello World</Text>);

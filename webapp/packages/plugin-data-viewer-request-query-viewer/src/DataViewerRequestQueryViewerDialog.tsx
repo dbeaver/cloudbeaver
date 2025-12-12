@@ -41,7 +41,9 @@ export const DataViewerRequestQueryViewerDialog: DialogComponent<IPayload> = obs
   const sqlDialect = useSqlDialectExtension(connectionDialectResource.data);
   const extensions = useCodemirrorExtensions();
 
-  extensions.set(...sqlDialect);
+  if (sqlDialect) {
+    extensions.set(...sqlDialect);
+  }
 
   function openSqlEditor() {
     const nodeId = NodeManagerUtils.connectionIdToConnectionNodeId(props.payload.connectionKey.connectionId);

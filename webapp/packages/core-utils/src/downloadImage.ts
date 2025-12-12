@@ -13,7 +13,7 @@ import { isImageBroken } from './isBrokenImage.js';
 
 export type { Options as IScreenshotOptions };
 
-const BROKEN_IMAGE_ERROR_MESSAGE = 'Something went wrong. please try select another file format';
+const BROKEN_IMAGE_ERROR_MESSAGE = 'Something went wrong. Please try to select another file format';
 
 export async function downloadSvg<T extends Node>(element: T, options: Options, fileName: string): Promise<void> {
   const svg = await modernScreenshot.domToForeignObjectSvg<T>(element, options);
