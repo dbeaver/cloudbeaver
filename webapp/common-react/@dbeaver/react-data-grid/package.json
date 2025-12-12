@@ -33,6 +33,7 @@
     "typescript": "^5"
   },
   "dependencies": {
+    "@dbeaver/js-helpers": "workspace:*",
     "@dbeaver/react-dnd": "workspace:^",
     "@dbeaver/ui-kit": "workspace:^",
     "react": "^19",

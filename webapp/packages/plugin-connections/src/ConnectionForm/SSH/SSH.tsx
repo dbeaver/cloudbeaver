@@ -33,7 +33,6 @@ import { ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { NetworkHandlerAuthType, type NetworkHandlerConfigInput } from '@cloudbeaver/core-sdk';
 import { useTab, type IFormState, type TabContainerPanelComponent } from '@cloudbeaver/core-ui';
-import { isSafari } from '@cloudbeaver/core-utils';
 
 import { authTypes } from './authTypes.js';
 import styles from './SSH.module.css';
@@ -106,10 +105,10 @@ export const SSH: TabContainerPanelComponent<Props> = observer(function SSH({ fo
             {translate('connections_network_handler_ssh_tunnel_auth_type')}
           </Select>
           <Container wrap gap>
-            <InputField type="text" name="host" state={handlerState.properties} readOnly={disabled || !enabled} required small>
+            <InputField type="text" name="host" state={handlerState.properties} autoComplete="on" readOnly={disabled || !enabled} required small>
               {translate('connections_network_handler_ssh_tunnel_host')}
             </InputField>
-            <InputField type="number" name="port" state={handlerState.properties} readOnly={disabled || !enabled} required tiny>
+            <InputField type="number" name="port" state={handlerState.properties} autoComplete="on" readOnly={disabled || !enabled} required tiny>
               {translate('connections_network_handler_ssh_tunnel_port')}
             </InputField>
           </Container>
@@ -120,6 +119,7 @@ export const SSH: TabContainerPanelComponent<Props> = observer(function SSH({ fo
               state={handlerState}
               readOnly={disabled || !enabled}
               required={handlerState.savePassword}
+              autoComplete="section-ssh-authentication username"
               tiny
               fill
             >
@@ -128,7 +128,7 @@ export const SSH: TabContainerPanelComponent<Props> = observer(function SSH({ fo
             <InputField
               type="password"
               name="password"
-              autoComplete={isSafari ? 'section-connection-ssh-authentication section-ssh password' : 'new-password'}
+              autoComplete="section-ssh-authentication current-password"
               state={handlerState}
               readOnly={disabled || !enabled}
               required={!passwordSaved && !keyAuth && handlerState.savePassword}

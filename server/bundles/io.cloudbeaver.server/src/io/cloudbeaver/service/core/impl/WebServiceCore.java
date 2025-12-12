@@ -373,6 +373,7 @@ public class WebServiceCore implements DBWServiceCore {
         if (saveCredentials) {
             // Save all passed credentials in the datasource container
             WebDataSourceUtils.saveAuthProperties(
+                webSession.getProgressMonitor(),
                 dataSourceContainer,
                 dataSourceContainer.getConnectionConfiguration(),
                 authProperties,
@@ -496,6 +497,8 @@ public class WebServiceCore implements DBWServiceCore {
         WebSessionProjectImpl project = getProjectById(webSession, projectId);
         WebConnectionConfig configInput = project.getConnectionConfigInput(connectionConfig);
 
+        configInput.setSaveCredentials(true); // It is used in createConnectionFromConfig
+
         DataSourceDescriptor dataSource = (DataSourceDescriptor) WebDataSourceUtils.getLocalOrGlobalDataSource(
             webSession, projectId, configInput.getConnectionId());
 
@@ -527,6 +530,7 @@ public class WebServiceCore implements DBWServiceCore {
                 }
             }
             WebDataSourceUtils.saveAuthProperties(
+                webSession.getProgressMonitor(),
                 testDataSource,
                 testDataSource.getConnectionConfiguration(),
                 configInput.getCredentials(),
@@ -535,7 +539,7 @@ public class WebServiceCore implements DBWServiceCore {
                 true
             );
         } else {
-            testDataSource = project.getDataSourceContainerFromInput(connectionConfig);
+            testDataSource = project.getDataSourceContainerFromInput(configInput);
         }
         validateDriverLibrariesPresence(testDataSource);
         webSession.provideAuthParameters(

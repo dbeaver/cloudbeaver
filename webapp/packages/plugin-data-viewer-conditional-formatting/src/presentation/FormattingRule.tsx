@@ -60,7 +60,7 @@ export const FormattingRule = observer<Props>(function FormattingRule({ columns,
   if (preview) {
     return (
       <Cell
-        ref={ref}
+        render={<div ref={ref} />}
         before={<FormattingPreview state={state} rule={rule} text="A" />}
         className={clsx('tw:rounded-(--theme-group-element-radius) tw:overflow-hidden tw:cursor-pointer theme-ripple-selectable tw:shrink-0', {
           'tw:before:bg-(--theme-primary)!': selected,
@@ -75,7 +75,7 @@ export const FormattingRule = observer<Props>(function FormattingRule({ columns,
 
   return (
     <Cell
-      ref={ref}
+      render={<div ref={ref} />}
       before={<FormattingPreview state={state} rule={rule} text="A" />}
       description={description}
       after={<ActionIconButton name="delete" title={t('ui_delete')} onClick={handleClick} />}
