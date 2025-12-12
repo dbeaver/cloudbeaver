@@ -25,7 +25,9 @@ import io.cloudbeaver.server.websockets.CBEventsLongPollingServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import org.eclipse.jetty.http.BadMessageException;
 import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.model.security.exception.SMAccessTokenExpiredException;
 import org.jkiss.dbeaver.model.websocket.WSConstants;
 import org.junit.Assert;
 import org.junit.Before;
@@ -53,13 +55,18 @@ public class CBEventsLongPollingServletTest extends CloudbeaverMockTest {
     }
 
     private class TestServlet extends CBEventsLongPollingServlet {
+
         @Override
-        protected WebHeadlessSession getHeadlessSession(String token, WebHttpRequestInfo info) throws DBException {
+        protected WebHeadlessSession getHeadlessSession(
+            @Nullable String token,
+            @NotNull WebHttpRequestInfo info
+        ) throws DBException {
             return sessionManager.getHeadlessSession(token, info, true);
         }
 
         @NotNull
-        protected BaseWebSession resolveSession(@NotNull HttpServletRequest req) {
+        @Override
+        protected BaseWebSession resolveSession(@NotNull HttpServletRequest req) throws SMAccessTokenExpiredException {
             return super.resolveSession(req);
         }
     }

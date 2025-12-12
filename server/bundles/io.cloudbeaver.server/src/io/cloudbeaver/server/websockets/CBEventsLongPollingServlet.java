@@ -33,6 +33,7 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.security.exception.SMAccessTokenExpiredException;
 import org.jkiss.dbeaver.model.websocket.WSConstants;
 import org.jkiss.dbeaver.model.websocket.WSUtils;
 import org.jkiss.dbeaver.model.websocket.event.WSEvent;
@@ -77,13 +78,13 @@ public class CBEventsLongPollingServlet extends HttpServlet {
     protected void doGet(@NotNull HttpServletRequest req, @NotNull HttpServletResponse resp) throws IOException {
         addCorsHeaders(req, resp);
 
-        BaseWebSession ws = resolveSession(req);
-        resp.setHeader(WSConstants.WS_SESSION_HEADER, ws.getSessionId());
-
-        CBEventsLongPolling ps = getOrCreatePollSession(ws);
-        ps.onMessage(PING);
-
         try {
+            BaseWebSession ws = resolveSession(req);
+            resp.setHeader(WSConstants.WS_SESSION_HEADER, ws.getSessionId());
+
+            CBEventsLongPolling ps = getOrCreatePollSession(ws);
+            ps.onMessage(PING);
+
             List<WSEvent> events = ps.pollEvents(POLL_TIMEOUT_SEC);
 
             if (events.isEmpty()) {
@@ -97,6 +98,8 @@ public class CBEventsLongPollingServlet extends HttpServlet {
             Thread.currentThread().interrupt();
             log.debug("Long-poll interrupted (likely client disconnected)", e);
             resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
+        } catch (SMAccessTokenExpiredException e) {
+            handleTokenExpired(resp);
         }
     }
 
@@ -104,21 +107,26 @@ public class CBEventsLongPollingServlet extends HttpServlet {
     protected void doPost(@NotNull HttpServletRequest req, @NotNull HttpServletResponse resp) throws IOException {
         addCorsHeaders(req, resp);
 
-        BaseWebSession ws = resolveSession(req);
-        resp.setHeader(WSConstants.WS_SESSION_HEADER, ws.getSessionId());
-        resp.addCookie(new Cookie(CBConstants.CB_SESSION_COOKIE_NAME, ws.getSessionId()));
+        try {
+            BaseWebSession ws = resolveSession(req);
+            resp.setHeader(WSConstants.WS_SESSION_HEADER, ws.getSessionId());
+            resp.addCookie(new Cookie(CBConstants.CB_SESSION_COOKIE_NAME, ws.getSessionId()));
 
-        CBEventsLongPolling ps = getOrCreatePollSession(ws);
+            CBEventsLongPolling ps = getOrCreatePollSession(ws);
 
-        String json = new String(req.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
-        if (CommonUtils.isEmpty(json)) {
-            sendError(resp, HttpServletResponse.SC_BAD_REQUEST, "Empty payload");
-            return;
+            String json = new String(req.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
+            if (CommonUtils.isEmpty(json)) {
+                sendError(resp, HttpServletResponse.SC_BAD_REQUEST, "Empty payload");
+                return;
+            }
+
+            ps.onMessage(json);
+
+            resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
+
+        } catch (SMAccessTokenExpiredException e) {
+            handleTokenExpired(resp);
         }
-
-        ps.onMessage(json);
-
-        resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
     }
 
     @Override
@@ -170,7 +178,7 @@ public class CBEventsLongPollingServlet extends HttpServlet {
     }
 
     @NotNull
-    protected BaseWebSession resolveSession(@NotNull HttpServletRequest req) {
+    protected BaseWebSession resolveSession(@NotNull HttpServletRequest req) throws SMAccessTokenExpiredException {
 
         String sid = getSessionId(req);
 
@@ -188,17 +196,22 @@ public class CBEventsLongPollingServlet extends HttpServlet {
             WebHeadlessSession headless = getHeadlessSession(token, info);
             if (headless != null) {
                 return headless;
-            } else  {
-                log.trace("Couldn't create headless session");
             }
+            log.trace("Couldn't create headless session");
+        } catch (SMAccessTokenExpiredException te) {
+            throw te;
         } catch (Exception e) {
             log.error("Error resolving headless session", e);
         }
 
         throw new BadMessageException("No web session found for long-poll request");
+
     }
 
-    protected WebHeadlessSession getHeadlessSession(String token, WebHttpRequestInfo info) throws DBException {
+    protected WebHeadlessSession getHeadlessSession(
+        @Nullable String token,
+        @NotNull WebHttpRequestInfo info
+    ) throws DBException {
         WebAppSessionManager sm = WebAppUtils.getWebApplication().getSessionManager();
         return sm.getHeadlessSession(token, info, true);
     }
@@ -244,18 +257,25 @@ public class CBEventsLongPollingServlet extends HttpServlet {
         @NotNull HttpServletResponse resp,
         int status,
         @NotNull String message
-    ) throws IOException {
+    ) {
+        try {
+            resp.setStatus(status);
+            resp.setContentType(CBConstants.APPLICATION_JSON);
 
-        resp.setStatus(status);
-        resp.setContentType(CBConstants.APPLICATION_JSON);
+            Map<String, Object> error = Map.of(
+                "error", message,
+                "status", status
+            );
 
-        Map<String, Object> error = Map.of(
-            "error", message,
-            "status", status
-        );
-
-        RpcConstants.COMPACT_GSON.toJson(error, resp.getWriter());
+            RpcConstants.COMPACT_GSON.toJson(error, resp.getWriter());
+        } catch (IOException e) {
+            log.warn("Failed to send error response: " + status + " / " + message, e);
+        }
     }
 
+    private void handleTokenExpired(@NotNull HttpServletResponse resp) {
+        log.debug("LP request rejected: access token expired");
+        sendError(resp, HttpServletResponse.SC_UNAUTHORIZED, "token_expired");
+    }
 
 }
