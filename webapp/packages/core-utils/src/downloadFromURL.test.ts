@@ -36,7 +36,7 @@ describe('downloadFromURL', () => {
     };
 
     originalXMLHttpRequest = globalThis.XMLHttpRequest;
-    (globalThis as any).XMLHttpRequest = function () {
+    (globalThis as any).XMLHttpRequest = function XMLHttpRequest() {
       return mockXHR;
     };
   });

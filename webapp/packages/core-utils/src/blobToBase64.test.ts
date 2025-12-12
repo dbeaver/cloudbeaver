@@ -14,7 +14,7 @@ describe('blobToBase64', () => {
   it('converts blob to base64', async () => {
     const result = 'data:text/plain;base64,dGVzdA==';
     const blob = new Blob(['test'], { type: 'text/plain' });
-    vitest.spyOn(globalThis, 'FileReader').mockImplementation(mockFileReader(() => result));
+    vitest.spyOn(globalThis, 'FileReader').mockImplementationOnce(mockFileReader(() => result));
 
     const base64 = await blobToBase64(blob);
 
@@ -25,7 +25,7 @@ describe('blobToBase64', () => {
     const result = 'data:text/plain;base64,';
     const blob = new Blob(['']);
 
-    vitest.spyOn(globalThis, 'FileReader').mockImplementation(mockFileReader(() => result));
+    vitest.spyOn(globalThis, 'FileReader').mockImplementationOnce(mockFileReader(() => result));
 
     const base64 = await blobToBase64(blob);
 
@@ -36,7 +36,7 @@ describe('blobToBase64', () => {
     const result = 'data:application/octet-stream;base64,dGhpcyBpcyBhIHRlc3Qgd2l0aCA=';
     const blob = new Blob(['this is a test with longer text']);
 
-    vitest.spyOn(globalThis, 'FileReader').mockImplementation(mockFileReader(() => result));
+    vitest.spyOn(globalThis, 'FileReader').mockImplementationOnce(mockFileReader(() => result));
 
     const base64 = await blobToBase64(blob, 20);
 

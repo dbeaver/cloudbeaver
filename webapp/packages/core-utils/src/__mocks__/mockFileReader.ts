@@ -16,7 +16,7 @@ interface MockFileReaderInstance {
 }
 
 export function mockFileReader(getResult: (() => string) | (() => Mock)): () => FileReader {
-  return function () {
+  return function mockFileReader() {
     const reader: MockFileReaderInstance = {
       onload: null,
       onerror: null,
