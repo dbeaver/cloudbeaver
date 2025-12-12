@@ -5,16 +5,16 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { useState } from 'react';
+import { useMemo } from 'react';
 
-import { createComplexLoader, useComplexLoader, useObjectRef } from '@cloudbeaver/core-blocks';
+import { createLazyLoader, useLazyImport, useObjectRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { GlobalConstants } from '@cloudbeaver/core-utils';
 import type { Compartment, Completion, CompletionConfig, CompletionContext, CompletionResult, Extension } from '@cloudbeaver/plugin-codemirror6';
-import { type ISQLEditorData, type SQLProposal } from '@cloudbeaver/plugin-sql-editor';
+import type { ISQLEditorData, SQLProposal } from '@cloudbeaver/plugin-sql-editor';
 
-const codemirrorComplexLoader = createComplexLoader(() => import('@cloudbeaver/plugin-codemirror6'));
+const codemirrorPluginLoader = createLazyLoader(() => import('@cloudbeaver/plugin-codemirror6'));
 
 type SqlCompletion = Completion & {
   icon?: string;
@@ -23,12 +23,15 @@ type SqlCompletion = Completion & {
 const CLOSE_CHARACTERS = /[\s()[\]{};:>,=\\*]/;
 const COMPLETION_WORD = /[\w*]*/;
 
-export function useSqlDialectAutocompletion(data: ISQLEditorData): [Compartment, Extension] {
-  const { closeCompletion, useEditorAutocompletion, insertCompletionText } = useComplexLoader(codemirrorComplexLoader);
+export function useSqlDialectAutocompletion(data: ISQLEditorData): [Compartment, Extension] | null {
+  const codemirror = useLazyImport(codemirrorPluginLoader);
   const localizationService = useService(LocalizationService);
   const optionsRef = useObjectRef({ data });
 
-  const [config] = useState<CompletionConfig>(() => {
+  const config = useMemo<CompletionConfig>(() => {
+    if (!codemirror) {
+      return undefined;
+    }
     function getOptionsFromProposals(explicit: boolean, word: string, proposals: SQLProposal[]): SqlCompletion[] {
       const wordLowerCase = word.toLocaleLowerCase();
       const hasSameName = proposals.some(
@@ -54,7 +57,7 @@ export function useSqlDialectAutocompletion(data: ISQLEditorData): [Compartment,
       if (filteredProposals.length === 0 && !hasSameName && explicit) {
         return [
           {
-            apply: closeCompletion,
+            apply: codemirror!.closeCompletion,
             label: localizationService.translate('sql_editor_hint_empty'),
           },
         ];
@@ -64,7 +67,7 @@ export function useSqlDialectAutocompletion(data: ISQLEditorData): [Compartment,
         ...filteredProposals.map<SqlCompletion>(proposal => ({
           label: proposal.displayString,
           apply: (view, completion, from, to) => {
-            view.dispatch(insertCompletionText(view.state, proposal.replacementString, proposal.replacementOffset, to));
+            view.dispatch(codemirror!.insertCompletionText(view.state, proposal.replacementString, proposal.replacementOffset, to));
           },
           boost: proposal.score,
           icon: proposal.icon,
@@ -96,7 +99,7 @@ export function useSqlDialectAutocompletion(data: ISQLEditorData): [Compartment,
               return null;
             }
 
-            if (current.options.some(option => option.apply === closeCompletion)) {
+            if (current.options.some(option => option.apply === codemirror!.closeCompletion)) {
               return null;
             }
 
@@ -152,9 +155,9 @@ export function useSqlDialectAutocompletion(data: ISQLEditorData): [Compartment,
       ],
       icons: false, // disable native symbol based icons
     };
-  });
+  }, [codemirror, localizationService]);
 
-  return useEditorAutocompletion(config);
+  return useMemo(() => codemirror?.createEditorAutocompletion(config) || null, [codemirror, config]);
 }
 
 function sanitizeProposal(value: string): string {

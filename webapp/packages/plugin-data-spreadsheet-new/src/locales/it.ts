@@ -12,7 +12,6 @@ export default [
   ['data_grid_table_disable_order', 'Disabilitato'],
   ['data_grid_table_disable_all_orders', 'Disabilita tutto'],
   ['data_grid_table_delete_filters_and_orders', "Reimposta i filtri / l'ordinamento"],
-  ['data_grid_table_tooltip_column_header_order', 'Ordina per colonna'],
   ['data_grid_table_context_menu_filter_dialog_title', 'Modifica valore'],
   ['data_grid_table_context_menu_filter_clipboard_permission', 'Dai accesso agli appunti'],
   ['data_grid_table_context_menu_save_value_error', 'Failed to save value'],

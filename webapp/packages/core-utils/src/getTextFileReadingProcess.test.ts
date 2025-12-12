@@ -5,19 +5,19 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { afterEach, beforeAll, beforeEach, describe, expect, it, vitest, type MockInstance } from 'vitest';
-import { consoleSpy, addKnownError } from '@cloudbeaver/tests-runner';
+import { afterEach, beforeEach, describe, expect, it, vitest, type MockInstance } from 'vitest';
+import { addKnownError, initKnownConsoleMessages } from '@cloudbeaver/tests-runner';
 
 import { getTextFileReadingProcess } from './getTextFileReadingProcess.js';
-
-beforeAll(() => {
-  addKnownError(/Error: Read error/);
-});
 
 describe('getTextFileReadingProcess', () => {
   let file: File;
   let mockFileReader: Partial<FileReader>;
   let fileReaderMock: MockInstance<(this: FileReader) => FileReader>;
+
+  initKnownConsoleMessages(() => {
+    addKnownError(/Error: Read error/);
+  });
 
   beforeEach(() => {
     file = new File(['file content'], 'test.txt', { type: 'text/plain' });
@@ -68,7 +68,8 @@ describe('getTextFileReadingProcess', () => {
     }
   });
 
-  it.skip('should reject with an error if reading fails', async () => {
+  it('should reject with an error if reading fails', async () => {
+    const { consoleSpy } = await import('@cloudbeaver/tests-runner');
     const { promise } = getTextFileReadingProcess(file);
     const error = new Error('Read error');
 

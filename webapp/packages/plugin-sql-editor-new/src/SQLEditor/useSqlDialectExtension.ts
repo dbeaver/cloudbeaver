@@ -7,37 +7,31 @@
  */
 import { useMemo } from 'react';
 
-import { createComplexLoader, type IComplexLoaderData, useComplexLoader } from '@cloudbeaver/core-blocks';
+import { createLazyLoader, useLazyImport } from '@cloudbeaver/core-blocks';
 import type { SqlDialectInfo } from '@cloudbeaver/core-sdk';
-import {
-  CassandraLoader,
-  Compartment,
-  type Extension,
-  MariaSQLLoader,
-  MSSQLLoader,
-  MySQLLoader,
-  PLSQLLoader,
-  PostgreSQLLoader,
-  SQLDialect,
-  SQLiteLoader,
-  StandardSQLLoader,
-} from '@cloudbeaver/plugin-codemirror6';
+import type { Compartment, Extension } from '@cloudbeaver/plugin-codemirror6';
 
-const codemirrorComplexLoader = createComplexLoader(() => import('@cloudbeaver/plugin-codemirror6'));
+const codemirrorPluginLoader = createLazyLoader(() => import('@cloudbeaver/plugin-codemirror6'));
 
-const SQL_EDITOR_COMPARTMENT = new Compartment();
-
-export function useSqlDialectExtension(dialectInfo: SqlDialectInfo | undefined): [Compartment, Extension] {
-  //TODO: probably we need to refactor it to lazy approach without triggering suspense
-  const { SQLDialect, SQL_EDITOR } = useComplexLoader(codemirrorComplexLoader);
-  const loader = getDialectLoader(dialectInfo?.name);
-  const dialect = useComplexLoader(loader);
+export function useSqlDialectExtension(dialectInfo: SqlDialectInfo | undefined): [Compartment, Extension] | null {
+  const codemirror = useLazyImport(codemirrorPluginLoader);
+  const loader = getDialectLoader(codemirror, dialectInfo?.name);
+  const dialect = useLazyImport(loader);
+  const SQL_EDITOR_COMPARTMENT = useMemo(() => {
+    if (!codemirror) {
+      return null;
+    }
+    return new codemirror.Compartment();
+  }, [codemirror]);
 
   return useMemo(() => {
+    if (!dialect || !codemirror || !SQL_EDITOR_COMPARTMENT) {
+      return null;
+    }
     let dialectInner = dialect;
 
     if (dialectInfo) {
-      dialectInner = SQLDialect.define({
+      dialectInner = codemirror.SQLDialect.define({
         keywords: dialectInfo.reservedWords.join(' ').toLowerCase(),
         builtin: dialectInfo.functions.join(' ').toUpperCase(),
         types: dialectInfo.dataTypes.join(' ').toUpperCase(),
@@ -51,30 +45,36 @@ export function useSqlDialectExtension(dialectInfo: SqlDialectInfo | undefined):
 
     return [
       SQL_EDITOR_COMPARTMENT,
-      SQL_EDITOR({
+      codemirror.SQL_EDITOR({
         dialect: dialectInner,
       }),
     ];
-  }, [dialect, dialectInfo]);
+  }, [SQL_EDITOR_COMPARTMENT, codemirror, dialect, dialectInfo]);
 }
 
-function getDialectLoader(name?: string): IComplexLoaderData<SQLDialect> {
+const emptyDialectLoader = createLazyLoader(() => Promise.resolve(null));
+
+function getDialectLoader(plugin: typeof import('@cloudbeaver/plugin-codemirror6') | null, name?: string) {
+  if (!plugin) {
+    return emptyDialectLoader;
+  }
+
   switch (name) {
     case 'PostgreSQL':
-      return PostgreSQLLoader;
+      return plugin.PostgreSQLLoader;
     case 'MySQL':
-      return MySQLLoader;
+      return plugin.MySQLLoader;
     case 'MariaSQL':
-      return MariaSQLLoader;
+      return plugin.MariaSQLLoader;
     case 'SQLServer':
-      return MSSQLLoader;
+      return plugin.MSSQLLoader;
     case 'SQLite':
-      return SQLiteLoader;
+      return plugin.SQLiteLoader;
     case 'CQL':
-      return CassandraLoader;
+      return plugin.CassandraLoader;
     case 'PLSQL':
-      return PLSQLLoader;
+      return plugin.PLSQLLoader;
     default:
-      return StandardSQLLoader;
+      return plugin.StandardSQLLoader;
   }
 }
