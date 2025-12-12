@@ -57,8 +57,9 @@ export const TreeToolbar = observer<React.PropsWithChildren<TreeToolbarProps>>(f
           className={clsx('tw:theme-text-primary', refreshing && 'tw:animate-spin')}
           aria-label={translate('ui_refresh')}
           title={translate('ui_refresh')}
+          onClick={handleRefresh}
         >
-          <Icon width={16} height={16} name="/icons/refresh_sm.svg" viewBox="0 0 16 16" onClick={handleRefresh} />
+          <Icon width={16} height={16} name="/icons/refresh_sm.svg" viewBox="0 0 16 16" />
         </IconButton>
       </div>
       <TreeToolbarFilter filter={treeFilter} filterEnabled={settings?.filter} />
