@@ -17,7 +17,9 @@ export function renderQueryForConfirmation(query: string): React.ReactElement {
 const RenderQuery = observer(function RenderQuery({ query }: { query: string }) {
   const sqlDialect = useSqlDialectExtension(undefined);
   const extensions = useCodemirrorExtensions();
-  extensions.set(...sqlDialect);
+  if (sqlDialect) {
+    extensions.set(...sqlDialect);
+  }
 
   return <SQLCodeEditorLoader className="tw:mt-4" value={query} extensions={extensions} lineWrapping readonly />;
 });

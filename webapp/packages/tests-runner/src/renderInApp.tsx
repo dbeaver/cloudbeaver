@@ -11,6 +11,8 @@ import { Suspense } from 'react';
 
 import { type IServiceProvider, ServiceProvider } from '@cloudbeaver/core-di';
 
+import { userEvent, type UserEvent } from '@testing-library/user-event';
+
 import type { IApplication } from './createApp.js';
 
 function resetDocument() {
@@ -27,6 +29,12 @@ function ApplicationWrapper(serviceInjector: IServiceProvider): React.FC<React.P
   );
 }
 
+type App<
+  Q extends Queries = typeof queries,
+  Container extends Element | DocumentFragment = HTMLElement,
+  BaseElement extends Element | DocumentFragment = Container,
+> = RenderResult<Q, Container, BaseElement> & { user: ReturnType<UserEvent['setup']> };
+
 // TODO move it to the common-react/@dbeaver/react-tests packages
 export function renderInApp<
   Q extends Queries = typeof queries,
@@ -36,11 +44,19 @@ export function renderInApp<
   ui: React.ReactElement,
   options: Omit<RenderOptions<Q, Container, BaseElement>, 'queries' | 'wrapper'> = {},
   app?: IApplication,
-): RenderResult<Q, Container, BaseElement> {
+): App<Q, Container, BaseElement> {
   resetDocument();
+  const user = userEvent.setup();
+
   if (!app) {
-    return render(ui, options);
+    return {
+      ...render(ui, options),
+      user,
+    } as App<Q, Container, BaseElement>;
   }
 
-  return render(ui, { wrapper: ApplicationWrapper(app.serviceProvider), ...options });
+  return {
+    ...render(ui, { wrapper: ApplicationWrapper(app.serviceProvider), ...options }),
+    user,
+  } as App<Q, Container, BaseElement>;
 }

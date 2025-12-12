@@ -22,6 +22,7 @@
     "@testing-library/dom": "^10",
     "@testing-library/jest-dom": "^6",
     "@testing-library/react": "^16",
+    "@testing-library/user-event": "^14",
     "mobx": "^6",
     "react": "^19",
     "react-dom": "^19",

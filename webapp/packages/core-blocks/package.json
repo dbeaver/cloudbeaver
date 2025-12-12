@@ -61,6 +61,7 @@
     "@dbeaver/react-tests": "workspace:*",
     "@testing-library/jest-dom": "^6",
     "@testing-library/react": "^16",
+    "@testing-library/user-event": "^14",
     "@types/react": "^19",
     "mobx": "^6",
     "react": "^19",
