@@ -7,7 +7,6 @@
  */
 import type { ITreeData } from './ITreeData.js';
 import type { ITreeFilter } from './useTreeFilter.js';
-import type { ITreeSelection } from './useTreeSelection.js';
 
 export interface ITreeToolbarSettings {
   filter: boolean;
@@ -17,7 +16,6 @@ export interface ITreeToolbar {
   treeData: ITreeData;
   settings?: ITreeToolbarSettings;
   treeFilter?: ITreeFilter & { filterPlaceholder?: string };
-  selection?: ITreeSelection;
   disabled?: boolean;
   onRefresh?: () => Promise<void>;
   className?: string;
