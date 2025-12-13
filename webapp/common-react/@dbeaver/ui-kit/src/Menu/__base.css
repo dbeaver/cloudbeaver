@@ -12,16 +12,16 @@
     --dbv-kit-menu-hover-border-color: var(--dbv-kit-color-control-hover);
 
     --dbv-kit-menu-font-weight: var(--tw-font-weight-normal);
-    --dbv-kit-menu-font-size: calc(var(--dbv-kit-font-size-base) * 0.875);
+    --dbv-kit-menu-font-size: calc(var(--dbv-kit-font-size-base) * 0.85);
 
     --dbv-kit-menu-popover-background: var(--dbv-kit-color-background);
     --dbv-kit-menu-popover-foreground: var(--dbv-kit-color-foreground);
-    --dbv-kit-menu-popover-shadow: var(--tw-shadow-md);
-    --dbv-kit-menu-popover-max-height: 18rem;
+    --dbv-kit-menu-popover-shadow: 0px 3px 3px -2px rgba(0, 0, 0, 0.2), 0px 3px 4px 0px rgba(0, 0, 0, 0.14), 0px 1px 8px 0px rgba(0, 0, 0, 0.12);
+    --dbv-kit-menu-popover-max-height: calc(100vh - 4rem);
     --dbv-kit-menu-popover-max-width: 20rem;
 
     --dbv-kit-menu-item-padding-inline: calc(var(--tw-spacing) * 5);
-    --dbv-kit-menu-item-padding-block: calc(var(--tw-spacing) * 1.4);
+    --dbv-kit-menu-item-padding-block: calc(var(--tw-spacing) * 0);
     --dbv-kit-menu-item-hover-background: var(--tw-color-gray-200);
     --dbv-kit-menu-item-hover-foreground: var(--dbv-kit-menu-foreground);
     --dbv-kit-menu-item-selected-background: var(--dbv-kit-color-primary-100);

@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { getComputed, Icon, Link, Loader, s, StaticImage, useContextMenuPosition, useMouse, useS, useStateDelay } from '@cloudbeaver/core-blocks';
+import { Icon, Link, Loader, s, StaticImage, useContextMenuPosition, useMouse, useS, useStateDelay } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource, DATA_CONTEXT_CONNECTION } from '@cloudbeaver/core-connections';
 import { useDataContextLink } from '@cloudbeaver/core-data-context';
 import { useService } from '@cloudbeaver/core-di';
@@ -53,18 +53,10 @@ export const ObjectMenuCell = observer<Props>(function ObjectMenuCell({ object }
 
   const mouseEnter = useStateDelay(mouse.state.mouseEnter, 33); // track mouse update only 30 times per second
 
-  const menuEmpty =
-    !menuOpened &&
-    getComputed(() => {
-      if (!mouseEnter) {
-        return true;
-      }
-
-      return !menu.available;
-    });
+  const menuEmpty = !menuOpened && !mouseEnter;
 
   function contextMenuOpenHandler(event: React.MouseEvent<HTMLDivElement>) {
-    contextMenuPosition.handleContextMenuOpen(event);
+    contextMenuPosition.open(event);
   }
 
   const property = object.object?.properties?.[0];
@@ -82,15 +74,7 @@ export const ObjectMenuCell = observer<Props>(function ObjectMenuCell({ object }
         {!menuEmpty && (
           <div className={s(styles, { menuBox: true })}>
             <Loader suspense small fullSize>
-              <ContextMenu
-                contextMenuPosition={contextMenuPosition}
-                menu={menu}
-                placement="auto-end"
-                hidden={menuEmpty}
-                modal
-                disclosure
-                onVisibleSwitch={switchState}
-              >
+              <ContextMenu contextMenuPosition={contextMenuPosition} menu={menu} onVisibleSwitch={switchState}>
                 <Icon className={s(styles, { menuIcon: true })} name="snack" viewBox="0 0 16 10" />
               </ContextMenu>
             </Loader>
