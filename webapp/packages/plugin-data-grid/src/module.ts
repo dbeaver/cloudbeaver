@@ -8,11 +8,12 @@
 
 import { ModuleRegistry, Bootstrap } from '@cloudbeaver/core-di';
 import { PluginBootstrap } from './PluginBootstrap.js';
+import { LocaleService } from './LocaleService.js';
 
 export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-data-grid',
 
   configure: serviceCollection => {
-    serviceCollection.addSingleton(Bootstrap, PluginBootstrap);
+    serviceCollection.addSingleton(Bootstrap, PluginBootstrap).addSingleton(Bootstrap, LocaleService);
   },
 });

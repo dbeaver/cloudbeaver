@@ -7,88 +7,106 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { Checkbox, MenuItem, MenuItemCheckbox, MenuItemElement, MenuItemRadio, Radio, useTranslate } from '@cloudbeaver/core-blocks';
-import { getBindingLabel, type IMenuActionItem } from '@cloudbeaver/core-view';
-
+import { Checkbox, getComputed, Radio, registry, useTranslate, type IMenuItemElementProps } from '@cloudbeaver/core-blocks';
+import { getBindingLabel, type IMenuActionItem, type IMenuInfo } from '@cloudbeaver/core-view';
 import type { IContextMenuItemProps } from './IContextMenuItemProps.js';
+import { MenuItem, MenuItemCheckbox, MenuItemRadio } from '@dbeaver/ui-kit';
+import { useCallback } from 'react';
 
 interface IMenuActionElementProps extends IContextMenuItemProps {
   item: IMenuActionItem;
+  onlyIcons?: boolean;
+  parentMenuInfo?: IMenuInfo;
+  itemComponent: React.FC<IMenuItemElementProps>;
 }
 
-export const MenuActionElement = observer<IMenuActionElementProps>(function MenuActionElement({ item, onClick }) {
-  const translate = useTranslate();
-  const actionInfo = item.action.actionInfo;
-  const loading = item.action.isLoading();
-  let binding;
-  if (item.action.binding !== null) {
-    binding = getBindingLabel(item.action.binding.binding);
-  }
+export const MenuActionElement = registry(
+  observer<IMenuActionElementProps>(function MenuActionElement({ item, parentMenuInfo, menuData, onlyIcons, itemComponent: MenuItemElement }) {
+    const translate = useTranslate();
 
-  function handleClick() {
-    onClick();
-    item.action.activate();
-  }
-
-  const label = translate(actionInfo.label);
-
-  if (actionInfo.type === 'select') {
-    const checked = item.action.isChecked();
-    return (
-      <MenuItemRadio
-        hidden={item.hidden}
-        id={item.id}
-        aria-label={label}
-        disabled={item.disabled}
-        name={item.id}
-        value={label}
-        checked={checked}
-        style={{ pointerEvents: 'auto' }}
-        focusable
-        onClick={handleClick}
-      >
-        <MenuItemElement label={actionInfo.label} icon={<Radio checked={checked} size="small" />} tooltip={actionInfo.tooltip} loading={loading} />
-      </MenuItemRadio>
+    const handleClick = useCallback(
+      function handleClick() {
+        item.events?.onSelect?.(menuData.context);
+        item.action.activate();
+      },
+      [item, menuData],
     );
-  }
 
-  if (actionInfo.type === 'checkbox') {
-    const checked = item.action.isChecked();
-    return (
-      <MenuItemCheckbox
-        hidden={item.hidden}
-        id={item.id}
-        aria-label={label}
-        disabled={item.disabled}
-        name={item.id}
-        value={label}
-        checked={checked}
-        style={{ pointerEvents: 'auto' }}
-        focusable
-        onClick={handleClick}
-      >
+    if (item.hidden) {
+      return null;
+    }
+
+    const actionInfo = item.action.actionInfo;
+    const loading = getComputed(() => item.action.isLoading());
+    let binding: string | undefined;
+    if (item.action.binding !== null) {
+      binding = getBindingLabel(item.action.binding.binding);
+    }
+
+    const label = translate(actionInfo.label);
+    const baseItemIcon = getComputed(() => actionInfo.icon ?? parentMenuInfo?.icon);
+
+    function renderMenuItem({ icon }: { icon?: React.ReactNode | string }) {
+      return (
         <MenuItemElement
           label={actionInfo.label}
           binding={binding}
-          icon={<Checkbox checked={checked} size="small" />}
+          icon={onlyIcons ? (baseItemIcon ?? icon) : icon}
           tooltip={actionInfo.tooltip}
+          onlyIcons={onlyIcons}
           loading={loading}
         />
-      </MenuItemCheckbox>
-    );
-  }
+      );
+    }
 
-  return (
-    <MenuItem
-      hidden={item.hidden}
-      id={item.id}
-      aria-label={label}
-      disabled={item.disabled}
-      style={{ pointerEvents: 'auto' }}
-      focusable
-      onClick={handleClick}
-    >
-      <MenuItemElement label={actionInfo.label} icon={actionInfo.icon} binding={binding} tooltip={actionInfo.tooltip} loading={loading} />
-    </MenuItem>
-  );
-});
+    if (actionInfo.type === 'select') {
+      const checked = item.action.isChecked();
+      return (
+        <MenuItemRadio
+          hidden={item.hidden}
+          id={item.id}
+          aria-label={label}
+          disabled={item.disabled}
+          name={item.id}
+          value={label}
+          checked={checked}
+          style={{ pointerEvents: 'auto' }}
+          render={renderMenuItem({ icon: <Radio checked={checked} size="small" /> })}
+          focusable
+          onClick={handleClick}
+        />
+      );
+    }
+
+    if (actionInfo.type === 'checkbox') {
+      const checked = item.action.isChecked();
+      return (
+        <MenuItemCheckbox
+          hidden={item.hidden}
+          id={item.id}
+          aria-label={label}
+          disabled={item.disabled}
+          name={item.id}
+          value={label}
+          checked={checked}
+          style={{ pointerEvents: 'auto' }}
+          render={renderMenuItem({ icon: <Checkbox checked={checked} size="small" /> })}
+          focusable
+          onClick={handleClick}
+        />
+      );
+    }
+
+    return (
+      <MenuItem
+        id={item.id}
+        aria-label={label}
+        disabled={item.disabled}
+        style={{ pointerEvents: 'auto' }}
+        render={renderMenuItem({ icon: baseItemIcon })}
+        focusable
+        onClick={handleClick}
+      />
+    );
+  }),
+);

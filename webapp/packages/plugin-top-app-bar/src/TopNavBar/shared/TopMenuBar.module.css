@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-.topMenuBar .menuBar {
+.topMenuBar :global(.dbv-kit-menubar) {
   display: flex;
   height: 100%;
 }

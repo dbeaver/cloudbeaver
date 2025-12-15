@@ -14,8 +14,11 @@ export * from './ContextMenu/ContextMenuLazy.js';
 export * from './ContextMenu/IContextMenuItemProps.js';
 export * from './ContextMenu/MenuBar/MenuBarLazy.js';
 export * from './ContextMenu/MenuBar/MenuBarItemLoader.js';
+export * from './ContextMenu/MenuActionElement.js';
+export * from './ContextMenu/MenuContext.js';
 export { default as MenuBarStyles } from './ContextMenu/MenuBar/MenuBar.module.css';
 export { default as MenuBarItemStyles } from './ContextMenu/MenuBar/MenuBarItem.module.css';
+export { default as MenuBarGroupStyles } from './ContextMenu/MenuBar/MenuBarGroup.module.css';
 
 export * from './DragAndDrop/DND_ELEMENT_TYPE.js';
 export * from './DragAndDrop/DND_NATIVE_TYPE.js';

@@ -121,6 +121,7 @@ export class SqlEditorBootstrap extends Bootstrap {
 
     this.actionService.addHandler({
       id: 'sql-editor',
+      actions: [ACTION_RENAME, ACTION_SQL_EDITOR_OPEN],
       isActionApplicable: (context, action) => {
         switch (action) {
           case ACTION_RENAME: {
@@ -242,6 +243,7 @@ export class SqlEditorBootstrap extends Bootstrap {
 
         return {
           ...action.info,
+          label: '',
           tooltip,
         };
       },
