@@ -21,6 +21,7 @@ declare module 'react-hotkeys-hook' {
     useKey?: boolean;
   };
   export type Hotkey = KeyboardModifiers & {
+    hotkey?: string;
     keys?: readonly string[];
     scopes?: Scopes;
     description?: string;

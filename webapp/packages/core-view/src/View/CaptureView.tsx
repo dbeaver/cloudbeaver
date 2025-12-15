@@ -45,7 +45,7 @@ export const CaptureView = observer<React.PropsWithChildren<ICaptureViewProps>>(
   useHotkeys(
     keys,
     (event, handler) => {
-      if (!event.isTrusted || !state.reference?.contains(document.activeElement)) {
+      if (!state.reference?.contains(document.activeElement)) {
         return;
       }
 
