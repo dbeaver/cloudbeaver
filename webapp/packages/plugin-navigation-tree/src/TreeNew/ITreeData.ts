@@ -16,9 +16,11 @@ export interface ITreeData {
   getUnfilteredChildren: (node: string) => string[];
   getParent: (node: string) => string | null;
   getState(id: string): Readonly<INodeState>;
+  getSelectedNodes(): string[];
 
   updateAllState(state: Partial<INodeState>): void;
   updateState(id: string, state: Partial<INodeState>): void;
+  clearSelection(): void;
   load(nodeId: string, manual: boolean): Promise<void>;
   update(): Promise<void>;
 }

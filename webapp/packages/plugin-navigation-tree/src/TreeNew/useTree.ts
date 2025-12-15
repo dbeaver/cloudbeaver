@@ -18,11 +18,13 @@ interface IOptions {
   onNodeClick?(id: string): void | Promise<void>;
   onNodeDoubleClick?(id: string): void | Promise<void>;
   getNodeHeight(id: string): number;
+  enableClickSelection?: boolean;
 }
 
 export interface ITree {
   getNodeComponent(id: string): NodeComponent | null;
   getNodeHeight(id: string): number;
+  enableClickSelection: boolean;
 
   openNode(id: string): Promise<void>;
   clickNode(id: string): Promise<void>;
@@ -37,10 +39,14 @@ export function useTree(options: IOptions): ITree {
     onNodeClick: observable.ref,
     onNodeDoubleClick: observable.ref,
     getNodeHeight: observable.ref,
+    enableClickSelection: observable.ref,
   });
 
   const data = useObservableRef(
     () => ({
+      get enableClickSelection(): boolean {
+        return options.enableClickSelection ?? true;
+      },
       getNodeComponent(id: string): NodeComponent | null {
         if (!options.nodeRenderers) {
           return null;

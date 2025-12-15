@@ -16,6 +16,7 @@ import type { TreeState } from './TreeState.js';
 
 export interface ITreeState {
   getState(id: string): Readonly<INodeState>;
+  getSelectedNodes(): string[];
   updateState(id: string, state: Partial<INodeState>): void;
   updateAllState(state: Partial<INodeState>): void;
 }
@@ -38,6 +39,15 @@ export function useTreeState(externalState?: TreeState): ITreeState {
     () => ({
       getState(id: string): Readonly<INodeState> {
         return state.get(id);
+      },
+      getSelectedNodes(): string[] {
+        const selectedNodes: string[] = [];
+        for (const [id, nodeState] of this.state.entries()) {
+          if (nodeState.selected) {
+            selectedNodes.push(id);
+          }
+        }
+        return selectedNodes;
       },
       updateState(id: string, state: Partial<INodeState>): void {
         Object.assign(this.getState(id), state);

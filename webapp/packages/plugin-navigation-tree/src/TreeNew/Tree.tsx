@@ -34,6 +34,7 @@ export interface NavigationTreeNewProps {
   nodeRenderers?: INodeRenderer[];
   emptyPlaceholder?: NodeEmptyPlaceholderComponent;
   className?: string;
+  enableClickSelection?: boolean;
   onNodeClick?(id: string): void | Promise<void>;
   onNodeDoubleClick?(id: string): void | Promise<void>;
   getNodeDnDContext?(id: string, context: IDataContext): void;
@@ -47,6 +48,7 @@ export const Tree = observer<NavigationTreeNewProps>(function Tree({
   nodeRenderers,
   emptyPlaceholder,
   className,
+  enableClickSelection,
   onNodeClick,
   onNodeDoubleClick,
   getNodeDnDContext,
@@ -58,6 +60,7 @@ export const Tree = observer<NavigationTreeNewProps>(function Tree({
     onNodeClick,
     onNodeDoubleClick,
     getNodeHeight,
+    enableClickSelection,
   });
   const mountOptimization = useTreeVirtualization();
   const elementsSizeCache = useNodeSizeCache(tree, data);

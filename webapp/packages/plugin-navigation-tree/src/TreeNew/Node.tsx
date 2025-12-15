@@ -8,7 +8,8 @@
 import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
 
-import { TreeNode } from '@cloudbeaver/core-blocks';
+import { EventTreeNodeSelectFlag, TreeNode } from '@cloudbeaver/core-blocks';
+import { EventContext } from '@cloudbeaver/core-events';
 
 import { TreeContext } from './contexts/TreeContext.js';
 import { TreeDataContext } from './contexts/TreeDataContext.js';
@@ -43,9 +44,21 @@ export const Node: NodeComponent = observer(function Node({ nodeId, offsetHeight
   const ControlRenderer = controlRenderer || NodeControl;
   const ChildrenRenderer = childrenRenderer;
 
+  function handleControlClick(event: React.MouseEvent<HTMLDivElement>) {
+    EventContext.set(event, EventTreeNodeSelectFlag);
+    const isMultiSelect = event.ctrlKey || event.metaKey;
+
+    if (!isMultiSelect) {
+      data.clearSelection();
+    }
+
+    const { selected } = data.getState(nodeId);
+    tree.selectNode(nodeId, isMultiSelect ? !selected : true);
+  }
+
   return (
     <TreeNode selected={selected} expanded={expanded} onExpand={handleToggleExpand} onOpen={handleOpen} onSelect={handleSelect} onClick={handleClick}>
-      <ControlRenderer ref={dndData.setTargetRef} nodeId={nodeId} />
+      <ControlRenderer ref={dndData.setTargetRef} nodeId={nodeId} onClick={tree.enableClickSelection ? handleControlClick : undefined} />
       {expanded && <ChildrenRenderer nodeId={nodeId} offsetHeight={offsetHeight + tree.getNodeHeight(nodeId)} />}
     </TreeNode>
   );
