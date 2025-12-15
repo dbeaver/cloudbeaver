@@ -10,14 +10,6 @@ import { describe, expect, it, vi } from 'vitest';
 import { Cell } from './Cell.js';
 import { renderInApp } from '@cloudbeaver/tests-runner';
 
-vi.mock('./s', () => ({
-  s: (...args: any[]) => args.join(' '),
-}));
-
-vi.mock('./useS', () => ({
-  useS: vi.fn(),
-}));
-
 vi.mock('./Containers/Container', () => ({
   Container: (props: any) => <div>{props.children}</div>,
 }));

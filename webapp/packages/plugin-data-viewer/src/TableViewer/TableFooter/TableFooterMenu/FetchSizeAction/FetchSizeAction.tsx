@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@ import { type ICustomMenuItemComponent } from '@cloudbeaver/core-view';
 import { DATA_CONTEXT_DV_DDM } from '../../../../DatabaseDataModel/DataContext/DATA_CONTEXT_DV_DDM.js';
 import { DataViewerSettingsService } from '../../../../DataViewerSettingsService.js';
 import styles from './FetchSizeAction.module.css';
+import { Input } from '@dbeaver/ui-kit';
 
 export const FetchSizeAction: ICustomMenuItemComponent = observer(function FetchSizeAction({ context }) {
   const model = context.get(DATA_CONTEXT_DV_DDM)!;
@@ -47,7 +48,7 @@ export const FetchSizeAction: ICustomMenuItemComponent = observer(function Fetch
   return (
     <Container className={s(style, { count: true })} keepSize noGrow center>
       <Form contents onSubmit={handleChange}>
-        <input
+        <Input
           ref={ref}
           className={s(style, { input: true })}
           type="number"
@@ -55,7 +56,8 @@ export const FetchSizeAction: ICustomMenuItemComponent = observer(function Fetch
           disabled={disabled}
           min={dataViewerSettingsService.minFetchSize}
           max={dataViewerSettingsService.maxFetchSize}
-          onChange={e => setLimit(e.target.value)}
+          size="small"
+          onChange={event => setLimit(event.target.value)}
           onBlur={handleChange}
         />
       </Form>

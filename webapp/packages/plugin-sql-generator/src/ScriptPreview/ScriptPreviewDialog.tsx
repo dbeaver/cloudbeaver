@@ -41,7 +41,9 @@ export const ScriptPreviewDialog = observer<DialogComponentProps<Payload>>(funct
   const dialect = useResource(ScriptPreviewDialog, ConnectionDialectResource, payload.connectionKey);
   const sqlDialect = useSqlDialectExtension(dialect.data);
   const extensions = useCodemirrorExtensions();
-  extensions.set(...sqlDialect);
+  if (sqlDialect) {
+    extensions.set(...sqlDialect);
+  }
 
   const apply = async () => {
     try {

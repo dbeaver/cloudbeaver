@@ -324,7 +324,6 @@ public class WebSession extends BaseWebSession
         } else {
             sessionProject = createSessionProject(project);
         }
-        sessionProject.refreshProjectSettings();
         // do not load data sources for anonymous project
         if (project.getType() == RMProjectType.USER && userContext.getUser() == null) {
             sessionProject.setInMemory(true);
@@ -590,8 +589,9 @@ public class WebSession extends BaseWebSession
 
     public WebAsyncTaskInfo runAsyncTask(@NotNull WebAsyncTaskInfo asyncTask, @NotNull WebAsyncTaskProcessor<?> runnable) {
         AbstractJob job = new AbstractJob(asyncTask.getName()) {
+            @NotNull
             @Override
-            protected IStatus run(DBRProgressMonitor monitor) {
+            protected IStatus run(@NotNull DBRProgressMonitor monitor) {
                 int curTaskCount = taskCount.incrementAndGet();
 
                 DBRProgressMonitor taskMonitor = new TaskProgressMonitor(monitor, WebSession.this, asyncTask);
@@ -841,7 +841,7 @@ public class WebSession extends BaseWebSession
             // uncommented because we had the problem with non-native auth models
             // (for example, can't connect to DynamoDB if credentials are not saved)
             DBAAuthCredentials credentials = configuration.getAuthModel().loadCredentials(dataSourceContainer, configuration);
-            WebDataSourceUtils.updateCredentialsFromProperties(credentials, configuration.getAuthProperties());
+            WebDataSourceUtils.updateCredentialsFromProperties(this.progressMonitor, credentials, configuration.getAuthProperties());
 
             configuration.getAuthModel().provideCredentials(dataSourceContainer, configuration, credentials);
         } catch (DBException e) {
@@ -1030,12 +1030,12 @@ public class WebSession extends BaseWebSession
 
     private class SessionProgressMonitor extends BaseProgressMonitor {
         @Override
-        public void beginTask(String name, int totalWork) {
+        public void beginTask(@NotNull String name, int totalWork) {
             addInfoMessage(name);
         }
 
         @Override
-        public void subTask(String name) {
+        public void subTask(@NotNull String name) {
             addInfoMessage(name);
         }
     }

@@ -45,7 +45,6 @@
     "react-hotkeys-hook": "^5",
     "react-minisearch": "^7",
     "reakit": "^1",
-    "reakit-system": "^0",
     "reakit-utils": "^0",
     "subscript": "^9",
     "tslib": "^2"
@@ -62,6 +61,7 @@
     "@dbeaver/react-tests": "workspace:*",
     "@testing-library/jest-dom": "^6",
     "@testing-library/react": "^16",
+    "@testing-library/user-event": "^14",
     "@types/react": "^19",
     "mobx": "^6",
     "react": "^19",

@@ -21,7 +21,7 @@
     font-weight: var(--dbv-kit-combobox-font-weight);
     font-size: var(--dbv-kit-combobox-font-size);
 
-    &:not(:disabled):hover {
+    &:not(:disabled):not(:focus-visible):not([data-focus-visible]):hover {
       border-color: var(--dbv-kit-combobox-hover-border-color);
     }
 

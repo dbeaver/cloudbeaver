@@ -269,12 +269,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
     @Override
     public WebUserInfo activeUser(@NotNull WebSession webSession) throws DBWebException {
         if (webSession.getUser() == null) {
-            ServletApplication application = webSession.getApplication();
-            if (!application.getAppConfiguration().isAnonymousAccessEnabled() || !webSession.isAuthorizedInSecurityManager()) {
-                return null;
-            }
-            SMUser anonymous = new SMUser("anonymous", true, null);
-            return new WebUserInfo(webSession, new WebUser(anonymous));
+            return getAnonymousUserInfo(webSession);
         }
         try {
             // Read user from security controller. It will also read meta parameters
@@ -373,14 +368,24 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
         @NotNull WebSession webSession,
         @NotNull Map<String, Object> parameters
     ) throws DBWebException {
-        if (webSession.getUser() == null) {
-            throw new DBWebException("Preferences cannot be changed for anonymous user");
-        }
         try {
             webSession.getUserContext().getPreferenceStore().updatePreferenceValues(parameters);
+            if (webSession.getUser() == null) {
+                return getAnonymousUserInfo(webSession);
+            }
             return new WebUserInfo(webSession, webSession.getUser());
         } catch (DBException e) {
             throw new DBWebException("Error setting user parameters", e);
         }
+    }
+
+    @Nullable
+    private WebUserInfo getAnonymousUserInfo(@NotNull WebSession webSession) {
+        ServletApplication application = webSession.getApplication();
+        if (!application.getAppConfiguration().isAnonymousAccessEnabled() || !webSession.isAuthorizedInSecurityManager()) {
+            return null;
+        }
+        SMUser anonymous = new SMUser("anonymous", true, null);
+        return new WebUserInfo(webSession, new WebUser(anonymous));
     }
 }

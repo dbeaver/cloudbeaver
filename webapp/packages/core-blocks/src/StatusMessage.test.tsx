@@ -18,20 +18,12 @@ vi.mock('./localization/useTranslate', () => ({
   useTranslate: () => (key: string) => key,
 }));
 
-vi.mock('./s', () => ({
-  s: vi.fn(),
-}));
-
 vi.mock('./IconOrImage', () => ({
   IconOrImage: (props: any) => <svg {...props} />,
 }));
 
 vi.mock('./Link', () => ({
   Link: (props: any) => <a {...props} />,
-}));
-
-vi.mock('./useS', () => ({
-  useS: vi.fn(),
 }));
 
 vi.mock('./useErrorDetails', () => ({

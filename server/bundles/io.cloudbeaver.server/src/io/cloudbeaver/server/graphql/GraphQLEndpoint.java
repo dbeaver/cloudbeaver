@@ -44,6 +44,7 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
+import org.jkiss.dbeaver.utils.MimeTypes;
 import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.HttpConstants;
 import org.jkiss.utils.IOUtils;
@@ -211,6 +212,7 @@ public class GraphQLEndpoint extends HttpServlet {
         if (path.contentEquals("/schema.json") && develMode) {
             executeQuery(request, response, GraphQLConstants.SCHEMA_READ_QUERY, null, null);
         } else if (path.contentEquals("/console") && develMode) {
+            response.setContentType(MimeTypes.TEXT_HTML);
             try (InputStream consolePageStream = WebServiceUtils.openStaticResource("static/graphiql/index.html")) {
                 IOUtils.copyStream(consolePageStream, response.getOutputStream());
             }
