@@ -295,10 +295,10 @@ public class WebSessionProjectImpl extends WebProjectImpl implements DBPObjectSe
     }
 
     public void refreshProjectSettings() throws DBException {
+        this.projectSettings = new ConcurrentHashMap<>();
         if (webSession.getUser() == null) {
             return;
         }
-        this.projectSettings = new ConcurrentHashMap<>();
         List<SMObjectSettings> loadedSettings = webSession.getSecurityController().getObjectSettings(
             getId(),
             getId(),
