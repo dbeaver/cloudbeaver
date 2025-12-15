@@ -730,7 +730,7 @@ public class WebServiceCore implements DBWServiceCore {
         WebConnectionInfo connectionInfo = WebDataSourceUtils.getWebConnectionInfo(webSession, projectId, id);
         DataSourceDescriptor dataSourceDescriptor = ((DataSourceDescriptor) connectionInfo.getDataSourceContainer());
         try {
-            if (webSession.isAuthorizedInSecurityManager()) {
+            if (webSession.getUserContext().isNonAnonymousUserAuthorizedInSM()) {
                 String serialized = DataSourceNavigatorSettingsUtils.serializeSettingsToJson(settings);
                 // save in sm database for authenticated users
                 webSession.getSecurityController().setObjectSettings(
