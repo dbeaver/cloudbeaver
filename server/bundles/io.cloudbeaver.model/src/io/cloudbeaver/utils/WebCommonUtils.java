@@ -18,6 +18,7 @@ package io.cloudbeaver.utils;
 
 import io.cloudbeaver.model.WebPropertyInfo;
 import io.cloudbeaver.model.session.WebSession;
+import jakarta.servlet.http.HttpServletRequest;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.DBPImage;
@@ -64,5 +65,11 @@ public class WebCommonUtils {
             }
         }
         return true;
+    }
+
+    @NotNull
+    public static String getRemoteIpAddress(@NotNull HttpServletRequest request) {
+        String remoteAddressFromHeader = request.getHeader("X-Real-IP");
+        return CommonUtils.isEmpty(remoteAddressFromHeader) ? request.getRemoteAddr() : remoteAddressFromHeader;
     }
 }
