@@ -38,7 +38,7 @@ export function baseConfigurationPlugin(mode: string, packageJson: any): PluginO
     }),
     copyAssetsPlugin(),
     legacy({
-      modernTargets: 'since 2023-01-01, not dead',
+      modernTargets: 'last 3 years, not dead',
       modernPolyfills: true,
       renderLegacyChunks: false,
     }),
