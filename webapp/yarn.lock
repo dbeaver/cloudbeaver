@@ -4730,13 +4730,13 @@ __metadata:
     "@tailwindcss/vite": "npm:4.0.7"
     "@types/fs-extra": "npm:^11"
     "@types/node": "npm:^22"
-    "@vitejs/plugin-legacy": "npm:^7.2.1"
+    "@vitejs/plugin-legacy": "npm:^7"
     "@vitejs/plugin-react": "npm:^5"
     "@wroud/vite-plugin-asset-resolver": "npm:^0"
     "@wroud/vite-plugin-tsc": "npm:^0"
     fs-extra: "npm:^11"
     rimraf: "npm:^6"
-    terser: "npm:^5.44.1"
+    terser: "npm:^5"
     tslib: "npm:^2"
     typescript: "npm:^5"
     vite: "npm:^7"
@@ -8974,7 +8974,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@vitejs/plugin-legacy@npm:^7.2.1":
+"@vitejs/plugin-legacy@npm:^7":
   version: 7.2.1
   resolution: "@vitejs/plugin-legacy@npm:7.2.1"
   dependencies:
@@ -18542,6 +18542,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"terser@npm:^5":
+  version: 5.44.1
+  resolution: "terser@npm:5.44.1"
+  dependencies:
+    "@jridgewell/source-map": "npm:^0.3.3"
+    acorn: "npm:^8.15.0"
+    commander: "npm:^2.20.0"
+    source-map-support: "npm:~0.5.20"
+  bin:
+    terser: bin/terser
+  checksum: 10c0/ee7a76692cb39b1ed22c30ff366c33ff3c977d9bb769575338ff5664676168fcba59192fb5168ef80c7cd901ef5411a1b0351261f5eaa50decf0fc71f63bde75
+  languageName: node
+  linkType: hard
+
 "terser@npm:^5.17.4":
   version: 5.44.0
   resolution: "terser@npm:5.44.0"
@@ -18553,20 +18567,6 @@ __metadata:
   bin:
     terser: bin/terser
   checksum: 10c0/f2838dc65ac2ac6a31c7233065364080de73cc363ecb8fe723a54f663b2fa9429abf08bc3920a6bea85c5c7c29908ffcf822baf1572574f8d3859a009bbf2327
-  languageName: node
-  linkType: hard
-
-"terser@npm:^5.44.1":
-  version: 5.44.1
-  resolution: "terser@npm:5.44.1"
-  dependencies:
-    "@jridgewell/source-map": "npm:^0.3.3"
-    acorn: "npm:^8.15.0"
-    commander: "npm:^2.20.0"
-    source-map-support: "npm:~0.5.20"
-  bin:
-    terser: bin/terser
-  checksum: 10c0/ee7a76692cb39b1ed22c30ff366c33ff3c977d9bb769575338ff5664676168fcba59192fb5168ef80c7cd901ef5411a1b0351261f5eaa50decf0fc71f63bde75
   languageName: node
   linkType: hard
 
