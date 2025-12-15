@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 
 import { type PlaceholderComponent, useS } from '@cloudbeaver/core-blocks';
 import { useDataContextLink } from '@cloudbeaver/core-data-context';
-import { MenuBar, MenuBarItemStyles, MenuBarStyles } from '@cloudbeaver/core-ui';
+import { MenuBar, MenuBarGroupStyles, MenuBarItemStyles, MenuBarStyles } from '@cloudbeaver/core-ui';
 import { useMenu } from '@cloudbeaver/core-view';
 
 import { DATA_CONTEXT_DV_DDM } from '../../DatabaseDataModel/DataContext/DATA_CONTEXT_DV_DDM.js';
@@ -20,7 +20,7 @@ import type { ITableHeaderPlaceholderProps } from './TableHeaderService.js';
 
 export const TableHeaderMenu: PlaceholderComponent<ITableHeaderPlaceholderProps> = observer(function TableHeaderMenu({ model, simple, resultIndex }) {
   const menu = useMenu({ menu: DATA_VIEWER_DATA_MODEL_TOOLS_MENU });
-  const menuBarStyles = useS(MenuBarStyles, MenuBarItemStyles);
+  const menuBarStyles = useS(MenuBarStyles, MenuBarItemStyles, MenuBarGroupStyles);
 
   useDataContextLink(menu.context, (context, id) => {
     context.set(DATA_CONTEXT_DV_DDM, model, id);

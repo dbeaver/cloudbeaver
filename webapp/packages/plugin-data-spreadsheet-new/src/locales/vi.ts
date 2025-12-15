@@ -17,7 +17,6 @@ export default [
   ['data_grid_table_disable_order', 'Đã tắt'],
   ['data_grid_table_disable_all_orders', 'Tắt tất cả'],
   ['data_grid_table_delete_filters_and_orders', 'Đặt lại bộ lọc / sắp xếp'],
-  ['data_grid_table_tooltip_column_header_order', 'Sắp xếp theo cột'],
   ['data_grid_table_context_menu_filter_dialog_title', 'Chỉnh sửa giá trị'],
   ['data_grid_table_context_menu_filter_clipboard_permission', 'Cấp quyền truy cập vào clipboard'],
   ['data_grid_table_context_menu_save_value_error', 'Không thể lưu giá trị'],

@@ -74,8 +74,9 @@ public class CBPlatform extends BaseWebPlatform {
             .scheduleMonitor();
 
         new AbstractJob("Delete temp folder") {
+            @NotNull
             @Override
-            protected IStatus run(DBRProgressMonitor monitor) {
+            protected IStatus run(@NotNull DBRProgressMonitor monitor) {
                 try {
                     IOUtils.deleteDirectory(getTempFolder(monitor, TEMP_FILE_FOLDER));
                     IOUtils.deleteDirectory(getTempFolder(monitor, TEMP_FILE_IMPORT_FOLDER));

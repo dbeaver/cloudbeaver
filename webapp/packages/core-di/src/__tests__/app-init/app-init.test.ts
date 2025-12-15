@@ -12,7 +12,7 @@ import { TestBootstrap } from './TestBootstrap.js';
 import { TestService } from './TestService.js';
 import testModule from './module.js';
 
-test.skip('App Initialization', async () => {
+test('App Initialization', async () => {
   const app = new App([testModule]);
 
   await (app as any).registerServices();

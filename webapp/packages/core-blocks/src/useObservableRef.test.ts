@@ -8,15 +8,9 @@
 
 import { describe, expect, test, vitest } from 'vitest';
 import { renderHook } from '@testing-library/react';
-import { action, computed, isObservable, observable, runInAction } from 'mobx';
-
+import { computed, isObservable, observable, runInAction } from 'mobx';
 import * as coreUtils from '@cloudbeaver/core-utils';
-
 import { useObservableRef } from './useObservableRef.js';
-
-vitest.mock('@cloudbeaver/core-utils', () => ({
-  bindFunctions: vitest.fn(),
-}));
 
 describe('useObservableRef', () => {
   test('should initialize with a function', () => {
@@ -42,7 +36,7 @@ describe('useObservableRef', () => {
   test('should bind functions', () => {
     const bindFunctions = vitest.spyOn(coreUtils, 'bindFunctions');
 
-    const observed = { count: observable, increment: action };
+    const observed = { count: observable };
 
     renderHook(() =>
       useObservableRef(
@@ -102,7 +96,7 @@ describe('useObservableRef', () => {
         this.count++;
       },
     });
-    const observed = { count: observable, increment: action };
+    const observed = { count: observable };
     const update = ['increment'];
 
     renderHook(() => useObservableRef(init, observed, update));

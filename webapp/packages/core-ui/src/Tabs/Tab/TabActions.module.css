@@ -16,6 +16,7 @@
   right: 0;
   z-index: 1;
   overflow: hidden;
+  padding-bottom: 2px; /* to align with the bottom of the tab with border */
 
   &:empty {
     display: none;
