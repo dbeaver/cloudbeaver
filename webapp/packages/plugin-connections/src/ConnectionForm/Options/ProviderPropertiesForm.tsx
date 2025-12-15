@@ -45,7 +45,7 @@ export const ProviderPropertiesForm = observer<Props>(function ProviderPropertie
   const nonBooleanProperties = supportedProperties.filter(property => !property.category && property.dataType !== 'Boolean');
 
   return (
-    <Group form gap>
+    <Group gap>
       {isUncategorizedExists && (
         <>
           <GroupTitle>{translate('ui_settings')}</GroupTitle>

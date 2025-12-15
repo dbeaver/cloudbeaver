@@ -185,7 +185,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
                 <Text>{translate('plugin_connections_connection_driver_not_installed_message')}</Text>
               </Alert>
             )}
-            <Group form box gap>
+            <Group box gap>
               <Container wrap gap>
                 <Combobox
                   name="driverId"
@@ -244,7 +244,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
                 ))}
             </Group>
           </Group>
-          <Group form gap>
+          <Group gap>
             <Container wrap gap>
               <InputField type="text" name="name" minLength={1} state={optionsPart.state} readOnly={readonly || formState.isDisabled} required fill>
                 {translate('connections_connection_name')}
@@ -267,7 +267,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
         </Container>
         <Container medium gap>
           {!driver?.anonymousAccess && (authentication.authorized || !edit) && (
-            <Group form gap>
+            <Group gap>
               <GroupTitle>{translate('connections_connection_edit_authentication')}</GroupTitle>
               {serverConfigResource.resource.distributed && isSharedProject && (
                 <FieldCheckbox
