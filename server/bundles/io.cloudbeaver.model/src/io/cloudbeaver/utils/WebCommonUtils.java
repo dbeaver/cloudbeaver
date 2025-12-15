@@ -35,6 +35,8 @@ import java.util.Collection;
 
 public class WebCommonUtils {
 
+    private static final String CLIENT_IP_HEADER = "X-Real-IP";
+
     public static String makeIconId(@Nullable DBPImage icon) {
         return icon == null ? null : icon.getLocation();
     }
@@ -69,7 +71,7 @@ public class WebCommonUtils {
 
     @NotNull
     public static String getRemoteIpAddress(@NotNull HttpServletRequest request) {
-        String remoteAddressFromHeader = request.getHeader("X-Real-IP");
+        String remoteAddressFromHeader = request.getHeader(CLIENT_IP_HEADER);
         return CommonUtils.isEmpty(remoteAddressFromHeader) ? request.getRemoteAddr() : remoteAddressFromHeader;
     }
 }
