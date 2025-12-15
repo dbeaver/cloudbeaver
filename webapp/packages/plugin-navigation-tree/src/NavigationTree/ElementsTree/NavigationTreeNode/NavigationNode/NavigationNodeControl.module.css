@@ -43,6 +43,7 @@
   margin-left: auto !important;
   margin-right: 8px !important;
   visibility: hidden;
+  display: flex;
 }
 
 .nameBox {

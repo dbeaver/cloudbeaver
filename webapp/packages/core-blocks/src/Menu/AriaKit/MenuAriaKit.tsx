@@ -42,8 +42,7 @@ export const MenuAriaKit = observer(function MenuAriaKit({
   ...rest
 }: IMenuAriaKitProps) {
   const store = useMenuStore(menuStoreProps);
-  const storeState = useStoreState(store);
-  const isOpen = storeState?.open ?? false;
+  const isOpen = useStoreState(store, 'open');
 
   function getAnchorRect() {
     if (!contextMenuPosition?.position) {

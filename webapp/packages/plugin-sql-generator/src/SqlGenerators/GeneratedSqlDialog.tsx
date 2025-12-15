@@ -77,7 +77,9 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<Payload>>(functi
   const sqlDialect = useSqlDialectExtension(connectionDialectResource.data);
 
   const extensions = useCodemirrorExtensions();
-  extensions.set(...sqlDialect);
+  if (sqlDialect) {
+    extensions.set(...sqlDialect);
+  }
   const error = useErrorDetails(state.error.exception);
 
   useEffect(() => {
