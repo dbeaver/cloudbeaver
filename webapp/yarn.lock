@@ -1480,7 +1480,7 @@ __metadata:
     mobx-react-lite: "npm:^4"
     react: "npm:^19"
     react-dom: "npm:^19"
-    react-hotkeys-hook: "npm:^5"
+    react-hotkeys-hook: "npm:5.1.0"
     react-minisearch: "npm:^7"
     reakit: "npm:^1"
     reakit-utils: "npm:^0"
@@ -16596,6 +16596,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-hotkeys-hook@npm:5.1.0":
+  version: 5.1.0
+  resolution: "react-hotkeys-hook@npm:5.1.0"
+  peerDependencies:
+    react: ">=16.8.0"
+    react-dom: ">=16.8.0"
+  checksum: 10c0/99df6d3c305b139ac7afd073b58575961bf30a819fb23e8f1251b1b3a9f1c7662737f8b6266e3fc42bd5bdfdaca81aa1e019613f95f9a6313267de265e45836d
+  languageName: node
+  linkType: hard
+
 "react-hotkeys-hook@npm:^4.6.1":
   version: 4.6.2
   resolution: "react-hotkeys-hook@npm:4.6.2"
@@ -16603,16 +16613,6 @@ __metadata:
     react: ">=16.8.1"
     react-dom: ">=16.8.1"
   checksum: 10c0/ef30c49260f47972acea37f3d2cae4de871a6f65bd25ebe0d266586ccf6fb495ed44ba78296dbeed82f3493b1dec8bde5df63e6f0f9a4f99697394e512049f84
-  languageName: node
-  linkType: hard
-
-"react-hotkeys-hook@npm:^5":
-  version: 5.2.1
-  resolution: "react-hotkeys-hook@npm:5.2.1"
-  peerDependencies:
-    react: ">=16.8.0"
-    react-dom: ">=16.8.0"
-  checksum: 10c0/ccffc5aba9dcab1b4ee1fec5cdae7ad24bf4edda06b1293ba1ae7e4b6e2eaf1f087bc3e3fc413d7a91b1db55145e24c8b45ce51710f2e233a76fb5dcbf034f96
   languageName: node
   linkType: hard
 
