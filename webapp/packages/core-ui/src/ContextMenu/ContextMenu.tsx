@@ -6,87 +6,113 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { forwardRef, useRef, useState } from 'react';
+import React, { use, useLayoutEffect, useMemo } from 'react';
 
-import { getComputed, type IMenuState, Menu, useAutoLoad, useObjectRef, useTranslate } from '@cloudbeaver/core-blocks';
-import { MenuActionItem } from '@cloudbeaver/core-view';
-
+import { MenuItemElement, useAutoLoad, useObjectRef, useTranslate } from '@cloudbeaver/core-blocks';
 import type { IContextMenuProps } from './IContextMenuProps.js';
-import { MenuItemRenderer } from './MenuItemRenderer.js';
+import { MenuButton, MenuProvider, Menu, type HovercardStoreState, useMenuStore, useStoreState } from '@dbeaver/ui-kit';
+import { RenderMenuItems } from './RenderMenuItems.js';
+import { type IMenuContext, MenuContext } from './MenuContext.js';
 
-// TODO the click doesn't work for React components as children
-export const ContextMenu = observer<IContextMenuProps, HTMLButtonElement>(
-  forwardRef(function ContextMenu(
-    { contextMenuPosition, menu: menuData, disclosure, children, placement, visible, onVisibleSwitch, modal, rtl, ...props },
-    ref,
-  ) {
-    const translate = useTranslate();
-    const [menuVisible, setMenuVisible] = useState(false);
+export interface IContextMenuNewProps extends Omit<IContextMenuProps, 'placement'> {
+  render?: React.ReactElement;
+  placement?: HovercardStoreState['placement'];
+  showOnHover?: boolean;
+  ref?: React.ForwardedRef<HTMLButtonElement>;
+  shift?: number;
+  gutter?: number;
+}
 
-    const handler = menuData.handler;
-    const hidden = getComputed(() => handler?.isHidden?.(menuData.context) || false);
-    const loading = getComputed(() => handler?.isLoading?.(menuData.context) || menuData.loaders.some(loader => loader.isLoading()) || false);
-    const disabled = getComputed(() => loading || handler?.isDisabled?.(menuData.context) || false);
-    const lazy = getComputed(() => !menuData.available || hidden);
+export const ContextMenu = observer<IContextMenuNewProps>(function ContextMenuInner({
+  contextMenuPosition,
+  menu: menuData,
+  children,
+  placement,
+  visible,
+  onVisibleSwitch,
+  rtl,
+  shift,
+  gutter,
+  ...rest
+}) {
+  const translate = useTranslate();
+  const parent = use(MenuContext);
+  const menu = useMenuStore({ placement, rtl: rtl || parent?.rtl, open: visible });
+  const isRtl = useStoreState(menu, 'rtl');
+  const isMenuOpen = useStoreState(menu, 'open');
 
-    const menu = useRef<IMenuState>(null);
+  const handler = menuData.handler;
 
-    useAutoLoad({ name: `${ContextMenu.name}(${menuData.menu.id})` }, menuData.loaders, !lazy, menuVisible, true);
+  useAutoLoad({ name: `${ContextMenuInner.name}(${menuData.menu.id})` }, menuData.loaders, true, isMenuOpen, true);
 
-    const handlers = useObjectRef(
-      () => ({
-        handleItemClose() {
-          menu.current?.hide();
-        },
-        hasBindings() {
-          return this.menuData.items.some(item => item instanceof MenuActionItem && item.action.binding !== null);
-        },
-        handleVisibleSwitch(visible: boolean) {
-          setMenuVisible(visible);
-          this.onVisibleSwitch?.(visible);
-
-          if (visible) {
-            this.handler?.handler?.(this.menuData.context);
-          }
-        },
-      }),
-      { menuData, handler, onVisibleSwitch },
-      ['handleItemClose', 'hasBindings', 'handleVisibleSwitch'],
-    );
-
-    if (lazy) {
-      return null;
-    }
-
-    const renderingChildren: React.ReactNode = typeof children === 'function' ? children({ loading, disabled }) : children;
-
-    return (
-      <Menu
-        {...props}
-        ref={ref}
-        label={translate(menuData.menu.info.label)}
-        title={translate(menuData.menu.info.tooltip)}
-        items={() =>
-          menuData.items.map(
-            item =>
-              menu.current && (
-                <MenuItemRenderer key={item.id} item={item} menuData={menuData} rtl={rtl} modal={modal} onItemClose={handlers.handleItemClose} />
-              ),
-          )
+  const handlers = useObjectRef(
+    () => ({
+      getAnchorRect() {
+        if (this.contextMenuPosition?.position) {
+          return this.contextMenuPosition.position;
         }
-        rtl={rtl}
-        menuRef={menu}
-        modal={modal}
-        visible={visible}
-        contextMenuPosition={contextMenuPosition}
-        placement={placement}
-        disabled={disabled}
-        disclosure={disclosure}
-        getHasBindings={handlers.hasBindings}
-        onVisibleSwitch={handlers.handleVisibleSwitch}
-      >
-        {renderingChildren}
-      </Menu>
-    );
-  }),
-);
+
+        return null;
+      },
+      handleVisibleSwitch(visible: boolean) {
+        this.onVisibleSwitch?.(visible);
+
+        if (visible) {
+          this.handler?.handler?.(this.menuData.context);
+        } else {
+          this.contextMenuPosition?.close();
+        }
+      },
+    }),
+    { menuData, handler, onVisibleSwitch, contextMenuPosition },
+    ['getAnchorRect', 'handleVisibleSwitch'],
+  );
+
+  const showAtPosition = !!contextMenuPosition?.position;
+  useLayoutEffect(() => {
+    if (showAtPosition) {
+      menu.show();
+    }
+  }, [showAtPosition, menu]);
+
+  const menuContext = useMemo<IMenuContext>(() => ({ menu: menuData, rtl: isRtl }), [menuData, isRtl]);
+
+  if (handler?.isHidden?.(menuData.context)) {
+    return null;
+  }
+
+  return (
+    <MenuContext value={menuContext}>
+      <MenuProvider store={menu} setOpen={handlers.handleVisibleSwitch}>
+        <MenuButton {...rest} title={translate(menuData.menu.info.tooltip)}>
+          {children}
+        </MenuButton>
+        <Menu
+          aria-label={translate(menuData.menu.info.label)}
+          getAnchorRect={contextMenuPosition ? handlers.getAnchorRect : undefined}
+          shift={shift}
+          gutter={gutter}
+          dir={isRtl ? 'rtl' : 'ltr'}
+        >
+          {isMenuOpen && (
+            <RenderMenuItems
+              menu={menuData}
+              menuComponent={ContextMenu}
+              itemComponent={MenuItemElement}
+              groupComponent={GroupComponent}
+              groupArrowComponent={GroupArrowComponent}
+            />
+          )}
+        </Menu>
+      </MenuProvider>
+    </MenuContext>
+  );
+});
+
+function GroupComponent(props: React.HTMLAttributes<HTMLDivElement>) {
+  return <div {...props} />;
+}
+
+function GroupArrowComponent(props: React.HTMLAttributes<HTMLButtonElement>) {
+  return <button {...props} />;
+}

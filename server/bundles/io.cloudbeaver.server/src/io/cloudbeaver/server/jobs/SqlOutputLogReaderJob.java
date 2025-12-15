@@ -66,8 +66,9 @@ public class SqlOutputLogReaderJob extends AbstractJob {
         this.contextInfoId = contextInfoId;
     }
 
+    @NotNull
     @Override
-    protected IStatus run(DBRProgressMonitor monitor) {
+    protected IStatus run(@NotNull DBRProgressMonitor monitor) {
         if (!DBWorkbench.getPlatform().isShuttingDown()) {
             try {
                 if (!dbcStatement.isStatementClosed()) {
