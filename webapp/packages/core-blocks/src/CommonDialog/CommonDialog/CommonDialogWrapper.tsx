@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 import { forwardRef, useContext } from 'react';
 
-import { Dialog } from '@dbeaver/ui-kit';
+import { Dialog, type DialogProps } from '@dbeaver/ui-kit';
 import { Loader } from '../../Loader/Loader.js';
 import { s } from '../../s.js';
 import { useS } from '../../useS.js';
@@ -25,10 +25,14 @@ export interface CommonDialogWrapperProps {
   freeHeight?: boolean;
   className?: string;
   children?: React.ReactNode;
+  autoFocusOnHide?: DialogProps['autoFocusOnHide'];
 }
 
 export const CommonDialogWrapper = observer<CommonDialogWrapperProps, HTMLDivElement>(
-  forwardRef(function CommonDialogWrapper({ size = 'medium', fixedSize, fixedWidth, freeHeight, 'aria-label': ariaLabel, className, children }, ref) {
+  forwardRef(function CommonDialogWrapper(
+    { size = 'medium', fixedSize, fixedWidth, freeHeight, 'aria-label': ariaLabel, autoFocusOnHide = true, className, children },
+    ref,
+  ) {
     const computedStyles = useS(styles);
     const context = useContext(DialogContext);
 
@@ -45,6 +49,7 @@ export const CommonDialogWrapper = observer<CommonDialogWrapperProps, HTMLDivEle
         open={context.visible}
         data-size={size}
         className={s(computedStyles, { dialog: true, fixedSize, fixedWidth, freeHeight }, className)}
+        autoFocusOnHide={autoFocusOnHide}
         backdrop
         onClose={handleClose}
       >

@@ -25,6 +25,7 @@ export function SlidePanel({ children, isOpen, onClose }: SlidePanelProps): Reac
     <SlideElement open={isOpen}>
       {isOpen && (
         <IconButton
+          id="slide-panel-close-button"
           size="small"
           aria-label={t('core_blocks_dialog_element_close_tooltip')}
           className={s(styles, { iconBtn: true })}

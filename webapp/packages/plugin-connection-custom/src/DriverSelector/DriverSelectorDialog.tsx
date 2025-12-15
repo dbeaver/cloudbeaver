@@ -32,7 +32,17 @@ export const DriverSelectorDialog: DialogComponent<Payload> = observer(function 
   });
 
   return (
-    <CommonDialogWrapper size="large" fixedSize>
+    <CommonDialogWrapper
+      size="large"
+      autoFocusOnHide={element => {
+        if (!element) {
+          const finalFocus = document.getElementById('slide-panel-close-button');
+          finalFocus?.focus();
+        }
+        return true;
+      }}
+      fixedSize
+    >
       <CommonDialogHeader title={translate('plugin_connections_new_connection_dialog_title')} />
       <CommonDialogBody noBodyPadding noOverflow>
         <DriverSelector className={s(style, { driverSelector: true })} drivers={dialog.drivers} onSelect={dialog.select} />
