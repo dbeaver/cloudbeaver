@@ -56,8 +56,8 @@
     :root {
       --dbv-kit-dialog-content-background: hsl(240deg, 10%, 16%);
       --dbv-kit-dialog-content-foreground: #ffffff;
-      --dbv-kit-dialog-header-border-bottom: 1px solid rgba(255, 255, 255, 0.12);
-      --dbv-kit-dialog-footer-border-top: 1px solid rgba(255, 255, 255, 0.12);
+      --dbv-kit-dialog-header-border-bottom: none;
+      --dbv-kit-dialog-footer-border-top: none;
       --dbv-kit-dialog-dismiss-background: hsl(240deg, 10%, 18%);
       --dbv-kit-dialog-dismiss-foreground: #cbcbcb;
       --dbv-kit-dialog-dismiss-hover-background: hsl(240deg, 10%, 22%);
