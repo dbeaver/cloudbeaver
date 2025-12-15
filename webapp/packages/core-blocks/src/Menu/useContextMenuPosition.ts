@@ -16,14 +16,15 @@ export interface IContextMenuPositionCoords {
 
 export interface IContextMenuPosition {
   position: IContextMenuPositionCoords | null;
-  handleContextMenuOpen: (event: React.MouseEvent) => void;
+  open: (event: React.MouseEvent) => void;
+  close: () => void;
 }
 
 export function useContextMenuPosition(): IContextMenuPosition {
   return useObservableRef<IContextMenuPosition>(
     () => ({
       position: null,
-      handleContextMenuOpen(event: React.MouseEvent) {
+      open(event: React.MouseEvent) {
         if (!event.currentTarget.contains(event.target as Node)) {
           return;
         }
@@ -46,9 +47,12 @@ export function useContextMenuPosition(): IContextMenuPosition {
           y,
         };
       },
+      close() {
+        this.position = null;
+      },
     }),
     { position: observable.ref },
     false,
-    ['handleContextMenuOpen'],
+    ['open', 'close'],
   );
 }

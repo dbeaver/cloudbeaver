@@ -7,9 +7,12 @@
  */
 
 import type { IContextMenuItemProps } from '@cloudbeaver/core-ui';
+import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { MenuCustomItem } from '@cloudbeaver/core-view';
-// eslint-disable-next-line @cloudbeaver/no-sync-component-import
-import { ContextMenuSearchItemComponent } from './ContextMenuSearchItemComponent.js';
+
+const ContextMenuSearchItemComponent = importLazyComponent(() =>
+  import('./ContextMenuSearchItemComponent.js').then(module => module.ContextMenuSearchItemComponent),
+);
 
 export class ContextMenuSearchItem extends MenuCustomItem<IContextMenuItemProps> {
   constructor() {

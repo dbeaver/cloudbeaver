@@ -593,8 +593,9 @@ public class WebSession extends BaseWebSession
 
     public WebAsyncTaskInfo runAsyncTask(@NotNull WebAsyncTaskInfo asyncTask, @NotNull WebAsyncTaskProcessor<?> runnable) {
         AbstractJob job = new AbstractJob(asyncTask.getName()) {
+            @NotNull
             @Override
-            protected IStatus run(DBRProgressMonitor monitor) {
+            protected IStatus run(@NotNull DBRProgressMonitor monitor) {
                 int curTaskCount = taskCount.incrementAndGet();
 
                 DBRProgressMonitor taskMonitor = new TaskProgressMonitor(monitor, WebSession.this, asyncTask);
@@ -1050,12 +1051,12 @@ public class WebSession extends BaseWebSession
 
     private class SessionProgressMonitor extends BaseProgressMonitor {
         @Override
-        public void beginTask(String name, int totalWork) {
+        public void beginTask(@NotNull String name, int totalWork) {
             addInfoMessage(name);
         }
 
         @Override
-        public void subTask(String name) {
+        public void subTask(@NotNull String name) {
             addInfoMessage(name);
         }
     }

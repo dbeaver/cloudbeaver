@@ -69,7 +69,7 @@ export class UserSettingsService extends EditableSettingsSource {
   }
 
   async save() {
-    if (this.userInfoResource.isAuthenticated()) {
+    if (this.userInfoResource.hasAccess()) {
       await this.userInfoResource.updatePreferences(Object.fromEntries(this.changes));
     } else {
       this.update(() => {
@@ -98,7 +98,7 @@ export class UserSettingsService extends EditableSettingsSource {
 
   private refreshConfig() {
     this.update(() => {
-      if (!this.userInfoResource.isAuthenticated()) {
+      if (!this.userInfoResource.hasAccess()) {
         this.clear();
         this.lastConfig = null;
         return;
@@ -125,7 +125,7 @@ export class UserSettingsService extends EditableSettingsSource {
   }
 
   private getSource() {
-    if (this.userInfoResource.isAuthenticated()) {
+    if (this.userInfoResource.hasAccess()) {
       return this.settings;
     }
 

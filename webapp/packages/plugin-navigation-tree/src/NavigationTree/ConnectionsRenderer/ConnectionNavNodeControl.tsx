@@ -18,6 +18,8 @@ import {
   TreeNodeIcon,
   TreeNodeName,
   useContextMenuPosition,
+  useHover,
+  useMergeRefs,
   useS,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
@@ -39,6 +41,8 @@ export const ConnectionNavNodeControl: NavTreeControlComponent = observer<NavTre
     const navNodeInfoResource = useService(NavNodeInfoResource);
     const navTreeResource = useService(NavTreeResource);
     const selected = treeNodeContext.selected;
+    const hoverHook = useHover();
+    const mergedRef = useMergeRefs(hoverHook.ref, ref);
 
     const error = getComputed(() => !!navNodeInfoResource.getException(node.id) || !!navTreeResource.getException(node.id));
     const connected = getComputed(() => node.objectFeatures.includes(EObjectFeature.dataSourceConnected));
@@ -59,11 +63,12 @@ export const ConnectionNavNodeControl: NavTreeControlComponent = observer<NavTre
     }
 
     function handleContextMenuOpen(event: React.MouseEvent<HTMLDivElement>) {
-      contextMenuPosition.handleContextMenuOpen(event);
+      contextMenuPosition.open(event);
       treeNodeContext.select();
     }
 
     const temporary = node.objectFeatures.includes(EObjectFeature.dataSourceTemporary);
+    const mountMenu = (selected || hoverHook.isHovered) && !dndPlaceholder;
 
     if (temporary) {
       tooltip += `\n${translate('ui_type')}: ${translate('core_connections_connection_temporary')}`;
@@ -71,7 +76,7 @@ export const ConnectionNavNodeControl: NavTreeControlComponent = observer<NavTre
 
     return (
       <TreeNodeControl
-        ref={ref}
+        ref={mergedRef}
         className={s(styles, { treeNodeControl: true, dragging: !!dndElement }, className)}
         onClick={onClick}
         onContextMenu={handleContextMenuOpen}
@@ -85,7 +90,7 @@ export const ConnectionNavNodeControl: NavTreeControlComponent = observer<NavTre
             <div className={s(styles, { nameBox: true })}>{name}</div>
           </Loader>
         </TreeNodeName>
-        {!dndPlaceholder && (
+        {mountMenu && (
           <div className={s(styles, { portal: true })} onClick={handlePortalClick}>
             <TreeNodeMenuLoader contextMenuPosition={contextMenuPosition} node={node} selected={selected} />
           </div>

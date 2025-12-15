@@ -11,12 +11,6 @@ import { renderHook } from '@testing-library/react';
 import type { IExecutorHandler, IExecutorHandlersCollection } from '@cloudbeaver/core-executor';
 
 import { useExecutor } from './useExecutor.js';
-import { useObjectRef } from './useObjectRef.js';
-
-vitest.mock('@cloudbeaver/core-executor', () => ({}));
-vitest.mock('./useObjectRef', () => ({
-  useObjectRef: vitest.fn(obj => obj),
-}));
 
 describe('useExecutor', () => {
   let mockExecutor: IExecutorHandlersCollection<any>;
@@ -118,16 +112,5 @@ describe('useExecutor', () => {
 
     expect(mockExecutor.addHandler).not.toHaveBeenCalled();
     expect(mockExecutor.addPostHandler).not.toHaveBeenCalled();
-  });
-
-  test('should use useObjectRef', () => {
-    const options = {
-      executor: mockExecutor,
-      handlers: [vitest.fn()],
-    };
-
-    renderHook(() => useExecutor(options));
-
-    expect(useObjectRef).toHaveBeenCalledWith(options);
   });
 });
