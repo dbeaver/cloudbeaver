@@ -8,30 +8,42 @@
 
 import { useEffect, useRef, useState } from 'react';
 
+interface IPendingState {
+  timeout: ReturnType<typeof setTimeout> | null;
+  state: boolean;
+}
+
 export function useStateDelay(state: boolean, delay: number, callback?: () => void): boolean {
   const [delayedState, setState] = useState(state);
   const callbackRef = useRef(callback);
-  const actualStateRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const actualStateRef = useRef<IPendingState | null>(null);
 
   callbackRef.current = callback;
 
   useEffect(() => {
-    if (state === delayedState) {
-      if (actualStateRef.current !== null) {
-        clearTimeout(actualStateRef.current);
+    if (delayedState === state) {
+      if (actualStateRef.current) {
+        if (actualStateRef.current.timeout !== null) {
+          clearTimeout(actualStateRef.current.timeout);
+        }
         actualStateRef.current = null;
       }
       return;
     }
 
-    if (actualStateRef.current !== null) {
-      return;
-    }
+    if (actualStateRef.current?.state !== state) {
+      if (actualStateRef.current && actualStateRef.current.timeout !== null) {
+        clearTimeout(actualStateRef.current.timeout);
+      }
 
-    actualStateRef.current = setTimeout(() => {
-      setState(state);
-      actualStateRef.current = null;
-    }, delay);
+      actualStateRef.current = {
+        timeout: setTimeout(() => {
+          setState(state);
+          actualStateRef.current = null;
+        }, delay),
+        state,
+      };
+    }
   });
 
   useEffect(() => {

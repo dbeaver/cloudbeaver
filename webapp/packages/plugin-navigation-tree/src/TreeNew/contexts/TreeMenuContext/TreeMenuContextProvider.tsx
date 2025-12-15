@@ -25,7 +25,7 @@ export const TreeMenuContextProvider = observer<PropsWithChildren<Props>>(functi
 
       {menu && (
         <div className="tw:absolute tw:invisible">
-          <ContextMenu menu={menu.menu} contextMenuPosition={menu.position} modal />
+          <ContextMenu menu={menu.menu} contextMenuPosition={menu.position} />
         </div>
       )}
     </TreeMenuContext>

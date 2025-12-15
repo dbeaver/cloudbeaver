@@ -41,7 +41,7 @@ export function useTreeMenu(options: ITreeMenuOptions): Readonly<ITreeMenu> {
           options.setContext(this.menu.context, this.id);
         }
 
-        this.position.handleContextMenuOpen(event);
+        this.position.open(event);
       },
     }),
     { openMenu: action.bound },

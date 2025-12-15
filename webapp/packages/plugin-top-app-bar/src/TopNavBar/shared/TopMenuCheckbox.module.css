@@ -1,3 +1,0 @@
-.container {
-  composes: checkbox-markup-theme--secondary from global;
-}
