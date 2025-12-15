@@ -261,6 +261,11 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
     }
   }
 
+  resetQueryParameters(): void {
+    this.previousQueryParameters = this.currentQueryParameters || this.previousQueryParameters;
+    this.currentQueryParameters = null;
+  }
+
   protected async executeQuery(
     executionContextInfo: IConnectionExecutionContextInfo,
     options: TOptions,
@@ -324,11 +329,6 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
     } else {
       await this.currentQueryAsyncTask?.cancelAsync();
     }
-  }
-
-  private resetQueryParameters() {
-    this.previousQueryParameters = this.currentQueryParameters;
-    this.currentQueryParameters = null;
   }
 
   private innerGetResults(

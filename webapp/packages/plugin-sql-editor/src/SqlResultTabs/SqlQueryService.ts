@@ -196,7 +196,8 @@ export class SqlQueryService {
           constraints: [],
           whereFilter: '',
           readLogs: isOutputLogsTabOpened,
-        });
+        })
+        .resetQueryParameters();
 
       this.sqlQueryResultService.updateGroupTabs(editorState, model, tabGroup.groupId, true);
 
@@ -290,7 +291,8 @@ export class SqlQueryService {
             constraints: [],
             whereFilter: '',
             readLogs: isOutputLogsTabOpened,
-          });
+          })
+          .resetQueryParameters();
 
         try {
           await model.setCountGain(this.dataViewerSettingsService.getDefaultRowsCount()).setSlice(0).request();
