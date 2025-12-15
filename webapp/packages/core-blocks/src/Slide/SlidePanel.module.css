@@ -15,7 +15,7 @@
   align-items: center;
 
   &:hover {
-    background-color: var(--dbv-kit-btn-secondary-background-hover);
+    background-color: color-mix(in srgb, transparent, var(--theme-primary) 5%);
   }
 }
 
