@@ -1,0 +1,38 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2025 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+
+.menuBarGroup {
+  composes: theme-ripple from global;
+  cursor: pointer;
+  background: transparent;
+  outline: none;
+  color: inherit;
+  padding: 0;
+}
+
+.menuBarGroup {
+  display: flex;
+
+  &.disabled {
+    pointer-events: none;
+  }
+}
+
+.floating {
+  & .menuBarGroup {
+    margin: 2px;
+    flex-shrink: 0;
+    overflow: hidden;
+    border-radius: var(--theme-form-element-radius);
+
+    & .menuBarItem {
+      margin: 0;
+      border-radius: 0;
+    }
+  }
+}

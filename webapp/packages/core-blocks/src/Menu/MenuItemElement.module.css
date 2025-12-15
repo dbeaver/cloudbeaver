@@ -39,7 +39,7 @@
     color: var(--theme-text-hint-on-light);
 
     &:empty {
-      padding: 0;
+      display: none;
     }
   }
   & .menuItemIcon,
