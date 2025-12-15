@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { Container, InputField } from '@cloudbeaver/core-blocks';
+import { PropertiesTable } from '@cloudbeaver/core-blocks';
 import { observer } from 'mobx-react-lite';
 
 export function renderQueryParamsForConfirmation(parameters: Record<string, any>, query: string): React.ReactElement {
@@ -15,12 +15,15 @@ export function renderQueryParamsForConfirmation(parameters: Record<string, any>
 
 const RenderParametersForm = observer(function RenderParametersForm({ parameters }: { query: string; parameters: Record<string, any> }) {
   return (
-    <Container wrap gap>
-      {Object.keys(parameters).map(paramName => (
-        <InputField key={paramName} name={paramName} state={parameters} fill>
-          {paramName}
-        </InputField>
-      ))}
-    </Container>
+    <PropertiesTable
+      properties={Object.keys(parameters).map(paramName => ({
+        id: paramName,
+        key: paramName,
+        displayName: paramName,
+        defaultValue: '',
+      }))}
+      propertiesState={parameters}
+      staticProperties
+    />
   );
 });
