@@ -6,64 +6,26 @@
  * you may not use this file except in compliance with the License.
  */
 
+import React, { use } from 'react';
 import { observer } from 'mobx-react-lite';
-import React, { useState } from 'react';
+import { DATA_CONTEXT_TREE_DATA, DATA_CONTEXT_TREE_FILTER, DATA_CONTEXT_TREE_REFRESH, type ITreeToolbarFilter } from './DATA_CONTEXT_TREE.js';
 
-import { clsx, IconButton } from '@dbeaver/ui-kit';
-
-import { useTranslate, Icon } from '@cloudbeaver/core-blocks';
+import { clsx } from '@dbeaver/ui-kit';
 import { useCaptureViewContext } from '@cloudbeaver/core-view';
-
-import { DATA_CONTEXT_NAV_TREE_ROOT } from '../NavigationTree/ElementsTree/ElementsTreeTools/NavigationTreeSettings/DATA_CONTEXT_NAV_TREE_ROOT.js';
-import { DATA_CONTEXT_TREE_TOOLBAR } from './DATA_CONTEXT_TREE_TOOLBAR.js';
-import type { ITreeToolbar } from './ITreeToolbar.js';
-import { TreeToolbarFilter } from './TreeToolbarFilter.js';
-import { TreeToolbarMenu } from './TreeToolbarMenu.js';
+import { TreeDataContext } from './contexts/TreeDataContext.js';
 
 interface TreeToolbarProps {
-  toolbar: ITreeToolbar;
+  filter?: ITreeToolbarFilter;
+  onRefresh?: () => Promise<void> | void;
+  className?: string;
 }
 
-export const TreeToolbar = observer<React.PropsWithChildren<TreeToolbarProps>>(function TreeToolbar({ toolbar, children }) {
-  const { treeData, settings, treeFilter, disabled, onRefresh, className } = toolbar;
-  const translate = useTranslate();
-  const [refreshing, setRefreshing] = useState(false);
-
+export const TreeToolbar = observer<React.PropsWithChildren<TreeToolbarProps>>(function TreeToolbar({ className, children, filter, onRefresh }) {
+  const data = use(TreeDataContext);
   useCaptureViewContext((context, id) => {
-    context.set(DATA_CONTEXT_NAV_TREE_ROOT, treeData.rootId, id);
-    context.set(DATA_CONTEXT_TREE_TOOLBAR, toolbar, id);
+    context.set(DATA_CONTEXT_TREE_DATA, data, id);
+    context.set(DATA_CONTEXT_TREE_FILTER, filter, id);
+    context.set(DATA_CONTEXT_TREE_REFRESH, onRefresh, id);
   });
-
-  const handleRefresh = async () => {
-    setRefreshing(true);
-    try {
-      if (onRefresh) {
-        await onRefresh();
-      } else {
-        await treeData.load(treeData.rootId, true);
-      }
-    } finally {
-      setRefreshing(false);
-    }
-  };
-
-  return (
-    <div className={clsx('tw:theme-background-surface tw:px-2', className)}>
-      <div className="tw:flex tw:flex-row tw:overflow-x-auto tw:justify-end tw:items-center tw:h-7 tw:px-1 tw:shrink-0">
-        <TreeToolbarMenu toolbar={toolbar} />
-        <IconButton
-          size="small"
-          disabled={disabled || refreshing}
-          className={clsx('tw:theme-text-primary', refreshing && 'tw:animate-spin')}
-          aria-label={translate('ui_refresh')}
-          title={translate('ui_refresh')}
-          onClick={handleRefresh}
-        >
-          <Icon width={16} height={16} name="/icons/refresh_sm.svg" viewBox="0 0 16 16" />
-        </IconButton>
-      </div>
-      <TreeToolbarFilter filter={treeFilter} filterEnabled={settings?.filter} />
-      {children}
-    </div>
-  );
+  return <div className={clsx('tw:theme-background-surface tw:px-2', className)}>{children}</div>;
 });

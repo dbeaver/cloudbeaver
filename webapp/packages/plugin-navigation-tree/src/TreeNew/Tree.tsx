@@ -18,10 +18,8 @@ import { TreeSelectionContext } from './contexts/TreeSelectionContext.js';
 import { TreeVirtualizationContext } from './contexts/TreeVirtualizationContext.js';
 import type { INodeRenderer } from './INodeRenderer.js';
 import type { ITreeData } from './ITreeData.js';
-import type { ITreeToolbar } from './ITreeToolbar.js';
 import { NodeChildren } from './NodeChildren.js';
 import type { NodeEmptyPlaceholderComponent } from './NodeEmptyPlaceholderComponent.js';
-import { TreeToolbar } from './TreeToolbar.js';
 import { useNodeSizeCache } from './useNodeSizeCache.js';
 import { useTree } from './useTree.js';
 import { useTreeDnD } from './useTreeDnD.js';
@@ -30,11 +28,10 @@ import { useTreeVirtualization } from './useTreeVirtualization.js';
 import { TreeMenuContextProvider } from './contexts/TreeMenuContext/TreeMenuContextProvider.js';
 import type { ITreeMenu } from './useTreeMenu.js';
 
-export interface NavigationTreeNewProps {
+export interface NavigationTreeNewProps extends React.PropsWithChildren {
   data: ITreeData;
   selection?: ITreeSelection;
   menu?: ITreeMenu;
-  toolbar?: ITreeToolbar;
   nodeRenderers?: INodeRenderer[];
   emptyPlaceholder?: NodeEmptyPlaceholderComponent;
   className?: string;
@@ -48,7 +45,7 @@ export const Tree = observer<NavigationTreeNewProps>(function Tree({
   data,
   selection,
   menu,
-  toolbar,
+  children,
   nodeRenderers,
   emptyPlaceholder,
   className,
@@ -72,7 +69,6 @@ export const Tree = observer<NavigationTreeNewProps>(function Tree({
 
   return (
     <div className={clsx('tw:flex tw:flex-col', className)}>
-      {toolbar && <TreeToolbar toolbar={toolbar} />}
       <div ref={mountOptimization.setRootRef} className="tw:flex-1" style={{ overflow: 'auto', position: 'relative' }}>
         <NodeSizeCacheContext.Provider value={elementsSizeCache}>
           <TreeDataContext.Provider value={data}>
@@ -81,6 +77,7 @@ export const Tree = observer<NavigationTreeNewProps>(function Tree({
                 <TreeContext.Provider value={tree}>
                   <TreeDnDContext.Provider value={treeDnD}>
                     <TreeMenuContextProvider menu={menu ?? null}>
+                      {children}
                       <NodeChildren nodeId={data.rootId} offsetHeight={0} emptyPlaceholder={emptyPlaceholder} root />
                     </TreeMenuContextProvider>
                   </TreeDnDContext.Provider>

@@ -7,25 +7,17 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { useDataContextLink } from '@cloudbeaver/core-data-context';
 import { MenuBar } from '@cloudbeaver/core-ui';
 import { useMenu } from '@cloudbeaver/core-view';
 
-import { DATA_CONTEXT_TREE_TOOLBAR } from './DATA_CONTEXT_TREE_TOOLBAR.js';
-import type { ITreeToolbar } from './ITreeToolbar.js';
 import { MENU_TREE_TOOLBAR } from './MENU_TREE_TOOLBAR.js';
 
 interface Props {
-  toolbar: ITreeToolbar;
   className?: string;
 }
 
-export const TreeToolbarMenu = observer<Props>(function TreeToolbarMenu({ toolbar, className }) {
+export const TreeToolbarMenu = observer<Props>(function TreeToolbarMenu({ className }) {
   const menu = useMenu({ menu: MENU_TREE_TOOLBAR });
-
-  useDataContextLink(menu.context, (context, id) => {
-    context.set(DATA_CONTEXT_TREE_TOOLBAR, toolbar, id);
-  });
 
   return <MenuBar menu={menu} className={className} />;
 });

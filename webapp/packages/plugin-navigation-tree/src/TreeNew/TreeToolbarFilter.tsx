@@ -6,18 +6,23 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
+import { useContext } from 'react';
 
 import { Filter, useTranslate } from '@cloudbeaver/core-blocks';
+import { useDataContext } from '@cloudbeaver/core-data-context';
+import { CaptureViewContext } from '@cloudbeaver/core-view';
 
-import type { ITreeFilter } from './useTreeFilter.js';
+import { DATA_CONTEXT_TREE_FILTER } from './DATA_CONTEXT_TREE.js';
 
 interface Props {
-  filter?: ITreeFilter & { filterPlaceholder?: string };
   filterEnabled?: boolean;
 }
 
-export const TreeToolbarFilter = observer<Props>(function TreeToolbarFilter({ filter, filterEnabled }) {
+export const TreeToolbarFilter = observer<Props>(function TreeToolbarFilter({ filterEnabled }) {
   const translate = useTranslate();
+  const viewContext = useContext(CaptureViewContext);
+  const context = useDataContext(viewContext);
+  const filter = context.get(DATA_CONTEXT_TREE_FILTER);
 
   if (!filterEnabled || !filter) {
     return null;
