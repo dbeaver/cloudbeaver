@@ -14,23 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.cloudbeaver.service.sql.messages;
+package io.cloudbeaver.websocket.event.task;
 
-import org.eclipse.osgi.util.NLS;
+import org.jkiss.code.NotNull;
 
-public class WebSQLMessages extends NLS {
-    static final String BUNDLE_NAME = "io.cloudbeaver.service.sql.messages.WebSQLResources"; //$NON-NLS-1$
+public class WSSessionTaskConfirmationRequestEvent extends WSAbstractSessionTaskEvent {
+    private static final String ID = "cb_session_task_confirmation_request";
 
-    // TODO: add localizations
-    public static String model_web_ai_query_confirmation_title;
-    public static String model_web_ai_query_confirmation_message;
-    public static String model_web_dialog_sql_param_title;
-
-    static {
-        NLS.initializeMessages(BUNDLE_NAME, WebSQLMessages.class);
+    public WSSessionTaskConfirmationRequestEvent(
+        @NotNull String taskId,
+        @NotNull String title,
+        @NotNull String message
+    ) {
+        super(ID, taskId, title, message);
     }
-
-    private WebSQLMessages() {
-    }
-
 }

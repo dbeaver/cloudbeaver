@@ -31,6 +31,7 @@ interface Props {
   onAdd?: () => void;
   onRemove?: (property: IProperty) => void;
   className?: string;
+  staticProperties?: boolean;
   filterable?: boolean;
 }
 
@@ -86,7 +87,7 @@ export const PropertiesTable = observer<Props>(function PropertiesTable(props) {
     }
 
     if (propertiesState) {
-      if (value === property.defaultValue) {
+      if (value === property.defaultValue && !propsRef.staticProperties) {
         delete propertiesState[property.key];
       } else {
         propertiesState[property.key] = value;
@@ -153,6 +154,7 @@ export const PropertiesTable = observer<Props>(function PropertiesTable(props) {
             value={propertiesState?.[property.key] ?? undefined}
             error={!isKeyUnique(property.key)}
             readOnly={readOnly}
+            removable={!props.staticProperties}
             onNameChange={changeName}
             onValueChange={changeValue}
             onRemove={removeProperty}

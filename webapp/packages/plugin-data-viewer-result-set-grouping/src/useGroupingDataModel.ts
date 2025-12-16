@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -11,7 +11,7 @@ import { useEffect, useRef } from 'react';
 import { useObjectRef, useResource } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource, createConnectionParam } from '@cloudbeaver/core-connections';
 import { IServiceProvider, useService } from '@cloudbeaver/core-di';
-import { AsyncTaskInfoService } from '@cloudbeaver/core-root';
+import { AsyncTaskInfoEventHandler, AsyncTaskInfoService } from '@cloudbeaver/core-root';
 import { GraphQLService } from '@cloudbeaver/core-sdk';
 import { isObjectsEqual } from '@cloudbeaver/core-utils';
 import {
@@ -26,6 +26,7 @@ import {
 import { GroupingDataSource } from './GroupingDataSource.js';
 import type { IDVResultSetGroupingPresentationState } from './IDVResultSetGroupingPresentationState.js';
 import type { IGroupingQueryState } from './IGroupingQueryState.js';
+import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 
 export interface IGroupingDataModel {
   model: IDatabaseDataModel<GroupingDataSource>;
@@ -41,6 +42,8 @@ export function useGroupingDataModel(
   const graphQLService = useService(GraphQLService);
   const asyncTaskInfoService = useService(AsyncTaskInfoService);
   const dataViewerSettingsService = useService(DataViewerSettingsService);
+  const commonDialogService = useService(CommonDialogService);
+  const asyncTaskInfoEventHandler = useService(AsyncTaskInfoEventHandler);
 
   const executionContext = sourceModel.source.executionContext;
   const contextInfo = executionContext?.context;
@@ -62,7 +65,7 @@ export function useGroupingDataModel(
           },
         };
       }
-      const source = new GroupingDataSource(serviceProvider, graphQLService, asyncTaskInfoService);
+      const source = new GroupingDataSource(serviceProvider, commonDialogService, asyncTaskInfoEventHandler, graphQLService, asyncTaskInfoService);
 
       source.setKeepExecutionContextOnDispose(true);
       const model = tableViewerStorageService.add(new DatabaseDataModel(source));
