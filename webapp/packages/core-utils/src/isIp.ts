@@ -6,12 +6,53 @@
  * you may not use this file except in compliance with the License.
  */
 
+const IPV4_REGEX = /^(25[0-5]|2[0-4]\d|1\d\d|\d\d?)\.(25[0-5]|2[0-4]\d|1\d\d|\d\d?)\.(25[0-5]|2[0-4]\d|1\d\d|\d\d?)\.(25[0-5]|2[0-4]\d|1\d\d|\d\d?)$/;
+
 export function isIp(host: string): boolean {
-  // Matches IPv4 like 127.0.0.1
-  const ipv4 = /^(25[0-5]|2[0-4]\d|1\d\d|\d\d?)\.(25[0-5]|2[0-4]\d|1\d\d|\d\d?)\.(25[0-5]|2[0-4]\d|1\d\d|\d\d?)\.(25[0-5]|2[0-4]\d|1\d\d|\d\d?)$/;
+  if (!host) {
+    return false;
+  }
 
-  // Matches IPv6 like [2001:0db8::1]
-  const ipv6 = /^\[?([a-f0-9:]+)\]?$/i;
+  const trimmedHost = host.trim();
 
-  return ipv4.test(host) || ipv6.test(host);
+  return isIPv4(trimmedHost) || isIPv6(trimmedHost);
+}
+
+function isIPv4(host: string): boolean {
+  return IPV4_REGEX.test(host);
+}
+
+function isIPv6(host: string): boolean {
+  const candidate = normalizeIPv6(host);
+
+  if (!candidate) {
+    return false;
+  }
+
+  try {
+    const url = new URL(`http://${candidate}`);
+
+    return url.hostname.startsWith('[') && url.hostname.endsWith(']');
+  } catch {
+    return false;
+  }
+}
+
+function normalizeIPv6(host: string): string | null {
+  const startsWithBracket = host.startsWith('[');
+  const endsWithBracket = host.endsWith(']');
+
+  if (startsWithBracket !== endsWithBracket) {
+    return null;
+  }
+
+  if (startsWithBracket) {
+    return host;
+  }
+
+  if (host.includes('[') || host.includes(']')) {
+    return null;
+  }
+
+  return `[${host}]`;
 }

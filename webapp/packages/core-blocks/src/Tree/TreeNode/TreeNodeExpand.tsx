@@ -9,9 +9,8 @@ import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
 
 import { EventContext } from '@cloudbeaver/core-events';
-import { Spinner } from '@dbeaver/ui-kit';
+import { Command, Spinner } from '@dbeaver/ui-kit';
 
-import { Clickable } from '../../Clickable.js';
 import { getComputed } from '../../getComputed.js';
 import { Icon } from '../../Icon.js';
 import { useTranslate } from '../../localization/useTranslate.js';
@@ -91,19 +90,17 @@ export const TreeNodeExpand = observer<Props>(function TreeNodeExpand({ leaf, bi
   const title = translate('ui_expand');
 
   return (
-    <Clickable
-      as="div"
+    <Command
+      render={<div onClick={handleExpand} onDoubleClick={handleDbClick} />}
       role="button"
       title={title}
       aria-label={title}
       className={s(styles, { treeNodeExpand: true, expanded: context.expanded }, className)}
       focusable={expandable}
       disabled={disabled || !expandable}
-      onClick={handleExpand}
-      onDoubleClick={handleDbClick}
     >
       {loading && <Spinner size="small" active />}
       {expandable && <Icon name={iconName} className={s(styles, { icon: true })} viewBox={viewBox} />}
-    </Clickable>
+    </Command>
   );
 });

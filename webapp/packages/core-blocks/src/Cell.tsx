@@ -11,10 +11,9 @@ import style from './Cell.module.css';
 import { Container } from './Containers/Container.js';
 import { s } from './s.js';
 import { useS } from './useS.js';
-import { Clickable, type ReakitComponent } from './Clickable.js';
-import type { ClickableOptions } from 'reakit';
+import { Command, type CommandProps } from '@dbeaver/ui-kit';
 
-interface Props extends ClickableOptions {
+interface Props extends CommandProps {
   description?: React.ReactNode | string;
   before?: React.ReactElement;
   after?: React.ReactElement;
@@ -22,23 +21,14 @@ interface Props extends ClickableOptions {
   big?: boolean;
   className?: string;
   children?: React.ReactNode;
+  render?: React.ReactElement;
 }
 
-export const Cell: ReakitComponent<'div', Props> = observer(function Cell({
-  as: asElement,
-  before,
-  after,
-  description,
-  className,
-  ripple = true,
-  big,
-  children,
-  ...rest
-}) {
+export const Cell = observer(function Cell({ render, before, after, description, className, ripple = true, big, children, ...rest }: Props) {
   const styles = useS(style);
 
   return (
-    <Clickable {...rest} as={asElement ?? 'div'} className={s(styles, { ripple, big }, className)}>
+    <Command {...rest} render={render ?? <div />} className={s(styles, { ripple, big }, className)}>
       <Container className={s(styles, { main: true })} gap parent center dense>
         {before && (
           <Container className={s(styles, { before: true })} keepSize>
@@ -57,6 +47,6 @@ export const Cell: ReakitComponent<'div', Props> = observer(function Cell({
           </Container>
         )}
       </Container>
-    </Clickable>
+    </Command>
   );
-}) as ReakitComponent<'div', Props>;
+});

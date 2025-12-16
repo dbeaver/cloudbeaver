@@ -21,6 +21,9 @@
       "path": "../react-dnd"
     },
     {
+      "path": "../react-translate"
+    },
+    {
       "path": "../ui-kit"
     }
   ]

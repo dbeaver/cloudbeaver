@@ -8,29 +8,23 @@
 import { action, computed, observable } from 'mobx';
 
 import { type AdminUser, compareUsers, compareNewUsers, UsersResource, UsersResourceFilterKey } from '@cloudbeaver/core-authentication';
-import { ConfirmationDialogDelete, TableState, useObservableRef, useOffsetPagination, useResource, useTranslate } from '@cloudbeaver/core-blocks';
+import { TableState, useObservableRef, useOffsetPagination, useResource } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { resourceKeyList } from '@cloudbeaver/core-resource';
 import { type ILoadableState, isArraysEqual } from '@cloudbeaver/core-utils';
 import { isDefined } from '@dbeaver/js-helpers';
 
 import type { IUserFilters } from './Filters/useUsersTableFilters.js';
 
 interface State {
-  loading: boolean;
   readonly hasMore: boolean;
-  state: TableState;
   users: AdminUser[];
   loadableState: ILoadableState;
   loadMore(): void;
   update: () => void;
-  delete: () => Promise<void>;
 }
 
 export function useUsersTable(filters: IUserFilters) {
-  const translate = useTranslate();
   const usersResource = useService(UsersResource);
   const searchFilter = filters.search.trim().toLowerCase();
   const enabledStateFilter = filters.status === 'true' ? true : filters.status === 'false' ? false : undefined;
@@ -39,7 +33,6 @@ export function useUsersTable(filters: IUserFilters) {
   });
   const usersLoader = useResource(useUsersTable, usersResource, pagination.currentPage);
   const notificationService = useService(NotificationService);
-  const commonDialogService = useService(CommonDialogService);
 
   const state: State = useObservableRef(
     () => ({
@@ -49,6 +42,8 @@ export function useUsersTable(filters: IUserFilters) {
         return pagination.hasNextPage;
       },
       get users() {
+        usersLoader.data; // triggers suspense, behaves differently than forceSuspense action cause used on the getter level
+
         return filters.filterUsers(
           Array.from(
             new Set([
@@ -69,55 +64,15 @@ export function useUsersTable(filters: IUserFilters) {
           notificationService.logException(exception, 'authentication_administration_tools_refresh_fail');
         }
       },
-      async delete() {
-        if (this.loading) {
-          return;
-        }
-
-        const deletionList = this.state.selectedList.filter(([_, value]) => value).map(([userId]) => userId!);
-        if (deletionList.length === 0) {
-          return;
-        }
-
-        const userNames = deletionList.map(name => `"${name}"`).join(', ');
-        const message = `${translate('authentication_administration_users_delete_confirmation')}${userNames}. ${translate('ui_are_you_sure')}`;
-
-        const { status } = await commonDialogService.open(ConfirmationDialogDelete, {
-          title: 'ui_data_delete_confirmation',
-          message,
-          confirmActionText: 'ui_delete',
-        });
-
-        if (status === DialogueStateResult.Rejected) {
-          return;
-        }
-
-        this.loading = true;
-
-        try {
-          await this.usersLoader.resource.deleteUsers(resourceKeyList(deletionList));
-          this.state.unselect();
-
-          for (const id of deletionList) {
-            this.state.collapse(id);
-          }
-        } catch (exception: any) {
-          notificationService.logException(exception, 'authentication_administration_user_delete_fail');
-        } finally {
-          this.loading = false;
-        }
-      },
       loadMore() {
         pagination.loadMore();
       },
     }),
     {
-      loading: observable.ref,
       usersLoader: observable.ref,
       loadableState: observable.ref,
       users: computed<AdminUser[]>({ equals: (first, second) => isArraysEqual(first, second, undefined, true) }),
       update: action.bound,
-      delete: action.bound,
       loadMore: action.bound,
     },
     { usersLoader, loadableState: usersLoader },

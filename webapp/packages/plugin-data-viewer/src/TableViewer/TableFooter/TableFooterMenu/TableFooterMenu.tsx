@@ -10,7 +10,7 @@ import { type HTMLAttributes } from 'react';
 
 import { CRegistry, s, useS } from '@cloudbeaver/core-blocks';
 import { useDataContextLink } from '@cloudbeaver/core-data-context';
-import { MenuBar, MenuBarItemStyles, MenuBarStyles } from '@cloudbeaver/core-ui';
+import { MenuBar, MenuBarGroupStyles, MenuBarItemStyles, MenuBarStyles } from '@cloudbeaver/core-ui';
 import { useCaptureViewContext, useMenu } from '@cloudbeaver/core-view';
 
 import { DATA_CONTEXT_DV_DDM } from '../../../DatabaseDataModel/DataContext/DATA_CONTEXT_DV_DDM.js';
@@ -29,7 +29,7 @@ interface Props {
 }
 
 export const TableFooterMenu = observer<Props>(function TableFooterMenu({ resultIndex, model, simple, role, className }) {
-  const styles = useS(MenuBarStyles, MenuBarItemStyles);
+  const styles = useS(MenuBarStyles, MenuBarItemStyles, MenuBarGroupStyles);
   const menu = useMenu({ menu: DATA_VIEWER_DATA_MODEL_ACTIONS_MENU });
 
   useCaptureViewContext((context, id) => {
@@ -46,7 +46,7 @@ export const TableFooterMenu = observer<Props>(function TableFooterMenu({ result
 
   return (
     <CRegistry registry={REFRESH_MENU_ITEM_REGISTRY}>
-      <MenuBar menu={menu} className={s(styles, { floating: true, withLabel: true }, className)} role={role} />
+      <MenuBar menu={menu} className={s(styles, { floating: true, withLabel: true }, className)} role={role} compact={false} />
     </CRegistry>
   );
 });

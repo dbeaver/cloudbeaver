@@ -76,8 +76,8 @@ export class UserProfileSettingsPluginBootstrap extends Bootstrap {
           tooltip: 'plugin_user_profile_settings_action_description',
         };
       },
-      handler: () => {
-        this.userProfileOptionsPanelService.open(SETTINGS_TAB_ID);
+      handler: async () => {
+        await this.userProfileOptionsPanelService.open(SETTINGS_TAB_ID);
       },
     });
   }
