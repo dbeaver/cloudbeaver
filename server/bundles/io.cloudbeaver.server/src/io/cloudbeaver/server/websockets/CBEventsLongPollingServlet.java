@@ -56,9 +56,9 @@ public class CBEventsLongPollingServlet extends HttpServlet {
 
     private volatile boolean running = false;
     private final Map<String, CBEventsLongPolling> sessions = new ConcurrentHashMap<>();
-    private final List<WebSessionResolver> resolvers = List.of(
-        new HeadlessWebSessionResolver(),
-        new CookieWebSessionResolver()
+    private final List<SessionResolver> resolvers = List.of(
+        new HeadlessSessionResolver(),
+        new CookieSessionResolver()
     );
 
     @Override
@@ -158,7 +158,6 @@ public class CBEventsLongPollingServlet extends HttpServlet {
         return running;
     }
 
-
     @Nullable
     protected BaseWebSession resolveSessionOrRespond(
         @NotNull HttpServletRequest req,
@@ -205,7 +204,7 @@ public class CBEventsLongPollingServlet extends HttpServlet {
 
     @Nullable
     protected BaseWebSession resolveSession(@NotNull HttpServletRequest req) {
-        for (WebSessionResolver resolver : resolvers) {
+        for (SessionResolver resolver : resolvers) {
             BaseWebSession session = resolver.resolve(req);
             if (session != null) {
                 return session;
@@ -250,6 +249,17 @@ public class CBEventsLongPollingServlet extends HttpServlet {
         RpcConstants.COMPACT_GSON.toJson(error, resp.getWriter());
     }
 
+    @NotNull
+    protected static WebHttpRequestInfo createRequestInfo(
+        @Nullable String sessionId, @NotNull HttpServletRequest req
+    ) {
+        return new WebHttpRequestInfo(
+            sessionId,
+            req.getAttribute("locale"),
+            req.getRemoteAddr(),
+            req.getHeader(HttpConstants.HEADER_USER_AGENT)
+        );
+    }
 
     /**
      * Resolves a {@link BaseWebSession} from an incoming HTTP request.
@@ -259,7 +269,7 @@ public class CBEventsLongPollingServlet extends HttpServlet {
      * </p>
      *
      */
-    public interface WebSessionResolver {
+    public interface SessionResolver {
         /**
          * @return session or null if resolver is not applicable
          */
@@ -267,34 +277,28 @@ public class CBEventsLongPollingServlet extends HttpServlet {
         BaseWebSession resolve(@NotNull HttpServletRequest req);
     }
 
-    public static class CookieWebSessionResolver implements WebSessionResolver {
+    public static class CookieSessionResolver implements SessionResolver {
 
         @Nullable
         @Override
         public BaseWebSession resolve(@NotNull HttpServletRequest req) {
 
-            String cookieSid = ServletAppUtils.getRequestCookie(req, CBConstants.CB_SESSION_COOKIE_NAME);
+            String sid = ServletAppUtils.getRequestCookie(req, CBConstants.CB_SESSION_COOKIE_NAME);
 
-            if (cookieSid == null) {
+            if (CommonUtils.isEmpty(sid)) {
                 return null;
             }
 
-            WebHttpRequestInfo info = new WebHttpRequestInfo(
-                cookieSid,
-                req.getAttribute("locale"),
-                req.getRemoteAddr(),
-                req.getHeader(HttpConstants.HEADER_USER_AGENT)
-            );
+            WebHttpRequestInfo info = CBEventsLongPollingServlet.createRequestInfo(sid, req);
 
-            WebAppSessionManager sm =
-                WebAppUtils.getWebApplication().getSessionManager();
+            WebAppSessionManager sm = WebAppUtils.getWebApplication().getSessionManager();
 
             return sm.getOrRestoreWebSession(info);
         }
 
     }
 
-    public static class HeadlessWebSessionResolver implements WebSessionResolver {
+    public static class HeadlessSessionResolver implements SessionResolver {
 
         @Nullable
         @Override
@@ -307,12 +311,7 @@ public class CBEventsLongPollingServlet extends HttpServlet {
                 return null;
             }
 
-            WebHttpRequestInfo info = new WebHttpRequestInfo(
-                sid,
-                req.getAttribute("locale"),
-                req.getRemoteAddr(),
-                req.getHeader(HttpConstants.HEADER_USER_AGENT)
-            );
+            WebHttpRequestInfo info = CBEventsLongPollingServlet.createRequestInfo(sid, req);
 
             try {
                 WebAppSessionManager sm = WebAppUtils.getWebApplication().getSessionManager();
