@@ -41,7 +41,7 @@ export function useHeaderDnD({ columns, getCanDrag, onReorder, getHeaderOrder }:
   const [dragOverElement, setDragOverElement] = useState<[number, boolean] | null>(null);
 
   function getDataColIdxByKey(key: string) {
-    const columnIndex = columns.filter(isColumn).findIndex(col => col.key === key);
+    const columnIndex = columns.findIndex(col => isColumn(col) && col.key === key);
 
     if (columnIndex === -1) {
       throw new Error(`Column with key '${key}' not found`);
