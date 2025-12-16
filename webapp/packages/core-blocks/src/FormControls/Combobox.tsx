@@ -180,7 +180,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
   }
 
   const displayPopover = !allowCustomValue || items.length > 0;
-  const hasCancelButton = displayValue && allowClear && !disabled && !readOnly;
+  const hasCancelButton = !!displayValue && allowClear && !disabled && !readOnly;
 
   return (
     <Field {...layoutProps} className={clsx(className, inline && 'tw:flex tw:items-center')}>
