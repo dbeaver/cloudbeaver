@@ -26,7 +26,6 @@ import io.cloudbeaver.server.CBConstants;
 import io.cloudbeaver.server.WebAppSessionManager;
 import io.cloudbeaver.server.events.WSWebUtils;
 import io.cloudbeaver.service.DBWSessionHandler;
-import io.cloudbeaver.utils.WebCommonUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -171,7 +170,7 @@ public class CBSessionManager implements WebAppSessionManager {
 
     private void validateSessionIp(@NotNull HttpServletRequest request, WebSession webSession) {
         boolean bindingEnabled = isSessionBindingEnabled(request);
-        String currentRemote = WebCommonUtils.getRemoteIpAddress(request);
+        String currentRemote = request.getRemoteAddr();
         if (bindingEnabled
             && (CommonUtils.isEmpty(currentRemote) || !currentRemote.equals(webSession.getLastRemoteAddr()))
         ) {

@@ -18,7 +18,6 @@ package io.cloudbeaver.utils;
 
 import io.cloudbeaver.model.WebPropertyInfo;
 import io.cloudbeaver.model.session.WebSession;
-import jakarta.servlet.http.HttpServletRequest;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.DBPImage;
@@ -34,8 +33,6 @@ import java.util.Arrays;
 import java.util.Collection;
 
 public class WebCommonUtils {
-
-    private static final String CLIENT_IP_HEADER = "X-Real-IP";
 
     public static String makeIconId(@Nullable DBPImage icon) {
         return icon == null ? null : icon.getLocation();
@@ -67,11 +64,5 @@ public class WebCommonUtils {
             }
         }
         return true;
-    }
-
-    @NotNull
-    public static String getRemoteIpAddress(@NotNull HttpServletRequest request) {
-        String remoteAddressFromHeader = request.getHeader(CLIENT_IP_HEADER);
-        return CommonUtils.isEmpty(remoteAddressFromHeader) ? request.getRemoteAddr() : remoteAddressFromHeader;
     }
 }

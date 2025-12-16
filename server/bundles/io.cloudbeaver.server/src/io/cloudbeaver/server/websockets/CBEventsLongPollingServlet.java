@@ -23,7 +23,6 @@ import io.cloudbeaver.server.CBConstants;
 import io.cloudbeaver.server.WebAppSessionManager;
 import io.cloudbeaver.server.WebAppUtils;
 import io.cloudbeaver.utils.ServletAppUtils;
-import io.cloudbeaver.utils.WebCommonUtils;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServlet;
@@ -178,7 +177,7 @@ public class CBEventsLongPollingServlet extends HttpServlet {
         WebHttpRequestInfo info = new WebHttpRequestInfo(
             sid,
             req.getAttribute("locale"),
-            WebCommonUtils.getRemoteIpAddress(req),
+            req.getRemoteAddr(),
             req.getHeader(HttpConstants.HEADER_USER_AGENT)
         );
 

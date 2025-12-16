@@ -16,7 +16,6 @@
  */
 package io.cloudbeaver.model.session;
 
-import io.cloudbeaver.utils.WebCommonUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import org.jkiss.code.Nullable;
 import org.jkiss.utils.HttpConstants;
@@ -36,7 +35,7 @@ public class WebHttpRequestInfo {
     public WebHttpRequestInfo(HttpServletRequest request) {
         this.id = request.getSession() == null ? null : request.getSession().getId();
         this.locale = request.getAttribute("locale");
-        this.lastRemoteAddress = WebCommonUtils.getRemoteIpAddress(request);
+        this.lastRemoteAddress = request.getRemoteAddr();
         this.lastRemoteUserAgent = request.getHeader(USER_AGENT);
     }
 
