@@ -26,6 +26,13 @@ import picocli.CommandLine;
 
 @CommandLine.Command(name = "cbvr", description = "CloudBeaver commands")
 public class CloudBeaverTopLevelCommand extends AbstractTopLevelCommand {
+    @CommandLine.Option(
+        names = {NOSPASH_OPTION},
+        hidden = true,
+        scope = CommandLine.ScopeType.INHERIT
+    )
+    private boolean noSplash;
+
     protected CloudBeaverTopLevelCommand(
         @Nullable ApplicationInstanceController controller,
         @NotNull CommandLineContext context,

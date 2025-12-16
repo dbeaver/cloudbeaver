@@ -6,118 +6,200 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { forwardRef, useRef, useState } from 'react';
 
-import { getComputed, type IMenuState, Menu, MenuItemElement, useAutoLoad, useObjectRef } from '@cloudbeaver/core-blocks';
+import {
+  getComputed,
+  useTranslate,
+  type IMenuItemElementProps,
+  type IMenuItemGroupArrowElementProps,
+  type IMenuItemGroupElementProps,
+} from '@cloudbeaver/core-blocks';
 import { useDataContextLink } from '@cloudbeaver/core-data-context';
 import {
   DATA_CONTEXT_MENU_NESTED,
   DATA_CONTEXT_SUBMENU_ITEM,
+  type IMenuActionItem,
   type IMenuData,
   type IMenuSubMenuItem,
   MenuActionItem,
+  MenuService,
   useMenu,
 } from '@cloudbeaver/core-view';
 
-import type { IMenuItemRendererProps } from './MenuItemRenderer.js';
+import type { IContextMenuNewProps } from './ContextMenu.js';
+import { type HovercardStoreState, MenuItem } from '@dbeaver/ui-kit';
+import { useService } from '@cloudbeaver/core-di';
+import { MenuActionElement } from './MenuActionElement.js';
+import { MenuContext, type IMenuContext } from './MenuContext.js';
+import { use, useCallback, useMemo } from 'react';
 
 interface ISubMenuElementProps extends Omit<React.ButtonHTMLAttributes<any>, 'style'> {
   menuData: IMenuData;
   subMenu: IMenuSubMenuItem;
-  itemRenderer: React.FC<IMenuItemRendererProps>;
-  menuModal?: boolean;
-  menuRtl?: boolean;
-  onItemClose?: () => void;
+  onlyIcons?: boolean;
+  showSubmenuOnHover?: boolean;
+  placement?: HovercardStoreState['placement'];
+  menuComponent: React.FC<IContextMenuNewProps>;
+  itemComponent: React.FC<IMenuItemElementProps>;
+  groupComponent: React.FC<IMenuItemGroupElementProps>;
+  groupArrowComponent: React.FC<IMenuItemGroupArrowElementProps>;
 }
 
-export const SubMenuElement = observer<ISubMenuElementProps, HTMLButtonElement>(
-  forwardRef(function SubMenuElement({ menuData, subMenu, itemRenderer, menuModal: modal, menuRtl: rtl, onItemClose, ...rest }, ref) {
-    const menu = useRef<IMenuState>(null);
-    const subMenuData = useMenu({ menu: subMenu.menu, context: menuData.context });
-    const [visible, setVisible] = useState(false);
+export const SubMenuElement = observer<ISubMenuElementProps>(function SubMenuElement({
+  menuData,
+  subMenu,
+  placement,
+  onlyIcons,
+  showSubmenuOnHover,
+  menuComponent,
+  itemComponent: MenuItemElement,
+  groupComponent: MenuItemGroupElement,
+  groupArrowComponent: MenuItemGroupArrowElement,
+}) {
+  const parent = use(MenuContext);
+  const translate = useTranslate();
+  const menuService = useService(MenuService);
+  const subMenuData = useMenu({ menu: subMenu.menu, context: menuData.context });
 
-    useDataContextLink(subMenuData.context, (context, id) => {
-      context.set(DATA_CONTEXT_MENU_NESTED, true, id);
-      context.set(DATA_CONTEXT_SUBMENU_ITEM, subMenu, id);
-    });
+  useDataContextLink(subMenuData.context, (context, id) => {
+    context.set(DATA_CONTEXT_MENU_NESTED, true, id);
+    context.set(DATA_CONTEXT_SUBMENU_ITEM, subMenu, id);
+  });
 
-    const handler = subMenuData.handler;
-    const hidden = getComputed(() => handler?.isHidden?.(subMenuData.context));
-    useAutoLoad(SubMenuElement, subMenuData.loaders, !hidden, visible, true);
+  const handler = subMenuData.handler;
 
-    const handlers = useObjectRef(
-      () => ({
-        handleItemClose() {
-          menu.current?.hide();
-          this.onItemClose?.();
-        },
-        hasBindings() {
-          return this.subMenuData.items.some(item => item instanceof MenuActionItem && item.action.binding !== null);
-        },
-        handleVisibleSwitch(visible: boolean) {
-          setVisible(visible);
-          if (visible) {
-            this.subMenu.events?.onOpen?.();
-            this.handler?.handler?.(this.subMenuData.context);
-          }
-        },
-      }),
-      { subMenuData, menuData, handler, subMenu, onItemClose },
-      ['handleItemClose', 'hasBindings', 'handleVisibleSwitch'],
-    );
+  // TODO: it's better to remove this expensive check to allow lazy loading of menu items
+  const hidden = getComputed(() => subMenuData.items.every(item => item.hidden) || handler?.isHidden?.(subMenuData.context));
+  const IconComponent = handler?.iconComponent?.() ?? subMenu.iconComponent?.();
+  const extraProps = handler?.getExtraProps?.() ?? (subMenu.getExtraProps?.() as any);
+  // TODO: fix, this triggers `Cannot update a component (`SubMenuElement`) while rendering a different component`
+  //       and if getComputed used update will be skipped
+  const loading = handler?.isLoading?.(subMenuData.context) || subMenuData.loaders.some(loader => loader.isLoading()) || false;
+  /** @deprecated must be refactored (#1)*/
+  const displayLabel = getComputed(() => handler?.isLabelVisible?.(subMenuData.context, subMenuData.menu) ?? true);
+  const info = handler?.getInfo?.(subMenuData.context, subMenuData.menu);
+  const action = info ? info.action : subMenu.menu.info.action;
+  const label = info?.label ?? subMenu.label ?? subMenu.menu.info.label;
+  const icon = info?.icon ?? subMenu.icon ?? subMenu.menu.info.icon;
+  const group = info ? info.group : subMenu.menu.info.group;
+  const disabled = getComputed(() => handler?.isDisabled?.(subMenuData.context));
 
-    if (hidden || !subMenuData.items.length) {
-      return null;
-    }
+  const tooltip = info?.tooltip ?? subMenu.tooltip ?? subMenu.menu.info.tooltip;
+  const MenuComponent = menuComponent;
 
-    const IconComponent = handler?.iconComponent?.() ?? subMenu.iconComponent?.();
-    const extraProps = handler?.getExtraProps?.() ?? (subMenu.getExtraProps?.() as any);
-    const loading = getComputed(() => handler?.isLoading?.(subMenuData.context) || subMenuData.loaders.some(loader => loader.isLoading()) || false);
-    /** @deprecated must be refactored (#1)*/
-    const displayLabel = getComputed(() => handler?.isLabelVisible?.(subMenuData.context, subMenuData.menu) ?? true);
-    const disabled = getComputed(() => handler?.isDisabled?.(subMenuData.context));
-    const loaded = getComputed(() => !subMenuData.loaders.some(loader => !loader.isLoaded()));
-    const info = handler?.getInfo?.(subMenuData.context, subMenuData.menu);
-    const label = info?.label ?? subMenu.label ?? subMenu.menu.info.label;
-    const icon = info?.icon ?? subMenu.icon ?? subMenu.menu.info.icon;
+  let actionItem: IMenuActionItem | null = null;
 
-    const tooltip = info?.tooltip ?? subMenu.tooltip ?? subMenu.menu.info.tooltip;
-    const MenuItemRenderer = itemRenderer;
-    const panelAvailable = subMenuData.available || !loaded;
+  if (action) {
+    actionItem = menuService.createActionItem(subMenuData.context, action);
+  }
+  const menuContext = useMemo<IMenuContext>(() => ({ menu: subMenuData, rtl: parent?.rtl }), [subMenuData, parent]);
 
+  const handleClick = useCallback(
+    function handleClick() {
+      subMenu.events?.onSelect?.(menuData.context);
+    },
+    [menuData, subMenu],
+  );
+
+  // TODO: need to be fixed, in case when menu depend on data from loaders this may be always true
+  if (hidden && !action) {
+    return null;
+  }
+
+  if (actionItem) {
     return (
-      <Menu
-        {...rest}
-        ref={ref}
-        menuRef={menu}
-        label={subMenuData.menu.info.label}
-        items={() =>
-          subMenuData.items.map(
-            item =>
-              menu.current && (
-                <MenuItemRenderer key={item.id} item={item} menuData={subMenuData} rtl={rtl} modal={modal} onItemClose={handlers.handleItemClose} />
-              ),
-          )
-        }
-        rtl={rtl}
-        modal={modal}
-        placement={rtl ? 'left-start' : 'right-start'}
-        panelAvailable={panelAvailable}
-        disabled={disabled}
-        getHasBindings={handlers.hasBindings}
-        submenu
-        onVisibleSwitch={handlers.handleVisibleSwitch}
-      >
-        <MenuItemElement
-          label={label}
-          displayLabel={displayLabel}
-          icon={IconComponent ? <IconComponent item={subMenu} {...extraProps} /> : icon}
-          tooltip={tooltip}
-          panelAvailable={panelAvailable}
-          loading={loading}
-          menu
+      <MenuItemGroupElement>
+        <MenuContext value={menuContext}>
+          <MenuActionElement
+            item={actionItem}
+            parentMenuInfo={info ?? subMenuData.menu.info}
+            menuData={subMenuData}
+            onlyIcons={!displayLabel || onlyIcons}
+            itemComponent={MenuItemElement}
+          />
+        </MenuContext>
+        <MenuComponent
+          menu={subMenuData}
+          placement={placement}
+          render={<MenuItemGroupArrowElement title={label ?? tooltip} style={{ pointerEvents: 'auto' }} />}
+          id={subMenu.id}
+          aria-label={translate(subMenu.label)}
+          showOnHover={showSubmenuOnHover}
+          disabled={disabled}
+          onClick={handleClick}
         />
-      </Menu>
+      </MenuItemGroupElement>
     );
-  }),
-);
+  }
+
+  if (group) {
+    const firstActionItem = subMenuData.items.find(item => item instanceof MenuActionItem);
+    if (firstActionItem) {
+      // TODO: don't want to show submenu right now
+      // if (subMenuData.items.length === 1) {
+      return (
+        <MenuContext value={menuContext}>
+          <MenuActionElement
+            item={firstActionItem}
+            parentMenuInfo={info ?? subMenuData.menu.info}
+            menuData={subMenuData}
+            onlyIcons={!displayLabel || onlyIcons}
+            itemComponent={MenuItemElement}
+          />
+        </MenuContext>
+      );
+      // }
+
+      // return (
+      //   <MenuItemGroupElement>
+      //     <MenuContext value={menuContext}>
+      //       <MenuActionElement
+      //         item={firstActionItem}
+      //         parentMenuInfo={info ?? subMenuData.menu.info}
+      //         menuData={subMenuData}
+      //         onlyIcons={!displayLabel || onlyIcons}
+      //         itemComponent={MenuItemElement}
+      //       />
+      //     </MenuContext>
+      //     <MenuComponent
+      //       menu={subMenuData}
+      //       placement={placement}
+      //       render={<MenuItemGroupArrowElement title={label ?? tooltip} style={{ pointerEvents: 'auto' }} />}
+      //       id={subMenu.id}
+      //       aria-label={translate(subMenu.label)}
+      //       disabled={disabled}
+      //       onClick={handleClick}
+      //     />
+      //   </MenuItemGroupElement>
+      // );
+    }
+  }
+
+  return (
+    <MenuComponent
+      menu={subMenuData}
+      placement={placement}
+      gutter={-4}
+      render={
+        <MenuItem
+          id={subMenu.id}
+          render={
+            <MenuItemElement
+              label={label}
+              onlyIcons={!displayLabel || onlyIcons}
+              icon={IconComponent ? <IconComponent item={subMenu} {...extraProps} /> : icon}
+              tooltip={tooltip}
+              loading={loading}
+              style={{ pointerEvents: 'auto' }}
+              aria-label={translate(subMenu.label)}
+              displaySubmenuMark
+            />
+          }
+        />
+      }
+      showOnHover={showSubmenuOnHover}
+      disabled={disabled}
+      onClick={handleClick}
+    />
+  );
+});
