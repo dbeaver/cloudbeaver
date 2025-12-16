@@ -27,6 +27,7 @@ import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
+import org.jkiss.dbeaver.model.qm.QMConstants;
 import org.jkiss.utils.CommonUtils;
 
 import java.lang.reflect.Method;
@@ -46,8 +47,11 @@ public class GraphQLLoggerUtil {
             return null;
         }
         String userId = session.getUserContext().getUserId();
-        if (userId == null && session.getUserContext().isAuthorizedInSecurityManager()) {
-            return "anonymous";
+        if (userId == null) {
+            if (session.getUserContext().isAuthorizedInSecurityManager()) {
+                return QMConstants.QM_ANONYMOUS_DOMAIN;
+            }
+            return QMConstants.QM_UNAUTHORIZED_DOMAIN;
         }
         return userId;
     }
