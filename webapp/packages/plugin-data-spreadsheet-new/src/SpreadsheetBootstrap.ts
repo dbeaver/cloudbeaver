@@ -108,26 +108,18 @@ export class SpreadsheetBootstrap extends Bootstrap {
           return { ...action.info, label: 'data_grid_table_open_value_panel', icon: 'value-panel' };
         }
 
-        if (action === ACTION_DATA_GRID_PIN_COLUMN) {
-          return { ...action.info, label: 'data_grid_table_pin_column' };
-        }
-
-        if (action === ACTION_DATA_GRID_UNPIN_COLUMN) {
-          return { ...action.info, label: 'data_grid_table_unpin_column' };
-        }
-
         return action.info;
       },
       isHidden: (context, action) => {
         const dataContextResultKey = context.get(DATA_CONTEXT_DV_RESULT_KEY)!;
         const presentationActions = context.get(DATA_CONTEXT_DV_PRESENTATION_ACTIONS)!;
 
-        if (action === ACTION_DATA_GRID_PIN_COLUMN && dataContextResultKey.column) {
-          return presentationActions.isPinnedColumn(dataContextResultKey.column) === true;
+        if (action === ACTION_DATA_GRID_PIN_COLUMN && dataContextResultKey) {
+          return presentationActions.isPinnedColumn(dataContextResultKey) === true;
         }
 
-        if (action === ACTION_DATA_GRID_UNPIN_COLUMN && dataContextResultKey.column) {
-          return presentationActions.isPinnedColumn(dataContextResultKey.column) === false;
+        if (action === ACTION_DATA_GRID_UNPIN_COLUMN && dataContextResultKey) {
+          return presentationActions.isPinnedColumn(dataContextResultKey) === false;
         }
 
         return false;
@@ -179,7 +171,7 @@ export class SpreadsheetBootstrap extends Bootstrap {
           const presentationActions = context.get(DATA_CONTEXT_DV_PRESENTATION_ACTIONS)!;
 
           if (dataContextResultKey.column) {
-            presentationActions.pinColumn(dataContextResultKey.column);
+            presentationActions.pinColumn(dataContextResultKey);
           }
         }
 
@@ -188,7 +180,7 @@ export class SpreadsheetBootstrap extends Bootstrap {
           const presentationActions = context.get(DATA_CONTEXT_DV_PRESENTATION_ACTIONS)!;
 
           if (dataContextResultKey.column) {
-            presentationActions.unpinColumn(dataContextResultKey.column);
+            presentationActions.unpinColumn(dataContextResultKey);
           }
         }
       },

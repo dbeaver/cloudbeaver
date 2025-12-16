@@ -6,11 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { IGridColumnKey, IGridDataKey } from '../DatabaseDataModel/Actions/Grid/IGridDataKey.js';
-
-export interface IDataPresentationActions {
-  edit: (position: IGridDataKey) => void;
-  pinColumn: (key: IGridColumnKey) => void;
-  unpinColumn: (key: IGridColumnKey) => void;
-  isPinnedColumn: (key: IGridColumnKey) => boolean;
+export interface IDataPresentationActions<TKey> {
+  edit: (key: TKey) => void;
+  pinColumn: (key: TKey) => void;
+  unpinColumn: (key: TKey) => void;
+  isPinnedColumn: (key: TKey) => boolean;
 }

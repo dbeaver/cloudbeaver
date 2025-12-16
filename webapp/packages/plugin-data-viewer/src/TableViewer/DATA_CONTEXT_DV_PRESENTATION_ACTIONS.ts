@@ -8,5 +8,8 @@
 import { createDataContext } from '@cloudbeaver/core-data-context';
 
 import type { IDataPresentationActions } from './IDataPresentationActions.js';
+import type { IGridDataKey } from '../DatabaseDataModel/Actions/Grid/IGridDataKey.js';
 
-export const DATA_CONTEXT_DV_PRESENTATION_ACTIONS = createDataContext<IDataPresentationActions>('data-viewer-database-presentation-actions');
+export const DATA_CONTEXT_DV_PRESENTATION_ACTIONS = createDataContext<IDataPresentationActions<IGridDataKey>>(
+  'data-viewer-database-presentation-actions',
+);

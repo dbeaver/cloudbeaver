@@ -8,5 +8,5 @@
 import { createAction } from '@cloudbeaver/core-view';
 
 export const ACTION_DATA_GRID_PIN_COLUMN = createAction('data-grid-pin-column', {
-  label: 'data_grid_table_pin_column',
+  label: 'plugin_data_spreadsheet_new_pin_column',
 });

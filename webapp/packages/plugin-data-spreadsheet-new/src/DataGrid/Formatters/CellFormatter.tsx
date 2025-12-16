@@ -10,14 +10,15 @@ import { use, useContext } from 'react';
 import { DataGridCellInnerContext } from '@cloudbeaver/plugin-data-grid';
 
 import { getComputed, s, useObjectRef, useS } from '@cloudbeaver/core-blocks';
-import type { IDataPresentationActions } from '@cloudbeaver/plugin-data-viewer';
+import type { IDataPresentationActions, IGridDataKey } from '@cloudbeaver/plugin-data-viewer';
 
 import { CellContext } from '../CellRenderer/CellContext.js';
 import { DataGridContext } from '../DataGridContext.js';
+import { TableDataContext } from '../TableDataContext.js';
 import style from './CellFormatter.module.css';
 import { CellFormatterFactory } from './CellFormatterFactory.js';
 import { CellMenu } from './Menu/CellMenu.js';
-import { TableDataContext } from '../TableDataContext.js';
+import { DataGridPinContext } from '../DataGridPinContext.js';
 
 interface Props {
   rowIdx: number;
@@ -26,6 +27,7 @@ interface Props {
 
 export const CellFormatter = observer<Props>(function CellFormatter({ rowIdx, colIdx }) {
   const context = useContext(DataGridContext);
+  const gridPinContext = useContext(DataGridPinContext);
   const tableDataContext = useContext(TableDataContext);
   const innerCellContext = use(DataGridCellInnerContext);
   const cellContext = useContext(CellContext);
@@ -36,7 +38,7 @@ export const CellFormatter = observer<Props>(function CellFormatter({ rowIdx, co
   );
   const styles = useS(style);
 
-  const spreadsheetActions = useObjectRef<IDataPresentationActions>({
+  const spreadsheetActions = useObjectRef<IDataPresentationActions<IGridDataKey>>({
     edit(position) {
       const colIdx = tableDataContext.getColumnIndexFromColumnKey(position.column);
       const rowIdx = tableDataContext.getRowIndexFromKey(position.row);
@@ -46,13 +48,13 @@ export const CellFormatter = observer<Props>(function CellFormatter({ rowIdx, co
       }
     },
     unpinColumn(key) {
-      context.unpinColumn(key);
+      gridPinContext.unpinColumn(key.column);
     },
     pinColumn(key) {
-      context.pinColumn(key);
+      gridPinContext.pinColumn(key.column);
     },
     isPinnedColumn(key) {
-      return context.isColumnPinned(key);
+      return gridPinContext.isColumnPinned(key.column);
     },
   });
 

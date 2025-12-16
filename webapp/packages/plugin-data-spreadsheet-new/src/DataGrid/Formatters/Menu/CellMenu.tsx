@@ -31,7 +31,7 @@ import classes from './CellMenu.module.css';
 interface Props {
   model: IDatabaseDataModel;
   actions: IDataTableActions;
-  spreadsheetActions: IDataPresentationActions;
+  spreadsheetActions: IDataPresentationActions<IGridDataKey>;
   resultIndex: number;
   cellKey: IGridDataKey;
   simple: boolean;

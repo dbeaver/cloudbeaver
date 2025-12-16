@@ -9,12 +9,11 @@
 import { forwardRef, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import {
   DataGrid as DataGridBase,
+  type ColumnOrColumnGroup,
   type CellSelectArgs,
   type DataGridHandle,
   type ColumnWidth,
   type ColumnWidths,
-  type Column,
-  type ColumnOrColumnGroup,
 } from 'react-data-grid';
 import { rowRenderer } from './renderers/rowRenderer.js';
 import { cellRenderer } from './renderers/cellRenderer.js';
@@ -105,7 +104,9 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
 
   const rowsCountRef = useRef(rowsCount);
   const innerGridRef = useRef<DataGridHandle>(null);
-  const columns = new Array<ColumnOrColumnGroup<IInnerRow, unknown>>(columnsCount).fill(null as any).map((_, i) => {
+  const columns = new Array<ColumnOrColumnGroup<IInnerRow, unknown>>(columnsCount)
+    .fill(null as any)
+    .map((_, i): ColumnOrColumnGroup<IInnerRow, unknown> => {
     const width = getHeaderWidth?.(i) ?? 'max-content';
     return {
       key: getColumnKey?.(i) ?? String(i),
@@ -118,7 +119,7 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
       renderHeaderCell: mapRenderHeaderCell(i),
       renderCell: mapCellContentRenderer(i),
       renderEditCell: mapEditCellRenderer(i),
-    } as Column<IInnerRow, unknown>;
+      };
   });
 
   const dndHeaderContext = useHeaderDnD({ columns, onReorder: onHeaderReorder, getCanDrag: getHeaderDnD, getHeaderOrder });
