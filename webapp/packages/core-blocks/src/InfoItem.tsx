@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ interface Props extends IInfoItem {
   className?: string;
 }
 
-export const InfoItem = observer<Props>(function InfoItem({ info, compact, icon = '/icons/info_icon.svg', className }) {
+export const InfoItem = observer<Props>(function InfoItem({ info, compact, icon = '/icons/preload/info_icon.svg', className }) {
   const styles = useS(style);
 
   const translate = useTranslate();

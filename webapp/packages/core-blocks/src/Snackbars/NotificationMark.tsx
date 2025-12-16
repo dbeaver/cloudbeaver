@@ -18,9 +18,9 @@ type IconProps = HTMLProps<HTMLDivElement> & {
 export const NotificationMark: React.FC<IconProps> = function NotificationMark({ type, ...props }) {
   return (
     <div aria-hidden {...props}>
-      {type === ENotificationType.Info && <IconOrImage icon="/icons/info_icon.svg" />}
-      {type === ENotificationType.Error && <IconOrImage icon="/icons/error_icon.svg" />}
-      {type === ENotificationType.Success && <IconOrImage icon="/icons/success_icon.svg" />}
+      {type === ENotificationType.Info && <IconOrImage icon="/icons/preload/info_icon.svg" />}
+      {type === ENotificationType.Error && <IconOrImage icon="/icons/preload/error_icon.svg" />}
+      {type === ENotificationType.Success && <IconOrImage icon="/icons/preload/success_icon.svg" />}
     </div>
   );
 };
