@@ -19,6 +19,7 @@ package io.cloudbeaver.server.websockets;
 import io.cloudbeaver.server.BaseWebPlatform;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.runtime.AbstractJob;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 
@@ -38,8 +39,9 @@ public class WebSocketPingPongJob extends AbstractJob {
         setSystem(true);
     }
 
+    @NotNull
     @Override
-    protected IStatus run(DBRProgressMonitor monitor) {
+    protected IStatus run(@NotNull DBRProgressMonitor monitor) {
         if (platform.isShuttingDown()) {
             return Status.OK_STATUS;
         }

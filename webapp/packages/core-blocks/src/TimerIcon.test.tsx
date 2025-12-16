@@ -14,14 +14,6 @@ vi.mock('./Icon', () => ({
   Icon: (props: any) => <svg {...props}>Icon</svg>,
 }));
 
-vi.mock('./s', () => ({
-  s: (...args: any[]) => args.join(' '),
-}));
-
-vi.mock('./useS', () => ({
-  useS: vi.fn(),
-}));
-
 describe('TimerIcon', () => {
   it('renders correctly with state "play" and interval 30', async () => {
     const { getByText, getByTestId } = renderInApp(<TimerIcon state="play" data-testid="timer-icon" interval={30} />);

@@ -17,7 +17,6 @@ export default [
   ['data_grid_table_disable_order', 'Désactivé'],
   ['data_grid_table_disable_all_orders', 'Désactiver tout'],
   ['data_grid_table_delete_filters_and_orders', 'Réinitialiser les filtres / le tri'],
-  ['data_grid_table_tooltip_column_header_order', 'Trier par colonne'],
   ['data_grid_table_context_menu_filter_dialog_title', 'Modifier la valeur'],
   ['data_grid_table_context_menu_filter_clipboard_permission', 'Donner accès au presse-papiers'],
   ['data_grid_table_context_menu_save_value_error', 'Échec de la sauvegarde de la valeur'],

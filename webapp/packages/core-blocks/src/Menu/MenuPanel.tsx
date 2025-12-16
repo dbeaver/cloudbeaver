@@ -30,6 +30,9 @@ export interface IMenuPanelProps {
   className?: string;
 }
 
+/**
+ * @deprecated use the @dbeaver/ui-kit package instead
+ */
 export const MenuPanel = observer<IMenuPanelProps, HTMLDivElement>(
   forwardRef(function MenuPanel({ label, menu, submenu, panelAvailable = true, rtl, getHasBindings, hasBindings, children, className }, ref) {
     const translate = useTranslate();

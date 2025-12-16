@@ -15,21 +15,14 @@ vi.mock('./IconOrImage', () => ({
   IconOrImage: (props: any) => <svg {...props}>{props.children}</svg>,
 }));
 
-vi.mock('./s', () => ({
-  s: (...args: any[]) => args.join(' '),
-}));
-
-vi.mock('./useS', () => ({
-  useS: vi.fn(),
-}));
-
 describe('Link', () => {
   it('should render link and children correctly', async () => {
-    const { getByText } = renderInApp(<Link href="#">Test Link</Link>);
+    const { getByText, getByRole } = renderInApp(<Link href="#">Test Link</Link>);
     const linkElement = await vi.waitFor(() => getByText('Test Link'));
 
     expect(linkElement.tagName).toBe('A');
     expect(linkElement).toBeInTheDocument();
+    expect(getByRole('link')).toBe(linkElement);
   });
 
   it('should display the indicator icon when indicator is true', () => {
