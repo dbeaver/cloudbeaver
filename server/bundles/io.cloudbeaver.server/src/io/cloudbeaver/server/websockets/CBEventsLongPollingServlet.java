@@ -17,21 +17,17 @@
 package io.cloudbeaver.server.websockets;
 
 import io.cloudbeaver.model.session.BaseWebSession;
-import io.cloudbeaver.model.session.WebHeadlessSession;
 import io.cloudbeaver.model.session.WebHttpRequestInfo;
 import io.cloudbeaver.server.CBConstants;
 import io.cloudbeaver.server.WebAppSessionManager;
 import io.cloudbeaver.server.WebAppUtils;
 import io.cloudbeaver.utils.ServletAppUtils;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.eclipse.jetty.http.BadMessageException;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
-import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.security.exception.SMAccessTokenExpiredException;
 import org.jkiss.dbeaver.model.websocket.WSConstants;
@@ -55,11 +51,16 @@ public class CBEventsLongPollingServlet extends HttpServlet {
     private static final Log log = Log.getLog(CBEventsLongPollingServlet.class);
 
     private static final String PING = WSUtils.clientGson.toJson(new WSSessionPingClientEvent("cb_session"));
-    private static final long POLL_TIMEOUT_SEC = 25;
-    private static final long SESSION_IDLE_TIMEOUT_SEC = 60;
+    private static final int POLL_TIMEOUT_SEC = 25;
+    private static final int SESSION_IDLE_TIMEOUT_SEC = 60;
+    public static final String TOKEN_EXPIRED = "token_expired";
 
     private volatile boolean running = false;
     private final Map<String, CBEventsLongPolling> sessions = new ConcurrentHashMap<>();
+    private final List<SessionResolver> resolvers = List.of(
+        new HeadlessSessionResolver(),
+        new CookieSessionResolver()
+    );
 
     @Override
     public void init() throws ServletException {
@@ -79,11 +80,14 @@ public class CBEventsLongPollingServlet extends HttpServlet {
         addCorsHeaders(req, resp);
 
         try {
-            BaseWebSession ws = resolveSession(req);
-            resp.setHeader(WSConstants.WS_SESSION_HEADER, ws.getSessionId());
+            final BaseWebSession ws = resolveSessionOrSendError(req, resp);
+            if (ws == null) {
+                return;
+            }
 
             CBEventsLongPolling ps = getOrCreatePollSession(ws);
             ps.onMessage(PING);
+
 
             List<WSEvent> events = ps.pollEvents(POLL_TIMEOUT_SEC);
 
@@ -98,8 +102,6 @@ public class CBEventsLongPollingServlet extends HttpServlet {
             Thread.currentThread().interrupt();
             log.debug("Long-poll interrupted (likely client disconnected)", e);
             resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
-        } catch (SMAccessTokenExpiredException e) {
-            handleTokenExpired(resp);
         }
     }
 
@@ -107,26 +109,23 @@ public class CBEventsLongPollingServlet extends HttpServlet {
     protected void doPost(@NotNull HttpServletRequest req, @NotNull HttpServletResponse resp) throws IOException {
         addCorsHeaders(req, resp);
 
-        try {
-            BaseWebSession ws = resolveSession(req);
-            resp.setHeader(WSConstants.WS_SESSION_HEADER, ws.getSessionId());
-            resp.addCookie(new Cookie(CBConstants.CB_SESSION_COOKIE_NAME, ws.getSessionId()));
-
-            CBEventsLongPolling ps = getOrCreatePollSession(ws);
-
-            String json = new String(req.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
-            if (CommonUtils.isEmpty(json)) {
-                sendError(resp, HttpServletResponse.SC_BAD_REQUEST, "Empty payload");
-                return;
-            }
-
-            ps.onMessage(json);
-
-            resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
-
-        } catch (SMAccessTokenExpiredException e) {
-            handleTokenExpired(resp);
+        final BaseWebSession ws = resolveSessionOrSendError(req, resp);
+        if (ws == null) {
+            return;
         }
+
+        CBEventsLongPolling ps = getOrCreatePollSession(ws);
+
+        String json = new String(req.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
+        if (CommonUtils.isEmpty(json)) {
+            sendError(resp, HttpServletResponse.SC_BAD_REQUEST, "Empty payload");
+            return;
+        }
+
+        ps.onMessage(json);
+
+        resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
+
     }
 
     @Override
@@ -159,6 +158,36 @@ public class CBEventsLongPollingServlet extends HttpServlet {
         return running;
     }
 
+    @Nullable
+    protected BaseWebSession resolveSessionOrSendError(
+        @NotNull HttpServletRequest req,
+        @NotNull HttpServletResponse resp
+    ) {
+
+        try {
+            BaseWebSession ws = resolveSession(req);
+
+            resp.setHeader(WSConstants.WS_SESSION_HEADER, ws.getSessionId());
+            ServletAppUtils.addResponseCookie(
+                req,
+                resp,
+                CBConstants.CB_SESSION_COOKIE_NAME,
+                ws.getSessionId(),
+                -1
+            );
+
+            return ws;
+        } catch (SecurityException e) {
+            if (TOKEN_EXPIRED.equals(e.getMessage())) {
+                log.debug("LP request rejected: access token expired");
+            } else {
+                log.warn("LP session resolve failed", e);
+            }
+            sendError(resp, HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
+            return null;
+        }
+    }
+
     private void addCorsHeaders(@NotNull HttpServletRequest req, @NotNull HttpServletResponse resp) {
         String origin = req.getHeader("Origin");
         boolean develMode = ServletAppUtils.getServletApplication().getServerConfiguration().isDevelMode();
@@ -177,61 +206,15 @@ public class CBEventsLongPollingServlet extends HttpServlet {
         resp.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
     }
 
-    @NotNull
-    protected BaseWebSession resolveSession(@NotNull HttpServletRequest req) throws SMAccessTokenExpiredException {
-
-        String sid = getSessionId(req);
-
-        WebHttpRequestInfo info = new WebHttpRequestInfo(
-            sid,
-            req.getAttribute("locale"),
-            req.getRemoteAddr(),
-            req.getHeader(HttpConstants.HEADER_USER_AGENT)
-        );
-
-        try {
-
-            String token = req.getHeader(WSConstants.WS_AUTH_HEADER);
-
-            WebHeadlessSession headless = getHeadlessSession(token, info);
-            if (headless != null) {
-                return headless;
-            }
-            log.trace("Couldn't create headless session");
-        } catch (SMAccessTokenExpiredException te) {
-            throw te;
-        } catch (Exception e) {
-            log.error("Error resolving headless session", e);
-        }
-
-        throw new BadMessageException("No web session found for long-poll request");
-
-    }
-
-    protected WebHeadlessSession getHeadlessSession(
-        @Nullable String token,
-        @NotNull WebHttpRequestInfo info
-    ) throws DBException {
-        WebAppSessionManager sm = WebAppUtils.getWebApplication().getSessionManager();
-        return sm.getHeadlessSession(token, info, true);
-    }
-
     @Nullable
-    private String getSessionId(@NotNull HttpServletRequest req) {
-        String sid = req.getHeader(WSConstants.WS_SESSION_HEADER);
-        if (!CommonUtils.isEmpty(sid)) {
-            return sid;
-        }
-
-        if (req.getCookies() != null) {
-            for (var cookie : req.getCookies()) {
-                if (CBConstants.CB_SESSION_COOKIE_NAME.equals(cookie.getName())) {
-                    return cookie.getValue();
-                }
+    protected BaseWebSession resolveSession(@NotNull HttpServletRequest req) {
+        for (SessionResolver r : resolvers) {
+            BaseWebSession s = r.resolve(req);
+            if (s != null) {
+                return s;
             }
         }
-
-        return null;
+        throw new SecurityException("No web session found for long-poll request");
     }
 
     @NotNull
@@ -273,9 +256,83 @@ public class CBEventsLongPollingServlet extends HttpServlet {
         }
     }
 
-    private void handleTokenExpired(@NotNull HttpServletResponse resp) {
-        log.debug("LP request rejected: access token expired");
-        sendError(resp, HttpServletResponse.SC_UNAUTHORIZED, "token_expired");
+    @NotNull
+    protected static WebHttpRequestInfo createRequestInfo(
+        @Nullable String sessionId, @NotNull HttpServletRequest req
+    ) {
+        return new WebHttpRequestInfo(
+            sessionId,
+            req.getAttribute("locale"),
+            req.getRemoteAddr(),
+            req.getHeader(HttpConstants.HEADER_USER_AGENT)
+        );
+    }
+
+    /**
+     * Resolves a {@link BaseWebSession} from an incoming HTTP request.
+     * <p>
+     * Implementations may use different resolution strategies
+     * (e.g. cookies, headers, tokens).
+     * </p>
+     *
+     */
+    public interface SessionResolver {
+        /**
+         * @return session or null if resolver is not applicable
+         */
+        @Nullable
+        BaseWebSession resolve(@NotNull HttpServletRequest req) throws SecurityException;
+    }
+
+    public static class CookieSessionResolver implements SessionResolver {
+
+        @Nullable
+        @Override
+        public BaseWebSession resolve(@NotNull HttpServletRequest req) {
+
+            String sid = ServletAppUtils.getRequestCookie(req, CBConstants.CB_SESSION_COOKIE_NAME);
+
+            if (CommonUtils.isEmpty(sid)) {
+                return null;
+            }
+
+            WebHttpRequestInfo info = CBEventsLongPollingServlet.createRequestInfo(sid, req);
+
+            WebAppSessionManager sm = WebAppUtils.getWebApplication().getSessionManager();
+
+            return sm.getOrRestoreWebSession(info);
+        }
+
+    }
+
+    public static class HeadlessSessionResolver implements SessionResolver {
+
+        @Nullable
+        @Override
+        public BaseWebSession resolve(@NotNull HttpServletRequest req) throws SecurityException {
+
+            String sid = req.getHeader(WSConstants.WS_SESSION_HEADER);
+            String token = req.getHeader(WSConstants.WS_AUTH_HEADER);
+
+            if (CommonUtils.isEmpty(sid) && CommonUtils.isEmpty(token)) {
+                return null;
+            }
+
+            WebHttpRequestInfo info = CBEventsLongPollingServlet.createRequestInfo(sid, req);
+
+            try {
+                WebAppSessionManager sm = WebAppUtils.getWebApplication().getSessionManager();
+
+                return sm.getHeadlessSession(token, info, true);
+
+            } catch (SMAccessTokenExpiredException te) {
+                // Message is used as protocol marker for client-side handling
+                throw new SecurityException(TOKEN_EXPIRED);
+            } catch (Exception e) {
+                log.warn("Failed to resolve headless session", e);
+                return null;
+            }
+        }
     }
 
 }
