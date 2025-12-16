@@ -16,6 +16,7 @@ import { baseHtmlPlugin } from './baseHtmlPlugin.js';
 import { copyAssetsPlugin } from './copy-assets/copyAssetsPlugin.js';
 import { manualChunks } from './manualChunks.js';
 import tailwindcss from '@tailwindcss/vite';
+import legacy from '@vitejs/plugin-legacy';
 
 export function baseConfigurationPlugin(mode: string, packageJson: any): PluginOption {
   const isProduction = mode === 'production';
@@ -36,6 +37,11 @@ export function baseConfigurationPlugin(mode: string, packageJson: any): PluginO
       rootUri: '/',
     }),
     copyAssetsPlugin(),
+    legacy({
+      modernTargets: 'last 3 years, not dead',
+      modernPolyfills: true,
+      renderLegacyChunks: false,
+    }),
     {
       name: 'base-configuration',
       enforce: 'pre',
