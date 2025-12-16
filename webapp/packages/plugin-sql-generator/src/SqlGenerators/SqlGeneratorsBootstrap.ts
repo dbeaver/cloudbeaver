@@ -11,6 +11,7 @@ import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { DATA_CONTEXT_NAV_NODE, EObjectFeature } from '@cloudbeaver/core-navigation-tree';
 import { getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
 import { MenuBaseItem, MenuService } from '@cloudbeaver/core-view';
+import { MENU_NAV_TREE } from '@cloudbeaver/plugin-navigation-tree';
 
 import { MENU_SQL_GENERATORS } from './MENU_SQL_GENERATORS.js';
 import { SqlGeneratorsResource } from './SqlGeneratorsResource.js';
@@ -30,6 +31,7 @@ export class SqlGeneratorsBootstrap extends Bootstrap {
   override register(): void {
     this.menuService.setHandler({
       id: 'node-sql-generators',
+      menus: [MENU_NAV_TREE],
       contexts: [DATA_CONTEXT_NAV_NODE],
       isDisabled: context => {
         const node = context.get(DATA_CONTEXT_NAV_NODE)!;
