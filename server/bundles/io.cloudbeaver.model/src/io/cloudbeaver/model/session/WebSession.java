@@ -254,16 +254,22 @@ public class WebSession extends BaseWebSession
     }
 
     // Note: for admin use only
-    public synchronized void resetUserState() throws DBException {
+    public synchronized void resetUserState(boolean needResetUserCache) throws DBException {
         clearAuthTokens();
-        try {
-            resetSessionCache();
-        } catch (DBCException e) {
-            addSessionError(e);
-            log.error(e);
+        if (needResetUserCache) {
+            try {
+                resetSessionCache();
+            } catch (DBCException e) {
+                addSessionError(e);
+                log.error(e);
+            }
         }
         refreshUserData();
         clearSessionContext();
+    }
+
+    public synchronized void resetUserState() throws DBException {
+        resetUserState(true);
     }
 
     @NotNull
