@@ -29,7 +29,6 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -72,7 +71,7 @@ public class WebGQLClient {
      */
     @NotNull
     public <T> T sendQuery(@NotNull String query, @Nullable Map<String, Object> variables) throws Exception {
-        return sendQueryWithHeaders(query, variables, List.of());
+        return sendQueryWithHeaders(query, variables, Map.of());
     }
 
     /**
@@ -87,7 +86,7 @@ public class WebGQLClient {
     public <T> T sendQueryWithHeaders(
         @NotNull String query,
         @Nullable Map<String, Object> variables,
-        @NotNull List<String> headers
+        @NotNull Map<String, String> headers
     ) throws Exception {
         HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
             .uri(URI.create(apiUrl))
@@ -95,7 +94,7 @@ public class WebGQLClient {
             .setHeader("TE-Client-Version", GeneralUtils.getMajorVersion())
             .header("Content-Type", "application/json");
         if (!headers.isEmpty()) {
-            requestBuilder.headers(headers.toArray(String[]::new));
+            headers.forEach(requestBuilder::header);
         }
         HttpRequest request = requestBuilder.build();
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
