@@ -5,40 +5,35 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { computed, observable } from 'mobx';
 
-import { compareTeams, type TeamInfo, TeamsResource } from '@cloudbeaver/core-authentication';
-import { ConfirmationDialogDelete, TableState, useObservableRef, useResource, useTranslate } from '@cloudbeaver/core-blocks';
+import { action, observable } from 'mobx';
+
+import { TeamsResource } from '@cloudbeaver/core-authentication';
+import { ConfirmationDialogDelete, useObservableRef, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { CachedMapAllKey, resourceKeyList } from '@cloudbeaver/core-resource';
-import type { ILoadableState } from '@cloudbeaver/core-utils';
+import type { ITableSelection } from '@cloudbeaver/plugin-data-grid';
 
 interface State {
-  tableState: TableState;
   processing: boolean;
-  teams: TeamInfo[];
-  state: ILoadableState;
+  teamsResource: TeamsResource;
+  selection: ITableSelection;
   update: () => Promise<void>;
   delete: () => Promise<void>;
 }
 
-export function useTeamsTable(): Readonly<State> {
+export function useTeamsTable(selection: ITableSelection): Readonly<State> {
   const notificationService = useService(NotificationService);
   const dialogService = useService(CommonDialogService);
-  const resource = useResource(useTeamsTable, TeamsResource, CachedMapAllKey);
+  const teamsResource = useService(TeamsResource);
 
   const translate = useTranslate();
 
   return useObservableRef<State>(
     () => ({
-      tableState: new TableState(),
       processing: false,
-      state: resource,
-      get teams() {
-        return resource.resource.values.slice().sort(compareTeams);
-      },
       async update() {
         if (this.processing) {
           return;
@@ -46,7 +41,7 @@ export function useTeamsTable(): Readonly<State> {
 
         try {
           this.processing = true;
-          await resource.resource.refresh(CachedMapAllKey);
+          await this.teamsResource.refresh(CachedMapAllKey);
           notificationService.logSuccess({ title: 'administration_teams_team_list_update_success' });
         } catch (exception: any) {
           notificationService.logException(exception, 'administration_teams_team_list_update_fail');
@@ -59,7 +54,7 @@ export function useTeamsTable(): Readonly<State> {
           return;
         }
 
-        const deletionList = this.tableState.selectedList;
+        const deletionList = this.selection.list;
 
         if (deletionList.length === 0) {
           return;
@@ -81,10 +76,9 @@ export function useTeamsTable(): Readonly<State> {
 
         try {
           this.processing = true;
-          await resource.resource.deleteTeam(resourceKeyList(deletionList), { force: true });
+          await this.teamsResource.deleteTeam(resourceKeyList(deletionList), { force: true });
 
-          this.tableState.unselect();
-          this.tableState.collapse(deletionList);
+          this.selection.clear();
         } catch (exception: any) {
           notificationService.logException(exception, 'Teams delete Error');
         } finally {
@@ -94,10 +88,10 @@ export function useTeamsTable(): Readonly<State> {
     }),
     {
       processing: observable.ref,
-      teams: computed,
-      state: observable.ref,
+      selection: observable.ref,
+      update: action.bound,
+      delete: action.bound,
     },
-    { state: resource },
-    ['update', 'delete'],
+    { teamsResource, selection },
   );
 }

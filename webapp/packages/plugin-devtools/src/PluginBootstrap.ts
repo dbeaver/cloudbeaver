@@ -35,9 +35,14 @@ export class PluginBootstrap extends Bootstrap {
   }
 
   override register(): void {
+    this.menuService.setHandler({
+      id: 'devtools-settings-menu',
+      menus: [MENU_USER_PROFILE],
+      isHidden: () => !this.devToolsService.isEnabled,
+    });
     this.menuService.addCreator({
       menus: [TOP_NAV_BAR_SETTINGS_MENU],
-      isApplicable: () => this.permissionsService.has(EAdminPermission.admin),
+      isApplicable: () => this.permissionsService.has(EAdminPermission.admin) && this.devToolsService.isEnabled,
       getItems: (context, items) => [ACTION_DEVTOOLS, ...items],
     });
 
