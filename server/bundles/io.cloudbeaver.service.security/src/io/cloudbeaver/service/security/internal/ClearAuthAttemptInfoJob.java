@@ -19,6 +19,7 @@ package io.cloudbeaver.service.security.internal;
 import io.cloudbeaver.service.security.CBEmbeddedSecurityController;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.runtime.AbstractJob;
@@ -39,8 +40,9 @@ public class ClearAuthAttemptInfoJob extends AbstractJob {
         this.securityController = securityController;
     }
 
+    @NotNull
     @Override
-    protected IStatus run(DBRProgressMonitor monitor) {
+    protected IStatus run(@NotNull DBRProgressMonitor monitor) {
         try {
             securityController.clearOldAuthAttemptInfo();
             schedule(CHECK_PERIOD);

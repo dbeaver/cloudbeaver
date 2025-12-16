@@ -20,7 +20,9 @@ export const QueryDetailsDialog: DialogComponent<IPayload> = observer(function Q
   const translate = useTranslate();
   const sqlDialect = useSqlDialectExtension(undefined);
   const extensions = useCodemirrorExtensions();
-  extensions.set(...sqlDialect);
+  if (sqlDialect) {
+    extensions.set(...sqlDialect);
+  }
 
   return (
     <CommonDialogWrapper size="large" fixedWidth>

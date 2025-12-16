@@ -25,7 +25,6 @@ export interface IMenuHandler<TExtraProps = unknown> {
   isLoading?: (context: IDataContextProvider) => boolean;
   isDisabled?: (context: IDataContextProvider) => boolean;
   isHidden?: (context: IDataContextProvider) => boolean;
-  hideIfEmpty?: (context: IDataContextProvider) => boolean;
   handler?: (context: IDataContextProvider) => void;
 
   /** @deprecated must be refactored (#1)*/

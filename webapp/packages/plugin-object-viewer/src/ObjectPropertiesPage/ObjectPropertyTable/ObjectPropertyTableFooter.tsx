@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -12,7 +12,7 @@ import { useDataContextLink } from '@cloudbeaver/core-data-context';
 import { useService } from '@cloudbeaver/core-di';
 import { DATA_CONTEXT_NAV_NODES, type NavNode, NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
 import { resourceKeyList } from '@cloudbeaver/core-resource';
-import { MenuBar, MenuBarItemStyles, MenuBarStyles } from '@cloudbeaver/core-ui';
+import { MenuBar, MenuBarGroupStyles, MenuBarItemStyles, MenuBarStyles } from '@cloudbeaver/core-ui';
 import { useMenu } from '@cloudbeaver/core-view';
 
 import { MENU_OBJECT_VIEWER_FOOTER } from './MENU_OBJECT_VIEWER_FOOTER.js';
@@ -23,7 +23,7 @@ interface Props {
 }
 
 export const ObjectPropertyTableFooter = observer<Props>(function ObjectPropertyTableFooter({ state, className }) {
-  const styles = useS(MenuBarStyles, MenuBarItemStyles);
+  const styles = useS(MenuBarStyles, MenuBarItemStyles, MenuBarGroupStyles);
   const navNodeInfoResource = useService(NavNodeInfoResource);
   const menu = useMenu({ menu: MENU_OBJECT_VIEWER_FOOTER });
 
@@ -35,5 +35,5 @@ export const ObjectPropertyTableFooter = observer<Props>(function ObjectProperty
     context.set(DATA_CONTEXT_NAV_NODES, getSelected, id);
   });
 
-  return <MenuBar className={s(styles, { floating: true, withLabel: true }, className)} menu={menu} />;
+  return <MenuBar className={s(styles, { floating: true, withLabel: true }, className)} menu={menu} compact={false} />;
 });

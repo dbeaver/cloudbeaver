@@ -6,7 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
-.topMenuBar .menuBarItemGroup .menuBarItem {
+.menuBarItemGroup,
+.menuBarItem {
   background: none;
   border: none;
   outline: none !important;
@@ -80,6 +81,10 @@
     & .icon {
       margin-right: 4px;
     }
+  }
+
+  &:disabled .menuBarItemMark {
+    display: none;
   }
 }
 

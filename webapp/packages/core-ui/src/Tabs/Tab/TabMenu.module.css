@@ -8,4 +8,5 @@
 
 .portal {
   visibility: hidden;
+  display: flex;
 }

@@ -16,14 +16,19 @@ const BASE64_NO_METADATA =
 
 describe('Remove metadata from base64', () => {
   test('should return base64 without metadata when base64 with metadata is passed', () => {
-    expect(removeMetadataFromDataURL(BASE64)).toMatch(BASE64_NO_METADATA);
+    expect(removeMetadataFromDataURL(BASE64)).toEqual(BASE64_NO_METADATA);
   });
 
   test('should return base64 when base64 with no metadata is passed', () => {
-    expect(removeMetadataFromDataURL(BASE64_NO_METADATA)).toMatch(BASE64_NO_METADATA);
+    expect(removeMetadataFromDataURL(BASE64_NO_METADATA)).toEqual(BASE64_NO_METADATA);
   });
 
   test('should return empty string when empty string is passed', () => {
     expect(removeMetadataFromDataURL('')).toMatch('');
+  });
+
+  test('should return original string when non-base64 string is passed', () => {
+    const nonBase64String = 'This, is not a; ;base64, data: string';
+    expect(removeMetadataFromDataURL(nonBase64String)).toEqual(nonBase64String);
   });
 });

@@ -21,12 +21,12 @@ describe('copyToClipboard', () => {
   });
 
   it('should focus on active element after copy', () => {
-    document.body.focus = vitest.fn();
+    const focusSpy = vitest.spyOn(document.body, 'focus');
 
     copyToClipboard('test');
 
     expect(document.activeElement).toBe(document.body);
-    expect(document.body.focus).toHaveBeenCalled();
+    expect(focusSpy).toHaveBeenCalled();
   });
 
   it('should have no children after copy', () => {

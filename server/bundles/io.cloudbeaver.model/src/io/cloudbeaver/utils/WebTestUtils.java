@@ -17,8 +17,11 @@
 
 package io.cloudbeaver.utils;
 
+import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.utils.GeneralUtils;
 
+import java.lang.reflect.Field;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -38,5 +41,31 @@ public class WebTestUtils {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    public static void setPrivateField(
+        @NotNull Object target,
+        @NotNull String fieldName,
+        @Nullable Object value
+    ) throws Exception {
+        Class<?> cls = target.getClass();
+        Field f = null;
+        while (cls != null) {
+            Field[] fields = cls.getDeclaredFields();
+            for (Field field : fields) {
+                if (field.getName().equals(fieldName)) {
+                    f = field;
+                    break;
+                }
+            }
+            cls = cls.getSuperclass();
+        }
+        if (f == null) {
+            throw new NoSuchFieldException(fieldName);
+        }
+        boolean isAccessible = f.canAccess(target);
+        f.setAccessible(true);
+        f.set(target, value);
+        f.setAccessible(isAccessible);
     }
 }

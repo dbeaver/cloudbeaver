@@ -24,7 +24,6 @@ export interface IMenuData {
   menu: IMenu;
   handler: IMenuHandler | null;
   context: IDataContext;
-  available: boolean;
   loaders: ILoadableState[];
   itemCreators: MenuCreatorItem[];
   items: IMenuItem[];
@@ -55,9 +54,6 @@ export function useMenu(options: IMenuOptions): IMenuData {
       get itemCreators() {
         return menuService.getMenuItemCreators(this.context);
       },
-      get available() {
-        return this.handler?.hideIfEmpty?.(this.context) === false || this.itemCreators.length > 0;
-      },
       get items(): IMenuItem[] {
         return menuService.getMenu(this.context, this.itemCreators).filter(item => item !== this.filterAction);
       },
@@ -67,7 +63,6 @@ export function useMenu(options: IMenuOptions): IMenuData {
     }),
     {
       loaders: computed,
-      available: computed,
       itemCreators: computed,
       items: computed,
       handler: computed,
