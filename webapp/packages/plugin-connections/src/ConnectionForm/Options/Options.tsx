@@ -276,7 +276,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
                   title={translate('connections_connection_share_credentials_tooltip')}
                   state={optionsPart.state}
                   disabled={formState.isDisabled || readonly}
-                  keepSize
+                  fill
                 >
                   {translate('connections_connection_share_credentials')}
                 </FieldCheckbox>
