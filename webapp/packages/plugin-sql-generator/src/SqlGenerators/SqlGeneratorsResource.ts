@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,8 @@ export class SqlGeneratorsResource extends CachedMapResource<string, SqlQueryGen
     private readonly navNodeInfoResource: NavNodeInfoResource,
   ) {
     super();
+
+    this.sync(this.navNodeInfoResource);
 
     this.navNodeInfoResource.outdateResource(this);
     this.navNodeInfoResource.deleteInResource(this);
