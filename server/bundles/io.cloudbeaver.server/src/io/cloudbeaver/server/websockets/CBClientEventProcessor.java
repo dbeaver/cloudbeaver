@@ -19,12 +19,12 @@ package io.cloudbeaver.server.websockets;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.session.BaseWebSession;
 import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.websocket.event.client.*;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.websocket.WSUtils;
 import org.jkiss.dbeaver.model.websocket.event.WSClientEvent;
-import org.jkiss.dbeaver.model.websocket.event.client.*;
 import org.jkiss.utils.CommonUtils;
 
 public class CBClientEventProcessor {
@@ -77,6 +77,16 @@ public class CBClientEventProcessor {
                         taskConfirmationEvent.getTaskId(),
                         taskConfirmationEvent.isConfirmed(),
                         taskConfirmationEvent.isSkipConfirmations()
+                    );
+                }
+                break;
+            }
+            case WSSessionTaskWithParametersConfirmationEvent.ID: {
+                if (webSession instanceof WebSession session) {
+                    var taskParamsConfirmationEvent = (WSSessionTaskWithParametersConfirmationEvent) clientEvent;
+                    session.handleTaskConfirmationWithParameters(
+                        taskParamsConfirmationEvent.getTaskId(),
+                        taskParamsConfirmationEvent.getParameters()
                     );
                 }
                 break;
