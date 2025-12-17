@@ -7,14 +7,14 @@
  */
 
 import './module.js';
-import { createComplexLoader } from '@cloudbeaver/core-blocks';
+import { createLazyLoader } from '@cloudbeaver/core-blocks';
 
 export * from './ReactCodemirrorPanel.js';
 export * from './EditorLoader.js';
 export * from './IEditorProps.js';
 export * from './IEditorRef.js';
 export * from './useEditorDefaultExtensions.js';
-export * from './useEditorAutocompletion.js';
+export * from './createEditorAutocompletion.js';
 export * from './useCodemirrorExtensions.js';
 
 export * from './Hyperlink/HyperlinkLoader.js';
@@ -31,11 +31,11 @@ export { json as JSON_EDITOR } from '@codemirror/lang-json';
 export { sql as SQL_EDITOR, SQLDialect } from '@codemirror/lang-sql';
 export { xml as XML_EDITOR } from '@codemirror/lang-xml';
 
-export const StandardSQLLoader = createComplexLoader(async () => (await import('@codemirror/lang-sql')).StandardSQL);
-export const PostgreSQLLoader = createComplexLoader(async () => (await import('@codemirror/lang-sql')).PostgreSQL);
-export const MySQLLoader = createComplexLoader(async () => (await import('@codemirror/lang-sql')).MySQL);
-export const MariaSQLLoader = createComplexLoader(async () => (await import('@codemirror/lang-sql')).MariaSQL);
-export const MSSQLLoader = createComplexLoader(async () => (await import('@codemirror/lang-sql')).MSSQL);
-export const SQLiteLoader = createComplexLoader(async () => (await import('@codemirror/lang-sql')).SQLite);
-export const CassandraLoader = createComplexLoader(async () => (await import('@codemirror/lang-sql')).Cassandra);
-export const PLSQLLoader = createComplexLoader(async () => (await import('@codemirror/lang-sql')).PLSQL);
+export const StandardSQLLoader = createLazyLoader(async () => (await import('@codemirror/lang-sql')).StandardSQL);
+export const PostgreSQLLoader = createLazyLoader(async () => (await import('@codemirror/lang-sql')).PostgreSQL);
+export const MySQLLoader = createLazyLoader(async () => (await import('@codemirror/lang-sql')).MySQL);
+export const MariaSQLLoader = createLazyLoader(async () => (await import('@codemirror/lang-sql')).MariaSQL);
+export const MSSQLLoader = createLazyLoader(async () => (await import('@codemirror/lang-sql')).MSSQL);
+export const SQLiteLoader = createLazyLoader(async () => (await import('@codemirror/lang-sql')).SQLite);
+export const CassandraLoader = createLazyLoader(async () => (await import('@codemirror/lang-sql')).Cassandra);
+export const PLSQLLoader = createLazyLoader(async () => (await import('@codemirror/lang-sql')).PLSQL);

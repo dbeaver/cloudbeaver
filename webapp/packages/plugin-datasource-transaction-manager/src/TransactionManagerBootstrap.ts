@@ -162,7 +162,7 @@ export class TransactionManagerBootstrap extends Bootstrap {
           const icon = `/icons/commit_mode_${auto ? 'auto' : 'manual'}_m.svg`;
           const label = `plugin_datasource_transaction_manager_commit_mode_switch_to_${auto ? 'manual' : 'auto'}`;
 
-          return { ...action.info, icon, label, tooltip: label };
+          return { ...action.info, icon, label: '', tooltip: label };
         }
 
         return action.info;

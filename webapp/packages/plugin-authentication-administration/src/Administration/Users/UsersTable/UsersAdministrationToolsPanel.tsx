@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ export const UsersAdministrationToolsPanel = observer<Props>(function UsersAdmin
   return (
     <ToolsPanel className={s(styles, { toolsPanel: true })} rounded>
       <SContext registry={registry}>
-        <MenuBar menu={menu} className={s(styles, { menuBar: true })} />
+        <MenuBar menu={menu} className={s(styles, { menuBar: true })} compact={false} />
       </SContext>
       <ToolsAction title={translate('authentication_administration_tools_refresh_tooltip')} icon="refresh" viewBox="0 0 24 24" onClick={onUpdate}>
         {translate('ui_refresh')}

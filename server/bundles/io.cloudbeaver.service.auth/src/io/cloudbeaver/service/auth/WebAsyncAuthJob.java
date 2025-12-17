@@ -46,8 +46,9 @@ public class WebAsyncAuthJob extends AbstractJob implements CustomCancelableJob 
     }
 
     //do nothing, this job is workaround to use exist async process
+    @NotNull
     @Override
-    protected IStatus run(DBRProgressMonitor monitor) {
+    protected IStatus run(@NotNull DBRProgressMonitor monitor) {
         return null;
     }
 

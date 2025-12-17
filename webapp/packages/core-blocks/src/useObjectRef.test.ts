@@ -6,118 +6,155 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { describe, expect, test, vitest } from 'vitest';
+import { describe, expect, test } from 'vitest';
 import { renderHook } from '@testing-library/react';
-
-import * as coreUtils from '@cloudbeaver/core-utils';
 
 import { useObjectRef } from './useObjectRef.js';
 
-vitest.mock('@cloudbeaver/core-utils', () => ({
-  bindFunctions: vitest.fn(),
-}));
+interface ITestObject {
+  value: number;
+  text?: string;
+  getValue(): number;
+  setValue(value: number): void;
+}
+
+function createTestObject(): ITestObject {
+  return {
+    value: 1,
+    text: 'initial',
+    getValue() {
+      return this.value;
+    },
+    setValue(value: number) {
+      this.value = value;
+    },
+  };
+}
 
 describe('useObjectRef', () => {
-  test('should initialize', () => {
-    const { result } = renderHook(() =>
-      useObjectRef({
-        count: 0,
-        increment: function (this: { count: number }) {
-          this.count++;
-        },
-      }),
+  test('returns stable object reference between renders', () => {
+    const { result, rerender } = renderHook(() => useObjectRef(createTestObject));
+
+    const firstRef = result.current;
+    rerender();
+    const secondRef = result.current;
+
+    expect(firstRef).toBe(secondRef);
+  });
+
+  test('initializes from object literal and keeps same reference', () => {
+    const initObject: ITestObject = createTestObject();
+
+    const { result, rerender } = renderHook(() => useObjectRef(initObject));
+
+    const firstRef = result.current;
+    rerender();
+
+    expect(result.current).toBe(firstRef);
+    // internal state should keep same reference between renders
+    expect(result.current.value).toBe(1);
+  });
+
+  test('applies update object on each render', () => {
+    const { result, rerender } = renderHook(
+      ({ value }: { value: number }) =>
+        useObjectRef(
+          () => ({
+            value: 0,
+          }),
+          {
+            value,
+          },
+        ),
+      {
+        initialProps: { value: 1 },
+      },
     );
 
-    expect(result.current.count).toBe(0);
-    expect(typeof result.current.increment).toBe('function');
+    expect(result.current.value).toBe(1);
+
+    rerender({ value: 5 });
+
+    expect(result.current.value).toBe(5);
   });
 
-  test('should initialize with empty object', () => {
-    const { result } = renderHook(() => useObjectRef({}));
+  test('binds specified methods to object when initialized', () => {
+    const { result } = renderHook(() => useObjectRef(createTestObject, false, ['getValue', 'setValue']));
 
-    expect(result.current).toEqual({});
+    const ref = result.current;
+    const getValue = ref.getValue;
+    const setValue = ref.setValue;
+
+    // if binding works, `this` inside methods should point to the ref object
+    expect(getValue()).toBe(1);
+
+    setValue(10);
+    expect(ref.value).toBe(10);
+    expect(getValue()).toBe(10);
   });
 
-  test('should bind ref functions', () => {
-    const bindFunctions = vitest.spyOn(coreUtils, 'bindFunctions');
+  test('binds methods when using bind array as second arg', () => {
+    const { result } = renderHook(() => useObjectRef(createTestObject, ['getValue', 'setValue']));
 
-    renderHook(() =>
-      useObjectRef(
-        () => ({
-          count: 0,
-          increment: function (this: { count: number }) {
-            this.count++;
-          },
-        }),
-        false,
-        ['increment'],
-      ),
-    );
+    const ref = result.current;
+    const getValue = ref.getValue;
+    const setValue = ref.setValue;
 
-    expect(bindFunctions).toHaveBeenCalledTimes(1);
-    bindFunctions.mockClear();
+    expect(getValue()).toBe(1);
+    setValue(3);
+    expect(getValue()).toBe(3);
   });
 
-  test('should merge update to bind', () => {
-    const bindFunctions = vitest.spyOn(coreUtils, 'bindFunctions');
-
-    renderHook(() =>
-      useObjectRef(
-        () => ({
-          count: 0,
-          increment: function (this: { count: number }) {
-            this.count++;
-          },
-        }),
-        {
-          count: 0,
-        },
-        ['increment'],
-      ),
-    );
-
-    expect(bindFunctions).toHaveBeenCalledTimes(1);
-    bindFunctions.mockClear();
-  });
-
-  test('should update ref via initial state method', () => {
-    type TRef = { update: { count: number; increment?: (this: { count: number }) => void } };
-    const init = () => ({ count: 0 });
-
-    const { result } = renderHook(({ update }: TRef) => useObjectRef(init, update, ['increment']), {
-      initialProps: {
-        update: {
-          count: 0,
-          increment: function () {
-            this.count++;
-          },
-        },
+  test('rebinds only methods present in update object', () => {
+    const create = () => ({
+      value: 1,
+      other: 1,
+      getValue() {
+        return this.value;
+      },
+      getOther() {
+        return this.other;
       },
     });
 
-    expect(result.current.count).toBe(0);
+    const { result, rerender } = renderHook(
+      ({ value }: { value: number }) =>
+        useObjectRef(
+          create,
+          {
+            value,
+          },
+          ['getValue', 'getOther'],
+        ),
+      { initialProps: { value: 1 } },
+    );
 
-    result.current?.increment?.();
+    const ref = result.current;
+    const getValue = ref.getValue;
+    const getOther = ref.getOther;
 
-    expect(result.current.count).toBe(1);
+    expect(getValue()).toBe(1);
+    expect(getOther()).toBe(1);
+
+    rerender({ value: 10 });
+
+    // getValue should be rebound to updated "value", getOther should still work with old binding
+    expect(ref.value).toBe(10);
+    expect(getValue()).toBe(10);
+    expect(getOther()).toBe(1);
   });
 
-  test('should update ref', () => {
-    type TRef = { update: { count: number } };
-    const init = () => ({ count: 0 });
+  test('supports partial init and update', () => {
+    const { result, rerender } = renderHook(
+      ({ text }: { text: string }) => useObjectRef<ITestObject, Partial<ITestObject>>(() => ({ value: 1 }) as ITestObject, { text }),
+      { initialProps: { text: 'first' } },
+    );
 
-    const { result, rerender } = renderHook(({ update }: TRef) => useObjectRef(init, update), {
-      initialProps: {
-        update: {
-          count: 0,
-        },
-      } as TRef,
-    });
+    expect(result.current.value).toBe(1);
+    expect(result.current.text).toBe('first');
 
-    expect(result.current.count).toBe(0);
+    rerender({ text: 'second' });
 
-    rerender({ update: { count: 3 } });
-
-    expect(result.current.count).toBe(3);
+    expect(result.current.text).toBe('second');
   });
 });

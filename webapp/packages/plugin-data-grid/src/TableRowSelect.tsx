@@ -17,17 +17,17 @@ interface BaseProps {
   disabled?: boolean;
 }
 
-interface RootProps extends BaseProps {
+export interface ITableRowRootSelectProps extends BaseProps {
   isRoot: true;
   id?: never;
 }
 
-interface Props extends BaseProps {
+export interface ITableRowSelectProps extends BaseProps {
   id: string;
   isRoot?: never;
 }
 
-export const TableRowSelect = observer<RootProps | Props>(function TableRowSelect({ isRoot, id, disabled }) {
+export const TableRowSelect = observer<ITableRowRootSelectProps | ITableRowSelectProps>(function TableRowSelect({ isRoot, id, disabled }) {
   const selection = use(TableSelectionContext);
 
   if (!selection) {

@@ -17,7 +17,6 @@ export default [
   ['data_grid_table_disable_order', '已禁用'],
   ['data_grid_table_disable_all_orders', '禁用所有'],
   ['data_grid_table_delete_filters_and_orders', '重置过滤器/排序'],
-  ['data_grid_table_tooltip_column_header_order', '按列排序'],
   ['data_grid_table_context_menu_filter_dialog_title', '编辑值'],
   ['data_grid_table_context_menu_filter_clipboard_permission', '授予访问剪贴板的权限'],
   ['data_grid_table_context_menu_save_value_error', '保存失败'],
