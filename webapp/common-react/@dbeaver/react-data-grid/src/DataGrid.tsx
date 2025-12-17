@@ -27,7 +27,7 @@ import { mapRenderHeaderCell } from './mapRenderHeaderCell.js';
 import { mapEditCellRenderer } from './mapEditCellRenderer.js';
 import { DataGridRowContext, type IDataGridRowContext } from './DataGridRowContext.js';
 import './DataGrid.css';
-import { HeaderDnDContext, useHeaderDnD } from './useHeaderDnD.js';
+import { HeaderDnDContext, isColumn, useHeaderDnD } from './useHeaderDnD.js';
 
 export interface ICellPosition {
   rowIdx: number;
@@ -107,20 +107,20 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
   const columns = new Array<ColumnOrColumnGroup<IInnerRow, unknown>>(columnsCount)
     .fill(null as any)
     .map((_, i): ColumnOrColumnGroup<IInnerRow, unknown> => {
-    const width = getHeaderWidth?.(i) ?? 'max-content';
-    return {
-      key: getColumnKey?.(i) ?? String(i),
-      name: '',
-      resizable: getHeaderResizable?.(i) ?? true,
-      width,
-      minWidth: 26,
-      editable: row => getCellEditable?.(row.idx, i) ?? false,
-      frozen: getHeaderPinned?.(i),
-      renderHeaderCell: mapRenderHeaderCell(i),
-      renderCell: mapCellContentRenderer(i),
-      renderEditCell: mapEditCellRenderer(i),
+      const width = getHeaderWidth?.(i) ?? 'max-content';
+      return {
+        key: getColumnKey?.(i) ?? String(i),
+        name: '',
+        resizable: getHeaderResizable?.(i) ?? true,
+        width,
+        minWidth: 26,
+        editable: row => getCellEditable?.(row.idx, i) ?? false,
+        frozen: getHeaderPinned?.(i),
+        renderHeaderCell: mapRenderHeaderCell(i),
+        renderCell: mapCellContentRenderer(i),
+        renderEditCell: mapEditCellRenderer(i),
       };
-  });
+    });
 
   const dndHeaderContext = useHeaderDnD({ columns, onReorder: onHeaderReorder, getCanDrag: getHeaderDnD, getHeaderOrder });
 
@@ -132,12 +132,21 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
       innerGridRef.current?.scrollToCell({ idx: position.colIdx && dndHeaderContext.getDataColIdx(position.colIdx), rowIdx: position.rowIdx });
     },
     openEditor: (position: ICellPosition) => {
-      innerGridRef.current?.selectCell(
-        { idx: dndHeaderContext.getDataColIdx(position.colIdx), rowIdx: position.rowIdx },
-        {
-          enableEditor: true,
-        },
-      );
+      const colIdx = dndHeaderContext.getDataColIdx(position.colIdx);
+      const columnOrGroup = columns[colIdx];
+
+      if (!columnOrGroup) {
+        return;
+      }
+
+      if (isColumn(columnOrGroup)) {
+        innerGridRef.current?.selectCellByKey(
+          { columnKey: columnOrGroup.key, rowIdx: position.rowIdx },
+          {
+            enableEditor: true,
+          },
+        );
+      }
     },
   }));
 

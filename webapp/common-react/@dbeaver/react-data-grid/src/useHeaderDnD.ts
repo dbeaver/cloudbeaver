@@ -31,7 +31,7 @@ interface IHeaderDnD {
 
 export const HeaderDnDContext = createContext<IHeaderDnD | null>(null);
 
-function isColumn(column: ColumnOrColumnGroup<IInnerRow, unknown>): column is Column<IInnerRow, unknown> {
+export function isColumn(column: ColumnOrColumnGroup<IInnerRow, unknown>): column is Column<IInnerRow, unknown> {
   return (column as Column<IInnerRow, unknown>).key !== undefined;
 }
 
