@@ -74,6 +74,15 @@ public class WebGQLClient {
         return sendQueryWithHeaders(query, variables, Map.of());
     }
 
+    @NotNull
+    public Map<String, Object> sendQueryAndGetHeaders(
+        @NotNull String query,
+        @Nullable Map<String, Object> variables,
+        @NotNull Map<String, String> requestHeaders
+    ) throws Exception {
+        return executeGQLRequest(query, variables, requestHeaders);
+    }
+
     /**
      * Sends GraphQL request without additional headers
      *
@@ -88,13 +97,24 @@ public class WebGQLClient {
         @Nullable Map<String, Object> variables,
         @NotNull Map<String, String> headers
     ) throws Exception {
+        Map<String, Object> parsed = executeGQLRequest(query, variables, headers);
+        // graphql response will be in "data" key
+        return (T) parsed.get("data");
+    }
+
+    @NotNull
+    private Map<String, Object> executeGQLRequest(
+        @NotNull String query,
+        @Nullable Map<String, Object> variables,
+        @NotNull Map<String, String> requestHeaders
+    ) throws Exception {
         HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
             .uri(URI.create(apiUrl))
             .POST(HttpRequest.BodyPublishers.ofString(makeGQLRequest(query, variables)))
             .setHeader("TE-Client-Version", GeneralUtils.getMajorVersion())
             .header("Content-Type", "application/json");
-        if (!headers.isEmpty()) {
-            headers.forEach(requestBuilder::header);
+        if (!requestHeaders.isEmpty()) {
+            requestHeaders.forEach(requestBuilder::header);
         }
         HttpRequest request = requestBuilder.build();
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
@@ -106,8 +126,10 @@ public class WebGQLClient {
             String message = JSONUtils.getString(JSONUtils.getObjectList(body, "errors").get(0), "message");
             throw new DBException(message);
         }
-        // graphql response will be in "data" key
-        return (T) JSONUtils.getObject(body, "data").get("result");
+        Map<String, Object> parsed = new LinkedHashMap<>();
+        parsed.put("data", JSONUtils.getObject(body, "data").get("result"));
+        parsed.put("headers", response.headers().map());
+        return parsed;
     }
 
     @NotNull
