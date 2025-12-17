@@ -32,12 +32,7 @@ export class SqlGeneratorsBootstrap extends Bootstrap {
       id: 'node-sql-generators',
       menus: [MENU_SQL_GENERATORS],
       contexts: [DATA_CONTEXT_NAV_NODE],
-      isDisabled: context => {
-        const node = context.get(DATA_CONTEXT_NAV_NODE)!;
-
-        return this.sqlGeneratorsResource.get(node.id)?.length === 0;
-      },
-      getLoader: (context, action) => {
+      getLoader: context => {
         const node = context.get(DATA_CONTEXT_NAV_NODE)!;
 
         return getCachedMapResourceLoaderState(this.sqlGeneratorsResource, () => node.id);
