@@ -26,6 +26,7 @@ import org.jkiss.dbeaver.model.DBUtils;
 import org.jkiss.dbeaver.model.data.DBDDataFilter;
 import org.jkiss.dbeaver.model.data.DBDDataReceiver;
 import org.jkiss.dbeaver.model.exec.*;
+import org.jkiss.dbeaver.model.sql.SQLParametersProvider;
 import org.jkiss.dbeaver.model.sql.SQLQuery;
 import org.jkiss.dbeaver.model.sql.SQLScriptContext;
 import org.jkiss.dbeaver.model.sql.SQLSyntaxManager;
@@ -48,13 +49,19 @@ public class WebSQLQueryDataContainer implements DBSDataContainer, DBPContextPro
     private final String query;
     private final SQLQueryDataContainer queryDataContainer;
 
-    public WebSQLQueryDataContainer(DBPDataSource dataSource, SQLSyntaxManager syntaxManager, String query) {
+    public WebSQLQueryDataContainer(
+        @NotNull DBPDataSource dataSource,
+        @NotNull SQLSyntaxManager syntaxManager,
+        @NotNull String query,
+        @NotNull SQLParametersProvider parametersProvider
+    ) {
         this.dataSource = dataSource;
         this.syntaxManager = syntaxManager;
         this.query = query;
 
         SQLScriptContext scriptContext = new SQLScriptContext(null,
-            this, null, new PrintWriter(System.err, true), null);
+            this, null, new PrintWriter(System.err, true), parametersProvider
+        );
         queryDataContainer = new SQLQueryDataContainer(this, new SQLQuery(dataSource, query), scriptContext, log);
     }
 

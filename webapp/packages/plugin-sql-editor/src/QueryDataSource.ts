@@ -9,8 +9,15 @@ import { makeObservable, observable } from 'mobx';
 
 import type { IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
 import type { IServiceProvider } from '@cloudbeaver/core-di';
-import type { ITask } from '@cloudbeaver/core-executor';
-import { AsyncTaskInfoService } from '@cloudbeaver/core-root';
+import { executorHandlerFilter, type IExecutorHandler, type ITask } from '@cloudbeaver/core-executor';
+import {
+  AsyncTask,
+  AsyncTaskInfoEventHandler,
+  AsyncTaskInfoService,
+  ClientEventId,
+  ServerEventId,
+  type IBaseAsyncTaskEvent,
+} from '@cloudbeaver/core-root';
 import {
   GraphQLService,
   ResultDataFormat,
@@ -18,8 +25,10 @@ import {
   type SqlQueryResults,
   type AsyncUpdateResultsDataBatchMutationVariables,
   type AsyncTaskInfo,
+  type WsSessionTaskQueryParamsConfirmationEvent,
+  type WsSessionTaskWithParametersConfirmationEvent,
 } from '@cloudbeaver/core-sdk';
-import { uuid } from '@cloudbeaver/core-utils';
+import { isArraysEqual, uuid } from '@cloudbeaver/core-utils';
 import {
   DocumentEditAction,
   type IDatabaseDataOptions,
@@ -29,6 +38,9 @@ import {
   ResultSetDataSource,
   ResultSetEditAction,
 } from '@cloudbeaver/plugin-data-viewer';
+import { DialogueStateResult, type CommonDialogService } from '@cloudbeaver/core-dialogs';
+import { ConfirmationDialog } from '@cloudbeaver/core-blocks';
+import { renderQueryParamsForConfirmation } from './renderQueryParamsForConfirmation.js';
 
 export interface IDataQueryOptions extends IDatabaseDataOptions {
   query: string;
@@ -50,13 +62,21 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
     return this.currentTask?.cancelled || false;
   }
 
+  private previousQueryParameters: Record<string, any> | null;
+  private currentQueryParameters: Record<string, any> | null;
+  private currentQueryAsyncTask: AsyncTask | null;
+  private queryParamsEventHandler: IExecutorHandler<IBaseAsyncTaskEvent, any>;
   constructor(
     override readonly serviceProvider: IServiceProvider,
+    private readonly commonDialogService: CommonDialogService,
+    private readonly asyncTaskInfoEventHandler: AsyncTaskInfoEventHandler,
     graphQLService: GraphQLService,
     asyncTaskInfoService: AsyncTaskInfoService,
   ) {
     super(serviceProvider, graphQLService, asyncTaskInfoService);
 
+    this.previousQueryParameters = null;
+    this.currentQueryParameters = null;
     this.currentTask = null;
     this.requestInfo = {
       originalQuery: '',
@@ -66,6 +86,14 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
       source: null,
       query: '',
     };
+    this.currentQueryAsyncTask = null;
+
+    this.handleQueryParamsEvent = this.handleQueryParamsEvent.bind(this);
+    this.queryParamsEventHandler = executorHandlerFilter(
+      event => event.id === ServerEventId.CbSessionTaskQueryParamsConfirmationRequest && event.taskId === this.currentQueryAsyncTask?.info?.id,
+      this.handleQueryParamsEvent,
+    );
+    asyncTaskInfoService.onExecuteEvent.addHandler(this.queryParamsEventHandler);
 
     makeObservable(this, {
       currentTask: observable.ref,
@@ -79,6 +107,11 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
   override async cancel(): Promise<void> {
     await super.cancel();
     await this.currentTask?.cancel();
+  }
+
+  override refreshData(): Promise<void> {
+    this.resetQueryParameters();
+    return super.refreshData();
   }
 
   async save(prevResults: IDatabaseResultSet[]): Promise<IDatabaseResultSet[]> {
@@ -171,6 +204,9 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
   }
 
   override setOptions(options: TOptions): this {
+    if (this.options?.query !== options.query) {
+      this.resetQueryParameters();
+    }
     this.options = options;
     return this;
   }
@@ -192,6 +228,7 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
     }
 
     const task = this.asyncTaskInfoService.create(() => this.executeQuery(executionContextInfo, options, firstResultId, limit));
+    this.currentQueryAsyncTask = task;
 
     this.currentTask = executionContext.run(
       async () => {
@@ -201,7 +238,10 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
         return result;
       },
       () => this.asyncTaskInfoService.cancel(task.id),
-      () => this.asyncTaskInfoService.remove(task.id),
+      () => {
+        this.asyncTaskInfoService.remove(task.id);
+        this.currentQueryAsyncTask = null;
+      },
     );
 
     try {
@@ -219,6 +259,11 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
       this.error = exception;
       throw exception;
     }
+  }
+
+  resetQueryParameters(): void {
+    this.previousQueryParameters = this.currentQueryParameters || this.previousQueryParameters;
+    this.currentQueryParameters = null;
   }
 
   protected async executeQuery(
@@ -245,6 +290,45 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
     });
 
     return taskInfo;
+  }
+
+  override async dispose(): Promise<void> {
+    await super.dispose();
+    this.asyncTaskInfoService.onExecuteEvent.removeHandler(this.queryParamsEventHandler);
+  }
+
+  private async handleQueryParamsEvent(event: IBaseAsyncTaskEvent) {
+    const queryParamsEvent = event as WsSessionTaskQueryParamsConfirmationEvent;
+    const canUseQueryParameters =
+      this.currentQueryParameters && isArraysEqual(Object.keys(this.currentQueryParameters), Object.keys(queryParamsEvent.parameters));
+
+    if (!canUseQueryParameters) {
+      const parametersState = observable({
+        ...Object.fromEntries(Object.entries(queryParamsEvent.parameters).map(([key, value]) => [key, this.previousQueryParameters?.[key] ?? value])),
+      });
+      // TODO: this UI thing should be moved outside of the `plugin-sql-editor` package to use sql editor component for preview
+      const dialogPromise = this.commonDialogService.open(ConfirmationDialog, {
+        title: queryParamsEvent.title,
+        message: queryParamsEvent.message,
+        size: 'large',
+        children: () => renderQueryParamsForConfirmation(parametersState, queryParamsEvent.query),
+      });
+
+      const { status } = await dialogPromise;
+      if (status === DialogueStateResult.Resolved) {
+        this.currentQueryParameters = { ...parametersState };
+      }
+    }
+
+    if (this.currentQueryParameters) {
+      this.asyncTaskInfoEventHandler.emit<WsSessionTaskWithParametersConfirmationEvent>({
+        id: ClientEventId.CbClientSessionTaskWithParametersConfirmation,
+        taskId: queryParamsEvent.taskId,
+        parameters: this.currentQueryParameters,
+      });
+    } else {
+      await this.currentQueryAsyncTask?.cancelAsync();
+    }
   }
 
   private innerGetResults(

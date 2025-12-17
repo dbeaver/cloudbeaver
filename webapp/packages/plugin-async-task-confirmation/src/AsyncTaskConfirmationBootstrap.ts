@@ -12,7 +12,6 @@ import { executorHandlerFilter } from '@cloudbeaver/core-executor';
 import { AsyncTask, AsyncTaskInfoService, ClientEventId, ServerEventId, type IBaseAsyncTaskEvent } from '@cloudbeaver/core-root';
 import { AsyncTaskInfoEventHandler } from '@cloudbeaver/core-root/AsyncTask/AsyncTaskInfoEventHandler.js';
 import type { WsSessionTaskConfirmationEvent, WsSessionTaskConfirmationRequestEvent } from '@cloudbeaver/core-sdk';
-import { observable } from 'mobx';
 
 @injectable(() => [AsyncTaskInfoService, CommonDialogService, AsyncTaskInfoEventHandler])
 export class AsyncTaskConfirmationBootstrap extends Bootstrap {
@@ -34,16 +33,13 @@ export class AsyncTaskConfirmationBootstrap extends Bootstrap {
 
   private async handleEvent(event: IBaseAsyncTaskEvent) {
     const confirmationEvent = event as WsSessionTaskConfirmationRequestEvent;
-    const dialogPromise = this.commonDialogService.open(
-      ConfirmationDialog,
-      observable({
-        title: confirmationEvent.title,
-        message: confirmationEvent.message,
-        icon: '/icons/warning_icon_sm.svg',
-        size: 'medium',
-        showSkipConfirmations: true,
-      }),
-    );
+    const dialogPromise = this.commonDialogService.open(ConfirmationDialog, {
+      title: confirmationEvent.title,
+      message: confirmationEvent.message,
+      icon: '/icons/warning_icon_sm.svg',
+      size: 'medium',
+      showSkipConfirmations: true,
+    });
     this.pendingConfirmations.set(confirmationEvent.taskId, dialogPromise);
 
     try {
