@@ -29,7 +29,9 @@
     "@cloudbeaver/tsconfig": "workspace:*",
     "@types/fs-extra": "^11",
     "@types/node": "^22",
+    "@vitejs/plugin-legacy": "^7",
     "rimraf": "^6",
+    "terser": "^5",
     "tslib": "^2",
     "typescript": "^5"
   },
