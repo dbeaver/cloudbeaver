@@ -16,6 +16,7 @@
  */
 package io.cloudbeaver.service.sql;
 
+import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.WebAsyncTaskInfo;
 import io.cloudbeaver.model.app.ServletAppConfiguration;
 import io.cloudbeaver.model.session.WebAsyncTaskProcessor;
@@ -36,6 +37,7 @@ import org.jkiss.dbeaver.model.gis.GisTransformUtils;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.struct.DBSAttributeBase;
 import org.jkiss.dbeaver.model.struct.DBSTypedObject;
+import org.jkiss.dbeaver.model.websocket.event.WSEvent;
 import org.jkiss.dbeaver.utils.ContentUtils;
 import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.utils.Base64;
@@ -45,6 +47,9 @@ import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 /**
  * Web SQL utils.
@@ -300,5 +305,28 @@ public class WebSQLUtils {
             }
         };
         return webSession.runAsyncTask(task, runnable);
+    }
+
+    @Nullable
+    public static <T> T requestConfirmation(
+        @NotNull WebSession webSession,
+        @NotNull WebAsyncTaskInfo asyncTask,
+        @NotNull WSEvent confirmationEvent,
+        @NotNull CompletableFuture<T> confirmationFuture
+    ) throws DBWebException {
+        String attributeName = WebSQLConstants.TASK_CONFIRMATION_ATTR_PREFIX + asyncTask.getId();
+        webSession.setAttribute(attributeName, confirmationFuture);
+
+        webSession.addSessionEvent(confirmationEvent);
+
+        try {
+            return confirmationFuture.get(WebSQLConstants.TASK_CONFIRMATION_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+        } catch (TimeoutException e) {
+            throw new DBWebException("Query confirmation timeout");
+        } catch (Exception e) {
+            throw new DBWebException("Error when processing confirmation response", e);
+        } finally {
+            webSession.removeAttribute(attributeName);
+        }
     }
 }
