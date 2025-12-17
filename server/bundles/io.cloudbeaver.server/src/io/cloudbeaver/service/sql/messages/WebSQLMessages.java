@@ -24,6 +24,7 @@ public class WebSQLMessages extends NLS {
     // TODO: add localizations
     public static String model_web_ai_query_confirmation_title;
     public static String model_web_ai_query_confirmation_message;
+    public static String model_web_dialog_sql_param_title;
 
     static {
         NLS.initializeMessages(BUNDLE_NAME, WebSQLMessages.class);
