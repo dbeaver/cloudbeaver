@@ -56,6 +56,7 @@ const defaultSettings = schema.object({
   'plugin.sql-editor.maxFileSize': schema.coerce.number().default(10 * 1024), // kilobyte
   'plugin.sql-editor.disabled': schemaExtra.stringedBoolean().default(false),
   'plugin.sql-editor.autoSave': schemaExtra.stringedBoolean().default(true),
+  'plugin.sql-editor.highlightWhitespace': schemaExtra.stringedBoolean().default(false),
   'sql.proposals.insert.table.alias': schema.coerce
     .string()
     .transform(value => {
@@ -118,6 +119,10 @@ export class SqlEditorSettingsService {
 
   get longNameProposals(): boolean {
     return this.settings.getValue('SQLEditor.ContentAssistant.proposals.long.name');
+  }
+
+  get highlightWhitespace(): boolean {
+    return this.settings.getValue('plugin.sql-editor.highlightWhitespace');
   }
 
   readonly settings: SettingsProvider<typeof defaultSettings>;
@@ -210,6 +215,16 @@ export class SqlEditorSettingsService {
           description: this.serverConfigResource.isFeatureEnabled(FEATURE_GIT_ID, true)
             ? 'plugin_sql_editor_settings_auto_save_description_git_integration'
             : 'plugin_sql_editor_settings_auto_save_description',
+        },
+        {
+          group: SQL_EDITOR_SETTINGS_GROUP,
+          key: 'plugin.sql-editor.highlightWhitespace',
+          access: {
+            scope: ['client'],
+          },
+          type: ESettingsValueType.Checkbox,
+          name: 'plugin_sql_editor_settings_highlight_white_space',
+          description: 'plugin_sql_editor_settings_highlight_white_space_description',
         },
       ];
 

@@ -14,17 +14,20 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { DATA_CONTEXT_NAV_NODE, getNodesFromContext, NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
 import { type TabContainerPanelComponent, useDNDBox } from '@cloudbeaver/core-ui';
 import { closeCompletion, type IEditorRef, Prec, ReactCodemirrorPanel, useCodemirrorExtensions } from '@cloudbeaver/plugin-codemirror6';
-import type { ISqlEditorModeProps } from '@cloudbeaver/plugin-sql-editor';
+import { SqlEditorSettingsService, type ISqlEditorModeProps } from '@cloudbeaver/plugin-sql-editor';
 
 import { ACTIVE_QUERY_EXTENSION } from '../ACTIVE_QUERY_EXTENSION.js';
 import { QUERY_STATUS_GUTTER_EXTENSION } from '../QUERY_STATUS_GUTTER_EXTENSION.js';
 import { SQLCodeEditorLoader } from '../SQLCodeEditor/SQLCodeEditorLoader.js';
 import { useSQLCodeEditor } from '../SQLCodeEditor/useSQLCodeEditor.js';
+import { useHighlightWhitespace } from '../useHighlightWhitespace.js';
 import { useSqlDialectAutocompletion } from '../useSqlDialectAutocompletion.js';
 import { useSqlDialectExtension } from '../useSqlDialectExtension.js';
 import style from './SQLCodeEditorPanel.module.css';
 import { SqlEditorInfoBar } from './SqlEditorInfoBar.js';
 import { useSQLCodeEditorPanel } from './useSQLCodeEditorPanel.js';
+import { useHighlightTrailingWhitespace } from '../useHighlightTrailingWhitespace.js';
+import { useHighlightNewLine } from '../useHighlightNewLine.js';
 
 export const SQLCodeEditorPanel: TabContainerPanelComponent<ISqlEditorModeProps> = observer(function SQLCodeEditorPanel({ data }) {
   const notificationService = useService(NotificationService);
@@ -35,17 +38,34 @@ export const SQLCodeEditorPanel: TabContainerPanelComponent<ISqlEditorModeProps>
   const [editorRef, setEditorRef] = useState<IEditorRef | null>(null);
 
   const editor = useSQLCodeEditor(editorRef);
+  const sqlEditorSettingsService = useService(SqlEditorSettingsService);
 
   const panel = useSQLCodeEditorPanel(data, editor);
   const extensions = useCodemirrorExtensions(undefined, [ACTIVE_QUERY_EXTENSION, Prec.lowest(QUERY_STATUS_GUTTER_EXTENSION)]);
   const autocompletion = useSqlDialectAutocompletion(data);
   const sqlDialect = useSqlDialectExtension(data.dialect);
+  const highlightWhitespace = useHighlightWhitespace(sqlEditorSettingsService.highlightWhitespace);
+  const highlightTrailingWhitespace = useHighlightTrailingWhitespace(sqlEditorSettingsService.highlightWhitespace);
+  const highlightNewLine = useHighlightNewLine(sqlEditorSettingsService.highlightWhitespace);
 
   if (autocompletion) {
     extensions.set(...autocompletion);
   }
+
   if (sqlDialect) {
     extensions.set(...sqlDialect);
+  }
+
+  if (highlightWhitespace) {
+    extensions.set(...highlightWhitespace);
+  }
+
+  if (highlightTrailingWhitespace) {
+    extensions.set(...highlightTrailingWhitespace);
+  }
+
+  if (highlightNewLine) {
+    extensions.set(...highlightNewLine);
   }
 
   const dndBox = useDNDBox({
