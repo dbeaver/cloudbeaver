@@ -68,8 +68,18 @@ export const SubMenuElement = observer<ISubMenuElementProps>(function SubMenuEle
 
   const handler = subMenuData.handler;
 
-  // TODO: it's better to remove this expensive check to allow lazy loading of menu items
-  const hidden = getComputed(() => subMenuData.items.every(item => item.hidden) || handler?.isHidden?.(subMenuData.context));
+  // NOTE: some menus rely on lazy loading. When items are not loaded yet `items` may be empty,
+  // but the submenu still must be rendered to allow opening it and triggering loaders.
+  const hidden = getComputed(() => {
+    if (handler?.isHidden?.(subMenuData.context)) {
+      return true;
+    }
+
+    const hasVisibleItems = subMenuData.items.some(item => !item.hidden);
+    const canLazyLoadItems = subMenuData.loaders.length > 0;
+
+    return !hasVisibleItems && !canLazyLoadItems;
+  });
   const IconComponent = handler?.iconComponent?.() ?? subMenu.iconComponent?.();
   const extraProps = handler?.getExtraProps?.() ?? (subMenu.getExtraProps?.() as any);
   // TODO: fix, this triggers `Cannot update a component (`SubMenuElement`) while rendering a different component`
