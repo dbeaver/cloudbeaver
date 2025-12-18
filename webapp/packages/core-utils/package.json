@@ -31,10 +31,10 @@
     "tslib": "^2",
     "underscore": "^1",
     "uuid": "^13",
-    "vitest": "^3",
+    "vitest": "^4",
     "whatwg-mimetype": "^4",
     "zod": "^4",
-    "zod-validation-error": "^4"
+    "zod-validation-error": "^5"
   },
   "devDependencies": {
     "@cloudbeaver/core-cli": "workspace:*",
@@ -44,11 +44,11 @@
     "@dbeaver/react-tests": "workspace:*",
     "@types/md5": "^2",
     "@types/underscore": "^1",
-    "@types/uuid": "^10",
+    "@types/uuid": "^11",
     "@types/whatwg-mimetype": "^3",
     "rimraf": "^6",
     "typescript": "^5",
-    "vitest": "^3",
+    "vitest": "^4",
     "zod": "^4"
   }
 }

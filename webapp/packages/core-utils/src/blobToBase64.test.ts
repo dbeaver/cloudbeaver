@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vitest } from 'vitest';
 
 import { blobToBase64 } from './blobToBase64.js';
 import { mockFileReader } from './__mocks__/mockFileReader.js';
@@ -14,8 +14,7 @@ describe('blobToBase64', () => {
   it('converts blob to base64', async () => {
     const result = 'data:text/plain;base64,dGVzdA==';
     const blob = new Blob(['test'], { type: 'text/plain' });
-
-    mockFileReader(() => result);
+    vitest.spyOn(globalThis, 'FileReader').mockImplementationOnce(mockFileReader(() => result));
 
     const base64 = await blobToBase64(blob);
 
@@ -26,7 +25,7 @@ describe('blobToBase64', () => {
     const result = 'data:text/plain;base64,';
     const blob = new Blob(['']);
 
-    mockFileReader(() => result);
+    vitest.spyOn(globalThis, 'FileReader').mockImplementationOnce(mockFileReader(() => result));
 
     const base64 = await blobToBase64(blob);
 
@@ -37,7 +36,7 @@ describe('blobToBase64', () => {
     const result = 'data:application/octet-stream;base64,dGhpcyBpcyBhIHRlc3Qgd2l0aCA=';
     const blob = new Blob(['this is a test with longer text']);
 
-    mockFileReader(() => result);
+    vitest.spyOn(globalThis, 'FileReader').mockImplementationOnce(mockFileReader(() => result));
 
     const base64 = await blobToBase64(blob, 20);
 
