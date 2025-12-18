@@ -3,8 +3,8 @@ Bundle-ManifestVersion: 2
 Bundle-Vendor: DBeaver Corp
 Bundle-Name: CloudBeaver SLF4j Binding
 Bundle-SymbolicName: io.cloudbeaver.slf4j;singleton:=true
-Bundle-Version: 1.0.51.qualifier
-Bundle-Release-Date: 20251222
+Bundle-Version: 1.0.52.qualifier
+Bundle-Release-Date: 20260105
 Bundle-RequiredExecutionEnvironment: JavaSE-21
 Bundle-ActivationPolicy: lazy
 Fragment-Host: slf4j.api
