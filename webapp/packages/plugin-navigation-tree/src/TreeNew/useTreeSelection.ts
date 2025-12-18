@@ -5,35 +5,22 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { computed } from 'mobx';
+import { action } from 'mobx';
 import { useState } from 'react';
 
 import { useObjectRef, useObservableRef } from '@cloudbeaver/core-blocks';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
 import type { ITreeData } from './ITreeData.js';
+import type { INodeSelection, ITreeCheckboxSelection } from './ITreeSelection.js';
 
 export interface ITreeSelectionOptions {
-  onSelectionChange?: (selectedNodeIds: Record<string, INodeSelection>) => void;
+  onSelectionChange?: (selectedNodeIds: Record<string, INodeSelection>) => Promise<void> | void;
   multipleSelection?: boolean;
   expandOnSelect?: boolean;
-  selectChildren?: boolean;
-}
-
-export interface INodeSelection {
-  selected: boolean;
-  indeterminate: boolean;
 }
 
 type TreeSelectionState = MetadataMap<string, INodeSelection>;
-
-export interface ITreeSelection {
-  selectionState: Record<string, INodeSelection>;
-  getSelection(nodeId: string): INodeSelection;
-  select(nodeId: string, selected?: boolean): Promise<void>;
-  selectAll(): Promise<void>;
-  clear(): void;
-}
 
 function updateIndeterminateStates(treeData: ITreeData, selectionMap: TreeSelectionState, nodeId: string): void {
   let currentNodeId: string | null | undefined = nodeId;
@@ -47,7 +34,7 @@ function updateIndeterminateStates(treeData: ITreeData, selectionMap: TreeSelect
 function updateNodeIndeterminateState(treeData: ITreeData, selectionMap: TreeSelectionState, nodeId: string): void {
   const node = treeData.getNode(nodeId);
   const children = treeData.getUnfilteredChildren(nodeId);
-  const currentState = selectionMap.get(nodeId);
+  const currentState = selectionMap.get(nodeId) ?? { selected: false, indeterminate: false };
 
   if (node.leaf || children.length === 0) {
     if (currentState.indeterminate) {
@@ -60,7 +47,7 @@ function updateNodeIndeterminateState(treeData: ITreeData, selectionMap: TreeSel
   let indeterminateCount = 0;
 
   for (const childId of children) {
-    const childState = selectionMap.get(childId);
+    const childState = selectionMap.get(childId) ?? { selected: false, indeterminate: false };
     if (childState.selected) {
       selectedCount++;
     }
@@ -90,7 +77,7 @@ async function setSelectionWithLoad(
 ): Promise<string[]> {
   const nodes = [nodeId];
   const nodeState = treeData.getState(nodeId);
-  const currentSelectedState = selectionMap.get(nodeId);
+  const currentSelectedState = selectionMap.get(nodeId) ?? { selected: false, indeterminate: false };
 
   if (currentSelectedState.selected === shouldSelect && !currentSelectedState.indeterminate) {
     return nodes;
@@ -121,7 +108,7 @@ async function setSelectionWithLoad(
     } else if (!treeData.getNode(nodeId).leaf) {
       selectionMap.set(nodeId, { selected: false, indeterminate: false });
     }
-  } catch (error) {
+  } catch {
     treeData.updateState(nodeId, { expanded: false });
     selectionMap.set(nodeId, { selected: false, indeterminate: false });
     return nodes;
@@ -134,18 +121,29 @@ async function setSelectionWithLoad(
   return nodes;
 }
 
-export function useTreeSelection(treeData: ITreeData, options: ITreeSelectionOptions = {}): Readonly<ITreeSelection> {
+export function useTreeSelection(treeData: ITreeData, options: ITreeSelectionOptions = {}): Readonly<ITreeCheckboxSelection> {
   options = useObjectRef(options);
 
-  const [internalState] = useState(() => new MetadataMap<string, INodeSelection>(() => ({ selected: false, indeterminate: false })));
+  const [selectionState] = useState(() => new MetadataMap<string, INodeSelection>(() => ({ selected: false, indeterminate: false })));
 
   const treeSelection = useObservableRef(
     () => ({
-      get selectionState(): Record<string, INodeSelection> {
-        return Object.fromEntries(internalState.entries());
+      type: 'checkbox' as const,
+      selectionState,
+      getSelectedNodes(): string[] {
+        const selected: string[] = [];
+        for (const [id, state] of selectionState.entries()) {
+          if (state.selected) {
+            selected.push(id);
+          }
+        }
+        return selected;
+      },
+      isSelected(nodeId: string): boolean {
+        return selectionState.get(nodeId)?.selected ?? false;
       },
       getSelection(nodeId: string): INodeSelection {
-        return internalState.get(nodeId);
+        return selectionState.get(nodeId) ?? { selected: false, indeterminate: false };
       },
       async select(nodeId: string, selected?: boolean): Promise<void> {
         const currentState = this.getSelection(nodeId);
@@ -156,38 +154,39 @@ export function useTreeSelection(treeData: ITreeData, options: ITreeSelectionOpt
         }
 
         const node = treeData.getNode(nodeId);
-        const selectChildren = options.selectChildren ?? true;
 
-        if (node.leaf || !selectChildren) {
-          internalState.set(nodeId, { selected: shouldSelect, indeterminate: false });
+        if (node.leaf) {
+          selectionState.set(nodeId, { selected: shouldSelect, indeterminate: false });
         } else {
-          await setSelectionWithLoad(treeData, internalState, nodeId, shouldSelect, options.expandOnSelect);
+          await setSelectionWithLoad(treeData, selectionState, nodeId, shouldSelect, options.expandOnSelect);
         }
 
-        updateIndeterminateStates(treeData, internalState, nodeId);
+        updateIndeterminateStates(treeData, selectionState, nodeId);
 
-        options.onSelectionChange?.(this.selectionState);
+        await options.onSelectionChange?.(Object.fromEntries(selectionState.entries()));
       },
       async selectAll(): Promise<void> {
         if (!options.multipleSelection) {
           return;
         }
 
-        await setSelectionWithLoad(treeData, internalState, treeData.rootId, true, options.expandOnSelect);
+        await setSelectionWithLoad(treeData, selectionState, treeData.rootId, true, options.expandOnSelect);
 
-        options.onSelectionChange?.(this.selectionState);
+        await options.onSelectionChange?.(Object.fromEntries(selectionState.entries()));
       },
-      clear(): void {
-        internalState.clear();
+      async clear(): Promise<void> {
+        selectionState.clear();
 
-        options.onSelectionChange?.(this.selectionState);
+        await options.onSelectionChange?.(Object.fromEntries(selectionState.entries()));
       },
     }),
     {
-      selectionState: computed,
+      select: action.bound,
+      selectAll: action.bound,
+      clear: action.bound,
     },
     false,
-    ['select', 'selectAll', 'clear', 'getSelection'],
+    ['getSelection', 'getSelectedNodes', 'isSelected'],
   );
 
   return treeSelection;

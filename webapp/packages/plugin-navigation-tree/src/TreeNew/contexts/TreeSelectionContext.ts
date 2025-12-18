@@ -7,6 +7,6 @@
  */
 import { createContext } from 'react';
 
-import type { ITreeSelection } from '../useTreeSelection.js';
+import type { ITreeSelection } from '../ITreeSelection.js';
 
 export const TreeSelectionContext = createContext<ITreeSelection | undefined>(undefined);

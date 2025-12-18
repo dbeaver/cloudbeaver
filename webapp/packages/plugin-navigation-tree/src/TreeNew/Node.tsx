@@ -8,11 +8,11 @@
 import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
 
-import { EventTreeNodeSelectFlag, TreeNode } from '@cloudbeaver/core-blocks';
-import { EventContext } from '@cloudbeaver/core-events';
+import { TreeNode } from '@cloudbeaver/core-blocks';
 
 import { TreeContext } from './contexts/TreeContext.js';
 import { TreeDataContext } from './contexts/TreeDataContext.js';
+import { TreeSelectionContext } from './contexts/TreeSelectionContext.js';
 import type { NodeComponent } from './INodeRenderer.js';
 import { NodeControl } from './NodeControl.js';
 import { useNodeDnD } from './useNodeDnD.js';
@@ -20,8 +20,10 @@ import { useNodeDnD } from './useNodeDnD.js';
 export const Node: NodeComponent = observer(function Node({ nodeId, offsetHeight, controlRenderer, childrenRenderer }) {
   const tree = useContext(TreeContext)!;
   const data = useContext(TreeDataContext)!;
+  const selection = useContext(TreeSelectionContext);
 
-  const { expanded, selected } = data.getState(nodeId);
+  const { expanded, selected: stateSelected } = data.getState(nodeId);
+  const selected = selection ? selection.isSelected(nodeId) : stateSelected;
 
   const dndData = useNodeDnD(nodeId, () => {});
 
@@ -33,8 +35,16 @@ export const Node: NodeComponent = observer(function Node({ nodeId, offsetHeight
     return tree.expandNode(nodeId, !expanded);
   }
 
-  function handleSelect() {
-    tree.selectNode(nodeId, !selected);
+  function handleSelect(multiple?: boolean, nested?: boolean) {
+    if (selection) {
+      if (selection.type === 'click') {
+        selection.select(nodeId, multiple, nested);
+      } else {
+        selection.select(nodeId);
+      }
+    } else {
+      tree.selectNode(nodeId, !stateSelected);
+    }
   }
 
   function handleClick() {
@@ -44,21 +54,9 @@ export const Node: NodeComponent = observer(function Node({ nodeId, offsetHeight
   const ControlRenderer = controlRenderer || NodeControl;
   const ChildrenRenderer = childrenRenderer;
 
-  function handleControlClick(event: React.MouseEvent<HTMLDivElement>) {
-    EventContext.set(event, EventTreeNodeSelectFlag);
-    const isMultiSelect = event.ctrlKey || event.metaKey;
-
-    if (!isMultiSelect) {
-      data.clearSelection();
-    }
-
-    const { selected } = data.getState(nodeId);
-    tree.selectNode(nodeId, isMultiSelect ? !selected : true);
-  }
-
   return (
     <TreeNode selected={selected} expanded={expanded} onExpand={handleToggleExpand} onOpen={handleOpen} onSelect={handleSelect} onClick={handleClick}>
-      <ControlRenderer ref={dndData.setTargetRef} nodeId={nodeId} onClick={tree.enableClickSelection ? handleControlClick : undefined} />
+      <ControlRenderer ref={dndData.setTargetRef} nodeId={nodeId} />
       {expanded && <ChildrenRenderer nodeId={nodeId} offsetHeight={offsetHeight + tree.getNodeHeight(nodeId)} />}
     </TreeNode>
   );

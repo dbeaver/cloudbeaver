@@ -55,6 +55,8 @@ export * from './TreeNew/useTreeData.js';
 export * from './TreeNew/ITreeData.js';
 export * from './TreeNew/useTreeFilter.js';
 export * from './TreeNew/useTreeSelection.js';
+export * from './TreeNew/useTreeClickSelection.js';
+export * from './TreeNew/ITreeSelection.js';
 export * from './TreeNew/INode.js';
 export * from './TreeNew/NodeEmptyPlaceholderComponent.js';
 

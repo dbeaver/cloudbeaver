@@ -15,7 +15,7 @@ import { TreeDataContext } from './contexts/TreeDataContext.js';
 import type { NodeControlComponent } from './INodeRenderer.js';
 
 export const NodeControl: NodeControlComponent = observer(
-  forwardRef(function NodeControl({ nodeId, onClick }, ref) {
+  forwardRef(function NodeControl({ nodeId }, ref) {
     const data = useContext(TreeDataContext)!;
     const tree = useContext(TreeContext)!;
 
@@ -23,7 +23,7 @@ export const NodeControl: NodeControlComponent = observer(
     const height = tree.getNodeHeight(nodeId);
 
     return (
-      <TreeNodeControl ref={ref} style={{ height }} onClick={onClick}>
+      <TreeNodeControl ref={ref} style={{ height }}>
         <TreeNodeExpand leaf={node.leaf} />
         <TreeNodeIcon icon={node.icon} />
         <TreeNodeName title={node.tooltip ?? node.name}>{node.name}</TreeNodeName>

@@ -17,12 +17,12 @@ import { TreeSelectionContext } from './contexts/TreeSelectionContext.js';
 import { TreeVirtualizationContext } from './contexts/TreeVirtualizationContext.js';
 import type { INodeRenderer } from './INodeRenderer.js';
 import type { ITreeData } from './ITreeData.js';
+import type { ITreeSelection } from './ITreeSelection.js';
 import { NodeChildren } from './NodeChildren.js';
 import type { NodeEmptyPlaceholderComponent } from './NodeEmptyPlaceholderComponent.js';
 import { useNodeSizeCache } from './useNodeSizeCache.js';
 import { useTree } from './useTree.js';
 import { useTreeDnD } from './useTreeDnD.js';
-import type { ITreeSelection } from './useTreeSelection.js';
 import { useTreeVirtualization } from './useTreeVirtualization.js';
 import { TreeMenuContextProvider } from './contexts/TreeMenuContext/TreeMenuContextProvider.js';
 import type { ITreeMenu } from './useTreeMenu.js';
@@ -34,7 +34,6 @@ export interface NavigationTreeNewProps {
   nodeRenderers?: INodeRenderer[];
   emptyPlaceholder?: NodeEmptyPlaceholderComponent;
   className?: string;
-  enableClickSelection?: boolean;
   onNodeClick?(id: string): void | Promise<void>;
   onNodeDoubleClick?(id: string): void | Promise<void>;
   getNodeDnDContext?(id: string, context: IDataContext): void;
@@ -48,7 +47,6 @@ export const Tree = observer<NavigationTreeNewProps>(function Tree({
   nodeRenderers,
   emptyPlaceholder,
   className,
-  enableClickSelection,
   onNodeClick,
   onNodeDoubleClick,
   getNodeDnDContext,
@@ -60,7 +58,6 @@ export const Tree = observer<NavigationTreeNewProps>(function Tree({
     onNodeClick,
     onNodeDoubleClick,
     getNodeHeight,
-    enableClickSelection,
   });
   const mountOptimization = useTreeVirtualization();
   const elementsSizeCache = useNodeSizeCache(tree, data);

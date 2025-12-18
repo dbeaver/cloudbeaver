@@ -13,7 +13,6 @@ export interface INodeComponentBaseProps {
 
 export interface INodeControlBaseProps extends React.RefAttributes<HTMLDivElement> {
   nodeId: string;
-  onClick?: (event: React.MouseEvent<HTMLDivElement>) => void;
 }
 
 export type NodeControlComponent =

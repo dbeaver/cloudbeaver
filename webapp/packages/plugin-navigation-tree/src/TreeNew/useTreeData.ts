@@ -112,12 +112,6 @@ export function useTreeData(options: IOptions): ITreeData {
       updateAllState(state: Partial<INodeState>) {
         this.state.updateAllState(state);
       },
-      clearSelection() {
-        this.state.updateAllState({ selected: false });
-      },
-      getSelectedNodes(): string[] {
-        return this.state.getSelectedNodes();
-      },
       async load(nodeId: string, manual: boolean) {
         await options.load(nodeId, manual);
       },
