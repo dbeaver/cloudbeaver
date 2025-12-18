@@ -303,6 +303,13 @@ type WSServerNotificationEvent implements CBServerEvent @since(version: "25.2.1"
     notificationType: WSServerNotificationEventType!
 }
 
+"Event for opening URL in client application"
+type WSOpenUrlEvent implements CBServerEvent @since(version: "25.3.1") {
+    id: CBServerEventId!
+    topicId: CBEventTopic!
+    url: String!
+}
+
 type WSSessionTaskConfirmationRequestEvent implements CBServerEvent @since(version: "25.2.2") {
     id: CBServerEventId!
     topicId: CBEventTopic!

@@ -166,7 +166,7 @@ public class CBSessionManager implements WebAppSessionManager {
 
         validateSessionIp(request, webSession);
 
-        webSession.updateOrigin(ServletAppUtils.getOriginFromRequest(request));
+        webSession.updateClientOrigin(ServletAppUtils.getOriginFromRequest(request));
 
         return webSession;
     }
