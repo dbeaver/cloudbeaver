@@ -9,4 +9,5 @@ import { createAction } from '@cloudbeaver/core-view';
 
 export const ACTION_DATA_GRID_UNPIN_COLUMN = createAction('data-grid-unpin-column', {
   label: 'plugin_data_spreadsheet_new_unpin_column',
+  icon: 'unpin-column',
 });
