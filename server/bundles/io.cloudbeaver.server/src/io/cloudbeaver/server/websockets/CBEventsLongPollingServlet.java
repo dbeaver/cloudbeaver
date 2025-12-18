@@ -31,6 +31,7 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.security.exception.SMAccessTokenExpiredException;
+import org.jkiss.dbeaver.model.security.exception.SMException;
 import org.jkiss.dbeaver.model.websocket.WSConstants;
 import org.jkiss.dbeaver.model.websocket.WSUtils;
 import org.jkiss.dbeaver.model.websocket.event.WSEvent;
@@ -177,15 +178,14 @@ public class CBEventsLongPollingServlet extends HttpServlet {
             );
 
             return ws;
-        } catch (SecurityException e) {
-            if (TOKEN_EXPIRED.equals(e.getMessage())) {
-                log.debug("LP request rejected: access token expired");
-            } else {
-                log.warn("LP session resolve failed", e);
-            }
+        } catch (SMException e) {
+            log.debug("LP request rejected: access token expired");
             sendError(resp, HttpConstants.CODE_TOKEN_EXPIRED, e.getMessage());
-            return null;
+        } catch (SecurityException e) {
+            log.warn("LP session resolve failed", e);
+            sendError(resp, HttpConstants.CODE_UNAUTHORIZED, e.getMessage());
         }
+        return null;
     }
 
     private void addCorsHeaders(@NotNull HttpServletRequest req, @NotNull HttpServletResponse resp) {
@@ -207,7 +207,7 @@ public class CBEventsLongPollingServlet extends HttpServlet {
     }
 
     @Nullable
-    protected BaseWebSession resolveSession(@NotNull HttpServletRequest req) {
+    protected BaseWebSession resolveSession(@NotNull HttpServletRequest req) throws SMException {
         for (SessionResolver r : resolvers) {
             BaseWebSession s = r.resolve(req);
             if (s != null) {
@@ -281,7 +281,7 @@ public class CBEventsLongPollingServlet extends HttpServlet {
          * @return session or null if resolver is not applicable
          */
         @Nullable
-        BaseWebSession resolve(@NotNull HttpServletRequest req) throws SecurityException;
+        BaseWebSession resolve(@NotNull HttpServletRequest req) throws SMException;
     }
 
     public static class CookieSessionResolver implements SessionResolver {
@@ -309,7 +309,7 @@ public class CBEventsLongPollingServlet extends HttpServlet {
 
         @Nullable
         @Override
-        public BaseWebSession resolve(@NotNull HttpServletRequest req) throws SecurityException {
+        public BaseWebSession resolve(@NotNull HttpServletRequest req) throws SMException {
 
             String sid = req.getHeader(WSConstants.WS_SESSION_HEADER);
             String token = req.getHeader(WSConstants.WS_AUTH_HEADER);
@@ -326,8 +326,7 @@ public class CBEventsLongPollingServlet extends HttpServlet {
                 return sm.getHeadlessSession(token, info, true);
 
             } catch (SMAccessTokenExpiredException te) {
-                // Message is used as protocol marker for client-side handling
-                throw new SecurityException(TOKEN_EXPIRED);
+                throw te;
             } catch (Exception e) {
                 log.warn("Failed to resolve headless session", e);
                 return null;
