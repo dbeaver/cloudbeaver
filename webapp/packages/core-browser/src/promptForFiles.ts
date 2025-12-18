@@ -31,9 +31,16 @@ export function promptForFiles({ multiple = false, accept }: { multiple?: boolea
 
     let settled = false;
 
+    const SAFETY_TIMEOUT_MS = 10 * 60 * 1000;
+    const safetyTimeoutId = setTimeout(() => {
+      if (!settled) {
+        settleErr(new Error('File selection timed out'));
+      }
+    }, SAFETY_TIMEOUT_MS);
+
     function cleanup() {
-      window.removeEventListener('focus', onWindowFocus, true);
-      document.removeEventListener('visibilitychange', onVisibilityChange, true);
+      window.clearTimeout(safetyTimeoutId);
+
       if (input.isConnected) {
         document.body.removeChild(input);
       }
@@ -63,25 +70,9 @@ export function promptForFiles({ multiple = false, accept }: { multiple?: boolea
       }
     });
 
-    function afterPickerClosedCheck() {
-      setTimeout(() => {
-        if (!settled) {
-          settleErr(new Error('No files selected'));
-        }
-      }, 1000);
-    }
-
-    function onWindowFocus() {
-      afterPickerClosedCheck();
-    }
-    function onVisibilityChange() {
-      if (document.visibilityState === 'visible') {
-        afterPickerClosedCheck();
-      }
-    }
-
-    window.addEventListener('focus', onWindowFocus, true);
-    document.addEventListener('visibilitychange', onVisibilityChange, true);
+    input.addEventListener('cancel', () => {
+      settleOk([]);
+    });
 
     document.body.appendChild(input);
 
@@ -90,12 +81,5 @@ export function promptForFiles({ multiple = false, accept }: { multiple?: boolea
     } catch (err) {
       settleErr(err instanceof Error ? err : new Error('File dialog blocked'));
     }
-
-    const SAFETY_TIMEOUT_MS = 10 * 60 * 1000;
-    setTimeout(() => {
-      if (!settled) {
-        settleErr(new Error('File selection timed out'));
-      }
-    }, SAFETY_TIMEOUT_MS);
   });
 }

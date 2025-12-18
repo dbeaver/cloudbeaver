@@ -102,7 +102,7 @@ export function useValuePanelImageValue({ model, resultIndex }: Props) {
           return this.contentAction.isDownloadable(this.cellHolder);
         }
 
-        return this.staticSrc && !this.truncated;
+        return !!this.staticSrc && !this.truncated;
       },
       get canUpload() {
         if (!this.cellHolder) {
@@ -115,7 +115,7 @@ export function useValuePanelImageValue({ model, resultIndex }: Props) {
           return false;
         }
 
-        return this.cellHolder && this.contentAction.isBlobTruncated(this.cellHolder);
+        return !!this.cellHolder && this.contentAction.isBlobTruncated(this.cellHolder);
       },
       async download() {
         try {
@@ -134,13 +134,17 @@ export function useValuePanelImageValue({ model, resultIndex }: Props) {
           this.notificationService.logException(exception, 'data_viewer_presentation_value_content_download_error');
         }
       },
-      upload() {
-        promptForFiles().then(files => {
+      async upload() {
+        try {
+          const files = await promptForFiles();
           const file = files?.[0];
+
           if (file && this.selectedCell) {
             this.editAction.set(this.selectedCell, createResultSetBlobValue(file));
           }
-        });
+        } catch (exception: any) {
+          this.notificationService.logException(exception, 'ui_upload_file_fail');
+        }
       },
       async loadFullImage() {
         if (!this.selectedCell) {
