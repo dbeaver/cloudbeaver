@@ -25,6 +25,7 @@ import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
+import org.jkiss.dbeaver.model.DBPObjectSettingsManager;
 import org.jkiss.dbeaver.model.DBPObjectSettingsProvider;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistryCache;
@@ -48,6 +49,7 @@ public class WebSessionProjectImpl extends WebProjectImpl implements DBPObjectSe
     private static final Log log = Log.getLog(WebSessionProjectImpl.class);
     protected final WebSession webSession;
     private final Map<String, WebConnectionInfo> connections = new HashMap<>();
+    private final DBPObjectSettingsManager projectSettingsManager = new DBPObjectSettingsManager();
     private Map<String, Map<String, String>> projectSettings;
     private boolean registryIsLoaded = false;
     private final Object lock = new Object();
@@ -99,6 +101,24 @@ public class WebSessionProjectImpl extends WebProjectImpl implements DBPObjectSe
         return projectSettings.get(objectId);
     }
 
+    @Override
+    public void setObjectSettings(@NotNull String objectId, @NotNull Map<String, String> settings) throws DBException {
+        if (webSession.getUserContext().isNonAnonymousUserAuthorizedInSM()) {
+            webSession.getSecurityController().setObjectSettings(
+                getId(),
+                objectId,
+                SMObjectType.datasource,
+                new LinkedHashMap<>(settings)
+            );
+        }
+        setObjectSettingsCache(objectId, settings);
+    }
+
+    @Override
+    public DBPObjectSettingsManager getObjectSettingsManager() {
+        return projectSettingsManager;
+    }
+
     private void loadProjectSettings() {
         try {
             refreshProjectSettings();
@@ -109,12 +129,6 @@ public class WebSessionProjectImpl extends WebProjectImpl implements DBPObjectSe
     }
 
     public void deleteObjectSettings(@NotNull String objectId, @NotNull List<String> settingIds) throws DBException {
-        webSession.getSecurityController().deleteObjectSettings(
-            getId(),
-            objectId,
-            SMObjectType.datasource,
-            new LinkedHashSet<>(settingIds)
-        );
         for (String settingId : settingIds) {
             Map<String, String> settings = projectSettings.get(objectId);
             if (settings != null) {
@@ -123,16 +137,11 @@ public class WebSessionProjectImpl extends WebProjectImpl implements DBPObjectSe
         }
     }
 
-    public void setObjectSettings(@NotNull String objectId, Map<String, Object> settingsToSet) throws DBException {
-        webSession.getSecurityController().setObjectSettings(
-            getId(),
-            objectId,
-            SMObjectType.datasource,
-            settingsToSet
-        );
+    public void setObjectSettingsCache(@NotNull String objectId, Map<String, String> settingsToSet) throws DBException {
         Map<String, String> settings = projectSettings.computeIfAbsent(objectId, k -> new HashMap<>());
-        for (Map.Entry<String, Object> entry : settingsToSet.entrySet()) {
+        for (Map.Entry<String, String> entry : settingsToSet.entrySet()) {
             settings.put(entry.getKey(), CommonUtils.toString(entry.getValue()));
+            this.projectSettingsManager.notifySettingsChanged(objectId, List.of(entry.getKey()));
         }
     }
 

@@ -54,6 +54,7 @@ import org.jkiss.dbeaver.model.security.exception.SMException;
 import org.jkiss.dbeaver.model.security.exception.SMRefreshTokenExpiredException;
 import org.jkiss.dbeaver.model.security.user.*;
 import org.jkiss.dbeaver.model.sql.SQLUtils;
+import org.jkiss.dbeaver.model.websocket.event.WSObjectSettingsEvent;
 import org.jkiss.dbeaver.model.websocket.event.WSUserCloseSessionsEvent;
 import org.jkiss.dbeaver.model.websocket.event.WSUserDeletedEvent;
 import org.jkiss.dbeaver.model.websocket.event.WSUserDisabledEvent;
@@ -138,6 +139,15 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         } catch (SQLException e) {
             throw new DBCException("Error while adding object settings", e);
         }
+        application.getEventController().addEvent(
+            WSObjectSettingsEvent.update(
+                getSmSessionId(),
+                userId,
+                objectType,
+                projectId,
+                objectId,
+                settings.keySet()
+            ));
     }
 
     @NotNull
@@ -215,6 +225,17 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
             }
         } catch (SQLException e) {
             throw new DBCException("Error while deleting object settings", e);
+        }
+        if (settingIds != null) {
+            application.getEventController().addEvent(
+                WSObjectSettingsEvent.delete(
+                    getSmSessionId(),
+                    userId,
+                    objectType,
+                    projectId,
+                    objectId,
+                    settingIds
+                ));
         }
     }
 

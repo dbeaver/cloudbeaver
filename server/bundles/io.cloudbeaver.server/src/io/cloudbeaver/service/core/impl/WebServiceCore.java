@@ -730,17 +730,7 @@ public class WebServiceCore implements DBWServiceCore {
         WebConnectionInfo connectionInfo = WebDataSourceUtils.getWebConnectionInfo(webSession, projectId, id);
         DataSourceDescriptor dataSourceDescriptor = ((DataSourceDescriptor) connectionInfo.getDataSourceContainer());
         try {
-            if (webSession.getUserContext().isNonAnonymousUserAuthorizedInSM()) {
-                String serialized = DataSourceNavigatorSettingsUtils.serializeSettingsToJson(settings);
-                // save in sm database for authenticated users
-                webSession.getSecurityController().setObjectSettings(
-                    connectionInfo.getProjectId(),
-                    connectionInfo.getId(),
-                    SMObjectType.datasource,
-                    Map.of(DataSourceNavigatorSettingsUtils.PARAM_ID_NAVIGATOR_SETTINGS, serialized)
-                );
-            }
-            dataSourceDescriptor.setCustomNavigatorSettings(settings);
+            DataSourceNavigatorSettingsUtils.updateCustomNavigatorSettings(dataSourceDescriptor, settings);
         } catch (DBException e) {
             throw new DBWebException("Error saving custom navigator settings", e);
         }
@@ -757,7 +747,6 @@ public class WebServiceCore implements DBWServiceCore {
         DataSourceDescriptor dataSourceDescriptor = ((DataSourceDescriptor) connectionInfo.getDataSourceContainer());
         try {
             if (webSession.isAuthorizedInSecurityManager()) {
-                DataSourceNavigatorSettings customSettings = dataSourceDescriptor.getNavigatorSettings();
                 // save in sm database for authenticated users
                 webSession.getSecurityController().deleteObjectSettings(
                     connectionInfo.getProjectId(),
