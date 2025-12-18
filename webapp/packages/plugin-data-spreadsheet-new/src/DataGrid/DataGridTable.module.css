@@ -6,9 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 .container {
-  --data-grid-edited-color: var(--theme-edit-status);
-  --data-grid-added-color: var(--theme-add-status);
-  --data-grid-deleted-color: var(--theme-delete-status);
+  --data-grid-edited-color: rgba(255, 153, 0, 0.3);
+  --data-grid-added-color: rgba(145, 255, 0, 0.3);
+  --data-grid-deleted-color: rgba(255, 51, 0, 0.3);
   --data-grid-order-button-unordered: #c4c4c4;
   --data-grid-readonly-status-color: #e28835;
   --data-grid-cell-selection-background-color: rgba(150, 150, 150, 0.2);
