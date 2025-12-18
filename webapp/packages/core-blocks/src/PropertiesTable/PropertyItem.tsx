@@ -23,14 +23,24 @@ interface Props {
   onNameChange: (staticId: string, newId: string) => void;
   onValueChange: (staticId: string, value: string | null) => void;
   onRemove: (staticId: string) => void;
+  removable?: boolean;
   error?: boolean;
   readOnly?: boolean;
 }
 
-export const PropertyItem = observer<Props>(function PropertyItem({ property, value, onNameChange, onValueChange, onRemove, error, readOnly }) {
+export const PropertyItem = observer<Props>(function PropertyItem({
+  property,
+  value,
+  onNameChange,
+  onValueChange,
+  onRemove,
+  error,
+  removable,
+  readOnly,
+}) {
   const styles = useS(classes);
   const translate = useTranslate();
-  const isDeletable = !readOnly && !property.displayName;
+  const isDeletable = !readOnly && !property.displayName && removable;
   const edited = value !== undefined && value !== property.defaultValue;
   const keyInputRef = useRef<HTMLInputElement>(null);
 
