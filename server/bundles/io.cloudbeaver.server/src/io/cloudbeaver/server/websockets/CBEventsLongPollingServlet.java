@@ -183,7 +183,7 @@ public class CBEventsLongPollingServlet extends HttpServlet {
             } else {
                 log.warn("LP session resolve failed", e);
             }
-            sendError(resp, HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
+            sendError(resp, HttpConstants.CODE_TOKEN_EXPIRED, e.getMessage());
             return null;
         }
     }
