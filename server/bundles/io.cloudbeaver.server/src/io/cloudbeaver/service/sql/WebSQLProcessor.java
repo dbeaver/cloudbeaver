@@ -25,6 +25,8 @@ import io.cloudbeaver.model.session.WebSessionProvider;
 import io.cloudbeaver.server.WebAppUtils;
 import io.cloudbeaver.server.jobs.SqlOutputLogReaderJob;
 import io.cloudbeaver.service.sql.messages.WebSQLMessages;
+import io.cloudbeaver.websocket.event.task.WSSessionTaskConfirmationRequestEvent;
+import io.cloudbeaver.websocket.event.task.WSSessionTaskQueryConfirmationRequestEvent;
 import org.eclipse.jface.text.Document;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
@@ -53,8 +55,6 @@ import org.jkiss.dbeaver.model.sql.parser.SQLScriptParser;
 import org.jkiss.dbeaver.model.struct.*;
 import org.jkiss.dbeaver.model.websocket.event.WSEvent;
 import org.jkiss.dbeaver.model.websocket.event.WSTransactionalCountEvent;
-import org.jkiss.dbeaver.model.websocket.event.session.WSSessionTaskConfirmationRequestEvent;
-import org.jkiss.dbeaver.model.websocket.event.session.WSSessionTaskQueryConfirmationRequestEvent;
 import org.jkiss.dbeaver.registry.confirmation.ConfirmationConstants;
 import org.jkiss.dbeaver.registry.confirmation.ConfirmationDescriptor;
 import org.jkiss.dbeaver.registry.confirmation.ConfirmationRegistry;
@@ -69,8 +69,6 @@ import java.nio.file.Path;
 import java.text.MessageFormat;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -189,7 +187,9 @@ public class WebSQLProcessor implements WebSessionProvider {
         long startTime = System.currentTimeMillis();
         WebSQLExecuteInfo executeInfo = new WebSQLExecuteInfo();
 
-        var dataContainer = new WebSQLQueryDataContainer(connection.getDataSource(), syntaxManager, sql);
+        WebSQLParametersProvider parametersProvider = new WebSQLParametersProvider(webSession, asyncTask);
+
+        var dataContainer = new WebSQLQueryDataContainer(connection.getDataSource(), syntaxManager, sql, parametersProvider);
 
         DBCExecutionContext context = getExecutionContext(dataContainer);
 
@@ -228,8 +228,13 @@ public class WebSQLProcessor implements WebSessionProvider {
                 }
             }
             if (element instanceof SQLQuery mainQuery) {
+
                 if (useEvents) {
-                    boolean isConfirmed = confirmQueryIfNeeded(mainQuery.getScriptElements(), asyncTask, isGenerated);
+                    // fill query with parameters
+                    mainQuery.setParameters(SQLScriptParser.parseParametersAndVariables(parserContext, 0, mainQuery.getLength()));
+                    boolean isConfirmed =
+                        dataContainer.getScriptContext().fillQueryParameters(mainQuery, () -> null, true) &&
+                            confirmDangerousQueryIfNeeded(mainQuery.getScriptElements(), asyncTask, isGenerated);
                     if (!isConfirmed) {
                         throw new DBWebException("Query execution was cancelled by user");
                     }
@@ -1260,7 +1265,7 @@ public class WebSQLProcessor implements WebSessionProvider {
         return convertInputCellValue(dbcSession, allAttributes, cellRow, withoutExecution);
     }
 
-    private boolean confirmQueryIfNeeded(
+    private boolean confirmDangerousQueryIfNeeded(
         @NotNull List<SQLScriptElement> scriptElements,
         @NotNull WebAsyncTaskInfo asyncTask,
         boolean isGenerated
@@ -1323,31 +1328,9 @@ public class WebSQLProcessor implements WebSessionProvider {
         if (!hasGeneratedUpdates && !hasDangerousUpdates && !hasDropStatement) {
             return true;
         } else {
-            return requestConfirmation(asyncTask, queryPreview, title, message);
-        }
-    }
-
-    private boolean requestConfirmation(
-        @NotNull WebAsyncTaskInfo asyncTask,
-        @Nullable String query,
-        @NotNull String title,
-        @NotNull String message
-    ) throws DBWebException {
-        String attributeName = WebSQLConstants.TASK_CONFIRMATION_ATTR_PREFIX + asyncTask.getId();
-        CompletableFuture<Boolean> confirmationFuture = new CompletableFuture<>();
-        webSession.setAttribute(attributeName, confirmationFuture);
-
-        webSession.addSessionEvent(createConfirmationEvent(asyncTask, query, title, message));
-
-        try {
-            Boolean isConfirmed = confirmationFuture.get(WebSQLConstants.TASK_CONFIRMATION_TIMEOUT_SECONDS, TimeUnit.SECONDS);
-            return isConfirmed != null && isConfirmed;
-        } catch (TimeoutException e) {
-            throw new DBWebException("Query confirmation timeout");
-        } catch (Exception e) {
-            throw new DBWebException("Error when processing confirmation response", e);
-        } finally {
-            webSession.removeAttribute(attributeName);
+            WSEvent confirmationEvent = createConfirmationEvent(asyncTask, queryPreview, title, message);
+            CompletableFuture<Boolean> confirmationFuture = new CompletableFuture<>();
+            return CommonUtils.toBoolean(WebSQLUtils.requestConfirmation(webSession, asyncTask, confirmationEvent, confirmationFuture));
         }
     }
 
