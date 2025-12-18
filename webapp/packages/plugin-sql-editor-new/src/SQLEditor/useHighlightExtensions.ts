@@ -12,21 +12,16 @@ import type { Compartment, Extension } from '@cloudbeaver/plugin-codemirror6';
 
 const codemirrorPluginLoader = createLazyLoader(() => import('@cloudbeaver/plugin-codemirror6'));
 
-export function useHighlightTrailingWhitespace(enabled: boolean): [Compartment, Extension] | null {
+export function useHighlightExtensions(enabled: boolean): [Compartment, Extension][] | null {
   const codemirror = useLazyImport(codemirrorPluginLoader);
 
-  const HIGHLIGHT_TRAILING_SPACE_COMPARTMENT = useMemo(() => {
-    if (!codemirror) {
-      return null;
-    }
-    return new codemirror.Compartment();
-  }, [codemirror]);
-
   return useMemo(() => {
-    if (!codemirror || !HIGHLIGHT_TRAILING_SPACE_COMPARTMENT || !enabled) {
+    if (!codemirror || !enabled) {
       return null;
     }
 
-    return [HIGHLIGHT_TRAILING_SPACE_COMPARTMENT, codemirror.highlightTrailingWhitespace()];
-  }, [HIGHLIGHT_TRAILING_SPACE_COMPARTMENT, codemirror, enabled]);
+    const extensions = [codemirror.highlightWhitespace, codemirror.highlightTrailingWhitespace, codemirror.highlightNewLine];
+
+    return extensions.map(extension => [new codemirror.Compartment(), extension()] as [Compartment, Extension]);
+  }, [codemirror, enabled]);
 }

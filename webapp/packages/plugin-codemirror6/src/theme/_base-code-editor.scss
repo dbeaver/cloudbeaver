@@ -32,9 +32,14 @@
   }
 
   .editor .cm-newline {
-    @include mdc-theme-prop(color, primary, false);
+    color: var(--theme-text-hint-on-light);
     margin-left: 4px;
     cursor: default;
+  }
+
+  .editor .cm-highlightSpace {
+    background-image: radial-gradient(circle at 50% 55%, var(--theme-text-hint-on-light) 15%, transparent 5%);
+    background-position: center;
   }
 
   .editor {

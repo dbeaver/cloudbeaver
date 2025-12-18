@@ -20,14 +20,12 @@ import { ACTIVE_QUERY_EXTENSION } from '../ACTIVE_QUERY_EXTENSION.js';
 import { QUERY_STATUS_GUTTER_EXTENSION } from '../QUERY_STATUS_GUTTER_EXTENSION.js';
 import { SQLCodeEditorLoader } from '../SQLCodeEditor/SQLCodeEditorLoader.js';
 import { useSQLCodeEditor } from '../SQLCodeEditor/useSQLCodeEditor.js';
-import { useHighlightWhitespace } from '../useHighlightWhitespace.js';
+import { useHighlightExtensions } from '../useHighlightExtensions.js';
 import { useSqlDialectAutocompletion } from '../useSqlDialectAutocompletion.js';
 import { useSqlDialectExtension } from '../useSqlDialectExtension.js';
 import style from './SQLCodeEditorPanel.module.css';
 import { SqlEditorInfoBar } from './SqlEditorInfoBar.js';
 import { useSQLCodeEditorPanel } from './useSQLCodeEditorPanel.js';
-import { useHighlightTrailingWhitespace } from '../useHighlightTrailingWhitespace.js';
-import { useHighlightNewLine } from '../useHighlightNewLine.js';
 
 export const SQLCodeEditorPanel: TabContainerPanelComponent<ISqlEditorModeProps> = observer(function SQLCodeEditorPanel({ data }) {
   const notificationService = useService(NotificationService);
@@ -44,9 +42,7 @@ export const SQLCodeEditorPanel: TabContainerPanelComponent<ISqlEditorModeProps>
   const extensions = useCodemirrorExtensions(undefined, [ACTIVE_QUERY_EXTENSION, Prec.lowest(QUERY_STATUS_GUTTER_EXTENSION)]);
   const autocompletion = useSqlDialectAutocompletion(data);
   const sqlDialect = useSqlDialectExtension(data.dialect);
-  const highlightWhitespace = useHighlightWhitespace(sqlEditorSettingsService.highlightWhitespace);
-  const highlightTrailingWhitespace = useHighlightTrailingWhitespace(sqlEditorSettingsService.highlightWhitespace);
-  const highlightNewLine = useHighlightNewLine(sqlEditorSettingsService.highlightWhitespace);
+  const highlightExtensions = useHighlightExtensions(sqlEditorSettingsService.highlightWhitespace);
 
   if (autocompletion) {
     extensions.set(...autocompletion);
@@ -56,16 +52,10 @@ export const SQLCodeEditorPanel: TabContainerPanelComponent<ISqlEditorModeProps>
     extensions.set(...sqlDialect);
   }
 
-  if (highlightWhitespace) {
-    extensions.set(...highlightWhitespace);
-  }
-
-  if (highlightTrailingWhitespace) {
-    extensions.set(...highlightTrailingWhitespace);
-  }
-
-  if (highlightNewLine) {
-    extensions.set(...highlightNewLine);
+  if (highlightExtensions) {
+    highlightExtensions.forEach(extension => {
+      extensions.set(...extension);
+    });
   }
 
   const dndBox = useDNDBox({
