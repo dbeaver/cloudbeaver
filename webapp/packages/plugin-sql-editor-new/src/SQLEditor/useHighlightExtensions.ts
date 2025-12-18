@@ -20,8 +20,12 @@ export function useHighlightExtensions(enabled: boolean): [Compartment, Extensio
       return null;
     }
 
-    const extensions = [codemirror.highlightWhitespace, codemirror.highlightTrailingWhitespace, codemirror.highlightNewLine];
+    const extensions = [
+      codemirror.highlightWhitespace(), 
+      codemirror.highlightTrailingWhitespace(), 
+      codemirror.highlightNewLine(), 
+    ];
 
-    return extensions.map(extension => [new codemirror.Compartment(), extension()] as [Compartment, Extension]);
+    return extensions.map(extension => [new codemirror.Compartment(), extension] as [Compartment, Extension]);
   }, [codemirror, enabled]);
 }
