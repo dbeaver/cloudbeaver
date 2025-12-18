@@ -15,9 +15,7 @@ export interface INodeControlBaseProps extends React.RefAttributes<HTMLDivElemen
   nodeId: string;
 }
 
-export type NodeControlComponent =
-  | React.MemoExoticComponent<React.ForwardRefExoticComponent<React.PropsWithoutRef<INodeControlBaseProps> & React.RefAttributes<HTMLDivElement>>>
-  | React.ForwardRefExoticComponent<React.PropsWithoutRef<INodeControlBaseProps> & React.RefAttributes<HTMLDivElement>>;
+export type NodeControlComponent = React.ComponentType<React.PropsWithoutRef<INodeControlBaseProps> & React.RefAttributes<HTMLDivElement>>;
 
 export interface INodeComponentProps extends INodeComponentBaseProps {
   childrenRenderer: React.FC<INodeComponentBaseProps>;
