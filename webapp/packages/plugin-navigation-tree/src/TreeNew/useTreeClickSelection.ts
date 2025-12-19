@@ -29,7 +29,9 @@ function collectVisibleNodes(treeData: ITreeData, nodeId: string): string[] {
     const state = treeData.getState(current);
     if (state.expanded) {
       const children = treeData.getChildren(current);
-      stack.push(...[...children].reverse());
+      for (let i = children.length - 1; i >= 0; i--) {
+        stack.push(children[i]!);
+      }
     }
   }
 
