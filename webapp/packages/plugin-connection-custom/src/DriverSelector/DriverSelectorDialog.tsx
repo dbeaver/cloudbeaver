@@ -34,12 +34,11 @@ export const DriverSelectorDialog: DialogComponent<Payload> = observer(function 
   return (
     <CommonDialogWrapper
       size="large"
-      autoFocusOnHide={element => {
-        if (!element) {
-          const finalFocus = document.getElementById('slide-panel-close-button');
-          finalFocus?.focus();
-        }
-        return true;
+      autoFocusOnHide={() => {
+        const finalFocus = document.getElementById('slide-panel-close-button');
+        finalFocus?.focus();
+
+        return false;
       }}
       fixedSize
     >
