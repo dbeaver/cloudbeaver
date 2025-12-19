@@ -34,7 +34,7 @@
     "@types/ws": "^8",
     "rimraf": "^6",
     "typescript": "^5",
-    "vitest": "^3",
+    "vitest": "^4",
     "ws": "^8"
   }
 }
