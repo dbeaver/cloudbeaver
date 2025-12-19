@@ -8,7 +8,7 @@ enum AdminSubjectType {
 
 "Information about connection access rights for a subject (user or team)"
 type AdminConnectionGrantInfo {
-    "Connection identifier (deprecated, use dataSourceId instead)"
+    "Connection identifier"
     connectionId: ID! @deprecated(reason: "use dataSourceId instead")
     "Data source (connection) identifier"
     dataSourceId: ID!
@@ -181,7 +181,7 @@ type WebFeatureSet {
 input ServerConfigInput {
     "Server display name"
     serverName: String
-    "Server base URL (deprecated)"
+    "Server base URL"
     serverURL: String @deprecated
 
     "Default administrator name"
@@ -191,7 +191,7 @@ input ServerConfigInput {
 
     "Whether anonymous access is enabled"
     anonymousAccessEnabled: Boolean
-    "Whether authentication is enabled (deprecated)"
+    "Whether authentication is enabled"
     authenticationEnabled: Boolean @deprecated
     "Whether private connections can be created"
     customConnectionsEnabled: Boolean
