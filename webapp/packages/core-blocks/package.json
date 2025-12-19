@@ -42,7 +42,7 @@
     "mobx-react-lite": "^4",
     "react": "^19",
     "react-dom": "^19",
-    "react-hotkeys-hook": "^5",
+    "react-hotkeys-hook": "5.1.0",
     "react-minisearch": "^7",
     "reakit": "^1",
     "reakit-utils": "^0",
@@ -69,6 +69,6 @@
     "rimraf": "^6",
     "typescript": "^5",
     "typescript-plugin-css-modules": "^5",
-    "vitest": "^3"
+    "vitest": "^4"
   }
 }
