@@ -54,7 +54,6 @@ public class CBEventsLongPollingServlet extends HttpServlet {
     private static final String PING = WSUtils.clientGson.toJson(new WSSessionPingClientEvent("cb_session"));
     private static final int POLL_TIMEOUT_SEC = 25;
     private static final int SESSION_IDLE_TIMEOUT_SEC = 60;
-    public static final String TOKEN_EXPIRED = "token_expired";
 
     private volatile boolean running = false;
     private final Map<String, CBEventsLongPolling> sessions = new ConcurrentHashMap<>();
