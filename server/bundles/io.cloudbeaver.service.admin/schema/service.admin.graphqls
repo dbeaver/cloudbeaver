@@ -197,7 +197,7 @@ input ServerConfigInput {
     customConnectionsEnabled: Boolean
     "Whether saving public credentials is allowed"
     publicCredentialsSaveEnabled: Boolean
-    "Whether saving credentials by admin is allowed"
+    "Whether saving credentials is allowed"
     adminCredentialsSaveEnabled: Boolean
     "Whether the resource manager is enabled"
     resourceManagerEnabled: Boolean
