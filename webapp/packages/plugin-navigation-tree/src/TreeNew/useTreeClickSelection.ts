@@ -70,7 +70,7 @@ export function useTreeClickSelection(treeData: ITreeData, options: ITreeClickSe
       async select(nodeId: string, multiple = false, range = false): Promise<void> {
         if (range && this.lastSelectedNode) {
           if (!multiple) {
-            this.clear();
+            selectionState.clear();
           }
           const nodesInRange = getNodesInRange(treeData, this.lastSelectedNode, nodeId);
           for (const id of nodesInRange) {
@@ -80,7 +80,7 @@ export function useTreeClickSelection(treeData: ITreeData, options: ITreeClickSe
           const currentState = this.getSelection(nodeId);
           selectionState.set(nodeId, { selected: !currentState.selected, indeterminate: false });
         } else {
-          this.clear();
+          selectionState.clear();
           selectionState.set(nodeId, { selected: true, indeterminate: false });
         }
 
