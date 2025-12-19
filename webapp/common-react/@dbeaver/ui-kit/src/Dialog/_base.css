@@ -19,9 +19,9 @@
     --dbv-kit-dialog-small-height: 262px;
     --dbv-kit-dialog-medium-width: 576px;
     --dbv-kit-dialog-medium-height: 374px;
-    --dbv-kit-dialog-large-width: 748px;
+    --dbv-kit-dialog-large-width: 720px;
     --dbv-kit-dialog-large-height: 468px;
-    --dbv-kit-dialog-max-width: 748px;
+    --dbv-kit-dialog-max-width: 720px;
 
     /* Slide variant (side panel) */
     --dbv-kit-dialog-slide-transition-duration: 300ms;

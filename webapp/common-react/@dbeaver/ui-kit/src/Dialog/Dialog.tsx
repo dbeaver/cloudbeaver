@@ -37,7 +37,7 @@ interface ExtendedDialogProps extends DialogProps {
 function Dialog({ className, backdrop, animated = true, ...props }: ExtendedDialogProps): JSX.Element {
   const backdropElement = backdrop === true ? <div className="dbv-kit-dialog__backdrop" data-animated={animated} /> : backdrop;
 
-  return <AriakitDialog className={clsx('dbv-kit-dialog__content', className)} backdrop={backdropElement} data-animated={animated} {...props} />;
+  return <AriakitDialog className={clsx('dbv-kit-dialog', className)} backdrop={backdropElement} data-animated={animated} {...props} />;
 }
 
 function DialogDisclosure({ className, ...props }: DialogDisclosureProps): JSX.Element {

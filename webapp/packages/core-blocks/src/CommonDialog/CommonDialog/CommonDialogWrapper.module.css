@@ -33,15 +33,15 @@
   }
 
   &.fixedSize[data-size='large'] {
-    width: 748px;
+    width: 720px;
     height: 468px;
-    min-width: 748px;
+    min-width: 720px;
     min-height: 468px;
   }
 
   &.fixedWidth[data-size='large'] {
-    width: 748px;
-    min-width: 748px;
+    width: 720px;
+    min-width: 720px;
   }
 
   &.freeHeight {
