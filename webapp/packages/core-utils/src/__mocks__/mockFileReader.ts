@@ -8,22 +8,25 @@
 
 import type { Mock } from 'vitest';
 
-export function mockFileReader(getResult: (() => string) | (() => Mock)): void {
-  const fileReader = class MockFileReader extends FileReader {
-    constructor() {
-      super();
-      Object.defineProperty(this, 'result', {
-        get: getResult,
-      });
-    }
+interface MockFileReaderInstance {
+  onload: ((event: ProgressEvent<FileReader>) => void) | null;
+  onerror: ((event: ProgressEvent<FileReader>) => void) | null;
+  result: string | ArrayBuffer | null;
+  readAsDataURL: (blob: Blob) => void;
+}
 
-    override readAsDataURL() {
-      this.onload?.({} as ProgressEvent<FileReader>);
-    }
+export function mockFileReader(getResult: (() => string) | (() => Mock)): () => FileReader {
+  return function mockFileReader() {
+    const reader: MockFileReaderInstance = {
+      onload: null,
+      onerror: null,
+      get result() {
+        return getResult() as string;
+      },
+      readAsDataURL() {
+        reader.onload?.({} as ProgressEvent<FileReader>);
+      },
+    };
+    return reader as unknown as FileReader;
   };
-
-  Object.defineProperty(globalThis, 'FileReader', {
-    writable: true,
-    value: fileReader,
-  });
 }

@@ -100,12 +100,16 @@ export class DataGridContextMenuSaveContentService {
         }
 
         if (action === ACTION_UPLOAD) {
-          promptForFiles().then(files => {
+          try {
+            const files = await promptForFiles();
             const file = files?.[0] ?? undefined;
+
             if (file) {
               edit.set(key, createResultSetBlobValue(file));
             }
-          });
+          } catch (exception: any) {
+            this.notificationService.logException(exception, 'ui_upload_file_fail');
+          }
         }
       },
     });

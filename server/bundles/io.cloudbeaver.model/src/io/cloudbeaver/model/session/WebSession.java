@@ -564,6 +564,10 @@ public class WebSession extends BaseWebSession
         if (job instanceof CustomCancelableJob cancelableJob) {
             cancelableJob.cancelJob(this, taskInfo);
         }
+        CompletableFuture<?> future = getAttribute(getTaskConfirmationAttributeName(taskId));
+        if (future != null) {
+            future.cancel(false);
+        }
         if (job != null) {
             job.cancel();
         }
@@ -1020,7 +1024,7 @@ public class WebSession extends BaseWebSession
         boolean confirmed,
         boolean skipConfirmations
     ) {
-        String attributeName = WebSQLConstants.TASK_CONFIRMATION_ATTR_PREFIX + taskId;
+        String attributeName = getTaskConfirmationAttributeName(taskId);
         if (confirmed && skipConfirmations) {
             setAttribute(WebSQLConstants.SKIP_TASK_CONFIRMATIONS_ATTR, Boolean.TRUE);
         }
@@ -1032,6 +1036,23 @@ public class WebSession extends BaseWebSession
         } else {
             log.error("Received unexpected confirmation event for taskId: " + taskId);
         }
+    }
+
+
+    public void handleTaskConfirmationWithParameters(@NotNull String taskId, @NotNull Map<String, Object> parameters) {
+        String attributeName = getTaskConfirmationAttributeName(taskId);
+        CompletableFuture<Map<String, Object>> confirmationFuture = getAttribute(attributeName);
+        if (confirmationFuture != null) {
+            confirmationFuture.complete(parameters);
+            removeAttribute(attributeName);
+        } else {
+            log.error("Received unexpected confirmation event for taskId: " + taskId);
+        }
+    }
+
+    @NotNull
+    private String getTaskConfirmationAttributeName(@NotNull String taskId) {
+        return WebSQLConstants.TASK_CONFIRMATION_ATTR_PREFIX + taskId;
     }
 
     private class SessionProgressMonitor extends BaseProgressMonitor {
