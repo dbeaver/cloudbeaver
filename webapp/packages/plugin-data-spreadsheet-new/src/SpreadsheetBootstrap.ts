@@ -115,11 +115,11 @@ export class SpreadsheetBootstrap extends Bootstrap {
         const presentationActions = context.get(DATA_CONTEXT_DV_PRESENTATION_ACTIONS)!;
 
         if (action === ACTION_DATA_GRID_PIN_COLUMN && dataContextResultKey) {
-          return presentationActions.isPinnedColumn(dataContextResultKey) === true;
+          return presentationActions.isColumnPinned(dataContextResultKey) === true;
         }
 
         if (action === ACTION_DATA_GRID_UNPIN_COLUMN && dataContextResultKey) {
-          return presentationActions.isPinnedColumn(dataContextResultKey) === false;
+          return presentationActions.isColumnPinned(dataContextResultKey) === false;
         }
 
         return false;

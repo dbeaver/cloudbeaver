@@ -53,7 +53,7 @@ export const CellFormatter = observer<Props>(function CellFormatter({ rowIdx, co
     pinColumn(key) {
       gridPinContext.pinColumn(key.column);
     },
-    isPinnedColumn(key) {
+    isColumnPinned(key) {
       return gridPinContext.isColumnPinned(key.column);
     },
   });
