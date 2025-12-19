@@ -124,29 +124,47 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
 
   const dndHeaderContext = useHeaderDnD({ columns, onReorder: onHeaderReorder, getCanDrag: getHeaderDnD, getHeaderOrder });
 
+  function mapPositionToColumnKey(position: ICellPosition): string | null {
+    const colIdx = dndHeaderContext.getDataColIdx(position.colIdx);
+    const columnOrGroup = columns[colIdx];
+
+    if (!columnOrGroup) {
+      return null;
+    }
+
+    if (isColumn(columnOrGroup)) {
+      return columnOrGroup.key;
+    }
+
+    return null;
+  }
+
   useImperativeHandle(ref, () => ({
     selectCell: (position: ICellPosition) => {
-      innerGridRef.current?.selectCell({ idx: dndHeaderContext.getDataColIdx(position.colIdx), rowIdx: position.rowIdx });
+      const columnKey = mapPositionToColumnKey(position);
+
+      if (!columnKey) {
+        return;
+      }
+
+      innerGridRef.current?.selectCellByKey({ columnKey, rowIdx: position.rowIdx });
     },
     scrollToCell: (position: Partial<ICellPosition>) => {
       innerGridRef.current?.scrollToCell({ idx: position.colIdx && dndHeaderContext.getDataColIdx(position.colIdx), rowIdx: position.rowIdx });
     },
     openEditor: (position: ICellPosition) => {
-      const colIdx = dndHeaderContext.getDataColIdx(position.colIdx);
-      const columnOrGroup = columns[colIdx];
+      const columnKey = mapPositionToColumnKey(position);
 
-      if (!columnOrGroup) {
+      if (!columnKey) {
         return;
       }
 
-      if (isColumn(columnOrGroup)) {
-        innerGridRef.current?.selectCellByKey(
-          { columnKey: columnOrGroup.key, rowIdx: position.rowIdx },
-          {
-            enableEditor: true,
-          },
-        );
-      }
+      innerGridRef.current?.selectCellByKey(
+        { columnKey, rowIdx: position.rowIdx },
+        {
+          enableEditor: true,
+        },
+      );
     },
   }));
 
