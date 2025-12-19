@@ -28,7 +28,7 @@ import { useTreeVirtualization } from './useTreeVirtualization.js';
 import { TreeMenuContextProvider } from './contexts/TreeMenuContext/TreeMenuContextProvider.js';
 import type { ITreeMenu } from './useTreeMenu.js';
 
-export interface NavigationTreeNewProps extends React.PropsWithChildren {
+export interface NavigationTreeNewProps {
   data: ITreeData;
   selection?: ITreeSelection;
   menu?: ITreeMenu;
@@ -41,7 +41,7 @@ export interface NavigationTreeNewProps extends React.PropsWithChildren {
   getNodeHeight(id: string): number;
 }
 
-export const Tree = observer<NavigationTreeNewProps>(function Tree({
+export const Tree = observer<React.PropsWithChildren<NavigationTreeNewProps>>(function Tree({
   data,
   selection,
   menu,

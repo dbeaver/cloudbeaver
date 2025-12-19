@@ -14,17 +14,13 @@ import { CaptureViewContext } from '@cloudbeaver/core-view';
 
 import { DATA_CONTEXT_TREE_FILTER } from './DATA_CONTEXT_TREE.js';
 
-interface Props {
-  filterEnabled?: boolean;
-}
-
-export const TreeToolbarFilter = observer<Props>(function TreeToolbarFilter({ filterEnabled }) {
+export const TreeToolbarFilter = observer(function TreeToolbarFilter() {
   const translate = useTranslate();
   const viewContext = useContext(CaptureViewContext);
   const context = useDataContext(viewContext);
   const filter = context.get(DATA_CONTEXT_TREE_FILTER);
 
-  if (!filterEnabled || !filter) {
+  if (!filter) {
     return null;
   }
 

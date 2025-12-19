@@ -14,7 +14,7 @@ import { clsx } from '@dbeaver/ui-kit';
 import { useCaptureViewContext } from '@cloudbeaver/core-view';
 import { TreeDataContext } from './contexts/TreeDataContext.js';
 
-interface TreeToolbarProps {
+export interface TreeToolbarProps {
   filter?: ITreeToolbarFilter;
   onRefresh?: () => Promise<void> | void;
   className?: string;

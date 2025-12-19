@@ -12,7 +12,7 @@ import { useMenu } from '@cloudbeaver/core-view';
 
 import { MENU_TREE_TOOLBAR } from './MENU_TREE_TOOLBAR.js';
 
-interface Props {
+export interface Props {
   className?: string;
 }
 
