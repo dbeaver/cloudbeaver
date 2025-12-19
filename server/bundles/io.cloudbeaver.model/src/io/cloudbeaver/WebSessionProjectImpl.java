@@ -139,10 +139,8 @@ public class WebSessionProjectImpl extends WebProjectImpl implements DBPObjectSe
 
     public void setObjectSettingsCache(@NotNull String objectId, Map<String, String> settingsToSet) throws DBException {
         Map<String, String> settings = projectSettings.computeIfAbsent(objectId, k -> new HashMap<>());
-        for (Map.Entry<String, String> entry : settingsToSet.entrySet()) {
-            settings.put(entry.getKey(), CommonUtils.toString(entry.getValue()));
-            this.projectSettingsManager.notifySettingsChanged(objectId, List.of(entry.getKey()));
-        }
+        settings.putAll(settingsToSet);
+        this.projectSettingsManager.notifySettingsChanged(objectId, new ArrayList<>(settingsToSet.keySet()));
     }
 
     @NotNull

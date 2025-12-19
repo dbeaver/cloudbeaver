@@ -755,7 +755,7 @@ public class WebServiceCore implements DBWServiceCore {
                     Set.of(DataSourceNavigatorSettingsUtils.PARAM_ID_NAVIGATOR_SETTINGS)
                 );
             }
-            dataSourceDescriptor.setCustomNavigatorSettings(null);
+            dataSourceDescriptor.getNavigatorSettings().setUserSettings(null);
         } catch (DBException e) {
             throw new DBWebException("Error deleting custom navigator settings", e);
         }
