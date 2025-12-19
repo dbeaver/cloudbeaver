@@ -15,7 +15,7 @@ import type { ITreeData } from './ITreeData.js';
 import type { INodeSelection, ITreeCheckboxSelection } from './ITreeSelection.js';
 
 export interface ITreeSelectionOptions {
-  onSelectionChange?: (selectedNodeIds: Record<string, INodeSelection>) => Promise<void> | void;
+  onSelectionChange?: (selectionState: MetadataMap<string, INodeSelection>) => Promise<void> | void;
   multipleSelection?: boolean;
   expandOnSelect?: boolean;
 }
@@ -130,15 +130,6 @@ export function useTreeSelection(treeData: ITreeData, options: ITreeSelectionOpt
     () => ({
       type: 'checkbox' as const,
       selectionState,
-      getSelectedNodes(): string[] {
-        const selected: string[] = [];
-        for (const [id, state] of selectionState.entries()) {
-          if (state.selected) {
-            selected.push(id);
-          }
-        }
-        return selected;
-      },
       isSelected(nodeId: string): boolean {
         return selectionState.get(nodeId)?.selected ?? false;
       },
@@ -163,7 +154,7 @@ export function useTreeSelection(treeData: ITreeData, options: ITreeSelectionOpt
 
         updateIndeterminateStates(treeData, selectionState, nodeId);
 
-        await options.onSelectionChange?.(Object.fromEntries(selectionState.entries()));
+        await options.onSelectionChange?.(selectionState);
       },
       async selectAll(): Promise<void> {
         if (!options.multipleSelection) {
@@ -172,12 +163,12 @@ export function useTreeSelection(treeData: ITreeData, options: ITreeSelectionOpt
 
         await setSelectionWithLoad(treeData, selectionState, treeData.rootId, true, options.expandOnSelect);
 
-        await options.onSelectionChange?.(Object.fromEntries(selectionState.entries()));
+        await options.onSelectionChange?.(selectionState);
       },
       async clear(): Promise<void> {
         selectionState.clear();
 
-        await options.onSelectionChange?.(Object.fromEntries(selectionState.entries()));
+        await options.onSelectionChange?.(selectionState);
       },
     }),
     {
@@ -186,7 +177,7 @@ export function useTreeSelection(treeData: ITreeData, options: ITreeSelectionOpt
       clear: action.bound,
     },
     false,
-    ['getSelection', 'getSelectedNodes', 'isSelected'],
+    ['getSelection', 'isSelected'],
   );
 
   return treeSelection;

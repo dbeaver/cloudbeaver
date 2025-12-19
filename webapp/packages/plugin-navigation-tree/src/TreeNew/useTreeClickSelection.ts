@@ -15,7 +15,7 @@ import type { ITreeData } from './ITreeData.js';
 import type { ITreeClickSelection, INodeSelection } from './ITreeSelection.js';
 
 export interface ITreeClickSelectionOptions {
-  onSelectionChange?: (selectedNodeIds: string[]) => void;
+  onSelectionChange?: (selectionState: MetadataMap<string, INodeSelection>) => void | Promise<void>;
 }
 
 function collectVisibleNodes(treeData: ITreeData, nodeId: string): string[] {
@@ -29,7 +29,6 @@ function collectVisibleNodes(treeData: ITreeData, nodeId: string): string[] {
     const state = treeData.getState(current);
     if (state.expanded) {
       const children = treeData.getChildren(current);
-      // Add children in reverse order so they're processed in correct order
       stack.push(...[...children].reverse());
     }
   }
@@ -62,15 +61,6 @@ export function useTreeClickSelection(treeData: ITreeData, options: ITreeClickSe
       type: 'click' as const,
       selectionState,
       lastSelectedNode: null as string | null,
-      getSelectedNodes(): string[] {
-        const selected: string[] = [];
-        for (const [id, state] of selectionState.entries()) {
-          if (state.selected) {
-            selected.push(id);
-          }
-        }
-        return selected;
-      },
       isSelected(nodeId: string): boolean {
         return selectionState.get(nodeId)?.selected ?? false;
       },
@@ -95,18 +85,18 @@ export function useTreeClickSelection(treeData: ITreeData, options: ITreeClickSe
         }
 
         this.lastSelectedNode = nodeId;
-        await optionsRef.onSelectionChange?.(this.getSelectedNodes());
+        await optionsRef.onSelectionChange?.(selectionState);
       },
       async clear(): Promise<void> {
         selectionState.clear();
-        await optionsRef.onSelectionChange?.(this.getSelectedNodes());
+        await optionsRef.onSelectionChange?.(selectionState);
       },
       async selectAll(): Promise<void> {
         const allNodes = collectVisibleNodes(treeData, treeData.rootId);
         for (const id of allNodes) {
           selectionState.set(id, { selected: true, indeterminate: false });
         }
-        await optionsRef.onSelectionChange?.(this.getSelectedNodes());
+        await optionsRef.onSelectionChange?.(selectionState);
       },
     }),
     {
@@ -116,7 +106,7 @@ export function useTreeClickSelection(treeData: ITreeData, options: ITreeClickSe
       selectAll: action.bound,
     },
     false,
-    ['isSelected', 'getSelection', 'getSelectedNodes'],
+    ['isSelected', 'getSelection'],
   );
 
   return treeClickSelection;

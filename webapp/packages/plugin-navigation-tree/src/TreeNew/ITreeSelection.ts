@@ -21,8 +21,6 @@ export interface ITreeSelectionBase {
 
   isSelected(nodeId: string): boolean;
 
-  getSelectedNodes(): string[];
-
   getSelection(nodeId: string): INodeSelection;
 
   clear(): Promise<void>;
