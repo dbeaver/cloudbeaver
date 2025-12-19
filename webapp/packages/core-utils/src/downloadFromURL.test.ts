@@ -21,6 +21,7 @@ type MockXHR = {
 
 describe('downloadFromURL', () => {
   let mockXHR: MockXHR;
+  let originalXMLHttpRequest: typeof globalThis.XMLHttpRequest;
 
   beforeEach(() => {
     vi.useFakeTimers();
@@ -34,11 +35,15 @@ describe('downloadFromURL', () => {
       response: null,
     };
 
-    (globalThis as any).XMLHttpRequest = vi.fn(() => mockXHR);
+    originalXMLHttpRequest = globalThis.XMLHttpRequest;
+    (globalThis as any).XMLHttpRequest = function XMLHttpRequest() {
+      return mockXHR;
+    };
   });
 
   afterEach(() => {
     vi.useRealTimers();
+    globalThis.XMLHttpRequest = originalXMLHttpRequest;
   });
 
   it('should open and send request to the specified URL', () => {

@@ -74,7 +74,7 @@ public class WebSessionAuthProcessor {
             }
         } catch (Exception e) {
             if (resetUserStateOnError) {
-                webSession.resetUserState();
+                webSession.resetUserState(false);
             }
             throw new DBException(e.getMessage(), e);
         }
