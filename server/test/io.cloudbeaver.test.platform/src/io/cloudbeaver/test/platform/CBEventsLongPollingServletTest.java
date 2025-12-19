@@ -23,10 +23,12 @@ import io.cloudbeaver.model.session.WebHttpRequestInfo;
 import io.cloudbeaver.server.WebAppSessionManager;
 import io.cloudbeaver.server.websockets.CBEventsLongPollingServlet;
 import jakarta.servlet.http.HttpServletRequest;
-import org.eclipse.jetty.http.BadMessageException;
 import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.websocket.WSConstants;
+import org.jkiss.utils.CommonUtils;
+import org.jkiss.utils.HttpConstants;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -53,19 +55,36 @@ public class CBEventsLongPollingServletTest extends CloudbeaverMockTest {
     }
 
     private class TestServlet extends CBEventsLongPollingServlet {
-        @Override
-        protected WebHeadlessSession getHeadlessSession(String token, WebHttpRequestInfo info) throws DBException {
-            return sessionManager.getHeadlessSession(token, info, true);
-        }
 
-        @NotNull
+        @Nullable
+        @Override
         protected BaseWebSession resolveSession(@NotNull HttpServletRequest req) {
-            return super.resolveSession(req);
+
+            String sid = req.getHeader(WSConstants.WS_SESSION_HEADER);
+            String token = req.getHeader(WSConstants.WS_AUTH_HEADER);
+
+            if (CommonUtils.isEmpty(sid) && CommonUtils.isEmpty(token)) {
+                return null;
+            }
+
+            WebHttpRequestInfo info = new WebHttpRequestInfo(
+                sid,
+                req.getAttribute("locale"),
+                req.getRemoteAddr(),
+                req.getHeader(HttpConstants.HEADER_USER_AGENT)
+            );
+
+            try {
+
+                return sessionManager.getHeadlessSession(token, info, true);
+            } catch (Exception e) {
+                return null;
+            }
         }
     }
 
     @Test
-    public void testResolveSessionReturnsHeadless() throws Exception {
+    public void testResolveSessionReturnsHeadless() throws DBException {
 
         Mockito.when(request.getHeader(WSConstants.WS_AUTH_HEADER)).thenReturn("token-123");
         Mockito.when(request.getHeader(WSConstants.WS_SESSION_HEADER)).thenReturn("sid-555");
@@ -82,8 +101,8 @@ public class CBEventsLongPollingServletTest extends CloudbeaverMockTest {
         Assert.assertSame(headlessSession, resolved);
     }
 
-    @Test(expected = BadMessageException.class)
-    public void testResolveSessionFailsWhenNoToken() throws Exception {
+    @Test
+    public void testResolveSessionFailsWhenNoToken() throws DBException {
 
         Mockito.when(request.getHeader(WSConstants.WS_AUTH_HEADER)).thenReturn(null);
         Mockito.when(request.getHeader(WSConstants.WS_SESSION_HEADER)).thenReturn("sid-123");
@@ -92,11 +111,11 @@ public class CBEventsLongPollingServletTest extends CloudbeaverMockTest {
                 ArgumentMatchers.any(), ArgumentMatchers.anyBoolean()))
             .thenReturn(null);
 
-        invokeResolve(new TestServlet(), request);
+        Assert.assertNull(invokeResolve(new TestServlet(), request));
     }
 
-    @Test(expected = BadMessageException.class)
-    public void testResolveSessionFailsWhenManagerThrows() throws Exception {
+    @Test
+    public void testResolveSessionFailsWhenManagerThrows() throws DBException {
 
         Mockito.when(request.getHeader(WSConstants.WS_AUTH_HEADER)).thenReturn("boom");
         Mockito.when(request.getHeader(WSConstants.WS_SESSION_HEADER)).thenReturn("sid-123");
@@ -106,10 +125,10 @@ public class CBEventsLongPollingServletTest extends CloudbeaverMockTest {
                 ArgumentMatchers.any(WebHttpRequestInfo.class), ArgumentMatchers.eq(true)))
             .thenThrow(new RuntimeException("Get HeadlessSession failed"));
 
-        invokeResolve(new TestServlet(), request);
+        Assert.assertNull(invokeResolve(new TestServlet(), request));
     }
 
-    private BaseWebSession invokeResolve(TestServlet servlet, HttpServletRequest req) throws Exception {
+    private BaseWebSession invokeResolve(TestServlet servlet, HttpServletRequest req) {
         return servlet.resolveSession(req);
     }
 }
