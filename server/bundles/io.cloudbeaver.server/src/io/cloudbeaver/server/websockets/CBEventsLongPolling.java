@@ -58,6 +58,7 @@ public class CBEventsLongPolling implements CBWebSessionEventHandler {
 
     public void touch() {
         lastPoll = System.currentTimeMillis();
+        webSession.touchSession();
     }
 
     @NotNull
