@@ -53,6 +53,10 @@ function getNodesInRange(treeData: ITreeData, fromNode: string, toNode: string):
   return allNodes.slice(start, end + 1);
 }
 
+function getSelectionState(state: boolean): INodeSelection {
+  return { selected: state, indeterminate: false };
+}
+
 export function useTreeClickSelection(treeData: ITreeData, options: ITreeClickSelectionOptions = {}): Readonly<ITreeClickSelection> {
   const optionsRef = useObjectRef(options);
 
@@ -67,23 +71,20 @@ export function useTreeClickSelection(treeData: ITreeData, options: ITreeClickSe
         return selectionState.get(nodeId)?.selected ?? false;
       },
       getSelection(nodeId: string): INodeSelection {
-        return selectionState.get(nodeId) ?? { selected: false, indeterminate: false };
+        return selectionState.get(nodeId) ?? getSelectionState(false);
       },
       async select(nodeId: string, multiple = false, range = false): Promise<void> {
         if (range && this.lastSelectedNode) {
-          if (!multiple) {
-            selectionState.clear();
-          }
           const nodesInRange = getNodesInRange(treeData, this.lastSelectedNode, nodeId);
           for (const id of nodesInRange) {
-            selectionState.set(id, { selected: true, indeterminate: false });
+            selectionState.set(id, getSelectionState(true));
           }
         } else if (multiple) {
           const currentState = this.getSelection(nodeId);
-          selectionState.set(nodeId, { selected: !currentState.selected, indeterminate: false });
+          selectionState.set(nodeId, getSelectionState(!currentState.selected));
         } else {
           selectionState.clear();
-          selectionState.set(nodeId, { selected: true, indeterminate: false });
+          selectionState.set(nodeId, getSelectionState(true));
         }
 
         this.lastSelectedNode = nodeId;
