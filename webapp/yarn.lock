@@ -16568,11 +16568,11 @@ __metadata:
 
 "react-data-grid@file:./artifacts::locator=%40dbeaver%2Freact-data-grid%40workspace%3Acommon-react%2F%40dbeaver%2Freact-data-grid":
   version: 7.0.0-beta.59
-  resolution: "react-data-grid@file:./artifacts#./artifacts::hash=d0ebd9&locator=%40dbeaver%2Freact-data-grid%40workspace%3Acommon-react%2F%40dbeaver%2Freact-data-grid"
+  resolution: "react-data-grid@file:./artifacts#./artifacts::hash=2cc675&locator=%40dbeaver%2Freact-data-grid%40workspace%3Acommon-react%2F%40dbeaver%2Freact-data-grid"
   peerDependencies:
     react: ^19.2
     react-dom: ^19.2
-  checksum: 10c0/88fc6b9bb8a43c3e242603ff5919f756515cc7b4baa13a53be863f3638552b1059077c8d77865f108eaddb408bde53a824bff24640c35115dbcf53a0734caf7b
+  checksum: 10c0/f0f608516b430249906d52259a1f792c9bcd47d0ddcb385500a1a528812c58d12a78d0f1a62f4d055b9247d3f6a7f008ec0b5f5b208589eb84acb8647eeb6272
   languageName: node
   linkType: hard
 

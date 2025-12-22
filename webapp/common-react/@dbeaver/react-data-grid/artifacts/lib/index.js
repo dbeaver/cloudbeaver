@@ -1851,7 +1851,8 @@ function DataGrid(props) {
 			});
 		},
 		selectCell,
-		selectCellByKey
+		selectCellByKey,
+		getColumnsOrdered
 	}));
 	/**
 	* event handlers
@@ -2096,6 +2097,9 @@ function DataGrid(props) {
 			row: isRowIdxWithinViewportBounds(position.rowIdx) ? rows[position.rowIdx] : void 0,
 			column: columns[position.idx]
 		});
+	}
+	function getColumnsOrdered() {
+		return columns;
 	}
 	function selectCellByKey(position, options) {
 		const columnIdx = columns.findIndex((col) => col.key === position.columnKey);

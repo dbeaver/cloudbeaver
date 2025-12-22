@@ -300,15 +300,16 @@ interface PartialPosition {
 //#endregion
 //#region src/DataGrid.d.ts
 type DefaultColumnOptions<R, SR> = Pick<Column<R, SR>, 'renderCell' | 'renderHeaderCell' | 'width' | 'minWidth' | 'maxWidth' | 'resizable' | 'sortable' | 'draggable'>;
-interface DataGridHandle {
+interface DataGridHandle<R, SR = unknown> {
   element: HTMLDivElement | null;
   scrollToCell: (position: PartialPosition) => void;
   selectCell: (position: Position, options?: SelectCellOptions) => void;
   selectCellByKey: (position: PositionByKey, options?: SelectCellOptions) => void;
+  getColumnsOrdered: () => readonly CalculatedColumn<R, SR>[];
 }
 type SharedDivProps = Pick<React.ComponentProps<'div'>, 'role' | 'aria-label' | 'aria-labelledby' | 'aria-description' | 'aria-describedby' | 'aria-rowcount' | 'className' | 'style'>;
 interface DataGridProps<R, SR = unknown, K extends Key = Key> extends SharedDivProps {
-  ref?: Maybe<React.Ref<DataGridHandle>>;
+  ref?: Maybe<React.Ref<DataGridHandle<R, SR>>>;
   /**
    * Grid and data Props
    */

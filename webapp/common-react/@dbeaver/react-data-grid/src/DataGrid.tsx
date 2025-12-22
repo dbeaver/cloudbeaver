@@ -14,6 +14,7 @@ import {
   type DataGridHandle,
   type ColumnWidth,
   type ColumnWidths,
+  type CalculatedColumn,
 } from 'react-data-grid';
 import { rowRenderer } from './renderers/rowRenderer.js';
 import { cellRenderer } from './renderers/cellRenderer.js';
@@ -56,6 +57,7 @@ export interface DataGridRef {
   selectCell: (position: ICellPosition) => void;
   scrollToCell: (position: Partial<ICellPosition>) => void;
   openEditor: (position: ICellPosition) => void;
+  getColumnsOrdered: () => readonly CalculatedColumn<IInnerRow, unknown>[];
 }
 
 const MAX_AUTO_SIZE_WIDTH = 350;
@@ -103,7 +105,7 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
   const columnsCount = useGridReactiveValue(columnCount);
 
   const rowsCountRef = useRef(rowsCount);
-  const innerGridRef = useRef<DataGridHandle>(null);
+  const innerGridRef = useRef<DataGridHandle<IInnerRow, unknown>>(null);
   const columns = new Array<ColumnOrColumnGroup<IInnerRow, unknown>>(columnsCount)
     .fill(null as any)
     .map((_, i): ColumnOrColumnGroup<IInnerRow, unknown> => {
@@ -166,6 +168,7 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
         },
       );
     },
+    getColumnsOrdered: () => innerGridRef.current?.getColumnsOrdered() ?? [],
   }));
 
   if (rowsCountRef.current !== rowsCount) {

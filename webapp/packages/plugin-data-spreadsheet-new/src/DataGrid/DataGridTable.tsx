@@ -112,25 +112,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
   }, []);
 
   const isColumnPinned = useCallback((colIdx: IGridColumnKey) => pinnedColumns.has(GridDataKeysUtils.serialize(colIdx)), [pinnedColumns]);
-
-  const getHeaderOrder = useCallback(() => {
-    const pinned: number[] = [];
-    const unpinned: number[] = [];
-
-    tableData.columns.forEach((col, idx) => {
-      if (col.key === null) {
-        return;
-      }
-
-      if (pinnedColumns.has(GridDataKeysUtils.serialize(col.key))) {
-        pinned.push(idx);
-      } else {
-        unpinned.push(idx);
-      }
-    });
-
-    return [...pinned, ...unpinned];
-  }, [tableData.columns, pinnedColumns]);
+  const getHeaderOrder = useCallback(() => (dataGridRef.current?.getColumnsOrdered() ?? []).map(col => col.key), [dataGridRef]);
 
   const gridSelectionContext = useGridSelectionContext(tableData, selectionAction, getHeaderOrder);
 

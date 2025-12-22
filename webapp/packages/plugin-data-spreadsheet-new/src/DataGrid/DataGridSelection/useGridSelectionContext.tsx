@@ -24,7 +24,7 @@ interface IGridSelectionState {
 export function useGridSelectionContext(
   tableData: ITableData,
   selectionAction: GridSelectAction,
-  getHeaderOrder: () => number[],
+  getHeaderOrder: () => string[],
 ): IDataGridSelectionContext {
   const props = useObjectRef({ tableData, selectionAction, getHeaderOrder });
 
@@ -118,7 +118,14 @@ export function useGridSelectionContext(
 
   function selectRange(startPosition: IDraggingPosition, lastPosition: IDraggingPosition, multiple: boolean, temporary = false) {
     state.range = temporary;
-    const columnsInRange = getColumnsInSelectionRange(startPosition.colIdx, lastPosition.colIdx);
+    const startColumn = props.tableData.getColumn(startPosition.colIdx);
+    const lastColumn = props.tableData.getColumn(lastPosition.colIdx);
+
+    if (!startColumn?.key || !lastColumn?.key) {
+      return;
+    }
+
+    const columnsInRange = getColumnsInSelectionRange(GridDataKeysUtils.serialize(startColumn.key), GridDataKeysUtils.serialize(lastColumn.key));
     const isIndexColumnInRange = props.tableData.isIndexColumnInRange(columnsInRange);
     const startRow = props.tableData.getRow(startPosition.rowIdx);
     const lastRow = props.tableData.getRow(lastPosition.rowIdx);
@@ -134,7 +141,7 @@ export function useGridSelectionContext(
     }
   }
 
-  function getColumnsInSelectionRange(startColIdx: number, endColIdx: number): IColumnInfo[] {
+  function getColumnsInSelectionRange(startColIdx: string, endColIdx: string): IColumnInfo[] {
     const { getHeaderOrder, tableData } = props;
 
     const visualOrder = getHeaderOrder();
@@ -143,15 +150,14 @@ export function useGridSelectionContext(
     const endVisualPos = visualOrder.indexOf(endColIdx);
 
     if (startVisualPos === -1 || endVisualPos === -1) {
-      return tableData.getColumnsInRange(startColIdx, endColIdx);
+      return [];
     }
 
     const minVisualPos = Math.min(startVisualPos, endVisualPos);
     const maxVisualPos = Math.max(startVisualPos, endVisualPos);
-
     const dataIndicesInRange = visualOrder.slice(minVisualPos, maxVisualPos + 1);
 
-    return dataIndicesInRange.map(idx => tableData.getColumn(idx)).filter(isColumnInfo);
+    return dataIndicesInRange.map(key => tableData.getColumn(tableData.getColumnIndexFromColumnKey({ index: Number(key) }))).filter(isColumnInfo);
   }
 
   const selectColumn = action(function selectColumn(colIdx: number, multiple: boolean) {
