@@ -24,6 +24,7 @@
     <modules>
         <module>bundles</module>
         <module>features</module>
+        <module>org.jkiss.dbeaver.model.lsp</module>
     </modules>
 
     <profiles>
