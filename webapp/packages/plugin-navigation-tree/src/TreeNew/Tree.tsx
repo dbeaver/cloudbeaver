@@ -68,25 +68,23 @@ export const Tree = observer<React.PropsWithChildren<NavigationTreeNewProps>>(fu
   });
 
   return (
-    <div className={clsx('tw:flex tw:flex-col', className)}>
-      <div ref={mountOptimization.setRootRef} className="tw:flex-1" style={{ overflow: 'auto', position: 'relative' }}>
-        <NodeSizeCacheContext.Provider value={elementsSizeCache}>
-          <TreeDataContext.Provider value={data}>
-            <TreeSelectionContext.Provider value={selection}>
-              <TreeVirtualizationContext.Provider value={mountOptimization}>
-                <TreeContext.Provider value={tree}>
-                  <TreeDnDContext.Provider value={treeDnD}>
-                    <TreeMenuContextProvider menu={menu ?? null}>
-                      {children}
-                      <NodeChildren nodeId={data.rootId} offsetHeight={0} emptyPlaceholder={emptyPlaceholder} root />
-                    </TreeMenuContextProvider>
-                  </TreeDnDContext.Provider>
-                </TreeContext.Provider>
-              </TreeVirtualizationContext.Provider>
-            </TreeSelectionContext.Provider>
-          </TreeDataContext.Provider>
-        </NodeSizeCacheContext.Provider>
-      </div>
+    <div ref={mountOptimization.setRootRef} className={clsx('tw:relative tw:overflow-auto tw:flex-1', className)}>
+      <NodeSizeCacheContext.Provider value={elementsSizeCache}>
+        <TreeDataContext.Provider value={data}>
+          <TreeSelectionContext.Provider value={selection}>
+            <TreeVirtualizationContext.Provider value={mountOptimization}>
+              <TreeContext.Provider value={tree}>
+                <TreeDnDContext.Provider value={treeDnD}>
+                  <TreeMenuContextProvider menu={menu ?? null}>
+                    {children}
+                    <NodeChildren nodeId={data.rootId} offsetHeight={0} emptyPlaceholder={emptyPlaceholder} root />
+                  </TreeMenuContextProvider>
+                </TreeDnDContext.Provider>
+              </TreeContext.Provider>
+            </TreeVirtualizationContext.Provider>
+          </TreeSelectionContext.Provider>
+        </TreeDataContext.Provider>
+      </NodeSizeCacheContext.Provider>
     </div>
   );
 });
