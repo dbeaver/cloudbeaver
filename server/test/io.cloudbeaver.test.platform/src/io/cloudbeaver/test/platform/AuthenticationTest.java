@@ -28,7 +28,7 @@ import org.jkiss.utils.SecurityUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -91,7 +91,9 @@ public class AuthenticationTest extends CloudbeaverMockTest {
     public void testReverseProxyAnonymousModeLogin() throws Exception {
         WebGQLClient client = CEAppStarter.createClient();
         String testUserId = "reverseProxyTestUser";
-        List<String> headers = List.of(RPAuthProvider.X_USER, testUserId, RPAuthProvider.X_TEAM, "user");
+        Map<String, String> headers = new HashMap<>();
+        headers.put(RPAuthProvider.X_USER, testUserId);
+        headers.put(RPAuthProvider.X_TEAM, "user");
         Map<String, Object> sessionInfo = client.sendQueryWithHeaders(GQL_OPEN_SESSION, null, headers);
         Assert.assertTrue(JSONUtils.getBoolean(sessionInfo, "valid"));
 

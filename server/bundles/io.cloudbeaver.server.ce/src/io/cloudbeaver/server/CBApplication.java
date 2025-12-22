@@ -49,7 +49,6 @@ import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.impl.app.BaseApplicationImpl;
-import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.security.SMAdminController;
 import org.jkiss.dbeaver.model.security.SMConstants;
 import org.jkiss.dbeaver.model.security.SMObjectType;
@@ -508,7 +507,7 @@ public abstract class CBApplication<T extends CBServerConfig>
     }
 
     @Override
-    public String getInfoDetails(DBRProgressMonitor monitor) {
+    public String getInfoDetails() {
         return "";
     }
 
