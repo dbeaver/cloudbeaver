@@ -55,7 +55,7 @@ export class TreeToolbarMenuService {
     });
   }
 
-  private treeToolbarActionHandler(contexts: IDataContextProvider, action: IAction): void {
+  private async treeToolbarActionHandler(contexts: IDataContextProvider, action: IAction): Promise<void> {
     const treeData = contexts.get(DATA_CONTEXT_TREE_DATA);
 
     if (treeData === undefined) {
@@ -69,9 +69,9 @@ export class TreeToolbarMenuService {
       case ACTION_TREE_REFRESH: {
         const refresh = contexts.get(DATA_CONTEXT_TREE_REFRESH);
         if (refresh) {
-          refresh();
+          await refresh();
         } else {
-          treeData.load(treeData.rootId, true);
+          await treeData.load(treeData.rootId, true);
         }
         break;
       }
