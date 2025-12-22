@@ -35,6 +35,7 @@
     color: var(--theme-text-hint-on-light);
     margin-left: 4px;
     cursor: default;
+    pointer-events: none;
   }
 
   .editor .cm-highlightSpace {
