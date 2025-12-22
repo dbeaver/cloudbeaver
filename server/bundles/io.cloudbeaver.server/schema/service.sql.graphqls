@@ -337,7 +337,21 @@ extend type Query {
         columnNames: [String!],
         functions: [String!],
         showDuplicatesOnly: Boolean
-    ): String!
+    ): String! @deprecated (reason: "use sqlGropingResultSet (25.3.1)")
+
+    "Creates async task to get grouped SQL results"
+    sqlGropingResultSet(
+        projectId: ID,
+        contextId: ID!,
+        connectionId: ID!,
+        resultsId: ID!,
+        columnNames: [String!],
+        functions: [String!],
+        showDuplicatesOnly: Boolean,
+        filter: SQLDataFilter,
+        dataFormat: ResultDataFormat,
+        isInteractive: Boolean
+    ): AsyncTaskInfo! @since(version: "25.3.1")
 }
 
 extend type Mutation {
