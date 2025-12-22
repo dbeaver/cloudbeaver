@@ -36,14 +36,16 @@ export const Node: NodeComponent = observer(function Node({ nodeId, offsetHeight
   }
 
   function handleSelect(multiple?: boolean, nested?: boolean) {
-    if (selection) {
-      if (selection.type === 'click') {
-        selection.select(nodeId, multiple, nested);
-      } else {
+    switch (selection?.type) {
+      case 'checkbox':
         selection.select(nodeId);
-      }
-    } else {
-      tree.selectNode(nodeId, !stateSelected);
+        break;
+      case 'click':
+        selection.select(nodeId, multiple, nested);
+        break;
+      default:
+        tree.selectNode(nodeId, !stateSelected);
+        break;
     }
   }
 
