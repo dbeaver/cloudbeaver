@@ -14,6 +14,7 @@
     <packaging>pom</packaging>
 
     <modules>
+        <module>org.jkiss.dbeaver.model.lsp</module>
         <module>io.cloudbeaver.test.platform</module>
     </modules>
 
