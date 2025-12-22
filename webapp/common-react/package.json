@@ -19,6 +19,6 @@
     "happy-dom": "^20",
     "prettier": "^3.6.2",
     "rimraf": "^6",
-    "vitest": "^3"
+    "vitest": "^4"
   }
 }

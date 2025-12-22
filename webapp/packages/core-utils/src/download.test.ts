@@ -6,11 +6,16 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { describe, expect, it, vitest } from 'vitest';
+import { beforeEach, describe, expect, it, vitest } from 'vitest';
 
 import { download } from './download.js';
 
 describe('download', () => {
+  beforeEach(() => {
+    // Clean up any existing links from previous tests
+    document.body.innerHTML = '';
+  });
+
   it('should not create links after download', () => {
     const blob = new Blob(['test'], { type: 'text/plain' });
     const linksBefore = document.querySelectorAll('a');
