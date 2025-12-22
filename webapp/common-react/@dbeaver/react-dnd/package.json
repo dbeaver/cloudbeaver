@@ -29,7 +29,7 @@
     "@types/react": "^19",
     "rimraf": "^6",
     "typescript": "^5",
-    "vitest": "^3"
+    "vitest": "^4"
   },
   "dependencies": {
     "react": "^19"
