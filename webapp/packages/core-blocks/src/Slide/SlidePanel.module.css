@@ -14,8 +14,9 @@
   overflow: hidden;
   align-items: center;
 
-  &:hover {
-    background-color: color-mix(in srgb, transparent, var(--theme-primary) 5%);
+  &:hover,
+  &:focus {
+    background-color: color-mix(in srgb, var(--theme-on-surface), var(--theme-surface) 90%);
   }
 }
 
