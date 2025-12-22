@@ -49,5 +49,6 @@
     <plugin id="org.jkiss.dbeaver.net.ssh" version="0.0.0"/>
     <plugin id="org.jkiss.dbeaver.net.ssh.sshj" version="0.0.0"/>
     <plugin id="org.jkiss.bundle.graphql" version="0.0.0"/>
+    <plugin id="org.jkiss.dbeaver.model.lsp" version="0.0.0"/>
 
 </feature>
