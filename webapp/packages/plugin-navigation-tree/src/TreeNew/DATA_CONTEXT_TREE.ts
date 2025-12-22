@@ -13,6 +13,6 @@ import type { ITreeFilter } from './useTreeFilter.js';
 export type ITreeToolbarFilter = ITreeFilter & { filterPlaceholder?: string };
 export type TreeRefreshHandler = () => Promise<void>;
 
-export const DATA_CONTEXT_TREE_DATA = createDataContext<ITreeData | undefined>('tree-new-data');
-export const DATA_CONTEXT_TREE_FILTER = createDataContext<ITreeToolbarFilter | undefined>('tree-new-filter');
-export const DATA_CONTEXT_TREE_REFRESH = createDataContext<TreeRefreshHandler | undefined>('tree-new-refresh');
+export const DATA_CONTEXT_TREE_DATA = createDataContext<ITreeData>('tree-new-data');
+export const DATA_CONTEXT_TREE_FILTER = createDataContext<ITreeToolbarFilter>('tree-new-filter');
+export const DATA_CONTEXT_TREE_REFRESH = createDataContext<TreeRefreshHandler>('tree-new-refresh');
