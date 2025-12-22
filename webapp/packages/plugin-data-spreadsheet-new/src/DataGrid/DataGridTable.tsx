@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 import { useCallback, useLayoutEffect, useMemo, useRef, type HTMLAttributes } from 'react';
 import { reaction } from 'mobx';
 
-import { getComputed, s, TextPlaceholder, useObjectRef, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { getComputed, TextPlaceholder, useObjectRef, useTranslate } from '@cloudbeaver/core-blocks';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { useCaptureViewContext } from '@cloudbeaver/core-view';
 import {
@@ -47,7 +47,7 @@ import { CellRenderer } from './CellRenderer/CellRenderer.js';
 import { DataGridContext, type IDataGridContext } from './DataGridContext.js';
 import { DataGridSelectionContext } from './DataGridSelection/DataGridSelectionContext.js';
 import { useGridSelectionContext } from './DataGridSelection/useGridSelectionContext.js';
-import classes from './DataGridTable.module.css';
+import './DataGridTable.css';
 import { CellFormatter } from './Formatters/CellFormatter.js';
 import { TableDataContext } from './TableDataContext.js';
 import { useGridDragging } from './useGridDragging.js';
@@ -73,7 +73,6 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
   ...rest
 }) {
   const translate = useTranslate();
-  const styles = useS(classes);
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
   const dataGridDivRef = useRef<HTMLDivElement | null>(null);
   const focusedCell = useRef<ICellPosition | null>(null);
@@ -502,13 +501,13 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
               ref={setContainersRef}
               tabIndex={-1}
               {...rest}
-              className={s(styles, { container: true }, className)}
+              className={clsx('data-grid__container', 'theme-typography--caption', className)}
               onMouseDown={onMouseDownHandler}
               onMouseMove={onMouseMoveHandler}
             >
               <DataGrid
                 ref={dataGridRef}
-                className={s(styles, { grid: true }, className)}
+                className={clsx('data-grid__grid', className)}
                 cell={cell}
                 cellText={cellText}
                 cellElement={cellElement}
