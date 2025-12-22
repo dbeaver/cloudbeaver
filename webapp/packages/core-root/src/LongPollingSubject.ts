@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { Subscription, Subscriber, Observer, NextObserver } from 'rxjs';
+import type { Subscription, Subscriber, NextObserver } from 'rxjs';
 import { Subject } from 'rxjs/internal/Subject';
 
 import type { ISessionEvent } from './SessionEventSource.js';
@@ -14,7 +14,7 @@ import type { ISessionEvent } from './SessionEventSource.js';
 export interface ILongPollingOptions {
   url: string;
   startObserver?: NextObserver<void>;
-  stopObserver?: Observer<void>;
+  stopObserver?: NextObserver<void>;
 }
 
 interface IPollResponse {
@@ -35,7 +35,7 @@ export class LongPollingSubject<T> extends Subject<T> {
     this.isPolling = false;
     this.abortController = null;
 
-    this.output = new Subject<T>();
+    this.output = new Subject();
   }
 
   override next(value: T): void {
