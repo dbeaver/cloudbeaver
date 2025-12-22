@@ -50,7 +50,6 @@ export const CommonDialogWrapper = observer<CommonDialogWrapperProps, HTMLDivEle
         data-size={size}
         className={s(computedStyles, { dialog: true, fixedSize, fixedWidth, freeHeight }, className)}
         autoFocusOnHide={autoFocusOnHide}
-        backdrop
         onClose={handleClose}
       >
         <Loader className={s(computedStyles, { loader: true })} suspense>
