@@ -11,7 +11,7 @@ import { useState } from 'react';
 import { useObjectRef } from '@cloudbeaver/core-blocks';
 import { type IGridColumnKey, type IGridDataKey, type IGridRowKey, GridDataKeysUtils, GridSelectAction } from '@cloudbeaver/plugin-data-viewer';
 
-import type { ITableData } from '../TableDataContext.js';
+import { isColumnInfo, type IColumnInfo, type ITableData } from '../TableDataContext.js';
 import type { IDraggingPosition } from '../useGridDragging.js';
 import type { IDataGridSelectionContext } from './DataGridSelectionContext.js';
 
@@ -21,8 +21,12 @@ interface IGridSelectionState {
   lastSelectedCell: IDraggingPosition | null;
 }
 
-export function useGridSelectionContext(tableData: ITableData, selectionAction: GridSelectAction): IDataGridSelectionContext {
-  const props = useObjectRef({ tableData, selectionAction });
+export function useGridSelectionContext(
+  tableData: ITableData,
+  selectionAction: GridSelectAction,
+  getHeaderOrder: () => number[],
+): IDataGridSelectionContext {
+  const props = useObjectRef({ tableData, selectionAction, getHeaderOrder });
 
   const [state] = useState<IGridSelectionState>(() =>
     observable({
@@ -114,7 +118,7 @@ export function useGridSelectionContext(tableData: ITableData, selectionAction: 
 
   function selectRange(startPosition: IDraggingPosition, lastPosition: IDraggingPosition, multiple: boolean, temporary = false) {
     state.range = temporary;
-    const columnsInRange = props.tableData.getColumnsInRange(startPosition.colIdx, lastPosition.colIdx);
+    const columnsInRange = getColumnsInSelectionRange(startPosition.colIdx, lastPosition.colIdx);
     const isIndexColumnInRange = props.tableData.isIndexColumnInRange(columnsInRange);
     const startRow = props.tableData.getRow(startPosition.rowIdx);
     const lastRow = props.tableData.getRow(lastPosition.rowIdx);
@@ -128,6 +132,26 @@ export function useGridSelectionContext(tableData: ITableData, selectionAction: 
         temporary,
       );
     }
+  }
+
+  function getColumnsInSelectionRange(startColIdx: number, endColIdx: number): IColumnInfo[] {
+    const { getHeaderOrder, tableData } = props;
+
+    const visualOrder = getHeaderOrder();
+
+    const startVisualPos = visualOrder.indexOf(startColIdx);
+    const endVisualPos = visualOrder.indexOf(endColIdx);
+
+    if (startVisualPos === -1 || endVisualPos === -1) {
+      return tableData.getColumnsInRange(startColIdx, endColIdx);
+    }
+
+    const minVisualPos = Math.min(startVisualPos, endVisualPos);
+    const maxVisualPos = Math.max(startVisualPos, endVisualPos);
+
+    const dataIndicesInRange = visualOrder.slice(minVisualPos, maxVisualPos + 1);
+
+    return dataIndicesInRange.map(idx => tableData.getColumn(idx)).filter(isColumnInfo);
   }
 
   const selectColumn = action(function selectColumn(colIdx: number, multiple: boolean) {

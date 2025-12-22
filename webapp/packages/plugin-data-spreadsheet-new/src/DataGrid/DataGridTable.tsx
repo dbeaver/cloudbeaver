@@ -85,7 +85,6 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
   const viewAction = model.source.getAction(resultIndex, IDatabaseDataViewAction, GridViewAction);
 
   const tableData = useTableData(model as unknown as IDatabaseDataModel<ResultSetDataSource>, resultIndex, dataGridDivRef);
-  const gridSelectionContext = useGridSelectionContext(tableData, selectionAction);
 
   const pinColumn = useCallback((colIdx: IGridColumnKey) => {
     setPinnedColumns(prev => {
@@ -113,6 +112,27 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
   }, []);
 
   const isColumnPinned = useCallback((colIdx: IGridColumnKey) => pinnedColumns.has(GridDataKeysUtils.serialize(colIdx)), [pinnedColumns]);
+
+  const getHeaderOrder = useCallback(() => {
+    const pinned: number[] = [];
+    const unpinned: number[] = [];
+
+    tableData.columns.forEach((col, idx) => {
+      if (col.key === null) {
+        return;
+      }
+
+      if (pinnedColumns.has(GridDataKeysUtils.serialize(col.key))) {
+        pinned.push(idx);
+      } else {
+        unpinned.push(idx);
+      }
+    });
+
+    return [...pinned, ...unpinned];
+  }, [tableData.columns, pinnedColumns]);
+
+  const gridSelectionContext = useGridSelectionContext(tableData, selectionAction, getHeaderOrder);
 
   const restoreFocus = useCallback(
     function restoreFocus() {
