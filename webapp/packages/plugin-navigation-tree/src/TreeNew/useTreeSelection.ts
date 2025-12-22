@@ -22,7 +22,9 @@ export interface ITreeSelectionOptions {
 
 type TreeSelectionState = MetadataMap<string, INodeSelection>;
 
-const DEFAULT_NODE_SELECTION: INodeSelection = { selected: false, indeterminate: false };
+function getDefaultSelection(): INodeSelection {
+  return { selected: false, indeterminate: false };
+}
 
 function updateIndeterminateStates(treeData: ITreeData, selectionMap: TreeSelectionState, nodeId: string): void {
   let currentNodeId: string | null | undefined = nodeId;
@@ -36,7 +38,7 @@ function updateIndeterminateStates(treeData: ITreeData, selectionMap: TreeSelect
 function updateNodeIndeterminateState(treeData: ITreeData, selectionMap: TreeSelectionState, nodeId: string): void {
   const node = treeData.getNode(nodeId);
   const children = treeData.getUnfilteredChildren(nodeId);
-  const currentState = selectionMap.get(nodeId) ?? DEFAULT_NODE_SELECTION;
+  const currentState = selectionMap.get(nodeId) ?? getDefaultSelection();
 
   if (node.leaf || children.length === 0) {
     if (currentState.indeterminate) {
@@ -49,7 +51,7 @@ function updateNodeIndeterminateState(treeData: ITreeData, selectionMap: TreeSel
   let indeterminateCount = 0;
 
   for (const childId of children) {
-    const childState = selectionMap.get(childId) ?? DEFAULT_NODE_SELECTION;
+    const childState = selectionMap.get(childId) ?? getDefaultSelection();
     if (childState.selected) {
       selectedCount++;
     }
@@ -79,7 +81,7 @@ async function setSelectionWithLoad(
 ): Promise<string[]> {
   const nodes = [nodeId];
   const nodeState = treeData.getState(nodeId);
-  const currentSelectedState = selectionMap.get(nodeId) ?? DEFAULT_NODE_SELECTION;
+  const currentSelectedState = selectionMap.get(nodeId) ?? getDefaultSelection();
 
   if (currentSelectedState.selected === shouldSelect && !currentSelectedState.indeterminate) {
     return nodes;
@@ -108,11 +110,11 @@ async function setSelectionWithLoad(
         });
       }
     } else if (!treeData.getNode(nodeId).leaf) {
-      selectionMap.set(nodeId, DEFAULT_NODE_SELECTION);
+      selectionMap.set(nodeId, getDefaultSelection());
     }
   } catch {
     treeData.updateState(nodeId, { expanded: false });
-    selectionMap.set(nodeId, DEFAULT_NODE_SELECTION);
+    selectionMap.set(nodeId, getDefaultSelection());
     return nodes;
   }
 
@@ -126,7 +128,7 @@ async function setSelectionWithLoad(
 export function useTreeSelection(treeData: ITreeData, options: ITreeSelectionOptions = {}): Readonly<ITreeCheckboxSelection> {
   options = useObjectRef(options);
 
-  const [selectionState] = useState(() => new MetadataMap<string, INodeSelection>(() => DEFAULT_NODE_SELECTION));
+  const [selectionState] = useState(() => new MetadataMap<string, INodeSelection>(() => getDefaultSelection()));
 
   const treeSelection = useObservableRef(
     () => ({
@@ -136,7 +138,7 @@ export function useTreeSelection(treeData: ITreeData, options: ITreeSelectionOpt
         return selectionState.get(nodeId)?.selected ?? false;
       },
       getSelection(nodeId: string): INodeSelection {
-        return selectionState.get(nodeId) ?? DEFAULT_NODE_SELECTION;
+        return selectionState.get(nodeId) ?? getDefaultSelection();
       },
       async select(nodeId: string, selected?: boolean): Promise<void> {
         const currentState = this.getSelection(nodeId);
