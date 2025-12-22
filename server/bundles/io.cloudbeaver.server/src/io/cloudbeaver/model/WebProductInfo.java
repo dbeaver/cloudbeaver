@@ -20,7 +20,6 @@ import io.cloudbeaver.utils.ServletAppUtils;
 import org.eclipse.core.runtime.IProduct;
 import org.eclipse.core.runtime.Platform;
 import org.jkiss.dbeaver.model.meta.Property;
-import org.jkiss.dbeaver.model.runtime.VoidProgressMonitor;
 import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.utils.CommonUtils;
 
@@ -75,7 +74,7 @@ public class WebProductInfo {
     @Property
     public String getLicenseInfo() {
         return provideSensitiveInformation
-            ? ServletAppUtils.getServletApplication().getInfoDetails(new VoidProgressMonitor())
+            ? ServletAppUtils.getServletApplication().getInfoDetails()
             : "";
     }
 
