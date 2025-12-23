@@ -28,5 +28,8 @@
     "tailwindcss": "4.0.7",
     "typescript": "^5",
     "vite": "^7"
+  },
+  "resolutions": {
+    "storybook": ">=10.1.10"
   }
 }

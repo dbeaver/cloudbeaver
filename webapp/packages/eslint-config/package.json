@@ -33,5 +33,9 @@
     "eslint-plugin-storybook": "^10",
     "storybook": "^10",
     "typescript-eslint": "^8"
+  },
+  "resolutions": {
+    "eslint-plugin-storybook": ">=10.1.10",
+    "storybook": ">=10.1.10"
   }
 }
