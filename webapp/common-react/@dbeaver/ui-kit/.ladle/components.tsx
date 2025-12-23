@@ -1,6 +1,6 @@
 import '../src/index.css';
 import './global.css';
-import Icons from '../assets/icons/icons.svg?react';
+import Icons from '../assets/icons/preload/icons.svg?react';
 
 import type { GlobalProvider } from '@ladle/react';
 

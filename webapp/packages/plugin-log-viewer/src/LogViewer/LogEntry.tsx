@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -33,10 +33,10 @@ export const LogEntry = observer<Props>(function LogEntry({ item, onSelect, sele
 
   switch (item.type) {
     case 'ERROR':
-      icon = '/icons/error_icon_sm.svg';
+      icon = '/icons/preload/error_icon_sm.svg';
       break;
     case 'WARNING':
-      icon = '/icons/warning_icon_sm.svg';
+      icon = '/icons/preload/warning_icon_sm.svg';
       break;
   }
 
