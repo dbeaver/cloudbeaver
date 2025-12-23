@@ -60,10 +60,10 @@ export const TableError = observer<Props>(function TableError({ model, loading, 
   const errorHidden = errorInfo.error === null;
   const quote = internalServerError?.errorType === ServerErrorType.QUOTE_EXCEEDED;
 
-  let icon = '/icons/error_icon.svg';
+  let icon = '/icons/preload/error_icon.svg';
 
   if (quote) {
-    icon = '/icons/info_icon.svg';
+    icon = '/icons/preload/info_icon.svg';
   }
 
   let onRetry = () => model.retry();
