@@ -12,6 +12,7 @@ import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, type DialogInternal } from '@cloudbeaver/core-dialogs';
 
 import { ErrorBoundary } from '../ErrorBoundary.js';
+import { Loader } from '../Loader/Loader.js';
 import { s } from '../s.js';
 import { useObjectRef } from '../useObjectRef.js';
 import { useS } from '../useS.js';
@@ -53,11 +54,13 @@ export const DialogsPortal = observer(function DialogsPortal() {
 
   return (
     <div className={s(styles, { backdrop: true })}>
-      <div className={s(styles, { innerBox: true })}>
-        {commonDialogService.dialogs.map((dialog, i, arr) => (
-          <NestedDialog key={dialog.id} visible={i === arr.length - 1} dialog={dialog} resolveDialog={state.resolve} rejectDialog={state.reject} />
-        ))}
-      </div>
+      <Loader className={s(styles, { loader: true })} suspense>
+        <div className={s(styles, { innerBox: true })}>
+          {commonDialogService.dialogs.map((dialog, i, arr) => (
+            <NestedDialog key={dialog.id} visible={i === arr.length - 1} dialog={dialog} resolveDialog={state.resolve} rejectDialog={state.reject} />
+          ))}
+        </div>
+      </Loader>
     </div>
   );
 });

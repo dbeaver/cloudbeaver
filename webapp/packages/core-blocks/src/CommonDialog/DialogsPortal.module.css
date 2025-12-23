@@ -5,6 +5,10 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+.loader {
+  height: 100%;
+}
+
 .error {
   composes: theme-background-surface theme-text-on-surface theme-elevation-z10 from global;
   border-radius: 0.25rem;
