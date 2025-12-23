@@ -9,12 +9,13 @@ import { DATA_CONTEXT_ADMINISTRATION_ITEM_ROUTE } from '@cloudbeaver/core-admini
 import { AUTH_PROVIDER_LOCAL_ID, AuthProvidersResource } from '@cloudbeaver/core-authentication';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CachedMapAllKey, getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
-import { ACTION_CREATE, ActionService, MenuService } from '@cloudbeaver/core-view';
+import { ACTION_CREATE, ACTION_REFRESH, ActionService, MenuService } from '@cloudbeaver/core-view';
 
 import { AdministrationUsersManagementService } from '../../../AdministrationUsersManagementService.js';
 import { MENU_USERS_ADMINISTRATION } from '../../../Menus/MENU_USERS_ADMINISTRATION.js';
 import { ADMINISTRATION_ITEM_USER_CREATE_PARAM } from '../ADMINISTRATION_ITEM_USER_CREATE_PARAM.js';
 import { CreateUserService } from './CreateUserService.js';
+import { DATA_CONTEXT_USERS_ADMINISTRATION_ACTIONS } from './DATA_CONTEXT_USERS_ADMINISTRATION_ACTIONS.js';
 
 @injectable(() => [AuthProvidersResource, CreateUserService, MenuService, ActionService, AdministrationUsersManagementService])
 export class CreateUserBootstrap extends Bootstrap {
@@ -28,18 +29,28 @@ export class CreateUserBootstrap extends Bootstrap {
     super();
   }
 
-  override register() {
+  override register(): void {
     this.menuService.addCreator({
       menus: [MENU_USERS_ADMINISTRATION],
       getItems(context, items) {
-        return [...items, ACTION_CREATE];
+        return [...items, ACTION_CREATE, ACTION_REFRESH];
+      },
+      orderItems(context, items) {
+        const refreshIndex = items.indexOf(ACTION_REFRESH);
+
+        if (refreshIndex > -1) {
+          const [refresh] = items.splice(refreshIndex, 1);
+          items.push(refresh!);
+        }
+
+        return items;
       },
     });
 
     this.actionService.addHandler({
       id: 'users-table-base',
       menus: [MENU_USERS_ADMINISTRATION],
-      actions: [ACTION_CREATE],
+      actions: [ACTION_CREATE, ACTION_REFRESH],
       isHidden: (context, action) => {
         if (action === ACTION_CREATE) {
           return this.administrationUsersManagementService.externalUserProviderEnabled || !this.authProvidersResource.has(AUTH_PROVIDER_LOCAL_ID);
@@ -65,6 +76,9 @@ export class CreateUserBootstrap extends Bootstrap {
           case ACTION_CREATE:
             this.createUserService.create();
             break;
+          case ACTION_REFRESH:
+            context.get(DATA_CONTEXT_USERS_ADMINISTRATION_ACTIONS)?.onRefresh();
+            break;
         }
       },
       getActionInfo: (context, action) => {
@@ -73,6 +87,15 @@ export class CreateUserBootstrap extends Bootstrap {
             ...action.info,
             icon: 'add',
             tooltip: 'authentication_administration_tools_add_tooltip',
+          };
+        }
+
+        if (action === ACTION_REFRESH) {
+          return {
+            ...action.info,
+            label: 'ui_refresh',
+            icon: 'refresh',
+            tooltip: 'authentication_administration_tools_refresh_tooltip',
           };
         }
 
