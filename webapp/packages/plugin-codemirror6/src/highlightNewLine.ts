@@ -27,14 +27,15 @@ export function highlightNewLine() {
 
       getDecorations(view: EditorView) {
         const widgets = [];
+        const lastLineNumber = view.state.doc.lines;
         for (const { from, to } of view.visibleRanges) {
           for (let pos = from; pos <= to; ) {
             const line = view.state.doc.lineAt(pos);
-            if (line.length === 0) {
-              widgets.push(Decoration.widget({ widget: new NewlineWidget(), side: 1 }).range(pos));
-            } else {
+
+            if (line.number < lastLineNumber) {
               widgets.push(Decoration.widget({ widget: new NewlineWidget(), side: 1 }).range(line.to));
             }
+
             pos = line.to + 1;
           }
         }
