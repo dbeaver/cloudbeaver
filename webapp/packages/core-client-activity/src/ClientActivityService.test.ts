@@ -9,18 +9,21 @@ import { beforeEach, describe, expect, it, vitest, afterEach } from 'vitest';
 
 import { ClientActivityService, INACTIVE_PERIOD_TIME } from './ClientActivityService.js';
 
-vitest.mock('@cloudbeaver/core-executor', () => ({
-  Executor: vitest.fn(() => ({
-    execute: vitest.fn(),
-    addHandler: vitest.fn(),
-    removeHandler: vitest.fn(),
-    addPostHandler: vitest.fn(),
-    removePostHandler: vitest.fn(),
-    before: vitest.fn(),
-    removeBefore: vitest.fn(),
-    next: vitest.fn(),
-  })),
-}));
+vitest.mock('@cloudbeaver/core-executor', () => {
+  class MockExecutor {
+    execute = vitest.fn();
+    addHandler = vitest.fn();
+    removeHandler = vitest.fn();
+    addPostHandler = vitest.fn();
+    removePostHandler = vitest.fn();
+    before = vitest.fn();
+    removeBefore = vitest.fn();
+    next = vitest.fn();
+  }
+  return {
+    Executor: MockExecutor,
+  };
+});
 
 describe('ClientActivityService', () => {
   let clientActivityService: ClientActivityService;
