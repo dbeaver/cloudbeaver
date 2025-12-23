@@ -48,6 +48,7 @@ export const ConnectionAuthModelCredentialsForm = observer<Props>(function Conne
         readOnly={readonly}
         getLayoutSize={getLayoutSize}
         showRememberTip
+        disableAutoCompleteForPasswords
         hideEmptyPlaceholder
       />
     </Container>
