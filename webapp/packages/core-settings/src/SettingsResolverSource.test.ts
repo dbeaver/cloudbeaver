@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { describe, expect, test } from 'vitest';
+import { beforeEach, describe, expect, test } from 'vitest';
 
 import {
   expectDeprecatedSettingMessage,
@@ -14,11 +14,10 @@ import {
 } from './__custom_mocks__/expectDeprecatedSettingMessage.js';
 import { SettingsResolverSource } from './SettingsResolverSource.js';
 import { createSettingsLayer, ROOT_SETTINGS_LAYER } from './SettingsLayer.js';
-import { createSettingsAliasResolver } from './createSettingsAliasResolver.js';
+import { createSettingsAliasResolver, DEPRECATED_SETTINGS } from './createSettingsAliasResolver.js';
 import { schema } from '@cloudbeaver/core-utils';
 import { EditableSettingsSource } from './EditableSettingsSource.js';
 import { initKnownConsoleMessages } from '@cloudbeaver/tests-runner';
-import { resetDeprecatedSettings } from './createSettingsAliasResolver.test.js';
 
 export class MemorySettingsService extends EditableSettingsSource {
   private readonly settings: Map<string, any>;
@@ -72,6 +71,12 @@ export class MemorySettingsService extends EditableSettingsSource {
 }
 
 const MEMORY_SETTINGS_LAYER = createSettingsLayer(ROOT_SETTINGS_LAYER, 'memory');
+
+function resetDeprecatedSettings() {
+  beforeEach(() => {
+    DEPRECATED_SETTINGS.clear();
+  });
+}
 
 describe('SettingsResolverSource', () => {
   initKnownConsoleMessages(addDeprecatedSettingPattern);

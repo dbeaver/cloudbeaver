@@ -134,7 +134,7 @@ export function SelectField<T, ItemType extends {} = SelectItem<T>>({
     return firstEnabledItem ? getItemValue(firstEnabledItem) : undefined;
   });
 
-  const handleChange = (newValue: string | string[]) => {
+  const handleChange = (newValue: string | readonly string[]) => {
     // TODO: add support for multi-select
 
     const newItem = items.find(item => getItemValueSerialized(item) === newValue);

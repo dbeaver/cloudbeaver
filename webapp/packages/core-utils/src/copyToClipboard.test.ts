@@ -5,33 +5,60 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { beforeAll, describe, expect, it, vitest } from 'vitest';
+import { afterAll, beforeEach, describe, expect, it, vitest } from 'vitest';
 
 import { copyToClipboard } from './copyToClipboard.js';
 
 describe('copyToClipboard', () => {
-  beforeAll(() => {
-    document.execCommand = vitest.fn() as any;
+  const originalExecCommand = document.execCommand;
+
+  beforeEach(() => {
+    document.execCommand = vitest.fn();
   });
 
-  it('should copy data to clipboard', () => {
-    copyToClipboard('test');
-
-    expect(document.execCommand).toHaveBeenCalledWith('copy');
+  afterAll(() => {
+    document.execCommand = originalExecCommand;
   });
 
-  it('should focus on active element after copy', () => {
-    const focusSpy = vitest.spyOn(document.body, 'focus');
+  it('should copy text to clipboard', () => {
+    const testData = 'test clipboard data';
+    const execCommandMock = vitest.spyOn(document, 'execCommand').mockReturnValue(true);
 
-    copyToClipboard('test');
+    copyToClipboard(testData);
 
-    expect(document.activeElement).toBe(document.body);
-    expect(focusSpy).toHaveBeenCalled();
+    expect(execCommandMock).toHaveBeenCalledWith('copy');
   });
 
-  it('should have no children after copy', () => {
-    copyToClipboard('test');
+  it('should create and remove a temporary textarea element', () => {
+    const testData = 'test data';
+    const appendChildSpy = vitest.spyOn(document.body, 'appendChild');
+    const removeChildSpy = vitest.spyOn(document.body, 'removeChild');
 
-    expect(document.body.children.length).toBe(0);
+    copyToClipboard(testData);
+
+    expect(appendChildSpy).toHaveBeenCalledTimes(1);
+    expect(removeChildSpy).toHaveBeenCalledTimes(1);
+
+    const firstCall = appendChildSpy.mock.calls[0];
+    expect(firstCall).toBeDefined();
+
+    const textarea = firstCall![0] as HTMLTextAreaElement;
+    expect(textarea.tagName).toBe('TEXTAREA');
+    expect(textarea.value).toBe(testData);
+  });
+
+  it('should restore focus to the previously active element', () => {
+    const testData = 'test data';
+    const mockElement = document.createElement('input');
+    const focusSpy = vitest.spyOn(mockElement, 'focus');
+
+    document.body.appendChild(mockElement);
+    mockElement.focus();
+
+    copyToClipboard(testData);
+
+    expect(focusSpy).toHaveBeenCalledWith({ preventScroll: true });
+
+    document.body.removeChild(mockElement);
   });
 });
