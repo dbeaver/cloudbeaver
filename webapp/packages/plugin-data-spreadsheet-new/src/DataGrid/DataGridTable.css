@@ -30,6 +30,12 @@
     user-select: none;
     -webkit-user-select: none;
 
+    & .rdg-cell-frozen {
+      &:nth-last-child(1 of &) {
+        border-inline-end-width: 3px;
+      }
+    }
+
     & .rdg-cell-custom-edited {
       background-color: var(--theme-edit-status) !important;
     }

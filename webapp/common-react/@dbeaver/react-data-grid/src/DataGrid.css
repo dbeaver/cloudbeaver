@@ -6,9 +6,22 @@
     --dbv-kit-icon-btn-outline-width: 1px;
   }
 
-  .rdg-cell-frozen {
-    &:nth-last-child(1 of &) {
-      border-inline-end-width: 3px;
+  @media (prefers-color-scheme: dark) {
+    .rdg-cell-frozen {
+      &:nth-last-child(1 of &) {
+        box-shadow: none;
+
+        &::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          z-index: -1;
+          background-color: rgba(255, 255, 255, 0.02);
+        }
+      }
     }
   }
 }
