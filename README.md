@@ -1,4 +1,4 @@
-<img src="https://github.com/dbeaver/cloudbeaver/wiki/images/cloudbeaver-logo.png" align="right" width="250"/>
+<img src="https://github.com/dbeaver/cloudbeaver/wiki/images/cloudbeaver-logo.png" alt="CloudBeaver logo" align="right" width="250"/>
 
 # CloudBeaver Community
 
@@ -24,6 +24,11 @@ You can see a live demo of CloudBeaver here: https://demo.cloudbeaver.io
 [Database access instructions](https://github.com/dbeaver/cloudbeaver/wiki/Demo-Server)
 
 ## Changelog
+
+### 25.3.1 2025-12-22
+- Implemented an ability to add parameters and variables to queries in the SQL Editor. This feature allows for the reuse of queries by changing parameters at the execution stage. It is enabled by default and can be configured in personal preferences;
+- Added support for mapping users to CloudBeaver teams based on LDAP memberOf group membership;
+- Added support for previous browser versions, but not older than three years.
 
 ### 25.3.0 2025-12-01
 ### Changes since 25.2.0:

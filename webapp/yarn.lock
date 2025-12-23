@@ -11858,14 +11858,14 @@ __metadata:
   linkType: hard
 
 "eslint-plugin-storybook@npm:^10":
-  version: 10.1.7
-  resolution: "eslint-plugin-storybook@npm:10.1.7"
+  version: 10.1.10
+  resolution: "eslint-plugin-storybook@npm:10.1.10"
   dependencies:
     "@typescript-eslint/utils": "npm:^8.8.1"
   peerDependencies:
     eslint: ">=8"
-    storybook: ^10.1.7
-  checksum: 10c0/e1ea9082c86f07ed53b436ef7cb20af348b4237fd72f46c445c3366ff225f466ac1c8f3d343a9609053abea7ee1001b9f2af27f5743e6e83e8a942035b6f2e3b
+    storybook: ^10.1.10
+  checksum: 10c0/7c891a849481e68fec354752f00c69b94c689c6b382671c48fb539cb086a626273be668b0fb7ceceb170a4b0f5dcb38a57d6cd093f349c1ff6f5ba2565fae765
   languageName: node
   linkType: hard
 
@@ -17985,8 +17985,8 @@ __metadata:
   linkType: hard
 
 "storybook@npm:^10":
-  version: 10.1.7
-  resolution: "storybook@npm:10.1.7"
+  version: 10.1.10
+  resolution: "storybook@npm:10.1.10"
   dependencies:
     "@storybook/global": "npm:^5.0.0"
     "@storybook/icons": "npm:^2.0.0"
@@ -18007,7 +18007,7 @@ __metadata:
       optional: true
   bin:
     storybook: ./dist/bin/dispatcher.js
-  checksum: 10c0/eaab0289f3c231d9edf8beb2f7d7efbe8df3336a08129b6c2c7db501c332ba14e0a1b894ccce4db90251c4c1b2f023d20df5d4dfc951b53cece727f0da294680
+  checksum: 10c0/beff5472ee86a995cbde2789b2aabd941f823e31ca6957bb4434cb8ee3d3703cf1248e44f4b4d402416a52bfee94677e74f233cc906487901e831e8ab610defa
   languageName: node
   linkType: hard
 
