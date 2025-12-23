@@ -53,7 +53,7 @@ export const AuthProviderForm = observer<Props>(function AuthProviderForm({ prov
               state={credentials.credentials}
               readOnly={authenticate}
               canShowPassword={false}
-              autoComplete="on"
+              autoComplete={parameter.encryption === 'none' ? 'on' : 'new-password'}
             >
               {parameter.displayName}
             </InputField>
