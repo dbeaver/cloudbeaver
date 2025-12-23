@@ -30,6 +30,7 @@ import { DataGridContextMenuSaveContentService } from './DataGrid/DataGridContex
 import { DataGridSettingsService } from './DataGridSettingsService.js';
 import { ACTION_DATA_GRID_PIN_COLUMN } from './DataGrid/Actions/Pin/ACTION_DATA_GRID_PIN_COLUMN.js';
 import { ACTION_DATA_GRID_UNPIN_COLUMN } from './DataGrid/Actions/Pin/ACTION_DATA_GRID_UNPIN_COLUMN.js';
+import { ACTION_DATA_GRID_UNPIN_ALL_COLUMNS } from './DataGrid/Actions/Pin/ACTION_DATA_GRID_UNPIN_ALL_COLUMNS.js';
 import { ACTION_DATA_GRID_FILTERS_RESET_OR_SORTING } from './DataGrid/Actions/Filters/ACTION_DATA_GRID_FILTERS_RESET_OR_SORTING.js';
 
 const VALUE_TEXT_PRESENTATION_ID = 'value-text-presentation';
@@ -89,6 +90,7 @@ export class SpreadsheetBootstrap extends Bootstrap {
         ACTION_DATA_GRID_FILTERS_RESET_OR_SORTING,
         ACTION_DATA_GRID_PIN_COLUMN,
         ACTION_DATA_GRID_UNPIN_COLUMN,
+        ACTION_DATA_GRID_UNPIN_ALL_COLUMNS,
       ],
     });
 
@@ -122,6 +124,10 @@ export class SpreadsheetBootstrap extends Bootstrap {
           return presentationActions.isColumnPinned(dataContextResultKey) === false;
         }
 
+        if (action === ACTION_DATA_GRID_UNPIN_ALL_COLUMNS) {
+          return !presentationActions.hasPinnedColumns();
+        }
+
         return false;
       },
       isActionApplicable: (context, action): boolean => {
@@ -144,7 +150,13 @@ export class SpreadsheetBootstrap extends Bootstrap {
           return constraints.orderConstraints.length > 0 || constraints.filterConstraints.length > 0;
         }
 
-        return [ACTION_OPEN, ACTION_DATA_GRID_FILTERS_RESET_OR_SORTING, ACTION_DATA_GRID_PIN_COLUMN, ACTION_DATA_GRID_UNPIN_COLUMN].includes(action);
+        return [
+          ACTION_OPEN,
+          ACTION_DATA_GRID_FILTERS_RESET_OR_SORTING,
+          ACTION_DATA_GRID_PIN_COLUMN,
+          ACTION_DATA_GRID_UNPIN_COLUMN,
+          ACTION_DATA_GRID_UNPIN_ALL_COLUMNS,
+        ].includes(action);
       },
       handler: async (context, action) => {
         if (action === ACTION_OPEN) {
@@ -182,6 +194,11 @@ export class SpreadsheetBootstrap extends Bootstrap {
           if (dataContextResultKey.column) {
             presentationActions.unpinColumn(dataContextResultKey);
           }
+        }
+
+        if (action === ACTION_DATA_GRID_UNPIN_ALL_COLUMNS) {
+          const presentationActions = context.get(DATA_CONTEXT_DV_PRESENTATION_ACTIONS)!;
+          presentationActions.unpinAllColumns();
         }
       },
     });

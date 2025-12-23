@@ -11,4 +11,6 @@ export interface IDataPresentationActions<TKey> {
   pinColumn: (key: TKey) => void;
   unpinColumn: (key: TKey) => void;
   isColumnPinned: (key: TKey) => boolean;
+  hasPinnedColumns: () => boolean;
+  unpinAllColumns: () => void;
 }

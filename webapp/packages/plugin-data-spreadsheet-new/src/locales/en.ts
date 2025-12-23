@@ -10,6 +10,7 @@ export default [
   ['data_grid_table_order', 'Sorting'],
   ['plugin_data_spreadsheet_new_pin_column', 'Pin Column'],
   ['plugin_data_spreadsheet_new_unpin_column', 'Unpin Column'],
+  ['plugin_data_spreadsheet_new_unpin_all_columns', 'Unpin All Columns'],
   ['data_grid_table_open_value_panel', 'Show in value panel'],
   ['data_grid_table_filter', 'Filters'],
   ['data_grid_table_filter_cell_value', 'Cell value'],

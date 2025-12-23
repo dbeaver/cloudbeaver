@@ -10,6 +10,7 @@ export default [
   ['data_grid_table_order', 'Сортировка'],
   ['plugin_data_spreadsheet_new_pin_column', 'Закрепить колонку'],
   ['plugin_data_spreadsheet_new_unpin_column', 'Открепить колонку'],
+  ['plugin_data_spreadsheet_new_unpin_all_columns', 'Открепить все колонки'],
   ['data_grid_table_open_value_panel', 'Показать в панели значений'],
   ['data_grid_table_filter', 'Фильтры'],
   ['data_grid_table_filter_cell_value', 'Значение ячейки'],

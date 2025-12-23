@@ -12,7 +12,9 @@ import { createContext } from 'react';
 export interface IDataGridPinContext {
   pinColumn: (columnKey: IGridColumnKey) => void;
   unpinColumn: (columnIndex: IGridColumnKey) => void;
+  unpinAllColumns: () => void;
   isColumnPinned: (columnIndex: IGridColumnKey) => boolean;
+  hasPinnedColumns: () => boolean;
 }
 
 export const DataGridPinContext = createContext<IDataGridPinContext>(undefined as any);

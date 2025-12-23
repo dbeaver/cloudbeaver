@@ -56,6 +56,12 @@ export const CellFormatter = observer<Props>(function CellFormatter({ rowIdx, co
     isColumnPinned(key) {
       return gridPinContext.isColumnPinned(key.column);
     },
+    unpinAllColumns() {
+      gridPinContext.unpinAllColumns();
+    },
+    hasPinnedColumns() {
+      return gridPinContext.hasPinnedColumns();
+    },
   });
 
   function handleCellMenuStateSwitch(visible: boolean): void {

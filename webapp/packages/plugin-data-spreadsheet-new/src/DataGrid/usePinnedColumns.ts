@@ -15,6 +15,7 @@ export function usePinnedColumns(): {
   gridPinContext: IDataGridPinContext;
   pinColumn: (colIdx: IGridColumnKey) => void;
   unpinColumn: (colIdx: IGridColumnKey) => void;
+  unpinAllColumns: () => void;
   isColumnPinned: (colIdx: IGridColumnKey) => boolean;
 } {
   const [pinnedColumns, setPinnedColumns] = useState<Set<string>>(new Set());
@@ -41,16 +42,23 @@ export function usePinnedColumns(): {
     });
   }, []);
 
+  const unpinAllColumns = useCallback(() => {
+    setPinnedColumns(new Set());
+  }, []);
+
   const isColumnPinned = useCallback((colIdx: IGridColumnKey) => pinnedColumns.has(GridDataKeysUtils.serialize(colIdx)), [pinnedColumns]);
+  const hasPinnedColumns = useCallback(() => pinnedColumns.size > 0, [pinnedColumns]);
 
   const gridPinContext = useMemo<IDataGridPinContext>(
     () => ({
       pinColumn,
       unpinColumn,
+      unpinAllColumns,
       isColumnPinned,
+      hasPinnedColumns,
     }),
-    [pinColumn, unpinColumn, isColumnPinned],
+    [pinColumn, unpinColumn, unpinAllColumns, isColumnPinned, hasPinnedColumns],
   );
 
-  return { pinnedColumns, pinColumn, unpinColumn, isColumnPinned, gridPinContext };
+  return { pinnedColumns, pinColumn, unpinColumn, unpinAllColumns, isColumnPinned, gridPinContext };
 }
