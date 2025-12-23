@@ -68,23 +68,23 @@ export const Tree = observer<React.PropsWithChildren<NavigationTreeNewProps>>(fu
   });
 
   return (
-    <div ref={mountOptimization.setRootRef} className={clsx('tw:relative tw:overflow-auto tw:flex-1', className)}>
-      <NodeSizeCacheContext.Provider value={elementsSizeCache}>
-        <TreeDataContext.Provider value={data}>
-          <TreeSelectionContext.Provider value={selection}>
-            <TreeVirtualizationContext.Provider value={mountOptimization}>
-              <TreeContext.Provider value={tree}>
-                <TreeDnDContext.Provider value={treeDnD}>
-                  <TreeMenuContextProvider menu={menu ?? null}>
-                    {children}
+    <NodeSizeCacheContext.Provider value={elementsSizeCache}>
+      <TreeDataContext.Provider value={data}>
+        <TreeSelectionContext.Provider value={selection}>
+          <TreeContext.Provider value={tree}>
+            <TreeDnDContext.Provider value={treeDnD}>
+              <TreeMenuContextProvider menu={menu ?? null}>
+                {children}
+                <div ref={mountOptimization.setRootRef} className={clsx('tw:relative tw:overflow-auto', className)}>
+                  <TreeVirtualizationContext.Provider value={mountOptimization}>
                     <NodeChildren nodeId={data.rootId} offsetHeight={0} emptyPlaceholder={emptyPlaceholder} root />
-                  </TreeMenuContextProvider>
-                </TreeDnDContext.Provider>
-              </TreeContext.Provider>
-            </TreeVirtualizationContext.Provider>
-          </TreeSelectionContext.Provider>
-        </TreeDataContext.Provider>
-      </NodeSizeCacheContext.Provider>
-    </div>
+                  </TreeVirtualizationContext.Provider>
+                </div>
+              </TreeMenuContextProvider>
+            </TreeDnDContext.Provider>
+          </TreeContext.Provider>
+        </TreeSelectionContext.Provider>
+      </TreeDataContext.Provider>
+    </NodeSizeCacheContext.Provider>
   );
 });
