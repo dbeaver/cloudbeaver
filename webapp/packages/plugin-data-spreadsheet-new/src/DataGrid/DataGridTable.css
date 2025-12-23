@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-@layer Components {
+@layer components {
   .theme-dark {
     --theme-add-status: #65974c;
     --theme-delete-status: #b55d68;
