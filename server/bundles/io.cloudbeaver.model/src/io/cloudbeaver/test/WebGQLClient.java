@@ -29,7 +29,6 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -72,7 +71,16 @@ public class WebGQLClient {
      */
     @NotNull
     public <T> T sendQuery(@NotNull String query, @Nullable Map<String, Object> variables) throws Exception {
-        return sendQueryWithHeaders(query, variables, List.of());
+        return sendQueryWithHeaders(query, variables, Map.of());
+    }
+
+    @NotNull
+    public Map<String, Object> sendQueryAndGetHeaders(
+        @NotNull String query,
+        @Nullable Map<String, Object> variables,
+        @NotNull Map<String, String> requestHeaders
+    ) throws Exception {
+        return executeGQLRequest(query, variables, requestHeaders);
     }
 
     /**
@@ -87,15 +95,26 @@ public class WebGQLClient {
     public <T> T sendQueryWithHeaders(
         @NotNull String query,
         @Nullable Map<String, Object> variables,
-        @NotNull List<String> headers
+        @NotNull Map<String, String> headers
+    ) throws Exception {
+        Map<String, Object> parsed = executeGQLRequest(query, variables, headers);
+        // graphql response will be in "data" key
+        return (T) parsed.get("data");
+    }
+
+    @NotNull
+    private Map<String, Object> executeGQLRequest(
+        @NotNull String query,
+        @Nullable Map<String, Object> variables,
+        @NotNull Map<String, String> requestHeaders
     ) throws Exception {
         HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
             .uri(URI.create(apiUrl))
             .POST(HttpRequest.BodyPublishers.ofString(makeGQLRequest(query, variables)))
             .setHeader("TE-Client-Version", GeneralUtils.getMajorVersion())
             .header("Content-Type", "application/json");
-        if (!headers.isEmpty()) {
-            requestBuilder.headers(headers.toArray(String[]::new));
+        if (!requestHeaders.isEmpty()) {
+            requestHeaders.forEach(requestBuilder::header);
         }
         HttpRequest request = requestBuilder.build();
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
@@ -107,8 +126,10 @@ public class WebGQLClient {
             String message = JSONUtils.getString(JSONUtils.getObjectList(body, "errors").get(0), "message");
             throw new DBException(message);
         }
-        // graphql response will be in "data" key
-        return (T) JSONUtils.getObject(body, "data").get("result");
+        Map<String, Object> parsed = new LinkedHashMap<>();
+        parsed.put("data", JSONUtils.getObject(body, "data").get("result"));
+        parsed.put("headers", response.headers().map());
+        return parsed;
     }
 
     @NotNull
