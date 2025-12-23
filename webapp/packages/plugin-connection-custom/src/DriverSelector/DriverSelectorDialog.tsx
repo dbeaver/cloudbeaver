@@ -7,7 +7,16 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { CommonDialogBody, CommonDialogHeader, CommonDialogWrapper, s, useResource, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import {
+  CommonDialogBody,
+  CommonDialogHeader,
+  CommonDialogWrapper,
+  s,
+  SLIDE_PANEL_CLOSE_BUTTON_ID,
+  useResource,
+  useS,
+  useTranslate,
+} from '@cloudbeaver/core-blocks';
 import type { DialogComponent } from '@cloudbeaver/core-dialogs';
 import { ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
@@ -35,7 +44,7 @@ export const DriverSelectorDialog: DialogComponent<Payload> = observer(function 
     <CommonDialogWrapper
       size="large"
       autoFocusOnHide={() => {
-        const finalFocus = document.getElementById('slide-panel-close-button');
+        const finalFocus = document.getElementById(SLIDE_PANEL_CLOSE_BUTTON_ID);
         finalFocus?.focus();
 
         return false;

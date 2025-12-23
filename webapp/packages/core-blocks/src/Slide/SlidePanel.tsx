@@ -17,6 +17,8 @@ interface SlidePanelProps {
 
 import style from './SlidePanel.module.css';
 
+export const SLIDE_PANEL_CLOSE_BUTTON_ID = 'slide-panel-close-button';
+
 export function SlidePanel({ children, isOpen, onClose }: SlidePanelProps): React.ReactElement {
   const styles = useS(style);
   const t = useTranslate();
@@ -25,7 +27,7 @@ export function SlidePanel({ children, isOpen, onClose }: SlidePanelProps): Reac
     <SlideElement open={isOpen}>
       {isOpen && (
         <IconButton
-          id="slide-panel-close-button"
+          id={SLIDE_PANEL_CLOSE_BUTTON_ID}
           size="small"
           aria-label={t('core_blocks_dialog_element_close_tooltip')}
           className={s(styles, { iconBtn: true })}
