@@ -25,7 +25,6 @@ import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
-import org.jkiss.dbeaver.model.DBPObjectSettingsManager;
 import org.jkiss.dbeaver.model.DBPObjectSettingsProvider;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistryCache;
@@ -37,6 +36,7 @@ import org.jkiss.dbeaver.model.security.SMObjectType;
 import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceEvent;
 import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceProperty;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
+import org.jkiss.dbeaver.registry.DataSourceNavigatorSettingsUtils;
 import org.jkiss.dbeaver.registry.DataSourceRegistry;
 import org.jkiss.dbeaver.runtime.jobs.DisconnectJob;
 import org.jkiss.utils.CommonUtils;
@@ -52,7 +52,6 @@ public class WebSessionProjectImpl extends WebProjectImpl implements DBPObjectSe
     private static final Log log = Log.getLog(WebSessionProjectImpl.class);
     protected final WebSession webSession;
     private final Map<String, WebConnectionInfo> connections = new HashMap<>();
-    private final DBPObjectSettingsManager projectSettingsManager = new DBPObjectSettingsManager();
     private Map<String, Map<String, String>> projectSettings;
     private boolean registryIsLoaded = false;
     private final Object lock = new Object();
@@ -95,7 +94,7 @@ public class WebSessionProjectImpl extends WebProjectImpl implements DBPObjectSe
     }
 
     @Nullable
-    public Map<String, String> getObjectSettings(@NotNull String objectId) {
+    public Map<String, String> getObjectSettings(@NotNull SMObjectType objectType, @NotNull String objectId) {
         synchronized (lock) {
             if (projectSettings == null) {
                 loadProjectSettings();
@@ -105,21 +104,20 @@ public class WebSessionProjectImpl extends WebProjectImpl implements DBPObjectSe
     }
 
     @Override
-    public void setObjectSettings(@NotNull String objectId, @NotNull Map<String, String> settings) throws DBException {
+    public void setObjectSettings(
+        @NotNull SMObjectType objectType,
+        @NotNull String objectId,
+        @NotNull Map<String, String> settings
+    ) throws DBException {
         if (webSession.getUserContext().isNonAnonymousUserAuthorizedInSM()) {
             webSession.getSecurityController().setObjectSettings(
                 getId(),
+                objectType,
                 objectId,
-                SMObjectType.datasource,
                 settings
             );
         }
         setObjectSettingsCache(objectId, settings);
-    }
-
-    @Override
-    public DBPObjectSettingsManager getObjectSettingsManager() {
-        return projectSettingsManager;
     }
 
     private void loadProjectSettings() {
@@ -143,7 +141,7 @@ public class WebSessionProjectImpl extends WebProjectImpl implements DBPObjectSe
     public void setObjectSettingsCache(@NotNull String objectId, Map<String, String> settingsToSet) throws DBException {
         Map<String, String> settings = projectSettings.computeIfAbsent(objectId, k -> new HashMap<>());
         settings.putAll(settingsToSet);
-        this.projectSettingsManager.notifySettingsChanged(objectId, new ArrayList<>(settingsToSet.keySet()));
+        DataSourceNavigatorSettingsUtils.objectSettingUpdated(this, objectId, settingsToSet.keySet());
     }
 
     @NotNull
@@ -311,8 +309,7 @@ public class WebSessionProjectImpl extends WebProjectImpl implements DBPObjectSe
         }
         List<SMObjectSettings> loadedSettings = webSession.getSecurityController().getObjectSettings(
             getId(),
-            getId(),
-            SMObjectType.project,
+            SMObjectType.project, getId(),
             null
         );
         loadedSettings.forEach(smObject -> projectSettings.put(smObject.objectId(), smObject.settings()));
@@ -411,8 +408,7 @@ public class WebSessionProjectImpl extends WebProjectImpl implements DBPObjectSe
     private void deleteAllDataSourceSettings(DBPDataSourceContainer dataSourceContainer) throws DBException {
         webSession.getSecurityController().deleteObjectSettings(
             getId(),
-            dataSourceContainer.getId(),
-            SMObjectType.datasource,
+            SMObjectType.datasource, dataSourceContainer.getId(),
             null
         );
     }

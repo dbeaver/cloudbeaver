@@ -62,8 +62,7 @@ public class WSObjectSettingsEventHandler extends WSDefaultEventHandler<WSObject
                 try {
                     List<SMObjectSettings> settings = webSession.getSecurityController().getObjectSettings(
                         project.getId(),
-                        objectId,
-                        event.getSmObjectType(),
+                        event.getSmObjectType(), objectId,
                         settingId
                     );
                     for (SMObjectSettings setting : settings) {

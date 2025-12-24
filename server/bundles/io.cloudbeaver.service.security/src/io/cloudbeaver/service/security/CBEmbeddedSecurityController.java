@@ -108,8 +108,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
     @Override
     public void setObjectSettings(
         @NotNull String projectId,
-        @NotNull String objectId,
-        @NotNull SMObjectType objectType,
+        @NotNull SMObjectType objectType, @NotNull String objectId,
         @NotNull Map<String, String> settings
     ) throws DBException {
         String userId = getUserIdOrThrow();
@@ -157,8 +156,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
     @Override
     public List<SMObjectSettings> getObjectSettings(
         @NotNull String projectId,
-        @NotNull String objectId,
-        @NotNull SMObjectType objectType,
+        @NotNull SMObjectType objectType, @NotNull String objectId,
         @Nullable String settingId
     ) throws DBException {
         String userId = getUserIdOrThrow();
@@ -203,8 +201,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
     @Override
     public void deleteObjectSettings(
         @NotNull String projectId,
-        @NotNull String objectId,
-        @NotNull SMObjectType objectType,
+        @NotNull SMObjectType objectType, @NotNull String objectId,
         @Nullable Set<String> settingIds
     ) throws DBException {
         try (Connection dbCon = database.openConnection()) {
@@ -1410,7 +1407,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
 
     @NotNull
     @Override
-    public String[] getTeamMembers(String teamId) throws DBException {
+    public String[] getTeamMembers(@NotNull String teamId) throws DBException {
         return getTeamMembersInfo(teamId).stream().map(SMTeamMemberInfo::userId).toArray(String[]::new);
     }
 
