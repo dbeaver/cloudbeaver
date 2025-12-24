@@ -42,7 +42,10 @@ import org.jkiss.dbeaver.runtime.jobs.DisconnectJob;
 import org.jkiss.utils.CommonUtils;
 
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class WebSessionProjectImpl extends WebProjectImpl implements DBPObjectSettingsProvider {
@@ -108,7 +111,7 @@ public class WebSessionProjectImpl extends WebProjectImpl implements DBPObjectSe
                 getId(),
                 objectId,
                 SMObjectType.datasource,
-                new LinkedHashMap<>(settings)
+                settings
             );
         }
         setObjectSettingsCache(objectId, settings);

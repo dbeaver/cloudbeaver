@@ -110,25 +110,28 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         @NotNull String projectId,
         @NotNull String objectId,
         @NotNull SMObjectType objectType,
-        @NotNull Map<String, Object> settings
+        @NotNull Map<String, String> settings
     ) throws DBException {
         String userId = getUserIdOrThrow();
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
-                deleteObjectSettings(projectId, objectId, objectType, settings.keySet());
+                deleteObjectSettings(dbCon, projectId, objectId, objectType, settings.keySet());
                 try (
                     PreparedStatement dbStat = dbCon.prepareStatement(
                         "INSERT INTO {table_prefix}CB_OBJECT_SETTINGS" +
                             "(PROJECT_ID,OBJECT_ID,OBJECT_TYPE,SUBJECT_ID,SETTING_ID,SETTING_VALUE,UPDATED_BY,UPDATE_TIME) " +
                             "VALUES(?,?,?,?,?,?,?,CURRENT_TIMESTAMP)")
                 ) {
-                    for (Map.Entry<String, Object> entry : settings.entrySet()) {
+                    for (Map.Entry<String, String> entry : settings.entrySet()) {
+                        if (entry.getValue() == null) {
+                            continue;
+                        }
                         dbStat.setString(1, projectId);
                         dbStat.setString(2, objectId);
                         dbStat.setString(3, objectType.name());
                         dbStat.setString(4, userId);
                         dbStat.setString(5, entry.getKey());
-                        dbStat.setString(6, CommonUtils.toString(entry.getValue()));
+                        dbStat.setString(6, entry.getValue());
                         dbStat.setString(7, userId);
                         dbStat.addBatch();
                     }
@@ -204,27 +207,37 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         @NotNull SMObjectType objectType,
         @Nullable Set<String> settingIds
     ) throws DBException {
+        try (Connection dbCon = database.openConnection()) {
+            deleteObjectSettings(dbCon, projectId, objectId, objectType, settingIds);
+        } catch (SQLException e) {
+            throw new DBCException("Error while deleting object settings", e);
+        }
+    }
+
+    private void deleteObjectSettings(
+        @NotNull Connection dbCon,
+        @NotNull String projectId,
+        @NotNull String objectId,
+        @NotNull SMObjectType objectType,
+        @Nullable Set<String> settingIds
+    ) throws DBException, SQLException {
         String userId = getUserIdOrThrow();
         String sql = "DELETE FROM {table_prefix}CB_OBJECT_SETTINGS WHERE PROJECT_ID=? AND OBJECT_ID=? AND OBJECT_TYPE=? AND SUBJECT_ID=?";
         if (settingIds != null && !settingIds.isEmpty()) {
             sql += " AND SETTING_ID IN (" + SQLUtils.generateParamList(settingIds.size()) + ")";
         }
-        try (Connection dbCon = database.openConnection()) {
-            try (PreparedStatement dbStat = dbCon.prepareStatement(sql)) {
-                int index = 1;
-                dbStat.setString(index++, projectId);
-                dbStat.setString(index++, objectId);
-                dbStat.setString(index++, objectType.name());
-                dbStat.setString(index++, userId);
-                if (settingIds != null) {
-                    for (String settingId : settingIds) {
-                        dbStat.setString(index++, settingId);
-                    }
+        try (PreparedStatement dbStat = dbCon.prepareStatement(sql)) {
+            int index = 1;
+            dbStat.setString(index++, projectId);
+            dbStat.setString(index++, objectId);
+            dbStat.setString(index++, objectType.name());
+            dbStat.setString(index++, userId);
+            if (settingIds != null) {
+                for (String settingId : settingIds) {
+                    dbStat.setString(index++, settingId);
                 }
-                dbStat.executeUpdate();
             }
-        } catch (SQLException e) {
-            throw new DBCException("Error while deleting object settings", e);
+            dbStat.executeUpdate();
         }
         if (settingIds != null) {
             application.getEventController().addEvent(

@@ -84,12 +84,12 @@ public class LocalResourceController extends BaseLocalResourceController {
     private final Map<String, RMLocalProject> projectRegistries = new LinkedHashMap<>();
 
     public LocalResourceController(
-        DBPWorkspace workspace,
-        SMCredentialsProvider credentialsProvider,
-        Path rootPath,
-        Path userProjectsPath,
-        Path sharedProjectsPath,
-        Supplier<SMAdminController> smControllerSupplier
+        @NotNull DBPWorkspace workspace,
+        @NotNull SMCredentialsProvider credentialsProvider,
+        @NotNull Path rootPath,
+        @NotNull Path userProjectsPath,
+        @NotNull Path sharedProjectsPath,
+        @NotNull Supplier<SMAdminController> smControllerSupplier
     ) throws DBException {
         super(workspace, new FileLockController(ServletAppUtils.getServletApplication().getApplicationInstanceId()));
         this.credentialsProvider = credentialsProvider;
@@ -102,21 +102,24 @@ public class LocalResourceController extends BaseLocalResourceController {
         this.fileHandlers = RMFileOperationHandlersRegistry.getInstance().getFileHandlers();
     }
 
+    @NotNull
     protected SMAdminController getSecurityController() {
         return smControllerSupplier.get();
     }
 
+    @Nullable
     private Path getGlobalProjectPath() {
         return globalProjectName == null ? null : this.rootPath.resolve(this.globalProjectName);
     }
 
+    @Nullable
     private Path getPrivateProjectPath() {
         SMCredentials activeUserCredentials = credentialsProvider.getActiveUserCredentials();
         String userId = activeUserCredentials == null ? null : activeUserCredentials.getUserId();
         return userId == null ? null : this.userProjectsPath.resolve(userId);
     }
 
-    protected RMLocalProject getWebProject(String projectId, boolean refresh) throws DBException {
+    protected RMLocalProject getWebProject(@NotNull String projectId, boolean refresh) throws DBException {
         synchronized (projectRegistries) {
             RMLocalProject project = projectRegistries.get(projectId);
             if (project == null || refresh) {
@@ -328,22 +331,22 @@ public class LocalResourceController extends BaseLocalResourceController {
 
     @Override
     public void deleteProject(@NotNull String projectId) throws DBException {
-        try (var projectLock = lockController.lock(projectId, "deleteProject")) {
-            RMProject project = makeProjectFromId(projectId, false);
+        try (var ignoredLock = lockController.lock(projectId, "deleteProject")) {
             Path targetPath = getProjectPath(projectId);
             if (!Files.exists(targetPath)) {
-                log.debug(MessageFormat.format("Project folder ''{0}'' is not found", projectId));
+                log.error(MessageFormat.format("Project folder ''{0}'' is not found", projectId));
                 return;
             }
             try {
-                log.debug("Deleting project '" + projectId + "'");
-                IOUtils.deleteDirectory(targetPath);
+                log.debug("Deleting project '" + projectId + "' in persistence storage");
                 getSecurityController().deleteObject(projectId, projectId, SMObjectType.project);
+                log.debug("Deleting project '" + projectId + "' folder");
+                IOUtils.deleteDirectory(targetPath);
                 synchronized (projectRegistries) {
                     projectRegistries.remove(projectId);
                 }
             } catch (IOException e) {
-                throw new DBException("Error deleting project '" + project.getName() + "'", e);
+                throw new DBException("Error deleting project '" + projectId + "'", e);
             }
         }
     }
@@ -407,6 +410,15 @@ public class LocalResourceController extends BaseLocalResourceController {
     @Override
     public void deleteProjectDataSources(@NotNull String projectId, @NotNull String[] dataSourceIds) throws DBException {
         super.deleteProjectDataSources(projectId, dataSourceIds);
+
+        log.debug("Delete datasources '" + Arrays.toString(dataSourceIds) + "' from security controller");
+        for (String dsId : dataSourceIds) {
+            try {
+                getSecurityController().deleteObject(projectId, dsId, SMObjectType.datasource);
+            } catch (DBException e) {
+                log.error("Error deleting datasource '" + dsId + "' from database");
+            }
+        }
         if (credentialsProvider.getActiveUserCredentials() != null && dataSourceIds.length > 0) {
             ServletAppUtils.getServletApplication().getEventController().addEvent(
                 WSDataSourceEvent.delete(
@@ -954,7 +966,7 @@ public class LocalResourceController extends BaseLocalResourceController {
     }
 
     @Nullable
-    protected RMProject makeProjectFromId(String projectId, boolean loadPermissions) throws DBException {
+    protected RMProject makeProjectFromId(@NotNull String projectId, boolean loadPermissions) throws DBException {
         var projectName = WebRMUtils.parseProjectName(projectId);
         var projectPath = getProjectPath(projectId);
         if (!Files.exists(projectPath)) {
@@ -1015,7 +1027,7 @@ public class LocalResourceController extends BaseLocalResourceController {
         }
     }
 
-    protected <T> T doProjectOperation(String projectId, RMFileOperation<T> operation) throws DBException {
+    protected <T> T doProjectOperation(@NotNull String projectId, @NotNull RMFileOperation<T> operation) throws DBException {
         for (RMFileOperationHandler fileHandler : fileHandlers) {
             try {
                 fileHandler.projectOpened(projectId);
@@ -1033,7 +1045,7 @@ public class LocalResourceController extends BaseLocalResourceController {
         return operation.doOperation();
     }
 
-    protected <T> T doFileReadOperation(String projectId, Path file, RMFileOperation<T> operation) throws DBException {
+    protected <T> T doFileReadOperation(@NotNull String projectId, @NotNull Path file, @NotNull RMFileOperation<T> operation) throws DBException {
         for (RMFileOperationHandler fileHandler : fileHandlers) {
             try {
                 fileHandler.beforeFileRead(projectId, file);
@@ -1052,7 +1064,11 @@ public class LocalResourceController extends BaseLocalResourceController {
         return operation.doOperation();
     }
 
-    protected <T> T doFileWriteOperation(String projectId, Path file, RMFileOperation<T> operation) throws DBException {
+    protected <T> T doFileWriteOperation(
+        @NotNull String projectId,
+        @NotNull Path file,
+        @NotNull RMFileOperation<T> operation
+    ) throws DBException {
         for (RMFileOperationHandler fileHandler : fileHandlers) {
             fileHandler.beforeFileChange(projectId, file);
         }
@@ -1071,7 +1087,7 @@ public class LocalResourceController extends BaseLocalResourceController {
         return result;
     }
 
-    protected Path getProjectPath(String projectId) throws DBException {
+    protected Path getProjectPath(@NotNull String projectId) throws DBException {
         RMProjectName project = WebRMUtils.parseProjectName(projectId);
         RMProjectType type = project.getType();
         String projectName = project.getName();
