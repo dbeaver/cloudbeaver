@@ -18,7 +18,6 @@ import { TableDataContext } from '../TableDataContext.js';
 import style from './CellFormatter.module.css';
 import { CellFormatterFactory } from './CellFormatterFactory.js';
 import { CellMenu } from './Menu/CellMenu.js';
-import { DataGridPinContext } from '../DataGridPinContext.js';
 
 interface Props {
   rowIdx: number;
@@ -27,7 +26,6 @@ interface Props {
 
 export const CellFormatter = observer<Props>(function CellFormatter({ rowIdx, colIdx }) {
   const context = useContext(DataGridContext);
-  const gridPinContext = useContext(DataGridPinContext);
   const tableDataContext = useContext(TableDataContext);
   const innerCellContext = use(DataGridCellInnerContext);
   const cellContext = useContext(CellContext);
@@ -48,19 +46,19 @@ export const CellFormatter = observer<Props>(function CellFormatter({ rowIdx, co
       }
     },
     unpinColumn(key) {
-      gridPinContext.unpinColumn(key.column);
+      tableDataContext.view.unpinColumn(key.column);
     },
     pinColumn(key) {
-      gridPinContext.pinColumn(key.column);
+      tableDataContext.view.pinColumn(key.column);
     },
     isColumnPinned(key) {
-      return gridPinContext.isColumnPinned(key.column);
+      return tableDataContext.view.isColumnPinned(key.column);
     },
     unpinAllColumns() {
-      gridPinContext.unpinAllColumns();
+      tableDataContext.view.unpinAllColumns();
     },
     hasPinnedColumns() {
-      return gridPinContext.hasPinnedColumns();
+      return tableDataContext.view.hasPinnedColumns();
     },
   });
 

@@ -5,8 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { useContext } from 'react';
-
 import { useCombinedRef } from '@cloudbeaver/core-blocks';
 import { useDataContext, useDataContextLink } from '@cloudbeaver/core-data-context';
 import { type IDNDBox, type IDNDData, useDNDBox, useDNDData } from '@cloudbeaver/core-ui';
@@ -22,9 +20,6 @@ import {
   ResultSetDataSource,
 } from '@cloudbeaver/plugin-data-viewer';
 
-import { DataGridPinContext } from '../DataGridPinContext.js';
-import { TableDataContext } from '../TableDataContext.js';
-
 type TableColumnInsertPositionSide = 'left' | 'right' | null;
 
 interface TableColumnDnD {
@@ -36,8 +31,6 @@ interface TableColumnDnD {
 
 export function useTableColumnDnD(model: IDatabaseDataModel, resultIndex: number, columnKey: IGridColumnKey | null): TableColumnDnD {
   const context = useDataContext();
-  const pinContext = useContext(DataGridPinContext);
-  const tableDataContext = useContext(TableDataContext);
   let resultSetViewAction: GridViewAction | undefined;
 
   if (isResultSetDataModel(model)) {
@@ -68,15 +61,13 @@ export function useTableColumnDnD(model: IDatabaseDataModel, resultIndex: number
       if (columnKey && dndColumnKey && resultSetViewAction) {
         resultSetViewAction.setColumnOrder(dndColumnKey, resultSetViewAction.columnIndex(columnKey));
 
-        if (pinContext && tableDataContext) {
-          const isFromPinned = pinContext.isColumnPinned(dndColumnKey);
-          const isToPinned = pinContext.isColumnPinned(columnKey);
+        const isFromPinned = resultSetViewAction.isColumnPinned(dndColumnKey);
+        const isToPinned = resultSetViewAction.isColumnPinned(columnKey);
 
-          if (isFromPinned && !isToPinned) {
-            pinContext.unpinColumn(dndColumnKey);
-          } else if (!isFromPinned && isToPinned) {
-            pinContext.pinColumn(dndColumnKey);
-          }
+        if (isFromPinned && !isToPinned) {
+          resultSetViewAction.unpinColumn(dndColumnKey);
+        } else if (!isFromPinned && isToPinned) {
+          resultSetViewAction.pinColumn(dndColumnKey);
         }
       }
     },
