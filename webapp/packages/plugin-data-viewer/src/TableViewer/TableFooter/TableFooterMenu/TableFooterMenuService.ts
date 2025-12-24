@@ -27,6 +27,7 @@ import {
   KEY_BINDING_DELETE_ROW,
   KEY_BINDING_DUPLICATE_ROW,
   KEY_BINDING_REVERT_INLINE_EDITOR_CHANGES,
+  KEY_BINDING_SAVE,
 } from '../../../DATA_VIEWER_KEY_BINDINGS.js';
 
 import { DatabaseEditChangeType, IDatabaseDataEditAction } from '../../../DatabaseDataModel/Actions/IDatabaseDataEditAction.js';
@@ -86,6 +87,16 @@ export class TableFooterMenuService {
       contexts: [DATA_CONTEXT_DV_DDM, DATA_CONTEXT_DV_DDM_RESULT_INDEX],
       isBindingApplicable(context, action) {
         return action === ACTION_DUPLICATE;
+      },
+      handler: this.tableFooterMenuActionHandler.bind(this),
+    });
+
+    this.keyBindingService.addKeyBindingHandler({
+      id: 'table-footer-save',
+      binding: KEY_BINDING_SAVE,
+      contexts: [DATA_CONTEXT_DV_DDM, DATA_CONTEXT_DV_DDM_RESULT_INDEX],
+      isBindingApplicable(context, action) {
+        return action === ACTION_SAVE;
       },
       handler: this.tableFooterMenuActionHandler.bind(this),
     });

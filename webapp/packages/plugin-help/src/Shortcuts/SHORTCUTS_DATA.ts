@@ -19,6 +19,7 @@ import {
   KEY_BINDING_DELETE_ROW,
   KEY_BINDING_DUPLICATE_ROW,
   KEY_BINDING_REVERT_INLINE_EDITOR_CHANGES,
+  KEY_BINDING_SAVE,
 } from '@cloudbeaver/plugin-data-viewer';
 import { KEY_BINDING_COLLAPSE_ALL, KEY_BINDING_ENABLE_FILTER } from '@cloudbeaver/plugin-navigation-tree';
 import { KEY_BINDING_LINK_OBJECT } from '@cloudbeaver/plugin-object-viewer-nav-tree-link';
@@ -81,6 +82,10 @@ export const DATA_VIEWER_SHORTCUTS: IShortcut[] = [
   {
     label: 'data_viewer_shortcut_delete_row',
     code: transformKeys(KEY_BINDING_DELETE_ROW),
+  },
+  {
+    label: 'ui_processing_save',
+    code: transformKeys(KEY_BINDING_SAVE),
   },
 ];
 
