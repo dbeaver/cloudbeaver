@@ -96,10 +96,7 @@ public class WebExpertSettingsProperties implements DBPObject {
     public static class SetOsUserVisibleValidator implements IPropertyValueValidator<WebExpertSettingsProperties, Object> {
         @Override
         public boolean isValidValue(@NotNull WebExpertSettingsProperties object, @Nullable Object value) throws IllegalArgumentException {
-            return CommonUtils.toBoolean(
-                ConfigurationUtils.isOracleDriver(object.driver),
-                false
-            );
+            return ConfigurationUtils.isOracleDriver(object.driver);
         }
     }
 }
