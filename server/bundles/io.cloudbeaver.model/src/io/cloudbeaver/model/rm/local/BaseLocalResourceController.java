@@ -63,6 +63,7 @@ public abstract class BaseLocalResourceController implements RMController {
         this.lockController = lockController;
     }
 
+    @Nullable
     @Override
     public RMProject getProject(@NotNull String projectId, boolean readResources, boolean readProperties)
         throws DBException {
@@ -81,6 +82,7 @@ public abstract class BaseLocalResourceController implements RMController {
         return project;
     }
 
+    @Nullable
     @Override
     public Object getProjectProperty(@NotNull String projectId, @NotNull String propName) throws DBException {
         var project = getWebProject(projectId, false);
@@ -93,7 +95,7 @@ public abstract class BaseLocalResourceController implements RMController {
     public void setProjectProperty(
         @NotNull String projectId,
         @NotNull String propName,
-        @NotNull Object propValue
+        @Nullable Object propValue
     ) throws DBException {
         RMLocalProject webProject = getWebProject(projectId, false);
         doFileWriteOperation(projectId, webProject.getMetadataFilePath(),

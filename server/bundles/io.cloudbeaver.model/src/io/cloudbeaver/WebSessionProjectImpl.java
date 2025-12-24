@@ -24,6 +24,7 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.DBPAdaptable;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.DBPObjectSettingsProvider;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
@@ -36,45 +37,33 @@ import org.jkiss.dbeaver.model.security.SMObjectType;
 import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceEvent;
 import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceProperty;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
-import org.jkiss.dbeaver.registry.DataSourceNavigatorSettingsUtils;
 import org.jkiss.dbeaver.registry.DataSourceRegistry;
+import org.jkiss.dbeaver.registry.project.BaseProjectSettings;
 import org.jkiss.dbeaver.runtime.jobs.DisconnectJob;
 import org.jkiss.utils.CommonUtils;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.*;
 
-public class WebSessionProjectImpl extends WebProjectImpl implements DBPObjectSettingsProvider {
+public class WebSessionProjectImpl extends WebProjectImpl implements DBPAdaptable {
     private static final Log log = Log.getLog(WebSessionProjectImpl.class);
+
     protected final WebSession webSession;
     private final Map<String, WebConnectionInfo> connections = new HashMap<>();
-    private Map<String, Map<String, String>> projectSettings;
+    private final BaseProjectSettings projectSettings;
     private boolean registryIsLoaded = false;
-    private final Object lock = new Object();
 
     public WebSessionProjectImpl(
         @NotNull WebSession webSession,
         @NotNull RMProject project
     ) {
-        super(
-            webSession.getWorkspace(),
-            webSession.getRmController(),
-            webSession.getSessionContext(),
-            project,
-            webSession.getUserPreferenceStore(),
-            RMUtils.getProjectPath(project)
-        );
-        this.webSession = webSession;
+        this(webSession, project, null);
     }
 
     public WebSessionProjectImpl(
         @NotNull WebSession webSession,
         @NotNull RMProject project,
-        @NotNull Path path
+        @Nullable Path path
     ) {
         super(
             webSession.getWorkspace(),
@@ -82,9 +71,45 @@ public class WebSessionProjectImpl extends WebProjectImpl implements DBPObjectSe
             webSession.getSessionContext(),
             project,
             webSession.getUserPreferenceStore(),
-            path
+            path == null ? RMUtils.getProjectPath(project) : path
         );
         this.webSession = webSession;
+        this.projectSettings = new BaseProjectSettings(this) {
+            @Override
+            protected Map<SMObjectType, Map<String, Map<String, String>>> loadAllProjectSettings() throws DBException {
+                if (webSession.getUser() == null) {
+                    return new LinkedHashMap<>();
+                }
+                List<SMObjectSettings> settings = webSession.getSecurityController().getObjectSettings(getId(), null, null, null);
+                Map<SMObjectType, Map<String, Map<String, String>>> result = new LinkedHashMap<>();
+                for (SMObjectSettings os : settings) {
+                    result.computeIfAbsent(os.objectType(), ot -> new LinkedHashMap<>())
+                        .computeIfAbsent(os.objectId(), oid -> os.settings());
+                }
+                return result;
+            }
+
+            @Override
+            protected void saveProjectSettings(
+                @NotNull SMObjectType objectType,
+                @NotNull String objectId,
+                @NotNull Map<String, String> settings
+            ) throws DBException {
+                if (webSession.getUserContext().isNonAnonymousUserAuthorizedInSM()) {
+                    webSession.getSecurityController().setObjectSettings(
+                        getId(),
+                        objectType,
+                        objectId,
+                        settings
+                    );
+                }
+            }
+        };
+    }
+
+    @NotNull
+    public BaseProjectSettings getProjectSettings() {
+        return projectSettings;
     }
 
     @Nullable
@@ -93,55 +118,12 @@ public class WebSessionProjectImpl extends WebProjectImpl implements DBPObjectSe
         return webSession.getNavigatorModel();
     }
 
-    @Nullable
-    public Map<String, String> getObjectSettings(@NotNull SMObjectType objectType, @NotNull String objectId) {
-        synchronized (lock) {
-            if (projectSettings == null) {
-                loadProjectSettings();
-            }
-        }
-        return projectSettings.get(objectId);
-    }
-
     @Override
-    public void setObjectSettings(
-        @NotNull SMObjectType objectType,
-        @NotNull String objectId,
-        @NotNull Map<String, String> settings
-    ) throws DBException {
-        if (webSession.getUserContext().isNonAnonymousUserAuthorizedInSM()) {
-            webSession.getSecurityController().setObjectSettings(
-                getId(),
-                objectType,
-                objectId,
-                settings
-            );
+    public <T> T getAdapter(@NotNull Class<T> adapter) {
+        if (adapter == DBPObjectSettingsProvider.class) {
+            return adapter.cast(projectSettings);
         }
-        setObjectSettingsCache(objectId, settings);
-    }
-
-    private void loadProjectSettings() {
-        try {
-            refreshProjectSettings();
-        } catch (DBException e) {
-            webSession.addSessionError(e);
-            log.error("Error refreshing settings for project " + getId(), e);
-        }
-    }
-
-    public void deleteObjectSettings(@NotNull String objectId, @NotNull List<String> settingIds) throws DBException {
-        for (String settingId : settingIds) {
-            Map<String, String> settings = projectSettings.get(objectId);
-            if (settings != null) {
-                settings.remove(settingId);
-            }
-        }
-    }
-
-    public void setObjectSettingsCache(@NotNull String objectId, Map<String, String> settingsToSet) throws DBException {
-        Map<String, String> settings = projectSettings.computeIfAbsent(objectId, k -> new HashMap<>());
-        settings.putAll(settingsToSet);
-        DataSourceNavigatorSettingsUtils.objectSettingUpdated(this, objectId, settingsToSet.keySet());
+        return null;
     }
 
     @NotNull
@@ -178,9 +160,6 @@ public class WebSessionProjectImpl extends WebProjectImpl implements DBPObjectSe
         synchronized (this.connections) {
             conCopy = new HashMap<>(this.connections);
             this.connections.clear();
-        }
-        synchronized (lock) {
-            this.projectSettings = null;
         }
 
         for (WebConnectionInfo connectionInfo : conCopy.values()) {
@@ -300,19 +279,6 @@ public class WebSessionProjectImpl extends WebProjectImpl implements DBPObjectSe
             }
         }
         return sendDataSourceUpdatedEvent;
-    }
-
-    public void refreshProjectSettings() throws DBException {
-        this.projectSettings = new ConcurrentHashMap<>();
-        if (webSession.getUser() == null) {
-            return;
-        }
-        List<SMObjectSettings> loadedSettings = webSession.getSecurityController().getObjectSettings(
-            getId(),
-            SMObjectType.project, getId(),
-            null
-        );
-        loadedSettings.forEach(smObject -> projectSettings.put(smObject.objectId(), smObject.settings()));
     }
 
     @NotNull

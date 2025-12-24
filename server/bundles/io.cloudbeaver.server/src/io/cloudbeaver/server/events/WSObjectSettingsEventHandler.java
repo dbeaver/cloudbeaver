@@ -26,9 +26,7 @@ import org.jkiss.dbeaver.model.security.SMObjectSettings;
 import org.jkiss.dbeaver.model.websocket.event.WSObjectSettingsEvent;
 import org.jkiss.utils.CommonUtils;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class WSObjectSettingsEventHandler extends WSDefaultEventHandler<WSObjectSettingsEvent> {
     private static final Log log = Log.getLog(WSObjectSettingsEventHandler.class);
@@ -62,18 +60,15 @@ public class WSObjectSettingsEventHandler extends WSDefaultEventHandler<WSObject
                 try {
                     List<SMObjectSettings> settings = webSession.getSecurityController().getObjectSettings(
                         project.getId(),
-                        event.getSmObjectType(), objectId,
+                        event.getSmObjectType(),
+                        objectId,
                         settingId
                     );
                     for (SMObjectSettings setting : settings) {
-                        project.setObjectSettingsCache(
+                        project.getProjectSettings().updateObjectSettingsCache(
+                            setting.objectType(),
                             setting.objectId(),
-                            setting.settings().entrySet().stream().collect(
-                                Collectors.toMap(
-                                    java.util.Map.Entry::getKey,
-                                    java.util.Map.Entry::getValue
-                                )
-                            )
+                            setting.settings()
                         );
                     }
                 } catch (DBException e) {
@@ -81,14 +76,11 @@ public class WSObjectSettingsEventHandler extends WSDefaultEventHandler<WSObject
                 }
             }
         } else if (WSObjectSettingsEvent.DELETED.equals(event.getId())) {
-            try {
-                project.deleteObjectSettings(
-                    objectId,
-                    new ArrayList<>(event.getSettingIds())
-                );
-            } catch (DBException e) {
-                log.error("Error deleting object settings", e);
-            }
+            project.getProjectSettings().deleteObjectSettingsCache(
+                event.getSmObjectType(),
+                objectId,
+                event.getSettingIds()
+            );
         }
     }
 

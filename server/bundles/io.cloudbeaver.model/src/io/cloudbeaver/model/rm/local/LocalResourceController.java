@@ -302,10 +302,11 @@ public class LocalResourceController extends BaseLocalResourceController {
         }
     }
 
+    @NotNull
     @Override
     public RMProject updateProject(@NotNull String projectId, @NotNull RMProjectInfo projectInfo) throws DBException {
         validateProjectName(projectId, projectInfo.getName());
-        try (var projectLock = lockController.lock(projectId, "updateProject")) {
+        try (var ignoredLock = lockController.lock(projectId, "updateProject")) {
             RMLocalProject project = getWebProject(projectId, false);
             Path targetPath = getProjectPath(projectId);
             if (!Files.exists(targetPath)) {
@@ -351,6 +352,7 @@ public class LocalResourceController extends BaseLocalResourceController {
         }
     }
 
+    @Nullable
     @Override
     public RMProject getProject(@NotNull String projectId, boolean readResources, boolean readProperties) throws DBException {
         RMProject project = makeProjectFromId(projectId, true);

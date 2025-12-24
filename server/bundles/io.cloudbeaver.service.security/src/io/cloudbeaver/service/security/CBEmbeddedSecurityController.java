@@ -156,14 +156,16 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
     @Override
     public List<SMObjectSettings> getObjectSettings(
         @NotNull String projectId,
-        @NotNull SMObjectType objectType, @NotNull String objectId,
+        @Nullable SMObjectType objectType,
+        @Nullable String objectId,
         @Nullable String settingId
     ) throws DBException {
         String userId = getUserIdOrThrow();
         try (Connection dbCon = database.openConnection()) {
-            boolean isAllProjectSettings = SMObjectType.project.equals(objectType) && projectId.equals(objectId);
+            boolean isAllProjectSettings = objectType == null || objectId == null ||
+                (SMObjectType.project.equals(objectType) && projectId.equals(objectId));
             try (
-                PreparedStatement dbStat = dbCon.prepareStatement("SELECT OBJECT_ID,SETTING_ID,SETTING_VALUE " +
+                PreparedStatement dbStat = dbCon.prepareStatement("SELECT OBJECT_TYPE,OBJECT_ID,SETTING_ID,SETTING_VALUE " +
                     "FROM {table_prefix}CB_OBJECT_SETTINGS " +
                     "WHERE PROJECT_ID=? AND SUBJECT_ID=?" +
                     (isAllProjectSettings ? "" : " AND OBJECT_ID=? AND OBJECT_TYPE=?") +
@@ -180,22 +182,43 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                     dbStat.setString(index++, settingId);
                 }
                 try (ResultSet dbResult = dbStat.executeQuery()) {
-                    Map<String, Map<String, String>> settingsByObjectId = new LinkedHashMap<>();
+                    Map<SMObjectType, Map<String, Map<String, String>>> settingsByObjectType = new LinkedHashMap<>();
                     while (dbResult.next()) {
-                        Map<String, String> objectSettings = settingsByObjectId.computeIfAbsent(
-                            dbResult.getString(1),
-                            k -> new LinkedHashMap<>()
-                        );
-                        objectSettings.put(dbResult.getString(2), dbResult.getString(3));
+                        SMObjectType smObjectType = CommonUtils.valueOf(SMObjectType.class, dbResult.getString(1), SMObjectType.datasource);
+                        String smObjectId = dbResult.getString(2);
+                        Map<String, String> objectSettings = settingsByObjectType
+                            .computeIfAbsent(smObjectType, ot -> new LinkedHashMap<>())
+                            .computeIfAbsent(smObjectId, k -> new LinkedHashMap<>());
+                        objectSettings.put(dbResult.getString(3), dbResult.getString(4));
                     }
-                    return settingsByObjectId.entrySet().stream()
-                        .map(entry -> new SMObjectSettings(entry.getKey(), entry.getValue()))
-                        .toList();
+                    return convertMapToSettingList(settingsByObjectType);
                 }
             }
         } catch (SQLException e) {
             throw new DBCException("Error while getting object settings", e);
         }
+    }
+
+    @NotNull
+    private static List<SMObjectSettings> convertMapToSettingList(
+        @NotNull Map<SMObjectType, Map<String, Map<String, String>>> settingsByObjectType
+    ) {
+        Map<SMObjectType, Map<String, SMObjectSettings>> settings = new LinkedHashMap<>();
+        List<SMObjectSettings> sList = new ArrayList<>();
+        for (var ote : settingsByObjectType.entrySet()) {
+            Map<String, SMObjectSettings> objMap = settings.computeIfAbsent(
+                ote.getKey(),
+                ot1 -> new LinkedHashMap<>()
+            );
+            for (var se : ote.getValue().entrySet()) {
+                objMap.computeIfAbsent(se.getKey(), k -> {
+                    SMObjectSettings os = new SMObjectSettings(ote.getKey(), se.getKey(), se.getValue());
+                    sList.add(os);
+                    return os;
+                });
+            }
+        }
+        return sList;
     }
 
     @Override
