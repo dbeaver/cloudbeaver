@@ -88,9 +88,11 @@ export function baseConfigurationPlugin(mode: string, packageJson: any): PluginO
             minify: isProduction,
             emptyOutDir: true,
             modulePreload: false,
-            /* We need to disable css splitting because of the issue with loading CSS for some chunks (dbeaver/pro#5599), can be removed when dbeaver/pro#5204 is done */
+            /* We need to disable css splitting because of the issue with loading CSS for some chunks 
+            (dbeaver/pro#5599), can be removed when dbeaver/pro#5204 is done */
             cssCodeSplit: false,
-            /* Imported or referenced assets that are smaller than this threshold will be inlined as base64 URLs to avoid extra http requests. Set to 0 to disable inlining altogether. */
+            /* Imported or referenced assets that are smaller than this threshold will be inlined as base64 
+            URLs to avoid extra http requests. Set to 0 to disable inlining altogether. */
             assetsInlineLimit: 0,
 
             rollupOptions: {
@@ -118,6 +120,7 @@ export function baseConfigurationPlugin(mode: string, packageJson: any): PluginO
             manifest: false,
             injectManifest: {
               maximumFileSizeToCacheInBytes: 20 * 1024 * 1024,
+              globPatterns: ['**/icons/preload/**/*.{svg,png,jpg,gif,jpeg}'],
               globIgnores: [
                 '**/license.txt',
                 '**/*.map',
