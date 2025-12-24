@@ -32,7 +32,7 @@ import org.jkiss.dbeaver.model.app.DBPDataSourceRegistryCache;
 import org.jkiss.dbeaver.model.navigator.DBNModel;
 import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.rm.RMUtils;
-import org.jkiss.dbeaver.model.security.SMObjectSettings;
+import org.jkiss.dbeaver.model.security.SMControllerUtils;
 import org.jkiss.dbeaver.model.security.SMObjectType;
 import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceEvent;
 import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceProperty;
@@ -75,18 +75,13 @@ public class WebSessionProjectImpl extends WebProjectImpl implements DBPAdaptabl
         );
         this.webSession = webSession;
         this.projectSettings = new BaseProjectSettings(this) {
+            @NotNull
             @Override
             protected Map<SMObjectType, Map<String, Map<String, String>>> loadAllProjectSettings() throws DBException {
                 if (webSession.getUser() == null) {
                     return new LinkedHashMap<>();
                 }
-                List<SMObjectSettings> settings = webSession.getSecurityController().getObjectSettings(getId(), null, null, null);
-                Map<SMObjectType, Map<String, Map<String, String>>> result = new LinkedHashMap<>();
-                for (SMObjectSettings os : settings) {
-                    result.computeIfAbsent(os.objectType(), ot -> new LinkedHashMap<>())
-                        .computeIfAbsent(os.objectId(), oid -> os.settings());
-                }
-                return result;
+                return SMControllerUtils.getObjectSettingsMap(WebSessionProjectImpl.this, webSession.getSecurityController());
             }
 
             @Override
@@ -96,12 +91,7 @@ public class WebSessionProjectImpl extends WebProjectImpl implements DBPAdaptabl
                 @NotNull Map<String, String> settings
             ) throws DBException {
                 if (webSession.getUserContext().isNonAnonymousUserAuthorizedInSM()) {
-                    webSession.getSecurityController().setObjectSettings(
-                        getId(),
-                        objectType,
-                        objectId,
-                        settings
-                    );
+                    webSession.getSecurityController().setObjectSettings(getId(), objectType, objectId, settings);
                 }
             }
         };
