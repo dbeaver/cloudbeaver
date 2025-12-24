@@ -54,4 +54,6 @@ export default [
     'plugin_sql_editor_settings_auto_save_description_git_integration',
     'Automatically save the script files. This feature is only available when Git integration is turned off',
   ],
+  ['plugin_sql_editor_settings_highlight_white_space', 'Highlight white space characters'],
+  ['plugin_sql_editor_settings_highlight_white_space_description', 'Highlight spaces, tabs and other white space characters in the SQL editor'],
 ];
