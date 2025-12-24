@@ -12,6 +12,7 @@ import { TreeNode } from '@cloudbeaver/core-blocks';
 
 import { TreeContext } from './contexts/TreeContext.js';
 import { TreeDataContext } from './contexts/TreeDataContext.js';
+import { TreeSelectionContext } from './contexts/TreeSelectionContext.js';
 import type { NodeComponent } from './INodeRenderer.js';
 import { NodeControl } from './NodeControl.js';
 import { useNodeDnD } from './useNodeDnD.js';
@@ -19,8 +20,10 @@ import { useNodeDnD } from './useNodeDnD.js';
 export const Node: NodeComponent = observer(function Node({ nodeId, offsetHeight, controlRenderer, childrenRenderer }) {
   const tree = useContext(TreeContext)!;
   const data = useContext(TreeDataContext)!;
+  const selection = useContext(TreeSelectionContext);
 
-  const { expanded, selected } = data.getState(nodeId);
+  const { expanded, selected: stateSelected } = data.getState(nodeId);
+  const selected = selection ? selection.isSelected(nodeId) : stateSelected;
 
   const dndData = useNodeDnD(nodeId, () => {});
 
@@ -32,8 +35,18 @@ export const Node: NodeComponent = observer(function Node({ nodeId, offsetHeight
     return tree.expandNode(nodeId, !expanded);
   }
 
-  function handleSelect() {
-    tree.selectNode(nodeId, !selected);
+  function handleSelect(multiple?: boolean, nested?: boolean) {
+    switch (selection?.type) {
+      case 'checkbox':
+        selection.select(nodeId);
+        break;
+      case 'click':
+        selection.select(nodeId, multiple, nested);
+        break;
+      default:
+        tree.selectNode(nodeId, !stateSelected);
+        break;
+    }
   }
 
   function handleClick() {

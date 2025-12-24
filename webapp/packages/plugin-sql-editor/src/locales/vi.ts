@@ -50,4 +50,9 @@ export default [
   ['plugin_sql_editor_settings_import_max_size_description', 'Kích thước tệp tối đa có thể nhập vào tính bằng KB'],
   ['plugin_sql_editor_settings_auto_save', 'Tự động lưu'],
   ['plugin_sql_editor_settings_auto_save_description', 'Tự động lưu nội dung trình soạn thảo'],
+  ['plugin_sql_editor_settings_highlight_white_space', 'Đánh dấu khoảng trắng'],
+  [
+    'plugin_sql_editor_settings_highlight_white_space_description',
+    'Đánh dấu khoảng trắng, tab và các ký tự khoảng trắng khác trong trình soạn thảo SQL',
+  ],
 ];
