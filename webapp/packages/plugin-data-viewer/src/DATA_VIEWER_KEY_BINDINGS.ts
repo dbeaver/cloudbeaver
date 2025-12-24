@@ -29,7 +29,7 @@ export const KEY_BINDING_DELETE_ROW: IKeyBinding = {
 
 export const KEY_BINDING_SAVE: IKeyBinding = {
   id: 'data-viewer-save',
-  keys: ['mod+shift+enter'],
+  keys: ['mod+shift+s'],
 };
 
 export const KEY_BINDING_CANCEL: IKeyBinding = {
