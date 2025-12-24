@@ -8,6 +8,7 @@
 import { observer } from 'mobx-react-lite';
 
 import type { IDataContext } from '@cloudbeaver/core-data-context';
+import { clsx } from '@dbeaver/ui-kit';
 
 import { NodeSizeCacheContext } from './contexts/NodeSizeCacheContext.js';
 import { TreeContext } from './contexts/TreeContext.js';
@@ -40,10 +41,11 @@ export interface NavigationTreeNewProps {
   getNodeHeight(id: string): number;
 }
 
-export const Tree = observer<NavigationTreeNewProps>(function Tree({
+export const Tree = observer<React.PropsWithChildren<NavigationTreeNewProps>>(function Tree({
   data,
   selection,
   menu,
+  children,
   nodeRenderers,
   emptyPlaceholder,
   className,
@@ -66,22 +68,23 @@ export const Tree = observer<NavigationTreeNewProps>(function Tree({
   });
 
   return (
-    <div ref={mountOptimization.setRootRef} className={className} style={{ overflow: 'auto', position: 'relative' }}>
-      <NodeSizeCacheContext.Provider value={elementsSizeCache}>
-        <TreeDataContext.Provider value={data}>
-          <TreeSelectionContext.Provider value={selection}>
-            <TreeVirtualizationContext.Provider value={mountOptimization}>
-              <TreeContext.Provider value={tree}>
-                <TreeDnDContext.Provider value={treeDnD}>
-                  <TreeMenuContextProvider menu={menu ?? null}>
+    <NodeSizeCacheContext.Provider value={elementsSizeCache}>
+      <TreeDataContext.Provider value={data}>
+        <TreeSelectionContext.Provider value={selection}>
+          <TreeContext.Provider value={tree}>
+            <TreeDnDContext.Provider value={treeDnD}>
+              <TreeMenuContextProvider menu={menu ?? null}>
+                {children}
+                <div ref={mountOptimization.setRootRef} className={clsx('tw:relative tw:overflow-auto', className)}>
+                  <TreeVirtualizationContext.Provider value={mountOptimization}>
                     <NodeChildren nodeId={data.rootId} offsetHeight={0} emptyPlaceholder={emptyPlaceholder} root />
-                  </TreeMenuContextProvider>
-                </TreeDnDContext.Provider>
-              </TreeContext.Provider>
-            </TreeVirtualizationContext.Provider>
-          </TreeSelectionContext.Provider>
-        </TreeDataContext.Provider>
-      </NodeSizeCacheContext.Provider>
-    </div>
+                  </TreeVirtualizationContext.Provider>
+                </div>
+              </TreeMenuContextProvider>
+            </TreeDnDContext.Provider>
+          </TreeContext.Provider>
+        </TreeSelectionContext.Provider>
+      </TreeDataContext.Provider>
+    </NodeSizeCacheContext.Provider>
   );
 });

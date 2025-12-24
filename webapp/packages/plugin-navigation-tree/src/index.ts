@@ -59,6 +59,13 @@ export * from './TreeNew/useTreeClickSelection.js';
 export * from './TreeNew/ITreeSelection.js';
 export * from './TreeNew/INode.js';
 export * from './TreeNew/NodeEmptyPlaceholderComponent.js';
+export * from './TreeNew/TreeToolbarLazy.js';
+export * from './TreeNew/TreeToolbarFilterLazy.js';
+export * from './TreeNew/TreeToolbarMenuLazy.js';
+export * from './TreeNew/TreeToolbarMenuService.js';
+export * from './TreeNew/DATA_CONTEXT_TREE.js';
+export * from './TreeNew/MENU_TREE_TOOLBAR.js';
+export * from './TreeNew/actions/ACTION_TREE_REFRESH.js';
 
 export * from './NavigationTree/getNavigationTreeUserSettingsId.js';
 export * from './NodesManager/NavNodeView/IFolderTransform.js';
