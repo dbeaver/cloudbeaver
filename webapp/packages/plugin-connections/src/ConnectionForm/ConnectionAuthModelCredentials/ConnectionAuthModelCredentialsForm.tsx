@@ -40,7 +40,6 @@ export const ConnectionAuthModelCredentialsForm = observer<Props>(function Conne
   return (
     <Container wrap gap hideEmpty>
       <ObjectPropertyInfoForm
-        autocompleteSectionName="section-connection-authentication"
         properties={properties}
         state={credentials}
         defaultState={defaultCredentials}
@@ -48,7 +47,6 @@ export const ConnectionAuthModelCredentialsForm = observer<Props>(function Conne
         readOnly={readonly}
         getLayoutSize={getLayoutSize}
         showRememberTip
-        disableAutoCompleteForPasswords
         hideEmptyPlaceholder
       />
     </Container>
