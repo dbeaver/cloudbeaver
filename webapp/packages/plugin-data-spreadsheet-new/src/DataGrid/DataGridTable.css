@@ -1,0 +1,116 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+@layer components {
+  .theme-dark {
+    --theme-add-status: #65974c;
+    --theme-delete-status: #b55d68;
+    --theme-edit-status: #a37d43;
+  }
+
+  .theme-light {
+    --theme-add-status: #c0f5a6;
+    --theme-delete-status: #f48693;
+    --theme-edit-status: #fbcc85;
+  }
+
+  .data-grid__container {
+    --data-grid-order-button-unordered: #c4c4c4;
+    --data-grid-readonly-status-color: #e28835;
+    --data-grid-cell-selection-background-color: rgba(150, 150, 150, 0.2);
+    --data-grid-cell-selection-background-color-focus: rgba(0, 145, 234, 0.2);
+    --data-grid-index-cell-border-color: var(--theme-primary);
+    --data-grid-selected-row-color: var(--theme-secondary) !important;
+    outline: 0;
+    overflow: auto;
+    user-select: none;
+    -webkit-user-select: none;
+
+    & .rdg-cell-frozen {
+      &:nth-last-child(1 of &) {
+        border-inline-end-width: 3px;
+      }
+    }
+
+    & .rdg-cell-custom-edited {
+      background-color: var(--theme-edit-status) !important;
+    }
+
+    & .rdg-cell-custom-added {
+      background-color: var(--theme-add-status) !important;
+    }
+
+    & .rdg-cell-custom-deleted {
+      background-color: var(--theme-delete-status) !important;
+    }
+  }
+
+  .data-grid__container .data-grid__grid {
+    width: 100%;
+    & .rdg-table-header__readonly-status {
+      background-color: var(--data-grid-readonly-status-color) !important;
+    }
+
+    & .rdg-table-header__order-button_unordered {
+      color: var(--data-grid-order-button-unordered) !important;
+
+      &:hover {
+        color: var(--theme-primary) !important;
+      }
+    }
+
+    & .rdg-row:hover .rdg-cell,
+    & .rdg-row:hover .rdg-cell-frozen {
+      border-bottom: 1px solid !important;
+      border-bottom-color: var(--theme-positive) !important;
+    }
+
+    & .rdg-row-custom-highlighted {
+      background: var(--data-grid-selected-row-color);
+
+      & .rdg-cell:first-child::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        border-left: 2px solid var(--data-grid-index-cell-border-color);
+      }
+    }
+
+    & .rdg-cell-custom-selected {
+      box-shadow: none !important;
+
+      &::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: var(--data-grid-cell-selection-background-color);
+      }
+    }
+
+    & .rdg-cell-custom-editing {
+      box-shadow: none;
+      background-color: inherit;
+    }
+  }
+
+  .data-grid__grid:focus-within {
+    & .rdg-cell-custom-selected::before {
+      background-color: var(--data-grid-cell-selection-background-color-focus);
+    }
+
+    & .rdg-cell-custom-editing::before {
+      background-color: transparent;
+    }
+  }
+}
