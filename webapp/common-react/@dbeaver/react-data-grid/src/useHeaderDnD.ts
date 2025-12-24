@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { ColumnOrColumnGroup } from 'react-data-grid';
+import type { Column, ColumnOrColumnGroup } from 'react-data-grid';
 import type { IInnerRow } from './IInnerRow.js';
 import { createContext, useId, useMemo, useState } from 'react';
 import { reorderArray } from '@dbeaver/js-helpers';
@@ -23,6 +23,7 @@ interface IHeaderDnD {
   columns: Array<ColumnOrColumnGroup<IInnerRow, unknown>>;
   getDataColIdx: (virtualColIdx: number) => number;
   getVirtualColIdx: (dataColIdx: number) => number;
+  getDataColIdxByKey: (key: string) => number;
   getCanDrag?: (colIdx: number) => boolean;
   onDragOver: (dragColIdx: number, dropColIdx: number, isAfter: boolean) => void;
   onDragEnd: (colIdx: number) => void;
@@ -30,10 +31,24 @@ interface IHeaderDnD {
 
 export const HeaderDnDContext = createContext<IHeaderDnD | null>(null);
 
+export function isColumn(column: ColumnOrColumnGroup<IInnerRow, unknown>): column is Column<IInnerRow, unknown> {
+  return (column as Column<IInnerRow, unknown>).key !== undefined;
+}
+
 export function useHeaderDnD({ columns, getCanDrag, onReorder, getHeaderOrder }: IHeaderDnDOptions): IHeaderDnD {
   const id = useId();
   const [activeDnDElement, setActiveDnDElement] = useState<number | null>(null);
   const [dragOverElement, setDragOverElement] = useState<[number, boolean] | null>(null);
+
+  function getDataColIdxByKey(key: string) {
+    const columnIndex = columns.findIndex(col => isColumn(col) && col.key === key);
+
+    if (columnIndex === -1) {
+      throw new Error(`Column with key '${key}' not found`);
+    }
+
+    return getDataColIdx(columnIndex);
+  }
 
   function getDataColIdx(virtualColIdx: number) {
     // Given a visible (ordered) column index, return the original data column index
@@ -94,6 +109,7 @@ export function useHeaderDnD({ columns, getCanDrag, onReorder, getHeaderOrder }:
     id,
     columns,
     getDataColIdx,
+    getDataColIdxByKey,
     getVirtualColIdx,
     getCanDrag,
     onDragOver,
