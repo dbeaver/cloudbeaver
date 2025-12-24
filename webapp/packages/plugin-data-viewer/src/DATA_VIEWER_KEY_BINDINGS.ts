@@ -31,3 +31,8 @@ export const KEY_BINDING_SAVE: IKeyBinding = {
   id: 'data-viewer-save',
   keys: ['mod+shift+enter'],
 };
+
+export const KEY_BINDING_CANCEL: IKeyBinding = {
+  id: 'data-viewer-cancel',
+  keys: ['mod+escape'],
+};

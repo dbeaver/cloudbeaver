@@ -24,6 +24,7 @@ import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
 
 import {
   KEY_BINDING_ADD_NEW_ROW,
+  KEY_BINDING_CANCEL,
   KEY_BINDING_DELETE_ROW,
   KEY_BINDING_DUPLICATE_ROW,
   KEY_BINDING_REVERT_INLINE_EDITOR_CHANGES,
@@ -101,7 +102,17 @@ export class TableFooterMenuService {
       handler: this.tableFooterMenuActionHandler.bind(this),
     });
 
-    this.dataViewerViewService.registerAction(ACTION_DELETE, ACTION_REVERT, ACTION_ADD, ACTION_DUPLICATE);
+    this.keyBindingService.addKeyBindingHandler({
+      id: 'table-footer-cancel',
+      binding: KEY_BINDING_CANCEL,
+      contexts: [DATA_CONTEXT_DV_DDM, DATA_CONTEXT_DV_DDM_RESULT_INDEX],
+      isBindingApplicable(context, action) {
+        return action === ACTION_CANCEL;
+      },
+      handler: this.tableFooterMenuActionHandler.bind(this),
+    });
+
+    this.dataViewerViewService.registerAction(ACTION_DELETE, ACTION_REVERT, ACTION_ADD, ACTION_DUPLICATE, ACTION_CANCEL);
   }
 
   private registerEditingActions() {

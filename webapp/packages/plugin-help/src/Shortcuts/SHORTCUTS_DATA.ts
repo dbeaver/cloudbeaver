@@ -16,6 +16,7 @@ import {
 } from '@cloudbeaver/core-view';
 import {
   KEY_BINDING_ADD_NEW_ROW,
+  KEY_BINDING_CANCEL,
   KEY_BINDING_DELETE_ROW,
   KEY_BINDING_DUPLICATE_ROW,
   KEY_BINDING_REVERT_INLINE_EDITOR_CHANGES,
@@ -86,6 +87,10 @@ export const DATA_VIEWER_SHORTCUTS: IShortcut[] = [
   {
     label: 'ui_processing_save',
     code: transformKeys(KEY_BINDING_SAVE),
+  },
+  {
+    label: 'ui_processing_cancel',
+    code: transformKeys(KEY_BINDING_CANCEL),
   },
 ];
 
