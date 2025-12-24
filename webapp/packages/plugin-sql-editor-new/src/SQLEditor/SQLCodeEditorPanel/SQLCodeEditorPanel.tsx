@@ -14,12 +14,13 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { DATA_CONTEXT_NAV_NODE, getNodesFromContext, NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
 import { type TabContainerPanelComponent, useDNDBox } from '@cloudbeaver/core-ui';
 import { closeCompletion, type IEditorRef, Prec, ReactCodemirrorPanel, useCodemirrorExtensions } from '@cloudbeaver/plugin-codemirror6';
-import type { ISqlEditorModeProps } from '@cloudbeaver/plugin-sql-editor';
+import { SqlEditorSettingsService, type ISqlEditorModeProps } from '@cloudbeaver/plugin-sql-editor';
 
 import { ACTIVE_QUERY_EXTENSION } from '../ACTIVE_QUERY_EXTENSION.js';
 import { QUERY_STATUS_GUTTER_EXTENSION } from '../QUERY_STATUS_GUTTER_EXTENSION.js';
 import { SQLCodeEditorLoader } from '../SQLCodeEditor/SQLCodeEditorLoader.js';
 import { useSQLCodeEditor } from '../SQLCodeEditor/useSQLCodeEditor.js';
+import { useHighlightExtensions } from '../useHighlightExtensions.js';
 import { useSqlDialectAutocompletion } from '../useSqlDialectAutocompletion.js';
 import { useSqlDialectExtension } from '../useSqlDialectExtension.js';
 import style from './SQLCodeEditorPanel.module.css';
@@ -35,17 +36,26 @@ export const SQLCodeEditorPanel: TabContainerPanelComponent<ISqlEditorModeProps>
   const [editorRef, setEditorRef] = useState<IEditorRef | null>(null);
 
   const editor = useSQLCodeEditor(editorRef);
+  const sqlEditorSettingsService = useService(SqlEditorSettingsService);
 
   const panel = useSQLCodeEditorPanel(data, editor);
   const extensions = useCodemirrorExtensions(undefined, [ACTIVE_QUERY_EXTENSION, Prec.lowest(QUERY_STATUS_GUTTER_EXTENSION)]);
   const autocompletion = useSqlDialectAutocompletion(data);
   const sqlDialect = useSqlDialectExtension(data.dialect);
+  const highlightExtensions = useHighlightExtensions(sqlEditorSettingsService.highlightWhitespace);
 
   if (autocompletion) {
     extensions.set(...autocompletion);
   }
+
   if (sqlDialect) {
     extensions.set(...sqlDialect);
+  }
+
+  if (highlightExtensions) {
+    highlightExtensions.forEach(extension => {
+      extensions.set(...extension);
+    });
   }
 
   const dndBox = useDNDBox({
