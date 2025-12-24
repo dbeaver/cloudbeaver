@@ -7,7 +7,7 @@
  */
 
 .table {
-  font-size: 12px;
+  font-size: 14px;
   & [role='columnheader'] {
     text-transform: uppercase;
   }

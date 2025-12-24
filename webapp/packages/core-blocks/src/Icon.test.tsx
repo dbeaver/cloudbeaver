@@ -21,7 +21,7 @@ describe('Icon', () => {
 
   test('should render with "icons.svg#name" path', () => {
     const { getByTestId } = renderInApp(<Icon data-testid="Icon" name="test" />);
-    expect(getByTestId('Icon').querySelector('use')).toHaveAttribute('href', '/path/icons/icons.svg#test');
+    expect(getByTestId('Icon').querySelector('use')).toHaveAttribute('href', '/path/icons/preload/icons.svg#test');
   });
 
   test('should render with custom absolute path', () => {

@@ -53,7 +53,7 @@ export const ErrorDetailsDialog: DialogComponent<Error | string> = observer(func
 
   return (
     <CommonDialogWrapper size="large">
-      <CommonDialogHeader title="core_eventsLog_dbeaverErrorDetails" icon="/icons/error_icon.svg" bigIcon onReject={props.rejectDialog} />
+      <CommonDialogHeader title="core_eventsLog_dbeaverErrorDetails" icon="/icons/preload/error_icon.svg" bigIcon onReject={props.rejectDialog} />
       <CommonDialogBody>
         {error.errors.map((error, id) => (
           <div key={id} className={s(styles, { errorInfoContainer: true })}>
