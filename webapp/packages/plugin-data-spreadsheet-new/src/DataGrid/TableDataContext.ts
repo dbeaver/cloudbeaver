@@ -56,4 +56,8 @@ export interface ITableData {
   isCellReadonly: (key: IGridDataKey) => boolean;
 }
 
+export function isColumnInfo(column: IColumnInfo | undefined): column is IColumnInfo {
+  return column?.key !== null;
+}
+
 export const TableDataContext = createContext<ITableData>(undefined as any);

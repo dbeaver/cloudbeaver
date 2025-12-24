@@ -5,11 +5,8 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { createAction } from '@cloudbeaver/core-view';
 
-import { createContext } from 'react';
-
-export interface IDataGridCellInnerContext {
-  isFocused: boolean;
-}
-
-export const DataGridCellInnerContext = createContext<IDataGridCellInnerContext | null>(null);
+export const ACTION_DATA_GRID_UNPIN_ALL_COLUMNS = createAction('data-grid-unpin-all-columns', {
+  label: 'plugin_data_spreadsheet_new_unpin_all_columns',
+});
