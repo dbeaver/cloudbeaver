@@ -16,6 +16,7 @@ import { NavigationTreeService } from './NavigationTree/NavigationTreeService.js
 import { ElementsTreeSettingsService } from './NavigationTree/ElementsTree/ElementsTreeTools/NavigationTreeSettings/ElementsTreeSettingsService.js';
 import { ElementsTreeToolsMenuService } from './NavigationTree/ElementsTree/ElementsTreeTools/ElementsTreeToolsMenuService.js';
 import { ElementsTreeService } from './NavigationTree/ElementsTree/ElementsTreeService.js';
+import { TreeToolbarMenuService } from './TreeNew/TreeToolbarMenuService.js';
 import { LocaleService } from './LocaleService.js';
 
 export default ModuleRegistry.add({
@@ -35,6 +36,7 @@ export default ModuleRegistry.add({
       .addSingleton(NavigationTreeService)
       .addSingleton(ElementsTreeSettingsService)
       .addSingleton(ElementsTreeToolsMenuService)
+      .addSingleton(TreeToolbarMenuService)
       .addSingleton(ElementsTreeService);
   },
 });
