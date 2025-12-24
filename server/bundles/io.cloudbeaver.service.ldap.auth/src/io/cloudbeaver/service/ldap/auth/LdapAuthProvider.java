@@ -85,7 +85,7 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
         Map<String, String> environment = creteAuthEnvironment(ldapSettings);
 
         Map<String, Object> userData = new HashMap<>();
-        if (!LdapUtils.isFullDN(userName) && CommonUtils.isNotEmpty(ldapSettings.getLoginAttribute())) {
+        if (!LdapUtils.isFullDN(userName, ldapSettings.getBaseDN()) && CommonUtils.isNotEmpty(ldapSettings.getLoginAttribute())) {
             userData = validateAndLoginUserAccessByUsername(userName, password, ldapSettings);
         }
         if (CommonUtils.isEmpty(userData)) {
