@@ -46,7 +46,7 @@ export const ExceptionMessage = observer<Props>(function ExceptionMessage({ exce
   return (
     <div className={s(styles, { error: true, icon, inline }, className)}>
       <div className={s(styles, { errorIcon: true })} title={error.message}>
-        <IconOrImage className={s(styles, { iconOrImage: true })} icon={inline || icon ? '/icons/error_icon_sm.svg' : '/icons/error_icon.svg'} />
+        <IconOrImage className={s(styles, { iconOrImage: true })} icon={inline || icon ? '/icons/preload/error_icon_sm.svg' : '/icons/preload/error_icon.svg'} />
       </div>
       {!icon && (
         <>
