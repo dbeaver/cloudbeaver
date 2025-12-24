@@ -24,6 +24,10 @@ import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
 
 public class ConfigurationUtils {
+    private static final String ORACLE_DRIVER_PROVIDER = "oracle";
+    private static final String ORACLE_CLASSNAME_PREFIX = "oracle.jdbc.";
+    private static final String ORACLE_JDBC_PREFIX = "jdbc:oracle:";
+
     private ConfigurationUtils() {
     }
 
@@ -39,6 +43,23 @@ public class ConfigurationUtils {
             return false;
         }
         return !driver.isEmbedded() || CommonUtils.toBoolean(driver.getDriverParameter(DBConstants.PARAM_SAFE_EMBEDDED_DRIVER), false);
+    }
+
+    public static boolean isOracleDriver(@NotNull DBPDriver driver) {
+        var providerId = driver.getProviderDescriptor().getId();
+        if (providerId.contains(ORACLE_DRIVER_PROVIDER)) {
+            return true;
+        }
+
+        var driverClassName = driver.getDriverClassName();
+        if (driverClassName != null && driverClassName.startsWith(ORACLE_CLASSNAME_PREFIX)) {
+            return true;
+        }
+
+        var sampleUrl = driver.getSampleURL();
+        return sampleUrl != null && sampleUrl.regionMatches(
+            true, 0, ORACLE_JDBC_PREFIX, 0, ORACLE_JDBC_PREFIX.length()
+        );
     }
 
 }

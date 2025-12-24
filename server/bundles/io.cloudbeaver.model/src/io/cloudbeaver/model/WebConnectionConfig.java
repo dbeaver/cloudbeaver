@@ -18,6 +18,7 @@ package io.cloudbeaver.model;
 
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
+import org.jkiss.dbeaver.model.DBConstants;
 import org.jkiss.dbeaver.model.connection.DBPDriverConfigurationType;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.meta.Property;
@@ -64,6 +65,7 @@ public class WebConnectionConfig {
     private boolean defaultAutoCommit;
     private String defaultCatalogName;
     private String defaultSchemaName;
+    private boolean setOsUser;
 
     public WebConnectionConfig() {
     }
@@ -106,6 +108,9 @@ public class WebConnectionConfig {
         defaultSchemaName = JSONUtils.getString(
             expertSettingsValues != null ? expertSettingsValues : params,
             WebExpertSettingsProperties.PROP_DEFAULT_SCHEMA
+        );
+        setOsUser = JSONUtils.getBoolean(
+            expertSettingsValues != null ? expertSettingsValues : params, DBConstants.PROP_SET_ORACLE_OS_USER
         );
 
         String configType = JSONUtils.getString(params, "configurationType");
@@ -258,5 +263,10 @@ public class WebConnectionConfig {
     @Property
     public String getDefaultSchemaName() {
         return defaultSchemaName;
+    }
+
+    @Property
+    public Boolean isSetOsUser() {
+        return setOsUser;
     }
 }

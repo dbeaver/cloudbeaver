@@ -452,6 +452,7 @@ public class WebConnectionInfo {
         expertSettings.put(WebExpertSettingsProperties.PROP_READ_ONLY, isReadOnly());
         expertSettings.put(WebExpertSettingsProperties.PROP_DEFAULT_CATALOG, getDefaultCatalogName());
         expertSettings.put(WebExpertSettingsProperties.PROP_DEFAULT_SCHEMA, getDefaultSchemaName());
+        expertSettings.put(DBConstants.PROP_SET_ORACLE_OS_USER, isSetOsUser());
         return expertSettings;
     }
 
@@ -541,6 +542,15 @@ public class WebConnectionInfo {
     public String getDefaultSchemaName() {
         DBPConnectionConfiguration connectionConfiguration = dataSourceContainer.getConnectionConfiguration();
         return connectionConfiguration.getBootstrap().getDefaultSchemaName();
+    }
+
+    @Property
+    public boolean isSetOsUser() {
+        DBPConnectionConfiguration connectionConfiguration = dataSourceContainer.getConnectionConfiguration();
+        return CommonUtils.toBoolean(
+            connectionConfiguration.getProviderProperty(DBConstants.PROP_SET_ORACLE_OS_USER),
+            false
+        );
     }
 
     @Property

@@ -1,7 +1,9 @@
 package io.cloudbeaver.model;
 
+import io.cloudbeaver.model.utils.ConfigurationUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
+import org.jkiss.dbeaver.model.DBConstants;
 import org.jkiss.dbeaver.model.DBPObject;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.model.connection.DBPDriverConstants;
@@ -50,6 +52,11 @@ public class WebExpertSettingsProperties implements DBPObject {
         return null;
     }
 
+    @Property(order = 6, id = DBConstants.PROP_SET_ORACLE_OS_USER, visibleIf = SetOsUserVisibleValidator.class)
+    public boolean isSetOsUser() {
+        return false;
+    }
+
 
     public static class KeepAliveIntervalFieldValidator implements IPropertyValueValidator<WebExpertSettingsProperties, Object> {
         @Override
@@ -83,6 +90,16 @@ public class WebExpertSettingsProperties implements DBPObject {
         @Override
         public boolean isValidValue(@NotNull WebExpertSettingsProperties object, @Nullable Object value) throws IllegalArgumentException {
             return CommonUtils.toBoolean(object.driver.getDriverParameter(DBPDriverConstants.PARAM_SUPPORTS_SCHEMA_SELECTION), true);
+        }
+    }
+
+    public static class SetOsUserVisibleValidator implements IPropertyValueValidator<WebExpertSettingsProperties, Object> {
+        @Override
+        public boolean isValidValue(@NotNull WebExpertSettingsProperties object, @Nullable Object value) throws IllegalArgumentException {
+            return CommonUtils.toBoolean(
+                ConfigurationUtils.isOracleDriver(object.driver),
+                false
+            );
         }
     }
 }

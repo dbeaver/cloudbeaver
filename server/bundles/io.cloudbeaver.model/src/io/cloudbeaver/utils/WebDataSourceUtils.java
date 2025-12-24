@@ -336,6 +336,9 @@ public class WebDataSourceUtils {
                 dsConfig.updateHandler(handlerConfig);
             }
         }
+        if (config.isSetOsUser() != null) {
+            dsConfig.setProviderProperty(DBConstants.PROP_SET_ORACLE_OS_USER, config.isSetOsUser().toString());
+        }
     }
 
     public static void setMainProperties(@NotNull DBPConnectionConfiguration dsConfig, @NotNull WebConnectionConfig config) {
