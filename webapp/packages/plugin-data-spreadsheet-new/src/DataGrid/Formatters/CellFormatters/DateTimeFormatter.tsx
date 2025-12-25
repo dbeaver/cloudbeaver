@@ -34,7 +34,6 @@ export const DateTimeFormatter = observer<ICellFormatterProps>(function DateTime
     return <GridNullFormatter />;
   }
 
-  const classes = s(style, { dateFormatter: true });
   let value = displayValue;
 
   if (tableDataContext.useUserFormatting) {
@@ -53,7 +52,7 @@ export const DateTimeFormatter = observer<ICellFormatterProps>(function DateTime
   }
 
   return (
-    <div className={classes}>
+    <div className={s(style, { dateFormatter: true })}>
       <div className={s(style, { dateFormatterValue: true })}>{value}</div>
     </div>
   );
