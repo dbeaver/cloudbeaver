@@ -121,7 +121,7 @@ export class DataGridSettingsService {
         },
         type: ESettingsValueType.Select,
         options: [
-          { value: NO_FORMAT, name: 'None' },
+          { value: NO_FORMAT, name: 'plugin_data_spreadsheet_new_settings_use_locale_formatting_none' },
           { value: OS_FORMAT, name: 'plugin_data_spreadsheet_new_settings_use_locale_formatting_os' },
           ...this.supportedLocales
             .map(locale => ({ value: locale, name: this.getLocaleName(locale) }))
