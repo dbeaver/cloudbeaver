@@ -725,12 +725,19 @@ public class WebServiceCore implements DBWServiceCore {
         @NotNull WebSession webSession,
         @Nullable String projectId,
         @NotNull String id,
-        @NotNull DataSourceNavigatorSettings settings
+        @NotNull DataSourceNavigatorSettings settings,
+        @Nullable Boolean userSettings
     ) throws DBWebException {
         WebConnectionInfo connectionInfo = WebDataSourceUtils.getWebConnectionInfo(webSession, projectId, id);
         DataSourceDescriptor dataSourceDescriptor = ((DataSourceDescriptor) connectionInfo.getDataSourceContainer());
         try {
-            DataSourceNavigatorSettingsUtils.updateCustomNavigatorSettings(dataSourceDescriptor, settings);
+            if (CommonUtils.toBoolean(userSettings)) {
+                DataSourceNavigatorSettingsUtils.updateCustomNavigatorSettings(dataSourceDescriptor, settings);
+            } else {
+                // If user has no permissions to save it will cause error
+                dataSourceDescriptor.setNavigatorSettings(settings);
+                dataSourceDescriptor.persistConfiguration();
+            }
         } catch (DBException e) {
             throw new DBWebException("Error saving custom navigator settings", e);
         }
@@ -744,8 +751,8 @@ public class WebServiceCore implements DBWServiceCore {
         @NotNull String id
     ) throws DBWebException {
         WebConnectionInfo connectionInfo = WebDataSourceUtils.getWebConnectionInfo(webSession, projectId, id);
-        DataSourceDescriptor dataSourceDescriptor = ((DataSourceDescriptor) connectionInfo.getDataSourceContainer());
         try {
+            ((DataSourceDescriptor)connectionInfo.getDataSourceContainer()).getNavigatorSettings().setUserSettings(false);
             if (webSession.isAuthorizedInSecurityManager()) {
                 // save in sm database for authenticated users
                 webSession.getSecurityController().deleteObjectSettings(
@@ -754,7 +761,6 @@ public class WebServiceCore implements DBWServiceCore {
                     Set.of(DataSourceNavigatorSettingsUtils.PARAM_ID_NAVIGATOR_SETTINGS)
                 );
             }
-            dataSourceDescriptor.getNavigatorSettings().setUserSettings(null);
         } catch (DBException e) {
             throw new DBWebException("Error deleting custom navigator settings", e);
         }
