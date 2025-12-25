@@ -31,6 +31,18 @@
     @include mdc-theme-prop(border-color, background, false);
   }
 
+  .editor .cm-newline {
+    color: var(--theme-text-hint-on-light);
+    margin-left: 4px;
+    cursor: default;
+    pointer-events: none;
+  }
+
+  .editor .cm-highlightSpace {
+    background-image: radial-gradient(circle at 50% 55%, var(--theme-text-hint-on-light) 15%, transparent 5%);
+    background-position: center;
+  }
+
   .editor {
     @include mdc-theme-prop(background-color, surface, false);
     @include mdc-theme-prop(color, on-surface, false);
