@@ -83,8 +83,8 @@ export function useTableData(
         // TODO: fix column abstraction
         return Boolean(this.data?.columns?.some(column => (column as SqlResultColumn).description));
       },
-      get useOSFormatting(): IDataGridFormatters | null {
-        const setting = this.dataGridSettingsService.useOSFormatting;
+      get useUserFormatting(): IDataGridFormatters | null {
+        const setting = this.dataGridSettingsService.useUserFormatting;
 
         if (setting === 'default') {
           return null;
@@ -108,6 +108,7 @@ export function useTableData(
             day: 'numeric',
             timeZone: 'UTC',
           }),
+          number: new Intl.NumberFormat(locale),
         };
       },
       getRow(rowIndex) {
@@ -173,7 +174,7 @@ export function useTableData(
       rows: computed,
       columnKeys: computed,
       hasDescription: computed,
-      useOSFormatting: computed,
+      useUserFormatting: computed,
       formatting: observable.ref,
       format: observable.ref,
       dataContent: observable.ref,

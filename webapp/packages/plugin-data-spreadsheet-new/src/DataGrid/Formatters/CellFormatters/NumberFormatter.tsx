@@ -13,10 +13,11 @@ import { NullFormatter as GridNullFormatter } from '@cloudbeaver/plugin-data-gri
 
 import { CellContext } from '../../CellRenderer/CellContext.js';
 import { TableDataContext } from '../../TableDataContext.js';
-import styles from './DateTimeFormatter.module.css';
 import type { ICellFormatterProps } from '../ICellFormatterProps.js';
 
-export const DateTimeFormatter = observer<ICellFormatterProps>(function DateTimeFormatter() {
+import styles from './NumberFormatter.module.css';
+
+export const NumberFormatter = observer<ICellFormatterProps>(function NumberFormatter() {
   const tableDataContext = useContext(TableDataContext);
   const cellContext = useContext(CellContext);
   const style = useS(styles);
@@ -34,27 +35,19 @@ export const DateTimeFormatter = observer<ICellFormatterProps>(function DateTime
     return <GridNullFormatter />;
   }
 
-  const classes = s(style, { dateFormatter: true });
   let value = displayValue;
 
   if (tableDataContext.useUserFormatting) {
-    const isDateOnly = /^\d{4}-\d{2}-\d{2}$/.test(displayValue);
-    const date = new Date(displayValue);
+    const numberValue = Number(displayValue);
 
-    if (!isNaN(date.getTime())) {
-      let formatter = tableDataContext.useUserFormatting.dateTime;
-
-      if (isDateOnly) {
-        formatter = tableDataContext.useUserFormatting.dateOnly;
-      }
-
-      value = formatter.format(date);
+    if (!isNaN(numberValue) && displayValue.trim() !== '') {
+      value = tableDataContext.useUserFormatting.number.format(numberValue);
     }
   }
 
   return (
-    <div className={classes}>
-      <div className={s(style, { dateFormatterValue: true })}>{value}</div>
+    <div className={s(style, { numberFormatter: true })}>
+      <div className={s(style, { numberFormatterValue: true })}>{value}</div>
     </div>
   );
 });

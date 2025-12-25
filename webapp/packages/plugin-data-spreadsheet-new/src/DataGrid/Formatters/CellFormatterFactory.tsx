@@ -18,6 +18,7 @@ import { TextFormatter } from './CellFormatters/TextFormatter.js';
 import type { ICellFormatterProps } from './ICellFormatterProps.js';
 import { IndexFormatter } from './IndexFormatter.js';
 import { DateTimeFormatter } from './CellFormatters/DateTimeFormatter.js';
+import { NumberFormatter } from './CellFormatters/NumberFormatter.js';
 
 export const CellFormatterFactory = observer<ICellFormatterProps>(function CellFormatterFactory(props) {
   const formatterRef = useRef<React.FC<ICellFormatterProps> | null>(null);
@@ -41,8 +42,11 @@ export const CellFormatterFactory = observer<ICellFormatterProps>(function CellF
         }
 
         const dataKind = resultColumn?.dataKind?.toUpperCase();
-        if (dataKind === 'DATETIME' && tableDataContext.useOSFormatting) {
+        if (dataKind === 'DATETIME' && tableDataContext.useUserFormatting) {
           formatterRef.current = DateTimeFormatter;
+        }
+        if (dataKind === 'NUMERIC' && tableDataContext.useUserFormatting) {
+          formatterRef.current = NumberFormatter;
         }
       }
     } else {

@@ -32,6 +32,7 @@ export interface IDataGridFormatters {
   locale: string;
   dateTime: Intl.DateTimeFormat;
   dateOnly: Intl.DateTimeFormat;
+  number: Intl.NumberFormat;
 }
 
 export interface ITableData {
@@ -60,7 +61,7 @@ export interface ITableData {
   isIndexColumn: (columnKey: IColumnInfo) => boolean;
   isIndexColumnInRange: (columnsRange: Array<IColumnInfo>) => boolean;
   isCellReadonly: (key: IGridDataKey) => boolean;
-  useOSFormatting: IDataGridFormatters | null;
+  useUserFormatting: IDataGridFormatters | null;
 }
 
 export function isColumnInfo(column: IColumnInfo | undefined): column is IColumnInfo {

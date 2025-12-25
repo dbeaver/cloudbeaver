@@ -21,7 +21,7 @@ import { DATA_EDITOR_SETTINGS_GROUP } from '@cloudbeaver/plugin-data-viewer';
 const defaultSettings = schema.object({
   'plugin.data-spreadsheet.hidden': schemaExtra.stringedBoolean().default(false),
   'plugin.data-spreadsheet.showDescriptionInHeader': schemaExtra.stringedBoolean().default(true),
-  'plugin.data-spreadsheet.useOSFormatting': schema.string().default('default'),
+  'plugin.data-spreadsheet.useUserFormatting': schema.string().default('default'),
 });
 
 export type DataGridSettingsSchema = typeof defaultSettings;
@@ -37,8 +37,8 @@ export class DataGridSettingsService {
     return this.settings.getValue('plugin.data-spreadsheet.showDescriptionInHeader');
   }
 
-  get useOSFormatting(): string {
-    return this.settings.getValue('plugin.data-spreadsheet.useOSFormatting');
+  get useUserFormatting(): string {
+    return this.settings.getValue('plugin.data-spreadsheet.useUserFormatting');
   }
 
   readonly settings: SettingsProvider<DataGridSettingsSchema>;
@@ -112,7 +112,7 @@ export class DataGridSettingsService {
       },
       {
         group: DATA_EDITOR_SETTINGS_GROUP,
-        key: 'plugin.data-spreadsheet.useOSFormatting',
+        key: 'plugin.data-spreadsheet.useUserFormatting',
         access: {
           scope: ['client'],
         },
