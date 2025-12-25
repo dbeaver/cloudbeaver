@@ -58,7 +58,6 @@ import org.jkiss.dbeaver.model.rm.RMProjectType;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.secret.DBSSecretController;
 import org.jkiss.dbeaver.model.secret.DBSSecretValue;
-import org.jkiss.dbeaver.model.security.SMObjectType;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
 import org.jkiss.dbeaver.registry.DataSourceNavigatorSettings;
 import org.jkiss.dbeaver.registry.DataSourceNavigatorSettingsUtils;
@@ -750,17 +749,9 @@ public class WebServiceCore implements DBWServiceCore {
         @NotNull String id
     ) throws DBWebException {
         WebConnectionInfo connectionInfo = WebDataSourceUtils.getWebConnectionInfo(webSession, projectId, id);
+        DataSourceDescriptor dataSourceDescriptor = ((DataSourceDescriptor) connectionInfo.getDataSourceContainer());
         try {
-            ((DataSourceDescriptor)connectionInfo.getDataSourceContainer()).getNavigatorSettings().setUserSettings(false);
-            if (webSession.isAuthorizedInSecurityManager()) {
-                // save in sm database for authenticated users
-                webSession.getSecurityController().deleteObjectSettings(
-                    connectionInfo.getProjectId(),
-                    SMObjectType.datasource,
-                    connectionInfo.getId(),
-                    DataSourceNavigatorSettings.NAVIGATOR_SETTINGS
-                );
-            }
+            DataSourceNavigatorSettingsUtils.clearCustomNavigatorSettings(dataSourceDescriptor);
         } catch (DBException e) {
             throw new DBWebException("Error deleting custom navigator settings", e);
         }

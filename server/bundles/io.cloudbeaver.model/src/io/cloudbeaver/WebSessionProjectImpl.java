@@ -94,6 +94,17 @@ public class WebSessionProjectImpl extends WebProjectImpl implements DBPAdaptabl
                     webSession.getSecurityController().setObjectSettings(getId(), objectType, objectId, settings);
                 }
             }
+
+            @Override
+            protected void deleteProjectSettings(
+                @NotNull SMObjectType objectType,
+                @NotNull String objectId,
+                @NotNull Set<String> settings
+            ) throws DBException {
+                if (webSession.getUserContext().isNonAnonymousUserAuthorizedInSM()) {
+                    webSession.getSecurityController().deleteObjectSettings(getId(), objectType, objectId, settings);
+                }
+            }
         };
     }
 
