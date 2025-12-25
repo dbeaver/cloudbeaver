@@ -757,8 +757,9 @@ public class WebServiceCore implements DBWServiceCore {
                 // save in sm database for authenticated users
                 webSession.getSecurityController().deleteObjectSettings(
                     connectionInfo.getProjectId(),
-                    SMObjectType.datasource, connectionInfo.getId(),
-                    Set.of(DataSourceNavigatorSettingsUtils.PARAM_ID_NAVIGATOR_SETTINGS)
+                    SMObjectType.datasource,
+                    connectionInfo.getId(),
+                    DataSourceNavigatorSettings.NAVIGATOR_SETTINGS
                 );
             }
         } catch (DBException e) {
