@@ -596,7 +596,7 @@ type NavigatorSettings {
     hideSchemas: Boolean!
     hideVirtualModel: Boolean!
 
-    userSettings: Boolean!
+    userSettings: Boolean! @since(version: "25.3.2")
 }
 
 type RMResourceType {
@@ -640,7 +640,7 @@ input NavigatorSettingsInput {
     hideSchemas: Boolean!
     hideVirtualModel: Boolean!
 
-    userSettings: Boolean
+    userSettings: Boolean @since(version: "25.3.2")
 }
 
 input NetworkHandlerConfigInput {
