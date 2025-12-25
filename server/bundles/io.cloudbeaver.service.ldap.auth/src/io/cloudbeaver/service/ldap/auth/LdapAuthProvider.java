@@ -103,7 +103,7 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
         @NotNull SMAuthProviderCustomConfiguration providerConfig,
         @NotNull Map<String, Object> authParameters
     ) throws DBException {
-        List<String> autoAssignmentTeamIds = detectAutoAssignmentTeam(providerConfig, authParameters);
+        List<String> autoAssignmentTeamIds = detectAutoAssignmentTeam(new LdapSettings(providerConfig), authParameters);
         SMAutoAssign smAutoAssign = new SMAutoAssign();
         autoAssignmentTeamIds.forEach(smAutoAssign::addExternalTeamId);
         return smAutoAssign;
@@ -490,7 +490,7 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
 
     @NotNull
     protected List<String> detectAutoAssignmentTeam(
-        @NotNull SMAuthProviderCustomConfiguration providerConfig,
+        @NotNull LdapSettings ldapSettings,
         @NotNull Map<String, Object> authParameters
     ) throws DBException {
         String userName = JSONUtils.getString(authParameters, LdapConstants.CRED_USERNAME);
@@ -498,7 +498,6 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
             throw new DBException("LDAP user name is empty");
         }
 
-        LdapSettings ldapSettings = new LdapSettings(providerConfig);
         String fullDN = JSONUtils.getString(authParameters, LdapConstants.CRED_USER_DN);
         String userDN;
         if (!CommonUtils.isEmpty(fullDN)) {
@@ -512,7 +511,7 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
 
         List<String> result = new ArrayList<>();
         result.add(userDN);
-        result.addAll(getGroupForMember(userDN, providerConfig, authParameters));
+        result.addAll(getGroupForMember(userDN, ldapSettings, authParameters));
         return result;
     }
 
@@ -528,10 +527,9 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
     }
 
     @NotNull
-    protected List<String> getGroupForMember(String fullDN, SMAuthProviderCustomConfiguration customConfiguration, Map<String, Object> authParameters) {
+    protected List<String> getGroupForMember(String fullDN, LdapSettings ldapSettings, Map<String, Object> authParameters) {
         DirContext context = null;
         Set<String> result = new LinkedHashSet<>();
-        LdapSettings ldapSettings = new LdapSettings(customConfiguration);
         try {
             Map<String, String> environment = creteAuthEnvironment(ldapSettings);
             if (CommonUtils.isEmpty(ldapSettings.getBindUserDN())) {
