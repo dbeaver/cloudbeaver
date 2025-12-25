@@ -725,13 +725,12 @@ public class WebServiceCore implements DBWServiceCore {
         @NotNull WebSession webSession,
         @Nullable String projectId,
         @NotNull String id,
-        @NotNull DataSourceNavigatorSettings settings,
-        @Nullable Boolean userSettings
+        @NotNull DataSourceNavigatorSettings settings
     ) throws DBWebException {
         WebConnectionInfo connectionInfo = WebDataSourceUtils.getWebConnectionInfo(webSession, projectId, id);
         DataSourceDescriptor dataSourceDescriptor = ((DataSourceDescriptor) connectionInfo.getDataSourceContainer());
         try {
-            if (CommonUtils.toBoolean(userSettings)) {
+            if (settings.isUserSettings()) {
                 DataSourceNavigatorSettingsUtils.updateCustomNavigatorSettings(dataSourceDescriptor, settings);
             } else {
                 // If user has no permissions to save it will cause error

@@ -639,6 +639,8 @@ input NavigatorSettingsInput {
     hideFolders: Boolean!
     hideSchemas: Boolean!
     hideVirtualModel: Boolean!
+
+    userSettings: Boolean
 }
 
 input NetworkHandlerConfigInput {
@@ -836,7 +838,7 @@ extend type Mutation {
     closeConnection( id: ID!, projectId: ID ): ConnectionInfo!
 
     "Change navigator settings for connection"
-    setConnectionNavigatorSettings( id: ID!, projectId: ID, settings: NavigatorSettingsInput!, userSettings: Boolean): ConnectionInfo!
+    setConnectionNavigatorSettings( id: ID!, projectId: ID, settings: NavigatorSettingsInput!): ConnectionInfo!
     "Sets to default navigator settings for connection"
     clearConnectionNavigatorSettings(projectId: ID!, id: ID! ): ConnectionInfo! @since(version: "25.3.1")
 
