@@ -22,7 +22,7 @@ import { useAppVersion } from '@cloudbeaver/core-version';
 import style from './Body.module.css';
 import { useAppHeight } from './useAppHeight.js';
 import { useClientActivity } from './useClientActivity.js';
-import icons from '@dbeaver/ui-kit/assets/icons/icons.svg?raw';
+import icons from '@dbeaver/ui-kit/assets/icons/preload/icons.svg?raw';
 
 export const Body = observer(function Body() {
   // const serverConfigLoader = useResource(Body, ServerConfigResource, undefined);

@@ -37,4 +37,5 @@ export default [
   ['plugin_navigation_tree_settings_projects_title', '项目分组'],
   ['plugin_navigation_tree_settings_disable', 'Disable'],
   ['plugin_navigation_tree_settings_disable_description', 'Disable navigation tree for all users'],
+  ['plugin_navigation_tree_toolbar_menu_title', '树工具栏菜单'],
 ];
