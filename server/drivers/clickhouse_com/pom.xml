@@ -19,7 +19,6 @@
             <groupId>com.clickhouse</groupId>
             <artifactId>clickhouse-jdbc</artifactId>
             <version>0.9.5</version>
-            <classifier>http</classifier>
             <exclusions>
                 <exclusion>
                     <groupId>org.apache.commons</groupId>
