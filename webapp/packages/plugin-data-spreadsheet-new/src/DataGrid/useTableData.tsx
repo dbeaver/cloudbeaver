@@ -30,7 +30,7 @@ import {
 
 import type { IColumnInfo, ITableData, IDataGridFormatters } from './TableDataContext.js';
 import { useService } from '@cloudbeaver/core-di';
-import { DataGridSettingsService } from '../DataGridSettingsService.js';
+import { DataGridSettingsService, NO_FORMAT, OS_FORMAT } from '../DataGridSettingsService.js';
 import type { SqlResultColumn } from '@cloudbeaver/core-sdk';
 import { GridConditionalFormattingAction } from '@cloudbeaver/plugin-data-viewer-conditional-formatting';
 
@@ -86,12 +86,11 @@ export function useTableData(
       get useUserFormatting(): IDataGridFormatters | null {
         const setting = this.dataGridSettingsService.useUserFormatting;
 
-        if (setting === 'default') {
+        if (setting === NO_FORMAT) {
           return null;
         }
 
-        const locale = setting === '_OS' ? new Intl.DateTimeFormat().resolvedOptions().locale : setting;
-
+        const locale = setting === OS_FORMAT ? new Intl.DateTimeFormat().resolvedOptions().locale : setting;
         return {
           locale,
           dateTime: new Intl.DateTimeFormat(locale, {

@@ -18,10 +18,13 @@ import {
 import { schema, schemaExtra } from '@cloudbeaver/core-utils';
 import { DATA_EDITOR_SETTINGS_GROUP } from '@cloudbeaver/plugin-data-viewer';
 
+export const NO_FORMAT = 'default';
+export const OS_FORMAT = '_OS';
+
 const defaultSettings = schema.object({
   'plugin.data-spreadsheet.hidden': schemaExtra.stringedBoolean().default(false),
   'plugin.data-spreadsheet.showDescriptionInHeader': schemaExtra.stringedBoolean().default(true),
-  'plugin.data-spreadsheet.useUserFormatting': schema.string().default('default'),
+  'plugin.data-spreadsheet.useUserFormatting': schema.string().default(NO_FORMAT),
 });
 
 export type DataGridSettingsSchema = typeof defaultSettings;
@@ -118,8 +121,8 @@ export class DataGridSettingsService {
         },
         type: ESettingsValueType.Select,
         options: [
-          { value: 'default', name: 'None' },
-          { value: '_OS', name: 'plugin_data_spreadsheet_new_settings_use_locale_formatting_os' },
+          { value: NO_FORMAT, name: 'None' },
+          { value: OS_FORMAT, name: 'plugin_data_spreadsheet_new_settings_use_locale_formatting_os' },
           ...this.supportedLocales
             .map(locale => ({ value: locale, name: this.getLocaleName(locale) }))
             .filter(locale => locale.name.length > 2)
