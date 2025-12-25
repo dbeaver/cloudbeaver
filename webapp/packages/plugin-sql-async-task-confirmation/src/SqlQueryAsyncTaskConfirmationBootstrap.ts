@@ -43,7 +43,7 @@ export class SqlQueryAsyncTaskConfirmationBootstrap extends Bootstrap {
     const dialogPromise = this.commonDialogService.open(ConfirmationDialog, {
       title: confirmationEvent.title,
       message: confirmationEvent.message,
-      icon: '/icons/warning_icon_sm.svg',
+      icon: '/icons/preload/warning_icon_sm.svg',
       showSkipConfirmations: true,
       size: 'large',
       children: () => renderQueryForConfirmation(confirmationEvent.query),

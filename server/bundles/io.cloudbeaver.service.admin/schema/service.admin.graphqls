@@ -1,138 +1,231 @@
-
+"Describes the type of the administrative subject (user or team)"
 enum AdminSubjectType {
+    "User"
     user,
+    "Team"
     team
 }
 
+"Information about connection access rights for a subject (user or team)"
 type AdminConnectionGrantInfo {
+    "Connection identifier"
     connectionId: ID! @deprecated(reason: "use dataSourceId instead")
+    "Data source (connection) identifier"
     dataSourceId: ID!
+    "Subject identifier (user or team)"
     subjectId: ID!
+    "Subject type (user or team)"
     subjectType: AdminSubjectType!
 }
 
+"Information about the user's role in a team"
 type AdminUserTeamGrantInfo @since(version: "24.0.5"){
+    "User identifier"
     userId: ID!
+    "User role in the team"
     teamRole: String
 }
 
+"Set of permissions assigned to an object"
 type AdminObjectPermissions {
+    "Object identifier"
     objectId: ID!
+    "List of permissions for the object"
     permissions: [String!]!
 }
 
+"Information about a subject's (user or team) permissions on an object"
 type AdminObjectGrantInfo {
+    "Subject identifier (user or team)"
     subjectId: ID!
+    "Subject type (user or team)"
     subjectType: AdminSubjectType!
+    "Subject permissions on the object"
     objectPermissions: AdminObjectPermissions!
 }
 
+"Result of searching for available connections by host"
 type AdminConnectionSearchInfo {
+    "Connection display name"
     displayName: String!
+    "Connection host"
     host: String!
+    "Connection port"
     port: Int!
+    "List of possible drivers for the connection"
     possibleDrivers: [ID!]!
+    "Default driver"
     defaultDriver: ID!
 }
 
+"Extended user information for the admin interface"
 type AdminUserInfo {
+    "User identifier"
     userId: ID!
 
+    "User custom meta parameters"
     metaParameters: Object!
+    "User configuration parameters"
     configurationParameters: Object!
+    "List of teams the user belongs to"
     grantedTeams: [ID!]!
+    "List of connections the user has access to"
     grantedConnections: [AdminConnectionGrantInfo!]!
 
+    "Origins from which the user was created or loaded"
     origins: [ObjectOrigin!]!
 
+    "List of linked authentication providers"
     linkedAuthProviders: [String!]!
+    "Whether the user is enabled"
     enabled: Boolean!
+    "User authentication role"
     authRole: String
 
+    "Date when the user was disabled"
     disableDate: DateTime @since(version: "25.0.2")
+    "Who disabled the user"
     disabledBy: String @since(version: "25.0.2")
+    "Reason why the user was disabled"
     disableReason: String @since(version: "25.0.2")
 
 }
 
+"Team information for the admin interface"
 type AdminTeamInfo {
+    "Team identifier"
     teamId: ID!
+    "Team display name"
     teamName: String
+    "Team description"
     description: String
 
+    "Team custom meta parameters"
     metaParameters: Object!
 
+    "List of user identifiers that belong to the team"
     grantedUsers: [ID!]!
+    "Detailed information about users and their roles in the team"
     grantedUsersInfo: [AdminUserTeamGrantInfo!]! @since(version: "24.0.5")
+    "List of connections assigned to this team"
     grantedConnections: [AdminConnectionGrantInfo!]!
 
+    "List of permissions assigned to the team"
     teamPermissions: [ID!]!
 }
 
+"Information about a permission"
 type AdminPermissionInfo {
+    "Permission identifier"
     id: ID!
+    "Human readable permission label"
     label: String
+    "Permission description"
     description: String
 
+    "Provider that owns the permission"
     provider: String!
+    "Permission category"
     category: String
 }
 
+"Authentication provider configuration"
 type AdminAuthProviderConfiguration {
+    "Authentication provider identifier"
     providerId: ID!
+    "Provider configuration identifier"
     id: ID!
+    "Configuration display name"
     displayName: String!
+    "Flag indicating whether the configuration is disabled"
     disabled: Boolean!
 
+    "Provider icon URL"
     iconURL: String
+    "Configuration description"
     description: String
 
+    "Provider configuration parameters"
     parameters: Object!
 
+    "Sign-in link (Single Sign-On, etc.)"
     signInLink: String
+    "Sign-out link"
     signOutLink: String
+    "Redirect URI"
     redirectLink: String
+    "Metadata link for the provider"
     metadataLink: String
+    "ACS (Assertion Consumer Service) link for SSO"
     acsLink: String
+    "Entity ID link for the provider"
     entityIdLink: String @since(version: "24.2.1")
 }
 
+"Set of web UI features"
 type WebFeatureSet {
+    "Feature set identifier"
     id: String!
+    "Feature set display name"
     label: String!
+    "Feature set description"
     description: String
+    "Feature set icon"
     icon: String
 
+    "Whether the feature set is enabled"
     enabled: Boolean!
 }
 
+"Input parameters for server configuration"
 input ServerConfigInput {
+    "Server display name"
     serverName: String
+    "Server base URL"
     serverURL: String @deprecated
 
+    "Default administrator name"
     adminName: String
+    "Default administrator password"
     adminPassword: String
 
+    "Whether anonymous access is enabled"
     anonymousAccessEnabled: Boolean
-    authenticationEnabled: Boolean
+    "Whether authentication is enabled"
+    authenticationEnabled: Boolean @deprecated
+    "Whether private connections can be created"
     customConnectionsEnabled: Boolean
+    "Whether saving public credentials is allowed"
     publicCredentialsSaveEnabled: Boolean
+    "Whether saving credentials is allowed"
     adminCredentialsSaveEnabled: Boolean
+    "Whether the resource manager is enabled"
     resourceManagerEnabled: Boolean
+    "Whether the secret manager is enabled"
     secretManagerEnabled: Boolean @since(version: "24.3.2")
 
+    "Enabled feature sets"
     enabledFeatures: [ID!]
+    "Enabled authentication providers"
     enabledAuthProviders: [ID!]
+    "Disabled drivers"
     disabledDrivers: [ID!]
 
+    "Session lifetime"
     sessionExpireTime: Int
+    "Force HTTPS usage"
     forceHttps: Boolean @since(version: "25.1.3")
+    "Supported hosts for accessing the server"
     supportedHosts: [String!] @since(version: "25.1.3")
+    "Bind session to client IP address"
     bindSessionToIp: String @since(version: "25.1.4")
 }
 
+"Filter input for searching users in the admin interface"
 input AdminUserFilterInput {
+    "User identifier mask"
     userIdMask: String
+    "Filter by enabled/disabled state"
     enabledState: Boolean
 }
 
