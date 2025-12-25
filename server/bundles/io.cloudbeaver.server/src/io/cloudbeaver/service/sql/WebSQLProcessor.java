@@ -967,9 +967,7 @@ public class WebSQLProcessor implements WebSessionProvider {
         @NotNull DBDDataFilter dataFilter
     ) throws DBException {
         DBDRowIdentifier rowIdentifier = resultsInfo.getDefaultRowIdentifier();
-        if (rowIdentifier == null || rowIdentifier.isIncomplete()) {
-            return;
-        }
+        checkRowIdentifier(resultsInfo, rowIdentifier);
         DBDAttributeBinding[] keyAttributes = rowIdentifier.getAttributes().toArray(new DBDAttributeBinding[0]);
         Object[] rowValues = new Object[keyAttributes.length];
         List<DBDAttributeConstraint> constraints = new ArrayList<>();
