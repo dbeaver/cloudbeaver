@@ -28,7 +28,7 @@ import {
   type IGridDataKey,
 } from '@cloudbeaver/plugin-data-viewer';
 
-import type { IColumnInfo, ITableData } from './TableDataContext.js';
+import type { IColumnInfo, ITableData, IDataGridFormatters } from './TableDataContext.js';
 import { useService } from '@cloudbeaver/core-di';
 import { DataGridSettingsService } from '../DataGridSettingsService.js';
 import type { SqlResultColumn } from '@cloudbeaver/core-sdk';
@@ -82,6 +82,33 @@ export function useTableData(
 
         // TODO: fix column abstraction
         return Boolean(this.data?.columns?.some(column => (column as SqlResultColumn).description));
+      },
+      get useOSFormatting(): IDataGridFormatters | null {
+        const setting = this.dataGridSettingsService.useOSFormatting;
+
+        if (setting === 'default') {
+          return null;
+        }
+
+        const locale = setting === '_OS' ? new Intl.DateTimeFormat().resolvedOptions().locale : setting;
+
+        return {
+          locale,
+          dateTime: new Intl.DateTimeFormat(locale, {
+            year: 'numeric',
+            month: 'numeric',
+            day: 'numeric',
+            hour: 'numeric',
+            minute: 'numeric',
+            second: 'numeric',
+          }),
+          dateOnly: new Intl.DateTimeFormat(locale, {
+            year: 'numeric',
+            month: 'numeric',
+            day: 'numeric',
+            timeZone: 'UTC',
+          }),
+        };
       },
       getRow(rowIndex) {
         return this.rows[rowIndex];
@@ -146,6 +173,7 @@ export function useTableData(
       rows: computed,
       columnKeys: computed,
       hasDescription: computed,
+      useOSFormatting: computed,
       formatting: observable.ref,
       format: observable.ref,
       dataContent: observable.ref,

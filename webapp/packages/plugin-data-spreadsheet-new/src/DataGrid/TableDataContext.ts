@@ -28,6 +28,12 @@ export interface IColumnInfo {
   key: IGridColumnKey | null;
 }
 
+export interface IDataGridFormatters {
+  locale: string;
+  dateTime: Intl.DateTimeFormat;
+  dateOnly: Intl.DateTimeFormat;
+}
+
 export interface ITableData {
   formatting: GridConditionalFormattingAction;
   format: IDatabaseDataFormatAction<Partial<IGridDataKey>, IResultSetValue, IDatabaseResultSet>;
@@ -54,6 +60,7 @@ export interface ITableData {
   isIndexColumn: (columnKey: IColumnInfo) => boolean;
   isIndexColumnInRange: (columnsRange: Array<IColumnInfo>) => boolean;
   isCellReadonly: (key: IGridDataKey) => boolean;
+  useOSFormatting: IDataGridFormatters | null;
 }
 
 export function isColumnInfo(column: IColumnInfo | undefined): column is IColumnInfo {

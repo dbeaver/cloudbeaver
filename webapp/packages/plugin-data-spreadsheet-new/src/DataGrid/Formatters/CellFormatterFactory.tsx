@@ -17,6 +17,7 @@ import { BooleanFormatter } from './CellFormatters/BooleanFormatter.js';
 import { TextFormatter } from './CellFormatters/TextFormatter.js';
 import type { ICellFormatterProps } from './ICellFormatterProps.js';
 import { IndexFormatter } from './IndexFormatter.js';
+import { DateTimeFormatter } from './CellFormatters/DateTimeFormatter.js';
 
 export const CellFormatterFactory = observer<ICellFormatterProps>(function CellFormatterFactory(props) {
   const formatterRef = useRef<React.FC<ICellFormatterProps> | null>(null);
@@ -37,6 +38,11 @@ export const CellFormatterFactory = observer<ICellFormatterProps>(function CellF
 
         if (resultColumn && isBooleanValuePresentationAvailable(holder.value, resultColumn)) {
           formatterRef.current = BooleanFormatter;
+        }
+
+        const dataKind = resultColumn?.dataKind?.toUpperCase();
+        if (dataKind === 'DATETIME' && tableDataContext.useOSFormatting) {
+          formatterRef.current = DateTimeFormatter;
         }
       }
     } else {
