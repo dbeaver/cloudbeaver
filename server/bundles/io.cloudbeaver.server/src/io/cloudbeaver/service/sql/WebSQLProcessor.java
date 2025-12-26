@@ -951,7 +951,7 @@ public class WebSQLProcessor implements WebSessionProvider {
         DBCExecutionContext executionContext = getExecutionContext(dataContainer);
         try (DBCSession session = executionContext.openSession(monitor, DBCExecutionPurpose.USER, "Generate data update batches")) {
             DBDDataFilter dataFilter = new DBDDataFilter();
-            addKeyAttributes(resultsInfo, row, dataContainer, session, dataFilter);
+            addKeyAttributes(monitor, resultsInfo, row, dataContainer, session, dataFilter);
             WebExecutionSource executionSource = new WebExecutionSource(dataContainer, executionContext, this);
             dataContainer.readData(
                 executionSource, session, dataReceiver, dataFilter,
@@ -960,12 +960,19 @@ public class WebSQLProcessor implements WebSessionProvider {
     }
 
     private void addKeyAttributes(
+        @NotNull DBRProgressMonitor monitor,
         @NotNull WebSQLResultsInfo resultsInfo,
         @NotNull WebSQLResultsRow row,
         @NotNull DBSDataContainer dataContainer,
         @NotNull DBCSession session,
         @NotNull DBDDataFilter dataFilter
     ) throws DBException {
+        if (resultsInfo.isSingleRow()) {
+            long rowCount = DBUtils.readRowCount(monitor, session.getExecutionContext(), dataContainer, null, this);
+            if (rowCount == 1) {
+                return;
+            }
+        }
         DBDRowIdentifier rowIdentifier = resultsInfo.getDefaultRowIdentifier();
         checkRowIdentifier(resultsInfo, rowIdentifier);
         DBDAttributeBinding[] keyAttributes = rowIdentifier.getAttributes().toArray(new DBDAttributeBinding[0]);
