@@ -44,16 +44,16 @@ function DialogDisclosure({ className, ...props }: DialogDisclosureProps): JSX.E
   return <AriakitDialogDisclosure className={clsx('dbv-kit-dialog__disclosure', className)} {...props} />;
 }
 
-function DialogHeader({ className, ...props }: ComponentPropsWithoutRef<'div'>): JSX.Element {
-  return <div className={clsx('dbv-kit-dialog__header', className)} {...props} />;
+function DialogHeader({ className, ...props }: ComponentPropsWithoutRef<'header'>): JSX.Element {
+  return <header className={clsx('dbv-kit-dialog__header', className)} {...props} />;
 }
 
 function DialogBody({ className, ...props }: ComponentPropsWithoutRef<'div'>): JSX.Element {
   return <div className={clsx('dbv-kit-dialog__body', className)} {...props} />;
 }
 
-function DialogFooter({ className, ...props }: ComponentPropsWithoutRef<'div'>): JSX.Element {
-  return <div className={clsx('dbv-kit-dialog__footer', className)} {...props} />;
+function DialogFooter({ className, ...props }: ComponentPropsWithoutRef<'footer'>): JSX.Element {
+  return <footer className={clsx('dbv-kit-dialog__footer', className)} {...props} />;
 }
 
 function DialogHeading({ className, ...props }: DialogHeadingProps): JSX.Element {
