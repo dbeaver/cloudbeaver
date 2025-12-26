@@ -51,4 +51,6 @@ export default [
     'plugin_sql_editor_settings_auto_save_description_git_integration',
     'Автоматически сохранять файлы скриптов. Эта настройка доступна только при отключенной интеграции с Git',
   ],
+  ['plugin_sql_editor_settings_highlight_white_space', 'Подсветить пробелы'],
+  ['plugin_sql_editor_settings_highlight_white_space_description', 'Подсветить пробелы, табуляции и другие пробельные символы в редакторе SQL'],
 ];

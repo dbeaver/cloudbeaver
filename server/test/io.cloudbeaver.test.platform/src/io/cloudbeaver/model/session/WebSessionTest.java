@@ -20,6 +20,8 @@ import io.cloudbeaver.CloudbeaverMockTest;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.app.ServletAuthApplication;
 import org.jkiss.dbeaver.model.websocket.event.WSEventController;
+import org.jkiss.utils.function.ThrowableConsumer;
+import org.jkiss.utils.function.ThrowableFunction;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -28,7 +30,6 @@ import org.mockito.Mockito;
 import java.util.Collections;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Function;
 
 public class WebSessionTest extends CloudbeaverMockTest {
 
@@ -53,10 +54,9 @@ public class WebSessionTest extends CloudbeaverMockTest {
 
         // Non-persistent attribute created via getAttribute with creator/disposer
         AtomicBoolean disposed = new AtomicBoolean(false);
-        Function<String, String> creator = (s) -> "created";
-        Function<String, String> disposer = (s) -> {
+        ThrowableFunction<String, String, Exception> creator = (s) -> "created";
+        ThrowableConsumer<String, Exception> disposer = (s) -> {
             disposed.set(true);
-            return null;
         };
 
         String created = session.getAttribute("createdKey", creator, disposer);
