@@ -51,4 +51,6 @@ export default [
     'plugin_sql_editor_settings_auto_save_description_git_integration',
     'Automatically save the script files. This feature is only available when Git integration is turned off',
   ],
+  ['plugin_sql_editor_settings_highlight_white_space', '高亮显示空白字符'],
+  ['plugin_sql_editor_settings_highlight_white_space_description', '高亮显示SQL编辑器中的空格、制表符和其他空白字符'],
 ];

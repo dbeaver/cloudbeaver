@@ -53,7 +53,7 @@ export const DeleteUserDialog: DialogComponent<IPayload> = function DeleteUserDi
     <CommonDialogWrapper size="small" fixedWidth>
       <CommonDialogHeader
         title={translate('authentication_administration_users_delete_user')}
-        icon="/icons/error_icon.svg"
+        icon="/icons/preload/error_icon.svg"
         bigIcon
         onReject={props.rejectDialog}
       />

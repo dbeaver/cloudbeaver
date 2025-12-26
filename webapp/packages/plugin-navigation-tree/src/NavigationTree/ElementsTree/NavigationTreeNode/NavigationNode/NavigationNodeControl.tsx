@@ -121,7 +121,7 @@ export const NavigationNodeControl: NavTreeControlComponent = observer(
     const title = nodeInfo.tooltip;
 
     if (error) {
-      icon = '/icons/error_icon_sm.svg';
+      icon = '/icons/preload/error_icon_sm.svg';
     }
 
     function handlePortalClick(event: React.MouseEvent<HTMLDivElement>) {
