@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 import React, { use, useLayoutEffect, useMemo } from 'react';
 
-import { Loader, MenuItemElement, useAutoLoad, useObjectRef, useTranslate } from '@cloudbeaver/core-blocks';
+import { MenuItemElement, useAutoLoad, useObjectRef, useTranslate } from '@cloudbeaver/core-blocks';
 import type { IContextMenuProps } from './IContextMenuProps.js';
 import { MenuButton, MenuProvider, Menu, type HovercardStoreState, useMenuStore, useStoreState } from '@dbeaver/ui-kit';
 import { RenderMenuItems } from './RenderMenuItems.js';
@@ -95,15 +95,13 @@ export const ContextMenu = observer<IContextMenuNewProps>(function ContextMenuIn
           dir={isRtl ? 'rtl' : 'ltr'}
         >
           {isMenuOpen && (
-            <Loader suspense small inline>
-              <RenderMenuItems
-                menu={menuData}
-                menuComponent={ContextMenu}
-                itemComponent={MenuItemElement}
-                groupComponent={GroupComponent}
-                groupArrowComponent={GroupArrowComponent}
-              />
-            </Loader>
+            <RenderMenuItems
+              menu={menuData}
+              menuComponent={ContextMenu}
+              itemComponent={MenuItemElement}
+              groupComponent={GroupComponent}
+              groupArrowComponent={GroupArrowComponent}
+            />
           )}
         </Menu>
       </MenuProvider>
