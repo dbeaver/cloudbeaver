@@ -6,17 +6,19 @@
  * you may not use this file except in compliance with the License.
  */
 
-.menuBarItemGroup {
-  & .menuBarItem {
-    & .menuBarItemBox {
-      gap: 0;
-    }
-    & .menuBarItemLabel {
-      font-size: 14px;
-    }
+.menuBarItem {
+  padding: 0 4px;
 
-    & .menuBarItemIcon + .menuBarItemLabel {
-      padding-left: initial;
-    }
+  & .menuBarItemBox {
+    gap: 0;
+  }
+  & .menuBarItemLabel {
+    font-size: 14px;
+    text-transform: uppercase;
+    font-weight: 700;
+  }
+
+  & .menuBarItemIcon + .menuBarItemLabel {
+    padding-left: initial;
   }
 }
