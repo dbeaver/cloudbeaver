@@ -17,6 +17,7 @@ import {
 } from '@cloudbeaver/core-settings';
 import { schema, schemaExtra } from '@cloudbeaver/core-utils';
 import { DATA_EDITOR_SETTINGS_GROUP } from '@cloudbeaver/plugin-data-viewer';
+import { COMMON_LOCALES } from './commonLocales.js';
 
 export const NO_FORMAT = 'default';
 export const OS_FORMAT = '_OS';
@@ -45,7 +46,7 @@ export class DataGridSettingsService {
   }
 
   readonly settings: SettingsProvider<DataGridSettingsSchema>;
-  readonly supportedLocales = this.getSupportedLocales();
+  readonly supportedLocales = this.getSupportedLocalesWithRegions();
 
   constructor(
     private readonly settingsProviderService: SettingsProviderService,
@@ -64,25 +65,15 @@ export class DataGridSettingsService {
     this.registerSettings();
   }
 
-  private getSupportedLocales() {
-    const codes = [];
-    const letters = 'abcdefghijklmnopqrstuvwxyz';
-
-    function isLanguageCodeSupported(code: string | Intl.Locale) {
-      const locale = new Intl.Locale(code);
-      return locale.maximize().region !== undefined;
-    }
-
-    for (let i = 0; i < letters.length; i++) {
-      for (let j = 0; j < letters.length; j++) {
-        const code = letters[i]! + letters[j]!;
-        if (isLanguageCodeSupported(code)) {
-          codes.push(code);
-        }
+  private getSupportedLocalesWithRegions() {
+    return COMMON_LOCALES.filter(localeCode => {
+      try {
+        const locale = new Intl.Locale(localeCode);
+        return locale.language && locale.region;
+      } catch {
+        return false;
       }
-    }
-
-    return codes;
+    });
   }
 
   private getLocaleName(localeCode: string) {
@@ -123,10 +114,7 @@ export class DataGridSettingsService {
         options: [
           { value: NO_FORMAT, name: 'plugin_data_spreadsheet_new_settings_use_locale_formatting_none' },
           { value: OS_FORMAT, name: 'plugin_data_spreadsheet_new_settings_use_locale_formatting_os' },
-          ...this.supportedLocales
-            .map(locale => ({ value: locale, name: this.getLocaleName(locale) }))
-            .filter(locale => locale.name.length > 2)
-            .sort((a, b) => a.name.localeCompare(b.name)),
+          ...this.supportedLocales.map(locale => ({ value: locale, name: this.getLocaleName(locale) })).sort((a, b) => a.name.localeCompare(b.name)),
         ],
         name: 'plugin_data_spreadsheet_new_settings_use_locale_formatting_title',
         description: 'plugin_data_spreadsheet_new_settings_use_locale_formatting_description',
