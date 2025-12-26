@@ -354,30 +354,11 @@ public class WebSessionProjectImpl extends WebProjectImpl implements DBPAdaptabl
     @NotNull
     private WebConnectionInfo closeAndDeleteConnection(@NotNull WebConnectionInfo connectionInfo) throws DBWebException {
         DBPDataSourceContainer dataSourceContainer = connectionInfo.getDataSourceContainer();
-        boolean disconnected = WebDataSourceUtils.disconnectDataSource(webSession, dataSourceContainer);
+        WebDataSourceUtils.disconnectDataSource(webSession, dataSourceContainer);
         DBPDataSourceRegistry registry = getDataSourceRegistry();
         registry.removeDataSource(dataSourceContainer);
-        try {
-            deleteAllDataSourceSettings(dataSourceContainer);
-            registry.checkForErrors();
-        } catch (DBException e) {
-            try {
-                registry.addDataSource(dataSourceContainer);
-            } catch (DBException ex) {
-                log.error("Error re-adding after delete attempt", e);
-            }
-            throw new DBWebException("Failed to delete connection", e);
-        }
         removeConnection(dataSourceContainer);
         return connectionInfo;
-    }
-
-    private void deleteAllDataSourceSettings(DBPDataSourceContainer dataSourceContainer) throws DBException {
-        webSession.getSecurityController().deleteObjectSettings(
-            getId(),
-            SMObjectType.datasource, dataSourceContainer.getId(),
-            null
-        );
     }
 
     @NotNull
