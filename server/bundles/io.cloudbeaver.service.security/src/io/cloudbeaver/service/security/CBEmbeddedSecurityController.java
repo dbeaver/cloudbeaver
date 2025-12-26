@@ -277,7 +277,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
 
     @Override
     public void deleteObject(
-        @Nullable String projectId,
+        @NotNull String projectId,
         @NotNull String objectId,
         @NotNull SMObjectType objectType
     ) throws DBException {
