@@ -57,6 +57,7 @@ import javax.net.ssl.TrustManagerFactory;
 public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBruteForceProtected, SMAuthProviderAssigner {
     private static final Log log = Log.getLog(LdapAuthProvider.class);
     public static final String LDAP_AUTH_PROVIDER_ID = "ldap";
+    private static final int DEFAULT_TIME_LIMIT = 30_000;
 
     public LdapAuthProvider() {
     }
@@ -84,7 +85,7 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
         Map<String, String> environment = creteAuthEnvironment(ldapSettings);
 
         Map<String, Object> userData = new HashMap<>();
-        if (!isFullDN(userName) && CommonUtils.isNotEmpty(ldapSettings.getLoginAttribute())) {
+        if (!LdapUtils.isFullDN(userName, ldapSettings.getBaseDN()) && CommonUtils.isNotEmpty(ldapSettings.getLoginAttribute())) {
             userData = validateAndLoginUserAccessByUsername(userName, password, ldapSettings);
         }
         if (CommonUtils.isEmpty(userData)) {
@@ -102,7 +103,7 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
         @NotNull SMAuthProviderCustomConfiguration providerConfig,
         @NotNull Map<String, Object> authParameters
     ) throws DBException {
-        List<String> autoAssignmentTeamIds = detectAutoAssignmentTeam(providerConfig, authParameters);
+        List<String> autoAssignmentTeamIds = detectAutoAssignmentTeam(new LdapSettings(providerConfig), authParameters);
         SMAutoAssign smAutoAssign = new SMAutoAssign();
         autoAssignmentTeamIds.forEach(smAutoAssign::addExternalTeamId);
         return smAutoAssign;
@@ -411,10 +412,6 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
         return cred.get(LdapConstants.CRED_USER_DN);
     }
 
-    private boolean isFullDN(String userName) {
-        return userName.contains(",") && userName.contains("=");
-    }
-
     private String buildFullUserDN(String userName, LdapSettings ldapSettings) {
         String fullUserDN = userName;
 
@@ -431,7 +428,7 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
     private SearchControls createSearchControls() {
         SearchControls searchControls = new SearchControls();
         searchControls.setSearchScope(SearchControls.SUBTREE_SCOPE);
-        searchControls.setTimeLimit(30_000);
+        searchControls.setTimeLimit(DEFAULT_TIME_LIMIT);
         searchControls.setReturningAttributes(new String[]{"*", "+"});
         return searchControls;
     }
@@ -493,7 +490,7 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
 
     @NotNull
     protected List<String> detectAutoAssignmentTeam(
-        @NotNull SMAuthProviderCustomConfiguration providerConfig,
+        @NotNull LdapSettings ldapSettings,
         @NotNull Map<String, Object> authParameters
     ) throws DBException {
         String userName = JSONUtils.getString(authParameters, LdapConstants.CRED_USERNAME);
@@ -501,7 +498,6 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
             throw new DBException("LDAP user name is empty");
         }
 
-        LdapSettings ldapSettings = new LdapSettings(providerConfig);
         String fullDN = JSONUtils.getString(authParameters, LdapConstants.CRED_USER_DN);
         String userDN;
         if (!CommonUtils.isEmpty(fullDN)) {
@@ -531,7 +527,7 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
     }
 
     @NotNull
-    private List<String> getGroupForMember(String fullDN, LdapSettings ldapSettings, Map<String, Object> authParameters) {
+    protected List<String> getGroupForMember(String fullDN, LdapSettings ldapSettings, Map<String, Object> authParameters) {
         DirContext context = null;
         Set<String> result = new LinkedHashSet<>();
         try {
@@ -573,11 +569,11 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
         return new ArrayList<>(result);
     }
 
-    private List<String> findGroupsByMemberOfAttribute(String fullDN, DirContext context) throws NamingException {
+    protected List<String> findGroupsByMemberOfAttribute(String fullDN, DirContext context) throws NamingException {
         List<String> result = new ArrayList<>();
         SearchControls memberOfSearch = new SearchControls();
         memberOfSearch.setSearchScope(SearchControls.OBJECT_SCOPE);
-        memberOfSearch.setTimeLimit(30_000);
+        memberOfSearch.setTimeLimit(DEFAULT_TIME_LIMIT);
         memberOfSearch.setReturningAttributes(new String[] {"*", "+"});
         NamingEnumeration<SearchResult> userRecord = context.search(fullDN, "(objectClass=*)", memberOfSearch);
         try {
@@ -602,7 +598,7 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
         return result;
     }
 
-    private List<String> findGroupsByMemberAttribute(String fullDN, LdapSettings ldapSettings, DirContext context) throws NamingException {
+    protected List<String> findGroupsByMemberAttribute(String fullDN, LdapSettings ldapSettings, DirContext context) throws NamingException {
         List<String> result = new ArrayList<>();
         String searchFilter = "(member={0})";
         SearchControls searchControls = new SearchControls();

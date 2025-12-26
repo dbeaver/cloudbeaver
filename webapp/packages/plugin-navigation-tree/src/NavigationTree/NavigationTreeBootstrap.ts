@@ -10,15 +10,17 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { LeftBarPanelService } from '@cloudbeaver/core-ui';
 
 import { NavigationTreeSettingsService } from '../NavigationTreeSettingsService.js';
+import { TreeToolbarMenuService } from '../TreeNew/TreeToolbarMenuService.js';
 import { ElementsTreeToolsMenuService } from './ElementsTree/ElementsTreeTools/ElementsTreeToolsMenuService.js';
 
 const NavigationTreePanel = importLazyComponent(() => import('./NavigationTreePanel.js').then(m => m.NavigationTreePanel));
 
-@injectable(() => [NavigationTreeSettingsService, ElementsTreeToolsMenuService, LeftBarPanelService])
+@injectable(() => [NavigationTreeSettingsService, ElementsTreeToolsMenuService, TreeToolbarMenuService, LeftBarPanelService])
 export class NavigationTreeBootstrap extends Bootstrap {
   constructor(
     private readonly navigationTreeSettingsService: NavigationTreeSettingsService,
     private readonly elementsTreeToolsMenuService: ElementsTreeToolsMenuService,
+    private readonly treeToolbarMenuService: TreeToolbarMenuService,
     private readonly leftBarPanelService: LeftBarPanelService,
   ) {
     super();
@@ -26,6 +28,7 @@ export class NavigationTreeBootstrap extends Bootstrap {
 
   override register(): void {
     this.elementsTreeToolsMenuService.register();
+    this.treeToolbarMenuService.register();
     this.leftBarPanelService.tabsContainer.add({
       key: 'navigation-tree-tab',
       order: 0,

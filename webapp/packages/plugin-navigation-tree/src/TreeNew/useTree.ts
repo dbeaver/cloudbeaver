@@ -71,7 +71,7 @@ export function useTree(options: IOptions): ITree {
           if (state) {
             await options.data.load(id, true);
           }
-        } catch (exception) {
+        } catch {
           options.data.updateState(id, { expanded: false });
         }
       },
