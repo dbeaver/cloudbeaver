@@ -9,7 +9,7 @@ import { DATA_CONTEXT_ADMINISTRATION_ITEM_ROUTE } from '@cloudbeaver/core-admini
 import { AUTH_PROVIDER_LOCAL_ID, AuthProvidersResource } from '@cloudbeaver/core-authentication';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CachedMapAllKey, getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
-import { ACTION_CREATE, ACTION_REFRESH, ActionService, MenuService } from '@cloudbeaver/core-view';
+import { ACTION_CREATE, ACTION_REFRESH, ActionService, menuExtractItems, MenuService } from '@cloudbeaver/core-view';
 
 import { AdministrationUsersManagementService } from '../../../AdministrationUsersManagementService.js';
 import { MENU_USERS_ADMINISTRATION } from '../../../Menus/MENU_USERS_ADMINISTRATION.js';
@@ -36,13 +36,7 @@ export class CreateUserBootstrap extends Bootstrap {
         return [...items, ACTION_CREATE, ACTION_REFRESH];
       },
       orderItems(context, items) {
-        const refreshIndex = items.indexOf(ACTION_REFRESH);
-
-        if (refreshIndex > -1) {
-          const [refresh] = items.splice(refreshIndex, 1);
-          items.push(refresh!);
-        }
-
+        items.push(...menuExtractItems(items, [ACTION_REFRESH]));
         return items;
       },
     });
