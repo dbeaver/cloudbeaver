@@ -158,18 +158,19 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         @NotNull String projectId,
         @Nullable SMObjectType objectType,
         @Nullable String objectId,
-        @Nullable String settingId
+        @Nullable String[] settingIds
     ) throws DBException {
         String userId = getUserIdOrThrow();
         try (Connection dbCon = database.openConnection()) {
             boolean isAllProjectSettings = objectType == null || objectId == null ||
                 (SMObjectType.project.equals(objectType) && projectId.equals(objectId));
             try (
-                PreparedStatement dbStat = dbCon.prepareStatement("SELECT OBJECT_TYPE,OBJECT_ID,SETTING_ID,SETTING_VALUE " +
+                PreparedStatement dbStat = dbCon.prepareStatement(
+                    "SELECT OBJECT_TYPE,OBJECT_ID,SETTING_ID,SETTING_VALUE " +
                     "FROM {table_prefix}CB_OBJECT_SETTINGS " +
                     "WHERE PROJECT_ID=? AND SUBJECT_ID=?" +
                     (isAllProjectSettings ? "" : " AND OBJECT_ID=? AND OBJECT_TYPE=?") +
-                    (settingId == null ? "" : " AND SETTING_ID=?"))
+                    (settingIds == null ? "" : " AND SETTING_ID IN (" + SQLUtils.generateParamList(settingIds.length) + ")"))
             ) {
                 int index = 1;
                 dbStat.setString(index++, projectId);
@@ -178,8 +179,10 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                     dbStat.setString(index++, objectId);
                     dbStat.setString(index++, objectType.name());
                 }
-                if (settingId != null) {
-                    dbStat.setString(index++, settingId);
+                if (settingIds != null) {
+                    for (String settingId : settingIds) {
+                        dbStat.setString(index++, settingId);
+                    }
                 }
                 try (ResultSet dbResult = dbStat.executeQuery()) {
                     Map<SMObjectType, Map<String, Map<String, String>>> settingsByObjectType = new LinkedHashMap<>();

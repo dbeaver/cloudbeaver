@@ -56,13 +56,13 @@ public class WSObjectSettingsEventHandler extends WSDefaultEventHandler<WSObject
     ) {
         String objectId = event.getObjectId();
         if (WSObjectSettingsEvent.UPDATED.equals(event.getId())) {
-            for (String settingId : event.getSettingIds()) {
+            {
                 try {
                     List<SMObjectSettings> settings = webSession.getSecurityController().getObjectSettings(
                         project.getId(),
                         event.getSmObjectType(),
                         objectId,
-                        settingId
+                        event.getSettingIds().toArray(new String[0])
                     );
                     for (SMObjectSettings setting : settings) {
                         project.getProjectSettings().updateObjectSettingsCache(
