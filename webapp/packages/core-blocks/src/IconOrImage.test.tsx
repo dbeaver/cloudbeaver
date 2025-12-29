@@ -14,7 +14,7 @@ import { renderInApp } from '@cloudbeaver/tests-runner';
 vi.mock('./Icon.js', () => ({
   Icon: vi.fn(({ ...props }) => (
     <svg {...props} role="svg">
-      <use href={`/icons/icons.svg#${props.name}`} />
+      <use href={`/icons/preload/icons.svg#${props.name}`} />
     </svg>
   )),
 }));

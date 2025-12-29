@@ -20,13 +20,11 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
+import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
-import org.jkiss.dbeaver.registry.fs.FileSystemProviderRegistry;
+import org.jkiss.dbeaver.registry.fs.FSUtils;
 import org.jkiss.utils.CommonUtils;
 
-import java.net.URI;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
 import java.nio.file.Path;
 
 /**
@@ -65,30 +63,20 @@ public abstract class BaseServerConfigurationController<T extends ServletServerC
         if (CommonUtils.isEmpty(workspaceLocation)) {
             return defaultWorkspaceLocation;
         }
-        URI workspaceUri = URI.create(workspaceLocation);
-        if (workspaceUri.getScheme() == null) {
-            // default filesystem
-            return getHomeDirectory().resolve(workspaceLocation);
-        } else {
-            var externalFsProvider =
-                FileSystemProviderRegistry.getInstance().getFileSystemProviderBySchema(workspaceUri.getScheme());
-            if (externalFsProvider == null) {
-                log.error("File system not found for scheme: " + workspaceUri.getScheme() + " default workspace " +
-                    "location will be used");
+        try {
+            Path externalFsPath = FSUtils.getPathFromURI(workspaceLocation);
+            if (externalFsPath == null) {
+                log.warn("Failed to detect workspace path from URI: " + workspaceLocation +
+                    " default workspace location will be used");
                 return defaultWorkspaceLocation;
             }
-            ClassLoader fsClassloader = externalFsProvider.getInstance().getClass().getClassLoader();
-            try (FileSystem externalFileSystem = FileSystems.newFileSystem(workspaceUri,
-                System.getenv(),
-                fsClassloader)) {
-                log.info("Path from external filesystem used for workspace: " + workspaceUri);
-                return externalFileSystem.provider().getPath(workspaceUri);
-            } catch (Exception e) {
-                log.error("Failed to initialize workspace path: " + workspaceUri + " default workspace " +
-                    "location will be used", e);
-            }
+            log.info("Path from external filesystem used for workspace: " + externalFsPath);
+            return externalFsPath;
+        } catch (DBException e) {
+            log.error("Failed to detect workspace path from URI: " + workspaceLocation +
+                " default workspace location will be used", e);
+            return defaultWorkspaceLocation;
         }
-        return defaultWorkspaceLocation;
     }
 
     @Nullable

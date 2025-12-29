@@ -54,6 +54,7 @@ import org.jkiss.dbeaver.model.security.exception.SMException;
 import org.jkiss.dbeaver.model.security.exception.SMRefreshTokenExpiredException;
 import org.jkiss.dbeaver.model.security.user.*;
 import org.jkiss.dbeaver.model.sql.SQLUtils;
+import org.jkiss.dbeaver.model.websocket.event.WSObjectSettingsEvent;
 import org.jkiss.dbeaver.model.websocket.event.WSUserCloseSessionsEvent;
 import org.jkiss.dbeaver.model.websocket.event.WSUserDeletedEvent;
 import org.jkiss.dbeaver.model.websocket.event.WSUserDisabledEvent;
@@ -106,27 +107,31 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
 
     @Override
     public void setObjectSettings(
-        @NotNull String objectId,
-        @NotNull SMObjectType objectType,
-        @NotNull Map<String, Object> settings
+        @NotNull String projectId,
+        @NotNull SMObjectType objectType, @NotNull String objectId,
+        @NotNull Map<String, String> settings
     ) throws DBException {
         String userId = getUserIdOrThrow();
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
-                deleteObjectSettings(objectId, objectType, settings.keySet());
+                deleteObjectSettings(dbCon, projectId, objectId, objectType, settings.keySet());
                 try (
                     PreparedStatement dbStat = dbCon.prepareStatement(
                         "INSERT INTO {table_prefix}CB_OBJECT_SETTINGS" +
-                            "(OBJECT_ID,OBJECT_TYPE,SUBJECT_ID,SETTING_ID,SETTING_VALUE,UPDATED_BY,UPDATE_TIME) " +
-                            "VALUES(?,?,?,?,?,?,CURRENT_TIMESTAMP)")
+                            "(PROJECT_ID,OBJECT_ID,OBJECT_TYPE,SUBJECT_ID,SETTING_ID,SETTING_VALUE,UPDATED_BY,UPDATE_TIME) " +
+                            "VALUES(?,?,?,?,?,?,?,CURRENT_TIMESTAMP)")
                 ) {
-                    for (Map.Entry<String, Object> entry : settings.entrySet()) {
-                        dbStat.setString(1, objectId);
-                        dbStat.setString(2, objectType.name());
-                        dbStat.setString(3, userId);
-                        dbStat.setString(4, entry.getKey());
-                        dbStat.setString(5, CommonUtils.toString(entry.getValue()));
-                        dbStat.setString(6, userId);
+                    for (Map.Entry<String, String> entry : settings.entrySet()) {
+                        if (entry.getValue() == null) {
+                            continue;
+                        }
+                        dbStat.setString(1, projectId);
+                        dbStat.setString(2, objectId);
+                        dbStat.setString(3, objectType.name());
+                        dbStat.setString(4, userId);
+                        dbStat.setString(5, entry.getKey());
+                        dbStat.setString(6, entry.getValue());
+                        dbStat.setString(7, userId);
                         dbStat.addBatch();
                     }
                     dbStat.executeBatch();
@@ -136,39 +141,60 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         } catch (SQLException e) {
             throw new DBCException("Error while adding object settings", e);
         }
+        application.getEventController().addEvent(
+            WSObjectSettingsEvent.update(
+                getSmSessionId(),
+                userId,
+                objectType,
+                projectId,
+                objectId,
+                settings.keySet()
+            ));
     }
 
     @NotNull
     @Override
-    public Map<String, Object> getObjectSettings(
-        @NotNull String objectId,
-        @NotNull SMObjectType objectType,
-        @Nullable String settingId
+    public List<SMObjectSettings> getObjectSettings(
+        @NotNull String projectId,
+        @Nullable SMObjectType objectType,
+        @Nullable String objectId,
+        @Nullable String[] settingIds
     ) throws DBException {
         String userId = getUserIdOrThrow();
         try (Connection dbCon = database.openConnection()) {
+            boolean isAllProjectSettings = objectType == null || objectId == null ||
+                (SMObjectType.project.equals(objectType) && projectId.equals(objectId));
             try (
-                PreparedStatement dbStat = dbCon.prepareStatement("SELECT SETTING_ID,SETTING_VALUE " +
+                PreparedStatement dbStat = dbCon.prepareStatement(
+                    "SELECT OBJECT_TYPE,OBJECT_ID,SETTING_ID,SETTING_VALUE " +
                     "FROM {table_prefix}CB_OBJECT_SETTINGS " +
-                    "WHERE OBJECT_ID=? AND OBJECT_TYPE=? AND SUBJECT_ID=?" +
-                    (settingId == null ? "" : " AND SETTING_ID=?"))
+                    "WHERE PROJECT_ID=? AND SUBJECT_ID=?" +
+                    (isAllProjectSettings ? "" : " AND OBJECT_ID=? AND OBJECT_TYPE=?") +
+                    (settingIds == null ? "" : " AND SETTING_ID IN (" + SQLUtils.generateParamList(settingIds.length) + ")"))
             ) {
                 int index = 1;
-                dbStat.setString(index++, objectId);
-                dbStat.setString(index++, objectType.name());
+                dbStat.setString(index++, projectId);
                 dbStat.setString(index++, userId);
-                if (settingId != null) {
-                    dbStat.setString(index++, settingId);
+                if (!isAllProjectSettings) {
+                    dbStat.setString(index++, objectId);
+                    dbStat.setString(index++, objectType.name());
+                }
+                if (settingIds != null) {
+                    for (String settingId : settingIds) {
+                        dbStat.setString(index++, settingId);
+                    }
                 }
                 try (ResultSet dbResult = dbStat.executeQuery()) {
-                    Map<String, Object> result = new LinkedHashMap<>();
+                    Map<SMObjectType, Map<String, Map<String, String>>> settingsByObjectType = new LinkedHashMap<>();
                     while (dbResult.next()) {
-                        result.put(
-                            dbResult.getString(1),
-                            dbResult.getString(2)
-                        );
+                        SMObjectType smObjectType = CommonUtils.valueOf(SMObjectType.class, dbResult.getString(1), SMObjectType.datasource);
+                        String smObjectId = dbResult.getString(2);
+                        Map<String, String> objectSettings = settingsByObjectType
+                            .computeIfAbsent(smObjectType, ot -> new LinkedHashMap<>())
+                            .computeIfAbsent(smObjectId, k -> new LinkedHashMap<>());
+                        objectSettings.put(dbResult.getString(3), dbResult.getString(4));
                     }
-                    return result;
+                    return convertMapToSettingList(settingsByObjectType);
                 }
             }
         } catch (SQLException e) {
@@ -176,32 +202,102 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         }
     }
 
-    @Override
-    public void deleteObjectSettings(
+    @NotNull
+    private static List<SMObjectSettings> convertMapToSettingList(
+        @NotNull Map<SMObjectType, Map<String, Map<String, String>>> settingsByObjectType
+    ) {
+        Map<SMObjectType, Map<String, SMObjectSettings>> settings = new LinkedHashMap<>();
+        List<SMObjectSettings> sList = new ArrayList<>();
+        for (var ote : settingsByObjectType.entrySet()) {
+            Map<String, SMObjectSettings> objMap = settings.computeIfAbsent(
+                ote.getKey(),
+                ot1 -> new LinkedHashMap<>()
+            );
+            for (var se : ote.getValue().entrySet()) {
+                objMap.computeIfAbsent(se.getKey(), k -> {
+                    SMObjectSettings os = new SMObjectSettings(ote.getKey(), se.getKey(), se.getValue());
+                    sList.add(os);
+                    return os;
+                });
+            }
+        }
+        return sList;
+    }
+
+    private void deleteObjectSettings(
+        @NotNull Connection dbCon,
+        @NotNull String projectId,
         @NotNull String objectId,
         @NotNull SMObjectType objectType,
         @Nullable Set<String> settingIds
-    ) throws DBException {
+    ) throws DBException, SQLException {
         String userId = getUserIdOrThrow();
-        String sql = "DELETE FROM {table_prefix}CB_OBJECT_SETTINGS WHERE OBJECT_ID=? AND OBJECT_TYPE=? AND SUBJECT_ID=?";
+        String sql = "DELETE FROM {table_prefix}CB_OBJECT_SETTINGS WHERE PROJECT_ID=? AND OBJECT_ID=? AND OBJECT_TYPE=? AND SUBJECT_ID=?";
         if (settingIds != null && !settingIds.isEmpty()) {
             sql += " AND SETTING_ID IN (" + SQLUtils.generateParamList(settingIds.size()) + ")";
         }
-        try (Connection dbCon = database.openConnection()) {
-            try (PreparedStatement dbStat = dbCon.prepareStatement(sql)) {
-                int index = 1;
-                dbStat.setString(index++, objectId);
-                dbStat.setString(index++, objectType.name());
-                dbStat.setString(index++, userId);
-                if (settingIds != null) {
-                    for (String settingId : settingIds) {
-                        dbStat.setString(index++, settingId);
-                    }
+        try (PreparedStatement dbStat = dbCon.prepareStatement(sql)) {
+            int index = 1;
+            dbStat.setString(index++, projectId);
+            dbStat.setString(index++, objectId);
+            dbStat.setString(index++, objectType.name());
+            dbStat.setString(index++, userId);
+            if (settingIds != null) {
+                for (String settingId : settingIds) {
+                    dbStat.setString(index++, settingId);
                 }
-                dbStat.executeUpdate();
+            }
+            dbStat.executeUpdate();
+        }
+        if (settingIds != null) {
+            application.getEventController().addEvent(
+                WSObjectSettingsEvent.delete(
+                    getSmSessionId(),
+                    userId,
+                    objectType,
+                    projectId,
+                    objectId,
+                    settingIds
+                ));
+        }
+    }
+
+    @Override
+    public void deleteObject(
+        @NotNull String projectId,
+        @NotNull String objectId,
+        @NotNull SMObjectType objectType
+    ) throws DBException {
+        try (Connection dbCon = database.openConnection()) {
+            try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
+                deleteAllObjectPermissions(dbCon, objectId, objectType);
+                deleteAllObjectSettings(dbCon, projectId, objectId, objectType);
+                txn.commit();
             }
         } catch (SQLException e) {
             throw new DBCException("Error while deleting object settings", e);
+        }
+    }
+
+    private void deleteAllObjectSettings(
+        @NotNull Connection connection,
+        @Nullable String projectId,
+        @NotNull String objectId,
+        @NotNull SMObjectType objectType
+    ) throws SQLException {
+        boolean projectDeleted = SMObjectType.project.equals(objectType) && objectId.equals(projectId);
+        String sql = "DELETE FROM {table_prefix}CB_OBJECT_SETTINGS WHERE PROJECT_ID=?";
+        if (!projectDeleted) {
+            sql += " AND OBJECT_ID=? AND OBJECT_TYPE=?";
+        }
+        try (PreparedStatement dbStat = connection.prepareStatement(sql)) {
+            int index = 1;
+            dbStat.setString(index++, projectId);
+            if (!projectDeleted) {
+                dbStat.setString(index++, objectId);
+                dbStat.setString(index++, objectType.name());
+            }
+            dbStat.executeUpdate();
         }
     }
 
@@ -1324,7 +1420,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
 
     @NotNull
     @Override
-    public String[] getTeamMembers(String teamId) throws DBException {
+    public String[] getTeamMembers(@NotNull String teamId) throws DBException {
         return getTeamMembersInfo(teamId).stream().map(SMTeamMemberInfo::userId).toArray(String[]::new);
     }
 
@@ -3183,21 +3279,23 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
     @Override
     public void deleteAllObjectPermissions(@NotNull String objectId, @NotNull SMObjectType objectType) throws DBException {
         try (Connection dbCon = database.openConnection()) {
-            JDBCUtils.executeStatement(dbCon,
-                "DELETE FROM {table_prefix}CB_OBJECT_PERMISSIONS WHERE OBJECT_TYPE=? AND OBJECT_ID=?",
-                objectType.name(),
-                objectId
-            );
-            JDBCUtils.executeStatement(
-                dbCon,
-                "DELETE FROM {table_prefix}CB_OBJECT_SETTINGS WHERE OBJECT_TYPE=? AND OBJECT_ID=?",
-                objectType.name(),
-                objectId
-            );
-
+            deleteAllObjectPermissions(dbCon, objectId, objectType);
         } catch (SQLException e) {
             throw new DBCException("Error deleting object permissions", e);
         }
+    }
+
+    private void deleteAllObjectPermissions(
+        @NotNull Connection connection,
+        @NotNull String objectId,
+        @NotNull SMObjectType objectType
+    ) throws SQLException {
+        JDBCUtils.executeStatement(
+            connection,
+            "DELETE FROM {table_prefix}CB_OBJECT_PERMISSIONS WHERE OBJECT_TYPE=? AND OBJECT_ID=?",
+            objectType.name(),
+            objectId
+        );
     }
 
     @Override

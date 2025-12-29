@@ -56,7 +56,7 @@ export const DisableUserDialog: DialogComponent<IPayload> = observer(function Di
     <CommonDialogWrapper size="small" className={s(styles, { commonDialogWrapper: true })} fixedWidth>
       <CommonDialogHeader
         title={translate('authentication_administration_users_delete_user')}
-        icon="/icons/error_icon.svg"
+        icon="/icons/preload/error_icon.svg"
         bigIcon
         onReject={props.rejectDialog}
       />

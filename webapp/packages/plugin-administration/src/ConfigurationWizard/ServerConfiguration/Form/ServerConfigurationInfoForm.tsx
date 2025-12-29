@@ -106,7 +106,7 @@ export const ServerConfigurationInfoForm = observer<Props>(function ServerConfig
           {!state.serverConfig.forceHttps && (
             <IconOrImage
               title={translate('administration_configuration_wizard_configuration_secure_cookies_warning')}
-              icon="/icons/warning_icon.svg"
+              icon="/icons/preload/warning_icon.svg"
               width={24}
             />
           )}

@@ -595,6 +595,8 @@ type NavigatorSettings {
     hideFolders: Boolean!
     hideSchemas: Boolean!
     hideVirtualModel: Boolean!
+
+    userSettings: Boolean! @since(version: "25.3.2")
 }
 
 type RMResourceType {
@@ -637,6 +639,8 @@ input NavigatorSettingsInput {
     hideFolders: Boolean!
     hideSchemas: Boolean!
     hideVirtualModel: Boolean!
+
+    userSettings: Boolean @since(version: "25.3.2")
 }
 
 input NetworkHandlerConfigInput {
@@ -816,10 +820,10 @@ extend type Mutation {
     "Test connection configuration. Returns remote server version"
     testConnection( config: ConnectionConfig!, projectId: ID): ConnectionInfo!
 
-    "Test network handler"
+    "Test network handler connectivity"
     testNetworkHandler( config: NetworkHandlerConfigInput! ): NetworkEndpointInfo!
 
-    "Initiate existing connection"
+    "Initiate database connection. User credentials may be (optionally) override default settings."
     initConnection(
         id: ID!,
         projectId: ID,
@@ -830,11 +834,13 @@ extend type Mutation {
         selectedSecretId:String
     ): ConnectionInfo!
 
-    "Disconnect from database"
+    "Disconnect from the database"
     closeConnection( id: ID!, projectId: ID ): ConnectionInfo!
 
-    "Change navigator settings for connection"
+    "Change navigator settings for connection. It can change default settings or user settings depending on userSettings property."
     setConnectionNavigatorSettings( id: ID!, projectId: ID, settings: NavigatorSettingsInput!): ConnectionInfo!
+    "Sets to default navigator settings for connection. Resets all user navigator settings for this connection."
+    clearConnectionNavigatorSettings(projectId: ID!, id: ID! ): ConnectionInfo! @since(version: "25.3.2")
 
     #### Generic async functions
 
