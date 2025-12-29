@@ -69,7 +69,7 @@ public class WebGQLClient {
      * @param variables GraphQL query variables
      * @return GraphQL response
      */
-    @NotNull
+    @Nullable
     public <T> T sendQuery(@NotNull String query, @Nullable Map<String, Object> variables) throws Exception {
         return sendQueryWithHeaders(query, variables, Map.of());
     }
