@@ -15,7 +15,12 @@ import java.net.http.HttpClient;
 @RunWithProduct("CloudbeaverServerUnitTest.product")
 @RunnerProxy(MockitoJUnitRunner.class)
 @RunWith(OSGITestRunner.class)
-@RunWithApplication(bundleName = "io.cloudbeaver.server.ce", registryName = "io.cloudbeaver.product.ce.application", args = {"-web-config", "workspace/conf/cloudbeaver.conf"})
+@RunWithApplication(
+    bundleName = "io.cloudbeaver.server.ce",
+    registryName = "io.cloudbeaver.product.ce.application",
+    args = {"-web-config", "workspace/conf/cloudbeaver.conf"},
+    vmArgs = {"logback.configurationFile", "workspace/conf/logback.xml"}
+)
 public abstract class CloudbeaverMockTest implements IAsyncApplication {
     private static final String GQL_API_URL = "http://localhost:18978/api/gql";
     private static final String SERVER_STATUS_URL = "http://localhost:18978/status";
