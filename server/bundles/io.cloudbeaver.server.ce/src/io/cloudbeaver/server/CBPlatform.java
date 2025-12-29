@@ -92,7 +92,7 @@ public class CBPlatform extends BaseWebPlatform {
     public synchronized void dispose() {
         long startTime = System.currentTimeMillis();
         isShutdown = true;
-        log.debug("Shutdown Core...");
+        log.debug("Shutdown web platform");
 
         if (driverRegistryListener != null) {
             DataSourceProviderRegistry.getInstance().removeDataSourceRegistryListener(driverRegistryListener);
