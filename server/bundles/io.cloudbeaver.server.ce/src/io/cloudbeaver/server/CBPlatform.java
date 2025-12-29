@@ -53,7 +53,7 @@ public class CBPlatform extends BaseWebPlatform {
     @Override
     protected synchronized void initialize() {
         long startTime = System.currentTimeMillis();
-        log.info("Initialize web platform...: ");
+        log.info("Initialize web platform " + getClass().getSimpleName());
         this.preferenceStore = new WebServerPreferenceStore(WebPlatformActivator.getInstance().getPreferences());
         super.initialize();
         this.scheduleServerJobs();
