@@ -54,7 +54,7 @@ export const ConnectionNavNodeControl: NavTreeControlComponent = observer<NavTre
     let tooltip = `${translate('ui_name')}: ${title}`;
 
     if (error) {
-      icon = '/icons/error_icon_sm.svg';
+      icon = '/icons/preload/error_icon_sm.svg';
     }
 
     function handlePortalClick(event: React.MouseEvent<HTMLDivElement>) {

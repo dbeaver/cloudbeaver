@@ -17,10 +17,13 @@
 package io.cloudbeaver.server.websockets;
 
 import io.cloudbeaver.model.session.BaseWebSession;
+import io.cloudbeaver.model.session.WebHeadlessSession;
 import io.cloudbeaver.websocket.CBWebSessionEventHandler;
+import io.cloudbeaver.websocket.event.client.WSSessionPingClientEvent;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.websocket.WSUtils;
 import org.jkiss.dbeaver.model.websocket.event.WSEvent;
 
 import java.util.ArrayList;
@@ -32,6 +35,8 @@ import java.util.concurrent.TimeUnit;
 public class CBEventsLongPolling implements CBWebSessionEventHandler {
 
     private static final Log log = Log.getLog(CBEventsLongPolling.class);
+
+    private static final String PING = WSUtils.clientGson.toJson(new WSSessionPingClientEvent("cb_session"));
 
     private static final int QUEUE_CAPACITY = 1000;
 
@@ -56,7 +61,16 @@ public class CBEventsLongPolling implements CBWebSessionEventHandler {
         return lastPoll;
     }
 
-    public void touch() {
+    public void onPoll() {
+        lastPoll = System.currentTimeMillis();
+
+        if (webSession instanceof WebHeadlessSession) {
+            webSession.touchSession();
+            processor.process(PING);
+        }
+    }
+
+    public void onUserActivity() {
         lastPoll = System.currentTimeMillis();
         webSession.touchSession();
     }

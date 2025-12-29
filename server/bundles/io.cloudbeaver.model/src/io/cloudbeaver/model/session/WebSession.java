@@ -60,6 +60,8 @@ import org.jkiss.dbeaver.model.websocket.event.MessageType;
 import org.jkiss.dbeaver.model.websocket.event.WSSessionLogUpdatedEvent;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.CommonUtils;
+import org.jkiss.utils.function.ThrowableConsumer;
+import org.jkiss.utils.function.ThrowableFunction;
 
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
@@ -67,7 +69,6 @@ import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 /**
  * Web session.
@@ -84,6 +85,7 @@ public class WebSession extends BaseWebSession
     private static final AtomicInteger TASK_ID = new AtomicInteger();
 
     public static String RUNTIME_PARAM_AUTH_INFOS = "auth-infos";
+    public static String RUNTIME_PARAM_CLIENT_ORIGIN = "client-origin";
     private final AtomicInteger taskCount = new AtomicInteger();
 
     private final String lastRemoteAddr;
@@ -91,12 +93,13 @@ public class WebSession extends BaseWebSession
 
     private String locale;
     private boolean cacheExpired;
+    private String clientOrigin;
 
     protected WebSessionGlobalProjectImpl globalProject;
     private final List<WebServerMessage> sessionMessages = new ArrayList<>();
 
     private final Map<String, WebAsyncTaskInfo> asyncTasks = new HashMap<>();
-    private final Map<String, Function<Object, Object>> attributeDisposers = new HashMap<>();
+    private final Map<String, ThrowableConsumer<Object, Exception>> attributeDisposers = new HashMap<>();
 
     // Map of auth tokens. Key is authentication provider
     private final List<WebAuthInfo> authTokens = new ArrayList<>();
@@ -277,6 +280,10 @@ public class WebSession extends BaseWebSession
         return connectListener;
     }
 
+    public void updateClientOrigin(@NotNull String originFromRequest) {
+        this.clientOrigin = originFromRequest;
+    }
+
     private void initNavigatorModel() {
 
         // Cleanup current data
@@ -338,10 +345,6 @@ public class WebSession extends BaseWebSession
         if (!project.isShared() || application.isConfigurationMode()) {
             getWorkspace().setActiveProject(sessionProject);
         }
-        log.info(String.format(
-            "Project created: [ID=%s, Name=%s, Type=%s, Creator=%s]",
-            project.getId(), project.getName(), project.getType(), project.getCreator()
-        ));
         return sessionProject;
     }
 
@@ -363,9 +366,14 @@ public class WebSession extends BaseWebSession
     private void resetSessionCache() throws DBCException {
         // Clear attributes
         synchronized (attributes) {
-            for (Map.Entry<String, Function<Object, Object>> attrDisposer : attributeDisposers.entrySet()) {
+            for (Map.Entry<String, ThrowableConsumer<Object, Exception>> attrDisposer : attributeDisposers.entrySet()) {
                 Object attrValue = attributes.get(attrDisposer.getKey());
-                attrDisposer.getValue().apply(attrValue);
+
+                try {
+                    attrDisposer.getValue().accept(attrValue);
+                } catch (Exception e) {
+                    log.error("Error disposing attribute '" + attrDisposer.getKey() + "'", e);
+                }
             }
             attributeDisposers.clear();
             // Remove all non-persistent attributes
@@ -696,7 +704,11 @@ public class WebSession extends BaseWebSession
         }
     }
 
-    public <T> T getAttribute(String name, Function<T, T> creator, Function<T, T> disposer) {
+    public <T, E extends Exception> T getAttribute(
+        String name,
+        ThrowableFunction<String, T, E> creator,
+        ThrowableConsumer<T, E> disposer
+    ) throws E {
         synchronized (attributes) {
             Object value = attributes.get(name);
             if (value instanceof PersistentAttribute persistentAttribute) {
@@ -707,7 +719,7 @@ public class WebSession extends BaseWebSession
                 if (value != null) {
                     attributes.put(name, value);
                     if (disposer != null) {
-                        attributeDisposers.put(name, (Function<Object, Object>) disposer);
+                        attributeDisposers.put(name, (ThrowableConsumer<Object, Exception>) disposer);
                     }
                 }
             }
@@ -839,6 +851,7 @@ public class WebSession extends BaseWebSession
                 contextCredentialsProvider.provideAuthParameters(monitor, dataSourceContainer, configuration);
             }
             configuration.setRuntimeAttribute(RUNTIME_PARAM_AUTH_INFOS, getAllAuthInfo());
+            configuration.setRuntimeAttribute(RUNTIME_PARAM_CLIENT_ORIGIN, this.clientOrigin);
 
             WebSessionProjectImpl project = getProjectById(dataSourceContainer.getProject().getId());
             if (project != null) {
