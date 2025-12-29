@@ -60,6 +60,9 @@
         <eventHandler class="io.cloudbeaver.server.events.WSEventHandlerWorkspaceConfigUpdate">
             <topic id="cb_workspace_configuration"/>
         </eventHandler>
+        <eventHandler class="io.cloudbeaver.server.events.WSObjectSettingsEventHandler">
+            <topic id="cb_object_settings"/>
+        </eventHandler>
     </extension>
 
     <extension point="org.jkiss.dbeaver.settings">

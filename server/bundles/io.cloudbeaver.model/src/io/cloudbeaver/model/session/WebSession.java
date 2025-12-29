@@ -85,6 +85,7 @@ public class WebSession extends BaseWebSession
     private static final AtomicInteger TASK_ID = new AtomicInteger();
 
     public static String RUNTIME_PARAM_AUTH_INFOS = "auth-infos";
+    public static String RUNTIME_PARAM_CLIENT_ORIGIN = "client-origin";
     private final AtomicInteger taskCount = new AtomicInteger();
 
     private final String lastRemoteAddr;
@@ -92,6 +93,7 @@ public class WebSession extends BaseWebSession
 
     private String locale;
     private boolean cacheExpired;
+    private String clientOrigin;
 
     protected WebSessionGlobalProjectImpl globalProject;
     private final List<WebServerMessage> sessionMessages = new ArrayList<>();
@@ -278,6 +280,10 @@ public class WebSession extends BaseWebSession
         return connectListener;
     }
 
+    public void updateClientOrigin(@NotNull String originFromRequest) {
+        this.clientOrigin = originFromRequest;
+    }
+
     private void initNavigatorModel() {
 
         // Cleanup current data
@@ -339,10 +345,6 @@ public class WebSession extends BaseWebSession
         if (!project.isShared() || application.isConfigurationMode()) {
             getWorkspace().setActiveProject(sessionProject);
         }
-        log.info(String.format(
-            "Project created: [ID=%s, Name=%s, Type=%s, Creator=%s]",
-            project.getId(), project.getName(), project.getType(), project.getCreator()
-        ));
         return sessionProject;
     }
 
@@ -849,6 +851,7 @@ public class WebSession extends BaseWebSession
                 contextCredentialsProvider.provideAuthParameters(monitor, dataSourceContainer, configuration);
             }
             configuration.setRuntimeAttribute(RUNTIME_PARAM_AUTH_INFOS, getAllAuthInfo());
+            configuration.setRuntimeAttribute(RUNTIME_PARAM_CLIENT_ORIGIN, this.clientOrigin);
 
             WebSessionProjectImpl project = getProjectById(dataSourceContainer.getProject().getId());
             if (project != null) {
