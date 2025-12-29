@@ -39,12 +39,12 @@ export function useTreeState(externalState?: TreeState): ITreeState {
       getState(id: string): Readonly<INodeState> {
         return state.get(id);
       },
-      updateState(id: string, state: Partial<INodeState>): void {
-        Object.assign(this.getState(id), state);
+      updateState(id: string, stateUpdate: Partial<INodeState>): void {
+        Object.assign(this.getState(id), stateUpdate);
       },
-      updateAllState(state: Partial<INodeState>): void {
-        for (const nodeState of this.state.values()) {
-          Object.assign(nodeState, state);
+      updateAllState(stateUpdate: Partial<INodeState>): void {
+        for (const nodeState of state.values()) {
+          Object.assign(nodeState, stateUpdate);
         }
       },
     }),
