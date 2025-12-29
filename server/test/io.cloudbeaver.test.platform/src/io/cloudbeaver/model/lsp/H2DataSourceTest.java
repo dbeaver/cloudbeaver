@@ -19,6 +19,7 @@ package io.cloudbeaver.model.lsp;
 import io.cloudbeaver.CloudbeaverMockTest;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.ModelPreferences;
+import org.jkiss.dbeaver.model.DBConstants;
 import org.jkiss.dbeaver.model.DBUtils;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.exec.jdbc.JDBCSession;
@@ -29,7 +30,6 @@ import org.jkiss.dbeaver.model.runtime.LoggingProgressMonitor;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.utils.PrefUtils;
-import org.jkiss.dbeaver.utils.ProjectResourceUtils;
 import org.junit.Assert;
 import org.junit.Before;
 
@@ -59,7 +59,7 @@ public abstract class H2DataSourceTest extends CloudbeaverMockTest {
         project.getDataSourceRegistry().addDataSource(dataSourceDescriptor);
         project.setResourceProperty(
             DocumentServiceTestUtils.BASIC_RESOURCE_PATH,
-            ProjectResourceUtils.PROP_CONTEXT_DEFAULT_DATASOURCE,
+            DBConstants.PROP_RESOURCE_DEFAULT_DATASOURCE,
             dataSourceDescriptor.getId()
         );
 
