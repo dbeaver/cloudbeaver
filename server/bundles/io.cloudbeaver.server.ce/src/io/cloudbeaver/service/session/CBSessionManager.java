@@ -26,6 +26,7 @@ import io.cloudbeaver.server.CBConstants;
 import io.cloudbeaver.server.WebAppSessionManager;
 import io.cloudbeaver.server.events.WSWebUtils;
 import io.cloudbeaver.service.DBWSessionHandler;
+import io.cloudbeaver.utils.ServletAppUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -164,6 +165,8 @@ public class CBSessionManager implements WebAppSessionManager {
         }
 
         validateSessionIp(request, webSession);
+
+        webSession.updateClientOrigin(ServletAppUtils.getOriginFromRequest(request));
 
         return webSession;
     }

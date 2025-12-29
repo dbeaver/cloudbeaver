@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ package io.cloudbeaver.service.navigator;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.model.WebPropertyInfo;
-import io.cloudbeaver.model.fs.FSUtils;
+import io.cloudbeaver.model.fs.WebFSUtils;
 import io.cloudbeaver.model.rm.DBNResourceManagerResource;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.registry.WebObjectFeatureProviderDescriptor;
@@ -208,7 +208,7 @@ public class WebNavigatorNodeInfo {
         if (node instanceof DBNPathBase dbnPath) {
             return DBFUtils.getUriFromPath(dbnPath.getPath()).toString();
         } else if (node instanceof DBNFileSystem dbnFs) {
-            return FSUtils.makeUniqueFsId(dbnFs.getFileSystem());
+            return WebFSUtils.makeUniqueFsId(dbnFs.getFileSystem());
         }
         return null;
     }

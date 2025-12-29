@@ -24,8 +24,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
-import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.model.rm.RMConstants;
+import org.jkiss.dbeaver.registry.DataSourceNavigatorSettings;
 import org.jkiss.dbeaver.registry.settings.ProductSettingDescriptor;
 
 import java.util.List;
@@ -200,7 +200,18 @@ public interface DBWServiceCore extends DBWService {
 
     @WebAction
     WebConnectionInfo setConnectionNavigatorSettings(
-        WebSession webSession, @Nullable String projectId, String id, DBNBrowseSettings settings) throws DBWebException;
+        @NotNull WebSession webSession,
+        @Nullable String projectId,
+        @NotNull String id,
+        @NotNull DataSourceNavigatorSettings settings
+    ) throws DBWebException;
+
+    @WebAction
+    WebConnectionInfo clearConnectionNavigatorSettings(
+        @NotNull WebSession webSession,
+        @NotNull String projectId,
+        @NotNull String id
+    ) throws DBWebException;
 
     ///////////////////////////////////////////
     // Async tasks
