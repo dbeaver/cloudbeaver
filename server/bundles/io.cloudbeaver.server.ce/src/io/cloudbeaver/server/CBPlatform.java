@@ -24,10 +24,12 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.app.DBPRegistryListener;
 import org.jkiss.dbeaver.model.impl.app.BaseApplicationImpl;
 import org.jkiss.dbeaver.model.preferences.DBPPreferenceStore;
 import org.jkiss.dbeaver.model.runtime.AbstractJob;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
+import org.jkiss.dbeaver.registry.DataSourceProviderRegistry;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.IOUtils;
 
@@ -44,6 +46,8 @@ public class CBPlatform extends BaseWebPlatform {
     private static final Log log = Log.getLog(CBPlatform.class);
 
     private WebServerPreferenceStore preferenceStore;
+    private DBPRegistryListener driverRegistryListener;
+    private boolean isShutdown;
 
     public static CBPlatform getInstance() {
         return (CBPlatform) DBWorkbench.getPlatform();
@@ -59,6 +63,15 @@ public class CBPlatform extends BaseWebPlatform {
         this.preferenceStore = new WebServerPreferenceStore(WebPlatformActivator.getInstance().getPreferences());
         super.initialize();
         scheduleServerJobs();
+
+        driverRegistryListener = new DBPRegistryListener() {
+            @Override
+            public void handleRegistryReload() {
+                WebAppUtils.getWebApplication().getDriverRegistry().refreshApplicableDrivers();
+            }
+        };
+        DataSourceProviderRegistry.getInstance().addDataSourceRegistryListener(driverRegistryListener);
+
         log.info("Web platform initialized (" + (System.currentTimeMillis() - startTime) + "ms)");
     }
 
@@ -90,7 +103,13 @@ public class CBPlatform extends BaseWebPlatform {
 
     public synchronized void dispose() {
         long startTime = System.currentTimeMillis();
+        isShutdown = true;
         log.debug("Shutdown Core...");
+
+        if (driverRegistryListener != null) {
+            DataSourceProviderRegistry.getInstance().removeDataSourceRegistryListener(driverRegistryListener);
+            driverRegistryListener = null;
+        }
 
         super.dispose();
 
@@ -113,7 +132,7 @@ public class CBPlatform extends BaseWebPlatform {
 
     @Override
     public boolean isShuttingDown() {
-        return false;
+        return isShutdown;
     }
 
 }

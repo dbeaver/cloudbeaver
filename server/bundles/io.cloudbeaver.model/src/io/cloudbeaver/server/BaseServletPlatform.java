@@ -72,6 +72,7 @@ public abstract class BaseServletPlatform extends BasePlatformImpl {
     }
 
     public synchronized void dispose() {
+        super.dispose();
         // Remove temp folder
         if (tempFolder != null) {
 
