@@ -38,7 +38,7 @@ import org.jkiss.dbeaver.model.impl.app.BaseProjectImpl;
 import org.jkiss.dbeaver.model.impl.auth.SessionContextImpl;
 import org.jkiss.dbeaver.model.navigator.DBNLocalFolder;
 import org.jkiss.dbeaver.model.rm.*;
-import org.jkiss.dbeaver.model.security.SMController;
+import org.jkiss.dbeaver.model.security.SMAdminController;
 import org.jkiss.dbeaver.model.security.SMObjectType;
 import org.jkiss.dbeaver.model.sql.DBQuotaException;
 import org.jkiss.dbeaver.model.websocket.event.MessageType;
@@ -78,18 +78,18 @@ public class LocalResourceController extends BaseLocalResourceController {
     private final Path userProjectsPath;
     private final Path sharedProjectsPath;
     private final String globalProjectName;
-    private Supplier<SMController> smControllerSupplier;
+    private Supplier<SMAdminController> smControllerSupplier;
     protected final List<RMFileOperationHandler> fileHandlers;
 
     private final Map<String, RMLocalProject> projectRegistries = new LinkedHashMap<>();
 
     public LocalResourceController(
-        DBPWorkspace workspace,
-        SMCredentialsProvider credentialsProvider,
-        Path rootPath,
-        Path userProjectsPath,
-        Path sharedProjectsPath,
-        Supplier<SMController> smControllerSupplier
+        @NotNull DBPWorkspace workspace,
+        @NotNull SMCredentialsProvider credentialsProvider,
+        @NotNull Path rootPath,
+        @NotNull Path userProjectsPath,
+        @NotNull Path sharedProjectsPath,
+        @NotNull Supplier<SMAdminController> smControllerSupplier
     ) throws DBException {
         super(workspace, new FileLockController(ServletAppUtils.getServletApplication().getApplicationInstanceId()));
         this.credentialsProvider = credentialsProvider;
@@ -102,21 +102,24 @@ public class LocalResourceController extends BaseLocalResourceController {
         this.fileHandlers = RMFileOperationHandlersRegistry.getInstance().getFileHandlers();
     }
 
-    protected SMController getSecurityController() {
+    @NotNull
+    protected SMAdminController getSecurityController() {
         return smControllerSupplier.get();
     }
 
+    @Nullable
     private Path getGlobalProjectPath() {
         return globalProjectName == null ? null : this.rootPath.resolve(this.globalProjectName);
     }
 
+    @Nullable
     private Path getPrivateProjectPath() {
         SMCredentials activeUserCredentials = credentialsProvider.getActiveUserCredentials();
         String userId = activeUserCredentials == null ? null : activeUserCredentials.getUserId();
         return userId == null ? null : this.userProjectsPath.resolve(userId);
     }
 
-    protected RMLocalProject getWebProject(String projectId, boolean refresh) throws DBException {
+    protected RMLocalProject getWebProject(@NotNull String projectId, boolean refresh) throws DBException {
         synchronized (projectRegistries) {
             RMLocalProject project = projectRegistries.get(projectId);
             if (project == null || refresh) {
@@ -299,10 +302,11 @@ public class LocalResourceController extends BaseLocalResourceController {
         }
     }
 
+    @NotNull
     @Override
     public RMProject updateProject(@NotNull String projectId, @NotNull RMProjectInfo projectInfo) throws DBException {
         validateProjectName(projectId, projectInfo.getName());
-        try (var projectLock = lockController.lock(projectId, "updateProject")) {
+        try (var ignoredLock = lockController.lock(projectId, "updateProject")) {
             RMLocalProject project = getWebProject(projectId, false);
             Path targetPath = getProjectPath(projectId);
             if (!Files.exists(targetPath)) {
@@ -328,26 +332,27 @@ public class LocalResourceController extends BaseLocalResourceController {
 
     @Override
     public void deleteProject(@NotNull String projectId) throws DBException {
-        try (var projectLock = lockController.lock(projectId, "deleteProject")) {
-            RMProject project = makeProjectFromId(projectId, false);
+        try (var ignoredLock = lockController.lock(projectId, "deleteProject")) {
             Path targetPath = getProjectPath(projectId);
             if (!Files.exists(targetPath)) {
-                log.debug(MessageFormat.format("Project folder ''{0}'' is not found", projectId));
+                log.error(MessageFormat.format("Project folder ''{0}'' is not found", projectId));
                 return;
             }
             try {
-                log.debug("Deleting project '" + projectId + "'");
+                log.debug("Deleting project '" + projectId + "' in persistence storage");
+                getSecurityController().deleteObject(projectId, projectId, SMObjectType.project);
+                log.debug("Deleting project '" + projectId + "' folder");
                 IOUtils.deleteDirectory(targetPath);
-                getSecurityController().deleteAllObjectPermissions(projectId, SMObjectType.project);
                 synchronized (projectRegistries) {
                     projectRegistries.remove(projectId);
                 }
             } catch (IOException e) {
-                throw new DBException("Error deleting project '" + project.getName() + "'", e);
+                throw new DBException("Error deleting project '" + projectId + "'", e);
             }
         }
     }
 
+    @Nullable
     @Override
     public RMProject getProject(@NotNull String projectId, boolean readResources, boolean readProperties) throws DBException {
         RMProject project = makeProjectFromId(projectId, true);
@@ -407,6 +412,15 @@ public class LocalResourceController extends BaseLocalResourceController {
     @Override
     public void deleteProjectDataSources(@NotNull String projectId, @NotNull String[] dataSourceIds) throws DBException {
         super.deleteProjectDataSources(projectId, dataSourceIds);
+
+        log.debug("Delete datasources '" + Arrays.toString(dataSourceIds) + "' from security controller");
+        for (String dsId : dataSourceIds) {
+            try {
+                getSecurityController().deleteObject(projectId, dsId, SMObjectType.datasource);
+            } catch (DBException e) {
+                log.error("Error deleting datasource '" + dsId + "' from database");
+            }
+        }
         if (credentialsProvider.getActiveUserCredentials() != null && dataSourceIds.length > 0) {
             ServletAppUtils.getServletApplication().getEventController().addEvent(
                 WSDataSourceEvent.delete(
@@ -954,7 +968,7 @@ public class LocalResourceController extends BaseLocalResourceController {
     }
 
     @Nullable
-    protected RMProject makeProjectFromId(String projectId, boolean loadPermissions) throws DBException {
+    protected RMProject makeProjectFromId(@NotNull String projectId, boolean loadPermissions) throws DBException {
         var projectName = WebRMUtils.parseProjectName(projectId);
         var projectPath = getProjectPath(projectId);
         if (!Files.exists(projectPath)) {
@@ -1015,7 +1029,7 @@ public class LocalResourceController extends BaseLocalResourceController {
         }
     }
 
-    protected <T> T doProjectOperation(String projectId, RMFileOperation<T> operation) throws DBException {
+    protected <T> T doProjectOperation(@NotNull String projectId, @NotNull RMFileOperation<T> operation) throws DBException {
         for (RMFileOperationHandler fileHandler : fileHandlers) {
             try {
                 fileHandler.projectOpened(projectId);
@@ -1033,7 +1047,7 @@ public class LocalResourceController extends BaseLocalResourceController {
         return operation.doOperation();
     }
 
-    protected <T> T doFileReadOperation(String projectId, Path file, RMFileOperation<T> operation) throws DBException {
+    protected <T> T doFileReadOperation(@NotNull String projectId, @NotNull Path file, @NotNull RMFileOperation<T> operation) throws DBException {
         for (RMFileOperationHandler fileHandler : fileHandlers) {
             try {
                 fileHandler.beforeFileRead(projectId, file);
@@ -1052,7 +1066,11 @@ public class LocalResourceController extends BaseLocalResourceController {
         return operation.doOperation();
     }
 
-    protected <T> T doFileWriteOperation(String projectId, Path file, RMFileOperation<T> operation) throws DBException {
+    protected <T> T doFileWriteOperation(
+        @NotNull String projectId,
+        @NotNull Path file,
+        @NotNull RMFileOperation<T> operation
+    ) throws DBException {
         for (RMFileOperationHandler fileHandler : fileHandlers) {
             fileHandler.beforeFileChange(projectId, file);
         }
@@ -1071,7 +1089,7 @@ public class LocalResourceController extends BaseLocalResourceController {
         return result;
     }
 
-    protected Path getProjectPath(String projectId) throws DBException {
+    protected Path getProjectPath(@NotNull String projectId) throws DBException {
         RMProjectName project = WebRMUtils.parseProjectName(projectId);
         RMProjectType type = project.getType();
         String projectName = project.getName();
@@ -1183,7 +1201,7 @@ public class LocalResourceController extends BaseLocalResourceController {
     public static Builder builder(
         SMCredentialsProvider credentialsProvider,
         DBPWorkspace workspace,
-        Supplier<SMController> smControllerSupplier
+        Supplier<SMAdminController> smControllerSupplier
     ) {
         return new Builder(workspace, credentialsProvider, smControllerSupplier);
     }
@@ -1195,7 +1213,7 @@ public class LocalResourceController extends BaseLocalResourceController {
 
     public static class Builder {
         protected final SMCredentialsProvider credentialsProvider;
-        protected final Supplier<SMController> smController;
+        protected final Supplier<SMAdminController> smController;
         protected final DBPWorkspace workspace;
 
         protected Path rootPath;
@@ -1204,7 +1222,7 @@ public class LocalResourceController extends BaseLocalResourceController {
 
         protected Builder(
             DBPWorkspace workspace, SMCredentialsProvider credentialsProvider,
-            Supplier<SMController> smControllerSupplier
+            Supplier<SMAdminController> smControllerSupplier
         ) {
             this.workspace = workspace;
             this.credentialsProvider = credentialsProvider;
