@@ -74,6 +74,9 @@ enum CBServerEventId {
     cb_session_task_confirmation_request @since(version: "25.2.2")
     cb_session_task_query_confirmation_request @since(version: "25.2.2")
     cb_session_task_query_params_confirmation_request @since(version: "25.2.5")
+
+    "Open URL request in client"
+    cb_open_url @since(version: "25.3.1")
 }
 
 "Events sent by client"
@@ -108,6 +111,7 @@ enum CBEventTopic {
     cb_workspace_configuration @since(version: "25.1.1")
     cb_ai @since(version: "25.1.1")
     cb_notification @since(version: "25.2.1")
+    cb_session_action @since(version: "25.3.1")
 }
 
 "Base server event interface"
@@ -299,6 +303,13 @@ type WSServerNotificationEvent implements CBServerEvent @since(version: "25.2.1"
     title: String
     message: String
     notificationType: WSServerNotificationEventType!
+}
+
+"Event for opening URL in client application"
+type WSOpenUrlEvent implements CBServerEvent @since(version: "25.3.1") {
+    id: CBServerEventId!
+    topicId: CBEventTopic!
+    url: String!
 }
 
 type WSSessionTaskConfirmationRequestEvent implements CBServerEvent @since(version: "25.2.2") {
