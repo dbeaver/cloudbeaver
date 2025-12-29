@@ -648,6 +648,31 @@ public class WebServiceSQL implements DBWServiceSQL {
     }
 
     @Override
+    public WebAsyncTaskInfo getGroupingSqlResultSet(
+        @NotNull WebSQLContextInfo contextInfo,
+        @NotNull String resultsId,
+        @NotNull List<String> columnsList,
+        @Nullable List<String> functions,
+        @Nullable Boolean showDuplicatesOnly,
+        @Nullable WebSQLDataFilter filter,
+        @Nullable WebDataFormat dataFormat,
+        boolean isInteractive
+    ) throws DBException {
+        String generateGroupByQuery = generateGroupByQuery(contextInfo, resultsId, columnsList, functions, showDuplicatesOnly);
+        return asyncExecuteQuery(
+            contextInfo.getProcessor().getWebSession(),
+            contextInfo.getProjectId(),
+            contextInfo,
+            generateGroupByQuery,
+            resultsId,
+            filter,
+            dataFormat,
+            false,
+            isInteractive
+        );
+    }
+
+    @Override
     public WebAsyncTaskInfo getRowDataCount(@NotNull WebSession webSession, @NotNull WebSQLContextInfo contextInfo, @NotNull String resultsId) {
         WebAsyncTaskProcessor<String> runnable = new WebAsyncTaskProcessor<>() {
             @Override

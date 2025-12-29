@@ -47,6 +47,6 @@
     "msw": "^2",
     "rimraf": "^6",
     "typescript": "^5",
-    "vitest": "^3"
+    "vitest": "^4"
   }
 }

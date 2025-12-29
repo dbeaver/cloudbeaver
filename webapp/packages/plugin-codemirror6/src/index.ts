@@ -24,6 +24,7 @@ export * from './Hyperlink/useHyperlink.js';
 export * from '@codemirror/view';
 export * from '@codemirror/state';
 export * from '@codemirror/autocomplete';
+export * from './highlightNewLine.js';
 
 export { html as HTML_EDITOR } from '@codemirror/lang-html';
 export { javascript as JAVASCRIPT_EDITOR } from '@codemirror/lang-javascript';

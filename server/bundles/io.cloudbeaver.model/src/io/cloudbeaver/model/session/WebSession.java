@@ -60,6 +60,8 @@ import org.jkiss.dbeaver.model.websocket.event.MessageType;
 import org.jkiss.dbeaver.model.websocket.event.WSSessionLogUpdatedEvent;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.CommonUtils;
+import org.jkiss.utils.function.ThrowableConsumer;
+import org.jkiss.utils.function.ThrowableFunction;
 
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
@@ -67,7 +69,6 @@ import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 /**
  * Web session.
@@ -96,7 +97,7 @@ public class WebSession extends BaseWebSession
     private final List<WebServerMessage> sessionMessages = new ArrayList<>();
 
     private final Map<String, WebAsyncTaskInfo> asyncTasks = new HashMap<>();
-    private final Map<String, Function<Object, Object>> attributeDisposers = new HashMap<>();
+    private final Map<String, ThrowableConsumer<Object, Exception>> attributeDisposers = new HashMap<>();
 
     // Map of auth tokens. Key is authentication provider
     private final List<WebAuthInfo> authTokens = new ArrayList<>();
@@ -254,16 +255,22 @@ public class WebSession extends BaseWebSession
     }
 
     // Note: for admin use only
-    public synchronized void resetUserState() throws DBException {
+    public synchronized void resetUserState(boolean needResetUserCache) throws DBException {
         clearAuthTokens();
-        try {
-            resetSessionCache();
-        } catch (DBCException e) {
-            addSessionError(e);
-            log.error(e);
+        if (needResetUserCache) {
+            try {
+                resetSessionCache();
+            } catch (DBCException e) {
+                addSessionError(e);
+                log.error(e);
+            }
         }
         refreshUserData();
         clearSessionContext();
+    }
+
+    public synchronized void resetUserState() throws DBException {
+        resetUserState(true);
     }
 
     @NotNull
@@ -332,10 +339,6 @@ public class WebSession extends BaseWebSession
         if (!project.isShared() || application.isConfigurationMode()) {
             getWorkspace().setActiveProject(sessionProject);
         }
-        log.info(String.format(
-            "Project created: [ID=%s, Name=%s, Type=%s, Creator=%s]",
-            project.getId(), project.getName(), project.getType(), project.getCreator()
-        ));
         return sessionProject;
     }
 
@@ -357,9 +360,14 @@ public class WebSession extends BaseWebSession
     private void resetSessionCache() throws DBCException {
         // Clear attributes
         synchronized (attributes) {
-            for (Map.Entry<String, Function<Object, Object>> attrDisposer : attributeDisposers.entrySet()) {
+            for (Map.Entry<String, ThrowableConsumer<Object, Exception>> attrDisposer : attributeDisposers.entrySet()) {
                 Object attrValue = attributes.get(attrDisposer.getKey());
-                attrDisposer.getValue().apply(attrValue);
+
+                try {
+                    attrDisposer.getValue().accept(attrValue);
+                } catch (Exception e) {
+                    log.error("Error disposing attribute '" + attrDisposer.getKey() + "'", e);
+                }
             }
             attributeDisposers.clear();
             // Remove all non-persistent attributes
@@ -558,6 +566,10 @@ public class WebSession extends BaseWebSession
         if (job instanceof CustomCancelableJob cancelableJob) {
             cancelableJob.cancelJob(this, taskInfo);
         }
+        CompletableFuture<?> future = getAttribute(getTaskConfirmationAttributeName(taskId));
+        if (future != null) {
+            future.cancel(false);
+        }
         if (job != null) {
             job.cancel();
         }
@@ -686,7 +698,11 @@ public class WebSession extends BaseWebSession
         }
     }
 
-    public <T> T getAttribute(String name, Function<T, T> creator, Function<T, T> disposer) {
+    public <T, E extends Exception> T getAttribute(
+        String name,
+        ThrowableFunction<String, T, E> creator,
+        ThrowableConsumer<T, E> disposer
+    ) throws E {
         synchronized (attributes) {
             Object value = attributes.get(name);
             if (value instanceof PersistentAttribute persistentAttribute) {
@@ -697,7 +713,7 @@ public class WebSession extends BaseWebSession
                 if (value != null) {
                     attributes.put(name, value);
                     if (disposer != null) {
-                        attributeDisposers.put(name, (Function<Object, Object>) disposer);
+                        attributeDisposers.put(name, (ThrowableConsumer<Object, Exception>) disposer);
                     }
                 }
             }
@@ -1014,7 +1030,7 @@ public class WebSession extends BaseWebSession
         boolean confirmed,
         boolean skipConfirmations
     ) {
-        String attributeName = WebSQLConstants.TASK_CONFIRMATION_ATTR_PREFIX + taskId;
+        String attributeName = getTaskConfirmationAttributeName(taskId);
         if (confirmed && skipConfirmations) {
             setAttribute(WebSQLConstants.SKIP_TASK_CONFIRMATIONS_ATTR, Boolean.TRUE);
         }
@@ -1026,6 +1042,23 @@ public class WebSession extends BaseWebSession
         } else {
             log.error("Received unexpected confirmation event for taskId: " + taskId);
         }
+    }
+
+
+    public void handleTaskConfirmationWithParameters(@NotNull String taskId, @NotNull Map<String, Object> parameters) {
+        String attributeName = getTaskConfirmationAttributeName(taskId);
+        CompletableFuture<Map<String, Object>> confirmationFuture = getAttribute(attributeName);
+        if (confirmationFuture != null) {
+            confirmationFuture.complete(parameters);
+            removeAttribute(attributeName);
+        } else {
+            log.error("Received unexpected confirmation event for taskId: " + taskId);
+        }
+    }
+
+    @NotNull
+    private String getTaskConfirmationAttributeName(@NotNull String taskId) {
+        return WebSQLConstants.TASK_CONFIRMATION_ATTR_PREFIX + taskId;
     }
 
     private class SessionProgressMonitor extends BaseProgressMonitor {

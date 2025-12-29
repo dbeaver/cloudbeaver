@@ -9,6 +9,7 @@
         <version>1.0.0</version>
         <relativePath>../</relativePath>
     </parent>
+    <packaging>pom</packaging>
 
     <properties>
         <deps.output.dir>clickhouse_com</deps.output.dir>
@@ -18,19 +19,22 @@
         <dependency>
             <groupId>com.clickhouse</groupId>
             <artifactId>clickhouse-jdbc</artifactId>
-            <version>0.8.5</version>
-            <classifier>http</classifier>
+            <version>0.9.5</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.apache.commons</groupId>
                     <artifactId>commons-lang3</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.lz4</groupId>
+                    <artifactId>lz4-java</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents.client5</groupId>
             <artifactId>httpclient5</artifactId>
-            <version>5.3.1</version>
+            <version>5.4.4</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.slf4j</groupId>
@@ -39,9 +43,9 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>org.lz4</groupId>
+            <groupId>at.yawk.lz4</groupId>
             <artifactId>lz4-java</artifactId>
-            <version>1.8.1</version>
+            <version>1.10.1</version>
         </dependency>
     </dependencies>
 

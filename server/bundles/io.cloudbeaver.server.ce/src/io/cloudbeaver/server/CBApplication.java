@@ -49,7 +49,6 @@ import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.impl.app.BaseApplicationImpl;
-import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.security.SMAdminController;
 import org.jkiss.dbeaver.model.security.SMConstants;
 import org.jkiss.dbeaver.model.security.SMObjectType;
@@ -86,8 +85,6 @@ public abstract class CBApplication<T extends CBServerConfig>
      * In configuration mode sessions expire after a week
      */
     private static final long CONFIGURATION_MODE_SESSION_IDLE_TIME = 60 * 60 * 1000 * 24 * 7;
-
-    private CloudBeaverInstanceServer instanceServer;
 
     static {
         Log.setDefaultDebugStream(System.out);
@@ -208,7 +205,7 @@ public abstract class CBApplication<T extends CBServerConfig>
     @Override
     protected void startServer() {
         try {
-            this.instanceServer = createInstanceServer();
+            createInstanceServer();
         } catch (Exception e) {
             log.error("Error initializing instance server", e);
         }
@@ -283,7 +280,8 @@ public abstract class CBApplication<T extends CBServerConfig>
             determineLocalAddresses();
             log.debug("\tLocal host addresses:");
             for (InetAddress ia : localInetAddresses) {
-                log.debug("\t\t" + ia.getHostAddress() + " (" + ia.getCanonicalHostName() + ")");
+                log.debug("\t\t" + ia.getHostAddress() +
+                    (Objects.equals(ia.getHostAddress(), ia.getCanonicalHostName()) ? "" : (" (" + ia.getCanonicalHostName() + ")")));
             }
         }
         {
@@ -508,7 +506,7 @@ public abstract class CBApplication<T extends CBServerConfig>
     }
 
     @Override
-    public String getInfoDetails(DBRProgressMonitor monitor) {
+    public String getInfoDetails() {
         return "";
     }
 

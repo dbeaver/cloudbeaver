@@ -51,12 +51,12 @@ export const StatusMessage = observer<Props>(function StatusMessage({
 
   message = translateMessage(message) || translateMessage(errorDetails.message);
 
-  let icon = '/icons/info_icon.svg';
+  let icon = '/icons/preload/info_icon.svg';
 
   if (isError) {
-    icon = '/icons/error_icon.svg';
+    icon = '/icons/preload/error_icon.svg';
   } else if (type === ENotificationType.Success) {
-    icon = '/icons/success_icon.svg';
+    icon = '/icons/preload/success_icon.svg';
   }
 
   if (errorDetails.hasDetails && !onShowDetails) {

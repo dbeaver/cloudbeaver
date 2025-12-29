@@ -201,11 +201,24 @@ public interface DBWServiceSQL extends DBWService {
     WebSQLQueryInfo parseSqlQuery(@NotNull WebConnectionInfo connectionInfo, @NotNull String sqlScript, int cursorPosition) throws DBWebException;
 
     @WebAction
+    @Deprecated
     String generateGroupByQuery(@NotNull WebSQLContextInfo contextInfo,
                                 @NotNull String resultsId,
                                 @NotNull List<String> columnsList,
                                 @Nullable List<String> functions,
                                 @Nullable Boolean showDuplicatesOnly) throws DBWebException;
+
+    @WebAction
+    WebAsyncTaskInfo getGroupingSqlResultSet(
+        @NotNull WebSQLContextInfo contextInfo,
+        @NotNull String resultsId,
+        @NotNull List<String> columnsList,
+        @Nullable List<String> functions,
+        @Nullable Boolean showDuplicatesOnly,
+        @Nullable WebSQLDataFilter filter,
+        @Nullable WebDataFormat dataFormat,
+        boolean isInteractive
+    ) throws DBException;
 
     @WebAction
     WebAsyncTaskInfo getRowDataCount(@NotNull WebSession webSession, @NotNull WebSQLContextInfo contextInfo, @NotNull String resultsId) throws DBWebException;
