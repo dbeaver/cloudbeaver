@@ -29,7 +29,7 @@ import org.jkiss.dbeaver.model.runtime.LoggingProgressMonitor;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.utils.PrefUtils;
-import org.jkiss.dbeaver.utils.ResourceUtils;
+import org.jkiss.dbeaver.utils.ProjectResourceUtils;
 import org.junit.Assert;
 import org.junit.Before;
 
@@ -59,7 +59,7 @@ public abstract class H2DataSourceTest extends CloudbeaverMockTest {
         project.getDataSourceRegistry().addDataSource(dataSourceDescriptor);
         project.setResourceProperty(
             DocumentServiceTestUtils.BASIC_RESOURCE_PATH,
-            ResourceUtils.PROP_CONTEXT_DEFAULT_DATASOURCE,
+            ProjectResourceUtils.PROP_CONTEXT_DEFAULT_DATASOURCE,
             dataSourceDescriptor.getId()
         );
 

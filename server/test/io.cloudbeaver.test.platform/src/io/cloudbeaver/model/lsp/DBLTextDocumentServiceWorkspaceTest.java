@@ -24,7 +24,7 @@ import org.jkiss.dbeaver.model.lsp.DBLServerSessionProvider;
 import org.jkiss.dbeaver.model.lsp.DBLTextDocumentService;
 import org.jkiss.dbeaver.model.lsp.context.ContextAwareDocument;
 import org.jkiss.dbeaver.registry.DataSourceRegistry;
-import org.jkiss.dbeaver.utils.ResourceUtils;
+import org.jkiss.dbeaver.utils.ProjectResourceUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -60,7 +60,7 @@ public class DBLTextDocumentServiceWorkspaceTest extends H2DataSourceTest {
     public void shouldInitContextWithCustomWorkspace() {
         Mockito.when(project.getResourceProperty(
             DocumentServiceTestUtils.BASIC_RESOURCE_PATH,
-            ResourceUtils.PROP_CONTEXT_DEFAULT_DATASOURCE
+            ProjectResourceUtils.PROP_CONTEXT_DEFAULT_DATASOURCE
         )).thenReturn(DATA_SOURCE_ID);
 
         String uri = String.format("lsp://%s/%s", PROJECT_ID, DocumentServiceTestUtils.BASIC_RESOURCE_PATH);
