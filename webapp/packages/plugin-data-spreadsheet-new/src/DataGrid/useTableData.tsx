@@ -28,15 +28,17 @@ import {
   type IGridDataKey,
 } from '@cloudbeaver/plugin-data-viewer';
 
-import type { IColumnInfo, ITableData, IDataGridFormatters } from './TableDataContext.js';
+import { type IColumnInfo, type ITableData, type IDataGridFormatters, DateTimeKind } from './TableDataContext.js';
 import { useService } from '@cloudbeaver/core-di';
 import { DataGridSettingsService, NO_FORMAT, OS_FORMAT } from '../DataGridSettingsService.js';
 import type { SqlResultColumn } from '@cloudbeaver/core-sdk';
 import { GridConditionalFormattingAction } from '@cloudbeaver/plugin-data-viewer-conditional-formatting';
+import { detectDateTimeKind } from './helpers/detectDateTimeKind.js';
 
 interface ITableDataPrivate extends ITableData {
   dataGridSettingsService: DataGridSettingsService;
   gridDIVElement: React.RefObject<HTMLDivElement | null>;
+  extendedDateKinds: Map<number, DateTimeKind>;
 }
 
 export function useTableData(
@@ -167,6 +169,27 @@ export function useTableData(
 
         return model.isReadonly(resultIndex) || (this.format.isReadOnly(key) && this.editor?.getElementState(key) !== DatabaseEditChangeType.add);
       },
+      getExtendedDateKind(columnKey: IGridColumnKey): DateTimeKind {
+        if (this.extendedDateKinds.has(columnKey.index)) {
+          return this.extendedDateKinds.get(columnKey.index) as DateTimeKind;
+        }
+
+        for (const row of this.rows) {
+          const cellKey = { column: columnKey, row };
+          const holder = this.getCellHolder(cellKey);
+
+          if (!this.format.isNull(holder)) {
+            const displayValue = this.format.getDisplayString(holder);
+            const kind = detectDateTimeKind(displayValue);
+            this.extendedDateKinds.set(columnKey.index, kind);
+            return kind;
+          }
+        }
+
+        const defaultKind = DateTimeKind.DateTime;
+        this.extendedDateKinds.set(columnKey.index, defaultKind);
+        return defaultKind;
+      },
     }),
     {
       columns: computed,
@@ -181,6 +204,7 @@ export function useTableData(
       editor: observable.ref,
       view: observable.ref,
       gridDIVElement: observable.ref,
+      extendedDateKinds: observable,
     },
     {
       formatting,
@@ -191,6 +215,7 @@ export function useTableData(
       view,
       gridDIVElement,
       dataGridSettingsService,
+      extendedDateKinds: new Map(),
     },
   );
 }

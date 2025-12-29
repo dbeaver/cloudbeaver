@@ -12,7 +12,7 @@ import { getComputed, s, useS } from '@cloudbeaver/core-blocks';
 import { NullFormatter as GridNullFormatter } from '@cloudbeaver/plugin-data-grid';
 
 import { CellContext } from '../../CellRenderer/CellContext.js';
-import { TableDataContext } from '../../TableDataContext.js';
+import { TableDataContext, DateTimeKind } from '../../TableDataContext.js';
 import styles from './DateTimeFormatter.module.css';
 import type { ICellFormatterProps } from '../ICellFormatterProps.js';
 
@@ -36,20 +36,20 @@ export const DateTimeFormatter = observer<ICellFormatterProps>(function DateTime
 
   let value = displayValue;
 
-  if (tableDataContext.useUserFormatting) {
-    const isDateOnly = /^\d{4}-\d{2}-\d{2}$/.test(displayValue);
-    const date = new Date(displayValue);
+  const extendedDateKind = tableDataContext.getExtendedDateKind(cellContext.cell.column);
 
-    if (!isNaN(date.getTime())) {
-      let formatter = tableDataContext.useUserFormatting.dateTime;
-
-      if (isDateOnly) {
-        formatter = tableDataContext.useUserFormatting.dateOnly;
-      }
-
-      value = formatter.format(date);
-    }
+  let dateFormatter;
+  switch (extendedDateKind) {
+    case DateTimeKind.DateTime:
+    case DateTimeKind.TimeOnly:
+      dateFormatter = tableDataContext.useUserFormatting!.dateTime;
+      break;
+    case DateTimeKind.DateOnly:
+      dateFormatter = tableDataContext.useUserFormatting!.dateOnly;
+      break;
   }
+  const date = new Date(displayValue);
+  value = dateFormatter.format(date);
 
   return (
     <div className={s(style, { dateFormatter: true })}>

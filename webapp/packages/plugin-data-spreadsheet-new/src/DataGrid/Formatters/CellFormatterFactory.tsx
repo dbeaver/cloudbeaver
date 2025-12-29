@@ -41,12 +41,15 @@ export const CellFormatterFactory = observer<ICellFormatterProps>(function CellF
           formatterRef.current = BooleanFormatter;
         }
 
-        const dataKind = resultColumn?.dataKind?.toUpperCase();
-        if (dataKind === 'DATETIME' && tableDataContext.useUserFormatting) {
-          formatterRef.current = DateTimeFormatter;
-        }
-        if (dataKind === 'NUMERIC' && tableDataContext.useUserFormatting) {
-          formatterRef.current = NumberFormatter;
+        if (tableDataContext.useUserFormatting) {
+          switch (resultColumn?.dataKind?.toUpperCase()) {
+            case 'DATETIME':
+              formatterRef.current = DateTimeFormatter;
+              break;
+            case 'NUMERIC':
+              formatterRef.current = NumberFormatter;
+              break;
+          }
         }
       }
     } else {
