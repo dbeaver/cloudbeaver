@@ -25,6 +25,7 @@ export class LongPollingSubject<T> extends Subject<T> {
   readonly options: ILongPollingOptions;
 
   private output: Subject<T>;
+  private refCount = 0;
   private isPolling: boolean;
   private abortController: AbortController | null;
 
@@ -44,7 +45,7 @@ export class LongPollingSubject<T> extends Subject<T> {
     });
   }
 
-  async send(data: T): Promise<void> {
+  private async send(data: T): Promise<void> {
     const response = await fetch(this.options.url, {
       method: 'POST',
       headers: {
@@ -60,6 +61,12 @@ export class LongPollingSubject<T> extends Subject<T> {
   }
 
   protected _subscribe(subscriber: Subscriber<T>): Subscription {
+    this.refCount++;
+
+    if (this.output.closed) {
+      this.output = new Subject();
+    }
+
     if (!this.isPolling) {
       this.startPolling();
     }
@@ -67,7 +74,9 @@ export class LongPollingSubject<T> extends Subject<T> {
     const subscription = this.output.subscribe(subscriber);
 
     subscriber.add(() => {
-      if (this.output.observers.length === 0) {
+      this.refCount--;
+
+      if (this.refCount === 0) {
         this.stopPolling();
       }
     });

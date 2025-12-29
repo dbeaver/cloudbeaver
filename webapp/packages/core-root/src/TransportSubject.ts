@@ -59,7 +59,11 @@ export class TransportSubject<T> extends Subject<T> {
   }
 
   protected _subscribe(subscriber: Subscriber<T>): Subscription {
-    if (!this.sub && !this.closed) {
+    if (this.output.closed) {
+      this.output = new Subject();
+    }
+
+    if ((!this.sub || this.sub.closed) && !this.closed) {
       this.connect();
     }
 
