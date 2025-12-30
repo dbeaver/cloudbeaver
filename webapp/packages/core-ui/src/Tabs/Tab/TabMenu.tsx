@@ -7,7 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { getComputed, s, useS } from '@cloudbeaver/core-blocks';
+import { getComputed } from '@cloudbeaver/core-blocks';
 import { type IDataContext, useDataContextLink } from '@cloudbeaver/core-data-context';
 import { useMenu } from '@cloudbeaver/core-view';
 
@@ -16,7 +16,6 @@ import type { ITabsContext } from '../TabsContext.js';
 import { DATA_CONTEXT_TAB_ID } from './DATA_CONTEXT_TAB_ID.js';
 import { DATA_CONTEXT_TABS_CONTEXT } from './DATA_CONTEXT_TABS_CONTEXT.js';
 import { MENU_TAB } from './MENU_TAB.js';
-import style from './TabMenu.module.css';
 
 interface TabMenuProps extends React.PropsWithChildren {
   tabId: string;
@@ -25,7 +24,6 @@ interface TabMenuProps extends React.PropsWithChildren {
 }
 
 export const TabMenu = observer<TabMenuProps>(function TabMenu({ children, tabId, state, menuContext }) {
-  const styles = useS(style);
   const menu = useMenu({
     menu: MENU_TAB,
     context: menuContext,
@@ -43,10 +41,8 @@ export const TabMenu = observer<TabMenuProps>(function TabMenu({ children, tabId
   }
 
   return (
-    <div className={s(styles, { portal: true })}>
       <ContextMenu menu={menu} placement="bottom-start">
         {children}
       </ContextMenu>
-    </div>
   );
 });
