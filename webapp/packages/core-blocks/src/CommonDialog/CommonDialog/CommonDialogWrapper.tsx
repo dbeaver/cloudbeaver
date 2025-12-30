@@ -26,12 +26,24 @@ export interface CommonDialogWrapperProps {
   className?: string;
   children?: React.ReactNode;
   autoFocusOnHide?: boolean | ((element: HTMLElement | null) => boolean) | undefined;
+  autoFocusOnShow?: boolean | ((element: HTMLElement | null) => boolean) | undefined;
   initialFocus?: HTMLElement | React.RefObject<HTMLElement | null> | null | undefined;
 }
 
 export const CommonDialogWrapper = observer<CommonDialogWrapperProps, HTMLDivElement>(
   forwardRef(function CommonDialogWrapper(
-    { size = 'medium', fixedSize, fixedWidth, freeHeight, 'aria-label': ariaLabel, autoFocusOnHide = true, className, initialFocus, children },
+    {
+      size = 'medium',
+      fixedSize,
+      fixedWidth,
+      freeHeight,
+      'aria-label': ariaLabel,
+      autoFocusOnHide = true,
+      autoFocusOnShow = true,
+      className,
+      initialFocus,
+      children,
+    },
     ref,
   ) {
     const computedStyles = useS(styles);
@@ -50,6 +62,7 @@ export const CommonDialogWrapper = observer<CommonDialogWrapperProps, HTMLDivEle
         open={context.visible}
         data-size={size}
         className={s(computedStyles, { dialog: true, fixedSize, fixedWidth, freeHeight }, className)}
+        autoFocusOnShow={autoFocusOnShow}
         autoFocusOnHide={autoFocusOnHide}
         initialFocus={initialFocus as HTMLElement | React.RefObject<HTMLElement> | null | undefined}
         onClose={handleClose}
