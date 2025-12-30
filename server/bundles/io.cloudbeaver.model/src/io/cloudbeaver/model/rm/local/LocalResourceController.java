@@ -16,7 +16,6 @@
  */
 package io.cloudbeaver.model.rm.local;
 
-import com.google.gson.reflect.TypeToken;
 import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.model.app.ServletApplication;
 import io.cloudbeaver.service.security.SMUtils;
@@ -31,11 +30,9 @@ import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
-import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.app.DBPWorkspace;
 import org.jkiss.dbeaver.model.auth.SMCredentials;
 import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
-import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.fs.lock.FileLockController;
 import org.jkiss.dbeaver.model.impl.app.BaseProjectImpl;
 import org.jkiss.dbeaver.model.impl.auth.SessionContextImpl;
@@ -59,7 +56,6 @@ import org.jkiss.utils.IOUtils;
 import org.jkiss.utils.Pair;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.text.MessageFormat;
 import java.time.OffsetDateTime;
@@ -75,7 +71,6 @@ import java.util.stream.Stream;
 public class LocalResourceController extends BaseLocalResourceController {
 
     private static final Log log = Log.getLog(LocalResourceController.class);
-    private static final String PROJECTS_INFO_FILE_NAME = "projects-info.json";
 
     protected final SMCredentialsProvider credentialsProvider;
 
@@ -87,7 +82,7 @@ public class LocalResourceController extends BaseLocalResourceController {
     protected final List<RMFileOperationHandler> fileHandlers;
 
     private final Map<String, RMLocalProject> projectRegistries = new LinkedHashMap<>();
-    private final Map<String, RMProjectInfo> sharedProjectsInfo = new LinkedHashMap<>();
+    private final ProjectsMetadataInfo sharedProjectsMetadataInfo;
 
     public LocalResourceController(
         @NotNull DBPWorkspace workspace,
@@ -106,78 +101,7 @@ public class LocalResourceController extends BaseLocalResourceController {
 
         this.globalProjectName = DBWorkbench.getPlatform().getApplication().getDefaultProjectName();
         this.fileHandlers = RMFileOperationHandlersRegistry.getInstance().getFileHandlers();
-        readProjectInfos(sharedProjectsPath);
-    }
-
-    private void readProjectInfos(@NotNull Path sharedProjectsPath) {
-        if (!Files.exists(sharedProjectsPath)) {
-            return;
-        }
-
-        if (Files.exists(sharedProjectsPath.resolve(PROJECTS_INFO_FILE_NAME))) {
-            try {
-                log.info("Reading shared project information");
-                String content = Files.readString(sharedProjectsPath.resolve(PROJECTS_INFO_FILE_NAME), StandardCharsets.UTF_8);
-                Map<String, RMProjectInfo> loaded = JSONUtils.GSON.fromJson(
-                    content,
-                    TypeToken.getParameterized(Map.class, String.class, RMProjectInfo.class).getType()
-                );
-                sharedProjectsInfo.clear();
-                if (loaded != null) {
-                    sharedProjectsInfo.putAll(loaded);
-                }
-            } catch (IOException e) {
-                log.error("Error reading existing " + PROJECTS_INFO_FILE_NAME, e);
-            }
-            return;
-        }
-
-        createProjectInfosFile(sharedProjectsPath);
-    }
-
-    private void createProjectInfosFile(@NotNull Path sharedProjectsPath) {
-        log.info("Migrating shared project information to the common place");
-        Map<String, RMProjectInfo> infos = new LinkedHashMap<>();
-        try (Stream<Path> stream = Files.list(sharedProjectsPath)) {
-            stream.filter(Files::isDirectory).forEach(projectDir -> {
-                String name = null;
-                String description = null;
-
-                Path settings = projectDir.resolve(DBPProject.METADATA_FOLDER).resolve(BaseProjectImpl.SETTINGS_STORAGE_FILE);
-                if (Files.exists(settings) && Files.isRegularFile(settings)) {
-                    try {
-                        String json = Files.readString(settings, StandardCharsets.UTF_8);
-                        Map<String, Object> map = JSONUtils.GSON.fromJson(json, JSONUtils.MAP_TYPE_TOKEN);
-                        name = JSONUtils.getString(map, BaseProjectImpl.PROP_PROJECT_NAME);
-                        description = JSONUtils.getString(map, BaseProjectImpl.PROP_PROJECT_DESCRIPTION);
-                    } catch (IOException e) {
-                        log.warn("Failed to read project settings for " + projectDir + ": " + e.getMessage());
-                    } catch (Exception e) {
-                        log.warn("Failed to parse project settings for " + projectDir + ": " + e.getMessage());
-                    }
-                }
-                RMProjectInfo info = new RMProjectInfo();
-                info.setName(CommonUtils.isEmpty(name) ? projectDir.getFileName().toString() : name);
-                info.setDescription(description);
-                String projectId = RMUtils.makeProjectIdFromPath(projectDir, RMProjectType.SHARED);
-                infos.put(projectId, info);
-            });
-        } catch (IOException e) {
-            log.error("Error listing shared projects path", e);
-        }
-        log.info("Migration for project information completed");
-        sharedProjectsInfo.clear();
-        sharedProjectsInfo.putAll(infos);
-        saveProjectsInfo();
-    }
-
-    private void saveProjectsInfo() {
-        try {
-            log.info("Saving shared project information");
-            Files.writeString(sharedProjectsPath.resolve(PROJECTS_INFO_FILE_NAME), JSONUtils.GSON.toJson(sharedProjectsInfo));
-        } catch (IOException e) {
-            log.error("Error writing " + PROJECTS_INFO_FILE_NAME, e);
-        }
+        this.sharedProjectsMetadataInfo = new ProjectsMetadataInfo(sharedProjectsPath);
     }
 
     @NotNull
@@ -202,8 +126,8 @@ public class LocalResourceController extends BaseLocalResourceController {
             RMLocalProject project = projectRegistries.get(projectId);
             if (project == null || refresh) {
                 project = createWebProjectImpl(projectId, new SessionContextImpl(null));
-                if (RMProjectType.SHARED.equals(project.getProjectType())) {
-                    project.setProjectInfo(getProjectInfoIfNeeded(projectId));
+                if (project.getProjectType() == RMProjectType.SHARED) {
+                    project.setProjectInfo(sharedProjectsMetadataInfo.getProjectInfo(projectId));
                 }
                 projectRegistries.put(projectId, project);
             }
@@ -217,11 +141,6 @@ public class LocalResourceController extends BaseLocalResourceController {
         @NotNull SessionContextImpl sessionContext
     ) throws DBException {
         return new RMLocalProject(workspace, sessionContext, getProjectPath(projectId), WebRMUtils.parseProjectName(projectId).getType());
-    }
-
-    @NotNull
-    private RMProjectInfo getProjectInfoIfNeeded(@NotNull String projectId) {
-        return sharedProjectsInfo.computeIfAbsent(projectId, key -> new RMProjectInfo());
     }
 
     @NotNull
@@ -402,8 +321,7 @@ public class LocalResourceController extends BaseLocalResourceController {
                 throw new DBException("Project '" + projectId + "' is not shared");
             }
             project.updateProject(projectInfo.getName(), projectInfo.getDescription());
-            sharedProjectsInfo.put(projectId, projectInfo);
-            saveProjectsInfo();
+            sharedProjectsMetadataInfo.updateProjectInfo(projectId, projectInfo);
             return WebRMUtils.createRmProjectFromWebProject(project);
         }
     }
@@ -434,6 +352,7 @@ public class LocalResourceController extends BaseLocalResourceController {
                 synchronized (projectRegistries) {
                     projectRegistries.remove(projectId);
                 }
+                sharedProjectsMetadataInfo.updateProjectInfo(projectId, null);
             } catch (IOException e) {
                 throw new DBException("Error deleting project '" + projectId + "'", e);
             }
@@ -1096,7 +1015,7 @@ public class LocalResourceController extends BaseLocalResourceController {
 
         RMLocalProject webProject = new RMLocalProject(workspace, new SessionContextImpl(null), path, type);
         if (type == RMProjectType.SHARED) {
-            webProject.setProjectInfo(getProjectInfoIfNeeded(webProject.getId()));
+            webProject.setProjectInfo(sharedProjectsMetadataInfo.getProjectInfo(webProject.getId()));
         }
         return createRmProjectFromWebProject(path, webProject, allProjectPermissions);
     }
