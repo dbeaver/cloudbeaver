@@ -55,8 +55,10 @@ public interface WebAppSessionManager {
     @Nullable
     WebSession findWebSession(HttpServletRequest request);
 
+    @Nullable
     WebSession findWebSession(HttpServletRequest request, boolean errorOnNoFound) throws DBWebException;
 
+    @NotNull
     Collection<BaseWebSession> getAllActiveSessions();
 
     WebSession getOrRestoreWebSession(WebHttpRequestInfo httpRequest);

@@ -33,7 +33,6 @@ import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceEvent;
 import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceProperty;
 import org.jkiss.dbeaver.model.websocket.event.permissions.WSObjectPermissionEvent;
 
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -61,22 +60,13 @@ public class WSObjectPermissionUpdatedEventHandler extends WSDefaultEventHandler
                     yield null;
                 }
         };
-        if (runnable == null) {
+        if (runnable == null || event.getSessionId() == null) {
             return;
         }
-        log.debug(event.getTopicId() + " event handled");
-        Collection<BaseWebSession> allSessions = CBApplication.getInstance().getSessionManager().getAllActiveSessions();
-        for (var activeUserSession : allSessions) {
-            if (!isAcceptableInSession(activeUserSession, event)) {
-                log.debug("Cannot handle %s event '%s' in session %s".formatted(
-                    event.getTopicId(),
-                    event.getId(),
-                    activeUserSession.getSessionId()
-                ));
-                continue;
-            }
+        BaseWebSession webSession = WebAppUtils.getWebApplication().getSessionManager().getSession(event.getSessionId());
+        if (webSession != null) {
             log.debug("%s event '%s' handled".formatted(event.getTopicId(), event.getId()));
-            runnable.accept(activeUserSession);
+            runnable.accept(webSession);
         }
     }
 

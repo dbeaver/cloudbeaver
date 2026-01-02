@@ -294,6 +294,7 @@ public class CBSessionManager implements WebAppSessionManager {
         }
     }
 
+    @Nullable
     @Override
     public WebSession findWebSession(HttpServletRequest request, boolean errorOnNoFound) throws DBWebException {
         WebSession webSession = findWebSession(request);
@@ -323,6 +324,7 @@ public class CBSessionManager implements WebAppSessionManager {
         }
     }
 
+    @NotNull
     @Override
     public Collection<BaseWebSession> getAllActiveSessions() {
         synchronized (sessionMap) {

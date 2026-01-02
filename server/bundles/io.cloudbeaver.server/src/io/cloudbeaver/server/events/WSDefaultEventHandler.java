@@ -23,26 +23,20 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.websocket.WSEventHandler;
 import org.jkiss.dbeaver.model.websocket.event.WSEvent;
 
-import java.util.Collection;
-
 public class WSDefaultEventHandler<EVENT extends WSEvent> implements WSEventHandler<EVENT> {
 
     private static final Log log = Log.getLog(WSDefaultEventHandler.class);
 
     @Override
     public void handleEvent(@NotNull EVENT event) {
-        log.debug(event.getTopicId() + " event handled");
-        Collection<BaseWebSession> allSessions = WebAppUtils.getWebApplication()
-            .getSessionManager()
-            .getAllActiveSessions();
-        for (var activeUserSession : allSessions) {
-            if (!isAcceptableInSession(activeUserSession, event)) {
-                log.debug("Cannot handle " + event.getTopicId() + " event '" + event.getId() +
-                    "' in session " + activeUserSession.getSessionId());
-                continue;
+        if (event.getSessionId() != null) {
+            BaseWebSession session = WebAppUtils.getWebApplication().getSessionManager().getSession(event.getSessionId());
+            if (session != null) {
+                log.debug(event.getTopicId() + " event '" + event.getId() + "' handled in session '" + event.getSessionId() + "'");
+                updateSessionData(session, event);
+            } else {
+                log.debug(event.getTopicId() + " event '" + event.getId() + "' not handled: session '" + event.getSessionId() + "' was not found.");
             }
-            log.debug(event.getTopicId() + " event '" + event.getId() + "' handled");
-            updateSessionData(activeUserSession, event);
         }
     }
 
