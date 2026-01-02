@@ -30,7 +30,7 @@ public class WSDefaultEventHandler<EVENT extends WSEvent> implements WSEventHand
     @Override
     public void handleEvent(@NotNull EVENT event) {
         if (event.getSessionId() != null) {
-            BaseWebSession session = WebAppUtils.getWebApplication().getSessionManager().getSession(event.getSessionId());
+            BaseWebSession session = WebAppUtils.getWebApplication().getSessionManager().findSessionBySmId(event.getSessionId());
             if (session != null) {
                 log.debug(event.getTopicId() + " event '" + event.getId() + "' handled in session '" + event.getSessionId() + "'");
                 updateSessionData(session, event);

@@ -283,7 +283,7 @@ public class CBSessionManager implements WebAppSessionManager {
 
     @Override
     @Nullable
-    public WebSession findWebSession(HttpServletRequest request) {
+    public WebSession findWebSession(@NotNull HttpServletRequest request) {
         String sessionId = getSessionId(request);
         synchronized (sessionMap) {
             var session = sessionMap.get(sessionId);
@@ -296,7 +296,20 @@ public class CBSessionManager implements WebAppSessionManager {
 
     @Nullable
     @Override
-    public WebSession findWebSession(HttpServletRequest request, boolean errorOnNoFound) throws DBWebException {
+    public BaseWebSession findSessionBySmId(@NotNull String smSessionId) {
+        synchronized (sessionMap) {
+            for (BaseWebSession session : sessionMap.values()) {
+                if (Objects.equals(session.getUserContext().getSmSessionId(), smSessionId)) {
+                    return session;
+                }
+            }
+        }
+        return null;
+    }
+
+    @Nullable
+    @Override
+    public WebSession findWebSession(@NotNull HttpServletRequest request, boolean errorOnNoFound) throws DBWebException {
         WebSession webSession = findWebSession(request);
         if (webSession != null) {
             return webSession;
@@ -454,12 +467,13 @@ public class CBSessionManager implements WebAppSessionManager {
     /**
      * Creates new web session or returns existing one.
      */
-    public WebSession createWebSession(WebHttpRequestInfo requestInfo) throws DBException {
+    @NotNull
+    public WebSession createWebSession(@NotNull WebHttpRequestInfo requestInfo) throws DBException {
         String id = requestInfo.getId();
         synchronized (sessionMap) {
             BaseWebSession baseWebSession = sessionMap.get(id);
-            if (baseWebSession instanceof WebSession) {
-                return (WebSession) baseWebSession;
+            if (baseWebSession instanceof WebSession webSession) {
+                return webSession;
             } else {
                 WebSession webSessionImpl = createWebSessionImpl(requestInfo);
                 sessionMap.put(id, webSessionImpl);

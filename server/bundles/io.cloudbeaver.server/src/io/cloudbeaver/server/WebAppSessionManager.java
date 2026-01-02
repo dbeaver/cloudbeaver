@@ -53,10 +53,13 @@ public interface WebAppSessionManager {
     BaseWebSession getSession(@NotNull String sessionId);
 
     @Nullable
-    WebSession findWebSession(HttpServletRequest request);
+    WebSession findWebSession(@NotNull HttpServletRequest request);
 
     @Nullable
-    WebSession findWebSession(HttpServletRequest request, boolean errorOnNoFound) throws DBWebException;
+    BaseWebSession findSessionBySmId(@NotNull String smSessionId);
+
+    @Nullable
+    WebSession findWebSession(@NotNull HttpServletRequest request, boolean errorOnNoFound) throws DBWebException;
 
     @NotNull
     Collection<BaseWebSession> getAllActiveSessions();

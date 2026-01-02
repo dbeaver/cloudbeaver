@@ -63,7 +63,7 @@ public class WSObjectPermissionUpdatedEventHandler extends WSDefaultEventHandler
         if (runnable == null || event.getSessionId() == null) {
             return;
         }
-        BaseWebSession webSession = WebAppUtils.getWebApplication().getSessionManager().getSession(event.getSessionId());
+        BaseWebSession webSession = WebAppUtils.getWebApplication().getSessionManager().findSessionBySmId(event.getSessionId());
         if (webSession != null) {
             log.debug("%s event '%s' handled".formatted(event.getTopicId(), event.getId()));
             runnable.accept(webSession);
