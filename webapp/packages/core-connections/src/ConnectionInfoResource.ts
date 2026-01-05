@@ -446,6 +446,18 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
     return this.get(key)!;
   }
 
+  async clearConnectionView(key: IConnectionInfoParams): Promise<Connection> {
+    const { connection } = await this.graphQLService.sdk.clearConnectionNavigatorSettings({
+      id: key.connectionId,
+      projectId: key.projectId,
+    });
+
+    this.set(createConnectionParam(connection), connection);
+    this.onDataOutdated.execute(key);
+
+    return this.get(key)!;
+  }
+
   async update(key: IConnectionInfoParams, config: ConnectionConfig): Promise<DatabaseConnection> {
     await this.performUpdate(key, [], async () => {
       const { connection } = await this.graphQLService.sdk.updateConnection({
