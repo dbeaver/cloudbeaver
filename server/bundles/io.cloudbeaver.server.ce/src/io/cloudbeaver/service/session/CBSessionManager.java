@@ -26,6 +26,7 @@ import io.cloudbeaver.server.CBConstants;
 import io.cloudbeaver.server.WebAppSessionManager;
 import io.cloudbeaver.server.events.WSWebUtils;
 import io.cloudbeaver.service.DBWSessionHandler;
+import io.cloudbeaver.utils.ServletAppUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -49,10 +50,10 @@ public class CBSessionManager implements WebAppSessionManager {
 
     private static final Log log = Log.getLog(CBSessionManager.class);
 
-    private final CBApplication application;
+    private final CBApplication<?> application;
     private final Map<String, BaseWebSession> sessionMap = new HashMap<>();
 
-    public CBSessionManager(CBApplication application) {
+    public CBSessionManager(CBApplication<?> application) {
         this.application = application;
     }
 
@@ -88,7 +89,7 @@ public class CBSessionManager implements WebAppSessionManager {
         return null;
     }
 
-    protected CBApplication getApplication() {
+    protected CBApplication<?> getApplication() {
         return application;
     }
 
@@ -164,6 +165,8 @@ public class CBSessionManager implements WebAppSessionManager {
         }
 
         validateSessionIp(request, webSession);
+
+        webSession.updateClientOrigin(ServletAppUtils.getOriginFromRequest(request));
 
         return webSession;
     }
@@ -264,7 +267,7 @@ public class CBSessionManager implements WebAppSessionManager {
     }
 
     @NotNull
-    protected Map<String, DBWSessionHandler> getSessionHandlers() {
+    protected Map<String, DBWSessionHandler<WebSession>> getSessionHandlers() {
         return WebHandlerRegistry.getInstance().getSessionHandlers()
             .stream()
             .collect(Collectors.toMap(WebSessionHandlerDescriptor::getId, WebSessionHandlerDescriptor::getInstance));
@@ -304,14 +307,11 @@ public class CBSessionManager implements WebAppSessionManager {
     }
 
     public void expireIdleSessions() {
-        long maxSessionIdleTime = application.getMaxSessionIdleTime();
-
         List<BaseWebSession> expiredList = new ArrayList<>();
         synchronized (sessionMap) {
             for (Iterator<BaseWebSession> iterator = sessionMap.values().iterator(); iterator.hasNext(); ) {
                 var session = iterator.next();
-                long idleMillis = System.currentTimeMillis() - session.getLastAccessTimeMillis();
-                if (idleMillis >= maxSessionIdleTime) {
+                if (!session.isValid()) {
                     iterator.remove();
                     expiredList.add(session);
                 }

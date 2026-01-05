@@ -28,7 +28,6 @@
 
     &[aria-disabled='true'] {
       opacity: var(--dbv-kit-control-disabled-opacity);
-      color: var(--dbv-kit-select-disabled-foreground);
       background-color: var(--dbv-kit-select-disabled-background);
     }
     &:focus-visible {

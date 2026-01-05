@@ -21,7 +21,15 @@ export {
   type IGridReactiveValue,
   type DataGridRef,
   type ICellPosition,
+  type IDataGridRowRenderer,
   type IDataGridCellRenderer,
   type IDataGridCellProps,
   type DataGridProps,
 } from '@dbeaver/react-data-grid';
+
+export { GrantManagementTable } from './GrantManagementTableLazy.js';
+export { TableRowSelect } from './TableRowSelectLazy.js';
+export { useTableSelection } from './useTableSelection.js';
+export { TableSelectionContext, type ITableSelection } from './TableSelectionContext.js';
+
+export type { IGrantManagementTableColumn } from './GrantManagementTable.js';

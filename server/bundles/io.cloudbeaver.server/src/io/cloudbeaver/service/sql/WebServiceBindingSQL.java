@@ -105,6 +105,19 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL>
                 getArgument(env, "functions"),
                 getArgument(env, "showDuplicatesOnly"))
             )
+            .dataFetcher(
+                "sqlGropingResultSet", env ->
+                    getService(env).getGroupingSqlResultSet(
+                        getSQLContext(env),
+                        getArgumentVal(env, "resultsId"),
+                        getArgumentVal(env, "columnNames"),
+                        getArgument(env, "functions"),
+                        getArgument(env, "showDuplicatesOnly"),
+                        getDataFilter(env),
+                        getDataFormat(env),
+                        CommonUtils.toBoolean(getArgument(env, "isInteractive"))
+                    )
+            )
         ;
 
         model.getMutationType()
@@ -191,7 +204,8 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL>
                     getArgument(env, "resultId"),
                     getDataFilter(env),
                     getDataFormat(env),
-                    CommonUtils.toBoolean(getArgument(env, "readLogs"))
+                    CommonUtils.toBoolean(getArgument(env, "readLogs")),
+                    CommonUtils.toBoolean(getArgument(env, "isInteractive"))
                 )
             )
             .dataFetcher("asyncReadDataFromContainer", env ->

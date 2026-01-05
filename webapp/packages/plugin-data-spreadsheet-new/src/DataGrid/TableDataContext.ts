@@ -19,15 +19,18 @@ import type {
   IGridDataKey,
   IGridRowKey,
   IResultSetValue,
+  IDatabaseValueHolder,
   ResultSetDataContentAction,
 } from '@cloudbeaver/plugin-data-viewer';
+import type { GridConditionalFormattingAction } from '@cloudbeaver/plugin-data-viewer-conditional-formatting';
 
 export interface IColumnInfo {
   key: IGridColumnKey | null;
 }
 
 export interface ITableData {
-  format: IDatabaseDataFormatAction<Partial<IGridDataKey>, IDatabaseResultSet>;
+  formatting: GridConditionalFormattingAction;
+  format: IDatabaseDataFormatAction<Partial<IGridDataKey>, IResultSetValue, IDatabaseResultSet>;
   dataContent: ResultSetDataContentAction;
   data: GridDataResultAction;
   editor: GridEditAction | undefined;
@@ -41,7 +44,7 @@ export interface ITableData {
   getRow: (rowIndex: number) => IGridRowKey | undefined;
   getColumn: (columnIndex: number) => IColumnInfo | undefined;
   getColumnByDataIndex: (key: IGridColumnKey) => IColumnInfo;
-  getCellValue: (key: IGridDataKey) => IResultSetValue | undefined;
+  getCellHolder: (key: IGridDataKey) => IDatabaseValueHolder<IGridDataKey, IResultSetValue>;
   getColumnInfo: (key: IGridColumnKey) => SqlResultColumn | undefined;
   getColumnsInRange: (startIndex: number, endIndex: number) => Array<IColumnInfo>;
   getColumnIndexFromColumnKey: (column: IGridColumnKey) => number;
@@ -51,6 +54,10 @@ export interface ITableData {
   isIndexColumn: (columnKey: IColumnInfo) => boolean;
   isIndexColumnInRange: (columnsRange: Array<IColumnInfo>) => boolean;
   isCellReadonly: (key: IGridDataKey) => boolean;
+}
+
+export function isColumnInfo(column: IColumnInfo | undefined): column is IColumnInfo {
+  return column?.key !== null;
 }
 
 export const TableDataContext = createContext<ITableData>(undefined as any);

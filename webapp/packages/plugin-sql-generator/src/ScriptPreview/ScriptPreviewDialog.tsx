@@ -41,7 +41,9 @@ export const ScriptPreviewDialog = observer<DialogComponentProps<Payload>>(funct
   const dialect = useResource(ScriptPreviewDialog, ConnectionDialectResource, payload.connectionKey);
   const sqlDialect = useSqlDialectExtension(dialect.data);
   const extensions = useCodemirrorExtensions();
-  extensions.set(...sqlDialect);
+  if (sqlDialect) {
+    extensions.set(...sqlDialect);
+  }
 
   const apply = async () => {
     try {
@@ -70,7 +72,7 @@ export const ScriptPreviewDialog = observer<DialogComponentProps<Payload>>(funct
         <Button variant="secondary" onClick={() => copy(payload.script, true)}>
           {translate('ui_copy_to_clipboard')}
         </Button>
-        <Button onClick={rejectDialog}>{translate('ui_close')}</Button>
+        <Button onClick={() => rejectDialog()}>{translate('ui_close')}</Button>
       </CommonDialogFooter>
     </CommonDialogWrapper>
   );

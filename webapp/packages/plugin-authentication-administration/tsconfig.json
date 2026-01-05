@@ -72,6 +72,9 @@
     },
     {
       "path": "../plugin-authentication"
+    },
+    {
+      "path": "../plugin-data-grid"
     }
   ],
   "include": [

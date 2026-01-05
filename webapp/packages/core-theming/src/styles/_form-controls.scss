@@ -52,7 +52,7 @@
     padding: 7px 12px;
     width: 100%;
     border: 2px solid;
-    outline: none;
+    outline: none !important;
     border-radius: $theme-form-element-radius;
 
     @include mdc-theme-prop(color, input-color, false);
@@ -67,6 +67,16 @@
 
     &:user-invalid {
       @include mdc-theme-prop(border-color, negative, false);
+    }
+
+    &[type='color'] {
+      padding: 0;
+      &::-webkit-color-swatch-wrapper {
+        padding: 0;
+      }
+      &::-webkit-color-swatch {
+        border: none;
+      }
     }
 
     &:focus,

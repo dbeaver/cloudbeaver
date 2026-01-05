@@ -27,7 +27,7 @@ export interface ObjectPropertyFormProps extends ILayoutSizeProps {
   defaultState?: Record<string, any>;
   category?: string | null;
   editable?: boolean;
-  autofillToken?: string;
+  autocompleteSectionName?: string;
   className?: string;
   disabled?: boolean;
   readOnly?: boolean;
@@ -38,8 +38,26 @@ export interface ObjectPropertyFormProps extends ILayoutSizeProps {
   canShowPassword?: boolean;
   disableAutoCompleteForPasswords?: boolean;
   isSaved?: (property: ObjectPropertyInfo) => boolean;
-  geLayoutSize?: (property: ObjectPropertyInfo) => ILayoutSizeProps;
+  getLayoutSize?: (property: ObjectPropertyInfo) => ILayoutSizeProps;
   onFocus?: (name: string) => void;
+}
+
+function getAutocompleteParam(property: ObjectPropertyInfo, prefix: string, disabledForPasswords: boolean): string {
+  const isPasswordField = property.features.includes('password');
+
+  if (isPasswordField && disabledForPasswords) {
+    return 'off';
+  }
+
+  if (isPasswordField) {
+    return prefix ? prefix + ' current-password' : 'current-password';
+  }
+
+  if (property.features.includes('name')) {
+    return prefix ? prefix + ' username' : 'username';
+  }
+
+  return 'on';
 }
 
 export const ObjectPropertyInfoForm = observer<ObjectPropertyFormProps>(function ObjectPropertyInfoForm({
@@ -51,7 +69,7 @@ export const ObjectPropertyInfoForm = observer<ObjectPropertyFormProps>(function
   disableAutoCompleteForPasswords = false,
   editable = true,
   className,
-  autofillToken = '',
+  autocompleteSectionName = '',
   disabled,
   readOnly,
   autoHide,
@@ -60,7 +78,7 @@ export const ObjectPropertyInfoForm = observer<ObjectPropertyFormProps>(function
   emptyPlaceholder = 'core_blocks_object_property_info_form_empty_placeholder',
   canShowPassword,
   isSaved,
-  geLayoutSize,
+  getLayoutSize,
   onFocus,
   ...rest
 }) {
@@ -92,13 +110,13 @@ export const ObjectPropertyInfoForm = observer<ObjectPropertyFormProps>(function
         return (
           <RenderField
             key={property.id}
-            className={s(sizeStyles, { ...(geLayoutSize ? geLayoutSize(property) : layoutProps) }, className)}
+            className={s(sizeStyles, { ...(getLayoutSize ? getLayoutSize(property) : layoutProps) }, className)}
             property={property}
             state={state}
             context={context}
             defaultState={defaults}
             editable={editable}
-            autofillToken={property.features.includes('password') && disableAutoCompleteForPasswords ? 'new-password' : autofillToken}
+            autocomplete={getAutocompleteParam(property, autocompleteSectionName, disableAutoCompleteForPasswords)}
             disabled={disabled}
             readOnly={readOnly}
             autoHide={autoHide}

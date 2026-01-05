@@ -180,7 +180,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
         }
       },
 
-      async executeQuery(): Promise<void> {
+      async executeQuery(inNewTab = false): Promise<void> {
         const isQuery = this.model.dataSource?.hasFeature(ESqlDataSourceFeatures.query);
 
         if (!isQuery || !this.isExecutionAllowed) {
@@ -189,7 +189,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
 
         try {
           const segment = await this.model.getResolvedSegment();
-          await this.executeQueryAction(segment, query => this.sqlQueryService.executeEditorQuery(this.state, query.query, false));
+          await this.executeQueryAction(segment, query => this.sqlQueryService.executeEditorQuery(this.state, query.query, inNewTab));
         } catch {}
       },
 
@@ -197,20 +197,6 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
         if (this.model.dataSource?.databaseModels.length) {
           this.sqlQueryService.initDatabaseDataModels(this.state);
         }
-      },
-
-      async executeQueryNewTab(): Promise<void> {
-        const isQuery = this.model.dataSource?.hasFeature(ESqlDataSourceFeatures.query);
-
-        if (!isQuery || !this.isExecutionAllowed) {
-          return;
-        }
-
-        try {
-          await this.executeQueryAction(await this.executeQueryAction(this.model.cursorSegment, () => this.model.getResolvedSegment()), query =>
-            this.sqlQueryService.executeEditorQuery(this.state, query.query, true),
-          );
-        } catch {}
       },
 
       async showExecutionPlan(): Promise<void> {
@@ -234,14 +220,14 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
         const processableTabs = this.state.tabs.filter(tab => tab.id !== OUTPUT_LOGS_TAB_ID);
 
         if (processableTabs.length > 0) {
-          const result = await this.commonDialogService.open(ConfirmationDialog, {
+          const { status, result } = await this.commonDialogService.open(ConfirmationDialog, {
             title: 'sql_editor_close_result_tabs_dialog_title',
             message: `Do you want to close ${processableTabs.length} tabs before executing script?`,
             confirmActionText: 'ui_yes',
-            extraStatus: 'no',
+            showExtraAction: true,
           });
 
-          if (result === DialogueStateResult.Resolved) {
+          if (status === DialogueStateResult.Resolved) {
             const state = await this.sqlResultTabsService.canCloseResultTabs(this.state);
 
             if (!state) {
@@ -249,7 +235,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
             }
 
             this.sqlResultTabsService.removeResultTabs(this.state, [OUTPUT_LOGS_TAB_ID]);
-          } else if (result === DialogueStateResult.Rejected) {
+          } else if (!result?.isExtraAction) {
             return;
           }
         }
@@ -320,7 +306,6 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
       getHintProposals: action.bound,
       formatScript: action.bound,
       executeQuery: action.bound,
-      executeQueryNewTab: action.bound,
       showExecutionPlan: action.bound,
       executeScript: action.bound,
       isDisabled: computed,

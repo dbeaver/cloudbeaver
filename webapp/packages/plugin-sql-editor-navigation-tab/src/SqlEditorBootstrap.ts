@@ -121,6 +121,7 @@ export class SqlEditorBootstrap extends Bootstrap {
 
     this.actionService.addHandler({
       id: 'sql-editor',
+      actions: [ACTION_RENAME, ACTION_SQL_EDITOR_OPEN],
       isActionApplicable: (context, action) => {
         switch (action) {
           case ACTION_RENAME: {
@@ -159,7 +160,7 @@ export class SqlEditorBootstrap extends Bootstrap {
             const name = getSqlEditorName(state, dataSource, connection);
             const regexp = /^(.*?)(\.\w+)$/gi.exec(name);
 
-            const result = await this.commonDialogService.open(RenameDialog, {
+            const { status, result } = await this.commonDialogService.open(RenameDialog, {
               name: regexp?.[1] ?? name,
               objectName: name,
               icon: dataSource.icon,
@@ -169,7 +170,7 @@ export class SqlEditorBootstrap extends Bootstrap {
                 ) && dataSource.canRename(name),
             });
 
-            if (result !== DialogueStateResult.Rejected && result !== DialogueStateResult.Resolved) {
+            if (status === DialogueStateResult.Resolved && result !== undefined) {
               dataSource.setName((result ?? '').trim());
             }
             break;
@@ -242,6 +243,7 @@ export class SqlEditorBootstrap extends Bootstrap {
 
         return {
           ...action.info,
+          label: '',
           tooltip,
         };
       },

@@ -9,6 +9,7 @@
         <version>1.0.0</version>
         <relativePath>../</relativePath>
     </parent>
+    <packaging>pom</packaging>
 
     <properties>
         <deps.output.dir>mssql/new</deps.output.dir>
@@ -18,7 +19,7 @@
         <dependency>
             <groupId>com.microsoft.sqlserver</groupId>
             <artifactId>mssql-jdbc</artifactId>
-            <version>12.8.0.jre11</version>
+            <version>13.2.1.jre11</version>
         </dependency>
 <!--
         <dependency>

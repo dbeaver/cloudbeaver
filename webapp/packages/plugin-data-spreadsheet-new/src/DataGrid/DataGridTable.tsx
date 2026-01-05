@@ -9,16 +9,15 @@ import { observer } from 'mobx-react-lite';
 import { useCallback, useLayoutEffect, useMemo, useRef, type HTMLAttributes } from 'react';
 import { reaction } from 'mobx';
 
-import { getComputed, s, TextPlaceholder, useObjectRef, useS, useTranslate } from '@cloudbeaver/core-blocks';
-// import { useService } from '@cloudbeaver/core-di';
+import { getComputed, TextPlaceholder, useObjectRef, useTranslate } from '@cloudbeaver/core-blocks';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
-// import { ClipboardService } from '@cloudbeaver/core-ui';
 import { useCaptureViewContext } from '@cloudbeaver/core-view';
 import {
   DataGrid,
   useCreateGridReactiveValue,
   type DataGridRef,
   type ICellPosition,
+  type IDataGridRowRenderer,
   type IDataGridCellRenderer,
   type DataGridProps,
 } from '@cloudbeaver/plugin-data-grid';
@@ -48,7 +47,7 @@ import { CellRenderer } from './CellRenderer/CellRenderer.js';
 import { DataGridContext, type IDataGridContext } from './DataGridContext.js';
 import { DataGridSelectionContext } from './DataGridSelection/DataGridSelectionContext.js';
 import { useGridSelectionContext } from './DataGridSelection/useGridSelectionContext.js';
-import classes from './DataGridTable.module.css';
+import './DataGridTable.css';
 import { CellFormatter } from './Formatters/CellFormatter.js';
 import { TableDataContext } from './TableDataContext.js';
 import { useGridDragging } from './useGridDragging.js';
@@ -56,6 +55,7 @@ import { useGridSelectedCellsCopy } from './useGridSelectedCellsCopy.js';
 import { useTableData } from './useTableData.js';
 import { TableColumnHeader } from './TableColumnHeader/TableColumnHeader.js';
 import { TableIndexColumnHeader } from './TableColumnHeader/TableIndexColumnHeader.js';
+import { clsx } from '@dbeaver/ui-kit';
 
 const ROW_HEIGHT = 24;
 export const HEADER_HEIGHT = 32;
@@ -71,7 +71,6 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
   ...rest
 }) {
   const translate = useTranslate();
-  const styles = useS(classes);
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
   const dataGridDivRef = useRef<HTMLDivElement | null>(null);
   const focusedCell = useRef<ICellPosition | null>(null);
@@ -82,7 +81,8 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
   const viewAction = model.source.getAction(resultIndex, IDatabaseDataViewAction, GridViewAction);
 
   const tableData = useTableData(model as unknown as IDatabaseDataModel<ResultSetDataSource>, resultIndex, dataGridDivRef);
-  const gridSelectionContext = useGridSelectionContext(tableData, selectionAction);
+  const getHeaderOrder = useCallback(() => (dataGridRef.current?.getColumnsOrdered() ?? []).map(col => col.key), [dataGridRef]);
+  const gridSelectionContext = useGridSelectionContext(tableData, selectionAction, getHeaderOrder);
 
   const restoreFocus = useCallback(
     function restoreFocus() {
@@ -284,7 +284,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
       return '';
     }
 
-    return tableData.format.getText({ row, column });
+    return tableData.format.getText(tableData.format.get({ row, column }));
   }
 
   const cellText = useCreateGridReactiveValue(
@@ -300,11 +300,22 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
     return null;
   }
 
+  // Track pinnedColumns.size to trigger re-render when columns are pinned/unpinned
+  // This ensures the component re-renders when columns are pinned/unpinned
+  getComputed(() => viewAction.pinnedColumns.size);
+
   function getHeaderPinned(colIdx: number) {
     if (colIdx === 0) {
       return true;
     }
-    return false;
+
+    const column = tableData.getColumn(colIdx);
+
+    if (!column?.key) {
+      return false;
+    }
+
+    return viewAction.isColumnPinned(column.key);
   }
 
   function getHeaderResizable(colIdx: number) {
@@ -378,19 +389,33 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
     [tableData, model],
   );
 
-  function handleSort(colIdx: number, order: 'asc' | 'desc' | null, isMultiple: boolean) {
+  function getRowElement(rowIdx: number, props: HTMLAttributes<HTMLDivElement>, renderDefaultRow: IDataGridRowRenderer) {
+    const isFocused = getComputed(() => gridSelectionContext.getFocusedElementPosition()?.rowIdx === rowIdx);
+    return renderDefaultRow({ className: clsx(props.className, isFocused && 'rdg-row-custom-highlighted') });
+  }
+
+  const rowElement = useCreateGridReactiveValue(
+    getRowElement,
+    (onValueChange, rowIdx, props, renderDefaultRow) => reaction(() => getRowElement(rowIdx, props, renderDefaultRow), onValueChange),
+    [],
+  );
+
+  async function handleSort(colIdx: number, order: 'asc' | 'desc' | null, isMultiple: boolean) {
     const column = tableData.getColumn(colIdx)?.key;
     if (!column) {
       return;
     }
+
     const resultColumn = tableData.getColumnInfo(column);
-    if (!resultColumn) {
+
+    if (!resultColumn || model.isLoading()) {
       return;
     }
+
     const constraintsAction = model.source.tryGetAction(resultIndex, IDatabaseDataConstraintAction);
     const currentOrder = constraintsAction!.getOrder(resultColumn.position);
     const nextOrder = getNextOrder(currentOrder);
-    model.request(() => {
+    await model.request(() => {
       constraintsAction!.setOrder(resultColumn.position, nextOrder, isMultiple);
     });
   }
@@ -422,18 +447,18 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
       return false;
     }
 
-    if (tableData.format.isBinary(cell) || tableData.format.isGeometry(cell) || tableData.dataContent.isTextTruncated(cell)) {
+    const holder = tableData.getCellHolder(cell);
+    if (tableData.format.isBinary(holder) || tableData.format.isGeometry(holder) || tableData.dataContent.isTextTruncated(holder)) {
       return false;
     }
 
     const resultColumn = tableData.getColumnInfo(cell.column);
-    const value = tableData.getCellValue(cell);
 
-    if (!resultColumn || value === undefined) {
+    if (!resultColumn || holder.value === undefined) {
       return false;
     }
 
-    const handleByBooleanFormatter = isBooleanValuePresentationAvailable(value, resultColumn);
+    const handleByBooleanFormatter = isBooleanValuePresentationAvailable(holder.value, resultColumn);
 
     return !(handleByBooleanFormatter || tableData.isCellReadonly(cell));
   }
@@ -476,16 +501,17 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
             ref={setContainersRef}
             tabIndex={-1}
             {...rest}
-            className={s(styles, { container: true }, className)}
+            className={clsx('data-grid__container', 'theme-typography--caption', className)}
             onMouseDown={onMouseDownHandler}
             onMouseMove={onMouseMoveHandler}
           >
             <DataGrid
               ref={dataGridRef}
-              className={s(styles, { grid: true }, className)}
+              className={clsx('data-grid__grid', className)}
               cell={cell}
               cellText={cellText}
               cellElement={cellElement}
+              rowElement={rowElement}
               getCellEditable={isCellEditable}
               headerElement={headerElement}
               getHeaderHeight={() => headerHeight}
@@ -499,6 +525,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
               columnSortable={columnSortable}
               columnSortingState={columnSortingState}
               getRowId={rowIdx => (tableData.rows[rowIdx] ? GridDataKeysUtils.serialize(tableData.rows[rowIdx]) : '')}
+              columnSortingMultiple
               onFocus={handleFocusChange}
               onScrollToBottom={handleScrollToBottom}
               onColumnSort={handleSort}

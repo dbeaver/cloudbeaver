@@ -30,7 +30,6 @@ import io.cloudbeaver.service.sql.WebSQLConstants;
 import io.cloudbeaver.utils.CBModelConstants;
 import io.cloudbeaver.utils.WebDataSourceUtils;
 import io.cloudbeaver.utils.WebEventUtils;
-import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.jkiss.code.NotNull;
@@ -38,6 +37,7 @@ import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBFileController;
+import org.jkiss.dbeaver.model.DBPAdaptable;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.DBPEventListener;
 import org.jkiss.dbeaver.model.access.DBAAuthCredentials;
@@ -45,7 +45,6 @@ import org.jkiss.dbeaver.model.access.DBACredentialsProvider;
 import org.jkiss.dbeaver.model.auth.*;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.exec.DBCException;
-import org.jkiss.dbeaver.model.fs.DBFFileSystemManager;
 import org.jkiss.dbeaver.model.meta.Association;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.navigator.DBNModel;
@@ -61,13 +60,15 @@ import org.jkiss.dbeaver.model.websocket.event.MessageType;
 import org.jkiss.dbeaver.model.websocket.event.WSSessionLogUpdatedEvent;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.CommonUtils;
+import org.jkiss.utils.function.ThrowableConsumer;
+import org.jkiss.utils.function.ThrowableFunction;
 
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 /**
  * Web session.
@@ -75,16 +76,16 @@ import java.util.stream.Collectors;
  */
 //TODO: split to authenticated and non authenticated context
 public class WebSession extends BaseWebSession
-    implements SMSessionWithAuth, SMCredentialsProvider, DBACredentialsProvider, IAdaptable {
+    implements SMSessionWithAuth, SMCredentialsProvider, DBACredentialsProvider, DBPAdaptable {
 
     private static final Log log = Log.getLog(WebSession.class);
 
     public static final SMSessionType CB_SESSION_TYPE = new SMSessionType("CloudBeaver");
     private static final String WEB_SESSION_AUTH_CONTEXT_TYPE = "web-session";
-    private static final String ATTR_LOCALE = "locale";
     private static final AtomicInteger TASK_ID = new AtomicInteger();
 
     public static String RUNTIME_PARAM_AUTH_INFOS = "auth-infos";
+    public static String RUNTIME_PARAM_CLIENT_ORIGIN = "client-origin";
     private final AtomicInteger taskCount = new AtomicInteger();
 
     private final String lastRemoteAddr;
@@ -92,27 +93,29 @@ public class WebSession extends BaseWebSession
 
     private String locale;
     private boolean cacheExpired;
+    private String clientOrigin;
 
     protected WebSessionGlobalProjectImpl globalProject;
     private final List<WebServerMessage> sessionMessages = new ArrayList<>();
 
     private final Map<String, WebAsyncTaskInfo> asyncTasks = new HashMap<>();
-    private final Map<String, Function<Object, Object>> attributeDisposers = new HashMap<>();
+    private final Map<String, ThrowableConsumer<Object, Exception>> attributeDisposers = new HashMap<>();
 
     // Map of auth tokens. Key is authentication provider
     private final List<WebAuthInfo> authTokens = new ArrayList<>();
 
     private DBNModel navigatorModel;
     private final DBRProgressMonitor progressMonitor = new SessionProgressMonitor();
-    private final Map<String, DBWSessionHandler> sessionHandlers;
+    private final Map<String, DBWSessionHandler<WebSession>> sessionHandlers;
     private final WebDataSourceConnectEventListener connectListener = new WebDataSourceConnectEventListener(this);
 
     public WebSession(
         @NotNull WebHttpRequestInfo requestInfo,
         @NotNull ServletAuthApplication application,
-        @NotNull Map<String, DBWSessionHandler> sessionHandlers
+        @NotNull Map<String, DBWSessionHandler<WebSession>> sessionHandlers
     ) throws DBException {
-        this(requestInfo.getId(),
+        this(
+            Objects.requireNonNull(requestInfo.getId()),
             CommonUtils.toString(requestInfo.getLocale()),
             application,
             sessionHandlers,
@@ -125,8 +128,8 @@ public class WebSession extends BaseWebSession
         @NotNull String id,
         @Nullable String locale,
         @NotNull ServletApplication application,
-        @NotNull Map<String, DBWSessionHandler> sessionHandlers,
-        @NotNull String remoteAddr
+        @NotNull Map<String, DBWSessionHandler<WebSession>> sessionHandlers,
+        @Nullable String remoteAddr
     ) throws DBException {
         super(id, application);
         if (CommonUtils.isEmpty(remoteAddr)) {
@@ -151,7 +154,7 @@ public class WebSession extends BaseWebSession
             if (authTokens.isEmpty()) {
                 return null;
             }
-            return authTokens.get(0);
+            return authTokens.getFirst();
         }
     }
 
@@ -254,21 +257,31 @@ public class WebSession extends BaseWebSession
     }
 
     // Note: for admin use only
-    public synchronized void resetUserState() throws DBException {
+    public synchronized void resetUserState(boolean needResetUserCache) throws DBException {
         clearAuthTokens();
-        try {
-            resetSessionCache();
-        } catch (DBCException e) {
-            addSessionError(e);
-            log.error(e);
+        if (needResetUserCache) {
+            try {
+                resetSessionCache();
+            } catch (DBCException e) {
+                addSessionError(e);
+                log.error(e);
+            }
         }
         refreshUserData();
         clearSessionContext();
     }
 
+    public synchronized void resetUserState() throws DBException {
+        resetUserState(true);
+    }
+
     @NotNull
     public DBPEventListener getDataSourceConnectListener() {
         return connectListener;
+    }
+
+    public void updateClientOrigin(@NotNull String originFromRequest) {
+        this.clientOrigin = originFromRequest;
     }
 
     private void initNavigatorModel() {
@@ -309,7 +322,7 @@ public class WebSession extends BaseWebSession
                 anonymousProject.setInMemory(true);
             }
             if (workspace.getActiveProject() == null && !workspace.getProjects().isEmpty()) {
-                workspace.setActiveProject(workspace.getProjects().get(0));
+                workspace.setActiveProject(workspace.getProjects().getFirst());
             }
         } catch (DBException e) {
             addSessionError(e);
@@ -324,7 +337,6 @@ public class WebSession extends BaseWebSession
         } else {
             sessionProject = createSessionProject(project);
         }
-        sessionProject.refreshProjectSettings();
         // do not load data sources for anonymous project
         if (project.getType() == RMProjectType.USER && userContext.getUser() == null) {
             sessionProject.setInMemory(true);
@@ -333,10 +345,6 @@ public class WebSession extends BaseWebSession
         if (!project.isShared() || application.isConfigurationMode()) {
             getWorkspace().setActiveProject(sessionProject);
         }
-        log.info(String.format(
-            "Project created: [ID=%s, Name=%s, Type=%s, Creator=%s]",
-            project.getId(), project.getName(), project.getType(), project.getCreator()
-        ));
         return sessionProject;
     }
 
@@ -358,9 +366,14 @@ public class WebSession extends BaseWebSession
     private void resetSessionCache() throws DBCException {
         // Clear attributes
         synchronized (attributes) {
-            for (Map.Entry<String, Function<Object, Object>> attrDisposer : attributeDisposers.entrySet()) {
+            for (Map.Entry<String, ThrowableConsumer<Object, Exception>> attrDisposer : attributeDisposers.entrySet()) {
                 Object attrValue = attributes.get(attrDisposer.getKey());
-                attrDisposer.getValue().apply(attrValue);
+
+                try {
+                    attrDisposer.getValue().accept(attrValue);
+                } catch (Exception e) {
+                    log.error("Error disposing attribute '" + attrDisposer.getKey() + "'", e);
+                }
             }
             attributeDisposers.clear();
             // Remove all non-persistent attributes
@@ -440,7 +453,7 @@ public class WebSession extends BaseWebSession
     }
 
     public synchronized void updateInfo(boolean isOldHttpSessionUsed) {
-        log.debug("Update session lifetime " + getSessionId() + " for user " + getUserId());
+        log.trace("Update session lifetime " + getSessionId() + " for user " + getUserId());
         touchSession();
         if (isOldHttpSessionUsed) {
             try {
@@ -559,6 +572,10 @@ public class WebSession extends BaseWebSession
         if (job instanceof CustomCancelableJob cancelableJob) {
             cancelableJob.cancelJob(this, taskInfo);
         }
+        CompletableFuture<?> future = getAttribute(getTaskConfirmationAttributeName(taskId));
+        if (future != null) {
+            future.cancel(false);
+        }
         if (job != null) {
             job.cancel();
         }
@@ -568,8 +585,7 @@ public class WebSession extends BaseWebSession
 
     public WebAsyncTaskInfo createAsyncTask(@NotNull String taskName) {
         int taskId = TASK_ID.incrementAndGet();
-        WebAsyncTaskInfo asyncTask = getAsyncTask(String.valueOf(taskId), taskName, true);
-        return asyncTask;
+        return getAsyncTask(String.valueOf(taskId), taskName, true);
     }
 
     public List<WebAsyncTaskInfo> findTasksByJob(@NotNull Class<? extends AbstractJob> jobClass) {
@@ -586,10 +602,14 @@ public class WebSession extends BaseWebSession
 
     public WebAsyncTaskInfo createAndRunAsyncTask(@NotNull String taskName, @NotNull WebAsyncTaskProcessor<?> runnable) {
         WebAsyncTaskInfo asyncTask = createAsyncTask(taskName);
+        return runAsyncTask(asyncTask, runnable);
+    }
 
-        AbstractJob job = new AbstractJob(taskName) {
+    public WebAsyncTaskInfo runAsyncTask(@NotNull WebAsyncTaskInfo asyncTask, @NotNull WebAsyncTaskProcessor<?> runnable) {
+        AbstractJob job = new AbstractJob(asyncTask.getName()) {
+            @NotNull
             @Override
-            protected IStatus run(DBRProgressMonitor monitor) {
+            protected IStatus run(@NotNull DBRProgressMonitor monitor) {
                 int curTaskCount = taskCount.incrementAndGet();
 
                 DBRProgressMonitor taskMonitor = new TaskProgressMonitor(monitor, WebSession.this, asyncTask);
@@ -684,7 +704,11 @@ public class WebSession extends BaseWebSession
         }
     }
 
-    public <T> T getAttribute(String name, Function<T, T> creator, Function<T, T> disposer) {
+    public <T, E extends Exception> T getAttribute(
+        String name,
+        ThrowableFunction<String, T, E> creator,
+        ThrowableConsumer<T, E> disposer
+    ) throws E {
         synchronized (attributes) {
             Object value = attributes.get(name);
             if (value instanceof PersistentAttribute persistentAttribute) {
@@ -695,7 +719,7 @@ public class WebSession extends BaseWebSession
                 if (value != null) {
                     attributes.put(name, value);
                     if (disposer != null) {
-                        attributeDisposers.put(name, (Function<Object, Object>) disposer);
+                        attributeDisposers.put(name, (ThrowableConsumer<Object, Exception>) disposer);
                     }
                 }
             }
@@ -720,7 +744,7 @@ public class WebSession extends BaseWebSession
                 }
                 return null;
             }
-            return authTokens.isEmpty() ? null : authTokens.get(0);
+            return authTokens.isEmpty() ? null : authTokens.getFirst();
         }
     }
 
@@ -763,10 +787,7 @@ public class WebSession extends BaseWebSession
             if (oldAuthInfo != null) {
                 removeAuthInfo(oldAuthInfo);
             }
-            SMSession authSession = authInfo.getAuthSession();
-            if (authSession != null) {
-                getSessionContext().addSession(authSession);
-            }
+            getSessionContext().addSession(authInfo.getAuthSession());
         }
         synchronized (authTokens) {
             Collections.addAll(authTokens, tokens);
@@ -830,6 +851,7 @@ public class WebSession extends BaseWebSession
                 contextCredentialsProvider.provideAuthParameters(monitor, dataSourceContainer, configuration);
             }
             configuration.setRuntimeAttribute(RUNTIME_PARAM_AUTH_INFOS, getAllAuthInfo());
+            configuration.setRuntimeAttribute(RUNTIME_PARAM_CLIENT_ORIGIN, this.clientOrigin);
 
             WebSessionProjectImpl project = getProjectById(dataSourceContainer.getProject().getId());
             if (project != null) {
@@ -842,7 +864,7 @@ public class WebSession extends BaseWebSession
             // uncommented because we had the problem with non-native auth models
             // (for example, can't connect to DynamoDB if credentials are not saved)
             DBAAuthCredentials credentials = configuration.getAuthModel().loadCredentials(dataSourceContainer, configuration);
-            WebDataSourceUtils.updateCredentialsFromProperties(credentials, configuration.getAuthProperties());
+            WebDataSourceUtils.updateCredentialsFromProperties(this.progressMonitor, credentials, configuration.getAuthProperties());
 
             configuration.getAuthModel().provideCredentials(dataSourceContainer, configuration, credentials);
         } catch (DBException e) {
@@ -860,7 +882,7 @@ public class WebSession extends BaseWebSession
 
     // May be called to extract auth information from session
     @Override
-    public <T> T getAdapter(Class<T> adapter) {
+    public <T> T getAdapter(@NotNull Class<T> adapter) {
         synchronized (authTokens) {
             for (WebAuthInfo authInfo : authTokens) {
                 if (isAuthInfoInstanceOf(authInfo, adapter)) {
@@ -882,7 +904,7 @@ public class WebSession extends BaseWebSession
     }
 
     private <T> boolean isAuthInfoInstanceOf(WebAuthInfo authInfo, Class<T> adapter) {
-        if (authInfo != null && authInfo.getAuthSession() != null) {
+        if (authInfo != null) {
             return adapter.isInstance(authInfo.getAuthSession());
         }
         return false;
@@ -1001,15 +1023,6 @@ public class WebSession extends BaseWebSession
     }
 
     @NotNull
-    public DBFFileSystemManager getFileSystemManager(String projectId) throws DBException {
-        var project = getProjectById(projectId);
-        if (project == null) {
-            throw new DBException("Project not found: " + projectId);
-        }
-        return project.getFileSystemManager();
-    }
-
-    @NotNull
     public WebSessionPreferenceStore getUserPreferenceStore() {
         return getUserContext().getPreferenceStore();
     }
@@ -1019,14 +1032,50 @@ public class WebSession extends BaseWebSession
         return globalProject;
     }
 
+    public void handleTaskConfirmation(
+        @NotNull String taskId,
+        boolean confirmed,
+        boolean skipConfirmations
+    ) {
+        String attributeName = getTaskConfirmationAttributeName(taskId);
+        if (confirmed && skipConfirmations) {
+            setAttribute(WebSQLConstants.SKIP_TASK_CONFIRMATIONS_ATTR, Boolean.TRUE);
+        }
+
+        CompletableFuture<Boolean> confirmationFuture = getAttribute(attributeName);
+        if (confirmationFuture != null) {
+            confirmationFuture.complete(confirmed);
+            removeAttribute(attributeName);
+        } else {
+            log.error("Received unexpected confirmation event for taskId: " + taskId);
+        }
+    }
+
+
+    public void handleTaskConfirmationWithParameters(@NotNull String taskId, @NotNull Map<String, Object> parameters) {
+        String attributeName = getTaskConfirmationAttributeName(taskId);
+        CompletableFuture<Map<String, Object>> confirmationFuture = getAttribute(attributeName);
+        if (confirmationFuture != null) {
+            confirmationFuture.complete(parameters);
+            removeAttribute(attributeName);
+        } else {
+            log.error("Received unexpected confirmation event for taskId: " + taskId);
+        }
+    }
+
+    @NotNull
+    private String getTaskConfirmationAttributeName(@NotNull String taskId) {
+        return WebSQLConstants.TASK_CONFIRMATION_ATTR_PREFIX + taskId;
+    }
+
     private class SessionProgressMonitor extends BaseProgressMonitor {
         @Override
-        public void beginTask(String name, int totalWork) {
+        public void beginTask(@NotNull String name, int totalWork) {
             addInfoMessage(name);
         }
 
         @Override
-        public void subTask(String name) {
+        public void subTask(@NotNull String name) {
             addInfoMessage(name);
         }
     }

@@ -136,15 +136,15 @@ export const GISValuePresentation = observer<Props>(function GISValuePresentatio
           continue;
         }
 
-        const value = view.getCellValue({ ...cell, column });
+        const cellHolder = view.getCellHolder({ ...cell, column });
         //TODO: fix column info abstraction
         const columnInfo = view.getColumn(column) as SqlResultColumn | undefined;
 
-        if (value && columnInfo?.name) {
+        if (cellHolder.value && columnInfo?.name) {
           values.push({
             key: columnInfo.name,
             // TODO: fix value abstraction
-            value: value as IResultSetValue,
+            value: cellHolder.value as IResultSetValue,
           });
         }
       }

@@ -13,7 +13,8 @@
     "react": "^19",
     "react-dom": "^19",
     "mobx": "^6",
-    "mobx-react-lite": "^4"
+    "mobx-react-lite": "^4",
+    "glob": "^13"
   },
   "scripts": {
     "test": "dbeaver-test",
@@ -52,7 +53,7 @@
     "rimraf": "^6",
     "typescript": "^5.8.3",
     "typescript-plugin-css-modules": "^5",
-    "vitest": "^3"
+    "vitest": "^4"
   },
   "packageManager": "yarn@4.9.2"
 }

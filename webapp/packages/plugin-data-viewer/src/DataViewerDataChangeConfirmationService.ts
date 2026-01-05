@@ -53,20 +53,22 @@ export class DataViewerDataChangeConfirmationService {
             if (confirmationContext.confirmed) {
               await model.save();
             } else {
-              const result = await this.commonDialogService.open(ConfirmationDialog, {
+              const { status, result } = await this.commonDialogService.open(ConfirmationDialog, {
                 title: 'data_viewer_result_edited_title',
                 subTitle: model.name || undefined,
                 message: 'data_viewer_result_edited_message',
                 confirmActionText: 'ui_yes',
-                extraStatus: 'no',
+                showExtraAction: true,
               });
 
-              if (result === DialogueStateResult.Rejected) {
-                ExecutorInterrupter.interrupt(contexts);
-              } else if (result === DialogueStateResult.Resolved) {
+              if (status === DialogueStateResult.Resolved) {
                 await model.save();
               } else {
-                editor.clear();
+                if (result?.isExtraAction) {
+                  editor.clear();
+                } else {
+                  ExecutorInterrupter.interrupt(contexts);
+                }
               }
             }
           }

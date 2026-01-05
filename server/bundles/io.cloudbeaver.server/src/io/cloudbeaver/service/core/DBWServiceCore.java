@@ -16,10 +16,7 @@
  */
 package io.cloudbeaver.service.core;
 
-import io.cloudbeaver.DBWebException;
-import io.cloudbeaver.WebAction;
-import io.cloudbeaver.WebObjectId;
-import io.cloudbeaver.WebProjectAction;
+import io.cloudbeaver.*;
 import io.cloudbeaver.model.*;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.service.DBWService;
@@ -27,8 +24,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
-import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.model.rm.RMConstants;
+import org.jkiss.dbeaver.registry.DataSourceNavigatorSettings;
 import org.jkiss.dbeaver.registry.settings.ProductSettingDescriptor;
 
 import java.util.List;
@@ -119,7 +116,7 @@ public interface DBWServiceCore extends DBWService {
         @NotNull WebSession webSession,
         @Nullable String projectId,
         @NotNull String connectionId,
-        @Nullable Map<String, Object> authProperties,
+        @WebParameterSecure @Nullable Map<String, Object> authProperties,
         @Nullable List<WebNetworkHandlerConfigInput> networkCredentials,
         boolean saveCredentials,
         boolean sharedCredentials,
@@ -130,7 +127,7 @@ public interface DBWServiceCore extends DBWService {
     WebConnectionInfo createConnection(
         @NotNull WebSession webSession,
         @Nullable @WebObjectId String projectId,
-        @NotNull Map<String, Object> connectionConfig
+        @WebParameterSecure @NotNull Map<String, Object> connectionConfig
     ) throws DBWebException;
 
     @WebProjectAction(requireProjectPermissions = {RMConstants.PERMISSION_PROJECT_DATASOURCES_EDIT})
@@ -203,7 +200,18 @@ public interface DBWServiceCore extends DBWService {
 
     @WebAction
     WebConnectionInfo setConnectionNavigatorSettings(
-        WebSession webSession, @Nullable String projectId, String id, DBNBrowseSettings settings) throws DBWebException;
+        @NotNull WebSession webSession,
+        @Nullable String projectId,
+        @NotNull String id,
+        @NotNull DataSourceNavigatorSettings settings
+    ) throws DBWebException;
+
+    @WebAction
+    WebConnectionInfo clearConnectionNavigatorSettings(
+        @NotNull WebSession webSession,
+        @NotNull String projectId,
+        @NotNull String id
+    ) throws DBWebException;
 
     ///////////////////////////////////////////
     // Async tasks

@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ export const VersionChecker = observer(function VersionChecker() {
   const versionService = useService(VersionService);
   const versionResource = useService(VersionResource);
 
-  const icon = versionUpdateService.newVersionAvailable ? '/icons/info_icon.svg' : '/icons/success_icon.svg';
+  const icon = versionUpdateService.newVersionAvailable ? '/icons/preload/info_icon.svg' : '/icons/preload/success_icon.svg';
   const text = versionUpdateService.newVersionAvailable ? 'version_update_new_version_available' : 'version_update_version_is_up_to_date';
   const description =
     versionService.current && versionResource.latest

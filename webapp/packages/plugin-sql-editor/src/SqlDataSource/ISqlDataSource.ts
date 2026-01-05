@@ -13,6 +13,7 @@ import type { IDatabaseDataModel } from '@cloudbeaver/plugin-data-viewer';
 import type { QueryDataSource } from '../QueryDataSource.js';
 import type { ESqlDataSourceFeatures } from './ESqlDataSourceFeatures.js';
 import type { ISqlDataSourceHistory } from './SqlDataSourceHistory/ISqlDataSourceHistory.js';
+import type { TLocalizationToken } from '@cloudbeaver/core-localization';
 
 export interface ISqlDataSourceKey {
   readonly key: string;
@@ -33,7 +34,8 @@ export interface ISqlDataSource<TDataSource extends QueryDataSource = QueryDataS
   readonly name: string | null;
   readonly icon?: string;
   readonly emptyPlaceholder?: string;
-  readonly message?: string;
+  readonly message?: TLocalizationToken;
+  readonly loadingMessage?: TLocalizationToken;
 
   readonly sourceKey: string;
   readonly projectId: string | null;

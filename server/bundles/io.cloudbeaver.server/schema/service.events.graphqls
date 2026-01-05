@@ -69,6 +69,14 @@ enum CBServerEventId {
     cb_workspace_config_changed @since(version: "25.1.1"),
     "Server notification"
     cb_server_notification@since(version: "25.2.1")
+
+    "Session task confirmations"
+    cb_session_task_confirmation_request @since(version: "25.2.2")
+    cb_session_task_query_confirmation_request @since(version: "25.2.2")
+    cb_session_task_query_params_confirmation_request @since(version: "25.2.5")
+
+    "Open URL request in client"
+    cb_open_url @since(version: "25.3.1")
 }
 
 "Events sent by client"
@@ -76,7 +84,9 @@ enum CBClientEventId {
     cb_client_topic_subscribe,
     cb_client_topic_unsubscribe,
     cb_client_projects_active,
-    cb_client_session_ping
+    cb_client_session_ping,
+    cb_client_session_task_confirmation @since(version: "25.2.2")
+    cb_client_session_task_with_parameters_confirmation @since(version: "25.2.5")
 }
 
 "Client subscribes on topic to receive only related events"
@@ -101,6 +111,7 @@ enum CBEventTopic {
     cb_workspace_configuration @since(version: "25.1.1")
     cb_ai @since(version: "25.1.1")
     cb_notification @since(version: "25.2.1")
+    cb_session_action @since(version: "25.3.1")
 }
 
 "Base server event interface"
@@ -292,6 +303,55 @@ type WSServerNotificationEvent implements CBServerEvent @since(version: "25.2.1"
     title: String
     message: String
     notificationType: WSServerNotificationEventType!
+}
+
+"Event for opening URL in client application"
+type WSOpenUrlEvent implements CBServerEvent @since(version: "25.3.1") {
+    id: CBServerEventId!
+    topicId: CBEventTopic!
+    url: String!
+}
+
+type WSSessionTaskConfirmationRequestEvent implements CBServerEvent @since(version: "25.2.2") {
+    id: CBServerEventId!
+    topicId: CBEventTopic!
+    taskId: ID!
+    title: String!
+    message: String!
+}
+
+type WSSessionTaskQueryConfirmationRequestEvent implements CBServerEvent @since(version: "25.2.2") {
+    id: CBServerEventId!
+    topicId: CBEventTopic!
+    taskId: ID!
+    title: String!
+    message: String!
+    query: String!
+}
+
+type WSSessionTaskConfirmationEvent implements CBClientEvent @since(version: "25.2.2") {
+    id: CBClientEventId!
+    topicId: CBEventTopic
+    taskId: ID!
+    confirmed: Boolean!
+    skipConfirmations: Boolean!
+}
+
+type WSSessionTaskQueryParamsConfirmationEvent implements CBServerEvent @since(version: "25.2.5") {
+    id: CBServerEventId!
+    topicId: CBEventTopic!
+    taskId: ID!
+    title: String!
+    message: String!
+    query: String!
+    parameters: Object!
+}
+
+type WSSessionTaskWithParametersConfirmationEvent implements CBClientEvent @since(version: "25.2.5") {
+    id: CBClientEventId!
+    topicId: CBEventTopic
+    taskId: ID!
+    parameters: Object!
 }
 
 extend type Query {

@@ -14,8 +14,11 @@ export * from './ContextMenu/ContextMenuLazy.js';
 export * from './ContextMenu/IContextMenuItemProps.js';
 export * from './ContextMenu/MenuBar/MenuBarLazy.js';
 export * from './ContextMenu/MenuBar/MenuBarItemLoader.js';
+export * from './ContextMenu/MenuActionElement.js';
+export * from './ContextMenu/MenuContext.js';
 export { default as MenuBarStyles } from './ContextMenu/MenuBar/MenuBar.module.css';
 export { default as MenuBarItemStyles } from './ContextMenu/MenuBar/MenuBarItem.module.css';
+export { default as MenuBarGroupStyles } from './ContextMenu/MenuBar/MenuBarGroup.module.css';
 
 export * from './DragAndDrop/DND_ELEMENT_TYPE.js';
 export * from './DragAndDrop/DND_NATIVE_TYPE.js';
@@ -48,6 +51,7 @@ export * from './Screens/AppScreen/OptionsPanelService.js';
 
 export * from './Tabs/ITab.js';
 export * from './Tabs/TabContext.js';
+export * from './Tabs/useTabDragAndDrop.js';
 export * from './Tabs/TabListLoader.js';
 export * from './Tabs/TabPanelLoader.js';
 export * from './Tabs/TabPanelListLoader.js';
@@ -58,6 +62,8 @@ export * from './Tabs/TabsContext.js';
 export * from './Tabs/TabsStateLoader.js';
 export * from './Tabs/useTabState.js';
 export * from './Tabs/useTabLocalState.js';
+export * from './Tabs/useTabOrderPersistence.js';
+export * from './Tabs/useTabPersistence.js';
 export { default as TabStyles } from './Tabs/Tab/Tab.module.css';
 export { default as TabTitleStyles } from './Tabs/Tab/TabTitle.module.css';
 export { default as TabVerticalRotatedStyles } from './Tabs/Tab/TabVerticalRotated.module.css';
@@ -92,3 +98,5 @@ export * from './SideBarPanel/SideBarPanelLoader.js';
 export * from './SideBarPanel/SideBarPanelService.js';
 
 export * from './Screens/AppScreen/BaseOptionsPanelService.js';
+export * from './ContextMenu/ContextMenuSearch/ContextMenuSearchItem.js';
+export * from './ContextMenu/ContextMenuSearch/DATA_CONTEXT_MENU_SEARCH.js';

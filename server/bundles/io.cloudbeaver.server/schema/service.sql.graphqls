@@ -158,8 +158,6 @@ type SQLExecuteInfo {
     duration: Int!
     # Actual conditions applied to query
     filterText: String
-#    # original sql query without SQLDataFilter
-#    originalQuery: String
     # Full query that was executed, contains all used filters
     fullQuery: String
     # Results
@@ -339,7 +337,21 @@ extend type Query {
         columnNames: [String!],
         functions: [String!],
         showDuplicatesOnly: Boolean
-    ): String!
+    ): String! @deprecated (reason: "use sqlGropingResultSet (25.3.1)")
+
+    "Creates async task to get grouped SQL results"
+    sqlGropingResultSet(
+        projectId: ID,
+        contextId: ID!,
+        connectionId: ID!,
+        resultsId: ID!,
+        columnNames: [String!],
+        functions: [String!],
+        showDuplicatesOnly: Boolean,
+        filter: SQLDataFilter,
+        dataFormat: ResultDataFormat,
+        isInteractive: Boolean
+    ): AsyncTaskInfo! @since(version: "25.3.1")
 }
 
 extend type Mutation {
@@ -362,6 +374,7 @@ extend type Mutation {
         filter: SQLDataFilter,
         dataFormat: ResultDataFormat,   # requested data format. May be ignored by server
         readLogs: Boolean               # added 23.2.1
+        isInteractive: Boolean          # Support WS events requested by server, e.g. confirmations. Added in 23.2.3
     ): AsyncTaskInfo!
 
     "Creates async task for reading data from the container node"

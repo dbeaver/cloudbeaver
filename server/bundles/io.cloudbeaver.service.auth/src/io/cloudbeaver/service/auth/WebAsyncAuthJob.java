@@ -46,8 +46,9 @@ public class WebAsyncAuthJob extends AbstractJob implements CustomCancelableJob 
     }
 
     //do nothing, this job is workaround to use exist async process
+    @NotNull
     @Override
-    protected IStatus run(DBRProgressMonitor monitor) {
+    protected IStatus run(@NotNull DBRProgressMonitor monitor) {
         return null;
     }
 
@@ -71,8 +72,13 @@ public class WebAsyncAuthJob extends AbstractJob implements CustomCancelableJob 
 
     @Override
     public void cancelJob(@NotNull WebSession webSession, @NotNull WebAsyncTaskInfo taskInfo) {
+        cancelJob(webSession, taskInfo, "Canceled by the user");
+    }
+
+    public void cancelJob(@NotNull WebSession webSession, @NotNull WebAsyncTaskInfo taskInfo, @NotNull String errorMessage) {
         taskInfo.setRunning(false);
-        taskInfo.setJobError(new DBException("Canceled by the user"));
+        taskInfo.setJobError(new DBException(errorMessage));
         WebEventUtils.sendAsyncTaskEvent(webSession, taskInfo);
     }
+
 }

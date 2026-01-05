@@ -9,7 +9,6 @@ import { observer } from 'mobx-react-lite';
 
 import { Container, ObjectPropertyInfoForm, type ILayoutSizeProps } from '@cloudbeaver/core-blocks';
 import { getObjectPropertyType, type ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
-import { isSafari } from '@cloudbeaver/core-utils';
 
 interface Props {
   credentials?: Record<string, any>;
@@ -34,20 +33,20 @@ export const ConnectionAuthModelCredentialsForm = observer<Props>(function Conne
     }
 
     return {
-      tiny: true,
+      fill: true,
     };
   }
 
   return (
     <Container wrap gap hideEmpty>
       <ObjectPropertyInfoForm
-        autofillToken={isSafari ? 'section-connection-authentication section-secrets' : 'new-password'}
+        autocompleteSectionName="section-connection-authentication"
         properties={properties}
         state={credentials}
         defaultState={defaultCredentials}
         disabled={disabled}
         readOnly={readonly}
-        geLayoutSize={getLayoutSize}
+        getLayoutSize={getLayoutSize}
         showRememberTip
         hideEmptyPlaceholder
       />

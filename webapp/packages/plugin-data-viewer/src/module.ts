@@ -8,7 +8,6 @@
 
 import { Bootstrap, conditional, Dependency, external, ModuleRegistry, proxy } from '@cloudbeaver/core-di';
 import { TextValuePresentationBootstrap } from './ValuePanelPresentation/TextValue/TextValuePresentationBootstrap.js';
-import { TextValuePresentationService } from './ValuePanelPresentation/TextValue/TextValuePresentationService.js';
 import { ImageValuePresentationBootstrap } from './ValuePanelPresentation/ImageValue/ImageValuePresentationBootstrap.js';
 import { BooleanValuePresentationBootstrap } from './ValuePanelPresentation/BooleanValue/BooleanValuePresentationBootstrap.js';
 import { TableViewerStorageService } from './TableViewer/TableViewerStorageService.js';
@@ -72,7 +71,6 @@ export default ModuleRegistry.add({
       .addSingleton(Dependency, proxy(DataViewerSettingsService))
       .addSingleton(DataPresentationService)
       .addSingleton(TextValuePresentationBootstrap)
-      .addSingleton(TextValuePresentationService)
       .addSingleton(ImageValuePresentationBootstrap)
       .addSingleton(BooleanValuePresentationBootstrap)
       .addSingleton(TableViewerStorageService)

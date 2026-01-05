@@ -39,7 +39,7 @@ export default [
   ['administration_configuration_wizard_configuration_supported_hosts', 'Allowed Server URLs'],
   [
     'administration_configuration_wizard_configuration_supported_hosts_description',
-    'You can specify multiple server URLs separated by a new line. An empty value means that all URLs are allowed',
+    'You can specify multiple server URLs separated by a new line. An empty value means that all URLs are allowed. Access from the IP-addresses is always allowed.',
   ],
   [
     'administration_configuration_wizard_configuration_supported_hosts_warning',

@@ -20,7 +20,9 @@ export const QueryDetailsDialog: DialogComponent<IPayload> = observer(function Q
   const translate = useTranslate();
   const sqlDialect = useSqlDialectExtension(undefined);
   const extensions = useCodemirrorExtensions();
-  extensions.set(...sqlDialect);
+  if (sqlDialect) {
+    extensions.set(...sqlDialect);
+  }
 
   return (
     <CommonDialogWrapper size="large" fixedWidth>
@@ -29,7 +31,7 @@ export const QueryDetailsDialog: DialogComponent<IPayload> = observer(function Q
         <SQLCodeEditorLoader value={props.payload.text} extensions={extensions} readonly />
       </CommonDialogBody>
       <CommonDialogFooter>
-        <Button variant="secondary" onClick={props.rejectDialog}>
+        <Button variant="secondary" onClick={() => props.rejectDialog()}>
           {translate('ui_stepper_back')}
         </Button>
       </CommonDialogFooter>

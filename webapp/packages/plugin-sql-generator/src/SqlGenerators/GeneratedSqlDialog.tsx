@@ -77,7 +77,9 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<Payload>>(functi
   const sqlDialect = useSqlDialectExtension(connectionDialectResource.data);
 
   const extensions = useCodemirrorExtensions();
-  extensions.set(...sqlDialect);
+  if (sqlDialect) {
+    extensions.set(...sqlDialect);
+  }
   const error = useErrorDetails(state.error.exception);
 
   useEffect(() => {
@@ -108,7 +110,7 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<Payload>>(functi
             <Button variant="secondary" onClick={() => copy(state.query, true)}>
               {translate('ui_copy_to_clipboard')}
             </Button>
-            <Button onClick={rejectDialog}>{translate('ui_close')}</Button>
+            <Button onClick={() => rejectDialog()}>{translate('ui_close')}</Button>
           </div>
         </div>
       </CommonDialogFooter>

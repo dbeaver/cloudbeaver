@@ -28,7 +28,7 @@ import { ConnectionInfoResource, createConnectionParam, type Connection } from '
 import { promptForFiles } from '@cloudbeaver/core-browser';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
-import { importLazyComponent } from '@cloudbeaver/core-blocks';
+import { ConfirmationDialog } from '@cloudbeaver/core-blocks';
 
 import { ACTION_SQL_EDITOR_EXECUTE } from './actions/ACTION_SQL_EDITOR_EXECUTE.js';
 import { ACTION_SQL_EDITOR_EXECUTE_NEW } from './actions/ACTION_SQL_EDITOR_EXECUTE_NEW.js';
@@ -53,7 +53,6 @@ import { SqlEditorSettingsService } from './SqlEditorSettingsService.js';
 
 const SYNC_DELAY = 5 * 60 * 1000;
 
-const ScriptImportDialog = importLazyComponent(() => import('./SqlEditor/ScriptImportDialog.js').then(m => m.ScriptImportDialog));
 const EXECUTIONS_ACTIONS = [
   ACTION_SQL_EDITOR_EXECUTE,
   ACTION_SQL_EDITOR_EXECUTE_NEW,
@@ -382,7 +381,7 @@ export class MenuBootstrap extends Bootstrap {
         data.executeQuery();
         break;
       case ACTION_SQL_EDITOR_EXECUTE_NEW:
-        data.executeQueryNewTab();
+        data.executeQuery(true);
         break;
       case ACTION_SQL_EDITOR_EXECUTE_SCRIPT:
         data.executeScript();
@@ -465,14 +464,19 @@ export class MenuBootstrap extends Bootstrap {
 
     const prevScript = dataSource.script.trim();
     if (prevScript) {
-      const result = await this.commonDialogService.open(ScriptImportDialog, null);
+      const payload = {
+        title: 'ui_changes_might_be_lost',
+        message: 'sql_editor_upload_script_unsaved_changes_dialog_message',
+        showExtraAction: true,
+        confirmActionText: 'ui_yes',
+      };
 
-      if (result === DialogueStateResult.Rejected) {
-        return;
-      }
+      const { status, result } = await this.commonDialogService.open(ConfirmationDialog, payload);
 
-      if (result !== DialogueStateResult.Resolved && result) {
+      if (status === DialogueStateResult.Resolved) {
         this.downloadSql(state);
+      } else if (!result?.isExtraAction) {
+        return;
       }
     }
 

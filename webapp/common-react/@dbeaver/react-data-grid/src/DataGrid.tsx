@@ -14,6 +14,7 @@ import {
   type DataGridHandle,
   type ColumnWidth,
   type ColumnWidths,
+  type CalculatedColumn,
 } from 'react-data-grid';
 import { rowRenderer } from './renderers/rowRenderer.js';
 import { cellRenderer } from './renderers/cellRenderer.js';
@@ -27,7 +28,7 @@ import { mapRenderHeaderCell } from './mapRenderHeaderCell.js';
 import { mapEditCellRenderer } from './mapEditCellRenderer.js';
 import { DataGridRowContext, type IDataGridRowContext } from './DataGridRowContext.js';
 import './DataGrid.css';
-import { HeaderDnDContext, useHeaderDnD } from './useHeaderDnD.js';
+import { HeaderDnDContext, isColumn, useHeaderDnD } from './useHeaderDnD.js';
 
 export interface ICellPosition {
   rowIdx: number;
@@ -42,6 +43,7 @@ export interface DataGridCellKeyboardEvent extends React.KeyboardEvent<HTMLDivEl
 export interface DataGridProps extends IDataGridCellContext, IDataGridRowContext, IDataGridHeaderCellContext, React.PropsWithChildren {
   getRowHeight?: (rowIdx: number) => number;
   getRowId?: (rowIdx: number) => React.Key;
+  getRowClass?: (rowIdx: number) => string | null;
   columnCount: IGridReactiveValue<number, []>;
   getColumnKey?: (colIdx: number) => string;
   onScroll?: (event: React.UIEvent<HTMLDivElement>) => void;
@@ -55,6 +57,7 @@ export interface DataGridRef {
   selectCell: (position: ICellPosition) => void;
   scrollToCell: (position: Partial<ICellPosition>) => void;
   openEditor: (position: ICellPosition) => void;
+  getColumnsOrdered: () => readonly CalculatedColumn<IInnerRow, unknown>[];
 }
 
 const MAX_AUTO_SIZE_WIDTH = 350;
@@ -78,9 +81,12 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
     getCellEditable,
     columnCount,
     getColumnKey,
+    rowElement,
     rowCount,
+    columnSortingMultiple,
     getRowId,
     getRowHeight,
+    getRowClass,
     onHeaderReorder,
     onScroll,
     onScrollToBottom,
@@ -99,7 +105,7 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
   const columnsCount = useGridReactiveValue(columnCount);
 
   const rowsCountRef = useRef(rowsCount);
-  const innerGridRef = useRef<DataGridHandle>(null);
+  const innerGridRef = useRef<DataGridHandle<IInnerRow, unknown>>(null);
   const columns = new Array<ColumnOrColumnGroup<IInnerRow, unknown>>(columnsCount)
     .fill(null as any)
     .map((_, i): ColumnOrColumnGroup<IInnerRow, unknown> => {
@@ -120,21 +126,49 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
 
   const dndHeaderContext = useHeaderDnD({ columns, onReorder: onHeaderReorder, getCanDrag: getHeaderDnD, getHeaderOrder });
 
+  function mapPositionToColumnKey(position: ICellPosition): string | null {
+    const colIdx = dndHeaderContext.getDataColIdx(position.colIdx);
+    const columnOrGroup = columns[colIdx];
+
+    if (!columnOrGroup) {
+      return null;
+    }
+
+    if (isColumn(columnOrGroup)) {
+      return columnOrGroup.key;
+    }
+
+    return null;
+  }
+
   useImperativeHandle(ref, () => ({
     selectCell: (position: ICellPosition) => {
-      innerGridRef.current?.selectCell({ idx: dndHeaderContext.getDataColIdx(position.colIdx), rowIdx: position.rowIdx });
+      const columnKey = mapPositionToColumnKey(position);
+
+      if (!columnKey) {
+        return;
+      }
+
+      innerGridRef.current?.selectCellByKey({ columnKey, rowIdx: position.rowIdx });
     },
     scrollToCell: (position: Partial<ICellPosition>) => {
       innerGridRef.current?.scrollToCell({ idx: position.colIdx && dndHeaderContext.getDataColIdx(position.colIdx), rowIdx: position.rowIdx });
     },
     openEditor: (position: ICellPosition) => {
-      innerGridRef.current?.selectCell(
-        { idx: dndHeaderContext.getDataColIdx(position.colIdx), rowIdx: position.rowIdx },
+      const columnKey = mapPositionToColumnKey(position);
+
+      if (!columnKey) {
+        return;
+      }
+
+      innerGridRef.current?.selectCellByKey(
+        { columnKey, rowIdx: position.rowIdx },
         {
           enableEditor: true,
         },
       );
     },
+    getColumnsOrdered: () => innerGridRef.current?.getColumnsOrdered() ?? [],
   }));
 
   if (rowsCountRef.current !== rowsCount) {
@@ -155,11 +189,11 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
   );
 
   function handleCellFocus(args: CellSelectArgs<IInnerRow, unknown>) {
-    onFocus?.({ colIdx: dndHeaderContext.getDataColIdx(args.column.idx), rowIdx: args.rowIdx });
+    onFocus?.({ colIdx: dndHeaderContext.getDataColIdxByKey(args.column.key), rowIdx: args.rowIdx });
   }
 
   function handleCellKeyDown(args: CellSelectArgs<IInnerRow, unknown>, event: DataGridCellKeyboardEvent) {
-    onCellKeyDown?.({ colIdx: dndHeaderContext.getDataColIdx(args.column.idx), rowIdx: args.rowIdx }, event);
+    onCellKeyDown?.({ colIdx: dndHeaderContext.getDataColIdxByKey(args.column.key), rowIdx: args.rowIdx }, event);
   }
 
   // We need to patch auto-size width to avoid extremely large columns on table initialization
@@ -181,10 +215,19 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
 
   return (
     <HeaderDnDContext value={dndHeaderContext}>
-      <DataGridRowContext value={{ rowCount, onScrollToBottom }}>
+      <DataGridRowContext value={{ rowElement, rowCount, onScrollToBottom }}>
         <DataGridCellContext value={{ cell, cellText, cellElement, cellTooltip, onCellChange }}>
           <DataGridCellHeaderContext
-            value={{ headerElement, headerText, getHeaderDnD, columnSortable, onColumnSort, columnSortingState, onHeaderKeyDown }}
+            value={{
+              headerElement,
+              headerText,
+              getHeaderDnD,
+              columnSortable,
+              onColumnSort,
+              columnSortingState,
+              onHeaderKeyDown,
+              columnSortingMultiple,
+            }}
           >
             <DataGridBase
               ref={innerGridRef}
@@ -194,6 +237,7 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
               headerRowHeight={getHeaderHeight?.()}
               rowHeight={getRowHeight ? row => getRowHeight(row.idx) : undefined}
               rowKeyGetter={getRowId ? row => getRowId(row.idx) : undefined}
+              rowClass={getRowClass ? row => getRowClass(row.idx) : undefined}
               columnWidths={columnWidths}
               renderers={{
                 renderRow: rowRenderer,

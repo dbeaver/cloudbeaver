@@ -33,6 +33,7 @@ export * from './DatabaseDataModel/Actions/DatabaseDataConstraintAction.js';
 export * from './DatabaseDataModel/Actions/ResultSet/ResultSetDataAction.js';
 export * from './DatabaseDataModel/Actions/Grid/GridDataKeysUtils.js';
 export * from './DatabaseDataModel/Actions/Grid/GridDataResultAction.js';
+export * from './DatabaseDataModel/Actions/IDatabaseValueHolder.js';
 export * from './DatabaseDataModel/Actions/Grid/GridEditAction.js';
 export * from './DatabaseDataModel/Actions/Grid/GridViewAction.js';
 export * from './DatabaseDataModel/Actions/Grid/IGridDataKey.js';
@@ -83,6 +84,7 @@ export * from './TableViewer/IDataPresentationActions.js';
 export * from './TableViewer/TableViewerLoader.js';
 export * from './TableViewer/TableFooter/TableFooterMenu/DATA_VIEWER_DATA_MODEL_ACTIONS_MENU.js';
 export * from './TableViewer/TableFooter/TableFooterMenu/TableFooterMenuService.js';
+export * from './TableViewer/TableHeader/TableHeaderService.js';
 
 export * from './ContainerDataSource.js';
 export * from './ResultSet/ResultSetDataSource.js';

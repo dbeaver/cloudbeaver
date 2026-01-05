@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { action, computed, makeObservable, observable } from 'mobx';
+import { action, computed, makeObservable, observable, ObservableSet } from 'mobx';
 
 import { DatabaseDataAction } from '../../DatabaseDataAction.js';
 import { IDatabaseDataSource } from '../../IDatabaseDataSource.js';
@@ -20,15 +20,16 @@ import { injectable } from '@cloudbeaver/core-di';
 import type { IDatabaseDataViewAction } from '../IDatabaseDataViewAction.js';
 import { IDatabaseDataResultAction } from '../IDatabaseDataResultAction.js';
 import { IDatabaseDataEditAction } from '../IDatabaseDataEditAction.js';
+import type { IDatabaseValueHolder } from '../IDatabaseValueHolder.js';
 
 @injectable(() => [IDatabaseDataSource, IDatabaseDataResult, IDatabaseDataResultAction, IDatabaseDataEditAction])
 export class GridViewAction<
-    TColumn = unknown,
-    TRow = unknown,
-    TKey extends IGridDataKey = IGridDataKey,
-    TCell = unknown,
-    TResult extends IDatabaseDataResult = IDatabaseDataResult,
-  >
+  TColumn = unknown,
+  TRow = unknown,
+  TKey extends IGridDataKey = IGridDataKey,
+  TCell = unknown,
+  TResult extends IDatabaseDataResult = IDatabaseDataResult,
+>
   extends DatabaseDataAction<any, TResult>
   implements IDatabaseDataViewAction<TKey, TCell, TResult>
 {
@@ -51,6 +52,7 @@ export class GridViewAction<
   }
 
   private columnsOrder: number[];
+  readonly pinnedColumns: ObservableSet<string>;
   protected readonly data: GridDataResultAction<TColumn, TRow, TKey, TCell, TResult>;
   protected readonly editor?: GridEditAction<TColumn, TRow, TKey, TCell, TResult>;
 
@@ -64,10 +66,15 @@ export class GridViewAction<
     this.data = data as GridDataResultAction<TColumn, TRow, TKey, TCell, TResult>;
     this.editor = editor as GridEditAction<TColumn, TRow, TKey, TCell, TResult> | undefined;
     this.columnsOrder = this.data.columns.map((key, index) => index);
+    this.pinnedColumns = observable.set<string>();
 
-    makeObservable<this, 'columnsOrder'>(this, {
+    makeObservable<this, 'columnsOrder' | 'pinnedColumns'>(this, {
       columnsOrder: observable,
+      pinnedColumns: observable,
       setColumnOrder: action,
+      pinColumn: action,
+      unpinColumn: action,
+      unpinAllColumns: action,
       rows: computed,
       rowKeys: computed,
       columns: computed,
@@ -143,28 +150,55 @@ export class GridViewAction<
     return { row, column };
   }
 
-  get(key: TKey): TCell | undefined {
+  get(key: TKey): IDatabaseValueHolder<TKey, TCell> | undefined {
     if (!this.has(key)) {
       return undefined;
     }
 
-    return this.getCellValue(key);
+    return this.getCellHolder(key);
   }
 
   getRow(row: IGridRowKey): TCell[] {
     return this.mapRow(row);
   }
 
-  getCellValue(cell: TKey): TCell {
+  getCellHolder(cell: TKey): IDatabaseValueHolder<TKey, TCell> {
     if (cell.column.index < 0 || cell.column.index >= this.data.columns.length) {
       throw new Error('Cell is out of range');
     }
 
-    return this.mapRow(cell.row)[cell.column.index]!;
+    return { value: this.mapRow(cell.row)[cell.column.index]!, key: cell };
   }
 
   getColumn(key: IGridColumnKey): TColumn | undefined {
     return this.mapColumn(key);
+  }
+
+  getColumnName(key: IGridColumnKey): string | undefined {
+    return this.data.getColumnName(key);
+  }
+
+  pinColumn(key: IGridColumnKey): void {
+    const serializedKey = GridDataKeysUtils.serialize(key);
+    this.pinnedColumns.add(serializedKey);
+  }
+
+  unpinColumn(key: IGridColumnKey): void {
+    const serializedKey = GridDataKeysUtils.serialize(key);
+    this.pinnedColumns.delete(serializedKey);
+  }
+
+  unpinAllColumns(): void {
+    this.pinnedColumns.clear();
+  }
+
+  isColumnPinned(key: IGridColumnKey): boolean {
+    const serializedKey = GridDataKeysUtils.serialize(key);
+    return this.pinnedColumns.has(serializedKey);
+  }
+
+  hasPinnedColumns(): boolean {
+    return this.pinnedColumns.size > 0;
   }
 
   protected mapRow(row: IGridRowKey): TCell[] {
