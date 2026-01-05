@@ -6,6 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
+import { Suspense } from 'react';
 
 import { type IMenuData } from '@cloudbeaver/core-view';
 import { RenderMenuItem } from './RenderMenuItem.js';
@@ -37,18 +38,19 @@ export const RenderMenuItems = observer<IRenderMenuItemsProps>(function RenderMe
   return (
     <>
       {menu.items.map(item => (
-        <RenderMenuItem
-          key={item.id}
-          item={item}
-          menuData={menu}
-          onlyIcons={onlyIcons}
-          placement={placement}
-          showSubmenuOnHover={showSubmenuOnHover}
-          menuComponent={menuComponent}
-          itemComponent={itemComponent}
-          groupComponent={groupComponent}
-          groupArrowComponent={groupArrowComponent}
-        />
+        <Suspense key={item.id} fallback={null}>
+          <RenderMenuItem
+            item={item}
+            menuData={menu}
+            onlyIcons={onlyIcons}
+            placement={placement}
+            showSubmenuOnHover={showSubmenuOnHover}
+            menuComponent={menuComponent}
+            itemComponent={itemComponent}
+            groupComponent={groupComponent}
+            groupArrowComponent={groupArrowComponent}
+          />
+        </Suspense>
       ))}
     </>
   );

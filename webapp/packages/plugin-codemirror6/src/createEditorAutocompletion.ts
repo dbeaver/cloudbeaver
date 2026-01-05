@@ -25,7 +25,6 @@ export function createEditorAutocompletion(config?: CompletionConfig): [Compartm
       EDITOR_AUTOCOMPLETION_KEYMAP,
       autocompletion({
         ...config,
-        closeOnBlur: false,
       }),
     ],
   ];
