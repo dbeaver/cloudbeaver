@@ -95,17 +95,6 @@ public class CBApplicationCE extends CBApplication<CBServerConfig> {
         return serverConfigController;
     }
 
-    protected void shutdown() {
-        try {
-            if (securityController instanceof CBEmbeddedSecurityController<?> embeddedSecurityController) {
-                embeddedSecurityController.shutdown();
-            }
-        } catch (Exception e) {
-            log.error(e);
-        }
-        super.shutdown();
-    }
-
     protected void finishSecurityServiceConfiguration(
         @NotNull String adminName,
         @Nullable String adminPassword,

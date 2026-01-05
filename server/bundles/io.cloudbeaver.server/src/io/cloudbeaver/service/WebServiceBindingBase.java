@@ -318,7 +318,7 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
                 // Check license
                 if (application.isLicenseRequired() && !application.isLicenseValid()) {
                     if (!ArrayUtils.contains(reqPermissions, DBWConstants.PERMISSION_ADMIN)) {
-                        String errorMessage = "Invalid server license";
+                        String errorMessage = "Server license is missing";
                         String licenseStatus = application.getLicenseStatus();
                         if (licenseStatus != null) {
                             errorMessage = errorMessage + ": " + licenseStatus;
