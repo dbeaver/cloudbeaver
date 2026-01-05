@@ -22,7 +22,7 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
-import org.jkiss.dbeaver.registry.fs.FSUtils;
+import org.jkiss.dbeaver.model.fs.DBFUtils;
 import org.jkiss.utils.CommonUtils;
 
 import java.nio.file.Path;
@@ -64,7 +64,7 @@ public abstract class BaseServerConfigurationController<T extends ServletServerC
             return defaultWorkspaceLocation;
         }
         try {
-            Path externalFsPath = FSUtils.getPathFromURI(workspaceLocation);
+            Path externalFsPath = DBFUtils.getPathFromURI(workspaceLocation);
             if (externalFsPath == null) {
                 log.warn("Failed to detect workspace path from URI: " + workspaceLocation +
                     " default workspace location will be used");
