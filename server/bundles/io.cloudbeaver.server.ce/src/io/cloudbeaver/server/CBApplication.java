@@ -33,6 +33,7 @@ import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.server.jetty.CBJettyServer;
 import io.cloudbeaver.service.DBWServiceInitializer;
 import io.cloudbeaver.service.DBWServiceServerConfigurator;
+import io.cloudbeaver.service.security.CBEmbeddedSecurityController;
 import io.cloudbeaver.service.session.CBSessionManager;
 import io.cloudbeaver.utils.WebDataSourceUtils;
 import org.eclipse.core.runtime.Platform;
@@ -300,7 +301,8 @@ public abstract class CBApplication<T extends CBServerConfig>
         try {
             initializeServer();
         } catch (DBException e) {
-            log.error("Error initializing server", e);
+            log.error("Error initializing " + systemInformationCollector.getProductName(), e);
+            shutdown();
             return;
         }
 
@@ -308,6 +310,7 @@ public abstract class CBApplication<T extends CBServerConfig>
             initializeSecurityController();
         } catch (Exception e) {
             log.error("Error initializing database", e);
+            shutdown();
             return;
         }
 
@@ -503,6 +506,16 @@ public abstract class CBApplication<T extends CBServerConfig>
 
     protected void shutdown() {
         log.debug("Cloudbeaver Server is stopping"); //$NON-NLS-1$
+
+        try {
+            if (securityController instanceof CBEmbeddedSecurityController<?> embeddedSecurityController) {
+                embeddedSecurityController.shutdown();
+            }
+        } catch (Exception e) {
+            log.error(e);
+        }
+
+        eventController.scheduleCheckJob();
     }
 
     @Override
