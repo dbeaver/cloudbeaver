@@ -39,7 +39,6 @@ You can see a live demo of CloudBeaver here: https://demo.cloudbeaver.io
 - Added support for mapping users to CloudBeaver teams based on LDAP memberOf group membership;
 - Added support for previous browser versions, but not older than three years.
 
-
 ### 25.3.0 2025-12-01
 
 ### Changes since 25.2.0:
