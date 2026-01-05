@@ -9,6 +9,7 @@
         <version>1.0.0</version>
         <relativePath>../</relativePath>
     </parent>
+    <packaging>pom</packaging>
 
     <properties>
         <deps.output.dir>mysql/mysql8</deps.output.dir>

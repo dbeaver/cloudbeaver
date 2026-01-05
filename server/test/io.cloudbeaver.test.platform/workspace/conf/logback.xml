@@ -15,5 +15,9 @@
     <root level="INFO">
         <appender-ref ref="CONSOLE"/>
     </root>
+    <logger name="org.jkiss" level="DEBUG"/>
+    <logger name="com.dbeaver" level="DEBUG"/>
+    <logger name="io.cloudbeaver" level="DEBUG"/>
+    <logger name="org.apache.kafka" level="WARN"/>
 
 </configuration>

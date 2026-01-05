@@ -33,7 +33,7 @@ export const ConnectionAuthModelCredentialsForm = observer<Props>(function Conne
     }
 
     return {
-      tiny: true,
+      fill: true,
     };
   }
 

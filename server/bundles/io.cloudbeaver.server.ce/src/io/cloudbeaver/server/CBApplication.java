@@ -33,6 +33,7 @@ import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.server.jetty.CBJettyServer;
 import io.cloudbeaver.service.DBWServiceInitializer;
 import io.cloudbeaver.service.DBWServiceServerConfigurator;
+import io.cloudbeaver.service.security.CBEmbeddedSecurityController;
 import io.cloudbeaver.service.session.CBSessionManager;
 import io.cloudbeaver.utils.WebDataSourceUtils;
 import org.eclipse.core.runtime.Platform;
@@ -85,8 +86,6 @@ public abstract class CBApplication<T extends CBServerConfig>
      * In configuration mode sessions expire after a week
      */
     private static final long CONFIGURATION_MODE_SESSION_IDLE_TIME = 60 * 60 * 1000 * 24 * 7;
-
-    private CloudBeaverInstanceServer instanceServer;
 
     static {
         Log.setDefaultDebugStream(System.out);
@@ -207,7 +206,7 @@ public abstract class CBApplication<T extends CBServerConfig>
     @Override
     protected void startServer() {
         try {
-            this.instanceServer = createInstanceServer();
+            createInstanceServer();
         } catch (Exception e) {
             log.error("Error initializing instance server", e);
         }
@@ -282,7 +281,8 @@ public abstract class CBApplication<T extends CBServerConfig>
             determineLocalAddresses();
             log.debug("\tLocal host addresses:");
             for (InetAddress ia : localInetAddresses) {
-                log.debug("\t\t" + ia.getHostAddress() + " (" + ia.getCanonicalHostName() + ")");
+                log.debug("\t\t" + ia.getHostAddress() +
+                    (Objects.equals(ia.getHostAddress(), ia.getCanonicalHostName()) ? "" : (" (" + ia.getCanonicalHostName() + ")")));
             }
         }
         {
@@ -301,7 +301,8 @@ public abstract class CBApplication<T extends CBServerConfig>
         try {
             initializeServer();
         } catch (DBException e) {
-            log.error("Error initializing server", e);
+            log.error("Error initializing " + systemInformationCollector.getProductName(), e);
+            shutdown();
             return;
         }
 
@@ -309,6 +310,7 @@ public abstract class CBApplication<T extends CBServerConfig>
             initializeSecurityController();
         } catch (Exception e) {
             log.error("Error initializing database", e);
+            shutdown();
             return;
         }
 
@@ -504,6 +506,16 @@ public abstract class CBApplication<T extends CBServerConfig>
 
     protected void shutdown() {
         log.debug("Cloudbeaver Server is stopping"); //$NON-NLS-1$
+
+        try {
+            if (securityController instanceof CBEmbeddedSecurityController<?> embeddedSecurityController) {
+                embeddedSecurityController.shutdown();
+            }
+        } catch (Exception e) {
+            log.error(e);
+        }
+
+        eventController.scheduleCheckJob();
     }
 
     @Override
