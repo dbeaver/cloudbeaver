@@ -24,21 +24,8 @@ import type {
 } from '@cloudbeaver/plugin-data-viewer';
 import type { GridConditionalFormattingAction } from '@cloudbeaver/plugin-data-viewer-conditional-formatting';
 
-export enum DateTimeKind {
-  DateTime = 'DATETIME',
-  DateOnly = 'DATE',
-  TimeOnly = 'TIME',
-}
-
 export interface IColumnInfo {
   key: IGridColumnKey | null;
-}
-
-export interface IDataGridFormatters {
-  locale: string;
-  dateTime: Intl.DateTimeFormat;
-  dateOnly: Intl.DateTimeFormat;
-  number: Intl.NumberFormat;
 }
 
 export interface ITableData {
@@ -53,7 +40,6 @@ export interface ITableData {
   columnKeys: IGridColumnKey[];
   rows: IGridRowKey[];
   gridDiv: HTMLDivElement | null;
-  useUserFormatting: IDataGridFormatters | null;
   inBounds: (position: IGridDataKey) => boolean;
   getRow: (rowIndex: number) => IGridRowKey | undefined;
   getColumn: (columnIndex: number) => IColumnInfo | undefined;
@@ -68,7 +54,6 @@ export interface ITableData {
   isIndexColumn: (columnKey: IColumnInfo) => boolean;
   isIndexColumnInRange: (columnsRange: Array<IColumnInfo>) => boolean;
   isCellReadonly: (key: IGridDataKey) => boolean;
-  getExtendedDateKind: (columnKey: IGridColumnKey) => DateTimeKind;
 }
 
 export function isColumnInfo(column: IColumnInfo | undefined): column is IColumnInfo {

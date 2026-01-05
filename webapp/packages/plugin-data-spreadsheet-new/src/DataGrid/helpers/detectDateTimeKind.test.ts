@@ -7,7 +7,7 @@
  */
 import { describe, expect, test } from 'vitest';
 
-import { DateTimeKind } from '../TableDataContext.js';
+import { DateTimeKind } from '../FormattingContext.js';
 import { detectDateTimeKind } from './detectDateTimeKind.js';
 
 describe('detectDateTimeKind', () => {

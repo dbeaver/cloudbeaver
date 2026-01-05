@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -28,17 +28,15 @@ import {
   type IGridDataKey,
 } from '@cloudbeaver/plugin-data-viewer';
 
-import { type IColumnInfo, type ITableData, type IDataGridFormatters, DateTimeKind } from './TableDataContext.js';
+import { type IColumnInfo, type ITableData } from './TableDataContext.js';
 import { useService } from '@cloudbeaver/core-di';
-import { DataGridSettingsService, NO_FORMAT, OS_FORMAT } from '../DataGridSettingsService.js';
+import { DataGridSettingsService } from '../DataGridSettingsService.js';
 import type { SqlResultColumn } from '@cloudbeaver/core-sdk';
 import { GridConditionalFormattingAction } from '@cloudbeaver/plugin-data-viewer-conditional-formatting';
-import { detectDateTimeKind } from './helpers/detectDateTimeKind.js';
 
 interface ITableDataPrivate extends ITableData {
   dataGridSettingsService: DataGridSettingsService;
   gridDIVElement: React.RefObject<HTMLDivElement | null>;
-  extendedDateKinds: Map<number, DateTimeKind>;
 }
 
 export function useTableData(
@@ -84,33 +82,6 @@ export function useTableData(
 
         // TODO: fix column abstraction
         return Boolean(this.data?.columns?.some(column => (column as SqlResultColumn).description));
-      },
-      get useUserFormatting(): IDataGridFormatters | null {
-        const setting = this.dataGridSettingsService.useUserFormatting;
-
-        if (setting === NO_FORMAT) {
-          return null;
-        }
-
-        const locale = setting === OS_FORMAT ? new Intl.DateTimeFormat().resolvedOptions().locale : setting;
-        return {
-          locale,
-          dateTime: new Intl.DateTimeFormat(locale, {
-            year: 'numeric',
-            month: 'numeric',
-            day: 'numeric',
-            hour: 'numeric',
-            minute: 'numeric',
-            second: 'numeric',
-          }),
-          dateOnly: new Intl.DateTimeFormat(locale, {
-            year: 'numeric',
-            month: 'numeric',
-            day: 'numeric',
-            timeZone: 'UTC',
-          }),
-          number: new Intl.NumberFormat(locale),
-        };
       },
       getRow(rowIndex) {
         return this.rows[rowIndex];
@@ -169,34 +140,12 @@ export function useTableData(
 
         return model.isReadonly(resultIndex) || (this.format.isReadOnly(key) && this.editor?.getElementState(key) !== DatabaseEditChangeType.add);
       },
-      getExtendedDateKind(columnKey: IGridColumnKey): DateTimeKind {
-        if (this.extendedDateKinds.has(columnKey.index)) {
-          return this.extendedDateKinds.get(columnKey.index) as DateTimeKind;
-        }
-
-        for (const row of this.rows) {
-          const cellKey = { column: columnKey, row };
-          const holder = this.getCellHolder(cellKey);
-
-          if (!this.format.isNull(holder)) {
-            const displayValue = this.format.getDisplayString(holder);
-            const kind = detectDateTimeKind(displayValue);
-            this.extendedDateKinds.set(columnKey.index, kind);
-            return kind;
-          }
-        }
-
-        const defaultKind = DateTimeKind.DateTime;
-        this.extendedDateKinds.set(columnKey.index, defaultKind);
-        return defaultKind;
-      },
     }),
     {
       columns: computed,
       rows: computed,
       columnKeys: computed,
       hasDescription: computed,
-      useUserFormatting: computed,
       formatting: observable.ref,
       format: observable.ref,
       dataContent: observable.ref,
@@ -204,7 +153,6 @@ export function useTableData(
       editor: observable.ref,
       view: observable.ref,
       gridDIVElement: observable.ref,
-      extendedDateKinds: observable,
     },
     {
       formatting,
@@ -215,7 +163,6 @@ export function useTableData(
       view,
       gridDIVElement,
       dataGridSettingsService,
-      extendedDateKinds: new Map(),
     },
   );
 }

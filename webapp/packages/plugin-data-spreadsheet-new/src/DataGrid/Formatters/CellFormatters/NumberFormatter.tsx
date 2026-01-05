@@ -8,19 +8,18 @@
 import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
 
-import { getComputed, s, useS } from '@cloudbeaver/core-blocks';
+import { getComputed } from '@cloudbeaver/core-blocks';
 import { NullFormatter as GridNullFormatter } from '@cloudbeaver/plugin-data-grid';
 
 import { CellContext } from '../../CellRenderer/CellContext.js';
+import { FormattingContext } from '../../FormattingContext.js';
 import { TableDataContext } from '../../TableDataContext.js';
 import type { ICellFormatterProps } from '../ICellFormatterProps.js';
 
-import styles from './NumberFormatter.module.css';
-
 export const NumberFormatter = observer<ICellFormatterProps>(function NumberFormatter() {
   const tableDataContext = useContext(TableDataContext);
+  const formattingContext = useContext(FormattingContext);
   const cellContext = useContext(CellContext);
-  const style = useS(styles);
 
   if (!cellContext.cell) {
     return null;
@@ -37,17 +36,17 @@ export const NumberFormatter = observer<ICellFormatterProps>(function NumberForm
 
   let value = displayValue;
 
-  if (tableDataContext.useUserFormatting) {
+  if (formattingContext.formatters) {
     const numberValue = Number(displayValue);
 
     if (!isNaN(numberValue) && displayValue.trim() !== '') {
-      value = tableDataContext.useUserFormatting.number.format(numberValue);
+      value = formattingContext.formatters.number.format(numberValue);
     }
   }
 
   return (
-    <div className={s(style, { numberFormatter: true })}>
-      <div className={s(style, { numberFormatterValue: true })}>{value}</div>
+    <div className="flex items-center overflow-hidden">
+      <div className="overflow-hidden text-ellipsis">{value}</div>
     </div>
   );
 });
