@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ import { getCommonAndOSSpecificKeys } from '../Action/KeyBinding/getCommonAndOSS
 import styles from './CaptureView.module.css';
 import { CaptureViewContext } from './CaptureViewContext.js';
 import type { IView } from './IView.js';
-import { parseHotkey } from './parseHotkey.js';
+import { mapShortcut, parseHotkey } from './parseHotkey.js';
 import { useActiveView } from './useActiveView.js';
 import { useViewContext } from './useViewContext.js';
 
@@ -40,7 +40,10 @@ export const CaptureView = observer<React.PropsWithChildren<ICaptureViewProps>>(
     .filter(action => action?.binding && !action.isDisabled())
     .filter(Boolean) as IActionItem[];
 
-  const keys = actionItems.map(item => getCommonAndOSSpecificKeys(item.binding?.binding)).flat();
+  const keys = actionItems
+    .map(item => getCommonAndOSSpecificKeys(item.binding?.binding))
+    .flat()
+    .map(item => mapShortcut(item));
 
   useHotkeys(
     keys,
@@ -57,6 +60,8 @@ export const CaptureView = observer<React.PropsWithChildren<ICaptureViewProps>>(
           return isObjectsEqual(hotkey, handler);
         });
       });
+
+      console.log(action);
 
       action?.activate(true);
     },
