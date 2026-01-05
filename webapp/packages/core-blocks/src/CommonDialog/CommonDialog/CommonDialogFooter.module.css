@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 .footer {
-  padding: 0 24px 24px 24px !important;
+  padding: 0 24px 24px;
   display: flex;
   z-index: 0;
   box-sizing: border-box;
