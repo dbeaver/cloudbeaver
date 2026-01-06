@@ -30,7 +30,6 @@ import io.cloudbeaver.service.sql.WebSQLConstants;
 import io.cloudbeaver.utils.CBModelConstants;
 import io.cloudbeaver.utils.WebDataSourceUtils;
 import io.cloudbeaver.utils.WebEventUtils;
-import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.jkiss.code.NotNull;
@@ -38,6 +37,7 @@ import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBFileController;
+import org.jkiss.dbeaver.model.DBPAdaptable;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.DBPEventListener;
 import org.jkiss.dbeaver.model.access.DBAAuthCredentials;
@@ -76,7 +76,7 @@ import java.util.stream.Collectors;
  */
 //TODO: split to authenticated and non authenticated context
 public class WebSession extends BaseWebSession
-    implements SMSessionWithAuth, SMCredentialsProvider, DBACredentialsProvider, IAdaptable {
+    implements SMSessionWithAuth, SMCredentialsProvider, DBACredentialsProvider, DBPAdaptable {
 
     private static final Log log = Log.getLog(WebSession.class);
 
@@ -882,7 +882,7 @@ public class WebSession extends BaseWebSession
 
     // May be called to extract auth information from session
     @Override
-    public <T> T getAdapter(Class<T> adapter) {
+    public <T> T getAdapter(@NotNull Class<T> adapter) {
         synchronized (authTokens) {
             for (WebAuthInfo authInfo : authTokens) {
                 if (isAuthInfoInstanceOf(authInfo, adapter)) {
