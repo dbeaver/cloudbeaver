@@ -1,0 +1,27 @@
+query asyncSqlGropingResultSet(
+  $projectId: ID
+  $contextId: ID!
+  $connectionId: ID!
+  $resultsId: ID!
+  $columnNames: [String!]
+  $functions: [String!]
+  $showDuplicatesOnly: Boolean
+  $filter: SQLDataFilter
+  $dataFormat: ResultDataFormat
+  $isInteractive: Boolean
+) {
+  taskInfo: sqlGropingResultSet(
+    projectId: $projectId
+    contextId: $contextId
+    connectionId: $connectionId
+    resultsId: $resultsId
+    columnNames: $columnNames
+    functions: $functions
+    showDuplicatesOnly: $showDuplicatesOnly
+    filter: $filter
+    dataFormat: $dataFormat
+    isInteractive: $isInteractive
+  ) {
+    ...AsyncTaskInfo
+  }
+}
