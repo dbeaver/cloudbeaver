@@ -53,37 +53,43 @@ export function useFormatting(tableData: ITableData): IFormattingContext {
           number: new Intl.NumberFormat(locale),
         };
       },
-      getExtendedDateKind(columnKey: IGridColumnKey): DateTimeKind {
-        if (this.extendedDateKinds.has(columnKey.index)) {
-          return this.extendedDateKinds.get(columnKey.index) as DateTimeKind;
-        }
+      get extendedDateKinds(): Map<number, DateTimeKind> {
+        const kindsMap = new Map<number, DateTimeKind>();
 
-        for (const row of this.tableData.rows) {
-          const cellKey = { column: columnKey, row };
-          const holder = this.tableData.getCellHolder(cellKey);
+        const rows = this.tableData.rows;
+        const columnKeys = this.tableData.columnKeys;
 
-          if (!this.tableData.format.isNull(holder)) {
-            const displayValue = this.tableData.format.getDisplayString(holder);
-            const kind = detectDateTimeKind(displayValue);
-            this.extendedDateKinds.set(columnKey.index, kind);
-            return kind;
+        for (const columnKey of columnKeys) {
+          let kind = DateTimeKind.DateTime;
+
+          for (const row of rows) {
+            const cellKey = { column: columnKey, row };
+            const holder = this.tableData.getCellHolder(cellKey);
+
+            if (!this.tableData.format.isNull(holder)) {
+              const displayValue = this.tableData.format.getDisplayString(holder);
+              kind = detectDateTimeKind(displayValue);
+              break;
+            }
           }
+
+          kindsMap.set(columnKey.index, kind);
         }
 
-        const defaultKind = DateTimeKind.DateTime;
-        this.extendedDateKinds.set(columnKey.index, defaultKind);
-        return defaultKind;
+        return kindsMap;
+      },
+      getExtendedDateKind(columnKey: IGridColumnKey): DateTimeKind {
+        return this.extendedDateKinds.get(columnKey.index) ?? DateTimeKind.DateTime;
       },
     }),
     {
       formatters: computed,
       tableData: observable.ref,
-      extendedDateKinds: observable.ref,
+      extendedDateKinds: computed,
     },
     {
       dataGridSettingsService,
       tableData,
-      extendedDateKinds: new Map(),
     },
   );
 }
