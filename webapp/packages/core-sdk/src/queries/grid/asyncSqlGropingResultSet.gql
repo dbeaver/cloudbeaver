@@ -10,7 +10,7 @@ query asyncSqlGropingResultSet(
   $dataFormat: ResultDataFormat
   $isInteractive: Boolean
 ) {
-  taskInfo: sqlGropingResultSet(
+  taskInfo: asyncSqlGroupingResultSet(
     projectId: $projectId
     contextId: $contextId
     connectionId: $connectionId

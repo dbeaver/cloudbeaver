@@ -106,8 +106,9 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL>
                 getArgument(env, "showDuplicatesOnly"))
             )
             .dataFetcher(
-                "sqlGropingResultSet", env ->
+                "asyncSqlGroupingResultSet", env ->
                     getService(env).getGroupingSqlResultSet(
+                        getWebSession(env),
                         getSQLContext(env),
                         getArgumentVal(env, "resultsId"),
                         getArgumentVal(env, "columnNames"),
