@@ -1,11 +1,12 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
+import { type HTMLAttributes, useRef } from 'react';
 
 import { Icon } from '../Icon.js';
 import { IconOrImage } from '../IconOrImage.js';
@@ -14,8 +15,8 @@ import { useTranslate } from '../localization/useTranslate.js';
 import { s } from '../s.js';
 import { useS } from '../useS.js';
 import { useStateDelay } from '../useStateDelay.js';
+import { useTruncatedTooltip } from '../useTruncatedTooltip.js';
 import style from './MenuItemElement.module.css';
-import type { HTMLAttributes } from 'react';
 
 export interface IMenuItemGroupArrowElementProps extends HTMLAttributes<HTMLButtonElement> {}
 
@@ -43,12 +44,12 @@ export const MenuItemElement = observer<IMenuItemElementProps>(function MenuItem
 }) {
   const styles = useS(style);
   const translate = useTranslate();
-
-  const title = translate(label);
+  const textRef = useRef<HTMLDivElement | null>(null);
+  const truncatedLabel = useTruncatedTooltip(textRef, label);
   loading = useStateDelay(loading, 300);
 
   return (
-    <button {...rest} className={s(styles, { menuPanelItem: true }, rest.className)} title={tooltip ? translate(tooltip) : title}>
+    <button {...rest} className={s(styles, { menuPanelItem: true }, rest.className)} title={tooltip || truncatedLabel}>
       <div className={s(styles, { menuItemMain: true })}>
         <div className={s(styles, { menuItemIcon: true })}>
           <Loader className={s(styles, { loader: true })} suspense small fullSize>
@@ -56,8 +57,8 @@ export const MenuItemElement = observer<IMenuItemElementProps>(function MenuItem
           </Loader>
         </div>
         {!onlyIcons ? (
-          <div className={s(styles, { menuItemText: true })} title={title}>
-            {title}
+          <div ref={textRef} className={s(styles, { menuItemText: true })}>
+            {translate(label)}
           </div>
         ) : (
           <div />
