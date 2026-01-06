@@ -54,8 +54,8 @@ export const DateTimeFormatter = observer<ICellFormatterProps>(function DateTime
   }
 
   return (
-    <div className="flex items-center overflow-hidden">
-      <div className="overflow-hidden text-ellipsis">{value}</div>
+    <div className="tw:flex tw:items-center tw:overflow-hidden">
+      <div className="tw:overflow-hidden tw:text-ellipsis">{value}</div>
     </div>
   );
 });
