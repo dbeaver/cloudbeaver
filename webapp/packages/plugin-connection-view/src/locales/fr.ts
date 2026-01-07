@@ -3,4 +3,5 @@ export default [
   ['plugin_connection_view_option_simple', 'Simple'],
   ['plugin_connection_view_option_advanced', 'Avancée'],
   ['plugin_connection_view_option_custom', 'Personnalisée'],
+  ['plugin_connection_view_option_reset_description', 'This will reset the connection view settings to default values'],
 ];

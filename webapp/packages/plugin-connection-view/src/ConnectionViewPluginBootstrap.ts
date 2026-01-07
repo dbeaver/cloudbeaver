@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -8,10 +8,9 @@
 
 import { ConnectionInfoResource, createConnectionParam, DATA_CONTEXT_CONNECTION, type Connection } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import { NotificationService } from '@cloudbeaver/core-events';
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { ActionService, MenuSeparatorItem, MenuService } from '@cloudbeaver/core-view';
-import { DATA_CONTEXT_NAV_NODE, EObjectFeature, NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
+import { DATA_CONTEXT_NAV_NODE, EObjectFeature } from '@cloudbeaver/core-navigation-tree';
 import {
   CONNECTION_NAVIGATOR_VIEW_SETTINGS,
   EAdminPermission,
@@ -20,6 +19,7 @@ import {
   type NavigatorViewSettings,
 } from '@cloudbeaver/core-root';
 import { getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
+import { ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { ConnectionFormService, PluginConnectionsSettingsService } from '@cloudbeaver/plugin-connections';
 
 import { ACTION_CONNECTION_VIEW_SIMPLE } from './Actions/ACTION_CONNECTION_VIEW_SIMPLE.js';
@@ -27,6 +27,7 @@ import { ACTION_CONNECTION_VIEW_ADVANCED } from './Actions/ACTION_CONNECTION_VIE
 import { ACTION_CONNECTION_VIEW_SYSTEM_OBJECTS } from './Actions/ACTION_CONNECTION_VIEW_SYSTEM_OBJECTS.js';
 import { MENU_CONNECTION_VIEW } from './MENU_CONNECTION_VIEW.js';
 import { ACTION_CONNECTION_VIEW_RESET } from './Actions/ACTION_CONNECTION_VIEW_RESET.js';
+import { ConnectionViewService } from './ConnectionViewService.js';
 
 const ConnectionViewForm = importLazyComponent(() => import('./ConnectionViewForm.js').then(m => m.ConnectionViewForm));
 
@@ -36,9 +37,9 @@ const ConnectionViewForm = importLazyComponent(() => import('./ConnectionViewFor
   PluginConnectionsSettingsService,
   PermissionsService,
   ConnectionInfoResource,
-  NavNodeManagerService,
-  NotificationService,
   ConnectionFormService,
+  ProjectInfoResource,
+  ConnectionViewService,
 ])
 export class ConnectionViewPluginBootstrap extends Bootstrap {
   constructor(
@@ -47,9 +48,9 @@ export class ConnectionViewPluginBootstrap extends Bootstrap {
     private readonly pluginConnectionsSettingsService: PluginConnectionsSettingsService,
     private readonly permissionsService: PermissionsService,
     private readonly connectionInfoResource: ConnectionInfoResource,
-    private readonly navNodeManagerService: NavNodeManagerService,
-    private readonly notificationService: NotificationService,
     private readonly connectionFormService: ConnectionFormService,
+    private readonly projectInfoResource: ProjectInfoResource,
+    private readonly connectionViewService: ConnectionViewService,
   ) {
     super();
   }
@@ -85,6 +86,19 @@ export class ConnectionViewPluginBootstrap extends Bootstrap {
       id: 'connection-view',
       actions: [ACTION_CONNECTION_VIEW_SIMPLE, ACTION_CONNECTION_VIEW_ADVANCED, ACTION_CONNECTION_VIEW_SYSTEM_OBJECTS, ACTION_CONNECTION_VIEW_RESET],
       contexts: [DATA_CONTEXT_CONNECTION],
+      isActionApplicable: (context, action) => {
+        if (action === ACTION_CONNECTION_VIEW_RESET) {
+          const connectionKey = context.get(DATA_CONTEXT_CONNECTION)!;
+          const connection = this.connectionInfoResource.get(connectionKey);
+
+          if (connection) {
+            const isShared = this.projectInfoResource.isProjectShared(connection.projectId);
+            return connection.navigatorSettings.userSettings && isShared;
+          }
+        }
+
+        return true;
+      },
       isChecked: (context, action) => {
         const connectionKey = context.get(DATA_CONTEXT_CONNECTION)!;
         const connection = this.connectionInfoResource.get(connectionKey);
@@ -144,15 +158,7 @@ export class ConnectionViewPluginBootstrap extends Bootstrap {
     this.connectionFormService.connectionContainer.add(ConnectionViewForm);
   }
 
-  private async changeConnectionView(connection: Connection, settings: NavigatorViewSettings) {
-    try {
-      connection = await this.connectionInfoResource.changeConnectionView(createConnectionParam(connection), { ...settings, userSettings: true });
-
-      if (connection.nodePath && connection.connected) {
-        await this.navNodeManagerService.refreshNode(connection.nodePath);
-      }
-    } catch (exception: any) {
-      this.notificationService.logException(exception);
-    }
+  private async changeConnectionView(connection: Connection, settings: NavigatorViewSettings): Promise<void> {
+    await this.connectionViewService.changeConnectionView(connection, { ...settings, userSettings: true });
   }
 }

@@ -8,7 +8,9 @@
 import type { NavigatorSettingsInput } from '@cloudbeaver/core-sdk';
 
 export type NavigatorView = 'simple' | 'advanced';
-export type NavigatorViewSettings = Partial<NavigatorSettingsInput>;
+export interface NavigatorViewSettings extends Omit<NavigatorSettingsInput, 'showSystemObjects'> {
+  showSystemObjects?: boolean;
+}
 
 export const CONNECTION_NAVIGATOR_VIEW_SETTINGS: Record<NavigatorView, NavigatorViewSettings> = {
   simple: {
