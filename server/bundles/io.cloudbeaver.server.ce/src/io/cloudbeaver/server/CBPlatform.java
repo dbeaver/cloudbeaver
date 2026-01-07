@@ -20,14 +20,13 @@ package io.cloudbeaver.server;
 import io.cloudbeaver.server.jobs.SessionStateJob;
 import io.cloudbeaver.server.jobs.WebDataSourceMonitorJob;
 import io.cloudbeaver.server.jobs.WebSessionMonitorJob;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.app.DBPRegistryListener;
 import org.jkiss.dbeaver.model.impl.app.BaseApplicationImpl;
 import org.jkiss.dbeaver.model.preferences.DBPPreferenceStore;
-import org.jkiss.dbeaver.model.runtime.AbstractJob;
-import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
+import org.jkiss.dbeaver.model.runtime.LoggingProgressMonitor;
+import org.jkiss.dbeaver.registry.DataSourceProviderRegistry;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.IOUtils;
 
@@ -38,12 +37,11 @@ import java.io.IOException;
  */
 public class CBPlatform extends BaseWebPlatform {
 
-    // The plug-in ID
-    public static final String PLUGIN_ID = "io.cloudbeaver.server"; //$NON-NLS-1$
-
     private static final Log log = Log.getLog(CBPlatform.class);
 
     private WebServerPreferenceStore preferenceStore;
+    private DBPRegistryListener driverRegistryListener;
+    private boolean isShutdown;
 
     public static CBPlatform getInstance() {
         return (CBPlatform) DBWorkbench.getPlatform();
@@ -55,10 +53,19 @@ public class CBPlatform extends BaseWebPlatform {
     @Override
     protected synchronized void initialize() {
         long startTime = System.currentTimeMillis();
-        log.info("Initialize web platform...: ");
+        log.info("Initialize web platform " + getClass().getSimpleName());
         this.preferenceStore = new WebServerPreferenceStore(WebPlatformActivator.getInstance().getPreferences());
         super.initialize();
-        scheduleServerJobs();
+        this.scheduleServerJobs();
+
+        this.driverRegistryListener = new DBPRegistryListener() {
+            @Override
+            public void handleRegistryReload() {
+                WebAppUtils.getWebApplication().getDriverRegistry().refreshApplicableDrivers();
+            }
+        };
+        DataSourceProviderRegistry.getInstance().addDataSourceRegistryListener(driverRegistryListener);
+
         log.info("Web platform initialized (" + (System.currentTimeMillis() - startTime) + "ms)");
     }
 
@@ -73,24 +80,24 @@ public class CBPlatform extends BaseWebPlatform {
         new WebDataSourceMonitorJob(this, getApplication().getSessionManager())
             .scheduleMonitor();
 
-        new AbstractJob("Delete temp folder") {
-            @NotNull
-            @Override
-            protected IStatus run(@NotNull DBRProgressMonitor monitor) {
-                try {
-                    IOUtils.deleteDirectory(getTempFolder(monitor, TEMP_FILE_FOLDER));
-                    IOUtils.deleteDirectory(getTempFolder(monitor, TEMP_FILE_IMPORT_FOLDER));
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-                return Status.OK_STATUS;
-            }
-        }.schedule();
+        try {
+            LoggingProgressMonitor monitor = new LoggingProgressMonitor(log);
+            IOUtils.deleteDirectory(getTempFolder(monitor, TEMP_FILE_FOLDER));
+            IOUtils.deleteDirectory(getTempFolder(monitor, TEMP_FILE_IMPORT_FOLDER));
+        } catch (IOException e) {
+            log.error(e);
+        }
     }
 
     public synchronized void dispose() {
         long startTime = System.currentTimeMillis();
-        log.debug("Shutdown Core...");
+        isShutdown = true;
+        log.debug("Shutdown web platform");
+
+        if (driverRegistryListener != null) {
+            DataSourceProviderRegistry.getInstance().removeDataSourceRegistryListener(driverRegistryListener);
+            driverRegistryListener = null;
+        }
 
         super.dispose();
 
@@ -113,7 +120,7 @@ public class CBPlatform extends BaseWebPlatform {
 
     @Override
     public boolean isShuttingDown() {
-        return false;
+        return isShutdown;
     }
 
 }
