@@ -20,7 +20,11 @@ export default [
   ['data_grid_table_context_menu_save_value_error', 'Failed to save value'],
   ['data_grid_table_index_column_tooltip', 'Seleziona tutta la tabella'],
   ['data_grid_table_readonly_tooltip', 'In sola lettura'],
-  ['plugin_data_spreadsheet_new_settings_disable', 'Disable Table presentation'],
-  ['plugin_data_spreadsheet_new_settings_description_label', 'Show columns description'],
-  ['plugin_data_spreadsheet_new_settings_description_label_description', 'Description will be shown under the column names in the table header'],
+  ['data_grid_table_no_key_found_tooltip', 'Nessuna chiave univoca è stata trovata. La modifica dei dati non è possibile.'],
+  ['plugin_data_spreadsheet_new_settings_disable', 'Disabilita la presentazione della tabella'],
+  ['plugin_data_spreadsheet_new_settings_description_label', 'Mostra la descrizione delle colonne'],
+  [
+    'plugin_data_spreadsheet_new_settings_description_label_description',
+    "La descrizione verrà mostrata sotto i nomi delle colonne nell'intestazione della tabella",
+  ],
 ];
