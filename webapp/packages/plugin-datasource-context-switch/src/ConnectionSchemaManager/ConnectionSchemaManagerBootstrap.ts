@@ -88,7 +88,7 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
       getInfo: (context, menu) => {
         const connection = this.connectionSchemaManagerService.currentConnection;
         const label = connection?.name || 'plugin_datasource_context_switch_select_connection';
-        const { clippedLabel: clippedLabel, tooltip } = getMenuLabelClipped(label);
+        const { clippedLabel, tooltip } = getMenuLabelClipped(label);
 
         return {
           ...menu,
@@ -318,13 +318,14 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
             continue;
           }
 
-          const { clippedLabel } = getMenuLabelClipped(schemaName);
+          const { clippedLabel, tooltip } = getMenuLabelClipped(schemaName);
+
           items.push(
             new MenuBaseItem(
               {
                 id: schemaName,
                 label: clippedLabel,
-                tooltip: schemaName,
+                tooltip,
                 icon: '/icons/plugin_datasource_context_switch_schema_contrast_sm.svg',
               },
               {
