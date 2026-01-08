@@ -6,7 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { type HTMLAttributes, useRef } from 'react';
 
 import { Icon } from '../Icon.js';
 import { IconOrImage } from '../IconOrImage.js';
@@ -15,8 +14,8 @@ import { useTranslate } from '../localization/useTranslate.js';
 import { s } from '../s.js';
 import { useS } from '../useS.js';
 import { useStateDelay } from '../useStateDelay.js';
-import { useTruncatedTooltip } from '../useTruncatedTooltip.js';
 import style from './MenuItemElement.module.css';
+import type { HTMLAttributes } from 'react';
 
 export interface IMenuItemGroupArrowElementProps extends HTMLAttributes<HTMLButtonElement> {}
 
@@ -44,25 +43,19 @@ export const MenuItemElement = observer<IMenuItemElementProps>(function MenuItem
 }) {
   const styles = useS(style);
   const translate = useTranslate();
-  const textRef = useRef<HTMLDivElement | null>(null);
-  const truncatedLabel = useTruncatedTooltip(textRef, label);
+
+  const title = translate(label);
   loading = useStateDelay(loading, 300);
 
   return (
-    <button {...rest} className={s(styles, { menuPanelItem: true }, rest.className)} title={tooltip || truncatedLabel}>
+    <button {...rest} className={s(styles, { menuPanelItem: true }, rest.className)} title={tooltip ? translate(tooltip) : undefined}>
       <div className={s(styles, { menuItemMain: true })}>
         <div className={s(styles, { menuItemIcon: true })}>
           <Loader className={s(styles, { loader: true })} suspense small fullSize>
             {typeof icon === 'string' ? <IconOrImage className={s(styles, { iconOrImage: true })} icon={icon} /> : icon}
           </Loader>
         </div>
-        {!onlyIcons ? (
-          <div ref={textRef} className={s(styles, { menuItemText: true })}>
-            {translate(label)}
-          </div>
-        ) : (
-          <div />
-        )}
+        {!onlyIcons ? <div className={s(styles, { menuItemText: true })}>{title}</div> : <div />}
         <div className={s(styles, { menuItemBinding: true })} title={binding}>
           {binding}
         </div>

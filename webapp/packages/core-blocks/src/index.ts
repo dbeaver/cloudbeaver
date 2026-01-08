@@ -231,7 +231,6 @@ export * from './usePermission.js';
 export * from './usePromiseState.js';
 export * from './useS.js';
 export * from './useStateDelay.js';
-export * from './useTruncatedTooltip.js';
 export * from './useErrorDetails.js';
 export * from './useActivationDelay.js';
 export * from './useAdministrationSettings.js';

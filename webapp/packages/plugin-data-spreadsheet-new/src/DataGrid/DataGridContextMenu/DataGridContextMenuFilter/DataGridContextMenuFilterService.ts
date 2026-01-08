@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -9,8 +9,7 @@ import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { ClipboardService } from '@cloudbeaver/core-ui';
-import { replaceMiddle } from '@cloudbeaver/core-utils';
-import { ActionService, MenuBaseItem, MenuService } from '@cloudbeaver/core-view';
+import { ActionService, getMenuLabelClipped, MenuBaseItem, MenuService } from '@cloudbeaver/core-view';
 import {
   DATA_CONTEXT_DV_DDM,
   DATA_CONTEXT_DV_DDM_RESULT_INDEX,
@@ -113,14 +112,16 @@ export class DataGridContextMenuFilterService {
 
         for (const filter of [IS_NULL_ID, IS_NOT_NULL_ID]) {
           const label = `${resultColumn ? `"${resultColumn.label}" ` : ''}${filter.split('_').join(' ')}`;
+          const { clippedLabel, tooltip } = getMenuLabelClipped(label);
 
           if (supportedOperations.some(operation => operation.id === filter)) {
             result.push(
               new MenuBaseItem(
                 {
                   id: filter,
-                  label,
+                  label: clippedLabel,
                   icon: 'filter',
+                  tooltip,
                 },
                 {
                   onSelect: async () => {
@@ -190,9 +191,13 @@ export class DataGridContextMenuFilterService {
         const resultColumn = data.getColumn(key.column) as SqlResultColumn | undefined;
 
         if (action === ACTION_DATA_GRID_FILTER_DELETE_FOR_COLUMN) {
+          const label = localizationService.translate('data_grid_table_filter_delete_for_column', undefined, { column: resultColumn?.name ?? '' });
+          const { clippedLabel, tooltip } = getMenuLabelClipped(label);
+
           return {
             ...action.info,
-            label: localizationService.translate('data_grid_table_filter_delete_for_column', undefined, { column: resultColumn?.name ?? '' }),
+            label: clippedLabel,
+            tooltip,
           };
         }
 
@@ -261,13 +266,15 @@ export class DataGridContextMenuFilterService {
           .filter(operation => !nullOperationsFilter(operation))
           .map(operation => {
             const wrappedValue = wrapOperationArgument(operation.id, cellValue);
-            const clippedValue = replaceMiddle(wrappedValue, ' ... ', 8, 30);
+            const fullLabel = `${columnLabel} ${operation.expression} ${wrappedValue}`;
+            const { clippedLabel, tooltip } = getMenuLabelClipped(fullLabel);
 
             return new MenuBaseItem(
               {
                 id: operation.id,
-                label: `${columnLabel} ${operation.expression} ${clippedValue}`,
+                label: clippedLabel,
                 icon: 'filter',
+                tooltip,
               },
               {
                 onSelect: async () => {
@@ -318,12 +325,14 @@ export class DataGridContextMenuFilterService {
           .filter(operation => !nullOperationsFilter(operation))
           .map(operation => {
             const title = `${columnLabel} ${operation.expression}`;
+            const { clippedLabel, tooltip } = getMenuLabelClipped(title);
 
             return new MenuBaseItem(
               {
                 id: operation.id,
-                label: title + ' ..',
+                label: clippedLabel + ' ..',
                 icon: 'filter-custom',
+                tooltip,
               },
               {
                 onSelect: async () => {
@@ -408,11 +417,11 @@ export class DataGridContextMenuFilterService {
             .map(operation => {
               const val = this.clipboardService.clipboardValue || '';
               const wrappedValue = wrapOperationArgument(operation.id, val);
-              const clippedValue = replaceMiddle(wrappedValue, ' ... ', 8, 30);
-              const label = `${columnLabel} ${operation.expression} ${clippedValue}`;
+              const label = `${columnLabel} ${operation.expression} ${wrappedValue}`;
+              const { clippedLabel, tooltip } = getMenuLabelClipped(label);
 
               return new MenuBaseItem(
-                { id: operation.id, icon: 'filter-clipboard', label },
+                { id: operation.id, icon: 'filter-clipboard', label: clippedLabel, tooltip },
                 {
                   onSelect: async () => {
                     const wrappedValue = wrapOperationArgument(operation.id, val);
