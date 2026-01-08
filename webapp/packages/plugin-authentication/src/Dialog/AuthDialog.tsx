@@ -150,10 +150,10 @@ export const AuthDialog: DialogComponent<IAuthOptions> = observer(function AuthD
       }}
     >
       <CommonDialogWrapper
+        autoFocusOnShow={false}
         className={s(styles, { wrapper: true })}
         size="large"
         aria-label={translate('authentication_login_dialog_title')}
-        autofocus={false}
       >
         <CommonDialogHeader
           title={dialogTitle}

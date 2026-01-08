@@ -7,7 +7,7 @@
  */
 import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 import {
   Button,
@@ -21,7 +21,6 @@ import {
   InputField,
   s,
   Translate,
-  useFocus,
   useObservableRef,
   useResource,
   useS,
@@ -78,7 +77,7 @@ export const FolderDialog: DialogComponent<FolderDialogPayload, IFolderDialogRes
 }) {
   const styles = useS(style);
   const translate = useTranslate();
-  const [focusedRef] = useFocus<HTMLFormElement>({ focusFirstChild: true });
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const { icon, folder, bigIcon, viewBox, value, projectId, selectProject, objectName, create, confirmActionText, filterProject } = payload;
   let { title } = payload;
@@ -162,12 +161,13 @@ export const FolderDialog: DialogComponent<FolderDialogPayload, IFolderDialogRes
   const subTitle = createPath(projectInfoLoader.data?.name ?? state.projectId, state.folder);
 
   return (
-    <CommonDialogWrapper size="small" className={className} fixedWidth>
+    <CommonDialogWrapper initialFocus={inputRef} size="small" className={className} fixedWidth>
       <CommonDialogHeader subTitle={subTitle} title={title} icon={icon} viewBox={viewBox} bigIcon={bigIcon} onReject={rejectDialog} />
       <CommonDialogBody>
-        <Form ref={focusedRef} onSubmit={resolveHandler}>
+        <Form onSubmit={resolveHandler}>
           <Container center gap>
             <InputField
+              ref={inputRef}
               name="value"
               state={state}
               error={!state.valid}
