@@ -15,4 +15,5 @@ export default [
   ['core_blocks_export_image_dialog_title', "Exporter en tant qu'image"],
   ['core_blocks_export_image_dialog_format', 'Format de fichier'],
   ['core_blocks_export_image_dialog_transparent_background', 'Fond transparent'],
+  ['core_blocks_dialog_element_close_tooltip', 'Fermer le panneau'],
 ];

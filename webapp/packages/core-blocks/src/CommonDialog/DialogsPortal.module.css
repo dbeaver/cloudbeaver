@@ -9,6 +9,11 @@
   height: 100%;
 }
 
+.error {
+  composes: theme-background-surface theme-text-on-surface theme-elevation-z10 from global;
+  border-radius: 0.25rem;
+}
+
 .backdrop {
   box-sizing: border-box;
   background-color: rgba(0, 0, 0, 0.48);
@@ -34,9 +39,4 @@
   & > :not(:last-child) {
     display: none;
   }
-}
-
-.error {
-  composes: theme-background-surface theme-text-on-surface theme-elevation-z10 from global;
-  border-radius: 0.25rem;
 }

@@ -9,12 +9,11 @@
   position: relative;
   display: grid;
   grid-template-columns: max-content 1fr;
-  flex-shrink: 0;
-  padding: 24px;
-  padding-right: 20px;
+  padding: 24px !important;
+  padding-right: 20px !important;
 
   &.noPadding {
-    padding: 0px;
+    padding: 0px !important;
   }
 }
 
