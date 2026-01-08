@@ -1,0 +1,260 @@
+# Dialog
+
+The Dialog component is a modal window built on top of [Ariakit Dialog](https://ariakit.org/components/dialog) that follows the WAI-ARIA Dialog Pattern.
+
+The Dialog provides a complete layout system with `DialogHeader`, `DialogBody`, and `DialogFooter` components that create a proper structure:
+
+- **Header** sticks to the top
+- **Body** takes all available space and scrolls when needed
+- **Footer** sticks to the bottom
+
+## Usage
+
+The component exposes a flexible API that can be used with state management or with `DialogProvider`:
+
+```tsx
+import {
+  Dialog,
+  DialogHeader,
+  DialogBody,
+  DialogFooter,
+  DialogHeading,
+  DialogDescription,
+  DialogDismiss,
+  DialogProvider,
+  useDialogStore,
+  Button,
+} from '@dbeaver/ui-kit';
+
+// Using state
+const [open, setOpen] = useState(false);
+
+<Dialog open={open} onClose={() => setOpen(false)} data-size="medium">
+  <DialogHeader>
+    <DialogHeading>Dialog Title</DialogHeading>
+  </DialogHeader>
+  <DialogBody>
+    <DialogDescription>Dialog content goes here</DialogDescription>
+  </DialogBody>
+  <DialogFooter>
+    <Button variant="secondary" onClick={() => setOpen(false)}>
+      Cancel
+    </Button>
+    <Button variant="primary" onClick={() => setOpen(false)}>
+      Confirm
+    </Button>
+  </DialogFooter>
+</Dialog>;
+
+// Using DialogProvider
+const dialog = useDialogStore();
+
+<DialogProvider store={dialog}>
+  <DialogDisclosure>
+    <Button>Open Dialog</Button>
+  </DialogDisclosure>
+  <Dialog data-size="medium">
+    <DialogHeader>
+      <DialogHeading>Title</DialogHeading>
+    </DialogHeader>
+    <DialogBody>
+      <DialogDescription>Content</DialogDescription>
+    </DialogBody>
+    <DialogFooter>
+      <DialogDismiss>Close</DialogDismiss>
+    </DialogFooter>
+  </Dialog>
+</DialogProvider>;
+```
+
+## Components
+
+- **Dialog** - Main dialog container, renders a modal window
+- **DialogDisclosure** - Button to open the dialog (requires DialogProvider)
+- **DialogHeader** - Header container that sticks to the top, typically contains DialogHeading
+- **DialogBody** - Scrollable body container that fills available space
+- **DialogFooter** - Footer container that sticks to the bottom, typically contains action buttons
+- **DialogHeading** - Dialog heading/title element (accessible label)
+- **DialogDescription** - Dialog description element (accessible description)
+- **DialogDismiss** - Button to close the dialog
+- **DialogProvider** - Provider for managing dialog state with `useDialogStore`
+
+## Sizes
+
+The Dialog component supports three predefined sizes via the `data-size` attribute:
+
+- **small** - 404px × 262px
+- **medium** - 576px × 396px - default
+- **large** - 720px × 556px
+
+```tsx
+<Dialog data-size="small">...</Dialog>
+<Dialog data-size="medium">...</Dialog>
+<Dialog data-size="large">...</Dialog>
+```
+
+## Variants
+
+### Slide Variant (Side Panel)
+
+The Dialog also supports a `slide` variant that creates a side panel appearing from the right:
+
+```tsx
+<Dialog data-variant="slide" portal={false}>
+  <div className="tw:p-6">
+    <DialogHeading>Settings Panel</DialogHeading>
+    <DialogDescription>Configure your preferences here...</DialogDescription>
+  </div>
+</Dialog>
+```
+
+**Slide variant features:**
+
+- Slides in from the right side of the screen
+- Fills 100% width and height of the parent container
+- Use `portal={false}` to render within parent instead of body
+- Slower animation: 300ms vs 150ms
+- Perfect for settings panels, detailed forms, or content requiring more space
+
+**Note:** When using `data-variant="slide"`, the `data-size` attribute is ignored.
+
+## Class names
+
+- `.dbv-kit-dialog` - the main class name for the dialog container.
+- `.dbv-kit-dialog__disclosure` - the class name for the disclosure/trigger button.
+- `.dbv-kit-dialog__header` - the class name for the header container.
+- `.dbv-kit-dialog__body` - the class name for the scrollable body container.
+- `.dbv-kit-dialog__footer` - the class name for the footer container.
+- `.dbv-kit-dialog__heading` - the class name for the heading element.
+- `.dbv-kit-dialog__description` - the class name for the description element.
+- `.dbv-kit-dialog__dismiss` - the class name for the dismiss/close button.
+
+## Styling
+
+The Dialog component supports customization through CSS variables.
+
+```css
+/* Container */
+--dbv-kit-dialog-content-background        /* #ffffff */
+--dbv-kit-dialog-content-foreground        /* #353535 */
+--dbv-kit-dialog-content-border-radius     /* 0.25rem */
+--dbv-kit-dialog-content-shadow            /* 0 6px 6px -3px #0003, 0 10px 14px 1px #00000024, 0 4px 18px 3px #0000001f */
+
+/* Layout */
+--dbv-kit-dialog-header-padding            /* 1rem 1.5rem */
+--dbv-kit-dialog-header-border-bottom      /* none */
+--dbv-kit-dialog-body-padding              /* 1.5rem */
+--dbv-kit-dialog-footer-padding            /* 1rem 1.5rem */
+--dbv-kit-dialog-footer-border-top         /* none */
+--dbv-kit-dialog-footer-gap                /* 0.75rem */
+
+/* Sizes */
+--dbv-kit-dialog-small-width               /* 404px */
+--dbv-kit-dialog-small-height              /* 262px */
+--dbv-kit-dialog-medium-width              /* 576px */
+--dbv-kit-dialog-medium-height             /* 374px */
+--dbv-kit-dialog-large-width               /* 748px */
+--dbv-kit-dialog-large-height              /* 468px */
+--dbv-kit-dialog-max-width                 /* 748px */
+
+/* Slide variant */
+--dbv-kit-dialog-slide-transition-duration /* 300ms */
+--dbv-kit-dialog-slide-transition-timing   /* ease-in-out */
+
+/* Backdrop */
+--dbv-kit-dialog-backdrop-background       /* #0000007a */
+
+/* Heading */
+--dbv-kit-dialog-heading-margin            /* 0 */
+--dbv-kit-dialog-heading-font-size         /* 1.25rem */
+--dbv-kit-dialog-heading-font-weight       /* 400 */
+--dbv-kit-dialog-heading-line-height       /* 2rem */
+--dbv-kit-dialog-heading-color             /* var(--dbv-kit-dialog-content-foreground) */
+
+/* Description */
+--dbv-kit-dialog-description-margin        /* 0 */
+--dbv-kit-dialog-description-font-size     /* 0.875rem */
+--dbv-kit-dialog-description-color         /* inherit */
+
+/* Disclosure */
+--dbv-kit-dialog-disclosure-background     /* transparent */
+--dbv-kit-dialog-disclosure-foreground     /* inherit */
+
+/* Dismiss */
+--dbv-kit-dialog-dismiss-background        /* #f2f2f2 */
+--dbv-kit-dialog-dismiss-foreground        /* #353535 */
+--dbv-kit-dialog-dismiss-hover-background  /* #e5e5e5 */
+```
+
+### Backdrop Styling
+
+The dialog backdrop can be styled using the `[data-backdrop]` selector:
+
+```css
+[data-backdrop] {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+```
+
+## Hooks
+
+The following hooks are re-exported for advanced scenarios:
+
+- `useDialogStore` — create or control a dialog store programmatically
+- `useDialogContext` — access the current dialog context/store
+
+## Props
+
+All components are thin wrappers around Ariakit:
+
+### Dialog
+
+Inherits Ariakit `Dialog` props. Accepts the following properties:
+
+- `open` - Controls dialog visibility
+- `onClose` - Callback when dialog is closed
+- `modal` - Whether the dialog is modal (default: true)
+- `portal` - Whether to render in a portal (default: true)
+- `animated` - Whether to animate dialog appearance (default: true). Set to `false` to disable animations, useful when combining with other animations. Note: animations are automatically disabled when user has `prefers-reduced-motion: reduce` enabled.
+- `data-size` - Dialog size: `'small'`, `'medium'`, or `'large'`
+- `data-variant` - Dialog variant: `'slide'` for side panel
+- Other standard Ariakit dialog properties
+
+### DialogHeading
+
+Inherits Ariakit `DialogHeading` props.
+
+### DialogDescription
+
+Inherits Ariakit `DialogDescription` props.
+
+### DialogDismiss
+
+Inherits Ariakit `DialogDismiss` props.
+
+### DialogDisclosure
+
+Inherits Ariakit `DialogDisclosure` props.
+
+### DialogProvider
+
+Inherits Ariakit `DialogProvider` props and provides the dialog store context.
+
+## Accessibility
+
+The Dialog component follows the [WAI-ARIA Dialog Pattern](https://www.w3.org/WAI/ARIA/apg/patterns/dialogmodal/):
+
+- Focus is trapped inside the dialog when open
+- Escape key closes the dialog
+- Focus returns to the trigger element when closed
+- Backdrop click closes the dialog
+- `DialogHeading` provides accessible label via `aria-labelledby`
+- `DialogDescription` provides accessible description via `aria-describedby`
+- **Animations automatically disabled** when user has `prefers-reduced-motion: reduce` setting enabled
+- Proper ARIA attributes for screen readers
+- Support for both modal and modeless dialogs
+- Keyboard navigation support
+
+## Underlying Components
+
+For more advanced usage, see the [Ariakit Dialog documentation](https://ariakit.org/components/dialog).

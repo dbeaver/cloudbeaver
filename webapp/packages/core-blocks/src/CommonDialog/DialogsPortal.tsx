@@ -6,8 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { useLayoutEffect, useMemo, useRef } from 'react';
-import { DialogBackdrop } from 'reakit';
+import { useMemo } from 'react';
 
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, type DialogInternal } from '@cloudbeaver/core-dialogs';
@@ -23,7 +22,6 @@ import style from './DialogsPortal.module.css';
 export const DialogsPortal = observer(function DialogsPortal() {
   const styles = useS(style);
   const commonDialogService = useService(CommonDialogService);
-  const focusedElementRef = useRef<HTMLElement | null>(null);
 
   let activeDialog: DialogInternal<any> | undefined;
 
@@ -43,48 +41,19 @@ export const DialogsPortal = observer(function DialogsPortal() {
           commonDialogService.resolveDialog(this.dialog.promise, result);
         }
       },
-      backdropClick(e: React.MouseEvent<HTMLDivElement>) {
-        if (e.target !== e.currentTarget) {
-          return;
-        }
-
-        e.preventDefault(); // prevent focus loss
-        if (!this.dialog?.options?.persistent && e.currentTarget.isEqualNode(e.target as HTMLElement)) {
-          this.reject();
-        }
-      },
     }),
     {
       dialog: activeDialog,
     },
-    ['reject', 'resolve', 'backdropClick'],
+    ['reject', 'resolve'],
   );
 
-  useMemo(() => {
-    if (!activeDialog) {
-      return;
-    }
-
-    // capture focused element before dialog open
-    if (document.activeElement instanceof HTMLElement) {
-      focusedElementRef.current = document.activeElement;
-    }
-  }, [activeDialog]);
-
-  useLayoutEffect(() => {
-    if (!activeDialog) {
-      return;
-    }
-
-    return () => {
-      // restore focus after dialog close
-      focusedElementRef.current?.focus();
-      focusedElementRef.current = null;
-    };
-  }, [activeDialog]);
+  if (!activeDialog) {
+    return null;
+  }
 
   return (
-    <DialogBackdrop className={s(styles, { backdrop: true })} visible={!!activeDialog} onMouseDown={state.backdropClick}>
+    <div className={s(styles, { backdrop: true })}>
       <Loader className={s(styles, { loader: true })} suspense>
         <div className={s(styles, { innerBox: true })}>
           {commonDialogService.dialogs.map((dialog, i, arr) => (
@@ -92,7 +61,7 @@ export const DialogsPortal = observer(function DialogsPortal() {
           ))}
         </div>
       </Loader>
-    </DialogBackdrop>
+    </div>
   );
 });
 

@@ -14,6 +14,7 @@ import { DisplayError } from './DisplayError.js';
 import style from './ErrorBoundary.module.css';
 import { ErrorContext, type IExceptionContext } from './ErrorContext.js';
 import { ExceptionMessage } from './ExceptionMessage.js';
+import { Spinner } from '@dbeaver/ui-kit';
 
 interface Props {
   simple?: boolean;
@@ -144,7 +145,7 @@ export class ErrorBoundary extends React.Component<React.PropsWithChildren<Props
 
     return (
       <ErrorContext.Provider value={this}>
-        <Suspense fallback={<>Loading...</>}>{children}</Suspense>
+        <Suspense fallback={<Spinner size="large" />}>{children}</Suspense>
       </ErrorContext.Provider>
     );
   }
