@@ -16,4 +16,5 @@ export default [
   ['core_blocks_export_image_dialog_title', 'Xuất dưới dạng hình ảnh'],
   ['core_blocks_export_image_dialog_format', 'Định dạng tệp'],
   ['core_blocks_export_image_dialog_transparent_background', 'Nền trong suốt'],
+  ['core_blocks_dialog_element_close_tooltip', 'Đóng bảng điều khiển'],
 ];

@@ -7,7 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { IconButton } from '@dbeaver/ui-kit';
+import { DialogHeader, IconButton } from '@dbeaver/ui-kit';
 import { Icon } from '../../Icon.js';
 import { IconOrImage } from '../../IconOrImage.js';
 import { useTranslate } from '../../localization/useTranslate.js';
@@ -40,7 +40,7 @@ export const CommonDialogHeader = observer<Props>(function CommonDialogHeader({
   const computedStyles = useS(styles);
 
   return (
-    <header title={translate(tooltip ?? title)} className={s(computedStyles, { header: true }, className)}>
+    <DialogHeader title={translate(tooltip ?? title)} className={s(computedStyles, { header: true }, className)}>
       <div className={s(computedStyles, { iconContainer: true })}>
         {icon && <IconOrImage className={s(computedStyles, { icon: true, bigIcon })} icon={icon} viewBox={viewBox} />}
       </div>
@@ -53,6 +53,6 @@ export const CommonDialogHeader = observer<Props>(function CommonDialogHeader({
         )}
       </div>
       {subTitle && <div className={s(computedStyles, { subTitle: true })}>{typeof subTitle === 'string' ? translate(subTitle) : subTitle}</div>}
-    </header>
+    </DialogHeader>
   );
 });

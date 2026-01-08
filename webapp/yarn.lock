@@ -4557,6 +4557,7 @@ __metadata:
     "@cloudbeaver/tsconfig": "workspace:*"
     "@dbeaver/ui-kit": "workspace:^"
     "@storybook/addon-docs": "npm:^10"
+    "@storybook/addon-storysource": "npm:^8"
     "@storybook/react-vite": "npm:^10"
     "@tailwindcss/vite": "npm:4.0.7"
     "@types/node": "npm:^22"
@@ -7423,6 +7424,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@storybook/addon-storysource@npm:^8":
+  version: 8.6.15
+  resolution: "@storybook/addon-storysource@npm:8.6.15"
+  dependencies:
+    "@storybook/source-loader": "npm:8.6.15"
+    estraverse: "npm:^5.2.0"
+    tiny-invariant: "npm:^1.3.1"
+  peerDependencies:
+    storybook: ^8.6.15
+  checksum: 10c0/e7486d3a405b15f15ba6e42bf327d6da0c61f02634f454a167ef02a505c6e65952840ecd6066b32a994313d03fe6615a6295c2027dce3591f017427a95ba4e13
+  languageName: node
+  linkType: hard
+
 "@storybook/builder-vite@npm:10.1.7":
   version: 10.1.7
   resolution: "@storybook/builder-vite@npm:10.1.7"
@@ -7527,6 +7541,19 @@ __metadata:
     typescript:
       optional: true
   checksum: 10c0/e3c5e424d749cba9924c30a25070b691c4f4a5e478f9e8e098be6043e8f96a7a022e95bb476525d1396cb9519744ffe7e8d2bf9385b4ec31428d8060352ef692
+  languageName: node
+  linkType: hard
+
+"@storybook/source-loader@npm:8.6.15":
+  version: 8.6.15
+  resolution: "@storybook/source-loader@npm:8.6.15"
+  dependencies:
+    es-toolkit: "npm:^1.22.0"
+    estraverse: "npm:^5.2.0"
+    prettier: "npm:^3.1.1"
+  peerDependencies:
+    storybook: ^8.6.15
+  checksum: 10c0/51de6e7d0534142ec7e74e46bbfdfd82dbacffe64c730fd42b323627b1e3ebd83493eb40986a4755f45d923ed8639ee58cd1281471d6f88556a6b8a27956a012
   languageName: node
   linkType: hard
 
@@ -11564,6 +11591,18 @@ __metadata:
     is-date-object: "npm:^1.0.5"
     is-symbol: "npm:^1.0.4"
   checksum: 10c0/c7e87467abb0b438639baa8139f701a06537d2b9bc758f23e8622c3b42fd0fdb5bde0f535686119e446dd9d5e4c0f238af4e14960f4771877cf818d023f6730b
+  languageName: node
+  linkType: hard
+
+"es-toolkit@npm:^1.22.0":
+  version: 1.43.0
+  resolution: "es-toolkit@npm:1.43.0"
+  dependenciesMeta:
+    "@trivago/prettier-plugin-sort-imports@4.3.0":
+      unplugged: true
+    prettier-plugin-sort-re-exports@0.0.1:
+      unplugged: true
+  checksum: 10c0/bbff0b591fd01be9f37a34dad7964b590e4952fc594c1230140771687f05136caa6ab21962a6e9cde7c4b529a149171ed5179d6379d4a8e656dbf7e8d126999c
   languageName: node
   linkType: hard
 
@@ -16396,7 +16435,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prettier@npm:^3, prettier@npm:^3.6.2":
+"prettier@npm:^3, prettier@npm:^3.1.1, prettier@npm:^3.6.2":
   version: 3.7.4
   resolution: "prettier@npm:3.7.4"
   bin:
@@ -18427,7 +18466,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tiny-invariant@npm:^1.3.3":
+"tiny-invariant@npm:^1.3.1, tiny-invariant@npm:^1.3.3":
   version: 1.3.3
   resolution: "tiny-invariant@npm:1.3.3"
   checksum: 10c0/65af4a07324b591a059b35269cd696aba21bef2107f29b9f5894d83cc143159a204b299553435b03874ebb5b94d019afa8b8eff241c8a4cfee95872c2e1c1c4a

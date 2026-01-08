@@ -14,7 +14,7 @@
     --dbv-kit-checkbox-icon-color: var(--tw-color-white);
 
     /* Checkbox border */
-    --dbv-kit-checkbox-border-width: calc(var(--dbv-kit-control-border-width) * 2);
+    --dbv-kit-checkbox-border-width: var(--dbv-kit-control-border-width);
     --dbv-kit-checkbox-border-radius: var(--dbv-kit-control-border-radius);
     --dbv-kit-checkbox-border-style: solid;
     --dbv-kit-checkbox-border-color: var(--dbv-kit-color-control-inactive);
