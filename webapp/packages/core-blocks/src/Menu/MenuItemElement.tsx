@@ -48,7 +48,7 @@ export const MenuItemElement = observer<IMenuItemElementProps>(function MenuItem
   loading = useStateDelay(loading, 300);
 
   return (
-    <button {...rest} className={s(styles, { menuPanelItem: true }, rest.className)} title={tooltip ? translate(tooltip) : undefined}>
+    <button {...rest} className={s(styles, { menuPanelItem: true }, rest.className)} title={translate(tooltip)}>
       <div className={s(styles, { menuItemMain: true })}>
         <div className={s(styles, { menuItemIcon: true })}>
           <Loader className={s(styles, { loader: true })} suspense small fullSize>
