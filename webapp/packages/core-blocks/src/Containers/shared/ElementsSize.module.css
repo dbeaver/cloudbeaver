@@ -60,6 +60,7 @@
 .container > .fill {
   flex-grow: 1;
   max-width: none;
+  min-width: 0;
 }
 
 .keepSize,

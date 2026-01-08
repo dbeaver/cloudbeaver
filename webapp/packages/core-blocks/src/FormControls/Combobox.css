@@ -1,7 +1,6 @@
 @layer components {
   .dbv-kit-combobox,
   .dbv-kit-combobox__popover {
-    --dbv-kit-combobox-border-width: 2px;
     --dbv-kit-combobox-hover-border-color: var(--theme-background);
 
     --dbv-kit-combobox-border-color: var(--theme-input-border);

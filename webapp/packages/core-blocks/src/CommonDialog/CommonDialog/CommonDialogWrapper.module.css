@@ -5,69 +5,47 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-.container {
-  box-sizing: border-box;
-  display: flex;
-  outline: none;
-}
-
 .dialog {
   composes: theme-background-surface theme-text-on-surface theme-elevation-z10 from global;
-  border-radius: 0.25rem;
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  overflow: hidden;
-  margin: 0;
-  border: none;
-  height: auto;
-  max-height: 100%;
-  max-width: 748px;
-  padding: 0px;
-  outline: none;
 
-  &.small {
+  &.fixedSize[data-size='small'] {
+    width: 404px;
+    height: 262px;
     min-width: 404px;
     min-height: 262px;
-    max-height: max(var(--app-height, 100vh) - 48px, 262px);
-
-    &.fixedSize {
-      width: 404px;
-      height: 262px;
-    }
-    &.fixedWidth {
-      width: 404px;
-    }
   }
-  &.medium {
+
+  &.fixedWidth[data-size='small'] {
+    width: 404px;
+    min-width: 404px;
+  }
+
+  &.fixedSize[data-size='medium'] {
+    width: 576px;
+    height: 374px;
     min-width: 576px;
     min-height: 374px;
-    max-height: max(var(--app-height, 100vh) - 48px, 374px);
-
-    &.fixedSize {
-      width: 576px;
-      height: 374px;
-    }
-    &.fixedWidth {
-      width: 576px;
-    }
   }
-  &.large {
+
+  &.fixedWidth[data-size='medium'] {
+    width: 576px;
+    min-width: 576px;
+  }
+
+  &.fixedSize[data-size='large'] {
+    width: 720px;
+    height: 468px;
     min-width: 720px;
     min-height: 468px;
-    max-height: max(var(--app-height, 100vh) - 48px, 468px);
+  }
 
-    &.fixedSize {
-      width: 720px;
-      height: 468px;
-    }
-    &.fixedWidth {
-      width: 720px;
-    }
+  &.fixedWidth[data-size='large'] {
+    width: 720px;
+    min-width: 720px;
   }
 
   &.freeHeight {
-    min-height: unset;
+    min-height: unset !important;
   }
 }
 

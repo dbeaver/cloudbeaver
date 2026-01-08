@@ -48,3 +48,4 @@ export * from './utils/clsx.js';
 export * from './ComponentProvider.js';
 export * from './Menu/Menu.js';
 export * from './Disclosure/Disclosure.js';
+export * from './Dialog/Dialog.js';
