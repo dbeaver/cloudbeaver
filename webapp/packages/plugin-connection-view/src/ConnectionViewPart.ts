@@ -6,13 +6,14 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { ConnectionInfoResource, DEFAULT_NAVIGATOR_VIEW_SETTINGS } from '@cloudbeaver/core-connections';
+import { ConnectionInfoResource, createConnectionParam, DEFAULT_NAVIGATOR_VIEW_SETTINGS } from '@cloudbeaver/core-connections';
 import type { NavigatorViewSettings } from '@cloudbeaver/core-root';
 import { FormPart, type IFormState } from '@cloudbeaver/core-ui';
 import type { ProjectInfoResource } from '@cloudbeaver/core-projects';
 import type { ConnectionFormOptionsPart, IConnectionFormState } from '@cloudbeaver/plugin-connections';
 
 import type { ConnectionViewService } from './ConnectionViewService.js';
+import type { ConnectionViewResource } from './ConnectionViewResource.js';
 
 export type ConnectionViewPartState = Required<Omit<NavigatorViewSettings, 'userSettings'>>;
 
@@ -27,6 +28,7 @@ export class ConnectionViewPart extends FormPart<ConnectionViewPartState, IConne
     private readonly connectionInfoResource: ConnectionInfoResource,
     private readonly connectionViewService: ConnectionViewService,
     private readonly projectInfoResource: ProjectInfoResource,
+    private readonly connectionViewResource: ConnectionViewResource,
   ) {
     super(formState, defaultStateGetter());
   }
@@ -36,7 +38,7 @@ export class ConnectionViewPart extends FormPart<ConnectionViewPartState, IConne
       return false;
     }
 
-    return this.connectionInfoResource.isOutdated(this.optionsPart.connectionKey);
+    return this.connectionViewResource.isOutdated(this.optionsPart.connectionKey);
   }
 
   protected override async loader(): Promise<void> {
@@ -46,7 +48,7 @@ export class ConnectionViewPart extends FormPart<ConnectionViewPartState, IConne
     }
 
     // THIS IS ONLY FOR USER SETTINGS, WE SHOULD LOAD GLOBAL SETTINGS FROM SOMEWHERE ELSE
-    const connection = await this.connectionInfoResource.load(this.optionsPart.connectionKey);
+    const connection = await this.connectionViewResource.load(this.optionsPart.connectionKey);
     this.setInitialState({ ...connection.navigatorSettings });
   }
 
@@ -59,7 +61,7 @@ export class ConnectionViewPart extends FormPart<ConnectionViewPartState, IConne
     const connection = await this.connectionInfoResource.load(this.optionsPart.connectionKey);
     const isShared = this.projectInfoResource.isProjectShared(connection.projectId);
 
-    await this.connectionViewService.changeConnectionView(connection, {
+    await this.connectionViewService.changeConnectionView(createConnectionParam(connection), {
       ...this.state,
       userSettings: !isShared,
     });

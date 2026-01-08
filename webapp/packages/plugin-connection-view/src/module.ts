@@ -11,6 +11,7 @@ import { Bootstrap, ModuleRegistry } from '@cloudbeaver/core-di';
 import { ConnectionViewPluginBootstrap } from './ConnectionViewPluginBootstrap.js';
 import { LocaleService } from './LocaleService.js';
 import { ConnectionViewService } from './ConnectionViewService.js';
+import { ConnectionViewResource } from './ConnectionViewResource.js';
 
 export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-connection-view',
@@ -19,6 +20,7 @@ export default ModuleRegistry.add({
     serviceCollection
       .addSingleton(Bootstrap, ConnectionViewPluginBootstrap)
       .addSingleton(Bootstrap, LocaleService)
-      .addSingleton(ConnectionViewService);
+      .addSingleton(ConnectionViewService)
+      .addSingleton(ConnectionViewResource);
   },
 });

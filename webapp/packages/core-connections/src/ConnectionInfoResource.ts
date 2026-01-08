@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -26,13 +26,7 @@ import {
   resourceKeyListAliasFactory,
   ResourceKeyUtils,
 } from '@cloudbeaver/core-resource';
-import {
-  DataSynchronizationService,
-  type NavigatorViewSettings,
-  ServerEventId,
-  SessionDataResource,
-  WorkspaceConfigEventHandler,
-} from '@cloudbeaver/core-root';
+import { DataSynchronizationService, ServerEventId, SessionDataResource, WorkspaceConfigEventHandler } from '@cloudbeaver/core-root';
 import {
   type AdminConnectionGrantInfo,
   type AdminConnectionSearchInfo,
@@ -428,32 +422,6 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
         metadata.connecting = false;
       }
     });
-
-    return this.get(key)!;
-  }
-
-  async changeConnectionView(key: IConnectionInfoParams, settings: NavigatorViewSettings): Promise<Connection> {
-    const connectionNavigatorViewSettings = this.get(key)?.navigatorSettings || DEFAULT_NAVIGATOR_VIEW_SETTINGS;
-    const { connection } = await this.graphQLService.sdk.setConnectionNavigatorSettings({
-      connectionId: key.connectionId,
-      projectId: key.projectId,
-      settings: { ...connectionNavigatorViewSettings, ...settings },
-    });
-
-    this.set(createConnectionParam(connection), connection);
-    this.onDataOutdated.execute(key);
-
-    return this.get(key)!;
-  }
-
-  async clearConnectionView(key: IConnectionInfoParams): Promise<Connection> {
-    const { connection } = await this.graphQLService.sdk.clearConnectionNavigatorSettings({
-      id: key.connectionId,
-      projectId: key.projectId,
-    });
-
-    this.set(createConnectionParam(connection), connection);
-    this.onDataOutdated.execute(key);
 
     return this.get(key)!;
   }

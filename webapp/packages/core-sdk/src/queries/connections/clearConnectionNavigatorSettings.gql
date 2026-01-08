@@ -1,5 +1,5 @@
 mutation clearConnectionNavigatorSettings($id: ID!, $projectId: ID!) {
   connection: clearConnectionNavigatorSettings(id: $id, projectId: $projectId) {
-    ...DatabaseConnection
+    ...DatabaseConnectionNavigatorViewSettings
   }
 }

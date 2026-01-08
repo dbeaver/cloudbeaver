@@ -1,0 +1,7 @@
+fragment DatabaseConnectionNavigatorViewSettings on ConnectionInfo {
+  id
+  projectId
+  navigatorSettings {
+    ...AllNavigatorSettings
+  }
+}

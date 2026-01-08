@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { ConnectionInfoResource, createConnectionParam, DATA_CONTEXT_CONNECTION, type Connection } from '@cloudbeaver/core-connections';
+import { createConnectionParam, DATA_CONTEXT_CONNECTION, type IConnectionInfoParams } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { ActionService, MenuSeparatorItem, MenuService } from '@cloudbeaver/core-view';
@@ -28,6 +28,7 @@ import { ACTION_CONNECTION_VIEW_SYSTEM_OBJECTS } from './Actions/ACTION_CONNECTI
 import { MENU_CONNECTION_VIEW } from './MENU_CONNECTION_VIEW.js';
 import { ACTION_CONNECTION_VIEW_RESET } from './Actions/ACTION_CONNECTION_VIEW_RESET.js';
 import { ConnectionViewService } from './ConnectionViewService.js';
+import { ConnectionViewResource } from './ConnectionViewResource.js';
 
 const ConnectionViewForm = importLazyComponent(() => import('./ConnectionViewForm.js').then(m => m.ConnectionViewForm));
 
@@ -36,10 +37,10 @@ const ConnectionViewForm = importLazyComponent(() => import('./ConnectionViewFor
   MenuService,
   PluginConnectionsSettingsService,
   PermissionsService,
-  ConnectionInfoResource,
   ConnectionFormService,
   ProjectInfoResource,
   ConnectionViewService,
+  ConnectionViewResource,
 ])
 export class ConnectionViewPluginBootstrap extends Bootstrap {
   constructor(
@@ -47,10 +48,10 @@ export class ConnectionViewPluginBootstrap extends Bootstrap {
     private readonly menuService: MenuService,
     private readonly pluginConnectionsSettingsService: PluginConnectionsSettingsService,
     private readonly permissionsService: PermissionsService,
-    private readonly connectionInfoResource: ConnectionInfoResource,
     private readonly connectionFormService: ConnectionFormService,
     private readonly projectInfoResource: ProjectInfoResource,
     private readonly connectionViewService: ConnectionViewService,
+    private readonly connectionViewResource: ConnectionViewResource,
   ) {
     super();
   }
@@ -89,7 +90,7 @@ export class ConnectionViewPluginBootstrap extends Bootstrap {
       isActionApplicable: (context, action) => {
         if (action === ACTION_CONNECTION_VIEW_RESET) {
           const connectionKey = context.get(DATA_CONTEXT_CONNECTION)!;
-          const connection = this.connectionInfoResource.get(connectionKey);
+          const connection = this.connectionViewResource.get(connectionKey);
 
           if (connection) {
             const isShared = this.projectInfoResource.isProjectShared(connection.projectId);
@@ -101,7 +102,7 @@ export class ConnectionViewPluginBootstrap extends Bootstrap {
       },
       isChecked: (context, action) => {
         const connectionKey = context.get(DATA_CONTEXT_CONNECTION)!;
-        const connection = this.connectionInfoResource.get(connectionKey);
+        const connection = this.connectionViewResource.get(connectionKey);
 
         if (!connection) {
           return false;
@@ -123,42 +124,43 @@ export class ConnectionViewPluginBootstrap extends Bootstrap {
       },
       handler: async (context, action) => {
         const connectionKey = context.get(DATA_CONTEXT_CONNECTION)!;
-        const connection = await this.connectionInfoResource.load(connectionKey);
+        const connection = await this.connectionViewResource.load(connectionKey);
+        const key = createConnectionParam(connection);
 
         switch (action) {
           case ACTION_CONNECTION_VIEW_SIMPLE: {
-            await this.changeConnectionView(connection, CONNECTION_NAVIGATOR_VIEW_SETTINGS.simple);
+            await this.changeConnectionView(key, CONNECTION_NAVIGATOR_VIEW_SETTINGS.simple);
             break;
           }
           case ACTION_CONNECTION_VIEW_ADVANCED: {
-            await this.changeConnectionView(connection, CONNECTION_NAVIGATOR_VIEW_SETTINGS.advanced);
+            await this.changeConnectionView(key, CONNECTION_NAVIGATOR_VIEW_SETTINGS.advanced);
             break;
           }
           case ACTION_CONNECTION_VIEW_SYSTEM_OBJECTS: {
             const currentSettings = connection.navigatorSettings;
 
-            await this.changeConnectionView(connection, {
+            await this.changeConnectionView(key, {
               ...currentSettings,
               showSystemObjects: !currentSettings.showSystemObjects,
             });
             break;
           }
           case ACTION_CONNECTION_VIEW_RESET: {
-            await this.connectionInfoResource.clearConnectionView(createConnectionParam(connection));
+            await this.connectionViewResource.clearConnectionView(createConnectionParam(connection));
             break;
           }
         }
       },
       getLoader: context => {
         const connectionKey = context.get(DATA_CONTEXT_CONNECTION)!;
-        return getCachedMapResourceLoaderState(this.connectionInfoResource, () => connectionKey, undefined, true);
+        return getCachedMapResourceLoaderState(this.connectionViewResource, () => connectionKey, undefined, true);
       },
     });
 
     this.connectionFormService.connectionContainer.add(ConnectionViewForm);
   }
 
-  private async changeConnectionView(connection: Connection, settings: NavigatorViewSettings): Promise<void> {
-    await this.connectionViewService.changeConnectionView(connection, { ...settings, userSettings: true });
+  private async changeConnectionView(connectionKey: IConnectionInfoParams, settings: NavigatorViewSettings): Promise<void> {
+    await this.connectionViewService.changeConnectionView(connectionKey, { ...settings, userSettings: true });
   }
 }

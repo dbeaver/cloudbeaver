@@ -14,6 +14,7 @@ import { ProjectInfoResource } from '@cloudbeaver/core-projects';
 
 import { ConnectionViewPart } from './ConnectionViewPart.js';
 import { ConnectionViewService } from './ConnectionViewService.js';
+import { ConnectionViewResource } from './ConnectionViewResource.js';
 
 const DATA_CONTEXT_CONNECTION_FORM_VIEW_PART = createDataContext<ConnectionViewPart>('Connection Form View Part');
 
@@ -24,7 +25,8 @@ export function getConnectionViewPart(formState: IFormState<IConnectionFormState
     const connectionInfoResource = di.getService(ConnectionInfoResource);
     const connectionViewService = di.getService(ConnectionViewService);
     const projectInfoResource = di.getService(ProjectInfoResource);
+    const connectionViewResource = di.getService(ConnectionViewResource);
 
-    return new ConnectionViewPart(formState, optionsPart, connectionInfoResource, connectionViewService, projectInfoResource);
+    return new ConnectionViewPart(formState, optionsPart, connectionInfoResource, connectionViewService, projectInfoResource, connectionViewResource);
   });
 }

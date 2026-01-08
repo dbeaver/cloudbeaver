@@ -6,23 +6,27 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { ConnectionInfoResource, createConnectionParam, type Connection } from '@cloudbeaver/core-connections';
+import { ConnectionInfoResource, type IConnectionInfoParams } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
 import { type NavigatorViewSettings } from '@cloudbeaver/core-root';
 
-@injectable(() => [ConnectionInfoResource, NavNodeManagerService, NotificationService])
+import { ConnectionViewResource } from './ConnectionViewResource.js';
+
+@injectable(() => [ConnectionInfoResource, NavNodeManagerService, NotificationService, ConnectionViewResource])
 export class ConnectionViewService {
   constructor(
     private readonly connectionInfoResource: ConnectionInfoResource,
     private readonly navNodeManagerService: NavNodeManagerService,
     private readonly notificationService: NotificationService,
+    private readonly connectionViewResource: ConnectionViewResource,
   ) {}
 
-  async changeConnectionView(connection: Connection, settings: NavigatorViewSettings): Promise<void> {
+  async changeConnectionView(connectionKey: IConnectionInfoParams, settings: NavigatorViewSettings): Promise<void> {
     try {
-      connection = await this.connectionInfoResource.changeConnectionView(createConnectionParam(connection), settings);
+      await this.connectionViewResource.changeConnectionView(connectionKey, settings);
+      const connection = await this.connectionInfoResource.load(connectionKey);
 
       if (connection.nodePath && connection.connected) {
         await this.navNodeManagerService.refreshNode(connection.nodePath);
