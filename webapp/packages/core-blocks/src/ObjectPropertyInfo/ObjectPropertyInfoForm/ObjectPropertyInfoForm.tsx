@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,8 @@ import { useS } from '../../useS.js';
 import { RenderField } from './RenderField.js';
 import { getObjectPropertyDefaults } from '../getObjectPropertyDefaults.js';
 
+type AutocompletePasswordType = 'current-password' | 'new-password' | 'off' | 'on';
+
 export interface ObjectPropertyFormProps extends ILayoutSizeProps {
   properties: ReadonlyArray<ObjectPropertyInfo>;
   state?: Record<string, any>;
@@ -36,25 +38,21 @@ export interface ObjectPropertyFormProps extends ILayoutSizeProps {
   hideEmptyPlaceholder?: boolean;
   emptyPlaceholder?: string;
   canShowPassword?: boolean;
-  disableAutoCompleteForPasswords?: boolean;
+  autocompletePasswordType?: AutocompletePasswordType;
   isSaved?: (property: ObjectPropertyInfo) => boolean;
   getLayoutSize?: (property: ObjectPropertyInfo) => ILayoutSizeProps;
   onFocus?: (name: string) => void;
 }
 
-function getAutocompleteParam(property: ObjectPropertyInfo, prefix: string, disabledForPasswords: boolean): string {
+function getAutocompleteParam(property: ObjectPropertyInfo, prefix: string, autocompletePasswordType: AutocompletePasswordType): string {
   const isPasswordField = property.features.includes('password');
 
-  if (isPasswordField && disabledForPasswords) {
-    return 'off';
-  }
-
   if (isPasswordField) {
-    return prefix ? prefix + ' current-password' : 'current-password';
+    return prefix ? `${prefix} ${autocompletePasswordType}` : autocompletePasswordType;
   }
 
   if (property.features.includes('name')) {
-    return prefix ? prefix + ' username' : 'username';
+    return prefix ? `${prefix} username` : 'username';
   }
 
   return 'on';
@@ -66,7 +64,6 @@ export const ObjectPropertyInfoForm = observer<ObjectPropertyFormProps>(function
   context,
   defaultState,
   category,
-  disableAutoCompleteForPasswords = false,
   editable = true,
   className,
   autocompleteSectionName = '',
@@ -77,6 +74,7 @@ export const ObjectPropertyInfoForm = observer<ObjectPropertyFormProps>(function
   hideEmptyPlaceholder,
   emptyPlaceholder = 'core_blocks_object_property_info_form_empty_placeholder',
   canShowPassword,
+  autocompletePasswordType = 'on',
   isSaved,
   getLayoutSize,
   onFocus,
@@ -116,7 +114,7 @@ export const ObjectPropertyInfoForm = observer<ObjectPropertyFormProps>(function
             context={context}
             defaultState={defaults}
             editable={editable}
-            autocomplete={getAutocompleteParam(property, autocompleteSectionName, disableAutoCompleteForPasswords)}
+            autocomplete={getAutocompleteParam(property, autocompleteSectionName, autocompletePasswordType)}
             disabled={disabled}
             readOnly={readOnly}
             autoHide={autoHide}
