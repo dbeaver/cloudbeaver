@@ -110,7 +110,8 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL>
                     getService(env).getGroupingSqlResultSet(
                         getWebSession(env),
                         getSQLContext(env),
-                        getArgumentVal(env, "resultsId"),
+                        getArgumentVal(env, "originalResultsId"),
+                        getArgument(env, "currentResultsId"),
                         getArgumentVal(env, "columnNames"),
                         getArgument(env, "functions"),
                         getArgument(env, "showDuplicatesOnly"),

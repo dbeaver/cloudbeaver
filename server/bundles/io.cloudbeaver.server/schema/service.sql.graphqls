@@ -344,7 +344,10 @@ extend type Query {
         projectId: ID,
         contextId: ID!,
         connectionId: ID!,
-        resultsId: ID!,
+        "Original results ID to group"
+        originalResultsId: ID!,
+        "Current results ID is needed to apply filters/sorting on top of grouping"
+        currentResultsId: ID,
         columnNames: [String!],
         functions: [String!],
         showDuplicatesOnly: Boolean,

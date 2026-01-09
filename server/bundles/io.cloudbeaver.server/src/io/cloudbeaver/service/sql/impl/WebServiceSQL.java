@@ -651,7 +651,8 @@ public class WebServiceSQL implements DBWServiceSQL {
     public WebAsyncTaskInfo getGroupingSqlResultSet(
         @NotNull WebSession webSession,
         @NotNull WebSQLContextInfo contextInfo,
-        @NotNull String resultsId,
+        @NotNull String originalResultsId,
+        @Nullable String currentResultsId,
         @NotNull List<String> columnsList,
         @Nullable List<String> functions,
         @Nullable Boolean showDuplicatesOnly,
@@ -662,8 +663,8 @@ public class WebServiceSQL implements DBWServiceSQL {
         return WebSQLUtils.createAsyncTaskExecuteSqlQuery(
             webSession,
             contextInfo,
-            generateGroupByQuery(contextInfo, resultsId, columnsList, functions, showDuplicatesOnly),
-            resultsId,
+            generateGroupByQuery(contextInfo, originalResultsId, columnsList, functions, showDuplicatesOnly),
+            currentResultsId,
             filter,
             dataFormat,
             false,
