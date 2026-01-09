@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -9,7 +9,7 @@ import { injectable } from '@cloudbeaver/core-di';
 import {
   ACTION_EDIT,
   ActionService,
-  getBindingLabel,
+  getBindingLabels,
   KEY_BINDING_ADD,
   KEY_BINDING_DUPLICATE,
   MenuService,
@@ -30,6 +30,7 @@ import {
   IDatabaseDataViewAction,
   isBooleanValuePresentationAvailable,
   isResultSetDataSource,
+  KEY_BINDING_DELETE_ROW,
   ResultSetDataContentAction,
   type IDatabaseValueHolder,
   type IGridDataKey,
@@ -206,19 +207,27 @@ export class DataGridContextMenuCellEditingService {
       return {
         ...action.info,
         label: 'data_grid_table_editing_row_add',
-        tooltip: t('data_grid_table_editing_row_add') + ' (' + getBindingLabel(KEY_BINDING_ADD) + ')',
+        tooltip: t('data_grid_table_editing_row_add') + ' (' + getBindingLabels(KEY_BINDING_ADD) + ')',
       };
     }
     if (action === ACTION_DATA_GRID_EDITING_DUPLICATE_ROW) {
       return {
         ...action.info,
         label: 'data_grid_table_editing_row_add_copy',
-        tooltip: t('data_grid_table_editing_row_add_copy') + ' (' + getBindingLabel(KEY_BINDING_DUPLICATE) + ')',
+        tooltip: t('data_grid_table_editing_row_add_copy') + ' (' + getBindingLabels(KEY_BINDING_DUPLICATE) + ')',
       };
     }
 
     if (action === ACTION_EDIT) {
       return { ...action.info, label: t('data_grid_table_editing_open_inline_editor'), icon: 'edit' };
+    }
+
+    if (action === ACTION_DATA_GRID_EDITING_DELETE_ROW) {
+      return {
+        ...action.info,
+        label: t('data_grid_table_editing_row_delete'),
+        tooltip: t('data_grid_table_editing_row_delete') + ' (' + getBindingLabels(KEY_BINDING_DELETE_ROW) + ')',
+      };
     }
 
     return action.info;
