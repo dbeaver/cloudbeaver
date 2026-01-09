@@ -7,7 +7,7 @@
  */
 export default [
   ['core_session_actions_open_url_title', '打开外部链接'],
-  ['core_session_actions_open_url_message', '应用程序想要打开一个外部链接：\n\n{arg:url}\n\n是否继续？'],
+  ['core_session_actions_open_url_message', '应用程序想要打开一个外部链接。是否继续？'],
   ['core_session_actions_open_url_button', '打开链接'],
   ['core_session_actions_open_url_error', '无法打开URL'],
   ['core_session_actions_popup_blocked', '弹出窗口已被浏览器阻止。请允许此站点的弹出窗口。'],

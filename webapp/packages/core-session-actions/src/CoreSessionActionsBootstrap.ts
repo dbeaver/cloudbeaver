@@ -9,14 +9,14 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { ConfirmationDialog } from '@cloudbeaver/core-blocks';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { LocalizationService } from '@cloudbeaver/core-localization';
 import { SessionResource } from '@cloudbeaver/core-root';
 import { WindowsService } from '@cloudbeaver/core-routing';
 import { CbServerEventId, type WsOpenUrlEvent } from '@cloudbeaver/core-sdk';
 
 import { SessionActionsEventHandler } from './SessionActionsEventHandler.js';
+import { renderUrlConfirmationDetails } from './UrlConfirmationDetails.js';
 
-@injectable(() => [SessionActionsEventHandler, NotificationService, CommonDialogService, WindowsService, SessionResource, LocalizationService])
+@injectable(() => [SessionActionsEventHandler, NotificationService, CommonDialogService, WindowsService, SessionResource])
 export class CoreSessionActionsBootstrap extends Bootstrap {
   constructor(
     private readonly sessionActionsEventHandler: SessionActionsEventHandler,
@@ -24,7 +24,6 @@ export class CoreSessionActionsBootstrap extends Bootstrap {
     private readonly commonDialogService: CommonDialogService,
     private readonly windowsService: WindowsService,
     private readonly sessionResource: SessionResource,
-    private readonly localizationService: LocalizationService,
   ) {
     super();
 
@@ -37,10 +36,11 @@ export class CoreSessionActionsBootstrap extends Bootstrap {
     try {
       const { status } = await this.commonDialogService.open(ConfirmationDialog, {
         title: 'core_session_actions_open_url_title',
-        message: this.localizationService.translate('core_session_actions_open_url_message', undefined, { url }),
+        message: 'core_session_actions_open_url_message',
         icon: '/icons/preload/info_icon_sm.svg',
         size: 'medium',
         confirmActionText: 'core_session_actions_open_url_button',
+        children: () => renderUrlConfirmationDetails(url),
       });
 
       if (status === DialogueStateResult.Resolved) {

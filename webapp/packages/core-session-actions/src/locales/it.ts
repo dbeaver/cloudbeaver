@@ -7,8 +7,8 @@
  */
 export default [
   ['core_session_actions_open_url_title', 'Apri link esterno'],
-  ['core_session_actions_open_url_message', 'L\'applicazione desidera aprire un link esterno:\n\n{arg:url}\n\nVuoi continuare?'],
+  ['core_session_actions_open_url_message', "L'applicazione desidera aprire un link esterno. Vuoi continuare?"],
   ['core_session_actions_open_url_button', 'Apri link'],
-  ['core_session_actions_open_url_error', 'Impossibile aprire l\'URL'],
+  ['core_session_actions_open_url_error', "Impossibile aprire l'URL"],
   ['core_session_actions_popup_blocked', 'Il popup è stato bloccato dal tuo browser. Consenti i popup per questo sito.'],
 ];

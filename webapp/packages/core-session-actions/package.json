@@ -30,12 +30,16 @@
     "@cloudbeaver/core-localization": "workspace:*",
     "@cloudbeaver/core-root": "workspace:*",
     "@cloudbeaver/core-routing": "workspace:*",
-    "@cloudbeaver/core-sdk": "workspace:*"
+    "@cloudbeaver/core-sdk": "workspace:*",
+    "react": "^19",
+    "react-dom": "^19"
   },
   "devDependencies": {
     "@cloudbeaver/core-cli": "workspace:*",
     "@cloudbeaver/tsconfig": "workspace:*",
     "@dbeaver/cli": "workspace:*",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
     "rimraf": "^6",
     "tslib": "^2",
     "typescript": "^5"
