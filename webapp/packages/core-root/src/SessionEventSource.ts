@@ -27,7 +27,6 @@ import {
   throwError,
   timer,
 } from 'rxjs';
-import { webSocket, WebSocketSubject } from 'rxjs/webSocket';
 
 import { injectable } from '@cloudbeaver/core-di';
 import { Executor, type IExecutor, type ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
@@ -41,6 +40,7 @@ import {
 
 import type { IBaseServerEvent, IServerEventCallback, IServerEventEmitter, Unsubscribe } from './ServerEventEmitter/IServerEventEmitter.js';
 import { SessionExpireService } from './SessionExpireService.js';
+import { TransportSubject } from './TransportSubject.js';
 
 export { ServerEventId, SessionEventTopic, ClientEventId };
 
@@ -66,10 +66,8 @@ export class SessionEventSource implements IServerEventEmitter<ISessionEvent, IS
   readonly onActivate: IExecutor;
   readonly onInit: ISyncExecutor;
 
-  private readonly closeSubject: Subject<CloseEvent>;
-  private readonly openSubject: Subject<Event>;
   private readonly errorSubject: Subject<Error>;
-  private readonly subject: WebSocketSubject<ISessionEvent>;
+  private readonly subject: TransportSubject<ISessionEvent>;
   private readonly oldEventsSubject: Subject<ISessionEvent>;
   private readonly emitSubject: Subject<ISessionEvent>;
   private readonly disconnectSubject: Subject<boolean>;
@@ -83,15 +81,10 @@ export class SessionEventSource implements IServerEventEmitter<ISessionEvent, IS
     this.onInit = new SyncExecutor();
     this.oldEventsSubject = new Subject();
     this.disconnectSubject = new Subject();
-    this.closeSubject = new Subject();
-    this.openSubject = new Subject();
     this.errorSubject = new Subject();
     this.disconnected = false;
-    this.subject = webSocket({
-      url: environmentService.wsEndpoint,
-      closeObserver: this.closeSubject,
-      openObserver: this.openSubject,
-    });
+
+    this.subject = new TransportSubject<ISessionEvent>(environmentService);
 
     const ready$ = defer(() => from(this.onActivate.execute())).pipe(shareReplay(1));
 
@@ -103,18 +96,14 @@ export class SessionEventSource implements IServerEventEmitter<ISessionEvent, IS
       )
       .subscribe(this.subject);
 
-    this.openSubject.subscribe(() => {
+    this.subject.ready$.subscribe(() => {
       this.onInit.execute();
-    });
-
-    this.closeSubject.subscribe(event => {
-      console.warn(`Websocket closed (${event.code}): ${event.reason}`);
     });
 
     this.eventsSubject = merge(this.oldEventsSubject, ready$.pipe(switchMap(() => this.subject))).pipe(this.handleErrors());
 
     this.errorSubject.pipe(debounceTime(1000)).subscribe(error => {
-      console.error('Websocket:', error);
+      console.error('Transport:', error);
     });
 
     this.errorHandler = this.errorHandler.bind(this);
@@ -217,7 +206,7 @@ export class SessionEventSource implements IServerEventEmitter<ISessionEvent, IS
 
             const delayIndex = Math.min(retryCount - 1, RETRY_INTERVALS.length - 1);
             const delayTime = RETRY_INTERVALS[delayIndex]!;
-            console.warn(`WebSocket retry attempt ${retryCount}/${MAX_RETRY_ATTEMPTS} in ${delayTime}ms`);
+            console.warn(`Transport retry attempt ${retryCount}/${MAX_RETRY_ATTEMPTS} in ${delayTime}ms`);
 
             return timer(delayTime);
           },
@@ -229,7 +218,7 @@ export class SessionEventSource implements IServerEventEmitter<ISessionEvent, IS
   }
 
   private errorHandler(error: any): Observable<ISessionEvent> {
-    this.errorSubject.next(new ServiceError('WebSocket connection error', { cause: error }));
+    this.errorSubject.next(new ServiceError('Transport error', { cause: error }));
     return throwError(() => error);
   }
 }
