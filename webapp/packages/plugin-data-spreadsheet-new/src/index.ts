@@ -7,4 +7,3 @@
  */
 
 import './module.js';
-export * from './DataGrid/DATA_GRID_BINDINGS.js';

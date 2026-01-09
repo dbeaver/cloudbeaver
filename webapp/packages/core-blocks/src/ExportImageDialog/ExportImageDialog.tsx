@@ -88,7 +88,7 @@ export const ExportImageDialog = observer<DialogComponentProps<ExportImagePayloa
           <ErrorMessage text={errorDetails.message || errorDetails.name} hasDetails={errorDetails.hasDetails} onShowDetails={errorDetails.open} />
         )}
       </CommonDialogBody>
-      <CommonDialogFooter className="tw:justify-end tw:items-center tw:gap-[24px]">
+      <CommonDialogFooter className="tw:justify-end tw:items-center tw:gap-6!">
         <Button type="button" variant="secondary" onClick={() => props.rejectDialog()}>
           {translate('app_shared_inlineEditor_dialog_cancel')}
         </Button>
