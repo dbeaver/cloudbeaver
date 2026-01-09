@@ -37,6 +37,7 @@ import { isDefined } from '@dbeaver/js-helpers';
 import { NavTreeSettingsService } from '../NavTreeSettingsService.js';
 import type { NavNode } from './EntityTypes.js';
 import { NavNodeInfoResource, ROOT_NODE_PATH } from './NavNodeInfoResource.js';
+import { EObjectFeature } from './EObjectFeature.js';
 
 // TODO: so much dirty
 export interface NodePath {
@@ -301,13 +302,17 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
           newName: name,
         });
 
-        const parts = node.id.split('/');
-        parts.splice(parts.length - 1, 1, name);
-        const path = parts.join('/');
-
         this.markOutdated(parentId);
         this.markLoaded(node.id);
         this.onDataOutdated.execute(parentId);
+
+        if (node.objectFeatures.includes(EObjectFeature.dataSource)) {
+          return node.id;
+        }
+
+        const parts = node.id.split('/');
+        parts.splice(parts.length - 1, 1, name);
+        const path = parts.join('/');
 
         return path;
       } finally {
