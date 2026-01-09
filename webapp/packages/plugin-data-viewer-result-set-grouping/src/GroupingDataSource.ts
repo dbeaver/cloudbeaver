@@ -21,14 +21,15 @@ export class GroupingDataSource extends QueryDataSource<IDataGroupingOptions> {
   protected override async executeQuery(
     executionContextInfo: IConnectionExecutionContextInfo,
     options: IDataGroupingOptions,
-    firstResultId: string | undefined,
+    currentResultsId: string | undefined,
     limit: number,
   ): Promise<AsyncTaskInfo> {
-    const { taskInfo } = await this.graphQLService.sdk.asyncSqlGropingResultSet({
+    const { taskInfo } = await this.graphQLService.sdk.asyncSqlGroupingResultSet({
       projectId: executionContextInfo.projectId,
       connectionId: executionContextInfo.connectionId,
       contextId: executionContextInfo.id,
-      resultsId: options.sourceResultId,
+      originalResultsId: options.sourceResultId,
+      currentResultsId: currentResultsId,
       columnNames: options.columns,
       functions: options.functions,
       showDuplicatesOnly: options.showDuplicatesOnly,

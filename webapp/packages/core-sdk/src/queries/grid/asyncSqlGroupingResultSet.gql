@@ -1,8 +1,9 @@
-query asyncSqlGropingResultSet(
+query asyncSqlGroupingResultSet(
   $projectId: ID
   $contextId: ID!
   $connectionId: ID!
-  $resultsId: ID!
+  $originalResultsId: ID!
+  $currentResultsId: ID
   $columnNames: [String!]
   $functions: [String!]
   $showDuplicatesOnly: Boolean
@@ -14,7 +15,8 @@ query asyncSqlGropingResultSet(
     projectId: $projectId
     contextId: $contextId
     connectionId: $connectionId
-    resultsId: $resultsId
+    originalResultsId: $originalResultsId
+    currentResultsId: $currentResultsId
     columnNames: $columnNames
     functions: $functions
     showDuplicatesOnly: $showDuplicatesOnly
