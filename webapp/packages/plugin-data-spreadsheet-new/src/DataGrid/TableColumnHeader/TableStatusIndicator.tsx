@@ -16,10 +16,14 @@ import { DataGridContext } from '../DataGridContext.js';
 import { TableDataContext } from '../TableDataContext.js';
 
 interface Props {
-  readonly: boolean;
+  readOnlyConnection: boolean;
 }
 
-export const TableStatusIndicator = observer<Props>(function TableStatusIndicator({ readonly }) {
+const STATUS_COLOR = 'status';
+const POSITIVE_COLOR = 'positive';
+const INFO_COLOR = 'info';
+
+export const TableStatusIndicator = observer<Props>(function TableStatusIndicator({ readOnlyConnection }) {
   const dataGridContext = useContext(DataGridContext);
   const tableDataContext = useContext(TableDataContext);
   const translate = useTranslate();
@@ -39,13 +43,17 @@ export const TableStatusIndicator = observer<Props>(function TableStatusIndicato
 
   // TODO: Detect virtual keys when backend provides the information
   const isVirtualKey = false;
-  let tooltip: string = '';
+  const tooltipParts: string[] = [];
 
-  if (readonly) {
-    tooltip = translate('data_grid_table_readonly_tooltip');
-    if (readOnlyStatus) {
-      tooltip += ': ' + readOnlyStatus;
+  if (readOnlyConnection) {
+    tooltipParts.push(translate('data_grid_table_readonly_connection_tooltip'));
+  }
+
+  if (readOnlyStatus) {
+    if (!readOnlyConnection) {
+      tooltipParts.push(translate('data_grid_table_readonly_tooltip'));
     }
+    tooltipParts.push(readOnlyStatus);
   }
 
   if (hasRowIdentifier) {
@@ -57,26 +65,30 @@ export const TableStatusIndicator = observer<Props>(function TableStatusIndicato
     })?.key;
 
     if (pkColumn) {
-      tooltip = `Unique key: ${(tableDataContext.data.getColumn(pkColumn) as SqlResultColumn | undefined)?.name}`;
+      tooltipParts.push(`Unique key: ${(tableDataContext.data.getColumn(pkColumn) as SqlResultColumn | undefined)?.name}`);
     }
-  } else {
-    tooltip = translate('data_grid_table_no_key_found_tooltip');
+  }
+
+  const tooltip = tooltipParts.join('\n');
+
+  let themeColor = STATUS_COLOR;
+  if (hasRowIdentifier && !isVirtualKey) {
+    themeColor = POSITIVE_COLOR;
+  } else if (isVirtualKey) {
+    themeColor = INFO_COLOR;
   }
 
   return (
     <div
       title={tooltip}
-      className="tw:absolute tw:top-1/2 tw:left-1 tw:-translate-y-1/2 tw:z-[1] tw:pointer-events-auto tw:flex tw:items-center tw:gap-1 tw:cursor-help"
+      className="tw:absolute tw:top-1/2 tw:left-1 tw:-translate-y-1/2 tw:z-1 tw:pointer-events-auto tw:flex tw:items-center tw:gap-1 tw:cursor-help"
     >
-      {readonly && <IconOrImage icon="/icons/lock.png" className="tw:w-2.5 tw:cursor-help" />}
+      {readOnlyConnection && <IconOrImage icon="/icons/lock.png" className="tw:w-2.5 tw:cursor-help" />}
       <div
         className={clsx(
-          'tw:w-3 tw:h-3 tw:rounded-full tw:flex-shrink-0',
-          'tw:bg-transparent tw:border-1',
+          'tw:w-3 tw:h-3 tw:rounded-full tw:shrink-0 tw:bg-transparent tw:border',
           "tw:before:content-[''] tw:before:block tw:before:w-1.5 tw:before:h-1.5 tw:before:rounded-full tw:before:m-0.5",
-          !hasRowIdentifier && 'tw:border-(--theme-status) tw:before:bg-(--theme-status)',
-          hasRowIdentifier && !isVirtualKey && 'tw:border-(--theme-positive) tw:before:bg-(--theme-positive)',
-          isVirtualKey && 'tw:border-(--theme-info) tw:before:bg-(--theme-info)',
+          `tw:border-(--theme-${themeColor}) tw:before:bg-(--theme-${themeColor})`,
         )}
       />
     </div>

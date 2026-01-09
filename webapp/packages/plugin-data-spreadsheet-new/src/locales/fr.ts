@@ -26,6 +26,7 @@ export default [
   ['data_grid_table_index_column_tooltip', 'Sélectionner toute la table'],
   ['data_grid_table_no_key_found_tooltip', "Aucune clé unique n'a été trouvée. La modification des données n'est pas possible."],
   ['data_grid_table_readonly_tooltip', 'Lecture seule'],
+  ['data_grid_table_readonly_connection_tooltip', 'Connexion en lecture seule'],
   ['plugin_data_spreadsheet_new_settings_disable', 'Désactiver la présentation de la table'],
   ['plugin_data_spreadsheet_new_settings_description_label', 'Show columns description'],
   ['plugin_data_spreadsheet_new_settings_description_label_description', 'Description will be shown under the column names in the table header'],

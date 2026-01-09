@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
 
-import { getComputed, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { s, useS, useTranslate } from '@cloudbeaver/core-blocks';
 
 import { DataGridContext } from '../DataGridContext.js';
 import { DataGridSelectionContext } from '../DataGridSelection/DataGridSelectionContext.js';
@@ -27,10 +27,6 @@ export const TableIndexColumnHeader = observer(function TableIndexColumnHeader()
     throw new Error('Contexts required');
   }
 
-  const readonly = getComputed(
-    () => dataGridContext.model.isReadonly(dataGridContext.resultIndex) && dataGridContext.model.hasElementIdentifier(dataGridContext.resultIndex),
-  );
-
   function handleClick() {
     selectionContext.selectTable();
     dataGridContext.focus();
@@ -38,7 +34,7 @@ export const TableIndexColumnHeader = observer(function TableIndexColumnHeader()
 
   return (
     <>
-      <TableStatusIndicator readonly={readonly} />
+      <TableStatusIndicator readOnlyConnection={dataGridContext.model.isReadonly(dataGridContext.resultIndex)} />
       <div
         role="button"
         title={translate('data_grid_table_index_column_tooltip')}

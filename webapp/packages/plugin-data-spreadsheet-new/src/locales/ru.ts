@@ -25,6 +25,7 @@ export default [
   ['data_grid_table_context_menu_save_value_error', 'Не удалось сохранить значение'],
   ['data_grid_table_index_column_tooltip', 'Выбрать всю таблицу'],
   ['data_grid_table_readonly_tooltip', 'Доступно только для чтения'],
+  ['data_grid_table_readonly_connection_tooltip', 'Подключение только для чтения'],
   ['data_grid_table_no_key_found_tooltip', 'Не найден уникальный ключ. Изменение данных невозможно.'],
   ['plugin_data_spreadsheet_new_settings_disable', 'Отключить табличное представление'],
   ['plugin_data_spreadsheet_new_settings_disable_description', 'Отключить табличное представление данных для всех пользователей'],

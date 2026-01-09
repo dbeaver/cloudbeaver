@@ -25,6 +25,7 @@ export default [
   ['data_grid_table_context_menu_save_value_error', 'Failed to save value'],
   ['data_grid_table_index_column_tooltip', 'Select whole table'],
   ['data_grid_table_readonly_tooltip', 'Read-only'],
+  ['data_grid_table_readonly_connection_tooltip', 'Read-only connection'],
   ['data_grid_table_no_key_found_tooltip', 'No unique key was found. Data modification is not possible.'],
   ['plugin_data_spreadsheet_new_settings_disable', 'Disable Table presentation'],
   ['plugin_data_spreadsheet_new_settings_disable_description', 'Disable table presentation of data for all users'],

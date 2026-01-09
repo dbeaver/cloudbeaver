@@ -19,6 +19,7 @@ export default [
   ['data_grid_table_context_menu_filter_dialog_title', 'Wert bearbeiten'],
   ['data_grid_table_index_column_tooltip', 'Wählen ganze Tabelle aus'],
   ['data_grid_table_readonly_tooltip', 'Schreibgeschützt'],
+  ['data_grid_table_readonly_connection_tooltip', 'Schreibgeschützte Verbindung'],
   ['data_grid_table_no_key_found_tooltip', 'Kein eindeutiger Schlüssel gefunden. Datenänderung nicht möglich.'],
   ['plugin_data_spreadsheet_new_settings_disable', 'Tabellenpräsentation deaktivieren'],
   ['plugin_data_spreadsheet_new_settings_disable_description', 'Deaktivieren Sie die Tabellenpräsentation von Daten für alle Benutzer'],
