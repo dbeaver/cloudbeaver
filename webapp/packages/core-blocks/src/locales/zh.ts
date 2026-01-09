@@ -16,4 +16,5 @@ export default [
   ['core_blocks_export_image_dialog_title', '导出为图片'],
   ['core_blocks_export_image_dialog_format', '文件格式'],
   ['core_blocks_export_image_dialog_transparent_background', '透明背景'],
+  ['core_blocks_dialog_element_close_tooltip', '关闭面板'],
 ];
