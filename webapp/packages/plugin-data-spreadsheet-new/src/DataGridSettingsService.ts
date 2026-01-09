@@ -60,12 +60,15 @@ export class DataGridSettingsService {
   readonly settings: SettingsProvider<DataGridSettingsSchema>;
   readonly supportedLocales: string[];
 
+  private osLocale: string | null;
+
   constructor(
     private readonly settingsProviderService: SettingsProviderService,
     private readonly settingsManagerService: SettingsManagerService,
     private readonly settingsResolverService: SettingsResolverService,
   ) {
     this.supportedLocales = getSupportedLocalesWithRegions();
+    this.osLocale = null;
     this.settings = this.settingsProviderService.createSettings(defaultSettings);
     this.settingsResolverService.addResolver(
       ROOT_SETTINGS_LAYER,
@@ -86,10 +89,18 @@ export class DataGridSettingsService {
     }
 
     if (setting === OS_FORMAT) {
-      return new Intl.DateTimeFormat().resolvedOptions().locale;
+      return this.getOrCreateOSLocale();
     }
 
     return setting;
+  }
+
+  private getOrCreateOSLocale(): string {
+    if (this.osLocale === null) {
+      this.osLocale = new Intl.DateTimeFormat().resolvedOptions().locale;
+    }
+
+    return this.osLocale;
   }
 
   private registerSettings() {

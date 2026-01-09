@@ -11,7 +11,7 @@ import { useContext, useRef } from 'react';
 import { isBooleanValuePresentationAvailable, type IGridDataKey } from '@cloudbeaver/plugin-data-viewer';
 
 import { CellContext } from '../CellRenderer/CellContext.js';
-import { FormattingContext } from '../FormattingContext.js';
+import { useFormattingContext } from '../FormattingContext.js';
 import { TableDataContext, type ITableData } from '../TableDataContext.js';
 import { BlobFormatter } from './CellFormatters/BlobFormatter.js';
 import { BooleanFormatter } from './CellFormatters/BooleanFormatter.js';
@@ -24,56 +24,53 @@ import { NumberFormatter } from './CellFormatters/NumberFormatter.js';
 interface IFormatterContext {
   tableDataContext: ITableData;
   hasFormatters: boolean;
+  holder: ReturnType<ITableData['getCellHolder']>;
+  resultColumn: ReturnType<ITableData['getColumnInfo']>;
 }
 
 type FormatterSelector = (context: IFormatterContext, cell: IGridDataKey) => React.FC<ICellFormatterProps> | null;
 
 const formatterSelectors: FormatterSelector[] = [
   // Binary
-  (context, cell) => {
-    const holder = context.tableDataContext.getCellHolder(cell);
-    return context.tableDataContext.format.isBinary(holder) ? BlobFormatter : null;
-  },
+  context => (context.tableDataContext.format.isBinary(context.holder) ? BlobFormatter : null),
 
   // Boolean
-  (context, cell) => {
-    const holder = context.tableDataContext.getCellHolder(cell);
-    const resultColumn = context.tableDataContext.getColumnInfo(cell.column);
-    return resultColumn && isBooleanValuePresentationAvailable(holder.value, resultColumn) ? BooleanFormatter : null;
-  },
+  context => (context.resultColumn && isBooleanValuePresentationAvailable(context.holder.value, context.resultColumn) ? BooleanFormatter : null),
 
   // DateTime
-  (context, cell) => {
+  context => {
     if (!context.hasFormatters) {
       return null;
     }
-    const resultColumn = context.tableDataContext.getColumnInfo(cell.column);
-    return resultColumn?.dataKind?.toUpperCase() === 'DATETIME' ? DateTimeFormatter : null;
+    return context.resultColumn?.dataKind?.toUpperCase() === 'DATETIME' ? DateTimeFormatter : null;
   },
 
   // Numeric
-  (context, cell) => {
+  context => {
     if (!context.hasFormatters) {
       return null;
     }
-    const resultColumn = context.tableDataContext.getColumnInfo(cell.column);
-    return resultColumn?.dataKind?.toUpperCase() === 'NUMERIC' ? NumberFormatter : null;
+    return context.resultColumn?.dataKind?.toUpperCase() === 'NUMERIC' ? NumberFormatter : null;
   },
 ];
 
 export const CellFormatterFactory = observer<ICellFormatterProps>(function CellFormatterFactory(props) {
   const formatterRef = useRef<React.FC<ICellFormatterProps> | null>(null);
   const tableDataContext = useContext(TableDataContext);
-  const formattingContext = useContext(FormattingContext);
+  const formattingContext = useFormattingContext();
   const cellContext = useContext(CellContext);
 
   if (formatterRef.current === null) {
     formatterRef.current = TextFormatter;
 
     if (cellContext.cell) {
+      const holder = tableDataContext.getCellHolder(cellContext.cell);
+      const resultColumn = tableDataContext.getColumnInfo(cellContext.cell.column);
       const context: IFormatterContext = {
         tableDataContext,
         hasFormatters: formattingContext.formatters !== null,
+        holder,
+        resultColumn,
       };
 
       for (const selector of formatterSelectors) {

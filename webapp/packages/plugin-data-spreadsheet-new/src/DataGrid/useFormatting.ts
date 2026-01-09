@@ -9,20 +9,22 @@ import { computed, observable } from 'mobx';
 
 import { useObservableRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import type { IGridColumnKey } from '@cloudbeaver/plugin-data-viewer';
+import type { IGridColumnKey, ResultSetCacheAction } from '@cloudbeaver/plugin-data-viewer';
 
 import { DataGridSettingsService } from '../DataGridSettingsService.js';
 import { detectDateTimeKind } from './helpers/detectDateTimeKind.js';
 import { DateTimeKind, type IDataGridFormatters, type IFormattingContext } from './FormattingContext.js';
 import type { ITableData } from './TableDataContext.js';
 
+const EXTENDED_DATE_KIND_CACHE = Symbol('data-grid-extended-date-kind');
+
 interface IFormattingContextPrivate extends IFormattingContext {
   dataGridSettingsService: DataGridSettingsService;
+  cache: ResultSetCacheAction;
   tableData: ITableData;
-  extendedDateKinds: Map<number, DateTimeKind>;
 }
 
-export function useFormatting(tableData: ITableData): IFormattingContext {
+export function useFormatting(tableData: ITableData, cache: ResultSetCacheAction): IFormattingContext {
   const dataGridSettingsService = useService(DataGridSettingsService);
 
   return useObservableRef<IFormattingContextPrivate>(
@@ -53,42 +55,40 @@ export function useFormatting(tableData: ITableData): IFormattingContext {
           number: new Intl.NumberFormat(locale),
         };
       },
-      get extendedDateKinds(): Map<number, DateTimeKind> {
-        const kindsMap = new Map<number, DateTimeKind>();
+      getExtendedDateKind(columnKey: IGridColumnKey): DateTimeKind {
+        const cached = this.cache.getColumn<DateTimeKind>(columnKey, EXTENDED_DATE_KIND_CACHE);
 
-        const rows = this.tableData.rows;
-        const columnKeys = this.tableData.columnKeys;
-
-        for (const columnKey of columnKeys) {
-          let kind = DateTimeKind.DateTime;
-
-          for (const row of rows) {
-            const cellKey = { column: columnKey, row };
-            const holder = this.tableData.getCellHolder(cellKey);
-
-            if (!this.tableData.format.isNull(holder)) {
-              const displayValue = this.tableData.format.getDisplayString(holder);
-              kind = detectDateTimeKind(displayValue);
-              break;
-            }
-          }
-
-          kindsMap.set(columnKey.index, kind);
+        if (cached !== undefined) {
+          return cached;
         }
 
-        return kindsMap;
-      },
-      getExtendedDateKind(columnKey: IGridColumnKey): DateTimeKind {
-        return this.extendedDateKinds.get(columnKey.index) ?? DateTimeKind.DateTime;
+        let kind = DateTimeKind.DateTime;
+        const rows = this.tableData.rows;
+
+        for (const row of rows) {
+          const cellKey = { column: columnKey, row };
+          const holder = this.tableData.getCellHolder(cellKey);
+
+          if (!this.tableData.format.isNull(holder)) {
+            const displayValue = this.tableData.format.getDisplayString(holder);
+            kind = detectDateTimeKind(displayValue);
+            break;
+          }
+        }
+
+        this.cache.setColumn(columnKey, EXTENDED_DATE_KIND_CACHE, kind);
+
+        return kind;
       },
     }),
     {
       formatters: computed,
+      cache: observable.ref,
       tableData: observable.ref,
-      extendedDateKinds: computed,
     },
     {
       dataGridSettingsService,
+      cache,
       tableData,
     },
   );

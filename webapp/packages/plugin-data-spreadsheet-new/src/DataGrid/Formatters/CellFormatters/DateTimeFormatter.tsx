@@ -12,13 +12,13 @@ import { getComputed } from '@cloudbeaver/core-blocks';
 import { NullFormatter as GridNullFormatter } from '@cloudbeaver/plugin-data-grid';
 
 import { CellContext } from '../../CellRenderer/CellContext.js';
-import { DateTimeKind, FormattingContext } from '../../FormattingContext.js';
+import { DateTimeKind, useFormattingContext } from '../../FormattingContext.js';
 import { TableDataContext } from '../../TableDataContext.js';
 import type { ICellFormatterProps } from '../ICellFormatterProps.js';
 
 export const DateTimeFormatter = observer<ICellFormatterProps>(function DateTimeFormatter() {
   const tableDataContext = useContext(TableDataContext);
-  const formattingContext = useContext(FormattingContext);
+  const formattingContext = useFormattingContext();
   const cellContext = useContext(CellContext);
 
   if (!cellContext.cell) {
@@ -39,7 +39,7 @@ export const DateTimeFormatter = observer<ICellFormatterProps>(function DateTime
   if (formattingContext.formatters) {
     const extendedDateKind = formattingContext.getExtendedDateKind(cellContext.cell.column);
 
-    let dateFormatter;
+    let dateFormatter: Intl.DateTimeFormat | null = null;
     switch (extendedDateKind) {
       case DateTimeKind.DateTime:
       case DateTimeKind.TimeOnly:
@@ -49,8 +49,10 @@ export const DateTimeFormatter = observer<ICellFormatterProps>(function DateTime
         dateFormatter = formattingContext.formatters.dateOnly;
         break;
     }
-    const date = new Date(displayValue);
-    value = dateFormatter!.format(date);
+    if (dateFormatter) {
+      const date = new Date(displayValue);
+      value = dateFormatter.format(date);
+    }
   }
 
   return (

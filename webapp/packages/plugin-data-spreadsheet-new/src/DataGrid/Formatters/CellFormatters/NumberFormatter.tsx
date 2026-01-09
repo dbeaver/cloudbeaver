@@ -12,13 +12,13 @@ import { getComputed } from '@cloudbeaver/core-blocks';
 import { NullFormatter as GridNullFormatter } from '@cloudbeaver/plugin-data-grid';
 
 import { CellContext } from '../../CellRenderer/CellContext.js';
-import { FormattingContext } from '../../FormattingContext.js';
+import { useFormattingContext } from '../../FormattingContext.js';
 import { TableDataContext } from '../../TableDataContext.js';
 import type { ICellFormatterProps } from '../ICellFormatterProps.js';
 
 export const NumberFormatter = observer<ICellFormatterProps>(function NumberFormatter() {
   const tableDataContext = useContext(TableDataContext);
-  const formattingContext = useContext(FormattingContext);
+  const formattingContext = useFormattingContext();
   const cellContext = useContext(CellContext);
 
   if (!cellContext.cell) {

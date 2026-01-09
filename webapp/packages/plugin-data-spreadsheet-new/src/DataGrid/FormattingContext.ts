@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { createContext } from 'react';
+import { createContext, useContext } from 'react';
 
 import type { IGridColumnKey } from '@cloudbeaver/plugin-data-viewer';
 
@@ -27,4 +27,14 @@ export interface IFormattingContext {
   getExtendedDateKind: (columnKey: IGridColumnKey) => DateTimeKind;
 }
 
-export const FormattingContext = createContext<IFormattingContext>(undefined as any);
+export const FormattingContext = createContext<IFormattingContext | null>(null);
+
+export function useFormattingContext(): IFormattingContext {
+  const context = useContext(FormattingContext);
+
+  if (!context) {
+    throw new Error('FormattingContext is required');
+  }
+
+  return context;
+}

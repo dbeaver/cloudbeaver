@@ -34,11 +34,13 @@ import {
   ResultSetDataSource,
   getNextOrder,
   isResultSetDataModel,
+  IDatabaseDataCacheAction,
   IDatabaseDataSelectAction,
   IDatabaseDataViewAction,
   IDatabaseDataConstraintAction,
   GridSelectAction,
   GridViewAction,
+  ResultSetCacheAction,
   type IGridEditActionData,
   type IGridDataKey,
 } from '@cloudbeaver/plugin-data-viewer';
@@ -63,15 +65,7 @@ const ROW_HEIGHT = 24;
 export const HEADER_HEIGHT = 32;
 export const HEADER_WITH_DESC_HEIGHT = 42;
 
-export const DataGridTable = observer<IDataPresentationProps>(function DataGridTable({
-  model,
-  actions,
-  resultIndex,
-  simple,
-  className,
-  dataFormat,
-  ...rest
-}) {
+export const DataGridTable = observer<IDataPresentationProps>(function DataGridTable({ model, actions, resultIndex, simple, className, ...rest }) {
   const translate = useTranslate();
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
   const dataGridDivRef = useRef<HTMLDivElement | null>(null);
@@ -81,9 +75,10 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
 
   const selectionAction = model.source.getAction(resultIndex, IDatabaseDataSelectAction, GridSelectAction);
   const viewAction = model.source.getAction(resultIndex, IDatabaseDataViewAction, GridViewAction);
+  const cacheAction = model.source.getAction(resultIndex, IDatabaseDataCacheAction, ResultSetCacheAction);
 
   const tableData = useTableData(model as unknown as IDatabaseDataModel<ResultSetDataSource>, resultIndex, dataGridDivRef);
-  const formatting = useFormatting(tableData);
+  const formatting = useFormatting(tableData, cacheAction);
   const getHeaderOrder = useCallback(() => (dataGridRef.current?.getColumnsOrdered() ?? []).map(col => col.key), [dataGridRef]);
   const gridSelectionContext = useGridSelectionContext(tableData, selectionAction, getHeaderOrder);
 
