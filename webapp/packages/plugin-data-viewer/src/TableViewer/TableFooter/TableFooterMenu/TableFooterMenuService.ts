@@ -15,16 +15,21 @@ import {
   ACTION_SAVE,
   ActionService,
   DATA_CONTEXT_MENU,
-  KEY_BINDING_ADD,
-  KEY_BINDING_DELETE,
-  KEY_BINDING_DUPLICATE,
-  KEY_BINDING_REVERT,
   KeyBindingService,
   MenuService,
   type IAction,
 } from '@cloudbeaver/core-view';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
+
+import {
+  KEY_BINDING_ADD_NEW_ROW,
+  KEY_BINDING_CANCEL,
+  KEY_BINDING_DELETE_ROW,
+  KEY_BINDING_DUPLICATE_ROW,
+  KEY_BINDING_REVERT_INLINE_EDITOR_CHANGES,
+  KEY_BINDING_SAVE,
+} from '../../../DATA_VIEWER_KEY_BINDINGS.js';
 
 import { DatabaseEditChangeType, IDatabaseDataEditAction } from '../../../DatabaseDataModel/Actions/IDatabaseDataEditAction.js';
 import { DATA_CONTEXT_DV_DDM } from '../../../DatabaseDataModel/DataContext/DATA_CONTEXT_DV_DDM.js';
@@ -49,7 +54,7 @@ export class TableFooterMenuService {
     this.registerEditingActions();
     this.keyBindingService.addKeyBindingHandler({
       id: 'table-footer-delete',
-      binding: KEY_BINDING_DELETE,
+      binding: KEY_BINDING_DELETE_ROW,
       contexts: [DATA_CONTEXT_DV_DDM, DATA_CONTEXT_DV_DDM_RESULT_INDEX],
       isBindingApplicable(context, action) {
         return action === ACTION_DELETE;
@@ -59,7 +64,7 @@ export class TableFooterMenuService {
 
     this.keyBindingService.addKeyBindingHandler({
       id: 'table-footer-revert',
-      binding: KEY_BINDING_REVERT,
+      binding: KEY_BINDING_REVERT_INLINE_EDITOR_CHANGES,
       contexts: [DATA_CONTEXT_DV_DDM, DATA_CONTEXT_DV_DDM_RESULT_INDEX],
       isBindingApplicable(context, action) {
         return action === ACTION_REVERT;
@@ -69,7 +74,7 @@ export class TableFooterMenuService {
 
     this.keyBindingService.addKeyBindingHandler({
       id: 'table-footer-add',
-      binding: KEY_BINDING_ADD,
+      binding: KEY_BINDING_ADD_NEW_ROW,
       contexts: [DATA_CONTEXT_DV_DDM, DATA_CONTEXT_DV_DDM_RESULT_INDEX],
       isBindingApplicable(context, action) {
         return action === ACTION_ADD;
@@ -79,7 +84,7 @@ export class TableFooterMenuService {
 
     this.keyBindingService.addKeyBindingHandler({
       id: 'table-footer-duplicate',
-      binding: KEY_BINDING_DUPLICATE,
+      binding: KEY_BINDING_DUPLICATE_ROW,
       contexts: [DATA_CONTEXT_DV_DDM, DATA_CONTEXT_DV_DDM_RESULT_INDEX],
       isBindingApplicable(context, action) {
         return action === ACTION_DUPLICATE;
@@ -87,7 +92,27 @@ export class TableFooterMenuService {
       handler: this.tableFooterMenuActionHandler.bind(this),
     });
 
-    this.dataViewerViewService.registerAction(ACTION_DELETE, ACTION_REVERT, ACTION_ADD, ACTION_DUPLICATE);
+    this.keyBindingService.addKeyBindingHandler({
+      id: 'table-footer-save',
+      binding: KEY_BINDING_SAVE,
+      contexts: [DATA_CONTEXT_DV_DDM, DATA_CONTEXT_DV_DDM_RESULT_INDEX],
+      isBindingApplicable(context, action) {
+        return action === ACTION_SAVE;
+      },
+      handler: this.tableFooterMenuActionHandler.bind(this),
+    });
+
+    this.keyBindingService.addKeyBindingHandler({
+      id: 'table-footer-cancel',
+      binding: KEY_BINDING_CANCEL,
+      contexts: [DATA_CONTEXT_DV_DDM, DATA_CONTEXT_DV_DDM_RESULT_INDEX],
+      isBindingApplicable(context, action) {
+        return action === ACTION_CANCEL;
+      },
+      handler: this.tableFooterMenuActionHandler.bind(this),
+    });
+
+    this.dataViewerViewService.registerAction(ACTION_DELETE, ACTION_REVERT, ACTION_ADD, ACTION_DUPLICATE, ACTION_CANCEL);
   }
 
   private registerEditingActions() {

@@ -3242,7 +3242,7 @@ __metadata:
     "@cloudbeaver/core-routing": "workspace:*"
     "@cloudbeaver/core-utils": "workspace:*"
     "@cloudbeaver/core-view": "workspace:*"
-    "@cloudbeaver/plugin-data-spreadsheet-new": "workspace:*"
+    "@cloudbeaver/plugin-data-viewer": "workspace:*"
     "@cloudbeaver/plugin-navigation-tabs": "workspace:*"
     "@cloudbeaver/plugin-navigation-tree": "workspace:*"
     "@cloudbeaver/plugin-object-viewer-nav-tree-link": "workspace:*"
