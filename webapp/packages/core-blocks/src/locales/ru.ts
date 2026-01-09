@@ -13,4 +13,5 @@ export default [
   ['core_blocks_export_image_dialog_title', 'Экспортировать как изображение'],
   ['core_blocks_export_image_dialog_format', 'Формат файла'],
   ['core_blocks_export_image_dialog_transparent_background', 'Прозрачный фон'],
+  ['core_blocks_dialog_element_close_tooltip', 'Закрыть панель'],
 ];
