@@ -77,7 +77,7 @@ public class WebConnectionConfigInputHandler<T extends WebConnectionConfig, C ex
 
         dataSource.setFolder(input.getFolder() != null ? registry.getFolder(input.getFolder()) : null);
         if (input.isDefaultAutoCommit() != null) {
-            dataSource.setDefaultAutoCommit(input.isDefaultAutoCommit());
+            dataSource.getConnectionConfiguration().getBootstrap().setDefaultAutoCommit(input.isDefaultAutoCommit());
         }
         WebDataSourceUtils.setConnectionConfiguration(
             dataSource.getDriver(),
