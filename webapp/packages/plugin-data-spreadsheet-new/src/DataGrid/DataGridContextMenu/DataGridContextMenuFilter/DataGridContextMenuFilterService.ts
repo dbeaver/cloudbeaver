@@ -111,17 +111,19 @@ export class DataGridContextMenuFilterService {
         const result = [];
 
         for (const filter of [IS_NULL_ID, IS_NOT_NULL_ID]) {
-          const label = `${resultColumn ? `"${resultColumn.label}" ` : ''}${filter.split('_').join(' ')}`;
-          const { clippedLabel, tooltip } = getMenuLabelClipped(label);
+          const { clippedLabel } = getMenuLabelClipped(resultColumn?.label ?? '');
+          const fullLabel = `${resultColumn ? `"${resultColumn.label}" ` : ''}${filter.split('_').join(' ')}`;
+          const label = `${resultColumn ? `"${clippedLabel}" ` : ''}${filter.split('_').join(' ')}`;
+          const tooltip = fullLabel !== label ? fullLabel : undefined;
 
           if (supportedOperations.some(operation => operation.id === filter)) {
             result.push(
               new MenuBaseItem(
                 {
                   id: filter,
-                  label: clippedLabel,
-                  icon: 'filter',
+                  label,
                   tooltip,
+                  icon: 'filter',
                 },
                 {
                   onSelect: async () => {
@@ -271,13 +273,14 @@ export class DataGridContextMenuFilterService {
             const wrappedValue = wrapOperationArgument(operation.id, cellValue);
             const { clippedLabel: clippedValue } = getMenuLabelClipped(wrappedValue);
             const fullLabel = `${columnLabel} ${operation.expression} ${wrappedValue}`;
+            const tooltip = fullLabel !== clippedValue ? fullLabel : undefined;
 
             return new MenuBaseItem(
               {
                 id: operation.id,
                 label: clippedValue,
                 icon: 'filter',
-                tooltip: fullLabel !== clippedValue ? fullLabel : undefined,
+                tooltip,
               },
               {
                 onSelect: async () => {
