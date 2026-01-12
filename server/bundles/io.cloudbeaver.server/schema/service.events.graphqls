@@ -309,6 +309,7 @@ type WSServerNotificationEvent implements CBServerEvent @since(version: "25.2.1"
 type WSOpenUrlEvent implements CBServerEvent @since(version: "25.3.1") {
     id: CBServerEventId!
     topicId: CBEventTopic!
+    timestamp: Int!
     url: String!
 }
 

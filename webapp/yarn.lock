@@ -2026,6 +2026,31 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@cloudbeaver/core-session-actions@workspace:*, @cloudbeaver/core-session-actions@workspace:packages/core-session-actions":
+  version: 0.0.0-use.local
+  resolution: "@cloudbeaver/core-session-actions@workspace:packages/core-session-actions"
+  dependencies:
+    "@cloudbeaver/core-blocks": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-dialogs": "workspace:*"
+    "@cloudbeaver/core-events": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-root": "workspace:*"
+    "@cloudbeaver/core-routing": "workspace:*"
+    "@cloudbeaver/core-sdk": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
+    "@dbeaver/cli": "workspace:*"
+    "@types/react": "npm:^19"
+    "@types/react-dom": "npm:^19"
+    react: "npm:^19"
+    react-dom: "npm:^19"
+    rimraf: "npm:^6"
+    tslib: "npm:^2"
+    typescript: "npm:^5"
+  languageName: unknown
+  linkType: soft
+
 "@cloudbeaver/core-session-localization@workspace:*, @cloudbeaver/core-session-localization@workspace:packages/core-session-localization":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/core-session-localization@workspace:packages/core-session-localization"
@@ -3787,6 +3812,7 @@ __metadata:
     "@cloudbeaver/core-sdk": "workspace:*"
     "@cloudbeaver/core-server-localization": "workspace:*"
     "@cloudbeaver/core-server-notifications": "workspace:*"
+    "@cloudbeaver/core-session-actions": "workspace:*"
     "@cloudbeaver/core-session-localization": "workspace:*"
     "@cloudbeaver/core-settings": "workspace:*"
     "@cloudbeaver/core-settings-localization": "workspace:*"
