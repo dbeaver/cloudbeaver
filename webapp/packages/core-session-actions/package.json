@@ -1,0 +1,47 @@
+{
+  "name": "@cloudbeaver/core-session-actions",
+  "type": "module",
+  "sideEffects": [
+    "./lib/module.js",
+    "./lib/index.js",
+    "src/**/*.css",
+    "src/**/*.scss",
+    "public/**/*"
+  ],
+  "version": "0.1.0",
+  "description": "",
+  "license": "Apache-2.0",
+  "exports": {
+    ".": "./lib/index.js",
+    "./module": "./lib/module.js"
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "clean": "rimraf --glob lib",
+    "lint": "eslint ./src/ --ext .ts,.tsx",
+    "test": "dbeaver-test",
+    "validate-dependencies": "core-cli-validate-dependencies"
+  },
+  "dependencies": {
+    "@cloudbeaver/core-blocks": "workspace:*",
+    "@cloudbeaver/core-di": "workspace:*",
+    "@cloudbeaver/core-dialogs": "workspace:*",
+    "@cloudbeaver/core-events": "workspace:*",
+    "@cloudbeaver/core-localization": "workspace:*",
+    "@cloudbeaver/core-root": "workspace:*",
+    "@cloudbeaver/core-routing": "workspace:*",
+    "@cloudbeaver/core-sdk": "workspace:*",
+    "react": "^19",
+    "react-dom": "^19"
+  },
+  "devDependencies": {
+    "@cloudbeaver/core-cli": "workspace:*",
+    "@cloudbeaver/tsconfig": "workspace:*",
+    "@dbeaver/cli": "workspace:*",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "rimraf": "^6",
+    "tslib": "^2",
+    "typescript": "^5"
+  }
+}
