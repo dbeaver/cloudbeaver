@@ -13,34 +13,25 @@ export function getCommonAndOSSpecificKeys(keyBinding: IKeyBinding | undefined):
   if (keyBinding === undefined) {
     return [];
   }
-  const specificKeys = getOSSpecificKeys(keyBinding);
-  const specificKeysFlat: string[] = [];
-  let keys: string[] = [];
 
-  if (keyBinding.keys !== undefined) {
-    keys = Array.isArray(keyBinding.keys) ? keyBinding.keys : [keyBinding.keys];
-  }
-
-  if (specificKeys !== undefined) {
-    if (Array.isArray(specificKeys)) {
-      specificKeysFlat.push(...specificKeys);
-    } else {
-      specificKeysFlat.push(specificKeys);
-    }
-  }
-
-  return [...specificKeysFlat, ...keys];
+  return [...getOSSpecificKeys(keyBinding), ...getKeys(keyBinding.keys)];
 }
 
-export function getOSSpecificKeys(keyBinding: IKeyBinding): string | string[] | undefined {
+export function getOSSpecificKeys(keyBinding: IKeyBinding): string[] {
   const OS = getOS();
+  const keys: string[] = [];
+
   if (OS === OperatingSystem.windowsOS) {
-    return keyBinding.keysWin;
+    keys.push(...getKeys(keyBinding.keysWin));
   }
 
   if (OS === OperatingSystem.macOS) {
-    return keyBinding.keysMac;
+    keys.push(...getKeys(keyBinding.keysMac));
   }
 
-  return undefined;
+  return keys;
+}
+
+function getKeys(keys: string[] | string | undefined): string[] {
+  return Array.isArray(keys) ? keys : [keys ?? ''].filter(Boolean);
 }
