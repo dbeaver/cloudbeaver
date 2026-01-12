@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { createConnectionParam, DATA_CONTEXT_CONNECTION, type IConnectionInfoParams } from '@cloudbeaver/core-connections';
+import { DATA_CONTEXT_CONNECTION, type IConnectionInfoParams } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { ActionService, MenuSeparatorItem, MenuService } from '@cloudbeaver/core-view';
@@ -90,11 +90,11 @@ export class ConnectionViewPluginBootstrap extends Bootstrap {
       isActionApplicable: (context, action) => {
         if (action === ACTION_CONNECTION_VIEW_RESET) {
           const connectionKey = context.get(DATA_CONTEXT_CONNECTION)!;
-          const connection = this.connectionViewResource.get(connectionKey);
+          const settings = this.connectionViewResource.get(connectionKey);
 
-          if (connection) {
-            const isShared = this.projectInfoResource.isProjectShared(connection.projectId);
-            return connection.navigatorSettings.userSettings && isShared;
+          if (settings) {
+            const isShared = this.projectInfoResource.isProjectShared(settings.projectId);
+            return settings.navigatorSettings.userSettings && isShared;
           }
         }
 
@@ -102,21 +102,21 @@ export class ConnectionViewPluginBootstrap extends Bootstrap {
       },
       isChecked: (context, action) => {
         const connectionKey = context.get(DATA_CONTEXT_CONNECTION)!;
-        const connection = this.connectionViewResource.get(connectionKey);
+        const settings = this.connectionViewResource.get(connectionKey);
 
-        if (!connection) {
+        if (!settings) {
           return false;
         }
 
         switch (action) {
           case ACTION_CONNECTION_VIEW_SIMPLE: {
-            return isNavigatorViewSettingsEqual(connection.navigatorSettings, CONNECTION_NAVIGATOR_VIEW_SETTINGS.simple);
+            return isNavigatorViewSettingsEqual(settings.navigatorSettings, CONNECTION_NAVIGATOR_VIEW_SETTINGS.simple);
           }
           case ACTION_CONNECTION_VIEW_ADVANCED: {
-            return isNavigatorViewSettingsEqual(connection.navigatorSettings, CONNECTION_NAVIGATOR_VIEW_SETTINGS.advanced);
+            return isNavigatorViewSettingsEqual(settings.navigatorSettings, CONNECTION_NAVIGATOR_VIEW_SETTINGS.advanced);
           }
           case ACTION_CONNECTION_VIEW_SYSTEM_OBJECTS: {
-            return connection.navigatorSettings.showSystemObjects;
+            return settings.navigatorSettings.showSystemObjects;
           }
         }
 
@@ -124,30 +124,28 @@ export class ConnectionViewPluginBootstrap extends Bootstrap {
       },
       handler: async (context, action) => {
         const connectionKey = context.get(DATA_CONTEXT_CONNECTION)!;
-        const connection = await this.connectionViewResource.load(connectionKey);
-        const key = createConnectionParam(connection);
+        const settings = await this.connectionViewResource.load(connectionKey);
 
         switch (action) {
           case ACTION_CONNECTION_VIEW_SIMPLE: {
-            await this.changeConnectionView(key, CONNECTION_NAVIGATOR_VIEW_SETTINGS.simple);
+            await this.changeConnectionView(connectionKey, CONNECTION_NAVIGATOR_VIEW_SETTINGS.simple);
             break;
           }
           case ACTION_CONNECTION_VIEW_ADVANCED: {
-            await this.changeConnectionView(key, CONNECTION_NAVIGATOR_VIEW_SETTINGS.advanced);
+            await this.changeConnectionView(connectionKey, CONNECTION_NAVIGATOR_VIEW_SETTINGS.advanced);
             break;
           }
           case ACTION_CONNECTION_VIEW_SYSTEM_OBJECTS: {
-            const currentSettings = connection.navigatorSettings;
+            const currentSettings = settings.navigatorSettings;
 
-            await this.changeConnectionView(key, {
+            await this.changeConnectionView(connectionKey, {
               ...currentSettings,
               showSystemObjects: !currentSettings.showSystemObjects,
             });
             break;
           }
           case ACTION_CONNECTION_VIEW_RESET: {
-            await this.connectionViewResource.clearConnectionView(createConnectionParam(connection));
-            break;
+            await this.connectionViewService.clearConnectionView(connectionKey);
           }
         }
       },

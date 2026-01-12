@@ -8,31 +8,34 @@
 
 import { ConnectionInfoResource, type IConnectionInfoParams } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
-import { NotificationService } from '@cloudbeaver/core-events';
 import { NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
 import { type NavigatorViewSettings } from '@cloudbeaver/core-root';
 
 import { ConnectionViewResource } from './ConnectionViewResource.js';
 
-@injectable(() => [ConnectionInfoResource, NavNodeManagerService, NotificationService, ConnectionViewResource])
+@injectable(() => [ConnectionInfoResource, NavNodeManagerService, ConnectionViewResource])
 export class ConnectionViewService {
   constructor(
     private readonly connectionInfoResource: ConnectionInfoResource,
     private readonly navNodeManagerService: NavNodeManagerService,
-    private readonly notificationService: NotificationService,
     private readonly connectionViewResource: ConnectionViewResource,
   ) {}
 
   async changeConnectionView(connectionKey: IConnectionInfoParams, settings: NavigatorViewSettings): Promise<void> {
-    try {
-      await this.connectionViewResource.changeConnectionView(connectionKey, settings);
-      const connection = await this.connectionInfoResource.load(connectionKey);
+    await this.connectionViewResource.changeConnectionView(connectionKey, settings);
+    await this.syncNode(connectionKey);
+  }
 
-      if (connection.nodePath && connection.connected) {
-        await this.navNodeManagerService.refreshNode(connection.nodePath);
-      }
-    } catch (exception: any) {
-      this.notificationService.logException(exception);
+  async clearConnectionView(connectionKey: IConnectionInfoParams): Promise<void> {
+    await this.connectionViewResource.clearConnectionView(connectionKey);
+    await this.syncNode(connectionKey);
+  }
+
+  private async syncNode(connectionKey: IConnectionInfoParams) {
+    const connection = await this.connectionInfoResource.load(connectionKey);
+
+    if (connection.nodePath && connection.connected) {
+      await this.navNodeManagerService.refreshNode(connection.nodePath);
     }
   }
 }
