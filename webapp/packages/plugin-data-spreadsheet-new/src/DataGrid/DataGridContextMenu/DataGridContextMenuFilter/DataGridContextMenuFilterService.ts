@@ -422,8 +422,10 @@ export class DataGridContextMenuFilterService {
             .map(operation => {
               const val = this.clipboardService.clipboardValue || '';
               const wrappedValue = wrapOperationArgument(operation.id, val);
-              const label = `${columnLabel} ${operation.expression} ${wrappedValue}`;
-              const { clippedLabel, tooltip } = getMenuLabelClipped(label);
+              const { clippedLabel: clippedValue } = getMenuLabelClipped(wrappedValue);
+              const clippedLabel = `${columnLabel} ${operation.expression} ${clippedValue}`;
+              const fullLabel = `${columnLabel} ${operation.expression} ${wrappedValue}`;
+              const tooltip = fullLabel !== clippedLabel ? fullLabel : undefined;
 
               return new MenuBaseItem(
                 { id: operation.id, icon: 'filter-clipboard', label: clippedLabel, tooltip },
