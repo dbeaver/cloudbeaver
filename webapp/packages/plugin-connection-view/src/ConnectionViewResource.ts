@@ -55,7 +55,7 @@ export class ConnectionViewResource extends CachedMapResource<IConnectionInfoPar
       settings: { ...connectionNavigatorViewSettings, ...settings },
     });
 
-    this.set(createConnectionParam(connection), connection);
+    this.set(key, connection);
     return this.get(key)!;
   }
 
@@ -65,7 +65,7 @@ export class ConnectionViewResource extends CachedMapResource<IConnectionInfoPar
       projectId: key.projectId,
     });
 
-    this.set(createConnectionParam(connection), connection);
+    this.set(key, connection);
     this.onDataOutdated.execute(key);
 
     return this.get(key)!;

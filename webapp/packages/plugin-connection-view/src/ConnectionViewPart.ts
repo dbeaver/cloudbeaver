@@ -6,10 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { ConnectionInfoResource, createConnectionParam, DEFAULT_NAVIGATOR_VIEW_SETTINGS } from '@cloudbeaver/core-connections';
+import { DEFAULT_NAVIGATOR_VIEW_SETTINGS } from '@cloudbeaver/core-connections';
 import type { NavigatorViewSettings } from '@cloudbeaver/core-root';
 import { FormPart, type IFormState } from '@cloudbeaver/core-ui';
-import type { ProjectInfoResource } from '@cloudbeaver/core-projects';
 import type { ConnectionFormOptionsPart, IConnectionFormState } from '@cloudbeaver/plugin-connections';
 
 import type { ConnectionViewService } from './ConnectionViewService.js';
@@ -25,9 +24,7 @@ export class ConnectionViewPart extends FormPart<ConnectionViewPartState, IConne
   constructor(
     formState: IFormState<IConnectionFormState>,
     private readonly optionsPart: ConnectionFormOptionsPart,
-    private readonly connectionInfoResource: ConnectionInfoResource,
     private readonly connectionViewService: ConnectionViewService,
-    private readonly projectInfoResource: ProjectInfoResource,
     private readonly connectionViewResource: ConnectionViewResource,
   ) {
     super(formState, defaultStateGetter());
@@ -56,13 +53,9 @@ export class ConnectionViewPart extends FormPart<ConnectionViewPartState, IConne
       return;
     }
 
-    // if the project is not shared, we save settings on the user level
-    const connection = await this.connectionInfoResource.load(this.optionsPart.connectionKey);
-    const isShared = this.projectInfoResource.isProjectShared(connection.projectId);
-
-    await this.connectionViewService.changeConnectionView(createConnectionParam(connection), {
+    await this.connectionViewService.changeConnectionView(this.optionsPart.connectionKey, {
       ...this.state,
-      userSettings: !isShared,
+      userSettings: false,
     });
   }
 }

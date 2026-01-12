@@ -9,8 +9,6 @@
 import type { IFormState } from '@cloudbeaver/core-ui';
 import { type IConnectionFormState, getConnectionFormOptionsPart } from '@cloudbeaver/plugin-connections';
 import { createDataContext, DATA_CONTEXT_DI_PROVIDER } from '@cloudbeaver/core-data-context';
-import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
-import { ProjectInfoResource } from '@cloudbeaver/core-projects';
 
 import { ConnectionViewPart } from './ConnectionViewPart.js';
 import { ConnectionViewService } from './ConnectionViewService.js';
@@ -22,11 +20,9 @@ export function getConnectionViewPart(formState: IFormState<IConnectionFormState
   return formState.getPart(DATA_CONTEXT_CONNECTION_FORM_VIEW_PART, context => {
     const di = context.get(DATA_CONTEXT_DI_PROVIDER)!;
     const optionsPart = getConnectionFormOptionsPart(formState);
-    const connectionInfoResource = di.getService(ConnectionInfoResource);
     const connectionViewService = di.getService(ConnectionViewService);
-    const projectInfoResource = di.getService(ProjectInfoResource);
     const connectionViewResource = di.getService(ConnectionViewResource);
 
-    return new ConnectionViewPart(formState, optionsPart, connectionInfoResource, connectionViewService, projectInfoResource, connectionViewResource);
+    return new ConnectionViewPart(formState, optionsPart, connectionViewService, connectionViewResource);
   });
 }

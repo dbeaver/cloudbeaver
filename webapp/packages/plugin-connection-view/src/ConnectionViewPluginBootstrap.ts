@@ -146,6 +146,7 @@ export class ConnectionViewPluginBootstrap extends Bootstrap {
           }
           case ACTION_CONNECTION_VIEW_RESET: {
             await this.connectionViewService.clearConnectionView(connectionKey);
+            break;
           }
         }
       },
@@ -155,7 +156,11 @@ export class ConnectionViewPluginBootstrap extends Bootstrap {
       },
     });
 
-    this.connectionFormService.connectionContainer.add(ConnectionViewForm);
+    this.connectionFormService.connectionContainer.add(
+      ConnectionViewForm,
+      undefined,
+      props => !this.projectInfoResource.isProjectShared(props.formState.state.projectId),
+    );
   }
 
   private async changeConnectionView(connectionKey: IConnectionInfoParams, settings: NavigatorViewSettings): Promise<void> {
