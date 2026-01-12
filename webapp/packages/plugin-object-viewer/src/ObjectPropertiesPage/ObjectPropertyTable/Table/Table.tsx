@@ -28,6 +28,9 @@ export interface TableProps {
   loadMore: () => void;
 }
 
+const MENU_COLUMN_INDEX = 1;
+const MENU_COLUMN_MIN_WIDTH = 16 + 16 + 16 + 8 + 24;
+
 export const Table = observer<TableProps>(function Table({ objects, hasNextPage, loadMore }) {
   const styles = useS(classes);
   const navTreeResource = useService(NavTreeResource);
@@ -112,6 +115,15 @@ export const Table = observer<TableProps>(function Table({ objects, hasNextPage,
     if (colIdx === 0) {
       return 40;
     }
+
+    return null;
+  }
+
+  function getHeaderMinWidth(colIdx: number) {
+    if (colIdx === MENU_COLUMN_INDEX) {
+      return MENU_COLUMN_MIN_WIDTH;
+    }
+
     return null;
   }
 
@@ -142,6 +154,7 @@ export const Table = observer<TableProps>(function Table({ objects, hasNextPage,
         cell={cell}
         cellTooltip={cellTooltip}
         getHeaderWidth={getHeaderWidth}
+        getHeaderMinWidth={getHeaderMinWidth}
         getHeaderResizable={getHeaderResizable}
         columnCount={columnCount}
         headerText={headerText}

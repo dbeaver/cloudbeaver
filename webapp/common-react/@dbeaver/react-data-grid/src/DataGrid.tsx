@@ -66,6 +66,7 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
   {
     headerElement,
     getHeaderWidth,
+    getHeaderMinWidth,
     headerText,
     getHeaderOrder,
     getHeaderResizable,
@@ -110,12 +111,13 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
     .fill(null as any)
     .map((_, i): ColumnOrColumnGroup<IInnerRow, unknown> => {
       const width = getHeaderWidth?.(i) ?? 'max-content';
+      const minWidth = getHeaderMinWidth?.(i) ?? 26;
       return {
         key: getColumnKey?.(i) ?? String(i),
         name: '',
         resizable: getHeaderResizable?.(i) ?? true,
         width,
-        minWidth: 26,
+        minWidth,
         editable: row => getCellEditable?.(row.idx, i) ?? false,
         frozen: getHeaderPinned?.(i),
         renderHeaderCell: mapRenderHeaderCell(i),
