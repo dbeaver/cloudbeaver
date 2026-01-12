@@ -22,8 +22,7 @@ export class ConnectionViewService {
   ) {}
 
   async changeConnectionView(connectionKey: IConnectionInfoParams, settings: NavigatorViewSettings): Promise<void> {
-    await this.connectionViewResource.changeConnectionView(connectionKey, settings);
-    const view = await this.connectionViewResource.load(connectionKey);
+    const view = await this.connectionViewResource.changeConnectionView(connectionKey, settings);
 
     if (settings.userSettings === false && view.navigatorSettings.userSettings) {
       return;
