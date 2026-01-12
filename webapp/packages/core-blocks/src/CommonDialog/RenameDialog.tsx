@@ -7,7 +7,7 @@
  */
 import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 import type { DialogComponent } from '@cloudbeaver/core-dialogs';
 import { throttleAsync } from '@cloudbeaver/core-utils';
@@ -19,7 +19,6 @@ import { Form } from '../FormControls/Form.js';
 import { InputField } from '../FormControls/InputField/InputField.js';
 import { useTranslate } from '../localization/useTranslate.js';
 import { s } from '../s.js';
-import { useFocus } from '../useFocus.js';
 import { useObservableRef } from '../useObservableRef.js';
 import { useS } from '../useS.js';
 import { CommonDialogBody } from './CommonDialog/CommonDialogBody.js';
@@ -57,7 +56,7 @@ export const RenameDialog: DialogComponent<RenameDialogPayload, string> = observ
   className,
 }) {
   const translate = useTranslate();
-  const [focusedRef] = useFocus<HTMLFormElement>({ focusFirstChild: true });
+  const ref = useRef<HTMLInputElement>(null);
   const styles = useS(style);
 
   const { icon, subTitle, bigIcon, viewBox, name, objectName, create, confirmActionText } = payload;
@@ -103,12 +102,19 @@ export const RenameDialog: DialogComponent<RenameDialogPayload, string> = observ
   const errorMessage = state.valid ? ' ' : translate(state.message ?? 'ui_rename_taken_or_invalid');
 
   return (
-    <CommonDialogWrapper size="small" className={className} fixedWidth>
+    <CommonDialogWrapper size="small" className={className} initialFocus={ref} fixedWidth>
       <CommonDialogHeader title={title} subTitle={subTitle} icon={icon} viewBox={viewBox} bigIcon={bigIcon} onReject={rejectDialog} />
       <CommonDialogBody>
-        <Form ref={focusedRef} onSubmit={() => resolveDialog(state.name)}>
+        <Form onSubmit={() => resolveDialog(state.name)}>
           <Container center>
-            <InputField name="name" state={state} error={!state.valid} description={errorMessage} onChange={() => state.validate().catch(() => {})}>
+            <InputField
+              ref={ref}
+              name="name"
+              state={state}
+              error={!state.valid}
+              description={errorMessage}
+              onChange={() => state.validate().catch(() => {})}
+            >
               {translate('ui_name')}
             </InputField>
           </Container>
