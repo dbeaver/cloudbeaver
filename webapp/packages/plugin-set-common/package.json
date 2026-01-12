@@ -43,6 +43,7 @@
     "@cloudbeaver/core-sdk": "workspace:*",
     "@cloudbeaver/core-server-localization": "workspace:*",
     "@cloudbeaver/core-server-notifications": "workspace:*",
+    "@cloudbeaver/core-session-actions": "workspace:*",
     "@cloudbeaver/core-session-localization": "workspace:*",
     "@cloudbeaver/core-settings": "workspace:*",
     "@cloudbeaver/core-settings-localization": "workspace:*",
