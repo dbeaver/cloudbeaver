@@ -191,8 +191,11 @@ export class DataGridContextMenuFilterService {
         const resultColumn = data.getColumn(key.column) as SqlResultColumn | undefined;
 
         if (action === ACTION_DATA_GRID_FILTER_DELETE_FOR_COLUMN) {
-          const label = localizationService.translate('data_grid_table_filter_delete_for_column', undefined, { column: resultColumn?.name ?? '' });
-          const { clippedLabel, tooltip } = getMenuLabelClipped(label);
+          const columnName = resultColumn?.name ?? '';
+          const { clippedLabel: clippedColumnName } = getMenuLabelClipped(columnName);
+          const clippedLabel = localizationService.translate('data_grid_table_filter_delete_for_column', undefined, { column: clippedColumnName });
+          const fullLabel = localizationService.translate('data_grid_table_filter_delete_for_column', undefined, { column: columnName });
+          const tooltip = fullLabel !== clippedLabel ? fullLabel : undefined;
 
           return {
             ...action.info,
@@ -266,15 +269,15 @@ export class DataGridContextMenuFilterService {
           .filter(operation => !nullOperationsFilter(operation))
           .map(operation => {
             const wrappedValue = wrapOperationArgument(operation.id, cellValue);
+            const { clippedLabel: clippedValue } = getMenuLabelClipped(wrappedValue);
             const fullLabel = `${columnLabel} ${operation.expression} ${wrappedValue}`;
-            const { clippedLabel, tooltip } = getMenuLabelClipped(fullLabel);
 
             return new MenuBaseItem(
               {
                 id: operation.id,
-                label: clippedLabel,
+                label: clippedValue,
                 icon: 'filter',
-                tooltip,
+                tooltip: fullLabel !== clippedValue ? fullLabel : undefined,
               },
               {
                 onSelect: async () => {
@@ -324,21 +327,23 @@ export class DataGridContextMenuFilterService {
         const filters = supportedOperations
           .filter(operation => !nullOperationsFilter(operation))
           .map(operation => {
-            const title = `${columnLabel} ${operation.expression}`;
-            const { clippedLabel, tooltip } = getMenuLabelClipped(title);
+            const { clippedLabel: clippedColumnLabel } = getMenuLabelClipped(columnLabel);
+            const fullLabel = `${columnLabel} ${operation.expression}..`;
+            const label = `${clippedColumnLabel} ${operation.expression}..`;
+            const tooltip = fullLabel !== label ? fullLabel : undefined;
 
             return new MenuBaseItem(
               {
                 id: operation.id,
-                label: clippedLabel + ' ..',
-                icon: 'filter-custom',
+                label,
                 tooltip,
+                icon: 'filter-custom',
               },
               {
                 onSelect: async () => {
                   const { status, result } = await this.commonDialogService.open(FilterCustomValueDialog, {
                     defaultValue: displayString,
-                    inputTitle: title + ':',
+                    inputTitle: label + ':',
                   });
 
                   if (status === DialogueStateResult.Resolved && result !== undefined) {

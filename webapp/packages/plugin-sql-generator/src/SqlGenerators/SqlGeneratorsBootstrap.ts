@@ -10,7 +10,7 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { DATA_CONTEXT_NAV_NODE, EObjectFeature } from '@cloudbeaver/core-navigation-tree';
 import { getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
-import { getMenuLabelClipped, MenuBaseItem, MenuService } from '@cloudbeaver/core-view';
+import { MenuBaseItem, MenuService } from '@cloudbeaver/core-view';
 
 import { MENU_SQL_GENERATORS } from './MENU_SQL_GENERATORS.js';
 import { SqlGeneratorsResource } from './SqlGeneratorsResource.js';
@@ -68,25 +68,24 @@ export class SqlGeneratorsBootstrap extends Bootstrap {
 
         return [
           ...items,
-          ...actions.map(action => {
-            const { clippedLabel, tooltip } = getMenuLabelClipped(action.label);
-
-            return new MenuBaseItem(
-              {
-                id: action.id,
-                label: clippedLabel,
-                tooltip,
-              },
-              {
-                onSelect: () => {
-                  this.commonDialogService.open(GeneratedSqlDialog, {
-                    generatorId: action.id,
-                    pathId: node.id,
-                  });
+          ...actions.map(
+            action =>
+              new MenuBaseItem(
+                {
+                  id: action.id,
+                  label: action.label,
+                  tooltip: action.description,
                 },
-              },
-            );
-          }),
+                {
+                  onSelect: () => {
+                    this.commonDialogService.open(GeneratedSqlDialog, {
+                      generatorId: action.id,
+                      pathId: node.id,
+                    });
+                  },
+                },
+              ),
+          ),
         ];
       },
     });
