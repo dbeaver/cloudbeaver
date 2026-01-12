@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -53,6 +53,8 @@ export class GridViewAction<
 
   private columnsOrder: number[];
   readonly pinnedColumns: ObservableSet<string>;
+  readonly pinnedRowsTop: ObservableSet<string>;
+  readonly pinnedRowsBottom: ObservableSet<string>;
   protected readonly data: GridDataResultAction<TColumn, TRow, TKey, TCell, TResult>;
   protected readonly editor?: GridEditAction<TColumn, TRow, TKey, TCell, TResult>;
 
@@ -67,14 +69,22 @@ export class GridViewAction<
     this.editor = editor as GridEditAction<TColumn, TRow, TKey, TCell, TResult> | undefined;
     this.columnsOrder = this.data.columns.map((key, index) => index);
     this.pinnedColumns = observable.set<string>();
+    this.pinnedRowsTop = observable.set<string>();
+    this.pinnedRowsBottom = observable.set<string>();
 
-    makeObservable<this, 'columnsOrder' | 'pinnedColumns'>(this, {
+    makeObservable<this, 'columnsOrder' | 'pinnedColumns' | 'pinnedRowsTop' | 'pinnedRowsBottom'>(this, {
       columnsOrder: observable,
       pinnedColumns: observable,
+      pinnedRowsTop: observable,
+      pinnedRowsBottom: observable,
       setColumnOrder: action,
       pinColumn: action,
       unpinColumn: action,
       unpinAllColumns: action,
+      pinRowTop: action,
+      pinRowBottom: action,
+      unpinRow: action,
+      unpinAllRows: action,
       rows: computed,
       rowKeys: computed,
       columns: computed,
@@ -199,6 +209,47 @@ export class GridViewAction<
 
   hasPinnedColumns(): boolean {
     return this.pinnedColumns.size > 0;
+  }
+
+  pinRowTop(key: IGridRowKey): void {
+    const serializedKey = GridDataKeysUtils.serialize(key);
+    this.pinnedRowsTop.add(serializedKey);
+    this.pinnedRowsBottom.delete(serializedKey);
+  }
+
+  pinRowBottom(key: IGridRowKey): void {
+    const serializedKey = GridDataKeysUtils.serialize(key);
+    this.pinnedRowsBottom.add(serializedKey);
+    this.pinnedRowsTop.delete(serializedKey);
+  }
+
+  unpinRow(key: IGridRowKey): void {
+    const serializedKey = GridDataKeysUtils.serialize(key);
+    this.pinnedRowsTop.delete(serializedKey);
+    this.pinnedRowsBottom.delete(serializedKey);
+  }
+
+  unpinAllRows(): void {
+    this.pinnedRowsTop.clear();
+    this.pinnedRowsBottom.clear();
+  }
+
+  isRowPinnedTop(key: IGridRowKey): boolean {
+    const serializedKey = GridDataKeysUtils.serialize(key);
+    return this.pinnedRowsTop.has(serializedKey);
+  }
+
+  isRowPinnedBottom(key: IGridRowKey): boolean {
+    const serializedKey = GridDataKeysUtils.serialize(key);
+    return this.pinnedRowsBottom.has(serializedKey);
+  }
+
+  isRowPinned(key: IGridRowKey): boolean {
+    return this.isRowPinnedTop(key) || this.isRowPinnedBottom(key);
+  }
+
+  hasPinnedRows(): boolean {
+    return this.pinnedRowsTop.size > 0 || this.pinnedRowsBottom.size > 0;
   }
 
   protected mapRow(row: IGridRowKey): TCell[] {

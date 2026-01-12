@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,6 @@ import {
   DATA_CONTEXT_DV_ACTIONS,
   DATA_CONTEXT_DV_DDM,
   DATA_CONTEXT_DV_DDM_RESULT_INDEX,
-  DATA_CONTEXT_DV_PRESENTATION_ACTIONS,
   DATA_CONTEXT_DV_RESULT_KEY,
   DATA_CONTEXT_DV_SIMPLE,
   DataPresentationService,
@@ -27,10 +26,8 @@ import { DataGridContextMenuCellEditingService } from './DataGrid/DataGridContex
 import { DataGridContextMenuFilterService } from './DataGrid/DataGridContextMenu/DataGridContextMenuFilter/DataGridContextMenuFilterService.js';
 import { DataGridContextMenuOrderService } from './DataGrid/DataGridContextMenu/DataGridContextMenuOrderService.js';
 import { DataGridContextMenuSaveContentService } from './DataGrid/DataGridContextMenu/DataGridContextMenuSaveContentService.js';
+import { DataGridContextMenuPinService } from './DataGrid/DataGridContextMenu/DataGridContextMenuPinService.js';
 import { DataGridSettingsService } from './DataGridSettingsService.js';
-import { ACTION_DATA_GRID_PIN_COLUMN } from './DataGrid/Actions/Pin/ACTION_DATA_GRID_PIN_COLUMN.js';
-import { ACTION_DATA_GRID_UNPIN_COLUMN } from './DataGrid/Actions/Pin/ACTION_DATA_GRID_UNPIN_COLUMN.js';
-import { ACTION_DATA_GRID_UNPIN_ALL_COLUMNS } from './DataGrid/Actions/Pin/ACTION_DATA_GRID_UNPIN_ALL_COLUMNS.js';
 import { ACTION_DATA_GRID_FILTERS_RESET_OR_SORTING } from './DataGrid/Actions/Filters/ACTION_DATA_GRID_FILTERS_RESET_OR_SORTING.js';
 
 const VALUE_TEXT_PRESENTATION_ID = 'value-text-presentation';
@@ -44,6 +41,7 @@ const SpreadsheetGrid = importLazyComponent(() => import('./SpreadsheetGrid.js')
   DataGridContextMenuFilterService,
   DataGridContextMenuCellEditingService,
   DataGridContextMenuSaveContentService,
+  DataGridContextMenuPinService,
   ActionService,
   MenuService,
   ExceptionsCatcherService,
@@ -56,6 +54,7 @@ export class SpreadsheetBootstrap extends Bootstrap {
     private readonly dataGridContextMenuFilterService: DataGridContextMenuFilterService,
     private readonly dataGridContextMenuCellEditingService: DataGridContextMenuCellEditingService,
     private readonly dataGridContextMenuSaveContentService: DataGridContextMenuSaveContentService,
+    private readonly dataGridContextMenuPinService: DataGridContextMenuPinService,
     private readonly actionService: ActionService,
     private readonly menuService: MenuService,
     exceptionsCatcherService: ExceptionsCatcherService,
@@ -79,56 +78,25 @@ export class SpreadsheetBootstrap extends Bootstrap {
     this.dataGridContextMenuFilterService.register();
     this.dataGridContextMenuCellEditingService.register();
     this.dataGridContextMenuSaveContentService.register();
+    this.dataGridContextMenuPinService.register();
 
     this.menuService.addCreator({
       root: true,
       menus: [MENU_DV_CONTEXT_MENU],
       contexts: [DATA_CONTEXT_DV_SIMPLE, DATA_CONTEXT_DV_ACTIONS, DATA_CONTEXT_DV_DDM, DATA_CONTEXT_DV_DDM_RESULT_INDEX],
-      getItems: (context, items) => [
-        ACTION_OPEN,
-        ...items,
-        ACTION_DATA_GRID_FILTERS_RESET_OR_SORTING,
-        ACTION_DATA_GRID_PIN_COLUMN,
-        ACTION_DATA_GRID_UNPIN_COLUMN,
-        ACTION_DATA_GRID_UNPIN_ALL_COLUMNS,
-      ],
+      getItems: (context, items) => [ACTION_OPEN, ...items, ACTION_DATA_GRID_FILTERS_RESET_OR_SORTING],
     });
 
     this.actionService.addHandler({
       id: 'data-grid-key-base-handler',
       menus: [MENU_DV_CONTEXT_MENU],
-      contexts: [
-        DATA_CONTEXT_DV_SIMPLE,
-        DATA_CONTEXT_DV_ACTIONS,
-        DATA_CONTEXT_DV_DDM,
-        DATA_CONTEXT_DV_DDM_RESULT_INDEX,
-        DATA_CONTEXT_DV_PRESENTATION_ACTIONS,
-        DATA_CONTEXT_DV_RESULT_KEY,
-      ],
+      contexts: [DATA_CONTEXT_DV_SIMPLE, DATA_CONTEXT_DV_ACTIONS, DATA_CONTEXT_DV_DDM, DATA_CONTEXT_DV_DDM_RESULT_INDEX, DATA_CONTEXT_DV_RESULT_KEY],
       getActionInfo: (context, action) => {
         if (action === ACTION_OPEN) {
           return { ...action.info, label: 'data_grid_table_open_value_panel', icon: 'value-panel' };
         }
 
         return action.info;
-      },
-      isHidden: (context, action) => {
-        const dataContextResultKey = context.get(DATA_CONTEXT_DV_RESULT_KEY)!;
-        const presentationActions = context.get(DATA_CONTEXT_DV_PRESENTATION_ACTIONS)!;
-
-        if (action === ACTION_DATA_GRID_PIN_COLUMN && dataContextResultKey) {
-          return presentationActions.isColumnPinned(dataContextResultKey) === true;
-        }
-
-        if (action === ACTION_DATA_GRID_UNPIN_COLUMN && dataContextResultKey) {
-          return presentationActions.isColumnPinned(dataContextResultKey) === false;
-        }
-
-        if (action === ACTION_DATA_GRID_UNPIN_ALL_COLUMNS) {
-          return !presentationActions.hasPinnedColumns();
-        }
-
-        return false;
       },
       isActionApplicable: (context, action): boolean => {
         const model = context.get(DATA_CONTEXT_DV_DDM)!;
@@ -150,13 +118,7 @@ export class SpreadsheetBootstrap extends Bootstrap {
           return constraints.orderConstraints.length > 0 || constraints.filterConstraints.length > 0;
         }
 
-        return [
-          ACTION_OPEN,
-          ACTION_DATA_GRID_FILTERS_RESET_OR_SORTING,
-          ACTION_DATA_GRID_PIN_COLUMN,
-          ACTION_DATA_GRID_UNPIN_COLUMN,
-          ACTION_DATA_GRID_UNPIN_ALL_COLUMNS,
-        ].includes(action);
+        return [ACTION_OPEN, ACTION_DATA_GRID_FILTERS_RESET_OR_SORTING].includes(action);
       },
       handler: async (context, action) => {
         if (action === ACTION_OPEN) {
@@ -176,29 +138,6 @@ export class SpreadsheetBootstrap extends Bootstrap {
           await model.request(() => {
             constraints.deleteData();
           });
-        }
-
-        if (action === ACTION_DATA_GRID_PIN_COLUMN) {
-          const dataContextResultKey = context.get(DATA_CONTEXT_DV_RESULT_KEY)!;
-          const presentationActions = context.get(DATA_CONTEXT_DV_PRESENTATION_ACTIONS)!;
-
-          if (dataContextResultKey.column) {
-            presentationActions.pinColumn(dataContextResultKey);
-          }
-        }
-
-        if (action === ACTION_DATA_GRID_UNPIN_COLUMN) {
-          const dataContextResultKey = context.get(DATA_CONTEXT_DV_RESULT_KEY)!;
-          const presentationActions = context.get(DATA_CONTEXT_DV_PRESENTATION_ACTIONS)!;
-
-          if (dataContextResultKey.column) {
-            presentationActions.unpinColumn(dataContextResultKey);
-          }
-        }
-
-        if (action === ACTION_DATA_GRID_UNPIN_ALL_COLUMNS) {
-          const presentationActions = context.get(DATA_CONTEXT_DV_PRESENTATION_ACTIONS)!;
-          presentationActions.unpinAllColumns();
         }
       },
     });

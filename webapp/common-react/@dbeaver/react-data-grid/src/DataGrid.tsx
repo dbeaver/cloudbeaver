@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ import { useGridReactiveValue } from './useGridReactiveValue.js';
 import { mapCellContentRenderer } from './mapCellContentRenderer.js';
 import { mapRenderHeaderCell } from './mapRenderHeaderCell.js';
 import { mapEditCellRenderer } from './mapEditCellRenderer.js';
+import { mapSummaryCellRenderer } from './mapSummaryCellRenderer.js';
 import { DataGridRowContext, type IDataGridRowContext } from './DataGridRowContext.js';
 import './DataGrid.css';
 import { HeaderDnDContext, isColumn, useHeaderDnD } from './useHeaderDnD.js';
@@ -71,6 +72,7 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
     getHeaderResizable,
     columnSortable,
     getHeaderHeight,
+    getSummaryRowHeight,
     getHeaderPinned,
     columnSortingState,
     getHeaderDnD,
@@ -87,6 +89,8 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
     getRowId,
     getRowHeight,
     getRowClass,
+    getRowPinnedTop,
+    getRowPinnedBottom,
     onHeaderReorder,
     onScroll,
     onScrollToBottom,
@@ -121,6 +125,7 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
         renderHeaderCell: mapRenderHeaderCell(i),
         renderCell: mapCellContentRenderer(i),
         renderEditCell: mapEditCellRenderer(i),
+        renderSummaryCell: mapSummaryCellRenderer(i),
       };
     });
 
@@ -180,13 +185,31 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
     }
   }
 
-  const rows = useMemo(
-    () =>
-      new Array<IInnerRow>(rowsCount).fill({ idx: 0 }).map((_, i) => ({
-        idx: i,
-      })),
-    [rowsCount],
-  );
+  const { rows, topPinnedRows, bottomPinnedRows } = useMemo(() => {
+    const allRows = new Array<IInnerRow>(rowsCount).fill({ idx: 0 }).map((_, i) => ({
+      idx: i,
+    }));
+
+    const topPinned: IInnerRow[] = [];
+    const bottomPinned: IInnerRow[] = [];
+
+    for (const row of allRows) {
+      const isPinnedTop = getRowPinnedTop?.(row.idx) ?? false;
+      const isPinnedBottom = getRowPinnedBottom?.(row.idx) ?? false;
+
+      if (isPinnedTop) {
+        topPinned.push(row);
+      } else if (isPinnedBottom) {
+        bottomPinned.push(row);
+      }
+    }
+
+    return {
+      rows: allRows,
+      topPinnedRows: topPinned,
+      bottomPinnedRows: bottomPinned,
+    };
+  }, [rowsCount, getRowPinnedTop, getRowPinnedBottom]);
 
   function handleCellFocus(args: CellSelectArgs<IInnerRow, unknown>) {
     onFocus?.({ colIdx: dndHeaderContext.getDataColIdxByKey(args.column.key), rowIdx: args.rowIdx });
@@ -215,7 +238,7 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
 
   return (
     <HeaderDnDContext value={dndHeaderContext}>
-      <DataGridRowContext value={{ rowElement, rowCount, onScrollToBottom }}>
+      <DataGridRowContext value={{ rowElement, rowCount, onScrollToBottom, getRowPinnedTop, getRowPinnedBottom }}>
         <DataGridCellContext value={{ cell, cellText, cellElement, cellTooltip, onCellChange }}>
           <DataGridCellHeaderContext
             value={{
@@ -235,6 +258,7 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
               rows={rows}
               className={className}
               headerRowHeight={getHeaderHeight?.()}
+              summaryRowHeight={getSummaryRowHeight?.()}
               rowHeight={getRowHeight ? row => getRowHeight(row.idx) : undefined}
               rowKeyGetter={getRowId ? row => getRowId(row.idx) : undefined}
               rowClass={getRowClass ? row => getRowClass(row.idx) : undefined}
@@ -244,6 +268,8 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
                 renderCell: cellRenderer,
                 noRowsFallback: children,
               }}
+              topSummaryRows={topPinnedRows}
+              bottomSummaryRows={bottomPinnedRows}
               onScroll={onScroll}
               onSelectedCellChange={handleCellFocus}
               onCellKeyDown={handleCellKeyDown}
