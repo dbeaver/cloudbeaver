@@ -549,6 +549,9 @@ type ConnectionInfo {
     "Supported features (provided etc)"
     features: [ String! ]!
     navigatorSettings: NavigatorSettings!
+    "Original navigator settings from the configuration file"
+    originalNavigatorSettings: NavigatorSettings! @since(version: "25.3.3")
+
     supportedDataFormats: [ ResultDataFormat! ]!
     configurationType: DriverConfigurationType
 
