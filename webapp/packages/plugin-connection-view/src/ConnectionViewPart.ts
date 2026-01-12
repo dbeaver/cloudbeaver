@@ -47,9 +47,8 @@ export class ConnectionViewPart extends FormPart<ConnectionViewPartState, IConne
       return;
     }
 
-    // THIS IS ONLY FOR USER SETTINGS, WE SHOULD LOAD GLOBAL SETTINGS FROM SOMEWHERE ELSE
-    const connection = await this.connectionViewResource.load(this.optionsPart.connectionKey);
-    this.setInitialState({ ...connection.originalNavigatorSettings });
+    const settings = await this.connectionViewResource.load(this.optionsPart.connectionKey);
+    this.setInitialState({ ...settings.originalNavigatorSettings });
   }
 
   protected override async saveChanges(data: IFormState<IConnectionFormState>): Promise<void> {
