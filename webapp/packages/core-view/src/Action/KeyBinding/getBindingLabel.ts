@@ -32,7 +32,6 @@ const FORMAT_SHORTCUT_KEYS_MAP: Record<string, string> = {
 };
 const SOURCE_DIVIDER_REGEXP = /\+/gi;
 const APPLIED_DIVIDER = ' + ';
-const BINDINGS_DIVIDER = ' | ';
 
 function transformKeys(keyBinding: IKeyBinding): string[] {
   return getCommonAndOSSpecificKeys(keyBinding).map(shortcut =>
@@ -63,6 +62,6 @@ function formatKeyToDisplayKey(code: string): string {
   }
 }
 
-export function getBindingLabels(binding: IKeyBinding): string | undefined {
-  return transformKeys(binding).join(BINDINGS_DIVIDER);
+export function getBindingLabel(binding: IKeyBinding): string | undefined {
+  return transformKeys(binding)[0];
 }

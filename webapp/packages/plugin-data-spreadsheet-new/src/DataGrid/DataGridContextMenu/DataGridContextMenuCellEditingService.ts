@@ -9,7 +9,7 @@ import { injectable } from '@cloudbeaver/core-di';
 import {
   ACTION_EDIT,
   ActionService,
-  getBindingLabels,
+  getBindingLabel,
   KEY_BINDING_ADD,
   KEY_BINDING_DUPLICATE,
   MenuService,
@@ -207,14 +207,14 @@ export class DataGridContextMenuCellEditingService {
       return {
         ...action.info,
         label: 'data_grid_table_editing_row_add',
-        tooltip: t('data_grid_table_editing_row_add') + ' (' + getBindingLabels(KEY_BINDING_ADD) + ')',
+        tooltip: t('data_grid_table_editing_row_add') + ' (' + getBindingLabel(KEY_BINDING_ADD) + ')',
       };
     }
     if (action === ACTION_DATA_GRID_EDITING_DUPLICATE_ROW) {
       return {
         ...action.info,
         label: 'data_grid_table_editing_row_add_copy',
-        tooltip: t('data_grid_table_editing_row_add_copy') + ' (' + getBindingLabels(KEY_BINDING_DUPLICATE) + ')',
+        tooltip: t('data_grid_table_editing_row_add_copy') + ' (' + getBindingLabel(KEY_BINDING_DUPLICATE) + ')',
       };
     }
 
@@ -226,7 +226,7 @@ export class DataGridContextMenuCellEditingService {
       return {
         ...action.info,
         label: t('data_grid_table_editing_row_delete'),
-        tooltip: t('data_grid_table_editing_row_delete') + ' (' + getBindingLabels(KEY_BINDING_DELETE_ROW) + ')',
+        tooltip: t('data_grid_table_editing_row_delete') + ' (' + getBindingLabel(KEY_BINDING_DELETE_ROW) + ')',
       };
     }
 

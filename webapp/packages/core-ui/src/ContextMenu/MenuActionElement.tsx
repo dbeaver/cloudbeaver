@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 
 import { Checkbox, getComputed, Radio, registry, useTranslate, type IMenuItemElementProps } from '@cloudbeaver/core-blocks';
-import { getBindingLabels, type IMenuActionItem, type IMenuInfo } from '@cloudbeaver/core-view';
+import { getBindingLabel, type IMenuActionItem, type IMenuInfo } from '@cloudbeaver/core-view';
 import type { IContextMenuItemProps } from './IContextMenuItemProps.js';
 import { MenuItem, MenuItemCheckbox, MenuItemRadio } from '@dbeaver/ui-kit';
 import { useCallback } from 'react';
@@ -40,7 +40,7 @@ export const MenuActionElement = registry(
     const loading = getComputed(() => item.action.isLoading());
     let binding: string | undefined;
     if (item.action.binding !== null) {
-      binding = getBindingLabels(item.action.binding.binding);
+      binding = getBindingLabel(item.action.binding.binding);
     }
 
     const label = translate(actionInfo.label);

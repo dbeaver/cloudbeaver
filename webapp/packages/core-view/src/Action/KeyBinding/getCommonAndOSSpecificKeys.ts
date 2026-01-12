@@ -14,6 +14,7 @@ export function getCommonAndOSSpecificKeys(keyBinding: IKeyBinding | undefined):
     return [];
   }
   const specificKeys = getOSSpecificKeys(keyBinding);
+  const specificKeysFlat: string[] = [];
   let keys: string[] = [];
 
   if (keyBinding.keys !== undefined) {
@@ -22,13 +23,13 @@ export function getCommonAndOSSpecificKeys(keyBinding: IKeyBinding | undefined):
 
   if (specificKeys !== undefined) {
     if (Array.isArray(specificKeys)) {
-      keys.push(...specificKeys);
+      specificKeysFlat.push(...specificKeys);
     } else {
-      keys.push(specificKeys);
+      specificKeysFlat.push(specificKeys);
     }
   }
 
-  return Array.from(new Set(keys));
+  return [...specificKeysFlat, ...keys];
 }
 
 export function getOSSpecificKeys(keyBinding: IKeyBinding): string | string[] | undefined {
