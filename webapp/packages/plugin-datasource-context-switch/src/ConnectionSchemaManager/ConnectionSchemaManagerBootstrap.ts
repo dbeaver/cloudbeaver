@@ -160,7 +160,7 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
         for (const connection of connections) {
           const connectionKey = createConnectionParam(connection);
 
-          const { clippedLabel, tooltip: tooltipConnectionName } = getMenuLabelClipped(connection.name);
+          const { clippedLabel, tooltip: tooltipConnectionName } = getMenuLabelClipped(connection.name, 16, 50);
           const tooltipFull = [tooltipConnectionName, connection.description].filter(Boolean).join('\n');
 
           items.push(
