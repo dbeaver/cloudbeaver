@@ -16,7 +16,6 @@
  */
 package io.cloudbeaver.model;
 
-import graphql.schema.DataFetchingEnvironment;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebProjectImpl;
 import io.cloudbeaver.model.app.BaseWebAppConfiguration;
@@ -284,12 +283,14 @@ public class WebConnectionInfo {
 
     @Property
     @NotNull
-    public DBNBrowseSettings getNavigatorSettings(@NotNull DataFetchingEnvironment environment) {
-        Boolean userSpecific = environment.getArgument("userSpecific");
-        if (userSpecific == null || !userSpecific) {
-            return dataSourceContainer.getNavigatorSettings().getOriginalSettings();
-        }
+    public DBNBrowseSettings getNavigatorSettings() {
         return dataSourceContainer.getNavigatorSettings();
+    }
+
+    @Property
+    @NotNull
+    public DBNBrowseSettings getDefaultNavigatorSettings() {
+        return dataSourceContainer.getNavigatorSettings().getOriginalSettings();
     }
 
     @Property

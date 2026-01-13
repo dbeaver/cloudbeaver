@@ -203,8 +203,7 @@ public interface DBWServiceCore extends DBWService {
         @NotNull WebSession webSession,
         @Nullable String projectId,
         @NotNull String id,
-        @NotNull DataSourceNavigatorSettings settings,
-        boolean userSpecific
+        @NotNull DataSourceNavigatorSettings settings
     ) throws DBWebException;
 
     @WebAction

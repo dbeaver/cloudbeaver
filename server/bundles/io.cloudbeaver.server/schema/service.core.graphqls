@@ -548,8 +548,10 @@ type ConnectionInfo {
 
     "Supported features (provided etc)"
     features: [ String! ]!
-    "Navigator settings for the connection, either global or user-specific depending on the 'userSpecific' parameter"
-    navigatorSettings(userSpecific: Boolean): NavigatorSettings!
+    "Navigator settings for the connection (with user settings applied)"
+    navigatorSettings: NavigatorSettings!
+    "Default navigator settings for the connection (without user settings applied)"
+    defaultNavigatorSettings: NavigatorSettings!
 
     supportedDataFormats: [ ResultDataFormat! ]!
     configurationType: DriverConfigurationType
@@ -641,6 +643,8 @@ input NavigatorSettingsInput {
     hideFolders: Boolean!
     hideSchemas: Boolean!
     hideVirtualModel: Boolean!
+
+    userSettings: Boolean @since(version: "25.3.2")
 }
 
 input NetworkHandlerConfigInput {
@@ -837,8 +841,8 @@ extend type Mutation {
     "Disconnect from the database"
     closeConnection( id: ID!, projectId: ID ): ConnectionInfo!
 
-    "Change navigator settings for connection. It can change default settings or user settings depending on userSpecific parameter."
-    setConnectionNavigatorSettings( id: ID!, projectId: ID, settings: NavigatorSettingsInput!, userSpecific: Boolean): ConnectionInfo!
+    "Change navigator settings for connection. It can change default settings or user settings depending on 'default' parameter."
+    setConnectionNavigatorSettings( id: ID!, projectId: ID, settings: NavigatorSettingsInput!): ConnectionInfo!
     "Sets to default navigator settings for connection. Resets all user navigator settings for this connection."
     clearConnectionNavigatorSettings(projectId: ID!, id: ID!): ConnectionInfo! @since(version: "25.3.2")
 
