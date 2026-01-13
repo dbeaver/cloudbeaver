@@ -1,10 +1,11 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+
 import { observer } from 'mobx-react-lite';
 import { useCallback, useLayoutEffect, useMemo, useRef, type HTMLAttributes } from 'react';
 import { reaction } from 'mobx';
@@ -303,6 +304,9 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
   // Track pinnedColumns.size to trigger re-render when columns are pinned/unpinned
   // This ensures the component re-renders when columns are pinned/unpinned
   getComputed(() => viewAction.pinnedColumns.size);
+  // Track pinnedRowsTop and pinnedRowsBottom to trigger re-render when rows are pinned/unpinned
+  getComputed(() => viewAction.pinnedRowsTop.size);
+  getComputed(() => viewAction.pinnedRowsBottom.size);
 
   function getHeaderPinned(colIdx: number) {
     if (colIdx === 0) {
@@ -316,6 +320,22 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
     }
 
     return viewAction.isColumnPinned(column.key);
+  }
+
+  function getRowPinnedTop(rowIdx: number) {
+    const row = tableData.rows[rowIdx];
+    if (!row) {
+      return false;
+    }
+    return viewAction.isRowPinnedTop(row);
+  }
+
+  function getRowPinnedBottom(rowIdx: number) {
+    const row = tableData.rows[rowIdx];
+    if (!row) {
+      return false;
+    }
+    return viewAction.isRowPinnedBottom(row);
   }
 
   function getHeaderResizable(colIdx: number) {
@@ -518,6 +538,9 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
               getHeaderWidth={getHeaderWidth}
               getHeaderPinned={getHeaderPinned}
               getHeaderResizable={getHeaderResizable}
+              getRowPinnedTop={getRowPinnedTop}
+              getRowPinnedBottom={getRowPinnedBottom}
+              getSummaryRowHeight={() => ROW_HEIGHT}
               getRowHeight={() => ROW_HEIGHT}
               getColumnKey={getColumnKey}
               columnCount={columnsCount}

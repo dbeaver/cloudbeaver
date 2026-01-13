@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,8 @@ export interface IDataGridRowContext {
   rowElement?: IGridReactiveValue<React.ReactNode, [rowIdx: number, props: IDataGridRowProps, renderDefaultRow: IDataGridRowRenderer]>;
   rowCount: IGridReactiveValue<number, []>;
   onScrollToBottom?: () => void;
+  getRowPinnedTop?: (rowIdx: number) => boolean;
+  getRowPinnedBottom?: (rowIdx: number) => boolean;
 }
 
 export const DataGridRowContext = createContext<IDataGridRowContext | null>(null);
