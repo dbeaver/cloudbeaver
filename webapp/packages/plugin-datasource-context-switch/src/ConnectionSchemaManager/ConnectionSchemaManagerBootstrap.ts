@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import { EObjectFeature, NodeManagerUtils } from '@cloudbeaver/core-navigation-t
 import { ProjectsService } from '@cloudbeaver/core-projects';
 import { getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
 import { ContextMenuSearchItem, DATA_CONTEXT_MENU_SEARCH, OptionsPanelService } from '@cloudbeaver/core-ui';
-import { MenuBaseItem, menuExtractItems, MenuSeparatorItem, MenuService } from '@cloudbeaver/core-view';
+import { getMenuLabelClipped, MenuBaseItem, menuExtractItems, MenuSeparatorItem, MenuService } from '@cloudbeaver/core-view';
 import { MENU_APP_ACTIONS } from '@cloudbeaver/plugin-top-app-bar';
 
 import { ConnectionSchemaManagerService } from './ConnectionSchemaManagerService.js';
@@ -88,10 +88,12 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
       getInfo: (context, menu) => {
         const connection = this.connectionSchemaManagerService.currentConnection;
         const label = connection?.name || 'plugin_datasource_context_switch_select_connection';
+        const { clippedLabel, tooltip } = getMenuLabelClipped(label);
 
         return {
           ...menu,
-          label,
+          label: clippedLabel,
+          tooltip,
         };
       },
       iconComponent: () => ConnectionIcon,
@@ -158,11 +160,12 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
         for (const connection of connections) {
           const connectionKey = createConnectionParam(connection);
 
+          const { clippedLabel } = getMenuLabelClipped(connection.name);
           items.push(
             new MenuBaseItem<IConnectionSelectorExtraProps>(
               {
                 id: serializeConnectionParam(connectionKey),
-                label: connection.name,
+                label: clippedLabel,
                 tooltip: connection.description,
               },
               {
@@ -226,6 +229,8 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
           label = 'plugin_datasource_context_switch_select_container';
         }
 
+        const { clippedLabel } = getMenuLabelClipped(label);
+
         if (!connectionSchemaManagerService.currentObjectSchema && !connectionSchemaManagerService.currentObjectCatalog) {
           icon = undefined;
         } else if (connectionSchemaManagerService.currentObjectSchema?.object?.features?.includes(EObjectFeature.schema)) {
@@ -242,7 +247,7 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
         return {
           ...menu,
           icon,
-          label,
+          label: clippedLabel,
           tooltip,
         };
       },
@@ -313,12 +318,14 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
             continue;
           }
 
+          const { clippedLabel, tooltip } = getMenuLabelClipped(schemaName);
+
           items.push(
             new MenuBaseItem(
               {
                 id: schemaName,
-                label: schemaName,
-                tooltip: schemaName,
+                label: clippedLabel,
+                tooltip,
                 icon: '/icons/plugin_datasource_context_switch_schema_contrast_sm.svg',
               },
               {
@@ -350,6 +357,7 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
 
           if (catalogData.schemaList.length === 0) {
             const excluded = !!filter && !catalogName.toLowerCase().includes(filter.toLowerCase());
+            const { clippedLabel, tooltip } = getMenuLabelClipped(catalogName);
 
             if (excluded) {
               continue;
@@ -359,8 +367,8 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
               new MenuBaseItem(
                 {
                   id: catalogName,
-                  label: catalogName,
-                  tooltip: catalogName,
+                  label: clippedLabel,
+                  tooltip,
                   icon: '/icons/plugin_datasource_context_switch_database_contrast_sm.svg',
                 },
                 {
@@ -382,6 +390,7 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
 
             const title = NodeManagerUtils.concatSchemaAndCatalog(catalog.name, schema.name);
             const excluded = !!filter && !title.toLowerCase().includes(filter.toLowerCase());
+            const { clippedLabel, tooltip } = getMenuLabelClipped(title);
 
             if (excluded) {
               continue;
@@ -391,8 +400,8 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
               new MenuBaseItem(
                 {
                   id: title,
-                  label: title,
-                  tooltip: title,
+                  label: clippedLabel,
+                  tooltip,
                   icon: '/icons/plugin_datasource_context_switch_schema_contrast_sm.svg',
                 },
                 {
