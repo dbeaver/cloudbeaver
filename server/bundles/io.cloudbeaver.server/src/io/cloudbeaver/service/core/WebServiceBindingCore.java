@@ -150,8 +150,10 @@ public class WebServiceBindingCore extends WebServiceBindingBase<DBWServiceCore>
                 getWebSession(env),
                 getProjectReference(env),
                 getArgumentVal(env, "id"),
-                WebServiceUtils.parseNavigatorSettings(getArgument(env, "settings"))
-            ))
+                    WebServiceUtils.parseNavigatorSettings(getArgument(env, "settings")),
+                    CommonUtils.toBoolean(getArgument(env, "userSpecific"))
+                )
+            )
             .dataFetcher(
                 "clearConnectionNavigatorSettings", env -> getService(env).clearConnectionNavigatorSettings(
                     getWebSession(env),

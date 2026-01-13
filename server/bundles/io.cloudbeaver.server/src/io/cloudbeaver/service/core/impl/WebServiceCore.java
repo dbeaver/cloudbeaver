@@ -724,14 +724,15 @@ public class WebServiceCore implements DBWServiceCore {
         @NotNull WebSession webSession,
         @Nullable String projectId,
         @NotNull String id,
-        @NotNull DataSourceNavigatorSettings settings
+        @NotNull DataSourceNavigatorSettings settings,
+        boolean userSpecific
     ) throws DBWebException {
         WebSessionProjectImpl project = webSession.getProjectById(projectId);
         WebConnectionInfo connectionInfo = project != null ? project.getWebConnectionInfo(id) :
             WebDataSourceUtils.getWebConnectionInfo(webSession, projectId, id);
         DataSourceDescriptor dataSourceDescriptor = ((DataSourceDescriptor) connectionInfo.getDataSourceContainer());
         try {
-            if (project != null && !project.isPrivateProject() && settings.isUserSettings()) {
+            if (project != null && !project.isPrivateProject() && userSpecific) {
                 DataSourceNavigatorSettingsUtils.updateCustomNavigatorSettings(dataSourceDescriptor, settings);
             } else {
                 // If user has no permissions to save it will cause error
