@@ -337,14 +337,17 @@ extend type Query {
         columnNames: [String!],
         functions: [String!],
         showDuplicatesOnly: Boolean
-    ): String! @deprecated (reason: "use sqlGropingResultSet (25.3.1)")
+    ): String! @deprecated (reason: "use asyncSqlGroupingResultSet (25.3.1)")
 
     "Creates async task to get grouped SQL results"
-    sqlGropingResultSet(
+    asyncSqlGroupingResultSet(
         projectId: ID,
         contextId: ID!,
         connectionId: ID!,
-        resultsId: ID!,
+        "Original results ID to group"
+        originalResultsId: ID!,
+        "Current results ID is needed to apply filters/sorting on top of grouping"
+        currentResultsId: ID,
         columnNames: [String!],
         functions: [String!],
         showDuplicatesOnly: Boolean,
