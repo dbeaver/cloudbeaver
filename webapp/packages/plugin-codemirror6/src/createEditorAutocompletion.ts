@@ -26,7 +26,7 @@ export const EDITOR_ACCEPT_COMPLETION_KEYBINDING: KeyBinding = {
 
 const EDITOR_AUTOCOMPLETION_COMPARTMENT = new Compartment();
 
-const EDITOR_AUTOCOMPLETION_KEYMAP = Prec.highest(keymap.of([EDITOR_START_COMPLETION_KEYBINDING, EDITOR_ACCEPT_COMPLETION_KEYBINDING]));
+const EDITOR_AUTOCOMPLETION_KEYMAP = Prec.high(keymap.of([EDITOR_START_COMPLETION_KEYBINDING, EDITOR_ACCEPT_COMPLETION_KEYBINDING]));
 
 export function createEditorAutocompletion(config?: CompletionConfig): [Compartment, Extension] {
   return [
