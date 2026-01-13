@@ -649,8 +649,10 @@ public class WebServiceSQL implements DBWServiceSQL {
 
     @Override
     public WebAsyncTaskInfo getGroupingSqlResultSet(
+        @NotNull WebSession webSession,
         @NotNull WebSQLContextInfo contextInfo,
-        @NotNull String resultsId,
+        @NotNull String originalResultsId,
+        @Nullable String currentResultsId,
         @NotNull List<String> columnsList,
         @Nullable List<String> functions,
         @Nullable Boolean showDuplicatesOnly,
@@ -658,13 +660,11 @@ public class WebServiceSQL implements DBWServiceSQL {
         @Nullable WebDataFormat dataFormat,
         boolean isInteractive
     ) throws DBException {
-        String generateGroupByQuery = generateGroupByQuery(contextInfo, resultsId, columnsList, functions, showDuplicatesOnly);
-        return asyncExecuteQuery(
-            contextInfo.getProcessor().getWebSession(),
-            contextInfo.getProjectId(),
+        return WebSQLUtils.createAsyncTaskExecuteSqlQuery(
+            webSession,
             contextInfo,
-            generateGroupByQuery,
-            resultsId,
+            generateGroupByQuery(contextInfo, originalResultsId, columnsList, functions, showDuplicatesOnly),
+            currentResultsId,
             filter,
             dataFormat,
             false,
