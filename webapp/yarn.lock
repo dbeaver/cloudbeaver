@@ -2903,6 +2903,7 @@ __metadata:
     "@cloudbeaver/plugin-data-viewer-conditional-formatting": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
     "@dbeaver/cli": "workspace:*"
+    "@dbeaver/js-helpers": "workspace:*"
     "@dbeaver/react-tests": "workspace:*"
     "@dbeaver/result-set-api": "workspace:*"
     "@dbeaver/ui-kit": "workspace:*"

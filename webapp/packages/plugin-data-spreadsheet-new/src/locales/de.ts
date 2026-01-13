@@ -23,4 +23,11 @@ export default [
   ['plugin_data_spreadsheet_new_settings_disable_description', 'Deaktivieren Sie die Tabellenpräsentation von Daten für alle Benutzer'],
   ['plugin_data_spreadsheet_new_settings_description_label', 'Show columns description'],
   ['plugin_data_spreadsheet_new_settings_description_label_description', 'Description will be shown under the column names in the table header'],
+  ['plugin_data_spreadsheet_new_settings_use_locale_formatting_title', 'Gebietsschema-Formatierung verwenden'],
+  ['plugin_data_spreadsheet_new_settings_use_locale_formatting_os', 'OS-Formatierung verwenden'],
+  ['plugin_data_spreadsheet_new_settings_use_locale_formatting_none', 'Keine'],
+  [
+    'plugin_data_spreadsheet_new_settings_use_locale_formatting_description',
+    'Verwenden Sie die Formatierung für Zahlen und Daten entsprechend dem ausgewählten Gebietsschema. (!) Dies betrifft nur die Datendarstellung; für die Bearbeitung sollten Rohwerte verwendet werden.',
+  ],
 ];
