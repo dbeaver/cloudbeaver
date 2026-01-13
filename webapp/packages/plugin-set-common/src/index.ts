@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -39,6 +39,7 @@ import coreVersionUpdate from '@cloudbeaver/core-version-update/module';
 import coreSupport from '@cloudbeaver/core-support/module';
 import coreView from '@cloudbeaver/core-view/module';
 import coreServerNotifications from '@cloudbeaver/core-server-notifications/module';
+import coreSessionActions from '@cloudbeaver/core-session-actions/module';
 
 import pluginAdministration from '@cloudbeaver/plugin-administration/module';
 import pluginAppLogo from '@cloudbeaver/plugin-app-logo/module';
@@ -143,6 +144,7 @@ const core = [
   coreSettingsUser,
   coreTaskManager,
   coreServerNotifications,
+  coreSessionActions,
 ];
 
 export const commonSet = [

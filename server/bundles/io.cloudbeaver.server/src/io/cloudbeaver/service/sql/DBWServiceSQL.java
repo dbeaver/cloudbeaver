@@ -210,8 +210,10 @@ public interface DBWServiceSQL extends DBWService {
 
     @WebAction
     WebAsyncTaskInfo getGroupingSqlResultSet(
+        @NotNull WebSession webSession,
         @NotNull WebSQLContextInfo contextInfo,
-        @NotNull String resultsId,
+        @NotNull String originalResultsId,
+        @Nullable String currentResultsId,
         @NotNull List<String> columnsList,
         @Nullable List<String> functions,
         @Nullable Boolean showDuplicatesOnly,
