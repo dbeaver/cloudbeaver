@@ -30,8 +30,10 @@ const FORMAT_SHORTCUT_KEYS_MAP: Record<string, string> = {
   del: 'delete',
   delete: 'delete',
 };
-const SOURCE_DIVIDER_REGEXP = /\+/gi;
-const APPLIED_DIVIDER = ' + ';
+
+export const SHORTCUT_DIVIDER = '+';
+export const SOURCE_DIVIDER_REGEXP = /\+/gi;
+export const APPLIED_DIVIDER = ` ${SHORTCUT_DIVIDER} `;
 
 function transformKeys(keyBinding: IKeyBinding): string[] {
   return getCommonAndOSSpecificKeys(keyBinding).map(shortcut =>

@@ -13,6 +13,8 @@ import {
   KEY_BINDING_OPEN_IN_TAB,
   KEY_BINDING_REDO,
   KEY_BINDING_UNDO,
+  SOURCE_DIVIDER_REGEXP,
+  APPLIED_DIVIDER,
 } from '@cloudbeaver/core-view';
 import {
   KEY_BINDING_ADD_NEW_ROW,
@@ -30,6 +32,8 @@ import {
   KEY_BINDING_SQL_EDITOR_EXECUTE_SCRIPT,
   KEY_BINDING_SQL_EDITOR_FORMAT,
   KEY_BINDING_SQL_EDITOR_SHOW_EXECUTION_PLAN,
+  KEY_BINDING_SQL_EDITOR_START_COMPLETION,
+  KEY_BINDING_SQL_EDITOR_ACCEPT_COMPLETION,
 } from '@cloudbeaver/plugin-sql-editor';
 import { KEY_BINDING_SQL_EDITOR_SAVE_AS_SCRIPT } from '@cloudbeaver/plugin-sql-editor-navigation-tab-script';
 
@@ -65,8 +69,6 @@ const FORMAT_SHORTCUT_KEYS_MAP: Record<string, string> = {
   pagedown: 'pagedown',
   period: '.',
 };
-const SOURCE_DIVIDER_REGEXP = /\+/gi;
-const APPLIED_DIVIDER = ' + ';
 
 export const DATA_VIEWER_SHORTCUTS: IShortcut[] = [
   {
@@ -139,6 +141,14 @@ export const SQL_EDITOR_SHORTCUTS: IShortcut[] = [
   {
     label: 'sql_editor_shortcut_open_editor_in_new_tab',
     code: transformKeys(KEY_BINDING_OPEN_IN_TAB),
+  },
+  {
+    label: 'sql_editor_shortcut_start_completion',
+    code: transformKeys(KEY_BINDING_SQL_EDITOR_START_COMPLETION),
+  },
+  {
+    label: 'sql_editor_shortcut_accept_completion',
+    code: transformKeys(KEY_BINDING_SQL_EDITOR_ACCEPT_COMPLETION),
   },
 ];
 

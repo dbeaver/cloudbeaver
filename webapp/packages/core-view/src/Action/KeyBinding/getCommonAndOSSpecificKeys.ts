@@ -14,22 +14,17 @@ export function getCommonAndOSSpecificKeys(keyBinding: IKeyBinding | undefined):
     return [];
   }
 
-  return [...getOSSpecificKeys(keyBinding), ...getKeys(keyBinding.keys)];
+  return Array.from(new Set([...getOSSpecificKeys(keyBinding), ...getKeys(keyBinding.keys)]));
 }
 
 export function getOSSpecificKeys(keyBinding: IKeyBinding): string[] {
   const OS = getOS();
-  const keys: string[] = [];
-
-  if (OS === OperatingSystem.windowsOS) {
-    keys.push(...getKeys(keyBinding.keysWin));
-  }
 
   if (OS === OperatingSystem.macOS) {
-    keys.push(...getKeys(keyBinding.keysMac));
+    return getKeys(keyBinding.keysMac);
   }
 
-  return keys;
+  return [];
 }
 
 function getKeys(keys: string[] | string | undefined): string[] {
