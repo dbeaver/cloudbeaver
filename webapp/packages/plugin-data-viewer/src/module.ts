@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ import { DataViewerService } from './DataViewerService.js';
 import { DataViewerDataChangeConfirmationService } from './DataViewerDataChangeConfirmationService.js';
 import { DataViewerBootstrap } from './DataViewerBootstrap.js';
 import { DataPresentationService } from './DataPresentationService.js';
+import { GridEditBootstrap } from './DatabaseDataModel/Actions/Grid/GridEditBootstrap.js';
 import { IDatabaseDataSource } from './DatabaseDataModel/IDatabaseDataSource.js';
 import { DatabaseDataActions } from './DatabaseDataModel/DatabaseDataActions.js';
 import { DatabaseMetadataAction } from './DatabaseDataModel/Actions/General/DatabaseMetadataAction.js';
@@ -62,6 +63,7 @@ export default ModuleRegistry.add({
       .addSingleton(Bootstrap, proxy(BooleanValuePresentationBootstrap))
       .addSingleton(Bootstrap, proxy(DataValuePanelBootstrap))
       .addSingleton(Bootstrap, proxy(DataViewerBootstrap))
+      .addSingleton(Bootstrap, proxy(GridEditBootstrap))
       .addSingleton(Bootstrap, proxy(ImageValuePresentationBootstrap))
       .addSingleton(Bootstrap, LocaleService)
       .addSingleton(Bootstrap, proxy(TableFetchSizeActionBootstrap))
@@ -88,6 +90,7 @@ export default ModuleRegistry.add({
       .addSingleton(DataViewerService)
       .addSingleton(DataViewerDataChangeConfirmationService)
       .addSingleton(DataViewerBootstrap)
+      .addSingleton(GridEditBootstrap)
 
       .addScoped(IDatabaseDataActions, DatabaseDataActions)
       .addTransient(IDatabaseDataSource, external())

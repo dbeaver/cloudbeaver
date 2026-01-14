@@ -19,6 +19,8 @@ import {
   KEY_BINDING_CANCEL,
   KEY_BINDING_DELETE_ROW,
   KEY_BINDING_DUPLICATE_ROW,
+  KEY_BINDING_DATA_VIEWER_CELL_REDO,
+  KEY_BINDING_DATA_VIEWER_CELL_UNDO,
   KEY_BINDING_REVERT_INLINE_EDITOR_CHANGES,
   KEY_BINDING_SAVE,
 } from '@cloudbeaver/plugin-data-viewer';
@@ -92,6 +94,14 @@ export const DATA_VIEWER_SHORTCUTS: IShortcut[] = [
   {
     label: 'ui_processing_cancel',
     code: transformKeys(KEY_BINDING_CANCEL),
+  },
+  {
+    label: 'ui_undo',
+    code: transformKeys(KEY_BINDING_DATA_VIEWER_CELL_UNDO),
+  },
+  {
+    label: 'ui_redo',
+    code: transformKeys(KEY_BINDING_DATA_VIEWER_CELL_REDO),
   },
 ];
 

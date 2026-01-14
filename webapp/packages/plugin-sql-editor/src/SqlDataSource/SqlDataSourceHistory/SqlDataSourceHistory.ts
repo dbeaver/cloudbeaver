@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -8,14 +8,13 @@
 import { makeAutoObservable } from 'mobx';
 
 import { type ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
+import { HistoryManager, type IHistoryState } from '@cloudbeaver/core-root';
 
 import { createSqlDataSourceHistoryInitialState } from './createSqlDataSourceHistoryInitialState.js';
 import type { ISqlDataSourceHistory } from './ISqlDataSourceHistory.js';
 import type { ISqlDataSourceHistoryState } from './ISqlDataSourceHistoryState.js';
+import type { ISqlDataSourceHistoryData } from './ISqlDataSourceHistoryData.js';
 import type { ISqlEditorCursor } from '../ISqlDataSource.js';
-
-const HOT_HISTORY_SIZE = 30;
-const COMPRESSED_HISTORY_DELAY = 5000;
 
 export class SqlDataSourceHistory implements ISqlDataSourceHistory {
   state: ISqlDataSourceHistoryState;
@@ -23,10 +22,15 @@ export class SqlDataSourceHistory implements ISqlDataSourceHistory {
     value: string;
     cursor?: ISqlEditorCursor;
   }>;
+  private readonly historyManager: HistoryManager<ISqlDataSourceHistoryData>;
 
   constructor() {
-    this.state = createSqlDataSourceHistoryInitialState();
+    const initialState = createSqlDataSourceHistoryInitialState();
+    this.state = initialState;
     this.onNavigate = new SyncExecutor();
+    this.historyManager = new HistoryManager<ISqlDataSourceHistoryData>(initialState.history[0]!, {
+      isEqual: (a, b) => a.value === b.value,
+    });
 
     makeAutoObservable(this, {
       onNavigate: false,
@@ -34,65 +38,60 @@ export class SqlDataSourceHistory implements ISqlDataSourceHistory {
   }
 
   add(value: string, source?: string, cursor?: ISqlEditorCursor): void {
-    // skip history if value is the same as current
-    if (this.state.history[this.state.historyIndex]!.value === value) {
-      return;
-    }
-
-    // remove all history after current index
-    if (this.state.historyIndex + 1 < this.state.history.length) {
-      this.state.history.splice(this.state.historyIndex + 1);
-    }
-
-    this.state.historyIndex = this.state.history.push({ value, source, timestamp: Date.now(), cursor }) - 1;
-    this.compressHistory();
+    const historyItem: ISqlDataSourceHistoryData = {
+      value,
+      source,
+      timestamp: Date.now(),
+      cursor,
+    };
+    this.historyManager.add(historyItem, source);
+    this.syncStateFromManager();
   }
 
   undo(): void {
-    if (this.state.historyIndex === 0) {
-      return;
+    const value = this.historyManager.undo();
+    if (value !== null) {
+      this.syncStateFromManager();
+      this.onNavigate.execute(value);
     }
-    this.state.historyIndex--;
-    const prevHistoryItem = this.state.history[this.state.historyIndex]!;
-    this.onNavigate.execute(prevHistoryItem);
   }
 
   redo(): void {
-    if (this.state.historyIndex + 1 >= this.state.history.length) {
-      return;
+    const value = this.historyManager.redo();
+    if (value !== null) {
+      this.syncStateFromManager();
+      this.onNavigate.execute(value);
     }
-
-    this.state.historyIndex++;
-    const prevHistoryItem = this.state.history[this.state.historyIndex]!;
-    this.onNavigate.execute(prevHistoryItem);
   }
 
   restore(state: ISqlDataSourceHistoryState): void {
     this.state = state;
+    this.historyManager.restore(mapStateToHistoryManagerState(state));
   }
 
   clear(): void {
-    this.state = createSqlDataSourceHistoryInitialState();
+    const initialState = createSqlDataSourceHistoryInitialState();
+    this.state = initialState;
+    this.historyManager.clear(initialState.history[0]!);
   }
 
-  private compressHistory(): void {
-    if (this.state.history.length > HOT_HISTORY_SIZE) {
-      for (let i = this.state.history.length - HOT_HISTORY_SIZE; i > 1; i--) {
-        const prevEntity = this.state.history[i - 1]!;
-        const entity = this.state.history[i]!;
-
-        if (prevEntity.timestamp === -1) {
-          break;
-        }
-
-        if (entity.timestamp - prevEntity.timestamp < COMPRESSED_HISTORY_DELAY) {
-          this.state.history.splice(i, 1);
-        } else {
-          prevEntity.timestamp = -1;
-        }
-      }
-
-      this.state.historyIndex = this.state.history.length - 1;
-    }
+  private syncStateFromManager(): void {
+    const managerState = this.historyManager.getState();
+    this.state = {
+      history: managerState.history.map(item => item.value),
+      historyIndex: managerState.historyIndex,
+    };
   }
+}
+
+function mapStateToHistoryManagerState(state: ISqlDataSourceHistoryState): IHistoryState<ISqlDataSourceHistoryData> {
+  return {
+    history: state.history.map(item => ({
+      value: item,
+      timestamp: item.timestamp,
+      source: item.source,
+      metadata: {},
+    })),
+    historyIndex: state.historyIndex,
+  };
 }

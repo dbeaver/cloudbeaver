@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,9 @@ import type { IGridColumnKey, IGridDataKey, IGridRowKey } from './IGridDataKey.j
 import { GridDataKeysUtils } from './GridDataKeysUtils.js';
 import { compareGridRowKeys } from './compareGridRowKeys.js';
 import { injectable } from '@cloudbeaver/core-di';
+import { HistoryManager } from '@cloudbeaver/core-root';
 import { IDatabaseDataResultAction } from '../IDatabaseDataResultAction.js';
+import { IDatabaseDataSelectAction } from '../IDatabaseDataSelectAction.js';
 
 export interface IGridUpdate<TCell> {
   row: IGridRowKey;
@@ -54,11 +56,13 @@ export class GridEditAction<
 > extends DatabaseEditAction<TKey, TCell, IGridEditApplyActionData, TResult> {
   protected readonly editorData: Map<string, IGridUpdate<TCell>>;
   protected readonly data: GridDataResultAction<TColumn, TRow, TKey, TCell, TResult>;
+  private readonly cellHistory: Map<string, HistoryManager<TCell>>;
 
   constructor(source: IDatabaseDataSource<any, TResult>, result: TResult, data: IDatabaseDataResultAction<TKey, TResult>) {
     super(source, result);
     this.editorData = new Map();
     this.data = data as GridDataResultAction<TColumn, TRow, TKey, TCell, TResult>;
+    this.cellHistory = new Map();
 
     makeObservable<this, 'editorData'>(this, {
       editorData: observable,
@@ -70,6 +74,8 @@ export class GridEditAction<
       revert: action,
       applyUpdate: action,
       applyPartialUpdate: action,
+      undoSelectedCellValue: action,
+      redoSelectedCellValue: action,
     });
   }
 
@@ -143,11 +149,17 @@ export class GridEditAction<
     return this.editorData.get(GridDataKeysUtils.serialize(key))?.update;
   }
 
-  set(key: TKey, value: TCell): void {
+  set(key: TKey, value: TCell, skipHistory = false): void {
     const [update] = this.getOrCreateUpdate(key.row, DatabaseEditChangeType.update);
     const prevValue = update.source?.[key.column.index] as any;
 
     update.update[key.column.index] = value;
+
+    // Add to history (unless skipping for undo/redo)
+    if (!skipHistory) {
+      const historyManager = this.getOrCreateCellHistory(key);
+      historyManager.add(value);
+    }
 
     this.action.execute({
       resultId: this.result.id,
@@ -420,6 +432,9 @@ export class GridEditAction<
         } else {
           revertedUpdates.push({ key, prevValue, value });
         }
+
+        const cellHistory = this.getOrCreateCellHistory(key);
+        cellHistory.clear(value);
       }
 
       this.removeEmptyUpdate(update);
@@ -455,6 +470,7 @@ export class GridEditAction<
 
   clear(): void {
     this.editorData.clear();
+    this.cellHistory.clear();
 
     this.action.execute({
       resultId: this.result.id,
@@ -543,5 +559,53 @@ export class GridEditAction<
     if (update.type === DatabaseEditChangeType.add) {
       update.type = DatabaseEditChangeType.update;
     }
+  }
+
+  undoSelectedCellValue(): void {
+    const focusedElement = this.source.tryGetAction(this.result, IDatabaseDataSelectAction)?.getFocusedElement() as TKey | null;
+
+    if (!focusedElement) {
+      return;
+    }
+
+    const historyManager = this.getOrCreateCellHistory(focusedElement);
+    const value = historyManager.undo();
+
+    if (value !== null) {
+      this.set(focusedElement, value, true);
+    }
+  }
+
+  redoSelectedCellValue(): void {
+    const focusedElement = this.source.tryGetAction(this.result, IDatabaseDataSelectAction)?.getFocusedElement() as TKey | null;
+
+    if (!focusedElement) {
+      return;
+    }
+
+    const historyManager = this.getOrCreateCellHistory(focusedElement);
+    const value = historyManager.redo();
+
+    if (value !== null) {
+      this.set(focusedElement, value, true);
+    }
+  }
+
+  private getOrCreateCellHistory(key: TKey): HistoryManager<TCell> {
+    const historyKey = GridDataKeysUtils.serializeElementKey(key);
+
+    if (!this.cellHistory.has(historyKey)) {
+      let currentValue = this.get(key);
+
+      if (currentValue === undefined) {
+        const rowValue = this.data.getRowValue(key.row);
+        currentValue = rowValue?.[key.column.index] as TCell | undefined;
+      }
+
+      const initialValue = currentValue ?? (null as TCell);
+      this.cellHistory.set(historyKey, new HistoryManager<TCell>(initialValue, { isEqual: (a, b) => this.compareCellValue(a, b) }));
+    }
+
+    return this.cellHistory.get(historyKey)!;
   }
 }

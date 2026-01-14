@@ -37,3 +37,15 @@ export const KEY_BINDING_CANCEL: IKeyBinding = {
   id: 'data-viewer-cancel',
   keys: ['mod+period'],
 };
+
+export const KEY_BINDING_DATA_VIEWER_CELL_UNDO: IKeyBinding = {
+  id: 'data-viewer-cell-undo',
+  keys: ['mod+z'],
+  preventDefault: true,
+};
+
+export const KEY_BINDING_DATA_VIEWER_CELL_REDO: IKeyBinding = {
+  id: 'data-viewer-cell-redo',
+  keys: ['mod+shift+z', 'mod+y'],
+  preventDefault: true,
+};
