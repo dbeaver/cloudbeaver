@@ -16,29 +16,35 @@
  */
 package io.cloudbeaver.model;
 
+import org.jkiss.code.NotNull;
+
 public class WebBasicEnumObjectInfo {
 
+    @NotNull
     private String displayName;
+    @NotNull
     private String value;
 
-    public WebBasicEnumObjectInfo(String displayName, String value) {
+    public WebBasicEnumObjectInfo(@NotNull String displayName, @NotNull String value) {
         this.displayName = displayName;
         this.value = value;
     }
 
+    @NotNull
     public String getDisplayName() {
         return displayName;
     }
 
-    public void setDisplayName(String displayName) {
+    public void setDisplayName(@NotNull String displayName) {
         this.displayName = displayName;
     }
 
+    @NotNull
     public String getValue() {
         return value;
     }
 
-    public void setValue(String value) {
+    public void setValue(@NotNull String value) {
         this.value = value;
     }
 }
