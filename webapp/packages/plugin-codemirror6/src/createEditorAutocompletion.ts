@@ -12,21 +12,28 @@ import { keymap, type KeyBinding } from '@codemirror/view';
 export type CompletionConfig = Parameters<typeof autocompletion>[0];
 
 // Shortcuts are case sensitive
-export const CODEMIRROR_SHORTCUT_SPLITTER = '-';
 export const EDITOR_START_COMPLETION_KEYBINDING: KeyBinding = {
-  key: ['Shift', 'Mod', 'Space'].join(CODEMIRROR_SHORTCUT_SPLITTER),
+  key: 'Shift-Mod-Space',
+  run: startCompletion,
+  preventDefault: true,
+};
+export const EDITOR_START_COMPLETION_ALTERNATIVE_KEYBINDING: KeyBinding = {
+  key: 'Alt-Space',
+  mac: 'Alt-Enter',
   run: startCompletion,
   preventDefault: true,
 };
 export const EDITOR_ACCEPT_COMPLETION_KEYBINDING: KeyBinding = {
-  key: ['Tab'].join(CODEMIRROR_SHORTCUT_SPLITTER),
+  key: 'Tab',
   run: acceptCompletion,
   preventDefault: true,
 };
 
 const EDITOR_AUTOCOMPLETION_COMPARTMENT = new Compartment();
 
-const EDITOR_AUTOCOMPLETION_KEYMAP = Prec.high(keymap.of([EDITOR_START_COMPLETION_KEYBINDING, EDITOR_ACCEPT_COMPLETION_KEYBINDING]));
+const EDITOR_AUTOCOMPLETION_KEYMAP = Prec.high(
+  keymap.of([EDITOR_START_COMPLETION_KEYBINDING, EDITOR_ACCEPT_COMPLETION_KEYBINDING, EDITOR_START_COMPLETION_ALTERNATIVE_KEYBINDING]),
+);
 
 export function createEditorAutocompletion(config?: CompletionConfig): [Compartment, Extension] {
   return [

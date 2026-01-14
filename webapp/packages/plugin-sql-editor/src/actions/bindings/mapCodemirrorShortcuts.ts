@@ -6,12 +6,17 @@
  * you may not use this file except in compliance with the License.
  */
 import { SHORTCUT_DIVIDER, type IKeyBinding } from '@cloudbeaver/core-view';
-import { CODEMIRROR_SHORTCUT_SPLITTER, type KeyBinding } from '@cloudbeaver/plugin-codemirror6';
+import { type KeyBinding } from '@cloudbeaver/plugin-codemirror6';
 
-export function mapCodemirrorShortcuts(keyBinding: KeyBinding): Omit<IKeyBinding, 'id'> {
+const CODEMIRROR_SHORTCUT_SPLITTER = '-';
+
+export function mapCodemirrorShortcuts(keyBinding: KeyBinding | KeyBinding[]): Omit<IKeyBinding, 'id'> {
+  const bindings = Array.isArray(keyBinding) ? keyBinding : [keyBinding];
+
   return {
-    keys: keyBinding.key?.split(CODEMIRROR_SHORTCUT_SPLITTER).join(SHORTCUT_DIVIDER) ?? '',
-    keysMac: keyBinding.key?.split(CODEMIRROR_SHORTCUT_SPLITTER).join(SHORTCUT_DIVIDER) ?? '',
-    preventDefault: keyBinding.preventDefault,
+    keys: bindings.map(kb => kb.key?.split(CODEMIRROR_SHORTCUT_SPLITTER).join(SHORTCUT_DIVIDER) ?? ''),
+    keysMac: bindings.map(kb => kb.mac?.split(CODEMIRROR_SHORTCUT_SPLITTER).join(SHORTCUT_DIVIDER) ?? ''),
+    keysWin: bindings.map(kb => kb.win?.split(CODEMIRROR_SHORTCUT_SPLITTER).join(SHORTCUT_DIVIDER) ?? ''),
+    preventDefault: bindings.some(kb => kb.preventDefault),
   };
 }

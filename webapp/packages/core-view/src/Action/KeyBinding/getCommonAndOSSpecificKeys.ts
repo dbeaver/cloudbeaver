@@ -32,5 +32,5 @@ export function getOSSpecificKeys(keyBinding: IKeyBinding): string[] {
 }
 
 function getKeys(keys: string[] | string | undefined): string[] {
-  return Array.isArray(keys) ? keys.filter(Boolean) : [keys ?? ''].filter(Boolean);
+  return (Array.isArray(keys) ? keys : [keys ?? '']).filter(Boolean);
 }
