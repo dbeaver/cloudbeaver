@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -71,15 +71,15 @@ export const ObjectMenuCell = observer<Props>(function ObjectMenuCell({ object }
         <Link className={s(styles, { value: true })} title={value} inline onClick={openNode}>
           {value}
         </Link>
-        {!menuEmpty && (
-          <div className={s(styles, { menuBox: true })}>
+        <div className={s(styles, { menuBox: true })}>
+          {!menuEmpty && (
             <Loader suspense small fullSize>
               <ContextMenu contextMenuPosition={contextMenuPosition} menu={menu} onVisibleSwitch={switchState}>
                 <Icon className={s(styles, { menuIcon: true })} name="snack" viewBox="0 0 16 10" />
               </ContextMenu>
             </Loader>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );

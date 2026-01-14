@@ -59,7 +59,7 @@
         <driver id="sqlite:libsql_jdbc"/>
         <driver id="sqlserver:microsoft"/>
         <driver id="generic:trino_jdbc"/>
-        <driver id="generic:duckdb_jdbc"/>
+        <driver id="duckdb:duckdb_jdbc"/>
         <driver id="generic:kyuubi_hive"/>
         <driver id="databend:databend"/>
     </extension>

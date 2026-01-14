@@ -74,6 +74,9 @@
       "path": "../core-server-notifications"
     },
     {
+      "path": "../core-session-actions"
+    },
+    {
       "path": "../core-session-localization"
     },
     {
