@@ -1,10 +1,11 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+
 import { action, computed, makeObservable, observable, runInAction } from 'mobx';
 
 import { AppAuthService, UserInfoResource } from '@cloudbeaver/core-authentication';
@@ -37,7 +38,6 @@ import { isDefined } from '@dbeaver/js-helpers';
 import { NavTreeSettingsService } from '../NavTreeSettingsService.js';
 import type { NavNode } from './EntityTypes.js';
 import { NavNodeInfoResource, ROOT_NODE_PATH } from './NavNodeInfoResource.js';
-import { EObjectFeature } from './EObjectFeature.js';
 
 // TODO: so much dirty
 export interface NodePath {
@@ -297,7 +297,7 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
     const newNodeId = await this.performUpdate(parentId, [], async () => {
       this.markLoading(node.id, true);
       try {
-        await this.graphQLService.sdk.navRenameNode({
+        const { nodePath } = await this.graphQLService.sdk.navRenameNode({
           nodePath: node.id,
           newName: name,
         });
@@ -306,15 +306,7 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
         this.markLoaded(node.id);
         this.onDataOutdated.execute(parentId);
 
-        if (node.objectFeatures.includes(EObjectFeature.dataSource)) {
-          return node.id;
-        }
-
-        const parts = node.id.split('/');
-        parts.splice(parts.length - 1, 1, name);
-        const path = parts.join('/');
-
-        return path;
+        return nodePath;
       } finally {
         this.markLoading(node.id, false);
       }

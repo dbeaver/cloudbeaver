@@ -14,7 +14,6 @@ import { LocalizationService } from '@cloudbeaver/core-localization';
 import {
   DATA_CONTEXT_NAV_NODE,
   ENodeFeature,
-  EObjectFeature,
   getNodePlainName,
   type INodeActions,
   isConnectionFolder,
@@ -114,7 +113,7 @@ export class NavNodeContextMenuService extends Bootstrap {
 
         if (NodeManagerUtils.isDatabaseObject(node.id) || isConnectionFolder(node)) {
           if (action === ACTION_RENAME) {
-            return (node.features?.includes(ENodeFeature.canRename) || node.objectFeatures.includes(EObjectFeature.dataSource)) ?? false;
+            return node.features?.includes(ENodeFeature.canRename) ?? false;
           }
 
           if (action === ACTION_DELETE) {
