@@ -158,7 +158,7 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
     });
 
     navTreeResource.onNodeRename.addHandler(data => {
-      const connection = this.getConnectionForNode(data.nodeId);
+      const connection = this.getConnectionForNode(data.newNodeId);
 
       if (connection) {
         this.markOutdated(createConnectionParam(connection));
