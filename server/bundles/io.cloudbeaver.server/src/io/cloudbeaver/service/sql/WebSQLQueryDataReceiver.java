@@ -36,7 +36,10 @@ import org.jkiss.dbeaver.model.struct.DBSEntity;
 import org.jkiss.utils.CommonUtils;
 
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 class WebSQLQueryDataReceiver implements DBDDataReceiver {
@@ -182,9 +185,18 @@ class WebSQLQueryDataReceiver implements DBDDataReceiver {
 
         webResultSet.setSingleEntity(isSingleEntity);
 
-        Set<DBDRowIdentifier> rowIdentifiers = resultsInfo.getRowIdentifiers();
-        boolean hasRowIdentifier = rowIdentifiers.stream().allMatch(DBDRowIdentifier::isValidIdentifier);
-        webResultSet.setHasRowIdentifier(!rowIdentifiers.isEmpty() && hasRowIdentifier);
+        DBDRowIdentifier rowIdentifier = resultsInfo.getDefaultRowIdentifier();
+        if (rowIdentifier != null && !rowIdentifier.isIncomplete() && rowIdentifier.isValidIdentifier()) {
+            webResultSet.setHasRowIdentifier(true);
+
+            String rowIdentifierName = rowIdentifier.getAttributes().stream()
+                .map(DBDAttributeBinding::getName)
+                .collect(Collectors.joining(","));
+            String constraintTypeName = rowIdentifier.getUniqueKey().getConstraintType().getName();
+            webResultSet.setRowIdentifier(
+                new WebSQLResultSetRowIdentifier(rowIdentifierName, constraintTypeName)
+            );
+        }
     }
 
     private void convertComplexValuesToRelationalView(DBCSession session) {

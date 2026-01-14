@@ -127,6 +127,8 @@ type SQLResultSet {
     hasMoreData: Boolean!
     "Identifies if result set has row identifier. If true then it is possible update data or load LOB files"
     hasRowIdentifier: Boolean!
+    "Contains info about a result set row identifier"
+    rowIdentifier: SQLRowIdentifier
     "Identifies if result has children collections. If true then children collections can be read from the result set"
     hasChildrenCollection: Boolean!
     "Identifies if result set supports dynamic trace. If true then dynamic trace can be read from the result set"
@@ -137,6 +139,13 @@ type SQLResultSet {
     readOnly: Boolean! @since(version: "25.0.1")
     "Status of read-only result set. If readOnly is true then this field contains reason why result set is read-only"
     readOnlyStatus: String @since(version: "25.0.1")
+}
+
+type SQLRowIdentifier {
+    "Name of a field acting as a row identifier"
+    name: String!
+    "Type of a row identifier. Possible values: PRIMARY KEY, UNIQUE KEY, VIRTUAL PRIMARY KEY"
+    type: String!
 }
 
 type SQLQueryResults {

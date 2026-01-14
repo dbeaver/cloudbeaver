@@ -17,6 +17,7 @@
 package io.cloudbeaver.service.sql;
 
 import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.data.DBDAttributeBinding;
 import org.jkiss.dbeaver.model.exec.DBCExecutionContext;
@@ -39,6 +40,7 @@ public class WebSQLQueryResultSet {
     private WebSQLResultsInfo resultsInfo;
     private boolean singleEntity = true;
     private boolean hasRowIdentifier;
+    private WebSQLResultSetRowIdentifier rowIdentifier;
 
     private boolean hasChildrenCollection;
     private boolean isSupportsDataFilter;
@@ -119,6 +121,16 @@ public class WebSQLQueryResultSet {
 
     public void setHasRowIdentifier(boolean hasRowIdentifier) {
         this.hasRowIdentifier = hasRowIdentifier;
+    }
+
+    @Property
+    @Nullable
+    public WebSQLResultSetRowIdentifier getRowIdentifier() {
+        return rowIdentifier;
+    }
+
+    public void setRowIdentifier(@NotNull WebSQLResultSetRowIdentifier rowIdentifier) {
+        this.rowIdentifier = rowIdentifier;
     }
 
     @Property
