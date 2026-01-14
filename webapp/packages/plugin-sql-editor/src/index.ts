@@ -15,6 +15,7 @@ export * from './actions/bindings/KEY_BINDING_SQL_EDITOR_FORMAT.js';
 export * from './actions/bindings/KEY_BINDING_SQL_EDITOR_SHOW_EXECUTION_PLAN.js';
 export * from './actions/bindings/KEY_BINDING_SQL_EDITOR_START_COMPLETION.js';
 export * from './actions/bindings/KEY_BINDING_SQL_EDITOR_ACCEPT_COMPLETION.js';
+export * from './actions/bindings/KEY_BINDING_SQL_EDITOR_ESCAPE.js';
 export * from './actions/ACTION_SQL_EDITOR_EXECUTE_NEW.js';
 export * from './actions/ACTION_SQL_EDITOR_EXECUTE_SCRIPT.js';
 export * from './actions/ACTION_SQL_EDITOR_EXECUTE.js';

@@ -22,6 +22,7 @@ export default [
   ['sql_editor_shortcut_comment_uncomment_selection', 'Закомментировать/раскомментировать выделение'],
   ['sql_editor_shortcut_start_completion', 'Показать подсказки автодополнения'],
   ['sql_editor_shortcut_accept_completion', 'Принять автодополнение'],
+  ['sql_editor_shortcut_escape', 'Выйти из редактора'],
 
   ['navigation_tree_shortcut_enable_filter', 'Включить фильтрацию'],
 ];

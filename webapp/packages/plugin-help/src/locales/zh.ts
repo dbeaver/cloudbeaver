@@ -22,6 +22,7 @@ export default [
   ['sql_editor_shortcut_comment_uncomment_selection', '注释/取消注释所选内容'],
   ['sql_editor_shortcut_start_completion', '显示自动完成建议'],
   ['sql_editor_shortcut_accept_completion', '接受自动完成'],
+  ['sql_editor_shortcut_escape', '退出编辑器'],
 
   ['navigation_tree_shortcut_enable_filter', '启用过滤'],
 ];

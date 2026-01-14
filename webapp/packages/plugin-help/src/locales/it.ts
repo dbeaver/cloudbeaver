@@ -22,6 +22,7 @@ export default [
   ['sql_editor_shortcut_comment_uncomment_selection', 'Comment/Uncomment selection'],
   ['sql_editor_shortcut_start_completion', 'Show autocomplete suggestions'],
   ['sql_editor_shortcut_accept_completion', 'Accept autocompletion'],
+  ['sql_editor_shortcut_escape', 'Escape editor'],
 
   ['navigation_tree_shortcut_enable_filter', 'Enable filtering'],
 ];

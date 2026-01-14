@@ -34,6 +34,7 @@ import {
   KEY_BINDING_SQL_EDITOR_SHOW_EXECUTION_PLAN,
   KEY_BINDING_SQL_EDITOR_START_COMPLETION,
   KEY_BINDING_SQL_EDITOR_ACCEPT_COMPLETION,
+  KEY_BINDING_SQL_EDITOR_ESCAPE,
 } from '@cloudbeaver/plugin-sql-editor';
 import { KEY_BINDING_SQL_EDITOR_SAVE_AS_SCRIPT } from '@cloudbeaver/plugin-sql-editor-navigation-tab-script';
 
@@ -149,6 +150,10 @@ export const SQL_EDITOR_SHORTCUTS: IShortcut[] = [
   {
     label: 'sql_editor_shortcut_accept_completion',
     code: transformKeys(KEY_BINDING_SQL_EDITOR_ACCEPT_COMPLETION),
+  },
+  {
+    label: 'sql_editor_shortcut_escape',
+    code: transformKeys(KEY_BINDING_SQL_EDITOR_ESCAPE),
   },
 ];
 
