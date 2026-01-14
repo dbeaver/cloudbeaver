@@ -82,6 +82,17 @@ describe('getCommonAndOSSpecificKeys', () => {
       expect(result).toEqual(['Cmd+A', 'Cmd+B', 'Ctrl+A']);
     });
 
+    it('should ignore keysWin on macOS', () => {
+      const keyBinding: IKeyBinding = {
+        id: 'test',
+        keys: 'Ctrl+A',
+        keysMac: 'Cmd+A',
+        keysWin: 'Ctrl+Shift+A',
+      };
+      const result = getCommonAndOSSpecificKeys(keyBinding);
+      expect(result).toEqual(['Cmd+A', 'Ctrl+A']);
+    });
+
     it('should remove duplicates', () => {
       const keyBinding: IKeyBinding = {
         id: 'test',
@@ -128,6 +139,46 @@ describe('getCommonAndOSSpecificKeys', () => {
       expect(result).toEqual(['Ctrl+A']);
     });
 
+    it('should return only Windows keys when keys is not provided', () => {
+      const keyBinding: IKeyBinding = {
+        id: 'test',
+        keysWin: 'Ctrl+Shift+A',
+        keysMac: 'Mod+Shift+A',
+      };
+      const result = getCommonAndOSSpecificKeys(keyBinding);
+      expect(result).toEqual(['Ctrl+Shift+A']);
+    });
+
+    it('should return both common and Windows keys when both are provided', () => {
+      const keyBinding: IKeyBinding = {
+        id: 'test',
+        keys: 'Ctrl+A',
+        keysWin: 'Ctrl+Shift+A',
+      };
+      const result = getCommonAndOSSpecificKeys(keyBinding);
+      expect(result).toEqual(['Ctrl+Shift+A', 'Ctrl+A']);
+    });
+
+    it('should handle array of keys', () => {
+      const keyBinding: IKeyBinding = {
+        id: 'test',
+        keys: ['Ctrl+A', 'Ctrl+B'],
+        keysWin: ['Ctrl+Shift+A', 'Ctrl+Shift+B'],
+      };
+      const result = getCommonAndOSSpecificKeys(keyBinding);
+      expect(result).toEqual(['Ctrl+Shift+A', 'Ctrl+Shift+B', 'Ctrl+A', 'Ctrl+B']);
+    });
+
+    it('should handle mixed string and array keys', () => {
+      const keyBinding: IKeyBinding = {
+        id: 'test',
+        keys: 'Ctrl+A',
+        keysWin: ['Ctrl+Shift+A', 'Ctrl+Shift+B'],
+      };
+      const result = getCommonAndOSSpecificKeys(keyBinding);
+      expect(result).toEqual(['Ctrl+Shift+A', 'Ctrl+Shift+B', 'Ctrl+A']);
+    });
+
     it('should return empty array when only keysMac is provided', () => {
       const keyBinding: IKeyBinding = {
         id: 'test',
@@ -137,32 +188,34 @@ describe('getCommonAndOSSpecificKeys', () => {
       expect(result).toEqual([]);
     });
 
-    it('should handle array of keys', () => {
-      const keyBinding: IKeyBinding = {
-        id: 'test',
-        keys: ['Ctrl+A', 'Ctrl+B'],
-        keysMac: ['Cmd+A', 'Cmd+B'],
-      };
-      const result = getCommonAndOSSpecificKeys(keyBinding);
-      expect(result).toEqual(['Ctrl+A', 'Ctrl+B']);
-    });
-
-    it('should handle string keys', () => {
+    it('should remove duplicates', () => {
       const keyBinding: IKeyBinding = {
         id: 'test',
         keys: 'Ctrl+A',
+        keysWin: 'Ctrl+A',
       };
       const result = getCommonAndOSSpecificKeys(keyBinding);
       expect(result).toEqual(['Ctrl+A']);
+    });
+
+    it('should handle empty keys', () => {
+      const keyBinding: IKeyBinding = {
+        id: 'test',
+        keys: '',
+        keysWin: '',
+      };
+      const result = getCommonAndOSSpecificKeys(keyBinding);
+      expect(result).toEqual([]);
     });
 
     it('should filter out empty strings', () => {
       const keyBinding: IKeyBinding = {
         id: 'test',
         keys: ['Ctrl+A', ''],
+        keysWin: ['Ctrl+Shift+A', ''],
       };
       const result = getCommonAndOSSpecificKeys(keyBinding);
-      expect(result).toEqual(['Ctrl+A']);
+      expect(result).toEqual(['Ctrl+Shift+A', 'Ctrl+A']);
     });
   });
 
@@ -171,11 +224,12 @@ describe('getCommonAndOSSpecificKeys', () => {
       vi.mocked(getOS).mockReturnValue(OperatingSystem.linuxOS);
     });
 
-    it('should return only common keys, ignoring keysMac', () => {
+    it('should return only common keys, ignoring keysMac and keysWin', () => {
       const keyBinding: IKeyBinding = {
         id: 'test',
         keys: 'Ctrl+A',
         keysMac: 'Cmd+A',
+        keysWin: 'Ctrl+Shift+A',
       };
       const result = getCommonAndOSSpecificKeys(keyBinding);
       expect(result).toEqual(['Ctrl+A']);
@@ -190,11 +244,21 @@ describe('getCommonAndOSSpecificKeys', () => {
       expect(result).toEqual([]);
     });
 
+    it('should return empty array when only keysWin is provided', () => {
+      const keyBinding: IKeyBinding = {
+        id: 'test',
+        keysWin: 'Ctrl+Shift+A',
+      };
+      const result = getCommonAndOSSpecificKeys(keyBinding);
+      expect(result).toEqual([]);
+    });
+
     it('should handle array of keys', () => {
       const keyBinding: IKeyBinding = {
         id: 'test',
         keys: ['Ctrl+A', 'Ctrl+B'],
         keysMac: ['Cmd+A', 'Cmd+B'],
+        keysWin: ['Ctrl+Shift+A', 'Ctrl+Shift+B'],
       };
       const result = getCommonAndOSSpecificKeys(keyBinding);
       expect(result).toEqual(['Ctrl+A', 'Ctrl+B']);

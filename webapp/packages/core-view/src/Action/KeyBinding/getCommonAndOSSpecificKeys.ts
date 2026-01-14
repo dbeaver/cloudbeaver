@@ -20,6 +20,10 @@ export function getCommonAndOSSpecificKeys(keyBinding: IKeyBinding | undefined):
 export function getOSSpecificKeys(keyBinding: IKeyBinding): string[] {
   const OS = getOS();
 
+  if (OS === OperatingSystem.windowsOS) {
+    return getKeys(keyBinding.keysWin);
+  }
+
   if (OS === OperatingSystem.macOS) {
     return getKeys(keyBinding.keysMac);
   }

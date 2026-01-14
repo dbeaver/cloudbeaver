@@ -11,6 +11,7 @@ interface IKeyBindingOptions {
   id: string;
   preventDefault?: boolean;
   keys?: string | string[];
+  keysWin?: string | string[];
   keysMac?: string | string[];
 }
 
