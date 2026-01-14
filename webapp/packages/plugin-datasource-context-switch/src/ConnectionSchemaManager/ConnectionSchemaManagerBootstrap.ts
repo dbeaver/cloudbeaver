@@ -87,7 +87,7 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
         this.connectionSchemaManagerService.isChangingConnectionContainer,
       getInfo: (context, menu) => {
         const connection = this.connectionSchemaManagerService.currentConnection;
-        const label = connection?.name || 'plugin_datasource_context_switch_select_connection';
+        const label = connection?.name || this.localizationService.translate('plugin_datasource_context_switch_select_connection');
         const { clippedLabel, tooltip } = getMenuLabelClipped(label);
 
         return {
@@ -160,13 +160,15 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
         for (const connection of connections) {
           const connectionKey = createConnectionParam(connection);
 
-          const { clippedLabel } = getMenuLabelClipped(connection.name);
+          const { clippedLabel, tooltip: tooltipConnectionName } = getMenuLabelClipped(connection.name, 16, 50);
+          const tooltipFull = [tooltipConnectionName, connection.description].filter(Boolean).join('\n');
+
           items.push(
             new MenuBaseItem<IConnectionSelectorExtraProps>(
               {
                 id: serializeConnectionParam(connectionKey),
                 label: clippedLabel,
-                tooltip: connection.description,
+                tooltip: tooltipFull,
               },
               {
                 onSelect: () => {
