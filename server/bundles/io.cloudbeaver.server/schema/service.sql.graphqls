@@ -126,9 +126,11 @@ type SQLResultSet {
     # server always returns hasMoreData = false
     hasMoreData: Boolean!
     "Identifies if result set has row identifier. If true then it is possible update data or load LOB files"
-    hasRowIdentifier: Boolean!
-    "Contains info about a result set row identifier"
-    rowIdentifier: SQLRowIdentifier
+    hasRowIdentifier: Boolean! @deprecated (reason: "use rowIdentifierState (25.3.1)")
+    "State of a table row identifier: METADATA_NOT_FOUND, NONE, PRIMARY_KEY, VIRTUAL_KEY"
+    rowIdentifierState: String! @since(version: "25.3.4")
+    "Contains info about a result set row identifier. Present if rowIdentifierState is PRIMARY_KEY or VIRTUAL_PRIMARY_KEY"
+    rowIdentifier: SQLRowIdentifier @since(version: "25.3.4")
     "Identifies if result has children collections. If true then children collections can be read from the result set"
     hasChildrenCollection: Boolean!
     "Identifies if result set supports dynamic trace. If true then dynamic trace can be read from the result set"
@@ -144,7 +146,7 @@ type SQLResultSet {
 type SQLRowIdentifier {
     "Name of a field acting as a row identifier"
     name: String!
-    "Type of a row identifier. Possible values: PRIMARY KEY, UNIQUE KEY, VIRTUAL PRIMARY KEY"
+    "Type of a row identifier"
     type: String!
 }
 

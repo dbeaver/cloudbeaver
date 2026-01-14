@@ -40,6 +40,7 @@ public class WebSQLQueryResultSet {
     private WebSQLResultsInfo resultsInfo;
     private boolean singleEntity = true;
     private boolean hasRowIdentifier;
+    private String rowIdentifierState;
     private WebSQLResultSetRowIdentifier rowIdentifier;
 
     private boolean hasChildrenCollection;
@@ -131,6 +132,15 @@ public class WebSQLQueryResultSet {
 
     public void setRowIdentifier(@NotNull WebSQLResultSetRowIdentifier rowIdentifier) {
         this.rowIdentifier = rowIdentifier;
+    }
+
+    @Property
+    public String getRowIdentifierState() {
+        return rowIdentifierState;
+    }
+
+    public void setRowIdentifierState(String rowIdentifierState) {
+        this.rowIdentifierState = rowIdentifierState;
     }
 
     @Property
