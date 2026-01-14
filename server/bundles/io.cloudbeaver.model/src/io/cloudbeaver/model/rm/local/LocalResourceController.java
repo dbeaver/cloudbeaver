@@ -175,11 +175,6 @@ public class LocalResourceController extends BaseLocalResourceController {
                 projects.add(0, userProject);
             }
         }
-        if (ServletAppUtils.getServletApplication().isMultiNode()) {
-            for (RMProject rmProject : projects) {
-                handleProjectOpened(rmProject.getId());
-            }
-        }
 
         projects.sort(Comparator.comparing(RMProject::getDisplayName));
         return projects.toArray(new RMProject[0]);
@@ -297,9 +292,6 @@ public class LocalResourceController extends BaseLocalResourceController {
         try {
             log.debug("Creating project '" + rmProject.getId() + "'");
             Files.createDirectories(projectPath);
-            if (ServletAppUtils.getServletApplication().isMultiNode()) {
-                createResourceTypeFolders(projectPath);
-            }
             fireRmProjectAddEvent(rmProject);
             return rmProject;
         } catch (IOException e) {
@@ -635,7 +627,8 @@ public class LocalResourceController extends BaseLocalResourceController {
         }
         return doProjectOperation(projectId, () -> {
             try {
-                Path folderPath = CommonUtils.isEmpty(folder) ?
+                boolean projectFolder = CommonUtils.isEmpty(folder);
+                Path folderPath = projectFolder ?
                     projectPath :
                     projectPath.resolve(folder);
                 folderPath = folderPath.normalize();
@@ -644,7 +637,7 @@ public class LocalResourceController extends BaseLocalResourceController {
                     throw new DBException("Invalid folder path");
                 }
                 createFolder(folderPath);
-                return readChildResources(projectId, folderPath, nameMask, readProperties, readHistory, recursive);
+                return readChildResources(projectId, folderPath, nameMask, projectFolder, readProperties, readHistory, recursive);
             } catch (NoSuchFileException e) {
                 throw new DBException("Invalid resource folder " + folder);
             } catch (IOException e) {
@@ -658,19 +651,45 @@ public class LocalResourceController extends BaseLocalResourceController {
         @NotNull String projectId,
         @NotNull Path folderPath,
         @Nullable String nameMask,
+        boolean projectFolder,
         boolean readProperties,
         boolean readHistory,
         boolean recursive
     ) throws IOException {
         try (Stream<Path> files = Files.list(folderPath)) {
-            return files.filter(path -> {
+            Set<RMResource> children = files.filter(path -> {
                     String fileName = path.getFileName().toString();
                     return (nameMask == null || nameMask.equals(fileName)) && !fileName.startsWith(".");
                 }) // skip hidden files
-                .sorted(Comparator.comparing(path -> path.getFileName().toString(), String.CASE_INSENSITIVE_ORDER))
                 .map((Path path) -> makeResourceFromPath(projectId, path, nameMask, readProperties, readHistory, recursive))
                 .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+            if (ServletAppUtils.getServletApplication().isMultiNode() && projectFolder) {
+                addResourceTypeFolders(folderPath, children);
+            }
+            return children.stream()
+                .sorted(Comparator.comparing(RMResource::getName, String.CASE_INSENSITIVE_ORDER))
                 .toArray(RMResource[]::new);
+        }
+    }
+
+    private void addResourceTypeFolders(@NotNull Path projectPath, @NotNull Set<RMResource> children) {
+        Set<String> folderNames = children.stream()
+            .filter(RMResource::isFolder)
+            .map(RMResource::getName)
+            .collect(Collectors.toSet());
+        // fake resources for default resource type folders
+        for (ResourceTypeDescriptor type : ResourceTypeRegistry.getInstance().getResourceTypes()) {
+            String defaultRoot = type.getDefaultRoot(null);
+            if (CommonUtils.isEmpty(defaultRoot)) {
+                continue;
+            }
+            Path resourceFolder = projectPath.resolve(defaultRoot);
+            if (!folderNames.contains(resourceFolder.getFileName().toString())) {
+                RMResource resource = new RMResource(resourceFolder.getFileName().toString());
+                resource.setFolder(true);
+                children.add(resource);
+            }
         }
     }
 
@@ -1020,25 +1039,6 @@ public class LocalResourceController extends BaseLocalResourceController {
         return createRmProjectFromWebProject(path, webProject, allProjectPermissions);
     }
 
-    private void createResourceTypeFolders(Path path) {
-        // FIXME: do not create folders by force!!!
-        var resourceTypes = ResourceTypeRegistry.getInstance().getResourceTypes();
-        for (var resourceType : resourceTypes) {
-            var defaultRoot = resourceType.getDefaultRoot(null);
-            if (defaultRoot == null) {
-                continue;
-            }
-            var typeFolder = path.resolve(defaultRoot);
-            try {
-                if (!Files.exists(typeFolder)) {
-                    createFolder(typeFolder);
-                }
-            } catch (Exception e) {
-                log.error("Resource folder " + typeFolder + " is not created", e);
-            }
-        }
-    }
-
     protected <T> T doProjectOperation(@NotNull String projectId, @NotNull RMFileOperation<T> operation) throws DBException {
         for (RMFileOperationHandler fileHandler : fileHandlers) {
             try {
@@ -1190,7 +1190,7 @@ public class LocalResourceController extends BaseLocalResourceController {
 
         if (recursive && resource.isFolder()) {
             try {
-                resource.setChildren(readChildResources(projectId, path, nameMask, readProperties, readHistory, true));
+                resource.setChildren(readChildResources(projectId, path, nameMask, false, readProperties, readHistory, true));
             } catch (IOException e) {
                 log.error(e);
             }
@@ -1202,10 +1202,6 @@ public class LocalResourceController extends BaseLocalResourceController {
     @NotNull
     private String getProjectRelativePath(@NotNull String projectId, @NotNull Path path) throws DBException {
         return getProjectPath(projectId).toAbsolutePath().relativize(path).toString().replace('\\', IPath.SEPARATOR);
-    }
-
-    protected void handleProjectOpened(String projectId) throws DBException {
-        createResourceTypeFolders(getProjectPath(projectId));
     }
 
     public static Builder builder(
