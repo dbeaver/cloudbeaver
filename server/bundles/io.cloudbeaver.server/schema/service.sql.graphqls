@@ -129,7 +129,7 @@ type SQLResultSet {
     hasRowIdentifier: Boolean! @deprecated (reason: "use rowIdentifierState (25.3.1)")
     "State of a table row identifier: METADATA_NOT_FOUND, NONE, PRIMARY_KEY, VIRTUAL_KEY"
     rowIdentifierState: String! @since(version: "25.3.4")
-    "Contains info about a result set row identifier. Present if rowIdentifierState is PRIMARY_KEY or VIRTUAL_PRIMARY_KEY"
+    "Contains info about a result set row identifier. Present if rowIdentifierState is PRIMARY_KEY"
     rowIdentifier: SQLRowIdentifier @since(version: "25.3.4")
     "Identifies if result has children collections. If true then children collections can be read from the result set"
     hasChildrenCollection: Boolean!
@@ -144,7 +144,7 @@ type SQLResultSet {
 }
 
 type SQLRowIdentifier {
-    "Name of a field acting as a row identifier"
+    "Name of a column or a set of columns acting as a row identifier"
     name: String!
     "Type of a row identifier"
     type: String!
