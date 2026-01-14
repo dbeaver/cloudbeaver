@@ -14,7 +14,6 @@ import {
   ConnectionInfoProjectKey,
   ConnectionInfoResource,
   createConnectionParam,
-  DEFAULT_NAVIGATOR_VIEW_SETTINGS,
   type IConnectionInfoParams,
   isConnectionInfoParamEqual,
   parseConnectionKey,
@@ -24,7 +23,7 @@ import { CachedMapResource, isResourceAlias, type ResourceKey, resourceKeyList, 
 import { schemaValidationError } from '@cloudbeaver/core-utils';
 import { GraphQLService, type DatabaseConnectionNavigatorViewSettingsFragment } from '@cloudbeaver/core-sdk';
 import { ProjectsService } from '@cloudbeaver/core-projects';
-import type { NavigatorViewSettings } from '@cloudbeaver/core-root';
+import { DEFAULT_NAVIGATOR_VIEW_SETTINGS, type NavigatorViewSettings } from '@cloudbeaver/core-root';
 
 type NavigatorViewSettingsInfo = DatabaseConnectionNavigatorViewSettingsFragment;
 

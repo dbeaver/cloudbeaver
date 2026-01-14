@@ -4,7 +4,7 @@ fragment DatabaseConnectionNavigatorViewSettings on ConnectionInfo {
   navigatorSettings {
     ...AllNavigatorSettings
   }
-  originalNavigatorSettings {
+  defaultNavigatorSettings {
     ...AllNavigatorSettings
   }
 }

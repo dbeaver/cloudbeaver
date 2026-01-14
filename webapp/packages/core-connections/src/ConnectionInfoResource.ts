@@ -34,7 +34,6 @@ import {
   type GetUserConnectionsQueryVariables,
   GraphQLService,
   type InitConnectionMutationVariables,
-  type NavigatorSettingsInput,
   type TestConnectionMutation,
 } from '@cloudbeaver/core-sdk';
 import { schemaValidationError } from '@cloudbeaver/core-utils';
@@ -57,16 +56,6 @@ export type NewConnection = Connection & { [NEW_CONNECTION_SYMBOL]: boolean; tim
 export const ConnectionInfoProjectKey = resourceKeyListAliasFactory('@connection-info/projects', (...projectIds: string[]) => ({ projectIds }));
 
 export const ConnectionInfoActiveProjectKey = resourceKeyListAlias('@connection-info/projects-active');
-
-export const DEFAULT_NAVIGATOR_VIEW_SETTINGS: NavigatorSettingsInput = {
-  showOnlyEntities: false,
-  hideFolders: false,
-  hideVirtualModel: false,
-  hideSchemas: false,
-  mergeEntities: false,
-  showSystemObjects: false,
-  showUtilityObjects: false,
-};
 
 export interface IConnectionInfoMetadata extends ICachedResourceMetadata {
   connecting?: boolean;

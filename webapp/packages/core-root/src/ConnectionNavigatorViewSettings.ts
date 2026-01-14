@@ -10,6 +10,16 @@ import type { NavigatorSettingsInput } from '@cloudbeaver/core-sdk';
 export type NavigatorView = 'simple' | 'advanced';
 export type NavigatorViewSettings = Omit<NavigatorSettingsInput, 'showSystemObjects'> & { showSystemObjects?: boolean };
 
+export const DEFAULT_NAVIGATOR_VIEW_SETTINGS: NavigatorSettingsInput = {
+  showOnlyEntities: false,
+  hideFolders: false,
+  hideVirtualModel: false,
+  hideSchemas: false,
+  mergeEntities: false,
+  showSystemObjects: false,
+  showUtilityObjects: false,
+};
+
 export const CONNECTION_NAVIGATOR_VIEW_SETTINGS: Record<NavigatorView, NavigatorViewSettings> = {
   simple: {
     showOnlyEntities: true,

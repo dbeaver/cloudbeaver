@@ -6,8 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { DEFAULT_NAVIGATOR_VIEW_SETTINGS } from '@cloudbeaver/core-connections';
-import type { NavigatorViewSettings } from '@cloudbeaver/core-root';
+import { type NavigatorViewSettings, DEFAULT_NAVIGATOR_VIEW_SETTINGS } from '@cloudbeaver/core-root';
 import { FormPart, type IFormState } from '@cloudbeaver/core-ui';
 import type { ConnectionFormOptionsPart, IConnectionFormState } from '@cloudbeaver/plugin-connections';
 
@@ -45,7 +44,7 @@ export class ConnectionViewPart extends FormPart<ConnectionViewPartState, IConne
     }
 
     const settings = await this.connectionViewResource.load(this.optionsPart.connectionKey);
-    this.setInitialState({ ...settings.originalNavigatorSettings });
+    this.setInitialState({ ...settings.defaultNavigatorSettings });
   }
 
   protected override async saveChanges(data: IFormState<IConnectionFormState>): Promise<void> {
