@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -56,8 +56,10 @@ export interface DataGridProps extends IDataGridCellContext, IDataGridRowContext
 export interface DataGridRef {
   selectCell: (position: ICellPosition) => void;
   scrollToCell: (position: Partial<ICellPosition>) => void;
+  scrollToDataCell: (position: Partial<ICellPosition> & { colIdx?: number }) => void;
   openEditor: (position: ICellPosition) => void;
   getColumnsOrdered: () => readonly CalculatedColumn<IInnerRow, unknown>[];
+  getDataColIdxByKey: (key: string) => number | null;
 }
 
 const MAX_AUTO_SIZE_WIDTH = 350;
@@ -154,6 +156,10 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
     scrollToCell: (position: Partial<ICellPosition>) => {
       innerGridRef.current?.scrollToCell({ idx: position.colIdx && dndHeaderContext.getDataColIdx(position.colIdx), rowIdx: position.rowIdx });
     },
+    scrollToDataCell: (position: Partial<ICellPosition> & { colIdx?: number }) => {
+      const virtualIdx = position.colIdx !== undefined ? dndHeaderContext.getVirtualColIdx(position.colIdx) : undefined;
+      innerGridRef.current?.scrollToCell({ idx: virtualIdx, rowIdx: position.rowIdx });
+    },
     openEditor: (position: ICellPosition) => {
       const columnKey = mapPositionToColumnKey(position);
 
@@ -169,6 +175,13 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
       );
     },
     getColumnsOrdered: () => innerGridRef.current?.getColumnsOrdered() ?? [],
+    getDataColIdxByKey: (key: string) => {
+      try {
+        return dndHeaderContext.getDataColIdxByKey(key);
+      } catch {
+        return null;
+      }
+    },
   }));
 
   if (rowsCountRef.current !== rowsCount) {
