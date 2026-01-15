@@ -29,7 +29,7 @@ cd cloudbeaver/deploy
 echo "Build CloudBeaver server"
 
 cd ../server/product/aggregate
-"$script_dir/../../dbeaver-common/mvnw" clean verify $MAVEN_COMMON_OPTS -Dheadless-platform
+"$script_dir/../../dbeaver-common/mvnw" clean verify "${MAVEN_COMMON_OPTS--T1C}" -Dheadless-platform
 if [[ "$?" -ne 0 ]] ; then
   echo 'Could not perform package'; exit $rc
 fi
