@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import { GridDataKeysUtils } from './GridDataKeysUtils.js';
 import { compareGridRowKeys } from './compareGridRowKeys.js';
 import { injectable } from '@cloudbeaver/core-di';
 import { IDatabaseDataResultAction } from '../IDatabaseDataResultAction.js';
+import { GridHistoryAction, type IHistoryEntry } from './GridHistoryAction.js';
 
 export interface IGridUpdate<TCell> {
   row: IGridRowKey;
@@ -44,6 +45,14 @@ export interface IGridEditApplyActionData extends IDatabaseDataEditApplyActionDa
 
 export type IGridEditActionData<TKey extends IGridDataKey = IGridDataKey, TCell = unknown> = IDatabaseDataEditActionData<TKey, TCell>;
 
+type IGridEditHistoryData<TKey extends IGridDataKey = IGridDataKey, TCell = unknown> = {
+  key: TKey;
+  value: TCell;
+  prevValue: TCell;
+};
+
+const GRID_EDIT_HISTORY_SOURCE_SET = 'grid-edit-action-set';
+
 @injectable(() => [IDatabaseDataSource, IDatabaseDataResult, IDatabaseDataResultAction])
 export class GridEditAction<
   TColumn = unknown,
@@ -54,14 +63,23 @@ export class GridEditAction<
 > extends DatabaseEditAction<TKey, TCell, IGridEditApplyActionData, TResult> {
   protected readonly editorData: Map<string, IGridUpdate<TCell>>;
   protected readonly data: GridDataResultAction<TColumn, TRow, TKey, TCell, TResult>;
+  protected readonly history: GridHistoryAction<IGridEditHistoryData<TKey, TCell>, TResult>;
 
   constructor(source: IDatabaseDataSource<any, TResult>, result: TResult, data: IDatabaseDataResultAction<TKey, TResult>) {
     super(source, result);
     this.editorData = new Map();
     this.data = data as GridDataResultAction<TColumn, TRow, TKey, TCell, TResult>;
+    this.history = source.tryGetAction<GridHistoryAction<IGridEditHistoryData<TKey, TCell>, TResult>>(result, GridHistoryAction) as GridHistoryAction<
+      IGridEditHistoryData<TKey, TCell>,
+      TResult
+    >;
 
-    makeObservable<this, 'editorData'>(this, {
+    this.history.onUndo.addHandler(this.handleUndo.bind(this));
+    this.history.onRedo.addHandler(this.handleRedo.bind(this));
+
+    makeObservable<this, 'editorData' | 'history'>(this, {
       editorData: observable,
+      history: observable,
       set: action,
       add: action,
       addRow: action,
@@ -144,6 +162,11 @@ export class GridEditAction<
   }
 
   set(key: TKey, value: TCell): void {
+    this.setCellValue(key, value);
+    this.updateHistoryWithCellValue(key, value);
+  }
+
+  private setCellValue(key: TKey, value: TCell): void {
     const [update] = this.getOrCreateUpdate(key.row, DatabaseEditChangeType.update);
     const prevValue = update.source?.[key.column.index] as any;
 
@@ -520,6 +543,35 @@ export class GridEditAction<
     return [this.editorData.get(key)!, created];
   }
 
+  private updateHistoryWithCellValue(key: TKey, value: TCell): void {
+    const [update] = this.getOrCreateUpdate(key.row, DatabaseEditChangeType.update);
+    const prevValue = update.source?.[key.column.index] as any;
+    const lastIndex = this.history.getState().length - 1;
+    const lastEntry = this.history.get(lastIndex);
+    const isSameKey = lastEntry && GridDataKeysUtils.isElementsKeyEqual(lastEntry.data.key, key);
+
+    if (isSameKey) {
+      this.history.update(lastIndex, {
+        data: {
+          key,
+          value,
+          prevValue,
+        },
+      });
+
+      return;
+    }
+
+    this.history.add({
+      source: GRID_EDIT_HISTORY_SOURCE_SET,
+      data: {
+        key,
+        value,
+        prevValue,
+      },
+    });
+  }
+
   protected compareCellValue(valueA: TCell | undefined, valueB: TCell | undefined): boolean {
     const castedValueA = valueA === undefined ? '' : valueA;
     const castedValueB = valueB === undefined ? '' : valueB;
@@ -542,6 +594,18 @@ export class GridEditAction<
 
     if (update.type === DatabaseEditChangeType.add) {
       update.type = DatabaseEditChangeType.update;
+    }
+  }
+
+  private handleUndo(entry: IHistoryEntry<IGridEditHistoryData<TKey, TCell>>): void {
+    if (entry.source === GRID_EDIT_HISTORY_SOURCE_SET) {
+      this.setCellValue(entry.data.key, entry.data.prevValue);
+    }
+  }
+
+  private handleRedo(entry: IHistoryEntry<IGridEditHistoryData<TKey, TCell>>): void {
+    if (entry.source === GRID_EDIT_HISTORY_SOURCE_SET) {
+      this.setCellValue(entry.data.key, entry.data.value);
     }
   }
 }

@@ -1,0 +1,132 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2026 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+import { action, makeObservable, observable } from 'mobx';
+
+import { type ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
+
+import { IDatabaseDataSource } from '../../IDatabaseDataSource.js';
+import { DatabaseDataAction } from '../../DatabaseDataAction.js';
+import { IDatabaseDataResult } from '../../IDatabaseDataResult.js';
+import { injectable } from '@cloudbeaver/core-di';
+
+export interface IHistoryEntry<TData = unknown> {
+  id: string;
+  timestamp: number;
+  data: TData;
+  source: string;
+}
+
+@injectable(() => [IDatabaseDataSource, IDatabaseDataResult])
+export class GridHistoryAction<TData = unknown, TResult extends IDatabaseDataResult = IDatabaseDataResult> extends DatabaseDataAction<any, TResult> {
+  readonly onAdd: ISyncExecutor<IHistoryEntry<TData>>;
+  readonly onUndo: ISyncExecutor<IHistoryEntry<TData>>;
+  readonly onRedo: ISyncExecutor<IHistoryEntry<TData>>;
+
+  private readonly history: IHistoryEntry<TData>[];
+  private currentIndex: number;
+
+  constructor(source: IDatabaseDataSource<any, TResult>, result: TResult) {
+    super(source, result);
+    this.onAdd = new SyncExecutor();
+    this.onUndo = new SyncExecutor();
+    this.onRedo = new SyncExecutor();
+    this.history = [];
+    this.currentIndex = -1;
+
+    makeObservable<this, 'history' | 'currentIndex'>(this, {
+      history: observable.shallow,
+      currentIndex: observable,
+      add: action,
+      undo: action,
+      redo: action,
+    });
+  }
+
+  add(entry: Omit<IHistoryEntry<TData>, 'id' | 'timestamp'>): void {
+    const newEntry: IHistoryEntry<TData> = {
+      ...entry,
+      id: `${Date.now()}-${Math.random()}`,
+      timestamp: Date.now(),
+    };
+
+    // remove all entries after the current index (if any)
+    if (this.currentIndex < this.history.length - 1) {
+      this.history.splice(this.currentIndex + 1);
+    }
+
+    this.history.push(newEntry);
+    this.currentIndex = this.history.length - 1;
+
+    this.onAdd.execute(newEntry);
+  }
+
+  get(index: number): IHistoryEntry<TData> | undefined {
+    return this.history[index];
+  }
+
+  update(index: number, partialEntry: Partial<IHistoryEntry<TData>>): void {
+    if (index < 0 || index >= this.history.length || !this.history[index]) {
+      return;
+    }
+
+    this.history[index] = {
+      ...this.history[index],
+      ...partialEntry,
+    };
+  }
+
+  undo(): boolean {
+    if (!this.canUndo()) {
+      return false;
+    }
+
+    const entry = this.getCurrentEntry();
+    this.currentIndex--;
+    if (entry) {
+      this.onUndo.execute(entry);
+    }
+    return true;
+  }
+
+  redo(): boolean {
+    if (!this.canRedo()) {
+      return false;
+    }
+
+    this.currentIndex++;
+    const entry = this.getCurrentEntry();
+    if (entry) {
+      this.onRedo.execute(entry);
+    }
+    return true;
+  }
+
+  canUndo(): boolean {
+    return this.currentIndex >= 0;
+  }
+
+  canRedo(): boolean {
+    return this.currentIndex < this.history.length - 1;
+  }
+
+  getCurrentEntry(): IHistoryEntry<TData> | undefined {
+    if (this.currentIndex < 0 || this.currentIndex >= this.history.length) {
+      return undefined;
+    }
+    return this.history[this.currentIndex];
+  }
+
+  getState(): readonly IHistoryEntry<TData>[] {
+    return this.history;
+  }
+
+  clear(): void {
+    this.history.length = 0;
+    this.currentIndex = -1;
+  }
+}
