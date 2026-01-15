@@ -27,8 +27,6 @@ jobs:
           java-version: "21"
           cache: maven
 
-      - uses: dbeaver/github-actions/install-maven@devel
-
       - name: Run build script
         run: ./build-backend.sh
         shell: bash

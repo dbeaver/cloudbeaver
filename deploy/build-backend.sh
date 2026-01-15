@@ -1,8 +1,11 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
 set -Eeo pipefail
 set +u
 
 echo "Clone and build Cloudbeaver"
+
+script_dir="$(realpath "$(dirname "$0")")"
 
 rm -rf ./drivers
 rm -rf ./cloudbeaver
@@ -26,7 +29,7 @@ cd cloudbeaver/deploy
 echo "Build CloudBeaver server"
 
 cd ../server/product/aggregate
-mvn clean verify $MAVEN_COMMON_OPTS -Dheadless-platform
+"$script_dir/../../dbeaver-common/mvnw" clean verify $MAVEN_COMMON_OPTS -Dheadless-platform
 if [[ "$?" -ne 0 ]] ; then
   echo 'Could not perform package'; exit $rc
 fi
