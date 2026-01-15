@@ -266,6 +266,7 @@ export class DataGridContextMenuFilterService {
         const cellValue = format.getText(format.get(key));
         const supportedOperations = data.getColumnOperations(key.column);
         const columnLabel = data.getColumn(key.column)?.label || '';
+        const { clippedLabel: clippedColumnLabel } = getMenuLabelClipped(columnLabel);
 
         const filters = supportedOperations
           .filter(operation => !nullOperationsFilter(operation))
@@ -273,14 +274,15 @@ export class DataGridContextMenuFilterService {
             const wrappedValue = wrapOperationArgument(operation.id, cellValue);
             const { clippedLabel: clippedValue } = getMenuLabelClipped(wrappedValue);
             const fullLabel = `${columnLabel} ${operation.expression} ${wrappedValue}`;
-            const tooltip = fullLabel !== clippedValue ? fullLabel : undefined;
+            const label = `${clippedColumnLabel} ${operation.expression} ${clippedValue}`;
+            const tooltip = fullLabel !== label ? fullLabel : undefined;
 
             return new MenuBaseItem(
               {
                 id: operation.id,
-                label: clippedValue,
-                icon: 'filter',
+                label,
                 tooltip,
+                icon: 'filter',
               },
               {
                 onSelect: async () => {
