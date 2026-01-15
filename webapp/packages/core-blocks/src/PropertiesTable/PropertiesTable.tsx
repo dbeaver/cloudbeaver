@@ -9,6 +9,8 @@ import { computed } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useCallback, useMemo, useState } from 'react';
 
+import { getObjectPropertyOptionValue } from '@cloudbeaver/core-sdk';
+
 import { Button } from '../Button.js';
 import { Filter } from '../FormControls/Filter.js';
 import { useTranslate } from '../localization/useTranslate.js';
@@ -87,7 +89,8 @@ export const PropertiesTable = observer<Props>(function PropertiesTable(props) {
     }
 
     if (propertiesState) {
-      if (value === property.defaultValue && !propsRef.staticProperties) {
+      const defaultValue = property.defaultValue && getObjectPropertyOptionValue(property.defaultValue);
+      if (value === defaultValue && !propsRef.staticProperties) {
         delete propertiesState[property.key];
       } else {
         propertiesState[property.key] = value;
