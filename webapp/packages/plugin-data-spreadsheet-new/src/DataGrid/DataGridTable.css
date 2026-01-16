@@ -10,12 +10,16 @@
     --theme-add-status: #65974c;
     --theme-delete-status: #b55d68;
     --theme-edit-status: #a37d43;
+    --theme-highlighted-cell-background: #ffff0054;
+    --theme-search-active-cell-background: #ff6a0054;
   }
 
   .theme-light {
     --theme-add-status: #c0f5a6;
     --theme-delete-status: #f48693;
     --theme-edit-status: #fbcc85;
+    --theme-highlighted-cell-background: #ffff0054;
+    --theme-search-active-cell-background: #ff6a0054;
   }
 
   .data-grid__container {
@@ -46,6 +50,14 @@
 
     & .rdg-cell-custom-deleted {
       background-color: var(--theme-delete-status) !important;
+    }
+
+    & .rdg-cell-search-match {
+      background-color: var(--theme-highlighted-cell-background) !important;
+    }
+
+    & .rdg-cell-search-active {
+      background-color: var(--theme-search-active-cell-background) !important;
     }
   }
 
