@@ -53,7 +53,7 @@ type IGridEditHistoryData<TKey extends IGridDataKey = IGridDataKey, TCell = unkn
 
 const GRID_EDIT_HISTORY_SOURCE_SET = 'grid-edit-action-set';
 
-@injectable(() => [IDatabaseDataSource, IDatabaseDataResult, IDatabaseDataResultAction])
+@injectable(() => [IDatabaseDataSource, IDatabaseDataResult, IDatabaseDataResultAction, GridHistoryAction])
 export class GridEditAction<
   TColumn = unknown,
   TRow = unknown,
@@ -65,21 +65,22 @@ export class GridEditAction<
   protected readonly data: GridDataResultAction<TColumn, TRow, TKey, TCell, TResult>;
   protected readonly history: GridHistoryAction<IGridEditHistoryData<TKey, TCell>, TResult>;
 
-  constructor(source: IDatabaseDataSource<any, TResult>, result: TResult, data: IDatabaseDataResultAction<TKey, TResult>) {
+  constructor(
+    source: IDatabaseDataSource<any, TResult>,
+    result: TResult,
+    data: IDatabaseDataResultAction<TKey, TResult>,
+    history: GridHistoryAction<any, TResult>,
+  ) {
     super(source, result);
     this.editorData = new Map();
     this.data = data as GridDataResultAction<TColumn, TRow, TKey, TCell, TResult>;
-    this.history = source.tryGetAction<GridHistoryAction<IGridEditHistoryData<TKey, TCell>, TResult>>(result, GridHistoryAction) as GridHistoryAction<
-      IGridEditHistoryData<TKey, TCell>,
-      TResult
-    >;
+    this.history = history as GridHistoryAction<IGridEditHistoryData<TKey, TCell>, TResult>;
 
     this.history.onUndo.addHandler(this.handleUndo.bind(this));
     this.history.onRedo.addHandler(this.handleRedo.bind(this));
 
-    makeObservable<this, 'editorData' | 'history'>(this, {
+    makeObservable<this, 'editorData'>(this, {
       editorData: observable,
-      history: observable,
       set: action,
       add: action,
       addRow: action,
@@ -547,7 +548,7 @@ export class GridEditAction<
     const [update] = this.getOrCreateUpdate(key.row, DatabaseEditChangeType.update);
     const prevValue = update.source?.[key.column.index] as any;
     const lastIndex = this.history.getState().length - 1;
-    const lastEntry = this.history.get(lastIndex);
+    const lastEntry = this.history.getCurrentEntry();
     const isSameKey = lastEntry && GridDataKeysUtils.isElementsKeyEqual(lastEntry.data.key, key);
 
     if (isSameKey) {

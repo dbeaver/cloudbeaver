@@ -15,7 +15,6 @@ import { IDatabaseDataResult } from '../../IDatabaseDataResult.js';
 import { injectable } from '@cloudbeaver/core-di';
 
 export interface IHistoryEntry<TData = unknown> {
-  id: string;
   timestamp: number;
   data: TData;
   source: string;
@@ -50,7 +49,6 @@ export class GridHistoryAction<TData = unknown, TResult extends IDatabaseDataRes
   add(entry: Omit<IHistoryEntry<TData>, 'id' | 'timestamp'>): void {
     const newEntry: IHistoryEntry<TData> = {
       ...entry,
-      id: `${Date.now()}-${Math.random()}`,
       timestamp: Date.now(),
     };
 
