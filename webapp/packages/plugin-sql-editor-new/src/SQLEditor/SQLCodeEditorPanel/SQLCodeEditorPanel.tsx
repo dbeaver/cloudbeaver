@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,15 @@ import { type TabContainerPanelComponent, useDNDBox } from '@cloudbeaver/core-ui
 import { closeCompletion, type IEditorRef, Prec, ReactCodemirrorPanel, useCodemirrorExtensions } from '@cloudbeaver/plugin-codemirror6';
 import { SqlEditorSettingsService, type ISqlEditorModeProps } from '@cloudbeaver/plugin-sql-editor';
 
-import { ACTIVE_QUERY_EXTENSION } from '../ACTIVE_QUERY_EXTENSION.js';
-import { QUERY_STATUS_GUTTER_EXTENSION } from '../QUERY_STATUS_GUTTER_EXTENSION.js';
-import { SQLCodeEditorLoader } from '../SQLCodeEditor/SQLCodeEditorLoader.js';
-import { useSQLCodeEditor } from '../SQLCodeEditor/useSQLCodeEditor.js';
+import {
+  ACTIVE_QUERY_EXTENSION,
+  QUERY_STATUS_GUTTER_EXTENSION,
+  SQLCodeEditor,
+  useSQLCodeEditor,
+  useSqlDialectExtension,
+} from '@cloudbeaver/plugin-sql-editor-codemirror';
 import { useHighlightExtensions } from '../useHighlightExtensions.js';
 import { useSqlDialectAutocompletion } from '../useSqlDialectAutocompletion.js';
-import { useSqlDialectExtension } from '../useSqlDialectExtension.js';
 import style from './SQLCodeEditorPanel.module.css';
 import { SqlEditorInfoBar } from './SqlEditorInfoBar.js';
 import { useSQLCodeEditorPanel } from './useSQLCodeEditorPanel.js';
@@ -109,7 +111,7 @@ export const SQLCodeEditorPanel: TabContainerPanelComponent<ISqlEditorModeProps>
 
   return (
     <div ref={dndBox.setRef} className={styles['box']}>
-      <SQLCodeEditorLoader
+      <SQLCodeEditor
         ref={setEditorRef}
         getValue={() => data.value}
         cursor={{
@@ -143,7 +145,7 @@ export const SQLCodeEditorPanel: TabContainerPanelComponent<ISqlEditorModeProps>
             <SqlEditorInfoBar state={editor.state} />
           </ReactCodemirrorPanel>
         )}
-      </SQLCodeEditorLoader>
+      </SQLCodeEditor>
     </div>
   );
 });

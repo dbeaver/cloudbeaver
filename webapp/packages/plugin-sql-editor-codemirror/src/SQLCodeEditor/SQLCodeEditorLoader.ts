@@ -1,10 +1,10 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
 
-export const SQLCodeEditorLoader = importLazyComponent(() => import('./SQLCodeEditor.js').then(m => m.SQLCodeEditor));
+export const SQLCodeEditor = importLazyComponent(() => import('./SQLCodeEditor.js').then(m => m.SQLCodeEditor));
