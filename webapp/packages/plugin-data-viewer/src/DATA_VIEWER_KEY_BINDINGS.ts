@@ -24,7 +24,7 @@ export const KEY_BINDING_DUPLICATE_ROW: IKeyBinding = {
 
 export const KEY_BINDING_DELETE_ROW: IKeyBinding = {
   id: 'data-viewer-delete-row',
-  keys: ['mod+shift+delete', 'mod+shift+backspace'],
+  keys: ['mod+shift+delete'],
 };
 
 export const KEY_BINDING_SAVE: IKeyBinding = {
