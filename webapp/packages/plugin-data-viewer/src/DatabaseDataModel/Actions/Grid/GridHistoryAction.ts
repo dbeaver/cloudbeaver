@@ -40,6 +40,7 @@ export class GridHistoryAction<TData = unknown, TResult extends IDatabaseDataRes
     makeObservable<this, 'history' | 'currentIndex'>(this, {
       history: observable.shallow,
       currentIndex: observable,
+      replaceLast: action,
       add: action,
       undo: action,
       redo: action,
@@ -67,15 +68,8 @@ export class GridHistoryAction<TData = unknown, TResult extends IDatabaseDataRes
     return this.history[index];
   }
 
-  update(index: number, partialEntry: Partial<IHistoryEntry<TData>>): void {
-    if (index < 0 || index >= this.history.length || !this.history[index]) {
-      return;
-    }
-
-    this.history[index] = {
-      ...this.history[index],
-      ...partialEntry,
-    };
+  replaceLast(entry: IHistoryEntry<TData>): void {
+    this.history[this.history.length - 1] = entry;
   }
 
   undo(): boolean {

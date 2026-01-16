@@ -547,12 +547,12 @@ export class GridEditAction<
   private updateHistoryWithCellValue(key: TKey, value: TCell): void {
     const [update] = this.getOrCreateUpdate(key.row, DatabaseEditChangeType.update);
     const prevValue = update.source?.[key.column.index] as any;
-    const lastIndex = this.history.getState().length - 1;
     const lastEntry = this.history.getCurrentEntry();
     const isSameKey = lastEntry && GridDataKeysUtils.isElementsKeyEqual(lastEntry.data.key, key);
 
     if (isSameKey) {
-      this.history.update(lastIndex, {
+      this.history.replaceLast({
+        ...lastEntry,
         data: {
           key,
           value,
