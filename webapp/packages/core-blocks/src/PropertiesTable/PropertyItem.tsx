@@ -42,7 +42,7 @@ export const PropertyItem = observer<Props>(function PropertyItem({
   const styles = useS(classes);
   const translate = useTranslate();
   const isDeletable = !readOnly && !property.displayName && removable;
-  const defaultValue = property.defaultValue ? String(getObjectPropertyOptionValue(property.defaultValue)) : undefined;
+  const defaultValue = property.defaultValue !== undefined ? String(getObjectPropertyOptionValue(property.defaultValue)) : undefined;
   const edited = value !== undefined && value !== defaultValue;
   const keyInputRef = useRef<HTMLInputElement>(null);
 

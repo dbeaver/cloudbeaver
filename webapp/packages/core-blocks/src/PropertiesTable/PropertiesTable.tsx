@@ -89,7 +89,7 @@ export const PropertiesTable = observer<Props>(function PropertiesTable(props) {
     }
 
     if (propertiesState) {
-      const defaultValue = property.defaultValue && getObjectPropertyOptionValue(property.defaultValue);
+      const defaultValue = property.defaultValue !== undefined ? String(getObjectPropertyOptionValue(property.defaultValue)) : undefined;
       if (value === defaultValue && !propsRef.staticProperties) {
         delete propertiesState[property.key];
       } else {
