@@ -38,6 +38,11 @@ export function useFormatting(tableData: ITableData, cache: ResultSetCacheAction
 
         return {
           locale,
+          timeOnly: new Intl.DateTimeFormat(locale, {
+            hour: 'numeric',
+            minute: 'numeric',
+            second: 'numeric',
+          }),
           dateTime: new Intl.DateTimeFormat(locale, {
             year: 'numeric',
             month: 'numeric',
@@ -50,7 +55,6 @@ export function useFormatting(tableData: ITableData, cache: ResultSetCacheAction
             year: 'numeric',
             month: 'numeric',
             day: 'numeric',
-            timeZone: 'UTC',
           }),
           number: new Intl.NumberFormat(locale),
         };
