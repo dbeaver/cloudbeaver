@@ -41,7 +41,7 @@ const RenderParametersForm = observer(function RenderParametersForm({
 
   for (const [paramName, paramValue] of Object.entries(parameters)) {
     if (String(paramValue)) {
-      query = query.replace(`:${paramName}`, String(paramValue));
+      query = query.replaceAll(`:${paramName}`, String(paramValue));
     }
   }
 
