@@ -60,7 +60,8 @@ import { useTableData } from './useTableData.js';
 import { TableColumnHeader } from './TableColumnHeader/TableColumnHeader.js';
 import { TableIndexColumnHeader } from './TableColumnHeader/TableIndexColumnHeader.js';
 import { useDataGridSearchState } from './DataGridSearchProvider.js';
-import { clsx, SearchPanel, type SearchPanelRef } from '@dbeaver/ui-kit';
+import { clsx, type SearchPanelRef } from '@dbeaver/ui-kit';
+import { SearchPanelObserver } from './SearchPanelObserver.js';
 
 const ROW_HEIGHT = 24;
 export const HEADER_HEIGHT = 32;
@@ -99,6 +100,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
       },
     }));
     searchState.setGridRef(dataGridRef);
+    searchState.setReplaceHandler(handleCellChange);
   }, [searchState, tableData]);
 
   useHotkeys(
@@ -209,6 +211,10 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
         return;
       }
 
+      if (searchState.suppressEditorSelection) {
+        return;
+      }
+
       const key = data.value[data.value.length - 1]!.key;
 
       const colIdx = tableData.getColumnIndexFromColumnKey(key.column);
@@ -225,6 +231,10 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
     tableData.editor?.action.addHandler(syncEditor);
 
     function syncFocus(data: DatabaseDataSelectActionsData<Partial<IGridDataKey>>) {
+      if (searchState.suppressEditorSelection) {
+        return;
+      }
+
       if (data.type === 'focus') {
         // TODO: we need this delay to update focus after render rows update
         setTimeout(() => {
@@ -564,22 +574,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
               />
             </div>
           </FormattingContext.Provider>
-          {searchState.open && (
-            <SearchPanel
-              ref={searchPanelRef}
-              className="tw:bg-(--theme-secondary) tw:px-0! tw:py-1! tw:mb-0!"
-              isReadOnly={getComputed(() => model.isReadonly(resultIndex))}
-              query={searchState.query}
-              searchMatchesCount={searchState.matches}
-              onQueryChange={searchState.setQuery}
-              onCaseSensitiveToggle={searchState.toggleCaseSensitive}
-              onWholeWordToggle={searchState.toggleWholeWord}
-              onRegexToggle={searchState.toggleRegex}
-              onFindNext={searchState.findNext}
-              onFindPrevious={searchState.findPrevious}
-              onClose={searchState.close}
-            />
-          )}
+          <SearchPanelObserver state={searchState} panelRef={searchPanelRef} isReadOnly={model.isReadonly(resultIndex)} />
         </TableDataContext.Provider>
       </DataGridSelectionContext.Provider>
     </DataGridContext.Provider>

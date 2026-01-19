@@ -28,6 +28,8 @@ export interface IDataGridSearchState {
   query: IDataViewerSearchQuery;
   matches: IDataViewerSearchMatches;
   open: boolean;
+  /** When true, editors should avoid changing grid selection/focus (used during replace). */
+  suppressEditorSelection?: boolean;
   setTableData: (
     getData: () => {
       rows: any[];
@@ -37,6 +39,8 @@ export interface IDataGridSearchState {
   ) => void;
   setGridRef: (ref: RefObject<DataGridRef | null>) => void;
   setQuery: (search: string) => void;
+  setReplace: (replace: string) => void;
+  setReplaceHandler: (fn: (rowIdx: number, colIdx: number, value: string) => void) => void;
   toggleCaseSensitive: () => void;
   toggleWholeWord: () => void;
   toggleRegex: () => void;
@@ -46,6 +50,7 @@ export interface IDataGridSearchState {
   close: () => void;
   isMatch: (rowIdx: number, colIdx: number) => boolean;
   isActiveMatch: (rowIdx: number, colIdx: number) => boolean;
+  replaceActive: () => void;
 }
 
 interface IDataGridSearchPersistent {
@@ -78,7 +83,6 @@ const ESCAPE_REGEX = /[.*+?^${}()|[\]\\]/g;
 //TODO:
 // 1. Optimize search for large datasets (add limit, debounce, web worker, etc.)
 // 2. Think about persisted artifact lifecycle (when and how to clean up)
-// 3. Editions while searching
 class DataGridSearchStore implements IDataGridSearchStateInternal {
   query: IDataViewerSearchQuery;
   open = false;
@@ -92,6 +96,8 @@ class DataGridSearchStore implements IDataGridSearchStateInternal {
   gridRef: RefObject<DataGridRef | null> | null = null;
   matchedCells: Array<{ rowIdx: number; colIdx: number }> = [];
   activeMatchIdx = -1;
+  replaceHandler: ((rowIdx: number, colIdx: number, value: string) => void) | null = null;
+  suppressEditorSelection = false;
 
   get matches(): IDataViewerSearchMatches {
     return {
@@ -108,37 +114,42 @@ class DataGridSearchStore implements IDataGridSearchStateInternal {
     this.query = { ...persisted.query };
     this.open = persisted.open;
 
-    makeObservable<this, 'tableReactionDisposer'>(this, {
-      query: observable.ref,
+    makeObservable<this, 'tableReactionDisposer' | 'replaceHandler' | 'suppressEditorSelection'>(this, {
+      query: observable,
       open: observable,
       tableData: observable.ref,
       gridRef: observable.ref,
-      matchedCells: observable.ref,
+      matchedCells: observable.shallow,
       activeMatchIdx: observable,
       matches: computed,
       setTableData: action.bound,
       setGridRef: action.bound,
+      setReplaceHandler: action.bound,
+      setReplace: action.bound,
       setQuery: action.bound,
       toggleCaseSensitive: action.bound,
       toggleWholeWord: action.bound,
       toggleRegex: action.bound,
       findNext: action.bound,
       findPrevious: action.bound,
+      replaceActive: action.bound,
       openSearch: action.bound,
       close: action.bound,
       runSearch: action.bound,
       scrollToActiveMatch: action.bound,
       tableReactionDisposer: observable.ref,
+      replaceHandler: observable.ref,
+      suppressEditorSelection: observable,
     });
 
     reaction(
-      () => this.query,
-      query => {
+      () => [this.query.search, this.query.caseSensitive, this.query.wholeWord, this.query.regexp],
+      ([search, caseSensitive, wholeWord, regexp]) => {
         this.persisted.query = {
-          search: query.search ?? '',
-          caseSensitive: !!query.caseSensitive,
-          wholeWord: !!query.wholeWord,
-          regexp: !!query.regexp,
+          search: typeof search === 'string' ? search : '',
+          caseSensitive: !!caseSensitive,
+          wholeWord: !!wholeWord,
+          regexp: !!regexp,
         };
       },
     );
@@ -181,6 +192,14 @@ class DataGridSearchStore implements IDataGridSearchStateInternal {
 
   setGridRef(ref: RefObject<DataGridRef | null>) {
     this.gridRef = ref;
+  }
+
+  setReplaceHandler(fn: (rowIdx: number, colIdx: number, value: string) => void) {
+    this.replaceHandler = fn;
+  }
+
+  setReplace(replace: string) {
+    this.query = { ...this.query, replace };
   }
 
   private buildSearchPattern(): RegExp {
@@ -251,22 +270,22 @@ class DataGridSearchStore implements IDataGridSearchStateInternal {
   }
 
   setQuery(search: string) {
-    this.query = { ...this.query, search };
+    this.query.search = search;
     this.runSearch();
   }
 
   toggleCaseSensitive() {
-    this.query = { ...this.query, caseSensitive: !this.query.caseSensitive };
+    this.query.caseSensitive = !this.query.caseSensitive;
     this.runSearch();
   }
 
   toggleWholeWord() {
-    this.query = { ...this.query, wholeWord: !this.query.wholeWord };
+    this.query.wholeWord = !this.query.wholeWord;
     this.runSearch();
   }
 
   toggleRegex() {
-    this.query = { ...this.query, regexp: !this.query.regexp };
+    this.query.regexp = !this.query.regexp;
     this.runSearch();
   }
 
@@ -288,6 +307,63 @@ class DataGridSearchStore implements IDataGridSearchStateInternal {
     this.scrollToActiveMatch();
   }
 
+  replaceActive() {
+    if (this.activeMatchIdx < 0 || this.activeMatchIdx >= this.matchedCells.length) {
+      return;
+    }
+
+    if (!this.replaceHandler) {
+      return;
+    }
+
+    const match = this.matchedCells[this.activeMatchIdx];
+    if (!match) {
+      return;
+    }
+
+    const value = this.query.replace ?? '';
+
+    if (!this.tableData) {
+      return;
+    }
+
+    const { getCellText } = this.tableData();
+    const cellText = getCellText(match.rowIdx, match.colIdx);
+    const searchPattern = this.buildSearchPattern();
+    const newText = cellText.replace(searchPattern, value);
+    this.suppressEditorSelection = true;
+    try {
+      this.replaceHandler(match.rowIdx, match.colIdx, newText);
+    } catch {
+    } finally {
+      this.suppressEditorSelection = false;
+    }
+
+    if (searchPattern.global) {
+      searchPattern.lastIndex = 0;
+    }
+    const stillMatches = searchPattern.test(newText);
+    if (searchPattern.global) {
+      searchPattern.lastIndex = 0;
+    }
+
+    if (!stillMatches) {
+      this.matchedCells.splice(this.activeMatchIdx, 1);
+
+      if (this.matchedCells.length === 0) {
+        this.activeMatchIdx = -1;
+      } else if (this.activeMatchIdx >= this.matchedCells.length) {
+        this.activeMatchIdx = this.matchedCells.length - 1;
+      }
+
+      if (this.activeMatchIdx >= 0) {
+        this.scrollToActiveMatch();
+      }
+    } else {
+      this.scrollToActiveMatch();
+    }
+  }
+
   openSearch(callback?: () => void) {
     this.open = true;
     if (callback) {
@@ -297,7 +373,7 @@ class DataGridSearchStore implements IDataGridSearchStateInternal {
 
   close() {
     this.open = false;
-    this.query = { ...this.query, search: '' };
+    this.query.search = '';
     this.matchedCells = [];
     this.activeMatchIdx = -1;
   }
