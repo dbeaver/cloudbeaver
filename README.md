@@ -25,6 +25,15 @@ You can see a live demo of CloudBeaver here: https://demo.cloudbeaver.io
 
 ## Changelog
 
+### 25.3.3 2026-01-19
+
+- For security reasons, session expiration leads to a complete logout for a user and clears all data from the screen;
+- Added "Use local formatting" setting to Data Editor. Users can choose how to display numbers and dates: using the OS locale, a custom locale, or keeping values unformatted. This formatting applies only to displayed values. Data in the database remains unchanged;
+- Added the shortcut Ctrl/Cmd + . to cancel operations in Data Editor;
+- CloudBeaver now supports long polling as a fallback when WebSockets are unavailable or blocked, ensuring reliable communication for metadata updates and SQL execution;
+- Fixed a keyboard navigation issue for panels to keep the focus inside;
+- Clickhouse: Spatial data support was added.
+
 ### 25.3.2 2026-01-05
 
 - The ability to pin columns has been added to the Data Editor, allowing users to keep key columns (e.g., IDs, names) visible while scrolling through wide tables;
