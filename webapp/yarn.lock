@@ -1485,7 +1485,7 @@ __metadata:
     reakit: "npm:^1"
     reakit-utils: "npm:^0"
     rimraf: "npm:^6"
-    subscript: "npm:^9"
+    subscript: "npm:^10"
     tslib: "npm:^2"
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
@@ -18379,10 +18379,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"subscript@npm:^9":
-  version: 9.2.0
-  resolution: "subscript@npm:9.2.0"
-  checksum: 10c0/2ee1ee12347a6b89d9ed9992f901175420dd9758f5bd7a448055bdee3c44d8d8bc496cb69b34bdea3c34e8e38fdb006c0b62e486c11610dd937a97cf233a9263
+"subscript@npm:^10":
+  version: 10.0.3
+  resolution: "subscript@npm:10.0.3"
+  checksum: 10c0/51acd12ee538bcdd36d8477dc704c5da745e9b62d255e3c67d2687dcba7e47bfffdd7c50adafdcafb0b60823922c28b5d27a05062e837ac31d7ae05f171f919b
   languageName: node
   linkType: hard
 
