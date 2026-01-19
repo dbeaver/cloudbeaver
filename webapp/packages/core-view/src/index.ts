@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -76,6 +76,7 @@ export * from './Menu/IMenu.js';
 export * from './Menu/IMenuInfo.js';
 export * from './Menu/menuExtractItems.js';
 export * from './Menu/menuItemsPlaceAfter.js';
+export * from './Menu/getMenuLabelClipped.js';
 export * from './Menu/MenuService.js';
 export * from './Menu/useMenu.js';
 export * from './Menu/useMenuContext.js';

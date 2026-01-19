@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -48,20 +48,14 @@ export const MenuItemElement = observer<IMenuItemElementProps>(function MenuItem
   loading = useStateDelay(loading, 300);
 
   return (
-    <button {...rest} className={s(styles, { menuPanelItem: true }, rest.className)} title={tooltip ? translate(tooltip) : title}>
+    <button {...rest} className={s(styles, { menuPanelItem: true }, rest.className)} title={translate(tooltip)}>
       <div className={s(styles, { menuItemMain: true })}>
         <div className={s(styles, { menuItemIcon: true })}>
           <Loader className={s(styles, { loader: true })} suspense small fullSize>
             {typeof icon === 'string' ? <IconOrImage className={s(styles, { iconOrImage: true })} icon={icon} /> : icon}
           </Loader>
         </div>
-        {!onlyIcons ? (
-          <div className={s(styles, { menuItemText: true })} title={title}>
-            {title}
-          </div>
-        ) : (
-          <div />
-        )}
+        {!onlyIcons ? <div className={s(styles, { menuItemText: true })}>{title}</div> : <div />}
         <div className={s(styles, { menuItemBinding: true })} title={binding}>
           {binding}
         </div>
