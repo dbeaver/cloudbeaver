@@ -32,14 +32,14 @@
   }
 
   .editor .cm-highlightTab {
-    opacity: 0.3;
+    opacity: 0.6;
     color: var(--theme-text-hint-on-light);
     pointer-events: none;
   }
 
   .editor .cm-newline {
     color: var(--theme-text-hint-on-light);
-    opacity: 0.3;
+    opacity: 0.6;
     margin-left: 4px;
     cursor: default;
     pointer-events: none;
@@ -47,7 +47,7 @@
 
   .editor .cm-highlightSpace {
     background-image: radial-gradient(circle at 50% 55%, var(--theme-text-hint-on-light) 15%, transparent 5%);
-    opacity: 0.3;
+    opacity: 0.6;
     background-position: center;
   }
 
