@@ -40,8 +40,15 @@ const RenderParametersForm = observer(function RenderParametersForm({
   }
 
   for (const [paramName, paramValue] of Object.entries(parameters)) {
-    if (String(paramValue)) {
-      query = query.replaceAll(`:${paramName}`, String(paramValue));
+    const paramValueString = String(paramValue);
+    if (paramValueString) {
+      if (sqlEditorSettingsService.parameterEnabled) {
+        query = query.replaceAll(`:${paramName}`, paramValueString);
+      }
+
+      if (sqlEditorSettingsService.variablesEnabled) {
+        query = query.replaceAll(`$\{${paramName}}`, paramValueString);
+      }
     }
   }
 
