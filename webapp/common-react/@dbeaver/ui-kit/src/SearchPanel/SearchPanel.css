@@ -34,7 +34,7 @@
     }
   }
 
-  .search-panel__input {
+  .search-panel__input, .search-panel__replace-input {
     display: flex;
     align-items: center;
     background-color: var(--theme-input-background);
