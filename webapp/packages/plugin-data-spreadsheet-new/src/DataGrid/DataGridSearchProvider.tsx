@@ -6,8 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { createContext, useContext } from 'react';
-
-import type { IDataGridSearchState } from './useDataGridSearch.js';
+import type { IDataGridSearchState } from './DataGridSearchStore.js';
 
 export const DataGridSearchStateContext = createContext<IDataGridSearchState | null>(null);
 

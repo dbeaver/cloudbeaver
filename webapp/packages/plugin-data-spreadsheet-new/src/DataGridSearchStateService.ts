@@ -8,6 +8,7 @@
 
 import { injectable } from '@cloudbeaver/core-di';
 import { MetadataMap } from '@cloudbeaver/core-utils';
+import { DataGridSearchStore } from './DataGrid/DataGridSearchStore.js';
 
 export interface IDataGridSearchPersistent {
   query: {
@@ -22,7 +23,7 @@ export interface IDataGridSearchPersistent {
   activeMatchIdx: number;
 }
 
-export const SEARCH_PERSISTENCE_PREFIX = 'data-grid-search';
+export const SEARCH_STATE_PREFIX = 'data-grid-search';
 
 export function createDefaultSearchPersistent(): IDataGridSearchPersistent {
   return {
@@ -40,8 +41,9 @@ export function createDefaultSearchPersistent(): IDataGridSearchPersistent {
 }
 
 @injectable()
-export class SearchPersistenceService {
-  private readonly store = new MetadataMap<string, IDataGridSearchPersistent>(() => createDefaultSearchPersistent());
+export class SearchStateService {
+  private readonly store = new MetadataMap<string, IDataGridSearchPersistent>(() => createDefaultSearchPersistent());   
+  private readonly cache = new Map<string, DataGridSearchStore>();
 
   get(key: string): IDataGridSearchPersistent {
     return this.store.get(key);
@@ -53,6 +55,7 @@ export class SearchPersistenceService {
 
   delete(key: string): void {
     this.store.delete(key);
+    this.cache.delete(key);
   }
 
   clearByPrefix(prefix: string): void {
@@ -61,6 +64,28 @@ export class SearchPersistenceService {
         this.store.delete(k);
       }
     }
+    for (const k of Array.from(this.cache.keys())) {
+      if (k.startsWith(prefix)) {
+        this.cache.delete(k);
+      }
+    }
+  }
+
+  clearAll(): void {
+    for (const k of Array.from(this.store.keys())) {
+      this.store.delete(k);
+    }
+    this.cache.clear();
+  }
+
+  getOrCreateStore<TStore extends DataGridSearchStore>(key: string, factory: () => TStore): TStore {
+    if (this.cache.has(key)) {
+      return this.cache.get(key) as TStore;
+    }
+
+    const store = factory();
+    this.cache.set(key, store);
+    return store;
   }
 }
 
