@@ -545,22 +545,30 @@ export class GridEditAction<
   }
 
   private updateHistoryWithCellValue(key: TKey, value: TCell): void {
-    const [update] = this.getOrCreateUpdate(key.row, DatabaseEditChangeType.update);
-    const prevValue = update.source?.[key.column.index] as any;
-    const lastEntry = this.history.getCurrentEntry();
-    const isSameKey = lastEntry && GridDataKeysUtils.isElementsKeyEqual(lastEntry.data.key, key);
+    const currentHistoryEntry = this.history.getCurrentEntry();
+    const isEditingSameCell = currentHistoryEntry?.source === GRID_EDIT_HISTORY_SOURCE_SET
+      && GridDataKeysUtils.isElementsKeyEqual(currentHistoryEntry.data.key, key);
+    const shouldCompressHistory = !isEditingSameCell && currentHistoryEntry;
 
-    if (isSameKey) {
-      this.history.replaceLast({
-        ...lastEntry,
-        data: {
-          key,
-          value,
-          prevValue,
+    if (shouldCompressHistory) {
+      this.history.compress(
+        entry =>
+          entry.source === GRID_EDIT_HISTORY_SOURCE_SET &&
+          GridDataKeysUtils.isElementsKeyEqual(entry.data.key, currentHistoryEntry.data.key),
+        entries => {
+          const firstEntry = entries[0]!;
+          const lastEntry = entries[entries.length - 1]!;
+          return {
+            source: GRID_EDIT_HISTORY_SOURCE_SET,
+            data: {
+              key: currentHistoryEntry.data.key,
+              value: lastEntry.data.value,
+              prevValue: firstEntry.data.prevValue,
+            },
+          };
         },
-      });
-
-      return;
+        'lastSequence',
+      );
     }
 
     this.history.add({
@@ -568,9 +576,31 @@ export class GridEditAction<
       data: {
         key,
         value,
-        prevValue,
+        prevValue: this.getPrevCellValue(key),
       },
     });
+  }
+
+  private getPrevCellValue(key: TKey): TCell {
+    const [update] = this.getOrCreateUpdate(key.row, DatabaseEditChangeType.update);
+    const currentHistoryEntry = this.history.getCurrentEntry();
+    const isEditingSameCell = currentHistoryEntry?.source === GRID_EDIT_HISTORY_SOURCE_SET
+      && GridDataKeysUtils.isElementsKeyEqual(currentHistoryEntry.data.key, key);
+    const initialValue = update.source?.[key.column.index] as TCell;
+    const latestHistoryEntry = this.history.getState().findLast(
+      entry => entry.source === GRID_EDIT_HISTORY_SOURCE_SET
+        && GridDataKeysUtils.isElementsKeyEqual(entry.data.key, key)
+    );
+
+    if (isEditingSameCell) {
+      return currentHistoryEntry?.data.value;
+    }
+
+    if (latestHistoryEntry) {
+      return latestHistoryEntry.data.value;
+    }
+
+    return initialValue;
   }
 
   protected compareCellValue(valueA: TCell | undefined, valueB: TCell | undefined): boolean {

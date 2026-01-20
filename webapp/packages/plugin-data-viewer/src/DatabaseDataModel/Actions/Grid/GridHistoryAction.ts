@@ -13,6 +13,8 @@ import { IDatabaseDataSource } from '../../IDatabaseDataSource.js';
 import { DatabaseDataAction } from '../../DatabaseDataAction.js';
 import { IDatabaseDataResult } from '../../IDatabaseDataResult.js';
 import { injectable } from '@cloudbeaver/core-di';
+import { isNumber } from '@cloudbeaver/core-utils';
+import { isNotNullDefined } from '@dbeaver/js-helpers';
 
 export interface IHistoryEntry<TData = unknown> {
   timestamp: number;
@@ -44,6 +46,7 @@ export class GridHistoryAction<TData = unknown, TResult extends IDatabaseDataRes
       add: action,
       undo: action,
       redo: action,
+      compress: action,
     });
   }
 
@@ -70,6 +73,65 @@ export class GridHistoryAction<TData = unknown, TResult extends IDatabaseDataRes
 
   replaceLast(entry: IHistoryEntry<TData>): void {
     this.history[this.history.length - 1] = entry;
+  }
+
+  compress(
+    comparator: (entry: IHistoryEntry<TData>, prevEntry: IHistoryEntry<TData> | null) => boolean,
+    createCompressedEntry: (entries: IHistoryEntry<TData>[]) => Omit<IHistoryEntry<TData>, 'timestamp'>,
+    mode: 'all' | 'lastSequence' = 'all',
+    compressedEntityIndex?: number,
+  ): void {
+    if (this.history.length === 0) {
+      return;
+    }
+
+    const allMatchingIndices: number[] = this.history.map((entry, index) => {
+      const prevEntry = this.history[index - 1] ?? null;
+
+      if (entry && comparator(entry, prevEntry)) {
+        return index;
+      }
+      return undefined;
+    }).filter(isNumber).filter((currentIndex, i, arr) => {
+      const prevIndex = arr[i - 1] ?? null;
+      const nextIndex = arr[i + 1] ?? null;
+
+      if (mode === 'lastSequence') {
+        if (prevIndex) {
+          return currentIndex - prevIndex === 1;
+        } else if (nextIndex) {
+          return nextIndex - currentIndex === 1;
+        }
+
+        return false;
+      }
+
+      return true;
+    });
+
+    if (allMatchingIndices.length <= 1) {
+      return;
+    }
+
+    const targetIndex = compressedEntityIndex ?? allMatchingIndices[allMatchingIndices.length - 1]!;
+    const entriesToCompress = allMatchingIndices
+      .map(index => this.history[index])
+      .filter<IHistoryEntry<TData>>(isNotNullDefined);
+    const removedBeforeTarget = allMatchingIndices.filter(index => index < targetIndex).length;
+    const newTargetIndex = targetIndex - removedBeforeTarget;
+    const compressedEntry: IHistoryEntry<TData> = {
+      ...createCompressedEntry(entriesToCompress),
+      timestamp: Date.now(),
+    };
+
+    allMatchingIndices.reverse().forEach(index => {
+      if (index !== targetIndex) {
+        this.history.splice(index, 1);
+      }
+    });
+
+    this.history[newTargetIndex] = compressedEntry;
+    this.currentIndex = Math.min(this.currentIndex, newTargetIndex);
   }
 
   undo(): boolean {
