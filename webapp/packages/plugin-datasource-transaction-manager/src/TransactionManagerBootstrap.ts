@@ -255,7 +255,15 @@ export class TransactionManagerBootstrap extends Bootstrap {
           const transaction = this.connectionExecutionContextService.get(context.id);
 
           if (transaction?.autoCommit === false) {
+            const key = createTransactionInfoParam(context.connectionId, context.projectId, context.id);
+            const count = await this.transactionLogCountResource.load(key);
+
+            if (count === 0) {
+              return;
+            }
+
             const connectionData = this.connectionInfoResource.get(connectionKey);
+
             const { status, result } = await this.commonDialogService.open(ConfirmationDialog, {
               title: `${this.localizationService.translate('plugin_datasource_transaction_manager_commit')} (${connectionData?.name ?? context.id})`,
               message: 'plugin_datasource_transaction_manager_commit_confirmation_message',
