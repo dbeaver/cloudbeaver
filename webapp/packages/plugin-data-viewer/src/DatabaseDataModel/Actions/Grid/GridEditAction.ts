@@ -61,14 +61,20 @@ type IGridHistoryDeleteRowData<TKey extends IGridDataKey = IGridDataKey, TCell =
   value?: TCell[];
 };
 
+type IGridHistoryDuplicateRowData<TKey extends IGridDataKey = IGridDataKey, TCell = unknown> = {
+  keys: Array<{ key: TKey; value?: TCell[] }>;
+};
+
 type IGridHistoryData<TKey extends IGridDataKey = IGridDataKey, TCell = unknown> =
   IGridHistoryEditCellData<TKey, TCell>
   | IGridHistoryAddRowData<TKey, TCell>
-  | IGridHistoryDeleteRowData<TKey, TCell>;
+  | IGridHistoryDeleteRowData<TKey, TCell>
+  | IGridHistoryDuplicateRowData<TKey, TCell>;
 
 const GRID_HISTORY_SOURCE_EDIT_CELL = 'grid-history-source-edit-cell';
 const GRID_HISTORY_SOURCE_ADD_ROW = 'grid-history-source-add-row';
 const GRID_HISTORY_SOURCE_DELETE_ROW = 'grid-history-source-delete-row';
+const GRID_HISTORY_SOURCE_DUPLICATE_ROW = 'grid-history-source-duplicate-row';
 
 function isGridHistoryEditCellData<TKey extends IGridDataKey = IGridDataKey, TCell = unknown>(
   data: IHistoryEntry<unknown>
@@ -86,6 +92,12 @@ function isGridHistoryDeleteRowData<TKey extends IGridDataKey = IGridDataKey, TC
   data: IHistoryEntry<unknown>
 ): data is IHistoryEntry<IGridHistoryDeleteRowData<TKey, TCell>> {
   return data.source === GRID_HISTORY_SOURCE_DELETE_ROW;
+}
+
+function isGridHistoryDuplicateRowData<TKey extends IGridDataKey = IGridDataKey, TCell = unknown>(
+  data: IHistoryEntry<unknown>
+): data is IHistoryEntry<IGridHistoryDuplicateRowData<TKey, TCell>> {
+  return data.source === GRID_HISTORY_SOURCE_DUPLICATE_ROW;
 }
 
 @injectable(() => [IDatabaseDataSource, IDatabaseDataResult, IDatabaseDataResultAction, GridHistoryAction])
@@ -282,6 +294,8 @@ export class GridEditAction<
   }
 
   duplicateRow(...keys: TKey[]): void {
+    const duplicatedKeys: Array<{ key: TKey; value?: TCell[] }> = [];
+
     for (const key of keys) {
       let value = this.data.getRowValue(key.row);
 
@@ -291,7 +305,21 @@ export class GridEditAction<
         value = editedValue.update;
       }
 
-      this.addRow(key.row, JSON.parse(JSON.stringify(value)), key.column);
+      const duplicatedValue = JSON.parse(JSON.stringify(value));
+
+      const nextRow = this.getNextRowAdd(key.row);
+      const duplicatedKey: TKey = { column: key.column, row: nextRow } as TKey;
+
+      this.addRow(nextRow, duplicatedValue, key.column, true);
+
+      duplicatedKeys.push({
+        key: duplicatedKey,
+        value: duplicatedValue,
+      });
+    }
+
+    if (duplicatedKeys.length > 0) {
+      this.updateHistoryWithDuplicateRow(duplicatedKeys);
     }
   }
 
@@ -670,6 +698,17 @@ export class GridEditAction<
     });
   }
 
+  private updateHistoryWithDuplicateRow(keys: Array<{ key: TKey; value?: TCell[] }>): void {
+    this.compressCellEditHistory();
+
+    this.history.add({
+      source: GRID_HISTORY_SOURCE_DUPLICATE_ROW,
+      data: {
+        keys,
+      },
+    });
+  }
+
   private getPrevCellValue(key: TKey): TCell {
     const [update] = this.getOrCreateUpdate(key.row, DatabaseEditChangeType.update);
     const currentHistoryEntry = this.history.getCurrentEntry();
@@ -730,6 +769,12 @@ export class GridEditAction<
     if (isGridHistoryDeleteRowData<TKey, TCell>(entry)) {
       this.revert(entry.data.key);
     }
+
+    if (isGridHistoryDuplicateRowData<TKey, TCell>(entry)) {
+      for (const { key } of entry.data.keys) {
+        this.deleteRow(key.row, key.column, true, true);
+      }
+    }
   }
 
   private handleRedo(entry: IHistoryEntry<unknown>): void {
@@ -743,6 +788,12 @@ export class GridEditAction<
 
     if (isGridHistoryDeleteRowData<TKey, TCell>(entry)) {
       this.deleteRow(entry.data.key.row, entry.data.key.column, true, true);
+    }
+
+    if (isGridHistoryDuplicateRowData<TKey, TCell>(entry)) {
+      for (const { key, value } of entry.data.keys) {
+        this.addRow(key.row, value, key.column, true);
+      }
     }
   }
 }
