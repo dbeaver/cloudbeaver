@@ -65,16 +65,24 @@ type IGridHistoryDuplicateRowData<TKey extends IGridDataKey = IGridDataKey, TCel
   keys: Array<{ key: TKey; value?: TCell[] }>;
 };
 
+type IGridHistoryRevertData<TKey extends IGridDataKey = IGridDataKey, TCell = unknown> = {
+  updates: Array<{ key: TKey; prevValue: TCell; value: TCell }>;
+  deletions: Array<{ key: TKey; value?: TCell[] }>;
+  additions: Array<{ key: TKey; rowValue?: TCell[] }>;
+};
+
 type IGridHistoryData<TKey extends IGridDataKey = IGridDataKey, TCell = unknown> =
   IGridHistoryEditCellData<TKey, TCell>
   | IGridHistoryAddRowData<TKey, TCell>
   | IGridHistoryDeleteRowData<TKey, TCell>
-  | IGridHistoryDuplicateRowData<TKey, TCell>;
+  | IGridHistoryDuplicateRowData<TKey, TCell>
+  | IGridHistoryRevertData<TKey, TCell>;
 
 const GRID_HISTORY_SOURCE_EDIT_CELL = 'grid-history-source-edit-cell';
 const GRID_HISTORY_SOURCE_ADD_ROW = 'grid-history-source-add-row';
 const GRID_HISTORY_SOURCE_DELETE_ROW = 'grid-history-source-delete-row';
 const GRID_HISTORY_SOURCE_DUPLICATE_ROW = 'grid-history-source-duplicate-row';
+const GRID_HISTORY_SOURCE_REVERT = 'grid-history-source-revert';
 
 function isGridHistoryEditCellData<TKey extends IGridDataKey = IGridDataKey, TCell = unknown>(
   data: IHistoryEntry<unknown>
@@ -98,6 +106,12 @@ function isGridHistoryDuplicateRowData<TKey extends IGridDataKey = IGridDataKey,
   data: IHistoryEntry<unknown>
 ): data is IHistoryEntry<IGridHistoryDuplicateRowData<TKey, TCell>> {
   return data.source === GRID_HISTORY_SOURCE_DUPLICATE_ROW;
+}
+
+function isGridHistoryRevertData<TKey extends IGridDataKey = IGridDataKey, TCell = unknown>(
+  data: IHistoryEntry<unknown>
+): data is IHistoryEntry<IGridHistoryRevertData<TKey, TCell>> {
+  return data.source === GRID_HISTORY_SOURCE_REVERT;
 }
 
 @injectable(() => [IDatabaseDataSource, IDatabaseDataResult, IDatabaseDataResultAction, GridHistoryAction])
@@ -490,9 +504,17 @@ export class GridEditAction<
   }
 
   revert(...keys: TKey[]): void {
+    this.revertInternal(keys, false);
+  }
+
+  private revertInternal(keys: TKey[], skipHistory: boolean): void {
     const revertedUpdates: Array<IDatabaseDataEditActionValue<TKey, TCell>> = [];
     const revertedDeletions: Array<IDatabaseDataEditActionValue<TKey, TCell>> = [];
     const revertedAdditions: Array<IDatabaseDataEditActionValue<TKey, TCell>> = [];
+
+    const historyUpdates: Array<{ key: TKey; prevValue: TCell; value: TCell }> = [];
+    const historyDeletions: Array<{ key: TKey; value?: TCell[] }> = [];
+    const historyAdditions: Array<{ key: TKey; rowValue?: TCell[] }> = [];
 
     for (const key of keys) {
       const row = GridDataKeysUtils.serialize(key.row);
@@ -506,18 +528,30 @@ export class GridEditAction<
       let value: TCell | undefined;
 
       if (update.type === DatabaseEditChangeType.delete) {
+        const rowValue = this.data.getRowValue(key.row);
+        if (!skipHistory) {
+          historyDeletions.push({ key, value: rowValue });
+        }
+
         revertedDeletions.push({ key });
         this.editorData.delete(row);
       } else {
         prevValue = update.update[key.column.index];
         value = update.source?.[key.column.index] ?? (null as TCell);
-        update.update[key.column.index] = value;
 
         if (update.type === DatabaseEditChangeType.add) {
+          if (!skipHistory) {
+            historyAdditions.push({ key, rowValue: update.update });
+          }
           revertedAdditions.push({ key, prevValue, value });
         } else {
+          if (!skipHistory) {
+            historyUpdates.push({ key, prevValue: prevValue as TCell, value: value as TCell });
+          }
           revertedUpdates.push({ key, prevValue, value });
         }
+
+        update.update[key.column.index] = value;
       }
 
       this.removeEmptyUpdate(update);
@@ -547,6 +581,14 @@ export class GridEditAction<
         type: DatabaseEditChangeType.add,
         revert: true,
         value: revertedAdditions,
+      });
+    }
+
+    if (!skipHistory && (historyUpdates.length > 0 || historyDeletions.length > 0 || historyAdditions.length > 0)) {
+      this.updateHistoryWithRevert({
+        updates: historyUpdates,
+        deletions: historyDeletions,
+        additions: historyAdditions,
       });
     }
   }
@@ -709,6 +751,15 @@ export class GridEditAction<
     });
   }
 
+  private updateHistoryWithRevert(data: IGridHistoryRevertData<TKey, TCell>): void {
+    this.compressCellEditHistory();
+
+    this.history.add({
+      source: GRID_HISTORY_SOURCE_REVERT,
+      data,
+    });
+  }
+
   private getPrevCellValue(key: TKey): TCell {
     const [update] = this.getOrCreateUpdate(key.row, DatabaseEditChangeType.update);
     const currentHistoryEntry = this.history.getCurrentEntry();
@@ -767,12 +818,26 @@ export class GridEditAction<
     }
 
     if (isGridHistoryDeleteRowData<TKey, TCell>(entry)) {
-      this.revert(entry.data.key);
+      this.revertInternal([entry.data.key], true);
     }
 
     if (isGridHistoryDuplicateRowData<TKey, TCell>(entry)) {
       for (const { key } of entry.data.keys) {
         this.deleteRow(key.row, key.column, true, true);
+      }
+    }
+
+    if (isGridHistoryRevertData<TKey, TCell>(entry)) {
+      for (const { key, prevValue } of entry.data.updates) {
+        this.setCellValue(key, prevValue);
+      }
+
+      for (const { key } of entry.data.deletions) {
+        this.deleteRow(key.row, key.column, true, true);
+      }
+
+      for (const { key, rowValue } of entry.data.additions) {
+        this.addRow(key.row, rowValue, key.column, true);
       }
     }
   }
@@ -794,6 +859,16 @@ export class GridEditAction<
       for (const { key, value } of entry.data.keys) {
         this.addRow(key.row, value, key.column, true);
       }
+    }
+
+    if (isGridHistoryRevertData<TKey, TCell>(entry)) {
+      const allKeys: TKey[] = [
+        ...entry.data.updates.map(({ key }) => key),
+        ...entry.data.deletions.map(({ key }) => key),
+        ...entry.data.additions.map(({ key }) => key),
+      ];
+
+      this.revertInternal(allKeys, true);
     }
   }
 }
