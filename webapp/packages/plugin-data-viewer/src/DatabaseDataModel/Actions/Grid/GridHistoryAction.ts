@@ -8,19 +8,23 @@
 import { action, makeObservable, observable } from 'mobx';
 
 import { type ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
+import { injectable } from '@cloudbeaver/core-di';
+import { isNumber } from '@cloudbeaver/core-utils';
+import { isNotNullDefined } from '@dbeaver/js-helpers';
 
 import { IDatabaseDataSource } from '../../IDatabaseDataSource.js';
 import { DatabaseDataAction } from '../../DatabaseDataAction.js';
 import { IDatabaseDataResult } from '../../IDatabaseDataResult.js';
-import { injectable } from '@cloudbeaver/core-di';
-import { isNumber } from '@cloudbeaver/core-utils';
-import { isNotNullDefined } from '@dbeaver/js-helpers';
 
 export interface IHistoryEntry<TData = unknown> {
   timestamp: number;
   data: TData;
   source: string;
 }
+
+export type CompressionMode = 'all' | 'lastSequence';
+export type EntryComparator<TData> = (entry: IHistoryEntry<TData>, prevEntry: IHistoryEntry<TData> | null) => boolean;
+export type CompressedEntryFactory<TData> = (entries: IHistoryEntry<TData>[]) => Omit<IHistoryEntry<TData>, 'timestamp'>;
 
 @injectable(() => [IDatabaseDataSource, IDatabaseDataResult])
 export class GridHistoryAction<TData = unknown, TResult extends IDatabaseDataResult = IDatabaseDataResult> extends DatabaseDataAction<any, TResult> {
@@ -56,11 +60,7 @@ export class GridHistoryAction<TData = unknown, TResult extends IDatabaseDataRes
       timestamp: Date.now(),
     };
 
-    // remove all entries after the current index (if any)
-    if (this.currentIndex < this.history.length - 1) {
-      this.history.splice(this.currentIndex + 1);
-    }
-
+    this.truncateFutureEntries();
     this.history.push(newEntry);
     this.currentIndex = this.history.length - 1;
 
@@ -76,62 +76,22 @@ export class GridHistoryAction<TData = unknown, TResult extends IDatabaseDataRes
   }
 
   compress(
-    comparator: (entry: IHistoryEntry<TData>, prevEntry: IHistoryEntry<TData> | null) => boolean,
-    createCompressedEntry: (entries: IHistoryEntry<TData>[]) => Omit<IHistoryEntry<TData>, 'timestamp'>,
-    mode: 'all' | 'lastSequence' = 'all',
+    comparator: EntryComparator<TData>,
+    createCompressedEntry: CompressedEntryFactory<TData>,
+    mode: CompressionMode = 'all',
     compressedEntityIndex?: number,
   ): void {
     if (this.history.length === 0) {
       return;
     }
 
-    const allMatchingIndices: number[] = this.history.map((entry, index) => {
-      const prevEntry = this.history[index - 1] ?? null;
+    const matchingIndices = this.findMatchingIndices(comparator, mode);
 
-      if (entry && comparator(entry, prevEntry)) {
-        return index;
-      }
-      return undefined;
-    }).filter(isNumber).filter((currentIndex, i, arr) => {
-      const prevIndex = arr[i - 1] ?? null;
-      const nextIndex = arr[i + 1] ?? null;
-
-      if (mode === 'lastSequence') {
-        if (prevIndex) {
-          return currentIndex - prevIndex === 1;
-        } else if (nextIndex) {
-          return nextIndex - currentIndex === 1;
-        }
-
-        return false;
-      }
-
-      return true;
-    });
-
-    if (allMatchingIndices.length <= 1) {
+    if (matchingIndices.length <= 1) {
       return;
     }
 
-    const targetIndex = compressedEntityIndex ?? allMatchingIndices[allMatchingIndices.length - 1]!;
-    const entriesToCompress = allMatchingIndices
-      .map(index => this.history[index])
-      .filter<IHistoryEntry<TData>>(isNotNullDefined);
-    const removedBeforeTarget = allMatchingIndices.filter(index => index < targetIndex).length;
-    const newTargetIndex = targetIndex - removedBeforeTarget;
-    const compressedEntry: IHistoryEntry<TData> = {
-      ...createCompressedEntry(entriesToCompress),
-      timestamp: Date.now(),
-    };
-
-    allMatchingIndices.reverse().forEach(index => {
-      if (index !== targetIndex) {
-        this.history.splice(index, 1);
-      }
-    });
-
-    this.history[newTargetIndex] = compressedEntry;
-    this.currentIndex = Math.min(this.currentIndex, newTargetIndex);
+    this.mergeEntries(matchingIndices, createCompressedEntry, compressedEntityIndex);
   }
 
   undo(): boolean {
@@ -182,5 +142,63 @@ export class GridHistoryAction<TData = unknown, TResult extends IDatabaseDataRes
   clear(): void {
     this.history.length = 0;
     this.currentIndex = -1;
+  }
+
+  private truncateFutureEntries(): void {
+    if (this.currentIndex < this.history.length - 1) {
+      this.history.splice(this.currentIndex + 1);
+    }
+  }
+
+  private findMatchingIndices(comparator: EntryComparator<TData>, mode: CompressionMode): number[] {
+    const allMatching = this.history
+      .map((entry, index) => {
+        const prevEntry = this.history[index - 1] ?? null;
+        return comparator(entry, prevEntry) ? index : undefined;
+      })
+      .filter(isNumber);
+
+    if (mode === 'all') {
+      return allMatching;
+    }
+
+    return allMatching.filter((currentIndex, i, arr) => {
+      const prevIndex = arr[i - 1] ?? null;
+      const nextIndex = arr[i + 1] ?? null;
+
+      if (prevIndex !== null && currentIndex - prevIndex === 1) {
+        return true;
+      }
+      if (nextIndex !== null && nextIndex - currentIndex === 1) {
+        return true;
+      }
+
+      return false;
+    });
+  }
+
+  private mergeEntries(matchingIndices: number[], createCompressedEntry: CompressedEntryFactory<TData>, compressedEntityIndex?: number): void {
+    const targetIndex = compressedEntityIndex ?? matchingIndices[matchingIndices.length - 1]!;
+    const entriesToCompress = matchingIndices.map(index => this.history[index]).filter<IHistoryEntry<TData>>(isNotNullDefined);
+
+    const removedBeforeTarget = matchingIndices.filter(index => index < targetIndex).length;
+    const newTargetIndex = targetIndex - removedBeforeTarget;
+
+    const compressedEntry: IHistoryEntry<TData> = {
+      ...createCompressedEntry(entriesToCompress),
+      timestamp: Date.now(),
+    };
+
+    matchingIndices
+      .slice()
+      .reverse()
+      .forEach(index => {
+        if (index !== targetIndex) {
+          this.history.splice(index, 1);
+        }
+      });
+
+    this.history[newTargetIndex] = compressedEntry;
+    this.currentIndex = Math.min(this.currentIndex, newTargetIndex);
   }
 }
