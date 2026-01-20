@@ -19,6 +19,7 @@ package io.cloudbeaver.server;
 import io.cloudbeaver.auth.NoAuthCredentialsProvider;
 import io.cloudbeaver.model.config.CBServerConfig;
 import io.cloudbeaver.model.rm.local.LocalResourceController;
+import io.cloudbeaver.registry.WebFeatureRegistry;
 import io.cloudbeaver.service.security.CBEmbeddedSecurityController;
 import io.cloudbeaver.service.security.EmbeddedSecurityControllerFactory;
 import org.jkiss.code.NotNull;
@@ -103,5 +104,13 @@ public class CBApplicationCE extends CBApplication<CBServerConfig> {
         if (securityController instanceof CBEmbeddedSecurityController<?> embeddedSecurityController) {
             embeddedSecurityController.finishConfiguration(adminName, adminPassword, authInfoList);
         }
+    }
+
+    @Override
+    public <T> T getAdapter(@NotNull Class<T> adapter) {
+        if (adapter.isAssignableFrom(WebFeatureRegistry.class)) {
+            return adapter.cast(WebFeatureRegistry.getInstance());
+        }
+        return super.getAdapter(adapter);
     }
 }

@@ -16,6 +16,7 @@
  */
 package io.cloudbeaver.server;
 
+import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.auth.NoAuthCredentialsProvider;
 import io.cloudbeaver.model.CBWebServerConfig;
@@ -35,7 +36,9 @@ import io.cloudbeaver.service.DBWServiceInitializer;
 import io.cloudbeaver.service.DBWServiceServerConfigurator;
 import io.cloudbeaver.service.security.CBEmbeddedSecurityController;
 import io.cloudbeaver.service.session.CBSessionManager;
+import io.cloudbeaver.utils.ServletAppUtils;
 import io.cloudbeaver.utils.WebDataSourceUtils;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.osgi.service.datalocation.Location;
 import org.jkiss.code.NotNull;
@@ -44,6 +47,7 @@ import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBConstants;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
+import org.jkiss.dbeaver.model.DBUtils;
 import org.jkiss.dbeaver.model.app.DBPPlatform;
 import org.jkiss.dbeaver.model.auth.AuthInfo;
 import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
@@ -77,7 +81,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public abstract class CBApplication<T extends CBServerConfig>
     extends BaseServletApplication
-    implements ServletAuthApplication, WebApplication {
+    implements ServletAuthApplication, WebApplication, IAdaptable {
 
     private static final Log log = Log.getLog(CBApplication.class);
 
@@ -225,13 +229,6 @@ public abstract class CBApplication<T extends CBServerConfig>
 
         configurationMode = CommonUtils.isEmpty(getServerConfiguration().getServerName());
 
-        try {
-            refreshServerConfiguration();
-        } catch (DBException e) {
-            log.error("Error refreshing server configuration", e);
-            return;
-        }
-
         eventController.setForceSkipEvents(isConfigurationMode()); // do not send events if configuration mode is on
 
 
@@ -341,11 +338,15 @@ public abstract class CBApplication<T extends CBServerConfig>
         }
     }
 
-    private void refreshEnabledFeatures() {
+    private void refreshEnabledFeatures() throws DBException {
+        WebFeatureRegistry featureRegistry = DBUtils.getAdapter(WebFeatureRegistry.class, ServletAppUtils.getServletApplication());
+        if (featureRegistry == null) {
+            throw new DBWebException("Feature registry not found");
+        }
         Set<String> enabledFeatures = new LinkedHashSet<>(Arrays.asList(getAppConfiguration().getEnabledFeatures()));
         Set<String> disabledFeatures = new LinkedHashSet<>(Arrays.asList(getAppConfiguration().getDisabledFeatures()));
 
-        WebFeatureRegistry.getInstance().getWebFeatures().stream()
+        featureRegistry.getWebFeatures().stream()
             .filter(f -> f.isEnabledByDefault() && !disabledFeatures.contains(f.getId()))
             .forEach(f -> enabledFeatures.add(f.getId()));
 
@@ -416,6 +417,7 @@ public abstract class CBApplication<T extends CBServerConfig>
     }
 
     protected void initializeServer() throws DBException {
+        refreshServerConfiguration(); // update features and drivers
         for (DBWServiceServerConfigurator wsc : WebServiceRegistry.getInstance()
             .getWebServices(DBWServiceServerConfigurator.class)) {
             try {
@@ -820,6 +822,11 @@ public abstract class CBApplication<T extends CBServerConfig>
     @Nullable
     public <T> T getApplicationContextValue(@NotNull String key) {
         return (T) applicationContext.get(key);
+    }
+
+    @Override
+    public <T> T getAdapter(@NotNull Class<T> adapter) {
+        return null;
     }
 
     protected CloudBeaverInstanceServer createInstanceServer() throws IOException {

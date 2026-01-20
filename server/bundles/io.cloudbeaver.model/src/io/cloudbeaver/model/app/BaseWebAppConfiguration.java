@@ -21,6 +21,7 @@ import io.cloudbeaver.registry.WebFeatureRegistry;
 import io.cloudbeaver.utils.ServletAppUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.DBConstants;
+import org.jkiss.dbeaver.model.DBUtils;
 import org.jkiss.utils.ArrayUtils;
 
 import java.util.Collections;
@@ -115,7 +116,11 @@ public abstract class BaseWebAppConfiguration implements ServletAppConfiguration
     public String[] getEnabledFeatures() {
         if (enabledFeatures == null) {
             // No config - enable all features (+backward compatibility)
-            return WebFeatureRegistry.getInstance().getWebFeatures()
+            WebFeatureRegistry featureRegistry = DBUtils.getAdapter(WebFeatureRegistry.class, ServletAppUtils.getServletApplication());
+            if (featureRegistry == null) {
+                return new String[0];
+            }
+            return featureRegistry.getWebFeatures()
                 .stream().map(DBWFeatureSet::getId).toArray(String[]::new);
         }
         return enabledFeatures;

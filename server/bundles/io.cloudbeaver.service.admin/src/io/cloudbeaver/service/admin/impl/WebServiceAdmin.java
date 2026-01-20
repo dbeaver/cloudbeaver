@@ -39,6 +39,7 @@ import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
+import org.jkiss.dbeaver.model.DBUtils;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.auth.AuthInfo;
@@ -457,7 +458,11 @@ public class WebServiceAdmin implements DBWServiceAdmin {
 
     @Override
     public List<DBWFeatureSet> listFeatureSets(@NotNull WebSession webSession) throws DBWebException {
-        return WebFeatureRegistry.getInstance().getWebFeatures();
+        WebFeatureRegistry featureRegistry = DBUtils.getAdapter(WebFeatureRegistry.class, ServletAppUtils.getServletApplication());
+        if (featureRegistry == null) {
+            throw new DBWebException("Feature registry not found");
+        }
+        return featureRegistry.getWebFeatures();
     }
 
     ////////////////////////////////////////////////////////////////////
@@ -674,10 +679,14 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         return true;
     }
 
-    private void updateDisabledFeaturesConfig(CBAppConfig appConfig, List<String> enabledFeatures) {
+    private void updateDisabledFeaturesConfig(@NotNull CBAppConfig appConfig, @NotNull List<String> enabledFeatures) throws DBWebException {
+        WebFeatureRegistry featureRegistry = DBUtils.getAdapter(WebFeatureRegistry.class, ServletAppUtils.getServletApplication());
+        if (featureRegistry == null) {
+            throw new DBWebException("Feature registry not found");
+        }
         Set<String> enabledIds = new LinkedHashSet<>(enabledFeatures);
         appConfig.setEnabledFeatures(enabledFeatures.toArray(new String[0]));
-        String[] disabledFeatures = WebFeatureRegistry.getInstance().getWebFeatures().stream().map(DBWFeatureSet::getId)
+        String[] disabledFeatures = featureRegistry.getWebFeatures().stream().map(DBWFeatureSet::getId)
             .filter(id -> !enabledIds.contains(id))
             .toArray(String[]::new);
         appConfig.setDisabledFeatures(disabledFeatures);
