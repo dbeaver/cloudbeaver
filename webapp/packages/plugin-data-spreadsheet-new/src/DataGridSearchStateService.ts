@@ -7,10 +7,9 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
-import { MetadataMap } from '@cloudbeaver/core-utils';
 import { DataGridSearchStore } from './DataGrid/DataGridSearchStore.js';
 
-export interface IDataGridSearchPersistent {
+export interface IDataGridSearchCache {
   query: {
     search: string;
     replace: string;
@@ -25,7 +24,7 @@ export interface IDataGridSearchPersistent {
 
 export const SEARCH_STATE_PREFIX = 'data-grid-search';
 
-export function createDefaultSearchPersistent(): IDataGridSearchPersistent {
+export function createDefaultSearch(): IDataGridSearchCache {
   return {
     query: {
       search: '',
@@ -42,50 +41,44 @@ export function createDefaultSearchPersistent(): IDataGridSearchPersistent {
 
 @injectable()
 export class SearchStateService {
-  private readonly store = new MetadataMap<string, IDataGridSearchPersistent>(() => createDefaultSearchPersistent());   
-  private readonly cache = new Map<string, DataGridSearchStore>();
+  private readonly stores = new Map<string, DataGridSearchStore>();
 
-  get(key: string): IDataGridSearchPersistent {
-    return this.store.get(key);
-  }
+  getOrCreateStore(key: string): DataGridSearchStore {
+    if (this.stores.has(key)) {
+      return this.stores.get(key)!;
+    }
 
-  set(key: string, value: IDataGridSearchPersistent): void {
-    this.store.set(key, value);
+    const store = new DataGridSearchStore(createDefaultSearch());
+    this.stores.set(key, store);
+    return store;
   }
 
   delete(key: string): void {
-    this.store.delete(key);
-    this.cache.delete(key);
+    const store = this.stores.get(key);
+    if (store) {
+      store.dispose();
+      this.stores.delete(key);
+    }
   }
 
   clearByPrefix(prefix: string): void {
-    for (const k of Array.from(this.store.keys())) {
-      if (k.startsWith(prefix)) {
-        this.store.delete(k);
-      }
-    }
-    for (const k of Array.from(this.cache.keys())) {
-      if (k.startsWith(prefix)) {
-        this.cache.delete(k);
+    for (const [key, store] of this.stores) {
+      if (key.startsWith(prefix)) {
+        store.dispose();
+        this.stores.delete(key);
       }
     }
   }
 
   clearAll(): void {
-    for (const k of Array.from(this.store.keys())) {
-      this.store.delete(k);
+    for (const store of this.stores.values()) {
+      store.dispose();
     }
-    this.cache.clear();
+    this.stores.clear();
   }
 
-  getOrCreateStore<TStore extends DataGridSearchStore>(key: string, factory: () => TStore): TStore {
-    if (this.cache.has(key)) {
-      return this.cache.get(key) as TStore;
-    }
-
-    const store = factory();
-    this.cache.set(key, store);
-    return store;
+  has(key: string): boolean {
+    return this.stores.has(key);
   }
 }
 

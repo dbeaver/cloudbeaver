@@ -9,7 +9,7 @@
 import type { DataGridRef } from '@cloudbeaver/plugin-data-grid';
 import { makeObservable, observable, computed, action, reaction } from 'mobx';
 import type { RefObject } from 'react';
-import type { IDataGridSearchPersistent } from '../DataGridSearchStateService.js';
+import type { IDataGridSearchCache } from '../DataGridSearchStateService.js';
 
 export interface IDataViewerSearchMatches {
   count: number;
@@ -98,16 +98,17 @@ export class DataGridSearchStore implements IDataGridSearchStateInternal {
     };
   }
 
-  private persisted: IDataGridSearchPersistent;
+  private cache: IDataGridSearchCache;
   private tableReactionDisposer: (() => void) | null = null;
   private pendingActiveMatchIdx: number | undefined = undefined;
   private reactionDisposers: Array<() => void> = [];
 
-  constructor(persisted: IDataGridSearchPersistent) {
-    this.persisted = persisted;
-    this.query = { ...persisted.query };
-    this.open = persisted.open;
-    this.replaceOpen = persisted.replaceOpen;
+  constructor(cache: IDataGridSearchCache) {
+    this.cache = cache;
+    this.query = { ...cache.query };
+    this.open = cache.open;
+    this.replaceOpen = cache.replaceOpen;
+    this.pendingActiveMatchIdx = cache.activeMatchIdx >= 0 ? cache.activeMatchIdx : undefined;
 
     makeObservable<this, 'tableReactionDisposer' | 'replaceHandler' | 'suppressEditorSelection'>(this, {
       query: observable,
@@ -142,16 +143,30 @@ export class DataGridSearchStore implements IDataGridSearchStateInternal {
 
     this.reactionDisposers.push(
       reaction(
-        () => [this.query.search, this.query.replace ?? '', this.query.caseSensitive, this.query.wholeWord, this.query.regexp],
-        ([search, replace, caseSensitive, wholeWord, regexp]) => {
-          this.persisted.query = {
+        () => [this.query.search, this.query.caseSensitive, this.query.wholeWord, this.query.regexp],
+        ([search, caseSensitive, wholeWord, regexp]) => {
+          this.cache.query = {
             search: typeof search === 'string' ? search : '',
-            replace: typeof replace === 'string' ? replace : '',
+            replace: this.query.replace ?? '',
             caseSensitive: !!caseSensitive,
             wholeWord: !!wholeWord,
             regexp: !!regexp,
           };
-          this.runSearch();
+          if (this.tableData) {
+            this.runSearch();
+          }
+        },
+      ),
+    );
+
+    this.reactionDisposers.push(
+      reaction(
+        () => this.query.replace ?? '',
+        replace => {
+          this.cache.query = {
+            ...this.cache.query,
+            replace: typeof replace === 'string' ? replace : '',
+          };
         },
       ),
     );
@@ -160,7 +175,7 @@ export class DataGridSearchStore implements IDataGridSearchStateInternal {
       reaction(
         () => this.open,
         open => {
-          this.persisted.open = open;
+          this.cache.open = open;
         },
       ),
     );
@@ -169,7 +184,7 @@ export class DataGridSearchStore implements IDataGridSearchStateInternal {
       reaction(
         () => this.replaceOpen,
         replaceOpen => {
-          this.persisted.replaceOpen = replaceOpen;
+          this.cache.replaceOpen = replaceOpen;
         },
       ),
     );
@@ -178,19 +193,13 @@ export class DataGridSearchStore implements IDataGridSearchStateInternal {
       reaction(
         () => this.activeMatchIdx,
         idx => {
-          this.persisted.activeMatchIdx = idx;
+          this.cache.activeMatchIdx = idx;
         },
       ),
     );
-  }
-
-  attachPersistence(persisted: IDataGridSearchPersistent): void {
-    this.persisted = persisted;
-    this.query = { ...persisted.query };
-    this.open = persisted.open;
-    this.replaceOpen = persisted.replaceOpen;
-    this.pendingActiveMatchIdx = persisted.activeMatchIdx >= 0 ? persisted.activeMatchIdx : undefined;
-    this.runSearch();
+    if (this.pendingActiveMatchIdx !== undefined) {
+      this.runSearch();
+    }
   }
 
   setTableData(
