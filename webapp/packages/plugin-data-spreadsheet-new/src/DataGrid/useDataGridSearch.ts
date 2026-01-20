@@ -8,8 +8,9 @@
 import { action, computed, makeObservable, observable, reaction } from 'mobx';
 import { useLayoutEffect, useMemo, type RefObject } from 'react';
 
-import { useUserData } from '@cloudbeaver/core-blocks';
 import type { DataGridRef } from '@cloudbeaver/plugin-data-grid';
+import { useService } from '@cloudbeaver/core-di';
+import { SearchPersistenceService, SEARCH_PERSISTENCE_PREFIX, type IDataGridSearchPersistent } from '../SearchPersistenceService.js';
 
 export interface IDataViewerSearchMatches {
   count: number;
@@ -28,6 +29,7 @@ export interface IDataGridSearchState {
   query: IDataViewerSearchQuery;
   matches: IDataViewerSearchMatches;
   open: boolean;
+  replaceOpen: boolean;
   /** When true, editors should avoid changing grid selection/focus (used during replace). */
   suppressEditorSelection?: boolean;
   setTableData: (
@@ -48,19 +50,10 @@ export interface IDataGridSearchState {
   findPrevious: () => void;
   openSearch: (callback?: () => void) => void;
   close: () => void;
+  setReplaceOpen: (open: boolean) => void;
   isMatch: (rowIdx: number, colIdx: number) => boolean;
   isActiveMatch: (rowIdx: number, colIdx: number) => boolean;
   replaceActive: () => void;
-}
-
-interface IDataGridSearchPersistent {
-  query: {
-    search: string;
-    caseSensitive: boolean;
-    wholeWord: boolean;
-    regexp: boolean;
-  };
-  open: boolean;
 }
 
 interface IDataGridSearchStateInternal extends IDataGridSearchState {
@@ -86,6 +79,7 @@ const ESCAPE_REGEX = /[.*+?^${}()|[\]\\]/g;
 class DataGridSearchStore implements IDataGridSearchStateInternal {
   query: IDataViewerSearchQuery;
   open = false;
+  replaceOpen = false;
   tableData:
     | (() => {
         rows: any[];
@@ -108,15 +102,18 @@ class DataGridSearchStore implements IDataGridSearchStateInternal {
 
   private persisted: IDataGridSearchPersistent;
   private tableReactionDisposer: (() => void) | null = null;
+  private pendingActiveMatchIdx: number | undefined = undefined;
 
   constructor(persisted: IDataGridSearchPersistent) {
     this.persisted = persisted;
     this.query = { ...persisted.query };
     this.open = persisted.open;
+    this.replaceOpen = persisted.replaceOpen;
 
     makeObservable<this, 'tableReactionDisposer' | 'replaceHandler' | 'suppressEditorSelection'>(this, {
       query: observable,
       open: observable,
+      replaceOpen: observable,
       tableData: observable.ref,
       gridRef: observable.ref,
       matchedCells: observable.shallow,
@@ -137,16 +134,18 @@ class DataGridSearchStore implements IDataGridSearchStateInternal {
       close: action.bound,
       runSearch: action.bound,
       scrollToActiveMatch: action.bound,
+      setReplaceOpen: action.bound,
       tableReactionDisposer: observable.ref,
       replaceHandler: observable.ref,
       suppressEditorSelection: observable,
     });
 
     reaction(
-      () => [this.query.search, this.query.caseSensitive, this.query.wholeWord, this.query.regexp],
-      ([search, caseSensitive, wholeWord, regexp]) => {
+      () => [this.query.search, this.query.replace ?? '', this.query.caseSensitive, this.query.wholeWord, this.query.regexp],
+      ([search, replace, caseSensitive, wholeWord, regexp]) => {
         this.persisted.query = {
           search: typeof search === 'string' ? search : '',
+          replace: typeof replace === 'string' ? replace : '',
           caseSensitive: !!caseSensitive,
           wholeWord: !!wholeWord,
           regexp: !!regexp,
@@ -160,12 +159,28 @@ class DataGridSearchStore implements IDataGridSearchStateInternal {
         this.persisted.open = open;
       },
     );
+
+    reaction(
+      () => this.replaceOpen,
+      replaceOpen => {
+        this.persisted.replaceOpen = replaceOpen;
+      },
+    );
+
+    reaction(
+      () => this.activeMatchIdx,
+      idx => {
+        this.persisted.activeMatchIdx = idx;
+      },
+    );
   }
 
   attachPersistence(persisted: IDataGridSearchPersistent) {
     this.persisted = persisted;
     this.query = { ...persisted.query };
     this.open = persisted.open;
+    this.replaceOpen = persisted.replaceOpen;
+    this.pendingActiveMatchIdx = persisted.activeMatchIdx >= 0 ? persisted.activeMatchIdx : undefined;
     this.runSearch();
   }
 
@@ -196,6 +211,10 @@ class DataGridSearchStore implements IDataGridSearchStateInternal {
 
   setReplaceHandler(fn: (rowIdx: number, colIdx: number, value: string) => void) {
     this.replaceHandler = fn;
+  }
+
+  setReplaceOpen(open: boolean) {
+    this.replaceOpen = open;
   }
 
   setReplace(replace: string) {
@@ -244,8 +263,16 @@ class DataGridSearchStore implements IDataGridSearchStateInternal {
   runSearch() {
     const matches = this.performSearch();
     this.matchedCells = matches;
-    this.activeMatchIdx = matches.length > 0 ? 0 : -1;
-    if (matches.length > 0) {
+
+    if (matches.length === 0) {
+      this.activeMatchIdx = -1;
+    } else {
+      this.activeMatchIdx = 0;
+    }
+
+    this.applyPendingActiveMatch();
+
+    if (this.activeMatchIdx >= 0) {
       this.scrollToActiveMatch();
     }
   }
@@ -256,6 +283,27 @@ class DataGridSearchStore implements IDataGridSearchStateInternal {
       this.activeMatchIdx = matches.length > 0 ? matches.length - 1 : -1;
     }
     this.matchedCells = matches;
+
+    if (this.applyPendingActiveMatch() && this.activeMatchIdx >= 0) {
+      this.scrollToActiveMatch();
+    }
+  }
+
+  private applyPendingActiveMatch(): boolean {
+    if (this.pendingActiveMatchIdx === undefined || this.matchedCells.length === 0) {
+      return false;
+    }
+
+    const desiredIdx = this.pendingActiveMatchIdx;
+    this.pendingActiveMatchIdx = undefined;
+
+    if (desiredIdx >= 0 && desiredIdx < this.matchedCells.length) {
+      this.activeMatchIdx = desiredIdx;
+    } else {
+      this.activeMatchIdx = this.matchedCells.length - 1;
+    }
+
+    return true;
   }
 
   scrollToActiveMatch() {
@@ -395,17 +443,11 @@ class DataGridSearchStore implements IDataGridSearchStateInternal {
 const dataGridSearchStoreCache = new Map<string, DataGridSearchStore>();
 
 export function useDataGridSearch(modelId: string, resultIndex: number): IDataGridSearchState {
-  const key = `data-grid-search-${modelId}-${resultIndex}`;
+  const key = `${SEARCH_PERSISTENCE_PREFIX}-${modelId}-${resultIndex}`;
 
-  const persisted = useUserData<IDataGridSearchPersistent>(key, () => ({
-    query: {
-      search: '',
-      caseSensitive: false,
-      wholeWord: false,
-      regexp: false,
-    },
-    open: false,
-  }));
+  const persistence = useService(SearchPersistenceService);
+
+  const persisted = useMemo(() => persistence.get(key), [key, persistence]);
 
   const store = useMemo(() => {
     let cached = dataGridSearchStoreCache.get(key);

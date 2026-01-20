@@ -58,6 +58,7 @@ export interface SearchPanelProps {
   onRegexToggle?: () => void;
   onWholeWordToggle?: () => void;
   onReplaceChange?: (value: string) => void;
+  onReplaceToggle?: (show: boolean) => void;
   onFindNext: () => void;
   onFindPrevious: () => void;
   onReplaceAll?: () => void;
@@ -81,6 +82,7 @@ export const SearchPanel = forwardRef<SearchPanelRef, SearchPanelProps>(function
     onRegexToggle,
     onWholeWordToggle,
     onReplaceChange,
+    onReplaceToggle,
     onFindNext,
     onFindPrevious,
     onReplaceAll,
@@ -102,7 +104,11 @@ export const SearchPanel = forwardRef<SearchPanelRef, SearchPanelProps>(function
   );
 
   function handleToggleReplace() {
-    setShowReplace(prev => !prev);
+    setShowReplace(prevShowReplace => {
+      const next = !prevShowReplace;
+      onReplaceToggle?.(next);
+      return next;
+    });
   }
 
   function handleKeyDown(event: KeyboardEvent<HTMLDivElement>) {

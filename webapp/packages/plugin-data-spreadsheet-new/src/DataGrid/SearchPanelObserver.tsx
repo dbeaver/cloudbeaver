@@ -25,6 +25,7 @@ export const SearchPanelObserver = observer(function SearchPanelObserver({
       className="tw:bg-(--theme-secondary) tw:px-0! tw:py-1! tw:mb-0!"
       isReadOnly={isReadOnly}
       query={state.query}
+      defaultShowReplace={state.replaceOpen}
       searchMatchesCount={state.matches}
       onQueryChange={state.setQuery}
       onCaseSensitiveToggle={state.toggleCaseSensitive}
@@ -33,6 +34,7 @@ export const SearchPanelObserver = observer(function SearchPanelObserver({
       onFindNext={state.findNext}
       onFindPrevious={state.findPrevious}
       onReplaceChange={state.setReplace}
+      onReplaceToggle={state.setReplaceOpen}
       onReplaceNext={state.replaceActive}
       onClose={state.close}
     />

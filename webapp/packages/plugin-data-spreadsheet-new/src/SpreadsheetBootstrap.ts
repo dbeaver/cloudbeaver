@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -17,10 +17,12 @@ import {
   DATA_CONTEXT_DV_PRESENTATION_ACTIONS,
   DATA_CONTEXT_DV_RESULT_KEY,
   DATA_CONTEXT_DV_SIMPLE,
+  TableViewerStorageService,
   DataPresentationService,
   IDatabaseDataConstraintAction,
   isResultSetDataSource,
   MENU_DV_CONTEXT_MENU,
+  type ITableViewerStorageChangeEventData,
 } from '@cloudbeaver/plugin-data-viewer';
 
 import { DataGridContextMenuCellEditingService } from './DataGrid/DataGridContextMenu/DataGridContextMenuCellEditingService.js';
@@ -28,6 +30,7 @@ import { DataGridContextMenuFilterService } from './DataGrid/DataGridContextMenu
 import { DataGridContextMenuOrderService } from './DataGrid/DataGridContextMenu/DataGridContextMenuOrderService.js';
 import { DataGridContextMenuSaveContentService } from './DataGrid/DataGridContextMenu/DataGridContextMenuSaveContentService.js';
 import { DataGridSettingsService } from './DataGridSettingsService.js';
+import { SEARCH_PERSISTENCE_PREFIX, SearchPersistenceService } from './SearchPersistenceService.js';
 import { ACTION_DATA_GRID_PIN_COLUMN } from './DataGrid/Actions/Pin/ACTION_DATA_GRID_PIN_COLUMN.js';
 import { ACTION_DATA_GRID_UNPIN_COLUMN } from './DataGrid/Actions/Pin/ACTION_DATA_GRID_UNPIN_COLUMN.js';
 import { ACTION_DATA_GRID_UNPIN_ALL_COLUMNS } from './DataGrid/Actions/Pin/ACTION_DATA_GRID_UNPIN_ALL_COLUMNS.js';
@@ -44,6 +47,8 @@ const SpreadsheetGrid = importLazyComponent(() => import('./SpreadsheetGrid.js')
   DataGridContextMenuFilterService,
   DataGridContextMenuCellEditingService,
   DataGridContextMenuSaveContentService,
+  SearchPersistenceService,
+  TableViewerStorageService,
   ActionService,
   MenuService,
   ExceptionsCatcherService,
@@ -56,6 +61,8 @@ export class SpreadsheetBootstrap extends Bootstrap {
     private readonly dataGridContextMenuFilterService: DataGridContextMenuFilterService,
     private readonly dataGridContextMenuCellEditingService: DataGridContextMenuCellEditingService,
     private readonly dataGridContextMenuSaveContentService: DataGridContextMenuSaveContentService,
+    private readonly searchPersistenceService: SearchPersistenceService,
+    private readonly tableViewerStorageService: TableViewerStorageService,
     private readonly actionService: ActionService,
     private readonly menuService: MenuService,
     exceptionsCatcherService: ExceptionsCatcherService,
@@ -92,6 +99,14 @@ export class SpreadsheetBootstrap extends Bootstrap {
         ACTION_DATA_GRID_UNPIN_COLUMN,
         ACTION_DATA_GRID_UNPIN_ALL_COLUMNS,
       ],
+    });
+
+    this.tableViewerStorageService.onChange.addHandler(({ type, model }: ITableViewerStorageChangeEventData) => {
+      if (type === 'remove') {
+        const modelId = model.id;
+        const prefix = `${SEARCH_PERSISTENCE_PREFIX}-${modelId}-`;
+        this.searchPersistenceService.clearByPrefix(prefix);
+      }
     });
 
     this.actionService.addHandler({
