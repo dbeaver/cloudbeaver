@@ -54,7 +54,7 @@ export class GridHistoryAction<TData = unknown, TResult extends IDatabaseDataRes
     });
   }
 
-  add(entry: Omit<IHistoryEntry<TData>, 'id' | 'timestamp'>): void {
+  add(entry: Omit<IHistoryEntry<TData>, 'timestamp'>): void {
     const newEntry: IHistoryEntry<TData> = {
       ...entry,
       timestamp: Date.now(),

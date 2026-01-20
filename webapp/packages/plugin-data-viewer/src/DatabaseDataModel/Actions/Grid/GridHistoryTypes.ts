@@ -17,8 +17,6 @@ export const GRID_HISTORY_SOURCE = {
   CANCEL: 'grid-history-source-cancel',
 } as const;
 
-export type GridHistorySource = (typeof GRID_HISTORY_SOURCE)[keyof typeof GRID_HISTORY_SOURCE];
-
 export interface IGridHistoryEditCellData<TKey extends IGridDataKey = IGridDataKey, TCell = unknown> {
   key: TKey;
   value: TCell;
