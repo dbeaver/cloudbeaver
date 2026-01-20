@@ -9,11 +9,11 @@
 import { useState } from 'react';
 import { observer } from 'mobx-react-lite';
 
-import { Link, useTranslate } from '@cloudbeaver/core-blocks';
+import { useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NavTreeResource } from '@cloudbeaver/core-navigation-tree';
 import { CachedResourceOffsetPageKey, CachedResourceOffsetPageTargetKey, getNextPageOffset } from '@cloudbeaver/core-resource';
-import { Spinner } from '@dbeaver/ui-kit';
+import { Button } from '@dbeaver/ui-kit';
 
 import type { NavigationNodeRendererComponent } from '../NavigationNodeComponent.js';
 import { NAVIGATION_TREE_LIMIT } from './elementsTreeLimitFilter.js';
@@ -50,19 +50,18 @@ const NavTreeLimitMessage: NavigationNodeRendererComponent = observer(function N
     }
   }
 
-  if (loading) {
-    return (
-      <div className='tw:px-6 tw:py-1'>
-        <Spinner size='small' />
-      </div>
-    );
-  }
-
   return (
-    <div className='tw:text-(--theme-text-hint-on-light) theme-typography--caption tw:px-6 tw:py-1'>
-      <Link title={translate('app_navigationTree_limited', undefined, { limit: limit })} onClick={loadMore}>
+    <div className='tw:px-6 tw:py-1'>
+      <Button
+        title={translate('app_navigationTree_limited', undefined, { limit: limit })}
+        variant='ghost'
+        size='small'
+        loading={loading}
+        disabled={loading}
+        onClick={loadMore}
+      >
         {translate('ui_load_more')}
-      </Link>
+      </Button>
     </div>
   );
 });
