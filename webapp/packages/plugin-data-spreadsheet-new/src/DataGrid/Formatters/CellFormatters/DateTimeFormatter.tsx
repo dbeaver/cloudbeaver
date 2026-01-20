@@ -42,16 +42,25 @@ export const DateTimeFormatter = observer<ICellFormatterProps>(function DateTime
     let dateFormatter: Intl.DateTimeFormat | null = null;
     switch (extendedDateKind) {
       case DateTimeKind.DateTime:
-      case DateTimeKind.TimeOnly:
         dateFormatter = formattingContext.formatters.dateTime;
+        break;
+      case DateTimeKind.TimeOnly:
+        dateFormatter = formattingContext.formatters.timeOnly;
         break;
       case DateTimeKind.DateOnly:
         dateFormatter = formattingContext.formatters.dateOnly;
         break;
     }
     if (dateFormatter) {
-      const date = new Date(displayValue);
-      value = dateFormatter.format(date);
+      if (DateTimeKind.TimeOnly === extendedDateKind) {
+        const [h = 0, m = 0, s = 0] = displayValue.split(':').map(Number);
+        const date = new Date();
+        date.setHours(h, m, s, 0);
+        value = dateFormatter.format(date);
+      } else {
+        const date = new Date(displayValue);
+        value = dateFormatter.format(date);
+      }
     }
   }
 
