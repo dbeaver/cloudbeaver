@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -11,7 +11,7 @@ import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { DATA_CONTEXT_NAV_NODE, ENodeFeature, NavTreeResource } from '@cloudbeaver/core-navigation-tree';
-import { DATA_CONTEXT_MENU, MenuBaseItem, MenuService } from '@cloudbeaver/core-view';
+import { DATA_CONTEXT_MENU, getMenuLabelClipped, MenuBaseItem, MenuService } from '@cloudbeaver/core-view';
 
 import { MENU_NAVIGATION_TREE_FILTERS } from './MENU_NAVIGATION_TREE_FILTERS.js';
 
@@ -52,11 +52,17 @@ export class NavigationTreeFiltersBootstrap extends Bootstrap {
       contexts: [DATA_CONTEXT_NAV_NODE],
       getItems: (context, items) => {
         const node = context.get(DATA_CONTEXT_NAV_NODE)!;
+        const { clippedLabel: clippedNodeName } = getMenuLabelClipped(node.name ?? '');
+        const fullLabel = this.localizationService.translate('plugin_navigation_tree_filters_configuration', undefined, { name: node.name ?? '' });
+        const clippedLabel = this.localizationService.translate('plugin_navigation_tree_filters_configuration', undefined, { name: clippedNodeName });
+        const tooltip = fullLabel !== clippedLabel ? fullLabel : undefined;
+
         const actions = [
           new MenuBaseItem(
             {
               id: 'configure-filter',
-              label: this.localizationService.translate('plugin_navigation_tree_filters_configuration', undefined, { name: node.name }) + '...',
+              label: `${clippedLabel}...`,
+              tooltip,
             },
             {
               onSelect: async () => {

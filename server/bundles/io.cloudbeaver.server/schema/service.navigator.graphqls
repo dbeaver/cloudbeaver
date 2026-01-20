@@ -155,8 +155,8 @@ extend type Mutation {
     "Reloads node and returns updated node info"
     navReloadNode( nodePath: ID! ): NavigatorNodeInfo!
 
-    "Renames node and returns new node name"
-    navRenameNode( nodePath: ID!, newName: String! ): String
+    "Renames node and returns new node id"
+    navRenameNode( nodePath: ID!, newName: String! ): String!
 
     "Deletes nodes with specified IDs and returns number of deleted nodes"
     navDeleteNodes( nodePaths: [ID!]! ): Int

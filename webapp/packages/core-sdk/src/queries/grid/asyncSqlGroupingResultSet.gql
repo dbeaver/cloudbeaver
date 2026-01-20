@@ -1,0 +1,29 @@
+query asyncSqlGroupingResultSet(
+  $projectId: ID
+  $contextId: ID!
+  $connectionId: ID!
+  $originalResultsId: ID!
+  $currentResultsId: ID
+  $columnNames: [String!]
+  $functions: [String!]
+  $showDuplicatesOnly: Boolean
+  $filter: SQLDataFilter
+  $dataFormat: ResultDataFormat
+  $isInteractive: Boolean
+) {
+  taskInfo: asyncSqlGroupingResultSet(
+    projectId: $projectId
+    contextId: $contextId
+    connectionId: $connectionId
+    originalResultsId: $originalResultsId
+    currentResultsId: $currentResultsId
+    columnNames: $columnNames
+    functions: $functions
+    showDuplicatesOnly: $showDuplicatesOnly
+    filter: $filter
+    dataFormat: $dataFormat
+    isInteractive: $isInteractive
+  ) {
+    ...AsyncTaskInfo
+  }
+}
