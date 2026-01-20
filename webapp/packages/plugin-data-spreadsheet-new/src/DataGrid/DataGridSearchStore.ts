@@ -5,10 +5,10 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
-import type { DataGridRef } from '@cloudbeaver/plugin-data-grid';
-import { makeObservable, observable, computed, action, reaction } from 'mobx';
 import type { RefObject } from 'react';
+import { makeObservable, observable, computed, action, reaction } from 'mobx';
+import { debounce } from '@cloudbeaver/core-utils';
+import type { DataGridRef } from '@cloudbeaver/plugin-data-grid';
 import type { IDataGridSearchCache } from '../DataGridSearchStateService.js';
 
 export interface IDataViewerSearchMatches {
@@ -72,6 +72,7 @@ interface IDataGridSearchStateInternal extends IDataGridSearchState {
 }
 
 const ESCAPE_REGEX = /[.*+?^${}()|[\]\\]/g;
+const SEARCH_DEBOUNCE_MS = 300;
 
 
 export class DataGridSearchStore implements IDataGridSearchStateInternal {
@@ -102,6 +103,7 @@ export class DataGridSearchStore implements IDataGridSearchStateInternal {
   private tableReactionDisposer: (() => void) | null = null;
   private pendingActiveMatchIdx: number | undefined = undefined;
   private reactionDisposers: Array<() => void> = [];
+  private debouncedSearch: () => void;
 
   constructor(cache: IDataGridSearchCache) {
     this.cache = cache;
@@ -109,6 +111,9 @@ export class DataGridSearchStore implements IDataGridSearchStateInternal {
     this.open = cache.open;
     this.replaceOpen = cache.replaceOpen;
     this.pendingActiveMatchIdx = cache.activeMatchIdx >= 0 ? cache.activeMatchIdx : undefined;
+    this.debouncedSearch = debounce(() => {
+      this.runSearch();
+    }, SEARCH_DEBOUNCE_MS);
 
     makeObservable<this, 'tableReactionDisposer' | 'replaceHandler' | 'suppressEditorSelection'>(this, {
       query: observable,
@@ -153,7 +158,7 @@ export class DataGridSearchStore implements IDataGridSearchStateInternal {
             regexp: !!regexp,
           };
           if (this.tableData) {
-            this.runSearch();
+            this.debouncedSearch();
           }
         },
       ),
