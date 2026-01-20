@@ -54,6 +54,7 @@ export interface IDataGridSearchState {
   isMatch: (rowIdx: number, colIdx: number) => boolean;
   isActiveMatch: (rowIdx: number, colIdx: number) => boolean;
   replaceActive: () => void;
+  replaceAll: () => void;
 }
 
 interface IDataGridSearchStateInternal extends IDataGridSearchState {
@@ -75,7 +76,6 @@ const ESCAPE_REGEX = /[.*+?^${}()|[\]\\]/g;
 
 //TODO:
 // 1. Optimize search for large datasets (add limit, debounce, web worker, etc.)
-// 2. Think about persisted artifact lifecycle (when and how to clean up)
 class DataGridSearchStore implements IDataGridSearchStateInternal {
   query: IDataViewerSearchQuery;
   open = false;
@@ -130,6 +130,7 @@ class DataGridSearchStore implements IDataGridSearchStateInternal {
       findNext: action.bound,
       findPrevious: action.bound,
       replaceActive: action.bound,
+      replaceAll: action.bound,
       openSearch: action.bound,
       close: action.bound,
       runSearch: action.bound,
@@ -360,39 +361,17 @@ class DataGridSearchStore implements IDataGridSearchStateInternal {
       return;
     }
 
-    if (!this.replaceHandler) {
-      return;
-    }
-
     const match = this.matchedCells[this.activeMatchIdx];
-    if (!match) {
+    if (!match || !this.replaceHandler || !this.tableData) {
       return;
     }
 
     const value = this.query.replace ?? '';
-
-    if (!this.tableData) {
-      return;
-    }
-
-    const { getCellText } = this.tableData();
-    const cellText = getCellText(match.rowIdx, match.colIdx);
     const searchPattern = this.buildSearchPattern();
-    const newText = cellText.replace(searchPattern, value);
-    this.suppressEditorSelection = true;
-    try {
-      this.replaceHandler(match.rowIdx, match.colIdx, newText);
-    } catch {
-    } finally {
-      this.suppressEditorSelection = false;
-    }
-
-    if (searchPattern.global) {
-      searchPattern.lastIndex = 0;
-    }
-    const stillMatches = searchPattern.test(newText);
-    if (searchPattern.global) {
-      searchPattern.lastIndex = 0;
+    const stillMatches = this.replaceCell(match, searchPattern, value, true);
+    
+    if (stillMatches === undefined) {
+      return;
     }
 
     if (!stillMatches) {
@@ -410,6 +389,55 @@ class DataGridSearchStore implements IDataGridSearchStateInternal {
     } else {
       this.scrollToActiveMatch();
     }
+  }
+
+  replaceAll() {
+    const matches = [...this.matchedCells];
+    if (!this.replaceHandler || !this.tableData || matches.length === 0) {
+      return;
+    }
+
+    const value = this.query.replace ?? '';
+    const searchPattern = this.buildSearchPattern();
+
+    for (const match of matches) {
+      this.replaceCell(match, searchPattern, value);
+    }
+    
+    this.runSearch();
+  }
+
+  private replaceCell(
+    match: { rowIdx: number; colIdx: number },
+    searchPattern: RegExp,
+    replaceValue: string,
+    checkStillMatches = false,
+  ): boolean | undefined {
+    if (!this.tableData || !this.replaceHandler) {
+      return undefined;
+    }
+
+    this.suppressEditorSelection = true;
+    const { getCellText } = this.tableData();
+    const cellText = getCellText(match.rowIdx, match.colIdx);
+    const newText = cellText.replace(searchPattern, replaceValue);
+    this.replaceHandler(match.rowIdx, match.colIdx, newText);
+
+    if (searchPattern.global) {
+      searchPattern.lastIndex = 0;
+    }
+
+    if (!checkStillMatches) {
+      return undefined;
+    }
+
+    const stillMatches = searchPattern.test(newText);
+    if (searchPattern.global) {
+      searchPattern.lastIndex = 0;
+    }
+
+    this.suppressEditorSelection = false;
+    return stillMatches;
   }
 
   openSearch(callback?: () => void) {

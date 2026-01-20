@@ -35,6 +35,7 @@ export const SearchPanelObserver = observer(function SearchPanelObserver({
       onFindPrevious={state.findPrevious}
       onReplaceChange={state.setReplace}
       onReplaceToggle={state.setReplaceOpen}
+      onReplaceAll={state.replaceAll}
       onReplaceNext={state.replaceActive}
       onClose={state.close}
     />
