@@ -45,13 +45,35 @@ export interface IGridEditApplyActionData extends IDatabaseDataEditApplyActionDa
 
 export type IGridEditActionData<TKey extends IGridDataKey = IGridDataKey, TCell = unknown> = IDatabaseDataEditActionData<TKey, TCell>;
 
-type IGridEditHistoryData<TKey extends IGridDataKey = IGridDataKey, TCell = unknown> = {
+type IGridHistoryEditCellData<TKey extends IGridDataKey = IGridDataKey, TCell = unknown> = {
   key: TKey;
   value: TCell;
   prevValue: TCell;
 };
 
-const GRID_EDIT_HISTORY_SOURCE_SET = 'grid-edit-action-set';
+type IGridHistoryAddRowData<TKey extends IGridDataKey = IGridDataKey, TCell = unknown> = {
+  key: TKey;
+  value?: TCell[];
+};
+
+type IGridHistoryData<TKey extends IGridDataKey = IGridDataKey, TCell = unknown> =
+  IGridHistoryEditCellData<TKey, TCell>
+  | IGridHistoryAddRowData<TKey, TCell>;
+
+const GRID_HISTORY_SOURCE_EDIT_CELL = 'grid-history-source-edit-cell';
+const GRID_HISTORY_SOURCE_ADD_ROW = 'grid-history-source-add-row';
+
+function isGridHistoryEditCellData<TKey extends IGridDataKey = IGridDataKey, TCell = unknown>(
+  data: IHistoryEntry<unknown>
+): data is IHistoryEntry<IGridHistoryEditCellData<TKey, TCell>> {
+  return data.source === GRID_HISTORY_SOURCE_EDIT_CELL;
+}
+
+function isGridHistoryAddRowData<TKey extends IGridDataKey = IGridDataKey, TCell = unknown>(
+  data: IHistoryEntry<unknown>
+): data is IHistoryEntry<IGridHistoryAddRowData<TKey, TCell>> {
+  return data.source === GRID_HISTORY_SOURCE_ADD_ROW;
+}
 
 @injectable(() => [IDatabaseDataSource, IDatabaseDataResult, IDatabaseDataResultAction, GridHistoryAction])
 export class GridEditAction<
@@ -63,7 +85,7 @@ export class GridEditAction<
 > extends DatabaseEditAction<TKey, TCell, IGridEditApplyActionData, TResult> {
   protected readonly editorData: Map<string, IGridUpdate<TCell>>;
   protected readonly data: GridDataResultAction<TColumn, TRow, TKey, TCell, TResult>;
-  protected readonly history: GridHistoryAction<IGridEditHistoryData<TKey, TCell>, TResult>;
+  protected readonly history: GridHistoryAction<IGridHistoryData<TKey, TCell>, TResult>;
 
   constructor(
     source: IDatabaseDataSource<any, TResult>,
@@ -74,7 +96,7 @@ export class GridEditAction<
     super(source, result);
     this.editorData = new Map();
     this.data = data as GridDataResultAction<TColumn, TRow, TKey, TCell, TResult>;
-    this.history = history as GridHistoryAction<IGridEditHistoryData<TKey, TCell>, TResult>;
+    this.history = history as GridHistoryAction<IGridHistoryData<TKey, TCell>, TResult>;
 
     this.history.onUndo.addHandler(this.handleUndo.bind(this));
     this.history.onRedo.addHandler(this.handleRedo.bind(this));
@@ -193,7 +215,7 @@ export class GridEditAction<
     this.addRow(key?.row, undefined, key?.column);
   }
 
-  addRow(row?: IGridRowKey, value?: TCell[], column?: IGridColumnKey): void {
+  addRow(row?: IGridRowKey, value?: TCell[], column?: IGridColumnKey, skipHistory?: boolean): void {
     if (!row) {
       row = this.data.getDefaultKey().row;
     }
@@ -202,7 +224,9 @@ export class GridEditAction<
       value = this.data.columns.map(() => null) as TCell[];
     }
 
-    row = this.getNextRowAdd(row);
+    if (!skipHistory) {
+      row = this.getNextRowAdd(row);
+    }
 
     if (!column) {
       column = this.data.getDefaultKey().column;
@@ -221,6 +245,10 @@ export class GridEditAction<
           },
         ],
       });
+
+      if (!skipHistory) {
+        this.updateHistoryWithAddRow({ column, row } as TKey);
+      }
     }
   }
 
@@ -544,22 +572,30 @@ export class GridEditAction<
     return [this.editorData.get(key)!, created];
   }
 
-  private updateHistoryWithCellValue(key: TKey, value: TCell): void {
+  private compressCellEditHistory(key?: TKey): void {
     const currentHistoryEntry = this.history.getCurrentEntry();
-    const isEditingSameCell = currentHistoryEntry?.source === GRID_EDIT_HISTORY_SOURCE_SET
+
+    if (!currentHistoryEntry || !isGridHistoryEditCellData<TKey, TCell>(currentHistoryEntry)) {
+      return;
+    }
+
+    const isEditingSameCell = key
       && GridDataKeysUtils.isElementsKeyEqual(currentHistoryEntry.data.key, key);
-    const shouldCompressHistory = !isEditingSameCell && currentHistoryEntry;
+    const shouldCompressHistory = !isEditingSameCell;
 
     if (shouldCompressHistory) {
       this.history.compress(
         entry =>
-          entry.source === GRID_EDIT_HISTORY_SOURCE_SET &&
+          isGridHistoryEditCellData<TKey, TCell>(entry) &&
           GridDataKeysUtils.isElementsKeyEqual(entry.data.key, currentHistoryEntry.data.key),
         entries => {
           const firstEntry = entries[0]!;
           const lastEntry = entries[entries.length - 1]!;
+          if (!isGridHistoryEditCellData<TKey, TCell>(firstEntry) || !isGridHistoryEditCellData<TKey, TCell>(lastEntry)) {
+            throw new Error('Invalid history entry type');
+          }
           return {
-            source: GRID_EDIT_HISTORY_SOURCE_SET,
+            source: GRID_HISTORY_SOURCE_EDIT_CELL,
             data: {
               key: currentHistoryEntry.data.key,
               value: lastEntry.data.value,
@@ -570,9 +606,13 @@ export class GridEditAction<
         'lastSequence',
       );
     }
+  }
+
+  private updateHistoryWithCellValue(key: TKey, value: TCell): void {
+    this.compressCellEditHistory(key);
 
     this.history.add({
-      source: GRID_EDIT_HISTORY_SOURCE_SET,
+      source: GRID_HISTORY_SOURCE_EDIT_CELL,
       data: {
         key,
         value,
@@ -581,22 +621,38 @@ export class GridEditAction<
     });
   }
 
+  private updateHistoryWithAddRow(key: TKey): void {
+    this.compressCellEditHistory();
+
+    const update = this.editorData.get(GridDataKeysUtils.serialize(key.row));
+    const value = update?.update;
+
+    this.history.add({
+      source: GRID_HISTORY_SOURCE_ADD_ROW,
+      data: {
+        key,
+        value,
+      },
+    });
+  }
+
   private getPrevCellValue(key: TKey): TCell {
     const [update] = this.getOrCreateUpdate(key.row, DatabaseEditChangeType.update);
     const currentHistoryEntry = this.history.getCurrentEntry();
-    const isEditingSameCell = currentHistoryEntry?.source === GRID_EDIT_HISTORY_SOURCE_SET
+    const isEditingSameCell = currentHistoryEntry
+      && isGridHistoryEditCellData<TKey, TCell>(currentHistoryEntry)
       && GridDataKeysUtils.isElementsKeyEqual(currentHistoryEntry.data.key, key);
     const initialValue = update.source?.[key.column.index] as TCell;
     const latestHistoryEntry = this.history.getState().findLast(
-      entry => entry.source === GRID_EDIT_HISTORY_SOURCE_SET
+      entry => isGridHistoryEditCellData<TKey, TCell>(entry)
         && GridDataKeysUtils.isElementsKeyEqual(entry.data.key, key)
     );
 
-    if (isEditingSameCell) {
-      return currentHistoryEntry?.data.value;
+    if (isEditingSameCell && currentHistoryEntry && isGridHistoryEditCellData<TKey, TCell>(currentHistoryEntry)) {
+      return currentHistoryEntry.data.value;
     }
 
-    if (latestHistoryEntry) {
+    if (latestHistoryEntry && isGridHistoryEditCellData<TKey, TCell>(latestHistoryEntry)) {
       return latestHistoryEntry.data.value;
     }
 
@@ -628,15 +684,19 @@ export class GridEditAction<
     }
   }
 
-  private handleUndo(entry: IHistoryEntry<IGridEditHistoryData<TKey, TCell>>): void {
-    if (entry.source === GRID_EDIT_HISTORY_SOURCE_SET) {
+  private handleUndo(entry: IHistoryEntry<unknown>): void {
+    if (isGridHistoryEditCellData<TKey, TCell>(entry)) {
       this.setCellValue(entry.data.key, entry.data.prevValue);
+    } else if (isGridHistoryAddRowData<TKey, TCell>(entry)) {
+      this.deleteRow(entry.data.key.row, entry.data.key.column, true);
     }
   }
 
-  private handleRedo(entry: IHistoryEntry<IGridEditHistoryData<TKey, TCell>>): void {
-    if (entry.source === GRID_EDIT_HISTORY_SOURCE_SET) {
+  private handleRedo(entry: IHistoryEntry<unknown>): void {
+    if (isGridHistoryEditCellData<TKey, TCell>(entry)) {
       this.setCellValue(entry.data.key, entry.data.value);
+    } else if (isGridHistoryAddRowData<TKey, TCell>(entry)) {
+      this.addRow(entry.data.key.row, entry.data.value, entry.data.key.column, true);
     }
   }
 }
