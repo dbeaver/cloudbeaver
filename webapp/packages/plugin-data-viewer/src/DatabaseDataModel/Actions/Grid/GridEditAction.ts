@@ -600,6 +600,8 @@ export class GridEditAction<
       resultId: this.result.id,
       revert: true,
     });
+
+    this.history.clear();
   }
 
   private getNextRowAdd(row: IGridRowKey): IGridRowKey {

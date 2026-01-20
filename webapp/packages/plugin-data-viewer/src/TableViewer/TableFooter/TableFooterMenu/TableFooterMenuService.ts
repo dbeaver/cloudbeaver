@@ -53,7 +53,7 @@ export class TableFooterMenuService {
     private readonly dataViewerViewService: DataViewerViewService,
     private readonly localizationService: LocalizationService,
     private readonly menuService: MenuService,
-  ) {}
+  ) { }
 
   register(): void {
     this.registerEditingActions();
@@ -299,12 +299,10 @@ export class TableFooterMenuService {
         break;
       }
       case ACTION_SAVE:
-        model.save().catch(() => {});
+        model.save().catch(() => { });
         break;
       case ACTION_CANCEL: {
         editor.clear();
-        const history = model.source.tryGetAction(resultIndex, GridHistoryAction);
-        history?.clear();
         break;
       }
       case ACTION_UNDO: {
