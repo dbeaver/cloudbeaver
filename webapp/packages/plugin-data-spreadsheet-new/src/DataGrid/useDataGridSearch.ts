@@ -15,7 +15,6 @@ import { DataGridSearchStore, type IDataGridSearchState } from './DataGridSearch
 // 1. Optimize search for large datasets (add limit, debounce, web worker, etc.)
 export function useDataGridSearch(modelId: string, resultIndex: number): IDataGridSearchState {
   const key = `${SEARCH_STATE_PREFIX}-${modelId}-${resultIndex}`;
-  console.log('useDataGridSearch key', key);
   const persistence = useService(SearchStateService);
   const persisted = useMemo(() => persistence.get(key), [key, persistence]);
 

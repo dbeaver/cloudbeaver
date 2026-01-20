@@ -101,6 +101,7 @@ export class DataGridSearchStore implements IDataGridSearchStateInternal {
   private persisted: IDataGridSearchPersistent;
   private tableReactionDisposer: (() => void) | null = null;
   private pendingActiveMatchIdx: number | undefined = undefined;
+  private reactionDisposers: Array<() => void> = [];
 
   constructor(persisted: IDataGridSearchPersistent) {
     this.persisted = persisted;
@@ -139,38 +140,47 @@ export class DataGridSearchStore implements IDataGridSearchStateInternal {
       suppressEditorSelection: observable,
     });
 
-    reaction(
-      () => [this.query.search, this.query.replace ?? '', this.query.caseSensitive, this.query.wholeWord, this.query.regexp],
-      ([search, replace, caseSensitive, wholeWord, regexp]) => {
-        this.persisted.query = {
-          search: typeof search === 'string' ? search : '',
-          replace: typeof replace === 'string' ? replace : '',
-          caseSensitive: !!caseSensitive,
-          wholeWord: !!wholeWord,
-          regexp: !!regexp,
-        };
-      },
+    this.reactionDisposers.push(
+      reaction(
+        () => [this.query.search, this.query.replace ?? '', this.query.caseSensitive, this.query.wholeWord, this.query.regexp],
+        ([search, replace, caseSensitive, wholeWord, regexp]) => {
+          this.persisted.query = {
+            search: typeof search === 'string' ? search : '',
+            replace: typeof replace === 'string' ? replace : '',
+            caseSensitive: !!caseSensitive,
+            wholeWord: !!wholeWord,
+            regexp: !!regexp,
+          };
+          this.runSearch();
+        },
+      ),
     );
 
-    reaction(
-      () => this.open,
-      open => {
-        this.persisted.open = open;
-      },
+    this.reactionDisposers.push(
+      reaction(
+        () => this.open,
+        open => {
+          this.persisted.open = open;
+        },
+      ),
     );
 
-    reaction(
-      () => this.replaceOpen,
-      replaceOpen => {
-        this.persisted.replaceOpen = replaceOpen;
-      },
+    this.reactionDisposers.push(
+      reaction(
+        () => this.replaceOpen,
+        replaceOpen => {
+          this.persisted.replaceOpen = replaceOpen;
+        },
+      ),
     );
 
-    reaction(
-      () => this.activeMatchIdx,
-      idx => {
-        this.persisted.activeMatchIdx = idx;
-      },
+    this.reactionDisposers.push(
+      reaction(
+        () => this.activeMatchIdx,
+        idx => {
+          this.persisted.activeMatchIdx = idx;
+        },
+      ),
     );
   }
 
@@ -204,6 +214,22 @@ export class DataGridSearchStore implements IDataGridSearchStateInternal {
     );
   }
 
+  dispose(): void {
+    this.tableReactionDisposer?.();
+    this.tableReactionDisposer = null;
+    
+    for (const disposer of this.reactionDisposers) {
+      disposer();
+    }
+    this.reactionDisposers = [];
+    
+    this.suppressEditorSelection = false;
+    this.matchedCells = [];
+    this.tableData = null;
+    this.gridRef = null;
+    this.replaceHandler = null;
+  }
+
   setGridRef(ref: RefObject<DataGridRef | null>): void {
     this.gridRef = ref;
   }
@@ -220,19 +246,27 @@ export class DataGridSearchStore implements IDataGridSearchStateInternal {
     this.query = { ...this.query, replace };
   }
 
-  private buildSearchPattern(): RegExp {
-    if (this.query.regexp) {
+  private buildSearchPattern(): RegExp | null {
+    if (!this.query.search) {
+      return null;
+    }
+
+    try {
+      if (this.query.regexp) {
+        const flags = this.query.caseSensitive ? 'g' : 'gi';
+        return new RegExp(this.query.search, flags);
+      }
+
+      let escapedSearch = this.query.search.replace(ESCAPE_REGEX, '\\$&');
+      if (this.query.wholeWord) {
+        escapedSearch = `\\b${escapedSearch}\\b`;
+      }
+
       const flags = this.query.caseSensitive ? 'g' : 'gi';
-      return new RegExp(this.query.search, flags);
+      return new RegExp(escapedSearch, flags);
+    } catch {
+      return null;
     }
-
-    let escapedSearch = this.query.search.replace(ESCAPE_REGEX, '\\$&');
-    if (this.query.wholeWord) {
-      escapedSearch = `\\b${escapedSearch}\\b`;
-    }
-
-    const flags = this.query.caseSensitive ? 'g' : 'gi';
-    return new RegExp(escapedSearch, flags);
   }
 
   private performSearch(): Array<{ rowIdx: number; colIdx: number }> {
@@ -242,6 +276,11 @@ export class DataGridSearchStore implements IDataGridSearchStateInternal {
 
     const { rows, columns, getCellText } = this.tableData();
     const searchPattern = this.buildSearchPattern();
+    
+    if (!searchPattern) {
+      return [];
+    }
+
     const matches: Array<{ rowIdx: number; colIdx: number }> = [];
 
     for (let rowIdx = 0; rowIdx < rows.length; rowIdx++) {
@@ -289,12 +328,17 @@ export class DataGridSearchStore implements IDataGridSearchStateInternal {
   }
 
   private applyPendingActiveMatch(): boolean {
-    if (this.pendingActiveMatchIdx === undefined || this.matchedCells.length === 0) {
+    if (this.pendingActiveMatchIdx === undefined) {
       return false;
     }
 
     const desiredIdx = this.pendingActiveMatchIdx;
     this.pendingActiveMatchIdx = undefined;
+
+    if (this.matchedCells.length === 0) {
+      this.activeMatchIdx = -1;
+      return false;
+    }
 
     if (desiredIdx >= 0 && desiredIdx < this.matchedCells.length) {
       this.activeMatchIdx = desiredIdx;
@@ -305,7 +349,7 @@ export class DataGridSearchStore implements IDataGridSearchStateInternal {
     return true;
   }
 
-  scrollToActiveMatch() {
+  scrollToActiveMatch(): void {
     if (!this.gridRef?.current || this.activeMatchIdx < 0 || this.activeMatchIdx >= this.matchedCells.length) {
       return;
     }
@@ -317,23 +361,19 @@ export class DataGridSearchStore implements IDataGridSearchStateInternal {
   }
 
   setQuery(search: string): void {
-    this.query.search = search;
-    this.runSearch();
+    this.query = { ...this.query, search };
   }
 
   toggleCaseSensitive(): void {
-    this.query.caseSensitive = !this.query.caseSensitive;
-    this.runSearch();
+    this.query = { ...this.query, caseSensitive: !this.query.caseSensitive };
   }
 
   toggleWholeWord(): void {
-    this.query.wholeWord = !this.query.wholeWord;
-    this.runSearch();
+    this.query = { ...this.query, wholeWord: !this.query.wholeWord };
   }
 
   toggleRegex(): void {
-    this.query.regexp = !this.query.regexp;
-    this.runSearch();
+    this.query = { ...this.query, regexp: !this.query.regexp };
   }
 
   findNext(): void {
@@ -366,6 +406,11 @@ export class DataGridSearchStore implements IDataGridSearchStateInternal {
 
     const value = this.query.replace ?? '';
     const searchPattern = this.buildSearchPattern();
+    
+    if (!searchPattern) {
+      return;
+    }
+    
     const stillMatches = this.replaceCell(match, searchPattern, value, true);
     
     if (stillMatches === undefined) {
@@ -397,6 +442,10 @@ export class DataGridSearchStore implements IDataGridSearchStateInternal {
 
     const value = this.query.replace ?? '';
     const searchPattern = this.buildSearchPattern();
+    
+    if (!searchPattern) {
+      return;
+    }
 
     for (const match of matches) {
       this.replaceCell(match, searchPattern, value);
@@ -407,35 +456,39 @@ export class DataGridSearchStore implements IDataGridSearchStateInternal {
 
   private replaceCell(
     match: { rowIdx: number; colIdx: number },
-    searchPattern: RegExp,
+    searchPattern: RegExp | null,
     replaceValue: string,
     checkStillMatches = false,
   ): boolean | undefined {
-    if (!this.tableData || !this.replaceHandler) {
+    if (!this.tableData || !this.replaceHandler || !searchPattern) {
       return undefined;
     }
 
     this.suppressEditorSelection = true;
-    const { getCellText } = this.tableData();
-    const cellText = getCellText(match.rowIdx, match.colIdx);
-    const newText = cellText.replace(searchPattern, replaceValue);
-    this.replaceHandler(match.rowIdx, match.colIdx, newText);
+    
+    try {
+      const { getCellText } = this.tableData();
+      const cellText = getCellText(match.rowIdx, match.colIdx);
+      const newText = cellText.replace(searchPattern, replaceValue);
+      this.replaceHandler(match.rowIdx, match.colIdx, newText);
 
-    if (searchPattern.global) {
-      searchPattern.lastIndex = 0;
+      if (searchPattern.global) {
+        searchPattern.lastIndex = 0;
+      }
+
+      if (!checkStillMatches) {
+        return undefined;
+      }
+
+      const stillMatches = searchPattern.test(newText);
+      if (searchPattern.global) {
+        searchPattern.lastIndex = 0;
+      }
+
+      return stillMatches;
+    } finally {
+      this.suppressEditorSelection = false;
     }
-
-    if (!checkStillMatches) {
-      return undefined;
-    }
-
-    const stillMatches = searchPattern.test(newText);
-    if (searchPattern.global) {
-      searchPattern.lastIndex = 0;
-    }
-
-    this.suppressEditorSelection = false;
-    return stillMatches;
   }
 
   openSearch(callback?: () => void): void {
