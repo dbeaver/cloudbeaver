@@ -22,7 +22,7 @@ import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.runtime.AbstractJob;
 
-public abstract class AbstractCancelableJob extends AbstractJob implements CustomCancelableJob{
+public abstract class AbstractCancelableJob extends AbstractJob implements CustomCancelableJob {
     protected AbstractCancelableJob(@NotNull String name) {
         super(name);
     }
