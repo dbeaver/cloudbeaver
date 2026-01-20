@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -47,7 +47,7 @@ export function useUsersTable(filters: IUserFilters) {
         return filters.filterUsers(
           Array.from(
             new Set([
-              ...this.usersLoader.resource.get(UsersResourceFilterKey(searchFilter, enabledStateFilter)),
+              ...(this.searchFilter ? this.usersLoader.resource.get(UsersResourceFilterKey(this.searchFilter, this.enabledStateFilter)) : []),
               ...usersResource.get(pagination.allPages),
             ]),
           )
@@ -69,13 +69,15 @@ export function useUsersTable(filters: IUserFilters) {
       },
     }),
     {
+      searchFilter: observable.ref,
+      enabledStateFilter: observable.ref,
       usersLoader: observable.ref,
       loadableState: observable.ref,
       users: computed<AdminUser[]>({ equals: (first, second) => isArraysEqual(first, second, undefined, true) }),
       update: action.bound,
       loadMore: action.bound,
     },
-    { usersLoader, loadableState: usersLoader },
+    { searchFilter, enabledStateFilter, usersLoader, loadableState: usersLoader },
   );
 
   return state;

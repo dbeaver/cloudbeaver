@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@ import {
   IDatabaseDataViewAction,
   isBooleanValuePresentationAvailable,
   isResultSetDataSource,
+  KEY_BINDING_DELETE_ROW,
   ResultSetDataContentAction,
   type IDatabaseValueHolder,
   type IGridDataKey,
@@ -219,6 +220,14 @@ export class DataGridContextMenuCellEditingService {
 
     if (action === ACTION_EDIT) {
       return { ...action.info, label: t('data_grid_table_editing_open_inline_editor'), icon: 'edit' };
+    }
+
+    if (action === ACTION_DATA_GRID_EDITING_DELETE_ROW) {
+      return {
+        ...action.info,
+        label: t('data_grid_table_editing_row_delete'),
+        tooltip: t('data_grid_table_editing_row_delete') + ' (' + getBindingLabel(KEY_BINDING_DELETE_ROW) + ')',
+      };
     }
 
     return action.info;
