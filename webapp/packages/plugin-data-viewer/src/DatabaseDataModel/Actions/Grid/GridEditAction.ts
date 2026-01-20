@@ -56,12 +56,19 @@ type IGridHistoryAddRowData<TKey extends IGridDataKey = IGridDataKey, TCell = un
   value?: TCell[];
 };
 
+type IGridHistoryDeleteRowData<TKey extends IGridDataKey = IGridDataKey, TCell = unknown> = {
+  key: TKey;
+  value?: TCell[];
+};
+
 type IGridHistoryData<TKey extends IGridDataKey = IGridDataKey, TCell = unknown> =
   IGridHistoryEditCellData<TKey, TCell>
-  | IGridHistoryAddRowData<TKey, TCell>;
+  | IGridHistoryAddRowData<TKey, TCell>
+  | IGridHistoryDeleteRowData<TKey, TCell>;
 
 const GRID_HISTORY_SOURCE_EDIT_CELL = 'grid-history-source-edit-cell';
 const GRID_HISTORY_SOURCE_ADD_ROW = 'grid-history-source-add-row';
+const GRID_HISTORY_SOURCE_DELETE_ROW = 'grid-history-source-delete-row';
 
 function isGridHistoryEditCellData<TKey extends IGridDataKey = IGridDataKey, TCell = unknown>(
   data: IHistoryEntry<unknown>
@@ -73,6 +80,12 @@ function isGridHistoryAddRowData<TKey extends IGridDataKey = IGridDataKey, TCell
   data: IHistoryEntry<unknown>
 ): data is IHistoryEntry<IGridHistoryAddRowData<TKey, TCell>> {
   return data.source === GRID_HISTORY_SOURCE_ADD_ROW;
+}
+
+function isGridHistoryDeleteRowData<TKey extends IGridDataKey = IGridDataKey, TCell = unknown>(
+  data: IHistoryEntry<unknown>
+): data is IHistoryEntry<IGridHistoryDeleteRowData<TKey, TCell>> {
+  return data.source === GRID_HISTORY_SOURCE_DELETE_ROW;
 }
 
 @injectable(() => [IDatabaseDataSource, IDatabaseDataResult, IDatabaseDataResultAction, GridHistoryAction])
@@ -294,8 +307,9 @@ export class GridEditAction<
         reverted.push({ key });
         this.editorData.delete(serializedKey);
       } else {
-        this.deleteRow(key.row, key.column, true);
+        this.deleteRow(key.row, key.column, true, true);
         deleted.push({ key });
+        this.updateHistoryWithDeleteRow(key);
       }
     }
 
@@ -318,7 +332,7 @@ export class GridEditAction<
     }
   }
 
-  deleteRow(key: IGridRowKey, column?: IGridColumnKey, silent?: boolean): void {
+  deleteRow(key: IGridRowKey, column?: IGridColumnKey, silent?: boolean, skipHistory?: boolean): void {
     const serializedKey = GridDataKeysUtils.serialize(key);
     const update = this.editorData.get(serializedKey);
 
@@ -348,6 +362,10 @@ export class GridEditAction<
             },
           ],
         });
+
+        if (!skipHistory) {
+          this.updateHistoryWithDeleteRow({ column, row: key } as TKey);
+        }
       }
     } else if (!silent) {
       this.action.execute({
@@ -636,6 +654,22 @@ export class GridEditAction<
     });
   }
 
+  private updateHistoryWithDeleteRow(key: TKey): void {
+    this.compressCellEditHistory();
+
+    const rowValue = this.data.getRowValue(key.row);
+    const update = this.editorData.get(GridDataKeysUtils.serialize(key.row));
+    const value = update?.update || rowValue;
+
+    this.history.add({
+      source: GRID_HISTORY_SOURCE_DELETE_ROW,
+      data: {
+        key,
+        value,
+      },
+    });
+  }
+
   private getPrevCellValue(key: TKey): TCell {
     const [update] = this.getOrCreateUpdate(key.row, DatabaseEditChangeType.update);
     const currentHistoryEntry = this.history.getCurrentEntry();
@@ -687,16 +721,28 @@ export class GridEditAction<
   private handleUndo(entry: IHistoryEntry<unknown>): void {
     if (isGridHistoryEditCellData<TKey, TCell>(entry)) {
       this.setCellValue(entry.data.key, entry.data.prevValue);
-    } else if (isGridHistoryAddRowData<TKey, TCell>(entry)) {
-      this.deleteRow(entry.data.key.row, entry.data.key.column, true);
+    }
+
+    if (isGridHistoryAddRowData<TKey, TCell>(entry)) {
+      this.deleteRow(entry.data.key.row, entry.data.key.column, true, true);
+    }
+
+    if (isGridHistoryDeleteRowData<TKey, TCell>(entry)) {
+      this.revert(entry.data.key);
     }
   }
 
   private handleRedo(entry: IHistoryEntry<unknown>): void {
     if (isGridHistoryEditCellData<TKey, TCell>(entry)) {
       this.setCellValue(entry.data.key, entry.data.value);
-    } else if (isGridHistoryAddRowData<TKey, TCell>(entry)) {
+    }
+
+    if (isGridHistoryAddRowData<TKey, TCell>(entry)) {
       this.addRow(entry.data.key.row, entry.data.value, entry.data.key.column, true);
+    }
+
+    if (isGridHistoryDeleteRowData<TKey, TCell>(entry)) {
+      this.deleteRow(entry.data.key.row, entry.data.key.column, true, true);
     }
   }
 }
