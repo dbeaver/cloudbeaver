@@ -11,10 +11,8 @@ import {
   ACTION_CANCEL,
   ACTION_DELETE,
   ACTION_DUPLICATE,
-  ACTION_REDO,
   ACTION_REVERT,
   ACTION_SAVE,
-  ACTION_UNDO,
   ActionService,
   DATA_CONTEXT_MENU,
   KeyBindingService,
@@ -34,6 +32,8 @@ import {
   KEY_BINDING_REVERT_INLINE_EDITOR_CHANGES,
   KEY_BINDING_SAVE,
 } from '../../../DATA_VIEWER_KEY_BINDINGS.js';
+import { ACTION_DV_UNDO } from '../../../ACTION_DV_UNDO.js';
+import { ACTION_DV_REDO } from '../../../ACTION_DV_REDO.js';
 
 import { DatabaseEditChangeType, IDatabaseDataEditAction } from '../../../DatabaseDataModel/Actions/IDatabaseDataEditAction.js';
 import { DATA_CONTEXT_DV_DDM } from '../../../DatabaseDataModel/DataContext/DATA_CONTEXT_DV_DDM.js';
@@ -53,7 +53,7 @@ export class TableFooterMenuService {
     private readonly dataViewerViewService: DataViewerViewService,
     private readonly localizationService: LocalizationService,
     private readonly menuService: MenuService,
-  ) { }
+  ) {}
 
   register(): void {
     this.registerEditingActions();
@@ -120,9 +120,10 @@ export class TableFooterMenuService {
     this.keyBindingService.addKeyBindingHandler({
       id: 'table-footer-undo',
       binding: KEY_BINDING_DATA_VIEWER_UNDO,
+      actions: [ACTION_DV_UNDO],
       contexts: [DATA_CONTEXT_DV_DDM, DATA_CONTEXT_DV_DDM_RESULT_INDEX],
       isBindingApplicable(context, action) {
-        return action === ACTION_UNDO;
+        return action === ACTION_DV_UNDO;
       },
       handler: this.tableFooterMenuActionHandler.bind(this),
     });
@@ -130,14 +131,23 @@ export class TableFooterMenuService {
     this.keyBindingService.addKeyBindingHandler({
       id: 'table-footer-redo',
       binding: KEY_BINDING_DATA_VIEWER_REDO,
+      actions: [ACTION_DV_REDO],
       contexts: [DATA_CONTEXT_DV_DDM, DATA_CONTEXT_DV_DDM_RESULT_INDEX],
       isBindingApplicable(context, action) {
-        return action === ACTION_REDO;
+        return action === ACTION_DV_REDO;
       },
       handler: this.tableFooterMenuActionHandler.bind(this),
     });
 
-    this.dataViewerViewService.registerAction(ACTION_DELETE, ACTION_REVERT, ACTION_ADD, ACTION_DUPLICATE, ACTION_CANCEL);
+    this.dataViewerViewService.registerAction(
+      ACTION_DELETE,
+      ACTION_REVERT,
+      ACTION_ADD,
+      ACTION_DUPLICATE,
+      ACTION_CANCEL,
+      ACTION_DV_UNDO,
+      ACTION_DV_REDO,
+    );
   }
 
   private registerEditingActions() {
@@ -158,7 +168,7 @@ export class TableFooterMenuService {
     this.actionService.addHandler({
       id: 'data-base-editing-handler',
       contexts: [DATA_CONTEXT_DV_DDM, DATA_CONTEXT_DV_DDM_RESULT_INDEX],
-      actions: [ACTION_ADD, ACTION_DUPLICATE, ACTION_DELETE, ACTION_REVERT, ACTION_SAVE, ACTION_CANCEL, ACTION_UNDO, ACTION_REDO],
+      actions: [ACTION_ADD, ACTION_DUPLICATE, ACTION_DELETE, ACTION_REVERT, ACTION_SAVE, ACTION_CANCEL, ACTION_DV_UNDO, ACTION_DV_REDO],
       isActionApplicable(context, action) {
         const model = context.get(DATA_CONTEXT_DV_DDM)!;
         const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
@@ -188,8 +198,8 @@ export class TableFooterMenuService {
           case ACTION_REVERT: {
             return editor.hasFeature('revert');
           }
-          case ACTION_UNDO:
-          case ACTION_REDO: {
+          case ACTION_DV_UNDO:
+          case ACTION_DV_REDO: {
             const history = model.source.tryGetAction(resultIndex, GridHistoryAction);
             return history !== undefined;
           }
@@ -251,12 +261,12 @@ export class TableFooterMenuService {
 
             return !editor?.isEdited();
           }
-          case ACTION_UNDO: {
+          case ACTION_DV_UNDO: {
             const history = model.source.tryGetAction(resultIndex, GridHistoryAction);
 
             return !history?.canUndo();
           }
-          case ACTION_REDO: {
+          case ACTION_DV_REDO: {
             const history = model.source.tryGetAction(resultIndex, GridHistoryAction);
 
             return !history?.canRedo();
@@ -299,18 +309,18 @@ export class TableFooterMenuService {
         break;
       }
       case ACTION_SAVE:
-        model.save().catch(() => { });
+        model.save().catch(() => {});
         break;
       case ACTION_CANCEL: {
         editor.clear();
         break;
       }
-      case ACTION_UNDO: {
+      case ACTION_DV_UNDO: {
         const history = model.source.tryGetAction(resultIndex, GridHistoryAction);
         history?.undo();
         break;
       }
-      case ACTION_REDO: {
+      case ACTION_DV_REDO: {
         const history = model.source.tryGetAction(resultIndex, GridHistoryAction);
         history?.redo();
         break;
