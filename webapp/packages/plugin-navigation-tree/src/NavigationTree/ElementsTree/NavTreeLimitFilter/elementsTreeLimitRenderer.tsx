@@ -6,14 +6,12 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { useState } from 'react';
 import { observer } from 'mobx-react-lite';
 
-import { useTranslate } from '@cloudbeaver/core-blocks';
+import { Button, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NavTreeResource } from '@cloudbeaver/core-navigation-tree';
 import { CachedResourceOffsetPageKey, CachedResourceOffsetPageTargetKey, getNextPageOffset } from '@cloudbeaver/core-resource';
-import { Button } from '@dbeaver/ui-kit';
 
 import type { NavigationNodeRendererComponent } from '../NavigationNodeComponent.js';
 import { NAVIGATION_TREE_LIMIT } from './elementsTreeLimitFilter.js';
@@ -31,22 +29,17 @@ const NavTreeLimitMessage: NavigationNodeRendererComponent = observer(function N
   const navTreeResource = useService(NavTreeResource);
   const limit = navTreeResource.childrenLimit;
 
-  const [loading, setLoading] = useState(false);
 
   async function loadMore() {
     const parentNodeId = path[path.length - 1];
     const pageInfo = navTreeResource.offsetPagination.getPageInfo(
       CachedResourceOffsetPageKey(0, 0).setParent(CachedResourceOffsetPageTargetKey(parentNodeId)),
     );
+
     if (pageInfo) {
-      try {
-        setLoading(true);
-        await navTreeResource.load(
-          CachedResourceOffsetPageKey(getNextPageOffset(pageInfo), limit).setParent(CachedResourceOffsetPageTargetKey(parentNodeId)),
-        );
-      } finally {
-        setLoading(false);
-      }
+      await navTreeResource.load(
+        CachedResourceOffsetPageKey(getNextPageOffset(pageInfo), limit).setParent(CachedResourceOffsetPageTargetKey(parentNodeId)),
+      );
     }
   }
 
@@ -54,10 +47,9 @@ const NavTreeLimitMessage: NavigationNodeRendererComponent = observer(function N
     <div className='tw:px-6 tw:py-1'>
       <Button
         title={translate('app_navigationTree_limited', undefined, { limit: limit })}
-        variant='ghost'
         size='small'
-        loading={loading}
-        disabled={loading}
+        variant='ghost'
+        loader
         onClick={loadMore}
       >
         {translate('ui_load_more')}
