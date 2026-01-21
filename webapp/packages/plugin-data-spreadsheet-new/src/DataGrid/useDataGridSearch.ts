@@ -10,9 +10,6 @@ import { useService } from '@cloudbeaver/core-di';
 import { SearchStateService, SEARCH_STATE_PREFIX } from '../DataGridSearchStateService.js';
 import type { IDataGridSearchState } from './DataGridSearchStore.js';
 
-
-//TODO:
-// 1. Optimize search for large datasets (add limit, debounce, web worker, etc.)
 export function useDataGridSearch(modelId: string, resultIndex: number): IDataGridSearchState {
   const key = useMemo(
     () => `${SEARCH_STATE_PREFIX}-${modelId}-${resultIndex}`,
