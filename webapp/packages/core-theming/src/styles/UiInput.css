@@ -1,6 +1,7 @@
 @layer components {
-  .dbv-kit-input {
+  :root, .dbv-kit-input {
     --dbv-kit-input-radius: 3px;
     --dbv-kit-color-control-hover: var(--theme-background);
+    --dbv-kit-input-background: var(--theme-input-background, #ffffff);
   }
 }
