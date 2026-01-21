@@ -44,6 +44,7 @@ import org.jkiss.dbeaver.model.auth.SMAuthInfo;
 import org.jkiss.dbeaver.model.auth.SMAuthStatus;
 import org.jkiss.dbeaver.model.auth.SMSessionExternal;
 import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
+import org.jkiss.dbeaver.model.qm.QMConstants;
 import org.jkiss.dbeaver.model.security.SMConstants;
 import org.jkiss.dbeaver.model.security.SMController;
 import org.jkiss.dbeaver.model.security.SMSubjectType;
@@ -385,7 +386,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
         if (!application.getAppConfiguration().isAnonymousAccessEnabled() || !webSession.isAuthorizedInSecurityManager()) {
             return null;
         }
-        SMUser anonymous = new SMUser("anonymous", true, null);
+        SMUser anonymous = new SMUser(QMConstants.QM_ANONYMOUS_USER, true, null);
         return new WebUserInfo(webSession, new WebUser(anonymous));
     }
 }

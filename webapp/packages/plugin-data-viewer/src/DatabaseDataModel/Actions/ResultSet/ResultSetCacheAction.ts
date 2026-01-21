@@ -16,7 +16,7 @@ import type { IDatabaseDataCacheAction } from '../IDatabaseDataCacheAction.js';
 import { ResultSetDataAction } from './ResultSetDataAction.js';
 import { injectable } from '@cloudbeaver/core-di';
 import { IDatabaseDataResult } from '../../IDatabaseDataResult.js';
-import type { IGridDataKey, IGridRowKey } from '../Grid/IGridDataKey.js';
+import type { IGridColumnKey, IGridDataKey, IGridRowKey } from '../Grid/IGridDataKey.js';
 
 @injectable(() => [IDatabaseDataSource, IDatabaseDataResult, ResultSetDataAction])
 export class ResultSetCacheAction
@@ -40,9 +40,11 @@ export class ResultSetCacheAction
       cache: observable,
       set: action,
       setRow: action,
+      setColumn: action,
       delete: action,
       deleteAll: action,
       deleteRow: action,
+      deleteColumn: action,
     });
   }
 
@@ -57,6 +59,15 @@ export class ResultSetCacheAction
 
   getRow<T>(key: IGridRowKey, scope: symbol): T | undefined {
     const keyCache = this.getRowCache(key);
+    if (!keyCache) {
+      return;
+    }
+
+    return keyCache.get(scope);
+  }
+
+  getColumn<T>(key: IGridColumnKey, scope: symbol): T | undefined {
+    const keyCache = this.getColumnCache(key);
     if (!keyCache) {
       return;
     }
@@ -84,6 +95,16 @@ export class ResultSetCacheAction
     return keyCache.has(scope);
   }
 
+  hasColumn(key: IGridColumnKey, scope: symbol): boolean {
+    const keyCache = this.getColumnCache(key);
+
+    if (!keyCache) {
+      return false;
+    }
+
+    return keyCache.has(scope);
+  }
+
   set<T>(key: IGridDataKey, scope: symbol, value: T): void {
     const keyCache = this.getOrCreateKeyCache(key);
 
@@ -92,6 +113,12 @@ export class ResultSetCacheAction
 
   setRow<T>(key: IGridRowKey, scope: symbol, value: T): void {
     const keyCache = this.getOrCreateRowKeyCache(key);
+
+    keyCache.set(scope, value);
+  }
+
+  setColumn<T>(key: IGridColumnKey, scope: symbol, value: T): void {
+    const keyCache = this.getOrCreateColumnKeyCache(key);
 
     keyCache.set(scope, value);
   }
@@ -118,6 +145,14 @@ export class ResultSetCacheAction
     }
   }
 
+  deleteColumn(key: IGridColumnKey, scope: symbol): void {
+    const keyCache = this.getColumnCache(key);
+
+    if (keyCache) {
+      keyCache.delete(scope);
+    }
+  }
+
   override afterResultUpdate(): void {
     this.cache.clear();
   }
@@ -130,6 +165,10 @@ export class ResultSetCacheAction
     return 'row:' + this.data.serializeRowKey(key);
   }
 
+  private serializeColumnKey(key: IGridColumnKey) {
+    return 'col:' + key.index;
+  }
+
   private serializeKey(key: IGridDataKey) {
     return this.data.serialize(key);
   }
@@ -140,6 +179,10 @@ export class ResultSetCacheAction
 
   private getRowCache(key: IGridRowKey) {
     return this.cache.get(this.serializeRowKey(key));
+  }
+
+  private getColumnCache(key: IGridColumnKey) {
+    return this.cache.get(this.serializeColumnKey(key));
   }
 
   private getOrCreateKeyCache(key: IGridDataKey) {
@@ -159,6 +202,17 @@ export class ResultSetCacheAction
     if (!keyCache) {
       keyCache = observable(new Map());
       this.cache.set(this.serializeRowKey(key), keyCache);
+    }
+
+    return keyCache;
+  }
+
+  private getOrCreateColumnKeyCache(key: IGridColumnKey) {
+    let keyCache = this.getColumnCache(key);
+
+    if (!keyCache) {
+      keyCache = observable(new Map());
+      this.cache.set(this.serializeColumnKey(key), keyCache);
     }
 
     return keyCache;
