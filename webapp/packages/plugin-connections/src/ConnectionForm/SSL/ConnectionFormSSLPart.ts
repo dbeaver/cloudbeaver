@@ -121,8 +121,7 @@ export class ConnectionFormSSLPart extends FormPart<INetworkHandlerConfig, IConn
         const isDefault = isNotNullDefined(descriptorProperty.defaultValue);
 
         if (!(key in handlerConfig.properties) && isDefault) {
-          const defaultValue = getObjectPropertyDefaultValue(descriptorProperty);
-          handlerConfig.properties[key] = defaultValue;
+          handlerConfig.properties[key] = getObjectPropertyDefaultValue(descriptorProperty);
         }
 
         const secured = descriptorProperty.features.includes(PROPERTY_FEATURE_SECURED);

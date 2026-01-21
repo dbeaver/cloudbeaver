@@ -560,8 +560,7 @@ function prepareDynamicProperties(
       const isDefault = isNotNullDefined(propertyInfo.defaultValue);
 
       if (!(propertyInfo.id in result) && isDefault) {
-        const defaultValue = getObjectPropertyDefaultValue(propertyInfo);
-        result[propertyInfo.id] = defaultValue;
+        result[propertyInfo.id] = getObjectPropertyDefaultValue(propertyInfo);
       }
     }
   }

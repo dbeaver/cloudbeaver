@@ -59,5 +59,9 @@ export function getObjectPropertyOptionName(option: ObjectPropertyOption): strin
     return option.displayName;
   }
 
+  if (option === null || option === undefined) {
+    return '';
+  }
+
   return String(option);
 }
