@@ -19,7 +19,6 @@ package io.cloudbeaver.server;
 import io.cloudbeaver.auth.NoAuthCredentialsProvider;
 import io.cloudbeaver.model.config.CBServerConfig;
 import io.cloudbeaver.model.rm.local.LocalResourceController;
-import io.cloudbeaver.registry.WebFeatureRegistry;
 import io.cloudbeaver.service.security.CBEmbeddedSecurityController;
 import io.cloudbeaver.service.security.EmbeddedSecurityControllerFactory;
 import org.jkiss.code.NotNull;
@@ -89,12 +88,6 @@ public class CBApplicationCE extends CBApplication<CBServerConfig> {
     @Override
     public DBFileController createFileController(@NotNull SMCredentialsProvider credentialsProvider) {
         return new LocalFileController(DBWorkbench.getPlatform().getWorkspace().getAbsolutePath().resolve(DBFileController.DATA_FOLDER));
-    }
-
-    @NotNull
-    @Override
-    public WebFeatureRegistry getFeatureRegistry() {
-        return WebFeatureRegistry.getInstance();
     }
 
     @Override
