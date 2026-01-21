@@ -14,31 +14,10 @@
       "path": "../core-cli"
     },
     {
-      "path": "../core-di"
-    },
-    {
-      "path": "../core-dialogs"
-    },
-    {
-      "path": "../core-events"
-    },
-    {
-      "path": "../core-executor"
-    },
-    {
-      "path": "../core-localization"
-    },
-    {
-      "path": "../core-root"
-    },
-    {
       "path": "../core-sdk"
     },
     {
       "path": "../plugin-codemirror6"
-    },
-    {
-      "path": "../plugin-sql-editor-codemirror"
     }
   ],
   "include": [
