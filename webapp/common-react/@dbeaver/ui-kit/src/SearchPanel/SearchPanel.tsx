@@ -27,22 +27,6 @@ export interface SearchPanelQuery {
   regexp?: boolean;
 }
 
-export interface SearchPanelStrings {
-  searchPlaceholder: string;
-  replacePlaceholder: string;
-  toggleReplace: string;
-  caseSensitive: string;
-  wholeWord: string;
-  regex: string;
-  findPrevious: string;
-  findNext: string;
-  replace: string;
-  replaceAll: string;
-  close: string;
-  matchesOf: string;
-  matchesNone: string;
-}
-
 export interface SearchPanelProps {
   isReadOnly?: boolean;
   query: SearchPanelQuery;
