@@ -75,6 +75,9 @@ public class WebDefaultFeatureProvider implements DBWFeatureProvider {
         if (node instanceof DBNContainer) {
             features.add(NODE_FEATURE_CONTAINER);
         }
+        if (node instanceof DBNDataSource && hasNodePermission(webSession, node, RMProjectPermission.DATA_SOURCES_EDIT)) {
+            features.add(NODE_FEATURE_CAN_RENAME);
+        }
         boolean isShared = false;
         if (node instanceof DBNDatabaseNode && !isLeaf) {
             if (node instanceof DBNDataSource dataSource) {

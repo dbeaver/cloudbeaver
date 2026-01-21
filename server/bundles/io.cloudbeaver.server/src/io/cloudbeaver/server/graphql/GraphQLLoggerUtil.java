@@ -49,9 +49,9 @@ public class GraphQLLoggerUtil {
         String userId = session.getUserContext().getUserId();
         if (userId == null) {
             if (session.getUserContext().isAuthorizedInSecurityManager()) {
-                return QMConstants.QM_ANONYMOUS_DOMAIN;
+                return QMConstants.QM_ANONYMOUS_USER;
             }
-            return QMConstants.QM_UNAUTHORIZED_DOMAIN;
+            return QMConstants.QM_UNAUTHORIZED_USER;
         }
         return userId;
     }
