@@ -101,7 +101,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
     }));
     searchState.setGridRef(dataGridRef);
     searchState.setReplaceHandler(handleCellChange);
-  }, [searchState, tableData]);
+  }, [searchState, tableData, handleCellChange]);
 
   useHotkeys(
     'mod+f',
@@ -250,7 +250,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
     return () => {
       tableData.editor?.action.removeHandler(syncEditor);
     };
-  }, [tableData.editor, selectionAction, handlers, tableData, restoreFocus]);
+  }, [tableData.editor, selectionAction, handlers, tableData, restoreFocus, searchState.suppressEditorSelection]);
 
   const handleFocusChange = (position: ICellPosition) => {
     focusedCell.current = position;

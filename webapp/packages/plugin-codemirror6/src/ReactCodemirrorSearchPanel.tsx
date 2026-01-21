@@ -163,7 +163,7 @@ export const ReactCodemirrorSearchPanel: React.FC<Props> = observer(function Rea
     }
 
     return undefined;
-  }, [view, top, compartment]);
+  }, [view, top, compartment, dom]);
 
   useLayoutEffect(() => {
     if (className) {
