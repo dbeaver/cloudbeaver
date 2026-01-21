@@ -31,6 +31,20 @@ export function getOSSpecificKeys(keyBinding: IKeyBinding): string[] {
   return [];
 }
 
+export function getShortcutLabelKeys(keyBinding: IKeyBinding | undefined): string[] {
+  if (keyBinding === undefined) {
+    return [];
+  }
+
+  const osKeys = getOSSpecificKeys(keyBinding);
+
+  if (osKeys.length) {
+    return osKeys;
+  }
+
+  return getKeys(keyBinding.keys);
+}
+
 function getKeys(keys: string[] | string | undefined): string[] {
   return (Array.isArray(keys) ? keys : [keys ?? '']).filter(Boolean);
 }
