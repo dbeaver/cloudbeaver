@@ -17,8 +17,6 @@ import {
 import {
   KEY_BINDING_ADD_NEW_ROW,
   KEY_BINDING_CANCEL,
-  KEY_BINDING_DATA_VIEWER_REDO,
-  KEY_BINDING_DATA_VIEWER_UNDO,
   KEY_BINDING_DELETE_ROW,
   KEY_BINDING_DUPLICATE_ROW,
   KEY_BINDING_REVERT_INLINE_EDITOR_CHANGES,
@@ -97,11 +95,11 @@ export const DATA_VIEWER_SHORTCUTS: IShortcut[] = [
   },
   {
     label: 'ui_undo',
-    code: transformKeys(KEY_BINDING_DATA_VIEWER_UNDO),
+    code: transformKeys(KEY_BINDING_UNDO),
   },
   {
     label: 'ui_redo',
-    code: transformKeys(KEY_BINDING_DATA_VIEWER_REDO),
+    code: transformKeys(KEY_BINDING_REDO),
   },
 ];
 
