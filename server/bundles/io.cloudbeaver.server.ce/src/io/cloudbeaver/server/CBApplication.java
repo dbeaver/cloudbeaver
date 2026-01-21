@@ -16,7 +16,6 @@
  */
 package io.cloudbeaver.server;
 
-import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.auth.NoAuthCredentialsProvider;
 import io.cloudbeaver.model.CBWebServerConfig;
@@ -29,7 +28,6 @@ import io.cloudbeaver.model.cli.CloudBeaverInstanceServer;
 import io.cloudbeaver.model.config.CBAppConfig;
 import io.cloudbeaver.model.config.CBServerConfig;
 import io.cloudbeaver.registry.WebDriverRegistry;
-import io.cloudbeaver.registry.WebFeatureRegistry;
 import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.server.jetty.CBJettyServer;
 import io.cloudbeaver.service.DBWServiceInitializer;
@@ -38,7 +36,6 @@ import io.cloudbeaver.service.security.CBEmbeddedSecurityController;
 import io.cloudbeaver.service.session.CBSessionManager;
 import io.cloudbeaver.utils.ServletAppUtils;
 import io.cloudbeaver.utils.WebDataSourceUtils;
-import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.osgi.service.datalocation.Location;
 import org.jkiss.code.NotNull;
@@ -47,7 +44,6 @@ import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBConstants;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
-import org.jkiss.dbeaver.model.DBUtils;
 import org.jkiss.dbeaver.model.app.DBPPlatform;
 import org.jkiss.dbeaver.model.auth.AuthInfo;
 import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
@@ -81,7 +77,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public abstract class CBApplication<T extends CBServerConfig>
     extends BaseServletApplication
-    implements ServletAuthApplication, WebApplication, IAdaptable {
+    implements ServletAuthApplication, WebApplication {
 
     private static final Log log = Log.getLog(CBApplication.class);
 
@@ -338,15 +334,11 @@ public abstract class CBApplication<T extends CBServerConfig>
         }
     }
 
-    private void refreshEnabledFeatures() throws DBException {
-        WebFeatureRegistry featureRegistry = DBUtils.getAdapter(WebFeatureRegistry.class, ServletAppUtils.getServletApplication());
-        if (featureRegistry == null) {
-            throw new DBWebException("Feature registry not found");
-        }
+    private void refreshEnabledFeatures() {
         Set<String> enabledFeatures = new LinkedHashSet<>(Arrays.asList(getAppConfiguration().getEnabledFeatures()));
         Set<String> disabledFeatures = new LinkedHashSet<>(Arrays.asList(getAppConfiguration().getDisabledFeatures()));
 
-        featureRegistry.getWebFeatures().stream()
+        ServletAppUtils.getServletApplication().getFeatureRegistry().getWebFeatures().stream()
             .filter(f -> f.isEnabledByDefault() && !disabledFeatures.contains(f.getId()))
             .forEach(f -> enabledFeatures.add(f.getId()));
 
@@ -822,11 +814,6 @@ public abstract class CBApplication<T extends CBServerConfig>
     @Nullable
     public <T> T getApplicationContextValue(@NotNull String key) {
         return (T) applicationContext.get(key);
-    }
-
-    @Override
-    public <T> T getAdapter(@NotNull Class<T> adapter) {
-        return null;
     }
 
     protected CloudBeaverInstanceServer createInstanceServer() throws IOException {

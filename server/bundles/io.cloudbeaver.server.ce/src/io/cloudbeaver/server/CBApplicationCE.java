@@ -91,6 +91,12 @@ public class CBApplicationCE extends CBApplication<CBServerConfig> {
         return new LocalFileController(DBWorkbench.getPlatform().getWorkspace().getAbsolutePath().resolve(DBFileController.DATA_FOLDER));
     }
 
+    @NotNull
+    @Override
+    public WebFeatureRegistry getFeatureRegistry() {
+        return WebFeatureRegistry.getInstance();
+    }
+
     @Override
     public CBServerConfigurationControllerEmbedded<CBServerConfig> getServerConfigurationController() {
         return serverConfigController;
@@ -104,13 +110,5 @@ public class CBApplicationCE extends CBApplication<CBServerConfig> {
         if (securityController instanceof CBEmbeddedSecurityController<?> embeddedSecurityController) {
             embeddedSecurityController.finishConfiguration(adminName, adminPassword, authInfoList);
         }
-    }
-
-    @Override
-    public <T> T getAdapter(@NotNull Class<T> adapter) {
-        if (adapter.isAssignableFrom(WebFeatureRegistry.class)) {
-            return adapter.cast(WebFeatureRegistry.getInstance());
-        }
-        return super.getAdapter(adapter);
     }
 }
