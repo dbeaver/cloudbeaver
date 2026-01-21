@@ -45,6 +45,7 @@
     "@cloudbeaver/plugin-codemirror6": "workspace:*",
     "@cloudbeaver/plugin-data-viewer": "workspace:*",
     "@cloudbeaver/plugin-navigation-tabs": "workspace:*",
+    "@cloudbeaver/plugin-sql-editor-codemirror": "workspace:*",
     "@dbeaver/js-helpers": "workspace:^",
     "mobx": "^6",
     "mobx-react-lite": "^4",

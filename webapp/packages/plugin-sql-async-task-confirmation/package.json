@@ -31,7 +31,7 @@
     "@cloudbeaver/core-root": "workspace:*",
     "@cloudbeaver/core-sdk": "workspace:*",
     "@cloudbeaver/plugin-codemirror6": "workspace:*",
-    "@cloudbeaver/plugin-sql-editor-new": "workspace:*",
+    "@cloudbeaver/plugin-sql-editor-codemirror": "workspace:*",
     "mobx": "^6",
     "mobx-react-lite": "^4",
     "react": "^19",
