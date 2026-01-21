@@ -32,7 +32,6 @@ export {
   type SearchPanelProps,
   type SearchPanelRef,
   type SearchPanelQuery,
-  type SearchPanelStrings,
 } from './SearchPanel/SearchPanel.js';
 export {
   Select,
