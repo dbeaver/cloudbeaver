@@ -9,7 +9,12 @@ import { observer } from 'mobx-react-lite';
 import { useCallback, useLayoutEffect, useMemo, useRef, type HTMLAttributes } from 'react';
 import { reaction } from 'mobx';
 
-import { getComputed, TextPlaceholder, useObjectRef, useTranslate, useHotkeys } from '@cloudbeaver/core-blocks';
+import {
+  getComputed,
+  TextPlaceholder,
+  useObjectRef,
+  useTranslate,
+} from '@cloudbeaver/core-blocks';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { useCaptureViewContext } from '@cloudbeaver/core-view';
 import {
@@ -44,6 +49,7 @@ import {
   type IGridEditActionData,
   type IGridDataKey,
 } from '@cloudbeaver/plugin-data-viewer';
+import { useGridSearch, type IGridSearchAdapter, type IGridScrollController, GridSearchPanel } from '@cloudbeaver/plugin-grid-search';
 
 import { CellRenderer } from './CellRenderer/CellRenderer.js';
 import { DataGridContext, type IDataGridContext } from './DataGridContext.js';
@@ -59,9 +65,7 @@ import { useGridSelectedCellsCopy } from './useGridSelectedCellsCopy.js';
 import { useTableData } from './useTableData.js';
 import { TableColumnHeader } from './TableColumnHeader/TableColumnHeader.js';
 import { TableIndexColumnHeader } from './TableColumnHeader/TableIndexColumnHeader.js';
-import { useDataGridSearchState } from './DataGridSearchProvider.js';
 import { clsx, type SearchPanelRef } from '@dbeaver/ui-kit';
-import { SearchPanelObserver } from './SearchPanelObserver.js';
 
 const ROW_HEIGHT = 24;
 export const HEADER_HEIGHT = 32;
@@ -74,7 +78,6 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
   const focusedCell = useRef<ICellPosition | null>(null);
   const focusSyncRef = useRef<ICellPosition | null>(null);
   const dataGridRef = useRef<DataGridRef>(null);
-  const searchState = useDataGridSearchState();
   const searchPanelRef = useRef<SearchPanelRef>(null);
 
   const selectionAction = model.source.getAction(resultIndex, IDatabaseDataSelectAction, GridSelectAction);
@@ -86,10 +89,10 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
   const getHeaderOrder = useCallback(() => (dataGridRef.current?.getColumnsOrdered() ?? []).map(col => col.key), [dataGridRef]);
   const gridSelectionContext = useGridSelectionContext(tableData, selectionAction, getHeaderOrder);
 
-  useLayoutEffect(() => {
-    searchState.setTableData(() => ({
-      rows: tableData.rows,
-      columns: tableData.columns,
+  const searchAdapter = useMemo<IGridSearchAdapter>(
+    () => ({
+      getRowCount: () => tableData.rows.length,
+      getColumnCount: () => tableData.columns.length,
       getCellText: (rowIdx: number, colIdx: number) => {
         const row = tableData.rows[rowIdx];
         const column = tableData.getColumn(colIdx)?.key;
@@ -98,20 +101,40 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
         }
         return tableData.format.getText(tableData.format.get({ row, column }));
       },
-    }));
-    searchState.setGridRef(dataGridRef);
-    searchState.setReplaceHandler(handleCellChange);
-  }, [searchState, tableData, handleCellChange]);
+      setCellValue: (rowIdx: number, colIdx: number, value: string) => {
+        const row = tableData.rows[rowIdx];
+        const column = tableData.getColumn(colIdx)?.key;
+        if (!row || !column) {
+          return;
+        }
+        tableData.editor?.set({ row, column }, value);
+      },
+    }),
+    [tableData],
+  );
 
-  useHotkeys(
-    'mod+f',
-    e => {
-      e.preventDefault();
-      if (isGridInFocus()) {
-        searchState.openSearch(() => searchPanelRef.current?.focus());
-      }
+  const scrollController = useMemo<IGridScrollController>(
+    () => ({
+      scrollToCell: pos => dataGridRef.current?.scrollToDataCell(pos),
+    }),
+    [],
+  );
+
+  const searchState = useGridSearch(`data-grid-${model.id}-${resultIndex}`, searchAdapter, scrollController, gridContainerRef, {
+    onOpen: () => searchPanelRef.current?.focus(),
+  });
+
+  const getCellClassName = useCreateGridReactiveValue(
+    (rowIdx, colIdx) => {
+      const className = searchState.getCellClassName(rowIdx, colIdx);
+      return className;
     },
-    { enableOnFormTags: true },
+    (onChange, rowIdx, colIdx) =>
+      reaction(
+        () => searchState.getCellClassName(rowIdx, colIdx),
+        onChange,
+      ),
+    [searchState],
   );
 
   const restoreFocus = useCallback(
@@ -293,8 +316,9 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
       isGridInFocus,
       getDataGridApi: () => dataGridRef.current,
       focus: restoreFocus,
+      searchState,
     }),
-    [model, actions, resultIndex, simple, dataGridRef, restoreFocus],
+    [model, actions, resultIndex, simple, dataGridRef, restoreFocus, searchState],
   );
 
   const columnsCount = useCreateGridReactiveValue(
@@ -552,6 +576,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
                 cellElement={cellElement}
                 rowElement={rowElement}
                 getCellEditable={isCellEditable}
+                getCellClassName={getCellClassName}
                 headerElement={headerElement}
                 getHeaderHeight={() => headerHeight}
                 getHeaderWidth={getHeaderWidth}
@@ -574,7 +599,12 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
               />
             </div>
           </FormattingContext.Provider>
-          <SearchPanelObserver state={searchState} panelRef={searchPanelRef} isReadOnly={model.isReadonly(resultIndex)} />
+          <GridSearchPanel
+            ref={searchPanelRef}
+            state={searchState}
+            isReadOnly={model.isReadonly(resultIndex)}
+            className="tw:bg-(--theme-secondary) tw:px-0.5! tw:py-1! tw:mb-0!"
+          />
         </TableDataContext.Provider>
       </DataGridSelectionContext.Provider>
     </DataGridContext.Provider>

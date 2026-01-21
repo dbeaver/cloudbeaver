@@ -30,11 +30,11 @@ import { DataGridContextMenuFilterService } from './DataGrid/DataGridContextMenu
 import { DataGridContextMenuOrderService } from './DataGrid/DataGridContextMenu/DataGridContextMenuOrderService.js';
 import { DataGridContextMenuSaveContentService } from './DataGrid/DataGridContextMenu/DataGridContextMenuSaveContentService.js';
 import { DataGridSettingsService } from './DataGridSettingsService.js';
-import { SEARCH_STATE_PREFIX, SearchStateService } from './DataGridSearchStateService.js';
 import { ACTION_DATA_GRID_PIN_COLUMN } from './DataGrid/Actions/Pin/ACTION_DATA_GRID_PIN_COLUMN.js';
 import { ACTION_DATA_GRID_UNPIN_COLUMN } from './DataGrid/Actions/Pin/ACTION_DATA_GRID_UNPIN_COLUMN.js';
 import { ACTION_DATA_GRID_UNPIN_ALL_COLUMNS } from './DataGrid/Actions/Pin/ACTION_DATA_GRID_UNPIN_ALL_COLUMNS.js';
 import { ACTION_DATA_GRID_FILTERS_RESET_OR_SORTING } from './DataGrid/Actions/Filters/ACTION_DATA_GRID_FILTERS_RESET_OR_SORTING.js';
+import { GridSearchService } from '@cloudbeaver/plugin-grid-search';
 
 const VALUE_TEXT_PRESENTATION_ID = 'value-text-presentation';
 
@@ -47,7 +47,7 @@ const SpreadsheetGrid = importLazyComponent(() => import('./SpreadsheetGrid.js')
   DataGridContextMenuFilterService,
   DataGridContextMenuCellEditingService,
   DataGridContextMenuSaveContentService,
-  SearchStateService,
+  GridSearchService,
   TableViewerStorageService,
   ActionService,
   MenuService,
@@ -61,7 +61,7 @@ export class SpreadsheetBootstrap extends Bootstrap {
     private readonly dataGridContextMenuFilterService: DataGridContextMenuFilterService,
     private readonly dataGridContextMenuCellEditingService: DataGridContextMenuCellEditingService,
     private readonly dataGridContextMenuSaveContentService: DataGridContextMenuSaveContentService,
-    private readonly searchStateService: SearchStateService,
+    private readonly gridSearchService: GridSearchService,
     private readonly tableViewerStorageService: TableViewerStorageService,
     private readonly actionService: ActionService,
     private readonly menuService: MenuService,
@@ -104,8 +104,8 @@ export class SpreadsheetBootstrap extends Bootstrap {
     this.tableViewerStorageService.onChange.addHandler(({ type, model }: ITableViewerStorageChangeEventData) => {
       if (type === 'remove') {
         const modelId = model.id;
-        const prefix = `${SEARCH_STATE_PREFIX}-${modelId}-`;
-        this.searchStateService.clearByPrefix(prefix);
+        const prefix = `data-grid-${modelId}-`;
+        this.gridSearchService.clearByPrefix(prefix);
       }
     });
 

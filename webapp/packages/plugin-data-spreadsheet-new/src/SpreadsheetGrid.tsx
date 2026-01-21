@@ -8,15 +8,7 @@
 import type { IDataPresentationProps } from '@cloudbeaver/plugin-data-viewer';
 
 import { DataGridTable } from './DataGrid/DataGridTableLoader.js';
-import { useDataGridSearch } from './DataGrid/useDataGridSearch.js';
-import { DataGridSearchStateContext } from './DataGrid/DataGridSearchProvider.js';
 
-export const SpreadsheetGrid: React.FC<IDataPresentationProps> = function SpreadsheetGrid({ model, resultIndex, ...rest }) {
-  const searchState = useDataGridSearch(model.id, resultIndex);
-
-  return (
-    <DataGridSearchStateContext value={searchState}>
-      <DataGridTable {...rest} model={model} resultIndex={resultIndex} />
-    </DataGridSearchStateContext>
-  );
+export const SpreadsheetGrid: React.FC<IDataPresentationProps> = function SpreadsheetGrid(props) {
+  return <DataGridTable {...props} />;
 };

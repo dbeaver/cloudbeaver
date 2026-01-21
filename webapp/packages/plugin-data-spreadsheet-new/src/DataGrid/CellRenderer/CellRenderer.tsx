@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@ import { DataGridContext } from '../DataGridContext.js';
 import { DataGridSelectionContext } from '../DataGridSelection/DataGridSelectionContext.js';
 import { TableDataContext, type IColumnInfo } from '../TableDataContext.js';
 import { CellContext } from './CellContext.js';
-import { useDataGridSearchState } from '../DataGridSearchProvider.js';
 
 interface Props {
   rowIdx: number;
@@ -33,7 +32,6 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
   const dataGridContext = useContext(DataGridContext);
   const tableDataContext = useContext(TableDataContext);
   const selectionContext = useContext(DataGridSelectionContext);
-  const searchState = useDataGridSearchState();
 
   const cellContext = useObservableRef(
     () => ({
@@ -98,8 +96,6 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
       'rdg-cell-custom-added': cellContext.editionState === DatabaseEditChangeType.add,
       'rdg-cell-custom-deleted': cellContext.editionState === DatabaseEditChangeType.delete,
       'rdg-cell-custom-edited': cellContext.editionState === DatabaseEditChangeType.update,
-      'rdg-cell-search-match': searchState.isMatch(rowIdx, colIdx),
-      'rdg-cell-search-active': searchState.isActiveMatch(rowIdx, colIdx),
     }),
   );
 

@@ -14,7 +14,6 @@ import { DataGridContextMenuSaveContentService } from './DataGrid/DataGridContex
 import { DataGridContextMenuOrderService } from './DataGrid/DataGridContextMenu/DataGridContextMenuOrderService.js';
 import { DataGridContextMenuFilterService } from './DataGrid/DataGridContextMenu/DataGridContextMenuFilter/DataGridContextMenuFilterService.js';
 import { DataGridContextMenuCellEditingService } from './DataGrid/DataGridContextMenu/DataGridContextMenuCellEditingService.js';
-import { SearchStateService } from './DataGridSearchStateService.js';
 
 export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-data-spreadsheet-new',
@@ -25,7 +24,6 @@ export default ModuleRegistry.add({
       .addSingleton(Bootstrap, SpreadsheetBootstrap)
       .addSingleton(Bootstrap, LocaleService)
       .addSingleton(DataGridContextMenuCellEditingService)
-      .addSingleton(SearchStateService)
       .addSingleton(DataGridSettingsService)
       .addSingleton(DataGridContextMenuSaveContentService)
       .addSingleton(DataGridContextMenuOrderService)

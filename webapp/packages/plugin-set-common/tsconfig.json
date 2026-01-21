@@ -191,6 +191,9 @@
       "path": "../plugin-gis-viewer"
     },
     {
+      "path": "../plugin-grid-search"
+    },
+    {
       "path": "../plugin-help"
     },
     {

@@ -2905,6 +2905,7 @@ __metadata:
     "@cloudbeaver/plugin-data-grid": "workspace:*"
     "@cloudbeaver/plugin-data-viewer": "workspace:*"
     "@cloudbeaver/plugin-data-viewer-conditional-formatting": "workspace:*"
+    "@cloudbeaver/plugin-grid-search": "workspace:^"
     "@cloudbeaver/tsconfig": "workspace:*"
     "@dbeaver/cli": "workspace:*"
     "@dbeaver/js-helpers": "workspace:*"
@@ -3252,6 +3253,29 @@ __metadata:
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
     wellknown: "npm:^0"
+  languageName: unknown
+  linkType: soft
+
+"@cloudbeaver/plugin-grid-search@workspace:^, @cloudbeaver/plugin-grid-search@workspace:packages/plugin-grid-search":
+  version: 0.0.0-use.local
+  resolution: "@cloudbeaver/plugin-grid-search@workspace:packages/plugin-grid-search"
+  dependencies:
+    "@cloudbeaver/core-blocks": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-utils": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
+    "@dbeaver/ui-kit": "workspace:^"
+    "@types/react": "npm:^19"
+    "@types/react-dom": "npm:^19"
+    mobx: "npm:^6"
+    mobx-react-lite: "npm:^4"
+    react: "npm:^19"
+    react-dom: "npm:^19"
+    rimraf: "npm:^6"
+    tslib: "npm:^2"
+    typescript: "npm:^5"
+    typescript-plugin-css-modules: "npm:^5"
   languageName: unknown
   linkType: soft
 
@@ -3856,6 +3880,7 @@ __metadata:
     "@cloudbeaver/plugin-ddl-viewer": "workspace:*"
     "@cloudbeaver/plugin-devtools": "workspace:*"
     "@cloudbeaver/plugin-gis-viewer": "workspace:*"
+    "@cloudbeaver/plugin-grid-search": "workspace:^"
     "@cloudbeaver/plugin-help": "workspace:*"
     "@cloudbeaver/plugin-holidays": "workspace:*"
     "@cloudbeaver/plugin-holidays-administration": "workspace:*"

@@ -2,8 +2,21 @@
 @import url('react-data-grid/lib/styles.css') layer(components);
 
 @layer components.rdg.Cell {
+  .theme-dark, .theme-light {
+    --theme-highlighted-cell-background: #ffff0054;
+    --theme-search-active-cell-background: #ff6a0054;
+  }
+
   .rdg {
     --dbv-kit-icon-btn-outline-width: 1px;
+  }
+
+  .rdg-cell-search-match {
+    background-color: var(--theme-highlighted-cell-background) !important;
+  }
+
+  .rdg-cell-search-active {
+    background-color: var(--theme-search-active-cell-background) !important;
   }
 
   @media (prefers-color-scheme: dark) {

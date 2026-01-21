@@ -82,6 +82,7 @@
     "@cloudbeaver/plugin-ddl-viewer": "workspace:*",
     "@cloudbeaver/plugin-devtools": "workspace:*",
     "@cloudbeaver/plugin-gis-viewer": "workspace:*",
+    "@cloudbeaver/plugin-grid-search": "workspace:^",
     "@cloudbeaver/plugin-help": "workspace:*",
     "@cloudbeaver/plugin-holidays": "workspace:*",
     "@cloudbeaver/plugin-holidays-administration": "workspace:*",

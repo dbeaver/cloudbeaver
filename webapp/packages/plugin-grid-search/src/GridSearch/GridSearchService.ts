@@ -7,48 +7,19 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
-import { DataGridSearchStore } from './DataGrid/DataGridSearchStore.js';
 
-export interface IDataGridSearchCache {
-  query: {
-    search: string;
-    replace: string;
-    caseSensitive: boolean;
-    wholeWord: boolean;
-    regexp: boolean;
-  };
-  open: boolean;
-  replaceOpen: boolean;
-  activeMatchIdx: number;
-}
-
-export const SEARCH_STATE_PREFIX = 'data-grid-search';
-
-export function createDefaultSearch(): IDataGridSearchCache {
-  return {
-    query: {
-      search: '',
-      replace: '',
-      caseSensitive: false,
-      wholeWord: false,
-      regexp: false,
-    },
-    open: false,
-    replaceOpen: false,
-    activeMatchIdx: -1,
-  };
-}
+import { createDefaultSearchCache, GridSearchStore } from './GridSearchStore.js';
 
 @injectable()
-export class SearchStateService {
-  private readonly stores = new Map<string, DataGridSearchStore>();
+export class GridSearchService {
+  private readonly stores = new Map<string, GridSearchStore>();
 
-  getOrCreateStore(key: string): DataGridSearchStore {
+  getOrCreateStore(key: string): GridSearchStore {
     if (this.stores.has(key)) {
       return this.stores.get(key)!;
     }
 
-    const store = new DataGridSearchStore(createDefaultSearch());
+    const store = new GridSearchStore(createDefaultSearchCache());
     this.stores.set(key, store);
     return store;
   }
@@ -81,4 +52,3 @@ export class SearchStateService {
     return this.stores.has(key);
   }
 }
-
