@@ -40,7 +40,7 @@ export const SearchOnly = () => {
   const ref = useRef<SearchPanelRef>(null);
 
   return (
-    <div className="tw:max-w-[340px] tw:relative tw:border tw-border-solid tw-border-transparent">
+    <div className="tw:relative tw:border tw-border-solid tw-border-transparent">
       <div style={{ display: 'none' }} dangerouslySetInnerHTML={{ __html: icons }} />
       <SearchPanel
         ref={ref}
@@ -70,7 +70,7 @@ export const SearchWithReplace = () => {
   const ref = useRef<SearchPanelRef>(null);
 
   return (
-    <div className="tw:max-w-[340px] tw:border tw:rounded">
+    <div className="tw:border tw:rounded">
       <div style={{ display: 'none' }} dangerouslySetInnerHTML={{ __html: icons }} />
       <SearchPanel
         ref={ref}
