@@ -51,7 +51,7 @@ export class GridEditHistoryManager<TKey extends IGridDataKey, TCell> {
   }
 
   recordCellEdit(key: TKey, value: TCell, editorAccess: IEditorDataAccess<TCell>): void {
-    this.compressCellEditHistory(key);
+    this.compressLastEditedCellHistory(key);
 
     this.history.add({
       source: GRID_HISTORY_SOURCE.EDIT_CELL,
@@ -64,7 +64,7 @@ export class GridEditHistoryManager<TKey extends IGridDataKey, TCell> {
   }
 
   recordAddRow(key: TKey, editorAccess: IEditorDataAccess<TCell>): void {
-    this.compressCellEditHistory();
+    this.compressLastEditedCellHistory();
 
     const update = editorAccess.getUpdate(key.row);
     const value = update?.update;
@@ -79,7 +79,7 @@ export class GridEditHistoryManager<TKey extends IGridDataKey, TCell> {
   }
 
   recordDeleteRow(key: TKey, editorAccess: IEditorDataAccess<TCell>): void {
-    this.compressCellEditHistory();
+    this.compressLastEditedCellHistory();
 
     const rowValue = editorAccess.getRowValue(key.row);
     const update = editorAccess.getUpdate(key.row);
@@ -95,7 +95,7 @@ export class GridEditHistoryManager<TKey extends IGridDataKey, TCell> {
   }
 
   recordDuplicateRow(keys: Array<{ key: TKey; value?: TCell[] }>): void {
-    this.compressCellEditHistory();
+    this.compressLastEditedCellHistory();
 
     this.history.add({
       source: GRID_HISTORY_SOURCE.DUPLICATE_ROW,
@@ -106,7 +106,7 @@ export class GridEditHistoryManager<TKey extends IGridDataKey, TCell> {
   }
 
   recordRevert(data: IGridHistoryRevertData<TKey, TCell>): void {
-    this.compressCellEditHistory();
+    this.compressLastEditedCellHistory();
 
     this.history.add({
       source: GRID_HISTORY_SOURCE.REVERT,
@@ -115,7 +115,7 @@ export class GridEditHistoryManager<TKey extends IGridDataKey, TCell> {
   }
 
   recordCancel(data: IGridHistoryCancelData<TKey, TCell>): void {
-    this.compressCellEditHistory();
+    this.compressLastEditedCellHistory();
 
     this.history.add({
       source: GRID_HISTORY_SOURCE.CANCEL,
@@ -123,7 +123,7 @@ export class GridEditHistoryManager<TKey extends IGridDataKey, TCell> {
     });
   }
 
-  private compressCellEditHistory(key?: TKey): void {
+  private compressLastEditedCellHistory(key?: TKey): void {
     const currentHistoryEntry = this.history.getCurrentEntry();
 
     if (!currentHistoryEntry || !isGridHistoryEditCellData<TKey, TCell>(currentHistoryEntry)) {
@@ -131,29 +131,34 @@ export class GridEditHistoryManager<TKey extends IGridDataKey, TCell> {
     }
 
     const isEditingSameCell = key && GridDataKeysUtils.isElementsKeyEqual(currentHistoryEntry.data.key, key);
-    const shouldCompressHistory = !isEditingSameCell;
 
-    if (shouldCompressHistory) {
-      this.history.compress(
-        entry => isGridHistoryEditCellData<TKey, TCell>(entry) && GridDataKeysUtils.isElementsKeyEqual(entry.data.key, currentHistoryEntry.data.key),
-        entries => {
-          const firstEntry = entries[0]!;
-          const lastEntry = entries[entries.length - 1]!;
-          if (!isGridHistoryEditCellData<TKey, TCell>(firstEntry) || !isGridHistoryEditCellData<TKey, TCell>(lastEntry)) {
-            throw new Error('Invalid history entry type');
-          }
-          return {
-            source: GRID_HISTORY_SOURCE.EDIT_CELL,
-            data: {
-              key: currentHistoryEntry.data.key,
-              value: lastEntry.data.value,
-              prevValue: firstEntry.data.prevValue,
-            },
-          };
-        },
-        'lastSequence',
-      );
+    if (isEditingSameCell) {
+      return;
     }
+
+    this.compressCellEditHistory(currentHistoryEntry.data.key);
+  }
+
+  private compressCellEditHistory(key: TKey): void {
+    this.history.compress(
+      entry => isGridHistoryEditCellData<TKey, TCell>(entry) && GridDataKeysUtils.isElementsKeyEqual(entry.data.key, key),
+      entries => {
+        const firstEntry = entries[0]!;
+        const lastEntry = entries[entries.length - 1]!;
+        if (!isGridHistoryEditCellData<TKey, TCell>(firstEntry) || !isGridHistoryEditCellData<TKey, TCell>(lastEntry)) {
+          throw new Error('Invalid history entry type');
+        }
+        return {
+          source: GRID_HISTORY_SOURCE.EDIT_CELL,
+          data: {
+            key,
+            value: lastEntry.data.value,
+            prevValue: firstEntry.data.prevValue,
+          },
+        };
+      },
+      'lastSequence',
+    );
   }
 
   private getPrevCellValue(key: TKey, editorAccess: IEditorDataAccess<TCell>): TCell {

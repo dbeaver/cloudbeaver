@@ -26,6 +26,8 @@ export type CompressionMode = 'all' | 'lastSequence';
 export type EntryComparator<TData> = (entry: IHistoryEntry<TData>, prevEntry: IHistoryEntry<TData> | null) => boolean;
 export type CompressedEntryFactory<TData> = (entries: IHistoryEntry<TData>[]) => Omit<IHistoryEntry<TData>, 'timestamp'>;
 
+const MAX_HISTORY_SIZE = 50;
+
 @injectable(() => [IDatabaseDataSource, IDatabaseDataResult])
 export class GridHistoryAction<TData = unknown, TResult extends IDatabaseDataResult = IDatabaseDataResult> extends DatabaseDataAction<any, TResult> {
   readonly onAdd: ISyncExecutor<IHistoryEntry<TData>>;
@@ -43,7 +45,7 @@ export class GridHistoryAction<TData = unknown, TResult extends IDatabaseDataRes
     this.history = [];
     this.currentIndex = -1;
 
-    makeObservable<this, 'history' | 'currentIndex'>(this, {
+    makeObservable<this, 'history' | 'currentIndex' | 'enforceHistoryLimit'>(this, {
       history: observable.shallow,
       currentIndex: observable,
       replaceLast: action,
@@ -51,6 +53,7 @@ export class GridHistoryAction<TData = unknown, TResult extends IDatabaseDataRes
       undo: action,
       redo: action,
       compress: action,
+      enforceHistoryLimit: action,
     });
   }
 
@@ -62,6 +65,7 @@ export class GridHistoryAction<TData = unknown, TResult extends IDatabaseDataRes
 
     this.truncateFutureEntries();
     this.history.push(newEntry);
+    this.enforceHistoryLimit();
     this.currentIndex = this.history.length - 1;
 
     this.onAdd.execute(newEntry);
@@ -147,6 +151,13 @@ export class GridHistoryAction<TData = unknown, TResult extends IDatabaseDataRes
   private truncateFutureEntries(): void {
     if (this.currentIndex < this.history.length - 1) {
       this.history.splice(this.currentIndex + 1);
+    }
+  }
+
+  private enforceHistoryLimit(): void {
+    if (this.history.length > MAX_HISTORY_SIZE) {
+      const excess = this.history.length - MAX_HISTORY_SIZE;
+      this.history.splice(0, excess);
     }
   }
 
