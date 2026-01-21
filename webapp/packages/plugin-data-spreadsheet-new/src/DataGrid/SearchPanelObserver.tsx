@@ -22,7 +22,7 @@ export const SearchPanelObserver = observer(function SearchPanelObserver({
   return state.open ? (
     <SearchPanel
       ref={panelRef}
-      className="tw:bg-(--theme-secondary) tw:px-0! tw:py-1! tw:mb-0!"
+      className="tw:bg-(--theme-secondary) tw:px-0.5! tw:py-1! tw:mb-0!"
       isReadOnly={isReadOnly}
       query={state.query}
       defaultShowReplace={state.replaceOpen}
