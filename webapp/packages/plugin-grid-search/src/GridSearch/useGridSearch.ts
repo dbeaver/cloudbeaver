@@ -6,72 +6,66 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { useLayoutEffect, useMemo, useRef, type RefObject } from 'react';
+import { useLayoutEffect, useMemo, type RefObject } from 'react';
+import { reaction } from 'mobx';
 
 import { useService } from '@cloudbeaver/core-di';
 
 import { useHotkeys } from '@cloudbeaver/core-blocks';
+import type { SearchPanelRef } from '@dbeaver/ui-kit';
 import { GridSearchService } from './GridSearchService.js';
-import type { IGridSearchAdapter, IGridScrollController, IGridSearchState } from './IGridSearchAdapter.js';
+import type { IGridSearchAdapter, IGridRef, IGridSearchState } from './IGridSearchAdapter.js';
 
-export interface UseGridSearchOptions {
-  /** Callback to invoke when search panel opens (e.g., to focus search input) */
-  onOpen?: () => void;
+interface IGridReactiveValue<T, TArgs extends any[]> {
+  get(...args: TArgs): T;
+  subscribe: (onValueChange: () => void, ...args: TArgs) => () => void;
 }
 
-/**
- * Hook to enable search functionality for a grid.
- *
- * @param id - Unique identifier for this search state (e.g., 'query-history-123')
- * @param adapter - Grid data adapter implementing IGridSearchAdapter
- * @param scrollController - Controller for scrolling to cells (can be null if not available yet)
- * @param containerRef - Reference to the container element for hotkey scoping
- * @param options - Optional configuration
- * @returns The grid search state object
- *
- * @example
- * ```tsx
- * const gridRef = useRef<DataGridRef>(null);
- * const containerRef = useRef<HTMLDivElement>(null);
- * const searchPanelRef = useRef<SearchPanelRef>(null);
- *
- * const adapter = useMemo(() => ({
- *   getRowCount: () => data.length,
- *   getColumnCount: () => columns.length,
- *   getCellText: (rowIdx, colIdx) => data[rowIdx][columns[colIdx]],
- * }), [data, columns]);
- *
- * const scrollController = useMemo(() => ({
- *   scrollToCell: (pos) => gridRef.current?.scrollToCell(pos),
- * }), []);
- *
- * const search = useGridSearch('grid', adapter, scrollController, containerRef, {
- *   onOpen: () => searchPanelRef.current?.focus(),
- * });
- * ```
- */
+export interface IGridSearchResult {
+  searchState: IGridSearchState;
+  getCellClassName: IGridReactiveValue<string | undefined, [rowIdx: number, colIdx: number]>;
+}
+
+export interface IGridSearchRefs {
+  /** Reference to the grid component with scrollToDataCell method */
+  gridRef: RefObject<IGridRef | null>;
+  /** Reference to the container element for hotkey scoping */
+  containerRef: RefObject<HTMLElement | null>;
+  /** Reference to the search panel for auto-focus on open */
+  searchPanelRef: RefObject<SearchPanelRef | null>;
+  /**
+   * Column index offset to apply when scrolling to cells.
+   * Use this when the grid has additional columns (e.g., selection checkbox) that aren't in the search adapter.
+   */
+  colIdxOffset?: number;
+}
+
 export function useGridSearch(
   id: string,
   adapter: IGridSearchAdapter,
-  scrollController: IGridScrollController | null,
-  containerRef: RefObject<HTMLElement | null>,
-  options?: UseGridSearchOptions,
-): IGridSearchState {
+  refs: IGridSearchRefs,
+): IGridSearchResult {
+  const { gridRef, containerRef, searchPanelRef, colIdxOffset = 0 } = refs;
   const service = useService(GridSearchService);
   const store = useMemo(() => service.getOrCreateStore(id), [id, service]);
-  const optionsRef = useRef(options);
-
-  useLayoutEffect(() => {
-    optionsRef.current = options;
-  }, [options]);
 
   useLayoutEffect(() => {
     store.setAdapter(adapter);
   }, [store, adapter]);
 
   useLayoutEffect(() => {
-    store.setScrollController(scrollController);
-  }, [store, scrollController]);
+    store.setScrollController(
+      gridRef.current?.scrollToDataCell
+        ? {
+            scrollToCell: pos =>
+              gridRef.current?.scrollToDataCell?.({
+                rowIdx: pos.rowIdx,
+                colIdx: pos.colIdx + colIdxOffset,
+              }),
+          }
+        : null,
+    );
+  }, [store, gridRef, colIdxOffset]);
 
   useHotkeys(
     'mod+f',
@@ -85,12 +79,29 @@ export function useGridSearch(
 
       const activeElement = document.activeElement;
       if (container.contains(activeElement) || container === activeElement) {
-        store.openSearch(() => optionsRef.current?.onOpen?.());
+        store.openSearch(() => searchPanelRef.current?.focus());
       }
     },
     { enableOnFormTags: true },
-    [store, containerRef],
+    [store, containerRef, searchPanelRef],
   );
 
-  return store;
+  const getCellClassName = useMemo(
+    () => ({
+      get: (rowIdx: number, colIdx: number) => {
+        const actualColIdx = colIdx - colIdxOffset;
+        return store.getCellClassName(rowIdx, actualColIdx);
+      },
+      subscribe: (onChange: () => void, rowIdx: number, colIdx: number) => {
+        const actualColIdx = colIdx - colIdxOffset;
+        return reaction(() => store.getCellClassName(rowIdx, actualColIdx), onChange);
+      },
+    }),
+    [store, colIdxOffset],
+  );
+
+  return {
+    searchState: store,
+    getCellClassName,
+  };
 }

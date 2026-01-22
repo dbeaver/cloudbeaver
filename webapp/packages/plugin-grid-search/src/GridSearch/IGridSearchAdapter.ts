@@ -12,6 +12,11 @@ export interface IGridSearchAdapter {
   getCellText: (rowIdx: number, colIdx: number) => string;
   setCellValue?: (rowIdx: number, colIdx: number, value: string) => void;
 }
+
+export interface IGridRef {
+  scrollToDataCell?: (pos: { rowIdx: number; colIdx: number }) => void;
+}
+
 export interface IGridScrollController {
   scrollToCell: (position: { rowIdx: number; colIdx: number }) => void;
 }
@@ -53,6 +58,3 @@ export interface IGridSearchState {
   getCellClassName: (rowIdx: number, colIdx: number) => string | undefined;
 }
 
-export interface IGridSearchContext {
-  suppressEditorSelection?: boolean;
-}
