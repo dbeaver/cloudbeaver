@@ -17,6 +17,7 @@ export function mapCodemirrorShortcuts(keyBinding: KeyBinding | KeyBinding[]): O
     keys: bindings.map(kb => kb.key?.split(CODEMIRROR_SHORTCUT_SPLITTER).join(SHORTCUT_DIVIDER) ?? ''),
     keysMac: bindings.map(kb => kb.mac?.split(CODEMIRROR_SHORTCUT_SPLITTER).join(SHORTCUT_DIVIDER) ?? ''),
     keysWin: bindings.map(kb => kb.win?.split(CODEMIRROR_SHORTCUT_SPLITTER).join(SHORTCUT_DIVIDER) ?? ''),
+    keysLinux: bindings.map(kb => kb.linux?.split(CODEMIRROR_SHORTCUT_SPLITTER).join(SHORTCUT_DIVIDER) ?? ''),
     preventDefault: bindings.some(kb => kb.preventDefault),
   };
 }

@@ -13,7 +13,8 @@ export type CompletionConfig = Parameters<typeof autocompletion>[0];
 
 // Shortcuts are case sensitive
 export const EDITOR_START_COMPLETION_KEYBINDING: KeyBinding = {
-  key: 'Ctrl-Space',
+  win: 'Mod-Space',
+  linux: 'Mod-Space',
   mac: 'Mod-Shift-Space',
   run: startCompletion,
   preventDefault: true,

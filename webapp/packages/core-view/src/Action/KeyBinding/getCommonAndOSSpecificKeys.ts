@@ -28,21 +28,11 @@ export function getOSSpecificKeys(keyBinding: IKeyBinding): string[] {
     return getKeys(keyBinding.keysMac);
   }
 
+  if (OS === OperatingSystem.linuxOS) {
+    return getKeys(keyBinding.keysLinux);
+  }
+
   return [];
-}
-
-export function getShortcutLabelKeys(keyBinding: IKeyBinding | undefined): string[] {
-  if (keyBinding === undefined) {
-    return [];
-  }
-
-  const osKeys = getOSSpecificKeys(keyBinding);
-
-  if (osKeys.length) {
-    return osKeys;
-  }
-
-  return getKeys(keyBinding.keys);
 }
 
 function getKeys(keys: string[] | string | undefined): string[] {

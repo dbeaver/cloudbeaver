@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { getOS, OperatingSystem } from '@cloudbeaver/core-utils';
-import { getShortcutLabelKeys } from './getCommonAndOSSpecificKeys.js';
+import { getCommonAndOSSpecificKeys } from './getCommonAndOSSpecificKeys.js';
 import type { IKeyBinding } from './IKeyBinding.js';
 
 const FORMAT_SHORTCUT_KEYS_MAP: Record<string, string> = {
@@ -37,7 +37,7 @@ export const SOURCE_DIVIDER_REGEXP = /\+/gi;
 export const APPLIED_DIVIDER = ` ${SHORTCUT_DIVIDER} `;
 
 export function transformKeys(keyBinding: IKeyBinding): string[] {
-  return getShortcutLabelKeys(keyBinding).map(shortcut =>
+  return getCommonAndOSSpecificKeys(keyBinding).map(shortcut =>
     shortcut.split(SOURCE_DIVIDER_REGEXP).map(formatKeyToDisplayKey).join(APPLIED_DIVIDER).toLocaleUpperCase(),
   );
 }

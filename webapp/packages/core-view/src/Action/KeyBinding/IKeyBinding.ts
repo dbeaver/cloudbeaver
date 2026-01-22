@@ -9,7 +9,9 @@
 export interface IKeyBinding {
   id: string;
   preventDefault?: boolean;
+  // use keys if it applied for all OS. otherwise use all OS specific keys to define shortcuts
   keys?: string | string[];
   keysWin?: string | string[];
   keysMac?: string | string[];
+  keysLinux?: string | string[];
 }
