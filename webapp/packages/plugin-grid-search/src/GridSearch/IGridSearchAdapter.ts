@@ -52,3 +52,7 @@ export interface IGridSearchState {
   /** Get CSS class names for cell based on search state (for highlighting) */
   getCellClassName: (rowIdx: number, colIdx: number) => string | undefined;
 }
+
+export interface IGridSearchContext {
+  suppressEditorSelection?: boolean;
+}

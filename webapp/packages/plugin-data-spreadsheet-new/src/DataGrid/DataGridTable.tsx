@@ -49,7 +49,7 @@ import {
   type IGridEditActionData,
   type IGridDataKey,
 } from '@cloudbeaver/plugin-data-viewer';
-import { useGridSearch, type IGridSearchAdapter, type IGridScrollController, GridSearchPanel } from '@cloudbeaver/plugin-grid-search';
+import { useGridSearch, type IGridSearchAdapter, type IGridScrollController, type IGridSearchContext, GridSearchPanel } from '@cloudbeaver/plugin-grid-search';
 
 import { CellRenderer } from './CellRenderer/CellRenderer.js';
 import { DataGridContext, type IDataGridContext } from './DataGridContext.js';
@@ -124,16 +124,16 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
     onOpen: () => searchPanelRef.current?.focus(),
   });
 
+  const searchContext = useMemo<IGridSearchContext>(
+    () => ({
+      suppressEditorSelection: searchState.suppressEditorSelection,
+    }),
+    [searchState],
+  );
+
   const getCellClassName = useCreateGridReactiveValue(
-    (rowIdx, colIdx) => {
-      const className = searchState.getCellClassName(rowIdx, colIdx);
-      return className;
-    },
-    (onChange, rowIdx, colIdx) =>
-      reaction(
-        () => searchState.getCellClassName(rowIdx, colIdx),
-        onChange,
-      ),
+    (rowIdx, colIdx) => searchState.getCellClassName(rowIdx, colIdx),
+    (onChange, rowIdx, colIdx) => reaction(() => searchState.getCellClassName(rowIdx, colIdx), onChange),
     [searchState],
   );
 
@@ -234,7 +234,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
         return;
       }
 
-      if (searchState.suppressEditorSelection) {
+      if (searchContext.suppressEditorSelection) {
         return;
       }
 
@@ -254,7 +254,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
     tableData.editor?.action.addHandler(syncEditor);
 
     function syncFocus(data: DatabaseDataSelectActionsData<Partial<IGridDataKey>>) {
-      if (searchState.suppressEditorSelection) {
+      if (searchContext.suppressEditorSelection) {
         return;
       }
 
@@ -273,7 +273,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
     return () => {
       tableData.editor?.action.removeHandler(syncEditor);
     };
-  }, [tableData.editor, selectionAction, handlers, tableData, restoreFocus, searchState.suppressEditorSelection]);
+  }, [tableData.editor, selectionAction, handlers, tableData, restoreFocus, searchContext.suppressEditorSelection]);
 
   const handleFocusChange = (position: ICellPosition) => {
     focusedCell.current = position;
@@ -316,9 +316,9 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
       isGridInFocus,
       getDataGridApi: () => dataGridRef.current,
       focus: restoreFocus,
-      searchState,
+      searchContext,
     }),
-    [model, actions, resultIndex, simple, dataGridRef, restoreFocus, searchState],
+    [model, actions, resultIndex, simple, dataGridRef, restoreFocus, searchContext],
   );
 
   const columnsCount = useCreateGridReactiveValue(

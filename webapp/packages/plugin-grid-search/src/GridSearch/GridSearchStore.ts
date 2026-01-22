@@ -293,7 +293,7 @@ export class GridSearchStore implements IGridSearchState {
   }
 
   getCellClassName(rowIdx: number, colIdx: number): string | undefined {
-    if (!this.query.search) {
+    if (!this.query?.search) {
       return undefined;
     }
 
