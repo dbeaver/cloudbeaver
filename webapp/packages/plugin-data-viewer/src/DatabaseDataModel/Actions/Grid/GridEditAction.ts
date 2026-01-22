@@ -172,7 +172,7 @@ export class GridEditAction<
 
   set(key: TKey, value: TCell): void {
     const [update] = this.getOrCreateUpdate(key.row, DatabaseEditChangeType.update);
-    const prevValue = update.source?.[key.column.index] as TCell;
+    const prevValue = update.update[key.column.index] as TCell;
 
     this.historyManager.recordCellEdit(key, value, prevValue);
 

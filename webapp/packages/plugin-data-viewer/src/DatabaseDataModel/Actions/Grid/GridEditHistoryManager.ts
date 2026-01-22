@@ -46,7 +46,7 @@ export class GridEditHistoryManager<TKey extends IGridDataKey, TCell> {
     this.history.clear();
   }
 
-  recordCellEdit(key: TKey, value: TCell, initialValue: TCell): void {
+  recordCellEdit(key: TKey, value: TCell, prevValue: TCell): void {
     this.compressLastEditedCellHistory(key);
 
     this.history.add({
@@ -54,7 +54,7 @@ export class GridEditHistoryManager<TKey extends IGridDataKey, TCell> {
       data: {
         key,
         value,
-        prevValue: this.getPrevCellValue(key, initialValue),
+        prevValue,
       },
     });
   }
@@ -154,24 +154,4 @@ export class GridEditHistoryManager<TKey extends IGridDataKey, TCell> {
     );
   }
 
-  private getPrevCellValue(key: TKey, initialValue: TCell): TCell {
-    const currentHistoryEntry = this.history.getCurrentEntry();
-    const isEditingSameCell =
-      currentHistoryEntry &&
-      isGridHistoryEditCellData<TKey, TCell>(currentHistoryEntry) &&
-      GridDataKeysUtils.isElementsKeyEqual(currentHistoryEntry.data.key, key);
-    const latestHistoryEntry = this.history
-      .getState()
-      .findLast(entry => isGridHistoryEditCellData<TKey, TCell>(entry) && GridDataKeysUtils.isElementsKeyEqual(entry.data.key, key));
-
-    if (isEditingSameCell && currentHistoryEntry && isGridHistoryEditCellData<TKey, TCell>(currentHistoryEntry)) {
-      return currentHistoryEntry.data.value;
-    }
-
-    if (latestHistoryEntry && isGridHistoryEditCellData<TKey, TCell>(latestHistoryEntry)) {
-      return latestHistoryEntry.data.value;
-    }
-
-    return initialValue;
-  }
 }
