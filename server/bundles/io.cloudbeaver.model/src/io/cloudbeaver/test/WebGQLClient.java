@@ -18,12 +18,14 @@ package io.cloudbeaver.test;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import io.cloudbeaver.server.CBConstants;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.utils.GeneralUtils;
 
+import java.net.CookieManager;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -55,10 +57,13 @@ public class WebGQLClient {
     @NotNull
     private final HttpClient httpClient;
     @NotNull
+    private final CookieManager cookieManager;
+    @NotNull
     private final String apiUrl;
 
-    public WebGQLClient(@NotNull HttpClient httpClient, @NotNull String apiUrl) {
+    public WebGQLClient(@NotNull HttpClient httpClient, @NotNull CookieManager cookieManager, @NotNull String apiUrl) {
         this.httpClient = httpClient;
+        this.cookieManager = cookieManager;
         this.apiUrl = apiUrl;
     }
 
@@ -141,5 +146,14 @@ public class WebGQLClient {
         }
 
         return gson.toJson(request, Map.class);
+    }
+
+    @NotNull
+    public String getSessionIdCookie() {
+        return cookieManager.getCookieStore().getCookies().stream()
+            .filter(cookie -> cookie.getName().equals(CBConstants.CB_SESSION_COOKIE_NAME))
+            .findFirst()
+            .get()
+            .getValue();
     }
 }

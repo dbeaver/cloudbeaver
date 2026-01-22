@@ -18,8 +18,10 @@ package io.cloudbeaver.model.rm.local;
 
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
+import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.app.DBPWorkspace;
 import org.jkiss.dbeaver.model.auth.SMSessionContext;
+import org.jkiss.dbeaver.model.rm.RMProjectInfo;
 import org.jkiss.dbeaver.model.rm.RMProjectType;
 import org.jkiss.dbeaver.model.rm.RMUtils;
 import org.jkiss.dbeaver.registry.project.LocalProjectImpl;
@@ -29,6 +31,8 @@ import java.nio.file.Path;
 public class RMLocalProject extends LocalProjectImpl {
     @NotNull
     private final RMProjectType projectType;
+    @Nullable
+    private RMProjectInfo projectInfo;
 
     public RMLocalProject(
         @NotNull DBPWorkspace workspace,
@@ -51,6 +55,39 @@ public class RMLocalProject extends LocalProjectImpl {
         return RMUtils.makeProjectIdFromPath(projectPath, projectType);
     }
 
+    @Nullable
+    @Override
+    public String getDescription() {
+        if (projectInfo == null) {
+            return null;
+        }
+        return projectInfo.getDescription();
+    }
+
+    @NotNull
+    @Override
+    public String getName() {
+        if (projectInfo == null || projectInfo.getName() == null) {
+            return projectPath.getFileName().toString();
+        }
+        return projectInfo.getName();
+    }
+
+    @NotNull
+    public RMProjectType getProjectType() {
+        return projectType;
+    }
+
+    @Override
+    public void updateProject(@Nullable String newName, @Nullable String description) throws DBException {
+        this.projectInfo = new RMProjectInfo();
+        projectInfo.setName(newName);
+        projectInfo.setDescription(description);
+    }
+
+    public void setProjectInfo(@NotNull RMProjectInfo projectInfo) {
+        this.projectInfo = projectInfo;
+    }
 
     public boolean canUpdateProjectName() {
         return RMProjectType.SHARED.equals(projectType);
