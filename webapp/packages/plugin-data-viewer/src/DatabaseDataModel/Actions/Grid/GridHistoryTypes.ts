@@ -12,7 +12,6 @@ export const GRID_HISTORY_SOURCE = {
   EDIT_CELL: 'grid-history-source-edit-cell',
   ADD_ROW: 'grid-history-source-add-row',
   DELETE_ROW: 'grid-history-source-delete-row',
-  DUPLICATE_ROW: 'grid-history-source-duplicate-row',
   REVERT: 'grid-history-source-revert',
   CANCEL: 'grid-history-source-cancel',
 } as const;
@@ -24,16 +23,10 @@ export interface IGridHistoryEditCellData<TKey extends IGridDataKey = IGridDataK
 }
 
 export interface IGridHistoryAddRowData<TKey extends IGridDataKey = IGridDataKey, TCell = unknown> {
-  key: TKey;
-  value?: TCell[];
+  keys: Array<{ key: TKey; value?: TCell[] }>;
 }
 
 export interface IGridHistoryDeleteRowData<TKey extends IGridDataKey = IGridDataKey, TCell = unknown> {
-  key: TKey;
-  value?: TCell[];
-}
-
-export interface IGridHistoryDuplicateRowData<TKey extends IGridDataKey = IGridDataKey, TCell = unknown> {
   keys: Array<{ key: TKey; value?: TCell[] }>;
 }
 
@@ -53,7 +46,6 @@ export type IGridHistoryData<TKey extends IGridDataKey = IGridDataKey, TCell = u
   | IGridHistoryEditCellData<TKey, TCell>
   | IGridHistoryAddRowData<TKey, TCell>
   | IGridHistoryDeleteRowData<TKey, TCell>
-  | IGridHistoryDuplicateRowData<TKey, TCell>
   | IGridHistoryRevertData<TKey, TCell>
   | IGridHistoryCancelData<TKey, TCell>;
 
@@ -73,12 +65,6 @@ export function isGridHistoryDeleteRowData<TKey extends IGridDataKey = IGridData
   entry: IHistoryEntry<unknown>,
 ): entry is IHistoryEntry<IGridHistoryDeleteRowData<TKey, TCell>> {
   return entry.source === GRID_HISTORY_SOURCE.DELETE_ROW;
-}
-
-export function isGridHistoryDuplicateRowData<TKey extends IGridDataKey = IGridDataKey, TCell = unknown>(
-  entry: IHistoryEntry<unknown>,
-): entry is IHistoryEntry<IGridHistoryDuplicateRowData<TKey, TCell>> {
-  return entry.source === GRID_HISTORY_SOURCE.DUPLICATE_ROW;
 }
 
 export function isGridHistoryRevertData<TKey extends IGridDataKey = IGridDataKey, TCell = unknown>(

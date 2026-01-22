@@ -59,41 +59,32 @@ export class GridEditHistoryManager<TKey extends IGridDataKey, TCell> {
     });
   }
 
-  recordAddRow(key: TKey, update: IGridUpdate<TCell> | undefined): void {
+  recordAddRow(keys: TKey | Array<{ key: TKey; value?: TCell[] }>, update?: IGridUpdate<TCell>): void {
     this.compressLastEditedCellHistory();
 
-    const value = update?.update;
+    const keysArray = Array.isArray(keys)
+      ? keys
+      : [{ key: keys, value: update?.update }];
 
     this.history.add({
       source: GRID_HISTORY_SOURCE.ADD_ROW,
       data: {
-        key,
-        value,
+        keys: keysArray,
       },
     });
   }
 
-  recordDeleteRow(key: TKey, update: IGridUpdate<TCell> | undefined, rowValue: TCell[] | undefined): void {
+  recordDeleteRow(keys: TKey | Array<{ key: TKey; value?: TCell[] }>, update?: IGridUpdate<TCell>, rowValue?: TCell[]): void {
     this.compressLastEditedCellHistory();
 
-    const value = update?.update || rowValue;
+    const keysArray = Array.isArray(keys)
+      ? keys
+      : [{ key: keys, value: update?.update || rowValue }];
 
     this.history.add({
       source: GRID_HISTORY_SOURCE.DELETE_ROW,
       data: {
-        key,
-        value,
-      },
-    });
-  }
-
-  recordDuplicateRow(keys: Array<{ key: TKey; value?: TCell[] }>): void {
-    this.compressLastEditedCellHistory();
-
-    this.history.add({
-      source: GRID_HISTORY_SOURCE.DUPLICATE_ROW,
-      data: {
-        keys,
+        keys: keysArray,
       },
     });
   }

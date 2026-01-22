@@ -274,28 +274,34 @@ export class GridEditAction<
     }
 
     if (duplicatedKeys.length > 0) {
-      this.historyManager.recordDuplicateRow(duplicatedKeys);
+      this.historyManager.recordAddRow(duplicatedKeys);
     }
   }
 
   delete(...keys: TKey[]): void {
     const reverted: Array<IDatabaseDataEditActionValue<TKey, TCell>> = [];
     const deleted: Array<IDatabaseDataEditActionValue<TKey, TCell>> = [];
+    const deletedKeys: Array<{ key: TKey; value?: TCell[] }> = [];
 
     for (const key of keys) {
       const serializedKey = GridDataKeysUtils.serialize(key.row);
       const update = this.editorData.get(serializedKey);
       const rowValue = this.data.getRowValue(key.row);
+      const value = update?.update || rowValue;
 
       if (update?.type === DatabaseEditChangeType.add) {
-        this.historyManager.recordDeleteRow(key, update, rowValue);
         reverted.push({ key });
         this.editorData.delete(serializedKey);
       } else {
-        this.historyManager.recordDeleteRow(key, update, rowValue);
         this.deleteRowSilent(key.row);
         deleted.push({ key });
       }
+
+      deletedKeys.push({ key, value });
+    }
+
+    if (deletedKeys.length > 0) {
+      this.historyManager.recordDeleteRow(deletedKeys);
     }
 
     if (reverted.length > 0) {

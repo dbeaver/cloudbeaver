@@ -12,7 +12,6 @@ import {
   isGridHistoryAddRowData,
   isGridHistoryCancelData,
   isGridHistoryDeleteRowData,
-  isGridHistoryDuplicateRowData,
   isGridHistoryEditCellData,
   isGridHistoryRevertData,
 } from './GridHistoryTypes.js';
@@ -36,19 +35,14 @@ function createUndoHandlers<TKey extends IGridDataKey, TCell>(): Record<string, 
     },
     [GRID_HISTORY_SOURCE.ADD_ROW]: (entry, ops) => {
       if (isGridHistoryAddRowData<TKey, TCell>(entry)) {
-        ops.deleteRow(entry.data.key.row, entry.data.key.column);
+        for (const { key } of entry.data.keys) {
+          ops.deleteRow(key.row, key.column);
+        }
       }
     },
     [GRID_HISTORY_SOURCE.DELETE_ROW]: (entry, ops) => {
       if (isGridHistoryDeleteRowData<TKey, TCell>(entry)) {
-        ops.revert([entry.data.key]);
-      }
-    },
-    [GRID_HISTORY_SOURCE.DUPLICATE_ROW]: (entry, ops) => {
-      if (isGridHistoryDuplicateRowData<TKey, TCell>(entry)) {
-        for (const { key } of entry.data.keys) {
-          ops.deleteRow(key.row, key.column);
-        }
+        ops.revert(entry.data.keys.map(({ key }) => key));
       }
     },
     [GRID_HISTORY_SOURCE.REVERT]: (entry, ops) => {
@@ -89,18 +83,15 @@ function createRedoHandlers<TKey extends IGridDataKey, TCell>(): Record<string, 
     },
     [GRID_HISTORY_SOURCE.ADD_ROW]: (entry, ops) => {
       if (isGridHistoryAddRowData<TKey, TCell>(entry)) {
-        ops.addRow(entry.data.key.row, entry.data.value, entry.data.key.column);
+        for (const { key, value } of entry.data.keys) {
+          ops.addRow(key.row, value, key.column);
+        }
       }
     },
     [GRID_HISTORY_SOURCE.DELETE_ROW]: (entry, ops) => {
       if (isGridHistoryDeleteRowData<TKey, TCell>(entry)) {
-        ops.deleteRow(entry.data.key.row, entry.data.key.column);
-      }
-    },
-    [GRID_HISTORY_SOURCE.DUPLICATE_ROW]: (entry, ops) => {
-      if (isGridHistoryDuplicateRowData<TKey, TCell>(entry)) {
-        for (const { key, value } of entry.data.keys) {
-          ops.addRow(key.row, value, key.column);
+        for (const { key } of entry.data.keys) {
+          ops.deleteRow(key.row, key.column);
         }
       }
     },
