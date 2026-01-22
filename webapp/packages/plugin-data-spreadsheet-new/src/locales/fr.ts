@@ -28,4 +28,11 @@ export default [
   ['plugin_data_spreadsheet_new_settings_disable', 'Désactiver la présentation de la table'],
   ['plugin_data_spreadsheet_new_settings_description_label', 'Show columns description'],
   ['plugin_data_spreadsheet_new_settings_description_label_description', 'Description will be shown under the column names in the table header'],
+  ['plugin_data_spreadsheet_new_settings_use_locale_formatting_title', 'Utiliser le formatage régional'],
+  ['plugin_data_spreadsheet_new_settings_use_locale_formatting_os', "Utiliser le formatage du système d'exploitation"],
+  ['plugin_data_spreadsheet_new_settings_use_locale_formatting_none', 'Aucun'],
+  [
+    'plugin_data_spreadsheet_new_settings_use_locale_formatting_description',
+    "Utilisez le formatage pour les nombres et les dates selon les paramètres régionaux sélectionnés. (!) Cela n'affecte que la représentation des données ; les valeurs brutes doivent être utilisées pour l'édition.",
+  ],
 ];

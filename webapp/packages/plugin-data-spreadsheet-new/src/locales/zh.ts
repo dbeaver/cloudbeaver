@@ -28,4 +28,11 @@ export default [
   ['plugin_data_spreadsheet_new_settings_disable', '禁用表显示'],
   ['plugin_data_spreadsheet_new_settings_description_label', 'Show columns description'],
   ['plugin_data_spreadsheet_new_settings_description_label_description', 'Description will be shown under the column names in the table header'],
+  ['plugin_data_spreadsheet_new_settings_use_locale_formatting_title', '使用本地格式化'],
+  ['plugin_data_spreadsheet_new_settings_use_locale_formatting_os', '使用操作系统格式化'],
+  ['plugin_data_spreadsheet_new_settings_use_locale_formatting_none', '无'],
+  [
+    'plugin_data_spreadsheet_new_settings_use_locale_formatting_description',
+    '根据选定的区域设置对数字和日期进行格式化。(!)这仅影响数据表示；编辑时应使用原始值。',
+  ],
 ];

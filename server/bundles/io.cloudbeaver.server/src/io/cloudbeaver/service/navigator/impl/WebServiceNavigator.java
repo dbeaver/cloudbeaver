@@ -446,13 +446,13 @@ public class WebServiceNavigator implements DBWServiceNavigator {
             checkProjectEditAccess(node, session);
             if (node.supportsRename()) {
                 if (node instanceof DBNLocalFolder) {
-                    return renameConnectionFolder(session, node, newName);
+                    renameConnectionFolder(session, node, newName);
+                } else if (node instanceof DBNResourceManagerResource) {
+                    renameRmResourceNode(session, node, newName);
+                } else {
+                    node.rename(session.getProgressMonitor(), newName);
                 }
-                if (node instanceof DBNResourceManagerResource) {
-                    return renameRmResourceNode(session, node, newName);
-                }
-                node.rename(session.getProgressMonitor(), newName);
-                return node.getName();
+                return node.getNodeItemPath();
             }
             if (node instanceof DBNDatabaseNode) {
                 return renameDatabaseObject(
@@ -466,8 +466,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
         }
     }
 
-    @NotNull
-    private String renameConnectionFolder(@NotNull WebSession session, DBNNode node, @NotNull String newName) throws DBException {
+    private void renameConnectionFolder(@NotNull WebSession session, DBNNode node, @NotNull String newName) throws DBException {
         WebConnectionFolderUtils.validateConnectionFolder(newName);
         DBNNode[] children = ((DBNLocalFolder) node).getLogicalParent().getChildren(session.getProgressMonitor());
         if (children != null) {
@@ -479,11 +478,9 @@ public class WebServiceNavigator implements DBWServiceNavigator {
             }
         }
         node.rename(session.getProgressMonitor(), newName);
-        return node.getName();
     }
 
-    @NotNull
-    private String renameRmResourceNode(@NotNull WebSession session, DBNNode node, @NotNull String newName) throws DBException {
+    private void renameRmResourceNode(@NotNull WebSession session, DBNNode node, @NotNull String newName) throws DBException {
         if (newName.contains("/") || newName.contains("\\")) {
             throw new DBWebException("New node name has prohibited symbols: \\ /");
         }
@@ -495,7 +492,6 @@ public class WebServiceNavigator implements DBWServiceNavigator {
         node.rename(session.getProgressMonitor(), newName);
         var newPath = rmNode.getResourceFolder();
         addRmMoveEvent(session, projectId, resourcePath, newPath);
-        return node.getName();
     }
 
     private void addRmMoveEvent(
@@ -685,7 +681,12 @@ public class WebServiceNavigator implements DBWServiceNavigator {
         }
     }
 
-    private String renameDatabaseObject(WebSession session, DBNDatabaseNode node, String newName) throws DBException {
+    @NotNull
+    private String renameDatabaseObject(
+        @NotNull WebSession session,
+        @NotNull DBNDatabaseNode node,
+        @NotNull String newName
+    ) throws DBException {
         if (node.getParentNode() instanceof DBNContainer) {
             DBSObject object = node.getObject();
             if (object != null) {
@@ -702,7 +703,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                         commandContext.resetChanges(true);
                         throw e;
                     }
-                    return node.getName();
+                    return node.getNodeItemPath();
                 }
             }
         }

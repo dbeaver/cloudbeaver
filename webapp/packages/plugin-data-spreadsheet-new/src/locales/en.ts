@@ -29,4 +29,11 @@ export default [
   ['plugin_data_spreadsheet_new_settings_disable_description', 'Disable table presentation of data for all users'],
   ['plugin_data_spreadsheet_new_settings_description_label', 'Show columns description'],
   ['plugin_data_spreadsheet_new_settings_description_label_description', 'Description will be shown under the column names in the table header'],
+  ['plugin_data_spreadsheet_new_settings_use_locale_formatting_title', 'Use locale formatting'],
+  ['plugin_data_spreadsheet_new_settings_use_locale_formatting_os', 'Use OS formatting'],
+  ['plugin_data_spreadsheet_new_settings_use_locale_formatting_none', 'None'],
+  [
+    'plugin_data_spreadsheet_new_settings_use_locale_formatting_description',
+    'Use formatting for numbers and dates according to the selected locale. (!)This only affects data representation; raw values should be used for editing.',
+  ],
 ];

@@ -84,6 +84,9 @@
     },
     {
       "path": "../plugin-navigation-tabs"
+    },
+    {
+      "path": "../plugin-sql-editor-codemirror"
     }
   ],
   "include": [
