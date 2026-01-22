@@ -39,6 +39,9 @@
     },
     {
       "path": "../plugin-sql-editor"
+    },
+    {
+      "path": "../plugin-sql-editor-codemirror"
     }
   ],
   "include": [

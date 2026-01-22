@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import type { DialogComponent } from '@cloudbeaver/core-dialogs';
 import { useService } from '@cloudbeaver/core-di';
 import { useCodemirrorExtensions } from '@cloudbeaver/plugin-codemirror6';
 import { LocalStorageSqlDataSource } from '@cloudbeaver/plugin-sql-editor';
-import { SQLCodeEditorLoader, useSqlDialectExtension } from '@cloudbeaver/plugin-sql-editor-new';
+import { SQLCodeEditor, useSqlDialectExtension } from '@cloudbeaver/plugin-sql-editor-codemirror';
 import { ConnectionDialectResource, ConnectionInfoResource, type IConnectionInfoParams } from '@cloudbeaver/core-connections';
 import { NavNodeManagerService, NodeManagerUtils } from '@cloudbeaver/core-navigation-tree';
 import { SqlEditorNavigatorService } from '@cloudbeaver/plugin-sql-editor-navigation-tab';
@@ -67,7 +67,7 @@ export const DataViewerRequestQueryViewerDialog: DialogComponent<IPayload> = obs
     <CommonDialogWrapper size="large" fixedWidth>
       <CommonDialogHeader title="SQL" onReject={props.rejectDialog} />
       <CommonDialogBody noBodyPadding noOverflow>
-        <SQLCodeEditorLoader value={props.payload.query} extensions={extensions} readonly />
+        <SQLCodeEditor value={props.payload.query} extensions={extensions} readonly />
       </CommonDialogBody>
       <CommonDialogFooter className="tw:flex tw:justify-between">
         <Button variant="secondary" onClick={() => props.rejectDialog()}>

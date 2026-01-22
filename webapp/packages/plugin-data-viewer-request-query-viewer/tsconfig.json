@@ -56,10 +56,10 @@
       "path": "../plugin-sql-editor"
     },
     {
-      "path": "../plugin-sql-editor-navigation-tab"
+      "path": "../plugin-sql-editor-codemirror"
     },
     {
-      "path": "../plugin-sql-editor-new"
+      "path": "../plugin-sql-editor-navigation-tab"
     }
   ],
   "include": [
