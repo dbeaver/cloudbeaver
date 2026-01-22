@@ -27,7 +27,7 @@ export interface IGridSearchResult {
 }
 
 export interface IGridSearchRefs {
-  /** Reference to the grid component with scrollToDataCell method */
+  /** Reference to the grid component with scrollToCell method */
   gridRef: RefObject<IGridRef | null>;
   /** Reference to the container element for hotkey scoping */
   containerRef: RefObject<HTMLElement | null>;
@@ -55,10 +55,10 @@ export function useGridSearch(
 
   useLayoutEffect(() => {
     store.setScrollController(
-      gridRef.current?.scrollToDataCell
+      gridRef.current?.scrollToCell
         ? {
             scrollToCell: pos =>
-              gridRef.current?.scrollToDataCell?.({
+              gridRef.current?.scrollToCell?.({
                 rowIdx: pos.rowIdx,
                 colIdx: pos.colIdx + colIdxOffset,
               }),

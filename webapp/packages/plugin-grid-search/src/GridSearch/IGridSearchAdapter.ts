@@ -14,7 +14,7 @@ export interface IGridSearchAdapter {
 }
 
 export interface IGridRef {
-  scrollToDataCell?: (pos: { rowIdx: number; colIdx: number }) => void;
+  scrollToCell?: (pos: { rowIdx: number; colIdx: number }) => void;
 }
 
 export interface IGridScrollController {

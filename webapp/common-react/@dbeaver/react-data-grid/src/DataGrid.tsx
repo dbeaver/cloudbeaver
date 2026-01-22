@@ -56,7 +56,6 @@ export interface DataGridProps extends IDataGridCellContext, IDataGridRowContext
 export interface DataGridRef {
   selectCell: (position: ICellPosition) => void;
   scrollToCell: (position: Partial<ICellPosition>) => void;
-  scrollToDataCell: (position: Partial<ICellPosition> & { colIdx?: number }) => void;
   openEditor: (position: ICellPosition) => void;
   getColumnsOrdered: () => readonly CalculatedColumn<IInnerRow, unknown>[];
   getDataColIdxByKey: (key: string) => number | null;
@@ -156,10 +155,6 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
     },
     scrollToCell: (position: Partial<ICellPosition>) => {
       innerGridRef.current?.scrollToCell({ idx: position.colIdx && dndHeaderContext.getDataColIdx(position.colIdx), rowIdx: position.rowIdx });
-    },
-    scrollToDataCell: (position: Partial<ICellPosition> & { colIdx?: number }) => {
-      const virtualIdx = position.colIdx !== undefined ? dndHeaderContext.getVirtualColIdx(position.colIdx) : undefined;
-      innerGridRef.current?.scrollToCell({ idx: virtualIdx, rowIdx: position.rowIdx });
     },
     openEditor: (position: ICellPosition) => {
       const columnKey = mapPositionToColumnKey(position);
