@@ -7,7 +7,7 @@
  */
 import type { IGridDataKey } from './IGridDataKey.js';
 import type { GridHistoryAction, IHistoryEntry } from './GridHistoryAction.js';
-import { handleRedo, handleUndo, type IGridEditOperations } from './GridHistoryHandlers.js';
+import { handleGridEditHistoryRedo, handleGridEditHistoryUndo, type IGridEditOperations } from './GridHistoryHandlers.js';
 import {
   GRID_HISTORY_SOURCE,
   isGridHistoryEditCellData,
@@ -27,10 +27,10 @@ export class GridEditHistoryManager<TKey extends IGridDataKey, TCell> {
 
   setupHandlers(operations: IGridEditOperations<TKey, TCell>): void {
     this.history.onUndo.addHandler((entry: IHistoryEntry<unknown>) => {
-      handleUndo(entry, operations);
+      handleGridEditHistoryUndo(entry, operations);
     });
     this.history.onRedo.addHandler((entry: IHistoryEntry<unknown>) => {
-      handleRedo(entry, operations);
+      handleGridEditHistoryRedo(entry, operations);
     });
   }
 
@@ -153,5 +153,4 @@ export class GridEditHistoryManager<TKey extends IGridDataKey, TCell> {
       'lastSequence',
     );
   }
-
 }

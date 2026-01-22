@@ -130,12 +130,18 @@ function createRedoHandlers<TKey extends IGridDataKey, TCell>(): Record<string, 
   };
 }
 
-export function handleUndo<TKey extends IGridDataKey, TCell>(entry: IHistoryEntry<unknown>, operations: IGridEditOperations<TKey, TCell>): void {
+export function handleGridEditHistoryUndo<TKey extends IGridDataKey, TCell>(
+  entry: IHistoryEntry<unknown>,
+  operations: IGridEditOperations<TKey, TCell>,
+): void {
   const handlers = createUndoHandlers<TKey, TCell>();
   handlers[entry.source]?.(entry, operations);
 }
 
-export function handleRedo<TKey extends IGridDataKey, TCell>(entry: IHistoryEntry<unknown>, operations: IGridEditOperations<TKey, TCell>): void {
+export function handleGridEditHistoryRedo<TKey extends IGridDataKey, TCell>(
+  entry: IHistoryEntry<unknown>,
+  operations: IGridEditOperations<TKey, TCell>,
+): void {
   const handlers = createRedoHandlers<TKey, TCell>();
   handlers[entry.source]?.(entry, operations);
 }
