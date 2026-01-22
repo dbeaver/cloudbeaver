@@ -126,7 +126,9 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
 
   const searchContext = useMemo<IGridSearchContext>(
     () => ({
-      suppressEditorSelection: searchState.suppressEditorSelection,
+      get suppressEditorSelection() {
+        return searchState.suppressEditorSelection;
+      },
     }),
     [searchState],
   );
