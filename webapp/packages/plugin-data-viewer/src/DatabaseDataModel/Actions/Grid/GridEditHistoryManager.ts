@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import type { IGridDataKey, IGridRowKey } from './IGridDataKey.js';
+import type { IGridDataKey } from './IGridDataKey.js';
 import type { GridHistoryAction, IHistoryEntry } from './GridHistoryAction.js';
 import { handleRedo, handleUndo, type IGridEditOperations } from './GridHistoryHandlers.js';
 import {
@@ -16,11 +16,7 @@ import {
   type IGridHistoryRevertData,
 } from './GridHistoryTypes.js';
 import { GridDataKeysUtils } from './GridDataKeysUtils.js';
-
-export interface IEditorDataAccess<TCell> {
-  getUpdate(row: IGridRowKey): { update: TCell[] } | undefined;
-  getRowValue(row: IGridRowKey): TCell[] | undefined;
-}
+import type { IGridUpdate } from './GridEditAction.js';
 
 export class GridEditHistoryManager<TKey extends IGridDataKey, TCell> {
   private readonly history: GridHistoryAction<IGridHistoryData<TKey, TCell>, any>;
@@ -50,7 +46,7 @@ export class GridEditHistoryManager<TKey extends IGridDataKey, TCell> {
     this.history.clear();
   }
 
-  recordCellEdit(key: TKey, value: TCell, editorAccess: IEditorDataAccess<TCell>): void {
+  recordCellEdit(key: TKey, value: TCell, initialValue: TCell): void {
     this.compressLastEditedCellHistory(key);
 
     this.history.add({
@@ -58,15 +54,14 @@ export class GridEditHistoryManager<TKey extends IGridDataKey, TCell> {
       data: {
         key,
         value,
-        prevValue: this.getPrevCellValue(key, editorAccess),
+        prevValue: this.getPrevCellValue(key, initialValue),
       },
     });
   }
 
-  recordAddRow(key: TKey, editorAccess: IEditorDataAccess<TCell>): void {
+  recordAddRow(key: TKey, update: IGridUpdate<TCell> | undefined): void {
     this.compressLastEditedCellHistory();
 
-    const update = editorAccess.getUpdate(key.row);
     const value = update?.update;
 
     this.history.add({
@@ -78,11 +73,9 @@ export class GridEditHistoryManager<TKey extends IGridDataKey, TCell> {
     });
   }
 
-  recordDeleteRow(key: TKey, editorAccess: IEditorDataAccess<TCell>): void {
+  recordDeleteRow(key: TKey, update: IGridUpdate<TCell> | undefined, rowValue: TCell[] | undefined): void {
     this.compressLastEditedCellHistory();
 
-    const rowValue = editorAccess.getRowValue(key.row);
-    const update = editorAccess.getUpdate(key.row);
     const value = update?.update || rowValue;
 
     this.history.add({
@@ -161,14 +154,12 @@ export class GridEditHistoryManager<TKey extends IGridDataKey, TCell> {
     );
   }
 
-  private getPrevCellValue(key: TKey, editorAccess: IEditorDataAccess<TCell>): TCell {
-    const update = editorAccess.getUpdate(key.row);
+  private getPrevCellValue(key: TKey, initialValue: TCell): TCell {
     const currentHistoryEntry = this.history.getCurrentEntry();
     const isEditingSameCell =
       currentHistoryEntry &&
       isGridHistoryEditCellData<TKey, TCell>(currentHistoryEntry) &&
       GridDataKeysUtils.isElementsKeyEqual(currentHistoryEntry.data.key, key);
-    const initialValue = (update as any)?.source?.[key.column.index] as TCell;
     const latestHistoryEntry = this.history
       .getState()
       .findLast(entry => isGridHistoryEditCellData<TKey, TCell>(entry) && GridDataKeysUtils.isElementsKeyEqual(entry.data.key, key));

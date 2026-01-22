@@ -25,7 +25,7 @@ import { GridDataKeysUtils } from './GridDataKeysUtils.js';
 import { compareGridRowKeys } from './compareGridRowKeys.js';
 import { IDatabaseDataResultAction } from '../IDatabaseDataResultAction.js';
 import { GridHistoryAction } from './GridHistoryAction.js';
-import { GridEditHistoryManager, type IEditorDataAccess } from './GridEditHistoryManager.js';
+import { GridEditHistoryManager } from './GridEditHistoryManager.js';
 import type { IGridHistoryCancelData, IGridHistoryData, IGridHistoryRevertData } from './GridHistoryTypes.js';
 
 export interface IGridUpdate<TCell> {
@@ -172,9 +172,9 @@ export class GridEditAction<
 
   set(key: TKey, value: TCell): void {
     const [update] = this.getOrCreateUpdate(key.row, DatabaseEditChangeType.update);
-    const prevValue = update.source?.[key.column.index] as any;
+    const prevValue = update.source?.[key.column.index] as TCell;
 
-    this.historyManager.recordCellEdit(key, value, this.createEditorDataAccess());
+    this.historyManager.recordCellEdit(key, value, prevValue);
 
     update.update[key.column.index] = value;
 
@@ -217,7 +217,8 @@ export class GridEditAction<
 
     if (created) {
       const key = { column, row } as TKey;
-      this.historyManager.recordAddRow(key, this.createEditorDataAccess());
+      const rowUpdate = this.editorData.get(GridDataKeysUtils.serialize(key.row));
+      this.historyManager.recordAddRow(key, rowUpdate);
 
       this.action.execute({
         resultId: this.result.id,
@@ -284,13 +285,14 @@ export class GridEditAction<
     for (const key of keys) {
       const serializedKey = GridDataKeysUtils.serialize(key.row);
       const update = this.editorData.get(serializedKey);
+      const rowValue = this.data.getRowValue(key.row);
 
       if (update?.type === DatabaseEditChangeType.add) {
-        this.historyManager.recordDeleteRow(key, this.createEditorDataAccess());
+        this.historyManager.recordDeleteRow(key, update, rowValue);
         reverted.push({ key });
         this.editorData.delete(serializedKey);
       } else {
-        this.historyManager.recordDeleteRow(key, this.createEditorDataAccess());
+        this.historyManager.recordDeleteRow(key, update, rowValue);
         this.deleteRowSilent(key.row);
         deleted.push({ key });
       }
@@ -632,13 +634,6 @@ export class GridEditAction<
         this.removeEmptyUpdate(update);
       }
     }
-  }
-
-  private createEditorDataAccess(): IEditorDataAccess<TCell> {
-    return {
-      getUpdate: (row: IGridRowKey) => this.editorData.get(GridDataKeysUtils.serialize(row)),
-      getRowValue: (row: IGridRowKey) => this.data.getRowValue(row),
-    };
   }
 
   private getNextRowAdd(row: IGridRowKey): IGridRowKey {
