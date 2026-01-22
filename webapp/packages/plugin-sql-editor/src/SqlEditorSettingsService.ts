@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -57,6 +57,8 @@ const defaultSettings = schema.object({
   'plugin.sql-editor.disabled': schemaExtra.stringedBoolean().default(false),
   'plugin.sql-editor.autoSave': schemaExtra.stringedBoolean().default(true),
   'plugin.sql-editor.highlightWhitespace': schemaExtra.stringedBoolean().default(false),
+  'sql.parameter.enabled': schemaExtra.stringedBoolean().default(true),
+  'sql.variables.enabled': schemaExtra.stringedBoolean().default(true),
   'sql.proposals.insert.table.alias': schema.coerce
     .string()
     .transform(value => {
@@ -115,6 +117,14 @@ export class SqlEditorSettingsService {
 
   get insertTableAlias(): schema.infer<typeof defaultSettings>['sql.proposals.insert.table.alias'] {
     return this.settings.getValue('sql.proposals.insert.table.alias');
+  }
+
+  get parameterEnabled(): boolean {
+    return this.settings.getValue('sql.parameter.enabled');
+  }
+
+  get variablesEnabled(): boolean {
+    return this.settings.getValue('sql.variables.enabled');
   }
 
   get longNameProposals(): boolean {

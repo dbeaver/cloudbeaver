@@ -19,12 +19,10 @@ package io.cloudbeaver.model.rm;
 import io.cloudbeaver.CloudbeaverMockTest;
 import io.cloudbeaver.app.CEAppStarter;
 import io.cloudbeaver.model.session.WebSession;
-import io.cloudbeaver.server.CBConstants;
 import io.cloudbeaver.service.rm.nio.RMNIOFileSystem;
 import io.cloudbeaver.service.rm.nio.RMNIOFileSystemProvider;
 import io.cloudbeaver.service.rm.nio.RMPath;
 import io.cloudbeaver.test.WebGQLClient;
-import io.cloudbeaver.test.platform.CEServerTestSuite;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.auth.SMAuthStatus;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
@@ -37,9 +35,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.net.CookieManager;
 import java.net.URI;
-import java.net.http.HttpClient;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
@@ -55,22 +51,12 @@ public class RMNIOTest extends CloudbeaverMockTest {
 
     @BeforeClass
     public static void init() throws Exception {
-        var cookieManager = new CookieManager();
         CEAppStarter.startServerIfNotStarted();
-        var httpClient = HttpClient.newBuilder()
-            .cookieHandler(cookieManager)
-            .version(HttpClient.Version.HTTP_2)
-            .build();
-        WebGQLClient client = CEAppStarter.createClient(httpClient);
+        WebGQLClient client = CEAppStarter.createClient();
         Map<String, Object> authInfo = CEAppStarter.authenticateTestUser(client);
         Assert.assertEquals(SMAuthStatus.SUCCESS.name(), JSONUtils.getString(authInfo, "authStatus"));
 
-        String sessionId = cookieManager.getCookieStore().getCookies()
-            .stream()
-            .filter(cookie -> cookie.getName().equals(CBConstants.CB_SESSION_COOKIE_NAME))
-            .findFirst()
-            .get()
-            .getValue();
+        String sessionId = client.getSessionIdCookie();
         webSession = (WebSession) CEAppStarter.getTestApp().getSessionManager().getSession(sessionId);
         Assert.assertNotNull(webSession);
         var projectName = "NIO_Test" + SecurityUtils.generateUniqueId();
