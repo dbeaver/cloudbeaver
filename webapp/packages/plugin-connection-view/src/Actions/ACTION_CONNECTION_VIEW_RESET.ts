@@ -9,6 +9,6 @@
 import { createAction } from '@cloudbeaver/core-view';
 
 export const ACTION_CONNECTION_VIEW_RESET = createAction('connection-view-reset', {
-  label: 'ui_reset',
+  label: 'plugin_connection_view_reset',
   tooltip: 'plugin_connection_view_option_reset_description',
 });

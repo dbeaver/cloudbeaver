@@ -9,5 +9,6 @@ import { createAction } from '@cloudbeaver/core-view';
 
 export const ACTION_CONNECTION_VIEW_SIMPLE = createAction('connection-view-simple', {
   label: 'plugin_connection_view_option_simple',
+  tooltip: 'plugin_connection_view_option_simple_description',
   type: 'select',
 });

@@ -9,5 +9,6 @@ import { createAction } from '@cloudbeaver/core-view';
 
 export const ACTION_CONNECTION_VIEW_ADVANCED = createAction('connection-view-advanced', {
   label: 'plugin_connection_view_option_advanced',
+  tooltip: 'plugin_connection_view_option_advanced_description',
   type: 'select',
 });

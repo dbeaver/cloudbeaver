@@ -8,7 +8,7 @@
 
 import { observer } from 'mobx-react-lite';
 
-import { Container, FieldCheckbox, Group, GroupTitle, useAutoLoad, useTranslate } from '@cloudbeaver/core-blocks';
+import { Container, FieldCheckbox, Group, GroupTitle, Radio, RadioGroup, useAutoLoad, useTranslate } from '@cloudbeaver/core-blocks';
 import { CONNECTION_NAVIGATOR_VIEW_SETTINGS, isNavigatorViewSettingsEqual } from '@cloudbeaver/core-root';
 import { getConnectionFormOptionsPart, type ConnectionFormContainerProps } from '@cloudbeaver/plugin-connections';
 
@@ -22,6 +22,7 @@ export const ConnectionViewForm = observer<ConnectionFormContainerProps>(functio
   useAutoLoad(ConnectionViewForm, [optionsFormPart, viewFormPart]);
 
   const isSimple = isNavigatorViewSettingsEqual(viewFormPart.state, CONNECTION_NAVIGATOR_VIEW_SETTINGS.simple);
+  const disabled = formState.isDisabled;
 
   function changeView() {
     const view = isSimple ? CONNECTION_NAVIGATOR_VIEW_SETTINGS.advanced : CONNECTION_NAVIGATOR_VIEW_SETTINGS.simple;
@@ -30,12 +31,18 @@ export const ConnectionViewForm = observer<ConnectionFormContainerProps>(functio
 
   return (
     <Group form gap>
-      <GroupTitle>{translate('plugin_connection_view')}</GroupTitle>
+      <GroupTitle>{translate('plugin_connection_view_default')}</GroupTitle>
       <Container gap dense>
-        <FieldCheckbox id="simple" checked={isSimple} onChange={changeView}>
-          {translate('plugin_connection_view_option_simple')}
-        </FieldCheckbox>
-        <FieldCheckbox name="showSystemObjects" state={viewFormPart.state}>
+        <RadioGroup name='conection_view' aria-label={translate('plugin_connection_view_default')} value={isSimple ? 'simple' : 'advanced'} onChange={changeView}>
+          <Radio value='simple' disabled={disabled} title={translate('plugin_connection_view_option_simple_description')} small keepSize>
+            {translate('plugin_connection_view_option_simple')}
+          </Radio>
+          <Radio value='advanced' disabled={disabled} title={translate('plugin_connection_view_option_advanced_description')} small keepSize>
+            {translate('plugin_connection_view_option_advanced')}
+          </Radio>
+        </RadioGroup>
+
+        <FieldCheckbox disabled={disabled} name="showSystemObjects" state={viewFormPart.state}>
           {translate('plugin_connection_view_option_show_system_objects')}
         </FieldCheckbox>
       </Container>

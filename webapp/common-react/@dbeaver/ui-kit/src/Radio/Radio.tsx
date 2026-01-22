@@ -17,7 +17,7 @@ export interface RadioProps extends Omit<_RadioProps, 'size'> {
 
 export function Radio({ children, className, size = 'medium', ...props }: RadioProps) {
   return (
-    <label className={clsx(`dbv-kit-radio dbv-kit-radio--${size}`, className)}>
+    <label title={props.title} className={clsx(`dbv-kit-radio dbv-kit-radio--${size}`, className)}>
       <_Radio className="dbv-kit-radio__input" {...props} />
       <div className="dbv-kit-radio__control" />
       <span className="dbv-kit-radio__title">{children}</span>
