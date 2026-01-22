@@ -41,7 +41,7 @@ function createUndoHandlers<TKey extends IGridDataKey, TCell>(): Record<string, 
     },
     [GRID_HISTORY_SOURCE.DELETE_ROW]: (entry, ops) => {
       if (isGridHistoryDeleteRowData<TKey, TCell>(entry)) {
-        ops.revert([entry.data.key]);
+        ops.addRow(entry.data.key.row, entry.data.value, entry.data.key.column);
       }
     },
     [GRID_HISTORY_SOURCE.DUPLICATE_ROW]: (entry, ops) => {
