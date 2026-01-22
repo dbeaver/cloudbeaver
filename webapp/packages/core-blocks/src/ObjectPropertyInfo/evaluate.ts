@@ -8,6 +8,8 @@
 
 import { err, token, type AST, compile } from 'subscript';
 
+import 'subscript/feature/literal.js';
+
 const UNDEFINED_MAPPER_VALUE = new Array(2).fill(undefined, 1) as AST;
 token('undefined', 20, a => (a ? err() : UNDEFINED_MAPPER_VALUE));
 token('null', 20, a => (a ? err() : UNDEFINED_MAPPER_VALUE));
