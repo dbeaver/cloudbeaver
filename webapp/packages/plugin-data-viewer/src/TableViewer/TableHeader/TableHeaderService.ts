@@ -101,6 +101,20 @@ export class TableHeaderService extends Bootstrap {
         }
       },
       getActionInfo: (context, action) => {
+        if (action === ACTION_UNDO) {
+          return {
+            ...action.info,
+            tooltip: 'ui_undo',
+          };
+        }
+
+        if (action === ACTION_REDO) {
+          return {
+            ...action.info,
+            tooltip: 'ui_redo',
+          };
+        }
+
         if (context.get(DATA_CONTEXT_MENU) === DATA_VIEWER_DATA_MODEL_TOOLS_MENU) {
           return { ...action.info, label: '' };
         }

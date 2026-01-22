@@ -9,6 +9,5 @@ import { createAction } from '../createAction.js';
 
 export const ACTION_REDO = createAction('redo', {
   label: 'ui_redo',
-  tooltip: 'ui_redo',
   icon: 'redo',
 });

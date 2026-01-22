@@ -9,6 +9,5 @@ import { createAction } from '../createAction.js';
 
 export const ACTION_UNDO = createAction('undo', {
   label: 'ui_undo',
-  tooltip: 'ui_undo',
   icon: 'undo',
 });
