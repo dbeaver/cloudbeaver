@@ -23,7 +23,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.eclipse.jetty.ee10.servlet.DefaultServlet;
+import org.eclipse.jetty.ee11.servlet.DefaultServlet;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.utils.GeneralUtils;

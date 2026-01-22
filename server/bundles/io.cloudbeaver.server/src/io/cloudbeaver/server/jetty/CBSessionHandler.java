@@ -17,7 +17,7 @@
 package io.cloudbeaver.server.jetty;
 
 import io.cloudbeaver.server.WebApplication;
-import org.eclipse.jetty.ee10.servlet.SessionHandler;
+import org.eclipse.jetty.ee11.servlet.SessionHandler;
 import org.jkiss.code.NotNull;
 
 public class CBSessionHandler extends SessionHandler {
