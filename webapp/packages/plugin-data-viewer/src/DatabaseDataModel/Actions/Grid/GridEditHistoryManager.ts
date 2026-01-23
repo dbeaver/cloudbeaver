@@ -62,9 +62,7 @@ export class GridEditHistoryManager<TKey extends IGridDataKey, TCell> {
   recordAddRow(keys: TKey | Array<{ key: TKey; value?: TCell[] }>, update?: IGridUpdate<TCell>): void {
     this.compressLastEditedCellHistory();
 
-    const keysArray = Array.isArray(keys)
-      ? keys
-      : [{ key: keys, value: update?.update }];
+    const keysArray = Array.isArray(keys) ? keys : [{ key: keys, value: update?.update }];
 
     this.history.add({
       source: GRID_HISTORY_SOURCE.ADD_ROW,
@@ -77,9 +75,7 @@ export class GridEditHistoryManager<TKey extends IGridDataKey, TCell> {
   recordDeleteRow(keys: TKey | Array<{ key: TKey; value?: TCell[] }>, update?: IGridUpdate<TCell>, rowValue?: TCell[]): void {
     this.compressLastEditedCellHistory();
 
-    const keysArray = Array.isArray(keys)
-      ? keys
-      : [{ key: keys, value: update?.update || rowValue }];
+    const keysArray = Array.isArray(keys) ? keys : [{ key: keys, value: update?.update || rowValue }];
 
     this.history.add({
       source: GRID_HISTORY_SOURCE.DELETE_ROW,
@@ -129,9 +125,23 @@ export class GridEditHistoryManager<TKey extends IGridDataKey, TCell> {
       entries => {
         const firstEntry = entries[0]!;
         const lastEntry = entries[entries.length - 1]!;
+
         if (!isGridHistoryEditCellData<TKey, TCell>(firstEntry) || !isGridHistoryEditCellData<TKey, TCell>(lastEntry)) {
-          throw new Error('Invalid history entry type');
+          console.error('GridEditHistoryManager: Invalid history entry type during compression. Using last entry as fallback.');
+
+          // fallback to last entry to avoid data loss
+          return {
+            source: GRID_HISTORY_SOURCE.EDIT_CELL,
+            data: isGridHistoryEditCellData<TKey, TCell>(lastEntry)
+              ? lastEntry.data
+              : {
+                  key,
+                  value: null as TCell,
+                  prevValue: null as TCell,
+                },
+          };
         }
+
         return {
           source: GRID_HISTORY_SOURCE.EDIT_CELL,
           data: {

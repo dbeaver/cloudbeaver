@@ -189,7 +189,13 @@ export class GridHistoryAction<TData = unknown, TResult extends IDatabaseDataRes
   }
 
   private mergeEntries(matchingIndices: number[], createCompressedEntry: CompressedEntryFactory<TData>, compressedEntityIndex?: number): void {
-    const targetIndex = compressedEntityIndex ?? matchingIndices[matchingIndices.length - 1]!;
+    let targetIndex = compressedEntityIndex ?? matchingIndices[matchingIndices.length - 1]!;
+
+    if (!matchingIndices.includes(targetIndex)) {
+      console.warn('GridHistoryAction: Target index not in matching indices, using last match');
+      targetIndex = matchingIndices[matchingIndices.length - 1]!;
+    }
+
     const entriesToCompress = matchingIndices.map(index => this.history[index]).filter<IHistoryEntry<TData>>(isNotNullDefined);
 
     const removedBeforeTarget = matchingIndices.filter(index => index < targetIndex).length;
