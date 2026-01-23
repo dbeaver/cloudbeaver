@@ -1,13 +1,13 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 import { makeObservable, observable } from 'mobx';
 
-import type { IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
+import { createConnectionParam, type IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
 import type { IServiceProvider } from '@cloudbeaver/core-di';
 import { executorHandlerFilter, type IExecutorHandler, type ITask } from '@cloudbeaver/core-executor';
 import {
@@ -306,12 +306,18 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
       const parametersState = observable({
         ...Object.fromEntries(Object.entries(queryParamsEvent.parameters).map(([key, value]) => [key, this.previousQueryParameters?.[key] ?? value])),
       });
+      const connectionKey = this.executionContext?.context
+        ? createConnectionParam(this.executionContext.context.projectId, this.executionContext.context.connectionId)
+        : null;
+
       // TODO: this UI thing should be moved outside of the `plugin-sql-editor` package to use sql editor component for preview
+      //       it is partially fixed, but still this UI code should be somewhere else
       const dialogPromise = this.commonDialogService.open(ConfirmationDialog, {
         title: queryParamsEvent.title,
         message: queryParamsEvent.message,
         size: 'large',
-        children: () => renderQueryParamsForConfirmation(parametersState, queryParamsEvent.query),
+        noOverflow: true,
+        children: () => renderQueryParamsForConfirmation(connectionKey, parametersState, queryParamsEvent.query),
       });
 
       const { status } = await dialogPromise;

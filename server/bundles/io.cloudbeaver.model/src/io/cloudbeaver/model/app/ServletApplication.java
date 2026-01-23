@@ -16,6 +16,7 @@
  */
 package io.cloudbeaver.model.app;
 
+import io.cloudbeaver.registry.WebFeatureRegistry;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -116,4 +117,10 @@ public interface ServletApplication extends DBPApplication {
     }
 
     boolean isAnonymousAccessEnabled();
+
+    /**
+     * Web feature registry
+     */
+    @NotNull
+    WebFeatureRegistry getFeatureRegistry();
 }
