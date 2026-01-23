@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { type NavigatorViewSettings, DEFAULT_NAVIGATOR_VIEW_SETTINGS } from '@cloudbeaver/core-root';
+import { type NavigatorViewSettings, DEFAULT_NAVIGATOR_VIEW_SETTINGS, DefaultNavigatorSettingsResource } from '@cloudbeaver/core-root';
 import { FormPart, type IFormState } from '@cloudbeaver/core-ui';
 import type { ConnectionFormOptionsPart, IConnectionFormState } from '@cloudbeaver/plugin-connections';
 
@@ -25,13 +25,14 @@ export class ConnectionViewPart extends FormPart<ConnectionViewPartState, IConne
     private readonly optionsPart: ConnectionFormOptionsPart,
     private readonly connectionViewService: ConnectionViewService,
     private readonly connectionViewResource: ConnectionViewResource,
+    private readonly defaultNavigatorSettingsResource: DefaultNavigatorSettingsResource
   ) {
     super(formState, defaultStateGetter());
   }
 
   override isOutdated(): boolean {
     if (!this.optionsPart.connectionKey) {
-      return false;
+      return this.defaultNavigatorSettingsResource.isOutdated();
     }
 
     return this.connectionViewResource.isOutdated(this.optionsPart.connectionKey);
@@ -39,7 +40,8 @@ export class ConnectionViewPart extends FormPart<ConnectionViewPartState, IConne
 
   protected override async loader(): Promise<void> {
     if (!this.optionsPart.connectionKey) {
-      this.setInitialState(defaultStateGetter());
+      const defaults = await this.defaultNavigatorSettingsResource.load();
+      this.setInitialState(defaults ? { ...defaults } : defaultStateGetter());
       return;
     }
 

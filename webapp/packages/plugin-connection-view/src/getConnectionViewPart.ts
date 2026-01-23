@@ -9,6 +9,7 @@
 import type { IFormState } from '@cloudbeaver/core-ui';
 import { type IConnectionFormState, getConnectionFormOptionsPart } from '@cloudbeaver/plugin-connections';
 import { createDataContext, DATA_CONTEXT_DI_PROVIDER } from '@cloudbeaver/core-data-context';
+import { DefaultNavigatorSettingsResource } from '@cloudbeaver/core-root';
 
 import { ConnectionViewPart } from './ConnectionViewPart.js';
 import { ConnectionViewService } from './ConnectionViewService.js';
@@ -22,7 +23,8 @@ export function getConnectionViewPart(formState: IFormState<IConnectionFormState
     const optionsPart = getConnectionFormOptionsPart(formState);
     const connectionViewService = di.getService(ConnectionViewService);
     const connectionViewResource = di.getService(ConnectionViewResource);
+    const defaultNavigatorSettingsResource = di.getService(DefaultNavigatorSettingsResource);
 
-    return new ConnectionViewPart(formState, optionsPart, connectionViewService, connectionViewResource);
+    return new ConnectionViewPart(formState, optionsPart, connectionViewService, connectionViewResource, defaultNavigatorSettingsResource);
   });
 }
