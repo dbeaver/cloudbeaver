@@ -11,12 +11,14 @@ import { handleGridEditHistoryRedo, handleGridEditHistoryUndo, type IGridEditOpe
 import {
   GRID_HISTORY_SOURCE,
   isGridHistoryEditCellData,
+  type IGridHistoryAddRowData,
   type IGridHistoryCancelData,
   type IGridHistoryData,
+  type IGridHistoryDeleteRowData,
+  type IGridHistoryEditCellData,
   type IGridHistoryRevertData,
 } from './GridHistoryTypes.js';
 import { GridDataKeysUtils } from './GridDataKeysUtils.js';
-import type { IGridUpdate } from './GridEditAction.js';
 
 export class GridEditHistoryManager<TKey extends IGridDataKey, TCell> {
   private readonly history: GridHistoryAction<IGridHistoryData<TKey, TCell>, any>;
@@ -34,54 +36,30 @@ export class GridEditHistoryManager<TKey extends IGridDataKey, TCell> {
     });
   }
 
-  getCurrentEntry(): IHistoryEntry<IGridHistoryData<TKey, TCell>> | undefined {
-    return this.history.getCurrentEntry();
-  }
-
-  getState(): readonly IHistoryEntry<IGridHistoryData<TKey, TCell>>[] {
-    return this.history.getState();
-  }
-
-  clear(): void {
-    this.history.clear();
-  }
-
-  recordCellEdit(key: TKey, value: TCell, prevValue: TCell): void {
-    this.compressLastEditedCellHistory(key);
+  recordCellEdit(data: IGridHistoryEditCellData<TKey, TCell>): void {
+    this.compressLastEditedCellHistory(data.key);
 
     this.history.add({
       source: GRID_HISTORY_SOURCE.EDIT_CELL,
-      data: {
-        key,
-        value,
-        prevValue,
-      },
+      data,
     });
   }
 
-  recordAddRow(keys: TKey | Array<{ key: TKey; value?: TCell[] }>, update?: IGridUpdate<TCell>): void {
+  recordAddRows(data: IGridHistoryAddRowData<TKey, TCell>): void {
     this.compressLastEditedCellHistory();
-
-    const keysArray = Array.isArray(keys) ? keys : [{ key: keys, value: update?.update }];
 
     this.history.add({
       source: GRID_HISTORY_SOURCE.ADD_ROW,
-      data: {
-        keys: keysArray,
-      },
+      data,
     });
   }
 
-  recordDeleteRow(keys: TKey | Array<{ key: TKey; value?: TCell[] }>, update?: IGridUpdate<TCell>, rowValue?: TCell[]): void {
+  recordDeleteRows(data: IGridHistoryDeleteRowData<TKey, TCell>): void {
     this.compressLastEditedCellHistory();
-
-    const keysArray = Array.isArray(keys) ? keys : [{ key: keys, value: update?.update || rowValue }];
 
     this.history.add({
       source: GRID_HISTORY_SOURCE.DELETE_ROW,
-      data: {
-        keys: keysArray,
-      },
+      data,
     });
   }
 

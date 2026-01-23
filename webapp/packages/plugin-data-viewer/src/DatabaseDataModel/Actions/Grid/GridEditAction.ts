@@ -26,7 +26,7 @@ import { compareGridRowKeys } from './compareGridRowKeys.js';
 import { IDatabaseDataResultAction } from '../IDatabaseDataResultAction.js';
 import { GridHistoryAction } from './GridHistoryAction.js';
 import { GridEditHistoryManager } from './GridEditHistoryManager.js';
-import type { IGridHistoryCancelData, IGridHistoryData, IGridHistoryRevertData } from './GridHistoryTypes.js';
+import type { IGridHistoryCancelData, IGridHistoryData, IGridHistoryKeyWithValue, IGridHistoryRevertData } from './GridHistoryTypes.js';
 
 export interface IGridUpdate<TCell> {
   row: IGridRowKey;
@@ -172,7 +172,11 @@ export class GridEditAction<
     const [update] = this.getOrCreateUpdate(key.row, DatabaseEditChangeType.update);
     const prevValue = update.update[key.column.index] as TCell;
 
-    this.historyManager.recordCellEdit(key, value, prevValue);
+    this.historyManager.recordCellEdit({
+      key,
+      value,
+      prevValue,
+    });
 
     update.update[key.column.index] = value;
 
@@ -216,7 +220,9 @@ export class GridEditAction<
     if (created) {
       const key = { column, row } as TKey;
       const rowUpdate = this.editorData.get(GridDataKeysUtils.serialize(key.row));
-      this.historyManager.recordAddRow(key, rowUpdate);
+      this.historyManager.recordAddRows({
+        keys: [{ key, value: rowUpdate?.update }],
+      });
 
       this.action.execute({
         resultId: this.result.id,
@@ -244,7 +250,7 @@ export class GridEditAction<
   }
 
   duplicateRow(...keys: TKey[]): void {
-    const duplicatedKeys: Array<{ key: TKey; value?: TCell[] }> = [];
+    const duplicatedKeys: Array<IGridHistoryKeyWithValue<TKey, TCell>> = [];
 
     for (const key of keys) {
       let value = this.data.getRowValue(key.row);
@@ -272,14 +278,16 @@ export class GridEditAction<
     }
 
     if (duplicatedKeys.length > 0) {
-      this.historyManager.recordAddRow(duplicatedKeys);
+      this.historyManager.recordAddRows({
+        keys: duplicatedKeys,
+      });
     }
   }
 
   delete(...keys: TKey[]): void {
     const reverted: Array<IDatabaseDataEditActionValue<TKey, TCell>> = [];
     const deleted: Array<IDatabaseDataEditActionValue<TKey, TCell>> = [];
-    const deletedKeys: Array<{ key: TKey; value?: TCell[] }> = [];
+    const deletedKeys: Array<IGridHistoryKeyWithValue<TKey, TCell>> = [];
 
     for (const key of keys) {
       const serializedKey = GridDataKeysUtils.serialize(key.row);
@@ -299,7 +307,9 @@ export class GridEditAction<
     }
 
     if (deletedKeys.length > 0) {
-      this.historyManager.recordDeleteRow(deletedKeys);
+      this.historyManager.recordDeleteRows({
+        keys: deletedKeys,
+      });
     }
 
     if (reverted.length > 0) {
