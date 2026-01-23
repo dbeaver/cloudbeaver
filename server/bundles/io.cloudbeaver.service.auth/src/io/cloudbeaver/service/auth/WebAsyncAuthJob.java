@@ -16,21 +16,16 @@
  */
 package io.cloudbeaver.service.auth;
 
-import io.cloudbeaver.model.CustomCancelableJob;
-import io.cloudbeaver.model.WebAsyncTaskInfo;
+import io.cloudbeaver.model.AbstractCancelableJob;
 import io.cloudbeaver.model.session.WebAuthInfo;
-import io.cloudbeaver.model.session.WebSession;
-import io.cloudbeaver.utils.WebEventUtils;
 import org.eclipse.core.runtime.IStatus;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
-import org.jkiss.dbeaver.DBException;
-import org.jkiss.dbeaver.model.runtime.AbstractJob;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 
 import java.util.List;
 
-public class WebAsyncAuthJob extends AbstractJob implements CustomCancelableJob {
+public class WebAsyncAuthJob extends AbstractCancelableJob {
     @NotNull
     private final String authId;
     private final boolean linkWithUser;
@@ -68,17 +63,6 @@ public class WebAsyncAuthJob extends AbstractJob implements CustomCancelableJob 
 
     public void setAuthResult(@Nullable List<WebAuthInfo> authResult) {
         this.authResult = authResult;
-    }
-
-    @Override
-    public void cancelJob(@NotNull WebSession webSession, @NotNull WebAsyncTaskInfo taskInfo) {
-        cancelJob(webSession, taskInfo, "Canceled by the user");
-    }
-
-    public void cancelJob(@NotNull WebSession webSession, @NotNull WebAsyncTaskInfo taskInfo, @NotNull String errorMessage) {
-        taskInfo.setRunning(false);
-        taskInfo.setJobError(new DBException(errorMessage));
-        WebEventUtils.sendAsyncTaskEvent(webSession, taskInfo);
     }
 
 }
