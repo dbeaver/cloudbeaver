@@ -101,24 +101,8 @@ export class GridEditHistoryManager<TKey extends IGridDataKey, TCell> {
     this.history.compress(
       entry => isGridHistoryEditCellData<TKey, TCell>(entry) && GridDataKeysUtils.isElementsKeyEqual(entry.data.key, key),
       entries => {
-        const firstEntry = entries[0]!;
-        const lastEntry = entries[entries.length - 1]!;
-
-        if (!isGridHistoryEditCellData<TKey, TCell>(firstEntry) || !isGridHistoryEditCellData<TKey, TCell>(lastEntry)) {
-          console.error('GridEditHistoryManager: Invalid history entry type during compression. Using last entry as fallback.');
-
-          // fallback to last entry to avoid data loss
-          return {
-            source: GRID_HISTORY_SOURCE.EDIT_CELL,
-            data: isGridHistoryEditCellData<TKey, TCell>(lastEntry)
-              ? lastEntry.data
-              : {
-                  key,
-                  value: null as TCell,
-                  prevValue: null as TCell,
-                },
-          };
-        }
+        const firstEntry = entries[0]! as IHistoryEntry<IGridHistoryEditCellData<TKey, TCell>>;
+        const lastEntry = entries[entries.length - 1]! as IHistoryEntry<IGridHistoryEditCellData<TKey, TCell>>;
 
         return {
           source: GRID_HISTORY_SOURCE.EDIT_CELL,

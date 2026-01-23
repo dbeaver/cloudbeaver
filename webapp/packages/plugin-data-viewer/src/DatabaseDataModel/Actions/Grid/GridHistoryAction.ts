@@ -189,6 +189,10 @@ export class GridHistoryAction<TData = unknown, TResult extends IDatabaseDataRes
   }
 
   private mergeEntries(matchingIndices: number[], createCompressedEntry: CompressedEntryFactory<TData>, compressedEntityIndex?: number): void {
+    if (!matchingIndices.length) {
+      return;
+    }
+
     let targetIndex = compressedEntityIndex ?? matchingIndices[matchingIndices.length - 1]!;
 
     if (!matchingIndices.includes(targetIndex)) {

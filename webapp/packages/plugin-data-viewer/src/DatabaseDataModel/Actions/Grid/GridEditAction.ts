@@ -71,30 +71,27 @@ export class GridEditAction<
     this.data = data as GridDataResultAction<TColumn, TRow, TKey, TCell, TResult>;
     this.historyManager = new GridEditHistoryManager<TKey, TCell>(history as GridHistoryAction<IGridHistoryData<TKey, TCell>, TResult>);
 
-    makeObservable<this, 'editorData' | 'setCellsInternal' | 'setRowsInternal' | 'addRowsInternal' | 'deleteRowsInternal' | 'removeEditsInternal'>(
-      this,
-      {
-        editorData: observable,
-        set: action,
-        add: action,
-        delete: action,
-        revert: action,
-        applyUpdate: action,
-        applyPartialUpdate: action,
-        setCellsInternal: action,
-        setRowsInternal: action,
-        addRowsInternal: action,
-        deleteRowsInternal: action,
-        removeEditsInternal: action,
-      },
-    );
+    makeObservable<this, 'editorData' | '_setRows' | '_addRows' | '_deleteRows' | '_removeEdits' | '_setCells'>(this, {
+      editorData: observable,
+      set: action,
+      add: action,
+      delete: action,
+      revert: action,
+      applyUpdate: action,
+      applyPartialUpdate: action,
+      _setCells: action,
+      _setRows: action,
+      _addRows: action,
+      _deleteRows: action,
+      _removeEdits: action,
+    });
 
     this.historyManager.setupHandlers({
-      setCells: this.setCellsInternal.bind(this),
-      setRows: this.setRowsInternal.bind(this),
-      addRows: this.addRowsInternal.bind(this),
-      deleteRows: this.deleteRowsInternal.bind(this),
-      removeEdits: this.removeEditsInternal.bind(this),
+      setCells: this._setCells.bind(this),
+      setRows: this._setRows.bind(this),
+      addRows: this._addRows.bind(this),
+      deleteRows: this._deleteRows.bind(this),
+      removeEdits: this._removeEdits.bind(this),
     });
   }
 
@@ -595,7 +592,7 @@ export class GridEditAction<
     }
   }
 
-  private setCellsInternal(cells: Array<{ key: TKey; value: TCell }>): void {
+  private _setCells(cells: Array<{ key: TKey; value: TCell }>): void {
     for (const { key, value } of cells) {
       const [update] = this.getOrCreateUpdate(key.row, DatabaseEditChangeType.update);
       update.update[key.column.index] = value;
@@ -603,7 +600,7 @@ export class GridEditAction<
     }
   }
 
-  private setRowsInternal(rows: Array<{ key: TKey; value: TCell[] }>): void {
+  private _setRows(rows: Array<{ key: TKey; value: TCell[] }>): void {
     for (const { key, value } of rows) {
       const [update] = this.getOrCreateUpdate(key.row, DatabaseEditChangeType.update);
       for (let i = 0; i < value.length; i++) {
@@ -613,7 +610,7 @@ export class GridEditAction<
     }
   }
 
-  private addRowsInternal(rows: Array<{ row: IGridRowKey; value: TCell[] | undefined; column: IGridColumnKey }>): void {
+  private _addRows(rows: Array<{ row: IGridRowKey; value: TCell[] | undefined; column: IGridColumnKey }>): void {
     for (const { row, value } of rows) {
       let rowValue = value;
 
@@ -625,7 +622,7 @@ export class GridEditAction<
     }
   }
 
-  private deleteRowsInternal(rows: Array<{ row: IGridRowKey; column: IGridColumnKey }>): void {
+  private _deleteRows(rows: Array<{ row: IGridRowKey; column: IGridColumnKey }>): void {
     for (const { row } of rows) {
       const serializedKey = GridDataKeysUtils.serialize(row);
       const update = this.editorData.get(serializedKey);
@@ -641,7 +638,7 @@ export class GridEditAction<
     }
   }
 
-  private removeEditsInternal(rows: Array<{ row: IGridRowKey }>): void {
+  private _removeEdits(rows: Array<{ row: IGridRowKey }>): void {
     for (const { row } of rows) {
       const serializedKey = GridDataKeysUtils.serialize(row);
       this.editorData.delete(serializedKey);
