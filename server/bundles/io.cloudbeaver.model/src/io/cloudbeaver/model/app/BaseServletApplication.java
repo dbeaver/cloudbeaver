@@ -17,6 +17,7 @@
 package io.cloudbeaver.model.app;
 
 import io.cloudbeaver.model.log.SLF4JLogHandler;
+import io.cloudbeaver.registry.WebFeatureRegistry;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.equinox.app.IApplicationContext;
 import org.jkiss.code.NotNull;
@@ -276,5 +277,11 @@ public abstract class BaseServletApplication extends BaseApplicationImpl impleme
     @Override
     public boolean isAnonymousAccessEnabled() {
         return getAppConfiguration().isAnonymousAccessEnabled();
+    }
+
+    @NotNull
+    @Override
+    public WebFeatureRegistry getFeatureRegistry() {
+        return WebFeatureRegistry.getInstance();
     }
 }
