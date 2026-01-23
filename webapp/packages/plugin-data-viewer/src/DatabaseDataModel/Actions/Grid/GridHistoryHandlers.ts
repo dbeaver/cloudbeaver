@@ -17,11 +17,11 @@ import {
 } from './GridHistoryTypes.js';
 
 export interface IGridEditOperations<TKey extends IGridDataKey, TCell> {
-  setCell(key: TKey, value: TCell): void;
-  setRow(key: TKey, value: TCell[]): void;
-  addRow(row: TKey['row'], value: TCell[] | undefined, column: TKey['column']): void;
-  deleteRow(row: TKey['row'], column: TKey['column']): void;
-  revert(keys: TKey[]): void;
+  setCells(cells: Array<{ key: TKey; value: TCell }>): void;
+  setRows(rows: Array<{ key: TKey; value: TCell[] }>): void;
+  addRows(rows: Array<{ row: TKey['row']; value: TCell[] | undefined; column: TKey['column'] }>): void;
+  deleteRows(rows: Array<{ row: TKey['row']; column: TKey['column'] }>): void;
+  removeEdits(rows: Array<{ row: TKey['row'] }>): void;
 }
 
 type HistoryHandler<TKey extends IGridDataKey, TCell> = (entry: IHistoryEntry<unknown>, operations: IGridEditOperations<TKey, TCell>) => void;
@@ -30,45 +30,45 @@ function createUndoHandlers<TKey extends IGridDataKey, TCell>(): Record<string, 
   return {
     [GRID_HISTORY_SOURCE.EDIT_CELL]: (entry, ops) => {
       if (isGridHistoryEditCellData<TKey, TCell>(entry)) {
-        ops.setCell(entry.data.key, entry.data.prevValue);
+        ops.setCells([
+          {
+            key: entry.data.key,
+            value: entry.data.prevValue,
+          },
+        ]);
       }
     },
     [GRID_HISTORY_SOURCE.ADD_ROW]: (entry, ops) => {
       if (isGridHistoryAddRowData<TKey, TCell>(entry)) {
-        for (const { key } of entry.data.keys) {
-          ops.deleteRow(key.row, key.column);
-        }
+        ops.deleteRows(entry.data.keys.map(({ key }) => ({ row: key.row, column: key.column })));
       }
     },
     [GRID_HISTORY_SOURCE.DELETE_ROW]: (entry, ops) => {
       if (isGridHistoryDeleteRowData<TKey, TCell>(entry)) {
-        ops.revert(entry.data.keys.map(({ key }) => key));
+        const addedRows = entry.data.keys.filter(({ key }) => key.row.subIndex !== 0);
+        const deletedRows = entry.data.keys.filter(({ key }) => key.row.subIndex === 0);
+
+        if (addedRows.length > 0) {
+          ops.addRows(addedRows.map(({ key, value }) => ({ row: key.row, value, column: key.column })));
+        }
+
+        if (deletedRows.length > 0) {
+          ops.removeEdits(deletedRows.map(({ key }) => ({ row: key.row })));
+        }
       }
     },
     [GRID_HISTORY_SOURCE.REVERT]: (entry, ops) => {
       if (isGridHistoryRevertData<TKey, TCell>(entry)) {
-        for (const { key, prevValue } of entry.data.updates) {
-          ops.setCell(key, prevValue);
-        }
-        for (const { key } of entry.data.deletions) {
-          ops.deleteRow(key.row, key.column);
-        }
-        for (const { key, rowValue } of entry.data.additions) {
-          ops.addRow(key.row, rowValue, key.column);
-        }
+        ops.setCells(entry.data.updates.map(({ key, prevValue }) => ({ key, value: prevValue })));
+        ops.deleteRows(entry.data.deletions.map(({ key }) => ({ row: key.row, column: key.column })));
+        ops.addRows(entry.data.additions.map(({ key, rowValue }) => ({ row: key.row, value: rowValue, column: key.column })));
       }
     },
     [GRID_HISTORY_SOURCE.CANCEL]: (entry, ops) => {
       if (isGridHistoryCancelData<TKey, TCell>(entry)) {
-        for (const { key, prevValue } of entry.data.updates) {
-          ops.setRow(key, prevValue);
-        }
-        for (const { key } of entry.data.deletions) {
-          ops.deleteRow(key.row, key.column);
-        }
-        for (const { key, rowValue } of entry.data.additions) {
-          ops.addRow(key.row, rowValue, key.column);
-        }
+        ops.setRows(entry.data.updates.map(({ key, prevValue }) => ({ key, value: prevValue })));
+        ops.deleteRows(entry.data.deletions.map(({ key }) => ({ row: key.row, column: key.column })));
+        ops.addRows(entry.data.additions.map(({ key, rowValue }) => ({ row: key.row, value: rowValue, column: key.column })));
       }
     },
   };
@@ -78,44 +78,36 @@ function createRedoHandlers<TKey extends IGridDataKey, TCell>(): Record<string, 
   return {
     [GRID_HISTORY_SOURCE.EDIT_CELL]: (entry, ops) => {
       if (isGridHistoryEditCellData<TKey, TCell>(entry)) {
-        ops.setCell(entry.data.key, entry.data.value);
+        ops.setCells([
+          {
+            key: entry.data.key,
+            value: entry.data.value,
+          },
+        ]);
       }
     },
     [GRID_HISTORY_SOURCE.ADD_ROW]: (entry, ops) => {
       if (isGridHistoryAddRowData<TKey, TCell>(entry)) {
-        for (const { key, value } of entry.data.keys) {
-          ops.addRow(key.row, value, key.column);
-        }
+        ops.addRows(entry.data.keys.map(({ key, value }) => ({ row: key.row, value, column: key.column })));
       }
     },
     [GRID_HISTORY_SOURCE.DELETE_ROW]: (entry, ops) => {
       if (isGridHistoryDeleteRowData<TKey, TCell>(entry)) {
-        for (const { key } of entry.data.keys) {
-          ops.deleteRow(key.row, key.column);
-        }
+        ops.deleteRows(entry.data.keys.map(({ key }) => ({ row: key.row, column: key.column })));
       }
     },
     [GRID_HISTORY_SOURCE.REVERT]: (entry, ops) => {
       if (isGridHistoryRevertData<TKey, TCell>(entry)) {
-        const allKeys: TKey[] = [
-          ...entry.data.updates.map(({ key }) => key),
-          ...entry.data.deletions.map(({ key }) => key),
-          ...entry.data.additions.map(({ key }) => key),
-        ];
-        ops.revert(allKeys);
+        ops.setCells(entry.data.updates.map(({ key, value }) => ({ key, value })));
+        ops.removeEdits(entry.data.deletions.map(({ key }) => ({ row: key.row })));
+        ops.deleteRows(entry.data.additions.map(({ key }) => ({ row: key.row, column: key.column })));
       }
     },
     [GRID_HISTORY_SOURCE.CANCEL]: (entry, ops) => {
       if (isGridHistoryCancelData<TKey, TCell>(entry)) {
-        for (const { key, value } of entry.data.updates) {
-          ops.setRow(key, value);
-        }
-        for (const { key } of entry.data.deletions) {
-          ops.revert([key]);
-        }
-        for (const { key } of entry.data.additions) {
-          ops.deleteRow(key.row, key.column);
-        }
+        ops.setRows(entry.data.updates.map(({ key, value }) => ({ key, value })));
+        ops.removeEdits(entry.data.deletions.map(({ key }) => ({ row: key.row })));
+        ops.deleteRows(entry.data.additions.map(({ key }) => ({ row: key.row, column: key.column })));
       }
     },
   };

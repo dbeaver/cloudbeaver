@@ -71,32 +71,30 @@ export class GridEditAction<
     this.data = data as GridDataResultAction<TColumn, TRow, TKey, TCell, TResult>;
     this.historyManager = new GridEditHistoryManager<TKey, TCell>(history as GridHistoryAction<IGridHistoryData<TKey, TCell>, TResult>);
 
-    makeObservable<this, 'editorData' | 'setCellValueInternal' | 'setRowValueInternal' | 'addRowInternal' | 'deleteRowInternal' | 'revertInternal'>(
+    makeObservable<this, 'editorData' | 'setCellsInternal' | 'setRowsInternal' | 'addRowsInternal' | 'deleteRowsInternal' | 'removeEditsInternal'>(
       this,
       {
         editorData: observable,
         set: action,
         add: action,
-        addRow: action,
         delete: action,
-        deleteRow: action,
         revert: action,
         applyUpdate: action,
         applyPartialUpdate: action,
-        setCellValueInternal: action,
-        setRowValueInternal: action,
-        addRowInternal: action,
-        deleteRowInternal: action,
-        revertInternal: action,
+        setCellsInternal: action,
+        setRowsInternal: action,
+        addRowsInternal: action,
+        deleteRowsInternal: action,
+        removeEditsInternal: action,
       },
     );
 
     this.historyManager.setupHandlers({
-      setCell: this.setCellValueInternal.bind(this),
-      setRow: this.setRowValueInternal.bind(this),
-      addRow: this.addRowInternal.bind(this),
-      deleteRow: this.deleteRowInternal.bind(this),
-      revert: this.revertInternal.bind(this),
+      setCells: this.setCellsInternal.bind(this),
+      setRows: this.setRowsInternal.bind(this),
+      addRows: this.addRowsInternal.bind(this),
+      deleteRows: this.deleteRowsInternal.bind(this),
+      removeEdits: this.removeEditsInternal.bind(this),
     });
   }
 
@@ -587,58 +585,56 @@ export class GridEditAction<
     }
   }
 
-  private setCellValueInternal(key: TKey, value: TCell): void {
-    const [update] = this.getOrCreateUpdate(key.row, DatabaseEditChangeType.update);
-    update.update[key.column.index] = value;
-    this.removeEmptyUpdate(update);
-  }
-
-  private setRowValueInternal(key: TKey, value: TCell[]): void {
-    const [update] = this.getOrCreateUpdate(key.row, DatabaseEditChangeType.update);
-    for (let i = 0; i < value.length; i++) {
-      update.update[i] = value[i]!;
-    }
-    this.removeEmptyUpdate(update);
-  }
-
-  private addRowInternal(row: IGridRowKey, value: TCell[] | undefined, column: IGridColumnKey): void {
-    if (value === undefined) {
-      value = this.data.columns.map(() => null) as TCell[];
-    }
-
-    this.getOrCreateUpdate(row, DatabaseEditChangeType.add, value);
-  }
-
-  private deleteRowInternal(row: IGridRowKey, _column: IGridColumnKey): void {
-    const serializedKey = GridDataKeysUtils.serialize(row);
-    const update = this.editorData.get(serializedKey);
-
-    if (update?.type === DatabaseEditChangeType.add) {
-      this.editorData.delete(serializedKey);
-    } else if (update) {
-      this.editorData.delete(serializedKey);
-      this.getOrCreateUpdate(row, DatabaseEditChangeType.delete);
-    } else {
-      this.getOrCreateUpdate(row, DatabaseEditChangeType.delete);
+  private setCellsInternal(cells: Array<{ key: TKey; value: TCell }>): void {
+    for (const { key, value } of cells) {
+      const [update] = this.getOrCreateUpdate(key.row, DatabaseEditChangeType.update);
+      update.update[key.column.index] = value;
+      this.removeEmptyUpdate(update);
     }
   }
 
-  private revertInternal(keys: TKey[]): void {
-    for (const key of keys) {
-      const row = GridDataKeysUtils.serialize(key.row);
-      const update = this.editorData.get(row);
+  private setRowsInternal(rows: Array<{ key: TKey; value: TCell[] }>): void {
+    for (const { key, value } of rows) {
+      const [update] = this.getOrCreateUpdate(key.row, DatabaseEditChangeType.update);
+      for (let i = 0; i < value.length; i++) {
+        update.update[i] = value[i]!;
+      }
+      this.removeEmptyUpdate(update);
+    }
+  }
 
-      if (!update) {
-        continue;
+  private addRowsInternal(rows: Array<{ row: IGridRowKey; value: TCell[] | undefined; column: IGridColumnKey }>): void {
+    for (const { row, value } of rows) {
+      let rowValue = value;
+
+      if (rowValue === undefined) {
+        rowValue = this.data.columns.map(() => null) as TCell[];
       }
 
-      if (update.type === DatabaseEditChangeType.delete) {
-        this.editorData.delete(row);
+      this.getOrCreateUpdate(row, DatabaseEditChangeType.add, rowValue);
+    }
+  }
+
+  private deleteRowsInternal(rows: Array<{ row: IGridRowKey; column: IGridColumnKey }>): void {
+    for (const { row } of rows) {
+      const serializedKey = GridDataKeysUtils.serialize(row);
+      const update = this.editorData.get(serializedKey);
+
+      if (update?.type === DatabaseEditChangeType.add) {
+        this.editorData.delete(serializedKey);
+      } else if (update) {
+        this.editorData.delete(serializedKey);
+        this.getOrCreateUpdate(row, DatabaseEditChangeType.delete);
       } else {
-        const value = update.source?.[key.column.index] ?? (null as TCell);
-        update.update[key.column.index] = value;
-        this.removeEmptyUpdate(update);
+        this.getOrCreateUpdate(row, DatabaseEditChangeType.delete);
       }
+    }
+  }
+
+  private removeEditsInternal(rows: Array<{ row: IGridRowKey }>): void {
+    for (const { row } of rows) {
+      const serializedKey = GridDataKeysUtils.serialize(row);
+      this.editorData.delete(serializedKey);
     }
   }
 
