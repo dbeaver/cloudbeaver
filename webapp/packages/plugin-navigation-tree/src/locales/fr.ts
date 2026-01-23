@@ -6,6 +6,7 @@ export default [
   ['app_navigationTree_link_with_editor', "Lier avec l'éditeur"],
   ['app_navigationTree_action_collapse_all', 'Tout réduire'],
   ['app_navigationTree_settings_filter_objects_description', 'Afficher la description des objets'],
+  ['plugin_navigation_tree_settings_filter_table_contents', 'Afficher les enfants des tables'],
   ['app_navigationTree_settings_filter_title', 'Filtrer'],
   ['app_navigationTree_settings_filter_description', 'Affiche les éléments filtrés dans les dossiers réduits'],
   ['app_navigationTree_settings_filter_all_title', 'Tout filtrer'],
