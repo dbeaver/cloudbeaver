@@ -6,7 +6,6 @@ export default [
   ['plugin_connection_view_option_simple_description', 'Mostra solo le tabelle'],
   ['plugin_connection_view_option_advanced', 'Avanzata'],
   ['plugin_connection_view_option_advanced_description', 'Mostra tutti gli oggetti del database'],
-  ['plugin_connection_view_option_custom', 'Personalizzata'],
   ['plugin_connection_view_option_show_system_objects', 'Mostra oggetti di sistema'],
-  ['plugin_connection_view_option_reset_description', 'This will reset the connection view settings to default values'],
+  ['plugin_connection_view_option_reset_description', 'Questo ripristinerà le impostazioni della vista connessione ai valori predefiniti'],
 ];

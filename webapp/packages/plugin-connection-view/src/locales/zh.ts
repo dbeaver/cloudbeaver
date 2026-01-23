@@ -6,7 +6,6 @@ export default [
   ['plugin_connection_view_option_simple_description', '仅显示表'],
   ['plugin_connection_view_option_advanced', '完善'],
   ['plugin_connection_view_option_advanced_description', '显示所有数据库对象'],
-  ['plugin_connection_view_option_custom', '自定义'],
   ['plugin_connection_view_option_show_system_objects', '展示系统对象'],
-  ['plugin_connection_view_option_reset_description', 'This will reset the connection view settings to default values'],
+  ['plugin_connection_view_option_reset_description', '这将把连接视图设置重置为默认值'],
 ];
