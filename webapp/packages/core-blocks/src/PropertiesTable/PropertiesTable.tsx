@@ -10,6 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { useCallback, useMemo, useState } from 'react';
 
 import { getObjectPropertyOptionValue } from '@cloudbeaver/core-sdk';
+import { isNotNullDefined } from '@dbeaver/js-helpers';
 
 import { Button } from '../Button.js';
 import { Filter } from '../FormControls/Filter.js';
@@ -89,7 +90,7 @@ export const PropertiesTable = observer<Props>(function PropertiesTable(props) {
     }
 
     if (propertiesState) {
-      const defaultValue = property.defaultValue !== undefined ? String(getObjectPropertyOptionValue(property.defaultValue)) : undefined;
+      const defaultValue = isNotNullDefined(property.defaultValue) ? String(getObjectPropertyOptionValue(property.defaultValue)) : undefined;
       if (value === defaultValue && !propsRef.staticProperties) {
         delete propertiesState[property.key];
       } else {

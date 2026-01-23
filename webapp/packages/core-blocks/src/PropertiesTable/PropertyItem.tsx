@@ -9,6 +9,7 @@ import { observer } from 'mobx-react-lite';
 import { useCallback, useLayoutEffect, useRef } from 'react';
 import { Input } from '@dbeaver/ui-kit';
 import { getObjectPropertyOptionName, getObjectPropertyOptionValue } from '@cloudbeaver/core-sdk';
+import { isNotNullDefined } from '@dbeaver/js-helpers';
 
 import { useTranslate } from '../localization/useTranslate.js';
 import { s } from '../s.js';
@@ -42,7 +43,7 @@ export const PropertyItem = observer<Props>(function PropertyItem({
   const styles = useS(classes);
   const translate = useTranslate();
   const isDeletable = !readOnly && !property.displayName && removable;
-  const defaultValue = property.defaultValue !== undefined ? String(getObjectPropertyOptionValue(property.defaultValue)) : undefined;
+  const defaultValue = isNotNullDefined(property.defaultValue) ? String(getObjectPropertyOptionValue(property.defaultValue)) : undefined;
   const edited = value !== undefined && value !== defaultValue;
   const keyInputRef = useRef<HTMLInputElement>(null);
 
