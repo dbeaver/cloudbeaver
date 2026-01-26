@@ -28,13 +28,13 @@ import io.cloudbeaver.model.cli.CloudBeaverInstanceServer;
 import io.cloudbeaver.model.config.CBAppConfig;
 import io.cloudbeaver.model.config.CBServerConfig;
 import io.cloudbeaver.registry.WebDriverRegistry;
-import io.cloudbeaver.registry.WebFeatureRegistry;
 import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.server.jetty.CBJettyServer;
 import io.cloudbeaver.service.DBWServiceInitializer;
 import io.cloudbeaver.service.DBWServiceServerConfigurator;
 import io.cloudbeaver.service.security.CBEmbeddedSecurityController;
 import io.cloudbeaver.service.session.CBSessionManager;
+import io.cloudbeaver.utils.ServletAppUtils;
 import io.cloudbeaver.utils.WebDataSourceUtils;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.osgi.service.datalocation.Location;
@@ -225,13 +225,6 @@ public abstract class CBApplication<T extends CBServerConfig>
 
         configurationMode = CommonUtils.isEmpty(getServerConfiguration().getServerName());
 
-        try {
-            refreshServerConfiguration();
-        } catch (DBException e) {
-            log.error("Error refreshing server configuration", e);
-            return;
-        }
-
         eventController.setForceSkipEvents(isConfigurationMode()); // do not send events if configuration mode is on
 
 
@@ -345,7 +338,7 @@ public abstract class CBApplication<T extends CBServerConfig>
         Set<String> enabledFeatures = new LinkedHashSet<>(Arrays.asList(getAppConfiguration().getEnabledFeatures()));
         Set<String> disabledFeatures = new LinkedHashSet<>(Arrays.asList(getAppConfiguration().getDisabledFeatures()));
 
-        WebFeatureRegistry.getInstance().getWebFeatures().stream()
+        ServletAppUtils.getServletApplication().getFeatureRegistry().getWebFeatures().stream()
             .filter(f -> f.isEnabledByDefault() && !disabledFeatures.contains(f.getId()))
             .forEach(f -> enabledFeatures.add(f.getId()));
 
@@ -416,6 +409,7 @@ public abstract class CBApplication<T extends CBServerConfig>
     }
 
     protected void initializeServer() throws DBException {
+        refreshServerConfiguration(); // update features and drivers
         for (DBWServiceServerConfigurator wsc : WebServiceRegistry.getInstance()
             .getWebServices(DBWServiceServerConfigurator.class)) {
             try {
