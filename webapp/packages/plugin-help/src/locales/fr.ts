@@ -19,6 +19,9 @@ export default [
   ['sql_editor_shortcut_open_editor_in_new_tab', "Ouvrir l'éditeur SQL dans un nouvel onglet"],
   ['sql_editor_shortcut_find', 'Rechercher'],
   ['sql_editor_shortcut_comment_uncomment_selection', 'Commenter/Décommenter la sélection'],
+  ['sql_editor_shortcut_start_completion', 'Afficher les suggestions de saisie semi-automatique'],
+  ['sql_editor_shortcut_accept_completion', 'Accepter la saisie semi-automatique'],
+  ['sql_editor_shortcut_escape', "Échapper l'éditeur"],
   ['navigation_tree_shortcut_enable_filter', 'Activer le filtrage'],
   ['plugin_help_multi_tab_support_title', "Le multi-onglet n'est pas supporté"],
   [
