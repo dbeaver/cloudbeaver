@@ -244,28 +244,6 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
                 ))}
             </Group>
           </Group>
-          <Group form gap>
-            <Container wrap gap>
-              <InputField type="text" name="name" minLength={1} state={optionsPart.state} readOnly={readonly || formState.isDisabled} required fill>
-                {translate('connections_connection_name')}
-              </InputField>
-              <ProjectSelect
-                value={formState.state.projectId}
-                readOnly={readonly || edit}
-                disabled={formState.isDisabled}
-                autoHide
-                onChange={setProject}
-              />
-              <InputField type="text" name="folder" state={optionsPart.state} autoHide readOnly tiny fill>
-                {translate('plugin_connections_connection_form_part_main_folder')}
-              </InputField>
-            </Container>
-            <Textarea name="description" rows={3} state={optionsPart.state} readOnly={readonly || formState.isDisabled}>
-              {translate('connections_connection_description')}
-            </Textarea>
-          </Group>
-        </Container>
-        <Container medium gap>
           {!driver?.anonymousAccess && (authentication.authorized || !edit) && (
             <Group form gap>
               <GroupTitle>{translate('connections_connection_edit_authentication')}</GroupTitle>
@@ -330,10 +308,32 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
               )}
             </Group>
           )}
+        </Container>
+        <Container medium gap>
           <Placeholder container={connectionFormService.providerPropertiesContainer} formState={formState} />
           {driver?.providerProperties && <ProviderPropertiesForm formState={formState} properties={driver.providerProperties} readonly={readonly} />}
 
           <AdvancedPropertiesForm config={optionsPart.state} disabled={formState.isDisabled} readonly={readonly} />
+          <Group form gap>
+            <Container wrap gap>
+              <InputField type="text" name="name" minLength={1} state={optionsPart.state} readOnly={readonly || formState.isDisabled} required fill>
+                {translate('connections_connection_name')}
+              </InputField>
+              <ProjectSelect
+                value={formState.state.projectId}
+                readOnly={readonly || edit}
+                disabled={formState.isDisabled}
+                autoHide
+                onChange={setProject}
+              />
+              <InputField type="text" name="folder" state={optionsPart.state} autoHide readOnly tiny fill>
+                {translate('plugin_connections_connection_form_part_main_folder')}
+              </InputField>
+            </Container>
+            <Textarea name="description" rows={3} state={optionsPart.state} readOnly={readonly || formState.isDisabled}>
+              {translate('connections_connection_description')}
+            </Textarea>
+          </Group>
         </Container>
       </ColoredContainer>
     </Form>

@@ -38,7 +38,7 @@
       "path": "../plugin-codemirror6"
     },
     {
-      "path": "../plugin-sql-editor-new"
+      "path": "../plugin-sql-editor-codemirror"
     }
   ],
   "include": [

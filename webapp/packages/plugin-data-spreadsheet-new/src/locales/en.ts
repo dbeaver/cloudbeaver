@@ -8,6 +8,9 @@ export default [
   ['data_grid_table_editing_row_delete', 'Delete current row'],
   ['data_grid_table_editing_row_revert', 'Revert value'],
   ['data_grid_table_order', 'Sorting'],
+  ['plugin_data_spreadsheet_new_pin_column', 'Pin Column'],
+  ['plugin_data_spreadsheet_new_unpin_column', 'Unpin Column'],
+  ['plugin_data_spreadsheet_new_unpin_all_columns', 'Unpin All Columns'],
   ['data_grid_table_open_value_panel', 'Show in value panel'],
   ['data_grid_table_filter', 'Filters'],
   ['data_grid_table_filter_cell_value', 'Cell value'],
@@ -26,4 +29,11 @@ export default [
   ['plugin_data_spreadsheet_new_settings_disable_description', 'Disable table presentation of data for all users'],
   ['plugin_data_spreadsheet_new_settings_description_label', 'Show columns description'],
   ['plugin_data_spreadsheet_new_settings_description_label_description', 'Description will be shown under the column names in the table header'],
+  ['plugin_data_spreadsheet_new_settings_use_locale_formatting_title', 'Use locale formatting'],
+  ['plugin_data_spreadsheet_new_settings_use_locale_formatting_os', 'Use OS formatting'],
+  ['plugin_data_spreadsheet_new_settings_use_locale_formatting_none', 'None'],
+  [
+    'plugin_data_spreadsheet_new_settings_use_locale_formatting_description',
+    'Use formatting for numbers and dates according to the selected locale. (!)This only affects data representation; raw values should be used for editing.',
+  ],
 ];

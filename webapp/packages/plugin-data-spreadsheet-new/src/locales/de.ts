@@ -7,6 +7,9 @@ export default [
   ['data_grid_table_editing_row_delete', 'Aktuelle Zeile löschen'],
   ['data_grid_table_editing_row_revert', 'Wert zurückkehren'],
   ['data_grid_table_order', 'Sortierung'],
+  ['plugin_data_spreadsheet_new_pin_column', 'Spalte anheften'],
+  ['plugin_data_spreadsheet_new_unpin_column', 'Spalte lösen'],
+  ['plugin_data_spreadsheet_new_unpin_all_columns', 'Alle Spalten lösen'],
   ['data_grid_table_filter_cell_value', 'Zellwert'],
   ['data_grid_table_filter_reset_all_filters', 'Alle Filter zurücksetzen'],
   ['data_grid_table_filter_delete_for_column', 'Filter für "{arg:column}" löschen'],
@@ -20,4 +23,11 @@ export default [
   ['plugin_data_spreadsheet_new_settings_disable_description', 'Deaktivieren Sie die Tabellenpräsentation von Daten für alle Benutzer'],
   ['plugin_data_spreadsheet_new_settings_description_label', 'Show columns description'],
   ['plugin_data_spreadsheet_new_settings_description_label_description', 'Description will be shown under the column names in the table header'],
+  ['plugin_data_spreadsheet_new_settings_use_locale_formatting_title', 'Gebietsschema-Formatierung verwenden'],
+  ['plugin_data_spreadsheet_new_settings_use_locale_formatting_os', 'OS-Formatierung verwenden'],
+  ['plugin_data_spreadsheet_new_settings_use_locale_formatting_none', 'Keine'],
+  [
+    'plugin_data_spreadsheet_new_settings_use_locale_formatting_description',
+    'Verwenden Sie die Formatierung für Zahlen und Daten entsprechend dem ausgewählten Gebietsschema. (!) Dies betrifft nur die Datendarstellung; für die Bearbeitung sollten Rohwerte verwendet werden.',
+  ],
 ];

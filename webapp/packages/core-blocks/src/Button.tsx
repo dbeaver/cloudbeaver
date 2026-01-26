@@ -19,20 +19,20 @@ import './Button.css';
 export type ButtonProps = (React.ButtonHTMLAttributes<HTMLButtonElement | HTMLAnchorElement> &
   React.LinkHTMLAttributes<HTMLLinkElement | HTMLButtonElement> &
   React.HTMLAttributes<HTMLDivElement>) & {
-  loading?: boolean;
-  icon?: string;
-  viewBox?: string;
-  iconPlacement?: 'start' | 'end';
-  iconSize?: number;
-  variant?: 'primary' | 'secondary' | 'danger';
-  size?: 'small' | 'medium' | 'large';
-  tag?: 'button' | 'a' | 'div';
-  href?: string;
-  target?: '_blank' | '_self' | '_parent' | '_top';
-  loader?: boolean;
-  onClick?: React.MouseEventHandler<HTMLButtonElement | HTMLAnchorElement | HTMLLinkElement | HTMLDivElement> | (() => Promise<any>);
-  download?: boolean;
-};
+    loading?: boolean;
+    icon?: string;
+    viewBox?: string;
+    iconPlacement?: 'start' | 'end';
+    iconSize?: number;
+    variant?: 'primary' | 'secondary' | 'danger' | 'ghost';
+    size?: 'small' | 'medium' | 'large';
+    tag?: 'button' | 'a' | 'div';
+    href?: string;
+    target?: '_blank' | '_self' | '_parent' | '_top';
+    loader?: boolean;
+    onClick?: React.MouseEventHandler<HTMLButtonElement | HTMLAnchorElement | HTMLLinkElement | HTMLDivElement> | (() => Promise<any>);
+    download?: boolean;
+  };
 
 export const Button = observer<ButtonProps>(function Button({
   children,

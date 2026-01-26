@@ -8,6 +8,9 @@ export default [
   ['data_grid_table_editing_row_delete', 'Удалить текущую строку'],
   ['data_grid_table_editing_row_revert', 'Отменить изменение'],
   ['data_grid_table_order', 'Сортировка'],
+  ['plugin_data_spreadsheet_new_pin_column', 'Закрепить колонку'],
+  ['plugin_data_spreadsheet_new_unpin_column', 'Открепить колонку'],
+  ['plugin_data_spreadsheet_new_unpin_all_columns', 'Открепить все колонки'],
   ['data_grid_table_open_value_panel', 'Показать в панели значений'],
   ['data_grid_table_filter', 'Фильтры'],
   ['data_grid_table_filter_cell_value', 'Значение ячейки'],
@@ -26,4 +29,11 @@ export default [
   ['plugin_data_spreadsheet_new_settings_disable_description', 'Отключить табличное представление данных для всех пользователей'],
   ['plugin_data_spreadsheet_new_settings_description_label', 'Показать описание колонки'],
   ['plugin_data_spreadsheet_new_settings_description_label_description', 'Описание будет показано под именами колонок в заголовке таблицы'],
+  ['plugin_data_spreadsheet_new_settings_use_locale_formatting_title', 'Использовать локальное форматирование'],
+  ['plugin_data_spreadsheet_new_settings_use_locale_formatting_os', 'Использовать системное форматирование'],
+  ['plugin_data_spreadsheet_new_settings_use_locale_formatting_none', 'Нет'],
+  [
+    'plugin_data_spreadsheet_new_settings_use_locale_formatting_description',
+    'Использовать форматирование для чисел и дат в соответствии с выбранной локалью. (!) Это влияет только на представление данных; для редактирования должны использоваться исходные значения.',
+  ],
 ];

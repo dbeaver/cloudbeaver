@@ -62,7 +62,7 @@ export const ServerConfigurationDriversForm = observer<Props>(function ServerCon
         title: 'ui_security_warning',
         message: translate('administration_disabled_drivers_enable_unsafe_driver_message', undefined, { driverName: driver?.name || id }),
         confirmActionText: 'ui_enable',
-        icon: '/icons/warning_icon.svg',
+        icon: '/icons/preload/warning_icon.svg',
         bigIcon: true,
         size: 'medium',
       });

@@ -6,22 +6,17 @@
  * you may not use this file except in compliance with the License.
  */
 .body {
-  flex: 1;
   box-sizing: content-box;
   display: flex;
   max-height: 100%;
   overflow: auto;
+  padding: 24px;
   padding-top: 0px;
   padding-right: 0px;
-  flex-shrink: 0;
-  padding: 24px;
 
   &.noBodyPadding {
     padding: 0px;
   }
-
-  padding-top: 0px;
-  padding-right: 0px;
 
   &.noBodyPadding + footer {
     padding-top: 24px;

@@ -8,6 +8,9 @@ export default [
   ['data_grid_table_editing_row_delete', 'Xóa hàng hiện tại'],
   ['data_grid_table_editing_row_revert', 'Hoàn nguyên giá trị'],
   ['data_grid_table_order', 'Sắp xếp'],
+  ['plugin_data_spreadsheet_new_pin_column', 'Ghim cột'],
+  ['plugin_data_spreadsheet_new_unpin_column', 'Bỏ ghim cột'],
+  ['plugin_data_spreadsheet_new_unpin_all_columns', 'Bỏ ghim tất cả cột'],
   ['data_grid_table_open_value_panel', 'Hiển thị trong bảng giá trị'],
   ['data_grid_table_filter', 'Bộ lọc'],
   ['data_grid_table_filter_cell_value', 'Giá trị ô'],
@@ -26,4 +29,11 @@ export default [
   ['plugin_data_spreadsheet_new_settings_disable_description', 'Tắt chế độ hiển thị dữ liệu dạng bảng cho tất cả người dùng'],
   ['plugin_data_spreadsheet_new_settings_description_label', 'Show columns description'],
   ['plugin_data_spreadsheet_new_settings_description_label_description', 'Description will be shown under the column names in the table header'],
+  ['plugin_data_spreadsheet_new_settings_use_locale_formatting_title', 'Sử dụng định dạng ngôn ngữ'],
+  ['plugin_data_spreadsheet_new_settings_use_locale_formatting_os', 'Sử dụng định dạng hệ điều hành'],
+  ['plugin_data_spreadsheet_new_settings_use_locale_formatting_none', 'Không'],
+  [
+    'plugin_data_spreadsheet_new_settings_use_locale_formatting_description',
+    'Sử dụng định dạng cho số và ngày theo ngôn ngữ đã chọn. (!) Điều này chỉ ảnh hưởng đến việc hiển thị dữ liệu; các giá trị thô nên được sử dụng để chỉnh sửa.',
+  ],
 ];

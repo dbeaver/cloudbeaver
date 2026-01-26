@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@ import {
   type IAdministrationItemRoute,
 } from '@cloudbeaver/core-administration';
 import {
-  Loader,
   s,
   SContext,
   SlideBox,
@@ -26,6 +25,7 @@ import {
   ToolsPanelStyles,
   useAutoLoad,
   useS,
+  SlidePanel,
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { OptionsPanelService, TabList, TabListStyles, TabsState, TabStyles } from '@cloudbeaver/core-ui';
@@ -140,19 +140,17 @@ export const Administration = observer<React.PropsWithChildren<Props>>(function 
           {children}
           <SContext registry={adminPageRegistry}>
             <SlideBox className={s(styles, { slideBox: true })} open={optionsPanelService.active} onClose={close}>
-              <SlideElement className={s(styles, { slideElement: true })}>
+              <SlideElement inert={optionsPanelService.active} className={s(styles, { slideElement: true })}>
                 <div className={s(styles, { content: true })}>
                   <ItemContent activeScreen={activeScreen} configurationWizard={configurationWizard} />
                 </div>
-                <SlideOverlay onClick={close} />
               </SlideElement>
-              <SlideElement className={s(styles, { slideElement: true })}>
-                <Loader className={s(styles, { loader: true })} suspense>
-                  <div className={s(styles, { content: true })}>
-                    <OptionsPanel />
-                  </div>
-                </Loader>
-              </SlideElement>
+              <SlideOverlay onClick={close} />
+              <SlidePanel isOpen={optionsPanelService.active} onClose={close}>
+                <div className={s(styles, { content: true })}>
+                  <OptionsPanel />
+                </div>
+              </SlidePanel>
             </SlideBox>
           </SContext>
         </div>

@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,7 @@ export interface ConfirmationDialogPayload {
   showSkipConfirmations?: boolean;
   showExtraAction?: boolean;
   bigIcon?: boolean;
+  noOverflow?: boolean;
   viewBox?: string;
   message: TLocalizationToken;
   confirmActionText?: TLocalizationToken;
@@ -60,6 +61,7 @@ export const ConfirmationDialog: DialogComponent<ConfirmationDialogPayload, Conf
     children,
     size = 'small',
     bigIcon,
+    noOverflow,
     viewBox,
     message,
     confirmActionText,
@@ -90,7 +92,7 @@ export const ConfirmationDialog: DialogComponent<ConfirmationDialogPayload, Conf
   return (
     <CommonDialogWrapper size={size} className={className} fixedWidth>
       <CommonDialogHeader title={title} subTitle={subTitle} icon={icon} viewBox={viewBox} bigIcon={bigIcon} onReject={reject} />
-      <CommonDialogBody>
+      <CommonDialogBody noOverflow={noOverflow}>
         <Translate token={message} />
         {children && children?.()}
       </CommonDialogBody>

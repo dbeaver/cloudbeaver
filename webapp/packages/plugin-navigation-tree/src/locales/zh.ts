@@ -3,7 +3,8 @@ export default [
   ['app_navigationTree_search', '搜索...'],
   ['app_navigationTree_limited', '元素数量限制为 {arg:limit} '],
   ['app_navigationTree_action_collapse_all', '收起全部'],
-  ['app_navigationTree_settings_filter_objects_description', 'Show objects description'],
+  ['app_navigationTree_settings_filter_objects_description', '显示对象描述'],
+  ['plugin_navigation_tree_settings_filter_table_contents', '显示表的子项'],
   ['app_navigationTree_settings_filter_title', '过滤器'],
   ['app_navigationTree_settings_filter_description', '查看过滤字段'],
   ['app_navigationTree_settings_filter_all_title', '查看收缩项'],
@@ -37,4 +38,5 @@ export default [
   ['plugin_navigation_tree_settings_projects_title', '项目分组'],
   ['plugin_navigation_tree_settings_disable', 'Disable'],
   ['plugin_navigation_tree_settings_disable_description', 'Disable navigation tree for all users'],
+  ['plugin_navigation_tree_toolbar_menu_title', '树工具栏菜单'],
 ];

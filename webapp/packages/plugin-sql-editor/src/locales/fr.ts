@@ -55,4 +55,9 @@ export default [
     'plugin_sql_editor_settings_auto_save_description_git_integration',
     'Automatically save the script files. This feature is only available when Git integration is turned off',
   ],
+  ['plugin_sql_editor_settings_highlight_white_space', "Mettre en surbrillance les caractères d'espace blanc"],
+  [
+    'plugin_sql_editor_settings_highlight_white_space_description',
+    "Mettre en surbrillance les espaces, les tabulations et les autres caractères d'espace blanc dans l'éditeur SQL",
+  ],
 ];

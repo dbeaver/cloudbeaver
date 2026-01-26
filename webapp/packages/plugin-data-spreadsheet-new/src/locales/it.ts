@@ -3,6 +3,9 @@ export default [
   ['data_grid_table_editing_set_to_null', 'Imposta a NULL'],
   ['data_grid_table_editing_open_inline_editor', "Apri l'editor contestuale"],
   ['data_grid_table_order', 'Ordinamento'],
+  ['plugin_data_spreadsheet_new_pin_column', 'Blocca colonna'],
+  ['plugin_data_spreadsheet_new_unpin_column', 'Sblocca colonna'],
+  ['plugin_data_spreadsheet_new_unpin_all_columns', 'Sblocca tutte le colonne'],
   ['data_grid_table_open_value_panel', 'Mostra nel pannello dei valori'],
   ['data_grid_table_filter', 'Filtri'],
   ['data_grid_table_filter_cell_value', 'Valore della cella'],
@@ -20,4 +23,11 @@ export default [
   ['plugin_data_spreadsheet_new_settings_disable', 'Disable Table presentation'],
   ['plugin_data_spreadsheet_new_settings_description_label', 'Show columns description'],
   ['plugin_data_spreadsheet_new_settings_description_label_description', 'Description will be shown under the column names in the table header'],
+  ['plugin_data_spreadsheet_new_settings_use_locale_formatting_title', 'Usa formattazione locale'],
+  ['plugin_data_spreadsheet_new_settings_use_locale_formatting_os', 'Usa formattazione del sistema operativo'],
+  ['plugin_data_spreadsheet_new_settings_use_locale_formatting_none', 'Nessuno'],
+  [
+    'plugin_data_spreadsheet_new_settings_use_locale_formatting_description',
+    'Usa la formattazione per numeri e date in base alla locale selezionata. (!) Questo influisce solo sulla rappresentazione dei dati; i valori grezzi devono essere usati per la modifica.',
+  ],
 ];

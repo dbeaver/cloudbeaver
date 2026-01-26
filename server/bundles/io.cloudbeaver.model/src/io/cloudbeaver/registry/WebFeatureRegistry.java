@@ -20,10 +20,12 @@ import io.cloudbeaver.DBWFeatureSet;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
+import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class WebFeatureRegistry {
 
@@ -33,7 +35,7 @@ public class WebFeatureRegistry {
 
     private static WebFeatureRegistry instance = null;
 
-    public synchronized static WebFeatureRegistry getInstance() {
+    public static synchronized WebFeatureRegistry getInstance() {
         if (instance == null) {
             instance = new WebFeatureRegistry();
             instance.loadExtensions(Platform.getExtensionRegistry());
@@ -41,23 +43,28 @@ public class WebFeatureRegistry {
         return instance;
     }
 
-    private final List<DBWFeatureSet> webFeatures = new ArrayList<>();
+    private final List<WebFeatureDescriptor> webFeatures = new ArrayList<>();
 
-    private WebFeatureRegistry() {
-    }
 
-    private void loadExtensions(IExtensionRegistry registry) {
+    protected void loadExtensions(@NotNull IExtensionRegistry registry) {
         IConfigurationElement[] extConfigs = registry.getConfigurationElementsFor(WebFeatureDescriptor.EXTENSION_ID);
         for (IConfigurationElement ext : extConfigs) {
             if (TAG_FEATURE.equals(ext.getName())) {
-                this.webFeatures.add(
-                    new WebFeatureDescriptor(ext));
+                this.webFeatures.add(createFeatureDescriptor(ext));
             }
         }
     }
 
+    @NotNull
+    protected WebFeatureDescriptor createFeatureDescriptor(@NotNull IConfigurationElement ext) {
+        return new WebFeatureDescriptor(ext);
+    }
+
+    @NotNull
     public List<DBWFeatureSet> getWebFeatures() {
-        return webFeatures;
+        return webFeatures.stream()
+            .filter(WebFeatureDescriptor::isApplicable)
+            .collect(Collectors.toList());
     }
 
 }

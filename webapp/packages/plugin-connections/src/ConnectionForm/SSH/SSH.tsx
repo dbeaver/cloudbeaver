@@ -128,7 +128,7 @@ export const SSH: TabContainerPanelComponent<Props> = observer(function SSH({ fo
             <InputField
               type="password"
               name="password"
-              autoComplete="section-ssh-authentication current-password"
+              autoComplete="section-ssh-authentication new-password"
               state={handlerState}
               readOnly={disabled || !enabled}
               required={!passwordSaved && !keyAuth && handlerState.savePassword}

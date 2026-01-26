@@ -1,4 +1,4 @@
-<img src="https://github.com/dbeaver/cloudbeaver/wiki/images/cloudbeaver-logo.png" align="right" width="250"/>
+<img src="https://github.com/dbeaver/cloudbeaver/wiki/images/cloudbeaver-logo.png" alt="CloudBeaver logo" align="right" width="250"/>
 
 # CloudBeaver Community
 
@@ -25,8 +25,33 @@ You can see a live demo of CloudBeaver here: https://demo.cloudbeaver.io
 
 ## Changelog
 
+### 25.3.3 2026-01-19
+
+- For security reasons, session expiration leads to a complete logout for a user and clears all data from the screen;
+- Added "Use local formatting" setting to Data Editor. Users can choose how to display numbers and dates: using the OS locale, a custom locale, or keeping values unformatted. This formatting applies only to displayed values. Data in the database remains unchanged;
+- Added the shortcut Ctrl/Cmd + . to cancel operations in Data Editor;
+- CloudBeaver now supports long polling as a fallback when WebSockets are unavailable or blocked, ensuring reliable communication for metadata updates and SQL execution;
+- Fixed a keyboard navigation issue for panels to keep the focus inside;
+- Clickhouse: Spatial data support was added.
+
+### 25.3.2 2026-01-05
+
+- The ability to pin columns has been added to the Data Editor, allowing users to keep key columns (e.g., IDs, names) visible while scrolling through wide tables;
+- Added a new setting in the SQL Editor to highlight spaces, tabs, and other whitespace characters to help users read, debug, and maintain their scripts. It is turned off by default and can be configured in personal preferences;
+- Redesigned the connection configuration page. Form fields and sections have been reorganized to provide more space for input and reduce visual clutter;
+- Clickhouse: driver has been updated to version 0.9.5;
+- Oracle: Added a new "Set Username to OS_USER" option in the Misc section of Oracle connection settings. When turned on, the tool automatically uses the current database username as the operating system user identifier in the session metadata.
+
+### 25.3.1 2025-12-22
+
+- Implemented an ability to add parameters and variables to queries in the SQL Editor. This feature allows for the reuse of queries by changing parameters at the execution stage. It is enabled by default and can be configured in personal preferences;
+- Added support for mapping users to CloudBeaver teams based on LDAP memberOf group membership;
+- Added support for previous browser versions, but not older than three years.
+
 ### 25.3.0 2025-12-01
+
 ### Changes since 25.2.0:
+
   - Administration:
     - Permission configuration for connections has been simplified, providing a clearer appearance and improved performance;
     - LDAP authentication now supports case-insensitive Distinguished Names (DNs), allowing login with mixed-case DNS.

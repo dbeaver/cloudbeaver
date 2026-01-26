@@ -2026,6 +2026,31 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@cloudbeaver/core-session-actions@workspace:*, @cloudbeaver/core-session-actions@workspace:packages/core-session-actions":
+  version: 0.0.0-use.local
+  resolution: "@cloudbeaver/core-session-actions@workspace:packages/core-session-actions"
+  dependencies:
+    "@cloudbeaver/core-blocks": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-dialogs": "workspace:*"
+    "@cloudbeaver/core-events": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-root": "workspace:*"
+    "@cloudbeaver/core-routing": "workspace:*"
+    "@cloudbeaver/core-sdk": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
+    "@dbeaver/cli": "workspace:*"
+    "@types/react": "npm:^19"
+    "@types/react-dom": "npm:^19"
+    react: "npm:^19"
+    react-dom: "npm:^19"
+    rimraf: "npm:^6"
+    tslib: "npm:^2"
+    typescript: "npm:^5"
+  languageName: unknown
+  linkType: soft
+
 "@cloudbeaver/core-session-localization@workspace:*, @cloudbeaver/core-session-localization@workspace:packages/core-session-localization":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/core-session-localization@workspace:packages/core-session-localization"
@@ -2311,8 +2336,11 @@ __metadata:
     "@cloudbeaver/core-extensions": "workspace:*"
     "@cloudbeaver/core-localization": "workspace:*"
     "@cloudbeaver/core-utils": "workspace:*"
+    "@cloudbeaver/tests-runner": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
+    "@dbeaver/cli": "workspace:*"
     "@dbeaver/js-helpers": "workspace:*"
+    "@dbeaver/react-tests": "workspace:*"
     "@types/react": "npm:^19"
     mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
@@ -2322,6 +2350,7 @@ __metadata:
     tslib: "npm:^2"
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
+    vitest: "npm:^4"
   languageName: unknown
   linkType: soft
 
@@ -2878,6 +2907,7 @@ __metadata:
     "@cloudbeaver/plugin-data-viewer-conditional-formatting": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
     "@dbeaver/cli": "workspace:*"
+    "@dbeaver/js-helpers": "workspace:*"
     "@dbeaver/react-tests": "workspace:*"
     "@dbeaver/result-set-api": "workspace:*"
     "@dbeaver/ui-kit": "workspace:*"
@@ -2938,8 +2968,8 @@ __metadata:
     "@cloudbeaver/plugin-codemirror6": "workspace:*"
     "@cloudbeaver/plugin-data-viewer": "workspace:*"
     "@cloudbeaver/plugin-sql-editor": "workspace:*"
+    "@cloudbeaver/plugin-sql-editor-codemirror": "workspace:*"
     "@cloudbeaver/plugin-sql-editor-navigation-tab": "workspace:*"
-    "@cloudbeaver/plugin-sql-editor-new": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
     "@dbeaver/cli": "workspace:*"
     "@dbeaver/js-helpers": "workspace:*"
@@ -3115,7 +3145,7 @@ __metadata:
     "@cloudbeaver/plugin-codemirror6": "workspace:*"
     "@cloudbeaver/plugin-data-grid": "workspace:*"
     "@cloudbeaver/plugin-datasource-context-switch": "workspace:*"
-    "@cloudbeaver/plugin-sql-editor-new": "workspace:*"
+    "@cloudbeaver/plugin-sql-editor-codemirror": "workspace:*"
     "@cloudbeaver/plugin-tools-panel": "workspace:*"
     "@cloudbeaver/plugin-top-app-bar": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
@@ -3150,8 +3180,8 @@ __metadata:
     "@cloudbeaver/plugin-codemirror6": "workspace:*"
     "@cloudbeaver/plugin-navigation-tree": "workspace:*"
     "@cloudbeaver/plugin-sql-editor": "workspace:*"
+    "@cloudbeaver/plugin-sql-editor-codemirror": "workspace:*"
     "@cloudbeaver/plugin-sql-editor-navigation-tab": "workspace:*"
-    "@cloudbeaver/plugin-sql-editor-new": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
     "@types/react": "npm:^19"
     mobx: "npm:^6"
@@ -3242,7 +3272,7 @@ __metadata:
     "@cloudbeaver/core-routing": "workspace:*"
     "@cloudbeaver/core-utils": "workspace:*"
     "@cloudbeaver/core-view": "workspace:*"
-    "@cloudbeaver/plugin-data-spreadsheet-new": "workspace:*"
+    "@cloudbeaver/plugin-data-viewer": "workspace:*"
     "@cloudbeaver/plugin-navigation-tabs": "workspace:*"
     "@cloudbeaver/plugin-navigation-tree": "workspace:*"
     "@cloudbeaver/plugin-object-viewer-nav-tree-link": "workspace:*"
@@ -3474,6 +3504,7 @@ __metadata:
     "@dbeaver/cli": "workspace:*"
     "@dbeaver/js-helpers": "workspace:*"
     "@dbeaver/react-tests": "workspace:*"
+    "@dbeaver/ui-kit": "workspace:^"
     "@types/react": "npm:^19"
     mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
@@ -3786,6 +3817,7 @@ __metadata:
     "@cloudbeaver/core-sdk": "workspace:*"
     "@cloudbeaver/core-server-localization": "workspace:*"
     "@cloudbeaver/core-server-notifications": "workspace:*"
+    "@cloudbeaver/core-session-actions": "workspace:*"
     "@cloudbeaver/core-session-localization": "workspace:*"
     "@cloudbeaver/core-settings": "workspace:*"
     "@cloudbeaver/core-settings-localization": "workspace:*"
@@ -3992,7 +4024,28 @@ __metadata:
     "@cloudbeaver/core-root": "workspace:*"
     "@cloudbeaver/core-sdk": "workspace:*"
     "@cloudbeaver/plugin-codemirror6": "workspace:*"
-    "@cloudbeaver/plugin-sql-editor-new": "workspace:*"
+    "@cloudbeaver/plugin-sql-editor-codemirror": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
+    "@types/react": "npm:^19"
+    mobx: "npm:^6"
+    mobx-react-lite: "npm:^4"
+    react: "npm:^19"
+    react-dom: "npm:^19"
+    rimraf: "npm:^6"
+    tslib: "npm:^2"
+    typescript: "npm:^5"
+    typescript-plugin-css-modules: "npm:^5"
+  languageName: unknown
+  linkType: soft
+
+"@cloudbeaver/plugin-sql-editor-codemirror@workspace:*, @cloudbeaver/plugin-sql-editor-codemirror@workspace:packages/plugin-sql-editor-codemirror":
+  version: 0.0.0-use.local
+  resolution: "@cloudbeaver/plugin-sql-editor-codemirror@workspace:packages/plugin-sql-editor-codemirror"
+  dependencies:
+    "@cloudbeaver/core-blocks": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-sdk": "workspace:*"
+    "@cloudbeaver/plugin-codemirror6": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
     "@types/react": "npm:^19"
     mobx: "npm:^6"
@@ -4097,6 +4150,7 @@ __metadata:
     "@cloudbeaver/core-utils": "workspace:*"
     "@cloudbeaver/plugin-codemirror6": "workspace:*"
     "@cloudbeaver/plugin-sql-editor": "workspace:*"
+    "@cloudbeaver/plugin-sql-editor-codemirror": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
     "@types/react": "npm:^19"
     mobx: "npm:^6"
@@ -4169,6 +4223,7 @@ __metadata:
     "@cloudbeaver/plugin-codemirror6": "workspace:*"
     "@cloudbeaver/plugin-data-viewer": "workspace:*"
     "@cloudbeaver/plugin-navigation-tabs": "workspace:*"
+    "@cloudbeaver/plugin-sql-editor-codemirror": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
     "@dbeaver/cli": "workspace:*"
     "@dbeaver/js-helpers": "workspace:^"
@@ -4204,7 +4259,7 @@ __metadata:
     "@cloudbeaver/plugin-codemirror6": "workspace:*"
     "@cloudbeaver/plugin-data-viewer": "workspace:*"
     "@cloudbeaver/plugin-sql-editor": "workspace:*"
-    "@cloudbeaver/plugin-sql-editor-new": "workspace:*"
+    "@cloudbeaver/plugin-sql-editor-codemirror": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
     "@dbeaver/cli": "workspace:*"
     "@types/react": "npm:^19"
@@ -4556,6 +4611,7 @@ __metadata:
     "@cloudbeaver/tsconfig": "workspace:*"
     "@dbeaver/ui-kit": "workspace:^"
     "@storybook/addon-docs": "npm:^10"
+    "@storybook/addon-storysource": "npm:^8"
     "@storybook/react-vite": "npm:^10"
     "@tailwindcss/vite": "npm:4.0.7"
     "@types/node": "npm:^22"
@@ -4858,9 +4914,9 @@ __metadata:
     "@dbeaver/ui-kit": "workspace:^"
     "@types/react": "npm:^19"
     "@types/react-dom": "npm:^19"
-    react: "npm:^19"
-    react-data-grid: "npm:7.0.0-beta.59"
-    react-dom: "npm:^19"
+    react: "npm:^19.2"
+    react-data-grid: "file:./artifacts"
+    react-dom: "npm:^19.2"
     rimraf: "npm:^6"
     typescript: "npm:^5"
   languageName: unknown
@@ -7422,6 +7478,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@storybook/addon-storysource@npm:^8":
+  version: 8.6.15
+  resolution: "@storybook/addon-storysource@npm:8.6.15"
+  dependencies:
+    "@storybook/source-loader": "npm:8.6.15"
+    estraverse: "npm:^5.2.0"
+    tiny-invariant: "npm:^1.3.1"
+  peerDependencies:
+    storybook: ^8.6.15
+  checksum: 10c0/e7486d3a405b15f15ba6e42bf327d6da0c61f02634f454a167ef02a505c6e65952840ecd6066b32a994313d03fe6615a6295c2027dce3591f017427a95ba4e13
+  languageName: node
+  linkType: hard
+
 "@storybook/builder-vite@npm:10.1.7":
   version: 10.1.7
   resolution: "@storybook/builder-vite@npm:10.1.7"
@@ -7526,6 +7595,19 @@ __metadata:
     typescript:
       optional: true
   checksum: 10c0/e3c5e424d749cba9924c30a25070b691c4f4a5e478f9e8e098be6043e8f96a7a022e95bb476525d1396cb9519744ffe7e8d2bf9385b4ec31428d8060352ef692
+  languageName: node
+  linkType: hard
+
+"@storybook/source-loader@npm:8.6.15":
+  version: 8.6.15
+  resolution: "@storybook/source-loader@npm:8.6.15"
+  dependencies:
+    es-toolkit: "npm:^1.22.0"
+    estraverse: "npm:^5.2.0"
+    prettier: "npm:^3.1.1"
+  peerDependencies:
+    storybook: ^8.6.15
+  checksum: 10c0/51de6e7d0534142ec7e74e46bbfdfd82dbacffe64c730fd42b323627b1e3ebd83493eb40986a4755f45d923ed8639ee58cd1281471d6f88556a6b8a27956a012
   languageName: node
   linkType: hard
 
@@ -11566,6 +11648,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"es-toolkit@npm:^1.22.0":
+  version: 1.43.0
+  resolution: "es-toolkit@npm:1.43.0"
+  dependenciesMeta:
+    "@trivago/prettier-plugin-sort-imports@4.3.0":
+      unplugged: true
+    prettier-plugin-sort-re-exports@0.0.1:
+      unplugged: true
+  checksum: 10c0/bbff0b591fd01be9f37a34dad7964b590e4952fc594c1230140771687f05136caa6ab21962a6e9cde7c4b529a149171ed5179d6379d4a8e656dbf7e8d126999c
+  languageName: node
+  linkType: hard
+
 "esast-util-from-estree@npm:^2.0.0":
   version: 2.0.0
   resolution: "esast-util-from-estree@npm:2.0.0"
@@ -11858,14 +11952,14 @@ __metadata:
   linkType: hard
 
 "eslint-plugin-storybook@npm:^10":
-  version: 10.1.7
-  resolution: "eslint-plugin-storybook@npm:10.1.7"
+  version: 10.1.10
+  resolution: "eslint-plugin-storybook@npm:10.1.10"
   dependencies:
     "@typescript-eslint/utils": "npm:^8.8.1"
   peerDependencies:
     eslint: ">=8"
-    storybook: ^10.1.7
-  checksum: 10c0/e1ea9082c86f07ed53b436ef7cb20af348b4237fd72f46c445c3366ff225f466ac1c8f3d343a9609053abea7ee1001b9f2af27f5743e6e83e8a942035b6f2e3b
+    storybook: ^10.1.10
+  checksum: 10c0/7c891a849481e68fec354752f00c69b94c689c6b382671c48fb539cb086a626273be668b0fb7ceceb170a4b0f5dcb38a57d6cd093f349c1ff6f5ba2565fae765
   languageName: node
   linkType: hard
 
@@ -16395,7 +16489,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prettier@npm:^3, prettier@npm:^3.6.2":
+"prettier@npm:^3, prettier@npm:^3.1.1, prettier@npm:^3.6.2":
   version: 3.7.4
   resolution: "prettier@npm:3.7.4"
   bin:
@@ -16566,13 +16660,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-data-grid@npm:7.0.0-beta.59":
+"react-data-grid@file:./artifacts::locator=%40dbeaver%2Freact-data-grid%40workspace%3Acommon-react%2F%40dbeaver%2Freact-data-grid":
   version: 7.0.0-beta.59
-  resolution: "react-data-grid@npm:7.0.0-beta.59"
+  resolution: "react-data-grid@file:./artifacts#./artifacts::hash=2cc675&locator=%40dbeaver%2Freact-data-grid%40workspace%3Acommon-react%2F%40dbeaver%2Freact-data-grid"
   peerDependencies:
     react: ^19.2
     react-dom: ^19.2
-  checksum: 10c0/b48da72e4e2d7562727354301fffd8433a06659e536effecae8a410a8e44e84e3368cde1970f98945ecd221e45ecbf4e4baa562e42fe32e5a9ff74a36a910633
+  checksum: 10c0/f0f608516b430249906d52259a1f792c9bcd47d0ddcb385500a1a528812c58d12a78d0f1a62f4d055b9247d3f6a7f008ec0b5f5b208589eb84acb8647eeb6272
   languageName: node
   linkType: hard
 
@@ -17985,8 +18079,8 @@ __metadata:
   linkType: hard
 
 "storybook@npm:^10":
-  version: 10.1.7
-  resolution: "storybook@npm:10.1.7"
+  version: 10.1.10
+  resolution: "storybook@npm:10.1.10"
   dependencies:
     "@storybook/global": "npm:^5.0.0"
     "@storybook/icons": "npm:^2.0.0"
@@ -18007,7 +18101,7 @@ __metadata:
       optional: true
   bin:
     storybook: ./dist/bin/dispatcher.js
-  checksum: 10c0/eaab0289f3c231d9edf8beb2f7d7efbe8df3336a08129b6c2c7db501c332ba14e0a1b894ccce4db90251c4c1b2f023d20df5d4dfc951b53cece727f0da294680
+  checksum: 10c0/beff5472ee86a995cbde2789b2aabd941f823e31ca6957bb4434cb8ee3d3703cf1248e44f4b4d402416a52bfee94677e74f233cc906487901e831e8ab610defa
   languageName: node
   linkType: hard
 
@@ -18426,7 +18520,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tiny-invariant@npm:^1.3.3":
+"tiny-invariant@npm:^1.3.1, tiny-invariant@npm:^1.3.3":
   version: 1.3.3
   resolution: "tiny-invariant@npm:1.3.3"
   checksum: 10c0/65af4a07324b591a059b35269cd696aba21bef2107f29b9f5894d83cc143159a204b299553435b03874ebb5b94d019afa8b8eff241c8a4cfee95872c2e1c1c4a

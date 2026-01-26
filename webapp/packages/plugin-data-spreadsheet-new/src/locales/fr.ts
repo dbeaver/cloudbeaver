@@ -8,6 +8,9 @@ export default [
   ['data_grid_table_editing_row_delete', 'Supprimer la ligne actuelle'],
   ['data_grid_table_editing_row_revert', 'Revenir à la valeur'],
   ['data_grid_table_order', 'Tri'],
+  ['plugin_data_spreadsheet_new_pin_column', 'Épingler la colonne'],
+  ['plugin_data_spreadsheet_new_unpin_column', 'Désépingler la colonne'],
+  ['plugin_data_spreadsheet_new_unpin_all_columns', 'Désépingler toutes les colonnes'],
   ['data_grid_table_open_value_panel', 'Afficher dans le panneau de valeurs'],
   ['data_grid_table_filter', 'Filtres'],
   ['data_grid_table_filter_cell_value', 'Valeur de la cellule'],
@@ -25,4 +28,11 @@ export default [
   ['plugin_data_spreadsheet_new_settings_disable', 'Désactiver la présentation de la table'],
   ['plugin_data_spreadsheet_new_settings_description_label', 'Show columns description'],
   ['plugin_data_spreadsheet_new_settings_description_label_description', 'Description will be shown under the column names in the table header'],
+  ['plugin_data_spreadsheet_new_settings_use_locale_formatting_title', 'Utiliser le formatage régional'],
+  ['plugin_data_spreadsheet_new_settings_use_locale_formatting_os', "Utiliser le formatage du système d'exploitation"],
+  ['plugin_data_spreadsheet_new_settings_use_locale_formatting_none', 'Aucun'],
+  [
+    'plugin_data_spreadsheet_new_settings_use_locale_formatting_description',
+    "Utilisez le formatage pour les nombres et les dates selon les paramètres régionaux sélectionnés. (!) Cela n'affecte que la représentation des données ; les valeurs brutes doivent être utilisées pour l'édition.",
+  ],
 ];

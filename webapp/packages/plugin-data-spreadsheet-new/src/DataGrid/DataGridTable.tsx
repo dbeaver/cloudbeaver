@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -9,10 +9,8 @@ import { observer } from 'mobx-react-lite';
 import { useCallback, useLayoutEffect, useMemo, useRef, type HTMLAttributes } from 'react';
 import { reaction } from 'mobx';
 
-import { getComputed, s, TextPlaceholder, useObjectRef, useS, useTranslate } from '@cloudbeaver/core-blocks';
-// import { useService } from '@cloudbeaver/core-di';
+import { getComputed, TextPlaceholder, useObjectRef, useTranslate } from '@cloudbeaver/core-blocks';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
-// import { ClipboardService } from '@cloudbeaver/core-ui';
 import { useCaptureViewContext } from '@cloudbeaver/core-view';
 import {
   DataGrid,
@@ -36,11 +34,13 @@ import {
   ResultSetDataSource,
   getNextOrder,
   isResultSetDataModel,
+  IDatabaseDataCacheAction,
   IDatabaseDataSelectAction,
   IDatabaseDataViewAction,
   IDatabaseDataConstraintAction,
   GridSelectAction,
   GridViewAction,
+  ResultSetCacheAction,
   type IGridEditActionData,
   type IGridDataKey,
 } from '@cloudbeaver/plugin-data-viewer';
@@ -49,10 +49,12 @@ import { CellRenderer } from './CellRenderer/CellRenderer.js';
 import { DataGridContext, type IDataGridContext } from './DataGridContext.js';
 import { DataGridSelectionContext } from './DataGridSelection/DataGridSelectionContext.js';
 import { useGridSelectionContext } from './DataGridSelection/useGridSelectionContext.js';
-import classes from './DataGridTable.module.css';
+import './DataGridTable.css';
 import { CellFormatter } from './Formatters/CellFormatter.js';
+import { FormattingContext } from './FormattingContext.js';
 import { TableDataContext } from './TableDataContext.js';
 import { useGridDragging } from './useGridDragging.js';
+import { useFormatting } from './useFormatting.js';
 import { useGridSelectedCellsCopy } from './useGridSelectedCellsCopy.js';
 import { useTableData } from './useTableData.js';
 import { TableColumnHeader } from './TableColumnHeader/TableColumnHeader.js';
@@ -63,17 +65,8 @@ const ROW_HEIGHT = 24;
 export const HEADER_HEIGHT = 32;
 export const HEADER_WITH_DESC_HEIGHT = 42;
 
-export const DataGridTable = observer<IDataPresentationProps>(function DataGridTable({
-  model,
-  actions,
-  resultIndex,
-  simple,
-  className,
-  dataFormat,
-  ...rest
-}) {
+export const DataGridTable = observer<IDataPresentationProps>(function DataGridTable({ model, actions, resultIndex, simple, className, ...rest }) {
   const translate = useTranslate();
-  const styles = useS(classes);
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
   const dataGridDivRef = useRef<HTMLDivElement | null>(null);
   const focusedCell = useRef<ICellPosition | null>(null);
@@ -82,9 +75,12 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
 
   const selectionAction = model.source.getAction(resultIndex, IDatabaseDataSelectAction, GridSelectAction);
   const viewAction = model.source.getAction(resultIndex, IDatabaseDataViewAction, GridViewAction);
+  const cacheAction = model.source.getAction(resultIndex, IDatabaseDataCacheAction, ResultSetCacheAction);
 
   const tableData = useTableData(model as unknown as IDatabaseDataModel<ResultSetDataSource>, resultIndex, dataGridDivRef);
-  const gridSelectionContext = useGridSelectionContext(tableData, selectionAction);
+  const formatting = useFormatting(tableData, cacheAction);
+  const getHeaderOrder = useCallback(() => (dataGridRef.current?.getColumnsOrdered() ?? []).map(col => col.key), [dataGridRef]);
+  const gridSelectionContext = useGridSelectionContext(tableData, selectionAction, getHeaderOrder);
 
   const restoreFocus = useCallback(
     function restoreFocus() {
@@ -302,11 +298,22 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
     return null;
   }
 
+  // Track pinnedColumns.size to trigger re-render when columns are pinned/unpinned
+  // This ensures the component re-renders when columns are pinned/unpinned
+  getComputed(() => viewAction.pinnedColumns.size);
+
   function getHeaderPinned(colIdx: number) {
     if (colIdx === 0) {
       return true;
     }
-    return false;
+
+    const column = tableData.getColumn(colIdx);
+
+    if (!column?.key) {
+      return false;
+    }
+
+    return viewAction.isColumnPinned(column.key);
   }
 
   function getHeaderResizable(colIdx: number) {
@@ -488,43 +495,45 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
     <DataGridContext.Provider value={gridContext}>
       <DataGridSelectionContext.Provider value={gridSelectionContext}>
         <TableDataContext.Provider value={tableData}>
-          <div
-            ref={setContainersRef}
-            tabIndex={-1}
-            {...rest}
-            className={s(styles, { container: true }, className)}
-            onMouseDown={onMouseDownHandler}
-            onMouseMove={onMouseMoveHandler}
-          >
-            <DataGrid
-              ref={dataGridRef}
-              className={s(styles, { grid: true }, className)}
-              cell={cell}
-              cellText={cellText}
-              cellElement={cellElement}
-              rowElement={rowElement}
-              getCellEditable={isCellEditable}
-              headerElement={headerElement}
-              getHeaderHeight={() => headerHeight}
-              getHeaderWidth={getHeaderWidth}
-              getHeaderPinned={getHeaderPinned}
-              getHeaderResizable={getHeaderResizable}
-              getRowHeight={() => ROW_HEIGHT}
-              getColumnKey={getColumnKey}
-              columnCount={columnsCount}
-              rowCount={rowsCount}
-              columnSortable={columnSortable}
-              columnSortingState={columnSortingState}
-              getRowId={rowIdx => (tableData.rows[rowIdx] ? GridDataKeysUtils.serialize(tableData.rows[rowIdx]) : '')}
-              columnSortingMultiple
-              onFocus={handleFocusChange}
-              onScrollToBottom={handleScrollToBottom}
-              onColumnSort={handleSort}
-              onCellChange={handleCellChange}
-              onCellKeyDown={handleCellKeyDown}
-              onHeaderKeyDown={gridSelectedCellCopy.onKeydownHandler}
-            />
-          </div>
+          <FormattingContext.Provider value={formatting}>
+            <div
+              ref={setContainersRef}
+              tabIndex={-1}
+              {...rest}
+              className={clsx('data-grid__container', 'theme-typography--caption', className)}
+              onMouseDown={onMouseDownHandler}
+              onMouseMove={onMouseMoveHandler}
+            >
+              <DataGrid
+                ref={dataGridRef}
+                className={clsx('data-grid__grid', className)}
+                cell={cell}
+                cellText={cellText}
+                cellElement={cellElement}
+                rowElement={rowElement}
+                getCellEditable={isCellEditable}
+                headerElement={headerElement}
+                getHeaderHeight={() => headerHeight}
+                getHeaderWidth={getHeaderWidth}
+                getHeaderPinned={getHeaderPinned}
+                getHeaderResizable={getHeaderResizable}
+                getRowHeight={() => ROW_HEIGHT}
+                getColumnKey={getColumnKey}
+                columnCount={columnsCount}
+                rowCount={rowsCount}
+                columnSortable={columnSortable}
+                columnSortingState={columnSortingState}
+                getRowId={rowIdx => (tableData.rows[rowIdx] ? GridDataKeysUtils.serialize(tableData.rows[rowIdx]) : '')}
+                columnSortingMultiple
+                onFocus={handleFocusChange}
+                onScrollToBottom={handleScrollToBottom}
+                onColumnSort={handleSort}
+                onCellChange={handleCellChange}
+                onCellKeyDown={handleCellKeyDown}
+                onHeaderKeyDown={gridSelectedCellCopy.onKeydownHandler}
+              />
+            </div>
+          </FormattingContext.Provider>
         </TableDataContext.Provider>
       </DataGridSelectionContext.Provider>
     </DataGridContext.Provider>

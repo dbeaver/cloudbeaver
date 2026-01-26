@@ -42,7 +42,7 @@ public class WebConnectionConfig {
     private String databaseName;
     private String url;
 
-    private int keepAliveInterval;
+    private Integer keepAliveInterval;
 
     private String name;
     private String description;
@@ -53,15 +53,15 @@ public class WebConnectionConfig {
 
     private String authModelId;
     private Map<String, Object> credentials;
-    private boolean saveCredentials;
-    private boolean sharedCredentials;
+    private Boolean saveCredentials;
+    private Boolean sharedCredentials;
     private Map<String, Object> mainPropertyValues;
     private Map<String, Object> expertSettingsValues;
     private Map<String, Object> providerProperties;
     private List<WebNetworkHandlerConfigInput> networkHandlersConfig;
     private DBPDriverConfigurationType configurationType;
     private String selectedSecretId;
-    private boolean defaultAutoCommit;
+    private Boolean defaultAutoCommit;
     private String defaultCatalogName;
     private String defaultSchemaName;
 
@@ -122,9 +122,17 @@ public class WebConnectionConfig {
         return connectionId;
     }
 
+    public void setConnectionId(String connectionId) {
+        this.connectionId = connectionId;
+    }
+
     @Property
     public String getDriverId() {
         return driverId;
+    }
+
+    public void setDriverId(String driverId) {
+        this.driverId = driverId;
     }
 
     @Property
@@ -132,9 +140,17 @@ public class WebConnectionConfig {
         return readOnly;
     }
 
+    public void setReadOnly(boolean readOnly) {
+        this.readOnly = readOnly;
+    }
+
     @Property
     public String getName() {
         return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     @Property
@@ -142,9 +158,17 @@ public class WebConnectionConfig {
         return description;
     }
 
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     @Property
     public String getFolder() {
         return folder;
+    }
+
+    public void setFolder(String folder) {
+        this.folder = folder;
     }
 
     @Property
@@ -152,9 +176,17 @@ public class WebConnectionConfig {
         return host;
     }
 
+    public void setHost(String host) {
+        this.host = host;
+    }
+
     @Property
     public String getPort() {
         return port;
+    }
+
+    public void setPort(String port) {
+        this.port = port;
     }
 
     @Property
@@ -162,9 +194,17 @@ public class WebConnectionConfig {
         return serverName;
     }
 
+    public void setServerName(String serverName) {
+        this.serverName = serverName;
+    }
+
     @Property
     public String getDatabaseName() {
         return databaseName;
+    }
+
+    public void setDatabaseName(String databaseName) {
+        this.databaseName = databaseName;
     }
 
     @Property
@@ -172,9 +212,17 @@ public class WebConnectionConfig {
         return url;
     }
 
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
     @Property
     public Map<String, Object> getProperties() {
         return properties;
+    }
+
+    public void setProperties(Map<String, Object> properties) {
+        this.properties = properties;
     }
 
     @Property
@@ -182,9 +230,17 @@ public class WebConnectionConfig {
         return userName;
     }
 
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
     @Property
     public String getUserPassword() {
         return userPassword;
+    }
+
+    public void setUserPassword(String userPassword) {
+        this.userPassword = userPassword;
     }
 
     @Property
@@ -192,9 +248,17 @@ public class WebConnectionConfig {
         return authModelId;
     }
 
+    public void setAuthModelId(String authModelId) {
+        this.authModelId = authModelId;
+    }
+
     @Property
     public DBPDriverConfigurationType getConfigurationType() {
         return configurationType;
+    }
+
+    public void setConfigurationType(DBPDriverConfigurationType configurationType) {
+        this.configurationType = configurationType;
     }
 
     @Property
@@ -202,8 +266,16 @@ public class WebConnectionConfig {
         return credentials;
     }
 
+    public void setCredentials(Map<String, Object> credentials) {
+        this.credentials = credentials;
+    }
+
     public List<WebNetworkHandlerConfigInput> getNetworkHandlersConfig() {
         return networkHandlersConfig;
+    }
+
+    public void setNetworkHandlersConfig(List<WebNetworkHandlerConfigInput> networkHandlersConfig) {
+        this.networkHandlersConfig = networkHandlersConfig;
     }
 
     @Property
@@ -211,13 +283,17 @@ public class WebConnectionConfig {
         return saveCredentials;
     }
 
+    public void setSaveCredentials(boolean saveCredentials) {
+        this.saveCredentials = saveCredentials;
+    }
+
     @Property
     public boolean isSharedCredentials() {
         return sharedCredentials;
     }
 
-    public void setSaveCredentials(boolean saveCredentials) {
-        this.saveCredentials = saveCredentials;
+    public void setSharedCredentials(boolean sharedCredentials) {
+        this.sharedCredentials = sharedCredentials;
     }
 
     @Property
@@ -225,9 +301,17 @@ public class WebConnectionConfig {
         return mainPropertyValues;
     }
 
+    public void setMainPropertyValues(Map<String, Object> mainPropertyValues) {
+        this.mainPropertyValues = mainPropertyValues;
+    }
+
     @Property
     public Map<String, Object> getExpertSettingsValues() {
         return expertSettingsValues;
+    }
+
+    public void setExpertSettingsValues(Map<String, Object> expertSettingsValues) {
+        this.expertSettingsValues = expertSettingsValues;
     }
 
     @Property
@@ -235,9 +319,17 @@ public class WebConnectionConfig {
         return providerProperties;
     }
 
+    public void setProviderProperties(Map<String, Object> providerProperties) {
+        this.providerProperties = providerProperties;
+    }
+
     @Property
     public Integer getKeepAliveInterval() {
         return keepAliveInterval;
+    }
+
+    public void setKeepAliveInterval(int keepAliveInterval) {
+        this.keepAliveInterval = keepAliveInterval;
     }
 
     @Property
@@ -245,9 +337,17 @@ public class WebConnectionConfig {
         return defaultAutoCommit;
     }
 
+    public void setDefaultAutoCommit(boolean defaultAutoCommit) {
+        this.defaultAutoCommit = defaultAutoCommit;
+    }
+
     @Nullable
     public String getSelectedSecretId() {
         return selectedSecretId;
+    }
+
+    public void setSelectedSecretId(String selectedSecretId) {
+        this.selectedSecretId = selectedSecretId;
     }
 
     @Property
@@ -255,8 +355,16 @@ public class WebConnectionConfig {
         return defaultCatalogName;
     }
 
+    public void setDefaultCatalogName(String defaultCatalogName) {
+        this.defaultCatalogName = defaultCatalogName;
+    }
+
     @Property
     public String getDefaultSchemaName() {
         return defaultSchemaName;
+    }
+
+    public void setDefaultSchemaName(String defaultSchemaName) {
+        this.defaultSchemaName = defaultSchemaName;
     }
 }
