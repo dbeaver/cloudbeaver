@@ -53,6 +53,7 @@ export interface DataGridProps extends IDataGridCellContext, IDataGridRowContext
   onEditorOpen?: (position: ICellPosition) => void;
   onCellKeyDown?: (position: ICellPosition, event: DataGridCellKeyboardEvent) => void;
   className?: string;
+  searchReadOnly?: boolean;
   defaultSearchState?: IGridSearchPersistence;
   onSearchStateChange?: (state: IGridSearchPersistence) => void;
 }
@@ -104,6 +105,7 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
     children,
     className,
     onCellKeyDown,
+    searchReadOnly,
     defaultSearchState,
     onSearchStateChange,
   },
@@ -304,6 +306,7 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
                   ref={searchPanelRef}
                   columnCount={columnsCount}
                   defaultState={defaultSearchState}
+                  isReadOnly={searchReadOnly}
                   scrollToCell={scrollToCell}
                   replaceCellValue={replaceCellValue}
                   onCellClassNameChange={setSearchCellClassName}

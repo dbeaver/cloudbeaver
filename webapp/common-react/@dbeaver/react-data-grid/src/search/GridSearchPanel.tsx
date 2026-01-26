@@ -26,12 +26,13 @@ interface GridSearchPanelProps {
   onCellClassNameChange: (value: IGridReactiveValue<string | undefined, [number, number]> | undefined) => void;
   onClose: () => void;
   onReplacingChange?: (isReplacing: boolean) => void;
+  isReadOnly?: boolean;
   defaultState?: IGridSearchPersistence;
   onStateChange?: (state: IGridSearchPersistence) => void;
 }
 
 export const GridSearchPanel = forwardRef<GridSearchPanelRef, GridSearchPanelProps>(function GridSearchPanel(
-  { columnCount, scrollToCell, replaceCellValue, onCellClassNameChange, onClose, onReplacingChange, defaultState, onStateChange },
+  { columnCount, scrollToCell, replaceCellValue, onCellClassNameChange, onClose, onReplacingChange, isReadOnly, defaultState, onStateChange },
   ref,
 ) {
   const panelRef = useRef<SearchPanelRef>(null);
@@ -68,7 +69,7 @@ export const GridSearchPanel = forwardRef<GridSearchPanelRef, GridSearchPanelPro
     <SearchPanel
       ref={panelRef}
       className="rdg-search-panel"
-      isReadOnly={!replaceCellValue}
+      isReadOnly={isReadOnly || !replaceCellValue}
       query={{
         search: snapshot.query,
         replace: snapshot.replace,
