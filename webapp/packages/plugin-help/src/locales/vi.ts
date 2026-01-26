@@ -20,6 +20,9 @@ export default [
   ['sql_editor_shortcut_open_editor_in_new_tab', 'Mở Trình chỉnh sửa SQL trong tab riêng biệt'],
   ['sql_editor_shortcut_find', 'Tìm kiếm'],
   ['sql_editor_shortcut_comment_uncomment_selection', 'Bình luận/Bỏ bình luận lựa chọn'],
+  ['sql_editor_shortcut_start_completion', 'Hiển thị gợi ý tự động hoàn thành'],
+  ['sql_editor_shortcut_accept_completion', 'Chấp nhận tự động hoàn thành'],
+  ['sql_editor_shortcut_escape', 'Thoát khỏi trình chỉnh sửa'],
 
   ['navigation_tree_shortcut_enable_filter', 'Bật lọc'],
 
