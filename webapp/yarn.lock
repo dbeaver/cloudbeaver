@@ -4903,7 +4903,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@dbeaver/react-data-grid@workspace:*, @dbeaver/react-data-grid@workspace:^, @dbeaver/react-data-grid@workspace:common-react/@dbeaver/react-data-grid":
+"@dbeaver/react-data-grid@workspace:*, @dbeaver/react-data-grid@workspace:common-react/@dbeaver/react-data-grid":
   version: 0.0.0-use.local
   resolution: "@dbeaver/react-data-grid@workspace:common-react/@dbeaver/react-data-grid"
   dependencies:
