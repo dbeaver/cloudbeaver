@@ -1,12 +1,12 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 
-import { forwardRef, useImperativeHandle, useMemo, useRef, useState } from 'react';
+import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import {
   DataGrid as DataGridBase,
   type ColumnOrColumnGroup,
@@ -29,6 +29,8 @@ import { mapEditCellRenderer } from './mapEditCellRenderer.js';
 import { DataGridRowContext, type IDataGridRowContext } from './DataGridRowContext.js';
 import './DataGrid.css';
 import { HeaderDnDContext, isColumn, useHeaderDnD } from './useHeaderDnD.js';
+import type { IGridSearchPersistence } from './search/useGridSearch.js';
+import { GridSearchPanel, type GridSearchPanelRef } from './search/GridSearchPanel.js';
 
 export interface ICellPosition {
   rowIdx: number;
@@ -51,6 +53,8 @@ export interface DataGridProps extends IDataGridCellContext, IDataGridRowContext
   onEditorOpen?: (position: ICellPosition) => void;
   onCellKeyDown?: (position: ICellPosition, event: DataGridCellKeyboardEvent) => void;
   className?: string;
+  defaultSearchState?: IGridSearchPersistence;
+  onSearchStateChange?: (state: IGridSearchPersistence) => void;
 }
 
 export interface DataGridRef {
@@ -58,6 +62,8 @@ export interface DataGridRef {
   scrollToCell: (position: Partial<ICellPosition>) => void;
   openEditor: (position: ICellPosition) => void;
   getColumnsOrdered: () => readonly CalculatedColumn<IInnerRow, unknown>[];
+  openSearch: () => void;
+  closeSearch: () => void;
 }
 
 const MAX_AUTO_SIZE_WIDTH = 350;
@@ -97,6 +103,8 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
     children,
     className,
     onCellKeyDown,
+    defaultSearchState,
+    onSearchStateChange,
   },
   ref,
 ) {
@@ -106,6 +114,57 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
 
   const rowsCountRef = useRef(rowsCount);
   const innerGridRef = useRef<DataGridHandle<IInnerRow, unknown>>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const searchPanelRef = useRef<GridSearchPanelRef>(null);
+  const replacingRef = useRef(false);
+
+  const [searchOpen, setSearchOpen] = useState(() => defaultSearchState?.open ?? false);
+  const [searchCellClassName, setSearchCellClassName] = useState<IGridReactiveValue<string | undefined, [number, number]>>();
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) {
+      return;
+    }
+
+    function handleKeyDown(e: KeyboardEvent) {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+        e.preventDefault();
+        setSearchOpen(true);
+        setTimeout(() => searchPanelRef.current?.focus(), 0);
+      }
+    }
+
+    el.addEventListener('keydown', handleKeyDown);
+    return () => el.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  function handleSearchOpen() {
+    setSearchOpen(true);
+    setTimeout(() => searchPanelRef.current?.focus(), 0);
+  }
+
+  function handleSearchClose() {
+    setSearchOpen(false);
+    containerRef.current?.querySelector<HTMLDivElement>('[aria-selected="true"]')?.focus();
+  }
+
+  function replaceCellValue(rowIdx: number, colIdx: number, value: string) {
+    if (getCellEditable?.(rowIdx, colIdx) === false) {
+      return;
+    }
+    replacingRef.current = true;
+    try {
+      onCellChange?.(rowIdx, colIdx, value);
+    } finally {
+      replacingRef.current = false;
+    }
+  }
+
+  function scrollToCell(position: { rowIdx: number; colIdx: number }) {
+    innerGridRef.current?.scrollToCell({ idx: position.colIdx, rowIdx: position.rowIdx });
+  }
+
   const columns = new Array<ColumnOrColumnGroup<IInnerRow, unknown>>(columnsCount)
     .fill(null as any)
     .map((_, i): ColumnOrColumnGroup<IInnerRow, unknown> => {
@@ -169,6 +228,8 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
       );
     },
     getColumnsOrdered: () => innerGridRef.current?.getColumnsOrdered() ?? [],
+    openSearch: handleSearchOpen,
+    closeSearch: handleSearchClose,
   }));
 
   if (rowsCountRef.current !== rowsCount) {
@@ -189,6 +250,9 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
   );
 
   function handleCellFocus(args: CellSelectArgs<IInnerRow, unknown>) {
+    if (replacingRef.current) {
+      return;
+    }
     onFocus?.({ colIdx: dndHeaderContext.getDataColIdxByKey(args.column.key), rowIdx: args.rowIdx });
   }
 
@@ -214,44 +278,58 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
   }
 
   return (
-    <HeaderDnDContext value={dndHeaderContext}>
-      <DataGridRowContext value={{ rowElement, rowCount, onScrollToBottom }}>
-        <DataGridCellContext value={{ cell, cellText, cellElement, cellTooltip, onCellChange }}>
-          <DataGridCellHeaderContext
-            value={{
-              headerElement,
-              headerText,
-              getHeaderDnD,
-              columnSortable,
-              onColumnSort,
-              columnSortingState,
-              onHeaderKeyDown,
-              columnSortingMultiple,
-            }}
-          >
-            <DataGridBase
-              ref={innerGridRef}
-              columns={dndHeaderContext.columns}
-              rows={rows}
-              className={className}
-              headerRowHeight={getHeaderHeight?.()}
-              rowHeight={getRowHeight ? row => getRowHeight(row.idx) : undefined}
-              rowKeyGetter={getRowId ? row => getRowId(row.idx) : undefined}
-              rowClass={getRowClass ? row => getRowClass(row.idx) : undefined}
-              columnWidths={columnWidths}
-              renderers={{
-                renderRow: rowRenderer,
-                renderCell: cellRenderer,
-                noRowsFallback: children,
+    <div ref={containerRef} className="rdg-search-container">
+      <HeaderDnDContext value={dndHeaderContext}>
+        <DataGridRowContext value={{ rowElement, rowCount, onScrollToBottom }}>
+          <DataGridCellContext value={{ cell, cellText, cellElement, cellTooltip, getCellClassName: searchCellClassName, onCellChange }}>
+            <DataGridCellHeaderContext
+              value={{
+                headerElement,
+                headerText,
+                getHeaderDnD,
+                columnSortable,
+                onColumnSort,
+                columnSortingState,
+                onHeaderKeyDown,
+                columnSortingMultiple,
               }}
-              onScroll={onScroll}
-              onSelectedCellChange={handleCellFocus}
-              onCellKeyDown={handleCellKeyDown}
-              onColumnWidthsChange={setColumnWidths}
-            />
-          </DataGridCellHeaderContext>
-        </DataGridCellContext>
-      </DataGridRowContext>
-    </HeaderDnDContext>
+            >
+              {searchOpen && (
+                <GridSearchPanel
+                  ref={searchPanelRef}
+                  columnCount={columnsCount}
+                  defaultState={defaultSearchState}
+                  scrollToCell={scrollToCell}
+                  replaceCellValue={replaceCellValue}
+                  onCellClassNameChange={setSearchCellClassName}
+                  onClose={handleSearchClose}
+                  onStateChange={onSearchStateChange}
+                />
+              )}
+              <DataGridBase
+                ref={innerGridRef}
+                columns={dndHeaderContext.columns}
+                rows={rows}
+                className={className}
+                headerRowHeight={getHeaderHeight?.()}
+                rowHeight={getRowHeight ? row => getRowHeight(row.idx) : undefined}
+                rowKeyGetter={getRowId ? row => getRowId(row.idx) : undefined}
+                rowClass={getRowClass ? row => getRowClass(row.idx) : undefined}
+                columnWidths={columnWidths}
+                renderers={{
+                  renderRow: rowRenderer,
+                  renderCell: cellRenderer,
+                  noRowsFallback: children,
+                }}
+                onScroll={onScroll}
+                onSelectedCellChange={handleCellFocus}
+                onCellKeyDown={handleCellKeyDown}
+                onColumnWidthsChange={setColumnWidths}
+              />
+            </DataGridCellHeaderContext>
+          </DataGridCellContext>
+        </DataGridRowContext>
+      </HeaderDnDContext>
+    </div>
   );
 });
