@@ -12,7 +12,6 @@ import {
   GRID_HISTORY_SOURCE,
   isGridHistoryEditCellData,
   type IGridHistoryAddRowData,
-  type IGridHistoryCancelData,
   type IGridHistoryCellUpdateData,
   type IGridHistoryData,
   type IGridHistoryDeleteRowData,
@@ -68,15 +67,6 @@ export class GridEditHistoryManager<TKey extends IGridDataKey, TCell> {
 
     this.history.add({
       source: GRID_HISTORY_SOURCE.REVERT,
-      data,
-    });
-  }
-
-  recordCancel(data: IGridHistoryCancelData<TKey, TCell>): void {
-    this.compressLastEditedCellHistory();
-
-    this.history.add({
-      source: GRID_HISTORY_SOURCE.CANCEL,
       data,
     });
   }

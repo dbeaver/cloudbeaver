@@ -26,7 +26,7 @@ import { compareGridRowKeys } from './compareGridRowKeys.js';
 import { IDatabaseDataResultAction } from '../IDatabaseDataResultAction.js';
 import { GridHistoryAction } from './GridHistoryAction.js';
 import { GridEditHistoryManager } from './GridEditHistoryManager.js';
-import type { IGridHistoryCancelData, IGridHistoryData, IGridHistoryRow, IGridHistoryRevertData } from './GridHistoryTypes.js';
+import type { IGridHistoryData, IGridHistoryRevertData, IGridHistoryRow } from './GridHistoryTypes.js';
 
 export interface IGridUpdate<TCell> {
   row: IGridRowKey;
@@ -286,9 +286,9 @@ export class GridEditAction<
 
       if (update?.type === DatabaseEditChangeType.add) {
         reverted.push({ key });
-        this.editorData.delete(serializedKey);
+        this._revertChanges([{ row: key.row }]);
       } else {
-        this.deleteRowSilent(key.row);
+        this._deleteRow(key.row);
         deleted.push({ key });
       }
 
@@ -322,49 +322,12 @@ export class GridEditAction<
     }
   }
 
-  deleteRow(key: IGridRowKey, column?: IGridColumnKey, silent?: boolean): void {
-    const serializedKey = GridDataKeysUtils.serialize(key);
-    const update = this.editorData.get(serializedKey);
-
-    if (key.subIndex !== 0 && !update) {
-      return;
-    }
-
-    if (update && update.type !== DatabaseEditChangeType.delete) {
-      this.editorData.delete(serializedKey);
-    }
-
+  deleteRow(key: IGridRowKey, column?: IGridColumnKey): void {
     if (!column) {
       column = this.data.getDefaultKey().column;
     }
 
-    if (update?.type !== DatabaseEditChangeType.add) {
-      const [update, created] = this.getOrCreateUpdate(key, DatabaseEditChangeType.delete);
-
-      if (created && !silent) {
-        this.action.execute({
-          resultId: this.result.id,
-          type: update.type,
-          revert: false,
-          value: [
-            {
-              key: { column, row: key } as TKey,
-            },
-          ],
-        });
-      }
-    } else if (!silent) {
-      this.action.execute({
-        resultId: this.result.id,
-        type: update.type,
-        revert: true,
-        value: [
-          {
-            key: { column, row: key } as TKey,
-          },
-        ],
-      });
-    }
+    this.delete({ row: key, column } as TKey);
   }
 
   applyPartialUpdate(resultId: string | null, rows: TCell[][]): void {
@@ -451,10 +414,17 @@ export class GridEditAction<
     const revertedUpdates: Array<IDatabaseDataEditActionValue<TKey, TCell>> = [];
     const revertedDeletions: Array<IDatabaseDataEditActionValue<TKey, TCell>> = [];
     const revertedAdditions: Array<IDatabaseDataEditActionValue<TKey, TCell>> = [];
-
-    const historyUpdates: IGridHistoryRevertData<TKey, TCell>['updates'] = [];
-    const historyDeletions: IGridHistoryRevertData<TKey, TCell>['deletions'] = [];
-    const historyAdditions: IGridHistoryRevertData<TKey, TCell>['additions'] = [];
+    const { updates, deletions, additions } = this._getAllChanges();
+    const allKeys = new Set(keys.map(key => GridDataKeysUtils.serialize(key.row)));
+    const historyUpdates: IGridHistoryRevertData<TKey, TCell>['updates'] = updates.filter(({ key }) =>
+      allKeys.has(GridDataKeysUtils.serialize(key.row)),
+    );
+    const historyDeletions: IGridHistoryRevertData<TKey, TCell>['deletions'] = deletions.filter(({ key }) =>
+      allKeys.has(GridDataKeysUtils.serialize(key.row)),
+    );
+    const historyAdditions: IGridHistoryRevertData<TKey, TCell>['additions'] = additions.filter(({ key }) =>
+      allKeys.has(GridDataKeysUtils.serialize(key.row)),
+    );
 
     for (const key of keys) {
       const row = GridDataKeysUtils.serialize(key.row);
@@ -468,9 +438,6 @@ export class GridEditAction<
       let value: TCell | undefined;
 
       if (update.type === DatabaseEditChangeType.delete) {
-        if (update.source) {
-          historyDeletions.push({ key, value: [...update.source] });
-        }
         revertedDeletions.push({ key });
         this.editorData.delete(row);
       } else {
@@ -479,12 +446,8 @@ export class GridEditAction<
         update.update[key.column.index] = value;
 
         if (update.type === DatabaseEditChangeType.add) {
-          if (update.update) {
-            historyAdditions.push({ key, value: [...update.update] });
-          }
           revertedAdditions.push({ key, prevValue, value });
         } else {
-          historyUpdates.push({ key, prevValue: prevValue as TCell, value: value as TCell });
           revertedUpdates.push({ key, prevValue, value });
         }
       }
@@ -539,14 +502,10 @@ export class GridEditAction<
     });
   }
 
-  private recordCancelHistory(): void {
-    if (this.editorData.size === 0) {
-      return;
-    }
-
-    const historyUpdates: IGridHistoryCancelData<TKey, TCell>['updates'] = [];
-    const historyDeletions: IGridHistoryCancelData<TKey, TCell>['deletions'] = [];
-    const historyAdditions: IGridHistoryCancelData<TKey, TCell>['additions'] = [];
+  private _getAllChanges() {
+    const historyUpdates: IGridHistoryRevertData<TKey, TCell>['updates'] = [];
+    const historyDeletions: IGridHistoryRevertData<TKey, TCell>['deletions'] = [];
+    const historyAdditions: IGridHistoryRevertData<TKey, TCell>['additions'] = [];
 
     for (const [, update] of this.editorData) {
       const key = { row: update.row, column: { index: 0 } } as TKey;
@@ -568,16 +527,30 @@ export class GridEditAction<
       }
     }
 
-    if (historyUpdates.length > 0 || historyDeletions.length > 0 || historyAdditions.length > 0) {
-      this.historyManager.recordCancel({
-        updates: historyUpdates,
-        deletions: historyDeletions,
-        additions: historyAdditions,
+    return {
+      updates: historyUpdates,
+      deletions: historyDeletions,
+      additions: historyAdditions,
+    };
+  }
+
+  private recordCancelHistory(): void {
+    if (this.editorData.size === 0) {
+      return;
+    }
+
+    const { updates, deletions, additions } = this._getAllChanges();
+
+    if (updates.length > 0 || deletions.length > 0 || additions.length > 0) {
+      this.historyManager.recordRevert({
+        updates,
+        deletions,
+        additions,
       });
     }
   }
 
-  private deleteRowSilent(row: IGridRowKey): void {
+  private _deleteRow(row: IGridRowKey): void {
     const serializedKey = GridDataKeysUtils.serialize(row);
     const update = this.editorData.get(serializedKey);
 
@@ -631,10 +604,10 @@ export class GridEditAction<
 
       if (update?.type === DatabaseEditChangeType.add) {
         this.editorData.delete(serializedKey);
-      } else if (update) {
-        this.editorData.delete(serializedKey);
-        this.getOrCreateUpdate(row, DatabaseEditChangeType.delete);
       } else {
+        if (update) {
+          this.editorData.delete(serializedKey);
+        }
         this.getOrCreateUpdate(row, DatabaseEditChangeType.delete);
       }
     }

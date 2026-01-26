@@ -10,7 +10,6 @@ import type { IGridDataKey } from './IGridDataKey.js';
 import {
   GRID_HISTORY_SOURCE,
   isGridHistoryAddRowData,
-  isGridHistoryCancelData,
   isGridHistoryDeleteRowData,
   isGridHistoryEditCellData,
   isGridHistoryRevertData,
@@ -58,13 +57,6 @@ function createUndoHandlers<TKey extends IGridDataKey, TCell>(): Record<string, 
     },
     [GRID_HISTORY_SOURCE.REVERT]: (entry, ops) => {
       if (isGridHistoryRevertData<TKey, TCell>(entry)) {
-        ops.setCells(entry.data.updates.map(({ key, prevValue }) => ({ key, value: prevValue })));
-        ops.deleteRows(entry.data.deletions.map(({ key }) => key));
-        ops.addRows(entry.data.additions.map(({ key, value }) => ({ ...key, value })));
-      }
-    },
-    [GRID_HISTORY_SOURCE.CANCEL]: (entry, ops) => {
-      if (isGridHistoryCancelData<TKey, TCell>(entry)) {
         ops.setRows(entry.data.updates.map(({ key, prevValue }) => ({ key, value: prevValue })));
         ops.deleteRows(entry.data.deletions.map(({ key }) => key));
         ops.addRows(entry.data.additions.map(({ key, value }) => ({ ...key, value })));
@@ -97,13 +89,6 @@ function createRedoHandlers<TKey extends IGridDataKey, TCell>(): Record<string, 
     },
     [GRID_HISTORY_SOURCE.REVERT]: (entry, ops) => {
       if (isGridHistoryRevertData<TKey, TCell>(entry)) {
-        ops.setCells(entry.data.updates.map(({ key, value }) => ({ key, value })));
-        ops.revertChanges(entry.data.deletions.map(({ key }) => ({ row: key.row })));
-        ops.deleteRows(entry.data.additions.map(({ key }) => ({ row: key.row, column: key.column })));
-      }
-    },
-    [GRID_HISTORY_SOURCE.CANCEL]: (entry, ops) => {
-      if (isGridHistoryCancelData<TKey, TCell>(entry)) {
         ops.setRows(entry.data.updates.map(({ key, value }) => ({ key, value })));
         ops.revertChanges(entry.data.deletions.map(({ key }) => ({ row: key.row })));
         ops.deleteRows(entry.data.additions.map(({ key }) => ({ row: key.row, column: key.column })));
