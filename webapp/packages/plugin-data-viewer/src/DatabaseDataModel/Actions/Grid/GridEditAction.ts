@@ -75,7 +75,9 @@ export class GridEditAction<
       editorData: observable,
       set: action,
       add: action,
+      addRow: action,
       delete: action,
+      deleteRow: action,
       revert: action,
       applyUpdate: action,
       applyPartialUpdate: action,
@@ -492,7 +494,19 @@ export class GridEditAction<
   }
 
   clear(): void {
-    this.recordCancelHistory();
+    if (this.editorData.size === 0) {
+      return;
+    }
+
+    const { updates, deletions, additions } = this._getAllChanges();
+
+    if (updates.length > 0 || deletions.length > 0 || additions.length > 0) {
+      this.historyManager.recordRevert({
+        updates,
+        deletions,
+        additions,
+      });
+    }
 
     this.editorData.clear();
 
@@ -532,22 +546,6 @@ export class GridEditAction<
       deletions: historyDeletions,
       additions: historyAdditions,
     };
-  }
-
-  private recordCancelHistory(): void {
-    if (this.editorData.size === 0) {
-      return;
-    }
-
-    const { updates, deletions, additions } = this._getAllChanges();
-
-    if (updates.length > 0 || deletions.length > 0 || additions.length > 0) {
-      this.historyManager.recordRevert({
-        updates,
-        deletions,
-        additions,
-      });
-    }
   }
 
   private _deleteRow(row: IGridRowKey): void {
@@ -602,12 +600,11 @@ export class GridEditAction<
       const serializedKey = GridDataKeysUtils.serialize(row);
       const update = this.editorData.get(serializedKey);
 
-      if (update?.type === DatabaseEditChangeType.add) {
+      if (update) {
         this.editorData.delete(serializedKey);
-      } else {
-        if (update) {
-          this.editorData.delete(serializedKey);
-        }
+      }
+
+      if (update?.type !== DatabaseEditChangeType.add) {
         this.getOrCreateUpdate(row, DatabaseEditChangeType.delete);
       }
     }
