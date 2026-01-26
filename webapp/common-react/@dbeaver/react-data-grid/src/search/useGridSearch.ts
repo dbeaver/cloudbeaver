@@ -57,6 +57,7 @@ export interface IGridSearchOptions {
   replaceCellValue: (rowIdx: number, colIdx: number, value: string) => void;
   defaultState?: IGridSearchPersistence;
   onChange?: (state: IGridSearchPersistence) => void;
+  onReplacingChange?: (isReplacing: boolean) => void;
 }
 
 interface GridSearchStore {
@@ -290,27 +291,32 @@ function createActions(store: GridSearchStore): IGridSearchActions {
         return;
       }
 
-      const cellText = store.options.getCellText(match.rowIdx, match.colIdx);
-      const { newText, stillMatches } = GridSearchEngine.replaceInCell(cellText, pattern, store.replace);
-      store.options.replaceCellValue(match.rowIdx, match.colIdx, newText);
+      store.options.onReplacingChange?.(true);
+      try {
+        const cellText = store.options.getCellText(match.rowIdx, match.colIdx);
+        const { newText, stillMatches } = GridSearchEngine.replaceInCell(cellText, pattern, store.replace);
+        store.options.replaceCellValue(match.rowIdx, match.colIdx, newText);
 
-      if (!stillMatches) {
-        store.matchedCells.splice(store.activeMatchIdx, 1);
-        store.matchedSet = new Set(store.matchedCells.map(m => `${m.rowIdx}+${m.colIdx}`));
+        if (!stillMatches) {
+          store.matchedCells.splice(store.activeMatchIdx, 1);
+          store.matchedSet = new Set(store.matchedCells.map(m => `${m.rowIdx}+${m.colIdx}`));
 
-        if (store.matchedCells.length === 0) {
-          store.activeMatchIdx = -1;
-        } else if (store.activeMatchIdx >= store.matchedCells.length) {
-          store.activeMatchIdx = store.matchedCells.length - 1;
+          if (store.matchedCells.length === 0) {
+            store.activeMatchIdx = -1;
+          } else if (store.activeMatchIdx >= store.matchedCells.length) {
+            store.activeMatchIdx = store.matchedCells.length - 1;
+          }
         }
-      }
 
-      invalidateSnapshot(store);
-      notify(store);
-      notifyCells(store);
+        invalidateSnapshot(store);
+        notify(store);
+        notifyCells(store);
 
-      if (store.activeMatchIdx >= 0) {
-        scrollToActiveMatch(store);
+        if (store.activeMatchIdx >= 0) {
+          scrollToActiveMatch(store);
+        }
+      } finally {
+        store.options.onReplacingChange?.(false);
       }
     },
 
@@ -324,14 +330,19 @@ function createActions(store: GridSearchStore): IGridSearchActions {
         return;
       }
 
-      const matches = [...store.matchedCells];
-      for (const match of matches) {
-        const cellText = store.options.getCellText(match.rowIdx, match.colIdx);
-        const { newText } = GridSearchEngine.replaceInCell(cellText, pattern, store.replace);
-        store.options.replaceCellValue(match.rowIdx, match.colIdx, newText);
-      }
+      store.options.onReplacingChange?.(true);
+      try {
+        const matches = [...store.matchedCells];
+        for (const match of matches) {
+          const cellText = store.options.getCellText(match.rowIdx, match.colIdx);
+          const { newText } = GridSearchEngine.replaceInCell(cellText, pattern, store.replace);
+          store.options.replaceCellValue(match.rowIdx, match.colIdx, newText);
+        }
 
-      runSearch(store);
+        runSearch(store);
+      } finally {
+        store.options.onReplacingChange?.(false);
+      }
     },
 
     setReplaceOpen(open: boolean): void {

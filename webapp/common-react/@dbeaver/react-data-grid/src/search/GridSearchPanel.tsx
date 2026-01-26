@@ -25,12 +25,13 @@ interface GridSearchPanelProps {
   replaceCellValue: (rowIdx: number, colIdx: number, value: string) => void;
   onCellClassNameChange: (value: IGridReactiveValue<string | undefined, [number, number]> | undefined) => void;
   onClose: () => void;
+  onReplacingChange?: (isReplacing: boolean) => void;
   defaultState?: IGridSearchPersistence;
   onStateChange?: (state: IGridSearchPersistence) => void;
 }
 
 export const GridSearchPanel = forwardRef<GridSearchPanelRef, GridSearchPanelProps>(function GridSearchPanel(
-  { columnCount, scrollToCell, replaceCellValue, onCellClassNameChange, onClose, defaultState, onStateChange },
+  { columnCount, scrollToCell, replaceCellValue, onCellClassNameChange, onClose, onReplacingChange, defaultState, onStateChange },
   ref,
 ) {
   const panelRef = useRef<SearchPanelRef>(null);
@@ -46,6 +47,7 @@ export const GridSearchPanel = forwardRef<GridSearchPanelRef, GridSearchPanelPro
     replaceCellValue,
     defaultState,
     onChange: onStateChange,
+    onReplacingChange,
   });
 
   useEffect(() => {

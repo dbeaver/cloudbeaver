@@ -189,6 +189,10 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
         return;
       }
 
+      if (dataGridRef.current?.isReplacing()) {
+        return;
+      }
+
       handlers.selectCell({ colIdx, rowIdx });
     }
 
@@ -196,6 +200,9 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
 
     function syncFocus(data: DatabaseDataSelectActionsData<Partial<IGridDataKey>>) {
       if (data.type === 'focus') {
+        if (dataGridRef.current?.isReplacing()) {
+          return;
+        }
         // TODO: we need this delay to update focus after render rows update
         setTimeout(() => {
           handlers.focusCell(data.key);

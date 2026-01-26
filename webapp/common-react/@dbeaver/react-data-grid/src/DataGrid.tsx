@@ -64,6 +64,7 @@ export interface DataGridRef {
   getColumnsOrdered: () => readonly CalculatedColumn<IInnerRow, unknown>[];
   openSearch: () => void;
   closeSearch: () => void;
+  isReplacing: () => boolean;
 }
 
 const MAX_AUTO_SIZE_WIDTH = 350;
@@ -116,7 +117,7 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
   const innerGridRef = useRef<DataGridHandle<IInnerRow, unknown>>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const searchPanelRef = useRef<GridSearchPanelRef>(null);
-  const replacingRef = useRef(false);
+  const isReplacingRef = useRef(false);
 
   const [searchOpen, setSearchOpen] = useState(() => defaultSearchState?.open ?? false);
   const [searchCellClassName, setSearchCellClassName] = useState<IGridReactiveValue<string | undefined, [number, number]>>();
@@ -153,12 +154,11 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
     if (getCellEditable?.(rowIdx, colIdx) === false) {
       return;
     }
-    replacingRef.current = true;
-    try {
-      onCellChange?.(rowIdx, colIdx, value);
-    } finally {
-      replacingRef.current = false;
-    }
+    onCellChange?.(rowIdx, colIdx, value);
+  }
+
+  function handleReplacingChange(value: boolean) {
+    isReplacingRef.current = value;
   }
 
   function scrollToCell(position: { rowIdx: number; colIdx: number }) {
@@ -202,6 +202,10 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
 
   useImperativeHandle(ref, () => ({
     selectCell: (position: ICellPosition) => {
+      if (isReplacingRef.current) {
+        return;
+      }
+
       const columnKey = mapPositionToColumnKey(position);
 
       if (!columnKey) {
@@ -230,6 +234,7 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
     getColumnsOrdered: () => innerGridRef.current?.getColumnsOrdered() ?? [],
     openSearch: handleSearchOpen,
     closeSearch: handleSearchClose,
+    isReplacing: () => isReplacingRef.current,
   }));
 
   if (rowsCountRef.current !== rowsCount) {
@@ -250,7 +255,7 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
   );
 
   function handleCellFocus(args: CellSelectArgs<IInnerRow, unknown>) {
-    if (replacingRef.current) {
+    if (isReplacingRef.current) {
       return;
     }
     onFocus?.({ colIdx: dndHeaderContext.getDataColIdxByKey(args.column.key), rowIdx: args.rowIdx });
@@ -304,6 +309,7 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
                   onCellClassNameChange={setSearchCellClassName}
                   onClose={handleSearchClose}
                   onStateChange={onSearchStateChange}
+                  onReplacingChange={handleReplacingChange}
                 />
               )}
               <DataGridBase
