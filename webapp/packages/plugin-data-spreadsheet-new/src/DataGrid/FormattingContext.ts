@@ -19,6 +19,7 @@ export interface IDataGridFormatters {
   locale: string;
   dateTime: Intl.DateTimeFormat;
   dateOnly: Intl.DateTimeFormat;
+  timeOnly: Intl.DateTimeFormat;
   number: Intl.NumberFormat;
 }
 

@@ -457,7 +457,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
 
     @Override
     public List<DBWFeatureSet> listFeatureSets(@NotNull WebSession webSession) throws DBWebException {
-        return WebFeatureRegistry.getInstance().getWebFeatures();
+        return ServletAppUtils.getServletApplication().getFeatureRegistry().getWebFeatures();
     }
 
     ////////////////////////////////////////////////////////////////////
@@ -674,10 +674,11 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         return true;
     }
 
-    private void updateDisabledFeaturesConfig(CBAppConfig appConfig, List<String> enabledFeatures) {
+    private void updateDisabledFeaturesConfig(@NotNull CBAppConfig appConfig, @NotNull List<String> enabledFeatures) {
         Set<String> enabledIds = new LinkedHashSet<>(enabledFeatures);
         appConfig.setEnabledFeatures(enabledFeatures.toArray(new String[0]));
-        String[] disabledFeatures = WebFeatureRegistry.getInstance().getWebFeatures().stream().map(DBWFeatureSet::getId)
+        String[] disabledFeatures = ServletAppUtils.getServletApplication().getFeatureRegistry().getWebFeatures().stream()
+            .map(DBWFeatureSet::getId)
             .filter(id -> !enabledIds.contains(id))
             .toArray(String[]::new);
         appConfig.setDisabledFeatures(disabledFeatures);

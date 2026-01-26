@@ -11,7 +11,7 @@ import { action, makeObservable, observable, runInAction, toJS } from 'mobx';
 import { AppAuthService, UserInfoResource } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
 import { Executor, ExecutorInterrupter, type ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
-import { NodeManagerUtils } from '@cloudbeaver/core-navigation-tree';
+import { NavTreeResource, NodeManagerUtils } from '@cloudbeaver/core-navigation-tree';
 import { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
 import {
   CachedMapAllKey,
@@ -90,6 +90,7 @@ export interface IConnectionInfoMetadata extends ICachedResourceMetadata {
   ConnectionInfoEventHandler,
   ConnectionStateEventHandler,
   UserInfoResource,
+  NavTreeResource,
 ])
 export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoParams, Connection, ConnectionInfoIncludes, IConnectionInfoMetadata> {
   readonly onConnectionCreate: Executor<Connection>;
@@ -109,6 +110,7 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
     connectionInfoEventHandler: ConnectionInfoEventHandler,
     connectionStateEventHandler: ConnectionStateEventHandler,
     userInfoResource: UserInfoResource,
+    navTreeResource: NavTreeResource,
   ) {
     super();
 
@@ -153,6 +155,14 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
     sessionDataResource.onDataOutdated.addHandler(() => {
       this.sessionUpdate = true;
       this.markOutdated();
+    });
+
+    navTreeResource.onNodeRename.addHandler(data => {
+      const connection = this.getConnectionForNode(data.newNodeId);
+
+      if (connection) {
+        this.markOutdated(createConnectionParam(connection));
+      }
     });
 
     connectionInfoEventHandler.onEvent<ResourceKeyList<IConnectionInfoParams>>(
