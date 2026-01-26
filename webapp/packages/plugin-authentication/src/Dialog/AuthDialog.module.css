@@ -43,6 +43,7 @@
 .errorMessage {
   composes: theme-background-secondary theme-text-on-secondary from global;
   flex: 1;
+  overflow: auto;
 }
 .tooManySessionsCheckbox {
   margin-bottom: 4px;
