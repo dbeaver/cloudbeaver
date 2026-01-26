@@ -19,7 +19,7 @@ import {
 export interface IGridEditOperations<TKey extends IGridDataKey, TCell> {
   setCells(cells: Array<{ key: TKey; value: TCell }>): void;
   setRows(rows: Array<{ key: TKey; value: TCell[] }>): void;
-  restoreAddedRows(rows: Array<{ row: TKey['row']; value: TCell[] | undefined; column: TKey['column'] }>): void;
+  addRows(rows: Array<{ row: TKey['row']; value: TCell[] | undefined; column: TKey['column'] }>): void;
   deleteRows(rows: Array<{ row: TKey['row']; column: TKey['column'] }>): void;
   revertChanges(rows: Array<{ row: TKey['row'] }>): void;
 }
@@ -49,7 +49,7 @@ function createUndoHandlers<TKey extends IGridDataKey, TCell>(): Record<string, 
           const isNewlyAddedRow = rowEntry.key.row.subIndex !== 0;
 
           if (isNewlyAddedRow) {
-            ops.restoreAddedRows([{ row: rowEntry.key.row, value: rowEntry.value, column: rowEntry.key.column }]);
+            ops.addRows([{ row: rowEntry.key.row, value: rowEntry.value, column: rowEntry.key.column }]);
           } else {
             ops.revertChanges([{ row: rowEntry.key.row }]);
           }
@@ -60,14 +60,14 @@ function createUndoHandlers<TKey extends IGridDataKey, TCell>(): Record<string, 
       if (isGridHistoryRevertData<TKey, TCell>(entry)) {
         ops.setCells(entry.data.updates.map(({ key, prevValue }) => ({ key, value: prevValue })));
         ops.deleteRows(entry.data.deletions.map(({ key }) => key));
-        ops.restoreAddedRows(entry.data.additions.map(({ key, value }) => ({ ...key, value })));
+        ops.addRows(entry.data.additions.map(({ key, value }) => ({ ...key, value })));
       }
     },
     [GRID_HISTORY_SOURCE.CANCEL]: (entry, ops) => {
       if (isGridHistoryCancelData<TKey, TCell>(entry)) {
         ops.setRows(entry.data.updates.map(({ key, prevValue }) => ({ key, value: prevValue })));
         ops.deleteRows(entry.data.deletions.map(({ key }) => key));
-        ops.restoreAddedRows(entry.data.additions.map(({ key, value }) => ({ ...key, value })));
+        ops.addRows(entry.data.additions.map(({ key, value }) => ({ ...key, value })));
       }
     },
   };
@@ -87,7 +87,7 @@ function createRedoHandlers<TKey extends IGridDataKey, TCell>(): Record<string, 
     },
     [GRID_HISTORY_SOURCE.ADD_ROW]: (entry, ops) => {
       if (isGridHistoryAddRowData<TKey, TCell>(entry)) {
-        ops.restoreAddedRows(entry.data.rowEntries.map(({ key, value }) => ({ row: key.row, value, column: key.column })));
+        ops.addRows(entry.data.rowEntries.map(({ key, value }) => ({ row: key.row, value, column: key.column })));
       }
     },
     [GRID_HISTORY_SOURCE.DELETE_ROW]: (entry, ops) => {

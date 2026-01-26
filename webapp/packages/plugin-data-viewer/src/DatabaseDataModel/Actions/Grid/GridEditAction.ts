@@ -71,31 +71,25 @@ export class GridEditAction<
     this.data = data as GridDataResultAction<TColumn, TRow, TKey, TCell, TResult>;
     this.historyManager = new GridEditHistoryManager<TKey, TCell>(history as GridHistoryAction<IGridHistoryData<TKey, TCell>, TResult>);
 
-    makeObservable<
-      this,
-      'editorData' | '_setRows' | '_restoreAddedRows' | '_deleteRows' | '_revertChanges' | '_setCells' | '_createNewRow' | '_deleteRow'
-    >(this, {
+    makeObservable<this, 'editorData' | '_setRows' | '_addRows' | '_deleteRows' | '_revertChanges' | '_setCells'>(this, {
       editorData: observable,
       set: action,
       add: action,
       delete: action,
-      duplicate: action,
       revert: action,
       applyUpdate: action,
       applyPartialUpdate: action,
       _setCells: action,
       _setRows: action,
-      _restoreAddedRows: action,
+      _addRows: action,
       _deleteRows: action,
       _revertChanges: action,
-      _createNewRow: action,
-      _deleteRow: action,
     });
 
     this.historyManager.setupHandlers({
       setCells: this._setCells.bind(this),
       setRows: this._setRows.bind(this),
-      restoreAddedRows: this._restoreAddedRows.bind(this),
+      addRows: this._addRows.bind(this),
       deleteRows: this._deleteRows.bind(this),
       revertChanges: this._revertChanges.bind(this),
     });
@@ -200,60 +194,82 @@ export class GridEditAction<
   }
 
   add(key?: TKey): void {
-    const defaultKey = this.data.getDefaultKey();
-    const row = key?.row ?? defaultKey.row;
-    const value = this.data.columns.map(() => null) as TCell[];
+    this.addRow(key?.row, undefined, key?.column);
+  }
 
-    const result = this._createNewRow(row, value);
+  addRow(row?: IGridRowKey, value?: TCell[], column?: IGridColumnKey, ignoreHistory = false): TKey {
+    if (!row) {
+      row = this.data.getDefaultKey().row;
+    }
 
-    if (result.created) {
-      this.historyManager.recordAddRows({
-        rowEntries: [{ key: result.key, value: result.update }],
-      });
+    if (value === undefined) {
+      value = this.data.columns.map(() => null) as TCell[];
+    }
+
+    row = this.getNextRowAdd(row);
+
+    if (!column) {
+      column = this.data.getDefaultKey().column;
+    }
+
+    const [update, created] = this.getOrCreateUpdate(row, DatabaseEditChangeType.add, value);
+    const key = { column, row } as TKey;
+
+    if (created) {
+      if (!ignoreHistory) {
+        this.historyManager.recordAddRows({
+          rowEntries: [{ key, value: update.update }],
+        });
+      }
 
       this.action.execute({
         resultId: this.result.id,
-        type: DatabaseEditChangeType.add,
+        type: update.type,
         revert: false,
-        value: [{ key: result.key }],
+        value: [{ key }],
       });
     }
+
+    return key;
   }
 
   duplicate(...keys: TKey[]): void {
-    const uniqueKeys: TKey[] = [];
-    const seen = new Set<string>();
+    const result: TKey[] = [];
+    const rowKeys = new Set<string>();
 
     for (const key of keys) {
       const serialized = GridDataKeysUtils.serialize(key.row);
-      if (!seen.has(serialized)) {
-        uniqueKeys.push(key);
-        seen.add(serialized);
+
+      if (!rowKeys.has(serialized)) {
+        result.push(key);
+        rowKeys.add(serialized);
       }
     }
 
-    const addedRows: Array<IGridHistoryRow<TKey, TCell>> = [];
+    this.duplicateRow(...result);
+  }
 
-    for (const key of uniqueKeys) {
+  duplicateRow(...keys: TKey[]): void {
+    const duplicatedKeys: Array<IGridHistoryRow<TKey, TCell>> = [];
+
+    for (const key of keys) {
+      let value = this.data.getRowValue(key.row);
+
       const editedValue = this.editorData.get(GridDataKeysUtils.serialize(key.row));
-      const sourceValue = editedValue?.update ?? this.data.getRowValue(key.row);
-      const clonedValue = JSON.parse(JSON.stringify(sourceValue)) as TCell[];
 
-      const { key: newKey, created } = this._createNewRow(key.row, clonedValue);
-
-      if (created) {
-        addedRows.push({ key: newKey, value: clonedValue });
+      if (editedValue) {
+        value = editedValue.update;
       }
+
+      const clonedValue = JSON.parse(JSON.stringify(value)) as TCell[];
+      const newKey = this.addRow(key.row, clonedValue, key.column, true);
+
+      duplicatedKeys.push({ key: newKey, value: clonedValue });
     }
 
-    if (addedRows.length > 0) {
-      this.historyManager.recordAddRows({ rowEntries: addedRows });
-
-      this.action.execute({
-        resultId: this.result.id,
-        type: DatabaseEditChangeType.add,
-        revert: false,
-        value: addedRows.map(({ key }) => ({ key })),
+    if (duplicatedKeys.length > 0) {
+      this.historyManager.recordAddRows({
+        rowEntries: duplicatedKeys,
       });
     }
   }
@@ -264,21 +280,27 @@ export class GridEditAction<
     const rowEntries: Array<IGridHistoryRow<TKey, TCell>> = [];
 
     for (const key of keys) {
-      const { key: resultKey, value, wasAdd } = this._deleteRow(key.row);
+      const serializedKey = GridDataKeysUtils.serialize(key.row);
+      const update = this.editorData.get(serializedKey);
+      const value = update?.update || this.data.getRowValue(key.row);
 
-      if (wasAdd) {
-        reverted.push({ key: resultKey });
+      if (update?.type === DatabaseEditChangeType.add) {
+        reverted.push({ key });
+        this.editorData.delete(serializedKey);
       } else {
-        deleted.push({ key: resultKey });
+        this.deleteRowSilent(key.row);
+        deleted.push({ key });
       }
 
       if (value) {
-        rowEntries.push({ key: resultKey, value });
+        rowEntries.push({ key, value });
       }
     }
 
     if (rowEntries.length > 0) {
-      this.historyManager.recordDeleteRows({ rowEntries });
+      this.historyManager.recordDeleteRows({
+        rowEntries,
+      });
     }
 
     if (reverted.length > 0) {
@@ -296,6 +318,51 @@ export class GridEditAction<
         type: DatabaseEditChangeType.delete,
         revert: false,
         value: deleted,
+      });
+    }
+  }
+
+  deleteRow(key: IGridRowKey, column?: IGridColumnKey, silent?: boolean): void {
+    const serializedKey = GridDataKeysUtils.serialize(key);
+    const update = this.editorData.get(serializedKey);
+
+    if (key.subIndex !== 0 && !update) {
+      return;
+    }
+
+    if (update && update.type !== DatabaseEditChangeType.delete) {
+      this.editorData.delete(serializedKey);
+    }
+
+    if (!column) {
+      column = this.data.getDefaultKey().column;
+    }
+
+    if (update?.type !== DatabaseEditChangeType.add) {
+      const [update, created] = this.getOrCreateUpdate(key, DatabaseEditChangeType.delete);
+
+      if (created && !silent) {
+        this.action.execute({
+          resultId: this.result.id,
+          type: update.type,
+          revert: false,
+          value: [
+            {
+              key: { column, row: key } as TKey,
+            },
+          ],
+        });
+      }
+    } else if (!silent) {
+      this.action.execute({
+        resultId: this.result.id,
+        type: update.type,
+        revert: true,
+        value: [
+          {
+            key: { column, row: key } as TKey,
+          },
+        ],
       });
     }
   }
@@ -462,7 +529,7 @@ export class GridEditAction<
   }
 
   clear(): void {
-    this._recordCancelHistory();
+    this.recordCancelHistory();
 
     this.editorData.clear();
 
@@ -472,7 +539,7 @@ export class GridEditAction<
     });
   }
 
-  private _recordCancelHistory(): void {
+  private recordCancelHistory(): void {
     if (this.editorData.size === 0) {
       return;
     }
@@ -510,6 +577,23 @@ export class GridEditAction<
     }
   }
 
+  private deleteRowSilent(row: IGridRowKey): void {
+    const serializedKey = GridDataKeysUtils.serialize(row);
+    const update = this.editorData.get(serializedKey);
+
+    if (row.subIndex !== 0 && !update) {
+      return;
+    }
+
+    if (update && update.type !== DatabaseEditChangeType.delete) {
+      this.editorData.delete(serializedKey);
+    }
+
+    if (update?.type !== DatabaseEditChangeType.add) {
+      this.getOrCreateUpdate(row, DatabaseEditChangeType.delete);
+    }
+  }
+
   private _setCells(cells: Array<{ key: TKey; value: TCell }>): void {
     for (const { key, value } of cells) {
       const [update] = this.getOrCreateUpdate(key.row, DatabaseEditChangeType.update);
@@ -528,16 +612,31 @@ export class GridEditAction<
     }
   }
 
-  private _restoreAddedRows(rows: Array<{ row: IGridRowKey; value: TCell[] | undefined; column: IGridColumnKey }>): void {
+  private _addRows(rows: Array<{ row: IGridRowKey; value: TCell[] | undefined; column: IGridColumnKey }>): void {
     for (const { row, value } of rows) {
-      const rowValue = value ?? (this.data.columns.map(() => null) as TCell[]);
+      let rowValue = value;
+
+      if (rowValue === undefined) {
+        rowValue = this.data.columns.map(() => null) as TCell[];
+      }
+
       this.getOrCreateUpdate(row, DatabaseEditChangeType.add, rowValue);
     }
   }
 
   private _deleteRows(rows: Array<{ row: IGridRowKey; column: IGridColumnKey }>): void {
     for (const { row } of rows) {
-      this._deleteRow(row);
+      const serializedKey = GridDataKeysUtils.serialize(row);
+      const update = this.editorData.get(serializedKey);
+
+      if (update?.type === DatabaseEditChangeType.add) {
+        this.editorData.delete(serializedKey);
+      } else if (update) {
+        this.editorData.delete(serializedKey);
+        this.getOrCreateUpdate(row, DatabaseEditChangeType.delete);
+      } else {
+        this.getOrCreateUpdate(row, DatabaseEditChangeType.delete);
+      }
     }
   }
 
@@ -546,40 +645,6 @@ export class GridEditAction<
       const serializedKey = GridDataKeysUtils.serialize(row);
       this.editorData.delete(serializedKey);
     }
-  }
-
-  private _createNewRow(row: IGridRowKey, value: TCell[]): { key: TKey; update: TCell[]; created: boolean } {
-    const nextRow = this.getNextRowAdd(row);
-    const column = this.data.getDefaultKey().column;
-    const [update, created] = this.getOrCreateUpdate(nextRow, DatabaseEditChangeType.add, value);
-
-    return {
-      key: { column, row: nextRow } as TKey,
-      update: update.update,
-      created,
-    };
-  }
-
-  private _deleteRow(row: IGridRowKey): { key: TKey; value: TCell[] | undefined; wasAdd: boolean } {
-    const serializedKey = GridDataKeysUtils.serialize(row);
-    const existingUpdate = this.editorData.get(serializedKey);
-    const column = this.data.getDefaultKey().column;
-    const key = { column, row } as TKey;
-    const wasAdd = existingUpdate?.type === DatabaseEditChangeType.add;
-    const value = existingUpdate?.update ?? this.data.getRowValue(row);
-
-    if (wasAdd) {
-      this.editorData.delete(serializedKey);
-    } else {
-      if (existingUpdate && existingUpdate.type !== DatabaseEditChangeType.delete) {
-        this.editorData.delete(serializedKey);
-      }
-      if (row.subIndex === 0 || existingUpdate) {
-        this.getOrCreateUpdate(row, DatabaseEditChangeType.delete);
-      }
-    }
-
-    return { key, value, wasAdd };
   }
 
   private getNextRowAdd(row: IGridRowKey): IGridRowKey {
