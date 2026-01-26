@@ -5,6 +5,7 @@ export default [
   ['app_navigationTree_limited', 'Elements are limited to {arg:limit} items'],
   ['app_navigationTree_action_collapse_all', 'Collapse all'],
   ['app_navigationTree_settings_filter_objects_description', 'Show objects description'],
+  ['plugin_navigation_tree_settings_filter_table_contents', 'Show children of tables'],
   ['app_navigationTree_settings_filter_title', 'Filter'],
   ['app_navigationTree_settings_filter_description', 'Show filtering field'],
   ['app_navigationTree_settings_filter_all_title', 'Show collapsed'],

@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ export function createElementsTreeSettings(defaults?: Partial<IElementsTreeSetti
     configurable: true,
     projects: true,
     objectsDescription: true,
+    showTableContents: false,
     ...defaults,
   };
 }
@@ -33,6 +34,7 @@ export function validateElementsTreeSettings(data: any): boolean {
     typeof data.showFolderExplorerPath === 'boolean' &&
     typeof data.configurable === 'boolean' &&
     typeof data.projects === 'boolean' &&
-    typeof data.objectsDescription === 'boolean'
+    typeof data.objectsDescription === 'boolean' &&
+    typeof data.showTableContents === 'boolean'
   );
 }

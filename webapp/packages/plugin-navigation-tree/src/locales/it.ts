@@ -5,6 +5,7 @@ export default [
   ['app_navigationTree_limited', 'Gli elementi sono limitati a {arg:limit} elementi'],
   ['app_navigationTree_action_collapse_all', 'Comprimi tutto'],
   ['app_navigationTree_settings_filter_objects_description', 'Mostra la descrizione degli oggetti'],
+  ['plugin_navigation_tree_settings_filter_table_contents', 'Mostra i figli delle tabelle'],
   ['app_navigationTree_settings_filter_title', 'Filtro'],
   ['app_navigationTree_settings_filter_description', 'Mostra il campo di filtro'],
   ['app_navigationTree_settings_filter_all_title', 'Mostra elementi compressi'],

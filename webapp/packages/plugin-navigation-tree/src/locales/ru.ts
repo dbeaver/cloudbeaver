@@ -6,6 +6,7 @@ export default [
 
   ['app_navigationTree_action_collapse_all', 'Свернуть все элементы'],
   ['app_navigationTree_settings_filter_objects_description', 'Показывать описание объектов'],
+  ['plugin_navigation_tree_settings_filter_table_contents', 'Показывать дочерние элементы таблиц'],
 
   ['app_navigationTree_settings_filter_title', 'Фильтр'],
   ['app_navigationTree_settings_filter_description', 'Показывать фильтр'],

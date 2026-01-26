@@ -5,6 +5,7 @@ export default [
   ['app_navigationTree_limited', 'Phần tử bị giới hạn ở {arg:limit} mục'],
   ['app_navigationTree_action_collapse_all', 'Thu gọn tất cả'],
   ['app_navigationTree_settings_filter_objects_description', 'Hiển thị mô tả đối tượng'],
+  ['plugin_navigation_tree_settings_filter_table_contents', 'Hiển thị các phần tử con của bảng'],
   ['app_navigationTree_settings_filter_title', 'Lọc'],
   ['app_navigationTree_settings_filter_description', 'Hiển thị trường lọc'],
   ['app_navigationTree_settings_filter_all_title', 'Hiển thị đã thu gọn'],

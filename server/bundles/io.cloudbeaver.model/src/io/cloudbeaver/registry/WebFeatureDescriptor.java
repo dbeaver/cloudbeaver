@@ -38,8 +38,7 @@ public class WebFeatureDescriptor extends AbstractContextDescriptor implements D
     private final DBPImage icon;
     private final boolean enabledByDefault;
 
-    public WebFeatureDescriptor(IConfigurationElement config)
-    {
+    public WebFeatureDescriptor(@NotNull IConfigurationElement config) {
         super(config);
         this.id = config.getAttribute("id");
         this.label = config.getAttribute("label");
@@ -77,4 +76,7 @@ public class WebFeatureDescriptor extends AbstractContextDescriptor implements D
         return enabledByDefault;
     }
 
+    public boolean isApplicable() {
+        return true;
+    }
 }
