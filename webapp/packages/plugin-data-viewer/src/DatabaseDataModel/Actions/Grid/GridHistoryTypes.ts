@@ -16,56 +16,43 @@ export const GRID_HISTORY_SOURCE = {
   CANCEL: 'grid-history-source-cancel',
 } as const;
 
-export interface IGridHistoryKeyWithValue<TKey extends IGridDataKey = IGridDataKey, TCell = unknown> {
+export interface IGridHistoryRow<TKey extends IGridDataKey = IGridDataKey, TCell = unknown> {
   key: TKey;
-  value?: TCell[];
-}
-
-export interface IGridHistoryKeyWithRowValue<TKey extends IGridDataKey = IGridDataKey, TCell = unknown> {
-  key: TKey;
-  rowValue?: TCell[];
-}
-
-export interface IGridHistoryCellUpdate<TKey extends IGridDataKey = IGridDataKey, TCell = unknown> {
-  key: TKey;
-  prevValue: TCell;
-  value: TCell;
-}
-
-export interface IGridHistoryRowUpdate<TKey extends IGridDataKey = IGridDataKey, TCell = unknown> {
-  key: TKey;
-  prevValue: TCell[];
   value: TCell[];
 }
 
-export interface IGridHistoryEditCellData<TKey extends IGridDataKey = IGridDataKey, TCell = unknown> {
+export interface IGridHistoryCellUpdateData<TKey extends IGridDataKey = IGridDataKey, TCell = unknown> {
   key: TKey;
-  value: TCell;
   prevValue: TCell;
+  value: TCell;
+}
+
+export interface IGridHistoryRowUpdate<TKey extends IGridDataKey = IGridDataKey, TCell = unknown> extends IGridHistoryRow<TKey, TCell> {
+  prevValue: TCell[];
 }
 
 export interface IGridHistoryAddRowData<TKey extends IGridDataKey = IGridDataKey, TCell = unknown> {
-  keys: Array<IGridHistoryKeyWithValue<TKey, TCell>>;
+  rowEntries: Array<IGridHistoryRow<TKey, TCell>>;
 }
 
 export interface IGridHistoryDeleteRowData<TKey extends IGridDataKey = IGridDataKey, TCell = unknown> {
-  keys: Array<IGridHistoryKeyWithValue<TKey, TCell>>;
+  rowEntries: Array<IGridHistoryRow<TKey, TCell>>;
 }
 
 export interface IGridHistoryRevertData<TKey extends IGridDataKey = IGridDataKey, TCell = unknown> {
-  updates: Array<IGridHistoryCellUpdate<TKey, TCell>>;
-  deletions: Array<IGridHistoryKeyWithValue<TKey, TCell>>;
-  additions: Array<IGridHistoryKeyWithRowValue<TKey, TCell>>;
+  updates: Array<IGridHistoryCellUpdateData<TKey, TCell>>;
+  deletions: Array<IGridHistoryRow<TKey, TCell>>;
+  additions: Array<IGridHistoryRow<TKey, TCell>>;
 }
 
 export interface IGridHistoryCancelData<TKey extends IGridDataKey = IGridDataKey, TCell = unknown> {
   updates: Array<IGridHistoryRowUpdate<TKey, TCell>>;
-  deletions: Array<IGridHistoryKeyWithValue<TKey, TCell>>;
-  additions: Array<IGridHistoryKeyWithRowValue<TKey, TCell>>;
+  deletions: Array<IGridHistoryRow<TKey, TCell>>;
+  additions: Array<IGridHistoryRow<TKey, TCell>>;
 }
 
 export type IGridHistoryData<TKey extends IGridDataKey = IGridDataKey, TCell = unknown> =
-  | IGridHistoryEditCellData<TKey, TCell>
+  | IGridHistoryCellUpdateData<TKey, TCell>
   | IGridHistoryAddRowData<TKey, TCell>
   | IGridHistoryDeleteRowData<TKey, TCell>
   | IGridHistoryRevertData<TKey, TCell>
@@ -73,7 +60,7 @@ export type IGridHistoryData<TKey extends IGridDataKey = IGridDataKey, TCell = u
 
 export function isGridHistoryEditCellData<TKey extends IGridDataKey = IGridDataKey, TCell = unknown>(
   entry: IHistoryEntry<unknown>,
-): entry is IHistoryEntry<IGridHistoryEditCellData<TKey, TCell>> {
+): entry is IHistoryEntry<IGridHistoryCellUpdateData<TKey, TCell>> {
   return entry.source === GRID_HISTORY_SOURCE.EDIT_CELL;
 }
 

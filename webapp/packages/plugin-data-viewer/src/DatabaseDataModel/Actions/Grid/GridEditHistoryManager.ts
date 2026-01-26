@@ -13,9 +13,9 @@ import {
   isGridHistoryEditCellData,
   type IGridHistoryAddRowData,
   type IGridHistoryCancelData,
+  type IGridHistoryCellUpdateData,
   type IGridHistoryData,
   type IGridHistoryDeleteRowData,
-  type IGridHistoryEditCellData,
   type IGridHistoryRevertData,
 } from './GridHistoryTypes.js';
 import { GridDataKeysUtils } from './GridDataKeysUtils.js';
@@ -36,7 +36,7 @@ export class GridEditHistoryManager<TKey extends IGridDataKey, TCell> {
     });
   }
 
-  recordCellEdit(data: IGridHistoryEditCellData<TKey, TCell>): void {
+  recordCellEdit(data: IGridHistoryCellUpdateData<TKey, TCell>): void {
     this.compressLastEditedCellHistory(data.key);
 
     this.history.add({
@@ -101,8 +101,8 @@ export class GridEditHistoryManager<TKey extends IGridDataKey, TCell> {
     this.history.compress(
       entry => isGridHistoryEditCellData<TKey, TCell>(entry) && GridDataKeysUtils.isElementsKeyEqual(entry.data.key, key),
       entries => {
-        const firstEntry = entries[0]! as IHistoryEntry<IGridHistoryEditCellData<TKey, TCell>>;
-        const lastEntry = entries[entries.length - 1]! as IHistoryEntry<IGridHistoryEditCellData<TKey, TCell>>;
+        const firstEntry = entries[0]! as IHistoryEntry<IGridHistoryCellUpdateData<TKey, TCell>>;
+        const lastEntry = entries[entries.length - 1]! as IHistoryEntry<IGridHistoryCellUpdateData<TKey, TCell>>;
 
         return {
           source: GRID_HISTORY_SOURCE.EDIT_CELL,
