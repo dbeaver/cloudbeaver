@@ -21,14 +21,14 @@ export interface IGridHistoryRow<TKey extends IGridDataKey = IGridDataKey, TCell
   value: TCell[];
 }
 
+export interface IGridHistoryRowWithPrev<TKey extends IGridDataKey = IGridDataKey, TCell = unknown> extends IGridHistoryRow<TKey, TCell> {
+  prevValue: TCell[];
+}
+
 export interface IGridHistoryCellUpdateData<TKey extends IGridDataKey = IGridDataKey, TCell = unknown> {
   key: TKey;
   prevValue: TCell;
   value: TCell;
-}
-
-export interface IGridHistoryRowUpdate<TKey extends IGridDataKey = IGridDataKey, TCell = unknown> extends IGridHistoryRow<TKey, TCell> {
-  prevValue: TCell[];
 }
 
 export interface IGridHistoryAddRowData<TKey extends IGridDataKey = IGridDataKey, TCell = unknown> {
@@ -46,7 +46,7 @@ export interface IGridHistoryRevertData<TKey extends IGridDataKey = IGridDataKey
 }
 
 export interface IGridHistoryCancelData<TKey extends IGridDataKey = IGridDataKey, TCell = unknown> {
-  updates: Array<IGridHistoryRowUpdate<TKey, TCell>>;
+  updates: Array<IGridHistoryRowWithPrev<TKey, TCell>>;
   deletions: Array<IGridHistoryRow<TKey, TCell>>;
   additions: Array<IGridHistoryRow<TKey, TCell>>;
 }
