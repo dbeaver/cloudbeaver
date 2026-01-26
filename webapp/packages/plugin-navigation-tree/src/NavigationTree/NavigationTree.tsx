@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -39,6 +39,7 @@ import { navigationTreeProjectsExpandStateGetter } from './ProjectsRenderer/navi
 import { navigationTreeProjectsRendererRenderer } from './ProjectsRenderer/navigationTreeProjectsRendererRenderer.js';
 import { ProjectsSettingsPlaceholderElement } from './ProjectsRenderer/ProjectsSettingsForm.js';
 import { useNavigationTree } from './useNavigationTree.js';
+import { TableContentsSettingsPlaceholderElement } from './ElementsTree/ElementsTreeTools/NavigationTreeSettings/TableContentsSettingsForm.js';
 
 const registry: StyleRegistry = [
   [
@@ -86,7 +87,10 @@ export const NavigationTree = observer(function NavigationTree() {
     [projectsNavNodeService, projectsService, navNodeInfoResource, navTreeResource],
   );
 
-  const settingsElements = useMemo(() => [ProjectsSettingsPlaceholderElement, ObjectsDescriptionSettingsPlaceholderElement], []);
+  const settingsElements = useMemo(
+    () => [ProjectsSettingsPlaceholderElement, ObjectsDescriptionSettingsPlaceholderElement, TableContentsSettingsPlaceholderElement],
+    [],
+  );
 
   useExecutor({
     executor: navTreeService.showNodeExecutor,
