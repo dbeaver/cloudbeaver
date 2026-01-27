@@ -183,8 +183,8 @@ function refreshMatches(store: GridSearchStore): void {
     store.options.getCellText,
   );
 
-  if (store.activeMatchIdx >= matches.length) {
-    store.activeMatchIdx = matches.length > 0 ? matches.length - 1 : -1;
+  if (store.activeMatchIdx < 0 || store.activeMatchIdx >= matches.length) {
+    store.activeMatchIdx = matches.length > 0 ? 0 : -1;
   }
 
   store.matchedCells = matches;
@@ -256,6 +256,9 @@ function createActions(store: GridSearchStore): IGridSearchActions {
 
     findNext(): void {
       if (store.matchedCells.length === 0) {
+        if (store.query) {
+          runSearch(store);
+        }
         return;
       }
       store.activeMatchIdx = (store.activeMatchIdx + 1) % store.matchedCells.length;
@@ -267,6 +270,9 @@ function createActions(store: GridSearchStore): IGridSearchActions {
 
     findPrevious(): void {
       if (store.matchedCells.length === 0) {
+        if (store.query) {
+          runSearch(store);
+        }
         return;
       }
       store.activeMatchIdx = store.activeMatchIdx === 0 ? store.matchedCells.length - 1 : store.activeMatchIdx - 1;
