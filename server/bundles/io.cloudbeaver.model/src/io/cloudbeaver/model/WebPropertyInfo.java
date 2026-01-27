@@ -243,9 +243,11 @@ public class WebPropertyInfo {
             List<Object> result = new ArrayList<>();
             int length = Array.getLength(value);
             for (int i = 0; i < length; i++) {
-                result.add(Array.get(value, i));
+                result.add(makePropertyValue(Array.get(value, i)));
             }
             return result;
+        } else if (value instanceof Enum<?> enumValue) {
+            return new WebBasicEnumObjectInfo(enumValue.toString(), enumValue.name());
         }
         Class<?> dataType = property.getDataType();
         if (dataType == Boolean.class || dataType == Boolean.TYPE) {
