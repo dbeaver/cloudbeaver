@@ -40,8 +40,8 @@
     position: relative;
     display: flex;
     flex-shrink: 0;
-    width: 16px;
-    height: 16px;
+    width: 24px;
+    height: 24px;
 
     & .menuIcon {
       width: 16px;
@@ -49,4 +49,12 @@
       flex-shrink: 0;
     }
   }
+}
+
+.contextMenu {
+  width: 16px;
+  height: 16px;
+  padding: 4px;
+  box-sizing: content-box;
+  cursor: pointer;
 }
