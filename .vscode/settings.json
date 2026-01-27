@@ -45,5 +45,8 @@
     "*.css": "postcss"
   },
   "java.checkstyle.configuration": "${workspaceFolder}/../dbeaver-common/.github/dbeaver-checkstyle-config.xml",
+  "java.checkstyle.modules": [
+    "${workspaceFolder}/../dbeaver-common/.github/checkstyle/checks/checkstyle-nullability-annotations.jar"
+  ],
   "java.checkstyle.version": "10.12.0"
 }
