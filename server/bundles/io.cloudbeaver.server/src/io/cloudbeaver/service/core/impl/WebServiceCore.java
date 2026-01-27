@@ -58,6 +58,7 @@ import org.jkiss.dbeaver.model.rm.RMProjectType;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.secret.DBSSecretController;
 import org.jkiss.dbeaver.model.secret.DBSSecretValue;
+import org.jkiss.dbeaver.model.security.SMObjectType;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
 import org.jkiss.dbeaver.registry.DataSourceNavigatorSettings;
 import org.jkiss.dbeaver.registry.DataSourceNavigatorSettingsUtils;
@@ -756,6 +757,23 @@ public class WebServiceCore implements DBWServiceCore {
             throw new DBWebException("Error deleting custom navigator settings", e);
         }
         return connectionInfo;
+    }
+
+    @Override
+    public Object setObjectSettings(
+        @NotNull WebSession webSession,
+        @NotNull String projectId,
+        @NotNull String objectType,
+        @NotNull String objectId,
+        @NotNull Map<String, String> settings
+    ) throws DBException {
+
+        SMObjectType smObjectType = SMObjectType.valueOf(objectType);
+        webSession.getSecurityController().setObjectSettings(projectId, smObjectType, objectId, settings);
+        //fixme return proper object
+        return settings.entrySet().stream()
+            .filter(e -> e.getValue() != null)
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
     @Override

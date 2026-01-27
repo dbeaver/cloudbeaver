@@ -24,6 +24,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
+import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.rm.RMConstants;
 import org.jkiss.dbeaver.registry.DataSourceNavigatorSettings;
 import org.jkiss.dbeaver.registry.settings.ProductSettingDescriptor;
@@ -212,6 +213,14 @@ public interface DBWServiceCore extends DBWService {
         @NotNull String projectId,
         @NotNull String id
     ) throws DBWebException;
+
+    Object setObjectSettings(
+        @NotNull WebSession webSession,
+        @NotNull String projectId,
+        @NotNull String objectType,
+        @NotNull String objectId,
+        @NotNull Map<String, String> settings
+    ) throws DBException;
 
     ///////////////////////////////////////////
     // Async tasks
