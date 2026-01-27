@@ -18,13 +18,13 @@ package io.cloudbeaver.service.sql;
 
 
 import io.cloudbeaver.model.session.WebSession;
-import org.eclipse.jface.text.Document;
 import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.sql.SQLModelPreferences;
+import org.jkiss.dbeaver.model.sql.SQLQuery;
+import org.jkiss.dbeaver.model.sql.SQLScriptElement;
 import org.jkiss.dbeaver.model.sql.completion.SQLCompletionRequest;
-import org.jkiss.dbeaver.model.sql.parser.SQLParserContext;
-import org.jkiss.dbeaver.model.sql.parser.SQLScriptParser;
-import org.jkiss.dbeaver.model.sql.semantics.SQLDocumentSyntaxContext;
+import org.jkiss.dbeaver.model.sql.semantics.SQLDocumentScriptItemSyntaxContext;
 import org.jkiss.dbeaver.model.sql.semantics.SQLQueryModelRecognizer;
 import org.jkiss.dbeaver.model.sql.semantics.SQLQueryRecognitionContext;
 import org.jkiss.dbeaver.model.sql.semantics.SQLScriptItemAtOffset;
@@ -32,59 +32,44 @@ import org.jkiss.dbeaver.model.sql.semantics.completion.SQLQueryCompletionContex
 
 public class WebSQLCompletionContextScriptParser {
 
-    @NotNull
     public static SQLQueryCompletionContext obtainCompletionContext(
-        WebSession webSession,
-        @NotNull String query,
+        @NotNull WebSession webSession,
+        @Nullable SQLScriptElement activeQuery,
         int position,
-        SQLCompletionRequest request
+        @NotNull SQLCompletionRequest request
     ) {
-        Document document = new Document(query);
-        SQLDocumentSyntaxContext syntaxContext = new SQLDocumentSyntaxContext();
-        SQLParserContext parserContext = new SQLParserContext(
-            request.getContext().getDataSource(),
-            request.getContext().getSyntaxManager(),
-            request.getContext().getRuleManager(),
-            document
-        );
-        var scriptItems = SQLScriptParser.parseScript(
-            parserContext.getDataSource(),
-            parserContext.getDialect(),
-            parserContext.getPreferenceStore(),
-            document.get()
-        );
-        if (scriptItems != null) {
-            for (var item : scriptItems) {
-                var model = SQLQueryModelRecognizer.recognizeQuery(
-                    new SQLQueryRecognitionContext(
-                        webSession.getProgressMonitor(),
-                        request.getContext().getExecutionContext(),
-                        true,
-                        webSession.getUserPreferenceStore().getBoolean(SQLModelPreferences.VALIDATE_FUNCTIONS),
-                        request.getContext().getSyntaxManager(),
-                        request.getContext().getDataSource().getSQLDialect()
-                    ),
-                    item.getOriginalText()
-                );
-                syntaxContext.registerScriptItemContext(
-                    item.getOriginalText(),
-                    model,
-                    item.getOffset(),
-                    item.getLength(),
-                    true
-                );
-            }
-        }
-
-        SQLScriptItemAtOffset scriptItem = syntaxContext.findScriptItem(position);
-        if (scriptItem != null) {
-            scriptItem.item.setHasContextBoundaryAtLength(false);
-            return SQLQueryCompletionContext.prepareCompletionContext(
-                scriptItem,
-                position,
-                request.getContext().getExecutionContext(),
-                request.getContext().getDataSource().getSQLDialect()
+        if (activeQuery != null) {
+            var model = SQLQueryModelRecognizer.recognizeQuery(
+                new SQLQueryRecognitionContext(
+                    webSession.getProgressMonitor(),
+                    request.getContext().getExecutionContext(),
+                    true,
+                    webSession.getUserPreferenceStore().getBoolean(SQLModelPreferences.VALIDATE_FUNCTIONS),
+                    request.getContext().getSyntaxManager(),
+                    request.getContext().getDataSource().getSQLDialect()
+                ),
+                activeQuery.getOriginalText()
             );
+
+            if (model != null) {
+                SQLDocumentScriptItemSyntaxContext scriptItemContext = new SQLDocumentScriptItemSyntaxContext(
+                    activeQuery.getOffset(),
+                    activeQuery.getOriginalText(),
+                    model,
+                    activeQuery.getLength()
+                );
+                scriptItemContext.setHasContextBoundaryAtLength(
+                    activeQuery instanceof SQLQuery queryElement && Boolean.TRUE.equals(queryElement.isEndsWithDelimiter())
+                );
+                return SQLQueryCompletionContext.prepareCompletionContext(
+                    new SQLScriptItemAtOffset(activeQuery.getOffset(), scriptItemContext),
+                    position,
+                    request.getContext().getExecutionContext(),
+                    request.getContext().getDataSource().getSQLDialect()
+                );
+            } else {
+                return SQLQueryCompletionContext.prepareOffquery(0, position);
+            }
         } else {
             return SQLQueryCompletionContext.prepareOffquery(0, position);
         }
