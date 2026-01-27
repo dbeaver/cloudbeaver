@@ -101,6 +101,11 @@ export class TableHeaderService extends Bootstrap {
         }
       },
       getActionInfo: (context, action) => {
+        if ([ACTION_UNDO, ACTION_REDO].includes(action)) {
+          console.log(action);
+          return action.info;
+        }
+
         if (context.get(DATA_CONTEXT_MENU) === DATA_VIEWER_DATA_MODEL_TOOLS_MENU) {
           return { ...action.info, label: '' };
         }
