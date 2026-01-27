@@ -57,6 +57,7 @@ import org.jkiss.dbeaver.model.sql.registry.SQLGeneratorConfigurationRegistry;
 import org.jkiss.dbeaver.model.sql.registry.SQLGeneratorDescriptor;
 import org.jkiss.dbeaver.model.sql.semantics.completion.SQLCompletionProposalComparator;
 import org.jkiss.dbeaver.model.sql.semantics.completion.SQLQueryCompletionAnalyzer;
+import org.jkiss.dbeaver.model.sql.semantics.completion.SQLQueryCompletionContext;
 import org.jkiss.dbeaver.model.struct.DBSDataContainer;
 import org.jkiss.dbeaver.model.struct.DBSObject;
 import org.jkiss.dbeaver.model.struct.DBSWrapper;
@@ -176,9 +177,11 @@ public class WebServiceSQL implements DBWServiceSQL {
                 .getString(SQLModelPreferences.AUTOCOMPLETION_MODE));
 
             if (!useDefaultCompletionEngine) {
+                SQLQueryCompletionContext queryCompletionContext = WebSQLCompletionContextScriptParser.obtainCompletionContext(
+                    webSession, activeQuery, position, request
+                );
                 SQLQueryCompletionAnalyzer analyzer = new SQLQueryCompletionAnalyzer(
-                    m -> WebSQLCompletionContextScriptParser.obtainCompletionContext(
-                        webSession, query, position, request),
+                    m -> queryCompletionContext,
                     request,
                     request::getDocumentOffset
                 );
