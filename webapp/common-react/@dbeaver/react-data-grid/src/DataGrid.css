@@ -11,18 +11,18 @@
   }
 
   .rdg-search-panel {
-    position: absolute;
-    top: 0;
-    right: 0;
-    z-index: 3;
+    padding-bottom: 0 !important;
+    .search-panel__inputs {
+      max-width: var(--tw-container-lg);
+    }
   }
 
   .rdg-cell-search-match {
-    background-color: rgba(255, 235, 59, 0.4);
+    background-color: #ffff0054;
   }
 
   .rdg-cell-search-active {
-    background-color: rgba(255, 152, 0, 0.5);
+    background-color: #ff6a0054;
   }
 }
 

@@ -7,7 +7,7 @@
  */
 
 import { forwardRef, useContext, useEffect, useImperativeHandle, useRef } from 'react';
-import { SearchPanel, type SearchPanelRef } from '@dbeaver/ui-kit';
+import { clsx, SearchPanel, type SearchPanelRef } from '@dbeaver/ui-kit';
 
 import { DataGridCellContext } from '../DataGridCellContext.js';
 import { DataGridRowContext } from '../DataGridRowContext.js';
@@ -68,7 +68,7 @@ export const GridSearchPanel = forwardRef<GridSearchPanelRef, GridSearchPanelPro
   return (
     <SearchPanel
       ref={panelRef}
-      className="rdg-search-panel"
+      className={clsx('rdg-search-panel tw:bg-(--theme-secondary)', isReadOnly && 'tw:px-0!')}
       isReadOnly={isReadOnly || !replaceCellValue}
       query={{
         search: snapshot.query,

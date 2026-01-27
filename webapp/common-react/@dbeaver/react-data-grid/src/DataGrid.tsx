@@ -301,20 +301,6 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
                 columnSortingMultiple,
               }}
             >
-              {searchOpen && (
-                <GridSearchPanel
-                  ref={searchPanelRef}
-                  columnCount={columnsCount}
-                  defaultState={defaultSearchState}
-                  isReadOnly={searchReadOnly}
-                  scrollToCell={scrollToCell}
-                  replaceCellValue={replaceCellValue}
-                  onCellClassNameChange={setSearchCellClassName}
-                  onClose={handleSearchClose}
-                  onStateChange={onSearchStateChange}
-                  onReplacingChange={handleReplacingChange}
-                />
-              )}
               <DataGridBase
                 ref={innerGridRef}
                 columns={dndHeaderContext.columns}
@@ -335,6 +321,20 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
                 onCellKeyDown={handleCellKeyDown}
                 onColumnWidthsChange={setColumnWidths}
               />
+              {searchOpen && (
+                <GridSearchPanel
+                  ref={searchPanelRef}
+                  columnCount={columnsCount}
+                  defaultState={defaultSearchState}
+                  isReadOnly={searchReadOnly}
+                  scrollToCell={scrollToCell}
+                  replaceCellValue={replaceCellValue}
+                  onCellClassNameChange={setSearchCellClassName}
+                  onClose={handleSearchClose}
+                  onStateChange={onSearchStateChange}
+                  onReplacingChange={handleReplacingChange}
+                />
+              )}
             </DataGridCellHeaderContext>
           </DataGridCellContext>
         </DataGridRowContext>

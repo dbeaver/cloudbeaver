@@ -31,7 +31,6 @@
     display: flex;
     align-items: center;
     background-color: var(--dbv-kit-input-background);
-    margin-bottom: calc(var(--tw-spacing) / 2);
     border: 1px solid var(--dbv-kit-input-border-color);
     border-radius: var(--dbv-kit-input-radius);
 
@@ -48,8 +47,11 @@
   }
 
   .search-panel__inputs {
+    display: flex;
+    flex-direction: column;
     flex: 1 1 420px;
     min-width: 120px;
+    gap: calc(var(--tw-spacing) / 2);
   }
 
   .search-panel__buttons {
