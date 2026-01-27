@@ -56,6 +56,16 @@ export class TableHeaderService extends Bootstrap {
     this.actionService.addHandler({
       id: 'table-header-menu-base-handler',
       contexts: [DATA_CONTEXT_DV_DDM, DATA_CONTEXT_DV_DDM_RESULT_INDEX],
+      isHidden(context, action) {
+        const model = context.get(DATA_CONTEXT_DV_DDM)!;
+        const isReadonly = model.isReadonly(context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!);
+
+        if ([ACTION_UNDO, ACTION_REDO].includes(action)) {
+          return isReadonly;
+        }
+
+        return false;
+      },
       isActionApplicable(context, action) {
         const model = context.get(DATA_CONTEXT_DV_DDM)!;
         const menu = context.hasValue(DATA_CONTEXT_MENU, DATA_VIEWER_DATA_MODEL_TOOLS_MENU);
