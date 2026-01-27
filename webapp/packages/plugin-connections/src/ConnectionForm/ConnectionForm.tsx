@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -11,7 +11,7 @@ import { Container, Form, Loader, Placeholder, s, StatusMessage, useForm, useObj
 import { useService } from '@cloudbeaver/core-di';
 import { ENotificationType, NotificationService } from '@cloudbeaver/core-events';
 import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
-import { formSubmitContext, TabList, TabPanelList, TabsState, type IFormState } from '@cloudbeaver/core-ui';
+import { FormMode, formSubmitContext, TabList, TabPanelList, TabsState, type IFormState } from '@cloudbeaver/core-ui';
 
 import { ConnectionFormActionsContext, type IConnectionFormActionsContext } from './ConnectFormActionsContext.js';
 import style from './ConnectionForm.module.css';
@@ -25,7 +25,7 @@ import type { IConnectionFormState } from './IConnectionFormState.js';
 export interface ConnectionFormProps {
   formState: ConnectionFormState;
   onCancel?: () => void;
-  onSave?: (config: ConnectionConfig) => void;
+  onSave?: (config: ConnectionConfig, isCreate?: boolean) => void;
   className?: string;
 }
 
@@ -46,20 +46,20 @@ export const ConnectionForm = observer<ConnectionFormProps>(function ConnectionF
       if (submitType === 'test') {
         submitInfo.setSubmitOnNoChanges(true);
       }
-      const initialMode = formState.mode;
+      const isCreate = formState.mode === FormMode.Create;
       const saved = await formState.save(context);
 
       if (saved) {
         if (submitType === 'submit') {
           notificationService.notify(
             {
-              title: initialMode === 'create' ? 'core_connections_connection_create_success' : 'core_connections_connection_update_success',
+              title: isCreate ? 'core_connections_connection_create_success' : 'core_connections_connection_update_success',
               message: optionsPart.state?.name,
             },
             ENotificationType.Success,
           );
 
-          onSave(optionsPart.state);
+          onSave(optionsPart.state, isCreate);
         }
       } else {
         const error = getFirstException(formState.exception);

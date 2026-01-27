@@ -21,7 +21,7 @@ import { DatabaseAuthModelsResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
-import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
+import type { IObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 
 import type { IConnectionAuthenticationConfig } from './IConnectionAuthenticationConfig.js';
 import { NetworkHandlers } from './NetworkHandlers.js';
@@ -29,7 +29,7 @@ import { NetworkHandlers } from './NetworkHandlers.js';
 export interface ConnectionAuthenticationFormProps {
   config: Partial<IConnectionAuthenticationConfig>;
   authModelId: string | null;
-  authProperties?: ObjectPropertyInfo[];
+  authProperties?: IObjectPropertyInfo[];
   networkHandlers?: string[];
   formId?: string;
   allowSaveCredentials?: boolean;
