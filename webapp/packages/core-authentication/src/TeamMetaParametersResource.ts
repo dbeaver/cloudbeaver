@@ -8,9 +8,9 @@
 import { injectable } from '@cloudbeaver/core-di';
 import { CachedDataResource } from '@cloudbeaver/core-resource';
 import { SessionResource } from '@cloudbeaver/core-root';
-import { GraphQLService, type ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
+import { GraphQLService, type IObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 
-export type TeamMetaParameter = ObjectPropertyInfo;
+export type TeamMetaParameter = IObjectPropertyInfo;
 
 @injectable(() => [GraphQLService, SessionResource])
 export class TeamMetaParametersResource extends CachedDataResource<TeamMetaParameter[]> {
