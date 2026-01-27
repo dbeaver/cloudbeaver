@@ -16,6 +16,10 @@ import { DateTimeKind, useFormattingContext } from '../../FormattingContext.js';
 import { TableDataContext } from '../../TableDataContext.js';
 import type { ICellFormatterProps } from '../ICellFormatterProps.js';
 
+function isValidDate(date: Date): boolean {
+  return !isNaN(date.getTime());
+}
+
 export const DateTimeFormatter = observer<ICellFormatterProps>(function DateTimeFormatter() {
   const tableDataContext = useContext(TableDataContext);
   const formattingContext = useFormattingContext();
@@ -59,7 +63,7 @@ export const DateTimeFormatter = observer<ICellFormatterProps>(function DateTime
         value = dateFormatter.format(date);
       } else {
         const date = new Date(displayValue);
-        value = dateFormatter.format(date);
+        value = isValidDate(date) ? dateFormatter.format(date) : displayValue;
       }
     }
   }
