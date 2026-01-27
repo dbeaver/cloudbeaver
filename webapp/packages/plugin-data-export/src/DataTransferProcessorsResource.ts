@@ -8,10 +8,14 @@
 import { injectable } from '@cloudbeaver/core-di';
 import { CachedMapAllKey, CachedMapResource, resourceKeyList } from '@cloudbeaver/core-resource';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
-import { type DataTransferProcessorInfo, GraphQLService } from '@cloudbeaver/core-sdk';
+import { type DataTransferProcessorInfo, GraphQLService, type IObjectPropertyInfo } from '@cloudbeaver/core-sdk';
+
+export interface IDataTransferProcessorInfo extends DataTransferProcessorInfo {
+  properties?: IObjectPropertyInfo[];
+}
 
 @injectable(() => [GraphQLService, ServerConfigResource])
-export class DataTransferProcessorsResource extends CachedMapResource<string, DataTransferProcessorInfo> {
+export class DataTransferProcessorsResource extends CachedMapResource<string, IDataTransferProcessorInfo> {
   constructor(
     private readonly graphQLService: GraphQLService,
     serverConfigResource: ServerConfigResource,
@@ -24,7 +28,7 @@ export class DataTransferProcessorsResource extends CachedMapResource<string, Da
     );
   }
 
-  protected async loader(): Promise<Map<string, DataTransferProcessorInfo>> {
+  protected async loader(): Promise<Map<string, IDataTransferProcessorInfo>> {
     const { processors } = await this.graphQLService.sdk.getDataTransferProcessors();
 
     this.replace(resourceKeyList(processors.map(processor => processor.id)), processors);

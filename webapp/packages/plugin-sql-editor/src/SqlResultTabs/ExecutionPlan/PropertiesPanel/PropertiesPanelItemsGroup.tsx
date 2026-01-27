@@ -8,14 +8,14 @@
 import { useState } from 'react';
 
 import { TableColumnValue, TableItem } from '@cloudbeaver/core-blocks';
-import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
+import type { IObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 
 import { Expand } from '../Expand.js';
 import { getPropertyValue } from '../getPropertyValue.js';
 import classes from './PropertiesPanelItemsGroup.module.css';
 
 interface Props {
-  properties: ObjectPropertyInfo[];
+  properties: IObjectPropertyInfo[];
   name: string;
 }
 
