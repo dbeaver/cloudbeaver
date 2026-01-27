@@ -18,7 +18,8 @@
 .menuBarGroupArrowCustomSubmenuMark {
   display: flex;
   align-items: center;
-  width: 14px;
+  justify-content: center;
+  width: 24px;
   min-height: 24px;
   height: 100%;
 

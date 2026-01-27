@@ -9,7 +9,7 @@ import { useCallback, useState } from 'react';
 
 import { EventTableItemSelectionFlag, TableColumnValue, TableItem } from '@cloudbeaver/core-blocks';
 import { EventContext } from '@cloudbeaver/core-events';
-import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
+import type { IObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 
 import type { IExecutionPlanNode } from './ExecutionPlanTreeContext.js';
 import { Expand } from './Expand.js';
@@ -17,7 +17,7 @@ import { getPropertyValue } from './getPropertyValue.js';
 import classes from './NestedNode.module.css';
 
 interface Props {
-  columns: ObjectPropertyInfo[];
+  columns: IObjectPropertyInfo[];
   node: IExecutionPlanNode;
   depth: number;
   className?: string;
