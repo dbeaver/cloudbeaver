@@ -2683,6 +2683,40 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@cloudbeaver/plugin-connection-view@workspace:*, @cloudbeaver/plugin-connection-view@workspace:packages/plugin-connection-view":
+  version: 0.0.0-use.local
+  resolution: "@cloudbeaver/plugin-connection-view@workspace:packages/plugin-connection-view"
+  dependencies:
+    "@cloudbeaver/core-blocks": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-connections": "workspace:*"
+    "@cloudbeaver/core-data-context": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-events": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-navigation-tree": "workspace:*"
+    "@cloudbeaver/core-projects": "workspace:*"
+    "@cloudbeaver/core-resource": "workspace:*"
+    "@cloudbeaver/core-root": "workspace:*"
+    "@cloudbeaver/core-sdk": "workspace:*"
+    "@cloudbeaver/core-ui": "workspace:*"
+    "@cloudbeaver/core-utils": "workspace:*"
+    "@cloudbeaver/core-view": "workspace:*"
+    "@cloudbeaver/plugin-connections": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
+    "@dbeaver/js-helpers": "workspace:*"
+    "@types/react": "npm:^19"
+    mobx: "npm:^6"
+    mobx-react-lite: "npm:^4"
+    react: "npm:^19"
+    react-dom: "npm:^19"
+    rimraf: "npm:^6"
+    tslib: "npm:^2"
+    typescript: "npm:^5"
+    typescript-plugin-css-modules: "npm:^5"
+  languageName: unknown
+  linkType: soft
+
 "@cloudbeaver/plugin-connections-administration@workspace:*, @cloudbeaver/plugin-connections-administration@workspace:packages/plugin-connections-administration":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-connections-administration@workspace:packages/plugin-connections-administration"
@@ -3840,6 +3874,7 @@ __metadata:
     "@cloudbeaver/plugin-codemirror6": "workspace:*"
     "@cloudbeaver/plugin-connection-custom": "workspace:*"
     "@cloudbeaver/plugin-connection-search": "workspace:*"
+    "@cloudbeaver/plugin-connection-view": "workspace:*"
     "@cloudbeaver/plugin-connections": "workspace:*"
     "@cloudbeaver/plugin-connections-administration": "workspace:*"
     "@cloudbeaver/plugin-data-export": "workspace:*"

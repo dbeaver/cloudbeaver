@@ -14,17 +14,19 @@ import { importLazyComponent, PlaceholderContainer } from '@cloudbeaver/core-blo
 
 const ConnectionFormBaseActionsLoader = importLazyComponent(() => import('./ConnectionFormBaseActions.js').then(m => m.ConnectionFormBaseActions));
 
-export type ProviderPropertiesContainerFormProps = {
+export type ConnectionFormContainerProps = {
   formState: IFormState<IConnectionFormState>;
 };
 
 @injectable(() => [LocalizationService, NotificationService])
 export class ConnectionFormService extends FormBaseService<IConnectionFormState, IConnectionFormProps> {
-  readonly providerPropertiesContainer: PlaceholderContainer<ProviderPropertiesContainerFormProps>;
+  readonly providerPropertiesContainer: PlaceholderContainer<ConnectionFormContainerProps>;
+  readonly connectionContainer: PlaceholderContainer<ConnectionFormContainerProps>;
 
   constructor(localizationService: LocalizationService, notificationService: NotificationService) {
     super(localizationService, notificationService, 'Connection form');
-    this.providerPropertiesContainer = new PlaceholderContainer<ProviderPropertiesContainerFormProps>();
+    this.providerPropertiesContainer = new PlaceholderContainer<ConnectionFormContainerProps>();
+    this.connectionContainer = new PlaceholderContainer<ConnectionFormContainerProps>();
     this.actionsContainer.add(ConnectionFormBaseActionsLoader);
   }
 }

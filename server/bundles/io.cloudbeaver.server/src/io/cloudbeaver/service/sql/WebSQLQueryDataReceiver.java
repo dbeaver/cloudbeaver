@@ -17,6 +17,7 @@
 package io.cloudbeaver.service.sql;
 
 import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.service.sql.WebSQLResultSetRowIdentifier.WebSQLResultSetRowIdentifierState;
 import io.cloudbeaver.utils.ServletAppUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
@@ -33,10 +34,14 @@ import org.jkiss.dbeaver.model.meta.MetaData;
 import org.jkiss.dbeaver.model.sql.DBQuotaException;
 import org.jkiss.dbeaver.model.struct.DBSDataContainer;
 import org.jkiss.dbeaver.model.struct.DBSEntity;
+import org.jkiss.dbeaver.model.struct.DBSEntityConstraintType;
 import org.jkiss.utils.CommonUtils;
 
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 class WebSQLQueryDataReceiver implements DBDDataReceiver {
@@ -182,9 +187,26 @@ class WebSQLQueryDataReceiver implements DBDDataReceiver {
 
         webResultSet.setSingleEntity(isSingleEntity);
 
-        Set<DBDRowIdentifier> rowIdentifiers = resultsInfo.getRowIdentifiers();
-        boolean hasRowIdentifier = rowIdentifiers.stream().allMatch(DBDRowIdentifier::isValidIdentifier);
-        webResultSet.setHasRowIdentifier(!rowIdentifiers.isEmpty() && hasRowIdentifier);
+        DBDRowIdentifier rowIdentifier = resultsInfo.getDefaultRowIdentifier();
+        if (rowIdentifier == null) {
+            webResultSet.setRowIdentifierState(WebSQLResultSetRowIdentifierState.METADATA_NOT_FOUND);
+        } else if (rowIdentifier.getUniqueKey().getConstraintType().equals(DBSEntityConstraintType.VIRTUAL_KEY)) {
+            webResultSet.setRowIdentifierState(WebSQLResultSetRowIdentifierState.VIRTUAL_KEY);
+        } else if (!rowIdentifier.isIncomplete() && rowIdentifier.isValidIdentifier()) {
+            webResultSet.setHasRowIdentifier(true);
+            webResultSet.setRowIdentifierState(WebSQLResultSetRowIdentifierState.PRIMARY_KEY);
+            List<WebSQLResultSetRowIdentifierAttribute> attributes = rowIdentifier.getAttributes().stream()
+                .map(a -> new WebSQLResultSetRowIdentifierAttribute(
+                    a.getName(), a.getOrdinalPosition(), a.getLabel(), a.getDescription()
+                ))
+                .toList();
+            String constraintTypeName = rowIdentifier.getUniqueKey().getConstraintType().getName();
+            webResultSet.setRowIdentifier(
+                new WebSQLResultSetRowIdentifier(constraintTypeName, attributes)
+            );
+        } else {
+            webResultSet.setRowIdentifierState(WebSQLResultSetRowIdentifierState.NONE);
+        }
     }
 
     private void convertComplexValuesToRelationalView(DBCSession session) {

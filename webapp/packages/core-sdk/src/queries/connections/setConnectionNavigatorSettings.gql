@@ -1,5 +1,5 @@
 mutation setConnectionNavigatorSettings($projectId: ID!, $connectionId: ID!, $settings: NavigatorSettingsInput!) {
   connection: setConnectionNavigatorSettings(projectId: $projectId, id: $connectionId, settings: $settings) {
-    ...DatabaseConnection
+   ...DatabaseConnectionNavigatorViewSettings
   }
 }
