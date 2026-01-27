@@ -20,13 +20,13 @@ import {
 import { useService } from '@cloudbeaver/core-di';
 import { DBObjectResource, NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
 import { resourceKeyList } from '@cloudbeaver/core-resource';
-import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
+import type { IObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 
 interface Props {
   objectId: string;
 }
 
-const emptyArray: ObjectPropertyInfo[] = [];
+const emptyArray: IObjectPropertyInfo[] = [];
 
 export const ObjectProperties = observer<Props>(function ObjectProperties({ objectId }) {
   const translate = useTranslate();

@@ -8,7 +8,7 @@
 import { makeObservable, observable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
-import { getObjectPropertyType, type ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
+import { getObjectPropertyOptionName, getObjectPropertyOptionValue, getObjectPropertyType, type IObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 import {
   ESettingsValueType,
   type ISettingDescription,
@@ -44,7 +44,7 @@ export class SettingsTransformationService {
     this.settingTransformers.set(key, transformer);
   }
 
-  mapSetting(groups: Map<string, SettingsGroup>, property: ObjectPropertyInfo): ISettingDescription<any> | null {
+  mapSetting(groups: Map<string, SettingsGroup>, property: IObjectPropertyInfo): ISettingDescription<any> | null {
     const key = property.id!;
     const transformer = this.settingTransformers.get(key);
 
@@ -58,7 +58,8 @@ export class SettingsTransformationService {
 
       name: property.displayName!,
       description: property.description!,
-      options: property.validValues?.map(value => ({ value, name: value })) || [],
+      options:
+        property.validValues?.map(value => ({ value: String(getObjectPropertyOptionValue(value)), name: getObjectPropertyOptionName(value) })) || [],
     };
 
     if (transformer) {
@@ -98,7 +99,7 @@ export class SettingsTransformationService {
   }
 }
 
-function convertObjectPropertyInfoType(property: ObjectPropertyInfo): ESettingsValueType {
+function convertObjectPropertyInfoType(property: IObjectPropertyInfo): ESettingsValueType {
   switch (getObjectPropertyType(property)) {
     case 'selector':
       return ESettingsValueType.Select;
