@@ -95,7 +95,7 @@ export const TreeNodeExpand = observer<Props>(function TreeNodeExpand({ leaf, bi
       role="button"
       title={title}
       aria-label={title}
-      className={s(styles, { treeNodeExpand: true, expanded: context.expanded }, className)}
+      className={s(styles, { treeNodeExpand: true, expanded: context.expanded, expandable }, className)}
       focusable={expandable}
       disabled={disabled || !expandable}
     >
