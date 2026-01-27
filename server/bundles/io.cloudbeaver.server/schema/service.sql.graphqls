@@ -160,8 +160,6 @@ type SQLRowIdentifier {
 type SQLRowIdentifierAttribute {
     name: String!
     ordinalPosition: Int!
-    label: String!
-    description: String
 }
 
 type SQLQueryResults {

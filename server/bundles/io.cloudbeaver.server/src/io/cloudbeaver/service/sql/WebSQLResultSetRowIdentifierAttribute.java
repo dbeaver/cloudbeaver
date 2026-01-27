@@ -7,12 +7,7 @@ public class WebSQLResultSetRowIdentifierAttribute {
 
     @NotNull
     private final String name;
-
     private final int ordinalPosition;
-    @NotNull
-    private final String label;
-    @Nullable
-    private final String description;
 
     public WebSQLResultSetRowIdentifierAttribute(
         @NotNull String name,
@@ -22,8 +17,6 @@ public class WebSQLResultSetRowIdentifierAttribute {
     ) {
         this.name = name;
         this.ordinalPosition = ordinalPosition;
-        this.label = label;
-        this.description = description;
     }
 
     @NotNull
@@ -33,15 +26,5 @@ public class WebSQLResultSetRowIdentifierAttribute {
 
     public int getOrdinalPosition() {
         return ordinalPosition;
-    }
-
-    @NotNull
-    public String getLabel() {
-        return label;
-    }
-
-    @Nullable
-    public String getDescription() {
-        return description;
     }
 }
