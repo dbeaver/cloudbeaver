@@ -23,6 +23,7 @@ import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.meta.Property;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -64,6 +65,8 @@ public class WebConnectionConfig {
     private Boolean defaultAutoCommit;
     private String defaultCatalogName;
     private String defaultSchemaName;
+    @NotNull
+    private Map<String, Object> defaultUserSettings = new LinkedHashMap<>();
 
     public WebConnectionConfig() {
     }
@@ -111,6 +114,7 @@ public class WebConnectionConfig {
         String configType = JSONUtils.getString(params, "configurationType");
         configurationType = configType == null ? null : DBPDriverConfigurationType.valueOf(configType);
 
+        defaultUserSettings = JSONUtils.getObject(params, "defaultUserSettings");
         networkHandlersConfig = new ArrayList<>();
         for (Map<String, Object> nhc : JSONUtils.getObjectList(params, "networkHandlersConfig")) {
             networkHandlersConfig.add(new WebNetworkHandlerConfigInput(nhc));
@@ -366,5 +370,14 @@ public class WebConnectionConfig {
 
     public void setDefaultSchemaName(String defaultSchemaName) {
         this.defaultSchemaName = defaultSchemaName;
+    }
+
+    @NotNull
+    public Map<String, Object> getDefaultUserSettings() {
+        return defaultUserSettings;
+    }
+
+    public void setDefaultUserSettings(@NotNull Map<String, Object> defaultUserSettings) {
+        this.defaultUserSettings = defaultUserSettings;
     }
 }

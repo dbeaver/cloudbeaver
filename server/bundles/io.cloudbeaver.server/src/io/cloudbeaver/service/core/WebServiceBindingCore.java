@@ -163,6 +163,13 @@ public class WebServiceBindingCore extends WebServiceBindingBase<DBWServiceCore>
                     getArgumentVal(env, "id")
                 )
             )
+            .dataFetcher("setObjectSettings", env -> getService(env).setObjectSettings(
+                getWebSession(env),
+                getProjectReference(env),
+                getArgumentVal(env, "objectType"),
+                getArgumentVal(env, "objectId"),
+                getArgumentVal(env, "settings")
+            ))
 
             .dataFetcher("asyncTaskInfo", env -> getService(env).getAsyncTaskInfo(
                 getWebSession(env),

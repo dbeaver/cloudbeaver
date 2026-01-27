@@ -741,6 +741,8 @@ input ConnectionConfig {
     defaultCatalogName: String @since(version: "25.0.5") @deprecated(reason: "25.2.1 use expertPropertyValues instead")
     "Sets schema name for the connection"
     defaultSchemaName: String @since(version: "25.0.5") @deprecated(reason: "25.2.1 use expertPropertyValues instead")
+    "Default user settings for connection"
+    defaultUserSettings: Object @since(version: "25.3.5")
 }
 
 ####################################################
@@ -846,6 +848,7 @@ extend type Mutation {
     "Sets to default navigator settings for connection. Resets all user navigator settings for this connection."
     clearConnectionNavigatorSettings(projectId: ID!, id: ID!): ConnectionInfo! @since(version: "25.3.2")
 
+    setObjectSettings(id: ID!, projectId:ID, settings: Object!): Object! @since(version: "25.3.5")
     #### Generic async functions
 
     "Cancel async task by ID"
