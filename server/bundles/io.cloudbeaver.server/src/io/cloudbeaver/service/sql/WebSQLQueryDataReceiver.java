@@ -17,6 +17,7 @@
 package io.cloudbeaver.service.sql;
 
 import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.service.sql.WebSQLResultSetRowIdentifier.WebSQLResultSetRowIdentifierState;
 import io.cloudbeaver.utils.ServletAppUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
@@ -188,21 +189,23 @@ class WebSQLQueryDataReceiver implements DBDDataReceiver {
 
         DBDRowIdentifier rowIdentifier = resultsInfo.getDefaultRowIdentifier();
         if (rowIdentifier == null) {
-            webResultSet.setRowIdentifierState(WebSQLResultSetRowIdentifier.TABLE_METADATA_NOT_FOUND);
+            webResultSet.setRowIdentifierState(WebSQLResultSetRowIdentifierState.METADATA_NOT_FOUND);
         } else if (rowIdentifier.getUniqueKey().getConstraintType().equals(DBSEntityConstraintType.VIRTUAL_KEY)) {
-            webResultSet.setRowIdentifierState(WebSQLResultSetRowIdentifier.VIRTUAL_KEY);
+            webResultSet.setRowIdentifierState(WebSQLResultSetRowIdentifierState.VIRTUAL_KEY);
         } else if (!rowIdentifier.isIncomplete() && rowIdentifier.isValidIdentifier()) {
             webResultSet.setHasRowIdentifier(true);
-            webResultSet.setRowIdentifierState(WebSQLResultSetRowIdentifier.PRIMARY_KEY);
-            String rowIdentifierName = rowIdentifier.getAttributes().stream()
-                .map(DBDAttributeBinding::getName)
-                .collect(Collectors.joining(","));
+            webResultSet.setRowIdentifierState(WebSQLResultSetRowIdentifierState.PRIMARY_KEY);
+            List<WebSQLResultSetRowIdentifierAttribute> attributes = rowIdentifier.getAttributes().stream()
+                .map(a -> new WebSQLResultSetRowIdentifierAttribute(
+                    a.getName(), a.getOrdinalPosition(), a.getLabel(), a.getDescription()
+                ))
+                .toList();
             String constraintTypeName = rowIdentifier.getUniqueKey().getConstraintType().getName();
             webResultSet.setRowIdentifier(
-                new WebSQLResultSetRowIdentifier(rowIdentifierName, constraintTypeName)
+                new WebSQLResultSetRowIdentifier(constraintTypeName, attributes)
             );
         } else {
-            webResultSet.setRowIdentifierState(WebSQLResultSetRowIdentifier.NO_ROW_ID);
+            webResultSet.setRowIdentifierState(WebSQLResultSetRowIdentifierState.NONE);
         }
     }
 

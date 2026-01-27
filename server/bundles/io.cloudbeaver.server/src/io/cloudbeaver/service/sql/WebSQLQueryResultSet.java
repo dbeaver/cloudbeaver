@@ -16,6 +16,7 @@
  */
 package io.cloudbeaver.service.sql;
 
+import io.cloudbeaver.service.sql.WebSQLResultSetRowIdentifier.WebSQLResultSetRowIdentifierState;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.Log;
@@ -40,7 +41,7 @@ public class WebSQLQueryResultSet {
     private WebSQLResultsInfo resultsInfo;
     private boolean singleEntity = true;
     private boolean hasRowIdentifier;
-    private String rowIdentifierState;
+    private WebSQLResultSetRowIdentifierState rowIdentifierState;
     private WebSQLResultSetRowIdentifier rowIdentifier;
 
     private boolean hasChildrenCollection;
@@ -135,11 +136,11 @@ public class WebSQLQueryResultSet {
     }
 
     @Property
-    public String getRowIdentifierState() {
+    public WebSQLResultSetRowIdentifierState getRowIdentifierState() {
         return rowIdentifierState;
     }
 
-    public void setRowIdentifierState(String rowIdentifierState) {
+    public void setRowIdentifierState(WebSQLResultSetRowIdentifierState rowIdentifierState) {
         this.rowIdentifierState = rowIdentifierState;
     }
 

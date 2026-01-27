@@ -18,30 +18,38 @@ package io.cloudbeaver.service.sql;
 
 import org.jkiss.code.NotNull;
 
+import java.util.List;
+
 public class WebSQLResultSetRowIdentifier {
 
-    public static final String TABLE_METADATA_NOT_FOUND = "METADATA_NOT_FOUND"; //$NON-NLS-1$
-    public static final String NO_ROW_ID = "NONE"; //$NON-NLS-1$
-    public static final String PRIMARY_KEY = "PRIMARY_KEY"; //$NON-NLS-1$
-    public static final String VIRTUAL_KEY = "VIRTUAL_KEY"; //$NON-NLS-1$
-
-    @NotNull
-    private final String name;
     @NotNull
     private final String type;
-
-    public WebSQLResultSetRowIdentifier(@NotNull String name, @NotNull String type) {
-        this.name = name;
-        this.type = type;
-    }
-
     @NotNull
-    public String getName() {
-        return name;
+    private final List<WebSQLResultSetRowIdentifierAttribute> attributes;
+
+    public WebSQLResultSetRowIdentifier(
+        @NotNull String type,
+        @NotNull List<WebSQLResultSetRowIdentifierAttribute> attributes
+    ) {
+        this.type = type;
+        this.attributes = attributes;
     }
 
     @NotNull
     public String getType() {
         return type;
     }
+
+    @NotNull
+    public List<WebSQLResultSetRowIdentifierAttribute> getAttributes() {
+        return attributes;
+    }
+
+    public enum WebSQLResultSetRowIdentifierState {
+        METADATA_NOT_FOUND,
+        NONE,
+        PRIMARY_KEY,
+        VIRTUAL_KEY
+    }
+
 }
