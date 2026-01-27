@@ -153,8 +153,8 @@ enum SQLRowIdentifierState {
 type SQLRowIdentifier {
     "Single or multiple attributes acting as a row identifier"
     attributes: [SQLRowIdentifierAttribute!]!
-    "Type of a row identifier"
-    type: String!
+    "Type of a row identifier constraint"
+    constraintType: String!
 }
 
 type SQLRowIdentifierAttribute {

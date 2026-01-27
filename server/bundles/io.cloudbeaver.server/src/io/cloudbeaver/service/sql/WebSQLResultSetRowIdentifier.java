@@ -23,7 +23,7 @@ import java.util.List;
 public class WebSQLResultSetRowIdentifier {
 
     @NotNull
-    private final String type;
+    private final String constraintType;
     @NotNull
     private final List<WebSQLResultSetRowIdentifierAttribute> attributes;
 
@@ -31,13 +31,13 @@ public class WebSQLResultSetRowIdentifier {
         @NotNull String type,
         @NotNull List<WebSQLResultSetRowIdentifierAttribute> attributes
     ) {
-        this.type = type;
+        this.constraintType = type;
         this.attributes = attributes;
     }
 
     @NotNull
-    public String getType() {
-        return type;
+    public String getConstraintType() {
+        return constraintType;
     }
 
     @NotNull
