@@ -74,7 +74,12 @@ export const ObjectMenuCell = observer<Props>(function ObjectMenuCell({ object }
         <div className={s(styles, { menuBox: true })}>
           {!menuEmpty && (
             <Loader suspense small fullSize>
-              <ContextMenu contextMenuPosition={contextMenuPosition} menu={menu} onVisibleSwitch={switchState}>
+              <ContextMenu
+                className={s(styles, { contextMenu: true })}
+                contextMenuPosition={contextMenuPosition}
+                menu={menu}
+                onVisibleSwitch={switchState}
+              >
                 <Icon className={s(styles, { menuIcon: true })} name="snack" viewBox="0 0 16 10" />
               </ContextMenu>
             </Loader>
