@@ -43,16 +43,17 @@ export const MenuActionElement = registry(
       binding = getBindingLabel(item.action.binding.binding);
     }
 
-    const label = translate(actionInfo.label);
+    const label = translate(actionInfo.label || item.action.action.info.label);
+    const tooltip = translate(actionInfo.tooltip || item.action.action.info.tooltip);
     const baseItemIcon = getComputed(() => actionInfo.icon ?? parentMenuInfo?.icon);
 
     function renderMenuItem({ icon }: { icon?: React.ReactNode | string }) {
       return (
         <MenuItemElement
-          label={actionInfo.label}
+          label={label}
           binding={binding}
           icon={onlyIcons ? (baseItemIcon ?? icon) : icon}
-          tooltip={actionInfo.tooltip}
+          tooltip={tooltip}
           onlyIcons={onlyIcons}
           loading={loading}
         />
