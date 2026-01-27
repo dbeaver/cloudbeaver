@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 import { useCallback } from 'react';
 
-import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
+import type { IObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 
 import { getLayoutProps } from '../../Containers/filterLayoutFakeProps.js';
 import type { ILayoutSizeProps } from '../../Containers/ILayoutSizeProps.js';
@@ -23,7 +23,7 @@ import { getObjectPropertyDefaults } from '../getObjectPropertyDefaults.js';
 type AutocompletePasswordType = 'current-password' | 'new-password' | 'off' | 'on';
 
 export interface ObjectPropertyFormProps extends ILayoutSizeProps {
-  properties: ReadonlyArray<ObjectPropertyInfo>;
+  properties: ReadonlyArray<IObjectPropertyInfo>;
   state?: Record<string, any>;
   context?: Record<string, any>;
   defaultState?: Record<string, any>;
@@ -39,12 +39,12 @@ export interface ObjectPropertyFormProps extends ILayoutSizeProps {
   emptyPlaceholder?: string;
   canShowPassword?: boolean;
   autocompletePasswordType?: AutocompletePasswordType;
-  isSaved?: (property: ObjectPropertyInfo) => boolean;
-  getLayoutSize?: (property: ObjectPropertyInfo) => ILayoutSizeProps;
+  isSaved?: (property: IObjectPropertyInfo) => boolean;
+  getLayoutSize?: (property: IObjectPropertyInfo) => ILayoutSizeProps;
   onFocus?: (name: string) => void;
 }
 
-function getAutocompleteParam(property: ObjectPropertyInfo, prefix: string, autocompletePasswordType: AutocompletePasswordType): string {
+function getAutocompleteParam(property: IObjectPropertyInfo, prefix: string, autocompletePasswordType: AutocompletePasswordType): string {
   const isPasswordField = property.features.includes('password');
 
   if (isPasswordField) {
