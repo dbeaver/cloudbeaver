@@ -12,7 +12,6 @@
   flex: 1;
   align-items: center;
   justify-content: flex-end;
-  overflow: auto;
 }
 
 .footerContainer > :not(:first-child) {

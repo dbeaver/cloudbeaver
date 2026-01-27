@@ -236,7 +236,7 @@ export const AuthDialog: DialogComponent<IAuthOptions> = observer(function AuthD
           )}
         </CommonDialogBody>
         <CommonDialogFooter>
-          <Container overflow>
+          <Container>
             {state.isTooManySessions && (
               <Checkbox
                 title={translate('authentication_auth_force_session_logout_checkbox_tooltip')}
