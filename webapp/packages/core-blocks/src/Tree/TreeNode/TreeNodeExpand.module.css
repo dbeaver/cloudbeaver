@@ -9,12 +9,18 @@
   position: relative;
   display: flex;
   align-items: center;
-  box-sizing: border-box;
+  box-sizing: content-box;
   flex-shrink: 0;
   opacity: 0.5;
   width: 16px;
   height: 16px;
+  padding: 4px;
   transform: rotate(-90deg);
+
+  &.expandable {
+    cursor: pointer;
+  }
+
   &.small {
     display: block;
   }
@@ -25,7 +31,6 @@
 }
 
 .icon {
-  cursor: pointer;
   height: 100%;
   width: 100%;
 }
