@@ -10,10 +10,12 @@ import { observer } from 'mobx-react-lite';
 import {
   ConditionType,
   getObjectPropertyDefaultValue,
+  getObjectPropertyOptionName,
+  getObjectPropertyOptionValue,
   getObjectPropertyType,
   getObjectPropertyValue,
   getObjectPropertyValueType,
-  type ObjectPropertyInfo,
+  type IObjectPropertyInfo,
 } from '@cloudbeaver/core-sdk';
 import { EMPTY_ARRAY, removeMetadataFromDataURL } from '@cloudbeaver/core-utils';
 
@@ -29,7 +31,7 @@ import { useTranslate } from '../../localization/useTranslate.js';
 import { evaluate } from '../evaluate.js';
 
 interface RenderFieldProps {
-  property: ObjectPropertyInfo;
+  property: IObjectPropertyInfo;
   state?: Record<string, any>;
   context?: Record<string, any>;
   defaultState?: Record<string, any>;
@@ -154,9 +156,9 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
           name={property.id!}
           state={state}
           items={property.validValues!}
-          keySelector={value => value}
-          valueSelector={value => value}
-          titleSelector={value => value}
+          keySelector={getObjectPropertyOptionValue}
+          valueSelector={getObjectPropertyOptionName}
+          titleSelector={getObjectPropertyOptionName}
           defaultValue={defaultValue}
           placeholder={placeholder}
           title={property.description}
@@ -175,9 +177,9 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
         required={required}
         name={property.id!}
         items={property.validValues!}
-        keySelector={value => value}
-        valueSelector={value => value}
-        titleSelector={value => value}
+        keySelector={getObjectPropertyOptionValue}
+        valueSelector={getObjectPropertyOptionName}
+        titleSelector={getObjectPropertyOptionName}
         defaultValue={defaultValue}
         placeholder={placeholder}
         title={property.description}
