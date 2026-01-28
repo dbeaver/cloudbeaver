@@ -64,6 +64,7 @@ export interface DataGridRef {
   getColumnsOrdered: () => readonly CalculatedColumn<IInnerRow, unknown>[];
   openSearch: () => void;
   closeSearch: () => void;
+  refreshSearch: () => void;
   isReplacing: () => boolean;
 }
 
@@ -238,6 +239,7 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
     getColumnsOrdered: () => innerGridRef.current?.getColumnsOrdered() ?? [],
     openSearch: handleSearchOpen,
     closeSearch: handleSearchClose,
+    refreshSearch: () => searchPanelRef.current?.refresh(),
     isReplacing: () => isReplacingRef.current,
   }));
 

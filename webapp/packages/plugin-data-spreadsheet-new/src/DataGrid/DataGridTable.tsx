@@ -177,6 +177,12 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
   useLayoutEffect(() => {
     function syncEditor(data: IGridEditActionData) {
       const editor = tableData.editor;
+
+      if (data.revert) {
+        dataGridRef.current?.refreshSearch();
+        return;
+      }
+
       if (data.resultId !== editor?.result.id || !data.value || data.value.length === 0 || data.type === DatabaseEditChangeType.delete) {
         return;
       }

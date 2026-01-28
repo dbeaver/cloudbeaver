@@ -61,6 +61,7 @@ export interface IGridSearchActions {
   replaceActive: () => void;
   replaceAll: () => void;
   setReplaceOpen: (open: boolean) => void;
+  refresh: () => void;
   close: () => void;
 }
 
@@ -390,6 +391,12 @@ function createActions(store: GridSearchStore): IGridSearchActions {
       }
       store.replaceOpen = open;
       syncState(store);
+    },
+
+    refresh(): void {
+      if (store.query) {
+        updateMatches(store, true);
+      }
     },
 
     close(): void {

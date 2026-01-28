@@ -17,6 +17,7 @@ import { type IGridSearchStorage, useGridSearch } from './useGridSearch.js';
 
 export interface GridSearchPanelRef {
   focus: () => void;
+  refresh: () => void;
 }
 
 interface GridSearchPanelProps {
@@ -58,6 +59,7 @@ export const GridSearchPanel = forwardRef<GridSearchPanelRef, GridSearchPanelPro
 
   useImperativeHandle(ref, () => ({
     focus: () => panelRef.current?.focus(),
+    refresh: () => actions.refresh(),
   }));
 
   function handleClose() {
