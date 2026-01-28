@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -8,7 +8,13 @@
 import type { IExecutor } from '@cloudbeaver/core-executor';
 import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
-import type { DatabaseDataAccessMode, IDatabaseDataSource, IDatabaseDataSourceOperationEvent, IRequestInfo } from './IDatabaseDataSource.js';
+import type {
+  DatabaseDataAccessMode,
+  IDatabaseDataSource,
+  IDatabaseDataSourceOperationEvent,
+  IRequestInfo,
+  IRowIdentifierInfo,
+} from './IDatabaseDataSource.js';
 
 export interface IRequestEventData<TSource extends IDatabaseDataSource<any, any> = IDatabaseDataSource> extends IDatabaseDataSourceOperationEvent {
   model: IDatabaseDataModel<TSource>;
@@ -32,6 +38,7 @@ export interface IDatabaseDataModel<TSource extends IDatabaseDataSource<any, any
   setName: (name: string | null) => this;
   isReadonly: (resultIndex: number) => boolean;
   hasElementIdentifier: (resultIndex: number) => boolean;
+  getRowIdentifierInfo: (resultIndex: number) => IRowIdentifierInfo;
   isDisabled: (resultIndex?: number) => boolean;
   isLoading: () => boolean;
   isDataAvailable: (offset: number, count: number) => boolean;

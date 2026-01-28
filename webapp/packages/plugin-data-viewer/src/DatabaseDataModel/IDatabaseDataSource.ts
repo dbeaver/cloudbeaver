@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -8,10 +8,15 @@
 import { createService, type IServiceProvider, type SingleServiceType } from '@cloudbeaver/core-di';
 import type { IExecutor, ISyncExecutor } from '@cloudbeaver/core-executor';
 import { type TLocalizationToken } from '@cloudbeaver/core-localization';
-import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
+import type { ResultDataFormat, SqlRowIdentifier, SqlRowIdentifierState } from '@cloudbeaver/core-sdk';
 
 import type { IDatabaseDataActions } from './IDatabaseDataActions.js';
 import type { IDatabaseDataResult } from './IDatabaseDataResult.js';
+
+export interface IRowIdentifierInfo {
+  state: SqlRowIdentifierState | null;
+  identifier: SqlRowIdentifier | null;
+}
 
 export enum DatabaseDataSourceOperation {
   /** Abstract operation with data, should not lead to data lost */
@@ -72,6 +77,7 @@ export interface IDatabaseDataSource<TOptions = unknown, TResult extends IDataba
   isLoadable: () => boolean;
   isReadonly: (resultIndex: number) => boolean;
   hasElementIdentifier: (resultIndex: number) => boolean;
+  getRowIdentifierInfo: (resultIndex: number) => IRowIdentifierInfo;
   isDataAvailable: (offset: number, count: number) => boolean;
   isLoading: () => boolean;
   isDisabled: (resultIndex?: number) => boolean;

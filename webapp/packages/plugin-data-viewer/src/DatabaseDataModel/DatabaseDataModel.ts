@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -12,7 +12,7 @@ import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 import { uuid } from '@cloudbeaver/core-utils';
 
 import type { IDatabaseDataModel, IRequestEventData } from './IDatabaseDataModel.js';
-import type { DatabaseDataAccessMode, IDatabaseDataSource, IRequestInfo } from './IDatabaseDataSource.js';
+import type { DatabaseDataAccessMode, IDatabaseDataSource, IRequestInfo, IRowIdentifierInfo } from './IDatabaseDataSource.js';
 
 export class DatabaseDataModel<TSource extends IDatabaseDataSource<any, any> = IDatabaseDataSource> implements IDatabaseDataModel<TSource> {
   id: string;
@@ -61,6 +61,10 @@ export class DatabaseDataModel<TSource extends IDatabaseDataSource<any, any> = I
 
   hasElementIdentifier(resultIndex: number): boolean {
     return this.source.hasElementIdentifier(resultIndex);
+  }
+
+  getRowIdentifierInfo(resultIndex: number): IRowIdentifierInfo {
+    return this.source.getRowIdentifierInfo(resultIndex);
   }
 
   isDataAvailable(offset: number, count: number): boolean {
