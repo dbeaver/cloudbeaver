@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -27,13 +27,14 @@ import { isResultSetFileValue } from './isResultSetFileValue.js';
 import { ResultSetDataAction } from './ResultSetDataAction.js';
 import type { IResultSetValue } from './ResultSetFormatAction.js';
 import { GridEditAction, type IGridEditActionData, type IGridUpdate } from '../Grid/GridEditAction.js';
+import { GridHistoryAction } from '../Grid/GridHistoryAction.js';
 import { injectable } from '@cloudbeaver/core-di';
 import { IDatabaseDataResult } from '../../IDatabaseDataResult.js';
 import type { IGridDataKey } from '../Grid/IGridDataKey.js';
 
 export type IResultSetEditActionData = IGridEditActionData<IGridDataKey, IResultSetValue>;
 
-@injectable(() => [IDatabaseDataSource, IDatabaseDataResult, ResultSetDataAction])
+@injectable(() => [IDatabaseDataSource, IDatabaseDataResult, ResultSetDataAction, GridHistoryAction])
 export class ResultSetEditAction extends GridEditAction<SqlResultColumn, SqlResultRowMetaData, IGridDataKey, IResultSetValue, IDatabaseResultSet> {
   static override dataFormat = [ResultDataFormat.Resultset];
 
@@ -41,8 +42,14 @@ export class ResultSetEditAction extends GridEditAction<SqlResultColumn, SqlResu
     source: IDatabaseDataSource,
     result: IDatabaseDataResult,
     protected override readonly data: ResultSetDataAction,
+    history: GridHistoryAction<any, IDatabaseDataResult>,
   ) {
-    super(source as unknown as IDatabaseDataSource<unknown, IDatabaseResultSet>, result as IDatabaseResultSet, data);
+    super(
+      source as unknown as IDatabaseDataSource<unknown, IDatabaseResultSet>,
+      result as IDatabaseResultSet,
+      data,
+      history as unknown as GridHistoryAction<any, IDatabaseResultSet>,
+    );
 
     if ((result as IDatabaseResultSet).data?.singleEntity) {
       this.features = ['add', 'delete', 'revert'];

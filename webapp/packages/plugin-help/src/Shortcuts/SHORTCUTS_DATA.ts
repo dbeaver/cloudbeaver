@@ -65,6 +65,14 @@ export const DATA_VIEWER_SHORTCUTS: IShortcut[] = [
     label: 'ui_processing_cancel',
     code: transformKeys(KEY_BINDING_CANCEL),
   },
+  {
+    label: 'ui_undo',
+    code: transformKeys(KEY_BINDING_UNDO),
+  },
+  {
+    label: 'ui_redo',
+    code: transformKeys(KEY_BINDING_REDO),
+  },
 ];
 
 export const SQL_EDITOR_SHORTCUTS: IShortcut[] = [
