@@ -126,7 +126,11 @@ type SQLResultSet {
     # server always returns hasMoreData = false
     hasMoreData: Boolean!
     "Identifies if result set has row identifier. If true then it is possible update data or load LOB files"
-    hasRowIdentifier: Boolean!
+    hasRowIdentifier: Boolean! @deprecated (reason: "use rowIdentifierState (25.3.4)")
+    "State of a table row identifier: METADATA_NOT_FOUND, NONE, PRIMARY_KEY, VIRTUAL_KEY"
+    rowIdentifierState: SQLRowIdentifierState @since(version: "25.3.4")
+    "Contains info about a result set row identifier. Present if rowIdentifierState is PRIMARY_KEY"
+    rowIdentifier: SQLRowIdentifier @since(version: "25.3.4")
     "Identifies if result has children collections. If true then children collections can be read from the result set"
     hasChildrenCollection: Boolean!
     "Identifies if result set supports dynamic trace. If true then dynamic trace can be read from the result set"
@@ -137,6 +141,25 @@ type SQLResultSet {
     readOnly: Boolean! @since(version: "25.0.1")
     "Status of read-only result set. If readOnly is true then this field contains reason why result set is read-only"
     readOnlyStatus: String @since(version: "25.0.1")
+}
+
+enum SQLRowIdentifierState {
+    METADATA_NOT_FOUND,
+    NONE,
+    PRIMARY_KEY,
+    VIRTUAL_KEY
+}
+
+type SQLRowIdentifier {
+    "Single or multiple attributes acting as a row identifier"
+    attributes: [SQLRowIdentifierAttribute!]!
+    "Type of a row identifier constraint"
+    constraintType: String!
+}
+
+type SQLRowIdentifierAttribute {
+    name: String!
+    ordinalPosition: Int!
 }
 
 type SQLQueryResults {
@@ -376,7 +399,7 @@ extend type Mutation {
         resultId: ID,
         filter: SQLDataFilter,
         dataFormat: ResultDataFormat,   # requested data format. May be ignored by server
-        readLogs: Boolean               # added 23.2.1
+        readLogs: Boolean,               # added 23.2.1
         isInteractive: Boolean          # Support WS events requested by server, e.g. confirmations. Added in 23.2.3
     ): AsyncTaskInfo!
 

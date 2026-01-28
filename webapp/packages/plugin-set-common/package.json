@@ -66,6 +66,7 @@
     "@cloudbeaver/plugin-codemirror6": "workspace:*",
     "@cloudbeaver/plugin-connection-custom": "workspace:*",
     "@cloudbeaver/plugin-connection-search": "workspace:*",
+    "@cloudbeaver/plugin-connection-view": "workspace:*",
     "@cloudbeaver/plugin-connections": "workspace:*",
     "@cloudbeaver/plugin-connections-administration": "workspace:*",
     "@cloudbeaver/plugin-data-export": "workspace:*",

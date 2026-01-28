@@ -147,6 +147,7 @@ export default [
   ['ui_field_is_required', 'Please fill in this field'],
   ['ui_delete_confirmation_message', 'You are about to delete "{arg:item}". Are you sure?'],
   ['ui_not_selected', 'Not selected'],
+  ['ui_reset', 'Reset'],
 
   ['root_permission_denied', "You don't have permissions"],
   ['root_permission_no_permission', "You don't have permission for this action"],
