@@ -13,7 +13,7 @@ import { DataGridCellContext } from '../DataGridCellContext.js';
 import { DataGridRowContext } from '../DataGridRowContext.js';
 import type { IGridReactiveValue } from '../IGridReactiveValue.js';
 import { useGridReactiveValue } from '../useGridReactiveValue.js';
-import { type IGridSearchPersistence, useGridSearch } from './useGridSearch.js';
+import { type IGridSearchStorage, useGridSearch } from './useGridSearch.js';
 
 export interface GridSearchPanelRef {
   focus: () => void;
@@ -27,12 +27,12 @@ interface GridSearchPanelProps {
   onClose: () => void;
   onReplacingChange?: (isReplacing: boolean) => void;
   isReadOnly?: boolean;
-  defaultState?: IGridSearchPersistence;
-  onStateChange?: (state: IGridSearchPersistence) => void;
+  storage?: IGridSearchStorage;
+  open?: boolean;
 }
 
 export const GridSearchPanel = forwardRef<GridSearchPanelRef, GridSearchPanelProps>(function GridSearchPanel(
-  { columnCount, scrollToCell, replaceCellValue, onCellClassNameChange, onClose, onReplacingChange, isReadOnly, defaultState, onStateChange },
+  { columnCount, scrollToCell, replaceCellValue, onCellClassNameChange, onClose, onReplacingChange, isReadOnly, storage, open },
   ref,
 ) {
   const panelRef = useRef<SearchPanelRef>(null);
@@ -46,9 +46,9 @@ export const GridSearchPanel = forwardRef<GridSearchPanelRef, GridSearchPanelPro
     getCellText: (r, c) => cellText?.get(r, c) ?? '',
     scrollToCell,
     replaceCellValue,
-    defaultState,
-    onChange: onStateChange,
     onReplacingChange,
+    storage,
+    open,
   });
 
   useEffect(() => {

@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,8 @@ import { ResultSetDataAction } from './ResultSetDataAction.js';
 import { injectable } from '@cloudbeaver/core-di';
 import { IDatabaseDataResult } from '../../IDatabaseDataResult.js';
 import type { IGridColumnKey, IGridDataKey, IGridRowKey } from '../Grid/IGridDataKey.js';
+
+const GLOBAL_CACHE_KEY = 'global';
 
 @injectable(() => [IDatabaseDataSource, IDatabaseDataResult, ResultSetDataAction])
 export class ResultSetCacheAction
@@ -41,10 +43,12 @@ export class ResultSetCacheAction
       set: action,
       setRow: action,
       setColumn: action,
+      setGlobal: action,
       delete: action,
       deleteAll: action,
       deleteRow: action,
       deleteColumn: action,
+      deleteGlobal: action,
     });
   }
 
@@ -153,6 +157,40 @@ export class ResultSetCacheAction
     }
   }
 
+  hasGlobal(scope: symbol): boolean {
+    const globalCache = this.getGlobalCache();
+
+    if (!globalCache) {
+      return false;
+    }
+
+    return globalCache.has(scope);
+  }
+
+  getGlobal<T>(scope: symbol): T | undefined {
+    const globalCache = this.getGlobalCache();
+
+    if (!globalCache) {
+      return;
+    }
+
+    return globalCache.get(scope);
+  }
+
+  setGlobal<T>(scope: symbol, value: T): void {
+    const globalCache = this.getOrCreateGlobalCache();
+
+    globalCache.set(scope, value);
+  }
+
+  deleteGlobal(scope: symbol): void {
+    const globalCache = this.getGlobalCache();
+
+    if (globalCache) {
+      globalCache.delete(scope);
+    }
+  }
+
   override afterResultUpdate(): void {
     this.cache.clear();
   }
@@ -216,5 +254,20 @@ export class ResultSetCacheAction
     }
 
     return keyCache;
+  }
+
+  private getGlobalCache() {
+    return this.cache.get(GLOBAL_CACHE_KEY);
+  }
+
+  private getOrCreateGlobalCache() {
+    let globalCache = this.getGlobalCache();
+
+    if (!globalCache) {
+      globalCache = observable(new Map());
+      this.cache.set(GLOBAL_CACHE_KEY, globalCache);
+    }
+
+    return globalCache;
   }
 }

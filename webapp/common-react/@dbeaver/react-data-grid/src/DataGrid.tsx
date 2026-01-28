@@ -29,7 +29,7 @@ import { mapEditCellRenderer } from './mapEditCellRenderer.js';
 import { DataGridRowContext, type IDataGridRowContext } from './DataGridRowContext.js';
 import './DataGrid.css';
 import { HeaderDnDContext, isColumn, useHeaderDnD } from './useHeaderDnD.js';
-import type { IGridSearchPersistence } from './search/useGridSearch.js';
+import type { IGridSearchStorage } from './search/useGridSearch.js';
 import { GridSearchPanel, type GridSearchPanelRef } from './search/GridSearchPanel.js';
 
 export interface ICellPosition {
@@ -54,8 +54,7 @@ export interface DataGridProps extends IDataGridCellContext, IDataGridRowContext
   onCellKeyDown?: (position: ICellPosition, event: DataGridCellKeyboardEvent) => void;
   className?: string;
   searchReadOnly?: boolean;
-  defaultSearchState?: IGridSearchPersistence;
-  onSearchStateChange?: (state: IGridSearchPersistence) => void;
+  searchStorage?: IGridSearchStorage;
 }
 
 export interface DataGridRef {
@@ -106,8 +105,7 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
     className,
     onCellKeyDown,
     searchReadOnly,
-    defaultSearchState,
-    onSearchStateChange,
+    searchStorage,
   },
   ref,
 ) {
@@ -121,7 +119,7 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
   const searchPanelRef = useRef<GridSearchPanelRef>(null);
   const isReplacingRef = useRef(false);
 
-  const [searchOpen, setSearchOpen] = useState(() => defaultSearchState?.open ?? false);
+  const [searchOpen, setSearchOpen] = useState(() => searchStorage?.get()?.open ?? false);
   const [searchCellClassName, setSearchCellClassName] = useState<IGridReactiveValue<string | undefined, [number, number]>>();
 
   useEffect(() => {
@@ -149,6 +147,10 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
 
   function handleSearchClose() {
     setSearchOpen(false);
+    const cached = searchStorage?.get();
+    if (cached) {
+      searchStorage?.set({ ...cached, open: false });
+    }
     containerRef.current?.querySelector<HTMLDivElement>('[aria-selected="true"]')?.focus();
   }
 
@@ -325,13 +327,13 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
                 <GridSearchPanel
                   ref={searchPanelRef}
                   columnCount={columnsCount}
-                  defaultState={defaultSearchState}
                   isReadOnly={searchReadOnly}
                   scrollToCell={scrollToCell}
                   replaceCellValue={replaceCellValue}
+                  storage={searchStorage}
+                  open={searchOpen}
                   onCellClassNameChange={setSearchCellClassName}
                   onClose={handleSearchClose}
-                  onStateChange={onSearchStateChange}
                   onReplacingChange={handleReplacingChange}
                 />
               )}

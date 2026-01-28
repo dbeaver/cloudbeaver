@@ -56,6 +56,7 @@ import { TableDataContext } from './TableDataContext.js';
 import { useGridDragging } from './useGridDragging.js';
 import { useFormatting } from './useFormatting.js';
 import { useGridSelectedCellsCopy } from './useGridSelectedCellsCopy.js';
+import { useSearchResultsCache } from './useSearchResultsCache.js';
 import { useTableData } from './useTableData.js';
 import { TableColumnHeader } from './TableColumnHeader/TableColumnHeader.js';
 import { TableIndexColumnHeader } from './TableColumnHeader/TableIndexColumnHeader.js';
@@ -79,6 +80,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
 
   const tableData = useTableData(model as unknown as IDatabaseDataModel<ResultSetDataSource>, resultIndex, dataGridDivRef);
   const formatting = useFormatting(tableData, cacheAction);
+  const searchResultsCache = useSearchResultsCache(cacheAction);
   const getHeaderOrder = useCallback(() => (dataGridRef.current?.getColumnsOrdered() ?? []).map(col => col.key), [dataGridRef]);
   const gridSelectionContext = useGridSelectionContext(tableData, selectionAction, getHeaderOrder);
 
@@ -531,6 +533,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
                 columnSortable={columnSortable}
                 columnSortingState={columnSortingState}
                 getRowId={rowIdx => (tableData.rows[rowIdx] ? GridDataKeysUtils.serialize(tableData.rows[rowIdx]) : '')}
+                searchStorage={searchResultsCache}
                 columnSortingMultiple
                 onFocus={handleFocusChange}
                 onScrollToBottom={handleScrollToBottom}

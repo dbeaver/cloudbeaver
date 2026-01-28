@@ -7,9 +7,4 @@
  */
 
 export { GridSearchEngine, type ISearchPatternOptions, type ICellMatch } from './GridSearchEngine.js';
-export {
-  useGridSearch,
-  type IGridSearchPersistence,
-  type IGridSearchSnapshot,
-  type IGridSearchOptions,
-} from './useGridSearch.js';
+export { useGridSearch, type IGridSearchSnapshot, type IGridSearchOptions, type ISearchState, type IGridSearchStorage } from './useGridSearch.js';
