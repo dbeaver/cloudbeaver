@@ -100,6 +100,7 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
     onScrollToBottom,
     onFocus,
     onCellChange,
+    onCellChangeBatch,
     onColumnSort,
     onHeaderKeyDown,
     children,
@@ -160,6 +161,20 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
       return;
     }
     onCellChange?.(rowIdx, colIdx, value);
+  }
+
+  function replaceCellValues(updates: Array<{ rowIdx: number; colIdx: number; value: string }>) {
+    const validUpdates = updates.filter(u => getCellEditable?.(u.rowIdx, u.colIdx) !== false);
+    if (validUpdates.length === 0) {
+      return;
+    }
+    if (onCellChangeBatch) {
+      onCellChangeBatch(validUpdates);
+    } else {
+      for (const update of validUpdates) {
+        onCellChange?.(update.rowIdx, update.colIdx, update.value);
+      }
+    }
   }
 
   function handleReplacingChange(value: boolean) {
@@ -332,6 +347,7 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
                   isReadOnly={searchReadOnly}
                   scrollToCell={scrollToCell}
                   replaceCellValue={replaceCellValue}
+                  replaceCellValues={replaceCellValues}
                   storage={searchStorage}
                   open={searchOpen}
                   onCellClassNameChange={setSearchCellClassName}

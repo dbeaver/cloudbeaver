@@ -65,12 +65,19 @@ export interface IGridSearchActions {
   close: () => void;
 }
 
+export interface ICellValueUpdate {
+  rowIdx: number;
+  colIdx: number;
+  value: string;
+}
+
 export interface IGridSearchOptions {
   rowCount: number;
   columnCount: number;
   getCellText: (rowIdx: number, colIdx: number) => string;
   scrollToCell: (position: { rowIdx: number; colIdx: number }) => void;
   replaceCellValue: (rowIdx: number, colIdx: number, value: string) => void;
+  replaceCellValues?: (updates: ICellValueUpdate[]) => void;
   onReplacingChange?: (isReplacing: boolean) => void;
   storage?: IGridSearchStorage;
   open?: boolean;
@@ -372,11 +379,20 @@ function createActions(store: GridSearchStore): IGridSearchActions {
       store.options.onReplacingChange?.(true);
       try {
         const matches = [...store.matchedCells];
+        const updates: ICellValueUpdate[] = [];
 
         for (const match of matches) {
           const cellText = store.options.getCellText(match.rowIdx, match.colIdx);
           const { newText } = GridSearchEngine.replaceInCell(cellText, pattern, store.replace);
-          store.options.replaceCellValue(match.rowIdx, match.colIdx, newText);
+          updates.push({ rowIdx: match.rowIdx, colIdx: match.colIdx, value: newText });
+        }
+
+        if (store.options.replaceCellValues) {
+          store.options.replaceCellValues(updates);
+        } else {
+          for (const update of updates) {
+            store.options.replaceCellValue(update.rowIdx, update.colIdx, update.value);
+          }
         }
 
         runSearch(store);

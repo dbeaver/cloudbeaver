@@ -464,6 +464,23 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
     tableData.editor?.set({ row, column }, value);
   }
 
+  function handleCellChangeBatch(changes: Array<{ rowIdx: number; colIdx: number; value: string }>) {
+    const updates = []; 
+
+    for (const { rowIdx, colIdx, value } of changes) {
+      const row = tableData.rows[rowIdx];
+      const column = tableData.getColumn(colIdx)?.key;
+
+      if (row && column) {
+        updates.push({ key: { row, column }, value });
+      }
+    }
+
+    if (updates.length > 0) {
+      tableData.editor?.setMany(updates);
+    }
+  }
+
   function isCellEditable(rowIdx: number, colIdx: number): boolean {
     const row = tableData.rows[rowIdx];
     const column = tableData.getColumn(colIdx)?.key;
@@ -565,6 +582,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
                 onScrollToBottom={handleScrollToBottom}
                 onColumnSort={handleSort}
                 onCellChange={handleCellChange}
+                onCellChangeBatch={handleCellChangeBatch}
                 onCellKeyDown={handleCellKeyDown}
                 onHeaderKeyDown={gridSelectedCellCopy.onKeydownHandler}
               />

@@ -12,6 +12,7 @@ import {
   GRID_HISTORY_SOURCE,
   isGridHistoryEditCellData,
   type IGridHistoryAddRowData,
+  type IGridHistoryBatchCellUpdateData,
   type IGridHistoryCellUpdateData,
   type IGridHistoryData,
   type IGridHistoryDeleteRowData,
@@ -40,6 +41,15 @@ export class GridEditHistoryManager<TKey extends IGridDataKey, TCell> {
 
     this.history.add({
       source: GRID_HISTORY_SOURCE.EDIT_CELL,
+      data,
+    });
+  }
+
+  recordBatchCellEdit(data: IGridHistoryBatchCellUpdateData<TKey, TCell>): void {
+    this.compressLastEditedCellHistory();
+
+    this.history.add({
+      source: GRID_HISTORY_SOURCE.BATCH_EDIT_CELLS,
       data,
     });
   }
