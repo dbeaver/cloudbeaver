@@ -5,9 +5,9 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
+import type { IObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 
-export function getPropertyValue(property: ObjectPropertyInfo): string {
+export function getPropertyValue(property: IObjectPropertyInfo): string {
   const value = property.value;
 
   if (!value) {

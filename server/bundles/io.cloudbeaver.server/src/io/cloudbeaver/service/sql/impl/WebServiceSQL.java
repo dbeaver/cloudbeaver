@@ -57,6 +57,7 @@ import org.jkiss.dbeaver.model.sql.registry.SQLGeneratorConfigurationRegistry;
 import org.jkiss.dbeaver.model.sql.registry.SQLGeneratorDescriptor;
 import org.jkiss.dbeaver.model.sql.semantics.completion.SQLCompletionProposalComparator;
 import org.jkiss.dbeaver.model.sql.semantics.completion.SQLQueryCompletionAnalyzer;
+import org.jkiss.dbeaver.model.sql.semantics.completion.SQLQueryCompletionContext;
 import org.jkiss.dbeaver.model.struct.DBSDataContainer;
 import org.jkiss.dbeaver.model.struct.DBSObject;
 import org.jkiss.dbeaver.model.struct.DBSWrapper;
@@ -176,9 +177,11 @@ public class WebServiceSQL implements DBWServiceSQL {
                 .getString(SQLModelPreferences.AUTOCOMPLETION_MODE));
 
             if (!useDefaultCompletionEngine) {
+                SQLQueryCompletionContext queryCompletionContext = WebSQLCompletionContextScriptParser.obtainCompletionContext(
+                    webSession, activeQuery, position, request
+                );
                 SQLQueryCompletionAnalyzer analyzer = new SQLQueryCompletionAnalyzer(
-                    m -> WebSQLCompletionContextScriptParser.obtainCompletionContext(
-                        webSession, query, position, request),
+                    m -> queryCompletionContext,
                     request,
                     request::getDocumentOffset
                 );
@@ -649,8 +652,10 @@ public class WebServiceSQL implements DBWServiceSQL {
 
     @Override
     public WebAsyncTaskInfo getGroupingSqlResultSet(
+        @NotNull WebSession webSession,
         @NotNull WebSQLContextInfo contextInfo,
-        @NotNull String resultsId,
+        @NotNull String originalResultsId,
+        @Nullable String currentResultsId,
         @NotNull List<String> columnsList,
         @Nullable List<String> functions,
         @Nullable Boolean showDuplicatesOnly,
@@ -658,13 +663,11 @@ public class WebServiceSQL implements DBWServiceSQL {
         @Nullable WebDataFormat dataFormat,
         boolean isInteractive
     ) throws DBException {
-        String generateGroupByQuery = generateGroupByQuery(contextInfo, resultsId, columnsList, functions, showDuplicatesOnly);
-        return asyncExecuteQuery(
-            contextInfo.getProcessor().getWebSession(),
-            contextInfo.getProjectId(),
+        return WebSQLUtils.createAsyncTaskExecuteSqlQuery(
+            webSession,
             contextInfo,
-            generateGroupByQuery,
-            resultsId,
+            generateGroupByQuery(contextInfo, originalResultsId, columnsList, functions, showDuplicatesOnly),
+            currentResultsId,
             filter,
             dataFormat,
             false,

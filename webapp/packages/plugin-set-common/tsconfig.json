@@ -74,6 +74,9 @@
       "path": "../core-server-notifications"
     },
     {
+      "path": "../core-session-actions"
+    },
+    {
       "path": "../core-session-localization"
     },
     {
@@ -138,6 +141,9 @@
     },
     {
       "path": "../plugin-connection-search"
+    },
+    {
+      "path": "../plugin-connection-view"
     },
     {
       "path": "../plugin-connections"

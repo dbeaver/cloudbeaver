@@ -6,6 +6,7 @@ export default [
 
   ['app_navigationTree_action_collapse_all', 'Свернуть все элементы'],
   ['app_navigationTree_settings_filter_objects_description', 'Показывать описание объектов'],
+  ['plugin_navigation_tree_settings_filter_table_contents', 'Показывать дочерние элементы таблиц'],
 
   ['app_navigationTree_settings_filter_title', 'Фильтр'],
   ['app_navigationTree_settings_filter_description', 'Показывать фильтр'],
@@ -23,11 +24,6 @@ export default [
   ['app_navigationTree_node_empty', 'Пусто'],
   ['app_navigationTree_node_no_results', "Извините, не удалось найти элементы содержащие '{arg:filter}'"],
   ['app_navigationTree_node_not_found', 'Элемент не найден'],
-  ['app_navigationTree_connection_view', 'Отображение'],
-  ['app_navigationTree_connection_view_option_simple', 'Упрощенное'],
-  ['app_navigationTree_connection_view_option_advanced', 'Продвинутое'],
-  ['app_navigationTree_connection_view_option_custom', 'Настраиваемое'],
-  ['app_navigationTree_connection_view_option_showSystemObjects', 'Показывать системные объекты'],
   ['app_navigationTree_refresh', 'Обновить'],
   ['app_navigationTree_refresh_error', 'Не удалось обновить узел'],
   ['app_navigationTree_node_change_name_error', 'Не удалось изменить название'],

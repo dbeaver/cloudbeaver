@@ -31,4 +31,11 @@ export default [
   ['plugin_data_spreadsheet_new_settings_disable_description', 'Tắt chế độ hiển thị dữ liệu dạng bảng cho tất cả người dùng'],
   ['plugin_data_spreadsheet_new_settings_description_label', 'Hiển thị mô tả cột'],
   ['plugin_data_spreadsheet_new_settings_description_label_description', 'Mô tả sẽ được hiển thị dưới tên các cột trong tiêu đề bảng'],
+  ['plugin_data_spreadsheet_new_settings_use_locale_formatting_title', 'Sử dụng định dạng ngôn ngữ'],
+  ['plugin_data_spreadsheet_new_settings_use_locale_formatting_os', 'Sử dụng định dạng hệ điều hành'],
+  ['plugin_data_spreadsheet_new_settings_use_locale_formatting_none', 'Không'],
+  [
+    'plugin_data_spreadsheet_new_settings_use_locale_formatting_description',
+    'Sử dụng định dạng cho số và ngày theo ngôn ngữ đã chọn. (!) Điều này chỉ ảnh hưởng đến việc hiển thị dữ liệu; các giá trị thô nên được sử dụng để chỉnh sửa.',
+  ],
 ];

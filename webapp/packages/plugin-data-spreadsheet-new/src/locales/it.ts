@@ -28,4 +28,11 @@ export default [
     'plugin_data_spreadsheet_new_settings_description_label_description',
     "La descrizione verrà mostrata sotto i nomi delle colonne nell'intestazione della tabella",
   ],
+  ['plugin_data_spreadsheet_new_settings_use_locale_formatting_title', 'Usa formattazione locale'],
+  ['plugin_data_spreadsheet_new_settings_use_locale_formatting_os', 'Usa formattazione del sistema operativo'],
+  ['plugin_data_spreadsheet_new_settings_use_locale_formatting_none', 'Nessuno'],
+  [
+    'plugin_data_spreadsheet_new_settings_use_locale_formatting_description',
+    'Usa la formattazione per numeri e date in base alla locale selezionata. (!) Questo influisce solo sulla rappresentazione dei dati; i valori grezzi devono essere usati per la modifica.',
+  ],
 ];

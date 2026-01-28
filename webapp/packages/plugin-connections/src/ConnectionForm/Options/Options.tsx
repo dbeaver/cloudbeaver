@@ -244,6 +244,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
                 ))}
             </Group>
           </Group>
+
           {!driver?.anonymousAccess && (authentication.authorized || !edit) && (
             <Group form gap>
               <GroupTitle>{translate('connections_connection_edit_authentication')}</GroupTitle>
@@ -308,6 +309,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
               )}
             </Group>
           )}
+          <Placeholder container={connectionFormService.connectionContainer} formState={formState} />
         </Container>
         <Container medium gap>
           <Placeholder container={connectionFormService.providerPropertiesContainer} formState={formState} />

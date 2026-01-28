@@ -11,10 +11,10 @@ import { type IProperty, useObservableRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { LocalizationService } from '@cloudbeaver/core-localization';
-import type { DataTransferOutputSettings, DataTransferProcessorInfo } from '@cloudbeaver/core-sdk';
+import { getObjectPropertyDefaultValue, type DataTransferOutputSettings } from '@cloudbeaver/core-sdk';
 
 import { DataExportService } from '../DataExportService.js';
-import { DataTransferProcessorsResource } from '../DataTransferProcessorsResource.js';
+import { DataTransferProcessorsResource, type IDataTransferProcessorInfo } from '../DataTransferProcessorsResource.js';
 import type { IExportContext } from '../IExportContext.js';
 import { DefaultExportOutputSettingsResource } from './DefaultExportOutputSettingsResource.js';
 import { EDataExportStep } from './EDataExportStep.js';
@@ -22,7 +22,7 @@ import { EDataExportStep } from './EDataExportStep.js';
 interface State {
   readonly properties: IProperty[];
   step: EDataExportStep;
-  processor: DataTransferProcessorInfo | null;
+  processor: IDataTransferProcessorInfo | null;
   processorProperties: Record<string, any>;
   outputSettings: Partial<DataTransferOutputSettings>;
   processing: boolean;
@@ -46,19 +46,23 @@ export function useDataExportDialog(context: IExportContext, onExport?: () => vo
           return [];
         }
 
-        return this.processor.properties.map(property => ({
-          id: property.id!,
-          key: property.id!,
-          displayName: property.displayName,
-          description: property.description,
-          validValues: property.validValues,
-          defaultValue: property.defaultValue,
-          valuePlaceholder: property.defaultValue,
-        }));
+        return this.processor.properties.map(property => {
+          const defaultValue = getObjectPropertyDefaultValue(property);
+
+          return {
+            id: property.id!,
+            key: property.id!,
+            displayName: property.displayName,
+            description: property.description,
+            validValues: property.validValues,
+            defaultValue,
+            valuePlaceholder: defaultValue,
+          };
+        });
       },
       step: EDataExportStep.DataTransferProcessor,
       processing: false,
-      processor: null as DataTransferProcessorInfo | null,
+      processor: null as IDataTransferProcessorInfo | null,
       processorProperties: {},
       outputSettings: {},
       exception: null,

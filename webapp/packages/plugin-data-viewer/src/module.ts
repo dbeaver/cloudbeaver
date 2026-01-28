@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -39,6 +39,7 @@ import { IDatabaseDataResultAction } from './DatabaseDataModel/Actions/IDatabase
 import { DocumentEditAction } from './DatabaseDataModel/Actions/Document/DocumentEditAction.js';
 import { GridEditAction } from './DatabaseDataModel/Actions/Grid/GridEditAction.js';
 import { GridViewAction } from './DatabaseDataModel/Actions/Grid/GridViewAction.js';
+import { GridHistoryAction } from './DatabaseDataModel/Actions/Grid/GridHistoryAction.js';
 import { IDatabaseDataViewAction } from './DatabaseDataModel/Actions/IDatabaseDataViewAction.js';
 import { ResultSetDataAction } from './DatabaseDataModel/Actions/ResultSet/ResultSetDataAction.js';
 import { ResultSetEditAction } from './DatabaseDataModel/Actions/ResultSet/ResultSetEditAction.js';
@@ -101,6 +102,7 @@ export default ModuleRegistry.add({
 
       .addScoped(GridEditAction)
       .addScoped(GridViewAction)
+      .addScoped(GridHistoryAction)
 
       .addScoped(ResultSetDataAction)
       .addScoped(ResultSetEditAction)

@@ -17,10 +17,7 @@
 package io.cloudbeaver.model.session;
 
 import io.cloudbeaver.*;
-import io.cloudbeaver.model.CustomCancelableJob;
-import io.cloudbeaver.model.WebAsyncTaskInfo;
-import io.cloudbeaver.model.WebConnectionInfo;
-import io.cloudbeaver.model.WebServerMessage;
+import io.cloudbeaver.model.*;
 import io.cloudbeaver.model.app.ServletApplication;
 import io.cloudbeaver.model.app.ServletAuthApplication;
 import io.cloudbeaver.model.session.monitor.TaskProgressMonitor;
@@ -606,7 +603,7 @@ public class WebSession extends BaseWebSession
     }
 
     public WebAsyncTaskInfo runAsyncTask(@NotNull WebAsyncTaskInfo asyncTask, @NotNull WebAsyncTaskProcessor<?> runnable) {
-        AbstractJob job = new AbstractJob(asyncTask.getName()) {
+        AbstractJob job = new AbstractCancelableJob(asyncTask.getName()) {
             @NotNull
             @Override
             protected IStatus run(@NotNull DBRProgressMonitor monitor) {
