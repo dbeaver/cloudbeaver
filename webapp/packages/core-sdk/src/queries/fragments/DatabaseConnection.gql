@@ -10,9 +10,6 @@ fragment DatabaseConnection on ConnectionInfo {
   nodePath
   features
   supportedDataFormats
-  navigatorSettings {
-    ...AllNavigatorSettings
-  }
   canViewSettings
   canEdit
   canDelete

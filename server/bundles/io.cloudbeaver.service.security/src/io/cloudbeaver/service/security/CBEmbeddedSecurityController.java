@@ -112,6 +112,8 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         @NotNull Map<String, String> settings
     ) throws DBException {
         String userId = getUserIdOrThrow();
+        Set<String> deletedSettingIds = new LinkedHashSet<>();
+        Set<String> updatedSettingIds = new LinkedHashSet<>();
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
                 deleteObjectSettings(dbCon, projectId, objectId, objectType, settings.keySet());
@@ -123,6 +125,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                 ) {
                     for (Map.Entry<String, String> entry : settings.entrySet()) {
                         if (entry.getValue() == null) {
+                            deletedSettingIds.add(entry.getKey());
                             continue;
                         }
                         dbStat.setString(1, projectId);
@@ -133,6 +136,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                         dbStat.setString(6, entry.getValue());
                         dbStat.setString(7, userId);
                         dbStat.addBatch();
+                        updatedSettingIds.add(entry.getKey());
                     }
                     dbStat.executeBatch();
                 }
@@ -141,15 +145,28 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         } catch (SQLException e) {
             throw new DBCException("Error while adding object settings", e);
         }
-        application.getEventController().addEvent(
-            WSObjectSettingsEvent.update(
-                getSmSessionId(),
-                userId,
-                objectType,
-                projectId,
-                objectId,
-                settings.keySet()
-            ));
+        if (!deletedSettingIds.isEmpty()) {
+            application.getEventController().addEvent(
+                WSObjectSettingsEvent.delete(
+                    getSmSessionId(),
+                    userId,
+                    objectType,
+                    projectId,
+                    objectId,
+                    deletedSettingIds
+                ));
+        }
+        if (!updatedSettingIds.isEmpty()) {
+            application.getEventController().addEvent(
+                WSObjectSettingsEvent.update(
+                    getSmSessionId(),
+                    userId,
+                    objectType,
+                    projectId,
+                    objectId,
+                    settings.keySet()
+                ));
+        }
     }
 
     @NotNull
@@ -248,17 +265,6 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                 }
             }
             dbStat.executeUpdate();
-        }
-        if (settingIds != null) {
-            application.getEventController().addEvent(
-                WSObjectSettingsEvent.delete(
-                    getSmSessionId(),
-                    userId,
-                    objectType,
-                    projectId,
-                    objectId,
-                    settingIds
-                ));
         }
     }
 

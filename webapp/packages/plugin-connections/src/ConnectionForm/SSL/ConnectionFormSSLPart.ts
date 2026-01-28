@@ -9,7 +9,7 @@ import { FormPart, formSubmitContext, type IFormState } from '@cloudbeaver/core-
 
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import type { IConnectionFormState } from '../IConnectionFormState.js';
-import { type NetworkHandlerConfigInput } from '@cloudbeaver/core-sdk';
+import { getObjectPropertyDefaultValue, type NetworkHandlerConfigInput } from '@cloudbeaver/core-sdk';
 import { isNotNullDefined } from '@dbeaver/js-helpers';
 import { getSSLDriverHandler } from './getSSLDriverHandler.js';
 import { ConnectionInfoNetworkHandlersResource, type DBDriverResource, type NetworkHandlerResource } from '@cloudbeaver/core-connections';
@@ -121,7 +121,7 @@ export class ConnectionFormSSLPart extends FormPart<INetworkHandlerConfig, IConn
         const isDefault = isNotNullDefined(descriptorProperty.defaultValue);
 
         if (!(key in handlerConfig.properties) && isDefault) {
-          handlerConfig.properties[key] = descriptorProperty.defaultValue;
+          handlerConfig.properties[key] = getObjectPropertyDefaultValue(descriptorProperty);
         }
 
         const secured = descriptorProperty.features.includes(PROPERTY_FEATURE_SECURED);
