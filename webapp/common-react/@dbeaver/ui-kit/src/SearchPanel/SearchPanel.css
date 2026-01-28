@@ -47,6 +47,7 @@
   }
 
   .search-panel__inputs {
+    background-color: var(--dbv-kit-input-background);
     display: flex;
     flex-direction: column;
     flex: 1 1 420px;
