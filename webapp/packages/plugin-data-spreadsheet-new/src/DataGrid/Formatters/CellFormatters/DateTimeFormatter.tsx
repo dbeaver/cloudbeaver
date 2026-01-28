@@ -16,6 +16,10 @@ import { DateTimeKind, useFormattingContext } from '../../FormattingContext.js';
 import { TableDataContext } from '../../TableDataContext.js';
 import type { ICellFormatterProps } from '../ICellFormatterProps.js';
 
+function isValidDate(date: Date): boolean {
+  return !isNaN(date.getTime());
+}
+
 export const DateTimeFormatter = observer<ICellFormatterProps>(function DateTimeFormatter() {
   const tableDataContext = useContext(TableDataContext);
   const formattingContext = useFormattingContext();
@@ -34,12 +38,13 @@ export const DateTimeFormatter = observer<ICellFormatterProps>(function DateTime
     return <GridNullFormatter />;
   }
 
-  let value = displayValue;
+  let date = new Date(displayValue);
+  let dateFormatter: Intl.DateTimeFormat | null = null;
 
   if (formattingContext.formatters) {
     const extendedDateKind = formattingContext.getExtendedDateKind(cellContext.cell.column);
 
-    let dateFormatter: Intl.DateTimeFormat | null = null;
+
     switch (extendedDateKind) {
       case DateTimeKind.DateTime:
         dateFormatter = formattingContext.formatters.dateTime;
@@ -51,17 +56,20 @@ export const DateTimeFormatter = observer<ICellFormatterProps>(function DateTime
         dateFormatter = formattingContext.formatters.dateOnly;
         break;
     }
-    if (dateFormatter) {
-      if (DateTimeKind.TimeOnly === extendedDateKind) {
-        const [h = 0, m = 0, s = 0] = displayValue.split(':').map(Number);
-        const date = new Date();
-        date.setHours(h, m, s, 0);
-        value = dateFormatter.format(date);
-      } else {
-        const date = new Date(displayValue);
-        value = dateFormatter.format(date);
-      }
+
+    if (DateTimeKind.TimeOnly === extendedDateKind) {
+      const [h = 0, m = 0, s = 0] = displayValue.split(':').map(Number);
+      const time = new Date();
+      time.setHours(h, m, s, 0);
+
+      date = time;
     }
+  }
+
+  let value = displayValue;
+
+  if (dateFormatter && isValidDate(date)) {
+    value = dateFormatter.format(date);
   }
 
   return (
