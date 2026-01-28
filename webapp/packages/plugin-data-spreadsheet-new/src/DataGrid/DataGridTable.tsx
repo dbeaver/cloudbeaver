@@ -41,6 +41,7 @@ import {
   GridSelectAction,
   GridViewAction,
   ResultSetCacheAction,
+  GridHistoryAction,
   type IGridEditActionData,
   type IGridDataKey,
 } from '@cloudbeaver/plugin-data-viewer';
@@ -77,6 +78,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
   const selectionAction = model.source.getAction(resultIndex, IDatabaseDataSelectAction, GridSelectAction);
   const viewAction = model.source.getAction(resultIndex, IDatabaseDataViewAction, GridViewAction);
   const cacheAction = model.source.getAction(resultIndex, IDatabaseDataCacheAction, ResultSetCacheAction);
+  const historyAction = model.source.tryGetAction(resultIndex, GridHistoryAction);
 
   const tableData = useTableData(model as unknown as IDatabaseDataModel<ResultSetDataSource>, resultIndex, dataGridDivRef);
   const formatting = useFormatting(tableData, cacheAction);
@@ -226,6 +228,24 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
       tableData.editor?.action.removeHandler(syncEditor);
     };
   }, [tableData.editor, selectionAction, handlers, tableData, restoreFocus]);
+
+  useLayoutEffect(() => {
+    if (!historyAction) {
+      return;
+    }
+
+    function refreshSearch() {
+      dataGridRef.current?.refreshSearch();
+    }
+
+    historyAction.onUndo.addHandler(refreshSearch);
+    historyAction.onRedo.addHandler(refreshSearch);
+
+    return () => {
+      historyAction.onUndo.removeHandler(refreshSearch);
+      historyAction.onRedo.removeHandler(refreshSearch);
+    };
+  }, [historyAction]);
 
   const handleFocusChange = (position: ICellPosition) => {
     focusedCell.current = position;
