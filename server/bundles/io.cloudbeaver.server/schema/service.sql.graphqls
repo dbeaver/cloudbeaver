@@ -145,8 +145,8 @@ type SQLResultSet {
 enum SQLRowIdentifierState {
     METADATA_NOT_FOUND,
     NONE,
-    VIRTUAL_KEY,
-    PRIMARY_KEY
+    PRIMARY_KEY,
+    VIRTUAL_KEY
 }
 
 type SQLRowIdentifier {
