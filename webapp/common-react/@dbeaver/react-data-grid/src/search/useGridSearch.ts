@@ -469,8 +469,6 @@ export function useGridSearch(options: IGridSearchOptions): IGridSearchResult {
   const [store] = useState(() => createStore(options));
   const prevRowCountRef = useRef(options.rowCount);
   const prevColCountRef = useRef(options.columnCount);
-
-  // eslint-disable-next-line react-hooks/immutability
   store.options = options;
 
   useEffect(() => {
