@@ -27,7 +27,10 @@ import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
+import org.jkiss.dbeaver.registry.DataSourcePreferenceStore;
 import org.jkiss.utils.CommonUtils;
+
+import java.util.Map;
 
 public class WebConnectionConfigInputHandler<T extends WebConnectionConfig, C extends DataSourceDescriptor> {
     private static final Log log = Log.getLog(WebConnectionConfigInputHandler.class);
@@ -93,6 +96,11 @@ public class WebConnectionConfigInputHandler<T extends WebConnectionConfig, C ex
             input.isSharedCredentials()
         );
         dataSource.setConnectionReadOnly(input.isReadOnly());
+        DataSourcePreferenceStore preferenceStore = dataSource.getPreferenceStore();
+        Map<String, Object> defaultUserSettings = input.getDefaultUserSettings();
+        for (Map.Entry<String, Object> entry : defaultUserSettings.entrySet()) {
+            preferenceStore.setValue(entry.getKey(), (String)entry.getValue());
+        }
     }
 
     @NotNull
