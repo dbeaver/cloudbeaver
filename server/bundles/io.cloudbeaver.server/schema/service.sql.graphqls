@@ -127,7 +127,7 @@ type SQLResultSet {
     hasMoreData: Boolean!
     "Identifies if result set has row identifier. If true then it is possible update data or load LOB files"
     hasRowIdentifier: Boolean! @deprecated (reason: "use rowIdentifierState (25.3.4)")
-    "State of a table row identifier: METADATA_NOT_FOUND, NONE, PRIMARY_KEY, VIRTUAL_KEY"
+    "State of a table row identifier"
     rowIdentifierState: SQLRowIdentifierState @since(version: "25.3.4")
     "Contains info about a result set row identifier. Present if rowIdentifierState is PRIMARY_KEY"
     rowIdentifier: SQLRowIdentifier @since(version: "25.3.4")
@@ -146,8 +146,7 @@ type SQLResultSet {
 enum SQLRowIdentifierState {
     METADATA_NOT_FOUND,
     NONE,
-    PRIMARY_KEY,
-    VIRTUAL_KEY
+    PRIMARY_KEY
 }
 
 type SQLRowIdentifier {
