@@ -143,6 +143,7 @@ export default [
   ['ui_field_is_required', 'Заполните это поле'],
   ['ui_delete_confirmation_message', 'Вы собираетесь удалить "{arg:item}". Вы уверены?'],
   ['ui_not_selected', 'Не выбрано'],
+  ['ui_reset', 'Сбросить'],
 
   ['root_permission_denied', 'Отказано в доступе'],
   ['root_permission_no_permission', 'У вас нет разрешения на это действие'],

@@ -6,9 +6,11 @@
  * you may not use this file except in compliance with the License.
  */
 .contextMenu {
-  padding: 0;
   height: 16px;
   width: 16px;
+  padding: 4px;
+  box-sizing: content-box;
+  cursor: pointer;
 
   &:before {
     display: none;
@@ -22,7 +24,6 @@
 }
 
 .icon {
-  cursor: pointer;
   width: 16px;
   height: 10px;
   fill: #dedede;

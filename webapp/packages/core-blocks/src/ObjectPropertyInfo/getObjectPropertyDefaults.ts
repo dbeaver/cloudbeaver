@@ -6,17 +6,17 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
+import { getObjectPropertyDefaultValue, type IObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 import { isNotNullDefined } from '@dbeaver/js-helpers';
 
-export function getObjectPropertyDefaults(properties: ReadonlyArray<ObjectPropertyInfo>): Record<string, any> {
+export function getObjectPropertyDefaults(properties: ReadonlyArray<IObjectPropertyInfo>): Record<string, any> {
   const result: Record<string, any> = {};
 
   for (const property of properties) {
     const isDefault = isNotNullDefined(property.defaultValue);
 
     if (isDefault && property.id) {
-      result[property.id] = property.defaultValue;
+      result[property.id] = getObjectPropertyDefaultValue(property);
     }
   }
 

@@ -143,6 +143,9 @@
       "path": "../plugin-connection-search"
     },
     {
+      "path": "../plugin-connection-view"
+    },
+    {
       "path": "../plugin-connections"
     },
     {

@@ -289,6 +289,12 @@ public class WebConnectionInfo {
 
     @Property
     @NotNull
+    public DBNBrowseSettings getDefaultNavigatorSettings() {
+        return dataSourceContainer.getNavigatorSettings().getOriginalSettings();
+    }
+
+    @Property
+    @NotNull
     public List<WebDataFormat> getSupportedDataFormats() {
         List<WebDataFormat> formats = new ArrayList<>();
         formats.add(WebDataFormat.resultset);
