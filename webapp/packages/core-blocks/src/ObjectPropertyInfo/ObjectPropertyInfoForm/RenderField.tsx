@@ -263,7 +263,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
         readOnly={readonly || disabled}
         autoComplete={autocomplete}
         className={className}
-        canShowPassword={state[property.id!] !== SAVED_VALUE_INDICATOR && canShowPassword}
+        canShowPassword={!!property.id && state[property.id] !== SAVED_VALUE_INDICATOR && canShowPassword}
         onFocus={onFocus}
       >
         {property.displayName}
