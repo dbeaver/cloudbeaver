@@ -73,7 +73,7 @@ export const GridSearchPanel = forwardRef<GridSearchPanelRef, GridSearchPanelPro
     <SearchPanel
       ref={panelRef}
       className={clsx('rdg-search-panel tw:bg-(--theme-secondary)', isReadOnly && 'tw:px-0!')}
-      isReadOnly={isReadOnly || !replaceCellValue}
+      isReadOnly={isReadOnly}
       query={{
         search: snapshot.query,
         replace: snapshot.replace,
