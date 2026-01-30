@@ -6,4 +6,6 @@ fragment AllNavigatorSettings on NavigatorSettings {
   hideFolders
   hideSchemas
   hideVirtualModel
+
+  userSettings
 }

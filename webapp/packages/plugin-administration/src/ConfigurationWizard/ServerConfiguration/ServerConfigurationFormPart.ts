@@ -7,10 +7,15 @@
  */
 import { AdministrationScreenService } from '@cloudbeaver/core-administration';
 import { ADMIN_USERNAME_MIN_LENGTH, AUTH_PROVIDER_LOCAL_ID, AuthProvidersResource, PasswordPolicyService } from '@cloudbeaver/core-authentication';
-import { DEFAULT_NAVIGATOR_VIEW_SETTINGS } from '@cloudbeaver/core-connections';
 import { ExecutorInterrupter, type IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
-import { DefaultNavigatorSettingsResource, PasswordPolicyResource, ProductInfoResource, ServerConfigResource } from '@cloudbeaver/core-root';
+import {
+  DefaultNavigatorSettingsResource,
+  PasswordPolicyResource,
+  ProductInfoResource,
+  ServerConfigResource,
+  DEFAULT_NAVIGATOR_VIEW_SETTINGS,
+} from '@cloudbeaver/core-root';
 import { FormPart, formValidationContext, type IFormState } from '@cloudbeaver/core-ui';
 import { isIp, isObjectsEqual, isValuesEqual } from '@cloudbeaver/core-utils';
 import { LocalizationService } from '@cloudbeaver/core-localization';

@@ -24,7 +24,6 @@ export * from './ConnectionForm/Options/getConnectionFormOptionsPart.js';
 export * from './ConnectionForm/Options/ConnectionFormOptionsPart.js';
 export * from './ConnectionForm/SharedCredentials/CONNECTION_FORM_SHARED_CREDENTIALS_TAB_ID.js';
 export * from './ConnectionForm/ConnectionAuthModelCredentials/ConnectionAuthModelCredentialsForm.js';
-export * from './ContextMenu/MENU_CONNECTION_VIEW.js';
 export * from './ContextMenu/MENU_CONNECTIONS.js';
 export * from './PublicConnectionForm/PublicConnectionFormService.js';
 export * from './NavNodes/ConnectionNavNodeService.js';
