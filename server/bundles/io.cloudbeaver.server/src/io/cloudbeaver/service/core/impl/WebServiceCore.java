@@ -134,6 +134,7 @@ public class WebServiceCore implements DBWServiceCore {
     ) throws DBWebException {
         if (id != null) {
             WebConnectionInfo connectionInfo = getConnectionState(webSession, projectId, id);
+            Map<String, String> connectionPreferences = connectionInfo.getConnectionPreferences();
             if (connectionInfo != null) {
                 return Collections.singletonList(connectionInfo);
             }
