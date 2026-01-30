@@ -94,9 +94,7 @@ export class DocumentEditAction<
   }
 
   setMany(updates: Array<{ key: TKey; value: TValue }>): void {
-    for (const { key, value } of updates) {
-      this.set(key, value);
-    }
+    throw new Error('Not implemented');
   }
 
   add(key: TKey): void {
