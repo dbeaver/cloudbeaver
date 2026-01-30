@@ -20,6 +20,7 @@ import {
   type IDataGridRowRenderer,
   type IDataGridCellRenderer,
   type DataGridProps,
+  type ICellChange,
 } from '@cloudbeaver/plugin-data-grid';
 import {
   DATA_CONTEXT_DV_PRESENTATION,
@@ -473,7 +474,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
     tableData.editor?.set({ row, column }, value);
   }
 
-  function handleCellChangeBatch(changes: Array<{ rowIdx: number; colIdx: number; value: string }>) {
+  function handleCellChangeBatch(changes: ICellChange[]) {
     const updates = [];
 
     for (const { rowIdx, colIdx, value } of changes) {
