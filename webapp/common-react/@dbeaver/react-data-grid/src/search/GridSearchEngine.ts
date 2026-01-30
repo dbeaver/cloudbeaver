@@ -18,6 +18,10 @@ export interface ICellMatch {
 }
 
 const ESCAPE_REGEX = /[.*+?^${}()|[\]\\]/g;
+const WORD_BOUNDARY_REGEX = '\\b';
+const GLOBAL_FLAG_REGEX = 'g';
+const IGNORE_CASE_FLAG_REGEX = 'i';
+const ESCAPE_REPLACE_REGEX = '\\$&';
 
 export class GridSearchEngine {
   /** Build regex from query string + flags. Returns null for empty/invalid input. */
@@ -28,16 +32,16 @@ export class GridSearchEngine {
 
     try {
       if (options.regexp) {
-        const flags = options.caseSensitive ? 'g' : 'gi';
+        const flags = options.caseSensitive ? GLOBAL_FLAG_REGEX : GLOBAL_FLAG_REGEX + IGNORE_CASE_FLAG_REGEX;
         return new RegExp(query, flags);
       }
 
-      let escapedSearch = query.replace(ESCAPE_REGEX, '\\$&');
+      let escapedSearch = query.replace(ESCAPE_REGEX, ESCAPE_REPLACE_REGEX);
       if (options.wholeWord) {
-        escapedSearch = `\\b${escapedSearch}\\b`;
+        escapedSearch = `${WORD_BOUNDARY_REGEX}${escapedSearch}${WORD_BOUNDARY_REGEX}`;
       }
 
-      const flags = options.caseSensitive ? 'g' : 'gi';
+      const flags = options.caseSensitive ? GLOBAL_FLAG_REGEX : GLOBAL_FLAG_REGEX + IGNORE_CASE_FLAG_REGEX;
       return new RegExp(escapedSearch, flags);
     } catch {
       return null;
