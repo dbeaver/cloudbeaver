@@ -176,6 +176,12 @@ function syncState(store: GridSearchStore): void {
   });
 }
 
+function updateGridSearch(store: GridSearchStore): void {
+  invalidateSnapshot(store);
+  notifyListeners(store);
+  syncState(store);
+}
+
 function buildPattern(store: GridSearchStore): RegExp | null {
   return GridSearchEngine.buildPattern(store.query, {
     caseSensitive: store.caseSensitive,
@@ -208,10 +214,8 @@ function updateMatches(store: GridSearchStore, preserveActiveIndex = false): voi
   }
 
   updateActiveMatchKey(store);
-  invalidateSnapshot(store);
-  notifyListeners(store);
+  updateGridSearch(store);
   notifyCellListeners(store);
-  syncState(store);
 }
 
 function runSearch(store: GridSearchStore): void {
@@ -247,9 +251,7 @@ function createActions(store: GridSearchStore): IGridSearchActions {
         return;
       }
       store.query = value;
-      invalidateSnapshot(store);
-      notifyListeners(store);
-      syncState(store);
+      updateGridSearch(store);
       debouncedSearch(store);
     },
 
@@ -258,32 +260,24 @@ function createActions(store: GridSearchStore): IGridSearchActions {
         return;
       }
       store.replace = value;
-      invalidateSnapshot(store);
-      notifyListeners(store);
-      syncState(store);
+      updateGridSearch(store);
     },
 
     toggleCaseSensitive(): void {
       store.caseSensitive = !store.caseSensitive;
-      invalidateSnapshot(store);
-      notifyListeners(store);
-      syncState(store);
+      updateGridSearch(store);
       debouncedSearch(store);
     },
 
     toggleWholeWord(): void {
       store.wholeWord = !store.wholeWord;
-      invalidateSnapshot(store);
-      notifyListeners(store);
-      syncState(store);
+      updateGridSearch(store);
       debouncedSearch(store);
     },
 
     toggleRegex(): void {
       store.regexp = !store.regexp;
-      invalidateSnapshot(store);
-      notifyListeners(store);
-      syncState(store);
+      updateGridSearch(store);
       debouncedSearch(store);
     },
 
@@ -296,11 +290,9 @@ function createActions(store: GridSearchStore): IGridSearchActions {
       }
       store.activeMatchIdx = (store.activeMatchIdx + 1) % store.matchedCells.length;
       updateActiveMatchKey(store);
-      invalidateSnapshot(store);
-      notifyListeners(store);
+      updateGridSearch(store);
       notifyCellListeners(store);
       scrollToActiveMatch(store);
-      syncState(store);
     },
 
     findPrevious(): void {
@@ -312,11 +304,9 @@ function createActions(store: GridSearchStore): IGridSearchActions {
       }
       store.activeMatchIdx = store.activeMatchIdx === 0 ? store.matchedCells.length - 1 : store.activeMatchIdx - 1;
       updateActiveMatchKey(store);
-      invalidateSnapshot(store);
-      notifyListeners(store);
+      updateGridSearch(store);
       notifyCellListeners(store);
       scrollToActiveMatch(store);
-      syncState(store);
     },
 
     replaceActive(): void {
@@ -352,15 +342,12 @@ function createActions(store: GridSearchStore): IGridSearchActions {
         }
 
         updateActiveMatchKey(store);
-        invalidateSnapshot(store);
-        notifyListeners(store);
+        updateGridSearch(store);
         notifyCellListeners(store);
 
         if (store.activeMatchIdx >= 0) {
           scrollToActiveMatch(store);
         }
-
-        syncState(store);
       } finally {
         store.options.onReplacingChange?.(false);
       }
