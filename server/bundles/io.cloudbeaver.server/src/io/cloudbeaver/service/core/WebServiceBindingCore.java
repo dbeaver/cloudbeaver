@@ -163,7 +163,7 @@ public class WebServiceBindingCore extends WebServiceBindingBase<DBWServiceCore>
                 getWebSession(env),
                 getProjectReference(env),
                 getArgumentVal(env, "objectType"),
-                getArgumentVal(env, "objectId"),
+                getArgumentVal(env, "id"),
                 getArgumentVal(env, "settings")
             ))
 
