@@ -582,6 +582,7 @@ public class WebConnectionInfo {
     }
 
 
+    @Property
     public Map<String, String> getConnectionPreferences() {
         DBPPreferenceStore preferenceStore = dataSourceContainer.getPreferenceStore();
         if (preferenceStore instanceof DataSourcePreferenceStore dataSourcePreferenceStore) {
