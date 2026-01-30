@@ -44,6 +44,8 @@ import {
   GridHistoryAction,
   type IGridEditActionData,
   type IGridDataKey,
+  type IHistoryEntry,
+  getKeyFromHistoryEntry,
 } from '@cloudbeaver/plugin-data-viewer';
 
 import { CellRenderer } from './CellRenderer/CellRenderer.js';
@@ -180,11 +182,6 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
     function syncEditor(data: IGridEditActionData) {
       const editor = tableData.editor;
 
-      if (data.revert) {
-        dataGridRef.current?.refreshSearch();
-        return;
-      }
-
       if (data.resultId !== editor?.result.id || !data.value || data.value.length === 0 || data.type === DatabaseEditChangeType.delete) {
         return;
       }
@@ -234,18 +231,30 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
       return;
     }
 
-    function refreshSearch() {
+    function handleHistoryChange(entry: IHistoryEntry<unknown>) {
       dataGridRef.current?.refreshSearch();
+
+      const key = getKeyFromHistoryEntry(entry);
+      if (!key) {
+        return;
+      }
+
+      const colIdx = tableData.getColumnIndexFromColumnKey(key.column);
+      const rowIdx = tableData.getRowIndexFromKey(key.row);
+
+      if (colIdx >= 0 && rowIdx >= 0) {
+        handlers.selectCell({ colIdx, rowIdx }, true);
+      }
     }
 
-    historyAction.onUndo.addHandler(refreshSearch);
-    historyAction.onRedo.addHandler(refreshSearch);
+    historyAction.onUndo.addHandler(handleHistoryChange);
+    historyAction.onRedo.addHandler(handleHistoryChange);
 
     return () => {
-      historyAction.onUndo.removeHandler(refreshSearch);
-      historyAction.onRedo.removeHandler(refreshSearch);
+      historyAction.onUndo.removeHandler(handleHistoryChange);
+      historyAction.onRedo.removeHandler(handleHistoryChange);
     };
-  }, [historyAction]);
+  }, [historyAction, tableData, handlers]);
 
   const handleFocusChange = (position: ICellPosition) => {
     focusedCell.current = position;
@@ -465,7 +474,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
   }
 
   function handleCellChangeBatch(changes: Array<{ rowIdx: number; colIdx: number; value: string }>) {
-    const updates = []; 
+    const updates = [];
 
     for (const { rowIdx, colIdx, value } of changes) {
       const row = tableData.rows[rowIdx];

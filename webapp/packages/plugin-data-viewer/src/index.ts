@@ -39,6 +39,7 @@ export * from './DatabaseDataModel/Actions/Grid/GridViewAction.js';
 export * from './DatabaseDataModel/Actions/Grid/IGridDataKey.js';
 export * from './DatabaseDataModel/Actions/Grid/GridSelectAction.js';
 export * from './DatabaseDataModel/Actions/Grid/GridHistoryAction.js';
+export * from './DatabaseDataModel/Actions/Grid/GridHistoryTypes.js';
 export * from './DatabaseDataModel/Actions/Grid/compareGridRowKeys.js';
 export * from './DatabaseDataModel/Actions/ResultSet/ResultSetEditAction.js';
 export * from './DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction.js';
