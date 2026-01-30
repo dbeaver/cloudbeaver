@@ -19,7 +19,6 @@ import {
   IDatabaseDataSource,
   type IDatabaseDataSourceOperationEvent,
   type IRequestInfo,
-  type IRowIdentifierInfo,
 } from './IDatabaseDataSource.js';
 
 export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseDataResult> implements IDatabaseDataSource<TOptions, TResult> {
@@ -197,15 +196,6 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
     return !this.isLoading() && !this.disabled;
   }
 
-  // TODO: probably should be moved to the DataResultAction
-  hasElementIdentifier(resultIndex: number): boolean {
-    return false;
-  }
-
-  getRowIdentifierInfo(resultIndex: number): IRowIdentifierInfo {
-    return { state: null, identifier: null };
-  }
-
   isReadonly(resultIndex: number): boolean {
     return this.access === DatabaseDataAccessMode.Readonly || this.results.length > 1 || this.disabled;
   }
@@ -308,10 +298,6 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
 
       return this.save(this.results).then(data => {
         this.setResults(data);
-        //TODO: Remove this when we have virtual keys. We need to refresh the data in tables without a primary key to avoid UI glitch #5140.
-        if (!this.hasElementIdentifier(0)) {
-          this.setOutdated();
-        }
       });
     });
   }

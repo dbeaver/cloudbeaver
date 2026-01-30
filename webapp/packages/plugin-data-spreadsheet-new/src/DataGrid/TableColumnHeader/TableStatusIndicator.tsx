@@ -11,6 +11,7 @@ import { useContext } from 'react';
 import { clsx } from '@dbeaver/ui-kit';
 
 import { IconOrImage, useTranslate } from '@cloudbeaver/core-blocks';
+import { isResultSetDataSource } from '@cloudbeaver/plugin-data-viewer';
 
 import { DataGridContext } from '../DataGridContext.js';
 import { TableDataContext } from '../TableDataContext.js';
@@ -26,8 +27,10 @@ export const TableStatusIndicator = observer(function TableStatusIndicator() {
     return null;
   }
 
-  const rowIdentifierInfo = dataGridContext.model.getRowIdentifierInfo(dataGridContext.resultIndex);
-  const hasRowIdentifier = dataGridContext.model.hasElementIdentifier(dataGridContext.resultIndex);
+  const source = dataGridContext.model.source;
+  const resultSetSource = isResultSetDataSource(source) ? source : null;
+  const rowIdentifierInfo = resultSetSource?.getRowIdentifierInfo(dataGridContext.resultIndex);
+  const hasRowIdentifier = resultSetSource?.hasElementIdentifier(dataGridContext.resultIndex);
 
   const firstColumn = tableDataContext.columns[1];
   const firstColumnData = isNotNullDefined(firstColumn?.key)
@@ -35,8 +38,8 @@ export const TableStatusIndicator = observer(function TableStatusIndicator() {
     : undefined;
   const readOnlyStatus = firstColumnData?.readOnlyStatus;
 
-  const isVirtualKey = rowIdentifierInfo.state === SqlRowIdentifierState.VirtualKey;
-  const isPrimaryKey = rowIdentifierInfo.state === SqlRowIdentifierState.PrimaryKey;
+  const isVirtualKey = rowIdentifierInfo?.state === SqlRowIdentifierState.VirtualKey;
+  const isPrimaryKey = rowIdentifierInfo?.state === SqlRowIdentifierState.PrimaryKey;
   const tooltipParts: string[] = [];
 
   if (readOnlyConnection) {
@@ -50,7 +53,7 @@ export const TableStatusIndicator = observer(function TableStatusIndicator() {
     tooltipParts.push(readOnlyStatus);
   }
 
-  if (hasRowIdentifier && rowIdentifierInfo.identifier) {
+  if (hasRowIdentifier && rowIdentifierInfo?.identifier) {
     const constraintType = rowIdentifierInfo.identifier.constraintType;
     const attributeNames = rowIdentifierInfo.identifier.attributes.map(attr => attr.name).join(', ');
     tooltipParts.push(`${constraintType}: ${attributeNames}`);

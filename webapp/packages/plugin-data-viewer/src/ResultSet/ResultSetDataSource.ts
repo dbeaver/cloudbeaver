@@ -76,6 +76,14 @@ export abstract class ResultSetDataSource<TOptions = IDatabaseDataOptions> exten
     await this.cancelLoadTotalCount();
   }
 
+  override async saveData(): Promise<void> {
+    await super.saveData();
+    // TODO: Remove this when we have virtual keys. We need to refresh the data in tables without a primary key to avoid UI glitch #5140.
+    if (!this.hasElementIdentifier(0)) {
+      this.setOutdated();
+    }
+  }
+
   async cancelLoadTotalCount(): Promise<ITask<number> | null> {
     await this.totalCountRequestTask?.cancel();
 
@@ -152,11 +160,11 @@ export abstract class ResultSetDataSource<TOptions = IDatabaseDataOptions> exten
     return this;
   }
 
-  override hasElementIdentifier(resultIndex: number): boolean {
+  hasElementIdentifier(resultIndex: number): boolean {
     return this.getResult(resultIndex)?.data?.hasRowIdentifier === true;
   }
 
-  override getRowIdentifierInfo(resultIndex: number): IRowIdentifierInfo {
+  getRowIdentifierInfo(resultIndex: number): IRowIdentifierInfo {
     const data = this.getResult(resultIndex)?.data;
     return {
       state: (data?.rowIdentifierState as SqlRowIdentifierState | undefined) ?? null,
