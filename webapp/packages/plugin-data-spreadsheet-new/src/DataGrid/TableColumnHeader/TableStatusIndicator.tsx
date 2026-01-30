@@ -14,14 +14,12 @@ import { IconOrImage, useTranslate } from '@cloudbeaver/core-blocks';
 
 import { DataGridContext } from '../DataGridContext.js';
 import { TableDataContext } from '../TableDataContext.js';
+import { isNotNullDefined } from '@dbeaver/js-helpers/isNotNullDefined';
 
-interface Props {
-  readOnlyConnection: boolean;
-}
-
-export const TableStatusIndicator = observer<Props>(function TableStatusIndicator({ readOnlyConnection }) {
+export const TableStatusIndicator = observer(function TableStatusIndicator() {
   const dataGridContext = useContext(DataGridContext);
   const tableDataContext = useContext(TableDataContext);
+  const readOnlyConnection = dataGridContext.model.isReadonly(dataGridContext.resultIndex);
   const translate = useTranslate();
 
   if (!tableDataContext || !dataGridContext) {
@@ -32,10 +30,9 @@ export const TableStatusIndicator = observer<Props>(function TableStatusIndicato
   const hasRowIdentifier = dataGridContext.model.hasElementIdentifier(dataGridContext.resultIndex);
 
   const firstColumn = tableDataContext.columns[1];
-  const firstColumnData =
-    firstColumn?.key !== null && firstColumn?.key !== undefined
-      ? (tableDataContext.data.getColumn(firstColumn.key) as SqlResultColumn | undefined)
-      : undefined;
+  const firstColumnData = isNotNullDefined(firstColumn?.key)
+    ? (tableDataContext.data.getColumn(firstColumn.key) as SqlResultColumn | undefined)
+    : undefined;
   const readOnlyStatus = firstColumnData?.readOnlyStatus;
 
   const isVirtualKey = rowIdentifierInfo.state === SqlRowIdentifierState.VirtualKey;

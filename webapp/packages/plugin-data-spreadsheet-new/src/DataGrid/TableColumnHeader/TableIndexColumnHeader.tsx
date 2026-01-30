@@ -34,7 +34,7 @@ export const TableIndexColumnHeader = observer(function TableIndexColumnHeader()
 
   return (
     <>
-      <TableStatusIndicator readOnlyConnection={dataGridContext.model.isReadonly(dataGridContext.resultIndex)} />
+      <TableStatusIndicator />
       <div
         role="button"
         title={translate('data_grid_table_index_column_tooltip')}
