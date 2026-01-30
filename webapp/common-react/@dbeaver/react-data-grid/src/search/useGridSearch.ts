@@ -75,7 +75,7 @@ export interface IGridSearchOptions {
   rowCount: number;
   columnCount: number;
   getCellText: (rowIdx: number, colIdx: number) => string;
-  scrollToCell: (position: { rowIdx: number; colIdx: number }) => void;
+  scrollToCell: (rowIdx: number, colIdx: number) => void;
   replaceCellValue: (rowIdx: number, colIdx: number, value: string) => void;
   replaceCellValues?: (updates: ICellValueUpdate[]) => void;
   onReplacingChange?: (isReplacing: boolean) => void;
@@ -240,7 +240,7 @@ function debouncedSearch(store: GridSearchStore): void {
 function scrollToActiveMatch(store: GridSearchStore): void {
   const match = store.matchedCells[store.activeMatchIdx];
   if (match) {
-    store.options.scrollToCell({ rowIdx: match.rowIdx, colIdx: match.colIdx });
+    store.options.scrollToCell(match.rowIdx, match.colIdx);
   }
 }
 

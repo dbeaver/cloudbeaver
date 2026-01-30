@@ -29,7 +29,7 @@ import { mapEditCellRenderer } from './mapEditCellRenderer.js';
 import { DataGridRowContext, type IDataGridRowContext } from './DataGridRowContext.js';
 import './DataGrid.css';
 import { HeaderDnDContext, isColumn, useHeaderDnD } from './useHeaderDnD.js';
-import type { IGridSearchStorage } from './search/useGridSearch.js';
+import type { ICellValueUpdate, IGridSearchStorage } from './search/useGridSearch.js';
 import { GridSearchPanel, type GridSearchPanelRef } from './search/GridSearchPanel.js';
 
 export interface ICellPosition {
@@ -163,7 +163,7 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
     onCellChange?.(rowIdx, colIdx, value);
   }
 
-  function replaceCellValues(updates: Array<{ rowIdx: number; colIdx: number; value: string }>) {
+  function replaceCellValues(updates: ICellValueUpdate[]) {
     const validUpdates = updates.filter(u => getCellEditable?.(u.rowIdx, u.colIdx) !== false);
     if (validUpdates.length === 0) {
       return;
@@ -181,8 +181,8 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
     isReplacingRef.current = value;
   }
 
-  function scrollToCell(position: { rowIdx: number; colIdx: number }) {
-    innerGridRef.current?.scrollToCell({ idx: position.colIdx, rowIdx: position.rowIdx });
+  function scrollToCell(rowIdx: number, colIdx: number) {
+    innerGridRef.current?.scrollToCell({ idx: colIdx, rowIdx });
   }
 
   const columns = new Array<ColumnOrColumnGroup<IInnerRow, unknown>>(columnsCount)

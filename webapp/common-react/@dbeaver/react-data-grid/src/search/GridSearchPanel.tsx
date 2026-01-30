@@ -22,7 +22,7 @@ export interface GridSearchPanelRef {
 
 interface GridSearchPanelProps {
   columnCount: number;
-  scrollToCell: (position: { rowIdx: number; colIdx: number }) => void;
+  scrollToCell: (rowIdx: number, colIdx: number) => void;
   replaceCellValue: (rowIdx: number, colIdx: number, value: string) => void;
   replaceCellValues?: (updates: ICellValueUpdate[]) => void;
   onCellClassNameChange: (value: IGridReactiveValue<string | undefined, [number, number]> | undefined) => void;
