@@ -42,6 +42,14 @@ export const GridSearchPanel = forwardRef<GridSearchPanelRef, GridSearchPanelPro
   const rowContext = useContext(DataGridRowContext);
   const rowCount = useGridReactiveValue(rowContext?.rowCount);
 
+  function refresh() {
+    actions.refresh();
+  }
+
+  function focus() {
+    panelRef.current?.focus();
+  }
+
   const { snapshot, actions, getCellClassName, replaceOpen } = useGridSearch({
     rowCount: rowCount ?? 0,
     columnCount,
@@ -60,8 +68,8 @@ export const GridSearchPanel = forwardRef<GridSearchPanelRef, GridSearchPanelPro
   }, [getCellClassName, onCellClassNameChange]);
 
   useImperativeHandle(ref, () => ({
-    focus: () => panelRef.current?.focus(),
-    refresh: () => actions.refresh(),
+    focus,
+    refresh,
   }));
 
   function handleClose() {
