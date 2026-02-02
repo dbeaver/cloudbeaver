@@ -46,10 +46,9 @@ export const CaptureView = observer<React.PropsWithChildren<ICaptureViewProps>>(
     (event, handler) => {
       /**
        * isTrusted - to prevent double handling of the event
-       * !state.reference?.contains(document.activeElement) - to handle the event only if the view is focused
        * EventContext.has - to prevent handling the event if it was already handled by a child view
        */
-      if (!event.isTrusted || !state.reference?.contains(document.activeElement) || EventContext.has(event, EventStopPropagationFlag)) {
+      if (!event.isTrusted || EventContext.has(event, EventStopPropagationFlag)) {
         return;
       }
 
@@ -82,9 +81,8 @@ export const CaptureView = observer<React.PropsWithChildren<ICaptureViewProps>>(
             return isObjectsEqual(hotkey, handler);
           });
         });
-        const isAppliedInSelectedScope = Boolean(state.reference?.contains(document.activeElement));
 
-        return isAppliedInSelectedScope && action?.binding?.binding.preventDefault === true;
+        return action?.binding?.binding.preventDefault === true;
       },
       enableOnContentEditable: true,
     },
