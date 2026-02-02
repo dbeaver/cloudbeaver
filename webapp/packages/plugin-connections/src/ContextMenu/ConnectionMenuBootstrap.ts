@@ -30,6 +30,8 @@ import { ACTION_CONNECTION_DISCONNECT_ALL } from './Actions/ACTION_CONNECTION_DI
 import { ACTION_CONNECTION_EDIT } from './Actions/ACTION_CONNECTION_EDIT.js';
 import { MENU_CONNECTIONS } from './MENU_CONNECTIONS.js';
 
+const COPY_NAME_SUFFIX = 'copy';
+
 @injectable(() => [
   NotificationService,
   ConnectionInfoResource,
@@ -166,7 +168,7 @@ export class ConnectionMenuBootstrap extends Bootstrap {
                 c => c.projectId === connection.projectId && c.folder === connection.folder,
               );
               const newName = getUniqueName(
-                connection.name,
+                connection.name.concat(` ${COPY_NAME_SUFFIX}`),
                 existingConnections.map(c => c.name),
               );
 
