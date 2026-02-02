@@ -565,6 +565,8 @@ type ConnectionInfo {
     requiredAuth: String
     defaultCatalogName: String @since(version: "25.0.5")
     defaultSchemaName: String @since(version: "25.0.5")
+    "Default user settings for connection"
+    defaultUserSettings: Object @since(version: "25.3.5")
 
     "List of tools that can be used with this connection. Returns empty list if no tools are available"
     tools: [String!]! @since(version: "24.1.3")

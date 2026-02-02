@@ -297,6 +297,16 @@ public class WebConnectionInfo {
 
     @Property
     @NotNull
+    public Map<String, String> defaultUserSettings() {
+        DBPPreferenceStore preferenceStore = dataSourceContainer.getPreferenceStore();
+        if (preferenceStore instanceof DataSourcePreferenceStore dataSourcePreferenceStore) {
+            return dataSourcePreferenceStore.getProperties();
+        }
+        return Collections.emptyMap();
+    }
+
+    @Property
+    @NotNull
     public List<WebDataFormat> getSupportedDataFormats() {
         List<WebDataFormat> formats = new ArrayList<>();
         formats.add(WebDataFormat.resultset);
