@@ -33,7 +33,7 @@ export const CaptureView = observer<React.PropsWithChildren<ICaptureViewProps>>(
   const viewContext = useViewContext(view, parentContext);
   const actionService = useService(ActionService);
   const activeView = useActiveView(view);
-  const [ref, state] = useFocus<HTMLDivElement>({ onFocus: activeView.focusView, onBlur: activeView.blurView });
+  const [ref] = useFocus<HTMLDivElement>({ onFocus: activeView.focusView, onBlur: activeView.blurView });
   const style = useS(styles);
 
   const allActionItems = view.actions.map(action => actionService.getAction(viewContext, action)).filter(Boolean) as IActionItem[];
