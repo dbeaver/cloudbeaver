@@ -416,11 +416,6 @@ public class WebGlobalProjectRegistryProxy implements DBPDataSourceRegistry, Dat
         dataSourceRegistry.resolveSecrets(secretController);
     }
 
-    @Override
-    public DBPObjectSettingsProvider getDatasourceSettingsProvider() {
-        return webSession;
-    }
-
     /**
      * Event listener proxy.
      * For some cases (like creating data source) we should not send event because of accessibility of connection.

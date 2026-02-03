@@ -33,7 +33,10 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
-import org.jkiss.dbeaver.model.*;
+import org.jkiss.dbeaver.model.DBFileController;
+import org.jkiss.dbeaver.model.DBPAdaptable;
+import org.jkiss.dbeaver.model.DBPDataSourceContainer;
+import org.jkiss.dbeaver.model.DBPEventListener;
 import org.jkiss.dbeaver.model.access.DBAAuthCredentials;
 import org.jkiss.dbeaver.model.access.DBACredentialsProvider;
 import org.jkiss.dbeaver.model.auth.*;
@@ -46,7 +49,9 @@ import org.jkiss.dbeaver.model.rm.*;
 import org.jkiss.dbeaver.model.runtime.AbstractJob;
 import org.jkiss.dbeaver.model.runtime.BaseProgressMonitor;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
-import org.jkiss.dbeaver.model.security.*;
+import org.jkiss.dbeaver.model.security.SMAdminController;
+import org.jkiss.dbeaver.model.security.SMConstants;
+import org.jkiss.dbeaver.model.security.SMController;
 import org.jkiss.dbeaver.model.sql.DBQuotaException;
 import org.jkiss.dbeaver.model.websocket.event.MessageType;
 import org.jkiss.dbeaver.model.websocket.event.WSSessionLogUpdatedEvent;
@@ -68,7 +73,7 @@ import java.util.stream.Collectors;
  */
 //TODO: split to authenticated and non authenticated context
 public class WebSession extends BaseWebSession
-    implements SMSessionWithAuth, SMCredentialsProvider, DBACredentialsProvider, DBPAdaptable, DBPObjectSettingsProvider {
+    implements SMSessionWithAuth, SMCredentialsProvider, DBACredentialsProvider, DBPAdaptable {
 
     private static final Log log = Log.getLog(WebSession.class);
 
@@ -1022,29 +1027,6 @@ public class WebSession extends BaseWebSession
     @Nullable
     public WebSessionGlobalProjectImpl getGlobalProject() {
         return globalProject;
-    }
-
-    @Override
-    public void clearObjectSettings(@NotNull String projectId, @NotNull SMObjectType objectType, @NotNull String objectId, @NotNull Set<String> settings)
-    throws DBException {
-        //fixme
-    }
-
-    @Nullable
-    @Override
-    public Map<String, String> getObjectSettings(@NotNull String projectId, @NotNull SMObjectType objectType, @NotNull String objectId) {
-        try {
-            List<SMObjectSettings> objectSettings = this.getSecurityController().getObjectSettings(projectId, objectType, objectId, null);
-            return objectSettings.isEmpty() ? null : objectSettings.getFirst().settings();
-        } catch (DBException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public void setObjectSettings(@NotNull String projectId, @NotNull SMObjectType objectType, @NotNull String objectId, @NotNull Map<String, String> settings)
-    throws DBException {
-        this.getSecurityController().setObjectSettings(projectId, objectType, objectId, settings);
     }
 
     public void handleTaskConfirmation(
