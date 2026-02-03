@@ -34,7 +34,6 @@ import org.jkiss.dbeaver.model.meta.MetaData;
 import org.jkiss.dbeaver.model.sql.DBQuotaException;
 import org.jkiss.dbeaver.model.struct.DBSDataContainer;
 import org.jkiss.dbeaver.model.struct.DBSEntity;
-import org.jkiss.dbeaver.model.struct.DBSEntityConstraintType;
 import org.jkiss.utils.CommonUtils;
 
 import java.lang.reflect.Method;
@@ -190,15 +189,11 @@ class WebSQLQueryDataReceiver implements DBDDataReceiver {
         DBDRowIdentifier rowIdentifier = resultsInfo.getDefaultRowIdentifier();
         if (rowIdentifier == null) {
             webResultSet.setRowIdentifierState(WebSQLResultSetRowIdentifierState.METADATA_NOT_FOUND);
-        } else if (rowIdentifier.getUniqueKey().getConstraintType().equals(DBSEntityConstraintType.VIRTUAL_KEY)) {
-            webResultSet.setRowIdentifierState(WebSQLResultSetRowIdentifierState.VIRTUAL_KEY);
         } else if (!rowIdentifier.isIncomplete() && rowIdentifier.isValidIdentifier()) {
             webResultSet.setHasRowIdentifier(true);
             webResultSet.setRowIdentifierState(WebSQLResultSetRowIdentifierState.PRIMARY_KEY);
             List<WebSQLResultSetRowIdentifierAttribute> attributes = rowIdentifier.getAttributes().stream()
-                .map(a -> new WebSQLResultSetRowIdentifierAttribute(
-                    a.getName(), a.getOrdinalPosition(), a.getLabel(), a.getDescription()
-                ))
+                .map(a -> new WebSQLResultSetRowIdentifierAttribute(a.getName(), a.getOrdinalPosition()))
                 .toList();
             String constraintTypeName = rowIdentifier.getUniqueKey().getConstraintType().getName();
             webResultSet.setRowIdentifier(
