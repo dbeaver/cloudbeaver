@@ -15,6 +15,7 @@
     --dbv-kit-radio-dot-size: 0.25;
     --dbv-kit-radio-font-size: calc(var(--dbv-kit-font-size-base) * 0.875);
     --dbv-kit-radio-gap: var(--tw-spacing);
+    --dbv-kit-radio-border-width: 1px;
 
     --dbv-kit-select-label-foreground: var(--dbv-kit-color-control-label);
     --dbv-kit-select-label-padding-inline: var(--tw-spacing);

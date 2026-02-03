@@ -24,7 +24,7 @@
     --dbv-kit-radio-active-border: var(--theme-primary);
     --dbv-kit-radio-active-foreground: var(--theme-primary);
 
-    --dbv-kit-radio-inactive-border: color-mix(in srgb, var(--theme-on-secondary), white 30%);
+    --dbv-kit-radio-inactive-border: color-mix(in srgb, var(--theme-on-secondary), white 20%);
     --dbv-kit-radio-hover-shadow-color: color-mix(in srgb, var(--theme-on-secondary), white 80%);
   }
 
