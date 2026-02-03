@@ -117,7 +117,7 @@ public class WebSessionWorkspace implements DBPWorkspace {
                 return project;
             }
         }
-        return null;
+        return activeProject;
     }
 
     @NotNull
@@ -150,7 +150,7 @@ public class WebSessionWorkspace implements DBPWorkspace {
 
     @Override
     public void deleteProject(@NotNull DBPProject project) throws DBException {
-        removeProject((WebSessionProjectImpl) project);
+        throw new DBException("Project removing is not supported in web session workspace");
     }
 
     @Override
