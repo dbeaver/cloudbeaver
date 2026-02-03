@@ -8,15 +8,10 @@
 import { createService, type IServiceProvider, type SingleServiceType } from '@cloudbeaver/core-di';
 import type { IExecutor, ISyncExecutor } from '@cloudbeaver/core-executor';
 import { type TLocalizationToken } from '@cloudbeaver/core-localization';
-import type { ResultDataFormat, SqlRowIdentifier, SqlRowIdentifierState } from '@cloudbeaver/core-sdk';
+import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
 import type { IDatabaseDataActions } from './IDatabaseDataActions.js';
 import type { IDatabaseDataResult } from './IDatabaseDataResult.js';
-
-export interface IRowIdentifierInfo {
-  state: SqlRowIdentifierState | null;
-  identifier: SqlRowIdentifier | null;
-}
 
 export enum DatabaseDataSourceOperation {
   /** Abstract operation with data, should not lead to data lost */

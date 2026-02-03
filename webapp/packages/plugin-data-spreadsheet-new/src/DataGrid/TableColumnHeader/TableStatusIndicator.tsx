@@ -15,7 +15,7 @@ import { isResultSetDataSource } from '@cloudbeaver/plugin-data-viewer';
 
 import { DataGridContext } from '../DataGridContext.js';
 import { TableDataContext } from '../TableDataContext.js';
-import { isNotNullDefined } from '@dbeaver/js-helpers/isNotNullDefined';
+import { isNotNullDefined } from '@dbeaver/js-helpers';
 
 export const TableStatusIndicator = observer(function TableStatusIndicator() {
   const dataGridContext = useContext(DataGridContext);

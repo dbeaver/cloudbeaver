@@ -14,7 +14,6 @@ import { AsyncTaskInfoService } from '@cloudbeaver/core-root';
 import type { GraphQLService, SqlRowIdentifier, SqlRowIdentifierState } from '@cloudbeaver/core-sdk';
 
 import { DatabaseDataSource } from '../DatabaseDataModel/DatabaseDataSource.js';
-import type { IRowIdentifierInfo } from '../DatabaseDataModel/IDatabaseDataSource.js';
 import { type IDatabaseDataOptions } from '../DatabaseDataModel/IDatabaseDataOptions.js';
 import type { IDatabaseResultSet } from '../DatabaseDataModel/IDatabaseResultSet.js';
 import { DatabaseDataConstraintAction } from '../DatabaseDataModel/Actions/DatabaseDataConstraintAction.js';
@@ -33,6 +32,11 @@ import { ResultSetFormatAction } from '../DatabaseDataModel/Actions/ResultSet/Re
 import { ResultSetSelectAction } from '../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction.js';
 import { ResultSetViewAction } from '../DatabaseDataModel/Actions/ResultSet/ResultSetViewAction.js';
 import { IDatabaseDataSelectAction } from '../DatabaseDataModel/Actions/IDatabaseDataSelectAction.js';
+
+export interface IRowIdentifierInfo {
+  state: SqlRowIdentifierState | null;
+  identifier: SqlRowIdentifier | null;
+}
 
 export abstract class ResultSetDataSource<TOptions = IDatabaseDataOptions> extends DatabaseDataSource<TOptions, IDatabaseResultSet> {
   executionContext: IConnectionExecutionContext | null;
