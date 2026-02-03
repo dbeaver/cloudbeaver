@@ -343,7 +343,7 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
     limit: number,
   ): IDatabaseResultSet[] | null {
     this.requestInfo = {
-      originalQuery: response.fullQuery || this.options?.query || '',
+      originalQuery: response.originalQuery || this.options?.query || '',
       requestDuration: response.duration || 0,
       requestMessage: response.statusMessage || '',
       requestFilter: response.filterText || '',
