@@ -18,6 +18,7 @@ import {
   IconOrImage,
   ObjectPropertyInfoForm,
   s,
+  SAVED_VALUE_INDICATOR,
   Switch,
   useAdministrationSettings,
   useAutoLoad,
@@ -33,7 +34,6 @@ import type { NetworkHandlerConfigInput, NetworkHandlerDescriptor } from '@cloud
 import { type TabContainerPanelComponent, useTab } from '@cloudbeaver/core-ui';
 import { WEBSITE_LINKS } from '@cloudbeaver/core-links';
 
-import { SAVED_VALUE_INDICATOR } from './SAVED_VALUE_INDICATOR.js';
 import styles from './SSL.module.css';
 import type { IConnectionFormProps } from '../IConnectionFormState.js';
 import { ConnectionInfoNetworkHandlersResource } from '@cloudbeaver/core-connections';
