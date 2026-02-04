@@ -26,6 +26,7 @@
     "@cloudbeaver/core-blocks": "workspace:*",
     "@cloudbeaver/core-data-context": "workspace:*",
     "@cloudbeaver/core-di": "workspace:*",
+    "@cloudbeaver/core-events": "workspace:*",
     "@cloudbeaver/core-extensions": "workspace:*",
     "@cloudbeaver/core-localization": "workspace:*",
     "@cloudbeaver/core-utils": "workspace:*",
