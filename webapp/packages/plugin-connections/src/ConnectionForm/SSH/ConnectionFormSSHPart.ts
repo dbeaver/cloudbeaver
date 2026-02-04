@@ -46,7 +46,7 @@ export class ConnectionFormSSHPart extends FormPart<INetworkHandlerConfig, IConn
     private readonly connectionInfoNetworkHandlersResource: ConnectionInfoNetworkHandlersResource,
     private readonly optionsPart: ConnectionFormOptionsPart,
   ) {
-    super(formState, getDefaultState());
+    super(formState, getDefaultState(), null, { overrideStateOnInit: true });
   }
 
   override isOutdated(): boolean {
@@ -93,10 +93,17 @@ export class ConnectionFormSSHPart extends FormPart<INetworkHandlerConfig, IConn
     };
   }
 
-  protected override async saveChanges(
+  protected override saveChanges(
     data: IFormState<IConnectionFormState>,
     contexts: IExecutionContextProvider<IFormState<IConnectionFormState>>,
-  ): Promise<void> {}
+  ): Promise<void> {
+    if (this.optionsPart.connectionKey) {
+      this.connectionInfoNetworkHandlersResource.markOutdated(this.optionsPart.connectionKey);
+    }
+    this.networkHandlerResource.markOutdated(SSH_TUNNEL_ID);
+
+    return Promise.resolve();
+  }
 
   protected override format(
     data: IFormState<IConnectionFormState>,
@@ -129,13 +136,6 @@ export class ConnectionFormSSHPart extends FormPart<INetworkHandlerConfig, IConn
     if (handlerConfig) {
       handlerConfig = getTrimmedSSHConfig(handlerConfig);
       this.optionsPart.state.networkHandlersConfig!.push(handlerConfig);
-    }
-
-    if (passwordChanged) {
-      this.state.password = '';
-    }
-    if (keyChanged) {
-      this.state.key = '';
     }
   }
 
