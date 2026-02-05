@@ -86,7 +86,7 @@
     height: var(--ring-size);
     margin-top: calc((var(--dbv-kit-radio-height) - (var(--ring-size))) * 0.5);
     border-radius: 50%;
-    border: 2px solid var(--dbv-kit-radio-inactive-border);
+    border: var(--dbv-kit-radio-border-width) solid var(--dbv-kit-radio-inactive-border);
     background-color: var(--dbv-kit-radio-inactive-background);
 
     @media (prefers-reduced-motion: no-preference) {
