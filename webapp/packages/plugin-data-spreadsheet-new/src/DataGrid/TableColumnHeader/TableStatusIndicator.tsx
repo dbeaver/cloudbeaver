@@ -8,20 +8,21 @@
 import { SqlRowIdentifierState, type SqlResultColumn } from '@cloudbeaver/core-sdk';
 import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
-import { clsx } from '@dbeaver/ui-kit';
 
-import { IconOrImage, useTranslate } from '@cloudbeaver/core-blocks';
+import { IconOrImage, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { isResultSetDataSource } from '@cloudbeaver/plugin-data-viewer';
 
 import { DataGridContext } from '../DataGridContext.js';
 import { TableDataContext } from '../TableDataContext.js';
 import { isNotNullDefined } from '@dbeaver/js-helpers';
+import styles from './TableStatusIndicator.module.css';
 
 export const TableStatusIndicator = observer(function TableStatusIndicator() {
   const dataGridContext = useContext(DataGridContext);
   const tableDataContext = useContext(TableDataContext);
   const readOnlyConnection = dataGridContext.model.isReadonly(dataGridContext.resultIndex);
   const translate = useTranslate();
+  const style = useS(styles);
 
   if (!tableDataContext || !dataGridContext) {
     return null;
@@ -47,9 +48,6 @@ export const TableStatusIndicator = observer(function TableStatusIndicator() {
   }
 
   if (readOnlyStatus) {
-    if (!readOnlyConnection) {
-      tooltipParts.push(translate('data_grid_table_readonly_tooltip'));
-    }
     tooltipParts.push(readOnlyStatus);
   }
 
@@ -70,12 +68,12 @@ export const TableStatusIndicator = observer(function TableStatusIndicator() {
     >
       {readOnlyConnection && <IconOrImage icon="/icons/lock.png" className="tw:w-2.5 tw:cursor-help" />}
       <div
-        className={clsx(
-          'tw:w-3 tw:h-3 tw:rounded-full tw:shrink-0 tw:bg-transparent tw:border',
-          "tw:before:content-[''] tw:before:block tw:before:w-1.5 tw:before:h-1.5 tw:before:rounded-full tw:before:m-0.5",
-          isPrimaryKey && 'tw:border-[var(--theme-positive)] tw:before:bg-[var(--theme-positive)]',
-          isVirtualKey && 'tw:border-[var(--theme-link-color)] tw:before:bg-[var(--theme-link-color)]',
-          !isPrimaryKey && !isVirtualKey && 'tw:border-[var(--theme-status)] tw:before:bg-[var(--theme-status)]',
+        className={s(
+          style,
+          { indicator: true },
+          isPrimaryKey && style['primaryKey'],
+          isVirtualKey && style['virtualKey'],
+          !isPrimaryKey && !isVirtualKey && style['defaultStatus'],
         )}
       />
     </div>

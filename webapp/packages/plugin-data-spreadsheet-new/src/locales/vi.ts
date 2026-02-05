@@ -24,7 +24,6 @@ export default [
   ['data_grid_table_context_menu_filter_clipboard_permission', 'Cấp quyền truy cập vào clipboard'],
   ['data_grid_table_context_menu_save_value_error', 'Không thể lưu giá trị'],
   ['data_grid_table_index_column_tooltip', 'Chọn toàn bộ bảng'],
-  ['data_grid_table_readonly_tooltip', 'Chỉ đọc'],
   ['data_grid_table_readonly_connection_tooltip', 'Kết nối chỉ đọc'],
   ['data_grid_table_no_key_found_tooltip', 'Không tìm thấy khóa duy nhất. Không thể sửa đổi dữ liệu.'],
   ['data_grid_table_virtual_key_tooltip', 'Khóa ảo'],
