@@ -9,10 +9,11 @@
 @layer components {
   :root {
     --dbv-kit-radio-small-height: 24px;
-    --dbv-kit-radio-small-gap: calc(var(--dbv-kit-radio-gap) * 0.25);
+    --dbv-kit-radio-medium-height: 28px;
+    --dbv-kit-radio-large-height: 32px;
+    --dbv-kit-radio-xlarge-height: 36px;
 
     --dbv-kit-radio-medium-dot-size: 0.3;
-    --dbv-kit-radio-medium-height: 32px;
     --dbv-kit-radio-medium-gap: calc(var(--dbv-kit-radio-gap) * 3);
   }
 
@@ -24,7 +25,7 @@
     --dbv-kit-radio-active-border: var(--theme-primary);
     --dbv-kit-radio-active-foreground: var(--theme-primary);
 
-    --dbv-kit-radio-inactive-border: color-mix(in srgb, var(--theme-on-secondary), white 30%);
+    --dbv-kit-radio-inactive-border: color-mix(in srgb, var(--theme-on-secondary), white 20%);
     --dbv-kit-radio-hover-shadow-color: color-mix(in srgb, var(--theme-on-secondary), white 80%);
   }
 
