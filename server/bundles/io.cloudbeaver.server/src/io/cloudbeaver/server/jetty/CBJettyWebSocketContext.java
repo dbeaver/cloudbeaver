@@ -18,8 +18,8 @@ package io.cloudbeaver.server.jetty;
 
 import io.cloudbeaver.service.DBWWebSocketContext;
 import jakarta.websocket.server.ServerEndpointConfig;
-import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
-import org.eclipse.jetty.ee10.websocket.jakarta.server.config.JakartaWebSocketServletContainerInitializer;
+import org.eclipse.jetty.ee11.servlet.ServletContextHandler;
+import org.eclipse.jetty.ee11.websocket.jakarta.server.config.JakartaWebSocketServletContainerInitializer;
 import org.eclipse.jetty.server.Server;
 import org.jkiss.code.NotNull;
 

@@ -23,7 +23,7 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.websocket.HandshakeResponse;
 import jakarta.websocket.server.HandshakeRequest;
 import jakarta.websocket.server.ServerEndpointConfig;
-import org.eclipse.jetty.ee10.websocket.jakarta.server.internal.JakartaWebSocketCreator;
+import org.eclipse.jetty.ee11.websocket.jakarta.server.internal.JakartaWebSocketCreator;
 import org.eclipse.jetty.http.BadMessageException;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
