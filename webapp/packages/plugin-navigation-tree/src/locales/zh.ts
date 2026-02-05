@@ -4,7 +4,7 @@ export default [
   ['app_navigationTree_limited', '元素数量限制为 {arg:limit} '],
   ['app_navigationTree_action_collapse_all', '收起全部'],
   ['app_navigationTree_settings_filter_objects_description', '显示对象描述'],
-  ['plugin_navigation_tree_settings_filter_table_contents', '显示表的子项'],
+  ['plugin_navigation_tree_settings_filter_table_contents', '显示表元素'],
   ['app_navigationTree_settings_filter_title', '过滤器'],
   ['app_navigationTree_settings_filter_description', '查看过滤字段'],
   ['app_navigationTree_settings_filter_all_title', '查看收缩项'],
