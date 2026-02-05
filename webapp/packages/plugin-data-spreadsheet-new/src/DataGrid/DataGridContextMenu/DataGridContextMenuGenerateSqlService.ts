@@ -46,26 +46,22 @@ export class DataGridContextMenuGenerateSqlService {
   ) {}
 
   register(): void {
-    // Add "Generate SQL" submenu to context menu
     this.menuService.addCreator({
       root: true,
       menus: [],
       contexts: [DATA_CONTEXT_DV_DDM, DATA_CONTEXT_DV_DDM_RESULT_INDEX, DATA_CONTEXT_DV_RESULT_KEY],
       isApplicable: context => {
         const model = context.get(DATA_CONTEXT_DV_DDM);
-        // Only show for result sets, not for data editor (ContainerDataSource)
         return isResultSetDataModel(model) && !isDataEditorSource(model.source);
       },
       getItems: (context, items) => [...items, MENU_DATA_GRID_GENERATE_SQL],
     });
 
-    // Add submenu items (all 5 generator types)
     this.menuService.addCreator({
       menus: [MENU_DATA_GRID_GENERATE_SQL],
       contexts: [DATA_CONTEXT_DV_DDM, DATA_CONTEXT_DV_DDM_RESULT_INDEX, DATA_CONTEXT_DV_RESULT_KEY],
       isApplicable: context => {
         const model = context.get(DATA_CONTEXT_DV_DDM);
-        // Only show for result sets, not for data editor (ContainerDataSource)
         return isResultSetDataModel(model) && !isDataEditorSource(model.source);
       },
       getItems: () => [
@@ -77,7 +73,6 @@ export class DataGridContextMenuGenerateSqlService {
       ],
     });
 
-    // Handle all SQL generation actions
     this.actionService.addHandler({
       id: 'data-grid-generate-sql-handler',
       menus: [MENU_DATA_GRID_GENERATE_SQL],
@@ -109,7 +104,6 @@ export class DataGridContextMenuGenerateSqlService {
       return;
     }
 
-    // Get selected rows or current row
     const select = model.source.tryGetAction(resultIndex, IDatabaseDataSelectAction, GridSelectAction);
     const data = model.source.getAction(resultIndex, ResultSetDataAction);
     const projectId = model.source.executionContext?.context?.projectId;
@@ -117,7 +111,6 @@ export class DataGridContextMenuGenerateSqlService {
     const contextId = model.source.executionContext?.context?.id;
     const resultId = model.source.getResult(resultIndex)?.id;
 
-    // Extract unique row keys from selected elements (which are IGridDataKey with { row, column })
     const selectedElements = select?.getSelectedElements() || [];
     const rowKeysSet = new Map<string, IGridRowKey>();
     for (const element of selectedElements) {
@@ -133,7 +126,6 @@ export class DataGridContextMenuGenerateSqlService {
       rowKeys = [key.row];
     }
 
-    // Check row limit
     if (rowKeys.length > MAX_ROWS_FOR_SQL_GENERATION) {
       this.notificationService.logError({
         title: 'data_grid_table_generate_sql_error_title',
@@ -143,7 +135,6 @@ export class DataGridContextMenuGenerateSqlService {
       return;
     }
 
-    // Convert to SqlResultRow format
     const rows: SqlResultRow[] = [];
     for (const rowKey of rowKeys) {
       const rowValue = data.getRowValue(rowKey);
