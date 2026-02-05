@@ -15,7 +15,6 @@ import { DataGridContextMenuOrderService } from './DataGrid/DataGridContextMenu/
 import { DataGridContextMenuFilterService } from './DataGrid/DataGridContextMenu/DataGridContextMenuFilter/DataGridContextMenuFilterService.js';
 import { DataGridContextMenuCellEditingService } from './DataGrid/DataGridContextMenu/DataGridContextMenuCellEditingService.js';
 import { DataGridContextMenuGenerateSqlService } from './DataGrid/DataGridContextMenu/DataGridContextMenuGenerateSqlService.js';
-import { SqlGenerationService } from './DataGrid/DataGridContextMenu/GenerateSQL/SqlGenerationService.js';
 
 export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-data-spreadsheet-new',
@@ -30,7 +29,6 @@ export default ModuleRegistry.add({
       .addSingleton(DataGridContextMenuSaveContentService)
       .addSingleton(DataGridContextMenuGenerateSqlService)
       .addSingleton(DataGridContextMenuOrderService)
-      .addSingleton(SqlGenerationService)
       .addSingleton(DataGridContextMenuFilterService);
   },
 });

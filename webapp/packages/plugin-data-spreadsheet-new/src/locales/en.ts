@@ -49,7 +49,7 @@ export default [
   ['data_grid_table_generate_sql_select_many_tooltip', 'Generate SELECT statement with WHERE IN clause'],
   ['data_grid_table_generate_sql_dialog_title', 'Generated SQL'],
   ['data_grid_table_generate_sql_error_title', 'SQL Generation Error'],
-  ['data_grid_table_generate_sql_error_generation_failed', 'No SQL query was generated'],
+  ['data_grid_table_generate_sql_error_no_connection', 'Unknown execution context'],
   ['data_grid_table_generate_sql_error_too_many_rows', 'Too many rows selected. Maximum allowed: 1000'],
   ['data_grid_table_generate_sql_error_no_rows', 'No rows selected'],
   ['data_grid_table_generate_sql_error_no_result', 'No result set available'],

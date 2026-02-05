@@ -14,6 +14,7 @@ import { MenuBaseItem, MenuService } from '@cloudbeaver/core-view';
 
 import { MENU_SQL_GENERATORS } from './MENU_SQL_GENERATORS.js';
 import { SqlGeneratorsResource } from './SqlGeneratorsResource.js';
+import { executeAsyncSilently } from '@cloudbeaver/core-utils';
 
 const GeneratedSqlDialog = importLazyComponent(() => import('./GeneratedSqlDialog.js').then(m => m.GeneratedSqlDialog));
 
@@ -77,10 +78,13 @@ export class SqlGeneratorsBootstrap extends Bootstrap {
                   tooltip: action.description,
                 },
                 {
-                  onSelect: () => {
-                    this.commonDialogService.open(GeneratedSqlDialog, {
-                      generatorId: action.id,
-                      pathId: node.id,
+                  onSelect: async () => {
+                    const { result, error } = await executeAsyncSilently(() => this.sqlGeneratorsResource.generateEntityQuery(action.id, node.id));
+
+                    await this.commonDialogService.open(GeneratedSqlDialog, {
+                      query: result ?? '',
+                      nodeId: node.id,
+                      exception: error,
                     });
                   },
                 },

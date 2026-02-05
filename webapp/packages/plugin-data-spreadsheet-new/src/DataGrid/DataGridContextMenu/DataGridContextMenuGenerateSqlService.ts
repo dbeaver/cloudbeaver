@@ -27,21 +27,22 @@ import { ACTION_DATA_GRID_GENERATE_SQL_INSERT } from '../Actions/GenerateSQL/ACT
 import { ACTION_DATA_GRID_GENERATE_SQL_SELECT } from '../Actions/GenerateSQL/ACTION_DATA_GRID_GENERATE_SQL_SELECT.js';
 import { ACTION_DATA_GRID_GENERATE_SQL_SELECT_MANY } from '../Actions/GenerateSQL/ACTION_DATA_GRID_GENERATE_SQL_SELECT_MANY.js';
 import { ACTION_DATA_GRID_GENERATE_SQL_UPDATE } from '../Actions/GenerateSQL/ACTION_DATA_GRID_GENERATE_SQL_UPDATE.js';
-import { GeneratedResultSetSqlDialog } from './GenerateSQL/GeneratedResultSetSqlDialog.js';
 import { MENU_DATA_GRID_GENERATE_SQL } from './GenerateSQL/MENU_DATA_GRID_GENERATE_SQL.js';
-import { SqlGenerationService } from './GenerateSQL/SqlGenerationService.js';
 import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
+import { GeneratedSqlDialog, SqlGeneratorsResource } from '@cloudbeaver/plugin-sql-generator';
+import { isNotNullDefined } from '@dbeaver/js-helpers';
+import { executeAsyncSilently } from '@cloudbeaver/core-utils';
 
 const MAX_ROWS_FOR_SQL_GENERATION = 1000;
 
-@injectable(() => [ActionService, MenuService, CommonDialogService, NotificationService, SqlGenerationService])
+@injectable(() => [ActionService, MenuService, CommonDialogService, NotificationService, SqlGeneratorsResource])
 export class DataGridContextMenuGenerateSqlService {
   constructor(
     private readonly actionService: ActionService,
     private readonly menuService: MenuService,
     private readonly commonDialogService: CommonDialogService,
     private readonly notificationService: NotificationService,
-    private readonly sqlGenerationService: SqlGenerationService,
+    private readonly sqlGenerationResource: SqlGeneratorsResource,
   ) {}
 
   register(): void {
@@ -111,6 +112,10 @@ export class DataGridContextMenuGenerateSqlService {
     // Get selected rows or current row
     const select = model.source.tryGetAction(resultIndex, IDatabaseDataSelectAction, GridSelectAction);
     const data = model.source.getAction(resultIndex, ResultSetDataAction);
+    const projectId = model.source.executionContext?.context?.projectId;
+    const connectionId = model.source.executionContext?.context?.connectionId;
+    const contextId = model.source.executionContext?.context?.id;
+    const resultId = model.source.getResult(resultIndex)?.id;
 
     // Extract unique row keys from selected elements (which are IGridDataKey with { row, column })
     const selectedElements = select?.getSelectedElements() || [];
@@ -155,29 +160,34 @@ export class DataGridContextMenuGenerateSqlService {
       this.notificationService.logError({
         title: 'data_grid_table_generate_sql_error_title',
         message: 'data_grid_table_generate_sql_error_no_rows',
-        isSilent: false,
       });
       return;
     }
 
-    try {
-      const generatedSql = await this.sqlGenerationService.generateSql(model, resultIndex, generatorId, rows);
-
-      if (!generatedSql) {
-        this.notificationService.logError({
-          title: 'data_grid_table_generate_sql_error_title',
-          message: 'data_grid_table_generate_sql_error_generation_failed',
-        });
-        return;
-      }
-
-      await this.commonDialogService.open(GeneratedResultSetSqlDialog, {
-        generatedSql,
+    if (!isNotNullDefined(projectId) || !isNotNullDefined(connectionId) || !isNotNullDefined(contextId) || !isNotNullDefined(resultId)) {
+      this.notificationService.logError({
+        title: 'data_grid_table_generate_sql_error_title',
+        message: 'data_grid_table_generate_sql_error_no_connection',
       });
-    } catch (exception: any) {
-      this.notificationService.logException(exception, 'data_grid_table_generate_sql_error_title');
       return;
     }
+
+    const { result, error } = await executeAsyncSilently(() =>
+      this.sqlGenerationResource.generateResultSetSql({
+        projectId,
+        connectionId,
+        contextId,
+        resultsId: resultId,
+        generatorId,
+        selectedRows: rows,
+      }),
+    );
+
+    await this.commonDialogService.open(GeneratedSqlDialog, {
+      query: result ?? '',
+      exception: error,
+      nodeId: connectionId,
+    });
   }
 }
 
