@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -9,12 +9,12 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { ACTION_IMPORT, ActionService, menuExtractItems, MenuService } from '@cloudbeaver/core-view';
 import {
-  ContainerDataSource,
   DATA_CONTEXT_DV_DDM,
   DATA_CONTEXT_DV_DDM_RESULT_INDEX,
   DATA_CONTEXT_DV_PRESENTATION,
   DATA_VIEWER_DATA_MODEL_ACTIONS_MENU,
   DataViewerPresentationType,
+  isDataEditorSource,
   isResultSetDataModel,
 } from '@cloudbeaver/plugin-data-viewer';
 
@@ -99,7 +99,7 @@ export class DataImportBootstrap extends Bootstrap {
         const model = context.get(DATA_CONTEXT_DV_DDM)!;
         const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
         const presentation = context.get(DATA_CONTEXT_DV_PRESENTATION);
-        const isContainer = model.source instanceof ContainerDataSource;
+        const isContainer = isDataEditorSource(model.source);
         return (
           !model.isReadonly(resultIndex) &&
           isContainer &&
