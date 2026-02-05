@@ -46,7 +46,7 @@ export class ConnectionFormSSHPart extends FormPart<INetworkHandlerConfig, IConn
     private readonly connectionInfoNetworkHandlersResource: ConnectionInfoNetworkHandlersResource,
     private readonly optionsPart: ConnectionFormOptionsPart,
   ) {
-    super(formState, getDefaultState(), null, { overrideStateOnInit: true });
+    super(formState, getDefaultState());
   }
 
   override isOutdated(): boolean {
@@ -93,17 +93,10 @@ export class ConnectionFormSSHPart extends FormPart<INetworkHandlerConfig, IConn
     };
   }
 
-  protected override saveChanges(
+  protected override async saveChanges(
     data: IFormState<IConnectionFormState>,
     contexts: IExecutionContextProvider<IFormState<IConnectionFormState>>,
-  ): Promise<void> {
-    if (this.optionsPart.connectionKey) {
-      this.connectionInfoNetworkHandlersResource.markOutdated(this.optionsPart.connectionKey);
-    }
-    this.networkHandlerResource.markOutdated(SSH_TUNNEL_ID);
-
-    return Promise.resolve();
-  }
+  ): Promise<void> {}
 
   protected override format(
     data: IFormState<IConnectionFormState>,

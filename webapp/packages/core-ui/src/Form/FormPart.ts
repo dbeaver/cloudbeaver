@@ -15,15 +15,10 @@ import type { IFormState } from './IFormState.js';
 import { formSubmitContext } from './formSubmitContext.js';
 import { formValidationContext } from './formValidationContext.js';
 
-interface PartOptions {
-  overrideStateOnInit?: boolean;
-}
-
 export abstract class FormPart<TPartState extends object, TFormState = any> implements IFormPart<TPartState> {
   state: TPartState;
   initialState: TPartState;
   isSaving: boolean;
-  overrideStateOnInit: boolean;
 
   exception: Error | null;
   promise: Promise<any> | null;
@@ -36,12 +31,10 @@ export abstract class FormPart<TPartState extends object, TFormState = any> impl
     protected readonly formState: IFormState<TFormState>,
     initialState: TPartState,
     schema: schema.ZodType<TPartState> | null = null,
-    options: PartOptions = { overrideStateOnInit: false },
   ) {
     this.initialState = initialState;
     this.state = toJS(this.initialState);
     this.isSaving = false;
-    this.overrideStateOnInit = options.overrideStateOnInit ?? false;
 
     this.exception = null;
     this.promise = null;
@@ -99,8 +92,8 @@ export abstract class FormPart<TPartState extends object, TFormState = any> impl
   }
 
   async save(data: IFormState<TFormState>, contexts: IExecutionContextProvider<IFormState<TFormState>>): Promise<void> {
-    if (this.promise) {
-      await this.promise;
+    if (this.loading) {
+      return;
     }
 
     this.loading = true;
@@ -132,6 +125,10 @@ export abstract class FormPart<TPartState extends object, TFormState = any> impl
   }
 
   async load(): Promise<void> {
+    if (this.formState.savingPromise) {
+      return;
+    }
+
     if (this.loading) {
       return this.promise;
     }
@@ -188,7 +185,7 @@ export abstract class FormPart<TPartState extends object, TFormState = any> impl
 
     this.initialState = initialState;
 
-    if (isChanged && !this.overrideStateOnInit) {
+    if (isChanged) {
       return;
     }
 
