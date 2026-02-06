@@ -53,4 +53,8 @@ export default [
   ],
   ['plugin_sql_editor_settings_highlight_white_space', 'Подсветить пробелы'],
   ['plugin_sql_editor_settings_highlight_white_space_description', 'Подсветить пробелы, табуляции и другие пробельные символы в редакторе SQL'],
+  [
+    'plugin_sql_editor_query_params_confirmation_description',
+    'Используйте Tab для переключения. Строковые значения должны быть в кавычках. Вы можете использовать выражения в значениях.',
+  ],
 ];

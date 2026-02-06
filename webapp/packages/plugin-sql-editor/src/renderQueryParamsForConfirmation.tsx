@@ -6,13 +6,14 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { PropertiesTable, useResource } from '@cloudbeaver/core-blocks';
+import { PropertiesTable, StatusMessage, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 import { SQLCodeEditor, useSqlDialectExtension } from '@cloudbeaver/plugin-sql-editor-codemirror';
 import { useCodemirrorExtensions } from '@cloudbeaver/plugin-codemirror6';
 import { observer } from 'mobx-react-lite';
 import { useService } from '@cloudbeaver/core-di';
 import { SqlEditorSettingsService } from './SqlEditorSettingsService.js';
 import { ConnectionDialectResource, type IConnectionInfoParams } from '@cloudbeaver/core-connections';
+import { ENotificationType } from '@cloudbeaver/core-events';
 
 export function renderQueryParamsForConfirmation(
   connectionKey: IConnectionInfoParams | null,
@@ -33,6 +34,7 @@ const RenderParametersForm = observer(function RenderParametersForm({
 }) {
   const sqlEditorSettingsService = useService(SqlEditorSettingsService);
   const connectionDialectResource = useResource(RenderParametersForm, ConnectionDialectResource, connectionKey);
+  const translate = useTranslate();
   const sqlDialect = useSqlDialectExtension(connectionDialectResource.data);
   const extensions = useCodemirrorExtensions();
   if (sqlDialect) {
@@ -71,6 +73,8 @@ const RenderParametersForm = observer(function RenderParametersForm({
       {!sqlEditorSettingsService.disabled && (
         <SQLCodeEditor value={query} extensions={extensions} className="tw:overflow-auto tw:flex-1/3" readonly />
       )}
+
+      <StatusMessage message={translate('plugin_sql_editor_query_params_confirmation_description')} type={ENotificationType.Info} multipleRows />
     </div>
   );
 });

@@ -55,4 +55,8 @@ export default [
     'plugin_sql_editor_settings_highlight_white_space_description',
     'Đánh dấu khoảng trắng, tab và các ký tự khoảng trắng khác trong trình soạn thảo SQL',
   ],
+  [
+    'plugin_sql_editor_query_params_confirmation_description',
+    'Sử dụng Tab để chuyển đổi. Giá trị chuỗi phải được đặt trong dấu ngoặc kép. Bạn có thể sử dụng biểu thức trong các giá trị.',
+  ],
 ];

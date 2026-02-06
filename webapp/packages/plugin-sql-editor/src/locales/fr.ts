@@ -60,4 +60,8 @@ export default [
     'plugin_sql_editor_settings_highlight_white_space_description',
     "Mettre en surbrillance les espaces, les tabulations et les autres caractères d'espace blanc dans l'éditeur SQL",
   ],
+  [
+    'plugin_sql_editor_query_params_confirmation_description',
+    'Utilisez Tab pour basculer. Les valeurs de chaîne doivent être entre guillemets. Vous pouvez utiliser des expressions dans les valeurs.',
+  ],
 ];
