@@ -9,6 +9,11 @@
 import { schema } from '@cloudbeaver/core-utils';
 import { CONNECTION_CONFIG_SCHEMA } from '@cloudbeaver/core-connections';
 
-export const CONNECTION_PREFERENCES_FORM_INFO_STATE_SCHEMA = CONNECTION_CONFIG_SCHEMA.pick({ name: true, folder: true });
+export const CONNECTION_PREFERENCES_FORM_INFO_STATE_SCHEMA = CONNECTION_CONFIG_SCHEMA.pick({
+  name: true,
+  folder: true,
+  description: true,
+  driverId: true,
+});
 
 export type IConnectionPreferencesFormInfoState = schema.infer<typeof CONNECTION_PREFERENCES_FORM_INFO_STATE_SCHEMA>;

@@ -7,3 +7,6 @@
  */
 
 import './module.js';
+
+export * from './ConnectionPreferencesForm/ConnectionPreferencesFormService.js';
+export * from './ConnectionPreferencesForm/IConnectionPreferencesFormState.js';

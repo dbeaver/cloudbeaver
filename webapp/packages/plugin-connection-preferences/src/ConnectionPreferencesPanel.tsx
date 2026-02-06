@@ -21,7 +21,7 @@ export const ConnectionPreferencesPanel: React.FC = observer(function Connection
   const close = useCallback(() => service.close(), [service]);
 
   return (
-    <ColoredContainer>
+    <ColoredContainer className='tw:h-full'>
       <Loader suspense>
         {service.formState && <ConnectionPreferencesFormLoader formState={service.formState} onCancel={close} />}
       </Loader>

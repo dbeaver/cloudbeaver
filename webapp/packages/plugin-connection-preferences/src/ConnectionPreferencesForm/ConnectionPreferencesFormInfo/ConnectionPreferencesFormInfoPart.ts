@@ -30,8 +30,10 @@ export class ConnectionPreferencesFormInfoPart extends FormPart<IConnectionPrefe
       const connection = await this.connectionInfoResource.load(key);
 
       this.setInitialState({
+        driverId: connection.driverId,
         name: connection.name,
         folder: connection.folder,
+        description: connection.description,
       });
 
       return;

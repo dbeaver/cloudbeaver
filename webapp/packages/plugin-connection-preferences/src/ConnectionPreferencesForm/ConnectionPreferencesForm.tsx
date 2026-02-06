@@ -63,19 +63,27 @@ export const ConnectionPreferencesForm = observer<ConnectionPreferencesFormProps
   return (
     <Form context={form} contents>
       <TabsState container={connectionPreferencesFormServicee.parts} localState={formState.parts} formState={formState}>
-        <StatusMessage
-          type={exception ? ENotificationType.Error : ENotificationType.Info}
-          message={formState.statusMessage}
-          exception={exception}
-        />
-        <TabList disabled={formState.isDisabled} underline big />
-        <div>
-          <Loader suspense inline hideMessage hideException>
-            <ConnectionPreferencesFormActionsContext.Provider value={actionsContext}>
-              <Placeholder container={connectionPreferencesFormServicee.actionsContainer} formState={formState} />
-            </ConnectionPreferencesFormActionsContext.Provider>
-          </Loader>
-          <div>
+        <div className="tw:flex tw:flex-col tw:flex-1 tw:h-full tw:overflow-auto theme-background-secondary theme-text-on-secondary">
+          <div className="tw:relative tw:flex tw:pt-4 tw:border-b-2 theme-border-color-background theme-background-secondary theme-text-on-secondary">
+            <div className="tw:flex-1 tw:overflow-hidden">
+              <div className="tw:h-6 tw:px-4 tw:flex tw:items-center tw:gap-2 theme-typography-caption tw:overflow-hidden">
+                <StatusMessage
+                  type={exception ? ENotificationType.Error : ENotificationType.Info}
+                  message={formState.statusMessage}
+                  exception={exception}
+                />
+              </div>
+              <TabList className="tw:relative tw:flex-shrink-0 tw:items-center" disabled={formState.isDisabled} underline big />
+            </div>
+            <div className="tw:flex tw:items-center tw:px-6 tw:gap-4">
+              <Loader suspense inline hideMessage hideException>
+                <ConnectionPreferencesFormActionsContext.Provider value={actionsContext}>
+                  <Placeholder container={connectionPreferencesFormServicee.actionsContainer} formState={formState} />
+                </ConnectionPreferencesFormActionsContext.Provider>
+              </Loader>
+            </div>
+          </div>
+          <div className="tw:relative tw:flex tw:flex-1 tw:flex-col tw:overflow-auto theme-background-secondary theme-border-color-background">
             <TabPanelList />
           </div>
         </div>

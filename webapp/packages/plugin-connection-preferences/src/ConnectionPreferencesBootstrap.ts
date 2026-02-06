@@ -39,16 +39,7 @@ export class ConnectionPreferencesBootstrap extends Bootstrap {
       id: 'connection-preferences',
       actions: [ACTION_CONNECTION_PREFERENCES],
       contexts: [DATA_CONTEXT_CONNECTION],
-      isActionApplicable: (context, action) => {
-        if (action === ACTION_CONNECTION_PREFERENCES) {
-          const connectionKey = context.get(DATA_CONTEXT_CONNECTION)!;
-          console.log(connectionKey);
-          return true;
-        }
-
-        return true;
-      },
-      handler: async (context, action) => {
+      handler: async context => {
         const connectionKey = context.get(DATA_CONTEXT_CONNECTION)!;
         await this.connectionPreferencesPanelService.open(connectionKey);
       },
