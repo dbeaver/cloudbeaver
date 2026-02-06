@@ -34,7 +34,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.eclipse.jetty.ee10.servlet.DefaultServlet;
+import org.eclipse.jetty.ee11.servlet.DefaultServlet;
 import org.eclipse.jetty.http.HttpHeader;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
