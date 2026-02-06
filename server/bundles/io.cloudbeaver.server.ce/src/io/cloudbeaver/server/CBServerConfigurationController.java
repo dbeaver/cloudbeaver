@@ -383,12 +383,6 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
         }
     }
 
-
-    public synchronized void updateServerUrl(@NotNull SMCredentialsProvider credentialsProvider,
-        @Nullable String newPublicUrl) throws DBException {
-        getServerConfiguration().setServerURL(newPublicUrl);
-    }
-
     protected Map<String, Object> collectConfigurationProperties(
         @NotNull CBServerConfig serverConfig,
         @NotNull CBAppConfig appConfig
