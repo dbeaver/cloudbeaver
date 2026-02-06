@@ -9,19 +9,25 @@ import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { SqlResultSetGeneratorId, type SqlResultRow } from '@cloudbeaver/core-sdk';
-import { ActionService, MenuService, type IAction } from '@cloudbeaver/core-view';
+import { ActionService, MenuService, type IAction, type IActionInfo } from '@cloudbeaver/core-view';
 import {
   DATA_CONTEXT_DV_DDM,
   DATA_CONTEXT_DV_DDM_RESULT_INDEX,
   DATA_CONTEXT_DV_RESULT_KEY,
   GridDataKeysUtils,
   GridSelectAction,
+  GridViewAction,
+  IDatabaseDataFormatAction,
   IDatabaseDataSelectAction,
+  IDatabaseDataViewAction,
   isResultSetDataModel,
   ResultSetDataAction,
+  ResultSetDataContentAction,
+  type IDatabaseValueHolder,
   type IGridColumnKey,
   type IGridDataKey,
   type IGridRowKey,
+  type IResultSetValue,
 } from '@cloudbeaver/plugin-data-viewer';
 
 import { ACTION_DATA_GRID_GENERATE_SQL_DELETE } from '../Actions/GenerateSQL/ACTION_DATA_GRID_GENERATE_SQL_DELETE.js';
@@ -87,7 +93,24 @@ export class DataGridContextMenuGenerateSqlService {
         ].includes(action),
       isDisabled: context => {
         const model = context.get(DATA_CONTEXT_DV_DDM)!;
-        return model.isLoading();
+
+        if (model.isLoading()) {
+          return true;
+        }
+
+        return hasLobValuesInSelectedRows(context);
+      },
+      getActionInfo: (context, action): IActionInfo => {
+        const actionInfo = action.info;
+
+        if (hasLobValuesInSelectedRows(context)) {
+          return {
+            ...actionInfo,
+            tooltip: 'data_grid_table_generate_sql_disabled_lob_tooltip',
+          };
+        }
+
+        return actionInfo;
       },
       handler: async (context, action) => {
         await this.openSqlDialog(context, mapGeneratorIdFromAction(action));
@@ -165,18 +188,27 @@ function mapGeneratorIdFromAction(action: IAction): SqlResultSetGeneratorId {
   }
 }
 
+function getRowKeys(
+  selectedElements: IGridDataKey<IGridRowKey, IGridColumnKey>[],
+  key: IGridDataKey<IGridRowKey, IGridColumnKey> | undefined,
+): IGridRowKey[] {
+  const rowKeysSet = new Map<string, IGridRowKey>(selectedElements.map(element => [GridDataKeysUtils.serialize(element.row), element.row]));
+  let rowKeys: IGridRowKey[] = Array.from(rowKeysSet.values());
+
+  if (rowKeys.length === 0 && key) {
+    rowKeys = [key.row];
+  }
+
+  return rowKeys;
+}
+
 function getSqlResultRows(
   data: ResultSetDataAction,
   selectedElements: IGridDataKey<IGridRowKey, IGridColumnKey>[],
   key: IGridDataKey<IGridRowKey, IGridColumnKey> | undefined,
 ): SqlResultRow[] {
-  const rowKeysSet = new Map<string, IGridRowKey>(selectedElements.map(element => [GridDataKeysUtils.serialize(element.row), element.row]));
-  let rowKeys: IGridRowKey[] = Array.from(rowKeysSet.values());
+  const rowKeys = getRowKeys(selectedElements, key);
   const result: SqlResultRow[] = [];
-
-  if (rowKeys.length === 0 && key) {
-    rowKeys = [key.row];
-  }
 
   for (const rowKey of rowKeys) {
     const rowValue = data.getRowValue(rowKey);
@@ -191,4 +223,43 @@ function getSqlResultRows(
   }
 
   return result;
+}
+
+function hasLobValuesInSelectedRows(context: IDataContextProvider): boolean {
+  const model = context.get(DATA_CONTEXT_DV_DDM)!;
+  const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
+  const key = context.get(DATA_CONTEXT_DV_RESULT_KEY);
+
+  const format = model.source.getAction(resultIndex, IDatabaseDataFormatAction);
+  const view = model.source.getAction(resultIndex, IDatabaseDataViewAction, GridViewAction);
+  const data = model.source.getAction(resultIndex, ResultSetDataAction);
+  const content = model.source.getAction(resultIndex, ResultSetDataContentAction);
+  const select = model.source.tryGetAction(resultIndex, IDatabaseDataSelectAction, GridSelectAction);
+
+  const selectedElements = select?.getSelectedElements() || [];
+  const rowKeys = getRowKeys(selectedElements, key);
+  const columnKeys = view.columnKeys;
+
+  for (const rowKey of rowKeys) {
+    const rowValue = data.getRowValue(rowKey);
+
+    if (!rowValue) {
+      continue;
+    }
+
+    for (const columnKey of columnKeys) {
+      const cellKey: IGridDataKey = { row: rowKey, column: columnKey };
+      const cellHolder = view.getCellHolder(cellKey) as IDatabaseValueHolder<IGridDataKey, IResultSetValue>;
+
+      if (format.isBinary(cellHolder)) {
+        return true;
+      }
+
+      if (content.isTextTruncated(cellHolder) || content.isBlobTruncated(cellHolder)) {
+        return true;
+      }
+    }
+  }
+
+  return false;
 }
