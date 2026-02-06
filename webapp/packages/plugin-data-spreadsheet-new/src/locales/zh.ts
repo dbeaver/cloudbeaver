@@ -49,7 +49,6 @@ export default [
   ['data_grid_table_generate_sql_dialog_title', '生成的 SQL'],
   ['data_grid_table_generate_sql_error_title', 'SQL 生成错误'],
   ['data_grid_table_generate_sql_error_no_connection', '未知的执行上下文'],
-  ['data_grid_table_generate_sql_error_too_many_rows', '选择的行数过多。最大允许：1000'],
   ['data_grid_table_generate_sql_error_no_rows', '未选择任何行'],
   ['data_grid_table_generate_sql_error_no_result', '没有可用的结果集'],
   ['data_grid_table_generate_sql_error_no_context', '没有可用的执行上下文'],

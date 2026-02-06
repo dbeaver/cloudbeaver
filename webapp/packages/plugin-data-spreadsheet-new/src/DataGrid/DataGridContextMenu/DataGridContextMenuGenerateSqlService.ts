@@ -14,11 +14,14 @@ import {
   DATA_CONTEXT_DV_DDM,
   DATA_CONTEXT_DV_DDM_RESULT_INDEX,
   DATA_CONTEXT_DV_RESULT_KEY,
+  GridDataKeysUtils,
   GridSelectAction,
   IDatabaseDataSelectAction,
   isDataEditorSource,
   isResultSetDataModel,
   ResultSetDataAction,
+  type IGridColumnKey,
+  type IGridDataKey,
   type IGridRowKey,
 } from '@cloudbeaver/plugin-data-viewer';
 
@@ -32,8 +35,6 @@ import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
 import { GeneratedSqlDialog, SqlGeneratorsResource } from '@cloudbeaver/plugin-sql-generator';
 import { isNotNullDefined } from '@dbeaver/js-helpers';
 import { executeAsyncSilently } from '@cloudbeaver/core-utils';
-
-const MAX_ROWS_FOR_SQL_GENERATION = 1000;
 
 @injectable(() => [ActionService, MenuService, CommonDialogService, NotificationService, SqlGeneratorsResource])
 export class DataGridContextMenuGenerateSqlService {
@@ -110,42 +111,8 @@ export class DataGridContextMenuGenerateSqlService {
     const connectionId = model.source.executionContext?.context?.connectionId;
     const contextId = model.source.executionContext?.context?.id;
     const resultId = model.source.getResult(resultIndex)?.id;
-
     const selectedElements = select?.getSelectedElements() || [];
-    const rowKeysSet = new Map<string, IGridRowKey>();
-    for (const element of selectedElements) {
-      const rowKey = element.row;
-      const serialized = `${rowKey.index}:${rowKey.subIndex}`;
-      if (!rowKeysSet.has(serialized)) {
-        rowKeysSet.set(serialized, rowKey);
-      }
-    }
-    let rowKeys: IGridRowKey[] = Array.from(rowKeysSet.values());
-
-    if (rowKeys.length === 0 && key) {
-      rowKeys = [key.row];
-    }
-
-    if (rowKeys.length > MAX_ROWS_FOR_SQL_GENERATION) {
-      this.notificationService.logError({
-        title: 'data_grid_table_generate_sql_error_title',
-        message: 'data_grid_table_generate_sql_error_too_many_rows',
-        isSilent: false,
-      });
-      return;
-    }
-
-    const rows: SqlResultRow[] = [];
-    for (const rowKey of rowKeys) {
-      const rowValue = data.getRowValue(rowKey);
-      const rowMetadata = data.getRowMetadata(rowKey);
-      if (rowValue) {
-        rows.push({
-          data: rowValue,
-          metaData: rowMetadata,
-        });
-      }
-    }
+    const rows = getSqlResultRows(data, selectedElements, key);
 
     if (rows.length === 0) {
       this.notificationService.logError({
@@ -197,4 +164,32 @@ function mapGeneratorIdFromAction(action: IAction): SqlResultSetGeneratorId {
     default:
       return SqlResultSetGeneratorId.DataInsert;
   }
+}
+
+function getSqlResultRows(
+  data: ResultSetDataAction,
+  selectedElements: IGridDataKey<IGridRowKey, IGridColumnKey>[],
+  key: IGridDataKey<IGridRowKey, IGridColumnKey> | undefined,
+): SqlResultRow[] {
+  const rowKeysSet = new Map<string, IGridRowKey>(selectedElements.map(element => [GridDataKeysUtils.serialize(element.row), element.row]));
+  let rowKeys: IGridRowKey[] = Array.from(rowKeysSet.values());
+  const result: SqlResultRow[] = [];
+
+  if (rowKeys.length === 0 && key) {
+    rowKeys = [key.row];
+  }
+
+  for (const rowKey of rowKeys) {
+    const rowValue = data.getRowValue(rowKey);
+    const rowMetadata = data.getRowMetadata(rowKey);
+
+    if (rowValue) {
+      result.push({
+        data: rowValue,
+        metaData: rowMetadata,
+      });
+    }
+  }
+
+  return result;
 }

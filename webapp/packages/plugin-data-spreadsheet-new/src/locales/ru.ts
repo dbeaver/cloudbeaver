@@ -50,7 +50,6 @@ export default [
   ['data_grid_table_generate_sql_dialog_title', 'Сгенерированный SQL'],
   ['data_grid_table_generate_sql_error_title', 'Ошибка генерации SQL'],
   ['data_grid_table_generate_sql_error_no_connection', 'Неизвестный контекст выполнения'],
-  ['data_grid_table_generate_sql_error_too_many_rows', 'Выбрано слишком много строк. Максимум: 1000'],
   ['data_grid_table_generate_sql_error_no_rows', 'Не выбрано ни одной строки'],
   ['data_grid_table_generate_sql_error_no_result', 'Результаты недоступны'],
   ['data_grid_table_generate_sql_error_no_context', 'Контекст выполнения недоступен'],

@@ -44,7 +44,6 @@ export default [
   ['data_grid_table_generate_sql_dialog_title', 'SQL Generato'],
   ['data_grid_table_generate_sql_error_title', 'Errore di generazione SQL'],
   ['data_grid_table_generate_sql_error_no_connection', 'Contesto di esecuzione sconosciuto'],
-  ['data_grid_table_generate_sql_error_too_many_rows', 'Troppe righe selezionate. Massimo consentito: 1000'],
   ['data_grid_table_generate_sql_error_no_rows', 'Nessuna riga selezionata'],
   ['data_grid_table_generate_sql_error_no_result', 'Nessun set di risultati disponibile'],
   ['data_grid_table_generate_sql_error_no_context', 'Nessun contesto di esecuzione disponibile'],
