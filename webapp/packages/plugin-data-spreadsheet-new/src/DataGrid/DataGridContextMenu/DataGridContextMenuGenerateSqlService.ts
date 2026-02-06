@@ -58,7 +58,9 @@ export class DataGridContextMenuGenerateSqlService {
       contexts: [DATA_CONTEXT_DV_DDM, DATA_CONTEXT_DV_DDM_RESULT_INDEX, DATA_CONTEXT_DV_RESULT_KEY],
       isApplicable: context => {
         const model = context.get(DATA_CONTEXT_DV_DDM);
-        return isResultSetDataModel(model);
+        const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
+
+        return isResultSetDataModel(model) && !model.source.isReadonly(resultIndex);
       },
       getItems: (context, items) => [...items, MENU_DATA_GRID_GENERATE_SQL],
     });
@@ -68,7 +70,8 @@ export class DataGridContextMenuGenerateSqlService {
       contexts: [DATA_CONTEXT_DV_DDM, DATA_CONTEXT_DV_DDM_RESULT_INDEX, DATA_CONTEXT_DV_RESULT_KEY],
       isApplicable: context => {
         const model = context.get(DATA_CONTEXT_DV_DDM);
-        return isResultSetDataModel(model);
+        const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
+        return isResultSetDataModel(model) && !model.source.isReadonly(resultIndex);
       },
       getItems: () => [
         ACTION_DATA_GRID_GENERATE_SQL_INSERT,
