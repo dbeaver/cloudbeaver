@@ -104,4 +104,9 @@ public class CBApplicationCE extends CBApplication<CBServerConfig> {
             embeddedSecurityController.finishConfiguration(adminName, adminPassword, authInfoList);
         }
     }
+
+    @Override
+    public boolean isCommunity() {
+        return true;
+    }
 }
