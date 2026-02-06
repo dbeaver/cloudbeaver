@@ -274,7 +274,3 @@ export class ContainerDataSource extends ResultSetDataSource<IDataContainerOptio
     return this.executionContext!;
   }
 }
-
-export function isDataEditorSource(source: unknown): source is ContainerDataSource {
-  return source instanceof ContainerDataSource;
-}

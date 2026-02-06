@@ -17,7 +17,6 @@ import {
   GridDataKeysUtils,
   GridSelectAction,
   IDatabaseDataSelectAction,
-  isDataEditorSource,
   isResultSetDataModel,
   ResultSetDataAction,
   type IGridColumnKey,
@@ -53,7 +52,7 @@ export class DataGridContextMenuGenerateSqlService {
       contexts: [DATA_CONTEXT_DV_DDM, DATA_CONTEXT_DV_DDM_RESULT_INDEX, DATA_CONTEXT_DV_RESULT_KEY],
       isApplicable: context => {
         const model = context.get(DATA_CONTEXT_DV_DDM);
-        return isResultSetDataModel(model) && !isDataEditorSource(model.source);
+        return isResultSetDataModel(model);
       },
       getItems: (context, items) => [...items, MENU_DATA_GRID_GENERATE_SQL],
     });
@@ -63,7 +62,7 @@ export class DataGridContextMenuGenerateSqlService {
       contexts: [DATA_CONTEXT_DV_DDM, DATA_CONTEXT_DV_DDM_RESULT_INDEX, DATA_CONTEXT_DV_RESULT_KEY],
       isApplicable: context => {
         const model = context.get(DATA_CONTEXT_DV_DDM);
-        return isResultSetDataModel(model) && !isDataEditorSource(model.source);
+        return isResultSetDataModel(model);
       },
       getItems: () => [
         ACTION_DATA_GRID_GENERATE_SQL_INSERT,
