@@ -7,6 +7,7 @@
  */
 import {
   ConnectionInfoAuthPropertiesResource,
+  ConnectionInfoProjectKey,
   ConnectionInfoResource,
   ConnectionsManagerService,
   ConnectionsSettingsService,
@@ -164,7 +165,10 @@ export class ConnectionMenuBootstrap extends Bootstrap {
           }
           case ACTION_CONNECTION_CLONE: {
             try {
-              const existingConnections = this.connectionInfoResource.values.filter(
+              // Load all connections for the project first to ensure we have them all to generate a unique name for the cloned connection
+              await this.connectionInfoResource.load(ConnectionInfoProjectKey(connection.projectId));
+
+              const existingConnections = this.connectionsManagerService.projectConnections.filter(
                 c => c.projectId === connection.projectId && c.folder === connection.folder,
               );
               const newName = getUniqueName(
