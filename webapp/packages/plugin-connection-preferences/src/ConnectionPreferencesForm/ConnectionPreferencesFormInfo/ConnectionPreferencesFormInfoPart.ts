@@ -27,6 +27,8 @@ export class ConnectionPreferencesFormInfoPart extends FormPart<IConnectionPrefe
   protected override async loader(): Promise<void> {
     if (this.formState.mode === 'edit' && this.formState.state) {
       const key = createConnectionParam(this.formState.state.projectId, this.formState.state.connectionId);
+
+      // probably should implement a separate method as we can load only public accessible connection info here (not implemeted on the backend yet)
       const connection = await this.connectionInfoResource.load(key);
 
       this.setInitialState({

@@ -6,6 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { action, makeObservable, observable } from 'mobx';
+
 import { injectable, IServiceProvider } from '@cloudbeaver/core-di';
 import { FormMode, OptionsPanelService } from '@cloudbeaver/core-ui';
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
@@ -28,17 +30,26 @@ export class ConnectionPreferencesPanelService {
     private readonly connectionPreferencesFormService: ConnectionPreferencesFormService,
   ) {
     this.formState = null;
+
+    makeObservable(this, {
+      formState: observable.shallow,
+      open: action,
+      close: action,
+    });
   }
 
-  async open(connectionKey: IConnectionInfoParams): Promise<void> {
+  async open(connectionKey: IConnectionInfoParams): Promise<boolean> {
     const opened = await this.optionsPanelService.open(formGetter);
 
     if (opened) {
+      this.formState?.dispose();
       this.formState = new ConnectionPreferencesFormState(this.serviceProvider, this.connectionPreferencesFormService, {
         projectId: connectionKey.projectId,
         connectionId: connectionKey.connectionId,
       }).setMode(FormMode.Edit);
     }
+
+    return opened;
   }
 
   async close(): Promise<void> {
