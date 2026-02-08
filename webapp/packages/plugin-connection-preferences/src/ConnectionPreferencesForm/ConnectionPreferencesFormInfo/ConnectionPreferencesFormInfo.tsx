@@ -16,7 +16,6 @@ import { DBDriverResource } from '@cloudbeaver/core-connections';
 import type { IConnectionPreferencesFormProps } from '../IConnectionPreferencesFormState.js';
 import { getConnectionPreferencesFormInfoPart } from './getConnectionPreferencesFormInfoPart.js';
 
-
 export const ConnectionPreferencesFormInfo: TabContainerPanelComponent<IConnectionPreferencesFormProps> = observer(function ConnectionPreferencesFormInfo({ formState, tabId }) {
   const translate = useTranslate();
   const infoPart = getConnectionPreferencesFormInfoPart(formState);

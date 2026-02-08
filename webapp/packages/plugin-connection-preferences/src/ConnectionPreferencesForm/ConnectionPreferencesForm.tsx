@@ -11,7 +11,6 @@ import { observer } from 'mobx-react-lite';
 import { Form, Loader, Placeholder, StatusMessage, useForm, useObjectRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { ENotificationType, NotificationService } from '@cloudbeaver/core-events';
-import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
 import { ExecutionContext } from '@cloudbeaver/core-executor';
 import { TabList, TabPanelList, TabsState, type IFormState } from '@cloudbeaver/core-ui';
 import { getFirstException } from '@cloudbeaver/core-utils';
@@ -25,10 +24,9 @@ import { getConnectionPreferencesFormInfoPart } from './ConnectionPreferencesFor
 export interface ConnectionPreferencesFormProps {
   formState: ConnectionPreferencesFormState;
   onCancel?: () => void;
-  onSave?: (config: ConnectionConfig) => void;
 }
 
-export const ConnectionPreferencesForm = observer<ConnectionPreferencesFormProps>(function ConnectionPreferencesForm({ formState, onCancel, onSave = () => { } }) {
+export const ConnectionPreferencesForm = observer<ConnectionPreferencesFormProps>(function ConnectionPreferencesForm({ formState, onCancel }) {
   const connectionPreferencesFormServicee = useService(ConnectionPreferencesFormService);
   const notificationService = useService(NotificationService);
 
@@ -36,7 +34,7 @@ export const ConnectionPreferencesForm = observer<ConnectionPreferencesFormProps
   const exception = getFirstException(formState.exception);
 
   const form = useForm({
-    onSubmit: async event => {
+    onSubmit: async () => {
       const context = new ExecutionContext<IFormState<IConnectionPreferencesFormState>>(formState);
 
       const saved = await formState.save(context);
@@ -49,8 +47,6 @@ export const ConnectionPreferencesForm = observer<ConnectionPreferencesFormProps
           },
           ENotificationType.Success,
         );
-
-        onSave(infoPart.state);
       }
     },
   });

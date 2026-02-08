@@ -13,10 +13,10 @@ import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { ConnectionPreferencesFormInfoPart } from './ConnectionPreferencesFormInfoPart.js';
 import type { IConnectionPreferencesFormState } from '../IConnectionPreferencesFormState.js';
 
-const DATA_CONTEXT_TEAM_FORM_OPTIONS_PART = createDataContext<ConnectionPreferencesFormInfoPart>('Connection Preferences Info Part');
+const DATA_CONTEXT_CONNECTION_PREFERENCES_FORM_INFO_PART = createDataContext<ConnectionPreferencesFormInfoPart>('Connection Preferences Info Part');
 
 export function getConnectionPreferencesFormInfoPart(formState: IFormState<IConnectionPreferencesFormState>): ConnectionPreferencesFormInfoPart {
-  return formState.getPart(DATA_CONTEXT_TEAM_FORM_OPTIONS_PART, context => {
+  return formState.getPart(DATA_CONTEXT_CONNECTION_PREFERENCES_FORM_INFO_PART, context => {
     const di = context.get(DATA_CONTEXT_DI_PROVIDER)!;
     const connectionInfoResource = di.getService(ConnectionInfoResource);
 
