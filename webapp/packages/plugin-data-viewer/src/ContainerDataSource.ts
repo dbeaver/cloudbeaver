@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -87,9 +87,11 @@ export class ContainerDataSource extends ResultSetDataSource<IDataContainerOptio
 
     try {
       const response = await this.currentTask;
+      const executedQuery = response.fullQuery || '';
 
       this.requestInfo = {
-        originalQuery: response.fullQuery || '',
+        originalQuery: response.originalQuery || executedQuery,
+        fullQuery: executedQuery,
         requestDuration: response.duration || 0,
         requestMessage: response.statusMessage || '',
         requestFilter: response.filterText || '',

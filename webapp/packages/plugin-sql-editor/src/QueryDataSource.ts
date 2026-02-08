@@ -80,6 +80,7 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
     this.currentTask = null;
     this.requestInfo = {
       originalQuery: '',
+      fullQuery: '',
       requestDuration: 0,
       requestMessage: '',
       requestFilter: '',
@@ -342,8 +343,11 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
     response: SqlExecuteInfo,
     limit: number,
   ): IDatabaseResultSet[] | null {
+    const executedQuery = response.fullQuery || this.options?.query || '';
+
     this.requestInfo = {
-      originalQuery: response.originalQuery || response.fullQuery || this.options?.query || '',
+      originalQuery: response.originalQuery || executedQuery,
+      fullQuery: executedQuery,
       requestDuration: response.duration || 0,
       requestMessage: response.statusMessage || '',
       requestFilter: response.filterText || '',

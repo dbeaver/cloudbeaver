@@ -27,7 +27,10 @@ export interface IDatabaseDataSourceOperationEvent {
 }
 
 export interface IRequestInfo {
+  /** The original query template with variables intact (e.g., SELECT :columnName FROM table) */
   readonly originalQuery: string;
+  /** The full query that was actually executed with all substitutions and filters applied */
+  readonly fullQuery: string;
   readonly requestDuration: number;
   readonly requestMessage: string | TLocalizationToken;
   /** A string representation of the filters constraints applied to the data request. Also returns as it is in case of whereFilter */

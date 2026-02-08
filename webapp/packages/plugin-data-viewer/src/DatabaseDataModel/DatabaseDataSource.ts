@@ -86,6 +86,7 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
     this.supportedDataFormats = [];
     this.requestInfo = {
       originalQuery: '',
+      fullQuery: '',
       requestDuration: 0,
       requestMessage: '',
       requestFilter: '',
