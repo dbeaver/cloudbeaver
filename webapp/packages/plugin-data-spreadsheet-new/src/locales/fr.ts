@@ -46,11 +46,13 @@ export default [
   ['data_grid_table_generate_sql_select_tooltip', 'Générer une instruction SELECT avec clause WHERE'],
   ['data_grid_table_generate_sql_select_many', 'SELECT (IN)'],
   ['data_grid_table_generate_sql_select_many_tooltip', 'Générer une instruction SELECT avec clause WHERE IN'],
-  ['data_grid_table_generate_sql_dialog_title', 'SQL Généré'],
   ['data_grid_table_generate_sql_error_title', 'Erreur de génération SQL'],
   ['data_grid_table_generate_sql_error_no_connection', "Contexte d'exécution inconnu"],
   ['data_grid_table_generate_sql_error_no_rows', 'Aucune ligne sélectionnée'],
   ['data_grid_table_generate_sql_error_no_result', 'Aucun ensemble de résultats disponible'],
   ['data_grid_table_generate_sql_error_no_context', "Aucun contexte d'exécution disponible"],
-  ['data_grid_table_generate_sql_disabled_lob_tooltip', 'La génération SQL n\'est pas disponible pour les lignes contenant des valeurs LOB ou tronquées'],
+  [
+    'data_grid_table_generate_sql_disabled_lob_tooltip',
+    "La génération SQL n'est pas disponible pour les lignes contenant des valeurs LOB ou tronquées",
+  ],
 ];

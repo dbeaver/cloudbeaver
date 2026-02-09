@@ -66,7 +66,7 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<Payload>>(functi
           {payload.exception && (
             <ErrorMessage
               className={s(styles, { errorMessage: true })}
-              text={getFirstException(payload.exception)?.message ?? 'Unknown error'}
+              text={getFirstException(payload.exception)?.message ?? translate('ui_unknown_error')}
               hasDetails={error.hasDetails}
               onShowDetails={error.open}
             />

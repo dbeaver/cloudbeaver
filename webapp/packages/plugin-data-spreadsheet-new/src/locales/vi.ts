@@ -47,7 +47,6 @@ export default [
   ['data_grid_table_generate_sql_select_tooltip', 'Tạo câu lệnh SELECT với điều kiện WHERE'],
   ['data_grid_table_generate_sql_select_many', 'SELECT (IN)'],
   ['data_grid_table_generate_sql_select_many_tooltip', 'Tạo câu lệnh SELECT với điều kiện WHERE IN'],
-  ['data_grid_table_generate_sql_dialog_title', 'SQL Đã Tạo'],
   ['data_grid_table_generate_sql_error_title', 'Lỗi Tạo SQL'],
   ['data_grid_table_generate_sql_error_no_connection', 'Ngữ cảnh thực thi không xác định'],
   ['data_grid_table_generate_sql_error_no_rows', 'Không có hàng nào được chọn'],

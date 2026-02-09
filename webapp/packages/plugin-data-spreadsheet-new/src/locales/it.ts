@@ -41,7 +41,6 @@ export default [
   ['data_grid_table_generate_sql_select_tooltip', 'Genera istruzione SELECT con clausola WHERE'],
   ['data_grid_table_generate_sql_select_many', 'SELECT (IN)'],
   ['data_grid_table_generate_sql_select_many_tooltip', 'Genera istruzione SELECT con clausola WHERE IN'],
-  ['data_grid_table_generate_sql_dialog_title', 'SQL Generato'],
   ['data_grid_table_generate_sql_error_title', 'Errore di generazione SQL'],
   ['data_grid_table_generate_sql_error_no_connection', 'Contesto di esecuzione sconosciuto'],
   ['data_grid_table_generate_sql_error_no_rows', 'Nessuna riga selezionata'],

@@ -47,7 +47,6 @@ export default [
   ['data_grid_table_generate_sql_select_tooltip', 'Сгенерировать SELECT-запрос с WHERE'],
   ['data_grid_table_generate_sql_select_many', 'SELECT (IN)'],
   ['data_grid_table_generate_sql_select_many_tooltip', 'Сгенерировать SELECT-запрос с WHERE IN'],
-  ['data_grid_table_generate_sql_dialog_title', 'Сгенерированный SQL'],
   ['data_grid_table_generate_sql_error_title', 'Ошибка генерации SQL'],
   ['data_grid_table_generate_sql_error_no_connection', 'Неизвестный контекст выполнения'],
   ['data_grid_table_generate_sql_error_no_rows', 'Не выбрано ни одной строки'],

@@ -37,6 +37,7 @@ export default [
   ['ui_reject', 'Отклонить'],
   ['ui_ignore', 'Пропустить'],
   ['ui_error', 'Ошибка'],
+  ['ui_unknown_error', 'Неизвестная ошибка'],
   ['ui_error_message', 'Ошибка:'],
   ['ui_error_close', 'Закрыть'],
   ['ui_clear', 'Очистить'],

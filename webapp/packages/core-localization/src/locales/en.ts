@@ -41,6 +41,7 @@ export default [
   ['ui_ignore', 'Ignore'],
   ['ui_unexpected_error', 'Unexpected error'],
   ['ui_error', 'Error'],
+  ['ui_unknown_error', 'Unknown Error'],
   ['ui_error_message', 'Error:'],
   ['ui_error_close', 'Close'],
   ['ui_clear', 'Clear'],

@@ -38,6 +38,7 @@ export default [
   ['ui_reject', 'Reject'],
   ['ui_ignore', 'Ignore'],
   ['ui_error', 'Errore'],
+  ['ui_unknown_error', 'Errore sconosciuto'],
   ['ui_error_message', 'Errore:'],
   ['ui_error_close', 'Chiudi'],
   ['ui_clear', 'Clear'],

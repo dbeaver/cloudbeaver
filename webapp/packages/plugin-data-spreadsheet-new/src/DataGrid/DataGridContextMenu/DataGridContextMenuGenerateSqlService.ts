@@ -39,7 +39,6 @@ import { MENU_DATA_GRID_GENERATE_SQL } from './GenerateSQL/MENU_DATA_GRID_GENERA
 import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
 import { GeneratedSqlDialog, SqlGeneratorsResource } from '@cloudbeaver/plugin-sql-generator';
 import { isNotNullDefined } from '@dbeaver/js-helpers';
-import { executeAsyncSilently } from '@cloudbeaver/core-utils';
 
 @injectable(() => [ActionService, MenuService, CommonDialogService, NotificationService, SqlGeneratorsResource])
 export class DataGridContextMenuGenerateSqlService {
@@ -101,12 +100,12 @@ export class DataGridContextMenuGenerateSqlService {
           return true;
         }
 
-        return hasLobValuesInSelectedRows(context);
+        return hasLargeObjectValuesInSelectedRows(context);
       },
       getActionInfo: (context, action): IActionInfo => {
         const actionInfo = action.info;
 
-        if (hasLobValuesInSelectedRows(context)) {
+        if (hasLargeObjectValuesInSelectedRows(context)) {
           return {
             ...actionInfo,
             tooltip: 'data_grid_table_generate_sql_disabled_lob_tooltip',
@@ -155,20 +154,25 @@ export class DataGridContextMenuGenerateSqlService {
       return;
     }
 
-    const { result, error } = await executeAsyncSilently(() =>
-      this.sqlGenerationResource.generateResultSetSql({
+    let query = '';
+    let exception: Error | null = null;
+
+    try {
+      query = this.sqlGenerationResource.generateResultSetSql({
         projectId,
         connectionId,
         contextId,
         resultsId: resultId,
         generatorId,
         selectedRows: rows,
-      }),
-    );
+      });
+    } catch (e: unknown) {
+      exception = e as Error;
+    }
 
     await this.commonDialogService.open(GeneratedSqlDialog, {
-      query: result ?? '',
-      exception: error,
+      query,
+      exception,
       nodeId: connectionId,
     });
   }
@@ -186,8 +190,9 @@ function mapGeneratorIdFromAction(action: IAction): SqlResultSetGeneratorId {
       return SqlResultSetGeneratorId.DataSelect;
     case ACTION_DATA_GRID_GENERATE_SQL_SELECT_MANY:
       return SqlResultSetGeneratorId.DataSelectMany;
-    default:
-      return SqlResultSetGeneratorId.DataInsert;
+    default: {
+      throw new Error(`Unsupported action for SQL generation: ${action.id}`);
+    }
   }
 }
 
@@ -195,8 +200,8 @@ function getRowKeys(
   selectedElements: IGridDataKey<IGridRowKey, IGridColumnKey>[],
   key: IGridDataKey<IGridRowKey, IGridColumnKey> | undefined,
 ): IGridRowKey[] {
-  const rowKeysSet = new Map<string, IGridRowKey>(selectedElements.map(element => [GridDataKeysUtils.serialize(element.row), element.row]));
-  let rowKeys: IGridRowKey[] = Array.from(rowKeysSet.values());
+  const rowKeysMap = new Map<string, IGridRowKey>(selectedElements.map(element => [GridDataKeysUtils.serialize(element.row), element.row]));
+  let rowKeys: IGridRowKey[] = Array.from(rowKeysMap.values());
 
   if (rowKeys.length === 0 && key) {
     rowKeys = [key.row];
@@ -228,7 +233,7 @@ function getSqlResultRows(
   return result;
 }
 
-function hasLobValuesInSelectedRows(context: IDataContextProvider): boolean {
+function hasLargeObjectValuesInSelectedRows(context: IDataContextProvider): boolean {
   const model = context.get(DATA_CONTEXT_DV_DDM)!;
   const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
   const key = context.get(DATA_CONTEXT_DV_RESULT_KEY);
