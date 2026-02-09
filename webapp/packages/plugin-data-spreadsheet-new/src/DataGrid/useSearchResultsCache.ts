@@ -21,6 +21,12 @@ export function useSearchResultsCache(cacheAction: ResultSetCacheAction): IGridS
       set(state: ISearchState): void {
         cacheAction.setGlobal(SEARCH_STORAGE_KEY, state);
       },
+      update(partial: Partial<ISearchState>): void {
+        const current = cacheAction.getGlobal<ISearchState>(SEARCH_STORAGE_KEY);
+        if (current) {
+          cacheAction.setGlobal(SEARCH_STORAGE_KEY, { ...current, ...partial });
+        }
+      },
     }),
     [cacheAction],
   );

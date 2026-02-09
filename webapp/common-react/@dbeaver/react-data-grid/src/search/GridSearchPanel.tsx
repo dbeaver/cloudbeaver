@@ -67,6 +67,10 @@ export const GridSearchPanel = forwardRef<GridSearchPanelRef, GridSearchPanelPro
     return () => onCellClassNameChange(undefined);
   }, [getCellClassName, onCellClassNameChange]);
 
+  useEffect(() => {
+    panelRef.current?.focus();
+  }, []);
+
   useImperativeHandle(ref, () => ({
     focus,
     refresh,

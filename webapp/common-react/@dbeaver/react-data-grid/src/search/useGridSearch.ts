@@ -30,6 +30,7 @@ export interface ISearchState {
 export interface IGridSearchStorage {
   get(): ISearchState | undefined;
   set(state: ISearchState): void;
+  update(state: Partial<ISearchState>): void;
 }
 const MATCH_CLASS = 'rdg-cell-search-match';
 const ACTIVE_CLASS = 'rdg-cell-search-match rdg-cell-search-active';
@@ -403,17 +404,8 @@ function createActions(store: GridSearchStore): IGridSearchActions {
     },
 
     close(): void {
-      store.options.storage?.set({
-        matchedCells: store.matchedCells,
-        activeMatchIdx: store.activeMatchIdx,
-        query: store.query,
-        replace: store.replace,
-        caseSensitive: store.caseSensitive,
-        wholeWord: store.wholeWord,
-        regexp: store.regexp,
-        replaceOpen: store.replaceOpen,
-        open: false,
-      });
+      syncState(store);
+      store.options.storage?.update({ open: false });
     },
   };
 }

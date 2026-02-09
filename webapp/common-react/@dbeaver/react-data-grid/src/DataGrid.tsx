@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
+import { forwardRef, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import {
   DataGrid as DataGridBase,
   type ColumnOrColumnGroup,
@@ -29,8 +29,9 @@ import { mapEditCellRenderer } from './mapEditCellRenderer.js';
 import { DataGridRowContext, type IDataGridRowContext } from './DataGridRowContext.js';
 import './DataGrid.css';
 import { HeaderDnDContext, isColumn, useHeaderDnD } from './useHeaderDnD.js';
-import type { ICellValueUpdate, IGridSearchStorage } from './search/useGridSearch.js';
-import { GridSearchPanel, type GridSearchPanelRef } from './search/GridSearchPanel.js';
+import type { IGridSearchStorage } from './search/useGridSearch.js';
+import { GridSearchPanel } from './search/GridSearchPanel.js';
+import { useDataGridSearch } from './useDataGridSearch.js';
 
 export interface ICellPosition {
   rowIdx: number;
@@ -118,68 +119,18 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
   const rowsCountRef = useRef(rowsCount);
   const innerGridRef = useRef<DataGridHandle<IInnerRow, unknown>>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const searchPanelRef = useRef<GridSearchPanelRef>(null);
-  const isReplacingRef = useRef(false);
-
-  const [searchOpen, setSearchOpen] = useState(() => searchStorage?.get()?.open ?? false);
-  const [searchCellClassName, setSearchCellClassName] = useState<IGridReactiveValue<string | undefined, [number, number]>>();
-
-  useEffect(() => {
-    const el = containerRef.current;
-    if (!el) {
-      return;
-    }
-
-    function handleKeyDown(e: KeyboardEvent) {
-      if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
-        e.preventDefault();
-        setSearchOpen(true);
-        setTimeout(() => searchPanelRef.current?.focus(), 0);
-      }
-    }
-
-    el.addEventListener('keydown', handleKeyDown);
-    return () => el.removeEventListener('keydown', handleKeyDown);
-  }, []);
-
-  function handleSearchOpen() {
-    setSearchOpen(true);
-    setTimeout(() => searchPanelRef.current?.focus(), 0);
-  }
-
-  function handleSearchClose() {
-    setSearchOpen(false);
-    const cached = searchStorage?.get();
-    if (cached) {
-      searchStorage?.set({ ...cached, open: false });
-    }
-    containerRef.current?.querySelector<HTMLDivElement>('[aria-selected="true"]')?.focus();
-  }
-
-  function replaceCellValue(rowIdx: number, colIdx: number, value: string) {
-    if (getCellEditable?.(rowIdx, colIdx) === false) {
-      return;
-    }
-    onCellChange?.(rowIdx, colIdx, value);
-  }
-
-  function replaceCellValues(updates: ICellValueUpdate[]) {
-    const validUpdates = updates.filter(u => getCellEditable?.(u.rowIdx, u.colIdx) !== false);
-    if (validUpdates.length === 0) {
-      return;
-    }
-    if (onCellChangeBatch) {
-      onCellChangeBatch(validUpdates);
-    } else {
-      for (const update of validUpdates) {
-        onCellChange?.(update.rowIdx, update.colIdx, update.value);
-      }
-    }
-  }
-
-  function handleReplacingChange(value: boolean) {
-    isReplacingRef.current = value;
-  }
+  const {
+    searchOpen,
+    searchCellClassName,
+    searchPanelRef,
+    isReplacingRef,
+    handleSearchOpen,
+    handleSearchClose,
+    replaceCellValue,
+    replaceCellValues,
+    handleReplacingChange,
+    setSearchCellClassName,
+  } = useDataGridSearch({ containerRef, searchStorage, getCellEditable, onCellChange, onCellChangeBatch });
 
   function scrollToCell(rowIdx: number, colIdx: number) {
     innerGridRef.current?.scrollToCell({ idx: colIdx, rowIdx });
