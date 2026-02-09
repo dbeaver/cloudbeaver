@@ -297,7 +297,7 @@ public class WebConnectionInfo {
 
     @Property
     @NotNull
-    public Map<String, String> defaultUserSettings() {
+    public Map<String, String> getDefaultUserSettings() {
         DBPPreferenceStore preferenceStore = dataSourceContainer.getPreferenceStore();
         if (preferenceStore instanceof DataSourcePreferenceStore dataSourcePreferenceStore) {
             return dataSourcePreferenceStore.getProperties();
@@ -591,13 +591,4 @@ public class WebConnectionInfo {
         this.credentialsSavedInSession = credentialsSavedInSession;
     }
 
-
-    @Property
-    public Map<String, String> getConnectionPreferences() {
-        DBPPreferenceStore preferenceStore = dataSourceContainer.getPreferenceStore();
-        if (preferenceStore instanceof DataSourcePreferenceStore dataSourcePreferenceStore) {
-            return dataSourcePreferenceStore.getProperties();
-        }
-        return Collections.emptyMap();
-    }
 }
