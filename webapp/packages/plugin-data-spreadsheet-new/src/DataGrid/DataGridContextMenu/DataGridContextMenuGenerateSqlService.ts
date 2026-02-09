@@ -158,7 +158,7 @@ export class DataGridContextMenuGenerateSqlService {
     let exception: Error | null = null;
 
     try {
-      query = this.sqlGenerationResource.generateResultSetSql({
+      query = await this.sqlGenerationResource.generateResultSetSql({
         projectId,
         connectionId,
         contextId,
