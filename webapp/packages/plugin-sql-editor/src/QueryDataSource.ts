@@ -343,11 +343,9 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
     response: SqlExecuteInfo,
     limit: number,
   ): IDatabaseResultSet[] | null {
-    const executedQuery = response.fullQuery || this.options?.query || '';
-
     this.requestInfo = {
-      originalQuery: response.originalQuery || executedQuery,
-      fullQuery: executedQuery,
+      originalQuery: response.originalQuery || '',
+      fullQuery: response.fullQuery || this.options?.query || '',
       requestDuration: response.duration || 0,
       requestMessage: response.statusMessage || '',
       requestFilter: response.filterText || '',
