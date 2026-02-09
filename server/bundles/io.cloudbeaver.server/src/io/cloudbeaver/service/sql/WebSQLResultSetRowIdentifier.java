@@ -48,8 +48,7 @@ public class WebSQLResultSetRowIdentifier {
     public enum WebSQLResultSetRowIdentifierState {
         METADATA_NOT_FOUND,
         NONE,
-        PRIMARY_KEY,
-        VIRTUAL_KEY
+        PRIMARY_KEY
     }
 
 }

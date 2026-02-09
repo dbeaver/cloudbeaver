@@ -29,6 +29,7 @@ import { Textarea } from '../../FormControls/Textarea.js';
 import { Link } from '../../Link.js';
 import { useTranslate } from '../../localization/useTranslate.js';
 import { evaluate } from '../evaluate.js';
+import { SAVED_VALUE_INDICATOR } from '../../SAVED_VALUE_INDICATOR.js';
 
 interface RenderFieldProps {
   property: IObjectPropertyInfo;
@@ -262,7 +263,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
         readOnly={readonly || disabled}
         autoComplete={autocomplete}
         className={className}
-        canShowPassword={canShowPassword}
+        canShowPassword={!!property.id && state[property.id] !== SAVED_VALUE_INDICATOR && canShowPassword}
         onFocus={onFocus}
       >
         {property.displayName}
@@ -284,7 +285,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
       readOnly={readonly || disabled}
       autoComplete={autocomplete}
       className={className}
-      canShowPassword={canShowPassword}
+      canShowPassword={value !== SAVED_VALUE_INDICATOR && canShowPassword}
       onFocus={onFocus}
     >
       {property.displayName}
