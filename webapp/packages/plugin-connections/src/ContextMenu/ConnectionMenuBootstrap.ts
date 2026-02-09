@@ -15,6 +15,7 @@ import {
   DATA_CONTEXT_CONNECTION,
 } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { LocalizationService } from '@cloudbeaver/core-localization';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { DATA_CONTEXT_NAV_NODE, EObjectFeature } from '@cloudbeaver/core-navigation-tree';
 import { getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
@@ -31,8 +32,6 @@ import { ACTION_CONNECTION_DISCONNECT_ALL } from './Actions/ACTION_CONNECTION_DI
 import { ACTION_CONNECTION_EDIT } from './Actions/ACTION_CONNECTION_EDIT.js';
 import { MENU_CONNECTIONS } from './MENU_CONNECTIONS.js';
 
-const COPY_NAME_SUFFIX = 'copy';
-
 @injectable(() => [
   NotificationService,
   ConnectionInfoResource,
@@ -43,6 +42,7 @@ const COPY_NAME_SUFFIX = 'copy';
   PublicConnectionFormService,
   ConnectionsSettingsService,
   ServerConfigResource,
+  LocalizationService,
 ])
 export class ConnectionMenuBootstrap extends Bootstrap {
   constructor(
@@ -55,6 +55,7 @@ export class ConnectionMenuBootstrap extends Bootstrap {
     private readonly publicConnectionFormService: PublicConnectionFormService,
     private readonly connectionsSettingsService: ConnectionsSettingsService,
     private readonly serverConfigResource: ServerConfigResource,
+    private readonly localizationService: LocalizationService,
   ) {
     super();
   }
@@ -166,14 +167,11 @@ export class ConnectionMenuBootstrap extends Bootstrap {
           case ACTION_CONNECTION_CLONE: {
             try {
               // Load all connections for the project first to ensure we have them all to generate a unique name for the cloned connection
-              await this.connectionInfoResource.load(ConnectionInfoProjectKey(connection.projectId));
-
-              const existingConnections = this.connectionsManagerService.projectConnections.filter(
-                c => c.projectId === connection.projectId && c.folder === connection.folder,
-              );
-              const newName = getUniqueName(
-                connection.name.concat(` ${COPY_NAME_SUFFIX}`),
-                existingConnections.map(c => c.name),
+              const projectConnections = await this.connectionInfoResource.load(ConnectionInfoProjectKey(connection.projectId));
+              const connectionNames = projectConnections.map(connection => connection.name);
+              const uniqueName = getUniqueName(
+                connection.name.concat(` ${this.localizationService.translate('ui_copy_to_clipboard').toLowerCase()}`),
+                connectionNames,
               );
 
               if (!connection.nodePath) {
@@ -181,7 +179,7 @@ export class ConnectionMenuBootstrap extends Bootstrap {
                 return;
               }
 
-              await this.connectionInfoResource.createFromNode(connection.projectId, connection.nodePath, newName);
+              await this.connectionInfoResource.createFromNode(connection.projectId, connection.nodePath, uniqueName);
             } catch (exception: any) {
               this.notificationService.logException(exception, 'plugin_connections_connection_clone_error');
             }
