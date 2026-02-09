@@ -9,7 +9,7 @@
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
 
 import type { IGridReactiveValue } from '../IGridReactiveValue.js';
-import { GridSearchEngine, type ICellMatch } from './GridSearchEngine.js';
+import { buildSearchPattern, replaceInCell, searchGrid, type ICellMatch } from './GridSearchEngine.js';
 
 export type { ICellMatch } from './GridSearchEngine.js';
 
@@ -183,7 +183,7 @@ function updateGridSearch(store: GridSearchStore): void {
 }
 
 function buildPattern(store: GridSearchStore): RegExp | null {
-  return GridSearchEngine.buildPattern(store.query, {
+  return buildSearchPattern(store.query, {
     caseSensitive: store.caseSensitive,
     wholeWord: store.wholeWord,
     regexp: store.regexp,
@@ -196,7 +196,7 @@ function updateActiveMatchKey(store: GridSearchStore): void {
 }
 
 function updateMatches(store: GridSearchStore, preserveActiveIndex = false): void {
-  const matches = GridSearchEngine.search(
+  const matches = searchGrid(
     store.query,
     { caseSensitive: store.caseSensitive, wholeWord: store.wholeWord, regexp: store.regexp },
     store.options.rowCount,
@@ -327,7 +327,7 @@ function createActions(store: GridSearchStore): IGridSearchActions {
       store.options.onReplacingChange?.(true);
       try {
         const cellText = store.options.getCellText(match.rowIdx, match.colIdx);
-        const { newText, stillMatches } = GridSearchEngine.replaceInCell(cellText, pattern, store.replace);
+        const { newText, stillMatches } = replaceInCell(cellText, pattern, store.replace);
         store.options.replaceCellValue(match.rowIdx, match.colIdx, newText);
 
         if (!stillMatches) {
@@ -370,7 +370,7 @@ function createActions(store: GridSearchStore): IGridSearchActions {
 
         for (const match of matches) {
           const cellText = store.options.getCellText(match.rowIdx, match.colIdx);
-          const { newText } = GridSearchEngine.replaceInCell(cellText, pattern, store.replace);
+          const { newText } = replaceInCell(cellText, pattern, store.replace);
           updates.push({ rowIdx: match.rowIdx, colIdx: match.colIdx, value: newText });
         }
 

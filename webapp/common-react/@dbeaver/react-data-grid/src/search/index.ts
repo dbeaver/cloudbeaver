@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-export { GridSearchEngine, type ISearchPatternOptions, type ICellMatch } from './GridSearchEngine.js';
+export { buildSearchPattern, searchGrid, replaceInCell, type ISearchPatternOptions, type ICellMatch } from './GridSearchEngine.js';
 export {
   useGridSearch,
   type IGridSearchSnapshot,
