@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import { useMemo } from 'react';
 
 export const MenuBar = observer<IMenuBarProps>(function MenuBar({ menu, compact = true, rtl, className, ref, ...props }) {
   const styles = useS(style);
-  const items = menu.items;
+  const items = menu.items.filter(item => !item.hidden);
   useAutoLoad(MenuBar, menu.loaders, true, false, true);
   const menubarStore = useMenubarStore({ rtl });
   const menuContext = useMemo<IMenuContext>(() => ({ menu, rtl }), [menu, rtl]);

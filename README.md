@@ -25,6 +25,23 @@ You can see a live demo of CloudBeaver here: https://demo.cloudbeaver.io
 
 ## Changelog
 
+### 25.3.4 2026-02-02
+
+- Editors:
+    - Added undo and redo functionality to the Data Editor for cell edits, row operations, and other data modifications. The history retains the last 50 actions across the Data Editor, result sets, and related panels;
+    - The SQL preview panel has been added to the Bind parameters/variables dialog in the SQL Editor, allowing users to review the SQL query with changed values on the fly;
+    - The Tab key can now be used for autocompletion in the SQL editor in the same way as the Enter key;
+    - Fixed an application freeze caused by fetch size canceling for large tables in the Result Set;
+    - Fixed an issue where pressing the Delete key during inline cell editing incorrectly marked the entire row for deletion.
+- Navigator:
+    - Added independent view preference settings for database connections at both the user and connection levels. Users can configure their preferred navigator view separately from connection-specific settings;
+    - Added "Show children of tables" option to Navigator tree settings. When enabled, the navigator displays nested objects such as columns under tables and views. The setting applies globally across all connections and remains disabled by default;
+    - Added the ability to rename connections via context menu in the Navigator Tree;
+- General:
+    - Expanded pointer target areas for icons in the navigator, editors, and tabs to a minimum of pixels per accessibility standards. Improved interaction accuracy and reduced errors for users with motor control limitations;
+    - The "Database Native" authentication type has been renamed to "Username/password" for all connectors;
+    - ClickHouse: Fixed an issue with displaying arrays of UUID, IPv4/IPv6, and Map types.
+
 ### 25.3.3 2026-01-19
 
 - For security reasons, session expiration leads to a complete logout for a user and clears all data from the screen;

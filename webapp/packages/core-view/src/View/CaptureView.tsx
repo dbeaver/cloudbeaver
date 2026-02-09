@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -8,8 +8,9 @@
 import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
 
-import { s, useFocus, useHotkeys, useS } from '@cloudbeaver/core-blocks';
+import { s, useFocus, useHotkeys, useMergeRefs, useS } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
+import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { isObjectsEqual } from '@cloudbeaver/core-utils';
 
 import { ActionService } from '../Action/ActionService.js';
@@ -32,24 +33,26 @@ export const CaptureView = observer<React.PropsWithChildren<ICaptureViewProps>>(
   const viewContext = useViewContext(view, parentContext);
   const actionService = useService(ActionService);
   const activeView = useActiveView(view);
-  const [ref, state] = useFocus<HTMLDivElement>({ onFocus: activeView.focusView, onBlur: activeView.blurView });
+  const [ref] = useFocus<HTMLDivElement>({ onFocus: activeView.focusView, onBlur: activeView.blurView });
   const style = useS(styles);
 
-  const actionItems = view.actions
-    .map(action => actionService.getAction(viewContext, action))
-    .filter(action => action?.binding && !action.isDisabled())
-    .filter(Boolean) as IActionItem[];
+  const allActionItems = view.actions.map(action => actionService.getAction(viewContext, action)).filter(Boolean) as IActionItem[];
+  const enabledActionItems = allActionItems.filter(action => action?.binding && !action.isDisabled()).filter(Boolean) as IActionItem[];
 
-  const keys = actionItems.map(item => getCommonAndOSSpecificKeys(item.binding?.binding)).flat();
+  const allKeys = allActionItems.map(item => getCommonAndOSSpecificKeys(item.binding?.binding)).flat();
 
-  useHotkeys(
-    keys,
+  const divRef = useHotkeys(
+    allKeys,
     (event, handler) => {
-      if (!event.isTrusted || !state.reference?.contains(document.activeElement)) {
+      /**
+       * isTrusted - to prevent double handling of the event
+       * EventContext.has - to prevent handling the event if it was already handled by a child view
+       */
+      if (!event.isTrusted || EventContext.has(event, EventStopPropagationFlag)) {
         return;
       }
 
-      const action = actionItems.find(action => {
+      const action = enabledActionItems.find(action => {
         const commonAndSpecificKeys = getCommonAndOSSpecificKeys(action.binding?.binding);
         return commonAndSpecificKeys.some(key => {
           const hotkey = parseHotkey(key);
@@ -58,13 +61,19 @@ export const CaptureView = observer<React.PropsWithChildren<ICaptureViewProps>>(
         });
       });
 
+      EventContext.set(event, EventStopPropagationFlag);
       action?.activate(true);
     },
     {
-      enabled: keys.length > 0,
+      enabled: allKeys.length > 0,
       enableOnFormTags: ['INPUT', 'SELECT', 'TEXTAREA'],
       preventDefault(event, handler) {
-        const action = actionItems.find(action => {
+        // Don't prevent default if event was already handled by a child view
+        if (EventContext.has(event, EventStopPropagationFlag)) {
+          return false;
+        }
+
+        const action = enabledActionItems.find(action => {
           const commonAndSpecificKeys = getCommonAndOSSpecificKeys(action.binding?.binding);
           return commonAndSpecificKeys.some(key => {
             const hotkey = parseHotkey(key);
@@ -72,17 +81,18 @@ export const CaptureView = observer<React.PropsWithChildren<ICaptureViewProps>>(
             return isObjectsEqual(hotkey, handler);
           });
         });
-        const isAppliedInSelectedScope = Boolean(state.reference?.contains(document.activeElement));
 
-        return isAppliedInSelectedScope && action?.binding?.binding.preventDefault === true;
+        return action?.binding?.binding.preventDefault === true;
       },
       enableOnContentEditable: true,
     },
   );
 
+  const mergedRef = useMergeRefs(ref, divRef);
+
   return (
     <CaptureViewContext.Provider value={viewContext}>
-      <div ref={ref} className={s(style, { container: true }, className)} tabIndex={0}>
+      <div ref={mergedRef} className={s(style, { container: true }, className)} tabIndex={0}>
         {children}
       </div>
     </CaptureViewContext.Provider>
