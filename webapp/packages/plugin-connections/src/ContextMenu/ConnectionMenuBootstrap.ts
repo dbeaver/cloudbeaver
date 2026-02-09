@@ -170,7 +170,7 @@ export class ConnectionMenuBootstrap extends Bootstrap {
               const projectConnections = await this.connectionInfoResource.load(ConnectionInfoProjectKey(connection.projectId));
               const connectionNames = projectConnections.map(connection => connection.name);
               const uniqueName = getUniqueName(
-                connection.name.concat(` ${this.localizationService.translate('ui_copy_to_clipboard').toLowerCase()}`),
+                connection.name.concat(` ${this.localizationService.translate('ui_copy').toLowerCase()}`),
                 connectionNames,
               );
 
