@@ -144,6 +144,7 @@ export default [
   ['ui_delete_confirmation_message', 'Вы собираетесь удалить "{arg:item}". Вы уверены?'],
   ['ui_not_selected', 'Не выбрано'],
   ['ui_reset', 'Сбросить'],
+  ['ui_documentaion', 'Документация'],
 
   ['root_permission_denied', 'Отказано в доступе'],
   ['root_permission_no_permission', 'У вас нет разрешения на это действие'],
