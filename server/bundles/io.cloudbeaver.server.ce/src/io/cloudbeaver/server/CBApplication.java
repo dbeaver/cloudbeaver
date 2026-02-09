@@ -119,11 +119,6 @@ public abstract class CBApplication<T extends CBServerConfig>
         this.homeDirectory = new File(initHomeFolder());
     }
 
-    @Nullable
-    public String getServerURL() {
-        return getServerConfiguration().getServerURL();
-    }
-
     // Port this server listens on. If set the 0 a random port is assigned which may be obtained with getLocalPort()
     @Override
     public int getServerPort() {
@@ -259,9 +254,6 @@ public abstract class CBApplication<T extends CBServerConfig>
         //log.debug("\tProduct details: " + application.getInfoDetails());
         log.debug("\tListen port: " + getServerPort() + (CommonUtils.isEmpty(getServerHost()) ? " on all interfaces" : " on " + getServerHost()));
         log.debug("\tBase URI: " + getServicesURI());
-        if (!isConfigurationMode()) {
-            log.debug("\tGlobal access server URL: " + getServerConfiguration().getServerURL());
-        }
         if (isDevelMode()) {
             log.debug("\tDevelopment mode");
         } else {
@@ -356,7 +348,6 @@ public abstract class CBApplication<T extends CBServerConfig>
      */
     protected void performAutoConfiguration(Path configPath) {
         String autoServerName = System.getenv(CBConstants.VAR_AUTO_CB_SERVER_NAME);
-        String autoServerURL = System.getenv(CBConstants.VAR_AUTO_CB_SERVER_URL);
         String autoAdminName = System.getenv(CBConstants.VAR_AUTO_CB_ADMIN_NAME);
         String autoAdminPassword = System.getenv(CBConstants.VAR_AUTO_CB_ADMIN_PASSWORD);
 
@@ -371,7 +362,6 @@ public abstract class CBApplication<T extends CBServerConfig>
                         autoProps.load(is);
 
                         autoServerName = autoProps.getProperty(CBConstants.VAR_AUTO_CB_SERVER_NAME);
-                        autoServerURL = autoProps.getProperty(CBConstants.VAR_AUTO_CB_SERVER_URL);
                         autoAdminName = autoProps.getProperty(CBConstants.VAR_AUTO_CB_ADMIN_NAME);
                         autoAdminPassword = autoProps.getProperty(CBConstants.VAR_AUTO_CB_ADMIN_PASSWORD);
                     } catch (IOException e) {
@@ -389,7 +379,6 @@ public abstract class CBApplication<T extends CBServerConfig>
         }
         CBServerConfig serverConfig = new CBServerConfig();
         serverConfig.setServerName(autoServerName);
-        serverConfig.setServerURL(autoServerURL);
         serverConfig.setMaxSessionIdleTime(getMaxSessionIdleTime());
         try {
             finishConfiguration(
