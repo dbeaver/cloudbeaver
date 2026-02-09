@@ -158,14 +158,15 @@ export class DataGridContextMenuGenerateSqlService {
     let exception: Error | null = null;
 
     try {
-      query = await this.sqlGenerationResource.generateResultSetSql({
-        projectId,
-        connectionId,
-        contextId,
-        resultsId: resultId,
-        generatorId,
-        selectedRows: rows,
-      });
+      query =
+        (await this.sqlGenerationResource.generateResultSetSql({
+          projectId,
+          connectionId,
+          contextId,
+          resultsId: resultId,
+          generatorId,
+          selectedRows: rows,
+        })) ?? '';
     } catch (e: unknown) {
       exception = e as Error;
     }
