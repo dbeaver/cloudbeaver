@@ -13,10 +13,8 @@ import {
   CommonDialogFooter,
   CommonDialogHeader,
   CommonDialogWrapper,
-  ErrorMessage,
   s,
   useClipboard,
-  useErrorDetails,
   useResource,
   useS,
   useTranslate,
@@ -26,12 +24,10 @@ import { useService } from '@cloudbeaver/core-di';
 import type { DialogComponentProps } from '@cloudbeaver/core-dialogs';
 import { useCodemirrorExtensions } from '@cloudbeaver/plugin-codemirror6';
 import { SQLCodeEditor, useSqlDialectExtension } from '@cloudbeaver/plugin-sql-editor-codemirror';
-import { getFirstException } from '@cloudbeaver/core-utils';
 
 import style from './GeneratedSqlDialog.module.css';
 
 interface Payload {
-  exception: Error | null;
   nodeId: string;
   query: string;
 }
@@ -51,7 +47,6 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<Payload>>(functi
   if (sqlDialect) {
     extensions.set(...sqlDialect);
   }
-  const error = useErrorDetails(payload.exception);
 
   return (
     <CommonDialogWrapper size="large">
@@ -63,14 +58,6 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<Payload>>(functi
       </CommonDialogBody>
       <CommonDialogFooter>
         <div className={s(styles, { footerContainer: true })}>
-          {payload.exception && (
-            <ErrorMessage
-              className={s(styles, { errorMessage: true })}
-              text={getFirstException(payload.exception)?.message ?? translate('ui_unknown_error')}
-              hasDetails={error.hasDetails}
-              onShowDetails={error.open}
-            />
-          )}
           <div className={s(styles, { buttons: true })}>
             <Button variant="secondary" disabled={!payload.query} onClick={() => copy(payload.query, true)}>
               {translate('ui_copy_to_clipboard')}

@@ -14,15 +14,17 @@ import { MenuBaseItem, MenuService } from '@cloudbeaver/core-view';
 
 import { MENU_SQL_GENERATORS } from './MENU_SQL_GENERATORS.js';
 import { SqlGeneratorsResource } from './SqlGeneratorsResource.js';
+import { NotificationService } from '@cloudbeaver/core-events';
 
 const GeneratedSqlDialog = importLazyComponent(() => import('./GeneratedSqlDialog.js').then(m => m.GeneratedSqlDialog));
 
-@injectable(() => [SqlGeneratorsResource, CommonDialogService, MenuService])
+@injectable(() => [SqlGeneratorsResource, CommonDialogService, MenuService, NotificationService])
 export class SqlGeneratorsBootstrap extends Bootstrap {
   constructor(
     private readonly sqlGeneratorsResource: SqlGeneratorsResource,
     private readonly commonDialogService: CommonDialogService,
     private readonly menuService: MenuService,
+    private readonly notificationService: NotificationService,
   ) {
     super();
   }
@@ -78,20 +80,15 @@ export class SqlGeneratorsBootstrap extends Bootstrap {
                 },
                 {
                   onSelect: async () => {
-                    let query = '';
-                    let exception: Error | null = null;
-
                     try {
-                      query = await this.sqlGeneratorsResource.generateEntityQuery(action.id, node.id);
-                    } catch (e: unknown) {
-                      exception = e as Error;
+                      const query = await this.sqlGeneratorsResource.generateEntityQuery(action.id, node.id);
+                      await this.commonDialogService.open(GeneratedSqlDialog, {
+                        query,
+                        nodeId: node.id,
+                      });
+                    } catch (e: any) {
+                      this.notificationService.logException(e, 'sql_generator_error_title');
                     }
-
-                    await this.commonDialogService.open(GeneratedSqlDialog, {
-                      query,
-                      nodeId: node.id,
-                      exception,
-                    });
                   },
                 },
               ),

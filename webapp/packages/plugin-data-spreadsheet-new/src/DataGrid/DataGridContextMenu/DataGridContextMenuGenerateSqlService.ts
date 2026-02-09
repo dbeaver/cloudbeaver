@@ -59,19 +59,13 @@ export class DataGridContextMenuGenerateSqlService {
         const model = context.get(DATA_CONTEXT_DV_DDM);
         const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
 
-        return isResultSetDataModel(model) && !model.source.isReadonly(resultIndex);
+        return isResultSetDataModel(model) && !model.isReadonly(resultIndex) && !model.isDisabled(resultIndex);
       },
       getItems: (context, items) => [...items, MENU_DATA_GRID_GENERATE_SQL],
     });
 
     this.menuService.addCreator({
       menus: [MENU_DATA_GRID_GENERATE_SQL],
-      contexts: [DATA_CONTEXT_DV_DDM, DATA_CONTEXT_DV_DDM_RESULT_INDEX, DATA_CONTEXT_DV_RESULT_KEY],
-      isApplicable: context => {
-        const model = context.get(DATA_CONTEXT_DV_DDM);
-        const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
-        return isResultSetDataModel(model) && !model.source.isReadonly(resultIndex);
-      },
       getItems: () => [
         ACTION_DATA_GRID_GENERATE_SQL_INSERT,
         ACTION_DATA_GRID_GENERATE_SQL_UPDATE,
@@ -85,14 +79,13 @@ export class DataGridContextMenuGenerateSqlService {
       id: 'data-grid-generate-sql-handler',
       menus: [MENU_DATA_GRID_GENERATE_SQL],
       contexts: [DATA_CONTEXT_DV_DDM, DATA_CONTEXT_DV_DDM_RESULT_INDEX, DATA_CONTEXT_DV_RESULT_KEY],
-      isActionApplicable: (context, action) =>
-        [
-          ACTION_DATA_GRID_GENERATE_SQL_INSERT,
-          ACTION_DATA_GRID_GENERATE_SQL_UPDATE,
-          ACTION_DATA_GRID_GENERATE_SQL_DELETE,
-          ACTION_DATA_GRID_GENERATE_SQL_SELECT,
-          ACTION_DATA_GRID_GENERATE_SQL_SELECT_MANY,
-        ].includes(action),
+      actions: [
+        ACTION_DATA_GRID_GENERATE_SQL_INSERT,
+        ACTION_DATA_GRID_GENERATE_SQL_UPDATE,
+        ACTION_DATA_GRID_GENERATE_SQL_DELETE,
+        ACTION_DATA_GRID_GENERATE_SQL_SELECT,
+        ACTION_DATA_GRID_GENERATE_SQL_SELECT_MANY,
+      ],
       isDisabled: context => {
         const model = context.get(DATA_CONTEXT_DV_DDM)!;
 
@@ -154,28 +147,31 @@ export class DataGridContextMenuGenerateSqlService {
       return;
     }
 
-    let query = '';
-    let exception: Error | null = null;
-
     try {
-      query =
-        (await this.sqlGenerationResource.generateResultSetSql({
-          projectId,
-          connectionId,
-          contextId,
-          resultsId: resultId,
-          generatorId,
-          selectedRows: rows,
-        })) ?? '';
-    } catch (e: unknown) {
-      exception = e as Error;
-    }
+      const query = await this.sqlGenerationResource.generateResultSetSql({
+        projectId,
+        connectionId,
+        contextId,
+        resultsId: resultId,
+        generatorId,
+        selectedRows: rows,
+      });
 
-    await this.commonDialogService.open(GeneratedSqlDialog, {
-      query,
-      exception,
-      nodeId: connectionId,
-    });
+      if (!query) {
+        this.notificationService.logError({
+          title: 'data_grid_table_generate_sql_error_title',
+          message: 'data_grid_table_generate_sql_error_no_query',
+        });
+        return;
+      }
+
+      await this.commonDialogService.open(GeneratedSqlDialog, {
+        query,
+        nodeId: connectionId,
+      });
+    } catch (e: any) {
+      this.notificationService.logException(e, 'data_grid_table_generate_sql_error_title');
+    }
   }
 }
 

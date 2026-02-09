@@ -48,6 +48,7 @@ export default [
   ['data_grid_table_generate_sql_select_many', 'SELECT (IN)'],
   ['data_grid_table_generate_sql_select_many_tooltip', 'Generate SELECT statement with WHERE IN clause'],
   ['data_grid_table_generate_sql_error_title', 'SQL Generation Error'],
+  ['data_grid_table_generate_sql_error_no_query', 'No query available for the current result'],
   ['data_grid_table_generate_sql_error_no_connection', 'Unknown execution context'],
   ['data_grid_table_generate_sql_error_no_rows', 'No rows selected'],
   ['data_grid_table_generate_sql_error_no_result', 'No result set available'],

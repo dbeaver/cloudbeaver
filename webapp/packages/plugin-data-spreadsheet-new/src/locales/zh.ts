@@ -47,6 +47,7 @@ export default [
   ['data_grid_table_generate_sql_select_many', 'SELECT (IN)'],
   ['data_grid_table_generate_sql_select_many_tooltip', '生成带 WHERE IN 子句的 SELECT 语句'],
   ['data_grid_table_generate_sql_error_title', 'SQL 生成错误'],
+  ['data_grid_table_generate_sql_error_no_query', '当前结果没有可用的查询'],
   ['data_grid_table_generate_sql_error_no_connection', '未知的执行上下文'],
   ['data_grid_table_generate_sql_error_no_rows', '未选择任何行'],
   ['data_grid_table_generate_sql_error_no_result', '没有可用的结果集'],
