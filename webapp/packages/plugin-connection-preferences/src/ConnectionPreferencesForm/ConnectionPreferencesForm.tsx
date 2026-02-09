@@ -27,7 +27,7 @@ export interface ConnectionPreferencesFormProps {
 }
 
 export const ConnectionPreferencesForm = observer<ConnectionPreferencesFormProps>(function ConnectionPreferencesForm({ formState, onCancel }) {
-  const connectionPreferencesFormServicee = useService(ConnectionPreferencesFormService);
+  const connectionPreferencesFormService = useService(ConnectionPreferencesFormService);
   const notificationService = useService(NotificationService);
 
   const infoPart = getConnectionPreferencesFormInfoPart(formState);
@@ -40,12 +40,11 @@ export const ConnectionPreferencesForm = observer<ConnectionPreferencesFormProps
       const saved = await formState.save(context);
 
       if (saved) {
-        notificationService.notify(
+        notificationService.logSuccess(
           {
             title: 'core_connections_connection_update_success',
             message: infoPart.state.name,
           },
-          ENotificationType.Success,
         );
       }
     },
@@ -58,7 +57,7 @@ export const ConnectionPreferencesForm = observer<ConnectionPreferencesFormProps
 
   return (
     <Form context={form} contents>
-      <TabsState container={connectionPreferencesFormServicee.parts} localState={formState.parts} formState={formState}>
+      <TabsState container={connectionPreferencesFormService.parts} localState={formState.parts} formState={formState}>
         <div className="tw:flex tw:flex-col tw:flex-1 tw:h-full tw:overflow-auto theme-background-secondary theme-text-on-secondary">
           <div className="tw:relative tw:flex tw:pt-4 tw:border-b-2 theme-border-color-background theme-background-secondary theme-text-on-secondary">
             <div className="tw:flex-1 tw:overflow-hidden">
@@ -74,7 +73,7 @@ export const ConnectionPreferencesForm = observer<ConnectionPreferencesFormProps
             <div className="tw:flex tw:items-center tw:px-6 tw:gap-4">
               <Loader suspense inline hideMessage hideException>
                 <ConnectionPreferencesFormActionsContext.Provider value={actionsContext}>
-                  <Placeholder container={connectionPreferencesFormServicee.actionsContainer} formState={formState} />
+                  <Placeholder container={connectionPreferencesFormService.actionsContainer} formState={formState} />
                 </ConnectionPreferencesFormActionsContext.Provider>
               </Loader>
             </div>

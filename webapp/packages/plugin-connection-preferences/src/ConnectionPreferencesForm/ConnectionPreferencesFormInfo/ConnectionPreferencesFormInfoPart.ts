@@ -7,10 +7,11 @@
  */
 
 import { FormPart, type IFormState } from '@cloudbeaver/core-ui';
-import { createConnectionParam, type ConnectionInfoResource } from '@cloudbeaver/core-connections';
+import { createConnectionParam } from '@cloudbeaver/core-connections';
 
 import type { IConnectionPreferencesFormState } from '../IConnectionPreferencesFormState.js';
 import type { IConnectionPreferencesFormInfoState } from './IConnectionPreferencesFormInfoState.js';
+import { ConnectionPreferencesInfoResource } from './ConnectionPreferencesInfoResource.js';
 
 function getInitialState(): IConnectionPreferencesFormInfoState {
   return {};
@@ -19,17 +20,24 @@ function getInitialState(): IConnectionPreferencesFormInfoState {
 export class ConnectionPreferencesFormInfoPart extends FormPart<IConnectionPreferencesFormInfoState, IConnectionPreferencesFormState> {
   constructor(
     formState: IFormState<IConnectionPreferencesFormState>,
-    private readonly connectionInfoResource: ConnectionInfoResource,
+    private readonly connectionPreferencesInfoResource: ConnectionPreferencesInfoResource,
   ) {
     super(formState, getInitialState());
   }
 
-  protected override async loader(): Promise<void> {
-    if (this.formState.mode === 'edit' && this.formState.state) {
+  override isOutdated(): boolean {
+    if (this.formState.state) {
       const key = createConnectionParam(this.formState.state.projectId, this.formState.state.connectionId);
+      return this.connectionPreferencesInfoResource.isOutdated(key);
+    }
 
-      // probably should implement a separate method as we can load only public accessible connection info here (not implemeted on the backend yet)
-      const connection = await this.connectionInfoResource.load(key);
+    return super.isOutdated();
+  }
+
+  protected override async loader(): Promise<void> {
+    if (this.formState.state) {
+      const key = createConnectionParam(this.formState.state.projectId, this.formState.state.connectionId);
+      const connection = await this.connectionPreferencesInfoResource.load(key);
 
       this.setInitialState({
         driverId: connection.driverId,

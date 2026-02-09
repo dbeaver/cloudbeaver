@@ -13,6 +13,7 @@ import { LocaleService } from './LocaleService.js';
 import { ConnectionPreferencesPanelService } from './ConnectionPreferencesPanelService.js';
 import { ConnectionPreferencesFormService } from './ConnectionPreferencesForm/ConnectionPreferencesFormService.js';
 import { ConnectionPreferencesInfoTabService } from './ConnectionPreferencesForm/ConnectionPreferencesFormInfo/ConnectionPreferencesInfoTabService.js';
+import { ConnectionPreferencesInfoResource } from './ConnectionPreferencesForm/ConnectionPreferencesFormInfo/ConnectionPreferencesInfoResource.js';
 
 export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-connection-preferences',
@@ -25,6 +26,7 @@ export default ModuleRegistry.add({
       .addSingleton(ConnectionPreferencesInfoTabService)
       .addSingleton(ConnectionPreferencesBootstrap)
       .addSingleton(ConnectionPreferencesPanelService)
-      .addSingleton(ConnectionPreferencesFormService);
+      .addSingleton(ConnectionPreferencesFormService)
+      .addSingleton(ConnectionPreferencesInfoResource);
   },
 });

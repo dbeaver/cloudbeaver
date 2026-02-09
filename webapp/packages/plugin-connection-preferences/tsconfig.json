@@ -41,6 +41,9 @@
       "path": "../core-projects"
     },
     {
+      "path": "../core-resource"
+    },
+    {
       "path": "../core-sdk"
     },
     {
