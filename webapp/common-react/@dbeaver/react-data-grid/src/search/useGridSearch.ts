@@ -10,6 +10,7 @@ import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from '
 
 import type { IGridReactiveValue } from '../IGridReactiveValue.js';
 import { buildSearchPattern, replaceInCell, searchGrid, type ICellMatch } from './GridSearchEngine.js';
+import type { ICellChange } from '../DataGridCellContext.js';
 
 export type { ICellMatch } from './GridSearchEngine.js';
 
@@ -66,19 +67,12 @@ export interface IGridSearchActions {
   close: () => void;
 }
 
-export interface ICellValueUpdate {
-  rowIdx: number;
-  colIdx: number;
-  value: string;
-}
-
 export interface IGridSearchOptions {
   rowCount: number;
   columnCount: number;
   getCellText: (rowIdx: number, colIdx: number) => string;
   scrollToCell: (rowIdx: number, colIdx: number) => void;
-  replaceCellValue: (rowIdx: number, colIdx: number, value: string) => void;
-  replaceCellValues?: (updates: ICellValueUpdate[]) => void;
+  onReplace: (updates: ICellChange[]) => void;
   onReplacingChange?: (isReplacing: boolean) => void;
   storage?: IGridSearchStorage;
   open?: boolean;
@@ -329,7 +323,7 @@ function createActions(store: GridSearchStore): IGridSearchActions {
       try {
         const cellText = store.options.getCellText(match.rowIdx, match.colIdx);
         const { newText, stillMatches } = replaceInCell(cellText, pattern, store.replace);
-        store.options.replaceCellValue(match.rowIdx, match.colIdx, newText);
+        store.options.onReplace([{ rowIdx: match.rowIdx, colIdx: match.colIdx, value: newText }]);
 
         if (!stillMatches) {
           store.matchedCells.splice(store.activeMatchIdx, 1);
@@ -367,26 +361,18 @@ function createActions(store: GridSearchStore): IGridSearchActions {
       store.options.onReplacingChange?.(true);
       try {
         const matches = [...store.matchedCells];
-        const updates: ICellValueUpdate[] = [];
-
-        for (const match of matches) {
+        const updates = matches.map(match => {
           const cellText = store.options.getCellText(match.rowIdx, match.colIdx);
           const { newText } = replaceInCell(cellText, pattern, store.replace);
-          updates.push({ rowIdx: match.rowIdx, colIdx: match.colIdx, value: newText });
-        }
+          return { rowIdx: match.rowIdx, colIdx: match.colIdx, value: newText };
+        });
 
-        if (store.options.replaceCellValues) {
-          store.options.replaceCellValues(updates);
-        } else {
-          for (const update of updates) {
-            store.options.replaceCellValue(update.rowIdx, update.colIdx, update.value);
-          }
-        }
-
-        runSearch(store);
+        store.options.onReplace(updates);
       } finally {
         store.options.onReplacingChange?.(false);
       }
+
+      runSearch(store);
     },
 
     setReplaceOpen(open: boolean): void {

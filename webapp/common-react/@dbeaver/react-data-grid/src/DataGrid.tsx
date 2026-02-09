@@ -126,11 +126,10 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
     isReplacingRef,
     handleSearchOpen,
     handleSearchClose,
-    replaceCellValue,
-    replaceCellValues,
+    onReplace,
     handleReplacingChange,
     setSearchCellClassName,
-  } = useDataGridSearch({ containerRef, searchStorage, getCellEditable, onCellChange, onCellChangeBatch });
+  } = useDataGridSearch({ containerRef, searchStorage, getCellEditable, onCellChangeBatch });
 
   function scrollToCell(rowIdx: number, colIdx: number) {
     innerGridRef.current?.scrollToCell({ idx: colIdx, rowIdx });
@@ -297,10 +296,9 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
                   columnCount={columnsCount}
                   isReadOnly={searchReadOnly}
                   scrollToCell={scrollToCell}
-                  replaceCellValue={replaceCellValue}
-                  replaceCellValues={replaceCellValues}
                   storage={searchStorage}
                   open={searchOpen}
+                  onReplace={onReplace}
                   onCellClassNameChange={setSearchCellClassName}
                   onClose={handleSearchClose}
                   onReplacingChange={handleReplacingChange}

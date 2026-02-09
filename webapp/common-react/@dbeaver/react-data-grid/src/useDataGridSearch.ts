@@ -8,27 +8,26 @@
 
 import { useEffect, useRef, useState } from 'react';
 
+import type { ICellChange } from './DataGridCellContext.js';
 import type { IGridReactiveValue } from './IGridReactiveValue.js';
 import type { GridSearchPanelRef } from './search/GridSearchPanel.js';
-import type { ICellValueUpdate, IGridSearchStorage } from './search/useGridSearch.js';
+import type { IGridSearchStorage } from './search/useGridSearch.js';
 
 interface UseDataGridSearchOptions {
   containerRef: React.RefObject<HTMLDivElement | null>;
   searchStorage: IGridSearchStorage | undefined;
   getCellEditable: ((rowIdx: number, colIdx: number) => boolean) | undefined;
-  onCellChange: ((rowIdx: number, colIdx: number, value: string) => void) | undefined;
-  onCellChangeBatch: ((updates: ICellValueUpdate[]) => void) | undefined;
+  onCellChangeBatch: ((updates: ICellChange[]) => void) | undefined;
 }
 
-export function useDataGridSearch({ containerRef, searchStorage, getCellEditable, onCellChange, onCellChangeBatch }: UseDataGridSearchOptions): {
+export function useDataGridSearch({ containerRef, searchStorage, getCellEditable, onCellChangeBatch }: UseDataGridSearchOptions): {
   searchOpen: boolean;
   searchCellClassName: IGridReactiveValue<string | undefined, [number, number]> | undefined;
   searchPanelRef: React.RefObject<GridSearchPanelRef | null>;
   isReplacingRef: React.RefObject<boolean>;
   handleSearchOpen: () => void;
   handleSearchClose: () => void;
-  replaceCellValue: (rowIdx: number, colIdx: number, value: string) => void;
-  replaceCellValues: (updates: ICellValueUpdate[]) => void;
+  onReplace: (updates: { rowIdx: number; colIdx: number; value: string }[]) => void;
   handleReplacingChange: (value: boolean) => void;
   setSearchCellClassName: (value: IGridReactiveValue<string | undefined, [number, number]> | undefined) => void;
 } {
@@ -65,24 +64,10 @@ export function useDataGridSearch({ containerRef, searchStorage, getCellEditable
     containerRef.current?.querySelector<HTMLDivElement>('[aria-selected="true"]')?.focus();
   }
 
-  function replaceCellValue(rowIdx: number, colIdx: number, value: string) {
-    if (getCellEditable?.(rowIdx, colIdx) === false) {
-      return;
-    }
-    onCellChange?.(rowIdx, colIdx, value);
-  }
-
-  function replaceCellValues(updates: ICellValueUpdate[]) {
+  function onReplace(updates: { rowIdx: number; colIdx: number; value: string }[]) {
     const validUpdates = updates.filter(u => getCellEditable?.(u.rowIdx, u.colIdx) !== false);
-    if (validUpdates.length === 0) {
-      return;
-    }
-    if (onCellChangeBatch) {
-      onCellChangeBatch(validUpdates);
-    } else {
-      for (const update of validUpdates) {
-        onCellChange?.(update.rowIdx, update.colIdx, update.value);
-      }
+    if (validUpdates.length > 0) {
+      onCellChangeBatch?.(validUpdates);
     }
   }
 
@@ -97,8 +82,7 @@ export function useDataGridSearch({ containerRef, searchStorage, getCellEditable
     isReplacingRef,
     handleSearchOpen,
     handleSearchClose,
-    replaceCellValue,
-    replaceCellValues,
+    onReplace,
     handleReplacingChange,
     setSearchCellClassName,
   };

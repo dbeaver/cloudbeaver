@@ -13,5 +13,4 @@ export {
   type IGridSearchOptions,
   type ISearchState,
   type IGridSearchStorage,
-  type ICellValueUpdate,
 } from './useGridSearch.js';
