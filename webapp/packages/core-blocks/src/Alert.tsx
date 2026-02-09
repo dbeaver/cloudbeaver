@@ -29,7 +29,7 @@ export const Alert = observer<PropsWithChildren<Props>>(function Alert({ title, 
 
   return (
     <div className={s(styles, { alert: true, error: variant === 'error' }, className)} role="alert">
-      <IconOrImage icon={icon} className="tw:mt-0.5" />
+      <IconOrImage icon={icon} className="tw:mt-0.5 tw:size-5" />
       <div className={s(styles, { body: true })}>
         <h3 className={s(styles, { title: true })}>{title ?? translate(variant === 'info' ? 'ui_information' : 'ui_error')}</h3>
         {children}
