@@ -99,7 +99,7 @@ public class WebConnectionConfigInputHandler<T extends WebConnectionConfig, C ex
         DataSourcePreferenceStore preferenceStore = dataSource.getPreferenceStore();
         Map<String, Object> defaultUserSettings = input.getDefaultUserSettings();
         for (Map.Entry<String, Object> entry : defaultUserSettings.entrySet()) {
-            preferenceStore.setValue(entry.getKey(), (String)entry.getValue());
+            preferenceStore.setValue(entry.getKey(), (String) entry.getValue());
         }
     }
 

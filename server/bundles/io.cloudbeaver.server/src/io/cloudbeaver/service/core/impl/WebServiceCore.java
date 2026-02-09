@@ -65,6 +65,7 @@ import org.jkiss.dbeaver.registry.DataSourceNavigatorSettingsUtils;
 import org.jkiss.dbeaver.registry.DataSourceProviderRegistry;
 import org.jkiss.dbeaver.registry.network.NetworkHandlerDescriptor;
 import org.jkiss.dbeaver.registry.network.NetworkHandlerRegistry;
+import org.jkiss.dbeaver.registry.project.BaseProjectSettings;
 import org.jkiss.dbeaver.registry.settings.ProductSettingDescriptor;
 import org.jkiss.dbeaver.registry.settings.ProductSettingsRegistry;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
@@ -134,7 +135,7 @@ public class WebServiceCore implements DBWServiceCore {
     ) throws DBWebException {
         if (id != null) {
             WebConnectionInfo connectionInfo = getConnectionState(webSession, projectId, id);
-            Map<String, String> connectionPreferences = connectionInfo.getConnectionPreferences();
+            Map<String, String> connectionPreferences = connectionInfo.getDefaultUserSettings();
             if (connectionInfo != null) {
                 return Collections.singletonList(connectionInfo);
             }
@@ -771,12 +772,14 @@ public class WebServiceCore implements DBWServiceCore {
         @NotNull Map<String, String> settings
     ) throws DBException {
 
+        WebSessionProjectImpl projectById = webSession.getProjectById(projectId);
+        if (projectById == null) {
+            throw new DBWebException("Project '" + projectId + "' not found");
+        }
+        BaseProjectSettings projectSettings = projectById.getProjectSettings();
         SMObjectType smObjectType = SMObjectType.valueOf(objectType);
-        webSession.getSecurityController().setObjectSettings(projectId, smObjectType, objectId, settings);
-        //fixme return proper object
-        return settings.entrySet().stream()
-            .filter(e -> e.getValue() != null)
-            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        projectSettings.setObjectSettings(smObjectType, objectId, settings);
+        return projectSettings.getObjectSettings(smObjectType, objectId);
     }
 
     @Override
