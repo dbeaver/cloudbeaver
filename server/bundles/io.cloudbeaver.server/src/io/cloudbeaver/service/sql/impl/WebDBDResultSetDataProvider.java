@@ -21,27 +21,29 @@ import io.cloudbeaver.service.sql.WebSQLContextInfo;
 import io.cloudbeaver.service.sql.WebSQLResultsRow;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
+import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.DBPDataSource;
+import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.DBUtils;
 import org.jkiss.dbeaver.model.data.DBDAttributeBinding;
-import org.jkiss.dbeaver.model.data.DBDDataProvider;
+import org.jkiss.dbeaver.model.data.DBDResultSetDataProvider;
 import org.jkiss.dbeaver.model.data.DBDRowIdentifier;
 import org.jkiss.dbeaver.model.data.DBDValueRow;
+import org.jkiss.dbeaver.model.data.hints.DBDValueHintContext;
 import org.jkiss.dbeaver.model.exec.DBCExecutionContext;
 import org.jkiss.dbeaver.model.struct.DBSEntity;
 import org.jkiss.dbeaver.model.struct.DBSObject;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
-public class WebDBDDataProvider implements DBDDataProvider, DBSObject {
+public class WebDBDResultSetDataProvider implements DBDResultSetDataProvider, DBSObject {
 
     private final String resultsId;
     private final WebSQLContextInfo contextInfo;
     private final List<WebSQLResultsRow> selectedRows;
 
-    WebDBDDataProvider(
+    WebDBDResultSetDataProvider(
         @NotNull String resultsId,
         @NotNull WebSQLContextInfo contextInfo,
         @NotNull List<WebSQLResultsRow> selectedRows
@@ -49,6 +51,18 @@ public class WebDBDDataProvider implements DBDDataProvider, DBSObject {
         this.resultsId = resultsId;
         this.contextInfo = contextInfo;
         this.selectedRows = selectedRows;
+    }
+
+    @NotNull
+    @Override
+    public DBDAttributeBinding[] getAttributes() throws DBWebException {
+        return contextInfo.getResults(resultsId).getAttributes();
+    }
+
+    @NotNull
+    @Override
+    public List<? extends DBDValueRow> getAllRows() {
+        return getSelectedRows();
     }
 
     @NotNull
@@ -70,7 +84,7 @@ public class WebDBDDataProvider implements DBDDataProvider, DBSObject {
 
     @Nullable
     @Override
-    public DBSEntity getSingleEntity() throws DBWebException {
+    public DBSEntity getSingleSource() throws DBWebException {
         DBDRowIdentifier rowIdentifier = contextInfo.getResults(resultsId).getDefaultRowIdentifier();
         if (rowIdentifier == null) {
             return null;
@@ -79,23 +93,43 @@ public class WebDBDDataProvider implements DBDDataProvider, DBSObject {
         }
     }
 
-    @NotNull
+    @Nullable
     @Override
-    public Collection<DBDAttributeBinding> getAllAttributes() throws DBWebException {
-        return List.of(contextInfo.getResults(resultsId).getAttributes());
+    public DBDRowIdentifier getDefaultRowIdentifier() {
+        try {
+            return contextInfo.getResults(resultsId).getDefaultRowIdentifier();
+        } catch (DBWebException e) {
+            return null;
+        }
     }
 
     @Nullable
     @Override
-    public Object getCellValue(@NotNull DBDAttributeBinding attribute, @NotNull DBDValueRow row) throws DBWebException {
-        DBDAttributeBinding[] allAttributes = getAllAttributes().toArray(new DBDAttributeBinding[0]);
-        return DBUtils.getAttributeValue(attribute, allAttributes, row.getValues());
+    public Object getCellValue(@NotNull DBDAttributeBinding attribute, @NotNull DBDValueRow row) throws DBException {
+        return DBUtils.getAttributeValue(attribute, getAttributes(), row.getValues());
     }
 
     @Nullable
     @Override
-    public DBDRowIdentifier getDefaultRowIdentifier() throws DBWebException {
-        return contextInfo.getResults(resultsId).getDefaultRowIdentifier();
+    public Object getCellValue(
+        @NotNull DBDAttributeBinding attribute,
+        @NotNull DBDValueRow row,
+        @Nullable int[] rowIndexes,
+        boolean retrieveDeepestCollectionElement
+    ) throws DBWebException {
+        return DBUtils.getAttributeValue(attribute, getAttributes(), row.getValues());
+    }
+
+    @Nullable
+    @Override
+    public DBDValueHintContext getHintContext() {
+        return null;
+    }
+
+    @Nullable
+    @Override
+    public String getReadOnlyStatus(@Nullable DBPDataSourceContainer dataSourceContainer) {
+        return null;
     }
 
     @Nullable
@@ -104,6 +138,7 @@ public class WebDBDDataProvider implements DBDDataProvider, DBSObject {
         return null;
     }
 
+    @Nullable
     @Override
     public DBPDataSource getDataSource() {
         DBCExecutionContext executionContext = contextInfo.getProcessor().getExecutionContext();
@@ -117,13 +152,13 @@ public class WebDBDDataProvider implements DBDDataProvider, DBSObject {
     @NotNull
     @Override
     public String getName() {
-        return WebDBDDataProvider.class.getSimpleName();
+        return WebDBDResultSetDataProvider.class.getSimpleName();
     }
 
     @Nullable
     @Override
     public String getDescription() {
-        return WebDBDDataProvider.class.getSimpleName();
+        return null;
     }
 
     @Override

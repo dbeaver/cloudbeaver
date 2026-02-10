@@ -256,7 +256,7 @@ public class WebServiceSQL implements DBWServiceSQL {
         @NotNull String resultsId,
         @NotNull List<WebSQLResultsRow> selectedRows
     ) throws DBWebException {
-        WebDBDDataProvider dataProvider = new WebDBDDataProvider(resultsId, sqlContext, selectedRows);
+        WebDBDResultSetDataProvider dataProvider = new WebDBDResultSetDataProvider(resultsId, sqlContext, selectedRows);
         return createAndRunGenerator(webSession, generatorId, Collections.singletonList(dataProvider));
     }
 
