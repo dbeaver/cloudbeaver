@@ -19,10 +19,10 @@ export interface IDatabaseDataCacheAction<TKey = unknown, TResult extends IDatab
   delete(key: TKey, scope: symbol): void;
   deleteAll(scope: symbol): void;
 
-  hasGlobal(scope: symbol): boolean;
-  getGlobal<T>(scope: symbol): T | undefined;
-  setGlobal<T>(scope: symbol, value: T): void;
-  deleteGlobal(scope: symbol): void;
+  hasShared(scope: symbol): boolean;
+  getShared<T>(scope: symbol): T | undefined;
+  setShared<T>(scope: symbol, value: T): void;
+  deleteShared(scope: symbol): void;
 }
 
 export const IDatabaseDataCacheAction = createService<IDatabaseDataCacheAction>('IDatabaseDataCacheAction');

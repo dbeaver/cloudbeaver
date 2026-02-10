@@ -18,7 +18,7 @@ import { injectable } from '@cloudbeaver/core-di';
 import { IDatabaseDataResult } from '../../IDatabaseDataResult.js';
 import type { IGridColumnKey, IGridDataKey, IGridRowKey } from '../Grid/IGridDataKey.js';
 
-const GLOBAL_CACHE_KEY = 'global';
+const SHARED_CACHE_KEY = 'shared';
 
 @injectable(() => [IDatabaseDataSource, IDatabaseDataResult, ResultSetDataAction])
 export class ResultSetCacheAction
@@ -43,12 +43,12 @@ export class ResultSetCacheAction
       set: action,
       setRow: action,
       setColumn: action,
-      setGlobal: action,
+      setShared: action,
       delete: action,
       deleteAll: action,
       deleteRow: action,
       deleteColumn: action,
-      deleteGlobal: action,
+      deleteShared: action,
     });
   }
 
@@ -157,37 +157,37 @@ export class ResultSetCacheAction
     }
   }
 
-  hasGlobal(scope: symbol): boolean {
-    const globalCache = this.getGlobalCache();
+  hasShared(scope: symbol): boolean {
+    const sharedCache = this.getSharedCache();
 
-    if (!globalCache) {
+    if (!sharedCache) {
       return false;
     }
 
-    return globalCache.has(scope);
+    return sharedCache.has(scope);
   }
 
-  getGlobal<T>(scope: symbol): T | undefined {
-    const globalCache = this.getGlobalCache();
+  getShared<T>(scope: symbol): T | undefined {
+    const sharedCache = this.getSharedCache();
 
-    if (!globalCache) {
+    if (!sharedCache) {
       return;
     }
 
-    return globalCache.get(scope);
+    return sharedCache.get(scope);
   }
 
-  setGlobal<T>(scope: symbol, value: T): void {
-    const globalCache = this.getOrCreateGlobalCache();
+  setShared<T>(scope: symbol, value: T): void {
+    const sharedCache = this.getOrCreateSharedCache();
 
-    globalCache.set(scope, value);
+    sharedCache.set(scope, value);
   }
 
-  deleteGlobal(scope: symbol): void {
-    const globalCache = this.getGlobalCache();
+  deleteShared(scope: symbol): void {
+    const sharedCache = this.getSharedCache();
 
-    if (globalCache) {
-      globalCache.delete(scope);
+    if (sharedCache) {
+      sharedCache.delete(scope);
     }
   }
 
@@ -256,18 +256,18 @@ export class ResultSetCacheAction
     return keyCache;
   }
 
-  private getGlobalCache() {
-    return this.cache.get(GLOBAL_CACHE_KEY);
+  private getSharedCache() {
+    return this.cache.get(SHARED_CACHE_KEY);
   }
 
-  private getOrCreateGlobalCache() {
-    let globalCache = this.getGlobalCache();
+  private getOrCreateSharedCache() {
+    let sharedCache = this.getSharedCache();
 
-    if (!globalCache) {
-      globalCache = observable(new Map());
-      this.cache.set(GLOBAL_CACHE_KEY, globalCache);
+    if (!sharedCache) {
+      sharedCache = observable(new Map());
+      this.cache.set(SHARED_CACHE_KEY, sharedCache);
     }
 
-    return globalCache;
+    return sharedCache;
   }
 }

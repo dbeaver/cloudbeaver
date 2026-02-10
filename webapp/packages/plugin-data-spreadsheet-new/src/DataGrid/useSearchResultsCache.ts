@@ -15,16 +15,16 @@ const SEARCH_STORAGE_KEY = Symbol('grid-search-storage');
 export function useSearchResultsCache(cacheAction: ResultSetCacheAction): IGridSearchStorage {
   return useMemo<IGridSearchStorage>(
     () => ({
-      get(): ISearchState | undefined {
-        return cacheAction.getGlobal<ISearchState>(SEARCH_STORAGE_KEY);
+      get(): ISearchState | undefined { 
+        return cacheAction.getShared<ISearchState>(SEARCH_STORAGE_KEY);
       },
       set(state: ISearchState): void {
-        cacheAction.setGlobal(SEARCH_STORAGE_KEY, state);
+        cacheAction.setShared(SEARCH_STORAGE_KEY, state);
       },
       update(partial: Partial<ISearchState>): void {
-        const current = cacheAction.getGlobal<ISearchState>(SEARCH_STORAGE_KEY);
+        const current = cacheAction.getShared<ISearchState>(SEARCH_STORAGE_KEY);
         if (current) {
-          cacheAction.setGlobal(SEARCH_STORAGE_KEY, { ...current, ...partial });
+          cacheAction.setShared(SEARCH_STORAGE_KEY, { ...current, ...partial });
         }
       },
     }),
