@@ -100,7 +100,9 @@ export class DataImportBootstrap extends Bootstrap {
         const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
         const presentation = context.get(DATA_CONTEXT_DV_PRESENTATION);
         const isContainer = model.source instanceof ContainerDataSource;
+
         return (
+          // TODO add more proper way to define to what features it should be added https://github.com/dbeaver/pro/issues/8299
           !model.isReadonly(resultIndex) &&
           isContainer &&
           !this.dataImportService.disabled &&
