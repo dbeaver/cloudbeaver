@@ -11,6 +11,8 @@ export default [
   ['plugin_connections_new_connection_dialog_title', 'Nuova connessione'],
 
   ['plugin_connections_connection_edit_menu_item_title', 'Modifica Connessione'],
+  ['plugin_connections_connection_clone', 'Clona'],
+  ['plugin_connections_connection_clone_error', 'Impossibile clonare la connessione'],
   ['plugin_connections_connection_edit_cancel_title', "Conferma l'annullamento"],
   [
     'plugin_connections_connection_edit_cancel_message',

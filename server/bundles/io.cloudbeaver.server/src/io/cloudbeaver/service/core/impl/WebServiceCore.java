@@ -467,7 +467,11 @@ public class WebServiceCore implements DBWServiceCore {
 
             ServletApplication app = ServletAppUtils.getServletApplication();
             if (app instanceof WebApplication webApplication) {
-                newDataSource.setNavigatorSettings(webApplication.getAppConfiguration().getDefaultNavigatorSettings());
+                newDataSource.setNavigatorSettings(
+                    dataSourceTemplate.isExternallyProvided() ?
+                        webApplication.getAppConfiguration().getDefaultNavigatorSettings() :
+                        dataSourceTemplate.getNavigatorSettings().getOriginalSettings()
+                );
             }
 
             WebConnectionConfig config = project.getConnectionConfigInput(connectionConfig);

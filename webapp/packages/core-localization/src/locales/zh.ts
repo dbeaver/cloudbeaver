@@ -62,6 +62,7 @@ export default [
   ['ui_no_matches_placeholder', '您的搜索没有返回匹配项。'],
   ['ui_information', '信息'],
   ['ui_clipboard', '剪贴板'],
+  ['ui_copy', '复制'],
   ['ui_copy_to_clipboard', '复制'],
   ['ui_copy_to_clipboard_copied', '已复制'],
   ['ui_copy_to_clipboard_failed_to_copy', '复制失败'],
