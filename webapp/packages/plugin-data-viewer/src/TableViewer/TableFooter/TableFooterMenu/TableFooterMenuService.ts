@@ -39,6 +39,7 @@ import type { IDatabaseDataModel } from '../../../DatabaseDataModel/IDatabaseDat
 import { DATA_VIEWER_DATA_MODEL_ACTIONS_MENU } from './DATA_VIEWER_DATA_MODEL_ACTIONS_MENU.js';
 import { DataViewerViewService } from '../../DataViewerViewService.js';
 import { IDatabaseDataSelectAction } from '../../../DatabaseDataModel/Actions/IDatabaseDataSelectAction.js';
+import { isResultSetDataSource } from '../../../ResultSet/ResultSetDataSource.js';
 
 @injectable(() => [ActionService, KeyBindingService, DataViewerViewService, LocalizationService, MenuService])
 export class TableFooterMenuService {
@@ -189,9 +190,10 @@ export class TableFooterMenuService {
           case ACTION_DELETE: {
             const editor = model.source.tryGetAction(resultIndex, IDatabaseDataEditAction);
             const selectedElements = getActiveElements(model, resultIndex);
+            const hasElementIdentifier = isResultSetDataSource(model.source) ? model.source.hasElementIdentifier(resultIndex) : false;
 
             const canEdit =
-              model.hasElementIdentifier(resultIndex) || selectedElements.every(key => editor?.getElementState(key) === DatabaseEditChangeType.add);
+              hasElementIdentifier || selectedElements.every(key => editor?.getElementState(key) === DatabaseEditChangeType.add);
 
             if (!editor || !canEdit) {
               return true;
