@@ -16,7 +16,8 @@
     "mobx-react-lite": "^4",
     "glob": "^13",
     "tar": ">=7.5.4",
-    "lodash": ">=4.17.23"
+    "lodash": ">=4.17.23",
+    "@isaacs/brace-expansion": ">=5.0.1"
   },
   "scripts": {
     "test": "dbeaver-test",

@@ -34,6 +34,7 @@ import {
   ResultSetDataSource,
   getNextOrder,
   isResultSetDataModel,
+  isResultSetDataSource,
   IDatabaseDataCacheAction,
   IDatabaseDataSelectAction,
   IDatabaseDataViewAction,
@@ -441,7 +442,9 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
 
     const editionState = tableData.getEditionState(cell);
 
-    if (!gridContext.model.hasElementIdentifier(tableData.view.resultIndex) && editionState !== DatabaseEditChangeType.add) {
+    const source = gridContext.model.source;
+    const hasElementIdentifier = isResultSetDataSource(source) ? source.hasElementIdentifier(tableData.view.resultIndex) : false;
+    if (!hasElementIdentifier && editionState !== DatabaseEditChangeType.add) {
       return false;
     }
 
