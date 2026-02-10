@@ -65,6 +65,7 @@ export default [
   ['ui_no_matches_placeholder', 'Tìm kiếm của bạn không có kết quả phù hợp.'],
   ['ui_information', 'Thông tin'],
   ['ui_clipboard', 'Clipboard'],
+  ['ui_copy', 'Sao chép'],
   ['ui_copy_to_clipboard', 'Sao chép'],
   ['ui_copy_to_clipboard_copied', 'Đã sao chép'],
   ['ui_copy_to_clipboard_failed_to_copy', 'Sao chép thất bại'],
