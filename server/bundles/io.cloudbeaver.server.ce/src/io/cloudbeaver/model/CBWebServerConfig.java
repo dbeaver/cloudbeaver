@@ -34,7 +34,7 @@ public class CBWebServerConfig extends WebServerConfig {
 
     @Property
     public String getServerURL() {
-        return CommonUtils.notEmpty(cbApp.getServerConfiguration().getServerURL());
+        return ""; // backward compatibility
     }
 
     @Property

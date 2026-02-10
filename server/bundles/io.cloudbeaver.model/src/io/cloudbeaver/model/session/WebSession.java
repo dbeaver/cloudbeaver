@@ -277,6 +277,11 @@ public class WebSession extends BaseWebSession
         return connectListener;
     }
 
+    @NotNull
+    public String getClientOrigin() {
+        return clientOrigin;
+    }
+
     public void updateClientOrigin(@NotNull String originFromRequest) {
         this.clientOrigin = originFromRequest;
     }

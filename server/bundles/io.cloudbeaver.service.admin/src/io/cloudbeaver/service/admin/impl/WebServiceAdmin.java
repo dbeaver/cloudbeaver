@@ -576,7 +576,6 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             CBAppConfig appConfig = new CBAppConfig(CBApplication.getInstance().getAppConfiguration());
             CBServerConfig serverConfig = new CBServerConfig();
             serverConfig.setServerName(CBApplication.getInstance().getServerName());
-            serverConfig.setServerURL(CBApplication.getInstance().getServerURL());
             serverConfig.setMaxSessionIdleTime(CBApplication.getInstance().getMaxSessionIdleTime());
             String adminName = null;
             String adminPassword = null;
@@ -606,7 +605,6 @@ public class WebServiceAdmin implements DBWServiceAdmin {
                 adminName = config.getAdminName();
                 adminPassword = config.getAdminPassword();
                 serverConfig.setServerName(config.getServerName());
-                serverConfig.setServerURL(config.getServerURL());
                 serverConfig.setMaxSessionIdleTime(config.getSessionExpireTime());
                 if (config.getForceHttps() != null) {
                     serverConfig.setForceHttps(config.getForceHttps());

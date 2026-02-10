@@ -37,7 +37,6 @@ public class CBConstants {
     public static final String PARAM_SUPPORTED_HOSTS = "supportedHosts";
     public static final String PARAM_SSL_CONFIGURATION_PATH = "sslConfigurationPath";
     public static final String PARAM_CONTENT_ROOT = "contentRoot";
-    public static final String PARAM_SERVER_URL = "serverURL";
     public static final String PARAM_ROOT_URI = "rootURI";
     public static final String PARAM_SERVICES_URI = "serviceURI";
     public static final String PARAM_DRIVERS_LOCATION = "driversLocation";
