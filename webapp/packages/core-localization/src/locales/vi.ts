@@ -65,6 +65,7 @@ export default [
   ['ui_no_matches_placeholder', 'Tìm kiếm của bạn không có kết quả phù hợp.'],
   ['ui_information', 'Thông tin'],
   ['ui_clipboard', 'Clipboard'],
+  ['ui_copy', 'Sao chép'],
   ['ui_copy_to_clipboard', 'Sao chép'],
   ['ui_copy_to_clipboard_copied', 'Đã sao chép'],
   ['ui_copy_to_clipboard_failed_to_copy', 'Sao chép thất bại'],
@@ -148,6 +149,7 @@ export default [
   ['ui_delete_confirmation_message', 'You are about to delete "{arg:item}". Are you sure?'],
   ['ui_not_selected', 'Not selected'],
   ['ui_reset', 'Reset'],
+  ['ui_documentaion', 'Tài liệu'],
 
   ['root_permission_denied', 'Bạn không có quyền'],
   ['root_permission_no_permission', 'Bạn không có quyền thực hiện hành động này'],

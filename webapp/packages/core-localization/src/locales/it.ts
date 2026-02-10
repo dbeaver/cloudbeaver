@@ -62,6 +62,7 @@ export default [
   ['ui_no_matches_placeholder', 'La tua ricerca non ha prodotto risultati.'],
   ['ui_information', 'Informazioni'],
   ['ui_clipboard', 'Appunti'],
+  ['ui_copy', 'Copia'],
   ['ui_copy_to_clipboard', 'Copia'],
   ['ui_copy_to_clipboard_copied', 'Copiato'],
   ['ui_copy_to_clipboard_failed_to_copy', 'Fallimento della copia'],
@@ -138,6 +139,7 @@ export default [
   ['ui_delete_confirmation_message', 'You are about to delete "{arg:item}". Are you sure?'],
   ['ui_not_selected', 'Not selected'],
   ['ui_reset', 'Reset'],
+  ['ui_documentaion', 'Documentation'],
 
   ['root_permission_denied', 'Non hai i permessi'],
   ['app_root_session_expire_warning_title', 'La sessione sta per scadere'],

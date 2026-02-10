@@ -59,6 +59,7 @@ export default [
   ['ui_no_matches_placeholder', "Votre recherche n'a retourné aucun résultat."],
   ['ui_information', 'Information'],
   ['ui_clipboard', 'Presse-papiers'],
+  ['ui_copy', 'Copier'],
   ['ui_copy_to_clipboard', 'Copier'],
   ['ui_copy_to_clipboard_copied', 'Copié'],
   ['ui_copy_to_clipboard_failed_to_copy', 'Échec de la copie'],
@@ -142,6 +143,7 @@ export default [
   ['ui_delete_confirmation_message', 'You are about to delete "{arg:item}". Are you sure?'],
   ['ui_not_selected', 'Not selected'],
   ['ui_reset', 'Reset'],
+  ['ui_documentaion', 'Documentation'],
 
   ['root_permission_denied', "Vous n'avez pas les permissions"],
   ['root_permission_no_permission', "Vous n'avez pas la permission pour cette action"],

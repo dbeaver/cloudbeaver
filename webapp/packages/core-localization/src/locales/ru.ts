@@ -61,6 +61,7 @@ export default [
   ['ui_data_delete_confirmation', 'Подтвердите удаление'],
   ['ui_information', 'Информация'],
   ['ui_clipboard', 'Буфер обмена'],
+  ['ui_copy', 'Копия'],
   ['ui_copy_to_clipboard', 'Копировать'],
   ['ui_copy_to_clipboard_copied', 'Скопировано'],
   ['ui_copy_to_clipboard_failed_to_copy', 'Не удалось скопировать'],
@@ -144,6 +145,7 @@ export default [
   ['ui_delete_confirmation_message', 'Вы собираетесь удалить "{arg:item}". Вы уверены?'],
   ['ui_not_selected', 'Не выбрано'],
   ['ui_reset', 'Сбросить'],
+  ['ui_documentaion', 'Документация'],
 
   ['root_permission_denied', 'Отказано в доступе'],
   ['root_permission_no_permission', 'У вас нет разрешения на это действие'],

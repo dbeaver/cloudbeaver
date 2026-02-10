@@ -72,7 +72,7 @@ export class DataExportMenuService {
       },
       getActionInfo(context, action) {
         if (action === ACTION_EXPORT) {
-          return { ...action.info, icon: 'table-export' };
+          return { ...action.info, tooltip: 'data_transfer_dialog_export_tooltip', icon: 'table-export' };
         }
 
         return action.info;

@@ -1,7 +1,6 @@
 package io.cloudbeaver.service.sql;
 
 import org.jkiss.code.NotNull;
-import org.jkiss.code.Nullable;
 
 public class WebSQLResultSetRowIdentifierAttribute {
 
@@ -11,9 +10,7 @@ public class WebSQLResultSetRowIdentifierAttribute {
 
     public WebSQLResultSetRowIdentifierAttribute(
         @NotNull String name,
-        int ordinalPosition,
-        @NotNull String label,
-        @Nullable String description
+        int ordinalPosition
     ) {
         this.name = name;
         this.ordinalPosition = ordinalPosition;

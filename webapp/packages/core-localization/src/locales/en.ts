@@ -65,6 +65,7 @@ export default [
   ['ui_no_matches_placeholder', 'Your search returned no matches.'],
   ['ui_information', 'Information'],
   ['ui_clipboard', 'Clipboard'],
+  ['ui_copy', 'Copy'],
   ['ui_copy_to_clipboard', 'Copy'],
   ['ui_copy_to_clipboard_copied', 'Copied'],
   ['ui_copy_to_clipboard_failed_to_copy', 'Failed to copy'],
@@ -148,6 +149,7 @@ export default [
   ['ui_delete_confirmation_message', 'You are about to delete "{arg:item}". Are you sure?'],
   ['ui_not_selected', 'Not selected'],
   ['ui_reset', 'Reset'],
+  ['ui_documentaion', 'Documentation'],
 
   ['root_permission_denied', "You don't have permissions"],
   ['root_permission_no_permission', "You don't have permission for this action"],
