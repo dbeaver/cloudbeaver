@@ -1,12 +1,13 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 import {
   ConnectionInfoAuthPropertiesResource,
+  ConnectionInfoProjectKey,
   ConnectionInfoResource,
   ConnectionsManagerService,
   ConnectionsSettingsService,
@@ -14,15 +15,18 @@ import {
   DATA_CONTEXT_CONNECTION,
 } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { LocalizationService } from '@cloudbeaver/core-localization';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { DATA_CONTEXT_NAV_NODE, EObjectFeature } from '@cloudbeaver/core-navigation-tree';
 import { getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
+import { getUniqueName } from '@cloudbeaver/core-utils';
 import { ACTION_DELETE, ActionService, MenuService } from '@cloudbeaver/core-view';
 import { MENU_APP_ACTIONS } from '@cloudbeaver/plugin-top-app-bar';
 
 import { PublicConnectionFormService } from '../PublicConnectionForm/PublicConnectionFormService.js';
 import { ACTION_CONNECTION_CHANGE_CREDENTIALS } from './Actions/ACTION_CONNECTION_CHANGE_CREDENTIALS.js';
+import { ACTION_CONNECTION_CLONE } from './Actions/ACTION_CONNECTION_CLONE.js';
 import { ACTION_CONNECTION_DISCONNECT } from './Actions/ACTION_CONNECTION_DISCONNECT.js';
 import { ACTION_CONNECTION_DISCONNECT_ALL } from './Actions/ACTION_CONNECTION_DISCONNECT_ALL.js';
 import { ACTION_CONNECTION_EDIT } from './Actions/ACTION_CONNECTION_EDIT.js';
@@ -38,6 +42,7 @@ import { MENU_CONNECTIONS } from './MENU_CONNECTIONS.js';
   PublicConnectionFormService,
   ConnectionsSettingsService,
   ServerConfigResource,
+  LocalizationService,
 ])
 export class ConnectionMenuBootstrap extends Bootstrap {
   constructor(
@@ -50,6 +55,7 @@ export class ConnectionMenuBootstrap extends Bootstrap {
     private readonly publicConnectionFormService: PublicConnectionFormService,
     private readonly connectionsSettingsService: ConnectionsSettingsService,
     private readonly serverConfigResource: ServerConfigResource,
+    private readonly localizationService: LocalizationService,
   ) {
     super();
   }
@@ -64,6 +70,7 @@ export class ConnectionMenuBootstrap extends Bootstrap {
         ...items,
         ACTION_CONNECTION_CHANGE_CREDENTIALS,
         ACTION_CONNECTION_EDIT,
+        ACTION_CONNECTION_CLONE,
         ACTION_CONNECTION_DISCONNECT,
         ACTION_CONNECTION_DISCONNECT_ALL,
       ],
@@ -75,6 +82,7 @@ export class ConnectionMenuBootstrap extends Bootstrap {
         ACTION_DELETE,
         ACTION_CONNECTION_CHANGE_CREDENTIALS,
         ACTION_CONNECTION_EDIT,
+        ACTION_CONNECTION_CLONE,
         ACTION_CONNECTION_DISCONNECT,
         ACTION_CONNECTION_DISCONNECT_ALL,
       ],
@@ -106,6 +114,10 @@ export class ConnectionMenuBootstrap extends Bootstrap {
 
         if (action === ACTION_CONNECTION_EDIT) {
           return !(connection.canEdit || connection.canViewSettings);
+        }
+
+        if (action === ACTION_CONNECTION_CLONE) {
+          return !connection.canEdit;
         }
 
         if (action === ACTION_CONNECTION_CHANGE_CREDENTIALS) {
@@ -150,6 +162,27 @@ export class ConnectionMenuBootstrap extends Bootstrap {
           }
           case ACTION_CONNECTION_CHANGE_CREDENTIALS: {
             await this.connectionsManagerService.requireConnection({ connectionId: connection.id, projectId: connection.projectId }, true);
+            break;
+          }
+          case ACTION_CONNECTION_CLONE: {
+            try {
+              // Load all connections for the project first to ensure we have them all to generate a unique name for the cloned connection
+              const projectConnections = await this.connectionInfoResource.load(ConnectionInfoProjectKey(connection.projectId));
+              const connectionNames = projectConnections.map(connection => connection.name);
+              const uniqueName = getUniqueName(
+                connection.name.concat(` ${this.localizationService.translate('ui_copy').toLowerCase()}`),
+                connectionNames,
+              );
+
+              if (!connection.nodePath) {
+                this.notificationService.logException(new Error('Connection node path is undefined'), 'plugin_connections_connection_clone_error');
+                return;
+              }
+
+              await this.connectionInfoResource.createFromNode(connection.projectId, connection.nodePath, uniqueName);
+            } catch (exception: any) {
+              this.notificationService.logException(exception, 'plugin_connections_connection_clone_error');
+            }
             break;
           }
         }
