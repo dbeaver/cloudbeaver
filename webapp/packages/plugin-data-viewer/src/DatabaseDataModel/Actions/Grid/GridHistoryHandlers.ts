@@ -10,7 +10,6 @@ import type { IGridDataKey } from './IGridDataKey.js';
 import {
   GRID_HISTORY_SOURCE,
   isGridHistoryAddRowData,
-  isGridHistoryBatchEditCellsData,
   isGridHistoryDeleteRowData,
   isGridHistoryEditCellData,
   isGridHistoryRevertData,
@@ -30,16 +29,6 @@ function createUndoHandlers<TKey extends IGridDataKey, TCell>(): Record<string, 
   return {
     [GRID_HISTORY_SOURCE.EDIT_CELL]: (entry, ops) => {
       if (isGridHistoryEditCellData<TKey, TCell>(entry)) {
-        ops.setCells([
-          {
-            key: entry.data.key,
-            value: entry.data.prevValue,
-          },
-        ]);
-      }
-    },
-    [GRID_HISTORY_SOURCE.BATCH_EDIT_CELLS]: (entry, ops) => {
-      if (isGridHistoryBatchEditCellsData<TKey, TCell>(entry)) {
         ops.setCells(entry.data.updates.map(u => ({ key: u.key, value: u.prevValue })));
       }
     },
@@ -75,16 +64,6 @@ function createRedoHandlers<TKey extends IGridDataKey, TCell>(): Record<string, 
   return {
     [GRID_HISTORY_SOURCE.EDIT_CELL]: (entry, ops) => {
       if (isGridHistoryEditCellData<TKey, TCell>(entry)) {
-        ops.setCells([
-          {
-            key: entry.data.key,
-            value: entry.data.value,
-          },
-        ]);
-      }
-    },
-    [GRID_HISTORY_SOURCE.BATCH_EDIT_CELLS]: (entry, ops) => {
-      if (isGridHistoryBatchEditCellsData<TKey, TCell>(entry)) {
         ops.setCells(entry.data.updates.map(u => ({ key: u.key, value: u.value })));
       }
     },

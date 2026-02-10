@@ -172,9 +172,7 @@ export class GridEditAction<
     const prevValue = update.update[key.column.index] as TCell;
 
     this.historyManager.recordCellEdit({
-      key,
-      value,
-      prevValue,
+      updates: [{ key, value, prevValue }],
     });
 
     update.update[key.column.index] = value;
@@ -214,7 +212,7 @@ export class GridEditAction<
       this.removeEmptyUpdate(update);
     }
 
-    this.historyManager.recordBatchCellEdit({ updates: historyUpdates });
+    this.historyManager.recordCellEdit({ updates: historyUpdates });
 
     this.action.execute({
       resultId: this.result.id,

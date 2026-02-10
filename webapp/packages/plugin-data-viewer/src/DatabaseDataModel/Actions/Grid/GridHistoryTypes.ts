@@ -10,7 +10,6 @@ import type { IHistoryEntry } from './GridHistoryAction.js';
 
 export const GRID_HISTORY_SOURCE = {
   EDIT_CELL: 'grid-history-source-edit-cell',
-  BATCH_EDIT_CELLS: 'grid-history-source-batch-edit-cells',
   ADD_ROW: 'grid-history-source-add-row',
   DELETE_ROW: 'grid-history-source-delete-row',
   REVERT: 'grid-history-source-revert',
@@ -21,14 +20,14 @@ export interface IGridHistoryRow<TKey extends IGridDataKey = IGridDataKey, TCell
   value: TCell[];
 }
 
-export interface IGridHistoryCellUpdateData<TKey extends IGridDataKey = IGridDataKey, TCell = unknown> {
+export interface IGridHistoryCellUpdate<TKey extends IGridDataKey = IGridDataKey, TCell = unknown> {
   key: TKey;
   prevValue: TCell;
   value: TCell;
 }
 
-export interface IGridHistoryBatchCellUpdateData<TKey extends IGridDataKey = IGridDataKey, TCell = unknown> {
-  updates: Array<IGridHistoryCellUpdateData<TKey, TCell>>;
+export interface IGridHistoryCellUpdateData<TKey extends IGridDataKey = IGridDataKey, TCell = unknown> {
+  updates: Array<IGridHistoryCellUpdate<TKey, TCell>>;
 }
 
 export interface IGridHistoryRowUpdate<TKey extends IGridDataKey = IGridDataKey, TCell = unknown> extends IGridHistoryRow<TKey, TCell> {
@@ -51,7 +50,6 @@ export interface IGridHistoryRevertData<TKey extends IGridDataKey = IGridDataKey
 
 export type IGridHistoryData<TKey extends IGridDataKey = IGridDataKey, TCell = unknown> =
   | IGridHistoryCellUpdateData<TKey, TCell>
-  | IGridHistoryBatchCellUpdateData<TKey, TCell>
   | IGridHistoryAddRowData<TKey, TCell>
   | IGridHistoryDeleteRowData<TKey, TCell>
   | IGridHistoryRevertData<TKey, TCell>;
@@ -60,12 +58,6 @@ export function isGridHistoryEditCellData<TKey extends IGridDataKey = IGridDataK
   entry: IHistoryEntry<unknown>,
 ): entry is IHistoryEntry<IGridHistoryCellUpdateData<TKey, TCell>> {
   return entry.source === GRID_HISTORY_SOURCE.EDIT_CELL;
-}
-
-export function isGridHistoryBatchEditCellsData<TKey extends IGridDataKey = IGridDataKey, TCell = unknown>(
-  entry: IHistoryEntry<unknown>,
-): entry is IHistoryEntry<IGridHistoryBatchCellUpdateData<TKey, TCell>> {
-  return entry.source === GRID_HISTORY_SOURCE.BATCH_EDIT_CELLS;
 }
 
 export function isGridHistoryAddRowData<TKey extends IGridDataKey = IGridDataKey, TCell = unknown>(
@@ -88,9 +80,6 @@ export function isGridHistoryRevertData<TKey extends IGridDataKey = IGridDataKey
 
 export function getKeyFromHistoryEntry(entry: IHistoryEntry<unknown>): IGridDataKey | null {
   if (isGridHistoryEditCellData(entry)) {
-    return entry.data.key;
-  }
-  if (isGridHistoryBatchEditCellsData(entry)) {
     const lastUpdate = entry.data.updates[entry.data.updates.length - 1];
     return lastUpdate?.key ?? null;
   }
