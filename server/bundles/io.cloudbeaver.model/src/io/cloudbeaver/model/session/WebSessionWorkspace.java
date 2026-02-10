@@ -19,9 +19,11 @@ package io.cloudbeaver.model.session;
 import io.cloudbeaver.WebSessionProjectImpl;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
+import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.DBPAdaptable;
 import org.jkiss.dbeaver.model.DBPImage;
 import org.jkiss.dbeaver.model.app.DBPPlatform;
+import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.app.DBPWorkspace;
 import org.jkiss.dbeaver.model.impl.auth.SessionContextImpl;
 import org.jkiss.dbeaver.model.rm.RMUtils;
@@ -109,16 +111,13 @@ public class WebSessionWorkspace implements DBPWorkspace {
 
     @Nullable
     @Override
-    public WebSessionProjectImpl getProjectById(@Nullable String projectId) {
-        if (projectId == null) {
-            return activeProject;
-        }
+    public WebSessionProjectImpl getProjectById(@NotNull String projectId) {
         for (WebSessionProjectImpl project : accessibleProjects) {
             if (project.getId().equals(projectId)) {
                 return project;
             }
         }
-        return null;
+        return activeProject;
     }
 
     @NotNull
@@ -141,6 +140,22 @@ public class WebSessionWorkspace implements DBPWorkspace {
     @Override
     public DBPImage getResourceIcon(DBPAdaptable resourceAdapter) {
         return null;
+    }
+
+    @NotNull
+    @Override
+    public WebSessionProjectImpl createProject(@NotNull String name, @Nullable String description) throws DBException {
+        throw new DBException("Project creation is not supported in web session workspace");
+    }
+
+    @Override
+    public void deleteProject(@NotNull DBPProject project) throws DBException {
+        throw new DBException("Project removing is not supported in web session workspace");
+    }
+
+    @Override
+    public void renameProject(@NotNull DBPProject project, @NotNull String newName) throws DBException {
+        throw new DBException("Project renaming is not supported in web session workspace");
     }
 
     public void setActiveProject(WebSessionProjectImpl activeProject) {
