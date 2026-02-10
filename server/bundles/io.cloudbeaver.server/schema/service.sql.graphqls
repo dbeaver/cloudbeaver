@@ -183,6 +183,8 @@ type SQLExecuteInfo {
     filterText: String
     # Full query that was executed, contains all used filters
     fullQuery: String
+    # Original query that was executed, without modifications
+    originalQuery: String
     # Results
     results: [ SQLQueryResults! ]!
 }
