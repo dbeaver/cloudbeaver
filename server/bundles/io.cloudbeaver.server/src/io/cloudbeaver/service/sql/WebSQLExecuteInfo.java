@@ -16,6 +16,7 @@
  */
 package io.cloudbeaver.service.sql;
 
+import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.meta.Property;
 
@@ -30,6 +31,7 @@ public class WebSQLExecuteInfo {
     private long duration;
     private String filterText;
     private String fullQuery;
+    private String originalQuery;
     private WebSQLQueryResults[] results;
 
     @Property
@@ -70,8 +72,11 @@ public class WebSQLExecuteInfo {
 
     @Property
     public String getOriginalQuery() {
-        //TODO implement
-        return null; // should return the original query without data filters
+        return originalQuery;
+    }
+
+    public void setOriginalQuery(@NotNull String originalQuery) {
+        this.originalQuery = originalQuery;
     }
 
     @Property

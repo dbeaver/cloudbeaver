@@ -296,7 +296,17 @@ public class WebSQLProcessor implements WebSessionProvider {
                                 if (sqlOutputLogReaderJob != null) {
                                     sqlOutputLogReaderJob.join();
                                 }
-                                fillQueryResults(contextInfo, dataContainer, dbStat, hasResultSet, executeInfo, webDataFilter, dataFilter, dataFormat);
+                                fillQueryResults(
+                                    contextInfo,
+                                    dataContainer,
+                                    dbStat,
+                                    hasResultSet,
+                                    executeInfo,
+                                    webDataFilter,
+                                    dataFilter,
+                                    dataFormat,
+                                    sqlElement.getOriginalText()
+                                );
                             }
                         }
                     }
@@ -1066,7 +1076,9 @@ public class WebSQLProcessor implements WebSessionProvider {
         @NotNull WebSQLExecuteInfo executeInfo,
         @NotNull WebSQLDataFilter webDataFilter,
         @NotNull DBDDataFilter dataFilter,
-        @Nullable WebDataFormat dataFormat) throws DBException {
+        @Nullable WebDataFormat dataFormat,
+        @NotNull String originalQuery
+    ) throws DBException {
 
         List<WebSQLQueryResults> resultList = new ArrayList<>();
         int maxResultsCount = resolveMaxResultsCount(dataContainer.getDataSource());
@@ -1110,6 +1122,7 @@ public class WebSQLProcessor implements WebSessionProvider {
 
         setResultFilterText(dbStat.getSession().getDataSource(), executeInfo, dataFilter);
         executeInfo.setFullQuery(dbStat.getQueryString());
+        executeInfo.setOriginalQuery(originalQuery);
     }
 
     private void setResultFilterText(
