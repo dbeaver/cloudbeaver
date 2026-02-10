@@ -219,10 +219,9 @@ public interface DBWServiceCore extends DBWService {
         @NotNull String id
     ) throws DBWebException;
 
-    Object setObjectSettings(
+    Object setObjectSettingsForDatasource(
         @NotNull WebSession webSession,
         @NotNull String projectId,
-        @NotNull String objectType,
         @NotNull String objectId,
         @NotNull Map<String, String> settings
     ) throws DBException;

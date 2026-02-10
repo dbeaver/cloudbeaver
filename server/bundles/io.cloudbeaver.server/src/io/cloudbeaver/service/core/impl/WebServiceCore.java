@@ -798,10 +798,9 @@ public class WebServiceCore implements DBWServiceCore {
     }
 
     @Override
-    public Object setObjectSettings(
+    public Object setObjectSettingsForDatasource(
         @NotNull WebSession webSession,
         @NotNull String projectId,
-        @NotNull String objectType,
         @NotNull String objectId,
         @NotNull Map<String, String> settings
     ) throws DBException {
@@ -811,9 +810,8 @@ public class WebServiceCore implements DBWServiceCore {
             throw new DBWebException("Project '" + projectId + "' not found");
         }
         BaseProjectSettings projectSettings = projectById.getProjectSettings();
-        SMObjectType smObjectType = SMObjectType.valueOf(objectType);
-        projectSettings.setObjectSettings(smObjectType, objectId, settings);
-        return projectSettings.getObjectSettings(smObjectType, objectId);
+        projectSettings.setObjectSettings(SMObjectType.datasource, objectId, settings);
+        return projectSettings.getObjectSettings(SMObjectType.datasource, objectId);
     }
 
     @Override
