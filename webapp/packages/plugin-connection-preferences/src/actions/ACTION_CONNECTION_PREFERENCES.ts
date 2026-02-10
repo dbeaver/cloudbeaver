@@ -9,5 +9,5 @@
 import { createAction } from '@cloudbeaver/core-view';
 
 export const ACTION_CONNECTION_PREFERENCES = createAction('connection-preferences', {
-  label: 'Preferences',
+  label: 'plugin_connection_preferences_info',
 });

@@ -1,3 +1,1 @@
-export default [
-  ['plugin_connection_preferences', 'Preferences'],
-];
+export default [['plugin_connection_preferences_info', 'Informazioni di connessione']];
