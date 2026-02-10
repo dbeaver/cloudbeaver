@@ -11,6 +11,8 @@ export default [
   ['plugin_connections_new_connection_dialog_title', '新连接'],
 
   ['plugin_connections_connection_edit_menu_item_title', '编辑连接'],
+  ['plugin_connections_connection_clone', '克隆'],
+  ['plugin_connections_connection_clone_error', '克隆连接失败'],
   ['plugin_connections_connection_edit_cancel_title', '取消确认'],
   ['plugin_connections_connection_edit_cancel_message', '您将取消连接更改。未保存的更改将丢失。您确定吗？'],
   ['plugin_connections_connection_edit_reconnect_title', '连接已更新'],
