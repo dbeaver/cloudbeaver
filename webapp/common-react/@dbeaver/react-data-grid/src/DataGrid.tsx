@@ -116,7 +116,7 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
   const rowsCount = useGridReactiveValue(rowCount);
   const columnsCount = useGridReactiveValue(columnCount);
 
-  const rowsCountRef = useRef(rowsCount);
+  const [prevRowsCount, setPrevRowsCount] = useState(rowsCount);
   const innerGridRef = useRef<DataGridHandle<IInnerRow, unknown>>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const {
@@ -208,11 +208,10 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
     isReplacing: () => isReplacingRef.current,
   }));
 
-  if (rowsCountRef.current !== rowsCount) {
-    const previousRowCount = rowsCountRef.current;
-    rowsCountRef.current = rowsCount;
+  if (prevRowsCount !== rowsCount) {
+    setPrevRowsCount(rowsCount);
 
-    if (previousRowCount === 0) {
+    if (prevRowsCount === 0) {
       setColumnWidths(new Map<string, ColumnWidth>());
     }
   }
