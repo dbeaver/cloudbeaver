@@ -142,6 +142,7 @@ export default [
   ['ui_delete_confirmation_message', 'You are about to delete "{arg:item}". Are you sure?'],
   ['ui_not_selected', 'Not selected'],
   ['ui_reset', 'Reset'],
+  ['ui_documentaion', 'Documentation'],
 
   ['root_permission_denied', "Vous n'avez pas les permissions"],
   ['root_permission_no_permission', "Vous n'avez pas la permission pour cette action"],
