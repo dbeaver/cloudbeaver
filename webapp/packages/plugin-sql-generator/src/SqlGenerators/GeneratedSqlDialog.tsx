@@ -5,9 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { useEffect } from 'react';
 
 import {
   Button,
@@ -15,12 +13,8 @@ import {
   CommonDialogFooter,
   CommonDialogHeader,
   CommonDialogWrapper,
-  ErrorMessage,
-  Loader,
   s,
   useClipboard,
-  useErrorDetails,
-  useObservableRef,
   useResource,
   useS,
   useTranslate,
@@ -28,16 +22,14 @@ import {
 import { ConnectionDialectResource, ConnectionInfoResource, createConnectionParam } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import type { DialogComponentProps } from '@cloudbeaver/core-dialogs';
-import { GQLErrorCatcher } from '@cloudbeaver/core-sdk';
 import { useCodemirrorExtensions } from '@cloudbeaver/plugin-codemirror6';
 import { SQLCodeEditor, useSqlDialectExtension } from '@cloudbeaver/plugin-sql-editor-codemirror';
 
 import style from './GeneratedSqlDialog.module.css';
-import { SqlGeneratorsResource } from './SqlGeneratorsResource.js';
 
 interface Payload {
-  generatorId: string;
-  pathId: string;
+  nodeId: string;
+  query: string;
 }
 
 export const GeneratedSqlDialog = observer<DialogComponentProps<Payload>>(function GeneratedSqlDialog({ rejectDialog, payload }) {
@@ -45,34 +37,9 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<Payload>>(functi
   const copy = useClipboard();
   const styles = useS(style);
 
-  const sqlGeneratorsResource = useService(SqlGeneratorsResource);
   const connectionInfoResource = useService(ConnectionInfoResource);
-  const connection = connectionInfoResource.getConnectionForNode(payload.pathId);
+  const connection = connectionInfoResource.getConnectionForNode(payload.nodeId);
 
-  const state = useObservableRef(
-    () => ({
-      query: '',
-      loading: true,
-      error: new GQLErrorCatcher(),
-      async load() {
-        this.error.clear();
-
-        try {
-          this.query = await sqlGeneratorsResource.generateEntityQuery(payload.generatorId, payload.pathId);
-        } catch (exception: any) {
-          this.error.catch(exception);
-        } finally {
-          this.loading = false;
-        }
-      },
-    }),
-    {
-      query: observable.ref,
-      loading: observable.ref,
-      connection: observable.ref,
-    },
-    { connection },
-  );
   const connectionDialectResource = useResource(GeneratedSqlDialog, ConnectionDialectResource, connection ? createConnectionParam(connection) : null);
   const sqlDialect = useSqlDialectExtension(connectionDialectResource.data);
 
@@ -80,34 +47,19 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<Payload>>(functi
   if (sqlDialect) {
     extensions.set(...sqlDialect);
   }
-  const error = useErrorDetails(state.error.exception);
-
-  useEffect(() => {
-    state.load();
-  }, []);
 
   return (
     <CommonDialogWrapper size="large">
       <CommonDialogHeader title="app_shared_sql_generators_dialog_title" icon="sql-script" onReject={rejectDialog} />
       <CommonDialogBody noOverflow noBodyPadding>
         <div className={s(styles, { wrapper: true })}>
-          <Loader loading={state.loading}>
-            {() => <SQLCodeEditor className={s(styles, { sqlCodeEditorLoader: true })} value={state.query} extensions={extensions} readonly />}
-          </Loader>
+          <SQLCodeEditor className={s(styles, { sqlCodeEditorLoader: true })} value={payload.query} extensions={extensions} readonly />
         </div>
       </CommonDialogBody>
       <CommonDialogFooter>
         <div className={s(styles, { footerContainer: true })}>
-          {state.error.responseMessage && (
-            <ErrorMessage
-              className={s(styles, { errorMessage: true })}
-              text={state.error.responseMessage}
-              hasDetails={error.hasDetails}
-              onShowDetails={error.open}
-            />
-          )}
           <div className={s(styles, { buttons: true })}>
-            <Button variant="secondary" onClick={() => copy(state.query, true)}>
+            <Button variant="secondary" disabled={!payload.query} onClick={() => copy(payload.query, true)}>
               {translate('ui_copy_to_clipboard')}
             </Button>
             <Button onClick={() => rejectDialog()}>{translate('ui_close')}</Button>
