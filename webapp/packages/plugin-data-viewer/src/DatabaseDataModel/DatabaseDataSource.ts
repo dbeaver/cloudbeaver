@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -86,6 +86,7 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
     this.supportedDataFormats = [];
     this.requestInfo = {
       originalQuery: '',
+      fullQuery: '',
       requestDuration: 0,
       requestMessage: '',
       requestFilter: '',
@@ -196,11 +197,6 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
     return !this.isLoading() && !this.disabled;
   }
 
-  // TODO: probably should be moved to the DataResultAction
-  hasElementIdentifier(resultIndex: number): boolean {
-    return false;
-  }
-
   isReadonly(resultIndex: number): boolean {
     return this.access === DatabaseDataAccessMode.Readonly || this.results.length > 1 || this.disabled;
   }
@@ -303,10 +299,6 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
 
       return this.save(this.results).then(data => {
         this.setResults(data);
-        //TODO: Remove this when we have virtual keys. We need to refresh the data in tables without a primary key to avoid UI glitch #5140.
-        if (!this.hasElementIdentifier(0)) {
-          this.setOutdated();
-        }
       });
     });
   }

@@ -89,7 +89,8 @@ export class ContainerDataSource extends ResultSetDataSource<IDataContainerOptio
       const response = await this.currentTask;
 
       this.requestInfo = {
-        originalQuery: response.fullQuery || '',
+        originalQuery: response.originalQuery || '',
+        fullQuery: response.fullQuery || '',
         requestDuration: response.duration || 0,
         requestMessage: response.statusMessage || '',
         requestFilter: response.filterText || '',
