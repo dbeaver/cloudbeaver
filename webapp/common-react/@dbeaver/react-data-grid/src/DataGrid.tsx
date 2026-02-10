@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { forwardRef, useImperativeHandle, useMemo, useRef, useState } from 'react';
+import { Activity, forwardRef, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import {
   DataGrid as DataGridBase,
   type ColumnOrColumnGroup,
@@ -290,7 +290,7 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
                 onCellKeyDown={handleCellKeyDown}
                 onColumnWidthsChange={setColumnWidths}
               />
-              {searchOpen && (
+              <Activity mode={searchOpen ? 'visible' : 'hidden'}>
                 <GridSearchPanel
                   ref={searchPanelRef}
                   columnCount={columnsCount}
@@ -303,7 +303,7 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
                   onClose={handleSearchClose}
                   onReplacingChange={handleReplacingChange}
                 />
-              )}
+              </Activity>
             </DataGridCellHeaderContext>
           </DataGridCellContext>
         </DataGridRowContext>
