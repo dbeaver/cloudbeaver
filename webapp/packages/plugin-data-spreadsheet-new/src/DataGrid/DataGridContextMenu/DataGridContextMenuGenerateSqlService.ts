@@ -18,12 +18,13 @@ import {
   GridSelectAction,
   GridViewAction,
   IDatabaseDataFormatAction,
+  IDatabaseDataResult,
   IDatabaseDataSelectAction,
-  IDatabaseDataViewAction,
+  IDatabaseDataSource,
   isResultSetDataModel,
-  isResultSetGeometryValue,
   ResultSetDataAction,
   ResultSetDataContentAction,
+  type IDatabaseDataModel,
   type IDatabaseValueHolder,
   type IGridColumnKey,
   type IGridDataKey,
@@ -40,7 +41,6 @@ import { MENU_DATA_GRID_GENERATE_SQL } from './GenerateSQL/MENU_DATA_GRID_GENERA
 import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
 import { GeneratedSqlDialog, SqlGeneratorsResource } from '@cloudbeaver/plugin-sql-generator';
 import { isNotNullDefined } from '@dbeaver/js-helpers';
-import { isResultSetContentValue } from '@dbeaver/result-set-api';
 
 @injectable(() => [ActionService, MenuService, CommonDialogService, NotificationService, SqlGeneratorsResource])
 export class DataGridContextMenuGenerateSqlService {
@@ -126,13 +126,12 @@ export class DataGridContextMenuGenerateSqlService {
     }
 
     const select = model.source.tryGetAction(resultIndex, IDatabaseDataSelectAction, GridSelectAction);
-    const data = model.source.getAction(resultIndex, ResultSetDataAction);
     const projectId = model.source.executionContext?.context?.projectId;
     const connectionId = model.source.executionContext?.context?.connectionId;
     const contextId = model.source.executionContext?.context?.id;
     const resultId = model.source.getResult(resultIndex)?.id;
     const selectedElements = select?.getSelectedElements() || [];
-    const rows = getSqlResultRows(data, selectedElements, key);
+    const rows = getSqlResultRows(model, resultIndex, selectedElements, key);
 
     if (rows.length === 0) {
       this.notificationService.logError({
@@ -211,12 +210,17 @@ function getRowKeys(
 }
 
 function getSqlResultRows(
-  data: ResultSetDataAction,
+  model: IDatabaseDataModel<IDatabaseDataSource<unknown, IDatabaseDataResult>>,
+  resultIndex: number,
   selectedElements: IGridDataKey<IGridRowKey, IGridColumnKey>[],
   key: IGridDataKey<IGridRowKey, IGridColumnKey> | undefined,
 ): SqlResultRow[] {
+  const data = model.source.getAction(resultIndex, ResultSetDataAction);
+  const format = model.source.getAction(resultIndex, IDatabaseDataFormatAction);
+  const view = model.source.getAction(resultIndex, GridViewAction);
   const rowKeys = getRowKeys(selectedElements, key);
   const result: SqlResultRow[] = [];
+  const columnKeys = view.columnKeys;
 
   for (const rowKey of rowKeys) {
     const rowValue = data.getRowValue(rowKey);
@@ -224,16 +228,18 @@ function getSqlResultRows(
 
     if (rowValue) {
       result.push({
-        data: rowValue.map(value => {
-          if (isResultSetContentValue(value)) {
-            return value.text ?? null;
+        data: rowValue.map((value, index) => {
+          const columnKey = columnKeys[index];
+
+          if (!columnKey) {
+            return value;
           }
 
-          if (isResultSetGeometryValue(value)) {
-            return value.text;
-          }
+          const cellKey: IGridDataKey = { row: rowKey, column: columnKey };
+          const holder = format.get(cellKey);
+          const text = format.getText(holder);
 
-          return value;
+          return text || null;
         }),
         metaData: rowMetadata,
       });
@@ -249,7 +255,7 @@ function hasLargeObjectValuesInSelectedRows(context: IDataContextProvider): bool
   const key = context.get(DATA_CONTEXT_DV_RESULT_KEY);
 
   const format = model.source.getAction(resultIndex, IDatabaseDataFormatAction);
-  const view = model.source.getAction(resultIndex, IDatabaseDataViewAction, GridViewAction);
+  const view = model.source.getAction(resultIndex, GridViewAction);
   const data = model.source.getAction(resultIndex, ResultSetDataAction);
   const content = model.source.getAction(resultIndex, ResultSetDataContentAction);
   const select = model.source.tryGetAction(resultIndex, IDatabaseDataSelectAction, GridSelectAction);
