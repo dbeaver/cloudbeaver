@@ -35,6 +35,7 @@ import org.jkiss.dbeaver.model.struct.DBSEntity;
 import org.jkiss.dbeaver.model.struct.DBSObject;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class WebDBDResultSetDataProvider implements DBDResultSetDataProvider, DBSObject {
@@ -57,6 +58,12 @@ public class WebDBDResultSetDataProvider implements DBDResultSetDataProvider, DB
     @Override
     public DBDAttributeBinding[] getAttributes() throws DBWebException {
         return contextInfo.getResults(resultsId).getAttributes();
+    }
+
+    @NotNull
+    @Override
+    public List<DBDAttributeBinding> getVisibleAttributes() throws DBException {
+        return Arrays.asList(getAttributes());
     }
 
     @NotNull
