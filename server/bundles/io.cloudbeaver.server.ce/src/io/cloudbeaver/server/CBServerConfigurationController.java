@@ -170,13 +170,9 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
 
     public T parseServerConfiguration() {
         var config = getServerConfiguration();
-        if (config.getServerURL() == null) {
-            String hostName = config.getServerHost();
-            if (CommonUtils.isEmpty(hostName) || NETWORK_MODE_VALUE_HOST.equalsIgnoreCase(System.getenv(NETWORK_MODE_ENV))) {
-                hostName = getLocalHostAddress();
-                config.setServerHost(hostName);
-            }
-            config.setServerURL("http://" + hostName + ":" + config.getServerPort());
+        if (NETWORK_MODE_VALUE_HOST.equalsIgnoreCase(System.getenv(NETWORK_MODE_ENV))) {
+            String hostName = getLocalHostAddress();
+            config.setServerHost(hostName);
         }
 
         config.setContentRoot(ServletAppUtils.getRelativePath(config.getContentRoot(), homeDirectory));
