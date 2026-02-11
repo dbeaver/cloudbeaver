@@ -39,6 +39,7 @@ import { MENU_DATA_GRID_GENERATE_SQL } from './GenerateSQL/MENU_DATA_GRID_GENERA
 import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
 import { GeneratedSqlDialog, SqlGeneratorsResource } from '@cloudbeaver/plugin-sql-generator';
 import { isNotNullDefined } from '@dbeaver/js-helpers';
+import { isResultSetContentValue } from '@dbeaver/result-set-api';
 
 @injectable(() => [ActionService, MenuService, CommonDialogService, NotificationService, SqlGeneratorsResource])
 export class DataGridContextMenuGenerateSqlService {
@@ -222,7 +223,7 @@ function getSqlResultRows(
 
     if (rowValue) {
       result.push({
-        data: rowValue,
+        data: rowValue.map(value => (isResultSetContentValue(value) ? value.text ?? null : value)),
         metaData: rowMetadata,
       });
     }
