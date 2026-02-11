@@ -1,0 +1,8 @@
+fragment DatabaseConnectionPreferencesInfo on ConnectionInfo {
+  id
+  projectId
+  name
+  description
+  folder
+  driverId
+}

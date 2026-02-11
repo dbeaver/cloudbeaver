@@ -387,12 +387,6 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
         }
     }
 
-
-    public synchronized void updateServerUrl(@NotNull SMCredentialsProvider credentialsProvider,
-        @Nullable String newPublicUrl) throws DBException {
-        getServerConfiguration().setServerURL(newPublicUrl);
-    }
-
     protected Map<String, Object> collectConfigurationProperties(
         @NotNull CBServerConfig serverConfig,
         @NotNull CBAppConfig appConfig
@@ -526,10 +520,6 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
                 serverConfigProperties,
                 CBConstants.PARAM_SERVER_NAME,
                 serverConfig.getServerName());
-        }
-        if (!CommonUtils.isEmpty(serverConfig.getServerURL())) {
-            copyConfigValue(
-                originServerConfig, serverConfigProperties, CBConstants.PARAM_SERVER_URL, serverConfig.getServerURL());
         }
         if (serverConfig.getMaxSessionIdleTime() > 0) {
             copyConfigValue(
