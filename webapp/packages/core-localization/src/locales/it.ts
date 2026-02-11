@@ -62,6 +62,7 @@ export default [
   ['ui_no_matches_placeholder', 'La tua ricerca non ha prodotto risultati.'],
   ['ui_information', 'Informazioni'],
   ['ui_clipboard', 'Appunti'],
+  ['ui_copy', 'Copia'],
   ['ui_copy_to_clipboard', 'Copia'],
   ['ui_copy_to_clipboard_copied', 'Copiato'],
   ['ui_copy_to_clipboard_failed_to_copy', 'Fallimento della copia'],

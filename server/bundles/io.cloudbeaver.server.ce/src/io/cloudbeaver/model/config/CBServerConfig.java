@@ -31,7 +31,6 @@ public class CBServerConfig implements WebServerConfiguration {
 
     private static final Log log = Log.getLog(CBServerConfig.class);
 
-    protected String serverURL;
     @NotNull
     protected List<String> supportedHosts = new ArrayList<>();
     protected boolean forceHttps;
@@ -60,10 +59,6 @@ public class CBServerConfig implements WebServerConfiguration {
 
     public CBServerConfig() {
         this.securityManagerConfiguration = createSecurityManagerConfiguration();
-    }
-
-    public String getServerURL() {
-        return serverURL;
     }
 
     public int getServerPort() {
@@ -106,10 +101,6 @@ public class CBServerConfig implements WebServerConfiguration {
 
     public String getStaticContent() {
         return staticContent;
-    }
-
-    public void setServerURL(String serverURL) {
-        this.serverURL = serverURL;
     }
 
     public void setServerPort(int serverPort) {

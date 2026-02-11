@@ -61,6 +61,7 @@ export default [
   ['ui_data_delete_confirmation', 'Подтвердите удаление'],
   ['ui_information', 'Информация'],
   ['ui_clipboard', 'Буфер обмена'],
+  ['ui_copy', 'Копия'],
   ['ui_copy_to_clipboard', 'Копировать'],
   ['ui_copy_to_clipboard_copied', 'Скопировано'],
   ['ui_copy_to_clipboard_failed_to_copy', 'Не удалось скопировать'],
