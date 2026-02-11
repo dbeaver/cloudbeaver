@@ -140,6 +140,9 @@
       "path": "../plugin-connection-custom"
     },
     {
+      "path": "../plugin-connection-preferences"
+    },
+    {
       "path": "../plugin-connection-search"
     },
     {
