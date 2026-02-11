@@ -21,6 +21,7 @@ import {
   IDatabaseDataSelectAction,
   IDatabaseDataViewAction,
   isResultSetDataModel,
+  isResultSetGeometryValue,
   ResultSetDataAction,
   ResultSetDataContentAction,
   type IDatabaseValueHolder,
@@ -223,7 +224,17 @@ function getSqlResultRows(
 
     if (rowValue) {
       result.push({
-        data: rowValue.map(value => (isResultSetContentValue(value) ? value.text ?? null : value)),
+        data: rowValue.map(value => {
+          if (isResultSetContentValue(value)) {
+            return value.text ?? null;
+          }
+
+          if (isResultSetGeometryValue(value)) {
+            return value.text;
+          }
+
+          return value;
+        }),
         metaData: rowMetadata,
       });
     }
