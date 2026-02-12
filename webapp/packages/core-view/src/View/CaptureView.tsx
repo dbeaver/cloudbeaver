@@ -65,6 +65,7 @@ export const CaptureView = observer<React.PropsWithChildren<ICaptureViewProps>>(
       action?.activate(true);
     },
     {
+      useKey: true,
       enabled: allKeys.length > 0,
       enableOnFormTags: ['INPUT', 'SELECT', 'TEXTAREA'],
       preventDefault(event, handler) {

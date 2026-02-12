@@ -1,0 +1,37 @@
+{
+  "name": "@dbeaver/react-hotkeys",
+  "type": "module",
+  "sideEffects": [],
+  "exports": {
+    ".": "./lib/index.js",
+    "./*": "./lib/*.js"
+  },
+  "scripts": {
+    "clear": "rimraf lib"
+  },
+  "files": [
+    "package.json",
+    "LICENSE",
+    "lib",
+    "!lib/**/*.d.ts.map",
+    "!lib/**/*.test.js",
+    "!lib/**/*.test.d.ts",
+    "!lib/**/*.test.d.ts.map",
+    "!lib/**/*.test.js.map",
+    "!lib/tests",
+    "!.tsbuildinfo"
+  ],
+  "packageManager": "yarn@4.9.2",
+  "devDependencies": {
+    "@dbeaver/tsconfig": "workspace:^",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "rimraf": "^6",
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "react": "^19.2",
+    "react-dom": "^19.2",
+    "react-hotkeys-hook": "file:./artifacts"
+  }
+}

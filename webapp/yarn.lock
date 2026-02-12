@@ -1468,6 +1468,7 @@ __metadata:
     "@cloudbeaver/tsconfig": "workspace:*"
     "@dbeaver/cli": "workspace:*"
     "@dbeaver/js-helpers": "workspace:*"
+    "@dbeaver/react-hotkeys": "workspace:*"
     "@dbeaver/react-tests": "workspace:*"
     "@dbeaver/ui-kit": "workspace:*"
     "@testing-library/jest-dom": "npm:^6"
@@ -1480,7 +1481,6 @@ __metadata:
     mobx-react-lite: "npm:^4"
     react: "npm:^19"
     react-dom: "npm:^19"
-    react-hotkeys-hook: "npm:5.1.0"
     react-minisearch: "npm:^7"
     reakit: "npm:^1"
     reakit-utils: "npm:^0"
@@ -5004,6 +5004,21 @@ __metadata:
     rimraf: "npm:^6"
     typescript: "npm:^5"
     vitest: "npm:^4"
+  languageName: unknown
+  linkType: soft
+
+"@dbeaver/react-hotkeys@workspace:*, @dbeaver/react-hotkeys@workspace:common-react/@dbeaver/react-hotkeys":
+  version: 0.0.0-use.local
+  resolution: "@dbeaver/react-hotkeys@workspace:common-react/@dbeaver/react-hotkeys"
+  dependencies:
+    "@dbeaver/tsconfig": "workspace:^"
+    "@types/react": "npm:^19"
+    "@types/react-dom": "npm:^19"
+    react: "npm:^19.2"
+    react-dom: "npm:^19.2"
+    react-hotkeys-hook: "file:./artifacts"
+    rimraf: "npm:^6"
+    typescript: "npm:^5"
   languageName: unknown
   linkType: soft
 
@@ -16851,13 +16866,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-hotkeys-hook@npm:5.1.0":
+"react-hotkeys-hook@file:./artifacts::locator=%40dbeaver%2Freact-hotkeys%40workspace%3Acommon-react%2F%40dbeaver%2Freact-hotkeys":
   version: 5.1.0
-  resolution: "react-hotkeys-hook@npm:5.1.0"
+  resolution: "react-hotkeys-hook@file:./artifacts#./artifacts::hash=4f8db9&locator=%40dbeaver%2Freact-hotkeys%40workspace%3Acommon-react%2F%40dbeaver%2Freact-hotkeys"
   peerDependencies:
-    react: ">=16.8.0"
-    react-dom: ">=16.8.0"
-  checksum: 10c0/99df6d3c305b139ac7afd073b58575961bf30a819fb23e8f1251b1b3a9f1c7662737f8b6266e3fc42bd5bdfdaca81aa1e019613f95f9a6313267de265e45836d
+    react: ^19.2
+    react-dom: ^19.2
+  checksum: 10c0/f991862d669be6c546e08ccbe1d01faf069a61653daad533a8392ce941679d032b0ece3ddc371498b76087a3f2bf3ae5e9acc6441d70a870bd9fe9ab9bd0f66b
   languageName: node
   linkType: hard
 

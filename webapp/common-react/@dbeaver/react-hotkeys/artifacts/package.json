@@ -1,0 +1,26 @@
+{
+  "name": "react-hotkeys-hook",
+  "version": "5.1.0",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./lib/index.d.ts",
+      "default": "./lib/index.js"
+    },
+    "./types": {
+      "types": "./lib/types.d.ts",
+      "default": "./lib/types.d.ts"
+    }
+  },
+  "browser": "./lib/index.js",
+  "main": "./lib/index.js",
+  "module": "./lib/index.js",
+  "types": "./lib/index.d.ts",
+  "files": [
+    "lib"
+  ],
+  "peerDependencies": {
+    "react": "^19.2",
+    "react-dom": "^19.2"
+  }
+}
