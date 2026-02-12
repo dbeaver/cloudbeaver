@@ -27,6 +27,7 @@ import { DataGridContextMenuCellEditingService } from './DataGrid/DataGridContex
 import { DataGridContextMenuFilterService } from './DataGrid/DataGridContextMenu/DataGridContextMenuFilter/DataGridContextMenuFilterService.js';
 import { DataGridContextMenuOrderService } from './DataGrid/DataGridContextMenu/DataGridContextMenuOrderService.js';
 import { DataGridContextMenuSaveContentService } from './DataGrid/DataGridContextMenu/DataGridContextMenuSaveContentService.js';
+import { DataGridContextMenuGenerateSqlService } from './DataGrid/DataGridContextMenu/DataGridContextMenuGenerateSqlService.js';
 import { DataGridSettingsService } from './DataGridSettingsService.js';
 import { ACTION_DATA_GRID_PIN_COLUMN } from './DataGrid/Actions/Pin/ACTION_DATA_GRID_PIN_COLUMN.js';
 import { ACTION_DATA_GRID_UNPIN_COLUMN } from './DataGrid/Actions/Pin/ACTION_DATA_GRID_UNPIN_COLUMN.js';
@@ -44,6 +45,7 @@ const SpreadsheetGrid = importLazyComponent(() => import('./SpreadsheetGrid.js')
   DataGridContextMenuFilterService,
   DataGridContextMenuCellEditingService,
   DataGridContextMenuSaveContentService,
+  DataGridContextMenuGenerateSqlService,
   ActionService,
   MenuService,
   ExceptionsCatcherService,
@@ -56,6 +58,7 @@ export class SpreadsheetBootstrap extends Bootstrap {
     private readonly dataGridContextMenuFilterService: DataGridContextMenuFilterService,
     private readonly dataGridContextMenuCellEditingService: DataGridContextMenuCellEditingService,
     private readonly dataGridContextMenuSaveContentService: DataGridContextMenuSaveContentService,
+    private readonly dataGridContextMenuGenerateSqlService: DataGridContextMenuGenerateSqlService,
     private readonly actionService: ActionService,
     private readonly menuService: MenuService,
     exceptionsCatcherService: ExceptionsCatcherService,
@@ -79,6 +82,7 @@ export class SpreadsheetBootstrap extends Bootstrap {
     this.dataGridContextMenuFilterService.register();
     this.dataGridContextMenuCellEditingService.register();
     this.dataGridContextMenuSaveContentService.register();
+    this.dataGridContextMenuGenerateSqlService.register();
 
     this.menuService.addCreator({
       root: true,
