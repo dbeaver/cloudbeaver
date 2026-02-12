@@ -187,8 +187,7 @@ public class CBEventsLongPollingServlet extends HttpServlet {
 
     private void addCorsHeaders(@NotNull HttpServletRequest req, @NotNull HttpServletResponse resp) {
         String origin = req.getHeader("Origin");
-        boolean develMode = ServletAppUtils.getServletApplication().getServerConfiguration().isDevelMode();
-        if (!develMode || origin == null) {
+        if (origin == null) {
             return;
         }
 
