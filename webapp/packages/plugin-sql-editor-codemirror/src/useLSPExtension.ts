@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 
 import { createLazyLoader, useLazyImport } from '@cloudbeaver/core-blocks';
 import { GlobalConstants } from '@cloudbeaver/core-utils';
@@ -14,44 +14,84 @@ import { type Compartment, type Extension, type Transport, LSPClient, languageSe
 const codemirrorPluginLoader = createLazyLoader(() => import('@cloudbeaver/plugin-codemirror6'));
 
 const LSP_ENDPOINT = 'ws/lsp';
+const RECONNECT_BASE_DELAY = 1000;
+const MAX_RECONNECT_ATTEMPTS = 5;
 
-function simpleWebSocketTransport(uri: string): Promise<Transport> {
+interface IReconnectingTransport extends Transport {
+  dispose(): void;
+}
+
+function createReconnectingTransport(uri: string): IReconnectingTransport {
   let handlers: ((value: string) => void)[] = [];
-  const sock = new WebSocket(uri);
+  let sock: WebSocket | null = null;
+  let reconnectAttempts = 0;
+  let reconnectTimeout: ReturnType<typeof setTimeout> | null = null;
+  let disposed = false;
 
-  sock.onmessage = e => {
-    handlers.forEach(h => h(e.data as string));
-  };
+  function connect() {
+    if (disposed) {
+      return;
+    }
 
-  sock.onerror = e => {
-    console.error('[LSP] WebSocket error:', e);
-  };
+    sock = new WebSocket(uri);
 
-  sock.onclose = () => {
-    console.log('[LSP] WebSocket connection closed');
-  };
-
-  return new Promise((resolve, reject) => {
     sock.onopen = () => {
-      console.log('[LSP] WebSocket connection established');
-      resolve({
-        send(message: string) {
-          sock.send(message);
-        },
-        subscribe(handler) {
-          handlers.push(handler);
-        },
-        unsubscribe(handler) {
-          handlers = handlers.filter(h => h !== handler);
-        },
-      });
+      reconnectAttempts = 0;
+    };
+
+    sock.onmessage = e => {
+      handlers.forEach(h => h(e.data as string));
+    };
+
+    sock.onclose = () => {
+      if (disposed) {
+        return;
+      }
+
+      if (reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
+        reconnectAttempts++;
+        const delay = RECONNECT_BASE_DELAY * 2 ** (reconnectAttempts - 1);
+        console.warn(`[LSP] WebSocket closed, reconnecting in ${delay}ms (${reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS})...`);
+        reconnectTimeout = setTimeout(connect, delay);
+      } else {
+        console.error('[LSP] Max reconnect attempts reached');
+      }
     };
 
     sock.onerror = e => {
-      console.error('[LSP] Failed to connect to WebSocket:', e);
-      reject(e);
+      console.error('[LSP] WebSocket error:', e);
     };
-  });
+  }
+
+  connect();
+
+  return {
+    send(message: string) {
+      if (sock?.readyState === WebSocket.OPEN) {
+        sock.send(message);
+      }
+    },
+    subscribe(handler) {
+      handlers.push(handler);
+    },
+    unsubscribe(handler) {
+      handlers = handlers.filter(h => h !== handler);
+    },
+    dispose() {
+      disposed = true;
+
+      if (reconnectTimeout !== null) {
+        clearTimeout(reconnectTimeout);
+      }
+
+      if (sock) {
+        sock.close();
+        sock = null;
+      }
+
+      handlers = [];
+    },
+  };
 }
 
 export interface ILSPExtensionOptions {
@@ -70,23 +110,25 @@ export function useLSPExtension(options: ILSPExtensionOptions): [Compartment, Ex
     return new codemirror.Compartment();
   }, [codemirror]);
 
-  const client = useMemo(() => {
+  const { client, transport } = useMemo(() => {
     const lspClient = new LSPClient({
       extensions: languageServerExtensions(),
     });
 
     const lspServerUrl = GlobalConstants.absoluteServiceWSUrl(LSP_ENDPOINT);
+    const lspTransport = createReconnectingTransport(lspServerUrl);
 
-    simpleWebSocketTransport(lspServerUrl)
-      .then(transport => {
-        lspClient.connect(transport);
-      })
-      .catch(error => {
-        console.error('[LSP] Failed to initialize LSP client:', error);
-      });
+    lspClient.connect(lspTransport);
 
-    return lspClient;
+    return { client: lspClient, transport: lspTransport };
   }, []);
+
+  useEffect(
+    () => () => {
+      transport.dispose();
+    },
+    [transport],
+  );
 
   const documentUri = useMemo(() => {
     if (!projectId || !resourcePath) {
