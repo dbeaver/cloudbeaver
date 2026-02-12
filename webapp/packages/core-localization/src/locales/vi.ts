@@ -41,6 +41,7 @@ export default [
   ['ui_ignore', 'Bỏ qua'],
   ['ui_unexpected_error', 'Lỗi không mong muốn'],
   ['ui_error', 'Lỗi'],
+  ['ui_unknown_error', 'Lỗi không xác định'],
   ['ui_error_message', 'Lỗi:'],
   ['ui_error_close', 'Đóng'],
   ['ui_clear', 'Xóa'],
