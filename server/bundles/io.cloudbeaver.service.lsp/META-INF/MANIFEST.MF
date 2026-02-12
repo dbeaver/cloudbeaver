@@ -1,0 +1,17 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Vendor: DBeaver Corp
+Bundle-Name: Cloudbeaver Lsp WS
+Bundle-SymbolicName: io.cloudbeaver.service.lsp;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Release-Date: 20260212
+Bundle-RequiredExecutionEnvironment: JavaSE-21
+Bundle-ActivationPolicy: lazy
+Require-Bundle: org.jkiss.dbeaver.model,
+    org.jkiss.dbeaver.model.lsp,
+    org.eclipse.jetty.websocket.core.client,
+    io.cloudbeaver.model,
+    io.cloudbeaver.server.ce
+Export-Package: io.cloudbeaver.service.lsp.ws
+Automatic-Module-Name: io.cloudbeaver.service.lsp
+Import-Package: org.slf4j
