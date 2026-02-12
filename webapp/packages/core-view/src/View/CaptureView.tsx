@@ -20,6 +20,7 @@ import styles from './CaptureView.module.css';
 import { CaptureViewContext } from './CaptureViewContext.js';
 import type { IView } from './IView.js';
 import { parseHotkey } from './parseHotkey.js';
+import { matchesHotkeyModifiers } from './matchesHotkeyModifiers.js';
 import { useActiveView } from './useActiveView.js';
 import { useViewContext } from './useViewContext.js';
 
@@ -57,7 +58,8 @@ export const CaptureView = observer<React.PropsWithChildren<ICaptureViewProps>>(
         return commonAndSpecificKeys.some(key => {
           const hotkey = parseHotkey(key);
 
-          return isObjectsEqual(hotkey, handler);
+          // modifiers are not checked by the library cause it has a bug: https://github.com/JohannesKlauss/react-hotkeys-hook/issues/1318
+          return isObjectsEqual(hotkey, handler) && matchesHotkeyModifiers(event, hotkey);
         });
       });
 
@@ -65,6 +67,7 @@ export const CaptureView = observer<React.PropsWithChildren<ICaptureViewProps>>(
       action?.activate(true);
     },
     {
+      useKey: true,
       enabled: allKeys.length > 0,
       enableOnFormTags: ['INPUT', 'SELECT', 'TEXTAREA'],
       preventDefault(event, handler) {
@@ -78,7 +81,8 @@ export const CaptureView = observer<React.PropsWithChildren<ICaptureViewProps>>(
           return commonAndSpecificKeys.some(key => {
             const hotkey = parseHotkey(key);
 
-            return isObjectsEqual(hotkey, handler);
+            // modifiers are not checked by the library cause it has a bug: https://github.com/JohannesKlauss/react-hotkeys-hook/issues/1318
+            return isObjectsEqual(hotkey, handler) && matchesHotkeyModifiers(event, hotkey);
           });
         });
 
