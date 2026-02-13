@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -100,7 +100,9 @@ export class DataImportBootstrap extends Bootstrap {
         const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
         const presentation = context.get(DATA_CONTEXT_DV_PRESENTATION);
         const isContainer = model.source instanceof ContainerDataSource;
+
         return (
+          // TODO add more proper way to define to what features it should be added https://github.com/dbeaver/pro/issues/8299
           !model.isReadonly(resultIndex) &&
           isContainer &&
           !this.dataImportService.disabled &&

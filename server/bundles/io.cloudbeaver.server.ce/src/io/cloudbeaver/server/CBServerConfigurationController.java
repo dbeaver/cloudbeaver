@@ -56,6 +56,9 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
 
     private static final Log log = Log.getLog(CBServerConfigurationController.class);
 
+    private static final String NETWORK_MODE_ENV = "NETWORK_MODE";
+    private static final String NETWORK_MODE_VALUE_HOST = "host";
+
     // Configurations
     @NotNull
     private final T serverConfiguration;
@@ -167,6 +170,11 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
 
     public T parseServerConfiguration() {
         var config = getServerConfiguration();
+        if (NETWORK_MODE_VALUE_HOST.equalsIgnoreCase(System.getenv(NETWORK_MODE_ENV))) {
+            String hostName = getLocalHostAddress();
+            config.setServerHost(hostName);
+        }
+
         config.setContentRoot(ServletAppUtils.getRelativePath(config.getContentRoot(), homeDirectory));
         config.setRootURI(readRootUri(config.getRootURI()));
         config.setDriversLocation(ServletAppUtils.getRelativePath(config.getDriversLocation(), homeDirectory));
