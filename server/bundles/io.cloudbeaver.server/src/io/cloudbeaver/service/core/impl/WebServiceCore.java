@@ -464,6 +464,11 @@ public class WebServiceCore implements DBWServiceCore {
                 throw new DBException("Node '" + nodePath + "' is not a datasource node");
             }
             DBPDataSourceContainer dataSourceTemplate = dbnDataSource.getDataSourceContainer();
+            if (!dataSourceTemplate.isExternallyProvided()) {
+                if (!CommonUtils.equalObjects(dataSourceTemplate.getProject(), project)) {
+                    throw new DBException("Copying connection to another project is not allowed");
+                }
+            }
 
             DataSourceDescriptor newDataSource = dataSourceRegistry.createDataSource(dataSourceTemplate);
 
