@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -241,10 +241,14 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
         }
 
         this.onExecute.execute(true);
+
         try {
           this.executingScript = true;
-          await this.model.getResolvedSegment();
-          const queries = this.model.parser.scripts;
+
+          const segment = await this.model.getResolvedSegment();
+
+          const hasSelection = segment && this.model.cursor.anchor !== this.model.cursor.head;
+          const queries = hasSelection ? this.model.parser.getQueriesInRange(segment.begin, segment.end) : this.model.parser.scripts;
 
           await this.sqlQueryService.executeQueries(
             this.state,
