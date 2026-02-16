@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebProjectImpl;
 import io.cloudbeaver.model.app.BaseWebAppConfiguration;
 import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.server.CBConstants;
 import io.cloudbeaver.service.security.SMUtils;
 import io.cloudbeaver.service.sql.WebDataFormat;
 import io.cloudbeaver.utils.CBModelConstants;
@@ -59,7 +60,6 @@ import java.util.stream.Collectors;
 public class WebConnectionInfo {
 
     private static final Log log = Log.getLog(WebConnectionInfo.class);
-    public static final String SECURED_VALUE = "********";
 
     private static final String FEATURE_HAS_TOOLS = "hasTools";
     private static final String FEATURE_CONNECTED = "connected";
@@ -127,7 +127,7 @@ public class WebConnectionInfo {
         if (canViewReadOnlyConnections()) {
             return dataSourceContainer.getConnectionConfiguration().getHostName();
         }
-        return SECURED_VALUE;
+        return CBConstants.SECURED_VALUE;
     }
 
     @Property
@@ -135,7 +135,7 @@ public class WebConnectionInfo {
         if (canViewReadOnlyConnections()) {
             return dataSourceContainer.getConnectionConfiguration().getHostPort();
         }
-        return SECURED_VALUE;
+        return CBConstants.SECURED_VALUE;
     }
 
     @Property
@@ -148,7 +148,7 @@ public class WebConnectionInfo {
         if (canViewReadOnlyConnections()) {
             return dataSourceContainer.getConnectionConfiguration().getDatabaseName();
         }
-        return SECURED_VALUE;
+        return CBConstants.SECURED_VALUE;
     }
 
     @Property
@@ -156,7 +156,7 @@ public class WebConnectionInfo {
         if (canViewReadOnlyConnections()) {
             return dataSourceContainer.getConnectionConfiguration().getUrl();
         }
-        return SECURED_VALUE;
+        return CBConstants.SECURED_VALUE;
     }
 
     @Property

@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2025 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package io.cloudbeaver.model;
 
 import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.server.CBConstants;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -42,7 +43,6 @@ public class WebPropertyInfo {
     private WebSession session;
     private DBPPropertyDescriptor property;
     private DBPPropertySource propertySource;
-    private boolean showProtected;
 
     private Object[] validValues;
 
@@ -59,14 +59,6 @@ public class WebPropertyInfo {
     public WebPropertyInfo(WebSession session, DBPPropertyDescriptor property) {
         this.session = session;
         this.property = property;
-    }
-
-    public boolean isShowProtected() {
-        return showProtected;
-    }
-
-    public void setShowProtected(boolean showProtected) {
-        this.showProtected = showProtected;
     }
 
     ///////////////////////////////////
@@ -138,11 +130,11 @@ public class WebPropertyInfo {
         Object value = propertySource == null ? null : propertySource.getPropertyValue(session.getProgressMonitor(), property.getId());
         if (property instanceof ObjectPropertyDescriptor) {
             ObjectPropertyDescriptor opd = (ObjectPropertyDescriptor) property;
-            if (!showProtected && opd.isPassword() || opd.isHidden()) {
+            if (opd.isPassword() || opd.isHidden()) {
                 if (value == null || value.toString().isEmpty()) {
                     return "";
                 }
-                return "******";
+                return CBConstants.SECURED_VALUE;
             }
         }
         return value == null ? null : makePropertyValue(value);
