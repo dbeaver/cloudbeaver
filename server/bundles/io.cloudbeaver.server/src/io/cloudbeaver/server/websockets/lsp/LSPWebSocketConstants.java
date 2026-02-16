@@ -1,4 +1,4 @@
-package io.cloudbeaver.lsp.websocket;
+package io.cloudbeaver.server.websockets.lsp;
 
 import java.time.Duration;
 

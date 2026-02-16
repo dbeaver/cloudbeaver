@@ -14,7 +14,7 @@
  * is strictly forbidden unless prior written permission is obtained
  * from DBeaver Corp.
  */
-package io.cloudbeaver.lsp.websocket;
+package io.cloudbeaver.server.websockets.lsp;
 
 import io.cloudbeaver.model.session.BaseWebSession;
 import io.cloudbeaver.server.websockets.CBAbstractWebSocket;
@@ -28,21 +28,25 @@ import org.jkiss.dbeaver.Log;
 public abstract class LSPWebSocket extends CBAbstractWebSocket {
     private static final Log log = Log.getLog(LSPWebSocket.class);
 
+    private LSPWebSocketMessageHandler handler;
+
     @Override
     public void onOpen(Session session, EndpointConfig endpointConfig) {
         BaseWebSession webSession = (BaseWebSession) session.getUserProperties()
             .get(CBWebSocketServerConfigurator.PROP_WEB_SESSION);
+        handler = new LSPWebSocketMessageHandler(webSession);
+        session.addMessageHandler(handler);
+        CBJettyWebSocketManager.registerWebSocket(webSession.getSessionId(), this);
 
         session.setMaxIdleTimeout(LSPWebSocketConstants.IDLE_TIMEOUT.toMillis());
         session.setMaxTextMessageBufferSize(Integer.MAX_VALUE);
         session.setMaxBinaryMessageBufferSize(Integer.MAX_VALUE);
-        session.addMessageHandler(new LSPWebSocketMessageHandler(webSession));
-
-        CBJettyWebSocketManager.registerWebSocket(webSession.getSessionId(), this);
     }
 
     @Override
     public void onClose(Session session, CloseReason closeReason) {
+        log.debug("Closing websocket session: " + session.getId());
+        handler.close();
     }
 
     @Override

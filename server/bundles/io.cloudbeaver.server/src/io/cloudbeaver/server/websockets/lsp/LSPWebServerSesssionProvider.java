@@ -1,4 +1,4 @@
-package io.cloudbeaver.lsp;
+package io.cloudbeaver.server.websockets.lsp;
 
 import io.cloudbeaver.model.session.BaseWebSession;
 import org.jkiss.code.NotNull;

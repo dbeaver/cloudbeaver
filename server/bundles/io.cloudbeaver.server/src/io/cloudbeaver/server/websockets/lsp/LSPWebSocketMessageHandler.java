@@ -1,6 +1,5 @@
-package io.cloudbeaver.lsp.websocket;
+package io.cloudbeaver.server.websockets.lsp;
 
-import io.cloudbeaver.lsp.LSPWebServerSesssionProvider;
 import io.cloudbeaver.model.session.BaseWebSession;
 import jakarta.websocket.MessageHandler;
 import org.jkiss.code.NotNull;
