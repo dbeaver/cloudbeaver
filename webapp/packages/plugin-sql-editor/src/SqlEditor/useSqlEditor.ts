@@ -245,10 +245,14 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
         try {
           this.executingScript = true;
 
-          const segment = await this.model.getResolvedSegment();
+          await this.model.getResolvedSegment();
 
-          const hasSelection = segment && this.model.cursor.anchor !== this.model.cursor.head;
-          const queries = hasSelection ? this.model.parser.getQueriesInRange(segment.begin, segment.end) : this.model.parser.scripts;
+          const cursor = this.model.cursor;
+          const hasSelection = cursor.anchor !== cursor.head;
+          const from = Math.min(cursor.anchor, cursor.head);
+          const to = Math.max(cursor.anchor, cursor.head);
+
+          const queries = hasSelection ? this.model.parser.getQueriesInRange(from, to) : this.model.parser.scripts;
 
           await this.sqlQueryService.executeQueries(
             this.state,
