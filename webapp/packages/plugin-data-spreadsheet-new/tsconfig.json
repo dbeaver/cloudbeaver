@@ -69,6 +69,9 @@
     },
     {
       "path": "../plugin-data-viewer-conditional-formatting"
+    },
+    {
+      "path": "../plugin-sql-generator"
     }
   ],
   "include": [
