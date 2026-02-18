@@ -23,6 +23,7 @@ import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.*;
 import org.jkiss.dbeaver.model.connection.DBPDriverConfigurationType;
+import org.jkiss.dbeaver.model.impl.PropertyDescriptor;
 import org.jkiss.dbeaver.model.impl.ProviderPropertyDescriptor;
 import org.jkiss.dbeaver.model.meta.IPropertyValueListProvider;
 import org.jkiss.dbeaver.model.meta.Property;
@@ -128,13 +129,12 @@ public class WebPropertyInfo {
     @Property
     public Object getValue() throws DBException {
         Object value = propertySource == null ? null : propertySource.getPropertyValue(session.getProgressMonitor(), property.getId());
-        if (property instanceof ObjectPropertyDescriptor) {
-            ObjectPropertyDescriptor opd = (ObjectPropertyDescriptor) property;
-            if (opd.isPassword() || opd.isHidden()) {
-                if (value == null || value.toString().isEmpty()) {
-                    return "";
-                }
-                return CBConstants.SECURED_VALUE;
+        if (property instanceof ObjectPropertyDescriptor opd && (opd.isPassword() || opd.isHidden())) {
+            return maskValue(value);
+        } else if (property instanceof PropertyDescriptor pd) {
+            String[] features = pd.getFeatures();
+            if (features != null && Arrays.asList(features).contains(DBConstants.PROP_FEATURE_PASSWORD)) {
+                return maskValue(value);
             }
         }
         return value == null ? null : makePropertyValue(value);
@@ -297,6 +297,15 @@ public class WebPropertyInfo {
         public enum Type {
             HIDE,
             READ_ONLY
+        }
+    }
+
+    @NotNull
+    private static String maskValue(@Nullable Object value) {
+        if (value == null || value.toString().isEmpty()) {
+            return "";
+        } else {
+            return CBConstants.SECURED_VALUE;
         }
     }
 }

@@ -38,6 +38,7 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.DBConstants;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPProject;
@@ -496,7 +497,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         @NotNull HttpServletRequest request,
         @NotNull WebSession webSession,
         @Nullable String providerId
-    ) throws DBWebException {
+    ) {
         String origin = ServletAppUtils.getOriginFromRequest(request);
         List<WebAuthProviderConfiguration> result = new ArrayList<>();
         for (SMAuthProviderCustomConfiguration cfg : CBApplication.getInstance().getAppConfiguration().getAuthCustomConfigurations()) {
@@ -505,6 +506,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             }
             WebAuthProviderDescriptor authProvider = WebAuthProviderRegistry.getInstance().getAuthProvider(cfg.getProvider());
             if (authProvider != null) {
+                maskSecuredConfigParameters(authProvider.getConfigurationParameters(), cfg);
                 result.add(new WebAuthProviderConfiguration(authProvider, cfg, origin));
             }
         }
@@ -949,6 +951,22 @@ public class WebServiceAdmin implements DBWServiceAdmin {
                     "Unexpected permission scope, expected [{}] but was [{}]",
                     expectedScope, permissionDescriptor.getScope()
                 ));
+            }
+        }
+    }
+
+    private void maskSecuredConfigParameters(
+        @NotNull List<WebAuthProviderProperty> configProperties,
+        @NotNull SMAuthProviderCustomConfiguration config
+    ) {
+        for (WebAuthProviderProperty property : configProperties) {
+            String[] features = property.getFeatures();
+            if (features != null && List.of(features).contains(DBConstants.PROP_FEATURE_PASSWORD)) {
+                String propertyId = property.getId();
+                Object securedParameterValue = config.getParameter(propertyId);
+                if (securedParameterValue != null && !securedParameterValue.toString().isEmpty()) {
+                    config.getParameters().put(propertyId, CBConstants.SECURED_VALUE);
+                }
             }
         }
     }
