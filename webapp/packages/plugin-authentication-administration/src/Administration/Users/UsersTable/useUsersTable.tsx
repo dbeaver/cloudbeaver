@@ -7,7 +7,7 @@
  */
 import { action, computed, observable } from 'mobx';
 
-import { type AdminUser, compareUsers, compareNewUsers, UsersResource, UsersResourceFilterKey } from '@cloudbeaver/core-authentication';
+import { type AdminUser, compareUsers, compareNewUsers, UsersResource, UsersResourceFilterKey, UsersResourceNewUsers } from '@cloudbeaver/core-authentication';
 import { TableState, useObservableRef, useOffsetPagination, useResource } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -25,13 +25,13 @@ interface State {
 }
 
 export function useUsersTable(filters: IUserFilters) {
-  const usersResource = useService(UsersResource);
   const searchFilter = filters.search.trim().toLowerCase();
   const enabledStateFilter = filters.status === 'true' ? true : filters.status === 'false' ? false : undefined;
   const pagination = useOffsetPagination(UsersResource, {
     key: UsersResourceFilterKey(searchFilter, enabledStateFilter),
   });
-  const usersLoader = useResource(useUsersTable, usersResource, pagination.currentPage);
+
+  const usersLoader = useResource(useUsersTable, UsersResource, pagination.currentPage);
   const notificationService = useService(NotificationService);
 
   const state: State = useObservableRef(
@@ -48,7 +48,8 @@ export function useUsersTable(filters: IUserFilters) {
           Array.from(
             new Set([
               ...(this.searchFilter ? this.usersLoader.resource.get(UsersResourceFilterKey(this.searchFilter, this.enabledStateFilter)) : []),
-              ...usersResource.get(pagination.allPages),
+              ...usersLoader.resource.get(pagination.allPages),
+              ...usersLoader.resource.get(UsersResourceNewUsers),
             ]),
           )
             .filter(isDefined)
