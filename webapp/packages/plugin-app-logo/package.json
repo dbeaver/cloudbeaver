@@ -26,7 +26,6 @@
     "@cloudbeaver/core-di": "workspace:*",
     "@cloudbeaver/core-root": "workspace:*",
     "@cloudbeaver/core-routing": "workspace:*",
-    "@cloudbeaver/core-version": "workspace:*",
     "@cloudbeaver/plugin-holidays": "workspace:*",
     "@cloudbeaver/plugin-top-app-bar": "workspace:*",
     "mobx": "^6",

@@ -23,9 +23,6 @@
       "path": "../core-routing"
     },
     {
-      "path": "../core-version"
-    },
-    {
       "path": "../plugin-holidays"
     },
     {
