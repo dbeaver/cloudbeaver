@@ -25,6 +25,19 @@ You can see a live demo of CloudBeaver here: https://demo.cloudbeaver.io
 
 ## Changelog
 
+### 25.3.5 2026-02-16
+
+- Data Editor:
+    - Added the ability to automatically generate INSERT, SELECT, DELETE, and UPDATE statements for the selected values in the Data Editor;
+    - Added a status indicator icon in the top-left corner of the Data Editor with tooltips explaining table editability. The icon shows whether the table has a primary key, is read-only due to connection settings, or contains only read-only columns.
+- Navigator:
+    - The Connection Info tab was added so that all users can see basic information about the current connection;
+    - Added the ability to duplicate connection configuration in the project navigation tree. The "Clone connection" feature is available in the context menu.
+- General:
+    - The missing pg_dump utility no longer causes errors during initialization or during deployment updates when PostgreSQL is selected as the inner database;
+    - DuckDB: Driver version was updated to 1.4.4.0;
+    - PostgreSQL: Added DDL display support for PostgreSQL policies.
+
 ### 25.3.4 2026-02-02
 
 - Editors:
