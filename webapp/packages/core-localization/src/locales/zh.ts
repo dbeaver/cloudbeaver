@@ -38,6 +38,7 @@ export default [
   ['ui_reject', '拒绝'],
   ['ui_ignore', '忽略'],
   ['ui_error', '错误'],
+  ['ui_unknown_error', '未知错误'],
   ['ui_error_message', '错误：'],
   ['ui_error_close', '关闭'],
   ['ui_clear', '清除'],
