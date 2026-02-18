@@ -24,12 +24,10 @@
       transition-timing-function: var(--tw-ease-in-out);
       transition-duration: 150ms;
       scale: 0.95;
-      translate: 0 -0.5rem;
 
       &[data-enter] {
         opacity: 1;
         scale: 1;
-        translate: 0;
       }
     }
   }
