@@ -113,15 +113,10 @@ export abstract class FormPart<TPartState extends object, TFormState = any> impl
         return;
       }
 
-      // loaded=false ensures setInitialState resets both initialState and state.
       this.loaded = false;
-
-      try {
-        await this.loader();
-        this.exception = null;
-      } finally {
-        this.loaded = true;
-      }
+      this.setInitialState(toJS(this.state));
+      this.loaded = true;
+      this.exception = null;
     } catch (exception: any) {
       this.exception = exception;
       throw exception;
