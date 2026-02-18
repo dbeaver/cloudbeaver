@@ -29,6 +29,8 @@ import io.cloudbeaver.server.servlets.WebStatusServlet;
 import io.cloudbeaver.server.websockets.CBEventsLongPollingServlet;
 import io.cloudbeaver.server.websockets.CBEventsWebSocket;
 import io.cloudbeaver.server.websockets.CBWebSocketServerConfigurator;
+import io.cloudbeaver.server.websockets.lsp.LSPWebSocket;
+import io.cloudbeaver.server.websockets.lsp.LSPWebSocketConstants;
 import io.cloudbeaver.service.DBWServiceBindingServlet;
 import io.cloudbeaver.service.DBWServiceBindingWebSocket;
 import jakarta.websocket.server.ServerEndpointConfig;
@@ -174,13 +176,24 @@ public class CBJettyServer {
 
                 JakartaWebSocketServletContainerInitializer.configure(servletContextHandler, (context, container) -> {
                     // Add echo endpoint to server container
-                    ServerEndpointConfig eventWsEnpoint = ServerEndpointConfig.Builder
+                    CBWebSocketServerConfigurator configurator =
+                        new CBWebSocketServerConfigurator(application.getSessionManager());
+
+                    ServerEndpointConfig eventWsEndpoint = ServerEndpointConfig.Builder
                         .create(
                             CBEventsWebSocket.class,
                             serverConfiguration.getServicesURI() + "ws"
-                        ).configurator(new CBWebSocketServerConfigurator(application.getSessionManager()))
+                        ).configurator(configurator)
                         .build();
-                    container.addEndpoint(eventWsEnpoint);
+                    container.addEndpoint(eventWsEndpoint);
+
+                    ServerEndpointConfig lspWsEndpoint = ServerEndpointConfig.Builder
+                        .create(
+                            LSPWebSocket.class,
+                            serverConfiguration.getServicesURI() + LSPWebSocketConstants.ENDPOINT_SUFFIX
+                        ).configurator(configurator)
+                        .build();
+                    container.addEndpoint(lspWsEndpoint);
                 });
 
                 JettyUtils.initSessionManager(
