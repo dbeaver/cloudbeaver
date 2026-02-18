@@ -7,17 +7,19 @@
  */
 import { FormPart, type IFormState } from '@cloudbeaver/core-ui';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
-import { ConnectionInfoPropertiesResource } from '@cloudbeaver/core-connections';
+import { CONNECTION_PROPERTIES_SCHEMA, ConnectionInfoPropertiesResource } from '@cloudbeaver/core-connections';
 import type { IConnectionFormState } from '../IConnectionFormState.js';
-import type { IConnectionProperties } from '../Options/IConnectionConfig.js';
 import { runInAction, toJS } from 'mobx';
 import type { ConnectionFormOptionsPart } from '../Options/ConnectionFormOptionsPart.js';
+import type { schema } from '@cloudbeaver/core-utils';
 
-function getDefaultState(): IConnectionProperties {
+type ConnectionProperties = schema.infer<typeof CONNECTION_PROPERTIES_SCHEMA>;
+
+function getDefaultState(): ConnectionProperties {
   return {};
 }
 
-export class ConnectionFormDriverPropertiesPart extends FormPart<IConnectionProperties, IConnectionFormState> {
+export class ConnectionFormDriverPropertiesPart extends FormPart<ConnectionProperties, IConnectionFormState> {
   constructor(
     formState: IFormState<IConnectionFormState>,
     private readonly connectionInfoPropertiesResource: ConnectionInfoPropertiesResource,

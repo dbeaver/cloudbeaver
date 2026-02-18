@@ -56,6 +56,9 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
 
     private static final Log log = Log.getLog(CBServerConfigurationController.class);
 
+    private static final String NETWORK_MODE_ENV = "NETWORK_MODE";
+    private static final String NETWORK_MODE_VALUE_HOST = "host";
+
     // Configurations
     @NotNull
     private final T serverConfiguration;
@@ -167,12 +170,9 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
 
     public T parseServerConfiguration() {
         var config = getServerConfiguration();
-        if (config.getServerURL() == null) {
-            String hostName = config.getServerHost();
-            if (CommonUtils.isEmpty(hostName)) {
-                hostName = getLocalHostAddress();
-            }
-            config.setServerURL("http://" + hostName + ":" + config.getServerPort());
+        if (NETWORK_MODE_VALUE_HOST.equalsIgnoreCase(System.getenv(NETWORK_MODE_ENV))) {
+            String hostName = getLocalHostAddress();
+            config.setServerHost(hostName);
         }
 
         config.setContentRoot(ServletAppUtils.getRelativePath(config.getContentRoot(), homeDirectory));
@@ -383,12 +383,6 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
         }
     }
 
-
-    public synchronized void updateServerUrl(@NotNull SMCredentialsProvider credentialsProvider,
-        @Nullable String newPublicUrl) throws DBException {
-        getServerConfiguration().setServerURL(newPublicUrl);
-    }
-
     protected Map<String, Object> collectConfigurationProperties(
         @NotNull CBServerConfig serverConfig,
         @NotNull CBAppConfig appConfig
@@ -522,10 +516,6 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
                 serverConfigProperties,
                 CBConstants.PARAM_SERVER_NAME,
                 serverConfig.getServerName());
-        }
-        if (!CommonUtils.isEmpty(serverConfig.getServerURL())) {
-            copyConfigValue(
-                originServerConfig, serverConfigProperties, CBConstants.PARAM_SERVER_URL, serverConfig.getServerURL());
         }
         if (serverConfig.getMaxSessionIdleTime() > 0) {
             copyConfigValue(

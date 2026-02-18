@@ -80,9 +80,6 @@ public interface ServletApplication extends DBPApplication {
     @NotNull
     DBFileController createFileController(@NotNull SMCredentialsProvider credentialsProvider);
 
-    @Nullable
-    String getServerURL();
-
     @NotNull
     default String getServicesURI() {
         return "/";

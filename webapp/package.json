@@ -17,7 +17,8 @@
     "glob": "^13",
     "tar": ">=7.5.4",
     "lodash": ">=4.17.23",
-    "@isaacs/brace-expansion": ">=5.0.1"
+    "@isaacs/brace-expansion": ">=5.0.1",
+    "axios": ">= 1.13.5"
   },
   "scripts": {
     "test": "dbeaver-test",

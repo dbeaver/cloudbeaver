@@ -1,15 +1,27 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { DriverConfigurationType } from '@cloudbeaver/core-sdk';
+
+import { DriverConfigurationType, NetworkHandlerAuthType } from '@cloudbeaver/core-sdk';
 import { schema } from '@cloudbeaver/core-utils';
-import { CONNECTION_NETWORK_HANDLER_SCHEMA } from './IConnectionNetworkHanler.js';
 
 export const CONNECTION_PROPERTIES_SCHEMA = schema.record(schema.string(), schema.any());
+
+export const CONNECTION_NETWORK_HANDLER_SCHEMA = schema.object({
+  id: schema.string(),
+  authType: schema.nativeEnum(NetworkHandlerAuthType).optional(),
+  enabled: schema.boolean().optional(),
+  key: schema.string().optional(),
+  password: schema.string().optional(),
+  properties: schema.record(schema.string(), schema.any()).optional(),
+  savePassword: schema.boolean().optional(),
+  secureProperties: schema.record(schema.string(), schema.any()).optional(),
+  userName: schema.string().optional(),
+});
 
 export const CONNECTION_CONFIG_SCHEMA = schema.object({
   authModelId: schema.string().optional(),
@@ -37,5 +49,3 @@ export const CONNECTION_CONFIG_SCHEMA = schema.object({
   userName: schema.string().optional(),
   userPassword: schema.string().optional(),
 });
-
-export type IConnectionProperties = schema.infer<typeof CONNECTION_PROPERTIES_SCHEMA>;
