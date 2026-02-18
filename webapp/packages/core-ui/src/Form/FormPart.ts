@@ -113,9 +113,7 @@ export abstract class FormPart<TPartState extends object, TFormState = any> impl
         return;
       }
 
-      this.loaded = false;
       this.setInitialState(toJS(this.state));
-      this.loaded = true;
       this.exception = null;
     } catch (exception: any) {
       this.exception = exception;
