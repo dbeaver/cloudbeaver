@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,6 @@ const ServerConfigurationFormPartStateConfigSchema = schema.object({
   resourceManagerEnabled: schema.boolean().optional(),
   secretManagerEnabled: schema.boolean().optional(),
   serverName: schema.string().trim().optional(),
-  serverURL: schema.string().trim().optional(),
   sessionExpireTime: schema.number().optional(),
   forceHttps: schema.boolean().optional(),
   supportedHosts: schema.string(),
