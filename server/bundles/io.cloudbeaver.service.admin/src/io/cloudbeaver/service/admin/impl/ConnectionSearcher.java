@@ -20,9 +20,11 @@ import io.cloudbeaver.model.config.CBAppConfig;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.utils.ConfigurationUtils;
 import io.cloudbeaver.server.CBApplication;
+import io.cloudbeaver.server.CBConstants;
 import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.server.WebAppUtils;
 import io.cloudbeaver.service.admin.AdminConnectionSearchInfo;
+import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.runtime.DBRRunnableWithProgress;
@@ -46,7 +48,7 @@ public class ConnectionSearcher implements DBRRunnableWithProgress {
     private final String[] hostNames;
     private final List<AdminConnectionSearchInfo> foundConnections = new ArrayList<>();
 
-    public ConnectionSearcher(WebSession webSession, String[] hostNames) {
+    public ConnectionSearcher(@NotNull WebSession webSession, @NotNull String[] hostNames) {
         this.webSession = webSession;
         this.hostNames = hostNames;
     }
@@ -54,6 +56,7 @@ public class ConnectionSearcher implements DBRRunnableWithProgress {
     /**
      * Returns all found connections in a current machine.
      */
+    @NotNull
     public List<AdminConnectionSearchInfo> getFoundConnections() {
         synchronized (foundConnections) {
             return new ArrayList<>(foundConnections);
@@ -66,7 +69,7 @@ public class ConnectionSearcher implements DBRRunnableWithProgress {
         Map<String, String> localHostNames = new HashMap<>();
         for (String hostName : hostNames) {
             monitor.subTask("Search connections on '" + hostName + "'");
-            if (hostName.equals("localhost") || hostName.equals("local") || hostName.equals("127.0.0.1")) {
+            if (hostName.equals("localhost") || hostName.equals("local") || hostName.equals(CBConstants.HOST_127_0_0_1)) {
                 for (InetAddress addr : CBPlatform.getInstance().getApplication().getLocalInetAddresses()) {
                     String localHostAddress = addr.getHostAddress();
                     finalHostNames.add(localHostAddress);
@@ -105,7 +108,7 @@ public class ConnectionSearcher implements DBRRunnableWithProgress {
         }
     }
 
-    private void searchConnections(DBRProgressMonitor monitor, String hostName, String displayName) {
+    private void searchConnections(@NotNull DBRProgressMonitor monitor, String hostName, String displayName) {
         int checkTimeout = 150;
         Map<Integer, AdminConnectionSearchInfo> portCache = new HashMap<>();
 
@@ -164,16 +167,10 @@ public class ConnectionSearcher implements DBRRunnableWithProgress {
 
     private static boolean isPortInBlockList(int portNumber) {
         // All http(s) and telnet ports are in block lists
-        switch (portNumber) {
-            case 0:
-            case 22:
-            case 80:
-            case 443:
-            case 8080:
-            case 8443:
-                return true;
-        }
-        return false;
+        return switch (portNumber) {
+            case 0, 22, 80, 443, 8080, 8443 -> true;
+            default -> false;
+        };
     }
 
 }
