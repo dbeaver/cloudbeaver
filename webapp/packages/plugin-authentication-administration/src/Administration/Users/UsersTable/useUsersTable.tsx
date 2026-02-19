@@ -7,8 +7,8 @@
  */
 import { action, computed, observable } from 'mobx';
 
-import { type AdminUser, compareUsers, compareNewUsers, UsersResource, UsersResourceFilterKey, UsersResourceNewUsers } from '@cloudbeaver/core-authentication';
-import { TableState, useObservableRef, useOffsetPagination, useResource } from '@cloudbeaver/core-blocks';
+import { type AdminUser, compareUsers, compareNewUsers, UsersResource, UsersResourceFilterKey } from '@cloudbeaver/core-authentication';
+import { TableState, useExecutor, useObservableRef, useOffsetPagination, useResource } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { type ILoadableState, isArraysEqual } from '@cloudbeaver/core-utils';
@@ -34,6 +34,15 @@ export function useUsersTable(filters: IUserFilters) {
   const usersLoader = useResource(useUsersTable, UsersResource, pagination.currentPage);
   const notificationService = useService(NotificationService);
 
+  useExecutor({
+    executor: usersLoader.resource.onUserCreate, handlers: [
+      function handleUserCreation() {
+        pagination.refresh();
+      },
+    ],
+  });
+
+
   const state: State = useObservableRef(
     () => ({
       loading: false,
@@ -49,7 +58,6 @@ export function useUsersTable(filters: IUserFilters) {
             new Set([
               ...(this.searchFilter ? this.usersLoader.resource.get(UsersResourceFilterKey(this.searchFilter, this.enabledStateFilter)) : []),
               ...usersLoader.resource.get(pagination.allPages),
-              ...usersLoader.resource.get(UsersResourceNewUsers),
             ]),
           )
             .filter(isDefined)
