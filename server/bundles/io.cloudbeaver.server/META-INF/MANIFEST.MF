@@ -34,6 +34,7 @@ Export-Package: io.cloudbeaver,
  io.cloudbeaver.server.jobs,
  io.cloudbeaver.server.servlets,
  io.cloudbeaver.server.websockets,
+ io.cloudbeaver.server.websockets.lsp,
  io.cloudbeaver.service,
  io.cloudbeaver.service.navigator,
  io.cloudbeaver.service.sql
