@@ -665,6 +665,11 @@ public class WebServiceAdmin implements DBWServiceAdmin {
                 // In config mode we always refresh because admin user doesn't exist yet
                 webSession.resetUserState();
             }
+            else {
+                // Just reload session state
+                webSession.refreshUserData();
+            }
+
             WebAppUtils.getWebApplication().getDriverRegistry().refreshApplicableDrivers();
         } catch (Throwable e) {
             throw new DBWebException("Error configuring server", e);
