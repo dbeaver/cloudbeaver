@@ -146,6 +146,8 @@ public class DBWebException extends DBException implements GraphQLError {
             } else {
                 return message;
             }
+        } else if (cause.getMessage() == null && cause.getCause() != null) {
+            return message + ":\n" + cause.getCause().getClass().getSimpleName();
         }
         if (CommonUtils.isEmpty(message)) {
             if (cause.getMessage() != null) {
