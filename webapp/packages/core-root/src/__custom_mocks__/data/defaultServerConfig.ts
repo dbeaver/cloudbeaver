@@ -117,7 +117,6 @@ export const defaultServerConfig: (productConfiguration?: Record<string, any>) =
       version: '22.1.2.202207140640',
       latestVersionInfo: WEBSITE_LINKS.LATEST_COMMUNITY_VERSION_PAGE,
       name: 'CloudBeaver Community',
-      description: 'Cloudbeaver Web UI Application',
       buildTime: 'July 14, 2022',
       releaseTime: 'July 11, 2022',
       licenseInfo: '',
