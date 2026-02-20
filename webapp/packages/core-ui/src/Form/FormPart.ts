@@ -75,6 +75,10 @@ export abstract class FormPart<TPartState extends object, TFormState = any> impl
     return false;
   }
 
+  isLoadable(): boolean {
+    return !this.formState.savingPromise;
+  }
+
   isLoaded(): boolean {
     return this.loaded;
   }
@@ -113,7 +117,7 @@ export abstract class FormPart<TPartState extends object, TFormState = any> impl
         return;
       }
 
-      this.setInitialState(toJS(this.state));
+      this.loaded = false;
       this.exception = null;
     } catch (exception: any) {
       this.exception = exception;
@@ -125,7 +129,7 @@ export abstract class FormPart<TPartState extends object, TFormState = any> impl
   }
 
   async load(): Promise<void> {
-    if (this.formState.savingPromise) {
+    if (!this.isLoadable()) {
       return;
     }
 
