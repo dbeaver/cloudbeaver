@@ -32,6 +32,7 @@ import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
 import org.jkiss.dbeaver.model.preferences.DBPPropertySource;
 import org.jkiss.dbeaver.registry.settings.ProductSettingDescriptor;
 import org.jkiss.dbeaver.runtime.properties.ObjectPropertyDescriptor;
+import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
 
 import java.lang.reflect.Array;
@@ -44,6 +45,7 @@ public class WebPropertyInfo {
     private WebSession session;
     private DBPPropertyDescriptor property;
     private DBPPropertySource propertySource;
+    private boolean showProtected;
 
     private Object[] validValues;
 
@@ -60,6 +62,14 @@ public class WebPropertyInfo {
     public WebPropertyInfo(WebSession session, DBPPropertyDescriptor property) {
         this.session = session;
         this.property = property;
+    }
+
+    public boolean isShowProtected() {
+        return showProtected;
+    }
+
+    public void setShowProtected(boolean showProtected) {
+        this.showProtected = showProtected;
     }
 
     ///////////////////////////////////
@@ -129,11 +139,13 @@ public class WebPropertyInfo {
     @Property
     public Object getValue() throws DBException {
         Object value = propertySource == null ? null : propertySource.getPropertyValue(session.getProgressMonitor(), property.getId());
-        if (property instanceof ObjectPropertyDescriptor opd && (opd.isPassword() || opd.isHidden())) {
+        if (property instanceof ObjectPropertyDescriptor opd &&
+            (!showProtected && opd.isPassword() || opd.isHidden())
+        ) {
             return maskValue(value);
         } else if (property instanceof PropertyDescriptor pd) {
             String[] features = pd.getFeatures();
-            if (features != null && Arrays.asList(features).contains(DBConstants.PROP_FEATURE_PASSWORD)) {
+            if (features != null && ArrayUtils.contains(features, DBConstants.PROP_FEATURE_PASSWORD)) {
                 return maskValue(value);
             }
         }

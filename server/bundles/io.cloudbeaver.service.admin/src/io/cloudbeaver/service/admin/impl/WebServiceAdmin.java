@@ -52,6 +52,7 @@ import org.jkiss.dbeaver.model.security.*;
 import org.jkiss.dbeaver.model.security.user.SMTeam;
 import org.jkiss.dbeaver.model.security.user.SMUser;
 import org.jkiss.dbeaver.utils.GeneralUtils;
+import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
 
 import java.text.MessageFormat;
@@ -543,7 +544,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         SMAuthProviderCustomConfiguration savedConfig = getProviderConfig(id);
         if (parameters != null && savedConfig != null) {
             for (Map.Entry<String, Object> entry : parameters.entrySet()) {
-                if (Objects.equals(entry.getValue(), CBConstants.SECURED_VALUE)) {
+                if (CBConstants.SECURED_VALUE.equals(entry.getValue())) {
                     parameters.put(entry.getKey(), savedConfig.getParameter(entry.getKey()));
                 }
             }
@@ -984,7 +985,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         SMAuthProviderCustomConfiguration securedConfig = new SMAuthProviderCustomConfiguration(config);
         for (WebAuthProviderProperty property : configProperties) {
             String[] features = property.getFeatures();
-            if (features != null && List.of(features).contains(DBConstants.PROP_FEATURE_PASSWORD)) {
+            if (features != null && ArrayUtils.contains(features, DBConstants.PROP_FEATURE_PASSWORD)) {
                 String propertyId = property.getId();
                 Object securedParameterValue = config.getParameter(propertyId);
                 if (securedParameterValue != null && !securedParameterValue.toString().isEmpty()) {
