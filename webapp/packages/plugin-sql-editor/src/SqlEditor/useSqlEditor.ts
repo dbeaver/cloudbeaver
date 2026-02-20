@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -241,10 +241,39 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
         }
 
         this.onExecute.execute(true);
+
         try {
           this.executingScript = true;
+
           await this.model.getResolvedSegment();
-          const queries = this.model.parser.scripts;
+
+          const cursor = this.model.cursor;
+          const hasSelection = cursor.anchor !== cursor.head;
+
+          let queries = this.model.parser.scripts;
+
+          // Returns queries that are in range of [from, to]. If query is partially in range, it will be clamped to the range.
+          // Selection sele[ct 1; select 2;] will produce [ct 1, select 2] queries.
+          if (hasSelection) {
+            const from = Math.min(cursor.anchor, cursor.head);
+            const to = Math.max(cursor.anchor, cursor.head);
+            const rangeQueries = this.model.parser.getQueriesInRange(from, to);
+
+            queries = rangeQueries.map(script => {
+              const clampedBegin = Math.max(script.begin, from);
+              const clampedEnd = Math.min(script.end, to);
+
+              if (clampedBegin === script.begin && clampedEnd === script.end) {
+                return script;
+              }
+
+              return {
+                query: script.query.substring(clampedBegin - script.begin, clampedEnd - script.begin),
+                begin: clampedBegin,
+                end: clampedEnd,
+              };
+            });
+          }
 
           await this.sqlQueryService.executeQueries(
             this.state,
