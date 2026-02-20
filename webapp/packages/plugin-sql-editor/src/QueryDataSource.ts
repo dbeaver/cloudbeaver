@@ -300,13 +300,13 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
 
   private async handleQueryParamsEvent(event: IBaseAsyncTaskEvent) {
     const queryParamsEvent = event as WsSessionTaskQueryParamsConfirmationEvent;
-    const canUseQueryParameters =
-      this.currentQueryParameters && isArraysEqual(Object.keys(this.currentQueryParameters), Object.keys(queryParamsEvent.parameters));
+    const paramNames = queryParamsEvent.parameters.map(p => p!.name);
+    const canUseQueryParameters = this.currentQueryParameters && isArraysEqual(Object.keys(this.currentQueryParameters), paramNames);
 
     if (!canUseQueryParameters) {
-      const parametersState = observable({
-        ...Object.fromEntries(Object.entries(queryParamsEvent.parameters).map(([key, value]) => [key, this.previousQueryParameters?.[key] ?? value])),
-      });
+      const parametersState = observable(
+        Object.fromEntries(queryParamsEvent.parameters.map(p => [p!.name, this.previousQueryParameters?.[p!.name] ?? p!.value ?? ''])),
+      );
       const connectionKey = this.executionContext?.context
         ? createConnectionParam(this.executionContext.context.projectId, this.executionContext.context.connectionId)
         : null;
