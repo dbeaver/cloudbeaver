@@ -68,6 +68,7 @@ import org.jkiss.dbeaver.registry.settings.ProductSettingDescriptor;
 import org.jkiss.dbeaver.registry.settings.ProductSettingsRegistry;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.runtime.jobs.ConnectionTestJob;
+import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.dbeaver.utils.RuntimeUtils;
 import org.jkiss.utils.CommonUtils;
 
@@ -344,7 +345,9 @@ public class WebServiceCore implements DBWServiceCore {
                     throwDriverNotFoundException(dataSourceContainer);
                 }
             }
-            throw new DBWebException("Error connecting to database", e);
+            String standardMessage = GeneralUtils.makeStandardErrorMessage(e);
+            String message = standardMessage != null ? standardMessage : "Error connecting to database";
+            throw new DBWebException(message, e);
         } finally {
             dataSourceContainer.setSavePassword(oldSavePassword);
             connectionInfo.clearCache();
