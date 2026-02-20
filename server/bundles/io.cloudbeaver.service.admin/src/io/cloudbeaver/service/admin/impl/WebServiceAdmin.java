@@ -506,8 +506,11 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             }
             WebAuthProviderDescriptor authProvider = WebAuthProviderRegistry.getInstance().getAuthProvider(cfg.getProvider());
             if (authProvider != null) {
-                maskSecuredConfigParameters(authProvider.getConfigurationParameters(), cfg);
-                result.add(new WebAuthProviderConfiguration(authProvider, cfg, origin));
+                result.add(new WebAuthProviderConfiguration(
+                    authProvider,
+                    maskSecuredConfigParameters(authProvider.getConfigurationParameters(), cfg),
+                    origin
+                ));
             }
         }
         return result;
@@ -523,7 +526,8 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         boolean disabled,
         @Nullable String iconURL,
         @Nullable String description,
-        @Nullable Map<String, Object> parameters) throws DBWebException {
+        @Nullable Map<String, Object> parameters
+    ) throws DBWebException {
         WebAuthProviderDescriptor authProvider = WebAuthProviderRegistry.getInstance().getAuthProvider(providerId);
         if (authProvider == null) {
             throw new DBWebException("Auth provider '" + providerId + "' not found");
@@ -536,6 +540,14 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         providerConfig.setDisabled(disabled);
         providerConfig.setIconURL(iconURL);
         providerConfig.setDescription(description);
+        SMAuthProviderCustomConfiguration savedConfig = getProviderConfig(id);
+        if (parameters != null && savedConfig != null) {
+            for (Map.Entry<String, Object> entry : parameters.entrySet()) {
+                if (Objects.equals(entry.getValue(), CBConstants.SECURED_VALUE)) {
+                    parameters.put(entry.getKey(), savedConfig.getParameter(entry.getKey()));
+                }
+            }
+        }
         providerConfig.setParameters(parameters);
         CBApplication.getInstance().getAppConfiguration().addAuthProviderConfiguration(providerConfig);
         try {
@@ -549,7 +561,11 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             providerConfig.getProvider(),
             webSession.getUserId()
         ));
-        return new WebAuthProviderConfiguration(authProvider, providerConfig, ServletAppUtils.getOriginFromRequest(request));
+        return new WebAuthProviderConfiguration(
+            authProvider,
+            maskSecuredConfigParameters(authProvider.getConfigurationParameters(), providerConfig),
+            ServletAppUtils.getOriginFromRequest(request)
+        );
     }
 
     @Override
@@ -960,19 +976,32 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         }
     }
 
-    private void maskSecuredConfigParameters(
+    @NotNull
+    private SMAuthProviderCustomConfiguration maskSecuredConfigParameters(
         @NotNull List<WebAuthProviderProperty> configProperties,
         @NotNull SMAuthProviderCustomConfiguration config
     ) {
+        SMAuthProviderCustomConfiguration securedConfig = new SMAuthProviderCustomConfiguration(config);
         for (WebAuthProviderProperty property : configProperties) {
             String[] features = property.getFeatures();
             if (features != null && List.of(features).contains(DBConstants.PROP_FEATURE_PASSWORD)) {
                 String propertyId = property.getId();
                 Object securedParameterValue = config.getParameter(propertyId);
                 if (securedParameterValue != null && !securedParameterValue.toString().isEmpty()) {
-                    config.getParameters().put(propertyId, CBConstants.SECURED_VALUE);
+                    securedConfig.getParameters().put(propertyId, CBConstants.SECURED_VALUE);
                 }
             }
         }
+        return securedConfig;
+    }
+
+    @Nullable
+    private SMAuthProviderCustomConfiguration getProviderConfig(@NotNull String configId) {
+        return CBApplication.getInstance().getAppConfiguration().getAuthCustomConfigurations().stream()
+            .filter(cfg -> Objects.equals(cfg.getId(), configId))
+            .filter(cfg ->
+                WebAuthProviderRegistry.getInstance().getAuthProvider(cfg.getProvider()) != null
+            ).findFirst()
+            .orElse(null);
     }
 }
