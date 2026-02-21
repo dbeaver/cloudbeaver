@@ -57,8 +57,6 @@ import org.jkiss.dbeaver.model.websocket.event.MessageType;
 import org.jkiss.dbeaver.model.websocket.event.WSSessionLogUpdatedEvent;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.CommonUtils;
-import org.jkiss.utils.function.ThrowableConsumer;
-import org.jkiss.utils.function.ThrowableFunction;
 
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
@@ -96,7 +94,6 @@ public class WebSession extends BaseWebSession
     private final List<WebServerMessage> sessionMessages = new ArrayList<>();
 
     private final Map<String, WebAsyncTaskInfo> asyncTasks = new HashMap<>();
-    private final Map<String, ThrowableConsumer<Object, Exception>> attributeDisposers = new HashMap<>();
 
     // Map of auth tokens. Key is authentication provider
     private final List<WebAuthInfo> authTokens = new ArrayList<>();
@@ -237,10 +234,12 @@ public class WebSession extends BaseWebSession
         return userContext.getAdminSecurityController();
     }
 
+    @NotNull
     public synchronized RMController getRmController() {
         return userContext.getRmController();
     }
 
+    @NotNull
     public synchronized DBFileController getFileController() {
         return userContext.getFileController();
     }
@@ -332,7 +331,8 @@ public class WebSession extends BaseWebSession
         }
     }
 
-    private WebSessionProjectImpl createWebProject(RMProject project) throws DBException {
+    @NotNull
+    private WebSessionProjectImpl createWebProject(@NotNull RMProject project) throws DBException {
         WebSessionProjectImpl sessionProject;
         if (project.isGlobal()) {
             sessionProject = createGlobalProject(project);
@@ -350,6 +350,7 @@ public class WebSession extends BaseWebSession
         return sessionProject;
     }
 
+    @NotNull
     protected WebSessionProjectImpl createSessionProject(@NotNull RMProject project) throws DBException {
         return new WebSessionProjectImpl(this, project, getProjectPath(project));
     }
@@ -359,29 +360,11 @@ public class WebSession extends BaseWebSession
         return RMUtils.getProjectPath(project);
     }
 
+    @NotNull
     protected WebSessionProjectImpl createGlobalProject(RMProject project) {
         globalProject = new WebSessionGlobalProjectImpl(this, project);
         globalProject.refreshAccessibleConnectionIds();
         return globalProject;
-    }
-
-    private void resetSessionCache() throws DBCException {
-        // Clear attributes
-        synchronized (attributes) {
-            for (Map.Entry<String, ThrowableConsumer<Object, Exception>> attrDisposer : attributeDisposers.entrySet()) {
-                Object attrValue = attributes.get(attrDisposer.getKey());
-
-                try {
-                    attrDisposer.getValue().accept(attrValue);
-                } catch (Exception e) {
-                    log.error("Error disposing attribute '" + attrDisposer.getKey() + "'", e);
-                }
-            }
-            attributeDisposers.clear();
-            // Remove all non-persistent attributes
-            attributes.entrySet().removeIf(
-                entry -> !(entry.getValue() instanceof PersistentAttribute));
-        }
     }
 
     private void resetNavigationModel() {
@@ -689,46 +672,6 @@ public class WebSession extends BaseWebSession
         }
     }
 
-    @Override
-    public <T> T getAttribute(String name) {
-        synchronized (attributes) {
-            Object value = attributes.get(name);
-            if (value instanceof PersistentAttribute persistentAttribute) {
-                value = persistentAttribute.value();
-            }
-            return (T) value;
-        }
-    }
-
-    public void setAttribute(String name, Object value, boolean persistent) {
-        synchronized (attributes) {
-            attributes.put(name, persistent ? new PersistentAttribute(value) : value);
-        }
-    }
-
-    public <T, E extends Exception> T getAttribute(
-        String name,
-        ThrowableFunction<String, T, E> creator,
-        ThrowableConsumer<T, E> disposer
-    ) throws E {
-        synchronized (attributes) {
-            Object value = attributes.get(name);
-            if (value instanceof PersistentAttribute persistentAttribute) {
-                value = persistentAttribute.value();
-            }
-            if (value == null) {
-                value = creator.apply(null);
-                if (value != null) {
-                    attributes.put(name, value);
-                    if (disposer != null) {
-                        attributeDisposers.put(name, (ThrowableConsumer<Object, Exception>) disposer);
-                    }
-                }
-            }
-            return (T) value;
-        }
-    }
-
     @Property
     public Map<String, Object> getActionParameters() {
         WebActionParameters action = WebActionParameters.fromSession(this, true);
@@ -945,7 +888,7 @@ public class WebSession extends BaseWebSession
     }
 
     @Nullable
-    public WebSessionProjectImpl getProjectById(@Nullable String projectId) {
+    public WebSessionProjectImpl getProjectById(@NotNull String projectId) {
         return getWorkspace().getProjectById(projectId);
     }
 
@@ -954,6 +897,7 @@ public class WebSession extends BaseWebSession
      *
      * @throws DBWebException if project with provided id is not found.
      */
+    @NotNull
     public WebSessionProjectImpl getAccessibleProjectById(@Nullable String projectId) throws DBWebException {
         WebSessionProjectImpl project = null;
         if (projectId != null) {
@@ -965,6 +909,7 @@ public class WebSession extends BaseWebSession
         return project;
     }
 
+    @NotNull
     public List<WebSessionProjectImpl> getAccessibleProjects() {
         return getWorkspace().getProjects();
     }
@@ -982,15 +927,14 @@ public class WebSession extends BaseWebSession
     /**
      * Removes project from session cache and navigator tree.
      */
-    public void deleteSessionProject(@Nullable WebSessionProjectImpl project) {
-        if (project != null) {
-            RMProject rmProject = project.getRMProject();
-            log.info(String.format(
-                "Project deleted: [ID=%s, Name=%s, Type=%s, Creator=%s]",
-                rmProject.getId(), rmProject.getName(), rmProject.getType(), rmProject.getCreator()
-            ));
-            project.dispose();
-        }
+    public void deleteSessionProject(@NotNull WebSessionProjectImpl project) {
+        RMProject rmProject = project.getRMProject();
+        log.info(String.format(
+            "Project deleted: [ID=%s, Name=%s, Type=%s, Creator=%s]",
+            rmProject.getId(), rmProject.getName(), rmProject.getType(), rmProject.getCreator()
+        ));
+        project.dispose();
+
         getWorkspace().removeProject(project);
         if (navigatorModel != null) {
             navigatorModel.getRoot().removeProject(project);
@@ -1001,6 +945,10 @@ public class WebSession extends BaseWebSession
     public void addSessionProject(@NotNull String projectId) throws DBException {
         super.addSessionProject(projectId);
         var rmProject = getRmController().getProject(projectId, false, false);
+        if (rmProject == null) {
+            log.error("RM project '" + projectId + "' not found");
+            return;
+        }
         createWebProject(rmProject);
     }
 
@@ -1015,7 +963,7 @@ public class WebSession extends BaseWebSession
     }
 
     @Override
-    public void removeSessionProject(@Nullable String projectId) throws DBException {
+    public void removeSessionProject(@NotNull String projectId) throws DBException {
         super.removeSessionProject(projectId);
         var project = getProjectById(projectId);
         if (project == null) {
@@ -1086,6 +1034,4 @@ public class WebSession extends BaseWebSession
         return true;
     }
 
-    private record PersistentAttribute(Object value) {
-    }
 }
