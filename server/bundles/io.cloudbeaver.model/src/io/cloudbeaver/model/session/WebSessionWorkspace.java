@@ -91,7 +91,9 @@ public class WebSessionWorkspace implements DBPWorkspace {
     @NotNull
     @Override
     public List<WebSessionProjectImpl> getProjects() {
-        return accessibleProjects;
+        synchronized (accessibleProjects) {
+            return new ArrayList<>(accessibleProjects);
+        }
     }
 
     @Nullable
@@ -103,9 +105,11 @@ public class WebSessionWorkspace implements DBPWorkspace {
     @Nullable
     @Override
     public WebSessionProjectImpl getProject(@NotNull String projectName) {
-        for (WebSessionProjectImpl project : accessibleProjects) {
-            if (project.getName().equals(projectName)) {
-                return project;
+        synchronized (accessibleProjects) {
+            for (WebSessionProjectImpl project : accessibleProjects) {
+                if (project.getName().equals(projectName)) {
+                    return project;
+                }
             }
         }
         log.error("Project name '" + projectName + "' not found in session workspace");
@@ -115,9 +119,11 @@ public class WebSessionWorkspace implements DBPWorkspace {
     @Nullable
     @Override
     public WebSessionProjectImpl getProjectById(@NotNull String projectId) {
-        for (WebSessionProjectImpl project : accessibleProjects) {
-            if (project.getId().equals(projectId)) {
-                return project;
+        synchronized (accessibleProjects) {
+            for (WebSessionProjectImpl project : accessibleProjects) {
+                if (project.getId().equals(projectId)) {
+                    return project;
+                }
             }
         }
         log.error("Project ID '" + projectId + "' not found in session workspace");
@@ -168,20 +174,26 @@ public class WebSessionWorkspace implements DBPWorkspace {
     }
 
     void addProject(@NotNull WebSessionProjectImpl project) {
-        accessibleProjects.add(project);
+        synchronized (accessibleProjects) {
+            accessibleProjects.add(project);
+        }
     }
 
     void removeProject(@NotNull WebSessionProjectImpl project) {
-        accessibleProjects.remove(project);
+        synchronized (accessibleProjects) {
+            accessibleProjects.remove(project);
+        }
     }
 
     void clearProjects() {
-        if (!this.accessibleProjects.isEmpty()) {
-            for (WebSessionProjectImpl project : accessibleProjects) {
-                project.dispose();
+        synchronized (accessibleProjects) {
+            if (!this.accessibleProjects.isEmpty()) {
+                for (WebSessionProjectImpl project : accessibleProjects) {
+                    project.dispose();
+                }
+                this.activeProject = null;
+                this.accessibleProjects.clear();
             }
-            this.activeProject = null;
-            this.accessibleProjects.clear();
         }
     }
 
