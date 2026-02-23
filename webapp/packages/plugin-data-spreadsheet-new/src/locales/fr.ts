@@ -35,7 +35,7 @@ export default [
   ['plugin_data_spreadsheet_new_settings_use_locale_formatting_none', 'Aucun'],
   [
     'plugin_data_spreadsheet_new_settings_use_locale_formatting_description',
-    "Utilisez le formatage pour les nombres et les dates selon les paramètres régionaux sélectionnés. (!) Cela n'affecte que la représentation des données ; les valeurs brutes doivent être utilisées pour l'édition.",
+    "Utilisez le formatage pour les nombres et les dates selon les paramètres régionaux sélectionnés. (!) Cela n'affecte que la représentation des données; les valeurs brutes doivent être utilisées pour l'édition.",
   ],
   ['data_grid_table_generate_sql', 'Générer SQL'],
   ['data_grid_table_generate_sql_insert', 'INSERT'],
