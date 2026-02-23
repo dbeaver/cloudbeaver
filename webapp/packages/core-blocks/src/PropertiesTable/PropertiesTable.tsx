@@ -36,6 +36,7 @@ interface Props {
   className?: string;
   staticProperties?: boolean;
   filterable?: boolean;
+  ordered?: boolean;
 }
 
 export const PropertiesTable = observer<Props>(function PropertiesTable(props) {
@@ -49,12 +50,12 @@ export const PropertiesTable = observer<Props>(function PropertiesTable(props) {
   const sortedProperties = useMemo(
     () =>
       computed(() =>
-        propsRef.properties
-          .slice()
-          .sort((a, b) => (a.displayName ?? '').localeCompare(b.displayName ?? ''))
-          .filter(p => p.new || p.key.toLocaleLowerCase().includes(filterValue.toLocaleLowerCase())),
+        (propsRef.ordered
+          ? propsRef.properties
+          : propsRef.properties.slice().sort((a, b) => (a.displayName ?? '').localeCompare(b.displayName ?? ''))
+        ).filter(p => p.new || p.key.toLocaleLowerCase().includes(filterValue.toLocaleLowerCase())),
       ),
-    [propsRef.properties, filterValue],
+    [propsRef.properties, propsRef.ordered, filterValue],
   );
 
   const changeName = useCallback((id: string, key: string) => {
