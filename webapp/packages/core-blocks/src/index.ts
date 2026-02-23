@@ -35,7 +35,6 @@ export * from './useLazyImport.js';
 export * from './DisplayError.js';
 export * from './ErrorBoundary.js';
 export * from './Icon.js';
-export * from './useHotkeys.js';
 export * from './useSync.js';
 
 export * from './ItemList/ItemList.js';
@@ -263,3 +262,4 @@ export * from './ObjectPropertyInfo/evaluate.js';
 export * from './ObjectPropertyInfo/getObjectPropertyDefaults.js';
 export * from './useVisible.js';
 export * from './SAVED_VALUE_INDICATOR.js';
+export * from './useHotkey.js';

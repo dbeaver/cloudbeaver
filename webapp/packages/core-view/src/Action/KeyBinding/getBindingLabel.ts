@@ -10,9 +10,6 @@ import { getCommonAndOSSpecificKeys } from './getCommonAndOSSpecificKeys.js';
 import type { IKeyBinding } from './IKeyBinding.js';
 
 const FORMAT_SHORTCUT_KEYS_MAP: Record<string, string> = {
-  comma: ',',
-  slash: '/',
-  backslash: '\\',
   backspace: '⌫',
   tab: 'tab',
   clear: 'clear',
@@ -29,7 +26,6 @@ const FORMAT_SHORTCUT_KEYS_MAP: Record<string, string> = {
   pagedown: 'pagedown',
   del: 'delete',
   delete: 'delete',
-  period: '.',
 };
 
 export const SHORTCUT_DIVIDER = '+';

@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 import { useEffect, useRef } from 'react';
 
-import { s, useHotkeys, useMergeRefs, useS } from '../index.js';
+import { s, useHotkey, useS } from '../index.js';
 import SlideBoxStyles from './SlideBox.module.css';
 import SlideBoxElementStyles from './SlideElement.module.css';
 import SlideBoxOverlayStyles from './SlideOverlay.module.css';
@@ -26,8 +26,7 @@ export const SlideBox = observer<Props>(function SlideBox({ children, open, clas
   const slideBoxOverlayStyles = useS(SlideBoxOverlayStyles);
 
   const divRef = useRef<HTMLDivElement>(null);
-  const ref = useHotkeys('escape', () => onClose?.(), { enabled: open });
-  const mergedRefs = useMergeRefs(ref, divRef);
+  useHotkey('Escape', () => onClose?.(), { enabled: open, target: divRef });
 
   useEffect(() => {
     const div = divRef.current;
@@ -52,7 +51,7 @@ export const SlideBox = observer<Props>(function SlideBox({ children, open, clas
 
   return (
     <div
-      ref={mergedRefs}
+      ref={divRef}
       className={s(slideBoxStyles, { slideBox: true }, s(slideBoxElementStyles, { open }), s(slideBoxOverlayStyles, { open }), className)}
     >
       {children}

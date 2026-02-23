@@ -6,12 +6,11 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { useContext } from 'react';
+import { useContext, useRef } from 'react';
 
-import { s, useFocus, useHotkeys, useMergeRefs, useS } from '@cloudbeaver/core-blocks';
+import { s, useFocus, useHotkey, useMergeRefs, useS, type RegisterableHotkey } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
-import { isObjectsEqual } from '@cloudbeaver/core-utils';
 
 import { ActionService } from '../Action/ActionService.js';
 import type { IActionItem } from '../Action/IActionItem.js';
@@ -19,7 +18,6 @@ import { getCommonAndOSSpecificKeys } from '../Action/KeyBinding/getCommonAndOSS
 import styles from './CaptureView.module.css';
 import { CaptureViewContext } from './CaptureViewContext.js';
 import type { IView } from './IView.js';
-import { parseHotkey } from './parseHotkey.js';
 import { useActiveView } from './useActiveView.js';
 import { useViewContext } from './useViewContext.js';
 
@@ -28,70 +26,65 @@ export interface ICaptureViewProps {
   className?: string;
 }
 
+interface ICaptureViewHotkeyProps {
+  hotkey: RegisterableHotkey;
+  target: React.RefObject<HTMLDivElement | null>;
+  action: IActionItem | undefined;
+}
+
+function CaptureViewHotkey({ hotkey, target, action }: ICaptureViewHotkeyProps) {
+  useHotkey(
+    hotkey,
+    event => {
+      /**
+       * isTrusted - to prevent double handling of the event
+       * EventContext.has - to prevent handling the event if it was already handled by a child view
+       */
+      if (!event.isTrusted || EventContext.has(event, EventStopPropagationFlag) || !action) {
+        return;
+      }
+
+      if (action.binding?.binding.preventDefault) {
+        event.preventDefault();
+      }
+
+      EventContext.set(event, EventStopPropagationFlag);
+      action.activate(true);
+    },
+    {
+      target,
+      ignoreInputs: false,
+    },
+  );
+
+  return null;
+}
+
 export const CaptureView = observer<React.PropsWithChildren<ICaptureViewProps>>(function CaptureView({ view, children, className }) {
   const parentContext = useContext(CaptureViewContext);
   const viewContext = useViewContext(view, parentContext);
   const actionService = useService(ActionService);
   const activeView = useActiveView(view);
-  const [ref] = useFocus<HTMLDivElement>({ onFocus: activeView.focusView, onBlur: activeView.blurView });
+  const [focusRef] = useFocus<HTMLDivElement>({ onFocus: activeView.focusView, onBlur: activeView.blurView });
+  const divRef = useRef<HTMLDivElement>(null);
   const style = useS(styles);
 
   const allActionItems = view.actions.map(action => actionService.getAction(viewContext, action)).filter(Boolean) as IActionItem[];
   const enabledActionItems = allActionItems.filter(action => action?.binding && !action.isDisabled()).filter(Boolean) as IActionItem[];
-
   const allKeys = allActionItems.map(item => getCommonAndOSSpecificKeys(item.binding?.binding)).flat();
 
-  const divRef = useHotkeys(
-    allKeys,
-    (event, handler) => {
-      /**
-       * isTrusted - to prevent double handling of the event
-       * EventContext.has - to prevent handling the event if it was already handled by a child view
-       */
-      if (!event.isTrusted || EventContext.has(event, EventStopPropagationFlag)) {
-        return;
-      }
-
-      const action = enabledActionItems.find(action => {
-        const commonAndSpecificKeys = getCommonAndOSSpecificKeys(action.binding?.binding);
-        return commonAndSpecificKeys.some(key => {
-          const hotkey = parseHotkey(key);
-
-          return isObjectsEqual(hotkey, handler);
-        });
-      });
-
-      EventContext.set(event, EventStopPropagationFlag);
-      action?.activate(true);
-    },
-    {
-      enabled: allKeys.length > 0,
-      enableOnFormTags: ['INPUT', 'SELECT', 'TEXTAREA'],
-      preventDefault(event, handler) {
-        // Don't prevent default if event was already handled by a child view
-        if (EventContext.has(event, EventStopPropagationFlag)) {
-          return false;
-        }
-
-        const action = enabledActionItems.find(action => {
-          const commonAndSpecificKeys = getCommonAndOSSpecificKeys(action.binding?.binding);
-          return commonAndSpecificKeys.some(key => {
-            const hotkey = parseHotkey(key);
-
-            return isObjectsEqual(hotkey, handler);
-          });
-        });
-
-        return action?.binding?.binding.preventDefault === true;
-      },
-      enableOnContentEditable: true,
-    },
-  );
-
-  const mergedRef = useMergeRefs(ref, divRef);
+  const mergedRef = useMergeRefs(focusRef, divRef);
 
   return (
     <CaptureViewContext.Provider value={viewContext}>
+      {allKeys.map(key => (
+        <CaptureViewHotkey
+          key={key}
+          hotkey={key as RegisterableHotkey}
+          target={divRef}
+          action={enabledActionItems.find(action => getCommonAndOSSpecificKeys(action.binding?.binding).includes(key))}
+        />
+      ))}
       <div ref={mergedRef} className={s(style, { container: true }, className)} tabIndex={0}>
         {children}
       </div>

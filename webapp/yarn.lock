@@ -1470,6 +1470,7 @@ __metadata:
     "@dbeaver/js-helpers": "workspace:*"
     "@dbeaver/react-tests": "workspace:*"
     "@dbeaver/ui-kit": "workspace:*"
+    "@tanstack/react-hotkeys": "npm:^0"
     "@testing-library/jest-dom": "npm:^6"
     "@testing-library/react": "npm:^16"
     "@testing-library/user-event": "npm:^14"
@@ -1480,7 +1481,6 @@ __metadata:
     mobx-react-lite: "npm:^4"
     react: "npm:^19"
     react-dom: "npm:^19"
-    react-hotkeys-hook: "npm:5.1.0"
     react-minisearch: "npm:^7"
     reakit: "npm:^1"
     reakit-utils: "npm:^0"
@@ -8145,6 +8145,48 @@ __metadata:
   peerDependencies:
     vite: ^5.2.0 || ^6
   checksum: 10c0/7c3f1312bcb784a28a17678b041f77aea22a9f5640b4e070db8c494b6c185ca3aa7962438a26e6ab87784c8bf70f11c1bfd92b82724fe41f348b8e2f04ba741d
+  languageName: node
+  linkType: hard
+
+"@tanstack/hotkeys@npm:0.3.0":
+  version: 0.3.0
+  resolution: "@tanstack/hotkeys@npm:0.3.0"
+  dependencies:
+    "@tanstack/store": "npm:^0.9.1"
+  checksum: 10c0/8d5fbf45ec135e3da2adec7ed2c8c395f9b449f8867c4686f49973e1e96a1b9ec73d1bb114a651aaa535fe4617ac3949b8d8ff5021ef46d69c4c6ec1d3f578b5
+  languageName: node
+  linkType: hard
+
+"@tanstack/react-hotkeys@npm:^0":
+  version: 0.3.0
+  resolution: "@tanstack/react-hotkeys@npm:0.3.0"
+  dependencies:
+    "@tanstack/hotkeys": "npm:0.3.0"
+    "@tanstack/react-store": "npm:^0.9.1"
+  peerDependencies:
+    react: ">=16.8"
+    react-dom: ">=16.8"
+  checksum: 10c0/544401e33ed54cfc7cc79d04eb004a11b7844da0767e42b44a0ea6d13872ed5d66a4463864f15ec103d54722b7a9d84e76f0664df448a229052c14953e51ca1d
+  languageName: node
+  linkType: hard
+
+"@tanstack/react-store@npm:^0.9.1":
+  version: 0.9.1
+  resolution: "@tanstack/react-store@npm:0.9.1"
+  dependencies:
+    "@tanstack/store": "npm:0.9.1"
+    use-sync-external-store: "npm:^1.6.0"
+  peerDependencies:
+    react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+    react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+  checksum: 10c0/8d03641c8619c2c92b5f05ea6a0c6060fe3efcab6bc2fb0990351f083263ed78fd220df62a427728f11137cba1cc2d0ca80175893a52d62a2e7057a4396e484a
+  languageName: node
+  linkType: hard
+
+"@tanstack/store@npm:0.9.1, @tanstack/store@npm:^0.9.1":
+  version: 0.9.1
+  resolution: "@tanstack/store@npm:0.9.1"
+  checksum: 10c0/2093bd201ec97e500fe3cdca6a76eec2c92d42790d46ff929819284be9814e768f61ac55d21215f16aefc173f7a910e9ed1abbebced519bbf08e7cc87b6b5d30
   languageName: node
   linkType: hard
 
@@ -16851,16 +16893,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-hotkeys-hook@npm:5.1.0":
-  version: 5.1.0
-  resolution: "react-hotkeys-hook@npm:5.1.0"
-  peerDependencies:
-    react: ">=16.8.0"
-    react-dom: ">=16.8.0"
-  checksum: 10c0/99df6d3c305b139ac7afd073b58575961bf30a819fb23e8f1251b1b3a9f1c7662737f8b6266e3fc42bd5bdfdaca81aa1e019613f95f9a6313267de265e45836d
-  languageName: node
-  linkType: hard
-
 "react-hotkeys-hook@npm:^4.6.1":
   version: 4.6.2
   resolution: "react-hotkeys-hook@npm:4.6.2"
@@ -19350,7 +19382,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"use-sync-external-store@npm:^1.2.0, use-sync-external-store@npm:^1.4.0, use-sync-external-store@npm:^1.5.0":
+"use-sync-external-store@npm:^1.2.0, use-sync-external-store@npm:^1.4.0, use-sync-external-store@npm:^1.5.0, use-sync-external-store@npm:^1.6.0":
   version: 1.6.0
   resolution: "use-sync-external-store@npm:1.6.0"
   peerDependencies:

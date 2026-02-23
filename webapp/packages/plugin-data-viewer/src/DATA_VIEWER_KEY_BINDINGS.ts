@@ -35,5 +35,5 @@ export const KEY_BINDING_SAVE: IKeyBinding = {
 
 export const KEY_BINDING_CANCEL: IKeyBinding = {
   id: 'data-viewer-cancel',
-  keys: ['mod+period'],
+  keys: ['mod+.'],
 };
