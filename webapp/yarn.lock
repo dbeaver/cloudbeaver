@@ -1480,7 +1480,7 @@ __metadata:
     mobx-react-lite: "npm:^4"
     react: "npm:^19"
     react-dom: "npm:^19"
-    react-hotkeys-hook: "npm:5.1.0"
+    react-hotkeys-hook: "npm:5.2.3"
     react-minisearch: "npm:^7"
     reakit: "npm:^1"
     reakit-utils: "npm:^0"
@@ -16851,13 +16851,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-hotkeys-hook@npm:5.1.0":
-  version: 5.1.0
-  resolution: "react-hotkeys-hook@npm:5.1.0"
+"react-hotkeys-hook@npm:5.2.3":
+  version: 5.2.3
+  resolution: "react-hotkeys-hook@npm:5.2.3"
   peerDependencies:
     react: ">=16.8.0"
     react-dom: ">=16.8.0"
-  checksum: 10c0/99df6d3c305b139ac7afd073b58575961bf30a819fb23e8f1251b1b3a9f1c7662737f8b6266e3fc42bd5bdfdaca81aa1e019613f95f9a6313267de265e45836d
+  checksum: 10c0/24ba0eaa2195bb504628aec7813c9014370ae71ab1489359690fba00f04c06d189ed191be1fbcdc3d1b6119e3e6a4051342c0a30b7c5dacd7f7b8457a1672624
   languageName: node
   linkType: hard
 
