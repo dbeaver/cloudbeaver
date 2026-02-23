@@ -20,6 +20,7 @@ package io.cloudbeaver.test.platform;
 import io.cloudbeaver.CloudbeaverMockTest;
 import io.cloudbeaver.app.CEAppStarter;
 import io.cloudbeaver.test.WebGQLClient;
+import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
@@ -37,12 +38,21 @@ public class ConnectionsTest extends CloudbeaverMockTest {
         query userConnections {
           result: userConnections {
             id
+            nodePath
           }
         }""";
     private static final String GQL_CONNECTIONS_CREATE = """
         mutation createConnection($config: ConnectionConfig!, $projectId: ID) {
           result: createConnection(config: $config, projectId: $projectId) {
             id
+            nodePath
+          }
+        }""";
+    private static final String GQL_COPY_CONNECTION_FROM_NODE = """
+        mutation copyConnectionFromNode($nodePath: String!, $config: ConnectionConfig, $projectId: ID) {
+          result: copyConnectionFromNode(nodePath: $nodePath, config: $config, projectId: $projectId) {
+            id
+            nodePath
           }
         }""";
     private static final String GQL_CONNECTIONS_DELETE = """
@@ -89,11 +99,36 @@ public class ConnectionsTest extends CloudbeaverMockTest {
         configuration.put("driverId", "postgresql:postgres-jdbc");
 
         Map<String, Object> addedConnection = client.sendQuery(GQL_CONNECTIONS_CREATE, variables);
+        Assert.assertNotNull(addedConnection);
+        checkAddedConnection(client, addedConnection);
 
+        String addedConnectionId = JSONUtils.getString(addedConnection, "id");
+        String nodePath = JSONUtils.getString(addedConnection, "nodePath");
+
+        Map<String, Object> config1 = Map.of("name", "connection copy");
+        Map<String, Object> variables1 = new LinkedHashMap<>();
+        variables1.put("projectId", "g_GlobalConfiguration");
+        variables1.put("config", config1);
+        variables1.put("nodePath", nodePath);
+
+        Assert.assertThrows(
+            DBException.class,
+            () -> client.sendQuery(GQL_COPY_CONNECTION_FROM_NODE, variables1)
+        );
+        variables1.put("projectId", "u_test");
+        Map<String, Object> copiedConnection = client.sendQuery(GQL_COPY_CONNECTION_FROM_NODE, variables1);
+        Assert.assertNotNull(copiedConnection);
+        checkAddedConnection(client, copiedConnection);
+        String copiedConnectionId = JSONUtils.getString(copiedConnection, "id");
+        Assert.assertTrue(client.sendQuery(GQL_CONNECTIONS_DELETE, Map.of("id", addedConnectionId)));
+        Assert.assertTrue(client.sendQuery(GQL_CONNECTIONS_DELETE, Map.of("id", copiedConnectionId)));
+    }
+
+    private void checkAddedConnection(@NotNull WebGQLClient client, @NotNull Map<String, Object> addedConnection) throws Exception {
         List<Map<String, Object>> connections = client.sendQuery(GQL_CONNECTIONS_GET, null);
         Assert.assertTrue(connections.contains(addedConnection));
-        String connectionId = JSONUtils.getString(addedConnection, "id");
-        Assert.assertNotNull(connectionId);
-        Assert.assertTrue(client.sendQuery(GQL_CONNECTIONS_DELETE, Map.of("id", connectionId)));
+        Assert.assertNotNull(JSONUtils.getString(addedConnection, "id"));
+        String nodePath = JSONUtils.getString(addedConnection, "nodePath");
+        Assert.assertNotNull(nodePath);
     }
 }
