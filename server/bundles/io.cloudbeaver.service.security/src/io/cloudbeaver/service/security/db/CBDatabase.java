@@ -184,7 +184,10 @@ public class CBDatabase extends InternalDB<WebDatabaseConfig> {
         return getDatabaseDriver(dataSourceProviderRegistry);
     }
 
-    private void setDefaultUserAndPassword(@NotNull DBPDriver driver) {
+    private void setDefaultUserAndPassword(@NotNull DBPDriver driver) throws DBException {
+        if (!driver.isEmbedded() && CommonUtils.isEmpty(databaseConfig.getPassword())) {
+            throw new DBException("Password must be specified for non-embedded database");
+        }
         if (!CommonUtils.isEmpty(databaseConfig.getUser()) || !driver.isEmbedded()) {
             return;
         }
