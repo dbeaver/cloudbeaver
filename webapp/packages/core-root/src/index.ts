@@ -18,6 +18,7 @@ export * from './DefaultNavigatorSettingsResource.js';
 export * from './FeaturesResource.js';
 export * from './NetworkError.js';
 export * from './NetworkStateService.js';
+export * from './ServerHealthCheckService.js';
 export * from './PasswordPolicyResource.js';
 export * from './SessionPermissionsResource.js';
 export * from './PermissionsService.js';

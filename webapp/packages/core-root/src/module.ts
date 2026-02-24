@@ -40,6 +40,7 @@ import { DataSynchronizationService } from './DataSynchronization/DataSynchroniz
 import { AsyncTaskInfoService } from './AsyncTask/AsyncTaskInfoService.js';
 import { AsyncTaskInfoEventHandler } from './AsyncTask/AsyncTaskInfoEventHandler.js';
 import { ServerDefaultSettingsService } from './Settings/ServerDefaultSettingsService.js';
+import { ServerHealthCheckService } from './ServerHealthCheckService.js';
 
 export default ModuleRegistry.add({
   name: '@cloudbeaver/core-root',
@@ -47,6 +48,7 @@ export default ModuleRegistry.add({
   configure: serviceCollection => {
     serviceCollection
       .addSingleton(Bootstrap, proxy(NetworkStateService))
+      .addSingleton(Bootstrap, proxy(ServerHealthCheckService))
       .addSingleton(Bootstrap, proxy(RootBootstrap))
       .addSingleton(Bootstrap, proxy(SessionExpireService))
       .addSingleton(Bootstrap, proxy(WindowEventsService))
@@ -92,6 +94,7 @@ export default ModuleRegistry.add({
       .addSingleton(ProductInfoResource)
       .addSingleton(PermissionsService)
       .addSingleton(NetworkStateService)
+      .addSingleton(ServerHealthCheckService)
       .addSingleton(PasswordPolicyResource)
       .addSingleton(FeaturesResource)
       .addSingleton(DefaultNavigatorSettingsResource)
