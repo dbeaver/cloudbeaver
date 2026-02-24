@@ -90,15 +90,6 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
   const getHeaderOrder = useCallback(() => (dataGridRef.current?.getColumnsOrdered() ?? []).map(col => col.key), [dataGridRef]);
   const gridSelectionContext = useGridSelectionContext(tableData, selectionAction, getHeaderOrder);
 
-  const restoreFocus = useCallback(
-    function restoreFocus() {
-      const gridDiv = gridContainerRef.current;
-      const focusSink = gridDiv?.querySelector<HTMLDivElement>('[aria-selected="true"]');
-      focusSink?.focus();
-    },
-    [gridContainerRef],
-  );
-
   function isGridInFocus(): boolean {
     const gridDiv = gridContainerRef.current;
     const focusSink = gridDiv?.querySelector('[aria-selected="true"]');
@@ -132,7 +123,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
         dataGridRef.current?.selectCell(pos);
       }
     },
-    focusCell(key: Partial<IGridDataKey> | null, initial = false) {
+    focusCell(key: Partial<IGridDataKey> | null, initial = false, deferred = false) {
       if ((!key?.column || !key?.row) && initial) {
         const selectedElements = selectionAction.getSelectedElements();
 
@@ -157,9 +148,14 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
       const colIdx = tableData.getColumnIndexFromColumnKey(key.column!);
       const rowIdx = tableData.getRowIndexFromKey(key.row!);
 
-      focusSyncRef.current = { colIdx, rowIdx };
-
-      this.selectCell({ colIdx, rowIdx });
+      if (deferred) {
+        if (dataGridRef.current?.selectCell({ colIdx, rowIdx }, { deferred: true })) {
+          focusSyncRef.current = { colIdx, rowIdx };
+        }
+      } else {
+        focusSyncRef.current = { colIdx, rowIdx };
+        this.selectCell({ colIdx, rowIdx });
+      }
     },
   }));
 
@@ -206,10 +202,6 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
         return;
       }
 
-      if (dataGridRef.current?.isReplacing()) {
-        return;
-      }
-
       handlers.selectCell({ colIdx, rowIdx });
     }
 
@@ -217,14 +209,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
 
     function syncFocus(data: DatabaseDataSelectActionsData<Partial<IGridDataKey>>) {
       if (data.type === 'focus') {
-        if (dataGridRef.current?.isReplacing()) {
-          return;
-        }
-        // TODO: we need this delay to update focus after render rows update
-        setTimeout(() => {
-          handlers.focusCell(data.key);
-          setTimeout(() => restoreFocus(), 1);
-        }, 1);
+        handlers.focusCell(data.key, false, true);
       }
     }
 
@@ -234,7 +219,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
     return () => {
       tableData.editor?.action.removeHandler(syncEditor);
     };
-  }, [tableData.editor, selectionAction, handlers, tableData, restoreFocus]);
+  }, [tableData.editor, selectionAction, handlers, tableData]);
 
   useLayoutEffect(() => {
     if (!historyAction) {
@@ -306,9 +291,9 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
       simple,
       isGridInFocus,
       getDataGridApi: () => dataGridRef.current,
-      focus: restoreFocus,
+      focus: () => dataGridRef.current?.restoreFocus(),
     }),
-    [model, actions, resultIndex, simple, dataGridRef, restoreFocus],
+    [model, actions, resultIndex, simple, dataGridRef],
   );
 
   const columnsCount = useCreateGridReactiveValue(

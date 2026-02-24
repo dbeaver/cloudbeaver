@@ -59,14 +59,14 @@ export interface DataGridProps extends IDataGridCellContext, IDataGridRowContext
 }
 
 export interface DataGridRef {
-  selectCell: (position: ICellPosition) => void;
+  selectCell: (position: ICellPosition, options?: { deferred?: boolean }) => boolean;
   scrollToCell: (position: Partial<ICellPosition>) => void;
   openEditor: (position: ICellPosition) => void;
+  restoreFocus: () => void;
   getColumnsOrdered: () => readonly CalculatedColumn<IInnerRow, unknown>[];
   openSearch: () => void;
   closeSearch: () => void;
   refreshSearch: () => void;
-  isReplacing: () => boolean;
 }
 
 const MAX_AUTO_SIZE_WIDTH = 350;
@@ -170,19 +170,33 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
     return null;
   }
 
+  function restoreFocusInternal() {
+    const focusSink = containerRef.current?.querySelector<HTMLDivElement>('[aria-selected="true"]');
+    focusSink?.focus();
+  }
+
   useImperativeHandle(ref, () => ({
-    selectCell: (position: ICellPosition) => {
+    selectCell: (position: ICellPosition, options?: { deferred?: boolean }) => {
       if (isReplacingRef.current) {
-        return;
+        return false;
       }
 
       const columnKey = mapPositionToColumnKey(position);
 
       if (!columnKey) {
-        return;
+        return false;
       }
 
-      innerGridRef.current?.selectCellByKey({ columnKey, rowIdx: position.rowIdx });
+      if (options?.deferred) {
+        setTimeout(() => {
+          innerGridRef.current?.selectCellByKey({ columnKey, rowIdx: position.rowIdx });
+          requestAnimationFrame(restoreFocusInternal);
+        }, 1);
+      } else {
+        innerGridRef.current?.selectCellByKey({ columnKey, rowIdx: position.rowIdx });
+      }
+
+      return true;
     },
     scrollToCell: (position: Partial<ICellPosition>) => {
       innerGridRef.current?.scrollToCell({ idx: position.colIdx && dndHeaderContext.getDataColIdx(position.colIdx), rowIdx: position.rowIdx });
@@ -201,11 +215,11 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
         },
       );
     },
+    restoreFocus: restoreFocusInternal,
     getColumnsOrdered: () => innerGridRef.current?.getColumnsOrdered() ?? [],
     openSearch: handleSearchOpen,
     closeSearch: handleSearchClose,
     refreshSearch: () => searchPanelRef.current?.refresh(),
-    isReplacing: () => isReplacingRef.current,
   }));
 
   if (prevRowsCount !== rowsCount) {
