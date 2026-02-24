@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -29,8 +29,6 @@ const TIMESTAMP_DIFFERENCE_THRESHOLD = 100;
 
 @injectable(() => [EventsSettingsService])
 export class NotificationService {
-  // todo change to common new Map()
-
   readonly notificationList: OrderedMap<number, INotification<any>>;
   readonly closeTask: IExecutor<number>;
   private notificationNextId: number;
@@ -87,6 +85,7 @@ export class NotificationService {
         title: options.title,
         message: options.message,
         details: options.details,
+        pinned: options.pinned,
         isSilent: !!options.isSilent,
         customComponent: options.customComponent,
         extraProps: options.extraProps || ({} as TProps),
@@ -99,7 +98,6 @@ export class NotificationService {
           this.close(id, delayDeleting);
           options.onClose?.(delayDeleting);
         },
-        showDetails: this.showDetails.bind(this, id),
       },
       {
         title: observable.ref,
@@ -112,7 +110,7 @@ export class NotificationService {
         autoClose: observable.ref,
         type: observable.ref,
         timestamp: observable.ref,
-        showDetails: observable.ref,
+        pinned: observable.ref,
       },
     );
 
@@ -135,7 +133,7 @@ export class NotificationService {
 
   customNotification<TProps extends INotificationExtraProps<any> = INotificationExtraProps>(
     component: () => NotificationComponent<TProps>,
-    props?: TProps extends any ? TProps : never, // some magic
+    props?: TProps extends any ? TProps : never,
     options?: INotificationOptions<TProps> & { type?: ENotificationType },
   ): INotification<TProps> {
     return this.notify(
@@ -151,7 +149,7 @@ export class NotificationService {
 
   processNotification<TProps extends INotificationProcessExtraProps<any> = INotificationExtraProps>(
     component: () => NotificationComponent<TProps>,
-    props?: TProps extends any ? TProps : never, // some magic,
+    props?: TProps extends any ? TProps : never,
     options?: INotificationOptions<TProps>,
   ): IProcessNotificationContainer<TProps> {
     const processController = props?.state || new ProcessNotificationController();
@@ -217,8 +215,6 @@ export class NotificationService {
   }
 
   close(id: number, delayDeleting = true): void {
-    // TODO: emit event or something
-
     if (delayDeleting) {
       const notification = this.notificationList.get(id);
 
@@ -233,9 +229,5 @@ export class NotificationService {
     }
     this.notificationList.remove(id);
     this.closeTask.execute(id);
-  }
-
-  showDetails(id: number): void {
-    // TODO: emit event or something
   }
 }

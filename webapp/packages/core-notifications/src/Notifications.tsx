@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -22,9 +22,11 @@ export const Notifications = observer(function Notifications() {
   return (
     <Portal>
       <div className={s(style, { notifications: true })}>
-        {notificationService.visibleNotifications.map(notification => (
-          <NotificationsItem key={notification.id} notification={notification} />
-        ))}
+        {notificationService.visibleNotifications
+          .sort((a, b) => (a.pinned ? 1 : 0) - (b.pinned ? 1 : 0))
+          .map(notification => (
+            <NotificationsItem key={notification.id} notification={notification} />
+          ))}
       </div>
     </Portal>
   );

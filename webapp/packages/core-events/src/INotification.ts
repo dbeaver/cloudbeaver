@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -51,6 +51,7 @@ export interface INotification<TProps extends INotificationExtraProps<any> = INo
   type: ENotificationType;
   title: string;
   message?: string;
+  pinned?: boolean;
   timestamp: number;
   details?: string | Error | null;
   autoClose?: boolean;
@@ -60,13 +61,13 @@ export interface INotification<TProps extends INotificationExtraProps<any> = INo
   extraProps: TProps;
   customComponent?: () => NotificationComponent<TProps>;
   close: (delayDeleting?: boolean) => void;
-  showDetails: () => void;
 }
 
 export interface INotificationOptions<TProps extends INotificationExtraProps<any> = INotificationExtraProps> {
   title: string;
   uuid?: string;
   message?: string;
+  pinned?: boolean;
   details?: string | Error | null;
   isSilent?: boolean;
   autoClose?: boolean;
