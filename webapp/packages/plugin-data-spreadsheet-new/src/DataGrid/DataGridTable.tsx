@@ -184,7 +184,15 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
     function syncEditor(data: IGridEditActionData) {
       const editor = tableData.editor;
 
-      if (data.resultId !== editor?.result.id || !data.value || data.value.length === 0 || data.type === DatabaseEditChangeType.delete) {
+      if (data.resultId !== editor?.result.id) {
+        return;
+      }
+
+      if (data.revert) {
+        dataGridRef.current?.refreshSearch();
+      }
+
+      if (!data.value || data.value.length === 0 || data.type === DatabaseEditChangeType.delete) {
         return;
       }
 
