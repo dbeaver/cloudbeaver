@@ -172,7 +172,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
 
       return await options.loadChildren(id, manual);
     } catch (exception: any) {
-      notificationService.logException(exception);
+      notificationService.logException(exception, 'plugin_navigation_tree_load_children_error');
       return false;
     }
   }

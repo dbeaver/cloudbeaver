@@ -14,6 +14,7 @@ export default [
   ['plugin_user_profile_authentication_change_password_new_password', 'Mật khẩu mới'],
   ['plugin_user_profile_authentication_change_password_repeat_password', 'Nhập lại mật khẩu'],
   ['plugin_user_profile_authentication_change_password_success', 'Mật khẩu đã được thay đổi thành công'],
+  ['plugin_user_profile_change_password_error', 'Không thể thay đổi mật khẩu'],
   ['plugin_user_profile_authentication_change_password_submit_label', 'Đổi'],
   ['plugin_user_profile_authentication_change_password_passwords_not_match', 'Mật khẩu không khớp'],
   ['plugin_user_profile_authentication_change_password_password_validation_error', 'Xác thực mật khẩu thất bại'],

@@ -152,7 +152,7 @@ export class ConnectionMenuBootstrap extends Bootstrap {
             try {
               await this.connectionsManagerService.deleteConnection(createConnectionParam(connection));
             } catch (exception: any) {
-              this.notificationService.logException(exception, 'Failed to delete connection');
+              this.notificationService.logException(exception, 'plugin_connections_connection_delete_error');
             }
             break;
           }

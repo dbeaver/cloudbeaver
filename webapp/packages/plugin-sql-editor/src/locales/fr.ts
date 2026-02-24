@@ -60,4 +60,12 @@ export default [
     'plugin_sql_editor_settings_highlight_white_space_description',
     "Mettre en surbrillance les espaces, les tabulations et les autres caractères d'espace blanc dans l'éditeur SQL",
   ],
+  ['plugin_sql_editor_format_script_error', 'Échec du formatage du script'],
+  ['plugin_sql_editor_query_execution_error', "Erreur d'exécution de la requête"],
+  ['plugin_sql_editor_execution_plan_error', "Erreur du plan d'exécution"],
+  ['plugin_sql_editor_upload_script_error', 'Échec du téléchargement du script'],
+  ['plugin_sql_editor_parse_script_error', "Échec de l'analyse du script SQL"],
+  ['plugin_sql_editor_connection_change_error', "Échec du changement de connexion de l'éditeur SQL"],
+  ['plugin_sql_editor_context_destroy_error', 'Échec de la destruction du contexte SQL {arg:id}'],
+  ['plugin_sql_editor_overlay_init_connection_error', "Échec de la restauration de la connexion pour l'éditeur SQL"],
 ];

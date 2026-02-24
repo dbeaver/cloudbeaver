@@ -34,7 +34,7 @@ export const ConnectionShield = observer<PropsWithChildren<IConnectionShieldProp
     try {
       await connectionsManagerService.requireConnection(connectionKey);
     } catch (exception: any) {
-      notificationService.logException(exception);
+      notificationService.logException(exception, 'plugin_connections_connection_connect_error');
     }
   }
 

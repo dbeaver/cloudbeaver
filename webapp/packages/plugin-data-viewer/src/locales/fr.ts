@@ -52,6 +52,7 @@ export default [
   ['data_viewer_total_count_canceled_title', 'Total annulé'],
   ['data_viewer_total_count_canceled_message', "La déclaration a été annulée à la demande de l'utilisateur"],
   ['data_viewer_total_count_failed', "Échec de l'obtention du compte total"],
+  ['data_viewer_total_count_cancel_failed', "Échec de l'annulation du compte total"],
   ['data_viewer_model_not_loaded', "Le modèle de la table n'est pas chargé"],
   ['data_viewer_copy_not_allowed', 'An ability to copy data is disabled'],
   ['data_viewer_copy_not_allowed_message', 'If this was unexpected, contact the administrator'],

@@ -59,4 +59,7 @@ export default [
   ['plugin_connections_connection_client_version', 'Phiên bản máy khách: {arg:version} \n'],
   ['plugin_connections_connection_server_version', 'Phiên bản máy chủ: {arg:version} \n'],
   ['plugin_connections_connection_connection_time', 'Thời gian kết nối: {arg:time} \n'],
+  ['plugin_connections_connection_delete_error', 'Không thể xóa kết nối'],
+  ['plugin_connections_connection_folder_create_error', 'Không thể tạo thư mục'],
+  ['plugin_connections_connection_connect_error', 'Không thể kết nối'],
 ];

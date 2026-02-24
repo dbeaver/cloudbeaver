@@ -53,6 +53,7 @@ export default [
   ['data_viewer_total_count_canceled_title', 'Total count canceled'],
   ['data_viewer_total_count_canceled_message', 'Statement was cancelled due to user request'],
   ['data_viewer_total_count_failed', 'Failed to get total count'],
+  ['data_viewer_total_count_cancel_failed', 'Failed to cancel total count'],
   ['data_viewer_model_not_loaded', 'Table model is not loaded'],
   ['data_viewer_copy_not_allowed', 'An ability to copy data is disabled'],
   ['data_viewer_copy_not_allowed_message', 'If this was unexpected, contact the administrator'],

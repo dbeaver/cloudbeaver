@@ -56,4 +56,7 @@ export default [
   ['plugin_connections_connection_client_version', 'Client version: {arg:version} \n'],
   ['plugin_connections_connection_server_version', 'Server version: {arg:version} \n'],
   ['plugin_connections_connection_connection_time', 'Connection time: {arg:time} \n'],
+  ['plugin_connections_connection_delete_error', 'Failed to delete connection'],
+  ['plugin_connections_connection_folder_create_error', 'Failed to create folder'],
+  ['plugin_connections_connection_connect_error', 'Failed to connect'],
 ];

@@ -29,6 +29,7 @@ export default [
   ['authentication_administration_user_updated', '用户信息已更新'],
   ['authentication_administration_user_created', '创建用户成功'],
   ['authentication_administration_user_create_failed', '创建新用户出错'],
+  ['authentication_administration_users_refresh_error', '刷新用户状态失败'],
   ['authentication_administration_users_delete_confirmation', '您将删除这些用户：'],
   ['authentication_administration_users_filters_search_placeholder', '搜索用户名称...'],
   ['authentication_administration_users_filters_status_enabled', '启用'],

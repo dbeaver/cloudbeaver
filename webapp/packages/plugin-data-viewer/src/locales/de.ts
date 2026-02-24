@@ -34,6 +34,7 @@ export default [
   ['data_viewer_script_preview_dialog_title', 'Vorschau ändert sich'],
   ['data_viewer_script_preview_error_title', 'Kann das Skript nicht bekommen'],
   ['data_viewer_total_count_tooltip', 'Totalzahl erhalten'],
+  ['data_viewer_total_count_cancel_failed', 'Fehler beim Abbrechen der Gesamtzahl'],
   ['data_viewer_model_not_loaded', 'Das Tabellenmodell ist nicht geladen'],
   ['data_viewer_copy_not_allowed', 'An ability to copy data is disabled'],
   ['data_viewer_copy_not_allowed_message', 'If this was unexpected, contact the administrator'],

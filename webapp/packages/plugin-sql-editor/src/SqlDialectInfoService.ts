@@ -20,7 +20,7 @@ export class SqlDialectInfoService {
     try {
       return await this.connectionDialectResource.formatScript(context, query);
     } catch (error: any) {
-      this.notificationService.logException(error, 'Failed to format script');
+      this.notificationService.logException(error, 'plugin_sql_editor_format_script_error');
     }
     return query;
   }

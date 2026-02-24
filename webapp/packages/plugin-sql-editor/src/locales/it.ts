@@ -52,4 +52,12 @@ export default [
     'plugin_sql_editor_settings_highlight_white_space_description',
     "Mettere in evidenza spazi, tabulazioni e altri caratteri di spazio bianco nell'editor SQL",
   ],
+  ['plugin_sql_editor_format_script_error', 'Impossibile formattare lo script'],
+  ['plugin_sql_editor_query_execution_error', 'Errore di esecuzione della query'],
+  ['plugin_sql_editor_execution_plan_error', 'Errore del piano di esecuzione'],
+  ['plugin_sql_editor_upload_script_error', 'Impossibile caricare lo script'],
+  ['plugin_sql_editor_parse_script_error', 'Impossibile analizzare lo script SQL'],
+  ['plugin_sql_editor_connection_change_error', "Impossibile modificare la connessione dell'editor SQL"],
+  ['plugin_sql_editor_context_destroy_error', 'Impossibile distruggere il contesto SQL {arg:id}'],
+  ['plugin_sql_editor_overlay_init_connection_error', "Impossibile ripristinare la connessione per l'editor SQL"],
 ];

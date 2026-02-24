@@ -33,7 +33,7 @@ export function useNavigationTree(): INavigationTree {
           try {
             await this.navigationTreeService.navToNode(node.id, node.parentId);
           } catch (exception: any) {
-            notificationService.logException(exception);
+            notificationService.logException(exception, 'plugin_navigation_tree_open_error');
             throw exception;
           }
         }

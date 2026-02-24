@@ -14,6 +14,7 @@ export default [
   ['plugin_user_profile_authentication_change_password_new_password', 'Nuova password'],
   ['plugin_user_profile_authentication_change_password_repeat_password', 'Ripeti password'],
   ['plugin_user_profile_authentication_change_password_success', 'Password modificata con successo'],
+  ['plugin_user_profile_change_password_error', 'Impossibile modificare la password'],
   ['plugin_user_profile_authentication_change_password_submit_label', 'Modifica'],
   ['plugin_user_profile_authentication_change_password_passwords_not_match', 'Le Passwords non coincidono'],
   ['plugin_user_profile_authentication_change_password_password_validation_error', 'Password validation failed'],

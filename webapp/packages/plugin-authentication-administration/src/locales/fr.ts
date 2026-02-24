@@ -30,6 +30,7 @@ export default [
   ['authentication_administration_user_updated', 'Utilisateur mis à jour'],
   ['authentication_administration_user_created', 'Utilisateur créé avec succès'],
   ['authentication_administration_user_create_failed', 'Erreur de création du nouvel utilisateur'],
+  ['authentication_administration_users_refresh_error', "Échec de l'actualisation du statut de l'utilisateur"],
   ['authentication_administration_users_delete_confirmation', 'Vous allez supprimer ces utilisateurs : '],
   ['authentication_administration_users_filters_search_placeholder', "Rechercher le nom de l'utilisateur..."],
   ['authentication_administration_users_filters_status_enabled', 'ACTIVÉ'],

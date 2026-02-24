@@ -30,6 +30,7 @@ export default [
   ['authentication_administration_user_updated', 'User updated'],
   ['authentication_administration_user_created', 'User was created successfully'],
   ['authentication_administration_user_create_failed', 'Error creating new user'],
+  ['authentication_administration_users_refresh_error', 'Failed to refresh user status'],
   ['authentication_administration_users_delete_confirmation', "You're going to delete these users: "],
   ['authentication_administration_users_filters_search_placeholder', 'Search for the user name...'],
   ['authentication_administration_users_filters_status_enabled', 'ENABLED'],

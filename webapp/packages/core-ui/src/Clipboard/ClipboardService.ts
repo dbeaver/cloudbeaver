@@ -49,7 +49,7 @@ export class ClipboardService {
     } catch (exception: any) {
       this.clipboardAvailable = false;
       this.clipboardValue = null;
-      this.notificationService.logException(exception, 'Failed to read from clipboard', '', true);
+      this.notificationService.logException(exception, 'core_ui_clipboard_read_error', '', true);
       this.notificationService.logInfo({ title: 'ui_clipboard_access_denied_title', message: 'ui_clipboard_access_denied_message' });
     }
 
@@ -86,7 +86,7 @@ export class ClipboardService {
     try {
       this.readPermission = await navigator.permissions.query({ name: 'clipboard-read' as any });
     } catch (exception: any) {
-      this.notificationService.logException(exception, 'Failed to get permission status', '', true);
+      this.notificationService.logException(exception, 'core_ui_clipboard_permission_error', '', true);
       this.readPermission = null;
     }
   }

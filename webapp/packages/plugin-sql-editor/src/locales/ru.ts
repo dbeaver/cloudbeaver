@@ -53,4 +53,12 @@ export default [
   ],
   ['plugin_sql_editor_settings_highlight_white_space', 'Подсветить пробелы'],
   ['plugin_sql_editor_settings_highlight_white_space_description', 'Подсветить пробелы, табуляции и другие пробельные символы в редакторе SQL'],
+  ['plugin_sql_editor_format_script_error', 'Не удалось отформатировать скрипт'],
+  ['plugin_sql_editor_query_execution_error', 'Ошибка выполнения запроса'],
+  ['plugin_sql_editor_execution_plan_error', 'Ошибка плана выполнения'],
+  ['plugin_sql_editor_upload_script_error', 'Не удалось загрузить скрипт'],
+  ['plugin_sql_editor_parse_script_error', 'Не удалось разобрать SQL скрипт'],
+  ['plugin_sql_editor_connection_change_error', 'Не удалось изменить подключение SQL-редактора'],
+  ['plugin_sql_editor_context_destroy_error', 'Не удалось уничтожить SQL контекст {arg:id}'],
+  ['plugin_sql_editor_overlay_init_connection_error', 'Не удалось восстановить подключение для SQL-редактора'],
 ];

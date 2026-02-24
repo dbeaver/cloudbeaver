@@ -30,6 +30,7 @@ export default [
   ['authentication_administration_user_updated', 'Пользователь обновлен'],
   ['authentication_administration_user_created', 'Пользователь создан успешно'],
   ['authentication_administration_user_create_failed', 'Не удалось создать пользователя'],
+  ['authentication_administration_users_refresh_error', 'Не удалось обновить статус пользователя'],
   ['authentication_administration_users_delete_confirmation', 'Вы собираетесь удалить следующих пользователей: '],
   ['authentication_administration_users_filters_search_placeholder', 'Поиск по имени пользователя...'],
   ['authentication_administration_users_filters_status_enabled', 'ВКЛЮЧЕН'],

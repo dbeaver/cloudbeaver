@@ -52,4 +52,7 @@ export default [
   ['plugin_connections_connection_client_version', 'Client version: {arg:version} \n'],
   ['plugin_connections_connection_server_version', 'Server version: {arg:version} \n'],
   ['plugin_connections_connection_connection_time', 'Connection time: {arg:time} \n'],
+  ['plugin_connections_connection_delete_error', '删除连接失败'],
+  ['plugin_connections_connection_folder_create_error', '无法创建文件夹'],
+  ['plugin_connections_connection_connect_error', '连接失败'],
 ];

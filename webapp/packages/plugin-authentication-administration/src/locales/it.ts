@@ -27,6 +27,7 @@ export default [
   ['authentication_administration_user_updated', 'Utente aggiornato'],
   ['authentication_administration_user_created', 'Utente creato con successo'],
   ['authentication_administration_user_create_failed', 'Errore di creazione nuovo utente'],
+  ['authentication_administration_users_refresh_error', "Impossibile aggiornare lo stato dell'utente"],
   ['authentication_administration_users_filters_search_placeholder', 'Search for the user name...'],
   ['authentication_administration_users_filters_status_enabled', 'ENABLED'],
   ['authentication_administration_users_filters_status_disabled', 'DISABLED'],

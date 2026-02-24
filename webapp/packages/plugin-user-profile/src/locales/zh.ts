@@ -14,6 +14,7 @@ export default [
   ['plugin_user_profile_authentication_change_password_new_password', '新密码'],
   ['plugin_user_profile_authentication_change_password_repeat_password', '重复密码'],
   ['plugin_user_profile_authentication_change_password_success', '密码更改成功'],
+  ['plugin_user_profile_change_password_error', '更改密码失败'],
   ['plugin_user_profile_authentication_change_password_submit_label', '更改'],
   ['plugin_user_profile_authentication_change_password_passwords_not_match', '密码不匹配'],
   ['plugin_user_profile_authentication_change_password_password_validation_error', '密码校验失败'],

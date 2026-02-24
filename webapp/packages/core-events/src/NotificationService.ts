@@ -180,7 +180,7 @@ export class NotificationService {
     return this.notify(notification, ENotificationType.Error);
   }
 
-  logException(exception: Error | GQLError | undefined | null, title?: string, message?: string, silent?: boolean): void {
+  logException(exception: Error | GQLError | undefined | null, title: string, message?: string, silent?: boolean): void {
     const errorDetails = errorOf(exception, DetailsError);
 
     if (!silent) {
@@ -188,7 +188,7 @@ export class NotificationService {
 
       if (hasDetails) {
         if (!title) {
-          title = exception?.name;
+          title = exception?.name || 'ui_unexpected_error';
         }
 
         if (!message) {

@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -32,6 +32,7 @@ import { SqlDataSourceService } from './SqlDataSource/SqlDataSourceService.js';
 import { SqlEditorSettingsService } from './SqlEditorSettingsService.js';
 import { Executor, type IExecutor } from '@cloudbeaver/core-executor';
 import { SqlQueryService } from './SqlResultTabs/SqlQueryService.js';
+import { LocalizationService } from '@cloudbeaver/core-localization';
 
 export type SQLProposal = SqlCompletionProposal;
 
@@ -54,6 +55,7 @@ export interface ISqlEditorActiveQueryUpdateData {
   SqlEditorSettingsService,
   ServerConfigResource,
   SqlQueryService,
+  LocalizationService,
 ])
 export class SqlEditorService {
   get autoSave(): boolean {
@@ -81,6 +83,7 @@ export class SqlEditorService {
     private readonly sqlEditorSettingsService: SqlEditorSettingsService,
     private readonly serverConfigResource: ServerConfigResource,
     private readonly sqlQueryService: SqlQueryService,
+    private readonly localizationService: LocalizationService,
   ) {
     this.updateActiveQuery = new Executor();
 
@@ -202,7 +205,7 @@ export class SqlEditorService {
 
       return true;
     } catch (exception: any) {
-      this.notificationService.logException(exception, 'Failed to change SQL-editor connection');
+      this.notificationService.logException(exception, 'plugin_sql_editor_connection_change_error');
       return false;
     }
   }
@@ -276,7 +279,14 @@ export class SqlEditorService {
       try {
         await executionContext.destroy();
       } catch (exception: any) {
-        this.notificationService.logException(exception, `Failed to destroy SQL-context ${executionContext.context?.id}`, '', true);
+        this.notificationService.logException(
+          exception,
+          this.localizationService.translate('plugin_sql_editor_context_destroy_error', undefined, {
+            id: executionContext.context?.id,
+          }),
+          '',
+          true,
+        );
       }
     }
   }

@@ -34,4 +34,6 @@ export default [
   ['plugin_navigation_tree_settings_disable', 'Disable'],
   ['plugin_navigation_tree_settings_disable_description', 'Disable navigation tree for all users'],
   ['plugin_navigation_tree_toolbar_menu_title', '树工具栏菜单'],
+  ['plugin_navigation_tree_open_error', '打开节点失败'],
+  ['plugin_navigation_tree_load_children_error', '加载子节点失败'],
 ];

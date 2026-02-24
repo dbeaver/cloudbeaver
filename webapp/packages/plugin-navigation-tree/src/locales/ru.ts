@@ -38,4 +38,6 @@ export default [
   ['plugin_navigation_tree_settings_disable', 'Отключить'],
   ['plugin_navigation_tree_settings_disable_description', 'Отключить дерево навигации для всех пользователей'],
   ['plugin_navigation_tree_toolbar_menu_title', 'Панель инструментов дерева'],
+  ['plugin_navigation_tree_open_error', 'Не удалось открыть узел'],
+  ['plugin_navigation_tree_load_children_error', 'Не удалось загрузить дочерние узлы'],
 ];

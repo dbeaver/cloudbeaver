@@ -30,6 +30,7 @@ export default [
   ['authentication_administration_user_updated', 'Người dùng đã được cập nhật'],
   ['authentication_administration_user_created', 'Người dùng đã được tạo thành công'],
   ['authentication_administration_user_create_failed', 'Lỗi tạo người dùng mới'],
+  ['authentication_administration_users_refresh_error', 'Không thể làm mới trạng thái người dùng'],
   ['authentication_administration_users_delete_confirmation', 'Bạn sắp xóa các người dùng sau: '],
   ['authentication_administration_users_filters_search_placeholder', 'Tìm kiếm tên người dùng...'],
   ['authentication_administration_users_filters_status_enabled', 'BẬT'],

@@ -70,7 +70,7 @@ export const ChangePassword = observer(function ChangePassword() {
         notificationService.logSuccess({ title: 'plugin_user_profile_authentication_change_password_success' });
       } catch (exception) {
         if (exception instanceof Error) {
-          notificationService.logException(exception);
+          notificationService.logException(exception, 'plugin_user_profile_change_password_error');
         }
       }
     },

@@ -210,10 +210,10 @@ export class SqlQueryService {
       if (source?.currentTask?.cancelled && isNewTabCreated) {
         this.sqlQueryResultService.removeGroup(editorState, tabGroup!.groupId);
         const message = 'Query execution has been canceled';
-        this.notificationService.logException(exception, 'Query execution Error', message);
+        this.notificationService.logException(exception, 'plugin_sql_editor_query_execution_error', message);
         return;
       } else if (!source) {
-        this.notificationService.logException(exception, 'Query execution Error', exception.message);
+        this.notificationService.logException(exception, 'plugin_sql_editor_query_execution_error', exception.message);
       }
       throw exception;
     }
@@ -341,7 +341,7 @@ export class SqlQueryService {
         this.tableViewerStorageService.remove(model.id);
       }
     } catch (exception: any) {
-      this.notificationService.logException(exception, 'Query execution Error', exception.message);
+      this.notificationService.logException(exception, 'plugin_sql_editor_query_execution_error', exception.message);
       throw exception;
     }
   }

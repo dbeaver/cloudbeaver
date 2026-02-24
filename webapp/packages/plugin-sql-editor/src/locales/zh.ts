@@ -53,4 +53,12 @@ export default [
   ],
   ['plugin_sql_editor_settings_highlight_white_space', '高亮显示空白字符'],
   ['plugin_sql_editor_settings_highlight_white_space_description', '高亮显示SQL编辑器中的空格、制表符和其他空白字符'],
+  ['plugin_sql_editor_format_script_error', '格式化脚本失败'],
+  ['plugin_sql_editor_query_execution_error', '查询执行错误'],
+  ['plugin_sql_editor_execution_plan_error', '执行计划错误'],
+  ['plugin_sql_editor_upload_script_error', '上传脚本失败'],
+  ['plugin_sql_editor_parse_script_error', '解析SQL脚本失败'],
+  ['plugin_sql_editor_connection_change_error', '更改SQL编辑器连接失败'],
+  ['plugin_sql_editor_context_destroy_error', '销毁SQL上下文失败 {arg:id}'],
+  ['plugin_sql_editor_overlay_init_connection_error', '恢复SQL编辑器连接失败'],
 ];

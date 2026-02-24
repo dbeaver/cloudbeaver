@@ -61,7 +61,7 @@ export const UsersTable = observer<Props>(function UsersTable({ users, isManagea
       try {
         await usersResource.enableUser(userId, enabled);
       } catch (error: any) {
-        notificationService.logException(error);
+        notificationService.logException(error, 'authentication_administration_users_refresh_error');
       }
     },
     [usersResource, notificationService],

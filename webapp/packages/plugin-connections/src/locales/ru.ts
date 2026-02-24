@@ -59,4 +59,7 @@ export default [
   ['plugin_connections_connection_client_version', 'Версия клиента: {arg:version} \n'],
   ['plugin_connections_connection_server_version', 'Версия сервера: {arg:version} \n'],
   ['plugin_connections_connection_connection_time', 'Время подключения: {arg:time} \n'],
+  ['plugin_connections_connection_delete_error', 'Не удалось удалить подключение'],
+  ['plugin_connections_connection_folder_create_error', 'Не удалось создать папку'],
+  ['plugin_connections_connection_connect_error', 'Не удалось подключиться'],
 ];

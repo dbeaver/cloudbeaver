@@ -47,6 +47,7 @@ export default [
   ['data_viewer_total_count_canceled_title', 'Получение количества записей отменено'],
   ['data_viewer_total_count_canceled_message', 'Запрос был отменен пользователем'],
   ['data_viewer_total_count_failed', 'Не удалось получить количество записей'],
+  ['data_viewer_total_count_cancel_failed', 'Не удалось отменить получение количества записей'],
   ['data_viewer_model_not_loaded', 'Не удалось загрузить модель таблицы'],
   ['data_viewer_copy_not_allowed', 'Копирование отключено'],
   ['data_viewer_copy_not_allowed_message', 'Если это не ожидаемо, обратитесь к администратору'],

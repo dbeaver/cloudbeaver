@@ -100,7 +100,7 @@ export class SqlExecutionPlanService {
     } catch (exception: any) {
       const cancelled = task.cancelled;
       const message = cancelled ? 'Execution plan process has been canceled' : undefined;
-      this.notificationService.logException(exception, 'Execution plan Error', message);
+      this.notificationService.logException(exception, 'plugin_sql_editor_execution_plan_error', message);
       this.removeTab(editorState, tabId);
 
       if (!cancelled) {

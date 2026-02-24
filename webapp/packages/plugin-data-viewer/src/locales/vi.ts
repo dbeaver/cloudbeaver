@@ -53,6 +53,7 @@ export default [
   ['data_viewer_total_count_canceled_title', 'Đã hủy tổng số lượng'],
   ['data_viewer_total_count_canceled_message', 'Câu lệnh đã bị hủy theo yêu cầu của người dùng'],
   ['data_viewer_total_count_failed', 'Không thể lấy tổng số lượng'],
+  ['data_viewer_total_count_cancel_failed', 'Không thể hủy lấy tổng số lượng'],
   ['data_viewer_model_not_loaded', 'Mô hình bảng chưa được tải'],
   ['data_viewer_copy_not_allowed', 'Khả năng sao chép dữ liệu đã bị tắt'],
   ['data_viewer_copy_not_allowed_message', 'Nếu điều này bất ngờ, vui lòng liên hệ quản trị viên'],

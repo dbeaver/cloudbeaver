@@ -433,7 +433,7 @@ export class SqlEditorTabService extends Bootstrap {
       dataSource.setExecutionContext({ ...context });
       return true;
     } catch (exception: any) {
-      this.notificationService.logException(exception, 'Failed to change SQL-editor catalog');
+      this.notificationService.logException(exception, 'plugin_sql_editor_navigation_tab_catalog_change_error');
       return false;
     }
   }
@@ -457,7 +457,7 @@ export class SqlEditorTabService extends Bootstrap {
       dataSource.setExecutionContext({ ...context });
       return true;
     } catch (exception: any) {
-      this.notificationService.logException(exception, 'Failed to change SQL-editor schema');
+      this.notificationService.logException(exception, 'plugin_sql_editor_navigation_tab_schema_change_error');
       return false;
     }
   }

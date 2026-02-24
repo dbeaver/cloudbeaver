@@ -484,7 +484,7 @@ export class MenuBootstrap extends Bootstrap {
       const script = await getTextFileReadingProcess(file).promise;
       dataSource.setScript(script);
     } catch (exception: any) {
-      this.notificationService.logException(exception, 'Uploading script error');
+      this.notificationService.logException(exception, 'plugin_sql_editor_upload_script_error');
     }
   }
 }

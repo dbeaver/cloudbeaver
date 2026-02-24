@@ -198,7 +198,7 @@ export class SqlEditorNavigatorService {
 
       this.navigationTabsService.selectTab(tab.id);
     } catch (exception: any) {
-      this.notificationService.logException(exception, 'SQL Editor Error', 'Error in SQL Editor while processing action with editor');
+      this.notificationService.logException(exception, 'plugin_sql_editor_navigation_tab_processing_error', 'plugin_sql_editor_navigation_tab_processing_error_message');
     }
   }
 }

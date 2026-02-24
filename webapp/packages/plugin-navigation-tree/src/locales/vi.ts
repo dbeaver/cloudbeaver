@@ -35,4 +35,6 @@ export default [
   ['plugin_navigation_tree_settings_disable', 'Tắt'],
   ['plugin_navigation_tree_settings_disable_description', 'Tắt cây điều hướng cho tất cả người dùng'],
   ['plugin_navigation_tree_toolbar_menu_title', 'Menu Thanh công cụ Cây'],
+  ['plugin_navigation_tree_open_error', 'Không thể mở nút'],
+  ['plugin_navigation_tree_load_children_error', 'Không thể tải các nút con'],
 ];

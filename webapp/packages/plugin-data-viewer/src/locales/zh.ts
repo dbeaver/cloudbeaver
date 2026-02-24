@@ -50,6 +50,7 @@ export default [
   ['data_viewer_script_preview_error_title', '无法获取脚本'],
   ['data_viewer_refresh_result_set', '刷新结果设置'],
   ['data_viewer_total_count_failed', '获取总数失败'],
+  ['data_viewer_total_count_cancel_failed', '取消获取总数失败'],
   ['data_viewer_total_count_tooltip', '获取总数'],
   ['data_viewer_total_count_canceled_title', '取消计算总数'],
   ['data_viewer_total_count_canceled_message', '由于用户请求，计数已被取消'],

@@ -55,4 +55,12 @@ export default [
     'plugin_sql_editor_settings_highlight_white_space_description',
     'Đánh dấu khoảng trắng, tab và các ký tự khoảng trắng khác trong trình soạn thảo SQL',
   ],
+  ['plugin_sql_editor_format_script_error', 'Không thể định dạng kịch bản'],
+  ['plugin_sql_editor_query_execution_error', 'Lỗi thực thi truy vấn'],
+  ['plugin_sql_editor_execution_plan_error', 'Lỗi kế hoạch thực thi'],
+  ['plugin_sql_editor_upload_script_error', 'Không thể tải lên kịch bản'],
+  ['plugin_sql_editor_parse_script_error', 'Không thể phân tích kịch bản SQL'],
+  ['plugin_sql_editor_connection_change_error', 'Không thể thay đổi kết nối của trình soạn thảo SQL'],
+  ['plugin_sql_editor_context_destroy_error', 'Không thể hủy ngữ cảnh SQL {arg:id}'],
+  ['plugin_sql_editor_overlay_init_connection_error', 'Không thể khôi phục kết nối cho trình soạn thảo SQL'],
 ];

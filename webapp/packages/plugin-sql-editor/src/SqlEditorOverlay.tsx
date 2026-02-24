@@ -81,7 +81,7 @@ export const SqlEditorOverlay = observer<Props>(function SqlEditorOverlay({ stat
     try {
       await sqlEditorService.initEditorConnection(state);
     } catch (exception: any) {
-      notificationService.logException(exception);
+      notificationService.logException(exception, 'plugin_sql_editor_overlay_init_connection_error');
     }
   }
 

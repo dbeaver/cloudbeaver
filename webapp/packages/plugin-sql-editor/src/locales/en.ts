@@ -56,4 +56,12 @@ export default [
   ],
   ['plugin_sql_editor_settings_highlight_white_space', 'Highlight white space characters'],
   ['plugin_sql_editor_settings_highlight_white_space_description', 'Highlight spaces, tabs and other white space characters in the SQL editor'],
+  ['plugin_sql_editor_format_script_error', 'Failed to format script'],
+  ['plugin_sql_editor_query_execution_error', 'Query execution error'],
+  ['plugin_sql_editor_execution_plan_error', 'Execution plan error'],
+  ['plugin_sql_editor_upload_script_error', 'Failed to upload script'],
+  ['plugin_sql_editor_parse_script_error', 'Failed to parse SQL script'],
+  ['plugin_sql_editor_connection_change_error', 'Failed to change SQL-editor connection'],
+  ['plugin_sql_editor_context_destroy_error', 'Failed to destroy SQL context {arg:id}'],
+  ['plugin_sql_editor_overlay_init_connection_error', 'Failed to restore connection for SQL editor'],
 ];

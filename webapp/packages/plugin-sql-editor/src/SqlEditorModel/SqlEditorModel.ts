@@ -138,7 +138,7 @@ export class SqlEditorModel<TDataSource extends QueryDataSource> extends Disposa
       await this.parser.parse(this.parserFn, projectId, connectionId);
       this.onUpdate.execute();
     } catch (exception: any) {
-      this.notificationService.logException(exception, 'Failed to parse SQL script');
+      this.notificationService.logException(exception, 'plugin_sql_editor_parse_script_error');
       throw exception;
     }
   }
