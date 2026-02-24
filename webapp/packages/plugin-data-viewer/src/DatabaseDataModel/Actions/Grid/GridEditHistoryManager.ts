@@ -36,8 +36,13 @@ export class GridEditHistoryManager<TKey extends IGridDataKey, TCell> {
   }
 
   recordCellEdit(data: IGridHistoryCellUpdateData<TKey, TCell>): void {
-    const singleUpdateKey = data.updates.length === 1 ? data.updates[0]!.key : undefined;
-    this.compressLastEditedCellHistory(singleUpdateKey);
+    // Pass the key to skip compression while the same cell is still being edited.
+    // Without a key, compression always runs (e.g. for bulk edits).
+    if (data.updates.length === 1) {
+      this.compressLastEditedCellHistory(data.updates[0]!.key);
+    } else {
+      this.compressLastEditedCellHistory();
+    }
 
     this.history.add({
       source: GRID_HISTORY_SOURCE.EDIT_CELL,
