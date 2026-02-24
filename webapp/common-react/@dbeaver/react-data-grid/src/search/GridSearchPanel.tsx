@@ -18,13 +18,13 @@ import { type IGridSearchStorage, useGridSearch } from './useGridSearch.js';
 export interface GridSearchPanelRef {
   focus: () => void;
   refresh: () => void;
+  getCellClassName: IGridReactiveValue<string | undefined, [number, number]>;
 }
 
 interface GridSearchPanelProps {
   columnCount: number;
   scrollToCell: (rowIdx: number, colIdx: number) => void;
   onReplace: (updates: ICellChange[]) => void;
-  onCellClassNameChange: (value: IGridReactiveValue<string | undefined, [number, number]> | undefined) => void;
   onClose: () => void;
   onReplacingChange?: (isReplacing: boolean) => void;
   isReadOnly?: boolean;
@@ -33,21 +33,13 @@ interface GridSearchPanelProps {
 }
 
 export const GridSearchPanel = forwardRef<GridSearchPanelRef, GridSearchPanelProps>(function GridSearchPanel(
-  { columnCount, scrollToCell, onReplace, onCellClassNameChange, onClose, onReplacingChange, isReadOnly, storage, open },
+  { columnCount, scrollToCell, onReplace, onClose, onReplacingChange, isReadOnly, storage, open },
   ref,
 ) {
   const panelRef = useRef<SearchPanelRef>(null);
   const { cellText } = useContext(DataGridCellContext) ?? {};
   const rowContext = useContext(DataGridRowContext);
   const rowCount = useGridReactiveValue(rowContext?.rowCount);
-
-  function refresh() {
-    actions.refresh();
-  }
-
-  function focus() {
-    panelRef.current?.focus();
-  }
 
   const { snapshot, actions, getCellClassName, replaceOpen } = useGridSearch({
     rowCount: rowCount ?? 0,
@@ -61,18 +53,18 @@ export const GridSearchPanel = forwardRef<GridSearchPanelRef, GridSearchPanelPro
   });
 
   useEffect(() => {
-    onCellClassNameChange(getCellClassName);
-    return () => onCellClassNameChange(undefined);
-  }, [getCellClassName, onCellClassNameChange]);
-
-  useEffect(() => {
     panelRef.current?.focus();
   }, []);
 
-  useImperativeHandle(ref, () => ({
-    focus,
-    refresh,
-  }));
+  useImperativeHandle(
+    ref,
+    () => ({
+      focus: () => panelRef.current?.focus(),
+      refresh: () => actions.refresh(),
+      getCellClassName,
+    }),
+    [actions, getCellClassName],
+  );
 
   function handleClose() {
     actions.close();

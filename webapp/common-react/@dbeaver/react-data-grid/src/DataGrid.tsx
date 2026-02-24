@@ -123,12 +123,12 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
     searchOpen,
     searchCellClassName,
     searchPanelRef,
+    setSearchPanelRef,
     isReplacingRef,
     handleSearchOpen,
     handleSearchClose,
     onReplace,
     handleReplacingChange,
-    setSearchCellClassName,
   } = useDataGridSearch({ containerRef, searchStorage, getCellEditable, onCellChangeBatch });
 
   function scrollToCell(rowIdx: number, colIdx: number) {
@@ -291,14 +291,13 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
               />
               <Activity mode={searchOpen ? 'visible' : 'hidden'}>
                 <GridSearchPanel
-                  ref={searchPanelRef}
+                  ref={setSearchPanelRef}
                   columnCount={columnsCount}
                   isReadOnly={searchReadOnly}
                   scrollToCell={scrollToCell}
                   storage={searchStorage}
                   open={searchOpen}
                   onReplace={onReplace}
-                  onCellClassNameChange={setSearchCellClassName}
                   onClose={handleSearchClose}
                   onReplacingChange={handleReplacingChange}
                 />

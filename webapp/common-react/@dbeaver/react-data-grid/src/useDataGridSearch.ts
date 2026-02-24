@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import type { ICellChange } from './DataGridCellContext.js';
 import type { IGridReactiveValue } from './IGridReactiveValue.js';
@@ -24,18 +24,23 @@ export function useDataGridSearch({ containerRef, searchStorage, getCellEditable
   searchOpen: boolean;
   searchCellClassName: IGridReactiveValue<string | undefined, [number, number]> | undefined;
   searchPanelRef: React.RefObject<GridSearchPanelRef | null>;
+  setSearchPanelRef: (instance: GridSearchPanelRef | null) => void;
   isReplacingRef: React.RefObject<boolean>;
   handleSearchOpen: () => void;
   handleSearchClose: () => void;
   onReplace: (updates: { rowIdx: number; colIdx: number; value: string }[]) => void;
   handleReplacingChange: (value: boolean) => void;
-  setSearchCellClassName: (value: IGridReactiveValue<string | undefined, [number, number]> | undefined) => void;
 } {
   const searchPanelRef = useRef<GridSearchPanelRef | null>(null);
   const isReplacingRef = useRef<boolean>(false);
 
   const [searchOpen, setSearchOpen] = useState(() => searchStorage?.get()?.open ?? false);
   const [searchCellClassName, setSearchCellClassName] = useState<IGridReactiveValue<string | undefined, [number, number]>>();
+
+  const setSearchPanelRef = useCallback((instance: GridSearchPanelRef | null) => {
+    searchPanelRef.current = instance;
+    setSearchCellClassName(instance?.getCellClassName);
+  }, []);
 
   useEffect(() => {
     const el = containerRef.current;
@@ -79,11 +84,11 @@ export function useDataGridSearch({ containerRef, searchStorage, getCellEditable
     searchOpen,
     searchCellClassName,
     searchPanelRef,
+    setSearchPanelRef,
     isReplacingRef,
     handleSearchOpen,
     handleSearchClose,
     onReplace,
     handleReplacingChange,
-    setSearchCellClassName,
   };
 }
