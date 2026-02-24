@@ -30,8 +30,8 @@ export interface ComboboxProps extends Omit<AriaComboboxProps, 'size'> {
   size?: 'small' | 'medium' | 'large' | 'xlarge';
 }
 
-export function ComboboxInput({ size, ...props }: ComboboxProps): React.JSX.Element {
-  return <Combobox {...props} className={clsx('dbv-kit-combobox', `dbv-kit-combobox--${size ?? 'medium'}`, props.className)} autoSelect />;
+export function ComboboxInput({ size, autoSelect = true, ...props }: ComboboxProps): React.JSX.Element {
+  return <Combobox {...props} className={clsx('dbv-kit-combobox', `dbv-kit-combobox--${size ?? 'medium'}`, props.className)} autoSelect={autoSelect} />;
 }
 
 export interface ComboboxPopoverProps extends AriaComboboxPopoverProps {

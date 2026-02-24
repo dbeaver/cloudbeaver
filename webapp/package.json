@@ -15,10 +15,11 @@
     "mobx": "^6",
     "mobx-react-lite": "^4",
     "glob": "^13",
-    "tar": ">=7.5.4",
+    "tar": ">=7.5.8",
     "lodash": ">=4.17.23",
     "@isaacs/brace-expansion": ">=5.0.1",
-    "axios": ">= 1.13.5"
+    "axios": ">= 1.13.5",
+    "minimatch": ">=10.2.1"
   },
   "scripts": {
     "test": "dbeaver-test",

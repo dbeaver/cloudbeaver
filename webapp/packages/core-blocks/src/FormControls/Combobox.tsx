@@ -7,7 +7,17 @@
  */
 import { observer } from 'mobx-react-lite';
 import { useCallback, useContext, useId, useState } from 'react';
-import { ComboboxInput, ComboboxItem, clsx, Spinner, ComboboxPopover, ComboboxDisclosure, ComboboxProvider, ComboboxCancel } from '@dbeaver/ui-kit';
+import {
+  ComboboxInput,
+  ComboboxItem,
+  clsx,
+  Spinner,
+  ComboboxPopover,
+  ComboboxDisclosure,
+  ComboboxProvider,
+  ComboboxCancel,
+  useComboboxStore,
+} from '@dbeaver/ui-kit';
 
 import { filterLayoutFakeProps, getLayoutProps } from '../Containers/filterLayoutFakeProps.js';
 import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps.js';
@@ -165,9 +175,25 @@ export const Combobox: ComboboxType = observer(function Combobox({
     onChange?.(value);
   }
 
+  const comboboxStore = useComboboxStore({
+    value: displayValue,
+    setValue: setInputValue,
+    selectedValue: selectedValue,
+    defaultValue: comboboxDefaultValue,
+    defaultSelectedValue: comboboxDefaultSelectedValue as string,
+    setSelectedValue: handleSelect,
+  });
+
   function handleBlur() {
     if (!allowCustomValue) {
       setInputValue(null);
+    }
+  }
+
+  function handleKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
+    if (allowCustomValue && event.key === 'Enter') {
+      event.preventDefault();
+      comboboxStore.setOpen(false);
     }
   }
 
@@ -194,14 +220,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
           {children}
         </FieldLabel>
       )}
-      <ComboboxProvider
-        value={displayValue}
-        setValue={setInputValue}
-        selectedValue={selectedValue}
-        defaultValue={comboboxDefaultValue}
-        defaultSelectedValue={comboboxDefaultSelectedValue as string}
-        setSelectedValue={handleSelect}
-      >
+      <ComboboxProvider store={comboboxStore}>
         <div className="tw:relative tw:flex tw:flex-1 tw:items-center tw:gap-2">
           <ComboboxInput
             defaultValue={comboboxDefaultValue}
@@ -216,7 +235,9 @@ export const Combobox: ComboboxType = observer(function Combobox({
             title={title}
             id={inputId}
             size={size}
+            autoSelect={!allowCustomValue}
             onBlur={handleBlur}
+            onKeyDown={handleKeyDown}
             {...rest}
           />
           {loading ? (
