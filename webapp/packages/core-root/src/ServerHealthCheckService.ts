@@ -14,6 +14,8 @@ import { errorOf, GlobalConstants } from '@cloudbeaver/core-utils';
 import { isNotNullDefined } from '@dbeaver/js-helpers';
 
 const SERVER_ERROR_STATUS_CODE = 500;
+const HEALTH_CHECK_RETRY_COUNT = 3;
+const HEALTH_CHECK_RETRY_PAUSE = 1000;
 
 export enum ServerHealthStatus {
   Unknown = 'unknown',
@@ -25,16 +27,19 @@ export enum ServerHealthStatus {
 export class ServerHealthCheckService extends Bootstrap {
   readonly onStatusChange: IExecutor<ServerHealthStatus>;
   private serverStatus: ServerHealthStatus;
+  private isHealthCheckInProgress = false;
 
   constructor(private readonly graphQLService: GraphQLService) {
     super();
 
     this.serverStatus = ServerHealthStatus.Unknown;
+    this.isHealthCheckInProgress = false;
     this.onStatusChange = new Executor();
     this.onStatusChange.setInitialDataGetter(() => this.serverStatus);
 
-    makeObservable<ServerHealthCheckService, 'serverStatus' | 'updateServerStatus'>(this, {
+    makeObservable<ServerHealthCheckService, 'isHealthCheckInProgress' | 'serverStatus' | 'updateServerStatus'>(this, {
       serverStatus: observable,
+      isHealthCheckInProgress: observable,
       status: computed,
       updateServerStatus: action.bound,
     });
@@ -53,13 +58,11 @@ export class ServerHealthCheckService extends Bootstrap {
     const healthCheckUrl = GlobalConstants.getHealthCheckUrl(origin);
 
     try {
-      const response = await fetch(healthCheckUrl, { method: 'HEAD' });
-      this.updateServerStatus(response.ok ? ServerHealthStatus.Alive : ServerHealthStatus.Unavailable);
+      await fetch(healthCheckUrl, { method: 'HEAD' });
+      return ServerHealthStatus.Alive;
     } catch (_exception: unknown) {
-      this.updateServerStatus(ServerHealthStatus.Unavailable);
+      return ServerHealthStatus.Unavailable;
     }
-
-    return this.serverStatus;
   }
 
   private updateServerStatus(status: ServerHealthStatus) {
@@ -79,14 +82,37 @@ export class ServerHealthCheckService extends Bootstrap {
     } catch (exception: unknown) {
       const gqlError = errorOf(exception, GQLError) ?? errorOf(exception, PlainGQLError);
       const status = gqlError?.response?.status;
+      const isAlive = isNotNullDefined(status) && status < SERVER_ERROR_STATUS_CODE;
 
-      if (isNotNullDefined(status)) {
-        this.updateServerStatus(status < SERVER_ERROR_STATUS_CODE ? ServerHealthStatus.Alive : ServerHealthStatus.Unavailable);
+      /* graphql can send code 200 and error in body, so we need to check status code to be sure 
+      that it is just error thrown, and not server is unavailable */
+      if (isAlive) {
+        this.updateServerStatus(ServerHealthStatus.Alive);
         return;
       }
 
-      const serverStatus = await this.healthCheckOrigin();
-      this.updateServerStatus(serverStatus);
+      if (this.isHealthCheckInProgress) {
+        return;
+      }
+
+      this.isHealthCheckInProgress = true;
+
+      for (let i = 0; i < HEALTH_CHECK_RETRY_COUNT; i++) {
+        const status = await this.healthCheckOrigin();
+
+        if (status === ServerHealthStatus.Alive) {
+          this.updateServerStatus(ServerHealthStatus.Alive);
+          this.isHealthCheckInProgress = false;
+          return;
+        }
+
+        if (status === ServerHealthStatus.Unavailable) {
+          await new Promise(resolve => setTimeout(resolve, HEALTH_CHECK_RETRY_PAUSE));
+        }
+      }
+
+      this.updateServerStatus(ServerHealthStatus.Unavailable);
+      this.isHealthCheckInProgress = false;
     }
   }
 }
