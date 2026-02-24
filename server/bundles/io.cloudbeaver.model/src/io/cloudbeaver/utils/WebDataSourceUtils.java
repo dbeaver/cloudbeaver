@@ -95,7 +95,7 @@ public class WebDataSourceUtils {
         if (cfgInput.getUserName() != null) {
             handlerConfig.setUserName(cfgInput.getUserName());
         }
-        if (cfgInput.getPassword() != null) {
+        if (CommonUtils.isNotEmpty(cfgInput.getPassword())) {
             handlerConfig.setPassword(cfgInput.getPassword());
         }
         setSecureProperties(handlerConfig, cfgInput, true);
