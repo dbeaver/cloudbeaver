@@ -23,7 +23,7 @@ export class PluginServerUnavailableBootstrap extends Bootstrap {
   }
 
   override register(): void {
-    this.serverHealthCheckService.onServerAliveChange.addHandler(this.handleServerAliveChange.bind(this));
+    this.serverHealthCheckService.onStatusChange.addHandler(this.handleServerStatusChange.bind(this));
     this.notificationService.closeTask.addHandler(this.handleCloseNotification.bind(this));
   }
 
@@ -33,7 +33,7 @@ export class PluginServerUnavailableBootstrap extends Bootstrap {
     }
   }
 
-  private handleServerAliveChange(status: ServerHealthStatus) {
+  private handleServerStatusChange(status: ServerHealthStatus) {
     if (status === ServerHealthStatus.Alive) {
       if (this.notificationId) {
         this.notificationService.close(this.notificationId);

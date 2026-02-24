@@ -23,25 +23,25 @@ export enum ServerHealthStatus {
 
 @injectable(() => [GraphQLService])
 export class ServerHealthCheckService extends Bootstrap {
-  readonly onServerAliveChange: IExecutor<ServerHealthStatus>;
-  private serverAlive: ServerHealthStatus;
+  readonly onStatusChange: IExecutor<ServerHealthStatus>;
+  private serverStatus: ServerHealthStatus;
 
   constructor(private readonly graphQLService: GraphQLService) {
     super();
 
-    this.serverAlive = ServerHealthStatus.Unknown;
-    this.onServerAliveChange = new Executor();
-    this.onServerAliveChange.setInitialDataGetter(() => this.serverAlive);
+    this.serverStatus = ServerHealthStatus.Unknown;
+    this.onStatusChange = new Executor();
+    this.onStatusChange.setInitialDataGetter(() => this.serverStatus);
 
-    makeObservable<ServerHealthCheckService, 'serverAlive' | 'updateServerAliveStatus'>(this, {
-      serverAlive: observable,
-      serverStatus: computed,
-      updateServerAliveStatus: action.bound,
+    makeObservable<ServerHealthCheckService, 'serverStatus' | 'updateServerStatus'>(this, {
+      serverStatus: observable,
+      status: computed,
+      updateServerStatus: action.bound,
     });
   }
 
-  get serverStatus(): ServerHealthStatus {
-    return this.serverAlive;
+  get status(): ServerHealthStatus {
+    return this.serverStatus;
   }
 
   override register(): void {
@@ -49,44 +49,44 @@ export class ServerHealthCheckService extends Bootstrap {
   }
 
   async healthCheckOrigin(): Promise<ServerHealthStatus> {
-    const currentOrigin = window.location.origin;
-    const healthCheckUrl = GlobalConstants.getHealthCheckUrl(currentOrigin);
+    const origin = window.location.origin;
+    const healthCheckUrl = GlobalConstants.getHealthCheckUrl(origin);
 
     try {
       const response = await fetch(healthCheckUrl, { method: 'HEAD' });
-      this.updateServerAliveStatus(response.ok ? ServerHealthStatus.Alive : ServerHealthStatus.Unavailable);
+      this.updateServerStatus(response.ok ? ServerHealthStatus.Alive : ServerHealthStatus.Unavailable);
     } catch (_exception: unknown) {
-      this.updateServerAliveStatus(ServerHealthStatus.Unavailable);
+      this.updateServerStatus(ServerHealthStatus.Unavailable);
     }
 
-    return this.serverAlive;
+    return this.serverStatus;
   }
 
-  private updateServerAliveStatus(status: ServerHealthStatus) {
-    if (this.serverAlive === status) {
+  private updateServerStatus(status: ServerHealthStatus) {
+    if (this.serverStatus === status) {
       return;
     }
 
-    this.serverAlive = status;
-    this.onServerAliveChange.execute(status);
+    this.serverStatus = status;
+    this.onStatusChange.execute(status);
   }
 
   private async healthCheckInterceptor(request: Promise<any>): Promise<any> {
     try {
       const response = await request;
-      this.updateServerAliveStatus(ServerHealthStatus.Alive);
+      this.updateServerStatus(ServerHealthStatus.Alive);
       return response;
     } catch (exception: unknown) {
       const gqlError = errorOf(exception, GQLError) ?? errorOf(exception, PlainGQLError);
       const status = gqlError?.response?.status;
 
       if (isNotNullDefined(status)) {
-        this.updateServerAliveStatus(status < SERVER_ERROR_STATUS_CODE ? ServerHealthStatus.Alive : ServerHealthStatus.Unavailable);
+        this.updateServerStatus(status < SERVER_ERROR_STATUS_CODE ? ServerHealthStatus.Alive : ServerHealthStatus.Unavailable);
         return;
       }
 
       const serverStatus = await this.healthCheckOrigin();
-      this.updateServerAliveStatus(serverStatus);
+      this.updateServerStatus(serverStatus);
     }
   }
 }
