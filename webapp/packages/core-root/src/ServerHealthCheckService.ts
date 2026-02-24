@@ -88,11 +88,11 @@ export class ServerHealthCheckService extends Bootstrap {
       that it is just error thrown, and not server is unavailable */
       if (isAlive) {
         this.updateServerStatus(ServerHealthStatus.Alive);
-        return;
+        throw exception;
       }
 
       if (this.isHealthCheckInProgress) {
-        return;
+        throw exception;
       }
 
       this.isHealthCheckInProgress = true;
@@ -103,7 +103,7 @@ export class ServerHealthCheckService extends Bootstrap {
         if (status === ServerHealthStatus.Alive) {
           this.updateServerStatus(ServerHealthStatus.Alive);
           this.isHealthCheckInProgress = false;
-          return;
+          throw exception;
         }
 
         if (status === ServerHealthStatus.Unavailable) {
@@ -113,6 +113,7 @@ export class ServerHealthCheckService extends Bootstrap {
 
       this.updateServerStatus(ServerHealthStatus.Unavailable);
       this.isHealthCheckInProgress = false;
+      throw exception;
     }
   }
 }
