@@ -52,6 +52,7 @@ export function useDataGridSearch({ containerRef, searchStorage, getCellEditable
       if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
         e.preventDefault();
         setSearchOpen(true);
+        searchPanelRef.current?.focus();
       }
     }
 
@@ -61,6 +62,7 @@ export function useDataGridSearch({ containerRef, searchStorage, getCellEditable
 
   function handleSearchOpen() {
     setSearchOpen(true);
+    searchPanelRef.current?.focus();
   }
 
   function handleSearchClose() {
