@@ -202,6 +202,7 @@ public class WebUserContext implements SMCredentialsProvider {
         return user;
     }
 
+    @Nullable
     public synchronized String getUserId() {
         return user == null ? null : user.getUserId();
     }
@@ -210,10 +211,12 @@ public class WebUserContext implements SMCredentialsProvider {
         this.user = user;
     }
 
+    @NotNull
     public synchronized SMAdminController getAdminSecurityController() {
         return adminSecurityController;
     }
 
+    @Nullable
     public synchronized Set<String> getUserPermissions() {
         return userPermissions;
     }
@@ -234,6 +237,7 @@ public class WebUserContext implements SMCredentialsProvider {
         this.userPermissions = permissions;
     }
 
+    @NotNull
     public DBSSecretController getSecretController() throws DBException {
         if (this.securityController == null) {
             this.secretController = application.getSecretController(this, workspace.getAuthContext());
@@ -241,6 +245,7 @@ public class WebUserContext implements SMCredentialsProvider {
         return secretController;
     }
 
+    @NotNull
     public synchronized String getSmSessionId() {
         return smSessionId;
     }
@@ -255,6 +260,7 @@ public class WebUserContext implements SMCredentialsProvider {
         return rmController;
     }
 
+    @NotNull
     public DBFileController getFileController() {
         return fileController;
     }
@@ -268,6 +274,7 @@ public class WebUserContext implements SMCredentialsProvider {
         this.refreshToken = refreshToken;
     }
 
+    @NotNull
     public WebSessionPreferenceStore getPreferenceStore() {
         return preferenceStore;
     }

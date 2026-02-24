@@ -11,6 +11,8 @@ export default [
   ['plugin_connections_connection_form_part_main_folder', 'Folder'],
 
   ['plugin_connections_connection_edit_menu_item_title', 'Edit Connection'],
+  ['plugin_connections_connection_clone', 'Clone'],
+  ['plugin_connections_connection_clone_error', 'Failed to clone connection'],
   ['plugin_connections_connection_edit_cancel_title', 'Cancel confirmation'],
   ['plugin_connections_connection_edit_cancel_message', "You're going to cancel connection changes. Unsaved changes will be lost. Are you sure?"],
   ['plugin_connections_connection_edit_reconnect_title', 'Connection updated'],

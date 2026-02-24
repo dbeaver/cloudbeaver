@@ -16,23 +16,24 @@
  */
 package io.cloudbeaver.websocket.event.task;
 
+import io.cloudbeaver.service.sql.WebSQLQueryParameterRecord;
 import org.jkiss.code.NotNull;
 
-import java.util.Map;
+import java.util.List;
 
 public class WSSessionTaskQueryParamsConfirmationEvent extends WSAbstractSessionTaskEvent {
     private static final String ID = "cb_session_task_query_params_confirmation_request";
     @NotNull
     private final String query;
     @NotNull
-    private final Map<String, Object> parameters;
+    private final List<WebSQLQueryParameterRecord> parameters;
 
     public WSSessionTaskQueryParamsConfirmationEvent(
         @NotNull String taskId,
         @NotNull String title,
         @NotNull String message,
         @NotNull String query,
-        @NotNull Map<String, Object> parameters
+        @NotNull List<WebSQLQueryParameterRecord> parameters
     ) {
         super(ID, taskId, title, message);
         this.query = query;
@@ -45,7 +46,7 @@ public class WSSessionTaskQueryParamsConfirmationEvent extends WSAbstractSession
     }
 
     @NotNull
-    public Map<String, Object> getParameters() {
+    public List<WebSQLQueryParameterRecord> getParameters() {
         return parameters;
     }
 }

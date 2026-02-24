@@ -398,7 +398,9 @@ public class WebServiceCore implements DBWServiceCore {
                 dataSourceContainer,
                 dataSourceContainer.getConnectionConfiguration()
             );
-            saveConfig[0] = true;
+            // don't understand why whe need to set this flag here
+            // need to discover it, maybe we can avoid it at all
+            saveConfig[0] = sharedCredentials;
         }
         if (WebServiceUtils.isGlobalProject(dataSourceContainer.getProject())) {
             // Do not flush config for global project (only admin can do it - CB-2415)
@@ -462,12 +464,21 @@ public class WebServiceCore implements DBWServiceCore {
                 throw new DBException("Node '" + nodePath + "' is not a datasource node");
             }
             DBPDataSourceContainer dataSourceTemplate = dbnDataSource.getDataSourceContainer();
+            if (!dataSourceTemplate.isExternallyProvided()) {
+                if (!CommonUtils.equalObjects(dataSourceTemplate.getProject(), project)) {
+                    throw new DBException("Copying connection to another project is not allowed");
+                }
+            }
 
             DataSourceDescriptor newDataSource = dataSourceRegistry.createDataSource(dataSourceTemplate);
 
             ServletApplication app = ServletAppUtils.getServletApplication();
             if (app instanceof WebApplication webApplication) {
-                newDataSource.setNavigatorSettings(webApplication.getAppConfiguration().getDefaultNavigatorSettings());
+                newDataSource.setNavigatorSettings(
+                    dataSourceTemplate.isExternallyProvided() ?
+                        webApplication.getAppConfiguration().getDefaultNavigatorSettings() :
+                        dataSourceTemplate.getNavigatorSettings().getOriginalSettings()
+                );
             }
 
             WebConnectionConfig config = project.getConnectionConfigInput(connectionConfig);

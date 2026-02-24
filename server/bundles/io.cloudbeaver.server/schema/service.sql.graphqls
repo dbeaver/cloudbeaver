@@ -150,6 +150,19 @@ enum SQLRowIdentifierState {
     VIRTUAL_KEY
 }
 
+enum SQLResultSetGeneratorId {
+    "SELECT .. WHERE .. ="
+    dataSelect,
+    "SELECT .. WHERE .. IN"
+    dataSelectMany,
+    "INSERT"
+    dataInsert,
+    "UPDATE"
+    dataUpdate,
+    "DELETE by Unique Key"
+    dataDeleteByUniqueKey,
+}
+
 type SQLRowIdentifier {
     "Single or multiple attributes acting as a row identifier"
     attributes: [SQLRowIdentifierAttribute!]!
@@ -336,6 +349,19 @@ extend type Query {
         generatorId: String!,
         options: Object!,
         nodePathList: [String!]!
+    ): String!
+
+    """
+    Returns an auto-generated SQL query based on provided rows data.
+    Uses generatorId value to establish the type of query (e.g. SELECT or INSERT)
+    """
+    sqlGenerateResultSetQuery(
+        projectId: ID,
+        connectionId: ID!,
+        contextId: ID!,
+        generatorId: SQLResultSetGeneratorId!,
+        resultsId: ID!,
+        selectedRows: [SQLResultRow!]!,
     ): String!
 
     "Parses SQL script and returns script info with queries start and end positions"
