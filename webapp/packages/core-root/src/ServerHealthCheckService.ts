@@ -16,6 +16,7 @@ import { isNotNullDefined } from '@dbeaver/js-helpers';
 const SERVER_ERROR_STATUS_CODE = 500;
 const HEALTH_CHECK_RETRY_COUNT = 3;
 const HEALTH_CHECK_RETRY_PAUSE = 1000;
+const HEALTH_CHECK_ABORT_TIMEOUT = 2000;
 
 export enum ServerHealthStatus {
   Unknown = 'unknown',
@@ -27,19 +28,17 @@ export enum ServerHealthStatus {
 export class ServerHealthCheckService extends Bootstrap {
   readonly onStatusChange: IExecutor<ServerHealthStatus>;
   private serverStatus: ServerHealthStatus;
-  private isHealthCheckInProgress = false;
+  private healthCheckPromise: Promise<void> | null = null;
 
   constructor(private readonly graphQLService: GraphQLService) {
     super();
 
     this.serverStatus = ServerHealthStatus.Unknown;
-    this.isHealthCheckInProgress = false;
     this.onStatusChange = new Executor();
     this.onStatusChange.setInitialDataGetter(() => this.serverStatus);
 
-    makeObservable<ServerHealthCheckService, 'isHealthCheckInProgress' | 'serverStatus' | 'updateServerStatus'>(this, {
+    makeObservable<ServerHealthCheckService, 'serverStatus' | 'updateServerStatus'>(this, {
       serverStatus: observable,
-      isHealthCheckInProgress: observable,
       status: computed,
       updateServerStatus: action.bound,
     });
@@ -56,12 +55,20 @@ export class ServerHealthCheckService extends Bootstrap {
   async healthCheckOrigin(): Promise<ServerHealthStatus> {
     const origin = window.location.origin;
     const healthCheckUrl = GlobalConstants.getHealthCheckUrl(origin);
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), HEALTH_CHECK_ABORT_TIMEOUT);
 
     try {
-      await fetch(healthCheckUrl, { method: 'HEAD' });
+      await fetch(healthCheckUrl, {
+        method: 'HEAD',
+        signal: controller.signal,
+        cache: 'no-cache',
+      });
       return ServerHealthStatus.Alive;
     } catch (_exception: unknown) {
       return ServerHealthStatus.Unavailable;
+    } finally {
+      clearTimeout(timeout);
     }
   }
 
@@ -84,36 +91,41 @@ export class ServerHealthCheckService extends Bootstrap {
       const status = gqlError?.response?.status;
       const isAlive = isNotNullDefined(status) && status < SERVER_ERROR_STATUS_CODE;
 
-      /* graphql can send code 200 and error in body, so we need to check status code to be sure 
+      /* graphql can send code 200 and error in body, so we need to check status code to be sure
       that it is just error thrown, and not server is unavailable */
       if (isAlive) {
         this.updateServerStatus(ServerHealthStatus.Alive);
         throw exception;
       }
 
-      if (this.isHealthCheckInProgress) {
+      if (this.healthCheckPromise) {
+        await this.healthCheckPromise;
         throw exception;
       }
 
-      this.isHealthCheckInProgress = true;
+      this.healthCheckPromise = this.performHealthCheck().finally(() => {
+        this.healthCheckPromise = null;
+      });
 
-      for (let i = 0; i < HEALTH_CHECK_RETRY_COUNT; i++) {
-        const status = await this.healthCheckOrigin();
-
-        if (status === ServerHealthStatus.Alive) {
-          this.updateServerStatus(ServerHealthStatus.Alive);
-          this.isHealthCheckInProgress = false;
-          throw exception;
-        }
-
-        if (status === ServerHealthStatus.Unavailable) {
-          await new Promise(resolve => setTimeout(resolve, HEALTH_CHECK_RETRY_PAUSE));
-        }
-      }
-
-      this.updateServerStatus(ServerHealthStatus.Unavailable);
-      this.isHealthCheckInProgress = false;
+      await this.healthCheckPromise;
       throw exception;
     }
+  }
+
+  private async performHealthCheck(): Promise<void> {
+    for (let i = 0; i < HEALTH_CHECK_RETRY_COUNT; i++) {
+      const status = await this.healthCheckOrigin();
+
+      if (status === ServerHealthStatus.Alive) {
+        this.updateServerStatus(ServerHealthStatus.Alive);
+        return;
+      }
+
+      if (status === ServerHealthStatus.Unavailable) {
+        await new Promise(resolve => setTimeout(resolve, HEALTH_CHECK_RETRY_PAUSE));
+      }
+    }
+
+    this.updateServerStatus(ServerHealthStatus.Unavailable);
   }
 }
