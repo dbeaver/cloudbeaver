@@ -26,7 +26,7 @@ export {
   type IDataGridCellRenderer,
   type IDataGridCellProps,
   type DataGridProps,
-  type ISearchState,
+  type IGridSearchStorageState,
   type IGridSearchStorage,
 } from '@dbeaver/react-data-grid';
 

@@ -7,7 +7,7 @@
  */
 import { useMemo } from 'react';
 
-import type { IGridSearchStorage, ISearchState } from '@cloudbeaver/plugin-data-grid';
+import type { IGridSearchStorage, IGridSearchStorageState } from '@cloudbeaver/plugin-data-grid';
 import type { ResultSetCacheAction } from '@cloudbeaver/plugin-data-viewer';
 
 const SEARCH_STORAGE_KEY = Symbol('grid-search-storage');
@@ -15,14 +15,14 @@ const SEARCH_STORAGE_KEY = Symbol('grid-search-storage');
 export function useSearchResultsCache(cacheAction: ResultSetCacheAction): IGridSearchStorage {
   return useMemo<IGridSearchStorage>(
     () => ({
-      get(): ISearchState | undefined { 
-        return cacheAction.getShared<ISearchState>(SEARCH_STORAGE_KEY);
+      get(): IGridSearchStorageState | undefined {
+        return cacheAction.getShared<IGridSearchStorageState>(SEARCH_STORAGE_KEY);
       },
-      set(state: ISearchState): void {
+      set(state: IGridSearchStorageState): void {
         cacheAction.setShared(SEARCH_STORAGE_KEY, state);
       },
-      update(partial: Partial<ISearchState>): void {
-        const current = cacheAction.getShared<ISearchState>(SEARCH_STORAGE_KEY);
+      update(partial: Partial<IGridSearchStorageState>): void {
+        const current = cacheAction.getShared<IGridSearchStorageState>(SEARCH_STORAGE_KEY);
         if (current) {
           cacheAction.setShared(SEARCH_STORAGE_KEY, { ...current, ...partial });
         }

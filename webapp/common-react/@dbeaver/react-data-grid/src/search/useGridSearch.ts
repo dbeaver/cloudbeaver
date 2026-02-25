@@ -17,22 +17,14 @@ export type { ICellMatch } from './GridSearchEngine.js';
 
 const DEFAULT_DEBOUNCE_MS = 300;
 
-export interface ISearchState {
-  matchedCells: ICellMatch[];
-  activeMatchIdx: number;
-  query: string;
-  replace: string;
-  caseSensitive: boolean;
-  wholeWord: boolean;
-  regexp: boolean;
-  replaceOpen: boolean;
+export interface IGridSearchStorageState extends GridSearchState {
   open: boolean;
 }
 
 export interface IGridSearchStorage {
-  get(): ISearchState | undefined;
-  set(state: ISearchState): void;
-  update(state: Partial<ISearchState>): void;
+  get(): IGridSearchStorageState | undefined;
+  set(state: IGridSearchStorageState): void;
+  update(state: Partial<IGridSearchStorageState>): void;
 }
 
 const MATCH_CLASS = 'rdg-cell-search-match';
@@ -42,6 +34,23 @@ type CellKey = `${number}+${number}`;
 
 function makeCellKey(rowIdx: number, colIdx: number): CellKey {
   return `${rowIdx}+${colIdx}`;
+}
+
+function scrollToMatch(scrollToCell: (rowIdx: number, colIdx: number) => void, match: ICellMatch | undefined): void {
+  if (match) {
+    scrollToCell(match.rowIdx, match.colIdx);
+  }
+}
+
+function getNextMatchAfterRemoval(matchedCells: ICellMatch[], activeMatchIdx: number): ICellMatch | undefined {
+  const nextActiveIdx = computeActiveIdxAfterRemoval(matchedCells.length - 1, activeMatchIdx);
+  if (nextActiveIdx < 0) {
+    return undefined;
+  }
+
+  const nextMatches = [...matchedCells];
+  nextMatches.splice(activeMatchIdx, 1);
+  return nextMatches[nextActiveIdx];
 }
 
 export interface IGridSearchSnapshot {
@@ -143,10 +152,7 @@ export function useGridSearch(options: IGridSearchOptions): IGridSearchResult {
       dispatch({ type: 'SET_MATCHES', matchedCells: matches, preserveActiveIndex });
 
       const newActiveIdx = computeActiveIdx(matches, currentState.activeMatchIdx, preserveActiveIndex);
-      const match = matches[newActiveIdx];
-      if (match) {
-        opts.scrollToCell(match.rowIdx, match.colIdx);
-      }
+      scrollToMatch(opts.scrollToCell, matches[newActiveIdx]);
     },
     [dispatch],
   );
@@ -187,10 +193,7 @@ export function useGridSearch(options: IGridSearchOptions): IGridSearchResult {
         }
         const nextIdx = (st.activeMatchIdx + 1) % st.matchedCells.length;
         dispatch({ type: 'NAVIGATE_NEXT' });
-        const match = st.matchedCells[nextIdx];
-        if (match) {
-          optionsRef.current.scrollToCell(match.rowIdx, match.colIdx);
-        }
+        scrollToMatch(optionsRef.current.scrollToCell, st.matchedCells[nextIdx]);
       },
 
       findPrevious(): void {
@@ -203,10 +206,7 @@ export function useGridSearch(options: IGridSearchOptions): IGridSearchResult {
         }
         const prevIdx = st.activeMatchIdx === 0 ? st.matchedCells.length - 1 : st.activeMatchIdx - 1;
         dispatch({ type: 'NAVIGATE_PREVIOUS' });
-        const match = st.matchedCells[prevIdx];
-        if (match) {
-          optionsRef.current.scrollToCell(match.rowIdx, match.colIdx);
-        }
+        scrollToMatch(optionsRef.current.scrollToCell, st.matchedCells[prevIdx]);
       },
 
       replaceActive(): void {
@@ -239,15 +239,8 @@ export function useGridSearch(options: IGridSearchOptions): IGridSearchResult {
           if (!stillMatches) {
             dispatch({ type: 'REMOVE_MATCH', index: st.activeMatchIdx });
 
-            const newActiveIdx = computeActiveIdxAfterRemoval(st.matchedCells.length - 1, st.activeMatchIdx);
-            if (newActiveIdx >= 0) {
-              const newMatches = [...st.matchedCells];
-              newMatches.splice(st.activeMatchIdx, 1);
-              const nextMatch = newMatches[newActiveIdx];
-              if (nextMatch) {
-                opts.scrollToCell(nextMatch.rowIdx, nextMatch.colIdx);
-              }
-            }
+            const nextMatch = getNextMatchAfterRemoval(st.matchedCells, st.activeMatchIdx);
+            scrollToMatch(opts.scrollToCell, nextMatch);
           }
         } finally {
           opts.onReplacingChange?.(false);

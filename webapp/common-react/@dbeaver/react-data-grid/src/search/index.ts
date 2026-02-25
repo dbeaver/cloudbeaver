@@ -11,6 +11,6 @@ export {
   useGridSearch,
   type IGridSearchSnapshot,
   type IGridSearchOptions,
-  type ISearchState,
+  type IGridSearchStorageState,
   type IGridSearchStorage,
 } from './useGridSearch.js';
