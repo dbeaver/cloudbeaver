@@ -21,11 +21,13 @@ import styles from './Loader.module.css';
 import { type ILoaderContext, LoaderContext } from './LoaderContext.js';
 import { Spinner } from '@dbeaver/ui-kit';
 
+import { useDebounceValue } from '../useDebounceValue.js';
+
 type LoaderState =
   | ILoadableState
   | {
-      loading: boolean;
-    };
+    loading: boolean;
+  };
 
 interface Props {
   /** if false, nothing will be rendered, by default true */
@@ -60,10 +62,10 @@ export const Loader = observer<Props>(function Loader({
   overlay,
   suspense,
   message,
-  hideMessage,
   hideException,
   secondary,
   small,
+  hideMessage = small,
   inline,
   fullSize,
   className,
@@ -162,24 +164,26 @@ export const Loader = observer<Props>(function Loader({
   }
 
   const style = useS(styles);
-  const [isVisible, setVisible] = useState(loading);
+
+  const debouncedLoading = useDebounceValue(loading, loading === true ? 500 : 0);
+  const [isVisible, setVisible] = useState(debouncedLoading);
 
   const refLoaderDisplayed = { state: false };
 
   useEffect(() => {
-    if (!loading) {
-      setVisible(loading);
+    if (!debouncedLoading) {
+      setVisible(debouncedLoading);
       return;
     }
 
     const id = setTimeout(() => {
-      setVisible(loading);
+      setVisible(debouncedLoading);
     }, 500);
 
     return () => {
       clearTimeout(id);
     };
-  }, [loading]);
+  }, [debouncedLoading]);
 
   useEffect(() => {
     if (context) {
@@ -237,24 +241,24 @@ export const Loader = observer<Props>(function Loader({
     return renderWrappedChildren();
   }
 
-  if (exception && !loading) {
+  if (exception && !debouncedLoading) {
     if (hideException) {
       return null;
     }
     return <ExceptionMessage exception={exception} inline={inline || inlineException} className={className} onRetry={reload} />;
   }
 
-  if (children && (!loader || !loading) && !overlay) {
+  if (children && (!loader || !debouncedLoading) && !overlay) {
     if (loaded) {
       return renderWrappedChildren();
     }
 
-    if (!loading) {
+    if (!debouncedLoading) {
       return null;
     }
   }
 
-  if ((!isVisible && overlay) || !loading) {
+  if ((!isVisible && overlay) || !debouncedLoading) {
     if (overlay) {
       return renderWrappedChildren();
     }
@@ -268,7 +272,7 @@ export const Loader = observer<Props>(function Loader({
     <LoaderContext.Provider value={contextState}>
       <>
         {overlay && renderWrappedChildren()}
-        <div ref={loaderRef} className={s(style, { loader: true, loaderOverlay: overlay, small, fullSize, inline }, className)}>
+        <div ref={loaderRef} className={s(style, { loader: true, loaderOverlay: overlay, fullSize, inline }, className)}>
           <Spinner className={s(style, { spinner: true, spinnerSecondary: secondary || overlay })} size={small ? 'small' : 'medium'} />
           {!hideMessage && (
             <div className={s(style, { message: true })}>
