@@ -111,6 +111,7 @@ import pluginSqlAsyncTaskConfirmation from '@cloudbeaver/plugin-sql-async-task-c
 import pluginDataViewerConditionalFormatting from '@cloudbeaver/plugin-data-viewer-conditional-formatting/module';
 import pluginConnectionView from '@cloudbeaver/plugin-connection-view/module';
 import pluginConnectionPreferences from '@cloudbeaver/plugin-connection-preferences/module';
+import pluginServerUnavailable from '@cloudbeaver/plugin-server-unavailable/module';
 
 const core = [
   coreRouting, // important, should be first because the router starts in load phase first after all plugins register phase
@@ -221,4 +222,5 @@ export const commonSet = [
   pluginDataViewerConditionalFormatting,
   pluginConnectionView,
   pluginConnectionPreferences,
+  pluginServerUnavailable,
 ];
