@@ -53,9 +53,8 @@ function getNextMatchAfterRemoval(matchedCells: ICellMatch[], activeMatchIdx: nu
     return undefined;
   }
 
-  const nextMatches = [...matchedCells];
-  nextMatches.splice(activeMatchIdx, 1);
-  return nextMatches[nextActiveIdx];
+  const actualIdx = nextActiveIdx >= activeMatchIdx ? nextActiveIdx + 1 : nextActiveIdx;
+  return matchedCells[actualIdx];
 }
 
 export interface IGridSearchActions {
