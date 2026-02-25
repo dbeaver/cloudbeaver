@@ -185,11 +185,12 @@ public class WebSession extends BaseWebSession
         this.cacheExpired = cacheExpired;
     }
 
-    public synchronized WebUser getUser() {
+    public WebUser getUser() {
         return this.userContext.getUser();
     }
 
-    public synchronized Map<String, String> getUserMetaParameters() {
+    @NotNull
+    public Map<String, String> getUserMetaParameters() {
         var user = getUser();
         if (user == null) {
             return Map.of();
@@ -201,20 +202,20 @@ public class WebSession extends BaseWebSession
         return allMetaParams;
     }
 
-    public synchronized String getUserId() {
+    public String getUserId() {
         return userContext.getUserId();
     }
 
     public synchronized boolean hasPermission(String perm) {
-        return getSessionPermissions().contains(DBWConstants.PERMISSION_ADMIN) ||
-            getSessionPermissions().contains(perm);
+        Set<String> sessionPermissions = getSessionPermissions();
+        return sessionPermissions.contains(DBWConstants.PERMISSION_ADMIN) || sessionPermissions.contains(perm);
     }
 
-    public synchronized boolean isAuthorizedInSecurityManager() {
+    public boolean isAuthorizedInSecurityManager() {
         return userContext.isAuthorizedInSecurityManager();
     }
 
-    public synchronized Set<String> getSessionPermissions() {
+    public Set<String> getSessionPermissions() {
         if (userContext.getUserPermissions() == null) {
             refreshSessionAuth();
         }
@@ -222,12 +223,12 @@ public class WebSession extends BaseWebSession
     }
 
     @NotNull
-    public synchronized SMController getSecurityController() {
+    public SMController getSecurityController() {
         return userContext.getSecurityController();
     }
 
     @NotNull
-    public synchronized SMAdminController getAdminSecurityController() throws DBException {
+    public SMAdminController getAdminSecurityController() throws DBException {
         if (!hasPermission(DBWConstants.PERMISSION_ADMIN)) {
             throw new DBException("Admin permissions required");
         }
@@ -235,17 +236,17 @@ public class WebSession extends BaseWebSession
     }
 
     @NotNull
-    public synchronized RMController getRmController() {
+    public RMController getRmController() {
         return userContext.getRmController();
     }
 
     @NotNull
-    public synchronized DBFileController getFileController() {
+    public DBFileController getFileController() {
         return userContext.getFileController();
     }
 
     @Override
-    public synchronized void refreshUserData() {
+    public void refreshUserData() {
         super.refreshUserData();
         refreshSessionAuth();
 
@@ -253,7 +254,7 @@ public class WebSession extends BaseWebSession
     }
 
     // Note: for admin use only
-    public synchronized void resetUserState(boolean needResetUserCache) throws DBException {
+    public void resetUserState(boolean needResetUserCache) throws DBException {
         clearAuthTokens();
         if (needResetUserCache) {
             try {
@@ -267,7 +268,7 @@ public class WebSession extends BaseWebSession
         clearSessionContext();
     }
 
-    public synchronized void resetUserState() throws DBException {
+    public void resetUserState() throws DBException {
         resetUserState(true);
     }
 
@@ -437,7 +438,7 @@ public class WebSession extends BaseWebSession
         }
     }
 
-    public synchronized void updateInfo(boolean isOldHttpSessionUsed) {
+    public void updateInfo(boolean isOldHttpSessionUsed) {
         log.trace("Update session lifetime " + getSessionId() + " for user " + getUserId());
         touchSession();
         if (isOldHttpSessionUsed) {
@@ -501,6 +502,7 @@ public class WebSession extends BaseWebSession
         super.close(clearTokens, sendSessionExpiredEvent);
     }
 
+    @NotNull
     private List<WebAuthInfo> clearAuthTokens() throws DBException {
         ArrayList<WebAuthInfo> tokensCopy;
         synchronized (authTokens) {
@@ -867,11 +869,11 @@ public class WebSession extends BaseWebSession
         return parameters;
     }
 
-    public synchronized void resetAuthToken() throws DBException {
+    public void resetAuthToken() throws DBException {
         this.userContext.reset();
     }
 
-    public synchronized boolean updateSMSession(SMAuthInfo smAuthInfo) throws DBException {
+    public boolean updateSMSession(SMAuthInfo smAuthInfo) throws DBException {
         boolean contextChanged = super.updateSMSession(smAuthInfo);
         if (contextChanged) {
             refreshUserData();

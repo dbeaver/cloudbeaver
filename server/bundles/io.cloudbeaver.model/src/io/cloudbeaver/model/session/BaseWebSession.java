@@ -150,7 +150,7 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
         return workspace.getAuthContext();
     }
 
-    protected void clearSessionContext() {
+    protected synchronized void clearSessionContext() {
         this.workspace.getAuthContext().clear();
         this.workspace.getAuthContext().addSession(this);
     }
