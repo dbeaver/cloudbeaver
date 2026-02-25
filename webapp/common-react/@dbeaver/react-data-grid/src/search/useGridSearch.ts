@@ -302,11 +302,6 @@ export function useGridSearch(options: IGridSearchOptions): IGridSearchResult {
     };
   }, [runSearchAndScroll]);
 
-  useEffect(() => {
-    optionsRef.current = options;
-    stateRef.current = state;
-  }, [options, state]);
-
   const [getCellClassName] = useState<IGridReactiveValue<string | undefined, [number, number]>>(() => ({
     get(rowIdx: number, colIdx: number): string | undefined {
       if (!queryRef.current) {
@@ -334,6 +329,9 @@ export function useGridSearch(options: IGridSearchOptions): IGridSearchResult {
 
   // --- Sync React state → refs, notify cell listeners ---
   useEffect(() => {
+    optionsRef.current = options;
+    stateRef.current = state;
+
     // Only rebuild matchedSet when matchedCells identity changes
     if (state.matchedCells !== prevMatchedCellsRef.current) {
       matchedSetRef.current = new Set(state.matchedCells.map(m => makeCellKey(m.rowIdx, m.colIdx)));
@@ -347,7 +345,7 @@ export function useGridSearch(options: IGridSearchOptions): IGridSearchResult {
     for (const listener of cellListenersRef.current) {
       listener();
     }
-  }, [state.matchedCells, state.activeMatchIdx, state.query]);
+  }, [options, state]);
 
   // --- Storage sync ---
   useEffect(() => {
