@@ -13,9 +13,8 @@ import { GQLError, GraphQLService, PlainGQLError } from '@cloudbeaver/core-sdk';
 import { errorOf } from '@cloudbeaver/core-utils';
 
 import { NetworkError } from './NetworkError.js';
-import { LocalizationService } from '@cloudbeaver/core-localization';
 
-@injectable(() => [GraphQLService, LocalizationService])
+@injectable(() => [GraphQLService])
 export class NetworkStateService extends Bootstrap {
   get state(): boolean {
     return this.networkState;
@@ -24,10 +23,7 @@ export class NetworkStateService extends Bootstrap {
   readonly networkStateExecutor: IExecutor<boolean>;
   private networkState: boolean;
 
-  constructor(
-    private readonly graphQLService: GraphQLService,
-    private readonly localizationService: LocalizationService,
-  ) {
+  constructor(private readonly graphQLService: GraphQLService) {
     super();
 
     this.networkState = true;
@@ -58,7 +54,7 @@ export class NetworkStateService extends Bootstrap {
         this.graphQLService.enableRequests();
       }
     } else {
-      this.graphQLService.blockRequests(new NetworkError(this.localizationService.translate('core_root_network_connection_lost_error')));
+      this.graphQLService.blockRequests(new NetworkError('Network connection was lost'));
     }
     this.networkState = state;
     this.networkStateExecutor.execute(this.networkState);
@@ -73,11 +69,11 @@ export class NetworkStateService extends Bootstrap {
       const isServerAvailable = statusCode && statusCode < 500;
 
       if (exception instanceof TypeError && exception.message === 'Failed to fetch') {
-        throw new NetworkError(this.localizationService.translate('core_root_network_error_while_processing'), { cause: exception });
+        throw new NetworkError('Error while processing request', { cause: exception });
       }
 
       if (!isServerAvailable) {
-        throw new NetworkError(this.localizationService.translate('core_root_network_server_not_available'), { cause: exception });
+        throw new NetworkError('Server is not available. Please check your network connection and try again.', { cause: exception });
       }
 
       throw exception;
