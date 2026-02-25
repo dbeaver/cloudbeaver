@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -9,12 +9,13 @@ import { makeObservable, observable } from 'mobx';
 
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { Executor, type IExecutor } from '@cloudbeaver/core-executor';
-import { GraphQLService } from '@cloudbeaver/core-sdk';
+import { GQLError, GraphQLService, PlainGQLError } from '@cloudbeaver/core-sdk';
 import { errorOf } from '@cloudbeaver/core-utils';
 
 import { NetworkError } from './NetworkError.js';
+import { LocalizationService } from '@cloudbeaver/core-localization';
 
-@injectable(() => [GraphQLService])
+@injectable(() => [GraphQLService, LocalizationService])
 export class NetworkStateService extends Bootstrap {
   get state(): boolean {
     return this.networkState;
@@ -23,7 +24,10 @@ export class NetworkStateService extends Bootstrap {
   readonly networkStateExecutor: IExecutor<boolean>;
   private networkState: boolean;
 
-  constructor(private readonly graphQLService: GraphQLService) {
+  constructor(
+    private readonly graphQLService: GraphQLService,
+    private readonly localizationService: LocalizationService,
+  ) {
     super();
 
     this.networkState = true;
@@ -54,7 +58,7 @@ export class NetworkStateService extends Bootstrap {
         this.graphQLService.enableRequests();
       }
     } else {
-      this.graphQLService.blockRequests(new NetworkError('Network connection was lost'));
+      this.graphQLService.blockRequests(new NetworkError(this.localizationService.translate('core_root_network_connection_lost_error')));
     }
     this.networkState = state;
     this.networkStateExecutor.execute(this.networkState);
@@ -64,9 +68,18 @@ export class NetworkStateService extends Bootstrap {
     try {
       return await request;
     } catch (exception: any) {
+      const gqlError = errorOf(exception, GQLError) ?? errorOf(exception, PlainGQLError);
+      const statusCode = gqlError?.response.status;
+      const isServerAvailable = statusCode && statusCode < 500;
+
       if (exception instanceof TypeError && exception.message === 'Failed to fetch') {
-        throw new NetworkError('Error while processing request', { cause: exception });
+        throw new NetworkError(this.localizationService.translate('core_root_network_error_while_processing'), { cause: exception });
       }
+
+      if (!isServerAvailable) {
+        throw new NetworkError(this.localizationService.translate('core_root_network_server_not_available'), { cause: exception });
+      }
+
       throw exception;
     }
   }
