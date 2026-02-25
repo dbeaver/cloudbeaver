@@ -51,7 +51,6 @@ export interface INotification<TProps extends INotificationExtraProps<any> = INo
   type: ENotificationType;
   title: string;
   message?: string;
-  pinned?: boolean;
   timestamp: number;
   details?: string | Error | null;
   autoClose?: boolean;
@@ -67,7 +66,6 @@ export interface INotificationOptions<TProps extends INotificationExtraProps<any
   title: string;
   uuid?: string;
   message?: string;
-  pinned?: boolean;
   details?: string | Error | null;
   isSilent?: boolean;
   autoClose?: boolean;

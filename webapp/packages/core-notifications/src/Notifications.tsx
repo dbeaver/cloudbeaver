@@ -22,11 +22,9 @@ export const Notifications = observer(function Notifications() {
   return (
     <Portal>
       <div className={s(style, { notifications: true })}>
-        {notificationService.visibleNotifications
-          .sort((a, b) => (a.pinned ? 1 : 0) - (b.pinned ? 1 : 0))
-          .map(notification => (
-            <NotificationsItem key={notification.id} notification={notification} />
-          ))}
+        {notificationService.visibleNotifications.map(notification => (
+          <NotificationsItem key={notification.id} notification={notification} />
+        ))}
       </div>
     </Portal>
   );
