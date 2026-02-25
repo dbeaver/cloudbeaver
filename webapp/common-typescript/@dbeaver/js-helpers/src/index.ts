@@ -14,3 +14,4 @@ export * from './memoizeLast.js';
 export * from './mutex.js';
 export * from './reorderArray.js';
 export * from './getLocalizedDisplayName.js';
+export * from './keyboardEventFlags.js';

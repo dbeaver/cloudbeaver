@@ -7,6 +7,7 @@
  */
 import { clsx } from 'clsx';
 import { forwardRef, type KeyboardEvent, useImperativeHandle, useRef, useState } from 'react';
+import { stopCaptureViewHotkeys } from '@dbeaver/js-helpers';
 import { useTranslate } from '@dbeaver/react-translate';
 
 import { Icon } from '../Icon/Icon.js';
@@ -117,6 +118,12 @@ export const SearchPanel = forwardRef<SearchPanelRef, SearchPanelProps>(function
     }
   }
 
+  function handleKeyDownCapture(event: KeyboardEvent<HTMLDivElement>) {
+    if (event.key === 'Escape') {
+      stopCaptureViewHotkeys(event.nativeEvent);
+    }
+  }
+
   function handleInputKeyDown(event: KeyboardEvent<HTMLInputElement>) {
     if (event.key === 'Enter') {
       if (event.shiftKey) {
@@ -138,7 +145,7 @@ export const SearchPanel = forwardRef<SearchPanelRef, SearchPanelProps>(function
   }
 
   return (
-    <div className={clsx('search-panel', className)} onKeyDown={handleKeyDown}>
+    <div className={clsx('search-panel', className)} onKeyDownCapture={handleKeyDownCapture} onKeyDown={handleKeyDown}>
       {!isReadOnly && enableReplace && (
         <IconButton
           className={clsx(showReplace ? 'tw:h-[56px]!' : 'tw:h-[26px]!')}
