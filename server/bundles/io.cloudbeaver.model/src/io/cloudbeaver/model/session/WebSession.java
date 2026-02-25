@@ -630,11 +630,11 @@ public class WebSession extends BaseWebSession
         return asyncTask;
     }
 
-    public void addSessionError(Throwable exception) {
+    public void addSessionError(@NotNull Throwable exception) {
         addSessionMessage(new WebServerMessage(exception));
     }
 
-    public void addSessionMessage(WebServerMessage message) {
+    public void addSessionMessage(@NotNull WebServerMessage message) {
         synchronized (sessionMessages) {
             sessionMessages.add(message);
         }
@@ -645,14 +645,15 @@ public class WebSession extends BaseWebSession
             message.getMessage()));
     }
 
-    public void addInfoMessage(String message) {
+    public void addInfoMessage(@NotNull String message) {
         addSessionMessage(new WebServerMessage(MessageType.INFO, message));
     }
 
-    public void addWarningMessage(String message) {
+    public void addWarningMessage(@NotNull String message) {
         addSessionMessage(new WebServerMessage(MessageType.WARNING, message));
     }
 
+    @NotNull
     public List<WebServerMessage> readLog(Integer maxEntries, Boolean clearLog) {
         synchronized (sessionMessages) {
             List<WebServerMessage> messages = new ArrayList<>();
@@ -700,7 +701,7 @@ public class WebSession extends BaseWebSession
         }
     }
 
-
+    @NotNull
     public List<WebAuthInfo> getAllAuthInfo() {
         synchronized (authTokens) {
             return new ArrayList<>(authTokens);
@@ -752,7 +753,7 @@ public class WebSession extends BaseWebSession
         });
     }
 
-    private void removeAuthInfo(WebAuthInfo oldAuthInfo) {
+    private void removeAuthInfo(@NotNull WebAuthInfo oldAuthInfo) {
         oldAuthInfo.closeAuth();
         synchronized (authTokens) {
             authTokens.remove(oldAuthInfo);
@@ -778,6 +779,7 @@ public class WebSession extends BaseWebSession
         return oldInfo;
     }
 
+    @Nullable
     public List<DBACredentialsProvider> getContextCredentialsProviders() {
         return getAdapters(DBACredentialsProvider.class);
     }
