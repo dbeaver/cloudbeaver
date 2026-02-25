@@ -99,7 +99,6 @@ export class ServerHealthCheckService extends Bootstrap {
       }
 
       if (this.healthCheckPromise) {
-        await this.healthCheckPromise;
         throw exception;
       }
 
@@ -107,7 +106,6 @@ export class ServerHealthCheckService extends Bootstrap {
         this.healthCheckPromise = null;
       });
 
-      await this.healthCheckPromise;
       throw exception;
     }
   }
