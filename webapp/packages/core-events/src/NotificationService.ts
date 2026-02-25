@@ -85,6 +85,7 @@ export class NotificationService {
         title: options.title,
         message: options.message,
         details: options.details,
+        pinned: options.pinned,
         isSilent: !!options.isSilent,
         customComponent: options.customComponent,
         extraProps: options.extraProps || ({} as TProps),
@@ -109,6 +110,7 @@ export class NotificationService {
         autoClose: observable.ref,
         type: observable.ref,
         timestamp: observable.ref,
+        pinned: observable.ref,
       },
     );
 

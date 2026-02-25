@@ -46,6 +46,7 @@ export class PluginServerUnavailableBootstrap extends Bootstrap {
         const notification = this.notificationService.logError({
           title: 'plugin_server_unavailable_error_title',
           message: 'plugin_server_unavailable_error_message',
+          pinned: true,
         });
         this.notificationId = notification.id;
       }
