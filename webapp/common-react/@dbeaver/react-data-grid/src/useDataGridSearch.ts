@@ -67,7 +67,6 @@ export function useDataGridSearch({ containerRef, searchStorage, getCellEditable
 
   function handleSearchClose() {
     setSearchOpen(false);
-    searchStorage?.update({ open: false });
     containerRef.current?.querySelector<HTMLDivElement>('[aria-selected="true"]')?.focus();
   }
 

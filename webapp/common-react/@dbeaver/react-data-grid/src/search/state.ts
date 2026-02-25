@@ -48,6 +48,27 @@ export function computeActiveIdxAfterRemoval(matchCount: number, activeIdx: numb
   return activeIdx;
 }
 
+function areMatchesEqual(left: ICellMatch[], right: ICellMatch[]): boolean {
+  if (left === right) {
+    return true;
+  }
+
+  if (left.length !== right.length) {
+    return false;
+  }
+
+  for (let i = 0; i < left.length; i++) {
+    const leftMatch = left[i];
+    const rightMatch = right[i];
+
+    if (!leftMatch || !rightMatch || leftMatch.rowIdx !== rightMatch.rowIdx || leftMatch.colIdx !== rightMatch.colIdx) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
 export function gridSearchReducer(state: GridSearchState, action: GridSearchReducerAction): GridSearchState {
   switch (action.type) {
     case 'SET_QUERY': {
@@ -70,6 +91,11 @@ export function gridSearchReducer(state: GridSearchState, action: GridSearchRedu
       return { ...state, regexp: !state.regexp };
     case 'SET_MATCHES': {
       const activeMatchIdx = computeActiveIdx(action.matchedCells, state.activeMatchIdx, action.preserveActiveIndex);
+
+      if (activeMatchIdx === state.activeMatchIdx && areMatchesEqual(state.matchedCells, action.matchedCells)) {
+        return state;
+      }
+
       return { ...state, matchedCells: action.matchedCells, activeMatchIdx };
     }
     case 'NAVIGATE_NEXT': {

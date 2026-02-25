@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { useEffect, useMemo, useReducer, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react';
 
 import type { IGridReactiveValue } from '../IGridReactiveValue.js';
 import { buildSearchPattern, replaceInCell, searchGrid, type ICellMatch } from './GridSearchEngine.js';
@@ -107,9 +107,7 @@ export function useGridSearch(options: IGridSearchOptions): IGridSearchResult {
   const [state, dispatch] = useReducer(gridSearchReducer, options, createInitialState);
 
   const optionsRef = useRef(options);
-  optionsRef.current = options;
   const stateRef = useRef(state);
-  stateRef.current = state;
 
   const cellListenersRef = useRef(new Set<() => void>());
   const prevMatchedCellsRef = useRef(state.matchedCells);
@@ -126,24 +124,36 @@ export function useGridSearch(options: IGridSearchOptions): IGridSearchResult {
   const lastGridSizeRef = useRef({ rowCount: options.rowCount, columnCount: options.columnCount });
   const isInitialMountRef = useRef(true);
 
-  const actions = useMemo<IGridSearchActions>(() => {
-    function runSearchNow(preserveActiveIndex: boolean): void {
+  const runSearchAndScroll = useCallback(
+    (searchState: Pick<GridSearchState, 'query' | 'caseSensitive' | 'wholeWord' | 'regexp'>, preserveActiveIndex: boolean): void => {
       const opts = optionsRef.current;
-      const st = stateRef.current;
+      const currentState = stateRef.current;
       const matches = searchGrid(
-        st.query,
-        { caseSensitive: st.caseSensitive, wholeWord: st.wholeWord, regexp: st.regexp },
+        searchState.query,
+        {
+          caseSensitive: searchState.caseSensitive,
+          wholeWord: searchState.wholeWord,
+          regexp: searchState.regexp,
+        },
         opts.rowCount,
         opts.columnCount,
         opts.getCellText,
       );
+
       dispatch({ type: 'SET_MATCHES', matchedCells: matches, preserveActiveIndex });
 
-      const newActiveIdx = computeActiveIdx(matches, st.activeMatchIdx, preserveActiveIndex);
+      const newActiveIdx = computeActiveIdx(matches, currentState.activeMatchIdx, preserveActiveIndex);
       const match = matches[newActiveIdx];
       if (match) {
         opts.scrollToCell(match.rowIdx, match.colIdx);
       }
+    },
+    [dispatch],
+  );
+
+  const actions = useMemo<IGridSearchActions>(() => {
+    function runSearchNow(preserveActiveIndex: boolean): void {
+      runSearchAndScroll(stateRef.current, preserveActiveIndex);
     }
 
     return {
@@ -303,7 +313,12 @@ export function useGridSearch(options: IGridSearchOptions): IGridSearchResult {
         });
       },
     };
-  }, [dispatch]);
+  }, [runSearchAndScroll]);
+
+  useEffect(() => {
+    optionsRef.current = options;
+    stateRef.current = state;
+  }, [options, state]);
 
   const [getCellClassName] = useState<IGridReactiveValue<string | undefined, [number, number]>>(() => ({
     get(rowIdx: number, colIdx: number): string | undefined {
@@ -360,7 +375,17 @@ export function useGridSearch(options: IGridSearchOptions): IGridSearchResult {
       replaceOpen: state.replaceOpen,
       open: optionsRef.current.open ?? true,
     });
-  }, [state.query, state.replace, state.caseSensitive, state.wholeWord, state.regexp, state.replaceOpen, state.matchedCells, state.activeMatchIdx]);
+  }, [
+    state.query,
+    state.replace,
+    state.caseSensitive,
+    state.wholeWord,
+    state.regexp,
+    state.replaceOpen,
+    state.matchedCells,
+    state.activeMatchIdx,
+    options.open,
+  ]);
 
   // --- Debounced search (reacts to query/flag changes) ---
   useEffect(() => {
@@ -374,26 +399,19 @@ export function useGridSearch(options: IGridSearchOptions): IGridSearchResult {
       return;
     }
 
-    const timeoutId = setTimeout(() => {
-      const opts = optionsRef.current;
-      const matches = searchGrid(
-        state.query,
-        { caseSensitive: state.caseSensitive, wholeWord: state.wholeWord, regexp: state.regexp },
-        opts.rowCount,
-        opts.columnCount,
-        opts.getCellText,
-      );
-      dispatch({ type: 'SET_MATCHES', matchedCells: matches, preserveActiveIndex: false });
+    const searchState = {
+      query: state.query,
+      caseSensitive: state.caseSensitive,
+      wholeWord: state.wholeWord,
+      regexp: state.regexp,
+    };
 
-      const activeIdx = computeActiveIdx(matches, stateRef.current.activeMatchIdx, false);
-      const match = matches[activeIdx];
-      if (match) {
-        opts.scrollToCell(match.rowIdx, match.colIdx);
-      }
+    const timeoutId = setTimeout(() => {
+      runSearchAndScroll(searchState, false);
     }, DEFAULT_DEBOUNCE_MS);
 
     return () => clearTimeout(timeoutId);
-  }, [state.query, state.caseSensitive, state.wholeWord, state.regexp]);
+  }, [state.query, state.caseSensitive, state.wholeWord, state.regexp, runSearchAndScroll]);
 
   // --- Re-search when grid size changes ---
   useEffect(() => {
