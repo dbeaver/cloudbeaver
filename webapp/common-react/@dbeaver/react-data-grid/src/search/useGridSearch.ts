@@ -11,7 +11,7 @@ import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'r
 import type { IGridReactiveValue } from '../IGridReactiveValue.js';
 import { buildSearchPattern, replaceInCell, searchGrid, type ICellMatch } from './GridSearchEngine.js';
 import type { ICellChange } from '../DataGridCellContext.js';
-import { computeActiveIdx, computeActiveIdxAfterRemoval, gridSearchReducer, type GridSearchState } from './state.js';
+import { computeActiveIdx, computeActiveIdxAfterRemoval, gridSearchReducer, type GridSearchQueryState, type GridSearchState } from './state.js';
 
 export type { ICellMatch } from './GridSearchEngine.js';
 
@@ -19,6 +19,11 @@ const DEFAULT_DEBOUNCE_MS = 300;
 
 export interface IGridSearchStorageState extends GridSearchState {
   open: boolean;
+}
+
+export interface IGridSearchSnapshot extends GridSearchQueryState {
+  matchCount: number;
+  activeMatchIndex: number;
 }
 
 export interface IGridSearchStorage {
@@ -51,16 +56,6 @@ function getNextMatchAfterRemoval(matchedCells: ICellMatch[], activeMatchIdx: nu
   const nextMatches = [...matchedCells];
   nextMatches.splice(activeMatchIdx, 1);
   return nextMatches[nextActiveIdx];
-}
-
-export interface IGridSearchSnapshot {
-  query: string;
-  replace: string;
-  caseSensitive: boolean;
-  wholeWord: boolean;
-  regexp: boolean;
-  matchCount: number;
-  activeMatchIndex: number;
 }
 
 export interface IGridSearchActions {

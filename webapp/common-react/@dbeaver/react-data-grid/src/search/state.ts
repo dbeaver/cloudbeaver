@@ -8,16 +8,24 @@
 
 import type { ICellMatch } from './GridSearchEngine.js';
 
-export interface GridSearchState {
+export interface GridSearchQueryState {
   query: string;
   replace: string;
   caseSensitive: boolean;
   wholeWord: boolean;
   regexp: boolean;
-  replaceOpen: boolean;
+}
+
+export interface GridSearchMatchState {
   matchedCells: ICellMatch[];
   activeMatchIdx: number;
 }
+
+export interface GridSearchUiState {
+  replaceOpen: boolean;
+}
+
+export interface GridSearchState extends GridSearchMatchState, GridSearchQueryState, GridSearchUiState {}
 
 export type GridSearchReducerAction =
   | { type: 'SET_QUERY'; query: string }
