@@ -251,9 +251,6 @@
       "path": "../plugin-root"
     },
     {
-      "path": "../plugin-server-unavailable"
-    },
-    {
       "path": "../plugin-session-expiration"
     },
     {
