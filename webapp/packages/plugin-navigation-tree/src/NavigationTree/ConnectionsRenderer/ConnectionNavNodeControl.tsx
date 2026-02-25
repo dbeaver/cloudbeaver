@@ -18,6 +18,7 @@ import {
   TreeNodeIcon,
   TreeNodeName,
   useContextMenuPosition,
+  useDebounceValue,
   useHover,
   useMergeRefs,
   useS,
@@ -69,6 +70,7 @@ export const ConnectionNavNodeControl: NavTreeControlComponent = observer<NavTre
 
     const temporary = node.objectFeatures.includes(EObjectFeature.dataSourceTemporary);
     const mountMenu = (selected || hoverHook.isHovered) && !dndPlaceholder;
+    const mountMenuDebounced = useDebounceValue(mountMenu, mountMenu ? 0 : 200);
 
     if (temporary) {
       tooltip += `\n${translate('ui_type')}: ${translate('core_connections_connection_temporary')}`;
@@ -90,7 +92,7 @@ export const ConnectionNavNodeControl: NavTreeControlComponent = observer<NavTre
             <div className={s(styles, { nameBox: true })}>{name}</div>
           </Loader>
         </TreeNodeName>
-        {mountMenu && (
+        {mountMenuDebounced && (
           <div className={s(styles, { portal: true })} onClick={handlePortalClick}>
             <TreeNodeMenuLoader contextMenuPosition={contextMenuPosition} node={node} selected={selected} />
           </div>

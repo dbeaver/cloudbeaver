@@ -263,3 +263,6 @@ export * from './ObjectPropertyInfo/evaluate.js';
 export * from './ObjectPropertyInfo/getObjectPropertyDefaults.js';
 export * from './useVisible.js';
 export * from './SAVED_VALUE_INDICATOR.js';
+export * from './useDebounceValue.js';
+export * from './useThrottleValue.js';
+export * from './useThrottleCallback.js';
