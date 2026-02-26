@@ -280,8 +280,7 @@ public class GraphQLEndpoint extends HttpServlet {
                     CommonUtils.notEmpty(operationName), userId, startTime,
                     errorMessage,
                     API_PROTOCOL,
-                    //fixme
-                    webSession!= null? webSession.getAttribute(QMConstants.QM_SESSION_ID_ATTR) : "unknown"
+                    webSession != null ? webSession.getAttribute(QMConstants.QM_SESSION_ID_ATTR) : ""
                 );
             }
         }
