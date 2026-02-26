@@ -44,7 +44,7 @@ export const GridSearchPanel = forwardRef<GridSearchPanelRef, GridSearchPanelPro
   const { snapshot, actions, getCellClassName, replaceOpen } = useGridSearch({
     rowCount: rowCount ?? 0,
     columnCount,
-    getCellText: (r, c) => cellText?.get(r, c) ?? '',
+    cellText,
     scrollToCell,
     onReplace,
     onReplacingChange,

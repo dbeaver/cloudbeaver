@@ -75,7 +75,7 @@ export interface IGridSearchActions {
 export interface IGridSearchOptions {
   rowCount: number;
   columnCount: number;
-  getCellText: (rowIdx: number, colIdx: number) => string;
+  cellText?: IGridReactiveValue<string, [rowIdx: number, colIdx: number]>;
   scrollToCell: (rowIdx: number, colIdx: number) => void;
   onReplace: (updates: ICellChange[]) => void;
   onReplacingChange?: (isReplacing: boolean) => void;
@@ -104,6 +104,10 @@ function createInitialState(options: IGridSearchOptions): GridSearchState {
     matchedCells: hasCache ? cached!.matchedCells : [],
     activeMatchIdx: hasCache ? cached!.activeMatchIdx : -1,
   };
+}
+
+function getCellText(options: IGridSearchOptions, rowIdx: number, colIdx: number): string {
+  return options.cellText?.get(rowIdx, colIdx) ?? '';
 }
 
 export function useGridSearch(options: IGridSearchOptions): IGridSearchResult {
@@ -139,7 +143,7 @@ export function useGridSearch(options: IGridSearchOptions): IGridSearchResult {
       },
       opts.rowCount,
       opts.columnCount,
-      opts.getCellText,
+      (rowIdx, colIdx) => getCellText(opts, rowIdx, colIdx),
     );
 
     dispatch({ type: 'SET_MATCHES', matchedCells: matches, preserveActiveIndex });
@@ -223,8 +227,8 @@ export function useGridSearch(options: IGridSearchOptions): IGridSearchResult {
         const opts = optionsRef.current;
         opts.onReplacingChange?.(true);
         try {
-          const cellText = opts.getCellText(match.rowIdx, match.colIdx);
-          const { newText, stillMatches } = replaceInCell(cellText, pattern, st.replace);
+          const cellValue = getCellText(opts, match.rowIdx, match.colIdx);
+          const { newText, stillMatches } = replaceInCell(cellValue, pattern, st.replace);
           opts.onReplace([{ rowIdx: match.rowIdx, colIdx: match.colIdx, value: newText }]);
 
           if (!stillMatches) {
@@ -258,8 +262,8 @@ export function useGridSearch(options: IGridSearchOptions): IGridSearchResult {
         try {
           const matches = [...st.matchedCells];
           const updates = matches.map(match => {
-            const cellText = opts.getCellText(match.rowIdx, match.colIdx);
-            const { newText } = replaceInCell(cellText, pattern, st.replace);
+            const cellValue = getCellText(opts, match.rowIdx, match.colIdx);
+            const { newText } = replaceInCell(cellValue, pattern, st.replace);
             return { rowIdx: match.rowIdx, colIdx: match.colIdx, value: newText };
           });
           opts.onReplace(updates);
