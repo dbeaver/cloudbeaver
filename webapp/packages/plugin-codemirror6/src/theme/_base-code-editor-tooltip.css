@@ -1,0 +1,15 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+
+.cm-tooltip {
+  composes: theme-typography--body2 theme-elevation-z3 from global;
+  background-color: var(--theme-surface);
+  color: var(--theme-on-surface);
+  border: none;
+  border-radius: var(--theme-form-element-radius);
+}

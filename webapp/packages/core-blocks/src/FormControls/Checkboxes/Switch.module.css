@@ -48,11 +48,11 @@
 }
 
 .disabled {
-  composes: theme-switch--disabled mdc-switch--disabled from global;
+  composes: theme-switch--disabled from global;
 }
 
 .checked {
-  composes: theme-switch--checked mdc-switch--checked from global;
+  composes: theme-switch--checked from global;
 }
 
 .switchControlTrack {

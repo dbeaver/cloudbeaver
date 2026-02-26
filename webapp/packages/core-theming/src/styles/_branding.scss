@@ -18,7 +18,11 @@
   //   $color 100%
   // );
   // background-size: 8px 8px;
-  background-color: $color #{if($important, '!important', '')};
+  @if $important {
+    background-color: $color !important;
+  } @else {
+    background-color: $color;
+  }
 }
 
 @mixin delimiter($color) {

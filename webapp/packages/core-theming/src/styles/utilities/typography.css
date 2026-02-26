@@ -1,0 +1,195 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+
+/**
+ * Typography Utilities
+ *
+ * Migrated from @material/typography
+ * Material Design typography system: https://material.io/design/typography/
+ *
+ * Provides typography classes based on Material Design Type Scale.
+ * All values are pixel-perfect copies from Material Design Components v4.
+ */
+
+@layer components {
+  /* Base typography */
+  .theme-typography {
+    font-family: Roboto, sans-serif;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Headline 1 - 6rem (96px) */
+  .theme-typography--headline1 {
+    font-family: Roboto, sans-serif;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    font-size: 6rem;
+    line-height: 6rem;
+    font-weight: 300;
+    letter-spacing: -0.015625em;
+    text-decoration: inherit;
+    text-transform: inherit;
+  }
+
+  /* Headline 2 - 3.75rem (60px) */
+  .theme-typography--headline2 {
+    font-family: Roboto, sans-serif;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    font-size: 3.75rem;
+    line-height: 3.75rem;
+    font-weight: 300;
+    letter-spacing: -0.0083333333em;
+    text-decoration: inherit;
+    text-transform: inherit;
+  }
+
+  /* Headline 3 - 3rem (48px) */
+  .theme-typography--headline3 {
+    font-family: Roboto, sans-serif;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    font-size: 3rem;
+    line-height: 3.125rem;
+    font-weight: 400;
+    letter-spacing: normal;
+    text-decoration: inherit;
+    text-transform: inherit;
+  }
+
+  /* Headline 4 - 2.125rem (34px) */
+  .theme-typography--headline4 {
+    font-family: Roboto, sans-serif;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    font-size: 2.125rem;
+    line-height: 2.5rem;
+    font-weight: 400;
+    letter-spacing: 0.0073529412em;
+    text-decoration: inherit;
+    text-transform: inherit;
+  }
+
+  /* Headline 5 - 1.5rem (24px) */
+  .theme-typography--headline5 {
+    font-family: Roboto, sans-serif;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    font-size: 1.5rem;
+    line-height: 2rem;
+    font-weight: 400;
+    letter-spacing: normal;
+    text-decoration: inherit;
+    text-transform: inherit;
+  }
+
+  /* Headline 6 - 1.25rem (20px) */
+  .theme-typography--headline6 {
+    font-family: Roboto, sans-serif;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    font-size: 1.25rem;
+    line-height: 2rem;
+    font-weight: 500;
+    letter-spacing: 0.0125em;
+    text-decoration: inherit;
+    text-transform: inherit;
+  }
+
+  /* Subtitle 1 - 1rem (16px) */
+  .theme-typography--subtitle1 {
+    font-family: Roboto, sans-serif;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    font-size: 1rem;
+    line-height: 1.75rem;
+    font-weight: 400;
+    letter-spacing: 0.009375em;
+    text-decoration: inherit;
+    text-transform: inherit;
+  }
+
+  /* Subtitle 2 - 0.875rem (14px) */
+  .theme-typography--subtitle2 {
+    font-family: Roboto, sans-serif;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    font-size: 0.875rem;
+    line-height: 1.375rem;
+    font-weight: 500;
+    letter-spacing: 0.0071428571em;
+    text-decoration: inherit;
+    text-transform: inherit;
+  }
+
+  /* Body 1 - 1rem (16px) */
+  .theme-typography--body1 {
+    font-family: Roboto, sans-serif;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    font-size: 1rem;
+    line-height: 1.5rem;
+    font-weight: 400;
+    letter-spacing: 0.03125em;
+    text-decoration: inherit;
+    text-transform: inherit;
+  }
+
+  /* Body 2 - 0.875rem (14px) */
+  .theme-typography--body2 {
+    font-family: Roboto, sans-serif;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    font-weight: 400;
+    letter-spacing: 0.0178571429em;
+    text-decoration: inherit;
+    text-transform: inherit;
+  }
+
+  /* Caption - 0.75rem (12px) */
+  .theme-typography--caption {
+    font-family: Roboto, sans-serif;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    font-size: 0.75rem;
+    line-height: 1.25rem;
+    font-weight: 400;
+    letter-spacing: 0.0333333333em;
+    text-decoration: inherit;
+    text-transform: inherit;
+  }
+
+  /* Button - 0.875rem (14px) */
+  .theme-typography--button {
+    font-family: Roboto, sans-serif;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    font-size: 0.875rem;
+    line-height: 2.25rem;
+    font-weight: 500;
+    letter-spacing: 0.0892857143em;
+    text-decoration: none;
+    text-transform: uppercase;
+  }
+
+  /* Overline - 0.75rem (12px) */
+  .theme-typography--overline {
+    font-family: Roboto, sans-serif;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    font-size: 0.75rem;
+    line-height: 2rem;
+    font-weight: 500;
+    letter-spacing: 0.1666666667em;
+    text-decoration: none;
+    text-transform: uppercase;
+  }
+}

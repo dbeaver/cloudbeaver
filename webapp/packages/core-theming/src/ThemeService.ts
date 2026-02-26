@@ -14,11 +14,12 @@ import { type ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import type { Style } from './ComponentStyle.js';
 import './styles/main/base.pure.css';
 import './styles/main/color.pure.scss';
-import './styles/main/elevation.pure.scss';
+import './styles/utilities/elevation.css';
 import './styles/main/fonts.pure.css';
 // TODO: important to keep normalize first
 import './styles/main/normalize.pure.css';
-import './styles/main/typography.pure.scss';
+import './styles/utilities/typography.css';
+import './styles/utilities/switch.css';
 import './styles/UiIconButton.css';
 import './styles/UiSpinner.css';
 import './styles/UiInput.css';
