@@ -92,7 +92,7 @@ export interface IGridSearchResult {
 
 function createInitialState(options: IGridSearchOptions): GridSearchState {
   const cached = options.storage?.get();
-  const hasCache = cached !== undefined && cached.matchedCells.length > 0;
+  const hasCache = cached !== undefined && !!cached.query && cached.matchedCells.length > 0;
 
   return {
     query: cached?.query ?? '',
@@ -127,29 +127,26 @@ export function useGridSearch(options: IGridSearchOptions): IGridSearchResult {
   const lastGridSizeRef = useRef({ rowCount: options.rowCount, columnCount: options.columnCount });
   const isInitialMountRef = useRef(true);
 
-  const runSearchAndScroll = useCallback(
-    (searchState: Pick<GridSearchState, 'query' | 'caseSensitive' | 'wholeWord' | 'regexp'>, preserveActiveIndex: boolean): void => {
-      const opts = optionsRef.current;
-      const currentState = stateRef.current;
-      const matches = searchGrid(
-        searchState.query,
-        {
-          caseSensitive: searchState.caseSensitive,
-          wholeWord: searchState.wholeWord,
-          regexp: searchState.regexp,
-        },
-        opts.rowCount,
-        opts.columnCount,
-        opts.getCellText,
-      );
+  const runSearchAndScroll = useCallback((searchState: Omit<GridSearchQueryState, 'replace'>, preserveActiveIndex: boolean): void => {
+    const opts = optionsRef.current;
+    const currentState = stateRef.current;
+    const matches = searchGrid(
+      searchState.query,
+      {
+        caseSensitive: searchState.caseSensitive,
+        wholeWord: searchState.wholeWord,
+        regexp: searchState.regexp,
+      },
+      opts.rowCount,
+      opts.columnCount,
+      opts.getCellText,
+    );
 
-      dispatch({ type: 'SET_MATCHES', matchedCells: matches, preserveActiveIndex });
+    dispatch({ type: 'SET_MATCHES', matchedCells: matches, preserveActiveIndex });
 
-      const newActiveIdx = computeActiveIdx(matches, currentState.activeMatchIdx, preserveActiveIndex);
-      scrollToMatch(opts.scrollToCell, matches[newActiveIdx]);
-    },
-    [dispatch],
-  );
+    const newActiveIdx = computeActiveIdx(matches, currentState.activeMatchIdx, preserveActiveIndex);
+    scrollToMatch(opts.scrollToCell, matches[newActiveIdx]);
+  }, []);
 
   const actions = useMemo<IGridSearchActions>(() => {
     function runSearchNow(preserveActiveIndex: boolean): void {
@@ -380,7 +377,6 @@ export function useGridSearch(options: IGridSearchOptions): IGridSearchResult {
     }
 
     if (!state.query) {
-      dispatch({ type: 'SET_MATCHES', matchedCells: [], preserveActiveIndex: false });
       return;
     }
 
@@ -419,12 +415,7 @@ export function useGridSearch(options: IGridSearchOptions): IGridSearchResult {
       return;
     }
 
-    // Defer to allow grid to render first
-    const timeoutId = setTimeout(() => {
-      actions.refresh();
-    }, 0);
-
-    return () => clearTimeout(timeoutId);
+    actions.refresh();
   }, [actions]);
 
   // --- Cleanup ---

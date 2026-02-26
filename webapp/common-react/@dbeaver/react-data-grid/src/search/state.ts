@@ -83,6 +83,20 @@ export function gridSearchReducer(state: GridSearchState, action: GridSearchRedu
       if (state.query === action.query) {
         return state;
       }
+
+      if (!action.query) {
+        if (state.matchedCells.length === 0 && state.activeMatchIdx === -1) {
+          return { ...state, query: action.query };
+        }
+
+        return {
+          ...state,
+          query: action.query,
+          matchedCells: [],
+          activeMatchIdx: -1,
+        };
+      }
+
       return { ...state, query: action.query };
     }
     case 'SET_REPLACE': {
