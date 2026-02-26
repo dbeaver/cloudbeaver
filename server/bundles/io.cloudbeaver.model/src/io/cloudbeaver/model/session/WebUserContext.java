@@ -53,9 +53,9 @@ public class WebUserContext implements SMCredentialsProvider {
     private final ServletApplication application;
     private final DBPWorkspace workspace;
 
-    private WebUser user;
-    private Set<String> userPermissions;
-    private SMCredentials smCredentials = null;
+    private volatile WebUser user;
+    private volatile Set<String> userPermissions;
+    private volatile SMCredentials smCredentials = null;
     private String smSessionId;
     private String refreshToken;
 
@@ -87,7 +87,7 @@ public class WebUserContext implements SMCredentialsProvider {
      * @return - true if context changed
      * @throws DBException - if user already authorized and new token come from another user
      */
-    public synchronized boolean refresh(@NotNull SMAuthInfo smAuthInfo) throws DBException {
+    public boolean refresh(@NotNull SMAuthInfo smAuthInfo) throws DBException {
         if (smAuthInfo.getAuthPermissions() == null && !isAuthorizedInSecurityManager()) {
             throw new DBCException("Required information about session permissions is missing");
         }
@@ -175,56 +175,56 @@ public class WebUserContext implements SMCredentialsProvider {
     }
 
     @NotNull
-    public synchronized SMController getSecurityController() {
+    public SMController getSecurityController() {
         return securityController;
     }
 
     @Nullable
     @Override
-    public synchronized SMCredentials getActiveUserCredentials() {
+    public SMCredentials getActiveUserCredentials() {
         return smCredentials;
     }
 
-    public synchronized boolean isAuthorizedInSecurityManager() {
+    public boolean isAuthorizedInSecurityManager() {
         return smCredentials != null;
     }
 
-    public synchronized boolean isNonAnonymousUserAuthorizedInSM() {
+    public boolean isNonAnonymousUserAuthorizedInSM() {
         return isAuthorizedInSecurityManager() && getUser() != null;
     }
 
-    public synchronized boolean isAnonymousUserAuthorizedInSM() {
+    public boolean isAnonymousUserAuthorizedInSM() {
         return isAuthorizedInSecurityManager() && getUser() == null;
     }
 
     @Nullable
-    public synchronized WebUser getUser() {
+    public WebUser getUser() {
         return user;
     }
 
     @Nullable
-    public synchronized String getUserId() {
+    public String getUserId() {
         return user == null ? null : user.getUserId();
     }
 
-    protected synchronized void setUser(@Nullable WebUser user) {
+    protected void setUser(@Nullable WebUser user) {
         this.user = user;
     }
 
     @NotNull
-    public synchronized SMAdminController getAdminSecurityController() {
+    public SMAdminController getAdminSecurityController() {
         return adminSecurityController;
     }
 
     @Nullable
-    public synchronized Set<String> getUserPermissions() {
+    public Set<String> getUserPermissions() {
         return userPermissions;
     }
 
     /**
      * reread the current user's permissions
      */
-    public synchronized void refreshPermissions() throws DBException {
+    public void refreshPermissions() throws DBException {
         if (isAuthorizedInSecurityManager()) {
             log.debug("refresh permissions " + getUserId() + " " + getSmSessionId());
             setUserPermissions(securityController.getTokenPermissions().getPermissions());
@@ -246,7 +246,7 @@ public class WebUserContext implements SMCredentialsProvider {
     }
 
     @NotNull
-    public synchronized String getSmSessionId() {
+    public String getSmSessionId() {
         return smSessionId;
     }
 
