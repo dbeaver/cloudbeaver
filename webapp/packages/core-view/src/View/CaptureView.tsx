@@ -7,7 +7,6 @@
  */
 import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
-import { isCaptureViewHotkeysStopped } from '@dbeaver/js-helpers';
 
 import { s, useFocus, useHotkeys, useMergeRefs, useS } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
@@ -49,7 +48,7 @@ export const CaptureView = observer<React.PropsWithChildren<ICaptureViewProps>>(
        * isTrusted - to prevent double handling of the event
        * EventContext.has - to prevent handling the event if it was already handled by a child view
        */
-      if (!event.isTrusted || isCaptureViewHotkeysStopped(event) || EventContext.has(event, EventStopPropagationFlag)) {
+      if (!event.isTrusted || EventContext.has(event, EventStopPropagationFlag)) {
         return;
       }
 
@@ -70,7 +69,7 @@ export const CaptureView = observer<React.PropsWithChildren<ICaptureViewProps>>(
       enableOnFormTags: ['INPUT', 'SELECT', 'TEXTAREA'],
       preventDefault(event, handler) {
         // Don't prevent default if event was already handled by a child view
-        if (isCaptureViewHotkeysStopped(event) || EventContext.has(event, EventStopPropagationFlag)) {
+        if (EventContext.has(event, EventStopPropagationFlag)) {
           return false;
         }
 

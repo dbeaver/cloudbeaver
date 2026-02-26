@@ -7,7 +7,7 @@
  */
 import { clsx } from 'clsx';
 import { forwardRef, type KeyboardEvent, useImperativeHandle, useRef, useState } from 'react';
-import { stopCaptureViewHotkeys } from '@dbeaver/js-helpers';
+import { EventContext, EventStopPropagationFlag } from '@dbeaver/js-helpers';
 import { useTranslate } from '@dbeaver/react-translate';
 
 import { Icon } from '../Icon/Icon.js';
@@ -120,7 +120,7 @@ export const SearchPanel = forwardRef<SearchPanelRef, SearchPanelProps>(function
 
   function handleKeyDownCapture(event: KeyboardEvent<HTMLDivElement>) {
     if (event.key === 'Escape') {
-      stopCaptureViewHotkeys(event.nativeEvent);
+      EventContext.set(event.nativeEvent, EventStopPropagationFlag);
     }
   }
 
