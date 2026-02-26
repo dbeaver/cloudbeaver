@@ -40,6 +40,7 @@ public interface ApiCallInterceptor {
         @Nullable String userId,
         @NotNull LocalDateTime startTime,
         @Nullable String errorMessage,
-        @NotNull String apiProtocol
+        @NotNull String apiProtocol,
+        String qmSessionId
     );
 }

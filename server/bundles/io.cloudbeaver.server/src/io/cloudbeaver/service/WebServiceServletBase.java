@@ -29,6 +29,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
+import org.jkiss.dbeaver.model.qm.QMConstants;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -75,7 +76,8 @@ public abstract class WebServiceServletBase extends HttpServlet {
         } finally {
             if (WebAppUtils.getWebApplication() instanceof ApiCallInterceptor apiCallInterceptor) {
                 apiCallInterceptor.onApiCallEvent(
-                    request, getVariables(request), request.getRequestURI(), webSession.getUserId(), startTime, errorMessage, API_PROTOCOL
+                    request, getVariables(request), request.getRequestURI(), webSession.getUserId(), startTime, errorMessage, API_PROTOCOL,
+                    webSession.getAttribute(QMConstants.QM_SESSION_ID_ATTR)
                 );
             }
         }

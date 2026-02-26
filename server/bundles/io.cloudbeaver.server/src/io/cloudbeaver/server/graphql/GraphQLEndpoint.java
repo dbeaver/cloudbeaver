@@ -45,6 +45,7 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
+import org.jkiss.dbeaver.model.qm.QMConstants;
 import org.jkiss.dbeaver.utils.MimeTypes;
 import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.HttpConstants;
@@ -272,12 +273,15 @@ public class GraphQLEndpoint extends HttpServlet {
                 errorMessage = executionException.getMessage();
             }
             if (WebAppUtils.getWebApplication() instanceof ApiCallInterceptor apiCallInterceptor) {
+                WebSession webSession = GraphQLLoggerUtil.getWebSession(request);
                 apiCallInterceptor.onApiCallEvent(
                     request,
                     variables,
                     CommonUtils.notEmpty(operationName), userId, startTime,
                     errorMessage,
-                    API_PROTOCOL
+                    API_PROTOCOL,
+                    //fixme
+                    webSession!= null? webSession.getAttribute(QMConstants.QM_SESSION_ID_ATTR) : "unknown"
                 );
             }
         }
