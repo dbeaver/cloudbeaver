@@ -41,7 +41,7 @@ export class NetworkStateService extends Bootstrap {
     window.addEventListener('online', () => this.setState(true));
     window.addEventListener('offline', () => this.setState(false));
 
-    this.graphQLService.registerInterceptor(this.sessionExpiredInterceptor.bind(this));
+    this.graphQLService.registerInterceptor(this.networkIssuesInterceptor.bind(this));
   }
 
   private setState(state: boolean) {
@@ -60,7 +60,7 @@ export class NetworkStateService extends Bootstrap {
     this.networkStateExecutor.execute(this.networkState);
   }
 
-  private async sessionExpiredInterceptor(request: Promise<any>): Promise<any> {
+  private async networkIssuesInterceptor(request: Promise<any>): Promise<any> {
     try {
       return await request;
     } catch (exception: any) {
