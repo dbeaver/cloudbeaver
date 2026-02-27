@@ -66,6 +66,13 @@ export class NetworkStateService extends Bootstrap {
     } catch (exception: any) {
       const gqlError = errorOf(exception, GQLError) ?? errorOf(exception, PlainGQLError);
       const statusCode = gqlError?.response.status;
+      /* 
+        GraphQL always returns a 200 status code, regardless of success or failure.
+        Errors include an object with error details.
+        the GraphQL client generates the 500 error due to no server response. A 500 status indicates either:
+        - Server is not available (down)
+        - Request timeout if it takes too long to get the response (e.g., no VPN connection, internet issues)
+      */
       const isServerAvailable = statusCode && statusCode < 500;
 
       if (exception instanceof TypeError && exception.message === 'Failed to fetch') {
