@@ -14,6 +14,8 @@ import { errorOf } from '@cloudbeaver/core-utils';
 
 import { NetworkError } from './NetworkError.js';
 
+const NO_NETWORK_MESSAGE = 'Failed to fetch';
+
 @injectable(() => [GraphQLService])
 export class NetworkStateService extends Bootstrap {
   get state(): boolean {
@@ -64,22 +66,20 @@ export class NetworkStateService extends Bootstrap {
     try {
       return await request;
     } catch (exception: any) {
-      const gqlError = errorOf(exception, GQLError) ?? errorOf(exception, PlainGQLError);
-      const statusCode = gqlError?.response.status;
       /* 
         GraphQL always returns a 200 status code, regardless of success or failure.
-        Errors include an object with error details.
-        the GraphQL client generates the 500 error due to no server response. A 500 status indicates either:
-        - Server is not available (down)
-        - Request timeout if it takes too long to get the response (e.g., no VPN connection, internet issues)
+        The client app proxy (e.g. vite) returns a 500 status code only in dev mode (frontend build),
+        In prod mode it throws a network error with a specific message.
       */
-      const isServerAvailable = statusCode && statusCode < 500;
+      const gqlError = errorOf(exception, GQLError) ?? errorOf(exception, PlainGQLError);
+      const isGqlProxyError = gqlError?.response.status === 500 && (!gqlError.response.body || Object.keys(gqlError.response.body).length === 0);
+      /* 
+        fetch() API throws a TypeError when a network error occurs, and the message is 'Failed to fetch'. 
+        This is a common way to detect network issues in web applications in prod mode (not dev frontend build) 
+      */
+      const isCommonNetworkError = exception instanceof TypeError && exception.message === NO_NETWORK_MESSAGE;
 
-      if (exception instanceof TypeError && exception.message === 'Failed to fetch') {
-        throw new NetworkError('Error while processing request', { cause: exception });
-      }
-
-      if (!isServerAvailable) {
+      if (isCommonNetworkError || isGqlProxyError) {
         throw new NetworkError('Server is not available. Please check your network connection and try again.', { cause: exception });
       }
 
