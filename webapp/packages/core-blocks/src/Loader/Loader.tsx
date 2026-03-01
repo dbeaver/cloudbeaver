@@ -21,7 +21,7 @@ import styles from './Loader.module.css';
 import { type ILoaderContext, LoaderContext } from './LoaderContext.js';
 import { Spinner } from '@dbeaver/ui-kit';
 
-import { useDebounceValue } from '../useDebounceValue.js';
+import { useStateDelay } from '../useStateDelay.js';
 
 type LoaderState =
   | ILoadableState
@@ -165,25 +165,9 @@ export const Loader = observer<Props>(function Loader({
 
   const style = useS(styles);
 
-  const debouncedLoading = useDebounceValue(loading, loading === true ? 500 : 0);
-  const [isVisible, setVisible] = useState(debouncedLoading);
+  const debouncedLoading = useStateDelay(loading, loading === true ? 500 : 0);
 
   const refLoaderDisplayed = { state: false };
-
-  useEffect(() => {
-    if (!debouncedLoading) {
-      setVisible(debouncedLoading);
-      return;
-    }
-
-    const id = setTimeout(() => {
-      setVisible(debouncedLoading);
-    }, 500);
-
-    return () => {
-      clearTimeout(id);
-    };
-  }, [debouncedLoading]);
 
   useEffect(() => {
     if (context) {
@@ -258,7 +242,7 @@ export const Loader = observer<Props>(function Loader({
     }
   }
 
-  if ((!isVisible && overlay) || !debouncedLoading) {
+  if (!debouncedLoading) {
     if (overlay) {
       return renderWrappedChildren();
     }
