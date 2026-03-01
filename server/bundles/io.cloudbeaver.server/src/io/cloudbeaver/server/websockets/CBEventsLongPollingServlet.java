@@ -93,7 +93,7 @@ public class CBEventsLongPollingServlet extends HttpServlet {
                 return;
             }
 
-            resp.setContentType(CBConstants.APPLICATION_JSON);
+            resp.setContentType(HttpConstants.CONTENT_TYPE_JSON);
             WSUtils.clientGson.toJson(Map.of("events", events), resp.getWriter());
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
@@ -239,7 +239,7 @@ public class CBEventsLongPollingServlet extends HttpServlet {
     ) {
         try {
             resp.setStatus(status);
-            resp.setContentType(CBConstants.APPLICATION_JSON);
+            resp.setContentType(HttpConstants.CONTENT_TYPE_JSON);
 
             Map<String, Object> error = Map.of(
                 "error", message,

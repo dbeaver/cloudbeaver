@@ -5,15 +5,16 @@ import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.service.WebServiceServletBase;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBConstants;
 import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.dbeaver.utils.MimeTypes;
+import org.jkiss.utils.HttpConstants;
 import org.jkiss.utils.IOUtils;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -47,7 +48,7 @@ public class WebAdminLogsServlet extends WebServiceServletBase {
             throw new DBWebException("Log file '" + logFileName + "' not found");
         }
 
-        response.setHeader("Content-Type", MimeTypes.TEXT_PLAIN);
+        response.setHeader(HttpConstants.HEADER_CONTENT_TYPE, MimeTypes.TEXT_PLAIN);
         if (logFileName.equals(".log")) {
             logFileName = "server.log";
         }
