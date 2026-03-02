@@ -9,30 +9,10 @@ import { makeObservable, observable } from 'mobx';
 
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { Executor, type IExecutor } from '@cloudbeaver/core-executor';
-import { GQLError, GraphQLService, PlainGQLError } from '@cloudbeaver/core-sdk';
+import { GraphQLService } from '@cloudbeaver/core-sdk';
 import { errorOf } from '@cloudbeaver/core-utils';
 
-import { NetworkError } from './NetworkError.js';
-
-/**
- * Checks if an error is a network-related fetch failure.
- * Different browsers throw different error messages for network issues:
- * - Chrome/Edge: "Failed to fetch"
- * - Firefox: "NetworkError when attempting to fetch resource"
- * - Safari: "Load failed"
- */
-function isNetworkFetchError(error: unknown): boolean {
-  if (!(error instanceof TypeError)) {
-    return false;
-  }
-
-  const message = error.message.toLowerCase();
-  return (
-    message.includes('failed to fetch') || // Chrome/Edge
-    message.includes('networkerror') || // Firefox
-    message.includes('load failed') // Safari
-  );
-}
+import { isNetworkFetchError, NetworkError } from './NetworkError.js';
 
 @injectable(() => [GraphQLService])
 export class NetworkStateService extends Bootstrap {
@@ -84,21 +64,7 @@ export class NetworkStateService extends Bootstrap {
     try {
       return await request;
     } catch (exception: any) {
-      /* 
-        GraphQL always returns a 200 status code, regardless of success or failure.
-        The client app proxy (e.g. vite) returns a 500 status code only in dev mode (frontend build),
-        In prod mode it throws a network error with a specific message.
-      */
-      const gqlError = errorOf(exception, GQLError) ?? errorOf(exception, PlainGQLError);
-      const isGqlProxyError = gqlError?.response.status === 500 && (!gqlError.response.body || Object.keys(gqlError.response.body).length === 0);
-      /*
-        fetch() API throws a TypeError when a network error occurs.
-        Different browsers use different error messages (Chrome: "Failed to fetch", Firefox: "NetworkError...", Safari: "Load failed").
-        This is a common way to detect network issues in web applications in prod mode (not dev frontend build)
-      */
-      const isCommonNetworkError = isNetworkFetchError(exception);
-
-      if (isCommonNetworkError || isGqlProxyError) {
+      if (isNetworkFetchError(exception)) {
         throw new NetworkError('Server is not available. Please check your network connection and try again.', { cause: exception });
       }
 
