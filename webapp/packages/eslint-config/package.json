@@ -36,6 +36,6 @@
   },
   "resolutions": {
     "eslint-plugin-storybook": ">=10.1.10",
-    "storybook": ">=10.1.10"
+    "storybook": ">=10.2.10"
   }
 }
