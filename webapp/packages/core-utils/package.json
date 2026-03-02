@@ -32,7 +32,7 @@
     "underscore": "^1",
     "uuid": "^13",
     "vitest": "^4",
-    "whatwg-mimetype": "^4",
+    "whatwg-mimetype": "^5",
     "zod": "^4",
     "zod-validation-error": "^5"
   },
