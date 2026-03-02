@@ -2333,6 +2333,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         invalidateUserTokens(currentUserCreds.getSmAccessToken());
     }
 
+    @NotNull
     @Override
     public SMTokens refreshSession(@NotNull String refreshToken) throws DBException {
         var currentUserCreds = getCurrentUserCreds();
@@ -2995,6 +2996,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         }
     }
 
+    @NotNull
     @Override
     public SMAuthPermissions getTokenPermissions() throws DBException {
         SMCredentials activeUserCredentials = credentialsProvider.getActiveUserCredentials();

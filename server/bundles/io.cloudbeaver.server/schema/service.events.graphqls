@@ -296,6 +296,13 @@ enum WSServerNotificationEventType {
     LOADING
     CUSTOM
 }
+
+"Query parameter information"
+type WSQueryParameterInfo {
+    name: String!
+    value: String
+}
+
 "General event for showing user notification"
 type WSServerNotificationEvent implements CBServerEvent @since(version: "25.2.1") {
     id: CBServerEventId!
@@ -338,14 +345,14 @@ type WSSessionTaskConfirmationEvent implements CBClientEvent @since(version: "25
     skipConfirmations: Boolean!
 }
 
-type WSSessionTaskQueryParamsConfirmationEvent implements CBServerEvent @since(version: "25.2.5") {
+type WSSessionTaskQueryParamsConfirmationEvent implements CBServerEvent @since(version: "26.0.0") {
     id: CBServerEventId!
     topicId: CBEventTopic!
     taskId: ID!
     title: String!
     message: String!
     query: String!
-    parameters: Object!
+    parameters: [WSQueryParameterInfo]!
 }
 
 type WSSessionTaskWithParametersConfirmationEvent implements CBClientEvent @since(version: "25.2.5") {
