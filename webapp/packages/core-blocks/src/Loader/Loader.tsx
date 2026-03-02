@@ -242,7 +242,7 @@ export const Loader = observer<Props>(function Loader({
     }
   }
 
-  if (!debouncedLoading) {
+  if ((!debouncedLoading && overlay) || !loading) {
     if (overlay) {
       return renderWrappedChildren();
     }
