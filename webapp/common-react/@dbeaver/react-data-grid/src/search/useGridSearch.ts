@@ -11,7 +11,14 @@ import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'r
 import type { IGridReactiveValue } from '../IGridReactiveValue.js';
 import { buildSearchPattern, replaceInCell, searchGrid, type ICellMatch } from './GridSearchEngine.js';
 import type { ICellChange } from '../DataGridCellContext.js';
-import { computeActiveIdx, computeActiveIdxAfterRemoval, gridSearchReducer, type GridSearchQueryState, type GridSearchState } from './state.js';
+import {
+  computeActiveIdx,
+  computeActiveIdxAfterRemoval,
+  computeActiveMatchIdx,
+  gridSearchReducer,
+  type GridSearchQueryState,
+  type GridSearchState,
+} from './state.js';
 
 export type { ICellMatch } from './GridSearchEngine.js';
 
@@ -186,8 +193,8 @@ export function useGridSearch(options: IGridSearchOptions): IGridSearchResult {
           }
           return;
         }
-        const nextIdx = (st.activeMatchIdx + 1) % st.matchedCells.length;
-        dispatch({ type: 'NAVIGATE_NEXT' });
+        const nextIdx = computeActiveMatchIdx(st.matchedCells.length, st.activeMatchIdx, 1);
+        dispatch({ type: 'SET_ACTIVE_MATCH', index: nextIdx });
         scrollToMatch(optionsRef.current.scrollToCell, st.matchedCells[nextIdx]);
       },
 
@@ -199,8 +206,8 @@ export function useGridSearch(options: IGridSearchOptions): IGridSearchResult {
           }
           return;
         }
-        const prevIdx = st.activeMatchIdx === 0 ? st.matchedCells.length - 1 : st.activeMatchIdx - 1;
-        dispatch({ type: 'NAVIGATE_PREVIOUS' });
+        const prevIdx = computeActiveMatchIdx(st.matchedCells.length, st.activeMatchIdx, -1);
+        dispatch({ type: 'SET_ACTIVE_MATCH', index: prevIdx });
         scrollToMatch(optionsRef.current.scrollToCell, st.matchedCells[prevIdx]);
       },
 

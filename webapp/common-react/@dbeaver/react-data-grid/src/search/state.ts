@@ -34,8 +34,7 @@ export type GridSearchReducerAction =
   | { type: 'TOGGLE_WHOLE_WORD' }
   | { type: 'TOGGLE_REGEX' }
   | { type: 'SET_MATCHES'; matchedCells: ICellMatch[]; preserveActiveIndex: boolean }
-  | { type: 'NAVIGATE_NEXT' }
-  | { type: 'NAVIGATE_PREVIOUS' }
+  | { type: 'SET_ACTIVE_MATCH'; index: number }
   | { type: 'REMOVE_MATCH'; index: number }
   | { type: 'SET_REPLACE_OPEN'; open: boolean };
 
@@ -46,14 +45,25 @@ export function computeActiveIdx(matchedCells: ICellMatch[], currentIdx: number,
   return matchedCells.length > 0 ? 0 : -1;
 }
 
-export function computeActiveIdxAfterRemoval(matchCount: number, activeIdx: number): number {
+export function computeActiveIdxAfterRemoval(matchCount: number, activeMatchIdx: number): number {
   if (matchCount === 0) {
     return -1;
   }
-  if (activeIdx >= matchCount) {
-    return matchCount - 1;
+
+  return Math.max(0, Math.min(activeMatchIdx, matchCount - 1));
+}
+
+export function computeActiveMatchIdx(matchCount: number, activeMatchIdx: number, offset = 0): number {
+  if (matchCount === 0) {
+    return -1;
   }
-  return activeIdx;
+
+  if (activeMatchIdx < 0 || activeMatchIdx >= matchCount) {
+    return offset >= 0 ? 0 : matchCount - 1;
+  }
+
+  const shifted = activeMatchIdx + offset;
+  return ((shifted % matchCount) + matchCount) % matchCount;
 }
 
 function areMatchesEqual(left: ICellMatch[], right: ICellMatch[]): boolean {
@@ -120,18 +130,17 @@ export function gridSearchReducer(state: GridSearchState, action: GridSearchRedu
 
       return { ...state, matchedCells: action.matchedCells, activeMatchIdx };
     }
-    case 'NAVIGATE_NEXT': {
+    case 'SET_ACTIVE_MATCH': {
       if (state.matchedCells.length === 0) {
         return state;
       }
-      return { ...state, activeMatchIdx: (state.activeMatchIdx + 1) % state.matchedCells.length };
-    }
-    case 'NAVIGATE_PREVIOUS': {
-      if (state.matchedCells.length === 0) {
+
+      const boundedIndex = Math.max(0, Math.min(action.index, state.matchedCells.length - 1));
+      if (boundedIndex === state.activeMatchIdx) {
         return state;
       }
-      const prevIdx = state.activeMatchIdx === 0 ? state.matchedCells.length - 1 : state.activeMatchIdx - 1;
-      return { ...state, activeMatchIdx: prevIdx };
+
+      return { ...state, activeMatchIdx: boundedIndex };
     }
     case 'REMOVE_MATCH': {
       const newMatches = [...state.matchedCells];
