@@ -25,91 +25,55 @@ You can see a live demo of CloudBeaver here: https://demo.cloudbeaver.io
 
 ## Changelog
 
-### 25.3.5 2026-02-16
+### 26.0.0 2026-03-02
 
-- Data Editor:
-    - Added the ability to automatically generate INSERT, SELECT, DELETE, and UPDATE statements for the selected values in the Data Editor;
-    - Added a status indicator icon in the top-left corner of the Data Editor with tooltips explaining table editability. The icon shows whether the table has a primary key, is read-only due to connection settings, or contains only read-only columns.
-- Navigator:
-    - The Connection Info tab was added so that all users can see basic information about the current connection;
-    - Added the ability to duplicate connection configuration in the project navigation tree. The "Clone connection" feature is available in the context menu.
-- General:
-    - The missing pg_dump utility no longer causes errors during initialization or during deployment updates when PostgreSQL is selected as the inner database;
-    - DuckDB: Driver version was updated to 1.4.4.0;
-    - PostgreSQL: Added DDL display support for PostgreSQL policies.
+### Changes since 25.3.0:
 
-### 25.3.4 2026-02-02
-
-- Editors:
-    - Added undo and redo functionality to the Data Editor for cell edits, row operations, and other data modifications. The history retains the last 50 actions across the Data Editor, result sets, and related panels;
-    - The SQL preview panel has been added to the Bind parameters/variables dialog in the SQL Editor, allowing users to review the SQL query with changed values on the fly;
-    - The Tab key can now be used for autocompletion in the SQL editor in the same way as the Enter key;
-    - Fixed an application freeze caused by fetch size canceling for large tables in the Result Set;
-    - Fixed an issue where pressing the Delete key during inline cell editing incorrectly marked the entire row for deletion.
-- Navigator:
-    - Added independent view preference settings for database connections at both the user and connection levels. Users can configure their preferred navigator view separately from connection-specific settings;
-    - Added "Show children of tables" option to Navigator tree settings. When enabled, the navigator displays nested objects such as columns under tables and views. The setting applies globally across all connections and remains disabled by default;
-    - Added the ability to rename connections via context menu in the Navigator Tree;
-- General:
-    - Expanded pointer target areas for icons in the navigator, editors, and tabs to a minimum of pixels per accessibility standards. Improved interaction accuracy and reduced errors for users with motor control limitations;
-    - The "Database Native" authentication type has been renamed to "Username/password" for all connectors;
-    - ClickHouse: Fixed an issue with displaying arrays of UUID, IPv4/IPv6, and Map types.
-
-### 25.3.3 2026-01-19
-
-- For security reasons, session expiration leads to a complete logout for a user and clears all data from the screen;
-- Added "Use local formatting" setting to Data Editor. Users can choose how to display numbers and dates: using the OS locale, a custom locale, or keeping values unformatted. This formatting applies only to displayed values. Data in the database remains unchanged;
-- Added the shortcut Ctrl/Cmd + . to cancel operations in Data Editor;
-- CloudBeaver now supports long polling as a fallback when WebSockets are unavailable or blocked, ensuring reliable communication for metadata updates and SQL execution;
-- Fixed a keyboard navigation issue for panels to keep the focus inside;
-- Clickhouse: Spatial data support was added.
-
-### 25.3.2 2026-01-05
-
-- The ability to pin columns has been added to the Data Editor, allowing users to keep key columns (e.g., IDs, names) visible while scrolling through wide tables;
-- Added a new setting in the SQL Editor to highlight spaces, tabs, and other whitespace characters to help users read, debug, and maintain their scripts. It is turned off by default and can be configured in personal preferences;
-- Redesigned the connection configuration page. Form fields and sections have been reorganized to provide more space for input and reduce visual clutter;
-- Clickhouse: driver has been updated to version 0.9.5;
-- Oracle: Added a new "Set Username to OS_USER" option in the Misc section of Oracle connection settings. When turned on, the tool automatically uses the current database username as the operating system user identifier in the session metadata.
-
-### 25.3.1 2025-12-22
-
-- Implemented an ability to add parameters and variables to queries in the SQL Editor. This feature allows for the reuse of queries by changing parameters at the execution stage. It is enabled by default and can be configured in personal preferences;
-- Added support for mapping users to CloudBeaver teams based on LDAP memberOf group membership;
-- Added support for previous browser versions, but not older than three years.
-
-### 25.3.0 2025-12-01
-
-### Changes since 25.2.0:
-
-  - Administration:
-    - Permission configuration for connections has been simplified, providing a clearer appearance and improved performance;
-    - LDAP authentication now supports case-insensitive Distinguished Names (DNs), allowing login with mixed-case DNS.
   - Security:
-    - Fixed a security issue in the Spatial Viewer for the HTML content to prevent a third-party script execution;
-    - Fixed the critical vulnerability (CVE-2025-61927) in the Happy DOM library. The library was updated to version 20.0.2.
+    - Enforced complete logout and screen data clearance upon session expiration;
+    - Fixed the high vulnerability (CVE-2026-25639) in the axios library. The library was updated to version 1.13.5.
+  - Administration:
+    - Added support for mapping users to CloudBeaver teams based on LDAP memberOf group membership;
+    - Change the User list settings in the Administration part to show both active and inactive users by default.
   - SQL Editor:
-    - A confirmation prompt has been added to the SQL Editor to prevent accidental execution of potentially dangerous queries. You can customize this behavior in Preferences > SQL Editor;
-    - A search field has been added to the catalog/schema selector on the main toolbar for easy navigation;
-    - Alphabetical order has been added to the autocomplete values in the SQL Editor to simplify object search;
-    - Added support for temporary tables in semantic analysis.
+    - Added support for parameters and variables in queries. This feature allows queries to be reused by changing parameters at execution time. Enabled by default and configurable in personal preferences;
+    - Added SQL preview to the Bind parameters/variables dialog to review queries with changed values on the fly;
+    - Enabled Tab key for autocompletion in the SQL Editor alongside the Enter key;
+    - Added a new setting in the SQL Editor to highlight spaces, tabs, and other whitespace characters to help users read, debug, and maintain their scripts. It is turned off by default and can be configured in personal preferences;
+    - Dangerous query confirmation is now shown for all DROP statements, not just for tables.
   - Data Editor:
-    - The ability to review the database query after applying filters and sorting in the Data Editor, Grouping panel, and Result sets has been added. The new Show SQL button is placed on the Filter panel;
-    - The value panel in the Data Editor has been redesigned to give users more space for viewing and editing data. Tab buttons for different data type visualizations are now aligned on a single level, creating a cleaner layout;
-    - Added visualization for column reordering in the Data Editor;
-    - Fixed an issue in the Data Editor where resizing one column in a wide table caused previously resized columns to revert to their original width. Users can resize multiple columns as intended.
+    - Added ability to automatically generate INSERT, SELECT, DELETE, and UPDATE statements for the selected values;
+    - Added undo and redo functionality for cell edits, row operations, and other data modifications. Retains the last 50 actions across the Data Editor, result sets, and related panels;
+    - Added "Use local formatting" setting. Users can choose how to display numbers and dates: using the OS locale, a custom locale, or keeping values unformatted. This formatting applies only to displayed values. Data in the database remains unchanged;
+    - Added column pinning to keep key columns (e.g., IDs, names) visible while horizontal scrolling through wide tables;
+    - Added status indicator icon in the top-left corner with tooltips explaining table editability. Indicates presence of primary keys, read-only connection settings, or read-only columns;
+    - Added shortcut Ctrl/Cmd + . to cancel operations in Data Editor;
+    - Fixed application freeze in canceling fetch size requests for large tables.
+  - Navigator tree:
+    - Added the ability to duplicate connection configuration in the project navigation tree. The "Clone connection" feature is available in the context menu;
+    - Added the ability for users to configure the Simple or Advanced view in the Navigation tree for all connections or for each connection separately;
+    - Added the ability to show table objects, such as columns or keys, in the Navigation tree. The setting is disabled by default and can be turned on in the Navigator settings panel;
+    - Added the ability to rename connections via context menu in the Navigation Tree;
+    - Added Connection Info tab to display basic information about the current connection for all users.
   - General:
-    - A reorder tabs option has been added to the application, allowing users to set editor tabs in custom positions;
-    - Keyboard navigation has been improved across the application. Additional shortcuts are available in the main info panel (top-right corner) to help discover them faster. Relevant keyboard shortcuts are also shown in the tooltips of Data Editor buttons;
-    - Boolean values have been replaced with intuitive checkboxes instead of the true/false text in the metadata editor, making editing easier and faster;
-    - The database navigator now automatically hides empty subfolders in shared projects, reducing visual clutter;
-  - Databases and drivers:
-    - ClickHouse: query canceling support has been added;
-    - DuckDB: fixed an issue where catalog selection was lost upon disconnection;
-    - PostgreSQL: fixed support for GIS data types;
-    - SQL Server: the driver has been updated to version 13.2.1;
-    - The "Show all databases" setting has been added on the connection page for MySQL and MariaDB.
-## Contribution
-As a community-driven open-source project, we warmly welcome contributions through GitHub pull requests. 
+    - Added support for long polling as a fallback when WebSockets are unavailable or blocked. Ensures reliable communication for metadata updates and SQL execution;
+    - Extended browser support to versions up to three years old;
+    - Redesigned the connection configuration page. Reorganized form fields and sections to provide more input space and reduce visual clutter;
+    - Expanded pointer target areas for icons in the Navigator, editors, and tabs according to the accessibility standards;
+    - Fixed a keyboard navigation issue for panels to keep the focus inside;
+    - Renamed "Database Native" authentication type to "Username/password" in the connection dialog;
+    - Fixed issue where the missing pg_dump utility caused errors during initialization or deployment updates when PostgreSQL was selected as the inner database.
+  - Databases:
+  - ClickHouse:
+    - Updated driver to version 0.9.5
+    - Added spatial data support
+    - Fixed an issue with displaying arrays of UUID, IPv4/IPv6, and Map types
+    - Fixed JSON data type reading
+    - Resolved an issue with CTE expressions
+  - DuckDB:
+    - Updated driver to version 1.4.4.0;
+    - Added support for the dollar-quoted string syntax for the SQL Editor
+  - Oracle: Added a new "Set Username to OS_USER" option in the Misc section of Oracle connection settings. Automatically uses the current database username as the operating system user identifier in session metadata when enabled;
+  - PostgreSQL: Added DDL display support for PostgreSQL policies.
 
 [We are happy to reward](https://dbeaver.com/help-dbeaver/) our most active contributors every major sprint.
