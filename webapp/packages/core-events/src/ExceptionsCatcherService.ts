@@ -14,7 +14,7 @@ export class ExceptionsCatcherService extends Bootstrap {
   baseCatcher: OnErrorEventHandler | null = null;
 
   private readonly ignored: string[] = [];
-  private readonly messageTitle = 'Uncatched exception';
+  private readonly messageTitle = 'Uncaught exception';
 
   constructor(private readonly notificationService: NotificationService) {
     super();
