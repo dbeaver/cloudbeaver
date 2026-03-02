@@ -14,7 +14,25 @@ import { errorOf } from '@cloudbeaver/core-utils';
 
 import { NetworkError } from './NetworkError.js';
 
-const NO_NETWORK_MESSAGE = 'Failed to fetch';
+/**
+ * Checks if an error is a network-related fetch failure.
+ * Different browsers throw different error messages for network issues:
+ * - Chrome/Edge: "Failed to fetch"
+ * - Firefox: "NetworkError when attempting to fetch resource"
+ * - Safari: "Load failed"
+ */
+function isNetworkFetchError(error: unknown): boolean {
+  if (!(error instanceof TypeError)) {
+    return false;
+  }
+
+  const message = error.message.toLowerCase();
+  return (
+    message.includes('failed to fetch') || // Chrome/Edge
+    message.includes('networkerror') || // Firefox
+    message.includes('load failed') // Safari
+  );
+}
 
 @injectable(() => [GraphQLService])
 export class NetworkStateService extends Bootstrap {
@@ -73,11 +91,12 @@ export class NetworkStateService extends Bootstrap {
       */
       const gqlError = errorOf(exception, GQLError) ?? errorOf(exception, PlainGQLError);
       const isGqlProxyError = gqlError?.response.status === 500 && (!gqlError.response.body || Object.keys(gqlError.response.body).length === 0);
-      /* 
-        fetch() API throws a TypeError when a network error occurs, and the message is 'Failed to fetch'. 
-        This is a common way to detect network issues in web applications in prod mode (not dev frontend build) 
+      /*
+        fetch() API throws a TypeError when a network error occurs.
+        Different browsers use different error messages (Chrome: "Failed to fetch", Firefox: "NetworkError...", Safari: "Load failed").
+        This is a common way to detect network issues in web applications in prod mode (not dev frontend build)
       */
-      const isCommonNetworkError = exception instanceof TypeError && exception.message === NO_NETWORK_MESSAGE;
+      const isCommonNetworkError = isNetworkFetchError(exception);
 
       if (isCommonNetworkError || isGqlProxyError) {
         throw new NetworkError('Server is not available. Please check your network connection and try again.', { cause: exception });
