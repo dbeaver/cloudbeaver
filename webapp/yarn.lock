@@ -15731,7 +15731,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"minimatch@npm:>=10.2.1":
+"minimatch@npm:>=10.2.3":
   version: 10.2.4
   resolution: "minimatch@npm:10.2.4"
   dependencies:
