@@ -37,6 +37,8 @@ describe('evaluate', () => {
     expect(evaluate('object.enabled == true', object)).toBe(true);
     expect(evaluate('object.value > 40', object)).toBe(true);
     expect(evaluate('object.name == "test"', object)).toBe(true);
+    expect(evaluate("object.name != 'other'", object)).toBe(true);
+    expect(evaluate("object.name == 'test'", object)).toBe(true);
   });
 
   it('should handle nested object properties', () => {
