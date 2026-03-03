@@ -20,6 +20,6 @@
     "eslint-plugin"
   ],
   "devDependencies": {
-    "eslint": "^10"
+    "eslint": "^9"
   }
 }
