@@ -454,9 +454,8 @@ export function useGridSearch(options: IGridSearchOptions): IGridSearchResult {
   useEffect(
     () => () => {
       cellListenersRef.current.clear();
-      clearTrackedCellSubscriptions();
     },
-    [clearTrackedCellSubscriptions],
+    [],
   );
 
   const snapshot = useMemo<IGridSearchSnapshot>(
