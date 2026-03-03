@@ -55,7 +55,6 @@ describe('evaluate', () => {
 
   it('should handle missing properties as undefined', () => {
     const obj = { existing: 'value' };
-    // Missing properties should evaluate as undefined in mathjs
     expect(evaluate('object.missing == undefined', obj)).toBe(true);
   });
 
