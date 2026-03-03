@@ -26,18 +26,18 @@ export const Node: NodeComponent = observer(function Node({ nodeId, offsetHeight
 
   const { expanded, selected: stateSelected } = data.getState(nodeId);
   const selected = selection ? selection.isSelected(nodeId) : stateSelected;
-  const node = data.getNode(nodeId);
 
   const dnd = useNodeDnD(nodeId);
 
+  const isNodeLeaf = getComputed(() => data.getNode(nodeId).leaf);
   const isValidDropTarget = getComputed(() => dnd.state.isOverCurrent && dnd.state.canDrop);
   const shouldAutoExpand = useStateDelay(isValidDropTarget, 600);
 
   useEffect(() => {
-    if (shouldAutoExpand && !expanded && !node.leaf) {
+    if (shouldAutoExpand && !expanded && !isNodeLeaf) {
       tree.expandNode(nodeId, true);
     }
-  }, [shouldAutoExpand, expanded, node.leaf, nodeId, tree]);
+  }, [shouldAutoExpand, expanded, isNodeLeaf, nodeId, tree]);
 
   function handleOpen() {
     return tree.openNode(nodeId);
