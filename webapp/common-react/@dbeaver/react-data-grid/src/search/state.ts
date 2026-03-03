@@ -25,7 +25,7 @@ export interface GridSearchUiState {
   replaceOpen: boolean;
 }
 
-export interface GridSearchState extends GridSearchMatchState, GridSearchQueryState, GridSearchUiState {}
+export interface GridSearchState extends GridSearchMatchState, GridSearchQueryState, GridSearchUiState { }
 
 export type GridSearchReducerAction =
   | { type: 'SET_QUERY'; query: string }
@@ -75,13 +75,8 @@ function areMatchesEqual(left: ICellMatch[], right: ICellMatch[]): boolean {
     return false;
   }
 
-  for (let i = 0; i < left.length; i++) {
-    const leftMatch = left[i];
-    const rightMatch = right[i];
-
-    if (!leftMatch || !rightMatch || leftMatch.rowIdx !== rightMatch.rowIdx || leftMatch.colIdx !== rightMatch.colIdx) {
-      return false;
-    }
+  if (left.some((left, i) => left.rowIdx !== right[i]!.rowIdx || left.colIdx !== right[i]!.colIdx)) {
+    return false;
   }
 
   return true;
