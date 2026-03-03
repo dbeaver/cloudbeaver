@@ -2266,7 +2266,6 @@ __metadata:
     "@timohausmann/quadtree-ts": "npm:^2"
     "@types/md5": "npm:^2"
     "@types/underscore": "npm:^1"
-    "@types/uuid": "npm:^11"
     "@types/whatwg-mimetype": "npm:^5"
     fast-deep-equal: "npm:^3"
     md5: "npm:^2"
@@ -3306,7 +3305,6 @@ __metadata:
     "@cloudbeaver/plugin-data-viewer": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
     "@types/leaflet": "npm:^1"
-    "@types/proj4": "npm:^2.19.0"
     "@types/react": "npm:^19"
     "@types/wellknown": "npm:^0"
     leaflet: "npm:^1"
@@ -9010,15 +9008,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/proj4@npm:^2.19.0":
-  version: 2.19.0
-  resolution: "@types/proj4@npm:2.19.0"
-  dependencies:
-    proj4: "npm:*"
-  checksum: 10c0/3df1d7a3613461f3f1c5e0369668e50b02c0149233e235bf4b82af53a1f6c61acea633c9087b0a57ed211c873397c005af31082e202ac642b001d3c866d66871
-  languageName: node
-  linkType: hard
-
 "@types/react-dom@npm:^19":
   version: 19.2.3
   resolution: "@types/react-dom@npm:19.2.3"
@@ -9090,15 +9079,6 @@ __metadata:
   version: 2.0.11
   resolution: "@types/unist@npm:2.0.11"
   checksum: 10c0/24dcdf25a168f453bb70298145eb043cfdbb82472db0bc0b56d6d51cd2e484b9ed8271d4ac93000a80da568f2402e9339723db262d0869e2bf13bc58e081768d
-  languageName: node
-  linkType: hard
-
-"@types/uuid@npm:^11":
-  version: 11.0.0
-  resolution: "@types/uuid@npm:11.0.0"
-  dependencies:
-    uuid: "npm:*"
-  checksum: 10c0/6ebf1448d8fdc78d348a8a84389b74083f2f58bed75a5a6cf3be8419d33dcf757735c8b2de746b066ff8ef07f4384d02549774dc84195ffa46b24745471e9d8e
   languageName: node
   linkType: hard
 
@@ -16763,7 +16743,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"proj4@npm:*, proj4@npm:^2":
+"proj4@npm:^2":
   version: 2.20.3
   resolution: "proj4@npm:2.20.3"
   dependencies:
@@ -19419,7 +19399,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"uuid@npm:*, uuid@npm:^13":
+"uuid@npm:^13":
   version: 13.0.0
   resolution: "uuid@npm:13.0.0"
   bin:
