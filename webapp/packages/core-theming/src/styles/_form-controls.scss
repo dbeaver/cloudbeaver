@@ -53,7 +53,7 @@
     width: 100%;
     border: 1px solid;
     outline: none !important;
-    border-radius: $theme-form-element-radius;
+    border-radius: var(--theme-form-element-radius);
 
     color: var(--theme-input-color);
     border-color: var(--theme-input-border);
@@ -62,8 +62,8 @@
     // we use box-shadow to overlap internal background-color style, we can't override it due to chrome bug
     &:-internal-autofill-selected,
     &:-internal-autofill-previewed {
-      -webkit-text-fill-color: $mdc-theme-on-secondary;
-      box-shadow: 0 0 0 50px $input-background inset;
+      -webkit-text-fill-color: var(--theme-on-secondary);
+      box-shadow: 0 0 0 50px var(--theme-input-background) inset;
     }
 
     &:user-invalid {
@@ -92,7 +92,7 @@
       opacity: 1;
       &:-internal-autofill-selected,
       &:-internal-autofill-previewed {
-        box-shadow: 0 0 0 50px $input-background-readonly inset;
+        box-shadow: 0 0 0 50px var(--theme-input-background-readonly) inset;
       }
     }
 
@@ -104,7 +104,7 @@
       opacity: 1;
       &:-internal-autofill-selected,
       &:-internal-autofill-previewed {
-        box-shadow: 0 0 0 50px $input-background-readonly inset;
+        box-shadow: 0 0 0 50px var(--theme-input-background-readonly) inset;
       }
     }
     &[data-embedded='true'] {
