@@ -11,6 +11,8 @@ import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'r
 import type { IGridReactiveValue } from '../IGridReactiveValue.js';
 import { buildSearchPattern, replaceInCell, searchGrid, type ICellMatch } from './GridSearchEngine.js';
 import type { ICellChange } from '../DataGridCellContext.js';
+import { makeCellKey } from './cellKey.js';
+import { useTrackedGridSearchCellSubscriptions } from './useTrackedGridSearchCellSubscriptions.js';
 import {
   computeActiveIdx,
   computeActiveIdxAfterRemoval,
@@ -41,12 +43,6 @@ export interface IGridSearchStorage {
 
 const MATCH_CLASS = 'rdg-cell-search-match';
 const ACTIVE_CLASS = 'rdg-cell-search-match rdg-cell-search-active';
-
-type CellKey = `${number}+${number}`;
-
-function makeCellKey(rowIdx: number, colIdx: number): CellKey {
-  return `${rowIdx}+${colIdx}`;
-}
 
 function scrollToMatch(scrollToCell: (rowIdx: number, colIdx: number) => void, match: ICellMatch | undefined): void {
   if (match) {
@@ -141,6 +137,7 @@ export function useGridSearch(options: IGridSearchOptions): IGridSearchResult {
   const runSearchAndScroll = useCallback((searchState: Omit<GridSearchQueryState, 'replace'>, preserveActiveIndex: boolean): void => {
     const opts = optionsRef.current;
     const currentState = stateRef.current;
+
     const matches = searchGrid(
       searchState.query,
       {
@@ -158,6 +155,20 @@ export function useGridSearch(options: IGridSearchOptions): IGridSearchResult {
     const newActiveIdx = computeActiveIdx(matches, currentState.activeMatchIdx, preserveActiveIndex);
     scrollToMatch(opts.scrollToCell, matches[newActiveIdx]);
   }, []);
+
+  const handleTrackedCellChange = useCallback((): void => {
+    const st = stateRef.current;
+    if (!st.query) {
+      return;
+    }
+
+    runSearchAndScroll(st, true);
+  }, [runSearchAndScroll]);
+
+  const { syncGridSubscriptions, clearTrackedCellSubscriptions } = useTrackedGridSearchCellSubscriptions({
+    debounceMs: DEFAULT_DEBOUNCE_MS,
+    onTrackedCellChange: handleTrackedCellChange,
+  });
 
   const actions = useMemo<IGridSearchActions>(() => {
     function runSearchNow(preserveActiveIndex: boolean): void {
@@ -382,12 +393,22 @@ export function useGridSearch(options: IGridSearchOptions): IGridSearchResult {
 
   // --- Debounced search (reacts to query/flag changes) ---
   useEffect(() => {
+    if (!state.query) {
+      clearTrackedCellSubscriptions();
+      return;
+    }
+
+    syncGridSubscriptions(options.cellText, options.rowCount, options.columnCount);
+  }, [state.query, options.cellText, options.rowCount, options.columnCount, syncGridSubscriptions, clearTrackedCellSubscriptions]);
+
+  useEffect(() => {
     if (isInitialMountRef.current) {
       isInitialMountRef.current = false;
       return;
     }
 
     if (!state.query) {
+      clearTrackedCellSubscriptions();
       return;
     }
 
@@ -403,7 +424,7 @@ export function useGridSearch(options: IGridSearchOptions): IGridSearchResult {
     }, DEFAULT_DEBOUNCE_MS);
 
     return () => clearTimeout(timeoutId);
-  }, [state.query, state.caseSensitive, state.wholeWord, state.regexp, runSearchAndScroll]);
+  }, [state.query, state.caseSensitive, state.wholeWord, state.regexp, runSearchAndScroll, clearTrackedCellSubscriptions]);
 
   // --- Re-search when grid size changes ---
   useEffect(() => {
@@ -433,8 +454,9 @@ export function useGridSearch(options: IGridSearchOptions): IGridSearchResult {
   useEffect(
     () => () => {
       cellListenersRef.current.clear();
+      clearTrackedCellSubscriptions();
     },
-    [],
+    [clearTrackedCellSubscriptions],
   );
 
   const snapshot = useMemo<IGridSearchSnapshot>(
