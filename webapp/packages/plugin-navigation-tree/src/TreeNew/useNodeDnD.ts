@@ -6,8 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 import { useContext } from 'react';
+import { observable } from 'mobx';
 
-import { useMergeRefs, useObjectRef, useObservableRef } from '@cloudbeaver/core-blocks';
+import { useMergeRefs, useObservableRef } from '@cloudbeaver/core-blocks';
 import { useDataContext } from '@cloudbeaver/core-data-context';
 import { useDNDBox, useDNDData } from '@cloudbeaver/core-ui';
 
@@ -24,46 +25,42 @@ export interface INodeDnD {
 
 export function useNodeDnD(nodeId: string): INodeDnD {
   const treeDnD = useContext(TreeDnDContext);
-  const treeDnDRef = useObjectRef({ treeDnD });
   const context = useDataContext();
 
   const dndData = useDNDData(context, {
-    canDrag: () => {
-      const dnd = treeDnDRef.treeDnD;
-      return dnd ? dnd.canDrag(nodeId) : false;
-    },
+    canDrag: () => (treeDnD ? treeDnD.canDrag(nodeId) : false),
     onDragStart: () => {
-      treeDnDRef.treeDnD?.getContext(nodeId, context);
+      treeDnD?.getContext(nodeId, context);
     },
     onDragEnd: () => {
-      treeDnDRef.treeDnD?.getContext(nodeId, context);
+      treeDnD?.getContext(nodeId, context);
     },
   });
 
   const dndBox = useDNDBox({
-    canDrop: moveContext => {
-      const dnd = treeDnDRef.treeDnD;
-      return dnd ? dnd.canDrop(nodeId, moveContext) : false;
-    },
-    onDrop: moveContext => treeDnDRef.treeDnD?.onDrop(nodeId, moveContext),
+    canDrop: moveContext => (treeDnD ? treeDnD.canDrop(nodeId, moveContext) : false),
+    onDrop: moveContext => treeDnD?.onDrop(nodeId, moveContext),
   });
 
   const setRef = useMergeRefs<Element>(dndData.setTargetRef as React.RefCallback<Element>, dndBox.setRef as React.RefCallback<Element>);
 
   const state = useObservableRef(
     () => ({
+      treeDnD,
       get isDragging() {
-        return treeDnDRef.treeDnD ? dndData.state.isDragging : false;
+        return this.treeDnD ? dndData.state.isDragging : false;
       },
       get isOverCurrent() {
-        return treeDnDRef.treeDnD ? dndBox.state.isOverCurrent : false;
+        return this.treeDnD ? dndBox.state.isOverCurrent : false;
       },
       get canDrop() {
-        return treeDnDRef.treeDnD ? dndBox.state.canDrop : false;
+        return this.treeDnD ? dndBox.state.canDrop : false;
       },
     }),
-    {},
-    false,
+    {
+      treeDnD: observable.ref,
+    },
+    { treeDnD },
   );
 
   return useObservableRef(
@@ -71,7 +68,10 @@ export function useNodeDnD(nodeId: string): INodeDnD {
       state,
       setRef,
     }),
-    {},
+    {
+      state: observable.ref,
+      setRef: observable.ref,
+    },
     { state, setRef },
   );
 }
