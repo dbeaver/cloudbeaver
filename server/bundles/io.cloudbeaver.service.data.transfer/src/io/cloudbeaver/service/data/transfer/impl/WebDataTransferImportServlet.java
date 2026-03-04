@@ -23,7 +23,6 @@ import io.cloudbeaver.model.WebAsyncTaskInfo;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.BaseWebPlatform;
-import io.cloudbeaver.server.CBConstants;
 import io.cloudbeaver.server.WebAppUtils;
 import io.cloudbeaver.server.WebApplication;
 import io.cloudbeaver.service.WebServiceServletBase;
@@ -40,6 +39,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
+import org.jkiss.utils.HttpConstants;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -121,7 +121,7 @@ public class WebDataTransferImportServlet extends WebServiceServletBase {
 
             WebAsyncTaskInfo asyncImportDataContainer =
                     dbwServiceDataTransfer.asyncImportDataContainer(processorId, filePath, webSQLResultsInfo, session);
-            response.setContentType(CBConstants.APPLICATION_JSON);
+            response.setContentType(HttpConstants.CONTENT_TYPE_JSON);
             Map<String, Object> parameters = new LinkedHashMap<>();
             parameters.put("id", asyncImportDataContainer.getId());
             parameters.put("name", asyncImportDataContainer.getName());
