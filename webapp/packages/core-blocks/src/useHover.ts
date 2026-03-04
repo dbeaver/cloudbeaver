@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { useCallback, useRef, useState } from 'react';
+import { startTransition, useCallback, useRef, useState } from 'react';
 
 interface UseHoverResult<T extends HTMLElement> {
   ref: React.RefCallback<T>;
@@ -17,11 +17,15 @@ export function useHover<T extends HTMLElement = HTMLElement>(): UseHoverResult<
   const nodeRef = useRef<T | null>(null);
 
   const handleMouseEnter = useCallback(() => {
-    setIsHovered(true);
+    startTransition(() => {
+      setIsHovered(true);
+    });
   }, []);
 
   const handleMouseLeave = useCallback(() => {
-    setIsHovered(false);
+    startTransition(() => {
+      setIsHovered(false);
+    });
   }, []);
 
   const ref = useCallback(
