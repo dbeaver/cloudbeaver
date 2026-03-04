@@ -60,7 +60,7 @@
 }
 
 .switchInput {
-  composes: theme-switch_native-control from global;
+  composes: theme-switch__native-control from global;
 }
 
 .switchControlUnderlay {
