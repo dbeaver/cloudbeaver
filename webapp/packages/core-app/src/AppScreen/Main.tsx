@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -13,6 +13,8 @@ import { LeftBarPanelService, SideBarPanel, SideBarPanelService } from '@cloudbe
 
 import style from './Main.module.css';
 import { RightArea } from './RightArea.js';
+
+const SIDE_BAR_PANEL_ID = 'dbeaver-left-sidebar';
 
 export const Main = observer(function Main() {
   const styles = useS(style);
@@ -42,14 +44,14 @@ export const Main = observer(function Main() {
         <Split {...splitMainState} sticky={30} mode={leftBarDisabled ? 'minimize' : splitMainState.mode} disable={leftBarDisabled}>
           <Pane className={s(styles, { pane: true })} basis="250px" main>
             <Loader suspense>
-              <SideBarPanel container={leftBarPanelService.tabsContainer} panelId="dbeaver-left-sidebar" />
+              <SideBarPanel container={leftBarPanelService.tabsContainer} panelId={SIDE_BAR_PANEL_ID} />
             </Loader>
           </Pane>
           <ResizerControls />
           <Pane className={s(styles, { pane: true })}>
             <Split {...splitRightState} mode={sideBarDisabled ? 'minimize' : splitRightState.mode} disable={sideBarDisabled} sticky={30}>
               <Pane className={s(styles, { pane: true })}>
-                <RightArea />
+                <RightArea sideBarPanelId={SIDE_BAR_PANEL_ID} />
               </Pane>
               <ResizerControls />
               <Pane className={s(styles, { pane: true })} basis="400px" main>

@@ -1,0 +1,47 @@
+@layer components {
+  .dbv-slide-dialog__overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 999;
+    background: rgb(0 0 0 / 0%);
+    transition: background ease-in-out 0.3s;
+    pointer-events: none;
+
+    &[data-active] {
+      background: rgb(0 0 0 / 35%);
+      pointer-events: auto;
+      cursor: pointer;
+    }
+  }
+
+  .dbv-slide-dialog__dialog {
+    --dbv-kit-dialog-content-background: var(--theme-surface);
+    overflow: visible;
+  }
+
+  .dbv-slide-dialog__close-btn {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    z-index: 1;
+    transform: translateY(-50%) translateX(-175%) rotate(90deg);
+    background-color: var(--theme-surface);
+    box-sizing: border-box;
+    width: 48px;
+    height: 48px;
+    padding: 15px;
+    border-radius: 50%;
+    color: var(--theme-on-surface);
+    overflow: hidden;
+    align-items: center;
+
+    &:hover,
+    &:focus {
+      background-color: color-mix(in srgb, var(--theme-on-surface), var(--theme-surface) 90%);
+    }
+  }
+
+  .dbv-slide-dialog__loader {
+    height: 100%;
+  }
+}

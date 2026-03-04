@@ -89,10 +89,8 @@ export * from './Placeholder/PlaceholderContainer.js';
 export * from './PropertiesTable/PropertiesTable.js';
 export * from './PropertiesTable/IProperty.js';
 
-export * from './Slide/SlideBox.js';
-export * from './Slide/SlideElement.js';
-export * from './Slide/SlideOverlay.js';
-export * from './Slide/SlidePanel.js';
+export * from './SLIDE_PANEL_CLOSE_BUTTON_ID.js';
+export * from './SlideDialog/SlideDialog.js';
 
 export * from './Split/SplitControls.js';
 export * from './Split/Pane.js';
