@@ -15,13 +15,14 @@ import {
   DATA_CONTEXT_TREE_SETTINGS,
   type ITreeToolbarFilter,
 } from './DATA_CONTEXT_TREE.js';
+import type { ITreeSettings } from './useTreeSettings.js';
 
 import { clsx } from '@dbeaver/ui-kit';
 import { useCaptureViewContext } from '@cloudbeaver/core-view';
 import { TreeDataContext } from './contexts/TreeDataContext.js';
 
 export interface TreeToolbarProps {
-  settings?: unknown;
+  settings?: ITreeSettings;
   filter?: ITreeToolbarFilter;
   onRefresh?: () => Promise<void> | void;
   className?: string;

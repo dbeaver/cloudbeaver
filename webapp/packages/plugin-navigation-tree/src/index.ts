@@ -54,6 +54,7 @@ export * from './TreeNew/NodeControlLazy.js';
 export * from './TreeNew/useTreeData.js';
 export * from './TreeNew/ITreeData.js';
 export * from './TreeNew/useTreeFilter.js';
+export * from './TreeNew/useTreeSettings.js';
 export * from './TreeNew/useTreeSelection.js';
 export * from './TreeNew/useTreeClickSelection.js';
 export * from './TreeNew/ITreeSelection.js';

@@ -6,12 +6,14 @@
  * you may not use this file except in compliance with the License.
  */
 import { observable } from 'mobx';
+import { useMemo } from 'react';
 
 import { useObjectRef, useObservableRef } from '@cloudbeaver/core-blocks';
 
 import type { TreeDataTransformer } from './DataTransformers/TreeDataTransformer.js';
 import type { ITreeData } from './ITreeData.js';
 import type { INodeState } from './INodeState.js';
+import type { ITreeSettings } from './useTreeSettings.js';
 
 export interface ITreeFilterOptions {
   isNodeMatched?: (nodeId: string, filter: string, isMatched: boolean) => boolean;
@@ -25,7 +27,36 @@ export interface ITreeFilter {
   setFilter(filter: string): void;
 }
 
-export function useTreeFilter(options: ITreeFilterOptions = {}): Readonly<ITreeFilter> {
+export interface ITreeFilterState {
+  enabled: boolean;
+  childrenTransformers: Array<TreeDataTransformer<string[]>>;
+  stateTransformers: Array<TreeDataTransformer<INodeState>>;
+  toolbarFilter: ITreeFilter | undefined;
+}
+
+export type ITreeFilterWithState = Readonly<ITreeFilter & ITreeFilterState>;
+
+export const TREE_SETTINGS_FILTER_ENABLED = 'tree.filter.enabled';
+
+export function useTreeFilterState(
+  treeFilter: Readonly<ITreeFilter>,
+  settings?: ITreeSettings,
+  enabledKey: string = TREE_SETTINGS_FILTER_ENABLED,
+): ITreeFilterState {
+  const enabled = settings?.get<boolean>(enabledKey) ?? true;
+
+  const childrenTransformers = useMemo(() => (enabled ? [treeFilter.transformer] : []), [enabled, treeFilter]);
+  const stateTransformers = useMemo(() => (enabled ? [treeFilter.stateTransformer] : []), [enabled, treeFilter]);
+
+  return {
+    enabled,
+    childrenTransformers,
+    stateTransformers,
+    toolbarFilter: enabled ? treeFilter : undefined,
+  };
+}
+
+function useTreeFilterBase(options: ITreeFilterOptions = {}): Readonly<ITreeFilter> {
   options = useObjectRef(options);
   const matchCache = new Map<string, boolean>();
 
@@ -114,5 +145,53 @@ export function useTreeFilter(options: ITreeFilterOptions = {}): Readonly<ITreeF
     },
     false,
     ['setFilter', 'isNodeMatched', 'transformer', 'stateTransformer'],
+  );
+}
+
+export function useTreeFilter(
+  options: ITreeFilterOptions = {},
+  settings?: ITreeSettings,
+  enabledKey: string = TREE_SETTINGS_FILTER_ENABLED,
+): ITreeFilterWithState {
+  const treeFilter = useTreeFilterBase(options);
+  const filterState = useTreeFilterState(treeFilter, settings, enabledKey);
+
+  return useMemo(
+    () => ({
+      get filter() {
+        return treeFilter.filter;
+      },
+      isNodeMatched(treeData: ITreeData, nodeId: string): boolean {
+        return treeFilter.isNodeMatched(treeData, nodeId);
+      },
+      transformer(treeData: ITreeData, nodeId: string, children: string[]): string[] {
+        return treeFilter.transformer(treeData, nodeId, children);
+      },
+      stateTransformer(treeData: ITreeData, nodeId: string, state: INodeState): INodeState {
+        return treeFilter.stateTransformer(treeData, nodeId, state);
+      },
+      setFilter(filter: string): void {
+        treeFilter.setFilter(filter);
+      },
+      get enabled() {
+        return filterState.enabled;
+      },
+      get childrenTransformers() {
+        return filterState.childrenTransformers;
+      },
+      get stateTransformers() {
+        return filterState.stateTransformers;
+      },
+      get toolbarFilter() {
+        return filterState.toolbarFilter;
+      },
+    }),
+    [
+      filterState.childrenTransformers,
+      filterState.enabled,
+      filterState.stateTransformers,
+      filterState.toolbarFilter,
+      treeFilter,
+    ],
   );
 }
