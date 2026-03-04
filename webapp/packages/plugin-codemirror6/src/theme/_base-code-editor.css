@@ -22,13 +22,13 @@
 .cm-mergeViewEditors,
 .cm-editor,
 .cm-gotoLine {
-  font-family: Roboto, sans-serif;
+  font-family: var(--theme-font-family);
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
-  font-size: 0.875rem;
-  line-height: 1.25rem;
-  font-weight: 400;
-  letter-spacing: 0.0178571429em;
+  font-size: var(--theme-typography-body2-font-size);
+  line-height: var(--theme-typography-body2-line-height);
+  font-weight: var(--theme-typography-body2-font-weight);
+  letter-spacing: var(--theme-typography-body2-letter-spacing);
   text-decoration: inherit;
   text-transform: inherit;
 }
@@ -132,13 +132,13 @@
   }
 
   & input {
-    font-family: Roboto, sans-serif;
+    font-family: var(--theme-font-family);
     -moz-osx-font-smoothing: grayscale;
     -webkit-font-smoothing: antialiased;
-    font-size: 0.875rem;
-    line-height: 1.25rem;
-    font-weight: 400;
-    letter-spacing: 0.0178571429em;
+    font-size: var(--theme-typography-body2-font-size);
+    line-height: var(--theme-typography-body2-line-height);
+    font-weight: var(--theme-typography-body2-font-weight);
+    letter-spacing: var(--theme-typography-body2-letter-spacing);
     text-decoration: inherit;
     text-transform: inherit;
     max-width: 60px;
@@ -150,13 +150,13 @@
     }
   }
   & .cm-button {
-    font-family: Roboto, sans-serif;
+    font-family: var(--theme-font-family);
     -moz-osx-font-smoothing: grayscale;
     -webkit-font-smoothing: antialiased;
-    font-size: 0.875rem;
-    line-height: 1.25rem;
-    font-weight: 400;
-    letter-spacing: 0.0178571429em;
+    font-size: var(--theme-typography-body2-font-size);
+    line-height: var(--theme-typography-body2-line-height);
+    font-weight: var(--theme-typography-body2-font-weight);
+    letter-spacing: var(--theme-typography-body2-letter-spacing);
     text-decoration: inherit;
     text-transform: inherit;
     background: transparent;

@@ -43,7 +43,7 @@
 
     min-width: 64px;
 
-    font-family: Roboto, sans-serif;
+    font-family: var(--theme-font-family);
     -moz-osx-font-smoothing: grayscale;
     -webkit-font-smoothing: antialiased;
 

@@ -11,176 +11,176 @@
 @layer components {
   /* Base typography */
   .theme-typography {
-    font-family: Roboto, sans-serif;
+    font-family: var(--theme-font-family);
     -moz-osx-font-smoothing: grayscale;
     -webkit-font-smoothing: antialiased;
   }
 
   /* Headline 1 - 6rem (96px) */
   .theme-typography--headline1 {
-    font-family: Roboto, sans-serif;
+    font-family: var(--theme-font-family);
     -moz-osx-font-smoothing: grayscale;
     -webkit-font-smoothing: antialiased;
-    font-size: 6rem;
-    line-height: 6rem;
-    font-weight: 300;
-    letter-spacing: -0.015625em;
+    font-size: var(--theme-typography-headline1-font-size);
+    line-height: var(--theme-typography-headline1-line-height);
+    font-weight: var(--theme-typography-headline1-font-weight);
+    letter-spacing: var(--theme-typography-headline1-letter-spacing);
     text-decoration: inherit;
     text-transform: inherit;
   }
 
   /* Headline 2 - 3.75rem (60px) */
   .theme-typography--headline2 {
-    font-family: Roboto, sans-serif;
+    font-family: var(--theme-font-family);
     -moz-osx-font-smoothing: grayscale;
     -webkit-font-smoothing: antialiased;
-    font-size: 3.75rem;
-    line-height: 3.75rem;
-    font-weight: 300;
-    letter-spacing: -0.0083333333em;
+    font-size: var(--theme-typography-headline2-font-size);
+    line-height: var(--theme-typography-headline2-line-height);
+    font-weight: var(--theme-typography-headline2-font-weight);
+    letter-spacing: var(--theme-typography-headline2-letter-spacing);
     text-decoration: inherit;
     text-transform: inherit;
   }
 
   /* Headline 3 - 3rem (48px) */
   .theme-typography--headline3 {
-    font-family: Roboto, sans-serif;
+    font-family: var(--theme-font-family);
     -moz-osx-font-smoothing: grayscale;
     -webkit-font-smoothing: antialiased;
-    font-size: 3rem;
-    line-height: 3.125rem;
-    font-weight: 400;
-    letter-spacing: normal;
+    font-size: var(--theme-typography-headline3-font-size);
+    line-height: var(--theme-typography-headline3-line-height);
+    font-weight: var(--theme-typography-headline3-font-weight);
+    letter-spacing: var(--theme-typography-headline3-letter-spacing);
     text-decoration: inherit;
     text-transform: inherit;
   }
 
   /* Headline 4 - 2.125rem (34px) */
   .theme-typography--headline4 {
-    font-family: Roboto, sans-serif;
+    font-family: var(--theme-font-family);
     -moz-osx-font-smoothing: grayscale;
     -webkit-font-smoothing: antialiased;
-    font-size: 2.125rem;
-    line-height: 2.5rem;
-    font-weight: 400;
-    letter-spacing: 0.0073529412em;
+    font-size: var(--theme-typography-headline4-font-size);
+    line-height: var(--theme-typography-headline4-line-height);
+    font-weight: var(--theme-typography-headline4-font-weight);
+    letter-spacing: var(--theme-typography-headline4-letter-spacing);
     text-decoration: inherit;
     text-transform: inherit;
   }
 
   /* Headline 5 - 1.5rem (24px) */
   .theme-typography--headline5 {
-    font-family: Roboto, sans-serif;
+    font-family: var(--theme-font-family);
     -moz-osx-font-smoothing: grayscale;
     -webkit-font-smoothing: antialiased;
-    font-size: 1.5rem;
-    line-height: 2rem;
-    font-weight: 400;
-    letter-spacing: normal;
+    font-size: var(--theme-typography-headline5-font-size);
+    line-height: var(--theme-typography-headline5-line-height);
+    font-weight: var(--theme-typography-headline5-font-weight);
+    letter-spacing: var(--theme-typography-headline5-letter-spacing);
     text-decoration: inherit;
     text-transform: inherit;
   }
 
   /* Headline 6 - 1.25rem (20px) */
   .theme-typography--headline6 {
-    font-family: Roboto, sans-serif;
+    font-family: var(--theme-font-family);
     -moz-osx-font-smoothing: grayscale;
     -webkit-font-smoothing: antialiased;
-    font-size: 1.25rem;
-    line-height: 2rem;
-    font-weight: 500;
-    letter-spacing: 0.0125em;
+    font-size: var(--theme-typography-headline6-font-size);
+    line-height: var(--theme-typography-headline6-line-height);
+    font-weight: var(--theme-typography-headline6-font-weight);
+    letter-spacing: var(--theme-typography-headline6-letter-spacing);
     text-decoration: inherit;
     text-transform: inherit;
   }
 
   /* Subtitle 1 - 1rem (16px) */
   .theme-typography--subtitle1 {
-    font-family: Roboto, sans-serif;
+    font-family: var(--theme-font-family);
     -moz-osx-font-smoothing: grayscale;
     -webkit-font-smoothing: antialiased;
-    font-size: 1rem;
-    line-height: 1.75rem;
-    font-weight: 400;
-    letter-spacing: 0.009375em;
+    font-size: var(--theme-typography-subtitle1-font-size);
+    line-height: var(--theme-typography-subtitle1-line-height);
+    font-weight: var(--theme-typography-subtitle1-font-weight);
+    letter-spacing: var(--theme-typography-subtitle1-letter-spacing);
     text-decoration: inherit;
     text-transform: inherit;
   }
 
   /* Subtitle 2 - 0.875rem (14px) */
   .theme-typography--subtitle2 {
-    font-family: Roboto, sans-serif;
+    font-family: var(--theme-font-family);
     -moz-osx-font-smoothing: grayscale;
     -webkit-font-smoothing: antialiased;
-    font-size: 0.875rem;
-    line-height: 1.375rem;
-    font-weight: 500;
-    letter-spacing: 0.0071428571em;
+    font-size: var(--theme-typography-subtitle2-font-size);
+    line-height: var(--theme-typography-subtitle2-line-height);
+    font-weight: var(--theme-typography-subtitle2-font-weight);
+    letter-spacing: var(--theme-typography-subtitle2-letter-spacing);
     text-decoration: inherit;
     text-transform: inherit;
   }
 
   /* Body 1 - 1rem (16px) */
   .theme-typography--body1 {
-    font-family: Roboto, sans-serif;
+    font-family: var(--theme-font-family);
     -moz-osx-font-smoothing: grayscale;
     -webkit-font-smoothing: antialiased;
-    font-size: 1rem;
-    line-height: 1.5rem;
-    font-weight: 400;
-    letter-spacing: 0.03125em;
+    font-size: var(--theme-typography-body1-font-size);
+    line-height: var(--theme-typography-body1-line-height);
+    font-weight: var(--theme-typography-body1-font-weight);
+    letter-spacing: var(--theme-typography-body1-letter-spacing);
     text-decoration: inherit;
     text-transform: inherit;
   }
 
   /* Body 2 - 0.875rem (14px) */
   .theme-typography--body2 {
-    font-family: Roboto, sans-serif;
+    font-family: var(--theme-font-family);
     -moz-osx-font-smoothing: grayscale;
     -webkit-font-smoothing: antialiased;
-    font-size: 0.875rem;
-    line-height: 1.25rem;
-    font-weight: 400;
-    letter-spacing: 0.0178571429em;
+    font-size: var(--theme-typography-body2-font-size);
+    line-height: var(--theme-typography-body2-line-height);
+    font-weight: var(--theme-typography-body2-font-weight);
+    letter-spacing: var(--theme-typography-body2-letter-spacing);
     text-decoration: inherit;
     text-transform: inherit;
   }
 
   /* Caption - 0.75rem (12px) */
   .theme-typography--caption {
-    font-family: Roboto, sans-serif;
+    font-family: var(--theme-font-family);
     -moz-osx-font-smoothing: grayscale;
     -webkit-font-smoothing: antialiased;
-    font-size: 0.75rem;
-    line-height: 1.25rem;
-    font-weight: 400;
-    letter-spacing: 0.0333333333em;
+    font-size: var(--theme-typography-caption-font-size);
+    line-height: var(--theme-typography-caption-line-height);
+    font-weight: var(--theme-typography-caption-font-weight);
+    letter-spacing: var(--theme-typography-caption-letter-spacing);
     text-decoration: inherit;
     text-transform: inherit;
   }
 
   /* Button - 0.875rem (14px) */
   .theme-typography--button {
-    font-family: Roboto, sans-serif;
+    font-family: var(--theme-font-family);
     -moz-osx-font-smoothing: grayscale;
     -webkit-font-smoothing: antialiased;
-    font-size: 0.875rem;
-    line-height: 2.25rem;
-    font-weight: 500;
-    letter-spacing: 0.0892857143em;
+    font-size: var(--theme-typography-button-font-size);
+    line-height: var(--theme-typography-button-line-height);
+    font-weight: var(--theme-typography-button-font-weight);
+    letter-spacing: var(--theme-typography-button-letter-spacing);
     text-decoration: none;
     text-transform: uppercase;
   }
 
   /* Overline - 0.75rem (12px) */
   .theme-typography--overline {
-    font-family: Roboto, sans-serif;
+    font-family: var(--theme-font-family);
     -moz-osx-font-smoothing: grayscale;
     -webkit-font-smoothing: antialiased;
-    font-size: 0.75rem;
-    line-height: 2rem;
-    font-weight: 500;
-    letter-spacing: 0.1666666667em;
+    font-size: var(--theme-typography-overline-font-size);
+    line-height: var(--theme-typography-overline-line-height);
+    font-weight: var(--theme-typography-overline-font-weight);
+    letter-spacing: var(--theme-typography-overline-letter-spacing);
     text-decoration: none;
     text-transform: uppercase;
   }
