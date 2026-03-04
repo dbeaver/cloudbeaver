@@ -7,6 +7,9 @@
  */
 
 .cm-tooltip.cm-tooltip-autocomplete {
+  background: unset;
+  border: none;
+
   & > ul {
     border-radius: var(--theme-form-element-radius);
   }
@@ -29,13 +32,13 @@
   }
 
   & li:hover {
-    background: var(--theme-sub-secondary);
-    color: var(--theme-on-secondary);
+    background: var(--theme-sub-secondary) !important;
+    color: var(--theme-on-secondary) !important;
   }
 
   & li[aria-selected='true'] {
-    background: var(--theme-secondary);
-    color: var(--theme-text-primary-on-light);
+    background: var(--theme-secondary) !important;
+    color: var(--theme-text-primary-on-light) !important;
   }
 }
 
