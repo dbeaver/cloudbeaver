@@ -24,6 +24,7 @@ import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.utils.GeneralUtils;
+import org.jkiss.utils.HttpConstants;
 
 import java.net.CookieManager;
 import java.net.URI;
@@ -127,7 +128,7 @@ public class WebGQLClient {
             .uri(URI.create(apiUrl))
             .POST(HttpRequest.BodyPublishers.ofString(makeGQLRequest(query, variables)))
             .setHeader("TE-Client-Version", GeneralUtils.getMajorVersion())
-            .header("Content-Type", "application/json");
+            .header(HttpConstants.HEADER_CONTENT_TYPE, HttpConstants.CONTENT_TYPE_JSON);
         if (!requestHeaders.isEmpty()) {
             requestHeaders.forEach(requestBuilder::header);
         }
