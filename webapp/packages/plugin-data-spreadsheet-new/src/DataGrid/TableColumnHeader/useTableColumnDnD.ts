@@ -65,9 +65,9 @@ export function useTableColumnDnD(model: IDatabaseDataModel, resultIndex: number
         const isToPinned = resultSetViewAction.isColumnPinned(columnKey);
 
         if (isFromPinned && !isToPinned) {
-          resultSetViewAction.unpinColumn([dndColumnKey]);
+          resultSetViewAction.unpinColumns([dndColumnKey]);
         } else if (!isFromPinned && isToPinned) {
-          resultSetViewAction.pinColumn([dndColumnKey]);
+          resultSetViewAction.pinColumns([dndColumnKey]);
         }
       }
     },

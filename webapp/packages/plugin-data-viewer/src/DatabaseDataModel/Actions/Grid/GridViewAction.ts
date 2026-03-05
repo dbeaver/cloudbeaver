@@ -72,8 +72,8 @@ export class GridViewAction<
       columnsOrder: observable,
       pinnedColumns: observable,
       setColumnOrder: action,
-      pinColumn: action,
-      unpinColumn: action,
+      pinColumns: action,
+      unpinColumns: action,
       unpinAllColumns: action,
       rows: computed,
       rowKeys: computed,
@@ -178,14 +178,14 @@ export class GridViewAction<
     return this.data.getColumnName(key);
   }
 
-  pinColumn(keys: IGridColumnKey[]): void {
+  pinColumns(keys: IGridColumnKey[]): void {
     for (const key of keys) {
       const serializedKey = GridDataKeysUtils.serialize(key);
       this.pinnedColumns.add(serializedKey);
     }
   }
 
-  unpinColumn(keys: IGridColumnKey[]): void {
+  unpinColumns(keys: IGridColumnKey[]): void {
     for (const key of keys) {
       const serializedKey = GridDataKeysUtils.serialize(key);
       this.pinnedColumns.delete(serializedKey);

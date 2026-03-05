@@ -46,10 +46,10 @@ export const CellFormatter = observer<Props>(function CellFormatter({ rowIdx, co
       }
     },
     unpinColumns(keys) {
-      tableDataContext.view.unpinColumn(keys.map(key => key.column));
+      tableDataContext.view.unpinColumns(keys.map(key => key.column));
     },
     pinColumns(keys) {
-      tableDataContext.view.pinColumn(keys.map(key => key.column));
+      tableDataContext.view.pinColumns(keys.map(key => key.column));
     },
     isColumnPinned(key) {
       return tableDataContext.view.isColumnPinned(key.column);
