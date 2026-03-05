@@ -73,6 +73,10 @@ export const ServerConfigurationPage: AdministrationItemContentComponent = obser
   const changed = part?.isChanged ?? false;
 
   async function save() {
+    if (!formState || !part) {
+      return;
+    }
+
     if (configurationWizard) {
       configurationWizardService.next();
       return;
@@ -92,7 +96,7 @@ export const ServerConfigurationPage: AdministrationItemContentComponent = obser
     const saved = await serverConfigurationFormStateManager.save();
 
     if (!saved) {
-      const error = getFirstException(part?.exception);
+      const error = getFirstException(part.exception);
       if (error) {
         notificationService.logException(error, 'administration_configuration_wizard_configuration_save_error');
         return;
@@ -106,7 +110,7 @@ export const ServerConfigurationPage: AdministrationItemContentComponent = obser
     onSubmit: save,
   });
 
-  if (!formState) {
+  if (!formState || !part) {
     return <Loader />;
   }
 
