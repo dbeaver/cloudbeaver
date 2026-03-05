@@ -90,9 +90,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ariakit/react-core@npm:0.4.21":
-  version: 0.4.21
-  resolution: "@ariakit/react-core@npm:0.4.21"
+"@ariakit/react-core@npm:0.4.22":
+  version: 0.4.22
+  resolution: "@ariakit/react-core@npm:0.4.22"
   dependencies:
     "@ariakit/core": "npm:0.4.18"
     "@floating-ui/dom": "npm:^1.0.0"
@@ -100,19 +100,19 @@ __metadata:
   peerDependencies:
     react: ^17.0.0 || ^18.0.0 || ^19.0.0
     react-dom: ^17.0.0 || ^18.0.0 || ^19.0.0
-  checksum: 10c0/6bc38183a9bc3811428f2722d5077f2db10266ce3d65ced6b5ca2ff67b5fbba178d0debbaddbaf5047048baf768980aa8277d917959cee7ce2e65ab8418d27ec
+  checksum: 10c0/7068afdf07e1e229ef2a7a885fa41cef09be27089adf622596c259a1d03017f111c6431d73e08aaa802ab12bde75f1d0ed9280867721a9382eb00072600a761c
   languageName: node
   linkType: hard
 
 "@ariakit/react@npm:^0":
-  version: 0.4.21
-  resolution: "@ariakit/react@npm:0.4.21"
+  version: 0.4.22
+  resolution: "@ariakit/react@npm:0.4.22"
   dependencies:
-    "@ariakit/react-core": "npm:0.4.21"
+    "@ariakit/react-core": "npm:0.4.22"
   peerDependencies:
     react: ^17.0.0 || ^18.0.0 || ^19.0.0
     react-dom: ^17.0.0 || ^18.0.0 || ^19.0.0
-  checksum: 10c0/bfa68459ecf86a893cfdd4951753e47a34e8eca1c1df2f576250b5de1450e5723d7d7d3f28e6537b37512396f940fa929b8291d30927d0e9109a60f9c92753bb
+  checksum: 10c0/acff6b2c44b42191c8e1ac1cc34e5cbe496edeb9d300c1d7d5ec073aee43823ba10809fc7b694364e9c690691a0d86e825793e3e7423c6c2a55a8a8d47c939fc
   languageName: node
   linkType: hard
 
@@ -11928,14 +11928,14 @@ __metadata:
   linkType: hard
 
 "es-toolkit@npm:^1.22.0":
-  version: 1.45.0
-  resolution: "es-toolkit@npm:1.45.0"
+  version: 1.45.1
+  resolution: "es-toolkit@npm:1.45.1"
   dependenciesMeta:
     "@trivago/prettier-plugin-sort-imports@4.3.0":
       unplugged: true
     prettier-plugin-sort-re-exports@0.0.1:
       unplugged: true
-  checksum: 10c0/f4a01fb2cc181a0df89e6b16df993345e90890c68d257b5883ddb1e91c32e8e5833093018ca3079540d5aba6b99683ee64de2f7ef89bf071234fa5b7e30f1bb8
+  checksum: 10c0/b19180c778af8fe2fb450e8e05a5793166c91e0aa66b87d9fcfcc5618bd33e6ceec9c103e074458d32b2044972dc4fc63631b3b615834fde261917e9561f6f59
   languageName: node
   linkType: hard
 
@@ -13132,9 +13132,9 @@ __metadata:
   linkType: hard
 
 "graphql@npm:^16, graphql@npm:^16.12.0":
-  version: 16.13.0
-  resolution: "graphql@npm:16.13.0"
-  checksum: 10c0/c20e7909c6c8d405a30f8caeae5aaf604b9f949bdcdf80bdb3d3561123e6099181c39eae697cf4fcdc5dd301ab215363b8def0aa0ff51f03cc7e4b48a8c2c2b1
+  version: 16.13.1
+  resolution: "graphql@npm:16.13.1"
+  checksum: 10c0/0c7a9aea59504fbf3e0674f13ddb82935780f2a388e1db0ef41c3711c0ff8cb0a871c50d30d2d5288f32b946af3570d6f9ba8d13b03a330336f27121f9ac7a6b
   languageName: node
   linkType: hard
 
@@ -18674,15 +18674,15 @@ __metadata:
   linkType: hard
 
 "tar@npm:>=7.5.8":
-  version: 7.5.9
-  resolution: "tar@npm:7.5.9"
+  version: 7.5.10
+  resolution: "tar@npm:7.5.10"
   dependencies:
     "@isaacs/fs-minipass": "npm:^4.0.0"
     chownr: "npm:^3.0.0"
     minipass: "npm:^7.1.2"
     minizlib: "npm:^3.1.0"
     yallist: "npm:^5.0.0"
-  checksum: 10c0/e870beb1b2477135ca2abe86b2d18f7b35d0a4e3a37bbc523d3b8f7adca268dfab543f26528a431d569897f8c53a7cac745cdfbc4411c2f89aeeacc652b81b0a
+  checksum: 10c0/ed905e4b33886377df6e9206e5d1bd34458c21666e27943f946799416f86348c938590d573d6a69312cb29c583b122647a64ec92782f2b7e24e68d985dd72531
   languageName: node
   linkType: hard
 
