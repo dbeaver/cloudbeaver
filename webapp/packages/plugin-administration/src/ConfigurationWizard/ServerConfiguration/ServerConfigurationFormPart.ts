@@ -1,16 +1,22 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+
 import { AdministrationScreenService } from '@cloudbeaver/core-administration';
 import { ADMIN_USERNAME_MIN_LENGTH, AUTH_PROVIDER_LOCAL_ID, AuthProvidersResource, PasswordPolicyService } from '@cloudbeaver/core-authentication';
-import { DEFAULT_NAVIGATOR_VIEW_SETTINGS } from '@cloudbeaver/core-connections';
 import { ExecutorInterrupter, type IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
-import { DefaultNavigatorSettingsResource, PasswordPolicyResource, ProductInfoResource, ServerConfigResource } from '@cloudbeaver/core-root';
+import {
+  DefaultNavigatorSettingsResource,
+  PasswordPolicyResource,
+  ProductInfoResource,
+  ServerConfigResource,
+  DEFAULT_NAVIGATOR_VIEW_SETTINGS,
+} from '@cloudbeaver/core-root';
 import { FormPart, formValidationContext, type IFormState } from '@cloudbeaver/core-ui';
 import { isIp, isObjectsEqual, isValuesEqual } from '@cloudbeaver/core-utils';
 import { LocalizationService } from '@cloudbeaver/core-localization';
@@ -32,7 +38,6 @@ function DEFAULT_STATE_GETTER(): IServerConfigurationFormPartState {
       resourceManagerEnabled: false,
       secretManagerEnabled: false,
       serverName: '',
-      serverURL: '',
       sessionExpireTime: MIN_SESSION_EXPIRE_TIME * 1000 * 60,
       forceHttps: true,
       supportedHosts: '',
@@ -151,7 +156,6 @@ export class ServerConfigurationFormPart extends FormPart<IServerConfigurationFo
         adminName,
         adminPassword,
         serverName: config?.name || productInfo?.name,
-        serverURL: this.administrationScreenService.isConfigurationMode && !config?.distributed ? window.location.origin : (config?.serverURL ?? ''),
         sessionExpireTime: config?.sessionExpireTime ?? MIN_SESSION_EXPIRE_TIME * 1000 * 60,
         adminCredentialsSaveEnabled: config?.adminCredentialsSaveEnabled ?? false,
         publicCredentialsSaveEnabled: config?.publicCredentialsSaveEnabled ?? false,

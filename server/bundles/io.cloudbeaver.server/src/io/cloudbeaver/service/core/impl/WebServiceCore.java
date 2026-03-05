@@ -46,7 +46,6 @@ import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.model.exec.DBCConnectException;
-import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.model.navigator.DBNDataSource;
 import org.jkiss.dbeaver.model.navigator.DBNModel;
 import org.jkiss.dbeaver.model.navigator.DBNNode;
@@ -60,6 +59,8 @@ import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.secret.DBSSecretController;
 import org.jkiss.dbeaver.model.secret.DBSSecretValue;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
+import org.jkiss.dbeaver.registry.DataSourceNavigatorSettings;
+import org.jkiss.dbeaver.registry.DataSourceNavigatorSettingsUtils;
 import org.jkiss.dbeaver.registry.DataSourceProviderRegistry;
 import org.jkiss.dbeaver.registry.network.NetworkHandlerDescriptor;
 import org.jkiss.dbeaver.registry.network.NetworkHandlerRegistry;
@@ -397,7 +398,9 @@ public class WebServiceCore implements DBWServiceCore {
                 dataSourceContainer,
                 dataSourceContainer.getConnectionConfiguration()
             );
-            saveConfig[0] = true;
+            // don't understand why whe need to set this flag here
+            // need to discover it, maybe we can avoid it at all
+            saveConfig[0] = sharedCredentials;
         }
         if (WebServiceUtils.isGlobalProject(dataSourceContainer.getProject())) {
             // Do not flush config for global project (only admin can do it - CB-2415)
@@ -461,12 +464,21 @@ public class WebServiceCore implements DBWServiceCore {
                 throw new DBException("Node '" + nodePath + "' is not a datasource node");
             }
             DBPDataSourceContainer dataSourceTemplate = dbnDataSource.getDataSourceContainer();
+            if (!dataSourceTemplate.isExternallyProvided()) {
+                if (!CommonUtils.equalObjects(dataSourceTemplate.getProject(), project)) {
+                    throw new DBException("Copying connection to another project is not allowed");
+                }
+            }
 
             DataSourceDescriptor newDataSource = dataSourceRegistry.createDataSource(dataSourceTemplate);
 
             ServletApplication app = ServletAppUtils.getServletApplication();
             if (app instanceof WebApplication webApplication) {
-                newDataSource.setNavigatorSettings(webApplication.getAppConfiguration().getDefaultNavigatorSettings());
+                newDataSource.setNavigatorSettings(
+                    dataSourceTemplate.isExternallyProvided() ?
+                        webApplication.getAppConfiguration().getDefaultNavigatorSettings() :
+                        dataSourceTemplate.getNavigatorSettings().getOriginalSettings()
+                );
             }
 
             WebConnectionConfig config = project.getConnectionConfigInput(connectionConfig);
@@ -720,12 +732,42 @@ public class WebServiceCore implements DBWServiceCore {
 
     @Override
     public WebConnectionInfo setConnectionNavigatorSettings(
-        WebSession webSession, @Nullable String projectId, String id, DBNBrowseSettings settings
+        @NotNull WebSession webSession,
+        @Nullable String projectId,
+        @NotNull String id,
+        @NotNull DataSourceNavigatorSettings settings
+    ) throws DBWebException {
+        WebSessionProjectImpl project = webSession.getProjectById(projectId);
+        WebConnectionInfo connectionInfo = project != null ? project.getWebConnectionInfo(id) :
+            WebDataSourceUtils.getWebConnectionInfo(webSession, projectId, id);
+        DataSourceDescriptor dataSourceDescriptor = ((DataSourceDescriptor) connectionInfo.getDataSourceContainer());
+        try {
+            if (project != null && !project.isPrivateProject() && settings.isUserSettings()) {
+                DataSourceNavigatorSettingsUtils.updateCustomNavigatorSettings(dataSourceDescriptor, settings);
+            } else {
+                // If user has no permissions to save it will cause error
+                dataSourceDescriptor.setNavigatorSettings(settings);
+                dataSourceDescriptor.persistConfiguration();
+            }
+        } catch (DBException e) {
+            throw new DBWebException("Error saving custom navigator settings", e);
+        }
+        return connectionInfo;
+    }
+
+    @Override
+    public WebConnectionInfo clearConnectionNavigatorSettings(
+        @NotNull WebSession webSession,
+        @NotNull String projectId,
+        @NotNull String id
     ) throws DBWebException {
         WebConnectionInfo connectionInfo = WebDataSourceUtils.getWebConnectionInfo(webSession, projectId, id);
         DataSourceDescriptor dataSourceDescriptor = ((DataSourceDescriptor) connectionInfo.getDataSourceContainer());
-        dataSourceDescriptor.setNavigatorSettings(settings);
-        dataSourceDescriptor.persistConfiguration();
+        try {
+            DataSourceNavigatorSettingsUtils.clearCustomNavigatorSettings(dataSourceDescriptor);
+        } catch (DBException e) {
+            throw new DBWebException("Error deleting custom navigator settings", e);
+        }
         return connectionInfo;
     }
 

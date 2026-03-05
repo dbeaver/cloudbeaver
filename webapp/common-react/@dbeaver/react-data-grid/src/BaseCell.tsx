@@ -18,7 +18,7 @@ export const BaseCell = memo(function BaseCell<TRow, TSummaryRow>(props: CellRen
   const cellContext = use(DataGridCellContext);
   const dndContext = use(HeaderDnDContext)!;
   const virtualColIdx = props.column.idx;
-  const dataColIdx = dndContext.getDataColIdx(props.column.idx);
+  const dataColIdx = dndContext.getDataColIdxByKey(props.column.key);
   const rowIdx = props.rowIdx;
   const tooltip = useGridReactiveValue(cellContext?.cellTooltip, rowIdx, dataColIdx);
 

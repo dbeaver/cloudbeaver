@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2025 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -294,19 +294,34 @@ public class ServletAppUtils {
     @NotNull
     public static String getOriginFromRequest(@NotNull HttpServletRequest request) {
         String origin = request.getHeader(HEADER_ORIGIN);
+        if (log.isTraceEnabled()) {
+            log.trace("Origin header: " + origin);
+        }
         if (CommonUtils.isEmpty(origin)) {
             origin = request.getHeader(HEADER_X_ORIGIN);
+            if (log.isTraceEnabled()) {
+                log.trace("X-Origin header: " + origin);
+            }
         }
         if (CommonUtils.isEmpty(origin)) {
             origin = request.getHeader(HEADER_REFERER);
+            if (log.isTraceEnabled()) {
+                log.trace("Referer header: " + origin);
+            }
         }
         String forwardedScheme = request.getHeader(HEADER_FORWARDED_SCHEME);
         String forwardedHost = request.getHeader(HEADER_FORWARDED_HOST);
         if (CommonUtils.isNotEmpty(forwardedScheme) && CommonUtils.isNotEmpty(forwardedHost)) {
             origin = forwardedScheme + "://" + forwardedHost;
+            if (log.isTraceEnabled()) {
+                log.trace("forwarded origin: " + origin);
+            }
         }
         if (CommonUtils.isEmpty(origin)) {
             URI requestUrl = URI.create(request.getRequestURL().toString());
+            if (log.isTraceEnabled()) {
+                log.trace("Request URL: " + requestUrl);
+            }
             origin = getRootUrlFromUri(requestUrl) + "/";
         }
         origin = removeSideSlashes(origin);
@@ -332,6 +347,9 @@ public class ServletAppUtils {
             } catch (URISyntaxException e) {
                 log.error("Failed to create URI without port", e);
             }
+        }
+        if (log.isTraceEnabled()) {
+            log.trace("Origin URI: " + origin);
         }
 
         return origin;

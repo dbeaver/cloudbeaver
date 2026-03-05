@@ -57,6 +57,7 @@ public abstract class BaseWebPlatform extends BaseServletPlatform {
         this.queryManager.registerMetaListener(qmLogWriter);
 
         this.certificateStorage = new DefaultCertificateStorage(
+            this,
             WebPlatformActivator.getInstance()
                 .getStateLocation()
                 .toFile()

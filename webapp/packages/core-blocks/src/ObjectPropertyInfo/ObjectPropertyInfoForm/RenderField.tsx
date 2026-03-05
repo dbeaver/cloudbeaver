@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -10,10 +10,12 @@ import { observer } from 'mobx-react-lite';
 import {
   ConditionType,
   getObjectPropertyDefaultValue,
+  getObjectPropertyOptionName,
+  getObjectPropertyOptionValue,
   getObjectPropertyType,
   getObjectPropertyValue,
   getObjectPropertyValueType,
-  type ObjectPropertyInfo,
+  type IObjectPropertyInfo,
 } from '@cloudbeaver/core-sdk';
 import { EMPTY_ARRAY, removeMetadataFromDataURL } from '@cloudbeaver/core-utils';
 
@@ -27,9 +29,10 @@ import { Textarea } from '../../FormControls/Textarea.js';
 import { Link } from '../../Link.js';
 import { useTranslate } from '../../localization/useTranslate.js';
 import { evaluate } from '../evaluate.js';
+import { SAVED_VALUE_INDICATOR } from '../../SAVED_VALUE_INDICATOR.js';
 
 interface RenderFieldProps {
-  property: ObjectPropertyInfo;
+  property: IObjectPropertyInfo;
   state?: Record<string, any>;
   context?: Record<string, any>;
   defaultState?: Record<string, any>;
@@ -90,7 +93,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
   if (controlType === 'link') {
     return (
       <FormFieldDescription label={property.displayName} className={className}>
-        <Link href={state?.[property.id!]} target="_blank" rel="noopener noreferrer">
+        <Link href={state?.[property.id!] ?? value} target="_blank" rel="noopener noreferrer">
           {property.description}
         </Link>
       </FormFieldDescription>
@@ -103,7 +106,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
     }
     return (
       <FormFieldDescription title={property.description} label={property.displayName} className={className}>
-        {state?.[property.id!]}
+        {state?.[property.id!] ?? value}
       </FormFieldDescription>
     );
   }
@@ -142,6 +145,10 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
     );
   }
 
+  const passwordSaved = showRememberTip && ((isPassword && !!property.value) || saved);
+  const passwordSavedMessage = passwordSaved ? translate('core_blocks_object_property_info_password_saved') : undefined;
+  const placeholder = passwordSavedMessage || property.description;
+
   if (controlType === 'selector') {
     if (state !== undefined) {
       return (
@@ -150,10 +157,11 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
           name={property.id!}
           state={state}
           items={property.validValues!}
-          keySelector={value => value}
-          valueSelector={value => value}
-          titleSelector={value => value}
+          keySelector={getObjectPropertyOptionValue}
+          valueSelector={getObjectPropertyOptionName}
+          titleSelector={getObjectPropertyOptionName}
           defaultValue={defaultValue}
+          placeholder={placeholder}
           title={property.description}
           disabled={disabled}
           readOnly={readonly}
@@ -170,10 +178,11 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
         required={required}
         name={property.id!}
         items={property.validValues!}
-        keySelector={value => value}
-        valueSelector={value => value}
-        titleSelector={value => value}
+        keySelector={getObjectPropertyOptionValue}
+        valueSelector={getObjectPropertyOptionName}
+        titleSelector={getObjectPropertyOptionName}
         defaultValue={defaultValue}
+        placeholder={placeholder}
         title={property.description}
         disabled={disabled}
         readOnly={readonly}
@@ -184,9 +193,6 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
       </Select>
     );
   }
-
-  const passwordSaved = showRememberTip && ((isPassword && !!property.value) || saved);
-  const passwordSavedMessage = passwordSaved ? translate('core_blocks_object_property_info_password_saved') : undefined;
 
   if (controlType === 'file' && state) {
     return (
@@ -213,7 +219,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
           required={required}
           title={state[property.id!]}
           labelTooltip={property.description || property.displayName}
-          placeholder={passwordSavedMessage}
+          placeholder={placeholder}
           name={property.id!}
           state={state}
           disabled={disabled}
@@ -230,7 +236,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
         required={required}
         title={value}
         labelTooltip={property.description || property.displayName}
-        placeholder={passwordSavedMessage}
+        placeholder={placeholder}
         name={property.id!}
         value={value}
         readOnly={readonly || disabled}
@@ -253,11 +259,11 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
         defaultState={defaultState || { [property.id!]: defaultValue }}
         autoHide={autoHide}
         description={hint}
-        placeholder={passwordSavedMessage}
+        placeholder={placeholder}
         readOnly={readonly || disabled}
         autoComplete={autocomplete}
         className={className}
-        canShowPassword={canShowPassword}
+        canShowPassword={!!property.id && state[property.id] !== SAVED_VALUE_INDICATOR && canShowPassword}
         onFocus={onFocus}
       >
         {property.displayName}
@@ -275,11 +281,11 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
       value={value}
       defaultValue={defaultValue}
       description={hint}
-      placeholder={passwordSavedMessage}
+      placeholder={placeholder}
       readOnly={readonly || disabled}
       autoComplete={autocomplete}
       className={className}
-      canShowPassword={canShowPassword}
+      canShowPassword={value !== SAVED_VALUE_INDICATOR && canShowPassword}
       onFocus={onFocus}
     >
       {property.displayName}

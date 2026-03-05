@@ -39,7 +39,10 @@ import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
-import org.jkiss.dbeaver.model.navigator.*;
+import org.jkiss.dbeaver.model.navigator.DBNContainer;
+import org.jkiss.dbeaver.model.navigator.DBNDataSource;
+import org.jkiss.dbeaver.model.navigator.DBNNode;
+import org.jkiss.dbeaver.model.navigator.DBNProject;
 import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
 import org.jkiss.dbeaver.model.rm.RMProjectType;
 import org.jkiss.dbeaver.registry.DataSourceNavigatorSettings;
@@ -68,7 +71,7 @@ public class WebServiceUtils extends WebCommonUtils {
         return WebServiceUtils.class.getClassLoader().getResourceAsStream(path);
     }
 
-    public static DBNBrowseSettings parseNavigatorSettings(Map<String, Object> settingsMap) {
+    public static DataSourceNavigatorSettings parseNavigatorSettings(Map<String, Object> settingsMap) {
         return gson.fromJson(
             gson.toJsonTree(settingsMap), DataSourceNavigatorSettings.class);
     }

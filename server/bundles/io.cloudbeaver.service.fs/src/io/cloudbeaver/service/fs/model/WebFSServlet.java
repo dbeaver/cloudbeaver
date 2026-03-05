@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package io.cloudbeaver.service.fs.model;
 
 import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.DBWebException;
-import io.cloudbeaver.model.fs.FSUtils;
+import io.cloudbeaver.model.fs.WebFSUtils;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.service.WebServiceServletBase;
@@ -28,13 +28,14 @@ import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.Part;
-import org.eclipse.jetty.ee10.servlet.ServletContextRequest;
+import org.eclipse.jetty.ee11.servlet.ServletContextRequest;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.navigator.fs.DBNPathBase;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.CommonUtils;
+import org.jkiss.utils.HttpConstants;
 import org.jkiss.utils.IOUtils;
 
 import java.io.IOException;
@@ -74,9 +75,9 @@ public class WebFSServlet extends WebServiceServletBase {
     }
 
     private void doGet(WebSession session, HttpServletRequest request, HttpServletResponse response) throws DBException, IOException {
-        Path path = FSUtils.getPathFromNode(session, request.getParameter("nodePath"));
+        Path path = WebFSUtils.getPathFromNode(session, request.getParameter("nodePath"));
         session.addInfoMessage("Download data ...");
-        response.setHeader("Content-Type", "application/octet-stream");
+        response.setHeader(HttpConstants.HEADER_CONTENT_TYPE, "application/octet-stream");
         response.setHeader("Content-Disposition", "attachment; filename=\"" + path.getFileName() + "\"");
         response.setHeader("Content-Length", String.valueOf(Files.size(path)));
 
@@ -93,7 +94,7 @@ public class WebFSServlet extends WebServiceServletBase {
         if (CommonUtils.isEmpty(parentNodePath)) {
             throw new DBException("Parent node path parameter is not found");
         }
-        DBNPathBase node = FSUtils.getNodeByPath(session, parentNodePath);
+        DBNPathBase node = WebFSUtils.getNodeByPath(session, parentNodePath);
         Path path = node.getPath();
         try {
             for (Part part : request.getParts()) {

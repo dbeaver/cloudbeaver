@@ -24,53 +24,46 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.DBPAdaptable;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
+import org.jkiss.dbeaver.model.DBPObjectSettingsProvider;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistryCache;
 import org.jkiss.dbeaver.model.navigator.DBNModel;
 import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.rm.RMUtils;
+import org.jkiss.dbeaver.model.security.SMControllerUtils;
 import org.jkiss.dbeaver.model.security.SMObjectType;
 import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceEvent;
 import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceProperty;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
 import org.jkiss.dbeaver.registry.DataSourceRegistry;
+import org.jkiss.dbeaver.registry.project.BaseProjectSettings;
 import org.jkiss.dbeaver.runtime.jobs.DisconnectJob;
 import org.jkiss.utils.CommonUtils;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.*;
 
-public class WebSessionProjectImpl extends WebProjectImpl {
+public class WebSessionProjectImpl extends WebProjectImpl implements DBPAdaptable {
     private static final Log log = Log.getLog(WebSessionProjectImpl.class);
+
     protected final WebSession webSession;
     private final Map<String, WebConnectionInfo> connections = new HashMap<>();
-    private final Map<String, Object> projectSettings = new ConcurrentHashMap<>();
+    private final BaseProjectSettings projectSettings;
     private boolean registryIsLoaded = false;
 
     public WebSessionProjectImpl(
         @NotNull WebSession webSession,
         @NotNull RMProject project
     ) {
-        super(
-            webSession.getWorkspace(),
-            webSession.getRmController(),
-            webSession.getSessionContext(),
-            project,
-            webSession.getUserPreferenceStore(),
-            RMUtils.getProjectPath(project)
-        );
-        this.webSession = webSession;
+        this(webSession, project, null);
     }
 
     public WebSessionProjectImpl(
         @NotNull WebSession webSession,
         @NotNull RMProject project,
-        @NotNull Path path
+        @Nullable Path path
     ) {
         super(
             webSession.getWorkspace(),
@@ -78,15 +71,50 @@ public class WebSessionProjectImpl extends WebProjectImpl {
             webSession.getSessionContext(),
             project,
             webSession.getUserPreferenceStore(),
-            path
+            path == null ? RMUtils.getProjectPath(project) : path
         );
         this.webSession = webSession;
+        this.projectSettings = new BaseProjectSettings(this) {
+            @NotNull
+            @Override
+            protected Map<SMObjectType, Map<String, Map<String, String>>> loadAllProjectSettings() throws DBException {
+                if (webSession.getUser() == null) {
+                    return new LinkedHashMap<>();
+                }
+                return SMControllerUtils.getObjectSettingsMap(WebSessionProjectImpl.this, webSession.getSecurityController());
+            }
+
+            @Override
+            protected void saveProjectSettings(
+                @NotNull SMObjectType objectType,
+                @NotNull String objectId,
+                @NotNull Map<String, String> settings
+            ) throws DBException {
+                if (webSession.getUserContext().isNonAnonymousUserAuthorizedInSM()) {
+                    webSession.getSecurityController().setObjectSettings(getId(), objectType, objectId, settings);
+                }
+            }
+
+        };
+    }
+
+    @NotNull
+    public BaseProjectSettings getProjectSettings() {
+        return projectSettings;
     }
 
     @Nullable
     @Override
     public DBNModel getNavigatorModel() {
         return webSession.getNavigatorModel();
+    }
+
+    @Override
+    public <T> T getAdapter(@NotNull Class<T> adapter) {
+        if (adapter == DBPObjectSettingsProvider.class) {
+            return adapter.cast(projectSettings);
+        }
+        return null;
     }
 
     @NotNull
@@ -190,6 +218,7 @@ public class WebSessionProjectImpl extends WebProjectImpl {
      *
      * @return connections from cache.
      */
+    @NotNull
     public List<WebConnectionInfo> getConnections() {
         if (!registryIsLoaded) {
             addDataSourcesToCache();
@@ -242,21 +271,6 @@ public class WebSessionProjectImpl extends WebProjectImpl {
             }
         }
         return sendDataSourceUpdatedEvent;
-    }
-
-    // TODO: load project settings on project load
-    public void refreshProjectSettings() throws DBException {
-        if (webSession.getUser() == null) {
-            projectSettings.clear();
-            return;
-        }
-        Map<String, Object> loadedSettings = webSession.getSecurityController().getObjectSettings(
-            getId(),
-            SMObjectType.project,
-            null
-        );
-        projectSettings.clear();
-        projectSettings.putAll(loadedSettings);
     }
 
     @NotNull
@@ -331,19 +345,9 @@ public class WebSessionProjectImpl extends WebProjectImpl {
     @NotNull
     private WebConnectionInfo closeAndDeleteConnection(@NotNull WebConnectionInfo connectionInfo) throws DBWebException {
         DBPDataSourceContainer dataSourceContainer = connectionInfo.getDataSourceContainer();
-        boolean disconnected = WebDataSourceUtils.disconnectDataSource(webSession, dataSourceContainer);
+        WebDataSourceUtils.disconnectDataSource(webSession, dataSourceContainer);
         DBPDataSourceRegistry registry = getDataSourceRegistry();
         registry.removeDataSource(dataSourceContainer);
-        try {
-            registry.checkForErrors();
-        } catch (DBException e) {
-            try {
-                registry.addDataSource(dataSourceContainer);
-            } catch (DBException ex) {
-                log.error("Error re-adding after delete attempt", e);
-            }
-            throw new DBWebException("Failed to delete connection", e);
-        }
         removeConnection(dataSourceContainer);
         return connectionInfo;
     }

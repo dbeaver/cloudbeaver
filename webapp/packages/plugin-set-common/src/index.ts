@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -39,6 +39,7 @@ import coreVersionUpdate from '@cloudbeaver/core-version-update/module';
 import coreSupport from '@cloudbeaver/core-support/module';
 import coreView from '@cloudbeaver/core-view/module';
 import coreServerNotifications from '@cloudbeaver/core-server-notifications/module';
+import coreSessionActions from '@cloudbeaver/core-session-actions/module';
 
 import pluginAdministration from '@cloudbeaver/plugin-administration/module';
 import pluginAppLogo from '@cloudbeaver/plugin-app-logo/module';
@@ -108,6 +109,8 @@ import pluginCodemirror6 from '@cloudbeaver/plugin-codemirror6/module';
 import pluginAsyncTaskConfirmation from '@cloudbeaver/plugin-async-task-confirmation/module';
 import pluginSqlAsyncTaskConfirmation from '@cloudbeaver/plugin-sql-async-task-confirmation/module';
 import pluginDataViewerConditionalFormatting from '@cloudbeaver/plugin-data-viewer-conditional-formatting/module';
+import pluginConnectionView from '@cloudbeaver/plugin-connection-view/module';
+import pluginConnectionPreferences from '@cloudbeaver/plugin-connection-preferences/module';
 
 const core = [
   coreRouting, // important, should be first because the router starts in load phase first after all plugins register phase
@@ -143,6 +146,7 @@ const core = [
   coreSettingsUser,
   coreTaskManager,
   coreServerNotifications,
+  coreSessionActions,
 ];
 
 export const commonSet = [
@@ -215,4 +219,6 @@ export const commonSet = [
   pluginAsyncTaskConfirmation,
   pluginSqlAsyncTaskConfirmation,
   pluginDataViewerConditionalFormatting,
+  pluginConnectionView,
+  pluginConnectionPreferences,
 ];

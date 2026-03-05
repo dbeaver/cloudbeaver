@@ -15,6 +15,7 @@
   "devDependencies": {
     "@cloudbeaver/tsconfig": "workspace:*",
     "@storybook/addon-docs": "^10",
+    "@storybook/addon-storysource": "^8",
     "@storybook/react-vite": "^10",
     "@tailwindcss/vite": "4.0.7",
     "@types/node": "^22",
@@ -23,7 +24,7 @@
     "@vitejs/plugin-react": "^5",
     "@wroud/vite-plugin-asset-resolver": "^0",
     "@wroud/vite-plugin-tsc": "^0",
-    "globals": "^16",
+    "globals": "^17",
     "storybook": "^10",
     "tailwindcss": "4.0.7",
     "typescript": "^5",

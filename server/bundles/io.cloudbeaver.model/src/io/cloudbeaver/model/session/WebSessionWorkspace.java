@@ -19,9 +19,12 @@ package io.cloudbeaver.model.session;
 import io.cloudbeaver.WebSessionProjectImpl;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
+import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPAdaptable;
 import org.jkiss.dbeaver.model.DBPImage;
 import org.jkiss.dbeaver.model.app.DBPPlatform;
+import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.app.DBPWorkspace;
 import org.jkiss.dbeaver.model.impl.auth.SessionContextImpl;
 import org.jkiss.dbeaver.model.rm.RMUtils;
@@ -36,6 +39,7 @@ import java.util.List;
  * Web workspace
  */
 public class WebSessionWorkspace implements DBPWorkspace {
+    private static final Log log = Log.getLog(WebSessionWorkspace.class);
 
     private final BaseWebSession session;
     private final SessionContextImpl workspaceAuthContext;
@@ -87,7 +91,9 @@ public class WebSessionWorkspace implements DBPWorkspace {
     @NotNull
     @Override
     public List<WebSessionProjectImpl> getProjects() {
-        return accessibleProjects;
+        synchronized (accessibleProjects) {
+            return new ArrayList<>(accessibleProjects);
+        }
     }
 
     @Nullable
@@ -99,26 +105,30 @@ public class WebSessionWorkspace implements DBPWorkspace {
     @Nullable
     @Override
     public WebSessionProjectImpl getProject(@NotNull String projectName) {
-        for (WebSessionProjectImpl project : accessibleProjects) {
-            if (project.getName().equals(projectName)) {
-                return project;
+        synchronized (accessibleProjects) {
+            for (WebSessionProjectImpl project : accessibleProjects) {
+                if (project.getName().equals(projectName)) {
+                    return project;
+                }
             }
         }
+        log.error("Project name '" + projectName + "' not found in session workspace");
         return null;
     }
 
     @Nullable
     @Override
-    public WebSessionProjectImpl getProjectById(@Nullable String projectId) {
-        if (projectId == null) {
-            return activeProject;
-        }
-        for (WebSessionProjectImpl project : accessibleProjects) {
-            if (project.getId().equals(projectId)) {
-                return project;
+    public WebSessionProjectImpl getProjectById(@NotNull String projectId) {
+        synchronized (accessibleProjects) {
+            for (WebSessionProjectImpl project : accessibleProjects) {
+                if (project.getId().equals(projectId)) {
+                    return project;
+                }
             }
         }
-        return null;
+        log.error("Project ID '" + projectId + "' not found in session workspace");
+        // FIXME: return null here
+        return activeProject;
     }
 
     @NotNull
@@ -143,25 +153,47 @@ public class WebSessionWorkspace implements DBPWorkspace {
         return null;
     }
 
-    public void setActiveProject(WebSessionProjectImpl activeProject) {
+    @NotNull
+    @Override
+    public WebSessionProjectImpl createProject(@NotNull String name, @Nullable String description) throws DBException {
+        throw new DBException("Project creation is not supported in web session workspace");
+    }
+
+    @Override
+    public void deleteProject(@NotNull DBPProject project) throws DBException {
+        throw new DBException("Project removing is not supported in web session workspace");
+    }
+
+    @Override
+    public void renameProject(@NotNull DBPProject project, @NotNull String newName) throws DBException {
+        throw new DBException("Project renaming is not supported in web session workspace");
+    }
+
+    public void setActiveProject(@NotNull WebSessionProjectImpl activeProject) {
         this.activeProject = activeProject;
     }
 
-    void addProject(WebSessionProjectImpl project) {
-        accessibleProjects.add(project);
+    void addProject(@NotNull WebSessionProjectImpl project) {
+        synchronized (accessibleProjects) {
+            accessibleProjects.add(project);
+        }
     }
 
-    void removeProject(WebSessionProjectImpl project) {
-        accessibleProjects.remove(project);
+    void removeProject(@NotNull WebSessionProjectImpl project) {
+        synchronized (accessibleProjects) {
+            accessibleProjects.remove(project);
+        }
     }
 
     void clearProjects() {
-        if (!this.accessibleProjects.isEmpty()) {
-            for (WebSessionProjectImpl project : accessibleProjects) {
-                project.dispose();
+        synchronized (accessibleProjects) {
+            if (!this.accessibleProjects.isEmpty()) {
+                for (WebSessionProjectImpl project : accessibleProjects) {
+                    project.dispose();
+                }
+                this.activeProject = null;
+                this.accessibleProjects.clear();
             }
-            this.activeProject = null;
-            this.accessibleProjects.clear();
         }
     }
 

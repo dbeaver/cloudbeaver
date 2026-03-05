@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -8,7 +8,7 @@
 import { action, computed, observable } from 'mobx';
 
 import { type AdminUser, compareUsers, compareNewUsers, UsersResource, UsersResourceFilterKey } from '@cloudbeaver/core-authentication';
-import { TableState, useObservableRef, useOffsetPagination, useResource } from '@cloudbeaver/core-blocks';
+import { TableState, useExecutor, useObservableRef, useOffsetPagination, useResource } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { type ILoadableState, isArraysEqual } from '@cloudbeaver/core-utils';
@@ -25,14 +25,23 @@ interface State {
 }
 
 export function useUsersTable(filters: IUserFilters) {
-  const usersResource = useService(UsersResource);
   const searchFilter = filters.search.trim().toLowerCase();
   const enabledStateFilter = filters.status === 'true' ? true : filters.status === 'false' ? false : undefined;
   const pagination = useOffsetPagination(UsersResource, {
     key: UsersResourceFilterKey(searchFilter, enabledStateFilter),
   });
-  const usersLoader = useResource(useUsersTable, usersResource, pagination.currentPage);
+
+  const usersLoader = useResource(useUsersTable, UsersResource, pagination.currentPage);
   const notificationService = useService(NotificationService);
+
+  useExecutor({
+    executor: usersLoader.resource.onUserCreate, handlers: [
+      function handleUserCreation() {
+        pagination.refresh();
+      },
+    ],
+  });
+
 
   const state: State = useObservableRef(
     () => ({
@@ -47,8 +56,8 @@ export function useUsersTable(filters: IUserFilters) {
         return filters.filterUsers(
           Array.from(
             new Set([
-              ...this.usersLoader.resource.get(UsersResourceFilterKey(searchFilter, enabledStateFilter)),
-              ...usersResource.get(pagination.allPages),
+              ...(this.searchFilter ? this.usersLoader.resource.get(UsersResourceFilterKey(this.searchFilter, this.enabledStateFilter)) : []),
+              ...usersLoader.resource.get(pagination.allPages),
             ]),
           )
             .filter(isDefined)
@@ -69,13 +78,15 @@ export function useUsersTable(filters: IUserFilters) {
       },
     }),
     {
+      searchFilter: observable.ref,
+      enabledStateFilter: observable.ref,
       usersLoader: observable.ref,
       loadableState: observable.ref,
       users: computed<AdminUser[]>({ equals: (first, second) => isArraysEqual(first, second, undefined, true) }),
       update: action.bound,
       loadMore: action.bound,
     },
-    { usersLoader, loadableState: usersLoader },
+    { searchFilter, enabledStateFilter, usersLoader, loadableState: usersLoader },
   );
 
   return state;

@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@ import {
   IDatabaseDataViewAction,
   isBooleanValuePresentationAvailable,
   isResultSetDataSource,
+  KEY_BINDING_DELETE_ROW,
   ResultSetDataContentAction,
   type IDatabaseValueHolder,
   type IGridDataKey,
@@ -63,6 +64,7 @@ export class DataGridContextMenuCellEditingService {
       isApplicable: context => {
         const model = context.get(DATA_CONTEXT_DV_DDM)!;
         const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
+        // TODO add more proper way to define to what features it should be added https://github.com/dbeaver/pro/issues/8299
         return isResultSetDataSource(model.source) && !model.isDisabled(resultIndex) && !model.isReadonly(resultIndex);
       },
       getItems: (context, items) => [...items, MENU_DATA_GRID_EDITING],
@@ -107,6 +109,7 @@ export class DataGridContextMenuCellEditingService {
         // If we somehow added a new row, we can always edit it
         const canEdit = editor.getElementState(key) === DatabaseEditChangeType.add;
 
+        // TODO add more proper way to define to what features it should be added https://github.com/dbeaver/pro/issues/8299
         if (model.isReadonly(resultIndex)) {
           return false;
         }
@@ -219,6 +222,14 @@ export class DataGridContextMenuCellEditingService {
 
     if (action === ACTION_EDIT) {
       return { ...action.info, label: t('data_grid_table_editing_open_inline_editor'), icon: 'edit' };
+    }
+
+    if (action === ACTION_DATA_GRID_EDITING_DELETE_ROW) {
+      return {
+        ...action.info,
+        label: t('data_grid_table_editing_row_delete'),
+        tooltip: t('data_grid_table_editing_row_delete') + ' (' + getBindingLabel(KEY_BINDING_DELETE_ROW) + ')',
+      };
     }
 
     return action.info;

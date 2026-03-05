@@ -60,6 +60,15 @@ export function useTableColumnDnD(model: IDatabaseDataModel, resultIndex: number
 
       if (columnKey && dndColumnKey && resultSetViewAction) {
         resultSetViewAction.setColumnOrder(dndColumnKey, resultSetViewAction.columnIndex(columnKey));
+
+        const isFromPinned = resultSetViewAction.isColumnPinned(dndColumnKey);
+        const isToPinned = resultSetViewAction.isColumnPinned(columnKey);
+
+        if (isFromPinned && !isToPinned) {
+          resultSetViewAction.unpinColumn(dndColumnKey);
+        } else if (!isFromPinned && isToPinned) {
+          resultSetViewAction.pinColumn(dndColumnKey);
+        }
       }
     },
   });

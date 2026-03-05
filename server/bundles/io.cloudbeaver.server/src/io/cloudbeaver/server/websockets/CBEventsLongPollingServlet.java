@@ -22,7 +22,6 @@ import io.cloudbeaver.server.CBConstants;
 import io.cloudbeaver.server.WebAppSessionManager;
 import io.cloudbeaver.server.WebAppUtils;
 import io.cloudbeaver.utils.ServletAppUtils;
-import io.cloudbeaver.websocket.event.client.WSSessionPingClientEvent;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -51,7 +50,6 @@ public class CBEventsLongPollingServlet extends HttpServlet {
 
     private static final Log log = Log.getLog(CBEventsLongPollingServlet.class);
 
-    private static final String PING = WSUtils.clientGson.toJson(new WSSessionPingClientEvent("cb_session"));
     private static final int POLL_TIMEOUT_SEC = 25;
     private static final int SESSION_IDLE_TIMEOUT_SEC = 60;
 
@@ -86,8 +84,7 @@ public class CBEventsLongPollingServlet extends HttpServlet {
             }
 
             CBEventsLongPolling ps = getOrCreatePollSession(ws);
-            ps.onMessage(PING);
-
+            ps.onPoll();
 
             List<WSEvent> events = ps.pollEvents(POLL_TIMEOUT_SEC);
 
@@ -96,7 +93,7 @@ public class CBEventsLongPollingServlet extends HttpServlet {
                 return;
             }
 
-            resp.setContentType(CBConstants.APPLICATION_JSON);
+            resp.setContentType(HttpConstants.CONTENT_TYPE_JSON);
             WSUtils.clientGson.toJson(Map.of("events", events), resp.getWriter());
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
@@ -115,6 +112,7 @@ public class CBEventsLongPollingServlet extends HttpServlet {
         }
 
         CBEventsLongPolling ps = getOrCreatePollSession(ws);
+        ps.onUserActivity();
 
         String json = new String(req.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
         if (CommonUtils.isEmpty(json)) {
@@ -222,7 +220,6 @@ public class CBEventsLongPollingServlet extends HttpServlet {
 
         return sessions.compute(sid, (key, existing) -> {
             if (existing != null) {
-                existing.touch();
                 return existing;
             }
 
@@ -242,7 +239,7 @@ public class CBEventsLongPollingServlet extends HttpServlet {
     ) {
         try {
             resp.setStatus(status);
-            resp.setContentType(CBConstants.APPLICATION_JSON);
+            resp.setContentType(HttpConstants.CONTENT_TYPE_JSON);
 
             Map<String, Object> error = Map.of(
                 "error", message,

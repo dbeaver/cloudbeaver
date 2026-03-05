@@ -28,12 +28,13 @@ import io.cloudbeaver.model.cli.CloudBeaverInstanceServer;
 import io.cloudbeaver.model.config.CBAppConfig;
 import io.cloudbeaver.model.config.CBServerConfig;
 import io.cloudbeaver.registry.WebDriverRegistry;
-import io.cloudbeaver.registry.WebFeatureRegistry;
 import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.server.jetty.CBJettyServer;
 import io.cloudbeaver.service.DBWServiceInitializer;
 import io.cloudbeaver.service.DBWServiceServerConfigurator;
+import io.cloudbeaver.service.security.CBEmbeddedSecurityController;
 import io.cloudbeaver.service.session.CBSessionManager;
+import io.cloudbeaver.utils.ServletAppUtils;
 import io.cloudbeaver.utils.WebDataSourceUtils;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.osgi.service.datalocation.Location;
@@ -86,8 +87,6 @@ public abstract class CBApplication<T extends CBServerConfig>
      */
     private static final long CONFIGURATION_MODE_SESSION_IDLE_TIME = 60 * 60 * 1000 * 24 * 7;
 
-    private CloudBeaverInstanceServer instanceServer;
-
     static {
         Log.setDefaultDebugStream(System.out);
     }
@@ -118,11 +117,6 @@ public abstract class CBApplication<T extends CBServerConfig>
 
     public CBApplication() {
         this.homeDirectory = new File(initHomeFolder());
-    }
-
-    @Nullable
-    public String getServerURL() {
-        return getServerConfiguration().getServerURL();
     }
 
     // Port this server listens on. If set the 0 a random port is assigned which may be obtained with getLocalPort()
@@ -207,7 +201,7 @@ public abstract class CBApplication<T extends CBServerConfig>
     @Override
     protected void startServer() {
         try {
-            this.instanceServer = createInstanceServer();
+            createInstanceServer();
         } catch (Exception e) {
             log.error("Error initializing instance server", e);
         }
@@ -225,13 +219,6 @@ public abstract class CBApplication<T extends CBServerConfig>
         }
 
         configurationMode = CommonUtils.isEmpty(getServerConfiguration().getServerName());
-
-        try {
-            refreshServerConfiguration();
-        } catch (DBException e) {
-            log.error("Error refreshing server configuration", e);
-            return;
-        }
 
         eventController.setForceSkipEvents(isConfigurationMode()); // do not send events if configuration mode is on
 
@@ -267,9 +254,6 @@ public abstract class CBApplication<T extends CBServerConfig>
         //log.debug("\tProduct details: " + application.getInfoDetails());
         log.debug("\tListen port: " + getServerPort() + (CommonUtils.isEmpty(getServerHost()) ? " on all interfaces" : " on " + getServerHost()));
         log.debug("\tBase URI: " + getServicesURI());
-        if (!isConfigurationMode()) {
-            log.debug("\tGlobal access server URL: " + getServerConfiguration().getServerURL());
-        }
         if (isDevelMode()) {
             log.debug("\tDevelopment mode");
         } else {
@@ -282,7 +266,8 @@ public abstract class CBApplication<T extends CBServerConfig>
             determineLocalAddresses();
             log.debug("\tLocal host addresses:");
             for (InetAddress ia : localInetAddresses) {
-                log.debug("\t\t" + ia.getHostAddress() + " (" + ia.getCanonicalHostName() + ")");
+                log.debug("\t\t" + ia.getHostAddress() +
+                    (Objects.equals(ia.getHostAddress(), ia.getCanonicalHostName()) ? "" : (" (" + ia.getCanonicalHostName() + ")")));
             }
         }
         {
@@ -301,7 +286,8 @@ public abstract class CBApplication<T extends CBServerConfig>
         try {
             initializeServer();
         } catch (DBException e) {
-            log.error("Error initializing server", e);
+            log.error("Error initializing " + systemInformationCollector.getProductName(), e);
+            shutdown();
             return;
         }
 
@@ -309,6 +295,7 @@ public abstract class CBApplication<T extends CBServerConfig>
             initializeSecurityController();
         } catch (Exception e) {
             log.error("Error initializing database", e);
+            shutdown();
             return;
         }
 
@@ -343,7 +330,7 @@ public abstract class CBApplication<T extends CBServerConfig>
         Set<String> enabledFeatures = new LinkedHashSet<>(Arrays.asList(getAppConfiguration().getEnabledFeatures()));
         Set<String> disabledFeatures = new LinkedHashSet<>(Arrays.asList(getAppConfiguration().getDisabledFeatures()));
 
-        WebFeatureRegistry.getInstance().getWebFeatures().stream()
+        ServletAppUtils.getServletApplication().getFeatureRegistry().getWebFeatures().stream()
             .filter(f -> f.isEnabledByDefault() && !disabledFeatures.contains(f.getId()))
             .forEach(f -> enabledFeatures.add(f.getId()));
 
@@ -361,7 +348,6 @@ public abstract class CBApplication<T extends CBServerConfig>
      */
     protected void performAutoConfiguration(Path configPath) {
         String autoServerName = System.getenv(CBConstants.VAR_AUTO_CB_SERVER_NAME);
-        String autoServerURL = System.getenv(CBConstants.VAR_AUTO_CB_SERVER_URL);
         String autoAdminName = System.getenv(CBConstants.VAR_AUTO_CB_ADMIN_NAME);
         String autoAdminPassword = System.getenv(CBConstants.VAR_AUTO_CB_ADMIN_PASSWORD);
 
@@ -376,7 +362,6 @@ public abstract class CBApplication<T extends CBServerConfig>
                         autoProps.load(is);
 
                         autoServerName = autoProps.getProperty(CBConstants.VAR_AUTO_CB_SERVER_NAME);
-                        autoServerURL = autoProps.getProperty(CBConstants.VAR_AUTO_CB_SERVER_URL);
                         autoAdminName = autoProps.getProperty(CBConstants.VAR_AUTO_CB_ADMIN_NAME);
                         autoAdminPassword = autoProps.getProperty(CBConstants.VAR_AUTO_CB_ADMIN_PASSWORD);
                     } catch (IOException e) {
@@ -394,7 +379,6 @@ public abstract class CBApplication<T extends CBServerConfig>
         }
         CBServerConfig serverConfig = new CBServerConfig();
         serverConfig.setServerName(autoServerName);
-        serverConfig.setServerURL(autoServerURL);
         serverConfig.setMaxSessionIdleTime(getMaxSessionIdleTime());
         try {
             finishConfiguration(
@@ -414,6 +398,7 @@ public abstract class CBApplication<T extends CBServerConfig>
     }
 
     protected void initializeServer() throws DBException {
+        refreshServerConfiguration(); // update features and drivers
         for (DBWServiceServerConfigurator wsc : WebServiceRegistry.getInstance()
             .getWebServices(DBWServiceServerConfigurator.class)) {
             try {
@@ -504,6 +489,16 @@ public abstract class CBApplication<T extends CBServerConfig>
 
     protected void shutdown() {
         log.debug("Cloudbeaver Server is stopping"); //$NON-NLS-1$
+
+        try {
+            if (securityController instanceof CBEmbeddedSecurityController<?> embeddedSecurityController) {
+                embeddedSecurityController.shutdown();
+            }
+        } catch (Exception e) {
+            log.error(e);
+        }
+
+        eventController.scheduleCheckJob();
     }
 
     @Override

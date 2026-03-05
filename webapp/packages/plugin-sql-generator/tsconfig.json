@@ -41,6 +41,9 @@
       "path": "../core-sdk"
     },
     {
+      "path": "../core-utils"
+    },
+    {
       "path": "../core-view"
     },
     {
@@ -53,7 +56,7 @@
       "path": "../plugin-sql-editor"
     },
     {
-      "path": "../plugin-sql-editor-new"
+      "path": "../plugin-sql-editor-codemirror"
     }
   ],
   "include": [

@@ -32,6 +32,7 @@
     "@cloudbeaver/core-utils": "workspace:*",
     "@cloudbeaver/plugin-codemirror6": "workspace:*",
     "@cloudbeaver/plugin-sql-editor": "workspace:*",
+    "@cloudbeaver/plugin-sql-editor-codemirror": "workspace:*",
     "mobx": "^6",
     "mobx-react-lite": "^4",
     "react": "^19",

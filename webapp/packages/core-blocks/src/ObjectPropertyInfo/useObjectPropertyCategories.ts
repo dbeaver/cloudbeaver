@@ -8,14 +8,14 @@
 import { computed, type IComputedValue } from 'mobx';
 import { useMemo } from 'react';
 
-import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
+import type { IObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 
 interface ICategoriesInfo {
   categories: string[];
   isUncategorizedExists: boolean;
 }
 
-export function useObjectPropertyCategories(properties: ObjectPropertyInfo[]) {
+export function useObjectPropertyCategories(properties: IObjectPropertyInfo[]) {
   const categories: IComputedValue<ICategoriesInfo> = useMemo(
     () =>
       computed(() => {
