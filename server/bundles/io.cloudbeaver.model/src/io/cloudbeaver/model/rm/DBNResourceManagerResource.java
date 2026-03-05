@@ -86,7 +86,7 @@ public class DBNResourceManagerResource extends DBNAbstractResourceManagerNode {
         } else {
             var fileExtension = IOUtils.getFileExtension(getNodeDisplayName());
             if (!CommonUtils.isEmpty(fileExtension)) {
-                RMProject project = getProjectNode();
+                RMProject project = getRmProject();
                 if (project != null) {
                     for (RMResourceType rt : project.getResourceTypes()) {
                         if (ArrayUtils.contains(rt.getFileExtensions(), fileExtension)) {
@@ -100,7 +100,7 @@ public class DBNResourceManagerResource extends DBNAbstractResourceManagerNode {
     }
 
     @Nullable
-    private RMProject getProjectNode() {
+    public RMProject getRmProject() {
         for (DBNNode node = this; node != null; node = node.getParentNode()) {
             if (node instanceof DBNResourceManagerProject) {
                 return  ((DBNResourceManagerProject) node).getProject();
@@ -129,18 +129,17 @@ public class DBNResourceManagerResource extends DBNAbstractResourceManagerNode {
         return children;
     }
 
-    @Nullable
     public String getResourceFolder() {
         StringBuilder folder = new StringBuilder();
         for (DBNNode parent = this; parent != null; parent = parent.getParentNode()) {
             if (parent instanceof DBNResourceManagerResource) {
-                if (!folder.isEmpty()) folder.insert(0, '/');
+                if (folder.length() > 0) folder.insert(0, '/');
                 folder.insert(0, parent.getName());
             } else {
                 break;
             }
         }
-        return folder.isEmpty() ? null : folder.toString();
+        return folder.length() == 0 ? null : folder.toString();
     }
 
     public RMProject getResourceProject() throws DBException {
@@ -209,11 +208,7 @@ public class DBNResourceManagerResource extends DBNAbstractResourceManagerNode {
 
     @Nullable
     @Override
-    public DBPObject getObjectDetails(
-        @NotNull DBRProgressMonitor monitor,
-        @NotNull SMSessionContext sessionContext,
-        @NotNull Object dataSource
-    ) {
+    public DBPObject getObjectDetails(@NotNull DBRProgressMonitor monitor, @NotNull SMSessionContext sessionContext, @NotNull Object dataSource) throws DBException {
         return resource;
     }
 
