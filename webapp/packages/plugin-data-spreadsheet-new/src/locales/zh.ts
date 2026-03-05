@@ -5,7 +5,7 @@ export default [
   ['data_grid_table_editing_open_inline_editor', '打开內联编辑器'],
   ['data_grid_table_editing_row_add', '添加行'],
   ['data_grid_table_editing_row_add_copy', '复制并添加行'],
-  ['data_grid_table_editing_row_delete', '删除当前行'],
+  ['data_grid_table_editing_row_delete', '删除行'],
   ['data_grid_table_editing_row_revert', '还原值'],
   ['data_grid_table_order', '排序'],
   ['plugin_data_spreadsheet_new_pin_column', '固定列'],

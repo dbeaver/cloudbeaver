@@ -5,7 +5,7 @@ export default [
   ['data_grid_table_editing_open_inline_editor', 'Mở trình chỉnh sửa nội tuyến'],
   ['data_grid_table_editing_row_add', 'Thêm hàng'],
   ['data_grid_table_editing_row_add_copy', 'Sao chép hàng'],
-  ['data_grid_table_editing_row_delete', 'Xóa hàng hiện tại'],
+  ['data_grid_table_editing_row_delete', 'Xóa hàng'],
   ['data_grid_table_editing_row_revert', 'Hoàn nguyên giá trị'],
   ['data_grid_table_order', 'Sắp xếp'],
   ['plugin_data_spreadsheet_new_pin_column', 'Ghim cột'],

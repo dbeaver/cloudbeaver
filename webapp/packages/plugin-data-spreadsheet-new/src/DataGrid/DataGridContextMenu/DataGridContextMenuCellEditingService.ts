@@ -41,10 +41,8 @@ import { LocalizationService } from '@cloudbeaver/core-localization';
 
 import { ACTION_DATA_GRID_EDITING_ADD_ROW } from '../Actions/Editing/ACTION_DATA_GRID_EDITING_ADD_ROW.js';
 import { ACTION_DATA_GRID_EDITING_DELETE_ROW } from '../Actions/Editing/ACTION_DATA_GRID_EDITING_DELETE_ROW.js';
-import { ACTION_DATA_GRID_EDITING_DELETE_SELECTED_ROW } from '../Actions/Editing/ACTION_DATA_GRID_EDITING_DELETE_SELECTED_ROW.js';
 import { ACTION_DATA_GRID_EDITING_DUPLICATE_ROW } from '../Actions/Editing/ACTION_DATA_GRID_EDITING_DUPLICATE_ROW.js';
 import { ACTION_DATA_GRID_EDITING_REVERT_ROW } from '../Actions/Editing/ACTION_DATA_GRID_EDITING_REVERT_ROW.js';
-import { ACTION_DATA_GRID_EDITING_REVERT_SELECTED_ROW } from '../Actions/Editing/ACTION_DATA_GRID_EDITING_REVERT_SELECTED_ROW.js';
 import { ACTION_DATA_GRID_EDITING_SET_TO_NULL } from '../Actions/Editing/ACTION_DATA_GRID_EDITING_SET_TO_NULL.js';
 import { MENU_DATA_GRID_EDITING } from './MENU_DATA_GRID_EDITING.js';
 import type { SqlResultColumn } from '@cloudbeaver/core-sdk';
@@ -79,9 +77,7 @@ export class DataGridContextMenuCellEditingService {
         ACTION_DATA_GRID_EDITING_ADD_ROW,
         ACTION_DATA_GRID_EDITING_DUPLICATE_ROW,
         ACTION_DATA_GRID_EDITING_DELETE_ROW,
-        ACTION_DATA_GRID_EDITING_DELETE_SELECTED_ROW,
         ACTION_DATA_GRID_EDITING_REVERT_ROW,
-        ACTION_DATA_GRID_EDITING_REVERT_SELECTED_ROW,
       ],
     });
 
@@ -105,7 +101,8 @@ export class DataGridContextMenuCellEditingService {
         const column = view.getColumn(key.column) as SqlResultColumn | undefined;
         const isComplex = format.isBinary(cellHolder) || format.isGeometry(cellHolder);
         const isTruncated = content.isTextTruncated(cellHolder as IDatabaseValueHolder<IGridDataKey, IResultSetValue>);
-        const selectedElements = select?.getSelectedElements() || [];
+        const selectedElements = select?.getSelectedElements();
+        const keys = selectedElements?.length ? selectedElements : [key];
         // If we somehow added a new row, we can always edit it
         const canEdit = editor.getElementState(key) === DatabaseEditChangeType.add;
 
@@ -131,23 +128,15 @@ export class DataGridContextMenuCellEditingService {
         }
 
         if (action === ACTION_DATA_GRID_EDITING_DELETE_ROW) {
-          return !(format.isReadOnly(key) && !canEdit) && editor.getElementState(key) !== DatabaseEditChangeType.delete;
-        }
-
-        if (action === ACTION_DATA_GRID_EDITING_DELETE_SELECTED_ROW) {
-          if ((format.isReadOnly(key) && !canEdit) || !editor.hasFeature('delete')) {
+          if ((keys.some(k => format.isReadOnly(k)) && !canEdit) || !editor.hasFeature('delete')) {
             return false;
           }
 
-          return selectedElements.some(key => editor.getElementState(key) !== DatabaseEditChangeType.delete);
+          return keys.some(key => editor.getElementState(key) !== DatabaseEditChangeType.delete);
         }
 
         if (action === ACTION_DATA_GRID_EDITING_REVERT_ROW) {
-          return editor.getElementState(key) !== null;
-        }
-
-        if (action === ACTION_DATA_GRID_EDITING_REVERT_SELECTED_ROW) {
-          return selectedElements.some(key => editor.getElementState(key) !== null);
+          return keys.some(key => editor.getElementState(key) !== null);
         }
 
         return [
@@ -156,9 +145,7 @@ export class DataGridContextMenuCellEditingService {
           ACTION_DATA_GRID_EDITING_ADD_ROW,
           ACTION_DATA_GRID_EDITING_DUPLICATE_ROW,
           ACTION_DATA_GRID_EDITING_DELETE_ROW,
-          ACTION_DATA_GRID_EDITING_DELETE_SELECTED_ROW,
           ACTION_DATA_GRID_EDITING_REVERT_ROW,
-          ACTION_DATA_GRID_EDITING_REVERT_SELECTED_ROW,
         ].includes(action);
       },
       getActionInfo: this.getActionInfo.bind(this),
@@ -170,33 +157,30 @@ export class DataGridContextMenuCellEditingService {
 
         const editor = model.source.getAction(resultIndex, IDatabaseDataEditAction, GridEditAction);
         const select = model.source.tryGetAction(resultIndex, IDatabaseDataSelectAction, GridSelectAction);
-
-        const selectedElements = select?.getSelectedElements() || [];
+        const selectedElements = select?.getSelectedElements();
+        const keys = selectedElements?.length ? selectedElements : [key];
 
         switch (action) {
           case ACTION_EDIT:
             actions.edit(key);
             break;
           case ACTION_DATA_GRID_EDITING_SET_TO_NULL:
-            editor.set(key, null);
+            for (const element of keys) {
+              // TODO wait for search merge to implement setMany here in order to have batched changes for undo/redo
+              editor.set(element, null);
+            }
             break;
           case ACTION_DATA_GRID_EDITING_ADD_ROW:
             editor.addRow(key.row);
             break;
           case ACTION_DATA_GRID_EDITING_DUPLICATE_ROW:
-            editor.duplicateRow(key);
+            editor.duplicateRow(...keys);
             break;
           case ACTION_DATA_GRID_EDITING_DELETE_ROW:
-            editor.deleteRow(key.row);
-            break;
-          case ACTION_DATA_GRID_EDITING_DELETE_SELECTED_ROW:
-            editor.delete(...selectedElements);
+            editor.delete(...keys);
             break;
           case ACTION_DATA_GRID_EDITING_REVERT_ROW:
-            editor.revert(key);
-            break;
-          case ACTION_DATA_GRID_EDITING_REVERT_SELECTED_ROW:
-            editor.revert(...selectedElements);
+            editor.revert(...keys);
             break;
         }
       },
