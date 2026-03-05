@@ -16,10 +16,9 @@ import style from './RightArea.module.css';
 
 interface Props {
   className?: string;
-  sideBarPanelId?: string;
 }
 
-export const RightArea = observer<Props>(function RightArea({ className, sideBarPanelId }) {
+export const RightArea = observer<Props>(function RightArea({ className }) {
   const styles = useS(style);
   const appScreenService = useService(AppScreenService);
   const optionsPanelService = useService(OptionsPanelService);
@@ -48,7 +47,7 @@ export const RightArea = observer<Props>(function RightArea({ className, sideBar
           </Loader>
         </Pane>
       </Split>
-      <SlideDialog open={optionsPanelService.active} persistentPanelIds={sideBarPanelId ? [sideBarPanelId] : undefined} onClose={close}>
+      <SlideDialog open={optionsPanelService.active} onClose={close}>
         <OptionsPanel />
       </SlideDialog>
     </div>

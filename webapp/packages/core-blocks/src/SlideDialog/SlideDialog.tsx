@@ -18,42 +18,26 @@ import './SlideDialog.css';
 
 export interface SlideDialogProps {
   open: boolean;
-  persistentPanelIds?: string[];
   onClose: () => void;
   children: React.ReactNode;
 }
 
-export const SlideDialog = observer<SlideDialogProps>(function SlideDialog({ open, persistentPanelIds, onClose, children }) {
+export const SlideDialog = observer<SlideDialogProps>(function SlideDialog({ open, onClose, children }) {
   const t = useTranslate();
   const overlayRef = useRef<HTMLDivElement>(null);
 
+  // We need to specify persistent elements for the dialog to make them accessible when the dialog is open.
+  // To add an element to the list of persistent elements, add the `data-dialog-persistent-element` attribute to it.
   const getPersistentElements = useCallback(() => {
-    const elements: Element[] = [];
-    const header = document.querySelector('header');
-    if (header) {
-      elements.push(header);
-    }
-    if (persistentPanelIds) {
-      for (const id of persistentPanelIds) {
-        const panel = document.querySelector(`[data-panel-id="${id}"]`);
-        if (panel) {
-          elements.push(panel);
-        }
-      }
-    }
-    const notifications = document.querySelectorAll('.__reakit-portal');
-    notifications.forEach(notification => elements.push(notification));
     const dialogs = document.querySelectorAll('[data-dialog]');
-    dialogs.forEach(dialog => elements.push(dialog));
-    if (overlayRef.current) {
-      elements.push(overlayRef.current);
-    }
-    return elements;
-  }, [persistentPanelIds]);
+    const persistentElements = document.querySelectorAll('[data-dialog-persistent-element]');
+
+    return [...dialogs, ...persistentElements];
+  }, []);
 
   return (
     <>
-      <div ref={overlayRef} className="dbv-slide-dialog__overlay" data-active={open || undefined} onClick={onClose} />
+      <div ref={overlayRef} className="dbv-slide-dialog__overlay" data-active={open || undefined} data-dialog-persistent-element onClick={onClose} />
       <Dialog
         open={open}
         data-variant="slide"

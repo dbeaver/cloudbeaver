@@ -14,8 +14,6 @@ import { LeftBarPanelService, SideBarPanel, SideBarPanelService } from '@cloudbe
 import style from './Main.module.css';
 import { RightArea } from './RightArea.js';
 
-const SIDE_BAR_PANEL_ID = 'dbeaver-left-sidebar';
-
 export const Main = observer(function Main() {
   const styles = useS(style);
   const sideBarPanelService = useService(SideBarPanelService);
@@ -43,15 +41,17 @@ export const Main = observer(function Main() {
       <main className={s(styles, { space: true })}>
         <Split {...splitMainState} sticky={30} mode={leftBarDisabled ? 'minimize' : splitMainState.mode} disable={leftBarDisabled}>
           <Pane className={s(styles, { pane: true })} basis="250px" main>
-            <Loader suspense>
-              <SideBarPanel container={leftBarPanelService.tabsContainer} panelId={SIDE_BAR_PANEL_ID} />
-            </Loader>
+            <div data-dialog-persistent-element>
+              <Loader suspense>
+                <SideBarPanel container={leftBarPanelService.tabsContainer} panelId="dbeaver-left-sidebar" />
+              </Loader>
+            </div>
           </Pane>
           <ResizerControls />
           <Pane className={s(styles, { pane: true })}>
             <Split {...splitRightState} mode={sideBarDisabled ? 'minimize' : splitRightState.mode} disable={sideBarDisabled} sticky={30}>
               <Pane className={s(styles, { pane: true })}>
-                <RightArea sideBarPanelId={SIDE_BAR_PANEL_ID} />
+                <RightArea />
               </Pane>
               <ResizerControls />
               <Pane className={s(styles, { pane: true })} basis="400px" main>

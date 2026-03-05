@@ -69,7 +69,6 @@ const tabsRegistry: StyleRegistry = [
     },
   ],
 ];
-const DATA_PANEL_ID = 'dbeaver-admin-sidebar';
 
 export const Administration = observer<React.PropsWithChildren<Props>>(function Administration({
   configurationWizard,
@@ -107,7 +106,7 @@ export const Administration = observer<React.PropsWithChildren<Props>>(function 
       <AdministrationCaptureViewContext />
       <TabsState currentTabId={activeScreen?.item} localState={administrationScreenService.itemState} orientation="vertical">
         <SContext registry={tabsRegistry}>
-          <TabList aria-label="Administration items" data-panel-id={DATA_PANEL_ID} vertical>
+          <TabList aria-label="Administration items" data-dialog-persistent-element vertical>
             {visibleItems.map(item => (
               <DrawerItem
                 key={item.name}
@@ -132,7 +131,7 @@ export const Administration = observer<React.PropsWithChildren<Props>>(function 
               <div className={s(styles, { mainContent: true })}>
                 <ItemContent activeScreen={activeScreen} configurationWizard={configurationWizard} />
               </div>
-              <SlideDialog open={optionsPanelService.active} persistentPanelIds={[DATA_PANEL_ID]} onClose={close}>
+              <SlideDialog open={optionsPanelService.active} onClose={close}>
                 <div className={s(styles, { content: true })}>
                   <OptionsPanel />
                 </div>
