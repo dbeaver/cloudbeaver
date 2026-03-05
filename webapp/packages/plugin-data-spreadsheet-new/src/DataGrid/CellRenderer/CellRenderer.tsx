@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -112,6 +112,11 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
           return;
         }
 
+        // Don't change selection on right-click - context menu will handle it
+        if (event.button === 2) {
+          return;
+        }
+
         this.selectionContext.select(
           {
             colIdx: this.colIdx,
@@ -122,14 +127,40 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
           false,
         );
       },
+      openContextMenu(event: React.MouseEvent<HTMLDivElement>) {
+        if (EventContext.has(event, EventStopPropagationFlag)) {
+          return;
+        }
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        // If the right-clicked cell is not in the current selection, select only this cell
+        const isCurrentCellSelected = this.selectionContext.isSelected(this.rowIdx, this.colIdx);
+
+        if (!isCurrentCellSelected) {
+          this.selectionContext.select(
+            {
+              colIdx: this.colIdx,
+              rowIdx: this.rowIdx,
+            },
+            false,
+            false,
+            false,
+          );
+        }
+
+        this.cellContext.setMenuVisibility(true);
+      },
     }),
     {
       colIdx,
       rowIdx,
       selectionContext,
       dataGridContext,
+      cellContext,
     },
-    ['mouseUp', 'mouseDown'],
+    ['mouseUp', 'mouseDown', 'openContextMenu'],
   );
 
   const formatting = getComputed(
@@ -146,6 +177,7 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
         'data-column-index': colIdx,
         onMouseDown: state.mouseDown,
         onMouseUp: state.mouseUp,
+        onContextMenu: state.openContextMenu,
         onPointerEnter: () => cellContext.setHover(true),
         onPointerLeave: () => cellContext.setHover(false),
       })}

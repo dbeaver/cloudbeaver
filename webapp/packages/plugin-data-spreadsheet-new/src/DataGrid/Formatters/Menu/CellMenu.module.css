@@ -17,7 +17,7 @@
   width: 16px;
   padding: 4px;
   box-sizing: content-box;
-  cursor: pointer;
+  pointer-events: none;
 }
 
 .icon {
