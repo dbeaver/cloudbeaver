@@ -22,7 +22,8 @@
     "minimatch": ">=10.2.3",
     "rollup": ">=4.59.0",
     "koa": ">=2.16.4",
-    "immutable": ">=4.3.8"
+    "immutable": ">=4.3.8",
+    "serialize-javascript": ">=7.0.3"
   },
   "scripts": {
     "test": "dbeaver-test",
