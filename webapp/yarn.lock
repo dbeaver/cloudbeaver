@@ -62,15 +62,15 @@ __metadata:
   linkType: hard
 
 "@ardatan/relay-compiler@npm:^12.0.3":
-  version: 12.0.3
-  resolution: "@ardatan/relay-compiler@npm:12.0.3"
+  version: 12.2.0
+  resolution: "@ardatan/relay-compiler@npm:12.2.0"
   dependencies:
     "@babel/generator": "npm:^7.26.10"
     "@babel/parser": "npm:^7.26.10"
     "@babel/runtime": "npm:^7.26.10"
     chalk: "npm:^4.0.0"
     fb-watchman: "npm:^2.0.0"
-    immutable: "npm:~3.7.6"
+    immutable: "npm:^3"
     invariant: "npm:^2.2.4"
     nullthrows: "npm:^1.1.1"
     relay-runtime: "npm:12.0.0"
@@ -79,7 +79,7 @@ __metadata:
     graphql: "*"
   bin:
     relay-compiler: bin/relay-compiler
-  checksum: 10c0/f0a69bc448733c594af896d8d51eefec7afde470d67093d419d58ec93270e22781571a7d621edeba18fd61d44fe68bfa72dc0a9bc95c54fe845817adf0883eca
+  checksum: 10c0/afdd83311638c64568ede4fca2646fbddd2024317a125fc456759063f5d90e469481139de795a9ba82d0ba0498d65681dc51f19854d43cfbf5fb75dfa58e5b02
   languageName: node
   linkType: hard
 
