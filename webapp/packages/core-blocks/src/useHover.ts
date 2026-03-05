@@ -10,19 +10,21 @@ import { startTransition, useCallback, useRef, useState } from 'react';
 interface UseHoverResult<T extends HTMLElement> {
   ref: React.RefCallback<T>;
   isHovered: boolean;
+  hoverIn: () => void;
+  hoverOut: () => void;
 }
 
 export function useHover<T extends HTMLElement = HTMLElement>(): UseHoverResult<T> {
   const [isHovered, setIsHovered] = useState(false);
   const nodeRef = useRef<T | null>(null);
 
-  const handleMouseEnter = useCallback(() => {
+  const hoverIn = useCallback(() => {
     startTransition(() => {
       setIsHovered(true);
     });
   }, []);
 
-  const handleMouseLeave = useCallback(() => {
+  const hoverOut = useCallback(() => {
     startTransition(() => {
       setIsHovered(false);
     });
@@ -31,19 +33,19 @@ export function useHover<T extends HTMLElement = HTMLElement>(): UseHoverResult<
   const ref = useCallback(
     (node: T | null) => {
       if (nodeRef.current) {
-        nodeRef.current.removeEventListener('mouseenter', handleMouseEnter);
-        nodeRef.current.removeEventListener('mouseleave', handleMouseLeave);
+        nodeRef.current.removeEventListener('mouseenter', hoverIn);
+        nodeRef.current.removeEventListener('mouseleave', hoverOut);
       }
 
       nodeRef.current = node;
 
       if (node) {
-        node.addEventListener('mouseenter', handleMouseEnter);
-        node.addEventListener('mouseleave', handleMouseLeave);
+        node.addEventListener('mouseenter', hoverIn);
+        node.addEventListener('mouseleave', hoverOut);
       }
     },
-    [handleMouseEnter, handleMouseLeave],
+    [hoverIn, hoverOut],
   );
 
-  return { ref, isHovered };
+  return { ref, isHovered, hoverIn, hoverOut };
 }
