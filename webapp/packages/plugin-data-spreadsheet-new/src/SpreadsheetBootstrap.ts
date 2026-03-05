@@ -210,10 +210,7 @@ function handleColumnPinAction(context: any, action: (columns: IGridDataKey[]) =
 
   const select = model.source.tryGetAction(resultIndex, IDatabaseDataSelectAction);
   const selectedElements = (select?.getSelectedElements() || []) as IGridDataKey[];
+  const keys = selectedElements.length ? selectedElements : [dataContextResultKey];
 
-  if (selectedElements.length > 0) {
-    action(selectedElements);
-  } else if (dataContextResultKey.column) {
-    action(dataContextResultKey);
-  }
+  action(keys);
 }
