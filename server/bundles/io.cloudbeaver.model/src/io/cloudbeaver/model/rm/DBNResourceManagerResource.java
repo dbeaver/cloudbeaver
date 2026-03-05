@@ -31,8 +31,6 @@ import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.rm.RMResource;
 import org.jkiss.dbeaver.model.rm.RMResourceType;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
-import org.jkiss.dbeaver.registry.ResourceTypeDescriptor;
-import org.jkiss.dbeaver.registry.ResourceTypeRegistry;
 import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.IOUtils;
@@ -44,7 +42,7 @@ public class DBNResourceManagerResource extends DBNAbstractResourceManagerNode {
 
     private final RMResource resource;
 
-    DBNResourceManagerResource(DBNNode parentNode, RMResource resource) {
+    DBNResourceManagerResource(@NotNull DBNNode parentNode, @NotNull RMResource resource) {
         super(parentNode);
         this.resource = resource;
     }
@@ -71,6 +69,7 @@ public class DBNResourceManagerResource extends DBNAbstractResourceManagerNode {
     @Override
     public DBPImage getNodeIcon() {
         if (resource.isFolder()) {
+/*
             if (getParentNode() instanceof DBNResourceManagerResource) {
                 return DBIcon.TREE_FOLDER;
             }
@@ -82,6 +81,7 @@ public class DBNResourceManagerResource extends DBNAbstractResourceManagerNode {
             if (folderResType != null) {
                 return folderResType.getFolderIcon();
             }
+*/
             return DBIcon.TREE_FOLDER;
         } else {
             var fileExtension = IOUtils.getFileExtension(getNodeDisplayName());
@@ -99,6 +99,7 @@ public class DBNResourceManagerResource extends DBNAbstractResourceManagerNode {
         }
     }
 
+    @Nullable
     private RMProject getProjectNode() {
         for (DBNNode node = this; node != null; node = node.getParentNode()) {
             if (node instanceof DBNResourceManagerProject) {
@@ -128,17 +129,18 @@ public class DBNResourceManagerResource extends DBNAbstractResourceManagerNode {
         return children;
     }
 
+    @Nullable
     public String getResourceFolder() {
         StringBuilder folder = new StringBuilder();
         for (DBNNode parent = this; parent != null; parent = parent.getParentNode()) {
             if (parent instanceof DBNResourceManagerResource) {
-                if (folder.length() > 0) folder.insert(0, '/');
+                if (!folder.isEmpty()) folder.insert(0, '/');
                 folder.insert(0, parent.getName());
             } else {
                 break;
             }
         }
-        return folder.length() == 0 ? null : folder.toString();
+        return folder.isEmpty() ? null : folder.toString();
     }
 
     public RMProject getResourceProject() throws DBException {
@@ -207,7 +209,11 @@ public class DBNResourceManagerResource extends DBNAbstractResourceManagerNode {
 
     @Nullable
     @Override
-    public DBPObject getObjectDetails(@NotNull DBRProgressMonitor monitor, @NotNull SMSessionContext sessionContext, @NotNull Object dataSource) throws DBException {
+    public DBPObject getObjectDetails(
+        @NotNull DBRProgressMonitor monitor,
+        @NotNull SMSessionContext sessionContext,
+        @NotNull Object dataSource
+    ) {
         return resource;
     }
 
