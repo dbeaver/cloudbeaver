@@ -13,33 +13,43 @@ import { useObservableRef } from '@cloudbeaver/core-blocks';
 export interface ITreeSettings {
     get<T>(key: string): T | undefined;
     set<T>(key: string, value: T): void;
+    delete(key: string): void;
+    clear(): void;
 }
 
 export interface ITreeSettingsOptions {
     initialSettings?: Record<string, unknown>;
-    onSet?<T>(key: string, value: T): void;
+    onChange?(entities: ReadonlyMap<string, unknown>): void;
 }
 
 export function useTreeSettings(options: ITreeSettingsOptions = {}): ITreeSettings {
-    const { initialSettings = {}, onSet } = options;
+    const { initialSettings = {}, onChange } = options;
 
     return useObservableRef(
         () => ({
-            onSet,
             settings: observable.map<string, unknown>(initialSettings),
             get<T>(key: string): T | undefined {
                 return this.settings.get(key) as T | undefined;
             },
             set<T>(key: string, value: T): void {
                 this.settings.set(key, value);
-                this.onSet?.(key, value);
+                onChange?.(this.settings);
+            },
+            delete(key: string): void {
+                this.settings.delete(key);
+                onChange?.(this.settings);
+            },
+            clear(): void {
+                this.settings.clear();
+                onChange?.(this.settings);
             },
         }),
         {
-            onSet: observable.ref,
             settings: observable.ref,
             set: action.bound,
+            delete: action.bound,
+            clear: action.bound,
         },
-        { onSet },
+        false,
     );
 }

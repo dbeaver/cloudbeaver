@@ -1,12 +1,11 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 import { observable } from 'mobx';
-import { useMemo } from 'react';
 
 import { useObjectRef, useObservableRef } from '@cloudbeaver/core-blocks';
 
@@ -38,25 +37,14 @@ export type ITreeFilterWithState = Readonly<ITreeFilter & ITreeFilterState>;
 
 export const TREE_SETTINGS_FILTER_ENABLED = 'tree.filter.enabled';
 
-export function useTreeFilterState(
-  treeFilter: Readonly<ITreeFilter>,
-  settings?: ITreeSettings,
-  enabledKey: string = TREE_SETTINGS_FILTER_ENABLED,
-): ITreeFilterState {
-  const enabled = settings?.get<boolean>(enabledKey) ?? true;
-
-  const childrenTransformers = useMemo(() => (enabled ? [treeFilter.transformer] : []), [enabled, treeFilter]);
-  const stateTransformers = useMemo(() => (enabled ? [treeFilter.stateTransformer] : []), [enabled, treeFilter]);
-
-  return {
-    enabled,
-    childrenTransformers,
-    stateTransformers,
-    toolbarFilter: enabled ? treeFilter : undefined,
-  };
+interface ITreeFilterStateObject extends ITreeFilter, ITreeFilterState {
+  settings?: ITreeSettings;
 }
 
-function useTreeFilterBase(options: ITreeFilterOptions = {}): Readonly<ITreeFilter> {
+export function useTreeFilter(
+  options: ITreeFilterOptions = {},
+  settings?: ITreeSettings,
+): ITreeFilterWithState {
   options = useObjectRef(options);
   const matchCache = new Map<string, boolean>();
 
@@ -88,9 +76,22 @@ function useTreeFilterBase(options: ITreeFilterOptions = {}): Readonly<ITreeFilt
     return false;
   }
 
-  return useObservableRef<ITreeFilter>(
+  return useObservableRef<ITreeFilterStateObject>(
     () => ({
+      settings,
       filter: '',
+      get enabled() {
+        return this.settings?.get<boolean>(TREE_SETTINGS_FILTER_ENABLED) ?? true;
+      },
+      get childrenTransformers() {
+        return this.enabled ? [this.transformer] : [];
+      },
+      get stateTransformers() {
+        return this.enabled ? [this.stateTransformer] : [];
+      },
+      get toolbarFilter(): ITreeFilter | undefined {
+        return this.enabled ? this : undefined;
+      },
       isNodeMatched(treeData: ITreeData, nodeId: string): boolean {
         const filter = this.filter.trim();
         if (!filter) {
@@ -106,6 +107,10 @@ function useTreeFilterBase(options: ITreeFilterOptions = {}): Readonly<ITreeFilt
         return isNodeMatched || treeData.getChildren(nodeId).length > 0;
       },
       transformer(treeData: ITreeData, nodeId: string, children: string[]): string[] {
+        if (!this.enabled) {
+          return children;
+        }
+
         const filter = this.filter.trim();
         if (!filter) {
           return children;
@@ -124,6 +129,10 @@ function useTreeFilterBase(options: ITreeFilterOptions = {}): Readonly<ITreeFilt
         return children.filter(child => this.isNodeMatched(treeData, child));
       },
       stateTransformer(treeData: ITreeData, nodeId: string, state: INodeState): INodeState {
+        if (!this.enabled) {
+          return state;
+        }
+
         const filter = this.filter.trim();
         if (!filter) {
           return state;
@@ -141,57 +150,10 @@ function useTreeFilterBase(options: ITreeFilterOptions = {}): Readonly<ITreeFilt
       },
     }),
     {
+      settings: observable.ref,
       filter: observable.ref,
     },
-    false,
+    { settings },
     ['setFilter', 'isNodeMatched', 'transformer', 'stateTransformer'],
-  );
-}
-
-export function useTreeFilter(
-  options: ITreeFilterOptions = {},
-  settings?: ITreeSettings,
-  enabledKey: string = TREE_SETTINGS_FILTER_ENABLED,
-): ITreeFilterWithState {
-  const treeFilter = useTreeFilterBase(options);
-  const filterState = useTreeFilterState(treeFilter, settings, enabledKey);
-
-  return useMemo(
-    () => ({
-      get filter() {
-        return treeFilter.filter;
-      },
-      isNodeMatched(treeData: ITreeData, nodeId: string): boolean {
-        return treeFilter.isNodeMatched(treeData, nodeId);
-      },
-      transformer(treeData: ITreeData, nodeId: string, children: string[]): string[] {
-        return treeFilter.transformer(treeData, nodeId, children);
-      },
-      stateTransformer(treeData: ITreeData, nodeId: string, state: INodeState): INodeState {
-        return treeFilter.stateTransformer(treeData, nodeId, state);
-      },
-      setFilter(filter: string): void {
-        treeFilter.setFilter(filter);
-      },
-      get enabled() {
-        return filterState.enabled;
-      },
-      get childrenTransformers() {
-        return filterState.childrenTransformers;
-      },
-      get stateTransformers() {
-        return filterState.stateTransformers;
-      },
-      get toolbarFilter() {
-        return filterState.toolbarFilter;
-      },
-    }),
-    [
-      filterState.childrenTransformers,
-      filterState.enabled,
-      filterState.stateTransformers,
-      filterState.toolbarFilter,
-      treeFilter,
-    ],
   );
 }
