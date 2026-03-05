@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,8 @@ import {
   DATA_CONTEXT_DV_SIMPLE,
   DataPresentationService,
   IDatabaseDataConstraintAction,
+  IDatabaseDataSelectAction,
+  type IGridDataKey,
   isResultSetDataSource,
   MENU_DV_CONTEXT_MENU,
 } from '@cloudbeaver/plugin-data-viewer';
@@ -183,21 +185,13 @@ export class SpreadsheetBootstrap extends Bootstrap {
         }
 
         if (action === ACTION_DATA_GRID_PIN_COLUMN) {
-          const dataContextResultKey = context.get(DATA_CONTEXT_DV_RESULT_KEY)!;
           const presentationActions = context.get(DATA_CONTEXT_DV_PRESENTATION_ACTIONS)!;
-
-          if (dataContextResultKey.column) {
-            presentationActions.pinColumn(dataContextResultKey);
-          }
+          handleColumnPinAction(context, columns => presentationActions.pinColumns(columns));
         }
 
         if (action === ACTION_DATA_GRID_UNPIN_COLUMN) {
-          const dataContextResultKey = context.get(DATA_CONTEXT_DV_RESULT_KEY)!;
           const presentationActions = context.get(DATA_CONTEXT_DV_PRESENTATION_ACTIONS)!;
-
-          if (dataContextResultKey.column) {
-            presentationActions.unpinColumn(dataContextResultKey);
-          }
+          handleColumnPinAction(context, columns => presentationActions.unpinColumns(columns));
         }
 
         if (action === ACTION_DATA_GRID_UNPIN_ALL_COLUMNS) {
@@ -206,5 +200,20 @@ export class SpreadsheetBootstrap extends Bootstrap {
         }
       },
     });
+  }
+}
+
+function handleColumnPinAction(context: any, action: (columns: IGridDataKey[]) => void) {
+  const dataContextResultKey = context.get(DATA_CONTEXT_DV_RESULT_KEY)!;
+  const model = context.get(DATA_CONTEXT_DV_DDM)!;
+  const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
+
+  const select = model.source.tryGetAction(resultIndex, IDatabaseDataSelectAction);
+  const selectedElements = (select?.getSelectedElements() || []) as IGridDataKey[];
+
+  if (selectedElements.length > 0) {
+    action(selectedElements);
+  } else if (dataContextResultKey.column) {
+    action(dataContextResultKey);
   }
 }
