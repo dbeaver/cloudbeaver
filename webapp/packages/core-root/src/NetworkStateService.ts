@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -12,7 +12,7 @@ import { Executor, type IExecutor } from '@cloudbeaver/core-executor';
 import { GraphQLService } from '@cloudbeaver/core-sdk';
 import { errorOf } from '@cloudbeaver/core-utils';
 
-import { NetworkError } from './NetworkError.js';
+import { isNetworkFetchError, NetworkError } from './NetworkError.js';
 
 @injectable(() => [GraphQLService])
 export class NetworkStateService extends Bootstrap {
@@ -41,7 +41,7 @@ export class NetworkStateService extends Bootstrap {
     window.addEventListener('online', () => this.setState(true));
     window.addEventListener('offline', () => this.setState(false));
 
-    this.graphQLService.registerInterceptor(this.sessionExpiredInterceptor.bind(this));
+    this.graphQLService.registerInterceptor(this.networkIssuesInterceptor.bind(this));
   }
 
   private setState(state: boolean) {
@@ -60,13 +60,14 @@ export class NetworkStateService extends Bootstrap {
     this.networkStateExecutor.execute(this.networkState);
   }
 
-  private async sessionExpiredInterceptor(request: Promise<any>): Promise<any> {
+  private async networkIssuesInterceptor(request: Promise<any>): Promise<any> {
     try {
       return await request;
     } catch (exception: any) {
-      if (exception instanceof TypeError && exception.message === 'Failed to fetch') {
-        throw new NetworkError('Error while processing request', { cause: exception });
+      if (isNetworkFetchError(exception)) {
+        throw new NetworkError('Server is not available. Please check your network connection and try again.', { cause: exception });
       }
+
       throw exception;
     }
   }
