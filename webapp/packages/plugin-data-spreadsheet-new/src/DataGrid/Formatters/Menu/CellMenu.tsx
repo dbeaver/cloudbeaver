@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
 
-import { MenuItemElementStyles, s, SContext, type StyleRegistry, useS } from '@cloudbeaver/core-blocks';
+import { Icon, MenuItemElementStyles, s, SContext, type StyleRegistry, useS } from '@cloudbeaver/core-blocks';
 import { useDataContextLink } from '@cloudbeaver/core-data-context';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { ContextMenu } from '@cloudbeaver/core-ui';
@@ -75,7 +75,9 @@ export const CellMenu = observer<Props>(function CellMenu({ model, actions, spre
   return (
     <SContext registry={registry}>
       <div className={s(style, { container: true })} onMouseUp={markStopPropagation} onDoubleClick={stopPropagation}>
-        <ContextMenu className={s(style, { contextMenu: true })} menu={menu} visible={cellContext.isMenuVisible} onVisibleSwitch={onStateSwitch} />
+        <ContextMenu className={s(style, { contextMenu: true })} menu={menu} visible={cellContext.isMenuVisible} onVisibleSwitch={onStateSwitch}>
+          <Icon className={s(style, { icon: true })} name="snack" viewBox="0 0 16 10" />
+        </ContextMenu>
       </div>
     </SContext>
   );
