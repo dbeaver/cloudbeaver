@@ -27,8 +27,10 @@ public class ContentSecurityPolicyFilter implements Filter {
     private static final String CSP_HEADER = "Content-Security-Policy";
     private static final List<String> CSP_RULES = List.of(
         "default-src 'self'",
-        "frame-ancestors 'self'",
-        "form-action 'self'"
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+        "style-src 'self' 'unsafe-inline'",
+        "img-src 'self' data:",
+        "connect-src 'self' https: wss:"
     );
     private static final String CSP_POLICY = String.join("; ", CSP_RULES) + ";";
 
