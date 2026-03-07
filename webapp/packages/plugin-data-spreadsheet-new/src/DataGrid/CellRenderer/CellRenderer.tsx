@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,12 @@ import { type IDataGridCellRenderer, type ICellPosition } from '@cloudbeaver/plu
 import { DatabaseEditChangeType, type IGridDataKey, type IGridRowKey } from '@cloudbeaver/plugin-data-viewer';
 import { isObjectsEqual } from '@cloudbeaver/core-utils';
 
+import { ColumnDnDContext } from '../ColumnDnDContext.js';
 import { DataGridContext } from '../DataGridContext.js';
 import { DataGridSelectionContext } from '../DataGridSelection/DataGridSelectionContext.js';
 import { TableDataContext, type IColumnInfo } from '../TableDataContext.js';
 import { CellContext } from './CellContext.js';
+import { useColumnDnDDrop } from '../TableColumnDnD/useColumnDnDDrop.js';
 
 interface Props {
   rowIdx: number;
@@ -32,6 +34,10 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
   const dataGridContext = useContext(DataGridContext);
   const tableDataContext = useContext(TableDataContext);
   const selectionContext = useContext(DataGridSelectionContext);
+  const columnDnDContext = useContext(ColumnDnDContext);
+
+  const columnInfo = tableDataContext.getColumn(colIdx);
+  const dndBox = useColumnDnDDrop(dataGridContext.model, dataGridContext.resultIndex, columnInfo?.key ?? null);
 
   const cellContext = useObservableRef(
     () => ({
@@ -90,12 +96,16 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
     { colIdx, rowIdx, tableDataContext, selectionContext, isFocused: props['aria-selected'] === 'true' },
   );
 
+  const isDropTarget = getComputed(
+    () => columnInfo?.key != null && columnDnDContext?.dropTargetColumnIndex === columnInfo.key.index && columnDnDContext?.isDragging,
+  );
   const classes = getComputed(() =>
     clsx({
       'rdg-cell-custom-selected': cellContext.isSelected,
       'rdg-cell-custom-added': cellContext.editionState === DatabaseEditChangeType.add,
       'rdg-cell-custom-deleted': cellContext.editionState === DatabaseEditChangeType.delete,
       'rdg-cell-custom-edited': cellContext.editionState === DatabaseEditChangeType.update,
+      'rdg-cell-column-drop': isDropTarget,
     }),
   );
 
@@ -140,6 +150,7 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
   return (
     <CellContext.Provider value={cellContext}>
       {renderDefaultCell({
+        ref: dndBox.setRef,
         className: classes,
         style: formatting || undefined,
         'data-row-index': rowIdx,

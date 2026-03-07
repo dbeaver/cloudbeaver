@@ -10,12 +10,14 @@
     --theme-add-status: #65974c;
     --theme-delete-status: #b55d68;
     --theme-edit-status: #a37d43;
+    --data-grid-dnd-drop-target-bg: rgba(255, 255, 255, 0.08);
   }
 
   .theme-light {
     --theme-add-status: #c0f5a6;
     --theme-delete-status: #f48693;
     --theme-edit-status: #fbcc85;
+    --data-grid-dnd-drop-target-bg: rgba(0, 0, 0, 0.08);
   }
 
   .data-grid__container {
@@ -101,6 +103,11 @@
     & .rdg-cell-custom-editing {
       box-shadow: none;
       background-color: inherit;
+    }
+
+    & .rdg-cell-column-drop,
+    & .rdg-cell:has([data-column-drop-target]) {
+      background-color: var(--data-grid-dnd-drop-target-bg);
     }
   }
 

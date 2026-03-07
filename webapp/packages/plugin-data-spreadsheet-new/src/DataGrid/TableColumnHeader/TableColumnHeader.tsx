@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -12,6 +12,7 @@ import { clsx } from '@dbeaver/ui-kit';
 import { getComputed, s, StaticImage, useS } from '@cloudbeaver/core-blocks';
 import { isResultSetDataSource } from '@cloudbeaver/plugin-data-viewer';
 
+import { ColumnDnDContext } from '../ColumnDnDContext.js';
 import { DataGridContext } from '../DataGridContext.js';
 import { DataGridSelectionContext } from '../DataGridSelection/DataGridSelectionContext.js';
 import { TableDataContext } from '../TableDataContext.js';
@@ -27,6 +28,7 @@ export const TableColumnHeader = observer<Props>(function TableColumnHeader({ co
   const dataGridContext = useContext(DataGridContext);
   const tableDataContext = useContext(TableDataContext);
   const gridSelectionContext = useContext(DataGridSelectionContext);
+  const columnDnDContext = useContext(ColumnDnDContext);
   const styles = useS(style);
 
   const resultIndex = dataGridContext.resultIndex;
@@ -35,6 +37,9 @@ export const TableColumnHeader = observer<Props>(function TableColumnHeader({ co
   const columnInfo = tableDataContext.getColumn(colIdx)!;
   const dnd = useTableColumnDnD(model, resultIndex, columnInfo.key);
 
+  const isDropTarget = getComputed(
+    () => columnInfo.key !== null && columnDnDContext?.dropTargetColumnIndex === columnInfo.key.index && columnDnDContext?.isDragging,
+  );
   const dataReadonly = getComputed(() => model.isReadonly(resultIndex));
   const hasElementIdentifier = getComputed(() => {
     const source = model.source;
@@ -78,7 +83,7 @@ export const TableColumnHeader = observer<Props>(function TableColumnHeader({ co
     <div
       ref={dnd.setRef}
       title={columnTooltip}
-      data-s-rearrange={dnd.side}
+      data-column-drop-target={isDropTarget || undefined}
       className={s(styles, { dragging: dnd.data.state.isDragging, dndBox: true }, 'tw:h-full')}
       onClick={handleClick}
     >
