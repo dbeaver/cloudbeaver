@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -38,6 +38,7 @@ import {
   CbEventTopic as SessionEventTopic,
 } from '@cloudbeaver/core-sdk';
 
+import { isNetworkFetchError, NetworkError } from './NetworkError.js';
 import type { IBaseServerEvent, IServerEventCallback, IServerEventEmitter, Unsubscribe } from './ServerEventEmitter/IServerEventEmitter.js';
 import { SessionExpireService } from './SessionExpireService.js';
 import { TransportSubject } from './TransportSubject.js';
@@ -218,6 +219,12 @@ export class SessionEventSource implements IServerEventEmitter<ISessionEvent, IS
   }
 
   private errorHandler(error: any): Observable<ISessionEvent> {
+    if (isNetworkFetchError(error)) {
+      const networkError = new NetworkError('Server is not available. Please check your network connection and try again.', { cause: error });
+      this.errorSubject.next(networkError);
+      return throwError(() => networkError);
+    }
+
     this.errorSubject.next(new ServiceError('Transport error', { cause: error }));
     return throwError(() => error);
   }
