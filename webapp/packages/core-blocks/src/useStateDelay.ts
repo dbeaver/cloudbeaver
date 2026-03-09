@@ -8,15 +8,15 @@
 
 import { useEffect, useRef, useState } from 'react';
 
-interface IPendingState {
+interface IPendingState<TValue> {
   timeout: ReturnType<typeof setTimeout> | null;
-  state: boolean;
+  state: TValue;
 }
 
-export function useStateDelay(state: boolean, delay: number, callback?: () => void): boolean {
+export function useStateDelay<TValue>(state: TValue, delay: number, callback?: () => void): TValue {
   const [delayedState, setState] = useState(state);
   const callbackRef = useRef(callback);
-  const actualStateRef = useRef<IPendingState | null>(null);
+  const actualStateRef = useRef<IPendingState<TValue> | null>(null);
 
   callbackRef.current = callback;
 

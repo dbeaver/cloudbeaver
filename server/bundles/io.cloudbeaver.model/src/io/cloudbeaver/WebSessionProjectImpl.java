@@ -218,6 +218,7 @@ public class WebSessionProjectImpl extends WebProjectImpl implements DBPAdaptabl
      *
      * @return connections from cache.
      */
+    @NotNull
     public List<WebConnectionInfo> getConnections() {
         if (!registryIsLoaded) {
             addDataSourcesToCache();
