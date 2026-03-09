@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2025 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,6 +47,8 @@ public class ServletAppUtils {
     private static final String HEADER_REFERER = "Referer";
 
     private static final String HEADER_FORWARDED_SCHEME = "X-Forwarded-Scheme";
+    private static final String HEADER_FORWARDED_PROTO = "X-Forwarded-Proto";
+    private static final String HEADER_FORWARDED_PORT = "X-Forwarded-Port";
     private static final String HEADER_FORWARDED_HOST = "X-Forwarded-Host";
     private static final Set<Integer> DEFAULT_PORTS = Set.of(
         80,
@@ -294,19 +296,37 @@ public class ServletAppUtils {
     @NotNull
     public static String getOriginFromRequest(@NotNull HttpServletRequest request) {
         String origin = request.getHeader(HEADER_ORIGIN);
+        if (log.isTraceEnabled()) {
+            log.trace("Origin header: " + origin);
+        }
         if (CommonUtils.isEmpty(origin)) {
             origin = request.getHeader(HEADER_X_ORIGIN);
+            if (log.isTraceEnabled()) {
+                log.trace("X-Origin header: " + origin);
+            }
         }
         if (CommonUtils.isEmpty(origin)) {
             origin = request.getHeader(HEADER_REFERER);
+            if (log.isTraceEnabled()) {
+                log.trace("Referer header: " + origin);
+            }
         }
         String forwardedScheme = request.getHeader(HEADER_FORWARDED_SCHEME);
+        if (CommonUtils.isEmpty(forwardedScheme)) {
+            forwardedScheme = request.getHeader(HEADER_FORWARDED_PROTO);
+        }
         String forwardedHost = request.getHeader(HEADER_FORWARDED_HOST);
         if (CommonUtils.isNotEmpty(forwardedScheme) && CommonUtils.isNotEmpty(forwardedHost)) {
             origin = forwardedScheme + "://" + forwardedHost;
+            if (log.isTraceEnabled()) {
+                log.trace("forwarded origin: " + origin);
+            }
         }
         if (CommonUtils.isEmpty(origin)) {
             URI requestUrl = URI.create(request.getRequestURL().toString());
+            if (log.isTraceEnabled()) {
+                log.trace("Request URL: " + requestUrl);
+            }
             origin = getRootUrlFromUri(requestUrl) + "/";
         }
         origin = removeSideSlashes(origin);
@@ -318,7 +338,15 @@ public class ServletAppUtils {
 
         origin = removeSideSlashes(origin);
         URI uri = URI.create(origin);
-        if (DEFAULT_PORTS.contains(uri.getPort())) {
+        int port = uri.getPort();
+        if (CommonUtils.isNotEmpty(request.getHeader(HEADER_FORWARDED_PORT))) {
+            try {
+                port = Integer.parseInt(request.getHeader(HEADER_FORWARDED_PORT));
+            } catch (NumberFormatException e) {
+                log.error("Failed to parse port from header: " + request.getHeader(HEADER_FORWARDED_PORT), e);
+            }
+        }
+        if (DEFAULT_PORTS.contains(port)) {
             try {
                 origin = new URI(
                     uri.getScheme(),
@@ -332,6 +360,9 @@ public class ServletAppUtils {
             } catch (URISyntaxException e) {
                 log.error("Failed to create URI without port", e);
             }
+        }
+        if (log.isTraceEnabled()) {
+            log.trace("Origin URI: " + origin);
         }
 
         return origin;

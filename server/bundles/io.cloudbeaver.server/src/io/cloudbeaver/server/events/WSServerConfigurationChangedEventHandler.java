@@ -14,24 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.cloudbeaver.server;
+package io.cloudbeaver.server.events;
 
+import io.cloudbeaver.model.session.BaseWebSession;
 import org.jkiss.code.NotNull;
-import org.jkiss.dbeaver.runtime.DBWorkbench;
+import org.jkiss.dbeaver.model.websocket.event.WSServerConfigurationChangedEvent;
 
-public class WebAppUtils {
+public class WSServerConfigurationChangedEventHandler extends WSDefaultEventHandler<WSServerConfigurationChangedEvent> {
 
-    public static boolean isWebApplication() {
-        return DBWorkbench.getPlatform().getApplication() instanceof WebApplication;
-    }
-
-    @NotNull
-    public static WebApplication getWebApplication() {
-        return (WebApplication) DBWorkbench.getPlatform().getApplication();
-    }
-
-    @NotNull
-    public static BaseWebPlatform getWebPlatform() {
-        return (BaseWebPlatform) DBWorkbench.getPlatform();
+    @Override
+    protected void updateSessionData(@NotNull BaseWebSession activeUserSession, @NotNull WSServerConfigurationChangedEvent event) {
+        activeUserSession.refreshUserData();
+        super.updateSessionData(activeUserSession, event);
     }
 }

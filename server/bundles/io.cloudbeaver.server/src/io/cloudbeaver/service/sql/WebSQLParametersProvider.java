@@ -32,7 +32,7 @@ import org.jkiss.dbeaver.model.sql.SQLQueryParameter;
 import org.jkiss.dbeaver.model.sql.SQLScriptContext;
 import org.jkiss.dbeaver.model.websocket.event.WSEvent;
 
-import java.util.LinkedHashMap;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -58,11 +58,11 @@ public class WebSQLParametersProvider extends SQLParametersProviderBase {
         @NotNull List<SQLQueryParameter> parameters,
         @NotNull Supplier<DBDDataReceiver> dataReceiverSupplier
     ) {
-        Map<String, Object> unsetParams = new LinkedHashMap<>();
+        List<WebSQLQueryParameterRecord> unsetParams = new ArrayList<>();
         for (SQLQueryParameter param : parameters) {
             if (!param.isVariableSet()) {
                 // Empty value for now, maybe in future we can set some defaults here
-                unsetParams.put(param.getName(), "");
+                unsetParams.add(new WebSQLQueryParameterRecord(param.getName(), param.getValue()));
             }
         }
         if (unsetParams.isEmpty()) {

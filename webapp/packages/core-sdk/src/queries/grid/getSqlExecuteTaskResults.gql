@@ -4,6 +4,7 @@ mutation getSqlExecuteTaskResults($taskId: ID!) {
     statusMessage
     filterText
     fullQuery
+    originalQuery
     results {
       title
       updateRowCount

@@ -1,10 +1,10 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Vendor: DBeaver Corp
-Bundle-Name: Cloudbeaver CE Server
+Bundle-Name: CloudBeaver Community
 Bundle-SymbolicName: io.cloudbeaver.server.ce;singleton:=true
-Bundle-Version: 26.0.0.qualifier
-Bundle-Release-Date: 20260302
+Bundle-Version: 26.0.1.qualifier
+Bundle-Release-Date: 20260323
 Bundle-RequiredExecutionEnvironment: JavaSE-21
 Bundle-ActivationPolicy: lazy
 Bundle-Activator: io.cloudbeaver.server.CBPlatformActivator

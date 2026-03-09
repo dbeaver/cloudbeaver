@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2025 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,6 +37,7 @@ import io.cloudbeaver.service.DBWBindingContext;
 import io.cloudbeaver.service.DBWServiceBindingGraphQL;
 import io.cloudbeaver.service.WebServiceBindingBase;
 import io.cloudbeaver.utils.ServletAppUtils;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -202,16 +203,21 @@ public class GraphQLEndpoint extends HttpServlet {
     }
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String path = request.getPathInfo();
         if (path == null) {
             path = request.getServletPath();
         }
         boolean develMode = ServletAppUtils.getServletApplication().getServerConfiguration().isDevelMode();
 
-        if (path.contentEquals("/schema.json") && develMode) {
+        if (!develMode) {
+            super.doGet(request, response);
+            return;
+        }
+
+        if (path.contentEquals("/schema.json")) {
             executeQuery(request, response, GraphQLConstants.SCHEMA_READ_QUERY, null, null);
-        } else if (path.contentEquals("/console") && develMode) {
+        } else if (path.contentEquals("/console")) {
             response.setContentType(MimeTypes.TEXT_HTML);
             try (InputStream consolePageStream = WebServiceUtils.openStaticResource("static/graphiql/index.html")) {
                 IOUtils.copyStream(consolePageStream, response.getOutputStream());
