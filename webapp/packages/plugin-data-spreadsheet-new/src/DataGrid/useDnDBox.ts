@@ -20,9 +20,9 @@ import {
   ResultSetDataSource,
 } from '@cloudbeaver/plugin-data-viewer';
 
-import { ColumnDnDContext } from '../ColumnDnDContext.js';
+import { ColumnDnDContext } from './ColumnDnDContext.js';
 
-export function useColumnDnDDrop(model: IDatabaseDataModel, resultIndex: number, columnKey: IGridColumnKey | null): IDNDBox {
+export function useDnDBox(model: IDatabaseDataModel, resultIndex: number, columnKey: IGridColumnKey | null): IDNDBox {
   const columnDnDContext = useContext(ColumnDnDContext);
   let resultSetViewAction: GridViewAction | undefined;
 

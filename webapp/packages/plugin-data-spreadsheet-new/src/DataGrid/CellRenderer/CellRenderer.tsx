@@ -21,7 +21,7 @@ import { DataGridContext } from '../DataGridContext.js';
 import { DataGridSelectionContext } from '../DataGridSelection/DataGridSelectionContext.js';
 import { TableDataContext, type IColumnInfo } from '../TableDataContext.js';
 import { CellContext } from './CellContext.js';
-import { useColumnDnDDrop } from '../TableColumnDnD/useColumnDnDDrop.js';
+import { useDnDBox } from '../useDnDBox.js';
 
 interface Props {
   rowIdx: number;
@@ -37,7 +37,7 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
   const columnDnDContext = useContext(ColumnDnDContext);
 
   const columnInfo = tableDataContext.getColumn(colIdx);
-  const dndBox = useColumnDnDDrop(dataGridContext.model, dataGridContext.resultIndex, columnInfo?.key ?? null);
+  const dndBox = useDnDBox(dataGridContext.model, dataGridContext.resultIndex, columnInfo?.key ?? null);
 
   const cellContext = useObservableRef(
     () => ({
