@@ -33,6 +33,9 @@ export default [
   ['sql_execution_plan_properties_panel_value', 'Giá trị'],
   ['sql_execution_plan_properties_panel_general', 'Chung'],
   ['sql_execution_plan_properties_panel_details', 'Chi tiết'],
+  ['sql_execution_plan_view_table', 'Bảng'],
+  ['sql_execution_plan_view_diagram', 'Sơ đồ'],
+  ['sql_execution_plan_view_label', 'Chế độ xem kế hoạch thực thi'],
   ['sql_editor_upload_script_tooltip', 'Tải lên kịch bản SQL'],
   ['sql_editor_download_script_tooltip', 'Tải xuống kịch bản SQL'],
   [

@@ -33,6 +33,9 @@ export default [
   ['sql_execution_plan_properties_panel_value', 'Value'],
   ['sql_execution_plan_properties_panel_general', 'General'],
   ['sql_execution_plan_properties_panel_details', 'Details'],
+  ['sql_execution_plan_view_table', 'Table'],
+  ['sql_execution_plan_view_diagram', 'Diagram'],
+  ['sql_execution_plan_view_label', 'Execution Plan View'],
   ['sql_editor_upload_script_tooltip', 'Upload sql script'],
   ['sql_editor_download_script_tooltip', 'Download sql script'],
   [

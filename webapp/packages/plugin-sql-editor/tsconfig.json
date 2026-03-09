@@ -8,6 +8,9 @@
   },
   "references": [
     {
+      "path": "../../common-react/@dbeaver/react-execution-plan-diagram"
+    },
+    {
       "path": "../../common-react/@dbeaver/react-tests"
     },
     {
