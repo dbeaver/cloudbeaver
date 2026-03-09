@@ -107,16 +107,16 @@
       background-color: inherit;
     }
 
-    & .rdg-cell-column-drop-left,
-    & .rdg-cell:has([data-s-rearrange='left']),
-    & .rdg-cell-column-drop-right,
-    & .rdg-cell:has([data-s-rearrange='right']) {
+    & .rdg-cell:has(.rdg-cell-column-drop-left),
+    & .rdg-cell-column-drop-left:not(.rdg-cell .rdg-cell-column-drop-left),
+    & .rdg-cell:has(.rdg-cell-column-drop-right),
+    & .rdg-cell-column-drop-right:not(.rdg-cell .rdg-cell-column-drop-right) {
       overflow: visible;
       background-color: var(--data-grid-dnd-drop-target-bg);
     }
 
-    & .rdg-cell-column-drop-left::after,
-    & .rdg-cell:has([data-s-rearrange='left'])::after {
+    & .rdg-cell:has(.rdg-cell-column-drop-left)::after,
+    & .rdg-cell-column-drop-left:not(.rdg-cell .rdg-cell-column-drop-left)::after {
       content: '';
       position: absolute;
       left: 0;
@@ -128,8 +128,8 @@
       pointer-events: none;
     }
 
-    & .rdg-cell-column-drop-right::after,
-    & .rdg-cell:has([data-s-rearrange='right'])::after {
+    & .rdg-cell:has(.rdg-cell-column-drop-right)::after,
+    & .rdg-cell-column-drop-right:not(.rdg-cell .rdg-cell-column-drop-right)::after {
       content: '';
       position: absolute;
       right: 0;

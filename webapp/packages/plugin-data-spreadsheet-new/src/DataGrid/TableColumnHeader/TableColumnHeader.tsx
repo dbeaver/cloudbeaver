@@ -43,6 +43,17 @@ export const TableColumnHeader = observer<Props>(function TableColumnHeader({ co
     }
     return null;
   });
+  const dropSideClassName = getComputed(() => {
+    if (dropSide === 'left') {
+      return 'rdg-cell-column-drop-left';
+    }
+
+    if (dropSide === 'right') {
+      return 'rdg-cell-column-drop-right';
+    }
+
+    return '';
+  });
   const dataReadonly = getComputed(() => model.isReadonly(resultIndex));
   const hasElementIdentifier = getComputed(() => {
     const source = model.source;
@@ -86,8 +97,7 @@ export const TableColumnHeader = observer<Props>(function TableColumnHeader({ co
     <div
       ref={dnd.setRef}
       title={columnTooltip}
-      data-s-rearrange={dropSide || undefined}
-      className={s(styles, { dragging: dnd.data.state.isDragging, dndBox: true }, 'tw:h-full')}
+      className={s(styles, { dragging: dnd.data.state.isDragging, dndBox: true }, 'tw:h-full', dropSideClassName)}
       onClick={handleClick}
     >
       <div className={s(styles, { header: true })}>
