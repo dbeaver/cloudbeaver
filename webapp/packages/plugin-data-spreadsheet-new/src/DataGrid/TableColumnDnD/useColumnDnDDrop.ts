@@ -59,7 +59,14 @@ export function useColumnDnDDrop(model: IDatabaseDataModel, resultIndex: number,
   });
 
   if (columnKey && dndBox.state.isOver && dndBox.state.context) {
-    columnDnDContext?.setDropTarget(columnKey.index);
+    const dndColumnKey = dndBox.state.context.get(DATA_CONTEXT_DV_DDM_RS_COLUMN_KEY);
+    let side: 'left' | 'right' = 'left';
+
+    if (resultSetViewAction && dndColumnKey && resultSetViewAction.columnIndex(columnKey) > resultSetViewAction.columnIndex(dndColumnKey)) {
+      side = 'right';
+    }
+
+    columnDnDContext?.setDropTarget(columnKey.index, side);
   }
 
   return dndBox;

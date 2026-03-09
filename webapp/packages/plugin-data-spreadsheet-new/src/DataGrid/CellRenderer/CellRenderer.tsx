@@ -96,16 +96,21 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
     { colIdx, rowIdx, tableDataContext, selectionContext, isFocused: props['aria-selected'] === 'true' },
   );
 
-  const isDropTarget = getComputed(
-    () => columnInfo?.key != null && columnDnDContext?.dropTargetColumnIndex === columnInfo.key.index && columnDnDContext?.isDragging,
-  );
+  const dropSide = getComputed(() => {
+    if (columnInfo?.key != null && columnDnDContext?.dropTargetColumnIndex === columnInfo.key.index && columnDnDContext?.isDragging) {
+      return columnDnDContext.dropSide;
+    }
+    return null;
+  });
   const classes = getComputed(() =>
     clsx({
       'rdg-cell-custom-selected': cellContext.isSelected,
       'rdg-cell-custom-added': cellContext.editionState === DatabaseEditChangeType.add,
       'rdg-cell-custom-deleted': cellContext.editionState === DatabaseEditChangeType.delete,
       'rdg-cell-custom-edited': cellContext.editionState === DatabaseEditChangeType.update,
-      'rdg-cell-column-drop': isDropTarget,
+      'rdg-cell-column-drop': dropSide !== null,
+      'rdg-cell-column-drop-left': dropSide === 'left',
+      'rdg-cell-column-drop-right': dropSide === 'right',
     }),
   );
 

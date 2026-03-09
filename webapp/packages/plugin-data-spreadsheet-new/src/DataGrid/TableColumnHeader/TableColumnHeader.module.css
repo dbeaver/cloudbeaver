@@ -49,6 +49,7 @@
 }
 .dndBox {
   width: 100%;
+  position: relative;
 }
 .description {
   composes: theme-typography--caption from global;

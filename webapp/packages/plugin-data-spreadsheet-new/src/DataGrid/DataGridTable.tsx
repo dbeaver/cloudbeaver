@@ -47,7 +47,7 @@ import {
 } from '@cloudbeaver/plugin-data-viewer';
 
 import { CellRenderer } from './CellRenderer/CellRenderer.js';
-import { ColumnDnDContext, type IColumnDnDState } from './ColumnDnDContext.js';
+import { ColumnDnDContext, type ColumnDropSide, type IColumnDnDState } from './ColumnDnDContext.js';
 import { DataGridContext, type IDataGridContext } from './DataGridContext.js';
 import { DataGridSelectionContext } from './DataGridSelection/DataGridSelectionContext.js';
 import { useGridSelectionContext } from './DataGridSelection/useGridSelectionContext.js';
@@ -87,9 +87,11 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
   const columnDnDState = useObservableRef<IColumnDnDState>(
     () => ({
       dropTargetColumnIndex: null,
+      dropSide: null,
       isDragging: false,
-      setDropTarget(columnIndex: number | null) {
+      setDropTarget(columnIndex: number | null, side?: ColumnDropSide) {
         this.dropTargetColumnIndex = columnIndex;
+        this.dropSide = side ?? null;
       },
       setDragging(isDragging: boolean) {
         this.isDragging = isDragging;
@@ -97,6 +99,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
     }),
     {
       dropTargetColumnIndex: observable.ref,
+      dropSide: observable.ref,
       isDragging: observable.ref,
       setDropTarget: action.bound,
       setDragging: action.bound,

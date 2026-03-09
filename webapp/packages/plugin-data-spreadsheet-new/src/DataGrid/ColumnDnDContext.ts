@@ -7,10 +7,13 @@
  */
 import { createContext } from 'react';
 
+export type ColumnDropSide = 'left' | 'right' | null;
+
 export interface IColumnDnDState {
   dropTargetColumnIndex: number | null;
+  dropSide: ColumnDropSide;
   isDragging: boolean;
-  setDropTarget(columnIndex: number | null): void;
+  setDropTarget(columnIndex: number | null, side?: ColumnDropSide): void;
   setDragging(isDragging: boolean): void;
 }
 

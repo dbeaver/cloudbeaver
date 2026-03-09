@@ -106,8 +106,41 @@
     }
 
     & .rdg-cell-column-drop,
-    & .rdg-cell:has([data-column-drop-target]) {
+    & .rdg-cell:has([data-s-rearrange]) {
       background-color: var(--data-grid-dnd-drop-target-bg);
+    }
+
+    & .rdg-cell-column-drop-left,
+    & .rdg-cell:has([data-s-rearrange='left']),
+    & .rdg-cell-column-drop-right,
+    & .rdg-cell:has([data-s-rearrange='right']) {
+      overflow: visible;
+    }
+
+    & .rdg-cell-column-drop-left::after,
+    & .rdg-cell:has([data-s-rearrange='left'])::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: calc(100% + 1px);
+      width: 2px;
+      background-color: #808080;
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    & .rdg-cell-column-drop-right::after,
+    & .rdg-cell:has([data-s-rearrange='right'])::after {
+      content: '';
+      position: absolute;
+      right: 0;
+      top: 0;
+      height: calc(100% + 1px);
+      width: 2px;
+      background-color: #808080;
+      z-index: 10;
+      pointer-events: none;
     }
   }
 

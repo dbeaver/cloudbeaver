@@ -37,9 +37,12 @@ export const TableColumnHeader = observer<Props>(function TableColumnHeader({ co
   const columnInfo = tableDataContext.getColumn(colIdx)!;
   const dnd = useTableColumnDnD(model, resultIndex, columnInfo.key);
 
-  const isDropTarget = getComputed(
-    () => columnInfo.key !== null && columnDnDContext?.dropTargetColumnIndex === columnInfo.key.index && columnDnDContext?.isDragging,
-  );
+  const dropSide = getComputed(() => {
+    if (columnInfo.key !== null && columnDnDContext?.dropTargetColumnIndex === columnInfo.key.index && columnDnDContext?.isDragging) {
+      return columnDnDContext.dropSide;
+    }
+    return null;
+  });
   const dataReadonly = getComputed(() => model.isReadonly(resultIndex));
   const hasElementIdentifier = getComputed(() => {
     const source = model.source;
@@ -83,7 +86,7 @@ export const TableColumnHeader = observer<Props>(function TableColumnHeader({ co
     <div
       ref={dnd.setRef}
       title={columnTooltip}
-      data-column-drop-target={isDropTarget || undefined}
+      data-s-rearrange={dropSide || undefined}
       className={s(styles, { dragging: dnd.data.state.isDragging, dndBox: true }, 'tw:h-full')}
       onClick={handleClick}
     >
