@@ -35,6 +35,7 @@ import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.navigator.fs.DBNPathBase;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.CommonUtils;
+import org.jkiss.utils.HttpConstants;
 import org.jkiss.utils.IOUtils;
 
 import java.io.IOException;
@@ -76,7 +77,7 @@ public class WebFSServlet extends WebServiceServletBase {
     private void doGet(WebSession session, HttpServletRequest request, HttpServletResponse response) throws DBException, IOException {
         Path path = WebFSUtils.getPathFromNode(session, request.getParameter("nodePath"));
         session.addInfoMessage("Download data ...");
-        response.setHeader("Content-Type", "application/octet-stream");
+        response.setHeader(HttpConstants.HEADER_CONTENT_TYPE, "application/octet-stream");
         response.setHeader("Content-Disposition", "attachment; filename=\"" + path.getFileName() + "\"");
         response.setHeader("Content-Length", String.valueOf(Files.size(path)));
 
