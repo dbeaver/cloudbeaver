@@ -29,13 +29,21 @@ import './ExecutionPlanDiagram.css';
 export interface ExecutionPlanDiagramProps extends IPlanDiagramCallbacks {
   data: IPlanData;
   options?: IPlanDiagramOptions;
+  selectedNodeId?: string | null;
 }
 
-export function ExecutionPlanDiagram({ data, options, onNodeSelect: onNodeSelectCallback, onNodeExpand }: ExecutionPlanDiagramProps): ReactNode {
+export function ExecutionPlanDiagram({
+  data,
+  options,
+  selectedNodeId: externalSelectedNodeId,
+  onNodeSelect: onNodeSelectCallback,
+  onNodeExpand,
+}: ExecutionPlanDiagramProps): ReactNode {
   const [collapsedNodes, setCollapsedNodes] = useState<Set<string>>(new Set());
   const [layout, setLayout] = useState<ILayoutResult | null>(null);
   const [heavyRouteIds, setHeavyRouteIds] = useState<Set<string>>(new Set());
-  const { selectedNodeId, selectNode, clearSelection } = useNodeSelection();
+  const { selectedNodeId: internalSelectedNodeId, selectNode, clearSelection } = useNodeSelection();
+  const selectedNodeId = externalSelectedNodeId !== undefined ? externalSelectedNodeId : internalSelectedNodeId;
   const measureRef = useRef<HTMLDivElement>(null);
   const panZoom = usePanZoom();
 
