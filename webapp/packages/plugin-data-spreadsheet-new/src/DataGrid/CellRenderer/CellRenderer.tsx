@@ -22,6 +22,7 @@ import { DataGridSelectionContext } from '../DataGridSelection/DataGridSelection
 import { TableDataContext, type IColumnInfo } from '../TableDataContext.js';
 import { CellContext } from './CellContext.js';
 import { useDnDBox } from '../useDnDBox.js';
+import { getDropSide } from '../getDropSide.js';
 
 interface Props {
   rowIdx: number;
@@ -35,7 +36,6 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
   const tableDataContext = useContext(TableDataContext);
   const selectionContext = useContext(DataGridSelectionContext);
   const columnDnDContext = useContext(ColumnDnDContext);
-
   const columnInfo = tableDataContext.getColumn(colIdx);
   const dndBox = useDnDBox(dataGridContext.model, dataGridContext.resultIndex, columnInfo?.key ?? null);
 
@@ -96,12 +96,7 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
     { colIdx, rowIdx, tableDataContext, selectionContext, isFocused: props['aria-selected'] === 'true' },
   );
 
-  const dropSide = getComputed(() => {
-    if (columnInfo?.key != null && columnDnDContext?.dropTargetColumnIndex === columnInfo.key.index && columnDnDContext?.isDragging) {
-      return columnDnDContext.dropSide;
-    }
-    return null;
-  });
+  const dropSide = getComputed(() => getDropSide(columnInfo, columnDnDContext));
   const classes = getComputed(() =>
     clsx({
       'rdg-cell-custom-selected': cellContext.isSelected,

@@ -47,7 +47,7 @@ import {
 } from '@cloudbeaver/plugin-data-viewer';
 
 import { CellRenderer } from './CellRenderer/CellRenderer.js';
-import { ColumnDnDContext, type ColumnDropSide, type IColumnDnDState } from './ColumnDnDContext.js';
+import { ColumnDnDContext, type IColumnDnDState } from './ColumnDnDContext.js';
 import { DataGridContext, type IDataGridContext } from './DataGridContext.js';
 import { DataGridSelectionContext } from './DataGridSelection/DataGridSelectionContext.js';
 import { useGridSelectionContext } from './DataGridSelection/useGridSelectionContext.js';
@@ -62,6 +62,7 @@ import { useTableData } from './useTableData.js';
 import { TableColumnHeader } from './TableColumnHeader/TableColumnHeader.js';
 import { TableIndexColumnHeader } from './TableColumnHeader/TableIndexColumnHeader.js';
 import { clsx } from '@dbeaver/ui-kit';
+import type { ColumnDropSide } from './getDropSide.js';
 
 const ROW_HEIGHT = 24;
 export const HEADER_HEIGHT = 32;

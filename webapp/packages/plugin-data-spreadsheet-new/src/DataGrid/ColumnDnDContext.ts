@@ -6,8 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { createContext } from 'react';
-
-export type ColumnDropSide = 'left' | 'right' | null;
+import type { ColumnDropSide } from './getDropSide.js';
 
 export interface IColumnDnDState {
   dropTargetColumnIndex: number | null;

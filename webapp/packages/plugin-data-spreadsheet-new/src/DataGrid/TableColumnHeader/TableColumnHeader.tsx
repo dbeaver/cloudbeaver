@@ -19,6 +19,7 @@ import { TableDataContext } from '../TableDataContext.js';
 import style from './TableColumnHeader.module.css';
 import { useTableColumnDnD } from './useTableColumnDnD.js';
 import type { SqlResultColumn } from '@cloudbeaver/core-sdk';
+import { getDropSide } from '../getDropSide.js';
 
 interface Props {
   colIdx: number;
@@ -37,12 +38,7 @@ export const TableColumnHeader = observer<Props>(function TableColumnHeader({ co
   const columnInfo = tableDataContext.getColumn(colIdx)!;
   const dnd = useTableColumnDnD(model, resultIndex, columnInfo.key);
 
-  const dropSide = getComputed(() => {
-    if (columnInfo.key !== null && columnDnDContext?.dropTargetColumnIndex === columnInfo.key.index && columnDnDContext?.isDragging) {
-      return columnDnDContext.dropSide;
-    }
-    return null;
-  });
+  const dropSide = getComputed(() => getDropSide(columnInfo, columnDnDContext));
   const dropSideClassName = getComputed(() => {
     if (dropSide === 'left') {
       return 'rdg-cell-column-drop-left';
