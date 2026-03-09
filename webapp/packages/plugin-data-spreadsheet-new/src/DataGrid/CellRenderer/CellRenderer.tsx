@@ -108,7 +108,6 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
       'rdg-cell-custom-added': cellContext.editionState === DatabaseEditChangeType.add,
       'rdg-cell-custom-deleted': cellContext.editionState === DatabaseEditChangeType.delete,
       'rdg-cell-custom-edited': cellContext.editionState === DatabaseEditChangeType.update,
-      'rdg-cell-column-drop': dropSide !== null,
       'rdg-cell-column-drop-left': dropSide === 'left',
       'rdg-cell-column-drop-right': dropSide === 'right',
     }),
