@@ -80,6 +80,7 @@
 
   .dbv-plan-node__metric-value {
     font-weight: 500;
+    flex-shrink: 0;
     color: var(--dbv-plan-node-metric-value-color);
   }
 
