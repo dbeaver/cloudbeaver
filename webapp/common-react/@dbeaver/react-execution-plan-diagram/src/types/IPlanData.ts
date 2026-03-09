@@ -10,7 +10,6 @@ import type { IPlanFeatures } from './IPlanFeatures.js';
 import type { IPlanNode } from './IPlanNode.js';
 
 export interface IPlanData {
-  queryString: string;
   /** Can be a flat list (using parentId) or a tree (using children) */
   nodes: IPlanNode[];
   features: IPlanFeatures;
