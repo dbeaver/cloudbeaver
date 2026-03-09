@@ -29,6 +29,7 @@ import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.utils.CommonUtils;
+import org.jkiss.utils.HttpConstants;
 import org.jkiss.utils.IOUtils;
 
 import java.io.IOException;
@@ -64,7 +65,7 @@ public class WebSQLResultServlet extends WebServiceServletBase {
         }
         Path dataFile = getDataFile(request);
         session.addInfoMessage("Download LOB file ...");
-        response.setHeader("Content-Type", "application/octet-stream");
+        response.setHeader(HttpConstants.HEADER_CONTENT_TYPE, "application/octet-stream");
         response.setHeader("Content-Disposition", "attachment; filename=\"" + dataFile.getFileName().toString() + "\"");
         response.setHeader("Content-Length", String.valueOf(Files.size(dataFile)));
         response.setDateHeader("Expires", System.currentTimeMillis() + CBConstants.STATIC_CACHE_SECONDS * 1000);
