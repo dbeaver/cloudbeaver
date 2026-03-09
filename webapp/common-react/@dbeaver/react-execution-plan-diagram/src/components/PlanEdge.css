@@ -1,0 +1,14 @@
+@layer base {
+  .dbv-plan-edge {
+    z-index: 1;
+    fill: none;
+    stroke: var(--dbv-plan-edge-color);
+    stroke-width: 1.5;
+    pointer-events: none;
+  }
+
+  .dbv-plan-edge[data-heavy-route] {
+    stroke: var(--dbv-plan-edge-heavy-color);
+    stroke-width: 2;
+  }
+}

@@ -1,0 +1,35 @@
+@layer base {
+  .dbv-plan-toolbar {
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
+    display: flex;
+    gap: 4px;
+    z-index: 10;
+  }
+
+  .dbv-plan-toolbar__button {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--dbv-plan-toolbar-border);
+    border-radius: 4px;
+    background: var(--dbv-plan-toolbar-bg);
+    color: var(--dbv-plan-toolbar-color);
+    cursor: pointer;
+    font-size: 14px;
+    line-height: 1;
+    padding: 0;
+    transition: background-color 0.1s ease;
+  }
+
+  .dbv-plan-toolbar__button:hover {
+    background: var(--dbv-plan-toolbar-hover-bg);
+  }
+
+  .dbv-plan-toolbar__button:active {
+    background: var(--dbv-plan-toolbar-active-bg);
+  }
+}

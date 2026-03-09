@@ -1,0 +1,50 @@
+{
+  "name": "@dbeaver/react-execution-plan-diagram",
+  "type": "module",
+  "sideEffects": [
+    "*.css"
+  ],
+  "exports": {
+    ".": "./lib/index.js",
+    "./*.css": "./src/*.css",
+    "./*": "./lib/*.js"
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "build:standalone": "vite build",
+    "clear": "rimraf lib dist"
+  },
+  "files": [
+    "package.json",
+    "LICENSE",
+    "README.md",
+    "lib",
+    "!lib/**/*.d.ts.map",
+    "!lib/**/*.test.js",
+    "!lib/**/*.test.d.ts",
+    "!lib/**/*.test.d.ts.map",
+    "!lib/**/*.test.js.map",
+    "!lib/tests",
+    "!.tsbuildinfo"
+  ],
+  "packageManager": "yarn@4.9.2",
+  "devDependencies": {
+    "@dbeaver/tsconfig": "workspace:^",
+    "@types/d3-selection": "^3",
+    "@types/d3-zoom": "^3",
+    "@types/dagre": "^0",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "rimraf": "^6",
+    "typescript": "^5",
+    "vite": "^7"
+  },
+  "dependencies": {
+    "@dbeaver/js-helpers": "workspace:*",
+    "d3-selection": "^3",
+    "d3-zoom": "^3",
+    "dagre": "^0",
+    "react": "^19.2",
+    "react-dom": "^19.2"
+  }
+}

@@ -1,0 +1,44 @@
+@layer base {
+  :root {
+    /* General */
+    --dbv-plan-font-family: system-ui, sans-serif;
+    --dbv-plan-font-size: 12px;
+
+    /* Viewport */
+    --dbv-plan-viewport-bg: #fafafa;
+
+    /* Node */
+    --dbv-plan-node-bg: #ffffff;
+    --dbv-plan-node-border-color: #c0c0c0;
+    --dbv-plan-node-selected-border: #2196f3;
+    --dbv-plan-node-selected-glow: #2196f34d;
+    --dbv-plan-node-heavy-color: #e53935;
+
+    /* Node caption */
+    --dbv-plan-node-caption-bg: #f5f5f5;
+    --dbv-plan-node-caption-color: #333;
+
+    /* Node name */
+    --dbv-plan-node-name-color: #1a1a1a;
+
+    /* Node metrics */
+    --dbv-plan-node-metric-color: #666;
+    --dbv-plan-node-metric-value-color: #333;
+
+    /* Node cost bar */
+    --dbv-plan-node-cost-bar-bg: #e0e0e0;
+    --dbv-plan-node-cost-bar-color: #ff9800;
+    --dbv-plan-node-cost-bar-high-color: var(--dbv-plan-node-heavy-color);
+
+    /* Edges */
+    --dbv-plan-edge-color: #999;
+    --dbv-plan-edge-heavy-color: var(--dbv-plan-node-heavy-color);
+
+    /* Toolbar */
+    --dbv-plan-toolbar-border: #ccc;
+    --dbv-plan-toolbar-bg: #fff;
+    --dbv-plan-toolbar-color: #333;
+    --dbv-plan-toolbar-hover-bg: #f0f0f0;
+    --dbv-plan-toolbar-active-bg: #e0e0e0;
+  }
+}

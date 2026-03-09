@@ -1,0 +1,129 @@
+@layer base {
+  .dbv-plan-node {
+    position: absolute;
+    border: 1px solid var(--dbv-plan-node-border-color);
+    border-radius: 4px;
+    background: var(--dbv-plan-node-bg);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    user-select: none;
+    display: flex;
+    flex-direction: column;
+    font-family: var(--dbv-plan-font-family);
+    font-size: var(--dbv-plan-font-size);
+    transition: box-shadow 0.15s ease;
+  }
+
+  .dbv-plan-node:hover {
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  }
+
+  .dbv-plan-node[data-selected] {
+    border-color: var(--dbv-plan-node-selected-border);
+    box-shadow: 0 0 0 2px var(--dbv-plan-node-selected-glow);
+  }
+
+  .dbv-plan-node[data-collapsed] {
+    border-style: dashed;
+  }
+
+  .dbv-plan-node__caption {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 8px;
+    background: var(--dbv-plan-node-caption-bg);
+    border-bottom: 1px solid var(--dbv-plan-node-border-color);
+    border-radius: 3px 3px 0 0;
+    font-weight: 600;
+    font-size: 11px;
+    color: var(--dbv-plan-node-caption-color);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .dbv-plan-node__caption-icon {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+  }
+
+  .dbv-plan-node__name {
+    padding: 4px 8px 2px;
+    color: var(--dbv-plan-node-name-color);
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .dbv-plan-node__metrics {
+    padding: 2px 8px 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+
+  .dbv-plan-node__metric {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    font-size: 10px;
+    color: var(--dbv-plan-node-metric-color);
+  }
+
+  .dbv-plan-node__metric-label {
+    flex-shrink: 0;
+  }
+
+  .dbv-plan-node__metric-value {
+    font-weight: 500;
+    color: var(--dbv-plan-node-metric-value-color);
+  }
+
+  .dbv-plan-node__cost-bar {
+    height: 2px;
+    background: var(--dbv-plan-node-cost-bar-bg);
+    margin-top: auto;
+    border-radius: 0 0 3px 3px;
+    overflow: hidden;
+  }
+
+  .dbv-plan-node__cost-bar-fill {
+    height: 100%;
+    background: var(--dbv-plan-node-cost-bar-color);
+    transition: width 0.2s ease;
+  }
+
+  .dbv-plan-node__cost-bar-fill[data-high-cost] {
+    background: var(--dbv-plan-node-cost-bar-high-color);
+  }
+
+  .dbv-plan-node__collapse-indicator {
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 17px;
+    height: 17px;
+    border-radius: 50%;
+    border: 1px solid var(--dbv-plan-node-border-color);
+    background: var(--dbv-plan-node-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    color: var(--dbv-plan-node-metric-color);
+    cursor: pointer;
+  }
+
+  .dbv-plan-node[data-horizontal] .dbv-plan-node__collapse-indicator {
+    bottom: auto;
+    left: auto;
+    right: -10px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+}

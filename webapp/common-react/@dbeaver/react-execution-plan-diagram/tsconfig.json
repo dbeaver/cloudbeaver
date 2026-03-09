@@ -1,0 +1,21 @@
+{
+  "extends": "@dbeaver/tsconfig/tsconfig.webview.json",
+  "compilerOptions": {
+    "tsBuildInfoFile": "./lib/.tsbuildinfo",
+    "rootDir": "src",
+    "rootDirs": [
+      "src"
+    ],
+    "outDir": "lib",
+    "incremental": true,
+    "composite": true
+  },
+  "include": [
+    "src"
+  ],
+  "references": [
+    {
+      "path": "../../../common-typescript/@dbeaver/js-helpers"
+    }
+  ]
+}
