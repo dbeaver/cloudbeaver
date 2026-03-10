@@ -256,6 +256,14 @@ public class WebServiceSQL implements DBWServiceSQL {
         @NotNull String resultsId,
         @NotNull List<WebSQLResultsRow> selectedRows
     ) throws DBWebException {
+        for (WebSQLResultsRow row : selectedRows) {
+            Object[] data = row.getData();
+            for (int i = 0; i < data.length; i++) {
+                if (data[i] instanceof String stringData && stringData.length() == WebSQLConstants.TEXT_PREVIEW_MAX_LENGTH) {
+                    data[i] = getCellValue(sqlContext, resultsId, i, row);
+                }
+            }
+        }
         WebDBDResultSetDataProvider dataProvider = new WebDBDResultSetDataProvider(resultsId, sqlContext, selectedRows);
         return createAndRunGenerator(webSession, generatorId, Collections.singletonList(dataProvider));
     }
