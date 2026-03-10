@@ -16,13 +16,21 @@
  */
 package io.cloudbeaver.server;
 
+import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 
 public class WebAppUtils {
+
+    public static boolean isWebApplication() {
+        return DBWorkbench.getPlatform().getApplication() instanceof WebApplication;
+    }
+
+    @NotNull
     public static WebApplication getWebApplication() {
         return (WebApplication) DBWorkbench.getPlatform().getApplication();
     }
 
+    @NotNull
     public static BaseWebPlatform getWebPlatform() {
         return (BaseWebPlatform) DBWorkbench.getPlatform();
     }

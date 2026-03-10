@@ -47,6 +47,8 @@ public class ServletAppUtils {
     private static final String HEADER_REFERER = "Referer";
 
     private static final String HEADER_FORWARDED_SCHEME = "X-Forwarded-Scheme";
+    private static final String HEADER_FORWARDED_PROTO = "X-Forwarded-Proto";
+    private static final String HEADER_FORWARDED_PORT = "X-Forwarded-Port";
     private static final String HEADER_FORWARDED_HOST = "X-Forwarded-Host";
     private static final Set<Integer> DEFAULT_PORTS = Set.of(
         80,
@@ -310,6 +312,9 @@ public class ServletAppUtils {
             }
         }
         String forwardedScheme = request.getHeader(HEADER_FORWARDED_SCHEME);
+        if (CommonUtils.isEmpty(forwardedScheme)) {
+            forwardedScheme = request.getHeader(HEADER_FORWARDED_PROTO);
+        }
         String forwardedHost = request.getHeader(HEADER_FORWARDED_HOST);
         if (CommonUtils.isNotEmpty(forwardedScheme) && CommonUtils.isNotEmpty(forwardedHost)) {
             origin = forwardedScheme + "://" + forwardedHost;
@@ -333,7 +338,15 @@ public class ServletAppUtils {
 
         origin = removeSideSlashes(origin);
         URI uri = URI.create(origin);
-        if (DEFAULT_PORTS.contains(uri.getPort())) {
+        int port = uri.getPort();
+        if (CommonUtils.isNotEmpty(request.getHeader(HEADER_FORWARDED_PORT))) {
+            try {
+                port = Integer.parseInt(request.getHeader(HEADER_FORWARDED_PORT));
+            } catch (NumberFormatException e) {
+                log.error("Failed to parse port from header: " + request.getHeader(HEADER_FORWARDED_PORT), e);
+            }
+        }
+        if (DEFAULT_PORTS.contains(port)) {
             try {
                 origin = new URI(
                     uri.getScheme(),
