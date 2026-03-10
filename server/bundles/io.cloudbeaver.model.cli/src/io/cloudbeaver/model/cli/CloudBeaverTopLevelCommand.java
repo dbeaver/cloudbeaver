@@ -22,10 +22,12 @@ import org.jkiss.dbeaver.model.cli.ApplicationInstanceController;
 import org.jkiss.dbeaver.model.cli.CLIContextImpl;
 import org.jkiss.dbeaver.model.cli.CLIRunMeta;
 import org.jkiss.dbeaver.model.cli.command.AbstractTopLevelCommand;
+import org.jkiss.dbeaver.model.cli.model.NonExecutableOption;
 import picocli.CommandLine;
 
 @CommandLine.Command(name = "cbvr", description = "CloudBeaver commands")
 public class CloudBeaverTopLevelCommand extends AbstractTopLevelCommand {
+    @NonExecutableOption
     @CommandLine.Option(
         names = {NOSPASH_OPTION},
         hidden = true,

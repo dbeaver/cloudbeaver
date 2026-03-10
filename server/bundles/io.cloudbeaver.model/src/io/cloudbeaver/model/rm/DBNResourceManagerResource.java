@@ -31,8 +31,6 @@ import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.rm.RMResource;
 import org.jkiss.dbeaver.model.rm.RMResourceType;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
-import org.jkiss.dbeaver.registry.ResourceTypeDescriptor;
-import org.jkiss.dbeaver.registry.ResourceTypeRegistry;
 import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.IOUtils;
@@ -44,7 +42,7 @@ public class DBNResourceManagerResource extends DBNAbstractResourceManagerNode {
 
     private final RMResource resource;
 
-    DBNResourceManagerResource(DBNNode parentNode, RMResource resource) {
+    DBNResourceManagerResource(@NotNull DBNNode parentNode, @NotNull RMResource resource) {
         super(parentNode);
         this.resource = resource;
     }
@@ -71,6 +69,7 @@ public class DBNResourceManagerResource extends DBNAbstractResourceManagerNode {
     @Override
     public DBPImage getNodeIcon() {
         if (resource.isFolder()) {
+/*
             if (getParentNode() instanceof DBNResourceManagerResource) {
                 return DBIcon.TREE_FOLDER;
             }
@@ -82,11 +81,12 @@ public class DBNResourceManagerResource extends DBNAbstractResourceManagerNode {
             if (folderResType != null) {
                 return folderResType.getFolderIcon();
             }
+*/
             return DBIcon.TREE_FOLDER;
         } else {
             var fileExtension = IOUtils.getFileExtension(getNodeDisplayName());
             if (!CommonUtils.isEmpty(fileExtension)) {
-                RMProject project = getProjectNode();
+                RMProject project = getRmProject();
                 if (project != null) {
                     for (RMResourceType rt : project.getResourceTypes()) {
                         if (ArrayUtils.contains(rt.getFileExtensions(), fileExtension)) {
@@ -99,7 +99,8 @@ public class DBNResourceManagerResource extends DBNAbstractResourceManagerNode {
         }
     }
 
-    private RMProject getProjectNode() {
+    @Nullable
+    public RMProject getRmProject() {
         for (DBNNode node = this; node != null; node = node.getParentNode()) {
             if (node instanceof DBNResourceManagerProject) {
                 return  ((DBNResourceManagerProject) node).getProject();

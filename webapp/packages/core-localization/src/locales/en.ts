@@ -31,7 +31,6 @@ export default [
   ['ui_minute_first_form', '{arg:interval} minute'],
   ['ui_minute_second_form', '{arg:interval} minutes'],
   ['ui_minute_third_form', '{arg:interval} minutes'],
-  ['ui_please_retry', 'Please retry'],
   ['ui_custom', 'Custom'],
   ['ui_configure', 'Configure'],
   ['ui_apply', 'Apply'],

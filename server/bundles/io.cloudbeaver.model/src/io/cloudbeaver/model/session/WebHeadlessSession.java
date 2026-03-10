@@ -35,12 +35,12 @@ public class WebHeadlessSession extends BaseWebSession {
     }
 
     @Override
-    public void addSessionError(Throwable exception) {
+    public void addSessionError(@NotNull Throwable exception) {
 
     }
 
     @Override
-    public void addSessionMessage(WebServerMessage message) {
+    public void addSessionMessage(@NotNull WebServerMessage message) {
 
     }
 
