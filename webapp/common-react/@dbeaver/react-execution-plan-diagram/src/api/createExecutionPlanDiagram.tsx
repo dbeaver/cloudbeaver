@@ -8,6 +8,7 @@
 
 import { createElement, useContext, useEffect } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
+import { TranslateContext, type TranslateFn } from '@dbeaver/react-translate';
 
 import { DiagramContext, type IToolbarActions } from '../components/DiagramContext.js';
 import { ExecutionPlanDiagram } from '../components/ExecutionPlanDiagram.js';
@@ -15,9 +16,12 @@ import type { IPlanData } from '../types/IPlanData.js';
 import type { IPlanDiagramCallbacks } from '../types/IPlanDiagramCallbacks.js';
 import type { IPlanDiagramOptions } from '../types/IPlanDiagramOptions.js';
 
+export type IPlanTranslations = Record<string, string>;
+
 export interface IExecutionPlanDiagramAPI {
   setData(data: IPlanData): void;
   setOptions(options: Partial<IPlanDiagramOptions>): void;
+  setTranslations(translations: IPlanTranslations): void;
   selectNode(nodeId: string | null): void;
   getSelectedNodeId(): string | null;
   zoomIn(): void;
@@ -43,7 +47,19 @@ interface IExecutionPlanDiagramState {
   options: IPlanDiagramOptions;
   selectedNodeId: string | null;
   callbacks: IPlanDiagramCallbacks;
+  translations: IPlanTranslations;
   toolbarActions: IToolbarActions | null;
+}
+
+function interpolateTranslation(template: string, args?: Record<string | number, any>): string {
+  if (!args) {
+    return template;
+  }
+
+  return template.replace(/\{arg:([^}]+)\}/g, (match, key) => {
+    const value = args[key];
+    return value == null ? match : String(value);
+  });
 }
 
 function hasNode(data: IPlanData | null, nodeId: string | null): boolean {
@@ -59,6 +75,7 @@ export function createExecutionPlanDiagram(
   initialData?: IPlanData,
   options?: IPlanDiagramOptions,
   callbacks?: IPlanDiagramCallbacks,
+  translations?: IPlanTranslations,
 ): IExecutionPlanDiagramAPI {
   let root: Root | null = createRoot(container);
   const state: IExecutionPlanDiagramState = {
@@ -66,6 +83,7 @@ export function createExecutionPlanDiagram(
     options: options ?? {},
     selectedNodeId: null,
     callbacks: callbacks ?? {},
+    translations: translations ?? {},
     toolbarActions: null,
   };
 
@@ -81,27 +99,40 @@ export function createExecutionPlanDiagram(
 
     root.render(
       createElement(
-        ExecutionPlanDiagram,
+        TranslateContext.Provider,
         {
-          data: state.data,
-          options: state.options,
-          selectedNodeId: state.selectedNodeId,
-          onNodeSelect: (nodeId, node) => {
-            state.selectedNodeId = nodeId;
-            state.callbacks.onNodeSelect?.(nodeId, node);
+          value: {
+            translate: ((token, fallback, args) => {
+              const key = token ? String(token) : undefined;
+              const template = (key && state.translations[key]) || fallback || key;
 
-            if (typeof (globalThis as any).onPlanNodeSelected === 'function') {
-              (globalThis as any).onPlanNodeSelected(nodeId);
-            }
-
-            render();
+              return (template ? interpolateTranslation(template, args) : template) as typeof token;
+            }) as TranslateFn,
           },
         },
-        createElement(ActionsCapture, {
-          onActions: actions => {
-            state.toolbarActions = actions;
+        createElement(
+          ExecutionPlanDiagram,
+          {
+            data: state.data,
+            options: state.options,
+            selectedNodeId: state.selectedNodeId,
+            onNodeSelect: (nodeId, node) => {
+              state.selectedNodeId = nodeId;
+              state.callbacks.onNodeSelect?.(nodeId, node);
+
+              if (typeof (globalThis as any).onPlanNodeSelected === 'function') {
+                (globalThis as any).onPlanNodeSelected(nodeId);
+              }
+
+              render();
+            },
           },
-        }),
+          createElement(ActionsCapture, {
+            onActions: actions => {
+              state.toolbarActions = actions;
+            },
+          }),
+        ),
       ),
     );
   }
@@ -116,6 +147,10 @@ export function createExecutionPlanDiagram(
     },
     setOptions(options: Partial<IPlanDiagramOptions>): void {
       state.options = { ...state.options, ...options };
+      render();
+    },
+    setTranslations(translations: IPlanTranslations): void {
+      state.translations = { ...translations };
       render();
     },
     selectNode(nodeId: string | null): void {
