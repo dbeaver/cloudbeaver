@@ -24,6 +24,7 @@ import { DATA_CONTEXT_DV_DDM } from '../../DatabaseDataModel/DataContext/DATA_CO
 import { DATA_CONTEXT_DV_DDM_RESULT_INDEX } from '../../DatabaseDataModel/DataContext/DATA_CONTEXT_DV_DDM_RESULT_INDEX.js';
 import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel.js';
 import { isResultSetDataSource, ResultSetDataSource } from '../../ResultSet/ResultSetDataSource.js';
+import { isEditableDataSource } from '../../ResultSet/isEditableDataSource.js';
 import { DATA_VIEWER_DATA_MODEL_TOOLS_MENU } from './DATA_VIEWER_DATA_MODEL_TOOLS_MENU.js';
 import { IDatabaseDataConstraintAction } from '../../DatabaseDataModel/Actions/IDatabaseDataConstraintAction.js';
 import { GridHistoryAction } from '../../DatabaseDataModel/Actions/Grid/GridHistoryAction.js';
@@ -58,11 +59,11 @@ export class TableHeaderService extends Bootstrap {
       contexts: [DATA_CONTEXT_DV_DDM, DATA_CONTEXT_DV_DDM_RESULT_INDEX],
       isHidden(context, action) {
         const model = context.get(DATA_CONTEXT_DV_DDM)!;
-        // TODO add more proper way to define to what features it should be added https://github.com/dbeaver/pro/issues/8299
-        const isReadonly = model.isReadonly(context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!);
+        const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
+        const isEditable = isEditableDataSource(model.source, resultIndex);
 
         if ([ACTION_UNDO, ACTION_REDO].includes(action)) {
-          return isReadonly;
+          return !isEditable;
         }
 
         return false;

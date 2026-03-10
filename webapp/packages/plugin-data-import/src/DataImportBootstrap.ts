@@ -15,6 +15,7 @@ import {
   DATA_CONTEXT_DV_PRESENTATION,
   DATA_VIEWER_DATA_MODEL_ACTIONS_MENU,
   DataViewerPresentationType,
+  isEditableDataSource,
   isResultSetDataModel,
 } from '@cloudbeaver/plugin-data-viewer';
 
@@ -102,8 +103,7 @@ export class DataImportBootstrap extends Bootstrap {
         const isContainer = model.source instanceof ContainerDataSource;
 
         return (
-          // TODO add more proper way to define to what features it should be added https://github.com/dbeaver/pro/issues/8299
-          !model.isReadonly(resultIndex) &&
+          isEditableDataSource(model.source, resultIndex) &&
           isContainer &&
           !this.dataImportService.disabled &&
           !presentation?.readonly &&

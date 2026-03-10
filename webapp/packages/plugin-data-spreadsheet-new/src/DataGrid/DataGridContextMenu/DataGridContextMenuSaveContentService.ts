@@ -18,6 +18,7 @@ import {
   DataViewerService,
   IDatabaseDataEditAction,
   IDatabaseDataFormatAction,
+  isEditableDataSource,
   isResultSetDataSource,
   ResultSetDataContentAction,
 } from '@cloudbeaver/plugin-data-viewer';
@@ -62,9 +63,8 @@ export class DataGridContextMenuSaveContentService {
 
         if (action === ACTION_UPLOAD) {
           return (
-            // TODO add more proper way to define to what features it should be added https://github.com/dbeaver/pro/issues/8299
             !format.isBinary(cellHolder) ||
-            model.isReadonly(resultIndex) ||
+            !isEditableDataSource(model.source, resultIndex) ||
             (format.isReadOnly(key) && editor.getElementState(key) !== DatabaseEditChangeType.add)
           );
         }

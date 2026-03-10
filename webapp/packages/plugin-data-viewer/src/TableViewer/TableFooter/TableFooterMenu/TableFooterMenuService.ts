@@ -40,6 +40,7 @@ import { DATA_VIEWER_DATA_MODEL_ACTIONS_MENU } from './DATA_VIEWER_DATA_MODEL_AC
 import { DataViewerViewService } from '../../DataViewerViewService.js';
 import { IDatabaseDataSelectAction } from '../../../DatabaseDataModel/Actions/IDatabaseDataSelectAction.js';
 import { isResultSetDataSource } from '../../../ResultSet/ResultSetDataSource.js';
+import { isEditableDataSource } from '../../../ResultSet/isEditableDataSource.js';
 
 @injectable(() => [ActionService, KeyBindingService, DataViewerViewService, LocalizationService, MenuService])
 export class TableFooterMenuService {
@@ -125,8 +126,11 @@ export class TableFooterMenuService {
         const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
         const presentation = context.get(DATA_CONTEXT_DV_PRESENTATION);
 
-        // TODO add more proper way to define to what features it should be added https://github.com/dbeaver/pro/issues/8299
-        return !model.isReadonly(resultIndex) && !presentation?.readonly && (!presentation || presentation.type === DataViewerPresentationType.Data);
+        return (
+          isEditableDataSource(model.source, resultIndex) &&
+          !presentation?.readonly &&
+          (!presentation || presentation.type === DataViewerPresentationType.Data)
+        );
       },
       getItems(context, items) {
         return [ACTION_ADD, ACTION_DUPLICATE, ACTION_DELETE, ACTION_REVERT, ACTION_SAVE, ACTION_CANCEL, ...items];
@@ -144,8 +148,7 @@ export class TableFooterMenuService {
           return false;
         }
 
-        // TODO add more proper way to define to what features it should be added https://github.com/dbeaver/pro/issues/8299
-        if (model.isReadonly(resultIndex)) {
+        if (!isEditableDataSource(model.source, resultIndex)) {
           return false;
         }
 
@@ -188,8 +191,7 @@ export class TableFooterMenuService {
             const selectedElements = getActiveElements(model, resultIndex);
             const hasElementIdentifier = isResultSetDataSource(model.source) ? model.source.hasElementIdentifier(resultIndex) : false;
 
-            const canEdit =
-              hasElementIdentifier || selectedElements.every(key => editor?.getElementState(key) === DatabaseEditChangeType.add);
+            const canEdit = hasElementIdentifier || selectedElements.every(key => editor?.getElementState(key) === DatabaseEditChangeType.add);
 
             if (!editor || !canEdit) {
               return true;

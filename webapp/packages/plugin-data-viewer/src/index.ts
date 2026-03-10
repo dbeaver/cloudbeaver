@@ -89,6 +89,8 @@ export * from './TableViewer/TableHeader/TableHeaderService.js';
 export * from './ContainerDataSource.js';
 export * from './ResultSet/ResultSetDataSource.js';
 export * from './ResultSet/isResultSetDataModel.js';
+export * from './ResultSet/isEditableDataSource.js';
+export * from './ResultSet/isEditableDataModel.js';
 export * from './DataPresentationService.js';
 export * from './DataViewerDataChangeConfirmationService.js';
 export * from './ValuePanelPresentation/BooleanValue/isBooleanValuePresentationAvailable.js';

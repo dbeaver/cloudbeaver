@@ -13,6 +13,7 @@ import type { ResultSetDataContentAction } from '../../DatabaseDataModel/Actions
 import type { IResultSetValue } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction.js';
 import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel.js';
 import { ResultSetDataSource } from '../../ResultSet/ResultSetDataSource.js';
+import { isEditableDataSource } from '../../ResultSet/isEditableDataSource.js';
 
 interface Args {
   contentAction: ResultSetDataContentAction;
@@ -23,15 +24,13 @@ interface Args {
   editAction: IDatabaseDataEditAction;
 }
 
-export function isTextValueReadonly({ contentAction, formatAction, model, resultIndex, cellHolder, editAction }: Args) {
+export function isTextValueReadonly({ contentAction, formatAction, model, resultIndex, cellHolder, editAction }: Args): boolean {
   if (!cellHolder) {
     return true;
   }
 
   return (
-    // TODO add more proper way to define to what features it should be added https://github.com/dbeaver/pro/issues/8299
-    model.isReadonly(resultIndex) ||
-    model.isDisabled(resultIndex) ||
+    !isEditableDataSource(model.source, resultIndex) ||
     (formatAction.isReadOnly(cellHolder.key) && editAction.getElementState(cellHolder.key) !== DatabaseEditChangeType.add) ||
     formatAction.isBinary(cellHolder) ||
     formatAction.isGeometry(cellHolder) ||

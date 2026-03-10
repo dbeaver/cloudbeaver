@@ -21,6 +21,7 @@ import {
   IDatabaseDataResult,
   IDatabaseDataSelectAction,
   IDatabaseDataSource,
+  isEditableDataModel,
   isResultSetDataModel,
   ResultSetDataAction,
   ResultSetDataContentAction,
@@ -61,8 +62,7 @@ export class DataGridContextMenuGenerateSqlService {
         const model = context.get(DATA_CONTEXT_DV_DDM);
         const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
 
-        // TODO add more proper way to define to what features it should be added https://github.com/dbeaver/pro/issues/8299
-        return isResultSetDataModel(model) && !model.isReadonly(resultIndex) && !model.isDisabled(resultIndex);
+        return isEditableDataModel(model, resultIndex);
       },
       getItems: (context, items) => [...items, MENU_DATA_GRID_GENERATE_SQL],
     });
