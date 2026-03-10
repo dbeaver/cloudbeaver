@@ -22,7 +22,7 @@ import {
 
 import { ColumnDnDContext } from './ColumnDnDContext.js';
 
-export function useDnDBox(model: IDatabaseDataModel, resultIndex: number, columnKey: IGridColumnKey | null): IDNDBox {
+export function useDataEditorDnDBox(model: IDatabaseDataModel, resultIndex: number, columnKey: IGridColumnKey | null): IDNDBox {
   const columnDnDContext = useContext(ColumnDnDContext);
   let resultSetViewAction: GridViewAction | undefined;
 

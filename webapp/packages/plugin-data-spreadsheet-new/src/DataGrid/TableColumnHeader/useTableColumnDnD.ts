@@ -19,7 +19,7 @@ import {
 } from '@cloudbeaver/plugin-data-viewer';
 
 import { ColumnDnDContext } from '../ColumnDnDContext.js';
-import { useDnDBox } from '../useDnDBox.js';
+import { useDataEditorDnDBox } from '../useDataEditorDnDBox.js';
 
 interface TableColumnDnD {
   setRef: (element: React.ReactElement | Element | null) => void;
@@ -48,7 +48,7 @@ export function useTableColumnDnD(model: IDatabaseDataModel, resultIndex: number
     },
   });
 
-  const dndBox = useDnDBox(model, resultIndex, columnKey);
+  const dndBox = useDataEditorDnDBox(model, resultIndex, columnKey);
 
   const setRef = useCombinedRef(dndData.setTargetRef, dndBox.setRef);
 
