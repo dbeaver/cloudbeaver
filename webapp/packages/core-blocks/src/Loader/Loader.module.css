@@ -51,11 +51,6 @@
       padding: 0;
     }
   }
-  .loader.small {
-    & .message {
-      display: none;
-    }
-  }
   .loader.fullSize {
     height: 100%;
     width: 100%;
