@@ -5016,6 +5016,7 @@ __metadata:
     "@dbeaver/cli": "workspace:*"
     "@dbeaver/js-helpers": "workspace:*"
     "@dbeaver/react-tests": "workspace:*"
+    "@dbeaver/react-translate": "workspace:*"
     "@dbeaver/tsconfig": "workspace:^"
     "@types/d3-selection": "npm:^3"
     "@types/d3-zoom": "npm:^3"

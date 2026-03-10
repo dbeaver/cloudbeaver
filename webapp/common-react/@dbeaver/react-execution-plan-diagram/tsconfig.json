@@ -26,6 +26,9 @@
     },
     {
       "path": "../react-tests"
+    },
+    {
+      "path": "../react-translate"
     }
   ]
 }

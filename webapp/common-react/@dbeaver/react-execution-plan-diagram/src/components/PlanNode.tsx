@@ -7,6 +7,7 @@
  */
 
 import type { FocusEventHandler, KeyboardEventHandler, ReactElement, Ref } from 'react';
+import { useTranslate } from '@dbeaver/react-translate';
 
 import type { IPlanFeatures } from '../types/IPlanFeatures.js';
 import type { IPlanNode } from '../types/IPlanNode.js';
@@ -52,6 +53,7 @@ export function PlanNode({
   onSelect,
   onToggleCollapse,
 }: PlanNodeProps): ReactElement {
+  const translate = useTranslate();
   const percent = node.percent != null ? Math.round(node.percent * 100) : null;
   const isHighCost = percent != null && percent > 50;
   const handleFocus: FocusEventHandler<HTMLDivElement> = () => {
@@ -90,7 +92,7 @@ export function PlanNode({
       <div className="dbv-plan-node__metrics">
         {features.hasCost && node.cost != null && (
           <div className="dbv-plan-node__metric">
-            <span className="dbv-plan-node__metric-label">Cost</span>
+            <span className="dbv-plan-node__metric-label">{translate('sql_execution_plan_diagram_cost', 'Cost')}</span>
             <span className="dbv-plan-node__metric-value">
               {formatNumber(node.cost)}
               {percent != null && ` (${percent}%)`}
@@ -99,13 +101,13 @@ export function PlanNode({
         )}
         {features.hasRows && node.rowCount != null && (
           <div className="dbv-plan-node__metric">
-            <span className="dbv-plan-node__metric-label">Rows</span>
+            <span className="dbv-plan-node__metric-label">{translate('sql_execution_plan_diagram_rows', 'Rows')}</span>
             <span className="dbv-plan-node__metric-value">{formatNumber(node.rowCount)}</span>
           </div>
         )}
         {features.hasDuration && node.duration != null && (
           <div className="dbv-plan-node__metric">
-            <span className="dbv-plan-node__metric-label">Time</span>
+            <span className="dbv-plan-node__metric-label">{translate('sql_execution_plan_diagram_time', 'Time')}</span>
             <span className="dbv-plan-node__metric-value">{formatDuration(node.duration)}</span>
           </div>
         )}
@@ -119,7 +121,11 @@ export function PlanNode({
         <button
           type="button"
           className="dbv-plan-node__collapse-indicator"
-          aria-label={collapsed ? `Expand ${node.type}` : `Collapse ${node.type}`}
+          aria-label={
+            collapsed
+              ? translate('sql_execution_plan_diagram_expand_node', 'Expand {arg:name}', { name: node.type })
+              : translate('sql_execution_plan_diagram_collapse_node', 'Collapse {arg:name}', { name: node.type })
+          }
           aria-expanded={!collapsed}
           onKeyDown={e => {
             e.stopPropagation();

@@ -40,6 +40,11 @@ export default [
   ['sql_execution_plan_diagram_zoom_out', 'Zoom out'],
   ['sql_execution_plan_diagram_fit_to_screen', 'Fit to screen'],
   ['sql_execution_plan_diagram_reset_view', 'Reset view'],
+  ['sql_execution_plan_diagram_cost', 'Cost'],
+  ['sql_execution_plan_diagram_rows', 'Rows'],
+  ['sql_execution_plan_diagram_time', 'Time'],
+  ['sql_execution_plan_diagram_expand_node', 'Expand {arg:name}'],
+  ['sql_execution_plan_diagram_collapse_node', 'Collapse {arg:name}'],
   ['sql_editor_upload_script_tooltip', 'Upload sql script'],
   ['sql_editor_download_script_tooltip', 'Download sql script'],
   [

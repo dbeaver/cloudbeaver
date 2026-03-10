@@ -45,6 +45,7 @@
   },
   "dependencies": {
     "@dbeaver/js-helpers": "workspace:*",
+    "@dbeaver/react-translate": "workspace:*",
     "d3-selection": "^3",
     "d3-zoom": "^3",
     "dagre": "^0",
