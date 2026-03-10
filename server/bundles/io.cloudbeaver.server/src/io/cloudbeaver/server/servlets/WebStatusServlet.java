@@ -17,7 +17,6 @@
 package io.cloudbeaver.server.servlets;
 
 import com.google.gson.stream.JsonWriter;
-import io.cloudbeaver.server.CBConstants;
 import io.cloudbeaver.server.WebAppUtils;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -27,6 +26,7 @@ import org.eclipse.jetty.ee11.servlet.DefaultServlet;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.utils.GeneralUtils;
+import org.jkiss.utils.HttpConstants;
 
 import java.io.IOException;
 import java.util.LinkedHashMap;
@@ -39,7 +39,7 @@ public class WebStatusServlet extends DefaultServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        response.setContentType(CBConstants.APPLICATION_JSON);
+        response.setContentType(HttpConstants.CONTENT_TYPE_JSON);
         response.setHeader("Access-Control-Allow-Origin", "*");
         Map<String, Object> infoMap = new LinkedHashMap<>();
         infoMap.put("health", "ok");

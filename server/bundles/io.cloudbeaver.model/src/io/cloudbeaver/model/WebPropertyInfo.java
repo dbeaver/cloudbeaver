@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2025 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,11 +17,13 @@
 package io.cloudbeaver.model;
 
 import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.server.CBConstants;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.*;
 import org.jkiss.dbeaver.model.connection.DBPDriverConfigurationType;
+import org.jkiss.dbeaver.model.impl.PropertyDescriptor;
 import org.jkiss.dbeaver.model.impl.ProviderPropertyDescriptor;
 import org.jkiss.dbeaver.model.meta.IPropertyValueListProvider;
 import org.jkiss.dbeaver.model.meta.Property;
@@ -30,6 +32,7 @@ import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
 import org.jkiss.dbeaver.model.preferences.DBPPropertySource;
 import org.jkiss.dbeaver.registry.settings.ProductSettingDescriptor;
 import org.jkiss.dbeaver.runtime.properties.ObjectPropertyDescriptor;
+import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
 
 import java.lang.reflect.Array;
@@ -136,13 +139,14 @@ public class WebPropertyInfo {
     @Property
     public Object getValue() throws DBException {
         Object value = propertySource == null ? null : propertySource.getPropertyValue(session.getProgressMonitor(), property.getId());
-        if (property instanceof ObjectPropertyDescriptor) {
-            ObjectPropertyDescriptor opd = (ObjectPropertyDescriptor) property;
-            if (!showProtected && opd.isPassword() || opd.isHidden()) {
-                if (value == null || value.toString().isEmpty()) {
-                    return "";
-                }
-                return "******";
+        if (property instanceof ObjectPropertyDescriptor opd &&
+            (!showProtected && opd.isPassword() || opd.isHidden())
+        ) {
+            return maskValue(value);
+        } else if (property instanceof PropertyDescriptor pd) {
+            String[] features = pd.getFeatures();
+            if (features != null && ArrayUtils.contains(features, DBConstants.PROP_FEATURE_PASSWORD)) {
+                return maskValue(value);
             }
         }
         return value == null ? null : makePropertyValue(value);
@@ -305,6 +309,15 @@ public class WebPropertyInfo {
         public enum Type {
             HIDE,
             READ_ONLY
+        }
+    }
+
+    @NotNull
+    private static String maskValue(@Nullable Object value) {
+        if (value == null || value.toString().isEmpty()) {
+            return "";
+        } else {
+            return CBConstants.SECURED_VALUE;
         }
     }
 }

@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -46,7 +46,10 @@ export const ExceptionMessage = observer<Props>(function ExceptionMessage({ exce
   return (
     <div className={s(styles, { error: true, icon, inline }, className)}>
       <div className={s(styles, { errorIcon: true })} title={error.message}>
-        <IconOrImage className={s(styles, { iconOrImage: true })} icon={inline || icon ? '/icons/preload/error_icon_sm.svg' : '/icons/preload/error_icon.svg'} />
+        <IconOrImage
+          className={s(styles, { iconOrImage: true })}
+          icon={inline || icon ? '/icons/preload/error_icon_sm.svg' : '/icons/preload/error_icon.svg'}
+        />
       </div>
       {!icon && (
         <>
@@ -56,7 +59,6 @@ export const ExceptionMessage = observer<Props>(function ExceptionMessage({ exce
             </h2>
             <div className={s(styles, { errorMessage: true })}>
               {(error.hasDetails && error.message) || translate('core_blocks_exception_message_error_message')}{' '}
-              {onRetry && translate('ui_please_retry')}
             </div>
             <div className={s(styles, { errorActions: true })}>
               <Button type="button" variant="secondary" disabled={error.isOpen} onClick={error.open}>

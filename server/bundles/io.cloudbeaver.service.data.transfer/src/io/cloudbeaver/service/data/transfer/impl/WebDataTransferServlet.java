@@ -28,6 +28,7 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.tools.transfer.registry.DataTransferProcessorDescriptor;
 import org.jkiss.dbeaver.tools.transfer.registry.DataTransferRegistry;
 import org.jkiss.utils.CommonUtils;
+import org.jkiss.utils.HttpConstants;
 
 import java.io.IOException;
 
@@ -69,7 +70,7 @@ public class WebDataTransferServlet extends WebServiceServletBase {
         }
         fileName = WebDataTransferUtils.normalizeFileName(fileName, taskInfo.getParameters().getOutputSettings());
         session.addInfoMessage("Download data ...");
-        response.setHeader("Content-Type", processor.getContentType());
+        response.setHeader(HttpConstants.HEADER_CONTENT_TYPE, processor.getContentType());
         response.setHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
 
         dtManager.exportDataTransferToStream(session.getProgressMonitor(), taskInfo, response.getOutputStream());

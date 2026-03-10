@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
  */
 package io.cloudbeaver.model;
 
+import io.cloudbeaver.server.CBConstants;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.net.DBWHandlerConfiguration;
 import org.jkiss.dbeaver.model.net.DBWHandlerType;
@@ -88,7 +89,9 @@ public class WebNetworkHandlerConfig {
         DBPPropertyDescriptor[] descriptor = configuration.getHandlerDescriptor().getHandlerProperties();
         for (DBPPropertyDescriptor p : descriptor) {
             if (p.hasFeature(RegistryConstants.ATTR_PASSWORD)) {
-                secureProperties.computeIfPresent(p.getId(), (k, v) -> CommonUtils.isEmpty(v) ? null : WebConnectionInfo.SECURED_VALUE);
+                secureProperties.computeIfPresent(p.getId(), (k, v) ->
+                    CommonUtils.isEmpty(v) ? null : CBConstants.SECURED_VALUE
+                );
             }
         }
         return secureProperties;

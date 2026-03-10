@@ -300,13 +300,23 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
 
   private async handleQueryParamsEvent(event: IBaseAsyncTaskEvent) {
     const queryParamsEvent = event as WsSessionTaskQueryParamsConfirmationEvent;
-    const canUseQueryParameters =
-      this.currentQueryParameters && isArraysEqual(Object.keys(this.currentQueryParameters), Object.keys(queryParamsEvent.parameters));
+    const parameterValues = new Map<string, string | null | undefined>();
+
+    for (const parameter of queryParamsEvent.parameters) {
+      if (!parameter?.name || parameterValues.has(parameter.name)) {
+        continue;
+      }
+
+      parameterValues.set(parameter.name, parameter.value);
+    }
+
+    const paramNames = Array.from(parameterValues.keys());
+    const canUseQueryParameters = this.currentQueryParameters && isArraysEqual(Object.keys(this.currentQueryParameters), paramNames);
 
     if (!canUseQueryParameters) {
-      const parametersState = observable({
-        ...Object.fromEntries(Object.entries(queryParamsEvent.parameters).map(([key, value]) => [key, this.previousQueryParameters?.[key] ?? value])),
-      });
+      const parametersState = observable(
+        Object.fromEntries(paramNames.map(name => [name, this.previousQueryParameters?.[name] ?? parameterValues.get(name) ?? ''])),
+      );
       const connectionKey = this.executionContext?.context
         ? createConnectionParam(this.executionContext.context.projectId, this.executionContext.context.connectionId)
         : null;
@@ -318,7 +328,7 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
         message: queryParamsEvent.message,
         size: 'large',
         noOverflow: true,
-        children: () => renderQueryParamsForConfirmation(connectionKey, parametersState, queryParamsEvent.query),
+        children: () => renderQueryParamsForConfirmation(connectionKey, parametersState, queryParamsEvent.query, paramNames),
       });
 
       const { status } = await dialogPromise;
