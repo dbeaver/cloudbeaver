@@ -8,6 +8,7 @@
 
 import type { FocusEventHandler, KeyboardEventHandler, ReactElement, Ref } from 'react';
 import { useTranslate } from '@dbeaver/react-translate';
+import { formatNumber } from '@dbeaver/js-helpers';
 
 import type { IPlanFeatures } from '../types/IPlanFeatures.js';
 import type { IPlanNode } from '../types/IPlanNode.js';
@@ -98,7 +99,7 @@ export function PlanNode({
           <div className="dbv-plan-node__metric">
             <span className="dbv-plan-node__metric-label">{translate('sql_execution_plan_diagram_cost', 'Cost')}</span>
             <span className="dbv-plan-node__metric-value">
-              {formatNumber(node.cost)}
+              {formatNumber(node.cost, 2)}
               {percent != null && ` (${percent}%)`}
             </span>
           </div>
@@ -106,7 +107,7 @@ export function PlanNode({
         {features.hasRows && node.rowCount != null && (
           <div className="dbv-plan-node__metric">
             <span className="dbv-plan-node__metric-label">{translate('sql_execution_plan_diagram_rows', 'Rows')}</span>
-            <span className="dbv-plan-node__metric-value">{formatNumber(node.rowCount)}</span>
+            <span className="dbv-plan-node__metric-value">{formatNumber(node.rowCount, 0)}</span>
           </div>
         )}
         {features.hasDuration && node.duration != null && (
@@ -150,18 +151,6 @@ export function PlanNode({
       )}
     </div>
   );
-}
-
-function formatNumber(value: number): string {
-  if (value >= 1_000_000) {
-    return `${(value / 1_000_000).toFixed(1)}M`;
-  }
-
-  if (value >= 1_000) {
-    return `${(value / 1_000).toFixed(1)}K`;
-  }
-
-  return value % 1 === 0 ? String(value) : value.toFixed(2);
 }
 
 function formatDuration(ms: number): string {
