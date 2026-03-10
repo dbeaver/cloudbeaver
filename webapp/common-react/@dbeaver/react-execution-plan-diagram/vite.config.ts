@@ -5,7 +5,7 @@ export default defineConfig({
     outDir: 'dist',
     emptyOutDir: true,
     rollupOptions: {
-      input: 'src/standalone.ts',
+      input: 'src/standalone.tsx',
       output: {
         entryFileNames: 'execution-plan-diagram.js',
         assetFileNames: 'execution-plan-diagram.[ext]',

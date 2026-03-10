@@ -23,9 +23,14 @@ export { computeHeavyRoute } from './layout/computeHeavyRoute.js';
 export { computeNodeWidth } from './layout/computeNodeDimensions.js';
 export { buildTree, filterVisibleNodes, flattenTree } from './layout/buildTree.js';
 
+// Hooks
+export { usePanZoom } from './hooks/usePanZoom.js';
+
 // Components
 export { ExecutionPlanDiagram } from './components/ExecutionPlanDiagram.js';
 export type { ExecutionPlanDiagramProps } from './components/ExecutionPlanDiagram.js';
+export { useDiagramActions } from './components/DiagramContext.js';
+export type { IToolbarActions } from './components/DiagramContext.js';
 
 // Imperative API (for Java bridge / standalone usage)
 export { createExecutionPlanDiagram } from './api/createExecutionPlanDiagram.js';

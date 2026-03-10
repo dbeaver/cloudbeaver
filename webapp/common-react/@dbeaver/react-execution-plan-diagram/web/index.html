@@ -13,10 +13,44 @@
         height: 100%;
         overflow: hidden;
       }
+
+      .custom-toolbar {
+        position: absolute;
+        bottom: 12px;
+        right: 12px;
+        display: flex;
+        gap: 4px;
+        z-index: 10;
+      }
+
+      .custom-toolbar button {
+        width: 32px;
+        height: 32px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        background: #fff;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+      }
+
+      .custom-toolbar button:hover {
+        background: #f0f0f0;
+      }
     </style>
   </head>
   <body>
     <div id="plan-container"></div>
+
+    <div class="custom-toolbar">
+      <button title="Zoom in" onclick="planZoomIn()">+</button>
+      <button title="Zoom out" onclick="planZoomOut()">−</button>
+      <button title="Fit to screen" onclick="planFitToScreen()">⊡</button>
+      <button title="Reset view" onclick="planResetView()">↺</button>
+    </div>
+
     <script src="../dist/execution-plan-diagram.js"></script>
     <script src="./mock-data.js"></script>
   </body>

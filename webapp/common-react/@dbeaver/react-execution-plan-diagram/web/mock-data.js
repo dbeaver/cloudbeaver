@@ -249,8 +249,12 @@ function loadMockData() {
   window.createExecutionPlanDiagram(MOCK_PLAN, {
     highlightHeavyRoute: true,
     enableCollapse: true,
+  }, {
+    onNodeSelect(nodeId, node) {
+      console.log('Selected execution plan node:', nodeId, node);
+    },
   });
-  console.log('Mock plan loaded. Try: loadComplexMock(), setPlanData(MOCK_PLAN_COMPLEX)');
+  console.log('Mock plan loaded. Click a node to see onNodeSelect output in the console. Try: loadComplexMock(), setPlanData(MOCK_PLAN_COMPLEX)');
 }
 
 function loadComplexMock() {

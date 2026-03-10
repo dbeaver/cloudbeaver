@@ -36,6 +36,10 @@ export default [
   ['sql_execution_plan_view_table', 'Bảng'],
   ['sql_execution_plan_view_diagram', 'Sơ đồ'],
   ['sql_execution_plan_view_label', 'Chế độ xem kế hoạch thực thi'],
+  ['sql_execution_plan_diagram_zoom_in', 'Phóng to'],
+  ['sql_execution_plan_diagram_zoom_out', 'Thu nhỏ'],
+  ['sql_execution_plan_diagram_fit_to_screen', 'Vừa màn hình'],
+  ['sql_execution_plan_diagram_reset_view', 'Đặt lại chế độ xem'],
   ['sql_editor_upload_script_tooltip', 'Tải lên kịch bản SQL'],
   ['sql_editor_download_script_tooltip', 'Tải xuống kịch bản SQL'],
   [

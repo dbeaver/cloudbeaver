@@ -16,6 +16,7 @@ import { ExecutionPlanDiagram } from '@dbeaver/react-execution-plan-diagram';
 import type { IExecutionPlanTab } from '../../ISqlEditorTabState.js';
 import { adaptExecutionPlanData } from './adaptExecutionPlanData.js';
 import { ExecutionPlanTreeBlock } from './ExecutionPlanTreeBlock.js';
+import { PlanDiagramToolbar } from './PlanDiagramToolbar.js';
 import { PropertiesPanel } from './PropertiesPanel/PropertiesPanel.js';
 import style from './SqlExecutionPlanPanel.module.css';
 
@@ -25,6 +26,7 @@ type ViewMode = 'table' | 'diagram';
 
 const VIEW_TAB_ID_TABLE: ViewMode = 'table';
 const VIEW_TAB_ID_DIAGRAM: ViewMode = 'diagram';
+const DIAGRAM_OPTIONS = { highlightHeavyRoute: true, enableCollapse: true };
 
 interface Props {
   executionPlanTab: IExecutionPlanTab;
@@ -66,12 +68,9 @@ export const SqlExecutionPlanPanel = observer<Props>(function SqlExecutionPlanPa
           <ExecutionPlanTreeBlock nodeList={data.executionPlan.nodes} query={data.executionPlan.query} onNodeSelect={setSelectedNode} />
         ) : (
           diagramData && (
-            <ExecutionPlanDiagram
-              data={diagramData}
-              selectedNodeId={selectedNode}
-              options={{ highlightHeavyRoute: true, enableCollapse: true }}
-              onNodeSelect={nodeId => setSelectedNode(nodeId)}
-            />
+            <ExecutionPlanDiagram data={diagramData} selectedNodeId={selectedNode} options={DIAGRAM_OPTIONS} onNodeSelect={setSelectedNode}>
+              <PlanDiagramToolbar />
+            </ExecutionPlanDiagram>
           )
         )}
       </Pane>

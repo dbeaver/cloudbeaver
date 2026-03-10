@@ -1,0 +1,10 @@
+@layer base {
+  .plan-diagram-toolbar {
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
+    display: flex;
+    gap: 4px;
+    z-index: 10;
+  }
+}

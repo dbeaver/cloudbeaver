@@ -9,6 +9,5 @@
 import type { IPlanNode } from './IPlanNode.js';
 
 export interface IPlanDiagramCallbacks {
-  onNodeSelect?: (nodeId: string, node: IPlanNode) => void;
-  onNodeExpand?: (nodeId: string, expanded: boolean) => void;
+  onNodeSelect?: (nodeId: string | null, node: IPlanNode | null) => void;
 }

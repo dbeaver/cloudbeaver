@@ -4300,6 +4300,7 @@ __metadata:
     "@dbeaver/js-helpers": "workspace:^"
     "@dbeaver/react-execution-plan-diagram": "workspace:^"
     "@dbeaver/react-tests": "workspace:*"
+    "@dbeaver/ui-kit": "workspace:^"
     "@types/react": "npm:^19"
     mobx: "npm:^6"
     mobx-react-lite: "npm:^4"

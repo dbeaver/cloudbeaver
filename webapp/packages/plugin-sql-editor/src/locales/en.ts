@@ -36,6 +36,10 @@ export default [
   ['sql_execution_plan_view_table', 'Table'],
   ['sql_execution_plan_view_diagram', 'Diagram'],
   ['sql_execution_plan_view_label', 'Execution Plan View'],
+  ['sql_execution_plan_diagram_zoom_in', 'Zoom in'],
+  ['sql_execution_plan_diagram_zoom_out', 'Zoom out'],
+  ['sql_execution_plan_diagram_fit_to_screen', 'Fit to screen'],
+  ['sql_execution_plan_diagram_reset_view', 'Reset view'],
   ['sql_editor_upload_script_tooltip', 'Upload sql script'],
   ['sql_editor_download_script_tooltip', 'Download sql script'],
   [

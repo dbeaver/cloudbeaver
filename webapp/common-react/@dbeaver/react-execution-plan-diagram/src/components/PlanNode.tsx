@@ -6,6 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
+import type { ReactElement } from 'react';
+
 import type { IPlanFeatures } from '../types/IPlanFeatures.js';
 import type { IPlanNode } from '../types/IPlanNode.js';
 
@@ -41,7 +43,7 @@ export function PlanNode({
   horizontal,
   onSelect,
   onToggleCollapse,
-}: PlanNodeProps) {
+}: PlanNodeProps): ReactElement {
   const percent = node.percent != null ? Math.round(node.percent * 100) : null;
   const isHighCost = percent != null && percent > 50;
 

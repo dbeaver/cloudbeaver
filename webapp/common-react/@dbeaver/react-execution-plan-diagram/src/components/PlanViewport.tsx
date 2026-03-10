@@ -6,6 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { memo, type ReactElement, type Ref } from 'react';
 import type { ZoomTransform } from 'd3-zoom';
 
 import type { ILayoutEdge } from '../layout/ILayoutEdge.js';
@@ -17,7 +18,7 @@ import { PlanNode } from './PlanNode.js';
 import './PlanViewport.css';
 
 export interface PlanViewportProps {
-  containerRef: React.Ref<HTMLDivElement>;
+  containerRef: Ref<HTMLDivElement>;
   transform: ZoomTransform;
   layoutNodes: ILayoutNode[];
   layoutEdges: ILayoutEdge[];
@@ -27,10 +28,76 @@ export interface PlanViewportProps {
   selectedNodeId: string | null;
   heavyRouteIds: Set<string>;
   collapsedNodes: Set<string>;
+  collapseEnabled: boolean;
   horizontal?: boolean;
-  onNodeSelect: (nodeId: string) => void;
+  onNodeSelect: (nodeId: string | null) => void;
   onToggleCollapse: (nodeId: string) => void;
 }
+
+interface PlanViewportContentProps {
+  layoutNodes: ILayoutNode[];
+  layoutEdges: ILayoutEdge[];
+  contentWidth: number;
+  contentHeight: number;
+  features: IPlanFeatures;
+  selectedNodeId: string | null;
+  heavyRouteIds: Set<string>;
+  collapsedNodes: Set<string>;
+  collapseEnabled: boolean;
+  horizontal?: boolean;
+  onNodeSelect: (nodeId: string | null) => void;
+  onToggleCollapse: (nodeId: string) => void;
+}
+
+const PlanViewportContent = memo(function PlanViewportContent({
+  layoutNodes,
+  layoutEdges,
+  contentWidth,
+  contentHeight,
+  features,
+  selectedNodeId,
+  heavyRouteIds,
+  collapsedNodes,
+  collapseEnabled,
+  horizontal,
+  onNodeSelect,
+  onToggleCollapse,
+}: PlanViewportContentProps): ReactElement {
+  return (
+    <>
+      <svg className="dbv-plan-viewport__edges" width={contentWidth} height={contentHeight}>
+        {layoutEdges.map(edge => (
+          <PlanEdge
+            key={`${edge.sourceId}-${edge.targetId}`}
+            edge={edge}
+            heavyRoute={heavyRouteIds.has(edge.sourceId) && heavyRouteIds.has(edge.targetId)}
+            horizontal={horizontal}
+          />
+        ))}
+      </svg>
+      <div className="dbv-plan-viewport__nodes">
+        {layoutNodes.map(layoutNode => (
+          <PlanNode
+            key={layoutNode.id}
+            node={layoutNode.node}
+            x={layoutNode.x}
+            y={layoutNode.y}
+            width={layoutNode.width}
+            height={layoutNode.height}
+            features={features}
+            selected={selectedNodeId === layoutNode.id}
+            heavyRoute={heavyRouteIds.has(layoutNode.id)}
+            collapsed={collapsedNodes.has(layoutNode.id)}
+            hasChildren={collapseEnabled && layoutNode.node.children != null && layoutNode.node.children.length > 0}
+            horizontal={horizontal}
+            onSelect={onNodeSelect}
+            onToggleCollapse={onToggleCollapse}
+          />
+        ))}
+      </div>
+    </>
+  );
+});
 
 export function PlanViewport({
   containerRef,
@@ -43,45 +110,30 @@ export function PlanViewport({
   selectedNodeId,
   heavyRouteIds,
   collapsedNodes,
+  collapseEnabled,
   horizontal,
   onNodeSelect,
   onToggleCollapse,
-}: PlanViewportProps) {
+}: PlanViewportProps): ReactElement {
   const transformStyle = `translate(${transform.x}px, ${transform.y}px) scale(${transform.k})`;
 
   return (
-    <div ref={containerRef} className="dbv-plan-viewport" onClick={() => onNodeSelect('')}>
+    <div ref={containerRef} className="dbv-plan-viewport" onClick={() => onNodeSelect(null)}>
       <div className="dbv-plan-viewport__content" style={{ transform: transformStyle }}>
-        <svg className="dbv-plan-viewport__edges" width={contentWidth} height={contentHeight}>
-          {layoutEdges.map(edge => (
-            <PlanEdge
-              key={`${edge.sourceId}-${edge.targetId}`}
-              edge={edge}
-              heavyRoute={heavyRouteIds.has(edge.sourceId) && heavyRouteIds.has(edge.targetId)}
-              horizontal={horizontal}
-            />
-          ))}
-        </svg>
-        <div className="dbv-plan-viewport__nodes">
-          {layoutNodes.map(layoutNode => (
-            <PlanNode
-              key={layoutNode.id}
-              node={layoutNode.node}
-              x={layoutNode.x}
-              y={layoutNode.y}
-              width={layoutNode.width}
-              height={layoutNode.height}
-              features={features}
-              selected={selectedNodeId === layoutNode.id}
-              heavyRoute={heavyRouteIds.has(layoutNode.id)}
-              collapsed={collapsedNodes.has(layoutNode.id)}
-              hasChildren={layoutNode.node.children != null && layoutNode.node.children.length > 0}
-              horizontal={horizontal}
-              onSelect={onNodeSelect}
-              onToggleCollapse={onToggleCollapse}
-            />
-          ))}
-        </div>
+        <PlanViewportContent
+          layoutNodes={layoutNodes}
+          layoutEdges={layoutEdges}
+          contentWidth={contentWidth}
+          contentHeight={contentHeight}
+          features={features}
+          selectedNodeId={selectedNodeId}
+          heavyRouteIds={heavyRouteIds}
+          collapsedNodes={collapsedNodes}
+          collapseEnabled={collapseEnabled}
+          horizontal={horizontal}
+          onNodeSelect={onNodeSelect}
+          onToggleCollapse={onToggleCollapse}
+        />
       </div>
     </div>
   );
