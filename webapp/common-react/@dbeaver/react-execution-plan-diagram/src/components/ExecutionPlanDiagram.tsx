@@ -9,7 +9,7 @@
 import { type ReactNode } from 'react';
 
 import { useExecutionPlanDiagramState } from '../hooks/useExecutionPlanDiagramState.js';
-import { computeNodeWidth } from '../layout/computeNodeDimensions.js';
+import { computeNodeWidth, PLAN_NODE_MAX_WIDTH } from '../layout/computeNodeDimensions.js';
 import type { IPlanData } from '../types/IPlanData.js';
 import type { IPlanDiagramCallbacks } from '../types/IPlanDiagramCallbacks.js';
 import type { IPlanDiagramOptions } from '../types/IPlanDiagramOptions.js';
@@ -62,7 +62,16 @@ export function ExecutionPlanDiagram({
         {/* Hidden measuring container: renders nodes to measure their real DOM size */}
         <div ref={measureRef} className="dbv-plan-diagram__measure">
           {visibleNodes.map(node => (
-            <PlanNode key={node.id} node={node} x={0} y={0} width={computeNodeWidth(node)} height={0} features={data.features} />
+            <PlanNode
+              key={node.id}
+              node={node}
+              x={0}
+              y={0}
+              minWidth={computeNodeWidth(node)}
+              maxWidth={PLAN_NODE_MAX_WIDTH}
+              height={0}
+              features={data.features}
+            />
           ))}
         </div>
 

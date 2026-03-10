@@ -18,8 +18,10 @@ export interface PlanNodeProps {
   node: IPlanNode;
   x: number;
   y: number;
-  width: number;
+  width?: number;
   height: number;
+  minWidth?: number;
+  maxWidth?: number;
   features: IPlanFeatures;
   selected?: boolean;
   heavyRoute?: boolean;
@@ -40,6 +42,8 @@ export function PlanNode({
   y,
   width,
   height,
+  minWidth,
+  maxWidth,
   features,
   selected,
   heavyRoute,
@@ -65,7 +69,7 @@ export function PlanNode({
       ref={nodeRef}
       className="dbv-plan-node"
       data-node-id={node.id}
-      style={{ left: x, top: y, width, minHeight: height || undefined }}
+      style={{ left: x, top: y, width, minWidth, maxWidth, minHeight: height || undefined }}
       data-selected={selected || undefined}
       data-heavy-route={heavyRoute || undefined}
       data-collapsed={collapsed || undefined}

@@ -75,17 +75,25 @@
     justify-content: space-between;
     align-items: center;
     gap: 8px;
+    min-width: 0;
     font-size: 10px;
     color: var(--dbv-plan-node-metric-color);
   }
 
   .dbv-plan-node__metric-label {
-    flex-shrink: 0;
+    flex: 1 1 auto;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .dbv-plan-node__metric-value {
     font-weight: 500;
-    flex-shrink: 0;
+    flex: 0 1 auto;
+    min-width: 0;
+    white-space: nowrap;
+    text-align: right;
     color: var(--dbv-plan-node-metric-value-color);
   }
 
