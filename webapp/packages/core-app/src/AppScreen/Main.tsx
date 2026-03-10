@@ -41,11 +41,9 @@ export const Main = observer(function Main() {
       <main className={s(styles, { space: true })}>
         <Split {...splitMainState} sticky={30} mode={leftBarDisabled ? 'minimize' : splitMainState.mode} disable={leftBarDisabled}>
           <Pane className={s(styles, { pane: true })} basis="250px" main>
-            <div data-dialog-persistent-element>
-              <Loader suspense>
-                <SideBarPanel container={leftBarPanelService.tabsContainer} panelId="dbeaver-left-sidebar" />
-              </Loader>
-            </div>
+            <Loader suspense>
+              <SideBarPanel container={leftBarPanelService.tabsContainer} panelId="dbeaver-left-sidebar" persist />
+            </Loader>
           </Pane>
           <ResizerControls />
           <Pane className={s(styles, { pane: true })}>
