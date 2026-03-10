@@ -9,7 +9,7 @@ import { computed, observable, action } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useContext, type HTMLAttributes } from 'react';
 
-import { getComputed, useObjectRef, useObservableRef } from '@cloudbeaver/core-blocks';
+import { getComputed, useHover, useObjectRef, useObservableRef } from '@cloudbeaver/core-blocks';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { clsx } from '@dbeaver/ui-kit';
 import { type IDataGridCellRenderer, type ICellPosition } from '@cloudbeaver/plugin-data-grid';
@@ -33,11 +33,13 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
   const tableDataContext = useContext(TableDataContext);
   const selectionContext = useContext(DataGridSelectionContext);
 
+  const hover = useHover();
+
   const cellContext = useObservableRef(
     () => ({
-      isHovered: false,
       isMenuVisible: false,
       isFocused: false,
+      isHovered: false,
       get position(): ICellPosition {
         return { colIdx: this.colIdx, rowIdx: this.rowIdx };
       },
@@ -64,19 +66,20 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
         return this.tableDataContext.getEditionState(this.cell);
       },
       setMenuVisibility(visibility: boolean): void {
+        if (this.isMenuVisible && !visibility) {
+          this.hover.hoverOut();
+        }
+
         this.isMenuVisible = visibility;
-      },
-      setHover(hovered: boolean) {
-        this.isHovered = hovered;
       },
     }),
     {
-      isHovered: observable.ref,
       isMenuVisible: observable.ref,
       setMenuVisibility: action,
       colIdx: observable.ref,
       rowIdx: observable.ref,
       isFocused: observable.ref,
+      isHovered: observable.ref,
       row: computed,
       column: computed,
       position: computed,
@@ -85,9 +88,9 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
       editionState: computed,
       tableDataContext: observable.ref,
       selectionContext: observable.ref,
-      setHover: action.bound,
+      hover: observable.ref,
     },
-    { colIdx, rowIdx, tableDataContext, selectionContext, isFocused: props['aria-selected'] === 'true' },
+    { colIdx, rowIdx, tableDataContext, selectionContext, hover, isFocused: props['aria-selected'] === 'true', isHovered: hover.isHovered },
   );
 
   const classes = getComputed(() =>
@@ -140,14 +143,13 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
   return (
     <CellContext.Provider value={cellContext}>
       {renderDefaultCell({
+        ref: hover.ref,
         className: classes,
         style: formatting || undefined,
         'data-row-index': rowIdx,
         'data-column-index': colIdx,
         onMouseDown: state.mouseDown,
         onMouseUp: state.mouseUp,
-        onPointerEnter: () => cellContext.setHover(true),
-        onPointerLeave: () => cellContext.setHover(false),
       })}
     </CellContext.Provider>
   );
