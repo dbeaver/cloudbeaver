@@ -12,6 +12,7 @@ import type { ZoomTransform } from 'd3-zoom';
 import type { ILayoutEdge } from '../layout/ILayoutEdge.js';
 import type { ILayoutNode } from '../layout/ILayoutNode.js';
 import type { IPlanFeatures } from '../types/IPlanFeatures.js';
+import { usePlanKeyboardNavigation } from '../hooks/usePlanKeyboardNavigation.js';
 import { PlanEdge } from './PlanEdge.js';
 import { PlanNode } from './PlanNode.js';
 
@@ -63,6 +64,12 @@ const PlanViewportContent = memo(function PlanViewportContent({
   onNodeSelect,
   onToggleCollapse,
 }: PlanViewportContentProps): ReactElement {
+  const { activeNodeId, setNodeRef, handleNodeFocus, handleNodeKeyDown } = usePlanKeyboardNavigation({
+    layoutNodes,
+    selectedNodeId,
+    onNodeSelect,
+  });
+
   return (
     <>
       <svg className="dbv-plan-viewport__edges" width={contentWidth} height={contentHeight}>
@@ -75,7 +82,7 @@ const PlanViewportContent = memo(function PlanViewportContent({
           />
         ))}
       </svg>
-      <div className="dbv-plan-viewport__nodes">
+      <div className="dbv-plan-viewport__nodes" role="listbox" aria-label="Execution plan nodes">
         {layoutNodes.map(layoutNode => (
           <PlanNode
             key={layoutNode.id}
@@ -90,6 +97,14 @@ const PlanViewportContent = memo(function PlanViewportContent({
             collapsed={collapsedNodes.has(layoutNode.id)}
             hasChildren={collapseEnabled && layoutNode.node.children != null && layoutNode.node.children.length > 0}
             horizontal={horizontal}
+            tabIndex={activeNodeId === layoutNode.id ? 0 : -1}
+            nodeRef={element => {
+              setNodeRef(layoutNode.id, element);
+            }}
+            onFocus={handleNodeFocus}
+            onKeyDown={event => {
+              handleNodeKeyDown(event, layoutNode.id);
+            }}
             onSelect={onNodeSelect}
             onToggleCollapse={onToggleCollapse}
           />

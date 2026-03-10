@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { ReactElement } from 'react';
+import type { FocusEventHandler, KeyboardEventHandler, ReactElement, Ref } from 'react';
 
 import type { IPlanFeatures } from '../types/IPlanFeatures.js';
 import type { IPlanNode } from '../types/IPlanNode.js';
@@ -25,6 +25,10 @@ export interface PlanNodeProps {
   collapsed?: boolean;
   hasChildren?: boolean;
   horizontal?: boolean;
+  tabIndex?: number;
+  nodeRef?: Ref<HTMLDivElement>;
+  onFocus?: (nodeId: string) => void;
+  onKeyDown?: KeyboardEventHandler<HTMLDivElement>;
   onSelect?: (nodeId: string) => void;
   onToggleCollapse?: (nodeId: string) => void;
 }
@@ -41,14 +45,22 @@ export function PlanNode({
   collapsed,
   hasChildren,
   horizontal,
+  tabIndex,
+  nodeRef,
+  onFocus,
+  onKeyDown,
   onSelect,
   onToggleCollapse,
 }: PlanNodeProps): ReactElement {
   const percent = node.percent != null ? Math.round(node.percent * 100) : null;
   const isHighCost = percent != null && percent > 50;
+  const handleFocus: FocusEventHandler<HTMLDivElement> = () => {
+    onFocus?.(node.id);
+  };
 
   return (
     <div
+      ref={nodeRef}
       className="dbv-plan-node"
       data-node-id={node.id}
       style={{ left: x, top: y, width, minHeight: height || undefined }}
@@ -56,6 +68,12 @@ export function PlanNode({
       data-heavy-route={heavyRoute || undefined}
       data-collapsed={collapsed || undefined}
       data-horizontal={horizontal || undefined}
+      role="option"
+      tabIndex={tabIndex}
+      aria-selected={selected ?? false}
+      aria-expanded={hasChildren ? !collapsed : undefined}
+      onFocus={handleFocus}
+      onKeyDown={onKeyDown}
       onClick={e => {
         e.stopPropagation();
         onSelect?.(node.id);
@@ -98,8 +116,17 @@ export function PlanNode({
         </div>
       )}
       {hasChildren && (
-        <div
+        <button
+          type="button"
           className="dbv-plan-node__collapse-indicator"
+          aria-label={collapsed ? `Expand ${node.type}` : `Collapse ${node.type}`}
+          aria-expanded={!collapsed}
+          onKeyDown={e => {
+            e.stopPropagation();
+          }}
+          onKeyUp={e => {
+            e.stopPropagation();
+          }}
           onClick={e => {
             e.stopPropagation();
             onToggleCollapse?.(node.id);
@@ -109,7 +136,7 @@ export function PlanNode({
             <line x1="1" y1="4" x2="7" y2="4" stroke="currentColor" strokeWidth="1.5" />
             {collapsed && <line x1="4" y1="1" x2="4" y2="7" stroke="currentColor" strokeWidth="1.5" />}
           </svg>
-        </div>
+        </button>
       )}
     </div>
   );

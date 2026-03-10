@@ -12,7 +12,8 @@
   "scripts": {
     "build": "tsc -b",
     "build:standalone": "vite build",
-    "clear": "rimraf lib dist"
+    "clear": "rimraf lib dist",
+    "test": "dbeaver-test"
   },
   "files": [
     "package.json",
@@ -29,6 +30,8 @@
   ],
   "packageManager": "yarn@4.9.2",
   "devDependencies": {
+    "@dbeaver/cli": "workspace:*",
+    "@dbeaver/react-tests": "workspace:*",
     "@dbeaver/tsconfig": "workspace:^",
     "@types/d3-selection": "^3",
     "@types/d3-zoom": "^3",
@@ -37,7 +40,8 @@
     "@types/react-dom": "^19",
     "rimraf": "^6",
     "typescript": "^5",
-    "vite": "^7"
+    "vite": "^7",
+    "vitest": "^4"
   },
   "dependencies": {
     "@dbeaver/js-helpers": "workspace:*",

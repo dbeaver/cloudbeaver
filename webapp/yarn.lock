@@ -5013,7 +5013,9 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@dbeaver/react-execution-plan-diagram@workspace:common-react/@dbeaver/react-execution-plan-diagram"
   dependencies:
+    "@dbeaver/cli": "workspace:*"
     "@dbeaver/js-helpers": "workspace:*"
+    "@dbeaver/react-tests": "workspace:*"
     "@dbeaver/tsconfig": "workspace:^"
     "@types/d3-selection": "npm:^3"
     "@types/d3-zoom": "npm:^3"
@@ -5028,6 +5030,7 @@ __metadata:
     rimraf: "npm:^6"
     typescript: "npm:^5"
     vite: "npm:^7"
+    vitest: "npm:^4"
   languageName: unknown
   linkType: soft
 
