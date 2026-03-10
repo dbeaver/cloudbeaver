@@ -19,13 +19,16 @@ interface Props {
 export const SqlEditorStatusBar = observer<Props>(function SqlEditorStatusBar({ dataSource }) {
   const styles = useS(classes);
   const t = useTranslate();
+
   return (
     <Loader
       className={s(styles, { statusPosition: true, loader: true })}
       state={dataSource}
       message={dataSource?.loadingMessage}
+      hideMessage={false}
       inline
       inlineException
+      small
     >
       {dataSource?.message && (
         <div className={s(styles, { statusPosition: true }, 'tw:p-2')}>
