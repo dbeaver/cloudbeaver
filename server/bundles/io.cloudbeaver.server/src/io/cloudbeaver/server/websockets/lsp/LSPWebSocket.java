@@ -31,16 +31,16 @@ public abstract class LSPWebSocket extends CBAbstractWebSocket {
     private LSPWebSocketMessageHandler handler;
 
     @Override
-    public void onOpen(Session session, EndpointConfig endpointConfig) {
-        BaseWebSession webSession = (BaseWebSession) session.getUserProperties()
+    public void onOpen(Session wsSession, EndpointConfig endpointConfig) {
+        BaseWebSession webSession = (BaseWebSession) wsSession.getUserProperties()
             .get(CBWebSocketServerConfigurator.PROP_WEB_SESSION);
-        handler = new LSPWebSocketMessageHandler(webSession);
-        session.addMessageHandler(handler);
+        handler = new LSPWebSocketMessageHandler(wsSession, webSession);
+        wsSession.addMessageHandler(handler);
         CBJettyWebSocketManager.registerWebSocket(webSession.getSessionId(), this);
 
-        session.setMaxIdleTimeout(LSPWebSocketConstants.IDLE_TIMEOUT.toMillis());
-        session.setMaxTextMessageBufferSize(Integer.MAX_VALUE);
-        session.setMaxBinaryMessageBufferSize(Integer.MAX_VALUE);
+        wsSession.setMaxIdleTimeout(LSPWebSocketConstants.IDLE_TIMEOUT.toMillis());
+        wsSession.setMaxTextMessageBufferSize(Integer.MAX_VALUE);
+        wsSession.setMaxBinaryMessageBufferSize(Integer.MAX_VALUE);
     }
 
     @Override
