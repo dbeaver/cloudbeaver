@@ -104,9 +104,6 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
 
   const state = useObjectRef(
     () => ({
-      mouseDown(event: React.MouseEvent<HTMLDivElement>) {
-        // this.selectCell(this.row, this.column);
-      },
       mouseUp(event: React.MouseEvent<HTMLDivElement>) {
         if (
           // !this.dataGridContext.isGridInFocus()
@@ -119,6 +116,7 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
 
         const isCurrentCellSelected = this.selectionContext.isSelected(this.rowIdx, this.colIdx);
         const isModifyingSelection = event.ctrlKey || event.metaKey || event.shiftKey;
+        const hasSelection = this.selectionContext.selectedCells.size > 0;
 
         if (!isCurrentCellSelected || isModifyingSelection) {
           this.selectionContext.select(
@@ -130,6 +128,11 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
             event.shiftKey,
             false,
           );
+          return;
+        }
+
+        if (hasSelection) {
+          this.selectionContext.clearSelection();
         }
       },
       openContextMenu(event: React.MouseEvent<HTMLDivElement>) {
@@ -165,7 +168,7 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
       dataGridContext,
       cellContext,
     },
-    ['mouseUp', 'mouseDown', 'openContextMenu'],
+    ['mouseUp', 'openContextMenu'],
   );
 
   const formatting = getComputed(
@@ -181,7 +184,6 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
         style: formatting || undefined,
         'data-row-index': rowIdx,
         'data-column-index': colIdx,
-        onMouseDown: state.mouseDown,
         onMouseUp: state.mouseUp,
         onContextMenu: state.openContextMenu,
       })}
