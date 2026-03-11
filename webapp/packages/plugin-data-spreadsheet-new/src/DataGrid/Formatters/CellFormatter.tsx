@@ -63,10 +63,6 @@ export const CellFormatter = observer<Props>(function CellFormatter({ rowIdx, co
   });
 
   function handleCellMenuStateSwitch(visible: boolean): void {
-    if (cellContext.isMenuVisible && !visible) {
-      cellContext.setHover(false);
-    }
-
     cellContext.setMenuVisibility(visible);
   }
 
