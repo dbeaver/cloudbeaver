@@ -119,6 +119,7 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
   const [prevRowsCount, setPrevRowsCount] = useState(rowsCount);
   const innerGridRef = useRef<DataGridHandle<IInnerRow, unknown>>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const deferredSelectRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const {
     searchOpen,
     searchCellClassName,
@@ -188,7 +189,11 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
       }
 
       if (options?.deferred) {
-        setTimeout(() => {
+        if (deferredSelectRef.current !== null) {
+          clearTimeout(deferredSelectRef.current);
+        }
+        deferredSelectRef.current = setTimeout(() => {
+          deferredSelectRef.current = null;
           innerGridRef.current?.selectCellByKey({ columnKey, rowIdx: position.rowIdx });
           requestAnimationFrame(restoreFocusInternal);
         }, 1);
