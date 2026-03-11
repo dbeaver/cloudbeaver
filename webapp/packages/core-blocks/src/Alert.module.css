@@ -35,3 +35,11 @@
   font-weight: 500;
   margin: 0;
 }
+
+.alert.error {
+  background-color: rgba(255, 77, 79, 0.15);
+
+  .title {
+    color: var(--theme-error);
+  }
+}
