@@ -825,7 +825,7 @@ extend type Mutation {
     testConnection( config: ConnectionConfig!, projectId: ID): ConnectionInfo!
 
     "Test network handler connectivity"
-    testNetworkHandler( config: NetworkHandlerConfigInput! ): NetworkEndpointInfo!
+    testNetworkHandler(projectId: ID, connectionId: ID, config: NetworkHandlerConfigInput! ): NetworkEndpointInfo!
 
     "Initiate database connection. User credentials may be (optionally) override default settings."
     initConnection(
