@@ -24,6 +24,7 @@
   flex: 1;
   position: relative;
   overflow: clip;
+  min-width: 0;
 }
 
 .mainContent {
