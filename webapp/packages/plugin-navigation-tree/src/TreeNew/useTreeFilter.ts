@@ -28,8 +28,6 @@ export interface ITreeFilter {
 
 export interface ITreeFilterState {
   enabled: boolean;
-  childrenTransformers: Array<TreeDataTransformer<string[]>>;
-  stateTransformers: Array<TreeDataTransformer<INodeState>>;
   toolbarFilter: ITreeFilter | undefined;
 }
 
@@ -82,12 +80,6 @@ export function useTreeFilter(
       filter: '',
       get enabled() {
         return this.settings?.get<boolean>(TREE_SETTINGS_FILTER_ENABLED) ?? true;
-      },
-      get childrenTransformers() {
-        return this.enabled ? [this.transformer] : [];
-      },
-      get stateTransformers() {
-        return this.enabled ? [this.stateTransformer] : [];
       },
       get toolbarFilter(): ITreeFilter | undefined {
         return this.enabled ? this : undefined;
