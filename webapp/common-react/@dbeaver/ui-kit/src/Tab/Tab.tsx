@@ -29,7 +29,7 @@ export function TabProvider({ children, ...props }: TabProviderProps) {
 }
 
 export function TabList({ ...props }: TabListProps) {
-  return <AriakitTabList{...props} />;
+  return <AriakitTabList {...props} />;
 }
 
 export function Tab({ ...props }: TabProps) {
