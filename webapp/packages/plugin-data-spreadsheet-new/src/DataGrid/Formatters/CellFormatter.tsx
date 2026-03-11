@@ -32,7 +32,9 @@ export const CellFormatter = observer<Props>(function CellFormatter({ rowIdx, co
 
   const cell = cellContext.cell;
   const showCellMenu = getComputed(
-    () => !!cell && (innerCellContext?.isFocused || cellContext.isFocused || cellContext.isHovered || cellContext.isMenuVisible),
+    () =>
+      !!cell &&
+      (innerCellContext?.isFocused || cellContext.isFocused || cellContext.isHovered || cellContext.isMenuVisible || cellContext.isSelected),
   );
   const styles = useS(style);
 

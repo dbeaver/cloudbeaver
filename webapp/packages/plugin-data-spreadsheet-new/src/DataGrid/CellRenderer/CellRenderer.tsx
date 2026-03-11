@@ -110,25 +110,27 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
       mouseUp(event: React.MouseEvent<HTMLDivElement>) {
         if (
           // !this.dataGridContext.isGridInFocus()
-          EventContext.has(event, EventStopPropagationFlag)
+          EventContext.has(event, EventStopPropagationFlag) ||
+          // Don't change selection on right-click - context menu will handle it
+          event.button === 2
         ) {
           return;
         }
 
-        // Don't change selection on right-click - context menu will handle it
-        if (event.button === 2) {
-          return;
-        }
+        const isCurrentCellSelected = this.selectionContext.isSelected(this.rowIdx, this.colIdx);
+        const isModifyingSelection = event.ctrlKey || event.metaKey || event.shiftKey;
 
-        this.selectionContext.select(
-          {
-            colIdx: this.colIdx,
-            rowIdx: this.rowIdx,
-          },
-          event.ctrlKey || event.metaKey,
-          event.shiftKey,
-          false,
-        );
+        if (!isCurrentCellSelected || isModifyingSelection) {
+          this.selectionContext.select(
+            {
+              colIdx: this.colIdx,
+              rowIdx: this.rowIdx,
+            },
+            event.ctrlKey || event.metaKey,
+            event.shiftKey,
+            false,
+          );
+        }
       },
       openContextMenu(event: React.MouseEvent<HTMLDivElement>) {
         if (EventContext.has(event, EventStopPropagationFlag)) {
