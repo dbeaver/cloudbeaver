@@ -5,41 +5,47 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { useCallback, useRef, useState } from 'react';
+import { startTransition, useCallback, useRef, useState } from 'react';
 
 interface UseHoverResult<T extends HTMLElement> {
   ref: React.RefCallback<T>;
   isHovered: boolean;
+  hoverIn: () => void;
+  hoverOut: () => void;
 }
 
 export function useHover<T extends HTMLElement = HTMLElement>(): UseHoverResult<T> {
   const [isHovered, setIsHovered] = useState(false);
   const nodeRef = useRef<T | null>(null);
 
-  const handleMouseEnter = useCallback(() => {
-    setIsHovered(true);
+  const hoverIn = useCallback(() => {
+    startTransition(() => {
+      setIsHovered(true);
+    });
   }, []);
 
-  const handleMouseLeave = useCallback(() => {
-    setIsHovered(false);
+  const hoverOut = useCallback(() => {
+    startTransition(() => {
+      setIsHovered(false);
+    });
   }, []);
 
   const ref = useCallback(
     (node: T | null) => {
       if (nodeRef.current) {
-        nodeRef.current.removeEventListener('mouseenter', handleMouseEnter);
-        nodeRef.current.removeEventListener('mouseleave', handleMouseLeave);
+        nodeRef.current.removeEventListener('mouseenter', hoverIn);
+        nodeRef.current.removeEventListener('mouseleave', hoverOut);
       }
 
       nodeRef.current = node;
 
       if (node) {
-        node.addEventListener('mouseenter', handleMouseEnter);
-        node.addEventListener('mouseleave', handleMouseLeave);
+        node.addEventListener('mouseenter', hoverIn);
+        node.addEventListener('mouseleave', hoverOut);
       }
     },
-    [handleMouseEnter, handleMouseLeave],
+    [hoverIn, hoverOut],
   );
 
-  return { ref, isHovered };
+  return { ref, isHovered, hoverIn, hoverOut };
 }
