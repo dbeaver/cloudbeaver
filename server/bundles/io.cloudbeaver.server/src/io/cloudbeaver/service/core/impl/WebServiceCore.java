@@ -591,6 +591,8 @@ public class WebServiceCore implements DBWServiceCore {
     @Override
     public WebNetworkEndpointInfo testNetworkHandler(
         @NotNull WebSession webSession,
+        @Nullable String projectId,
+        @Nullable String connectionId,
         @NotNull WebNetworkHandlerConfigInput nhConfig
     ) throws DBWebException {
         DBRProgressMonitor monitor = webSession.getProgressMonitor();
@@ -611,7 +613,13 @@ public class WebServiceCore implements DBWServiceCore {
                 try {
                     monitor.subTask("Initialize tunnel");
 
-                    DBWHandlerConfiguration configuration = new DBWHandlerConfiguration(handlerDescriptor, null);
+                    DBWHandlerConfiguration currentConnectionHandlerConfig =
+                        getCurrentConnectionHandlerConfig(webSession, projectId, connectionId, nhConfig.getId());
+
+                    DBWHandlerConfiguration configuration = currentConnectionHandlerConfig == null
+                        ? new DBWHandlerConfiguration(handlerDescriptor, null)
+                        : new DBWHandlerConfiguration(currentConnectionHandlerConfig);
+
                     WebDataSourceUtils.updateHandlerConfig(configuration, nhConfig);
                     configuration.setSavePassword(true);
                     configuration.setEnabled(true);
@@ -640,6 +648,22 @@ public class WebServiceCore implements DBWServiceCore {
             // Close it
             monitor.done();
         }
+    }
+
+    @Nullable
+    private DBWHandlerConfiguration getCurrentConnectionHandlerConfig(
+        @NotNull WebSession webSession,
+        @Nullable String projectId,
+        @Nullable String connectionId,
+        @NotNull String handlerConfigId
+    ) throws DBWebException {
+        if (projectId == null || connectionId == null) {
+            return null;
+        }
+        WebSessionProjectImpl sessionProject = webSession.getAccessibleProjectById(projectId);
+        WebConnectionInfo connectionInfo = sessionProject.getWebConnectionInfo(connectionId);
+        DBPConnectionConfiguration connectionConfiguration = connectionInfo.getDataSourceContainer().getConnectionConfiguration();
+        return connectionConfiguration.getHandler(handlerConfigId);
     }
 
     @Override

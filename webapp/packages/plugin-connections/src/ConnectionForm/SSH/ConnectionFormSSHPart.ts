@@ -49,6 +49,22 @@ export class ConnectionFormSSHPart extends FormPart<INetworkHandlerConfig, IConn
     super(formState, getDefaultState());
   }
 
+  getConfig(): NetworkHandlerConfigInput {
+    const passwordChanged = isPasswordChanged(this.state, this.initialState);
+    const keyChanged = isKeyChanged(this.state, this.initialState);
+
+    const handlerConfig: NetworkHandlerConfigInput = {
+      ...this.state,
+      savePassword: this.state.savePassword || this.optionsPart.state.sharedCredentials,
+      key: this.state.authType === NetworkHandlerAuthType.PublicKey && keyChanged ? this.state.key : undefined,
+      password: passwordChanged ? this.state.password : undefined,
+    };
+
+    delete handlerConfig.secureProperties;
+
+    return handlerConfig;
+  }
+
   override isOutdated(): boolean {
     if (this.networkHandlerResource.isOutdated(SSH_TUNNEL_ID)) {
       return true;
@@ -108,17 +124,7 @@ export class ConnectionFormSSHPart extends FormPart<INetworkHandlerConfig, IConn
       return;
     }
 
-    const passwordChanged = isPasswordChanged(this.state, this.initialState);
-    const keyChanged = isKeyChanged(this.state, this.initialState);
-
-    let handlerConfig: NetworkHandlerConfigInput = {
-      ...this.state,
-      savePassword: this.state.savePassword || this.optionsPart.state.sharedCredentials,
-      key: this.state.authType === NetworkHandlerAuthType.PublicKey && keyChanged ? this.state.key : undefined,
-      password: passwordChanged ? this.state.password : undefined,
-    };
-
-    delete handlerConfig.secureProperties;
+    const config = getTrimmedSSHConfig(this.getConfig());
 
     if (this.state.enabled && !this.state.savePassword) {
       this.formState.state.requiredNetworkHandlersIds.push(this.state.id);
@@ -126,10 +132,7 @@ export class ConnectionFormSSHPart extends FormPart<INetworkHandlerConfig, IConn
       this.formState.state.requiredNetworkHandlersIds = this.formState.state.requiredNetworkHandlersIds.filter(id => id !== this.state.id);
     }
 
-    if (handlerConfig) {
-      handlerConfig = getTrimmedSSHConfig(handlerConfig);
-      this.optionsPart.state.networkHandlersConfig!.push(handlerConfig);
-    }
+    this.optionsPart.state.networkHandlersConfig!.push(config);
   }
 
   protected override validate(

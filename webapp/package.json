@@ -19,7 +19,11 @@
     "lodash": ">=4.17.23",
     "@isaacs/brace-expansion": ">=5.0.1",
     "axios": ">= 1.13.5",
-    "minimatch": ">=10.2.1"
+    "minimatch": ">=10.2.3",
+    "rollup": ">=4.59.0",
+    "koa": ">=2.16.4",
+    "immutable": ">=4.3.8",
+    "serialize-javascript": ">=7.0.3"
   },
   "scripts": {
     "test": "dbeaver-test",
