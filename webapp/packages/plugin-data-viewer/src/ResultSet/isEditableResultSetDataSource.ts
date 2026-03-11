@@ -25,5 +25,5 @@ export function isEditableResultSetDataSource<TOptions = unknown>(
   dataSource: IDatabaseDataSource<any, any> | undefined | null,
   resultIndex: number,
 ): dataSource is ResultSetDataSource<TOptions> {
-  return dataSource != null && isResultSetDataSource(dataSource) && !dataSource.isReadonly(resultIndex);
+  return dataSource != null && isResultSetDataSource(dataSource) && !dataSource.isReadonly(resultIndex) && !dataSource.isDisabled(resultIndex);
 }
