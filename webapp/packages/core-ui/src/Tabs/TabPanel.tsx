@@ -1,13 +1,13 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { TabPanel as BaseTabPanel } from '@dbeaver/ui-kit';
 import { observer } from 'mobx-react-lite';
 import { useContext, useMemo } from 'react';
-import { TabPanel as BaseTabPanel } from 'reakit';
 
 import { getComputed, Loader, s, useS } from '@cloudbeaver/core-blocks';
 
@@ -44,7 +44,7 @@ export const TabPanel: React.FC<TabPanelProps> = observer(function TabPanel({ ta
 
   return (
     <TabContext.Provider value={tabContext}>
-      <BaseTabPanel ref={panelRef} {...tabContextState.state} tabId={tabId} className={s(styles, { tabPanel: true, contents }, className)}>
+      <BaseTabPanel ref={panelRef} tabId={tabId} className={s(styles, { tabPanel: true, contents }, className)}>
         <Loader suspense>{renderChildren()}</Loader>
       </BaseTabPanel>
     </TabContext.Provider>

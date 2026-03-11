@@ -1,12 +1,13 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 import { createContext } from 'react';
-import type { TabStateReturn } from 'reakit';
+
+import type { TabStore, TabStoreState } from '@dbeaver/ui-kit';
 
 import type { IDataContext } from '@cloudbeaver/core-data-context';
 import type { IExecutor } from '@cloudbeaver/core-executor';
@@ -17,7 +18,8 @@ import type { ITabData, ITabInfo, ITabsContainer } from './TabsContainer/ITabsCo
 export type TabDirection = 'left' | 'right';
 
 export interface ITabsContext<T = Record<string, any>> {
-  state: TabStateReturn;
+  state: TabStoreState;
+  store: TabStore;
   tabsState: MetadataMap<string, any>;
   props: T;
   container?: ITabsContainer<T>;
