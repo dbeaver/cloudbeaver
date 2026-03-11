@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -10,17 +10,19 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { LeftBarPanelService } from '@cloudbeaver/core-ui';
 
 import { NavigationTreeSettingsService } from '../NavigationTreeSettingsService.js';
+import { TreeSettingsMenuService } from '../TreeNew/TreeSettingsMenuService.js';
 import { TreeToolbarMenuService } from '../TreeNew/TreeToolbarMenuService.js';
 import { ElementsTreeToolsMenuService } from './ElementsTree/ElementsTreeTools/ElementsTreeToolsMenuService.js';
 
 const NavigationTreePanel = importLazyComponent(() => import('./NavigationTreePanel.js').then(m => m.NavigationTreePanel));
 
-@injectable(() => [NavigationTreeSettingsService, ElementsTreeToolsMenuService, TreeToolbarMenuService, LeftBarPanelService])
+@injectable(() => [NavigationTreeSettingsService, ElementsTreeToolsMenuService, TreeToolbarMenuService, TreeSettingsMenuService, LeftBarPanelService])
 export class NavigationTreeBootstrap extends Bootstrap {
   constructor(
     private readonly navigationTreeSettingsService: NavigationTreeSettingsService,
     private readonly elementsTreeToolsMenuService: ElementsTreeToolsMenuService,
     private readonly treeToolbarMenuService: TreeToolbarMenuService,
+    private readonly treeSettingsMenuService: TreeSettingsMenuService,
     private readonly leftBarPanelService: LeftBarPanelService,
   ) {
     super();
@@ -29,6 +31,7 @@ export class NavigationTreeBootstrap extends Bootstrap {
   override register(): void {
     this.elementsTreeToolsMenuService.register();
     this.treeToolbarMenuService.register();
+    this.treeSettingsMenuService.register();
     this.leftBarPanelService.tabsContainer.add({
       key: 'navigation-tree-tab',
       order: 0,

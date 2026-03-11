@@ -68,6 +68,10 @@ export * from './TreeNew/DATA_CONTEXT_TREE.js';
 export * from './TreeNew/MENU_TREE_TOOLBAR.js';
 export * from './TreeNew/MENU_TREE_SETTINGS.js';
 export * from './TreeNew/actions/ACTION_TREE_REFRESH.js';
+export * from './TreeNew/actions/ACTION_TREE_SHOW_FILTER.js';
+export * from './TreeNew/actions/ACTION_TREE_SHOW_DESCRIPTIONS.js';
+export * from './TreeNew/actions/ACTION_TREE_SAVE_STATE.js';
+export * from './TreeNew/TreeSettingsMenuService.js';
 
 export * from './NavigationTree/getNavigationTreeUserSettingsId.js';
 export * from './NodesManager/NavNodeView/IFolderTransform.js';
