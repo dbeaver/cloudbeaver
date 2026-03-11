@@ -38,7 +38,12 @@ export function useNodeDnD(nodeId: string): INodeDnD {
   });
 
   const dndBox = useDNDBox({
-    canDrop: moveContext => (treeDnD ? treeDnD.canDrop(nodeId, moveContext) : false),
+    canDrop: (moveContext, isOver) => {
+      if (!treeDnD || !isOver) {
+        return false;
+      }
+      return treeDnD.canDrop(nodeId, moveContext);
+    },
     onDrop: moveContext => treeDnD?.onDrop(nodeId, moveContext),
   });
 
