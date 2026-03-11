@@ -174,7 +174,7 @@ export class DataGridContextMenuCellEditingService {
             editor.add(...keys);
             break;
           case ACTION_DATA_GRID_EDITING_DUPLICATE_ROW:
-            editor.duplicateRow(...keys);
+            editor.duplicate(...keys);
             break;
           case ACTION_DATA_GRID_EDITING_DELETE_ROW:
             editor.delete(...keys);
