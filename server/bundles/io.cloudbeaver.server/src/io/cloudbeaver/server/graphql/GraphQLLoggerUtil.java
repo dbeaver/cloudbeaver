@@ -44,7 +44,7 @@ public class GraphQLLoggerUtil {
     public static String getUserId(@NotNull HttpServletRequest request) {
         WebSession session = getWebSession(request);
         if (session == null) {
-            return null;
+            return QMConstants.QM_UNAUTHORIZED_USER;
         }
         String userId = session.getUserContext().getUserId();
         if (userId == null) {
