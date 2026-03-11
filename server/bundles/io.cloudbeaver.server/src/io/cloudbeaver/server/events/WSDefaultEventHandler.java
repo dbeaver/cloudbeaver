@@ -31,6 +31,9 @@ public class WSDefaultEventHandler<EVENT extends WSEvent> implements WSEventHand
 
     @Override
     public void handleEvent(@NotNull EVENT event) {
+        if (!WebAppUtils.isWebApplication()) {
+            return;
+        }
         log.debug(event.getTopicId() + " event handled");
         Collection<BaseWebSession> allSessions = WebAppUtils.getWebApplication()
             .getSessionManager()

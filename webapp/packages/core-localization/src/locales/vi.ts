@@ -31,7 +31,6 @@ export default [
   ['ui_minute_first_form', '{arg:interval} phút'],
   ['ui_minute_second_form', '{arg:interval} phút'],
   ['ui_minute_third_form', '{arg:interval} phút'],
-  ['ui_please_retry', 'Vui lòng thử lại'],
   ['ui_custom', 'Tùy chỉnh'],
   ['ui_configure', 'Cấu hình'],
   ['ui_apply', 'Áp dụng'],
