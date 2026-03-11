@@ -31,6 +31,7 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.DBPDataKind;
 import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.DBUtils;
@@ -256,16 +257,36 @@ public class WebServiceSQL implements DBWServiceSQL {
         @NotNull String resultsId,
         @NotNull List<WebSQLResultsRow> selectedRows
     ) throws DBWebException {
+        checkAndFillTruncatedData(sqlContext, resultsId, selectedRows);
+        WebDBDResultSetDataProvider dataProvider = new WebDBDResultSetDataProvider(resultsId, sqlContext, selectedRows);
+        return createAndRunGenerator(webSession, generatorId, Collections.singletonList(dataProvider));
+    }
+
+    private void checkAndFillTruncatedData(
+        @NotNull WebSQLContextInfo sqlContext,
+        @NotNull String resultsId,
+        @NotNull List<WebSQLResultsRow> selectedRows
+    ) throws DBWebException {
+        List<DBDAttributeBinding> attributes = Arrays.stream(sqlContext.getResults(resultsId).getAttributes())
+            .filter(attr -> canBeTruncated(attr.getDataKind()))
+            .toList();
         for (WebSQLResultsRow row : selectedRows) {
             Object[] data = row.getData();
-            for (int i = 0; i < data.length; i++) {
-                if (data[i] instanceof String stringData && stringData.length() == WebSQLConstants.TEXT_PREVIEW_MAX_LENGTH) {
-                    data[i] = getCellValue(sqlContext, resultsId, i, row);
+            for (DBDAttributeBinding attribute : attributes) {
+                int position = attribute.getOrdinalPosition();
+                boolean valueIsTruncated = data[position] != null &&
+                    data[position].toString().length() == WebSQLConstants.TEXT_PREVIEW_MAX_LENGTH;
+                if (valueIsTruncated) {
+                    data[position] = getCellValue(sqlContext, resultsId, position, row);
                 }
             }
         }
-        WebDBDResultSetDataProvider dataProvider = new WebDBDResultSetDataProvider(resultsId, sqlContext, selectedRows);
-        return createAndRunGenerator(webSession, generatorId, Collections.singletonList(dataProvider));
+    }
+
+    private boolean canBeTruncated(@NotNull DBPDataKind dataKind) {
+        return dataKind.equals(DBPDataKind.STRING) ||
+            dataKind.equals(DBPDataKind.CONTENT) ||
+            dataKind.equals(DBPDataKind.BINARY);
     }
 
     private String createAndRunGenerator(
