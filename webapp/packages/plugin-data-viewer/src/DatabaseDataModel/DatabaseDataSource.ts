@@ -35,7 +35,7 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
   options: TOptions | null;
   requestInfo: IRequestInfo;
   error: Error | null;
-  features: Set<DatabaseDataFeature>;
+  readonly features: Set<DatabaseDataFeature>;
 
   get canCancel(): boolean {
     if (this.activeOperation instanceof Task) {
@@ -101,6 +101,7 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
     makeObservable<DatabaseDataSource<TOptions, TResult>, 'disabled' | 'activeOperationStack' | 'outdated'>(this, {
       access: observable,
       dataFormat: observable,
+      features: observable,
       supportedDataFormats: observable,
       results: observable,
       offset: observable,
@@ -114,6 +115,7 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
       outdated: observable.ref,
       activeOperationStack: observable.shallow,
       setResults: action,
+      setFeature: action,
       setSupportedDataFormats: action,
       resetData: action,
     });

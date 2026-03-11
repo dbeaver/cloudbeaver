@@ -43,14 +43,27 @@ export enum DatabaseDataAccessMode {
   Readonly,
 }
 
+/**
+ * Feature flags for database data sources.
+ * These flags control which UI actions and capabilities are available for a data source.
+ * Multiple features can be combined to enable different functionality sets.
+ */
 export enum DatabaseDataFeature {
+  /** Base database connection capability. All data sources must have this feature. */
   Database = 'Database',
+  /** Table/view data editor with full edit, add, delete operations. Used for container data (tables, views). */
   DataEditor = 'DataEditor',
+  /** Generic result set viewing capability with row identification and execution context management. */
   ResultSet = 'ResultSet',
+  /** Query execution result display with editing capabilities. Used for SQL query results. */
   QueryResult = 'QueryResult',
+  /** Data grouping and aggregation functionality. Used for GROUP BY operations. */
   Grouping = 'Grouping',
+  /** Sub-collection data viewing (e.g., nested documents, arrays). */
   SubCollection = 'SubCollection',
+  /** Session management capabilities for multi-session data sources. */
   SessionManager = 'SessionManager',
+  /** Dataset operations for saved/named data collections. */
   Dataset = 'Dataset',
 }
 
@@ -80,7 +93,7 @@ export interface IDatabaseDataSource<TOptions = unknown, TResult extends IDataba
   readonly serviceProvider: IServiceProvider;
   readonly onOperation: IExecutor<IDatabaseDataSourceOperationEvent>;
   readonly onResultsUpdate: ISyncExecutor<TResult[]>;
-  readonly features: Set<DatabaseDataFeature>;
+  readonly features: ReadonlySet<DatabaseDataFeature>;
 
   isError: () => boolean;
   isOutdated: () => boolean;
