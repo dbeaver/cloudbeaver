@@ -16,7 +16,7 @@ import {
   DataViewerPresentationType,
   IDatabaseDataEditAction,
   type IDatabaseDataModel,
-  isEditableDataSource,
+  isEditableResultSetDataSource,
   isResultSetDataSource,
   ResultSetDataSource,
 } from '@cloudbeaver/plugin-data-viewer';
@@ -43,7 +43,7 @@ export class GeneratorMenuBootstrap extends Bootstrap {
         const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
         const presentation = context.get(DATA_CONTEXT_DV_PRESENTATION);
         return (
-          isEditableDataSource(model.source, resultIndex) &&
+          isEditableResultSetDataSource(model.source, resultIndex) &&
           model.source.getResult(resultIndex)?.dataFormat === ResultDataFormat.Resultset &&
           !presentation?.readonly &&
           (!presentation || presentation.type === DataViewerPresentationType.Data)

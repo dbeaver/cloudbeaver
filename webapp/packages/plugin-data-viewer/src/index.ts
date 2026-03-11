@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -89,8 +89,8 @@ export * from './TableViewer/TableHeader/TableHeaderService.js';
 export * from './ContainerDataSource.js';
 export * from './ResultSet/ResultSetDataSource.js';
 export * from './ResultSet/isResultSetDataModel.js';
-export * from './ResultSet/isEditableDataSource.js';
-export * from './ResultSet/isEditableDataModel.js';
+export * from './ResultSet/isEditableResultSetDataSource.js';
+export * from './ResultSet/isEditableResultSetDataModel.js';
 export * from './DataPresentationService.js';
 export * from './DataViewerDataChangeConfirmationService.js';
 export * from './ValuePanelPresentation/BooleanValue/isBooleanValuePresentationAvailable.js';

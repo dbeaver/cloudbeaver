@@ -21,7 +21,7 @@ import {
   IDatabaseDataResult,
   IDatabaseDataSelectAction,
   IDatabaseDataSource,
-  isEditableDataModel,
+  isEditableResultSetDataModel,
   isResultSetDataModel,
   ResultSetDataAction,
   ResultSetDataContentAction,
@@ -62,7 +62,7 @@ export class DataGridContextMenuGenerateSqlService {
         const model = context.get(DATA_CONTEXT_DV_DDM);
         const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
 
-        return isEditableDataModel(model, resultIndex);
+        return isEditableResultSetDataModel(model, resultIndex);
       },
       getItems: (context, items) => [...items, MENU_DATA_GRID_GENERATE_SQL],
     });

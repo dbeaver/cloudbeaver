@@ -29,7 +29,7 @@ import {
   IDatabaseDataSelectAction,
   IDatabaseDataViewAction,
   isBooleanValuePresentationAvailable,
-  isEditableDataSource,
+  isEditableResultSetDataSource,
   KEY_BINDING_DELETE_ROW,
   ResultSetDataContentAction,
   type IDatabaseValueHolder,
@@ -64,7 +64,7 @@ export class DataGridContextMenuCellEditingService {
       isApplicable: context => {
         const model = context.get(DATA_CONTEXT_DV_DDM)!;
         const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
-        return isEditableDataSource(model.source, resultIndex);
+        return isEditableResultSetDataSource(model.source, resultIndex);
       },
       getItems: (context, items) => [...items, MENU_DATA_GRID_EDITING],
     });
@@ -108,7 +108,7 @@ export class DataGridContextMenuCellEditingService {
         // If we somehow added a new row, we can always edit it
         const canEdit = editor.getElementState(key) === DatabaseEditChangeType.add;
 
-        if (!isEditableDataSource(model.source, resultIndex)) {
+        if (!isEditableResultSetDataSource(model.source, resultIndex)) {
           return false;
         }
 

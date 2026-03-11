@@ -21,7 +21,7 @@ import { type ResultSetDataSource, isResultSetDataSource } from './ResultSetData
  * - Undo/Redo history actions
  * - Data modification operations
  */
-export function isEditableDataSource<TOptions = unknown>(
+export function isEditableResultSetDataSource<TOptions = unknown>(
   dataSource: IDatabaseDataSource<any, any> | undefined | null,
   resultIndex: number,
 ): dataSource is ResultSetDataSource<TOptions> {

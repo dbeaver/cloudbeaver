@@ -15,7 +15,7 @@ import {
   DATA_CONTEXT_DV_PRESENTATION,
   DATA_VIEWER_DATA_MODEL_ACTIONS_MENU,
   DataViewerPresentationType,
-  isEditableDataSource,
+  isEditableResultSetDataSource,
   isResultSetDataModel,
 } from '@cloudbeaver/plugin-data-viewer';
 
@@ -103,7 +103,7 @@ export class DataImportBootstrap extends Bootstrap {
         const isContainer = model.source instanceof ContainerDataSource;
 
         return (
-          isEditableDataSource(model.source, resultIndex) &&
+          isEditableResultSetDataSource(model.source, resultIndex) &&
           isContainer &&
           !this.dataImportService.disabled &&
           !presentation?.readonly &&

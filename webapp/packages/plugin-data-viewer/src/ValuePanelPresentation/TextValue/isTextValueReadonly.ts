@@ -13,7 +13,7 @@ import type { ResultSetDataContentAction } from '../../DatabaseDataModel/Actions
 import type { IResultSetValue } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction.js';
 import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel.js';
 import { ResultSetDataSource } from '../../ResultSet/ResultSetDataSource.js';
-import { isEditableDataSource } from '../../ResultSet/isEditableDataSource.js';
+import { isEditableResultSetDataSource } from '../../ResultSet/isEditableResultSetDataSource.js';
 
 interface Args {
   contentAction: ResultSetDataContentAction;
@@ -30,7 +30,7 @@ export function isTextValueReadonly({ contentAction, formatAction, model, result
   }
 
   return (
-    !isEditableDataSource(model.source, resultIndex) ||
+    !isEditableResultSetDataSource(model.source, resultIndex) ||
     (formatAction.isReadOnly(cellHolder.key) && editAction.getElementState(cellHolder.key) !== DatabaseEditChangeType.add) ||
     formatAction.isBinary(cellHolder) ||
     formatAction.isGeometry(cellHolder) ||

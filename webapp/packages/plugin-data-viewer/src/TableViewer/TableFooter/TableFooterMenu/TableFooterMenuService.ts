@@ -40,7 +40,7 @@ import { DATA_VIEWER_DATA_MODEL_ACTIONS_MENU } from './DATA_VIEWER_DATA_MODEL_AC
 import { DataViewerViewService } from '../../DataViewerViewService.js';
 import { IDatabaseDataSelectAction } from '../../../DatabaseDataModel/Actions/IDatabaseDataSelectAction.js';
 import { isResultSetDataSource } from '../../../ResultSet/ResultSetDataSource.js';
-import { isEditableDataSource } from '../../../ResultSet/isEditableDataSource.js';
+import { isEditableResultSetDataSource } from '../../../ResultSet/isEditableResultSetDataSource.js';
 
 @injectable(() => [ActionService, KeyBindingService, DataViewerViewService, LocalizationService, MenuService])
 export class TableFooterMenuService {
@@ -127,7 +127,7 @@ export class TableFooterMenuService {
         const presentation = context.get(DATA_CONTEXT_DV_PRESENTATION);
 
         return (
-          isEditableDataSource(model.source, resultIndex) &&
+          isEditableResultSetDataSource(model.source, resultIndex) &&
           !presentation?.readonly &&
           (!presentation || presentation.type === DataViewerPresentationType.Data)
         );
@@ -148,7 +148,7 @@ export class TableFooterMenuService {
           return false;
         }
 
-        if (!isEditableDataSource(model.source, resultIndex)) {
+        if (!isEditableResultSetDataSource(model.source, resultIndex)) {
           return false;
         }
 
