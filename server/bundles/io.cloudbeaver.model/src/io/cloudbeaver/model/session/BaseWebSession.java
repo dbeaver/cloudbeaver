@@ -21,7 +21,6 @@ import io.cloudbeaver.model.app.ServletApplication;
 import io.cloudbeaver.model.app.ServletAuthApplication;
 import io.cloudbeaver.websocket.CBWebSessionEventHandler;
 import org.jkiss.code.NotNull;
-import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.auth.SMAuthInfo;
@@ -103,7 +102,7 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
         }
     }
 
-    public abstract void addSessionError(Throwable exception);
+    public abstract void addSessionError(@NotNull Throwable exception);
 
     public void addEventHandler(@NotNull CBWebSessionEventHandler handler) {
         synchronized (sessionEventHandlers) {
@@ -117,11 +116,11 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
         }
     }
 
-    public synchronized boolean updateSMSession(SMAuthInfo smAuthInfo) throws DBException {
+    public boolean updateSMSession(SMAuthInfo smAuthInfo) throws DBException {
         return userContext.refresh(smAuthInfo);
     }
 
-    public synchronized void refreshUserData() {
+    public void refreshUserData() {
         try {
             userContext.refreshPermissions();
             if (userContext.isAuthorizedInSecurityManager()) {
@@ -151,7 +150,7 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
         return workspace.getAuthContext();
     }
 
-    protected void clearSessionContext() {
+    protected synchronized void clearSessionContext() {
         this.workspace.getAuthContext().clear();
         this.workspace.getAuthContext().addSession(this);
     }
@@ -177,12 +176,12 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
         return lastAccessTime;
     }
 
-    public synchronized void touchSession() {
+    public void touchSession() {
         this.lastAccessTime = System.currentTimeMillis();
     }
 
     @NotNull
-    public synchronized WebUserContext getUserContext() {
+    public WebUserContext getUserContext() {
         return userContext;
     }
 
@@ -227,7 +226,7 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
         this.eventsFilter = eventsFilter;
     }
 
-    public boolean isProjectAccessible(String projectId) {
+    public boolean isProjectAccessible(@NotNull String projectId) {
         return userContext.getAccessibleProjectIds().contains(projectId);
     }
 
@@ -240,11 +239,11 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
     }
 
 
-    public void removeSessionProject(@Nullable String projectId) throws DBException {
+    public void removeSessionProject(@NotNull String projectId) throws DBException {
         userContext.getAccessibleProjectIds().remove(projectId);
     }
 
-    public abstract void addSessionMessage(WebServerMessage message);
+    public abstract void addSessionMessage(@NotNull WebServerMessage message);
 
     @Property
     public boolean isValid() {

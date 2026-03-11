@@ -23,20 +23,14 @@ import org.jkiss.dbeaver.model.DBConstants;
 import org.jkiss.dbeaver.model.app.DBACertificateStorage;
 import org.jkiss.dbeaver.model.app.DBPWorkspace;
 import org.jkiss.dbeaver.model.impl.app.DefaultCertificateStorage;
-import org.jkiss.dbeaver.model.qm.QMRegistry;
 import org.jkiss.dbeaver.model.qm.QMUtils;
 import org.jkiss.dbeaver.registry.DataSourceProviderRegistry;
 import org.jkiss.dbeaver.runtime.SecurityProviderUtils;
-import org.jkiss.dbeaver.runtime.qm.QMLogFileWriter;
-import org.jkiss.dbeaver.runtime.qm.QMRegistryImpl;
 
 public abstract class BaseWebPlatform extends BaseServletPlatform {
     public static final String TEMP_FILE_FOLDER = "temp-sql-upload-files";
     public static final String TEMP_FILE_IMPORT_FOLDER = "temp-import-files";
 
-
-    private QMRegistryImpl queryManager;
-    private QMLogFileWriter qmLogWriter;
     private DBACertificateStorage certificateStorage;
     private ServerGlobalWorkspace workspace;
 
@@ -49,12 +43,8 @@ public abstract class BaseWebPlatform extends BaseServletPlatform {
         getApplication().beforeWorkspaceInitialization();
         this.workspace = new ServerGlobalWorkspace(this, getApplication());
         this.workspace.initializeProjects();
-        QMUtils.initApplication(this);
 
-        this.queryManager = new QMRegistryImpl();
-
-        this.qmLogWriter = new QMLogFileWriter();
-        this.queryManager.registerMetaListener(qmLogWriter);
+        QMUtils.initPlatform(true);
 
         this.certificateStorage = new DefaultCertificateStorage(
             this,
@@ -93,21 +83,8 @@ public abstract class BaseWebPlatform extends BaseServletPlatform {
     @Override
     public synchronized void dispose() {
         super.dispose();
-        if (this.qmLogWriter != null) {
-            this.queryManager.unregisterMetaListener(qmLogWriter);
-            this.qmLogWriter.dispose();
-            this.qmLogWriter = null;
-        }
-        if (this.queryManager != null) {
-            this.queryManager.dispose();
-            //queryManager = null;
-        }
+        QMUtils.disposePlatform();
         DataSourceProviderRegistry.dispose();
-    }
-
-    @NotNull
-    public QMRegistry getQueryManager() {
-        return queryManager;
     }
 
 }

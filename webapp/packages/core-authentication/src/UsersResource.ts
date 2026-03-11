@@ -30,6 +30,7 @@ import {
   type GetUsersListQueryVariables,
   GraphQLService,
 } from '@cloudbeaver/core-sdk';
+import { Executor } from '@cloudbeaver/core-executor';
 
 import { AUTH_PROVIDER_LOCAL_ID } from './AUTH_PROVIDER_LOCAL_ID.js';
 import { AuthInfoService } from './AuthInfoService.js';
@@ -65,6 +66,8 @@ interface UserCreateOptions {
 
 @injectable(() => [GraphQLService, ServerConfigResource, AuthProviderService, AuthInfoService, SessionPermissionsResource])
 export class UsersResource extends CachedMapResource<string, AdminUser, UserResourceIncludes> {
+  readonly onUserCreate: Executor<AdminUser>;
+
   constructor(
     private readonly graphQLService: GraphQLService,
     private readonly serverConfigResource: ServerConfigResource,
@@ -73,6 +76,8 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
     sessionPermissionsResource: SessionPermissionsResource,
   ) {
     super();
+
+    this.onUserCreate = new Executor();
 
     sessionPermissionsResource.require(this, EAdminPermission.admin);
     sessionPermissionsResource.onDataOutdated.addHandler(() => this.markOutdated());
@@ -151,7 +156,10 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
     newUser.createdAt = Date.now();
     this.set(user.userId, newUser);
 
-    return this.get(user.userId)!;
+    const userData = this.get(user.userId)!;
+
+    await this.onUserCreate.execute(userData);
+    return userData;
   }
 
   cleanNewFlags(): void {
