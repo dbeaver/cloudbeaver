@@ -53,7 +53,26 @@ export function useSqlDialectAutocompletion(data: ISQLEditorData): [Compartment,
           fields: ['displayString', 'replacementString'],
         });
 
-        filteredProposals = matchResults.map(r => r.item);
+        filteredProposals = matchResults
+          .sort((a, b) => {
+            const aDisplayLower = sanitizeProposal(a.item.displayString).toLocaleLowerCase();
+            const aReplacementLower = a.item.replacementString.toLocaleLowerCase();
+            const bDisplayLower = sanitizeProposal(b.item.displayString).toLocaleLowerCase();
+            const bReplacementLower = b.item.replacementString.toLocaleLowerCase();
+
+            const aStartsWith = aDisplayLower.startsWith(wordLowerCase) || aReplacementLower.startsWith(wordLowerCase);
+            const bStartsWith = bDisplayLower.startsWith(wordLowerCase) || bReplacementLower.startsWith(wordLowerCase);
+
+            if (aStartsWith && !bStartsWith) {
+              return -1;
+            }
+            if (!aStartsWith && bStartsWith) {
+              return 1;
+            }
+
+            return (b.score ?? 0) - (a.score ?? 0);
+          })
+          .map(r => r.item);
       }
 
       if (filteredProposals.length === 0 && !hasSameName && explicit) {
