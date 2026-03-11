@@ -43,6 +43,17 @@ export enum DatabaseDataAccessMode {
   Readonly,
 }
 
+export enum DatabaseDataFeature {
+  Database = 'Database',
+  DataEditor = 'DataEditor',
+  ResultSet = 'ResultSet',
+  QueryResult = 'QueryResult',
+  Grouping = 'Grouping',
+  SubCollection = 'SubCollection',
+  SessionManager = 'SessionManager',
+  Dataset = 'Dataset',
+}
+
 export type GetDatabaseDataSourceOptions<TSource extends IDatabaseDataSource<any, any>> =
   TSource extends IDatabaseDataSource<infer TOptions> ? TOptions : never;
 
@@ -69,6 +80,7 @@ export interface IDatabaseDataSource<TOptions = unknown, TResult extends IDataba
   readonly serviceProvider: IServiceProvider;
   readonly onOperation: IExecutor<IDatabaseDataSourceOperationEvent>;
   readonly onResultsUpdate: ISyncExecutor<TResult[]>;
+  readonly features: Set<DatabaseDataFeature>;
 
   isError: () => boolean;
   isOutdated: () => boolean;
@@ -99,6 +111,7 @@ export interface IDatabaseDataSource<TOptions = unknown, TResult extends IDataba
   setOptions: (options: TOptions) => this;
   setDataFormat: (dataFormat: ResultDataFormat) => this;
   setSupportedDataFormats: (dataFormats: ResultDataFormat[]) => this;
+  setFeature: (feature: DatabaseDataFeature) => this;
 
   retry: () => Promise<void>;
   /**

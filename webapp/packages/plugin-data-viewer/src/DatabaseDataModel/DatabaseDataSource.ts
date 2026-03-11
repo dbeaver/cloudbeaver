@@ -15,6 +15,7 @@ import { IDatabaseDataActions } from './IDatabaseDataActions.js';
 import type { IDatabaseDataResult } from './IDatabaseDataResult.js';
 import {
   DatabaseDataAccessMode,
+  DatabaseDataFeature,
   DatabaseDataSourceOperation,
   IDatabaseDataSource,
   type IDatabaseDataSourceOperationEvent,
@@ -34,6 +35,7 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
   options: TOptions | null;
   requestInfo: IRequestInfo;
   error: Error | null;
+  features: Set<DatabaseDataFeature>;
 
   get canCancel(): boolean {
     if (this.activeOperation instanceof Task) {
@@ -84,6 +86,7 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
     this.onOperation = new Executor();
     this.dataFormat = ResultDataFormat.Resultset;
     this.supportedDataFormats = [];
+    this.features = new Set<DatabaseDataFeature>([DatabaseDataFeature.Database]);
     this.requestInfo = {
       originalQuery: '',
       fullQuery: '',
@@ -249,6 +252,11 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
 
   setError(error: Error): this {
     this.error = error;
+    return this;
+  }
+
+  setFeature(feature: DatabaseDataFeature): this {
+    this.features.add(feature);
     return this;
   }
 
