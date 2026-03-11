@@ -54,14 +54,15 @@ export const SSH: TabContainerPanelComponent<Props> = observer(function SSH({ fo
   const serverConfigResource = useResource(SSH, ServerConfigResource, undefined, {
     active: selected,
   });
+  const SSHPart = getConnectionFormSSHPart(formState);
 
   async function testConnection() {
     setLoading(true);
-    await networkHandlerResource.test(handlerState);
+    const config = SSHPart.getConfig();
+    await networkHandlerResource.test(config, formState.state.projectId, formState.state.connectionId);
     setLoading(false);
   }
 
-  const SSHPart = getConnectionFormSSHPart(formState);
   const style = useS(styles);
   const translate = useTranslate();
   const disabled = formState.isDisabled || loading || formState.isReadOnly;

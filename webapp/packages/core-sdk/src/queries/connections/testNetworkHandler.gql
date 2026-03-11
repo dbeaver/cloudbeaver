@@ -1,5 +1,5 @@
-mutation testNetworkHandler($config: NetworkHandlerConfigInput!) {
-  info: testNetworkHandler(config: $config) {
+mutation testNetworkHandler($projectId: ID, $connectionId: ID, $config: NetworkHandlerConfigInput!) {
+  info: testNetworkHandler(projectId: $projectId, connectionId: $connectionId, config: $config) {
     message
     clientVersion
     serverVersion
