@@ -98,7 +98,7 @@
   }
 
   .dbv-plan-node__cost-bar {
-    height: 2px;
+    height: 6px;
     background: var(--dbv-plan-node-cost-bar-bg);
     margin-top: auto;
     border-radius: 0 0 3px 3px;
@@ -142,7 +142,7 @@
   .dbv-plan-node[data-horizontal] .dbv-plan-node__collapse-indicator {
     bottom: auto;
     left: auto;
-    right: -10px;
+    right: -9px;
     top: 50%;
     transform: translateY(-50%);
   }
