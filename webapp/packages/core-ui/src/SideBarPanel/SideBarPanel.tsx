@@ -9,14 +9,12 @@ import { observer } from 'mobx-react-lite';
 
 import { s, SContext, type StyleRegistry, useS } from '@cloudbeaver/core-blocks';
 
-import TabStyles from '../Tabs/Tab/Tab.module.css';
 import { TabList } from '../Tabs/TabList.js';
 import TabPanelStyles from '../Tabs/TabPanel.module.css';
 import { TabPanelList } from '../Tabs/TabPanelList.js';
 import type { TabsContainer } from '../Tabs/TabsContainer/TabsContainer.js';
 import { TabsState } from '../Tabs/TabsState.js';
 import styles from './shared/SideBarPanel.module.css';
-import SideBarPanelTab from './shared/SideBarPanelTab.module.css';
 import SideBarPanelTabPanel from './shared/SideBarPanelTabPanel.module.css';
 import { useTabOrderPersistence } from '../Tabs/useTabOrderPersistence.js';
 import { useTabPersistence } from '../Tabs/useTabPersistence.js';
@@ -27,13 +25,6 @@ export interface SideBarPanelProps {
 }
 
 const sideBarPanelRegistry: StyleRegistry = [
-  [
-    TabStyles,
-    {
-      mode: 'append',
-      styles: [SideBarPanelTab],
-    },
-  ],
   [
     TabPanelStyles,
     {
