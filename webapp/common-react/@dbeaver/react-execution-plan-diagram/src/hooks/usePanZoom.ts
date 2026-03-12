@@ -15,7 +15,8 @@ export interface IPanZoomState {
   containerRef: React.RefCallback<HTMLDivElement>;
   zoomIn(): void;
   zoomOut(): void;
-  fitToScreen(contentWidth: number, contentHeight: number): void;
+  setContentSize(width: number, height: number): void;
+  fitToScreen(): void;
   setZoom(scale: number): void;
   resetView(): void;
 }
@@ -28,6 +29,7 @@ export function usePanZoom(): IPanZoomState {
   const [transform, setTransform] = useState<ZoomTransform>(zoomIdentity);
   const [container, setContainer] = useState<HTMLDivElement | null>(null);
   const zoomBehaviorRef = useRef<ZoomBehavior<HTMLDivElement, unknown> | null>(null);
+  const contentSizeRef = useRef<{ width: number; height: number } | null>(null);
 
   const containerRef = useCallback((node: HTMLDivElement | null) => {
     setContainer(node);
@@ -71,26 +73,28 @@ export function usePanZoom(): IPanZoomState {
     }
   }, [container]);
 
-  const fitToScreen = useCallback(
-    (contentWidth: number, contentHeight: number) => {
-      const zoomBehavior = zoomBehaviorRef.current;
+  const setContentSize = useCallback((width: number, height: number) => {
+    contentSizeRef.current = { width, height };
+  }, []);
 
-      if (!container || !zoomBehavior || contentWidth === 0 || contentHeight === 0) {
-        return;
-      }
+  const fitToScreen = useCallback(() => {
+    const zoomBehavior = zoomBehaviorRef.current;
+    const size = contentSizeRef.current;
 
-      const { clientWidth, clientHeight } = container;
-      const padding = 40;
-      const scaleX = (clientWidth - padding * 2) / contentWidth;
-      const scaleY = (clientHeight - padding * 2) / contentHeight;
-      const scale = Math.min(scaleX, scaleY, 1);
-      const tx = (clientWidth - contentWidth * scale) / 2;
-      const ty = (clientHeight - contentHeight * scale) / 2;
+    if (!container || !zoomBehavior || !size || size.width === 0 || size.height === 0) {
+      return;
+    }
 
-      zoomBehavior.transform(select(container), zoomIdentity.translate(tx, ty).scale(scale));
-    },
-    [container],
-  );
+    const { clientWidth, clientHeight } = container;
+    const padding = 40;
+    const scaleX = (clientWidth - padding * 2) / size.width;
+    const scaleY = (clientHeight - padding * 2) / size.height;
+    const scale = Math.min(scaleX, scaleY, 1);
+    const tx = (clientWidth - size.width * scale) / 2;
+    const ty = (clientHeight - size.height * scale) / 2;
+
+    zoomBehavior.transform(select(container), zoomIdentity.translate(tx, ty).scale(scale));
+  }, [container]);
 
   const setZoom = useCallback(
     (scale: number) => {
@@ -111,5 +115,5 @@ export function usePanZoom(): IPanZoomState {
     }
   }, [container]);
 
-  return { transform, containerRef, zoomIn, zoomOut, fitToScreen, setZoom, resetView };
+  return { transform, containerRef, zoomIn, zoomOut, setContentSize, fitToScreen, setZoom, resetView };
 }

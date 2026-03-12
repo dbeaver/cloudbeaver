@@ -8,16 +8,16 @@
 
 import { createContext, useContext } from 'react';
 
-export interface IToolbarActions {
+export interface IDiagramActions {
   zoomIn(): void;
   zoomOut(): void;
   fitToScreen(): void;
   resetView(): void;
 }
 
-export const DiagramContext = createContext<IToolbarActions | null>(null);
+export const DiagramContext = createContext<IDiagramActions | null>(null);
 
-export function useDiagramActions(): IToolbarActions {
+export function useDiagramActions(): IDiagramActions {
   const actions = useContext(DiagramContext);
 
   if (!actions) {

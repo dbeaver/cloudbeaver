@@ -10,7 +10,7 @@ import { createElement, useContext, useEffect } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { TranslateContext, type TranslateFn } from '@dbeaver/react-translate';
 
-import { DiagramContext, type IToolbarActions } from '../components/DiagramContext.js';
+import { DiagramContext, type IDiagramActions } from '../components/DiagramContext.js';
 import { ExecutionPlanDiagram } from '../components/ExecutionPlanDiagram.js';
 import type { IPlanData } from '../types/IPlanData.js';
 import type { IPlanDiagramCallbacks } from '../types/IPlanDiagramCallbacks.js';
@@ -44,7 +44,7 @@ export interface IExecutionPlanDiagramAPI {
 }
 
 /** Invisible child component that captures toolbar actions from DiagramContext. */
-function ActionsCapture({ onActions }: { onActions: (actions: IToolbarActions | null) => void }) {
+function ActionsCapture({ onActions }: { onActions: (actions: IDiagramActions | null) => void }) {
   const actions = useContext(DiagramContext);
 
   useEffect(() => {
@@ -60,7 +60,7 @@ interface IExecutionPlanDiagramState {
   selectedNodeId: string | null;
   callbacks: IPlanDiagramCallbacks;
   translations: IPlanTranslations;
-  toolbarActions: IToolbarActions | null;
+  diagramActions: IDiagramActions | null;
 }
 
 function interpolateTranslation(template: string, args?: Record<string | number, any>): string {
@@ -106,8 +106,12 @@ export function createExecutionPlanDiagram(
     selectedNodeId: null,
     callbacks: callbacks ?? {},
     translations: translations ?? {},
-    toolbarActions: null,
+    diagramActions: null,
   };
+
+  function captureActions(actions: IDiagramActions | null): void {
+    state.diagramActions = actions;
+  }
 
   function render(): void {
     if (!root) {
@@ -149,11 +153,7 @@ export function createExecutionPlanDiagram(
               render();
             },
           },
-          createElement(ActionsCapture, {
-            onActions: actions => {
-              state.toolbarActions = actions;
-            },
-          }),
+          createElement(ActionsCapture, { onActions: captureActions }),
         ),
       ),
     );
@@ -183,16 +183,16 @@ export function createExecutionPlanDiagram(
       return state.selectedNodeId;
     },
     zoomIn(): void {
-      state.toolbarActions?.zoomIn();
+      state.diagramActions?.zoomIn();
     },
     zoomOut(): void {
-      state.toolbarActions?.zoomOut();
+      state.diagramActions?.zoomOut();
     },
     fitToScreen(): void {
-      state.toolbarActions?.fitToScreen();
+      state.diagramActions?.fitToScreen();
     },
     resetView(): void {
-      state.toolbarActions?.resetView();
+      state.diagramActions?.resetView();
     },
     dispose(): void {
       if (root) {
@@ -200,7 +200,7 @@ export function createExecutionPlanDiagram(
         root = null;
       }
 
-      state.toolbarActions = null;
+      state.diagramActions = null;
     },
   };
 

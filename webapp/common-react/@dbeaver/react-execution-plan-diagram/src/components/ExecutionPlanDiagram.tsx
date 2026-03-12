@@ -46,7 +46,7 @@ export function ExecutionPlanDiagram({
     collapsedNodes,
     collapseEnabled,
     horizontal,
-    toolbarActions,
+    diagramActions,
     handleNodeSelect,
     handleToggleCollapse,
   } = useExecutionPlanDiagramState({
@@ -57,7 +57,7 @@ export function ExecutionPlanDiagram({
   });
 
   return (
-    <DiagramContext.Provider value={toolbarActions}>
+    <DiagramContext.Provider value={diagramActions}>
       <div className={`dbv-plan-diagram ${options?.className ?? ''}`}>
         {/* Hidden measuring container: renders nodes to measure their real DOM size */}
         <div ref={measureRef} className="dbv-plan-diagram__measure">

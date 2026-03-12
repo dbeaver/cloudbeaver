@@ -30,7 +30,7 @@ export { usePanZoom } from './hooks/usePanZoom.js';
 export { ExecutionPlanDiagram } from './components/ExecutionPlanDiagram.js';
 export type { ExecutionPlanDiagramProps } from './components/ExecutionPlanDiagram.js';
 export { useDiagramActions } from './components/DiagramContext.js';
-export type { IToolbarActions } from './components/DiagramContext.js';
+export type { IDiagramActions } from './components/DiagramContext.js';
 
 // Imperative API (for Java bridge / standalone usage)
 export { createExecutionPlanDiagram } from './api/createExecutionPlanDiagram.js';
