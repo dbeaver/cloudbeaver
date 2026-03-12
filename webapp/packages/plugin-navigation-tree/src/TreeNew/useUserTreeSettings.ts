@@ -6,7 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { UserDataService } from '@cloudbeaver/core-authentication';
+import { useEffect, useRef } from 'react';
+
+import { UserDataService, UserInfoResource } from '@cloudbeaver/core-authentication';
+import { useObjectRef, useResource } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 
 import { type ITreeSettings, useTreeSettings } from './useTreeSettings.js';
@@ -17,6 +20,7 @@ function validateRecord(data: unknown): boolean {
 
 export function useUserTreeSettings(settingsId: string): ITreeSettings {
   const userDataService = useService(UserDataService);
+  useResource(useUserTreeSettings, UserInfoResource, undefined);
 
   const persistedSettings = userDataService.getUserData<Record<string, unknown>>(
     settingsId,
@@ -24,18 +28,34 @@ export function useUserTreeSettings(settingsId: string): ITreeSettings {
     validateRecord,
   );
 
-  return useTreeSettings({
+  const ref = useObjectRef({ persistedSettings });
+  ref.persistedSettings = persistedSettings;
+
+  const treeSettings = useTreeSettings({
     initialSettings: persistedSettings,
     onChange(newSettings) {
-      for (const key of Object.keys(persistedSettings)) {
+      const current = ref.persistedSettings;
+
+      for (const key of Object.keys(current)) {
         if (!newSettings.has(key)) {
-          delete persistedSettings[key];
+          delete current[key];
         }
       }
 
       for (const [key, value] of newSettings) {
-        persistedSettings[key] = value;
+        current[key] = value;
       }
     },
   });
+
+  const prevSettingsRef = useRef(persistedSettings);
+
+  useEffect(() => {
+    if (prevSettingsRef.current !== persistedSettings) {
+      prevSettingsRef.current = persistedSettings;
+      treeSettings.replace(persistedSettings);
+    }
+  }, [persistedSettings, treeSettings]);
+
+  return treeSettings;
 }

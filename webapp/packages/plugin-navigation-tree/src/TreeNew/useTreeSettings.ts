@@ -15,6 +15,7 @@ export interface ITreeSettings {
     set<T>(key: string, value: T): void;
     delete(key: string): void;
     clear(): void;
+    replace(entries: Record<string, unknown>): void;
 }
 
 export interface ITreeSettingsOptions {
@@ -43,12 +44,16 @@ export function useTreeSettings(options: ITreeSettingsOptions = {}): ITreeSettin
                 this.settings.clear();
                 onChange?.(this.settings);
             },
+            replace(entries: Record<string, unknown>): void {
+                this.settings.replace(entries);
+            },
         }),
         {
             settings: observable.ref,
             set: action.bound,
             delete: action.bound,
             clear: action.bound,
+            replace: action.bound,
         },
         false,
     );
