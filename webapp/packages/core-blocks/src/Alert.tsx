@@ -17,18 +17,21 @@ import classes from './Alert.module.css';
 
 interface Props {
   title?: string;
+  variant?: 'info' | 'error';
   className?: string;
 }
 
-export const Alert = observer<PropsWithChildren<Props>>(function Alert({ title, className, children }) {
+export const Alert = observer<PropsWithChildren<Props>>(function Alert({ title, variant = 'info', className, children }) {
   const translate = useTranslate();
   const styles = useS(classes);
 
+  const icon = variant === 'info' ? '/icons/preload/info_icon_sm.svg' : '/icons/preload/error_icon_sm.svg';
+
   return (
-    <div className={s(styles, { alert: true }, className)} role="alert">
-      <IconOrImage icon="/icons/preload/info_icon_sm.svg" className="tw:mt-0.5" />
+    <div className={s(styles, { alert: true, error: variant === 'error' }, className)} role="alert">
+      <IconOrImage icon={icon} className="tw:mt-0.5 tw:size-5" />
       <div className={s(styles, { body: true })}>
-        <h3 className={s(styles, { title: true })}>{title ?? translate('ui_information')}</h3>
+        <h3 className={s(styles, { title: true })}>{title ?? translate(variant === 'info' ? 'ui_information' : 'ui_error')}</h3>
         {children}
       </div>
     </div>
