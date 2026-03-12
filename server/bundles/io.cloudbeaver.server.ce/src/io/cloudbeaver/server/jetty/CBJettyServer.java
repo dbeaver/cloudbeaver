@@ -29,8 +29,8 @@ import io.cloudbeaver.server.servlets.WebStatusServlet;
 import io.cloudbeaver.server.websockets.CBEventsLongPollingServlet;
 import io.cloudbeaver.server.websockets.CBEventsWebSocket;
 import io.cloudbeaver.server.websockets.CBWebSocketServerConfigurator;
-import io.cloudbeaver.server.websockets.lsp.LSPWebSocket;
 import io.cloudbeaver.server.websockets.lsp.LSPWebSocketConstants;
+import io.cloudbeaver.server.websockets.lsp.LSPWebSocketEndpoint;
 import io.cloudbeaver.service.DBWServiceBindingServlet;
 import io.cloudbeaver.service.DBWServiceBindingWebSocket;
 import jakarta.websocket.server.ServerEndpointConfig;
@@ -189,7 +189,7 @@ public class CBJettyServer {
 
                     ServerEndpointConfig lspWsEndpoint = ServerEndpointConfig.Builder
                         .create(
-                            LSPWebSocket.class,
+                            LSPWebSocketEndpoint.class,
                             serverConfiguration.getServicesURI() + LSPWebSocketConstants.ENDPOINT_SUFFIX
                         ).configurator(configurator)
                         .build();
