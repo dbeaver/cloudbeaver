@@ -10,7 +10,7 @@ import type { IExecutor, IExecutorHandlersCollection } from '@cloudbeaver/core-e
 import { useExecutor } from './useExecutor.js';
 
 export function useFormValidator(
-  validationTask: IExecutor<any> | IExecutorHandlersCollection<any>,
+  validationTask: IExecutor<any> | IExecutorHandlersCollection<any> | undefined,
   ref: HTMLFormElement | null,
   callback?: () => void,
 ): void {
