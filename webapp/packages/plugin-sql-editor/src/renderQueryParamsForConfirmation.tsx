@@ -14,22 +14,43 @@ import { useService } from '@cloudbeaver/core-di';
 import { SqlEditorSettingsService } from './SqlEditorSettingsService.js';
 import { ConnectionDialectResource, type IConnectionInfoParams } from '@cloudbeaver/core-connections';
 
+const REGEXP_META_CHARS_PATTERN = /[.*+?^${}()|[\]\\]/g;
+
+function escapeForRegExp(value: string): string {
+  return value.replace(REGEXP_META_CHARS_PATTERN, '\\$&');
+}
+
+function getNamedParameterPattern(escapedName: string): string {
+  return `:${escapedName}\\b`;
+}
+
+function getVariableParameterPattern(escapedName: string): string {
+  return `\\$\\{${escapedName}\\}`;
+}
+
+function replaceQueryToken(query: string, pattern: string, value: string): string {
+  return query.replace(new RegExp(pattern, 'g'), value);
+}
+
 export function renderQueryParamsForConfirmation(
   connectionKey: IConnectionInfoParams | null,
   parameters: Record<string, any>,
   query: string,
+  orderedParameters: string[],
 ): React.ReactElement {
-  return <RenderParametersForm parameters={parameters} query={query} connectionKey={connectionKey} />;
+  return <RenderParametersForm parameters={parameters} query={query} connectionKey={connectionKey} orderedParameters={orderedParameters} />;
 }
 
 const RenderParametersForm = observer(function RenderParametersForm({
   parameters,
   query,
   connectionKey,
+  orderedParameters,
 }: {
   query: string;
   parameters: Record<string, any>;
   connectionKey: IConnectionInfoParams | null;
+  orderedParameters: string[];
 }) {
   const sqlEditorSettingsService = useService(SqlEditorSettingsService);
   const connectionDialectResource = useResource(RenderParametersForm, ConnectionDialectResource, connectionKey);
@@ -40,14 +61,16 @@ const RenderParametersForm = observer(function RenderParametersForm({
   }
 
   for (const [paramName, paramValue] of Object.entries(parameters)) {
-    const paramValueString = String(paramValue);
+    const paramValueString = String(paramValue); 
     if (paramValueString) {
+      const escapedName = escapeForRegExp(paramName);
+
       if (sqlEditorSettingsService.parameterEnabled) {
-        query = query.replaceAll(`:${paramName}`, paramValueString);
+        query = replaceQueryToken(query, getNamedParameterPattern(escapedName), paramValueString);
       }
 
       if (sqlEditorSettingsService.variablesEnabled) {
-        query = query.replaceAll(`$\{${paramName}}`, paramValueString);
+        query = replaceQueryToken(query, getVariableParameterPattern(escapedName), paramValueString);
       }
     }
   }
@@ -56,14 +79,16 @@ const RenderParametersForm = observer(function RenderParametersForm({
     <div className="tw:flex tw:flex-col tw:overflow-auto tw:gap-3 tw:min-h-full">
       <div className="tw:overflow-auto tw:flex-auto tw:flex">
         <PropertiesTable
-          properties={Object.keys(parameters).map(paramName => ({
-            id: paramName,
+          properties={orderedParameters.map((paramName, index) => ({
+            id: `${index}:${paramName}`,
             key: paramName,
             displayName: paramName,
+            description: paramName,
             defaultValue: '',
           }))}
           propertiesState={parameters}
           className="tw:overflow-auto"
+          sortByName={false}
           staticProperties
         />
       </div>
