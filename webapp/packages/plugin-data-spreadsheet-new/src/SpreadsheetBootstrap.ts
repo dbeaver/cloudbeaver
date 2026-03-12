@@ -143,8 +143,10 @@ export class SpreadsheetBootstrap extends Bootstrap {
         if (action === ACTION_OPEN) {
           const actions = context.get(DATA_CONTEXT_DV_ACTIONS);
           const simple = context.get(DATA_CONTEXT_DV_SIMPLE);
+          const select = model.source.tryGetAction(resultIndex, IDatabaseDataSelectAction);
+          const hasSingleCellSelected = select?.getActiveElements().length === 1;
 
-          return actions?.valuePresentationId !== VALUE_TEXT_PRESENTATION_ID && !simple;
+          return actions?.valuePresentationId !== VALUE_TEXT_PRESENTATION_ID && !simple && hasSingleCellSelected;
         }
 
         if (action === ACTION_DATA_GRID_FILTERS_RESET_OR_SORTING) {
