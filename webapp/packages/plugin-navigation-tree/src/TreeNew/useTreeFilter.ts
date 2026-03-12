@@ -28,7 +28,6 @@ export interface ITreeFilter {
 
 export interface ITreeFilterState {
   enabled: boolean;
-  toolbarFilter: ITreeFilter | undefined;
 }
 
 export type ITreeFilterWithState = Readonly<ITreeFilter & ITreeFilterState>;
@@ -80,9 +79,6 @@ export function useTreeFilter(
       filter: '',
       get enabled() {
         return this.settings?.get<boolean>(TREE_SETTINGS_FILTER_ENABLED) ?? true;
-      },
-      get toolbarFilter(): ITreeFilter | undefined {
-        return this.enabled ? this : undefined;
       },
       isNodeMatched(treeData: ITreeData, nodeId: string): boolean {
         const filter = this.filter.trim();
