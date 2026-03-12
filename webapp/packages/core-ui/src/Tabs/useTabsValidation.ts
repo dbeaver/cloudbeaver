@@ -12,6 +12,7 @@ import { ExecutorHandlersCollection } from '@cloudbeaver/core-executor';
 
 import { TabsContext } from './TabsContext.js';
 import { TabsValidationContext } from './TabsValidationContext.js';
+import { useTabsState } from './useTabsState.js';
 
 export function useTabsValidation(tabId: string): React.RefObject<HTMLDivElement | null> {
   const tabContextState = useContext(TabsContext);
@@ -23,7 +24,8 @@ export function useTabsValidation(tabId: string): React.RefObject<HTMLDivElement
 
   const panelRef = useRef<HTMLDivElement>(null);
   const tabsValidationContext = useContext(TabsValidationContext);
-  const selected = getComputed(() => tabContextState.state.selectedId === tabId);
+  const selectedId = useTabsState('selectedId');
+  const selected = getComputed(() => selectedId === tabId);
 
   const tabPropsRef = useObjectRef({ tabId, tabsValidationContext });
   const validationState = useObjectRef(

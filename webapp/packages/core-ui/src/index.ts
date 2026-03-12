@@ -64,6 +64,8 @@ export * from './Tabs/useTabState.js';
 export * from './Tabs/useTabLocalState.js';
 export * from './Tabs/useTabOrderPersistence.js';
 export * from './Tabs/useTabPersistence.js';
+export * from './Tabs/useTabsStore.js';
+export * from './Tabs/useTabsState.js';
 export { default as TabStyles } from './Tabs/Tab/Tab.module.css';
 export { default as TabTitleStyles } from './Tabs/Tab/TabTitle.module.css';
 export { default as TabVerticalRotatedStyles } from './Tabs/Tab/TabVerticalRotated.module.css';
@@ -90,8 +92,6 @@ export * from './Tabs/Tab/TabProps.js';
 export * from './Tabs/Tab/TabTitleLoader.js';
 export * from './Tabs/Tab/useTab.js';
 export * from './Tabs/TabsBootstrap.js';
-
-export * from './Tabs/TabsBox/TabsBoxLoader.js';
 
 export * from './SideBarPanel/LeftBarPanelService.js';
 export * from './SideBarPanel/SideBarPanelLoader.js';

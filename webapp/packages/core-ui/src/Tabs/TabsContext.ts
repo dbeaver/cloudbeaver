@@ -7,8 +7,6 @@
  */
 import { createContext } from 'react';
 
-import type { TabStore, TabStoreState } from '@dbeaver/ui-kit';
-
 import type { IDataContext } from '@cloudbeaver/core-data-context';
 import type { IExecutor } from '@cloudbeaver/core-executor';
 import type { MetadataMap, MetadataValueGetter, schema } from '@cloudbeaver/core-utils';
@@ -18,8 +16,6 @@ import type { ITabData, ITabInfo, ITabsContainer } from './TabsContainer/ITabsCo
 export type TabDirection = 'left' | 'right';
 
 export interface ITabsContext<T = Record<string, any>> {
-  state: TabStoreState;
-  store: TabStore;
   tabsState: MetadataMap<string, any>;
   props: T;
   container?: ITabsContainer<T>;

@@ -75,9 +75,9 @@ export const Tab = observer<TabProps>(function Tab({ after, ...props }) {
             type="button"
             title={translate(title ?? info?.title)}
             id={tabId}
-            aria-selected={tab.selected}
             className={s(styles, { tab: true }, className)}
             disabled={disabled}
+            tabbable
             onClick={tab.handleOpen}
           >
             <div className={s(styles, { tabContainer: true })}>{children}</div>

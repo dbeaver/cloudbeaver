@@ -89,13 +89,15 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
     defaultSelectedId: selectedId,
     selectedId: currentTabId,
     orientation,
+    selectOnMove: false,
+    focusLoop: false,
   });
 
-  const state = useStoreState(store);
+  const selected = useStoreState(store, 'selectedId');
 
   const dynamic = useObjectRef(
     () => ({
-      selectedId: state.selectedId,
+      selectedId: selected,
     }),
     {
       canClose,
@@ -105,7 +107,7 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
       props,
       tabsState,
       container,
-      state,
+      selected,
       store,
       tabList,
     },
@@ -155,7 +157,7 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
     ],
   });
 
-  const currentSelectedId = state.selectedId;
+  const currentSelectedId = selected;
 
   useEffect(() => {
     if (!isNotNullDefined(currentSelectedId) || dynamic.selectedId === currentSelectedId) {
@@ -244,8 +246,6 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
       sortFunction,
     }),
     {
-      state: observable.ref,
-      store: observable.ref,
       tabsState: observable.ref,
       props: observable.ref,
       container: observable.ref,
@@ -268,8 +268,6 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
       reorder: action.bound,
     },
     {
-      state,
-      store,
       tabsState,
       props,
       container,
@@ -285,9 +283,10 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
   );
 
   let currentTabInfo: ITabInfo<T, unknown> | undefined;
+
   if (container) {
-    if (state.selectedId) {
-      currentTabInfo = value.getTabInfo(state.selectedId);
+    if (selected) {
+      currentTabInfo = value.getTabInfo(selected);
     }
   }
 
