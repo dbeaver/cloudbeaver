@@ -6,6 +6,17 @@
  * you may not use this file except in compliance with the License.
  */
 
+/**
+ * Standalone entry point — built by Vite into `dist/execution-plan-diagram.js`.
+ * Exposes the diagram API as window globals for use in non-React hosts
+ * (e.g. DBeaver desktop SWT Browser via `browser.execute("setPlanData(...)")`).
+ *
+ * Expects a `<div id="plan-container">` in the host HTML.
+ *
+ * Java integration hook: define `window.onPlanNodeSelected(nodeId)` as a
+ * BrowserFunction before creating the diagram — it is called on every
+ * node selection change.
+ */
 import { createExecutionPlanDiagram, type IExecutionPlanDiagramAPI, type IPlanTranslations } from './api/createExecutionPlanDiagram.js';
 import type { IPlanData } from './types/IPlanData.js';
 import type { IPlanDiagramCallbacks } from './types/IPlanDiagramCallbacks.js';

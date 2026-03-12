@@ -18,16 +18,28 @@ import type { IPlanDiagramOptions } from '../types/IPlanDiagramOptions.js';
 
 export type IPlanTranslations = Record<string, string>;
 
+/**
+ * Imperative API for controlling the execution plan diagram from outside React.
+ * Created by {@link createExecutionPlanDiagram}. In the standalone bundle,
+ * these methods are also exposed as `window.*` globals (see standalone.tsx).
+ */
 export interface IExecutionPlanDiagramAPI {
+  /** Replace the entire plan data. Clears selection if the selected node no longer exists. */
   setData(data: IPlanData): void;
+  /** Merge new options into the current options (partial update). */
   setOptions(options: Partial<IPlanDiagramOptions>): void;
+  /** Set i18n translations as a key→value map. */
   setTranslations(translations: IPlanTranslations): void;
+  /** Select a node by ID, or pass null to clear selection. */
   selectNode(nodeId: string | null): void;
+  /** Get the currently selected node ID, or null if nothing is selected. */
   getSelectedNodeId(): string | null;
   zoomIn(): void;
   zoomOut(): void;
   fitToScreen(): void;
+  /** Reset zoom and pan to the initial state. */
   resetView(): void;
+  /** Unmount the React tree and release resources. */
   dispose(): void;
 }
 
@@ -70,6 +82,16 @@ function hasNode(data: IPlanData | null, nodeId: string | null): boolean {
   return data.nodes.some(node => node.id === nodeId);
 }
 
+/**
+ * Mount an execution plan diagram into a DOM container and return an imperative API.
+ * This is the main entry point for non-React hosts (Java SWT Browser, plain HTML).
+ *
+ * @param container - DOM element to render into (e.g. `document.getElementById('plan-container')`)
+ * @param initialData - plan data to display immediately (can also be set later via `api.setData()`)
+ * @param options - layout and display options
+ * @param callbacks - event callbacks (e.g. `onNodeSelect`)
+ * @param translations - i18n key→value map for UI labels
+ */
 export function createExecutionPlanDiagram(
   container: HTMLElement,
   initialData?: IPlanData,
