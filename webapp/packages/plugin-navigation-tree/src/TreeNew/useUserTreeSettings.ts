@@ -6,11 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { useEffect, useRef } from 'react';
-
-import { UserDataService, UserInfoResource } from '@cloudbeaver/core-authentication';
-import { useObjectRef, useResource } from '@cloudbeaver/core-blocks';
-import { useService } from '@cloudbeaver/core-di';
+import { useObjectRef, useUserData } from '@cloudbeaver/core-blocks';
 
 import { type ITreeSettings, useTreeSettings } from './useTreeSettings.js';
 
@@ -19,22 +15,30 @@ function validateRecord(data: unknown): boolean {
 }
 
 export function useUserTreeSettings(settingsId: string): ITreeSettings {
-  const userDataService = useService(UserDataService);
-  useResource(useUserTreeSettings, UserInfoResource, undefined);
+  const ref = useObjectRef({
+    persistedSettings: null as Record<string, unknown> | null,
+    treeSettings: null as ITreeSettings | null,
+  });
 
-  const persistedSettings = userDataService.getUserData<Record<string, unknown>>(
+  const persistedSettings = useUserData<Record<string, unknown>>(
     settingsId,
     () => ({}),
+    (data) => {
+      ref.treeSettings?.replace(data);
+    },
     validateRecord,
   );
 
-  const ref = useObjectRef({ persistedSettings });
   ref.persistedSettings = persistedSettings;
 
   const treeSettings = useTreeSettings({
     initialSettings: persistedSettings,
     onChange(newSettings) {
       const current = ref.persistedSettings;
+
+      if (!current) {
+        return;
+      }
 
       for (const key of Object.keys(current)) {
         if (!newSettings.has(key)) {
@@ -48,14 +52,7 @@ export function useUserTreeSettings(settingsId: string): ITreeSettings {
     },
   });
 
-  const prevSettingsRef = useRef(persistedSettings);
-
-  useEffect(() => {
-    if (prevSettingsRef.current !== persistedSettings) {
-      prevSettingsRef.current = persistedSettings;
-      treeSettings.replace(persistedSettings);
-    }
-  }, [persistedSettings, treeSettings]);
+  ref.treeSettings = treeSettings;
 
   return treeSettings;
 }
