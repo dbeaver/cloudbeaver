@@ -87,7 +87,6 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
 
   const store = useTabStore({
     defaultSelectedId: selectedId,
-    selectedId: currentTabId,
     orientation,
     selectOnMove: false,
     focusLoop: false,
@@ -115,7 +114,7 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
 
   useEffect(() => {
     if (isNotNullDefined(currentTabId)) {
-      dynamic.store.select(currentTabId);
+      dynamic.store.setSelectedId(currentTabId);
       dynamic.selectedId = currentTabId;
     }
   }, [currentTabId]);
