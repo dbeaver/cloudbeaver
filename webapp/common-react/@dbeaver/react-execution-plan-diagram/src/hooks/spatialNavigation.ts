@@ -14,9 +14,9 @@ export interface INodeCenter {
 }
 
 // We give more importance to movement in the chosen direction than to sideways movement.
-// Weight 4 means that 1px forward is stronger than up to 3px sideways.
+// Weight 5 means that 1px forward is stronger than up to 4px sideways.
 // This helps keyboard navigation move in the expected direction and not jump diagonally too often.
-export const PRIMARY_AXIS_WEIGHT = 4;
+export const PRIMARY_AXIS_WEIGHT = 5;
 
 export function getDirectionalNavigationScore(dx: number, dy: number, direction: Direction): number | null {
     let primaryDistance = 0;
