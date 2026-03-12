@@ -79,6 +79,8 @@ export class ConnectionFormDriverPropertiesPart extends FormPart<ConnectionPrope
           this.state[key] = this.state[key].trim();
         }
       }
+
+      this.optionsPart.state.properties = toJS(this.state);
     });
   }
 }
