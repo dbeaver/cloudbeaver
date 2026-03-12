@@ -35,6 +35,7 @@ import { ACTION_DATA_GRID_PIN_COLUMN } from './DataGrid/Actions/Pin/ACTION_DATA_
 import { ACTION_DATA_GRID_UNPIN_COLUMN } from './DataGrid/Actions/Pin/ACTION_DATA_GRID_UNPIN_COLUMN.js';
 import { ACTION_DATA_GRID_UNPIN_ALL_COLUMNS } from './DataGrid/Actions/Pin/ACTION_DATA_GRID_UNPIN_ALL_COLUMNS.js';
 import { ACTION_DATA_GRID_FILTERS_RESET_OR_SORTING } from './DataGrid/Actions/Filters/ACTION_DATA_GRID_FILTERS_RESET_OR_SORTING.js';
+import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
 
 const VALUE_TEXT_PRESENTATION_ID = 'value-text-presentation';
 
@@ -114,6 +115,25 @@ export class SpreadsheetBootstrap extends Bootstrap {
       getActionInfo: (context, action) => {
         if (action === ACTION_OPEN) {
           return { ...action.info, label: 'data_grid_table_open_value_panel', icon: 'value-panel' };
+        }
+
+        if (action === ACTION_DATA_GRID_PIN_COLUMN || action === ACTION_DATA_GRID_UNPIN_COLUMN) {
+          const model = context.get(DATA_CONTEXT_DV_DDM)!;
+          const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
+          const select = model.source.tryGetAction(resultIndex, IDatabaseDataSelectAction);
+          const selectedElements = (select?.getActiveElements() || []) as IGridDataKey[];
+          const uniqueColumns = new Set(selectedElements.map(e => e.column.index));
+          const isMultiple = uniqueColumns.size > 1;
+
+          if (action === ACTION_DATA_GRID_PIN_COLUMN) {
+            const label = isMultiple ? 'plugin_data_spreadsheet_new_pin_columns' : 'plugin_data_spreadsheet_new_pin_column';
+            return { ...action.info, label };
+          }
+
+          if (action === ACTION_DATA_GRID_UNPIN_COLUMN) {
+            const label = isMultiple ? 'plugin_data_spreadsheet_new_unpin_columns' : 'plugin_data_spreadsheet_new_unpin_column';
+            return { ...action.info, label };
+          }
         }
 
         return action.info;
@@ -205,13 +225,13 @@ export class SpreadsheetBootstrap extends Bootstrap {
   }
 }
 
-function handleColumnPinAction(context: any, action: (columns: IGridDataKey[]) => void) {
+function handleColumnPinAction(context: IDataContextProvider, action: (columns: IGridDataKey[]) => void) {
   const dataContextResultKey = context.get(DATA_CONTEXT_DV_RESULT_KEY)!;
   const model = context.get(DATA_CONTEXT_DV_DDM)!;
   const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
 
   const select = model.source.tryGetAction(resultIndex, IDatabaseDataSelectAction);
-  const selectedElements = (select?.getSelectedElements() || []) as IGridDataKey[];
+  const selectedElements = (select?.getActiveElements() || []) as IGridDataKey[];
   const keys = selectedElements.length ? selectedElements : [dataContextResultKey];
 
   action(keys);

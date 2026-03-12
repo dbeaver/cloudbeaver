@@ -101,8 +101,7 @@ export class DataGridContextMenuCellEditingService {
         const column = view.getColumn(key.column) as SqlResultColumn | undefined;
         const isComplex = format.isBinary(cellHolder) || format.isGeometry(cellHolder);
         const isTruncated = content.isTextTruncated(cellHolder as IDatabaseValueHolder<IGridDataKey, IResultSetValue>);
-        const selectedElements = select?.getSelectedElements();
-        const keys = selectedElements?.length ? selectedElements : [key];
+        const selectedElements = select?.getActiveElements() ?? [];
         // If we somehow added a new row, we can always edit it
         const canEdit = editor.getElementState(key) === DatabaseEditChangeType.add;
 
@@ -128,15 +127,15 @@ export class DataGridContextMenuCellEditingService {
         }
 
         if (action === ACTION_DATA_GRID_EDITING_DELETE_ROW) {
-          if ((keys.some(k => format.isReadOnly(k)) && !canEdit) || !editor.hasFeature('delete')) {
+          if ((selectedElements.some(k => format.isReadOnly(k)) && !canEdit) || !editor.hasFeature('delete')) {
             return false;
           }
 
-          return keys.some(key => editor.getElementState(key) !== DatabaseEditChangeType.delete);
+          return selectedElements.some(key => editor.getElementState(key) !== DatabaseEditChangeType.delete);
         }
 
         if (action === ACTION_DATA_GRID_EDITING_REVERT_ROW) {
-          return keys.some(key => editor.getElementState(key) !== null);
+          return selectedElements.some(key => editor.getElementState(key) !== null);
         }
 
         return [
@@ -157,30 +156,29 @@ export class DataGridContextMenuCellEditingService {
 
         const editor = model.source.getAction(resultIndex, IDatabaseDataEditAction, GridEditAction);
         const select = model.source.tryGetAction(resultIndex, IDatabaseDataSelectAction, GridSelectAction);
-        const selectedElements = select?.getSelectedElements();
-        const keys = selectedElements?.length ? selectedElements : [key];
+        const selectedElements = select?.getActiveElements() ?? [];
 
         switch (action) {
           case ACTION_EDIT:
             actions.edit(key);
             break;
           case ACTION_DATA_GRID_EDITING_SET_TO_NULL:
-            for (const element of keys) {
+            for (const element of selectedElements) {
               // TODO wait for search merge to implement setMany here in order to have batched changes for undo/redo
               editor.set(element, null);
             }
             break;
           case ACTION_DATA_GRID_EDITING_ADD_ROW:
-            editor.add(...keys);
+            editor.add(...selectedElements);
             break;
           case ACTION_DATA_GRID_EDITING_DUPLICATE_ROW:
-            editor.duplicate(...keys);
+            editor.duplicate(...selectedElements);
             break;
           case ACTION_DATA_GRID_EDITING_DELETE_ROW:
-            editor.delete(...keys);
+            editor.delete(...selectedElements);
             break;
           case ACTION_DATA_GRID_EDITING_REVERT_ROW:
-            editor.revert(...keys);
+            editor.revert(...selectedElements);
             break;
         }
       },
@@ -188,31 +186,50 @@ export class DataGridContextMenuCellEditingService {
   }
 
   private getActionInfo(context: IDataContextProvider, action: IAction) {
-    const t = this.localizationService.translate;
+    const translate = this.localizationService.translate;
+    const model = context.get(DATA_CONTEXT_DV_DDM)!;
+    const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
+    const select = model.source.tryGetAction(resultIndex, IDatabaseDataSelectAction);
+    const selectedElements = (select?.getActiveElements() ?? []) as IGridDataKey[];
+    const uniqueRows = new Set(selectedElements.map(e => `${e.row.index}.${e.row.subIndex}`));
+    const isMultipleRows = uniqueRows.size > 1;
+    const uniqueCells = selectedElements.length;
+    const isMultipleCells = uniqueCells > 1 && uniqueRows.size === 1;
+
     if (action === ACTION_DATA_GRID_EDITING_ADD_ROW) {
+      const label = isMultipleRows ? 'data_grid_table_editing_rows_add' : 'data_grid_table_editing_row_add';
       return {
         ...action.info,
-        label: 'data_grid_table_editing_row_add',
-        tooltip: t('data_grid_table_editing_row_add') + ' (' + getBindingLabel(KEY_BINDING_ADD) + ')',
+        label,
+        tooltip: translate(label) + ' (' + getBindingLabel(KEY_BINDING_ADD) + ')',
       };
     }
     if (action === ACTION_DATA_GRID_EDITING_DUPLICATE_ROW) {
+      const label = isMultipleRows ? 'data_grid_table_editing_rows_add_copy' : 'data_grid_table_editing_row_add_copy';
       return {
         ...action.info,
-        label: 'data_grid_table_editing_row_add_copy',
-        tooltip: t('data_grid_table_editing_row_add_copy') + ' (' + getBindingLabel(KEY_BINDING_DUPLICATE) + ')',
+        label,
+        tooltip: translate(label) + ' (' + getBindingLabel(KEY_BINDING_DUPLICATE) + ')',
       };
     }
 
     if (action === ACTION_EDIT) {
-      return { ...action.info, label: t('data_grid_table_editing_open_inline_editor'), icon: 'edit' };
+      return { ...action.info, label: translate('data_grid_table_editing_open_inline_editor'), icon: 'edit' };
     }
 
     if (action === ACTION_DATA_GRID_EDITING_DELETE_ROW) {
+      const label = isMultipleRows ? 'data_grid_table_editing_rows_delete' : 'data_grid_table_editing_row_delete';
       return {
         ...action.info,
-        label: t('data_grid_table_editing_row_delete'),
-        tooltip: t('data_grid_table_editing_row_delete') + ' (' + getBindingLabel(KEY_BINDING_DELETE_ROW) + ')',
+        label: translate(label),
+        tooltip: translate(label) + ' (' + getBindingLabel(KEY_BINDING_DELETE_ROW) + ')',
+      };
+    }
+
+    if (action === ACTION_DATA_GRID_EDITING_REVERT_ROW) {
+      return {
+        ...action.info,
+        label: translate(isMultipleRows || isMultipleCells ? 'data_grid_table_editing_rows_revert' : 'data_grid_table_editing_row_revert'),
       };
     }
 

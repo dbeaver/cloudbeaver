@@ -108,7 +108,7 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
         if (
           // !this.dataGridContext.isGridInFocus()
           EventContext.has(event, EventStopPropagationFlag) ||
-          // Don't change selection on right-click - context menu will handle it
+          // Preventing selection being reset on right-click
           event.button === 2
         ) {
           return;
