@@ -13,6 +13,7 @@ import { formatNumber } from '@dbeaver/js-helpers';
 import type { IPlanFeatures } from '../types/IPlanFeatures.js';
 import type { IPlanNode } from '../types/IPlanNode.js';
 
+import { PlanNodeMetric } from './PlanNodeMetric.js';
 import './PlanNode.css';
 
 export interface PlanNodeProps {
@@ -96,25 +97,20 @@ export function PlanNode({
       )}
       <div className="dbv-plan-node__metrics">
         {features.hasCost && node.cost != null && (
-          <div className="dbv-plan-node__metric">
-            <span className="dbv-plan-node__metric-label">{translate('sql_execution_plan_diagram_cost', 'Cost')}</span>
-            <span className="dbv-plan-node__metric-value">
-              {formatNumber(node.cost, 2)}
-              {percent != null && ` (${percent}%)`}
-            </span>
-          </div>
+          <PlanNodeMetric labelKey="sql_execution_plan_diagram_cost" label="Cost">
+            {formatNumber(node.cost, 2)}
+            {percent != null && ` (${percent}%)`}
+          </PlanNodeMetric>
         )}
         {features.hasRows && node.rowCount != null && (
-          <div className="dbv-plan-node__metric">
-            <span className="dbv-plan-node__metric-label">{translate('sql_execution_plan_diagram_rows', 'Rows')}</span>
-            <span className="dbv-plan-node__metric-value">{formatNumber(node.rowCount, 0)}</span>
-          </div>
+          <PlanNodeMetric labelKey="sql_execution_plan_diagram_rows" label="Rows">
+            {formatNumber(node.rowCount, 0)}
+          </PlanNodeMetric>
         )}
         {features.hasDuration && node.duration != null && (
-          <div className="dbv-plan-node__metric">
-            <span className="dbv-plan-node__metric-label">{translate('sql_execution_plan_diagram_time', 'Time')}</span>
-            <span className="dbv-plan-node__metric-value">{formatDuration(node.duration)}</span>
-          </div>
+          <PlanNodeMetric labelKey="sql_execution_plan_diagram_time" label="Time">
+            {formatDuration(node.duration)}
+          </PlanNodeMetric>
         )}
       </div>
       {features.hasCost && percent != null && (
