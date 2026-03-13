@@ -67,7 +67,7 @@ export const Main = observer(function Main() {
           <Pane className={s(styles, { pane: true })} basis="250px" main>
             <Loader suspense>
               <SContext registry={LEFT_SIDEBAR_PANEL_REGISTRY}>
-                <SideBarPanel container={leftBarPanelService.tabsContainer} panelId="dbeaver-left-sidebar" persist />
+                <SideBarPanel container={leftBarPanelService.tabsContainer} panelId="dbeaver-left-sidebar" />
               </SContext>
             </Loader>
           </Pane>

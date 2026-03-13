@@ -22,7 +22,6 @@ import { useTabPersistence } from '../Tabs/useTabPersistence.js';
 export interface SideBarPanelProps {
   container: TabsContainer;
   panelId: string;
-  persist?: boolean;
 }
 
 const sideBarPanelRegistry: StyleRegistry = [
@@ -35,7 +34,7 @@ const sideBarPanelRegistry: StyleRegistry = [
   ],
 ];
 
-export const SideBarPanel = observer<SideBarPanelProps>(function SideBarPanel({ container, panelId, persist }) {
+export const SideBarPanel = observer<SideBarPanelProps>(function SideBarPanel({ container, panelId }) {
   const style = useS(styles);
 
   const { onReorder, sortTabs, persistenceKey } = useTabOrderPersistence(panelId, () => container.getIdList());
@@ -52,7 +51,7 @@ export const SideBarPanel = observer<SideBarPanelProps>(function SideBarPanel({ 
         onChange={tab => selectTab(tab.tabId)}
         onReorder={onReorder}
       >
-        <div className={s(style, { box: true })} data-panel-id={panelId} {...(persist ? { 'data-dialog-persistent-element': true } : {})}>
+        <div className={s(style, { box: true })} data-panel-id={panelId} data-dialog-persistent-element>
           <TabList className={s(style, { tabList: true })} underline />
           <div className={s(style, { contentBox: true })}>
             <TabPanelList />
