@@ -78,7 +78,6 @@ export function computePlanLayout(
     const target = layoutNodeMap.get(e.w)!;
 
     if (isHorizontal) {
-      // LR: right-center → left-center; RL: left-center → right-center
       const sourceRight = direction === 'LR';
 
       return {
