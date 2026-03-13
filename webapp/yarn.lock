@@ -4297,7 +4297,6 @@ __metadata:
     "@cloudbeaver/tsconfig": "workspace:*"
     "@dbeaver/cli": "workspace:*"
     "@dbeaver/js-helpers": "workspace:^"
-    "@dbeaver/react-execution-plan-diagram": "workspace:^"
     "@dbeaver/react-tests": "workspace:*"
     "@dbeaver/ui-kit": "workspace:^"
     "@types/react": "npm:^19"
@@ -5008,7 +5007,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@dbeaver/react-execution-plan-diagram@workspace:^, @dbeaver/react-execution-plan-diagram@workspace:common-react/@dbeaver/react-execution-plan-diagram":
+"@dbeaver/react-execution-plan-diagram@workspace:common-react/@dbeaver/react-execution-plan-diagram":
   version: 0.0.0-use.local
   resolution: "@dbeaver/react-execution-plan-diagram@workspace:common-react/@dbeaver/react-execution-plan-diagram"
   dependencies:
