@@ -8,53 +8,45 @@
 
 import type { IPlanNode } from '../types/IPlanNode.js';
 
-function getCumulativeCost(node: IPlanNode, cache: Map<string, number>): number {
-  const cached = cache.get(node.id);
+function findHeaviestChild(children: IPlanNode[]): IPlanNode | undefined {
+  let heaviest: IPlanNode | undefined;
+  let heaviestCost = -1;
 
-  if (cached !== undefined) {
-    return cached;
-  }
+  for (const child of children) {
+    const cost = child.cost ?? 0;
 
-  let cost = node.cost ?? 0;
-
-  if (node.children) {
-    for (const child of node.children) {
-      cost += getCumulativeCost(child, cache);
+    if (cost > heaviestCost) {
+      heaviest = child;
+      heaviestCost = cost;
     }
   }
 
-  cache.set(node.id, cost);
-  return cost;
+  return heaviestCost > 0 ? heaviest : undefined;
 }
 
-function markHeavyRoute(node: IPlanNode, result: Set<string>, cache: Map<string, number>): void {
-  result.add(node.id);
-
-  if (!node.children || node.children.length === 0) {
-    return;
-  }
-
-  let heaviestChild = node.children[0]!;
-  let heaviestCost = getCumulativeCost(heaviestChild, cache);
-
-  for (let i = 1; i < node.children.length; i++) {
-    const childCost = getCumulativeCost(node.children[i]!, cache);
-
-    if (childCost > heaviestCost) {
-      heaviestChild = node.children[i]!;
-      heaviestCost = childCost;
-    }
-  }
-
-  markHeavyRoute(heaviestChild, result, cache);
-}
-
+/**
+ * Computes the "heavy route" — the path from each root to a leaf
+ * following the most expensive child at each level.
+ */
 export function computeHeavyRoute(roots: IPlanNode[]): Set<string> {
   const result = new Set<string>();
-  const cache = new Map<string, number>();
 
   for (const root of roots) {
-    markHeavyRoute(root, result, cache);
+    if (root.cost == null || root.cost <= 0) {
+      continue;
+    }
+
+    let current: IPlanNode | undefined = root;
+
+    while (current) {
+      result.add(current.id);
+
+      if (!current.children || current.children.length === 0) {
+        break;
+      }
+
+      current = findHeaviestChild(current.children);
+    }
   }
 
   return result;
