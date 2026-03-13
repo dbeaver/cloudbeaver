@@ -64,6 +64,8 @@ import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
 /**
  * Web session.
@@ -99,6 +101,7 @@ public class WebSession extends BaseWebSession
     private final List<WebAuthInfo> authTokens = new ArrayList<>();
 
     private DBNModel navigatorModel;
+    private final ReadWriteLock navigatorModelLock = new ReentrantReadWriteLock(true);
     private final DBRProgressMonitor progressMonitor = new SessionProgressMonitor();
     private final Map<String, DBWSessionHandler<WebSession>> sessionHandlers;
     private final WebDataSourceConnectEventListener connectListener = new WebDataSourceConnectEventListener(this);
@@ -287,21 +290,25 @@ public class WebSession extends BaseWebSession
     }
 
     private void initNavigatorModel() {
+        navigatorModelLock.writeLock().lock();
+        try {
+            // Cleanup current data
+            if (this.navigatorModel != null) {
+                this.navigatorModel.dispose();
+                this.navigatorModel = null;
+            }
+            this.globalProject = null;
 
-        // Cleanup current data
-        if (this.navigatorModel != null) {
-            this.navigatorModel.dispose();
-            this.navigatorModel = null;
+            loadProjects();
+
+            this.navigatorModel = new DBNModel(DBWorkbench.getPlatform(), getWorkspace().getProjects());
+            this.navigatorModel.setModelAuthContext(getWorkspace().getAuthContext());
+            this.navigatorModel.initialize();
+
+            this.locale = Locale.getDefault().getLanguage();
+        } finally {
+            navigatorModelLock.writeLock().unlock();
         }
-        this.globalProject = null;
-
-        loadProjects();
-
-        this.navigatorModel = new DBNModel(DBWorkbench.getPlatform(), getWorkspace().getProjects());
-        this.navigatorModel.setModelAuthContext(getWorkspace().getAuthContext());
-        this.navigatorModel.initialize();
-
-        this.locale = Locale.getDefault().getLanguage();
     }
 
     private void loadProjects() {
@@ -369,11 +376,16 @@ public class WebSession extends BaseWebSession
     }
 
     private void resetNavigationModel() {
-        getWorkspace().getProjects().forEach(WebSessionProjectImpl::dispose);
+        navigatorModelLock.writeLock().lock();
+        try {
+            getWorkspace().getProjects().forEach(WebSessionProjectImpl::dispose);
 
-        if (this.navigatorModel != null) {
-            this.navigatorModel.dispose();
-            this.navigatorModel = null;
+            if (this.navigatorModel != null) {
+                this.navigatorModel.dispose();
+                this.navigatorModel = null;
+            }
+        } finally {
+            navigatorModelLock.writeLock().unlock();
         }
     }
 
@@ -416,15 +428,25 @@ public class WebSession extends BaseWebSession
 
     @Nullable
     public DBNModel getNavigatorModel() {
-        return navigatorModel;
+        navigatorModelLock.readLock().lock();
+        try {
+            return navigatorModel;
+        } finally {
+            navigatorModelLock.readLock().unlock();
+        }
     }
 
     @NotNull
     public DBNModel getNavigatorModelOrThrow() throws DBWebException {
-        if (navigatorModel != null) {
-            return navigatorModel;
+        navigatorModelLock.readLock().lock();
+        try {
+            if (navigatorModel != null) {
+                return navigatorModel;
+            }
+            throw new DBWebException("Navigator model is not found in session");
+        } finally {
+            navigatorModelLock.readLock().unlock();
         }
-        throw new DBWebException("Navigator model is not found in session");
     }
     /**
      * Returns and clears progress messages
@@ -923,8 +945,13 @@ public class WebSession extends BaseWebSession
      */
     public void addSessionProject(@NotNull WebSessionProjectImpl project) {
         getWorkspace().addProject(project);
-        if (navigatorModel != null) {
-            navigatorModel.getRoot().addProject(project, false);
+        navigatorModelLock.readLock().lock();
+        try {
+            if (navigatorModel != null) {
+                navigatorModel.getRoot().addProject(project, false);
+            }
+        } finally {
+            navigatorModelLock.readLock().unlock();
         }
     }
 
@@ -940,8 +967,13 @@ public class WebSession extends BaseWebSession
         project.dispose();
 
         getWorkspace().removeProject(project);
-        if (navigatorModel != null) {
-            navigatorModel.getRoot().removeProject(project);
+        navigatorModelLock.readLock().lock();
+        try {
+            if (navigatorModel != null) {
+                navigatorModel.getRoot().removeProject(project);
+            }
+        } finally {
+            navigatorModelLock.readLock().unlock();
         }
     }
 
