@@ -6,7 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { useObjectRef, useUserData } from '@cloudbeaver/core-blocks';
+import { useEffect, useRef } from 'react';
+
+import { useUserData } from '@cloudbeaver/core-blocks';
 
 import { type ITreeSettings, useTreeSettings } from './useTreeSettings.js';
 
@@ -15,26 +17,22 @@ function validateRecord(data: unknown): boolean {
 }
 
 export function useUserTreeSettings(settingsId: string): ITreeSettings {
-  const ref = useObjectRef({
-    persistedSettings: null as Record<string, unknown> | null,
-    treeSettings: null as ITreeSettings | null,
-  });
+  const persistedSettingsRef = useRef<Record<string, unknown> | null>(null);
+  const treeSettingsRef = useRef<ITreeSettings | null>(null);
 
   const persistedSettings = useUserData<Record<string, unknown>>(
     settingsId,
     () => ({}),
-    (data) => {
-      ref.treeSettings?.replace(data);
+    data => {
+      treeSettingsRef.current?.replace(data);
     },
     validateRecord,
   );
 
-  ref.persistedSettings = persistedSettings;
-
   const treeSettings = useTreeSettings({
     initialSettings: persistedSettings,
     onChange(newSettings) {
-      const current = ref.persistedSettings;
+      const current = persistedSettingsRef.current;
 
       if (!current) {
         return;
@@ -52,7 +50,10 @@ export function useUserTreeSettings(settingsId: string): ITreeSettings {
     },
   });
 
-  ref.treeSettings = treeSettings;
+  useEffect(() => {
+    persistedSettingsRef.current = persistedSettings;
+    treeSettingsRef.current = treeSettings;
+  });
 
   return treeSettings;
 }
