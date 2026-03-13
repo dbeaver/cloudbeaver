@@ -6,15 +6,16 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { type ReactNode } from 'react';
+import { type ReactNode, useMemo } from 'react';
 
 import { useExecutionPlanDiagramState } from '../hooks/useExecutionPlanDiagramState.js';
+import { usePanZoom } from '../hooks/usePanZoom.js';
 import { computeNodeWidth, PLAN_NODE_MAX_WIDTH } from '../layout/computeNodeDimensions.js';
 import type { IPlanData } from '../types/IPlanData.js';
 import type { IPlanDiagramCallbacks } from '../types/IPlanDiagramCallbacks.js';
 import type { IPlanDiagramOptions } from '../types/IPlanDiagramOptions.js';
 
-import { DiagramContext } from './DiagramContext.js';
+import { type IDiagramActions, DiagramContext } from './DiagramContext.js';
 import { PlanNode } from './PlanNode.js';
 import { PlanViewport } from './PlanViewport.js';
 
@@ -35,10 +36,10 @@ export function ExecutionPlanDiagram({
   children,
   onNodeSelect,
 }: ExecutionPlanDiagramProps): ReactNode {
+  const { transform, containerRef, zoomIn, zoomOut, setContentSize, fitToScreen, resetView } = usePanZoom();
+
   const {
     measureRef,
-    containerRef,
-    transform,
     layout,
     visibleNodes,
     selectedNodeId,
@@ -46,7 +47,6 @@ export function ExecutionPlanDiagram({
     collapsedNodes,
     collapseEnabled,
     horizontal,
-    diagramActions,
     handleNodeSelect,
     handleToggleCollapse,
   } = useExecutionPlanDiagramState({
@@ -54,7 +54,13 @@ export function ExecutionPlanDiagram({
     options,
     selectedNodeId: externalSelectedNodeId,
     onNodeSelect,
+    onLayoutComputed: setContentSize,
   });
+
+  const diagramActions = useMemo<IDiagramActions>(
+    () => ({ zoomIn, zoomOut, fitToScreen, resetView }),
+    [zoomIn, zoomOut, fitToScreen, resetView],
+  );
 
   return (
     <DiagramContext.Provider value={diagramActions}>
