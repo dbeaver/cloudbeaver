@@ -11,6 +11,7 @@ import type { IPlanNode } from '../types/IPlanNode.js';
 export interface ILayoutNode {
   id: string;
   node: IPlanNode;
+  /** Top-left corner position */
   x: number;
   y: number;
   width: number;
