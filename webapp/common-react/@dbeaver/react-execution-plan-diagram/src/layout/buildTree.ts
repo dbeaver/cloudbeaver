@@ -8,56 +8,43 @@
 
 import type { IPlanNode } from '../types/IPlanNode.js';
 
+export interface IPlanTreeData {
+  roots: IPlanNode[];
+  nodeMap: Map<string, IPlanNode>;
+}
+
 /**
  * Converts a flat node list (using parentId) into a tree structure (using children).
- * If nodes already have children populated, returns them as-is.
+ * If nodes already have children populated, extracts roots from the list.
  */
-export function buildTree(nodes: IPlanNode[]): IPlanNode[] {
+export function buildTree(nodes: IPlanNode[]): IPlanTreeData {
   const hasChildren = nodes.some(n => n.children && n.children.length > 0);
 
   if (hasChildren) {
-    return nodes.filter(n => !n.parentId);
+    const nodeMap = new Map(nodes.map(n => [n.id, n]));
+    const roots = nodes.filter(n => !n.parentId);
+    return { roots, nodeMap };
   }
 
-  const map = new Map<string, IPlanNode>();
-  const tree: IPlanNode[] = [];
+  const nodeMap = new Map<string, IPlanNode>();
+  const roots: IPlanNode[] = [];
 
   for (const node of nodes) {
-    map.set(node.id, { ...node, children: [] });
+    nodeMap.set(node.id, { ...node, children: [] });
   }
 
   for (const node of nodes) {
-    const treeNode = map.get(node.id)!;
-    const parent = node.parentId ? map.get(node.parentId) : undefined;
+    const treeNode = nodeMap.get(node.id)!;
+    const parent = node.parentId ? nodeMap.get(node.parentId) : undefined;
 
     if (parent) {
       parent.children!.push(treeNode);
     } else {
-      tree.push(treeNode);
+      roots.push(treeNode);
     }
   }
 
-  return tree;
-}
-
-export function flattenTree(roots: IPlanNode[]): IPlanNode[] {
-  const result: IPlanNode[] = [];
-
-  function collectAll(node: IPlanNode): void {
-    result.push(node);
-
-    if (node.children) {
-      for (const child of node.children) {
-        collectAll(child);
-      }
-    }
-  }
-
-  for (const root of roots) {
-    collectAll(root);
-  }
-
-  return result;
+  return { roots, nodeMap };
 }
 
 export function filterVisibleNodes(roots: IPlanNode[], collapsedNodes: Set<string>): IPlanNode[] {

@@ -8,7 +8,7 @@
 
 import { useMemo } from 'react';
 
-import { buildTree, filterVisibleNodes, flattenTree } from '../layout/buildTree.js';
+import { buildTree, filterVisibleNodes } from '../layout/buildTree.js';
 import { computeHeavyRoute } from '../layout/computeHeavyRoute.js';
 import type { IPlanNode } from '../types/IPlanNode.js';
 
@@ -26,15 +26,13 @@ export function usePlanTree(
     rawCollapsedNodes: Set<string>,
     highlightHeavyRoute: boolean,
 ): IPlanTree {
-    const tree = useMemo(() => buildTree(nodes), [nodes]);
-    const allNodes = useMemo(() => flattenTree(tree), [tree]);
-    const nodeMap = useMemo(() => new Map(allNodes.map(node => [node.id, node])), [allNodes]);
+    const { roots, nodeMap } = useMemo(() => buildTree(nodes), [nodes]);
     const collapsedNodes = useMemo(
         () => new Set(Array.from(rawCollapsedNodes).filter(nodeId => nodeMap.has(nodeId))),
         [nodeMap, rawCollapsedNodes],
     );
-    const visibleNodes = useMemo(() => filterVisibleNodes(tree, collapsedNodes), [tree, collapsedNodes]);
-    const heavyRouteIds = useMemo(() => (highlightHeavyRoute ? computeHeavyRoute(tree) : EMPTY_STRING_SET), [highlightHeavyRoute, tree]);
+    const visibleNodes = useMemo(() => filterVisibleNodes(roots, collapsedNodes), [roots, collapsedNodes]);
+    const heavyRouteIds = useMemo(() => (highlightHeavyRoute ? computeHeavyRoute(roots) : EMPTY_STRING_SET), [highlightHeavyRoute, roots]);
 
     return { nodeMap, collapsedNodes, visibleNodes, heavyRouteIds };
 }

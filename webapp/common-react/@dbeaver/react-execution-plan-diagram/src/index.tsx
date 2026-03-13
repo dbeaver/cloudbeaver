@@ -21,7 +21,8 @@ export type { ILayoutResult } from './layout/ILayoutResult.js';
 export { computePlanLayout } from './layout/computePlanLayout.js';
 export { computeHeavyRoute } from './layout/computeHeavyRoute.js';
 export { computeNodeWidth } from './layout/computeNodeDimensions.js';
-export { buildTree, filterVisibleNodes, flattenTree } from './layout/buildTree.js';
+export { buildTree, filterVisibleNodes } from './layout/buildTree.js';
+export type { IPlanTreeData } from './layout/buildTree.js';
 
 // Hooks
 export { usePanZoom } from './hooks/usePanZoom.js';
