@@ -184,8 +184,9 @@ public class WebSQLQueryResultSet {
     /**
      * Sets info about read-only status of a result set.
      */
-    public void setReadOnlyInfo(@NotNull DBCExecutionContext executionContext) {
+    public void setReadOnlyInfo(@Nullable DBCExecutionContext executionContext) {
         this.readOnly = DBExecUtils.isResultSetReadOnly(executionContext);
-        this.readOnlyStatus = DBExecUtils.getResultSetReadOnlyStatus(executionContext.getDataSource().getContainer());
+        this.readOnlyStatus = DBExecUtils.getResultSetReadOnlyStatus(
+            executionContext == null ? null : executionContext.getDataSource().getContainer());
     }
 }
