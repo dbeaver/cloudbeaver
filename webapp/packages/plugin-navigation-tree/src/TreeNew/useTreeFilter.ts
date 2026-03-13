@@ -78,7 +78,7 @@ export function useTreeFilter(
       settings,
       filter: '',
       get enabled() {
-        return this.settings?.get<boolean>(TREE_SETTINGS_FILTER_ENABLED) ?? true;
+        return this.settings?.get<boolean>(TREE_SETTINGS_FILTER_ENABLED) ?? false;
       },
       isNodeMatched(treeData: ITreeData, nodeId: string): boolean {
         const filter = this.filter.trim();

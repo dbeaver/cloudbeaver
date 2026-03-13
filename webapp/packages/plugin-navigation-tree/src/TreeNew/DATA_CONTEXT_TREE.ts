@@ -8,10 +8,10 @@
 import { createDataContext } from '@cloudbeaver/core-data-context';
 
 import type { ITreeData } from './ITreeData.js';
-import type { ITreeFilter } from './useTreeFilter.js';
+import type { ITreeFilter, ITreeFilterState } from './useTreeFilter.js';
 import type { ITreeSettings } from './useTreeSettings.js';
 
-export type ITreeToolbarFilter = ITreeFilter & { filterPlaceholder?: string };
+export type ITreeToolbarFilter = ITreeFilter & ITreeFilterState & { filterPlaceholder?: string };
 export type TreeRefreshHandler = () => Promise<void>;
 
 export const DATA_CONTEXT_TREE_DATA = createDataContext<ITreeData>('tree-new-data');
