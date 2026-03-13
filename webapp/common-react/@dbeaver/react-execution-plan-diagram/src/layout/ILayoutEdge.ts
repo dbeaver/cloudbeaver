@@ -9,10 +9,10 @@
 export interface ILayoutEdge {
   sourceId: string;
   targetId: string;
-  /** Source node bottom-center */
+  /** Source anchor (TB: bottom-center, LR: right-center) */
   x1: number;
   y1: number;
-  /** Target node top-center */
+  /** Target anchor (TB: top-center, LR: left-center) */
   x2: number;
   y2: number;
 }
