@@ -16,7 +16,7 @@ export const MenuBarGroup = registry(
     const styles = useS(style);
 
     return (
-      <div className={s(styles, { menuBarGroup: true }, className)} {...rest}>
+      <div className={s(styles, { menuBarGroup: true }, className, 'tw-ripple')} {...rest}>
         {children}
       </div>
     );

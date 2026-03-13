@@ -16,7 +16,7 @@
 }
 
 .tagContainer {
-  composes: theme-ripple theme-background-secondary theme-text-on-secondary from global;
+  composes: theme-background-secondary theme-text-on-secondary from global;
   display: flex;
   align-items: center;
   padding: 4px 4px 4px 8px;

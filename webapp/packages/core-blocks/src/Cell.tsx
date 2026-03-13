@@ -28,7 +28,7 @@ export const Cell = observer(function Cell({ render, before, after, description,
   const styles = useS(style);
 
   return (
-    <Command {...rest} render={render ?? <div />} className={s(styles, { ripple, big }, className)}>
+    <Command {...rest} render={render ?? <div />} className={s(styles, { big }, className, ripple ? 'tw-ripple' : undefined)}>
       <Container className={s(styles, { main: true })} gap parent center dense>
         {before && (
           <Container className={s(styles, { before: true })} keepSize>

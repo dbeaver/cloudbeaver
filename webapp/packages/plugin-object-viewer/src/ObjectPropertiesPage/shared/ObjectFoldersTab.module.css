@@ -7,6 +7,6 @@
  */
 
 .tab {
-  composes: theme-ripple theme-background-background theme-ripple-selectable from global;
+  composes: theme-background-background from global;
   color: inherit;
 }

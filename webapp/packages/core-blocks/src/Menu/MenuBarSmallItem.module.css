@@ -14,7 +14,7 @@
 }
 
 .iconBox {
-  composes: theme-form-element-radius theme-text-primary theme-ripple from global;
+  composes: theme-form-element-radius theme-text-primary from global;
   box-sizing: border-box;
   overflow: hidden;
   padding: 4px !important;

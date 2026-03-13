@@ -7,7 +7,6 @@
  */
 
 .menuBarItem {
-  composes: theme-ripple from global;
   cursor: pointer;
   background: transparent;
   outline: none;

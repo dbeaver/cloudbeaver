@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -138,7 +138,7 @@ export const Menu = observer<IMenuProps, HTMLButtonElement>(
               key={relativePosition ? 'link' : 'main'}
               ref={combinedRef}
               tabIndex={0}
-              className={s(styles, { menuButton: true }, className)}
+              className={s(styles, { menuButton: true }, className, 'tw-ripple')}
               {...menu}
               visible={menuVisible}
               {...props}
@@ -173,7 +173,7 @@ export const Menu = observer<IMenuProps, HTMLButtonElement>(
             key={relativePosition ? 'link' : 'main'}
             ref={combinedRef}
             tabIndex={0}
-            className={s(styles, { menuButton: true }, className)}
+            className={s(styles, { menuButton: true }, className, 'tw-ripple')}
             {...menu}
             visible={menuVisible}
             {...props}

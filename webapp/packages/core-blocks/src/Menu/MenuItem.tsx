@@ -42,7 +42,7 @@ export const MenuItem: ReakitProxyComponent<'button', MenuItemOptions> = observe
         {...menu}
         aria-selected={selected}
         {...rest}
-        className={s(styles, { menuItem: true, hidden }, className)}
+        className={s(styles, { menuItem: true, hidden }, className, 'tw-ripple')}
         disabled={selected || rest.disabled}
         style={{ pointerEvents: 'auto' }}
         focusable

@@ -1,0 +1,38 @@
+@layer components {
+  .tw-ripple {
+    position: relative;
+
+    &::before {
+      position: absolute;
+      content: '';
+      opacity: 0;
+      inset: 0;
+      overflow: hidden;
+      background-color: currentColor;
+      border-radius: inherit;
+      pointer-events: none;
+    }
+
+    &:hover::before {
+      opacity: 0.04;
+    }
+
+    &:focus::before {
+      opacity: 0.1;
+    }
+
+    &:active::before {
+      opacity: 0.1;
+    }
+
+    &[aria-expanded='true']::before {
+      opacity: 0.14;
+    }
+  }
+
+  .tw-ripple-selectable {
+    &[aria-selected='true']::before {
+      opacity: 0.14;
+    }
+  }
+}

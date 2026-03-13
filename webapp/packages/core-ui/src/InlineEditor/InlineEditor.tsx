@@ -169,7 +169,7 @@ const EditorAction = observer<React.ButtonHTMLAttributes<HTMLButtonElement>>(fun
   const style = useS(styles);
 
   return (
-    <button className={s(style, { editorAction: true })} {...props}>
+    <button className={s(style, { editorAction: true }, 'tw-ripple')} {...props}>
       {children}
     </button>
   );

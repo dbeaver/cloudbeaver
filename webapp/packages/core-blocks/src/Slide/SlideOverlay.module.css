@@ -20,7 +20,7 @@
 }
 
 .iconBtn {
-  composes: theme-background-surface theme-text-on-surface theme-ripple from global;
+  composes: theme-background-surface theme-text-on-surface from global;
   box-sizing: border-box;
   margin-left: 36px;
   width: 48px;
