@@ -146,9 +146,7 @@ export function createExecutionPlanDiagram(
               state.selectedNodeId = nodeId;
               state.callbacks.onNodeSelect?.(nodeId, node);
 
-              if (typeof (globalThis as any).onPlanNodeSelected === 'function') {
-                (globalThis as any).onPlanNodeSelected(nodeId);
-              }
+              window.onPlanNodeSelected?.(nodeId);
 
               render();
             },

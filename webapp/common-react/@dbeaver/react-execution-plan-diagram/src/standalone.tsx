@@ -41,6 +41,8 @@ declare global {
     planResetView: () => void;
     disposePlanDiagram: () => void;
     __planDiagram: IExecutionPlanDiagramAPI | null;
+    /** Java BrowserFunction — called on every node selection change */
+    onPlanNodeSelected?: (nodeId: string | null) => void;
     __PLAN_INIT_DATA__?: IPlanData;
     __PLAN_INIT_OPTIONS__?: IPlanDiagramOptions;
     __PLAN_INIT_TRANSLATIONS__?: IPlanTranslations;
@@ -51,7 +53,8 @@ const container = document.getElementById('plan-container');
 
 if (container) {
   window.createExecutionPlanDiagram = (data, options, callbacks, translations) => {
-    window.__planDiagram = createExecutionPlanDiagram(container, data, options, callbacks, translations ?? window.__PLAN_INIT_TRANSLATIONS__);
+    const resolvedTranslations = translations ?? window.__PLAN_INIT_TRANSLATIONS__;
+    window.__planDiagram = createExecutionPlanDiagram(container, data, options, callbacks, resolvedTranslations);
     return true;
   };
 

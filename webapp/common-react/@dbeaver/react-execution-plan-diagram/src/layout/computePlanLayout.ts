@@ -54,6 +54,7 @@ export function computePlanLayout(
 
   dagre.layout(g);
 
+  // Safe: setGraph() was called above, and dagre.layout() populates width/height
   const graphLabel = g.graph()!;
   const layoutNodeMap = new Map<string, ILayoutNode>();
 
