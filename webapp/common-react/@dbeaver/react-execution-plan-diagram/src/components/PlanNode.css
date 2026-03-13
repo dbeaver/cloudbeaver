@@ -23,6 +23,43 @@
     outline-offset: 2px;
   }
 
+  .dbv-plan-node[data-hint]:focus-visible::after {
+    content: attr(data-hint);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-bottom: 8px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    background: var(--dbv-plan-node-caption-bg);
+    border: 1px solid var(--dbv-plan-node-border-color);
+    color: var(--dbv-plan-node-caption-color);
+    font-size: 10px;
+    white-space: nowrap;
+    pointer-events: none;
+    z-index: 1;
+    animation: dbv-plan-hint 15s ease-in-out forwards;
+  }
+
+  @keyframes dbv-plan-hint {
+    0% {
+      opacity: 0;
+    }
+    25% {
+      opacity: 0;
+    }
+    30% {
+      opacity: 1;
+    }
+    95% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+
   .dbv-plan-node[data-selected]:not(:focus-visible) {
     border-color: var(--dbv-plan-node-selected-border);
     box-shadow: 0 0 0 2px var(--dbv-plan-node-selected-glow);

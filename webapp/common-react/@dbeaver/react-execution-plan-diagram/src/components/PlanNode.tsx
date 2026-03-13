@@ -62,13 +62,13 @@ export function PlanNode({
   const translate = useTranslate();
   const percent = node.percent != null ? Math.round(node.percent * 100) : null;
   const isHighCost = percent != null && percent > 50;
-  const title = hasChildren
+  const hint = hasChildren
     ? translate(
         collapsed ? 'sql_execution_plan_diagram_node_expand_hint' : 'sql_execution_plan_diagram_node_collapse_hint',
         collapsed ? '{arg:type} — press C to expand' : '{arg:type} — press C to collapse',
         { type: node.type },
       )
-    : node.type;
+    : undefined;
   const handleFocus: FocusEventHandler<HTMLDivElement> = () => {
     onFocus?.(node.id);
   };
@@ -77,7 +77,7 @@ export function PlanNode({
     <div
       ref={nodeRef}
       className="dbv-plan-node"
-      title={title}
+      data-hint={hint}
       data-node-id={node.id}
       style={{ left: x, top: y, width, minWidth, maxWidth, minHeight: height || undefined }}
       data-selected={selected || undefined}
@@ -95,14 +95,8 @@ export function PlanNode({
         onSelect?.(node.id);
       }}
     >
-      <div className="dbv-plan-node__caption" title={node.type}>
-        {node.type}
-      </div>
-      {node.name && (
-        <div className="dbv-plan-node__name" title={node.name}>
-          {node.name}
-        </div>
-      )}
+      <div className="dbv-plan-node__caption">{node.type}</div>
+      {node.name && <div className="dbv-plan-node__name">{node.name}</div>}
       <div className="dbv-plan-node__metrics">
         {features.hasCost && node.cost != null && (
           <PlanNodeMetric labelKey="sql_execution_plan_diagram_cost" label="Cost">
