@@ -68,6 +68,7 @@ const PlanViewportContent = memo(function PlanViewportContent({
     layoutNodes,
     selectedNodeId,
     onNodeSelect,
+    onToggleCollapse,
   });
 
   return (

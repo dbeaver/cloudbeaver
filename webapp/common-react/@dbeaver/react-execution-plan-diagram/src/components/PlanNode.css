@@ -107,11 +107,6 @@
     padding: 0;
   }
 
-  .dbv-plan-node__collapse-indicator:focus-visible {
-    outline: 2px solid var(--dbv-plan-node-selected-border);
-    outline-offset: 2px;
-  }
-
   .dbv-plan-node[data-horizontal] .dbv-plan-node__collapse-indicator {
     bottom: auto;
     left: auto;

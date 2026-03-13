@@ -15,6 +15,7 @@ interface IUsePlanKeyboardNavigationOptions {
     layoutNodes: ILayoutNode[];
     selectedNodeId: string | null;
     onNodeSelect: (nodeId: string | null) => void;
+    onToggleCollapse?: (nodeId: string) => void;
 }
 export interface IPlanKeyboardNavigation {
     activeNodeId: string | null;
@@ -27,6 +28,7 @@ export function usePlanKeyboardNavigation({
     layoutNodes,
     selectedNodeId,
     onNodeSelect,
+    onToggleCollapse,
 }: IUsePlanKeyboardNavigationOptions): IPlanKeyboardNavigation {
     const nodeRefs = useRef<Map<string, HTMLDivElement>>(new Map());
     const [lastFocusedNodeId, setLastFocusedNodeId] = useState<string | null>(null);
@@ -119,8 +121,13 @@ export function usePlanKeyboardNavigation({
                     return;
                 }
             }
+
+            if (event.code === 'KeyC') {
+                event.preventDefault();
+                onToggleCollapse?.(nodeId);
+            }
         },
-        [findAdjacentNodeId, focusNode, layoutNodes, onNodeSelect],
+        [findAdjacentNodeId, focusNode, layoutNodes, onNodeSelect, onToggleCollapse],
     );
 
     return {

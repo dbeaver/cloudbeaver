@@ -43,8 +43,8 @@ export default [
   ['sql_execution_plan_diagram_cost', 'Cost'],
   ['sql_execution_plan_diagram_rows', 'Rows'],
   ['sql_execution_plan_diagram_time', 'Time'],
-  ['sql_execution_plan_diagram_expand_node', 'Expand {arg:name}'],
-  ['sql_execution_plan_diagram_collapse_node', 'Collapse {arg:name}'],
+  ['sql_execution_plan_diagram_node_collapse_hint', '{arg:type} — press C to collapse'],
+  ['sql_execution_plan_diagram_node_expand_hint', '{arg:type} — press C to expand'],
   ['sql_editor_upload_script_tooltip', 'Upload sql script'],
   ['sql_editor_download_script_tooltip', 'Download sql script'],
   [

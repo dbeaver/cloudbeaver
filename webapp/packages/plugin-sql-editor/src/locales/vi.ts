@@ -43,8 +43,8 @@ export default [
   ['sql_execution_plan_diagram_cost', 'Chi phí'],
   ['sql_execution_plan_diagram_rows', 'Số hàng'],
   ['sql_execution_plan_diagram_time', 'Thời gian'],
-  ['sql_execution_plan_diagram_expand_node', 'Mở rộng {arg:name}'],
-  ['sql_execution_plan_diagram_collapse_node', 'Thu gọn {arg:name}'],
+  ['sql_execution_plan_diagram_node_collapse_hint', '{arg:type} — nhấn C để thu gọn'],
+  ['sql_execution_plan_diagram_node_expand_hint', '{arg:type} — nhấn C để mở rộng'],
   ['sql_editor_upload_script_tooltip', 'Tải lên kịch bản SQL'],
   ['sql_editor_download_script_tooltip', 'Tải xuống kịch bản SQL'],
   [

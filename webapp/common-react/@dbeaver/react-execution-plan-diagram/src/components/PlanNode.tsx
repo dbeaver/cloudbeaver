@@ -62,6 +62,13 @@ export function PlanNode({
   const translate = useTranslate();
   const percent = node.percent != null ? Math.round(node.percent * 100) : null;
   const isHighCost = percent != null && percent > 50;
+  const title = hasChildren
+    ? translate(
+        collapsed ? 'sql_execution_plan_diagram_node_expand_hint' : 'sql_execution_plan_diagram_node_collapse_hint',
+        collapsed ? '{arg:type} — press C to expand' : '{arg:type} — press C to collapse',
+        { type: node.type },
+      )
+    : node.type;
   const handleFocus: FocusEventHandler<HTMLDivElement> = () => {
     onFocus?.(node.id);
   };
@@ -70,6 +77,7 @@ export function PlanNode({
     <div
       ref={nodeRef}
       className="dbv-plan-node"
+      title={title}
       data-node-id={node.id}
       style={{ left: x, top: y, width, minWidth, maxWidth, minHeight: height || undefined }}
       data-selected={selected || undefined}
@@ -119,21 +127,9 @@ export function PlanNode({
         </div>
       )}
       {hasChildren && (
-        <button
-          type="button"
+        <div
           className="dbv-plan-node__collapse-indicator"
-          aria-label={
-            collapsed
-              ? translate('sql_execution_plan_diagram_expand_node', 'Expand {arg:name}', { name: node.type })
-              : translate('sql_execution_plan_diagram_collapse_node', 'Collapse {arg:name}', { name: node.type })
-          }
-          aria-expanded={!collapsed}
-          onKeyDown={e => {
-            e.stopPropagation();
-          }}
-          onKeyUp={e => {
-            e.stopPropagation();
-          }}
+          aria-hidden
           onClick={e => {
             e.stopPropagation();
             onToggleCollapse?.(node.id);
@@ -143,7 +139,7 @@ export function PlanNode({
             <line x1="1" y1="4" x2="7" y2="4" stroke="currentColor" strokeWidth="1.5" />
             {collapsed && <line x1="4" y1="1" x2="4" y2="7" stroke="currentColor" strokeWidth="1.5" />}
           </svg>
-        </button>
+        </div>
       )}
     </div>
   );
