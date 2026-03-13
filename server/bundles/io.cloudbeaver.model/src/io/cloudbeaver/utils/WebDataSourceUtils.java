@@ -283,7 +283,7 @@ public class WebDataSourceUtils {
         if (config.getProperties() != null) {
             Map<String, String> newProps = new LinkedHashMap<>();
             for (Map.Entry<String, Object> pe : config.getProperties().entrySet()) {
-                newProps.put(pe.getKey(), CommonUtils.toString(pe.getValue()));
+                newProps.put(pe.getKey(), CommonUtils.toString(pe.getValue(), null));
             }
             dsConfig.setProperties(newProps);
         }
