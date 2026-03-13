@@ -83,6 +83,9 @@ export * from './NodesManager/useNode.js';
 export * from './NodesManager/useChildren.js';
 export * from './TreeNew/contexts/TreeMenuContext/TreeMenuContext.js';
 export * from './TreeNew/useTreeMenu.js';
+export type { ITreeDnD } from './TreeNew/useTreeDnD.js';
+export type { INodeDnD } from './TreeNew/useNodeDnD.js';
+export { useTreeDnD } from './TreeNew/useTreeDnD.js';
 
 export * from './NodesManager/NodeLinkLoader.js';
 

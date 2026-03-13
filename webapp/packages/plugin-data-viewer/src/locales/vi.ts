@@ -63,4 +63,5 @@ export default [
   ['settings_data_editor_fetch_default_description', 'Số lượng hàng mặc định để lấy'],
   ['plugin_data_viewer_no_available_presentation', 'Không có chế độ hiển thị nào khả dụng'],
   ['plugin_data_viewer_result_set_save_success', 'Lưu thành công'],
+  ['plugin_data_viewer_fetch_size', 'Kích thước lấy'],
 ];
