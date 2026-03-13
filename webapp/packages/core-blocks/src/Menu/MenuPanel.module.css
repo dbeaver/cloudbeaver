@@ -10,13 +10,17 @@
   z-index: 999;
 }
 .menuBox {
-  composes: theme-background-surface theme-text-on-surface theme-group-element-radius theme-typography--body2 theme-elevation-z5 from global;
+  composes: theme-background-surface theme-text-on-surface theme-group-element-radius theme-typography--body2 from global;
   composes: menuBox from './MenuItemElement.module.css';
 
   display: flex;
   flex-direction: column;
   min-width: 140px;
   padding: 6px 0;
+  box-shadow:
+    0px 3px 5px -1px rgba(0, 0, 0, 0.2),
+    0px 5px 8px 0px rgba(0, 0, 0, 0.14),
+    0px 1px 14px 0px rgba(0, 0, 0, 0.12);
 
   & .menuBox {
     margin-top: -6px;

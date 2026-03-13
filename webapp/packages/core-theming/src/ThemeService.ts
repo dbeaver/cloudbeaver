@@ -14,7 +14,6 @@ import { type ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import type { Style } from './ComponentStyle.js';
 import './styles/main/base.pure.css';
 import './styles/main/color.pure.scss';
-import './styles/utilities/elevation.css';
 import './styles/main/fonts.pure.css';
 // TODO: important to keep normalize first
 import './styles/main/normalize.pure.css';
