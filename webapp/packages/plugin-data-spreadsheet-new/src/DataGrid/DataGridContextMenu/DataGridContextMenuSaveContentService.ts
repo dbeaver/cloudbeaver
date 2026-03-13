@@ -39,7 +39,7 @@ export class DataGridContextMenuSaveContentService {
         const model = context.get(DATA_CONTEXT_DV_DDM)!;
         const allowedFeatures = [DatabaseDataFeature.DataEditor, DatabaseDataFeature.QueryResult];
 
-        return allowedFeatures.some(feature => model.source.features.has(feature));
+        return allowedFeatures.some(feature => model.source.hasFeature(feature));
       },
       getItems: (context, items) => [...items, ACTION_UPLOAD, ACTION_DOWNLOAD],
     });

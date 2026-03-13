@@ -59,12 +59,6 @@ export enum DatabaseDataFeature {
   QueryResult = 'QueryResult',
   /** Data grouping and aggregation functionality. Used for GROUP BY operations. */
   Grouping = 'Grouping',
-  /** Sub-collection data viewing (e.g., nested documents, arrays). */
-  SubCollection = 'SubCollection',
-  /** Session management capabilities for multi-session data sources. */
-  SessionManager = 'SessionManager',
-  /** Dataset operations for saved/named data collections. */
-  Dataset = 'Dataset',
 }
 
 export type GetDatabaseDataSourceOptions<TSource extends IDatabaseDataSource<any, any>> =
@@ -93,7 +87,6 @@ export interface IDatabaseDataSource<TOptions = unknown, TResult extends IDataba
   readonly serviceProvider: IServiceProvider;
   readonly onOperation: IExecutor<IDatabaseDataSourceOperationEvent>;
   readonly onResultsUpdate: ISyncExecutor<TResult[]>;
-  readonly features: ReadonlySet<DatabaseDataFeature>;
 
   isError: () => boolean;
   isOutdated: () => boolean;
@@ -104,6 +97,7 @@ export interface IDatabaseDataSource<TOptions = unknown, TResult extends IDataba
   isDisabled: (resultIndex?: number) => boolean;
 
   hasResult: (resultIndex: number) => boolean;
+  hasFeature: (feature: DatabaseDataFeature | string) => boolean;
 
   tryGetAction<T>(resultIndex: number, action: SingleServiceType<T, any[]>): T | undefined;
   tryGetAction<T>(result: TResult, action: SingleServiceType<T, any[]>): T | undefined;

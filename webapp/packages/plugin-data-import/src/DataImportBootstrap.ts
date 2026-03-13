@@ -99,10 +99,10 @@ export class DataImportBootstrap extends Bootstrap {
         const model = context.get(DATA_CONTEXT_DV_DDM)!;
         const presentation = context.get(DATA_CONTEXT_DV_PRESENTATION);
         const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
-        const allowedFeatures = [DatabaseDataFeature.DataEditor, DatabaseDataFeature.SubCollection];
+        const allowedFeatures = [DatabaseDataFeature.DataEditor];
 
         return (
-          allowedFeatures.some(feature => model.source.features.has(feature)) &&
+          allowedFeatures.some(feature => model.source.hasFeature(feature)) &&
           !model.isReadonly(resultIndex) &&
           !this.dataImportService.disabled &&
           !presentation?.readonly &&

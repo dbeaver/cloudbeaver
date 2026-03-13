@@ -45,7 +45,7 @@ export class GeneratorMenuBootstrap extends Bootstrap {
         const allowedFeatures = [DatabaseDataFeature.DataEditor, DatabaseDataFeature.QueryResult];
 
         return (
-          allowedFeatures.some(feature => model.source.features.has(feature)) &&
+          allowedFeatures.some(feature => model.source.hasFeature(feature)) &&
           !model.isReadonly(resultIndex) &&
           model.source.getResult(resultIndex)?.dataFormat === ResultDataFormat.Resultset &&
           !presentation?.readonly &&

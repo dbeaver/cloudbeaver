@@ -65,7 +65,7 @@ export class DataGridContextMenuGenerateSqlService {
 
         return (
           !!model &&
-          allowedFeatures.some(feature => model.source.features.has(feature)) &&
+          allowedFeatures.some(feature => model.source.hasFeature(feature)) &&
           !model.isDisabled(resultIndex) &&
           !model.isReadonly(resultIndex)
         );

@@ -60,7 +60,7 @@ export class TableHeaderService extends Bootstrap {
       isHidden(context, action) {
         const model = context.get(DATA_CONTEXT_DV_DDM)!;
         const allowedFeatures = [DatabaseDataFeature.DataEditor, DatabaseDataFeature.QueryResult];
-        const isFeatureSupported = allowedFeatures.some(feature => model.source.features.has(feature));
+        const isFeatureSupported = allowedFeatures.some(feature => model.source.hasFeature(feature));
         const isReadonly = model.isReadonly(context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!);
 
         if ([ACTION_UNDO, ACTION_REDO].includes(action)) {

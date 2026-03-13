@@ -66,9 +66,7 @@ export class DataGridContextMenuCellEditingService {
         const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
         const allowedFeatures = [DatabaseDataFeature.DataEditor, DatabaseDataFeature.QueryResult];
 
-        return (
-          allowedFeatures.some(feature => model.source.features.has(feature)) && !model.isDisabled(resultIndex) && !model.isReadonly(resultIndex)
-        );
+        return allowedFeatures.some(feature => model.source.hasFeature(feature)) && !model.isDisabled(resultIndex) && !model.isReadonly(resultIndex);
       },
       getItems: (context, items) => [...items, MENU_DATA_GRID_EDITING],
     });

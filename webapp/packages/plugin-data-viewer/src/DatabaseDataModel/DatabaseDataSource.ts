@@ -35,7 +35,7 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
   options: TOptions | null;
   requestInfo: IRequestInfo;
   error: Error | null;
-  readonly features: Set<DatabaseDataFeature>;
+  private readonly features: Set<DatabaseDataFeature | string>;
 
   get canCancel(): boolean {
     if (this.activeOperation instanceof Task) {
@@ -98,7 +98,7 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
     this.error = null;
     this.lastAction = this.requestData.bind(this);
 
-    makeObservable<DatabaseDataSource<TOptions, TResult>, 'disabled' | 'activeOperationStack' | 'outdated'>(this, {
+    makeObservable<DatabaseDataSource<TOptions, TResult>, 'disabled' | 'features' | 'activeOperationStack' | 'outdated'>(this, {
       access: observable,
       dataFormat: observable,
       features: observable,
@@ -257,9 +257,13 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
     return this;
   }
 
-  setFeature(feature: DatabaseDataFeature): this {
+  setFeature(feature: DatabaseDataFeature | string): this {
     this.features.add(feature);
     return this;
+  }
+
+  hasFeature(feature: DatabaseDataFeature | string): boolean {
+    return this.hasFeature(feature);
   }
 
   async retry(): Promise<void> {
