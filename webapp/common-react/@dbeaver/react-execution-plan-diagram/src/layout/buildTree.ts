@@ -28,10 +28,10 @@ export function buildTree(nodes: IPlanNode[]): IPlanNode[] {
 
   for (const node of nodes) {
     const treeNode = map.get(node.id)!;
+    const parent = node.parentId ? map.get(node.parentId) : undefined;
 
-    if (node.parentId) {
-      const parent = map.get(node.parentId);
-      parent?.children!.push(treeNode);
+    if (parent) {
+      parent.children!.push(treeNode);
     } else {
       tree.push(treeNode);
     }
@@ -43,49 +43,41 @@ export function buildTree(nodes: IPlanNode[]): IPlanNode[] {
 export function flattenTree(roots: IPlanNode[]): IPlanNode[] {
   const result: IPlanNode[] = [];
 
-  function walk(node: IPlanNode): void {
+  function collectAll(node: IPlanNode): void {
     result.push(node);
 
     if (node.children) {
       for (const child of node.children) {
-        walk(child);
+        collectAll(child);
       }
     }
   }
 
   for (const root of roots) {
-    walk(root);
+    collectAll(root);
   }
 
   return result;
 }
 
-export function filterVisibleNodes(allNodes: IPlanNode[], collapsedNodes: Set<string>): IPlanNode[] {
-  if (collapsedNodes.size === 0) {
-    return allNodes;
-  }
+export function filterVisibleNodes(roots: IPlanNode[], collapsedNodes: Set<string>): IPlanNode[] {
+  const result: IPlanNode[] = [];
 
-  const parentMap = new Map(allNodes.map(n => [n.id, n.parentId]));
-  const hiddenCache = new Map<string, boolean>();
+  function collectVisible(node: IPlanNode): void {
+    result.push(node);
 
-  function isHidden(nodeId: string): boolean {
-    const cached = hiddenCache.get(nodeId);
-
-    if (cached !== undefined) {
-      return cached;
+    if (collapsedNodes.has(node.id) || !node.children) {
+      return;
     }
 
-    const parentId = parentMap.get(nodeId);
-
-    if (!parentId) {
-      hiddenCache.set(nodeId, false);
-      return false;
+    for (const child of node.children) {
+      collectVisible(child);
     }
-
-    const result = collapsedNodes.has(parentId) || isHidden(parentId);
-    hiddenCache.set(nodeId, result);
-    return result;
   }
 
-  return allNodes.filter(n => !isHidden(n.id));
+  for (const root of roots) {
+    collectVisible(root);
+  }
+
+  return result;
 }

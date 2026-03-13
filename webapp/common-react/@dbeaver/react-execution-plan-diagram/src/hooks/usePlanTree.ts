@@ -33,7 +33,7 @@ export function usePlanTree(
         () => new Set(Array.from(rawCollapsedNodes).filter(nodeId => nodeMap.has(nodeId))),
         [nodeMap, rawCollapsedNodes],
     );
-    const visibleNodes = useMemo(() => filterVisibleNodes(allNodes, collapsedNodes), [allNodes, collapsedNodes]);
+    const visibleNodes = useMemo(() => filterVisibleNodes(tree, collapsedNodes), [tree, collapsedNodes]);
     const heavyRouteIds = useMemo(() => (highlightHeavyRoute ? computeHeavyRoute(tree) : EMPTY_STRING_SET), [highlightHeavyRoute, tree]);
 
     return { nodeMap, collapsedNodes, visibleNodes, heavyRouteIds };
