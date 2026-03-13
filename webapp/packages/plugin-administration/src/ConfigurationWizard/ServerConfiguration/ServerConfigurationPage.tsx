@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@ import {
   Group,
   GroupItem,
   GroupTitle,
+  Loader,
   Placeholder,
   s,
   ToolsAction,
@@ -53,25 +54,29 @@ export const ServerConfigurationPage: AdministrationItemContentComponent = obser
   const serverConfigurationFormStateManager = useService(ServerConfigurationFormStateManager);
   const configurationWizardService = useService(ConfigurationWizardService);
 
-  const formState = serverConfigurationFormStateManager.formState!;
-  const part = getServerConfigurationFormPart(formState);
+  const formState = serverConfigurationFormStateManager.formState;
+  const part = formState ? getServerConfigurationFormPart(formState) : null;
 
-  useAutoLoad(ServerConfigurationPage, [part]);
-  useFormValidator(formState.validationTask, ref.reference);
+  useAutoLoad(ServerConfigurationPage, part ?? []);
+  useFormValidator(formState?.validationTask, ref.reference);
 
   function handleChange() {
     if (configurationWizard) {
       serverConfigurationService.setDone(false);
     }
 
-    if (!part.state.serverConfig.adminCredentialsSaveEnabled) {
+    if (part && !part.state.serverConfig.adminCredentialsSaveEnabled) {
       part.state.serverConfig.publicCredentialsSaveEnabled = false;
     }
   }
 
-  const changed = part.isChanged;
+  const changed = part?.isChanged ?? false;
 
   async function save() {
+    if (!formState || !part) {
+      return;
+    }
+
     if (configurationWizard) {
       configurationWizardService.next();
       return;
@@ -104,6 +109,10 @@ export const ServerConfigurationPage: AdministrationItemContentComponent = obser
   const form = useForm({
     onSubmit: save,
   });
+
+  if (!formState || !part) {
+    return <Loader />;
+  }
 
   return (
     <ColoredContainer vertical wrap gap parent>
