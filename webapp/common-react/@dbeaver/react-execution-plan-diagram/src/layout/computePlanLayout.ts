@@ -10,6 +10,7 @@ import dagre from 'dagre';
 
 import type { IPlanDiagramOptions } from '../types/IPlanDiagramOptions.js';
 import type { IPlanNode } from '../types/IPlanNode.js';
+import type { ILayoutNode } from './ILayoutNode.js';
 import type { ILayoutResult } from './ILayoutResult.js';
 
 const NODE_SEP = 40;
@@ -39,12 +40,12 @@ export function computePlanLayout(
     g.setNode(node.id, { width: size.width, height: size.height });
   }
 
-  const nodeIds = new Set(nodes.map(n => n.id));
+  const nodeMap = new Map(nodes.map(n => [n.id, n]));
 
   for (const node of nodes) {
     if (node.children) {
       for (const child of node.children) {
-        if (nodeIds.has(child.id)) {
+        if (nodeMap.has(child.id)) {
           g.setEdge(node.id, child.id);
         }
       }
@@ -53,23 +54,21 @@ export function computePlanLayout(
 
   dagre.layout(g);
 
-  const nodeMap = new Map(nodes.map(n => [n.id, n]));
   const graphLabel = g.graph()!;
+  const layoutNodeMap = new Map<string, ILayoutNode>();
 
-  const layoutNodes = g.nodes().map(id => {
+  for (const id of g.nodes()) {
     const dagreNode = g.node(id);
 
-    return {
+    layoutNodeMap.set(id, {
       id,
       node: nodeMap.get(id)!,
       x: dagreNode.x - dagreNode.width / 2,
       y: dagreNode.y - dagreNode.height / 2,
       width: dagreNode.width,
       height: dagreNode.height,
-    };
-  });
-
-  const layoutNodeMap = new Map(layoutNodes.map(n => [n.id, n]));
+    });
+  }
 
   const isHorizontal = direction === 'LR' || direction === 'RL';
 
@@ -84,9 +83,9 @@ export function computePlanLayout(
         sourceId: e.v,
         targetId: e.w,
         x1: sourceRight ? source.x + source.width : source.x,
-        y1: source.y + source.height / 2 + 1,
+        y1: source.y + source.height / 2,
         x2: sourceRight ? target.x : target.x + target.width,
-        y2: target.y + target.height / 2 + 1,
+        y2: target.y + target.height / 2,
       };
     }
 
@@ -101,7 +100,7 @@ export function computePlanLayout(
   });
 
   return {
-    nodes: layoutNodes,
+    nodes: Array.from(layoutNodeMap.values()),
     edges: layoutEdges,
     width: graphLabel.width ?? 0,
     height: graphLabel.height ?? 0,
