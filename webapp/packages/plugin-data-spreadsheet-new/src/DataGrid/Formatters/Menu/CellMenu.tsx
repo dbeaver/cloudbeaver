@@ -1,17 +1,19 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
+import { useContext } from 'react';
 
 import { Icon, MenuItemElementStyles, s, SContext, type StyleRegistry, useS } from '@cloudbeaver/core-blocks';
 import { useDataContextLink } from '@cloudbeaver/core-data-context';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { ContextMenu } from '@cloudbeaver/core-ui';
 import { useMenu } from '@cloudbeaver/core-view';
+import { CellContext } from '../../CellRenderer/CellContext.js';
 import {
   DATA_CONTEXT_DV_ACTIONS,
   DATA_CONTEXT_DV_DDM,
@@ -51,6 +53,7 @@ const registry: StyleRegistry = [
 export const CellMenu = observer<Props>(function CellMenu({ model, actions, spreadsheetActions, resultIndex, cellKey, simple, onStateSwitch }) {
   const style = useS(classes);
   const menu = useMenu({ menu: MENU_DV_CONTEXT_MENU });
+  const cellContext = useContext(CellContext);
 
   useDataContextLink(menu.context, (context, id) => {
     context.set(DATA_CONTEXT_DV_DDM, model, id);
@@ -72,7 +75,7 @@ export const CellMenu = observer<Props>(function CellMenu({ model, actions, spre
   return (
     <SContext registry={registry}>
       <div className={s(style, { container: true })} onMouseUp={markStopPropagation} onDoubleClick={stopPropagation}>
-        <ContextMenu className={s(style, { contextMenu: true })} menu={menu} onVisibleSwitch={onStateSwitch}>
+        <ContextMenu className={s(style, { contextMenu: true })} menu={menu} visible={cellContext.isMenuVisible} onVisibleSwitch={onStateSwitch}>
           <Icon className={s(style, { icon: true })} name="snack" viewBox="0 0 16 10" />
         </ContextMenu>
       </div>
