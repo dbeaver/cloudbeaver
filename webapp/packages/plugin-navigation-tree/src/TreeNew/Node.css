@@ -1,0 +1,9 @@
+@layer components {
+  .tree-node--dnd-drop-target ::before {
+    opacity: 0.16;
+  }
+
+  .tree-node--dnd-dragging {
+    opacity: 0.6;
+  }
+}

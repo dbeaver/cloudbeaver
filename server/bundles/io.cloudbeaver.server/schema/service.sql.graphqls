@@ -51,7 +51,9 @@ type SQLContextInfo {
 }
 
 input SQLDataFilterConstraint {
-    attributePosition: Int!
+    "Either attributeName or attributePosition must be specified"
+    attributeName: String
+    attributePosition: Int
     orderPosition: Int
     orderAsc: Boolean
 

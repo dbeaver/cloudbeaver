@@ -54,7 +54,7 @@ export abstract class DatabaseEditAction<
   abstract getElementState(key: TKey): DatabaseEditChangeType | null;
   abstract get(key: TKey): TValue | undefined;
   abstract set(key: TKey, value: TValue): void;
-  abstract add(key?: TKey): void;
+  abstract add(...key: TKey[]): void;
   abstract duplicate(...key: TKey[]): void;
   abstract delete(...key: TKey[]): void;
   abstract applyPartialUpdate(resultId: string | null, rows: TValue[][]): void;

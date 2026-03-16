@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,8 @@ import {
   DATA_CONTEXT_DV_SIMPLE,
   DataPresentationService,
   IDatabaseDataConstraintAction,
+  IDatabaseDataSelectAction,
+  type IGridDataKey,
   isResultSetDataSource,
   MENU_DV_CONTEXT_MENU,
 } from '@cloudbeaver/plugin-data-viewer';
@@ -33,6 +35,7 @@ import { ACTION_DATA_GRID_PIN_COLUMN } from './DataGrid/Actions/Pin/ACTION_DATA_
 import { ACTION_DATA_GRID_UNPIN_COLUMN } from './DataGrid/Actions/Pin/ACTION_DATA_GRID_UNPIN_COLUMN.js';
 import { ACTION_DATA_GRID_UNPIN_ALL_COLUMNS } from './DataGrid/Actions/Pin/ACTION_DATA_GRID_UNPIN_ALL_COLUMNS.js';
 import { ACTION_DATA_GRID_FILTERS_RESET_OR_SORTING } from './DataGrid/Actions/Filters/ACTION_DATA_GRID_FILTERS_RESET_OR_SORTING.js';
+import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
 
 const VALUE_TEXT_PRESENTATION_ID = 'value-text-presentation';
 
@@ -114,6 +117,25 @@ export class SpreadsheetBootstrap extends Bootstrap {
           return { ...action.info, label: 'data_grid_table_open_value_panel', icon: 'value-panel' };
         }
 
+        if (action === ACTION_DATA_GRID_PIN_COLUMN || action === ACTION_DATA_GRID_UNPIN_COLUMN) {
+          const model = context.get(DATA_CONTEXT_DV_DDM)!;
+          const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
+          const select = model.source.tryGetAction(resultIndex, IDatabaseDataSelectAction);
+          const selectedElements = (select?.getActiveElements() || []) as IGridDataKey[];
+          const uniqueColumns = new Set(selectedElements.map(e => e.column.index));
+          const isMultiple = uniqueColumns.size > 1;
+
+          if (action === ACTION_DATA_GRID_PIN_COLUMN) {
+            const label = isMultiple ? 'plugin_data_spreadsheet_new_pin_columns' : 'plugin_data_spreadsheet_new_pin_column';
+            return { ...action.info, label };
+          }
+
+          if (action === ACTION_DATA_GRID_UNPIN_COLUMN) {
+            const label = isMultiple ? 'plugin_data_spreadsheet_new_unpin_columns' : 'plugin_data_spreadsheet_new_unpin_column';
+            return { ...action.info, label };
+          }
+        }
+
         return action.info;
       },
       isHidden: (context, action) => {
@@ -141,8 +163,10 @@ export class SpreadsheetBootstrap extends Bootstrap {
         if (action === ACTION_OPEN) {
           const actions = context.get(DATA_CONTEXT_DV_ACTIONS);
           const simple = context.get(DATA_CONTEXT_DV_SIMPLE);
+          const select = model.source.tryGetAction(resultIndex, IDatabaseDataSelectAction);
+          const hasSingleCellSelected = select?.getActiveElements().length === 1;
 
-          return actions?.valuePresentationId !== VALUE_TEXT_PRESENTATION_ID && !simple;
+          return actions?.valuePresentationId !== VALUE_TEXT_PRESENTATION_ID && !simple && hasSingleCellSelected;
         }
 
         if (action === ACTION_DATA_GRID_FILTERS_RESET_OR_SORTING) {
@@ -183,21 +207,13 @@ export class SpreadsheetBootstrap extends Bootstrap {
         }
 
         if (action === ACTION_DATA_GRID_PIN_COLUMN) {
-          const dataContextResultKey = context.get(DATA_CONTEXT_DV_RESULT_KEY)!;
           const presentationActions = context.get(DATA_CONTEXT_DV_PRESENTATION_ACTIONS)!;
-
-          if (dataContextResultKey.column) {
-            presentationActions.pinColumn(dataContextResultKey);
-          }
+          handleColumnPinAction(context, columns => presentationActions.pinColumns(columns));
         }
 
         if (action === ACTION_DATA_GRID_UNPIN_COLUMN) {
-          const dataContextResultKey = context.get(DATA_CONTEXT_DV_RESULT_KEY)!;
           const presentationActions = context.get(DATA_CONTEXT_DV_PRESENTATION_ACTIONS)!;
-
-          if (dataContextResultKey.column) {
-            presentationActions.unpinColumn(dataContextResultKey);
-          }
+          handleColumnPinAction(context, columns => presentationActions.unpinColumns(columns));
         }
 
         if (action === ACTION_DATA_GRID_UNPIN_ALL_COLUMNS) {
@@ -207,4 +223,16 @@ export class SpreadsheetBootstrap extends Bootstrap {
       },
     });
   }
+}
+
+function handleColumnPinAction(context: IDataContextProvider, action: (columns: IGridDataKey[]) => void) {
+  const dataContextResultKey = context.get(DATA_CONTEXT_DV_RESULT_KEY)!;
+  const model = context.get(DATA_CONTEXT_DV_DDM)!;
+  const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
+
+  const select = model.source.tryGetAction(resultIndex, IDatabaseDataSelectAction);
+  const selectedElements = (select?.getActiveElements() || []) as IGridDataKey[];
+  const keys = selectedElements.length ? selectedElements : [dataContextResultKey];
+
+  action(keys);
 }

@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -45,11 +45,11 @@ export const CellFormatter = observer<Props>(function CellFormatter({ rowIdx, co
         context.getDataGridApi()?.openEditor({ colIdx, rowIdx });
       }
     },
-    unpinColumn(key) {
-      tableDataContext.view.unpinColumn(key.column);
+    unpinColumns(keys) {
+      tableDataContext.view.unpinColumns(keys.map(key => key.column));
     },
-    pinColumn(key) {
-      tableDataContext.view.pinColumn(key.column);
+    pinColumns(keys) {
+      tableDataContext.view.pinColumns(keys.map(key => key.column));
     },
     isColumnPinned(key) {
       return tableDataContext.view.isColumnPinned(key.column);
