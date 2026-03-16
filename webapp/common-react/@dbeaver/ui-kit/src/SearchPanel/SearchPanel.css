@@ -61,9 +61,9 @@
     flex-direction: column;
     justify-content: center;
 
-    @container (width >= 280px) {
+    @container (width >= 300px) {
       &:has(.search-panel__matches) {
-        flex-basis: 140px;
+        flex-basis: 150px;
       }
     }
   }
@@ -74,7 +74,7 @@
     font-size: 12px;
     flex-shrink: 0;
 
-    @container (width >= 280px) {
+    @container (width >= 300px) {
       display: inline;
       padding-inline: var(--tw-spacing);
     }
