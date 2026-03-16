@@ -7,9 +7,9 @@
  */
 import type { IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
 import type { IServiceProvider } from '@cloudbeaver/core-di';
-import type { CommonDialogService } from '@cloudbeaver/core-dialogs';
+import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { AsyncTaskInfoEventHandler, AsyncTaskInfoService } from '@cloudbeaver/core-root';
-import type { AsyncTaskInfo, GraphQLService } from '@cloudbeaver/core-sdk';
+import { type AsyncTaskInfo, GraphQLService } from '@cloudbeaver/core-sdk';
 import { DatabaseDataFeature } from '@cloudbeaver/plugin-data-viewer';
 import { type IDataQueryOptions, QueryDataSource } from '@cloudbeaver/plugin-sql-editor';
 

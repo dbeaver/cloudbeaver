@@ -227,5 +227,5 @@ export abstract class ResultSetDataSource<TOptions = IDatabaseDataOptions> exten
 }
 
 export function isResultSetDataSource<T = IDatabaseDataOptions>(dataSource: any): dataSource is ResultSetDataSource<T> {
-  return dataSource instanceof ResultSetDataSource || dataSource.hasFeature(DatabaseDataFeature.ResultSet);
+  return dataSource instanceof ResultSetDataSource;
 }
