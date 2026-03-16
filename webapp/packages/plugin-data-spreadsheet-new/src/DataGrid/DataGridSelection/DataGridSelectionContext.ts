@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -13,6 +13,7 @@ import type { IDraggingPosition } from '../useGridDragging.js';
 
 export interface IDataGridSelectionContext {
   selectedCells: Map<string, IGridDataKey[]>;
+  clearSelection: VoidFunction;
   select: (cell: IDraggingPosition, multiple: boolean, range: boolean, temporary: boolean) => void;
   selectColumn: (colIdx: number, multiple: boolean) => void;
   selectTable: () => void;

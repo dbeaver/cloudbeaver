@@ -195,8 +195,40 @@ export class GridEditAction<
     this.removeEmptyUpdate(update);
   }
 
-  add(key?: TKey): void {
-    this.addRow(key?.row, undefined, key?.column);
+  add(...keys: TKey[]): void {
+    const result: TKey[] = [];
+    const rowKeys = new Set<string>();
+
+    for (const key of keys) {
+      const serialized = GridDataKeysUtils.serialize(key.row);
+
+      if (!rowKeys.has(serialized)) {
+        result.push(key);
+        rowKeys.add(serialized);
+      }
+    }
+
+    if (result.length <= 1) {
+      this.addRow(result[0]?.row, undefined, result[0]?.column);
+      return;
+    }
+
+    const addedKeys: Array<IGridHistoryRow<TKey, TCell>> = [];
+
+    for (const key of result) {
+      const newKey = this.addRow(key.row, undefined, key.column, true);
+      const update = this.editorData.get(GridDataKeysUtils.serialize(newKey.row));
+
+      if (update) {
+        addedKeys.push({ key: newKey, value: update.update });
+      }
+    }
+
+    if (addedKeys.length > 0) {
+      this.historyManager.recordAddRows({
+        rowEntries: addedKeys,
+      });
+    }
   }
 
   addRow(row?: IGridRowKey, value?: TCell[], column?: IGridColumnKey, ignoreHistory = false): TKey {
