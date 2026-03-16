@@ -114,6 +114,7 @@
   }
 
   .editorAction {
+    composes: theme-ripple from global;
     box-sizing: border-box;
     display: flex;
     align-items: center;

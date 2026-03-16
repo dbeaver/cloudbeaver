@@ -27,7 +27,7 @@ export const Tag = observer(function Tag<T extends string | number>({ id, label,
   const styles = useS(style);
 
   return (
-    <li title={label} className={s(styles, { tagContainer: true }, className, 'tw-ripple')}>
+    <li title={label} className={s(styles, { tagContainer: true }, className)}>
       {icon && (
         <div className={s(styles, { tagIcon: true })}>
           <IconOrImage icon={icon} className={s(styles, { iconOrImage: true })} />

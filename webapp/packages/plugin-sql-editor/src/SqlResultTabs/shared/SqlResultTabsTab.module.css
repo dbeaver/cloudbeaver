@@ -6,6 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 .tab {
-  composes: theme-background-surface theme-text-text-primary-on-light from global;
+  composes: theme-ripple theme-background-surface theme-text-text-primary-on-light from global;
   height: 38px !important;
 }

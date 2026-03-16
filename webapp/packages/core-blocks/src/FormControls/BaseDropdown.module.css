@@ -21,6 +21,7 @@
 }
 
 .menuItem {
+  composes: theme-ripple from global;
   background: transparent;
   display: flex;
   flex-direction: row;

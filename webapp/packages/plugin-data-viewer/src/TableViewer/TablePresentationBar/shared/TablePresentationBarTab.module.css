@@ -7,7 +7,7 @@
  */
 
 .tab {
-  composes: theme-background-background theme-text-text-primary-on-light theme-typography--body2 from global;
+  composes: theme-ripple theme-background-background theme-text-text-primary-on-light theme-typography--body2 from global;
   text-transform: uppercase;
   font-weight: normal;
 

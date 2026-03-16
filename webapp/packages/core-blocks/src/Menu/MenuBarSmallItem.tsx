@@ -30,7 +30,7 @@ export const MenuBarSmallItem: React.FC<React.PropsWithChildren<Props>> = functi
   // TODO: replace IconButton with StaticImage / Icon
   // TODO: use button for icon-box (maybe)
   return (
-    <div className={s(style, { iconBox: true }, className, 'tw-ripple')} tabIndex={0} onClick={onClick}>
+    <div className={s(style, { iconBox: true }, className)} tabIndex={0} onClick={onClick}>
       {icon && <IconButton className={s(style, { iconButton: true })} name={icon} viewBox={viewBox} {...rest} />}
       {children && <div className={s(style, { iconLabel: true })}>{children}</div>}
     </div>

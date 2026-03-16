@@ -41,3 +41,7 @@
 .description {
   composes: theme-typography--caption from global;
 }
+
+.ripple {
+  composes: theme-ripple from global;
+}

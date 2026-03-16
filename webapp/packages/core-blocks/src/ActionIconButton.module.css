@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 .actionIconButton {
-  composes: theme-form-element-radius from global;
+  composes: theme-form-element-radius theme-ripple from global;
 
   box-sizing: border-box;
   overflow: hidden;

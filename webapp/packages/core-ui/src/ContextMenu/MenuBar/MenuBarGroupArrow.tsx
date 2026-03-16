@@ -17,7 +17,7 @@ export const MenuBarGroupArrow = registry(
     const t = useTranslate();
 
     return (
-      <button className={s(styles, { menuBarGroupArrowCustomSubmenuMark: true }, className, 'tw-ripple')} title={t(title)} {...rest}>
+      <button className={s(styles, { menuBarGroupArrowCustomSubmenuMark: true }, className)} title={t(title)} {...rest}>
         <Icon className={s(styles, { icon: true })} name="arrow" viewBox="0 0 16 16" />
       </button>
     );

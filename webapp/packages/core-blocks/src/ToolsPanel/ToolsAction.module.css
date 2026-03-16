@@ -6,6 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 .button {
+  composes: theme-ripple from global;
   padding: 0 4px;
   display: flex;
   align-items: center;

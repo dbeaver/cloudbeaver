@@ -48,7 +48,7 @@ export const MenuBarItem = registry(
     const tabIndex = selected ? 0 : -1;
 
     return (
-      <button ref={ref} className={s(styles, { menuBarItem: true }, className, 'tw-ripple')} tabIndex={tabIndex} {...rest} title={tooltip} aria-label={tooltip}>
+      <button ref={ref} className={s(styles, { menuBarItem: true }, className)} tabIndex={tabIndex} {...rest} title={tooltip} aria-label={tooltip}>
         <div className={s(styles, { menuBarItemBox: true })}>
           {loading ? (
             <div className={s(styles, { menuBarItemIcon: true })}>

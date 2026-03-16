@@ -65,7 +65,7 @@ export const InputAutocompletionMenu = observer(function InputAutocompletionMenu
           id={proposal.displayString}
           type="button"
           title={proposal.title}
-          className={s(styles, { menuItem: true }, 'tw-ripple')}
+          className={s(styles, { menuItem: true })}
           onClick={event => handleSelect(proposal)}
         >
           {proposal.icon && (

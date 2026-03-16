@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 .menuPanelItem {
-  composes: theme-border-color-background from global;
+  composes: theme-ripple theme-border-color-background from global;
 
   flex: 1;
   display: flex;

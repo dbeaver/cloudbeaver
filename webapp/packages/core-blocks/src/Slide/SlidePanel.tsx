@@ -30,7 +30,7 @@ export function SlidePanel({ children, isOpen, onClose }: SlidePanelProps): Reac
           id={SLIDE_PANEL_CLOSE_BUTTON_ID}
           size="small"
           aria-label={t('core_blocks_dialog_element_close_tooltip')}
-          className={s(styles, { iconBtn: true }, 'tw-ripple')}
+          className={s(styles, { iconBtn: true })}
           autoFocus
           onClick={onClose}
         >

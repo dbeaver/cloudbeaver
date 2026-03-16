@@ -76,7 +76,7 @@ export const Tab = observer<TabProps>(function Tab({ after, ...props }) {
             type="button"
             title={translate(title ?? info?.title)}
             id={tabId}
-            className={s(styles, { tab: true }, className, 'tw-ripple tw-ripple-selectable')}
+            className={s(styles, { tab: true }, className)}
             disabled={disabled}
             onClick={tab.handleOpen}
           >
