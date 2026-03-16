@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -24,8 +24,7 @@ export const IS_NOT_NULL_ID = 'IS_NOT_NULL';
 @injectable(() => [IDatabaseDataSource, IDatabaseDataResult])
 export class DatabaseDataConstraintAction
   extends DatabaseDataAction<IDatabaseDataOptions, IDatabaseResultSet>
-  implements IDatabaseDataConstraintAction<IDatabaseResultSet>
-{
+  implements IDatabaseDataConstraintAction<IDatabaseResultSet> {
   static dataFormat = [ResultDataFormat.Resultset, ResultDataFormat.Document];
 
   get supported(): boolean {
@@ -236,7 +235,7 @@ export class DatabaseDataConstraintAction
       if (isFilterConstraint(currentConstraint)) {
         deleteOrderFromConstraint(currentConstraint);
       } else {
-        this.deleteConstraint(currentConstraint.attributePosition);
+        this.deleteConstraint(currentConstraint.attributePosition!);
       }
     }
   }
