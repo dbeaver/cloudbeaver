@@ -39,7 +39,7 @@ export default [
   ['plugin_navigation_tree_settings_disable_description', 'Отключить дерево навигации для всех пользователей'],
   ['plugin_navigation_tree_toolbar_menu_title', 'Панель инструментов дерева'],
   ['plugin_navigation_tree_settings_menu_title', 'Настройки дерева'],
-  ['plugin_navigation_tree_settings_show_filter', 'Показать фильтр'],
-  ['plugin_navigation_tree_settings_show_descriptions', 'Показать описания'],
-  ['plugin_navigation_tree_settings_save_state', 'Сохранить состояние дерева'],
+  ['plugin_navigation_tree_settings_show_filter', 'Показывать фильтр'],
+  ['plugin_navigation_tree_settings_show_descriptions', 'Показывать описания'],
+  ['plugin_navigation_tree_settings_save_state', 'Сохранять состояние дерева'],
 ];
