@@ -8,14 +8,11 @@
 
 @mixin base-code-editor-autocompletion() {
   .cm-tooltip.cm-tooltip-autocomplete {
-    background: unset;
-    border: none;
-
-    & > ul {
+    & > :global(ul) {
       border-radius: var(--theme-form-element-radius);
     }
 
-    & li {
+    & :global(li) {
       display: flex;
       align-items: center;
     }
@@ -27,17 +24,17 @@
       padding: 0;
       margin-right: 0.6em;
 
-      &:not([src]) {
+      &:not(:global([src])) {
         opacity: 0;
       }
     }
 
-    & li:hover {
+    & :global(li):hover {
       background: var(--theme-sub-secondary);
       color: var(--theme-on-secondary);
     }
 
-    & li[aria-selected='true'] {
+    & :global(li):global([aria-selected='true']) {
       background: var(--theme-secondary);
       color: var(--theme-text-primary-on-light);
     }
