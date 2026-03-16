@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ public class WebSQLDataFilter {
 
 
     private int offset;
-    private int limit ;
+    private int limit;
     private String where;
     private final List<WebSQLDataFilterConstraint> constraints = new ArrayList<>();
 
@@ -48,7 +48,7 @@ public class WebSQLDataFilter {
         this.limit = DEFAULT_ROWS_NUMBER;
     }
 
-    public WebSQLDataFilter(Map<String, Object> filterProps) {
+    public WebSQLDataFilter(@NotNull Map<String, Object> filterProps) {
         this.offset = CommonUtils.toInt(filterProps.get("offset"));
         this.limit = CommonUtils.toInt(filterProps.get("limit"));
         if (this.limit <= 0) {
@@ -59,10 +59,10 @@ public class WebSQLDataFilter {
         this.where = CommonUtils.toString(filterProps.get("where"), null);
         Object constraints = filterProps.get("constraints");
         if (constraints instanceof Collection) {
-            for (Object constrItem : (Collection<?>)constraints) {
+            for (Object constrItem : (Collection<?>) constraints) {
                 if (constrItem instanceof Map) {
                     this.constraints.add(
-                        new WebSQLDataFilterConstraint((Map<String, Object>)constrItem));
+                        new WebSQLDataFilterConstraint((Map<String, Object>) constrItem));
                 }
             }
         }
@@ -92,7 +92,8 @@ public class WebSQLDataFilter {
         return where;
     }
 
-    public static WebSQLDataFilter from(DBDDataFilter filter) {
+    @NotNull
+    public static WebSQLDataFilter from(@NotNull DBDDataFilter filter) {
         var webFilter = new WebSQLDataFilter();
         webFilter.where = filter.getWhere();
         for (DBDAttributeConstraint constraint : filter.getConstraints()) {
@@ -101,6 +102,7 @@ public class WebSQLDataFilter {
         return webFilter;
     }
 
+    @NotNull
     public DBDDataFilter makeDataFilter(@Nullable WebSQLResultsInfo resultInfo) throws DBException {
         DBDDataFilter dataFilter = new DBDDataFilter();
         dataFilter.setWhere(where);
@@ -112,12 +114,17 @@ public class WebSQLDataFilter {
     }
 
 
+    @NotNull
     private List<DBDAttributeConstraint> mapWebConstrainsToDbdConstrains(@Nullable WebSQLResultsInfo resultInfo) throws DBException {
+        if (resultInfo == null) {
+            return getDbdConstraints();
+        }
         List<DBDAttributeConstraint> constraints = generateEmptyConstrains(resultInfo);
         fillEmptyConstrains(constraints);
         return constraints;
     }
 
+    @NotNull
     public List<DBDAttributeConstraint> generateEmptyConstrains(@Nullable WebSQLResultsInfo resultInfo) {
         if (resultInfo == null) {
             return Collections.emptyList();
@@ -132,7 +139,7 @@ public class WebSQLDataFilter {
 
     private void fillEmptyConstrains(@NotNull List<DBDAttributeConstraint> emptyConstraints) throws DBException {
         for (WebSQLDataFilterConstraint webConstr : constraints) {
-            if(webConstr.getAttributePosition() >= emptyConstraints.size()) {
+            if (webConstr.getAttributePosition() >= emptyConstraints.size()) {
                 throw new DBException(MessageFormat.format("Incorrect column position ''{0}'' in order clause", webConstr.getAttributePosition()));
             }
             DBDAttributeConstraint dbConstr = emptyConstraints.get(webConstr.getAttributePosition());
@@ -140,6 +147,7 @@ public class WebSQLDataFilter {
         }
     }
 
+    @NotNull
     private DBDAttributeConstraint fillEmptyConstraint(@NotNull DBDAttributeConstraint dbConstr,
                                                        @NotNull WebSQLDataFilterConstraint webConstr) {
         dbConstr.setPlainNameReference(true);
@@ -158,5 +166,34 @@ public class WebSQLDataFilter {
             dbConstr.setValue(webConstr.getValue());
         }
         return dbConstr;
+    }
+
+    private List<DBDAttributeConstraint> getDbdConstraints() {
+        List<DBDAttributeConstraint> dbConstraints = new ArrayList<>();
+        for (WebSQLDataFilterConstraint constraint : constraints) {
+            String attributeName = constraint.getAttributeName();
+            DBDAttributeConstraint dbConstraint = new DBDAttributeConstraint(
+                attributeName, getOriginalVisualPosition(constraint, attributeName)
+            );
+
+            fillEmptyConstraint(dbConstraint, constraint);
+            dbConstraints.add(dbConstraint);
+        }
+        return dbConstraints;
+    }
+
+    private static int getOriginalVisualPosition(WebSQLDataFilterConstraint constraint, String attributeName) {
+        Integer attributePosition = constraint.getAttributePosition();
+
+        if (CommonUtils.isEmpty(attributeName)) {
+            if (attributePosition == null) {
+                throw new IllegalArgumentException("Constraint must specify either attributePosition or attributeName");
+            }
+            throw new IllegalArgumentException(
+                "Can't convert constraint by attributePosition without result set metadata (attributeName is required)"
+            );
+        }
+
+        return attributePosition == null ? -1 : attributePosition;
     }
 }
