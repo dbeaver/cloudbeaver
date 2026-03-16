@@ -49,7 +49,7 @@ export function useDataGridSearch({ containerRef, searchStorage, getCellEditable
     }
 
     function handleKeyDown(e: KeyboardEvent) {
-      if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+      if ((e.ctrlKey || e.metaKey) && e.code === 'KeyF') {
         e.preventDefault();
         setSearchOpen(true);
         searchPanelRef.current?.focus();
