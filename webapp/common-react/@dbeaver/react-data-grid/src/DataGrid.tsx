@@ -54,8 +54,11 @@ export interface DataGridProps extends IDataGridCellContext, IDataGridRowContext
   onEditorOpen?: (position: ICellPosition) => void;
   onCellKeyDown?: (position: ICellPosition, event: DataGridCellKeyboardEvent) => void;
   className?: string;
-  searchReadOnly?: boolean;
-  searchStorage?: IGridSearchStorage;
+  search?: {
+    isEnabled?: boolean;
+    isReadOnly?: boolean;
+    storage?: IGridSearchStorage;
+  };
 }
 
 export interface DataGridRef {
@@ -107,8 +110,7 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
     children,
     className,
     onCellKeyDown,
-    searchReadOnly,
-    searchStorage,
+    search: { isEnabled: searchEnabled, isReadOnly: searchReadOnly, storage: searchStorage } = {},
   },
   ref,
 ) {
@@ -308,7 +310,7 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
                 onCellKeyDown={handleCellKeyDown}
                 onColumnWidthsChange={setColumnWidths}
               />
-              <Activity mode={searchOpen ? 'visible' : 'hidden'}>
+              <Activity mode={searchEnabled && searchOpen ? 'visible' : 'hidden'}>
                 <GridSearchPanel
                   ref={setSearchPanelRef}
                   columnCount={columnsCount}

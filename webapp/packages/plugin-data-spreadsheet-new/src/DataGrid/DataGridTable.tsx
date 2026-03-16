@@ -582,10 +582,13 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
                 columnSortable={columnSortable}
                 columnSortingState={columnSortingState}
                 getRowId={rowIdx => (tableData.rows[rowIdx] ? GridDataKeysUtils.serialize(tableData.rows[rowIdx]) : '')}
-                searchStorage={searchResultsCache}
-                searchReadOnly={
-                  model.isReadonly(resultIndex) || !(isResultSetDataSource(model.source) && model.source.hasElementIdentifier(resultIndex))
-                }
+                search={{
+                  isEnabled: true,
+                  isReadOnly: 
+                  model.isReadonly(resultIndex) ||
+                  !(isResultSetDataSource(model.source) && model.source.hasElementIdentifier(resultIndex)),
+                  storage: searchResultsCache,
+                }}
                 columnSortingMultiple
                 onFocus={handleFocusChange}
                 onScrollToBottom={handleScrollToBottom}
