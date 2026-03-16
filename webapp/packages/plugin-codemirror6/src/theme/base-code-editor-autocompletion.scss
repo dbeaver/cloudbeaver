@@ -1,0 +1,49 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+
+@mixin base-code-editor-autocompletion() {
+  .cm-tooltip.cm-tooltip-autocomplete {
+    background: unset;
+    border: none;
+
+    & > ul {
+      border-radius: var(--theme-form-element-radius);
+    }
+
+    & li {
+      display: flex;
+      align-items: center;
+    }
+
+    & .cm-completionIcon {
+      opacity: 1;
+      width: 16px;
+      height: 16px;
+      padding: 0;
+      margin-right: 0.6em;
+
+      &:not([src]) {
+        opacity: 0;
+      }
+    }
+
+    & li:hover {
+      background: var(--theme-sub-secondary);
+      color: var(--theme-on-secondary);
+    }
+
+    & li[aria-selected='true'] {
+      background: var(--theme-secondary);
+      color: var(--theme-text-primary-on-light);
+    }
+  }
+
+  .cm-tooltip.cm-completionInfo {
+    margin-left: 8px;
+  }
+}

@@ -7,9 +7,6 @@
  */
 import type { ThemeSelector } from '@cloudbeaver/core-theming';
 
-import './_base-code-editor.css';
-import './_base-code-editor-tooltip.css';
-import './_base-code-editor-autocompletion.css';
 import type Dark from './dark.module.scss';
 import type Light from './light.module.scss';
 

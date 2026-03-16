@@ -7,8 +7,14 @@
  */
 
 @import '@cloudbeaver/core-theming/src/styles/theme-light';
+@import './base-code-editor';
+@import './base-code-editor-autocompletion';
+@import './base-code-editor-tooltip';
 
 :global .#{$theme-class} {
+  @include base-code-editor;
+  @include base-code-editor-autocompletion;
+  @include base-code-editor-tooltip;
   --editor-meta: #ff1717;
   --editor-keyword: #07a;
   --editor-atom: #905;
