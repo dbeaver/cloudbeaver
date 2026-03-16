@@ -12691,10 +12691,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"flatted@npm:^3.2.9":
-  version: 3.3.4
-  resolution: "flatted@npm:3.3.4"
-  checksum: 10c0/d1f33426e9714063a65a90940acdb2897eceb810230a58e496d90334dcecfa81a90135bbc660df6827939865d57cb4a2afab14dcd3d505e16a8484fd73bf9642
+"flatted@npm:>=3.4.0":
+  version: 3.4.1
+  resolution: "flatted@npm:3.4.1"
+  checksum: 10c0/3987a7f1e39bc7215cece001354313b462cdb4fb2dde0df4f7acd9e5016fbae56ee6fb3f0870b2150145033be8bda4f01af6f87a00946049651131bbfca7dfa6
   languageName: node
   linkType: hard
 
