@@ -263,7 +263,7 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
   }
 
   hasFeature(feature: DatabaseDataFeature | string): boolean {
-    return this.hasFeature(feature);
+    return this.features.has(feature);
   }
 
   async retry(): Promise<void> {
