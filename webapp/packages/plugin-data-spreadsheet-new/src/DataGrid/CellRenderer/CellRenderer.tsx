@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -104,26 +104,61 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
 
   const state = useObjectRef(
     () => ({
-      mouseDown(event: React.MouseEvent<HTMLDivElement>) {
-        // this.selectCell(this.row, this.column);
-      },
       mouseUp(event: React.MouseEvent<HTMLDivElement>) {
         if (
           // !this.dataGridContext.isGridInFocus()
-          EventContext.has(event, EventStopPropagationFlag)
+          EventContext.has(event, EventStopPropagationFlag) ||
+          // Preventing selection being reset on right-click
+          event.button === 2
         ) {
           return;
         }
 
-        this.selectionContext.select(
-          {
-            colIdx: this.colIdx,
-            rowIdx: this.rowIdx,
-          },
-          event.ctrlKey || event.metaKey,
-          event.shiftKey,
-          false,
-        );
+        const isCurrentCellSelected = this.selectionContext.isSelected(this.rowIdx, this.colIdx);
+        const isModifyingSelection = event.ctrlKey || event.metaKey || event.shiftKey;
+        const hasSelection = this.selectionContext.selectedCells.size > 0;
+
+        if (!isCurrentCellSelected || isModifyingSelection) {
+          this.selectionContext.select(
+            {
+              colIdx: this.colIdx,
+              rowIdx: this.rowIdx,
+            },
+            event.ctrlKey || event.metaKey,
+            event.shiftKey,
+            false,
+          );
+          return;
+        }
+
+        if (hasSelection) {
+          this.selectionContext.clearSelection();
+        }
+      },
+      openContextMenu(event: React.MouseEvent<HTMLDivElement>) {
+        if (EventContext.has(event, EventStopPropagationFlag)) {
+          return;
+        }
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        // If the right-clicked cell is not in the current selection, select only this cell
+        const isCurrentCellSelected = this.selectionContext.isSelected(this.rowIdx, this.colIdx);
+
+        if (!isCurrentCellSelected) {
+          this.selectionContext.select(
+            {
+              colIdx: this.colIdx,
+              rowIdx: this.rowIdx,
+            },
+            false,
+            false,
+            false,
+          );
+        }
+
+        this.cellContext.setMenuVisibility(true);
       },
     }),
     {
@@ -131,8 +166,9 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
       rowIdx,
       selectionContext,
       dataGridContext,
+      cellContext,
     },
-    ['mouseUp', 'mouseDown'],
+    ['mouseUp', 'openContextMenu'],
   );
 
   const formatting = getComputed(
@@ -148,8 +184,8 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
         style: formatting || undefined,
         'data-row-index': rowIdx,
         'data-column-index': colIdx,
-        onMouseDown: state.mouseDown,
         onMouseUp: state.mouseUp,
+        onContextMenu: state.openContextMenu,
       })}
     </CellContext.Provider>
   );
