@@ -62,9 +62,9 @@ export function useDataEditorDnDBox(model: IDatabaseDataModel, resultIndex: numb
         const isToPinned = resultSetViewAction.isColumnPinned(columnKey);
 
         if (isFromPinned && !isToPinned) {
-          resultSetViewAction.unpinColumn(dndColumnKey);
+          resultSetViewAction.unpinColumns([dndColumnKey]);
         } else if (!isFromPinned && isToPinned) {
-          resultSetViewAction.pinColumn(dndColumnKey);
+          resultSetViewAction.pinColumns([dndColumnKey]);
         }
       }
     },

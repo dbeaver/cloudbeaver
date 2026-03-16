@@ -9,7 +9,7 @@ import { computed, observable, action } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useContext, type HTMLAttributes } from 'react';
 
-import { getComputed, useObjectRef, useObservableRef } from '@cloudbeaver/core-blocks';
+import { getComputed, useHover, useMergeRefs, useObjectRef, useObservableRef } from '@cloudbeaver/core-blocks';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { clsx } from '@dbeaver/ui-kit';
 import { type IDataGridCellRenderer, type ICellPosition } from '@cloudbeaver/plugin-data-grid';
@@ -39,11 +39,13 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
   const columnInfo = tableDataContext.getColumn(colIdx);
   const dndBox = useDataEditorDnDBox(dataGridContext.model, dataGridContext.resultIndex, columnInfo?.key ?? null);
 
+  const hover = useHover();
+
   const cellContext = useObservableRef(
     () => ({
-      isHovered: false,
       isMenuVisible: false,
       isFocused: false,
+      isHovered: false,
       get position(): ICellPosition {
         return { colIdx: this.colIdx, rowIdx: this.rowIdx };
       },
@@ -70,19 +72,20 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
         return this.tableDataContext.getEditionState(this.cell);
       },
       setMenuVisibility(visibility: boolean): void {
+        if (this.isMenuVisible && !visibility) {
+          this.hover.hoverOut();
+        }
+
         this.isMenuVisible = visibility;
-      },
-      setHover(hovered: boolean) {
-        this.isHovered = hovered;
       },
     }),
     {
-      isHovered: observable.ref,
       isMenuVisible: observable.ref,
       setMenuVisibility: action,
       colIdx: observable.ref,
       rowIdx: observable.ref,
       isFocused: observable.ref,
+      isHovered: observable.ref,
       row: computed,
       column: computed,
       position: computed,
@@ -91,9 +94,9 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
       editionState: computed,
       tableDataContext: observable.ref,
       selectionContext: observable.ref,
-      setHover: action.bound,
+      hover: observable.ref,
     },
-    { colIdx, rowIdx, tableDataContext, selectionContext, isFocused: props['aria-selected'] === 'true' },
+    { colIdx, rowIdx, tableDataContext, selectionContext, hover, isFocused: props['aria-selected'] === 'true', isHovered: hover.isHovered },
   );
 
   const dropSide = getComputed(() => getDropSide(columnInfo, columnDnDContext));
@@ -110,26 +113,61 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
 
   const state = useObjectRef(
     () => ({
-      mouseDown(event: React.MouseEvent<HTMLDivElement>) {
-        // this.selectCell(this.row, this.column);
-      },
       mouseUp(event: React.MouseEvent<HTMLDivElement>) {
         if (
           // !this.dataGridContext.isGridInFocus()
-          EventContext.has(event, EventStopPropagationFlag)
+          EventContext.has(event, EventStopPropagationFlag) ||
+          // Preventing selection being reset on right-click
+          event.button === 2
         ) {
           return;
         }
 
-        this.selectionContext.select(
-          {
-            colIdx: this.colIdx,
-            rowIdx: this.rowIdx,
-          },
-          event.ctrlKey || event.metaKey,
-          event.shiftKey,
-          false,
-        );
+        const isCurrentCellSelected = this.selectionContext.isSelected(this.rowIdx, this.colIdx);
+        const isModifyingSelection = event.ctrlKey || event.metaKey || event.shiftKey;
+        const hasSelection = this.selectionContext.selectedCells.size > 0;
+
+        if (!isCurrentCellSelected || isModifyingSelection) {
+          this.selectionContext.select(
+            {
+              colIdx: this.colIdx,
+              rowIdx: this.rowIdx,
+            },
+            event.ctrlKey || event.metaKey,
+            event.shiftKey,
+            false,
+          );
+          return;
+        }
+
+        if (hasSelection) {
+          this.selectionContext.clearSelection();
+        }
+      },
+      openContextMenu(event: React.MouseEvent<HTMLDivElement>) {
+        if (EventContext.has(event, EventStopPropagationFlag)) {
+          return;
+        }
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        // If the right-clicked cell is not in the current selection, select only this cell
+        const isCurrentCellSelected = this.selectionContext.isSelected(this.rowIdx, this.colIdx);
+
+        if (!isCurrentCellSelected) {
+          this.selectionContext.select(
+            {
+              colIdx: this.colIdx,
+              rowIdx: this.rowIdx,
+            },
+            false,
+            false,
+            false,
+          );
+        }
+
+        this.cellContext.setMenuVisibility(true);
       },
     }),
     {
@@ -137,8 +175,9 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
       rowIdx,
       selectionContext,
       dataGridContext,
+      cellContext,
     },
-    ['mouseUp', 'mouseDown'],
+    ['mouseUp', 'openContextMenu'],
   );
 
   const formatting = getComputed(
@@ -146,18 +185,18 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
     isObjectsEqual,
   );
 
+  const mergedRef = useMergeRefs(dndBox.setRef, hover.ref);
+
   return (
     <CellContext.Provider value={cellContext}>
       {renderDefaultCell({
-        ref: dndBox.setRef,
+        ref: mergedRef,
         className: classes,
         style: formatting || undefined,
         'data-row-index': rowIdx,
         'data-column-index': colIdx,
-        onMouseDown: state.mouseDown,
         onMouseUp: state.mouseUp,
-        onPointerEnter: () => cellContext.setHover(true),
-        onPointerLeave: () => cellContext.setHover(false),
+        onContextMenu: state.openContextMenu,
       })}
     </CellContext.Provider>
   );
