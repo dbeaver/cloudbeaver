@@ -1,0 +1,31 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2025 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+
+/**
+ * Elevation Utilities
+ *
+ * Provides elevation shadow classes for composable styles.
+ * Currently used elevations: small (z3), medium (z5), large (z6), xlarge (z10)
+ */
+
+// Elevation shadow values from Material Design
+$elevation-shadows: (
+  small: (0px 3px 3px -2px rgba(0, 0, 0, 0.2), 0px 3px 4px 0px rgba(0, 0, 0, 0.14), 0px 1px 8px 0px rgba(0, 0, 0, 0.12)),
+  medium: (0px 3px 5px -1px rgba(0, 0, 0, 0.2), 0px 5px 8px 0px rgba(0, 0, 0, 0.14), 0px 1px 14px 0px rgba(0, 0, 0, 0.12)),
+  large: (0px 3px 5px -1px rgba(0, 0, 0, 0.2), 0px 6px 10px 0px rgba(0, 0, 0, 0.14), 0px 1px 18px 0px rgba(0, 0, 0, 0.12)),
+  xlarge: (0px 6px 6px -3px rgba(0, 0, 0, 0.2), 0px 10px 14px 1px rgba(0, 0, 0, 0.14), 0px 4px 18px 3px rgba(0, 0, 0, 0.12)),
+);
+
+@mixin elevation() {
+  @each $name, $shadow in $elevation-shadows {
+    &.theme-elevation-#{$name},
+    .theme-elevation-#{$name} {
+      box-shadow: $shadow;
+    }
+  }
+}
