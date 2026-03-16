@@ -57,4 +57,5 @@ export default [
   ['settings_data_editor_fetch_default_description', 'Количество строк для выборки по умолчанию'],
   ['plugin_data_viewer_no_available_presentation', 'Нет доступных представлений'],
   ['plugin_data_viewer_result_set_save_success', 'Успешно сохранено'],
+  ['plugin_data_viewer_fetch_size', 'Размер выборки'],
 ];

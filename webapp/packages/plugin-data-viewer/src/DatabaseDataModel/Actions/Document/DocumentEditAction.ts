@@ -93,7 +93,7 @@ export class DocumentEditAction<
     this.removeUnchanged(key);
   }
 
-  add(key: TKey): void {
+  add(...key: TKey[]): void {
     throw new Error('Not implemented');
   }
 

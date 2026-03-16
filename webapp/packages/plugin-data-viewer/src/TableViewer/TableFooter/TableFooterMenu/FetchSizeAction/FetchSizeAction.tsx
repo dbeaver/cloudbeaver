@@ -8,14 +8,14 @@
 import { observer } from 'mobx-react-lite';
 import { useEffect, useRef, useState } from 'react';
 
-import { Container, Form, getComputed, s, useS } from '@cloudbeaver/core-blocks';
+import { Container, Form, getComputed, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { type ICustomMenuItemComponent } from '@cloudbeaver/core-view';
+import { Input } from '@dbeaver/ui-kit';
 
 import { DATA_CONTEXT_DV_DDM } from '../../../../DatabaseDataModel/DataContext/DATA_CONTEXT_DV_DDM.js';
 import { DataViewerSettingsService } from '../../../../DataViewerSettingsService.js';
 import styles from './FetchSizeAction.module.css';
-import { Input } from '@dbeaver/ui-kit';
 
 export const FetchSizeAction: ICustomMenuItemComponent = observer(function FetchSizeAction({ context }) {
   const model = context.get(DATA_CONTEXT_DV_DDM)!;
@@ -23,6 +23,7 @@ export const FetchSizeAction: ICustomMenuItemComponent = observer(function Fetch
   const [limit, setLimit] = useState(model.countGain + '');
   const dataViewerSettingsService = useService(DataViewerSettingsService);
   const style = useS(styles);
+  const translate = useTranslate();
 
   async function handleChange() {
     if (!ref.current) {
@@ -50,6 +51,7 @@ export const FetchSizeAction: ICustomMenuItemComponent = observer(function Fetch
       <Form contents onSubmit={handleChange}>
         <Input
           ref={ref}
+          title={translate('plugin_data_viewer_fetch_size')}
           className={s(style, { input: true })}
           type="number"
           value={limit}
