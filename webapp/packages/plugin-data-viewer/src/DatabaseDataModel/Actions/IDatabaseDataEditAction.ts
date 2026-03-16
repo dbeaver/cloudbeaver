@@ -56,7 +56,7 @@ export interface IDatabaseDataEditAction<
   get: (key: TKey) => TValue | undefined;
   set: (key: TKey, value: TValue) => void;
   setMany: (updates: Array<{ key: TKey; value: TValue }>) => void;
-  add: (key?: TKey) => void;
+  add: (...key: TKey[]) => void;
   duplicate: (...key: TKey[]) => void;
   delete: (...key: TKey[]) => void;
   applyPartialUpdate(resultId: string, rows: TValue[][]): void;

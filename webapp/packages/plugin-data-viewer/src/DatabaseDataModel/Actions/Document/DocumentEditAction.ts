@@ -97,7 +97,7 @@ export class DocumentEditAction<
     throw new Error('Not implemented');
   }
 
-  add(key: TKey): void {
+  add(...key: TKey[]): void {
     throw new Error('Not implemented');
   }
 

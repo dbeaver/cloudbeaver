@@ -26,8 +26,7 @@ export abstract class DatabaseEditAction<
   TResult extends IDatabaseDataResult = IDatabaseDataResult,
 >
   extends DatabaseDataAction<any, TResult>
-  implements IDatabaseDataEditAction<TKey, TValue, TUpdate, TResult>
-{
+  implements IDatabaseDataEditAction<TKey, TValue, TUpdate, TResult> {
   static dataFormat: ResultDataFormat[] | null = null;
 
   readonly action: ISyncExecutor<IDatabaseDataEditActionData<TKey, TValue>>;
@@ -55,7 +54,7 @@ export abstract class DatabaseEditAction<
   abstract get(key: TKey): TValue | undefined;
   abstract set(key: TKey, value: TValue): void;
   abstract setMany(updates: Array<{ key: TKey; value: TValue }>): void;
-  abstract add(key?: TKey): void;
+  abstract add(...key: TKey[]): void;
   abstract duplicate(...key: TKey[]): void;
   abstract delete(...key: TKey[]): void;
   abstract applyPartialUpdate(resultId: string | null, rows: TValue[][]): void;
