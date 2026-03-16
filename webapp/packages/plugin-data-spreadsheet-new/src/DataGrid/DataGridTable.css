@@ -95,6 +95,7 @@
         width: 100%;
         height: 100%;
         background-color: var(--data-grid-cell-selection-background-color);
+        pointer-events: none;
       }
     }
 
