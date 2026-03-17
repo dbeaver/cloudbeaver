@@ -1,50 +1,51 @@
-/**
- * Ripple Effect Utilities
- *
- * Provides hover/focus/active feedback using a pseudo-element overlay.
- * Uses currentColor so it adapts to the parent's text color.
- */
+@utility ripple {
+  position: relative;
 
+  &::before {
+    position: absolute;
+    content: '';
+    opacity: 0;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: currentColor;
+    border-radius: inherit;
+    pointer-events: none;
+    transition: opacity 150ms linear;
+  }
+
+  &:hover::before {
+    opacity: 0.04;
+  }
+
+  &:focus::before {
+    opacity: 0.1;
+  }
+
+  &:active::before {
+    opacity: 0.1;
+  }
+
+  &[aria-expanded='true']::before {
+    opacity: 0.14;
+  }
+}
+
+@utility ripple-selectable {
+  &[aria-selected='true']::before {
+    opacity: 0.14;
+  }
+}
+
+/* Component layer classes for backwards compatibility. TODO: Remove it once all components are migrated to the new utility classes */
 @layer components {
-  /* Base ripple effect */
   .theme-ripple {
-    position: relative;
-
-    &::before {
-      position: absolute;
-      content: '';
-      opacity: 0;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      background-color: currentColor;
-      border-radius: inherit;
-      pointer-events: none;
-      transition: opacity 150ms linear;
-    }
-
-    &:hover::before {
-      opacity: 0.04;
-    }
-
-    &:focus::before {
-      opacity: 0.1;
-    }
-
-    &:active::before {
-      opacity: 0.1;
-    }
-
-    &[aria-expanded='true']::before {
-      opacity: 0.14;
-    }
+    @apply ripple;
   }
 
   .theme-ripple-selectable {
-    &[aria-selected='true']::before {
-      opacity: 0.14;
-    }
+    @apply ripple-selectable;
   }
 }

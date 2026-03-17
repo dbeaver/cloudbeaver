@@ -1,70 +1,118 @@
-/**
- * Typography Utilities
- *
- * Migrated from @material/typography
- * Material Design typography system: https://material.io/design/typography/
- *
- * Provides typography classes based on Material Design Type Scale.
- * All values are pixel-perfect copies from Material Design Components v4.
- */
+@utility font-theme {
+  font-family: var(--theme-font-family);
+}
 
+@utility font-theme-mono {
+  font-family: var(--theme-font-family-mono);
+}
+
+@utility text-headline6 {
+  font-size: var(--theme-typography-headline6-font-size);
+}
+
+@utility leading-headline6 {
+  line-height: var(--theme-typography-headline6-line-height);
+}
+
+@utility font-headline6 {
+  font-weight: var(--theme-typography-headline6-font-weight);
+}
+
+@utility tracking-headline6 {
+  letter-spacing: var(--theme-typography-headline6-letter-spacing);
+}
+
+@utility text-body1 {
+  font-size: var(--theme-typography-body1-font-size);
+}
+
+@utility leading-body1 {
+  line-height: var(--theme-typography-body1-line-height);
+}
+
+@utility font-body1 {
+  font-weight: var(--theme-typography-body1-font-weight);
+}
+
+@utility tracking-body1 {
+  letter-spacing: var(--theme-typography-body1-letter-spacing);
+}
+
+@utility text-body2 {
+  font-size: var(--theme-typography-body2-font-size);
+}
+
+@utility leading-body2 {
+  line-height: var(--theme-typography-body2-line-height);
+}
+
+@utility font-body2 {
+  font-weight: var(--theme-typography-body2-font-weight);
+}
+
+@utility tracking-body2 {
+  letter-spacing: var(--theme-typography-body2-letter-spacing);
+}
+
+@utility text-caption {
+  font-size: var(--theme-typography-caption-font-size);
+}
+
+@utility leading-caption {
+  line-height: var(--theme-typography-caption-line-height);
+}
+
+@utility font-caption {
+  font-weight: var(--theme-typography-caption-font-weight);
+}
+
+@utility tracking-caption {
+  letter-spacing: var(--theme-typography-caption-letter-spacing);
+}
+
+@utility decoration-inherit {
+  text-decoration: inherit;
+}
+
+@utility transform-inherit {
+  text-transform: inherit;
+}
+
+@utility typography-headline6 {
+  @apply text-headline6 leading-headline6 font-headline6 tracking-headline6;
+}
+
+@utility typography-body1 {
+  @apply text-body1 leading-body1 font-body1 tracking-body1;
+}
+
+@utility typography-body2 {
+  @apply text-body2 leading-body2 font-body2 tracking-body2 decoration-inherit transform-inherit;
+}
+
+@utility typography-caption {
+  @apply text-caption leading-caption font-caption tracking-caption decoration-inherit transform-inherit;
+}
+
+/* Component layer classes for backwards compatibility. TODO: Remove it once all components are migrated to the new utility classes */
 @layer components {
-  /* Base typography */
   .theme-typography {
-    font-family: var(--theme-font-family);
-    -moz-osx-font-smoothing: grayscale;
-    -webkit-font-smoothing: antialiased;
+    @apply font-theme antialiased;
   }
 
-  /* Headline 6 - 1.25rem (20px) */
   .theme-typography--headline6 {
-    font-family: var(--theme-font-family);
-    -moz-osx-font-smoothing: grayscale;
-    -webkit-font-smoothing: antialiased;
-    font-size: var(--theme-typography-headline6-font-size);
-    line-height: var(--theme-typography-headline6-line-height);
-    font-weight: var(--theme-typography-headline6-font-weight);
-    letter-spacing: var(--theme-typography-headline6-letter-spacing);
-    text-decoration: inherit;
-    text-transform: inherit;
+    @apply typography-headline6;
   }
 
-  /* Body 1 - 1rem (16px) */
   .theme-typography--body1 {
-    font-family: var(--theme-font-family);
-    -moz-osx-font-smoothing: grayscale;
-    -webkit-font-smoothing: antialiased;
-    font-size: var(--theme-typography-body1-font-size);
-    line-height: var(--theme-typography-body1-line-height);
-    font-weight: var(--theme-typography-body1-font-weight);
-    letter-spacing: var(--theme-typography-body1-letter-spacing);
-    text-decoration: inherit;
-    text-transform: inherit;
+    @apply typography-body1;
   }
 
-  /* Body 2 - 0.875rem (14px) */
   .theme-typography--body2 {
-    font-family: var(--theme-font-family);
-    -moz-osx-font-smoothing: grayscale;
-    -webkit-font-smoothing: antialiased;
-    font-size: var(--theme-typography-body2-font-size);
-    line-height: var(--theme-typography-body2-line-height);
-    font-weight: var(--theme-typography-body2-font-weight);
-    letter-spacing: var(--theme-typography-body2-letter-spacing);
-    text-decoration: inherit;
-    text-transform: inherit;
+    @apply typography-body2;
   }
 
-  /* Caption - 0.75rem (12px) */
   .theme-typography--caption {
-    font-family: var(--theme-font-family);
-    -moz-osx-font-smoothing: grayscale;
-    -webkit-font-smoothing: antialiased;
-    font-size: var(--theme-typography-caption-font-size);
-    line-height: var(--theme-typography-caption-line-height);
-    font-weight: var(--theme-typography-caption-font-weight);
-    letter-spacing: var(--theme-typography-caption-letter-spacing);
-    text-decoration: inherit;
-    text-transform: inherit;
+    @apply typography-caption;
   }
 }
