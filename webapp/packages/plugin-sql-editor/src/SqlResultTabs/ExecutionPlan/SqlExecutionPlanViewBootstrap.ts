@@ -11,9 +11,7 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 
 import { SqlExecutionPlanViewService } from './SqlExecutionPlanViewService.js';
 
-const ExecutionPlanTreeView = importLazyComponent(() =>
-  import('./ExecutionPlanTreeView.js').then(m => m.ExecutionPlanTreeView),
-);
+const ExecutionPlanTreeView = importLazyComponent(() => import('./ExecutionPlanTreeView.js').then(m => m.ExecutionPlanTreeView));
 
 @injectable(() => [SqlExecutionPlanViewService])
 export class SqlExecutionPlanViewBootstrap extends Bootstrap {
@@ -24,7 +22,7 @@ export class SqlExecutionPlanViewBootstrap extends Bootstrap {
   override register(): void {
     this.viewService.tabs.add({
       key: 'table',
-      name: 'sql_execution_plan_view_table',
+      name: 'plugin_sql_execution_plan_view_table',
       order: 0,
       panel: () => ExecutionPlanTreeView,
     });

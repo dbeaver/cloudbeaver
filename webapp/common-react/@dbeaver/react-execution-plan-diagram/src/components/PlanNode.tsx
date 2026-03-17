@@ -63,7 +63,7 @@ export function PlanNode({
   const percent = node.percent != null ? Math.round(node.percent * 100) : null;
   const hint = hasChildren
     ? translate(
-        collapsed ? 'sql_execution_plan_diagram_node_expand_hint' : 'sql_execution_plan_diagram_node_collapse_hint',
+        collapsed ? 'plugin_sql_execution_plan_diagram_node_expand_hint' : 'plugin_sql_execution_plan_diagram_node_collapse_hint',
         collapsed ? '{arg:type} — press C to expand' : '{arg:type} — press C to collapse',
         { type: node.type },
       )
@@ -99,18 +99,18 @@ export function PlanNode({
       {node.name && <div className="dbv-plan-node__name">{node.name}</div>}
       <div className="dbv-plan-node__metrics">
         {features.hasCost && node.cost != null && (
-          <PlanNodeMetric labelKey="sql_execution_plan_diagram_cost" label="Cost">
+          <PlanNodeMetric labelKey="plugin_sql_execution_plan_diagram_cost" label="Cost">
             {formatNumber(node.cost, 2)}
             {percent != null && ` (${percent}%)`}
           </PlanNodeMetric>
         )}
         {features.hasRows && node.rowCount != null && (
-          <PlanNodeMetric labelKey="sql_execution_plan_diagram_rows" label="Rows">
+          <PlanNodeMetric labelKey="plugin_sql_execution_plan_diagram_rows" label="Rows">
             {formatNumber(node.rowCount, 0)}
           </PlanNodeMetric>
         )}
         {features.hasDuration && node.duration != null && (
-          <PlanNodeMetric labelKey="sql_execution_plan_diagram_time" label="Time">
+          <PlanNodeMetric labelKey="plugin_sql_execution_plan_diagram_time" label="Time">
             {formatDuration(node.duration)}
           </PlanNodeMetric>
         )}
