@@ -15,12 +15,12 @@ const ExecutionPlanTreeView = importLazyComponent(() => import('./ExecutionPlanT
 
 @injectable(() => [SqlExecutionPlanViewService])
 export class SqlExecutionPlanViewBootstrap extends Bootstrap {
-  constructor(private readonly viewService: SqlExecutionPlanViewService) {
+  constructor(private readonly sqlExecutionPlanViewService: SqlExecutionPlanViewService) {
     super();
   }
 
   override register(): void {
-    this.viewService.tabs.add({
+    this.sqlExecutionPlanViewService.tabs.add({
       key: 'table',
       name: 'plugin_sql_execution_plan_view_table',
       order: 0,

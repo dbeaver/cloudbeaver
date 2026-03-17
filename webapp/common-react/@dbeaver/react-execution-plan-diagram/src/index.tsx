@@ -29,7 +29,7 @@ export { usePanZoom } from './hooks/usePanZoom.js';
 
 // Components
 export { ExecutionPlanDiagram } from './components/ExecutionPlanDiagram.js';
-export type { ExecutionPlanDiagramProps } from './components/ExecutionPlanDiagram.js';
+export type { IExecutionPlanDiagramProps } from './components/ExecutionPlanDiagram.js';
 export { useDiagramActions } from './components/DiagramContext.js';
 export type { IDiagramActions } from './components/DiagramContext.js';
 

@@ -10,13 +10,13 @@ import type { ILayoutEdge } from '../layout/ILayoutEdge.js';
 
 import './PlanEdge.css';
 
-export interface PlanEdgeProps {
+export interface IExecutionPlanEdgeProps {
   edge: ILayoutEdge;
   heavyRoute?: boolean;
   horizontal?: boolean;
 }
 
-export function PlanEdge({ edge, heavyRoute, horizontal }: PlanEdgeProps): React.ReactElement {
+export function ExecutionPlanEdge({ edge, heavyRoute, horizontal }: IExecutionPlanEdgeProps): React.ReactElement {
   let d: string;
 
   if (horizontal) {

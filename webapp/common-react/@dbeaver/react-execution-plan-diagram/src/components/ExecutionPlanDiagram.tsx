@@ -16,13 +16,13 @@ import type { IPlanDiagramCallbacks } from '../types/IPlanDiagramCallbacks.js';
 import type { IPlanDiagramOptions } from '../types/IPlanDiagramOptions.js';
 
 import { type IDiagramActions, DiagramContext } from './DiagramContext.js';
-import { PlanNode } from './PlanNode.js';
-import { PlanViewport } from './PlanViewport.js';
+import { ExecutionPlanNode } from './ExecutionPlanNode.js';
+import { ExecutionPlanViewport } from './ExecutionPlanViewport.js';
 
 import './theme.css';
 import './ExecutionPlanDiagram.css';
 
-export interface ExecutionPlanDiagramProps extends IPlanDiagramCallbacks {
+export interface IExecutionPlanDiagramProps extends IPlanDiagramCallbacks {
   data: IPlanData;
   options?: IPlanDiagramOptions;
   selectedNodeId?: string | null;
@@ -35,7 +35,7 @@ export function ExecutionPlanDiagram({
   selectedNodeId: externalSelectedNodeId,
   children,
   onNodeSelect,
-}: ExecutionPlanDiagramProps): ReactNode {
+}: IExecutionPlanDiagramProps): ReactNode {
   const { transform, containerRef, zoomIn, zoomOut, setContentSize, fitToScreen, resetView } = usePanZoom();
 
   const {
@@ -68,7 +68,7 @@ export function ExecutionPlanDiagram({
         {/* Hidden measuring container: renders nodes to measure their real DOM size */}
         <div ref={measureRef} className="dbv-plan-diagram__measure">
           {visibleNodes.map(node => (
-            <PlanNode
+            <ExecutionPlanNode
               key={node.id}
               node={node}
               x={0}
@@ -83,7 +83,7 @@ export function ExecutionPlanDiagram({
 
         {layout && (
           <>
-            <PlanViewport
+            <ExecutionPlanViewport
               containerRef={containerRef}
               transform={transform}
               layoutNodes={layout.nodes}

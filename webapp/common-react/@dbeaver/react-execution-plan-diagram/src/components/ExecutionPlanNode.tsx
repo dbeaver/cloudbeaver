@@ -13,10 +13,10 @@ import { formatNumber } from '@dbeaver/js-helpers';
 import type { IPlanFeatures } from '../types/IPlanFeatures.js';
 import type { IPlanNode } from '../types/IPlanNode.js';
 
-import { PlanNodeMetric } from './PlanNodeMetric.js';
+import { ExecutionPlanNodeMetric } from './ExecutionPlanNodeMetric.js';
 import './PlanNode.css';
 
-export interface PlanNodeProps {
+export interface IExecutionPlanNodeProps {
   node: IPlanNode;
   x: number;
   y: number;
@@ -38,7 +38,7 @@ export interface PlanNodeProps {
   onToggleCollapse?: (nodeId: string) => void;
 }
 
-export function PlanNode({
+export function ExecutionPlanNode({
   node,
   x,
   y,
@@ -58,7 +58,7 @@ export function PlanNode({
   onKeyDown,
   onSelect,
   onToggleCollapse,
-}: PlanNodeProps): ReactElement {
+}: IExecutionPlanNodeProps): ReactElement {
   const translate = useTranslate();
   const percent = node.percent != null ? Math.round(node.percent * 100) : null;
   const hint = hasChildren
@@ -99,20 +99,20 @@ export function PlanNode({
       {node.name && <div className="dbv-plan-node__name">{node.name}</div>}
       <div className="dbv-plan-node__metrics">
         {features.hasCost && node.cost != null && (
-          <PlanNodeMetric labelKey="plugin_sql_execution_plan_diagram_cost" label="Cost">
+          <ExecutionPlanNodeMetric labelKey="plugin_sql_execution_plan_diagram_cost" label="Cost">
             {formatNumber(node.cost, 2)}
             {percent != null && ` (${percent}%)`}
-          </PlanNodeMetric>
+          </ExecutionPlanNodeMetric>
         )}
         {features.hasRows && node.rowCount != null && (
-          <PlanNodeMetric labelKey="plugin_sql_execution_plan_diagram_rows" label="Rows">
+          <ExecutionPlanNodeMetric labelKey="plugin_sql_execution_plan_diagram_rows" label="Rows">
             {formatNumber(node.rowCount, 0)}
-          </PlanNodeMetric>
+          </ExecutionPlanNodeMetric>
         )}
         {features.hasDuration && node.duration != null && (
-          <PlanNodeMetric labelKey="plugin_sql_execution_plan_diagram_time" label="Time">
+          <ExecutionPlanNodeMetric labelKey="plugin_sql_execution_plan_diagram_time" label="Time">
             {formatDuration(node.duration)}
-          </PlanNodeMetric>
+          </ExecutionPlanNodeMetric>
         )}
       </div>
       {features.hasCost && percent != null && (

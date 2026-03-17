@@ -13,12 +13,12 @@ import type { ILayoutEdge } from '../layout/ILayoutEdge.js';
 import type { ILayoutNode } from '../layout/ILayoutNode.js';
 import type { IPlanFeatures } from '../types/IPlanFeatures.js';
 import { usePlanKeyboardNavigation } from '../hooks/usePlanKeyboardNavigation.js';
-import { PlanEdge } from './PlanEdge.js';
-import { PlanNode } from './PlanNode.js';
+import { ExecutionPlanEdge } from './ExecutionPlanEdge.js';
+import { ExecutionPlanNode } from './ExecutionPlanNode.js';
 
 import './PlanViewport.css';
 
-export interface PlanViewportProps {
+export interface IExecutionPlanViewportProps {
   containerRef: Ref<HTMLDivElement>;
   transform: ZoomTransform;
   layoutNodes: ILayoutNode[];
@@ -75,7 +75,7 @@ const PlanViewportContent = memo(function PlanViewportContent({
     <>
       <svg className="dbv-plan-viewport__edges" width={contentWidth} height={contentHeight}>
         {layoutEdges.map(edge => (
-          <PlanEdge
+          <ExecutionPlanEdge
             key={`${edge.sourceId}-${edge.targetId}`}
             edge={edge}
             heavyRoute={heavyRouteIds.has(edge.sourceId) && heavyRouteIds.has(edge.targetId)}
@@ -85,7 +85,7 @@ const PlanViewportContent = memo(function PlanViewportContent({
       </svg>
       <div className="dbv-plan-viewport__nodes" role="listbox" aria-label="Execution plan nodes">
         {layoutNodes.map(layoutNode => (
-          <PlanNode
+          <ExecutionPlanNode
             key={layoutNode.id}
             node={layoutNode.node}
             x={layoutNode.x}
@@ -115,7 +115,7 @@ const PlanViewportContent = memo(function PlanViewportContent({
   );
 });
 
-export function PlanViewport({
+export function ExecutionPlanViewport({
   containerRef,
   transform,
   layoutNodes,
@@ -130,7 +130,7 @@ export function PlanViewport({
   horizontal,
   onNodeSelect,
   onToggleCollapse,
-}: PlanViewportProps): ReactElement {
+}: IExecutionPlanViewportProps): ReactElement {
   const transformStyle = `translate(${transform.x}px, ${transform.y}px) scale(${transform.k})`;
 
   return (

@@ -25,7 +25,7 @@ interface Props {
 export const SqlExecutionPlanPanel = observer<Props>(function SqlExecutionPlanPanel({ executionPlanTab }) {
   const styles = useS(style);
   const sqlExecutionPlanService = useService(SqlExecutionPlanService);
-  const viewService = useService(SqlExecutionPlanViewService);
+  const sqlExecutionPlanViewService = useService(SqlExecutionPlanViewService);
   const data = sqlExecutionPlanService.data.get(executionPlanTab.tabId);
   const [selectedNode, setSelectedNode] = useState<string | null>(null);
   const splitState = useSplitUserState('execution-plan');
@@ -38,7 +38,7 @@ export const SqlExecutionPlanPanel = observer<Props>(function SqlExecutionPlanPa
     <Split {...splitState} mode={selectedNode ? splitState.mode : 'minimize'} disable={!selectedNode} sticky={30}>
       <Pane className={s(styles, { pane: true })}>
         <TabsState
-          container={viewService.tabs}
+          container={sqlExecutionPlanViewService.tabs}
           nodes={data.executionPlan.nodes}
           query={data.executionPlan.query}
           selectedNode={selectedNode}

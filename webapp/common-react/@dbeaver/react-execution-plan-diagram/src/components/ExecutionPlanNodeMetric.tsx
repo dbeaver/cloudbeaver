@@ -11,13 +11,13 @@ import { useTranslate } from '@dbeaver/react-translate';
 
 import './PlanNodeMetric.css';
 
-interface PlanNodeMetricProps {
+interface ExecutionPlanNodeMetricProps {
   labelKey: string;
   label: string;
   children: ReactNode;
 }
 
-export function PlanNodeMetric({ labelKey, label, children }: PlanNodeMetricProps): ReactElement {
+export function ExecutionPlanNodeMetric({ labelKey, label, children }: ExecutionPlanNodeMetricProps): ReactElement {
   const translate = useTranslate();
 
   return (
