@@ -18,27 +18,24 @@ package io.cloudbeaver.model.cli;
 
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
-import org.jkiss.dbeaver.model.cli.*;
-import org.jkiss.dbeaver.model.cli.model.CommandLineAuthenticator;
+import org.jkiss.dbeaver.model.cli.ApplicationCommandLine;
+import org.jkiss.dbeaver.model.cli.ApplicationInstanceController;
+import org.jkiss.dbeaver.model.cli.CLIContextImpl;
+import org.jkiss.dbeaver.model.cli.CLIRunMeta;
 import picocli.CommandLine;
 
 public class CloudBeaverCommandLine extends ApplicationCommandLine<ApplicationInstanceController> {
-    @Nullable
-    private final CommandLineAuthenticator authenticator;
     private final CloudBeaverMixin mixin;
 
-    public CloudBeaverCommandLine(@Nullable CommandLineAuthenticator authenticator) {
+    public CloudBeaverCommandLine() {
         super();
-        this.authenticator = authenticator;
         this.mixin = new CloudBeaverMixin();
     }
 
     public CloudBeaverCommandLine(
-        @Nullable CommandLineAuthenticator authenticator,
         @NotNull CloudBeaverMixin mixin
     ) {
         super();
-        this.authenticator = authenticator;
         this.mixin = mixin;
     }
 
@@ -48,9 +45,6 @@ public class CloudBeaverCommandLine extends ApplicationCommandLine<ApplicationIn
         @NotNull CLIContextImpl context,
         @NotNull CLIRunMeta runMeta
     ) {
-        if (authenticator != null) {
-            context.setContextParameter(CLIConstants.CONTEXT_PARAM_AUTHENTICATOR, authenticator);
-        }
         return new CloudBeaverTopLevelCommand(applicationInstanceController, context, runMeta);
     }
 

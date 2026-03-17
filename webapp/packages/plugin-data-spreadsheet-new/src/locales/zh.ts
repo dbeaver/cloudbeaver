@@ -60,5 +60,4 @@ export default [
   ['data_grid_table_generate_sql_error_no_rows', '未选择任何行'],
   ['data_grid_table_generate_sql_error_no_result', '没有可用的结果集'],
   ['data_grid_table_generate_sql_error_no_context', '没有可用的执行上下文'],
-  ['data_grid_table_generate_sql_disabled_lob_tooltip', '包含 LOB 或截断值的行无法生成 SQL'],
 ];
