@@ -10,16 +10,16 @@
     --theme-add-status: #65974c;
     --theme-delete-status: #b55d68;
     --theme-edit-status: #a37d43;
-    --data-grid-dnd-drop-target-bg: rgba(255, 255, 255, 0.08);
-    --data-grid-dnd-drop-target-border-color: rgba(255, 255, 255, 0.5);
+    --data-grid-dnd-drop-target-bg: #4f4f4f;
+    --data-grid-dnd-drop-target-border-color: #888888;
   }
 
   .theme-light {
     --theme-add-status: #c0f5a6;
     --theme-delete-status: #f48693;
     --theme-edit-status: #fbcc85;
-    --data-grid-dnd-drop-target-bg: rgba(0, 0, 0, 0.08);
-    --data-grid-dnd-drop-target-border-color: rgba(0, 0, 0, 0.5);
+    --data-grid-dnd-drop-target-bg: #eeeeee;
+    --data-grid-dnd-drop-target-border-color: #808080;
   }
 
   .data-grid__container {
@@ -125,7 +125,7 @@
       height: calc(100% + 1px);
       width: 2px;
       background-color: var(--data-grid-dnd-drop-target-border-color);
-      z-index: 10;
+      z-index: 0;
       pointer-events: none;
     }
 
@@ -138,7 +138,7 @@
       height: calc(100% + 1px);
       width: 2px;
       background-color: var(--data-grid-dnd-drop-target-border-color);
-      z-index: 10;
+      z-index: 0;
       pointer-events: none;
     }
   }
