@@ -6,4 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-export { EventContext, type IEventFlag } from '@dbeaver/js-helpers';
+import { EventContext } from './eventContext.js';
+
+export const EventStopPropagationFlag = EventContext.create('stopPropagation');

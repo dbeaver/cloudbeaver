@@ -6,4 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
-export { EventContext, type IEventFlag } from '@dbeaver/js-helpers';
+export type CellKey = `${number}+${number}`;
+
+export function makeCellKey(rowIdx: number, colIdx: number): CellKey {
+    return `${rowIdx}+${colIdx}`;
+}

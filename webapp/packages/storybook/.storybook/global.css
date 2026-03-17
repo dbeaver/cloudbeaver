@@ -1,6 +1,50 @@
 @import 'tailwindcss' layer(base) prefix(tw);
 
 @layer theme {
+  :root {
+    --theme-primary: #2a7cb4;
+    --theme-secondary: #f2f2f2;
+    --theme-background: #dedede;
+    --theme-surface: #ffffff;
+    --theme-error: #b00020;
+    --theme-on-primary: #ffffff;
+    --theme-on-secondary: #6d6d6d;
+    --theme-on-surface: #353535;
+    --theme-on-error: #fff;
+    --theme-text-primary-on-background: rgba(0, 0, 0, .87);
+    --theme-text-secondary-on-background: rgba(0, 0, 0, .45);
+    --theme-text-hint-on-background: rgba(0, 0, 0, .55);
+    --theme-text-disabled-on-background: rgba(0, 0, 0, .2);
+    --theme-text-icon-on-background: rgba(0, 0, 0, .38);
+    --theme-text-primary-on-light: rgba(0, 0, 0, .87);
+    --theme-text-secondary-on-light: rgba(0, 0, 0, .45);
+    --theme-text-hint-on-light: rgba(0, 0, 0, .55);
+    --theme-text-disabled-on-light: rgba(0, 0, 0, .2);
+    --theme-text-icon-on-light: rgba(0, 0, 0, .38);
+    --theme-text-primary-on-dark: white;
+    --theme-text-secondary-on-dark: rgba(255, 255, 255, .7);
+    --theme-text-hint-on-dark: rgba(255, 255, 255, .55);
+    --theme-text-disabled-on-dark: rgba(255, 255, 255, .45);
+    --theme-text-icon-on-dark: rgba(255, 255, 255, .45);
+    --theme-sub-secondary: #f8f8f8;
+    --theme-on-sub-secondary: #6d6d6d;
+    --theme-positive: #52c41a;
+    --theme-on-positive: #fff;
+    --theme-negative: #e73e52;
+    --theme-status: #ff9900;
+    --theme-link-color: #2a7cb4;
+    --theme-input-color: #353535;
+    --theme-input-color-disabled: #686868;
+    --theme-input-color-readonly: #353535;
+    --theme-input-color-placeholder: rgb(142.25, 142.25, 142.25);
+    --theme-input-border: #d9d9d9;
+    --theme-input-border-readonly: #d9d9d9;
+    --theme-input-border-disabled: #d9d9d9;
+    --theme-input-background: #ffffff;
+    --theme-input-background-disabled: #e9e9e9;
+    --theme-input-background-readonly: #e9e9e9
+  }
+
   main {
     color: var(--dbv-kit-color-foreground);
     background-color: var(--tw-color-gray-50);

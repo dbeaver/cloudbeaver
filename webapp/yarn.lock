@@ -1720,6 +1720,7 @@ __metadata:
     "@cloudbeaver/core-utils": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
     "@dbeaver/cli": "workspace:*"
+    "@dbeaver/js-helpers": "workspace:*"
     "@dbeaver/react-tests": "workspace:*"
     mobx: "npm:^6"
     rimraf: "npm:^6"
