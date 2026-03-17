@@ -60,13 +60,13 @@ export function useSqlDialectAutocompletion(data: ISQLEditorData): [Compartment,
             const bDisplayLower = sanitizeProposal(b.item.displayString).toLocaleLowerCase();
             const bReplacementLower = b.item.replacementString.toLocaleLowerCase();
 
-            const aStartsWith = aDisplayLower.includes(wordLowerCase) || aReplacementLower.includes(wordLowerCase);
-            const bStartsWith = bDisplayLower.includes(wordLowerCase) || bReplacementLower.includes(wordLowerCase);
+            const aIncludes = aDisplayLower.includes(wordLowerCase) || aReplacementLower.includes(wordLowerCase);
+            const bIncludes = bDisplayLower.includes(wordLowerCase) || bReplacementLower.includes(wordLowerCase);
 
-            if (aStartsWith && !bStartsWith) {
+            if (aIncludes && !bIncludes) {
               return -1;
             }
-            if (!aStartsWith && bStartsWith) {
+            if (!aIncludes && bIncludes) {
               return 1;
             }
 
