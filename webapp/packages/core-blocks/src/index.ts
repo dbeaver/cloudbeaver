@@ -257,6 +257,7 @@ export * from './Flex/Flex.js';
 export * from './FormControls/useInputAutocomplete.js';
 export * from './FormControls/InputAutocompletionMenu.js';
 export * from './useSearch.js';
+export * from './fuzzyMatch.js';
 export * from './useObjectInfoTooltip.js';
 export * from './Alert.js';
 export * from './ObjectPropertyInfo/evaluate.js';
