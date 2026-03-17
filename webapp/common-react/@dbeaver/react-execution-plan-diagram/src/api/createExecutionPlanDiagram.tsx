@@ -63,12 +63,14 @@ interface IExecutionPlanDiagramState {
   diagramActions: IDiagramActions | null;
 }
 
+const REPLACE_REGEX = /\{arg:([^}]+)\}/g;
+
 function interpolateTranslation(template: string, args?: Record<string | number, any>): string {
   if (!args) {
     return template;
   }
 
-  return template.replace(/\{arg:([^}]+)\}/g, (match, key) => {
+  return template.replace(REPLACE_REGEX, (match, key) => {
     const value = args[key];
     return value == null ? match : String(value);
   });
