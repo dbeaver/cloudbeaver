@@ -95,6 +95,9 @@ export class ConnectionFormDriverPropertiesPart extends FormPart<ConnectionPrope
 
     const properties = await this.dbDriverResource.load(this.optionsPart.state.driverId, ['includeDriverProperties']);
 
+    /* Default property values must not be returned. If they are included in the request, the backend will send them back with modified values (e.g., null converted to an empty string).
+    To avoid this behavior, only properties that were explicitly changed should be sent. Any properties that still contain default values must be removed from the object before sending the request
+    */
     for (const [key, value] of Object.entries(config)) {
       const property = properties?.driverProperties.find(property => property.id === key);
       if (property && value === getObjectPropertyOptionValue(property.defaultValue)) {
