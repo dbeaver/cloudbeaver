@@ -27,20 +27,14 @@ import org.jkiss.dbeaver.model.navigator.DBNRoot;
 public class RMNavigatorModelExtender implements DBNModelExtender {
 
     @Override
-    public DBNNode[] getExtraNodes(@NotNull DBNNode parentNode) {
-        if (parentNode instanceof DBNRoot && ServletAppUtils.getServletApplication()
+    public DBNNode createNode(@NotNull DBNNode parentNode) {
+        if (parentNode instanceof DBNRoot root && ServletAppUtils.getServletApplication()
             .getAppConfiguration()
             .isResourceManagerEnabled()) {
-            return createRMNodes((DBNRoot) parentNode);
+            return new DBNResourceManagerRoot(root);
         } else {
             return null;
         }
-    }
-
-    private DBNNode[] createRMNodes(DBNRoot root) {
-        return new DBNNode[]{
-            new DBNResourceManagerRoot(root)
-        };
     }
 
 }

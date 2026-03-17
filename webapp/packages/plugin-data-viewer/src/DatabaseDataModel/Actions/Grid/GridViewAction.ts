@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -72,8 +72,8 @@ export class GridViewAction<
       columnsOrder: observable,
       pinnedColumns: observable,
       setColumnOrder: action,
-      pinColumn: action,
-      unpinColumn: action,
+      pinColumns: action,
+      unpinColumns: action,
       unpinAllColumns: action,
       rows: computed,
       rowKeys: computed,
@@ -178,14 +178,18 @@ export class GridViewAction<
     return this.data.getColumnName(key);
   }
 
-  pinColumn(key: IGridColumnKey): void {
-    const serializedKey = GridDataKeysUtils.serialize(key);
-    this.pinnedColumns.add(serializedKey);
+  pinColumns(keys: IGridColumnKey[]): void {
+    for (const key of keys) {
+      const serializedKey = GridDataKeysUtils.serialize(key);
+      this.pinnedColumns.add(serializedKey);
+    }
   }
 
-  unpinColumn(key: IGridColumnKey): void {
-    const serializedKey = GridDataKeysUtils.serialize(key);
-    this.pinnedColumns.delete(serializedKey);
+  unpinColumns(keys: IGridColumnKey[]): void {
+    for (const key of keys) {
+      const serializedKey = GridDataKeysUtils.serialize(key);
+      this.pinnedColumns.delete(serializedKey);
+    }
   }
 
   unpinAllColumns(): void {
