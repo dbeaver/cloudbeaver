@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -10,6 +10,7 @@ import { injectable } from '@cloudbeaver/core-di';
 import { ACTION_COLLAPSE_ALL, ActionService, type IAction, MenuService } from '@cloudbeaver/core-view';
 
 import { DATA_CONTEXT_TREE_DATA, DATA_CONTEXT_TREE_REFRESH } from './DATA_CONTEXT_TREE.js';
+import { MENU_TREE_SETTINGS } from './MENU_TREE_SETTINGS.js';
 import { MENU_TREE_TOOLBAR } from './MENU_TREE_TOOLBAR.js';
 import { ACTION_TREE_REFRESH } from './actions/ACTION_TREE_REFRESH.js';
 
@@ -51,7 +52,7 @@ export class TreeToolbarMenuService {
 
     this.menuService.addCreator({
       menus: [MENU_TREE_TOOLBAR],
-      getItems: (_, items) => [...items, ACTION_TREE_REFRESH, ACTION_COLLAPSE_ALL],
+      getItems: (_, items) => [...items, MENU_TREE_SETTINGS, ACTION_TREE_REFRESH, ACTION_COLLAPSE_ALL],
     });
   }
 

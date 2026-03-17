@@ -60,8 +60,4 @@ export default [
   ['data_grid_table_generate_sql_error_no_rows', 'Aucune ligne sélectionnée'],
   ['data_grid_table_generate_sql_error_no_result', 'Aucun ensemble de résultats disponible'],
   ['data_grid_table_generate_sql_error_no_context', "Aucun contexte d'exécution disponible"],
-  [
-    'data_grid_table_generate_sql_disabled_lob_tooltip',
-    "La génération SQL n'est pas disponible pour les lignes contenant des valeurs LOB ou tronquées",
-  ],
 ];

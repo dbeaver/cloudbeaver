@@ -61,5 +61,4 @@ export default [
   ['data_grid_table_generate_sql_error_no_rows', 'No rows selected'],
   ['data_grid_table_generate_sql_error_no_result', 'No result set available'],
   ['data_grid_table_generate_sql_error_no_context', 'No execution context available'],
-  ['data_grid_table_generate_sql_disabled_lob_tooltip', 'SQL generation is not available for rows containing LOB or truncated values'],
 ];

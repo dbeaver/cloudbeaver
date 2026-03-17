@@ -99,8 +99,8 @@ export const PropertyItem = observer<Props>(function PropertyItem({
             <ActionIconButton
               title={translate('core_blocks_properties_table_item_reset')}
               name="/icons/data_revert_all_sm.svg"
-              viewBox="0 0 16 16"
               type="button"
+              img
               onClick={handleRevert}
             />
           )}
@@ -108,7 +108,6 @@ export const PropertyItem = observer<Props>(function PropertyItem({
             <ActionIconButton
               title={translate('core_blocks_properties_table_item_remove')}
               name="reject"
-              viewBox="0 0 11 11"
               type="button"
               onClick={handleRemove}
             />

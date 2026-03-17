@@ -38,7 +38,7 @@ export const Table = observer<TableProps>(function Table({ objects, hasNextPage,
   const tableState = useTable();
   const tabLocalState = useTabLocalState<IScrollState>(() => ({ scrollTop: 0, scrollLeft: 0 }));
 
-  const scrollBox = (tableContainer?.firstChild as HTMLDivElement | undefined) ?? null;
+  const scrollBox = tableContainer?.querySelector<HTMLDivElement>('[role="grid"]') ?? null;
   useControlledScroll(scrollBox, tabLocalState);
 
   const baseObject = objects.slice().sort((a, b) => (b.object?.properties?.length || 0) - (a.object?.properties?.length || 0));
