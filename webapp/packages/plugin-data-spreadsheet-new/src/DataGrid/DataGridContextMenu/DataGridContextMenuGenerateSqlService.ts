@@ -9,7 +9,7 @@ import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { SqlResultSetGeneratorId, type SqlResultRow } from '@cloudbeaver/core-sdk';
-import { ActionService, MenuService, type IAction, type IActionInfo } from '@cloudbeaver/core-view';
+import { ActionService, MenuService, type IAction } from '@cloudbeaver/core-view';
 import {
   DATA_CONTEXT_DV_DDM,
   DATA_CONTEXT_DV_DDM_RESULT_INDEX,
@@ -23,13 +23,10 @@ import {
   IDatabaseDataSource,
   isResultSetDataModel,
   ResultSetDataAction,
-  ResultSetDataContentAction,
   type IDatabaseDataModel,
-  type IDatabaseValueHolder,
   type IGridColumnKey,
   type IGridDataKey,
   type IGridRowKey,
-  type IResultSetValue,
 } from '@cloudbeaver/plugin-data-viewer';
 
 import { ACTION_DATA_GRID_GENERATE_SQL_DELETE } from '../Actions/GenerateSQL/ACTION_DATA_GRID_GENERATE_SQL_DELETE.js';
@@ -92,23 +89,7 @@ export class DataGridContextMenuGenerateSqlService {
       isDisabled: context => {
         const model = context.get(DATA_CONTEXT_DV_DDM)!;
 
-        if (model.isLoading()) {
-          return true;
-        }
-
-        return hasLargeObjectValuesInSelectedRows(context);
-      },
-      getActionInfo: (context, action): IActionInfo => {
-        const actionInfo = action.info;
-
-        if (hasLargeObjectValuesInSelectedRows(context)) {
-          return {
-            ...actionInfo,
-            tooltip: 'data_grid_table_generate_sql_disabled_lob_tooltip',
-          };
-        }
-
-        return actionInfo;
+        return model.isLoading();
       },
       handler: async (context, action) => {
         await this.openSqlDialog(context, mapGeneratorIdFromAction(action));
@@ -247,43 +228,4 @@ function getSqlResultRows(
   }
 
   return result;
-}
-
-function hasLargeObjectValuesInSelectedRows(context: IDataContextProvider): boolean {
-  const model = context.get(DATA_CONTEXT_DV_DDM)!;
-  const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
-  const key = context.get(DATA_CONTEXT_DV_RESULT_KEY);
-
-  const format = model.source.getAction(resultIndex, IDatabaseDataFormatAction);
-  const view = model.source.getAction(resultIndex, GridViewAction);
-  const data = model.source.getAction(resultIndex, ResultSetDataAction);
-  const content = model.source.getAction(resultIndex, ResultSetDataContentAction);
-  const select = model.source.tryGetAction(resultIndex, IDatabaseDataSelectAction, GridSelectAction);
-
-  const selectedElements = select?.getSelectedElements() || [];
-  const rowKeys = getRowKeys(selectedElements, key);
-  const columnKeys = view.columnKeys;
-
-  for (const rowKey of rowKeys) {
-    const rowValue = data.getRowValue(rowKey);
-
-    if (!rowValue) {
-      continue;
-    }
-
-    for (const columnKey of columnKeys) {
-      const cellKey: IGridDataKey = { row: rowKey, column: columnKey };
-      const cellHolder = view.getCellHolder(cellKey) as IDatabaseValueHolder<IGridDataKey, IResultSetValue>;
-
-      if (format.isBinary(cellHolder)) {
-        return true;
-      }
-
-      if (content.isTextTruncated(cellHolder) || content.isBlobTruncated(cellHolder)) {
-        return true;
-      }
-    }
-  }
-
-  return false;
 }

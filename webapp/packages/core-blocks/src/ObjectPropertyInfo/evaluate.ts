@@ -25,5 +25,5 @@ export function evaluate(expression: string, object: Record<string, any>): boole
     object,
   };
   const result = fn(context);
-  return result;
+  return !!result;
 }
