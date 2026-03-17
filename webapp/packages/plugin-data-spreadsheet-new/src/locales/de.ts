@@ -55,5 +55,4 @@ export default [
   ['data_grid_table_generate_sql_error_no_rows', 'Keine Zeilen ausgewählt'],
   ['data_grid_table_generate_sql_error_no_result', 'Kein Ergebnis verfügbar'],
   ['data_grid_table_generate_sql_error_no_context', 'Kein Ausführungskontext verfügbar'],
-  ['data_grid_table_generate_sql_disabled_lob_tooltip', 'SQL-Generierung ist für Zeilen mit LOB oder abgeschnittenen Werten nicht verfügbar'],
 ];
