@@ -20,7 +20,10 @@ import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.utils.WebCommonUtils;
+import org.jkiss.code.NotNull;
+import org.jkiss.dbeaver.model.DBConstants;
 import org.jkiss.dbeaver.model.connection.DBPAuthModelDescriptor;
+import org.jkiss.dbeaver.model.impl.auth.AuthModelDatabaseNative;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
 import org.jkiss.dbeaver.model.preferences.DBPPropertySource;
@@ -74,7 +77,6 @@ public class WebDatabaseAuthModel {
 
     @Property
     public WebPropertyInfo[] getProperties() throws DBWebException {
-
         DBPPropertySource credentialsSource = model.createCredentialsSource(null, null);
         Predicate<DBPPropertyDescriptor> predicate = CommonUtils.isEmpty(getRequiredAuth())
             ? p -> true
@@ -82,9 +84,18 @@ public class WebDatabaseAuthModel {
 
         return Arrays.stream(credentialsSource.getProperties())
             .filter(predicate)
+            .filter(p -> !isPassword(p) || isPasswordApplicable())
             .filter(p -> !p.isDesktop())
-            .map(p -> new WebPropertyInfo(webSession, p, credentialsSource)).toArray(WebPropertyInfo[]::new);
+            .map(p -> new WebPropertyInfo(webSession, p, credentialsSource))
+            .toArray(WebPropertyInfo[]::new);
     }
 
+    private boolean isPassword(@NotNull DBPPropertyDescriptor property) {
+        return property.hasFeature(DBConstants.PROP_FEATURE_PASSWORD);
+    }
 
+    private boolean isPasswordApplicable() {
+        return model.getInstance() instanceof AuthModelDatabaseNative<?> nativeModel &&
+            nativeModel.isUserPasswordApplicable();
+    }
 }
