@@ -60,8 +60,8 @@ export function useSqlDialectAutocompletion(data: ISQLEditorData): [Compartment,
             const bDisplayLower = sanitizeProposal(b.item.displayString).toLocaleLowerCase();
             const bReplacementLower = b.item.replacementString.toLocaleLowerCase();
 
-            const aStartsWith = aDisplayLower.startsWith(wordLowerCase) || aReplacementLower.startsWith(wordLowerCase);
-            const bStartsWith = bDisplayLower.startsWith(wordLowerCase) || bReplacementLower.startsWith(wordLowerCase);
+            const aStartsWith = aDisplayLower.includes(wordLowerCase) || aReplacementLower.includes(wordLowerCase);
+            const bStartsWith = bDisplayLower.includes(wordLowerCase) || bReplacementLower.includes(wordLowerCase);
 
             if (aStartsWith && !bStartsWith) {
               return -1;

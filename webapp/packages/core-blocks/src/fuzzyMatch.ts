@@ -14,7 +14,7 @@ export interface FuzzyMatchResult<T> {
   match: SearchResult;
 }
 
-const DEFAULT_FUZZY_THRESHOLD = 0.6;
+const DEFAULT_FUZZY_THRESHOLD = 0.5;
 
 interface FuzzyMatchOptions<T extends object> {
   query: string;
