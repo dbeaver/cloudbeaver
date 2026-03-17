@@ -242,12 +242,11 @@ export class TableFooterMenuService {
     if (!editor) {
       return;
     }
-    const select = model.source.tryGetAction(resultIndex, IDatabaseDataSelectAction);
     const selectedElements = getActiveElements(model, resultIndex);
 
     switch (action) {
       case ACTION_ADD: {
-        editor.add(select?.getFocusedElement());
+        editor.add(...selectedElements);
         break;
       }
       case ACTION_DUPLICATE: {
