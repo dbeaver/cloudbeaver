@@ -26,7 +26,7 @@
     </extension>
 
     <extension point="org.jkiss.dbeaver.navigator">
-        <extender id="rm" root="true" class="io.cloudbeaver.service.rm.RMNavigatorModelExtender"/>
+        <extender id="rm" root="true" nodeDisplayName="Resources" nodeType="io.cloudbeaver.model.rm.DBNResourceManagerRoot" class="io.cloudbeaver.service.rm.RMNavigatorModelExtender"/>
     </extension>
 
 </plugin>
