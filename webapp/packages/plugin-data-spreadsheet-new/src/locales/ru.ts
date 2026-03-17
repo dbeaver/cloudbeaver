@@ -61,5 +61,4 @@ export default [
   ['data_grid_table_generate_sql_error_no_rows', 'Не выбрано ни одной строки'],
   ['data_grid_table_generate_sql_error_no_result', 'Результаты недоступны'],
   ['data_grid_table_generate_sql_error_no_context', 'Контекст выполнения недоступен'],
-  ['data_grid_table_generate_sql_disabled_lob_tooltip', 'Генерация SQL недоступна для строк, содержащих LOB или усеченные значения'],
 ];

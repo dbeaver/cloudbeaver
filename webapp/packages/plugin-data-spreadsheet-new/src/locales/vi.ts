@@ -61,5 +61,4 @@ export default [
   ['data_grid_table_generate_sql_error_no_rows', 'Không có hàng nào được chọn'],
   ['data_grid_table_generate_sql_error_no_result', 'Không có tập kết quả'],
   ['data_grid_table_generate_sql_error_no_context', 'Không có ngữ cảnh thực thi'],
-  ['data_grid_table_generate_sql_disabled_lob_tooltip', 'Tạo SQL không khả dụng cho các hàng chứa giá trị LOB hoặc bị cắt ngắn'],
 ];
