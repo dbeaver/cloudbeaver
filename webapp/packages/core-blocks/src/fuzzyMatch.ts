@@ -6,9 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import MiniSearch, { type SearchResult } from 'minisearch';
-
-const FUZZY_THRESHOLD = 0.5;
+import MiniSearch, { type SearchResult, type SearchOptions } from 'minisearch';
 
 export interface FuzzyMatchResult<T> {
   item: T;
@@ -16,13 +14,16 @@ export interface FuzzyMatchResult<T> {
   match: SearchResult;
 }
 
+const DEFAULT_FUZZY_THRESHOLD = 0.6;
+
 interface FuzzyMatchOptions<T extends object> {
   query: string;
   items: T[];
   fields: Array<keyof T & string>;
+  options?: SearchOptions;
 }
 
-export function fuzzyMatch<T extends object>({ query, items, fields }: FuzzyMatchOptions<T>): FuzzyMatchResult<T>[] {
+export function fuzzyMatch<T extends object>({ query, items, fields, options }: FuzzyMatchOptions<T>): FuzzyMatchResult<T>[] {
   if (items.length === 0 || query.length === 0) {
     return items.map(item => ({ item, score: 0, match: {} as SearchResult }));
   }
@@ -30,9 +31,9 @@ export function fuzzyMatch<T extends object>({ query, items, fields }: FuzzyMatc
   const miniSearch = new MiniSearch({
     fields,
     searchOptions: {
-      fuzzy: FUZZY_THRESHOLD,
+      fuzzy: DEFAULT_FUZZY_THRESHOLD,
       prefix: true,
-      combineWith: 'OR',
+      ...options,
     },
   });
 
