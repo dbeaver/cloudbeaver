@@ -101,14 +101,13 @@ export const NavigationTabsBar = observer<Props>(function NavigationTabsBar({ cl
           currentTabId={navigation.currentTabId}
           reorderStateKey="navigation-tabs-bar"
           tabList={navigation.tabIdList}
-          multipleRows={navigationSettings.hasMultipleRows}
           enabledBaseActions
           autoSelect
           onChange={handleTabChange}
           onReorder={handleReorder}
         >
           <div className="tw:outline-none tw:flex-1 tw:flex tw:flex-col tw:max-w-full">
-            <TabList className="theme-background-secondary theme-text-on-secondary">
+            <TabList className={clsx("tw:overflow-auto tw:max-w-full theme-background-secondary theme-text-on-secondary", navigationSettings.hasMultipleRows && 'tw:flex-wrap')}>
               <SContext registry={tabsRegistry}>
                 {navigation.tabIdList.map(tabId => (
                   <TabHandlerTab key={tabId} tabId={tabId} onSelect={handleSelect} onClose={handleClose} />
