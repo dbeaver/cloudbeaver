@@ -57,8 +57,6 @@ import org.jkiss.dbeaver.model.websocket.event.MessageType;
 import org.jkiss.dbeaver.model.websocket.event.WSSessionLogUpdatedEvent;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.CommonUtils;
-import org.jkiss.utils.function.ThrowableConsumer;
-import org.jkiss.utils.function.ThrowableFunction;
 
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
@@ -66,6 +64,8 @@ import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
 /**
  * Web session.
@@ -96,12 +96,12 @@ public class WebSession extends BaseWebSession
     private final List<WebServerMessage> sessionMessages = new ArrayList<>();
 
     private final Map<String, WebAsyncTaskInfo> asyncTasks = new HashMap<>();
-    private final Map<String, ThrowableConsumer<Object, Exception>> attributeDisposers = new HashMap<>();
 
     // Map of auth tokens. Key is authentication provider
     private final List<WebAuthInfo> authTokens = new ArrayList<>();
 
     private DBNModel navigatorModel;
+    private final ReadWriteLock navigatorModelLock = new ReentrantReadWriteLock(true);
     private final DBRProgressMonitor progressMonitor = new SessionProgressMonitor();
     private final Map<String, DBWSessionHandler<WebSession>> sessionHandlers;
     private final WebDataSourceConnectEventListener connectListener = new WebDataSourceConnectEventListener(this);
@@ -188,11 +188,12 @@ public class WebSession extends BaseWebSession
         this.cacheExpired = cacheExpired;
     }
 
-    public synchronized WebUser getUser() {
+    public WebUser getUser() {
         return this.userContext.getUser();
     }
 
-    public synchronized Map<String, String> getUserMetaParameters() {
+    @NotNull
+    public Map<String, String> getUserMetaParameters() {
         var user = getUser();
         if (user == null) {
             return Map.of();
@@ -204,20 +205,20 @@ public class WebSession extends BaseWebSession
         return allMetaParams;
     }
 
-    public synchronized String getUserId() {
+    public String getUserId() {
         return userContext.getUserId();
     }
 
     public synchronized boolean hasPermission(String perm) {
-        return getSessionPermissions().contains(DBWConstants.PERMISSION_ADMIN) ||
-            getSessionPermissions().contains(perm);
+        Set<String> sessionPermissions = getSessionPermissions();
+        return sessionPermissions.contains(DBWConstants.PERMISSION_ADMIN) || sessionPermissions.contains(perm);
     }
 
-    public synchronized boolean isAuthorizedInSecurityManager() {
+    public boolean isAuthorizedInSecurityManager() {
         return userContext.isAuthorizedInSecurityManager();
     }
 
-    public synchronized Set<String> getSessionPermissions() {
+    public Set<String> getSessionPermissions() {
         if (userContext.getUserPermissions() == null) {
             refreshSessionAuth();
         }
@@ -225,28 +226,30 @@ public class WebSession extends BaseWebSession
     }
 
     @NotNull
-    public synchronized SMController getSecurityController() {
+    public SMController getSecurityController() {
         return userContext.getSecurityController();
     }
 
     @NotNull
-    public synchronized SMAdminController getAdminSecurityController() throws DBException {
+    public SMAdminController getAdminSecurityController() throws DBException {
         if (!hasPermission(DBWConstants.PERMISSION_ADMIN)) {
             throw new DBException("Admin permissions required");
         }
         return userContext.getAdminSecurityController();
     }
 
-    public synchronized RMController getRmController() {
+    @NotNull
+    public RMController getRmController() {
         return userContext.getRmController();
     }
 
-    public synchronized DBFileController getFileController() {
+    @NotNull
+    public DBFileController getFileController() {
         return userContext.getFileController();
     }
 
     @Override
-    public synchronized void refreshUserData() {
+    public void refreshUserData() {
         super.refreshUserData();
         refreshSessionAuth();
 
@@ -254,7 +257,7 @@ public class WebSession extends BaseWebSession
     }
 
     // Note: for admin use only
-    public synchronized void resetUserState(boolean needResetUserCache) throws DBException {
+    public void resetUserState(boolean needResetUserCache) throws DBException {
         clearAuthTokens();
         if (needResetUserCache) {
             try {
@@ -268,7 +271,7 @@ public class WebSession extends BaseWebSession
         clearSessionContext();
     }
 
-    public synchronized void resetUserState() throws DBException {
+    public void resetUserState() throws DBException {
         resetUserState(true);
     }
 
@@ -277,26 +280,35 @@ public class WebSession extends BaseWebSession
         return connectListener;
     }
 
+    @NotNull
+    public String getClientOrigin() {
+        return clientOrigin;
+    }
+
     public void updateClientOrigin(@NotNull String originFromRequest) {
         this.clientOrigin = originFromRequest;
     }
 
     private void initNavigatorModel() {
+        navigatorModelLock.writeLock().lock();
+        try {
+            // Cleanup current data
+            if (this.navigatorModel != null) {
+                this.navigatorModel.dispose();
+                this.navigatorModel = null;
+            }
+            this.globalProject = null;
 
-        // Cleanup current data
-        if (this.navigatorModel != null) {
-            this.navigatorModel.dispose();
-            this.navigatorModel = null;
+            loadProjects();
+
+            this.navigatorModel = new DBNModel(DBWorkbench.getPlatform(), getWorkspace().getProjects());
+            this.navigatorModel.setModelAuthContext(getWorkspace().getAuthContext());
+            this.navigatorModel.initialize();
+
+            this.locale = Locale.getDefault().getLanguage();
+        } finally {
+            navigatorModelLock.writeLock().unlock();
         }
-        this.globalProject = null;
-
-        loadProjects();
-
-        this.navigatorModel = new DBNModel(DBWorkbench.getPlatform(), getWorkspace().getProjects());
-        this.navigatorModel.setModelAuthContext(getWorkspace().getAuthContext());
-        this.navigatorModel.initialize();
-
-        this.locale = Locale.getDefault().getLanguage();
     }
 
     private void loadProjects() {
@@ -327,7 +339,8 @@ public class WebSession extends BaseWebSession
         }
     }
 
-    private WebSessionProjectImpl createWebProject(RMProject project) throws DBException {
+    @NotNull
+    private WebSessionProjectImpl createWebProject(@NotNull RMProject project) throws DBException {
         WebSessionProjectImpl sessionProject;
         if (project.isGlobal()) {
             sessionProject = createGlobalProject(project);
@@ -345,6 +358,7 @@ public class WebSession extends BaseWebSession
         return sessionProject;
     }
 
+    @NotNull
     protected WebSessionProjectImpl createSessionProject(@NotNull RMProject project) throws DBException {
         return new WebSessionProjectImpl(this, project, getProjectPath(project));
     }
@@ -354,37 +368,24 @@ public class WebSession extends BaseWebSession
         return RMUtils.getProjectPath(project);
     }
 
+    @NotNull
     protected WebSessionProjectImpl createGlobalProject(RMProject project) {
         globalProject = new WebSessionGlobalProjectImpl(this, project);
         globalProject.refreshAccessibleConnectionIds();
         return globalProject;
     }
 
-    private void resetSessionCache() throws DBCException {
-        // Clear attributes
-        synchronized (attributes) {
-            for (Map.Entry<String, ThrowableConsumer<Object, Exception>> attrDisposer : attributeDisposers.entrySet()) {
-                Object attrValue = attributes.get(attrDisposer.getKey());
-
-                try {
-                    attrDisposer.getValue().accept(attrValue);
-                } catch (Exception e) {
-                    log.error("Error disposing attribute '" + attrDisposer.getKey() + "'", e);
-                }
-            }
-            attributeDisposers.clear();
-            // Remove all non-persistent attributes
-            attributes.entrySet().removeIf(
-                entry -> !(entry.getValue() instanceof PersistentAttribute));
-        }
-    }
-
     private void resetNavigationModel() {
-        getWorkspace().getProjects().forEach(WebSessionProjectImpl::dispose);
+        navigatorModelLock.writeLock().lock();
+        try {
+            getWorkspace().getProjects().forEach(WebSessionProjectImpl::dispose);
 
-        if (this.navigatorModel != null) {
-            this.navigatorModel.dispose();
-            this.navigatorModel = null;
+            if (this.navigatorModel != null) {
+                this.navigatorModel.dispose();
+                this.navigatorModel = null;
+            }
+        } finally {
+            navigatorModelLock.writeLock().unlock();
         }
     }
 
@@ -427,15 +428,25 @@ public class WebSession extends BaseWebSession
 
     @Nullable
     public DBNModel getNavigatorModel() {
-        return navigatorModel;
+        navigatorModelLock.readLock().lock();
+        try {
+            return navigatorModel;
+        } finally {
+            navigatorModelLock.readLock().unlock();
+        }
     }
 
     @NotNull
     public DBNModel getNavigatorModelOrThrow() throws DBWebException {
-        if (navigatorModel != null) {
-            return navigatorModel;
+        navigatorModelLock.readLock().lock();
+        try {
+            if (navigatorModel != null) {
+                return navigatorModel;
+            }
+            throw new DBWebException("Navigator model is not found in session");
+        } finally {
+            navigatorModelLock.readLock().unlock();
         }
-        throw new DBWebException("Navigator model is not found in session");
     }
     /**
      * Returns and clears progress messages
@@ -449,7 +460,7 @@ public class WebSession extends BaseWebSession
         }
     }
 
-    public synchronized void updateInfo(boolean isOldHttpSessionUsed) {
+    public void updateInfo(boolean isOldHttpSessionUsed) {
         log.trace("Update session lifetime " + getSessionId() + " for user " + getUserId());
         touchSession();
         if (isOldHttpSessionUsed) {
@@ -513,6 +524,7 @@ public class WebSession extends BaseWebSession
         super.close(clearTokens, sendSessionExpiredEvent);
     }
 
+    @NotNull
     private List<WebAuthInfo> clearAuthTokens() throws DBException {
         ArrayList<WebAuthInfo> tokensCopy;
         synchronized (authTokens) {
@@ -642,11 +654,11 @@ public class WebSession extends BaseWebSession
         return asyncTask;
     }
 
-    public void addSessionError(Throwable exception) {
+    public void addSessionError(@NotNull Throwable exception) {
         addSessionMessage(new WebServerMessage(exception));
     }
 
-    public void addSessionMessage(WebServerMessage message) {
+    public void addSessionMessage(@NotNull WebServerMessage message) {
         synchronized (sessionMessages) {
             sessionMessages.add(message);
         }
@@ -657,14 +669,15 @@ public class WebSession extends BaseWebSession
             message.getMessage()));
     }
 
-    public void addInfoMessage(String message) {
+    public void addInfoMessage(@NotNull String message) {
         addSessionMessage(new WebServerMessage(MessageType.INFO, message));
     }
 
-    public void addWarningMessage(String message) {
+    public void addWarningMessage(@NotNull String message) {
         addSessionMessage(new WebServerMessage(MessageType.WARNING, message));
     }
 
+    @NotNull
     public List<WebServerMessage> readLog(Integer maxEntries, Boolean clearLog) {
         synchronized (sessionMessages) {
             List<WebServerMessage> messages = new ArrayList<>();
@@ -681,46 +694,6 @@ public class WebSession extends BaseWebSession
                 }
             }
             return messages;
-        }
-    }
-
-    @Override
-    public <T> T getAttribute(String name) {
-        synchronized (attributes) {
-            Object value = attributes.get(name);
-            if (value instanceof PersistentAttribute persistentAttribute) {
-                value = persistentAttribute.value();
-            }
-            return (T) value;
-        }
-    }
-
-    public void setAttribute(String name, Object value, boolean persistent) {
-        synchronized (attributes) {
-            attributes.put(name, persistent ? new PersistentAttribute(value) : value);
-        }
-    }
-
-    public <T, E extends Exception> T getAttribute(
-        String name,
-        ThrowableFunction<String, T, E> creator,
-        ThrowableConsumer<T, E> disposer
-    ) throws E {
-        synchronized (attributes) {
-            Object value = attributes.get(name);
-            if (value instanceof PersistentAttribute persistentAttribute) {
-                value = persistentAttribute.value();
-            }
-            if (value == null) {
-                value = creator.apply(null);
-                if (value != null) {
-                    attributes.put(name, value);
-                    if (disposer != null) {
-                        attributeDisposers.put(name, (ThrowableConsumer<Object, Exception>) disposer);
-                    }
-                }
-            }
-            return (T) value;
         }
     }
 
@@ -752,7 +725,7 @@ public class WebSession extends BaseWebSession
         }
     }
 
-
+    @NotNull
     public List<WebAuthInfo> getAllAuthInfo() {
         synchronized (authTokens) {
             return new ArrayList<>(authTokens);
@@ -804,7 +777,7 @@ public class WebSession extends BaseWebSession
         });
     }
 
-    private void removeAuthInfo(WebAuthInfo oldAuthInfo) {
+    private void removeAuthInfo(@NotNull WebAuthInfo oldAuthInfo) {
         oldAuthInfo.closeAuth();
         synchronized (authTokens) {
             authTokens.remove(oldAuthInfo);
@@ -830,6 +803,7 @@ public class WebSession extends BaseWebSession
         return oldInfo;
     }
 
+    @Nullable
     public List<DBACredentialsProvider> getContextCredentialsProviders() {
         return getAdapters(DBACredentialsProvider.class);
     }
@@ -917,11 +891,11 @@ public class WebSession extends BaseWebSession
         return parameters;
     }
 
-    public synchronized void resetAuthToken() throws DBException {
+    public void resetAuthToken() throws DBException {
         this.userContext.reset();
     }
 
-    public synchronized boolean updateSMSession(SMAuthInfo smAuthInfo) throws DBException {
+    public boolean updateSMSession(SMAuthInfo smAuthInfo) throws DBException {
         boolean contextChanged = super.updateSMSession(smAuthInfo);
         if (contextChanged) {
             refreshUserData();
@@ -940,7 +914,7 @@ public class WebSession extends BaseWebSession
     }
 
     @Nullable
-    public WebSessionProjectImpl getProjectById(@Nullable String projectId) {
+    public WebSessionProjectImpl getProjectById(@NotNull String projectId) {
         return getWorkspace().getProjectById(projectId);
     }
 
@@ -949,6 +923,7 @@ public class WebSession extends BaseWebSession
      *
      * @throws DBWebException if project with provided id is not found.
      */
+    @NotNull
     public WebSessionProjectImpl getAccessibleProjectById(@Nullable String projectId) throws DBWebException {
         WebSessionProjectImpl project = null;
         if (projectId != null) {
@@ -960,6 +935,7 @@ public class WebSession extends BaseWebSession
         return project;
     }
 
+    @NotNull
     public List<WebSessionProjectImpl> getAccessibleProjects() {
         return getWorkspace().getProjects();
     }
@@ -969,26 +945,35 @@ public class WebSession extends BaseWebSession
      */
     public void addSessionProject(@NotNull WebSessionProjectImpl project) {
         getWorkspace().addProject(project);
-        if (navigatorModel != null) {
-            navigatorModel.getRoot().addProject(project, false);
+        navigatorModelLock.readLock().lock();
+        try {
+            if (navigatorModel != null) {
+                navigatorModel.getRoot().addProject(project, false);
+            }
+        } finally {
+            navigatorModelLock.readLock().unlock();
         }
     }
 
     /**
      * Removes project from session cache and navigator tree.
      */
-    public void deleteSessionProject(@Nullable WebSessionProjectImpl project) {
-        if (project != null) {
-            RMProject rmProject = project.getRMProject();
-            log.info(String.format(
-                "Project deleted: [ID=%s, Name=%s, Type=%s, Creator=%s]",
-                rmProject.getId(), rmProject.getName(), rmProject.getType(), rmProject.getCreator()
-            ));
-            project.dispose();
-        }
+    public void deleteSessionProject(@NotNull WebSessionProjectImpl project) {
+        RMProject rmProject = project.getRMProject();
+        log.info(String.format(
+            "Project deleted: [ID=%s, Name=%s, Type=%s, Creator=%s]",
+            rmProject.getId(), rmProject.getName(), rmProject.getType(), rmProject.getCreator()
+        ));
+        project.dispose();
+
         getWorkspace().removeProject(project);
-        if (navigatorModel != null) {
-            navigatorModel.getRoot().removeProject(project);
+        navigatorModelLock.readLock().lock();
+        try {
+            if (navigatorModel != null) {
+                navigatorModel.getRoot().removeProject(project);
+            }
+        } finally {
+            navigatorModelLock.readLock().unlock();
         }
     }
 
@@ -996,6 +981,10 @@ public class WebSession extends BaseWebSession
     public void addSessionProject(@NotNull String projectId) throws DBException {
         super.addSessionProject(projectId);
         var rmProject = getRmController().getProject(projectId, false, false);
+        if (rmProject == null) {
+            log.error("RM project '" + projectId + "' not found");
+            return;
+        }
         createWebProject(rmProject);
     }
 
@@ -1010,7 +999,7 @@ public class WebSession extends BaseWebSession
     }
 
     @Override
-    public void removeSessionProject(@Nullable String projectId) throws DBException {
+    public void removeSessionProject(@NotNull String projectId) throws DBException {
         super.removeSessionProject(projectId);
         var project = getProjectById(projectId);
         if (project == null) {
@@ -1081,6 +1070,4 @@ public class WebSession extends BaseWebSession
         return true;
     }
 
-    private record PersistentAttribute(Object value) {
-    }
 }

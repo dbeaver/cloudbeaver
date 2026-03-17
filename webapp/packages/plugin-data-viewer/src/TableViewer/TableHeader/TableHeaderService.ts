@@ -58,6 +58,7 @@ export class TableHeaderService extends Bootstrap {
       contexts: [DATA_CONTEXT_DV_DDM, DATA_CONTEXT_DV_DDM_RESULT_INDEX],
       isHidden(context, action) {
         const model = context.get(DATA_CONTEXT_DV_DDM)!;
+        // TODO add more proper way to define to what features it should be added https://github.com/dbeaver/pro/issues/8299
         const isReadonly = model.isReadonly(context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!);
 
         if ([ACTION_UNDO, ACTION_REDO].includes(action)) {

@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2025 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,7 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.DBPDataKind;
 import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.DBUtils;
@@ -66,10 +67,7 @@ import org.jkiss.dbeaver.utils.RuntimeUtils;
 import org.jkiss.utils.CommonUtils;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -248,6 +246,54 @@ public class WebServiceSQL implements DBWServiceSQL {
     @Override
     public String generateEntityQuery(@NotNull WebSession session, @NotNull String generatorId, @NotNull Map<String, Object> options, @NotNull List<String> nodePathList) throws DBWebException {
         List<DBSObject> objectList = getObjectListFromNodeIds(session, nodePathList);
+        return createAndRunGenerator(session, generatorId, objectList);
+    }
+
+    @Override
+    public String sqlGenerateResultSetQuery(
+        @NotNull WebSession webSession,
+        @NotNull WebSQLContextInfo sqlContext,
+        @NotNull String generatorId,
+        @NotNull String resultsId,
+        @NotNull List<WebSQLResultsRow> selectedRows
+    ) throws DBWebException {
+        checkAndFillTruncatedData(sqlContext, resultsId, selectedRows);
+        WebDBDResultSetDataProvider dataProvider = new WebDBDResultSetDataProvider(resultsId, sqlContext, selectedRows);
+        return createAndRunGenerator(webSession, generatorId, Collections.singletonList(dataProvider));
+    }
+
+    private void checkAndFillTruncatedData(
+        @NotNull WebSQLContextInfo sqlContext,
+        @NotNull String resultsId,
+        @NotNull List<WebSQLResultsRow> selectedRows
+    ) throws DBWebException {
+        List<DBDAttributeBinding> attributes = Arrays.stream(sqlContext.getResults(resultsId).getAttributes())
+            .filter(attr -> canBeTruncated(attr.getDataKind()))
+            .toList();
+        for (WebSQLResultsRow row : selectedRows) {
+            Object[] data = row.getData();
+            for (DBDAttributeBinding attribute : attributes) {
+                int position = attribute.getOrdinalPosition();
+                boolean valueIsTruncated = data[position] != null &&
+                    data[position].toString().length() == WebSQLConstants.TEXT_PREVIEW_MAX_LENGTH;
+                if (valueIsTruncated) {
+                    data[position] = getCellValue(sqlContext, resultsId, position, row);
+                }
+            }
+        }
+    }
+
+    private boolean canBeTruncated(@NotNull DBPDataKind dataKind) {
+        return dataKind.equals(DBPDataKind.STRING) ||
+            dataKind.equals(DBPDataKind.CONTENT) ||
+            dataKind.equals(DBPDataKind.BINARY);
+    }
+
+    private String createAndRunGenerator(
+        @NotNull WebSession session,
+        @NotNull String generatorId,
+        @NotNull List<DBSObject> objectList
+    ) throws DBWebException {
         SQLGeneratorDescriptor generator = SQLGeneratorConfigurationRegistry.getInstance().getGenerator(generatorId);
         if (generator == null) {
             throw new DBWebException("Generator '" + generatorId + "' not found");

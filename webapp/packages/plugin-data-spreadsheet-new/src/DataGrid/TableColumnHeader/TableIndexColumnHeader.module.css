@@ -15,11 +15,3 @@
   bottom: 0;
   right: 0;
 }
-
-.iconOrImage {
-  cursor: auto;
-  width: 10px;
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-}

@@ -10,6 +10,7 @@ import { useContext } from 'react';
 import { clsx } from '@dbeaver/ui-kit';
 
 import { getComputed, s, StaticImage, useS } from '@cloudbeaver/core-blocks';
+import { isResultSetDataSource } from '@cloudbeaver/plugin-data-viewer';
 
 import { DataGridContext } from '../DataGridContext.js';
 import { DataGridSelectionContext } from '../DataGridSelection/DataGridSelectionContext.js';
@@ -35,7 +36,10 @@ export const TableColumnHeader = observer<Props>(function TableColumnHeader({ co
   const dnd = useTableColumnDnD(model, resultIndex, columnInfo.key);
 
   const dataReadonly = getComputed(() => model.isReadonly(resultIndex));
-  const hasElementIdentifier = getComputed(() => model.hasElementIdentifier(resultIndex));
+  const hasElementIdentifier = getComputed(() => {
+    const source = model.source;
+    return isResultSetDataSource(source) ? source.hasElementIdentifier(resultIndex) : false;
+  });
 
   let icon: string | undefined;
   let columnName: string | undefined;

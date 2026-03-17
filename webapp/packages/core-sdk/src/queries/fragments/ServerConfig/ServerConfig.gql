@@ -2,7 +2,6 @@ fragment ServerConfig on ServerConfig {
   name
   version
   workspaceId
-  serverURL
   rootURI
   containerId
   defaultAuthRole

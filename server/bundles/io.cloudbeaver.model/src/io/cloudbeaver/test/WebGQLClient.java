@@ -24,6 +24,7 @@ import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.utils.GeneralUtils;
+import org.jkiss.utils.HttpConstants;
 
 import java.net.CookieManager;
 import java.net.URI;
@@ -113,11 +114,21 @@ public class WebGQLClient {
         @Nullable Map<String, Object> variables,
         @NotNull Map<String, String> requestHeaders
     ) throws Exception {
+        return  executeGQLRequest(query, variables, requestHeaders, "result");
+    }
+
+    @NotNull
+    public Map<String, Object> executeGQLRequest(
+        @NotNull String query,
+        @Nullable Map<String, Object> variables,
+        @NotNull Map<String, String> requestHeaders,
+        @NotNull String resultName
+    ) throws Exception {
         HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
             .uri(URI.create(apiUrl))
             .POST(HttpRequest.BodyPublishers.ofString(makeGQLRequest(query, variables)))
             .setHeader("TE-Client-Version", GeneralUtils.getMajorVersion())
-            .header("Content-Type", "application/json");
+            .header(HttpConstants.HEADER_CONTENT_TYPE, HttpConstants.CONTENT_TYPE_JSON);
         if (!requestHeaders.isEmpty()) {
             requestHeaders.forEach(requestBuilder::header);
         }
@@ -132,7 +143,7 @@ public class WebGQLClient {
             throw new DBException(message);
         }
         Map<String, Object> parsed = new LinkedHashMap<>();
-        parsed.put("data", JSONUtils.getObject(body, "data").get("result"));
+        parsed.put("data", JSONUtils.getObject(body, "data").get(resultName));
         parsed.put("headers", response.headers().map());
         return parsed;
     }

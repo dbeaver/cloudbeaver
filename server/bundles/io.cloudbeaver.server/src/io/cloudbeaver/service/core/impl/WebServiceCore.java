@@ -400,7 +400,9 @@ public class WebServiceCore implements DBWServiceCore {
                 dataSourceContainer,
                 dataSourceContainer.getConnectionConfiguration()
             );
-            saveConfig[0] = true;
+            // don't understand why whe need to set this flag here
+            // need to discover it, maybe we can avoid it at all
+            saveConfig[0] = sharedCredentials;
         }
         if (WebServiceUtils.isGlobalProject(dataSourceContainer.getProject())) {
             // Do not flush config for global project (only admin can do it - CB-2415)
@@ -464,12 +466,21 @@ public class WebServiceCore implements DBWServiceCore {
                 throw new DBException("Node '" + nodePath + "' is not a datasource node");
             }
             DBPDataSourceContainer dataSourceTemplate = dbnDataSource.getDataSourceContainer();
+            if (!dataSourceTemplate.isExternallyProvided()) {
+                if (!CommonUtils.equalObjects(dataSourceTemplate.getProject(), project)) {
+                    throw new DBException("Copying connection to another project is not allowed");
+                }
+            }
 
             DataSourceDescriptor newDataSource = dataSourceRegistry.createDataSource(dataSourceTemplate);
 
             ServletApplication app = ServletAppUtils.getServletApplication();
             if (app instanceof WebApplication webApplication) {
-                newDataSource.setNavigatorSettings(webApplication.getAppConfiguration().getDefaultNavigatorSettings());
+                newDataSource.setNavigatorSettings(
+                    dataSourceTemplate.isExternallyProvided() ?
+                        webApplication.getAppConfiguration().getDefaultNavigatorSettings() :
+                        dataSourceTemplate.getNavigatorSettings().getOriginalSettings()
+                );
             }
 
             WebConnectionConfig config = project.getConnectionConfigInput(connectionConfig);
@@ -582,6 +593,8 @@ public class WebServiceCore implements DBWServiceCore {
     @Override
     public WebNetworkEndpointInfo testNetworkHandler(
         @NotNull WebSession webSession,
+        @Nullable String projectId,
+        @Nullable String connectionId,
         @NotNull WebNetworkHandlerConfigInput nhConfig
     ) throws DBWebException {
         DBRProgressMonitor monitor = webSession.getProgressMonitor();
@@ -602,7 +615,13 @@ public class WebServiceCore implements DBWServiceCore {
                 try {
                     monitor.subTask("Initialize tunnel");
 
-                    DBWHandlerConfiguration configuration = new DBWHandlerConfiguration(handlerDescriptor, null);
+                    DBWHandlerConfiguration currentConnectionHandlerConfig =
+                        getCurrentConnectionHandlerConfig(webSession, projectId, connectionId, nhConfig.getId());
+
+                    DBWHandlerConfiguration configuration = currentConnectionHandlerConfig == null
+                        ? new DBWHandlerConfiguration(handlerDescriptor, null)
+                        : new DBWHandlerConfiguration(currentConnectionHandlerConfig);
+
                     WebDataSourceUtils.updateHandlerConfig(configuration, nhConfig);
                     configuration.setSavePassword(true);
                     configuration.setEnabled(true);
@@ -631,6 +650,22 @@ public class WebServiceCore implements DBWServiceCore {
             // Close it
             monitor.done();
         }
+    }
+
+    @Nullable
+    private DBWHandlerConfiguration getCurrentConnectionHandlerConfig(
+        @NotNull WebSession webSession,
+        @Nullable String projectId,
+        @Nullable String connectionId,
+        @NotNull String handlerConfigId
+    ) throws DBWebException {
+        if (projectId == null || connectionId == null) {
+            return null;
+        }
+        WebSessionProjectImpl sessionProject = webSession.getAccessibleProjectById(projectId);
+        WebConnectionInfo connectionInfo = sessionProject.getWebConnectionInfo(connectionId);
+        DBPConnectionConfiguration connectionConfiguration = connectionInfo.getDataSourceContainer().getConnectionConfiguration();
+        return connectionConfiguration.getHandler(handlerConfigId);
     }
 
     @Override

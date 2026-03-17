@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ import {
   DataViewerService,
   IDatabaseDataEditAction,
   IDatabaseDataFormatAction,
+  IDatabaseDataSelectAction,
   isResultSetDataSource,
   ResultSetDataContentAction,
 } from '@cloudbeaver/plugin-data-viewer';
@@ -54,17 +55,21 @@ export class DataGridContextMenuSaveContentService {
         const content = model.source.getAction(resultIndex, ResultSetDataContentAction);
         const format = model.source.getAction(resultIndex, IDatabaseDataFormatAction);
         const editor = model.source.getAction(resultIndex, IDatabaseDataEditAction);
+        const select = model.source.getAction(resultIndex, IDatabaseDataSelectAction);
         const cellHolder = format.get(key);
+        const hasSingleCellSelected = select?.getActiveElements().length === 1;
 
         if (action === ACTION_DOWNLOAD) {
-          return !content.isDownloadable(cellHolder) || !this.dataViewerService.canExportData;
+          return !content.isDownloadable(cellHolder) || !this.dataViewerService.canExportData || !hasSingleCellSelected;
         }
 
         if (action === ACTION_UPLOAD) {
           return (
+            // TODO add more proper way to define to what features it should be added https://github.com/dbeaver/pro/issues/8299
             !format.isBinary(cellHolder) ||
             model.isReadonly(resultIndex) ||
-            (format.isReadOnly(key) && editor.getElementState(key) !== DatabaseEditChangeType.add)
+            (format.isReadOnly(key) && editor.getElementState(key) !== DatabaseEditChangeType.add) ||
+            !hasSingleCellSelected
           );
         }
 
