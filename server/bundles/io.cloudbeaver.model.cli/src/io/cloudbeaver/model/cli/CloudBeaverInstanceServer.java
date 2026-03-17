@@ -29,7 +29,7 @@ public class CloudBeaverInstanceServer extends ApplicationInstanceServer<Applica
 
     public CloudBeaverInstanceServer() throws IOException {
         super(ApplicationInstanceController.class);
-        this.commandLine = new CloudBeaverCommandLine(null);
+        this.commandLine = new CloudBeaverCommandLine();
     }
 
     public CloudBeaverInstanceServer(@NotNull CloudBeaverCommandLine commandLine) throws IOException {
