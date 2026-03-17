@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,8 @@ import { ResultSetDataAction } from './ResultSetDataAction.js';
 import { injectable } from '@cloudbeaver/core-di';
 import { IDatabaseDataResult } from '../../IDatabaseDataResult.js';
 import type { IGridColumnKey, IGridDataKey, IGridRowKey } from '../Grid/IGridDataKey.js';
+
+const SHARED_CACHE_KEY = 'shared';
 
 @injectable(() => [IDatabaseDataSource, IDatabaseDataResult, ResultSetDataAction])
 export class ResultSetCacheAction
@@ -41,10 +43,12 @@ export class ResultSetCacheAction
       set: action,
       setRow: action,
       setColumn: action,
+      setShared: action,
       delete: action,
       deleteAll: action,
       deleteRow: action,
       deleteColumn: action,
+      deleteShared: action,
     });
   }
 
@@ -153,6 +157,40 @@ export class ResultSetCacheAction
     }
   }
 
+  hasShared(scope: symbol): boolean {
+    const sharedCache = this.getSharedCache();
+
+    if (!sharedCache) {
+      return false;
+    }
+
+    return sharedCache.has(scope);
+  }
+
+  getShared<T>(scope: symbol): T | undefined {
+    const sharedCache = this.getSharedCache();
+
+    if (!sharedCache) {
+      return;
+    }
+
+    return sharedCache.get(scope);
+  }
+
+  setShared<T>(scope: symbol, value: T): void {
+    const sharedCache = this.getOrCreateSharedCache();
+
+    sharedCache.set(scope, value);
+  }
+
+  deleteShared(scope: symbol): void {
+    const sharedCache = this.getSharedCache();
+
+    if (sharedCache) {
+      sharedCache.delete(scope);
+    }
+  }
+
   override afterResultUpdate(): void {
     this.cache.clear();
   }
@@ -216,5 +254,20 @@ export class ResultSetCacheAction
     }
 
     return keyCache;
+  }
+
+  private getSharedCache() {
+    return this.cache.get(SHARED_CACHE_KEY);
+  }
+
+  private getOrCreateSharedCache() {
+    let sharedCache = this.getSharedCache();
+
+    if (!sharedCache) {
+      sharedCache = observable(new Map());
+      this.cache.set(SHARED_CACHE_KEY, sharedCache);
+    }
+
+    return sharedCache;
   }
 }

@@ -20,10 +20,14 @@ export interface IGridHistoryRow<TKey extends IGridDataKey = IGridDataKey, TCell
   value: TCell[];
 }
 
-export interface IGridHistoryCellUpdateData<TKey extends IGridDataKey = IGridDataKey, TCell = unknown> {
+export interface IGridHistoryCellUpdate<TKey extends IGridDataKey = IGridDataKey, TCell = unknown> {
   key: TKey;
   prevValue: TCell;
   value: TCell;
+}
+
+export interface IGridHistoryCellUpdateData<TKey extends IGridDataKey = IGridDataKey, TCell = unknown> {
+  updates: Array<IGridHistoryCellUpdate<TKey, TCell>>;
 }
 
 export interface IGridHistoryRowUpdate<TKey extends IGridDataKey = IGridDataKey, TCell = unknown> extends IGridHistoryRow<TKey, TCell> {
@@ -72,4 +76,32 @@ export function isGridHistoryRevertData<TKey extends IGridDataKey = IGridDataKey
   entry: IHistoryEntry<unknown>,
 ): entry is IHistoryEntry<IGridHistoryRevertData<TKey, TCell>> {
   return entry.source === GRID_HISTORY_SOURCE.REVERT;
+}
+
+export function getKeyFromHistoryEntry(entry: IHistoryEntry<unknown>): IGridDataKey | null {
+  if (isGridHistoryEditCellData(entry)) {
+    const lastUpdate = entry.data.updates[entry.data.updates.length - 1];
+    return lastUpdate?.key ?? null;
+  }
+  if (isGridHistoryAddRowData(entry)) {
+    const firstRow = entry.data.rowEntries[0];
+    return firstRow?.key ?? null;
+  }
+  if (isGridHistoryDeleteRowData(entry)) {
+    const firstRow = entry.data.rowEntries[0];
+    return firstRow?.key ?? null;
+  }
+  if (isGridHistoryRevertData(entry)) {
+    const firstUpdate = entry.data.updates[0];
+    if (firstUpdate) {
+      return firstUpdate.key;
+    }
+    const firstDeletion = entry.data.deletions[0];
+    if (firstDeletion) {
+      return firstDeletion.key;
+    }
+    const firstAddition = entry.data.additions[0];
+    return firstAddition?.key ?? null;
+  }
+  return null;
 }
