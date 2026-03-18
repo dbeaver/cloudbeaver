@@ -1,0 +1,14 @@
+@layer base {
+  .dbv-plan-viewport__edges {
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+  }
+
+  .dbv-plan-viewport__nodes {
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+}
