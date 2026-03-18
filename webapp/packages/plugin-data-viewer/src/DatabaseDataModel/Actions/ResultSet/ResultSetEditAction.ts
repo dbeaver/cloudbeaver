@@ -57,12 +57,20 @@ export class ResultSetEditAction extends GridEditAction<SqlResultColumn, SqlResu
   }
 
   override set(key: IGridDataKey, value: IResultSetValue): void {
+    super.set(key, this.transformValue(key, value));
+  }
+
+  override setMany(updates: Array<{ key: IGridDataKey; value: IResultSetValue }>): void {
+    super.setMany(updates.map(({ key, value }) => ({ key, value: this.transformValue(key, value) })));
+  }
+
+  private transformValue(key: IGridDataKey, value: IResultSetValue): IResultSetValue {
     const [update] = this.getOrCreateUpdate(key.row, DatabaseEditChangeType.update);
     const prevValue = update.source?.[key.column.index] as any;
 
     if (isResultSetContentValue(prevValue) && !isResultSetComplexValue(value)) {
       if ('text' in prevValue && !isNull(value)) {
-        value = createResultSetContentValue({
+        return createResultSetContentValue({
           text: String(value),
           contentLength: String(value).length,
           contentType: prevValue.contentType ?? 'text/plain',
@@ -70,7 +78,7 @@ export class ResultSetEditAction extends GridEditAction<SqlResultColumn, SqlResu
       }
     }
 
-    super.set(key, value);
+    return value;
   }
 
   getBlobsToUpload(): Array<IResultSetBlobValue> {
