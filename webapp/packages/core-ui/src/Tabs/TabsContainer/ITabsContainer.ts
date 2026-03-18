@@ -49,6 +49,7 @@ export interface ITabsContainer<TProps = void, TOptions extends Record<string, a
   readonly areaLabel: string;
   readonly tabInfoList: Array<ITabInfo<TProps, TOptions>>;
   has: (tabId: string) => boolean;
+  select: (tabId: string, props: TProps) => void;
   getTabInfo: (tabId: string) => ITabInfo<TProps, TOptions> | undefined;
   getDisplayedTabInfo: (tabId: string, props?: TProps) => ITabInfo<TProps, TOptions> | undefined;
   getTabState: <T>(

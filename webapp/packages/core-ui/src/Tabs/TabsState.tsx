@@ -139,6 +139,7 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
           dynamic.state.setCurrentId(data.tabId);
           dynamic.state.setSelectedId(data.tabId);
         }
+        dynamic.container?.select(data.tabId, dynamic.props);
       },
     ],
   });
