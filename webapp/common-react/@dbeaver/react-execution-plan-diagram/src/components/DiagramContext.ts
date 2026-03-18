@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { createContext, useContext } from 'react';
+import { createContext, use } from 'react';
 
 export interface IDiagramActions {
   zoomIn(): void;
@@ -18,7 +18,7 @@ export interface IDiagramActions {
 export const DiagramContext = createContext<IDiagramActions | null>(null);
 
 export function useDiagramActions(): IDiagramActions {
-  const actions = useContext(DiagramContext);
+  const actions = use(DiagramContext);
 
   if (!actions) {
     throw new Error('useDiagramActions must be used inside ExecutionPlanDiagram');
