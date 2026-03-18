@@ -6,6 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { memo } from 'react';
+
 import type { ILayoutEdge } from '../layout/ILayoutEdge.js';
 
 import './ExecutionPlanEdge.css';
@@ -16,7 +18,7 @@ export interface IExecutionPlanEdgeProps {
   horizontal?: boolean;
 }
 
-export function ExecutionPlanEdge({ edge, heavyRoute, horizontal }: IExecutionPlanEdgeProps): React.ReactElement {
+export const ExecutionPlanEdge = memo(function ExecutionPlanEdge({ edge, heavyRoute, horizontal }: IExecutionPlanEdgeProps): React.ReactElement {
   let d: string;
 
   if (horizontal) {
@@ -28,4 +30,4 @@ export function ExecutionPlanEdge({ edge, heavyRoute, horizontal }: IExecutionPl
   }
 
   return <path className="dbv-plan-edge" d={d} data-heavy-route={heavyRoute || undefined} />;
-}
+});
