@@ -23,6 +23,9 @@
   },
   "dependencies": {
     "@cloudbeaver/core-blocks": "workspace:*",
+    "@cloudbeaver/core-connections": "workspace:*",
+    "@cloudbeaver/core-di": "workspace:*",
+    "@cloudbeaver/core-dialogs": "workspace:*",
     "@cloudbeaver/core-sdk": "workspace:*",
     "@cloudbeaver/plugin-codemirror6": "workspace:*",
     "mobx": "^6",

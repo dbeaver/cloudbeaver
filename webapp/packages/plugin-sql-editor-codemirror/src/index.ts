@@ -11,3 +11,5 @@ export * from './SQLCodeEditor/useSQLCodeEditor.js';
 export * from './useSqlDialectExtension.js';
 export * from './ACTIVE_QUERY_EXTENSION.js';
 export * from './QUERY_STATUS_GUTTER_EXTENSION.js';
+export * from './GeneratedSqlDialog.js';
+export * from './ConfirmationGeneratedSqlDialog.js';

@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { DATA_CONTEXT_NAV_NODE, EObjectFeature } from '@cloudbeaver/core-navigation-tree';
@@ -15,8 +14,7 @@ import { MenuBaseItem, MenuService } from '@cloudbeaver/core-view';
 import { MENU_SQL_GENERATORS } from './MENU_SQL_GENERATORS.js';
 import { SqlGeneratorsResource } from './SqlGeneratorsResource.js';
 import { NotificationService } from '@cloudbeaver/core-events';
-
-const GeneratedSqlDialog = importLazyComponent(() => import('./GeneratedSqlDialog.js').then(m => m.GeneratedSqlDialog));
+import { GeneratedSqlDialog } from '@cloudbeaver/plugin-sql-editor-codemirror';
 
 @injectable(() => [SqlGeneratorsResource, CommonDialogService, MenuService, NotificationService])
 export class SqlGeneratorsBootstrap extends Bootstrap {

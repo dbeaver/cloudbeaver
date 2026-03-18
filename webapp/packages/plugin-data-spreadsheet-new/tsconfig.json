@@ -71,6 +71,9 @@
       "path": "../plugin-data-viewer-conditional-formatting"
     },
     {
+      "path": "../plugin-sql-editor-codemirror"
+    },
+    {
       "path": "../plugin-sql-generator"
     }
   ],

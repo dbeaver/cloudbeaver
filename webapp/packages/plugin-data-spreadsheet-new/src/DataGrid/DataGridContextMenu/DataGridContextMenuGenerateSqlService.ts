@@ -36,8 +36,9 @@ import { ACTION_DATA_GRID_GENERATE_SQL_SELECT_MANY } from '../Actions/GenerateSQ
 import { ACTION_DATA_GRID_GENERATE_SQL_UPDATE } from '../Actions/GenerateSQL/ACTION_DATA_GRID_GENERATE_SQL_UPDATE.js';
 import { MENU_DATA_GRID_GENERATE_SQL } from './GenerateSQL/MENU_DATA_GRID_GENERATE_SQL.js';
 import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
-import { GeneratedSqlDialog, SqlGeneratorsResource } from '@cloudbeaver/plugin-sql-generator';
+import { SqlGeneratorsResource } from '@cloudbeaver/plugin-sql-generator';
 import { isNotNullDefined } from '@dbeaver/js-helpers';
+import { GeneratedSqlDialog } from '@cloudbeaver/plugin-sql-editor-codemirror';
 
 @injectable(() => [ActionService, MenuService, CommonDialogService, NotificationService, SqlGeneratorsResource])
 export class DataGridContextMenuGenerateSqlService {
