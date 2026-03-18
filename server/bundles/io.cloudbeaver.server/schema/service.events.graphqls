@@ -17,52 +17,10 @@ enum CBServerEventId {
     "Session expired"
     cb_session_expired,
 
-    "Datasource created"
-    cb_datasource_created,
-    "Datasource updated"
-    cb_datasource_updated,
-    "Datasource deleted"
-    cb_datasource_deleted,
-
-    "Datasource folder created"
-    cb_datasource_folder_created,
-    "Datasource folder updated"
-    cb_datasource_folder_updated,
-    "Datasource folder deleted"
-    cb_datasource_folder_deleted,
-
-    "Datasource disconnected"
-    cb_datasource_disconnected,
-    "Datasource connected"
-    cb_datasource_connected,
-
-    "Resource manager resource created"
-    cb_rm_resource_created,
-    "Resource manager resource updated"
-    cb_rm_resource_updated,
-    "Resource manager resource deleted"
-    cb_rm_resource_deleted,
-
-    "Resource manager project added"
-    cb_rm_project_added,
-    "Resource manager project added"
-    cb_rm_project_updated,
-    "Resource manager project removed"
-    cb_rm_project_removed,
-
     "Object permissions updated (e.g., datasource)"
     cb_object_permissions_updated,
     "Subject permissions updated (e.g., user, team)"
     cb_subject_permissions_updated,
-
-    "Database output log updated (e.g., DBMS in Oracle)"
-    cb_database_output_log_updated,
-    cb_ai_chat_message_chunk @since(version: "25.1.1")
-    cb_ai_chat_message_error @since(version: "25.1.1")
-    cb_ai_chat_message @since(version: "25.3.5")
-
-    "Transaction count updated"
-    cb_transaction_count @since(version: "24.3.3"),
 
     "Session async task info updated"
     cb_session_task_info_updated @since(version: "24.3.1"),
@@ -70,11 +28,6 @@ enum CBServerEventId {
     cb_workspace_config_changed @since(version: "25.1.1"),
     "Server notification"
     cb_server_notification@since(version: "25.2.1")
-
-    "Session task confirmations"
-    cb_session_task_confirmation_request @since(version: "25.2.2")
-    cb_session_task_query_confirmation_request @since(version: "25.2.2")
-    cb_session_task_query_params_confirmation_request @since(version: "25.2.5")
 
     "Open URL request in client"
     cb_open_url @since(version: "25.3.1")
@@ -85,9 +38,7 @@ enum CBClientEventId {
     cb_client_topic_subscribe,
     cb_client_topic_unsubscribe,
     cb_client_projects_active,
-    cb_client_session_ping,
-    cb_client_session_task_confirmation @since(version: "25.2.2")
-    cb_client_session_task_with_parameters_confirmation @since(version: "25.2.5")
+    cb_client_session_ping
 }
 
 "Client subscribes on topic to receive only related events"
@@ -95,22 +46,14 @@ enum CBEventTopic {
     cb_config,
     cb_session_log,
     cb_session,
-    cb_datasource,
-    cb_datasource_folder,
-    cb_scripts,
-    cb_projects,
     cb_object_permissions,
     cb_subject_permissions,
-    cb_database_output_log,
 
     cb_session_task, @since(version: "24.3.1")
 
-    cb_datasource_connection,
     cb_delete_temp_folder,
 
-    cb_transaction @since(version: "24.3.3"),
     cb_workspace_configuration @since(version: "25.1.1")
-    cb_ai @since(version: "25.1.1")
     cb_notification @since(version: "25.2.1")
     cb_session_action @since(version: "25.3.1")
 }
@@ -125,30 +68,6 @@ interface CBServerEvent {
 interface CBClientEvent {
     id: CBClientEventId!
     topicId: CBEventTopic
-}
-
-"Datasource folder event"
-type CBDatasourceFolderEvent implements CBServerEvent {
-    id: CBServerEventId!
-    topicId: CBEventTopic
-    nodePaths: [String!]! # list of folders node ids
-    projectId: String!
-}
-
-"Datasource event"
-type CBDatasourceEvent implements CBServerEvent {
-    id: CBServerEventId!
-    topicId: CBEventTopic
-    dataSourceIds: [String!]! # list of datasources ids
-    projectId: String!
-}
-
-"Resource manager event"
-type CBRMEvent implements CBServerEvent {
-    id: CBServerEventId!
-    topicId: CBEventTopic
-    resourcePath: String!
-    projectId: String!
 }
 
 "Server Config event"
@@ -188,12 +107,6 @@ type WSSessionExpiredEvent implements CBServerEvent {
     topicId: CBEventTopic
 }
 
-"RM project update event"
-type CBProjectUpdateEvent implements CBServerEvent {
-    id: CBServerEventId!
-    topicId: CBEventTopic
-    projectId: String!
-}
 
 "Subject permission update event"
 type CBSubjectPermissionUpdateEvent implements CBServerEvent {
@@ -223,22 +136,6 @@ type CBProjectsActiveEvent implements CBClientEvent {
     projectIds: [String!]!
 }
 
-"Database output log event"
-type CBDatabaseOutputLogEvent implements CBServerEvent {
-    id: CBServerEventId!
-    topicId: CBEventTopic
-    contextId: String!
-    messages: [WSOutputLogInfo!]!
-    eventTimestamp: Int!
-}
-
-"Define the type for WSOutputLogInfo"
-type WSOutputLogInfo {
-    severity: String
-    message: String
-    # Add more fields if needed
-}
-
 "Async task info status event"
 type WSAsyncTaskInfo @since(version: "24.3.1") {
     id: CBServerEventId!
@@ -247,73 +144,11 @@ type WSAsyncTaskInfo @since(version: "24.3.1") {
     running: Boolean!
 }
 
-"Datasource disconnect event"
-type WSDataSourceDisconnectEvent implements CBServerEvent {
-    id: CBServerEventId!
-    topicId: CBEventTopic
-    connectionId: String!
-    projectId: String!
-    timestamp: Int!
-}
-"Datasource connect event"
-type WSDataSourceConnectEvent implements CBServerEvent {
-    id: CBServerEventId!
-    topicId: CBEventTopic
-    connectionId: String!
-    projectId: String!
-    timestamp: Int!
-}
-
-"Datasource count event in transactional mode"
-type WSTransactionalCountEvent implements CBServerEvent {
-    id: CBServerEventId!
-    topicId: CBEventTopic
-    contextId: String!
-    projectId: String!
-    connectionId: String!
-    transactionalCount: Int!
-}
-
-type WSAIChatMessageChunkEvent implements CBServerEvent @since(version: "25.1.1") {
-    id: CBServerEventId!
-    topicId: CBEventTopic
-    conversationId: ID!
-    messageId: ID!
-    chunk: String
-    completed: Boolean!
-}
-
-type WSAIChatMessageErrorEvent implements CBServerEvent @since(version: "25.1.1") {
-    id: CBServerEventId!
-    topicId: CBEventTopic
-    conversationId: ID!
-    messageId: ID!
-    errorMessage: String
-}
-
-
-type WSAIChatMessageEvent implements CBServerEvent @since(version: "25.3.5") {
-    id: CBServerEventId!
-    topicId: CBEventTopic
-    conversationId: ID!
-    messageId: ID!
-    role: String!
-    content: String!
-    displayMessage: String!
-    time: String!
-}
-
 enum WSServerNotificationEventType {
     INFO
     ERROR
     LOADING
     CUSTOM
-}
-
-"Query parameter information"
-type WSQueryParameterInfo {
-    name: String!
-    value: String
 }
 
 "General event for showing user notification"
@@ -325,54 +160,13 @@ type WSServerNotificationEvent implements CBServerEvent @since(version: "25.2.1"
     notificationType: WSServerNotificationEventType!
 }
 
+#TODO: move out
 "Event for opening URL in client application"
 type WSOpenUrlEvent implements CBServerEvent @since(version: "25.3.1") {
     id: CBServerEventId!
     topicId: CBEventTopic!
     timestamp: Int!
     url: String!
-}
-
-type WSSessionTaskConfirmationRequestEvent implements CBServerEvent @since(version: "25.2.2") {
-    id: CBServerEventId!
-    topicId: CBEventTopic!
-    taskId: ID!
-    title: String!
-    message: String!
-}
-
-type WSSessionTaskQueryConfirmationRequestEvent implements CBServerEvent @since(version: "25.2.2") {
-    id: CBServerEventId!
-    topicId: CBEventTopic!
-    taskId: ID!
-    title: String!
-    message: String!
-    query: String!
-}
-
-type WSSessionTaskConfirmationEvent implements CBClientEvent @since(version: "25.2.2") {
-    id: CBClientEventId!
-    topicId: CBEventTopic
-    taskId: ID!
-    confirmed: Boolean!
-    skipConfirmations: Boolean!
-}
-
-type WSSessionTaskQueryParamsConfirmationEvent implements CBServerEvent @since(version: "26.0.0") {
-    id: CBServerEventId!
-    topicId: CBEventTopic!
-    taskId: ID!
-    title: String!
-    message: String!
-    query: String!
-    parameters: [WSQueryParameterInfo]!
-}
-
-type WSSessionTaskWithParametersConfirmationEvent implements CBClientEvent @since(version: "25.2.5") {
-    id: CBClientEventId!
-    topicId: CBEventTopic
-    taskId: ID!
-    parameters: Object!
 }
 
 extend type Query {
