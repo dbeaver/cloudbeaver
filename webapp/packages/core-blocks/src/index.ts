@@ -60,7 +60,6 @@ export { default as ConnectionImageWithMaskSvgStyles } from './ConnectionImageWi
 export * from './Menu/AriaKit/MenuAriaKit.js';
 export * from './Menu/Menu.js';
 export { default as MenuStyles } from './Menu/Menu.module.css';
-export * from './Menu/MenuBarSmallItem.js';
 export * from './Menu/MenuEmptyItem.js';
 export * from './Menu/MenuItem.js';
 export { default as MenuItemStyles } from './Menu/MenuItem.module.css';

@@ -8,7 +8,8 @@
 import { observer } from 'mobx-react-lite';
 import { useCallback } from 'react';
 
-import { Container, MenuBarSmallItem, s, Textarea, useClipboard, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { Container, s, Textarea, useClipboard, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { Button } from '@dbeaver/ui-kit';
 
 import type { ILogEntry } from './ILogEntry.js';
 import classes from './LogViewerInfoPanel.module.css';
@@ -34,12 +35,25 @@ export const LogViewerInfoPanel = observer<Props>(function LogViewerInfoPanel({ 
     <Container className={s(styles, { panelWrapper: true }, className)} vertical>
       <Container className={s(styles, { buttons: true })} noGrow noWrap>
         <Container keepSize noWrap>
-          <MenuBarSmallItem className={s(styles, { button: true })} title={translate('ui_copy_to_clipboard')} onClick={copyMessage}>
+          <Button
+            className='tw:flex-none'
+            variant='ghost'
+            size='small'
+            title={translate('ui_copy_to_clipboard')}
+            onClick={copyMessage}
+          >
             {translate('ui_copy_to_clipboard')}
-          </MenuBarSmallItem>
-          <MenuBarSmallItem className={s(styles, { button: true })} title={translate('ui_close')} onClick={onClose}>
+          </Button>
+
+          <Button
+            className='tw:flex-none'
+            variant='ghost'
+            size='small'
+            title={translate('ui_close')}
+            onClick={onClose}
+          >
             {translate('ui_close')}
-          </MenuBarSmallItem>
+          </Button>
         </Container>
       </Container>
       <div className={s(styles, { contentWrapper: true })}>

@@ -7,7 +7,6 @@
  */
 @layer components {
   .dbv-kit-button {
-    --dbv-kit-btn-padding-inline: 15px;
     --dbv-kit-btn-outline-color: var(--theme-primary);
     --dbv-kit-control-disabled-foreground: #3535355e;
     --dbv-kit-control-disabled-background: #3535351f;
