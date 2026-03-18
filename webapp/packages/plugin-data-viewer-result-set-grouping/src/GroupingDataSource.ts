@@ -6,7 +6,11 @@
  * you may not use this file except in compliance with the License.
  */
 import type { IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
-import type { AsyncTaskInfo } from '@cloudbeaver/core-sdk';
+import type { IServiceProvider } from '@cloudbeaver/core-di';
+import { CommonDialogService } from '@cloudbeaver/core-dialogs';
+import { AsyncTaskInfoEventHandler, AsyncTaskInfoService } from '@cloudbeaver/core-root';
+import { type AsyncTaskInfo, GraphQLService } from '@cloudbeaver/core-sdk';
+import { DatabaseDataFeature } from '@cloudbeaver/plugin-data-viewer';
 import { type IDataQueryOptions, QueryDataSource } from '@cloudbeaver/plugin-sql-editor';
 
 export interface IDataGroupingOptions extends IDataQueryOptions {
@@ -18,6 +22,17 @@ export interface IDataGroupingOptions extends IDataQueryOptions {
 }
 
 export class GroupingDataSource extends QueryDataSource<IDataGroupingOptions> {
+  constructor(
+    serviceProvider: IServiceProvider,
+    commonDialogService: CommonDialogService,
+    asyncTaskInfoEventHandler: AsyncTaskInfoEventHandler,
+    graphQLService: GraphQLService,
+    asyncTaskInfoService: AsyncTaskInfoService,
+  ) {
+    super(serviceProvider, commonDialogService, asyncTaskInfoEventHandler, graphQLService, asyncTaskInfoService);
+    this.setFeature(DatabaseDataFeature.Grouping);
+  }
+
   protected override async executeQuery(
     executionContextInfo: IConnectionExecutionContextInfo,
     options: IDataGroupingOptions,
