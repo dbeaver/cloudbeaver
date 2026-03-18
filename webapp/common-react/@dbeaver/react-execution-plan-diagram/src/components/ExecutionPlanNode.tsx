@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { FocusEventHandler, KeyboardEventHandler, ReactElement, Ref } from 'react';
+import { useCallback, type FocusEventHandler, type KeyboardEventHandler, type ReactElement, type Ref } from 'react';
 import { useTranslate } from '@dbeaver/react-translate';
 import { formatNumber } from '@dbeaver/js-helpers';
 
@@ -14,7 +14,8 @@ import type { IPlanFeatures } from '../types/IPlanFeatures.js';
 import type { IPlanNode } from '../types/IPlanNode.js';
 
 import { ExecutionPlanNodeMetric } from './ExecutionPlanNodeMetric.js';
-import './PlanNode.css';
+import { ExecutionPlanCollapseIndicator } from './ExecutionPlanCollapseIndicator.js';
+import './ExecutionPlanNode.css';
 
 export interface IExecutionPlanNodeProps {
   node: IPlanNode;
@@ -68,9 +69,15 @@ export function ExecutionPlanNode({
         { type: node.type },
       )
     : undefined;
-  const handleFocus: FocusEventHandler<HTMLDivElement> = () => {
+  const handleFocus: FocusEventHandler<HTMLDivElement> = useCallback(() => {
     onFocus?.(node.id);
-  };
+  }, [node.id, onFocus]);
+
+  const handleCollapseToggle = useCallback(() => {
+    if (hasChildren) {
+      onToggleCollapse?.(node.id);
+    }
+  }, [hasChildren, node.id, onToggleCollapse]);
 
   return (
     <div
@@ -120,21 +127,7 @@ export function ExecutionPlanNode({
           <div className="dbv-plan-node__cost-bar-fill" style={{ width: `${percent}%` }} />
         </div>
       )}
-      {hasChildren && (
-        <div
-          className="dbv-plan-node__collapse-indicator"
-          aria-hidden
-          onClick={e => {
-            e.stopPropagation();
-            onToggleCollapse?.(node.id);
-          }}
-        >
-          <svg width="8" height="8" viewBox="0 0 8 8">
-            <line x1="1" y1="4" x2="7" y2="4" stroke="currentColor" strokeWidth="1.5" />
-            {collapsed && <line x1="4" y1="1" x2="4" y2="7" stroke="currentColor" strokeWidth="1.5" />}
-          </svg>
-        </div>
-      )}
+      {hasChildren && <ExecutionPlanCollapseIndicator collapsed={collapsed} onToggleCollapse={handleCollapseToggle} />}
     </div>
   );
 }

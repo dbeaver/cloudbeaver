@@ -8,7 +8,7 @@
 
 import type { ILayoutEdge } from '../layout/ILayoutEdge.js';
 
-import './PlanEdge.css';
+import './ExecutionPlanEdge.css';
 
 export interface IExecutionPlanEdgeProps {
   edge: ILayoutEdge;

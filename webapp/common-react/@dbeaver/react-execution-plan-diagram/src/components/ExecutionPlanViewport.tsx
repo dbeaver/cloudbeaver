@@ -16,7 +16,7 @@ import { usePlanKeyboardNavigation } from '../hooks/usePlanKeyboardNavigation.js
 import { ExecutionPlanEdge } from './ExecutionPlanEdge.js';
 import { ExecutionPlanNode } from './ExecutionPlanNode.js';
 
-import './PlanViewport.css';
+import './ExecutionPlanViewport.css';
 
 export interface IExecutionPlanViewportProps {
   containerRef: Ref<HTMLDivElement>;

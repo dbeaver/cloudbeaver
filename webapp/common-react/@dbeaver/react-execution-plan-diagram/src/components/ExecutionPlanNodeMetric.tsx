@@ -9,7 +9,7 @@
 import type { ReactElement, ReactNode } from 'react';
 import { useTranslate } from '@dbeaver/react-translate';
 
-import './PlanNodeMetric.css';
+import './ExecutionPlanNodeMetric.css';
 
 interface ExecutionPlanNodeMetricProps {
   labelKey: string;

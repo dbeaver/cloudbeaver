@@ -124,31 +124,4 @@
   .dbv-plan-node__cost-bar-fill[data-high-cost] {
     background: var(--dbv-plan-node-cost-bar-high-color);
   }
-
-  .dbv-plan-node__collapse-indicator {
-    position: absolute;
-    bottom: -8px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 17px;
-    height: 17px;
-    border-radius: 50%;
-    border: 1px solid var(--dbv-plan-node-border-color);
-    background: var(--dbv-plan-node-bg);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 10px;
-    color: var(--dbv-plan-node-metric-color);
-    cursor: pointer;
-    padding: 0;
-  }
-
-  .dbv-plan-node[data-horizontal] .dbv-plan-node__collapse-indicator {
-    bottom: auto;
-    left: auto;
-    right: -9px;
-    top: 50%;
-    transform: translateY(-50%);
-  }
 }
