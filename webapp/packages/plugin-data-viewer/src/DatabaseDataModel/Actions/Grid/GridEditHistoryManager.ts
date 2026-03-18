@@ -36,7 +36,13 @@ export class GridEditHistoryManager<TKey extends IGridDataKey, TCell> {
   }
 
   recordCellEdit(data: IGridHistoryCellUpdateData<TKey, TCell>): void {
-    this.compressLastEditedCellHistory(data.key);
+    // Pass the key to skip compression while the same cell is still being edited.
+    // Without a key, compression always runs (e.g. for bulk edits).
+    if (data.updates.length === 1) {
+      this.compressLastEditedCellHistory(data.updates[0]!.key);
+    } else {
+      this.compressLastEditedCellHistory();
+    }
 
     this.history.add({
       source: GRID_HISTORY_SOURCE.EDIT_CELL,
@@ -78,18 +84,27 @@ export class GridEditHistoryManager<TKey extends IGridDataKey, TCell> {
       return;
     }
 
-    const isEditingSameCell = key && GridDataKeysUtils.isElementsKeyEqual(currentHistoryEntry.data.key, key);
+    const currentUpdate = currentHistoryEntry.data.updates.length === 1 ? currentHistoryEntry.data.updates[0] : undefined;
+
+    if (!currentUpdate) {
+      return;
+    }
+
+    const isEditingSameCell = key && GridDataKeysUtils.isElementsKeyEqual(currentUpdate.key, key);
 
     if (isEditingSameCell) {
       return;
     }
 
-    this.compressCellEditHistory(currentHistoryEntry.data.key);
+    this.compressCellEditHistory(currentUpdate.key);
   }
 
   private compressCellEditHistory(key: TKey): void {
     this.history.compress(
-      entry => isGridHistoryEditCellData<TKey, TCell>(entry) && GridDataKeysUtils.isElementsKeyEqual(entry.data.key, key),
+      entry =>
+        isGridHistoryEditCellData<TKey, TCell>(entry) &&
+        entry.data.updates.length === 1 &&
+        GridDataKeysUtils.isElementsKeyEqual(entry.data.updates[0]!.key, key),
       entries => {
         const firstEntry = entries[0]! as IHistoryEntry<IGridHistoryCellUpdateData<TKey, TCell>>;
         const lastEntry = entries[entries.length - 1]! as IHistoryEntry<IGridHistoryCellUpdateData<TKey, TCell>>;
@@ -97,9 +112,13 @@ export class GridEditHistoryManager<TKey extends IGridDataKey, TCell> {
         return {
           source: GRID_HISTORY_SOURCE.EDIT_CELL,
           data: {
-            key,
-            value: lastEntry.data.value,
-            prevValue: firstEntry.data.prevValue,
+            updates: [
+              {
+                key,
+                value: lastEntry.data.updates[0]!.value,
+                prevValue: firstEntry.data.updates[0]!.prevValue,
+              },
+            ],
           },
         };
       },

@@ -35,4 +35,8 @@ export default [
   ['plugin_navigation_tree_settings_disable', 'Disable'],
   ['plugin_navigation_tree_settings_disable_description', 'Disable navigation tree for all users'],
   ['plugin_navigation_tree_toolbar_menu_title', 'Tree Toolbar'],
+  ['plugin_navigation_tree_settings_menu_title', 'Tree settings'],
+  ['plugin_navigation_tree_settings_show_filter', 'Show filter'],
+  ['plugin_navigation_tree_settings_show_descriptions', 'Show descriptions'],
+  ['plugin_navigation_tree_settings_save_state', 'Save tree state'],
 ];

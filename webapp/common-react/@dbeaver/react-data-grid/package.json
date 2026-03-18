@@ -8,6 +8,7 @@
     "./*": "./lib/*.js"
   },
   "scripts": {
+    "build": "tsc -b",
     "clear": "rimraf lib"
   },
   "files": [

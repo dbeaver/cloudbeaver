@@ -172,9 +172,7 @@ export class GridEditAction<
     const prevValue = update.update[key.column.index] as TCell;
 
     this.historyManager.recordCellEdit({
-      key,
-      value,
-      prevValue,
+      updates: [{ key, value, prevValue }],
     });
 
     update.update[key.column.index] = value;
@@ -193,6 +191,35 @@ export class GridEditAction<
     });
 
     this.removeEmptyUpdate(update);
+  }
+
+  setMany(updates: Array<{ key: TKey; value: TCell }>): void {
+    if (updates.length === 0) {
+      return;
+    }
+
+    const historyUpdates: Array<{ key: TKey; prevValue: TCell; value: TCell }> = [];
+    const actionValues: Array<{ key: TKey; prevValue: TCell; value: TCell }> = [];
+
+    for (const { key, value } of updates) {
+      const [update] = this.getOrCreateUpdate(key.row, DatabaseEditChangeType.update);
+      const prevValue = update.update[key.column.index] as TCell;
+
+      historyUpdates.push({ key, prevValue, value });
+      actionValues.push({ key, prevValue, value });
+
+      update.update[key.column.index] = value;
+      this.removeEmptyUpdate(update);
+    }
+
+    this.historyManager.recordCellEdit({ updates: historyUpdates });
+
+    this.action.execute({
+      resultId: this.result.id,
+      type: DatabaseEditChangeType.update,
+      revert: false,
+      value: actionValues,
+    });
   }
 
   add(...keys: TKey[]): void {
