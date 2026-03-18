@@ -31,7 +31,7 @@ export const TabPanel: React.FC<TabPanelProps> = observer(function TabPanel({ ta
   const tabContext = useMemo(() => ({ tabId }), [tabId]);
   const store = useTabsStore();
   const selectedId = useTabsState('selectedId');
-  const selected = getComputed(() => selectedId === tabId);
+  const selected = selectedId === tabId;
   const enabled = getComputed(() => (lazy || tabContextState.lazy) && !selected);
 
   if (enabled) {

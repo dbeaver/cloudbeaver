@@ -7,7 +7,7 @@
  */
 import { useContext, useEffect, useRef } from 'react';
 
-import { FormContext, getComputed, useExecutor, useObjectRef } from '@cloudbeaver/core-blocks';
+import { FormContext, useExecutor, useObjectRef } from '@cloudbeaver/core-blocks';
 import { ExecutorHandlersCollection } from '@cloudbeaver/core-executor';
 
 import { TabsContext } from './TabsContext.js';
@@ -25,7 +25,7 @@ export function useTabsValidation(tabId: string): React.RefObject<HTMLDivElement
   const panelRef = useRef<HTMLDivElement>(null);
   const tabsValidationContext = useContext(TabsValidationContext);
   const selectedId = useTabsState('selectedId');
-  const selected = getComputed(() => selectedId === tabId);
+  const selected = selectedId === tabId;
 
   const tabPropsRef = useObjectRef({ tabId, tabsValidationContext });
   const validationState = useObjectRef(
