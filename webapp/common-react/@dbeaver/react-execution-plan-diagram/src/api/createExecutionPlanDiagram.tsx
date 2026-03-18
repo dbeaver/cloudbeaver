@@ -200,6 +200,11 @@ export function createExecutionPlanDiagram(
         root = null;
       }
 
+      state.data = null;
+      state.options = {};
+      state.selectedNodeId = null;
+      state.callbacks = {};
+      state.translations = {};
       state.diagramActions = null;
     },
   };
