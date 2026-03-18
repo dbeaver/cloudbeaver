@@ -43,13 +43,17 @@ export interface IExecutionPlanDiagramAPI {
   dispose(): void;
 }
 
-/** Invisible child component that captures toolbar actions from DiagramContext. */
-function ActionsCapture({ onActions }: { onActions: (actions: IDiagramActions | null) => void }) {
+/** Invisible child component that captures toolbar actions from DiagramContext into a ref. */
+function ActionsCapture({ actionsRef }: { actionsRef: { current: IDiagramActions | null } }) {
   const actions = useContext(DiagramContext);
 
   useEffect(() => {
-    onActions(actions);
-  }, [actions, onActions]);
+    actionsRef.current = actions;
+
+    return () => {
+      actionsRef.current = null;
+    };
+  }, [actions, actionsRef]);
 
   return null;
 }
@@ -60,7 +64,6 @@ interface IExecutionPlanDiagramState {
   selectedNodeId: string | null;
   callbacks: IPlanDiagramCallbacks;
   translations: IPlanTranslations;
-  diagramActions: IDiagramActions | null;
 }
 
 function hasNode(data: IPlanData | null, nodeId: string | null): boolean {
@@ -95,12 +98,9 @@ export function createExecutionPlanDiagram(
     selectedNodeId: null,
     callbacks: callbacks ?? {},
     translations: translations ?? {},
-    diagramActions: null,
   };
 
-  function captureActions(actions: IDiagramActions | null): void {
-    state.diagramActions = actions;
-  }
+  const diagramActionsRef: { current: IDiagramActions | null } = { current: null };
 
   function render(): void {
     if (!root) {
@@ -139,7 +139,7 @@ export function createExecutionPlanDiagram(
               render();
             },
           },
-          createElement(ActionsCapture, { onActions: captureActions }),
+          createElement(ActionsCapture, { actionsRef: diagramActionsRef }),
         ),
       ),
     );
@@ -169,16 +169,16 @@ export function createExecutionPlanDiagram(
       return state.selectedNodeId;
     },
     zoomIn(): void {
-      state.diagramActions?.zoomIn();
+      diagramActionsRef.current?.zoomIn();
     },
     zoomOut(): void {
-      state.diagramActions?.zoomOut();
+      diagramActionsRef.current?.zoomOut();
     },
     fitToScreen(): void {
-      state.diagramActions?.fitToScreen();
+      diagramActionsRef.current?.fitToScreen();
     },
     resetView(): void {
-      state.diagramActions?.resetView();
+      diagramActionsRef.current?.resetView();
     },
     dispose(): void {
       if (root) {
@@ -191,7 +191,7 @@ export function createExecutionPlanDiagram(
       state.selectedNodeId = null;
       state.callbacks = {};
       state.translations = {};
-      state.diagramActions = null;
+      diagramActionsRef.current = null;
     },
   };
 
