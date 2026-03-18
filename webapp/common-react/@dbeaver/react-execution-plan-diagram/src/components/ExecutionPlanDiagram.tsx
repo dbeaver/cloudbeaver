@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { type ReactNode, useMemo } from 'react';
+import { type ReactNode, type Ref, useImperativeHandle, useMemo } from 'react';
 
 import { useExecutionPlanDiagramState } from '../hooks/useExecutionPlanDiagramState.js';
 import { usePanZoom } from '../hooks/usePanZoom.js';
@@ -23,6 +23,7 @@ import './theme.css';
 import './ExecutionPlanDiagram.css';
 
 export interface IExecutionPlanDiagramProps extends IPlanDiagramCallbacks {
+  ref?: Ref<IDiagramActions>;
   data: IPlanData;
   options?: IPlanDiagramOptions;
   selectedNodeId?: string | null;
@@ -30,6 +31,7 @@ export interface IExecutionPlanDiagramProps extends IPlanDiagramCallbacks {
 }
 
 export function ExecutionPlanDiagram({
+  ref,
   data,
   options,
   selectedNodeId: externalSelectedNodeId,
@@ -57,13 +59,12 @@ export function ExecutionPlanDiagram({
     onLayoutComputed: setContentSize,
   });
 
-  const diagramActions = useMemo<IDiagramActions>(
-    () => ({ zoomIn, zoomOut, fitToScreen, resetView }),
-    [zoomIn, zoomOut, fitToScreen, resetView],
-  );
+  const diagramActions = useMemo<IDiagramActions>(() => ({ zoomIn, zoomOut, fitToScreen, resetView }), [zoomIn, zoomOut, fitToScreen, resetView]);
+
+  useImperativeHandle(ref, () => diagramActions, [diagramActions]);
 
   return (
-    <DiagramContext.Provider value={diagramActions}>
+    <DiagramContext value={diagramActions}>
       <div className={`dbv-plan-diagram ${options?.className ?? ''}`}>
         {/* Hidden measuring container: renders nodes to measure their real DOM size */}
         <div ref={measureRef} className="dbv-plan-diagram__measure">
@@ -103,6 +104,6 @@ export function ExecutionPlanDiagram({
           </>
         )}
       </div>
-    </DiagramContext.Provider>
+    </DiagramContext>
   );
 }
