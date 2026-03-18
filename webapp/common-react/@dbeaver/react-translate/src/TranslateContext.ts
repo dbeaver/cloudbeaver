@@ -9,17 +9,20 @@
 import { createContext } from 'react';
 import type { LocalizationToken } from './LocalizationToken.js';
 
-const ARG_PLACEHOLDER_REGEX = /\{arg:([^}]+)\}/g;
-
 export function interpolateTranslation(template: string, args?: Record<string | number, unknown>): string {
   if (!args) {
     return template;
   }
 
-  return template.replace(ARG_PLACEHOLDER_REGEX, (match, key) => {
-    const value = args[key];
-    return value == null ? match : String(value);
-  });
+  let result = template;
+
+  for (const [key, value] of Object.entries(args)) {
+    if (value != null) {
+      result = result.split(`{arg:${key}}`).join(String(value));
+    }
+  }
+
+  return result;
 }
 
 export function defaultTranslateFn<T extends LocalizationToken | undefined>(token: T, fallback?: T, args?: Record<string | number, unknown>): T {
