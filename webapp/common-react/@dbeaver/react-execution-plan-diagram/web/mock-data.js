@@ -254,12 +254,27 @@ function loadMockData() {
       console.log('Selected execution plan node:', nodeId, node);
     },
   });
-  console.log('Mock plan loaded. Click a node to see onNodeSelect output in the console. Try: loadComplexMock(), setPlanData(MOCK_PLAN_COMPLEX)');
+  console.log('Mock plan loaded. Click a node to see onNodeSelect output in the console. Try: loadComplexMock(), loadWithTranslations(), setPlanData(MOCK_PLAN_COMPLEX)');
 }
 
 function loadComplexMock() {
   window.setPlanData(MOCK_PLAN_COMPLEX);
   console.log('Complex mock plan loaded.');
+}
+
+function loadWithTranslations() {
+  window.createExecutionPlanDiagram(MOCK_PLAN, {
+    highlightHeavyRoute: true,
+    enableCollapse: true,
+  }, {
+    onNodeSelect(nodeId, node) {
+      console.log('Selected execution plan node:', nodeId, node);
+    },
+  }, {
+    'plugin_sql_execution_plan_diagram_node_expand_hint': '{arg:type} — нажмите C чтобы развернуть',
+    'plugin_sql_execution_plan_diagram_node_collapse_hint': '{arg:type} — нажмите C чтобы свернуть',
+  });
+  console.log('Mock plan with translations loaded. Focus a node with children to see interpolated hints.');
 }
 
 console.log('Mock data ready. Run loadMockData() to initialize the diagram.');

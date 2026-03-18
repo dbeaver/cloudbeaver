@@ -8,7 +8,7 @@
 
 import { createElement, useContext, useEffect } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
-import { TranslateContext, type TranslateFn } from '@dbeaver/react-translate';
+import { defaultTranslateFn, TranslateContext, type TranslateFn } from '@dbeaver/react-translate';
 
 import { DiagramContext, type IDiagramActions } from '../components/DiagramContext.js';
 import { ExecutionPlanDiagram } from '../components/ExecutionPlanDiagram.js';
@@ -61,19 +61,6 @@ interface IExecutionPlanDiagramState {
   callbacks: IPlanDiagramCallbacks;
   translations: IPlanTranslations;
   diagramActions: IDiagramActions | null;
-}
-
-const REPLACE_REGEX = /\{arg:([^}]+)\}/g;
-
-function interpolateTranslation(template: string, args?: Record<string | number, any>): string {
-  if (!args) {
-    return template;
-  }
-
-  return template.replace(REPLACE_REGEX, (match, key) => {
-    const value = args[key];
-    return value == null ? match : String(value);
-  });
 }
 
 function hasNode(data: IPlanData | null, nodeId: string | null): boolean {
@@ -131,10 +118,9 @@ export function createExecutionPlanDiagram(
         {
           value: {
             translate: ((token, fallback, args) => {
-              const key = token ? String(token) : undefined;
-              const template = (key && state.translations[key]) || fallback || key;
+              const translated = token ? state.translations[token] : undefined;
 
-              return (template ? interpolateTranslation(template, args) : template) as typeof token;
+              return defaultTranslateFn(token, (translated || fallback) as typeof token, args);
             }) as TranslateFn,
           },
         },
