@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { useCallback, type FocusEventHandler, type KeyboardEventHandler, type ReactElement, type Ref } from 'react';
+import { memo, useCallback, type FocusEventHandler, type KeyboardEventHandler, type ReactElement, type Ref } from 'react';
 import { useTranslate } from '@dbeaver/react-translate';
 import { formatNumber } from '@dbeaver/js-helpers';
 
@@ -39,7 +39,7 @@ export interface IExecutionPlanNodeProps {
   onToggleCollapse?: (nodeId: string) => void;
 }
 
-export function ExecutionPlanNode({
+export const ExecutionPlanNode = memo(function ExecutionPlanNode({
   node,
   x,
   y,
@@ -79,6 +79,14 @@ export function ExecutionPlanNode({
     }
   }, [hasChildren, node.id, onToggleCollapse]);
 
+  const handleClick = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      e.stopPropagation();
+      onSelect?.(node.id);
+    },
+    [node.id, onSelect],
+  );
+
   return (
     <div
       ref={nodeRef}
@@ -97,10 +105,7 @@ export function ExecutionPlanNode({
       aria-expanded={hasChildren ? !collapsed : undefined}
       onFocus={handleFocus}
       onKeyDown={onKeyDown}
-      onClick={e => {
-        e.stopPropagation();
-        onSelect?.(node.id);
-      }}
+      onClick={handleClick}
     >
       <div className="dbv-plan-node__caption">{node.type}</div>
       {node.name && <div className="dbv-plan-node__name">{node.name}</div>}
@@ -130,7 +135,7 @@ export function ExecutionPlanNode({
       {hasChildren && <ExecutionPlanCollapseIndicator collapsed={collapsed} onToggleCollapse={handleCollapseToggle} />}
     </div>
   );
-}
+});
 
 function formatDuration(ms: number): string {
   if (ms >= 1000) {
