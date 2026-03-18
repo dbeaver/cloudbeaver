@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { ReactElement, ReactNode } from 'react';
+import { memo, type ReactElement, type ReactNode } from 'react';
 import { useTranslate } from '@dbeaver/react-translate';
 
 import './ExecutionPlanNodeMetric.css';
@@ -17,7 +17,11 @@ interface ExecutionPlanNodeMetricProps {
   children: ReactNode;
 }
 
-export function ExecutionPlanNodeMetric({ labelKey, label, children }: ExecutionPlanNodeMetricProps): ReactElement {
+export const ExecutionPlanNodeMetric = memo(function ExecutionPlanNodeMetric({
+  labelKey,
+  label,
+  children,
+}: ExecutionPlanNodeMetricProps): ReactElement {
   const translate = useTranslate();
 
   return (
@@ -26,4 +30,4 @@ export function ExecutionPlanNodeMetric({ labelKey, label, children }: Execution
       <span className="dbv-plan-node-metric__value">{children}</span>
     </div>
   );
-}
+});
