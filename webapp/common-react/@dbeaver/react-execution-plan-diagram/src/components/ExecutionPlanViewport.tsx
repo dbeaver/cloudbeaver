@@ -86,6 +86,9 @@ const PlanViewportContent = memo(function PlanViewportContent({
       <div className="dbv-plan-viewport__nodes" role="listbox" aria-label="Execution plan nodes">
         {layoutNodes.map(layoutNode => (
           <ExecutionPlanNode
+            ref={element => {
+              setNodeRef(layoutNode.id, element);
+            }}
             key={layoutNode.id}
             node={layoutNode.node}
             x={layoutNode.x}
@@ -99,9 +102,6 @@ const PlanViewportContent = memo(function PlanViewportContent({
             hasChildren={collapseEnabled && layoutNode.node.children != null && layoutNode.node.children.length > 0}
             horizontal={horizontal}
             tabIndex={activeNodeId === layoutNode.id ? 0 : -1}
-            nodeRef={element => {
-              setNodeRef(layoutNode.id, element);
-            }}
             onFocus={handleNodeFocus}
             onKeyDown={event => {
               handleNodeKeyDown(event, layoutNode.id);

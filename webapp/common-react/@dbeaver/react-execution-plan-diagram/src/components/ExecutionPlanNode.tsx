@@ -32,7 +32,7 @@ export interface IExecutionPlanNodeProps {
   hasChildren?: boolean;
   horizontal?: boolean;
   tabIndex?: number;
-  nodeRef?: Ref<HTMLDivElement>;
+  ref?: Ref<HTMLDivElement>;
   onFocus?: (nodeId: string) => void;
   onKeyDown?: KeyboardEventHandler<HTMLDivElement>;
   onSelect?: (nodeId: string) => void;
@@ -54,7 +54,7 @@ export const ExecutionPlanNode = memo(function ExecutionPlanNode({
   hasChildren,
   horizontal,
   tabIndex,
-  nodeRef,
+  ref,
   onFocus,
   onKeyDown,
   onSelect,
@@ -89,7 +89,7 @@ export const ExecutionPlanNode = memo(function ExecutionPlanNode({
 
   return (
     <div
-      ref={nodeRef}
+      ref={ref}
       className="dbv-plan-node"
       data-hint={hint}
       data-node-id={node.id}
