@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { createElement, useContext, useEffect } from 'react';
+import { useContext, useEffect } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { defaultTranslateFn, TranslateContext, type TranslateFn } from '@dbeaver/react-translate';
 
@@ -112,36 +112,30 @@ export function createExecutionPlanDiagram(
       return;
     }
 
+    const translate: TranslateFn = ((token, fallback, args) => {
+      const translated = token ? state.translations[token] : undefined;
+
+      return defaultTranslateFn(token, (translated || fallback) as typeof token, args);
+    }) as TranslateFn;
+
     root.render(
-      createElement(
-        TranslateContext.Provider,
-        {
-          value: {
-            translate: ((token, fallback, args) => {
-              const translated = token ? state.translations[token] : undefined;
+      <TranslateContext.Provider value={{ translate }}>
+        <ExecutionPlanDiagram
+          data={state.data}
+          options={state.options}
+          selectedNodeId={state.selectedNodeId}
+          onNodeSelect={(nodeId, node) => {
+            state.selectedNodeId = nodeId;
+            state.callbacks.onNodeSelect?.(nodeId, node);
 
-              return defaultTranslateFn(token, (translated || fallback) as typeof token, args);
-            }) as TranslateFn,
-          },
-        },
-        createElement(
-          ExecutionPlanDiagram,
-          {
-            data: state.data,
-            options: state.options,
-            selectedNodeId: state.selectedNodeId,
-            onNodeSelect: (nodeId, node) => {
-              state.selectedNodeId = nodeId;
-              state.callbacks.onNodeSelect?.(nodeId, node);
+            window.onPlanNodeSelected?.(nodeId);
 
-              window.onPlanNodeSelected?.(nodeId);
-
-              render();
-            },
-          },
-          createElement(ActionsCapture, { actionsRef: diagramActionsRef }),
-        ),
-      ),
+            render();
+          }}
+        >
+          <ActionsCapture actionsRef={diagramActionsRef} />
+        </ExecutionPlanDiagram>
+      </TranslateContext.Provider>,
     );
   }
 
