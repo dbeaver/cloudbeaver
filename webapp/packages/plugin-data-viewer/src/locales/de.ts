@@ -43,4 +43,5 @@ export default [
   ['settings_data_editor_fetch_default_name', 'Standard fetch size'],
   ['settings_data_editor_fetch_default_description', 'Standardnummer der Zeilen zum Abrufen'],
   ['plugin_data_viewer_no_available_presentation', 'Keine verfügbare Präsentation'],
+  ['plugin_data_viewer_fetch_size', 'Abrufgröße'],
 ];

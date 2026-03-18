@@ -1,13 +1,13 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 import { useMemo } from 'react';
 
-import { createLazyLoader, useLazyImport, useObjectRef } from '@cloudbeaver/core-blocks';
+import { createLazyLoader, fuzzyMatch, useLazyImport, useObjectRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { GlobalConstants } from '@cloudbeaver/core-utils';
@@ -38,21 +38,42 @@ export function useSqlDialectAutocompletion(data: ISQLEditorData): [Compartment,
         ({ replacementString, displayString }) =>
           sanitizeProposal(displayString) === wordLowerCase || replacementString.toLocaleLowerCase() === wordLowerCase,
       );
-      const filteredProposals = proposals
-        .filter(({ replacementString, displayString }) => {
-          if (word === '*') {
-            return true;
-          }
 
-          const display = sanitizeProposal(displayString);
-          const replacement = replacementString.toLocaleLowerCase();
+      let filteredProposals: SQLProposal[];
 
-          const displayMatch = display !== wordLowerCase && (display.startsWith(wordLowerCase) || display.includes(wordLowerCase));
-          const replacementMatch = replacement !== wordLowerCase && (replacement.startsWith(wordLowerCase) || replacement.includes(wordLowerCase));
+      if (word === '*') {
+        filteredProposals = proposals;
+      } else {
+        const matchResults = fuzzyMatch({
+          query: word,
+          items: proposals.filter(
+            ({ replacementString, displayString }) =>
+              sanitizeProposal(displayString) !== wordLowerCase && replacementString.toLocaleLowerCase() !== wordLowerCase,
+          ),
+          fields: ['displayString', 'replacementString'],
+        });
 
-          return displayMatch || replacementMatch;
-        })
-        .sort((a, b) => (b.score ?? 0) - (a.score ?? 0));
+        filteredProposals = matchResults
+          .sort((a, b) => {
+            const aDisplayLower = sanitizeProposal(a.item.displayString).toLocaleLowerCase();
+            const aReplacementLower = a.item.replacementString.toLocaleLowerCase();
+            const bDisplayLower = sanitizeProposal(b.item.displayString).toLocaleLowerCase();
+            const bReplacementLower = b.item.replacementString.toLocaleLowerCase();
+
+            const aIncludes = aDisplayLower.includes(wordLowerCase) || aReplacementLower.includes(wordLowerCase);
+            const bIncludes = bDisplayLower.includes(wordLowerCase) || bReplacementLower.includes(wordLowerCase);
+
+            if (aIncludes && !bIncludes) {
+              return -1;
+            }
+            if (!aIncludes && bIncludes) {
+              return 1;
+            }
+
+            return (b.score ?? 0) - (a.score ?? 0);
+          })
+          .map(r => r.item);
+      }
 
       if (filteredProposals.length === 0 && !hasSameName && explicit) {
         return [
@@ -63,16 +84,14 @@ export function useSqlDialectAutocompletion(data: ISQLEditorData): [Compartment,
         ];
       }
 
-      return [
-        ...filteredProposals.map<SqlCompletion>(proposal => ({
-          label: proposal.displayString,
-          apply: (view, completion, from, to) => {
-            view.dispatch(codemirror!.insertCompletionText(view.state, proposal.replacementString, proposal.replacementOffset, to));
-          },
-          boost: proposal.score,
-          icon: proposal.icon,
-        })),
-      ];
+      return filteredProposals.map<SqlCompletion>(proposal => ({
+        label: proposal.displayString,
+        apply: (view, completion, from, to) => {
+          view.dispatch(codemirror!.insertCompletionText(view.state, proposal.replacementString, proposal.replacementOffset, to));
+        },
+        boost: proposal.score,
+        icon: proposal.icon,
+      }));
     }
 
     async function completionSource(context: CompletionContext): Promise<CompletionResult | null> {
@@ -155,7 +174,7 @@ export function useSqlDialectAutocompletion(data: ISQLEditorData): [Compartment,
       ],
       icons: false, // disable native symbol based icons
     };
-  }, [codemirror, localizationService]);
+  }, [codemirror, localizationService, optionsRef]);
 
   return useMemo(() => codemirror?.createEditorAutocompletion(config) || null, [codemirror, config]);
 }

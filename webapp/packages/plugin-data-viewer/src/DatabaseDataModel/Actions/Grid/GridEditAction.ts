@@ -172,9 +172,7 @@ export class GridEditAction<
     const prevValue = update.update[key.column.index] as TCell;
 
     this.historyManager.recordCellEdit({
-      key,
-      value,
-      prevValue,
+      updates: [{ key, value, prevValue }],
     });
 
     update.update[key.column.index] = value;
@@ -195,8 +193,69 @@ export class GridEditAction<
     this.removeEmptyUpdate(update);
   }
 
-  add(key?: TKey): void {
-    this.addRow(key?.row, undefined, key?.column);
+  setMany(updates: Array<{ key: TKey; value: TCell }>): void {
+    if (updates.length === 0) {
+      return;
+    }
+
+    const historyUpdates: Array<{ key: TKey; prevValue: TCell; value: TCell }> = [];
+    const actionValues: Array<{ key: TKey; prevValue: TCell; value: TCell }> = [];
+
+    for (const { key, value } of updates) {
+      const [update] = this.getOrCreateUpdate(key.row, DatabaseEditChangeType.update);
+      const prevValue = update.update[key.column.index] as TCell;
+
+      historyUpdates.push({ key, prevValue, value });
+      actionValues.push({ key, prevValue, value });
+
+      update.update[key.column.index] = value;
+      this.removeEmptyUpdate(update);
+    }
+
+    this.historyManager.recordCellEdit({ updates: historyUpdates });
+
+    this.action.execute({
+      resultId: this.result.id,
+      type: DatabaseEditChangeType.update,
+      revert: false,
+      value: actionValues,
+    });
+  }
+
+  add(...keys: TKey[]): void {
+    const result: TKey[] = [];
+    const rowKeys = new Set<string>();
+
+    for (const key of keys) {
+      const serialized = GridDataKeysUtils.serialize(key.row);
+
+      if (!rowKeys.has(serialized)) {
+        result.push(key);
+        rowKeys.add(serialized);
+      }
+    }
+
+    if (result.length <= 1) {
+      this.addRow(result[0]?.row, undefined, result[0]?.column);
+      return;
+    }
+
+    const addedKeys: Array<IGridHistoryRow<TKey, TCell>> = [];
+
+    for (const key of result) {
+      const newKey = this.addRow(key.row, undefined, key.column, true);
+      const update = this.editorData.get(GridDataKeysUtils.serialize(newKey.row));
+
+      if (update) {
+        addedKeys.push({ key: newKey, value: update.update });
+      }
+    }
+
+    if (addedKeys.length > 0) {
+      this.historyManager.recordAddRows({
+        rowEntries: addedKeys,
+      });
+    }
   }
 
   addRow(row?: IGridRowKey, value?: TCell[], column?: IGridColumnKey, ignoreHistory = false): TKey {
