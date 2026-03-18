@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -20,14 +20,13 @@ import type {
 import { makeObservable, observable } from 'mobx';
 
 export abstract class DatabaseEditAction<
-    TKey = unknown,
-    TValue = unknown,
-    TUpdate extends IDatabaseDataEditApplyActionData = IDatabaseDataEditApplyActionData,
-    TResult extends IDatabaseDataResult = IDatabaseDataResult,
-  >
+  TKey = unknown,
+  TValue = unknown,
+  TUpdate extends IDatabaseDataEditApplyActionData = IDatabaseDataEditApplyActionData,
+  TResult extends IDatabaseDataResult = IDatabaseDataResult,
+>
   extends DatabaseDataAction<any, TResult>
-  implements IDatabaseDataEditAction<TKey, TValue, TUpdate, TResult>
-{
+  implements IDatabaseDataEditAction<TKey, TValue, TUpdate, TResult> {
   static dataFormat: ResultDataFormat[] | null = null;
 
   readonly action: ISyncExecutor<IDatabaseDataEditActionData<TKey, TValue>>;
@@ -54,6 +53,7 @@ export abstract class DatabaseEditAction<
   abstract getElementState(key: TKey): DatabaseEditChangeType | null;
   abstract get(key: TKey): TValue | undefined;
   abstract set(key: TKey, value: TValue): void;
+  abstract setMany(updates: Array<{ key: TKey; value: TValue }>): void;
   abstract add(...key: TKey[]): void;
   abstract duplicate(...key: TKey[]): void;
   abstract delete(...key: TKey[]): void;

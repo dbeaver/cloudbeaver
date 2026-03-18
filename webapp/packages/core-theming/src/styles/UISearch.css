@@ -1,0 +1,6 @@
+@layer components {
+  .search-panel__inputs {
+    --dbv-kit-input-border-color: var(--theme-input-border, #cccccc);
+    --dbv-kit-input-background: var(--theme-input-background, #ffffff);
+  }
+}

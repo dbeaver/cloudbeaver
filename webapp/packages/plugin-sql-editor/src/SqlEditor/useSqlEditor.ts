@@ -14,7 +14,7 @@ import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dial
 import { NotificationService } from '@cloudbeaver/core-events';
 import { SyncExecutor } from '@cloudbeaver/core-executor';
 import type { SqlCompletionProposal, SqlScriptInfoFragment } from '@cloudbeaver/core-sdk';
-import { createLastPromiseGetter, type LastPromiseGetter, throttleAsync } from '@cloudbeaver/core-utils';
+import { createLastPromiseGetter, type LastPromiseGetter } from '@cloudbeaver/core-utils';
 
 import type { ISqlEditorTabState } from '../ISqlEditorTabState.js';
 import { ESqlDataSourceFeatures } from '../SqlDataSource/ESqlDataSourceFeatures.js';
@@ -133,7 +133,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
 
       getLastAutocomplete: createLastPromiseGetter(),
 
-      getHintProposals: throttleAsync(async function getHintProposals(this: ISQLEditorDataPrivate, position, simple) {
+      async getHintProposals(this: ISQLEditorDataPrivate, position, simple) {
         const executionContext = this.model.dataSource?.executionContext;
         if (!executionContext) {
           return [];
@@ -152,7 +152,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
         this.hintsLimitIsMet = hints.length >= MAX_HINTS_LIMIT;
 
         return hints;
-      }, 300),
+      },
 
       async formatScript(): Promise<void> {
         if (this.isDisabled || this.isScriptEmpty || !this.model.dataSource?.executionContext) {
