@@ -7,7 +7,7 @@
  */
 
 // Types
-export { PlanNodeKind } from './types/PlanNodeKind.js';
+export { EPlanNodeKind } from './types/PlanNodeKind.js';
 export type { IPlanNode, IPlanNodeProperty } from './types/IPlanNode.js';
 export type { IPlanData } from './types/IPlanData.js';
 export type { IPlanFeatures } from './types/IPlanFeatures.js';

@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-export enum PlanNodeKind {
+export enum EPlanNodeKind {
   DEFAULT = 'DEFAULT',
   SELECT = 'SELECT',
   TABLE_SCAN = 'TABLE_SCAN',

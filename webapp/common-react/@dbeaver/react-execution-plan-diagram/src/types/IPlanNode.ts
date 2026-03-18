@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { PlanNodeKind } from './PlanNodeKind.js';
+import type { EPlanNodeKind } from './PlanNodeKind.js';
 
 export interface IPlanNodeProperty {
   id: string;
@@ -18,7 +18,7 @@ export interface IPlanNodeProperty {
 
 export interface IPlanNode {
   id: string;
-  kind: PlanNodeKind;
+  kind: EPlanNodeKind;
   name?: string;
   type: string;
   condition?: string;
