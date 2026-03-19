@@ -36,4 +36,5 @@ export default [
   ['plugin_navigation_tree_settings_disable', 'Désactiver'],
   ['plugin_navigation_tree_settings_disable_description', 'Désactiver l’arborescence de navigation pour tous les utilisateurs'],
   ['plugin_navigation_tree_toolbar_menu_title', "Barre d'outils de l'arborescence"],
+  ['plugin_navigation_tree_settings_menu_title', "Paramètres de l'arborescence"],
 ];

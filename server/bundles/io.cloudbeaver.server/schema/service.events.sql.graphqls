@@ -1,0 +1,97 @@
+extend enum CBServerEventId {
+    "Database output log updated (e.g., DBMS in Oracle)"
+    cb_database_output_log_updated,
+
+    "Transaction count updated"
+    cb_transaction_count @since(version: "24.3.3"),
+
+    "Session task confirmations"
+    cb_session_task_confirmation_request @since(version: "25.2.2")
+    cb_session_task_query_confirmation_request @since(version: "25.2.2")
+    cb_session_task_query_params_confirmation_request @since(version: "25.2.5")
+}
+
+extend enum CBClientEventId {
+    cb_client_session_task_confirmation @since(version: "25.2.2")
+    cb_client_session_task_with_parameters_confirmation @since(version: "25.2.5")
+}
+
+extend enum CBEventTopic {
+    cb_database_output_log,
+    cb_transaction @since(version: "24.3.3")
+}
+
+"Database output log event"
+type CBDatabaseOutputLogEvent implements CBServerEvent {
+    id: CBServerEventId!
+    topicId: CBEventTopic
+    contextId: String!
+    messages: [WSOutputLogInfo!]!
+    eventTimestamp: Int!
+}
+
+"Define the type for WSOutputLogInfo"
+type WSOutputLogInfo {
+    severity: String
+    message: String
+    # Add more fields if needed
+}
+
+"Datasource count event in transactional mode"
+type WSTransactionalCountEvent implements CBServerEvent {
+    id: CBServerEventId!
+    topicId: CBEventTopic
+    contextId: String!
+    projectId: String!
+    connectionId: String!
+    transactionalCount: Int!
+}
+
+"Query parameter information"
+type WSQueryParameterInfo {
+    name: String!
+    value: String
+}
+
+type WSSessionTaskConfirmationRequestEvent implements CBServerEvent @since(version: "25.2.2") {
+    id: CBServerEventId!
+    topicId: CBEventTopic!
+    taskId: ID!
+    title: String!
+    message: String!
+}
+
+type WSSessionTaskQueryConfirmationRequestEvent implements CBServerEvent @since(version: "25.2.2") {
+    id: CBServerEventId!
+    topicId: CBEventTopic!
+    taskId: ID!
+    title: String!
+    message: String!
+    query: String!
+}
+
+type WSSessionTaskConfirmationEvent implements CBClientEvent @since(version: "25.2.2") {
+    id: CBClientEventId!
+    topicId: CBEventTopic
+    taskId: ID!
+    confirmed: Boolean!
+    skipConfirmations: Boolean!
+}
+
+type WSSessionTaskQueryParamsConfirmationEvent implements CBServerEvent @since(version: "26.0.0") {
+    id: CBServerEventId!
+    topicId: CBEventTopic!
+    taskId: ID!
+    title: String!
+    message: String!
+    query: String!
+    parameters: [WSQueryParameterInfo]!
+}
+
+type WSSessionTaskWithParametersConfirmationEvent implements CBClientEvent @since(version: "25.2.5") {
+    id: CBClientEventId!
+    topicId: CBEventTopic
+    taskId: ID!
+    parameters: Object!
+}
+

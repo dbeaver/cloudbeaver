@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -54,6 +54,8 @@ export * from './TreeNew/NodeControlLazy.js';
 export * from './TreeNew/useTreeData.js';
 export * from './TreeNew/ITreeData.js';
 export * from './TreeNew/useTreeFilter.js';
+export * from './TreeNew/useTreeSettings.js';
+export * from './TreeNew/useUserTreeSettings.js';
 export * from './TreeNew/useTreeSelection.js';
 export * from './TreeNew/useTreeClickSelection.js';
 export * from './TreeNew/ITreeSelection.js';
@@ -65,7 +67,12 @@ export * from './TreeNew/TreeToolbarMenuLazy.js';
 export * from './TreeNew/TreeToolbarMenuService.js';
 export * from './TreeNew/DATA_CONTEXT_TREE.js';
 export * from './TreeNew/MENU_TREE_TOOLBAR.js';
+export * from './TreeNew/MENU_TREE_SETTINGS.js';
 export * from './TreeNew/actions/ACTION_TREE_REFRESH.js';
+export * from './TreeNew/actions/ACTION_TREE_SHOW_FILTER.js';
+export * from './TreeNew/actions/ACTION_TREE_SHOW_DESCRIPTIONS.js';
+export * from './TreeNew/actions/ACTION_TREE_SAVE_STATE.js';
+export * from './TreeNew/TreeSettingsMenuService.js';
 
 export * from './NavigationTree/getNavigationTreeUserSettingsId.js';
 export * from './NodesManager/NavNodeView/IFolderTransform.js';
@@ -76,6 +83,9 @@ export * from './NodesManager/useNode.js';
 export * from './NodesManager/useChildren.js';
 export * from './TreeNew/contexts/TreeMenuContext/TreeMenuContext.js';
 export * from './TreeNew/useTreeMenu.js';
+export type { ITreeDnD } from './TreeNew/useTreeDnD.js';
+export type { INodeDnD } from './TreeNew/useNodeDnD.js';
+export { useTreeDnD } from './TreeNew/useTreeDnD.js';
 
 export * from './NodesManager/NodeLinkLoader.js';
 
