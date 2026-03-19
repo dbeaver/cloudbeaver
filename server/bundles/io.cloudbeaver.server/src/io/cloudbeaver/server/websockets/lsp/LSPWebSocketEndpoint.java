@@ -44,14 +44,14 @@ public class LSPWebSocketEndpoint extends CBAbstractWebSocket {
         wsSession.setMaxTextMessageBufferSize(Integer.MAX_VALUE);
         wsSession.setMaxBinaryMessageBufferSize(Integer.MAX_VALUE);
 
-        LSPWebServerSesssionProvider sessionProvider = new LSPWebServerSesssionProvider(webSession);
+        LSPWebServerSessionProvider sessionProvider = new LSPWebServerSessionProvider(webSession);
         DBLServer server = new DBLServer(sessionProvider);
-        var builder = new WebSocketLauncherBuilder<LanguageClient>();
-        builder.setSession(wsSession);
-        builder.setLocalService(server);
-        builder.setRemoteInterface(LanguageClient.class);
-        Launcher<LanguageClient> launcher = builder.create();
-        server.connect(launcher.getRemoteProxy());
+        Launcher<LanguageClient> launcher = new WebSocketLauncherBuilder<LanguageClient>()
+            .setSession(wsSession)
+            .setLocalService(server)
+            .setRemoteInterface(LanguageClient.class)
+            .create();
+        launcher.startListening();
     }
 
     @Override

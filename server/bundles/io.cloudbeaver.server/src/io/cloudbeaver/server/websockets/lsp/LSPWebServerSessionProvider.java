@@ -23,12 +23,12 @@ import org.jkiss.dbeaver.model.app.DBPWorkspace;
 import org.jkiss.dbeaver.model.auth.impl.AbstractSessionPersistent;
 import org.jkiss.dbeaver.model.lsp.DBLServerSessionProvider;
 
-public class LSPWebServerSesssionProvider implements DBLServerSessionProvider {
+public class LSPWebServerSessionProvider implements DBLServerSessionProvider {
 
     @NotNull
     private final BaseWebSession session;
 
-    public LSPWebServerSesssionProvider(@NotNull BaseWebSession session) {
+    public LSPWebServerSessionProvider(@NotNull BaseWebSession session) {
         this.session = session;
     }
 
