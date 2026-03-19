@@ -6,12 +6,11 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { useContext, useEffect } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { defaultTranslateFn, TranslateContext, type TranslateFn } from '@dbeaver/react-translate';
 
-import { DiagramContext, type IDiagramActions } from '../components/DiagramContext.js';
 import { ExecutionPlanDiagram } from '../components/ExecutionPlanDiagram.js';
+import type { IDiagramActions } from '../components/DiagramContext.js';
 import type { IPlanData } from '../types/IPlanData.js';
 import type { IPlanDiagramCallbacks } from '../types/IPlanDiagramCallbacks.js';
 import type { IPlanDiagramOptions } from '../types/IPlanDiagramOptions.js';
@@ -41,21 +40,6 @@ export interface IExecutionPlanDiagramAPI {
   resetView(): void;
   /** Unmount the React tree and release resources. */
   dispose(): void;
-}
-
-/** Invisible child component that captures toolbar actions from DiagramContext into a ref. */
-function ActionsCapture({ actionsRef }: { actionsRef: { current: IDiagramActions | null } }) {
-  const actions = useContext(DiagramContext);
-
-  useEffect(() => {
-    actionsRef.current = actions;
-
-    return () => {
-      actionsRef.current = null;
-    };
-  }, [actions, actionsRef]);
-
-  return null;
 }
 
 interface IExecutionPlanDiagramState {
@@ -100,7 +84,7 @@ export function createExecutionPlanDiagram(
     translations: translations ?? {},
   };
 
-  const diagramActionsRef: { current: IDiagramActions | null } = { current: null };
+  let diagramActions: IDiagramActions | null = null;
 
   function render(): void {
     if (!root) {
@@ -121,6 +105,9 @@ export function createExecutionPlanDiagram(
     root.render(
       <TranslateContext.Provider value={{ translate }}>
         <ExecutionPlanDiagram
+          ref={actions => {
+            diagramActions = actions;
+          }}
           data={state.data}
           options={state.options}
           selectedNodeId={state.selectedNodeId}
@@ -132,9 +119,7 @@ export function createExecutionPlanDiagram(
 
             render();
           }}
-        >
-          <ActionsCapture actionsRef={diagramActionsRef} />
-        </ExecutionPlanDiagram>
+        />
       </TranslateContext.Provider>,
     );
   }
@@ -163,16 +148,16 @@ export function createExecutionPlanDiagram(
       return state.selectedNodeId;
     },
     zoomIn(): void {
-      diagramActionsRef.current?.zoomIn();
+      diagramActions?.zoomIn();
     },
     zoomOut(): void {
-      diagramActionsRef.current?.zoomOut();
+      diagramActions?.zoomOut();
     },
     fitToScreen(): void {
-      diagramActionsRef.current?.fitToScreen();
+      diagramActions?.fitToScreen();
     },
     resetView(): void {
-      diagramActionsRef.current?.resetView();
+      diagramActions?.resetView();
     },
     dispose(): void {
       if (root) {
@@ -185,7 +170,7 @@ export function createExecutionPlanDiagram(
       state.selectedNodeId = null;
       state.callbacks = {};
       state.translations = {};
-      diagramActionsRef.current = null;
+      diagramActions = null;
     },
   };
 
