@@ -3948,6 +3948,7 @@ __metadata:
     "@cloudbeaver/plugin-sql-editor-screen": "workspace:*"
     "@cloudbeaver/plugin-sql-generator": "workspace:*"
     "@cloudbeaver/plugin-system-information-administration": "workspace:*"
+    "@cloudbeaver/plugin-tailwindcss-theme": "workspace:*"
     "@cloudbeaver/plugin-task-manager": "workspace:*"
     "@cloudbeaver/plugin-theme": "workspace:*"
     "@cloudbeaver/plugin-tools-panel": "workspace:*"
@@ -4374,6 +4375,21 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@cloudbeaver/plugin-tailwindcss-theme@workspace:*, @cloudbeaver/plugin-tailwindcss-theme@workspace:packages/plugin-tailwindcss-theme":
+  version: 0.0.0-use.local
+  resolution: "@cloudbeaver/plugin-tailwindcss-theme@workspace:packages/plugin-tailwindcss-theme"
+  dependencies:
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
+    "@dbeaver/cli": "workspace:*"
+    rimraf: "npm:^6"
+    tailwindcss: "npm:4.0.7"
+    tslib: "npm:^2"
+    typescript: "npm:^5"
+  languageName: unknown
+  linkType: soft
+
 "@cloudbeaver/plugin-task-manager@workspace:*, @cloudbeaver/plugin-task-manager@workspace:packages/plugin-task-manager":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-task-manager@workspace:packages/plugin-task-manager"
@@ -4648,6 +4664,7 @@ __metadata:
     "@cloudbeaver/core-browser": "workspace:*"
     "@cloudbeaver/core-cli": "workspace:*"
     "@cloudbeaver/plugin-sso": "workspace:*"
+    "@cloudbeaver/plugin-tailwindcss-theme": "workspace:*"
     "@cloudbeaver/product-base": "workspace:*"
     "@cloudbeaver/product-default-impl": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"

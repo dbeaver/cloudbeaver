@@ -1,0 +1,4 @@
+@import 'tailwindcss' layer(base) prefix(tw);
+@import './shadow.css';
+
+@custom-variant dark (&:where(.theme-dark, .theme-dark *));

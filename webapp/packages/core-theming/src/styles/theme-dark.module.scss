@@ -10,7 +10,6 @@
 
 @include theme-matcher;
 @include colors;
-@include elevation;
 @include form-controls;
 @include link;
 @include delimiter($mdc-theme-background);

@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -60,7 +60,7 @@ export const MenuPanel = observer<IMenuPanelProps, HTMLDivElement>(
           aria-label={translate(label)}
           visible={panelAvailable}
         >
-          <div dir={rtl ? 'rtl' : undefined} data-s-has-bindings={hasBindings} className={s(styles, { menuBox: true })}>
+          <div dir={rtl ? 'rtl' : undefined} data-s-has-bindings={hasBindings} className={s(styles, { menuBox: true }, 'tw:shadow-medium')}>
             {Children.count(renderedChildren) === 0 && <MenuEmptyItem />}
             {renderedChildren}
           </div>

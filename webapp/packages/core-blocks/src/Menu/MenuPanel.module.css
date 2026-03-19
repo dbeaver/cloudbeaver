@@ -10,7 +10,7 @@
   z-index: 999;
 }
 .menuBox {
-  composes: theme-background-surface theme-text-on-surface theme-group-element-radius theme-typography--body2 theme-elevation-medium from global;
+  composes: theme-background-surface theme-text-on-surface theme-group-element-radius theme-typography--body2 from global;
   composes: menuBox from './MenuItemElement.module.css';
 
   display: flex;

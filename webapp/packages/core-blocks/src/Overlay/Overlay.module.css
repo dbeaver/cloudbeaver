@@ -34,7 +34,7 @@
 }
 
 .box {
-  composes: theme-background-surface theme-text-on-surface theme-elevation-large from global;
+  composes: theme-background-surface theme-text-on-surface from global;
   display: flex;
   flex-direction: column;
   justify-content: center;
