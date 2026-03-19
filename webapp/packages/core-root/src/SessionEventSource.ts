@@ -45,7 +45,7 @@ import { TransportSubject } from './TransportSubject.js';
 
 export { ServerEventId, SessionEventTopic, ClientEventId };
 
-export type SessionEventId = ServerEventId | ClientEventId;
+export type SessionEventId = ServerEventId | ClientEventId | string;
 
 export interface ISessionEvent extends IBaseServerEvent<SessionEventId, SessionEventTopic> {
   id: SessionEventId;
