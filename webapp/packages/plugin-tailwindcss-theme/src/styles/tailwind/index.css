@@ -1,4 +1,6 @@
 @import 'tailwindcss' layer(base) prefix(tw);
 @import './shadow.css';
+@import './typography.css';
+@import './typography-utilities.css';
 
 @custom-variant dark (&:where(.theme-dark, .theme-dark *));
