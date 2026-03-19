@@ -51,7 +51,7 @@ public class LSPWebSocketEndpoint extends CBAbstractWebSocket {
             .setLocalService(server)
             .setRemoteInterface(LanguageClient.class)
             .create();
-        launcher.startListening();
+        server.connect(launcher.getRemoteProxy());
     }
 
     @Override
