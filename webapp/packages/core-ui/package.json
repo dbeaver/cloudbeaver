@@ -42,7 +42,6 @@
     "react-dnd": "^16",
     "react-dnd-html5-backend": "^16",
     "react-dom": "^19",
-    "reakit": "^1",
     "tslib": "^2"
   },
   "devDependencies": {
