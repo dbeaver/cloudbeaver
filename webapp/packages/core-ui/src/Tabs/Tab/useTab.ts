@@ -14,6 +14,7 @@ import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events
 import { TabContext } from '../TabContext.js';
 import type { ITabData } from '../TabsContainer/ITabsContainer.js';
 import { TabsContext } from '../TabsContext.js';
+import { useTabsState } from '../useTabsState.js';
 
 export function useTab(
   tabId?: string,
@@ -24,6 +25,7 @@ export function useTab(
   const state = useContext(TabsContext);
   const tabContext = useContext(TabContext);
   const refObject = useObjectRef({ onClick });
+  const selectedId = useTabsState('selectedId');
 
   tabId = tabId || tabContext?.tabId;
 
@@ -62,7 +64,7 @@ export function useTab(
   return useObservableRef(
     () => ({
       get selected() {
-        return this.state.state.selectedId === this.tabId;
+        return this.selectedId === this.tabId;
       },
       get closable() {
         return this.state.canClose(this.tabId);
@@ -87,10 +89,12 @@ export function useTab(
       closable: computed,
       state: observable.ref,
       tabId: observable.ref,
+      selectedId: observable.ref,
     },
     {
       state,
       tabId,
+      selectedId,
     },
     ['getInfo', 'handleOpen', 'handleClose'],
   );

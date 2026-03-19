@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -21,9 +21,9 @@ import {
 import { observer } from 'mobx-react-lite';
 import { useContext, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { SearchPanel, type SearchPanelRef } from '@dbeaver/ui-kit';
 
 import { ReactCodemirrorContext } from './ReactCodemirrorContext.js';
-import { SearchPanel, type SearchPanelRef } from './SearchPanel/SearchPanel.js';
 
 interface Props extends React.PropsWithChildren {
   className?: string;
@@ -183,9 +183,9 @@ export const ReactCodemirrorSearchPanel: React.FC<Props> = observer(function Rea
 
   return createPortal(
     <SearchPanel
-      isReadOnly={view.state.readOnly}
       ref={searchPanelRef}
-      queryState={queryState}
+      isReadOnly={view.state.readOnly}
+      query={queryState}
       searchMatchesCount={searchMatchesCount}
       onQueryChange={handleQueryChange}
       onCaseSensitiveToggle={handleCaseSensitiveToggle}

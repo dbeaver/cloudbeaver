@@ -22,6 +22,7 @@ import {
 import { DATA_VIEWER_CONSTRAINTS_DELETE_ACTION } from '../../DatabaseDataModel/Actions/ResultSet/Actions/DATA_VIEWER_CONSTRAINTS_DELETE_ACTION.js';
 import { DATA_CONTEXT_DV_DDM } from '../../DatabaseDataModel/DataContext/DATA_CONTEXT_DV_DDM.js';
 import { DATA_CONTEXT_DV_DDM_RESULT_INDEX } from '../../DatabaseDataModel/DataContext/DATA_CONTEXT_DV_DDM_RESULT_INDEX.js';
+import { DatabaseDataFeature } from '../../DatabaseDataModel/IDatabaseDataSource.js';
 import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel.js';
 import { isResultSetDataSource, ResultSetDataSource } from '../../ResultSet/ResultSetDataSource.js';
 import { DATA_VIEWER_DATA_MODEL_TOOLS_MENU } from './DATA_VIEWER_DATA_MODEL_TOOLS_MENU.js';
@@ -58,11 +59,12 @@ export class TableHeaderService extends Bootstrap {
       contexts: [DATA_CONTEXT_DV_DDM, DATA_CONTEXT_DV_DDM_RESULT_INDEX],
       isHidden(context, action) {
         const model = context.get(DATA_CONTEXT_DV_DDM)!;
-        // TODO add more proper way to define to what features it should be added https://github.com/dbeaver/pro/issues/8299
+        const allowedFeatures = [DatabaseDataFeature.DataEditor, DatabaseDataFeature.QueryResult];
+        const isFeatureSupported = allowedFeatures.some(feature => model.source.hasFeature(feature));
         const isReadonly = model.isReadonly(context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!);
 
         if ([ACTION_UNDO, ACTION_REDO].includes(action)) {
-          return isReadonly;
+          return isReadonly || !isFeatureSupported;
         }
 
         return false;
