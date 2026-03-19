@@ -90,6 +90,7 @@ import pluginSettingsPanel from '@cloudbeaver/plugin-settings-panel/module';
 import pluginSqlEditor from '@cloudbeaver/plugin-sql-editor/module';
 import pluginSqlEditorNavigationTab from '@cloudbeaver/plugin-sql-editor-navigation-tab/module';
 import pluginSqlEditorNavigationTabScript from '@cloudbeaver/plugin-sql-editor-navigation-tab-script/module';
+import pluginSqlEditorCodemirror from '@cloudbeaver/plugin-sql-editor-codemirror/module';
 import pluginSqlEditorNew from '@cloudbeaver/plugin-sql-editor-new/module';
 import pluginSqlEditorScreen from '@cloudbeaver/plugin-sql-editor-screen/module';
 import pluginSqlGenerator from '@cloudbeaver/plugin-sql-generator/module';
@@ -175,6 +176,7 @@ export const commonSet = [
   pluginSqlEditorNavigationTab,
   pluginSqlEditorScreen,
   pluginSqlEditorNew,
+  pluginSqlEditorCodemirror,
   pluginSqlGenerator,
   pluginUserProfile,
   pluginUserProfileAdministration,
