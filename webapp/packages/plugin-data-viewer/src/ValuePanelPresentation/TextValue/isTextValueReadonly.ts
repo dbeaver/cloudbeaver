@@ -29,7 +29,6 @@ export function isTextValueReadonly({ contentAction, formatAction, model, result
   }
 
   return (
-    // TODO add more proper way to define to what features it should be added https://github.com/dbeaver/pro/issues/8299
     model.isReadonly(resultIndex) ||
     model.isDisabled(resultIndex) ||
     (formatAction.isReadOnly(cellHolder.key) && editAction.getElementState(cellHolder.key) !== DatabaseEditChangeType.add) ||

@@ -56,3 +56,4 @@ export * from './ComponentProvider.js';
 export * from './Menu/Menu.js';
 export * from './Disclosure/Disclosure.js';
 export * from './Dialog/Dialog.js';
+export * from './Tab/Tab.js';

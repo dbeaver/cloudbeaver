@@ -20,6 +20,7 @@ import {
   DATA_CONTEXT_DV_DDM_RESULT_INDEX,
   DATA_CONTEXT_DV_PRESENTATION_ACTIONS,
   DATA_CONTEXT_DV_RESULT_KEY,
+  DatabaseDataFeature,
   DatabaseEditChangeType,
   GridEditAction,
   GridSelectAction,
@@ -29,7 +30,6 @@ import {
   IDatabaseDataSelectAction,
   IDatabaseDataViewAction,
   isBooleanValuePresentationAvailable,
-  isResultSetDataSource,
   KEY_BINDING_DELETE_ROW,
   ResultSetDataContentAction,
   type IDatabaseValueHolder,
@@ -62,8 +62,9 @@ export class DataGridContextMenuCellEditingService {
       isApplicable: context => {
         const model = context.get(DATA_CONTEXT_DV_DDM)!;
         const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
-        // TODO add more proper way to define to what features it should be added https://github.com/dbeaver/pro/issues/8299
-        return isResultSetDataSource(model.source) && !model.isDisabled(resultIndex) && !model.isReadonly(resultIndex);
+        const allowedFeatures = [DatabaseDataFeature.DataEditor, DatabaseDataFeature.QueryResult];
+
+        return allowedFeatures.some(feature => model.source.hasFeature(feature)) && !model.isDisabled(resultIndex) && !model.isReadonly(resultIndex);
       },
       getItems: (context, items) => [...items, MENU_DATA_GRID_EDITING],
     });
@@ -105,7 +106,6 @@ export class DataGridContextMenuCellEditingService {
         // If we somehow added a new row, we can always edit it
         const canEdit = editor.getElementState(key) === DatabaseEditChangeType.add;
 
-        // TODO add more proper way to define to what features it should be added https://github.com/dbeaver/pro/issues/8299
         if (model.isReadonly(resultIndex)) {
           return false;
         }
