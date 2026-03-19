@@ -13,9 +13,11 @@ import {
   Loader,
   Pane,
   ResizerControls,
+  s,
   SContext,
   Split,
   useExecutor,
+  useS,
   useSplitUserState,
   type StyleRegistry,
 } from '@cloudbeaver/core-blocks';
@@ -23,7 +25,7 @@ import { useService } from '@cloudbeaver/core-di';
 import { LeftBarPanelService, SideBarPanel, SideBarPanelService, TabStyles } from '@cloudbeaver/core-ui';
 
 import { RightArea } from './RightArea.js';
-import './Main.css';
+import style from './Main.module.css';
 import LeftSideBarPanel from './LeftSideBarPanel.module.css';
 
 const LEFT_SIDEBAR_PANEL_REGISTRY: StyleRegistry = [
@@ -37,6 +39,7 @@ const LEFT_SIDEBAR_PANEL_REGISTRY: StyleRegistry = [
 ];
 
 export const Main = observer(function Main() {
+  const styles = useS(style);
   const sideBarPanelService = useService(SideBarPanelService);
   const leftBarPanelService = useService(LeftBarPanelService);
 
@@ -58,10 +61,10 @@ export const Main = observer(function Main() {
   });
 
   return (
-    <Loader className="main-loader" suspense>
-      <main className="main-space">
+    <Loader className={s(styles, { loader: true })} suspense>
+      <main className={s(styles, { space: true })}>
         <Split {...splitMainState} sticky={30} mode={leftBarDisabled ? 'minimize' : splitMainState.mode} disable={leftBarDisabled}>
-          <Pane className="main-pane" basis="250px" main>
+          <Pane className={s(styles, { pane: true })} basis="250px" main>
             <Loader suspense>
               <SContext registry={LEFT_SIDEBAR_PANEL_REGISTRY}>
                 <SideBarPanel container={leftBarPanelService.tabsContainer} panelId="dbeaver-left-sidebar" />
@@ -69,14 +72,14 @@ export const Main = observer(function Main() {
             </Loader>
           </Pane>
           <ResizerControls />
-          <Pane className="main-pane">
+          <Pane className={s(styles, { pane: true })}>
             <Split {...splitRightState} mode={sideBarDisabled ? 'minimize' : splitRightState.mode} disable={sideBarDisabled} sticky={30}>
-              <Pane className="main-pane">
+              <Pane className={s(styles, { pane: true })}>
                 <RightArea />
               </Pane>
               <ResizerControls />
-              <Pane className="main-pane" basis="400px" main>
-                <Loader className="main-loader" suspense>
+              <Pane className={s(styles, { pane: true })} basis="400px" main>
+                <Loader className={s(styles, { loader: true })} suspense>
                   <SideBarPanel container={sideBarPanelService.tabsContainer} panelId="dbeaver-right-sidebar" />
                 </Loader>
               </Pane>

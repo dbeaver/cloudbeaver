@@ -5,22 +5,19 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
-@import '@cloudbeaver/core-theming/src/styles/utilities';
-
-.main-space {
-  @apply typography-body2 bg-theme-surface text-theme-on-surface;
+.space {
+  composes: theme-typography--body2 theme-background-surface theme-text-on-surface from global;
   display: flex;
   flex-direction: row;
   flex: 1;
   overflow: hidden;
 }
-.main-pane {
-  @apply bg-theme-surface text-theme-on-surface;
+.pane {
+  composes: theme-background-surface theme-text-on-surface from global;
   display: flex;
   position: relative;
   overflow: hidden;
 }
-.main-loader {
+.loader {
   height: 100%;
 }
