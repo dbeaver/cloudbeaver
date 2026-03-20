@@ -17,52 +17,17 @@ interface IReconnectingTransport extends Transport {
   dispose(): void;
 }
 
-function createReconnectingTransport(uri: string): IReconnectingTransport {
+function createReconnectingTransport(uri: string): { ready: Promise<IReconnectingTransport>; dispose(): void } {
   let handlers: ((value: string) => void)[] = [];
   let sock: WebSocket | null = null;
   let reconnectAttempts = 0;
   let reconnectTimeout: ReturnType<typeof setTimeout> | null = null;
   let disposed = false;
+  let connected = false;
 
-  function connect() {
-    if (disposed) {
-      return;
-    }
+  const { promise: ready, resolve: resolveReady, reject: rejectReady } = Promise.withResolvers<IReconnectingTransport>();
 
-    sock = new WebSocket(uri);
-
-    sock.onopen = () => {
-      console.log('[LSP] WebSocket connected');
-      reconnectAttempts = 0;
-    };
-
-    sock.onmessage = e => {
-      handlers.forEach(h => h(e.data as string));
-    };
-
-    sock.onclose = () => {
-      if (disposed) {
-        return;
-      }
-
-      if (reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
-        reconnectAttempts++;
-        const delay = RECONNECT_BASE_DELAY * 2 ** (reconnectAttempts - 1);
-        console.warn(`[LSP] WebSocket closed, reconnecting in ${delay}ms (${reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS})...`);
-        reconnectTimeout = setTimeout(connect, delay);
-      } else {
-        console.error('[LSP] Max reconnect attempts reached');
-      }
-    };
-
-    sock.onerror = e => {
-      console.error('[LSP] WebSocket error:', e);
-    };
-  }
-
-  connect();
-
-  return {
+  const transport: IReconnectingTransport = {
     send(message: string) {
       if (sock?.readyState === WebSocket.OPEN) {
         sock.send(message);
@@ -82,6 +47,10 @@ function createReconnectingTransport(uri: string): IReconnectingTransport {
       }
 
       if (sock) {
+        sock.onopen = null;
+        sock.onmessage = null;
+        sock.onclose = null;
+        sock.onerror = null;
         sock.close();
         sock = null;
       }
@@ -89,12 +58,57 @@ function createReconnectingTransport(uri: string): IReconnectingTransport {
       handlers = [];
     },
   };
+
+  function connect() {
+    if (disposed) {
+      return;
+    }
+
+    sock = new WebSocket(uri);
+
+    sock.onopen = () => {
+      reconnectAttempts = 0;
+
+      if (!connected) {
+        connected = true;
+        resolveReady(transport);
+      }
+    };
+
+    sock.onmessage = e => {
+      handlers.forEach(h => h(e.data as string));
+    };
+
+    sock.onclose = () => {
+      if (disposed) {
+        return;
+      }
+
+      if (reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
+        reconnectAttempts++;
+        const delay = RECONNECT_BASE_DELAY * 2 ** (reconnectAttempts - 1);
+        console.warn(`[LSP] WebSocket closed, reconnecting in ${delay}ms (${reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS})...`);
+        reconnectTimeout = setTimeout(connect, delay);
+      } else {
+        console.error('[LSP] Max reconnect attempts reached');
+        rejectReady(new Error('LSP WebSocket connection failed after max reconnect attempts'));
+      }
+    };
+
+    sock.onerror = e => {
+      console.error('[LSP] WebSocket error:', e);
+    };
+  }
+
+  connect();
+
+  return { ready, dispose: transport.dispose };
 }
 
 @injectable()
 export class LSPConnectionService {
   private client: LSPClient | null = null;
-  private transport: IReconnectingTransport | null = null;
+  private disposeTransport: (() => void) | null = null;
   private refCount = 0;
 
   acquire(): LSPClient {
@@ -104,8 +118,18 @@ export class LSPConnectionService {
       });
 
       const url = GlobalConstants.absoluteServiceWSUrl(LSP_ENDPOINT);
-      this.transport = createReconnectingTransport(url);
-      this.client.connect(this.transport);
+      const { ready, dispose } = createReconnectingTransport(url);
+      this.disposeTransport = dispose;
+
+      ready
+        .then(transport => {
+          if (this.client) {
+            this.client.connect(transport);
+          }
+        })
+        .catch(error => {
+          console.error(error);
+        });
     }
 
     this.refCount++;
@@ -116,10 +140,10 @@ export class LSPConnectionService {
     this.refCount--;
 
     if (this.refCount <= 0) {
-      this.transport?.dispose();
       this.client = null;
-      this.transport = null;
       this.refCount = 0;
+      this.disposeTransport?.();
+      this.disposeTransport = null;
     }
   }
 }
