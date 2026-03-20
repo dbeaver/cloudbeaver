@@ -1,51 +1,43 @@
-/*
- * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
- *
- * Licensed under the Apache License, Version 2.0.
- * you may not use this file except in compliance with the License.
- */
+@import '@cloudbeaver/plugin-tailwindcss-theme/tailwind.css';
 
-@mixin base-code-editor() {
-  .editor,
-  .cm-editor,
-  .cm-mergeView,
-  .cm-mergeViewEditors,
-  .cm-scroller,
-  .ReactCodemirror {
-    width: 100%;
-    height: 100% !important;
-  }
+/* Increase specificity by selector repetition */
+.editor.editor,
+.cm-editor.cm-editor,
+.cm-mergeView.cm-mergeView,
+.cm-mergeViewEditors.cm-mergeViewEditors,
+.cm-scroller.cm-scroller,
+.ReactCodemirror.ReactCodemirror {
+  width: 100%;
+  height: 100% !important;
+}
 
-  .editor,
-  .ReactCodemirror,
-  .cm-mergeView,
-  .cm-mergeViewEditors,
-  .cm-editor,
-  .cm-gotoLine {
-    font-family: var(--theme-font-family);
-    -moz-osx-font-smoothing: grayscale;
-    -webkit-font-smoothing: antialiased;
-    font-size: var(--theme-typography-body2-font-size);
-    line-height: var(--theme-typography-body2-line-height);
-    font-weight: var(--theme-typography-body2-font-weight);
-    letter-spacing: var(--theme-typography-body2-letter-spacing);
-    text-decoration: inherit;
-    text-transform: inherit;
-  }
+.editor.editor,
+.ReactCodemirror.ReactCodemirror,
+.cm-mergeView.cm-mergeView,
+.cm-mergeViewEditors.cm-mergeViewEditors,
+.cm-editor.cm-editor,
+.cm-gotoLine.cm-gotoLine {
+  @apply tw:typography-body2;
+}
 
-  .cm-mergeViewEditor:first-child {
+.cm-mergeViewEditor.cm-mergeViewEditor {
+  &:first-child {
     border-right: 1px solid;
     border-color: var(--theme-background);
   }
+}
 
-  .editor .cm-highlightTab {
+.editor.editor {
+  background-color: var(--theme-surface);
+  color: var(--theme-on-surface);
+
+  & .cm-highlightTab {
     opacity: 0.6;
     color: var(--theme-text-hint-on-light);
     pointer-events: none;
   }
 
-  .editor .cm-newline {
+  & .cm-newline {
     color: var(--theme-text-hint-on-light);
     opacity: 0.6;
     margin-left: 4px;
@@ -53,31 +45,26 @@
     pointer-events: none;
   }
 
-  .editor .cm-highlightSpace {
+  & .cm-highlightSpace {
     background-image: radial-gradient(circle at 50% 55%, var(--theme-text-hint-on-light) 15%, transparent 5%);
     opacity: 0.6;
     background-position: center;
   }
 
-  .editor {
-    background-color: var(--theme-surface);
-    color: var(--theme-on-surface);
-  }
-
-  .editor .cm-scroller {
+  & .cm-scroller {
     outline: none;
     line-height: unset;
   }
 
-  .editor .cm-content {
+  & .cm-content {
     caret-color: var(--editor-cursor);
   }
 
-  .editor .cm-cursor {
+  & .cm-cursor {
     border-left-color: var(--editor-cursor);
   }
 
-  .editor .cm-link {
+  & .cm-link {
     &.cm-link-loaded {
       color: var(--theme-primary);
       text-decoration: underline;
@@ -85,36 +72,25 @@
     }
   }
 
-  .editor .cm-dropCursor {
+  & .cm-dropCursor {
     border-left: 1.2px solid var(--editor-cursor);
   }
 
-  .editor .cm-gutters,
-  .cm-panel {
+  & .cm-gutters {
     background-color: var(--theme-surface);
     color: var(--theme-text-hint-on-light);
     border-color: var(--theme-background);
   }
 
-  .cm-panels-top,
-  .cm-panels-bottom {
-    border-color: var(--theme-background);
-  }
-
-  .editor .cm-activeLine {
+  & .cm-activeLine {
     box-shadow: 0 0 0 2px var(--theme-sub-secondary);
   }
 
-  .editor .cm-activeLineGutter {
+  & .cm-activeLineGutter {
     color: var(--theme-on-surface);
   }
 
-  .ͼ2 .cm-activeLine:not(.cm-changedLine, .cm-deletedLine),
-  .ͼ2 .cm-activeLineGutter:not(.cm-changedLineGutter, .cm-deletedLineGutter) {
-    background-color: unset;
-  }
-
-  .editor .cm-gotoLine.cm-panel {
+  & .cm-gotoLine.cm-panel {
     display: flex;
     align-items: flex-end;
     flex-wrap: wrap;
@@ -133,15 +109,7 @@
     }
 
     & input {
-      font-family: var(--theme-font-family);
-      -moz-osx-font-smoothing: grayscale;
-      -webkit-font-smoothing: antialiased;
-      font-size: var(--theme-typography-body2-font-size);
-      line-height: var(--theme-typography-body2-line-height);
-      font-weight: var(--theme-typography-body2-font-weight);
-      letter-spacing: var(--theme-typography-body2-letter-spacing);
-      text-decoration: inherit;
-      text-transform: inherit;
+      @apply tw:typography-body2;
       max-width: 60px;
       height: 24px;
       padding-inline: 8px;
@@ -151,15 +119,7 @@
       }
     }
     & .cm-button {
-      font-family: var(--theme-font-family);
-      -moz-osx-font-smoothing: grayscale;
-      -webkit-font-smoothing: antialiased;
-      font-size: var(--theme-typography-body2-font-size);
-      line-height: var(--theme-typography-body2-line-height);
-      font-weight: var(--theme-typography-body2-font-weight);
-      letter-spacing: var(--theme-typography-body2-letter-spacing);
-      text-decoration: inherit;
-      text-transform: inherit;
+      @apply tw:typography-body2;
       background: transparent;
       height: 24px;
       padding-block: 0;
@@ -199,24 +159,24 @@
     }
   }
 
-  .editor .cm-content ::selection {
+  & .cm-content ::selection {
     background: var(--theme-primary);
     color: white;
   }
 
-  .editor .cm-lineNumbers .cm-gutterElement {
+  & .cm-lineNumbers .cm-gutterElement {
     min-width: 3ch;
     box-sizing: content-box;
   }
 
-  .editor .cm-gutters .cm-foldGutter .cm-gutterElement {
+  & .cm-gutters .cm-foldGutter .cm-gutterElement {
     display: flex;
     align-items: center;
     cursor: pointer;
     user-select: none;
   }
 
-  .editor .cm-gutters .cm-foldGutter .cm-gutterElement-icon {
+  & .cm-gutters .cm-foldGutter .cm-gutterElement-icon {
     padding: 0 3px 0 5px;
     width: 20px;
     height: 12px;
@@ -227,7 +187,7 @@
     }
   }
 
-  .editor .cm-gutters .query-status .cm-gutterElement {
+  & .cm-gutters .query-status .cm-gutterElement {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -250,106 +210,120 @@
     }
   }
 
-  .editor .tok-keyword {
+  & .tok-keyword {
     color: var(--editor-keyword);
     font-weight: bold;
   }
 
-  .editor .tok-operator {
+  & .tok-operator {
     color: var(--editor-operator);
   }
 
-  .editor .tok-variable-2 {
+  & .tok-variable-2 {
     color: var(--editor-variable-2);
   }
 
-  .editor .tok-variable-3,
-  .editor .tok-type {
+  & .tok-variable-3,
+  & .tok-type {
     color: var(--editor-variable-3);
   }
 
-  .editor .tok-builtin {
+  & .tok-builtin {
     color: var(--editor-builtin);
   }
 
-  .editor .tok-atom {
+  & .tok-atom {
     color: var(--editor-atom);
   }
 
-  .editor .tok-number {
+  & .tok-number {
     color: var(--editor-number);
   }
 
-  .editor .tok-def {
+  & .tok-def {
     color: var(--editor-def);
   }
 
-  .editor .tok-string {
+  & .tok-string {
     color: var(--editor-string);
   }
 
-  .editor .tok-string2 {
+  & .tok-string2 {
     color: var(--editor-string-2);
   }
 
-  .editor .tok-comment {
+  & .tok-comment {
     color: var(--editor-comment);
   }
 
-  .editor .tok-variable {
+  & .tok-variable {
     color: var(--editor-variable);
   }
 
-  .editor .tok-tag {
+  & .tok-tag {
     color: var(--editor-tag);
   }
 
-  .editor .tok-meta {
+  & .tok-meta {
     color: var(--editor-meta);
   }
 
-  .editor .tok-attribute {
+  & .tok-attribute {
     color: var(--editor-attribute);
   }
 
-  .editor .tok-property {
+  & .tok-property {
     color: var(--editor-property);
   }
 
-  .editor .tok-qualifier {
+  & .tok-qualifier {
     color: var(--editor-qualifier);
   }
 
-  .editor .tok-variable-3,
-  .editor .tok-type {
-    color: var(--editor-variable-3);
-  }
-
-  .editor .tok-typeName {
+  & .tok-typeName {
     color: var(--editor-type-name);
   }
 
-  .editor .tok-punctuation {
+  & .tok-punctuation {
     color: var(--editor-punctuation);
   }
 
-  .editor .tok-propertyName {
+  & .tok-propertyName {
     color: var(--editor-property-name);
   }
 
-  .editor .tok-className {
+  & .tok-className {
     color: var(--editor-class-name);
   }
 
-  .editor .tok-bool {
+  & .tok-bool {
     color: var(--editor-bool);
   }
 
-  .editor .tok-variableName {
+  & .tok-variableName {
     color: var(--editor-variable-name);
   }
 
-  .editor .tok-labelName {
+  & .tok-labelName {
     color: var(--editor-label-name);
   }
 }
+
+.cm-panel.cm-panel {
+  background-color: var(--theme-surface);
+  color: var(--theme-text-hint-on-light);
+  border-color: var(--theme-background);
+}
+
+.cm-panels-top.cm-panels-top,
+.cm-panels-bottom.cm-panels-bottom {
+  border-color: var(--theme-background) !important;
+}
+
+.ͼ2.ͼ2 {
+  & .cm-activeLine:not(.cm-changedLine, .cm-deletedLine),
+  & .cm-activeLineGutter:not(.cm-changedLineGutter, .cm-deletedLineGutter) {
+    background-color: unset;
+  }
+}
+

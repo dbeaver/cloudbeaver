@@ -2576,6 +2576,7 @@ __metadata:
     "@cloudbeaver/core-localization": "workspace:*"
     "@cloudbeaver/core-theming": "workspace:*"
     "@cloudbeaver/core-utils": "workspace:*"
+    "@cloudbeaver/plugin-tailwindcss-theme": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
     "@codemirror/autocomplete": "npm:^6"
     "@codemirror/commands": "npm:^6"
