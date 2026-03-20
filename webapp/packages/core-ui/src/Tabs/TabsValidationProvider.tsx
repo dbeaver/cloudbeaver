@@ -15,10 +15,12 @@ import { isDefined, isNotNullDefined } from '@dbeaver/js-helpers';
 
 import { TabsContext } from './TabsContext.js';
 import { TabsValidationContext } from './TabsValidationContext.js';
+import { useTabsState } from './useTabsState.js';
 
 export const TabsValidationProvider = observer(function TabsValidation({ children }: React.PropsWithChildren) {
   const tabsContext = useContext(TabsContext);
   const notificationService = useService(NotificationService);
+  const selectedId = useTabsState('selectedId');
 
   if (!tabsContext) {
     throw new Error('TabsState should be defined');
@@ -35,7 +37,7 @@ export const TabsValidationProvider = observer(function TabsValidation({ childre
       selectNextInvalidTab() {
         const next = Array.from(this.invalidTabs)[0] as string | undefined;
 
-        if (!isDefined(next) || (isNotNullDefined(this.tabsContext.state.selectedId) && this.invalidTabs.has(this.tabsContext.state.selectedId))) {
+        if (!isDefined(next) || (isNotNullDefined(this.selectedId) && this.invalidTabs.has(this.selectedId))) {
           return;
         }
 
@@ -63,7 +65,7 @@ export const TabsValidationProvider = observer(function TabsValidation({ childre
         }
       },
     }),
-    { tabsContext, notificationService },
+    { tabsContext, notificationService, selectedId },
     ['invalidate'],
   );
 

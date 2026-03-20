@@ -29,12 +29,7 @@ function createUndoHandlers<TKey extends IGridDataKey, TCell>(): Record<string, 
   return {
     [GRID_HISTORY_SOURCE.EDIT_CELL]: (entry, ops) => {
       if (isGridHistoryEditCellData<TKey, TCell>(entry)) {
-        ops.setCells([
-          {
-            key: entry.data.key,
-            value: entry.data.prevValue,
-          },
-        ]);
+        ops.setCells(entry.data.updates.map(u => ({ key: u.key, value: u.prevValue })));
       }
     },
     [GRID_HISTORY_SOURCE.ADD_ROW]: (entry, ops) => {
@@ -69,12 +64,7 @@ function createRedoHandlers<TKey extends IGridDataKey, TCell>(): Record<string, 
   return {
     [GRID_HISTORY_SOURCE.EDIT_CELL]: (entry, ops) => {
       if (isGridHistoryEditCellData<TKey, TCell>(entry)) {
-        ops.setCells([
-          {
-            key: entry.data.key,
-            value: entry.data.value,
-          },
-        ]);
+        ops.setCells(entry.data.updates.map(u => ({ key: u.key, value: u.value })));
       }
     },
     [GRID_HISTORY_SOURCE.ADD_ROW]: (entry, ops) => {

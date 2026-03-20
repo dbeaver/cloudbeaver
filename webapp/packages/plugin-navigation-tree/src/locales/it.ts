@@ -32,4 +32,5 @@ export default [
   ['plugin_navigation_tree_settings_disable', 'Disabilita'],
   ['plugin_navigation_tree_settings_disable_description', "Disabilita l'albero di navigazione per tutti gli utenti"],
   ['plugin_navigation_tree_toolbar_menu_title', "Barra degli strumenti dell'albero"],
+  ['plugin_navigation_tree_settings_menu_title', "Impostazioni dell'albero"],
 ];

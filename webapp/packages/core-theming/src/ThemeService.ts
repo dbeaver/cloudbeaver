@@ -21,6 +21,7 @@ import './styles/utilities/ripple.css';
 import './styles/UiIconButton.css';
 import './styles/UiSpinner.css';
 import './styles/UiInput.css';
+import './styles/UISearch.css';
 import './styles/UiPopover.css';
 import './styles/UiColorPicker.css';
 import { FALLBACK_THEME_ID, themes } from './themes.js';
