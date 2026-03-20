@@ -28,7 +28,7 @@ export const LogViewerTable = observer<Props>(function LogViewerTable({ items, s
   return (
     <Container className={s(style, { wrapper: true }, className)}>
       <Button
-        className='tw:max-w-max tw:!absolute tw:absolute tw:top-1 tw:right-4 tw:z-[100]'
+        className='tw:max-w-max tw:!absolute tw:top-1 tw:right-4 tw:z-[100]'
         variant='ghost'
         size='small'
         title={translate('plugin_log_viewer_clear_log')}
