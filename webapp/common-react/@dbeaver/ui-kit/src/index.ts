@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,13 @@ export { ColorPicker } from './ColorPicker/ColorPicker.js';
 export { ColorPickerBase, type ColorPickerProps } from './ColorPicker/ColorPickerBase.js';
 export { Input, InputBase, type InputProps } from './Input/Input.js';
 export {
+  SearchPanel,
+  type SearchPanelProps,
+  type SearchPanelRef,
+  type SearchPanelQuery,
+  type SearchPanelStrings,
+} from './SearchPanel/SearchPanel.js';
+export {
   Select,
   useSelectContext,
   useSelectStore,
@@ -49,3 +56,4 @@ export * from './ComponentProvider.js';
 export * from './Menu/Menu.js';
 export * from './Disclosure/Disclosure.js';
 export * from './Dialog/Dialog.js';
+export * from './Tab/Tab.js';

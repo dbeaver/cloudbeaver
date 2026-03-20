@@ -9,17 +9,20 @@ import { computed, observable, action } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useContext, type HTMLAttributes } from 'react';
 
-import { getComputed, useHover, useObjectRef, useObservableRef } from '@cloudbeaver/core-blocks';
+import { getComputed, useHover, useMergeRefs, useObjectRef, useObservableRef } from '@cloudbeaver/core-blocks';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { clsx } from '@dbeaver/ui-kit';
 import { type IDataGridCellRenderer, type ICellPosition } from '@cloudbeaver/plugin-data-grid';
 import { DatabaseEditChangeType, type IGridDataKey, type IGridRowKey } from '@cloudbeaver/plugin-data-viewer';
 import { isObjectsEqual } from '@cloudbeaver/core-utils';
 
+import { ColumnDnDContext } from '../ColumnDnDContext.js';
 import { DataGridContext } from '../DataGridContext.js';
 import { DataGridSelectionContext } from '../DataGridSelection/DataGridSelectionContext.js';
 import { TableDataContext, type IColumnInfo } from '../TableDataContext.js';
 import { CellContext } from './CellContext.js';
+import { useDataEditorDnDBox } from '../useDataEditorDnDBox.js';
+import { getDropSide } from '../getDropSide.js';
 
 interface Props {
   rowIdx: number;
@@ -32,6 +35,9 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
   const dataGridContext = useContext(DataGridContext);
   const tableDataContext = useContext(TableDataContext);
   const selectionContext = useContext(DataGridSelectionContext);
+  const columnDnDContext = useContext(ColumnDnDContext);
+  const columnInfo = tableDataContext.getColumn(colIdx);
+  const dndBox = useDataEditorDnDBox(dataGridContext.model, dataGridContext.resultIndex, columnInfo?.key ?? null);
 
   const hover = useHover();
 
@@ -93,12 +99,15 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
     { colIdx, rowIdx, tableDataContext, selectionContext, hover, isFocused: props['aria-selected'] === 'true', isHovered: hover.isHovered },
   );
 
+  const dropSide = getComputed(() => getDropSide(columnInfo, columnDnDContext));
   const classes = getComputed(() =>
     clsx({
       'rdg-cell-custom-selected': cellContext.isSelected,
       'rdg-cell-custom-added': cellContext.editionState === DatabaseEditChangeType.add,
       'rdg-cell-custom-deleted': cellContext.editionState === DatabaseEditChangeType.delete,
       'rdg-cell-custom-edited': cellContext.editionState === DatabaseEditChangeType.update,
+      'rdg-cell-column-drop-left': dropSide === 'left',
+      'rdg-cell-column-drop-right': dropSide === 'right',
     }),
   );
 
@@ -176,10 +185,12 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
     isObjectsEqual,
   );
 
+  const mergedRef = useMergeRefs(dndBox.setRef, hover.ref);
+
   return (
     <CellContext.Provider value={cellContext}>
       {renderDefaultCell({
-        ref: hover.ref,
+        ref: mergedRef,
         className: classes,
         style: formatting || undefined,
         'data-row-index': rowIdx,

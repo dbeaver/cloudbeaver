@@ -1,0 +1,35 @@
+extend enum CBServerEventId {
+    "Resource manager resource created"
+    cb_rm_resource_created,
+    "Resource manager resource updated"
+    cb_rm_resource_updated,
+    "Resource manager resource deleted"
+    cb_rm_resource_deleted,
+
+    "Resource manager project added"
+    cb_rm_project_added,
+    "Resource manager project added"
+    cb_rm_project_updated,
+    "Resource manager project removed"
+    cb_rm_project_removed
+}
+
+extend enum CBEventTopic {
+    cb_projects,
+    cb_scripts
+}
+
+"Resource manager event"
+type CBRMEvent implements CBServerEvent {
+    id: CBServerEventId!
+    topicId: CBEventTopic
+    resourcePath: String!
+    projectId: String!
+}
+
+"RM project update event"
+type CBProjectUpdateEvent implements CBServerEvent {
+    id: CBServerEventId!
+    topicId: CBEventTopic
+    projectId: String!
+}

@@ -1,0 +1,62 @@
+####################################################
+extend enum CBServerEventId {
+
+    "Datasource created"
+    cb_datasource_created,
+    "Datasource updated"
+    cb_datasource_updated,
+    "Datasource deleted"
+    cb_datasource_deleted,
+
+    "Datasource folder created"
+    cb_datasource_folder_created,
+    "Datasource folder updated"
+    cb_datasource_folder_updated,
+    "Datasource folder deleted"
+    cb_datasource_folder_deleted,
+
+    "Datasource disconnected"
+    cb_datasource_disconnected,
+    "Datasource connected"
+    cb_datasource_connected
+}
+
+extend enum CBEventTopic {
+    cb_datasource,
+    cb_datasource_folder,
+    cb_datasource_connection
+}
+
+"Datasource folder event"
+type CBDatasourceFolderEvent implements CBServerEvent {
+    id: CBServerEventId!
+    topicId: CBEventTopic
+    nodePaths: [String!]! # list of folders node ids
+    projectId: String!
+}
+
+"Datasource event"
+type CBDatasourceEvent implements CBServerEvent {
+    id: CBServerEventId!
+    topicId: CBEventTopic
+    dataSourceIds: [String!]! # list of datasources ids
+    projectId: String!
+}
+
+"Datasource disconnect event"
+type WSDataSourceDisconnectEvent implements CBServerEvent {
+    id: CBServerEventId!
+    topicId: CBEventTopic
+    connectionId: String!
+    projectId: String!
+    timestamp: Int!
+}
+"Datasource connect event"
+type WSDataSourceConnectEvent implements CBServerEvent {
+    id: CBServerEventId!
+    topicId: CBEventTopic
+    connectionId: String!
+    projectId: String!
+    timestamp: Int!
+}
+

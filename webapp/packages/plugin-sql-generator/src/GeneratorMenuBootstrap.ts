@@ -13,6 +13,7 @@ import {
   DATA_CONTEXT_DV_DDM_RESULT_INDEX,
   DATA_CONTEXT_DV_PRESENTATION,
   DATA_VIEWER_DATA_MODEL_ACTIONS_MENU,
+  DatabaseDataFeature,
   DataViewerPresentationType,
   IDatabaseDataEditAction,
   type IDatabaseDataModel,
@@ -41,8 +42,10 @@ export class GeneratorMenuBootstrap extends Bootstrap {
         const model = context.get(DATA_CONTEXT_DV_DDM)!;
         const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
         const presentation = context.get(DATA_CONTEXT_DV_PRESENTATION);
+        const allowedFeatures = [DatabaseDataFeature.DataEditor, DatabaseDataFeature.QueryResult];
+
         return (
-          // TODO add more proper way to define to what features it should be added https://github.com/dbeaver/pro/issues/8299
+          allowedFeatures.some(feature => model.source.hasFeature(feature)) &&
           !model.isReadonly(resultIndex) &&
           model.source.getResult(resultIndex)?.dataFormat === ResultDataFormat.Resultset &&
           !presentation?.readonly &&

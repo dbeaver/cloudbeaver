@@ -1,21 +1,22 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+
 import { observer } from 'mobx-react-lite';
 import { useCallback, useEffect, useState } from 'react';
 
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
-import { Loader, s, SContext, type StyleRegistry, useExecutor, useS } from '@cloudbeaver/core-blocks';
+import { Loader, SContext, type StyleRegistry, useExecutor } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { type ITabData, TabPanel, TabsBox, TabStyles } from '@cloudbeaver/core-ui';
+import { type ITabData, TabList, TabPanel, TabsState, TabStyles } from '@cloudbeaver/core-ui';
 import { CaptureView } from '@cloudbeaver/core-view';
+import { clsx } from '@dbeaver/ui-kit';
 
 import { NavigationTabsService } from '../NavigationTabsService.js';
-import styles from './shared/NavigationTabsBar.module.css';
 import NavigationTabsBarTab from './shared/NavigationTabsBarTab.module.css';
 import { TabHandlerPanel } from './Tabs/TabHandlerPanel.js';
 import { TabHandlerTab } from './Tabs/TabHandlerTab.js';
@@ -43,7 +44,6 @@ export const NavigationTabsBar = observer<Props>(function NavigationTabsBar({ cl
   // TODO: we get exception when after closing the restored page trying to open another
   //       it's related to hooks order and state restoration
   const [restoring, setRestoring] = useState(false);
-  const style = useS(styles);
 
   const handleSelect = useCallback((tabId: string) => navigation.selectTab(tabId), [navigation]);
   const handleClose = useCallback((tabId: string) => navigation.closeTab(tabId), [navigation]);
@@ -95,33 +95,32 @@ export const NavigationTabsBar = observer<Props>(function NavigationTabsBar({ cl
   }
 
   return (
-    <CaptureView view={navigation} className={s(style, { captureView: true }, className)}>
+    <CaptureView view={navigation} className={clsx('tw:flex-1 tw:flex tw:overflow-auto', className)}>
       <Loader loading={restoring}>
-        <TabsBox
+        <TabsState
           currentTabId={navigation.currentTabId}
-          className={s(style, { tabsBox: true })}
-          tabsClassName={s(style, { tabs: true })}
-          tabs={
-            <SContext registry={tabsRegistry}>
-              {navigation.tabIdList.map(tabId => (
-                <TabHandlerTab key={tabId} tabId={tabId} onSelect={handleSelect} onClose={handleClose} />
-              ))}
-            </SContext>
-          }
-          tabList={navigation.tabIdList}
-          multipleRows={navigationSettings.hasMultipleRows}
           reorderStateKey="navigation-tabs-bar"
-          autoSelect
+          tabList={navigation.tabIdList}
           enabledBaseActions
+          autoSelect
           onChange={handleTabChange}
           onReorder={handleReorder}
         >
-          {navigation.tabIdList.map(tabId => (
-            <TabPanel key={tabId} tabId={tabId} lazy>
-              {() => <TabHandlerPanel tabId={tabId} />}
-            </TabPanel>
-          ))}
-        </TabsBox>
+          <div className="tw:outline-none tw:flex-1 tw:flex tw:flex-col tw:max-w-full">
+            <TabList className={clsx("tw:overflow-auto tw:max-w-full theme-background-secondary theme-text-on-secondary", navigationSettings.hasMultipleRows && 'tw:flex-wrap')}>
+              <SContext registry={tabsRegistry}>
+                {navigation.tabIdList.map(tabId => (
+                  <TabHandlerTab key={tabId} tabId={tabId} onSelect={handleSelect} onClose={handleClose} />
+                ))}
+              </SContext>
+            </TabList>
+            {navigation.tabIdList.map(tabId => (
+              <TabPanel key={tabId} className="tw:flex-1 tw:flex tw:overflow-hidden tw:relative" tabId={tabId} lazy>
+                {() => <TabHandlerPanel tabId={tabId} />}
+              </TabPanel>
+            ))}
+          </div>
+        </TabsState>
       </Loader>
     </CaptureView>
   );

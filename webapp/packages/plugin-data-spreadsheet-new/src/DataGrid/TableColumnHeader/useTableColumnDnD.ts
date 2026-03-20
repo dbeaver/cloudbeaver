@@ -5,37 +5,31 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { useContext } from 'react';
+
 import { useCombinedRef } from '@cloudbeaver/core-blocks';
 import { useDataContext, useDataContextLink } from '@cloudbeaver/core-data-context';
-import { type IDNDBox, type IDNDData, useDNDBox, useDNDData } from '@cloudbeaver/core-ui';
+import { type IDNDBox, type IDNDData, useDNDData } from '@cloudbeaver/core-ui';
 import {
   DATA_CONTEXT_DV_DDM,
   DATA_CONTEXT_DV_DDM_RESULT_INDEX,
   DATA_CONTEXT_DV_DDM_RS_COLUMN_KEY,
-  GridViewAction,
   type IDatabaseDataModel,
-  IDatabaseDataViewAction,
   type IGridColumnKey,
-  isResultSetDataModel,
-  ResultSetDataSource,
 } from '@cloudbeaver/plugin-data-viewer';
 
-type TableColumnInsertPositionSide = 'left' | 'right' | null;
+import { ColumnDnDContext } from '../ColumnDnDContext.js';
+import { useDataEditorDnDBox } from '../useDataEditorDnDBox.js';
 
 interface TableColumnDnD {
   setRef: (element: React.ReactElement | Element | null) => void;
   data: IDNDData;
   box: IDNDBox;
-  side: TableColumnInsertPositionSide;
 }
 
 export function useTableColumnDnD(model: IDatabaseDataModel, resultIndex: number, columnKey: IGridColumnKey | null): TableColumnDnD {
   const context = useDataContext();
-  let resultSetViewAction: GridViewAction | undefined;
-
-  if (isResultSetDataModel(model)) {
-    resultSetViewAction = (model.source as ResultSetDataSource).tryGetAction(resultIndex, IDatabaseDataViewAction, GridViewAction);
-  }
+  const columnDnDContext = useContext(ColumnDnDContext);
 
   useDataContextLink(context, (context, id) => {
     context.set(DATA_CONTEXT_DV_DDM, model, id);
@@ -45,47 +39,18 @@ export function useTableColumnDnD(model: IDatabaseDataModel, resultIndex: number
 
   const dndData = useDNDData(context, {
     canDrag: () => !model.isDisabled(resultIndex),
-  });
-
-  const dndBox = useDNDBox({
-    canDrop(context) {
-      return (
-        context.hasValue(DATA_CONTEXT_DV_DDM, model) &&
-        context.hasValue(DATA_CONTEXT_DV_DDM_RESULT_INDEX, resultIndex) &&
-        !context.hasValue(DATA_CONTEXT_DV_DDM_RS_COLUMN_KEY, columnKey)
-      );
+    onDragStart() {
+      columnDnDContext?.setDragging(true);
     },
-    onDrop(context) {
-      const dndColumnKey = context.get(DATA_CONTEXT_DV_DDM_RS_COLUMN_KEY);
-
-      if (columnKey && dndColumnKey && resultSetViewAction) {
-        resultSetViewAction.setColumnOrder(dndColumnKey, resultSetViewAction.columnIndex(columnKey));
-
-        const isFromPinned = resultSetViewAction.isColumnPinned(dndColumnKey);
-        const isToPinned = resultSetViewAction.isColumnPinned(columnKey);
-
-        if (isFromPinned && !isToPinned) {
-          resultSetViewAction.unpinColumns([dndColumnKey]);
-        } else if (!isFromPinned && isToPinned) {
-          resultSetViewAction.pinColumns([dndColumnKey]);
-        }
-      }
+    onDragEnd() {
+      columnDnDContext?.setDragging(false);
+      columnDnDContext?.setDropTarget(null);
     },
   });
+
+  const dndBox = useDataEditorDnDBox(model, resultIndex, columnKey);
 
   const setRef = useCombinedRef(dndData.setTargetRef, dndBox.setRef);
 
-  let side: TableColumnInsertPositionSide = null;
-
-  if (columnKey && dndBox.state.isOver && dndBox.state.context) {
-    const dndColumnKey = dndBox.state.context.get(DATA_CONTEXT_DV_DDM_RS_COLUMN_KEY);
-
-    if (resultSetViewAction && dndColumnKey && resultSetViewAction.columnIndex(columnKey) > resultSetViewAction.columnIndex(dndColumnKey)) {
-      side = 'right';
-    } else {
-      side = 'left';
-    }
-  }
-
-  return { setRef, data: dndData, box: dndBox, side };
+  return { setRef, data: dndData, box: dndBox };
 }
