@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -288,7 +288,7 @@ export function WithoutAnimation(): JSX.Element {
         <DialogBody>
           <DialogDescription>
             This dialog has animations disabled using the <code>animated={'{false}'}</code> prop. This is useful when combining the dialog with other
-            animations (e.g., SlideElement) to avoid animation conflicts.
+            animations to avoid animation conflicts.
           </DialogDescription>
         </DialogBody>
         <DialogFooter>

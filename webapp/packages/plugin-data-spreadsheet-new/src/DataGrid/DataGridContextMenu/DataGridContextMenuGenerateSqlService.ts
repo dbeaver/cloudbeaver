@@ -14,6 +14,7 @@ import {
   DATA_CONTEXT_DV_DDM,
   DATA_CONTEXT_DV_DDM_RESULT_INDEX,
   DATA_CONTEXT_DV_RESULT_KEY,
+  DatabaseDataFeature,
   GridDataKeysUtils,
   GridSelectAction,
   GridViewAction,
@@ -57,9 +58,14 @@ export class DataGridContextMenuGenerateSqlService {
       isApplicable: context => {
         const model = context.get(DATA_CONTEXT_DV_DDM);
         const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
+        const allowedFeatures = [DatabaseDataFeature.DataEditor, DatabaseDataFeature.QueryResult];
 
-        // TODO add more proper way to define to what features it should be added https://github.com/dbeaver/pro/issues/8299
-        return isResultSetDataModel(model) && !model.isReadonly(resultIndex) && !model.isDisabled(resultIndex);
+        return (
+          !!model &&
+          allowedFeatures.some(feature => model.source.hasFeature(feature)) &&
+          !model.isDisabled(resultIndex) &&
+          !model.isReadonly(resultIndex)
+        );
       },
       getItems: (context, items) => [...items, MENU_DATA_GRID_GENERATE_SQL],
     });

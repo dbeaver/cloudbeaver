@@ -32,6 +32,7 @@ import { ResultSetFormatAction } from '../DatabaseDataModel/Actions/ResultSet/Re
 import { ResultSetSelectAction } from '../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction.js';
 import { ResultSetViewAction } from '../DatabaseDataModel/Actions/ResultSet/ResultSetViewAction.js';
 import { IDatabaseDataSelectAction } from '../DatabaseDataModel/Actions/IDatabaseDataSelectAction.js';
+import { DatabaseDataFeature } from '../DatabaseDataModel/IDatabaseDataSource.js';
 
 export interface IRowIdentifierInfo {
   state: SqlRowIdentifierState | null;
@@ -52,6 +53,7 @@ export abstract class ResultSetDataSource<TOptions = IDatabaseDataOptions> exten
     this.totalCountRequestTask = null;
     this.executionContext = null;
     this.keepExecutionContextOnDispose = false;
+    this.setFeature(DatabaseDataFeature.ResultSet);
 
     this.actions
       .registerAction(IDatabaseDataResultAction, DocumentDataAction)

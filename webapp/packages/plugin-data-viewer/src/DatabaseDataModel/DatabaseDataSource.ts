@@ -15,6 +15,7 @@ import { IDatabaseDataActions } from './IDatabaseDataActions.js';
 import type { IDatabaseDataResult } from './IDatabaseDataResult.js';
 import {
   DatabaseDataAccessMode,
+  DatabaseDataFeature,
   DatabaseDataSourceOperation,
   IDatabaseDataSource,
   type IDatabaseDataSourceOperationEvent,
@@ -34,6 +35,7 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
   options: TOptions | null;
   requestInfo: IRequestInfo;
   error: Error | null;
+  private readonly features: Set<DatabaseDataFeature | string>;
 
   get canCancel(): boolean {
     if (this.activeOperation instanceof Task) {
@@ -84,6 +86,7 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
     this.onOperation = new Executor();
     this.dataFormat = ResultDataFormat.Resultset;
     this.supportedDataFormats = [];
+    this.features = new Set<DatabaseDataFeature>([DatabaseDataFeature.Database]);
     this.requestInfo = {
       originalQuery: '',
       fullQuery: '',
@@ -95,9 +98,10 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
     this.error = null;
     this.lastAction = this.requestData.bind(this);
 
-    makeObservable<DatabaseDataSource<TOptions, TResult>, 'disabled' | 'activeOperationStack' | 'outdated'>(this, {
+    makeObservable<DatabaseDataSource<TOptions, TResult>, 'disabled' | 'features' | 'activeOperationStack' | 'outdated'>(this, {
       access: observable,
       dataFormat: observable,
+      features: observable,
       supportedDataFormats: observable,
       results: observable,
       offset: observable,
@@ -111,6 +115,7 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
       outdated: observable.ref,
       activeOperationStack: observable.shallow,
       setResults: action,
+      setFeature: action,
       setSupportedDataFormats: action,
       resetData: action,
     });
@@ -250,6 +255,15 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
   setError(error: Error): this {
     this.error = error;
     return this;
+  }
+
+  setFeature(feature: DatabaseDataFeature | string): this {
+    this.features.add(feature);
+    return this;
+  }
+
+  hasFeature(feature: DatabaseDataFeature | string): boolean {
+    return this.features.has(feature);
   }
 
   async retry(): Promise<void> {

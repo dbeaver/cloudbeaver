@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,7 @@ import {
   filterOnlyActive,
   type IAdministrationItemRoute,
 } from '@cloudbeaver/core-administration';
-import {
-  s,
-  SContext,
-  SlideBox,
-  SlideElement,
-  SlideOverlay,
-  type StyleRegistry,
-  ToolsActionStyles,
-  ToolsPanelStyles,
-  useAutoLoad,
-  useS,
-  SlidePanel,
-} from '@cloudbeaver/core-blocks';
+import { s, SContext, SlideDialog, type StyleRegistry, ToolsActionStyles, ToolsPanelStyles, useAutoLoad, useS } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { OptionsPanelService, TabList, TabListStyles, TabsState, TabStyles } from '@cloudbeaver/core-ui';
 import type { ILoadableState } from '@cloudbeaver/core-utils';
@@ -118,7 +106,7 @@ export const Administration = observer<React.PropsWithChildren<Props>>(function 
       <AdministrationCaptureViewContext />
       <TabsState currentTabId={activeScreen?.item} localState={administrationScreenService.itemState} orientation="vertical">
         <SContext registry={tabsRegistry}>
-          <TabList aria-label="Administration items" vertical>
+          <TabList aria-label="Administration items" data-dialog-persistent-element vertical>
             {visibleItems.map(item => (
               <DrawerItem
                 key={item.name}
@@ -139,19 +127,16 @@ export const Administration = observer<React.PropsWithChildren<Props>>(function 
         <div ref={contentRef} className={s(styles, { contentContainer: true })}>
           {children}
           <SContext registry={adminPageRegistry}>
-            <SlideBox className={s(styles, { slideBox: true })} open={optionsPanelService.active} onClose={close}>
-              <SlideElement inert={optionsPanelService.active} className={s(styles, { slideElement: true })}>
-                <div className={s(styles, { content: true })}>
-                  <ItemContent activeScreen={activeScreen} configurationWizard={configurationWizard} />
-                </div>
-              </SlideElement>
-              <SlideOverlay onClick={close} />
-              <SlidePanel isOpen={optionsPanelService.active} onClose={close}>
+            <div className={s(styles, { container: true })}>
+              <div className={s(styles, { mainContent: true })}>
+                <ItemContent activeScreen={activeScreen} configurationWizard={configurationWizard} />
+              </div>
+              <SlideDialog open={optionsPanelService.active} onClose={close}>
                 <div className={s(styles, { content: true })}>
                   <OptionsPanel />
                 </div>
-              </SlidePanel>
-            </SlideBox>
+              </SlideDialog>
+            </div>
           </SContext>
         </div>
       </TabsState>
