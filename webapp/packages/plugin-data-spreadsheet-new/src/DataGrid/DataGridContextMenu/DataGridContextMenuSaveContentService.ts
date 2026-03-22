@@ -14,12 +14,12 @@ import {
   DATA_CONTEXT_DV_DDM,
   DATA_CONTEXT_DV_DDM_RESULT_INDEX,
   DATA_CONTEXT_DV_RESULT_KEY,
+  DatabaseDataFeature,
   DatabaseEditChangeType,
   DataViewerService,
   IDatabaseDataEditAction,
   IDatabaseDataFormatAction,
   IDatabaseDataSelectAction,
-  isResultSetDataSource,
   ResultSetDataContentAction,
 } from '@cloudbeaver/plugin-data-viewer';
 
@@ -38,7 +38,9 @@ export class DataGridContextMenuSaveContentService {
       contexts: [DATA_CONTEXT_DV_DDM, DATA_CONTEXT_DV_DDM_RESULT_INDEX, DATA_CONTEXT_DV_RESULT_KEY],
       isApplicable: context => {
         const model = context.get(DATA_CONTEXT_DV_DDM)!;
-        return isResultSetDataSource(model.source);
+        const allowedFeatures = [DatabaseDataFeature.DataEditor, DatabaseDataFeature.QueryResult];
+
+        return allowedFeatures.some(feature => model.source.hasFeature(feature));
       },
       getItems: (context, items) => [...items, ACTION_UPLOAD, ACTION_DOWNLOAD],
     });
@@ -65,7 +67,6 @@ export class DataGridContextMenuSaveContentService {
 
         if (action === ACTION_UPLOAD) {
           return (
-            // TODO add more proper way to define to what features it should be added https://github.com/dbeaver/pro/issues/8299
             !format.isBinary(cellHolder) ||
             model.isReadonly(resultIndex) ||
             (format.isReadOnly(key) && editor.getElementState(key) !== DatabaseEditChangeType.add) ||
