@@ -47,10 +47,11 @@ export const SQLCodeEditorPanel: TabContainerPanelComponent<ISqlEditorModeProps>
   const sqlDialect = useSqlDialectExtension(data.dialect);
   const highlightExtensions = useHighlightExtensions(sqlEditorSettingsService.highlightWhitespace);
 
-  const lspExtension = useLSPExtension({
-    projectId: data.model.dataSource?.projectId,
-    resourcePath: data.model.state?.editorId,
-  });
+  const lspDocumentUri =
+    data.model.dataSource?.lspDocumentUri ??
+    (data.model.dataSource?.projectId ? `lsp://${data.model.dataSource.projectId}/${data.model.state?.editorId}` : null);
+
+  const lspExtension = useLSPExtension({ documentUri: lspDocumentUri });
 
   if (autocompletion) {
     extensions.set(...autocompletion);

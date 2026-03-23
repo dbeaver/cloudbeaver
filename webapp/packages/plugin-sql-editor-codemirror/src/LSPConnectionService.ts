@@ -17,6 +17,21 @@ interface IReconnectingTransport extends Transport {
   dispose(): void;
 }
 
+interface ILSPPosition {
+  line: number;
+  character: number;
+}
+
+interface ILSPTextEdit {
+  range: { start: ILSPPosition; end: ILSPPosition };
+  newText: string;
+}
+
+interface IDocumentFormattingParams {
+  textDocument: { uri: string };
+  options: { tabSize: number; insertSpaces: boolean };
+}
+
 function createReconnectingTransport(uri: string): { ready: Promise<IReconnectingTransport>; dispose(): void } {
   let handlers: ((value: string) => void)[] = [];
   let sock: WebSocket | null = null;
@@ -134,6 +149,25 @@ export class LSPConnectionService {
 
     this.refCount++;
     return this.client;
+  }
+
+  async formatDocument(documentUri: string): Promise<string | null> {
+    if (!this.client) {
+      return null;
+    }
+
+    this.client.sync();
+
+    const result = await this.client.request<IDocumentFormattingParams, ILSPTextEdit[] | null>('textDocument/formatting', {
+      textDocument: { uri: documentUri },
+      options: { tabSize: 4, insertSpaces: true },
+    });
+
+    if (!result?.length) {
+      return null;
+    }
+
+    return result[0]!.newText;
   }
 
   release(): void {

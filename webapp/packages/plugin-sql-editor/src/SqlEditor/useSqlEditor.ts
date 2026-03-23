@@ -19,7 +19,7 @@ import { createLastPromiseGetter, type LastPromiseGetter } from '@cloudbeaver/co
 import type { ISqlEditorTabState } from '../ISqlEditorTabState.js';
 import { ESqlDataSourceFeatures } from '../SqlDataSource/ESqlDataSourceFeatures.js';
 import type { ISqlEditorCursor } from '../SqlDataSource/ISqlDataSource.js';
-import { SqlDialectInfoService } from '../SqlDialectInfoService.js';
+import { LSPConnectionService } from '@cloudbeaver/plugin-sql-editor-codemirror';
 import { SqlEditorService } from '../SqlEditorService.js';
 import { type ISQLScriptSegment } from '../SQLParser.js';
 import { SqlExecutionPlanService } from '../SqlResultTabs/ExecutionPlan/SqlExecutionPlanService.js';
@@ -31,7 +31,7 @@ import { SqlEditorSettingsService } from '../SqlEditorSettingsService.js';
 import { SqlEditorModelService } from '../SqlEditorModel/SqlEditorModelService.js';
 
 interface ISQLEditorDataPrivate extends ISQLEditorData {
-  readonly sqlDialectInfoService: SqlDialectInfoService;
+  readonly lspConnectionService: LSPConnectionService;
   readonly connectionExecutionContextService: ConnectionExecutionContextService;
   readonly sqlQueryService: SqlQueryService;
   readonly sqlEditorService: SqlEditorService;
@@ -56,7 +56,7 @@ const MAX_HINTS_LIMIT = 200;
 export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
   const connectionExecutionContextService = useService(ConnectionExecutionContextService);
   const sqlQueryService = useService(SqlQueryService);
-  const sqlDialectInfoService = useService(SqlDialectInfoService);
+  const lspConnectionService = useService(LSPConnectionService);
   const sqlEditorService = useService(SqlEditorService);
   const notificationService = useService(NotificationService);
   const sqlExecutionPlanService = useService(SqlExecutionPlanService);
@@ -155,26 +155,30 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
       },
 
       async formatScript(): Promise<void> {
-        if (this.isDisabled || this.isScriptEmpty || !this.model.dataSource?.executionContext) {
+        if (this.isDisabled || this.isScriptEmpty) {
           return;
         }
 
-        const script = await this.model.getResolvedSegment();
+        const documentUri =
+          this.model.dataSource?.lspDocumentUri ??
+          (this.model.dataSource?.projectId ? `lsp://${this.model.dataSource.projectId}/${this.state.editorId}` : null);
 
-        if (!script) {
+        if (!documentUri) {
           return;
         }
 
         this.onExecute.execute(true);
         try {
           this.readonlyState = true;
-          const formatted = await this.sqlDialectInfoService.formatScript(this.model.dataSource.executionContext, script.query);
+          const formatted = await this.lspConnectionService.formatDocument(documentUri);
 
-          const cursorAnchor = this.model.cursor.anchor;
-          this.setScript(this.value.substring(0, script.begin) + formatted + this.value.substring(script.end), 'format', {
-            anchor: cursorAnchor,
-            head: cursorAnchor,
-          });
+          if (formatted !== null) {
+            const cursorAnchor = this.model.cursor.anchor;
+            this.setScript(formatted, 'format', {
+              anchor: cursorAnchor,
+              head: cursorAnchor,
+            });
+          }
         } finally {
           this.readonlyState = false;
         }
@@ -352,9 +356,9 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
       state,
       model,
       dialect: connectionDialectLoader.tryGetData,
+      lspConnectionService,
       connectionExecutionContextService,
       sqlQueryService,
-      sqlDialectInfoService,
       sqlEditorService,
       sqlExecutionPlanService,
       sqlResultTabsService,

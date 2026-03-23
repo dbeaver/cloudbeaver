@@ -16,12 +16,11 @@ import { LSPConnectionService } from './LSPConnectionService.js';
 const codemirrorPluginLoader = createLazyLoader(() => import('@cloudbeaver/plugin-codemirror6'));
 
 export interface ILSPExtensionOptions {
-  projectId: string | null | undefined;
-  resourcePath: string | null | undefined;
+  documentUri: string | null | undefined;
 }
 
 export function useLSPExtension(options: ILSPExtensionOptions): [Compartment, Extension] | null {
-  const { projectId, resourcePath } = options;
+  const { documentUri } = options;
   const codemirror = useLazyImport(codemirrorPluginLoader);
   const lspConnectionService = useService(LSPConnectionService);
 
@@ -35,13 +34,6 @@ export function useLSPExtension(options: ILSPExtensionOptions): [Compartment, Ex
   const client = useMemo(() => lspConnectionService.acquire(), [lspConnectionService]);
 
   useEffect(() => () => lspConnectionService.release(), [lspConnectionService]);
-
-  const documentUri = useMemo(() => {
-    if (!projectId || !resourcePath) {
-      return null;
-    }
-    return `lsp://${projectId}/${resourcePath}`;
-  }, [projectId, resourcePath]);
 
   return useMemo(() => {
     if (!LSP_COMPARTMENT || !client || !codemirror || !documentUri) {

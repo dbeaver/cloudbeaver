@@ -46,7 +46,6 @@ export * from './SqlEditorModel/SqlEditorModelService.js';
 export * from './DATA_CONTEXT_SQL_EDITOR_STATE.js';
 export * from './getSqlEditorName.js';
 export * from './QueryDataSource.js';
-export * from './SqlDialectInfoService.js';
 export * from './ISqlEditorTabState.js';
 export * from './SQLEditorLoader.js';
 export * from './SqlEditorModeService.js';

@@ -20,7 +20,6 @@ import { SqlEditorSettingsService } from './SqlEditorSettingsService.js';
 import { SqlEditorService } from './SqlEditorService.js';
 import { SqlEditorModeService } from './SqlEditorModeService.js';
 import { SqlEditorGroupTabsBootstrap } from './SqlEditorGroupTabsBootstrap.js';
-import { SqlDialectInfoService } from './SqlDialectInfoService.js';
 import { SqlDataSourceService } from './SqlDataSource/SqlDataSourceService.js';
 import { LocalStorageSqlDataSourceBootstrap } from './SqlDataSource/LocalStorage/LocalStorageSqlDataSourceBootstrap.js';
 import { MenuBootstrap } from './MenuBootstrap.js';
@@ -54,7 +53,6 @@ export default ModuleRegistry.add({
       .addSingleton(SqlEditorService)
       .addSingleton(SqlEditorModeService)
       .addSingleton(SqlEditorGroupTabsBootstrap)
-      .addSingleton(SqlDialectInfoService)
       .addSingleton(SqlDataSourceService)
       .addSingleton(LocalStorageSqlDataSourceBootstrap)
       .addSingleton(SqlEditorModelService)
