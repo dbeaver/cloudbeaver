@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,10 @@ import {
   ObjectViewerTabService,
 } from '@cloudbeaver/plugin-object-viewer';
 
+import type { ContainerDataSource } from './ContainerDataSource.js';
+import type { IDatabaseDataModel } from './DatabaseDataModel/IDatabaseDataModel.js';
 import type { IDataViewerPageState } from './IDataViewerPageState.js';
+import { DataViewerTableStateService } from './DataViewerTableState/DataViewerTableStateService.js';
 import { TableViewerStorageService } from './TableViewer/TableViewerStorageService.js';
 
 const DataViewerTab = importLazyComponent(() => import('./DataViewerPage/DataViewerTab.js').then(module => module.DataViewerTab));
@@ -36,6 +39,7 @@ const DataViewerPanel = importLazyComponent(() => import('./DataViewerPage/DataV
   NavigationTabsService,
   ConnectionInfoResource,
   TableViewerStorageService,
+  DataViewerTableStateService,
 ])
 export class DataViewerTabService {
   readonly page: ObjectPage<IDataViewerPageState>;
@@ -49,6 +53,7 @@ export class DataViewerTabService {
     private readonly navigationTabsService: NavigationTabsService,
     private readonly connectionInfoResource: ConnectionInfoResource,
     private readonly tableViewerStorageService: TableViewerStorageService,
+    private readonly dataViewerTableStateService: DataViewerTableStateService,
   ) {
     this.page = this.dbObjectPageService.register({
       key: 'data_viewer_data',
@@ -57,7 +62,7 @@ export class DataViewerTabService {
       getTabComponent: () => DataViewerTab,
       getPanelComponent: () => DataViewerPanel,
       onRestore: this.handleTabRestore.bind(this),
-      onUnload: this.handleTabClose.bind(this),
+      onUnload: this.handleTabUnload.bind(this),
       canClose: this.handleTabCanClose.bind(this),
       onClose: this.handleTabClose.bind(this),
     });
@@ -93,6 +98,7 @@ export class DataViewerTabService {
           return;
         }
       } else if (isObjectViewerTab(tab) && tab.handlerState.tableId) {
+        this.saveTableState(tab);
         await this.disposeTableModel(tab.handlerState.tableId);
       }
     }
@@ -132,9 +138,34 @@ export class DataViewerTabService {
     return true;
   }
 
+  private async handleTabUnload(tab: ITab<IObjectViewerTabState>) {
+    this.saveTableState(tab);
+
+    if (tab.handlerState.tableId) {
+      await this.disposeTableModel(tab.handlerState.tableId);
+    }
+  }
+
   private async handleTabClose(tab: ITab<IObjectViewerTabState>) {
     if (tab.handlerState.tableId) {
       await this.disposeTableModel(tab.handlerState.tableId);
+    }
+    this.dataViewerTableStateService.clearState(tab.handlerState.objectId);
+  }
+
+  private saveTableState(tab: ITab<IObjectViewerTabState>): void {
+    if (!tab.handlerState.tableId) {
+      return;
+    }
+
+    const model = this.tableViewerStorageService.get<IDatabaseDataModel<ContainerDataSource>>(tab.handlerState.tableId);
+
+    if (model) {
+      try {
+        this.dataViewerTableStateService.saveState(tab.handlerState.objectId, model);
+      } catch {
+        // silently ignore
+      }
     }
   }
 

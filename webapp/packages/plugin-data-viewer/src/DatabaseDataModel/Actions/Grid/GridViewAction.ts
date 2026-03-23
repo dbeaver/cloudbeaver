@@ -80,6 +80,8 @@ export class GridViewAction<
       columns: computed,
       columnKeys: computed,
     });
+
+    this.restorePendingState();
   }
 
   has(cell: TKey): boolean {
@@ -230,6 +232,61 @@ export class GridViewAction<
     super.updateResult(result, index);
     if (this.columnsOrder.length !== this.data.columns.length) {
       this.columnsOrder = this.data.columns.map((key, index) => index);
+    }
+    this.restorePendingState();
+  }
+
+  private restorePendingState(): void {
+    const source = this.source as any;
+
+    if (source.pendingColumnOrder?.length) {
+      const orderNames: string[] = source.pendingColumnOrder;
+      source.pendingColumnOrder = null;
+
+      const nameToIndex = new Map<string, number>();
+
+      for (const key of this.columnKeys) {
+        const name = this.getColumnName(key);
+
+        if (name) {
+          nameToIndex.set(name, key.index);
+        }
+      }
+
+      const newOrder: number[] = [];
+      const usedIndices = new Set<number>();
+
+      for (const name of orderNames) {
+        const index = nameToIndex.get(name);
+
+        if (index !== undefined) {
+          newOrder.push(index);
+          usedIndices.add(index);
+        }
+      }
+
+      for (const key of this.data.columns.map((_, i) => i)) {
+        if (!usedIndices.has(key)) {
+          newOrder.push(key);
+        }
+      }
+
+      if (newOrder.length === this.columnsOrder.length) {
+        this.columnsOrder = newOrder;
+      }
+    }
+
+    if (source.pendingPinnedColumns?.length) {
+      const columnNames: string[] = source.pendingPinnedColumns;
+      source.pendingPinnedColumns = null;
+
+      const keys = columnNames
+        .map(name => this.columnKeys.find(k => this.getColumnName(k) === name))
+        .filter((k): k is IGridColumnKey => k !== undefined);
+
+      if (keys.length > 0) {
+        this.pinColumns(keys);
+      }
     }
   }
 }

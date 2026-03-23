@@ -24,7 +24,8 @@ export const IS_NOT_NULL_ID = 'IS_NOT_NULL';
 @injectable(() => [IDatabaseDataSource, IDatabaseDataResult])
 export class DatabaseDataConstraintAction
   extends DatabaseDataAction<IDatabaseDataOptions, IDatabaseResultSet>
-  implements IDatabaseDataConstraintAction<IDatabaseResultSet> {
+  implements IDatabaseDataConstraintAction<IDatabaseResultSet>
+{
   static dataFormat = [ResultDataFormat.Resultset, ResultDataFormat.Document];
 
   get supported(): boolean {
@@ -182,6 +183,7 @@ export class DatabaseDataConstraintAction
 
     if (currentConstraint) {
       currentConstraint.operator = operator;
+      currentConstraint.attributeName = this.getColumnNameByPosition(attributePosition);
       if (value !== undefined) {
         currentConstraint.value = value;
       } else if (currentConstraint.value !== undefined) {
@@ -192,6 +194,7 @@ export class DatabaseDataConstraintAction
 
     const constraint: SqlDataFilterConstraint = {
       attributePosition,
+      attributeName: this.getColumnNameByPosition(attributePosition),
       operator,
     };
 
@@ -219,6 +222,7 @@ export class DatabaseDataConstraintAction
       if (!resetOrder) {
         this.source.options.constraints.push({
           attributePosition,
+          attributeName: this.getColumnNameByPosition(attributePosition),
           orderPosition: this.getMaxOrderPosition(),
           orderAsc: order === EOrder.asc,
         });
@@ -256,6 +260,10 @@ export class DatabaseDataConstraintAction
 
   override updateResult(result: IDatabaseResultSet): void {
     updateConstraintsForResult(this.source, result);
+  }
+
+  private getColumnNameByPosition(attributePosition: number): string | undefined {
+    return this.result.data?.columns?.find(c => c.position === attributePosition)?.name ?? undefined;
   }
 }
 

@@ -27,6 +27,7 @@ import { DataViewerService } from './DataViewerService.js';
 import { DataViewerDataChangeConfirmationService } from './DataViewerDataChangeConfirmationService.js';
 import { DataViewerBootstrap } from './DataViewerBootstrap.js';
 import { DataPresentationService } from './DataPresentationService.js';
+import { DataViewerTableStateService } from './DataViewerTableState/DataViewerTableStateService.js';
 import { IDatabaseDataSource } from './DatabaseDataModel/IDatabaseDataSource.js';
 import { DatabaseDataActions } from './DatabaseDataModel/DatabaseDataActions.js';
 import { DatabaseMetadataAction } from './DatabaseDataModel/Actions/General/DatabaseMetadataAction.js';
@@ -88,6 +89,7 @@ export default ModuleRegistry.add({
       .addSingleton(DataViewerSettingsService)
       .addSingleton(DataViewerService)
       .addSingleton(DataViewerDataChangeConfirmationService)
+      .addSingleton(DataViewerTableStateService)
       .addSingleton(DataViewerBootstrap)
 
       .addScoped(IDatabaseDataActions, DatabaseDataActions)

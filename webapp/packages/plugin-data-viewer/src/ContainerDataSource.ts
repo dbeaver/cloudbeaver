@@ -34,6 +34,8 @@ export interface IDataContainerOptions extends IDatabaseDataOptions {
 
 export class ContainerDataSource extends ResultSetDataSource<IDataContainerOptions> {
   currentTask: ITask<SqlExecuteInfo> | null;
+  pendingPinnedColumns: string[] | null;
+  pendingColumnOrder: string[] | null;
 
   override get canCancel(): boolean {
     return this.currentTask?.cancellable || false;
@@ -52,6 +54,8 @@ export class ContainerDataSource extends ResultSetDataSource<IDataContainerOptio
     super(serviceProvider, graphQLService, asyncTaskInfoService);
 
     this.currentTask = null;
+    this.pendingPinnedColumns = null;
+    this.pendingColumnOrder = null;
     this.executionContext = null;
     this.setFeature(DatabaseDataFeature.DataEditor);
 
