@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -61,6 +61,20 @@ export const ChangePassword = observer(function ChangePassword() {
     }
     return null;
   });
+
+  function onPasswordBlur() {
+    if (!state.repeatedPassword) {
+      return;
+    }
+
+    if (!isValuesEqual(state.repeatedPassword, state.password, null)) {
+      passwordRepeatRef.current?.setCustomValidity(translate('authentication_user_passwords_not_match'));
+      passwordRepeatRef.current?.reportValidity();
+      return;
+    }
+
+    passwordRepeatRef.current?.setCustomValidity('');
+  }
 
   const form = useForm({
     async onSubmit() {
@@ -143,6 +157,7 @@ export const ChangePassword = observer(function ChangePassword() {
                 mapValue={(value?: string) => value?.trim() ?? ''}
                 small
                 required
+                onBlur={onPasswordBlur}
               >
                 {translate('plugin_user_profile_authentication_change_password_new_password')}
               </InputField>
