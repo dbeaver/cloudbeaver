@@ -16,6 +16,7 @@ import type { ITreeSettings } from './useTreeSettings.js';
 
 export interface ITreeFilterOptions {
   isNodeMatched?: (nodeId: string, filter: string, isMatched: boolean) => boolean;
+  isEnabled?: boolean;
 }
 
 export interface ITreeFilter {
@@ -38,10 +39,7 @@ interface ITreeFilterStateObject extends ITreeFilter, ITreeFilterState {
   settings?: ITreeSettings;
 }
 
-export function useTreeFilter(
-  options: ITreeFilterOptions = {},
-  settings?: ITreeSettings,
-): ITreeFilterWithState {
+export function useTreeFilter(options: ITreeFilterOptions = {}, settings?: ITreeSettings): ITreeFilterWithState {
   options = useObjectRef(options);
   const matchCache = new Map<string, boolean>();
 
@@ -78,7 +76,7 @@ export function useTreeFilter(
       settings,
       filter: '',
       get enabled() {
-        return this.settings?.get<boolean>(TREE_SETTINGS_FILTER_ENABLED) ?? false;
+        return this.settings?.get<boolean>(TREE_SETTINGS_FILTER_ENABLED) ?? options.isEnabled ?? false;
       },
       isNodeMatched(treeData: ITreeData, nodeId: string): boolean {
         const filter = this.filter.trim();
