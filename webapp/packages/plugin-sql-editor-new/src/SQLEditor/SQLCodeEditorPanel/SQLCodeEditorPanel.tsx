@@ -22,6 +22,7 @@ import {
   SQLCodeEditor,
   useSQLCodeEditor,
   useSqlDialectExtension,
+  useLSPExtension,
 } from '@cloudbeaver/plugin-sql-editor-codemirror';
 import { useHighlightExtensions } from '../useHighlightExtensions.js';
 import { useSqlDialectAutocompletion } from '../useSqlDialectAutocompletion.js';
@@ -46,6 +47,12 @@ export const SQLCodeEditorPanel: TabContainerPanelComponent<ISqlEditorModeProps>
   const sqlDialect = useSqlDialectExtension(data.dialect);
   const highlightExtensions = useHighlightExtensions(sqlEditorSettingsService.highlightWhitespace);
 
+  const lspDocumentUri =
+    data.model.dataSource?.lspDocumentUri ??
+    (data.model.dataSource?.projectId ? `lsp://${data.model.dataSource.projectId}/${data.model.state?.editorId}` : null);
+
+  const lspExtension = useLSPExtension({ documentUri: lspDocumentUri });
+
   if (autocompletion) {
     extensions.set(...autocompletion);
   }
@@ -58,6 +65,10 @@ export const SQLCodeEditorPanel: TabContainerPanelComponent<ISqlEditorModeProps>
     highlightExtensions.forEach(extension => {
       extensions.set(...extension);
     });
+  }
+
+  if (lspExtension) {
+    extensions.set(...lspExtension);
   }
 
   const dndBox = useDNDBox({

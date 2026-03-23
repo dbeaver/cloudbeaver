@@ -14,7 +14,13 @@
       "path": "../core-cli"
     },
     {
+      "path": "../core-di"
+    },
+    {
       "path": "../core-sdk"
+    },
+    {
+      "path": "../core-utils"
     },
     {
       "path": "../plugin-codemirror6"

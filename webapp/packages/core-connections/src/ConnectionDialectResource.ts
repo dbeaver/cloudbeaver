@@ -12,7 +12,6 @@ import { CachedMapAllKey, CachedMapResource, type ResourceKey, resourceKeyList, 
 import { GraphQLService, type SqlDialectInfo } from '@cloudbeaver/core-sdk';
 
 import type { IConnectionInfoParams } from './CONNECTION_INFO_PARAM_SCHEMA.js';
-import type { IConnectionExecutionContextInfo } from './ConnectionExecutionContext/ConnectionExecutionContextResource.js';
 import {
   ConnectionInfoActiveProjectKey,
   ConnectionInfoProjectKey,
@@ -40,17 +39,6 @@ export class ConnectionDialectResource extends CachedMapResource<IConnectionInfo
     );
     this.aliases.replace(CachedMapAllKey, () => resourceKeyList(connectionInfoResource.keys));
     this.before(ExecutorInterrupter.interrupter(key => !connectionInfoResource.isConnected(key)));
-  }
-
-  async formatScript(context: IConnectionExecutionContextInfo, query: string): Promise<string> {
-    const result = await this.graphQLService.sdk.formatSqlQuery({
-      projectId: context.projectId,
-      connectionId: context.connectionId,
-      contextId: context.id,
-      query,
-    });
-
-    return result.query;
   }
 
   protected async loader(

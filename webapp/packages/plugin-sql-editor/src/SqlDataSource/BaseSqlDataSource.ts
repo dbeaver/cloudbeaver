@@ -77,6 +77,10 @@ export abstract class BaseSqlDataSource<TDataSource extends QueryDataSource = Qu
     return this.executionContext?.projectId ?? null;
   }
 
+  get lspDocumentUri(): string | null {
+    return null;
+  }
+
   readonly icon: string;
   readonly history: ISqlDataSourceHistory;
   readonly onUpdate: ISyncExecutor;
