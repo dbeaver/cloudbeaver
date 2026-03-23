@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { PropertiesTable, useResource } from '@cloudbeaver/core-blocks';
+import { Alert, PropertiesTable, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 import { SQLCodeEditor, useSqlDialectExtension } from '@cloudbeaver/plugin-sql-editor-codemirror';
 import { useCodemirrorExtensions } from '@cloudbeaver/plugin-codemirror6';
 import { observer } from 'mobx-react-lite';
@@ -56,12 +56,15 @@ const RenderParametersForm = observer(function RenderParametersForm({
   const connectionDialectResource = useResource(RenderParametersForm, ConnectionDialectResource, connectionKey);
   const sqlDialect = useSqlDialectExtension(connectionDialectResource.data);
   const extensions = useCodemirrorExtensions();
+  const translate = useTranslate();
+  const quote = connectionDialectResource.data?.quoteStrings?.[0]?.[0] ?? '"';
+
   if (sqlDialect) {
     extensions.set(...sqlDialect);
   }
 
   for (const [paramName, paramValue] of Object.entries(parameters)) {
-    const paramValueString = String(paramValue); 
+    const paramValueString = String(paramValue);
     if (paramValueString) {
       const escapedName = escapeForRegExp(paramName);
 
@@ -96,6 +99,11 @@ const RenderParametersForm = observer(function RenderParametersForm({
       {!sqlEditorSettingsService.disabled && (
         <SQLCodeEditor value={query} extensions={extensions} className="tw:overflow-auto tw:flex-1/3" readonly />
       )}
+      <Alert
+        title={translate('plugin_sql_editor_bind_parameters_dialog_alert_title', undefined, {
+          example: `${quote}string-example${quote}`,
+        })}
+      />
     </div>
   );
 });

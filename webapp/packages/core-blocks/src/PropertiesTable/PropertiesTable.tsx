@@ -165,7 +165,6 @@ export const PropertiesTable = observer<Props>(function PropertiesTable(props) {
             onRemove={removeProperty}
           />
         ))}
-        <div className={s(style, { propertiesListOverflow: true })} />
       </div>
     </div>
   );
