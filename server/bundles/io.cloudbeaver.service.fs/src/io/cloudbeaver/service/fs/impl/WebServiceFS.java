@@ -35,6 +35,7 @@ import org.jkiss.dbeaver.runtime.DBWorkbench;
 
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.text.MessageFormat;
 import java.util.Arrays;
@@ -213,6 +214,8 @@ public class WebServiceFS implements DBWServiceFS {
             oldParentNode.removeChildResource(oldNode.getPath());
             parentNode.addChildResource(to);
             return new FSFile(parentNode.getChild(to));
+        } catch (NoSuchFileException e) {
+            throw new DBWebException("File not found. Please refresh the catalog and check if file exists.");
         } catch (Exception e) {
             throw new DBWebException("Failed to move file: " + e.getMessage(), e);
         }
