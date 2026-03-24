@@ -53,5 +53,5 @@ export default [
   ],
   ['plugin_sql_editor_settings_highlight_white_space', 'Подсветить пробелы'],
   ['plugin_sql_editor_settings_highlight_white_space_description', 'Подсветить пробелы, табуляции и другие пробельные символы в редакторе SQL'],
-  ['plugin_sql_editor_bind_parameters_dialog_alert_title', 'Значения строк должны быть в кавычках следующим образом: {arg:example}.'],
+  ['plugin_sql_editor_bind_parameters_dialog_alert_title', 'Строковые значения должны быть заключены в кавычки'],
 ];

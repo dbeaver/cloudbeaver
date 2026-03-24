@@ -57,7 +57,6 @@ const RenderParametersForm = observer(function RenderParametersForm({
   const sqlDialect = useSqlDialectExtension(connectionDialectResource.data);
   const extensions = useCodemirrorExtensions();
   const translate = useTranslate();
-  const quote = connectionDialectResource.data?.quoteStrings?.[0]?.[0] ?? '"';
 
   if (sqlDialect) {
     extensions.set(...sqlDialect);
@@ -99,11 +98,7 @@ const RenderParametersForm = observer(function RenderParametersForm({
       {!sqlEditorSettingsService.disabled && (
         <SQLCodeEditor value={query} extensions={extensions} className="tw:overflow-auto tw:flex-1/3" readonly />
       )}
-      <Alert
-        title={translate('plugin_sql_editor_bind_parameters_dialog_alert_title', undefined, {
-          example: `${quote}string-example${quote}`,
-        })}
-      />
+      <Alert title={translate('plugin_sql_editor_bind_parameters_dialog_alert_title')} />
     </div>
   );
 });
