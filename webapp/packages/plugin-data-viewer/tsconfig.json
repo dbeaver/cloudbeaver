@@ -23,9 +23,6 @@
       "path": "../../common-typescript/@dbeaver/result-set-api"
     },
     {
-      "path": "../core-authentication"
-    },
-    {
       "path": "../core-blocks"
     },
     {

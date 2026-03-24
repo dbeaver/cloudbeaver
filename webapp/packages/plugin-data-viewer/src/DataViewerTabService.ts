@@ -163,8 +163,8 @@ export class DataViewerTabService {
     if (model) {
       try {
         this.dataViewerTableStateService.saveState(tab.handlerState.objectId, model);
-      } catch {
-        // silently ignore
+      } catch (exception: any) {
+        console.warn('[DataViewerTableState] Failed to save state on tab lifecycle', exception);
       }
     }
   }

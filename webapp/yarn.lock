@@ -3117,7 +3117,6 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-data-viewer@workspace:packages/plugin-data-viewer"
   dependencies:
-    "@cloudbeaver/core-authentication": "workspace:*"
     "@cloudbeaver/core-blocks": "workspace:*"
     "@cloudbeaver/core-browser": "workspace:*"
     "@cloudbeaver/core-cli": "workspace:*"

@@ -9,6 +9,7 @@ import { action, computed, makeObservable, observable, ObservableSet } from 'mob
 
 import { DatabaseDataAction } from '../../DatabaseDataAction.js';
 import { IDatabaseDataSource } from '../../IDatabaseDataSource.js';
+import type { IDataContainerOptions } from '../../../ContainerDataSource.js';
 import type { IGridColumnKey, IGridDataKey, IGridRowKey } from './IGridDataKey.js';
 import { IDatabaseDataResult } from '../../IDatabaseDataResult.js';
 import { compareGridRowKeys } from './compareGridRowKeys.js';
@@ -68,13 +69,14 @@ export class GridViewAction<
     this.columnsOrder = this.data.columns.map((key, index) => index);
     this.pinnedColumns = observable.set<string>();
 
-    makeObservable<this, 'columnsOrder' | 'pinnedColumns'>(this, {
+    makeObservable<this, 'columnsOrder' | 'pinnedColumns' | 'restorePendingState'>(this, {
       columnsOrder: observable,
       pinnedColumns: observable,
       setColumnOrder: action,
       pinColumns: action,
       unpinColumns: action,
       unpinAllColumns: action,
+      restorePendingState: action,
       rows: computed,
       rowKeys: computed,
       columns: computed,
@@ -233,15 +235,18 @@ export class GridViewAction<
     if (this.columnsOrder.length !== this.data.columns.length) {
       this.columnsOrder = this.data.columns.map((key, index) => index);
     }
-    this.restorePendingState();
   }
 
   private restorePendingState(): void {
-    const source = this.source as any;
+    const options = this.source.options as IDataContainerOptions | undefined;
 
-    if (source.pendingColumnOrder?.length) {
-      const orderNames: string[] = source.pendingColumnOrder;
-      source.pendingColumnOrder = null;
+    if (!options) {
+      return;
+    }
+
+    if (options.pendingColumnOrder?.length) {
+      const orderNames: string[] = options.pendingColumnOrder;
+      delete options.pendingColumnOrder;
 
       const nameToIndex = new Map<string, number>();
 
@@ -276,9 +281,9 @@ export class GridViewAction<
       }
     }
 
-    if (source.pendingPinnedColumns?.length) {
-      const columnNames: string[] = source.pendingPinnedColumns;
-      source.pendingPinnedColumns = null;
+    if (options.pendingPinnedColumns?.length) {
+      const columnNames: string[] = options.pendingPinnedColumns;
+      delete options.pendingPinnedColumns;
 
       const keys = columnNames
         .map(name => this.columnKeys.find(k => this.getColumnName(k) === name))

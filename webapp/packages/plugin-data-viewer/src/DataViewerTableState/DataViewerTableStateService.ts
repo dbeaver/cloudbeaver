@@ -136,7 +136,12 @@ export class DataViewerTableStateService {
       return null;
     }
 
-    if (state.constraints.length === 0 && !state.whereFilter && state.pinnedColumns.length === 0) {
+    if (
+      state.constraints.length === 0 &&
+      !state.whereFilter &&
+      state.pinnedColumns.length === 0 &&
+      (!state.columnOrder || state.columnOrder.length === 0)
+    ) {
       return null;
     }
 

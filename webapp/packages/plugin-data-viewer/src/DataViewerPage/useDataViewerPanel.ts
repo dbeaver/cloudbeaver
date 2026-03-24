@@ -80,8 +80,8 @@ export function useDataViewerPanel(tab: ITab<IObjectViewerTabState>) {
               orderPosition: c.orderPosition,
             }));
             model.source.options.whereFilter = persistedState.whereFilter || '';
-            model.source.pendingPinnedColumns = persistedState.pinnedColumns;
-            model.source.pendingColumnOrder = persistedState.columnOrder ?? null;
+            model.source.options.pendingPinnedColumns = persistedState.pinnedColumns.length > 0 ? persistedState.pinnedColumns : undefined;
+            model.source.options.pendingColumnOrder = persistedState.columnOrder?.length ? persistedState.columnOrder : undefined;
           }
         } catch (exception: any) {
           console.warn('[DataViewerTableState] Failed to restore state', exception);
