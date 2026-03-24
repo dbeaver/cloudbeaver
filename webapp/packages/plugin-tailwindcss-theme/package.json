@@ -14,7 +14,7 @@
   "exports": {
     ".": "./lib/index.js",
     "./module": "./lib/module.js",
-    "./tailwind.css": "./src/styles/tailwind/index.css",
+    "./tailwind.css": "./src/styles/index.css",
     "./*": "./*"
   },
   "scripts": {
