@@ -139,12 +139,39 @@ public class WebSQLDataFilter {
 
     private void fillEmptyConstrains(@NotNull List<DBDAttributeConstraint> emptyConstraints) throws DBException {
         for (WebSQLDataFilterConstraint webConstr : constraints) {
-            if (webConstr.getAttributePosition() >= emptyConstraints.size()) {
-                throw new DBException(MessageFormat.format("Incorrect column position ''{0}'' in order clause", webConstr.getAttributePosition()));
+            DBDAttributeConstraint dbConstr = resolveConstraint(emptyConstraints, webConstr);
+            if (dbConstr != null) {
+                fillEmptyConstraint(dbConstr, webConstr);
             }
-            DBDAttributeConstraint dbConstr = emptyConstraints.get(webConstr.getAttributePosition());
-            fillEmptyConstraint(dbConstr, webConstr);
         }
+    }
+
+    @Nullable
+    private DBDAttributeConstraint resolveConstraint(
+        @NotNull List<DBDAttributeConstraint> emptyConstraints,
+        @NotNull WebSQLDataFilterConstraint webConstr
+    ) throws DBException {
+        Integer position = webConstr.getAttributePosition();
+        String name = webConstr.getAttributeName();
+
+        if (position != null) {
+            if (position >= emptyConstraints.size()) {
+                throw new DBException(
+                    MessageFormat.format("Incorrect column position ''{0}'' in order clause", position)
+                );
+            }
+            return emptyConstraints.get(position);
+        }
+
+        if (!CommonUtils.isEmpty(name)) {
+            for (DBDAttributeConstraint constraint : emptyConstraints) {
+                if (name.equals(constraint.getAttributeName())) {
+                    return constraint;
+                }
+            }
+        }
+
+        return null;
     }
 
     @NotNull
