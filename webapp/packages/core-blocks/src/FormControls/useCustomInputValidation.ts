@@ -11,12 +11,14 @@ import { ExecutorInterrupter } from '@cloudbeaver/core-executor';
 
 import { useTranslate } from '../localization/useTranslate.js';
 import { useExecutor } from '../useExecutor.js';
-import { FormContext } from './FormContext.js';
+import { FormContext, type IFormContext } from './FormContext.js';
 
 export function useCustomInputValidation<T = void, TType extends HTMLInputElement | HTMLTextAreaElement = HTMLInputElement>(
   validation: (value: T) => string | null,
+  formContext?: IFormContext,
 ): React.RefObject<TType | null> {
-  const context = useContext(FormContext);
+  const reactContext = useContext(FormContext);
+  const context = formContext ?? reactContext;
   const inputRef = useRef<TType | null>(null);
   const translate = useTranslate();
 
@@ -55,6 +57,19 @@ export function useCustomInputValidation<T = void, TType extends HTMLInputElemen
         if (!validate(inputRef.current)) {
           ExecutorInterrupter.interrupt(context);
         }
+      },
+    ],
+  });
+
+  useExecutor({
+    executor: context?.onChange,
+    handlers: [
+      function revalidateOnChange() {
+        if (!inputRef.current || inputRef.current.validity.valid) {
+          return;
+        }
+
+        validate(inputRef.current);
       },
     ],
   });
