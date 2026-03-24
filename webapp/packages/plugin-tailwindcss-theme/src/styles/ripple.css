@@ -6,23 +6,11 @@
  */
 
 @layer components {
-  /* Base ripple effect */
   .theme-ripple {
-    position: relative;
+    @apply tw:relative;
 
     &::before {
-      position: absolute;
-      content: '';
-      opacity: 0;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      background-color: currentColor;
-      border-radius: inherit;
-      pointer-events: none;
-      transition: opacity 150ms linear;
+      @apply tw:absolute tw:content-[''] tw:opacity-0 tw:top-0 tw:left-0 tw:w-full tw:h-full tw:overflow-hidden tw:bg-[currentColor] tw:rounded-[inherit] tw:pointer-events-none tw:transition-opacity tw:duration-150 tw:ease-linear;
     }
 
     &:hover::before {
