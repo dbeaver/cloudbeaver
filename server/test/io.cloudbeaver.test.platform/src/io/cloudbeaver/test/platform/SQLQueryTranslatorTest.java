@@ -181,14 +181,14 @@ public class    SQLQueryTranslatorTest extends CloudbeaverMockTest {
 
     @Test
     public void createTableWithAscii() throws DBException {
-        var basicSql = "CREATE TABLE CB_TEST_TYPES (ASCII_COLUMN VARCHAR(128) ASCII);\n";
+        var basicSql = "CREATE TABLE CB_TEST_TYPES (ASCII_COLUMN VARCHAR(128) ASCII NOT NULL);\n";
 
         Map<SQLDialect, String> expectedSqlByDialect = new HashMap<>();
-        expectedSqlByDialect.put(new H2SQLDialect(), "CREATE TABLE CB_TEST_TYPES (ASCII_COLUMN VARCHAR (128));\n");
-        expectedSqlByDialect.put(new PostgreDialect(), "CREATE TABLE CB_TEST_TYPES (ASCII_COLUMN VARCHAR (128));\n");
+        expectedSqlByDialect.put(new H2SQLDialect(), "CREATE TABLE CB_TEST_TYPES (ASCII_COLUMN VARCHAR (128) NOT NULL);\n");
+        expectedSqlByDialect.put(new PostgreDialect(), "CREATE TABLE CB_TEST_TYPES (ASCII_COLUMN VARCHAR (128) NOT NULL);\n");
         expectedSqlByDialect.put(
             new MySQLDialect(),
-            "CREATE TABLE CB_TEST_TYPES (ASCII_COLUMN VARCHAR (128) CHARACTER SET latin1);"
+            "CREATE TABLE CB_TEST_TYPES (ASCII_COLUMN VARCHAR (128) CHARACTER SET latin1 NOT NULL);"
         );
         translateAndValidateQueries(basicSql, expectedSqlByDialect);
     }
