@@ -25,6 +25,35 @@ You can see a live demo of CloudBeaver here: https://demo.cloudbeaver.io
 
 ## Changelog
 
+### 26.0.1 2026-03-23
+
+  - Data Editor:
+    - Added the Find and Replace functionality for the Data Editor with the ability to find data by matching case, whole word, or using regular expressions.
+    - Added support for adding, duplicating, deleting, or setting values to NULL in multiple highlighted rows via the Data Editor context menu.
+    - SQL query generation in the Data Editor is now available for columns containing large object data.
+    - Improved column drag-and-drop behavior in the Data Editor. Users could drag columns from any area within the header and drop them onto any part of the target column or table body.
+  - SQL Editor:
+    - Added fuzzy search to SQL Editor auto-completion for object names. The feature allowed users to find tables and containers even with typos or incorrect letter ordering by matching strings that start with, contain, or resemble the input.
+    - Fixed data editing for SQL scripts with variables.
+  - General:
+    - Added a close button to the right tab when it is the only open tab (ex. Scripts). Users no longer needed to use the main menu to close a single tab.
+    - Replaced the generic "Something went wrong" message with a specific network error notification when the application cannot connect to the server.
+    - Null or empty values can now be assigned to the Driver properties for all drivers.
+    - Fixed an issue where re-selecting an existing SSH key file during connection edits caused problems.
+    - Fixed the ability to switch tabs in the Data editor using the keyboard.
+    - Fixed error notification spelling. Thanks to @Malcolm-B-Breaks.
+  - ClickHouse:
+    - Updated driver version to 0.9.7.
+    - Fixed IP address display in the Data Editor by removing the leading slash.
+  - PostgreSQL: Fixed an error when connecting via URL if the database name contains a hyphen.
+  - Security:
+    - Fixed the high vulnerability (CVE-2025-45141) in the tar library. The library was updated to version 7.5.11.
+    - Fixed the high vulnerability (CVE-2026-27148) in the storybook library. The library was updated to version 10.2.10.
+    - Fixed the high vulnerability (CVE-2026-27606) in the rollup library. The library was updated to version 4.59.0.
+    - Fixed the high vulnerability (CVE-2026-27904) in the minimatch library. The library was updated to version 3.1.3.
+    - Fixed the high vulnerability (CVE-2026-27959) in the koa library. The library was updated to version 2.16.4.
+    - Fixed the high vulnerability (CVE-2026-32141) in the flatted library. The library was updated to version 4.4.0.
+
 ### 26.0.0 2026-03-02
 
 ### Changes since 25.3.0:

@@ -24,7 +24,7 @@ export function getObjectPropertyDisplayValue(property: IObjectPropertyInfo) {
   return String(getValue(property.value, controlType));
 }
 
-function getValue(value: any, controlType: ObjectPropertyType) {
+function getValue(value: any, controlType: ObjectPropertyType): any {
   const checkbox = controlType === 'checkbox';
 
   if (value === null || value === undefined) {
@@ -40,7 +40,7 @@ function getValue(value: any, controlType: ObjectPropertyType) {
   }
 
   if (Array.isArray(value)) {
-    return value.join(', ');
+    return `[${value.map(v => getValue(v, controlType)).join(', ')}]`;
   }
 
   return value.value || value.displayName || JSON.stringify(value);

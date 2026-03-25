@@ -12,9 +12,6 @@
 
   .rdg-search-panel {
     padding-bottom: 0 !important;
-    .search-panel__inputs {
-      max-width: var(--tw-container-lg);
-    }
   }
 
   .rdg-cell-search-match {
