@@ -92,6 +92,7 @@ const RenderParametersForm = observer(function RenderParametersForm({
           className="tw:overflow-auto"
           sortByName={false}
           staticProperties
+          disableBottomPadding
         />
       </div>
 

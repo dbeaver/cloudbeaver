@@ -53,3 +53,13 @@
   max-height: 600px;
   padding: 4px 0px;
 }
+
+.propertiesListOverflow {
+  composes: branding-overflow from global;
+  position: sticky;
+  flex-shrink: 0;
+  bottom: -4px;
+  width: 100%;
+  height: 24px;
+  pointer-events: none;
+}

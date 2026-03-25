@@ -37,10 +37,11 @@ interface Props {
   staticProperties?: boolean;
   filterable?: boolean;
   sortByName?: boolean;
+  disableBottomPadding?: boolean;
 }
 
 export const PropertiesTable = observer<Props>(function PropertiesTable(props) {
-  const { className, onAdd, readOnly, propertiesState } = props;
+  const { className, onAdd, readOnly, propertiesState, disableBottomPadding = false } = props;
   const translate = useTranslate();
   const propsRef = useObjectRef({ ...props });
   const style = useS(styles);
@@ -165,6 +166,7 @@ export const PropertiesTable = observer<Props>(function PropertiesTable(props) {
             onRemove={removeProperty}
           />
         ))}
+        {!disableBottomPadding && <div className={s(style, { propertiesListOverflow: true })} />}
       </div>
     </div>
   );
