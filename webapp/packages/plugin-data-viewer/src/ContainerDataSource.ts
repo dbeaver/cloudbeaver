@@ -30,8 +30,6 @@ import { DatabaseDataFeature } from './DatabaseDataModel/IDatabaseDataSource.js'
 
 export interface IDataContainerOptions extends IDatabaseDataOptions {
   containerNodePath: string;
-  pendingPinnedColumns?: string[];
-  pendingColumnOrder?: string[];
 }
 
 export class ContainerDataSource extends ResultSetDataSource<IDataContainerOptions> {

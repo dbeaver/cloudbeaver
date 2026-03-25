@@ -184,6 +184,10 @@ export class DataViewerTableStateService {
       return false;
     }
 
+    if (data.columnOrder !== undefined && (!Array.isArray(data.columnOrder) || !data.columnOrder.every(c => typeof c === 'string'))) {
+      return false;
+    }
+
     return true;
   }
 }

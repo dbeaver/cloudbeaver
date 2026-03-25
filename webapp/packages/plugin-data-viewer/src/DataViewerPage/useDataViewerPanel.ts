@@ -7,7 +7,7 @@
  */
 import { useEffect } from 'react';
 
-import { reaction, toJS } from 'mobx';
+import { comparer, reaction, toJS } from 'mobx';
 
 import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
@@ -80,8 +80,6 @@ export function useDataViewerPanel(tab: ITab<IObjectViewerTabState>) {
               orderPosition: c.orderPosition,
             }));
             model.source.options.whereFilter = persistedState.whereFilter || '';
-            model.source.options.pendingPinnedColumns = persistedState.pinnedColumns.length > 0 ? persistedState.pinnedColumns : undefined;
-            model.source.options.pendingColumnOrder = persistedState.columnOrder?.length ? persistedState.columnOrder : undefined;
           }
         } catch (exception: any) {
           console.warn('[DataViewerTableState] Failed to restore state', exception);
@@ -119,6 +117,35 @@ export function useDataViewerPanel(tab: ITab<IObjectViewerTabState>) {
       return;
     }
 
+    const persistedState = dataViewerTableStateService.restoreState(tab.handlerState.objectId);
+    const hasViewState = persistedState && (persistedState.pinnedColumns.length > 0 || persistedState.columnOrder?.length);
+
+    let viewStateRestored = false;
+
+    const cancelViewRestore = hasViewState
+      ? reaction(
+          () => dbModel.source.results.length > 0,
+          hasResults => {
+            if (!hasResults || viewStateRestored) {
+              return;
+            }
+
+            viewStateRestored = true;
+
+            try {
+              const viewAction = dbModel.source.tryGetAction(0, IDatabaseDataViewAction, GridViewAction);
+
+              if (viewAction) {
+                viewAction.restoreViewState(persistedState.pinnedColumns, persistedState.columnOrder);
+              }
+            } catch (exception: any) {
+              console.warn('[DataViewerTableState] Failed to restore view state', exception);
+            }
+          },
+          { fireImmediately: true },
+        )
+      : undefined;
+
     const disposer = reaction(
       () => {
         const options = dbModel.source.options;
@@ -147,10 +174,13 @@ export function useDataViewerPanel(tab: ITab<IObjectViewerTabState>) {
           console.warn('[DataViewerTableState] Auto-save failed', exception);
         }
       },
-      { delay: 1000, fireImmediately: false },
+      { delay: 1000, fireImmediately: false, equals: comparer.structural },
     );
 
-    return disposer;
+    return () => {
+      cancelViewRestore?.();
+      disposer();
+    };
   }, [tableId, tableViewerStorageService, dataViewerTableStateService, tab.handlerState.objectId]);
 
   return model;

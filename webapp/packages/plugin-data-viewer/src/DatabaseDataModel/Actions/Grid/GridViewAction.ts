@@ -9,7 +9,6 @@ import { action, computed, makeObservable, observable, ObservableSet } from 'mob
 
 import { DatabaseDataAction } from '../../DatabaseDataAction.js';
 import { IDatabaseDataSource } from '../../IDatabaseDataSource.js';
-import type { IDataContainerOptions } from '../../../ContainerDataSource.js';
 import type { IGridColumnKey, IGridDataKey, IGridRowKey } from './IGridDataKey.js';
 import { IDatabaseDataResult } from '../../IDatabaseDataResult.js';
 import { compareGridRowKeys } from './compareGridRowKeys.js';
@@ -69,21 +68,19 @@ export class GridViewAction<
     this.columnsOrder = this.data.columns.map((key, index) => index);
     this.pinnedColumns = observable.set<string>();
 
-    makeObservable<this, 'columnsOrder' | 'pinnedColumns' | 'restorePendingState'>(this, {
+    makeObservable<this, 'columnsOrder' | 'pinnedColumns'>(this, {
       columnsOrder: observable,
       pinnedColumns: observable,
       setColumnOrder: action,
       pinColumns: action,
       unpinColumns: action,
       unpinAllColumns: action,
-      restorePendingState: action,
+      restoreViewState: action,
       rows: computed,
       rowKeys: computed,
       columns: computed,
       columnKeys: computed,
     });
-
-    this.restorePendingState();
   }
 
   has(cell: TKey): boolean {
@@ -237,17 +234,8 @@ export class GridViewAction<
     }
   }
 
-  private restorePendingState(): void {
-    const options = this.source.options as IDataContainerOptions | undefined;
-
-    if (!options) {
-      return;
-    }
-
-    if (options.pendingColumnOrder?.length) {
-      const orderNames: string[] = options.pendingColumnOrder;
-      delete options.pendingColumnOrder;
-
+  restoreViewState(pinnedColumnNames: string[], columnOrderNames?: string[]): void {
+    if (columnOrderNames?.length) {
       const nameToIndex = new Map<string, number>();
 
       for (const key of this.columnKeys) {
@@ -261,7 +249,7 @@ export class GridViewAction<
       const newOrder: number[] = [];
       const usedIndices = new Set<number>();
 
-      for (const name of orderNames) {
+      for (const name of columnOrderNames) {
         const index = nameToIndex.get(name);
 
         if (index !== undefined) {
@@ -281,11 +269,8 @@ export class GridViewAction<
       }
     }
 
-    if (options.pendingPinnedColumns?.length) {
-      const columnNames: string[] = options.pendingPinnedColumns;
-      delete options.pendingPinnedColumns;
-
-      const keys = columnNames
+    if (pinnedColumnNames.length > 0) {
+      const keys = pinnedColumnNames
         .map(name => this.columnKeys.find(k => this.getColumnName(k) === name))
         .filter((k): k is IGridColumnKey => k !== undefined);
 
