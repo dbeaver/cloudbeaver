@@ -209,5 +209,3 @@ export const GridCellsClipboardHelper = {
     return filterApplicableUpdates(updates, tableData);
   },
 };
-
-export const gridCellsClipboardHelper = GridCellsClipboardHelper;
