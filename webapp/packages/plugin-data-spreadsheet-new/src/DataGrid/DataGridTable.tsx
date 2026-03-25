@@ -61,7 +61,7 @@ import { FormattingContext } from './FormattingContext.js';
 import { TableDataContext } from './TableDataContext.js';
 import { useGridDragging } from './useGridDragging.js';
 import { useFormatting } from './useFormatting.js';
-import { useGridSelectedCellsCopy } from './useGridSelectedCellsCopy.js';
+import { useGridSelectedCellsClipboard } from './useGridSelectedCellsClipboard.js';
 import { useSearchResultsCache } from './useSearchResultsCache.js';
 import { useTableData } from './useTableData.js';
 import { TableColumnHeader } from './TableColumnHeader/TableColumnHeader.js';
@@ -184,7 +184,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
     },
   }));
 
-  const gridSelectedCellCopy = useGridSelectedCellsCopy(tableData, selectionAction as unknown as DatabaseSelectAction, gridSelectionContext);
+  const gridSelectedCellsClipboard = useGridSelectedCellsClipboard(tableData, selectionAction as DatabaseSelectAction, gridSelectionContext);
   const { onMouseDownHandler, onMouseMoveHandler } = useGridDragging({
     onDragStart: startPosition => {
       handlers.selectCell(startPosition);
@@ -559,7 +559,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
   }
 
   const handleCellKeyDown: DataGridProps['onCellKeyDown'] = (_, event) => {
-    gridSelectedCellCopy.onKeydownHandler(event);
+    gridSelectedCellsClipboard.onKeydownHandler(event);
     const cell = selectionAction.getFocusedElement();
 
     if (EventContext.has(event, EventStopPropagationFlag) || model.isReadonly(resultIndex) || !cell) {
@@ -621,7 +621,9 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
                   onCellChange={handleCellChange}
                   onCellChangeBatch={handleCellChangeBatch}
                   onCellKeyDown={handleCellKeyDown}
-                  onHeaderKeyDown={gridSelectedCellCopy.onKeydownHandler}
+                  onHeaderKeyDown={event => {
+                    gridSelectedCellsClipboard.onKeydownHandler(event);
+                  }}
                 />
               </div>
             </FormattingContext.Provider>

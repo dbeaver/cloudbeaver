@@ -28,6 +28,7 @@ export {
   type DataGridProps,
   type IGridSearchStorageState,
   type IGridSearchStorage,
+  type DataGridCellKeyboardEvent,
 } from '@dbeaver/react-data-grid';
 
 export { GrantManagementTable } from './GrantManagementTableLazy.js';
