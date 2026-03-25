@@ -24,7 +24,7 @@
     "koa": ">=2.16.4",
     "immutable": ">=4.3.8",
     "serialize-javascript": ">=7.0.3",
-    "flatted": ">=3.4.0"
+    "flatted": ">=3.4.2"
   },
   "scripts": {
     "test": "dbeaver-test",

@@ -24,8 +24,9 @@
     --dbv-kit-dialog-max-width: 720px;
 
     /* Slide variant (side panel) */
-    --dbv-kit-dialog-slide-transition-duration: 300ms;
-    --dbv-kit-dialog-slide-transition-timing: ease-in-out;
+    --dbv-kit-dialog-slide-inset: 120px;
+    --dbv-kit-dialog-slide-transition-duration: 350ms;
+    --dbv-kit-dialog-slide-transition-timing: cubic-bezier(0.4, 0, 0.2, 1);
 
     /* Backdrop */
     --dbv-kit-dialog-backdrop-background: #0000007a;
