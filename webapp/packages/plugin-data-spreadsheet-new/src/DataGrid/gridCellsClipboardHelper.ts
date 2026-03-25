@@ -18,6 +18,11 @@ import type { ITableData } from './TableDataContext.js';
 
 type CellUpdate = { key: IGridDataKey; value: string };
 
+const COLUMN_SIGNATURE_SEPARATOR = ',';
+const CELL_COLUMN_SEPARATOR = '\t';
+const ROW_LINE_SEPARATOR = '\r\n';
+const CLIPBOARD_LINE_SEPARATOR_REGEX = /\r?\n/;
+
 function sortRowsByIndex(rows: IGridDataKey[][], tableData: ITableData): IGridDataKey[][] {
   return rows.toSorted((a, b) => tableData.getRowIndexFromKey(a[0]!.row) - tableData.getRowIndexFromKey(b[0]!.row));
 }
@@ -27,11 +32,7 @@ function sortCellsByColumn(cells: IGridDataKey[], tableData: ITableData): IGridD
 }
 
 function getColumnSignature(row: IGridDataKey[], tableData: ITableData): string {
-  return row.map(cell => tableData.getColumnIndexFromColumnKey(cell.column)).join(',');
-}
-
-function areIndicesContiguous(indices: number[]): boolean {
-  return indices.every((val, i) => i === 0 || val === indices[i - 1]! + 1);
+  return row.map(cell => tableData.getColumnIndexFromColumnKey(cell.column)).join(COLUMN_SIGNATURE_SEPARATOR);
 }
 
 function isCellEditable(key: IGridDataKey, tableData: ITableData): boolean {
@@ -46,9 +47,7 @@ function isCellEditable(key: IGridDataKey, tableData: ITableData): boolean {
 }
 
 function filterApplicableUpdates(updates: CellUpdate[], tableData: ITableData): CellUpdate[] {
-  return updates.filter(
-    ({ key, value }) => isCellEditable(key, tableData) && tableData.format.getText(tableData.format.get(key)) !== value,
-  );
+  return updates.filter(({ key, value }) => isCellEditable(key, tableData) && tableData.format.getText(tableData.format.get(key)) !== value);
 }
 
 export const GridCellsClipboardHelper = {
@@ -62,31 +61,13 @@ export const GridCellsClipboardHelper = {
       return true;
     }
 
-    const rows = sortRowsByIndex([...selectedCells.values()], tableData);
-    const rowIndices = rows.map(r => tableData.getRowIndexFromKey(r[0]!.row));
-
-    if (!areIndicesContiguous(rowIndices)) {
-      return false;
-    }
-
-    const firstRowCols = rows[0]!.map(cell => tableData.getColumnIndexFromColumnKey(cell.column)).sort((a, b) => a - b);
-
-    if (!areIndicesContiguous(firstRowCols)) {
-      return false;
-    }
-
-    const colSignature = firstRowCols.join(',');
-
-    return rows.every(row => getColumnSignature(sortCellsByColumn(row, tableData), tableData) === colSignature);
+    const cells = [...selectedCells.values()].flat();
+    return this.partitionIntoSegments(cells, tableData).length === 1;
   },
   getCellCopyValue(tableData: ITableData, key: IGridDataKey): string {
     return tableData.format.getText(tableData.format.get(key));
   },
-  getSelectedCellsValue(
-    tableData: ITableData,
-    selectedCells: Map<string, IGridDataKey[]>,
-    focusedCell?: IGridDataKey | null,
-  ): string | null {
+  getSelectedCellsValue(tableData: ITableData, selectedCells: Map<string, IGridDataKey[]>, focusedCell?: IGridDataKey | null): string | null {
     if (selectedCells.size === 0) {
       return focusedCell && isCellEditable(focusedCell, tableData) ? this.getCellCopyValue(tableData, focusedCell) : null;
     }
@@ -95,9 +76,7 @@ export const GridCellsClipboardHelper = {
       return null;
     }
 
-    const orderedRows = sortRowsByIndex([...selectedCells.values()], tableData).map(row =>
-      row.filter(cell => isCellEditable(cell, tableData)),
-    );
+    const orderedRows = sortRowsByIndex([...selectedCells.values()], tableData).map(row => row.filter(cell => isCellEditable(cell, tableData)));
 
     const selectedColumnKeys = new Set(orderedRows.flatMap(row => row.map(cell => GridDataKeysUtils.serialize(cell.column))));
     const selectedColumns = tableData.view.columnKeys.filter(column => selectedColumnKeys.has(GridDataKeysUtils.serialize(column)));
@@ -115,15 +94,15 @@ export const GridCellsClipboardHelper = {
             const cellKey = rowCells.get(GridDataKeysUtils.serialize(column));
             return cellKey ? this.getCellCopyValue(tableData, cellKey) : '';
           })
-          .join('\t');
+          .join(CELL_COLUMN_SEPARATOR);
       })
-      .join('\r\n');
+      .join(ROW_LINE_SEPARATOR);
   },
   parseClipboardData(text: string): string[][] {
     return text
-      .split(/\r?\n/)
+      .split(CLIPBOARD_LINE_SEPARATOR_REGEX)
       .filter(row => row.length > 0)
-      .map(row => row.split('\t'));
+      .map(row => row.split(CELL_COLUMN_SEPARATOR));
   },
   getPastedCells(
     clipboardText: string,
@@ -166,10 +145,7 @@ export const GridCellsClipboardHelper = {
       rowMap.get(rowKey)!.push(cell);
     }
 
-    return sortRowsByIndex(
-      Array.from(rowMap.values()),
-      tableData,
-    ).map(rowCells => sortCellsByColumn(rowCells, tableData));
+    return sortRowsByIndex(Array.from(rowMap.values()), tableData).map(rowCells => sortCellsByColumn(rowCells, tableData));
   },
   partitionIntoSegments(cells: IGridDataKey[], tableData: ITableData): IGridDataKey[][][] {
     if (cells.length === 0) {
@@ -209,18 +185,10 @@ export const GridCellsClipboardHelper = {
   },
   mapClipboardToGrid(clipboard: string[][], targetGrid: IGridDataKey[][]): CellUpdate[] {
     const clipCols = clipboard[0]?.length ?? 0;
-    const updates: CellUpdate[] = [];
 
-    for (let tRow = 0; tRow < Math.min(targetGrid.length, clipboard.length); tRow++) {
-      for (let tCol = 0; tCol < Math.min(targetGrid[tRow]!.length, clipCols); tCol++) {
-        updates.push({
-          key: targetGrid[tRow]![tCol]!,
-          value: clipboard[tRow]![tCol]!,
-        });
-      }
-    }
-
-    return updates;
+    return targetGrid
+      .slice(0, clipboard.length)
+      .flatMap((row, tRow) => row.slice(0, clipCols).map((key, tCol) => ({ key, value: clipboard[tRow]![tCol]! })));
   },
   mapClipboardToSelection(clipboard: string[][], targets: IGridDataKey[], tableData: ITableData): CellUpdate[] {
     const clipCols = clipboard[0]?.length ?? 0;
