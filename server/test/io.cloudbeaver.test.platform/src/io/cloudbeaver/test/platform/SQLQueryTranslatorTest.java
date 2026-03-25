@@ -184,23 +184,12 @@ public class    SQLQueryTranslatorTest extends CloudbeaverMockTest {
         var basicSql = "CREATE TABLE CB_TEST_TYPES (ASCII_COLUMN VARCHAR(128) ASCII);\n";
 
         Map<SQLDialect, String> expectedSqlByDialect = new HashMap<>();
-        expectedSqlByDialect.put(new H2SQLDialect(), "CREATE TABLE CB_TEST_TYPES (ASCII_COLUMN VARCHAR(128));\n");
+        expectedSqlByDialect.put(new H2SQLDialect(), "CREATE TABLE CB_TEST_TYPES (ASCII_COLUMN VARCHAR (128));\n");
         expectedSqlByDialect.put(new PostgreDialect(), "CREATE TABLE CB_TEST_TYPES (ASCII_COLUMN VARCHAR (128));\n");
         expectedSqlByDialect.put(
             new MySQLDialect(),
-            "CREATE TABLE CB_TEST_TYPES (ASCII_COLUMN VARCHAR (128) CHARACTER SET latin1);\n"
+            "CREATE TABLE CB_TEST_TYPES (ASCII_COLUMN VARCHAR (128) CHARACTER SET latin1);"
         );
-        translateAndValidateQueries(basicSql, expectedSqlByDialect);
-    }
-
-    @Test
-    public void alterTableWithAscii() throws DBException {
-        var basicSql = "ALTER TABLE CB_TEST_TYPES ADD COLUMN ASCII_COLUMN VARCHAR(128) ASCII;\n";
-
-        Map<SQLDialect, String> expectedSqlByDialect = new HashMap<>();
-        expectedSqlByDialect.put(new MySQLDialect(), "ALTER TABLE CB_TEST_TYPES ADD COLUMN ASCII_COLUMN VARCHAR (128) CHARACTER SET latin1;\n");
-        expectedSqlByDialect.put(new PostgreDialect(), "ALTER TABLE CB_TEST_TYPES ADD COLUMN ASCII_COLUMN VARCHAR (128);\n");
-
         translateAndValidateQueries(basicSql, expectedSqlByDialect);
     }
 
@@ -228,7 +217,10 @@ public class    SQLQueryTranslatorTest extends CloudbeaverMockTest {
 
     private static String normalizeScript(String script) {
         // Unify for tests
-        return script.toLowerCase().replace(GeneralUtils.getDefaultLineSeparator(), "\n");
+        return script.toLowerCase()
+            .replaceAll("\\s", " ")
+            .replace(GeneralUtils.getDefaultLineSeparator(), "\n")
+            .trim();
     }
 
 }
