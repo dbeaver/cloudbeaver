@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { computed, makeObservable } from 'mobx';
+import { computed, makeObservable, runInAction } from 'mobx';
 
 import { type DataTypeLogicalOperation, ResultDataFormat, type SqlDataFilterConstraint } from '@cloudbeaver/core-sdk';
 
@@ -272,31 +272,41 @@ function updateConstraintsForResult(source: IDatabaseDataSource<IDatabaseDataOpt
     return;
   }
 
-  for (const constraint of source.options.constraints) {
-    const prevColumn = result.data?.columns?.find(column => column.position === constraint.attributePosition);
+  runInAction(() => {
+    for (const constraint of source.options!.constraints) {
+      let prevColumn = result.data?.columns?.find(column => column.position === constraint.attributePosition);
 
-    if (!prevColumn) {
-      return;
-    }
+      if (!prevColumn && constraint.attributeName) {
+        prevColumn = result.data?.columns?.find(column => column.name === constraint.attributeName);
 
-    let column = result.data?.columns?.find(column => column.position === prevColumn.position);
+        if (prevColumn) {
+          constraint.attributePosition = prevColumn.position;
+        }
+      }
 
-    if (!column || column.label !== prevColumn.label) {
-      column = result.data?.columns?.find(column => column.label === prevColumn.label);
-    }
+      if (!prevColumn) {
+        continue;
+      }
 
-    if (column && prevColumn.position !== column.position) {
-      const prevConstraint = source.prevOptions?.constraints.find(
-        prevConstraint => prevConstraint.attributePosition === constraint.attributePosition,
-      );
+      let column = result.data?.columns?.find(column => column.position === prevColumn.position);
 
-      constraint.attributePosition = column.position;
+      if (!column || column.label !== prevColumn.label) {
+        column = result.data?.columns?.find(column => column.label === prevColumn.label);
+      }
 
-      if (prevConstraint) {
-        prevConstraint.attributePosition = constraint.attributePosition;
+      if (column && prevColumn.position !== column.position) {
+        const prevConstraint = source.prevOptions?.constraints.find(
+          prevConstraint => prevConstraint.attributePosition === constraint.attributePosition,
+        );
+
+        constraint.attributePosition = column.position;
+
+        if (prevConstraint) {
+          prevConstraint.attributePosition = constraint.attributePosition;
+        }
       }
     }
-  }
+  });
 }
 
 export function nullOperationsFilter(operation: DataTypeLogicalOperation): boolean {
