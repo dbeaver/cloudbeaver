@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,10 @@ export function useCustomInputValidation<T = void, TType extends HTMLInputElemen
   const context = formContext ?? reactContext;
   const inputRef = useRef<TType | null>(null);
   const translate = useTranslate();
+
+  if (!context) {
+    throw new Error('useCustomInputValidation must be used within a FormContext provider');
+  }
 
   function validate(element: TType): boolean {
     let value: T = undefined as unknown as T;
