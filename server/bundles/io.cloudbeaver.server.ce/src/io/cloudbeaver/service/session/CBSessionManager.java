@@ -379,6 +379,63 @@ public class CBSessionManager implements WebAppSessionManager {
         }
     }
 
+    @Nullable
+    public WebSession getWebSession(
+        @Nullable String smAccessToken,
+        @NotNull WebHttpRequestInfo requestInfo,
+        boolean create
+    ) throws DBException {
+        if (CommonUtils.isEmpty(smAccessToken)) {
+            return null;
+        }
+        synchronized (sessionMap) {
+            var tempCredProvider = new SMTokenCredentialProvider(smAccessToken);
+            SMAuthPermissions authPermissions = application.createSecurityController(tempCredProvider).getTokenPermissions();
+            var sessionId = requestInfo.getId() != null ? requestInfo.getId()
+                : authPermissions.getSessionId();
+
+            var existSession = sessionMap.get(sessionId);
+
+            if (existSession instanceof WebSession webSession) {
+                var creds = webSession.getUserContext().getActiveUserCredentials();
+                if (creds == null || !smAccessToken.equals(creds.getSmAccessToken())) {
+                    if (webSession.getUserContext().refresh(
+                        smAccessToken,
+                        null,
+                        authPermissions
+                    )) {
+                        webSession.refreshUserData();
+                    }
+                }
+                return webSession;
+            }
+            if (existSession != null) {
+                //session exist but it not web session
+                return null;
+            }
+            if (!create) {
+                return null;
+            }
+            if (requestInfo.getId() == null) {
+                requestInfo = new WebHttpRequestInfo(
+                    sessionId,
+                    requestInfo.getLocale(),
+                    requestInfo.getLastRemoteAddress(),
+                    requestInfo.getLastRemoteUserAgent()
+                );
+            }
+            var webSession = createWebSessionImpl(requestInfo);
+            webSession.getUserContext().refresh(
+                smAccessToken,
+                null,
+                authPermissions
+            );
+            webSession.refreshUserData();
+            sessionMap.put(sessionId, webSession);
+            return webSession;
+        }
+    }
+
     /**
      * Send session state with remaining alive time to all cached session
      */
