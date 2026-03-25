@@ -34,21 +34,21 @@ function areIndicesContiguous(indices: number[]): boolean {
   return indices.every((val, i) => i === 0 || val === indices[i - 1]! + 1);
 }
 
+function isCellEditable(key: IGridDataKey, tableData: ITableData): boolean {
+  const cellHolder = tableData.view.getCellHolder(key) as IDatabaseValueHolder<IGridDataKey, IResultSetValue>;
+
+  return !(
+    tableData.format.isReadOnly(key) ||
+    tableData.format.isBinary(cellHolder) ||
+    tableData.dataContent.isTextTruncated(cellHolder) ||
+    tableData.dataContent.isBlobTruncated(cellHolder)
+  );
+}
+
 function filterApplicableUpdates(updates: CellUpdate[], tableData: ITableData): CellUpdate[] {
-  return updates.filter(({ key, value }) => {
-    const cellHolder = tableData.view.getCellHolder(key) as IDatabaseValueHolder<IGridDataKey, IResultSetValue>;
-
-    const isEditable = !(
-      tableData.format.isReadOnly(key) ||
-      tableData.format.isBinary(cellHolder) ||
-      tableData.dataContent.isTextTruncated(cellHolder) ||
-      tableData.dataContent.isBlobTruncated(cellHolder)
-    );
-
-    const isChanged = tableData.format.getText(tableData.format.get(key)) !== value;
-
-    return isEditable && isChanged;
-  });
+  return updates.filter(
+    ({ key, value }) => isCellEditable(key, tableData) && tableData.format.getText(tableData.format.get(key)) !== value,
+  );
 }
 
 export const GridCellsClipboardHelper = {
@@ -88,17 +88,23 @@ export const GridCellsClipboardHelper = {
     focusedCell?: IGridDataKey | null,
   ): string | null {
     if (selectedCells.size === 0) {
-      return focusedCell ? this.getCellCopyValue(tableData, focusedCell) : null;
+      return focusedCell && isCellEditable(focusedCell, tableData) ? this.getCellCopyValue(tableData, focusedCell) : null;
     }
 
     if (!this.isContiguousSelection(selectedCells, tableData)) {
       return null;
     }
 
-    const orderedRows = sortRowsByIndex([...selectedCells.values()], tableData);
+    const orderedRows = sortRowsByIndex([...selectedCells.values()], tableData).map(row =>
+      row.filter(cell => isCellEditable(cell, tableData)),
+    );
 
     const selectedColumnKeys = new Set(orderedRows.flatMap(row => row.map(cell => GridDataKeysUtils.serialize(cell.column))));
     const selectedColumns = tableData.view.columnKeys.filter(column => selectedColumnKeys.has(GridDataKeysUtils.serialize(column)));
+
+    if (selectedColumns.length === 0) {
+      return null;
+    }
 
     return orderedRows
       .map(rowSelection => {
