@@ -74,22 +74,12 @@ export class DataViewerTableStateService {
       constraints.push(persisted);
     }
 
-    const pinnedColumns: string[] = [];
+    let pinnedColumns: string[] = [];
     const columnOrder: string[] = [];
     const viewAction = model.source.tryGetAction(0, IDatabaseDataViewAction, GridViewAction);
 
     if (viewAction) {
-      for (const serializedKey of viewAction.pinnedColumns) {
-        const index = parseInt(serializedKey, 10);
-
-        if (!isNaN(index)) {
-          const columnName = viewAction.getColumnName({ index });
-
-          if (columnName) {
-            pinnedColumns.push(columnName);
-          }
-        }
-      }
+      pinnedColumns = viewAction.getPinnedColumnNames();
 
       let isCustomOrder = false;
 

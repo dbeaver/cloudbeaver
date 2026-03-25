@@ -206,6 +206,24 @@ export class GridViewAction<
     return this.pinnedColumns.size > 0;
   }
 
+  getPinnedColumnNames(): string[] {
+    const names: string[] = [];
+
+    for (const serializedKey of this.pinnedColumns) {
+      const index = parseInt(serializedKey, 10);
+
+      if (!isNaN(index)) {
+        const name = this.getColumnName({ index });
+
+        if (name) {
+          names.push(name);
+        }
+      }
+    }
+
+    return names;
+  }
+
   protected mapRow(row: IGridRowKey): TCell[] {
     const edited = this.editor?.getRow(row);
 
