@@ -32,7 +32,6 @@ import io.cloudbeaver.service.security.bruteforce.UserLoginRecord;
 import io.cloudbeaver.service.security.db.CBDatabase;
 import io.cloudbeaver.service.security.internal.AuthAttemptSessionInfo;
 import io.cloudbeaver.service.security.internal.CBAuthSubjectRepo;
-import io.cloudbeaver.service.security.internal.SMTokenInfo;
 import io.cloudbeaver.utils.WebEventUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
@@ -2437,7 +2436,9 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         }
     }
 
-    private SMTokenInfo readAccessTokenInfo(String smAccessToken) throws DBException {
+    @NotNull
+    @Override
+    public SMTokenInfo readAccessTokenInfo(@NotNull String smAccessToken) throws DBException {
         try (Connection dbCon = database.openConnection();
             PreparedStatement dbStat = dbCon.prepareStatement(
                 """
