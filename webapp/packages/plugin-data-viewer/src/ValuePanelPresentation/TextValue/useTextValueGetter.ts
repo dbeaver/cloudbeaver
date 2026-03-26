@@ -9,10 +9,10 @@ import { observable } from 'mobx';
 
 import { useObservableRef, useSuspense } from '@cloudbeaver/core-blocks';
 import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
-import { isResultSetContentValue } from '@dbeaver/result-set-api';
 import { blobToBase64, removeMetadataFromDataURL } from '@cloudbeaver/core-utils';
 import { isNotNullDefined } from '@dbeaver/js-helpers';
 
+import { getCellTextValue } from '../../DatabaseDataModel/Actions/ResultSet/getCellTextValue.js';
 import { isResultSetBlobValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetBlobValue.js';
 import type { ResultSetDataContentAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetDataContentAction.js';
 import { formatText } from './formatText.js';
@@ -66,28 +66,16 @@ export function useTextValueGetter({ cellHolder, contentType, formatAction, cont
   );
 
   function valueGetter() {
-    let value = '';
-
     if (!isNotNullDefined(cellHolder)) {
-      return value;
+      return '';
     }
 
-    const isBinary = formatAction.isBinary(cellHolder);
-    const cachedFullText = contentAction.retrieveFullTextFromCache(cellHolder.key);
+    let value = getCellTextValue(cellHolder, formatAction, contentAction, {
+      decodeBinary: true,
+      resolvedBlobValue: parsedBlobValueGetter(),
+    });
 
-    if (isBinary && isResultSetContentValue(cellHolder.value)) {
-      if (cellHolder.value.binary) {
-        value = atob(cellHolder.value.binary);
-      } else if (cellHolder.value.text) {
-        value = cellHolder.value.text;
-      }
-    } else if (isResultSetBlobValue(cellHolder.value)) {
-      value = atob(parsedBlobValueGetter() ?? '');
-    } else {
-      value = cachedFullText || formatAction.getText(cellHolder);
-    }
-
-    if (!editAction.isElementEdited(cellHolder.key) || isBinary) {
+    if (!editAction.isElementEdited(cellHolder.key) || formatAction.isBinary(cellHolder)) {
       value = formatText(contentType, value);
     }
 

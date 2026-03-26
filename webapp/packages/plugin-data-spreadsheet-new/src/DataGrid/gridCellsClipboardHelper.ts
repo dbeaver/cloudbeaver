@@ -5,8 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { DatabaseSelectAction, type IGridDataKey, GridDataKeysUtils } from '@cloudbeaver/plugin-data-viewer';
-import { isResultSetContentValue } from '@dbeaver/result-set-api';
+import { DatabaseSelectAction, type IGridDataKey, GridDataKeysUtils, getCellTextValue } from '@cloudbeaver/plugin-data-viewer';
 
 import type { IDataGridSelectionContext } from './DataGridSelection/DataGridSelectionContext.js';
 import type { ITableData } from './TableDataContext.js';
@@ -52,33 +51,9 @@ export const GridCellsClipboardHelper = {
     const cells = [...selectedCells.values()].flat();
     return this.partitionIntoSegments(cells, tableData).length === 1;
   },
-  // TODO this seems like a logic duplication. find places with editable cells and value gettings and try to unify
   getCellCopyValue(tableData: ITableData, key: IGridDataKey): string {
     const holder = tableData.getCellHolder(key);
-
-    // Check if content is truncated and try to get full text from cache
-    if (tableData.dataContent.isTextTruncated(holder)) {
-      const fullText = tableData.dataContent.retrieveFullTextFromCache(key);
-      if (fullText !== undefined) {
-        return fullText;
-      }
-    }
-
-    // For binary/blob values, try to get the text representation
-    if (tableData.format.isBinary(holder)) {
-      // If it's a content value with binary data, return the binary string (base64)
-      if (isResultSetContentValue(holder.value) && holder.value.binary !== undefined) {
-        return holder.value.binary;
-      }
-      // If it's a content value with text, return the text
-      if (isResultSetContentValue(holder.value) && holder.value.text !== undefined) {
-        return holder.value.text;
-      }
-      // For file values, return empty string as we can't copy the actual blob
-      return '';
-    }
-
-    return tableData.format.getText(holder);
+    return getCellTextValue(holder, tableData.format, tableData.dataContent);
   },
   getSelectedCellsValue(tableData: ITableData, selectedCells: Map<string, IGridDataKey[]>, focusedCell?: IGridDataKey | null): string | null {
     if (selectedCells.size === 0) {

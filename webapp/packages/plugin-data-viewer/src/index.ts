@@ -26,6 +26,7 @@ export * from './DatabaseDataModel/Actions/ResultSet/createResultSetFileValue.js
 export * from './DatabaseDataModel/Actions/ResultSet/IResultSetBlobValue.js';
 export * from './DatabaseDataModel/Actions/ResultSet/IResultSetFileValue.js';
 export * from './DatabaseDataModel/Actions/ResultSet/IResultSetGeometryValue.js';
+export * from './DatabaseDataModel/Actions/ResultSet/getCellTextValue.js';
 export * from './DatabaseDataModel/Actions/ResultSet/isResultSetBlobValue.js';
 export * from './DatabaseDataModel/Actions/ResultSet/isResultSetFileValue.js';
 export * from './DatabaseDataModel/Actions/ResultSet/isResultSetGeometryValue.js';
