@@ -34,7 +34,6 @@ import org.jkiss.dbeaver.model.security.SMAdminController;
 import org.jkiss.dbeaver.model.security.SMController;
 import org.jkiss.dbeaver.registry.LocalFileController;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
-import org.jkiss.dbeaver.utils.GeneralUtils;
 
 import java.util.List;
 
@@ -82,7 +81,7 @@ public class CBApplicationCE extends CBApplication<CBServerConfig> {
         @NotNull SMCredentialsProvider credentialsProvider,
         @NotNull DBPWorkspace workspace
     ) throws DBException {
-        var lockManager = createLockManager(GeneralUtils.getMetadataFolder());
+        var lockManager = createLockManager();
         return LocalResourceController
             .builder(credentialsProvider, workspace, lockManager, this::getSecurityController)
             .build();
