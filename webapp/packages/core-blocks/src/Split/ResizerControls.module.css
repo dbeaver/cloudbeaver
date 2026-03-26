@@ -15,7 +15,7 @@
   cursor: ew-resize;
   user-select: none;
   z-index: 1;
-  transition: background-color var(--duration-slow) var(--ease-in-out);
+  transition: background-color var(--duration-slow) var(--ease-smooth);
 
   &:before {
     content: ' ';

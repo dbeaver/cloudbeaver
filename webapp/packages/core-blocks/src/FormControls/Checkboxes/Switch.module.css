@@ -104,9 +104,9 @@
     opacity: 0.38;
     border: none;
     transition:
-      background-color var(--duration-micro) var(--ease-standard),
-      border-color var(--duration-micro) var(--ease-standard),
-      opacity var(--duration-micro) var(--ease-standard);
+      background-color var(--duration-fast) var(--ease-smooth-start),
+      border-color var(--duration-fast) var(--ease-smooth-start),
+      opacity var(--duration-fast) var(--ease-smooth-start);
   }
 
   .switchControlUnderlay {
@@ -114,7 +114,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: margin-left var(--duration-micro) var(--ease-standard);
+    transition: margin-left var(--duration-fast) var(--ease-smooth-start);
   }
 
   .switchControlThumb {
@@ -131,8 +131,8 @@
     pointer-events: none;
     z-index: 1;
     transition:
-      background-color var(--duration-micro) var(--ease-standard),
-      border-color var(--duration-micro) var(--ease-standard);
+      background-color var(--duration-fast) var(--ease-smooth-start),
+      border-color var(--duration-fast) var(--ease-smooth-start);
   }
 
   .checked {

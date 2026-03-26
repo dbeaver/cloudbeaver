@@ -18,7 +18,7 @@ button.holidayButton {
 .holidayButton img {
   transition:
     filter var(--duration-slow),
-    transform var(--duration-slow) var(--ease-in-out);
+    transform var(--duration-slow) var(--ease-smooth);
 }
 
 .holidayButton:hover {

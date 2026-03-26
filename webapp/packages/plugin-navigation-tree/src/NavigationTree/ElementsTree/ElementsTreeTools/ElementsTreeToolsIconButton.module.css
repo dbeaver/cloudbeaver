@@ -11,13 +11,13 @@
 .iconButton {
   & .icon,
   & .staticImage {
-    transition: transform var(--duration-slow) var(--ease-in-out);
+    transition: transform var(--duration-slow) var(--ease-smooth);
   }
 
   &.loading {
     & .icon,
     & .staticImage {
-      animation: rotating var(--duration-spin) var(--ease-linear) infinite;
+      animation: rotating var(--duration-spin) var(--ease-evenly) infinite;
     }
   }
 

@@ -13,7 +13,7 @@
   box-sizing: border-box;
   height: 28px;
   padding: 0 16px;
-  transition: padding var(--duration-medium) var(--ease-in-out);
+  transition: padding var(--duration-medium) var(--ease-smooth);
 
   &.nowrap,
   &.ellipsis {

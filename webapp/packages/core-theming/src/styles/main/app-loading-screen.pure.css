@@ -15,9 +15,9 @@
 }
 #app-loading-screen .app-loading-screen__logo-spinner {
   transform-origin: center;
-  -webkit-animation: spin var(--duration-spin-slow) var(--ease-linear) infinite;
-  -moz-animation: spin var(--duration-spin-slow) var(--ease-linear) infinite;
-  animation: spin var(--duration-spin-slow) var(--ease-linear) infinite;
+  -webkit-animation: spin var(--duration-spin) var(--ease-evenly) infinite;
+  -moz-animation: spin var(--duration-spin) var(--ease-evenly) infinite;
+  animation: spin var(--duration-spin) var(--ease-evenly) infinite;
 }
 :not(:empty) + #app-loading-screen.app-loading-screen--fade-out {
   opacity: 0;

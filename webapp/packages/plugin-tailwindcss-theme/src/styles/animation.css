@@ -1,33 +1,21 @@
 :root {
-  --duration-micro: 90ms;
   --duration-fast: 100ms;
-  --duration-normal: 150ms;
   --duration-medium: 200ms;
-  --duration-slow: 300ms;
-  --duration-slower: 350ms;
+  --duration-slow: 350ms;
   --duration-slowest: 500ms;
 
   --duration-spin: 1.5s;
-  --duration-spin-slow: 2s;
 
-  --ease-linear: linear;
+  --ease-evenly: linear;
   --ease-soft: ease;
-  --ease-in-out: ease-in-out;
-  --ease-out: cubic-bezier(0, 0, 0.2, 1);
-  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-smooth: ease-in-out;
+  --ease-smooth-end: cubic-bezier(0, 0, 0.2, 1);
+  --ease-smooth-start: cubic-bezier(0.4, 0, 0.2, 1);
   --ease-emphasized: cubic-bezier(0.4, 0, 0.6, 1);
-}
-
-@utility duration-micro {
-  transition-duration: var(--duration-micro);
 }
 
 @utility duration-fast {
   transition-duration: var(--duration-fast);
-}
-
-@utility duration-normal {
-  transition-duration: var(--duration-normal);
 }
 
 @utility duration-medium {
@@ -38,20 +26,28 @@
   transition-duration: var(--duration-slow);
 }
 
-@utility duration-slower {
-  transition-duration: var(--duration-slower);
-}
-
 @utility duration-slowest {
   transition-duration: var(--duration-slowest);
+}
+
+@utility ease-evenly {
+  transition-timing-function: var(--ease-evenly);
 }
 
 @utility ease-soft {
   transition-timing-function: var(--ease-soft);
 }
 
-@utility ease-standard {
-  transition-timing-function: var(--ease-standard);
+@utility ease-smooth {
+  transition-timing-function: var(--ease-smooth);
+}
+
+@utility ease-smooth-end {
+  transition-timing-function: var(--ease-smooth-end);
+}
+
+@utility ease-smooth-start {
+  transition-timing-function: var(--ease-smooth-start);
 }
 
 @utility ease-emphasized {

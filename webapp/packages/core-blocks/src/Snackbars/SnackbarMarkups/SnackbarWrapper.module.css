@@ -21,8 +21,8 @@
   opacity: 0;
   border-radius: var(--theme-group-element-radius);
   transition:
-    opacity var(--duration-slow) var(--ease-in-out),
-    transform var(--duration-slowest) var(--ease-in-out);
+    opacity var(--duration-slow) var(--ease-smooth),
+    transform var(--duration-slowest) var(--ease-smooth);
   transform: translateX(-100%);
 
   &.mounted {
@@ -34,8 +34,8 @@
     opacity: 0;
     transform: translateX(-100%);
     transition:
-      opacity var(--duration-slowest) var(--ease-in-out),
-      transform var(--duration-slowest) var(--ease-in-out);
+      opacity var(--duration-slowest) var(--ease-smooth),
+      transform var(--duration-slowest) var(--ease-smooth);
   }
 }
 

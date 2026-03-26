@@ -30,7 +30,7 @@
     justify-content: center;
     align-items: center;
     opacity: 0;
-    transition: opacity var(--duration-slow) var(--ease-standard);
+    transition: opacity var(--duration-slow) var(--ease-smooth-start);
     &:global(.animate) {
       opacity: 1;
     }
