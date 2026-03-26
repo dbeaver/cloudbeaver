@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@ import org.jkiss.dbeaver.model.DBFileController;
 import org.jkiss.dbeaver.model.app.DBPWorkspace;
 import org.jkiss.dbeaver.model.auth.AuthInfo;
 import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
+import org.jkiss.dbeaver.model.fs.lock.shared.SharedFileLockManager;
 import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.security.SMAdminController;
 import org.jkiss.dbeaver.model.security.SMController;
@@ -75,13 +76,17 @@ public class CBApplicationCE extends CBApplication<CBServerConfig> {
         );
     }
 
-
-
     @NotNull
     @Override
-    public RMController createResourceController(@NotNull SMCredentialsProvider credentialsProvider,
-                                                 @NotNull DBPWorkspace workspace) throws DBException {
-        return LocalResourceController.builder(credentialsProvider, workspace, this::getSecurityController).build();
+    public RMController createResourceController(
+        @NotNull SMCredentialsProvider credentialsProvider,
+        @NotNull DBPWorkspace workspace
+    ) throws DBException {
+
+        var lockManager = new SharedFileLockManager(getApplicationInstanceId());
+        return LocalResourceController
+            .builder(credentialsProvider, workspace, lockManager, this::getSecurityController)
+            .build();
     }
 
     @NotNull
