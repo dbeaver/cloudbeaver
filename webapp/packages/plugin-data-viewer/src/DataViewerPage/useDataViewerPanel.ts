@@ -7,7 +7,7 @@
  */
 import { useEffect } from 'react';
 
-import { comparer, reaction, toJS } from 'mobx';
+import { reaction } from 'mobx';
 
 import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
@@ -157,7 +157,7 @@ export function useDataViewerPanel(tab: ITab<IObjectViewerTabState>) {
         const viewAction = dbModel.source.tryGetAction(0, IDatabaseDataViewAction, GridViewAction);
 
         return {
-          constraints: toJS(options.constraints),
+          constraints: options.constraints,
           whereFilter: options.whereFilter,
           pinnedColumns: viewAction ? Array.from(viewAction.pinnedColumns) : [],
           columnKeys: viewAction?.columnKeys.map(k => k.index) ?? [],
@@ -174,7 +174,7 @@ export function useDataViewerPanel(tab: ITab<IObjectViewerTabState>) {
           console.warn('[DataViewerTableState] Auto-save failed', exception);
         }
       },
-      { delay: 1000, fireImmediately: false, equals: comparer.structural },
+      { delay: 1000, fireImmediately: false },
     );
 
     return () => {
