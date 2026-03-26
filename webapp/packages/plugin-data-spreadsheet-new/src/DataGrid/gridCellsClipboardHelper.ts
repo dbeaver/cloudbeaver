@@ -5,7 +5,14 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { DatabaseSelectAction, type IGridDataKey, GridDataKeysUtils, getCellTextValue } from '@cloudbeaver/plugin-data-viewer';
+import {
+  DatabaseEditChangeType,
+  DatabaseSelectAction,
+  type IGridDataKey,
+  GridDataKeysUtils,
+  getCellTextValue,
+  isBooleanValuePresentationAvailable,
+} from '@cloudbeaver/plugin-data-viewer';
 
 import type { IDataGridSelectionContext } from './DataGridSelection/DataGridSelectionContext.js';
 import type { ITableData } from './TableDataContext.js';
@@ -29,12 +36,32 @@ function getColumnSignature(row: IGridDataKey[], tableData: ITableData): string 
   return row.map(cell => tableData.getColumnIndexFromColumnKey(cell.column)).join(COLUMN_SIGNATURE_SEPARATOR);
 }
 
-function isCellPasteable(key: IGridDataKey, tableData: ITableData): boolean {
-  return !tableData.format.isReadOnly(key);
+export function isGridCellEditable(key: IGridDataKey, tableData: ITableData, hasElementIdentifier: boolean): boolean {
+  const editionState = tableData.getEditionState(key);
+
+  if (!hasElementIdentifier && editionState !== DatabaseEditChangeType.add) {
+    return false;
+  }
+
+  const holder = tableData.getCellHolder(key);
+
+  if (tableData.format.isBinary(holder) || tableData.format.isGeometry(holder) || tableData.dataContent.isTextTruncated(holder)) {
+    return false;
+  }
+
+  const resultColumn = tableData.getColumnInfo(key.column);
+
+  if (!resultColumn || holder.value === undefined) {
+    return false;
+  }
+
+  return !(isBooleanValuePresentationAvailable(holder.value, resultColumn) || tableData.isCellReadonly(key));
 }
 
-function filterApplicableUpdates(updates: CellUpdate[], tableData: ITableData): CellUpdate[] {
-  return updates.filter(({ key, value }) => isCellPasteable(key, tableData) && tableData.format.getText(tableData.format.get(key)) !== value);
+function filterApplicableUpdates(updates: CellUpdate[], tableData: ITableData, hasElementIdentifier: boolean): CellUpdate[] {
+  return updates.filter(
+    ({ key, value }) => isGridCellEditable(key, tableData, hasElementIdentifier) && tableData.format.getText(tableData.format.get(key)) !== value,
+  );
 }
 
 export const GridCellsClipboardHelper = {
@@ -97,6 +124,7 @@ export const GridCellsClipboardHelper = {
     selectionContext: IDataGridSelectionContext,
     selectionAction: DatabaseSelectAction | undefined,
     tableData: ITableData,
+    hasElementIdentifier: boolean,
   ): CellUpdate[] {
     const clipboardData = this.parseClipboardData(clipboardText);
 
@@ -110,7 +138,7 @@ export const GridCellsClipboardHelper = {
       return [];
     }
 
-    return this.mapClipboardToSelection(clipboardData, targetCells, tableData);
+    return this.mapClipboardToSelection(clipboardData, targetCells, tableData, hasElementIdentifier);
   },
   getTargetCells(selectionContext: IDataGridSelectionContext, selectionAction: DatabaseSelectAction | undefined): IGridDataKey[] {
     const selectedCells = Array.from(selectionContext.selectedCells.values()).flat();
@@ -178,7 +206,7 @@ export const GridCellsClipboardHelper = {
       .slice(0, clipboard.length)
       .flatMap((row, tRow) => row.slice(0, clipCols).map((key, tCol) => ({ key, value: clipboard[tRow]![tCol]! })));
   },
-  mapClipboardToSelection(clipboard: string[][], targets: IGridDataKey[], tableData: ITableData): CellUpdate[] {
+  mapClipboardToSelection(clipboard: string[][], targets: IGridDataKey[], tableData: ITableData, hasElementIdentifier: boolean): CellUpdate[] {
     const clipCols = clipboard[0]?.length ?? 0;
 
     if (clipboard.length === 0 || clipCols === 0) {
@@ -194,6 +222,6 @@ export const GridCellsClipboardHelper = {
       updates = this.partitionIntoSegments(targets, tableData).flatMap(segmentGrid => this.mapClipboardToGrid(clipboard, segmentGrid));
     }
 
-    return filterApplicableUpdates(updates, tableData);
+    return filterApplicableUpdates(updates, tableData, hasElementIdentifier);
   },
 };

@@ -31,9 +31,10 @@ export function useGridSelectedCellsClipboard(
   tableData: ITableData,
   selectAction: DatabaseSelectAction | undefined,
   selectionContext: IDataGridSelectionContext,
+  hasElementIdentifier: boolean,
 ): IUseGridSelectedCellsClipboardResult {
   const dataViewerService = useService(DataViewerService);
-  const props = useObjectRef({ tableData, selectionContext, selectAction });
+  const props = useObjectRef({ tableData, selectionContext, selectAction, hasElementIdentifier });
   const copyEventHandler = useDataViewerCopyHandler();
   const canCopyData = dataViewerService.canCopyData;
 
@@ -45,7 +46,13 @@ export function useGridSelectedCellsClipboard(
         return;
       }
 
-      const selected = GridCellsClipboardHelper.getPastedCells(clipboardText, props.selectionContext, props.selectAction, props.tableData);
+      const selected = GridCellsClipboardHelper.getPastedCells(
+        clipboardText,
+        props.selectionContext,
+        props.selectAction,
+        props.tableData,
+        props.hasElementIdentifier,
+      );
 
       if (selected.length > 0) {
         props.tableData.editor?.setMany(selected);

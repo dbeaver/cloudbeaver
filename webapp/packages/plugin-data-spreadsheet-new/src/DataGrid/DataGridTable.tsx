@@ -30,7 +30,6 @@ import {
   DataViewerPresentationType,
   type IDatabaseDataModel,
   type IDataPresentationProps,
-  isBooleanValuePresentationAvailable,
   GridDataKeysUtils,
   ResultSetDataSource,
   getNextOrder,
@@ -58,6 +57,7 @@ import { useGridSelectionContext } from './DataGridSelection/useGridSelectionCon
 import './DataGridTable.css';
 import { CellFormatter } from './Formatters/CellFormatter.js';
 import { FormattingContext } from './FormattingContext.js';
+import { isGridCellEditable } from './gridCellsClipboardHelper.js';
 import { TableDataContext } from './TableDataContext.js';
 import { useGridDragging } from './useGridDragging.js';
 import { useFormatting } from './useFormatting.js';
@@ -91,6 +91,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
   const searchResultsCache = useSearchResultsCache(cacheAction);
   const getHeaderOrder = useCallback(() => (dataGridRef.current?.getColumnsOrdered() ?? []).map(col => col.key), [dataGridRef]);
   const gridSelectionContext = useGridSelectionContext(tableData, selectionAction, getHeaderOrder);
+  const hasElementIdentifier = isResultSetDataSource(model.source) ? model.source.hasElementIdentifier(resultIndex) : false;
 
   const columnDnDState = useObservableRef<IColumnDnDState>(
     () => ({
@@ -184,7 +185,12 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
     },
   }));
 
-  const gridSelectedCellsClipboard = useGridSelectedCellsClipboard(tableData, selectionAction as DatabaseSelectAction, gridSelectionContext);
+  const gridSelectedCellsClipboard = useGridSelectedCellsClipboard(
+    tableData,
+    selectionAction as DatabaseSelectAction,
+    gridSelectionContext,
+    hasElementIdentifier,
+  );
   const { onMouseDownHandler, onMouseMoveHandler } = useGridDragging({
     onDragStart: startPosition => {
       handlers.selectCell(startPosition);
@@ -518,30 +524,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
       return false;
     }
 
-    const cell = { row, column };
-
-    const editionState = tableData.getEditionState(cell);
-
-    const source = gridContext.model.source;
-    const hasElementIdentifier = isResultSetDataSource(source) ? source.hasElementIdentifier(tableData.view.resultIndex) : false;
-    if (!hasElementIdentifier && editionState !== DatabaseEditChangeType.add) {
-      return false;
-    }
-
-    const holder = tableData.getCellHolder(cell);
-    if (tableData.format.isBinary(holder) || tableData.format.isGeometry(holder) || tableData.dataContent.isTextTruncated(holder)) {
-      return false;
-    }
-
-    const resultColumn = tableData.getColumnInfo(cell.column);
-
-    if (!resultColumn || holder.value === undefined) {
-      return false;
-    }
-
-    const handleByBooleanFormatter = isBooleanValuePresentationAvailable(holder.value, resultColumn);
-
-    return !(handleByBooleanFormatter || tableData.isCellReadonly(cell));
+    return isGridCellEditable({ row, column }, tableData, hasElementIdentifier);
   }
 
   function getColumnKey(colIdx: number) {
