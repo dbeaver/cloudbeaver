@@ -9,6 +9,7 @@ import { action, makeObservable, observable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 import { StorageService } from '@cloudbeaver/core-storage';
+import { schema } from '@cloudbeaver/core-utils';
 
 import type { ContainerDataSource } from '../ContainerDataSource.js';
 import { isFilterConstraint, isOrderConstraint } from '../DatabaseDataModel/Actions/DatabaseDataConstraintAction.js';
@@ -18,6 +19,21 @@ import type { IDatabaseDataModel } from '../DatabaseDataModel/IDatabaseDataModel
 import type { IDataViewerPersistedState, IPersistedConstraint } from './IDataViewerPersistedState.js';
 
 const STORAGE_KEY = 'dataviewer-table-states';
+
+const persistedConstraintSchema = schema.object({
+  attributeName: schema.string().min(1),
+  operator: schema.string().optional(),
+  value: schema.unknown().optional(),
+  orderAsc: schema.boolean().optional(),
+  orderPosition: schema.number().optional(),
+});
+
+const persistedStateSchema = schema.object({
+  constraints: schema.array(persistedConstraintSchema),
+  whereFilter: schema.string(),
+  pinnedColumns: schema.array(schema.string()),
+  columnOrder: schema.array(schema.string()).optional(),
+});
 
 @injectable(() => [StorageService])
 export class DataViewerTableStateService {
@@ -152,32 +168,6 @@ export class DataViewerTableStateService {
   }
 
   private validateState(data: IDataViewerPersistedState): boolean {
-    if (!data || typeof data !== 'object') {
-      return false;
-    }
-
-    if (!Array.isArray(data.constraints)) {
-      return false;
-    }
-
-    for (const c of data.constraints) {
-      if (!c || typeof c.attributeName !== 'string' || c.attributeName.length === 0) {
-        return false;
-      }
-    }
-
-    if (typeof data.whereFilter !== 'string') {
-      return false;
-    }
-
-    if (!Array.isArray(data.pinnedColumns) || !data.pinnedColumns.every(c => typeof c === 'string')) {
-      return false;
-    }
-
-    if (data.columnOrder !== undefined && (!Array.isArray(data.columnOrder) || !data.columnOrder.every(c => typeof c === 'string'))) {
-      return false;
-    }
-
-    return true;
+    return persistedStateSchema.safeParse(data).success;
   }
 }
