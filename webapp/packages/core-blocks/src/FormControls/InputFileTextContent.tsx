@@ -140,14 +140,21 @@ export const InputFileTextContent: InputFileTextContentType = observer(function 
         {children}
       </FieldLabel>
       <UploadArea title={tooltip} disabled={disabled} accept={accept} reset onChange={handleChange}>
-        <Button className="tw:inline-flex" icon="/icons/import.svg" tag="div" variant="secondary" disabled={disabled}>
+        <Button className="tw:w-max" icon="/icons/import.svg" tag="div" variant="secondary" disabled={disabled}>
           {translate('ui_upload_file')}
         </Button>
       </UploadArea>
       <FieldDescription className={s(styles, { fieldDescription: true })}>
         {description}
         {(selected || saved) && (
-          <IconButton className='tw:shrink-0' variant='secondary' disabled={disabled} size='small' aria-label={translate('ui_remove')} onClick={removeFile}>
+          <IconButton
+            className="tw:shrink-0"
+            variant="secondary"
+            disabled={disabled}
+            size="small"
+            aria-label={translate('ui_remove')}
+            onClick={removeFile}
+          >
             <Icon name="cross" width={12} height={12} />
           </IconButton>
         )}
