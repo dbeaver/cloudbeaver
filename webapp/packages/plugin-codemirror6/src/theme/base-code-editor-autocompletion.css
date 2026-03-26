@@ -1,5 +1,3 @@
-@import '@cloudbeaver/plugin-tailwindcss-theme/tailwind.css';
-
 /* Increase specificity by selector repetition */
 .cm-tooltip.cm-tooltip {
   &.cm-tooltip-autocomplete {
