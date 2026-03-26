@@ -10,7 +10,7 @@
     @apply tw:relative;
 
     &::before {
-      @apply tw:absolute tw:content-[''] tw:opacity-0 tw:top-0 tw:left-0 tw:w-full tw:h-full tw:overflow-hidden tw:bg-[currentColor] tw:rounded-[inherit] tw:pointer-events-none tw:transition-opacity tw:duration-150 tw:ease-linear;
+      @apply tw:absolute tw:content-[''] tw:opacity-0 tw:top-0 tw:left-0 tw:w-full tw:h-full tw:overflow-hidden tw:bg-[currentColor] tw:rounded-[inherit] tw:pointer-events-none tw:transition-opacity tw:duration-normal tw:ease-linear;
     }
 
     &:hover::before {

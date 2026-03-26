@@ -6,11 +6,13 @@
  * you may not use this file except in compliance with the License.
  */
 
+@import '@cloudbeaver/plugin-tailwindcss-theme/tailwind.css';
+
 .tableItemExpandBoxIcon {
   width: 16px;
   height: 16px;
   padding: 0;
-  transition: transform ease-in-out 0.2s;
+  transition: transform var(--duration-medium) var(--ease-in-out);
 
   &.expanded {
     transform: rotate(180deg);

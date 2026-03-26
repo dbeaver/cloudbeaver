@@ -1,10 +1,12 @@
+@import '@cloudbeaver/plugin-tailwindcss-theme/tailwind.css';
+
 @layer components {
   .dbv-slide-dialog__overlay {
     position: absolute;
     inset: 0;
     z-index: 999;
     background: rgb(0 0 0 / 0%);
-    transition: background ease-in-out 0.3s;
+    transition: background var(--duration-slow) var(--ease-in-out);
     pointer-events: none;
 
     &[data-active] {

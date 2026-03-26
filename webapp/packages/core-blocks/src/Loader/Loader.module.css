@@ -6,6 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
+@import '@cloudbeaver/plugin-tailwindcss-theme/tailwind.css';
+
 @layer components {
   .spinner {
     --dbv-kit-spinner-stroke-color: var(--theme-primary);
@@ -28,7 +30,7 @@
     justify-content: center;
     align-items: center;
     opacity: 0;
-    transition: opacity cubic-bezier(0.4, 0, 0.2, 1) 0.3s;
+    transition: opacity var(--duration-slow) var(--ease-standard);
     &:global(.animate) {
       opacity: 1;
     }

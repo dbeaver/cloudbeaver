@@ -1,4 +1,5 @@
 @import 'tailwindcss' layer(base) prefix(tw);
+@import './animation.css';
 @import './shadow.css';
 @import './typography.css';
 @import './typography-utilities.css';

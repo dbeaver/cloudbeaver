@@ -5,6 +5,9 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+
+@import '@cloudbeaver/plugin-tailwindcss-theme/tailwind.css';
+
 .notification {
   composes: theme-background-surface theme-text-on-surface from global;
   position: relative;
@@ -18,8 +21,8 @@
   opacity: 0;
   border-radius: var(--theme-group-element-radius);
   transition:
-    opacity 0.3s ease-in-out,
-    transform 0.5s ease-in-out;
+    opacity var(--duration-slow) var(--ease-in-out),
+    transform var(--duration-slowest) var(--ease-in-out);
   transform: translateX(-100%);
 
   &.mounted {
@@ -31,8 +34,8 @@
     opacity: 0;
     transform: translateX(-100%);
     transition:
-      opacity 0.5s ease-in-out,
-      transform 0.5s ease-in-out;
+      opacity var(--duration-slowest) var(--ease-in-out),
+      transform var(--duration-slowest) var(--ease-in-out);
   }
 }
 

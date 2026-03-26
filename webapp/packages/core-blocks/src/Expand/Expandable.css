@@ -1,3 +1,5 @@
+@import '@cloudbeaver/plugin-tailwindcss-theme/tailwind.css';
+
 @layer components {
   .dbv-kit-disclosure__disclosure {
     --dbv-kit-disclosure-foreground: var(--theme-text-on-surface);
@@ -12,8 +14,8 @@
     display: grid;
     grid-template-rows: 0fr;
     transition-property: grid-template-rows;
-    transition-timing-function: ease-in-out;
-    transition-duration: 200ms;
+    transition-timing-function: var(--ease-in-out);
+    transition-duration: var(--duration-medium);
 
     > * {
       overflow: hidden;
@@ -36,7 +38,7 @@
     opacity: 0.5;
     width: var(--dbv-kit-disclosure-icon-size);
     height: var(--dbv-kit-disclosure-icon-size);
-    transition: transform 150ms ease-in-out;
+    transition: transform var(--duration-normal) var(--ease-in-out);
     transform-origin: center;
     transform: rotate(-90deg);
   }

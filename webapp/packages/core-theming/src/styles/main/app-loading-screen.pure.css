@@ -1,3 +1,5 @@
+@import '@cloudbeaver/plugin-tailwindcss-theme/tailwind.css';
+
 #app-loading-screen {
   z-index: 999;
   position: absolute;
@@ -8,14 +10,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: opacity 0.3s;
+  transition: opacity var(--duration-slow);
   background: white;
 }
 #app-loading-screen .app-loading-screen__logo-spinner {
   transform-origin: center;
-  -webkit-animation:spin 2s linear infinite;
-  -moz-animation:spin 2s linear infinite;
-  animation:spin 2s linear infinite;
+  -webkit-animation: spin var(--duration-spin-slow) var(--ease-linear) infinite;
+  -moz-animation: spin var(--duration-spin-slow) var(--ease-linear) infinite;
+  animation: spin var(--duration-spin-slow) var(--ease-linear) infinite;
 }
 :not(:empty) + #app-loading-screen.app-loading-screen--fade-out {
   opacity: 0;
@@ -24,6 +26,19 @@
   display: none;
 }
 
-@-moz-keyframes spin { 100% { -moz-transform: rotate(360deg); } }
-@-webkit-keyframes spin { 100% { -webkit-transform: rotate(360deg); } }
-@keyframes spin { 100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); } }
+@-moz-keyframes spin {
+  100% {
+    -moz-transform: rotate(360deg);
+  }
+}
+@-webkit-keyframes spin {
+  100% {
+    -webkit-transform: rotate(360deg);
+  }
+}
+@keyframes spin {
+  100% {
+    -webkit-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}

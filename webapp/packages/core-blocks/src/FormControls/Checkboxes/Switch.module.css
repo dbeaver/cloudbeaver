@@ -5,6 +5,9 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+
+@import '@cloudbeaver/plugin-tailwindcss-theme/tailwind.css';
+
 @layer components {
   .field {
     --dbv-kit-control-outline-offset: -8px;
@@ -101,9 +104,9 @@
     opacity: 0.38;
     border: none;
     transition:
-      background-color 90ms cubic-bezier(0.4, 0, 0.2, 1),
-      border-color 90ms cubic-bezier(0.4, 0, 0.2, 1),
-      opacity 90ms cubic-bezier(0.4, 0, 0.2, 1);
+      background-color var(--duration-micro) var(--ease-standard),
+      border-color var(--duration-micro) var(--ease-standard),
+      opacity var(--duration-micro) var(--ease-standard);
   }
 
   .switchControlUnderlay {
@@ -111,7 +114,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: margin-left 90ms cubic-bezier(0.4, 0, 0.2, 1);
+    transition: margin-left var(--duration-micro) var(--ease-standard);
   }
 
   .switchControlThumb {
@@ -128,8 +131,8 @@
     pointer-events: none;
     z-index: 1;
     transition:
-      background-color 90ms cubic-bezier(0.4, 0, 0.2, 1),
-      border-color 90ms cubic-bezier(0.4, 0, 0.2, 1);
+      background-color var(--duration-micro) var(--ease-standard),
+      border-color var(--duration-micro) var(--ease-standard);
   }
 
   .checked {
