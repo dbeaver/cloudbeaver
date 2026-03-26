@@ -57,7 +57,6 @@ import { useGridSelectionContext } from './DataGridSelection/useGridSelectionCon
 import './DataGridTable.css';
 import { CellFormatter } from './Formatters/CellFormatter.js';
 import { FormattingContext } from './FormattingContext.js';
-import { isGridCellEditable } from './gridCellsClipboardHelper.js';
 import { TableDataContext } from './TableDataContext.js';
 import { useGridDragging } from './useGridDragging.js';
 import { useFormatting } from './useFormatting.js';
@@ -68,6 +67,7 @@ import { TableColumnHeader } from './TableColumnHeader/TableColumnHeader.js';
 import { TableIndexColumnHeader } from './TableColumnHeader/TableIndexColumnHeader.js';
 import { clsx } from '@dbeaver/ui-kit';
 import type { ColumnDropSide } from './getDropSide.js';
+import { GridCellsHelper } from './gridCellsHelper.js';
 
 const ROW_HEIGHT = 24;
 export const HEADER_HEIGHT = 32;
@@ -524,7 +524,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
       return false;
     }
 
-    return isGridCellEditable({ row, column }, tableData, hasElementIdentifier);
+    return GridCellsHelper.isGridCellEditable({ row, column }, tableData, hasElementIdentifier);
   }
 
   function getColumnKey(colIdx: number) {

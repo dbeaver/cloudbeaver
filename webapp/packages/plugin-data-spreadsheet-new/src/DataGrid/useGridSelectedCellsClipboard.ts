@@ -14,9 +14,9 @@ import { copyToClipboard } from '@cloudbeaver/core-utils';
 import { DatabaseSelectAction, DataViewerService, ResultSetSelectAction, useDataViewerCopyHandler } from '@cloudbeaver/plugin-data-viewer';
 
 import type { IDataGridSelectionContext } from './DataGridSelection/DataGridSelectionContext.js';
-import { GridCellsClipboardHelper } from './gridCellsClipboardHelper.js';
 import type { ITableData } from './TableDataContext.js';
 import { type DataGridCellKeyboardEvent } from '@cloudbeaver/plugin-data-grid';
+import { GridClipboardHelper } from './gridClipboardHelper.js';
 
 interface IUseGridSelectedCellsClipboardResult {
   onKeydownHandler: (event: DataGridCellKeyboardEvent) => void;
@@ -46,7 +46,7 @@ export function useGridSelectedCellsClipboard(
         return;
       }
 
-      const selected = GridCellsClipboardHelper.getPastedCells(
+      const selected = GridClipboardHelper.getPastedCells(
         clipboardText,
         props.selectionContext,
         props.selectAction,
@@ -70,7 +70,7 @@ export function useGridSelectedCellsClipboard(
         }
 
         const focusedElement = props.selectAction.getFocusedElement();
-        const value = GridCellsClipboardHelper.getSelectedCellsValue(props.tableData, props.selectionContext.selectedCells, focusedElement);
+        const value = GridClipboardHelper.getClipboardValueFromSelectedCells(props.tableData, props.selectionContext.selectedCells, focusedElement);
 
         if (value !== null) {
           copyToClipboard(value);
@@ -83,7 +83,7 @@ export function useGridSelectedCellsClipboard(
 
   const onKeydownHandler = useCallback(
     async (event: DataGridCellKeyboardEvent) => {
-      if (!(event.ctrlKey || event.metaKey) || !GridCellsClipboardHelper.isGridClipboardTarget(event)) {
+      if (!(event.ctrlKey || event.metaKey) || !GridClipboardHelper.isGridClipboardTarget(event)) {
         return;
       }
 
