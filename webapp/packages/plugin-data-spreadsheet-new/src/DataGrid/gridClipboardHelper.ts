@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { DatabaseSelectAction, type IGridDataKey, GridDataKeysUtils } from '@cloudbeaver/plugin-data-viewer';
+import { DatabaseSelectAction, type IGridDataKey, GridDataKeysUtils, getCellTextValue } from '@cloudbeaver/plugin-data-viewer';
 
 import type { IDataGridSelectionContext } from './DataGridSelection/DataGridSelectionContext.js';
 import type { ITableData } from './TableDataContext.js';
@@ -28,7 +28,7 @@ export const GridClipboardHelper = {
     focusedCell?: IGridDataKey | null,
   ): string | null {
     if (selectedCells.size === 0) {
-      return focusedCell ? GridCellsHelper.getCellValue(tableData, focusedCell) : null;
+      return focusedCell ? getCellTextValue(tableData.getCellHolder(focusedCell), tableData.format, tableData.dataContent) : null;
     }
 
     if (!GridSelectionHelper.isContiguousSelection(selectedCells, tableData)) {
@@ -51,7 +51,7 @@ export const GridClipboardHelper = {
         return selectedColumns
           .map(column => {
             const cellKey = rowCells.get(GridDataKeysUtils.serialize(column));
-            return cellKey ? GridCellsHelper.getCellValue(tableData, cellKey) : '';
+            return cellKey ? getCellTextValue(tableData.getCellHolder(cellKey), tableData.format, tableData.dataContent) : '';
           })
           .join(CELL_COLUMN_SEPARATOR);
       })

@@ -44,8 +44,4 @@ export const GridCellsHelper = {
 
     return !(isBooleanValuePresentationAvailable(holder.value, resultColumn) || tableData.isCellReadonly(key));
   },
-  getCellValue(tableData: ITableData, key: IGridDataKey): string {
-    const holder = tableData.getCellHolder(key);
-    return getCellTextValue(holder, tableData.format, tableData.dataContent);
-  },
 };
