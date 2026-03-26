@@ -21,7 +21,7 @@
     --dbv-kit-btn-primary-border-color: var(--theme-primary);
 
     --dbv-kit-btn-secondary-background: transparent;
-    --dbv-kit-btn-secondary-background-hover: color-mix(in srgb, transparent, var(--theme-primary) 5%);
+    --dbv-kit-btn-secondary-background-hover: color-mix(in srgb, transparent, var(--theme-primary) 10%);
     --dbv-kit-btn-secondary-background-active: color-mix(in srgb, transparent, var(--theme-primary) 20%);
     --dbv-kit-btn-secondary-foreground: var(--theme-link-color);
     --dbv-kit-btn-secondary-foreground-hover: var(--theme-link-color);
@@ -36,7 +36,7 @@
     --dbv-kit-btn-ghost-foreground-hover: var(--theme-link-color);
     --dbv-kit-btn-ghost-foreground-active: var(--theme-link-color);
     --dbv-kit-btn-ghost-background: transparent;
-    --dbv-kit-btn-ghost-background-hover: color-mix(in srgb, transparent, var(--theme-primary) 5%);
+    --dbv-kit-btn-ghost-background-hover: color-mix(in srgb, transparent, var(--theme-primary) 10%);
     --dbv-kit-btn-ghost-background-active: color-mix(in srgb, transparent, var(--theme-primary) 20%);
     --dbv-kit-btn-ghost-border-color: transparent;
 
