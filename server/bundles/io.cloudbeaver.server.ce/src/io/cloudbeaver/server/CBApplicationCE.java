@@ -29,12 +29,12 @@ import org.jkiss.dbeaver.model.DBFileController;
 import org.jkiss.dbeaver.model.app.DBPWorkspace;
 import org.jkiss.dbeaver.model.auth.AuthInfo;
 import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
-import org.jkiss.dbeaver.model.fs.lock.shared.SharedFileLockManager;
 import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.security.SMAdminController;
 import org.jkiss.dbeaver.model.security.SMController;
 import org.jkiss.dbeaver.registry.LocalFileController;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
+import org.jkiss.dbeaver.utils.GeneralUtils;
 
 import java.util.List;
 
@@ -82,8 +82,7 @@ public class CBApplicationCE extends CBApplication<CBServerConfig> {
         @NotNull SMCredentialsProvider credentialsProvider,
         @NotNull DBPWorkspace workspace
     ) throws DBException {
-
-        var lockManager = new SharedFileLockManager(getApplicationInstanceId());
+        var lockManager = createLockManager(GeneralUtils.getMetadataFolder());
         return LocalResourceController
             .builder(credentialsProvider, workspace, lockManager, this::getSecurityController)
             .build();

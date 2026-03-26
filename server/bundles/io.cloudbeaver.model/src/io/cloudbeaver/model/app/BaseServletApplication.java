@@ -25,16 +25,19 @@ import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBFileController;
+import org.jkiss.dbeaver.model.app.DBPLockManagerProvider;
 import org.jkiss.dbeaver.model.app.DBPWorkspace;
 import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
 import org.jkiss.dbeaver.model.auth.SMSessionContext;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
+import org.jkiss.dbeaver.model.fs.lock.LockManager;
 import org.jkiss.dbeaver.model.impl.app.ApplicationRegistry;
 import org.jkiss.dbeaver.model.impl.app.BaseApplicationImpl;
 import org.jkiss.dbeaver.model.impl.app.BaseWorkspaceImpl;
 import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.secret.DBSSecretController;
 import org.jkiss.dbeaver.model.websocket.event.WSEventController;
+import org.jkiss.dbeaver.model.fs.lock.shared.SharedFileLockManager;
 import org.jkiss.dbeaver.runtime.IVariableResolver;
 import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.dbeaver.utils.RuntimeUtils;
@@ -48,7 +51,7 @@ import java.util.Map;
 /**
  * Servlet application
  */
-public abstract class BaseServletApplication extends BaseApplicationImpl implements ServletApplication {
+public abstract class BaseServletApplication extends BaseApplicationImpl implements ServletApplication, DBPLockManagerProvider {
 
     public static final String DEFAULT_CONFIG_FILE_PATH = "/etc/cloudbeaver.conf";
     public static final String CUSTOM_CONFIG_FOLDER = "custom";
@@ -71,6 +74,12 @@ public abstract class BaseServletApplication extends BaseApplicationImpl impleme
     @Override
     public DBFileController createFileController(@NotNull SMCredentialsProvider credentialsProvider) {
         throw new IllegalStateException("File controller is not supported by " + getClass().getSimpleName());
+    }
+
+    @NotNull
+    @Override
+    public LockManager createLockManager(@NotNull Path metadataFolder) throws DBException {
+        return new SharedFileLockManager(getApplicationInstanceId(), metadataFolder);
     }
 
     @Nullable
