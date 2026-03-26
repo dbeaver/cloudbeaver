@@ -5,13 +5,8 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import {
-  DatabaseSelectAction,
-  type IGridDataKey,
-  GridDataKeysUtils,
-  type IDatabaseValueHolder,
-  type IResultSetValue,
-} from '@cloudbeaver/plugin-data-viewer';
+import { DatabaseSelectAction, type IGridDataKey, GridDataKeysUtils } from '@cloudbeaver/plugin-data-viewer';
+import { isResultSetContentValue } from '@dbeaver/result-set-api';
 
 import type { IDataGridSelectionContext } from './DataGridSelection/DataGridSelectionContext.js';
 import type { ITableData } from './TableDataContext.js';
@@ -35,19 +30,12 @@ function getColumnSignature(row: IGridDataKey[], tableData: ITableData): string 
   return row.map(cell => tableData.getColumnIndexFromColumnKey(cell.column)).join(COLUMN_SIGNATURE_SEPARATOR);
 }
 
-function isCellEditable(key: IGridDataKey, tableData: ITableData): boolean {
-  const cellHolder = tableData.view.getCellHolder(key) as IDatabaseValueHolder<IGridDataKey, IResultSetValue>;
-
-  return !(
-    tableData.format.isReadOnly(key) ||
-    tableData.format.isBinary(cellHolder) ||
-    tableData.dataContent.isTextTruncated(cellHolder) ||
-    tableData.dataContent.isBlobTruncated(cellHolder)
-  );
+function isCellPasteable(key: IGridDataKey, tableData: ITableData): boolean {
+  return !tableData.format.isReadOnly(key);
 }
 
 function filterApplicableUpdates(updates: CellUpdate[], tableData: ITableData): CellUpdate[] {
-  return updates.filter(({ key, value }) => isCellEditable(key, tableData) && tableData.format.getText(tableData.format.get(key)) !== value);
+  return updates.filter(({ key, value }) => isCellPasteable(key, tableData) && tableData.format.getText(tableData.format.get(key)) !== value);
 }
 
 export const GridCellsClipboardHelper = {
@@ -64,19 +52,44 @@ export const GridCellsClipboardHelper = {
     const cells = [...selectedCells.values()].flat();
     return this.partitionIntoSegments(cells, tableData).length === 1;
   },
+  // TODO this seems like a logic duplication. find places with editable cells and value gettings and try to unify
   getCellCopyValue(tableData: ITableData, key: IGridDataKey): string {
-    return tableData.format.getText(tableData.format.get(key));
+    const holder = tableData.getCellHolder(key);
+
+    // Check if content is truncated and try to get full text from cache
+    if (tableData.dataContent.isTextTruncated(holder)) {
+      const fullText = tableData.dataContent.retrieveFullTextFromCache(key);
+      if (fullText !== undefined) {
+        return fullText;
+      }
+    }
+
+    // For binary/blob values, try to get the text representation
+    if (tableData.format.isBinary(holder)) {
+      // If it's a content value with binary data, return the binary string (base64)
+      if (isResultSetContentValue(holder.value) && holder.value.binary !== undefined) {
+        return holder.value.binary;
+      }
+      // If it's a content value with text, return the text
+      if (isResultSetContentValue(holder.value) && holder.value.text !== undefined) {
+        return holder.value.text;
+      }
+      // For file values, return empty string as we can't copy the actual blob
+      return '';
+    }
+
+    return tableData.format.getText(holder);
   },
   getSelectedCellsValue(tableData: ITableData, selectedCells: Map<string, IGridDataKey[]>, focusedCell?: IGridDataKey | null): string | null {
     if (selectedCells.size === 0) {
-      return focusedCell && isCellEditable(focusedCell, tableData) ? this.getCellCopyValue(tableData, focusedCell) : null;
+      return focusedCell ? this.getCellCopyValue(tableData, focusedCell) : null;
     }
 
     if (!this.isContiguousSelection(selectedCells, tableData)) {
       return null;
     }
 
-    const orderedRows = sortRowsByIndex([...selectedCells.values()], tableData).map(row => row.filter(cell => isCellEditable(cell, tableData)));
+    const orderedRows = sortRowsByIndex([...selectedCells.values()], tableData);
 
     const selectedColumnKeys = new Set(orderedRows.flatMap(row => row.map(cell => GridDataKeysUtils.serialize(cell.column))));
     const selectedColumns = tableData.view.columnKeys.filter(column => selectedColumnKeys.has(GridDataKeysUtils.serialize(column)));
