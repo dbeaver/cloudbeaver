@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { DatabaseEditChangeType, type IGridDataKey, isBooleanValuePresentationAvailable, getCellTextValue } from '@cloudbeaver/plugin-data-viewer';
+import { DatabaseEditChangeType, type IGridDataKey, isBooleanValuePresentationAvailable } from '@cloudbeaver/plugin-data-viewer';
 
 import type { ITableData } from './TableDataContext.js';
 
