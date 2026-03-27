@@ -207,21 +207,10 @@ export class GridViewAction<
   }
 
   getPinnedColumnNames(): string[] {
-    const names: string[] = [];
-
-    for (const serializedKey of this.pinnedColumns) {
-      const index = parseInt(serializedKey, 10);
-
-      if (!isNaN(index)) {
-        const name = this.getColumnName({ index });
-
-        if (name) {
-          names.push(name);
-        }
-      }
-    }
-
-    return names;
+    return this.columnKeys
+      .filter(key => this.isColumnPinned(key))
+      .map(key => this.getColumnName(key))
+      .filter((name): name is string => name !== undefined);
   }
 
   protected mapRow(row: IGridRowKey): TCell[] {
