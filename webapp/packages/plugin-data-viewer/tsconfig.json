@@ -71,9 +71,6 @@
       "path": "../core-settings"
     },
     {
-      "path": "../core-storage"
-    },
-    {
       "path": "../core-ui"
     },
     {

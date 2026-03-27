@@ -24,7 +24,7 @@ import {
 import type { ContainerDataSource } from './ContainerDataSource.js';
 import type { IDatabaseDataModel } from './DatabaseDataModel/IDatabaseDataModel.js';
 import type { IDataViewerPageState } from './IDataViewerPageState.js';
-import { DataViewerTableStateService } from './DataViewerTableState/DataViewerTableStateService.js';
+import { buildPersistedState } from './DataViewerTableState/buildPersistedState.js';
 import { TableViewerStorageService } from './TableViewer/TableViewerStorageService.js';
 
 const DataViewerTab = importLazyComponent(() => import('./DataViewerPage/DataViewerTab.js').then(module => module.DataViewerTab));
@@ -39,7 +39,6 @@ const DataViewerPanel = importLazyComponent(() => import('./DataViewerPage/DataV
   NavigationTabsService,
   ConnectionInfoResource,
   TableViewerStorageService,
-  DataViewerTableStateService,
 ])
 export class DataViewerTabService {
   readonly page: ObjectPage<IDataViewerPageState>;
@@ -53,7 +52,6 @@ export class DataViewerTabService {
     private readonly navigationTabsService: NavigationTabsService,
     private readonly connectionInfoResource: ConnectionInfoResource,
     private readonly tableViewerStorageService: TableViewerStorageService,
-    private readonly dataViewerTableStateService: DataViewerTableStateService,
   ) {
     this.page = this.dbObjectPageService.register({
       key: 'data_viewer_data',
@@ -150,7 +148,6 @@ export class DataViewerTabService {
     if (tab.handlerState.tableId) {
       await this.disposeTableModel(tab.handlerState.tableId);
     }
-    this.dataViewerTableStateService.clearState(tab.handlerState.objectId);
   }
 
   private saveTableState(tab: ITab<IObjectViewerTabState>): void {
@@ -162,9 +159,13 @@ export class DataViewerTabService {
 
     if (model) {
       try {
-        this.dataViewerTableStateService.saveState(tab.handlerState.objectId, model);
+        const pageState = this.page.getState(tab);
+
+        if (pageState) {
+          pageState.persistedState = buildPersistedState(model) ?? undefined;
+        }
       } catch (exception: any) {
-        console.warn('[DataViewerTableState] Failed to save state on tab lifecycle', exception);
+        console.warn('[DataViewerTabService] Failed to save state on tab lifecycle', exception);
       }
     }
   }

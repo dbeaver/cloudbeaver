@@ -22,7 +22,8 @@ import { type IDatabaseDataModel } from '../DatabaseDataModel/IDatabaseDataModel
 import { DataPresentationService } from '../DataPresentationService.js';
 import { DataViewerDataChangeConfirmationService } from '../DataViewerDataChangeConfirmationService.js';
 import { DataViewerTableService } from '../DataViewerTableService.js';
-import { DataViewerTableStateService } from '../DataViewerTableState/DataViewerTableStateService.js';
+import { buildPersistedState } from '../DataViewerTableState/buildPersistedState.js';
+import { validatePersistedState } from '../DataViewerTableState/validatePersistedState.js';
 import { DataViewerTabService } from '../DataViewerTabService.js';
 import { TableViewerStorageService } from '../TableViewer/TableViewerStorageService.js';
 import { useDataViewerModel } from '../useDataViewerModel.js';
@@ -35,7 +36,6 @@ export function useDataViewerPanel(tab: ITab<IObjectViewerTabState>) {
   const connectionInfoResource = useService(ConnectionInfoResource);
   const dataPresentationService = useService(DataPresentationService);
   const dataViewerDataChangeConfirmationService = useService(DataViewerDataChangeConfirmationService);
-  const dataViewerTableStateService = useService(DataViewerTableStateService);
 
   const tableId = tab.handlerState.tableId;
 
@@ -69,9 +69,10 @@ export function useDataViewerPanel(tab: ITab<IObjectViewerTabState>) {
         tab.handlerState.tableId = model.id;
 
         try {
-          const persistedState = dataViewerTableStateService.restoreState(tab.handlerState.objectId);
+          const pageState = dataViewerTabService.page.getState(tab);
+          const persistedState = pageState?.persistedState;
 
-          if (persistedState && model.source.options) {
+          if (persistedState && validatePersistedState(persistedState) && model.source.options) {
             model.source.options.constraints = persistedState.constraints.map(c => ({
               attributeName: c.attributeName,
               operator: c.operator,
@@ -117,8 +118,10 @@ export function useDataViewerPanel(tab: ITab<IObjectViewerTabState>) {
       return;
     }
 
-    const persistedState = dataViewerTableStateService.restoreState(tab.handlerState.objectId);
-    const hasViewState = persistedState && (persistedState.pinnedColumns.length > 0 || persistedState.columnOrder?.length);
+    const pageState = dataViewerTabService.page.getState(tab);
+    const persistedState = pageState?.persistedState;
+    const hasViewState =
+      persistedState && validatePersistedState(persistedState) && (persistedState.pinnedColumns.length > 0 || persistedState.columnOrder?.length);
 
     let viewStateRestored = false;
 
@@ -169,7 +172,11 @@ export function useDataViewerPanel(tab: ITab<IObjectViewerTabState>) {
         }
 
         try {
-          dataViewerTableStateService.saveState(tab.handlerState.objectId, dbModel);
+          const currentPageState = dataViewerTabService.page.getState(tab);
+
+          if (currentPageState) {
+            currentPageState.persistedState = buildPersistedState(dbModel) ?? undefined;
+          }
         } catch (exception: any) {
           console.warn('[DataViewerTableState] Auto-save failed', exception);
         }
@@ -181,7 +188,7 @@ export function useDataViewerPanel(tab: ITab<IObjectViewerTabState>) {
       cancelViewRestore?.();
       disposer();
     };
-  }, [tableId, tableViewerStorageService, dataViewerTableStateService, tab.handlerState.objectId]);
+  }, [tableId, tableViewerStorageService, dataViewerTabService, tab]);
 
   return model;
 }
