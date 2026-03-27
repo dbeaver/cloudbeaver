@@ -68,8 +68,18 @@ export function useDataViewerPanel(tab: ITab<IObjectViewerTabState>) {
         model = dataViewerTableService.create(connectionInfo, node);
         tab.handlerState.tableId = model.id;
 
+        let pageState = dataViewerTabService.page.getState(tab);
+
+        if (!pageState) {
+          dataViewerTabService.page.setState(tab, {
+            resultIndex: 0,
+            presentationId: '',
+            valuePresentationId: null,
+          });
+          pageState = dataViewerTabService.page.getState(tab);
+        }
+
         try {
-          const pageState = dataViewerTabService.page.getState(tab);
           const persistedState = pageState?.persistedState;
 
           if (persistedState && validatePersistedState(persistedState) && model.source.options) {
@@ -88,8 +98,6 @@ export function useDataViewerPanel(tab: ITab<IObjectViewerTabState>) {
 
         model.source.setOutdated();
         dataViewerDataChangeConfirmationService.trackTableDataUpdate(model.id);
-
-        const pageState = dataViewerTabService.page.getState(tab);
 
         if (pageState) {
           const presentation = dataPresentationService.get(pageState.presentationId);

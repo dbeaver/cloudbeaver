@@ -158,14 +158,10 @@ export class DataViewerTabService {
     const model = this.tableViewerStorageService.get<IDatabaseDataModel<ContainerDataSource>>(tab.handlerState.tableId);
 
     if (model) {
-      try {
-        const pageState = this.page.getState(tab);
+      const pageState = this.page.getState(tab);
 
-        if (pageState) {
-          pageState.persistedState = buildPersistedState(model) ?? undefined;
-        }
-      } catch (exception: any) {
-        console.warn('[DataViewerTabService] Failed to save state on tab lifecycle', exception);
+      if (pageState) {
+        pageState.persistedState = buildPersistedState(model) ?? undefined;
       }
     }
   }
