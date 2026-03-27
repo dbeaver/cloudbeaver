@@ -38,6 +38,7 @@ export function useQuery<T>(queryFn: () => Promise<T>, deps: any[] = []): QueryS
       .then(data => setState({ data, loading: false, error: null }))
       .catch(error => {
         if (error.name === 'AbortError') {
+          setState(prev => ({ ...prev, loading: false }));
           return;
         }
 
