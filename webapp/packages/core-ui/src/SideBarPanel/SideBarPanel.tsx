@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -51,7 +51,7 @@ export const SideBarPanel = observer<SideBarPanelProps>(function SideBarPanel({ 
         onChange={tab => selectTab(tab.tabId)}
         onReorder={onReorder}
       >
-        <div className={s(style, { box: true })}>
+        <div className={s(style, { box: true })} data-panel-id={panelId} data-dialog-persistent-element>
           <TabList className={s(style, { tabList: true })} underline />
           <div className={s(style, { contentBox: true })}>
             <TabPanelList />

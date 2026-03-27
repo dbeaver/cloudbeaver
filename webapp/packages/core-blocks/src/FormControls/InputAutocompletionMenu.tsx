@@ -1,82 +1,45 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { observer } from 'mobx-react-lite';
-import type { RefObject } from 'react';
 
-import BaseDropdownStyles from '../FormControls/BaseDropdown.module.css';
-import { IconOrImage } from '../IconOrImage.js';
-import { Menu } from '../Menu/Menu.js';
-import { MenuItem } from '../Menu/MenuItem.js';
-import type { IMenuState } from '../Menu/MenuStateContext.js';
-import { s } from '../s.js';
-import { Text } from '../Text.js';
-import { useS } from '../useS.js';
-import style from './InputAutocompletionMenu.module.css';
+import { observer } from 'mobx-react-lite';
+import { Composite, CompositeItem, Popover } from '@dbeaver/ui-kit';
+
 import { type InputAutocompleteProposal } from './useInputAutocomplete.js';
+import { useS } from '../useS.js';
+import { BaseDropdownStyles, IconOrImage, s, Text } from '../index.js';
+import { forwardRef } from 'react';
 
 interface AutocompletionProps {
-  position: { x: number; y: number };
   proposals: InputAutocompleteProposal[];
-  menuRef: RefObject<IMenuState>;
   className?: string;
   onSelect?: (proposal: InputAutocompleteProposal) => void;
 }
 
-export const InputAutocompletionMenu = observer(function InputAutocompletionMenu({
-  position,
-  className,
-  menuRef,
+export const InputAutocompletionMenu = observer(forwardRef<HTMLDivElement, AutocompletionProps>(function InputAutocompletionMenu({
   proposals,
   onSelect,
-}: AutocompletionProps) {
-  const styles = useS(style, BaseDropdownStyles);
-  const contextMenuPosition = {
-    position,
-    open: () => {},
-    close: () => {},
-  };
+}, ref) {
+  const styles = useS(BaseDropdownStyles);
 
-  function handleSelect(proposal: InputAutocompleteProposal) {
-    menuRef.current?.hide();
-    onSelect?.(proposal);
-  }
-
-  if (!proposals.length) {
-    return;
-  }
-
-  // TODO: migrate to new menu or popover
   return (
-    <Menu
-      contextMenuPosition={contextMenuPosition}
-      visible={proposals.length > 0}
-      panelAvailable={proposals.length > 0}
-      className={s(styles, { menu: true }, className)}
-      menuRef={menuRef}
-      label="Autocompletion"
-      items={proposals.map(proposal => (
-        <MenuItem
-          key={proposal.displayString}
-          id={proposal.displayString}
-          type="button"
-          title={proposal.title}
-          className={s(styles, { menuItem: true })}
-          onClick={event => handleSelect(proposal)}
-        >
-          {proposal.icon && (
-            <div className={s(styles, { itemIcon: true })}>
-              <IconOrImage icon={proposal.icon} className={s(styles, { iconOrImage: true })} />
-            </div>
-          )}
-          <Text truncate>{proposal.displayString}</Text>
-        </MenuItem>
-      ))}
-      modal
-    />
+    <Popover.PopoverContent ref={ref} className={s(styles, { menu: true })} gutter={4} modal={false} autoFocusOnShow={false} unmountOnHide>
+      <Composite>
+        {proposals.map(proposal => (
+          <CompositeItem key={proposal.title} className={s(styles, { menuItem: true }, 'tw:w-full')} onClick={() => onSelect?.(proposal)}>
+            {proposal.icon && (
+              <div className={s(styles, { itemIcon: true })}>
+                <IconOrImage icon={proposal.icon} className={s(styles, { iconOrImage: true })} />
+              </div>
+            )}
+            <Text truncate>{proposal.displayString}</Text>
+          </CompositeItem>
+        ))}
+      </Composite>
+    </Popover.PopoverContent>
   );
-});
+}));
