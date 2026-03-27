@@ -8,7 +8,9 @@
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 
 import { AppScreenService } from './AppScreenService.js';
-import { SkipNavLinks } from './SkipNavLinks.js';
+import { importLazyComponent } from '@cloudbeaver/core-blocks';
+
+const SkipNavLinks = importLazyComponent(() => import('./SkipNavLinks.js').then(m => m.SkipNavLinks));
 
 @injectable(() => [AppScreenService])
 export class SkipNavBootstrap extends Bootstrap {

@@ -17,8 +17,8 @@ import { MENU_APP_STATE } from '@cloudbeaver/plugin-top-app-bar';
 import { NavigationTabsService } from '@cloudbeaver/plugin-navigation-tabs';
 
 import { ACTION_APP_HELP } from './actions/ACTION_APP_HELP.js';
-import { SkipNavShortcutsLink } from './SkipNavShortcutsLink.js';
 
+const SkipNavShortcutsLink = importLazyComponent(() => import('./SkipNavShortcutsLink.js').then(m => m.SkipNavShortcutsLink));
 const ShortcutsDialog = importLazyComponent(() => import('./Shortcuts/ShortcutsDialog.js').then(m => m.ShortcutsDialog));
 const WelcomeDocs = importLazyComponent(() => import('./WelcomeDocs.js').then(m => m.WelcomeDocs));
 
