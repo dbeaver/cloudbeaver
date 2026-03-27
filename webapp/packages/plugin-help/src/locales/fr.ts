@@ -17,16 +17,16 @@ export default [
   ['sql_editor_shortcut_show_execution_plan', "Afficher le plan d'exécution"],
   ['sql_editor_shortcut_format', 'Formater le script'],
   ['sql_editor_shortcut_open_editor_in_new_tab', "Ouvrir l'éditeur SQL dans un nouvel onglet"],
-  ['sql_editor_shortcut_find', 'Rechercher'],
   ['sql_editor_shortcut_comment_uncomment_selection', 'Commenter/Décommenter la sélection'],
   ['sql_editor_shortcut_start_completion', 'Afficher les suggestions de saisie semi-automatique'],
   ['sql_editor_shortcut_accept_completion', 'Accepter la saisie semi-automatique'],
   ['sql_editor_shortcut_escape', "Échapper l'éditeur"],
+  ['plugin_search_panel_find', 'Rechercher'],
   ['navigation_tree_shortcut_enable_filter', 'Activer le filtrage'],
   ['plugin_help_multi_tab_support_title', "Le multi-onglet n'est pas supporté"],
   [
     'plugin_help_multi_tab_support_description',
     "Les données ne sont pas connectées à d'autres onglets du navigateur. Tout onglet d'application ouvert ne sera pas sauvegardé et sera probablement perdu après la fermeture de l'onglet. Vos paramètres et données locaux seront perdus après la fermeture de l'onglet. Vous pouvez charger les onglets et les paramètres pour cet onglet.",
   ],
-  ['plugin_help_multi_tab_support_load_settings', 'Charger les onglets comme paramètres'],
+  ['plugin_help_multi_tab_support_load_settings', 'Charger les onglets et les paramètres'],
 ];

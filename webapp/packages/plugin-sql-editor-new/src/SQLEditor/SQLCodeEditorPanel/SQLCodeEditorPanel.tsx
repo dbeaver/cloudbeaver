@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
 
-import { MenuBarSmallItem, useExecutor, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { Button, useExecutor, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { DATA_CONTEXT_NAV_NODE, getNodesFromContext, NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
@@ -129,14 +129,24 @@ export const SQLCodeEditorPanel: TabContainerPanelComponent<ISqlEditorModeProps>
         {data.isIncomingChanges && (
           <>
             <ReactCodemirrorPanel className={styles['reactCodemirrorPanel']} top>
-              <MenuBarSmallItem title={translate('plugin_sql_editor_new_merge_conflict_keep_current_tooltip')} onClick={keepCurrent}>
+              <Button
+                variant='ghost'
+                size='small'
+                title={translate('plugin_sql_editor_new_merge_conflict_keep_current_tooltip')}
+                onClick={keepCurrent}
+              >
                 {translate('plugin_sql_editor_new_merge_conflict_keep_current_label')}
-              </MenuBarSmallItem>
+              </Button>
             </ReactCodemirrorPanel>
             <ReactCodemirrorPanel className={styles['reactCodemirrorPanel']} top incomingView>
-              <MenuBarSmallItem title={translate('plugin_sql_editor_new_merge_conflict_accept_incoming_tooltip')} onClick={applyIncoming}>
+              <Button
+                variant='ghost'
+                size='small'
+                title={translate('plugin_sql_editor_new_merge_conflict_accept_incoming_tooltip')}
+                onClick={applyIncoming}
+              >
                 {translate('plugin_sql_editor_new_merge_conflict_accept_incoming_label')}
-              </MenuBarSmallItem>
+              </Button>
             </ReactCodemirrorPanel>
           </>
         )}
