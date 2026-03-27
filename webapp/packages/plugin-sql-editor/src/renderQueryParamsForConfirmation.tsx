@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { PropertiesTable, useResource, useTranslate } from '@cloudbeaver/core-blocks';
+import { IconOrImage, PropertiesTable, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 import { SQLCodeEditor, useSqlDialectExtension } from '@cloudbeaver/plugin-sql-editor-codemirror';
 import { useCodemirrorExtensions } from '@cloudbeaver/plugin-codemirror6';
 import { observer } from 'mobx-react-lite';
@@ -95,12 +95,12 @@ const RenderParametersForm = observer(function RenderParametersForm({
           disableOverflowEffect
         />
       </div>
-
       {!sqlEditorSettingsService.disabled && (
         <SQLCodeEditor value={query} extensions={extensions} className="tw:overflow-auto tw:flex-1/3" readonly />
       )}
-      <div className="theme-typography--body2 tw:p-2 tw:bg-(--theme-secondary)">
-        {translate('plugin_sql_editor_bind_parameters_dialog_alert_title')}
+      <div className="theme-typography--body2 tw:p-2 tw:bg-(--theme-secondary) tw:flex tw:flex-row tw:gap-2 tw:items-center tw:rounded">
+        <IconOrImage icon="/icons/preload/info_icon_sm.svg" className="tw:size-3" />
+        <span>{translate('plugin_sql_editor_bind_parameters_dialog_alert_title')}</span>
       </div>
     </div>
   );
