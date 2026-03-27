@@ -11,15 +11,9 @@ import type { ITableData } from './TableDataContext.js';
 
 export type CellUpdate = { key: IGridDataKey; value: string };
 
-const COLUMN_SIGNATURE_SEPARATOR = ',';
+const COLUMN_SIGNATURE_SEPARATOR = '***column-separator***';
 
 export const GridCellsHelper = {
-  sortRowsByIndex(rows: IGridDataKey[][], tableData: ITableData): IGridDataKey[][] {
-    return rows.toSorted((a, b) => tableData.getRowIndexFromKey(a[0]!.row) - tableData.getRowIndexFromKey(b[0]!.row));
-  },
-  sortCellsByColumn(cells: IGridDataKey[], tableData: ITableData): IGridDataKey[] {
-    return cells.toSorted((a, b) => tableData.getColumnIndexFromColumnKey(a.column) - tableData.getColumnIndexFromColumnKey(b.column));
-  },
   getColumnSignature(row: IGridDataKey[], tableData: ITableData): string {
     return row.map(cell => tableData.getColumnIndexFromColumnKey(cell.column)).join(COLUMN_SIGNATURE_SEPARATOR);
   },

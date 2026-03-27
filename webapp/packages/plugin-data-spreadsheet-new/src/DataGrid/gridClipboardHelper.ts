@@ -31,7 +31,7 @@ export const GridClipboardHelper = {
       return null;
     }
 
-    const orderedRows = GridCellsHelper.sortRowsByIndex([...selectedCells.values()], tableData);
+    const orderedRows = [...selectedCells.values()];
 
     const selectedColumnKeys = new Set(orderedRows.flatMap(row => row.map(cell => GridDataKeysUtils.serialize(cell.column))));
     const selectedColumns = tableData.view.columnKeys.filter(column => selectedColumnKeys.has(GridDataKeysUtils.serialize(column)));

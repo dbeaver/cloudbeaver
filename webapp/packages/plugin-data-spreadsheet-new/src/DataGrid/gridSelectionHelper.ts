@@ -45,9 +45,7 @@ export const GridSelectionHelper = {
       rowMap.get(rowKey)!.push(cell);
     }
 
-    const grid = GridCellsHelper.sortRowsByIndex(Array.from(rowMap.values()), tableData).map(rowCells =>
-      GridCellsHelper.sortCellsByColumn(rowCells, tableData),
-    );
+    const grid = Array.from(rowMap.values());
 
     if (grid.length === 0) {
       return [];
