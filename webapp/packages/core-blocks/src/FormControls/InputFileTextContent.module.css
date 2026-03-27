@@ -18,12 +18,3 @@
   align-items: center;
   gap: 2px;
 }
-.iconButton {
-  width: 12px;
-  height: 12px;
-  flex-shrink: 0;
-  cursor: pointer;
-  &:hover {
-    opacity: 0.5;
-  }
-}

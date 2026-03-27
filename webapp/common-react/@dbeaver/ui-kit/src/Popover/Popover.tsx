@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -10,6 +10,10 @@ import * as Ariakit from '@ariakit/react';
 import clsx from 'clsx';
 
 import './Popover.css';
+
+export function PopoverAnchor({ children, ...props }: Ariakit.PopoverAnchorProps) {
+  return <Ariakit.PopoverAnchor {...props}>{children}</Ariakit.PopoverAnchor>;
+}
 
 export function Popover({ children, ...props }: Ariakit.PopoverProviderProps) {
   return <Ariakit.PopoverProvider {...props}>{children}</Ariakit.PopoverProvider>;
@@ -40,3 +44,6 @@ Popover.PopoverArrow = PopoverArrow;
 Popover.PopoverHeading = PopoverHeading;
 Popover.PopoverDescription = PopoverDescription;
 Popover.PopoverContent = PopoverContent;
+Popover.Anchor = PopoverAnchor;
+
+export { usePopoverStore, type PopoverStore } from '@ariakit/react';

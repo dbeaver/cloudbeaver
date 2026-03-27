@@ -26,10 +26,6 @@
   padding: 4px;
 }
 
-.button {
-  flex: unset;
-}
-
 .type {
   composes: theme-typography--body2 from global;
   margin: 0;
