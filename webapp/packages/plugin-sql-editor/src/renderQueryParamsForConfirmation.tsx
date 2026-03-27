@@ -99,7 +99,7 @@ const RenderParametersForm = observer(function RenderParametersForm({
       {!sqlEditorSettingsService.disabled && (
         <SQLCodeEditor value={query} extensions={extensions} className="tw:overflow-auto tw:flex-1/3" readonly />
       )}
-      <Alert size="small" title={translate('plugin_sql_editor_bind_parameters_dialog_alert_title')} />
+      <Alert title={translate('plugin_sql_editor_bind_parameters_dialog_alert_title')} />
     </div>
   );
 });
