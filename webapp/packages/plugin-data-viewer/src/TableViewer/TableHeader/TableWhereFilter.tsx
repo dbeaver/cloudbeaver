@@ -1,10 +1,11 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+
 import { observer } from 'mobx-react-lite';
 import { useRef } from 'react';
 
@@ -17,6 +18,7 @@ import {
   useTranslate,
 } from '@cloudbeaver/core-blocks';
 import { InlineEditor } from '@cloudbeaver/core-ui';
+import { CompositeProvider, Popover, useCompositeStore } from '@dbeaver/ui-kit';
 
 import type { ITableHeaderPlaceholderProps } from './TableHeaderService.js';
 import styles from './TableWhereFilter.module.css';
@@ -30,10 +32,15 @@ export const TableWhereFilter: PlaceholderComponent<ITableHeaderPlaceholderProps
   const state = useWhereFilter(model, resultIndex);
   const data = useTableViewerHeaderData({ model, resultIndex });
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const store = useCompositeStore();
   const autocompleteState = useInputAutocomplete(inputRef, {
     separator: AUTOCOMPLETE_WORD_SEPARATOR,
     sourceHints: data.hintProposals ?? [],
     matchStrategy: 'fuzzy',
+    onNavigate: () => {
+      store.move(store.first());
+    },
   });
 
   if (!state.supported) {
@@ -55,26 +62,30 @@ export const TableWhereFilter: PlaceholderComponent<ITableHeaderPlaceholderProps
 
   return (
     <Container className={styles['imbeddedEditor']}>
-      <InlineEditor
-        ref={inputRef}
-        className={styles['inlineEditor']}
-        name="data_where"
-        value={state.filter}
-        placeholder={translate(state.constraints?.supported ? 'table_header_sql_expression' : 'table_header_sql_expression_not_supported')}
-        controlsPosition="inside"
-        edited={!!state.filter}
-        disableSave={!state.applicableFilter}
-        disabled={state.disabled}
-        simple
-        onSave={onSave}
-        onChange={state.set}
-      />
-      <InputAutocompletionMenu
-        position={autocompleteState.position}
-        proposals={autocompleteState.proposals}
-        menuRef={autocompleteState.menuRef}
-        onSelect={handleSelect}
-      />
+      <CompositeProvider store={store}>
+        <Popover placement='bottom-start' open={autocompleteState.proposals.length > 0}>
+          <Popover.Anchor>
+            <InlineEditor
+              ref={inputRef}
+              className={styles['inlineEditor']}
+              name="data_where"
+              value={state.filter}
+              placeholder={translate(state.constraints?.supported ? 'table_header_sql_expression' : 'table_header_sql_expression_not_supported')}
+              controlsPosition="inside"
+              edited={!!state.filter}
+              disableSave={!state.applicableFilter}
+              disabled={state.disabled}
+              simple
+              onSave={onSave}
+              onChange={state.set}
+            />
+          </Popover.Anchor>
+          <InputAutocompletionMenu
+            proposals={autocompleteState.proposals}
+            onSelect={handleSelect}
+          />
+        </Popover>
+      </CompositeProvider>
     </Container>
   );
 });
