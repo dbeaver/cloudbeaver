@@ -16,7 +16,7 @@ export interface IDataViewerPersistedState {
 export interface IPersistedConstraint {
   attributeName: string;
   operator?: string;
-  value?: any;
+  value?: unknown;
   orderAsc?: boolean;
   orderPosition?: number;
 }
