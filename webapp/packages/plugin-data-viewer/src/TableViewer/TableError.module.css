@@ -6,8 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-@import '@cloudbeaver/plugin-tailwindcss-theme/tailwind.css';
-
 .error {
   composes: theme-background-surface theme-text-on-surface from global;
   position: absolute;

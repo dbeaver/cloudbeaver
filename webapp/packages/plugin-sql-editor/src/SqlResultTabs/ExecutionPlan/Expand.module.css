@@ -6,8 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-@import '@cloudbeaver/plugin-tailwindcss-theme/tailwind.css';
-
 .icon {
   composes: theme-text-on-surface from global;
   width: 100%;

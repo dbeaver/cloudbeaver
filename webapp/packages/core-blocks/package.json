@@ -34,7 +34,6 @@
     "@cloudbeaver/core-sdk": "workspace:*",
     "@cloudbeaver/core-theming": "workspace:*",
     "@cloudbeaver/core-utils": "workspace:*",
-    "@cloudbeaver/plugin-tailwindcss-theme": "workspace:*",
     "@dbeaver/js-helpers": "workspace:*",
     "@dbeaver/ui-kit": "workspace:*",
     "go-split": "^3",

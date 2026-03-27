@@ -1,5 +1,3 @@
-@import '@cloudbeaver/plugin-tailwindcss-theme/tailwind.css';
-
 @layer components {
   .dbv-kit-disclosure__disclosure {
     --dbv-kit-disclosure-foreground: var(--theme-text-on-surface);

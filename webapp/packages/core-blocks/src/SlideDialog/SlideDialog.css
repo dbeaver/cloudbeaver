@@ -1,5 +1,3 @@
-@import '@cloudbeaver/plugin-tailwindcss-theme/tailwind.css';
-
 @layer components {
   .dbv-slide-dialog__overlay {
     position: absolute;

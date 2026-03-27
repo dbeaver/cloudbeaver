@@ -94,7 +94,6 @@ import pluginSqlEditorNew from '@cloudbeaver/plugin-sql-editor-new/module';
 import pluginSqlEditorScreen from '@cloudbeaver/plugin-sql-editor-screen/module';
 import pluginSqlGenerator from '@cloudbeaver/plugin-sql-generator/module';
 import pluginTaskManager from '@cloudbeaver/plugin-task-manager/module';
-import pluginTailwindcssTheme from '@cloudbeaver/plugin-tailwindcss-theme/module';
 import pluginTheme from '@cloudbeaver/plugin-theme/module';
 import pluginToolsPanel from '@cloudbeaver/plugin-tools-panel/module';
 import pluginTopAppBar from '@cloudbeaver/plugin-top-app-bar/module';
@@ -159,7 +158,6 @@ export const commonSet = [
   pluginDataGrid,
   pluginAuthentication,
   pluginAuthenticationAdministration,
-  pluginTailwindcssTheme,
   pluginTheme,
   pluginLocalization,
   pluginConnectionCustom,

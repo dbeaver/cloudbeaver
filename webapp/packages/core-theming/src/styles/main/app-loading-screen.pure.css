@@ -1,5 +1,3 @@
-@import '@cloudbeaver/plugin-tailwindcss-theme/tailwind.css';
-
 #app-loading-screen {
   z-index: 999;
   position: absolute;

@@ -1,5 +1,4 @@
 @import '@cloudbeaver/plugin-tailwindcss-theme/tailwind.css';
-
 /* Increase specificity by selector repetition */
 .editor.editor,
 .cm-editor.cm-editor,
@@ -326,4 +325,3 @@
     background-color: unset;
   }
 }
-

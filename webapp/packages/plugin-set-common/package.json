@@ -116,7 +116,6 @@
     "@cloudbeaver/plugin-sql-editor-screen": "workspace:*",
     "@cloudbeaver/plugin-sql-generator": "workspace:*",
     "@cloudbeaver/plugin-system-information-administration": "workspace:*",
-    "@cloudbeaver/plugin-tailwindcss-theme": "workspace:*",
     "@cloudbeaver/plugin-task-manager": "workspace:*",
     "@cloudbeaver/plugin-theme": "workspace:*",
     "@cloudbeaver/plugin-tools-panel": "workspace:*",
