@@ -24,7 +24,9 @@
     "koa": ">=2.16.4",
     "immutable": ">=4.3.8",
     "serialize-javascript": ">=7.0.3",
-    "flatted": ">=3.4.2"
+    "flatted": ">=3.4.2",
+    "picomatch": ">=2.3.2",
+    "happy-dom": ">=20.8.8"
   },
   "scripts": {
     "test": "dbeaver-test",
