@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -8,6 +8,45 @@
 
 .pane {
   &:first-child {
+    display: flex;
+    flex-direction: column;
     overflow: hidden;
+
+    /* Map diagram component variables to CloudBeaver theme */
+
+    /* Viewport */
+    --dbv-plan-viewport-bg: var(--theme-surface);
+
+    /* Node */
+    --dbv-plan-node-bg: var(--theme-sub-secondary);
+    --dbv-plan-node-border-color: var(--theme-input-border);
+    --dbv-plan-node-selected-border: var(--theme-primary);
+    --dbv-plan-node-selected-glow: color-mix(in srgb, var(--theme-primary) 30%, transparent);
+    --dbv-plan-node-heavy-color: var(--theme-negative);
+
+    /* Node caption */
+    --dbv-plan-node-caption-bg: var(--theme-background);
+    --dbv-plan-node-caption-color: var(--theme-on-surface);
+
+    /* Node name */
+    --dbv-plan-node-name-color: var(--theme-on-surface);
+
+    /* Node metrics */
+    --dbv-plan-node-metric-color: var(--theme-text-secondary-on-light);
+    --dbv-plan-node-metric-value-color: var(--theme-on-surface);
+
+    /* Node cost bar */
+    --dbv-plan-node-cost-bar-bg: var(--theme-input-border);
+    --dbv-plan-node-cost-bar-color: var(--theme-status);
+
+    /* Edges */
+    --dbv-plan-edge-color: var(--theme-text-hint-on-light);
+
+    /* Toolbar */
+    --dbv-plan-toolbar-border: var(--theme-input-border);
+    --dbv-plan-toolbar-bg: var(--theme-surface);
+    --dbv-plan-toolbar-color: var(--theme-on-surface);
+    --dbv-plan-toolbar-hover-bg: var(--theme-sub-secondary);
+    --dbv-plan-toolbar-active-bg: var(--theme-secondary);
   }
 }

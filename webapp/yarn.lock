@@ -2260,6 +2260,7 @@ __metadata:
     "@cloudbeaver/tests-runner": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
     "@dbeaver/cli": "workspace:*"
+    "@dbeaver/js-helpers": "workspace:*"
     "@dbeaver/react-tests": "workspace:*"
     "@timohausmann/quadtree-ts": "npm:^2"
     "@types/md5": "npm:^2"

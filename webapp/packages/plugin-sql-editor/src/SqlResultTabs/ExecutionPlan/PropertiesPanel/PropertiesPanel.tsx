@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -50,11 +50,11 @@ export const PropertiesPanel = observer<Props>(function PropertiesPanel({ select
   ).get();
 
   if (!general.length && !details.length) {
-    return <TextPlaceholder>{translate('sql_execution_plan_properties_panel_placeholder')}</TextPlaceholder>;
+    return <TextPlaceholder>{translate('plugin_sql_execution_plan_properties_panel_placeholder')}</TextPlaceholder>;
   }
 
-  const nameColumnTitle = translate('sql_execution_plan_properties_panel_name');
-  const valueColumnTitle = translate('sql_execution_plan_properties_panel_value');
+  const nameColumnTitle = translate('plugin_sql_execution_plan_properties_panel_name');
+  const valueColumnTitle = translate('plugin_sql_execution_plan_properties_panel_value');
 
   return (
     <Table className={className}>
@@ -63,8 +63,12 @@ export const PropertiesPanel = observer<Props>(function PropertiesPanel({ select
         <TableColumnHeader title={valueColumnTitle}>{valueColumnTitle}</TableColumnHeader>
       </TableHeader>
       <TableBody>
-        {!!general.length && <PropertiesPanelItemsGroup properties={general} name={translate('sql_execution_plan_properties_panel_general')} />}
-        {!!details.length && <PropertiesPanelItemsGroup properties={details} name={translate('sql_execution_plan_properties_panel_details')} />}
+        {!!general.length && (
+          <PropertiesPanelItemsGroup properties={general} name={translate('plugin_sql_execution_plan_properties_panel_general')} />
+        )}
+        {!!details.length && (
+          <PropertiesPanelItemsGroup properties={details} name={translate('plugin_sql_execution_plan_properties_panel_details')} />
+        )}
       </TableBody>
     </Table>
   );
