@@ -17,7 +17,7 @@ export function usePasswordValidation(formContext?: IFormContext) {
   useResource(usePasswordValidation, PasswordPolicyResource, undefined);
   const passwordPolicyService = useService(PasswordPolicyService);
 
-  const ref = useCustomInputValidation<string>(value => {
+  const { ref } = useCustomInputValidation<string>(value => {
     if (!value) {
       return null;
     }

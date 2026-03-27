@@ -27,7 +27,7 @@ export const TeamOptions: TabContainerPanelComponent<TeamFormProps> = observer(f
 
   useAutoLoad(TeamOptions, tabState, tab.selected && !loaded);
 
-  const idValidationRef = useCustomInputValidation<string>(value => {
+  const { ref: idValidationRef } = useCustomInputValidation<string>(value => {
     const v = value.trim();
 
     if (!v) {

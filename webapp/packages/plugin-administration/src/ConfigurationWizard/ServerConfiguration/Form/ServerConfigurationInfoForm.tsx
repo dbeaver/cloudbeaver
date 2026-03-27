@@ -33,7 +33,7 @@ interface Props {
 export const ServerConfigurationInfoForm = observer<Props>(function ServerConfigurationInfoForm({ state }) {
   const serverConfigLoader = useResource(ServerConfigurationInfoForm, ServerConfigResource, undefined);
   const translate = useTranslate();
-  const validation = useCustomInputValidation<string, HTMLTextAreaElement>(value => {
+  const { ref: validation } = useCustomInputValidation<string, HTMLTextAreaElement>(value => {
     const currentHost = window.location.host;
 
     if (!isIp(window.location.hostname) && value.trim() && !value.includes(currentHost)) {

@@ -20,7 +20,7 @@ export const ServerConfigurationAdminForm = observer<Props>(function ServerConfi
   const translate = useTranslate();
   const passwordValidationRef = usePasswordValidation();
 
-  const passwordRepeatRef = useCustomInputValidation<string>(value => {
+  const { ref: passwordRepeatRef } = useCustomInputValidation<string>(value => {
     if (!isValuesEqual(value, serverConfig.adminPassword, null)) {
       return translate('authentication_user_passwords_not_match');
     }

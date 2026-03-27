@@ -13,10 +13,15 @@ import { useTranslate } from '../localization/useTranslate.js';
 import { useExecutor } from '../useExecutor.js';
 import { FormContext, type IFormContext } from './FormContext.js';
 
+export interface ICustomInputValidation<TType extends HTMLInputElement | HTMLTextAreaElement = HTMLInputElement> {
+  ref: React.RefObject<TType | null>;
+  revalidate: () => void;
+}
+
 export function useCustomInputValidation<T = void, TType extends HTMLInputElement | HTMLTextAreaElement = HTMLInputElement>(
   validation: (value: T) => string | null,
   formContext?: IFormContext,
-): React.RefObject<TType | null> {
+): ICustomInputValidation<TType> {
   const reactContext = useContext(FormContext);
   const context = formContext ?? reactContext;
   const inputRef = useRef<TType | null>(null);
@@ -33,20 +38,30 @@ export function useCustomInputValidation<T = void, TType extends HTMLInputElemen
       value = element.value as unknown as T;
     }
 
-    const valid = element.validity.valid;
     const result = validation(value);
 
-    try {
-      if (typeof result === 'string') {
-        element.setCustomValidity(result || translate('core_blocks_custom_input_validation_error'));
-        return false;
-      }
-      element.setCustomValidity('');
-      return true;
-    } finally {
-      if (valid !== element.validity.valid) {
-        element.reportValidity();
-      }
+    if (typeof result === 'string') {
+      element.setCustomValidity(result || translate('core_blocks_custom_input_validation_error'));
+      return false;
+    }
+    element.setCustomValidity('');
+    return true;
+  }
+
+  function validateAndReport(element: TType): boolean {
+    const valid = element.validity.valid;
+    const result = validate(element);
+
+    if (valid !== element.validity.valid) {
+      element.reportValidity();
+    }
+
+    return result;
+  }
+
+  function revalidate() {
+    if (inputRef.current) {
+      validate(inputRef.current);
     }
   }
 
@@ -58,22 +73,9 @@ export function useCustomInputValidation<T = void, TType extends HTMLInputElemen
           return;
         }
 
-        if (!validate(inputRef.current)) {
+        if (!validateAndReport(inputRef.current)) {
           ExecutorInterrupter.interrupt(context);
         }
-      },
-    ],
-  });
-
-  useExecutor({
-    executor: context?.onChange,
-    handlers: [
-      function revalidateOnChange() {
-        if (!inputRef.current || inputRef.current.validity.valid) {
-          return;
-        }
-
-        validate(inputRef.current);
       },
     ],
   });
@@ -87,14 +89,14 @@ export function useCustomInputValidation<T = void, TType extends HTMLInputElemen
     function handleInput(event: Event) {
       const target = event.target as TType;
       if (target.validity.valid === false) {
-        validate(target);
+        validateAndReport(target);
       }
     }
 
     function handleBlur(event: Event) {
       const target = event.target as TType;
       if (target.validity.valid === true) {
-        validate(target);
+        validateAndReport(target);
       }
     }
 
@@ -107,5 +109,5 @@ export function useCustomInputValidation<T = void, TType extends HTMLInputElemen
     };
   });
 
-  return inputRef;
+  return { ref: inputRef, revalidate };
 }

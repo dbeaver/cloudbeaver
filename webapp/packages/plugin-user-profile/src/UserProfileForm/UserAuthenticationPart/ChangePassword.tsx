@@ -70,7 +70,7 @@ export const ChangePassword = observer(function ChangePassword() {
   });
 
   const passwordValidationRef = usePasswordValidation(form);
-  const passwordRepeatRef = useCustomInputValidation<string>(value => {
+  const passwordRepeatValidation = useCustomInputValidation<string>(value => {
     if (!isValuesEqual(value, state.password, null)) {
       return translate('authentication_user_passwords_not_match');
     }
@@ -144,11 +144,12 @@ export const ChangePassword = observer(function ChangePassword() {
                 mapValue={(value?: string) => value?.trim() ?? ''}
                 small
                 required
+                onChange={passwordRepeatValidation.revalidate}
               >
                 {translate('plugin_user_profile_authentication_change_password_new_password')}
               </InputField>
               <InputField
-                ref={passwordRepeatRef}
+                ref={passwordRepeatValidation.ref}
                 type="password"
                 name="repeatedPassword"
                 state={state}

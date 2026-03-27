@@ -55,7 +55,7 @@ export const SettingField = observer<Props>(function SettingField({ resolver, se
 
   value = value ?? '';
 
-  const customValidation = useCustomInputValidation(value => {
+  const { ref: customValidation } = useCustomInputValidation(value => {
     if (!(setting.key in settingsProviderService.schema.shape)) {
       return null;
     }

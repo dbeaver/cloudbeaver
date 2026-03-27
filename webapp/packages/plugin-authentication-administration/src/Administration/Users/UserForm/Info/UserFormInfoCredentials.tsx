@@ -45,7 +45,7 @@ export const UserFormInfoCredentials = observer<Props>(function UserFormInfoCred
     local = !editing || (!!userInfo.data && isLocalUser(userInfo.data));
   }
 
-  const usernameValidationRef = useCustomInputValidation<string>(value => {
+  const { ref: usernameValidationRef } = useCustomInputValidation<string>(value => {
     const v = value.trim();
 
     if (!v) {
@@ -59,7 +59,7 @@ export const UserFormInfoCredentials = observer<Props>(function UserFormInfoCred
     return null;
   });
 
-  const passwordRepeatRef = useCustomInputValidation<string>(value => {
+  const { ref: passwordRepeatRef } = useCustomInputValidation<string>(value => {
     if (!isValuesEqual(value, tabState.state.password, null)) {
       return translate('authentication_user_passwords_not_match');
     }
