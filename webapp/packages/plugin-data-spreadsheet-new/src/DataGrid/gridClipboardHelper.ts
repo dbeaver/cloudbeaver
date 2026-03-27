@@ -15,6 +15,7 @@ import { GridSelectionHelper } from './gridSelectionHelper.js';
 const CELL_COLUMN_SEPARATOR = '\t';
 const ROW_LINE_SEPARATOR = '\r\n';
 const CLIPBOARD_LINE_SEPARATOR_REGEX = /\r?\n/;
+const EMPTY_CELL_MARKER = '\u200B'; // Zero-width space as marker for non-selected cells
 
 export const GridClipboardHelper = {
   isClipboardTarget(event: React.KeyboardEvent): boolean {
@@ -25,10 +26,6 @@ export const GridClipboardHelper = {
   getValueFromSelectedCells(tableData: ITableData, selectedCells: Map<string, IGridDataKey[]>, focusedCell?: IGridDataKey | null): string | null {
     if (selectedCells.size === 0) {
       return focusedCell ? getCellTextValue(tableData.getCellHolder(focusedCell), tableData.format, tableData.dataContent) : null;
-    }
-
-    if (!GridSelectionHelper.isContiguousSelection(selectedCells, tableData)) {
-      return null;
     }
 
     const orderedRows = GridCellsHelper.sortRowsByIndex([...selectedCells.values()], tableData);
@@ -47,7 +44,7 @@ export const GridClipboardHelper = {
         return selectedColumns
           .map(column => {
             const cellKey = rowCells.get(GridDataKeysUtils.serialize(column));
-            return cellKey ? getCellTextValue(tableData.getCellHolder(cellKey), tableData.format, tableData.dataContent) : '';
+            return cellKey ? getCellTextValue(tableData.getCellHolder(cellKey), tableData.format, tableData.dataContent) : EMPTY_CELL_MARKER;
           })
           .join(CELL_COLUMN_SEPARATOR);
       })
@@ -78,16 +75,43 @@ export const GridClipboardHelper = {
       return [];
     }
 
-    return this.mapClipboardToSelection(clipboardData, targetCells, tableData, hasElementIdentifier);
+    const isContiguous = GridSelectionHelper.isContiguousSelection(
+      new Map(
+        Array.from(
+          targetCells.reduce((map, cell) => {
+            const rowKey = GridDataKeysUtils.serialize(cell.row);
+            if (!map.has(rowKey)) {
+              map.set(rowKey, []);
+            }
+            map.get(rowKey)!.push(cell);
+            return map;
+          }, new Map<string, IGridDataKey[]>()),
+        ),
+      ),
+      tableData,
+    );
+
+    if (isContiguous) {
+      return this.mapClipboardToContiguousSelection(clipboardData, targetCells, tableData, hasElementIdentifier);
+    }
+
+    return this.mapClipboardToNonContiguousSelection(clipboardData, targetCells, tableData, hasElementIdentifier);
   },
   mapClipboardToGrid(clipboard: string[][], targetGrid: IGridDataKey[][]): CellUpdate[] {
     const clipCols = clipboard[0]?.length ?? 0;
 
     return targetGrid
       .slice(0, clipboard.length)
-      .flatMap((row, tRow) => row.slice(0, clipCols).map((key, tCol) => ({ key, value: clipboard[tRow]![tCol]! })));
+      .flatMap((row, tRow) =>
+        row.slice(0, clipCols).map((key, tCol) => ({ key, value: clipboard[tRow]![tCol]! })).filter(({ value }) => value !== EMPTY_CELL_MARKER),
+      );
   },
-  mapClipboardToSelection(clipboard: string[][], targets: IGridDataKey[], tableData: ITableData, hasElementIdentifier: boolean): CellUpdate[] {
+  mapClipboardToContiguousSelection(
+    clipboard: string[][],
+    targets: IGridDataKey[],
+    tableData: ITableData,
+    hasElementIdentifier: boolean,
+  ): CellUpdate[] {
     const clipCols = clipboard[0]?.length ?? 0;
 
     if (clipboard.length === 0 || clipCols === 0) {
@@ -107,5 +131,59 @@ export const GridClipboardHelper = {
       ({ key, value }) =>
         GridCellsHelper.isCellEditable(key, tableData, hasElementIdentifier) && tableData.format.getText(tableData.format.get(key)) !== value,
     );
+  },
+  mapClipboardToNonContiguousSelection(
+    clipboard: string[][],
+    targets: IGridDataKey[],
+    tableData: ITableData,
+    hasElementIdentifier: boolean,
+  ): CellUpdate[] {
+    const clipCols = clipboard[0]?.length ?? 0;
+
+    if (clipboard.length === 0 || clipCols === 0) {
+      return [];
+    }
+
+    const updates: CellUpdate[] = [];
+
+    if (clipboard.length === 1 && clipCols === 1) {
+      const value = clipboard[0]![0]!;
+      return targets
+        .map(key => ({ key, value }))
+        .filter(
+          ({ key, value }) =>
+            GridCellsHelper.isCellEditable(key, tableData, hasElementIdentifier) && tableData.format.getText(tableData.format.get(key)) !== value,
+        );
+    }
+
+    const sortedTargets = this.getSortedCellsInGrid(targets, tableData);
+    const flatClipboard = clipboard.flat();
+
+    for (let i = 0; i < sortedTargets.length && i < flatClipboard.length; i++) {
+      const key = sortedTargets[i]!;
+      const value = flatClipboard[i]!;
+
+      if (value === EMPTY_CELL_MARKER) {
+        continue;
+      }
+
+      const isEditable = GridCellsHelper.isCellEditable(key, tableData, hasElementIdentifier);
+      const currentValue = tableData.format.getText(tableData.format.get(key));
+
+      if (isEditable && currentValue !== value) {
+        updates.push({ key, value });
+      }
+    }
+
+    return updates;
+  },
+  getSortedCellsInGrid(cells: IGridDataKey[], tableData: ITableData): IGridDataKey[] {
+    return cells.toSorted((a, b) => {
+      const rowDiff = tableData.getRowIndexFromKey(a.row) - tableData.getRowIndexFromKey(b.row);
+      if (rowDiff !== 0) {
+        return rowDiff;
+      }
+      return tableData.getColumnIndexFromColumnKey(a.column) - tableData.getColumnIndexFromColumnKey(b.column);
+    });
   },
 };
