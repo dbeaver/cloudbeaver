@@ -193,8 +193,12 @@ public class ServletAppUtils {
         @NotNull String origin
     ) throws DBException {
         String finalOrigin =  webAuthApplication.modifyOrigin(origin);
-        StringBuilder authUriBuilder = new StringBuilder(removeSideSlashes(finalOrigin));
         String serviceUriSegment = removeSideSlashes(webAuthApplication.getAuthServiceUriSegment());
+        String rootUri = removeSideSlashes(getServletApplication().getRootURI());
+        if (finalOrigin.endsWith("/" + rootUri) && serviceUriSegment.startsWith(rootUri + "/")) {
+            finalOrigin = finalOrigin.substring(0, finalOrigin.length() - rootUri.length());
+        }
+        StringBuilder authUriBuilder = new StringBuilder(removeSideSlashes(finalOrigin));
         if (CommonUtils.isNotEmpty(serviceUriSegment)) {
             authUriBuilder.append("/").append(serviceUriSegment);
         }
