@@ -7,7 +7,8 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { Container, MenuBarSmallItem, s, Table, TableBody, TableColumnHeader, TableHeader, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { Container, Icon, s, Table, TableBody, TableColumnHeader, TableHeader, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { Button, ButtonIcon } from '@dbeaver/ui-kit';
 
 import type { ILogEntry } from './ILogEntry.js';
 import { LogEntry } from './LogEntry.js';
@@ -26,15 +27,18 @@ export const LogViewerTable = observer<Props>(function LogViewerTable({ items, s
 
   return (
     <Container className={s(style, { wrapper: true }, className)}>
-      <MenuBarSmallItem
-        className={s(style, { clearButton: true })}
-        icon="trash"
-        viewBox="0 0 24 24"
+      <Button
+        className='tw:max-w-max tw:!absolute tw:top-1 tw:right-4 tw:z-[100]'
+        variant='ghost'
+        size='small'
         title={translate('plugin_log_viewer_clear_log')}
         onClick={onClear}
       >
+        <ButtonIcon placement="start">
+          <Icon className='tw:w-4' name="trash" viewBox="0 0 24 24" />
+        </ButtonIcon>
         {translate('ui_clear')}
-      </MenuBarSmallItem>
+      </Button>
       <Container className={s(style, { tableWrapper: true })} overflow>
         <Table className={s(style, { table: true })}>
           <TableHeader fixed>

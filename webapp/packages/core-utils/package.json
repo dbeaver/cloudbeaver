@@ -23,6 +23,7 @@
     "validate-dependencies": "core-cli-validate-dependencies"
   },
   "dependencies": {
+    "@dbeaver/js-helpers": "workspace:*",
     "@timohausmann/quadtree-ts": "^2",
     "fast-deep-equal": "^3",
     "md5": "^2",
