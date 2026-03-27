@@ -115,7 +115,11 @@ export class DataViewerTabService {
       await initTab();
 
       if (tabInfo.isNewlyCreated) {
-        trySwitchPage(this.page);
+        trySwitchPage(this.page, {
+          resultIndex: 0,
+          presentationId: '',
+          valuePresentationId: null,
+        });
       }
     } catch (exception: any) {
       this.notificationService.logException(exception, 'Data Editor Error', 'Error in Data Editor while processing action with database node');

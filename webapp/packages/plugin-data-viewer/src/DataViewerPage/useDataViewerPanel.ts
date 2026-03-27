@@ -68,16 +68,7 @@ export function useDataViewerPanel(tab: ITab<IObjectViewerTabState>) {
         model = dataViewerTableService.create(connectionInfo, node);
         tab.handlerState.tableId = model.id;
 
-        let pageState = dataViewerTabService.page.getState(tab);
-
-        if (!pageState) {
-          dataViewerTabService.page.setState(tab, {
-            resultIndex: 0,
-            presentationId: '',
-            valuePresentationId: null,
-          });
-          pageState = dataViewerTabService.page.getState(tab);
-        }
+        const pageState = dataViewerTabService.page.getState(tab);
 
         try {
           const persistedState = pageState?.persistedState;
@@ -93,7 +84,7 @@ export function useDataViewerPanel(tab: ITab<IObjectViewerTabState>) {
             model.source.options.whereFilter = persistedState.whereFilter || '';
           }
         } catch (exception: any) {
-          console.warn('[DataViewerTableState] Failed to restore state', exception);
+          console.warn('[useDataViewerPanel] Failed to restore state', exception);
         }
 
         model.source.setOutdated();
@@ -150,7 +141,7 @@ export function useDataViewerPanel(tab: ITab<IObjectViewerTabState>) {
                 viewAction.restoreViewState(persistedState.pinnedColumns, persistedState.columnOrder);
               }
             } catch (exception: any) {
-              console.warn('[DataViewerTableState] Failed to restore view state', exception);
+              console.warn('[useDataViewerPanel] Failed to restore view state', exception);
             }
           },
           { fireImmediately: true },
@@ -186,7 +177,7 @@ export function useDataViewerPanel(tab: ITab<IObjectViewerTabState>) {
             currentPageState.persistedState = buildPersistedState(dbModel) ?? undefined;
           }
         } catch (exception: any) {
-          console.warn('[DataViewerTableState] Auto-save failed', exception);
+          console.warn('[useDataViewerPanel] Auto-save failed', exception);
         }
       },
       { delay: 1000, fireImmediately: false },
