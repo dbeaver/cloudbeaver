@@ -59,7 +59,6 @@
     "prettier": "^3.6.2",
     "react": "^19",
     "react-dom": "^19",
-    "reakit": "^1",
     "rimraf": "^6",
     "typescript": "^5.8.3",
     "typescript-plugin-css-modules": "^5",
