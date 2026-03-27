@@ -274,10 +274,10 @@ function updateConstraintsForResult(source: IDatabaseDataSource<IDatabaseDataOpt
 
   runInAction(() => {
     for (const constraint of source.options!.constraints) {
-      let prevColumn = result.data?.columns?.find(column => column.position === constraint.attributePosition);
+      let prevColumn = result.data?.columns?.find(c => c.position === constraint.attributePosition);
 
       if (!prevColumn && constraint.attributeName) {
-        prevColumn = result.data?.columns?.find(column => column.name === constraint.attributeName);
+        prevColumn = result.data?.columns?.find(c => c.name === constraint.attributeName);
 
         if (prevColumn) {
           constraint.attributePosition = prevColumn.position;
@@ -288,10 +288,10 @@ function updateConstraintsForResult(source: IDatabaseDataSource<IDatabaseDataOpt
         continue;
       }
 
-      let column = result.data?.columns?.find(column => column.position === prevColumn.position);
+      let column = result.data?.columns?.find(c => c.position === prevColumn.position);
 
       if (!column || column.label !== prevColumn.label) {
-        column = result.data?.columns?.find(column => column.label === prevColumn.label);
+        column = result.data?.columns?.find(c => c.label === prevColumn.label);
       }
 
       if (column && prevColumn.position !== column.position) {
