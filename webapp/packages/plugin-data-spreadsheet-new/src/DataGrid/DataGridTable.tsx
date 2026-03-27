@@ -524,7 +524,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
       return false;
     }
 
-    return GridCellsHelper.isGridCellEditable({ row, column }, tableData, hasElementIdentifier);
+    return GridCellsHelper.isCellEditable({ row, column }, tableData, hasElementIdentifier);
   }
 
   function getColumnKey(colIdx: number) {

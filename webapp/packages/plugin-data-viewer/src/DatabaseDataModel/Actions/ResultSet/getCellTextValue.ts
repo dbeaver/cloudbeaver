@@ -26,9 +26,9 @@ export function getCellTextValue(
   options?: IGetCellTextValueOptions,
 ): string {
   const decodeBinary = options?.decodeBinary ?? false;
+  const fullText = contentAction.retrieveFullTextFromCache(holder.key);
 
   if (contentAction.isTextTruncated(holder)) {
-    const fullText = contentAction.retrieveFullTextFromCache(holder.key);
     if (fullText !== undefined) {
       return fullText;
     }
@@ -50,6 +50,5 @@ export function getCellTextValue(
     return '';
   }
 
-  const cachedFullText = contentAction.retrieveFullTextFromCache(holder.key);
-  return cachedFullText ?? formatAction.getText(holder);
+  return fullText ?? formatAction.getText(holder);
 }

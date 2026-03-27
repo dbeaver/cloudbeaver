@@ -23,7 +23,7 @@ export const GridCellsHelper = {
   getColumnSignature(row: IGridDataKey[], tableData: ITableData): string {
     return row.map(cell => tableData.getColumnIndexFromColumnKey(cell.column)).join(COLUMN_SIGNATURE_SEPARATOR);
   },
-  isGridCellEditable(key: IGridDataKey, tableData: ITableData, hasElementIdentifier: boolean): boolean {
+  isCellEditable(key: IGridDataKey, tableData: ITableData, hasElementIdentifier: boolean): boolean {
     const editionState = tableData.getEditionState(key);
 
     if (!hasElementIdentifier && editionState !== DatabaseEditChangeType.add) {

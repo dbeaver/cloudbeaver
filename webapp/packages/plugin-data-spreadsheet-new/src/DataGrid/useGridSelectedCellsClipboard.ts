@@ -70,7 +70,7 @@ export function useGridSelectedCellsClipboard(
         }
 
         const focusedElement = props.selectAction.getFocusedElement();
-        const value = GridClipboardHelper.getClipboardValueFromSelectedCells(props.tableData, props.selectionContext.selectedCells, focusedElement);
+        const value = GridClipboardHelper.getValueFromSelectedCells(props.tableData, props.selectionContext.selectedCells, focusedElement);
 
         if (value !== null) {
           copyToClipboard(value);
@@ -83,7 +83,7 @@ export function useGridSelectedCellsClipboard(
 
   const onKeydownHandler = useCallback(
     async (event: DataGridCellKeyboardEvent) => {
-      if (!(event.ctrlKey || event.metaKey) || !GridClipboardHelper.isGridClipboardTarget(event)) {
+      if (!(event.ctrlKey || event.metaKey) || !GridClipboardHelper.isClipboardTarget(event)) {
         return;
       }
 
@@ -102,6 +102,8 @@ export function useGridSelectedCellsClipboard(
           EventContext.set(event, EventStopPropagationFlag);
 
           await handlePaste();
+          break;
+        default:
           break;
       }
     },

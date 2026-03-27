@@ -17,16 +17,12 @@ const ROW_LINE_SEPARATOR = '\r\n';
 const CLIPBOARD_LINE_SEPARATOR_REGEX = /\r?\n/;
 
 export const GridClipboardHelper = {
-  isGridClipboardTarget(event: React.KeyboardEvent): boolean {
+  isClipboardTarget(event: React.KeyboardEvent): boolean {
     const role = (document.activeElement as HTMLElement | null)?.getAttribute('role');
 
     return role === 'gridcell' || role === 'columnheader' || event.target === event.currentTarget;
   },
-  getClipboardValueFromSelectedCells(
-    tableData: ITableData,
-    selectedCells: Map<string, IGridDataKey[]>,
-    focusedCell?: IGridDataKey | null,
-  ): string | null {
+  getValueFromSelectedCells(tableData: ITableData, selectedCells: Map<string, IGridDataKey[]>, focusedCell?: IGridDataKey | null): string | null {
     if (selectedCells.size === 0) {
       return focusedCell ? getCellTextValue(tableData.getCellHolder(focusedCell), tableData.format, tableData.dataContent) : null;
     }
@@ -57,7 +53,7 @@ export const GridClipboardHelper = {
       })
       .join(ROW_LINE_SEPARATOR);
   },
-  parseClipboardData(text: string): string[][] {
+  parseClipboard(text: string): string[][] {
     return text
       .split(CLIPBOARD_LINE_SEPARATOR_REGEX)
       .filter(row => row.length > 0)
@@ -70,7 +66,7 @@ export const GridClipboardHelper = {
     tableData: ITableData,
     hasElementIdentifier: boolean,
   ): CellUpdate[] {
-    const clipboardData = this.parseClipboardData(clipboardText);
+    const clipboardData = this.parseClipboard(clipboardText);
 
     if (clipboardData.length === 0) {
       return [];
@@ -109,7 +105,7 @@ export const GridClipboardHelper = {
 
     return updates.filter(
       ({ key, value }) =>
-        GridCellsHelper.isGridCellEditable(key, tableData, hasElementIdentifier) && tableData.format.getText(tableData.format.get(key)) !== value,
+        GridCellsHelper.isCellEditable(key, tableData, hasElementIdentifier) && tableData.format.getText(tableData.format.get(key)) !== value,
     );
   },
 };
