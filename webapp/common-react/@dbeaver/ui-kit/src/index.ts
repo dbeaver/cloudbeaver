@@ -21,7 +21,7 @@ export {
   type FocusTrapRegionProps,
 } from '@ariakit/react';
 
-export { Button, ButtonBase, type ButtonProps, ButtonIcon, type ButtonIconProps } from './Button/Button.js';
+export { Button, ButtonBase, type ButtonProps, ButtonIcon, type ButtonIconProps, UnstyledButton, type UnstyledButtonProps } from './Button/Button.js';
 export { IconButton, IconButtonBase, type IconButtonProps } from './IconButton/IconButton.js';
 export { Checkbox, CheckboxBase, type CheckboxProps } from './Checkbox/Checkbox.js';
 export { ColorPicker } from './ColorPicker/ColorPicker.js';
@@ -46,7 +46,7 @@ export {
 } from './Select/Select.js';
 export * from './Combobox/Combobox.js';
 export * from './Command/Command.js';
-export { Popover } from './Popover/Popover.js';
+export { Popover, usePopoverStore, type PopoverStore } from './Popover/Popover.js';
 export { SelectField, type SelectFieldProps, type SelectItem } from './Select/SelectField.js';
 export { Spinner, type SpinnerProps } from './Spinner/Spinner.js';
 export { Radio, RadioGroup, useRadioContext, useRadioStore, type RadioProviderProps, type RadioProps, type RadioGroupProps } from './Radio/index.js';
@@ -57,3 +57,14 @@ export * from './Menu/Menu.js';
 export * from './Disclosure/Disclosure.js';
 export * from './Dialog/Dialog.js';
 export * from './Tab/Tab.js';
+export { Portal, type PortalProps } from './Portal/Portal.js';
+export {
+  Composite,
+  CompositeItem,
+  CompositeProvider,
+  useCompositeStore,
+  type CompositeProps,
+  type CompositeItemProps,
+  type CompositeProviderProps,
+  type CompositeStore,
+} from './Composite/Composite.js';

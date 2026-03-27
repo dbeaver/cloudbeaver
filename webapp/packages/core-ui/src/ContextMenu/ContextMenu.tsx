@@ -14,7 +14,7 @@ import { MenuButton, MenuProvider, Menu, type HovercardStoreState, useMenuStore,
 import { RenderMenuItems } from './RenderMenuItems.js';
 import { type IMenuContext, MenuContext } from './MenuContext.js';
 
-export interface IContextMenuNewProps extends Omit<IContextMenuProps, 'placement'> {
+export interface IContextMenuNewProps extends IContextMenuProps {
   render?: React.ReactElement;
   placement?: HovercardStoreState['placement'];
   showOnHover?: boolean;
