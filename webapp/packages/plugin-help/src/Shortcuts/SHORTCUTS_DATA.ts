@@ -34,7 +34,7 @@ const KEY_BINDING_SQL_EDITOR_COMMENT = createKeyBinding({
 });
 
 const KEY_BINDING_FIND = createKeyBinding({
-  id: 'plugin-search-panel-find',
+  id: 'find',
   keys: ['mod+f'],
 });
 
