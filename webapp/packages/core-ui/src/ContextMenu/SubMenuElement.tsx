@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -67,6 +67,7 @@ export const SubMenuElement = observer<ISubMenuElementProps>(function SubMenuEle
   });
 
   const handler = subMenuData.handler;
+  const hasVisibleItems = getComputed(() => subMenuData.items.some(item => !item.hidden));
 
   // NOTE: some menus rely on lazy loading. When items are not loaded yet `items` may be empty,
   // but the submenu still must be rendered to allow opening it and triggering loaders.
@@ -92,7 +93,7 @@ export const SubMenuElement = observer<ISubMenuElementProps>(function SubMenuEle
   const label = info?.label ?? subMenu.label ?? subMenu.menu.info.label;
   const icon = info?.icon ?? subMenu.icon ?? subMenu.menu.info.icon;
   const group = info ? info.group : subMenu.menu.info.group;
-  const disabled = getComputed(() => handler?.isDisabled?.(subMenuData.context));
+  const disabled = getComputed(() => handler?.isDisabled?.(subMenuData.context) || !hasVisibleItems);
 
   const tooltip = info?.tooltip ?? subMenu.tooltip ?? subMenu.menu.info.tooltip;
   const MenuComponent = menuComponent;
@@ -193,6 +194,7 @@ export const SubMenuElement = observer<ISubMenuElementProps>(function SubMenuEle
       render={
         <MenuItem
           id={subMenu.id}
+          disabled={disabled}
           render={
             <MenuItemElement
               label={label}
