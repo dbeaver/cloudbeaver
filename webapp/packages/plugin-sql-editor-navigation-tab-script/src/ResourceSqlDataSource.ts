@@ -149,7 +149,7 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
     private readonly projectsService: ProjectsService,
     state: IResourceSqlDataSourceState,
   ) {
-    super();
+    super('/icons/sql_script_m.svg');
     this.bindState(state);
     this.lastAction = undefined;
     this.loaded = false;
