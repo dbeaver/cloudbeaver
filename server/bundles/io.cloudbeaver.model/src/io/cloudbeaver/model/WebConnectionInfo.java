@@ -297,7 +297,7 @@ public class WebConnectionInfo {
 
     @Property
     @NotNull
-    public Map<String, String> getDefaultUserSettings() {
+    public Map<String, String> getDefaultUserPreferences() {
         DBPPreferenceStore preferenceStore = dataSourceContainer.getPreferenceStore();
         if (preferenceStore instanceof DataSourcePreferenceStore dataSourcePreferenceStore) {
             return dataSourcePreferenceStore.getProperties();

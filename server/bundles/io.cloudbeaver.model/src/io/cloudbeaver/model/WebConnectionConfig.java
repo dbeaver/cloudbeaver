@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,7 +66,7 @@ public class WebConnectionConfig {
     private String defaultCatalogName;
     private String defaultSchemaName;
     @NotNull
-    private Map<String, Object> defaultUserSettings = new LinkedHashMap<>();
+    private Map<String, Object> defaultUserPreferences = new LinkedHashMap<>();
 
     public WebConnectionConfig() {
     }
@@ -114,7 +114,7 @@ public class WebConnectionConfig {
         String configType = JSONUtils.getString(params, "configurationType");
         configurationType = configType == null ? null : DBPDriverConfigurationType.valueOf(configType);
 
-        defaultUserSettings = JSONUtils.getObject(params, "defaultUserSettings");
+        defaultUserPreferences = JSONUtils.getObject(params, "defaultUserPreferences");
         networkHandlersConfig = new ArrayList<>();
         for (Map<String, Object> nhc : JSONUtils.getObjectList(params, "networkHandlersConfig")) {
             networkHandlersConfig.add(new WebNetworkHandlerConfigInput(nhc));
@@ -373,11 +373,11 @@ public class WebConnectionConfig {
     }
 
     @NotNull
-    public Map<String, Object> getDefaultUserSettings() {
-        return defaultUserSettings;
+    public Map<String, Object> getDefaultUserPreferences() {
+        return defaultUserPreferences;
     }
 
-    public void setDefaultUserSettings(@NotNull Map<String, Object> defaultUserSettings) {
-        this.defaultUserSettings = defaultUserSettings;
+    public void setDefaultUserPreferences(@NotNull Map<String, Object> defaultUserPreferences) {
+        this.defaultUserPreferences = defaultUserPreferences;
     }
 }

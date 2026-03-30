@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2025 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -798,7 +798,8 @@ public class WebServiceCore implements DBWServiceCore {
     }
 
     @Override
-    public Object setObjectSettingsForDatasource(
+    @NotNull
+    public Map<String, String> setObjectSettingsForDatasource(
         @NotNull WebSession webSession,
         @NotNull String projectId,
         @NotNull String objectId,
@@ -811,7 +812,8 @@ public class WebServiceCore implements DBWServiceCore {
         }
         BaseProjectSettings projectSettings = projectById.getProjectSettings();
         projectSettings.setObjectSettings(SMObjectType.datasource, objectId, settings);
-        return projectSettings.getObjectSettings(SMObjectType.datasource, objectId);
+        Map<String, String> objectSettings = projectSettings.getObjectSettings(SMObjectType.datasource, objectId);
+        return objectSettings == null ? new HashMap<>() : objectSettings;
     }
 
     @Override

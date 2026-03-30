@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -97,8 +97,9 @@ public class WebConnectionConfigInputHandler<T extends WebConnectionConfig, C ex
         );
         dataSource.setConnectionReadOnly(input.isReadOnly());
         DataSourcePreferenceStore preferenceStore = dataSource.getPreferenceStore();
-        Map<String, Object> defaultUserSettings = input.getDefaultUserSettings();
-        for (Map.Entry<String, Object> entry : defaultUserSettings.entrySet()) {
+        preferenceStore.clear();
+        Map<String, Object> defaultUserPreferences = input.getDefaultUserPreferences();
+        for (Map.Entry<String, Object> entry : defaultUserPreferences.entrySet()) {
             preferenceStore.setValue(entry.getKey(), (String) entry.getValue());
         }
     }
