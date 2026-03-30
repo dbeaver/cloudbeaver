@@ -57,4 +57,5 @@ export default [
   ],
   ['plugin_sql_editor_settings_highlight_white_space', 'Highlight white space characters'],
   ['plugin_sql_editor_settings_highlight_white_space_description', 'Highlight spaces, tabs and other white space characters in the SQL editor'],
+  ['plugin_sql_editor_bind_parameters_dialog_alert_title', 'String values must be quoted'],
 ];

@@ -53,4 +53,5 @@ export default [
     'plugin_sql_editor_settings_highlight_white_space_description',
     "Mettere in evidenza spazi, tabulazioni e altri caratteri di spazio bianco nell'editor SQL",
   ],
+  ['plugin_sql_editor_bind_parameters_dialog_alert_title', 'I valori stringa devono essere racchiusi tra virgolette'],
 ];

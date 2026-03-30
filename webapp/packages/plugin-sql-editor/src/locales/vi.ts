@@ -56,4 +56,5 @@ export default [
     'plugin_sql_editor_settings_highlight_white_space_description',
     'Đánh dấu khoảng trắng, tab và các ký tự khoảng trắng khác trong trình soạn thảo SQL',
   ],
+  ['plugin_sql_editor_bind_parameters_dialog_alert_title', 'Giá trị chuỗi phải được đặt trong dấu ngoặc kép'],
 ];
