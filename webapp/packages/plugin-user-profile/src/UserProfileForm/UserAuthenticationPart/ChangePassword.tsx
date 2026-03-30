@@ -19,9 +19,9 @@ import {
   InputField,
   ToolsAction,
   ToolsPanel,
-  useCustomInputValidation,
   useExecutor,
   useForm,
+  useFormCustomInputValidation,
   useObservableRef,
   usePasswordValidation,
   useTranslate,
@@ -70,7 +70,7 @@ export const ChangePassword = observer(function ChangePassword() {
   });
 
   const passwordValidationRef = usePasswordValidation(form);
-  const passwordRepeatValidation = useCustomInputValidation<string>(value => {
+  const passwordRepeatValidation = useFormCustomInputValidation<string>(value => {
     if (!isValuesEqual(value, state.password, null)) {
       return translate('authentication_user_passwords_not_match');
     }
