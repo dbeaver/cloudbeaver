@@ -39,7 +39,7 @@ enum CBClientEventId {
     cb_client_topic_unsubscribe,
     cb_client_projects_active,
     cb_client_session_ping,
-    cb_client_action_cancel @since(version: "26.0.2")
+    cb_client_cancel_action @since(version: "26.0.2")
 }
 
 "Client subscribes on topic to receive only related events"
