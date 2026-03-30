@@ -9,11 +9,10 @@ import { PasswordPolicyService } from '@cloudbeaver/core-authentication';
 import { useService } from '@cloudbeaver/core-di';
 import { PasswordPolicyResource } from '@cloudbeaver/core-root';
 
-import { type IFormContext } from './FormControls/FormContext.js';
 import { useCustomInputValidation } from './FormControls/useCustomInputValidation.js';
 import { useResource } from './ResourcesHooks/useResource.js';
 
-export function usePasswordValidation(formContext?: IFormContext) {
+export function usePasswordValidation() {
   useResource(usePasswordValidation, PasswordPolicyResource, undefined);
   const passwordPolicyService = useService(PasswordPolicyService);
 
