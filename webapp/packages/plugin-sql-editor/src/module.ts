@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,8 @@ import { OutputLogsService } from './SqlResultTabs/OutputLogs/OutputLogsService.
 import { OutputLogsResource } from './SqlResultTabs/OutputLogs/OutputLogsResource.js';
 import { OutputLogsEventHandler } from './SqlResultTabs/OutputLogs/OutputLogsEventHandler.js';
 import { SqlExecutionPlanService } from './SqlResultTabs/ExecutionPlan/SqlExecutionPlanService.js';
+import { SqlExecutionPlanViewService } from './SqlResultTabs/ExecutionPlan/SqlExecutionPlanViewService.js';
+import { SqlExecutionPlanViewBootstrap } from './SqlResultTabs/ExecutionPlan/SqlExecutionPlanViewBootstrap.js';
 import { SqlEditorView } from './SqlEditorView.js';
 import { SqlEditorSettingsService } from './SqlEditorSettingsService.js';
 import { SqlEditorService } from './SqlEditorService.js';
@@ -49,6 +51,8 @@ export default ModuleRegistry.add({
       .addSingleton(OutputLogsResource)
       .addSingleton(OutputLogsEventHandler)
       .addSingleton(SqlExecutionPlanService)
+      .addSingleton(SqlExecutionPlanViewService)
+      .addSingleton(Bootstrap, SqlExecutionPlanViewBootstrap)
       .addSingleton(SqlEditorView)
       .addSingleton(SqlEditorSettingsService)
       .addSingleton(SqlEditorService)
