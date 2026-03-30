@@ -43,10 +43,3 @@
   width: 116px;
   min-width: 116px;
 }
-
-.clearButton {
-  position: absolute !important;
-  top: 4px;
-  right: 16px;
-  z-index: 100;
-}

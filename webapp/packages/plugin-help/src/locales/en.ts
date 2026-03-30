@@ -18,11 +18,12 @@ export default [
   ['sql_editor_shortcut_show_execution_plan', 'Show Execution plan'],
   ['sql_editor_shortcut_format', 'Format script'],
   ['sql_editor_shortcut_open_editor_in_new_tab', 'Open SQL Editor in the separate browser Tab'],
-  ['sql_editor_shortcut_find', 'Find'],
   ['sql_editor_shortcut_comment_uncomment_selection', 'Comment/Uncomment selection'],
   ['sql_editor_shortcut_start_completion', 'Show autocomplete suggestions'],
   ['sql_editor_shortcut_accept_completion', 'Accept autocompletion'],
   ['sql_editor_shortcut_escape', 'Escape editor'],
+
+  ['plugin_search_panel_find', 'Find'],
 
   ['navigation_tree_shortcut_enable_filter', 'Enable filtering'],
 
@@ -34,5 +35,5 @@ export default [
   Your local application settings will be lost after the browser tab is closed.
   You can load tabs and settings for this tab`,
   ],
-  ['plugin_help_multi_tab_support_load_settings', 'Load tabs ans settings'],
+  ['plugin_help_multi_tab_support_load_settings', 'Load tabs and settings'],
 ];

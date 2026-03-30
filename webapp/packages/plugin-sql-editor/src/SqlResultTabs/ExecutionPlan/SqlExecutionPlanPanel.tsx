@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -10,12 +10,13 @@ import { useState } from 'react';
 
 import { Loader, Pane, ResizerControls, s, Split, useS, useSplitUserState } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
+import { TabList, TabPanelList, TabsState } from '@cloudbeaver/core-ui';
 
 import type { IExecutionPlanTab } from '../../ISqlEditorTabState.js';
-import { ExecutionPlanTreeBlock } from './ExecutionPlanTreeBlock.js';
 import { PropertiesPanel } from './PropertiesPanel/PropertiesPanel.js';
-import style from './SqlExecutionPlanPanel.module.css';
 import { SqlExecutionPlanService } from './SqlExecutionPlanService.js';
+import { SqlExecutionPlanViewService } from './SqlExecutionPlanViewService.js';
+import style from './SqlExecutionPlanPanel.module.css';
 
 interface Props {
   executionPlanTab: IExecutionPlanTab;
@@ -24,6 +25,7 @@ interface Props {
 export const SqlExecutionPlanPanel = observer<Props>(function SqlExecutionPlanPanel({ executionPlanTab }) {
   const styles = useS(style);
   const sqlExecutionPlanService = useService(SqlExecutionPlanService);
+  const sqlExecutionPlanViewService = useService(SqlExecutionPlanViewService);
   const data = sqlExecutionPlanService.data.get(executionPlanTab.tabId);
   const [selectedNode, setSelectedNode] = useState<string | null>(null);
   const splitState = useSplitUserState('execution-plan');
@@ -35,7 +37,17 @@ export const SqlExecutionPlanPanel = observer<Props>(function SqlExecutionPlanPa
   return (
     <Split {...splitState} mode={selectedNode ? splitState.mode : 'minimize'} disable={!selectedNode} sticky={30}>
       <Pane className={s(styles, { pane: true })}>
-        <ExecutionPlanTreeBlock nodeList={data.executionPlan.nodes} query={data.executionPlan.query} onNodeSelect={setSelectedNode} />
+        <TabsState
+          container={sqlExecutionPlanViewService.tabs}
+          nodes={data.executionPlan.nodes}
+          query={data.executionPlan.query}
+          selectedNode={selectedNode}
+          lazy
+          onNodeSelect={setSelectedNode}
+        >
+          <TabList underline />
+          <TabPanelList />
+        </TabsState>
       </Pane>
       <ResizerControls />
       <Pane className={s(styles, { pane: true })} basis="30%" main>
