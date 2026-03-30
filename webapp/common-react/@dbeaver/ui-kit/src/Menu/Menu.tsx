@@ -45,6 +45,8 @@ import {
   type MenuListProps,
   type MenuBarProps,
   type MenuItemCheckProps,
+  type MenuStore,
+  type MenuStoreState
 } from '@ariakit/react';
 import clsx from 'clsx';
 
@@ -175,6 +177,8 @@ export {
   type MenuStoreProps,
   type MenuArrowProps,
   type HovercardStoreState,
+  type MenuStore,
+  type MenuStoreState
 };
 
 Menu.Provider = MenuProvider;
