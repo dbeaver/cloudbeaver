@@ -14,25 +14,25 @@
     }
 
     &:hover::before {
-      opacity: 0.04;
+      opacity: 0.07;
     }
 
     &:focus::before {
-      opacity: 0.1;
+      opacity: 0.11;
     }
 
     &:active::before {
-      opacity: 0.1;
+      opacity: 0.11;
     }
 
     &[aria-expanded='true']::before {
-      opacity: 0.14;
+      opacity: 0.15;
     }
   }
 
   .theme-ripple-selectable {
     &[aria-selected='true']::before {
-      opacity: 0.14;
+      opacity: 0.15;
     }
   }
 }
