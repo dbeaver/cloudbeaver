@@ -1,7 +1,7 @@
 @theme {
   /* Font families */
-  --font-sans: Roboto, sans-serif;
-  --font-mono: RobotoMono, sans-serif;
+  --font-roboto: Roboto, sans-serif;
+  --font-roboto-mono: RobotoMono, sans-serif;
 
   /* Headline 6 – 1.25rem (20px) */
   --text-headline6: 1.25rem;
