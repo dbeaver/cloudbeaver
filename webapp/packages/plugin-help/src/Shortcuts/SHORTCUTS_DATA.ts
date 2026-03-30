@@ -33,8 +33,8 @@ const KEY_BINDING_SQL_EDITOR_COMMENT = createKeyBinding({
   keys: ['mod+/'],
 });
 
-const KEY_BINDING_SQL_EDITOR_FIND = createKeyBinding({
-  id: 'sql-editor-find',
+const KEY_BINDING_FIND = createKeyBinding({
+  id: 'find',
   keys: ['mod+f'],
 });
 
@@ -56,6 +56,10 @@ export const DATA_VIEWER_SHORTCUTS: IShortcut[] = [
   {
     label: 'data_viewer_shortcut_delete_row',
     code: transformKeys(KEY_BINDING_DELETE_ROW),
+  },
+  {
+    label: 'plugin_search_panel_find',
+    code: transformKeys(KEY_BINDING_FIND),
   },
   {
     label: 'ui_processing_save',
@@ -109,8 +113,8 @@ export const SQL_EDITOR_SHORTCUTS: IShortcut[] = [
     code: transformKeys(KEY_BINDING_REDO),
   },
   {
-    label: 'sql_editor_shortcut_find',
-    code: transformKeys(KEY_BINDING_SQL_EDITOR_FIND),
+    label: 'plugin_search_panel_find',
+    code: transformKeys(KEY_BINDING_FIND),
   },
   {
     label: 'sql_editor_shortcut_comment_uncomment_selection',
