@@ -11,7 +11,7 @@ import { type DependencyList, useEffect, useRef, useState } from 'react';
 import { useDidUpdate } from './useDidUpdate.js';
 
 /* The use query return type */
-export interface UseQueryOptions<QueryData, Data> {
+export interface IUseQueryOptions<QueryData, Data> {
   /* The enabled state of the query */
   enabled?: boolean;
   /* The depends for the hook */
@@ -32,7 +32,7 @@ export interface UseQueryOptions<QueryData, Data> {
   select?: (data: QueryData) => Data;
 }
 
-interface UseQueryCallbackParams {
+interface IUseQueryCallbackParams {
   /* The depends for the hook */
   keys: DependencyList;
   /* The abort signal */
@@ -40,7 +40,7 @@ interface UseQueryCallbackParams {
 }
 
 /* The use query return type */
-export interface UseQueryReturn<Data> {
+export interface IUseQueryReturn<Data> {
   /* The abort function */
   abort: AbortController['abort'];
   /* The state of the query */
@@ -80,10 +80,10 @@ export interface UseQueryReturn<Data> {
  * @example
  * const { data, isFetching, isLoading, isError, isSuccess, error, refetch, isRefetching, abort, aborted } = useQuery(() => fetch('url'));
  */
-export const useQuery = <QueryData, Data = QueryData>(
-  callback: (params: UseQueryCallbackParams) => Promise<QueryData>,
-  options?: UseQueryOptions<QueryData, Data>,
-): UseQueryReturn<Data> => {
+export function useQuery<QueryData, Data = QueryData>(
+  callback: (params: IUseQueryCallbackParams) => Promise<QueryData>,
+  options?: IUseQueryOptions<QueryData, Data>,
+): IUseQueryReturn<Data> {
   const enabled = options?.enabled ?? true;
   const retryCountRef = useRef(options?.retry ? getRetry(options.retry) : 0);
   const alreadyRequested = useRef(false);
@@ -102,12 +102,12 @@ export const useQuery = <QueryData, Data = QueryData>(
 
   const keys = options?.keys ?? [];
 
-  const abort = () => {
+  function abort() {
     abortControllerRef.current.abort();
     abortControllerRef.current = new AbortController();
-  };
+  }
 
-  const request = (action: 'init' | 'refetch') => {
+  function request(action: 'init' | 'refetch') {
     abort();
 
     setIsFetching(true);
@@ -177,7 +177,7 @@ export const useQuery = <QueryData, Data = QueryData>(
           intervalIdRef.current = interval;
         }
       });
-  };
+  }
 
   useEffect(() => {
     if (!enabled) {
@@ -197,7 +197,9 @@ export const useQuery = <QueryData, Data = QueryData>(
 
   useEffect(() => () => clearInterval(intervalIdRef.current), [enabled, options?.refetchInterval, options?.retry, ...keys]);
 
-  const refetch = () => request('refetch');
+  function refetch() {
+    request('refetch');
+  }
 
   return {
     abort,
@@ -210,7 +212,7 @@ export const useQuery = <QueryData, Data = QueryData>(
     isSuccess,
     isRefetching,
   };
-};
+}
 
 function getRetry(retry: boolean | number) {
   if (typeof retry === 'number') {
