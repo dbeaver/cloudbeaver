@@ -54,3 +54,6 @@ export * from './SqlEditorService.js';
 export * from './SqlEditorSettingsService.js';
 export * from './SqlEditorView.js';
 export * from './SqlResultTabs/SqlQueryService.js';
+export * from './SqlResultTabs/ExecutionPlan/SqlExecutionPlanViewService.js';
+export type { ISqlExecutionPlanViewProps } from './SqlResultTabs/ExecutionPlan/ISqlExecutionPlanViewProps.js';
+
