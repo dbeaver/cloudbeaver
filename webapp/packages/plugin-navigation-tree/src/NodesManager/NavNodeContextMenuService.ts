@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -39,6 +39,8 @@ import {
 
 import { DATA_CONTEXT_NAV_NODE_ACTIONS } from '../NavigationTree/ElementsTree/NavigationTreeNode/TreeNodeMenu/DATA_CONTEXT_NAV_NODE_ACTIONS.js';
 import { MENU_NAVIGATION_TREE_CREATE } from '../NavigationTree/ElementsTree/NavigationTreeNode/TreeNodeMenu/MENU_NAVIGATION_TREE_CREATE.js';
+import { MENU_NAVIGATION_TREE_MANAGE } from '../NavigationTree/ElementsTree/NavigationTreeNode/TreeNodeMenu/MENU_NAVIGATION_TREE_MANAGE.js';
+import { MENU_NAVIGATION_TREE_TOOLS } from '../NavigationTree/ElementsTree/NavigationTreeNode/TreeNodeMenu/MENU_NAVIGATION_TREE_TOOLS.js';
 
 export interface INodeMenuData {
   node: NavNode;
@@ -196,12 +198,20 @@ export class NavNodeContextMenuService extends Bootstrap {
       menus: [MENU_NAVIGATION_TREE_CREATE],
     });
 
+    this.menuService.setHandler({
+      id: 'menu-navigation-tree-manage',
+      menus: [MENU_NAVIGATION_TREE_MANAGE],
+    });
+
+    this.menuService.setHandler({
+      id: 'menu-navigation-tree-tools',
+      menus: [MENU_NAVIGATION_TREE_TOOLS],
+    });
+
     this.menuService.addCreator({
-      root: true,
+      menus: [MENU_NAVIGATION_TREE_MANAGE],
       contexts: [DATA_CONTEXT_NAV_NODE],
       getItems: (context, items) => {
-        items = [MENU_NAVIGATION_TREE_CREATE, ACTION_OPEN, ACTION_REFRESH, ...items];
-
         if (this.navTreeSettingsService.editing) {
           items.push(ACTION_RENAME);
         }
@@ -212,13 +222,24 @@ export class NavNodeContextMenuService extends Bootstrap {
 
         return items;
       },
+    });
+
+    this.menuService.addCreator({
+      root: true,
+      contexts: [DATA_CONTEXT_NAV_NODE],
+      getItems: (context, items) => [
+        ...items,
+        MENU_NAVIGATION_TREE_CREATE,
+        ACTION_OPEN,
+        ACTION_REFRESH,
+        MENU_NAVIGATION_TREE_MANAGE,
+        MENU_NAVIGATION_TREE_TOOLS,
+      ],
       orderItems: (context, items) => {
         const actionsOpen = menuExtractItems(items, [ACTION_OPEN]);
-        const actionsManage = menuExtractItems(items, [ACTION_RENAME, ACTION_DELETE]);
         const actionsRefresh = menuExtractItems(items, [ACTION_REFRESH]);
 
         items.unshift(...actionsOpen);
-        items.push(...actionsManage);
 
         if (actionsRefresh.length > 0) {
           if (items.length > 0) {

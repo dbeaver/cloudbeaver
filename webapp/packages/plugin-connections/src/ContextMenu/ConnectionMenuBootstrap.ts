@@ -17,7 +17,8 @@ import {
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { DATA_CONTEXT_NAV_NODE, EObjectFeature } from '@cloudbeaver/core-navigation-tree';
+import { DATA_CONTEXT_NAV_NODE, EObjectFeature, NavTreeSettingsService } from '@cloudbeaver/core-navigation-tree';
+import { MENU_NAVIGATION_TREE_MANAGE } from '@cloudbeaver/plugin-navigation-tree';
 import { getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { getUniqueName } from '@cloudbeaver/core-utils';
@@ -43,6 +44,7 @@ import { MENU_CONNECTIONS } from './MENU_CONNECTIONS.js';
   ConnectionsSettingsService,
   ServerConfigResource,
   LocalizationService,
+  NavTreeSettingsService,
 ])
 export class ConnectionMenuBootstrap extends Bootstrap {
   constructor(
@@ -64,16 +66,15 @@ export class ConnectionMenuBootstrap extends Bootstrap {
     this.addConnectionsMenuToTopAppBar();
 
     this.menuService.addCreator({
+      menus: [MENU_NAVIGATION_TREE_MANAGE],
+      contexts: [DATA_CONTEXT_CONNECTION],
+      getItems: (context, items) => [...items, ACTION_CONNECTION_EDIT, ACTION_CONNECTION_CLONE],
+    });
+
+    this.menuService.addCreator({
       root: true,
       contexts: [DATA_CONTEXT_CONNECTION],
-      getItems: (context, items) => [
-        ...items,
-        ACTION_CONNECTION_CHANGE_CREDENTIALS,
-        ACTION_CONNECTION_EDIT,
-        ACTION_CONNECTION_CLONE,
-        ACTION_CONNECTION_DISCONNECT,
-        ACTION_CONNECTION_DISCONNECT_ALL,
-      ],
+      getItems: (context, items) => [...items, ACTION_CONNECTION_CHANGE_CREDENTIALS, ACTION_CONNECTION_DISCONNECT, ACTION_CONNECTION_DISCONNECT_ALL],
     });
 
     this.actionService.addHandler({
