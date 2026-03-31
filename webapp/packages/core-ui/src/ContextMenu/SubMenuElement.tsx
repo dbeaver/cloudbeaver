@@ -9,6 +9,7 @@ import { observer } from 'mobx-react-lite';
 
 import {
   getComputed,
+  useAutoLoad,
   useTranslate,
   type IMenuItemElementProps,
   type IMenuItemGroupArrowElementProps,
@@ -31,6 +32,7 @@ import { type HovercardStoreState, MenuItem } from '@dbeaver/ui-kit';
 import { useService } from '@cloudbeaver/core-di';
 import { MenuActionElement } from './MenuActionElement.js';
 import { MenuContext, type IMenuContext } from './MenuContext.js';
+import { RenderMenuItem } from './RenderMenuItem.js';
 import { use, useCallback, useMemo } from 'react';
 
 interface ISubMenuElementProps extends Omit<React.ButtonHTMLAttributes<any>, 'style'> {
@@ -61,6 +63,8 @@ export const SubMenuElement = observer<ISubMenuElementProps>(function SubMenuEle
   const menuService = useService(MenuService);
   const subMenuData = useMenu({ menu: subMenu.menu, context: menuData.context });
 
+  useAutoLoad({ name: `SubMenuElement(${subMenu.menu.id})` }, subMenuData.loaders, true, true, false);
+
   useDataContextLink(subMenuData.context, (context, id) => {
     context.set(DATA_CONTEXT_MENU_NESTED, true, id);
     context.set(DATA_CONTEXT_SUBMENU_ITEM, subMenu, id);
@@ -68,17 +72,14 @@ export const SubMenuElement = observer<ISubMenuElementProps>(function SubMenuEle
 
   const handler = subMenuData.handler;
   const hasVisibleItems = getComputed(() => subMenuData.items.some(item => !item.hidden));
+  const allLoadersFinished = getComputed(() => subMenuData.loaders.every(loader => loader.isLoaded() || loader.isError()));
 
-  // NOTE: some menus rely on lazy loading. When items are not loaded yet `items` may be empty,
-  // but the submenu still must be rendered to allow opening it and triggering loaders.
   const hidden = getComputed(() => {
     if (handler?.isHidden?.(subMenuData.context)) {
       return true;
     }
 
-    const canLazyLoadItems = subMenuData.loaders.length > 0;
-
-    return !hasVisibleItems && !canLazyLoadItems;
+    return !hasVisibleItems;
   });
   const IconComponent = handler?.iconComponent?.() ?? subMenu.iconComponent?.();
   const extraProps = handler?.getExtraProps?.() ?? (subMenu.getExtraProps?.() as any);
@@ -111,9 +112,30 @@ export const SubMenuElement = observer<ISubMenuElementProps>(function SubMenuEle
     [menuData, subMenu],
   );
 
+  if (!allLoadersFinished) {
+    return null;
+  }
+
   // TODO: need to be fixed, in case when menu depend on data from loaders this may be always true
   if (hidden && !action) {
     return null;
+  }
+
+  const visibleItems = getComputed(() => subMenuData.items.filter(item => !item.hidden));
+
+  if (!action && visibleItems.length === 1) {
+    const singleItem = visibleItems[0]!;
+    return (
+      <RenderMenuItem
+        item={singleItem}
+        menuData={subMenuData}
+        onlyIcons={onlyIcons}
+        menuComponent={menuComponent}
+        itemComponent={MenuItemElement}
+        groupComponent={MenuItemGroupElement}
+        groupArrowComponent={MenuItemGroupArrowElement}
+      />
+    );
   }
 
   if (actionItem) {
@@ -193,7 +215,6 @@ export const SubMenuElement = observer<ISubMenuElementProps>(function SubMenuEle
       render={
         <MenuItem
           id={subMenu.id}
-          disabled={disabled}
           render={
             <MenuItemElement
               label={label}
