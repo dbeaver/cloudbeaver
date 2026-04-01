@@ -66,7 +66,7 @@ public class WebConnectionConfig {
     private String defaultCatalogName;
     private String defaultSchemaName;
     @NotNull
-    private Map<String, Object> defaultUserPreferences = new LinkedHashMap<>();
+    private Map<String, String> defaultUserPreferences = new LinkedHashMap<>();
 
     public WebConnectionConfig() {
     }
@@ -114,7 +114,8 @@ public class WebConnectionConfig {
         String configType = JSONUtils.getString(params, "configurationType");
         configurationType = configType == null ? null : DBPDriverConfigurationType.valueOf(configType);
 
-        defaultUserPreferences = JSONUtils.getObject(params, "defaultUserPreferences");
+        Map<String, Object> stringObjectUserPrefMap = JSONUtils.getObject(params, "defaultUserPreferences");
+        stringObjectUserPrefMap.forEach((key, value) -> defaultUserPreferences.put(key, value.toString()));
         networkHandlersConfig = new ArrayList<>();
         for (Map<String, Object> nhc : JSONUtils.getObjectList(params, "networkHandlersConfig")) {
             networkHandlersConfig.add(new WebNetworkHandlerConfigInput(nhc));
@@ -373,11 +374,11 @@ public class WebConnectionConfig {
     }
 
     @NotNull
-    public Map<String, Object> getDefaultUserPreferences() {
+    public Map<String, String> getDefaultUserPreferences() {
         return defaultUserPreferences;
     }
 
-    public void setDefaultUserPreferences(@NotNull Map<String, Object> defaultUserPreferences) {
+    public void setDefaultUserPreferences(@NotNull Map<String, String> defaultUserPreferences) {
         this.defaultUserPreferences = defaultUserPreferences;
     }
 }
