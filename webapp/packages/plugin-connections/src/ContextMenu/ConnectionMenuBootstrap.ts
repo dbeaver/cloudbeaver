@@ -81,11 +81,6 @@ export class ConnectionMenuBootstrap extends Bootstrap {
       menus: [MENU_NAVIGATION_TREE_MANAGE],
       actions: [ACTION_CONNECTION_EDIT, ACTION_CONNECTION_CLONE, ACTION_DELETE],
       contexts: [DATA_CONTEXT_CONNECTION],
-      getLoader: (context, action) => {
-        const connectionKey = context.get(DATA_CONTEXT_CONNECTION)!;
-
-        return getCachedMapResourceLoaderState(this.connectionInfoResource, () => connectionKey, undefined, true);
-      },
       isHidden: (context, action) => {
         const connectionKey = context.get(DATA_CONTEXT_CONNECTION)!;
         const connection = this.connectionInfoResource.get(connectionKey);
