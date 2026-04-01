@@ -108,9 +108,11 @@ export class NavNodeContextMenuService extends Bootstrap {
     });
 
     this.actionService.addHandler({
-      id: 'nav-node-base-handler',
+      id: 'nav-node-base-manage-menu',
+      menus: [MENU_NAVIGATION_TREE_MANAGE],
+      actions: [ACTION_RENAME, ACTION_DELETE],
       contexts: [DATA_CONTEXT_NAV_NODE],
-      isActionApplicable: (context, action): boolean => {
+      isActionApplicable: (context, action) => {
         const node = context.get(DATA_CONTEXT_NAV_NODE)!;
 
         if (NodeManagerUtils.isDatabaseObject(node.id) || isConnectionFolder(node)) {
@@ -123,29 +125,13 @@ export class NavNodeContextMenuService extends Bootstrap {
           }
         }
 
-        if (action === ACTION_OPEN) {
-          return this.navNodeManagerService.canOpen(node.id, node.parentId);
-        }
-
-        return [ACTION_OPEN, ACTION_REFRESH].includes(action);
+        return false;
       },
       handler: async (context, action) => {
         const node = context.get(DATA_CONTEXT_NAV_NODE)!;
         const name = getNodePlainName(node);
 
         switch (action) {
-          case ACTION_OPEN: {
-            this.navNodeManagerService.navToNode(node.id, node.parentId);
-            break;
-          }
-          case ACTION_REFRESH: {
-            try {
-              await this.navNodeManagerService.refreshTree(node.id);
-            } catch (exception: any) {
-              this.notificationService.logException(exception, 'app_navigationTree_refresh_error');
-            }
-            break;
-          }
           case ACTION_RENAME: {
             const actions = context.get(DATA_CONTEXT_NAV_NODE_ACTIONS);
 
@@ -186,6 +172,38 @@ export class NavNodeContextMenuService extends Bootstrap {
                 exception,
                 this.localizationService.translate('app_navigationTree_node_delete_error', undefined, { name }),
               );
+            }
+            break;
+          }
+        }
+      },
+    });
+
+    this.actionService.addHandler({
+      id: 'nav-node-base-handler',
+      contexts: [DATA_CONTEXT_NAV_NODE],
+      isActionApplicable: (context, action): boolean => {
+        const node = context.get(DATA_CONTEXT_NAV_NODE)!;
+
+        if (action === ACTION_OPEN) {
+          return this.navNodeManagerService.canOpen(node.id, node.parentId);
+        }
+
+        return [ACTION_OPEN, ACTION_REFRESH].includes(action);
+      },
+      handler: async (context, action) => {
+        const node = context.get(DATA_CONTEXT_NAV_NODE)!;
+
+        switch (action) {
+          case ACTION_OPEN: {
+            this.navNodeManagerService.navToNode(node.id, node.parentId);
+            break;
+          }
+          case ACTION_REFRESH: {
+            try {
+              await this.navNodeManagerService.refreshTree(node.id);
+            } catch (exception: any) {
+              this.notificationService.logException(exception, 'app_navigationTree_refresh_error');
             }
             break;
           }
