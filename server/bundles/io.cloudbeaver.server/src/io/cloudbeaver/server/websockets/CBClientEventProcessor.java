@@ -91,6 +91,13 @@ public class CBClientEventProcessor {
                 }
                 break;
             }
+            case WSSessionCancelActionClientEvent.ID: {
+                if (webSession instanceof WebSession session) {
+                    var cancelActionEvent = (WSSessionCancelActionClientEvent) clientEvent;
+                    session.handleActionCancelledEvent(cancelActionEvent.getActionId());
+                }
+                break;
+            }
             case WSAiFunctionCallConfirmationClientEvent.ID: {
                 if (webSession instanceof WebSession session) {
                     var event = (WSAiFunctionCallConfirmationClientEvent) clientEvent;

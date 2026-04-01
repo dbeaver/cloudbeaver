@@ -1052,7 +1052,6 @@ public class WebSession extends BaseWebSession
         }
     }
 
-
     public void handleTaskConfirmationWithParameters(@NotNull String taskId, @NotNull Map<String, Object> parameters) {
         String attributeName = getTaskConfirmationAttributeName(taskId);
         CompletableFuture<Map<String, Object>> confirmationFuture = getAttribute(attributeName);
@@ -1062,6 +1061,16 @@ public class WebSession extends BaseWebSession
         } else {
             log.error("Received unexpected confirmation event for taskId: " + taskId);
         }
+    }
+
+    public void handleActionCancelledEvent(@NotNull String actionId) {
+        Object attributeValue = getAttribute(actionId);
+        if (!(attributeValue instanceof CompletableFuture<?> future)) {
+            log.info("Action to be cancelled not found, skipping: " + actionId);
+            return;
+        }
+        future.completeExceptionally(new DBWebException("Action cancelled by user: " + actionId));
+        removeAttribute(actionId);
     }
 
     public void handleAiFunctionConfirmation(@NotNull String taskId, boolean confirmed) {
