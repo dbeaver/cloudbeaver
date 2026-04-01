@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2025 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1037,7 +1037,6 @@ public class WebSession extends BaseWebSession
         }
     }
 
-
     public void handleTaskConfirmationWithParameters(@NotNull String taskId, @NotNull Map<String, Object> parameters) {
         String attributeName = getTaskConfirmationAttributeName(taskId);
         CompletableFuture<Map<String, Object>> confirmationFuture = getAttribute(attributeName);
@@ -1047,6 +1046,16 @@ public class WebSession extends BaseWebSession
         } else {
             log.error("Received unexpected confirmation event for taskId: " + taskId);
         }
+    }
+
+    public void handleActionCancelledEvent(@NotNull String actionId) {
+        Object attributeValue = getAttribute(actionId);
+        if (!(attributeValue instanceof CompletableFuture<?> future)) {
+            log.info("Action to be cancelled not found, skipping: " + actionId);
+            return;
+        }
+        future.completeExceptionally(new DBWebException("Action cancelled by user: " + actionId));
+        removeAttribute(actionId);
     }
 
     @NotNull
