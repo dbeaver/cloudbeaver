@@ -189,7 +189,7 @@ export class NavNodeContextMenuService extends Bootstrap {
           return this.navNodeManagerService.canOpen(node.id, node.parentId);
         }
 
-        return [ACTION_OPEN, ACTION_REFRESH].includes(action);
+        return [ACTION_REFRESH].includes(action);
       },
       handler: async (context, action) => {
         const node = context.get(DATA_CONTEXT_NAV_NODE)!;
