@@ -67,6 +67,11 @@ export class ConnectionMenuBootstrap extends Bootstrap {
 
     this.menuService.addCreator({
       menus: [MENU_NAVIGATION_TREE_MANAGE],
+      isApplicable: context => {
+        const node = context.get(DATA_CONTEXT_NAV_NODE)!;
+
+        return node.objectFeatures.includes(EObjectFeature.dataSource);
+      },
       getItems: (context, items) => [...items, ACTION_CONNECTION_EDIT, ACTION_CONNECTION_CLONE, ACTION_DELETE],
     });
 
