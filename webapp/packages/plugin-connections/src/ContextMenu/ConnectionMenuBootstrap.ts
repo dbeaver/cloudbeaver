@@ -67,12 +67,7 @@ export class ConnectionMenuBootstrap extends Bootstrap {
 
     this.menuService.addCreator({
       menus: [MENU_NAVIGATION_TREE_MANAGE],
-      isApplicable: context => {
-        const node = context.get(DATA_CONTEXT_NAV_NODE)!;
-
-        return node.objectFeatures.includes(EObjectFeature.dataSource);
-      },
-      getItems: (context, items) => [...items, ACTION_CONNECTION_EDIT, ACTION_CONNECTION_CLONE, ACTION_DELETE],
+      getItems: (context, items) => [...items, ACTION_CONNECTION_EDIT, ACTION_CONNECTION_CLONE],
     });
 
     this.menuService.addCreator({
@@ -85,6 +80,11 @@ export class ConnectionMenuBootstrap extends Bootstrap {
       id: 'connection-menu-management',
       menus: [MENU_NAVIGATION_TREE_MANAGE],
       actions: [ACTION_CONNECTION_EDIT, ACTION_CONNECTION_CLONE, ACTION_DELETE],
+      isActionApplicable: context => {
+        const node = context.get(DATA_CONTEXT_NAV_NODE)!;
+
+        return node.objectFeatures.includes(EObjectFeature.dataSource);
+      },
       contexts: [DATA_CONTEXT_CONNECTION],
       isHidden: (context, action) => {
         const connectionKey = context.get(DATA_CONTEXT_CONNECTION)!;
