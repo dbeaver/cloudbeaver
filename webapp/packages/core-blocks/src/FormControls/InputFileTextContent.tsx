@@ -9,10 +9,10 @@ import { observer } from 'mobx-react-lite';
 import { type ReactNode, useContext, useState } from 'react';
 
 import { blobToBase64, bytesToSize } from '@cloudbeaver/core-utils';
+import { IconButton } from '@dbeaver/ui-kit';
 
 import { Button } from '../Button.js';
 import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps.js';
-import { IconButton } from '../IconButton.js';
 import { useTranslate } from '../localization/useTranslate.js';
 import { s } from '../s.js';
 import { UploadArea } from '../UploadArea.js';
@@ -22,6 +22,7 @@ import { FieldDescription } from './FieldDescription.js';
 import { FieldLabel } from './FieldLabel.js';
 import { FormContext } from './FormContext.js';
 import inputFileTextContentStyles from './InputFileTextContent.module.css';
+import { Icon } from '../Icon.js';
 
 const DEFAULT_MAX_FILE_SIZE = 2048;
 
@@ -139,13 +140,24 @@ export const InputFileTextContent: InputFileTextContentType = observer(function 
         {children}
       </FieldLabel>
       <UploadArea title={tooltip} disabled={disabled} accept={accept} reset onChange={handleChange}>
-        <Button className="tw:inline-flex" icon="/icons/import.svg" tag="div" variant="secondary" disabled={disabled}>
+        <Button className="tw:w-max" icon="/icons/import.svg" tag="div" variant="secondary" disabled={disabled}>
           {translate('ui_upload_file')}
         </Button>
       </UploadArea>
       <FieldDescription className={s(styles, { fieldDescription: true })}>
         {description}
-        {(selected || saved) && <IconButton className={s(styles, { iconButton: true })} disabled={disabled} name="cross" onClick={removeFile} />}
+        {(selected || saved) && (
+          <IconButton
+            className="tw:shrink-0"
+            variant="secondary"
+            disabled={disabled}
+            size="small"
+            aria-label={translate('ui_remove')}
+            onClick={removeFile}
+          >
+            <Icon name="cross" width={12} height={12} />
+          </IconButton>
+        )}
       </FieldDescription>
     </Field>
   );

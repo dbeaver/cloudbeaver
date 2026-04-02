@@ -1,17 +1,17 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+
 import { action, computed, observable } from 'mobx';
-import { type RefObject, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
+import { type RefObject, useEffect, useLayoutEffect, useMemo } from 'react';
 
 import { debounce } from '@cloudbeaver/core-utils';
 import { isNotNullDefined } from '@dbeaver/js-helpers';
 
-import type { IMenuState } from '../Menu/MenuStateContext.js';
 import type { IContextMenuPositionCoords } from '../Menu/useContextMenuPosition.js';
 import { useObservableRef } from '../useObservableRef.js';
 import { type SearchStrategy, useSearch } from '../useSearch.js';
@@ -23,6 +23,7 @@ interface InputAutocompleteOptions {
   separator?: string | RegExp;
   matchStrategy?: SearchStrategy;
   predicate?: (suggestion: InputAutocompleteProposal, lastWord?: string) => boolean;
+  onNavigate?: () => void;
 }
 
 export interface InputAutocompleteProposal {
@@ -38,7 +39,6 @@ interface State {
   proposals: InputAutocompleteProposal[];
   position: IContextMenuPositionCoords;
   inputValue: string;
-  menuRef: RefObject<IMenuState>;
 }
 
 const DEFAULT_SEPARATOR = ' ';
@@ -48,7 +48,7 @@ const CONTEXT_INPUT_OFFSET_Y = 3;
 
 export const useInputAutocomplete = (
   inputRef: RefObject<HTMLInputElement | HTMLTextAreaElement | null>,
-  { sourceHints, separator = DEFAULT_SEPARATOR, matchStrategy = 'contains', predicate }: InputAutocompleteOptions,
+  { sourceHints, separator = DEFAULT_SEPARATOR, matchStrategy = 'contains', onNavigate, predicate }: InputAutocompleteOptions,
 ): Readonly<State> => {
   const search = useSearch({
     sourceHints,
@@ -56,7 +56,7 @@ export const useInputAutocomplete = (
     matchStrategy,
     predicate,
   });
-  const menuRef = useRef<IMenuState>(null);
+
   const state = useObservableRef(
     () => ({
       position: { x: 0, y: 0 } as IContextMenuPositionCoords,
@@ -126,7 +126,7 @@ export const useInputAutocomplete = (
       position: observable.ref,
       inputValue: observable.ref,
     },
-    { inputRef, search, menuRef },
+    { inputRef, search, onNavigate },
   );
 
   const handleInput = useMemo(
@@ -145,12 +145,11 @@ export const useInputAutocomplete = (
   function handleKeyDown(event: any) {
     switch (event.key) {
       case 'Escape':
-        state.menuRef.current?.hide();
         state.resetState();
         break;
       case 'ArrowDown':
       case 'ArrowUp':
-        state.menuRef.current?.first();
+        state.onNavigate?.();
         break;
       case 'Tab':
         state.resetState();
