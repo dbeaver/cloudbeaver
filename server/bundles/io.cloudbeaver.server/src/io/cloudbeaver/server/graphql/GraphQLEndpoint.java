@@ -58,10 +58,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 public class GraphQLEndpoint extends HttpServlet {
@@ -242,22 +239,24 @@ public class GraphQLEndpoint extends HttpServlet {
         @Nullable String operationName
     ) throws IOException {
 
-        String token = request.getHeader("Token");
+
         WebAppSessionManager sessionManager = WebAppUtils.getWebApplication().getSessionManager();
-        WebSession webSession = null;
-        try {
-            webSession = sessionManager.getWebSessionByToken(request, token);
-        } catch (DBException e) {
-            //fixme
-            throw new RuntimeException(e);
+
+        Map<String, Object> mapOfContext = new HashMap<>();
+        mapOfContext.put("request", request);
+        mapOfContext.put("response", response);
+        mapOfContext.put("bindingContext", bindingContext);
+        String token = request.getHeader("Token");
+        if (token != null) {
+            try {
+                WebSession webSession = sessionManager.getWebSessionByToken(request, token);
+                mapOfContext.put(WebSession.class.getName(), webSession);
+            } catch (DBException e) {
+                //fixme
+                throw new RuntimeException(e);
+            }
         }
-        Map<String, Object> mapOfContext =
-            Map.of(
-                "request", request,
-                "response", response,
-                "bindingContext", bindingContext,
-                WebSession.class.getName(), webSession
-            );
+
         ExecutionInput.Builder contextBuilder = ExecutionInput.newExecutionInput()
             .graphQLContext(mapOfContext)
             .query(query);
