@@ -60,6 +60,7 @@
     display: none;
 
     & .icon {
+      fill: var(--theme-on-primary);
       width: 12px;
     }
   }
