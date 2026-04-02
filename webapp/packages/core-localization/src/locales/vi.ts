@@ -44,6 +44,7 @@ export default [
   ['ui_error_message', 'Lỗi:'],
   ['ui_error_close', 'Đóng'],
   ['ui_clear', 'Xóa'],
+  ['ui_file_name', 'Tên tệp'],
   ['ui_remove', 'Xóa'],
   ['ui_close', 'Đóng'],
   ['ui_open', 'Mở'],
