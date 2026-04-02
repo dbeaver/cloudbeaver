@@ -1,22 +1,22 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { useContext, useEffect, useRef } from 'react';
-
-import { ExecutorInterrupter } from '@cloudbeaver/core-executor';
-
+import { useEffect, useRef } from 'react';
 import { useTranslate } from '../localization/useTranslate.js';
-import { useExecutor } from '../useExecutor.js';
-import { FormContext } from './FormContext.js';
+
+export interface ICustomInputValidation<TType extends HTMLInputElement | HTMLTextAreaElement = HTMLInputElement> {
+  ref: React.RefObject<TType | null>;
+  revalidate: () => void;
+  revalidateAndReport: (element: TType) => boolean;
+}
 
 export function useCustomInputValidation<T = void, TType extends HTMLInputElement | HTMLTextAreaElement = HTMLInputElement>(
   validation: (value: T) => string | null,
-): React.RefObject<TType | null> {
-  const context = useContext(FormContext);
+): ICustomInputValidation<TType> {
   const inputRef = useRef<TType | null>(null);
   const translate = useTranslate();
 
@@ -27,37 +27,32 @@ export function useCustomInputValidation<T = void, TType extends HTMLInputElemen
       value = element.value as unknown as T;
     }
 
-    const valid = element.validity.valid;
     const result = validation(value);
 
-    try {
-      if (typeof result === 'string') {
-        element.setCustomValidity(result || translate('core_blocks_custom_input_validation_error'));
-        return false;
-      }
-      element.setCustomValidity('');
-      return true;
-    } finally {
-      if (valid !== element.validity.valid) {
-        element.reportValidity();
-      }
+    if (typeof result === 'string') {
+      element.setCustomValidity(result || translate('core_blocks_custom_input_validation_error'));
+      return false;
     }
+    element.setCustomValidity('');
+    return true;
   }
 
-  useExecutor({
-    executor: context?.onValidate,
-    handlers: [
-      function validationHandler(_, context) {
-        if (!inputRef.current) {
-          return;
-        }
+  function revalidateAndReport(element: TType): boolean {
+    const valid = element.validity.valid;
+    const result = validate(element);
 
-        if (!validate(inputRef.current)) {
-          ExecutorInterrupter.interrupt(context);
-        }
-      },
-    ],
-  });
+    if (valid !== element.validity.valid) {
+      element.reportValidity();
+    }
+
+    return result;
+  }
+
+  function revalidate() {
+    if (inputRef.current) {
+      validate(inputRef.current);
+    }
+  }
 
   useEffect(() => {
     const element = inputRef.current;
@@ -68,14 +63,14 @@ export function useCustomInputValidation<T = void, TType extends HTMLInputElemen
     function handleInput(event: Event) {
       const target = event.target as TType;
       if (target.validity.valid === false) {
-        validate(target);
+        revalidateAndReport(target);
       }
     }
 
     function handleBlur(event: Event) {
       const target = event.target as TType;
       if (target.validity.valid === true) {
-        validate(target);
+        revalidateAndReport(target);
       }
     }
 
@@ -88,5 +83,5 @@ export function useCustomInputValidation<T = void, TType extends HTMLInputElemen
     };
   });
 
-  return inputRef;
+  return { ref: inputRef, revalidate, revalidateAndReport };
 }
