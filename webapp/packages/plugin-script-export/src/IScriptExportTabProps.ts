@@ -12,12 +12,4 @@ export interface IScriptExportTabProps {
   editorId: string;
   projectId?: string;
   connectionId?: string;
-  /** Each tab must call this to register its export controller with the dialog */
-  registerScriptExportController?: (controller: IScriptExportTabController) => void;
-}
-
-export interface IScriptExportTabController {
-  export: () => string | Promise<string>;
-  canExport?: () => boolean;
-  isExporting?: () => boolean;
 }

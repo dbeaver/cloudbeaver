@@ -5,12 +5,23 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { action, observable } from 'mobx';
+import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { useEffect } from 'react';
 
-import { Container, Form, InputField, Translate, useFocus, useObservableRef } from '@cloudbeaver/core-blocks';
-import type { IScriptExportTabProps } from '@cloudbeaver/plugin-script-export';
+import {
+  Button,
+  CommonDialogBody,
+  CommonDialogFooter,
+  Container,
+  Fill,
+  Form,
+  InputField,
+  Translate,
+  useFocus,
+  useForm,
+  useObservableRef,
+} from '@cloudbeaver/core-blocks';
+import { useScriptExportDialog, type IScriptExportTabProps } from '@cloudbeaver/plugin-script-export';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 import { downloadSql } from '../downloadSql.js';
 
@@ -22,42 +33,50 @@ interface State {
 export const LocalExportTab: TabContainerPanelComponent<IScriptExportTabProps> = observer(function LocalExportTab({
   script,
   fileName: initialFileName,
-  registerScriptExportController,
 }) {
+  const { resolveDialog, rejectDialog } = useScriptExportDialog();
   const [focusedRef] = useFocus<HTMLFormElement>({ focusFirstChild: true });
 
   const state = useObservableRef<State>(
     () => ({
       fileName: initialFileName,
-      export() {
-        downloadSql(this.fileName, script);
-        return this.fileName;
-      },
     }),
     {
       fileName: observable.ref,
-      export: action.bound,
     },
     false,
   );
+  const form = useForm({
+    onSubmit() {
+      downloadSql(state.fileName, script);
+      resolveDialog(state.fileName);
+    },
+  });
 
-  useEffect(() => {
-    registerScriptExportController?.({
-      export: state.export,
-      canExport: () => state.fileName.trim().length > 0,
-      isExporting: () => false,
-    });
-  }, [registerScriptExportController, state.export, state.fileName]);
+  const canSave = state.fileName.trim().length > 0;
 
   return (
-    <Container gap vertical>
-      <Form ref={focusedRef}>
-        <Container gap>
-          <InputField name="fileName" state={state}>
-            <Translate token="ui_file_name" />
-          </InputField>
+    <>
+      <CommonDialogBody>
+        <Container gap vertical>
+          <Form ref={focusedRef} context={form}>
+            <Container gap>
+              <InputField name="fileName" state={state} required>
+                <Translate token="ui_file_name" />
+              </InputField>
+            </Container>
+          </Form>
         </Container>
-      </Form>
-    </Container>
+      </CommonDialogBody>
+      <CommonDialogFooter>
+        <Button type="button" variant="secondary" onClick={() => rejectDialog()}>
+          <Translate token="ui_processing_cancel" />
+        </Button>
+        <Fill />
+        <Button type="button" disabled={!canSave} onClick={() => form.submit()}>
+          <Translate token="ui_processing_save" />
+        </Button>
+      </CommonDialogFooter>
+    </>
   );
 });
