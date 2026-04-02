@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2025 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,7 +51,7 @@ public class CBSessionManager implements WebAppSessionManager {
     private static final Log log = Log.getLog(CBSessionManager.class);
 
     private final CBApplication<?> application;
-    private final Map<String, BaseWebSession> sessionMap = new HashMap<>();
+    protected final Map<String, BaseWebSession> sessionMap = new HashMap<>();
 
     public CBSessionManager(CBApplication<?> application) {
         this.application = application;
@@ -526,5 +526,11 @@ public class CBSessionManager implements WebAppSessionManager {
     protected void closeExpiredSession(@NotNull BaseWebSession session) {
         log.debug("> Expire session '" + session.getSessionId() + "'");
         session.close();
+    }
+
+    @NotNull
+    @Override
+    public WebSession getWebSessionByToken(HttpServletRequest request, String token) throws DBException {
+        return null;
     }
 }

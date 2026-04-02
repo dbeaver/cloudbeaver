@@ -32,6 +32,7 @@ import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.model.apilog.ApiCallInterceptor;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.registry.WebServiceRegistry;
+import io.cloudbeaver.server.WebAppSessionManager;
 import io.cloudbeaver.server.WebAppUtils;
 import io.cloudbeaver.service.DBWBindingContext;
 import io.cloudbeaver.service.DBWServiceBindingGraphQL;
@@ -43,6 +44,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
+import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.utils.MimeTypes;
@@ -239,11 +241,22 @@ public class GraphQLEndpoint extends HttpServlet {
         @Nullable Map<String, Object> variables,
         @Nullable String operationName
     ) throws IOException {
+
+        String token = request.getHeader("Token");
+        WebAppSessionManager sessionManager = WebAppUtils.getWebApplication().getSessionManager();
+        WebSession webSession = null;
+        try {
+            webSession = sessionManager.getWebSessionByToken(request, token);
+        } catch (DBException e) {
+            //fixme
+            throw new RuntimeException(e);
+        }
         Map<String, Object> mapOfContext =
             Map.of(
                 "request", request,
                 "response", response,
-                "bindingContext", bindingContext
+                "bindingContext", bindingContext,
+                WebSession.class.getName(), webSession
             );
         ExecutionInput.Builder contextBuilder = ExecutionInput.newExecutionInput()
             .graphQLContext(mapOfContext)

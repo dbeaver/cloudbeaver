@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2025 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -108,11 +108,7 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
     }
 
     protected static WebSession getWebSession(DataFetchingEnvironment env) throws DBWebException {
-        if (env.getGraphQlContext().getBoolean(CloudbeaverCliConstants.CLI_MODE)) {
-            return getSessionFromContextOrThrow(env);
-        }
-        return WebAppUtils.getWebApplication().getSessionManager().getWebSession(
-            GraphQLEndpoint.getServletRequestOrThrow(env), getServletResponse(env));
+        return getWebSession(env, true);
     }
 
     @Nullable
@@ -132,6 +128,12 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
     protected static WebSession getWebSession(@NotNull DataFetchingEnvironment env, boolean errorOnNotFound) throws DBWebException {
         if (env.getGraphQlContext().getBoolean(CloudbeaverCliConstants.CLI_MODE)) {
             return getSessionFromContextOrThrow(env);
+        }
+        //fixme как то получше написать
+        WebSession session = env.getGraphQlContext().get(WebSession.class.getName());
+        if (session != null) {
+            // retrieved session by token
+            return session;
         }
         return WebAppUtils.getWebApplication().getSessionManager().getWebSession(
             GraphQLEndpoint.getServletRequestOrThrow(env), getServletResponse(env), errorOnNotFound);
