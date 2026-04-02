@@ -492,7 +492,6 @@ public class WebSession extends BaseWebSession
     public void close() {
         try {
             resetNavigationModel();
-            resetSessionCache();
         } catch (Throwable e) {
             log.error(e);
         }
@@ -509,7 +508,6 @@ public class WebSession extends BaseWebSession
     public void close(boolean clearTokens, boolean sendSessionExpiredEvent) {
         try {
             resetNavigationModel();
-            resetSessionCache();
         } catch (Throwable e) {
             log.error(e);
         }
