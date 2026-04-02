@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -151,7 +151,7 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
     }
 
     protected synchronized void clearSessionContext() {
-        this.workspace.getAuthContext().clear();
+        this.workspace.getAuthContext().clearContext(false);
         this.workspace.getAuthContext().addSession(this);
     }
 
@@ -187,12 +187,13 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
 
     @Override
     public void close() {
-        super.close();
         cleanUpSession(true);
+        super.close();
     }
 
     public void close(boolean clearTokens, boolean sendSessionExpiredEvent) {
         cleanUpSession(sendSessionExpiredEvent);
+        super.close();
     }
 
     private void cleanUpSession(boolean sendSessionExpiredEvent) {
