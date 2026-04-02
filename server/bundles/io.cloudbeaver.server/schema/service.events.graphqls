@@ -38,7 +38,8 @@ enum CBClientEventId {
     cb_client_topic_subscribe,
     cb_client_topic_unsubscribe,
     cb_client_projects_active,
-    cb_client_session_ping
+    cb_client_session_ping,
+    cb_client_cancel_action @since(version: "26.0.2")
 }
 
 "Client subscribes on topic to receive only related events"
@@ -136,6 +137,13 @@ type CBProjectsActiveEvent implements CBClientEvent {
     projectIds: [String!]!
 }
 
+"Action cancelled by user"
+type CBActionCancelledEvent implements CBClientEvent @since(version: "26.0.2") {
+    id: CBClientEventId!
+    topicId: CBEventTopic
+    actionId: String!
+}
+
 "Async task info status event"
 type WSAsyncTaskInfo @since(version: "24.3.1") {
     id: CBServerEventId!
@@ -167,6 +175,7 @@ type WSOpenUrlEvent implements CBServerEvent @since(version: "25.3.1") {
     topicId: CBEventTopic!
     timestamp: Int!
     url: String!
+    actionId: String!
 }
 
 extend type Query {
