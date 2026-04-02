@@ -37,6 +37,7 @@ export * from './DatabaseDataModel/Actions/IDatabaseValueHolder.js';
 export * from './DatabaseDataModel/Actions/Grid/GridEditAction.js';
 export * from './DatabaseDataModel/Actions/Grid/GridViewAction.js';
 export * from './DatabaseDataModel/Actions/Grid/IGridDataKey.js';
+export * from './DatabaseDataModel/Actions/Grid/IRestoreViewState.js';
 export * from './DatabaseDataModel/Actions/Grid/GridSelectAction.js';
 export * from './DatabaseDataModel/Actions/Grid/GridHistoryAction.js';
 export * from './DatabaseDataModel/Actions/Grid/GridHistoryTypes.js';
@@ -49,6 +50,8 @@ export * from './DatabaseDataModel/Actions/ResultSet/ResultSetDataContentAction.
 export * from './DatabaseDataModel/Actions/DatabaseDataResultAction.js';
 export * from './DatabaseDataModel/Actions/DatabaseEditAction.js';
 export * from './DatabaseDataModel/Actions/General/DatabaseMetadataAction.js';
+export * from './DatabaseDataModel/Actions/General/DatabasePersistedStateAction.js';
+export * from './DatabaseDataModel/Actions/IDatabasePersistedStateAction.js';
 export * from './DatabaseDataModel/Actions/DatabaseSelectAction.js';
 export * from './DatabaseDataModel/Actions/IDatabaseDataCacheAction.js';
 export * from './DatabaseDataModel/Actions/IDatabaseDataViewAction.js';

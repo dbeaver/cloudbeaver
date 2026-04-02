@@ -21,10 +21,7 @@ import {
   ObjectViewerTabService,
 } from '@cloudbeaver/plugin-object-viewer';
 
-import type { ContainerDataSource } from './ContainerDataSource.js';
-import type { IDatabaseDataModel } from './DatabaseDataModel/IDatabaseDataModel.js';
 import type { IDataViewerPageState } from './IDataViewerPageState.js';
-import { buildPersistedState } from './DataViewerTableState/buildPersistedState.js';
 import { TableViewerStorageService } from './TableViewer/TableViewerStorageService.js';
 
 const DataViewerTab = importLazyComponent(() => import('./DataViewerPage/DataViewerTab.js').then(module => module.DataViewerTab));
@@ -60,7 +57,7 @@ export class DataViewerTabService {
       getTabComponent: () => DataViewerTab,
       getPanelComponent: () => DataViewerPanel,
       onRestore: this.handleTabRestore.bind(this),
-      onUnload: this.handleTabUnload.bind(this),
+      onUnload: this.handleTabClose.bind(this),
       canClose: this.handleTabCanClose.bind(this),
       onClose: this.handleTabClose.bind(this),
     });
@@ -96,7 +93,6 @@ export class DataViewerTabService {
           return;
         }
       } else if (isObjectViewerTab(tab) && tab.handlerState.tableId) {
-        this.saveTableState(tab);
         await this.disposeTableModel(tab.handlerState.tableId);
       }
     }
@@ -140,33 +136,9 @@ export class DataViewerTabService {
     return true;
   }
 
-  private async handleTabUnload(tab: ITab<IObjectViewerTabState>) {
-    this.saveTableState(tab);
-
-    if (tab.handlerState.tableId) {
-      await this.disposeTableModel(tab.handlerState.tableId);
-    }
-  }
-
   private async handleTabClose(tab: ITab<IObjectViewerTabState>) {
     if (tab.handlerState.tableId) {
       await this.disposeTableModel(tab.handlerState.tableId);
-    }
-  }
-
-  private saveTableState(tab: ITab<IObjectViewerTabState>): void {
-    if (!tab.handlerState.tableId) {
-      return;
-    }
-
-    const model = this.tableViewerStorageService.get<IDatabaseDataModel<ContainerDataSource>>(tab.handlerState.tableId);
-
-    if (model) {
-      const pageState = this.page.getState(tab);
-
-      if (pageState) {
-        pageState.persistedState = buildPersistedState(model) ?? undefined;
-      }
     }
   }
 

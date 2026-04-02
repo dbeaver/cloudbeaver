@@ -6,9 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-export interface IDataViewerPageState {
-  resultIndex: number;
-  presentationId: string;
-  valuePresentationId: string | null;
-  persistedState?: Record<string, unknown>;
+export interface IRestoreViewState {
+  pinnedColumnNames: string[];
+  columnOrderNames?: string[];
 }

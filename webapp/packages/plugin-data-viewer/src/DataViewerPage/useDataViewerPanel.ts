@@ -16,13 +16,14 @@ import type { ITab } from '@cloudbeaver/plugin-navigation-tabs';
 import type { IObjectViewerTabState } from '@cloudbeaver/plugin-object-viewer';
 
 import { ContainerDataSource } from '../ContainerDataSource.js';
+import { DatabasePersistedStateAction } from '../DatabaseDataModel/Actions/General/DatabasePersistedStateAction.js';
 import { GridViewAction } from '../DatabaseDataModel/Actions/Grid/GridViewAction.js';
+import { IDatabasePersistedStateAction } from '../DatabaseDataModel/Actions/IDatabasePersistedStateAction.js';
 import { IDatabaseDataViewAction } from '../DatabaseDataModel/Actions/IDatabaseDataViewAction.js';
 import { type IDatabaseDataModel } from '../DatabaseDataModel/IDatabaseDataModel.js';
 import { DataPresentationService } from '../DataPresentationService.js';
 import { DataViewerDataChangeConfirmationService } from '../DataViewerDataChangeConfirmationService.js';
 import { DataViewerTableService } from '../DataViewerTableService.js';
-import { buildPersistedState } from '../DataViewerTableState/buildPersistedState.js';
 import { validatePersistedState } from '../DataViewerTableState/validatePersistedState.js';
 import { DataViewerTabService } from '../DataViewerTabService.js';
 import { TableViewerStorageService } from '../TableViewer/TableViewerStorageService.js';
@@ -118,75 +119,45 @@ export function useDataViewerPanel(tab: ITab<IObjectViewerTabState>) {
     }
 
     const pageState = dataViewerTabService.page.getState(tab);
-    const persistedState = pageState?.persistedState;
-    const hasViewState =
-      persistedState && validatePersistedState(persistedState) && (persistedState.pinnedColumns.length > 0 || persistedState.columnOrder?.length);
-
-    let viewStateRestored = false;
-
-    const cancelViewRestore = hasViewState
-      ? reaction(
-          () => dbModel.source.results.length > 0,
-          hasResults => {
-            if (!hasResults || viewStateRestored) {
-              return;
-            }
-
-            viewStateRestored = true;
-
-            try {
-              const viewAction = dbModel.source.tryGetAction(0, IDatabaseDataViewAction, GridViewAction);
-
-              if (viewAction) {
-                viewAction.restoreViewState(persistedState.pinnedColumns, persistedState.columnOrder);
-              }
-            } catch (exception: any) {
-              console.warn('[useDataViewerPanel] Failed to restore view state', exception);
-            }
-          },
-          { fireImmediately: true },
-        )
-      : undefined;
 
     const disposer = reaction(
-      () => {
-        const options = dbModel.source.options;
-
-        if (!options) {
-          return null;
-        }
-
-        const viewAction = dbModel.source.tryGetAction(0, IDatabaseDataViewAction, GridViewAction);
-
-        return {
-          constraints: options.constraints,
-          whereFilter: options.whereFilter,
-          pinnedColumns: viewAction ? Array.from(viewAction.pinnedColumns) : [],
-          columnKeys: viewAction?.columnKeys.map(k => k.index) ?? [],
-        };
-      },
-      current => {
-        if (!current) {
+      () => dbModel.source.results.length > 0,
+      hasResults => {
+        if (!hasResults) {
           return;
         }
 
-        try {
-          const currentPageState = dataViewerTabService.page.getState(tab);
+        disposer();
 
-          if (currentPageState) {
-            currentPageState.persistedState = buildPersistedState(dbModel) ?? undefined;
+        try {
+          const persistedAction = dbModel.source.tryGetAction(0, IDatabasePersistedStateAction, DatabasePersistedStateAction);
+
+          if (persistedAction && pageState) {
+            if (!pageState.persistedState) {
+              pageState.persistedState = {};
+            }
+
+            persistedAction.setStore(pageState.persistedState);
+
+            const persistedState = pageState.persistedState;
+
+            if (persistedState && validatePersistedState(persistedState)) {
+              const viewAction = dbModel.source.tryGetAction(0, IDatabaseDataViewAction, GridViewAction);
+
+              viewAction?.restoreViewState({
+                pinnedColumnNames: persistedState.pinnedColumns,
+                columnOrderNames: persistedState.columnOrder,
+              });
+            }
           }
         } catch (exception: any) {
-          console.warn('[useDataViewerPanel] Auto-save failed', exception);
+          console.warn('[useDataViewerPanel] Failed to initialize persisted state', exception);
         }
       },
-      { delay: 1000, fireImmediately: false },
+      { fireImmediately: true },
     );
 
-    return () => {
-      cancelViewRestore?.();
-      disposer();
-    };
+    return () => disposer();
   }, [tableId, tableViewerStorageService, dataViewerTabService, tab]);
 
   return model;

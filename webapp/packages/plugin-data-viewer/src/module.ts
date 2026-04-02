@@ -54,6 +54,8 @@ import { ResultSetCacheAction } from './DatabaseDataModel/Actions/ResultSet/Resu
 import { IDatabaseDataResult } from './DatabaseDataModel/IDatabaseDataResult.js';
 import { IDatabaseDataConstraintAction } from './DatabaseDataModel/Actions/IDatabaseDataConstraintAction.js';
 import { DatabaseDataConstraintAction } from './DatabaseDataModel/Actions/DatabaseDataConstraintAction.js';
+import { IDatabasePersistedStateAction } from './DatabaseDataModel/Actions/IDatabasePersistedStateAction.js';
+import { DatabasePersistedStateAction } from './DatabaseDataModel/Actions/General/DatabasePersistedStateAction.js';
 
 export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-data-viewer',
@@ -95,6 +97,7 @@ export default ModuleRegistry.add({
 
       .addTransient(IDatabaseDataResult, external())
       .addScoped(IDatabaseDataMetadataAction, DatabaseMetadataAction)
+      .addScoped(IDatabasePersistedStateAction, DatabasePersistedStateAction)
       .addScoped(DatabaseRefreshAction)
 
       .addScoped(DocumentDataAction)

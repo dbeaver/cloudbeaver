@@ -43,6 +43,10 @@ export class ResultSetDataAction extends GridDataResultAction<
     return this.getColumn(key)?.name;
   }
 
+  override getColumnNameByPosition(attributePosition: number): string | undefined {
+    return this.columns.find(c => c.position === attributePosition)?.name;
+  }
+
   insertRow(row: IGridRowKey, value: IResultSetValue[], shift = 0): IGridRowKey | undefined {
     if (this.result.data?.rowsWithMetaData) {
       const index = row.index + shift;

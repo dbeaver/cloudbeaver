@@ -7,6 +7,7 @@
  */
 import { action, computed, makeObservable, observable, ObservableSet } from 'mobx';
 
+import { isDefined } from '@dbeaver/js-helpers';
 import { DatabaseDataAction } from '../../DatabaseDataAction.js';
 import { IDatabaseDataSource } from '../../IDatabaseDataSource.js';
 import type { IGridColumnKey, IGridDataKey, IGridRowKey } from './IGridDataKey.js';
@@ -21,6 +22,9 @@ import type { IDatabaseDataViewAction } from '../IDatabaseDataViewAction.js';
 import { IDatabaseDataResultAction } from '../IDatabaseDataResultAction.js';
 import { IDatabaseDataEditAction } from '../IDatabaseDataEditAction.js';
 import type { IDatabaseValueHolder } from '../IDatabaseValueHolder.js';
+import { IDatabasePersistedStateAction, PERSISTED_STATE_KEY } from '../IDatabasePersistedStateAction.js';
+import { DatabasePersistedStateAction } from '../General/DatabasePersistedStateAction.js';
+import type { IRestoreViewState } from './IRestoreViewState.js';
 
 @injectable(() => [IDatabaseDataSource, IDatabaseDataResult, IDatabaseDataResultAction, IDatabaseDataEditAction])
 export class GridViewAction<
@@ -112,6 +116,7 @@ export class GridViewAction<
 
     this.columnsOrder.splice(this.columnsOrder.indexOf(columnIndex), 1);
     this.columnsOrder.splice(index, 0, columnIndex);
+    this.persistViewState();
   }
 
   columnIndex(key: IGridColumnKey): number {
@@ -184,6 +189,7 @@ export class GridViewAction<
       const serializedKey = GridDataKeysUtils.serialize(key);
       this.pinnedColumns.add(serializedKey);
     }
+    this.persistViewState();
   }
 
   unpinColumns(keys: IGridColumnKey[]): void {
@@ -191,10 +197,12 @@ export class GridViewAction<
       const serializedKey = GridDataKeysUtils.serialize(key);
       this.pinnedColumns.delete(serializedKey);
     }
+    this.persistViewState();
   }
 
   unpinAllColumns(): void {
     this.pinnedColumns.clear();
+    this.persistViewState();
   }
 
   isColumnPinned(key: IGridColumnKey): boolean {
@@ -210,7 +218,7 @@ export class GridViewAction<
     return this.columnKeys
       .filter(key => this.isColumnPinned(key))
       .map(key => this.getColumnName(key))
-      .filter((name): name is string => name !== undefined);
+      .filter(isDefined);
   }
 
   protected mapRow(row: IGridRowKey): TCell[] {
@@ -241,7 +249,38 @@ export class GridViewAction<
     }
   }
 
-  restoreViewState(pinnedColumnNames: string[], columnOrderNames?: string[]): void {
+  private persistViewState(): void {
+    const ps = this.source.tryGetAction(this.result, IDatabasePersistedStateAction, DatabasePersistedStateAction);
+
+    if (!ps) {
+      return;
+    }
+
+    ps.set(PERSISTED_STATE_KEY.pinnedColumns, this.getPinnedColumnNames());
+
+    const keys = this.columnKeys;
+    let isCustomOrder = false;
+    const columnNames: string[] = [];
+
+    for (let i = 0; i < keys.length; i++) {
+      const key = keys[i]!;
+      const name = this.getColumnName(key);
+
+      if (name) {
+        columnNames.push(name);
+      }
+
+      if (key.index !== i) {
+        isCustomOrder = true;
+      }
+    }
+
+    ps.set(PERSISTED_STATE_KEY.columnOrder, isCustomOrder ? columnNames : []);
+  }
+
+  restoreViewState(state: IRestoreViewState): void {
+    const { pinnedColumnNames, columnOrderNames } = state;
+
     if (columnOrderNames?.length) {
       const nameToIndex = new Map<string, number>();
 
@@ -277,9 +316,7 @@ export class GridViewAction<
     }
 
     if (pinnedColumnNames.length > 0) {
-      const keys = pinnedColumnNames
-        .map(name => this.columnKeys.find(k => this.getColumnName(k) === name))
-        .filter((k): k is IGridColumnKey => k !== undefined);
+      const keys = pinnedColumnNames.map(name => this.columnKeys.find(k => this.getColumnName(k) === name)).filter(isDefined);
 
       if (keys.length > 0) {
         this.pinColumns(keys);

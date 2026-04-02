@@ -17,6 +17,9 @@ import { EOrder, type Order } from '../Order.js';
 import type { IDatabaseDataConstraintAction } from './IDatabaseDataConstraintAction.js';
 import { injectable } from '@cloudbeaver/core-di';
 import { IDatabaseDataResult } from '../IDatabaseDataResult.js';
+import { IDatabasePersistedStateAction, PERSISTED_STATE_KEY } from './IDatabasePersistedStateAction.js';
+import { DatabasePersistedStateAction } from './General/DatabasePersistedStateAction.js';
+import type { IPersistedConstraint } from '../../DataViewerTableState/IDataViewerPersistedState.js';
 
 export const IS_NULL_ID = 'IS_NULL';
 export const IS_NOT_NULL_ID = 'IS_NOT_NULL';
@@ -92,6 +95,7 @@ export class DatabaseDataConstraintAction
     }
 
     this.source.options.constraints = [];
+    this.persistConstraints();
   }
 
   deleteFilter(attributePosition: number): void {
@@ -99,6 +103,7 @@ export class DatabaseDataConstraintAction
     if (constraint) {
       deleteLogicalOperationFromConstraint(constraint);
       this.deleteEmptyConstraint(attributePosition);
+      this.persistConstraints();
     }
   }
 
@@ -117,6 +122,7 @@ export class DatabaseDataConstraintAction
     }
 
     this.source.options.constraints = newConstraints;
+    this.persistConstraints();
   }
 
   deleteOrders(): void {
@@ -134,6 +140,7 @@ export class DatabaseDataConstraintAction
     }
 
     this.source.options.constraints = newConstraints;
+    this.persistConstraints();
   }
 
   deleteOrder(attributePosition: number): void {
@@ -141,6 +148,7 @@ export class DatabaseDataConstraintAction
     if (constraint) {
       deleteOrderFromConstraint(constraint);
       this.deleteEmptyConstraint(attributePosition);
+      this.persistConstraints();
     }
   }
 
@@ -168,6 +176,7 @@ export class DatabaseDataConstraintAction
     }
 
     this.source.options.whereFilter = value;
+    this.persistConstraints();
   }
 
   resetWhereFilter() {
@@ -189,6 +198,7 @@ export class DatabaseDataConstraintAction
       } else if (currentConstraint.value !== undefined) {
         delete currentConstraint.value;
       }
+      this.persistConstraints();
       return;
     }
 
@@ -203,6 +213,7 @@ export class DatabaseDataConstraintAction
     }
 
     this.source.options.constraints.push(constraint);
+    this.persistConstraints();
   }
 
   setOrder(attributePosition: number, order: Order, multiple: boolean): void {
@@ -227,6 +238,7 @@ export class DatabaseDataConstraintAction
           orderAsc: order === EOrder.asc,
         });
       }
+      this.persistConstraints();
       return;
     }
 
@@ -242,6 +254,7 @@ export class DatabaseDataConstraintAction
         this.deleteConstraint(currentConstraint.attributePosition!);
       }
     }
+    this.persistConstraints();
   }
 
   getOrder(attributePosition: number): Order {
@@ -263,7 +276,42 @@ export class DatabaseDataConstraintAction
   }
 
   private getColumnNameByPosition(attributePosition: number): string | undefined {
-    return this.result.data?.columns?.find(c => c.position === attributePosition)?.name ?? undefined;
+    return this.result.data?.columns?.find(c => c.position === attributePosition)?.name;
+  }
+
+  private persistConstraints(): void {
+    const ps = this.source.tryGetAction(this.result, IDatabasePersistedStateAction, DatabasePersistedStateAction);
+
+    if (!ps || !this.source.options) {
+      return;
+    }
+
+    const constraints: IPersistedConstraint[] = this.source.options.constraints
+      .map(c => {
+        const name = c.attributeName ?? this.getColumnNameByPosition(c.attributePosition!);
+
+        if (!name) {
+          return null;
+        }
+
+        const persisted: IPersistedConstraint = { attributeName: name };
+
+        if (isFilterConstraint(c)) {
+          persisted.operator = c.operator;
+          persisted.value = c.value;
+        }
+
+        if (isOrderConstraint(c)) {
+          persisted.orderAsc = c.orderAsc;
+          persisted.orderPosition = c.orderPosition;
+        }
+
+        return persisted;
+      })
+      .filter((c): c is IPersistedConstraint => c !== null);
+
+    ps.set(PERSISTED_STATE_KEY.constraints, constraints);
+    ps.set(PERSISTED_STATE_KEY.whereFilter, this.source.options.whereFilter || '');
   }
 }
 
