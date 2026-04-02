@@ -30,6 +30,7 @@
   "dependencies": {
     "@cloudbeaver/core-browser": "workspace:*",
     "@cloudbeaver/plugin-sso": "workspace:*",
+    "@cloudbeaver/plugin-tailwindcss-theme": "workspace:*",
     "@cloudbeaver/product-base": "workspace:*",
     "@cloudbeaver/product-default-impl": "workspace:*",
     "react": "^19",
