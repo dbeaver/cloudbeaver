@@ -27,7 +27,6 @@ import org.jkiss.dbeaver.model.auth.SMAuthInfo;
 import org.jkiss.dbeaver.model.auth.SMAuthSpace;
 import org.jkiss.dbeaver.model.auth.SMSessionContext;
 import org.jkiss.dbeaver.model.auth.impl.AbstractSessionPersistent;
-import org.jkiss.dbeaver.model.impl.auth.SessionContextImpl;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.rm.RMProjectInfo;
 import org.jkiss.dbeaver.model.security.user.SMTeam;
@@ -152,10 +151,8 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
     }
 
     protected synchronized void clearSessionContext() {
-        SessionContextImpl authContext = this.workspace.getAuthContext();
-        authContext.removeSession(this);
-        authContext.clearContext();
-        authContext.addSession(this);
+        this.workspace.getAuthContext().clearContext();
+        this.workspace.getAuthContext().addSession(this);
     }
 
     @NotNull
