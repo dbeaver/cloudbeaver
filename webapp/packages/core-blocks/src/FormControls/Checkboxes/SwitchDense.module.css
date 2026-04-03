@@ -5,14 +5,39 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-.switchBody {
-  composes: theme-switch_dense from global;
-}
-.fieldLabel {
-  composes: theme-typography--body2 from global;
+@layer components {
+  .switchBody {
+    & .switchControl {
+      width: 24px;
+      height: 16px;
+    }
+
+    & .switchControlTrack {
+      height: 10px;
+      border-radius: 5px;
+    }
+
+    & .switchControlUnderlay {
+      margin-left: -3px;
+    }
+
+    & .switchControlThumb {
+      width: 14px;
+      height: 14px;
+      border-width: 7px;
+    }
+
+    & .checked .switchControlUnderlay {
+      margin-left: 13px;
+    }
+  }
+
+  /* overrides bold label style from SwitchDense.module.css because of specificity */
+  .switchBody .fieldLabel {
+    font-weight: initial;
+  }
 }
 
-/* overrides bold label style from SwitchDense.module.css because of specificity */
-.switchBody .fieldLabel {
-  font-weight: initial;
+.fieldLabel {
+  composes: theme-typography--body2 from global;
 }
