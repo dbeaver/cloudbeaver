@@ -7,7 +7,7 @@
  */
 import { useEffect } from 'react';
 
-import { reaction } from 'mobx';
+import { when } from 'mobx';
 
 import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
@@ -120,15 +120,9 @@ export function useDataViewerPanel(tab: ITab<IObjectViewerTabState>) {
 
     const pageState = dataViewerTabService.page.getState(tab);
 
-    const disposer = reaction(
+    const disposer = when(
       () => dbModel.source.results.length > 0,
-      hasResults => {
-        if (!hasResults) {
-          return;
-        }
-
-        disposer();
-
+      () => {
         try {
           const persistedAction = dbModel.source.tryGetAction(0, IDatabasePersistedStateAction, DatabasePersistedStateAction);
 
@@ -154,7 +148,6 @@ export function useDataViewerPanel(tab: ITab<IObjectViewerTabState>) {
           console.warn('[useDataViewerPanel] Failed to initialize persisted state', exception);
         }
       },
-      { fireImmediately: true },
     );
 
     return () => disposer();
