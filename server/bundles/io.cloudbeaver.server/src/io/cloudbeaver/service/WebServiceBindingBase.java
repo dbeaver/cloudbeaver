@@ -129,12 +129,10 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
         if (env.getGraphQlContext().getBoolean(CloudbeaverCliConstants.CLI_MODE)) {
             return getSessionFromContextOrThrow(env);
         }
-        //fixme как то получше написать
-        WebSession session = env.getGraphQlContext().get(WebSession.class.getName());
-        if (session != null) {
-            // retrieved session by token
-            return session;
-        }
+//        WebSession session = env.getGraphQlContext().get(WebSession.class.getName());
+//        if (session != null) {
+//            return session;
+//        }
         return WebAppUtils.getWebApplication().getSessionManager().getWebSession(
             GraphQLEndpoint.getServletRequestOrThrow(env), getServletResponse(env), errorOnNotFound);
     }
