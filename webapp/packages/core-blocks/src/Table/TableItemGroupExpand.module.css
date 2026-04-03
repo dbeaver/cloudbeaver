@@ -20,7 +20,7 @@
   cursor: pointer;
   opacity: 0.5;
   transform: rotate(-90deg);
-  transition: transform 0.15s ease-in-out;
+  transition: transform var(--duration-medium) var(--ease-smooth);
 
   &.expanded {
     transform: rotate(0deg);

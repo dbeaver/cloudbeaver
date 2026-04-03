@@ -20,26 +20,25 @@ interface AutocompletionProps {
   onSelect?: (proposal: InputAutocompleteProposal) => void;
 }
 
-export const InputAutocompletionMenu = observer(forwardRef<HTMLDivElement, AutocompletionProps>(function InputAutocompletionMenu({
-  proposals,
-  onSelect,
-}, ref) {
-  const styles = useS(BaseDropdownStyles);
+export const InputAutocompletionMenu = observer(
+  forwardRef<HTMLDivElement, AutocompletionProps>(function InputAutocompletionMenu({ proposals, onSelect }, ref) {
+    const styles = useS(BaseDropdownStyles);
 
-  return (
-    <Popover.PopoverContent ref={ref} className={s(styles, { menu: true })} gutter={4} modal={false} autoFocusOnShow={false} unmountOnHide>
-      <Composite>
-        {proposals.map(proposal => (
-          <CompositeItem key={proposal.title} className={s(styles, { menuItem: true }, 'tw:w-full')} onClick={() => onSelect?.(proposal)}>
-            {proposal.icon && (
-              <div className={s(styles, { itemIcon: true })}>
-                <IconOrImage icon={proposal.icon} className={s(styles, { iconOrImage: true })} />
-              </div>
-            )}
-            <Text truncate>{proposal.displayString}</Text>
-          </CompositeItem>
-        ))}
-      </Composite>
-    </Popover.PopoverContent>
-  );
-}));
+    return (
+      <Popover.PopoverContent ref={ref} className={s(styles, { menu: true })} gutter={4} modal={false} autoFocusOnShow={false} unmountOnHide>
+        <Composite>
+          {proposals.map(proposal => (
+            <CompositeItem key={proposal.title} className={s(styles, { menuItem: true }, 'tw:w-full')} onClick={() => onSelect?.(proposal)}>
+              {proposal.icon && (
+                <div className={s(styles, { itemIcon: true })}>
+                  <IconOrImage icon={proposal.icon} className={s(styles, { iconOrImage: true })} />
+                </div>
+              )}
+              <Text truncate>{proposal.displayString}</Text>
+            </CompositeItem>
+          ))}
+        </Composite>
+      </Popover.PopoverContent>
+    );
+  }),
+);

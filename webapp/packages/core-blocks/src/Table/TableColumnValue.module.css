@@ -5,12 +5,13 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+
 .cell {
   position: relative;
   box-sizing: border-box;
   height: 28px;
   padding: 0 16px;
-  transition: padding ease-in-out 0.24s;
+  transition: padding var(--duration-medium) var(--ease-smooth);
 
   &.nowrap,
   &.ellipsis {

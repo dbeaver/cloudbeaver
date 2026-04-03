@@ -1,0 +1,53 @@
+@theme {
+  /* Font families */
+  --font-roboto: Roboto, sans-serif;
+  --font-roboto-mono: RobotoMono, sans-serif;
+
+  /* Headline 6 – 1.25rem (20px) */
+  --text-headline6: 1.25rem;
+  --leading-headline6: 2rem;
+  --font-weight-headline6: 500;
+  --tracking-headline6: 0.0125em;
+
+  /* Subtitle 1 – 1rem (16px) */
+  --text-subtitle1: 1rem;
+  --leading-subtitle1: 1.75rem;
+  --font-weight-subtitle1: 400;
+  --tracking-subtitle1: 0.009375em;
+
+  /* Subtitle 2 – 0.875rem (14px) */
+  --text-subtitle2: 0.875rem;
+  --leading-subtitle2: 1.375rem;
+  --font-weight-subtitle2: 500;
+  --tracking-subtitle2: 0.0071428571em;
+
+  /* Body 1 – 1rem (16px) */
+  --text-body1: 1rem;
+  --leading-body1: 1.5rem;
+  --font-weight-body1: 400;
+  --tracking-body1: 0.03125em;
+
+  /* Body 2 – 0.875rem (14px) */
+  --text-body2: 0.875rem;
+  --leading-body2: 1.25rem;
+  --font-weight-body2: 400;
+  --tracking-body2: 0.0178571429em;
+
+  /* Caption – 0.75rem (12px) */
+  --text-caption: 0.75rem;
+  --leading-caption: 1.25rem;
+  --font-weight-caption: 400;
+  --tracking-caption: 0.0333333333em;
+
+  /* Button – 0.875rem (14px) */
+  --text-button: 0.875rem;
+  --leading-button: 2.25rem;
+  --font-weight-button: 500;
+  --tracking-button: 0.0892857143em;
+
+  /* Overline – 0.75rem (12px) */
+  --text-overline: 0.75rem;
+  --leading-overline: 2rem;
+  --font-weight-overline: 500;
+  --tracking-overline: 0.1666666667em;
+}

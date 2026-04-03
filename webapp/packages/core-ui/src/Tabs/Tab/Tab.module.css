@@ -6,10 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-.placeholder {
-  composes: placeholder from global;
-}
-
 .tab {
   position: relative;
   font-weight: normal;

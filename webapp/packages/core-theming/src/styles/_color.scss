@@ -6,90 +6,89 @@
  * you may not use this file except in compliance with the License.
  */
 
-@mixin colors($query: mdc-feature-all()) {
-  $feat-color: mdc-feature-create-target($query, color);
+@mixin colors() {
+  // Export all theme colors as CSS variables
+  --theme-primary: #{$mdc-theme-primary};
+  --theme-on-primary: #{$mdc-theme-on-primary};
+  --theme-secondary: #{$mdc-theme-secondary};
+  --theme-on-secondary: #{$mdc-theme-on-secondary};
+  --theme-error: #{$mdc-theme-error};
+  --theme-surface: #{$mdc-theme-surface};
+  --theme-on-surface: #{$mdc-theme-on-surface};
+  --theme-background: #{$mdc-theme-background};
+  --theme-sub-secondary: #{$mdc-theme-sub-secondary};
+  --theme-on-sub-secondary: #{$mdc-theme-on-sub-secondary};
+  --theme-positive: #{$color-positive};
+  --theme-on-positive: #{$color-on-positive};
+  --theme-negative: #{$color-negative};
+  --theme-status: #{$color-status};
+  --theme-link-color: #{$link-color};
+  --theme-input-color: #{$input-color};
+  --theme-input-color-disabled: #{$input-color-disabled};
+  --theme-input-color-readonly: #{$input-color-readonly};
+  --theme-input-color-placeholder: #{$input-color-placeholder};
+  --theme-input-border: #{$input-border};
+  --theme-input-border-readonly: #{$input-border-readonly};
+  --theme-input-border-disabled: #{$input-border-disabled};
+  --theme-input-background: #{$input-background};
+  --theme-input-background-disabled: #{$input-background-disabled};
+  --theme-input-background-readonly: #{$input-background-readonly};
+  --theme-switch-thumb: #{lighten($mdc-theme-surface, 5%)};
 
-  /*:root {*/
-  @include mdc-feature-targets($feat-color) {
-    @each $style in map-keys($mdc-theme-property-values) {
-      --theme-#{$style}: #{map-get($mdc-theme-property-values, $style)};
-    }
+  // Text color variants derived from $mdc-theme-text-colors
+  // Map keys "light"/"dark" describe the ink color, not the background.
+  // "on-light" (on light background) needs dark ink, "on-dark" needs light ink.
+  $light-ink-colors: map-get($mdc-theme-text-colors, light);
+  $dark-ink-colors: map-get($mdc-theme-text-colors, dark);
+
+  @each $variant in (primary, secondary, sub-secondary, hint, disabled, icon, negative) {
+    --theme-text-#{$variant}-on-light: #{map-get($dark-ink-colors, $variant)};
+    --theme-text-#{$variant}-on-dark: #{map-get($light-ink-colors, $variant)};
   }
-  /*}*/
 
-  @each $style in map-keys($mdc-theme-property-values) {
-    @if $style != 'background' and $style != 'surface' and $style != 'on-surface' {
-      &.theme-text-#{$style},
-      .theme-text-#{$style} {
-        @include theme-ripple-color($query, $style);
+  // Theme color utility classes
+  @each $color-name in (primary, on-primary, secondary, on-secondary, error, on-error, surface, on-surface, background, positive, negative, status) {
+    &.theme-text-#{$color-name},
+    .theme-text-#{$color-name} {
+      color: var(--theme-#{$color-name});
 
-        @include mdc-feature-targets($feat-color) {
-          @include mdc-theme-prop(color, $style, true);
-        }
+      svg,
+      & > svg {
+        fill: var(--theme-#{$color-name});
+      }
+    }
 
-        svg,
-        & > svg {
-          @include mdc-feature-targets($feat-color) {
-            @include mdc-theme-prop(fill, $style, true);
-          }
-        }
-      }
-      &.theme-border-color-#{$style},
-      .theme-border-color-#{$style} {
-        @include mdc-feature-targets($feat-color) {
-          @include mdc-theme-prop(border-color, $style, true);
-        }
-      }
-      &.theme-fill-#{$style},
-      .theme-fill-#{$style} {
-        @include mdc-feature-targets($feat-color) {
-          @include mdc-theme-prop(fill, $style, true);
-        }
-      }
-    } @else {
-      &.theme-text-#{$style},
-      .theme-text-#{$style} {
-        @include theme-ripple-color($query, $style);
+    &.theme-border-color-#{$color-name},
+    .theme-border-color-#{$color-name} {
+      border-color: var(--theme-#{$color-name}) !important;
+    }
 
-        @include mdc-feature-targets($feat-color) {
-          @include mdc-theme-prop(color, $style);
-        }
-
-        svg,
-        & > svg {
-          @include mdc-feature-targets($feat-color) {
-            @include mdc-theme-prop(fill, $style);
-          }
-        }
-      }
-      &.theme-background-#{$style},
-      .theme-background-#{$style} {
-        @include mdc-feature-targets($feat-color) {
-          @include mdc-theme-prop(background-color, $style);
-        }
-      }
-      &.theme-border-color-#{$style},
-      .theme-border-color-#{$style} {
-        @include mdc-feature-targets($feat-color) {
-          @include mdc-theme-prop(border-color, $style, true);
-        }
-      }
-      &.theme-fill-#{$style},
-      .theme-fill-#{$style} {
-        @include mdc-feature-targets($feat-color) {
-          @include mdc-theme-prop(fill, $style);
-        }
-      }
+    &.theme-fill-#{$color-name},
+    .theme-fill-#{$color-name} {
+      fill: var(--theme-#{$color-name});
     }
   }
 
-  // CSS rules for using primary and secondary (plus light/dark variants) as background colors.
-  @each $style in ('primary', 'secondary', 'positive') {
-    &.theme-background-#{$style},
-    .theme-background-#{$style} {
-      @include mdc-feature-targets($feat-color) {
-        @include mdc-theme-prop(background-color, $style, true);
+  // Text variant utility classes (text-primary-on-light, text-hint-on-light, etc.)
+  @each $variant in (primary, secondary, sub-secondary, hint, disabled, icon, negative) {
+    @each $tone in (light, dark) {
+      &.theme-text-text-#{$variant}-on-#{$tone},
+      .theme-text-text-#{$variant}-on-#{$tone} {
+        color: var(--theme-text-#{$variant}-on-#{$tone});
+
+        svg,
+        & > svg {
+          fill: var(--theme-text-#{$variant}-on-#{$tone});
+        }
       }
+    }
+  }
+
+  // Background color classes
+  @each $color-name in (primary, secondary, surface, background, positive) {
+    &.theme-background-#{$color-name},
+    .theme-background-#{$color-name} {
+      background-color: var(--theme-#{$color-name});
     }
   }
 }
