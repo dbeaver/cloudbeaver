@@ -1,0 +1,86 @@
+@import './typography.css';
+
+/* Typography utilities – usable via @apply tw:typography-body1 etc. */
+
+@utility typography-base {
+  @apply tw:font-roboto tw:antialiased;
+}
+
+/* Headline 6 - 1.25rem (20px) */
+@utility typography-headline6 {
+  @apply tw:font-roboto tw:antialiased tw:text-headline6 tw:leading-headline6 tw:font-headline6 tw:tracking-headline6 tw:[text-decoration:inherit] tw:[text-transform:inherit];
+}
+
+/* Subtitle 1 - 1rem (16px) */
+@utility typography-subtitle1 {
+  @apply tw:font-roboto tw:antialiased tw:text-subtitle1 tw:leading-subtitle1 tw:font-subtitle1 tw:tracking-subtitle1 tw:[text-decoration:inherit] tw:[text-transform:inherit];
+}
+
+/* Subtitle 2 - 0.875rem (14px) */
+@utility typography-subtitle2 {
+  @apply tw:font-roboto tw:antialiased tw:text-subtitle2 tw:leading-subtitle2 tw:font-subtitle2 tw:tracking-subtitle2 tw:[text-decoration:inherit] tw:[text-transform:inherit];
+}
+
+/* Body 1 - 1rem (16px) */
+@utility typography-body1 {
+  @apply tw:font-roboto tw:antialiased tw:text-body1 tw:leading-body1 tw:font-body1 tw:tracking-body1 tw:[text-decoration:inherit] tw:[text-transform:inherit];
+}
+
+/* Body 2 - 0.875rem (14px) */
+@utility typography-body2 {
+  @apply tw:font-roboto tw:antialiased tw:text-body2 tw:leading-body2 tw:font-body2 tw:tracking-body2 tw:[text-decoration:inherit] tw:[text-transform:inherit];
+}
+
+/* Caption - 0.75rem (12px) */
+@utility typography-caption {
+  @apply tw:font-roboto tw:antialiased tw:text-caption tw:leading-caption tw:font-caption tw:tracking-caption tw:[text-decoration:inherit] tw:[text-transform:inherit];
+}
+
+/* Button - 0.875rem (14px) */
+@utility typography-button {
+  @apply tw:font-roboto tw:antialiased tw:text-button tw:leading-button tw:font-button tw:tracking-button tw:[text-decoration:inherit] tw:[text-transform:inherit];
+}
+
+/* Overline - 0.75rem (12px) */
+@utility typography-overline {
+  @apply tw:font-roboto tw:antialiased tw:text-overline tw:leading-overline tw:font-overline tw:tracking-overline tw:[text-decoration:inherit] tw:[text-transform:inherit];
+}
+
+/* Component class aliases – reuse the utilities above */
+@layer components {
+  .theme-typography {
+    @apply tw:font-roboto tw:antialiased;
+  }
+
+  .theme-typography--headline6 {
+    @apply tw:font-roboto tw:antialiased tw:text-headline6 tw:leading-headline6 tw:font-headline6 tw:tracking-headline6 tw:[text-decoration:inherit] tw:[text-transform:inherit];
+  }
+
+  .theme-typography--subtitle1 {
+    @apply tw:font-roboto tw:antialiased tw:text-subtitle1 tw:leading-subtitle1 tw:font-subtitle1 tw:tracking-subtitle1 tw:[text-decoration:inherit] tw:[text-transform:inherit];
+  }
+
+  .theme-typography--subtitle2 {
+    @apply tw:font-roboto tw:antialiased tw:text-subtitle2 tw:leading-subtitle2 tw:font-subtitle2 tw:tracking-subtitle2 tw:[text-decoration:inherit] tw:[text-transform:inherit];
+  }
+
+  .theme-typography--body1 {
+    @apply tw:font-roboto tw:antialiased tw:text-body1 tw:leading-body1 tw:font-body1 tw:tracking-body1 tw:[text-decoration:inherit] tw:[text-transform:inherit];
+  }
+
+  .theme-typography--body2 {
+    @apply tw:font-roboto tw:antialiased tw:text-body2 tw:leading-body2 tw:font-body2 tw:tracking-body2 tw:[text-decoration:inherit] tw:[text-transform:inherit];
+  }
+
+  .theme-typography--caption {
+    @apply tw:font-roboto tw:antialiased tw:text-caption tw:leading-caption tw:font-caption tw:tracking-caption tw:[text-decoration:inherit] tw:[text-transform:inherit];
+  }
+
+  .theme-typography--button {
+    @apply tw:font-roboto tw:antialiased tw:text-button tw:leading-button tw:font-button tw:tracking-button tw:[text-decoration:inherit] tw:[text-transform:inherit];
+  }
+
+  .theme-typography--overline {
+    @apply tw:font-roboto tw:antialiased tw:text-overline tw:leading-overline tw:font-overline tw:tracking-overline tw:[text-decoration:inherit] tw:[text-transform:inherit];
+  }
+}

@@ -179,6 +179,20 @@ public class    SQLQueryTranslatorTest extends CloudbeaverMockTest {
 
     }
 
+    @Test
+    public void createTableWithAscii() throws DBException {
+        var basicSql = "CREATE TABLE CB_TEST_TYPES (ASCII_COLUMN VARCHAR(128) ASCII NOT NULL);\n";
+
+        Map<SQLDialect, String> expectedSqlByDialect = new HashMap<>();
+        expectedSqlByDialect.put(new H2SQLDialect(), "CREATE TABLE CB_TEST_TYPES (ASCII_COLUMN VARCHAR (128) NOT NULL);\n");
+        expectedSqlByDialect.put(new PostgreDialect(), "CREATE TABLE CB_TEST_TYPES (ASCII_COLUMN VARCHAR (128) NOT NULL);\n");
+        expectedSqlByDialect.put(
+            new MySQLDialect(),
+            "CREATE TABLE CB_TEST_TYPES (ASCII_COLUMN VARCHAR (128) CHARACTER SET latin1 NOT NULL);"
+        );
+        translateAndValidateQueries(basicSql, expectedSqlByDialect);
+    }
+
     private static void translateAndValidateQueries(
         @NotNull String basicSql,
         @NotNull Map<SQLDialect, String> expectedSqlByDialect
@@ -203,7 +217,10 @@ public class    SQLQueryTranslatorTest extends CloudbeaverMockTest {
 
     private static String normalizeScript(String script) {
         // Unify for tests
-        return script.toLowerCase().replace(GeneralUtils.getDefaultLineSeparator(), "\n");
+        return script.toLowerCase()
+            .replaceAll("\\s", " ")
+            .replace(GeneralUtils.getDefaultLineSeparator(), "\n")
+            .trim();
     }
 
 }

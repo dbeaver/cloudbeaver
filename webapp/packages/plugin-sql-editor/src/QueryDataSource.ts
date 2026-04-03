@@ -30,6 +30,7 @@ import {
 } from '@cloudbeaver/core-sdk';
 import { isArraysEqual, uuid } from '@cloudbeaver/core-utils';
 import {
+  DatabaseDataFeature,
   DocumentEditAction,
   type IDatabaseDataOptions,
   type IDatabaseResultSet,
@@ -88,6 +89,7 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
       query: '',
     };
     this.currentQueryAsyncTask = null;
+    this.setFeature(DatabaseDataFeature.QueryResult);
 
     this.handleQueryParamsEvent = this.handleQueryParamsEvent.bind(this);
     this.queryParamsEventHandler = executorHandlerFilter(

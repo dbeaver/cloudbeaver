@@ -10,12 +10,16 @@
     --theme-add-status: #65974c;
     --theme-delete-status: #b55d68;
     --theme-edit-status: #a37d43;
+    --data-grid-dnd-drop-target-bg: #4f4f4f;
+    --data-grid-dnd-drop-target-border-color: #888888;
   }
 
   .theme-light {
     --theme-add-status: #c0f5a6;
     --theme-delete-status: #f48693;
     --theme-edit-status: #fbcc85;
+    --data-grid-dnd-drop-target-bg: #eeeeee;
+    --data-grid-dnd-drop-target-border-color: #808080;
   }
 
   .data-grid__container {
@@ -102,6 +106,40 @@
     & .rdg-cell-custom-editing {
       box-shadow: none;
       background-color: inherit;
+    }
+
+    & .rdg-cell:has(.rdg-cell-column-drop-left),
+    & .rdg-cell-column-drop-left:not(.rdg-cell .rdg-cell-column-drop-left),
+    & .rdg-cell:has(.rdg-cell-column-drop-right),
+    & .rdg-cell-column-drop-right:not(.rdg-cell .rdg-cell-column-drop-right) {
+      overflow: visible;
+      background-color: var(--data-grid-dnd-drop-target-bg);
+    }
+
+    & .rdg-cell:has(.rdg-cell-column-drop-left)::after,
+    & .rdg-cell-column-drop-left:not(.rdg-cell .rdg-cell-column-drop-left)::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: calc(100% + 1px);
+      width: 2px;
+      background-color: var(--data-grid-dnd-drop-target-border-color);
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    & .rdg-cell:has(.rdg-cell-column-drop-right)::after,
+    & .rdg-cell-column-drop-right:not(.rdg-cell .rdg-cell-column-drop-right)::after {
+      content: '';
+      position: absolute;
+      right: 0;
+      top: 0;
+      height: calc(100% + 1px);
+      width: 2px;
+      background-color: var(--data-grid-dnd-drop-target-border-color);
+      z-index: 0;
+      pointer-events: none;
     }
   }
 

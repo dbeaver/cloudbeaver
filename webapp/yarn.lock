@@ -1482,8 +1482,6 @@ __metadata:
     react-dom: "npm:^19"
     react-hotkeys-hook: "npm:5.2.3"
     react-minisearch: "npm:^7"
-    reakit: "npm:^1"
-    reakit-utils: "npm:^0"
     rimraf: "npm:^6"
     subscript: "npm:^9"
     tslib: "npm:^2"
@@ -1720,6 +1718,7 @@ __metadata:
     "@cloudbeaver/core-utils": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
     "@dbeaver/cli": "workspace:*"
+    "@dbeaver/js-helpers": "workspace:*"
     "@dbeaver/react-tests": "workspace:*"
     mobx: "npm:^6"
     rimraf: "npm:^6"
@@ -1825,12 +1824,12 @@ __metadata:
     "@cloudbeaver/core-di": "workspace:*"
     "@cloudbeaver/core-events": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
+    "@dbeaver/ui-kit": "workspace:^"
     "@types/react": "npm:^19"
     mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
     react: "npm:^19"
     react-dom: "npm:^19"
-    reakit: "npm:^1"
     rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
@@ -2198,15 +2197,6 @@ __metadata:
     "@dbeaver/react-tests": "workspace:*"
     "@dbeaver/ui-kit": "workspace:^"
     "@fontsource/roboto": "npm:^5"
-    "@material/button": "npm:^4"
-    "@material/checkbox": "npm:^4"
-    "@material/elevation": "npm:^4"
-    "@material/layout-grid": "npm:^4"
-    "@material/radio": "npm:^4"
-    "@material/ripple": "npm:^4"
-    "@material/switch": "npm:^4"
-    "@material/theme": "npm:^4"
-    "@material/typography": "npm:^4"
     mobx: "npm:^6"
     rimraf: "npm:^6"
     tslib: "npm:^2"
@@ -2245,7 +2235,6 @@ __metadata:
     react-dnd: "npm:^16"
     react-dnd-html5-backend: "npm:^16"
     react-dom: "npm:^19"
-    reakit: "npm:^1"
     rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
@@ -2262,6 +2251,7 @@ __metadata:
     "@cloudbeaver/tests-runner": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
     "@dbeaver/cli": "workspace:*"
+    "@dbeaver/js-helpers": "workspace:*"
     "@dbeaver/react-tests": "workspace:*"
     "@timohausmann/quadtree-ts": "npm:^2"
     "@types/md5": "npm:^2"
@@ -2518,7 +2508,6 @@ __metadata:
     mobx-react-lite: "npm:^4"
     react: "npm:^19"
     react-dom: "npm:^19"
-    reakit: "npm:^1"
     rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
@@ -2585,6 +2574,7 @@ __metadata:
     "@cloudbeaver/core-localization": "workspace:*"
     "@cloudbeaver/core-theming": "workspace:*"
     "@cloudbeaver/core-utils": "workspace:*"
+    "@cloudbeaver/plugin-tailwindcss-theme": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
     "@codemirror/autocomplete": "npm:^6"
     "@codemirror/commands": "npm:^6"
@@ -3075,6 +3065,7 @@ __metadata:
     "@cloudbeaver/plugin-data-viewer": "workspace:*"
     "@cloudbeaver/plugin-sql-editor": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
+    "@dbeaver/ui-kit": "workspace:*"
     "@types/react": "npm:^19"
     mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
@@ -3432,6 +3423,7 @@ __metadata:
     "@cloudbeaver/tsconfig": "workspace:*"
     "@dbeaver/cli": "workspace:*"
     "@dbeaver/react-tests": "workspace:*"
+    "@dbeaver/ui-kit": "workspace:^"
     "@types/react": "npm:^19"
     mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
@@ -3468,6 +3460,7 @@ __metadata:
     "@cloudbeaver/core-view": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
     "@dbeaver/js-helpers": "workspace:*"
+    "@dbeaver/ui-kit": "workspace:*"
     "@types/react": "npm:^19"
     mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
@@ -3634,7 +3627,6 @@ __metadata:
     mobx-react-lite: "npm:^4"
     react: "npm:^19"
     react-dom: "npm:^19"
-    reakit: "npm:^1"
     rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
@@ -4383,6 +4375,21 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@cloudbeaver/plugin-tailwindcss-theme@workspace:*, @cloudbeaver/plugin-tailwindcss-theme@workspace:packages/plugin-tailwindcss-theme":
+  version: 0.0.0-use.local
+  resolution: "@cloudbeaver/plugin-tailwindcss-theme@workspace:packages/plugin-tailwindcss-theme"
+  dependencies:
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
+    "@dbeaver/cli": "workspace:*"
+    rimraf: "npm:^6"
+    tailwindcss: "npm:4.0.7"
+    tslib: "npm:^2"
+    typescript: "npm:^5"
+  languageName: unknown
+  linkType: soft
+
 "@cloudbeaver/plugin-task-manager@workspace:*, @cloudbeaver/plugin-task-manager@workspace:packages/plugin-task-manager":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-task-manager@workspace:packages/plugin-task-manager"
@@ -4657,6 +4664,7 @@ __metadata:
     "@cloudbeaver/core-browser": "workspace:*"
     "@cloudbeaver/core-cli": "workspace:*"
     "@cloudbeaver/plugin-sso": "workspace:*"
+    "@cloudbeaver/plugin-tailwindcss-theme": "workspace:*"
     "@cloudbeaver/product-base": "workspace:*"
     "@cloudbeaver/product-default-impl": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
@@ -6980,208 +6988,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@material/animation@npm:^4.0.0":
-  version: 4.0.0
-  resolution: "@material/animation@npm:4.0.0"
-  dependencies:
-    tslib: "npm:^1.9.3"
-  checksum: 10c0/793a5fffc763d17c4085ba924379553f5c9c4a1b5120437b2ebbfb86e65033db32f6d4752ce3a3de473940956db5f55afe18d5fb5b165c3b8d4d19a2c5609d9e
-  languageName: node
-  linkType: hard
-
-"@material/base@npm:*":
-  version: 14.0.0
-  resolution: "@material/base@npm:14.0.0"
-  dependencies:
-    tslib: "npm:^2.1.0"
-  checksum: 10c0/4576b1d32c8c9c1e71c50b1b39f70e42ef9ca87884a9f4450a982ad272a619df4c35dde3993f1d9ca7a54219ac8eec95570a9005b40abb1ae70eaa8cf84f3dcf
-  languageName: node
-  linkType: hard
-
-"@material/base@npm:^4.0.0":
-  version: 4.0.0
-  resolution: "@material/base@npm:4.0.0"
-  dependencies:
-    tslib: "npm:^1.9.3"
-  checksum: 10c0/627a311620ec4470a0d7ac9ea17233501d8241a99ef7ba101e2758f0e45faf30c36943bb137cd0612ed909d4c6fdacd87e995e20e1316fb9c846b5910e308e49
-  languageName: node
-  linkType: hard
-
-"@material/button@npm:^4":
-  version: 4.0.0
-  resolution: "@material/button@npm:4.0.0"
-  dependencies:
-    "@material/density": "npm:^4.0.0"
-    "@material/elevation": "npm:^4.0.0"
-    "@material/feature-targeting": "npm:^4.0.0"
-    "@material/ripple": "npm:^4.0.0"
-    "@material/rtl": "npm:^4.0.0"
-    "@material/shape": "npm:^4.0.0"
-    "@material/theme": "npm:^4.0.0"
-    "@material/touch-target": "npm:^4.0.0"
-    "@material/typography": "npm:^4.0.0"
-  checksum: 10c0/6536b6166b33fc200e8ff5acf7045ac1b657d33247c894acb672e95e6e6abbf2b7c8e9a6e3bcd6e3b4ad3f07374da72a9c6c986c2fd8099a389b52acd2c65a7d
-  languageName: node
-  linkType: hard
-
-"@material/checkbox@npm:^4":
-  version: 4.0.0
-  resolution: "@material/checkbox@npm:4.0.0"
-  dependencies:
-    "@material/animation": "npm:^4.0.0"
-    "@material/base": "npm:^4.0.0"
-    "@material/density": "npm:^4.0.0"
-    "@material/dom": "npm:^4.0.0"
-    "@material/feature-targeting": "npm:^4.0.0"
-    "@material/ripple": "npm:^4.0.0"
-    "@material/theme": "npm:^4.0.0"
-    "@material/touch-target": "npm:^4.0.0"
-    tslib: "npm:^1.9.3"
-  checksum: 10c0/8ad90d9f102a2a555b5fd24b8fb55245ca84391234e79546c6cfab136b32308148749306fdb7f1aae2c22be7632875452766aab96df00e1660faac231f695508
-  languageName: node
-  linkType: hard
-
-"@material/density@npm:*":
-  version: 14.0.0
-  resolution: "@material/density@npm:14.0.0"
-  dependencies:
-    tslib: "npm:^2.1.0"
-  checksum: 10c0/d7e43fd8a007f8758404077092da783ca33118d9c782d5f2ebad214b678419a6e31133f111330031db01540e55a4f0aca2086000b8deac6b43ddacff08934107
-  languageName: node
-  linkType: hard
-
-"@material/density@npm:^4.0.0":
-  version: 4.0.0
-  resolution: "@material/density@npm:4.0.0"
-  checksum: 10c0/71b8adf28167611a28c8ced4c71e311112f6b4eb32a7c21a449a8f8dc55ae9e11220aa4335f893f9ecf9d9a63fc833c52b17e3143b5506be96b38c82bac3e273
-  languageName: node
-  linkType: hard
-
-"@material/dom@npm:^4.0.0":
-  version: 4.0.0
-  resolution: "@material/dom@npm:4.0.0"
-  dependencies:
-    tslib: "npm:^1.9.3"
-  checksum: 10c0/66574766fefc7f37410424333e8c88fd87e8c2fa28ade66dd02fe19d77eac9f3bf0b6d6b762d79adbea1cf4e76ed8279d040aac8003c6ce68b8c860bbc05c252
-  languageName: node
-  linkType: hard
-
-"@material/elevation@npm:^4, @material/elevation@npm:^4.0.0":
-  version: 4.0.0
-  resolution: "@material/elevation@npm:4.0.0"
-  dependencies:
-    "@material/animation": "npm:^4.0.0"
-    "@material/feature-targeting": "npm:^4.0.0"
-    "@material/theme": "npm:^4.0.0"
-  checksum: 10c0/3fa4d82d67bfe84822e46fcda59fc97ad254ac361d28b63f275c6b5384f9edf214ececd8aefff2856c033b65260cd36a760cc8bf4dd1381013f5f5f6c57ceebc
-  languageName: node
-  linkType: hard
-
-"@material/feature-targeting@npm:^4.0.0":
-  version: 4.0.0
-  resolution: "@material/feature-targeting@npm:4.0.0"
-  checksum: 10c0/6abf68a6de33e5e571c36dd7b61712036cd407ff9e1a16b590dd13e420228e75994f2b3c0d7ad7faedea54c11a0ffa9b0b4c00d660d007eb1f892c3415bb05b4
-  languageName: node
-  linkType: hard
-
-"@material/layout-grid@npm:^4":
-  version: 4.0.0
-  resolution: "@material/layout-grid@npm:4.0.0"
-  checksum: 10c0/04780ac3689778868bc443891420d04347d7070dbebbd577892611e11826c05565db9b1bc8b4ac27d5b4a8d7cb255f9e1935697fcee79d587f341cd22f6ded94
-  languageName: node
-  linkType: hard
-
-"@material/radio@npm:^4":
-  version: 4.0.0
-  resolution: "@material/radio@npm:4.0.0"
-  dependencies:
-    "@material/animation": "npm:^4.0.0"
-    "@material/base": "npm:^4.0.0"
-    "@material/density": "npm:^4.0.0"
-    "@material/dom": "npm:^4.0.0"
-    "@material/feature-targeting": "npm:^4.0.0"
-    "@material/ripple": "npm:^4.0.0"
-    "@material/theme": "npm:^4.0.0"
-    "@material/touch-target": "npm:^4.0.0"
-    tslib: "npm:^1.9.3"
-  checksum: 10c0/f1bbf104915175da13f63d2a79fc0b769219e056e9bbdf4f3493d7e78bdaf02a22b9f163b8fc165f4ee597b98efed5e67347514241c7c151896db61287f6afaa
-  languageName: node
-  linkType: hard
-
-"@material/ripple@npm:^4, @material/ripple@npm:^4.0.0":
-  version: 4.0.0
-  resolution: "@material/ripple@npm:4.0.0"
-  dependencies:
-    "@material/animation": "npm:^4.0.0"
-    "@material/base": "npm:^4.0.0"
-    "@material/dom": "npm:^4.0.0"
-    "@material/feature-targeting": "npm:^4.0.0"
-    "@material/theme": "npm:^4.0.0"
-    tslib: "npm:^1.9.3"
-  checksum: 10c0/52e4483d2aac930d10d3ca9691f9e86eb8dd1433671e4f509a907b3df4bbebe22f46c5db111f17bf859aa14f7876afca44ee43fd7a0a370f20cb2daaa9f03c1e
-  languageName: node
-  linkType: hard
-
-"@material/rtl@npm:^4.0.0":
-  version: 4.0.0
-  resolution: "@material/rtl@npm:4.0.0"
-  checksum: 10c0/2a695b5014e76b2db8b19cf3029bffec44c10cd8e1b299bcf72938faafebdcd6ea634be23548efbb060fc9cc27e0ab122e638ea827336986a8e1d32d95def760
-  languageName: node
-  linkType: hard
-
-"@material/shape@npm:^4.0.0":
-  version: 4.0.0
-  resolution: "@material/shape@npm:4.0.0"
-  dependencies:
-    "@material/feature-targeting": "npm:^4.0.0"
-  checksum: 10c0/a0e04598bfb7e0d24c5b18d29abea818e27f109e30cdd384f686d034580ec1177c2988d2e3ba3a4df94ad1904d9d2b0eefe35da869804bdc1367cfa38344bcf5
-  languageName: node
-  linkType: hard
-
-"@material/switch@npm:^4":
-  version: 4.0.0
-  resolution: "@material/switch@npm:4.0.0"
-  dependencies:
-    "@material/animation": "npm:^4.0.0"
-    "@material/base": "npm:^4.0.0"
-    "@material/dom": "npm:^4.0.0"
-    "@material/elevation": "npm:^4.0.0"
-    "@material/feature-targeting": "npm:^4.0.0"
-    "@material/ripple": "npm:^4.0.0"
-    "@material/rtl": "npm:^4.0.0"
-    "@material/theme": "npm:^4.0.0"
-    tslib: "npm:^1.9.3"
-  checksum: 10c0/87a189c70c11f543247a6e14e78f245db5fc397c368eefd9bc49b39146618b6613c271adaa71053f8acb9bc8e02e273743c0187b9187e54436fd0ae45770e5e9
-  languageName: node
-  linkType: hard
-
-"@material/theme@npm:^4, @material/theme@npm:^4.0.0":
-  version: 4.0.0
-  resolution: "@material/theme@npm:4.0.0"
-  dependencies:
-    "@material/feature-targeting": "npm:^4.0.0"
-  checksum: 10c0/3720688b9a785e881b1769830adecc5c7a61e0210486106a951a061ed5e0b4aa6f8070552718c60e41c40000eac335f79456397532f524ec1d4c78b2b62198da
-  languageName: node
-  linkType: hard
-
-"@material/touch-target@npm:^4.0.0":
-  version: 4.0.0
-  resolution: "@material/touch-target@npm:4.0.0"
-  dependencies:
-    "@material/feature-targeting": "npm:^4.0.0"
-  checksum: 10c0/fd22140923cac852b27dbc44885f7119269eefa1da4426a62571b3a841da6bf7c671decb0a909839d512ab540439241e8efb69adcfc1b8c31b1d65c155083056
-  languageName: node
-  linkType: hard
-
-"@material/typography@npm:^4, @material/typography@npm:^4.0.0":
-  version: 4.0.0
-  resolution: "@material/typography@npm:4.0.0"
-  dependencies:
-    "@material/feature-targeting": "npm:^4.0.0"
-  checksum: 10c0/071cbdffd8109aa3def679636d119200b61416040ddff6e1df368f789416cb9dbcad32e868f2723871627133fc6eaab973e59e915f298e63d7a3bc8422b0ff06
-  languageName: node
-  linkType: hard
-
 "@mdx-js/mdx@npm:^3.1.0":
   version: 3.1.1
   resolution: "@mdx-js/mdx@npm:3.1.1"
@@ -7455,13 +7261,6 @@ __metadata:
     "@parcel/watcher-win32-x64":
       optional: true
   checksum: 10c0/1e1d91f92e94e4640089a7cead243b2b81ca9aa8e1c862a97a25f589e84fbf1ad93abeb503f325c43a8c0e024ae0e74b48ec42c1cd84e8e423a3a87d25ded4f2
-  languageName: node
-  linkType: hard
-
-"@popperjs/core@npm:^2.5.4":
-  version: 2.11.8
-  resolution: "@popperjs/core@npm:2.11.8"
-  checksum: 10c0/4681e682abc006d25eb380d0cf3efc7557043f53b6aea7a5057d0d1e7df849a00e281cd8ea79c902a35a414d7919621fc2ba293ecec05f413598e0b23d5a1e63
   languageName: node
   linkType: hard
 
@@ -10056,13 +9855,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"body-scroll-lock@npm:^3.1.5":
-  version: 3.1.5
-  resolution: "body-scroll-lock@npm:3.1.5"
-  checksum: 10c0/657c948d64ffe17d2c89958f57c2c636203cf5216e3ba33ad76604bf1b5144fd8f4b5d832d09105f8782d5b8bc96f38780331ec55f3af5f27694dff38a0cc9d7
-  languageName: node
-  linkType: hard
-
 "boolbase@npm:^1.0.0":
   version: 1.0.0
   resolution: "boolbase@npm:1.0.0"
@@ -10568,7 +10360,6 @@ __metadata:
     prettier: "npm:^3.6.2"
     react: "npm:^19"
     react-dom: "npm:^19"
-    reakit: "npm:^1"
     rimraf: "npm:^6"
     typescript: "npm:^5.8.3"
     typescript-plugin-css-modules: "npm:^5"
@@ -12691,10 +12482,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"flatted@npm:>=3.4.0":
-  version: 3.4.1
-  resolution: "flatted@npm:3.4.1"
-  checksum: 10c0/3987a7f1e39bc7215cece001354313b462cdb4fb2dde0df4f7acd9e5016fbae56ee6fb3f0870b2150145033be8bda4f01af6f87a00946049651131bbfca7dfa6
+"flatted@npm:>=3.4.2":
+  version: 3.4.2
+  resolution: "flatted@npm:3.4.2"
+  checksum: 10c0/a65b67aae7172d6cdf63691be7de6c5cd5adbdfdfe2e9da1a09b617c9512ed794037741ee53d93114276bff3f93cd3b0d97d54f9b316e1e4885dde6e9ffdf7ed
   languageName: node
   linkType: hard
 
@@ -13138,9 +12929,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"happy-dom@npm:^20":
-  version: 20.8.3
-  resolution: "happy-dom@npm:20.8.3"
+"happy-dom@npm:>=20.8.8":
+  version: 20.8.9
+  resolution: "happy-dom@npm:20.8.9"
   dependencies:
     "@types/node": "npm:>=20.0.0"
     "@types/whatwg-mimetype": "npm:^3.0.2"
@@ -13148,7 +12939,7 @@ __metadata:
     entities: "npm:^7.0.1"
     whatwg-mimetype: "npm:^3.0.0"
     ws: "npm:^8.18.3"
-  checksum: 10c0/79a2b6d32e2f778b015511c9d2de7f7859954cbd27a30720736e60552a88e0345ffc8b2c5e77140c5f2f7fef95c563aea7ab0b2edba5d8c7edd5676b43ecef55
+  checksum: 10c0/12fe9b85891b1289935b2a4f726e2839e7c92e3f55401bd20cb5500763dd994364645acaab20a754fd90d5e1b2ffdf734b39a32ea02704c3e3ee0c4d30cf958e
   languageName: node
   linkType: hard
 
@@ -16575,17 +16366,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"picomatch@npm:^2.2.2, picomatch@npm:^2.3.1":
-  version: 2.3.1
-  resolution: "picomatch@npm:2.3.1"
-  checksum: 10c0/26c02b8d06f03206fc2ab8d16f19960f2ff9e81a658f831ecb656d8f17d9edc799e8364b1f4a7873e89d9702dff96204be0fa26fe4181f6843f040f819dac4be
-  languageName: node
-  linkType: hard
-
-"picomatch@npm:^4.0.2, picomatch@npm:^4.0.3":
-  version: 4.0.3
-  resolution: "picomatch@npm:4.0.3"
-  checksum: 10c0/9582c951e95eebee5434f59e426cddd228a7b97a0161a375aed4be244bd3fe8e3a31b846808ea14ef2c8a2527a6eeab7b3946a67d5979e81694654f939473ae2
+"picomatch@npm:>=2.3.2":
+  version: 4.0.4
+  resolution: "picomatch@npm:4.0.4"
+  checksum: 10c0/e2c6023372cc7b5764719a5ffb9da0f8e781212fa7ca4bd0562db929df8e117460f00dff3cb7509dacfc06b86de924b247f504d0ce1806a37fac4633081466b0
   languageName: node
   linkType: hard
 
@@ -17061,55 +16845,6 @@ __metadata:
   version: 4.1.2
   resolution: "readdirp@npm:4.1.2"
   checksum: 10c0/60a14f7619dec48c9c850255cd523e2717001b0e179dc7037cfa0895da7b9e9ab07532d324bfb118d73a710887d1e35f79c495fa91582784493e085d18c72c62
-  languageName: node
-  linkType: hard
-
-"reakit-system@npm:^0.15.2":
-  version: 0.15.2
-  resolution: "reakit-system@npm:0.15.2"
-  dependencies:
-    reakit-utils: "npm:^0.15.2"
-  peerDependencies:
-    react: ^16.8.0 || ^17.0.0
-    react-dom: ^16.8.0 || ^17.0.0
-  checksum: 10c0/bd97e297b972e205656dd99a6955ed263d5102ab24212e55b90a86dd9a4eac056b63ba882af65705036922e9cb599d5903318d1202086a3e4ee45b5cc794d44e
-  languageName: node
-  linkType: hard
-
-"reakit-utils@npm:^0, reakit-utils@npm:^0.15.2":
-  version: 0.15.2
-  resolution: "reakit-utils@npm:0.15.2"
-  peerDependencies:
-    react: ^16.8.0 || ^17.0.0
-    react-dom: ^16.8.0 || ^17.0.0
-  checksum: 10c0/258654f9510fb7622fc03f81a63021721ace6c424bdff47a8f79e3b974501ef6b1b44fdb78ab01ed1a75d3fd6867d100e97ef74138c0d848c2aa5738477bf853
-  languageName: node
-  linkType: hard
-
-"reakit-warning@npm:^0.6.2":
-  version: 0.6.2
-  resolution: "reakit-warning@npm:0.6.2"
-  dependencies:
-    reakit-utils: "npm:^0.15.2"
-  peerDependencies:
-    react: ^16.8.0 || ^17.0.0
-  checksum: 10c0/e93856e9dd4b56e7cd36cd654cb5688eb05fc8f75e3d89069352bc61ab6f6cf501892405dd1612442e45880562048af5c17b3e771fd6af79348bc90a20f8d930
-  languageName: node
-  linkType: hard
-
-"reakit@npm:^1":
-  version: 1.3.11
-  resolution: "reakit@npm:1.3.11"
-  dependencies:
-    "@popperjs/core": "npm:^2.5.4"
-    body-scroll-lock: "npm:^3.1.5"
-    reakit-system: "npm:^0.15.2"
-    reakit-utils: "npm:^0.15.2"
-    reakit-warning: "npm:^0.6.2"
-  peerDependencies:
-    react: ^16.8.0 || ^17.0.0
-    react-dom: ^16.8.0 || ^17.0.0
-  checksum: 10c0/ce5972b1242bd0704840c77faa6f687cc3bd0e66ac5f6fe84328408d2e624a4532c4bb1d82b6b6dcbc876dc0700c472b420acebf80603d59115a810ae8916e12
   languageName: node
   linkType: hard
 
@@ -18909,7 +18644,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tslib@npm:^1.10.0, tslib@npm:^1.9.3":
+"tslib@npm:^1.10.0":
   version: 1.14.1
   resolution: "tslib@npm:1.14.1"
   checksum: 10c0/69ae09c49eea644bc5ebe1bca4fa4cc2c82b7b3e02f43b84bd891504edf66dbc6b2ec0eef31a957042de2269139e4acff911e6d186a258fb14069cd7f6febce2

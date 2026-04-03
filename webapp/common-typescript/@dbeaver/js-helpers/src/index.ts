@@ -8,9 +8,12 @@
 
 export * from './ColorConvert.js';
 export * from './debouncePromise.js';
+export * from './eventContext.js';
+export * from './eventStopPropagationFlag.js';
 export * from './isDefined.js';
 export * from './isNotNullDefined.js';
 export * from './memoizeLast.js';
 export * from './mutex.js';
 export * from './reorderArray.js';
 export * from './getLocalizedDisplayName.js';
+export * from './formatNumber.js';
