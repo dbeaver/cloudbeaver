@@ -450,20 +450,13 @@ export class MenuBootstrap extends Bootstrap {
       return;
     }
 
-    const { status, result: filePath } = await this.scriptExportService.openExportDialog(this.commonDialogService, {
+    await this.scriptExportService.openExportDialog({
       script,
       fileName: withTimestamp(name),
       editorId: state.editorId,
       projectId: executionContext?.projectId,
       connectionId: executionContext?.connectionId,
     });
-
-    if (status === DialogueStateResult.Resolved) {
-      this.notificationService.logSuccess({
-        title: 'sql_editor_script_exported',
-        message: filePath,
-      });
-    }
   }
 
   private async uploadSql(state: ISqlEditorTabState) {

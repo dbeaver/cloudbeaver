@@ -12,6 +12,8 @@ import { Button, Fill, Form, InputField, Translate, useFocus, useForm, useObserv
 import { useScriptExportDialog, type IScriptExportTabProps } from '@cloudbeaver/plugin-script-export';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 import { downloadSql } from '../downloadSql.js';
+import { NotificationService } from '@cloudbeaver/core-events';
+import { useService } from '@cloudbeaver/core-di';
 
 interface State {
   fileName: string;
@@ -24,6 +26,7 @@ export const LocalExportTab: TabContainerPanelComponent<IScriptExportTabProps> =
 }) {
   const { resolveDialog, rejectDialog, FooterSlot } = useScriptExportDialog();
   const [focusedRef] = useFocus<HTMLFormElement>({ focusFirstChild: true });
+  const notificationService = useService(NotificationService);
 
   const state = useObservableRef<State>(
     () => ({
@@ -37,7 +40,11 @@ export const LocalExportTab: TabContainerPanelComponent<IScriptExportTabProps> =
   const form = useForm({
     onSubmit() {
       downloadSql(state.fileName, script);
-      resolveDialog(state.fileName);
+      resolveDialog();
+      notificationService.logSuccess({
+        title: 'sql_editor_script_exported',
+        message: state.fileName,
+      });
     },
   });
 

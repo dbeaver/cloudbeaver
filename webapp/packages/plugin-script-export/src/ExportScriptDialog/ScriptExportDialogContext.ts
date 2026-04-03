@@ -9,7 +9,7 @@
 import { createContext, useContext } from 'react';
 
 interface IScriptExportDialogContext {
-  resolveDialog: (result: string) => void;
+  resolveDialog: (result: void | undefined) => void;
   rejectDialog: () => void;
   FooterSlot: React.FC<React.PropsWithChildren>;
 }

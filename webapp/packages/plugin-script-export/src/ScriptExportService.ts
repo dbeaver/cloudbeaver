@@ -8,7 +8,7 @@
 import type { IScriptExportTabProps } from './IScriptExportTabProps.js';
 import { injectable } from '@cloudbeaver/core-di';
 import { TabsContainer } from '@cloudbeaver/core-ui';
-import { type CommonDialogService } from '@cloudbeaver/core-dialogs';
+import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
 
 export interface IScriptExportResult {
@@ -18,15 +18,15 @@ export interface IScriptExportResult {
 
 const ExportScriptDialog = importLazyComponent(() => import('./ExportScriptDialog/ExportScriptDialog.js').then(module => module.ExportScriptDialog));
 
-@injectable(() => [])
+@injectable(() => [CommonDialogService])
 export class ScriptExportService {
   readonly tabsContainer: TabsContainer<IScriptExportTabProps>;
 
-  constructor() {
+  constructor(private readonly commonDialogService: CommonDialogService) {
     this.tabsContainer = new TabsContainer('script_export_tabs');
   }
 
-  openExportDialog(dialogService: CommonDialogService, props: IScriptExportTabProps) {
-    return dialogService.open(ExportScriptDialog, props);
+  openExportDialog(props: IScriptExportTabProps) {
+    return this.commonDialogService.open(ExportScriptDialog, props);
   }
 }

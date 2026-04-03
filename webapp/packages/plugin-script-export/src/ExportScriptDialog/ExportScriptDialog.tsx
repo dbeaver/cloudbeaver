@@ -19,7 +19,7 @@ import styles from './ExportScriptDialog.module.css';
 import { TabList, TabPanelList, TabsState } from '@cloudbeaver/core-ui';
 import { ScriptExportDialogContext } from './ScriptExportDialogContext.js';
 
-export const ExportScriptDialog: DialogComponent<IScriptExportTabProps, string> = observer(function ExportScriptDialog({
+export const ExportScriptDialog: DialogComponent<IScriptExportTabProps> = observer(function ExportScriptDialog({
   payload,
   resolveDialog,
   rejectDialog,
