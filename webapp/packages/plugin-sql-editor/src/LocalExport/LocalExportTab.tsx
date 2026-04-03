@@ -61,7 +61,7 @@ export const LocalExportTab: TabContainerPanelComponent<IScriptExportTabProps> =
         <Container gap vertical>
           <Form ref={focusedRef} context={form}>
             <Container gap>
-              <InputField name="fileName" state={state} required>
+              <InputField name="fileName" state={state} required small>
                 <Translate token="ui_file_name" />
               </InputField>
             </Container>
