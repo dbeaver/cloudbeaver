@@ -6,20 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 
-@import '@material/theme/mixins';
-@import '@material/ripple/mixins';
-@import '@material/button/mixins';
-@import '@material/elevation/mixins';
-@import '@material/typography/mixins';
 @import './variables';
 @import './theme';
 @import './color-scheme';
-@import './layout-grid';
 @import './branding';
-@import './theme-ripple';
-@import './ripple';
 @import './color';
-@import './switch';
-@import './placeholder';
 @import './form-controls';
 @import './link';

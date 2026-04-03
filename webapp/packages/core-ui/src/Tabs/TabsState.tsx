@@ -125,7 +125,7 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
       const tabExists = isNotNullDefined(selectedId) && displayed.includes(selectedId);
 
       if (!tabExists) {
-        dynamic.store.select(displayed[0]);
+        dynamic.store.setSelectedId(displayed[0]);
       }
     }
   }, [displayed, autoSelect]);
@@ -141,7 +141,7 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
         }
         dynamic.selectedId = data.tabId;
         if (dynamic.store.getState().selectedId !== data.tabId) {
-          dynamic.store.select(data.tabId);
+          dynamic.store.setSelectedId(data.tabId);
         }
       },
     ],

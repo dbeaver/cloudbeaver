@@ -10,7 +10,7 @@
   width: 16px;
   height: 16px;
   padding: 0;
-  transition: transform ease-in-out 0.2s;
+  transition: transform var(--duration-medium) var(--ease-smooth);
 
   &.expanded {
     transform: rotate(180deg);

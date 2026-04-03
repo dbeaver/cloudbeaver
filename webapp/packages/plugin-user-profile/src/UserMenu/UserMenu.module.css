@@ -10,6 +10,7 @@
   padding: 0;
 
   & .icon {
+    fill: var(--theme-on-primary);
     width: 32px;
     height: 100%;
     padding: 0 8px;
