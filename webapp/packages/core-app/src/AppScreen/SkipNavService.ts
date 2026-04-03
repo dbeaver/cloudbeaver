@@ -5,14 +5,22 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { PlaceholderContainer } from '@cloudbeaver/core-blocks';
+import { importLazyComponent, PlaceholderContainer } from '@cloudbeaver/core-blocks';
 import { injectable } from '@cloudbeaver/core-di';
 
-@injectable()
+import { AppScreenService } from './AppScreenService.js';
+
+const SkipNavLinks = importLazyComponent(() => import('./SkipNavLinks.js').then(m => m.SkipNavLinks));
+
+@injectable(() => [AppScreenService])
 export class SkipNavService {
   readonly extraLinks: PlaceholderContainer;
 
-  constructor() {
+  constructor(private readonly appScreenService: AppScreenService) {
     this.extraLinks = new PlaceholderContainer();
+  }
+
+  registerLinks(): void {
+    this.appScreenService.placeholder.add(SkipNavLinks, 0);
   }
 }

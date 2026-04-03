@@ -9,7 +9,6 @@
 import { Bootstrap, ModuleRegistry } from '@cloudbeaver/core-di';
 import { AppScreenService } from './AppScreen/AppScreenService.js';
 import { AppScreenBootstrap } from './AppScreen/AppScreenBootstrap.js';
-import { SkipNavBootstrap } from './AppScreen/SkipNavBootstrap.js';
 import { SkipNavService } from './AppScreen/SkipNavService.js';
 import { AppLocaleService } from './AppLocaleService.js';
 
@@ -20,7 +19,6 @@ export default ModuleRegistry.add({
     serviceCollection
       .addSingleton(Bootstrap, AppLocaleService)
       .addSingleton(Bootstrap, AppScreenBootstrap)
-      .addSingleton(Bootstrap, SkipNavBootstrap)
       .addSingleton(AppScreenService)
       .addSingleton(SkipNavService);
   },

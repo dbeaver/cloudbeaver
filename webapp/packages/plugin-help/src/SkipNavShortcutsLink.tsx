@@ -11,7 +11,7 @@ import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { UnstyledButton } from '@dbeaver/ui-kit';
 
-import { skipNavLinkStyles } from '@cloudbeaver/core-app';
+import { skipNavStyles } from '@cloudbeaver/core-app';
 
 const ShortcutsDialog = importLazyComponent(() => import('./Shortcuts/ShortcutsDialog.js').then(m => m.ShortcutsDialog));
 
@@ -24,7 +24,7 @@ export const SkipNavShortcutsLink = observer(function SkipNavShortcutsLink(): Re
   }
 
   return (
-    <UnstyledButton type="button" className={skipNavLinkStyles} onClick={handleClick}>
+    <UnstyledButton type="button" className={skipNavStyles['skipNavLink']} onClick={handleClick}>
       {translate('shortcuts_title')}
     </UnstyledButton>
   );

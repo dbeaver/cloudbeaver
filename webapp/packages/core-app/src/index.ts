@@ -18,4 +18,5 @@ export * from './AppLocaleService.js';
 export * from './BodyLazy.js';
 
 //styles for skip nav links
-export { skipNavLink as skipNavLinkStyles } from './AppScreen/SkipNavLinks.module.css';
+import styles from './AppScreen/SkipNavLinks.module.css';
+export { styles as skipNavStyles };

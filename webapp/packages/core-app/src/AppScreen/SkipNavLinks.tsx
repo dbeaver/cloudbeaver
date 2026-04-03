@@ -12,7 +12,7 @@ import { UnstyledButton } from '@dbeaver/ui-kit';
 
 import { PANEL_ID_LEFT_SIDEBAR, PANEL_ID_MAIN_CONTENT } from './AppScreenService.js';
 import { SkipNavService } from './SkipNavService.js';
-import { skipNav, skipNavLink } from './SkipNavLinks.module.css';
+import styles from './SkipNavLinks.module.css';
 
 function focusPanel(panelId: string) {
   const element = document.querySelector<HTMLElement>(`[data-panel-id="${panelId}"]`);
@@ -24,11 +24,11 @@ export const SkipNavLinks = observer(function SkipNavLinks(): React.ReactElement
   const skipNavService = useService(SkipNavService);
 
   return (
-    <nav aria-label={translate('app_skip_nav_label')} className={skipNav}>
-      <UnstyledButton type="button" className={skipNavLink} onClick={() => focusPanel(PANEL_ID_LEFT_SIDEBAR)}>
+    <nav aria-label={translate('app_skip_nav_label')} className={styles['skipNav']}>
+      <UnstyledButton type="button" className={styles['skipNavLink']} onClick={() => focusPanel(PANEL_ID_LEFT_SIDEBAR)}>
         {translate('app_skip_nav_navigator')}
       </UnstyledButton>
-      <UnstyledButton type="button" className={skipNavLink} onClick={() => focusPanel(PANEL_ID_MAIN_CONTENT)}>
+      <UnstyledButton type="button" className={styles['skipNavLink']} onClick={() => focusPanel(PANEL_ID_MAIN_CONTENT)}>
         {translate('app_skip_nav_main_content')}
       </UnstyledButton>
       <Placeholder container={skipNavService.extraLinks} />
