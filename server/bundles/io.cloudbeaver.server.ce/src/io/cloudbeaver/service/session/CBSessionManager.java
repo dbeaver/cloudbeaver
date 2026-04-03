@@ -537,6 +537,6 @@ public class CBSessionManager implements WebAppSessionManager {
     @NotNull
     @Override
     public WebSession getWebSessionByToken(HttpServletRequest request, String token) throws DBException {
-        return null;
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 }
