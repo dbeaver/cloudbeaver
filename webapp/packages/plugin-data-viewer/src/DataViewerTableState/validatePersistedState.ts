@@ -20,7 +20,7 @@ const persistedConstraintSchema = schema.object({
 const persistedStateSchema = schema.object({
   constraints: schema.array(persistedConstraintSchema),
   whereFilter: schema.string(),
-  pinnedColumns: schema.array(schema.string()),
+  pinnedColumns: schema.array(schema.string()).optional().default([]),
   columnOrder: schema.array(schema.string()).optional(),
 });
 

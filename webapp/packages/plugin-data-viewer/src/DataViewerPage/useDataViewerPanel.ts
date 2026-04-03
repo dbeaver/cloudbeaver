@@ -118,12 +118,21 @@ export function useDataViewerPanel(tab: ITab<IObjectViewerTabState>) {
       return;
     }
 
-    const pageState = dataViewerTabService.page.getState(tab);
-
-    const disposer = when(
+    const dispose = when(
       () => dbModel.source.results.length > 0,
       () => {
         try {
+          let pageState = dataViewerTabService.page.getState(tab);
+
+          if (!pageState) {
+            dataViewerTabService.page.setState(tab, {
+              resultIndex: 0,
+              presentationId: '',
+              valuePresentationId: null,
+            });
+            pageState = dataViewerTabService.page.getState(tab);
+          }
+
           const persistedAction = dbModel.source.tryGetAction(0, IDatabasePersistedStateAction, DatabasePersistedStateAction);
 
           if (persistedAction && pageState) {
@@ -135,11 +144,11 @@ export function useDataViewerPanel(tab: ITab<IObjectViewerTabState>) {
 
             const persistedState = pageState.persistedState;
 
-            if (persistedState && validatePersistedState(persistedState)) {
+            if (validatePersistedState(persistedState)) {
               const viewAction = dbModel.source.tryGetAction(0, IDatabaseDataViewAction, GridViewAction);
 
               viewAction?.restoreViewState({
-                pinnedColumnNames: persistedState.pinnedColumns,
+                pinnedColumnNames: persistedState.pinnedColumns ?? [],
                 columnOrderNames: persistedState.columnOrder,
               });
             }
@@ -150,7 +159,7 @@ export function useDataViewerPanel(tab: ITab<IObjectViewerTabState>) {
       },
     );
 
-    return () => disposer();
+    return () => dispose();
   }, [tableId, tableViewerStorageService, dataViewerTabService, tab]);
 
   return model;

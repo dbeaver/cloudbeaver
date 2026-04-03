@@ -9,7 +9,7 @@
 export interface IDataViewerPersistedState {
   constraints: IPersistedConstraint[];
   whereFilter: string;
-  pinnedColumns: string[];
+  pinnedColumns?: string[];
   columnOrder?: string[];
 }
 
