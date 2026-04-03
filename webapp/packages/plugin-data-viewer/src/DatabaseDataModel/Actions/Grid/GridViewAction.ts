@@ -256,11 +256,10 @@ export class GridViewAction<
       return;
     }
 
-    ps.set(PERSISTED_STATE_KEY.pinnedColumns, this.getPinnedColumnNames());
-
     const keys = this.columnKeys;
     let isCustomOrder = false;
     const columnNames: string[] = [];
+    const pinnedNames: string[] = [];
 
     for (let i = 0; i < keys.length; i++) {
       const key = keys[i]!;
@@ -268,6 +267,10 @@ export class GridViewAction<
 
       if (name) {
         columnNames.push(name);
+
+        if (this.isColumnPinned(key)) {
+          pinnedNames.push(name);
+        }
       }
 
       if (key.index !== i) {
@@ -275,6 +278,7 @@ export class GridViewAction<
       }
     }
 
+    ps.set(PERSISTED_STATE_KEY.pinnedColumns, pinnedNames);
     ps.set(PERSISTED_STATE_KEY.columnOrder, isCustomOrder ? columnNames : []);
   }
 
@@ -315,11 +319,11 @@ export class GridViewAction<
       }
     }
 
-    if (pinnedColumnNames.length > 0) {
-      const keys = pinnedColumnNames.map(name => this.columnKeys.find(k => this.getColumnName(k) === name)).filter(isDefined);
+    for (const name of pinnedColumnNames) {
+      const key = this.columnKeys.find(k => this.getColumnName(k) === name);
 
-      if (keys.length > 0) {
-        this.pinColumns(keys);
+      if (key) {
+        this.pinnedColumns.add(GridDataKeysUtils.serialize(key));
       }
     }
   }
