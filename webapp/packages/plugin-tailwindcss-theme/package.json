@@ -1,5 +1,5 @@
 {
-  "name": "@cloudbeaver/core-theming",
+  "name": "@cloudbeaver/plugin-tailwindcss-theme",
   "type": "module",
   "sideEffects": [
     "./lib/module.js",
@@ -14,6 +14,7 @@
   "exports": {
     ".": "./lib/index.js",
     "./module": "./lib/module.js",
+    "./tailwind.css": "./src/styles/index.css",
     "./*": "./*"
   },
   "scripts": {
@@ -25,24 +26,14 @@
   },
   "dependencies": {
     "@cloudbeaver/core-di": "workspace:*",
-    "@cloudbeaver/core-events": "workspace:*",
-    "@cloudbeaver/core-executor": "workspace:*",
-    "@cloudbeaver/core-localization": "workspace:*",
-    "@cloudbeaver/core-settings": "workspace:*",
-    "@cloudbeaver/core-utils": "workspace:*",
-    "@dbeaver/ui-kit": "workspace:^",
-    "mobx": "^6",
-    "tslib": "^2"
+    "tailwindcss": "4.0.7"
   },
   "devDependencies": {
     "@cloudbeaver/core-cli": "workspace:*",
     "@cloudbeaver/tsconfig": "workspace:*",
     "@dbeaver/cli": "workspace:*",
-    "@dbeaver/react-tests": "workspace:*",
-    "@fontsource/roboto": "^5",
     "rimraf": "^6",
-    "typescript": "^5",
-    "typescript-plugin-css-modules": "^5",
-    "vitest": "^4"
+    "tslib": "^2",
+    "typescript": "^5"
   }
 }

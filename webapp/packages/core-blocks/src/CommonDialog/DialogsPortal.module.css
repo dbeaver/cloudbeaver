@@ -10,7 +10,7 @@
 }
 
 .error {
-  composes: theme-background-surface theme-text-on-surface theme-elevation-z10 from global;
+  composes: theme-background-surface theme-text-on-surface from global;
   border-radius: 0.25rem;
 }
 

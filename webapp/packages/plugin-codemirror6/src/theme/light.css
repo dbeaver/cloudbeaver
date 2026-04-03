@@ -1,0 +1,31 @@
+.theme-light {
+  --editor-meta: #ff1717;
+  --editor-keyword: #07a;
+  --editor-atom: #905;
+  --editor-number: #905;
+  --editor-def: #00f;
+  --editor-variable: black;
+  --editor-variable-2: #a8bd00;
+  --editor-variable-3: #a8bd00;
+  --editor-property: black;
+  --editor-operator: #a67f59;
+  --editor-comment: #3f7f5f;
+  --editor-string: #1f8900;
+  --editor-string-2: #f50;
+  --editor-qualifier: #555;
+  --editor-builtin: #07a;
+  --editor-bracket: #cc7;
+  --editor-tag: #170;
+  --editor-attribute: #00c;
+  --editor-link: #905;
+  --editor-error: #f00;
+  --editor-delimiter: rgb(238, 204, 100);
+  --editor-cursor: #000;
+  --editor-type-name: #007acc;
+  --editor-class-name: #007acc;
+  --editor-punctuation: #6d6d6d;
+  --editor-property-name: #c42626;
+  --editor-bool: #905;
+  --editor-variable-name: #905;
+  --editor-label-name: #81a1c1;
+}
