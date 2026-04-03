@@ -32,6 +32,7 @@ import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.model.apilog.ApiCallInterceptor;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.registry.WebServiceRegistry;
+import io.cloudbeaver.server.CBConstants;
 import io.cloudbeaver.server.WebAppSessionManager;
 import io.cloudbeaver.server.WebAppUtils;
 import io.cloudbeaver.service.DBWBindingContext;
@@ -246,7 +247,7 @@ public class GraphQLEndpoint extends HttpServlet {
         mapOfContext.put("request", request);
         mapOfContext.put("response", response);
         mapOfContext.put("bindingContext", bindingContext);
-        String token = request.getHeader("Token");
+        String token = request.getHeader(CBConstants.HEADER_API_TOKEN);
         if (token != null) {
             try {
                 WebSession webSession = sessionManager.getWebSessionByToken(request, token);

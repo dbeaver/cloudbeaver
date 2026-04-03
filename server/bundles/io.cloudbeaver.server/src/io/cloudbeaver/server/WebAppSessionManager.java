@@ -74,5 +74,5 @@ public interface WebAppSessionManager {
     }
 
     @NotNull
-    WebSession getWebSessionByToken(HttpServletRequest request, String token) throws DBException;
+    WebSession getWebSessionByToken(@NotNull HttpServletRequest request, @NotNull String token) throws DBException;
 }
