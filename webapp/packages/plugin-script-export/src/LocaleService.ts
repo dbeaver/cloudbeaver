@@ -19,6 +19,16 @@ export class LocaleService extends Bootstrap {
 
   private async provider(locale: string) {
     switch (locale) {
+      case 'ru':
+        return (await import('./locales/ru.js')).default;
+      case 'it':
+        return (await import('./locales/it.js')).default;
+      case 'zh':
+        return (await import('./locales/zh.js')).default;
+      case 'fr':
+        return (await import('./locales/fr.js')).default;
+      case 'vi':
+        return (await import('./locales/vi.js')).default;
       case 'en':
       default:
         return (await import('./locales/en.js')).default;
