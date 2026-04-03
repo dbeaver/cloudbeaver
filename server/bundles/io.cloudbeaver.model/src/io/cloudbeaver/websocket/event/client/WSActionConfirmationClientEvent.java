@@ -20,44 +20,26 @@ import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.websocket.WSConstants;
 import org.jkiss.dbeaver.model.websocket.event.WSClientEvent;
 
-public class WSAiFunctionCallConfirmationClientEvent extends WSClientEvent {
+public class WSActionConfirmationClientEvent extends WSClientEvent {
 
-    public static final String ID = "cb_client_ai_function_call_confirmation";
+    public static final String ID = "cb_client_action_confirmation";
 
     @NotNull
-    private final String conversationId;
-    @NotNull
-    private final String messageId;
-    @NotNull
-    private final String taskId;
+    private final String actionId;
     private final boolean confirmed;
 
-    public WSAiFunctionCallConfirmationClientEvent(
-        @NotNull String conversationId,
-        @NotNull String messageId,
-        @NotNull String taskId,
+    public WSActionConfirmationClientEvent(
+        @NotNull String actionId,
         boolean confirmed
     ) {
-        super(ID, WSConstants.TOPIC_AI);
-        this.conversationId = conversationId;
-        this.messageId = messageId;
-        this.taskId = taskId;
+        super(ID, WSConstants.TOPIC_SESSION_ACTION);
+        this.actionId = actionId;
         this.confirmed = confirmed;
     }
 
     @NotNull
-    public String getConversationId() {
-        return conversationId;
-    }
-
-    @NotNull
-    public String getMessageId() {
-        return messageId;
-    }
-
-    @NotNull
-    public String getTaskId() {
-        return taskId;
+    public String getActionId() {
+        return actionId;
     }
 
     public boolean isConfirmed() {

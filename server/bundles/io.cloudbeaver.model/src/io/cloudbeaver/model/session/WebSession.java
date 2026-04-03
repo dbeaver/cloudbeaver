@@ -1071,16 +1071,26 @@ public class WebSession extends BaseWebSession
         removeAttribute(actionId);
     }
 
-    public void handleAiFunctionConfirmation(@NotNull String taskId, boolean confirmed) {
+    public void handleActionConfirmation(@NotNull String actionId, boolean confirmed) {
         if (confirmed) {
-            runAsyncTaskJob(taskId);
+            runAsyncTaskJob(actionId);
         } else {
             try {
-                asyncTaskCancel(taskId);
+                asyncTaskCancel(actionId);
             } catch (DBWebException e) {
                 log.error("Error cancelling function confirmation task", e);
                 addSessionError(e);
             }
+        }
+    }
+
+    public void handleActionResult(@NotNull String actionId, @NotNull Object result) {
+        CompletableFuture<Object> future = getAttribute(actionId);
+        if (future != null) {
+            future.complete(result);
+            removeAttribute(actionId);
+        } else {
+            log.error("Received unexpected action result event for actionId: " + actionId);
         }
     }
 
