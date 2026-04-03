@@ -289,6 +289,7 @@ public class CBSessionManager implements WebAppSessionManager {
     @Override
     @Nullable
     public WebSession findWebSession(HttpServletRequest request) {
+        //fixme здесь также надо прочекать токен
         String sessionId = getSessionId(request);
         synchronized (sessionMap) {
             var session = sessionMap.get(sessionId);
