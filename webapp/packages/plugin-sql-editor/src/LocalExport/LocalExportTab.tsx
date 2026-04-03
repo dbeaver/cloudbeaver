@@ -8,19 +8,7 @@
 import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 
-import {
-  Button,
-  CommonDialogBody,
-  CommonDialogFooter,
-  Container,
-  Fill,
-  Form,
-  InputField,
-  Translate,
-  useFocus,
-  useForm,
-  useObservableRef,
-} from '@cloudbeaver/core-blocks';
+import { Button, Fill, Form, InputField, Translate, useFocus, useForm, useObservableRef } from '@cloudbeaver/core-blocks';
 import { useScriptExportDialog, type IScriptExportTabProps } from '@cloudbeaver/plugin-script-export';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 import { downloadSql } from '../downloadSql.js';
@@ -34,7 +22,7 @@ export const LocalExportTab: TabContainerPanelComponent<IScriptExportTabProps> =
   script,
   fileName: initialFileName,
 }) {
-  const { resolveDialog, rejectDialog } = useScriptExportDialog();
+  const { resolveDialog, rejectDialog, FooterSlot } = useScriptExportDialog();
   const [focusedRef] = useFocus<HTMLFormElement>({ focusFirstChild: true });
 
   const state = useObservableRef<State>(
@@ -57,26 +45,22 @@ export const LocalExportTab: TabContainerPanelComponent<IScriptExportTabProps> =
 
   return (
     <>
-      <CommonDialogBody>
-        <Container gap vertical>
-          <Form ref={focusedRef} context={form}>
-            <Container gap>
-              <InputField name="fileName" state={state} required small>
-                <Translate token="ui_file_name" />
-              </InputField>
-            </Container>
-          </Form>
-        </Container>
-      </CommonDialogBody>
-      <CommonDialogFooter>
-        <Button type="button" variant="secondary" onClick={() => rejectDialog()}>
-          <Translate token="ui_processing_cancel" />
-        </Button>
-        <Fill />
-        <Button type="button" disabled={!canSave} onClick={() => form.submit()}>
-          <Translate token="ui_processing_save" />
-        </Button>
-      </CommonDialogFooter>
+      <Form ref={focusedRef} context={form} className="tw:p-6 tw:w-full">
+        <InputField name="fileName" state={state} required small>
+          <Translate token="ui_file_name" />
+        </InputField>
+      </Form>
+      {FooterSlot && (
+        <FooterSlot>
+          <Button type="button" variant="secondary" onClick={() => rejectDialog()}>
+            <Translate token="ui_processing_cancel" />
+          </Button>
+          <Fill />
+          <Button type="button" disabled={!canSave} onClick={() => form.submit()}>
+            <Translate token="ui_processing_save" />
+          </Button>
+        </FooterSlot>
+      )}
     </>
   );
 });

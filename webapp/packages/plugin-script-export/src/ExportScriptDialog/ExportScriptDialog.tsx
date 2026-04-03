@@ -6,9 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
+import { createPortal } from 'react-dom';
 
-import { CommonDialogHeader, CommonDialogWrapper, s, useS } from '@cloudbeaver/core-blocks';
+import { CommonDialogBody, CommonDialogFooter, CommonDialogHeader, CommonDialogWrapper, s, useS } from '@cloudbeaver/core-blocks';
 import type { DialogComponent } from '@cloudbeaver/core-dialogs';
 import { useService } from '@cloudbeaver/core-di';
 
@@ -27,11 +28,23 @@ export const ExportScriptDialog: DialogComponent<IScriptExportTabProps, string> 
   const scriptExportService = useService(ScriptExportService);
   const style = useS(styles);
   const [selectedTabId, setSelectedTabId] = useState<string | undefined>(undefined);
+  const [footerNode, setFooterNode] = useState<HTMLDivElement | null>(null);
+  const footerRef = useCallback((node: HTMLDivElement | null) => setFooterNode(node), []);
+
+  const FooterSlot: React.FC<React.PropsWithChildren> = useCallback(
+    ({ children }) => {
+      if (!footerNode) {
+        return null;
+      }
+      return createPortal(children, footerNode);
+    },
+    [footerNode],
+  );
 
   return (
     <CommonDialogWrapper size="large" className={className} fixedWidth>
       <CommonDialogHeader title="plugin_script_export_dialog_title" icon="/icons/export.svg" onReject={rejectDialog} />
-      <ScriptExportDialogContext.Provider value={{ resolveDialog, rejectDialog }}>
+      <ScriptExportDialogContext.Provider value={{ resolveDialog, rejectDialog, FooterSlot }}>
         <TabsState
           container={scriptExportService.tabsContainer}
           currentTabId={selectedTabId}
@@ -39,12 +52,13 @@ export const ExportScriptDialog: DialogComponent<IScriptExportTabProps, string> 
           onChange={tab => setSelectedTabId(tab.tabId)}
           {...payload}
         >
-          <div className={s(style, { box: true })}>
+          <CommonDialogBody noBodyPadding noOverflow>
             <TabList className={s(style, { tabList: true })} underline />
-            <div className={s(style, { contentBox: true })}>
-              <TabPanelList />
-            </div>
-          </div>
+            <TabPanelList />
+          </CommonDialogBody>
+          <CommonDialogFooter>
+            <div ref={footerRef} className={s(style, { footerSlot: true })} />
+          </CommonDialogFooter>
         </TabsState>
       </ScriptExportDialogContext.Provider>
     </CommonDialogWrapper>

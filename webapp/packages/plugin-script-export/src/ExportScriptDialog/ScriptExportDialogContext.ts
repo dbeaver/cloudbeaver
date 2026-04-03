@@ -11,6 +11,7 @@ import { createContext, useContext } from 'react';
 interface IScriptExportDialogContext {
   resolveDialog: (result: string) => void;
   rejectDialog: () => void;
+  FooterSlot: React.FC<React.PropsWithChildren>;
 }
 
 const ScriptExportDialogContext = createContext<IScriptExportDialogContext | null>(null);
