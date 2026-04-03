@@ -1,5 +1,5 @@
 @layer components {
-  .dbv-kit-skip-nav {
+  .skipNav {
     position: absolute;
     top: 8px;
     left: 8px;
@@ -7,7 +7,7 @@
     display: flex;
   }
 
-  .dbv-kit-skip-nav__link {
+  .skipNavLink {
     position: absolute;
     width: 1px;
     height: 1px;
@@ -25,16 +25,16 @@
     border: var(--dbv-kit-btn-border-width) var(--dbv-kit-btn-border-style) var(--dbv-kit-btn-border-color);
     border-radius: var(--dbv-kit-btn-border-radius);
     box-shadow: var(--dbv-kit-dialog-content-shadow);
-  }
 
-  .dbv-kit-skip-nav__link:focus {
-    position: static;
-    width: auto;
-    height: var(--dbv-kit-btn-height);
-    overflow: visible;
-    clip: auto;
-    clip-path: none;
-    outline: var(--dbv-kit-control-outline-width) solid var(--dbv-kit-control-outline-color);
-    outline-offset: var(--dbv-kit-control-outline-offset);
+    &:focus {
+      position: static;
+      width: auto;
+      height: var(--dbv-kit-btn-height);
+      overflow: visible;
+      clip: auto;
+      clip-path: none;
+      outline: var(--dbv-kit-control-outline-width) solid var(--dbv-kit-control-outline-color);
+      outline-offset: var(--dbv-kit-control-outline-offset);
+    }
   }
 }

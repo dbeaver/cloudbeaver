@@ -5,13 +5,17 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { observer } from 'mobx-react-lite';
 import { importLazyComponent, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
+import { UnstyledButton } from '@dbeaver/ui-kit';
+
+import { skipNavLinkStyles } from '@cloudbeaver/core-app';
 
 const ShortcutsDialog = importLazyComponent(() => import('./Shortcuts/ShortcutsDialog.js').then(m => m.ShortcutsDialog));
 
-export function SkipNavShortcutsLink(): React.ReactElement {
+export const SkipNavShortcutsLink = observer(function SkipNavShortcutsLink(): React.ReactElement {
   const translate = useTranslate();
   const commonDialogService = useService(CommonDialogService);
 
@@ -20,8 +24,8 @@ export function SkipNavShortcutsLink(): React.ReactElement {
   }
 
   return (
-    <button type="button" className="dbv-kit-skip-nav__link" onClick={handleClick}>
+    <UnstyledButton type="button" className={skipNavLinkStyles} onClick={handleClick}>
       {translate('shortcuts_title')}
-    </button>
+    </UnstyledButton>
   );
-}
+});
