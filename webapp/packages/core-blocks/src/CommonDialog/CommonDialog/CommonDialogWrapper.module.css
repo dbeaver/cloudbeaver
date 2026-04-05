@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 .dialog {
-  composes: theme-background-surface theme-text-on-surface theme-elevation-z10 from global;
+  composes: theme-background-surface theme-text-on-surface from global;
 
   &.fixedSize[data-size='small'] {
     width: 404px;

@@ -27,6 +27,7 @@
     "@cloudbeaver/core-localization": "workspace:*",
     "@cloudbeaver/core-theming": "workspace:*",
     "@cloudbeaver/core-utils": "workspace:*",
+    "@cloudbeaver/plugin-tailwindcss-theme": "workspace:*",
     "@codemirror/autocomplete": "^6",
     "@codemirror/commands": "^6",
     "@codemirror/lang-html": "^6",

@@ -2,28 +2,22 @@
   "extends": "@cloudbeaver/tsconfig/tsconfig.json",
   "compilerOptions": {
     "rootDir": "src",
-    "outDir": "dist",
-    "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo",
+    "outDir": "lib",
+    "tsBuildInfoFile": "lib/tsconfig.tsbuildinfo",
     "composite": true
   },
   "references": [
     {
-      "path": "../core-browser"
+      "path": "../../common-typescript/@dbeaver/cli"
     },
     {
       "path": "../core-cli"
     },
     {
-      "path": "../plugin-sso"
+      "path": "../core-di"
     },
     {
-      "path": "../plugin-tailwindcss-theme"
-    },
-    {
-      "path": "../product-base"
-    },
-    {
-      "path": "../product-default-impl"
+      "path": "../core-di/tsconfig.json"
     }
   ],
   "include": [
@@ -35,7 +29,6 @@
   ],
   "exclude": [
     "**/node_modules",
-    "dist/**/*",
     "lib/**/*"
   ]
 }
