@@ -1,0 +1,8 @@
+@import 'tailwindcss' layer(base) prefix(tw);
+@import './animation.css';
+@import './shadow.css';
+@import './typography.css';
+@import './typography-utilities.css';
+@import './ripple.css';
+
+@custom-variant dark (&:where(.theme-dark, .theme-dark *));

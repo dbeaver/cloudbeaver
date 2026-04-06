@@ -5,6 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+
 .resizerControls {
   composes: theme-background-background theme-text-on-secondary from global;
   position: relative;
@@ -12,7 +13,7 @@
   cursor: ew-resize;
   user-select: none;
   z-index: 1;
-  transition: background-color 0.3s ease-in-out;
+  transition: background-color var(--duration-slow) var(--ease-smooth);
 
   &:before {
     content: ' ';

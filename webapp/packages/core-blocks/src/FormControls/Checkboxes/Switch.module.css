@@ -5,6 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+
 @layer components {
   .field {
     --dbv-kit-control-outline-offset: -8px;
@@ -41,34 +42,118 @@
       border-width: var(--dbv-kit-control-outline-width);
     }
   }
-}
 
-.switchControl {
-  composes: theme-switch from global;
-}
+  .switchControl {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    width: 36px;
+    height: 20px;
+    vertical-align: middle;
+    outline: none;
+    flex-shrink: 0;
 
-.disabled {
-  composes: theme-switch--disabled mdc-switch--disabled from global;
-}
+    &:not(.disabled):hover .switchControlThumb {
+      box-shadow:
+        0px 3px 1px -2px rgba(0, 0, 0, 0.2),
+        0px 2px 2px 0px rgba(0, 0, 0, 0.14),
+        0px 1px 5px 0px rgba(0, 0, 0, 0.12),
+        0px 0px 0px 8px color-mix(in srgb, var(--theme-on-surface) 4%, transparent);
+    }
 
-.checked {
-  composes: theme-switch--checked mdc-switch--checked from global;
-}
+    &:not(.disabled):has(.switchInput:focus-visible) .switchControlThumb {
+      box-shadow:
+        0px 3px 1px -2px rgba(0, 0, 0, 0.2),
+        0px 2px 2px 0px rgba(0, 0, 0, 0.14),
+        0px 1px 5px 0px rgba(0, 0, 0, 0.12),
+        0px 0px 0px 12px color-mix(in srgb, var(--theme-on-surface) 8%, transparent);
+    }
+  }
 
-.switchControlTrack {
-  composes: theme-switch__track from global;
-}
+  .switchInput {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+    margin: 0;
+    padding: 0;
+    z-index: 2;
 
-.switchInput {
-  composes: theme-switch_native-control from global;
-}
+    &:disabled {
+      cursor: default;
+      pointer-events: none;
+    }
+  }
 
-.switchControlUnderlay {
-  composes: theme-switch__thumb-underlay from global;
-}
+  .switchControlTrack {
+    box-sizing: border-box;
+    position: absolute;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+    width: 100%;
+    height: 14px;
+    border: 1px solid var(--theme-on-surface, #000);
+    border-radius: 7px;
+    background-color: var(--theme-on-surface, #000);
+    opacity: 0.38;
+    border: none;
+    transition:
+      background-color var(--duration-fast) var(--ease-smooth-start),
+      border-color var(--duration-fast) var(--ease-smooth-start),
+      opacity var(--duration-fast) var(--ease-smooth-start);
+  }
 
-.switchControlThumb {
-  composes: theme-switch__thumb from global;
+  .switchControlUnderlay {
+    margin-left: -2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: margin-left var(--duration-fast) var(--ease-smooth-start);
+  }
+
+  .switchControlThumb {
+    box-sizing: border-box;
+    width: 20px;
+    height: 20px;
+    border: 10px solid var(--theme-switch-thumb, #fff);
+    border-radius: 50%;
+    background-color: var(--theme-surface, #fff);
+    box-shadow:
+      0px 3px 1px -2px rgba(0, 0, 0, 0.2),
+      0px 2px 2px 0px rgba(0, 0, 0, 0.14),
+      0px 1px 5px 0px rgba(0, 0, 0, 0.12);
+    pointer-events: none;
+    z-index: 1;
+    transition:
+      background-color var(--duration-fast) var(--ease-smooth-start),
+      border-color var(--duration-fast) var(--ease-smooth-start);
+  }
+
+  .checked {
+    & .switchControlTrack {
+      background-color: color-mix(in srgb, var(--theme-primary, #2a7cb4) 50%, transparent);
+      border-color: color-mix(in srgb, var(--theme-primary, #2a7cb4) 50%, transparent);
+      opacity: 1;
+    }
+
+    & .switchControlUnderlay {
+      margin-left: 18px;
+    }
+
+    & .switchControlThumb {
+      background-color: var(--theme-primary, #2a7cb4);
+      border-color: var(--theme-primary, #2a7cb4);
+    }
+  }
+
+  .disabled {
+    opacity: 0.38;
+    pointer-events: none;
+  }
 }
 
 .switchBody {
