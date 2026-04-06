@@ -24,6 +24,7 @@ import {
 import { useService } from '@cloudbeaver/core-di';
 import { LeftBarPanelService, SideBarPanel, SideBarPanelService, TabStyles } from '@cloudbeaver/core-ui';
 
+import { PANEL_ID_LEFT_SIDEBAR, PANEL_ID_RIGHT_SIDEBAR } from './AppScreenService.js';
 import { RightArea } from './RightArea.js';
 import style from './Main.module.css';
 import LeftSideBarPanel from './LeftSideBarPanel.module.css';
@@ -67,7 +68,7 @@ export const Main = observer(function Main() {
           <Pane className={s(styles, { pane: true })} basis="250px" main>
             <Loader suspense>
               <SContext registry={LEFT_SIDEBAR_PANEL_REGISTRY}>
-                <SideBarPanel container={leftBarPanelService.tabsContainer} panelId="dbeaver-left-sidebar" />
+                <SideBarPanel container={leftBarPanelService.tabsContainer} panelId={PANEL_ID_LEFT_SIDEBAR} />
               </SContext>
             </Loader>
           </Pane>
@@ -80,7 +81,7 @@ export const Main = observer(function Main() {
               <ResizerControls />
               <Pane className={s(styles, { pane: true })} basis="400px" main>
                 <Loader className={s(styles, { loader: true })} suspense>
-                  <SideBarPanel container={sideBarPanelService.tabsContainer} panelId="dbeaver-right-sidebar" />
+                  <SideBarPanel container={sideBarPanelService.tabsContainer} panelId={PANEL_ID_RIGHT_SIDEBAR} />
                 </Loader>
               </Pane>
             </Split>

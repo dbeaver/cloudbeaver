@@ -1,4 +1,7 @@
 export default [
+  ['app_skip_nav_label', '跳过导航'],
+  ['app_skip_nav_navigator', '跳转到导航器'],
+  ['app_skip_nav_main_content', '跳转到主要内容'],
   ['app_shared_settingsMenu_config', '配置'],
   ['app_shared_settingsMenu_theme', '主题'],
   ['app_shared_settingsMenu_lang', '语言'],

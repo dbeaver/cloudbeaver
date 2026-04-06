@@ -1,0 +1,39 @@
+/* Increase specificity by selector repetition */
+.cm-tooltip.cm-tooltip {
+  &.cm-tooltip-autocomplete {
+    & > ul {
+      border-radius: var(--theme-form-element-radius);
+    }
+
+    & li {
+      display: flex;
+      align-items: center;
+
+      &:hover {
+        background: var(--theme-sub-secondary);
+        color: var(--theme-on-secondary);
+      }
+
+      &[aria-selected='true'] {
+        background: var(--theme-secondary);
+        color: var(--theme-text-primary-on-light);
+      }
+    }
+
+    & .cm-completionIcon {
+      opacity: 1;
+      width: 16px;
+      height: 16px;
+      padding: 0;
+      margin-right: 0.6em;
+
+      &:not([src]) {
+        opacity: 0;
+      }
+    }
+  }
+
+  &.cm-completionInfo {
+    margin-left: 8px;
+  }
+}

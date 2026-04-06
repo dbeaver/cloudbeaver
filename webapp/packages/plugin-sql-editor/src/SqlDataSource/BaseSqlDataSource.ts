@@ -91,7 +91,7 @@ export abstract class BaseSqlDataSource<TDataSource extends QueryDataSource = Qu
   protected editing: boolean;
   protected innerCursorState: ISqlEditorCursor;
 
-  constructor(icon = '/icons/sql_script_m.svg') {
+  constructor(icon = '/icons/sql_script_temp_m.svg') {
     this.icon = icon;
     this.databaseModels = [];
     this.incomingScript = undefined;
