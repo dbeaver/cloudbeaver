@@ -5,7 +5,12 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
+
+// Mock the plugin to prevent side effects from module initialization
+vi.mock('@cloudbeaver/plugin-data-viewer', () => ({
+  isStringifiedBoolean: (value: string) => /^(true|false)$/i.test(value),
+}));
 
 import { computePasteUpdates } from './computePasteUpdates.js';
 import type { ITableData } from '../../TableDataContext.js';

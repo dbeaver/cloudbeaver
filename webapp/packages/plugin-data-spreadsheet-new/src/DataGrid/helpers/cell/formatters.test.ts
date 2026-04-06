@@ -7,6 +7,11 @@
  */
 import { describe, it, expect, vi } from 'vitest';
 
+// Mock the plugin to prevent side effects from module initialization
+vi.mock('@cloudbeaver/plugin-data-viewer', () => ({
+  isResultSetFileValue: (value: any) => value?.$type === 'file',
+}));
+
 import { formatCellValueForClipboard } from './formatters.js';
 import { NULL_SENTINEL } from '../constants/nullSentinel.js';
 import type { ITableData } from '../../TableDataContext.js';

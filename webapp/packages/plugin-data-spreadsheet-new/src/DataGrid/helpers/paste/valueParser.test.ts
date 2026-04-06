@@ -7,6 +7,11 @@
  */
 import { describe, it, expect, vi } from 'vitest';
 
+// Mock the plugin to prevent side effects from module initialization
+vi.mock('@cloudbeaver/plugin-data-viewer', () => ({
+  isStringifiedBoolean: (value: string) => /^(true|false)$/i.test(value),
+}));
+
 import { parseValueForCell } from './valueParser.js';
 import { NULL_SENTINEL } from '../constants/nullSentinel.js';
 import type { ITableData } from '../../TableDataContext.js';
