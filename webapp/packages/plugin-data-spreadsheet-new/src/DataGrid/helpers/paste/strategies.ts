@@ -80,7 +80,7 @@ function pasteGridToSelection(ctx: IPasteContext): IPasteUpdate[] {
 }
 
 function pasteGridFromFocused(ctx: IPasteContext): IPasteUpdate[] {
-  const { pastedGrid, rowCount, colCount, focusedElement, tableData, visualColumnOrder, isCellEditable } = ctx;
+  const { pastedGrid, rowCount, colCount, focusedElement, selectedCells, tableData, visualColumnOrder, isCellEditable } = ctx;
 
   if (focusedElement === null) {
     return [];
@@ -92,8 +92,16 @@ function pasteGridFromFocused(ctx: IPasteContext): IPasteUpdate[] {
   }
 
   const startRowIdx = tableData.getRowIndexFromKey(focusedElement.row);
-  const pasteRows = Math.min(rowCount, tableData.rows.length - startRowIdx);
-  const pasteCols = Math.min(colCount, visualColumnOrder.length - visualColIdx);
+
+  // If there's a selection, use its size to limit the paste area
+  const visualBox = selectedCells.size > 0 ? getVisualBoundingBox(selectedCells, tableData, visualColumnOrder) : null;
+
+  // Calculate paste bounds: use selection size if available, otherwise use grid bounds
+  const maxRows = visualBox ? visualBox.rows : tableData.rows.length - startRowIdx;
+  const maxCols = visualBox ? visualBox.columns : visualColumnOrder.length - visualColIdx;
+
+  const pasteRows = Math.min(rowCount, maxRows);
+  const pasteCols = Math.min(colCount, maxCols);
 
   return buildUpdates({
     grid: pastedGrid,
@@ -112,8 +120,9 @@ function pasteGridFromFocused(ctx: IPasteContext): IPasteUpdate[] {
  * First matching strategy is applied.
  *
  * Note: Region paste always starts from the focused element (if available),
- * regardless of selection state. This provides intuitive paste behavior
- * where the cursor position determines where content is inserted.
+ * and uses the selection size to limit how much is pasted. This provides
+ * intuitive paste behavior where the cursor position determines where content
+ * is inserted, and the selection determines the paste area size.
  */
 export const PASTE_STRATEGIES: IPasteStrategy[] = [
   {
@@ -127,7 +136,7 @@ export const PASTE_STRATEGIES: IPasteStrategy[] = [
     apply: pasteSingleCellToFocused,
   },
   {
-    // Region -> focused: paste region starting at focused cell (prioritized over selection)
+    // Region -> focused: paste region starting at focused cell, clipped to selection size if available
     matches: ctx => !ctx.isSingleCell && ctx.focusedElement !== null,
     apply: pasteGridFromFocused,
   },
