@@ -30,6 +30,7 @@ import { GRID_ROLES } from './helpers/constants/gridRoles.js';
 import { formatCellValueForClipboard } from './helpers/cell/formatters.js';
 import { getCellRawValue, isCellPasteable } from './helpers/cell/accessors.js';
 import { extractCellsFromRegion, extractRegionCells } from './helpers/selection/extractCells.js';
+import { isCompleteRectangleSelected } from './helpers/selection/boundingBox.js';
 import { buildTsvFromCells } from './helpers/selection/buildTsv.js';
 import { computePasteUpdates } from './helpers/paste/computePasteUpdates.js';
 
@@ -55,6 +56,7 @@ function isGridCellTarget(event: React.KeyboardEvent): boolean {
 
 /**
  * Get the region to copy based on current selection state.
+ * Returns null if selection has holes (non-rectangular selection).
  */
 function getRegionToCopy(
   selectedCells: Map<string, IGridDataKey[]>,
@@ -64,12 +66,20 @@ function getRegionToCopy(
   getCellRawValue: (key: IGridDataKey) => unknown,
 ) {
   // Priority 1: Use last selection region if available (preserves selection order)
+  // Only if selection is a complete rectangle (no holes from Cmd+click unselecting)
   if (selectedCells.size > 0 && lastSelectionRegion) {
+    if (!isCompleteRectangleSelected(selectedCells, tableData)) {
+      return null;
+    }
     return extractCellsFromRegion({ region: lastSelectionRegion, getCellRawValue });
   }
 
   // Priority 2: Use bounding box of selected cells
+  // Only if selection is a complete rectangle (no holes from Cmd+click unselecting)
   if (selectedCells.size > 0) {
+    if (!isCompleteRectangleSelected(selectedCells, tableData)) {
+      return null;
+    }
     return extractRegionCells({ tableData, selectedCells, getCellRawValue });
   }
 

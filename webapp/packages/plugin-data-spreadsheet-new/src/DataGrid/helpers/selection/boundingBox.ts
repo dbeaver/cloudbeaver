@@ -57,3 +57,26 @@ export function getBoundingBox(selectedCells: Map<string, IGridDataKey[]>, table
     columns: maxColIdx - minColIdx + 1,
   };
 }
+
+/**
+ * Check if the selection forms a complete rectangle (no holes).
+ * Returns true if all cells within the bounding box are selected.
+ */
+export function isCompleteRectangleSelected(selectedCells: Map<string, IGridDataKey[]>, tableData: ITableData): boolean {
+  const box = getBoundingBox(selectedCells, tableData);
+
+  if (!box) {
+    return false;
+  }
+
+  // Count actual selected cells
+  let selectedCount = 0;
+  for (const cells of selectedCells.values()) {
+    selectedCount += cells.length;
+  }
+
+  // Expected count for a complete rectangle
+  const expectedCount = box.rows * box.columns;
+
+  return selectedCount === expectedCount;
+}
