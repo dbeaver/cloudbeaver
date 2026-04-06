@@ -43,8 +43,8 @@ export class ResultSetDataAction extends GridDataResultAction<
     return this.getColumn(key)?.name;
   }
 
-  override getColumnNameByPosition(attributePosition: number): string | undefined {
-    return this.columns.find(c => c.position === attributePosition)?.name;
+  override getColumnNameAt(colIdx: number): string | undefined {
+    return this.columns.find(c => c.position === colIdx)?.name;
   }
 
   insertRow(row: IGridRowKey, value: IResultSetValue[], shift = 0): IGridRowKey | undefined {

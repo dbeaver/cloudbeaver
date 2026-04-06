@@ -56,7 +56,8 @@ export abstract class GridDataResultAction<
   }
 
   abstract getColumnName(key: IGridColumnKey): string | undefined;
-  abstract getColumnNameByPosition(attributePosition: number): string | undefined;
+
+  abstract getColumnNameAt(colIdx: number): string | undefined;
   abstract insertRow(row: IGridRowKey, value: TCell[], shift?: number): IGridRowKey | undefined;
   abstract removeRow(row: IGridRowKey, shift?: number): IGridRowKey | undefined;
   abstract setRowValue(row: IGridRowKey, value: TCell[], shift?: number): void;

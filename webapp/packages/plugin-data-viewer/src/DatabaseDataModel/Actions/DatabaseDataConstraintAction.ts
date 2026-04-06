@@ -192,7 +192,7 @@ export class DatabaseDataConstraintAction
 
     if (currentConstraint) {
       currentConstraint.operator = operator;
-      currentConstraint.attributeName = this.getColumnNameByPosition(attributePosition);
+      currentConstraint.attributeName = this.getColumnNameAt(attributePosition);
       if (value !== undefined) {
         currentConstraint.value = value;
       } else if (currentConstraint.value !== undefined) {
@@ -204,7 +204,7 @@ export class DatabaseDataConstraintAction
 
     const constraint: SqlDataFilterConstraint = {
       attributePosition,
-      attributeName: this.getColumnNameByPosition(attributePosition),
+      attributeName: this.getColumnNameAt(attributePosition),
       operator,
     };
 
@@ -233,7 +233,7 @@ export class DatabaseDataConstraintAction
       if (!resetOrder) {
         this.source.options.constraints.push({
           attributePosition,
-          attributeName: this.getColumnNameByPosition(attributePosition),
+          attributeName: this.getColumnNameAt(attributePosition),
           orderPosition: this.getMaxOrderPosition(),
           orderAsc: order === EOrder.asc,
         });
@@ -275,8 +275,8 @@ export class DatabaseDataConstraintAction
     updateConstraintsForResult(this.source, result);
   }
 
-  private getColumnNameByPosition(attributePosition: number): string | undefined {
-    return this.result.data?.columns?.find(c => c.position === attributePosition)?.name;
+  private getColumnNameAt(colIdx: number): string | undefined {
+    return this.result.data?.columns?.find(c => c.position === colIdx)?.name;
   }
 
   private persistConstraints(): void {
@@ -288,7 +288,7 @@ export class DatabaseDataConstraintAction
 
     const constraints: IPersistedConstraint[] = this.source.options.constraints
       .map(c => {
-        const name = c.attributeName ?? this.getColumnNameByPosition(c.attributePosition!);
+        const name = c.attributeName ?? this.getColumnNameAt(c.attributePosition!);
 
         if (!name) {
           return null;
