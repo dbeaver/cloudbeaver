@@ -93,12 +93,14 @@ function pasteGridFromFocused(ctx: IPasteContext): IPasteUpdate[] {
 
   const startRowIdx = tableData.getRowIndexFromKey(focusedElement.row);
 
-  // If there's a selection, use its size to limit the paste area
+  // If there's a multi-cell selection, use its size to limit the paste area
+  // For single-cell selection, paste the whole region (as much as fits)
   const visualBox = selectedCells.size > 0 ? getVisualBoundingBox(selectedCells, tableData, visualColumnOrder) : null;
+  const isSingleCellSelection = visualBox && visualBox.rows === 1 && visualBox.columns === 1;
 
-  // Calculate paste bounds: use selection size if available, otherwise use grid bounds
-  const maxRows = visualBox ? visualBox.rows : tableData.rows.length - startRowIdx;
-  const maxCols = visualBox ? visualBox.columns : visualColumnOrder.length - visualColIdx;
+  // Calculate paste bounds: use selection size only for multi-cell selection, otherwise use grid bounds
+  const maxRows = visualBox && !isSingleCellSelection ? visualBox.rows : tableData.rows.length - startRowIdx;
+  const maxCols = visualBox && !isSingleCellSelection ? visualBox.columns : visualColumnOrder.length - visualColIdx;
 
   const pasteRows = Math.min(rowCount, maxRows);
   const pasteCols = Math.min(colCount, maxCols);
@@ -119,10 +121,9 @@ function pasteGridFromFocused(ctx: IPasteContext): IPasteUpdate[] {
  * Paste strategies ordered by priority.
  * First matching strategy is applied.
  *
- * Note: Region paste always starts from the focused element (if available),
- * and uses the selection size to limit how much is pasted. This provides
- * intuitive paste behavior where the cursor position determines where content
- * is inserted, and the selection determines the paste area size.
+ * Note: Region paste always starts from the focused element (if available).
+ * - For multi-cell selection: uses selection size to limit paste area
+ * - For single-cell selection or no selection: pastes whole region (as much as fits)
  */
 export const PASTE_STRATEGIES: IPasteStrategy[] = [
   {

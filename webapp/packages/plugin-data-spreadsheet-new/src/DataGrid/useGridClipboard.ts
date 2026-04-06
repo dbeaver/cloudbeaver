@@ -57,6 +57,7 @@ function isGridCellTarget(event: React.KeyboardEvent): boolean {
 /**
  * Get the region to copy based on current selection state.
  * Returns null if selection has holes (non-rectangular selection).
+ * Always uses visual column order to respect pinned/reordered columns.
  */
 function getRegionToCopy(
   selectedCells: Map<string, IGridDataKey[]>,
@@ -64,6 +65,7 @@ function getRegionToCopy(
   lastSelectionRegion: ILastSelectionRegion | null,
   tableData: ITableData,
   getCellRawValue: (key: IGridDataKey) => unknown,
+  visualColumnOrder: IGridColumnKey[],
 ) {
   // Priority 1: Use last selection region if available (preserves selection order)
   // Only if selection is a complete rectangle (no holes from Cmd+click unselecting)
@@ -71,22 +73,22 @@ function getRegionToCopy(
     if (!isCompleteRectangleSelected(selectedCells, tableData)) {
       return null;
     }
-    return extractCellsFromRegion({ region: lastSelectionRegion, getCellRawValue });
+    return extractCellsFromRegion({ region: lastSelectionRegion, getCellRawValue, visualColumnOrder });
   }
 
-  // Priority 2: Use bounding box of selected cells
+  // Priority 2: Use bounding box of selected cells with visual column order
   // Only if selection is a complete rectangle (no holes from Cmd+click unselecting)
   if (selectedCells.size > 0) {
     if (!isCompleteRectangleSelected(selectedCells, tableData)) {
       return null;
     }
-    return extractRegionCells({ tableData, selectedCells, getCellRawValue });
+    return extractRegionCells({ tableData, selectedCells, getCellRawValue, visualColumnOrder });
   }
 
   // Priority 3: Use focused element as single-cell selection
   if (focusedElement) {
     const serialized = GridDataKeysUtils.serialize(focusedElement.row);
-    return extractRegionCells({ tableData, selectedCells: new Map([[serialized, [focusedElement]]]), getCellRawValue });
+    return extractRegionCells({ tableData, selectedCells: new Map([[serialized, [focusedElement]]]), getCellRawValue, visualColumnOrder });
   }
 
   return null;
@@ -116,7 +118,7 @@ export function useGridClipboard(params: IUseGridClipboardParams): IUseGridClipb
   const copyEventHandler = useDataViewerCopyHandler();
 
   const handleCopy = useCallback(() => {
-    const { tableData, selectionContext, selectAction, gridClipboard } = props;
+    const { tableData, selectionContext, selectAction, gridClipboard, getHeaderOrder } = props;
 
     if (!dataViewerService.canCopyData || !(selectAction instanceof ResultSetSelectAction)) {
       return;
@@ -130,8 +132,20 @@ export function useGridClipboard(params: IUseGridClipboardParams): IUseGridClipb
       return;
     }
 
+    // Get visual column order to respect pinned/reordered columns
+    const visualColumnOrder: IGridColumnKey[] = getHeaderOrder()
+      .map(key => ({ index: Number(key) }))
+      .filter(col => !Number.isNaN(col.index));
+
     const getCellValue = (key: IGridDataKey) => getCellRawValue({ tableData, key });
-    const regionData = getRegionToCopy(selectedCells, focusedElement, selectionContext.lastSelectionRegion, tableData, getCellValue);
+    const regionData = getRegionToCopy(
+      selectedCells,
+      focusedElement,
+      selectionContext.lastSelectionRegion,
+      tableData,
+      getCellValue,
+      visualColumnOrder,
+    );
 
     if (!regionData) {
       return;

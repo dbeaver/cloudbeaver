@@ -12,12 +12,22 @@ import type { IExtractCellsParams, IExtractedCells, IExtractFromRegionParams } f
 
 /**
  * Build a 2D grid of raw cell values from the last selection region.
- * Uses actual row/column keys to correctly handle pinned and reordered columns.
+ * Always uses visual column order to correctly handle pinned and reordered columns.
  */
 export function extractCellsFromRegion(params: IExtractFromRegionParams): IExtractedCells | null {
-  const { region, getCellRawValue } = params;
+  const { region, getCellRawValue, visualColumnOrder } = params;
 
   if (region.rowKeys.length === 0 || region.columnKeys.length === 0) {
+    return null;
+  }
+
+  // Get the set of column indices from the region
+  const regionColIndices = new Set(region.columnKeys.map(col => col.index));
+
+  // Reorder columns based on visual order, keeping only those in the region
+  const orderedColumnKeys = visualColumnOrder.filter(col => regionColIndices.has(col.index));
+
+  if (orderedColumnKeys.length === 0) {
     return null;
   }
 
@@ -26,7 +36,7 @@ export function extractCellsFromRegion(params: IExtractFromRegionParams): IExtra
   for (const row of region.rowKeys) {
     const rowCells: Array<{ sourceKey: IGridDataKey; value: unknown }> = [];
 
-    for (const colKey of region.columnKeys) {
+    for (const colKey of orderedColumnKeys) {
       const key: IGridDataKey = { row, column: colKey };
       const value = getCellRawValue(key);
       rowCells.push({ sourceKey: key, value });
@@ -39,14 +49,15 @@ export function extractCellsFromRegion(params: IExtractFromRegionParams): IExtra
     return null;
   }
 
-  return { cells, columnKeys: region.columnKeys, rowKeys: region.rowKeys };
+  return { cells, columnKeys: orderedColumnKeys, rowKeys: region.rowKeys };
 }
 
 /**
  * Build a 2D grid of raw cell values from the selected cells bounding box.
+ * Always uses visual column order to respect pinned/reordered columns.
  */
 export function extractRegionCells(params: IExtractCellsParams): IExtractedCells | null {
-  const { tableData, selectedCells, getCellRawValue } = params;
+  const { tableData, selectedCells, getCellRawValue, visualColumnOrder } = params;
 
   const box = getBoundingBox(selectedCells, tableData);
 
@@ -55,7 +66,6 @@ export function extractRegionCells(params: IExtractCellsParams): IExtractedCells
   }
 
   const rowKeys = [];
-  const columnKeys = [];
 
   for (let rowIdx = box.startRowIdx; rowIdx <= box.endRowIdx; rowIdx++) {
     const row = tableData.getRow(rowIdx);
@@ -64,12 +74,16 @@ export function extractRegionCells(params: IExtractCellsParams): IExtractedCells
     }
   }
 
-  for (let colIdx = box.startColIdx; colIdx <= box.endColIdx; colIdx++) {
-    const col = tableData.getColumn(colIdx);
-    if (col?.key) {
-      columnKeys.push(col.key);
+  // Find selected column indices
+  const selectedColIndices = new Set<number>();
+  for (const cells of selectedCells.values()) {
+    for (const cell of cells) {
+      selectedColIndices.add(cell.column.index);
     }
   }
 
-  return extractCellsFromRegion({ region: { rowKeys, columnKeys }, getCellRawValue });
+  // Filter visual column order to only include selected columns, preserving visual order
+  const columnKeys = visualColumnOrder.filter(col => selectedColIndices.has(col.index));
+
+  return extractCellsFromRegion({ region: { rowKeys, columnKeys }, getCellRawValue, visualColumnOrder });
 }

@@ -29,9 +29,11 @@ export interface IExtractCellsParams {
   tableData: ITableData;
   selectedCells: Map<string, IGridDataKey[]>;
   getCellRawValue: (key: IGridDataKey) => unknown;
+  visualColumnOrder: IGridColumnKey[];
 }
 
 export interface IExtractFromRegionParams {
   region: ILastSelectionRegion;
   getCellRawValue: (key: IGridDataKey) => unknown;
+  visualColumnOrder: IGridColumnKey[];
 }
