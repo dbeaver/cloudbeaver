@@ -19,10 +19,13 @@ import { isObjectsEqual } from '@cloudbeaver/core-utils';
 import { ColumnDnDContext } from '../ColumnDnDContext.js';
 import { DataGridContext } from '../DataGridContext.js';
 import { DataGridSelectionContext } from '../DataGridSelection/DataGridSelectionContext.js';
+import { GridClipboardContext } from '../GridClipboardContext.js';
 import { TableDataContext, type IColumnInfo } from '../TableDataContext.js';
 import { CellContext } from './CellContext.js';
 import { useDataEditorDnDBox } from '../useDataEditorDnDBox.js';
 import { getDropSide } from '../getDropSide.js';
+import { useClipboardOutline } from '../hooks/useClipboardOutline.js';
+import { CELL_CLASSES } from '../helpers/constants/cellClasses.js';
 
 interface Props {
   rowIdx: number;
@@ -36,6 +39,7 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
   const tableDataContext = useContext(TableDataContext);
   const selectionContext = useContext(DataGridSelectionContext);
   const columnDnDContext = useContext(ColumnDnDContext);
+  const gridClipboard = useContext(GridClipboardContext);
   const columnInfo = tableDataContext.getColumn(colIdx);
   const dndBox = useDataEditorDnDBox(dataGridContext.model, dataGridContext.resultIndex, columnInfo?.key ?? null);
 
@@ -100,14 +104,21 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
   );
 
   const dropSide = getComputed(() => getDropSide(columnInfo, columnDnDContext));
+  const { isClipboardCell, outline: clipboardOutline } = useClipboardOutline(rowIdx, colIdx, cellContext.cell, gridClipboard, tableDataContext);
+
   const classes = getComputed(() =>
     clsx({
-      'rdg-cell-custom-selected': cellContext.isSelected,
-      'rdg-cell-custom-added': cellContext.editionState === DatabaseEditChangeType.add,
-      'rdg-cell-custom-deleted': cellContext.editionState === DatabaseEditChangeType.delete,
-      'rdg-cell-custom-edited': cellContext.editionState === DatabaseEditChangeType.update,
-      'rdg-cell-column-drop-left': dropSide === 'left',
-      'rdg-cell-column-drop-right': dropSide === 'right',
+      [CELL_CLASSES.selected]: cellContext.isSelected,
+      [CELL_CLASSES.added]: cellContext.editionState === DatabaseEditChangeType.add,
+      [CELL_CLASSES.deleted]: cellContext.editionState === DatabaseEditChangeType.delete,
+      [CELL_CLASSES.edited]: cellContext.editionState === DatabaseEditChangeType.update,
+      [CELL_CLASSES.clipboard]: isClipboardCell,
+      [CELL_CLASSES.clipboardEdgeTop]: clipboardOutline.top,
+      [CELL_CLASSES.clipboardEdgeRight]: clipboardOutline.right,
+      [CELL_CLASSES.clipboardEdgeBottom]: clipboardOutline.bottom,
+      [CELL_CLASSES.clipboardEdgeLeft]: clipboardOutline.left,
+      [CELL_CLASSES.columnDropLeft]: dropSide === 'left',
+      [CELL_CLASSES.columnDropRight]: dropSide === 'right',
     }),
   );
 

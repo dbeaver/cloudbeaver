@@ -13,12 +13,13 @@ import { type IGridColumnKey, type IGridDataKey, type IGridRowKey, GridDataKeysU
 
 import { isColumnInfo, type IColumnInfo, type ITableData } from '../TableDataContext.js';
 import type { IDraggingPosition } from '../useGridDragging.js';
-import type { IDataGridSelectionContext } from './DataGridSelectionContext.js';
+import type { IDataGridSelectionContext, ILastSelectionRegion } from './DataGridSelectionContext.js';
 
 interface IGridSelectionState {
   range: boolean;
   temporarySelection: Map<string, IGridDataKey[]>;
   lastSelectedCell: IDraggingPosition | null;
+  lastSelectionRegion: ILastSelectionRegion | null;
 }
 
 export function useGridSelectionContext(
@@ -33,6 +34,7 @@ export function useGridSelectionContext(
       range: false,
       temporarySelection: new Map<string, IGridDataKey[]>(),
       lastSelectedCell: null,
+      lastSelectionRegion: null,
     }),
   );
 
@@ -131,13 +133,25 @@ export function useGridSelectionContext(
     const lastRow = props.tableData.getRow(lastPosition.rowIdx);
 
     if (startRow && lastRow) {
-      selectRows(
-        startRow,
-        lastRow,
-        isIndexColumnInRange ? undefined : columnsInRange.filter(column => column.key !== null).map(column => column.key!),
-        multiple,
-        temporary,
-      );
+      const columnKeys = isIndexColumnInRange ? undefined : columnsInRange.filter(column => column.key !== null).map(column => column.key!);
+
+      if (!temporary) {
+        const firstRowIdx = Math.min(startPosition.rowIdx, lastPosition.rowIdx);
+        const lastRowIdx = Math.max(startPosition.rowIdx, lastPosition.rowIdx);
+        const rowKeys: IGridRowKey[] = [];
+        for (let i = firstRowIdx; i <= lastRowIdx; i++) {
+          const row = props.tableData.getRow(i);
+          if (row) {
+            rowKeys.push(row);
+          }
+        }
+        state.lastSelectionRegion = {
+          rowKeys,
+          columnKeys: columnKeys ?? props.tableData.columnKeys,
+        };
+      }
+
+      selectRows(startRow, lastRow, columnKeys, multiple, temporary);
     }
   }
 
@@ -253,8 +267,21 @@ export function useGridSelectionContext(
     }
 
     if (isIndexColumn) {
+      if (!temporary) {
+        state.lastSelectionRegion = {
+          rowKeys: [row],
+          columnKeys: props.tableData.columnKeys,
+        };
+      }
       selectRows(row, row, undefined, multiple, temporary);
       return;
+    }
+
+    if (!temporary) {
+      state.lastSelectionRegion = {
+        rowKeys: row ? [row] : [],
+        columnKeys: column?.key ? [column.key] : [],
+      };
     }
 
     if (column.key !== null) {
@@ -284,6 +311,9 @@ export function useGridSelectionContext(
     () => ({
       get selectedCells() {
         return props.selectionAction.selectedElements;
+      },
+      get lastSelectionRegion() {
+        return state.lastSelectionRegion;
       },
       select,
       selectColumn,

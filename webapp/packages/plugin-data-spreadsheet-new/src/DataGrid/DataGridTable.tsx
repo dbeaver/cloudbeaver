@@ -7,7 +7,7 @@
  */
 import { observable, action, reaction } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { useCallback, useLayoutEffect, useMemo, useRef, type HTMLAttributes } from 'react';
+import { useCallback, useLayoutEffect, useMemo, useRef, useState, type HTMLAttributes } from 'react';
 
 import { getComputed, TextPlaceholder, useObjectRef, useObservableRef, useTranslate } from '@cloudbeaver/core-blocks';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
@@ -58,10 +58,12 @@ import { useGridSelectionContext } from './DataGridSelection/useGridSelectionCon
 import './DataGridTable.css';
 import { CellFormatter } from './Formatters/CellFormatter.js';
 import { FormattingContext } from './FormattingContext.js';
+import { GridClipboardContext } from './GridClipboardContext.js';
 import { TableDataContext } from './TableDataContext.js';
+import { GridClipboard } from './helpers/clipboard/GridClipboard.js';
 import { useGridDragging } from './useGridDragging.js';
 import { useFormatting } from './useFormatting.js';
-import { useGridSelectedCellsCopy } from './useGridSelectedCellsCopy.js';
+import { useGridClipboard } from './useGridClipboard.js';
 import { useSearchResultsCache } from './useSearchResultsCache.js';
 import { useTableData } from './useTableData.js';
 import { TableColumnHeader } from './TableColumnHeader/TableColumnHeader.js';
@@ -91,6 +93,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
   const searchResultsCache = useSearchResultsCache(cacheAction);
   const getHeaderOrder = useCallback(() => (dataGridRef.current?.getColumnsOrdered() ?? []).map(col => col.key), [dataGridRef]);
   const gridSelectionContext = useGridSelectionContext(tableData, selectionAction, getHeaderOrder);
+  const [gridClipboard] = useState(() => new GridClipboard());
 
   const columnDnDState = useObservableRef<IColumnDnDState>(
     () => ({
@@ -184,7 +187,13 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
     },
   }));
 
-  const gridSelectedCellCopy = useGridSelectedCellsCopy(tableData, selectionAction as unknown as DatabaseSelectAction, gridSelectionContext);
+  const gridSelectedCellCopy = useGridClipboard({
+    tableData,
+    selectAction: selectionAction as unknown as DatabaseSelectAction,
+    selectionContext: gridSelectionContext,
+    gridClipboard,
+    getHeaderOrder,
+  });
   const { onMouseDownHandler, onMouseMoveHandler } = useGridDragging({
     onDragStart: startPosition => {
       handlers.selectCell(startPosition);
@@ -208,6 +217,8 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
       if (data.resultId !== editor?.result.id) {
         return;
       }
+
+      gridClipboard.clear();
 
       if (data.revert) {
         dataGridRef.current?.refreshSearch();
@@ -560,6 +571,11 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
 
   const handleCellKeyDown: DataGridProps['onCellKeyDown'] = (_, event) => {
     gridSelectedCellCopy.onKeydownHandler(event);
+
+    if ((event.ctrlKey || event.metaKey) && event.code === 'KeyV') {
+      event.preventGridDefault();
+    }
+
     const cell = selectionAction.getFocusedElement();
 
     if (EventContext.has(event, EventStopPropagationFlag) || model.isReadonly(resultIndex) || !cell) {
@@ -571,63 +587,66 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
       case 'Escape':
       case 'Delete':
         event.preventGridDefault();
+        break;
     }
   };
 
   return (
-    <ColumnDnDContext.Provider value={columnDnDState}>
-      <DataGridContext.Provider value={gridContext}>
-        <DataGridSelectionContext.Provider value={gridSelectionContext}>
-          <TableDataContext.Provider value={tableData}>
-            <FormattingContext.Provider value={formatting}>
-              <div
-                ref={setContainersRef}
-                tabIndex={-1}
-                {...rest}
-                className={clsx('data-grid__container', 'theme-typography--caption', className)}
-                onMouseDown={onMouseDownHandler}
-                onMouseMove={onMouseMoveHandler}
-              >
-                <DataGrid
-                  ref={dataGridRef}
-                  className={clsx('data-grid__grid', className)}
-                  cell={cell}
-                  cellText={cellText}
-                  cellElement={cellElement}
-                  rowElement={rowElement}
-                  getCellEditable={isCellEditable}
-                  headerElement={headerElement}
-                  getHeaderHeight={() => headerHeight}
-                  getHeaderWidth={getHeaderWidth}
-                  getHeaderPinned={getHeaderPinned}
-                  getHeaderResizable={getHeaderResizable}
-                  getRowHeight={() => ROW_HEIGHT}
-                  getColumnKey={getColumnKey}
-                  columnCount={columnsCount}
-                  rowCount={rowsCount}
-                  columnSortable={columnSortable}
-                  columnSortingState={columnSortingState}
-                  getRowId={rowIdx => (tableData.rows[rowIdx] ? GridDataKeysUtils.serialize(tableData.rows[rowIdx]) : '')}
-                  search={{
-                    isEnabled: true,
-                    isReadOnly:
-                      model.isReadonly(resultIndex) || !(isResultSetDataSource(model.source) && model.source.hasElementIdentifier(resultIndex)),
-                    storage: searchResultsCache,
-                  }}
-                  columnSortingMultiple
-                  onFocus={handleFocusChange}
-                  onScrollToBottom={handleScrollToBottom}
-                  onColumnSort={handleSort}
-                  onCellChange={handleCellChange}
-                  onCellChangeBatch={handleCellChangeBatch}
-                  onCellKeyDown={handleCellKeyDown}
-                  onHeaderKeyDown={gridSelectedCellCopy.onKeydownHandler}
-                />
-              </div>
-            </FormattingContext.Provider>
-          </TableDataContext.Provider>
-        </DataGridSelectionContext.Provider>
-      </DataGridContext.Provider>
-    </ColumnDnDContext.Provider>
+    <GridClipboardContext.Provider value={gridClipboard}>
+      <ColumnDnDContext.Provider value={columnDnDState}>
+        <DataGridContext.Provider value={gridContext}>
+          <DataGridSelectionContext.Provider value={gridSelectionContext}>
+            <TableDataContext.Provider value={tableData}>
+              <FormattingContext.Provider value={formatting}>
+                <div
+                  ref={setContainersRef}
+                  tabIndex={-1}
+                  {...rest}
+                  className={clsx('data-grid__container', 'theme-typography--caption', className)}
+                  onMouseDown={onMouseDownHandler}
+                  onMouseMove={onMouseMoveHandler}
+                >
+                  <DataGrid
+                    ref={dataGridRef}
+                    className={clsx('data-grid__grid', className)}
+                    cell={cell}
+                    cellText={cellText}
+                    cellElement={cellElement}
+                    rowElement={rowElement}
+                    getCellEditable={isCellEditable}
+                    headerElement={headerElement}
+                    getHeaderHeight={() => headerHeight}
+                    getHeaderWidth={getHeaderWidth}
+                    getHeaderPinned={getHeaderPinned}
+                    getHeaderResizable={getHeaderResizable}
+                    getRowHeight={() => ROW_HEIGHT}
+                    getColumnKey={getColumnKey}
+                    columnCount={columnsCount}
+                    rowCount={rowsCount}
+                    columnSortable={columnSortable}
+                    columnSortingState={columnSortingState}
+                    getRowId={rowIdx => (tableData.rows[rowIdx] ? GridDataKeysUtils.serialize(tableData.rows[rowIdx]) : '')}
+                    search={{
+                      isEnabled: true,
+                      isReadOnly:
+                        model.isReadonly(resultIndex) || !(isResultSetDataSource(model.source) && model.source.hasElementIdentifier(resultIndex)),
+                      storage: searchResultsCache,
+                    }}
+                    columnSortingMultiple
+                    onFocus={handleFocusChange}
+                    onScrollToBottom={handleScrollToBottom}
+                    onColumnSort={handleSort}
+                    onCellChange={handleCellChange}
+                    onCellChangeBatch={handleCellChangeBatch}
+                    onCellKeyDown={handleCellKeyDown}
+                    onHeaderKeyDown={gridSelectedCellCopy.onKeydownHandler}
+                  />
+                </div>
+              </FormattingContext.Provider>
+            </TableDataContext.Provider>
+          </DataGridSelectionContext.Provider>
+        </DataGridContext.Provider>
+      </ColumnDnDContext.Provider>
+    </GridClipboardContext.Provider>
   );
 });

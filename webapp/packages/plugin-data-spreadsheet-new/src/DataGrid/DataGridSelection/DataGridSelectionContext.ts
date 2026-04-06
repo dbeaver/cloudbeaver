@@ -7,12 +7,18 @@
  */
 import { createContext } from 'react';
 
-import type { IGridDataKey } from '@cloudbeaver/plugin-data-viewer';
+import type { IGridColumnKey, IGridDataKey, IGridRowKey } from '@cloudbeaver/plugin-data-viewer';
 
 import type { IDraggingPosition } from '../useGridDragging.js';
 
+export interface ILastSelectionRegion {
+  rowKeys: IGridRowKey[];
+  columnKeys: IGridColumnKey[];
+}
+
 export interface IDataGridSelectionContext {
   selectedCells: Map<string, IGridDataKey[]>;
+  lastSelectionRegion: ILastSelectionRegion | null;
   clearSelection: VoidFunction;
   select: (cell: IDraggingPosition, multiple: boolean, range: boolean, temporary: boolean) => void;
   selectColumn: (colIdx: number, multiple: boolean) => void;
