@@ -16,6 +16,8 @@
  */
 package io.cloudbeaver.model;
 
+import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.net.DBWHandlerType;
 import org.jkiss.utils.CommonUtils;
@@ -28,12 +30,14 @@ import java.util.Map;
  */
 public class WebNetworkHandlerConfigInput {
 
+    @NotNull
     private final Map<String, Object> cfg;
 
-    public WebNetworkHandlerConfigInput(Map<String, Object> cfg) {
+    public WebNetworkHandlerConfigInput(@NotNull Map<String, Object> cfg) {
         this.cfg = cfg;
     }
 
+    @Nullable
     public DBWHandlerType getType() {
         return CommonUtils.valueOf(DBWHandlerType.class, JSONUtils.getString(cfg, "type"), null);
     }
@@ -42,6 +46,7 @@ public class WebNetworkHandlerConfigInput {
         return JSONUtils.getString(cfg, "id");
     }
 
+    @Nullable
     public Boolean isEnabled() {
         if (cfg.containsKey("enabled")) {
             return JSONUtils.getBoolean(cfg, "enabled");
@@ -62,11 +67,13 @@ public class WebNetworkHandlerConfigInput {
         return JSONUtils.getString(cfg, "password");
     }
 
-    @Deprecated // use secured properties
+    // Deprecated. Use secured properties
+    @Nullable
     public String getKey() {
         return JSONUtils.getString(cfg, "key");
     }
 
+    @Nullable
     public Boolean isSavePassword() {
         if (cfg.containsKey("savePassword")) {
             return JSONUtils.getBoolean(cfg, "savePassword");
@@ -75,10 +82,12 @@ public class WebNetworkHandlerConfigInput {
         }
     }
 
+    @Nullable
     public Map<String, Object> getProperties() {
         return JSONUtils.getObjectOrNull(cfg, "properties");
     }
 
+    @Nullable
     public Map<String, String> getSecureProperties() {
         var secureProperties = JSONUtils.getObjectOrNull(cfg, "secureProperties");
         if (secureProperties == null) {

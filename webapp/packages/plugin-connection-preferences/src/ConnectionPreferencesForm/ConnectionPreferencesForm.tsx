@@ -61,7 +61,7 @@ export const ConnectionPreferencesForm = observer<ConnectionPreferencesFormProps
         <div className="tw:flex tw:flex-col tw:flex-1 tw:h-full tw:overflow-auto theme-background-secondary theme-text-on-secondary">
           <div className="tw:relative tw:flex tw:pt-4 tw:border-b-2 theme-border-color-background theme-background-secondary theme-text-on-secondary">
             <div className="tw:flex-1 tw:overflow-hidden">
-              <div className="tw:h-6 tw:px-4 tw:flex tw:items-center tw:gap-2 theme-typography-caption tw:overflow-hidden">
+              <div className="tw:h-6 tw:px-4 tw:flex tw:items-center tw:gap-2 theme-typography--caption tw:overflow-hidden">
                 <StatusMessage
                   type={exception ? ENotificationType.Error : ENotificationType.Info}
                   message={formState.statusMessage}

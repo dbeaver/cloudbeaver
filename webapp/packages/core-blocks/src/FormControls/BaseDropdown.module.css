@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 .menu {
-  composes: theme-text-on-surface theme-background-surface theme-typography--caption theme-elevation-z3 from global;
+  composes: theme-text-on-surface theme-background-surface theme-typography--caption from global;
   display: flex;
   flex-direction: column;
   max-height: 300px;

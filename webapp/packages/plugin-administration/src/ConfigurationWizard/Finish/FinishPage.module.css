@@ -1,17 +1,21 @@
 .layoutGrid {
-  composes: layout-grid from global;
+  display: grid;
+  box-sizing: border-box;
   width: 100%;
   flex: 1;
+  padding: 24px;
 }
 
 .layoutGridInner {
-  composes: layout-grid__inner from global;
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 24px;
   min-height: 100%;
 }
 
 .layoutGridCell {
-  composes: layout-grid__cell from global;
   composes: theme-background-surface theme-text-on-surface theme-border-color-background from global;
+  grid-column: 1 / -1;
   position: relative;
   border: solid 1px;
   padding: 16px 24px;
