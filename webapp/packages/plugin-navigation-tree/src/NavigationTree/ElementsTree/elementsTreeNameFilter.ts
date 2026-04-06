@@ -76,8 +76,8 @@ export function elementsTreeNameFilterNode(tree: IElementsTree, node: NavNode, f
   return createFilter(filterToLower)(nodeName) ? EEquality.partially : EEquality.none;
 }
 
-function wildcardMatch(str: string, pattern: string): boolean {
-  const s = str.toLowerCase();
+function wildcardMatch(value: string, pattern: string): boolean {
+  const s = value.toLowerCase();
   const p = pattern.trim().toLowerCase();
   const parts = p.split('*');
 
