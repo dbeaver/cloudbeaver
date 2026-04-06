@@ -56,7 +56,6 @@ function isGridCellTarget(event: React.KeyboardEvent): boolean {
 
 /**
  * Get the region to copy based on current selection state.
- * Returns null if selection has holes (non-rectangular selection).
  * Always uses visual column order to respect pinned/reordered columns.
  */
 function getRegionToCopy(
@@ -67,12 +66,9 @@ function getRegionToCopy(
   getCellRawValue: (key: IGridDataKey) => unknown,
   visualColumnOrder: IGridColumnKey[],
 ) {
-  // Priority 1: Use last selection region if available (preserves selection order)
-  // Only if selection is a complete rectangle (no holes from Cmd+click unselecting)
+  // Priority 1: Use last selection region if available
+  // This allows copying the most recent selection even with multiple non-contiguous regions
   if (selectedCells.size > 0 && lastSelectionRegion) {
-    if (!isCompleteRectangleSelected(selectedCells, tableData)) {
-      return null;
-    }
     return extractCellsFromRegion({ region: lastSelectionRegion, getCellRawValue, visualColumnOrder });
   }
 
