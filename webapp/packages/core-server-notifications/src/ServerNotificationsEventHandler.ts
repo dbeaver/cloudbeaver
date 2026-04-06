@@ -30,12 +30,7 @@ interface ServerNotificationEventMapped extends IBaseServerEvent<SessionEventId,
 }
 
 @injectable(() => [SessionEventSource])
-export class ServerNotificationsEventHandler extends TopicEventHandler<
-  ServerNotificationEventMapped,
-  ISessionEvent,
-  SessionEventId,
-  SessionEventTopic
-> {
+export class ServerNotificationsEventHandler extends TopicEventHandler<ServerNotificationEventMapped, ISessionEvent, SessionEventId, string> {
   constructor(sessionEventSource: SessionEventSource) {
     super(CbEventTopic.CbNotification, sessionEventSource);
   }
