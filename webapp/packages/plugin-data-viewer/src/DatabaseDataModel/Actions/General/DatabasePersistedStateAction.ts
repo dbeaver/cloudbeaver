@@ -7,6 +7,7 @@
  */
 import { injectable } from '@cloudbeaver/core-di';
 import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
+import { makeObservable, observable } from 'mobx';
 
 import { DatabaseDataAction } from '../../DatabaseDataAction.js';
 import { IDatabaseDataResult } from '../../IDatabaseDataResult.js';
@@ -20,7 +21,16 @@ export class DatabasePersistedStateAction<TResult extends IDatabaseDataResult = 
 {
   static dataFormat: ResultDataFormat[] | null = null;
 
-  private store: Record<string, unknown> = {};
+  private store: Record<string, unknown>;
+
+  constructor(source: IDatabaseDataSource<any, TResult>, result: TResult) {
+    super(source, result);
+    this.store = {};
+
+    makeObservable<this, 'store'>(this, {
+      store: observable.ref,
+    });
+  }
 
   setStore(store: Record<string, unknown>): void {
     this.store = store;
