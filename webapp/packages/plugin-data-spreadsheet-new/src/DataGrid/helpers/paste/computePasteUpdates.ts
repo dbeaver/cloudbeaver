@@ -16,12 +16,13 @@ import type { IPasteContext, IPasteParams, IPasteUpdate } from './types.js';
  * by visual position, not data index.
  *
  * Rules:
- * - Single cell copied -> paste into single focused cell (1:1)
  * - Single cell copied -> paste into selection: paste same value to all cells in target
- * - Region copied -> paste into single focused cell: paste region starting at focused cell, clip to grid bounds
- * - Region copied -> paste into target region:
- *   - If target is smaller than source: paste partially (only what fits in target)
- *   - If target is larger than or equal to source: paste once at top-left of target, no duplication
+ * - Single cell copied -> paste into single focused cell (1:1)
+ * - Region copied -> paste starting at focused cell: paste region from focused cell, clip to grid bounds
+ * - Region copied -> paste into selection (no focus): paste region clipped to selection bounds
+ *
+ * Note: Region paste always starts from the focused element when available,
+ * providing intuitive cursor-based paste behavior.
  *
  * Skips cells that are not editable.
  */

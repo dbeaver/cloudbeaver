@@ -110,6 +110,10 @@ function pasteGridFromFocused(ctx: IPasteContext): IPasteUpdate[] {
 /**
  * Paste strategies ordered by priority.
  * First matching strategy is applied.
+ *
+ * Note: Region paste always starts from the focused element (if available),
+ * regardless of selection state. This provides intuitive paste behavior
+ * where the cursor position determines where content is inserted.
  */
 export const PASTE_STRATEGIES: IPasteStrategy[] = [
   {
@@ -123,13 +127,13 @@ export const PASTE_STRATEGIES: IPasteStrategy[] = [
     apply: pasteSingleCellToFocused,
   },
   {
-    // Region -> selection: paste region clipped to selection bounds
-    matches: ctx => !ctx.isSingleCell && ctx.hasSelection,
-    apply: pasteGridToSelection,
+    // Region -> focused: paste region starting at focused cell (prioritized over selection)
+    matches: ctx => !ctx.isSingleCell && ctx.focusedElement !== null,
+    apply: pasteGridFromFocused,
   },
   {
-    // Region -> focused: paste region starting at focused cell
-    matches: ctx => !ctx.isSingleCell && !ctx.hasSelection && ctx.focusedElement !== null,
-    apply: pasteGridFromFocused,
+    // Region -> selection: paste region clipped to selection bounds (fallback when no focused element)
+    matches: ctx => !ctx.isSingleCell && ctx.hasSelection,
+    apply: pasteGridToSelection,
   },
 ];

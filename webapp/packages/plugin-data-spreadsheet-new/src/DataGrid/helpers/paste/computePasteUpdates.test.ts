@@ -164,7 +164,35 @@ describe('computePasteUpdates', () => {
   });
 
   describe('grid to selection', () => {
-    it('should paste grid clipped to selection bounds', () => {
+    it('should paste grid starting at focused element when both selection and focus exist', () => {
+      const selectedCells = new Map([
+        ['0:0', [createDataKey(0, 0), createDataKey(0, 1)]],
+        ['1:0', [createDataKey(1, 0), createDataKey(1, 1)]],
+      ]);
+      const focusedElement = createDataKey(1, 1); // Focus is at (1,1)
+
+      const result = computePasteUpdates({
+        pastedGrid: [
+          ['A', 'B'],
+          ['C', 'D'],
+        ],
+        selectedCells,
+        focusedElement,
+        tableData,
+        visualColumnOrder,
+        isCellEditable,
+      });
+
+      // Should start at focused element (1,1), not at selection top-left (0,0)
+      // Table is 3x3, so starting at (1,1) with 2x2 grid fits all 4 cells
+      expect(result).toHaveLength(4);
+      expect(result.map(u => u.value)).toEqual(['A', 'B', 'C', 'D']);
+      expect(result[0]).toMatchObject({
+        key: { row: { index: 1 }, column: { index: 1 } },
+      });
+    });
+
+    it('should paste grid clipped to selection bounds when no focused element', () => {
       const selectedCells = new Map([
         ['0:0', [createDataKey(0, 0), createDataKey(0, 1)]],
         ['1:0', [createDataKey(1, 0), createDataKey(1, 1)]],
