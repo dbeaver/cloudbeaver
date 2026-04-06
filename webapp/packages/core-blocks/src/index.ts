@@ -179,6 +179,7 @@ export * from './FormControls/Form.js';
 export * from './FormControls/Textarea.js';
 export * from './FormControls/useCapsLockTracker.js';
 export * from './FormControls/useCustomInputValidation.js';
+export * from './FormControls/useFormCustomInputValidation.js';
 export * from './FormControls/useForm.js';
 export * from './FormControls/Textarea.js';
 export * from './Link.js';

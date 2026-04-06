@@ -9,13 +9,8 @@
 @import './theme-light';
 
 @include theme-matcher;
-@include layout-grid;
 @include colors;
-@include ripple-core-styles;
-@include theme-ripple;
-@include switch-core-styles;
 @include form-controls;
 @include link;
-@include placeholder;
 @include delimiter($mdc-theme-background);
 @include branding-overflow;

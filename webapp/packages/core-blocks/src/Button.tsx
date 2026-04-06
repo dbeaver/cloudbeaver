@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -8,7 +8,7 @@
 import { createElement } from 'react';
 import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { Button as UIKitButton, ButtonIcon } from '@dbeaver/ui-kit';
+import { Button as UIKitButton, ButtonIcon, clsx } from '@dbeaver/ui-kit';
 
 import { IconOrImage } from './IconOrImage.js';
 import { useObjectRef } from './useObjectRef.js';
@@ -19,20 +19,20 @@ import './Button.css';
 export type ButtonProps = (React.ButtonHTMLAttributes<HTMLButtonElement | HTMLAnchorElement> &
   React.LinkHTMLAttributes<HTMLLinkElement | HTMLButtonElement> &
   React.HTMLAttributes<HTMLDivElement>) & {
-    loading?: boolean;
-    icon?: string;
-    viewBox?: string;
-    iconPlacement?: 'start' | 'end';
-    iconSize?: number;
-    variant?: 'primary' | 'secondary' | 'danger' | 'ghost';
-    size?: 'small' | 'medium' | 'large';
-    tag?: 'button' | 'a' | 'div';
-    href?: string;
-    target?: '_blank' | '_self' | '_parent' | '_top';
-    loader?: boolean;
-    onClick?: React.MouseEventHandler<HTMLButtonElement | HTMLAnchorElement | HTMLLinkElement | HTMLDivElement> | (() => Promise<any>);
-    download?: boolean;
-  };
+  loading?: boolean;
+  icon?: string;
+  viewBox?: string;
+  iconPlacement?: 'start' | 'end';
+  iconSize?: number;
+  variant?: 'primary' | 'secondary' | 'danger' | 'ghost';
+  size?: 'small' | 'medium' | 'large';
+  tag?: 'button' | 'a' | 'div';
+  href?: string;
+  target?: '_blank' | '_self' | '_parent' | '_top';
+  loader?: boolean;
+  onClick?: React.MouseEventHandler<HTMLButtonElement | HTMLAnchorElement | HTMLLinkElement | HTMLDivElement> | (() => Promise<any>);
+  download?: boolean;
+};
 
 export const Button = observer<ButtonProps>(function Button({
   children,
@@ -81,7 +81,15 @@ export const Button = observer<ButtonProps>(function Button({
 
   const Tag = createElement(tag);
   return (
-    <UIKitButton render={Tag} {...rest} loading={loading} type={type} disabled={disabled} className={className} onClick={state.click}>
+    <UIKitButton
+      render={Tag}
+      {...rest}
+      loading={loading}
+      type={type}
+      disabled={disabled}
+      className={clsx(className, 'theme-typography')}
+      onClick={state.click}
+    >
       {icon && (
         <ButtonIcon placement={iconPlacement}>
           <IconOrImage width={iconSize} icon={icon} viewBox={viewBox} />

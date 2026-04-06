@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2025 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,12 +62,15 @@ public class WebSessionTest extends CloudbeaverMockTest {
         String created = session.getAttribute("createdKey", creator, disposer);
         Assert.assertEquals("created", created);
 
-        // After close() non-persistent attribute should be disposed; persistent remain
-        session.close();
-
-        Assert.assertTrue("disposer must be invoked during close()", disposed.get());
         // persistent attribute should still be available
         Assert.assertEquals("persistValue", session.getAttribute("persistentKey"));
+
+        session.close();
+
+        // persistent attribute should иу тгдд
+        Assert.assertNull("persistValue", session.getAttribute("persistentKey"));
+
+        Assert.assertTrue("disposer must be invoked during close()", disposed.get());
     }
 
     @Test

@@ -28,7 +28,7 @@
     justify-content: center;
     align-items: center;
     opacity: 0;
-    transition: opacity cubic-bezier(0.4, 0, 0.2, 1) 0.3s;
+    transition: opacity var(--duration-slow) var(--ease-smooth-start);
     &:global(.animate) {
       opacity: 1;
     }

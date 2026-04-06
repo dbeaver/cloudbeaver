@@ -42,10 +42,6 @@
 
     min-width: 64px;
 
-    font-family: Roboto, sans-serif;
-    -moz-osx-font-smoothing: grayscale;
-    -webkit-font-smoothing: antialiased;
-
     font-weight: 500;
     letter-spacing: 0.0892857143em;
     text-decoration: none;
