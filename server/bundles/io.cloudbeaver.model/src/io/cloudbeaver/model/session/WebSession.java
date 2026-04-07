@@ -607,26 +607,13 @@ public class WebSession extends BaseWebSession
         }
     }
 
+    @NotNull
     public WebAsyncTaskInfo createAndRunAsyncTask(@NotNull String taskName, @NotNull WebAsyncTaskProcessor<?> runnable) {
         WebAsyncTaskInfo asyncTask = createAsyncTask(taskName);
         return runAsyncTask(asyncTask, runnable);
     }
 
-    @Nullable
-    public WebAsyncTaskInfo runAsyncTaskJob(@NotNull String taskId) {
-        WebAsyncTaskInfo asyncTask;
-        synchronized (asyncTasks) {
-            asyncTask = asyncTasks.get(taskId);
-        }
-        if (asyncTask == null || asyncTask.getJob() == null) {
-            addSessionError(new DBWebException("Task '" + taskId + "' should exist and have a job"));
-            return null;
-        }
-        asyncTask.setRunning(true);
-        asyncTask.getJob().schedule();
-        return asyncTask;
-    }
-
+    @NotNull
     public WebAsyncTaskInfo runAsyncTask(@NotNull WebAsyncTaskInfo asyncTask, @NotNull WebAsyncTaskProcessor<?> runnable) {
         AbstractJob job = new AbstractCancelableJob(asyncTask.getName()) {
             @NotNull
@@ -1069,19 +1056,6 @@ public class WebSession extends BaseWebSession
         }
         future.completeExceptionally(new DBWebException("Action cancelled by user: " + actionId));
         removeAttribute(actionId);
-    }
-
-    public void handleAiFunctionConfirmation(@NotNull String taskId, boolean confirmed) {
-        if (confirmed) {
-            runAsyncTaskJob(taskId);
-        } else {
-            try {
-                asyncTaskCancel(taskId);
-            } catch (DBWebException e) {
-                log.error("Error cancelling function confirmation task", e);
-                addSessionError(e);
-            }
-        }
     }
 
     @NotNull
