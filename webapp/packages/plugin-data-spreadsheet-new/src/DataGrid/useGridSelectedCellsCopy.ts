@@ -9,9 +9,8 @@ import { useCallback } from 'react';
 
 import { useObjectRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { EventContext, EventStopPropagationFlag, NotificationService } from '@cloudbeaver/core-events';
+import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { copyToClipboard } from '@cloudbeaver/core-utils';
-import type { DataGridCellKeyboardEvent } from '@cloudbeaver/plugin-data-grid';
 import {
   DatabaseSelectAction,
   DataViewerService,
@@ -27,32 +26,7 @@ import type { ITableData } from './TableDataContext.js';
 
 const EVENT_KEY_CODE = {
   C: 'KeyC',
-  V: 'KeyV',
 };
-
-function isEventFromGrid(event: DataGridCellKeyboardEvent): boolean {
-  const activeElement = document.activeElement as HTMLElement | null;
-  return (
-    activeElement?.getAttribute('role') === 'gridcell' ||
-    activeElement?.getAttribute('role') === 'columnheader' ||
-    event.target === event.currentTarget
-  );
-}
-
-function getSelectedCells(selectionContext: IDataGridSelectionContext, selectAction?: ResultSetSelectAction): Map<string, IGridDataKey[]> | null {
-  const hasSelection = Array.from(selectionContext.selectedCells.keys()).length > 0;
-
-  if (hasSelection) {
-    return selectionContext.selectedCells;
-  }
-
-  const focusedElement = selectAction?.getFocusedElement() as IGridDataKey | undefined;
-  if (focusedElement) {
-    return new Map<string, IGridDataKey[]>([[GridDataKeysUtils.serialize(focusedElement.row), [focusedElement]]]);
-  }
-
-  return null;
-}
 
 function getCellCopyValue(tableData: ITableData, key: IGridDataKey): string {
   return tableData.format.getText(tableData.format.get(key));
@@ -96,75 +70,45 @@ export function useGridSelectedCellsCopy(
   tableData: ITableData,
   selectAction: DatabaseSelectAction | undefined,
   selectionContext: IDataGridSelectionContext,
-): { onKeydownHandler: (event: DataGridCellKeyboardEvent) => void } {
+) {
   const dataViewerService = useService(DataViewerService);
-  const notificationService = useService(NotificationService);
   const props = useObjectRef({ tableData, selectionContext, selectAction });
   const copyEventHandler = useDataViewerCopyHandler();
 
-  const onKeydownHandler = useCallback(
-    async (event: DataGridCellKeyboardEvent) => {
-      if (!isEventFromGrid(event)) {
+  const onKeydownHandler = useCallback((event: React.KeyboardEvent) => {
+    if ((event.ctrlKey || event.metaKey) && event.nativeEvent.code === EVENT_KEY_CODE.C) {
+      const activeElement = document.activeElement as HTMLElement | null;
+      if (
+        activeElement?.getAttribute('role') !== 'gridcell' &&
+        activeElement?.getAttribute('role') !== 'columnheader' &&
+        event.target !== event.currentTarget
+      ) {
         return;
       }
+      EventContext.set(event, EventStopPropagationFlag);
 
-      if ((event.ctrlKey || event.metaKey) && event.nativeEvent.code === EVENT_KEY_CODE.C) {
-        EventContext.set(event, EventStopPropagationFlag);
-
-        if (dataViewerService.canCopyData) {
-          if (!(props.selectAction instanceof ResultSetSelectAction)) {
-            throw new Error('Copying data is not supported');
-          }
-
-          const cells = getSelectedCells(props.selectionContext, props.selectAction);
-
-          if (cells) {
-            const firstRow = Array.from(cells.values())[0];
-            const isMultipleSelection = cells.size > 1 || (firstRow?.length ?? 0) > 1;
-            const value = isMultipleSelection ? getSelectedCellsValue(props.tableData, cells) : getCellCopyValue(props.tableData, firstRow![0]!);
-
-            copyToClipboard(value);
-          }
+      if (dataViewerService.canCopyData) {
+        if (!(props.selectAction instanceof ResultSetSelectAction)) {
+          throw new Error('Copying data is not supported');
         }
 
-        copyEventHandler(event);
-      }
+        const focusedElement = props.selectAction?.getFocusedElement();
+        let value: string | null = null;
 
-      if ((event.ctrlKey || event.metaKey) && event.nativeEvent.code === EVENT_KEY_CODE.V) {
-        EventContext.set(event, EventStopPropagationFlag);
-        event.preventDefault();
-        event.preventGridDefault();
+        if (Array.from(props.selectionContext.selectedCells.keys()).length > 0) {
+          value = getSelectedCellsValue(props.tableData, props.selectionContext.selectedCells);
+        } else if (focusedElement) {
+          value = getCellCopyValue(tableData, focusedElement);
+        }
 
-        if (props.tableData.editor && props.selectAction instanceof ResultSetSelectAction) {
-          const cells = getSelectedCells(props.selectionContext, props.selectAction);
-          if (cells) {
-            if (!tableData.editor) {
-              return;
-            }
-
-            try {
-              const clipboardText = await navigator.clipboard.readText();
-
-              if (!clipboardText) {
-                return;
-              }
-
-              const updates = Array.from(cells.values())
-                .flat()
-                .map(key => ({ key, value: clipboardText }));
-
-              if (updates.length > 0) {
-                tableData.editor.setMany(updates);
-              }
-            } catch (error) {
-              notificationService.logException(error as Error, 'data_grid_paste_error');
-            }
-          }
+        if (value !== null) {
+          copyToClipboard(value);
         }
       }
-    },
-    [props, dataViewerService.canCopyData, copyEventHandler, notificationService, tableData.editor],
-  );
+
+      copyEventHandler(event);
+    }
+  }, []);
 
   return { onKeydownHandler };
 }
