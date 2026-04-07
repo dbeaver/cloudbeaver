@@ -20,49 +20,6 @@ const EVENT_KEY_CODE = {
   V: 'KeyV',
 };
 
-function getSelectedCells(selectionContext: IDataGridSelectionContext, selectAction?: ResultSetSelectAction): Map<string, IGridDataKey[]> | null {
-  const hasSelection = Array.from(selectionContext.selectedCells.keys()).length > 0;
-
-  if (hasSelection) {
-    return selectionContext.selectedCells;
-  }
-
-  const focusedElement = selectAction?.getFocusedElement() as IGridDataKey | undefined;
-  if (focusedElement) {
-    return new Map<string, IGridDataKey[]>([[GridDataKeysUtils.serialize(focusedElement.row), [focusedElement]]]);
-  }
-
-  return null;
-}
-
-async function parseClipboardAndPaste(
-  tableData: ITableData,
-  selectedCells: Map<string, IGridDataKey[]>,
-  notificationService: NotificationService,
-): Promise<void> {
-  if (!tableData.editor) {
-    return;
-  }
-
-  try {
-    const clipboardText = await navigator.clipboard.readText();
-
-    if (!clipboardText) {
-      return;
-    }
-
-    const updates = Array.from(selectedCells.values())
-      .flat()
-      .map(key => ({ key, value: clipboardText }));
-
-    if (updates.length > 0) {
-      tableData.editor.setMany(updates);
-    }
-  } catch (error) {
-    notificationService.logException(error as Error, 'data_grid_paste_error');
-  }
-}
-
 export function useGridSelectedCellsPaste(
   tableData: ITableData,
   selectAction: ResultSetSelectAction | undefined,
@@ -71,22 +28,58 @@ export function useGridSelectedCellsPaste(
   const notificationService = useService(NotificationService);
   const props = useObjectRef({ tableData, selectionContext, selectAction });
 
+  const getSelectedCells = useCallback((): Map<string, IGridDataKey[]> | null => {
+    const hasSelection = Array.from(selectionContext.selectedCells.keys()).length > 0;
+
+    if (hasSelection) {
+      return selectionContext.selectedCells;
+    }
+
+    const focusedElement = selectAction?.getFocusedElement() as IGridDataKey | undefined;
+    if (focusedElement) {
+      return new Map<string, IGridDataKey[]>([[GridDataKeysUtils.serialize(focusedElement.row), [focusedElement]]]);
+    }
+
+    return null;
+  }, [selectAction, selectionContext]);
+
   const onKeydownHandler = useCallback(
-    (event: DataGridCellKeyboardEvent) => {
+    async (event: DataGridCellKeyboardEvent) => {
       if ((event.ctrlKey || event.metaKey) && event.nativeEvent.code === EVENT_KEY_CODE.V) {
         EventContext.set(event, EventStopPropagationFlag);
         event.preventDefault();
         event?.preventGridDefault?.();
 
         if (props.tableData.editor && props.selectAction instanceof ResultSetSelectAction) {
-          const cells = getSelectedCells(props.selectionContext, props.selectAction);
-          if (cells) {
-            void parseClipboardAndPaste(props.tableData, cells, notificationService);
+          const selectedCells = getSelectedCells();
+
+          if (selectedCells) {
+            if (!tableData.editor) {
+              return;
+            }
+
+            try {
+              const clipboardText = await navigator.clipboard.readText();
+
+              if (!clipboardText) {
+                return;
+              }
+
+              const updates = Array.from(selectedCells.values())
+                .flat()
+                .map(key => ({ key, value: clipboardText }));
+
+              if (updates.length > 0) {
+                tableData.editor.setMany(updates);
+              }
+            } catch (error) {
+              notificationService.logException(error as Error, 'data_grid_paste_error');
+            }
           }
         }
       }
     },
-    [props, notificationService],
+    [props, notificationService, tableData.editor, getSelectedCells],
   );
 
   return { onKeydownHandler };
