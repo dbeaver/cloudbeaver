@@ -98,17 +98,10 @@ public class CBClientEventProcessor {
                 }
                 break;
             }
-            case WSActionConfirmationClientEvent.ID: {
+            case WSAiFunctionCallConfirmationClientEvent.ID: {
                 if (webSession instanceof WebSession session) {
-                    var event = (WSActionConfirmationClientEvent) clientEvent;
-                    session.handleActionConfirmation(event.getActionId(), event.isConfirmed());
-                }
-                break;
-            }
-            case WSActionResultClientEvent.ID: {
-                if (webSession instanceof WebSession session) {
-                    var event = (WSActionResultClientEvent) clientEvent;
-                    session.handleActionResult(event.getActionId(), event.getResult());
+                    var event = (WSAiFunctionCallConfirmationClientEvent) clientEvent;
+                    session.handleAiFunctionConfirmation(event.getTaskId(), event.isConfirmed());
                 }
                 break;
             }

@@ -40,8 +40,6 @@ enum CBClientEventId {
     cb_client_projects_active,
     cb_client_session_ping,
     cb_client_cancel_action @since(version: "26.0.2")
-    cb_client_action_confirmation @since(version: "26.0.3")
-    cb_client_action_result @since(version: "26.0.3")
 }
 
 "Client subscribes on topic to receive only related events"
@@ -144,22 +142,6 @@ type CBActionCancelledEvent implements CBClientEvent @since(version: "26.0.2") {
     id: CBClientEventId!
     topicId: CBEventTopic
     actionId: String!
-}
-
-"User's action result"
-type CBActionResultEvent implements CBClientEvent @since(version: "26.0.3") {
-    id: CBClientEventId!
-    topicId: CBEventTopic
-    actionId: String!
-    result: Object!
-}
-
-"User's action confirmation"
-type CBActionConfirmationEvent implements CBClientEvent @since(version: "26.0.3") {
-    id: CBClientEventId!
-    topicId: CBEventTopic
-    actionId: String!
-    confirmed: Boolean
 }
 
 "Async task info status event"

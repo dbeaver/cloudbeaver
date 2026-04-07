@@ -48,10 +48,8 @@
                      class="io.cloudbeaver.websocket.event.client.WSSessionTaskWithParametersConfirmationEvent"/>
         <clientEvent id="cb_client_cancel_action"
                      class="io.cloudbeaver.websocket.event.client.WSSessionCancelActionClientEvent"/>
-        <clientEvent id="cb_client_action_confirmation"
-                     class="io.cloudbeaver.websocket.event.client.WSActionConfirmationClientEvent"/>
-        <clientEvent id="cb_client_action_result"
-                     class="io.cloudbeaver.websocket.event.client.WSActionResultClientEvent"/>
+        <clientEvent id="cb_client_ai_function_call_confirmation"
+                     class="io.cloudbeaver.websocket.event.client.WSAiFunctionCallConfirmationClientEvent"/>
     </extension>
 
 </plugin>
