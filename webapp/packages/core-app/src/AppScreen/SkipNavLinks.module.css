@@ -1,0 +1,40 @@
+@layer components {
+  .skipNav {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    z-index: 10000;
+    display: flex;
+  }
+
+  .skipNavLink {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    cursor: pointer;
+    white-space: nowrap;
+    clip: rect(0, 0, 0, 0);
+    clip-path: inset(50%);
+    padding-inline: var(--dbv-kit-btn-padding-inline);
+    background: var(--dbv-kit-dialog-content-background);
+    color: var(--dbv-kit-dialog-content-foreground);
+    font: inherit;
+    font-weight: var(--dbv-kit-btn-font-weight);
+    font-size: var(--dbv-kit-btn-font-size);
+    border: var(--dbv-kit-btn-border-width) var(--dbv-kit-btn-border-style) var(--dbv-kit-btn-border-color);
+    border-radius: var(--dbv-kit-btn-border-radius);
+    box-shadow: var(--dbv-kit-dialog-content-shadow);
+
+    &:focus {
+      position: static;
+      width: auto;
+      height: var(--dbv-kit-btn-height);
+      overflow: visible;
+      clip: auto;
+      clip-path: none;
+      outline: var(--dbv-kit-control-outline-width) solid var(--dbv-kit-control-outline-color);
+      outline-offset: var(--dbv-kit-control-outline-offset);
+    }
+  }
+}
