@@ -14,7 +14,7 @@ import { type ISessionEvent, type SessionEventId, SessionEventSource, SessionEve
 export type { ISessionPermissionEvent };
 
 @injectable(() => [SessionEventSource])
-export class SessionPermissionEventHandler extends TopicEventHandler<ISessionPermissionEvent, ISessionEvent, SessionEventId, string> {
+export class SessionPermissionEventHandler extends TopicEventHandler<ISessionPermissionEvent, ISessionEvent, SessionEventId, SessionEventTopic> {
   constructor(sessionEventSource: SessionEventSource) {
     super(SessionEventTopic.CbSubjectPermissions, sessionEventSource);
   }

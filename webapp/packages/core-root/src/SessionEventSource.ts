@@ -47,22 +47,22 @@ export { ServerEventId, SessionEventTopic, ClientEventId };
 
 export type SessionEventId = ServerEventId | ClientEventId | string;
 
-export interface ISessionEvent extends IBaseServerEvent<SessionEventId, string> {
+export interface ISessionEvent extends IBaseServerEvent<SessionEventId, SessionEventTopic> {
   id: SessionEventId;
-  topicId?: string;
+  topicId?: SessionEventTopic;
   [key: string]: any;
 }
 
 export interface ITopicSubEvent extends ISessionEvent {
   id: ClientEventId.CbClientTopicSubscribe | ClientEventId.CbClientTopicUnsubscribe;
-  topicId: string;
+  topicId: SessionEventTopic;
 }
 
 const RETRY_INTERVALS = [1000, 5000, 30000, 60000]; // 1s, 5s, 30s, 1m
 const MAX_RETRY_ATTEMPTS = 4;
 
 @injectable(() => [SessionExpireService, EnvironmentService])
-export class SessionEventSource implements IServerEventEmitter<ISessionEvent, ISessionEvent, SessionEventId, string> {
+export class SessionEventSource implements IServerEventEmitter<ISessionEvent, ISessionEvent, SessionEventId, SessionEventTopic> {
   readonly eventsSubject: Observable<ISessionEvent>;
   readonly onActivate: IExecutor;
   readonly onInit: ISyncExecutor;

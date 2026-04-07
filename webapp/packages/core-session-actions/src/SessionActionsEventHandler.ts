@@ -6,11 +6,11 @@
  * you may not use this file except in compliance with the License.
  */
 import { injectable } from '@cloudbeaver/core-di';
-import { type ISessionEvent, type SessionEventId, SessionEventSource, TopicEventHandler } from '@cloudbeaver/core-root';
+import { type ISessionEvent, type SessionEventId, SessionEventSource, SessionEventTopic, TopicEventHandler } from '@cloudbeaver/core-root';
 import { CbEventTopic, type WsOpenUrlEvent } from '@cloudbeaver/core-sdk';
 
 @injectable(() => [SessionEventSource])
-export class SessionActionsEventHandler extends TopicEventHandler<WsOpenUrlEvent, ISessionEvent, SessionEventId, string> {
+export class SessionActionsEventHandler extends TopicEventHandler<WsOpenUrlEvent, ISessionEvent, SessionEventId, SessionEventTopic> {
   constructor(sessionEventSource: SessionEventSource) {
     super(CbEventTopic.CbSessionAction, sessionEventSource);
   }

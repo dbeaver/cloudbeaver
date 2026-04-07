@@ -12,7 +12,7 @@ import { TopicEventHandler } from '../ServerEventEmitter/TopicEventHandler.js';
 import { type ISessionEvent, type SessionEventId, SessionEventSource, SessionEventTopic } from '../SessionEventSource.js';
 
 @injectable(() => [SessionEventSource])
-export class AsyncTaskInfoEventHandler extends TopicEventHandler<WsAsyncTaskInfo, ISessionEvent, SessionEventId, string> {
+export class AsyncTaskInfoEventHandler extends TopicEventHandler<WsAsyncTaskInfo, ISessionEvent, SessionEventId, SessionEventTopic> {
   constructor(sessionEventSource: SessionEventSource) {
     super(SessionEventTopic.CbSessionTask, sessionEventSource);
   }

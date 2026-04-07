@@ -14,7 +14,7 @@ import { ClientEventId, type ISessionEvent, type SessionEventId, SessionEventSou
 export { type ISessionStateEvent };
 
 @injectable(() => [SessionEventSource])
-export class SessionInfoEventHandler extends TopicEventHandler<ISessionStateEvent, ISessionEvent, SessionEventId, string> {
+export class SessionInfoEventHandler extends TopicEventHandler<ISessionStateEvent, ISessionEvent, SessionEventId, SessionEventTopic> {
   constructor(sessionEventSource: SessionEventSource) {
     super(SessionEventTopic.CbSession, sessionEventSource);
   }

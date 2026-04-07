@@ -15,7 +15,7 @@ export type IWsDataSourceConnectEvent = WsDataSourceConnectEvent;
 type ConnectionStateEvent = IWsDataSourceConnectEvent | IWsDataSourceDisconnectEvent;
 
 @injectable(() => [SessionEventSource])
-export class ConnectionStateEventHandler extends TopicEventHandler<ConnectionStateEvent, ISessionEvent, SessionEventId, string> {
+export class ConnectionStateEventHandler extends TopicEventHandler<ConnectionStateEvent, ISessionEvent, SessionEventId, SessionEventTopic> {
   constructor(sessionEventSource: SessionEventSource) {
     super(SessionEventTopic.CbDatasourceConnection, sessionEventSource);
   }
