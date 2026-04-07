@@ -1,4 +1,7 @@
 export default [
+  ['app_skip_nav_label', 'Skip navigation'],
+  ['app_skip_nav_navigator', 'Skip to Navigator'],
+  ['app_skip_nav_main_content', 'Skip to Main Content'],
   ['app_shared_settingsMenu_config', 'Configuration'],
   ['app_shared_settingsMenu_theme', 'Theme'],
   ['app_shared_settingsMenu_lang', 'Language'],
