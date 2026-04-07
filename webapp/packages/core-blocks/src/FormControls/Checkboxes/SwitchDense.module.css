@@ -6,7 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 @layer components {
-  .switchBody {
+  /* add specifity so it wins css race */
+  .switchBody.switchBody {
     & .switchControl {
       width: 24px;
       height: 16px;
@@ -33,7 +34,7 @@
   }
 
   /* overrides bold label style from SwitchDense.module.css because of specificity */
-  .switchBody .fieldLabel {
+  .switchBody.switchBody .fieldLabel {
     font-weight: initial;
   }
 }
