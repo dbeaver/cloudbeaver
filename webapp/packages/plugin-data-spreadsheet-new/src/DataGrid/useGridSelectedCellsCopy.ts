@@ -9,7 +9,7 @@ import { useCallback } from 'react';
 
 import { useObjectRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
+import { EventContext, EventStopPropagationFlag, NotificationService } from '@cloudbeaver/core-events';
 import { copyToClipboard } from '@cloudbeaver/core-utils';
 import type { DataGridCellKeyboardEvent } from '@cloudbeaver/plugin-data-grid';
 import {
@@ -92,41 +92,18 @@ function getSelectedCellsValue(tableData: ITableData, selectedCells: Map<string,
   return rowsValues.join('\r\n');
 }
 
-async function parseClipboardAndPaste(tableData: ITableData, selectedCells: Map<string, IGridDataKey[]>): Promise<void> {
-  if (!tableData.editor) {
-    return;
-  }
-
-  try {
-    const clipboardText = await navigator.clipboard.readText();
-
-    if (!clipboardText) {
-      return;
-    }
-
-    const updates = Array.from(selectedCells.values())
-      .flat()
-      .map(key => ({ key, value: clipboardText }));
-
-    if (updates.length > 0) {
-      tableData.editor.setMany(updates);
-    }
-  } catch (error) {
-    console.error('Failed to paste from clipboard:', error);
-  }
-}
-
 export function useGridSelectedCellsCopy(
   tableData: ITableData,
   selectAction: DatabaseSelectAction | undefined,
   selectionContext: IDataGridSelectionContext,
 ): { onKeydownHandler: (event: DataGridCellKeyboardEvent) => void } {
   const dataViewerService = useService(DataViewerService);
+  const notificationService = useService(NotificationService);
   const props = useObjectRef({ tableData, selectionContext, selectAction });
   const copyEventHandler = useDataViewerCopyHandler();
 
   const onKeydownHandler = useCallback(
-    (event: DataGridCellKeyboardEvent) => {
+    async (event: DataGridCellKeyboardEvent) => {
       if (!isEventFromGrid(event)) {
         return;
       }
@@ -142,10 +119,9 @@ export function useGridSelectedCellsCopy(
           const cells = getSelectedCells(props.selectionContext, props.selectAction);
 
           if (cells) {
-            const isMultipleSelection = cells.size > 1 || Array.from(cells.values())[0]!.length > 1;
-            const value = isMultipleSelection
-              ? getSelectedCellsValue(props.tableData, cells)
-              : getCellCopyValue(props.tableData, Array.from(cells.values())[0]![0]!);
+            const firstRow = Array.from(cells.values())[0];
+            const isMultipleSelection = cells.size > 1 || (firstRow?.length ?? 0) > 1;
+            const value = isMultipleSelection ? getSelectedCellsValue(props.tableData, cells) : getCellCopyValue(props.tableData, firstRow![0]!);
 
             copyToClipboard(value);
           }
@@ -162,12 +138,32 @@ export function useGridSelectedCellsCopy(
         if (props.tableData.editor && props.selectAction instanceof ResultSetSelectAction) {
           const cells = getSelectedCells(props.selectionContext, props.selectAction);
           if (cells) {
-            void parseClipboardAndPaste(props.tableData, cells);
+            if (!tableData.editor) {
+              return;
+            }
+
+            try {
+              const clipboardText = await navigator.clipboard.readText();
+
+              if (!clipboardText) {
+                return;
+              }
+
+              const updates = Array.from(cells.values())
+                .flat()
+                .map(key => ({ key, value: clipboardText }));
+
+              if (updates.length > 0) {
+                tableData.editor.setMany(updates);
+              }
+            } catch (error) {
+              notificationService.logException(error as Error, 'data_grid_paste_error');
+            }
           }
         }
       }
     },
-    [props, dataViewerService.canCopyData, tableData, copyEventHandler],
+    [props, dataViewerService.canCopyData, copyEventHandler, notificationService, tableData.editor],
   );
 
   return { onKeydownHandler };
