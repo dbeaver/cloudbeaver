@@ -28,7 +28,7 @@
     "tailwindcss": "4.0.7",
     "typescript": "^5",
     "vite": "^8",
-    "vite-plugin-svgr": "^4.3.0"
+    "vite-plugin-svgr": "^5"
   },
   "dependencies": {
     "@ariakit/react": "^0",
