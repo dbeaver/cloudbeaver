@@ -1,4 +1,7 @@
 export default [
+  ['app_skip_nav_label', 'Bỏ qua điều hướng'],
+  ['app_skip_nav_navigator', 'Chuyển đến trình điều hướng'],
+  ['app_skip_nav_main_content', 'Chuyển đến nội dung chính'],
   ['app_shared_settingsMenu_config', 'Cấu hình'],
   ['app_shared_settingsMenu_theme', 'Giao diện'],
   ['app_shared_settingsMenu_lang', 'Ngôn ngữ'],

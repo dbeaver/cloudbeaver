@@ -1,11 +1,11 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { AppScreenService } from '@cloudbeaver/core-app';
+import { AppScreenService, SkipNavService } from '@cloudbeaver/core-app';
 import { ActionSnackbar, importLazyComponent } from '@cloudbeaver/core-blocks';
 import { LocalStorageSaveService } from '@cloudbeaver/core-browser';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
@@ -18,6 +18,7 @@ import { NavigationTabsService } from '@cloudbeaver/plugin-navigation-tabs';
 
 import { ACTION_APP_HELP } from './actions/ACTION_APP_HELP.js';
 
+const SkipNavShortcutsLink = importLazyComponent(() => import('./SkipNavShortcutsLink.js').then(m => m.SkipNavShortcutsLink));
 const ShortcutsDialog = importLazyComponent(() => import('./Shortcuts/ShortcutsDialog.js').then(m => m.ShortcutsDialog));
 const WelcomeDocs = importLazyComponent(() => import('./WelcomeDocs.js').then(m => m.WelcomeDocs));
 
@@ -29,6 +30,7 @@ const WelcomeDocs = importLazyComponent(() => import('./WelcomeDocs.js').then(m 
   NotificationService,
   LocalStorageSaveService,
   NavigationTabsService,
+  SkipNavService,
 ])
 export class PluginBootstrap extends Bootstrap {
   private errorNotification: INotification<any> | null;
@@ -40,6 +42,7 @@ export class PluginBootstrap extends Bootstrap {
     private readonly notificationService: NotificationService,
     private readonly localStorageSaveService: LocalStorageSaveService,
     private readonly navigationTabsService: NavigationTabsService,
+    private readonly skipNavService: SkipNavService,
   ) {
     super();
     this.errorNotification = null;
@@ -51,6 +54,7 @@ export class PluginBootstrap extends Bootstrap {
     this.navigationTabsService.welcomeContainer.add(WelcomeDocs, undefined);
     this.addTopAppMenuItems();
     this.addMultiTabSupportNotification();
+    this.skipNavService.extraLinks.add(SkipNavShortcutsLink);
   }
 
   private addMultiTabSupportNotification() {
