@@ -11,7 +11,7 @@ import { useObjectRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { EventContext, EventStopPropagationFlag, NotificationService } from '@cloudbeaver/core-events';
 import type { DataGridCellKeyboardEvent } from '@cloudbeaver/plugin-data-grid';
-import { type IGridDataKey, GridDataKeysUtils, ResultSetSelectAction } from '@cloudbeaver/plugin-data-viewer';
+import { ResultSetSelectAction } from '@cloudbeaver/plugin-data-viewer';
 
 import type { IDataGridSelectionContext } from './DataGridSelection/DataGridSelectionContext.js';
 import type { ITableData } from './TableDataContext.js';
@@ -28,21 +28,6 @@ export function useGridSelectedCellsPaste(
   const notificationService = useService(NotificationService);
   const props = useObjectRef({ tableData, selectionContext, selectAction });
 
-  const getSelectedCells = useCallback((): Map<string, IGridDataKey[]> | null => {
-    const hasSelection = Array.from(selectionContext.selectedCells.keys()).length > 0;
-
-    if (hasSelection) {
-      return selectionContext.selectedCells;
-    }
-
-    const focusedElement = selectAction?.getFocusedElement() as IGridDataKey | undefined;
-    if (focusedElement) {
-      return new Map<string, IGridDataKey[]>([[GridDataKeysUtils.serialize(focusedElement.row), [focusedElement]]]);
-    }
-
-    return null;
-  }, [selectAction, selectionContext]);
-
   const onKeydownHandler = useCallback(
     async (event: DataGridCellKeyboardEvent) => {
       if ((event.ctrlKey || event.metaKey) && event.nativeEvent.code === EVENT_KEY_CODE.V) {
@@ -51,7 +36,7 @@ export function useGridSelectedCellsPaste(
         event?.preventGridDefault?.();
 
         if (props.tableData.editor && props.selectAction instanceof ResultSetSelectAction) {
-          const selectedCells = getSelectedCells();
+          const selectedCells = selectAction?.getSelectedElementsWithFocused();
 
           if (selectedCells) {
             if (!tableData.editor) {
@@ -79,7 +64,7 @@ export function useGridSelectedCellsPaste(
         }
       }
     },
-    [props, notificationService, tableData.editor, getSelectedCells],
+    [props, notificationService, tableData.editor, selectAction],
   );
 
   return { onKeydownHandler };

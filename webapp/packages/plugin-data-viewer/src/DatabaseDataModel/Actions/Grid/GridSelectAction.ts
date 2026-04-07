@@ -167,6 +167,25 @@ export class GridSelectAction<
     return Array.from(this.selectedElements.values()).flat();
   }
 
+  getSelectedElementsWithFocused(): TKey[] {
+    const elements = this.getSelectedElements();
+    const focus = this.getFocusedElement();
+
+    if (!focus) {
+      return elements;
+    }
+
+    const hasFocus = elements.some(
+      element => GridDataKeysUtils.isEqual(element.column, focus.column) && GridDataKeysUtils.isEqual(element.row, focus.row),
+    );
+
+    if (hasFocus) {
+      return elements;
+    }
+
+    return [...elements, focus];
+  }
+
   getActiveElements(): TKey[] {
     const elements = this.getSelectedElements();
     const focus = this.getFocusedElement();
