@@ -14,5 +14,4 @@ export default defineConfig({
     isolate: false,
     watch: false,
   },
-  esbuild: false,
 });

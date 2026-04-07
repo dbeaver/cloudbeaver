@@ -29,7 +29,7 @@
     "@cloudbeaver/tsconfig": "workspace:*",
     "@types/fs-extra": "^11",
     "@types/node": "^22",
-    "@vitejs/plugin-legacy": "^7",
+    "@vitejs/plugin-legacy": "^8",
     "rimraf": "^6",
     "terser": "^5",
     "tslib": "^2",
@@ -37,12 +37,12 @@
   },
   "dependencies": {
     "@tailwindcss/vite": "4.0.7",
-    "@vitejs/plugin-react": "^5",
+    "@vitejs/plugin-react": "^6",
     "@wroud/vite-plugin-asset-resolver": "^0",
     "@wroud/vite-plugin-tsc": "^0",
     "fs-extra": "^11",
     "tslib": "^2",
-    "vite": "^7",
+    "vite": "^8",
     "vite-multiple-assets": "^2",
     "vite-plugin-pwa": "^1"
   }

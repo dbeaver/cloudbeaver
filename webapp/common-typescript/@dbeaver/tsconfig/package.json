@@ -4,6 +4,6 @@
   "dependencies": {
     "typescript": "^5",
     "typescript-plugin-css-modules": "^5",
-    "vite": "^7"
+    "vite": "^8"
   }
 }

@@ -94,11 +94,12 @@ export function baseConfigurationPlugin(mode: string, packageJson: any): PluginO
             /* Imported or referenced assets that are smaller than this threshold will be inlined as base64 
             URLs to avoid extra http requests. Set to 0 to disable inlining altogether. */
             assetsInlineLimit: 0,
+            rollupOptions: undefined,
 
-            rollupOptions: {
-              ...config.build?.rollupOptions,
+            rolldownOptions: {
+              ...config.build?.rolldownOptions,
               input: {
-                ...(config.build?.rollupOptions?.input as Record<string, string>),
+                ...(config.build?.rolldownOptions?.input as Record<string, string>),
                 main: 'src/index.html',
                 sso: 'src/sso.html',
                 ssoError: 'src/ssoError.html',
