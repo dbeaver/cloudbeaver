@@ -12,6 +12,7 @@ export default [
   ['data_grid_table_editing_row_revert', 'Отменить изменение'],
   ['data_grid_table_editing_rows_revert', 'Отменить изменения'],
   ['data_grid_table_order', 'Сортировка'],
+  ['data_grid_table_paste_error', 'Не удается прочитать буфер обмена'],
   ['plugin_data_spreadsheet_new_pin_column', 'Закрепить колонку'],
   ['plugin_data_spreadsheet_new_pin_columns', 'Закрепить колонки'],
   ['plugin_data_spreadsheet_new_unpin_column', 'Открепить колонку'],

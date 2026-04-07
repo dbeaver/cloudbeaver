@@ -12,6 +12,7 @@ export default [
   ['data_grid_table_editing_row_revert', 'Hoàn nguyên giá trị'],
   ['data_grid_table_editing_rows_revert', 'Hoàn nguyên các giá trị'],
   ['data_grid_table_order', 'Sắp xếp'],
+  ['data_grid_table_paste_error', 'Không thể đọc khay nhớ tạm'],
   ['plugin_data_spreadsheet_new_pin_column', 'Ghim cột'],
   ['plugin_data_spreadsheet_new_pin_columns', 'Ghim các cột'],
   ['plugin_data_spreadsheet_new_unpin_column', 'Bỏ ghim cột'],

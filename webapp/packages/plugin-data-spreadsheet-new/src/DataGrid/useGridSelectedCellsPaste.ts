@@ -6,14 +6,11 @@
  * you may not use this file except in compliance with the License.
  */
 import { useCallback } from 'react';
-
-import { useObjectRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { EventContext, EventStopPropagationFlag, NotificationService } from '@cloudbeaver/core-events';
 import type { DataGridCellKeyboardEvent } from '@cloudbeaver/plugin-data-grid';
 import { ResultSetSelectAction } from '@cloudbeaver/plugin-data-viewer';
 
-import type { IDataGridSelectionContext } from './DataGridSelection/DataGridSelectionContext.js';
 import type { ITableData } from './TableDataContext.js';
 
 const EVENT_KEY_CODE = {
@@ -23,48 +20,38 @@ const EVENT_KEY_CODE = {
 export function useGridSelectedCellsPaste(
   tableData: ITableData,
   selectAction: ResultSetSelectAction | undefined,
-  selectionContext: IDataGridSelectionContext,
 ): { onKeydownHandler: (event: DataGridCellKeyboardEvent) => void } {
   const notificationService = useService(NotificationService);
-  const props = useObjectRef({ tableData, selectionContext, selectAction });
 
   const onKeydownHandler = useCallback(
     async (event: DataGridCellKeyboardEvent) => {
-      if ((event.ctrlKey || event.metaKey) && event.nativeEvent.code === EVENT_KEY_CODE.V) {
-        EventContext.set(event, EventStopPropagationFlag);
-        event.preventDefault();
-        event?.preventGridDefault?.();
+      const isPasteShortcut = (event.ctrlKey || event.metaKey) && event.nativeEvent.code === EVENT_KEY_CODE.V;
+      const selectedCells = selectAction?.getActiveElements();
 
-        if (props.tableData.editor && props.selectAction instanceof ResultSetSelectAction) {
-          const selectedCells = selectAction?.getSelectedElementsWithFocused();
+      if (!isPasteShortcut) {
+        return;
+      }
 
-          if (selectedCells) {
-            if (!tableData.editor) {
-              return;
-            }
+      EventContext.set(event, EventStopPropagationFlag);
+      event.preventDefault();
+      event?.preventGridDefault?.();
 
-            try {
-              const clipboardText = await navigator.clipboard.readText();
+      if (!selectedCells?.length || !tableData.editor) {
+        return;
+      }
 
-              if (!clipboardText) {
-                return;
-              }
+      try {
+        const clipboardText = await navigator.clipboard.readText();
+        const updates = selectedCells.map(key => ({ key, value: clipboardText }));
 
-              const updates = Array.from(selectedCells.values())
-                .flat()
-                .map(key => ({ key, value: clipboardText }));
-
-              if (updates.length > 0) {
-                tableData.editor.setMany(updates);
-              }
-            } catch (error) {
-              notificationService.logException(error as Error, 'data_grid_paste_error');
-            }
-          }
+        if (updates.length > 0) {
+          tableData.editor.setMany(updates);
         }
+      } catch (error) {
+        notificationService.logException(error as Error, 'ata_grid_table_paste_error');
       }
     },
-    [props, notificationService, tableData.editor, selectAction],
+    [notificationService, tableData.editor, selectAction],
   );
 
   return { onKeydownHandler };

@@ -187,7 +187,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
   }));
 
   const gridSelectedCellCopy = useGridSelectedCellsCopy(tableData, selectionAction as unknown as DatabaseSelectAction, gridSelectionContext);
-  const gridSelectedCellPaste = useGridSelectedCellsPaste(tableData, selectionAction as unknown as ResultSetSelectAction, gridSelectionContext);
+  const gridSelectedCellPaste = useGridSelectedCellsPaste(tableData, selectionAction as unknown as ResultSetSelectAction);
   const { onMouseDownHandler, onMouseMoveHandler } = useGridDragging({
     onDragStart: startPosition => {
       handlers.selectCell(startPosition);

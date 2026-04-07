@@ -12,6 +12,7 @@ export default [
   ['data_grid_table_editing_row_revert', 'Revenir à la valeur'],
   ['data_grid_table_editing_rows_revert', 'Revenir aux valeurs'],
   ['data_grid_table_order', 'Tri'],
+  ['data_grid_table_paste_error', 'Impossible de lire le presse-papiers'],
   ['plugin_data_spreadsheet_new_pin_column', 'Épingler la colonne'],
   ['plugin_data_spreadsheet_new_pin_columns', 'Épingler les colonnes'],
   ['plugin_data_spreadsheet_new_unpin_column', 'Désépingler la colonne'],

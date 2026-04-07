@@ -12,6 +12,7 @@ export default [
   ['data_grid_table_editing_row_revert', '还原值'],
   ['data_grid_table_editing_rows_revert', '还原多个值'],
   ['data_grid_table_order', '排序'],
+  ['data_grid_table_paste_error', '无法读取剪贴板'],
   ['plugin_data_spreadsheet_new_pin_column', '固定列'],
   ['plugin_data_spreadsheet_new_pin_columns', '固定多列'],
   ['plugin_data_spreadsheet_new_unpin_column', '取消固定列'],
