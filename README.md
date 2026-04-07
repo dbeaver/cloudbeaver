@@ -25,6 +25,25 @@ You can see a live demo of CloudBeaver here: https://demo.cloudbeaver.io
 
 ## Changelog
 
+### 26.0.2 2026-04-06
+
+- UI improvements:
+    - Marked icons for non-saved (temporary) scripts with the hourglass symbol to add visual distinction from the saved ones.
+    - Added the tooltip about quoting rules for the Bind variables parameters dialog.
+    - Improved keyboard navigation for context menu and buttons for Data Editor, SQL Editor, and Navigator tree.
+- Authentication:
+    - Fixed the bug with the authentication form. Now the same password is required for the password change operation.
+    - Fixed the display of authentication fields for SQL Server with Active Directory - MSI. The unnecessary Password field was removed.
+- Databases and drivers:
+    - DuckDB: Fixed geometry type display for database versions > 1.5. (thanks @EastLord).
+    - H2 database:
+        - Added new embedded driver version 2.4.2.
+        - Updated server driver to the version 2.4.2.
+- Security:
+    - Fixed the high vulnerability (CVE-2026-33671) in the picomatch library. The library was updated to version 2.3.2.
+    - Fixed the high vulnerability (CVE-2026-33943) in the happy-dom library. The library was updated to version 20.8.8.
+    - Fixed the high vulnerability (CVE-2026-33228) in the flatted library. The library was updated to version 3.4.2.
+
 ### 26.0.1 2026-03-23
 
   - Data Editor:

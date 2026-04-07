@@ -11,7 +11,7 @@ import { Loader, Pane, Placeholder, ResizerControls, s, SlideDialog, Split, useS
 import { useService } from '@cloudbeaver/core-di';
 import { OptionsPanelService } from '@cloudbeaver/core-ui';
 
-import { AppScreenService } from './AppScreenService.js';
+import { AppScreenService, PANEL_ID_MAIN_CONTENT } from './AppScreenService.js';
 import style from './RightArea.module.css';
 
 interface Props {
@@ -33,7 +33,7 @@ export const RightArea = observer<Props>(function RightArea({ className }) {
   }
 
   return (
-    <div className={s(styles, { container: true }, className)}>
+    <div data-panel-id={PANEL_ID_MAIN_CONTENT} tabIndex={-1} className={s(styles, { container: true }, className)}>
       <Split {...splitState} sticky={30} split="horizontal" mode={toolsDisabled ? 'minimize' : splitState.mode} disable={toolsDisabled} keepRatio>
         <Pane className={s(styles, { pane: true })}>
           <Loader className={s(styles, { loader: true })} suspense>
