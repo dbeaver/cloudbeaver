@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2025 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,7 @@ public class WebAsyncAuthJob extends AbstractCancelableJob {
     //to get auth result
     @Nullable
     private List<WebAuthInfo> authResult;
+    private boolean sessionRotated;
 
     public WebAsyncAuthJob(@NotNull String name, @NotNull String authId, boolean linkWithUser) {
         super(name);
@@ -46,7 +47,6 @@ public class WebAsyncAuthJob extends AbstractCancelableJob {
     protected IStatus run(@NotNull DBRProgressMonitor monitor) {
         return null;
     }
-
     @NotNull
     public String getAuthId() {
         return authId;
@@ -63,6 +63,14 @@ public class WebAsyncAuthJob extends AbstractCancelableJob {
 
     public void setAuthResult(@Nullable List<WebAuthInfo> authResult) {
         this.authResult = authResult;
+    }
+
+    public boolean isSessionRotated() {
+        return sessionRotated;
+    }
+
+    public void setSessionRotated(boolean sessionRotated) {
+        this.sessionRotated = sessionRotated;
     }
 
 }

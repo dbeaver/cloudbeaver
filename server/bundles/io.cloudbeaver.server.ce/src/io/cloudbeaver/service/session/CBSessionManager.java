@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2025 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -197,6 +197,26 @@ public class CBSessionManager implements WebAppSessionManager {
     protected String getSessionId(@NotNull HttpServletRequest request) {
         HttpSession httpSession = request.getSession(true);
         return httpSession.getId();
+    }
+
+    /**
+     * Rotates the session ID after successful authentication to prevent session fixation attacks.
+     */
+    public void rotateSessionId(@NotNull HttpServletRequest request) {
+        HttpSession oldSession = request.getSession(false);
+        if (oldSession == null) {
+            log.debug("No HTTP session present, skipping session ID rotation");
+            return;
+        }
+        String oldSessionId = oldSession.getId();
+        String newSessionId = request.changeSessionId();
+        synchronized (sessionMap) {
+            BaseWebSession webSession = sessionMap.remove(oldSessionId);
+            if (webSession != null) {
+                sessionMap.put(newSessionId, webSession);
+            }
+        }
+        log.debug("Session ID rotated after authentication ('" + oldSessionId + "' -> '" + newSessionId + "')");
     }
 
     /**

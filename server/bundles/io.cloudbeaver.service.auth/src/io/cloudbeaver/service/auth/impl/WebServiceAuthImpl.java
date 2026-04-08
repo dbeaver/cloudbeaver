@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2025 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -67,6 +67,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
 
     @Override
     public WebAuthStatus authLogin(
+        @NotNull HttpServletRequest httpRequest,
         @NotNull WebSession webSession,
         @NotNull String providerId,
         @Nullable String providerConfigurationId,
@@ -85,7 +86,9 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
             } else {
                 //run it sync
                 var authProcessor = new WebSessionAuthProcessor(webSession, smAuthInfo, linkWithActiveUser);
-                return new WebAuthStatus(smAuthInfo.getAuthStatus(), authProcessor.authenticateSession());
+                List<WebAuthInfo> authInfos = authProcessor.authenticateSession();
+                CBApplication.getInstance().getSessionManager().rotateSessionId(httpRequest);
+                return new WebAuthStatus(smAuthInfo.getAuthStatus(), authInfos);
             }
         } catch (SMTooManySessionsException e) {
             throw new DBWebException("User authentication failed", e.getErrorType(), e);
@@ -139,7 +142,11 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
     }
 
     @Override
-    public WebAsyncAuthTaskResult federatedAuthTaskResult(@NotNull WebSession webSession, @NotNull String taskId) throws DBWebException {
+    public WebAsyncAuthTaskResult federatedAuthTaskResult(
+        @NotNull HttpServletRequest httpRequest,
+        @NotNull WebSession webSession,
+        @NotNull String taskId
+    ) throws DBWebException {
         WebAsyncTaskInfo taskInfo = webSession.asyncTaskStatus(taskId, true);
         if (taskInfo == null) {
             throw new DBWebException("Task '" + taskId + "' not found");
@@ -154,6 +161,9 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
         List<WebAuthInfo> userTokens = job.getAuthResult();
         if (CommonUtils.isEmpty(userTokens)) {
             userTokens = List.of();
+        } else if (!job.isSessionRotated()) {
+            CBApplication.getInstance().getSessionManager().rotateSessionId(httpRequest);
+            job.setSessionRotated(true);
         }
         return new WebAsyncAuthTaskResult(userTokens);
     }
@@ -261,6 +271,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
                     }
                 }
             }
+            CBApplication.getInstance().getSessionManager().rotateSessionId(httpRequest);
             return new WebLogoutInfo(logoutUrls);
         } catch (DBException e) {
             throw new DBWebException("User logout failed", e);
