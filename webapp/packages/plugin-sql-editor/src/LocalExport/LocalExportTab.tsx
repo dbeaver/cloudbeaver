@@ -14,6 +14,7 @@ import { downloadSql } from '../downloadSql.js';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { useService } from '@cloudbeaver/core-di';
 import { useState } from 'react';
+import { withTimestamp } from '@cloudbeaver/core-utils';
 
 export const LocalExportTab: TabContainerPanelComponent<IScriptExportTabProps> = observer(function LocalExportTab({
   script,
@@ -26,7 +27,7 @@ export const LocalExportTab: TabContainerPanelComponent<IScriptExportTabProps> =
 
   const form = useForm({
     onSubmit() {
-      downloadSql(fileName, script);
+      downloadSql(withTimestamp(fileName), script);
       resolveDialog();
       notificationService.logSuccess({
         title: 'sql_editor_script_exported',

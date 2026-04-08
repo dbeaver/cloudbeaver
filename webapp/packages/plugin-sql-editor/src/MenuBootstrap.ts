@@ -446,13 +446,13 @@ export class MenuBootstrap extends Bootstrap {
       this.scriptExportService.tabsContainer.has(LOCAL_EXPORT_TAB_ID) && this.scriptExportService.tabsContainer.getDisplayed().length === 1;
 
     if (hasOnlyLocalExport) {
-      downloadSql(name, script);
+      downloadSql(withTimestamp(name), script);
       return;
     }
 
     await this.scriptExportService.openExportDialog({
       script,
-      fileName: withTimestamp(name),
+      fileName: name,
       editorId: state.editorId,
       projectId: executionContext?.projectId,
       connectionId: executionContext?.connectionId,
