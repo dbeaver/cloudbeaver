@@ -90,8 +90,10 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL>
                 getService(env).generateEntityQuery(
                     getWebSession(env),
                     getArgumentVal(env, "generatorId"),
-                    getArgumentVal(env, "options"),
-                    getArgumentVal(env, "nodePathList"))
+                    getArgumentVal(env, "nodePathList"),
+                    getArgumentVal(env, "useFullyQualifiedNames"),
+                    getArgumentVal(env, "compactSql")
+                )
             )
             .dataFetcher("sqlGenerateResultSetQuery", env ->
                 getService(env).sqlGenerateResultSetQuery(
@@ -99,7 +101,9 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL>
                     getSQLContext(env),
                     getArgumentVal(env, "generatorId"),
                     getArgumentVal(env, "resultsId"),
-                    getResultsRow(env, "selectedRows")
+                    getResultsRow(env, "selectedRows"),
+                    getArgumentVal(env, "useFullyQualifiedNames"),
+                    getArgumentVal(env, "compactSql")
                 )
             )
             .dataFetcher("sqlParseScript", env ->
