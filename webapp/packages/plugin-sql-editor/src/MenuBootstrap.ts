@@ -451,7 +451,7 @@ export class MenuBootstrap extends Bootstrap {
       downloadSql(fileName, script);
       this.notificationService.logSuccess({
         title: 'plugin_sql_editor_script_exported',
-        message: fileName,
+        message: `${fileName}.sql`,
       });
 
       return;

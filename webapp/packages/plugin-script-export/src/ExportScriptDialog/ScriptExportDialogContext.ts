@@ -10,7 +10,7 @@ import { createContext, useContext } from 'react';
 
 export interface IScriptExportDialogState {
   canSubmit: boolean;
-  onSubmit: () => void;
+  onSubmit: () => void | Promise<void>;
   loading?: boolean;
 }
 

@@ -37,7 +37,7 @@ export const ExportScriptDialog: DialogComponent<IScriptExportTabProps> = observ
   const dialogState = useObservableRef<IScriptExportDialogState>(
     () => ({
       canSubmit: false,
-      onSubmit: () => {},
+      onSubmit: async () => {},
       loading: false,
     }),
     {
@@ -48,9 +48,13 @@ export const ExportScriptDialog: DialogComponent<IScriptExportTabProps> = observ
     false,
   );
 
-  function handleSubmit() {
-    dialogState.onSubmit();
-    resolveDialog();
+  async function handleSubmit() {
+    try {
+      await dialogState.onSubmit();
+      resolveDialog();
+    } catch (error) {
+      // Keep dialog open on error
+    }
   }
 
   return (

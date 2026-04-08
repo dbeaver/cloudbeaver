@@ -6,11 +6,11 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { download, withTimestamp } from '@cloudbeaver/core-utils';
+import { download } from '@cloudbeaver/core-utils';
 
 export function downloadSql(name: string, script: string): void {
   const blob = new Blob([script], {
     type: 'application/sql',
   });
-  download(blob, `${withTimestamp(name)}.sql`);
+  download(blob, `${name}.sql`);
 }

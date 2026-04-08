@@ -41,7 +41,7 @@ export const LocalExportTab: TabContainerPanelComponent<IScriptExportTabProps> =
       downloadSql(fileNameWithTimestamp, script);
       notificationService.logSuccess({
         title: 'plugin_sql_editor_script_exported',
-        message: fileNameWithTimestamp,
+        message: `${fileNameWithTimestamp}.sql`,
       });
     };
   });
