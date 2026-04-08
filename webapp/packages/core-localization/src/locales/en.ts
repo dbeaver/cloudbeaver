@@ -82,6 +82,8 @@ export default [
   ['ui_rename', 'Rename'],
   ['ui_create', 'Create'],
   ['ui_create_processing', 'Creating...'],
+  ['ui_manage', 'Manage'],
+  ['ui_tools', 'Tools'],
   ['ui_folder', 'Folder'],
   ['ui_folder_new', 'New folder'],
   ['ui_folder_new_default_name', 'New folder'],

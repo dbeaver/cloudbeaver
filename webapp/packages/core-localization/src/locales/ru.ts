@@ -79,6 +79,8 @@ export default [
   ['ui_rename', 'Переименовать'],
   ['ui_create', 'Создать'],
   ['ui_create_processing', 'Создание...'],
+  ['ui_manage', 'Управление'],
+  ['ui_tools', 'Инструменты'],
   ['ui_folder', 'Папка'],
   ['ui_folder_new', 'Новая папка'],
   ['ui_folder_new_default_name', 'Новая папка'],

@@ -11,6 +11,7 @@ import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { DATA_CONTEXT_NAV_NODE, EObjectFeature } from '@cloudbeaver/core-navigation-tree';
+import { MENU_NAVIGATION_TREE_MANAGE } from '@cloudbeaver/plugin-navigation-tree';
 import { withTimestamp } from '@cloudbeaver/core-utils';
 import { ACTION_EXPORT, ActionService, menuExtractItems, MenuService } from '@cloudbeaver/core-view';
 import {
@@ -111,7 +112,7 @@ export class DataExportMenuService {
     });
 
     this.menuService.addCreator({
-      root: true,
+      menus: [MENU_NAVIGATION_TREE_MANAGE],
       contexts: [DATA_CONTEXT_NAV_NODE],
       isApplicable: context => {
         const node = context.get(DATA_CONTEXT_NAV_NODE)!;

@@ -10,6 +10,7 @@ import { DATA_CONTEXT_CONNECTION } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { ActionService, MenuService } from '@cloudbeaver/core-view';
 import { DATA_CONTEXT_NAV_NODE, EObjectFeature } from '@cloudbeaver/core-navigation-tree';
+import { MENU_NAVIGATION_TREE_TOOLS } from '@cloudbeaver/plugin-navigation-tree';
 
 import { ACTION_CONNECTION_PREFERENCES } from './actions/ACTION_CONNECTION_PREFERENCES.js';
 import { ConnectionPreferencesPanelService } from './ConnectionPreferencesPanelService.js';
@@ -26,7 +27,7 @@ export class ConnectionPreferencesBootstrap extends Bootstrap {
 
   override register(): void {
     this.menuService.addCreator({
-      root: true,
+      menus: [MENU_NAVIGATION_TREE_TOOLS],
       contexts: [DATA_CONTEXT_CONNECTION, DATA_CONTEXT_NAV_NODE],
       isApplicable: context => {
         const node = context.get(DATA_CONTEXT_NAV_NODE)!;
