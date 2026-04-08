@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
 
-import { InputField, Translate, useFocus, useObservableRef } from '@cloudbeaver/core-blocks';
+import { Form, InputField, Translate, useFocus, useObservableRef } from '@cloudbeaver/core-blocks';
 import { useScriptExportDialog, type IScriptExportTabProps } from '@cloudbeaver/plugin-script-export';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 import { downloadSql } from '../downloadSql.js';
@@ -21,8 +21,8 @@ export const LocalExportTab: TabContainerPanelComponent<IScriptExportTabProps> =
   script,
   fileName: initialFileName,
 }) {
-  const { resolveDialog, action } = useScriptExportDialog();
-  const [focusedRef] = useFocus<HTMLDivElement>({ focusFirstChild: true });
+  const { dialogState } = useScriptExportDialog();
+  const [focusedRef] = useFocus<HTMLFormElement>({ focusFirstChild: true });
   const notificationService = useService(NotificationService);
   const state = useObservableRef(
     () => ({
@@ -35,11 +35,10 @@ export const LocalExportTab: TabContainerPanelComponent<IScriptExportTabProps> =
   );
 
   useEffect(() => {
-    action.canSubmit = state.fileName.trim().length > 0;
-    action.onSubmit = () => {
+    dialogState.canSubmit = state.fileName.trim().length > 0;
+    dialogState.onSubmit = () => {
       const fileNameWithTimestamp = withTimestamp(state.fileName);
       downloadSql(fileNameWithTimestamp, script);
-      resolveDialog();
       notificationService.logSuccess({
         title: 'plugin_sql_editor_script_exported',
         message: fileNameWithTimestamp,
@@ -48,10 +47,10 @@ export const LocalExportTab: TabContainerPanelComponent<IScriptExportTabProps> =
   });
 
   return (
-    <div ref={focusedRef} className="tw:p-6 tw:w-full">
+    <Form ref={focusedRef} className="tw:p-6 tw:w-full">
       <InputField name="fileName" value={state.fileName} onChange={value => (state.fileName = value)} required small>
         <Translate token="ui_file_name" />
       </InputField>
-    </div>
+    </Form>
   );
 });

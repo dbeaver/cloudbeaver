@@ -8,16 +8,14 @@
 
 import { createContext, useContext } from 'react';
 
-export interface IScriptExportDialogAction {
+export interface IScriptExportDialogState {
   canSubmit: boolean;
   onSubmit: () => void;
   loading?: boolean;
 }
 
 interface IScriptExportDialogContext {
-  resolveDialog: (result: void | undefined) => void;
-  rejectDialog: () => void;
-  action: IScriptExportDialogAction;
+  dialogState: IScriptExportDialogState;
 }
 
 const ScriptExportDialogContext = createContext<IScriptExportDialogContext | null>(null);

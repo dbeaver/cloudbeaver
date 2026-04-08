@@ -24,7 +24,7 @@ import { useService } from '@cloudbeaver/core-di';
 
 import { ScriptExportService, type IScriptExportTabProps } from '../ScriptExportService.js';
 import { TabList, TabPanelList, TabsState } from '@cloudbeaver/core-ui';
-import { ScriptExportDialogContext, type IScriptExportDialogAction } from './ScriptExportDialogContext.js';
+import { ScriptExportDialogContext, type IScriptExportDialogState } from './ScriptExportDialogContext.js';
 
 export const ExportScriptDialog: DialogComponent<IScriptExportTabProps> = observer(function ExportScriptDialog({
   payload,
@@ -34,8 +34,7 @@ export const ExportScriptDialog: DialogComponent<IScriptExportTabProps> = observ
 }) {
   const scriptExportService = useService(ScriptExportService);
   const [selectedTabId, setSelectedTabId] = useState<string | undefined>(undefined);
-
-  const action = useObservableRef<IScriptExportDialogAction>(
+  const dialogState = useObservableRef<IScriptExportDialogState>(
     () => ({
       canSubmit: false,
       onSubmit: () => {},
@@ -49,10 +48,15 @@ export const ExportScriptDialog: DialogComponent<IScriptExportTabProps> = observ
     false,
   );
 
+  function handleSubmit() {
+    dialogState.onSubmit();
+    resolveDialog();
+  }
+
   return (
     <CommonDialogWrapper size="large" className={className} fixedWidth>
       <CommonDialogHeader title="plugin_script_export_dialog_title" icon="/icons/export.svg" onReject={rejectDialog} />
-      <ScriptExportDialogContext.Provider value={{ resolveDialog, rejectDialog, action }}>
+      <ScriptExportDialogContext.Provider value={{ dialogState }}>
         <TabsState
           container={scriptExportService.tabsContainer}
           currentTabId={selectedTabId}
@@ -69,7 +73,7 @@ export const ExportScriptDialog: DialogComponent<IScriptExportTabProps> = observ
               <Translate token="ui_processing_cancel" />
             </Button>
             <Fill />
-            <Button type="button" disabled={!action.canSubmit || action.loading} onClick={() => action.onSubmit()}>
+            <Button type="button" disabled={!dialogState.canSubmit || dialogState.loading} onClick={handleSubmit}>
               <Translate token="ui_processing_save" />
             </Button>
           </CommonDialogFooter>
