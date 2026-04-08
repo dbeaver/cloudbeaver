@@ -5,6 +5,8 @@ query sqlGenerateResultSetQuery(
   $generatorId: SQLResultSetGeneratorId!
   $resultsId: ID!
   $selectedRows: [SQLResultRow!]!
+  $useFullyQualifiedNames: Boolean
+  $compactSql: Boolean
 ) {
   sqlGenerateResultSetQuery(
     projectId: $projectId
@@ -13,5 +15,7 @@ query sqlGenerateResultSetQuery(
     generatorId: $generatorId
     resultsId: $resultsId
     selectedRows: $selectedRows
+    useFullyQualifiedNames: $useFullyQualifiedNames
+    compactSql: $compactSql
   )
 }

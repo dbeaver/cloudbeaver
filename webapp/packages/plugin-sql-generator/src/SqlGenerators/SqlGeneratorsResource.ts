@@ -24,11 +24,18 @@ export class SqlGeneratorsResource extends CachedMapResource<string, SqlQueryGen
     this.navNodeInfoResource.deleteInResource(this);
   }
 
-  async generateEntityQuery(generatorId: string, nodePathList: string | string[]): Promise<string> {
+  async generateEntityQuery(
+    generatorId: string,
+    nodePathList: string | string[],
+    useFullyQualifiedNames?: boolean,
+    compactSql?: boolean,
+  ): Promise<string> {
     const result = await this.graphQLService.sdk.sqlGenerateEntityQuery({
       generatorId,
       nodePathList,
       options: {},
+      useFullyQualifiedNames,
+      compactSql,
     });
 
     return result.sqlGenerateEntityQuery;

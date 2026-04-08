@@ -9,35 +9,59 @@ import { observer } from 'mobx-react-lite';
 
 import {
   Button,
+  Checkbox,
   CommonDialogBody,
   CommonDialogFooter,
   CommonDialogHeader,
   CommonDialogWrapper,
-  s,
   useClipboard,
+  useObservableRef,
   useResource,
-  useS,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
 import { ConnectionDialectResource, ConnectionInfoResource, createConnectionParam } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import type { DialogComponentProps } from '@cloudbeaver/core-dialogs';
 import { useCodemirrorExtensions } from '@cloudbeaver/plugin-codemirror6';
+import { SqlEditorNavigatorService } from '@cloudbeaver/plugin-sql-editor-navigation-tab';
 import { SQLCodeEditor, useSqlDialectExtension } from '@cloudbeaver/plugin-sql-editor-codemirror';
 
-import style from './GeneratedSqlDialog.module.css';
+import { SqlGeneratorsResource } from './SqlGeneratorsResource.js';
+import { observable } from 'mobx';
+import { NotificationService } from '@cloudbeaver/core-events';
 
 interface Payload {
   nodeId: string;
   query: string;
+  generatorId: string;
+  defaultUseFullyQualifiedNames?: boolean;
+  defaultCompactSql?: boolean;
 }
 
 export const GeneratedSqlDialog = observer<DialogComponentProps<Payload>>(function GeneratedSqlDialog({ rejectDialog, payload }) {
   const translate = useTranslate();
   const copy = useClipboard();
-  const styles = useS(style);
+
+  const state = useObservableRef(
+    () => ({
+      useFullyQualifiedNames: payload.defaultUseFullyQualifiedNames ?? true,
+      compactSql: payload.defaultCompactSql ?? false,
+      query: payload.query,
+      loading: false,
+    }),
+    {
+      useFullyQualifiedNames: observable.ref,
+      compactSql: observable.ref,
+      query: observable.ref,
+      loading: observable.ref,
+    },
+    false,
+  );
 
   const connectionInfoResource = useService(ConnectionInfoResource);
+  const sqlGeneratorsResource = useService(SqlGeneratorsResource);
+  const sqlEditorNavigatorService = useService(SqlEditorNavigatorService);
+  const notificationService = useService(NotificationService);
   const connection = connectionInfoResource.getConnectionForNode(payload.nodeId);
 
   const connectionDialectResource = useResource(GeneratedSqlDialog, ConnectionDialectResource, connection ? createConnectionParam(connection) : null);
@@ -48,20 +72,76 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<Payload>>(functi
     extensions.set(...sqlDialect);
   }
 
+  async function regenerateQuery() {
+    state.loading = true;
+    try {
+      const newQuery = await sqlGeneratorsResource.generateEntityQuery(
+        payload.generatorId,
+        payload.nodeId,
+        state.useFullyQualifiedNames,
+        state.compactSql,
+      );
+      state.query = newQuery;
+      notificationService.logSuccess({ title: 'app_shared_sql_generators_query_regenerated' });
+    } catch (error: any) {
+      notificationService.logException(error, 'app_shared_sql_generators_query_regenerated');
+    } finally {
+      state.loading = false;
+    }
+  }
+
+  async function handleOpenInEditor() {
+    if (connection) {
+      await sqlEditorNavigatorService.openNewEditor({
+        connectionKey: createConnectionParam(connection),
+        query: state.query,
+      });
+      rejectDialog();
+    }
+  }
+
   return (
     <CommonDialogWrapper size="large">
       <CommonDialogHeader title="app_shared_sql_generators_dialog_title" icon="sql-script" onReject={rejectDialog} />
       <CommonDialogBody noOverflow noBodyPadding>
-        <div className={s(styles, { wrapper: true })}>
-          <SQLCodeEditor className={s(styles, { sqlCodeEditorLoader: true })} value={payload.query} extensions={extensions} readonly />
+        <div className="tw:flex tw:items-center tw:h-full tw:w-full tw:overflow-auto">
+          <SQLCodeEditor className="tw:h-full tw:w-full" value={state.query} extensions={extensions} readonly />
         </div>
       </CommonDialogBody>
       <CommonDialogFooter>
-        <div className={s(styles, { footerContainer: true })}>
-          <div className={s(styles, { buttons: true })}>
-            <Button variant="secondary" disabled={!payload.query} onClick={() => copy(payload.query, true)}>
+        <div className="tw:flex tw:flex-col tw:w-full tw:gap-6">
+          <div className="tw:flex tw:flex-col tw:gap-1 tw:w-full">
+            <div className="theme-typography--body1">Settings</div>
+            <div className="tw:flex tw:flex-row tw:gap-3 tw:w-full">
+              <Checkbox
+                id="use-fully-qualified-names"
+                state={state}
+                name="useFullyQualifiedNames"
+                disabled={state.loading}
+                label={translate('app_shared_sql_generators_use_fully_qualified_names')}
+              />
+
+              <Checkbox
+                id="compact-sql"
+                state={state}
+                name="compactSql"
+                disabled={state.loading}
+                label={translate('app_shared_sql_generators_compact_sql')}
+              />
+            </div>
+          </div>
+          <div className="tw:flex tw:justify-end tw:w-full tw:gap-6">
+            <Button variant="secondary" disabled={state.loading} onClick={regenerateQuery}>
+              {translate('ui_refresh')}
+            </Button>
+            <Button variant="secondary" disabled={!state.query || state.loading} onClick={() => copy(state.query, true)}>
               {translate('ui_copy_to_clipboard')}
             </Button>
+            {connection && (
+              <Button variant="secondary" disabled={!state.query || state.loading} onClick={handleOpenInEditor}>
+                {translate('app_shared_sql_generators_open_in_editor')}
+              </Button>
+            )}
             <Button onClick={() => rejectDialog()}>{translate('ui_close')}</Button>
           </div>
         </div>

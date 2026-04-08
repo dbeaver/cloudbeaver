@@ -40,6 +40,9 @@ import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
 import { GeneratedSqlDialog, SqlGeneratorsResource } from '@cloudbeaver/plugin-sql-generator';
 import { isNotNullDefined } from '@dbeaver/js-helpers';
 
+const DEFAULT_USE_FULLY_QUALIFIED_NAMES = true;
+const DEFAULT_COMPACT_SQL = false;
+
 @injectable(() => [ActionService, MenuService, CommonDialogService, NotificationService, SqlGeneratorsResource])
 export class DataGridContextMenuGenerateSqlService {
   constructor(
@@ -144,6 +147,8 @@ export class DataGridContextMenuGenerateSqlService {
         resultsId: resultId,
         generatorId,
         selectedRows: rows,
+        useFullyQualifiedNames: DEFAULT_USE_FULLY_QUALIFIED_NAMES,
+        compactSql: DEFAULT_COMPACT_SQL,
       });
 
       if (!query) {
@@ -157,6 +162,9 @@ export class DataGridContextMenuGenerateSqlService {
       await this.commonDialogService.open(GeneratedSqlDialog, {
         query,
         nodeId: connectionId,
+        generatorId: generatorId,
+        defaultUseFullyQualifiedNames: DEFAULT_USE_FULLY_QUALIFIED_NAMES,
+        defaultCompactSql: DEFAULT_COMPACT_SQL,
       });
     } catch (e: any) {
       this.notificationService.logException(e, 'data_grid_table_generate_sql_error_title');
