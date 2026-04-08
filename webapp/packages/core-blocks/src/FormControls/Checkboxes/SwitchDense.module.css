@@ -7,35 +7,37 @@
  */
 @layer components {
   /* add specifity so it wins css race */
-  .switchBody.switchBody {
-    & .switchControl {
-      width: 24px;
-      height: 16px;
+  .field {
+    & .switchBody {
+      & .switchControl {
+        width: 24px;
+        height: 16px;
+      }
+
+      & .switchControlTrack {
+        height: 10px;
+        border-radius: 5px;
+      }
+
+      & .switchControlUnderlay {
+        margin-left: -3px;
+      }
+
+      & .switchControlThumb {
+        width: 14px;
+        height: 14px;
+        border-width: 7px;
+      }
+
+      & .checked .switchControlUnderlay {
+        margin-left: 13px;
+      }
     }
 
-    & .switchControlTrack {
-      height: 10px;
-      border-radius: 5px;
+    /* overrides bold label style from SwitchDense.module.css because of specificity */
+    & .switchBody .fieldLabel {
+      font-weight: initial;
     }
-
-    & .switchControlUnderlay {
-      margin-left: -3px;
-    }
-
-    & .switchControlThumb {
-      width: 14px;
-      height: 14px;
-      border-width: 7px;
-    }
-
-    & .checked .switchControlUnderlay {
-      margin-left: 13px;
-    }
-  }
-
-  /* overrides bold label style from SwitchDense.module.css because of specificity */
-  .switchBody.switchBody .fieldLabel {
-    font-weight: initial;
   }
 }
 
