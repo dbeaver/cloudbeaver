@@ -11,7 +11,6 @@ export default [
   ['data_grid_table_editing_row_revert', 'Wert zurückkehren'],
   ['data_grid_table_editing_rows_revert', 'Werte zurückkehren'],
   ['data_grid_table_order', 'Sortierung'],
-  ['data_grid_table_paste_error', 'Zwischenablage kann nicht gelesen werden'],
   ['plugin_data_spreadsheet_new_pin_column', 'Spalte anheften'],
   ['plugin_data_spreadsheet_new_pin_columns', 'Spalten anheften'],
   ['plugin_data_spreadsheet_new_unpin_column', 'Spalte lösen'],

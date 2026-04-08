@@ -7,11 +7,12 @@
  */
 import { useCallback } from 'react';
 import { useService } from '@cloudbeaver/core-di';
-import { EventContext, EventStopPropagationFlag, NotificationService } from '@cloudbeaver/core-events';
+import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import type { DataGridCellKeyboardEvent } from '@cloudbeaver/plugin-data-grid';
 import { ResultSetSelectAction } from '@cloudbeaver/plugin-data-viewer';
 
 import type { ITableData } from './TableDataContext.js';
+import { ClipboardService } from '@cloudbeaver/core-ui';
 
 const EVENT_KEY_CODE = {
   V: 'KeyV',
@@ -21,7 +22,7 @@ export function useGridSelectedCellsPaste(
   tableData: ITableData,
   selectAction: ResultSetSelectAction | undefined,
 ): { onKeydownHandler: (event: DataGridCellKeyboardEvent) => void } {
-  const notificationService = useService(NotificationService);
+  const clipboardService = useService(ClipboardService);
 
   const onKeydownHandler = useCallback(
     async (event: DataGridCellKeyboardEvent) => {
@@ -40,18 +41,14 @@ export function useGridSelectedCellsPaste(
         return;
       }
 
-      try {
-        const clipboardText = await navigator.clipboard.readText();
-        const updates = selectedCells.map(key => ({ key, value: clipboardText }));
+      const clipboardText = await clipboardService.read();
+      const updates = selectedCells.filter(key => !tableData.isCellReadonly(key)).map(key => ({ key, value: clipboardText }));
 
-        if (updates.length > 0) {
-          tableData.editor.setMany(updates);
-        }
-      } catch (error) {
-        notificationService.logException(error as Error, 'ata_grid_table_paste_error');
+      if (updates.length > 0) {
+        tableData.editor.setMany(updates);
       }
     },
-    [notificationService, tableData.editor, selectAction],
+    [tableData, selectAction, clipboardService],
   );
 
   return { onKeydownHandler };

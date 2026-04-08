@@ -11,7 +11,6 @@ export default [
   ['data_grid_table_editing_row_revert', 'Ripristina valore'],
   ['data_grid_table_editing_rows_revert', 'Ripristina valori'],
   ['data_grid_table_order', 'Ordinamento'],
-  ['data_grid_table_paste_error', 'Impossibile leggere gli appunti'],
   ['plugin_data_spreadsheet_new_pin_column', 'Blocca colonna'],
   ['plugin_data_spreadsheet_new_pin_columns', 'Blocca colonne'],
   ['plugin_data_spreadsheet_new_unpin_column', 'Sblocca colonna'],

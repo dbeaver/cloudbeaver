@@ -12,7 +12,6 @@ export default [
   ['data_grid_table_editing_row_revert', 'Revert value'],
   ['data_grid_table_editing_rows_revert', 'Revert values'],
   ['data_grid_table_order', 'Sorting'],
-  ['data_grid_table_paste_error', 'Cannot read clipboard'],
   ['plugin_data_spreadsheet_new_pin_column', 'Pin Column'],
   ['plugin_data_spreadsheet_new_pin_columns', 'Pin Columns'],
   ['plugin_data_spreadsheet_new_unpin_column', 'Unpin Column'],
