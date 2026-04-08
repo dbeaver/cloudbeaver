@@ -79,6 +79,8 @@ export default [
   ['ui_open_in_tab', '在选项卡中打开'],
   ['ui_create', '新建'],
   ['ui_create_processing', '创建中...'],
+  ['ui_manage', '管理'],
+  ['ui_tools', '工具'],
   ['ui_folder', '文件夹'],
   ['ui_folder_new', '新建文件夹'],
   ['ui_folder_new_default_name', '新建文件夹'],
@@ -147,6 +149,8 @@ export default [
   ['ui_not_selected', 'Not selected'],
   ['ui_reset', 'Reset'],
   ['ui_documentaion', '文档'],
+  ['ui_deny', '拒绝'],
+  ['ui_allow', '允许'],
 
   ['root_permission_denied', '您没有权限'],
   ['root_permission_no_permission', '您没有权限执行此操作'],

@@ -56,6 +56,9 @@
       "path": "../plugin-data-viewer"
     },
     {
+      "path": "../plugin-navigation-tree"
+    },
+    {
       "path": "../plugin-sql-editor"
     }
   ],

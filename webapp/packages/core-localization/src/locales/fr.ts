@@ -76,6 +76,8 @@ export default [
   ['ui_rename', 'Renommer'],
   ['ui_create', 'Créer'],
   ['ui_create_processing', 'Création...'],
+  ['ui_manage', 'Gérer'],
+  ['ui_tools', 'Outils'],
   ['ui_folder', 'Dossier'],
   ['ui_folder_new', 'Nouveau dossier'],
   ['ui_folder_new_default_name', 'Nouveau dossier'],
@@ -144,6 +146,8 @@ export default [
   ['ui_not_selected', 'Not selected'],
   ['ui_reset', 'Reset'],
   ['ui_documentaion', 'Documentation'],
+  ['ui_deny', 'Refuser'],
+  ['ui_allow', 'Autoriser'],
 
   ['root_permission_denied', "Vous n'avez pas les permissions"],
   ['root_permission_no_permission', "Vous n'avez pas la permission pour cette action"],
