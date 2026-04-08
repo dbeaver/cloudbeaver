@@ -17,6 +17,8 @@ export * from './NavigationTree/ElementsTree/NavigationTreeNode/NavigationNode/N
 export * from './NavigationTree/ElementsTree/NavigationTreeNode/TreeNodeMenu/DATA_CONTEXT_NAV_NODE_ACTIONS.js';
 export * from './NavigationTree/ElementsTree/NavigationTreeNode/TreeNodeMenu/TreeNodeMenuLoader.js';
 export * from './NavigationTree/ElementsTree/NavigationTreeNode/TreeNodeMenu/MENU_NAVIGATION_TREE_CREATE.js';
+export * from './NavigationTree/ElementsTree/NavigationTreeNode/TreeNodeMenu/MENU_NAVIGATION_TREE_MANAGE.js';
+export * from './NavigationTree/ElementsTree/NavigationTreeNode/TreeNodeMenu/MENU_NAVIGATION_TREE_TOOLS.js';
 export * from './NavigationTree/ElementsTree/NavigationTreeNode/NavigationNodeRendererLoader.js';
 export * from './NavigationTree/ElementsTree/NavigationTreeNode/isDraggingInsideProject.js';
 
