@@ -12,8 +12,8 @@
     display: grid;
     grid-template-rows: 0fr;
     transition-property: grid-template-rows;
-    transition-timing-function: ease-in-out;
-    transition-duration: 200ms;
+    transition-timing-function: var(--ease-smooth);
+    transition-duration: var(--duration-medium);
 
     > * {
       overflow: hidden;
@@ -36,7 +36,7 @@
     opacity: 0.5;
     width: var(--dbv-kit-disclosure-icon-size);
     height: var(--dbv-kit-disclosure-icon-size);
-    transition: transform 150ms ease-in-out;
+    transition: transform var(--duration-medium) var(--ease-smooth);
     transform-origin: center;
     transform: rotate(-90deg);
   }

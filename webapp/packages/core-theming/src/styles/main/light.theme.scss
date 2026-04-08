@@ -13,13 +13,8 @@
     @include colors;
     @include color-scheme;
     @include css-variables;
-    @include ripple-core-styles;
-    @include theme-ripple;
-    @include layout-grid;
     @include form-controls;
-    @include switch-core-styles;
     @include link;
-    @include placeholder;
     @include delimiter($mdc-theme-secondary);
     @include branding-overflow;
   }
