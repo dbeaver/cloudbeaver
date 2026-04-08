@@ -84,7 +84,7 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<Payload>>(functi
       state.query = newQuery;
       notificationService.logSuccess({ title: 'app_shared_sql_generators_query_regenerated' });
     } catch (error: any) {
-      notificationService.logException(error, 'app_shared_sql_generators_query_regenerated');
+      notificationService.logException(error, 'app_shared_sql_generators_error_title');
     } finally {
       state.loading = false;
     }
