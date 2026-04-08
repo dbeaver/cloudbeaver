@@ -16,6 +16,7 @@
     border-style: var(--dbv-kit-menu-border-style);
     box-shadow: var(--dbv-kit-menu-popover-shadow);
     outline: 0;
+    padding-block: var(--dbv-kit-menu-popover-padding-block);
 
     @media (prefers-reduced-motion: no-preference) {
       opacity: 0;
