@@ -6,16 +6,25 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { useCallback, useState } from 'react';
-import { createPortal } from 'react-dom';
+import { useState } from 'react';
+import { observable } from 'mobx';
 
-import { CommonDialogBody, CommonDialogFooter, CommonDialogHeader, CommonDialogWrapper } from '@cloudbeaver/core-blocks';
+import {
+  Button,
+  CommonDialogBody,
+  CommonDialogFooter,
+  CommonDialogHeader,
+  CommonDialogWrapper,
+  Fill,
+  Translate,
+  useObservableRef,
+} from '@cloudbeaver/core-blocks';
 import type { DialogComponent } from '@cloudbeaver/core-dialogs';
 import { useService } from '@cloudbeaver/core-di';
 
 import { ScriptExportService, type IScriptExportTabProps } from '../ScriptExportService.js';
 import { TabList, TabPanelList, TabsState } from '@cloudbeaver/core-ui';
-import { ScriptExportDialogContext } from './ScriptExportDialogContext.js';
+import { ScriptExportDialogContext, type IScriptExportDialogAction } from './ScriptExportDialogContext.js';
 
 export const ExportScriptDialog: DialogComponent<IScriptExportTabProps> = observer(function ExportScriptDialog({
   payload,
@@ -25,23 +34,25 @@ export const ExportScriptDialog: DialogComponent<IScriptExportTabProps> = observ
 }) {
   const scriptExportService = useService(ScriptExportService);
   const [selectedTabId, setSelectedTabId] = useState<string | undefined>(undefined);
-  const [footerNode, setFooterNode] = useState<HTMLDivElement | null>(null);
-  const footerRef = useCallback((node: HTMLDivElement | null) => setFooterNode(node), []);
 
-  const FooterSlot: React.FC<React.PropsWithChildren> = useCallback(
-    ({ children }) => {
-      if (!footerNode) {
-        return null;
-      }
-      return createPortal(children, footerNode);
+  const action = useObservableRef<IScriptExportDialogAction>(
+    () => ({
+      canSubmit: false,
+      onSubmit: () => {},
+      loading: false,
+    }),
+    {
+      canSubmit: observable.ref,
+      onSubmit: observable.ref,
+      loading: observable.ref,
     },
-    [footerNode],
+    false,
   );
 
   return (
     <CommonDialogWrapper size="large" className={className} fixedWidth>
       <CommonDialogHeader title="plugin_script_export_dialog_title" icon="/icons/export.svg" onReject={rejectDialog} />
-      <ScriptExportDialogContext.Provider value={{ resolveDialog, rejectDialog, FooterSlot }}>
+      <ScriptExportDialogContext.Provider value={{ resolveDialog, rejectDialog, action }}>
         <TabsState
           container={scriptExportService.tabsContainer}
           currentTabId={selectedTabId}
@@ -54,7 +65,13 @@ export const ExportScriptDialog: DialogComponent<IScriptExportTabProps> = observ
             <TabPanelList />
           </CommonDialogBody>
           <CommonDialogFooter>
-            <div ref={footerRef} className="tw:contents" />
+            <Button type="button" variant="secondary" onClick={() => rejectDialog()}>
+              <Translate token="ui_processing_cancel" />
+            </Button>
+            <Fill />
+            <Button type="button" disabled={!action.canSubmit || action.loading} onClick={() => action.onSubmit()}>
+              <Translate token="ui_processing_save" />
+            </Button>
           </CommonDialogFooter>
         </TabsState>
       </ScriptExportDialogContext.Provider>

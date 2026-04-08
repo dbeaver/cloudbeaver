@@ -8,10 +8,16 @@
 
 import { createContext, useContext } from 'react';
 
+export interface IScriptExportDialogAction {
+  canSubmit: boolean;
+  onSubmit: () => void;
+  loading?: boolean;
+}
+
 interface IScriptExportDialogContext {
   resolveDialog: (result: void | undefined) => void;
   rejectDialog: () => void;
-  FooterSlot: React.FC<React.PropsWithChildren>;
+  action: IScriptExportDialogAction;
 }
 
 const ScriptExportDialogContext = createContext<IScriptExportDialogContext | null>(null);
