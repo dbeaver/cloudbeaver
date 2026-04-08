@@ -370,7 +370,7 @@ export class MenuBootstrap extends Bootstrap {
 
     this.scriptExportService.tabsContainer.add({
       key: LOCAL_EXPORT_TAB_ID,
-      name: 'sql_editor_export_local_tab',
+      name: 'plugin_sql_editor_export_local_tab',
       order: 1,
       panel: () => LocalExportTab,
     });
@@ -450,7 +450,7 @@ export class MenuBootstrap extends Bootstrap {
 
       downloadSql(fileName, script);
       this.notificationService.logSuccess({
-        title: 'sql_editor_script_exported',
+        title: 'plugin_sql_editor_script_exported',
         message: fileName,
       });
 
