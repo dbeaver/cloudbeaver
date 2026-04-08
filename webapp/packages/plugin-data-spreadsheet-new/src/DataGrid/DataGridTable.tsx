@@ -31,6 +31,7 @@ import {
   DataViewerPresentationType,
   type IDatabaseDataModel,
   type IDataPresentationProps,
+  isBooleanValuePresentationAvailable,
   GridDataKeysUtils,
   ResultSetDataSource,
   ResultSetSelectAction,
@@ -514,7 +515,37 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
   }
 
   function isCellEditable(rowIdx: number, colIdx: number): boolean {
-    return tableData.isCellEditable(rowIdx, colIdx);
+    const row = tableData.rows[rowIdx];
+    const column = tableData.getColumn(colIdx)?.key;
+
+    if (!row || !column) {
+      return false;
+    }
+
+    const cell = { row, column };
+
+    const editionState = tableData.getEditionState(cell);
+
+    const source = gridContext.model.source;
+    const hasElementIdentifier = isResultSetDataSource(source) ? source.hasElementIdentifier(tableData.view.resultIndex) : false;
+    if (!hasElementIdentifier && editionState !== DatabaseEditChangeType.add) {
+      return false;
+    }
+
+    const holder = tableData.getCellHolder(cell);
+    if (tableData.format.isBinary(holder) || tableData.format.isGeometry(holder) || tableData.dataContent.isTextTruncated(holder)) {
+      return false;
+    }
+
+    const resultColumn = tableData.getColumnInfo(cell.column);
+
+    if (!resultColumn || holder.value === undefined) {
+      return false;
+    }
+
+    const handleByBooleanFormatter = isBooleanValuePresentationAvailable(holder.value, resultColumn);
+
+    return !(handleByBooleanFormatter || tableData.isCellReadonly(cell));
   }
 
   function getColumnKey(colIdx: number) {

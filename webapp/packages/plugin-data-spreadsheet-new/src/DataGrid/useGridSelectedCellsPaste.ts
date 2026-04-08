@@ -9,7 +9,7 @@ import { useCallback } from 'react';
 import { useService } from '@cloudbeaver/core-di';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import type { DataGridCellKeyboardEvent } from '@cloudbeaver/plugin-data-grid';
-import { ResultSetSelectAction, GridDataKeysUtils } from '@cloudbeaver/plugin-data-viewer';
+import { ResultSetSelectAction } from '@cloudbeaver/plugin-data-viewer';
 
 import type { ITableData } from './TableDataContext.js';
 import { ClipboardService } from '@cloudbeaver/core-ui';
@@ -42,18 +42,7 @@ export function useGridSelectedCellsPaste(
       }
 
       const clipboardText = await clipboardService.read();
-      const updates = selectedCells
-        .filter(key => {
-          const rowIdx = tableData.rows.findIndex(row => GridDataKeysUtils.isEqual(row, key.row));
-          const colIdx = tableData.columns.findIndex(col => col.key && GridDataKeysUtils.isEqual(col.key, key.column));
-
-          if (rowIdx === -1 || colIdx === -1) {
-            return false;
-          }
-
-          return tableData.isCellEditable(rowIdx, colIdx);
-        })
-        .map(key => ({ key, value: clipboardText }));
+      const updates = selectedCells.filter(key => !tableData.isCellReadonly(key)).map(key => ({ key, value: clipboardText }));
 
       if (updates.length > 0) {
         tableData.editor.setMany(updates);
