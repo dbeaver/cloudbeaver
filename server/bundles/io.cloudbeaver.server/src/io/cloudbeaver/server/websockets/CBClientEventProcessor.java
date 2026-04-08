@@ -53,7 +53,7 @@ public class CBClientEventProcessor {
         }
 
         // Handle with custom handlers
-        WSClientEventDescriptor ced = WSEventRegistry.getInstance().getClientEvent(clientEvent.getId());
+         WSClientEventDescriptor ced = WSEventRegistry.getInstance().getClientEvent(clientEvent.getId());
         if (ced != null && ced.getHandler() != null) {
             try {
                 ced.getHandler().handleEvent(webSession, clientEvent);
