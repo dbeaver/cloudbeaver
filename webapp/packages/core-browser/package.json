@@ -45,6 +45,6 @@
     "@dbeaver/cli": "workspace:*",
     "rimraf": "^6",
     "typescript": "^5",
-    "vite": "^8"
+    "vite": "^7"
   }
 }

@@ -212,7 +212,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/helper-define-polyfill-provider@npm:^0.6.8":
+"@babel/helper-define-polyfill-provider@npm:^0.6.5, @babel/helper-define-polyfill-provider@npm:^0.6.8":
   version: 0.6.8
   resolution: "@babel/helper-define-polyfill-provider@npm:0.6.8"
   dependencies:
@@ -853,7 +853,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/plugin-transform-modules-systemjs@npm:^7.29.0":
+"@babel/plugin-transform-modules-systemjs@npm:^7.27.1, @babel/plugin-transform-modules-systemjs@npm:^7.29.0":
   version: 7.29.0
   resolution: "@babel/plugin-transform-modules-systemjs@npm:7.29.0"
   dependencies:
@@ -1206,7 +1206,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/preset-env@npm:^7.11.0, @babel/preset-env@npm:^7.29.2":
+"@babel/preset-env@npm:^7.11.0, @babel/preset-env@npm:^7.28.0":
   version: 7.29.2
   resolution: "@babel/preset-env@npm:7.29.2"
   dependencies:
@@ -1554,7 +1554,7 @@ __metadata:
     rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
-    vite: "npm:^8"
+    vite: "npm:^7"
     workbox-cacheable-response: "npm:^7"
     workbox-core: "npm:^7"
     workbox-expiration: "npm:^7"
@@ -3271,7 +3271,7 @@ __metadata:
     tslib: "npm:^2"
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
-    vite: "npm:^8"
+    vite: "npm:^7"
   languageName: unknown
   linkType: soft
 
@@ -4612,8 +4612,8 @@ __metadata:
     "@tailwindcss/vite": "npm:4.0.7"
     "@types/fs-extra": "npm:^11"
     "@types/node": "npm:^22"
-    "@vitejs/plugin-legacy": "npm:^8"
-    "@vitejs/plugin-react": "npm:^6"
+    "@vitejs/plugin-legacy": "npm:^7"
+    "@vitejs/plugin-react": "npm:^5"
     "@wroud/vite-plugin-asset-resolver": "npm:^0"
     "@wroud/vite-plugin-tsc": "npm:^0"
     fs-extra: "npm:^11"
@@ -4621,7 +4621,7 @@ __metadata:
     terser: "npm:^5"
     tslib: "npm:^2"
     typescript: "npm:^5"
-    vite: "npm:^8"
+    vite: "npm:^7"
     vite-multiple-assets: "npm:^2"
     vite-plugin-pwa: "npm:^1"
   languageName: unknown
@@ -4671,7 +4671,7 @@ __metadata:
     tailwindcss: "npm:4.0.7"
     tslib: "npm:^2"
     typescript: "npm:^5"
-    vite: "npm:^8"
+    vite: "npm:^7"
   languageName: unknown
   linkType: soft
 
@@ -4688,7 +4688,7 @@ __metadata:
     "@types/node": "npm:^22"
     "@types/react": "npm:^19"
     "@types/react-dom": "npm:^19"
-    "@vitejs/plugin-react": "npm:^6"
+    "@vitejs/plugin-react": "npm:^5"
     "@wroud/vite-plugin-asset-resolver": "npm:^0"
     "@wroud/vite-plugin-tsc": "npm:^0"
     globals: "npm:^17"
@@ -4697,7 +4697,7 @@ __metadata:
     storybook: "npm:^10"
     tailwindcss: "npm:4.0.7"
     typescript: "npm:^5"
-    vite: "npm:^8"
+    vite: "npm:^7"
   languageName: unknown
   linkType: soft
 
@@ -5053,7 +5053,7 @@ __metadata:
   dependencies:
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
-    vite: "npm:^8"
+    vite: "npm:^7"
   languageName: unknown
   linkType: soft
 
@@ -5077,8 +5077,8 @@ __metadata:
     rimraf: "npm:^6"
     tailwindcss: "npm:4.0.7"
     typescript: "npm:^5"
-    vite: "npm:^8"
-    vite-plugin-svgr: "npm:^5"
+    vite: "npm:^7"
+    vite-plugin-svgr: "npm:^4.3.0"
   languageName: unknown
   linkType: soft
 
@@ -7151,10 +7151,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@rolldown/pluginutils@npm:1.0.0-rc.7":
-  version: 1.0.0-rc.7
-  resolution: "@rolldown/pluginutils@npm:1.0.0-rc.7"
-  checksum: 10c0/9d5490b5805b25bcd1720ca01c4c032b55a0ef953dab36a8dd42c568e82214576baa464f3027cd5dff3fabcfbe3bf3db2251d12b60220f5d1cd2ffde5ee37082
+"@rolldown/pluginutils@npm:1.0.0-rc.3":
+  version: 1.0.0-rc.3
+  resolution: "@rolldown/pluginutils@npm:1.0.0-rc.3"
+  checksum: 10c0/3928b6282a30f307d1b075d2f217180ae173ea9e00638ce46ab65f089bd5f7a0b2c488ae1ce530f509387793c656a2910337c4cd68fa9d37d7e439365989e699
   languageName: node
   linkType: hard
 
@@ -7234,7 +7234,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@rollup/pluginutils@npm:^5.0.1, @rollup/pluginutils@npm:^5.0.2, @rollup/pluginutils@npm:^5.3.0":
+"@rollup/pluginutils@npm:^5.0.1, @rollup/pluginutils@npm:^5.0.2, @rollup/pluginutils@npm:^5.2.0":
   version: 5.3.0
   resolution: "@rollup/pluginutils@npm:5.3.0"
   dependencies:
@@ -8915,26 +8915,26 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@vitejs/plugin-legacy@npm:^8":
-  version: 8.0.1
-  resolution: "@vitejs/plugin-legacy@npm:8.0.1"
+"@vitejs/plugin-legacy@npm:^7":
+  version: 7.2.1
+  resolution: "@vitejs/plugin-legacy@npm:7.2.1"
   dependencies:
-    "@babel/core": "npm:^7.29.0"
+    "@babel/core": "npm:^7.28.0"
     "@babel/plugin-transform-dynamic-import": "npm:^7.27.1"
-    "@babel/plugin-transform-modules-systemjs": "npm:^7.29.0"
-    "@babel/preset-env": "npm:^7.29.2"
-    babel-plugin-polyfill-corejs3: "npm:^0.14.2"
-    babel-plugin-polyfill-regenerator: "npm:^0.6.8"
-    browserslist: "npm:^4.28.1"
+    "@babel/plugin-transform-modules-systemjs": "npm:^7.27.1"
+    "@babel/preset-env": "npm:^7.28.0"
+    babel-plugin-polyfill-corejs3: "npm:^0.13.0"
+    babel-plugin-polyfill-regenerator: "npm:^0.6.5"
+    browserslist: "npm:^4.25.1"
     browserslist-to-esbuild: "npm:^2.1.1"
-    core-js: "npm:^3.49.0"
-    magic-string: "npm:^0.30.21"
+    core-js: "npm:^3.45.0"
+    magic-string: "npm:^0.30.17"
     regenerator-runtime: "npm:^0.14.1"
     systemjs: "npm:^6.15.1"
   peerDependencies:
     terser: ^5.16.0
-    vite: ^8.0.0
-  checksum: 10c0/7c148ccabc154cf781d9e281d1cd17b2a640335fb16b226c0dd4e80982f672b867f719e20bfe734d0541398a9791464146a06f04827f6db2e4e19d2b2986515f
+    vite: ^7.0.0
+  checksum: 10c0/bb9c14793c304ab84202a27218df4a71472ef8998c984121dcbc268b7dad8141d3c153f899794d5d62fed0e422ca756d24780e7da3f053e0ff87a37429808737
   languageName: node
   linkType: hard
 
@@ -8966,21 +8966,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@vitejs/plugin-react@npm:^6":
-  version: 6.0.1
-  resolution: "@vitejs/plugin-react@npm:6.0.1"
+"@vitejs/plugin-react@npm:^5":
+  version: 5.2.0
+  resolution: "@vitejs/plugin-react@npm:5.2.0"
   dependencies:
-    "@rolldown/pluginutils": "npm:1.0.0-rc.7"
+    "@babel/core": "npm:^7.29.0"
+    "@babel/plugin-transform-react-jsx-self": "npm:^7.27.1"
+    "@babel/plugin-transform-react-jsx-source": "npm:^7.27.1"
+    "@rolldown/pluginutils": "npm:1.0.0-rc.3"
+    "@types/babel__core": "npm:^7.20.5"
+    react-refresh: "npm:^0.18.0"
   peerDependencies:
-    "@rolldown/plugin-babel": ^0.1.7 || ^0.2.0
-    babel-plugin-react-compiler: ^1.0.0
-    vite: ^8.0.0
-  peerDependenciesMeta:
-    "@rolldown/plugin-babel":
-      optional: true
-    babel-plugin-react-compiler:
-      optional: true
-  checksum: 10c0/6c42f53a970cb6b0776ba5b4203bb01690ac564c56fca706d4037b50aec965ddc0f11530ab58ab2cd0fbe8c12e14cff6966b22d90391283b4a53294e3ddd478d
+    vite: ^4.2.0 || ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0
+  checksum: 10c0/bac0a409e71eee954a05bc41580411c369bd5f9ef0586a1f9743fba76ad6603c437d93d407d230780015361f93d1592c55e53314813cded6369c36d3c1e8edbf
   languageName: node
   linkType: hard
 
@@ -9596,7 +9594,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"babel-plugin-polyfill-corejs3@npm:^0.14.0, babel-plugin-polyfill-corejs3@npm:^0.14.2":
+"babel-plugin-polyfill-corejs3@npm:^0.13.0":
+  version: 0.13.0
+  resolution: "babel-plugin-polyfill-corejs3@npm:0.13.0"
+  dependencies:
+    "@babel/helper-define-polyfill-provider": "npm:^0.6.5"
+    core-js-compat: "npm:^3.43.0"
+  peerDependencies:
+    "@babel/core": ^7.4.0 || ^8.0.0-0 <8.0.0
+  checksum: 10c0/5d8e228da425edc040d8c868486fd01ba10b0440f841156a30d9f8986f330f723e2ee61553c180929519563ef5b64acce2caac36a5a847f095d708dda5d8206d
+  languageName: node
+  linkType: hard
+
+"babel-plugin-polyfill-corejs3@npm:^0.14.0":
   version: 0.14.2
   resolution: "babel-plugin-polyfill-corejs3@npm:0.14.2"
   dependencies:
@@ -9608,7 +9618,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"babel-plugin-polyfill-regenerator@npm:^0.6.6, babel-plugin-polyfill-regenerator@npm:^0.6.8":
+"babel-plugin-polyfill-regenerator@npm:^0.6.5, babel-plugin-polyfill-regenerator@npm:^0.6.6":
   version: 0.6.8
   resolution: "babel-plugin-polyfill-regenerator@npm:0.6.8"
   dependencies:
@@ -9765,7 +9775,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"browserslist@npm:^4.24.0, browserslist@npm:^4.28.1":
+"browserslist@npm:^4.24.0, browserslist@npm:^4.25.1, browserslist@npm:^4.28.1":
   version: 4.28.2
   resolution: "browserslist@npm:4.28.2"
   dependencies:
@@ -10461,7 +10471,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"core-js-compat@npm:^3.48.0":
+"core-js-compat@npm:^3.43.0, core-js-compat@npm:^3.48.0":
   version: 3.49.0
   resolution: "core-js-compat@npm:3.49.0"
   dependencies:
@@ -10470,7 +10480,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"core-js@npm:^3.49.0":
+"core-js@npm:^3.45.0":
   version: 3.49.0
   resolution: "core-js@npm:3.49.0"
   checksum: 10c0/2e42edb47eda38fd5368380131623c8aa5d4a6b42164125b17744bdc08fa5ebbbdd06b4b4aa6ca3663470a560b0f2fba48e18f142dfe264b0039df85bc625694
@@ -14394,7 +14404,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"magic-string@npm:^0.30.0, magic-string@npm:^0.30.21":
+"magic-string@npm:^0.30.0, magic-string@npm:^0.30.17, magic-string@npm:^0.30.21":
   version: 0.30.21
   resolution: "magic-string@npm:0.30.21"
   dependencies:
@@ -16552,6 +16562,13 @@ __metadata:
   version: 0.17.0
   resolution: "react-refresh@npm:0.17.0"
   checksum: 10c0/002cba940384c9930008c0bce26cac97a9d5682bc623112c2268ba0c155127d9c178a9a5cc2212d560088d60dfd503edd808669a25f9b377f316a32361d0b23c
+  languageName: node
+  linkType: hard
+
+"react-refresh@npm:^0.18.0":
+  version: 0.18.0
+  resolution: "react-refresh@npm:0.18.0"
+  checksum: 10c0/34a262f7fd803433a534f50deb27a148112a81adcae440c7d1cbae7ef14d21ea8f2b3d783e858cb7698968183b77755a38b4d4b5b1d79b4f4689c2f6d358fff2
   languageName: node
   linkType: hard
 
@@ -19005,16 +19022,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"vite-plugin-svgr@npm:^5":
-  version: 5.2.0
-  resolution: "vite-plugin-svgr@npm:5.2.0"
+"vite-plugin-svgr@npm:^4.3.0":
+  version: 4.5.0
+  resolution: "vite-plugin-svgr@npm:4.5.0"
   dependencies:
-    "@rollup/pluginutils": "npm:^5.3.0"
+    "@rollup/pluginutils": "npm:^5.2.0"
     "@svgr/core": "npm:^8.1.0"
     "@svgr/plugin-jsx": "npm:^8.1.0"
   peerDependencies:
-    vite: ">=3.0.0"
-  checksum: 10c0/818ddea9a25839f9a5e3903f55e738b3de2f76c374148a637e61e31e6a3ada815a061d3e8010306a9f2701827d2f34d8fbc5db47bf1e74059050ad7a57c0f601
+    vite: ">=2.6.0"
+  checksum: 10c0/3e1959fec626bb4f5a8ec13ff15bc40ffbc1c0ff38149bebe3f37dc2d67ed1f276f129ff7983e06946cf712e19996affd9d6868aa7d20d8921d1fe4449109b55
   languageName: node
   linkType: hard
 
