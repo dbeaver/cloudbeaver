@@ -21,6 +21,7 @@ import {
   type IDataGridCellRenderer,
   type DataGridProps,
   type ICellChange,
+  type DataGridCellKeyboardEvent,
 } from '@cloudbeaver/plugin-data-grid';
 import {
   DATA_CONTEXT_DV_PRESENTATION,
@@ -562,8 +563,8 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
   }
 
   const handleCellKeyDown: DataGridProps['onCellKeyDown'] = (_, event) => {
-    gridSelectedCellCopy.onKeydownHandler(event);
-    gridSelectedCellPaste.onKeydownHandler(event);
+    handleCopyPaste(event);
+
     const cell = selectionAction.getFocusedElement();
 
     if (EventContext.has(event, EventStopPropagationFlag) || model.isReadonly(resultIndex) || !cell) {
@@ -577,6 +578,15 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
         event.preventGridDefault();
     }
   };
+
+  function handleCopyPaste(event: DataGridCellKeyboardEvent) {
+    const readonly = model.isReadonly(resultIndex);
+    gridSelectedCellCopy.onKeydownHandler(event);
+
+    if (!readonly) {
+      gridSelectedCellPaste.onKeydownHandler(event);
+    }
+  }
 
   return (
     <ColumnDnDContext.Provider value={columnDnDState}>
@@ -625,10 +635,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
                   onCellChange={handleCellChange}
                   onCellChangeBatch={handleCellChangeBatch}
                   onCellKeyDown={handleCellKeyDown}
-                  onHeaderKeyDown={event => {
-                    gridSelectedCellCopy.onKeydownHandler(event);
-                    gridSelectedCellPaste.onKeydownHandler(event);
-                  }}
+                  onHeaderKeyDown={handleCopyPaste}
                 />
               </div>
             </FormattingContext.Provider>
