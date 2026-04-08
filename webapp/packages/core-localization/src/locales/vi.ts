@@ -82,6 +82,8 @@ export default [
   ['ui_rename', 'Đổi tên'],
   ['ui_create', 'Tạo'],
   ['ui_create_processing', 'Đang tạo...'],
+  ['ui_manage', 'Quản lý'],
+  ['ui_tools', 'Công cụ'],
   ['ui_folder', 'Thư mục'],
   ['ui_folder_new', 'Thư mục mới'],
   ['ui_folder_new_default_name', 'Thư mục mới'],
