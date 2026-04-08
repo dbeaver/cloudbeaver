@@ -26,6 +26,8 @@ import {
   type IGridRowKey,
   type IGridColumnKey,
   type IGridDataKey,
+  isResultSetDataSource,
+  isBooleanValuePresentationAvailable,
 } from '@cloudbeaver/plugin-data-viewer';
 
 import { type IColumnInfo, type ITableData } from './TableDataContext.js';
@@ -37,6 +39,8 @@ import { GridConditionalFormattingAction } from '@cloudbeaver/plugin-data-viewer
 interface ITableDataPrivate extends ITableData {
   dataGridSettingsService: DataGridSettingsService;
   gridDIVElement: React.RefObject<HTMLDivElement | null>;
+  model: IDatabaseDataModel<ResultSetDataSource>;
+  resultIndex: number;
 }
 
 export function useTableData(
@@ -140,6 +144,39 @@ export function useTableData(
 
         return model.isReadonly(resultIndex) || (this.format.isReadOnly(key) && this.editor?.getElementState(key) !== DatabaseEditChangeType.add);
       },
+      isCellEditable(rowIndex: number, columnIndex: number) {
+        const row = this.rows[rowIndex];
+        const column = this.getColumn(columnIndex)?.key;
+
+        if (!row || !column) {
+          return false;
+        }
+
+        const cell = { row, column };
+
+        const editionState = this.getEditionState(cell);
+
+        const source = this.model.source;
+        const hasElementIdentifier = isResultSetDataSource(source) ? source.hasElementIdentifier(this.resultIndex) : false;
+        if (!hasElementIdentifier && editionState !== DatabaseEditChangeType.add) {
+          return false;
+        }
+
+        const holder = this.getCellHolder(cell);
+        if (this.format.isBinary(holder) || this.format.isGeometry(holder) || this.dataContent.isTextTruncated(holder)) {
+          return false;
+        }
+
+        const resultColumn = this.getColumnInfo(cell.column);
+
+        if (!resultColumn || holder.value === undefined) {
+          return false;
+        }
+
+        const handleByBooleanFormatter = isBooleanValuePresentationAvailable(holder.value, resultColumn);
+
+        return !(handleByBooleanFormatter || this.isCellReadonly(cell));
+      },
     }),
     {
       columns: computed,
@@ -163,6 +200,8 @@ export function useTableData(
       view,
       gridDIVElement,
       dataGridSettingsService,
+      model,
+      resultIndex,
     },
   );
 }
