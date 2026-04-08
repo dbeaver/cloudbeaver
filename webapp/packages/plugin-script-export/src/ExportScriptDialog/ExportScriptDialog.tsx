@@ -9,13 +9,11 @@ import { observer } from 'mobx-react-lite';
 import { useCallback, useState } from 'react';
 import { createPortal } from 'react-dom';
 
-import { CommonDialogBody, CommonDialogFooter, CommonDialogHeader, CommonDialogWrapper, s, useS } from '@cloudbeaver/core-blocks';
+import { CommonDialogBody, CommonDialogFooter, CommonDialogHeader, CommonDialogWrapper } from '@cloudbeaver/core-blocks';
 import type { DialogComponent } from '@cloudbeaver/core-dialogs';
 import { useService } from '@cloudbeaver/core-di';
 
-import type { IScriptExportTabProps } from '../IScriptExportTabProps.js';
-import { ScriptExportService } from '../ScriptExportService.js';
-import styles from './ExportScriptDialog.module.css';
+import { ScriptExportService, type IScriptExportTabProps } from '../ScriptExportService.js';
 import { TabList, TabPanelList, TabsState } from '@cloudbeaver/core-ui';
 import { ScriptExportDialogContext } from './ScriptExportDialogContext.js';
 
@@ -26,7 +24,6 @@ export const ExportScriptDialog: DialogComponent<IScriptExportTabProps> = observ
   className,
 }) {
   const scriptExportService = useService(ScriptExportService);
-  const style = useS(styles);
   const [selectedTabId, setSelectedTabId] = useState<string | undefined>(undefined);
   const [footerNode, setFooterNode] = useState<HTMLDivElement | null>(null);
   const footerRef = useCallback((node: HTMLDivElement | null) => setFooterNode(node), []);
@@ -53,11 +50,11 @@ export const ExportScriptDialog: DialogComponent<IScriptExportTabProps> = observ
           {...payload}
         >
           <CommonDialogBody noBodyPadding noOverflow>
-            <TabList className={s(style, { tabList: true })} underline />
+            <TabList className="theme-border-color-background tw:flex-shrink-0 tw:px-3" underline />
             <TabPanelList />
           </CommonDialogBody>
           <CommonDialogFooter>
-            <div ref={footerRef} className={s(style, { footerSlot: true })} />
+            <div ref={footerRef} className="tw:contents" />
           </CommonDialogFooter>
         </TabsState>
       </ScriptExportDialogContext.Provider>

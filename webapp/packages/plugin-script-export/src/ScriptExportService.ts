@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import type { IScriptExportTabProps } from './IScriptExportTabProps.js';
 import { injectable } from '@cloudbeaver/core-di';
 import { TabsContainer } from '@cloudbeaver/core-ui';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
@@ -14,6 +13,14 @@ import { importLazyComponent } from '@cloudbeaver/core-blocks';
 export interface IScriptExportResult {
   exported: boolean;
   location?: string;
+}
+
+export interface IScriptExportTabProps {
+  script: string;
+  fileName: string;
+  editorId: string;
+  projectId?: string;
+  connectionId?: string;
 }
 
 const ExportScriptDialog = importLazyComponent(() => import('./ExportScriptDialog/ExportScriptDialog.js').then(module => module.ExportScriptDialog));

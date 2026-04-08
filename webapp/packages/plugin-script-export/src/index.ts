@@ -6,7 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-export * from './IScriptExportTabProps.js';
 export * from './ScriptExportService.js';
 export * from './ExportScriptDialog/ExportScriptDialog.js';
 export * from './ExportScriptDialog/ScriptExportDialogContext.js';

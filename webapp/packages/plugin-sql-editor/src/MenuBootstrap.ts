@@ -443,7 +443,7 @@ export class MenuBootstrap extends Bootstrap {
     const name = getSqlEditorName(state, dataSource, connection);
     const script = dataSource.script;
     const hasOnlyLocalExport =
-      this.scriptExportService.tabsContainer.has(LOCAL_EXPORT_TAB_ID) && this.scriptExportService.tabsContainer.getIdList().length === 1;
+      this.scriptExportService.tabsContainer.has(LOCAL_EXPORT_TAB_ID) && this.scriptExportService.tabsContainer.getDisplayed().length === 1;
 
     if (hasOnlyLocalExport) {
       downloadSql(name, script);
