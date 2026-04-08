@@ -405,14 +405,24 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
 
     protected void importUsers(@NotNull Connection connection, @NotNull SMUserImportList userImportList)
         throws DBException, SQLException {
+        List<SMUserProvisioning> users = userImportList.getUsers();
+        Set<String> seen = new HashSet<>();
         outer:
-        for (SMUserProvisioning user : userImportList.getUsers()) {
-            String authRole = user.getAuthRole() == null ? userImportList.getAuthRole() : user.getAuthRole();
-            String userId = user.getUserId();
+        for (SMUserProvisioning user : users) {
             Map<String, String> metaParameters = user.getMetaParameters();
+            String effectiveUserId = user.getUserId();
             if (CommonUtils.isNotEmpty(metaParameters.get(SMStandardMeta.META_USER_ID))) {
-                userId = metaParameters.get(SMStandardMeta.META_USER_ID);
+                effectiveUserId = metaParameters.get(SMStandardMeta.META_USER_ID);
             }
+            String effectiveUserIdLowerCase = effectiveUserId.toLowerCase();
+            if (seen.contains(effectiveUserIdLowerCase)) {
+                log.warn("Skipping duplicate user (case-insensitive): " + effectiveUserId);
+                continue;
+            }
+            seen.add(effectiveUserIdLowerCase);
+
+            String authRole = user.getAuthRole() == null ? userImportList.getAuthRole() : user.getAuthRole();
+            String userId = effectiveUserId;
             for (String possibleUserId : List.of(userId, userId.toLowerCase())) {
                 if (isSubjectExists(possibleUserId)) {
                     if (getSubjectType(possibleUserId) == SMSubjectType.team) {
