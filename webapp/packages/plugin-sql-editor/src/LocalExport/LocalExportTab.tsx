@@ -27,11 +27,13 @@ export const LocalExportTab: TabContainerPanelComponent<IScriptExportTabProps> =
 
   const form = useForm({
     onSubmit() {
-      downloadSql(withTimestamp(fileName), script);
+      const fileNameWithTimestamp = withTimestamp(fileName);
+
+      downloadSql(fileNameWithTimestamp, script);
       resolveDialog();
       notificationService.logSuccess({
         title: 'sql_editor_script_exported',
-        message: fileName,
+        message: fileNameWithTimestamp,
       });
     },
   });

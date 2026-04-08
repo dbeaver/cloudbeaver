@@ -446,7 +446,14 @@ export class MenuBootstrap extends Bootstrap {
       this.scriptExportService.tabsContainer.has(LOCAL_EXPORT_TAB_ID) && this.scriptExportService.tabsContainer.getDisplayed().length === 1;
 
     if (hasOnlyLocalExport) {
-      downloadSql(withTimestamp(name), script);
+      const fileName = withTimestamp(name);
+
+      downloadSql(fileName, script);
+      this.notificationService.logSuccess({
+        title: 'sql_editor_script_exported',
+        message: fileName,
+      });
+
       return;
     }
 
