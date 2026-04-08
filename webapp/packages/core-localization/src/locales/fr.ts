@@ -76,6 +76,8 @@ export default [
   ['ui_rename', 'Renommer'],
   ['ui_create', 'Créer'],
   ['ui_create_processing', 'Création...'],
+  ['ui_manage', 'Gérer'],
+  ['ui_tools', 'Outils'],
   ['ui_folder', 'Dossier'],
   ['ui_folder_new', 'Nouveau dossier'],
   ['ui_folder_new_default_name', 'Nouveau dossier'],

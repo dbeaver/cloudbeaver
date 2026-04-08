@@ -37,6 +37,7 @@
     "@cloudbeaver/core-utils": "workspace:*",
     "@cloudbeaver/core-view": "workspace:*",
     "@cloudbeaver/plugin-data-viewer": "workspace:*",
+    "@cloudbeaver/plugin-navigation-tree": "workspace:*",
     "@cloudbeaver/plugin-sql-editor": "workspace:*",
     "mobx": "^6",
     "mobx-react-lite": "^4",
