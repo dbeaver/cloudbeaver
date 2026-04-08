@@ -513,6 +513,10 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
     }
   }
 
+  function isCellEditable(rowIdx: number, colIdx: number): boolean {
+    return tableData.isCellEditable(rowIdx, colIdx);
+  }
+
   function getColumnKey(colIdx: number) {
     const column = tableData.columns[colIdx];
 
@@ -574,7 +578,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
                   cellText={cellText}
                   cellElement={cellElement}
                   rowElement={rowElement}
-                  getCellEditable={tableData.isCellEditable.bind(tableData)}
+                  getCellEditable={isCellEditable}
                   headerElement={headerElement}
                   getHeaderHeight={() => headerHeight}
                   getHeaderWidth={getHeaderWidth}
