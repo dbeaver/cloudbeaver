@@ -23,12 +23,19 @@ import {
 
 import type { IDataGridSelectionContext } from './DataGridSelection/DataGridSelectionContext.js';
 import type { ITableData } from './TableDataContext.js';
+import { isResultSetBinaryValue } from '@dbeaver/result-set-api';
 
 const EVENT_KEY_CODE = {
   C: 'KeyC',
 };
 
 function getCellCopyValue(tableData: ITableData, key: IGridDataKey): string {
+  const holder = tableData.getCellHolder(key);
+
+  if (tableData.format.isBinary(holder) && isResultSetBinaryValue(holder.value)) {
+    return holder.value.binary;
+  }
+
   return tableData.format.getText(tableData.format.get(key));
 }
 
