@@ -145,7 +145,7 @@ export function useTableData(
       isCellEditable(key: IGridDataKey) {
         const editionState = this.getEditionState(key);
 
-        const source = model.source;
+        const source = dataContent.source;
         const hasElementIdentifier = isResultSetDataSource(source) ? source.hasElementIdentifier(this.view.resultIndex) : false;
         if (!hasElementIdentifier && editionState !== DatabaseEditChangeType.add) {
           return false;
