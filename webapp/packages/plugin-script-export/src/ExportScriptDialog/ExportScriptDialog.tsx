@@ -7,7 +7,6 @@
  */
 import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
-import { observable } from 'mobx';
 
 import {
   Button,
@@ -16,15 +15,15 @@ import {
   CommonDialogHeader,
   CommonDialogWrapper,
   Fill,
+  Form,
   Translate,
-  useObservableRef,
+  useForm,
 } from '@cloudbeaver/core-blocks';
 import type { DialogComponent } from '@cloudbeaver/core-dialogs';
 import { useService } from '@cloudbeaver/core-di';
 
 import { ScriptExportService, type IScriptExportTabProps } from '../ScriptExportService.js';
 import { TabList, TabPanelList, TabsState } from '@cloudbeaver/core-ui';
-import { ScriptExportDialogContext, type IScriptExportDialogState } from './ScriptExportDialogContext.js';
 
 export const ExportScriptDialog: DialogComponent<IScriptExportTabProps> = observer(function ExportScriptDialog({
   payload,
@@ -34,23 +33,11 @@ export const ExportScriptDialog: DialogComponent<IScriptExportTabProps> = observ
 }) {
   const scriptExportService = useService(ScriptExportService);
   const [selectedTabId, setSelectedTabId] = useState<string | undefined>(undefined);
-  const dialogState = useObservableRef<IScriptExportDialogState>(
-    () => ({
-      canSubmit: false,
-      onSubmit: async () => {},
-      loading: false,
-    }),
-    {
-      canSubmit: observable.ref,
-      onSubmit: observable.ref,
-      loading: observable.ref,
-    },
-    false,
-  );
+  const form = useForm();
 
   async function handleSubmit() {
     try {
-      await dialogState.onSubmit();
+      await form.submit();
       resolveDialog();
     } catch (error) {
       // Keep dialog open on error
@@ -60,29 +47,29 @@ export const ExportScriptDialog: DialogComponent<IScriptExportTabProps> = observ
   return (
     <CommonDialogWrapper size="large" className={className} fixedWidth>
       <CommonDialogHeader title="plugin_script_export_dialog_title" icon="/icons/export.svg" onReject={rejectDialog} />
-      <ScriptExportDialogContext.Provider value={{ dialogState }}>
-        <TabsState
-          container={scriptExportService.tabsContainer}
-          currentTabId={selectedTabId}
-          lazy
-          onChange={tab => setSelectedTabId(tab.tabId)}
-          {...payload}
-        >
-          <CommonDialogBody noBodyPadding noOverflow>
-            <TabList className="theme-border-color-background tw:flex-shrink-0 tw:px-3" underline />
-            <TabPanelList />
-          </CommonDialogBody>
-          <CommonDialogFooter>
-            <Button type="button" variant="secondary" onClick={() => rejectDialog()}>
-              <Translate token="ui_processing_cancel" />
-            </Button>
-            <Fill />
-            <Button type="button" disabled={!dialogState.canSubmit || dialogState.loading} onClick={handleSubmit}>
-              <Translate token="ui_processing_save" />
-            </Button>
-          </CommonDialogFooter>
-        </TabsState>
-      </ScriptExportDialogContext.Provider>
+      <TabsState
+        container={scriptExportService.tabsContainer}
+        currentTabId={selectedTabId}
+        lazy
+        onChange={tab => setSelectedTabId(tab.tabId)}
+        {...payload}
+      >
+        <CommonDialogBody noBodyPadding noOverflow>
+          <TabList className="theme-border-color-background tw:shrink-0 tw:px-3" underline />
+          <Form context={form}>
+            <TabPanelList className="tw:flex-col tw:gap-4 tw:p-6 tw:w-full tw:overflow-auto" />
+          </Form>
+        </CommonDialogBody>
+        <CommonDialogFooter>
+          <Button type="button" variant="secondary" onClick={() => rejectDialog()}>
+            <Translate token="ui_processing_cancel" />
+          </Button>
+          <Fill />
+          <Button type="submit" onClick={handleSubmit}>
+            <Translate token="ui_processing_save" />
+          </Button>
+        </CommonDialogFooter>
+      </TabsState>
     </CommonDialogWrapper>
   );
 });

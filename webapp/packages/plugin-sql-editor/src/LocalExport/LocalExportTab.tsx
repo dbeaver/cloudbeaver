@@ -6,10 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { useEffect } from 'react';
 
-import { Form, InputField, Translate, useFocus, useObservableRef } from '@cloudbeaver/core-blocks';
-import { useScriptExportDialog, type IScriptExportTabProps } from '@cloudbeaver/plugin-script-export';
+import { Form, InputField, Translate, useFocus, useForm, useObservableRef } from '@cloudbeaver/core-blocks';
+import { type IScriptExportTabProps } from '@cloudbeaver/plugin-script-export';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 import { downloadSql } from '../downloadSql.js';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -21,7 +20,6 @@ export const LocalExportTab: TabContainerPanelComponent<IScriptExportTabProps> =
   script,
   fileName: initialFileName,
 }) {
-  const { dialogState } = useScriptExportDialog();
   const [focusedRef] = useFocus<HTMLFormElement>({ focusFirstChild: true });
   const notificationService = useService(NotificationService);
   const state = useObservableRef(
@@ -34,21 +32,20 @@ export const LocalExportTab: TabContainerPanelComponent<IScriptExportTabProps> =
     false,
   );
 
-  useEffect(() => {
-    dialogState.canSubmit = state.fileName.trim().length > 0;
-    dialogState.onSubmit = () => {
+  useForm({
+    onSubmit(event) {
       const fileNameWithTimestamp = withTimestamp(state.fileName);
       downloadSql(fileNameWithTimestamp, script);
       notificationService.logSuccess({
         title: 'plugin_sql_editor_script_exported',
         message: `${fileNameWithTimestamp}.sql`,
       });
-    };
+    },
   });
 
   return (
-    <Form ref={focusedRef} className="tw:p-6 tw:w-full">
-      <InputField name="fileName" value={state.fileName} onChange={value => (state.fileName = value)} required small>
+    <Form ref={focusedRef}>
+      <InputField name="fileName" value={state.fileName} required small onChange={value => (state.fileName = value)}>
         <Translate token="ui_file_name" />
       </InputField>
     </Form>
