@@ -7,7 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { Form, InputField, Translate, useFocus, useForm, useObservableRef } from '@cloudbeaver/core-blocks';
+import { Form, InputField, Translate, useFocus, useForm } from '@cloudbeaver/core-blocks';
 import { type IScriptExportTabProps } from '@cloudbeaver/plugin-script-export';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 import { downloadSql } from '../downloadSql.js';
