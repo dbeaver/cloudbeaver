@@ -8,9 +8,27 @@
 
 import { download } from '@cloudbeaver/core-utils';
 
+function sanitizeFilename(filename: string): string {
+  // Remove or replace invalid filesystem characters
+  return filename
+    .replace(/[/\\:*?"<>|]/g, '_')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, 255); // Max filename length for most filesystems
+}
+
 export function downloadSql(name: string, script: string): void {
+  if (!name || name.trim().length === 0) {
+    throw new Error('Filename cannot be empty');
+  }
+
+  if (!script) {
+    throw new Error('Script content cannot be empty');
+  }
+
+  const sanitizedName = sanitizeFilename(name);
   const blob = new Blob([script], {
     type: 'application/sql',
   });
-  download(blob, `${name}.sql`);
+  download(blob, `${sanitizedName}.sql`);
 }
