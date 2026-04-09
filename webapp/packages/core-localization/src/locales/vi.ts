@@ -152,6 +152,8 @@ export default [
   ['ui_not_selected', 'Not selected'],
   ['ui_reset', 'Reset'],
   ['ui_documentaion', 'Tài liệu'],
+  ['ui_deny', 'Từ chối'],
+  ['ui_allow', 'Cho phép'],
 
   ['root_permission_denied', 'Bạn không có quyền'],
   ['root_permission_no_permission', 'Bạn không có quyền thực hiện hành động này'],
