@@ -6,8 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-export * from './ScriptExportService.js';
-export * from './ExportScriptDialog/ExportScriptDialogLazy.js';
-export * from './ExportScriptDialog/ScriptExportDialogContext.js';
+import { importLazyComponent } from '@cloudbeaver/core-blocks';
 
-import './module.js';
+export const ExportScriptDialog = importLazyComponent(() => import('./ExportScriptDialog.js').then(module => module.ExportScriptDialog));

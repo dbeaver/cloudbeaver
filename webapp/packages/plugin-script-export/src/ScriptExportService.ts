@@ -8,7 +8,7 @@
 import { injectable } from '@cloudbeaver/core-di';
 import { TabsContainer } from '@cloudbeaver/core-ui';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
-import { importLazyComponent } from '@cloudbeaver/core-blocks';
+import { ExportScriptDialog } from './ExportScriptDialog/ExportScriptDialogLazy.js';
 
 export interface IScriptExportResult {
   exported: boolean;
@@ -22,8 +22,6 @@ export interface IScriptExportTabProps {
   projectId?: string;
   connectionId?: string;
 }
-
-const ExportScriptDialog = importLazyComponent(() => import('./ExportScriptDialog/ExportScriptDialog.js').then(module => module.ExportScriptDialog));
 
 @injectable(() => [CommonDialogService])
 export class ScriptExportService {
