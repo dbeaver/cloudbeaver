@@ -82,7 +82,6 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<Payload>>(functi
         state.compactSql,
       );
       state.query = newQuery;
-      notificationService.logSuccess({ title: 'app_shared_sql_generators_query_regenerated' });
     } catch (error: any) {
       notificationService.logException(error, 'app_shared_sql_generators_error_title');
     } finally {
@@ -100,6 +99,16 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<Payload>>(functi
     }
   }
 
+  async function handleFullyQualifiedNamesChange(value: boolean) {
+    state.useFullyQualifiedNames = value;
+    await regenerateQuery();
+  }
+
+  async function handleCompactSqlChange(value: boolean) {
+    state.compactSql = value;
+    await regenerateQuery();
+  }
+
   return (
     <CommonDialogWrapper size="large">
       <CommonDialogHeader title="app_shared_sql_generators_dialog_title" icon="sql-script" onReject={rejectDialog} />
@@ -111,7 +120,6 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<Payload>>(functi
       <CommonDialogFooter>
         <div className="tw:flex tw:flex-col tw:w-full tw:gap-6">
           <div className="tw:flex tw:flex-col tw:gap-1 tw:w-full">
-            <div className="theme-typography--body1">Settings</div>
             <div className="tw:flex tw:flex-row tw:gap-3 tw:w-full">
               <Checkbox
                 id="use-fully-qualified-names"
@@ -119,6 +127,7 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<Payload>>(functi
                 name="useFullyQualifiedNames"
                 disabled={state.loading}
                 label={translate('app_shared_sql_generators_use_fully_qualified_names')}
+                onChange={handleFullyQualifiedNamesChange}
               />
 
               <Checkbox
@@ -127,13 +136,11 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<Payload>>(functi
                 name="compactSql"
                 disabled={state.loading}
                 label={translate('app_shared_sql_generators_compact_sql')}
+                onChange={handleCompactSqlChange}
               />
             </div>
           </div>
           <div className="tw:flex tw:justify-end tw:w-full tw:gap-6">
-            <Button variant="secondary" disabled={state.loading} onClick={regenerateQuery}>
-              {translate('ui_refresh')}
-            </Button>
             <Button variant="secondary" disabled={!state.query || state.loading} onClick={() => copy(state.query, true)}>
               {translate('ui_copy_to_clipboard')}
             </Button>

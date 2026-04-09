@@ -3,5 +3,4 @@ export default [
   ['app_shared_sql_generators_use_fully_qualified_names', '使用完全限定名'],
   ['app_shared_sql_generators_compact_sql', '紧凑SQL'],
   ['app_shared_sql_generators_open_in_editor', '在SQL编辑器中打开'],
-  ['app_shared_sql_generators_query_regenerated', '查询已重新生成'],
 ];
