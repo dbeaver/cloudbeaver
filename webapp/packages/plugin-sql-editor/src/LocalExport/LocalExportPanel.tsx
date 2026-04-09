@@ -16,7 +16,7 @@ import { useService } from '@cloudbeaver/core-di';
 import { observable } from 'mobx';
 import { withTimestamp } from '@cloudbeaver/core-utils';
 
-export const LocalExportTab: TabContainerPanelComponent<IScriptExportTabProps> = observer(function LocalExportTab({
+export const LocalExportPanel: TabContainerPanelComponent<IScriptExportTabProps> = observer(function LocalExportPanel({
   script,
   fileName: initialFileName,
 }) {

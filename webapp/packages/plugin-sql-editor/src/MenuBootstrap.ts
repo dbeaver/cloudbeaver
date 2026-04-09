@@ -64,7 +64,7 @@ const EXECUTIONS_ACTIONS = [
 ];
 
 const LOCAL_EXPORT_TAB_ID = 'sql-editor-local-export-tab';
-const LocalExportTab = importLazyComponent(() => import('./LocalExport/LocalExportTab.js').then(module => module.LocalExportTab));
+const LocalExportPanel = importLazyComponent(() => import('./LocalExport/LocalExportPanel.js').then(module => module.LocalExportPanel));
 
 @injectable(() => [
   MenuService,
@@ -372,7 +372,7 @@ export class MenuBootstrap extends Bootstrap {
       key: LOCAL_EXPORT_TAB_ID,
       name: 'plugin_sql_editor_export_local_tab',
       order: 1,
-      panel: () => LocalExportTab,
+      panel: () => LocalExportPanel,
     });
   }
 
