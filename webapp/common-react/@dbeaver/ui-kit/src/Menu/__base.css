@@ -26,7 +26,7 @@
     --dbv-kit-menu-item-hover-background: var(--tw-color-gray-200);
     --dbv-kit-menu-item-hover-foreground: var(--dbv-kit-menu-foreground);
     --dbv-kit-menu-item-selected-background: var(--dbv-kit-color-primary-100);
-    --dbv-kit-menu-item-border-radius: var(--dbv-kit-control-border-radius);
+    --dbv-kit-menu-item-border-radius: calc(var(--dbv-kit-menu-border-radius) * 0.7);
 
     --dbv-kit-menu-separator-color: var(--dbv-kit-color-control-inactive);
   }
