@@ -79,6 +79,8 @@ export default [
   ['ui_rename', 'Переименовать'],
   ['ui_create', 'Создать'],
   ['ui_create_processing', 'Создание...'],
+  ['ui_manage', 'Управление'],
+  ['ui_tools', 'Инструменты'],
   ['ui_folder', 'Папка'],
   ['ui_folder_new', 'Новая папка'],
   ['ui_folder_new_default_name', 'Новая папка'],
@@ -147,6 +149,8 @@ export default [
   ['ui_not_selected', 'Не выбрано'],
   ['ui_reset', 'Сбросить'],
   ['ui_documentaion', 'Документация'],
+  ['ui_deny', 'Отклонить'],
+  ['ui_allow', 'Разрешить'],
 
   ['root_permission_denied', 'Отказано в доступе'],
   ['root_permission_no_permission', 'У вас нет разрешения на это действие'],
