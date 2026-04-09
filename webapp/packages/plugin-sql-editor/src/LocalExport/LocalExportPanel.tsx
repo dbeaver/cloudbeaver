@@ -13,8 +13,8 @@ import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 import { downloadSql } from '../downloadSql.js';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { useService } from '@cloudbeaver/core-di';
-import { observable } from 'mobx';
 import { withTimestamp } from '@cloudbeaver/core-utils';
+import { useState } from 'react';
 
 export const LocalExportPanel: TabContainerPanelComponent<IScriptExportTabProps> = observer(function LocalExportPanel({
   script,
@@ -22,19 +22,11 @@ export const LocalExportPanel: TabContainerPanelComponent<IScriptExportTabProps>
 }) {
   const [focusedRef] = useFocus<HTMLFormElement>({ focusFirstChild: true });
   const notificationService = useService(NotificationService);
-  const state = useObservableRef(
-    () => ({
-      fileName: initialFileName,
-    }),
-    {
-      fileName: observable.ref,
-    },
-    false,
-  );
+  const [fileName, setFileName] = useState(initialFileName);
 
   useForm({
     onSubmit(event) {
-      const fileNameWithTimestamp = withTimestamp(state.fileName);
+      const fileNameWithTimestamp = withTimestamp(fileName);
       downloadSql(fileNameWithTimestamp, script);
       notificationService.logSuccess({
         title: 'plugin_sql_editor_script_exported',
@@ -45,7 +37,7 @@ export const LocalExportPanel: TabContainerPanelComponent<IScriptExportTabProps>
 
   return (
     <Form ref={focusedRef}>
-      <InputField name="fileName" value={state.fileName} required small onChange={value => (state.fileName = value)}>
+      <InputField name="fileName" value={fileName} required small onChange={setFileName}>
         <Translate token="ui_file_name" />
       </InputField>
     </Form>
