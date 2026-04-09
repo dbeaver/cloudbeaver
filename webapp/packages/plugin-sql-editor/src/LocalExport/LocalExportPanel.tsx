@@ -24,7 +24,7 @@ export const LocalExportPanel: TabContainerPanelComponent<IScriptExportTabProps>
   const notificationService = useService(NotificationService);
   const [fileName, setFileName] = useState(initialFileName);
 
-  useForm({
+  const form = useForm({
     onSubmit(event) {
       const fileNameWithTimestamp = withTimestamp(fileName);
       downloadSql(fileNameWithTimestamp, script);
@@ -36,7 +36,7 @@ export const LocalExportPanel: TabContainerPanelComponent<IScriptExportTabProps>
   });
 
   return (
-    <Form ref={focusedRef}>
+    <Form ref={focusedRef} context={form}>
       <InputField name="fileName" value={fileName} required small onChange={setFileName}>
         <Translate token="ui_file_name" />
       </InputField>

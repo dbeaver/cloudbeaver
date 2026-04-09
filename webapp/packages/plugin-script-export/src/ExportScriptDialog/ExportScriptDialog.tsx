@@ -33,43 +33,38 @@ export const ExportScriptDialog: DialogComponent<IScriptExportTabProps> = observ
 }) {
   const scriptExportService = useService(ScriptExportService);
   const [selectedTabId, setSelectedTabId] = useState<string | undefined>(undefined);
-  const form = useForm();
-
-  async function handleSubmit() {
-    try {
-      await form.submit();
+  const form = useForm({
+    onSubmit() {
       resolveDialog();
-    } catch (error) {
-      // Keep dialog open on error
-    }
-  }
+    },
+  });
 
   return (
-    <CommonDialogWrapper size="large" className={className} fixedWidth>
-      <CommonDialogHeader title="plugin_script_export_dialog_title" icon="/icons/export.svg" onReject={rejectDialog} />
-      <TabsState
-        container={scriptExportService.tabsContainer}
-        currentTabId={selectedTabId}
-        lazy
-        onChange={tab => setSelectedTabId(tab.tabId)}
-        {...payload}
-      >
-        <CommonDialogBody noBodyPadding noOverflow>
-          <TabList className="theme-border-color-background tw:shrink-0 tw:px-3" underline />
-          <Form context={form}>
+    <Form context={form}>
+      <CommonDialogWrapper size="large" className={className} fixedWidth>
+        <CommonDialogHeader title="plugin_script_export_dialog_title" icon="/icons/export.svg" onReject={rejectDialog} />
+        <TabsState
+          container={scriptExportService.tabsContainer}
+          currentTabId={selectedTabId}
+          lazy
+          onChange={tab => setSelectedTabId(tab.tabId)}
+          {...payload}
+        >
+          <CommonDialogBody noBodyPadding noOverflow>
+            <TabList className="theme-border-color-background tw:shrink-0 tw:px-3" underline />
             <TabPanelList className="tw:flex-col tw:gap-4 tw:p-6 tw:w-full tw:overflow-auto" />
-          </Form>
-        </CommonDialogBody>
-        <CommonDialogFooter>
-          <Button type="button" variant="secondary" onClick={() => rejectDialog()}>
-            <Translate token="ui_processing_cancel" />
-          </Button>
-          <Fill />
-          <Button type="submit" onClick={handleSubmit}>
-            <Translate token="ui_processing_save" />
-          </Button>
-        </CommonDialogFooter>
-      </TabsState>
-    </CommonDialogWrapper>
+          </CommonDialogBody>
+          <CommonDialogFooter>
+            <Button type="button" variant="secondary" onClick={() => rejectDialog()}>
+              <Translate token="ui_processing_cancel" />
+            </Button>
+            <Fill />
+            <Button type="button" onClick={() => form.submit()}>
+              <Translate token="ui_processing_save" />
+            </Button>
+          </CommonDialogFooter>
+        </TabsState>
+      </CommonDialogWrapper>
+    </Form>
   );
 });

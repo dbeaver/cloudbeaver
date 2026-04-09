@@ -10,11 +10,6 @@ import { TabsContainer } from '@cloudbeaver/core-ui';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { ExportScriptDialog } from './ExportScriptDialog/ExportScriptDialogLazy.js';
 
-export interface IScriptExportResult {
-  exported: boolean;
-  location?: string;
-}
-
 export interface IScriptExportTabProps {
   script: string;
   fileName: string;
