@@ -22,8 +22,7 @@ import type { IDatabaseDataViewAction } from '../IDatabaseDataViewAction.js';
 import { IDatabaseDataResultAction } from '../IDatabaseDataResultAction.js';
 import { IDatabaseDataEditAction } from '../IDatabaseDataEditAction.js';
 import type { IDatabaseValueHolder } from '../IDatabaseValueHolder.js';
-import { IDatabasePersistedStateAction, PERSISTED_STATE_KEY } from '../IDatabasePersistedStateAction.js';
-import { DatabasePersistedStateAction } from '../General/DatabasePersistedStateAction.js';
+import { PERSISTED_STATE_KEY } from '../IDatabasePersistedStateAction.js';
 import type { IRestoreViewState } from './IRestoreViewState.js';
 
 @injectable(() => [IDatabaseDataSource, IDatabaseDataResult, IDatabaseDataResultAction, IDatabaseDataEditAction])
@@ -56,6 +55,7 @@ export class GridViewAction<
   }
 
   private columnsOrder: number[];
+  private viewStateRestored: boolean;
   readonly pinnedColumns: ObservableSet<string>;
   protected readonly data: GridDataResultAction<TColumn, TRow, TKey, TCell, TResult>;
   protected readonly editor?: GridEditAction<TColumn, TRow, TKey, TCell, TResult>;
@@ -71,6 +71,7 @@ export class GridViewAction<
     this.editor = editor as GridEditAction<TColumn, TRow, TKey, TCell, TResult> | undefined;
     this.columnsOrder = this.data.columns.map((key, index) => index);
     this.pinnedColumns = observable.set<string>();
+    this.viewStateRestored = false;
 
     makeObservable<this, 'columnsOrder' | 'pinnedColumns'>(this, {
       columnsOrder: observable,
@@ -85,6 +86,8 @@ export class GridViewAction<
       columns: computed,
       columnKeys: computed,
     });
+
+    this.tryRestoreViewState();
   }
 
   has(cell: TKey): boolean {
@@ -249,13 +252,30 @@ export class GridViewAction<
     }
   }
 
-  private persistViewState(): void {
-    const ps = this.source.tryGetAction(this.result, IDatabasePersistedStateAction, DatabasePersistedStateAction);
+  override afterResultUpdate(): void {
+    this.tryRestoreViewState();
+  }
 
-    if (!ps) {
+  private tryRestoreViewState(): void {
+    if (this.viewStateRestored) {
       return;
     }
 
+    const ps = this.source.persistedState;
+
+    if (!ps.has(PERSISTED_STATE_KEY.pinnedColumns) && !ps.has(PERSISTED_STATE_KEY.columnOrder)) {
+      return;
+    }
+
+    this.viewStateRestored = true;
+    const pinnedColumnNames = ps.get<string[]>(PERSISTED_STATE_KEY.pinnedColumns) ?? [];
+    const columnOrderNames = ps.get<string[]>(PERSISTED_STATE_KEY.columnOrder);
+
+    this.restoreViewState({ pinnedColumnNames, columnOrderNames });
+  }
+
+  private persistViewState(): void {
+    const ps = this.source.persistedState;
     const keys = this.columnKeys;
     let isCustomOrder = false;
     const columnNames: string[] = [];

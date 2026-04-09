@@ -5,21 +5,15 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { createService } from '@cloudbeaver/core-di';
-
-import type { IDatabaseDataAction } from '../IDatabaseDataAction.js';
-import type { IDatabaseDataResult } from '../IDatabaseDataResult.js';
 import type { IDataViewerPersistedState } from '../../DataViewerTableState/IDataViewerPersistedState.js';
 
-export interface IDatabasePersistedStateAction<TResult extends IDatabaseDataResult = IDatabaseDataResult> extends IDatabaseDataAction<any, TResult> {
+export interface IDatabasePersistedStateAction {
   get<T>(key: string): T | undefined;
   set(key: string, value: unknown): void;
   delete(key: string): void;
   has(key: string): boolean;
   setStore(store: Record<string, unknown>): void;
 }
-
-export const IDatabasePersistedStateAction = createService<IDatabasePersistedStateAction>('IDatabasePersistedStateAction');
 
 export const PERSISTED_STATE_KEY = {
   constraints: 'constraints',

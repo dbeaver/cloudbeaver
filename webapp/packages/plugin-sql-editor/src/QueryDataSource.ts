@@ -210,7 +210,7 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
     if (this.options?.query !== options.query) {
       this.resetQueryParameters();
     }
-    this.options = options;
+    this._options = options;
     return this;
   }
 

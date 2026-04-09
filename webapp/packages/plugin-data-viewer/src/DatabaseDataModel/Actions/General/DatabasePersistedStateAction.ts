@@ -5,26 +5,17 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { injectable } from '@cloudbeaver/core-di';
-import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 import { makeObservable, observable } from 'mobx';
 
-import { DatabaseDataAction } from '../../DatabaseDataAction.js';
-import { IDatabaseDataResult } from '../../IDatabaseDataResult.js';
-import { IDatabaseDataSource } from '../../IDatabaseDataSource.js';
 import type { IDatabasePersistedStateAction } from '../IDatabasePersistedStateAction.js';
+import { validatePersistedState } from '../../../DataViewerTableState/validatePersistedState.js';
 
-@injectable(() => [IDatabaseDataSource, IDatabaseDataResult])
-export class DatabasePersistedStateAction<TResult extends IDatabaseDataResult = IDatabaseDataResult>
-  extends DatabaseDataAction<any, TResult>
-  implements IDatabasePersistedStateAction<TResult>
-{
-  static dataFormat: ResultDataFormat[] | null = null;
-
+export class DatabasePersistedStateAction implements IDatabasePersistedStateAction {
   private store: Record<string, unknown>;
+  private readonly source: { options: any };
 
-  constructor(source: IDatabaseDataSource<any, TResult>, result: TResult) {
-    super(source, result);
+  constructor(source: { options: any }) {
+    this.source = source;
     this.store = {};
 
     makeObservable<this, 'store'>(this, {
@@ -34,6 +25,7 @@ export class DatabasePersistedStateAction<TResult extends IDatabaseDataResult = 
 
   setStore(store: Record<string, unknown>): void {
     this.store = store;
+    this.applyPersistedConstraints();
   }
 
   has(key: string): boolean {
@@ -50,5 +42,24 @@ export class DatabasePersistedStateAction<TResult extends IDatabaseDataResult = 
 
   delete(key: string): void {
     delete this.store[key];
+  }
+
+  private applyPersistedConstraints(): void {
+    const options = this.source.options;
+
+    if (!options || !validatePersistedState(this.store)) {
+      return;
+    }
+
+    if ('constraints' in options && 'whereFilter' in options) {
+      options.constraints = this.store.constraints.map(c => ({
+        attributeName: c.attributeName,
+        operator: c.operator,
+        value: c.value,
+        orderAsc: c.orderAsc,
+        orderPosition: c.orderPosition,
+      }));
+      options.whereFilter = this.store.whereFilter || '';
+    }
   }
 }

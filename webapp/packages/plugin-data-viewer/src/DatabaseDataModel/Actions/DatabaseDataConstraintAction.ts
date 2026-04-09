@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { computed, makeObservable, runInAction } from 'mobx';
+import { action, autorun, computed, type IReactionDisposer, makeObservable, runInAction } from 'mobx';
 
 import { type DataTypeLogicalOperation, ResultDataFormat, type SqlDataFilterConstraint } from '@cloudbeaver/core-sdk';
 
@@ -17,8 +17,7 @@ import { EOrder, type Order } from '../Order.js';
 import type { IDatabaseDataConstraintAction } from './IDatabaseDataConstraintAction.js';
 import { injectable } from '@cloudbeaver/core-di';
 import { IDatabaseDataResult } from '../IDatabaseDataResult.js';
-import { IDatabasePersistedStateAction, PERSISTED_STATE_KEY } from './IDatabasePersistedStateAction.js';
-import { DatabasePersistedStateAction } from './General/DatabasePersistedStateAction.js';
+import { PERSISTED_STATE_KEY } from './IDatabasePersistedStateAction.js';
 import type { IPersistedConstraint } from '../../DataViewerTableState/IDataViewerPersistedState.js';
 
 export const IS_NULL_ID = 'IS_NULL';
@@ -30,6 +29,8 @@ export class DatabaseDataConstraintAction
   implements IDatabaseDataConstraintAction<IDatabaseResultSet>
 {
   static dataFormat = [ResultDataFormat.Resultset, ResultDataFormat.Document];
+
+  private readonly persistDisposer: IReactionDisposer;
 
   get supported(): boolean {
     return this.source.constraintsAvailable && this.source.results.length < 2;
@@ -58,7 +59,24 @@ export class DatabaseDataConstraintAction
     makeObservable(this, {
       orderConstraints: computed,
       filterConstraints: computed,
+      deleteAll: action,
+      deleteFilter: action,
+      deleteFilters: action,
+      deleteOrders: action,
+      deleteOrder: action,
+      deleteDataFilters: action,
+      deleteData: action,
+      setWhereFilter: action,
+      setFilter: action,
+      setOrder: action,
     });
+
+    this.persistDisposer = autorun(() => this.persistConstraints());
+  }
+
+  override dispose(): void {
+    this.persistDisposer();
+    super.dispose();
   }
 
   private deleteConstraint(attributePosition: number) {
@@ -95,7 +113,6 @@ export class DatabaseDataConstraintAction
     }
 
     this.source.options.constraints = [];
-    this.persistConstraints();
   }
 
   deleteFilter(attributePosition: number): void {
@@ -103,7 +120,6 @@ export class DatabaseDataConstraintAction
     if (constraint) {
       deleteLogicalOperationFromConstraint(constraint);
       this.deleteEmptyConstraint(attributePosition);
-      this.persistConstraints();
     }
   }
 
@@ -122,7 +138,6 @@ export class DatabaseDataConstraintAction
     }
 
     this.source.options.constraints = newConstraints;
-    this.persistConstraints();
   }
 
   deleteOrders(): void {
@@ -140,7 +155,6 @@ export class DatabaseDataConstraintAction
     }
 
     this.source.options.constraints = newConstraints;
-    this.persistConstraints();
   }
 
   deleteOrder(attributePosition: number): void {
@@ -148,7 +162,6 @@ export class DatabaseDataConstraintAction
     if (constraint) {
       deleteOrderFromConstraint(constraint);
       this.deleteEmptyConstraint(attributePosition);
-      this.persistConstraints();
     }
   }
 
@@ -176,7 +189,6 @@ export class DatabaseDataConstraintAction
     }
 
     this.source.options.whereFilter = value;
-    this.persistConstraints();
   }
 
   resetWhereFilter() {
@@ -198,7 +210,6 @@ export class DatabaseDataConstraintAction
       } else if (currentConstraint.value !== undefined) {
         delete currentConstraint.value;
       }
-      this.persistConstraints();
       return;
     }
 
@@ -213,7 +224,6 @@ export class DatabaseDataConstraintAction
     }
 
     this.source.options.constraints.push(constraint);
-    this.persistConstraints();
   }
 
   setOrder(attributePosition: number, order: Order, multiple: boolean): void {
@@ -238,7 +248,6 @@ export class DatabaseDataConstraintAction
           orderAsc: order === EOrder.asc,
         });
       }
-      this.persistConstraints();
       return;
     }
 
@@ -254,7 +263,6 @@ export class DatabaseDataConstraintAction
         this.deleteConstraint(currentConstraint.attributePosition!);
       }
     }
-    this.persistConstraints();
   }
 
   getOrder(attributePosition: number): Order {
@@ -280,12 +288,11 @@ export class DatabaseDataConstraintAction
   }
 
   private persistConstraints(): void {
-    const ps = this.source.tryGetAction(this.result, IDatabasePersistedStateAction, DatabasePersistedStateAction);
-
-    if (!ps || !this.source.options) {
+    if (!this.source.options) {
       return;
     }
 
+    const ps = this.source.persistedState;
     const constraints: IPersistedConstraint[] = this.source.options.constraints
       .map(c => {
         const name = c.attributeName ?? this.getColumnNameAt(c.attributePosition!);

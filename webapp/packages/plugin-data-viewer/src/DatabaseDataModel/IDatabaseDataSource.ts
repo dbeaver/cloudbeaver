@@ -10,6 +10,7 @@ import type { IExecutor, ISyncExecutor } from '@cloudbeaver/core-executor';
 import { type TLocalizationToken } from '@cloudbeaver/core-localization';
 import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
+import type { IDatabasePersistedStateAction } from './Actions/IDatabasePersistedStateAction.js';
 import type { IDatabaseDataActions } from './IDatabaseDataActions.js';
 import type { IDatabaseDataResult } from './IDatabaseDataResult.js';
 
@@ -80,6 +81,7 @@ export interface IDatabaseDataSource<TOptions = unknown, TResult extends IDataba
   /** Options of the previous request */
   readonly prevOptions: Readonly<TOptions> | null;
   readonly options: TOptions | null;
+  readonly persistedState: IDatabasePersistedStateAction;
   readonly requestInfo: IRequestInfo;
   readonly error: Error | null;
   readonly canCancel: boolean;
