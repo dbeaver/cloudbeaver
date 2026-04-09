@@ -31,7 +31,6 @@ import {
   DataViewerPresentationType,
   type IDatabaseDataModel,
   type IDataPresentationProps,
-  isBooleanValuePresentationAvailable,
   GridDataKeysUtils,
   ResultSetDataSource,
   ResultSetSelectAction,
@@ -514,40 +513,6 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
     }
   }
 
-  function isCellEditable(rowIdx: number, colIdx: number): boolean {
-    const row = tableData.rows[rowIdx];
-    const column = tableData.getColumn(colIdx)?.key;
-
-    if (!row || !column) {
-      return false;
-    }
-
-    const cell = { row, column };
-
-    const editionState = tableData.getEditionState(cell);
-
-    const source = gridContext.model.source;
-    const hasElementIdentifier = isResultSetDataSource(source) ? source.hasElementIdentifier(tableData.view.resultIndex) : false;
-    if (!hasElementIdentifier && editionState !== DatabaseEditChangeType.add) {
-      return false;
-    }
-
-    const holder = tableData.getCellHolder(cell);
-    if (tableData.format.isBinary(holder) || tableData.format.isGeometry(holder) || tableData.dataContent.isTextTruncated(holder)) {
-      return false;
-    }
-
-    const resultColumn = tableData.getColumnInfo(cell.column);
-
-    if (!resultColumn || holder.value === undefined) {
-      return false;
-    }
-
-    const handleByBooleanFormatter = isBooleanValuePresentationAvailable(holder.value, resultColumn);
-
-    return !(handleByBooleanFormatter || tableData.isCellReadonly(cell));
-  }
-
   function getColumnKey(colIdx: number) {
     const column = tableData.columns[colIdx];
 
@@ -586,6 +551,19 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
     if (!readonly) {
       gridSelectedCellPaste.onKeydownHandler(event);
     }
+  }
+
+  function isCellEditable(rowIdx: number, colIdx: number): boolean {
+    const row = tableData.rows[rowIdx];
+    const column = tableData.getColumn(colIdx)?.key;
+
+    if (!row || !column) {
+      return false;
+    }
+
+    const key: IGridDataKey = { row, column };
+
+    return tableData.isCellEditable(key);
   }
 
   return (

@@ -43,15 +43,7 @@ export function useGridSelectedCellsPaste(
 
       const clipboardText = await clipboardService.read();
 
-      const updates = selectedCells
-        .filter(
-          key =>
-            !tableData.isCellReadonly(key) &&
-            // blobs can be large we can copy a part of it since it is not fully in the cell
-            // so pasting it we can save broken blob
-            !tableData.format.isBinary(tableData.getCellHolder(key)),
-        )
-        .map(key => ({ key, value: clipboardText }));
+      const updates = selectedCells.filter(key => tableData.isCellEditable(key)).map(key => ({ key, value: clipboardText }));
 
       if (updates.length > 0) {
         tableData.editor.setMany(updates);
