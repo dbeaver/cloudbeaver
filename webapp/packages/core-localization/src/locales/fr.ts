@@ -146,6 +146,8 @@ export default [
   ['ui_not_selected', 'Not selected'],
   ['ui_reset', 'Reset'],
   ['ui_documentaion', 'Documentation'],
+  ['ui_deny', 'Refuser'],
+  ['ui_allow', 'Autoriser'],
 
   ['root_permission_denied', "Vous n'avez pas les permissions"],
   ['root_permission_no_permission', "Vous n'avez pas la permission pour cette action"],
