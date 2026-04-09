@@ -20,6 +20,7 @@
     --dbv-kit-menu-popover-max-height: calc(100vh - 4rem);
     --dbv-kit-menu-popover-max-width: 20rem;
     --dbv-kit-menu-popover-padding-block: calc(var(--tw-spacing) * 1);
+    --dbv-kit-menu-popover-padding-inline: calc(var(--tw-spacing) * 1);
 
     --dbv-kit-menu-item-padding-inline: calc(var(--tw-spacing) * 5);
     --dbv-kit-menu-item-padding-block: calc(var(--tw-spacing) * 0);
