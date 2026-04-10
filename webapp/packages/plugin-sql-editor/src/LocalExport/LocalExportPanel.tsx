@@ -7,7 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { Form, InputField, Translate, useFocus, useForm } from '@cloudbeaver/core-blocks';
+import { InputField, Translate, useForm } from '@cloudbeaver/core-blocks';
 import { type IScriptExportTabProps } from '@cloudbeaver/plugin-script-export';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 import { downloadSql } from '../downloadSql.js';
@@ -20,12 +20,11 @@ export const LocalExportPanel: TabContainerPanelComponent<IScriptExportTabProps>
   script,
   fileName: initialFileName,
 }) {
-  const [focusedRef] = useFocus<HTMLFormElement>({ focusFirstChild: true });
   const notificationService = useService(NotificationService);
   const [fileName, setFileName] = useState(initialFileName);
 
-  const form = useForm({
-    onSubmit(event) {
+  useForm({
+    onSubmit() {
       const fileNameWithTimestamp = withTimestamp(fileName);
       downloadSql(fileNameWithTimestamp, script);
       notificationService.logSuccess({
@@ -36,10 +35,8 @@ export const LocalExportPanel: TabContainerPanelComponent<IScriptExportTabProps>
   });
 
   return (
-    <Form ref={focusedRef} context={form}>
-      <InputField name="fileName" value={fileName} required small onChange={setFileName}>
-        <Translate token="ui_file_name" />
-      </InputField>
-    </Form>
+    <InputField name="fileName" value={fileName} required small onChange={setFileName}>
+      <Translate token="ui_file_name" />
+    </InputField>
   );
 });
