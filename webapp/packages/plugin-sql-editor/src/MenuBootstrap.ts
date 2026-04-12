@@ -266,14 +266,20 @@ export class MenuBootstrap extends Bootstrap {
       },
       isDisabled: (context, action) => {
         const data = context.get(DATA_CONTEXT_SQL_EDITOR_DATA)!;
+        const state = context.get(DATA_CONTEXT_SQL_EDITOR_STATE)!;
 
         if (EXECUTIONS_ACTIONS.includes(action)) {
           return data.isDisabled || data.isScriptEmpty;
         }
 
         switch (action) {
-          case ACTION_SQL_EDITOR_FORMAT:
-            return data.isDisabled || data.isScriptEmpty || data.readonly;
+          case ACTION_SQL_EDITOR_FORMAT: {
+            const source = this.sqlDataSourceService.get(state.editorId);
+            const context = source?.executionContext;
+            const connection = context ? this.connectionInfoResource.get(createConnectionParam(context.projectId, context.connectionId)) : null;
+
+            return data.isDisabled || data.isScriptEmpty || data.readonly || !connection?.connected;
+          }
         }
 
         return false;
