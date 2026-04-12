@@ -8,5 +8,6 @@
 
 export * from './ScriptExportService.js';
 export * from './ExportScriptDialog/ExportScriptDialogLazy.js';
+export * from './ExportScriptDialog/ExportScriptDialogContext.js';
 
 import './module.js';
