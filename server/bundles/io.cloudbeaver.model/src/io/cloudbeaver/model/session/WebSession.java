@@ -607,11 +607,13 @@ public class WebSession extends BaseWebSession
         }
     }
 
+    @NotNull
     public WebAsyncTaskInfo createAndRunAsyncTask(@NotNull String taskName, @NotNull WebAsyncTaskProcessor<?> runnable) {
         WebAsyncTaskInfo asyncTask = createAsyncTask(taskName);
         return runAsyncTask(asyncTask, runnable);
     }
 
+    @NotNull
     public WebAsyncTaskInfo runAsyncTask(@NotNull WebAsyncTaskInfo asyncTask, @NotNull WebAsyncTaskProcessor<?> runnable) {
         AbstractJob job = new AbstractCancelableJob(asyncTask.getName()) {
             @NotNull
