@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2025 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import io.cloudbeaver.server.jobs.SessionStateJob;
 import io.cloudbeaver.server.jobs.WebDataSourceMonitorJob;
 import io.cloudbeaver.server.jobs.WebSessionMonitorJob;
 import org.jkiss.code.NotNull;
+import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.app.DBPRegistryListener;
 import org.jkiss.dbeaver.model.impl.app.BaseApplicationImpl;
@@ -51,7 +52,7 @@ public class CBPlatform extends BaseWebPlatform {
     }
 
     @Override
-    protected synchronized void initialize() {
+    protected synchronized void initialize() throws DBException {
         long startTime = System.currentTimeMillis();
         log.info("Initialize web platform " + getClass().getSimpleName());
         this.preferenceStore = new WebServerPreferenceStore(WebPlatformActivator.getInstance().getPreferences());
