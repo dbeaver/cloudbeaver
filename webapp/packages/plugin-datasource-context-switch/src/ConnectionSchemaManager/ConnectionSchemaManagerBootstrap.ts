@@ -125,21 +125,21 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
       menus: [MENU_CONNECTION_SELECTOR],
       getItems: (context, items) => {
         const filter = context.get(DATA_CONTEXT_MENU_SEARCH);
-        const noneItem = new MenuBaseItem(
-          { id: 'none', label: 'core_connections_no_connection', icon: '/icons/database_sm.svg' },
-          {
-            onSelect: () => {
-              this.connectionSchemaManagerService.selectConnection(null);
-            },
-          },
-          {
-            isDisabled: () => !this.connectionSchemaManagerService.currentConnectionKey,
-          },
-        );
-
         const fixed: typeof items = [new ContextMenuSearchItem()];
 
         if (!this.connectionSchemaManagerService.currentConnectionRequired) {
+          const noneItem = new MenuBaseItem(
+            { id: 'none', label: 'core_connections_no_connection', icon: '/icons/database_sm.svg' },
+            {
+              onSelect: () => {
+                this.connectionSchemaManagerService.selectConnection(null);
+              },
+            },
+            {
+              isDisabled: () => !this.connectionSchemaManagerService.currentConnectionKey,
+            },
+          );
+
           fixed.push(noneItem, new MenuSeparatorItem());
         }
 

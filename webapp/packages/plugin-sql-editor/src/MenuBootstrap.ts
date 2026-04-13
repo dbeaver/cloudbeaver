@@ -266,7 +266,6 @@ export class MenuBootstrap extends Bootstrap {
       },
       isDisabled: (context, action) => {
         const data = context.get(DATA_CONTEXT_SQL_EDITOR_DATA)!;
-        const state = context.get(DATA_CONTEXT_SQL_EDITOR_STATE)!;
 
         if (EXECUTIONS_ACTIONS.includes(action)) {
           return data.isDisabled || data.isScriptEmpty;
@@ -274,8 +273,7 @@ export class MenuBootstrap extends Bootstrap {
 
         switch (action) {
           case ACTION_SQL_EDITOR_FORMAT: {
-            const source = this.sqlDataSourceService.get(state.editorId);
-            const context = source?.executionContext;
+            const context = data.model.dataSource?.executionContext;
             const connection = context ? this.connectionInfoResource.get(createConnectionParam(context.projectId, context.connectionId)) : null;
 
             return data.isDisabled || data.isScriptEmpty || data.readonly || !connection?.connected;
