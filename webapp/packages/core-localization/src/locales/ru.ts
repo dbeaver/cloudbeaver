@@ -149,6 +149,8 @@ export default [
   ['ui_not_selected', 'Не выбрано'],
   ['ui_reset', 'Сбросить'],
   ['ui_documentaion', 'Документация'],
+  ['ui_deny', 'Отклонить'],
+  ['ui_allow', 'Разрешить'],
 
   ['root_permission_denied', 'Отказано в доступе'],
   ['root_permission_no_permission', 'У вас нет разрешения на это действие'],

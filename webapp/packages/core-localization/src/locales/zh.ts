@@ -149,6 +149,8 @@ export default [
   ['ui_not_selected', 'Not selected'],
   ['ui_reset', 'Reset'],
   ['ui_documentaion', '文档'],
+  ['ui_deny', '拒绝'],
+  ['ui_allow', '允许'],
 
   ['root_permission_denied', '您没有权限'],
   ['root_permission_no_permission', '您没有权限执行此操作'],

@@ -2395,7 +2395,8 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         }
     }
 
-    private SMCredentials getCurrentUserCreds() throws SMException {
+    @NotNull
+    protected SMCredentials getCurrentUserCreds() throws SMException {
         var currentUserCreds = credentialsProvider.getActiveUserCredentials();
         if (currentUserCreds == null) {
             throw new SMException("Unauthorized");

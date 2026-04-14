@@ -13,7 +13,7 @@ if [ "$(id -u)" -eq 0 ]; then
 
     chown -R $DBEAVER_UID:$DBEAVER_GID $PWD/workspace
     # Execute run-cloudbeaver-server.sh as the dbeaver user with the JAVA_HOME and PATH environment variables
-    exec su "$TARGET_USER" -c "JAVA_HOME=$JAVA_HOME PATH=$PATH ./run-cloudbeaver-server.sh"
+    exec su "$TARGET_USER" -c "JAVA_HOME=$JAVA_HOME PATH=$PATH ./run-cloudbeaver-server.sh $*"
 else
-    exec ./run-cloudbeaver-server.sh
+    exec ./run-cloudbeaver-server.sh "$@"
 fi

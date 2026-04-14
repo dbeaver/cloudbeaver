@@ -21,6 +21,7 @@ import {
   type IDataGridCellRenderer,
   type DataGridProps,
   type ICellChange,
+  type DataGridCellKeyboardEvent,
 } from '@cloudbeaver/plugin-data-grid';
 import {
   DATA_CONTEXT_DV_PRESENTATION,
@@ -30,9 +31,9 @@ import {
   DataViewerPresentationType,
   type IDatabaseDataModel,
   type IDataPresentationProps,
-  isBooleanValuePresentationAvailable,
   GridDataKeysUtils,
   ResultSetDataSource,
+  ResultSetSelectAction,
   getNextOrder,
   isResultSetDataModel,
   isResultSetDataSource,
@@ -62,6 +63,7 @@ import { TableDataContext } from './TableDataContext.js';
 import { useGridDragging } from './useGridDragging.js';
 import { useFormatting } from './useFormatting.js';
 import { useGridSelectedCellsCopy } from './useGridSelectedCellsCopy.js';
+import { useGridSelectedCellsPaste } from './useGridSelectedCellsPaste.js';
 import { useSearchResultsCache } from './useSearchResultsCache.js';
 import { useTableData } from './useTableData.js';
 import { TableColumnHeader } from './TableColumnHeader/TableColumnHeader.js';
@@ -185,6 +187,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
   }));
 
   const gridSelectedCellCopy = useGridSelectedCellsCopy(tableData, selectionAction as unknown as DatabaseSelectAction, gridSelectionContext);
+  const gridSelectedCellPaste = useGridSelectedCellsPaste(tableData, selectionAction as unknown as ResultSetSelectAction);
   const { onMouseDownHandler, onMouseMoveHandler } = useGridDragging({
     onDragStart: startPosition => {
       handlers.selectCell(startPosition);
@@ -510,40 +513,6 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
     }
   }
 
-  function isCellEditable(rowIdx: number, colIdx: number): boolean {
-    const row = tableData.rows[rowIdx];
-    const column = tableData.getColumn(colIdx)?.key;
-
-    if (!row || !column) {
-      return false;
-    }
-
-    const cell = { row, column };
-
-    const editionState = tableData.getEditionState(cell);
-
-    const source = gridContext.model.source;
-    const hasElementIdentifier = isResultSetDataSource(source) ? source.hasElementIdentifier(tableData.view.resultIndex) : false;
-    if (!hasElementIdentifier && editionState !== DatabaseEditChangeType.add) {
-      return false;
-    }
-
-    const holder = tableData.getCellHolder(cell);
-    if (tableData.format.isBinary(holder) || tableData.format.isGeometry(holder) || tableData.dataContent.isTextTruncated(holder)) {
-      return false;
-    }
-
-    const resultColumn = tableData.getColumnInfo(cell.column);
-
-    if (!resultColumn || holder.value === undefined) {
-      return false;
-    }
-
-    const handleByBooleanFormatter = isBooleanValuePresentationAvailable(holder.value, resultColumn);
-
-    return !(handleByBooleanFormatter || tableData.isCellReadonly(cell));
-  }
-
   function getColumnKey(colIdx: number) {
     const column = tableData.columns[colIdx];
 
@@ -559,7 +528,8 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
   }
 
   const handleCellKeyDown: DataGridProps['onCellKeyDown'] = (_, event) => {
-    gridSelectedCellCopy.onKeydownHandler(event);
+    handleCopyPaste(event);
+
     const cell = selectionAction.getFocusedElement();
 
     if (EventContext.has(event, EventStopPropagationFlag) || model.isReadonly(resultIndex) || !cell) {
@@ -573,6 +543,28 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
         event.preventGridDefault();
     }
   };
+
+  function handleCopyPaste(event: DataGridCellKeyboardEvent) {
+    const readonly = model.isReadonly(resultIndex);
+    gridSelectedCellCopy.onKeydownHandler(event);
+
+    if (!readonly) {
+      gridSelectedCellPaste.onKeydownHandler(event);
+    }
+  }
+
+  function isCellEditable(rowIdx: number, colIdx: number): boolean {
+    const row = tableData.rows[rowIdx];
+    const column = tableData.getColumn(colIdx)?.key;
+
+    if (!row || !column) {
+      return false;
+    }
+
+    const key: IGridDataKey = { row, column };
+
+    return tableData.isCellEditable(key);
+  }
 
   return (
     <ColumnDnDContext.Provider value={columnDnDState}>
@@ -621,7 +613,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
                   onCellChange={handleCellChange}
                   onCellChangeBatch={handleCellChangeBatch}
                   onCellKeyDown={handleCellKeyDown}
-                  onHeaderKeyDown={gridSelectedCellCopy.onKeydownHandler}
+                  onHeaderKeyDown={handleCopyPaste}
                 />
               </div>
             </FormattingContext.Provider>
