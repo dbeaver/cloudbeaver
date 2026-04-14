@@ -449,11 +449,6 @@ export class MenuBootstrap extends Bootstrap {
       const fileName = withTimestamp(name);
 
       downloadSql(fileName, script);
-      this.notificationService.logSuccess({
-        title: 'plugin_sql_editor_script_exported',
-        message: `${fileName}.sql`,
-      });
-
       return;
     }
 

@@ -38,7 +38,7 @@ export const LocalExportPanel: TabContainerPanelComponent<IScriptExportTabProps>
   });
 
   return (
-    <InputField name="fileName" value={fileName} required small onChange={setFileName}>
+    <InputField className="tw:max-w-80!" name="fileName" value={fileName} required onChange={setFileName}>
       <Translate token="ui_file_name" />
     </InputField>
   );
