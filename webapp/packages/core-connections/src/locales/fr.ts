@@ -1,7 +1,6 @@
 export default [
   ['core_connections_connections_settings_group', 'Connexions'],
   ['core_connections_search_database_tip', "Saisissez vos hôtes ici, par exemple 'localhost host1.myhost.com 192.168.0.1' et appuyez sur Entrée"],
-  ['core_connections_new_connection', 'Nouvelle connexion'],
   ['core_connections_connection_create_error', 'Erreur de création de connexion'],
   ['core_connections_connection_save_error', 'Erreur de sauvegarde de connexion'],
   ['core_connections_connection_access_empty', 'Aucun utilisateur et équipe disponibles'],

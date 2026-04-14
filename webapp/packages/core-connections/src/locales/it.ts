@@ -1,7 +1,6 @@
 export default [
   ['core_connections_connections_settings_group', 'Connections'],
   ['core_connections_search_database_tip', "Digita gli hosts qui, p.e. 'localhost host1.myhost.com 192.168.0.1' e premi Invio"],
-  ['core_connections_new_connection', 'Nuova Connessione'],
   ['core_connections_connection_create_error', 'Errore di creazione connessione'],
   ['core_connections_connection_save_error', 'Errore di salvataggio connessione'],
   ['core_connections_connection_no_information', 'Nessuna informazione disponibile'],

@@ -16,6 +16,8 @@
     border-style: var(--dbv-kit-menu-border-style);
     box-shadow: var(--dbv-kit-menu-popover-shadow);
     outline: 0;
+    padding-block: var(--dbv-kit-menu-popover-padding-block);
+    padding-inline: var(--dbv-kit-menu-popover-padding-inline);
 
     @media (prefers-reduced-motion: no-preference) {
       opacity: 0;
@@ -42,6 +44,7 @@
     cursor: pointer;
     font-weight: var(--dbv-kit-menu-font-weight);
     font-size: var(--dbv-kit-menu-font-size);
+    border-radius: var(--dbv-kit-menu-item-border-radius);
 
     &:hover:not([aria-disabled='true']) {
       background-color: var(--dbv-kit-menu-item-hover-background);

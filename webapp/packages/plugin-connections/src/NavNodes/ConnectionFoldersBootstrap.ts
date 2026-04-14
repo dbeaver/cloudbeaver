@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -55,6 +55,7 @@ import { ACTION_NEW_FOLDER, ActionService, type IAction, MenuService } from '@cl
 import {
   DATA_CONTEXT_ELEMENTS_TREE,
   MENU_ELEMENTS_TREE_TOOLS,
+  MENU_NAVIGATION_TREE_CREATE,
   NavigationTreeService,
   TreeSelectionService,
 } from '@cloudbeaver/plugin-navigation-tree';
@@ -176,7 +177,7 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
     });
 
     this.menuService.addCreator({
-      root: true,
+      menus: [MENU_NAVIGATION_TREE_CREATE],
       contexts: [DATA_CONTEXT_NAV_NODE, DATA_CONTEXT_ELEMENTS_TREE],
       isApplicable: context => {
         const node = context.get(DATA_CONTEXT_NAV_NODE)!;

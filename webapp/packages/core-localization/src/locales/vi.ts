@@ -82,6 +82,8 @@ export default [
   ['ui_rename', 'Đổi tên'],
   ['ui_create', 'Tạo'],
   ['ui_create_processing', 'Đang tạo...'],
+  ['ui_manage', 'Quản lý'],
+  ['ui_tools', 'Công cụ'],
   ['ui_folder', 'Thư mục'],
   ['ui_folder_new', 'Thư mục mới'],
   ['ui_folder_new_default_name', 'Thư mục mới'],
@@ -150,6 +152,8 @@ export default [
   ['ui_not_selected', 'Not selected'],
   ['ui_reset', 'Reset'],
   ['ui_documentaion', 'Tài liệu'],
+  ['ui_deny', 'Từ chối'],
+  ['ui_allow', 'Cho phép'],
 
   ['root_permission_denied', 'Bạn không có quyền'],
   ['root_permission_no_permission', 'Bạn không có quyền thực hiện hành động này'],

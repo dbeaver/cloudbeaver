@@ -1,7 +1,6 @@
 export default [
   ['core_connections_connections_settings_group', '连接'],
   ['core_connections_search_database_tip', '在此处输入您的主机，例如“localhost host1.myhost.com 192.168.0.1”然后按 Enter'],
-  ['core_connections_new_connection', '新连接'],
   ['core_connections_connection_create_error', '创建连接失败'],
   ['core_connections_connection_save_error', '保存链接失败'],
   ['core_connections_connection_no_information', '没有可用信息'],
