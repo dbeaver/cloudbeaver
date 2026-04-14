@@ -22,8 +22,10 @@ import type { IDatabaseDataViewAction } from '../IDatabaseDataViewAction.js';
 import { IDatabaseDataResultAction } from '../IDatabaseDataResultAction.js';
 import { IDatabaseDataEditAction } from '../IDatabaseDataEditAction.js';
 import type { IDatabaseValueHolder } from '../IDatabaseValueHolder.js';
-import { PERSISTED_STATE_KEY } from '../IDatabasePersistedStateAction.js';
 import type { IRestoreViewState } from './IRestoreViewState.js';
+
+const PINNED_COLUMNS_KEY = 'pinnedColumns';
+const COLUMN_ORDER_KEY = 'columnOrder';
 
 @injectable(() => [IDatabaseDataSource, IDatabaseDataResult, IDatabaseDataResultAction, IDatabaseDataEditAction])
 export class GridViewAction<
@@ -263,13 +265,13 @@ export class GridViewAction<
 
     const ps = this.source.persistedState;
 
-    if (!ps.has(PERSISTED_STATE_KEY.pinnedColumns) && !ps.has(PERSISTED_STATE_KEY.columnOrder)) {
+    if (!ps.has(PINNED_COLUMNS_KEY) && !ps.has(COLUMN_ORDER_KEY)) {
       return;
     }
 
     this.viewStateRestored = true;
-    const pinnedColumnNames = ps.get<string[]>(PERSISTED_STATE_KEY.pinnedColumns) ?? [];
-    const columnOrderNames = ps.get<string[]>(PERSISTED_STATE_KEY.columnOrder);
+    const pinnedColumnNames = ps.get<string[]>(PINNED_COLUMNS_KEY) ?? [];
+    const columnOrderNames = ps.get<string[]>(COLUMN_ORDER_KEY);
 
     this.restoreViewState({ pinnedColumnNames, columnOrderNames });
   }
@@ -298,8 +300,8 @@ export class GridViewAction<
       }
     }
 
-    ps.set(PERSISTED_STATE_KEY.pinnedColumns, pinnedNames);
-    ps.set(PERSISTED_STATE_KEY.columnOrder, isCustomOrder ? columnNames : []);
+    ps.set(PINNED_COLUMNS_KEY, pinnedNames);
+    ps.set(COLUMN_ORDER_KEY, isCustomOrder ? columnNames : []);
   }
 
   restoreViewState(state: IRestoreViewState): void {

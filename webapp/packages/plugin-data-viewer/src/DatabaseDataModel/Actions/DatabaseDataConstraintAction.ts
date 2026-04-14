@@ -17,11 +17,13 @@ import { EOrder, type Order } from '../Order.js';
 import type { IDatabaseDataConstraintAction } from './IDatabaseDataConstraintAction.js';
 import { injectable } from '@cloudbeaver/core-di';
 import { IDatabaseDataResult } from '../IDatabaseDataResult.js';
-import { PERSISTED_STATE_KEY } from './IDatabasePersistedStateAction.js';
 import type { IPersistedConstraint } from '../../DataViewerTableState/IDataViewerPersistedState.js';
 
 export const IS_NULL_ID = 'IS_NULL';
 export const IS_NOT_NULL_ID = 'IS_NOT_NULL';
+
+const CONSTRAINTS_KEY = 'constraints';
+const WHERE_FILTER_KEY = 'whereFilter';
 
 @injectable(() => [IDatabaseDataSource, IDatabaseDataResult])
 export class DatabaseDataConstraintAction
@@ -317,8 +319,8 @@ export class DatabaseDataConstraintAction
       })
       .filter((c): c is IPersistedConstraint => c !== null);
 
-    ps.set(PERSISTED_STATE_KEY.constraints, constraints);
-    ps.set(PERSISTED_STATE_KEY.whereFilter, this.source.options.whereFilter || '');
+    ps.set(CONSTRAINTS_KEY, constraints);
+    ps.set(WHERE_FILTER_KEY, this.source.options.whereFilter || '');
   }
 }
 

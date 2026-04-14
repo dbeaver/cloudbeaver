@@ -50,8 +50,8 @@ export * from './DatabaseDataModel/Actions/ResultSet/ResultSetDataContentAction.
 export * from './DatabaseDataModel/Actions/DatabaseDataResultAction.js';
 export * from './DatabaseDataModel/Actions/DatabaseEditAction.js';
 export * from './DatabaseDataModel/Actions/General/DatabaseMetadataAction.js';
-export * from './DatabaseDataModel/Actions/General/DatabasePersistedStateAction.js';
-export * from './DatabaseDataModel/Actions/IDatabasePersistedStateAction.js';
+export * from './DatabaseDataModel/DatabasePersistedStateStore.js';
+export * from './DatabaseDataModel/IDatabasePersistedStateStore.js';
 export * from './DatabaseDataModel/Actions/DatabaseSelectAction.js';
 export * from './DatabaseDataModel/Actions/IDatabaseDataCacheAction.js';
 export * from './DatabaseDataModel/Actions/IDatabaseDataViewAction.js';

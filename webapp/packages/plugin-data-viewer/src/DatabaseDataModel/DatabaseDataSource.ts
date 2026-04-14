@@ -11,7 +11,7 @@ import { withExternal, type IServiceProvider, type IServiceScope, type SingleSer
 import { Executor, ExecutorInterrupter, type IExecutor, type ISyncExecutor, type ITask, SyncExecutor, Task } from '@cloudbeaver/core-executor';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
-import { DatabasePersistedStateAction } from './Actions/General/DatabasePersistedStateAction.js';
+import { DatabasePersistedStateStore } from './DatabasePersistedStateStore.js';
 import { IDatabaseDataActions } from './IDatabaseDataActions.js';
 import type { IDatabaseDataResult } from './IDatabaseDataResult.js';
 import {
@@ -34,7 +34,7 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
   count: number;
   prevOptions: Readonly<TOptions> | null;
   protected _options: TOptions | null;
-  readonly persistedState: DatabasePersistedStateAction;
+  readonly persistedState: DatabasePersistedStateStore;
   requestInfo: IRequestInfo;
   error: Error | null;
   private readonly features: Set<DatabaseDataFeature | string>;
@@ -85,7 +85,7 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
     this.count = 0;
     this.prevOptions = null;
     this._options = null;
-    this.persistedState = new DatabasePersistedStateAction(this);
+    this.persistedState = new DatabasePersistedStateStore(this);
     this.disabled = false;
     this.outdated = true;
     this.constraintsAvailable = true;

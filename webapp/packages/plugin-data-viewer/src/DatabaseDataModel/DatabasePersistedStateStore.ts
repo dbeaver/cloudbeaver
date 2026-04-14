@@ -7,10 +7,10 @@
  */
 import { makeObservable, observable } from 'mobx';
 
-import type { IDatabasePersistedStateAction } from '../IDatabasePersistedStateAction.js';
-import { validatePersistedState } from '../../../DataViewerTableState/validatePersistedState.js';
+import type { IDatabasePersistedStateStore } from './IDatabasePersistedStateStore.js';
+import { validatePersistedState } from '../DataViewerTableState/validatePersistedState.js';
 
-export class DatabasePersistedStateAction implements IDatabasePersistedStateAction {
+export class DatabasePersistedStateStore implements IDatabasePersistedStateStore {
   private store: Record<string, unknown>;
   private readonly source: { options: any };
 
