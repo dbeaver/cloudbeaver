@@ -35,7 +35,7 @@ exec java ${JAVA_OPTS} \
   --add-opens=java.sql/java.sql=ALL-UNNAMED \
   -jar ${launcherJar} \
   -product io.cloudbeaver.product.ce.product \
-  -web-config conf/cloudbeaver.conf \
   "$@" \
+  -web-config conf/cloudbeaver.conf \
   -nl en \
   -registryMultiLanguage
