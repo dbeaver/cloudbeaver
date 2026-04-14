@@ -248,11 +248,13 @@ public class WebServiceSQL implements DBWServiceSQL {
         @NotNull WebSession session,
         @NotNull String generatorId,
         @NotNull List<String> nodePathList,
-        boolean useFullyQualifiedNames,
-        boolean compactSql
+        @NotNull WebSQLGeneratorOptions options
     ) throws DBWebException {
         List<DBSObject> objectList = getObjectListFromNodeIds(session, nodePathList);
-        return createAndRunGenerator(session, generatorId, objectList, useFullyQualifiedNames, compactSql);
+        return createAndRunGenerator(
+            session, generatorId, objectList,
+            options.useFullyQualifiedNames(), options.compactSql()
+        );
     }
 
     @Override
@@ -262,14 +264,13 @@ public class WebServiceSQL implements DBWServiceSQL {
         @NotNull String generatorId,
         @NotNull String resultsId,
         @NotNull List<WebSQLResultsRow> selectedRows,
-        boolean useFullyQualifiedNames,
-        boolean compactSql
+        @NotNull WebSQLGeneratorOptions options
     ) throws DBWebException {
         checkAndFillTruncatedData(sqlContext, resultsId, selectedRows);
         WebDBDResultSetDataProvider dataProvider = new WebDBDResultSetDataProvider(resultsId, sqlContext, selectedRows);
         return createAndRunGenerator(
             webSession, generatorId, Collections.singletonList(dataProvider),
-            useFullyQualifiedNames, compactSql
+            options.useFullyQualifiedNames(), options.compactSql()
         );
     }
 
