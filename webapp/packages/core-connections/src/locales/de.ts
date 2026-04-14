@@ -1,6 +1,5 @@
 export default [
   ['core_connections_connections_settings_group', 'Verbindungen'],
-  ['core_connections_new_connection', 'Neue Verbindung'],
   ['core_connections_connection_access_empty', 'Keine verfügbaren Benutzer und Teams'],
   ['core_connections_connection_no_information', 'Keine Information verfügbar'],
   ['connections_administration_delete_confirmation', 'Sie werden diese Verbindungen löschen: '],
