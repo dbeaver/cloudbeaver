@@ -17,14 +17,15 @@
 package io.cloudbeaver.model.rm.local;
 
 import com.google.gson.reflect.TypeToken;
-import io.cloudbeaver.utils.ServletAppUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
-import org.jkiss.dbeaver.model.fs.lock.FileLockController;
+import org.jkiss.dbeaver.model.fs.lock.LockManager;
+import org.jkiss.dbeaver.model.fs.lock.LockOptions;
+import org.jkiss.dbeaver.model.fs.lock.LockTarget;
 import org.jkiss.dbeaver.model.impl.app.BaseProjectImpl;
 import org.jkiss.dbeaver.model.rm.RMProjectInfo;
 import org.jkiss.dbeaver.model.rm.RMProjectType;
@@ -45,12 +46,12 @@ public class ProjectsMetadataInfo {
 
     private final Map<String, RMProjectInfo> projectsInfo = new LinkedHashMap<>();
     private final Path projectsPath;
-    private final FileLockController lockController;
+    private final LockManager lockController;
 
 
-    public ProjectsMetadataInfo(@NotNull Path projectsPath) throws DBException {
+    public ProjectsMetadataInfo(@NotNull Path projectsPath, @NotNull LockManager lockController) throws DBException {
         this.projectsPath = projectsPath;
-        this.lockController = new FileLockController(ServletAppUtils.getServletApplication().getApplicationInstanceId());
+        this.lockController = lockController;
         readProjectInfos(projectsPath);
     }
 
@@ -139,7 +140,7 @@ public class ProjectsMetadataInfo {
     }
 
     private void saveProjectsInfo() {
-        try (var lock = lockController.lock(PROJECTS_INFO_FILE_NAME, "saveProjectsInfo")) {
+        try (var lock = lockController.lock(LockTarget.of(PROJECTS_INFO_FILE_NAME), LockOptions.of("saveProjectsInfo"))) {
             log.info("Saving project information");
             Files.writeString(projectsPath.resolve(PROJECTS_INFO_FILE_NAME), JSONUtils.GSON.toJson(projectsInfo));
         } catch (IOException e) {

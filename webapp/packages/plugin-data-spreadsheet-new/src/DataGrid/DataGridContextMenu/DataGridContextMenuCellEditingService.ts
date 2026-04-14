@@ -163,10 +163,7 @@ export class DataGridContextMenuCellEditingService {
             actions.edit(key);
             break;
           case ACTION_DATA_GRID_EDITING_SET_TO_NULL:
-            for (const element of selectedElements) {
-              // TODO wait for search merge to implement setMany here in order to have batched changes for undo/redo
-              editor.set(element, null);
-            }
+            editor.setMany(selectedElements.map(key => ({ key, value: null })));
             break;
           case ACTION_DATA_GRID_EDITING_ADD_ROW:
             editor.add(...selectedElements);

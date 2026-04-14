@@ -80,6 +80,8 @@ export default [
   ['ui_rename', 'Rename'],
   ['ui_create', 'Create'],
   ['ui_create_processing', 'Creating...'],
+  ['ui_manage', 'Manage'],
+  ['ui_tools', 'Strumenti'],
   ['ui_folder', 'Folder'],
   ['ui_folder_new', 'New folder'],
   ['ui_folder_new_default_name', 'New folder'],
@@ -141,6 +143,8 @@ export default [
   ['ui_not_selected', 'Not selected'],
   ['ui_reset', 'Reset'],
   ['ui_documentaion', 'Documentation'],
+  ['ui_deny', 'Nega'],
+  ['ui_allow', 'Consenti'],
 
   ['root_permission_denied', 'Non hai i permessi'],
   ['app_root_session_expire_warning_title', 'La sessione sta per scadere'],
