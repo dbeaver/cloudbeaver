@@ -243,6 +243,7 @@ public class WebServiceSQL implements DBWServiceSQL {
         return SQLGeneratorConfigurationRegistry.getInstance().getApplicableGenerators(objectList, session).toArray(new SQLGeneratorDescriptor[0]);
     }
 
+    @NotNull
     @Override
     public String generateEntityQuery(
         @NotNull WebSession session,
@@ -257,6 +258,7 @@ public class WebServiceSQL implements DBWServiceSQL {
         );
     }
 
+    @NotNull
     @Override
     public String sqlGenerateResultSetQuery(
         @NotNull WebSession webSession,
@@ -301,6 +303,7 @@ public class WebServiceSQL implements DBWServiceSQL {
             dataKind.equals(DBPDataKind.BINARY);
     }
 
+    @NotNull
     private String createAndRunGenerator(
         @NotNull WebSession session,
         @NotNull String generatorId,
