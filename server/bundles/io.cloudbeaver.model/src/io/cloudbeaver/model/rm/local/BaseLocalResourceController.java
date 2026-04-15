@@ -116,22 +116,7 @@ public abstract class BaseLocalResourceController implements RMController {
         return doFileReadOperation(
             projectId,
             projectMetadata.getMetadataFolder(false),
-            () -> {
-                DBPDataSourceRegistry registry = projectMetadata.getDataSourceRegistry();
-                registry.refreshConfig();
-                registry.checkForErrors();
-                DataSourceConfigurationManagerBuffer buffer = new DataSourceConfigurationManagerBuffer();
-                Predicate<DBPDataSourceContainer> filter = null;
-                if (!ArrayUtils.isEmpty(dataSourceIds)) {
-                    filter = ds -> ArrayUtils.contains(dataSourceIds, ds.getId());
-                }
-                ((DataSourcePersistentRegistry) registry).saveConfigurationToManager(new VoidProgressMonitor(),
-                    buffer,
-                    filter);
-                registry.checkForErrors();
-
-                return new String(buffer.getData(), StandardCharsets.UTF_8);
-            }
+            () -> serializeProjectDataSourcesConfiguration(projectMetadata, dataSourceIds)
         );
     }
 
@@ -160,12 +145,13 @@ public abstract class BaseLocalResourceController implements RMController {
         @Nullable List<String> dataSourceIds
     ) throws DBException {
         try (var ignoredLock = lockController.lock(LockTarget.of(projectId), LockOptions.of("updateProjectDataSources"))) {
-            DBPProject project = getWebProject(projectId, false);
+            RMLocalProject project = getWebProject(projectId, false);
+            String processedConfiguration = preprocessDataSourceConfigurationUpdate(project, projectId, configuration, dataSourceIds);
             return doFileWriteOperation(
                 projectId, project.getMetadataFolder(false),
                 () -> {
                     DBPDataSourceRegistry registry = project.getDataSourceRegistry();
-                    DBPDataSourceConfigurationStorage storage = new DataSourceMemoryStorage(configuration.getBytes(
+                    DBPDataSourceConfigurationStorage storage = new DataSourceMemoryStorage(processedConfiguration.getBytes(
                         StandardCharsets.UTF_8));
                     DataSourceConfigurationManager manager = new DataSourceConfigurationManagerBuffer();
                     final DataSourceParseResults parseResults = ((DataSourcePersistentRegistry) registry).loadDataSources(
@@ -183,6 +169,35 @@ public abstract class BaseLocalResourceController implements RMController {
                 }
             );
         }
+    }
+
+    @NotNull
+    protected String preprocessDataSourceConfigurationUpdate(
+        @NotNull RMLocalProject project,
+        @NotNull String projectId,
+        @NotNull String configuration,
+        @Nullable List<String> dataSourceIds
+    ) throws DBException {
+        return configuration;
+    }
+
+    @NotNull
+    protected String serializeProjectDataSourcesConfiguration(
+        @NotNull DBPProject project,
+        @Nullable String[] dataSourceIds
+    ) throws DBException {
+        DBPDataSourceRegistry registry = project.getDataSourceRegistry();
+        registry.refreshConfig();
+        registry.checkForErrors();
+        DataSourceConfigurationManagerBuffer buffer = new DataSourceConfigurationManagerBuffer();
+        Predicate<DBPDataSourceContainer> filter = null;
+        if (!ArrayUtils.isEmpty(dataSourceIds)) {
+            filter = ds -> ArrayUtils.contains(dataSourceIds, ds.getId());
+        }
+        ((DataSourcePersistentRegistry) registry).saveConfigurationToManager(new VoidProgressMonitor(), buffer, filter);
+        registry.checkForErrors();
+
+        return new String(buffer.getData(), StandardCharsets.UTF_8);
     }
 
     @Override
