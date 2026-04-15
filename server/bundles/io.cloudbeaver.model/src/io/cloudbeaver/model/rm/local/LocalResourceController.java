@@ -82,6 +82,7 @@ public class LocalResourceController extends BaseLocalResourceController {
     private final String globalProjectName;
     private Supplier<SMAdminController> smControllerSupplier;
     protected final List<RMFileOperationHandler> fileHandlers;
+    protected final List<RMDataSourceConfigUpdateHandler> dataSourceConfigUpdateHandlers;
 
     private final Map<String, RMLocalProject> projectRegistries = new LinkedHashMap<>();
     private final ProjectsMetadataInfo sharedProjectsMetadataInfo;
@@ -104,6 +105,7 @@ public class LocalResourceController extends BaseLocalResourceController {
 
         this.globalProjectName = DBWorkbench.getPlatform().getApplication().getDefaultProjectName();
         this.fileHandlers = RMFileOperationHandlersRegistry.getInstance().getFileHandlers();
+        this.dataSourceConfigUpdateHandlers = RMDataSourceConfigUpdateHandlersRegistry.getInstance().getHandlers();
         this.sharedProjectsMetadataInfo = new ProjectsMetadataInfo(sharedProjectsPath, lockController);
     }
 
@@ -409,6 +411,34 @@ public class LocalResourceController extends BaseLocalResourceController {
         DataSourceParseResults parseResults = super.updateProjectDataSourcesConfig(projectId, configuration, dataSourceIds);
         sendDataSourcesConfigUpdatedEvent(registry, oldDataSources, parseResults);
         return parseResults != null;
+    }
+
+    @Override
+    @NotNull
+    protected String preprocessDataSourceConfigurationUpdate(
+        @NotNull RMLocalProject project,
+        @NotNull String projectId,
+        @NotNull String configuration,
+        @Nullable List<String> dataSourceIds
+    ) throws DBException {
+        if (dataSourceConfigUpdateHandlers.isEmpty()) {
+            return configuration;
+        }
+
+        Set<RMProjectPermission> projectPermissions = getProjectPermissions(projectId, project.getProjectType());
+        String currentConfiguration = serializeProjectDataSourcesConfiguration(
+            project,
+            dataSourceIds == null ? null : dataSourceIds.toArray(String[]::new)
+        );
+        String processedConfiguration = configuration;
+        for (RMDataSourceConfigUpdateHandler handler : dataSourceConfigUpdateHandlers) {
+            processedConfiguration = handler.processDataSourceConfigurationUpdate(
+                currentConfiguration,
+                processedConfiguration,
+                projectPermissions
+            );
+        }
+        return processedConfiguration;
     }
 
     @Override
