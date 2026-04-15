@@ -37,7 +37,6 @@ export * from './DatabaseDataModel/Actions/IDatabaseValueHolder.js';
 export * from './DatabaseDataModel/Actions/Grid/GridEditAction.js';
 export * from './DatabaseDataModel/Actions/Grid/GridViewAction.js';
 export * from './DatabaseDataModel/Actions/Grid/IGridDataKey.js';
-export * from './DatabaseDataModel/Actions/Grid/IRestoreViewState.js';
 export * from './DatabaseDataModel/Actions/Grid/GridSelectAction.js';
 export * from './DatabaseDataModel/Actions/Grid/GridHistoryAction.js';
 export * from './DatabaseDataModel/Actions/Grid/GridHistoryTypes.js';

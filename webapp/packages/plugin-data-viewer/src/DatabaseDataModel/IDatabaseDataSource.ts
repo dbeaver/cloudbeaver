@@ -118,6 +118,7 @@ export interface IDatabaseDataSource<TOptions = unknown, TResult extends IDataba
   setAccess: (access: DatabaseDataAccessMode) => this;
   setSlice: (offset: number, count: number) => this;
   setOptions: (options: TOptions) => this;
+  loadPersistedState: (state: Record<string, unknown>) => this;
   setDataFormat: (dataFormat: ResultDataFormat) => this;
   setSupportedDataFormats: (dataFormats: ResultDataFormat[]) => this;
   setFeature: (feature: DatabaseDataFeature) => this;

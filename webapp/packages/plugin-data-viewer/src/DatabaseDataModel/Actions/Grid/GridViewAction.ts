@@ -5,8 +5,9 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { action, computed, makeObservable, observable, ObservableSet } from 'mobx';
+import { action, computed, makeObservable } from 'mobx';
 
+import { isArraysEqual } from '@cloudbeaver/core-utils';
 import { isDefined } from '@dbeaver/js-helpers';
 import { DatabaseDataAction } from '../../DatabaseDataAction.js';
 import { IDatabaseDataSource } from '../../IDatabaseDataSource.js';
@@ -22,7 +23,6 @@ import type { IDatabaseDataViewAction } from '../IDatabaseDataViewAction.js';
 import { IDatabaseDataResultAction } from '../IDatabaseDataResultAction.js';
 import { IDatabaseDataEditAction } from '../IDatabaseDataEditAction.js';
 import type { IDatabaseValueHolder } from '../IDatabaseValueHolder.js';
-import type { IRestoreViewState } from './IRestoreViewState.js';
 
 const PINNED_COLUMNS_KEY = 'pinnedColumns';
 const COLUMN_ORDER_KEY = 'columnOrder';
@@ -56,9 +56,58 @@ export class GridViewAction<
     return this.columnKeys.map(this.mapColumn, this);
   }
 
-  private columnsOrder: number[];
-  private viewStateRestored: boolean;
-  readonly pinnedColumns: ObservableSet<string>;
+  get columnsOrder(): number[] {
+    const columns = this.data.columns;
+    const names = this.source.persistedState.get<string[]>(COLUMN_ORDER_KEY);
+
+    if (!names?.length) {
+      return columns.map((_, i) => i);
+    }
+
+    const nameToIndex = new Map<string, number>();
+    for (let i = 0; i < columns.length; i++) {
+      const name = this.getColumnName({ index: i });
+      if (name !== undefined) {
+        nameToIndex.set(name, i);
+      }
+    }
+
+    const order: number[] = [];
+    const used = new Set<number>();
+    for (const name of names) {
+      const idx = nameToIndex.get(name);
+      if (idx !== undefined && !used.has(idx)) {
+        order.push(idx);
+        used.add(idx);
+      }
+    }
+    for (let i = 0; i < columns.length; i++) {
+      if (!used.has(i)) {
+        order.push(i);
+      }
+    }
+    return order;
+  }
+
+  get pinnedColumns(): ReadonlySet<string> {
+    const names = this.source.persistedState.get<string[]>(PINNED_COLUMNS_KEY);
+    const result = new Set<string>();
+
+    if (!names?.length) {
+      return result;
+    }
+
+    const nameSet = new Set(names);
+    for (let i = 0; i < this.data.columns.length; i++) {
+      const key: IGridColumnKey = { index: i };
+      const name = this.getColumnName(key);
+      if (name !== undefined && nameSet.has(name)) {
+        result.add(GridDataKeysUtils.serialize(key));
+      }
+    }
+    return result;
+  }
+
   protected readonly data: GridDataResultAction<TColumn, TRow, TKey, TCell, TResult>;
   protected readonly editor?: GridEditAction<TColumn, TRow, TKey, TCell, TResult>;
 
@@ -71,25 +120,19 @@ export class GridViewAction<
     super(source, result);
     this.data = data as GridDataResultAction<TColumn, TRow, TKey, TCell, TResult>;
     this.editor = editor as GridEditAction<TColumn, TRow, TKey, TCell, TResult> | undefined;
-    this.columnsOrder = this.data.columns.map((key, index) => index);
-    this.pinnedColumns = observable.set<string>();
-    this.viewStateRestored = false;
 
-    makeObservable<this, 'columnsOrder' | 'pinnedColumns'>(this, {
-      columnsOrder: observable,
-      pinnedColumns: observable,
+    makeObservable(this, {
+      columnsOrder: computed,
+      pinnedColumns: computed,
       setColumnOrder: action,
       pinColumns: action,
       unpinColumns: action,
       unpinAllColumns: action,
-      restoreViewState: action,
       rows: computed,
       rowKeys: computed,
       columns: computed,
       columnKeys: computed,
     });
-
-    this.tryRestoreViewState();
   }
 
   has(cell: TKey): boolean {
@@ -113,15 +156,25 @@ export class GridViewAction<
   }
 
   setColumnOrder(key: IGridColumnKey, index: number): void {
-    const columnIndex = this.columnDataIndex(key);
-
-    if (columnIndex === -1) {
+    const columnName = this.getColumnName(key);
+    if (columnName === undefined) {
       return;
     }
 
-    this.columnsOrder.splice(this.columnsOrder.indexOf(columnIndex), 1);
-    this.columnsOrder.splice(index, 0, columnIndex);
-    this.persistViewState();
+    const currentNames = this.columnKeys.map(k => this.getColumnName(k)).filter(isDefined);
+
+    const fromIdx = currentNames.indexOf(columnName);
+    if (fromIdx === -1) {
+      return;
+    }
+
+    currentNames.splice(fromIdx, 1);
+    currentNames.splice(index, 0, columnName);
+
+    const defaultNames = this.data.columns.map((_, i) => this.getColumnName({ index: i })).filter(isDefined);
+    const isDefaultOrder = isArraysEqual(currentNames, defaultNames, undefined, true);
+
+    this.source.persistedState.set(COLUMN_ORDER_KEY, isDefaultOrder ? [] : currentNames);
   }
 
   columnIndex(key: IGridColumnKey): number {
@@ -190,29 +243,40 @@ export class GridViewAction<
   }
 
   pinColumns(keys: IGridColumnKey[]): void {
-    for (const key of keys) {
-      const serializedKey = GridDataKeysUtils.serialize(key);
-      this.pinnedColumns.add(serializedKey);
-    }
-    this.persistViewState();
+    this.mutatePinned(names => {
+      for (const key of keys) {
+        const name = this.getColumnName(key);
+        if (name !== undefined) {
+          names.add(name);
+        }
+      }
+    });
   }
 
   unpinColumns(keys: IGridColumnKey[]): void {
-    for (const key of keys) {
-      const serializedKey = GridDataKeysUtils.serialize(key);
-      this.pinnedColumns.delete(serializedKey);
-    }
-    this.persistViewState();
+    this.mutatePinned(names => {
+      for (const key of keys) {
+        const name = this.getColumnName(key);
+        if (name !== undefined) {
+          names.delete(name);
+        }
+      }
+    });
   }
 
   unpinAllColumns(): void {
-    this.pinnedColumns.clear();
-    this.persistViewState();
+    this.source.persistedState.set(PINNED_COLUMNS_KEY, []);
+  }
+
+  private mutatePinned(mutate: (names: Set<string>) => void): void {
+    const ps = this.source.persistedState;
+    const names = new Set(ps.get<string[]>(PINNED_COLUMNS_KEY) ?? []);
+    mutate(names);
+    ps.set(PINNED_COLUMNS_KEY, [...names]);
   }
 
   isColumnPinned(key: IGridColumnKey): boolean {
-    const serializedKey = GridDataKeysUtils.serialize(key);
-    return this.pinnedColumns.has(serializedKey);
+    return this.pinnedColumns.has(GridDataKeysUtils.serialize(key));
   }
 
   hasPinnedColumns(): boolean {
@@ -249,104 +313,38 @@ export class GridViewAction<
 
   override updateResult(result: TResult, index: number): void {
     super.updateResult(result, index);
-    if (this.columnsOrder.length !== this.data.columns.length) {
-      this.columnsOrder = this.data.columns.map((key, index) => index);
-    }
-  }
 
-  override afterResultUpdate(): void {
-    this.tryRestoreViewState();
-  }
-
-  private tryRestoreViewState(): void {
-    if (this.viewStateRestored) {
+    if (this.data.columns.length === 0) {
       return;
     }
 
     const ps = this.source.persistedState;
+    const orderNames = ps.get<string[]>(COLUMN_ORDER_KEY);
+    const pinnedNames = ps.get<string[]>(PINNED_COLUMNS_KEY);
 
-    if (!ps.has(PINNED_COLUMNS_KEY) && !ps.has(COLUMN_ORDER_KEY)) {
+    if (!orderNames?.length && !pinnedNames?.length) {
       return;
     }
 
-    this.viewStateRestored = true;
-    const pinnedColumnNames = ps.get<string[]>(PINNED_COLUMNS_KEY) ?? [];
-    const columnOrderNames = ps.get<string[]>(COLUMN_ORDER_KEY);
-
-    this.restoreViewState({ pinnedColumnNames, columnOrderNames });
-  }
-
-  private persistViewState(): void {
-    const ps = this.source.persistedState;
-    const keys = this.columnKeys;
-    let isCustomOrder = false;
-    const columnNames: string[] = [];
-    const pinnedNames: string[] = [];
-
-    for (let i = 0; i < keys.length; i++) {
-      const key = keys[i]!;
-      const name = this.getColumnName(key);
-
-      if (name) {
-        columnNames.push(name);
-
-        if (this.isColumnPinned(key)) {
-          pinnedNames.push(name);
-        }
-      }
-
-      if (key.index !== i) {
-        isCustomOrder = true;
+    const validNames = new Set<string>();
+    for (let i = 0; i < this.data.columns.length; i++) {
+      const name = this.getColumnName({ index: i });
+      if (name !== undefined) {
+        validNames.add(name);
       }
     }
 
-    ps.set(PINNED_COLUMNS_KEY, pinnedNames);
-    ps.set(COLUMN_ORDER_KEY, isCustomOrder ? columnNames : []);
-  }
-
-  restoreViewState(state: IRestoreViewState): void {
-    const { pinnedColumnNames, columnOrderNames } = state;
-
-    if (columnOrderNames?.length) {
-      const nameToIndex = new Map<string, number>();
-
-      for (const key of this.columnKeys) {
-        const name = this.getColumnName(key);
-
-        if (name) {
-          nameToIndex.set(name, key.index);
-        }
+    const cleanStoredNames = (key: string, stored: string[] | undefined) => {
+      if (!stored?.length) {
+        return;
       }
-
-      const newOrder: number[] = [];
-      const usedIndices = new Set<number>();
-
-      for (const name of columnOrderNames) {
-        const index = nameToIndex.get(name);
-
-        if (index !== undefined) {
-          newOrder.push(index);
-          usedIndices.add(index);
-        }
+      const cleaned = stored.filter(n => validNames.has(n));
+      if (cleaned.length !== stored.length) {
+        ps.set(key, cleaned);
       }
+    };
 
-      for (const key of this.data.columns.map((_, i) => i)) {
-        if (!usedIndices.has(key)) {
-          newOrder.push(key);
-        }
-      }
-
-      if (newOrder.length === this.columnsOrder.length) {
-        this.columnsOrder = newOrder;
-      }
-    }
-
-    for (const name of pinnedColumnNames) {
-      const key = this.columnKeys.find(k => this.getColumnName(k) === name);
-
-      if (key) {
-        this.pinnedColumns.add(GridDataKeysUtils.serialize(key));
-      }
-    }
+    cleanStoredNames(COLUMN_ORDER_KEY, orderNames);
+    cleanStoredNames(PINNED_COLUMNS_KEY, pinnedNames);
   }
 }

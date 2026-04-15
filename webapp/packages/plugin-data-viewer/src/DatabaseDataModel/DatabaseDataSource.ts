@@ -85,7 +85,7 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
     this.count = 0;
     this.prevOptions = null;
     this._options = null;
-    this.persistedState = new DatabasePersistedStateStore(this);
+    this.persistedState = new DatabasePersistedStateStore();
     this.disabled = false;
     this.outdated = true;
     this.constraintsAvailable = true;
@@ -239,6 +239,14 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
     this._options = options;
     return this;
   }
+
+  loadPersistedState(state: Record<string, unknown>): this {
+    this.persistedState.setStore(state);
+    this.onPersistedStateLoaded();
+    return this;
+  }
+
+  protected onPersistedStateLoaded(): void {}
 
   setDataFormat(dataFormat: ResultDataFormat): this {
     this.dataFormat = dataFormat;

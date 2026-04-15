@@ -74,7 +74,7 @@ export function useDataViewerPanel(tab: ITab<IObjectViewerTabState>) {
             pageState.persistedState = {};
           }
 
-          model.source.persistedState.setStore(pageState.persistedState);
+          model.source.loadPersistedState(pageState.persistedState);
 
           const presentation = dataPresentationService.get(pageState.presentationId);
 
