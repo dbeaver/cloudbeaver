@@ -20,6 +20,7 @@ import { SqlEditorStatusBar } from './SqlEditorStatusBar.js';
 import { SqlEditorView } from './SqlEditorView.js';
 import { SqlResultTabs } from './SqlResultTabs/SqlResultTabs.js';
 import { useDataSource } from './useDataSource.js';
+import { SqlEditorConnectionBar } from './SqlEditorConnectionBar.js';
 
 export interface SqlEditorProps {
   state: ISqlEditorTabState;
@@ -39,6 +40,7 @@ export const SqlEditor = observer<SqlEditorProps>(function SqlEditor({ state }) 
   return (
     <Loader suspense>
       <CaptureView className={s(styles, { captureView: true })} view={sqlEditorView}>
+        <SqlEditorConnectionBar state={state} />
         <Split {...splitState} split="horizontal" sticky={30}>
           <Pane className={s(styles, { pane: true })} basis="50%" main>
             <SqlEditorLoader state={state} />
