@@ -32,7 +32,7 @@ export const SqlEditor = observer<SqlEditorProps>(function SqlEditor({ state }) 
   const sqlDataSourceService = useService(SqlDataSourceService);
   const dataSource = sqlDataSourceService.get(state.editorId);
 
-  useDataSource(state, dataSource);
+  useDataSource(dataSource);
   const splitState = useSplitUserState(`sql-editor-${dataSource?.sourceKey ?? 'default'}`);
 
   const opened = dataSource?.isOpened() || false;
@@ -40,7 +40,7 @@ export const SqlEditor = observer<SqlEditorProps>(function SqlEditor({ state }) 
   return (
     <Loader suspense>
       <CaptureView className={s(styles, { captureView: true })} view={sqlEditorView}>
-        <SqlEditorConnectionBar state={state} />
+        {opened && <SqlEditorConnectionBar state={state} />}
         <Split {...splitState} split="horizontal" sticky={30}>
           <Pane className={s(styles, { pane: true })} basis="50%" main>
             <SqlEditorLoader state={state} />

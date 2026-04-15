@@ -12,9 +12,8 @@ import { useService } from '@cloudbeaver/core-di';
 
 import type { ISqlDataSource } from './SqlDataSource/ISqlDataSource.js';
 import { SqlEditorService } from './SqlEditorService.js';
-import type { ISqlEditorTabState } from './ISqlEditorTabState.js';
 
-export function useDataSource(state: ISqlEditorTabState, dataSource?: ISqlDataSource) {
+export function useDataSource(dataSource?: ISqlDataSource) {
   const sqlEditorService = useService(SqlEditorService);
 
   // TODO: getComputed skips update somehow ...
