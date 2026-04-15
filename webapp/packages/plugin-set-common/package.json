@@ -102,6 +102,7 @@
     "@cloudbeaver/plugin-resource-manager-administration": "workspace:*",
     "@cloudbeaver/plugin-resource-manager-scripts": "workspace:*",
     "@cloudbeaver/plugin-root": "workspace:*",
+    "@cloudbeaver/plugin-script-export": "workspace:*",
     "@cloudbeaver/plugin-session-expiration": "workspace:*",
     "@cloudbeaver/plugin-settings-administration": "workspace:*",
     "@cloudbeaver/plugin-settings-default-administration": "workspace:*",
