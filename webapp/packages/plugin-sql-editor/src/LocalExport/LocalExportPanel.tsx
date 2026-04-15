@@ -11,8 +11,6 @@ import { InputField, Translate, useForm } from '@cloudbeaver/core-blocks';
 import { ExportScriptDialogContext, type IScriptExportTabProps } from '@cloudbeaver/plugin-script-export';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 import { downloadSql } from '../downloadSql.js';
-import { NotificationService } from '@cloudbeaver/core-events';
-import { useService } from '@cloudbeaver/core-di';
 import { withTimestamp } from '@cloudbeaver/core-utils';
 import { useState, useContext } from 'react';
 
@@ -21,17 +19,12 @@ export const LocalExportPanel: TabContainerPanelComponent<IScriptExportTabProps>
   fileName: initialFileName,
 }) {
   const dialogContext = useContext(ExportScriptDialogContext);
-  const notificationService = useService(NotificationService);
   const [fileName, setFileName] = useState(initialFileName);
 
   useForm({
     onSubmit() {
       const fileNameWithTimestamp = withTimestamp(fileName);
       downloadSql(fileNameWithTimestamp, script);
-      notificationService.logSuccess({
-        title: 'plugin_sql_editor_script_exported',
-        message: `${fileNameWithTimestamp}.sql`,
-      });
 
       dialogContext?.resolveDialog();
     },
