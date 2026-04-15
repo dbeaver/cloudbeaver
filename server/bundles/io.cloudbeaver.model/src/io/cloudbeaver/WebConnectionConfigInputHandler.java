@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
+import org.jkiss.dbeaver.registry.DataSourcePreferenceStore;
 import org.jkiss.utils.CommonUtils;
 
 public class WebConnectionConfigInputHandler<T extends WebConnectionConfig, C extends DataSourceDescriptor> {
@@ -93,6 +94,9 @@ public class WebConnectionConfigInputHandler<T extends WebConnectionConfig, C ex
             input.isSharedCredentials()
         );
         dataSource.setConnectionReadOnly(input.isReadOnly());
+        DataSourcePreferenceStore preferenceStore = dataSource.getPreferenceStore();
+        preferenceStore.clear();
+        preferenceStore.setProperties(input.getDefaultUserPreferences());
     }
 
     @NotNull
