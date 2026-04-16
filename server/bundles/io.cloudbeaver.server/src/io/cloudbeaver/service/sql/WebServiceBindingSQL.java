@@ -91,8 +91,7 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL>
                     getWebSession(env),
                     getArgumentVal(env, "generatorId"),
                     getArgumentVal(env, "nodePathList"),
-                    getArgumentVal(env, "useFullyQualifiedNames"),
-                    getArgumentVal(env, "compactSql")
+                    getGeneratorOptions(env)
                 )
             )
             .dataFetcher("sqlGenerateResultSetQuery", env ->
@@ -102,8 +101,7 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL>
                     getArgumentVal(env, "generatorId"),
                     getArgumentVal(env, "resultsId"),
                     getResultsRow(env, "selectedRows"),
-                    getArgumentVal(env, "useFullyQualifiedNames"),
-                    getArgumentVal(env, "compactSql")
+                    getGeneratorOptions(env)
                 )
             )
             .dataFetcher("sqlParseScript", env ->
@@ -417,6 +415,18 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL>
             return Collections.emptyList();
         }
         return mapList.stream().map(WebSQLResultsRow::new).collect(Collectors.toList());
+    }
+
+    @NotNull
+    private static WebSQLGeneratorOptions getGeneratorOptions(@NotNull DataFetchingEnvironment env) {
+        Map<String, Object> optionsMap = getArgument(env, "generatorOptions");
+        if (optionsMap == null) {
+            return new WebSQLGeneratorOptions(true, false);
+        }
+        return new WebSQLGeneratorOptions(
+            CommonUtils.toBoolean(optionsMap.get("useFullyQualifiedNames")),
+            CommonUtils.toBoolean(optionsMap.get("compactSql"))
+        );
     }
 
 }

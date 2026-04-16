@@ -254,6 +254,11 @@ type SQLQueryGenerator {
     multiObject: Boolean!
 }
 
+input SQLQueryGeneratorOptions {
+    useFullyQualifiedNames: Boolean!
+    compactSql: Boolean!
+}
+
 ####################################################
 # SQL Query info
 ####################################################
@@ -341,10 +346,9 @@ extend type Query {
     """
     sqlGenerateEntityQuery(
         generatorId: String!,
-        options: Object @deprecated(reason: "moved to query params (26.0.3)")
+        options: Object @deprecated(reason: "use generatorOptions (26.0.3)")
         nodePathList: [String!]!,
-        useFullyQualifiedNames: Boolean! = true,
-        compactSql: Boolean! = false,
+        generatorOptions: SQLQueryGeneratorOptions
     ): String!
 
     """
@@ -358,8 +362,7 @@ extend type Query {
         generatorId: SQLResultSetGeneratorId!,
         resultsId: ID!,
         selectedRows: [SQLResultRow!]!,
-        useFullyQualifiedNames: Boolean! = true,
-        compactSql: Boolean! = false
+        generatorOptions: SQLQueryGeneratorOptions
     ): String!
 
     "Parses SQL script and returns script info with queries start and end positions"

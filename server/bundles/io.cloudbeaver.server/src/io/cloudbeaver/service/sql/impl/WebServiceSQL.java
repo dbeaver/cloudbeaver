@@ -243,18 +243,22 @@ public class WebServiceSQL implements DBWServiceSQL {
         return SQLGeneratorConfigurationRegistry.getInstance().getApplicableGenerators(objectList, session).toArray(new SQLGeneratorDescriptor[0]);
     }
 
+    @NotNull
     @Override
     public String generateEntityQuery(
         @NotNull WebSession session,
         @NotNull String generatorId,
         @NotNull List<String> nodePathList,
-        boolean useFullyQualifiedNames,
-        boolean compactSql
+        @NotNull WebSQLGeneratorOptions options
     ) throws DBWebException {
         List<DBSObject> objectList = getObjectListFromNodeIds(session, nodePathList);
-        return createAndRunGenerator(session, generatorId, objectList, useFullyQualifiedNames, compactSql);
+        return createAndRunGenerator(
+            session, generatorId, objectList,
+            options.useFullyQualifiedNames(), options.compactSql()
+        );
     }
 
+    @NotNull
     @Override
     public String sqlGenerateResultSetQuery(
         @NotNull WebSession webSession,
@@ -262,14 +266,13 @@ public class WebServiceSQL implements DBWServiceSQL {
         @NotNull String generatorId,
         @NotNull String resultsId,
         @NotNull List<WebSQLResultsRow> selectedRows,
-        boolean useFullyQualifiedNames,
-        boolean compactSql
+        @NotNull WebSQLGeneratorOptions options
     ) throws DBWebException {
         checkAndFillTruncatedData(sqlContext, resultsId, selectedRows);
         WebDBDResultSetDataProvider dataProvider = new WebDBDResultSetDataProvider(resultsId, sqlContext, selectedRows);
         return createAndRunGenerator(
             webSession, generatorId, Collections.singletonList(dataProvider),
-            useFullyQualifiedNames, compactSql
+            options.useFullyQualifiedNames(), options.compactSql()
         );
     }
 
@@ -300,6 +303,7 @@ public class WebServiceSQL implements DBWServiceSQL {
             dataKind.equals(DBPDataKind.BINARY);
     }
 
+    @NotNull
     private String createAndRunGenerator(
         @NotNull WebSession session,
         @NotNull String generatorId,

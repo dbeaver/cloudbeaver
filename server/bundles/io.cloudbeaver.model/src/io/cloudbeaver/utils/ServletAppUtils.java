@@ -309,12 +309,6 @@ public class ServletAppUtils {
                 log.trace("X-Origin header: " + origin);
             }
         }
-        if (CommonUtils.isEmpty(origin)) {
-            origin = request.getHeader(HEADER_REFERER);
-            if (log.isTraceEnabled()) {
-                log.trace("Referer header: " + origin);
-            }
-        }
         String forwardedScheme = request.getHeader(HEADER_FORWARDED_SCHEME);
         if (CommonUtils.isEmpty(forwardedScheme)) {
             forwardedScheme = request.getHeader(HEADER_FORWARDED_PROTO);

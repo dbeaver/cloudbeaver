@@ -9,27 +9,28 @@ import { observer } from 'mobx-react-lite';
 import { type ReactNode } from 'react';
 
 import { IconOrImage } from '../IconOrImage.js';
-import { DisclosureProvider, Disclosure, DisclosureContent } from '@dbeaver/ui-kit';
+import { DisclosureProvider, Disclosure, DisclosureContent, clsx } from '@dbeaver/ui-kit';
 import './Expandable.css';
 
 interface Props {
-  label: string;
+  label: string | ReactNode;
   children: ReactNode;
   defaultExpanded?: boolean;
   disabled?: boolean;
+  className?: string;
 }
 
-export const Expandable = observer(function Expandable({ label, defaultExpanded, disabled, children }: Props) {
+export const Expandable = observer(function Expandable({ label, defaultExpanded, disabled, children, className }: Props) {
   return (
     <div>
       <DisclosureProvider defaultOpen={defaultExpanded}>
         <Disclosure disabled={disabled}>
           <IconOrImage className="disclosure-icon" icon="arrow" />
-          <h2 className="theme-typography--body2 disclosure-label">{label}</h2>
+          {typeof label === 'string' ? <h2 className="theme-typography--body2 disclosure-label">{label}</h2> : label}
         </Disclosure>
         <DisclosureContent>
           <div>
-            <div className="disclosure-content-inner"> {children}</div>
+            <div className={clsx('disclosure-content-inner', className)}> {children}</div>
           </div>
         </DisclosureContent>
       </DisclosureProvider>

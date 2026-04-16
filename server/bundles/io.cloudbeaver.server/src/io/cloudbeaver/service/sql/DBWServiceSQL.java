@@ -72,15 +72,16 @@ public interface DBWServiceSQL extends DBWService {
         @NotNull WebSession session,
         @NotNull List<String> nodePathList) throws DBWebException;
 
+    @NotNull
     @WebAction
     String generateEntityQuery(
         @NotNull WebSession session,
         @NotNull String generatorId,
         @NotNull List<String> nodePathList,
-        boolean useFullyQualifiedNames,
-        boolean compactSql
+        @NotNull WebSQLGeneratorOptions options
     ) throws DBWebException;
 
+    @NotNull
     @WebAction
     String sqlGenerateResultSetQuery(
         @NotNull WebSession session,
@@ -88,8 +89,7 @@ public interface DBWServiceSQL extends DBWService {
         @NotNull String generatorId,
         @NotNull String resultsId,
         @NotNull List<WebSQLResultsRow> selectedRows,
-        boolean useFullyQualifiedNames,
-        boolean compactSql
+        @NotNull WebSQLGeneratorOptions options
     ) throws DBWebException;
 
     @WebAction
