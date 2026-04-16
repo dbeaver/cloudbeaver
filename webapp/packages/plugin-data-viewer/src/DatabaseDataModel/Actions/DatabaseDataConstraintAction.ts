@@ -7,7 +7,6 @@
  */
 import { action, computed, makeObservable, runInAction, untracked } from 'mobx';
 
-import { schema } from '@cloudbeaver/core-utils';
 import { type DataTypeLogicalOperation, ResultDataFormat, type SqlDataFilterConstraint, type SqlResultColumn } from '@cloudbeaver/core-sdk';
 
 import { DatabaseDataAction } from '../DatabaseDataAction.js';
@@ -25,104 +24,49 @@ export const IS_NOT_NULL_ID = 'IS_NOT_NULL';
 const CONSTRAINTS_KEY = 'constraints';
 const WHERE_FILTER_KEY = 'whereFilter';
 
-export interface IPersistedConstraint {
-  attributeName: string;
-  attributePosition: number;
-  operator?: string;
-  value?: unknown;
-  orderAsc?: boolean;
-  orderPosition?: number;
-}
-
-const persistedConstraintSchema = schema.object({
-  attributeName: schema.string().min(1),
-  attributePosition: schema.number(),
-  operator: schema.string().optional(),
-  value: schema.unknown().optional(),
-  orderAsc: schema.boolean().optional(),
-  orderPosition: schema.number().optional(),
-});
-
-const dataFilterSliceSchema = schema.object({
-  [CONSTRAINTS_KEY]: schema.array(persistedConstraintSchema),
-  [WHERE_FILTER_KEY]: schema.string(),
-});
-
-function isDataFilterOptions(options: unknown): options is IDatabaseDataOptions {
-  return !!options && typeof options === 'object' && CONSTRAINTS_KEY in options && WHERE_FILTER_KEY in options;
-}
-
-export function persistDataFilterConstraints(source: IDatabaseDataSource<any, IDatabaseResultSet>): void {
+export function persistDataFilterConstraints<TOptions extends IDatabaseDataOptions>(
+  source: IDatabaseDataSource<TOptions, IDatabaseResultSet>,
+): void {
   const options = source.options;
-  if (!isDataFilterOptions(options)) {
+  if (!options) {
     return;
   }
 
-  const constraints: IPersistedConstraint[] = options.constraints
-    .map(c => {
-      if (!c.attributeName || c.attributePosition === undefined) {
-        return null;
-      }
-
-      const persisted: IPersistedConstraint = {
-        attributeName: c.attributeName,
-        attributePosition: c.attributePosition,
-      };
-
-      if (isFilterConstraint(c)) {
-        persisted.operator = c.operator;
-        persisted.value = c.value;
-      }
-      if (isOrderConstraint(c)) {
-        persisted.orderAsc = c.orderAsc;
-        persisted.orderPosition = c.orderPosition;
-      }
-      return persisted;
-    })
-    .filter((c): c is IPersistedConstraint => c !== null);
+  const constraints = options.constraints.filter(hasConstraintIdentity).map(constraint => ({ ...constraint }));
 
   const whereFilter = options.whereFilter || '';
 
   untracked(() => {
-    const ps = source.persistedState;
-    const storedWhereFilter = ps.get<string>(WHERE_FILTER_KEY);
-    const storedConstraints = ps.get<IPersistedConstraint[]>(CONSTRAINTS_KEY);
+    const storedWhereFilter = source.persistedState.get<string>(WHERE_FILTER_KEY);
+    const storedConstraints = source.persistedState.get<SqlDataFilterConstraint[]>(CONSTRAINTS_KEY);
 
     if (storedWhereFilter === whereFilter && JSON.stringify(storedConstraints) === JSON.stringify(constraints)) {
       return;
     }
 
-    ps.set(CONSTRAINTS_KEY, constraints);
-    ps.set(WHERE_FILTER_KEY, whereFilter);
+    source.persistedState.set(CONSTRAINTS_KEY, constraints);
+    source.persistedState.set(WHERE_FILTER_KEY, whereFilter);
   });
 }
 
-export function applyPersistedDataFilterConstraints(source: IDatabaseDataSource<any, IDatabaseResultSet>): void {
+export function applyPersistedDataFilterConstraints<TOptions extends IDatabaseDataOptions>(
+  source: IDatabaseDataSource<TOptions, IDatabaseResultSet>,
+): void {
   const options = source.options;
-  if (!isDataFilterOptions(options)) {
+  if (!options) {
     return;
   }
 
-  const snapshot = {
-    [CONSTRAINTS_KEY]: source.persistedState.get<unknown>(CONSTRAINTS_KEY),
-    [WHERE_FILTER_KEY]: source.persistedState.get<unknown>(WHERE_FILTER_KEY),
-  };
+  const constraints = source.persistedState.get<unknown>(CONSTRAINTS_KEY) as SqlDataFilterConstraint[];
+  const whereFilter = source.persistedState.get<unknown>(WHERE_FILTER_KEY) as string;
 
-  const parsed = dataFilterSliceSchema.safeParse(snapshot);
-  if (!parsed.success) {
+  if (!constraints || typeof whereFilter !== 'string') {
     return;
   }
 
   runInAction(() => {
-    options.constraints = parsed.data[CONSTRAINTS_KEY].map(c => ({
-      attributeName: c.attributeName,
-      attributePosition: c.attributePosition,
-      operator: c.operator,
-      value: c.value,
-      orderAsc: c.orderAsc,
-      orderPosition: c.orderPosition,
-    }));
-    options.whereFilter = parsed.data[WHERE_FILTER_KEY];
+    options.constraints = constraints.map(constraint => ({ ...constraint }));
+    options.whereFilter = whereFilter;
   });
 }
 
@@ -395,24 +339,22 @@ function updateConstraintsForResult(source: IDatabaseDataSource<IDatabaseDataOpt
 
   runInAction(() => {
     for (const constraint of source.options!.constraints) {
-      const initialPosition = constraint.attributePosition;
-      const initialName = constraint.attributeName;
-
-      if (initialPosition === undefined || initialName === undefined) {
+      if (!hasConstraintIdentity(constraint)) {
         source.options!.constraints = [];
         source.options!.whereFilter = '';
-        source.persistedState.delete(CONSTRAINTS_KEY);
-        source.persistedState.delete(WHERE_FILTER_KEY);
+        clearPersistedDataFilterState(source);
         return;
       }
+
+      const initialPosition = constraint.attributePosition;
+      const initialName = constraint.attributeName;
 
       const resolvedColumn = resolveConstraintColumn(columns, initialName, initialPosition);
 
       if (!resolvedColumn) {
         source.options!.constraints = [];
         source.options!.whereFilter = '';
-        source.persistedState.delete(CONSTRAINTS_KEY);
-        source.persistedState.delete(WHERE_FILTER_KEY);
+        clearPersistedDataFilterState(source);
         return;
       }
 
@@ -435,8 +377,22 @@ function resolveConstraintColumn(
   columns: SqlResultColumn[],
   attributeName: string,
   attributePosition: number,
-): SqlResultColumn | undefined {
-  return columns.find(column => column.position === attributePosition && column.name === attributeName);
+): (SqlResultColumn & { name: string; position: number }) | undefined {
+  return columns.find(
+    (column): column is SqlResultColumn & { name: string; position: number } =>
+      typeof column.name === 'string' && typeof column.position === 'number' && column.position === attributePosition && column.name === attributeName,
+  );
+}
+
+function clearPersistedDataFilterState(source: IDatabaseDataSource<any, IDatabaseResultSet>): void {
+  source.persistedState.delete(CONSTRAINTS_KEY);
+  source.persistedState.delete(WHERE_FILTER_KEY);
+}
+
+function hasConstraintIdentity(
+  constraint: SqlDataFilterConstraint,
+): constraint is SqlDataFilterConstraint & { attributeName: string; attributePosition: number } {
+  return typeof constraint.attributeName === 'string' && constraint.attributeName.length > 0 && typeof constraint.attributePosition === 'number';
 }
 
 export function nullOperationsFilter(operation: DataTypeLogicalOperation): boolean {

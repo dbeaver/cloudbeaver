@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ export class DVResultTraceDetailsBootstrap extends Bootstrap {
     super();
   }
 
-  override register() {
+  override register(): void {
     this.dataPresentationService.add({
       id: 'result-trace-details-presentation',
       type: DataPresentationType.toolsPanel,
@@ -32,7 +32,7 @@ export class DVResultTraceDetailsBootstrap extends Bootstrap {
         if (!isResultSetDataSource(source)) {
           return true;
         }
-        const result = (source as ResultSetDataSource<unknown>).getResult(resultIndex);
+        const result = (source as ResultSetDataSource).getResult(resultIndex);
         return !result?.data?.hasDynamicTrace;
       },
       getPresentationComponent: () => DVResultTraceDetailsPresentation,

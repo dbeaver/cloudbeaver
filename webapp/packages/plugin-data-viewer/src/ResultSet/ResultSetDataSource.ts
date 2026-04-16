@@ -43,7 +43,9 @@ export interface IRowIdentifierInfo {
   identifier: SqlRowIdentifier | null;
 }
 
-export abstract class ResultSetDataSource<TOptions = IDatabaseDataOptions> extends DatabaseDataSource<TOptions, IDatabaseResultSet> {
+export abstract class ResultSetDataSource<TOptions extends IDatabaseDataOptions = IDatabaseDataOptions>
+  extends DatabaseDataSource<TOptions, IDatabaseResultSet>
+{
   executionContext: IConnectionExecutionContext | null;
   totalCountRequestTask: ITask<number> | null;
   private keepExecutionContextOnDispose: boolean;
@@ -238,6 +240,8 @@ export abstract class ResultSetDataSource<TOptions = IDatabaseDataOptions> exten
   }
 }
 
-export function isResultSetDataSource<T = IDatabaseDataOptions>(dataSource: any): dataSource is ResultSetDataSource<T> {
+export function isResultSetDataSource<T extends IDatabaseDataOptions = IDatabaseDataOptions>(
+  dataSource: unknown,
+): dataSource is ResultSetDataSource<T> {
   return dataSource instanceof ResultSetDataSource;
 }
