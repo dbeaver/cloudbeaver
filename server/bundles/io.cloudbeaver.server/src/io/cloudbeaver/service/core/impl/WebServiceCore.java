@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2025 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,12 +58,14 @@ import org.jkiss.dbeaver.model.rm.RMProjectType;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.secret.DBSSecretController;
 import org.jkiss.dbeaver.model.secret.DBSSecretValue;
+import org.jkiss.dbeaver.model.security.SMObjectType;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
 import org.jkiss.dbeaver.registry.DataSourceNavigatorSettings;
 import org.jkiss.dbeaver.registry.DataSourceNavigatorSettingsUtils;
 import org.jkiss.dbeaver.registry.DataSourceProviderRegistry;
 import org.jkiss.dbeaver.registry.network.NetworkHandlerDescriptor;
 import org.jkiss.dbeaver.registry.network.NetworkHandlerRegistry;
+import org.jkiss.dbeaver.registry.project.BaseProjectSettings;
 import org.jkiss.dbeaver.registry.settings.ProductSettingDescriptor;
 import org.jkiss.dbeaver.registry.settings.ProductSettingsRegistry;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
@@ -793,6 +795,25 @@ public class WebServiceCore implements DBWServiceCore {
             throw new DBWebException("Error deleting custom navigator settings", e);
         }
         return connectionInfo;
+    }
+
+    @Override
+    @NotNull
+    public Map<String, String> setObjectSettingsForDatasource(
+        @NotNull WebSession webSession,
+        @NotNull String projectId,
+        @NotNull String objectId,
+        @NotNull Map<String, String> settings
+    ) throws DBException {
+
+        WebSessionProjectImpl projectById = webSession.getProjectById(projectId);
+        if (projectById == null) {
+            throw new DBWebException("Project '" + projectId + "' not found");
+        }
+        BaseProjectSettings projectSettings = projectById.getProjectSettings();
+        projectSettings.setObjectSettings(SMObjectType.datasource, objectId, settings);
+        Map<String, String> objectSettings = projectSettings.getObjectSettings(SMObjectType.datasource, objectId);
+        return objectSettings == null ? new HashMap<>() : objectSettings;
     }
 
     @Override

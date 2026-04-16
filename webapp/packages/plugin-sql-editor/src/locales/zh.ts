@@ -55,4 +55,6 @@ export default [
   ['plugin_sql_editor_settings_highlight_white_space', '高亮显示空白字符'],
   ['plugin_sql_editor_settings_highlight_white_space_description', '高亮显示SQL编辑器中的空格、制表符和其他空白字符'],
   ['plugin_sql_editor_bind_parameters_dialog_alert_title', '字符串值必须用引号括起来'],
+  ['plugin_sql_editor_export_local_tab', '到操作系统（本地）'],
+  ['plugin_sql_editor_script_exported', '脚本导出成功'],
 ];
