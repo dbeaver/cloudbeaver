@@ -11,12 +11,15 @@ import type { IDatabasePersistedStateStore } from './IDatabasePersistedStateStor
 
 export class DatabasePersistedStateStore implements IDatabasePersistedStateStore {
   private store: Record<string, unknown>;
+  private version: number;
 
   constructor() {
     this.store = {};
+    this.version = 0;
 
-    makeObservable<this, 'store'>(this, {
+    makeObservable<this, 'store' | 'version'>(this, {
       store: observable.ref,
+      version: observable,
       setStore: action,
       set: action,
       delete: action,
@@ -25,21 +28,38 @@ export class DatabasePersistedStateStore implements IDatabasePersistedStateStore
 
   setStore(store: Record<string, unknown>): void {
     this.store = store;
+    this.version++;
   }
 
   has(key: string): boolean {
+    this.observeVersion();
     return key in this.store;
   }
 
   get<T>(key: string): T | undefined {
+    this.observeVersion();
     return this.store[key] as T | undefined;
   }
 
   set(key: string, value: unknown): void {
+    if (this.store[key] === value) {
+      return;
+    }
+
     this.store[key] = value;
+    this.version++;
   }
 
   delete(key: string): void {
+    if (!(key in this.store)) {
+      return;
+    }
+
     delete this.store[key];
+    this.version++;
+  }
+
+  private observeVersion(): number {
+    return this.version;
   }
 }

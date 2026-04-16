@@ -8,7 +8,7 @@
 import { action, computed, makeObservable, runInAction, untracked } from 'mobx';
 
 import { schema } from '@cloudbeaver/core-utils';
-import { type DataTypeLogicalOperation, ResultDataFormat, type SqlDataFilterConstraint } from '@cloudbeaver/core-sdk';
+import { type DataTypeLogicalOperation, ResultDataFormat, type SqlDataFilterConstraint, type SqlResultColumn } from '@cloudbeaver/core-sdk';
 
 import { DatabaseDataAction } from '../DatabaseDataAction.js';
 import type { IDatabaseDataOptions } from '../IDatabaseDataOptions.js';
@@ -27,6 +27,7 @@ const WHERE_FILTER_KEY = 'whereFilter';
 
 export interface IPersistedConstraint {
   attributeName: string;
+  attributePosition: number;
   operator?: string;
   value?: unknown;
   orderAsc?: boolean;
@@ -35,6 +36,7 @@ export interface IPersistedConstraint {
 
 const persistedConstraintSchema = schema.object({
   attributeName: schema.string().min(1),
+  attributePosition: schema.number(),
   operator: schema.string().optional(),
   value: schema.unknown().optional(),
   orderAsc: schema.boolean().optional(),
@@ -56,21 +58,17 @@ export function persistDataFilterConstraints(source: IDatabaseDataSource<any, ID
     return;
   }
 
-  const columns = source.getResult(0)?.data?.columns;
-  const resolveName = (position: number | undefined): string | undefined => {
-    if (position === undefined) {
-      return undefined;
-    }
-    return columns?.find(c => c.position === position)?.name;
-  };
-
   const constraints: IPersistedConstraint[] = options.constraints
     .map(c => {
-      const name = c.attributeName ?? resolveName(c.attributePosition);
-      if (!name) {
+      if (!c.attributeName || c.attributePosition === undefined) {
         return null;
       }
-      const persisted: IPersistedConstraint = { attributeName: name };
+
+      const persisted: IPersistedConstraint = {
+        attributeName: c.attributeName,
+        attributePosition: c.attributePosition,
+      };
+
       if (isFilterConstraint(c)) {
         persisted.operator = c.operator;
         persisted.value = c.value;
@@ -118,6 +116,7 @@ export function applyPersistedDataFilterConstraints(source: IDatabaseDataSource<
   runInAction(() => {
     options.constraints = parsed.data[CONSTRAINTS_KEY].map(c => ({
       attributeName: c.attributeName,
+      attributePosition: c.attributePosition,
       operator: c.operator,
       value: c.value,
       orderAsc: c.orderAsc,
@@ -278,7 +277,7 @@ export class DatabaseDataConstraintAction
     this.resetWhereFilter();
   }
 
-  setWhereFilter(value: string) {
+  setWhereFilter(value: string): void {
     if (!this.source.options) {
       throw new Error('Options must be provided');
     }
@@ -286,11 +285,11 @@ export class DatabaseDataConstraintAction
     this.source.options.whereFilter = value;
   }
 
-  resetWhereFilter() {
+  resetWhereFilter(): void {
     this.setWhereFilter('');
   }
 
-  setFilter(attributePosition: number, operator: string, value?: any): void {
+  setFilter(attributePosition: number, operator: string, value?: unknown): void {
     if (!this.source.options) {
       throw new Error('Options must be provided');
     }
@@ -388,41 +387,56 @@ function updateConstraintsForResult(source: IDatabaseDataSource<IDatabaseDataOpt
     return;
   }
 
+  const columns = result.data?.columns ?? [];
+
+  if (columns.length === 0) {
+    return;
+  }
+
   runInAction(() => {
     for (const constraint of source.options!.constraints) {
-      let prevColumn = result.data?.columns?.find(c => c.position === constraint.attributePosition);
+      const initialPosition = constraint.attributePosition;
+      const initialName = constraint.attributeName;
 
-      if (!prevColumn && constraint.attributeName) {
-        prevColumn = result.data?.columns?.find(c => c.name === constraint.attributeName);
-
-        if (prevColumn) {
-          constraint.attributePosition = prevColumn.position;
-        }
+      if (initialPosition === undefined || initialName === undefined) {
+        source.options!.constraints = [];
+        source.options!.whereFilter = '';
+        source.persistedState.delete(CONSTRAINTS_KEY);
+        source.persistedState.delete(WHERE_FILTER_KEY);
+        return;
       }
 
-      if (!prevColumn) {
-        continue;
+      const resolvedColumn = resolveConstraintColumn(columns, initialName, initialPosition);
+
+      if (!resolvedColumn) {
+        source.options!.constraints = [];
+        source.options!.whereFilter = '';
+        source.persistedState.delete(CONSTRAINTS_KEY);
+        source.persistedState.delete(WHERE_FILTER_KEY);
+        return;
       }
 
-      let column = result.data?.columns?.find(c => c.position === prevColumn.position);
+      constraint.attributeName = resolvedColumn.name;
+      constraint.attributePosition = resolvedColumn.position;
 
-      if (!column || column.label !== prevColumn.label) {
-        column = result.data?.columns?.find(c => c.label === prevColumn.label);
-      }
+      const prevConstraint = source.prevOptions?.constraints.find(
+        prevConstraint => prevConstraint.attributePosition === initialPosition && prevConstraint.attributeName === initialName,
+      );
 
-      if (column && prevColumn.position !== column.position) {
-        const prevConstraint = source.prevOptions?.constraints.find(
-          prevConstraint => prevConstraint.attributePosition === constraint.attributePosition,
-        );
-
-        constraint.attributePosition = column.position;
-
-        if (prevConstraint) {
-          prevConstraint.attributePosition = constraint.attributePosition;
-        }
+      if (prevConstraint) {
+        prevConstraint.attributeName = constraint.attributeName;
+        prevConstraint.attributePosition = constraint.attributePosition;
       }
     }
   });
+}
+
+function resolveConstraintColumn(
+  columns: SqlResultColumn[],
+  attributeName: string,
+  attributePosition: number,
+): SqlResultColumn | undefined {
+  return columns.find(column => column.position === attributePosition && column.name === attributeName);
 }
 
 export function nullOperationsFilter(operation: DataTypeLogicalOperation): boolean {
@@ -440,12 +454,12 @@ export function getNextOrder(order: Order): Order {
   }
 }
 
-export function wrapOperationArgument(operationId: string, argument: any): string {
+export function wrapOperationArgument(operationId: string, argument: unknown): string {
   if (operationId === 'LIKE') {
     return `%${argument}%`;
   }
 
-  return argument;
+  return String(argument);
 }
 
 export function isFilterConstraint(constraint: SqlDataFilterConstraint): boolean {

@@ -27,6 +27,18 @@ import type { IDatabaseValueHolder } from '../IDatabaseValueHolder.js';
 const PINNED_COLUMNS_KEY = 'pinnedColumns';
 const COLUMN_ORDER_KEY = 'columnOrder';
 
+interface IGridStoredColumnReference {
+  name: string;
+  position: number;
+}
+
+interface IResolvedLayoutState {
+  valid: boolean;
+  hasState: boolean;
+  columnOrder: number[];
+  pinnedColumns: ReadonlySet<string>;
+}
+
 @injectable(() => [IDatabaseDataSource, IDatabaseDataResult, IDatabaseDataResultAction, IDatabaseDataEditAction])
 export class GridViewAction<
   TColumn = unknown,
@@ -57,55 +69,11 @@ export class GridViewAction<
   }
 
   get columnsOrder(): number[] {
-    const columns = this.data.columns;
-    const names = this.source.persistedState.get<string[]>(COLUMN_ORDER_KEY);
-
-    if (!names?.length) {
-      return columns.map((_, i) => i);
-    }
-
-    const nameToIndex = new Map<string, number>();
-    for (let i = 0; i < columns.length; i++) {
-      const name = this.getColumnName({ index: i });
-      if (name !== undefined) {
-        nameToIndex.set(name, i);
-      }
-    }
-
-    const order: number[] = [];
-    const used = new Set<number>();
-    for (const name of names) {
-      const idx = nameToIndex.get(name);
-      if (idx !== undefined && !used.has(idx)) {
-        order.push(idx);
-        used.add(idx);
-      }
-    }
-    for (let i = 0; i < columns.length; i++) {
-      if (!used.has(i)) {
-        order.push(i);
-      }
-    }
-    return order;
+    return this.getResolvedLayoutState().columnOrder;
   }
 
   get pinnedColumns(): ReadonlySet<string> {
-    const names = this.source.persistedState.get<string[]>(PINNED_COLUMNS_KEY);
-    const result = new Set<string>();
-
-    if (!names?.length) {
-      return result;
-    }
-
-    const nameSet = new Set(names);
-    for (let i = 0; i < this.data.columns.length; i++) {
-      const key: IGridColumnKey = { index: i };
-      const name = this.getColumnName(key);
-      if (name !== undefined && nameSet.has(name)) {
-        result.add(GridDataKeysUtils.serialize(key));
-      }
-    }
-    return result;
+    return this.getResolvedLayoutState().pinnedColumns;
   }
 
   protected readonly data: GridDataResultAction<TColumn, TRow, TKey, TCell, TResult>;
@@ -156,25 +124,25 @@ export class GridViewAction<
   }
 
   setColumnOrder(key: IGridColumnKey, index: number): void {
-    const columnName = this.getColumnName(key);
-    if (columnName === undefined) {
+    const columnRef = this.getStoredColumnReference(key);
+    if (columnRef === undefined) {
       return;
     }
 
-    const currentNames = this.columnKeys.map(k => this.getColumnName(k)).filter(isDefined);
+    const currentOrder = this.getCurrentColumnReferences();
 
-    const fromIdx = currentNames.indexOf(columnName);
+    const fromIdx = currentOrder.findIndex(ref => this.isSameStoredColumnReference(ref, columnRef));
     if (fromIdx === -1) {
       return;
     }
 
-    currentNames.splice(fromIdx, 1);
-    currentNames.splice(index, 0, columnName);
+    currentOrder.splice(fromIdx, 1);
+    currentOrder.splice(index, 0, columnRef);
 
-    const defaultNames = this.data.columns.map((_, i) => this.getColumnName({ index: i })).filter(isDefined);
-    const isDefaultOrder = isArraysEqual(currentNames, defaultNames, undefined, true);
+    const defaultOrder = this.getDefaultColumnReferences();
+    const isDefaultOrder = isArraysEqual(currentOrder, defaultOrder, (left, right) => this.isSameStoredColumnReference(left, right), true);
 
-    this.source.persistedState.set(COLUMN_ORDER_KEY, isDefaultOrder ? [] : currentNames);
+    this.source.persistedState.set(COLUMN_ORDER_KEY, isDefaultOrder ? [] : currentOrder);
   }
 
   columnIndex(key: IGridColumnKey): number {
@@ -243,22 +211,26 @@ export class GridViewAction<
   }
 
   pinColumns(keys: IGridColumnKey[]): void {
-    this.mutatePinned(names => {
+    this.mutatePinned(columns => {
       for (const key of keys) {
-        const name = this.getColumnName(key);
-        if (name !== undefined) {
-          names.add(name);
+        const column = this.getStoredColumnReference(key);
+        if (column !== undefined && !columns.some(ref => this.isSameStoredColumnReference(ref, column))) {
+          columns.push(column);
         }
       }
     });
   }
 
   unpinColumns(keys: IGridColumnKey[]): void {
-    this.mutatePinned(names => {
+    this.mutatePinned(columns => {
       for (const key of keys) {
-        const name = this.getColumnName(key);
-        if (name !== undefined) {
-          names.delete(name);
+        const column = this.getStoredColumnReference(key);
+        if (column !== undefined) {
+          const index = columns.findIndex(ref => this.isSameStoredColumnReference(ref, column));
+
+          if (index !== -1) {
+            columns.splice(index, 1);
+          }
         }
       }
     });
@@ -268,11 +240,76 @@ export class GridViewAction<
     this.source.persistedState.set(PINNED_COLUMNS_KEY, []);
   }
 
-  private mutatePinned(mutate: (names: Set<string>) => void): void {
-    const ps = this.source.persistedState;
-    const names = new Set(ps.get<string[]>(PINNED_COLUMNS_KEY) ?? []);
-    mutate(names);
-    ps.set(PINNED_COLUMNS_KEY, [...names]);
+  protected getStoredColumnReference(key: IGridColumnKey): IGridStoredColumnReference | undefined {
+    const name = this.getColumnName(key);
+    const column = this.getColumn(key);
+
+    if (!name || typeof column !== 'object' || column === null || !('position' in column) || typeof column.position !== 'number') {
+      return undefined;
+    }
+
+    return {
+      name,
+      position: column.position,
+    };
+  }
+
+  protected isStoredColumnReference(reference: unknown): reference is IGridStoredColumnReference {
+    return (
+      typeof reference === 'object' &&
+      reference !== null &&
+      'name' in reference &&
+      'position' in reference &&
+      typeof reference.name === 'string' &&
+      reference.name.length > 0 &&
+      typeof reference.position === 'number'
+    );
+  }
+
+  protected isSameStoredColumnReference(left: unknown, right: unknown): boolean {
+    if (!this.isStoredColumnReference(left) || !this.isStoredColumnReference(right)) {
+      return false;
+    }
+
+    return left.name === right.name && left.position === right.position;
+  }
+
+  protected resolveStoredColumnReference(reference: unknown, used: Set<number>): number | undefined {
+    if (!this.isStoredColumnReference(reference)) {
+      return undefined;
+    }
+
+    let match: number | undefined;
+
+    for (let i = 0; i < this.data.columns.length; i++) {
+      if (used.has(i)) {
+        continue;
+      }
+
+      const current = this.getStoredColumnReference({ index: i });
+
+      if (!current) {
+        continue;
+      }
+
+      if (!this.isSameStoredColumnReference(current, reference)) {
+        continue;
+      }
+
+      if (match !== undefined) {
+        return undefined;
+      }
+
+      match = i;
+    }
+
+    return match;
+  }
+
+  private mutatePinned(mutate: (columns: unknown[]) => void): void {
+    const columns = this.getCurrentPinnedReferences();
+    mutate(columns);
+    this.source.persistedState.set(PINNED_COLUMNS_KEY, columns);
   }
 
   isColumnPinned(key: IGridColumnKey): boolean {
@@ -314,37 +351,114 @@ export class GridViewAction<
   override updateResult(result: TResult, index: number): void {
     super.updateResult(result, index);
 
-    if (this.data.columns.length === 0) {
+    const layout = this.getResolvedLayoutState();
+
+    if (!layout.hasState || layout.valid) {
       return;
     }
 
-    const ps = this.source.persistedState;
-    const orderNames = ps.get<string[]>(COLUMN_ORDER_KEY);
-    const pinnedNames = ps.get<string[]>(PINNED_COLUMNS_KEY);
+    this.source.persistedState.set(COLUMN_ORDER_KEY, []);
+    this.source.persistedState.set(PINNED_COLUMNS_KEY, []);
+  }
 
-    if (!orderNames?.length && !pinnedNames?.length) {
-      return;
+  private getResolvedLayoutState(): IResolvedLayoutState {
+    const defaultOrder = this.data.columns.map((_, i) => i);
+    const emptyPins = new Set<string>();
+    const orderRefs = this.readStoredColumnReferences(COLUMN_ORDER_KEY);
+    const pinnedRefs = this.readStoredColumnReferences(PINNED_COLUMNS_KEY);
+
+    if (orderRefs === null || pinnedRefs === null) {
+      return {
+        valid: false,
+        hasState: true,
+        columnOrder: defaultOrder,
+        pinnedColumns: emptyPins,
+      };
     }
 
-    const validNames = new Set<string>();
-    for (let i = 0; i < this.data.columns.length; i++) {
-      const name = this.getColumnName({ index: i });
-      if (name !== undefined) {
-        validNames.add(name);
-      }
+    if (!orderRefs?.length && !pinnedRefs?.length) {
+      return {
+        valid: true,
+        hasState: false,
+        columnOrder: defaultOrder,
+        pinnedColumns: emptyPins,
+      };
     }
 
-    const cleanStoredNames = (key: string, stored: string[] | undefined) => {
-      if (!stored?.length) {
-        return;
-      }
-      const cleaned = stored.filter(n => validNames.has(n));
-      if (cleaned.length !== stored.length) {
-        ps.set(key, cleaned);
-      }
+    const order = this.resolveStoredColumnReferences(orderRefs ?? []);
+    const pinned = this.resolveStoredColumnReferences(pinnedRefs ?? []);
+
+    if (order === null || pinned === null) {
+      return {
+        valid: false,
+        hasState: true,
+        columnOrder: defaultOrder,
+        pinnedColumns: emptyPins,
+      };
+    }
+
+    return {
+      valid: true,
+      hasState: true,
+      columnOrder: orderRefs?.length ? order : defaultOrder,
+      pinnedColumns: this.serializePinnedColumns(pinned),
     };
+  }
 
-    cleanStoredNames(COLUMN_ORDER_KEY, orderNames);
-    cleanStoredNames(PINNED_COLUMNS_KEY, pinnedNames);
+  private readStoredColumnReferences(key: string): unknown[] | undefined | null {
+    const stored = this.source.persistedState.get<unknown>(key);
+
+    if (stored === undefined) {
+      return undefined;
+    }
+
+    if (!Array.isArray(stored)) {
+      return null;
+    }
+
+    return stored;
+  }
+
+  private resolveStoredColumnReferences(references: unknown[]): number[] | null {
+    const resolved: number[] = [];
+    const used = new Set<number>();
+
+    for (const reference of references) {
+      const columnIndex = this.resolveStoredColumnReference(reference, used);
+
+      if (columnIndex === undefined) {
+        return null;
+      }
+
+      resolved.push(columnIndex);
+      used.add(columnIndex);
+    }
+
+    return resolved;
+  }
+
+  private getCurrentColumnReferences(): unknown[] {
+    return this.columnKeys.map(key => this.getStoredColumnReference(key)).filter(isDefined);
+  }
+
+  private getDefaultColumnReferences(): unknown[] {
+    return this.data.columns.map((_, i) => this.getStoredColumnReference({ index: i })).filter(isDefined);
+  }
+
+  private getCurrentPinnedReferences(): unknown[] {
+    return this.columnKeys
+      .filter(key => this.isColumnPinned(key))
+      .map(key => this.getStoredColumnReference(key))
+      .filter(isDefined);
+  }
+
+  private serializePinnedColumns(columns: number[]): ReadonlySet<string> {
+    const pinned = new Set<string>();
+
+    for (const index of columns) {
+      pinned.add(GridDataKeysUtils.serialize({ index }));
+    }
+
+    return pinned;
   }
 }
