@@ -26,6 +26,8 @@ import {
   type IGridRowKey,
   type IGridColumnKey,
   type IGridDataKey,
+  isBooleanValuePresentationAvailable,
+  isResultSetDataSource,
 } from '@cloudbeaver/plugin-data-viewer';
 
 import { type IColumnInfo, type ITableData } from './TableDataContext.js';
@@ -139,6 +141,30 @@ export function useTableData(
         }
 
         return model.isReadonly(resultIndex) || (this.format.isReadOnly(key) && this.editor?.getElementState(key) !== DatabaseEditChangeType.add);
+      },
+      isCellEditable(key: IGridDataKey) {
+        const editionState = this.getEditionState(key);
+
+        const source = dataContent.source;
+        const hasElementIdentifier = isResultSetDataSource(source) ? source.hasElementIdentifier(this.view.resultIndex) : false;
+        if (!hasElementIdentifier && editionState !== DatabaseEditChangeType.add) {
+          return false;
+        }
+
+        const holder = this.getCellHolder(key);
+        if (this.format.isBinary(holder) || this.format.isGeometry(holder) || this.dataContent.isTextTruncated(holder)) {
+          return false;
+        }
+
+        const resultColumn = this.getColumnInfo(key.column);
+
+        if (!resultColumn || holder.value === undefined) {
+          return false;
+        }
+
+        const handleByBooleanFormatter = isBooleanValuePresentationAvailable(holder.value, resultColumn);
+
+        return !(handleByBooleanFormatter || this.isCellReadonly(key));
       },
     }),
     {

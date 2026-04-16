@@ -23,6 +23,7 @@ import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBConstants;
 import org.jkiss.dbeaver.model.connection.*;
+import org.jkiss.dbeaver.model.impl.PropertyDescriptor;
 import org.jkiss.dbeaver.model.impl.auth.AuthModelDatabaseNative;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
@@ -186,9 +187,27 @@ public class WebDatabaseDriverInfo {
             cfg.setDatabaseName(driver.getDefaultDatabase());
             cfg.setUrl(driver.getConnectionURL(cfg));
             DBPPropertyDescriptor[] properties = driver.getDataSourceProvider().getConnectionProperties(webSession.getProgressMonitor(), driver, cfg);
+            Map<String, Object> connectionProperties = driver.getConnectionProperties();
+            for (Map.Entry<String, Object> connProp : connectionProperties.entrySet()) {
+                String propName = connProp.getKey();
+                Object propValue = connProp.getValue();
+                DBPPropertyDescriptor dbpPropertyDescriptor = new PropertyDescriptor(
+                    null,
+                    propName,
+                    propName,
+                    null,
+                    false,
+                    String.class,
+                    propValue,
+                    null
+                );
+                properties = ArrayUtils.add(DBPPropertyDescriptor.class, properties, dbpPropertyDescriptor);
+                cfg.setProperty(propName, (String) propValue);
+            }
             if (properties == null) {
                 return new WebPropertyInfo[0];
             }
+
 
             PropertySourceCustom propertySource = new PropertySourceCustom(
                 properties,

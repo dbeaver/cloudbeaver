@@ -25,6 +25,8 @@ import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.websocket.WSUtils;
 import org.jkiss.dbeaver.model.websocket.event.WSClientEvent;
+import org.jkiss.dbeaver.model.websocket.registry.WSClientEventDescriptor;
+import org.jkiss.dbeaver.model.websocket.registry.WSEventRegistry;
 import org.jkiss.utils.CommonUtils;
 
 public class CBClientEventProcessor {
@@ -47,6 +49,17 @@ public class CBClientEventProcessor {
         } catch (Exception e) {
             log.error("Error parsing event: " + e.getMessage(), e);
             webSession.addSessionError(new DBWebException("Invalid event: " + e.getMessage()));
+            return;
+        }
+
+        // Handle with custom handlers
+         WSClientEventDescriptor ced = WSEventRegistry.getInstance().getClientEvent(clientEvent.getId());
+        if (ced != null && ced.getHandler() != null) {
+            try {
+                ced.getHandler().handleEvent(webSession, clientEvent);
+            } catch (Exception e) {
+                log.error("Error handling event '" + clientEvent.getId() + "'", e);
+            }
             return;
         }
 

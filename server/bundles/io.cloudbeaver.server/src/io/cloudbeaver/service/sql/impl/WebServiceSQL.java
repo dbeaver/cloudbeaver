@@ -243,23 +243,37 @@ public class WebServiceSQL implements DBWServiceSQL {
         return SQLGeneratorConfigurationRegistry.getInstance().getApplicableGenerators(objectList, session).toArray(new SQLGeneratorDescriptor[0]);
     }
 
+    @NotNull
     @Override
-    public String generateEntityQuery(@NotNull WebSession session, @NotNull String generatorId, @NotNull Map<String, Object> options, @NotNull List<String> nodePathList) throws DBWebException {
+    public String generateEntityQuery(
+        @NotNull WebSession session,
+        @NotNull String generatorId,
+        @NotNull List<String> nodePathList,
+        @NotNull WebSQLGeneratorOptions options
+    ) throws DBWebException {
         List<DBSObject> objectList = getObjectListFromNodeIds(session, nodePathList);
-        return createAndRunGenerator(session, generatorId, objectList);
+        return createAndRunGenerator(
+            session, generatorId, objectList,
+            options.useFullyQualifiedNames(), options.compactSql()
+        );
     }
 
+    @NotNull
     @Override
     public String sqlGenerateResultSetQuery(
         @NotNull WebSession webSession,
         @NotNull WebSQLContextInfo sqlContext,
         @NotNull String generatorId,
         @NotNull String resultsId,
-        @NotNull List<WebSQLResultsRow> selectedRows
+        @NotNull List<WebSQLResultsRow> selectedRows,
+        @NotNull WebSQLGeneratorOptions options
     ) throws DBWebException {
         checkAndFillTruncatedData(sqlContext, resultsId, selectedRows);
         WebDBDResultSetDataProvider dataProvider = new WebDBDResultSetDataProvider(resultsId, sqlContext, selectedRows);
-        return createAndRunGenerator(webSession, generatorId, Collections.singletonList(dataProvider));
+        return createAndRunGenerator(
+            webSession, generatorId, Collections.singletonList(dataProvider),
+            options.useFullyQualifiedNames(), options.compactSql()
+        );
     }
 
     private void checkAndFillTruncatedData(
@@ -289,10 +303,13 @@ public class WebServiceSQL implements DBWServiceSQL {
             dataKind.equals(DBPDataKind.BINARY);
     }
 
+    @NotNull
     private String createAndRunGenerator(
         @NotNull WebSession session,
         @NotNull String generatorId,
-        @NotNull List<DBSObject> objectList
+        @NotNull List<DBSObject> objectList,
+        boolean useFullyQualifiedNames,
+        boolean compactSql
     ) throws DBWebException {
         SQLGeneratorDescriptor generator = SQLGeneratorConfigurationRegistry.getInstance().getGenerator(generatorId);
         if (generator == null) {
@@ -300,6 +317,8 @@ public class WebServiceSQL implements DBWServiceSQL {
         }
         try {
             SQLGenerator<DBSObject> generatorInstance = generator.createGenerator(objectList);
+            generatorInstance.setFullyQualifiedNames(useFullyQualifiedNames);
+            generatorInstance.setCompactSQL(compactSql);
             generatorInstance.run(session.getProgressMonitor());
             return generatorInstance.getResult();
         } catch (DBException e) {
