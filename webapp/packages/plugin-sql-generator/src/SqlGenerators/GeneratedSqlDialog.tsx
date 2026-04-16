@@ -29,13 +29,13 @@ import { SQLCodeEditor, useSqlDialectExtension } from '@cloudbeaver/plugin-sql-e
 import { SqlGeneratorsResource } from './SqlGeneratorsResource.js';
 import { observable } from 'mobx';
 import { NotificationService } from '@cloudbeaver/core-events';
+import type { SqlQueryGeneratorOptions } from '@cloudbeaver/core-sdk';
 
 interface Payload {
   nodeId: string;
   query: string;
   generatorId: string;
-  defaultUseFullyQualifiedNames?: boolean;
-  defaultCompactSql?: boolean;
+  options?: SqlQueryGeneratorOptions;
 }
 
 export const GeneratedSqlDialog = observer<DialogComponentProps<Payload>>(function GeneratedSqlDialog({ rejectDialog, payload }) {
@@ -44,8 +44,8 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<Payload>>(functi
 
   const state = useObservableRef(
     () => ({
-      useFullyQualifiedNames: payload.defaultUseFullyQualifiedNames ?? true,
-      compactSql: payload.defaultCompactSql ?? false,
+      useFullyQualifiedNames: payload.options?.useFullyQualifiedNames ?? true,
+      compactSql: payload.options?.compactSql ?? false,
       query: payload.query,
       loading: false,
     }),
@@ -75,12 +75,10 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<Payload>>(functi
   async function regenerateQuery() {
     state.loading = true;
     try {
-      const newQuery = await sqlGeneratorsResource.generateEntityQuery(
-        payload.generatorId,
-        payload.nodeId,
-        state.useFullyQualifiedNames,
-        state.compactSql,
-      );
+      const newQuery = await sqlGeneratorsResource.generateEntityQuery(payload.generatorId, payload.nodeId, {
+        compactSql: state.compactSql,
+        useFullyQualifiedNames: state.useFullyQualifiedNames,
+      });
       state.query = newQuery;
     } catch (error: any) {
       notificationService.logException(error, 'app_shared_sql_generators_error_title');

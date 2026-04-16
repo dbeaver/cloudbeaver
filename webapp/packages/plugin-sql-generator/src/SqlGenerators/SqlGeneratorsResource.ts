@@ -8,9 +8,18 @@
 import { injectable } from '@cloudbeaver/core-di';
 import { NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
 import { CachedMapResource, isResourceAlias, type ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-resource';
-import { GraphQLService, type SqlGenerateResultSetQueryQueryVariables, type SqlQueryGenerator } from '@cloudbeaver/core-sdk';
+import {
+  GraphQLService,
+  type SqlGenerateResultSetQueryQueryVariables,
+  type SqlQueryGenerator,
+  type SqlQueryGeneratorOptions,
+} from '@cloudbeaver/core-sdk';
 
 export const MAX_GENERATORS_LENGTH = 15;
+export const DEFAULT_QUERY_GENERATOR_OPTIONS: SqlQueryGeneratorOptions = {
+  useFullyQualifiedNames: true,
+  compactSql: false,
+};
 
 @injectable(() => [GraphQLService, NavNodeInfoResource])
 export class SqlGeneratorsResource extends CachedMapResource<string, SqlQueryGenerator[]> {
@@ -24,18 +33,11 @@ export class SqlGeneratorsResource extends CachedMapResource<string, SqlQueryGen
     this.navNodeInfoResource.deleteInResource(this);
   }
 
-  async generateEntityQuery(
-    generatorId: string,
-    nodePathList: string | string[],
-    useFullyQualifiedNames?: boolean,
-    compactSql?: boolean,
-  ): Promise<string> {
+  async generateEntityQuery(generatorId: string, nodePathList: string | string[], options?: SqlQueryGeneratorOptions): Promise<string> {
     const result = await this.graphQLService.sdk.sqlGenerateEntityQuery({
       generatorId,
       nodePathList,
-      options: {},
-      useFullyQualifiedNames,
-      compactSql,
+      generatorOptions: options,
     });
 
     return result.sqlGenerateEntityQuery;

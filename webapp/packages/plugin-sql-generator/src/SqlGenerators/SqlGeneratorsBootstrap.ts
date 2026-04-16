@@ -13,13 +13,10 @@ import { getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
 import { MenuBaseItem, MenuService } from '@cloudbeaver/core-view';
 
 import { MENU_SQL_GENERATORS } from './MENU_SQL_GENERATORS.js';
-import { SqlGeneratorsResource } from './SqlGeneratorsResource.js';
+import { DEFAULT_QUERY_GENERATOR_OPTIONS, SqlGeneratorsResource } from './SqlGeneratorsResource.js';
 import { NotificationService } from '@cloudbeaver/core-events';
 
 const GeneratedSqlDialog = importLazyComponent(() => import('./GeneratedSqlDialog.js').then(m => m.GeneratedSqlDialog));
-
-const DEFAULT_USE_FULLY_QUALIFIED_NAMES = true;
-const DEFAULT_COMPACT_SQL = false;
 
 @injectable(() => [SqlGeneratorsResource, CommonDialogService, MenuService, NotificationService])
 export class SqlGeneratorsBootstrap extends Bootstrap {
@@ -84,18 +81,12 @@ export class SqlGeneratorsBootstrap extends Bootstrap {
                 {
                   onSelect: async () => {
                     try {
-                      const query = await this.sqlGeneratorsResource.generateEntityQuery(
-                        action.id,
-                        node.id,
-                        DEFAULT_USE_FULLY_QUALIFIED_NAMES,
-                        DEFAULT_COMPACT_SQL,
-                      );
+                      const query = await this.sqlGeneratorsResource.generateEntityQuery(action.id, node.id, DEFAULT_QUERY_GENERATOR_OPTIONS);
                       await this.commonDialogService.open(GeneratedSqlDialog, {
                         query,
                         nodeId: node.id,
                         generatorId: action.id,
-                        defaultCompactSql: DEFAULT_COMPACT_SQL,
-                        defaultUseFullyQualifiedNames: DEFAULT_USE_FULLY_QUALIFIED_NAMES,
+                        options: DEFAULT_QUERY_GENERATOR_OPTIONS,
                       });
                     } catch (e: any) {
                       this.notificationService.logException(e, 'app_shared_sql_generators_error_title');

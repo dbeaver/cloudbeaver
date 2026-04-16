@@ -1,15 +1,3 @@
-query sqlGenerateEntityQuery(
-  $generatorId: String!
-  $options: Object!
-  $nodePathList: [String!]!
-  $useFullyQualifiedNames: Boolean
-  $compactSql: Boolean
-) {
-  sqlGenerateEntityQuery(
-    generatorId: $generatorId
-    options: $options
-    nodePathList: $nodePathList
-    useFullyQualifiedNames: $useFullyQualifiedNames
-    compactSql: $compactSql
-  )
+query sqlGenerateEntityQuery($generatorId: String!, $nodePathList: [String!]!, $generatorOptions: SQLQueryGeneratorOptions) {
+  sqlGenerateEntityQuery(generatorId: $generatorId, nodePathList: $nodePathList, generatorOptions: $generatorOptions)
 }

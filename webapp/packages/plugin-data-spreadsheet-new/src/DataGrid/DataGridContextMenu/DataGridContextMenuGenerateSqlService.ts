@@ -37,11 +37,8 @@ import { ACTION_DATA_GRID_GENERATE_SQL_SELECT_MANY } from '../Actions/GenerateSQ
 import { ACTION_DATA_GRID_GENERATE_SQL_UPDATE } from '../Actions/GenerateSQL/ACTION_DATA_GRID_GENERATE_SQL_UPDATE.js';
 import { MENU_DATA_GRID_GENERATE_SQL } from './GenerateSQL/MENU_DATA_GRID_GENERATE_SQL.js';
 import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
-import { GeneratedSqlDialog, SqlGeneratorsResource } from '@cloudbeaver/plugin-sql-generator';
+import { DEFAULT_QUERY_GENERATOR_OPTIONS, GeneratedSqlDialog, SqlGeneratorsResource } from '@cloudbeaver/plugin-sql-generator';
 import { isNotNullDefined } from '@dbeaver/js-helpers';
-
-const DEFAULT_USE_FULLY_QUALIFIED_NAMES = true;
-const DEFAULT_COMPACT_SQL = false;
 
 @injectable(() => [ActionService, MenuService, CommonDialogService, NotificationService, SqlGeneratorsResource])
 export class DataGridContextMenuGenerateSqlService {
@@ -147,8 +144,7 @@ export class DataGridContextMenuGenerateSqlService {
         resultsId: resultId,
         generatorId,
         selectedRows: rows,
-        useFullyQualifiedNames: DEFAULT_USE_FULLY_QUALIFIED_NAMES,
-        compactSql: DEFAULT_COMPACT_SQL,
+        generatorOptions: DEFAULT_QUERY_GENERATOR_OPTIONS,
       });
 
       if (!query) {
@@ -163,8 +159,7 @@ export class DataGridContextMenuGenerateSqlService {
         query,
         nodeId: connectionId,
         generatorId: generatorId,
-        defaultUseFullyQualifiedNames: DEFAULT_USE_FULLY_QUALIFIED_NAMES,
-        defaultCompactSql: DEFAULT_COMPACT_SQL,
+        options: DEFAULT_QUERY_GENERATOR_OPTIONS,
       });
     } catch (e: any) {
       this.notificationService.logException(e, 'data_grid_table_generate_sql_error_title');
