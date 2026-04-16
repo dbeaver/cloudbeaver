@@ -19,12 +19,15 @@ package io.cloudbeaver.service.sql;
 import io.cloudbeaver.model.WebPropertyInfo;
 import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.exec.plan.DBCPlanCostNode;
 import org.jkiss.dbeaver.model.exec.plan.DBCPlanNode;
 import org.jkiss.dbeaver.runtime.properties.ObjectPropertyDescriptor;
 import org.jkiss.dbeaver.runtime.properties.PropertyCollector;
 
 import java.util.Arrays;
+import java.util.function.Function;
 
 /**
  * WebSQLExecutionPlanNode.
@@ -73,6 +76,26 @@ public class WebSQLExecutionPlanNode {
         return node.getNodeDescription();
     }
 
+    @Nullable
+    public Double getCost() {
+        return getMetric(DBCPlanCostNode::getNodeCost);
+    }
+
+    @Nullable
+    public Double getRowCount() {
+        return getMetric(DBCPlanCostNode::getNodeRowCount);
+    }
+
+    @Nullable
+    public Double getDuration() {
+        return getMetric(DBCPlanCostNode::getNodeDuration);
+    }
+
+    @Nullable
+    public Double getPercent() {
+        return getMetric(DBCPlanCostNode::getNodePercent);
+    }
+
     @NotNull
     public WebPropertyInfo[] getProperties() {
         PropertyCollector propertyCollector = new PropertyCollector(node, false);
@@ -80,6 +103,16 @@ public class WebSQLExecutionPlanNode {
         return Arrays.stream(propertyCollector.getProperties())
             .filter(p -> !(p instanceof ObjectPropertyDescriptor && ((ObjectPropertyDescriptor) p).isHidden()))
             .map(p -> new WebPropertyInfo(webSession, p, propertyCollector)).toArray(WebPropertyInfo[]::new);
+    }
+
+    @Nullable
+    private Double getMetric(Function<DBCPlanCostNode, Number> extractor) {
+        if (!(node instanceof DBCPlanCostNode)) {
+            return null;
+        }
+
+        Number value = extractor.apply((DBCPlanCostNode) node);
+        return value == null ? null : value.doubleValue();
     }
 
 }
