@@ -65,7 +65,6 @@ export interface IElementsTreeSettings {
   filter: boolean;
   filterAll: boolean;
   saveExpanded: boolean;
-  foldersTree: boolean;
   saveFilter: boolean;
   showFolderExplorerPath: boolean;
   configurable: boolean;
@@ -247,19 +246,6 @@ export function useElementsTree(options: IOptions): IElementsTree {
       if (expanded && elementsTree.isNodeExpandable(nodeId) && elementsTree.getNodeChildren(nodeId).length === 0 && !elementsTree.filtering) {
         elementsTree.collapse(nodeId);
         return;
-      }
-
-      if (
-        elementsTree.settings?.foldersTree &&
-        options.folderExplorer.options.expandFoldersWithSingleElement &&
-        nodeId === options.root &&
-        elementsTree.getNodeChildren(nodeId).length === 1
-      ) {
-        const nextNode = elementsTree.getNodeChildren(nodeId)[0]!;
-
-        if (elementsTree.isNodeExpandable(nextNode) || elementsTree.isNodeExpanded(nextNode)) {
-          options.folderExplorer.open(navNodeInfoResource.getParents(nextNode), nextNode);
-        }
       }
 
       await this.loadNodes(...(navTreeResource.get(nodeId) || []));
@@ -592,19 +578,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
         await options.onClick?.(node);
       },
       async open(node: NavNode, path: string[], leaf: boolean) {
-        const expandableOrExpanded = this.isNodeExpandable(node.id) || this.isNodeExpanded(node.id);
-        if (!leaf && this.settings?.foldersTree && expandableOrExpanded) {
-          const nodeId = node.id;
-
-          const loaded = await handleLoadChildren(node.id, false);
-          if (loaded) {
-            this.setFilter('');
-            options.folderExplorer.open(path, nodeId);
-          }
-        }
-
-        const folder = (!leaf && this.settings?.foldersTree) || false;
-        await options.onOpen?.(node, folder);
+        await options.onOpen?.(node, false);
       },
       async expand(node: NavNode, state: boolean) {
         if (!this.isNodeExpandable(node.id)) {
