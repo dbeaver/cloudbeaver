@@ -242,6 +242,8 @@ public class GraphQLEndpoint extends HttpServlet {
 
 
         WebAppSessionManager sessionManager = WebAppUtils.getWebApplication().getSessionManager();
+        String userId = GraphQLLoggerUtil.getUserId(request);
+        LocalDateTime startTime = LocalDateTime.now();
 
         Map<String, Object> mapOfContext = new HashMap<>();
         mapOfContext.put("request", request);
@@ -254,6 +256,17 @@ public class GraphQLEndpoint extends HttpServlet {
                 mapOfContext.put(WebSession.class.getName(), webSession);
             } catch (DBException e) {
                 log.error("Error obtaining web session by token", e);
+                DBWebException webException = new DBWebException(
+                    "Error obtaining web session by token: " + e.getMessage(),
+                    DBWebException.ERROR_CODE_AUTH_REQUIRED,
+                    e
+                );
+                ExecutionResult executionResult = ExecutionResult.newExecutionResult()
+                    .addError(webException)
+                    .build();
+                notifyApiCallInterceptor(request, variables, operationName, userId, startTime, webException.getMessage());
+                writeExecutionResult(request, response, executionResult);
+                return;
             }
         }
 
@@ -266,8 +279,6 @@ public class GraphQLEndpoint extends HttpServlet {
         if (operationName != null) {
             contextBuilder.operationName(operationName);
         }
-        String userId = GraphQLLoggerUtil.getUserId(request);
-        LocalDateTime startTime = LocalDateTime.now();
         ExecutionInput executionInput = contextBuilder.build();
         ExecutionResult executionResult = null;
         Exception executionException = null;
@@ -283,23 +294,44 @@ public class GraphQLEndpoint extends HttpServlet {
             } else if (executionException != null) {
                 errorMessage = executionException.getMessage();
             }
-            if (WebAppUtils.getWebApplication() instanceof ApiCallInterceptor apiCallInterceptor) {
-                apiCallInterceptor.onApiCallEvent(
-                    request,
-                    variables,
-                    CommonUtils.notEmpty(operationName), userId, startTime,
-                    errorMessage,
-                    API_PROTOCOL
-                );
-            }
+            notifyApiCallInterceptor(request, variables, operationName, userId, startTime, errorMessage);
         }
 
         if (executionResult != null) {
-            Map<String, Object> resJSON = executionResult.toSpecification();
-            String resString = gson.toJson(resJSON);
-            setDevelHeaders(request, response);
-            response.setContentType(GraphQLConstants.CONTENT_TYPE_JSON_UTF8);
-            response.getWriter().print(resString);
+            writeExecutionResult(request, response, executionResult);
+        }
+    }
+
+    private void writeExecutionResult(
+        @NotNull HttpServletRequest request,
+        @NotNull HttpServletResponse response,
+        @NotNull ExecutionResult executionResult
+    ) throws IOException {
+        Map<String, Object> resJSON = executionResult.toSpecification();
+        String resString = gson.toJson(resJSON);
+        setDevelHeaders(request, response);
+        response.setContentType(GraphQLConstants.CONTENT_TYPE_JSON_UTF8);
+        response.getWriter().print(resString);
+    }
+
+    private void notifyApiCallInterceptor(
+        @NotNull HttpServletRequest request,
+        @Nullable Map<String, Object> variables,
+        @Nullable String operationName,
+        @Nullable String userId,
+        @NotNull LocalDateTime startTime,
+        @Nullable String errorMessage
+    ) {
+        if (WebAppUtils.getWebApplication() instanceof ApiCallInterceptor apiCallInterceptor) {
+            apiCallInterceptor.onApiCallEvent(
+                request,
+                variables,
+                CommonUtils.notEmpty(operationName),
+                userId,
+                startTime,
+                errorMessage,
+                API_PROTOCOL
+            );
         }
     }
 
