@@ -27,6 +27,7 @@ export default [
   ['data_grid_table_readonly_connection_tooltip', 'Schreibgeschützte Verbindung'],
   ['data_grid_table_no_key_found_tooltip', 'Kein eindeutiger Schlüssel gefunden. Datenänderung nicht möglich.'],
   ['data_grid_table_virtual_key_tooltip', 'Virtueller Schlüssel'],
+  ['data_grid_table_key_column_tooltip', 'Schlüsselspalte'],
   ['plugin_data_spreadsheet_new_settings_disable', 'Tabellenpräsentation deaktivieren'],
   ['plugin_data_spreadsheet_new_settings_disable_description', 'Deaktivieren Sie die Tabellenpräsentation von Daten für alle Benutzer'],
   ['plugin_data_spreadsheet_new_settings_description_label', 'Show columns description'],

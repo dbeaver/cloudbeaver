@@ -51,7 +51,7 @@ export const SideBarPanel = observer<SideBarPanelProps>(function SideBarPanel({ 
         onChange={tab => selectTab(tab.tabId)}
         onReorder={onReorder}
       >
-        <div className={s(style, { box: true })} data-panel-id={panelId} data-dialog-persistent-element>
+        <div tabIndex={-1} className={s(style, { box: true })} data-panel-id={panelId} data-dialog-persistent-element>
           <TabList className={s(style, { tabList: true })} underline />
           <div className={s(style, { contentBox: true })}>
             <TabPanelList />

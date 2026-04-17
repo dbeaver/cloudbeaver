@@ -5,10 +5,15 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-.switchControl {
-  composes: theme-switch_primary from global;
-}
+@layer components {
+  .switchBody {
+    .switchControl {
+      width: 36px;
+      height: 20px;
+    }
 
-.fieldLabel {
-  font-weight: 500;
+    .fieldLabel {
+      font-weight: 500;
+    }
+  }
 }

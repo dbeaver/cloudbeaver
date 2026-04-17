@@ -9,7 +9,7 @@
   composes: theme-background-positive from global;
   position: absolute;
   opacity: 0;
-  transition: opacity 0.3s ease;
+  transition: opacity var(--duration-slow) var(--ease-soft);
   bottom: 0;
   right: 0;
   box-sizing: border-box;

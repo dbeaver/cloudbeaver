@@ -33,6 +33,7 @@ export default [
   ['data_grid_table_readonly_connection_tooltip', 'Kết nối chỉ đọc'],
   ['data_grid_table_no_key_found_tooltip', 'Không tìm thấy khóa duy nhất. Không thể sửa đổi dữ liệu.'],
   ['data_grid_table_virtual_key_tooltip', 'Khóa ảo'],
+  ['data_grid_table_key_column_tooltip', 'Cột khóa'],
   ['plugin_data_spreadsheet_new_settings_disable', 'Tắt chế độ hiển thị dạng bảng'],
   ['plugin_data_spreadsheet_new_settings_disable_description', 'Tắt chế độ hiển thị dữ liệu dạng bảng cho tất cả người dùng'],
   ['plugin_data_spreadsheet_new_settings_description_label', 'Hiển thị mô tả cột'],

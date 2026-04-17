@@ -33,6 +33,7 @@ export default [
   ['data_grid_table_readonly_connection_tooltip', 'Подключение только для чтения'],
   ['data_grid_table_no_key_found_tooltip', 'Не найден уникальный ключ. Изменение данных невозможно.'],
   ['data_grid_table_virtual_key_tooltip', 'Виртуальный ключ'],
+  ['data_grid_table_key_column_tooltip', 'Ключевая колонка'],
   ['plugin_data_spreadsheet_new_settings_disable', 'Отключить табличное представление'],
   ['plugin_data_spreadsheet_new_settings_disable_description', 'Отключить табличное представление данных для всех пользователей'],
   ['plugin_data_spreadsheet_new_settings_description_label', 'Показать описание колонки'],

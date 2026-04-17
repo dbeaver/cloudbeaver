@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2025 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
+import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.rm.RMConstants;
 import org.jkiss.dbeaver.registry.DataSourceNavigatorSettings;
 import org.jkiss.dbeaver.registry.settings.ProductSettingDescriptor;
@@ -217,6 +218,14 @@ public interface DBWServiceCore extends DBWService {
         @NotNull String projectId,
         @NotNull String id
     ) throws DBWebException;
+
+    @NotNull
+    Map<String, String> setObjectSettingsForDatasource(
+        @NotNull WebSession webSession,
+        @NotNull String projectId,
+        @NotNull String objectId,
+        @NotNull Map<String, String> settings
+    ) throws DBException;
 
     ///////////////////////////////////////////
     // Async tasks

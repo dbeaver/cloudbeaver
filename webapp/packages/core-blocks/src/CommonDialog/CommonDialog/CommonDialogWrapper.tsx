@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -61,7 +61,7 @@ export const CommonDialogWrapper = observer<CommonDialogWrapperProps, HTMLDivEle
         aria-label={ariaLabel}
         open={context.visible}
         data-size={size}
-        className={s(computedStyles, { dialog: true, fixedSize, fixedWidth, freeHeight }, className)}
+        className={s(computedStyles, { dialog: true, fixedSize, fixedWidth, freeHeight }, 'tw:shadow-xlarge', className)}
         autoFocusOnShow={autoFocusOnShow}
         autoFocusOnHide={autoFocusOnHide}
         initialFocus={initialFocus as HTMLElement | React.RefObject<HTMLElement> | null | undefined}

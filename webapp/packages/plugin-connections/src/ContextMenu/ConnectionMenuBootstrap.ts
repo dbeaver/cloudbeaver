@@ -17,7 +17,7 @@ import {
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { DATA_CONTEXT_NAV_NODE, EObjectFeature } from '@cloudbeaver/core-navigation-tree';
+import { DATA_CONTEXT_NAV_NODE, EObjectFeature, NavTreeSettingsService } from '@cloudbeaver/core-navigation-tree';
 import { getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { getUniqueName } from '@cloudbeaver/core-utils';
@@ -31,6 +31,7 @@ import { ACTION_CONNECTION_DISCONNECT } from './Actions/ACTION_CONNECTION_DISCON
 import { ACTION_CONNECTION_DISCONNECT_ALL } from './Actions/ACTION_CONNECTION_DISCONNECT_ALL.js';
 import { ACTION_CONNECTION_EDIT } from './Actions/ACTION_CONNECTION_EDIT.js';
 import { MENU_CONNECTIONS } from './MENU_CONNECTIONS.js';
+import { MENU_NAVIGATION_TREE_MANAGE } from '@cloudbeaver/plugin-navigation-tree';
 
 @injectable(() => [
   NotificationService,
@@ -43,6 +44,7 @@ import { MENU_CONNECTIONS } from './MENU_CONNECTIONS.js';
   ConnectionsSettingsService,
   ServerConfigResource,
   LocalizationService,
+  NavTreeSettingsService,
 ])
 export class ConnectionMenuBootstrap extends Bootstrap {
   constructor(
@@ -64,28 +66,93 @@ export class ConnectionMenuBootstrap extends Bootstrap {
     this.addConnectionsMenuToTopAppBar();
 
     this.menuService.addCreator({
+      menus: [MENU_NAVIGATION_TREE_MANAGE],
+      getItems: (context, items) => [...items, ACTION_CONNECTION_EDIT, ACTION_CONNECTION_CLONE],
+    });
+
+    this.menuService.addCreator({
       root: true,
       contexts: [DATA_CONTEXT_CONNECTION],
-      getItems: (context, items) => [
-        ...items,
-        ACTION_CONNECTION_CHANGE_CREDENTIALS,
-        ACTION_CONNECTION_EDIT,
-        ACTION_CONNECTION_CLONE,
-        ACTION_CONNECTION_DISCONNECT,
-        ACTION_CONNECTION_DISCONNECT_ALL,
-      ],
+      getItems: (context, items) => [...items, ACTION_CONNECTION_CHANGE_CREDENTIALS, ACTION_CONNECTION_DISCONNECT, ACTION_CONNECTION_DISCONNECT_ALL],
+    });
+
+    this.actionService.addHandler({
+      id: 'connection-menu-management',
+      menus: [MENU_NAVIGATION_TREE_MANAGE],
+      actions: [ACTION_CONNECTION_EDIT, ACTION_CONNECTION_CLONE, ACTION_DELETE],
+      isActionApplicable: context => {
+        const node = context.get(DATA_CONTEXT_NAV_NODE)!;
+
+        return node.objectFeatures.includes(EObjectFeature.dataSource);
+      },
+      contexts: [DATA_CONTEXT_CONNECTION],
+      isHidden: (context, action) => {
+        const connectionKey = context.get(DATA_CONTEXT_CONNECTION)!;
+        const connection = this.connectionInfoResource.get(connectionKey);
+
+        if (!connection) {
+          return true;
+        }
+
+        if (action === ACTION_DELETE) {
+          return !connection.canDelete;
+        }
+
+        if (action === ACTION_CONNECTION_EDIT) {
+          return !(connection.canEdit || connection.canViewSettings);
+        }
+
+        if (action === ACTION_CONNECTION_CLONE) {
+          return !connection.canEdit;
+        }
+
+        return true;
+      },
+      handler: async (context, action) => {
+        const connectionKey = context.get(DATA_CONTEXT_CONNECTION)!;
+        const connection = await this.connectionInfoResource.load(connectionKey);
+
+        switch (action) {
+          case ACTION_DELETE: {
+            try {
+              await this.connectionsManagerService.deleteConnection(createConnectionParam(connection));
+            } catch (exception: any) {
+              this.notificationService.logException(exception, 'Failed to delete connection');
+            }
+            break;
+          }
+          case ACTION_CONNECTION_EDIT: {
+            this.publicConnectionFormService.open(connection.projectId, { connectionId: connection.id });
+            break;
+          }
+          case ACTION_CONNECTION_CLONE: {
+            try {
+              // Load all connections for the project first to ensure we have them all to generate a unique name for the cloned connection
+              const projectConnections = await this.connectionInfoResource.load(ConnectionInfoProjectKey(connection.projectId));
+              const connectionNames = projectConnections.map(connection => connection.name);
+              const uniqueName = getUniqueName(
+                connection.name.concat(` ${this.localizationService.translate('ui_copy').toLowerCase()}`),
+                connectionNames,
+              );
+
+              if (!connection.nodePath) {
+                this.notificationService.logException(new Error('Connection node path is undefined'), 'plugin_connections_connection_clone_error');
+                return;
+              }
+
+              await this.connectionInfoResource.createFromNode(connection.projectId, connection.nodePath, uniqueName);
+            } catch (exception: any) {
+              this.notificationService.logException(exception, 'plugin_connections_connection_clone_error');
+            }
+            break;
+          }
+        }
+      },
     });
 
     this.actionService.addHandler({
       id: 'connection-management',
-      actions: [
-        ACTION_DELETE,
-        ACTION_CONNECTION_CHANGE_CREDENTIALS,
-        ACTION_CONNECTION_EDIT,
-        ACTION_CONNECTION_CLONE,
-        ACTION_CONNECTION_DISCONNECT,
-        ACTION_CONNECTION_DISCONNECT_ALL,
-      ],
+      actions: [ACTION_CONNECTION_CHANGE_CREDENTIALS, ACTION_CONNECTION_DISCONNECT, ACTION_CONNECTION_DISCONNECT_ALL],
       contexts: [DATA_CONTEXT_CONNECTION, DATA_CONTEXT_NAV_NODE],
       isActionApplicable: context => {
         const node = context.get(DATA_CONTEXT_NAV_NODE)!;
@@ -106,18 +173,6 @@ export class ConnectionMenuBootstrap extends Bootstrap {
 
         if (action === ACTION_CONNECTION_DISCONNECT_ALL) {
           return !this.connectionsManagerService.hasAnyConnection(true);
-        }
-
-        if (action === ACTION_DELETE) {
-          return !connection.canDelete;
-        }
-
-        if (action === ACTION_CONNECTION_EDIT) {
-          return !(connection.canEdit || connection.canViewSettings);
-        }
-
-        if (action === ACTION_CONNECTION_CLONE) {
-          return !connection.canEdit;
         }
 
         if (action === ACTION_CONNECTION_CHANGE_CREDENTIALS) {
@@ -148,41 +203,9 @@ export class ConnectionMenuBootstrap extends Bootstrap {
             await this.connectionsManagerService.closeAllConnections();
             break;
           }
-          case ACTION_DELETE: {
-            try {
-              await this.connectionsManagerService.deleteConnection(createConnectionParam(connection));
-            } catch (exception: any) {
-              this.notificationService.logException(exception, 'Failed to delete connection');
-            }
-            break;
-          }
-          case ACTION_CONNECTION_EDIT: {
-            this.publicConnectionFormService.open(connection.projectId, { connectionId: connection.id });
-            break;
-          }
+
           case ACTION_CONNECTION_CHANGE_CREDENTIALS: {
             await this.connectionsManagerService.requireConnection({ connectionId: connection.id, projectId: connection.projectId }, true);
-            break;
-          }
-          case ACTION_CONNECTION_CLONE: {
-            try {
-              // Load all connections for the project first to ensure we have them all to generate a unique name for the cloned connection
-              const projectConnections = await this.connectionInfoResource.load(ConnectionInfoProjectKey(connection.projectId));
-              const connectionNames = projectConnections.map(connection => connection.name);
-              const uniqueName = getUniqueName(
-                connection.name.concat(` ${this.localizationService.translate('ui_copy').toLowerCase()}`),
-                connectionNames,
-              );
-
-              if (!connection.nodePath) {
-                this.notificationService.logException(new Error('Connection node path is undefined'), 'plugin_connections_connection_clone_error');
-                return;
-              }
-
-              await this.connectionInfoResource.createFromNode(connection.projectId, connection.nodePath, uniqueName);
-            } catch (exception: any) {
-              this.notificationService.logException(exception, 'plugin_connections_connection_clone_error');
-            }
             break;
           }
         }

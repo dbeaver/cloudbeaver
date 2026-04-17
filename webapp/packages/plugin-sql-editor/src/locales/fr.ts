@@ -62,4 +62,6 @@ export default [
     "Mettre en surbrillance les espaces, les tabulations et les autres caractères d'espace blanc dans l'éditeur SQL",
   ],
   ['plugin_sql_editor_bind_parameters_dialog_alert_title', 'Les valeurs de type chaîne doivent être entre guillemets'],
+  ['plugin_sql_editor_export_local_tab', 'vers OS (local)'],
+  ['plugin_sql_editor_script_exported', 'Script exporté avec succès'],
 ];
