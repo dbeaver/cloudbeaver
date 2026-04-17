@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,6 @@ import org.jkiss.dbeaver.runtime.properties.ObjectPropertyDescriptor;
 import org.jkiss.dbeaver.runtime.properties.PropertyCollector;
 
 import java.util.Arrays;
-import java.util.function.Function;
 
 /**
  * WebSQLExecutionPlanNode.
@@ -78,22 +77,22 @@ public class WebSQLExecutionPlanNode {
 
     @Nullable
     public Double getCost() {
-        return getMetric(DBCPlanCostNode::getNodeCost);
+        return node instanceof DBCPlanCostNode cn && cn.getNodeCost() != null ? cn.getNodeCost().doubleValue() : null;
     }
 
     @Nullable
-    public Double getRowCount() {
-        return getMetric(DBCPlanCostNode::getNodeRowCount);
+    public Number getRowCount() {
+        return node instanceof DBCPlanCostNode cn ? cn.getNodeRowCount() : null;
     }
 
     @Nullable
     public Double getDuration() {
-        return getMetric(DBCPlanCostNode::getNodeDuration);
+        return node instanceof DBCPlanCostNode cn && cn.getNodeDuration() != null ? cn.getNodeDuration().doubleValue() : null;
     }
 
     @Nullable
     public Double getPercent() {
-        return getMetric(DBCPlanCostNode::getNodePercent);
+        return node instanceof DBCPlanCostNode cn && cn.getNodePercent() != null ? cn.getNodePercent().doubleValue() : null;
     }
 
     @NotNull
@@ -101,18 +100,8 @@ public class WebSQLExecutionPlanNode {
         PropertyCollector propertyCollector = new PropertyCollector(node, false);
         propertyCollector.collectProperties();
         return Arrays.stream(propertyCollector.getProperties())
-            .filter(p -> !(p instanceof ObjectPropertyDescriptor && ((ObjectPropertyDescriptor) p).isHidden()))
+            .filter(p -> !(p instanceof ObjectPropertyDescriptor && p.isHidden()))
             .map(p -> new WebPropertyInfo(webSession, p, propertyCollector)).toArray(WebPropertyInfo[]::new);
-    }
-
-    @Nullable
-    private Double getMetric(Function<DBCPlanCostNode, Number> extractor) {
-        if (!(node instanceof DBCPlanCostNode)) {
-            return null;
-        }
-
-        Number value = extractor.apply((DBCPlanCostNode) node);
-        return value == null ? null : value.doubleValue();
     }
 
 }
