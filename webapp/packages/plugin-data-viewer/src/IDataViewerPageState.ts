@@ -10,5 +10,5 @@ export interface IDataViewerPageState {
   resultIndex: number;
   presentationId: string;
   valuePresentationId: string | null;
-  persistedState?: Record<string, unknown>;
+  persistedState: Record<string, unknown>;
 }

@@ -65,17 +65,14 @@ export function useDataViewerPanel(tab: ITab<IObjectViewerTabState>) {
             resultIndex: 0,
             presentationId: '',
             valuePresentationId: null,
+            persistedState: {},
           });
-          pageState = dataViewerTabService.page.getState(tab);
+          pageState = dataViewerTabService.page.getState(tab)!;
         }
 
-        if (!pageState!.persistedState) {
-          pageState!.persistedState = {};
-        }
+        model.source.loadPersistedState(pageState.persistedState);
 
-        model.source.loadPersistedState(pageState!.persistedState);
-
-        const presentation = dataPresentationService.get(pageState!.presentationId);
+        const presentation = dataPresentationService.get(pageState.presentationId);
 
         if (presentation?.dataFormat !== undefined) {
           model.setDataFormat(presentation.dataFormat);

@@ -115,6 +115,7 @@ export class DataViewerTabService {
           resultIndex: 0,
           presentationId: '',
           valuePresentationId: null,
+          persistedState: {},
         });
       }
     } catch (exception: any) {

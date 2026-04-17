@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { action, computed, makeObservable, runInAction, untracked } from 'mobx';
+import { action, computed, makeObservable, runInAction } from 'mobx';
 
 import { type DataTypeLogicalOperation, ResultDataFormat, type SqlDataFilterConstraint, type SqlResultColumn } from '@cloudbeaver/core-sdk';
 
@@ -32,21 +32,8 @@ export function persistDataFilterConstraints<TOptions extends IDatabaseDataOptio
     return;
   }
 
-  const constraints = options.constraints.filter(hasConstraintIdentity).map(constraint => ({ ...constraint }));
-
-  const whereFilter = options.whereFilter || '';
-
-  untracked(() => {
-    const storedWhereFilter = source.persistedState.get<string>(WHERE_FILTER_KEY);
-    const storedConstraints = source.persistedState.get<SqlDataFilterConstraint[]>(CONSTRAINTS_KEY);
-
-    if (storedWhereFilter === whereFilter && JSON.stringify(storedConstraints) === JSON.stringify(constraints)) {
-      return;
-    }
-
-    source.persistedState.set(CONSTRAINTS_KEY, constraints);
-    source.persistedState.set(WHERE_FILTER_KEY, whereFilter);
-  });
+  source.persistedState.set(CONSTRAINTS_KEY, options.constraints.filter(hasConstraintIdentity));
+  source.persistedState.set(WHERE_FILTER_KEY, options.whereFilter || '');
 }
 
 export function applyPersistedDataFilterConstraints<TOptions extends IDatabaseDataOptions>(
@@ -57,10 +44,10 @@ export function applyPersistedDataFilterConstraints<TOptions extends IDatabaseDa
     return;
   }
 
-  const constraints = source.persistedState.get<unknown>(CONSTRAINTS_KEY) as SqlDataFilterConstraint[];
-  const whereFilter = source.persistedState.get<unknown>(WHERE_FILTER_KEY) as string;
+  const constraints = source.persistedState.get<SqlDataFilterConstraint[]>(CONSTRAINTS_KEY);
+  const whereFilter = source.persistedState.get<string>(WHERE_FILTER_KEY);
 
-  if (!constraints || typeof whereFilter !== 'string') {
+  if (!Array.isArray(constraints) || typeof whereFilter !== 'string') {
     return;
   }
 
@@ -340,9 +327,7 @@ function updateConstraintsForResult(source: IDatabaseDataSource<IDatabaseDataOpt
   runInAction(() => {
     for (const constraint of source.options!.constraints) {
       if (!hasConstraintIdentity(constraint)) {
-        source.options!.constraints = [];
-        source.options!.whereFilter = '';
-        clearPersistedDataFilterState(source);
+        resetDataFilterState(source);
         return;
       }
 
@@ -352,9 +337,7 @@ function updateConstraintsForResult(source: IDatabaseDataSource<IDatabaseDataOpt
       const resolvedColumn = resolveConstraintColumn(columns, initialName, initialPosition);
 
       if (!resolvedColumn) {
-        source.options!.constraints = [];
-        source.options!.whereFilter = '';
-        clearPersistedDataFilterState(source);
+        resetDataFilterState(source);
         return;
       }
 
@@ -373,6 +356,13 @@ function updateConstraintsForResult(source: IDatabaseDataSource<IDatabaseDataOpt
   });
 }
 
+function resetDataFilterState(source: IDatabaseDataSource<IDatabaseDataOptions, IDatabaseResultSet>): void {
+  source.options!.constraints = [];
+  source.options!.whereFilter = '';
+  source.persistedState.delete(CONSTRAINTS_KEY);
+  source.persistedState.delete(WHERE_FILTER_KEY);
+}
+
 function resolveConstraintColumn(
   columns: SqlResultColumn[],
   attributeName: string,
@@ -382,11 +372,6 @@ function resolveConstraintColumn(
     (column): column is SqlResultColumn & { name: string; position: number } =>
       typeof column.name === 'string' && typeof column.position === 'number' && column.position === attributePosition && column.name === attributeName,
   );
-}
-
-function clearPersistedDataFilterState(source: IDatabaseDataSource<any, IDatabaseResultSet>): void {
-  source.persistedState.delete(CONSTRAINTS_KEY);
-  source.persistedState.delete(WHERE_FILTER_KEY);
 }
 
 function hasConstraintIdentity(

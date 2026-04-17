@@ -5,61 +5,39 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { action, makeObservable, observable } from 'mobx';
+import { observable } from 'mobx';
 
 import type { IDatabasePersistedStateStore } from './IDatabasePersistedStateStore.js';
 
 export class DatabasePersistedStateStore implements IDatabasePersistedStateStore {
-  private store: Record<string, unknown>;
-  private version: number;
+  private readonly store = observable.map<string, unknown>();
+  private external: Record<string, unknown> | null = null;
 
-  constructor() {
-    this.store = {};
-    this.version = 0;
-
-    makeObservable<this, 'store' | 'version'>(this, {
-      store: observable.ref,
-      version: observable,
-      setStore: action,
-      set: action,
-      delete: action,
-    });
-  }
-
-  setStore(store: Record<string, unknown>): void {
-    this.store = store;
-    this.version++;
+  setStore(external: Record<string, unknown>): void {
+    this.external = external;
+    this.store.replace(Object.entries(external));
   }
 
   has(key: string): boolean {
-    this.observeVersion();
-    return key in this.store;
+    return this.store.has(key);
   }
 
   get<T>(key: string): T | undefined {
-    this.observeVersion();
-    return this.store[key] as T | undefined;
+    return this.store.get(key) as T | undefined;
   }
 
   set(key: string, value: unknown): void {
-    if (this.store[key] === value) {
-      return;
+    this.store.set(key, value);
+    // Mirror into the external tab-state object so it persists on serialization.
+    if (this.external) {
+      this.external[key] = value;
     }
-
-    this.store[key] = value;
-    this.version++;
   }
 
   delete(key: string): void {
-    if (!(key in this.store)) {
-      return;
+    this.store.delete(key);
+    if (this.external) {
+      delete this.external[key];
     }
-
-    delete this.store[key];
-    this.version++;
-  }
-
-  private observeVersion(): number {
-    return this.version;
   }
 }
