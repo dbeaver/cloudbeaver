@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -8,7 +8,7 @@
 import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { WindowEventsService } from '@cloudbeaver/core-root';
-import { download, getTextFileReadingProcess, throttle, withTimestamp } from '@cloudbeaver/core-utils';
+import { getTextFileReadingProcess, throttle, withTimestamp } from '@cloudbeaver/core-utils';
 import {
   ACTION_DOWNLOAD,
   ACTION_REDO,
@@ -28,7 +28,9 @@ import { ConnectionInfoResource, createConnectionParam, type Connection } from '
 import { promptForFiles } from '@cloudbeaver/core-browser';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
-import { ConfirmationDialog } from '@cloudbeaver/core-blocks';
+import { ConfirmationDialog, importLazyComponent } from '@cloudbeaver/core-blocks';
+
+import { ScriptExportService } from '@cloudbeaver/plugin-script-export';
 
 import { ACTION_SQL_EDITOR_EXECUTE } from './actions/ACTION_SQL_EDITOR_EXECUTE.js';
 import { ACTION_SQL_EDITOR_EXECUTE_NEW } from './actions/ACTION_SQL_EDITOR_EXECUTE_NEW.js';
@@ -50,6 +52,7 @@ import { SQL_EDITOR_ACTIONS_MENU } from './SqlEditor/SQL_EDITOR_ACTIONS_MENU.js'
 import { getSqlEditorName } from './getSqlEditorName.js';
 import type { ISqlEditorTabState } from './ISqlEditorTabState.js';
 import { SqlEditorSettingsService } from './SqlEditorSettingsService.js';
+import { downloadSql } from './downloadSql.js';
 
 const SYNC_DELAY = 5 * 60 * 1000;
 
@@ -59,6 +62,9 @@ const EXECUTIONS_ACTIONS = [
   ACTION_SQL_EDITOR_EXECUTE_SCRIPT,
   ACTION_SQL_EDITOR_SHOW_EXECUTION_PLAN,
 ];
+
+const LOCAL_EXPORT_TAB_ID = 'sql-editor-local-export-tab';
+const LocalExportPanel = importLazyComponent(() => import('./LocalExport/LocalExportPanel.js').then(module => module.LocalExportPanel));
 
 @injectable(() => [
   MenuService,
@@ -70,6 +76,7 @@ const EXECUTIONS_ACTIONS = [
   SqlEditorSettingsService,
   NotificationService,
   CommonDialogService,
+  ScriptExportService,
 ])
 export class MenuBootstrap extends Bootstrap {
   constructor(
@@ -82,6 +89,7 @@ export class MenuBootstrap extends Bootstrap {
     private readonly sqlEditorSettingsService: SqlEditorSettingsService,
     private readonly notificationService: NotificationService,
     private readonly commonDialogService: CommonDialogService,
+    private readonly scriptExportService: ScriptExportService,
   ) {
     super();
   }
@@ -359,6 +367,13 @@ export class MenuBootstrap extends Bootstrap {
     //     ...items,
     //   ],
     // });
+
+    this.scriptExportService.tabsContainer.add({
+      key: LOCAL_EXPORT_TAB_ID,
+      name: 'plugin_sql_editor_export_local_tab',
+      order: 1,
+      panel: () => LocalExportPanel,
+    });
   }
 
   private sqlEditorActionHandler(context: IDataContextProvider, action: IAction): void {
@@ -411,7 +426,7 @@ export class MenuBootstrap extends Bootstrap {
     }
   }
 
-  private downloadSql(state: ISqlEditorTabState) {
+  private async downloadSql(state: ISqlEditorTabState) {
     const dataSource = this.sqlDataSourceService.get(state.editorId);
 
     if (!dataSource) {
@@ -427,11 +442,23 @@ export class MenuBootstrap extends Bootstrap {
 
     const name = getSqlEditorName(state, dataSource, connection);
     const script = dataSource.script;
+    const hasOnlyLocalExport =
+      this.scriptExportService.tabsContainer.has(LOCAL_EXPORT_TAB_ID) && this.scriptExportService.tabsContainer.getDisplayed().length === 1;
 
-    const blob = new Blob([script], {
-      type: 'application/sql',
+    if (hasOnlyLocalExport) {
+      const fileName = withTimestamp(name);
+
+      downloadSql(fileName, script);
+      return;
+    }
+
+    await this.scriptExportService.openExportDialog({
+      script,
+      fileName: name,
+      editorId: state.editorId,
+      projectId: executionContext?.projectId,
+      connectionId: executionContext?.connectionId,
     });
-    download(blob, `${withTimestamp(name)}.sql`);
   }
 
   private async uploadSql(state: ISqlEditorTabState) {

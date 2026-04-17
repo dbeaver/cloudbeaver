@@ -33,6 +33,7 @@ export default [
   ['data_grid_table_readonly_connection_tooltip', 'Read-only connection'],
   ['data_grid_table_no_key_found_tooltip', 'No unique key was found. Data modification is not possible.'],
   ['data_grid_table_virtual_key_tooltip', 'Virtual key'],
+  ['data_grid_table_key_column_tooltip', 'Key column'],
   ['plugin_data_spreadsheet_new_settings_disable', 'Disable Table presentation'],
   ['plugin_data_spreadsheet_new_settings_disable_description', 'Disable table presentation of data for all users'],
   ['plugin_data_spreadsheet_new_settings_description_label', 'Show columns description'],

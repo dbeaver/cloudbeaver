@@ -86,6 +86,9 @@
       "path": "../plugin-navigation-tabs"
     },
     {
+      "path": "../plugin-script-export"
+    },
+    {
       "path": "../plugin-sql-editor-codemirror"
     }
   ],

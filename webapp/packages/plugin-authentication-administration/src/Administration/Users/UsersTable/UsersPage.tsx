@@ -21,6 +21,7 @@ import { useUsersTableFilters } from './Filters/useUsersTableFilters.js';
 import { UsersAdministrationToolsPanel } from './UsersAdministrationToolsPanel.js';
 import { useUsersTable } from './useUsersTable.js';
 import { UsersTable } from './UsersTable.js';
+import { UsersAdministrationService } from '../UsersAdministrationService.js';
 
 interface Props {
   param?: string | null;
@@ -30,6 +31,7 @@ export const UsersPage = observer<Props>(function UsersPage({ param }) {
   const createUserService = useService(CreateUserService);
   const authRolesResource = useResource(UsersPage, AuthRolesResource, undefined);
   const administrationUsersManagementService = useService(AdministrationUsersManagementService);
+  const usersAdministrationService = useService(UsersAdministrationService);
 
   useAutoLoad(UsersPage, administrationUsersManagementService.loaders);
   const filters = useUsersTableFilters();
@@ -42,6 +44,12 @@ export const UsersPage = observer<Props>(function UsersPage({ param }) {
 
   return (
     <ColoredContainer vertical wrap gap parent maximum>
+      {usersAdministrationService.informationPlaceholder.getDisplayed({}).length > 0 && (
+        <Group keepSize box maximum>
+          <Placeholder container={usersAdministrationService.informationPlaceholder} />
+        </Group>
+      )}
+
       <Group keepSize box>
         <UsersAdministrationToolsPanel onUpdate={table.update} />
       </Group>
