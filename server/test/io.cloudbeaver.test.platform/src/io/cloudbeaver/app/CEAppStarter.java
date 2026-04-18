@@ -24,7 +24,7 @@ import io.cloudbeaver.utils.WebTestUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.SecurityUtils;
-import org.junit.AfterClass;
+import org.junit.jupiter.api.AfterAll;
 
 import java.net.CookieManager;
 import java.net.http.HttpClient;
@@ -66,7 +66,7 @@ public class CEAppStarter {
         }
     }
 
-    @AfterClass
+    @AfterAll
     public static void shutdownServer() {
         testApp.stop();
     }

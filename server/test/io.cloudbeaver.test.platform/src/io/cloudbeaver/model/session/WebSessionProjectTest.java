@@ -29,9 +29,9 @@ import org.jkiss.dbeaver.model.rm.RMProjectType;
 import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceEvent;
 import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceProperty;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 
@@ -44,7 +44,7 @@ public class WebSessionProjectTest extends CloudbeaverMockTest {
     private RMProject rmProject;
 
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         var sessionContext = Mockito.mock(SMSessionContext.class);
         Mockito.when(webSession.getSessionContext()).thenReturn(sessionContext);
@@ -69,14 +69,14 @@ public class WebSessionProjectTest extends CloudbeaverMockTest {
 
         // add connection
         var info = project.addConnection(ds);
-        Assert.assertNotNull(info);
+        Assertions.assertNotNull(info);
         var fetched = project.findWebConnectionInfo("ds1");
-        Assert.assertNotNull(fetched);
-        Assert.assertEquals("ds1", fetched.getDataSourceContainer().getId());
+        Assertions.assertNotNull(fetched);
+        Assertions.assertEquals("ds1", fetched.getDataSourceContainer().getId());
 
         // remove connection
         project.removeConnection(ds);
-        Assert.assertNull(project.findWebConnectionInfo("ds1"));
+        Assertions.assertNull(project.findWebConnectionInfo("ds1"));
     }
 
     @Test
@@ -91,7 +91,7 @@ public class WebSessionProjectTest extends CloudbeaverMockTest {
                 return registry;
             }
         };
-        Assert.assertThrows(DBWebException.class, () -> project.getWebConnectionInfo("missing"));
+        Assertions.assertThrows(DBWebException.class, () -> project.getWebConnectionInfo("missing"));
     }
 
     @Test
@@ -115,9 +115,9 @@ public class WebSessionProjectTest extends CloudbeaverMockTest {
         List<?> connections = project.getConnections();
 
         Mockito.verify(registry, Mockito.times(1)).getDataSources();
-        Assert.assertNotNull(connections);
-        Assert.assertEquals(1, connections.size());
-        Assert.assertEquals("ds1", project.getConnections().getFirst().getDataSourceContainer().getId());
+        Assertions.assertNotNull(connections);
+        Assertions.assertEquals(1, connections.size());
+        Assertions.assertEquals("ds1", project.getConnections().getFirst().getDataSourceContainer().getId());
     }
 
     @Test
@@ -140,10 +140,10 @@ public class WebSessionProjectTest extends CloudbeaverMockTest {
         Mockito.when(event.getDataSourceIds()).thenReturn(List.of("ds1"));
 
         boolean res = project.updateProjectDataSources(event);
-        Assert.assertTrue(res);
+        Assertions.assertTrue(res);
         var info = project.findWebConnectionInfo("ds1");
-        Assert.assertNotNull(info);
-        Assert.assertEquals("ds1", info.getDataSourceContainer().getId());
+        Assertions.assertNotNull(info);
+        Assertions.assertEquals("ds1", info.getDataSourceContainer().getId());
 
     }
 
@@ -164,20 +164,20 @@ public class WebSessionProjectTest extends CloudbeaverMockTest {
             }
         };
 
-        Assert.assertNotNull(project.getConnections());
+        Assertions.assertNotNull(project.getConnections());
 
         WSDataSourceEvent event = Mockito.mock(WSDataSourceEvent.class);
         Mockito.when(event.getId()).thenReturn(WSDataSourceEvent.UPDATED);
         Mockito.when(event.getDataSourceIds()).thenReturn(List.of("ds1"));
         Mockito.when(event.getProperty()).thenReturn(WSDataSourceProperty.NAME);
 
-        Assert.assertTrue(project.updateProjectDataSources(event));
+        Assertions.assertTrue(project.updateProjectDataSources(event));
         var info = project.findWebConnectionInfo("ds1");
-        Assert.assertNotNull(info);
-        Assert.assertEquals("ds1", info.getDataSourceContainer().getId());
+        Assertions.assertNotNull(info);
+        Assertions.assertEquals("ds1", info.getDataSourceContainer().getId());
 
         Mockito.when(event.getProperty()).thenReturn(WSDataSourceProperty.INTERNAL);
-        Assert.assertFalse(project.updateProjectDataSources(event));
+        Assertions.assertFalse(project.updateProjectDataSources(event));
 
     }
 
@@ -204,8 +204,8 @@ public class WebSessionProjectTest extends CloudbeaverMockTest {
         Mockito.when(event.getDataSourceIds()).thenReturn(List.of("ds1"));
 
         boolean res = project.updateProjectDataSources(event);
-        Assert.assertTrue(res);
-        Assert.assertNull(project.findWebConnectionInfo("ds1"));
+        Assertions.assertTrue(res);
+        Assertions.assertNull(project.findWebConnectionInfo("ds1"));
     }
 
     @Test
@@ -226,8 +226,8 @@ public class WebSessionProjectTest extends CloudbeaverMockTest {
         Mockito.when(event.getDataSourceIds()).thenReturn(List.of("ds1"));
 
         boolean res = project.updateProjectDataSources(event);
-        Assert.assertFalse(res);
-        Assert.assertNull(project.findWebConnectionInfo("ds1"));
+        Assertions.assertFalse(res);
+        Assertions.assertNull(project.findWebConnectionInfo("ds1"));
     }
 
     @Test
@@ -253,9 +253,9 @@ public class WebSessionProjectTest extends CloudbeaverMockTest {
 
         // when registry is marked as loaded, it should not be queried again
         Mockito.verify(registry, Mockito.never()).getDataSources();
-        Assert.assertNotNull(connections);
-        Assert.assertEquals(1, connections.size());
-        Assert.assertEquals("ds1", project.getConnections().getFirst().getDataSourceContainer().getId());
+        Assertions.assertNotNull(connections);
+        Assertions.assertEquals(1, connections.size());
+        Assertions.assertEquals("ds1", project.getConnections().getFirst().getDataSourceContainer().getId());
     }
 
 }

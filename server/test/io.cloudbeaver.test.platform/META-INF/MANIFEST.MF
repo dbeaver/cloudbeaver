@@ -8,8 +8,6 @@ Bundle-Vendor: DBeaver Corp
 Bundle-RequiredExecutionEnvironment: JavaSE-21
 Bundle-ActivationPolicy: lazy
 Require-Bundle: org.eclipse.core.runtime,
- org.junit,
- org.mockito.mockito-core,
  org.apache.felix.scr,
  org.jkiss.dbeaver.model,
  org.jkiss.dbeaver.osgi.test.runner;visibility:=reexport,
