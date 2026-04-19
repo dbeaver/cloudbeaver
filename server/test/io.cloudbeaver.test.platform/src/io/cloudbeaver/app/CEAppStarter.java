@@ -43,6 +43,9 @@ public class CEAppStarter {
 
     public static void startServerIfNotStarted() throws Exception {
         System.out.println("Start CBApplication");
+        if (testApp != null) {
+            return;
+        }
         if (DBWorkbench.isPlatformStarted() && DBWorkbench.getPlatform().getApplication() instanceof CBApplication<?>) {
             testApp = (CBApplication<?>) DBWorkbench.getPlatform().getApplication();
             return;
