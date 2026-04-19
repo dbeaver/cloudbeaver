@@ -16,11 +16,13 @@
  */
 package io.cloudbeaver;
 
+import io.cloudbeaver.app.CEAppStarter;
 import io.cloudbeaver.utils.WebTestUtils;
 import org.jkiss.junit.osgi.annotation.RunWithApplication;
 import org.jkiss.junit.osgi.annotation.RunWithProduct;
 import org.jkiss.junit.osgi.behaviors.IAsyncApplication;
 import org.jkiss.junit.osgi.extension.OSGITestExtension;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockitoAnnotations;
@@ -37,6 +39,11 @@ import java.net.http.HttpClient;
     vmArgs = {"logback.configurationFile", "workspace/conf/logback.xml"}
 )
 public abstract class CloudbeaverMockTest implements IAsyncApplication {
+    @BeforeAll
+    public static void startServer() throws Exception {
+        CEAppStarter.startServerIfNotStarted();
+    }
+
     @BeforeEach
     public void setupMocks() {
         MockitoAnnotations.openMocks(this);
