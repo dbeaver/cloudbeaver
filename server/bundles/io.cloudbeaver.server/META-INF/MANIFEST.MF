@@ -7,13 +7,10 @@ Bundle-Version: 26.0.4.qualifier
 Bundle-Release-Date: 20260504
 Bundle-RequiredExecutionEnvironment: JavaSE-21
 Bundle-ActivationPolicy: lazy
-Require-Bundle: org.eclipse.core.runtime;visibility:=reexport,
- org.apache.commons.jexl,
- org.jkiss.utils;visibility:=reexport,
+Require-Bundle: org.apache.commons.jexl,
  org.jkiss.dbeaver.model.sql;visibility:=reexport,
  org.jkiss.dbeaver.data.gis,
  org.jkiss.bundle.jetty.server;visibility:=reexport,
- com.google.gson;visibility:=reexport,
  org.jkiss.bundle.graphql;visibility:=reexport,
  org.jkiss.bundle.apache.dbcp,
  org.jkiss.dbeaver.net.ssh,
