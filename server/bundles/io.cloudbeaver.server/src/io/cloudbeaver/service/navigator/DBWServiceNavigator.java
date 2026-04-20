@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -63,11 +63,12 @@ public interface DBWServiceNavigator extends DBWService {
         @Nullable Boolean recursive) throws DBWebException;
 
     @WebAction
+    @NotNull
     WebStructContainers getStructContainers(
-        String projectId,
-        WebConnectionInfo connectionInfo,
-        String contextId,
-        String catalog) throws DBWebException;
+        @NotNull String projectId,
+        @NotNull WebConnectionInfo connectionInfo,
+        @NotNull String contextId,
+        @Nullable String catalog) throws DBWebException;
 
     @WebAction
     String renameNode(
