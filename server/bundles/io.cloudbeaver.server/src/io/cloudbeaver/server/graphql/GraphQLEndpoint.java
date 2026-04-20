@@ -252,8 +252,7 @@ public class GraphQLEndpoint extends HttpServlet {
         String token = request.getHeader(CBConstants.HEADER_API_TOKEN);
         if (token != null) {
             try {
-                WebSession webSession = sessionManager.getWebSessionByToken(request, token);
-                mapOfContext.put(WebSession.class.getName(), webSession);
+                sessionManager.getWebSessionByToken(request, token);
             } catch (DBException e) {
                 log.error("Error obtaining web session by token", e);
                 DBWebException webException = new DBWebException(
