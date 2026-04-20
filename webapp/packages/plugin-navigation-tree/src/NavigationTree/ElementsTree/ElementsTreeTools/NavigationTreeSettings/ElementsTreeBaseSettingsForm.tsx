@@ -56,17 +56,6 @@ export const ElementsTreeBaseSettingsForm: PlaceholderComponent<IElementsTreeSet
       >
         {translate('app_navigationTree_settings_state_title')}
       </Switch>
-      <Switch
-        id={`${root}.foldersTree`}
-        name="foldersTree"
-        state={settings}
-        disabled={!settings.configurable}
-        title={translate('app_navigationTree_settings_folders_description')}
-        mod={['primary', 'dense']}
-        small
-      >
-        {translate('app_navigationTree_settings_folders_title')}
-      </Switch>
     </>
   );
 });

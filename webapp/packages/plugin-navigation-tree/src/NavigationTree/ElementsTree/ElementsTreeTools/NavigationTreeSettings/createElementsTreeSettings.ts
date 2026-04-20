@@ -13,7 +13,6 @@ export function createElementsTreeSettings(defaults?: Partial<IElementsTreeSetti
     filterAll: false,
     saveFilter: true,
     saveExpanded: true,
-    foldersTree: false,
     showFolderExplorerPath: true,
     configurable: true,
     projects: true,
@@ -30,7 +29,6 @@ export function validateElementsTreeSettings(data: any): boolean {
     typeof data.filter === 'boolean' &&
     typeof data.saveFilter === 'boolean' &&
     typeof data.saveExpanded === 'boolean' &&
-    typeof data.foldersTree === 'boolean' &&
     typeof data.showFolderExplorerPath === 'boolean' &&
     typeof data.configurable === 'boolean' &&
     typeof data.projects === 'boolean' &&

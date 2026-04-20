@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,9 @@ package io.cloudbeaver.service.sql;
 import io.cloudbeaver.model.WebPropertyInfo;
 import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.exec.plan.DBCPlanCostNode;
 import org.jkiss.dbeaver.model.exec.plan.DBCPlanNode;
 import org.jkiss.dbeaver.runtime.properties.ObjectPropertyDescriptor;
 import org.jkiss.dbeaver.runtime.properties.PropertyCollector;
@@ -73,12 +75,32 @@ public class WebSQLExecutionPlanNode {
         return node.getNodeDescription();
     }
 
+    @Nullable
+    public Double getCost() {
+        return node instanceof DBCPlanCostNode cn && cn.getNodeCost() != null ? cn.getNodeCost().doubleValue() : null;
+    }
+
+    @Nullable
+    public Number getRowCount() {
+        return node instanceof DBCPlanCostNode cn ? cn.getNodeRowCount() : null;
+    }
+
+    @Nullable
+    public Double getDuration() {
+        return node instanceof DBCPlanCostNode cn && cn.getNodeDuration() != null ? cn.getNodeDuration().doubleValue() : null;
+    }
+
+    @Nullable
+    public Double getPercent() {
+        return node instanceof DBCPlanCostNode cn && cn.getNodePercent() != null ? cn.getNodePercent().doubleValue() : null;
+    }
+
     @NotNull
     public WebPropertyInfo[] getProperties() {
         PropertyCollector propertyCollector = new PropertyCollector(node, false);
         propertyCollector.collectProperties();
         return Arrays.stream(propertyCollector.getProperties())
-            .filter(p -> !(p instanceof ObjectPropertyDescriptor && ((ObjectPropertyDescriptor) p).isHidden()))
+            .filter(p -> !(p instanceof ObjectPropertyDescriptor && p.isHidden()))
             .map(p -> new WebPropertyInfo(webSession, p, propertyCollector)).toArray(WebPropertyInfo[]::new);
     }
 

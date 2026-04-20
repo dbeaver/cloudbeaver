@@ -42,6 +42,7 @@ export default [
   ['ui_error_message', 'Errore:'],
   ['ui_error_close', 'Chiudi'],
   ['ui_clear', 'Clear'],
+  ['ui_file_name', 'Nome del file'],
   ['ui_remove', 'Remove'],
   ['ui_close', 'Chiudi'],
   ['ui_open', 'Open'],
