@@ -118,7 +118,22 @@ public abstract class BaseLocalResourceController implements RMController {
         return doFileReadOperation(
             projectId,
             projectMetadata.getMetadataFolder(false),
-            () -> serializeProjectDataSourcesConfiguration(projectMetadata, dataSourceIds)
+            () -> {
+                DBPDataSourceRegistry registry = projectMetadata.getDataSourceRegistry();
+                registry.refreshConfig();
+                registry.checkForErrors();
+                DataSourceConfigurationManagerBuffer buffer = new DataSourceConfigurationManagerBuffer();
+                Predicate<DBPDataSourceContainer> filter = null;
+                if (!ArrayUtils.isEmpty(dataSourceIds)) {
+                    filter = ds -> ArrayUtils.contains(dataSourceIds, ds.getId());
+                }
+                ((DataSourcePersistentRegistry) registry).saveConfigurationToManager(new VoidProgressMonitor(),
+                    buffer,
+                    filter);
+                registry.checkForErrors();
+
+                return new String(buffer.getData(), StandardCharsets.UTF_8);
+            }
         );
     }
 
@@ -173,7 +188,6 @@ public abstract class BaseLocalResourceController implements RMController {
                             storedDataSourceConfigurations
                         );
                     } catch (DBException e) {
-                        registry.refreshConfig();
                         registry.checkForErrors();
                     }
                     log.debug("Save data sources configuration in project '" + projectId + "'");
@@ -199,25 +213,6 @@ public abstract class BaseLocalResourceController implements RMController {
         @Nullable List<String> dataSourceIds,
         @NotNull Map<String, DBPConnectionConfiguration> storedDataSourceConfigurations
     ) throws DBException {
-    }
-
-    @NotNull
-    protected String serializeProjectDataSourcesConfiguration(
-        @NotNull DBPProject project,
-        @Nullable String[] dataSourceIds
-    ) throws DBException {
-        DBPDataSourceRegistry registry = project.getDataSourceRegistry();
-        registry.refreshConfig();
-        registry.checkForErrors();
-        DataSourceConfigurationManagerBuffer buffer = new DataSourceConfigurationManagerBuffer();
-        Predicate<DBPDataSourceContainer> filter = null;
-        if (!ArrayUtils.isEmpty(dataSourceIds)) {
-            filter = ds -> ArrayUtils.contains(dataSourceIds, ds.getId());
-        }
-        ((DataSourcePersistentRegistry) registry).saveConfigurationToManager(new VoidProgressMonitor(), buffer, filter);
-        registry.checkForErrors();
-
-        return new String(buffer.getData(), StandardCharsets.UTF_8);
     }
 
     @Override
