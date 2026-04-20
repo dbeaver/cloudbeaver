@@ -85,6 +85,12 @@ public abstract class BaseServletApplication extends BaseApplicationImpl impleme
 
     @NotNull
     @Override
+    public LockManager createLockManager(@NotNull String applicationId, @NotNull Path metadataFolder) throws DBException {
+        return new SharedFileLockManager(applicationId, metadataFolder);
+    }
+
+    @NotNull
+    @Override
     public LockManager createLockManager() throws DBException {
         return new SharedFileLockManager(getApplicationInstanceId());
     }
