@@ -26,5 +26,9 @@ mutation getSqlExecutionPlanResult(
             order
           }
         }
+        hasCost
+        hasRows
+        hasDuration
+        durationMeasure
     }
 }
