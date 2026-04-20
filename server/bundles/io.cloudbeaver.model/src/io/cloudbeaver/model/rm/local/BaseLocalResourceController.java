@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2025 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ import org.jkiss.dbeaver.model.DBPDataSourceFolder;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.app.DBPWorkspace;
+import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.fs.lock.LockManager;
 import org.jkiss.dbeaver.model.fs.lock.LockOptions;
 import org.jkiss.dbeaver.model.fs.lock.LockTarget;
@@ -45,6 +46,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Predicate;
 
 public abstract class BaseLocalResourceController implements RMController {
@@ -146,12 +148,13 @@ public abstract class BaseLocalResourceController implements RMController {
     ) throws DBException {
         try (var ignoredLock = lockController.lock(LockTarget.of(projectId), LockOptions.of("updateProjectDataSources"))) {
             RMLocalProject project = getWebProject(projectId, false);
-            String processedConfiguration = preprocessDataSourceConfigurationUpdate(project, projectId, configuration, dataSourceIds);
+            Map<String, DBPConnectionConfiguration> storedDataSourceConfigurations =
+                captureCurrentDataSourceConfigurations(project, dataSourceIds);
             return doFileWriteOperation(
                 projectId, project.getMetadataFolder(false),
                 () -> {
                     DBPDataSourceRegistry registry = project.getDataSourceRegistry();
-                    DBPDataSourceConfigurationStorage storage = new DataSourceMemoryStorage(processedConfiguration.getBytes(
+                    DBPDataSourceConfigurationStorage storage = new DataSourceMemoryStorage(configuration.getBytes(
                         StandardCharsets.UTF_8));
                     DataSourceConfigurationManager manager = new DataSourceConfigurationManagerBuffer();
                     final DataSourceParseResults parseResults = ((DataSourcePersistentRegistry) registry).loadDataSources(
@@ -162,6 +165,17 @@ public abstract class BaseLocalResourceController implements RMController {
                         dataSourceIds == null
                     );
                     registry.checkForErrors();
+                    try {
+                        processLoadedDataSourceConfigurationUpdate(
+                            project,
+                            projectId,
+                            dataSourceIds,
+                            storedDataSourceConfigurations
+                        );
+                    } catch (DBException e) {
+                        registry.refreshConfig();
+                        registry.checkForErrors();
+                    }
                     log.debug("Save data sources configuration in project '" + projectId + "'");
                     ((DataSourcePersistentRegistry) registry).saveDataSources();
                     registry.checkForErrors();
@@ -172,13 +186,19 @@ public abstract class BaseLocalResourceController implements RMController {
     }
 
     @NotNull
-    protected String preprocessDataSourceConfigurationUpdate(
+    protected Map<String, DBPConnectionConfiguration> captureCurrentDataSourceConfigurations(
+        @NotNull RMLocalProject project,
+        @Nullable List<String> dataSourceIds
+    ) {
+        return Map.of();
+    }
+
+    protected void processLoadedDataSourceConfigurationUpdate(
         @NotNull RMLocalProject project,
         @NotNull String projectId,
-        @NotNull String configuration,
-        @Nullable List<String> dataSourceIds
+        @Nullable List<String> dataSourceIds,
+        @NotNull Map<String, DBPConnectionConfiguration> storedDataSourceConfigurations
     ) throws DBException {
-        return configuration;
     }
 
     @NotNull

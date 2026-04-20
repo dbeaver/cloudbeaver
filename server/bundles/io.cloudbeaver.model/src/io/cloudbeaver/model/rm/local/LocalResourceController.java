@@ -33,12 +33,14 @@ import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPWorkspace;
 import org.jkiss.dbeaver.model.auth.SMCredentials;
 import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
+import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.fs.lock.LockManager;
 import org.jkiss.dbeaver.model.fs.lock.LockOptions;
 import org.jkiss.dbeaver.model.fs.lock.LockTarget;
 import org.jkiss.dbeaver.model.impl.app.BaseProjectImpl;
 import org.jkiss.dbeaver.model.impl.auth.SessionContextImpl;
 import org.jkiss.dbeaver.model.navigator.DBNLocalFolder;
+import org.jkiss.dbeaver.model.net.DBWHandlerConfiguration;
 import org.jkiss.dbeaver.model.rm.*;
 import org.jkiss.dbeaver.model.security.SMAdminController;
 import org.jkiss.dbeaver.model.security.SMObjectType;
@@ -52,6 +54,7 @@ import org.jkiss.dbeaver.registry.DataSourceDescriptor;
 import org.jkiss.dbeaver.registry.DataSourceParseResults;
 import org.jkiss.dbeaver.registry.ResourceTypeDescriptor;
 import org.jkiss.dbeaver.registry.ResourceTypeRegistry;
+import org.jkiss.dbeaver.registry.network.NetworkHandlerDescriptor;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.IOUtils;
@@ -82,7 +85,6 @@ public class LocalResourceController extends BaseLocalResourceController {
     private final String globalProjectName;
     private Supplier<SMAdminController> smControllerSupplier;
     protected final List<RMFileOperationHandler> fileHandlers;
-    protected final List<RMDataSourceConfigUpdateHandler> dataSourceConfigUpdateHandlers;
 
     private final Map<String, RMLocalProject> projectRegistries = new LinkedHashMap<>();
     private final ProjectsMetadataInfo sharedProjectsMetadataInfo;
@@ -105,7 +107,6 @@ public class LocalResourceController extends BaseLocalResourceController {
 
         this.globalProjectName = DBWorkbench.getPlatform().getApplication().getDefaultProjectName();
         this.fileHandlers = RMFileOperationHandlersRegistry.getInstance().getFileHandlers();
-        this.dataSourceConfigUpdateHandlers = RMDataSourceConfigUpdateHandlersRegistry.getInstance().getHandlers();
         this.sharedProjectsMetadataInfo = new ProjectsMetadataInfo(sharedProjectsPath, lockController);
     }
 
@@ -415,30 +416,103 @@ public class LocalResourceController extends BaseLocalResourceController {
 
     @Override
     @NotNull
-    protected String preprocessDataSourceConfigurationUpdate(
+    protected Map<String, DBPConnectionConfiguration> captureCurrentDataSourceConfigurations(
+        @NotNull RMLocalProject project,
+        @Nullable List<String> dataSourceIds
+    ) {
+        return project.getDataSourceRegistry().getDataSources().stream()
+            .filter(ds -> dataSourceIds == null || dataSourceIds.contains(ds.getId()))
+            .collect(Collectors.toMap(
+                DBPDataSourceContainer::getId,
+                ds -> new DBPConnectionConfiguration(ds.getConnectionConfiguration())
+            ));
+    }
+
+    @Override
+    protected void processLoadedDataSourceConfigurationUpdate(
         @NotNull RMLocalProject project,
         @NotNull String projectId,
-        @NotNull String configuration,
-        @Nullable List<String> dataSourceIds
+        @Nullable List<String> dataSourceIds,
+        @NotNull Map<String, DBPConnectionConfiguration> storedDataSourceConfigurations
     ) throws DBException {
-        if (dataSourceConfigUpdateHandlers.isEmpty()) {
-            return configuration;
-        }
+        Set<RMProjectPermission> userProjectPermissions = getProjectPermissions(projectId, project.getProjectType());
+        Set<String> grantedPermissions = userProjectPermissions.stream()
+            .flatMap(permission -> permission.getAllPermissions().stream())
+            .collect(Collectors.toSet());
 
-        Set<RMProjectPermission> projectPermissions = getProjectPermissions(projectId, project.getProjectType());
-        String currentConfiguration = serializeProjectDataSourcesConfiguration(
-            project,
-            dataSourceIds == null ? null : dataSourceIds.toArray(String[]::new)
-        );
-        String processedConfiguration = configuration;
-        for (RMDataSourceConfigUpdateHandler handler : dataSourceConfigUpdateHandlers) {
-            processedConfiguration = handler.processDataSourceConfigurationUpdate(
-                currentConfiguration,
-                processedConfiguration,
-                projectPermissions
+        for (DBPDataSourceContainer dataSource : project.getDataSourceRegistry().getDataSources()) {
+            if (dataSourceIds != null && !dataSourceIds.contains(dataSource.getId())) {
+                continue;
+            }
+
+            DBPConnectionConfiguration storedConfiguration = storedDataSourceConfigurations.get(dataSource.getId());
+            reconcileNetworkHandlers(
+                storedConfiguration,
+                dataSource.getConnectionConfiguration(),
+                grantedPermissions
             );
         }
-        return processedConfiguration;
+    }
+
+    private void reconcileNetworkHandlers(
+        @Nullable DBPConnectionConfiguration storedConfiguration,
+        @NotNull DBPConnectionConfiguration updatedConfiguration,
+        @NotNull Set<String> grantedPermissions
+    ) throws DBException {
+
+        // Getting all handlers ids from both stored and updated configurations to check permissions for all of them
+        // and to add missing handlers if user has no permissions to add new ones
+        Set<String> handlerIds = new LinkedHashSet<>();
+        if (storedConfiguration != null) {
+            storedConfiguration.getHandlers().stream()
+                .map(DBWHandlerConfiguration::getId)
+                .forEach(handlerIds::add);
+        }
+        updatedConfiguration.getHandlers().stream()
+            .map(DBWHandlerConfiguration::getId)
+            .forEach(handlerIds::add);
+
+        for (String handlerId : handlerIds) {
+            DBWHandlerConfiguration storedHandler = storedConfiguration == null ? null : storedConfiguration.getHandler(handlerId);
+            DBWHandlerConfiguration updatedHandler = updatedConfiguration.getHandler(handlerId);
+            DBWHandlerConfiguration descriptorSource = updatedHandler != null ? updatedHandler : storedHandler;
+            if (descriptorSource == null
+                || !(descriptorSource.getHandlerDescriptor() instanceof NetworkHandlerDescriptor descriptor)) {
+                continue;
+            }
+
+            if (descriptor.getRequiredPermissions().isEmpty()
+                || grantedPermissions.containsAll(descriptor.getRequiredPermissions())) {
+                continue;
+            }
+
+            if (storedHandler == null) {
+                throw new DBException("No permissions to configure network handler '" + handlerId + "'");
+            }
+
+            // if user doesn't have permissions to add new handler, we should keep old one
+            if (updatedHandler == null) {
+                updatedConfiguration.updateHandler(new DBWHandlerConfiguration(storedHandler));
+                continue;
+            }
+
+            if (!areSameHandlerConfiguration(storedHandler, updatedHandler)) {
+                throw new DBException("No permissions to modify network handler '" + handlerId + "'");
+            }
+        }
+    }
+
+    private boolean areSameHandlerConfiguration(
+        @NotNull DBWHandlerConfiguration storedHandler,
+        @NotNull DBWHandlerConfiguration updatedHandler
+    ) {
+        DBWHandlerConfiguration storedHandlerCopy = new DBWHandlerConfiguration(storedHandler);
+        storedHandlerCopy.setDataSource(null);
+
+        DBWHandlerConfiguration updatedHandlerCopy = new DBWHandlerConfiguration(updatedHandler);
+        updatedHandlerCopy.setDataSource(null);
+
+        return storedHandlerCopy.equals(updatedHandlerCopy);
     }
 
     @Override
