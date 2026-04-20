@@ -228,6 +228,10 @@ type DataTypeLogicalOperation {
 type SQLExecutionPlan {
     query: String!
     nodes: [SQLExecutionPlanNode!]!
+    hasCost: Boolean! @since(version: "26.0.3")
+    hasRows: Boolean! @since(version: "26.0.3")
+    hasDuration: Boolean! @since(version: "26.0.3")
+    durationMeasure: String @since(version: "26.0.3")
 }
 
 type SQLExecutionPlanNode {
@@ -240,6 +244,10 @@ type SQLExecutionPlanNode {
     condition: String
     description: String
     properties: [ObjectPropertyInfo!]!
+    cost: Float @since(version: "26.0.3")
+    rowCount: Float @since(version: "26.0.3")
+    duration: Float @since(version: "26.0.3")
+    percent: Float @since(version: "26.0.3")
 }
 
 ####################################################
