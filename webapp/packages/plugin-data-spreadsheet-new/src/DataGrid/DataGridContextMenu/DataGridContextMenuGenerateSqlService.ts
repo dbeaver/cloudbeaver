@@ -8,7 +8,7 @@
 import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { SqlResultSetGeneratorId, type SqlResultRow } from '@cloudbeaver/core-sdk';
+import { SqlResultSetGeneratorId, type SqlQueryGeneratorOptions, type SqlResultRow } from '@cloudbeaver/core-sdk';
 import { ActionService, MenuService, type IAction } from '@cloudbeaver/core-view';
 import {
   DATA_CONTEXT_DV_DDM,
@@ -137,33 +137,76 @@ export class DataGridContextMenuGenerateSqlService {
     }
 
     try {
-      const query = await this.sqlGenerationResource.generateResultSetSql({
+      const query = await this.generateQuery({
         projectId,
         connectionId,
         contextId,
-        resultsId: resultId,
+        resultId,
         generatorId,
-        selectedRows: rows,
-        generatorOptions: DEFAULT_QUERY_GENERATOR_OPTIONS,
+        rows,
+        options: DEFAULT_QUERY_GENERATOR_OPTIONS,
       });
 
       if (!query) {
-        this.notificationService.logError({
-          title: 'data_grid_table_generate_sql_error_title',
-          message: 'data_grid_table_generate_sql_error_no_query',
-        });
         return;
       }
 
       await this.commonDialogService.open(GeneratedSqlDialog, {
         query,
         nodeId: connectionId,
-        generatorId: generatorId,
         options: DEFAULT_QUERY_GENERATOR_OPTIONS,
+        regenerateQuery: options =>
+          this.generateQuery({
+            projectId,
+            connectionId,
+            contextId,
+            resultId,
+            generatorId,
+            rows,
+            options,
+          }),
       });
     } catch (e: any) {
       this.notificationService.logException(e, 'data_grid_table_generate_sql_error_title');
     }
+  }
+
+  private async generateQuery({
+    projectId,
+    connectionId,
+    contextId,
+    resultId,
+    generatorId,
+    rows,
+    options,
+  }: {
+    projectId: string;
+    connectionId: string;
+    contextId: string;
+    resultId: string;
+    generatorId: SqlResultSetGeneratorId;
+    rows: SqlResultRow[];
+    options: SqlQueryGeneratorOptions;
+  }): Promise<string | null> {
+    const query = await this.sqlGenerationResource.generateResultSetSql({
+      projectId,
+      connectionId,
+      contextId,
+      resultsId: resultId,
+      generatorId,
+      selectedRows: rows,
+      generatorOptions: options,
+    });
+
+    if (!query) {
+      this.notificationService.logError({
+        title: 'data_grid_table_generate_sql_error_title',
+        message: 'data_grid_table_generate_sql_error_no_query',
+      });
+      return null;
+    }
+
+    return query;
   }
 }
 

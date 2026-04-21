@@ -26,7 +26,6 @@ import { useCodemirrorExtensions } from '@cloudbeaver/plugin-codemirror6';
 import { SqlEditorNavigatorService } from '@cloudbeaver/plugin-sql-editor-navigation-tab';
 import { SQLCodeEditor, useSqlDialectExtension } from '@cloudbeaver/plugin-sql-editor-codemirror';
 
-import { SqlGeneratorsResource } from './SqlGeneratorsResource.js';
 import { observable } from 'mobx';
 import { NotificationService } from '@cloudbeaver/core-events';
 import type { SqlQueryGeneratorOptions } from '@cloudbeaver/core-sdk';
@@ -34,8 +33,8 @@ import type { SqlQueryGeneratorOptions } from '@cloudbeaver/core-sdk';
 interface Payload {
   nodeId: string;
   query: string;
-  generatorId: string;
   options?: SqlQueryGeneratorOptions;
+  regenerateQuery: (options: SqlQueryGeneratorOptions) => Promise<string | null>;
 }
 
 export const GeneratedSqlDialog = observer<DialogComponentProps<Payload>>(function GeneratedSqlDialog({ rejectDialog, payload }) {
@@ -59,7 +58,6 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<Payload>>(functi
   );
 
   const connectionInfoResource = useService(ConnectionInfoResource);
-  const sqlGeneratorsResource = useService(SqlGeneratorsResource);
   const sqlEditorNavigatorService = useService(SqlEditorNavigatorService);
   const notificationService = useService(NotificationService);
   const connection = connectionInfoResource.getConnectionForNode(payload.nodeId);
@@ -75,11 +73,11 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<Payload>>(functi
   async function regenerateQuery() {
     state.loading = true;
     try {
-      const newQuery = await sqlGeneratorsResource.generateEntityQuery(payload.generatorId, payload.nodeId, {
+      const newQuery = await payload.regenerateQuery({
         compactSql: state.compactSql,
         useFullyQualifiedNames: state.useFullyQualifiedNames,
       });
-      state.query = newQuery;
+      state.query = newQuery ?? '';
     } catch (error: any) {
       notificationService.logException(error, 'app_shared_sql_generators_error_title');
     } finally {
