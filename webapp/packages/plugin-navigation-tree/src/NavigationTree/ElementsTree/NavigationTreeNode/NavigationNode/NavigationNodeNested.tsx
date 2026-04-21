@@ -50,7 +50,7 @@ export const NavigationNodeNested = observer(
     children = useDeferredValue(children);
     empty = useDeferredValue(empty);
 
-    if (empty && !treeContext?.tree.settings?.foldersTree) {
+    if (empty) {
       return null;
     }
 

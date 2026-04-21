@@ -16,7 +16,7 @@ export function useElementsTreeFolderExplorer(baseRoot: string, settings: IEleme
     saveState: settings?.saveExpanded,
   });
 
-  const foldersTreeDisabled = getComputed(() => !settings?.foldersTree && folderExplorer.state.folder !== baseRoot);
+  const foldersTreeDisabled = getComputed(() => folderExplorer.state.folder !== baseRoot);
 
   useEffect(() => {
     if (foldersTreeDisabled) {

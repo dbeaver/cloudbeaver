@@ -7,11 +7,9 @@ Bundle-Release-Date: 20220606
 Bundle-Vendor: DBeaver Corp
 Bundle-RequiredExecutionEnvironment: JavaSE-21
 Bundle-ActivationPolicy: lazy
-Require-Bundle: org.eclipse.core.runtime,
- org.junit,
+Require-Bundle: org.junit,
  org.mockito.mockito-core,
  org.apache.felix.scr,
- org.jkiss.dbeaver.model,
  org.jkiss.dbeaver.osgi.test.runner;visibility:=reexport,
  org.jkiss.dbeaver.model.sql,
  org.jkiss.dbeaver.model.lsp,
