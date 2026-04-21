@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { defaultKeymap, indentWithTab } from '@codemirror/commands';
-import { bracketMatching, foldGutter, indentOnInput, syntaxHighlighting } from '@codemirror/language';
+import { bracketMatching, foldGutter, indentOnInput, indentUnit, syntaxHighlighting } from '@codemirror/language';
 import { highlightSelectionMatches, searchKeymap } from '@codemirror/search';
 import { Compartment, type Extension } from '@codemirror/state';
 import {
@@ -54,6 +54,7 @@ const defaultExtensionsFlags: IDefaultExtensions = {
   keymap: true,
   lineWrapping: false,
   search: true,
+  tabIndentation: true,
 };
 
 export interface IDefaultExtensions {
@@ -73,6 +74,7 @@ export interface IDefaultExtensions {
   keymap?: boolean;
   lineWrapping?: boolean;
   search?: boolean;
+  tabIndentation?: boolean;
 }
 
 const extensionMap = {
@@ -109,6 +111,7 @@ const extensionMap = {
   rectangularSelection,
   keymap: () => keymap.of(DEFAULT_KEY_MAP),
   lineWrapping: () => EditorView.lineWrapping,
+  tabIndentation: () => indentUnit.of('\t'),
 };
 
 const DEFAULT_EXTENSIONS_COMPARTMENT = new Compartment();
