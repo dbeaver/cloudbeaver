@@ -51,7 +51,7 @@ public class CBSessionManager implements WebAppSessionManager {
     private static final Log log = Log.getLog(CBSessionManager.class);
 
     private final CBApplication<?> application;
-    protected final Map<String, SessionHolder> sessionMap = new HashMap<>();
+    protected final Map<String, BaseWebSession> sessionMap = new HashMap<>();
 
     public CBSessionManager(CBApplication<?> application) {
         this.application = application;
@@ -78,7 +78,7 @@ public class CBSessionManager implements WebAppSessionManager {
     public BaseWebSession closeSession(@NotNull String sessionId, boolean sendSessionExpiredEvent) {
         BaseWebSession webSession;
         synchronized (sessionMap) {
-            webSession = getSessionFromHolder(sessionMap.remove(sessionId));
+            webSession = sessionMap.remove(sessionId);
         }
         if (webSession != null) {
             log.debug("> Close session '" + sessionId + "'");
@@ -91,11 +91,6 @@ public class CBSessionManager implements WebAppSessionManager {
 
     protected CBApplication<?> getApplication() {
         return application;
-    }
-
-    @Nullable
-    protected BaseWebSession getSessionFromHolder(@Nullable SessionHolder sessionHolder) {
-        return sessionHolder == null ? null : sessionHolder.getSession();
     }
 
     @Deprecated
@@ -129,14 +124,14 @@ public class CBSessionManager implements WebAppSessionManager {
         String sessionId = getSessionId(request);
         WebSession webSession;
         synchronized (sessionMap) {
-            var baseWebSession = getSessionFromHolder(sessionMap.get(sessionId));
+            var baseWebSession = sessionMap.get(sessionId);
             if (baseWebSession == null && CBApplication.getInstance().isConfigurationMode()) {
                 try {
                     webSession = createWebSessionImpl(new WebHttpRequestInfo(request));
                 } catch (DBException e) {
                     throw new DBWebException("Failed to create web session", e);
                 }
-                sessionMap.put(sessionId, new SessionHolder(SessionType.WEB, webSession));
+                sessionMap.put(sessionId, webSession);
             } else if (baseWebSession == null) {
                 try {
                     webSession = createWebSessionImpl(new WebHttpRequestInfo(request));
@@ -160,7 +155,7 @@ public class CBSessionManager implements WebAppSessionManager {
 
                 webSession.setCacheExpired(!httpSession.isNew());
 
-                sessionMap.put(sessionId, new SessionHolder(SessionType.WEB, webSession));
+                sessionMap.put(sessionId, webSession);
             } else {
                 if (!(baseWebSession instanceof WebSession)) {
                     throw new DBWebException("Unexpected session type: " + baseWebSession.getClass().getName());
@@ -219,7 +214,7 @@ public class CBSessionManager implements WebAppSessionManager {
         WebSession webSession;
         synchronized (sessionMap) {
             if (sessionMap.containsKey(sessionId)) {
-                var cachedWebSession = getSessionFromHolder(sessionMap.get(sessionId));
+                var cachedWebSession = sessionMap.get(sessionId);
                 if (!(cachedWebSession instanceof WebSession)) {
                     log.warn("Unexpected session type: " + cachedWebSession.getClass().getName());
                     return null;
@@ -236,7 +231,7 @@ public class CBSessionManager implements WebAppSessionManager {
                     webSession = createWebSessionImpl(requestInfo);
                     restorePreviousUserSession(webSession, oldAuthInfo);
 
-                    sessionMap.put(sessionId, new SessionHolder(SessionType.WEB, webSession));
+                    sessionMap.put(sessionId, webSession);
                     log.debug("Web session restored");
                     return webSession;
                 } catch (DBException e) {
@@ -272,11 +267,6 @@ public class CBSessionManager implements WebAppSessionManager {
     }
 
     @NotNull
-    protected WebSession createWebSessionImpl(@NotNull WebHttpRequestInfo request, @NotNull String sessionId) throws DBException {
-        return new WebSession(sessionId, request, application, getSessionHandlers());
-    }
-
-    @NotNull
     protected Map<String, DBWSessionHandler<WebSession>> getSessionHandlers() {
         return WebHandlerRegistry.getInstance().getSessionHandlers()
             .stream()
@@ -287,7 +277,7 @@ public class CBSessionManager implements WebAppSessionManager {
     @Nullable
     public BaseWebSession getSession(@NotNull String sessionId) {
         synchronized (sessionMap) {
-            return getSessionFromHolder(sessionMap.get(sessionId));
+            return sessionMap.get(sessionId);
         }
     }
 
@@ -296,7 +286,7 @@ public class CBSessionManager implements WebAppSessionManager {
     public WebSession findWebSession(HttpServletRequest request) {
         String sessionId = getSessionId(request);
         synchronized (sessionMap) {
-            var session = getSessionFromHolder(sessionMap.get(sessionId));
+            var session = sessionMap.get(sessionId);
             if (session instanceof WebSession) {
                 return (WebSession) session;
             }
@@ -319,9 +309,8 @@ public class CBSessionManager implements WebAppSessionManager {
     public void expireIdleSessions() {
         List<BaseWebSession> expiredList = new ArrayList<>();
         synchronized (sessionMap) {
-            for (Iterator<SessionHolder> iterator = sessionMap.values().iterator(); iterator.hasNext(); ) {
-                var sessionHolder = iterator.next();
-                var session = sessionHolder.getSession();
+            for (Iterator<BaseWebSession> iterator = sessionMap.values().iterator(); iterator.hasNext(); ) {
+                var session = iterator.next();
                 if (!session.isValid()) {
                     iterator.remove();
                     expiredList.add(session);
@@ -337,11 +326,7 @@ public class CBSessionManager implements WebAppSessionManager {
     @Override
     public Collection<BaseWebSession> getAllActiveSessions() {
         synchronized (sessionMap) {
-            List<BaseWebSession> sessions = new ArrayList<>(sessionMap.size());
-            for (SessionHolder sessionHolder : sessionMap.values()) {
-                sessions.add(sessionHolder.getSession());
-            }
-            return sessions;
+            return new ArrayList<>(sessionMap.values());
         }
     }
 
@@ -360,7 +345,7 @@ public class CBSessionManager implements WebAppSessionManager {
             var sessionId = requestInfo.getId() != null ? requestInfo.getId()
                 : authPermissions.getSessionId();
 
-            var existSession = getSessionFromHolder(sessionMap.get(sessionId));
+            var existSession = sessionMap.get(sessionId);
 
             if (existSession instanceof WebHeadlessSession) {
                 var creds = existSession.getUserContext().getActiveUserCredentials();
@@ -389,7 +374,7 @@ public class CBSessionManager implements WebAppSessionManager {
                 null,
                 authPermissions
             );
-            sessionMap.put(sessionId, new SessionHolder(SessionType.HEADLESS, headlessSession));
+            sessionMap.put(sessionId, headlessSession);
             return headlessSession;
         }
     }
@@ -409,7 +394,7 @@ public class CBSessionManager implements WebAppSessionManager {
             var sessionId = requestInfo.getId() != null ? requestInfo.getId()
                 : authPermissions.getSessionId();
 
-            var existSession = getSessionFromHolder(sessionMap.get(sessionId));
+            var existSession = sessionMap.get(sessionId);
 
             if (existSession instanceof WebSession webSession) {
                 var creds = webSession.getUserContext().getActiveUserCredentials();
@@ -446,7 +431,7 @@ public class CBSessionManager implements WebAppSessionManager {
                 authPermissions
             );
             webSession.refreshUserData();
-            sessionMap.put(sessionId, new SessionHolder(SessionType.WEB, webSession));
+            sessionMap.put(sessionId, webSession);
             return webSession;
         }
     }
@@ -457,7 +442,6 @@ public class CBSessionManager implements WebAppSessionManager {
     public void sendSessionsStates() {
         synchronized (sessionMap) {
             sessionMap.values().parallelStream()
-                .map(SessionHolder::getSession)
                 .filter(session -> {
                     if (session instanceof WebSession webSession) {
                         return webSession.isAuthorizedInSecurityManager();
@@ -482,9 +466,8 @@ public class CBSessionManager implements WebAppSessionManager {
 
     public void closeUserSession(@NotNull WSAbstractEvent event) {
         synchronized (sessionMap) {
-            for (Iterator<SessionHolder> iterator = sessionMap.values().iterator(); iterator.hasNext(); ) {
-                var sessionHolder = iterator.next();
-                var session = sessionHolder.getSession();
+            for (Iterator<BaseWebSession> iterator = sessionMap.values().iterator(); iterator.hasNext(); ) {
+                var session = iterator.next();
                 if (CommonUtils.equalObjects(session.getUserContext().getUserId(), event.getUserId())) {
                     if (session instanceof WebHeadlessSession headlessSession) {
                         headlessSession.addSessionEvent(event);
@@ -498,9 +481,8 @@ public class CBSessionManager implements WebAppSessionManager {
 
     public void closeSessions(@NotNull List<String> smSessionsId) {
         synchronized (sessionMap) {
-            for (Iterator<SessionHolder> iterator = sessionMap.values().iterator(); iterator.hasNext(); ) {
-                var sessionHolder = iterator.next();
-                var session = sessionHolder.getSession();
+            for (Iterator<BaseWebSession> iterator = sessionMap.values().iterator(); iterator.hasNext(); ) {
+                var session = iterator.next();
                 if (smSessionsId.contains(session.getUserContext().getSmSessionId())) {
                     iterator.remove();
                     session.close(false, true);
@@ -514,9 +496,8 @@ public class CBSessionManager implements WebAppSessionManager {
      */
     public void closeAllSessions(@Nullable String initiatorSessionId) {
         synchronized (sessionMap) {
-            for (Iterator<SessionHolder> iterator = sessionMap.values().iterator(); iterator.hasNext(); ) {
-                var sessionHolder = iterator.next();
-                var session = sessionHolder.getSession();
+            for (Iterator<BaseWebSession> iterator = sessionMap.values().iterator(); iterator.hasNext(); ) {
+                var session = iterator.next();
                 iterator.remove();
                 session.close(false, !WSWebUtils.isSessionIdEquals(session, initiatorSessionId));
             }
@@ -529,12 +510,12 @@ public class CBSessionManager implements WebAppSessionManager {
     public WebSession createWebSession(WebHttpRequestInfo requestInfo) throws DBException {
         String id = requestInfo.getId();
         synchronized (sessionMap) {
-            BaseWebSession baseWebSession = getSessionFromHolder(sessionMap.get(id));
+            BaseWebSession baseWebSession = sessionMap.get(id);
             if (baseWebSession instanceof WebSession) {
                 return (WebSession) baseWebSession;
             } else {
                 WebSession webSessionImpl = createWebSessionImpl(requestInfo);
-                sessionMap.put(id, new SessionHolder(SessionType.WEB, webSessionImpl));
+                sessionMap.put(id, webSessionImpl);
                 return webSessionImpl;
             }
         }

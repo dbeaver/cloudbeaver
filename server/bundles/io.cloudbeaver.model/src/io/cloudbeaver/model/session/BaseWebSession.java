@@ -55,6 +55,8 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
     @NotNull
     protected final ServletApplication application;
     protected volatile long lastAccessTime;
+    @NotNull
+    private SessionType sessionType = SessionType.WEB;
 
     private final List<CBWebSessionEventHandler> sessionEventHandlers = new CopyOnWriteArrayList<>();
     private WebSessionEventsFilter eventsFilter;
@@ -174,6 +176,15 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
 
     public long getLastAccessTimeMillis() {
         return lastAccessTime;
+    }
+
+    @NotNull
+    public SessionType getSessionType() {
+        return sessionType;
+    }
+
+    public void setSessionType(@NotNull SessionType sessionType) {
+        this.sessionType = sessionType;
     }
 
     public void touchSession() {

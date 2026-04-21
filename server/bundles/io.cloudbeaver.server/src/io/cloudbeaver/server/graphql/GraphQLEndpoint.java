@@ -59,7 +59,10 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 public class GraphQLEndpoint extends HttpServlet {
@@ -245,10 +248,6 @@ public class GraphQLEndpoint extends HttpServlet {
         String userId = GraphQLLoggerUtil.getUserId(request);
         LocalDateTime startTime = LocalDateTime.now();
 
-        Map<String, Object> mapOfContext = new HashMap<>();
-        mapOfContext.put("request", request);
-        mapOfContext.put("response", response);
-        mapOfContext.put("bindingContext", bindingContext);
         String token = request.getHeader(CBConstants.HEADER_API_TOKEN);
         if (token != null) {
             try {
@@ -269,6 +268,12 @@ public class GraphQLEndpoint extends HttpServlet {
             }
         }
 
+        Map<String, Object> mapOfContext =
+            Map.of(
+                "request", request,
+                "response", response,
+                "bindingContext", bindingContext
+            );
         ExecutionInput.Builder contextBuilder = ExecutionInput.newExecutionInput()
             .graphQLContext(mapOfContext)
             .query(query);
