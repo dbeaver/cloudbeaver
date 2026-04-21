@@ -16,8 +16,6 @@ export default [
   ['app_navigationTree_node_rename_error', 'Si è verificato un errore durante la rinominazione'],
   ['app_navigationTree_settings_state_title', "Salva stato dell'albero"],
   ['app_navigationTree_settings_state_description', "Riapri i nodi espansi dopo l'aggiornamento della pagina"],
-  ['app_navigationTree_settings_folders_title', 'Cartelle'],
-  ['app_navigationTree_settings_folders_description', "Apri qualsiasi nodo come radice dell'albero"],
   ['app_navigationTree_node_empty', 'Vuoto'],
   ['app_navigationTree_node_no_results', 'Siamo spiacenti. Nessun risultato corrispondente per "{arg:filter}"'],
   ['app_navigationTree_node_not_found', 'Nodo non trovato'],
