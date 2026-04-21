@@ -37,7 +37,7 @@ import { ACTION_DATA_GRID_GENERATE_SQL_SELECT_MANY } from '../Actions/GenerateSQ
 import { ACTION_DATA_GRID_GENERATE_SQL_UPDATE } from '../Actions/GenerateSQL/ACTION_DATA_GRID_GENERATE_SQL_UPDATE.js';
 import { MENU_DATA_GRID_GENERATE_SQL } from './GenerateSQL/MENU_DATA_GRID_GENERATE_SQL.js';
 import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
-import { DEFAULT_QUERY_GENERATOR_OPTIONS, GeneratedSqlDialog, SqlGeneratorsResource } from '@cloudbeaver/plugin-sql-generator';
+import { getDefaultQueryGeneratorOptions, GeneratedSqlDialog, SqlGeneratorsResource } from '@cloudbeaver/plugin-sql-generator';
 import { isNotNullDefined } from '@dbeaver/js-helpers';
 
 @injectable(() => [ActionService, MenuService, CommonDialogService, NotificationService, SqlGeneratorsResource])
@@ -144,7 +144,7 @@ export class DataGridContextMenuGenerateSqlService {
         resultId,
         generatorId,
         rows,
-        options: DEFAULT_QUERY_GENERATOR_OPTIONS,
+        options: getDefaultQueryGeneratorOptions(),
       });
 
       if (!query) {
@@ -154,7 +154,7 @@ export class DataGridContextMenuGenerateSqlService {
       await this.commonDialogService.open(GeneratedSqlDialog, {
         query,
         nodeId: connectionId,
-        options: DEFAULT_QUERY_GENERATOR_OPTIONS,
+        options: getDefaultQueryGeneratorOptions(),
         regenerateQuery: options =>
           this.generateQuery({
             projectId,

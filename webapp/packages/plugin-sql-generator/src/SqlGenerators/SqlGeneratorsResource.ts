@@ -16,10 +16,10 @@ import {
 } from '@cloudbeaver/core-sdk';
 
 export const MAX_GENERATORS_LENGTH = 15;
-export const DEFAULT_QUERY_GENERATOR_OPTIONS: SqlQueryGeneratorOptions = {
+export const getDefaultQueryGeneratorOptions = (): SqlQueryGeneratorOptions => ({
   useFullyQualifiedNames: true,
   compactSql: false,
-};
+});
 
 @injectable(() => [GraphQLService, NavNodeInfoResource])
 export class SqlGeneratorsResource extends CachedMapResource<string, SqlQueryGenerator[]> {

@@ -13,7 +13,7 @@ import { getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
 import { MenuBaseItem, MenuService } from '@cloudbeaver/core-view';
 
 import { MENU_SQL_GENERATORS } from './MENU_SQL_GENERATORS.js';
-import { DEFAULT_QUERY_GENERATOR_OPTIONS, SqlGeneratorsResource } from './SqlGeneratorsResource.js';
+import { getDefaultQueryGeneratorOptions, SqlGeneratorsResource } from './SqlGeneratorsResource.js';
 import { NotificationService } from '@cloudbeaver/core-events';
 
 const GeneratedSqlDialog = importLazyComponent(() => import('./GeneratedSqlDialog.js').then(m => m.GeneratedSqlDialog));
@@ -81,11 +81,11 @@ export class SqlGeneratorsBootstrap extends Bootstrap {
                 {
                   onSelect: async () => {
                     try {
-                      const query = await this.sqlGeneratorsResource.generateEntityQuery(action.id, node.id, DEFAULT_QUERY_GENERATOR_OPTIONS);
+                      const query = await this.sqlGeneratorsResource.generateEntityQuery(action.id, node.id, getDefaultQueryGeneratorOptions());
                       await this.commonDialogService.open(GeneratedSqlDialog, {
                         query,
                         nodeId: node.id,
-                        options: DEFAULT_QUERY_GENERATOR_OPTIONS,
+                        options: getDefaultQueryGeneratorOptions(),
                         regenerateQuery: options => this.sqlGeneratorsResource.generateEntityQuery(action.id, node.id, options),
                       });
                     } catch (e: any) {

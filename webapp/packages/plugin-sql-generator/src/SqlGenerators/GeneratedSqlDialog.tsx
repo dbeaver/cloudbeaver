@@ -70,7 +70,21 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<Payload>>(functi
     extensions.set(...sqlDialect);
   }
 
-  async function regenerateQuery() {
+  async function handleOpenInEditor() {
+    try {
+      await sqlEditorNavigatorService.openNewEditor({
+        connectionKey: connection ? createConnectionParam(connection) : undefined,
+        query: state.query,
+      });
+    } catch (error: any) {
+      notificationService.logException(error, 'app_shared_sql_generators_error_open_editor');
+    }
+    rejectDialog();
+  }
+
+  async function handleOptionChange<T extends keyof typeof state>(key: T, value: (typeof state)[T]) {
+    state[key] = value;
+
     state.loading = true;
     try {
       const newQuery = await payload.regenerateQuery({
@@ -83,24 +97,6 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<Payload>>(functi
     } finally {
       state.loading = false;
     }
-  }
-
-  async function handleOpenInEditor() {
-    await sqlEditorNavigatorService.openNewEditor({
-      connectionKey: connection ? createConnectionParam(connection) : undefined,
-      query: state.query,
-    });
-    rejectDialog();
-  }
-
-  async function handleFullyQualifiedNamesChange(value: boolean) {
-    state.useFullyQualifiedNames = value;
-    await regenerateQuery();
-  }
-
-  async function handleCompactSqlChange(value: boolean) {
-    state.compactSql = value;
-    await regenerateQuery();
   }
 
   return (
@@ -121,7 +117,7 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<Payload>>(functi
                 name="useFullyQualifiedNames"
                 disabled={state.loading}
                 label={translate('app_shared_sql_generators_use_fully_qualified_names')}
-                onChange={handleFullyQualifiedNamesChange}
+                onChange={value => handleOptionChange('useFullyQualifiedNames', value)}
               />
 
               <Checkbox
@@ -130,7 +126,7 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<Payload>>(functi
                 name="compactSql"
                 disabled={state.loading}
                 label={translate('app_shared_sql_generators_compact_sql')}
-                onChange={handleCompactSqlChange}
+                onChange={value => handleOptionChange('compactSql', value)}
               />
             </div>
           </div>
