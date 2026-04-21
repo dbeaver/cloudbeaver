@@ -88,13 +88,11 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<Payload>>(functi
   }
 
   async function handleOpenInEditor() {
-    if (connection) {
-      await sqlEditorNavigatorService.openNewEditor({
-        connectionKey: createConnectionParam(connection),
-        query: state.query,
-      });
-      rejectDialog();
-    }
+    await sqlEditorNavigatorService.openNewEditor({
+      connectionKey: connection ? createConnectionParam(connection) : undefined,
+      query: state.query,
+    });
+    rejectDialog();
   }
 
   async function handleFullyQualifiedNamesChange(value: boolean) {
@@ -142,11 +140,9 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<Payload>>(functi
             <Button variant="secondary" disabled={!state.query || state.loading} onClick={() => copy(state.query, true)}>
               {translate('ui_copy_to_clipboard')}
             </Button>
-            {connection && (
-              <Button variant="secondary" disabled={!state.query || state.loading} onClick={handleOpenInEditor}>
-                {translate('app_shared_sql_generators_open_in_editor')}
-              </Button>
-            )}
+            <Button variant="secondary" disabled={!state.query || state.loading} onClick={handleOpenInEditor}>
+              {translate('app_shared_sql_generators_open_in_editor')}
+            </Button>
             <Button onClick={() => rejectDialog()}>{translate('ui_close')}</Button>
           </div>
         </div>
