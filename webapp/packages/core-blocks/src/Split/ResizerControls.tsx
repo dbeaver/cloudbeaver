@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ export const ResizerControls = observer<ResizerControlsProps>(function ResizerCo
   const horizontal = split.state.split === 'horizontal';
 
   return (
-    <Resizer className={s(styles, { resizerControls: true, vertical, horizontal }, className)}>
+    <Resizer className={s(styles, { resizerControls: true, vertical, horizontal }, className)} data-dialog-persistent-element>
       <SplitControls />
     </Resizer>
   );
