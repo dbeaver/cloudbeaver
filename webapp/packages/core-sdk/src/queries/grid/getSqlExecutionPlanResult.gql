@@ -21,10 +21,10 @@ mutation getSqlExecutionPlanResult($taskId: ID!) {
         value
         order
       }
-      hasCost
-      hasRows
-      hasDuration
-      durationMeasure
     }
+    hasCost
+    hasRows
+    hasDuration
+    durationMeasure
   }
 }
