@@ -35,6 +35,7 @@ export const TextValueEditor = observer<Props>(function TextValueEditor({ conten
       readonly={readonly}
       extensions={extensions}
       copyEventHandler={copyEventHandler}
+      autoFocus
       onChange={onChange}
     />
   );
