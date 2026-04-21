@@ -7,7 +7,7 @@
  */
 import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { forwardRef, useEffect } from 'react';
+import { forwardRef, useEffect, useRef } from 'react';
 
 import {
   getComputed,
@@ -76,6 +76,8 @@ export const TableViewer = observer<TableViewerProps, HTMLDivElement>(
     );
     const mergedRef = useMergeRefs(ref, navRef);
 
+    const gridContainerRef = useRef<HTMLDivElement>(null);
+
     const localActions = useObjectRef({
       clearConstraints() {
         const unknownModel = dataModel as any;
@@ -88,6 +90,9 @@ export const TableViewer = observer<TableViewerProps, HTMLDivElement>(
         if (constraints) {
           constraints.deleteAll();
         }
+      },
+      restoreGridFocus() {
+        gridContainerRef.current?.querySelector<HTMLElement>('[aria-selected="true"]')?.focus();
       },
     });
 
@@ -112,7 +117,7 @@ export const TableViewer = observer<TableViewerProps, HTMLDivElement>(
           }
 
           if (id === null) {
-            this.onValuePresentationChange(null);
+            this.closeValuePresentation();
             return;
           }
 
@@ -130,14 +135,18 @@ export const TableViewer = observer<TableViewerProps, HTMLDivElement>(
         },
         switchValuePresentation(id: string | null) {
           if (id === this.valuePresentationId) {
-            this.onValuePresentationChange(null);
+            this.closeValuePresentation();
             return;
           }
 
           this.setValuePresentation(id);
         },
         closeValuePresentation() {
+          if (!this.valuePresentationId) {
+            return;
+          }
           this.onValuePresentationChange(null);
+          localActions.restoreGridFocus();
         },
       }),
       {
@@ -235,7 +244,7 @@ export const TableViewer = observer<TableViewerProps, HTMLDivElement>(
                 disableAutoMargin
               >
                 <Pane className={s(styles, { pane: true })}>
-                  <div className={s(styles, { paneContent: true, grid: true })} tabIndex={0} data-presentation>
+                  <div ref={gridContainerRef} className={s(styles, { paneContent: true, grid: true })} tabIndex={0} data-presentation>
                     <Loader className={s(styles, { loader: true })} suspense>
                       <DataPresentation
                         model={dataModel}
