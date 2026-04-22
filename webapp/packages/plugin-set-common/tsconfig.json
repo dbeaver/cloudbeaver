@@ -251,6 +251,9 @@
       "path": "../plugin-root"
     },
     {
+      "path": "../plugin-script-export"
+    },
+    {
       "path": "../plugin-session-expiration"
     },
     {

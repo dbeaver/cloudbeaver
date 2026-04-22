@@ -3826,6 +3826,30 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@cloudbeaver/plugin-script-export@workspace:*, @cloudbeaver/plugin-script-export@workspace:packages/plugin-script-export":
+  version: 0.0.0-use.local
+  resolution: "@cloudbeaver/plugin-script-export@workspace:packages/plugin-script-export"
+  dependencies:
+    "@cloudbeaver/core-blocks": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-dialogs": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-ui": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
+    "@dbeaver/cli": "workspace:*"
+    "@types/react": "npm:^19"
+    "@types/react-dom": "npm:^19"
+    mobx: "npm:^6"
+    mobx-react-lite: "npm:^4"
+    react: "npm:^19"
+    react-dom: "npm:^19"
+    rimraf: "npm:^6"
+    tslib: "npm:^2"
+    typescript: "npm:^5"
+  languageName: unknown
+  linkType: soft
+
 "@cloudbeaver/plugin-session-expiration@workspace:*, @cloudbeaver/plugin-session-expiration@workspace:packages/plugin-session-expiration":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-session-expiration@workspace:packages/plugin-session-expiration"
@@ -3938,6 +3962,7 @@ __metadata:
     "@cloudbeaver/plugin-resource-manager-administration": "workspace:*"
     "@cloudbeaver/plugin-resource-manager-scripts": "workspace:*"
     "@cloudbeaver/plugin-root": "workspace:*"
+    "@cloudbeaver/plugin-script-export": "workspace:*"
     "@cloudbeaver/plugin-session-expiration": "workspace:*"
     "@cloudbeaver/plugin-settings-administration": "workspace:*"
     "@cloudbeaver/plugin-settings-default-administration": "workspace:*"
@@ -4287,6 +4312,7 @@ __metadata:
     "@cloudbeaver/plugin-codemirror6": "workspace:*"
     "@cloudbeaver/plugin-data-viewer": "workspace:*"
     "@cloudbeaver/plugin-navigation-tabs": "workspace:*"
+    "@cloudbeaver/plugin-script-export": "workspace:*"
     "@cloudbeaver/plugin-sql-editor-codemirror": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
     "@dbeaver/cli": "workspace:*"

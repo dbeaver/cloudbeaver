@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class    SQLQueryTranslatorTest extends CloudbeaverMockTest {
@@ -43,20 +44,20 @@ public class    SQLQueryTranslatorTest extends CloudbeaverMockTest {
             " IS_SECRET_STORAGE CHAR(1) DEFAULT 'Y' NOT NULL," +
             " PRIMARY KEY (SUBJECT_ID));\n";
 
-        Map<SQLDialect, String> expectedSqlByDialect = new HashMap<>();
+        Map<SQLDialect, String> expectedSqlByDialect = new LinkedHashMap<>();
         expectedSqlByDialect.put(new H2SQLDialect(), basicSql);
         expectedSqlByDialect.put(
             new PostgreDialect(),
-            "CREATE TABLE CB_AUTH_SUBJECT (SUBJECT_ID VARCHAR (128) NOT NULL,\n" +
-                "SUBJECT_TYPE VARCHAR (8) NOT NULL,\n" +
-                "IS_SECRET_STORAGE CHAR (1) DEFAULT 'Y' NOT NULL,\n" +
-                "PRIMARY KEY (SUBJECT_ID));\n"
+            "CREATE TABLE CB_AUTH_SUBJECT (SUBJECT_ID VARCHAR (128) NOT NULL," + System.lineSeparator() +
+                "SUBJECT_TYPE VARCHAR (8) NOT NULL," + System.lineSeparator() +
+                "IS_SECRET_STORAGE CHAR (1) DEFAULT 'Y' NOT NULL," + System.lineSeparator() +
+                "PRIMARY KEY (SUBJECT_ID));"
         );
         expectedSqlByDialect.put(new MySQLDialect(),
-            "CREATE TABLE CB_AUTH_SUBJECT (SUBJECT_ID VARCHAR (128) NOT NULL,\n" +
-                "SUBJECT_TYPE VARCHAR (8) NOT NULL,\n" +
-                "IS_SECRET_STORAGE CHAR (1) DEFAULT 'Y' NOT NULL,\n" +
-                "PRIMARY KEY (SUBJECT_ID));\n");
+            "CREATE TABLE CB_AUTH_SUBJECT (SUBJECT_ID VARCHAR (128) NOT NULL," + System.lineSeparator() +
+                "SUBJECT_TYPE VARCHAR (8) NOT NULL," + System.lineSeparator() +
+                "IS_SECRET_STORAGE CHAR (1) DEFAULT 'Y' NOT NULL," + System.lineSeparator() +
+                "PRIMARY KEY (SUBJECT_ID));");
         expectedSqlByDialect.put(new OracleSQLDialect(), basicSql);
         expectedSqlByDialect.put(new SQLServerDialectMssql(), basicSql);
 
@@ -183,13 +184,13 @@ public class    SQLQueryTranslatorTest extends CloudbeaverMockTest {
     public void createTableWithAscii() throws DBException {
         var basicSql = "CREATE TABLE CB_TEST_TYPES (ASCII_COLUMN VARCHAR(128) ASCII NOT NULL);\n";
 
-        Map<SQLDialect, String> expectedSqlByDialect = new HashMap<>();
-        expectedSqlByDialect.put(new H2SQLDialect(), "CREATE TABLE CB_TEST_TYPES (ASCII_COLUMN VARCHAR (128) NOT NULL);\n");
-        expectedSqlByDialect.put(new PostgreDialect(), "CREATE TABLE CB_TEST_TYPES (ASCII_COLUMN VARCHAR (128) NOT NULL);\n");
+        Map<SQLDialect, String> expectedSqlByDialect = new LinkedHashMap<>();
         expectedSqlByDialect.put(
             new MySQLDialect(),
             "CREATE TABLE CB_TEST_TYPES (ASCII_COLUMN VARCHAR (128) CHARACTER SET latin1 NOT NULL);"
         );
+        expectedSqlByDialect.put(new H2SQLDialect(), "CREATE TABLE CB_TEST_TYPES (ASCII_COLUMN VARCHAR (128) NOT NULL);\n");
+        expectedSqlByDialect.put(new PostgreDialect(), "CREATE TABLE CB_TEST_TYPES (ASCII_COLUMN VARCHAR (128) NOT NULL);\n");
         translateAndValidateQueries(basicSql, expectedSqlByDialect);
     }
 

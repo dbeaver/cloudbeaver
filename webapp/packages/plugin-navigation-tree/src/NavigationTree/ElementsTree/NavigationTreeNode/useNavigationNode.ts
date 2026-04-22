@@ -132,10 +132,6 @@ export function useNavigationNode(node: NavNode, path: string[]): INavigationNod
 }
 
 export function isLeaf(node: NavNode, children: string[] | undefined, tree: IElementsTree | undefined, outdated: boolean): boolean {
-  if (node.folder && tree?.settings?.foldersTree) {
-    return false;
-  }
-
   return (
     (!tree?.settings?.showTableContents && node.objectFeatures.includes(EObjectFeature.entity)) ||
     !node.hasChildren ||
