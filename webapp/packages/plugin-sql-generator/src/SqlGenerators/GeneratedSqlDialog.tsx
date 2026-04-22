@@ -17,6 +17,7 @@ import {
   useClipboard,
   useObservableRef,
   useResource,
+  useStateDelay,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
 import { ConnectionDialectResource, ConnectionInfoResource, createConnectionParam } from '@cloudbeaver/core-connections';
@@ -89,6 +90,8 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<Payload>>(functi
     extensions.set(...sqlDialect);
   }
 
+  const visibleLoading = useStateDelay(state.loading, 300);
+
   async function handleOpenInEditor() {
     try {
       await sqlEditorNavigatorService.openNewEditor({
@@ -117,7 +120,7 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<Payload>>(functi
                 id="use-fully-qualified-names"
                 state={state}
                 name="useFullyQualifiedNames"
-                disabled={state.loading}
+                disabled={visibleLoading}
                 label={translate('app_shared_sql_generators_use_fully_qualified_names')}
                 onChange={value => state.handleOptionChange('useFullyQualifiedNames', value)}
               />
@@ -126,17 +129,17 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<Payload>>(functi
                 id="compact-sql"
                 state={state}
                 name="compactSql"
-                disabled={state.loading}
+                disabled={visibleLoading}
                 label={translate('app_shared_sql_generators_compact_sql')}
                 onChange={value => state.handleOptionChange('compactSql', value)}
               />
             </div>
           </div>
           <div className="tw:flex tw:justify-end tw:w-full tw:gap-6">
-            <Button variant="secondary" disabled={!state.query || state.loading} onClick={() => copy(state.query, true)}>
+            <Button variant="secondary" disabled={!state.query || visibleLoading} onClick={() => copy(state.query, true)}>
               {translate('ui_copy_to_clipboard')}
             </Button>
-            <Button variant="secondary" disabled={!state.query || state.loading} onClick={handleOpenInEditor}>
+            <Button variant="secondary" disabled={!state.query || visibleLoading} onClick={handleOpenInEditor}>
               {translate('app_shared_sql_generators_open_in_editor')}
             </Button>
             <Button onClick={() => rejectDialog()}>{translate('ui_close')}</Button>
