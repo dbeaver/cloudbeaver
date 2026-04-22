@@ -187,7 +187,7 @@ export class DataGridContextMenuGenerateSqlService {
     generatorId: SqlResultSetGeneratorId;
     rows: SqlResultRow[];
     options: SqlQueryGeneratorOptions;
-  }): Promise<string | null> {
+  }): Promise<string> {
     const query = await this.sqlGenerationResource.generateResultSetSql({
       projectId,
       connectionId,
@@ -199,11 +199,7 @@ export class DataGridContextMenuGenerateSqlService {
     });
 
     if (!query) {
-      this.notificationService.logError({
-        title: 'data_grid_table_generate_sql_error_title',
-        message: 'data_grid_table_generate_sql_error_no_query',
-      });
-      return null;
+      throw new Error('data_grid_table_generate_sql_error_no_query');
     }
 
     return query;

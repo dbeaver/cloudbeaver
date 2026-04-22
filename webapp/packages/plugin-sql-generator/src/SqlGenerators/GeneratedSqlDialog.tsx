@@ -34,12 +34,13 @@ interface Payload {
   nodeId: string;
   query: string;
   options?: SqlQueryGeneratorOptions;
-  regenerateQuery: (options: SqlQueryGeneratorOptions) => Promise<string | null>;
+  regenerateQuery: (options: SqlQueryGeneratorOptions) => Promise<string>;
 }
 
 export const GeneratedSqlDialog = observer<DialogComponentProps<Payload>>(function GeneratedSqlDialog({ rejectDialog, payload }) {
   const translate = useTranslate();
   const copy = useClipboard();
+  const notificationService = useService(NotificationService);
 
   const state = useObservableRef(
     () => ({
@@ -47,19 +48,37 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<Payload>>(functi
       compactSql: payload.options?.compactSql ?? false,
       query: payload.query,
       loading: false,
+      handleOptionChange: async function handleOptionChange<T extends keyof typeof state>(key: T, value: (typeof state)[T]) {
+        this[key] = value;
+        this.loading = true;
+
+        try {
+          this.query = await this.payload.regenerateQuery({
+            compactSql: this.compactSql,
+            useFullyQualifiedNames: this.useFullyQualifiedNames,
+          });
+        } catch (error: any) {
+          this.notificationService.logException(error, 'app_shared_sql_generators_error_title');
+        } finally {
+          this.loading = false;
+        }
+      },
     }),
     {
+      handleOptionChange: observable.ref,
       useFullyQualifiedNames: observable.ref,
       compactSql: observable.ref,
       query: observable.ref,
       loading: observable.ref,
     },
-    false,
+    {
+      payload,
+      notificationService,
+    },
   );
 
   const connectionInfoResource = useService(ConnectionInfoResource);
   const sqlEditorNavigatorService = useService(SqlEditorNavigatorService);
-  const notificationService = useService(NotificationService);
   const connection = connectionInfoResource.getConnectionForNode(payload.nodeId);
 
   const connectionDialectResource = useResource(GeneratedSqlDialog, ConnectionDialectResource, connection ? createConnectionParam(connection) : null);
@@ -76,26 +95,9 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<Payload>>(functi
         connectionKey: connection ? createConnectionParam(connection) : undefined,
         query: state.query,
       });
+      rejectDialog();
     } catch (error: any) {
       notificationService.logException(error, 'app_shared_sql_generators_error_open_editor');
-    }
-    rejectDialog();
-  }
-
-  async function handleOptionChange<T extends keyof typeof state>(key: T, value: (typeof state)[T]) {
-    state[key] = value;
-
-    state.loading = true;
-    try {
-      const newQuery = await payload.regenerateQuery({
-        compactSql: state.compactSql,
-        useFullyQualifiedNames: state.useFullyQualifiedNames,
-      });
-      state.query = newQuery ?? '';
-    } catch (error: any) {
-      notificationService.logException(error, 'app_shared_sql_generators_error_title');
-    } finally {
-      state.loading = false;
     }
   }
 
@@ -117,7 +119,7 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<Payload>>(functi
                 name="useFullyQualifiedNames"
                 disabled={state.loading}
                 label={translate('app_shared_sql_generators_use_fully_qualified_names')}
-                onChange={value => handleOptionChange('useFullyQualifiedNames', value)}
+                onChange={value => state.handleOptionChange('useFullyQualifiedNames', value)}
               />
 
               <Checkbox
@@ -126,7 +128,7 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<Payload>>(functi
                 name="compactSql"
                 disabled={state.loading}
                 label={translate('app_shared_sql_generators_compact_sql')}
-                onChange={value => handleOptionChange('compactSql', value)}
+                onChange={value => state.handleOptionChange('compactSql', value)}
               />
             </div>
           </div>
