@@ -8,7 +8,12 @@
 import { action, computed, type IReactionDisposer, observable } from 'mobx';
 
 import { ConfirmationDialog, getComputed, useExecutor, useObservableRef, useResource } from '@cloudbeaver/core-blocks';
-import { ConnectionDialectResource, ConnectionExecutionContextService, createConnectionParam } from '@cloudbeaver/core-connections';
+import {
+  ConnectionDialectResource,
+  ConnectionExecutionContextService,
+  ConnectionInfoResource,
+  createConnectionParam,
+} from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -40,6 +45,7 @@ interface ISQLEditorDataPrivate extends ISQLEditorData {
   readonly sqlEditorSettingsService: SqlEditorSettingsService;
   readonly commonDialogService: CommonDialogService;
   readonly sqlResultTabsService: SqlResultTabsService;
+  readonly connectionInfoResource: ConnectionInfoResource;
   readonly getLastAutocomplete: LastPromiseGetter<SqlCompletionProposal[]>;
   readonly parseScript: LastPromiseGetter<SqlScriptInfoFragment>;
 
@@ -64,6 +70,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
   const commonDialogService = useService(CommonDialogService);
   const sqlEditorSettingsService = useService(SqlEditorSettingsService);
   const sqlEditorModelService = useService(SqlEditorModelService);
+  const connectionInfoResource = useService(ConnectionInfoResource);
 
   const model = sqlEditorModelService.getOrCreate(state);
 
@@ -135,7 +142,14 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
 
       async getHintProposals(this: ISQLEditorDataPrivate, position, simple) {
         const executionContext = this.model.dataSource?.executionContext;
+
         if (!executionContext) {
+          return [];
+        }
+
+        const connectionKey = createConnectionParam(executionContext.projectId, executionContext.connectionId);
+
+        if (!this.connectionInfoResource.isConnected(connectionKey)) {
           return [];
         }
 
@@ -361,6 +375,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
       notificationService,
       commonDialogService,
       sqlEditorSettingsService,
+      connectionInfoResource,
     },
   );
 
