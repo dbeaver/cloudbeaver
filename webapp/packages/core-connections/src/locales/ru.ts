@@ -86,4 +86,5 @@ export default [
   ['core_connections_settings_disable_description', 'Отключить возможность создания новых подключений'],
   ['core_connections_connection_driver_not_installed', 'Драйвер не установлен'],
   ['core_connections_connection_temporary', 'Временное подключение'],
+  ['core_connections_no_connection', 'Отсутствует подключение'],
 ];

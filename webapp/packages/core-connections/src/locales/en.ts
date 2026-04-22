@@ -80,4 +80,5 @@ export default [
   ['core_connections_settings_disable_description', 'Disable the ability to create new connections'],
   ['core_connections_connection_driver_not_installed', 'Driver is not installed'],
   ['core_connections_connection_temporary', 'Temporary connection'],
+  ['core_connections_no_connection', 'No connection'],
 ];
