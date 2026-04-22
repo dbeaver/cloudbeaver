@@ -26,7 +26,7 @@ import { useCodemirrorExtensions } from '@cloudbeaver/plugin-codemirror6';
 import { SqlEditorNavigatorService } from '@cloudbeaver/plugin-sql-editor-navigation-tab';
 import { SQLCodeEditor, useSqlDialectExtension } from '@cloudbeaver/plugin-sql-editor-codemirror';
 
-import { observable } from 'mobx';
+import { action, observable } from 'mobx';
 import { NotificationService } from '@cloudbeaver/core-events';
 import type { SqlQueryGeneratorOptions } from '@cloudbeaver/core-sdk';
 
@@ -65,7 +65,7 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<Payload>>(functi
       },
     }),
     {
-      handleOptionChange: observable.ref,
+      handleOptionChange: action.bound,
       useFullyQualifiedNames: observable.ref,
       compactSql: observable.ref,
       query: observable.ref,
