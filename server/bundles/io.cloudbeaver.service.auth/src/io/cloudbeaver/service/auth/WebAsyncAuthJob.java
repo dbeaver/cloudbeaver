@@ -46,6 +46,7 @@ public class WebAsyncAuthJob extends AbstractCancelableJob {
     protected IStatus run(@NotNull DBRProgressMonitor monitor) {
         return null;
     }
+
     @NotNull
     public String getAuthId() {
         return authId;
