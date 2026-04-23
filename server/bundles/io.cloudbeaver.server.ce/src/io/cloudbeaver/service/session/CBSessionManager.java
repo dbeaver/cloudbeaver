@@ -217,7 +217,6 @@ public class CBSessionManager implements WebAppSessionManager {
                 sessionMap.put(newSessionId, webSession);
             }
         }
-        log.debug("Session ID rotated after authentication ('" + oldSessionId + "' -> '" + newSessionId + "')");
     }
 
     /**
