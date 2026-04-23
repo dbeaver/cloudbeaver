@@ -96,6 +96,7 @@ export function useGridSelectedCellsPaste(
 
         const updates = targets.filter(key => tableData.isCellEditable(key)).map(key => ({ key, value }));
         tableData.editor.setMany(updates);
+        return;
       }
 
       const [first] = targets;

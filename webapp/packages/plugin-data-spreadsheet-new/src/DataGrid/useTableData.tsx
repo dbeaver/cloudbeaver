@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { action, computed, observable } from 'mobx';
+import { computed, observable } from 'mobx';
 
 import { useObservableRef } from '@cloudbeaver/core-blocks';
 import {
@@ -179,7 +179,6 @@ export function useTableData(
       editor: observable.ref,
       view: observable.ref,
       gridDIVElement: observable.ref,
-      isCellEditable: action.bound,
     },
     {
       formatting,
