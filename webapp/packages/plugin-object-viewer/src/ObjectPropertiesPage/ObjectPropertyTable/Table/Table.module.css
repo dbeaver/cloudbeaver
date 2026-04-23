@@ -13,6 +13,10 @@
   justify-content: space-between;
 }
 
+.container :global(.rdg-search-container) {
+  overflow: auto;
+}
+
 .dataGrid {
   width: 100%;
   height: 100%;

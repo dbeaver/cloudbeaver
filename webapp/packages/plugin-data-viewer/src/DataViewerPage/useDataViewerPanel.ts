@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -57,18 +57,29 @@ export function useDataViewerPanel(tab: ITab<IObjectViewerTabState>) {
 
         model = dataViewerTableService.create(connectionInfo, node);
         tab.handlerState.tableId = model.id;
+
+        let pageState = dataViewerTabService.page.getState(tab);
+
+        if (!pageState) {
+          dataViewerTabService.page.setState(tab, {
+            resultIndex: 0,
+            presentationId: '',
+            valuePresentationId: null,
+            persistedState: {},
+          });
+          pageState = dataViewerTabService.page.getState(tab)!;
+        }
+
+        model.source.loadPersistedState(pageState.persistedState);
+
+        const presentation = dataPresentationService.get(pageState.presentationId);
+
+        if (presentation?.dataFormat !== undefined) {
+          model.setDataFormat(presentation.dataFormat);
+        }
+
         model.source.setOutdated();
         dataViewerDataChangeConfirmationService.trackTableDataUpdate(model.id);
-
-        const pageState = dataViewerTabService.page.getState(tab);
-
-        if (pageState) {
-          const presentation = dataPresentationService.get(pageState.presentationId);
-
-          if (presentation?.dataFormat !== undefined) {
-            model.setDataFormat(presentation.dataFormat);
-          }
-        }
       }
 
       if (node?.name) {
