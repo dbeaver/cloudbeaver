@@ -8,13 +8,12 @@
 
 $mdc-theme-primary: #2a7cb4;
 $mdc-theme-on-primary: #ffffff;
-$mdc-theme-secondary: hsl(240deg, 10%, 13%);
-$mdc-theme-on-secondary: #cbcbcb;
-
+$mdc-theme-secondary: hsl(240deg, 10%, 11%);
+$mdc-theme-on-secondary: #d6d6d6;
 $mdc-theme-sub-secondary: hsl(240deg, 10%, 18%);
 $mdc-theme-on-sub-secondary: #cbcbcb;
 
-$mdc-theme-surface: hsl(240deg, 10%, 16%);
+$mdc-theme-surface: hsl(240deg, 10%, 14%);
 $mdc-theme-on-surface: #ffffff;
 $mdc-theme-background: hsl(240deg, 10%, 25%);
 $mdc-theme-error: #e94948;
@@ -30,7 +29,7 @@ $link-color-focus: #3f96d1;
 
 $input-color: $mdc-theme-on-secondary;
 $input-color-disabled: darken($input-color, 10%);
-$input-color-placeholder: darken($input-color, 35%);
+$input-color-placeholder: darken($input-color, 20%);
 $input-color-readonly: darken($input-color, 5%);
 $input-border: #585958;
 $input-border-disabled: darken($input-border, 10%);
@@ -42,11 +41,11 @@ $input-background-readonly: #3e3e3e;
 $mdc-theme-text-colors: (
   dark: (
     primary: white,
-    secondary: rgba(white, 0.7),
-    sub-secondary: rgba(white, 0.7),
-    hint: rgba(white, 0.55),
-    disabled: rgba(white, 0.45),
-    icon: rgba(white, 0.45),
+    secondary: rgba(white, 0.75),
+    sub-secondary: rgba(white, 0.75),
+    hint: rgba(white, 0.6),
+    disabled: rgba(white, 0.45), 
+    icon: rgba(white, 0.5),
     negative: $color-negative,
   ),
   light: (
