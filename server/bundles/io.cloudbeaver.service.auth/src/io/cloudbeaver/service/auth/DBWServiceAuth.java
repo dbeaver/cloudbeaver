@@ -57,7 +57,6 @@ public interface DBWServiceAuth extends DBWService {
 
     @WebAction(authRequired = false)
     WebAsyncAuthTaskResult federatedAuthTaskResult(
-        @NotNull HttpServletRequest httpRequest,
         @NotNull WebSession webSession,
         @NotNull String taskId
     ) throws DBWebException;

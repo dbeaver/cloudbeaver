@@ -46,7 +46,6 @@ public class WebServiceBindingAuth extends WebServiceBindingBase<DBWServiceAuth>
                 CommonUtils.toBoolean(getArgument(env, "forceSessionsLogout"))
             ))
             .dataFetcher("federatedAuthTaskResult", env -> getService(env).federatedAuthTaskResult(
-                GraphQLEndpoint.getServletRequestOrThrow(env),
                 getWebSession(env, false),
                 getArgumentVal(env, "taskId")
             ))
