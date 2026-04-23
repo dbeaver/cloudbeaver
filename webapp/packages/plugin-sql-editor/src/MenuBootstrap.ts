@@ -280,8 +280,12 @@ export class MenuBootstrap extends Bootstrap {
         }
 
         switch (action) {
-          case ACTION_SQL_EDITOR_FORMAT:
-            return data.isDisabled || data.isScriptEmpty || data.readonly;
+          case ACTION_SQL_EDITOR_FORMAT: {
+            const context = data.model.dataSource?.executionContext;
+            const connection = context ? this.connectionInfoResource.get(createConnectionParam(context.projectId, context.connectionId)) : null;
+
+            return data.isDisabled || data.isScriptEmpty || data.readonly || !connection?.connected;
+          }
         }
 
         return false;
