@@ -33,7 +33,6 @@ public class WebAsyncAuthJob extends AbstractCancelableJob {
     //to get auth result
     @Nullable
     private List<WebAuthInfo> authResult;
-    private boolean sessionRotated;
 
     public WebAsyncAuthJob(@NotNull String name, @NotNull String authId, boolean linkWithUser) {
         super(name);
@@ -63,14 +62,6 @@ public class WebAsyncAuthJob extends AbstractCancelableJob {
 
     public void setAuthResult(@Nullable List<WebAuthInfo> authResult) {
         this.authResult = authResult;
-    }
-
-    public boolean isSessionRotated() {
-        return sessionRotated;
-    }
-
-    public void setSessionRotated(boolean sessionRotated) {
-        this.sessionRotated = sessionRotated;
     }
 
 }

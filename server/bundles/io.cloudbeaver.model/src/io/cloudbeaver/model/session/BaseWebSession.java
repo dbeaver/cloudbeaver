@@ -48,7 +48,7 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
     private static final Log log = Log.getLog(BaseWebSession.class);
 
     @NotNull
-    protected final String id;
+    protected volatile String id;
     protected final long createTime;
     @NotNull
     protected final WebUserContext userContext;
@@ -159,6 +159,10 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
     @Property
     public String getSessionId() {
         return id;
+    }
+
+    public void setSessionId(@NotNull String id) {
+        this.id = id;
     }
 
     @NotNull

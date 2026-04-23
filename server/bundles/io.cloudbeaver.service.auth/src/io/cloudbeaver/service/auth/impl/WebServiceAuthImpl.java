@@ -161,9 +161,6 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
         List<WebAuthInfo> userTokens = job.getAuthResult();
         if (CommonUtils.isEmpty(userTokens)) {
             userTokens = List.of();
-        } else if (!job.isSessionRotated()) {
-            CBApplication.getInstance().getSessionManager().rotateSessionId(httpRequest);
-            job.setSessionRotated(true);
         }
         return new WebAsyncAuthTaskResult(userTokens);
     }

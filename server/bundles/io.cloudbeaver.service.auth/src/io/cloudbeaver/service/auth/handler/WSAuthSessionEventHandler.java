@@ -35,6 +35,7 @@ import org.jkiss.dbeaver.model.auth.SMAuthInfo;
 import org.jkiss.dbeaver.model.auth.SMAuthStatus;
 import org.jkiss.dbeaver.model.websocket.WSEventHandler;
 import org.jkiss.dbeaver.model.websocket.event.session.WSAuthEvent;
+import org.jkiss.utils.CommonUtils;
 
 import java.util.List;
 
@@ -88,6 +89,9 @@ public class WSAuthSessionEventHandler implements WSEventHandler<WSAuthEvent> {
                         linkCredentialsWithActiveUser
                     ).authenticateSession();
                     relatedJob.setAuthResult(newInfos);
+                    if (!CommonUtils.isEmpty(newInfos)) {
+                        webSession.markPendingSessionRotation();
+                    }
                 } catch (DBException e) {
                     webSession.addSessionError(e);
                     relatedTask.setJobError(e);

@@ -213,6 +213,7 @@ public class CBSessionManager implements WebAppSessionManager {
         synchronized (sessionMap) {
             BaseWebSession webSession = sessionMap.remove(oldSessionId);
             if (webSession != null) {
+                webSession.setSessionId(newSessionId);
                 sessionMap.put(newSessionId, webSession);
             }
         }
@@ -303,15 +304,17 @@ public class CBSessionManager implements WebAppSessionManager {
 
     @Override
     @Nullable
-    public WebSession findWebSession(HttpServletRequest request) {
+    public WebSession findWebSession(@NotNull HttpServletRequest request) {
         String sessionId = getSessionId(request);
+        WebSession webSession;
         synchronized (sessionMap) {
             var session = sessionMap.get(sessionId);
-            if (session instanceof WebSession) {
-                return (WebSession) session;
-            }
-            return null;
+            webSession = (session instanceof WebSession) ? (WebSession) session : null;
         }
+        if (webSession != null && webSession.isPendingSessionRotation()) {
+            rotateSessionId(request);
+        }
+        return webSession;
     }
 
     @Override

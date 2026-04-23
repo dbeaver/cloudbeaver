@@ -63,6 +63,7 @@ import java.nio.file.Path;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -84,6 +85,7 @@ public class WebSession extends BaseWebSession
     public static String RUNTIME_PARAM_AUTH_INFOS = "auth-infos";
     public static String RUNTIME_PARAM_CLIENT_ORIGIN = "client-origin";
     private final AtomicInteger taskCount = new AtomicInteger();
+    private final AtomicBoolean pendingSessionRotation = new AtomicBoolean(false);
 
     private final String lastRemoteAddr;
     private String lastRemoteUserAgent;
@@ -186,6 +188,14 @@ public class WebSession extends BaseWebSession
 
     public void setCacheExpired(boolean cacheExpired) {
         this.cacheExpired = cacheExpired;
+    }
+
+    public void markPendingSessionRotation() {
+        pendingSessionRotation.set(true);
+    }
+
+    public boolean isPendingSessionRotation() {
+        return pendingSessionRotation.compareAndSet(true, false);
     }
 
     public WebUser getUser() {
