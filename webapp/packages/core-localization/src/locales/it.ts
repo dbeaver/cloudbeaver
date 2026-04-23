@@ -146,6 +146,8 @@ export default [
   ['ui_documentaion', 'Documentation'],
   ['ui_deny', 'Nega'],
   ['ui_allow', 'Consenti'],
+  ['ui_decline', 'Declina'],
+  ['ui_declined', 'Declinato'],
 
   ['root_permission_denied', 'Non hai i permessi'],
   ['app_root_session_expire_warning_title', 'La sessione sta per scadere'],
