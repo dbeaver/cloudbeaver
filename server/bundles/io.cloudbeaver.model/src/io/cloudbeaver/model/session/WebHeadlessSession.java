@@ -31,8 +31,7 @@ public class WebHeadlessSession extends BaseWebSession {
         @NotNull String id,
         @NotNull ServletAuthApplication application
     ) throws DBException {
-        super(id, application);
-        setSessionType(SessionType.HEADLESS);
+        super(id, application, SessionType.HEADLESS);
     }
 
     @Override
