@@ -40,6 +40,10 @@ public class WebSQLExecutionPlan {
         this.plan = plan;
     }
 
+    public DBCPlan getPlan() {
+        return plan;
+    }
+
     public String getQuery() {
         return plan.getQueryString();
     }
