@@ -30,12 +30,12 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class CBJettyWebSocketManager {
     private static final Log log = Log.getLog(CBJettyWebSocketManager.class);
-    private static final Map<String, List<CBEventsWebSocket>> socketBySessionId = new ConcurrentHashMap<>();
+    private static final Map<String, List<CBAbstractWebSocket>> socketBySessionId = new ConcurrentHashMap<>();
 
     private CBJettyWebSocketManager() {
     }
 
-    public static void registerWebSocket(@NotNull String webSessionId, @NotNull CBEventsWebSocket webSocket) {
+    public static void registerWebSocket(@NotNull String webSessionId, @NotNull CBAbstractWebSocket webSocket) {
         socketBySessionId.computeIfAbsent(webSessionId, key -> new CopyOnWriteArrayList<>()).add(webSocket);
     }
 
@@ -57,7 +57,7 @@ public class CBJettyWebSocketManager {
                 entry -> {
                     var sessionId = entry.getKey();
                     var webSockets = entry.getValue();
-                    for (CBEventsWebSocket webSocket : webSockets) {
+                    for (CBAbstractWebSocket webSocket : webSockets) {
                         try {
                             webSocket.getSession().getBasicRemote().sendPing(
                                 ByteBuffer.wrap("cb-ping".getBytes(StandardCharsets.UTF_8))

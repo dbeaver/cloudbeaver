@@ -9,6 +9,7 @@ Bundle-RequiredExecutionEnvironment: JavaSE-21
 Bundle-ActivationPolicy: lazy
 Require-Bundle: org.apache.commons.jexl,
  org.jkiss.dbeaver.model.sql;visibility:=reexport,
+ org.jkiss.dbeaver.model.lsp,
  org.jkiss.dbeaver.data.gis,
  org.jkiss.bundle.jetty.server;visibility:=reexport,
  org.jkiss.bundle.graphql;visibility:=reexport,
@@ -16,7 +17,8 @@ Require-Bundle: org.apache.commons.jexl,
  org.jkiss.dbeaver.net.ssh,
  io.cloudbeaver.model;visibility:=reexport,
  io.cloudbeaver.model.cli,
- io.cloudbeaver.service.security;visibility:=reexport
+ io.cloudbeaver.service.security;visibility:=reexport,
+ org.eclipse.lsp4j.websocket.jakarta
 Export-Package: io.cloudbeaver,
  io.cloudbeaver.model,
  io.cloudbeaver.model.app,
@@ -30,9 +32,11 @@ Export-Package: io.cloudbeaver,
  io.cloudbeaver.server.jobs,
  io.cloudbeaver.server.servlets,
  io.cloudbeaver.server.websockets,
+ io.cloudbeaver.server.websockets.lsp,
  io.cloudbeaver.service,
  io.cloudbeaver.service.navigator,
  io.cloudbeaver.service.sql
-Import-Package: org.slf4j
+Import-Package: org.slf4j,
+  jakarta.websocket
 Bundle-Localization: OSGI-INF/l10n/bundle
 Automatic-Module-Name: io.cloudbeaver.server
