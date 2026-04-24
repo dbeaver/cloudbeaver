@@ -404,11 +404,11 @@ export class SqlEditorTabService extends Bootstrap {
     return true;
   }
 
-  async setConnectionId(tab: ITab<ISqlEditorTabState>, connectionKey: IConnectionInfoParams, catalogId?: string, schemaId?: string) {
+  async setConnectionId(tab: ITab<ISqlEditorTabState>, connectionKey: IConnectionInfoParams | null, catalogId?: string, schemaId?: string) {
     const state = await this.sqlEditorService.setConnection(tab.handlerState, connectionKey, catalogId, schemaId);
 
     if (state) {
-      this.attachToProject(tab, connectionKey.projectId);
+      this.attachToProject(tab, connectionKey?.projectId ?? null);
     }
 
     return state;

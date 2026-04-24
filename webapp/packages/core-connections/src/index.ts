@@ -32,6 +32,7 @@ export * from './NavTree/isConnectionNode.js';
 
 export * from './extensions/IConnectionProvider.js';
 export * from './extensions/IConnectionSetter.js';
+export * from './extensions/IConnectionRequiredProvider.js';
 export * from './ConnectionFolderEventHandler.js';
 export * from './ConnectionsManagerService.js';
 export * from './ConnectionFolderResource.js';

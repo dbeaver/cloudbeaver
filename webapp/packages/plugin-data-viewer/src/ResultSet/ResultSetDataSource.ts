@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { makeObservable, observable } from 'mobx';
+import { autorun, type IReactionDisposer, makeObservable, observable } from 'mobx';
 
 import type { IConnectionExecutionContext, IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
 import type { IServiceProvider } from '@cloudbeaver/core-di';
@@ -16,7 +16,11 @@ import type { GraphQLService, SqlRowIdentifier, SqlRowIdentifierState } from '@c
 import { DatabaseDataSource } from '../DatabaseDataModel/DatabaseDataSource.js';
 import { type IDatabaseDataOptions } from '../DatabaseDataModel/IDatabaseDataOptions.js';
 import type { IDatabaseResultSet } from '../DatabaseDataModel/IDatabaseResultSet.js';
-import { DatabaseDataConstraintAction } from '../DatabaseDataModel/Actions/DatabaseDataConstraintAction.js';
+import {
+  applyPersistedDataFilterConstraints,
+  DatabaseDataConstraintAction,
+  persistDataFilterConstraints,
+} from '../DatabaseDataModel/Actions/DatabaseDataConstraintAction.js';
 import { DocumentDataAction } from '../DatabaseDataModel/Actions/Document/DocumentDataAction.js';
 import { DocumentEditAction } from '../DatabaseDataModel/Actions/Document/DocumentEditAction.js';
 import { IDatabaseDataCacheAction } from '../DatabaseDataModel/Actions/IDatabaseDataCacheAction.js';
@@ -39,10 +43,13 @@ export interface IRowIdentifierInfo {
   identifier: SqlRowIdentifier | null;
 }
 
-export abstract class ResultSetDataSource<TOptions = IDatabaseDataOptions> extends DatabaseDataSource<TOptions, IDatabaseResultSet> {
+export abstract class ResultSetDataSource<TOptions extends IDatabaseDataOptions = IDatabaseDataOptions>
+  extends DatabaseDataSource<TOptions, IDatabaseResultSet>
+{
   executionContext: IConnectionExecutionContext | null;
   totalCountRequestTask: ITask<number> | null;
   private keepExecutionContextOnDispose: boolean;
+  private readonly persistConstraintsDisposer: IReactionDisposer;
 
   constructor(
     override readonly serviceProvider: IServiceProvider,
@@ -71,6 +78,12 @@ export abstract class ResultSetDataSource<TOptions = IDatabaseDataOptions> exten
       totalCountRequestTask: observable.ref,
       executionContext: observable,
     });
+
+    this.persistConstraintsDisposer = autorun(() => persistDataFilterConstraints(this));
+  }
+
+  protected override onPersistedStateLoaded(): void {
+    applyPersistedDataFilterConstraints(this);
   }
 
   override isReadonly(resultIndex: number): boolean {
@@ -147,6 +160,7 @@ export abstract class ResultSetDataSource<TOptions = IDatabaseDataOptions> exten
   }
 
   override async dispose(): Promise<void> {
+    this.persistConstraintsDisposer();
     await super.dispose();
     if (this.keepExecutionContextOnDispose) {
       await this.closeResults(this.results);
@@ -226,6 +240,8 @@ export abstract class ResultSetDataSource<TOptions = IDatabaseDataOptions> exten
   }
 }
 
-export function isResultSetDataSource<T = IDatabaseDataOptions>(dataSource: any): dataSource is ResultSetDataSource<T> {
+export function isResultSetDataSource<T extends IDatabaseDataOptions = IDatabaseDataOptions>(
+  dataSource: unknown,
+): dataSource is ResultSetDataSource<T> {
   return dataSource instanceof ResultSetDataSource;
 }
