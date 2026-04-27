@@ -9,5 +9,5 @@
 .blobFormatter {
   display: flex;
   align-items: center;
-  color: var(--theme-primary);
+  color: #348ECC;
 }
