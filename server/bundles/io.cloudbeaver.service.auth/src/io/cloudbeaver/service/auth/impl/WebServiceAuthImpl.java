@@ -68,7 +68,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
     @Override
     public WebAuthStatus authLogin(
         @NotNull HttpServletRequest httpRequest,
-        @NotNull WebSession webSession,
+        @NotNull WebSession inputWebSession,
         @NotNull String providerId,
         @Nullable String providerConfigurationId,
         @Nullable Map<String, Object> authParameters,
@@ -77,7 +77,8 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
     ) throws DBWebException {
         try {
             // Rotate web session during each login attempt to prevent session fixation attacks
-            webSession = CBApplication.getInstance().getSessionManager().rotateSession(httpRequest, webSession);
+            WebSession webSession = CBApplication.getInstance().getSessionManager()
+                .rotateSession(httpRequest, inputWebSession);
 
             var smAuthInfo = initiateAuthentication(webSession, providerId, providerConfigurationId, authParameters, forceSessionsLogout);
             //TODO deprecated, use asyncAuthLogin for federated auth, exits for backward compatibility
@@ -102,14 +103,15 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
     @Override
     public WebAsyncAuthStatus federatedLogin(
         @NotNull HttpServletRequest httpRequest,
-        @NotNull WebSession webSession,
+        @NotNull WebSession inputWebSession,
         @NotNull String providerId,
         @Nullable String providerConfigurationId,
         boolean linkWithActiveUser,
         boolean forceSessionsLogout
     ) throws DBWebException {
         // Rotate web session during each login attempt to prevent session fixation attacks
-        webSession = CBApplication.getInstance().getSessionManager().rotateSession(httpRequest, webSession);
+        WebSession webSession = CBApplication.getInstance().getSessionManager()
+            .rotateSession(httpRequest, inputWebSession);
 
         WebAuthProviderDescriptor providerDescriptor = WebAuthProviderRegistry.getInstance().getAuthProvider(providerId);
         if (providerDescriptor == null) {
