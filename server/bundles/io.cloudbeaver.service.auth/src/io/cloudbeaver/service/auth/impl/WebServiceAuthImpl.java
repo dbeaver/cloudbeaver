@@ -76,6 +76,9 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
         boolean forceSessionsLogout
     ) throws DBWebException {
         try {
+            // Rotate web session during each login attempt to prevent session fixation attacks
+            webSession = CBApplication.getInstance().getSessionManager().rotateSession(httpRequest, webSession);
+
             var smAuthInfo = initiateAuthentication(webSession, providerId, providerConfigurationId, authParameters, forceSessionsLogout);
             //TODO deprecated, use asyncAuthLogin for federated auth, exits for backward compatibility
             linkWithActiveUser = linkWithActiveUser && CBApplication.getInstance().getAppConfiguration()
@@ -87,7 +90,6 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
                 //run it sync
                 var authProcessor = new WebSessionAuthProcessor(webSession, smAuthInfo, linkWithActiveUser);
                 List<WebAuthInfo> authInfos = authProcessor.authenticateSession();
-                CBApplication.getInstance().getSessionManager().rotateSessionId(httpRequest);
                 return new WebAuthStatus(smAuthInfo.getAuthStatus(), authInfos);
             }
         } catch (SMTooManySessionsException e) {
@@ -106,6 +108,9 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
         boolean linkWithActiveUser,
         boolean forceSessionsLogout
     ) throws DBWebException {
+        // Rotate web session during each login attempt to prevent session fixation attacks
+        webSession = CBApplication.getInstance().getSessionManager().rotateSession(httpRequest, webSession);
+
         WebAuthProviderDescriptor providerDescriptor = WebAuthProviderRegistry.getInstance().getAuthProvider(providerId);
         if (providerDescriptor == null) {
             throw new DBWebException("Provider '" + providerId + "' not found");
@@ -264,7 +269,6 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
                     }
                 }
             }
-            CBApplication.getInstance().getSessionManager().rotateSessionId(httpRequest);
             return new WebLogoutInfo(logoutUrls);
         } catch (DBException e) {
             throw new DBWebException("User logout failed", e);

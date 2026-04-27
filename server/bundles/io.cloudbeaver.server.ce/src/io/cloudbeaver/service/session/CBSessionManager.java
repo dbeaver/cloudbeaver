@@ -200,23 +200,38 @@ public class CBSessionManager implements WebAppSessionManager {
     }
 
     /**
-     * Rotates the session ID after successful authentication to prevent session fixation attacks.
+     * Invalidates the current HTTP session, creates a new one, and binds a new {@link WebSession} to it.
      */
-    public void rotateSessionId(@NotNull HttpServletRequest request) {
-        HttpSession oldSession = request.getSession(false);
-        if (oldSession == null) {
-            log.debug("No HTTP session present, skipping session ID rotation");
-            return;
+    public WebSession rotateSession(
+        @NotNull HttpServletRequest request,
+        @NotNull WebSession webSession
+    ) throws DBWebException {
+        HttpSession oldHttpSession = request.getSession(false);
+        if (oldHttpSession != null) {
+            oldHttpSession.invalidate();
         }
-        String oldSessionId = oldSession.getId();
-        String newSessionId = request.changeSessionId();
+        String newSessionId = request.getSession(true).getId();
+
+        String locale = webSession.getLocale();
+        String remoteAddr = webSession.getLastRemoteAddr();
+        String remoteUserAgent = webSession.getLastRemoteUserAgent();
+        var requestInfo = new WebHttpRequestInfo(newSessionId, locale, remoteAddr, remoteUserAgent);
+        WebSession newWebSession = null;
+        try {
+            newWebSession = createWebSessionImpl(requestInfo);
+        } catch (DBException e) {
+            throw new DBWebException(e);
+        }
+        webSession.migrateEventHandlersTo(newWebSession);
+        String oldSessionId = webSession.getSessionId();
         synchronized (sessionMap) {
-            BaseWebSession webSession = sessionMap.remove(oldSessionId);
-            if (webSession != null) {
-                webSession.setSessionId(newSessionId);
-                sessionMap.put(newSessionId, webSession);
-            }
+            sessionMap.remove(oldSessionId);
+            sessionMap.put(newSessionId, newWebSession);
         }
+        webSession.close(false, false);
+
+        log.debug("Session rotated '" + oldSessionId + "' -> '" + newSessionId + "'");
+        return newWebSession;
     }
 
     /**
@@ -309,9 +324,6 @@ public class CBSessionManager implements WebAppSessionManager {
         synchronized (sessionMap) {
             var session = sessionMap.get(sessionId);
             webSession = (session instanceof WebSession) ? (WebSession) session : null;
-        }
-        if (webSession != null && webSession.isPendingSessionRotation()) {
-            rotateSessionId(request);
         }
         return webSession;
     }

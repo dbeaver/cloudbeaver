@@ -48,7 +48,7 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
     private static final Log log = Log.getLog(BaseWebSession.class);
 
     @NotNull
-    protected volatile String id;
+    protected final String id;
     protected final long createTime;
     @NotNull
     protected final WebUserContext userContext;
@@ -116,6 +116,13 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
         }
     }
 
+    public void migrateEventHandlersTo(@NotNull BaseWebSession target) {
+        synchronized (sessionEventHandlers) {
+            sessionEventHandlers.forEach(target::addEventHandler);
+            sessionEventHandlers.clear();
+        }
+    }
+
     public boolean updateSMSession(SMAuthInfo smAuthInfo) throws DBException {
         return userContext.refresh(smAuthInfo);
     }
@@ -159,10 +166,6 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
     @Property
     public String getSessionId() {
         return id;
-    }
-
-    public void setSessionId(@NotNull String id) {
-        this.id = id;
     }
 
     @NotNull
