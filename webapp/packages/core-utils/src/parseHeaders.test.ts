@@ -69,6 +69,16 @@ describe('textToHeaders', () => {
   test('should allow empty values', () => {
     expect(textToHeaders('X-Empty=')).toEqual({ 'X-Empty': '' });
   });
+
+  test('should trim whitespace from values (textarea input normalization)', () => {
+    // Trimming on parse is intentional — textarea input may have surrounding whitespace.
+    // Note: serialize→parse is NOT a lossless roundtrip for values with leading/trailing spaces.
+    expect(textToHeaders('X-Pad=  value  ')).toEqual({ 'X-Pad': 'value' });
+  });
+
+  test('should keep last value when a key appears multiple times', () => {
+    expect(textToHeaders('X-Key=first\nX-Key=second')).toEqual({ 'X-Key': 'second' });
+  });
 });
 
 describe('headersToText', () => {
