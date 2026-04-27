@@ -455,7 +455,8 @@ public class CBSessionManager implements WebAppSessionManager {
      */
     public void sendSessionsStates() {
         synchronized (sessionMap) {
-            sessionMap.values().parallelStream()
+            sessionMap.values()
+                .parallelStream()
                 .filter(session -> {
                     if (session instanceof WebSession webSession) {
                         return webSession.isAuthorizedInSecurityManager();
@@ -482,7 +483,8 @@ public class CBSessionManager implements WebAppSessionManager {
         synchronized (sessionMap) {
             for (Iterator<BaseWebSession> iterator = sessionMap.values().iterator(); iterator.hasNext(); ) {
                 var session = iterator.next();
-                if (CommonUtils.equalObjects(session.getUserContext().getUserId(), event.getUserId())) {
+                if (CommonUtils.equalObjects(session.getUserContext().getUserId(),
+                    event.getUserId())) {
                     if (session instanceof WebHeadlessSession headlessSession) {
                         headlessSession.addSessionEvent(event);
                     }
