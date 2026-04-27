@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -59,6 +59,7 @@ export const SplitControls: React.FC = function SplitControls() {
       data-s-split={split.state.split}
       data-s-mode={inverseMode}
       className={s(styles, { container: true, inverse })}
+      data-dialog-persistent-element
       onMouseDown={split.state.onMouseDown}
       onTouchStart={split.state.onTouchStart}
       onTouchEnd={split.state.onTouchEnd}
