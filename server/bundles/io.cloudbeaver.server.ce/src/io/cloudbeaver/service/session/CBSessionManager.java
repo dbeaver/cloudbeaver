@@ -216,7 +216,7 @@ public class CBSessionManager implements WebAppSessionManager {
         String remoteAddr = webSession.getLastRemoteAddr();
         String remoteUserAgent = webSession.getLastRemoteUserAgent();
         var requestInfo = new WebHttpRequestInfo(newSessionId, locale, remoteAddr, remoteUserAgent);
-        WebSession newWebSession = null;
+        WebSession newWebSession;
         try {
             newWebSession = createWebSessionImpl(requestInfo);
         } catch (DBException e) {

@@ -76,9 +76,12 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
         boolean forceSessionsLogout
     ) throws DBWebException {
         try {
-            // Rotate web session during each login attempt to prevent session fixation attacks
-            WebSession webSession = CBApplication.getInstance().getSessionManager()
-                .rotateSession(httpRequest, inputWebSession);
+            WebSession webSession = inputWebSession;
+            if (inputWebSession.getUser() == null) {
+                // Rotate anonymous web sessions during login attempts to prevent session fixation attacks.
+                webSession = CBApplication.getInstance().getSessionManager()
+                    .rotateSession(httpRequest, inputWebSession);
+            }
 
             var smAuthInfo = initiateAuthentication(webSession, providerId, providerConfigurationId, authParameters, forceSessionsLogout);
             //TODO deprecated, use asyncAuthLogin for federated auth, exits for backward compatibility
@@ -109,9 +112,12 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
         boolean linkWithActiveUser,
         boolean forceSessionsLogout
     ) throws DBWebException {
-        // Rotate web session during each login attempt to prevent session fixation attacks
-        WebSession webSession = CBApplication.getInstance().getSessionManager()
-            .rotateSession(httpRequest, inputWebSession);
+        WebSession webSession = inputWebSession;
+        if (inputWebSession.getUser() == null) {
+            // Rotate anonymous web sessions during login attempts to prevent session fixation attacks.
+            webSession = CBApplication.getInstance().getSessionManager()
+                .rotateSession(httpRequest, inputWebSession);
+        }
 
         WebAuthProviderDescriptor providerDescriptor = WebAuthProviderRegistry.getInstance().getAuthProvider(providerId);
         if (providerDescriptor == null) {
