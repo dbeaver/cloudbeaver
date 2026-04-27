@@ -71,7 +71,7 @@ export const MenuActionElement = registry(
           value={label}
           checked={checked}
           style={{ pointerEvents: 'auto' }}
-          render={renderMenuItem({ icon: <Radio checked={checked} size="small" /> })}
+          render={renderMenuItem({ icon: <span style={{ pointerEvents: 'none' }}><Radio checked={checked} size="small" /></span> })}
           focusable
           onClick={handleClick}
         />
@@ -90,7 +90,7 @@ export const MenuActionElement = registry(
           value={label}
           checked={checked}
           style={{ pointerEvents: 'auto' }}
-          render={renderMenuItem({ icon: <Checkbox checked={checked} size="small" /> })}
+          render={renderMenuItem({ icon: <span style={{ pointerEvents: 'none' }}><Checkbox checked={checked} size="small" /></span> })}
           focusable
           onClick={handleClick}
         />
