@@ -72,7 +72,4 @@ public interface WebAppSessionManager {
     default void expireIdleSessions() {
 
     }
-
-    @NotNull
-    WebSession getWebSessionByToken(@NotNull HttpServletRequest request, @NotNull String token) throws DBException;
 }

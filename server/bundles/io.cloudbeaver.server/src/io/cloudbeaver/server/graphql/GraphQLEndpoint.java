@@ -32,8 +32,6 @@ import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.model.apilog.ApiCallInterceptor;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.registry.WebServiceRegistry;
-import io.cloudbeaver.server.CBConstants;
-import io.cloudbeaver.server.WebAppSessionManager;
 import io.cloudbeaver.server.WebAppUtils;
 import io.cloudbeaver.service.DBWBindingContext;
 import io.cloudbeaver.service.DBWServiceBindingGraphQL;
@@ -45,7 +43,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
-import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.utils.MimeTypes;
@@ -243,29 +240,11 @@ public class GraphQLEndpoint extends HttpServlet {
         @Nullable String operationName
     ) throws IOException {
 
-
-        WebAppSessionManager sessionManager = WebAppUtils.getWebApplication().getSessionManager();
         String userId = GraphQLLoggerUtil.getUserId(request);
         LocalDateTime startTime = LocalDateTime.now();
 
-        String token = request.getHeader(CBConstants.HEADER_API_TOKEN);
-        if (token != null) {
-            try {
-                sessionManager.getWebSessionByToken(request, token);
-            } catch (DBException e) {
-                log.error("Error obtaining web session by token", e);
-                DBWebException webException = new DBWebException(
-                    "Error obtaining web session by token: " + e.getMessage(),
-                    DBWebException.ERROR_CODE_AUTH_REQUIRED,
-                    e
-                );
-                ExecutionResult executionResult = ExecutionResult.newExecutionResult()
-                    .addError(webException)
-                    .build();
-                notifyApiCallInterceptor(request, variables, operationName, userId, startTime, webException.getMessage());
-                writeExecutionResult(request, response, executionResult);
-                return;
-            }
+        if (isQueryHandledBeforeExecution(request, response, variables, operationName, userId, startTime)) {
+            return;
         }
 
         Map<String, Object> mapOfContext =
@@ -306,7 +285,18 @@ public class GraphQLEndpoint extends HttpServlet {
         }
     }
 
-    private void writeExecutionResult(
+    protected boolean isQueryHandledBeforeExecution(
+        @NotNull HttpServletRequest request,
+        @NotNull HttpServletResponse response,
+        @Nullable Map<String, Object> variables,
+        @Nullable String operationName,
+        @Nullable String userId,
+        @NotNull LocalDateTime startTime
+    ) throws IOException {
+        return false;
+    }
+
+    protected void writeExecutionResult(
         @NotNull HttpServletRequest request,
         @NotNull HttpServletResponse response,
         @NotNull ExecutionResult executionResult
@@ -318,7 +308,7 @@ public class GraphQLEndpoint extends HttpServlet {
         response.getWriter().print(resString);
     }
 
-    private void notifyApiCallInterceptor(
+    protected void notifyApiCallInterceptor(
         @NotNull HttpServletRequest request,
         @Nullable Map<String, Object> variables,
         @Nullable String operationName,

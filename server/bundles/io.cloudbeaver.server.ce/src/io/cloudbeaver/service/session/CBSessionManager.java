@@ -540,9 +540,4 @@ public class CBSessionManager implements WebAppSessionManager {
         session.close();
     }
 
-    @NotNull
-    @Override
-    public WebSession getWebSessionByToken(@NotNull HttpServletRequest request, @NotNull String token) throws DBException {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
 }
