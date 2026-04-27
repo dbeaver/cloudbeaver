@@ -202,6 +202,7 @@ public class CBSessionManager implements WebAppSessionManager {
     /**
      * Invalidates the current HTTP session, creates a new one, and binds a new {@link WebSession} to it.
      */
+    @NotNull
     public WebSession rotateSession(
         @NotNull HttpServletRequest request,
         @NotNull WebSession webSession

@@ -104,6 +104,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
     }
 
     @Override
+    @NotNull
     public WebAsyncAuthStatus federatedLogin(
         @NotNull HttpServletRequest httpRequest,
         @NotNull WebSession inputWebSession,
