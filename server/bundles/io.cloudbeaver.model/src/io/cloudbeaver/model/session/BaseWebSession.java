@@ -116,6 +116,13 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
         }
     }
 
+    public void migrateEventHandlersTo(@NotNull BaseWebSession target) {
+        synchronized (sessionEventHandlers) {
+            sessionEventHandlers.forEach(target::addEventHandler);
+            sessionEventHandlers.clear();
+        }
+    }
+
     public boolean updateSMSession(SMAuthInfo smAuthInfo) throws DBException {
         return userContext.refresh(smAuthInfo);
     }
