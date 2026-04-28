@@ -23,10 +23,10 @@
     --dbv-kit-btn-secondary-background: transparent;
     --dbv-kit-btn-secondary-background-hover: color-mix(in srgb, transparent, var(--theme-primary) 10%);
     --dbv-kit-btn-secondary-background-active: color-mix(in srgb, transparent, var(--theme-primary) 20%);
-    --dbv-kit-btn-secondary-foreground: var(--theme-link-color);
-    --dbv-kit-btn-secondary-foreground-hover: var(--theme-link-color);
-    --dbv-kit-btn-secondary-foreground-active: var(--theme-link-color);
-    --dbv-kit-btn-secondary-border-color: var(--theme-link-color);
+    --dbv-kit-btn-secondary-foreground: #2674ab;
+    --dbv-kit-btn-secondary-foreground-hover: #297ebb;
+    --dbv-kit-btn-secondary-foreground-active: #2674ab;
+    --dbv-kit-btn-secondary-border-color: #2674ab;
 
     --dbv-kit-btn-danger-background: var(--theme-negative);
     --dbv-kit-btn-danger-background-hover: color-mix(in srgb, var(--theme-negative), white 10%);
@@ -52,5 +52,10 @@
   .theme-dark .dbv-kit-button {
     --dbv-kit-control-disabled-foreground: #ffffff5e;
     --dbv-kit-control-disabled-background: #ffffff1f;
+
+    --dbv-kit-btn-secondary-foreground: #2e8dd1;
+    --dbv-kit-btn-secondary-foreground-hover: #59adea;
+    --dbv-kit-btn-secondary-foreground-active: #2e8dd1;
+    --dbv-kit-btn-secondary-border-color: #2e8dd1;
   }
 }
