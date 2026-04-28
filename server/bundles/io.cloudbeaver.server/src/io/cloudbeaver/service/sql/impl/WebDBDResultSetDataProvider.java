@@ -25,10 +25,7 @@ import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.DBUtils;
-import org.jkiss.dbeaver.model.data.DBDAttributeBinding;
-import org.jkiss.dbeaver.model.data.DBDResultSetDataProvider;
-import org.jkiss.dbeaver.model.data.DBDRowIdentifier;
-import org.jkiss.dbeaver.model.data.DBDValueRow;
+import org.jkiss.dbeaver.model.data.*;
 import org.jkiss.dbeaver.model.data.hints.DBDValueHintContext;
 import org.jkiss.dbeaver.model.exec.DBCExecutionContext;
 import org.jkiss.dbeaver.model.struct.DBSEntity;
@@ -122,9 +119,14 @@ public class WebDBDResultSetDataProvider implements DBDResultSetDataProvider, DB
         @NotNull DBDAttributeBinding attribute,
         @NotNull DBDValueRow row,
         @Nullable int[] rowIndexes,
+        @Nullable ResultSetValuePath valuePath,
         boolean retrieveDeepestCollectionElement
     ) throws DBWebException {
-        return DBUtils.getAttributeValue(attribute, getAttributes(), row.getValues());
+        if (valuePath != null) {
+            return DBUtils.getRowValueByPath(row, valuePath);
+        } else {
+            return DBUtils.getAttributeValue(attribute, getAttributes(), row.getValues());
+        }
     }
 
     @Nullable
