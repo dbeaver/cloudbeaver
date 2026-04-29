@@ -72,6 +72,11 @@ input SQLDataFilter {
     orderBy: String
 }
 
+type SQLResultColumnReference {
+    associationName: String!
+    targetEntityName: String
+}
+
 type SQLResultColumn {
     position: Int!
     name: String
@@ -95,6 +100,9 @@ type SQLResultColumn {
 
     "Operations supported for this attribute"
     supportedOperations: [DataTypeLogicalOperation!]!
+
+    "Foreign key references available for this column"
+    references: [SQLResultColumnReference!]!
 
     "Description of the column"
     description: String @since(version: "25.1.3")
@@ -448,6 +456,19 @@ extend type Mutation {
         containerNodePath: ID!,
         resultId: ID,
         filter: SQLDataFilter,
+        dataFormat: ResultDataFormat
+    ): AsyncTaskInfo!
+
+    "Creates async task for reading referenced data by foreign key cell"
+    asyncSqlNavigateForeignKey(
+        projectId: ID,
+        connectionId: ID!,
+        contextId: ID!,
+        resultsId: ID!,
+        columnIndex: Int!,
+        row: SQLResultRow!,
+        associationName: String,
+        resultId: ID,
         dataFormat: ResultDataFormat
     ): AsyncTaskInfo!
 

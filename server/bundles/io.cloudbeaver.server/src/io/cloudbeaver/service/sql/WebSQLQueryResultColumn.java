@@ -24,6 +24,12 @@ import org.jkiss.dbeaver.model.data.DBDAttributeBinding;
 import org.jkiss.dbeaver.model.exec.DBCLogicalOperator;
 import org.jkiss.dbeaver.model.exec.DBExecUtils;
 import org.jkiss.dbeaver.model.meta.Property;
+import org.jkiss.dbeaver.model.struct.DBSEntityAssociation;
+import org.jkiss.dbeaver.model.struct.DBSEntityReferrer;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Web SQL query resultset.
@@ -128,6 +134,21 @@ public class WebSQLQueryResultColumn {
     @Property
     public DBCLogicalOperator[] getSupportedOperations() {
         return attrMeta.getValueHandler().getSupportedOperators(attrMeta);
+    }
+
+    @Property
+    public List<WebSQLQueryResultColumnReference> getReferences() {
+        List<DBSEntityReferrer> referrers = attrMeta.getReferrers();
+        if (referrers == null || referrers.isEmpty()) {
+            return Collections.emptyList();
+        }
+        List<WebSQLQueryResultColumnReference> references = new ArrayList<>();
+        for (DBSEntityReferrer referrer : referrers) {
+            if (referrer instanceof DBSEntityAssociation) {
+                references.add(new WebSQLQueryResultColumnReference((DBSEntityAssociation) referrer));
+            }
+        }
+        return references;
     }
 
     @Override

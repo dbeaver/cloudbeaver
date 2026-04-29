@@ -232,6 +232,17 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL>
                     getDataFilter(env),
                     getDataFormat(env)
                 ))
+            .dataFetcher("asyncSqlNavigateForeignKey", env ->
+                getService(env).asyncNavigateForeignKey(
+                    getWebSession(env),
+                    getSQLContext(env),
+                    getArgumentVal(env, "resultsId"),
+                    getArgumentVal(env, "columnIndex"),
+                    new WebSQLResultsRow(getArgument(env, "row")),
+                    getArgument(env, "associationName"),
+                    getArgument(env, "resultId"),
+                    getDataFormat(env)
+                ))
             .dataFetcher("asyncSqlExecuteResults", env ->
                 getService(env).asyncGetQueryResults(
                     getWebSession(env), getArgumentVal(env, "taskId")

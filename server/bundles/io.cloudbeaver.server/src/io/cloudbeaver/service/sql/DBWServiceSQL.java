@@ -126,6 +126,17 @@ public interface DBWServiceSQL extends DBWService {
         @Nullable WebSQLDataFilter filter,
         @Nullable WebDataFormat dataFormat) throws DBWebException;
 
+    @WebAction
+    WebAsyncTaskInfo asyncNavigateForeignKey(
+        @NotNull WebSession webSession,
+        @NotNull WebSQLContextInfo contextInfo,
+        @NotNull String resultsId,
+        @NotNull Integer columnIndex,
+        @NotNull WebSQLResultsRow row,
+        @Nullable String associationName,
+        @Nullable String resultId,
+        @Nullable WebDataFormat dataFormat) throws DBException;
+
     /**
      * Reads dynamic trace from provided database results.
      */

@@ -36,6 +36,8 @@ import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.DBUtils;
 import org.jkiss.dbeaver.model.data.DBDAttributeBinding;
+import org.jkiss.dbeaver.model.data.DBDReferenceNavigation;
+import org.jkiss.dbeaver.model.data.DBDReferenceUtils;
 import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.exec.DBCLogicalOperator;
 import org.jkiss.dbeaver.model.exec.DBExecUtils;
@@ -59,9 +61,7 @@ import org.jkiss.dbeaver.model.sql.registry.SQLGeneratorDescriptor;
 import org.jkiss.dbeaver.model.sql.semantics.completion.SQLCompletionProposalComparator;
 import org.jkiss.dbeaver.model.sql.semantics.completion.SQLQueryCompletionAnalyzer;
 import org.jkiss.dbeaver.model.sql.semantics.completion.SQLQueryCompletionContext;
-import org.jkiss.dbeaver.model.struct.DBSDataContainer;
-import org.jkiss.dbeaver.model.struct.DBSObject;
-import org.jkiss.dbeaver.model.struct.DBSWrapper;
+import org.jkiss.dbeaver.model.struct.*;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.utils.RuntimeUtils;
 import org.jkiss.utils.CommonUtils;
@@ -601,6 +601,86 @@ public class WebServiceSQL implements DBWServiceSQL {
             }
         };
         return contextInfo.getProcessor().getWebSession().createAndRunAsyncTask("Read data from container " + nodePath, runnable);
+    }
+
+    @Override
+    public WebAsyncTaskInfo asyncNavigateForeignKey(
+        @NotNull WebSession webSession,
+        @NotNull WebSQLContextInfo contextInfo,
+        @NotNull String resultsId,
+        @NotNull Integer columnIndex,
+        @NotNull WebSQLResultsRow row,
+        @Nullable String associationName,
+        @Nullable String resultId,
+        @Nullable WebDataFormat dataFormat
+    ) {
+        WebAsyncTaskProcessor<String> runnable = new WebAsyncTaskProcessor<>() {
+            @Override
+            public void run(DBRProgressMonitor monitor) throws InvocationTargetException {
+                try {
+                    monitor.beginTask("Navigate foreign key", 1);
+                    //Get bindings
+                    WebSQLResultsInfo resultsInfo = contextInfo.getResults(resultsId);
+                    DBDAttributeBinding[] attributes = resultsInfo.getAttributes();
+                    if (columnIndex < 0 || columnIndex >= attributes.length) {
+                        throw new DBWebException("Column index '" + columnIndex + "' is out of range");
+                    }
+                    DBDAttributeBinding attribute = attributes[columnIndex];
+                    // Get association
+                    List<DBSEntityReferrer> referrers = attribute.getReferrers();
+                    if (CommonUtils.isEmpty(referrers)) {
+                        throw new DBException("Association not found in attribute [" + attribute.getName() + "]");
+                    }
+                    DBSEntityAssociation association = null;
+                    for (DBSEntityReferrer referrer : referrers) {
+                        if (referrer instanceof DBSEntityAssociation) {
+                            DBSEntityAssociation referrerAssociation = (DBSEntityAssociation) referrer;
+                            if (CommonUtils.isEmpty(associationName) ||
+                                CommonUtils.equalObjects(associationName, referrerAssociation.getName())) {
+                                association = referrerAssociation;
+                                break;
+                            }
+                        }
+                    }
+                    if (association == null) {
+                        if (CommonUtils.isEmpty(associationName)) {
+                            throw new DBException("Association not found in attribute [" + attribute.getName() + "]");
+                        }
+                        throw new DBException("Association '" + associationName + "' not found in attribute [" + attribute.getName() + "]");
+                    }
+
+                    WebDBDResultSetDataProvider dataProvider = new WebDBDResultSetDataProvider(
+                        resultsId,
+                        contextInfo,
+                        List.of(row)
+                    );
+                    DBDReferenceNavigation navigation = DBDReferenceUtils.resolveAssociationNavigation(
+                        monitor,
+                        dataProvider,
+                        association,
+                        dataProvider.getSelectedRows()
+                    );
+                    if (!(navigation.getTargetEntity() instanceof DBSDataContainer targetDataContainer)) {
+                        throw new DBWebException("Referenced entity '" + navigation.getTargetEntity().getName() + "' is not a data container");
+                    }
+                    WebSQLExecuteInfo executeResults = contextInfo.getProcessor().readDataFromContainer(
+                        contextInfo,
+                        monitor,
+                        targetDataContainer,
+                        resultId,
+                        WebSQLDataFilter.from(navigation.getTargetFilter()),
+                        dataFormat
+                    );
+                    this.result = executeResults.getStatusMessage();
+                    this.extendedResults = executeResults;
+                } catch (Throwable e) {
+                    throw new InvocationTargetException(e);
+                } finally {
+                    monitor.done();
+                }
+            }
+        };
+        return webSession.createAndRunAsyncTask("Navigate foreign key from results " + resultsId, runnable);
     }
 
     @NotNull
