@@ -4351,6 +4351,7 @@ __metadata:
     "@cloudbeaver/plugin-data-viewer": "workspace:*"
     "@cloudbeaver/plugin-sql-editor": "workspace:*"
     "@cloudbeaver/plugin-sql-editor-codemirror": "workspace:*"
+    "@cloudbeaver/plugin-sql-editor-navigation-tab": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
     "@dbeaver/cli": "workspace:*"
     "@types/react": "npm:^19"

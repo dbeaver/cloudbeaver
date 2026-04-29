@@ -155,6 +155,8 @@ export default [
   ['ui_documentaion', 'Tài liệu'],
   ['ui_deny', 'Từ chối'],
   ['ui_allow', 'Cho phép'],
+  ['ui_decline', 'Từ chối'],
+  ['ui_declined', 'Đã từ chối'],
 
   ['root_permission_denied', 'Bạn không có quyền'],
   ['root_permission_no_permission', 'Bạn không có quyền thực hiện hành động này'],
