@@ -89,4 +89,4 @@ export * from './bindFunctions.js';
 export * from './isNumber.js';
 export * from './getSubjectDifferences.js';
 export * from './downloadImage.js';
-export * from './postForBlob.js';
+export * from './submitForm.js';
