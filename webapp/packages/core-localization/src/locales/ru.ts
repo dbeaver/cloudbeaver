@@ -152,6 +152,8 @@ export default [
   ['ui_documentaion', 'Документация'],
   ['ui_deny', 'Отклонить'],
   ['ui_allow', 'Разрешить'],
+  ['ui_decline', 'Отклонить'],
+  ['ui_declined', 'Отклонено'],
 
   ['root_permission_denied', 'Отказано в доступе'],
   ['root_permission_no_permission', 'У вас нет разрешения на это действие'],

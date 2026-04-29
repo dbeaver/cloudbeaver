@@ -29,9 +29,7 @@ export const Expandable = observer(function Expandable({ label, defaultExpanded,
           {typeof label === 'string' ? <h2 className="theme-typography--body2 disclosure-label">{label}</h2> : label}
         </Disclosure>
         <DisclosureContent>
-          <div>
-            <div className={clsx('disclosure-content-inner', className)}> {children}</div>
-          </div>
+          <div className={clsx('disclosure-content-inner', className)}>{children}</div>
         </DisclosureContent>
       </DisclosureProvider>
     </div>
