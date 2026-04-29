@@ -152,6 +152,8 @@ export default [
   ['ui_documentaion', '文档'],
   ['ui_deny', '拒绝'],
   ['ui_allow', '允许'],
+  ['ui_decline', '拒绝'],
+  ['ui_declined', '已拒绝'],
 
   ['root_permission_denied', '您没有权限'],
   ['root_permission_no_permission', '您没有权限执行此操作'],
