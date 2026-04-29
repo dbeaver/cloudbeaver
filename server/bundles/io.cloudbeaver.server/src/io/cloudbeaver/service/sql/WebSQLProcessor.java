@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2025 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -415,13 +415,14 @@ public class WebSQLProcessor implements WebSessionProvider {
                 monitor, resultsInfo, rowIdentifier, updatedRows, deletedRows, addedRows, resultBatches, keyReceiver);
 
             DBCExecutionContext executionContext = getExecutionContext(dataManipulator);
+            boolean skipAutoCommitToggle = executionContext.getDataSource() instanceof DBCNativeBatchAutoCommit;
             try (DBCSession session = executionContext.openSession(monitor, DBCExecutionPurpose.USER, "Update data in container")) {
                 DBCTransactionManager txnManager = DBUtils.getTransactionManager(executionContext);
                 boolean revertToAutoCommit = false;
                 DBCSavepoint savepoint = null;
                 if (txnManager != null) {
                     isAutoCommitEnabled = txnManager.isAutoCommit();
-                    if (txnManager.isSupportsTransactions() && isAutoCommitEnabled) {
+                    if (txnManager.isSupportsTransactions() && isAutoCommitEnabled && !skipAutoCommitToggle) {
                         txnManager.setAutoCommit(monitor, false);
                         revertToAutoCommit = true;
                     }
@@ -447,11 +448,13 @@ public class WebSQLProcessor implements WebSessionProvider {
                         newResultSetRows.add(new WebSQLQueryResultSetRow(rowValues, null));
                     }
 
-                    if (txnManager != null && txnManager.isSupportsTransactions() && isAutoCommitEnabled) {
+                    if (txnManager != null && txnManager.isSupportsTransactions() &&
+                        isAutoCommitEnabled && !skipAutoCommitToggle
+                    ) {
                         txnManager.commit(session);
                     }
                 } catch (Exception e) {
-                    if (txnManager != null && txnManager.isSupportsTransactions()) {
+                    if (txnManager != null && txnManager.isSupportsTransactions() && !skipAutoCommitToggle) {
                         txnManager.rollback(session, savepoint);
                     }
                     throw new DBCException("Error persisting data changes", e);
