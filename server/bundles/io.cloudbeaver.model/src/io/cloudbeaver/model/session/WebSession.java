@@ -111,17 +111,8 @@ public class WebSession extends BaseWebSession
         @NotNull ServletAuthApplication application,
         @NotNull Map<String, DBWSessionHandler<WebSession>> sessionHandlers
     ) throws DBException {
-        this(Objects.requireNonNull(requestInfo.getId()), requestInfo, application, sessionHandlers);
-    }
-
-    public WebSession(
-        @NotNull String sessionId,
-        @NotNull WebHttpRequestInfo requestInfo,
-        @NotNull ServletAuthApplication application,
-        @NotNull Map<String, DBWSessionHandler<WebSession>> sessionHandlers
-    ) throws DBException {
         this(
-            sessionId,
+            Objects.requireNonNull(requestInfo.getId()),
             CommonUtils.toString(requestInfo.getLocale()),
             application,
             sessionHandlers,
