@@ -468,7 +468,6 @@ extend type Mutation {
         columnIndex: Int!,
         row: SQLResultRow!,
         associationName: String,
-        resultId: ID,
         dataFormat: ResultDataFormat
     ): AsyncTaskInfo!
 

@@ -134,7 +134,6 @@ public interface DBWServiceSQL extends DBWService {
         @NotNull Integer columnIndex,
         @NotNull WebSQLResultsRow row,
         @Nullable String associationName,
-        @Nullable String resultId,
         @Nullable WebDataFormat dataFormat) throws DBException;
 
     /**

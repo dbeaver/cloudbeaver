@@ -611,7 +611,6 @@ public class WebServiceSQL implements DBWServiceSQL {
         @NotNull Integer columnIndex,
         @NotNull WebSQLResultsRow row,
         @Nullable String associationName,
-        @Nullable String resultId,
         @Nullable WebDataFormat dataFormat
     ) {
         WebAsyncTaskProcessor<String> runnable = new WebAsyncTaskProcessor<>() {
@@ -667,7 +666,7 @@ public class WebServiceSQL implements DBWServiceSQL {
                         contextInfo,
                         monitor,
                         targetDataContainer,
-                        resultId,
+                        null,
                         WebSQLDataFilter.from(navigation.getTargetFilter()),
                         dataFormat
                     );
