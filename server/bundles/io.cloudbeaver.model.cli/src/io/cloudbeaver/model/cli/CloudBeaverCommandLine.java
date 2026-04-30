@@ -57,7 +57,7 @@ public class CloudBeaverCommandLine extends ApplicationCommandLine<ApplicationIn
         @Nullable ApplicationInstanceController applicationInstanceController,
         @NotNull CLIContextImpl context,
         @NotNull CLIRunMeta runMeta,
-        List<CLICommandDescriptor> commandsToExecute
+        @NotNull List<CLICommandDescriptor> commandsToExecute
     ) {
         var cmd = super.initCommandLine(applicationInstanceController, context, runMeta, commandsToExecute);
         cmd.addMixin("cloudbeaver", mixin);
