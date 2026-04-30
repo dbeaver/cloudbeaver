@@ -8,7 +8,7 @@
 import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { SqlResultSetGeneratorId, type SqlResultRow } from '@cloudbeaver/core-sdk';
+import { SqlResultSetGeneratorId, type SqlQueryGeneratorOptions, type SqlResultRow } from '@cloudbeaver/core-sdk';
 import { ActionService, MenuService, type IAction } from '@cloudbeaver/core-view';
 import {
   DATA_CONTEXT_DV_DDM,
@@ -37,7 +37,7 @@ import { ACTION_DATA_GRID_GENERATE_SQL_SELECT_MANY } from '../Actions/GenerateSQ
 import { ACTION_DATA_GRID_GENERATE_SQL_UPDATE } from '../Actions/GenerateSQL/ACTION_DATA_GRID_GENERATE_SQL_UPDATE.js';
 import { MENU_DATA_GRID_GENERATE_SQL } from './GenerateSQL/MENU_DATA_GRID_GENERATE_SQL.js';
 import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
-import { GeneratedSqlDialog, SqlGeneratorsResource } from '@cloudbeaver/plugin-sql-generator';
+import { getDefaultQueryGeneratorOptions, GeneratedSqlDialog, SqlGeneratorsResource } from '@cloudbeaver/plugin-sql-generator';
 import { isNotNullDefined } from '@dbeaver/js-helpers';
 
 @injectable(() => [ActionService, MenuService, CommonDialogService, NotificationService, SqlGeneratorsResource])
@@ -137,30 +137,72 @@ export class DataGridContextMenuGenerateSqlService {
     }
 
     try {
-      const query = await this.sqlGenerationResource.generateResultSetSql({
+      const query = await this.generateQuery({
         projectId,
         connectionId,
         contextId,
-        resultsId: resultId,
+        resultId,
         generatorId,
-        selectedRows: rows,
+        rows,
+        options: getDefaultQueryGeneratorOptions(),
       });
 
       if (!query) {
-        this.notificationService.logError({
-          title: 'data_grid_table_generate_sql_error_title',
-          message: 'data_grid_table_generate_sql_error_no_query',
-        });
         return;
       }
 
       await this.commonDialogService.open(GeneratedSqlDialog, {
         query,
         nodeId: connectionId,
+        options: getDefaultQueryGeneratorOptions(),
+        regenerateQuery: options =>
+          this.generateQuery({
+            projectId,
+            connectionId,
+            contextId,
+            resultId,
+            generatorId,
+            rows,
+            options,
+          }),
       });
     } catch (e: any) {
       this.notificationService.logException(e, 'data_grid_table_generate_sql_error_title');
     }
+  }
+
+  private async generateQuery({
+    projectId,
+    connectionId,
+    contextId,
+    resultId,
+    generatorId,
+    rows,
+    options,
+  }: {
+    projectId: string;
+    connectionId: string;
+    contextId: string;
+    resultId: string;
+    generatorId: SqlResultSetGeneratorId;
+    rows: SqlResultRow[];
+    options: SqlQueryGeneratorOptions;
+  }): Promise<string> {
+    const query = await this.sqlGenerationResource.generateResultSetSql({
+      projectId,
+      connectionId,
+      contextId,
+      resultsId: resultId,
+      generatorId,
+      selectedRows: rows,
+      generatorOptions: options,
+    });
+
+    if (!query) {
+      throw new Error('data_grid_table_generate_sql_error_no_query');
+    }
+
+    return query;
   }
 }
 

@@ -17,6 +17,7 @@
 package io.cloudbeaver.service.sql;
 
 import io.cloudbeaver.model.session.WebSession;
+import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.exec.plan.DBCPlan;
 import org.jkiss.dbeaver.model.exec.plan.DBCPlanCostNode;
@@ -32,12 +33,19 @@ public class WebSQLExecutionPlan {
 
     private static final Log log = Log.getLog(WebSQLExecutionPlan.class);
 
+    @NotNull
     private final WebSession webSession;
+    @NotNull
     private final DBCPlan plan;
 
-    public WebSQLExecutionPlan(WebSession webSession, DBCPlan plan) {
+    public WebSQLExecutionPlan(@NotNull WebSession webSession, @NotNull DBCPlan plan) {
         this.webSession = webSession;
         this.plan = plan;
+    }
+
+    @NotNull
+    public DBCPlan getPlan() {
+        return plan;
     }
 
     public String getQuery() {
