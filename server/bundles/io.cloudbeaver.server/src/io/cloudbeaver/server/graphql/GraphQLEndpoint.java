@@ -243,7 +243,7 @@ public class GraphQLEndpoint extends HttpServlet {
         String userId = GraphQLLoggerUtil.getUserId(request);
         LocalDateTime startTime = LocalDateTime.now();
 
-        if (isQueryHandledBeforeExecution(request, response, variables, operationName, userId, startTime)) {
+        if (isQueryHandledBeforeExecution(request, response, variables, operationName, userId)) {
             return;
         }
 
@@ -290,8 +290,7 @@ public class GraphQLEndpoint extends HttpServlet {
         @NotNull HttpServletResponse response,
         @Nullable Map<String, Object> variables,
         @Nullable String operationName,
-        @Nullable String userId,
-        @NotNull LocalDateTime startTime
+        @Nullable String userId
     ) throws IOException {
         return false;
     }
