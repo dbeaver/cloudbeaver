@@ -299,12 +299,7 @@ public class CBSessionManager implements WebAppSessionManager {
 
     @NotNull
     protected WebSession createWebSessionImpl(@NotNull WebHttpRequestInfo request) throws DBException {
-        return new WebSession(
-            Objects.requireNonNull(request.getId()),
-            request,
-            application,
-            getSessionHandlers()
-        );
+        return new WebSession(request, application, getSessionHandlers());
     }
 
     @NotNull
