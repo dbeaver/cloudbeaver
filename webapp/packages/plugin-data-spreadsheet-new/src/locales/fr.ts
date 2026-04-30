@@ -55,6 +55,8 @@ export default [
   ['data_grid_table_generate_sql_select_tooltip', 'Générer une instruction SELECT avec clause WHERE'],
   ['data_grid_table_generate_sql_select_many', 'SELECT .. WHERE .. IN'],
   ['data_grid_table_generate_sql_select_many_tooltip', 'Générer une instruction SELECT avec clause WHERE IN'],
+  ['data_grid_table_generate_sql_create', 'CREATE'],
+  ['data_grid_table_generate_sql_create_tooltip', "Générer une instruction CREATE pour l'entité"],
   ['data_grid_table_generate_sql_error_title', 'Erreur de génération SQL'],
   ['data_grid_table_generate_sql_error_no_query', 'Aucune requête disponible pour le résultat actuel'],
   ['data_grid_table_generate_sql_error_no_connection', "Contexte d'exécution inconnu"],
