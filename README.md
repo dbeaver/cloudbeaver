@@ -25,6 +25,29 @@ You can see a live demo of CloudBeaver here: https://demo.cloudbeaver.io
 
 ## Changelog
 
+### 26.0.4 2026-05-04
+
+- Data Editor:
+    - Added the ability to copy-paste multiple cells at once. Pasted values will be distributed across separate cells, not put in a single cell.
+    - Data Editor started to keep the state of column configurations, such as filters, sorting, and ordering, after the reconnect, page refresh, and re-login.
+- SQL Editor:
+    - Updated the SQL Editor to use real tab characters for indentation. The application displayed tabs as four-space gaps with a distinct visual marker.
+    - Added the ability to view and edit scripts without connecting to the database.
+    - Added more settings to the Generated SQL window, including the ability to select fully qualified names for query or use compact SQL formatting.
+    - Added the ability to open in the SQL Editor generated queries right from the Generate SQL window.
+- Accessibility:
+    - Fixed contrast for elements across different application parts in the light and dark themes to meet WCAG requirements.
+- General:
+    - Removed the "Folders" setting from the available settings for the Navigator Tree.
+- Databases:
+    - DuckDB: Fixed map rendering for GEOMETRY types with CRS parameters.
+    - Firebird: Expanded database-specific SQL dialect coverage for the SQL Editor. Added more keywords, built-in functions, and SQL generators.
+    - MySQL: Fixed query boundaries recognition in the SQL Editor for scripts with the DELIMITER keyword.
+    - SQL Server: Fixed DDL generation for external tables.
+- Security:
+    - Updated session handling to prompt the application to generate a new session identifier for each login.
+    - Fixed the high vulnerability (CVE-2026-3505) in the bcpg-jdk18on library. The library was updated to version 1.84.0.
+
 ### 26.0.3 2026-04-20
 
 - Data Editor:
