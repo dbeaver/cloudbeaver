@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2025 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -353,9 +353,13 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
             }
             String sessionId = GraphQLLoggerUtil.getSmSessionId(request);
             String userId = GraphQLLoggerUtil.getUserId(request);
-            String loggerMessage = GraphQLLoggerUtil.buildLoggerMessage(sessionId, userId, method, args);
+            try {
+                String loggerMessage = GraphQLLoggerUtil.buildLoggerMessage(sessionId, userId, method, args);
 
-            log.debug("API > " + method.getName() + loggerMessage);
+                log.debug("API > " + method.getName() + loggerMessage);
+            } catch (Throwable e) {
+                log.error("Logging error", e);
+            }
 
             setLogContext(method, args);
         }

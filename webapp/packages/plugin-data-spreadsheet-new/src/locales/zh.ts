@@ -32,6 +32,7 @@ export default [
   ['data_grid_table_index_column_tooltip', '选择整个表'],
   ['data_grid_table_no_key_found_tooltip', '未找到唯一键。无法修改数据。'],
   ['data_grid_table_virtual_key_tooltip', '虚拟键'],
+  ['data_grid_table_key_column_tooltip', '键列'],
   ['data_grid_table_readonly_connection_tooltip', '只读连接'],
   ['plugin_data_spreadsheet_new_settings_disable', '禁用表显示'],
   ['plugin_data_spreadsheet_new_settings_description_label', '显示列描述'],

@@ -42,6 +42,7 @@ export default [
   ['ui_error_message', 'Errore:'],
   ['ui_error_close', 'Chiudi'],
   ['ui_clear', 'Clear'],
+  ['ui_file_name', 'Nome del file'],
   ['ui_remove', 'Remove'],
   ['ui_close', 'Chiudi'],
   ['ui_open', 'Open'],
@@ -145,6 +146,8 @@ export default [
   ['ui_documentaion', 'Documentation'],
   ['ui_deny', 'Nega'],
   ['ui_allow', 'Consenti'],
+  ['ui_decline', 'Declina'],
+  ['ui_declined', 'Declinato'],
 
   ['root_permission_denied', 'Non hai i permessi'],
   ['app_root_session_expire_warning_title', 'La sessione sta per scadere'],

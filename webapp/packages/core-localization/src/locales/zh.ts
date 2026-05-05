@@ -42,6 +42,7 @@ export default [
   ['ui_error_message', '错误：'],
   ['ui_error_close', '关闭'],
   ['ui_clear', '清除'],
+  ['ui_file_name', '文件名'],
   ['ui_remove', '移除'],
   ['ui_close', '关闭'],
   ['ui_open', '打开'],
@@ -151,6 +152,8 @@ export default [
   ['ui_documentaion', '文档'],
   ['ui_deny', '拒绝'],
   ['ui_allow', '允许'],
+  ['ui_decline', '拒绝'],
+  ['ui_declined', '已拒绝'],
 
   ['root_permission_denied', '您没有权限'],
   ['root_permission_no_permission', '您没有权限执行此操作'],

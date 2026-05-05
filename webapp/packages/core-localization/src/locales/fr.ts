@@ -42,6 +42,7 @@ export default [
   ['ui_error_message', 'Erreur :'],
   ['ui_error_close', 'Fermer'],
   ['ui_clear', 'Effacer'],
+  ['ui_file_name', 'Nom du fichier'],
   ['ui_remove', 'Supprimer'],
   ['ui_close', 'Fermer'],
   ['ui_open', 'Ouvrir'],
@@ -148,6 +149,8 @@ export default [
   ['ui_documentaion', 'Documentation'],
   ['ui_deny', 'Refuser'],
   ['ui_allow', 'Autoriser'],
+  ['ui_decline', 'Refuser'],
+  ['ui_declined', 'Refusé'],
 
   ['root_permission_denied', "Vous n'avez pas les permissions"],
   ['root_permission_no_permission', "Vous n'avez pas la permission pour cette action"],

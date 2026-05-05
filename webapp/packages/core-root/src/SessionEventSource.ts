@@ -47,9 +47,9 @@ export { ServerEventId, SessionEventTopic, ClientEventId };
 
 export type SessionEventId = ServerEventId | ClientEventId | string;
 
-export interface ISessionEvent extends IBaseServerEvent<SessionEventId, SessionEventTopic> {
+export interface ISessionEvent<T extends string = SessionEventTopic> extends IBaseServerEvent<SessionEventId, T> {
   id: SessionEventId;
-  topicId?: SessionEventTopic;
+  topicId?: T;
   [key: string]: any;
 }
 

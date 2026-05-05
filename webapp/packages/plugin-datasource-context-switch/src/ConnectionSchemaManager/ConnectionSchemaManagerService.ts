@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,7 @@ import {
   DBDriverResource,
   type IConnectionInfoParams,
   type IConnectionProvider,
+  type IConnectionRequiredProvider,
   type IConnectionSetter,
   type IExecutionContextProvider,
   type IObjectCatalogProvider,
@@ -22,6 +23,7 @@ import {
   type IObjectSchemaProvider,
   type IObjectSchemaSetter,
   isConnectionProvider,
+  isConnectionRequiredProvider,
   isConnectionSetter,
   isExecutionContextProvider,
   isObjectCatalogProvider,
@@ -65,6 +67,7 @@ interface IActiveItem<T> {
   getCurrentCatalogId?: IObjectCatalogProvider<T>;
   getCurrentExecutionContext?: IExecutionContextProvider<T>;
   getCurrentLoader?: IObjectLoaderProvider<T>;
+  getCurrentConnectionRequired?: IConnectionRequiredProvider<T>;
   changeConnectionId?: IConnectionSetter<T>;
   changeProjectId?: IProjectSetter<T>;
   changeCatalogId?: IObjectCatalogSetter<T>;
@@ -111,6 +114,14 @@ export class ConnectionSchemaManagerService {
     }
 
     return this.activeConnectionKey;
+  }
+
+  get currentConnectionRequired(): boolean | undefined {
+    if (!this.activeItem?.getCurrentConnectionRequired) {
+      return;
+    }
+
+    return this.activeItem.getCurrentConnectionRequired(this.activeItem.context);
   }
 
   get activeObjectCatalogId(): string | undefined {
@@ -320,7 +331,7 @@ export class ConnectionSchemaManagerService {
   /**
    * Trigger when user select connection in dropdown
    */
-  async selectConnection(connectionKey: IConnectionInfoParams): Promise<void> {
+  async selectConnection(connectionKey: IConnectionInfoParams | null): Promise<void> {
     if (!this.activeItem?.changeConnectionId) {
       return;
     }
@@ -328,8 +339,10 @@ export class ConnectionSchemaManagerService {
       runInAction(() => {
         this.changingProjectId = true;
         this.changingConnection = true;
-        this.pendingProjectId = connectionKey.projectId;
+
+        this.pendingProjectId = connectionKey ? connectionKey.projectId : null;
         this.pendingConnectionKey = connectionKey;
+
         this.pendingSchemaId = undefined;
         this.pendingCatalogId = undefined;
       });
@@ -471,6 +484,9 @@ export class ConnectionSchemaManagerService {
       })
       .on(isObjectLoaderProvider, extension => {
         item.getCurrentLoader = extension;
+      })
+      .on(isConnectionRequiredProvider, extension => {
+        item.getCurrentConnectionRequired = extension;
       })
 
       .on(isProjectSetter, extension => {

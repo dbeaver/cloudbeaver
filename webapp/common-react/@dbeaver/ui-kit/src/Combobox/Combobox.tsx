@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -25,13 +25,17 @@ import {
 } from '@ariakit/react';
 import clsx from 'clsx';
 import './Combobox.css';
+import { UiKitPopoverContext } from '../Popover/UiKitPopoverContext.js';
+import { use } from 'react';
 
 export interface ComboboxProps extends Omit<AriaComboboxProps, 'size'> {
   size?: 'small' | 'medium' | 'large' | 'xlarge';
 }
 
 export function ComboboxInput({ size, autoSelect = true, ...props }: ComboboxProps): React.JSX.Element {
-  return <Combobox {...props} className={clsx('dbv-kit-combobox', `dbv-kit-combobox--${size ?? 'medium'}`, props.className)} autoSelect={autoSelect} />;
+  return (
+    <Combobox {...props} className={clsx('dbv-kit-combobox', `dbv-kit-combobox--${size ?? 'medium'}`, props.className)} autoSelect={autoSelect} />
+  );
 }
 
 export interface ComboboxPopoverProps extends AriaComboboxPopoverProps {
@@ -42,8 +46,17 @@ export interface ComboboxPopoverProps extends AriaComboboxPopoverProps {
  * ComboboxPopover - Wrapper around AriaKit's popover with default styles
  */
 export function ComboboxPopover({ children, className, ...props }: ComboboxPopoverProps): React.JSX.Element {
+  const popoverContext = use(UiKitPopoverContext);
+
   return (
-    <AriaComboboxPopover gutter={8} className={clsx('dbv-kit-combobox__popover', className)} portal sameWidth unmountOnHide {...props}>
+    <AriaComboboxPopover
+      gutter={8}
+      className={clsx('dbv-kit-combobox__popover', className)}
+      portal={(popoverContext.portal || props.portal) ?? false}
+      sameWidth
+      unmountOnHide
+      {...props}
+    >
       {children}
     </AriaComboboxPopover>
   );

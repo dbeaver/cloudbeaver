@@ -12,8 +12,6 @@ export default [
   ['app_navigationTree_settings_filter_all_description', 'Shows filtered elements in collapsed folders'],
   ['app_navigationTree_settings_state_title', 'Save tree state'],
   ['app_navigationTree_settings_state_description', 'Reopen expanded nodes after page refresh'],
-  ['app_navigationTree_settings_folders_title', 'Folders'],
-  ['app_navigationTree_settings_folders_description', 'Open any node as tree root node'],
   ['app_navigationTree_node_delete_confirmation', 'You\'re going to delete "{arg:name}". Are you sure?'],
   ['app_navigationTree_node_folder_delete_confirmation', 'All content in the selected folder will be deleted.'],
   ['app_navigationTree_node_delete_error', 'Failed to delete "{arg:name}'],

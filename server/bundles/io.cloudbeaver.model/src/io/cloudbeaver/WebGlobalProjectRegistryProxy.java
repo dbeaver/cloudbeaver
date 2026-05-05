@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2025 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -407,12 +407,12 @@ public class WebGlobalProjectRegistryProxy implements DBPDataSourceRegistry, Dat
     }
 
     @Override
-    public void persistSecrets(DBSSecretController secretController) throws DBException {
+    public void persistSecrets(@NotNull DBSSecretController secretController) throws DBException {
         dataSourceRegistry.persistSecrets(secretController);
     }
 
     @Override
-    public void resolveSecrets(DBSSecretController secretController) throws DBException {
+    public void resolveSecrets(@NotNull DBSSecretController secretController) throws DBException {
         dataSourceRegistry.resolveSecrets(secretController);
     }
 

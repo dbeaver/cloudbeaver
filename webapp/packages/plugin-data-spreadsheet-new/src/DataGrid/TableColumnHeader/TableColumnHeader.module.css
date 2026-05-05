@@ -26,6 +26,11 @@
   height: 16px;
   display: block;
 }
+.keyImage {
+  flex-shrink: 0;
+  height: 10px;
+  width: 10px;
+}
 .name {
   font-weight: 400;
   flex-grow: 1;

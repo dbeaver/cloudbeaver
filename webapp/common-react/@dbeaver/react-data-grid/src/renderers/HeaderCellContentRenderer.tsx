@@ -12,6 +12,7 @@ import { DataGridCellHeaderContext } from '../DataGridHeaderCellContext.js';
 import { useGridReactiveValue } from '../useGridReactiveValue.js';
 import { HeaderDnDContext } from '../useHeaderDnD.js';
 import { OrderButton } from './OrderButton.js';
+import type { DataGridCellKeyboardEvent } from '../DataGrid.js';
 
 interface Props {
   colIdx: number;
@@ -71,7 +72,7 @@ export const HeaderCellContentRenderer = memo(function HeaderCellContentRenderer
     onColumnSort(colIdx, nextSortState, e.ctrlKey || e.metaKey);
   }
 
-  function onKeyDown(event: React.KeyboardEvent<HTMLElement>) {
+  function onKeyDown(event: DataGridCellKeyboardEvent) {
     onHeaderKeyDown?.(event);
 
     if ((event.key === 'Enter' || event.key === ' ') && isColumnSortable && onColumnSort) {

@@ -13,7 +13,7 @@ import { getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
 import { MenuBaseItem, MenuService } from '@cloudbeaver/core-view';
 
 import { MENU_SQL_GENERATORS } from './MENU_SQL_GENERATORS.js';
-import { SqlGeneratorsResource } from './SqlGeneratorsResource.js';
+import { getDefaultQueryGeneratorOptions, SqlGeneratorsResource } from './SqlGeneratorsResource.js';
 import { NotificationService } from '@cloudbeaver/core-events';
 
 const GeneratedSqlDialog = importLazyComponent(() => import('./GeneratedSqlDialog.js').then(m => m.GeneratedSqlDialog));
@@ -39,7 +39,7 @@ export class SqlGeneratorsBootstrap extends Bootstrap {
 
         return this.sqlGeneratorsResource.get(node.id)?.length === 0;
       },
-      getLoader: (context, action) => {
+      getLoader: context => {
         const node = context.get(DATA_CONTEXT_NAV_NODE)!;
 
         return getCachedMapResourceLoaderState(this.sqlGeneratorsResource, () => node.id);
@@ -81,13 +81,15 @@ export class SqlGeneratorsBootstrap extends Bootstrap {
                 {
                   onSelect: async () => {
                     try {
-                      const query = await this.sqlGeneratorsResource.generateEntityQuery(action.id, node.id);
+                      const query = await this.sqlGeneratorsResource.generateEntityQuery(action.id, node.id, getDefaultQueryGeneratorOptions());
                       await this.commonDialogService.open(GeneratedSqlDialog, {
                         query,
                         nodeId: node.id,
+                        options: getDefaultQueryGeneratorOptions(),
+                        regenerateQuery: options => this.sqlGeneratorsResource.generateEntityQuery(action.id, node.id, options),
                       });
                     } catch (e: any) {
-                      this.notificationService.logException(e, 'sql_generator_error_title');
+                      this.notificationService.logException(e, 'app_shared_sql_generators_error_title');
                     }
                   },
                 },
