@@ -405,7 +405,7 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
     });
   }
 
-  async init(config: ConnectionInitConfig): Promise<Connection> {
+  async init(config: ConnectionInitConfig, signal?: AbortSignal): Promise<Connection> {
     const key: IConnectionInfoParams = { projectId: config.projectId, connectionId: config.connectionId };
 
     await this.performUpdate(key, [], async () => {
@@ -414,7 +414,7 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
       try {
         const { connection } = await this.graphQLService.sdk.initConnection({
           ...config,
-        });
+        }, undefined, signal);
         this.set(createConnectionParam(connection), connection);
         this.onDataOutdated.execute(key);
       } finally {

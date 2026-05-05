@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import {
 } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { NetworkHandlerAuthType } from '@cloudbeaver/core-sdk';
+import { SessionActionsEventHandler } from '@cloudbeaver/core-session-actions';
 import type { ILoadableState } from '@cloudbeaver/core-utils';
 
 import type { IConnectionAuthenticationConfig } from '../../ConnectionAuthentication/IConnectionAuthenticationConfig.js';
@@ -50,6 +51,7 @@ export function useDatabaseCredentialsAuthDialog(
   const dbDriverResource = useService(DBDriverResource);
   const connectionInfoAuthPropertiesResource = useService(ConnectionInfoAuthPropertiesResource);
   const connectionInfoNetworkHandlersLoader = useService(ConnectionInfoNetworkHandlersResource);
+  const sessionActionsEventHandler = useService(SessionActionsEventHandler);
 
   const state: IState = useObservableRef(
     () => ({
@@ -127,15 +129,24 @@ export function useDatabaseCredentialsAuthDialog(
           return;
         }
 
+        const abortController = new AbortController();
+        function abortHandler() {
+          abortController.abort();
+        }
+        this.sessionActionsEventHandler.onAuthCancelled.addHandler(abortHandler);
+
         try {
           this.authException = null;
           this.authenticating = true;
-          await this.connectionInfoResource.init(this.getConfig());
+          await this.connectionInfoResource.init(this.getConfig(), abortController.signal);
           this.onInit?.();
         } catch (exception: any) {
-          this.authException = exception;
+          if (exception?.name !== 'AbortError') {
+            this.authException = exception;
+          }
         } finally {
           this.authenticating = false;
+          this.sessionActionsEventHandler.onAuthCancelled.removeHandler(abortHandler);
         }
       },
       getConfig() {
@@ -189,6 +200,7 @@ export function useDatabaseCredentialsAuthDialog(
       resetCredentials,
       connectionInfoAuthPropertiesResource,
       connectionInfoNetworkHandlersLoader,
+      sessionActionsEventHandler,
       onInit,
     },
   );
