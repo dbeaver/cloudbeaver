@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@ import clsx from 'clsx';
 import type { ComponentPropsWithoutRef, JSX } from 'react';
 
 import './Dialog.css';
+import { UiKitPopoverContext } from '../Popover/UiKitPopoverContext.js';
 
 interface ExtendedDialogProps extends DialogProps {
   animated?: boolean;
@@ -37,7 +38,11 @@ interface ExtendedDialogProps extends DialogProps {
 function Dialog({ className, backdrop, animated = true, ...props }: ExtendedDialogProps): JSX.Element {
   const backdropElement = backdrop === true ? <div className="dbv-kit-dialog__backdrop" data-animated={animated} /> : backdrop;
 
-  return <AriakitDialog className={clsx('dbv-kit-dialog', className)} backdrop={backdropElement} data-animated={animated} {...props} />;
+  return (
+    <UiKitPopoverContext value={{ portal: props.portal ?? true }}>
+      <AriakitDialog className={clsx('dbv-kit-dialog', className)} backdrop={backdropElement} data-animated={animated} {...props} />
+    </UiKitPopoverContext>
+  );
 }
 
 function DialogDisclosure({ className, ...props }: DialogDisclosureProps): JSX.Element {

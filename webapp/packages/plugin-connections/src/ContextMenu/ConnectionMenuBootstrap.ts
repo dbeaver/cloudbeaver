@@ -21,7 +21,7 @@ import { DATA_CONTEXT_NAV_NODE, EObjectFeature, NavTreeSettingsService } from '@
 import { getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { getUniqueName } from '@cloudbeaver/core-utils';
-import { ACTION_DELETE, ActionService, MenuService } from '@cloudbeaver/core-view';
+import { ACTION_DELETE, ActionService, menuExtractItems, MenuSeparatorItem, MenuService } from '@cloudbeaver/core-view';
 import { MENU_APP_ACTIONS } from '@cloudbeaver/plugin-top-app-bar';
 
 import { PublicConnectionFormService } from '../PublicConnectionForm/PublicConnectionFormService.js';
@@ -74,6 +74,15 @@ export class ConnectionMenuBootstrap extends Bootstrap {
       root: true,
       contexts: [DATA_CONTEXT_CONNECTION],
       getItems: (context, items) => [...items, ACTION_CONNECTION_CHANGE_CREDENTIALS, ACTION_CONNECTION_DISCONNECT, ACTION_CONNECTION_DISCONNECT_ALL],
+      orderItems(context, items) {
+        const disconnect = menuExtractItems(items, [ACTION_CONNECTION_DISCONNECT, ACTION_CONNECTION_DISCONNECT_ALL]);
+
+        if (disconnect.length > 0) {
+          return [...items, new MenuSeparatorItem(), ...disconnect];
+        }
+
+        return items;
+      },
     });
 
     this.actionService.addHandler({
