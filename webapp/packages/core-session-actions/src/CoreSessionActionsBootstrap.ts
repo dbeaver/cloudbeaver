@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import { ConfirmationDialog } from '@cloudbeaver/core-blocks';
+import { ConfirmationDialog, importLazyComponent } from '@cloudbeaver/core-blocks';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { SessionResource } from '@cloudbeaver/core-root';
@@ -14,7 +14,8 @@ import { WindowsService } from '@cloudbeaver/core-routing';
 import { CbServerEventId, type WsOpenUrlEvent } from '@cloudbeaver/core-sdk';
 
 import { SessionActionsEventHandler } from './SessionActionsEventHandler.js';
-import { renderUrlConfirmationDetails } from './UrlConfirmationDetails.js';
+
+const renderUrlConfirmationDetails = importLazyComponent(() => import('./UrlConfirmationDetails.js').then(m => m.renderUrlConfirmationDetails));
 
 @injectable(() => [SessionActionsEventHandler, NotificationService, CommonDialogService, WindowsService, SessionResource])
 export class CoreSessionActionsBootstrap extends Bootstrap {
@@ -52,6 +53,9 @@ export class CoreSessionActionsBootstrap extends Bootstrap {
           this.notificationService.logError({
             title: 'core_session_actions_popup_blocked',
           });
+
+          this.sessionActionsEventHandler.cancelAuth(actionId);
+          return;
         }
       }
 
