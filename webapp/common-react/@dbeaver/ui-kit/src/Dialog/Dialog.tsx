@@ -39,9 +39,9 @@ function Dialog({ className, backdrop, animated = true, ...props }: ExtendedDial
   const backdropElement = backdrop === true ? <div className="dbv-kit-dialog__backdrop" data-animated={animated} /> : backdrop;
 
   return (
-    <UiKitPopoverContext.Provider value={{ portal: props.portal ?? true }}>
+    <UiKitPopoverContext value={{ portal: props.portal ?? true }}>
       <AriakitDialog className={clsx('dbv-kit-dialog', className)} backdrop={backdropElement} data-animated={animated} {...props} />
-    </UiKitPopoverContext.Provider>
+    </UiKitPopoverContext>
   );
 }
 
