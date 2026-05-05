@@ -2268,7 +2268,7 @@ __metadata:
     tslib: "npm:^2"
     typescript: "npm:^5"
     underscore: "npm:^1"
-    uuid: "npm:^13"
+    uuid: "npm:^14"
     vitest: "npm:^4"
     whatwg-mimetype: "npm:^5"
     zod: "npm:^4"
@@ -18617,12 +18617,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"uuid@npm:^13":
-  version: 13.0.2
-  resolution: "uuid@npm:13.0.2"
+"uuid@npm:^14":
+  version: 14.0.0
+  resolution: "uuid@npm:14.0.0"
   bin:
     uuid: dist-node/bin/uuid
-  checksum: 10c0/32c7ee84fa7c7966cc09b3a1514a752a8e2f609f15c00033fbaedc0255d577d1877b839f11ee537f37e587bbc620bbb98c3b3a1482931b8ed47d79497cd7a7cd
+  checksum: 10c0/a57ae7794c45005c1a9208989196c5baf79a7679c30f43c1bee9033a2c4d113a2cea216fa6fcc9663b08b0d55635df1a7c6eb7e7f3d21c3e50688c698fa39a50
   languageName: node
   linkType: hard
 
