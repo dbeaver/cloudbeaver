@@ -24,8 +24,10 @@ import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.app.DBPPlatform;
 import org.jkiss.dbeaver.model.app.DBPProject;
+import org.jkiss.dbeaver.model.auth.SMSession;
 import org.jkiss.dbeaver.model.impl.app.BaseProjectImpl;
 import org.jkiss.dbeaver.model.impl.app.BaseWorkspaceImpl;
+import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.utils.CommonUtils;
 
 import java.io.IOException;
@@ -54,6 +56,12 @@ public class ServerGlobalWorkspace extends BaseWorkspaceImpl {
     ) {
         super(platform, application.getWorkspaceDirectory());
         this.application = application;
+    }
+
+    @NotNull
+    @Override
+    protected SMSession acquireWorkspaceSession(@NotNull DBRProgressMonitor monitor) throws DBException {
+        return new ServerGlobalWorkspaceSession(this);
     }
 
     @Override
