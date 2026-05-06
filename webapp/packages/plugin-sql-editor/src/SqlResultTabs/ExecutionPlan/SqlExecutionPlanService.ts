@@ -21,6 +21,7 @@ import { SqlDataSourceService } from '../../SqlDataSource/SqlDataSourceService.j
 interface IExecutionPlanData {
   task: ITask<SqlExecutionPlan>;
   executionPlan: SqlExecutionPlan | null;
+  editorId: string;
 }
 
 @injectable(() => [GraphQLService, NotificationService, AsyncTaskInfoService, ConnectionExecutionContextService, SqlDataSourceService])
@@ -81,6 +82,7 @@ export class SqlExecutionPlanService {
     this.data.set(tabId, {
       task,
       executionPlan: null,
+      editorId: editorState.editorId,
     });
 
     try {
@@ -96,6 +98,7 @@ export class SqlExecutionPlanService {
       this.data.set(tabId, {
         task,
         executionPlan,
+        editorId: editorState.editorId,
       });
     } catch (exception: any) {
       const cancelled = task.cancelled;

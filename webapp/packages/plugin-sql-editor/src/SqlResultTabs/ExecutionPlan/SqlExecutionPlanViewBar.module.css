@@ -8,8 +8,8 @@
 
 .tabBar {
   composes: theme-background-secondary theme-text-on-secondary from global;
-  overflow: auto;
-  padding: 4px 0;
+  overflow-x: hidden;
+  padding-top: 4px;
 }
 
 .tab {
@@ -23,5 +23,6 @@
 }
 
 .tabList {
-  background: transparent !important;
+  margin-right: 8px;
+  margin-left: 4px;
 }
