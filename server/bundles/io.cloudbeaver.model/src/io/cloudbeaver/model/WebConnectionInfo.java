@@ -16,7 +16,6 @@
  */
 package io.cloudbeaver.model;
 
-import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebProjectImpl;
 import io.cloudbeaver.model.app.BaseWebAppConfiguration;
@@ -41,8 +40,6 @@ import org.jkiss.dbeaver.model.impl.auth.AuthModelDatabaseNative;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.model.navigator.DBNDataSource;
-import org.jkiss.dbeaver.model.net.DBWHandlerConfiguration;
-import org.jkiss.dbeaver.model.net.DBWHandlerType;
 import org.jkiss.dbeaver.model.preferences.DBPPreferenceStore;
 import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
 import org.jkiss.dbeaver.model.preferences.DBPPropertySource;
@@ -346,35 +343,8 @@ public class WebConnectionInfo {
             !dataSourceContainer.getDriver().isAnonymousAccess();
     }
 
-    public void validateConnection(@Nullable List<WebNetworkHandlerConfigInput> networkHandlerConfigInput) throws DBWebException {
-        if (session.hasPermission(DBWConstants.PERMISSION_ADMIN)) {
-            // we do not restrict ssh for admins
-            return;
-        }
-        if (ServletAppUtils.getServletApplication().getAppConfiguration().isFeatureEnabled(CBConstants.SERVER_FEATURE_SSH)) {
-            return;
-        }
+    public void validateConnection() throws DBWebException {
 
-        boolean usesTunnelConfig = dataSourceContainer.getConnectionConfiguration().getHandlers()
-            .stream()
-            .filter(DBWHandlerConfiguration::isEnabled)
-            .anyMatch(cfg -> cfg.getType() == DBWHandlerType.TUNNEL);
-
-        if (!usesTunnelConfig && networkHandlerConfigInput != null) {
-            for (WebNetworkHandlerConfigInput input : networkHandlerConfigInput) {
-                if (!CommonUtils.getBoolean(input.isEnabled(), false)) {
-                    continue;
-                }
-                DBWHandlerConfiguration configuration = dataSourceContainer.getConnectionConfiguration().getHandler(input.getId());
-                if (configuration != null && configuration.getType() == DBWHandlerType.TUNNEL) {
-                    usesTunnelConfig = true;
-                }
-            }
-        }
-        if (usesTunnelConfig) {
-            throw new DBWebException(
-                "SSH tunneling is required for this connection, but it is currently disabled. Please contact your administrator.");
-        }
     }
 
     // we don't show non-secured properties in FE when connecting to DB without saved credentials

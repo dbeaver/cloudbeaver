@@ -309,7 +309,7 @@ public class WebServiceCore implements DBWServiceCore {
         @Nullable String selectedSecretId
     ) throws DBWebException {
         WebConnectionInfo connectionInfo = WebDataSourceUtils.getWebConnectionInfo(webSession, projectId, connectionId);
-        connectionInfo.validateConnection(networkCredentials);
+        connectionInfo.validateConnection();
         connectionInfo.setSavedCredentials(authProperties, networkCredentials);
 
         var dataSourceContainer = connectionInfo.getDataSourceContainer();
