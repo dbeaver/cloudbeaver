@@ -78,13 +78,18 @@ export function useGridSelectedCellsCopy(
   const onKeydownHandler = useCallback((event: React.KeyboardEvent) => {
     if ((event.ctrlKey || event.metaKey) && event.nativeEvent.code === EVENT_KEY_CODE.C) {
       const activeElement = document.activeElement as HTMLElement | null;
-      if (
-        activeElement?.getAttribute('role') !== 'gridcell' &&
-        activeElement?.getAttribute('role') !== 'columnheader' &&
-        event.target !== event.currentTarget
-      ) {
+      const isEditing = activeElement?.matches('input, textarea, [contenteditable="true"]');
+
+      if(isEditing) {
         return;
       }
+
+      const hasTarget = activeElement?.closest('[role="gridcell"], [role="columnheader"]') !== null;
+
+      if (!hasTarget && event.target !== event.currentTarget) {
+        return;
+      }
+
       EventContext.set(event, EventStopPropagationFlag);
 
       if (dataViewerService.canCopyData) {
