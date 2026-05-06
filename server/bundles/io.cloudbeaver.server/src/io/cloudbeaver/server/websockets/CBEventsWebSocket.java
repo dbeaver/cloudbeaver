@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,8 @@ public class CBEventsWebSocket extends CBAbstractWebSocket implements CBWebSessi
 
     @Nullable
     private BaseWebSession webSession;
+    @Nullable
+    private FromUserEventHandler fromUserEventHandler;
 
     @Override
     public void onOpen(Session session, EndpointConfig config) {
@@ -48,7 +50,8 @@ public class CBEventsWebSocket extends CBAbstractWebSocket implements CBWebSessi
             log.debug("EventWebSocket connected to the " + webSession.getSessionId() + " session");
 
             session.setMaxIdleTimeout(Duration.ofMinutes(5).toMillis());
-            session.addMessageHandler(String.class, new FromUserEventHandler(webSession));
+            fromUserEventHandler = new FromUserEventHandler(webSession);
+            session.addMessageHandler(String.class, fromUserEventHandler);
             session.addMessageHandler(PongMessage.class, new WebSocketPingPongCallback(webSession));
 
             CBJettyWebSocketManager.registerWebSocket(webSession.getSessionId(), this);
@@ -73,6 +76,14 @@ public class CBEventsWebSocket extends CBAbstractWebSocket implements CBWebSessi
         log.debug("Socket Closed: [" + closeReason.getCloseCode() + "] " + closeReason.getReasonPhrase());
         if (webSession != null) {
             this.webSession.removeEventHandler(this);
+        }
+    }
+
+    @Override
+    public void handleSessionRotation(@NotNull BaseWebSession newSession) {
+        this.webSession = newSession;
+        if (fromUserEventHandler != null) {
+            fromUserEventHandler.setWebSession(newSession);
         }
     }
 

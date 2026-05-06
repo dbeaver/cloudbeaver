@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,9 +40,9 @@ public class CBEventsLongPolling implements CBWebSessionEventHandler {
 
     private static final int QUEUE_CAPACITY = 1000;
 
-    private final BaseWebSession webSession;
+    private BaseWebSession webSession;
     private final BlockingQueue<WSEvent> queue = new LinkedBlockingQueue<>(QUEUE_CAPACITY);
-    private final CBClientEventProcessor processor;
+    private CBClientEventProcessor processor;
     private volatile long lastPoll;
 
     public CBEventsLongPolling(@NotNull BaseWebSession webSession) {
@@ -98,6 +98,12 @@ public class CBEventsLongPolling implements CBWebSessionEventHandler {
 
     public void onMessage(@Nullable String message) {
         processor.process(message);
+    }
+
+    @Override
+    public void handleSessionRotation(@NotNull BaseWebSession newSession) {
+        this.webSession = newSession;
+        this.processor = new CBClientEventProcessor(this.webSession);
     }
 
     @Override

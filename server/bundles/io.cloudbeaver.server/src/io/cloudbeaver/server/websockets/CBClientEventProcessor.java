@@ -33,9 +33,13 @@ public class CBClientEventProcessor {
 
     private static final Log log = Log.getLog(CBClientEventProcessor.class);
 
-    final BaseWebSession webSession;
+    private BaseWebSession webSession;
 
     public CBClientEventProcessor(@NotNull BaseWebSession webSession) {
+        this.webSession = webSession;
+    }
+
+    public void setWebSession(BaseWebSession webSession) {
         this.webSession = webSession;
     }
 
