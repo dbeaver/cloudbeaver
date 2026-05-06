@@ -4774,7 +4774,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@codemirror/autocomplete@npm:^6, @codemirror/autocomplete@npm:^6.0.0":
+"@codemirror/autocomplete@npm:6.20.1":
   version: 6.20.1
   resolution: "@codemirror/autocomplete@npm:6.20.1"
   dependencies:
@@ -4786,7 +4786,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@codemirror/commands@npm:^6":
+"@codemirror/commands@npm:6.10.3":
   version: 6.10.3
   resolution: "@codemirror/commands@npm:6.10.3"
   dependencies:
@@ -4798,7 +4798,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@codemirror/lang-css@npm:^6.0.0":
+"@codemirror/lang-css@npm:6.3.1":
   version: 6.3.1
   resolution: "@codemirror/lang-css@npm:6.3.1"
   dependencies:
@@ -4811,7 +4811,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@codemirror/lang-html@npm:^6":
+"@codemirror/lang-html@npm:6.4.11":
   version: 6.4.11
   resolution: "@codemirror/lang-html@npm:6.4.11"
   dependencies:
@@ -4828,7 +4828,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@codemirror/lang-javascript@npm:^6, @codemirror/lang-javascript@npm:^6.0.0":
+"@codemirror/lang-javascript@npm:6.2.5":
   version: 6.2.5
   resolution: "@codemirror/lang-javascript@npm:6.2.5"
   dependencies:
@@ -4843,7 +4843,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@codemirror/lang-json@npm:^6":
+"@codemirror/lang-json@npm:6.0.2":
   version: 6.0.2
   resolution: "@codemirror/lang-json@npm:6.0.2"
   dependencies:
@@ -4853,7 +4853,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@codemirror/lang-sql@npm:^6":
+"@codemirror/lang-sql@npm:6.10.0":
   version: 6.10.0
   resolution: "@codemirror/lang-sql@npm:6.10.0"
   dependencies:
@@ -4867,7 +4867,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@codemirror/lang-xml@npm:^6":
+"@codemirror/lang-xml@npm:6.1.0":
   version: 6.1.0
   resolution: "@codemirror/lang-xml@npm:6.1.0"
   dependencies:
@@ -4881,7 +4881,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@codemirror/language@npm:^6, @codemirror/language@npm:^6.0.0, @codemirror/language@npm:^6.4.0, @codemirror/language@npm:^6.6.0":
+"@codemirror/language@npm:6.12.3":
   version: 6.12.3
   resolution: "@codemirror/language@npm:6.12.3"
   dependencies:
@@ -4895,7 +4895,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@codemirror/lint@npm:^6.0.0":
+"@codemirror/lint@npm:6.9.5":
   version: 6.9.5
   resolution: "@codemirror/lint@npm:6.9.5"
   dependencies:
@@ -4906,7 +4906,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@codemirror/merge@npm:^6":
+"@codemirror/merge@npm:6.12.1":
   version: 6.12.1
   resolution: "@codemirror/merge@npm:6.12.1"
   dependencies:
@@ -4930,7 +4930,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@codemirror/state@npm:^6, @codemirror/state@npm:^6.0.0, @codemirror/state@npm:^6.6.0":
+"@codemirror/state@npm:6.6.0":
   version: 6.6.0
   resolution: "@codemirror/state@npm:6.6.0"
   dependencies:
@@ -4939,7 +4939,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@codemirror/view@npm:^6, @codemirror/view@npm:^6.0.0, @codemirror/view@npm:^6.17.0, @codemirror/view@npm:^6.23.0, @codemirror/view@npm:^6.27.0, @codemirror/view@npm:^6.35.0, @codemirror/view@npm:^6.37.0":
+"@codemirror/view@npm:6.41.1":
   version: 6.41.1
   resolution: "@codemirror/view@npm:6.41.1"
   dependencies:
