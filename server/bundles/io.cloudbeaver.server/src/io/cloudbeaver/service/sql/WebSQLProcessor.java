@@ -35,6 +35,8 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataKind;
 import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.DBUtils;
+import org.jkiss.dbeaver.model.connection.DBPDriver;
+import org.jkiss.dbeaver.model.connection.DBPDriverConstants;
 import org.jkiss.dbeaver.model.data.*;
 import org.jkiss.dbeaver.model.edit.DBEPersistAction;
 import org.jkiss.dbeaver.model.exec.*;
@@ -415,7 +417,10 @@ public class WebSQLProcessor implements WebSessionProvider {
                 monitor, resultsInfo, rowIdentifier, updatedRows, deletedRows, addedRows, resultBatches, keyReceiver);
 
             DBCExecutionContext executionContext = getExecutionContext(dataManipulator);
-            boolean skipAutoCommitToggle = executionContext.getDataSource() instanceof DBCNativeBatchAutoCommit;
+            DBPDriver driver = executionContext.getDataSource().getContainer().getDriver();
+            boolean skipAutoCommitToggle = CommonUtils.toBoolean(
+                driver.getDriverParameter(DBPDriverConstants.PARAM_NATIVE_BATCH_AUTO_COMMIT)
+            );
             try (DBCSession session = executionContext.openSession(monitor, DBCExecutionPurpose.USER, "Update data in container")) {
                 DBCTransactionManager txnManager = DBUtils.getTransactionManager(executionContext);
                 boolean revertToAutoCommit = false;
