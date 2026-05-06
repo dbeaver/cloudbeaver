@@ -9,7 +9,7 @@
 import { DATA_CONTEXT_CONNECTION, type IConnectionInfoParams } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
-import { ActionService, MenuSeparatorItem, MenuService } from '@cloudbeaver/core-view';
+import { ACTION_OPEN, ActionService, menuItemsPlaceAfter, MenuSeparatorItem, MenuService } from '@cloudbeaver/core-view';
 import { DATA_CONTEXT_NAV_NODE, EObjectFeature } from '@cloudbeaver/core-navigation-tree';
 import {
   CONNECTION_NAVIGATOR_VIEW_SETTINGS,
@@ -69,6 +69,10 @@ export class ConnectionViewPluginBootstrap extends Bootstrap {
         return node.objectFeatures.includes(EObjectFeature.dataSource);
       },
       getItems: (context, items) => [...items, MENU_CONNECTION_VIEW],
+      orderItems: (context, items) => {
+        menuItemsPlaceAfter(items, [MENU_CONNECTION_VIEW], ACTION_OPEN);
+        return items;
+      },
     });
 
     this.menuService.addCreator({
