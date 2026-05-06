@@ -27,7 +27,8 @@
     "flatted": ">=3.4.2",
     "picomatch": ">=2.3.2",
     "happy-dom": ">=20.8.8",
-    "vite": "7.3.2"
+    "vite": "7.3.2",
+    "@codemirror/search": "6.6.0"
   },
   "scripts": {
     "test": "dbeaver-test",
