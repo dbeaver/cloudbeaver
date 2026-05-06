@@ -6,6 +6,14 @@
  * you may not use this file except in compliance with the License.
  */
 
+.tabsLayout {
+  display: flex;
+  flex-direction: row;
+  flex: 1;
+  overflow: hidden;
+  height: 100%;
+}
+
 .pane {
   &:first-child {
     display: flex;

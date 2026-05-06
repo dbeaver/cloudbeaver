@@ -1,0 +1,27 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2026 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+
+.tabBar {
+  composes: theme-background-secondary theme-text-on-secondary from global;
+  overflow: auto;
+  padding: 4px 0;
+}
+
+.tab {
+  composes: theme-ripple theme-background-background theme-text-text-primary-on-light theme-typography--body2 from global;
+  text-transform: uppercase;
+  font-weight: normal;
+
+  &:global([aria-selected='true']) {
+    font-weight: normal !important;
+  }
+}
+
+.tabList {
+  background: transparent !important;
+}

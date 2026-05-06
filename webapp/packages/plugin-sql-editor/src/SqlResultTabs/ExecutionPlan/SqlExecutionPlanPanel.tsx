@@ -10,11 +10,12 @@ import { useState } from 'react';
 
 import { Loader, Pane, ResizerControls, s, Split, useS, useSplitUserState } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { TabList, TabPanelList, TabsState } from '@cloudbeaver/core-ui';
+import { TabPanelList, TabsState } from '@cloudbeaver/core-ui';
 
 import type { IExecutionPlanTab } from '../../ISqlEditorTabState.js';
 import { PropertiesPanel } from './PropertiesPanel/PropertiesPanel.js';
 import { SqlExecutionPlanService } from './SqlExecutionPlanService.js';
+import { SqlExecutionPlanViewBar } from './SqlExecutionPlanViewBar.js';
 import { SqlExecutionPlanViewService } from './SqlExecutionPlanViewService.js';
 import style from './SqlExecutionPlanPanel.module.css';
 
@@ -45,8 +46,10 @@ export const SqlExecutionPlanPanel = observer<Props>(function SqlExecutionPlanPa
           lazy
           onNodeSelect={setSelectedNode}
         >
-          <TabList underline />
-          <TabPanelList />
+          <div className={s(styles, { tabsLayout: true })}>
+            <SqlExecutionPlanViewBar />
+            <TabPanelList />
+          </div>
         </TabsState>
       </Pane>
       <ResizerControls />
