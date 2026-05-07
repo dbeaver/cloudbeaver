@@ -34,7 +34,7 @@ import { LocalizationService } from '@cloudbeaver/core-localization';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { action, computed, makeObservable, observable, reaction, toJS } from 'mobx';
 import { getUniqueName } from '@cloudbeaver/core-utils';
-import { getObjectPropertyDefaults } from '@cloudbeaver/core-blocks';
+import { getObjectPropertyDefaults, SAVED_VALUE_INDICATOR } from '@cloudbeaver/core-blocks';
 import { isNotNullDefined } from '@dbeaver/js-helpers';
 import { parseJdbcUri } from '@dbeaver/jdbc-uri-parser';
 
@@ -229,9 +229,7 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
 
     if (authPropertiesInfo.authProperties) {
       for (const property of authPropertiesInfo.authProperties) {
-        if (!property.features.includes('password')) {
-          config.credentials[property.id!] = getObjectPropertyValue(property);
-        }
+        config.credentials[property.id!] = getObjectPropertyValue(property);
       }
     }
 
@@ -390,6 +388,7 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
       const isPasswordEmpty =
         passwordProperty &&
         (this.state.credentials?.[passwordProperty.id!] === getObjectPropertyDefaultValue(passwordProperty) ||
+          this.state.credentials?.[passwordProperty.id!] === SAVED_VALUE_INDICATOR ||
           !this.state.credentials?.[passwordProperty.id!]);
 
       if (isCredentialsChanged(properties, this.state.credentials!)) {
@@ -579,7 +578,7 @@ function isCredentialsChanged(authProperties: IObjectPropertyInfo[], credentials
     const value = credentials[property.id!];
 
     if (property.features.includes('password')) {
-      if (value !== undefined) {
+      if (value !== undefined && value !== SAVED_VALUE_INDICATOR) {
         return property.features.includes('file') ? true : !!value;
       }
     } else if (value !== getObjectPropertyValue(property)) {
