@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,8 @@ import {
 import clsx from 'clsx';
 
 import './Select.css';
+import { UiKitPopoverContext } from '../Popover/UiKitPopoverContext.js';
+import { use } from 'react';
 
 export function SelectProvider({ children, ...props }: SelectProviderProps) {
   return <AriaSelectProvider {...props}>{children}</AriaSelectProvider>;
@@ -37,8 +39,15 @@ export function Select({ className, ...props }: SelectProps) {
 }
 
 export function SelectPopover({ children, className, ...props }: SelectPopoverProps) {
+  const popoverContext = use(UiKitPopoverContext);
+
   return (
-    <AriaSelectPopover className={clsx('dbv-kit-select__popover', className)} sameWidth={props.sameWidth ?? true} portal={props.portal ?? true} {...props}>
+    <AriaSelectPopover
+      className={clsx('dbv-kit-select__popover', className)}
+      sameWidth={props.sameWidth ?? true}
+      portal={(popoverContext.portal || props.portal) ?? false}
+      {...props}
+    >
       {children}
     </AriaSelectPopover>
   );
