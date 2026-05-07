@@ -56,6 +56,8 @@ export default [
   ['data_grid_table_generate_sql_select_tooltip', 'Сгенерировать SELECT-запрос с WHERE'],
   ['data_grid_table_generate_sql_select_many', 'SELECT .. WHERE .. IN'],
   ['data_grid_table_generate_sql_select_many_tooltip', 'Сгенерировать SELECT-запрос с WHERE IN'],
+  ['data_grid_table_generate_sql_create', 'DDL'],
+  ['data_grid_table_generate_sql_create_tooltip', 'Сгенерировать DDL-запрос для сущности'],
   ['data_grid_table_generate_sql_error_title', 'Ошибка генерации SQL'],
   ['data_grid_table_generate_sql_error_no_query', 'Нет запроса для текущего результата'],
   ['data_grid_table_generate_sql_error_no_connection', 'Неизвестный контекст выполнения'],

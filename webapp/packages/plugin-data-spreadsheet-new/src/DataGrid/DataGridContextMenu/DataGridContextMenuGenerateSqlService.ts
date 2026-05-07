@@ -24,12 +24,14 @@ import {
   IDatabaseDataSource,
   isResultSetDataModel,
   ResultSetDataAction,
+  type IDataContainerOptions,
   type IDatabaseDataModel,
   type IGridColumnKey,
   type IGridDataKey,
   type IGridRowKey,
 } from '@cloudbeaver/plugin-data-viewer';
 
+import { ACTION_DATA_GRID_GENERATE_SQL_CREATE } from '../Actions/GenerateSQL/ACTION_DATA_GRID_GENERATE_SQL_CREATE.js';
 import { ACTION_DATA_GRID_GENERATE_SQL_DELETE } from '../Actions/GenerateSQL/ACTION_DATA_GRID_GENERATE_SQL_DELETE.js';
 import { ACTION_DATA_GRID_GENERATE_SQL_INSERT } from '../Actions/GenerateSQL/ACTION_DATA_GRID_GENERATE_SQL_INSERT.js';
 import { ACTION_DATA_GRID_GENERATE_SQL_SELECT } from '../Actions/GenerateSQL/ACTION_DATA_GRID_GENERATE_SQL_SELECT.js';
@@ -37,7 +39,7 @@ import { ACTION_DATA_GRID_GENERATE_SQL_SELECT_MANY } from '../Actions/GenerateSQ
 import { ACTION_DATA_GRID_GENERATE_SQL_UPDATE } from '../Actions/GenerateSQL/ACTION_DATA_GRID_GENERATE_SQL_UPDATE.js';
 import { MENU_DATA_GRID_GENERATE_SQL } from './GenerateSQL/MENU_DATA_GRID_GENERATE_SQL.js';
 import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
-import { getDefaultQueryGeneratorOptions, GeneratedSqlDialog, SqlGeneratorsResource } from '@cloudbeaver/plugin-sql-generator';
+import { getDefaultQueryGeneratorOptions, GeneratedSqlDialog, SqlGeneratorsResource, DDL_GENERATOR_ID } from '@cloudbeaver/plugin-sql-generator';
 import { isNotNullDefined } from '@dbeaver/js-helpers';
 
 @injectable(() => [ActionService, MenuService, CommonDialogService, NotificationService, SqlGeneratorsResource])
@@ -78,6 +80,7 @@ export class DataGridContextMenuGenerateSqlService {
         ACTION_DATA_GRID_GENERATE_SQL_DELETE,
         ACTION_DATA_GRID_GENERATE_SQL_SELECT,
         ACTION_DATA_GRID_GENERATE_SQL_SELECT_MANY,
+        ACTION_DATA_GRID_GENERATE_SQL_CREATE,
       ],
     });
 
@@ -91,6 +94,7 @@ export class DataGridContextMenuGenerateSqlService {
         ACTION_DATA_GRID_GENERATE_SQL_DELETE,
         ACTION_DATA_GRID_GENERATE_SQL_SELECT,
         ACTION_DATA_GRID_GENERATE_SQL_SELECT_MANY,
+        ACTION_DATA_GRID_GENERATE_SQL_CREATE,
       ],
       isDisabled: context => {
         const model = context.get(DATA_CONTEXT_DV_DDM)!;
@@ -98,6 +102,11 @@ export class DataGridContextMenuGenerateSqlService {
         return model.isLoading();
       },
       handler: async (context, action) => {
+        if (action === ACTION_DATA_GRID_GENERATE_SQL_CREATE) {
+          await this.openEntitySqlDialog(context);
+          return;
+        }
+
         await this.openSqlDialog(context, mapGeneratorIdFromAction(action));
       },
     });
@@ -165,6 +174,50 @@ export class DataGridContextMenuGenerateSqlService {
             rows,
             options,
           }),
+      });
+    } catch (e: any) {
+      this.notificationService.logException(e, 'data_grid_table_generate_sql_error_title');
+    }
+  }
+
+  private async openEntitySqlDialog(context: IDataContextProvider): Promise<void> {
+    const model = context.get(DATA_CONTEXT_DV_DDM)!;
+    const options = model.source.options as IDataContainerOptions | undefined;
+    const nodePathList = options?.containerNodePath;
+
+    if (!isResultSetDataModel(model)) {
+      return;
+    }
+
+    const connectionId = model.source.executionContext?.context?.connectionId;
+
+    if (!nodePathList || !isNotNullDefined(connectionId)) {
+      this.notificationService.logError({
+        title: 'data_grid_table_generate_sql_error_title',
+        message: 'data_grid_table_generate_sql_error_no_connection',
+      });
+      return;
+    }
+
+    try {
+      const generators = await this.sqlGenerationResource.load(nodePathList);
+      const createGenerator = generators.find(g => g.id.toLowerCase().includes(DDL_GENERATOR_ID.toLowerCase()));
+
+      if (!createGenerator) {
+        this.notificationService.logError({
+          title: 'data_grid_table_generate_sql_error_title',
+          message: 'data_grid_table_generate_sql_error_no_query',
+        });
+        return;
+      }
+
+      const query = await this.sqlGenerationResource.generateEntityQuery(createGenerator.id, nodePathList, getDefaultQueryGeneratorOptions());
+
+      await this.commonDialogService.open(GeneratedSqlDialog, {
+        query,
+        nodeId: connectionId,
+        options: getDefaultQueryGeneratorOptions(),
+        regenerateQuery: genOptions => this.sqlGenerationResource.generateEntityQuery(createGenerator.id, nodePathList, genOptions),
       });
     } catch (e: any) {
       this.notificationService.logException(e, 'data_grid_table_generate_sql_error_title');
