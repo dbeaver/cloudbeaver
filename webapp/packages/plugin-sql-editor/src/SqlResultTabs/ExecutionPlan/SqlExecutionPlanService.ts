@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@ import { SqlDataSourceService } from '../../SqlDataSource/SqlDataSourceService.j
 interface IExecutionPlanData {
   task: ITask<SqlExecutionPlan>;
   executionPlan: SqlExecutionPlan | null;
-  editorId: string;
 }
 
 @injectable(() => [GraphQLService, NotificationService, AsyncTaskInfoService, ConnectionExecutionContextService, SqlDataSourceService])
@@ -82,7 +81,6 @@ export class SqlExecutionPlanService {
     this.data.set(tabId, {
       task,
       executionPlan: null,
-      editorId: editorState.editorId,
     });
 
     try {
@@ -98,7 +96,6 @@ export class SqlExecutionPlanService {
       this.data.set(tabId, {
         task,
         executionPlan,
-        editorId: editorState.editorId,
       });
     } catch (exception: any) {
       const cancelled = task.cancelled;
