@@ -6,7 +6,6 @@ export default [
   ['core_blocks_confirmation_dialog_title', 'Yêu cầu xác nhận'],
   ['core_blocks_properties_table_item_reset', 'Đặt về mặc định'],
   ['core_blocks_object_property_info_form_empty_placeholder', 'Thuộc tính trống'],
-  ['core_blocks_object_property_info_password_saved', 'Giá trị trường đã lưu'],
   ['core_blocks_properties_table_item_remove', 'Xóa thuộc tính'],
   ['combobox_no_results_placeholder', 'Không có kết quả'],
   ['combobox_select_placeholder', 'Select an option'],

@@ -27,7 +27,6 @@ import { InputFileTextContent } from '../../FormControls/InputFileTextContent.js
 import { isControlPresented } from '../../FormControls/isControlPresented.js';
 import { Textarea } from '../../FormControls/Textarea.js';
 import { Link } from '../../Link.js';
-import { useTranslate } from '../../localization/useTranslate.js';
 import { evaluate } from '../evaluate.js';
 import { SAVED_VALUE_INDICATOR } from '../../SAVED_VALUE_INDICATOR.js';
 
@@ -64,8 +63,6 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
   onFocus,
   readOnly,
 }) {
-  const translate = useTranslate();
-
   let readonly = readOnly;
 
   const controlType = getObjectPropertyType(property);
@@ -146,7 +143,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
   }
 
   const passwordSaved = showRememberTip && ((isPassword && !!property.value) || saved);
-  const passwordSavedMessage = passwordSaved ? translate('core_blocks_object_property_info_password_saved') : undefined;
+  const passwordSavedMessage = passwordSaved ? SAVED_VALUE_INDICATOR : undefined;
   const placeholder = passwordSavedMessage || property.description;
 
   if (controlType === 'selector') {

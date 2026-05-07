@@ -5,7 +5,6 @@ export default [
   ['core_block_properties_table_add', 'Ajouter une propriété'],
   ['core_blocks_properties_table_item_reset', 'Réinitialiser par défaut'],
   ['core_blocks_object_property_info_form_empty_placeholder', 'Propriétés vides'],
-  ['core_blocks_object_property_info_password_saved', 'La valeur du champ est sauvegardée'],
   ['core_blocks_properties_table_item_remove', 'Supprimer la propriété'],
   ['combobox_no_results_placeholder', 'Aucun résultat'],
   ['combobox_select_placeholder', 'Select an option'],
