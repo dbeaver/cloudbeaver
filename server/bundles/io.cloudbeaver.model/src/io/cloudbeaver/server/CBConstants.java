@@ -82,6 +82,4 @@ public class CBConstants {
     public static final String DEFAULT_CLOUD_PROJECT_NAME = "GlobalConfiguration";
 
     public static final String SECURED_VALUE = "******";
-
-    public static final String SERVER_FEATURE_SSH = "ssh";
 }
