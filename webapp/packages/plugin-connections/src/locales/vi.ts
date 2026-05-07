@@ -59,4 +59,5 @@ export default [
   ['plugin_connections_connection_client_version', 'Phiên bản máy khách: {arg:version} \n'],
   ['plugin_connections_connection_server_version', 'Phiên bản máy chủ: {arg:version} \n'],
   ['plugin_connections_connection_connection_time', 'Thời gian kết nối: {arg:time} \n'],
+  ['plugin_connections_connection_network_handler_ssh_tunnel_unsupported', 'Đường hầm SSH bị vô hiệu hóa ở cấp quản trị.'],
 ];

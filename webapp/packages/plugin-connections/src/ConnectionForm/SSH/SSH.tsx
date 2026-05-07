@@ -26,6 +26,7 @@ import {
   useResource,
   useS,
   useTranslate,
+  Alert,
 } from '@cloudbeaver/core-blocks';
 import { NetworkHandlerResource, SSH_TUNNEL_ID } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
@@ -46,6 +47,9 @@ interface Props {
   formState: IFormState<IConnectionFormState>;
 }
 
+const FEATURE_SSH_ID = 'ssh';
+
+
 export const SSH: TabContainerPanelComponent<Props> = observer(function SSH({ formState, handlerState, tabId }) {
   const { selected } = useTab(tabId);
   const [loading, setLoading] = useState(false);
@@ -65,8 +69,9 @@ export const SSH: TabContainerPanelComponent<Props> = observer(function SSH({ fo
 
   const style = useS(styles);
   const translate = useTranslate();
-  const disabled = formState.isDisabled || loading || formState.isReadOnly;
   const enabled = handlerState.enabled || false;
+  const locked = !serverConfigResource.resource.isFeatureEnabled(FEATURE_SSH_ID) && !enabled;
+  const disabled = formState.isDisabled || loading || formState.isReadOnly || locked;
   const keyAuth = handlerState.authType === NetworkHandlerAuthType.PublicKey;
   const passwordFilled = (SSHPart.initialState?.password === null && handlerState.password !== '') || !!handlerState.password?.length;
   const testAvailable = keyAuth ? !!handlerState.key?.length : passwordFilled;
@@ -90,6 +95,11 @@ export const SSH: TabContainerPanelComponent<Props> = observer(function SSH({ fo
     <Form className={s(style, { form: true })}>
       <ColoredContainer parent>
         <Group form gap keepSize large>
+          {!serverConfigResource.resource.isFeatureEnabled(FEATURE_SSH_ID) && (
+            <Alert>
+              {translate('plugin_connections_connection_network_handler_ssh_tunnel_unsupported')}
+            </Alert>
+          )}
           <Switch id="ssh-enable-switch" name="enabled" state={handlerState} mod={['primary']} disabled={disabled}>
             {translate('connections_network_handler_ssh_tunnel_enable')}
           </Switch>
