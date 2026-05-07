@@ -6,6 +6,7 @@ export default [
   ['core_blocks_confirmation_dialog_title', '需要确认'],
   ['core_blocks_properties_table_item_reset', '重置默认值'],
   ['core_blocks_object_property_info_form_empty_placeholder', '属性为空'],
+  ['core_blocks_object_property_info_password_saved', '字段值已保存'],
   ['core_blocks_properties_table_item_remove', '移除属性'],
   ['combobox_no_results_placeholder', '无结果'],
   ['combobox_select_placeholder', 'Select an option'],
