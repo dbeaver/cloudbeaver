@@ -13,6 +13,7 @@ import { isObjectsEqual, schema } from '@cloudbeaver/core-utils';
 import type { IFormPart } from './IFormPart.js';
 import type { IFormState } from './IFormState.js';
 import { formSubmitContext } from './formSubmitContext.js';
+import { safeParseSchema } from './safeParseSchema.js';
 import { formValidationContext } from './formValidationContext.js';
 
 export abstract class FormPart<TPartState extends object, TFormState = any> implements IFormPart<TPartState> {
@@ -165,14 +166,14 @@ export abstract class FormPart<TPartState extends object, TFormState = any> impl
   private async handleValidation(data: IFormState<TFormState>, contexts: IExecutionContextProvider<IFormState<TFormState>>): Promise<void> {
     const validation = contexts.getContext(formValidationContext);
 
-    try {
-      if (this.schema) {
-        const parsedState = this.schema.parse(toJS(this.state));
-        this.setState(observable(parsedState));
+    if (this.schema) {
+      const result = safeParseSchema(this.schema, toJS(this.state), validation);
+
+      if (!result.success) {
+        return;
       }
-    } catch (e: any) {
-      validation.error(schema.prettifyError(e));
-      return;
+
+      this.setState(observable(result.data));
     }
 
     try {

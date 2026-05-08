@@ -35,6 +35,7 @@ export * from './Form/FormBaseService.js';
 export * from './Form/FormMode.js';
 export * from './Form/FormState.js';
 export * from './Form/FormPart.js';
+export * from './Form/safeParseSchema.js';
 export * from './Form/formStateContext.js';
 export * from './Form/formStatusContext.js';
 export * from './Form/formValidationContext.js';
