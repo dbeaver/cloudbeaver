@@ -27,10 +27,10 @@ export * from '@codemirror/autocomplete';
 export * from './highlightNewLine.js';
 
 export { history } from '@codemirror/commands';
-
 export { html as HTML_EDITOR } from '@codemirror/lang-html';
 export { javascript as JAVASCRIPT_EDITOR } from '@codemirror/lang-javascript';
-export { json as JSON_EDITOR } from '@codemirror/lang-json';
+export { json as JSON_EDITOR, jsonParseLinter } from '@codemirror/lang-json';
+export { linter, lintGutter } from '@codemirror/lint';
 export { sql as SQL_EDITOR, SQLDialect } from '@codemirror/lang-sql';
 export { xml as XML_EDITOR } from '@codemirror/lang-xml';
 
