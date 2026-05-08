@@ -117,7 +117,7 @@ export const Administration = observer<React.PropsWithChildren<Props>>(function 
               />
             ))}
 
-            {SupportInstruction && (
+            {!configurationWizard && SupportInstruction && (
               <div className="tw:mt-auto tw:p-2">
                 <SupportInstruction />
               </div>
