@@ -58,5 +58,4 @@ export default [
   ['plugin_connections_connection_client_version', 'Client version: {arg:version} \n'],
   ['plugin_connections_connection_server_version', 'Server version: {arg:version} \n'],
   ['plugin_connections_connection_connection_time', 'Connection time: {arg:time} \n'],
-  ['plugin_connections_connection_network_handler_ssh_tunnel_unsupported', "Il tunnel SSH è disabilitato a livello di amministrazione."],
 ];
