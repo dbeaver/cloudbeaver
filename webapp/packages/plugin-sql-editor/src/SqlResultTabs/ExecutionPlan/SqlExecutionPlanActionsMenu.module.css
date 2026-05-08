@@ -33,4 +33,5 @@
   text-orientation: mixed;
   transform: rotate(180deg);
   white-space: nowrap;
+  font-weight: normal;
 }
