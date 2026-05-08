@@ -46,7 +46,11 @@ export const SqlExecutionPlanActionsMenu = observer<Props>(function SqlExecution
 
   return (
     <SContext registry={registry}>
-      <MenuBar menu={menu} className={s(menuBarStyles, { toolsMenu: true, floating: true, executionPlanActions: true })} />
+      <MenuBar
+        menu={menu}
+        className={s(menuBarStyles, { toolsMenu: true, floating: true, withLabel: true, executionPlanActions: true })}
+        compact={false}
+      />
     </SContext>
   );
 });

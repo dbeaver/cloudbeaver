@@ -15,8 +15,18 @@
   height: unset;
 }
 
-.toolsMenu .menuBarItemGroup .menuBarItem {
-  & .menuBarItemLabel {
-    display: none;
-  }
+.executionPlanActions .menuBarItem {
+  width: auto;
+  height: auto;
+}
+
+.executionPlanActions .menuBarItemBox {
+  flex-direction: column-reverse;
+}
+
+.executionPlanActions .menuBarItemLabel {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  transform: rotate(180deg);
+  white-space: nowrap;
 }
