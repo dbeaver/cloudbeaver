@@ -24,6 +24,10 @@
   flex-direction: column-reverse;
 }
 
+.executionPlanActions .menuBarItemIcon {
+  transform: rotate(-90deg);
+}
+
 .executionPlanActions .menuBarItemLabel {
   writing-mode: vertical-rl;
   text-orientation: mixed;
