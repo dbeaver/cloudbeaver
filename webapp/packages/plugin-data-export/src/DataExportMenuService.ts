@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -11,7 +11,6 @@ import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { DATA_CONTEXT_NAV_NODE, EObjectFeature } from '@cloudbeaver/core-navigation-tree';
-import { MENU_NAVIGATION_TREE_MANAGE } from '@cloudbeaver/plugin-navigation-tree';
 import { withTimestamp } from '@cloudbeaver/core-utils';
 import { ACTION_EXPORT, ActionService, menuExtractItems, MenuService } from '@cloudbeaver/core-view';
 import {
@@ -112,7 +111,7 @@ export class DataExportMenuService {
     });
 
     this.menuService.addCreator({
-      menus: [MENU_NAVIGATION_TREE_MANAGE],
+      root: true,
       contexts: [DATA_CONTEXT_NAV_NODE],
       isApplicable: context => {
         const node = context.get(DATA_CONTEXT_NAV_NODE)!;

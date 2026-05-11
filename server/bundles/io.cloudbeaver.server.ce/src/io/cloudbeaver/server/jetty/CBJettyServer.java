@@ -24,6 +24,7 @@ import io.cloudbeaver.server.CBConstants;
 import io.cloudbeaver.server.filters.ServerConfigurationTimeLimitFilter;
 import io.cloudbeaver.server.graphql.GraphQLEndpoint;
 import io.cloudbeaver.server.servlets.CBImageServlet;
+import io.cloudbeaver.server.servlets.CBManifestServlet;
 import io.cloudbeaver.server.servlets.CBStaticServlet;
 import io.cloudbeaver.server.servlets.WebStatusServlet;
 import io.cloudbeaver.server.websockets.CBEventsLongPollingServlet;
@@ -118,6 +119,9 @@ public class CBJettyServer {
 
                 ServletHolder imagesServletHolder = new ServletHolder("images", new CBImageServlet());
                 servletContextHandler.addServlet(imagesServletHolder, serverConfiguration.getServicesURI() + "images/*");
+
+                ServletHolder manifestServletHolder = new ServletHolder("manifest", new CBManifestServlet(contentRootPath));
+                servletContextHandler.addServlet(manifestServletHolder, "/manifest.webmanifest");
 
                 servletContextHandler.addServlet(new ServletHolder("status", new WebStatusServlet()), "/status");
 

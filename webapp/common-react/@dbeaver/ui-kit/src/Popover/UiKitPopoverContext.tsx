@@ -6,6 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 
-import './module.js';
+import { createContext } from 'react';
 
-export * from './SupportService.js';
+export interface UiKitPopoverContextProps {
+  portal: boolean;
+}
+
+export const UiKitPopoverContext = createContext<UiKitPopoverContextProps>({ portal: false });

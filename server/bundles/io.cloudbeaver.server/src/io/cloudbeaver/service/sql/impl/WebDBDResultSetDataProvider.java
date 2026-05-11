@@ -28,6 +28,7 @@ import org.jkiss.dbeaver.model.DBUtils;
 import org.jkiss.dbeaver.model.data.*;
 import org.jkiss.dbeaver.model.data.hints.DBDValueHintContext;
 import org.jkiss.dbeaver.model.exec.DBCExecutionContext;
+import org.jkiss.dbeaver.model.impl.data.ResultSetHintContext;
 import org.jkiss.dbeaver.model.struct.DBSEntity;
 import org.jkiss.dbeaver.model.struct.DBSObject;
 
@@ -40,6 +41,7 @@ public class WebDBDResultSetDataProvider implements DBDResultSetDataProvider, DB
     private final String resultsId;
     private final WebSQLContextInfo contextInfo;
     private final List<WebSQLResultsRow> selectedRows;
+    private final DBDValueHintContext hintContext;
 
     WebDBDResultSetDataProvider(
         @NotNull String resultsId,
@@ -49,6 +51,7 @@ public class WebDBDResultSetDataProvider implements DBDResultSetDataProvider, DB
         this.resultsId = resultsId;
         this.contextInfo = contextInfo;
         this.selectedRows = selectedRows;
+        this.hintContext = new ResultSetHintContext(() -> null, () -> null);
     }
 
     @NotNull
@@ -129,10 +132,10 @@ public class WebDBDResultSetDataProvider implements DBDResultSetDataProvider, DB
         }
     }
 
-    @Nullable
+    @NotNull
     @Override
     public DBDValueHintContext getHintContext() {
-        return null;
+        return hintContext;
     }
 
     @Nullable

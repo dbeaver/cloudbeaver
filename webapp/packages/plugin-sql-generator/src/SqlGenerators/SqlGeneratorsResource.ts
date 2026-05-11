@@ -20,6 +20,7 @@ export const getDefaultQueryGeneratorOptions = (): SqlQueryGeneratorOptions => (
   useFullyQualifiedNames: true,
   compactSql: false,
 });
+export const DDL_GENERATOR_ID = 'tableDDL';
 
 @injectable(() => [GraphQLService, NavNodeInfoResource])
 export class SqlGeneratorsResource extends CachedMapResource<string, SqlQueryGenerator[]> {
