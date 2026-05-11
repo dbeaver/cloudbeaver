@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2026 DBeaver Corp and others
+ * Copyright (C) 2010-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -67,8 +67,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
 
     @Override
     public WebAuthStatus authLogin(
-        @NotNull HttpServletRequest httpRequest,
-        @NotNull WebSession inputWebSession,
+        @NotNull WebSession webSession,
         @NotNull String providerId,
         @Nullable String providerConfigurationId,
         @Nullable Map<String, Object> authParameters,
@@ -76,13 +75,6 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
         boolean forceSessionsLogout
     ) throws DBWebException {
         try {
-            WebSession webSession = inputWebSession;
-            if (inputWebSession.getUser() == null) {
-                // Rotate anonymous web sessions during login attempts to prevent session fixation attacks.
-                webSession = CBApplication.getInstance().getSessionManager()
-                    .rotateSession(httpRequest, inputWebSession);
-            }
-
             var smAuthInfo = initiateAuthentication(webSession, providerId, providerConfigurationId, authParameters, forceSessionsLogout);
             //TODO deprecated, use asyncAuthLogin for federated auth, exits for backward compatibility
             linkWithActiveUser = linkWithActiveUser && CBApplication.getInstance().getAppConfiguration()
@@ -93,8 +85,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
             } else {
                 //run it sync
                 var authProcessor = new WebSessionAuthProcessor(webSession, smAuthInfo, linkWithActiveUser);
-                List<WebAuthInfo> authInfos = authProcessor.authenticateSession();
-                return new WebAuthStatus(smAuthInfo.getAuthStatus(), authInfos);
+                return new WebAuthStatus(smAuthInfo.getAuthStatus(), authProcessor.authenticateSession());
             }
         } catch (SMTooManySessionsException e) {
             throw new DBWebException("User authentication failed", e.getErrorType(), e);
@@ -104,22 +95,14 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
     }
 
     @Override
-    @NotNull
     public WebAsyncAuthStatus federatedLogin(
         @NotNull HttpServletRequest httpRequest,
-        @NotNull WebSession inputWebSession,
+        @NotNull WebSession webSession,
         @NotNull String providerId,
         @Nullable String providerConfigurationId,
         boolean linkWithActiveUser,
         boolean forceSessionsLogout
     ) throws DBWebException {
-        WebSession webSession = inputWebSession;
-        if (inputWebSession.getUser() == null) {
-            // Rotate anonymous web sessions during login attempts to prevent session fixation attacks.
-            webSession = CBApplication.getInstance().getSessionManager()
-                .rotateSession(httpRequest, inputWebSession);
-        }
-
         WebAuthProviderDescriptor providerDescriptor = WebAuthProviderRegistry.getInstance().getAuthProvider(providerId);
         if (providerDescriptor == null) {
             throw new DBWebException("Provider '" + providerId + "' not found");

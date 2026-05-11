@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2026 DBeaver Corp and others
+ * Copyright (C) 2010-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -200,42 +200,6 @@ public class CBSessionManager implements WebAppSessionManager {
     }
 
     /**
-     * Invalidates the current HTTP session, creates a new one, and binds a new {@link WebSession} to it.
-     */
-    @NotNull
-    public WebSession rotateSession(
-        @NotNull HttpServletRequest request,
-        @NotNull WebSession webSession
-    ) throws DBWebException {
-        HttpSession oldHttpSession = request.getSession(false);
-        if (oldHttpSession != null) {
-            oldHttpSession.invalidate();
-        }
-        String newSessionId = request.getSession(true).getId();
-
-        String locale = webSession.getLocale();
-        String remoteAddr = webSession.getLastRemoteAddr();
-        String remoteUserAgent = webSession.getLastRemoteUserAgent();
-        var requestInfo = new WebHttpRequestInfo(newSessionId, locale, remoteAddr, remoteUserAgent);
-        WebSession newWebSession;
-        try {
-            newWebSession = createWebSessionImpl(requestInfo);
-        } catch (DBException e) {
-            throw new DBWebException(e);
-        }
-        webSession.migrateEventHandlersTo(newWebSession);
-        String oldSessionId = webSession.getSessionId();
-        synchronized (sessionMap) {
-            sessionMap.remove(oldSessionId);
-            sessionMap.put(newSessionId, newWebSession);
-        }
-        webSession.close(false, false);
-
-        log.debug("Session rotated '" + oldSessionId + "' -> '" + newSessionId + "'");
-        return newWebSession;
-    }
-
-    /**
      * Returns not expired session from cache, or restore it.
      *
      * @return WebSession object or null, if session expired or invalid
@@ -319,14 +283,15 @@ public class CBSessionManager implements WebAppSessionManager {
 
     @Override
     @Nullable
-    public WebSession findWebSession(@NotNull HttpServletRequest request) {
+    public WebSession findWebSession(HttpServletRequest request) {
         String sessionId = getSessionId(request);
-        WebSession webSession;
         synchronized (sessionMap) {
             var session = sessionMap.get(sessionId);
-            webSession = (session instanceof WebSession) ? (WebSession) session : null;
+            if (session instanceof WebSession) {
+                return (WebSession) session;
+            }
+            return null;
         }
-        return webSession;
     }
 
     @Override
