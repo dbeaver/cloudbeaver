@@ -13,7 +13,8 @@ import { getComputed, useHover, useMergeRefs, useObjectRef, useObservableRef } f
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { clsx } from '@dbeaver/ui-kit';
 import { type IDataGridCellRenderer, type ICellPosition } from '@cloudbeaver/plugin-data-grid';
-import { DatabaseEditChangeType, type IGridDataKey, type IGridRowKey } from '@cloudbeaver/plugin-data-viewer';
+import { DatabaseEditChangeType, type IGridDataKey, type IGridRowKey, KEY_BINDING_OPEN_CELL_CONTEXT_MENU } from '@cloudbeaver/plugin-data-viewer';
+import { matchesKeyBinding } from '@cloudbeaver/core-view';
 import { isObjectsEqual } from '@cloudbeaver/core-utils';
 
 import { ColumnDnDContext } from '../ColumnDnDContext.js';
@@ -144,6 +145,13 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
           this.selectionContext.clearSelection();
         }
       },
+      keyDown(event: React.KeyboardEvent<HTMLDivElement>) {
+        if (matchesKeyBinding(event, KEY_BINDING_OPEN_CELL_CONTEXT_MENU)) {
+          event.preventDefault();
+          event.stopPropagation();
+          this.cellContext.setMenuVisibility(!this.cellContext.isMenuVisible);
+        }
+      },
       openContextMenu(event: React.MouseEvent<HTMLDivElement>) {
         if (EventContext.has(event, EventStopPropagationFlag)) {
           return;
@@ -177,7 +185,7 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
       dataGridContext,
       cellContext,
     },
-    ['mouseUp', 'openContextMenu'],
+    ['keyDown', 'mouseUp', 'openContextMenu'],
   );
 
   const formatting = getComputed(
@@ -195,6 +203,7 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
         style: formatting || undefined,
         'data-row-index': rowIdx,
         'data-column-index': colIdx,
+        onKeyDown: state.keyDown,
         onMouseUp: state.mouseUp,
         onContextMenu: state.openContextMenu,
       })}

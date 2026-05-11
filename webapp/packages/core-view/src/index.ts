@@ -52,6 +52,7 @@ export * from './Action/IActionItem.js';
 export * from './Action/KeyBinding/IKeyBinding.js';
 export * from './Action/KeyBinding/getCommonAndOSSpecificKeys.js';
 export * from './Action/KeyBinding/getBindingLabel.js';
+export * from './Action/KeyBinding/matchesKeyBinding.js';
 export * from './LoadableStateContext/DATA_CONTEXT_LOADABLE_STATE.js';
 export * from './Menu/MenuItem/IMenuCheckboxItem.js';
 export * from './Menu/MenuItem/IMenuActionItem.js';
