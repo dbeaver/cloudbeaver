@@ -6,7 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 import { injectable } from '@cloudbeaver/core-di';
-import { SyncExecutor } from '@cloudbeaver/core-executor';
 import {
   ClientEventId,
   type ISessionEvent,
@@ -19,8 +18,6 @@ import { CbEventTopic, type CbActionCancelledEvent, type WsOpenUrlEvent } from '
 
 @injectable(() => [SessionEventSource])
 export class SessionActionsEventHandler extends TopicEventHandler<WsOpenUrlEvent, ISessionEvent, SessionEventId, SessionEventTopic> {
-  readonly onAuthCancelled = new SyncExecutor<string>();
-
   constructor(sessionEventSource: SessionEventSource) {
     super(CbEventTopic.CbSessionAction, sessionEventSource);
   }
@@ -31,7 +28,6 @@ export class SessionActionsEventHandler extends TopicEventHandler<WsOpenUrlEvent
       topicId: SessionEventTopic.CbSessionAction,
       actionId,
     });
-    this.onAuthCancelled.execute(actionId);
   }
 
   map(event: WsOpenUrlEvent): WsOpenUrlEvent {
