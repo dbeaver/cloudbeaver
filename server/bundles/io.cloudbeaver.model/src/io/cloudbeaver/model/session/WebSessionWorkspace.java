@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package io.cloudbeaver.model.session;
 
 import io.cloudbeaver.WebSessionProjectImpl;
+import io.cloudbeaver.utils.ServletAppUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -199,12 +200,15 @@ public class WebSessionWorkspace implements DBPWorkspace {
 
     @Override
     public boolean hasRealmPermission(@NotNull String permission) {
+        if (getWebSession() instanceof WebSession webSession) {
+            return webSession.getSessionPermissions().contains(permission);
+        }
         return false;
     }
 
     @Override
     public boolean supportsRealmFeature(@NotNull String feature) {
-        return false;
+        return ServletAppUtils.getServletApplication().getAppConfiguration().isFeatureEnabled(feature);
     }
 
 }

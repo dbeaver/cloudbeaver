@@ -115,4 +115,9 @@ public class ServerGlobalWorkspace extends BaseWorkspaceImpl {
         }
         return null;
     }
+
+    @Override
+    public boolean supportsRealmFeature(@NotNull String feature) {
+        return application.getAppConfiguration().isFeatureEnabled(feature);
+    }
 }

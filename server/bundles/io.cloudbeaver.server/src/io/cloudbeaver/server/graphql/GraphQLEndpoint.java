@@ -239,6 +239,14 @@ public class GraphQLEndpoint extends HttpServlet {
         @Nullable Map<String, Object> variables,
         @Nullable String operationName
     ) throws IOException {
+
+        String userId = GraphQLLoggerUtil.getUserId(request);
+        LocalDateTime startTime = LocalDateTime.now();
+
+        if (isQueryHandledBeforeExecution(request, response, variables, operationName, userId)) {
+            return;
+        }
+
         Map<String, Object> mapOfContext =
             Map.of(
                 "request", request,
@@ -254,8 +262,6 @@ public class GraphQLEndpoint extends HttpServlet {
         if (operationName != null) {
             contextBuilder.operationName(operationName);
         }
-        String userId = GraphQLLoggerUtil.getUserId(request);
-        LocalDateTime startTime = LocalDateTime.now();
         ExecutionInput executionInput = contextBuilder.build();
         ExecutionResult executionResult = null;
         Exception executionException = null;
@@ -271,23 +277,54 @@ public class GraphQLEndpoint extends HttpServlet {
             } else if (executionException != null) {
                 errorMessage = executionException.getMessage();
             }
-            if (WebAppUtils.getWebApplication() instanceof ApiCallInterceptor apiCallInterceptor) {
-                apiCallInterceptor.onApiCallEvent(
-                    request,
-                    variables,
-                    CommonUtils.notEmpty(operationName), userId, startTime,
-                    errorMessage,
-                    API_PROTOCOL
-                );
-            }
+            notifyApiCallInterceptor(request, variables, operationName, userId, startTime, errorMessage);
         }
 
         if (executionResult != null) {
-            Map<String, Object> resJSON = executionResult.toSpecification();
-            String resString = gson.toJson(resJSON);
-            setDevelHeaders(request, response);
-            response.setContentType(GraphQLConstants.CONTENT_TYPE_JSON_UTF8);
-            response.getWriter().print(resString);
+            writeExecutionResult(request, response, executionResult);
+        }
+    }
+
+    protected boolean isQueryHandledBeforeExecution(
+        @NotNull HttpServletRequest request,
+        @NotNull HttpServletResponse response,
+        @Nullable Map<String, Object> variables,
+        @Nullable String operationName,
+        @Nullable String userId
+    ) throws IOException {
+        return false;
+    }
+
+    protected void writeExecutionResult(
+        @NotNull HttpServletRequest request,
+        @NotNull HttpServletResponse response,
+        @NotNull ExecutionResult executionResult
+    ) throws IOException {
+        Map<String, Object> resJSON = executionResult.toSpecification();
+        String resString = gson.toJson(resJSON);
+        setDevelHeaders(request, response);
+        response.setContentType(GraphQLConstants.CONTENT_TYPE_JSON_UTF8);
+        response.getWriter().print(resString);
+    }
+
+    protected void notifyApiCallInterceptor(
+        @NotNull HttpServletRequest request,
+        @Nullable Map<String, Object> variables,
+        @Nullable String operationName,
+        @Nullable String userId,
+        @NotNull LocalDateTime startTime,
+        @Nullable String errorMessage
+    ) {
+        if (WebAppUtils.getWebApplication() instanceof ApiCallInterceptor apiCallInterceptor) {
+            apiCallInterceptor.onApiCallEvent(
+                request,
+                variables,
+                CommonUtils.notEmpty(operationName),
+                userId,
+                startTime,
+                errorMessage,
+                API_PROTOCOL
+            );
         }
     }
 
