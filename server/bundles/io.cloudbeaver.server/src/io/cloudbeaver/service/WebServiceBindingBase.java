@@ -108,11 +108,7 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
     }
 
     protected static WebSession getWebSession(DataFetchingEnvironment env) throws DBWebException {
-        if (env.getGraphQlContext().getBoolean(CloudbeaverCliConstants.CLI_MODE)) {
-            return getSessionFromContextOrThrow(env);
-        }
-        return WebAppUtils.getWebApplication().getSessionManager().getWebSession(
-            GraphQLEndpoint.getServletRequestOrThrow(env), getServletResponse(env));
+        return getWebSession(env, true);
     }
 
     @Nullable

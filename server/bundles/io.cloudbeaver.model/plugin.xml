@@ -25,6 +25,11 @@
                     label="Default secret controller" description="Default void secret controller"/>
     </extension>
 
+    <extension point="io.cloudbeaver.feature">
+        <feature id="ssh" label="SSH tunnels for databases" description="Enables SSH tunnels for secure database connections, allowing access to remote databases through encrypted channels" enabledByDefault="true"/>
+    </extension>
+
+
     <extension point="org.jkiss.dbeaver.ws.event">
         <event topicId="cb_session_task" id="cb_session_task_info_updated"
                class="io.cloudbeaver.websocket.event.task.WSSessionTaskInfoEvent"/>
