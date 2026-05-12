@@ -6,6 +6,28 @@
  * you may not use this file except in compliance with the License.
  */
 
+.tabsLayout {
+  display: flex;
+  flex-direction: row;
+  flex: 1;
+  overflow: hidden;
+  height: 100%;
+}
+
+.actionsBar {
+  composes: theme-border-color-background from global;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: auto;
+  border-right: solid 1px;
+}
+
+.tabPanelList {
+  flex: 1;
+  overflow: hidden;
+}
+
 .pane {
   &:first-child {
     display: flex;
