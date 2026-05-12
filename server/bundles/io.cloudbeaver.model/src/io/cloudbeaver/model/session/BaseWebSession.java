@@ -55,14 +55,21 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
     @NotNull
     protected final ServletApplication application;
     protected volatile long lastAccessTime;
+    @NotNull
+    private final SessionType sessionType;
 
     private final List<CBWebSessionEventHandler> sessionEventHandlers = new CopyOnWriteArrayList<>();
     private WebSessionEventsFilter eventsFilter;
     private final WebSessionWorkspace workspace;
 
-    public BaseWebSession(@NotNull String id, @NotNull ServletApplication application) throws DBException {
+    public BaseWebSession(
+        @NotNull String id,
+        @NotNull ServletApplication application,
+        @NotNull SessionType sessionType
+    ) throws DBException {
         this.id = id;
         this.application = application;
+        this.sessionType = sessionType;
         this.createTime = System.currentTimeMillis();
         this.lastAccessTime = this.createTime;
         this.workspace = createWebWorkspace();
@@ -174,6 +181,11 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
 
     public long getLastAccessTimeMillis() {
         return lastAccessTime;
+    }
+
+    @NotNull
+    public SessionType getSessionType() {
+        return sessionType;
     }
 
     public void touchSession() {

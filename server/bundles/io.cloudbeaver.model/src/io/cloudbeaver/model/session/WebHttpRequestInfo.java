@@ -17,6 +17,7 @@
 package io.cloudbeaver.model.session;
 
 import jakarta.servlet.http.HttpServletRequest;
+import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.utils.HttpConstants;
 
@@ -31,12 +32,16 @@ public class WebHttpRequestInfo {
     private final String lastRemoteAddress;
     @Nullable
     private final String lastRemoteUserAgent;
+    @NotNull
+    private final SessionType sessionType;
 
     public WebHttpRequestInfo(HttpServletRequest request) {
-        this.id = request.getSession() == null ? null : request.getSession().getId();
-        this.locale = request.getAttribute("locale");
-        this.lastRemoteAddress = request.getRemoteAddr();
-        this.lastRemoteUserAgent = request.getHeader(USER_AGENT);
+        this(
+            request.getSession() == null ? null : request.getSession().getId(),
+            request.getAttribute("locale"),
+            request.getRemoteAddr(),
+            request.getHeader(USER_AGENT)
+        );
     }
 
     public WebHttpRequestInfo(
@@ -45,10 +50,21 @@ public class WebHttpRequestInfo {
         @Nullable String lastRemoteAddress,
         @Nullable String lastRemoteUserAgent
     ) {
+        this(id, locale, lastRemoteAddress, lastRemoteUserAgent, SessionType.WEB);
+    }
+
+    public WebHttpRequestInfo(
+        @Nullable String id,
+        @Nullable Object locale,
+        @Nullable String lastRemoteAddress,
+        @Nullable String lastRemoteUserAgent,
+        @NotNull SessionType sessionType
+    ) {
         this.id = id;
         this.locale = locale;
         this.lastRemoteAddress = lastRemoteAddress;
         this.lastRemoteUserAgent = lastRemoteUserAgent;
+        this.sessionType = sessionType;
     }
 
     @Nullable
@@ -69,5 +85,10 @@ public class WebHttpRequestInfo {
     @Nullable
     public String getLastRemoteUserAgent() {
         return lastRemoteUserAgent;
+    }
+
+    @NotNull
+    public SessionType getSessionType() {
+        return sessionType;
     }
 }

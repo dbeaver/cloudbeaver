@@ -128,7 +128,7 @@ public class CBJettyServer {
                 ServletHolder eventsServletHolder = new ServletHolder("events", new CBEventsLongPollingServlet());
                 servletContextHandler.addServlet(eventsServletHolder, serverConfiguration.getServicesURI() + "events/*");
 
-                GraphQLEndpoint endpoint = new GraphQLEndpoint(new ServerConfigurationTimeLimitFilter(application));
+                GraphQLEndpoint endpoint = application.createGraphQLEndpoint(new ServerConfigurationTimeLimitFilter(application));
                 application.addApplicationContextValue(GraphQL.class.getName(), endpoint.getGraphQL());
                 String gqlServletPath = serverConfiguration.getServicesURI() + "gql/*";
                 servletContextHandler.addServlet(
