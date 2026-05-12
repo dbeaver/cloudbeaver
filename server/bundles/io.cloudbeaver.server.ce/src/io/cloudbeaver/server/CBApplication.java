@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2025 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
  */
 package io.cloudbeaver.server;
 
+import graphql.execution.instrumentation.Instrumentation;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.auth.NoAuthCredentialsProvider;
 import io.cloudbeaver.model.CBWebServerConfig;
@@ -29,6 +30,7 @@ import io.cloudbeaver.model.config.CBAppConfig;
 import io.cloudbeaver.model.config.CBServerConfig;
 import io.cloudbeaver.registry.WebDriverRegistry;
 import io.cloudbeaver.registry.WebServiceRegistry;
+import io.cloudbeaver.server.graphql.GraphQLEndpoint;
 import io.cloudbeaver.server.jetty.CBJettyServer;
 import io.cloudbeaver.service.DBWServiceInitializer;
 import io.cloudbeaver.service.DBWServiceServerConfigurator;
@@ -683,6 +685,11 @@ public abstract class CBApplication<T extends CBServerConfig>
 
     protected CBSessionManager createSessionManager() {
         return new CBSessionManager(this);
+    }
+
+    @NotNull
+    public GraphQLEndpoint createGraphQLEndpoint(@NotNull Instrumentation instrumentation) {
+        return new GraphQLEndpoint(instrumentation);
     }
 
     @NotNull

@@ -62,6 +62,9 @@
       "path": "../core-sdk"
     },
     {
+      "path": "../core-session-actions"
+    },
+    {
       "path": "../core-settings"
     },
     {
