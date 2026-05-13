@@ -31,6 +31,6 @@ public class ServerGlobalWorkspaceSession extends LocalWorkspaceSession {
     @Nullable
     @Override
     public DBSSecretController getSecretController() {
-        return super.getSecretController();
+        return null;
     }
 }
