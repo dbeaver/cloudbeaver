@@ -130,7 +130,7 @@ export class ConnectionNavNodeService {
 
     await this.connectionInfoResource.load(ConnectionInfoActiveProjectKey);
 
-    const notConnected = ResourceKeyUtils.some(key, key => {
+    const notConnectedChildrenNode = ResourceKeyUtils.some(key, key => {
       const connection = this.connectionInfoResource.getConnectionForNode(key);
 
       if (!connection || connection.connected) {
@@ -142,7 +142,7 @@ export class ConnectionNavNodeService {
       return key !== connectionNodeId;
     });
 
-    if (notConnected) {
+    if (notConnectedChildrenNode) {
       ExecutorInterrupter.interrupt(context);
       throw new Error('Connection not established');
     }
