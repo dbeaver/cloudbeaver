@@ -13,8 +13,7 @@ import { getComputed, useHover, useMergeRefs, useObjectRef, useObservableRef } f
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { clsx } from '@dbeaver/ui-kit';
 import { type IDataGridCellRenderer, type ICellPosition } from '@cloudbeaver/plugin-data-grid';
-import { DatabaseEditChangeType, type IGridDataKey, type IGridRowKey, KEY_BINDING_OPEN_CELL_CONTEXT_MENU } from '@cloudbeaver/plugin-data-viewer';
-import { matchesKeyBinding } from '@cloudbeaver/core-view';
+import { DatabaseEditChangeType, KEY_BINDING_OPEN_CELL_CONTEXT_MENU, type IGridDataKey, type IGridRowKey } from '@cloudbeaver/plugin-data-viewer';
 import { isObjectsEqual } from '@cloudbeaver/core-utils';
 
 import { ColumnDnDContext } from '../ColumnDnDContext.js';
@@ -24,6 +23,7 @@ import { TableDataContext, type IColumnInfo } from '../TableDataContext.js';
 import { CellContext } from './CellContext.js';
 import { useDataEditorDnDBox } from '../useDataEditorDnDBox.js';
 import { getDropSide } from '../getDropSide.js';
+import { isBindingPressed } from '@cloudbeaver/core-view';
 
 interface Props {
   rowIdx: number;
@@ -146,7 +146,7 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
         }
       },
       keyDown(event: React.KeyboardEvent<HTMLDivElement>) {
-        if (matchesKeyBinding(event, KEY_BINDING_OPEN_CELL_CONTEXT_MENU)) {
+        if (isBindingPressed(event, KEY_BINDING_OPEN_CELL_CONTEXT_MENU)) {
           event.preventDefault();
           event.stopPropagation();
           this.cellContext.setMenuVisibility(!this.cellContext.isMenuVisible);
