@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -35,7 +35,6 @@ export interface IFormState<TState> {
   readonly submitTask: IExecutor<IFormState<TState>>;
   readonly formatTask: IExecutor<IFormState<TState>>;
   readonly validationTask: IExecutor<IFormState<TState>>;
-  readonly resetTask: IExecutor<IFormState<TState>>;
 
   setMode(mode: FormMode): this;
   setPartsState(state: MetadataMap<string, any>): this;
