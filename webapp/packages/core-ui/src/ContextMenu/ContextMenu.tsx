@@ -21,6 +21,7 @@ export interface IContextMenuNewProps extends IContextMenuProps {
   ref?: React.ForwardedRef<HTMLButtonElement>;
   shift?: number;
   gutter?: number;
+  autoFocusOnShow?: boolean;
 }
 
 export const ContextMenu = observer<IContextMenuNewProps>(function ContextMenuInner({
@@ -33,6 +34,7 @@ export const ContextMenu = observer<IContextMenuNewProps>(function ContextMenuIn
   rtl,
   shift,
   gutter,
+  autoFocusOnShow = false,
   ...rest
 }) {
   const translate = useTranslate();
@@ -44,7 +46,6 @@ export const ContextMenu = observer<IContextMenuNewProps>(function ContextMenuIn
   const handler = menuData.handler;
 
   useAutoLoad({ name: `${ContextMenuInner.name}(${menuData.menu.id})` }, menuData.loaders, true, isMenuOpen, true);
-  menu.setAutoFocusOnShow(true);
 
   const handlers = useObjectRef(
     () => ({
@@ -75,6 +76,8 @@ export const ContextMenu = observer<IContextMenuNewProps>(function ContextMenuIn
       menu.show();
     }
   }, [showAtPosition, menu]);
+
+  menu.setAutoFocusOnShow(autoFocusOnShow);
 
   const menuContext = useMemo<IMenuContext>(() => ({ menu: menuData, rtl: isRtl }), [menuData, isRtl]);
 
