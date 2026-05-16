@@ -30,6 +30,7 @@ import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.model.net.DBWNetworkProfile;
+import org.jkiss.dbeaver.model.net.DBWNetworkProfileManager;
 import org.jkiss.dbeaver.model.preferences.DBPPreferenceStore;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.secret.DBSSecretController;
@@ -258,26 +259,10 @@ public class WebGlobalProjectRegistryProxy implements DBPDataSourceRegistry, Dat
         dataSourceRegistry.removeSavedFilter(filterName);
     }
 
-    @Nullable
-    @Override
-    public DBWNetworkProfile getNetworkProfile(@Nullable String source, @NotNull String name) {
-        return dataSourceRegistry.getNetworkProfile(source, name);
-    }
-
     @NotNull
     @Override
-    public List<DBWNetworkProfile> getNetworkProfiles() {
+    public DBWNetworkProfileManager getNetworkProfiles() {
         return dataSourceRegistry.getNetworkProfiles();
-    }
-
-    @Override
-    public void updateNetworkProfile(@NotNull DBWNetworkProfile profile) {
-        dataSourceRegistry.updateNetworkProfile(profile);
-    }
-
-    @Override
-    public void removeNetworkProfile(@NotNull DBWNetworkProfile profile) {
-        dataSourceRegistry.removeNetworkProfile(profile);
     }
 
     @Nullable
