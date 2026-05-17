@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@ import { Link, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import type { TeamInfo } from '@cloudbeaver/core-authentication';
 import { ADMINISTRATION_TABLE_DEFAULT_ROW_HEIGHT, AdministrationTableStyles } from '@cloudbeaver/core-administration';
-import { DataGrid, useCreateGridReactiveValue, TableRowSelect } from '@cloudbeaver/plugin-data-grid';
+import { DataGrid, useCreateGridReactiveValue, TableRowSelect, onCellKeyDownTableOpen } from '@cloudbeaver/plugin-data-grid';
 
 import { TeamsTableOptionsPanelService } from './TeamsTableOptionsPanelService.js';
 
@@ -117,6 +117,14 @@ export const TeamsTable = observer<Props>(function TeamsTable({ teams }) {
         headerElement={headerElement}
         cell={cell}
         className={s(styles, { table: true })}
+        onCellKeyDown={(position, event) =>
+          onCellKeyDownTableOpen(position, event, {
+            rows: teams,
+            columns: COLUMNS,
+            openColumnKey: ID_COLUMN.key,
+            open: row => teamsTableOptionsPanelService.open(row.teamId),
+          })
+        }
       />
     </div>
   );

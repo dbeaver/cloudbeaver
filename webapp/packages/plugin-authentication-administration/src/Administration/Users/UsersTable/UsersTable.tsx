@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@ import type { AdminUserInfoFragment } from '@cloudbeaver/core-sdk';
 import { UsersResource } from '@cloudbeaver/core-authentication';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ADMINISTRATION_TABLE_DEFAULT_ROW_HEIGHT, AdministrationTableStyles } from '@cloudbeaver/core-administration';
-import { DataGrid, useCreateGridReactiveValue } from '@cloudbeaver/plugin-data-grid';
+import { DataGrid, useCreateGridReactiveValue, onCellKeyDownTableOpen } from '@cloudbeaver/plugin-data-grid';
 
 import { UsersTableOptionsPanelService } from './UsersTableOptionsPanelService.js';
 import { UsersAdministrationService } from '../UsersAdministrationService.js';
@@ -161,6 +161,14 @@ export const UsersTable = observer<Props>(function UsersTable({ users, isManagea
         cell={cell}
         className={s(styles, { table: true })}
         onScrollToBottom={onLoadMore}
+        onCellKeyDown={(position, event) =>
+          onCellKeyDownTableOpen(position, event, {
+            rows: users,
+            columns,
+            openColumnKey: ID_COLUMN.key,
+            open: row => usersTableOptionsPanelService.open(row.userId),
+          })
+        }
       />
     </div>
   );
