@@ -25,6 +25,31 @@ You can see a live demo of CloudBeaver here: https://demo.cloudbeaver.io
 
 ## Changelog
 
+### 26.0.5 2026-05-18
+- Authorization:
+    - Added HTTP header authentication support for GraphQL queries. Users can provide API tokens via Authorization or X-Api-Key headers, allowing external data tools to authenticate without modifying request bodies.
+- Data Editor:
+    - Added a DDL generation option to the Data Editor and Result Set. Users can view table schemas directly while editing or reviewing records.
+    - Fixed the copying of Boolean values in the clipboard in the Data Editor.
+- SQL Editor:
+    - Updated the SQL Editor to use real tab characters for indentation. The application displayed tabs as four-space gaps with a distinct visual marker.
+    - Added an ability to view and edit scripts without connecting to the database.
+    - Added more settings to the Generated SQL window, including the ability to select fully qualified names for query or use compact SQL formatting.
+    - Added the ability to open generated queries right from the Generate SQL window.
+- General:
+    - Updated the manifest.webmanifest file to dynamically generate the environment variable according to the CLOUDBEAVER_ROOT_URI. (thanks to @houssemexo26 )
+- Databases:
+    - PostgreSQL:
+        - Updated driver to version 42.7.11.
+        - Fixed missing INOUT parameters in CHECK generation for procedures and functions.
+        - Fixed handling of 24:xx values in time columns.
+    - Snowflake: Updated driver to version 4.1.0.
+    - SQL Server: Fixed the issue with connecting to the database after the Java update.
+- Security:
+    - Added an administrative setting to restrict SSH tunneling capabilities. Administrators can now limit tunnel configuration to authorized users, reducing the risk of unauthorized network access.
+    - Fixed the high vulnerability (CVE-2026-42035) in the axios library. The library was updated to version 1.15.1.
+    - Fixed the medium vulnerability (CVE-2026-41305) in the postcss library. The library was updated to version 8.5.14.
+
 ### 26.0.4 2026-05-04
 
 - Data Editor:
