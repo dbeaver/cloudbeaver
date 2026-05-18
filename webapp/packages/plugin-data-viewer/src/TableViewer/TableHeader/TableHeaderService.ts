@@ -91,10 +91,22 @@ export class TableHeaderService extends Bootstrap {
             const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
             const constraints = model.source.tryGetAction(resultIndex, IDatabaseDataConstraintAction);
 
+            let updated = false;
+
             if (constraints) {
               constraints.deleteData();
+              updated = true;
+            }
+
+            if (!updated && model.source.options) {
+              model.source.options.whereFilter = '';
+              updated = true;
+            }
+
+            if (updated) {
               await model.request();
             }
+
             break;
           }
           case ACTION_UNDO: {
