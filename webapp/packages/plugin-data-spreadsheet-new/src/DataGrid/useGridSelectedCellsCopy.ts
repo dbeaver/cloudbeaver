@@ -12,13 +12,12 @@ import { useService } from '@cloudbeaver/core-di';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { copyToClipboard } from '@cloudbeaver/core-utils';
 import {
-  DatabaseSelectAction,
   DataViewerService,
   type IGridColumnKey,
   type IGridDataKey,
   GridDataKeysUtils,
-  ResultSetSelectAction,
   useDataViewerCopyHandler,
+  GridSelectAction,
 } from '@cloudbeaver/plugin-data-viewer';
 
 import type { IDataGridSelectionContext } from './DataGridSelection/DataGridSelectionContext.js';
@@ -68,7 +67,7 @@ function getSelectedCellsValue(tableData: ITableData, selectedCells: Map<string,
 
 export function useGridSelectedCellsCopy(
   tableData: ITableData,
-  selectAction: DatabaseSelectAction | undefined,
+  selectAction: GridSelectAction | undefined,
   selectionContext: IDataGridSelectionContext,
 ) {
   const dataViewerService = useService(DataViewerService);
@@ -80,7 +79,7 @@ export function useGridSelectedCellsCopy(
       const activeElement = document.activeElement as HTMLElement | null;
       const isEditing = activeElement?.matches('input, textarea, [contenteditable="true"]');
 
-      if(isEditing) {
+      if (isEditing) {
         return;
       }
 
@@ -93,11 +92,8 @@ export function useGridSelectedCellsCopy(
       EventContext.set(event, EventStopPropagationFlag);
 
       if (dataViewerService.canCopyData) {
-        if (!(props.selectAction instanceof ResultSetSelectAction)) {
-          throw new Error('Copying data is not supported');
-        }
-
         const focusedElement = props.selectAction?.getFocusedElement();
+
         let value: string | null = null;
 
         if (Array.from(props.selectionContext.selectedCells.keys()).length > 0) {
