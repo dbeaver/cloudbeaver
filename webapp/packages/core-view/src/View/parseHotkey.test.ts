@@ -219,4 +219,34 @@ describe('isBindingPressed', () => {
     const event = makeEvent({ key: 'Escape' });
     expect(isBindingPressed(event as any, binding)).toBe(true);
   });
+
+  it('returns false when an extra shift is pressed but binding is mod+/', () => {
+    const binding: IKeyBinding = { id: 'test', keys: 'mod+/' };
+    const event = makeEvent({ ctrlKey: true, shiftKey: true, key: '/' });
+    expect(isBindingPressed(event as any, binding)).toBe(false);
+  });
+
+  it('returns false when an extra alt is pressed but binding is ctrl+s', () => {
+    const binding: IKeyBinding = { id: 'test', keys: 'ctrl+s' };
+    const event = makeEvent({ ctrlKey: true, altKey: true, key: 's' });
+    expect(isBindingPressed(event as any, binding)).toBe(false);
+  });
+
+  it('returns false when an extra shift and alt are pressed but binding is mod+z', () => {
+    const binding: IKeyBinding = { id: 'test', keys: 'mod+z' };
+    const event = makeEvent({ ctrlKey: true, shiftKey: true, altKey: true, key: 'z' });
+    expect(isBindingPressed(event as any, binding)).toBe(false);
+  });
+
+  it('returns false when ctrl is pressed but binding is shift+a (extra ctrl)', () => {
+    const binding: IKeyBinding = { id: 'test', keys: 'shift+a' };
+    const event = makeEvent({ shiftKey: true, ctrlKey: true, key: 'a' });
+    expect(isBindingPressed(event as any, binding)).toBe(false);
+  });
+
+  it('returns true when exact modifiers match and no extra modifiers are pressed (mod+/)', () => {
+    const binding: IKeyBinding = { id: 'test', keys: 'mod+/' };
+    const event = makeEvent({ ctrlKey: true, key: '/' });
+    expect(isBindingPressed(event as any, binding)).toBe(true);
+  });
 });

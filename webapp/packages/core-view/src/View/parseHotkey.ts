@@ -58,20 +58,23 @@ export function isBindingPressed<T extends HTMLElement>(event: KeyboardEvent<T>,
     const parsed = parseHotkey(hotkey, combinationKey);
     const mod = event.ctrlKey || event.metaKey;
 
-    if (parsed.mod && !mod) {
+    if (!!parsed.shift !== event.shiftKey) {
       return false;
     }
-    if (parsed.ctrl && !event.ctrlKey) {
+    if (!!parsed.alt !== event.altKey) {
       return false;
     }
-    if (parsed.meta && !event.metaKey) {
-      return false;
-    }
-    if (parsed.shift && !event.shiftKey) {
-      return false;
-    }
-    if (parsed.alt && !event.altKey) {
-      return false;
+    if (parsed.mod) {
+      if (!mod) {
+        return false;
+      }
+    } else {
+      if (event.ctrlKey !== !!parsed.ctrl) {
+        return false;
+      }
+      if (event.metaKey !== !!parsed.meta) {
+        return false;
+      }
     }
 
     return parsed.keys?.some(k => mapKey(event.key) === k) ?? false;
