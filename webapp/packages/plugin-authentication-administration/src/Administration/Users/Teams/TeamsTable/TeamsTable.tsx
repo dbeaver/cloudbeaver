@@ -13,9 +13,10 @@ import { Link, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import type { TeamInfo } from '@cloudbeaver/core-authentication';
 import { ADMINISTRATION_TABLE_DEFAULT_ROW_HEIGHT, AdministrationTableStyles } from '@cloudbeaver/core-administration';
-import { DataGrid, useCreateGridReactiveValue, TableRowSelect, onCellKeyDownTableOpen } from '@cloudbeaver/plugin-data-grid';
+import { DataGrid, useCreateGridReactiveValue, TableRowSelect } from '@cloudbeaver/plugin-data-grid';
 
 import { TeamsTableOptionsPanelService } from './TeamsTableOptionsPanelService.js';
+import { Command } from '@dbeaver/ui-kit';
 
 interface Props {
   teams: TeamInfo[];
@@ -54,13 +55,14 @@ export const TeamsTable = observer<Props>(function TeamsTable({ teams }) {
 
     if (column.key === ID_COLUMN.key) {
       return (
-        <div
+        <Command
+          tabIndex={0}
           title={row.teamId}
-          className="tw:flex tw:cursor-pointer tw:items-center tw:gap-2"
+          className="tw:flex tw:cursor-pointer tw:items-center tw:gap-2 tw:outline-none"
           onClick={() => teamsTableOptionsPanelService.open(row.teamId)}
         >
           <Link truncate>{row.teamId}</Link>
-        </div>
+        </Command>
       );
     }
 
@@ -117,14 +119,6 @@ export const TeamsTable = observer<Props>(function TeamsTable({ teams }) {
         headerElement={headerElement}
         cell={cell}
         className={s(styles, { table: true })}
-        onCellKeyDown={(position, event) =>
-          onCellKeyDownTableOpen(position, event, {
-            rows: teams,
-            columns: COLUMNS,
-            openColumnKey: ID_COLUMN.key,
-            open: row => teamsTableOptionsPanelService.open(row.teamId),
-          })
-        }
       />
     </div>
   );

@@ -16,10 +16,11 @@ import type { AdminUserInfoFragment } from '@cloudbeaver/core-sdk';
 import { UsersResource } from '@cloudbeaver/core-authentication';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ADMINISTRATION_TABLE_DEFAULT_ROW_HEIGHT, AdministrationTableStyles } from '@cloudbeaver/core-administration';
-import { DataGrid, useCreateGridReactiveValue, onCellKeyDownTableOpen } from '@cloudbeaver/plugin-data-grid';
+import { DataGrid, useCreateGridReactiveValue } from '@cloudbeaver/plugin-data-grid';
 
 import { UsersTableOptionsPanelService } from './UsersTableOptionsPanelService.js';
 import { UsersAdministrationService } from '../UsersAdministrationService.js';
+import { Command } from '@dbeaver/ui-kit';
 
 interface Props {
   users: AdminUserInfoFragment[];
@@ -84,13 +85,14 @@ export const UsersTable = observer<Props>(function UsersTable({ users, isManagea
 
     if (column.key === ID_COLUMN.key) {
       return (
-        <div
+        <Command
+          tabIndex={0}
           title={row.userId}
-          className="tw:flex tw:cursor-pointer tw:items-center tw:gap-2"
+          className="tw:flex tw:cursor-pointer tw:items-center tw:gap-2 tw:outline-none"
           onClick={() => usersTableOptionsPanelService.open(row.userId)}
         >
           <Link truncate>{row.userId}</Link>
-        </div>
+        </Command>
       );
     }
 
@@ -161,14 +163,6 @@ export const UsersTable = observer<Props>(function UsersTable({ users, isManagea
         cell={cell}
         className={s(styles, { table: true })}
         onScrollToBottom={onLoadMore}
-        onCellKeyDown={(position, event) =>
-          onCellKeyDownTableOpen(position, event, {
-            rows: users,
-            columns,
-            openColumnKey: ID_COLUMN.key,
-            open: row => usersTableOptionsPanelService.open(row.userId),
-          })
-        }
       />
     </div>
   );
