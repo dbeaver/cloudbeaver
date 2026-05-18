@@ -27,7 +27,6 @@ import {
   DATA_CONTEXT_DV_PRESENTATION,
   type DatabaseDataSelectActionsData,
   DatabaseEditChangeType,
-  DatabaseSelectAction,
   DataViewerPresentationType,
   type IDatabaseDataModel,
   type IDataPresentationProps,
@@ -186,7 +185,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
     },
   }));
 
-  const gridSelectedCellCopy = useGridSelectedCellsCopy(tableData, selectionAction as unknown as DatabaseSelectAction, gridSelectionContext);
+  const gridSelectedCellCopy = useGridSelectedCellsCopy(tableData, selectionAction, gridSelectionContext);
   const gridSelectedCellPaste = useGridSelectedCellsPaste(tableData, selectionAction as unknown as ResultSetSelectAction);
   const { onMouseDownHandler, onMouseMoveHandler } = useGridDragging({
     onDragStart: startPosition => {
