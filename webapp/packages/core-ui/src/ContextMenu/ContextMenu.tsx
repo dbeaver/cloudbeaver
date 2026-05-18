@@ -34,7 +34,7 @@ export const ContextMenu = observer<IContextMenuNewProps>(function ContextMenuIn
   rtl,
   shift,
   gutter,
-  autoFocusOnShow = false,
+  autoFocusOnShow,
   ...rest
 }) {
   const translate = useTranslate();
@@ -42,6 +42,7 @@ export const ContextMenu = observer<IContextMenuNewProps>(function ContextMenuIn
   const menu = useMenuStore({ placement, rtl: rtl || parent?.rtl, open: visible });
   const isRtl = useStoreState(menu, 'rtl');
   const isMenuOpen = useStoreState(menu, 'open');
+  const isAutoFocus = useStoreState(menu, 'autoFocusOnShow');
 
   const handler = menuData.handler;
 
@@ -77,9 +78,13 @@ export const ContextMenu = observer<IContextMenuNewProps>(function ContextMenuIn
     }
   }, [showAtPosition, menu]);
 
-  menu.setAutoFocusOnShow(autoFocusOnShow);
-
   const menuContext = useMemo<IMenuContext>(() => ({ menu: menuData, rtl: isRtl }), [menuData, isRtl]);
+
+  useLayoutEffect(() => {
+    if (autoFocusOnShow && !isAutoFocus) {
+      menu.setAutoFocusOnShow(true);
+    }
+  }, [autoFocusOnShow, isAutoFocus, menu]);
 
   if (handler?.isHidden?.(menuData.context)) {
     return null;
