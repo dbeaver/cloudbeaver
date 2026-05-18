@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2025 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -556,7 +556,7 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
             log.debug("Found " + groupsByMemberAttribute.size() + " groups by member attribute");
             result.addAll(groupsByMemberAttribute);
         } catch (Exception e) {
-            log.error("Group not found", e);
+            log.error("Group not found. " + e.getMessage());
         } finally {
             try {
                 if (context != null) {
@@ -618,7 +618,7 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
                     //add relative dn to base dn
                     result.add(next.getName());
                 } catch (Exception e) {
-                    log.error("Failed fetch user group. Skipping...", e);
+                    log.error("Failed fetch user group. " + e.getMessage());
                 }
             }
         } finally {

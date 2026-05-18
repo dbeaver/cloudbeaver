@@ -14,6 +14,7 @@ import { LocalizationService } from '@cloudbeaver/core-localization';
 import {
   DATA_CONTEXT_NAV_NODE,
   ENodeFeature,
+  EObjectFeature,
   getNodePlainName,
   type INodeActions,
   isConnectionFolder,
@@ -25,6 +26,7 @@ import {
   nodeDeleteContext,
   NodeManagerUtils,
 } from '@cloudbeaver/core-navigation-tree';
+import { isConnectionNode } from '@cloudbeaver/core-connections';
 import { ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import {
   ACTION_DELETE,
@@ -201,7 +203,11 @@ export class NavNodeContextMenuService extends Bootstrap {
           }
           case ACTION_REFRESH: {
             try {
-              await this.navNodeManagerService.refreshTree(node.id);
+              if (isConnectionNode(node) && !node.objectFeatures.includes(EObjectFeature.dataSourceConnected)) {
+                await this.navNodeInfoResource.refresh(node.id);
+              } else {
+                await this.navNodeManagerService.refreshTree(node.id);
+              }
             } catch (exception: any) {
               this.notificationService.logException(exception, 'app_navigationTree_refresh_error');
             }

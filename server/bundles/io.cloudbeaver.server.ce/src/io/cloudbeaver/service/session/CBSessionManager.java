@@ -51,7 +51,7 @@ public class CBSessionManager implements WebAppSessionManager {
     private static final Log log = Log.getLog(CBSessionManager.class);
 
     private final CBApplication<?> application;
-    private final Map<String, BaseWebSession> sessionMap = new HashMap<>();
+    protected final Map<String, BaseWebSession> sessionMap = new HashMap<>();
 
     public CBSessionManager(CBApplication<?> application) {
         this.application = application;
@@ -527,4 +527,5 @@ public class CBSessionManager implements WebAppSessionManager {
         log.debug("> Expire session '" + session.getSessionId() + "'");
         session.close();
     }
+
 }
