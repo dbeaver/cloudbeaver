@@ -11,6 +11,10 @@ import type { SqlExecutionPlanNode } from '@cloudbeaver/core-sdk';
 export interface ISqlExecutionPlanViewProps {
   nodes: SqlExecutionPlanNode[];
   query: string;
+  hasCost: boolean;
+  hasRows: boolean;
+  hasDuration: boolean;
+  durationMeasure?: string;
   selectedNode: string | null;
   onNodeSelect: (nodeId: string | null) => void;
 }
