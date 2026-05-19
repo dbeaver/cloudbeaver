@@ -69,7 +69,7 @@ export function useGridSelectedCellsPaste(
       }
 
       const getRowIdx = (key: IGridDataKey) => tableData.getRowIndexFromKey(key.row);
-      const getColIdx = (key: IGridDataKey) => tableData.getColumnIndexFromColumnKey(key.column);
+      const getColIdx = (key: IGridDataKey) => tableData.getVisualColumnIndexFromColumnKey(key.column);
 
       // row-major order (top-to-bottom, left-to-right)
       const targets = selectedCells.slice().sort((a, b) => {

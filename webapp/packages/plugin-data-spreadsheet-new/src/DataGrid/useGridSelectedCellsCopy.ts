@@ -46,7 +46,7 @@ function getSelectedCellsValue(tableData: ITableData, selectedCells: Map<string,
   const rowsValues: string[] = [];
   for (const rowSelection of orderedSelectedCells.values()) {
     const rowCellsValues: string[] = [];
-    for (const column of tableData.view.columnKeys) {
+    for (const column of tableData.view.visualColumnKeys) {
       if (!selectedColumns.some(columnKey => GridDataKeysUtils.isEqual(columnKey, column))) {
         continue;
       }
