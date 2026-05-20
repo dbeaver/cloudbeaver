@@ -8,7 +8,13 @@
 import type { IExecutor } from '@cloudbeaver/core-executor';
 import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
-import type { DatabaseDataAccessMode, IDatabaseDataSource, IDatabaseDataSourceOperationEvent, IRequestInfo } from './IDatabaseDataSource.js';
+import type {
+  DatabaseDataAccessMode,
+  DataReadonlyReason,
+  IDatabaseDataSource,
+  IDatabaseDataSourceOperationEvent,
+  IRequestInfo,
+} from './IDatabaseDataSource.js';
 
 export interface IRequestEventData<TSource extends IDatabaseDataSource<any, any> = IDatabaseDataSource> extends IDatabaseDataSourceOperationEvent {
   model: IDatabaseDataModel<TSource>;
@@ -31,6 +37,7 @@ export interface IDatabaseDataModel<TSource extends IDatabaseDataSource<any, any
 
   setName: (name: string | null) => this;
   isReadonly: (resultIndex: number) => boolean;
+  getReadonlyReason: (resultIndex: number) => DataReadonlyReason | null;
   isDisabled: (resultIndex?: number) => boolean;
   isLoading: () => boolean;
   isDataAvailable: (offset: number, count: number) => boolean;

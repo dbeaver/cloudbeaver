@@ -43,6 +43,12 @@ export enum DatabaseDataAccessMode {
   Default,
   Readonly,
 }
+export enum DataReadonlyReason {
+  /** The data source does not support editing (grouping panel). */
+  Presentation = 'presentation',
+  /** The result data itself is marked read-only by the server (computed columns, missing row identifier). */
+  Result = 'result',
+}
 
 /**
  * Feature flags for database data sources.
@@ -94,6 +100,7 @@ export interface IDatabaseDataSource<TOptions = unknown, TResult extends IDataba
   isOutdated: () => boolean;
   isLoadable: () => boolean;
   isReadonly: (resultIndex: number) => boolean;
+  getReadonlyReason: (resultIndex: number) => DataReadonlyReason | null;
   isDataAvailable: (offset: number, count: number) => boolean;
   isLoading: () => boolean;
   isDisabled: (resultIndex?: number) => boolean;

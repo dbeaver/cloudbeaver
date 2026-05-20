@@ -25,6 +25,7 @@ export default [
   ['data_grid_table_context_menu_filter_dialog_title', 'Wert bearbeiten'],
   ['data_grid_table_index_column_tooltip', 'Wählen ganze Tabelle aus'],
   ['data_grid_table_readonly_connection_tooltip', 'Schreibgeschützte Verbindung'],
+  ['data_grid_table_readonly_presentation_tooltip', 'Die aktive Darstellung unterstützt keine Datenbearbeitung'],
   ['data_grid_table_no_key_found_tooltip', 'Kein eindeutiger Schlüssel gefunden. Datenänderung nicht möglich.'],
   ['data_grid_table_virtual_key_tooltip', 'Virtueller Schlüssel'],
   ['data_grid_table_key_column_tooltip', 'Schlüsselspalte'],

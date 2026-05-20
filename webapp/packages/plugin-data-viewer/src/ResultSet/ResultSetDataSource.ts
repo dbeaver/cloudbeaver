@@ -36,16 +36,17 @@ import { ResultSetFormatAction } from '../DatabaseDataModel/Actions/ResultSet/Re
 import { ResultSetSelectAction } from '../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction.js';
 import { ResultSetViewAction } from '../DatabaseDataModel/Actions/ResultSet/ResultSetViewAction.js';
 import { IDatabaseDataSelectAction } from '../DatabaseDataModel/Actions/IDatabaseDataSelectAction.js';
-import { DatabaseDataFeature } from '../DatabaseDataModel/IDatabaseDataSource.js';
+import { DatabaseDataFeature, DataReadonlyReason } from '../DatabaseDataModel/IDatabaseDataSource.js';
 
 export interface IRowIdentifierInfo {
   state: SqlRowIdentifierState | null;
   identifier: SqlRowIdentifier | null;
 }
 
-export abstract class ResultSetDataSource<TOptions extends IDatabaseDataOptions = IDatabaseDataOptions>
-  extends DatabaseDataSource<TOptions, IDatabaseResultSet>
-{
+export abstract class ResultSetDataSource<TOptions extends IDatabaseDataOptions = IDatabaseDataOptions> extends DatabaseDataSource<
+  TOptions,
+  IDatabaseResultSet
+> {
   executionContext: IConnectionExecutionContext | null;
   totalCountRequestTask: ITask<number> | null;
   private keepExecutionContextOnDispose: boolean;
@@ -88,6 +89,13 @@ export abstract class ResultSetDataSource<TOptions extends IDatabaseDataOptions 
 
   override isReadonly(resultIndex: number): boolean {
     return super.isReadonly(resultIndex) || !this.executionContext?.context || !!this.getResult(resultIndex)?.data?.readOnly;
+  }
+
+  override getReadonlyReason(resultIndex: number): DataReadonlyReason | null {
+    if (this.getResult(resultIndex)?.data?.readOnly) {
+      return DataReadonlyReason.Result;
+    }
+    return null;
   }
 
   override async cancel(): Promise<void> {

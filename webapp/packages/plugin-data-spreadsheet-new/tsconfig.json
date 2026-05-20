@@ -32,6 +32,9 @@
       "path": "../core-cli"
     },
     {
+      "path": "../core-connections"
+    },
+    {
       "path": "../core-data-context"
     },
     {

@@ -30,6 +30,7 @@ export default [
   ['data_grid_table_context_menu_save_value_error', 'Failed to save value'],
   ['data_grid_table_index_column_tooltip', 'Seleziona tutta la tabella'],
   ['data_grid_table_readonly_connection_tooltip', 'Connessione in sola lettura'],
+  ['data_grid_table_readonly_presentation_tooltip', 'La presentazione attiva non supporta la modifica dei dati'],
   ['data_grid_table_no_key_found_tooltip', 'Nessuna chiave univoca è stata trovata. La modifica dei dati non è possibile.'],
   ['data_grid_table_virtual_key_tooltip', 'Chiave virtuale'],
   ['data_grid_table_key_column_tooltip', 'Colonna chiave'],
