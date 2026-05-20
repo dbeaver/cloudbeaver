@@ -52,6 +52,10 @@ export const SqlExecutionPlanPanel = observer<Props>(function SqlExecutionPlanPa
           container={sqlExecutionPlanViewService.tabs}
           nodes={data.executionPlan.nodes}
           query={data.executionPlan.query}
+          hasCost={data.executionPlan.hasCost}
+          hasRows={data.executionPlan.hasRows}
+          hasDuration={data.executionPlan.hasDuration}
+          durationMeasure={data.executionPlan.durationMeasure}
           selectedNode={selectedNode}
           lazy
           onNodeSelect={setSelectedNode}

@@ -4,6 +4,7 @@ export default [
   ['plugin_help_welcome_docs_label', 'Документация'],
   ['plugin_help_welcome_docs_description', 'Узнайте как использовать {arg:product}'],
 
+  ['data_viewer_shortcut_open_cell_context_menu', 'Открыть контекстное меню для выбранной ячейки'],
   ['data_viewer_shortcut_start_inline_editing', 'Начать редактирование ячейки во встроенном редакторе'],
   ['data_viewer_shortcut_add_new_row', 'Добавить новую строку'],
   ['data_viewer_shortcut_duplicate_row', 'Продублировать строку'],
