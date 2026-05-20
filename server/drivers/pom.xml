@@ -26,6 +26,7 @@
         <module>h2_v3</module>
         <module>jaybird</module>
         <module>kyuubi</module>
+        <module>libsql</module>
         <module>mysql</module>
         <module>mariadb</module>
         <module>oracle</module>
