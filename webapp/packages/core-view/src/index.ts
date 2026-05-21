@@ -86,6 +86,7 @@ export * from './View/CaptureViewLazy.js';
 export * from './View/CaptureViewContext.js';
 export * from './View/IActiveView.js';
 export * from './View/IView.js';
+export * from './View/parseHotkey.js';
 export * from './View/useActiveView.js';
 export * from './View/useCaptureViewContext.js';
 export * from './View/View.js';
