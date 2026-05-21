@@ -4,6 +4,7 @@ export default [
   ['plugin_help_welcome_docs_label', 'Documentation'],
   ['plugin_help_welcome_docs_description', 'Learn how to use {arg:product}'],
 
+  ['data_viewer_shortcut_open_cell_context_menu', '打开所选单元格的上下文菜单'],
   ['data_viewer_shortcut_start_inline_editing', '为所选单元格打开内联编辑器'],
   ['data_viewer_shortcut_add_new_row', '添加行'],
   ['data_viewer_shortcut_duplicate_row', '复制行'],
