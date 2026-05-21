@@ -223,9 +223,8 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
         !this.appAuthService.authenticated ||
         !this.connectionSchemaManagerService.objectContainerList ||
         (this.connectionSchemaManagerService.currentObjectSchemaId === undefined &&
-          this.connectionSchemaManagerService.currentObjectCatalogId === undefined &&
-          !this.connectionSchemaManagerService.isObjectCatalogChangeable &&
-          !this.connectionSchemaManagerService.isObjectSchemaChangeable) ||
+          this.connectionSchemaManagerService.currentObjectCatalogId === undefined) ||
+        (!this.connectionSchemaManagerService.isObjectCatalogChangeable && !this.connectionSchemaManagerService.isObjectSchemaChangeable) ||
         (this.connectionSchemaManagerService.objectContainerList.schemaList.length === 0 &&
           this.connectionSchemaManagerService.objectContainerList.catalogList.length === 0),
       getLoader: () => {
@@ -246,7 +245,7 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
         );
 
         if (!label) {
-          label = 'plugin_datasource_context_switch_select_container';
+          label = this.localizationService.translate('plugin_datasource_context_switch_select_container');
         }
 
         const { clippedLabel } = getMenuLabelClipped(label);
