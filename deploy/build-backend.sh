@@ -2,6 +2,9 @@
 set -Eeo pipefail
 set +u
 
+script_dir="$(realpath "$(dirname "$0")")"
+repositories_root_dir="$(realpath "$script_dir/../..")"
+
 echo "Clone and build Cloudbeaver"
 
 rm -rf ./drivers
@@ -16,10 +19,9 @@ echo "Pull cloudbeaver platform"
 cd ../..
 
 echo "Pull dbeaver platform"
-[ ! -d dbeaver ] && git clone --depth 1 https://github.com/dbeaver/dbeaver.git
-[ ! -d dbeaver-common ] && git clone --depth 1 https://github.com/dbeaver/dbeaver-common.git
-[ ! -d dbeaver-jdbc-libsql ] && git clone --depth 1 https://github.com/dbeaver/dbeaver-jdbc-libsql.git
-
+[ ! -d "$repositories_root_dir/dbeaver-common" ] && git clone --depth 1 https://github.com/dbeaver/dbeaver-common.git "$repositories_root_dir/dbeaver-common"
+source "$repositories_root_dir/dbeaver-common/scripts/git_utils.sh"
+prepare_repo_and_dependencies "$repositories_root_dir" cloudbeaver
 
 cd cloudbeaver/deploy
 
