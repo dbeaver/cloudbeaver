@@ -1,5 +1,6 @@
 :global(.rdg-cell) .editor {
   appearance: none;
+  resize: none;
 
   box-sizing: border-box;
   min-height: initial;
