@@ -60,6 +60,16 @@ export function useGridSelectedCellsPaste(
         return;
       }
 
+      if (selectedCells.length === 1) {
+        const [target] = selectedCells;
+
+        if (target && tableData.isCellEditable(target)) {
+          tableData.editor.set(target, clipboardText);
+        }
+
+        return;
+      }
+
       const matrix = parseTSV(clipboardText);
       const rows = matrix.length;
       const cols = matrix[0]?.length ?? 0;
