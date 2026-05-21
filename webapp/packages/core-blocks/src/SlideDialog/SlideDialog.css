@@ -2,7 +2,6 @@
   .dbv-slide-dialog__overlay {
     position: absolute;
     inset: 0;
-    z-index: 999;
     background: rgb(0 0 0 / 0%);
     transition: background var(--duration-slow) var(--ease-smooth);
     pointer-events: none;
