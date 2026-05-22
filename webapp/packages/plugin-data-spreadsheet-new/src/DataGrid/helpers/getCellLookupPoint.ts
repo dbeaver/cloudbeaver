@@ -20,7 +20,7 @@ export interface IRect {
 export const LOOKUP_INSET = 18;
 
 /**
- Lets the caller resolve a cell even when the cursor is dragged off-grid.
+ * Clamps the cursor into the grid body so a cell can be resolved via elementFromPoint even when the cursor is dragged off-grid.
  */
 export function getCellLookupPoint(cursor: IMousePosition, body: IRect): IMousePosition {
   return {
