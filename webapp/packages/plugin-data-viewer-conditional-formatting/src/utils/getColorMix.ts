@@ -1,12 +1,12 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 
-import { clamp } from './clamp.js';
+import { clamp } from '@dbeaver/js-helpers';
 
 export function getColorMix(color1: string, color2: string, ratio: number): string {
   const percent = clamp(ratio * 100, 0, 100);
