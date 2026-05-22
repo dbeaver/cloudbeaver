@@ -1,42 +1,45 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 
 import { useObjectRef } from '@cloudbeaver/core-blocks';
+
+import { type IMousePosition, useGridAutoScroll } from './useGridAutoScroll.js';
 
 export interface IDraggingPosition {
   rowIdx: number;
   colIdx: number;
 }
 
-interface IMousePosition {
-  x: number;
-  y: number;
-}
+type DraggingMouseEvent = React.MouseEvent<HTMLDivElement> | MouseEvent;
 
-type DraggingCallback = (
-  startPosition: IDraggingPosition,
-  currentPosition: IDraggingPosition,
-  event: React.MouseEvent<HTMLDivElement> | MouseEvent,
-) => void;
+type DraggingCallback = (startPosition: IDraggingPosition, currentPosition: IDraggingPosition, event: DraggingMouseEvent) => void;
 
 interface IDraggingState {
   startDraggingCell: IDraggingPosition | null;
   currentDraggingCell: IDraggingPosition | null;
   startMousePosition: IMousePosition | null;
+  /** Last mouse event, reused to keep modifier keys (ctrl/meta) available while auto-scrolling */
+  lastEvent: DraggingMouseEvent | null;
+  scrollContainer: HTMLElement | null;
   dragging: boolean;
   mouseDown: boolean;
 }
 
 interface IDraggingCallbacks {
-  onDragStart?: (startPosition: IDraggingPosition, event: React.MouseEvent<HTMLDivElement> | MouseEvent) => void;
+  onDragStart?: (startPosition: IDraggingPosition, event: DraggingMouseEvent) => void;
   onDragOver?: DraggingCallback;
   onDragEnd?: DraggingCallback;
+}
+
+interface IGridDragging {
+  onMouseDownHandler: (event: React.MouseEvent<HTMLDivElement>) => void;
+  onMouseMoveHandler: (event: React.MouseEvent<HTMLDivElement>) => void;
 }
 
 const THRESHOLD = 10;
@@ -52,19 +55,18 @@ function getDelta(startPosition: IMousePosition | null, currentPosition: IMouseP
   return Math.max(xDelta, yDelta);
 }
 
-function getCellPositionFromEvent(event: React.MouseEvent<HTMLDivElement>) {
-  const target = event.target as HTMLElement;
-  const cell = target.closest('[role="gridcell"]') as HTMLElement | null;
+function getCellPositionFromElement(element: Element | null): IDraggingPosition | undefined {
+  const cell = element?.closest('[role="gridcell"]');
 
   if (!cell) {
-    return;
+    return undefined;
   }
 
   const rowIdx = cell.getAttribute('data-row-index');
   const columnIdx = cell.getAttribute('data-column-index');
 
   if (!rowIdx || !columnIdx) {
-    return;
+    return undefined;
   }
 
   return {
@@ -81,105 +83,115 @@ function isDraggingStarted(delta: number | null, threshold: number) {
   return delta > threshold;
 }
 
-export function useGridDragging(props: IDraggingCallbacks) {
+export function useGridDragging(props: IDraggingCallbacks): IGridDragging {
   const callbacks = useObjectRef(props);
 
-  const state = useObjectRef<IDraggingState>(
-    () => ({
-      startDraggingCell: null,
-      currentDraggingCell: null,
-      startMousePosition: null,
-      dragging: false,
-      mouseDown: false,
-    }),
-    false,
-  );
+  const state = useRef<IDraggingState>({
+    startDraggingCell: null,
+    currentDraggingCell: null,
+    startMousePosition: null,
+    lastEvent: null,
+    scrollContainer: null,
+    dragging: false,
+    mouseDown: false,
+  });
 
-  const onMouseDownHandler = useCallback((event: React.MouseEvent<HTMLDivElement>) => {
-    const position = getCellPositionFromEvent(event);
+  const dragOver = useCallback(
+    (position: IDraggingPosition, event: DraggingMouseEvent): void => {
+      const { startDraggingCell, currentDraggingCell } = state.current;
 
-    if (!position) {
-      return;
-    }
-
-    state.mouseDown = true;
-    state.startMousePosition = { x: event.pageX, y: event.pageY };
-    state.startDraggingCell = { colIdx: position.colIdx, rowIdx: position.rowIdx };
-  }, []);
-
-  const onMouseMoveHandler = useCallback((event: React.MouseEvent<HTMLDivElement>) => {
-    if (!state.mouseDown) {
-      return;
-    }
-
-    const position = getCellPositionFromEvent(event);
-
-    if (!position) {
-      return;
-    }
-
-    if (!state.dragging) {
-      const delta = getDelta(state.startMousePosition, { x: event.pageX, y: event.pageY });
-      if (!isDraggingStarted(delta, THRESHOLD)) {
+      if (!startDraggingCell || (position.rowIdx === currentDraggingCell?.rowIdx && position.colIdx === currentDraggingCell.colIdx)) {
         return;
       }
 
-      if (callbacks.onDragStart && state.startDraggingCell) {
-        callbacks.onDragStart(state.startDraggingCell, event);
+      state.current.currentDraggingCell = position;
+      callbacks.onDragOver?.(startDraggingCell, position, event);
+    },
+    [callbacks],
+  );
+
+  const autoScroll = useGridAutoScroll(
+    useCallback(
+      (cellLookupPoint: IMousePosition): void => {
+        const position = getCellPositionFromElement(document.elementFromPoint(cellLookupPoint.x, cellLookupPoint.y));
+
+        if (position && state.current.lastEvent) {
+          dragOver(position, state.current.lastEvent);
+        }
+      },
+      [dragOver],
+    ),
+  );
+
+  const onMouseDownHandler = useCallback((event: React.MouseEvent<HTMLDivElement>): void => {
+    const position = getCellPositionFromElement(event.target as Element);
+
+    if (!position) {
+      return;
+    }
+
+    state.current.mouseDown = true;
+    state.current.startMousePosition = { x: event.pageX, y: event.pageY };
+    state.current.startDraggingCell = position;
+    state.current.scrollContainer = event.currentTarget.querySelector<HTMLElement>('[role="grid"]');
+  }, []);
+
+  const onMouseMoveHandler = useCallback(
+    (event: React.MouseEvent<HTMLDivElement>): void => {
+      if (!state.current.mouseDown) {
+        return;
       }
 
-      state.dragging = true;
-      return;
-    }
+      if (!state.current.dragging) {
+        const delta = getDelta(state.current.startMousePosition, { x: event.pageX, y: event.pageY });
 
-    // check if the new cell is equal to the previous cell
-    if (position.rowIdx === state.currentDraggingCell?.rowIdx && position.colIdx === state.currentDraggingCell.colIdx) {
-      return;
-    }
+        if (!isDraggingStarted(delta, THRESHOLD)) {
+          return;
+        }
 
-    state.currentDraggingCell = { colIdx: position.colIdx, rowIdx: position.rowIdx };
+        if (state.current.startDraggingCell) {
+          callbacks.onDragStart?.(state.current.startDraggingCell, event);
+        }
 
-    if (callbacks.onDragOver) {
-      callbacks.onDragOver(
-        {
-          colIdx: state.startDraggingCell!.colIdx,
-          rowIdx: state.startDraggingCell!.rowIdx,
-        },
-        {
-          colIdx: position.colIdx,
-          rowIdx: position.rowIdx,
-        },
-        event,
-      );
-    }
-  }, []);
+        state.current.dragging = true;
+        return;
+      }
 
-  const onMouseUpHandler = useCallback((event: React.MouseEvent<HTMLDivElement> | MouseEvent) => {
-    state.mouseDown = false;
-    state.startMousePosition = null;
+      state.current.lastEvent = event;
 
-    if (!state.dragging || !state.startDraggingCell || !state.currentDraggingCell) {
-      return;
-    }
+      const position = getCellPositionFromElement(event.target as Element);
 
-    if (callbacks.onDragEnd) {
-      callbacks.onDragEnd(
-        {
-          colIdx: state.startDraggingCell.colIdx,
-          rowIdx: state.startDraggingCell.rowIdx,
-        },
-        {
-          colIdx: state.currentDraggingCell.colIdx,
-          rowIdx: state.currentDraggingCell.rowIdx,
-        },
-        event,
-      );
-    }
+      if (position) {
+        dragOver(position, event);
+      }
 
-    state.dragging = false;
-    state.startMousePosition = null;
-    state.currentDraggingCell = null;
-  }, []);
+      if (state.current.scrollContainer) {
+        autoScroll.update(state.current.scrollContainer, { x: event.clientX, y: event.clientY });
+      }
+    },
+    [callbacks, dragOver, autoScroll],
+  );
+
+  const onMouseUpHandler = useCallback(
+    (event: DraggingMouseEvent): void => {
+      autoScroll.stop();
+
+      const { dragging, startDraggingCell, currentDraggingCell } = state.current;
+
+      if (dragging && startDraggingCell && currentDraggingCell) {
+        callbacks.onDragEnd?.(startDraggingCell, currentDraggingCell, event);
+      }
+
+      state.current.mouseDown = false;
+      state.current.dragging = false;
+      state.current.startMousePosition = null;
+      state.current.startDraggingCell = null;
+      state.current.currentDraggingCell = null;
+      state.current.lastEvent = null;
+      state.current.scrollContainer = null;
+    },
+    [callbacks, autoScroll],
+  );
 
   useEffect(() => {
     document.addEventListener('mouseup', onMouseUpHandler);
