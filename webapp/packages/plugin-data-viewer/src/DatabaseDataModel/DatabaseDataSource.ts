@@ -18,7 +18,6 @@ import {
   DatabaseDataAccessMode,
   DatabaseDataFeature,
   DatabaseDataSourceOperation,
-  type DataReadonlyReason,
   IDatabaseDataSource,
   type IDatabaseDataSourceOperationEvent,
   type IRequestInfo,
@@ -212,10 +211,6 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
 
   isReadonly(resultIndex: number): boolean {
     return this.access === DatabaseDataAccessMode.Readonly || this.results.length > 1 || this.disabled;
-  }
-
-  getReadonlyReason(resultIndex: number): DataReadonlyReason | null {
-    return null;
   }
 
   isLoading(): boolean {

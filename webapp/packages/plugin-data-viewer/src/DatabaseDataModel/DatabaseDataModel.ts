@@ -12,7 +12,7 @@ import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 import { uuid } from '@cloudbeaver/core-utils';
 
 import type { IDatabaseDataModel, IRequestEventData } from './IDatabaseDataModel.js';
-import type { DatabaseDataAccessMode, DataReadonlyReason, IDatabaseDataSource, IRequestInfo } from './IDatabaseDataSource.js';
+import type { DatabaseDataAccessMode, IDatabaseDataSource, IRequestInfo } from './IDatabaseDataSource.js';
 
 export class DatabaseDataModel<TSource extends IDatabaseDataSource<any, any> = IDatabaseDataSource> implements IDatabaseDataModel<TSource> {
   id: string;
@@ -57,10 +57,6 @@ export class DatabaseDataModel<TSource extends IDatabaseDataSource<any, any> = I
 
   isReadonly(resultIndex: number): boolean {
     return this.source.isReadonly(resultIndex);
-  }
-
-  getReadonlyReason(resultIndex: number): DataReadonlyReason | null {
-    return this.source.getReadonlyReason(resultIndex);
   }
 
   isDataAvailable(offset: number, count: number): boolean {

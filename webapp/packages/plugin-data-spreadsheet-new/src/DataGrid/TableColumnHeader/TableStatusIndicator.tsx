@@ -11,7 +11,7 @@ import { useContext } from 'react';
 
 import { IconOrImage, s, useResource, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource, createConnectionParam } from '@cloudbeaver/core-connections';
-import { DataReadonlyReason, isResultSetDataSource } from '@cloudbeaver/plugin-data-viewer';
+import { DatabaseDataFeature, isResultSetDataSource } from '@cloudbeaver/plugin-data-viewer';
 
 import { DataGridContext } from '../DataGridContext.js';
 import { TableDataContext } from '../TableDataContext.js';
@@ -26,13 +26,16 @@ export const TableStatusIndicator = observer(function TableStatusIndicator() {
   const source = dataGridContext.model.source;
   const resultSetSource = isResultSetDataSource(source) ? source : null;
 
-  // We intentionally do NOT use `model.isReadonly()` for this — that method aggregates several
-  // unrelated reasons and loses information about WHY editing isn't allowed.
+  /* We do NOT use `model.isReadonly()` here —
+  that method aggregates several unrelated reasons
+  and loses information about WHY editing isn't allowed. */
   const contextInfo = resultSetSource?.executionContext?.context;
   const connectionKey = contextInfo ? createConnectionParam(contextInfo.projectId, contextInfo.connectionId) : null;
   const connectionInfoLoader = useResource(TableStatusIndicator, ConnectionInfoResource, connectionKey);
   const readOnlyConnection = connectionInfoLoader.data?.readOnly ?? false;
-  const readonlyReason = source.getReadonlyReason(dataGridContext.resultIndex);
+
+  const readOnlyPresentation = source.hasFeature(DatabaseDataFeature.Grouping);
+
   const style = useS(styles);
 
   if (!tableDataContext || !dataGridContext) {
@@ -53,7 +56,7 @@ export const TableStatusIndicator = observer(function TableStatusIndicator() {
   const tooltipParts: string[] = [];
 
   // Presentation-level read-only takes precedence over connection-level read-only.
-  if (readonlyReason === DataReadonlyReason.Presentation) {
+  if (readOnlyPresentation) {
     tooltipParts.push(translate('data_grid_table_readonly_presentation_tooltip'));
   } else if (readOnlyConnection) {
     tooltipParts.push(translate('data_grid_table_readonly_connection_tooltip'));
@@ -71,7 +74,7 @@ export const TableStatusIndicator = observer(function TableStatusIndicator() {
     tooltipParts.push(translate('data_grid_table_virtual_key_tooltip'));
   }
 
-  const showLockIcon = readOnlyConnection || readonlyReason === DataReadonlyReason.Presentation;
+  const showLockIcon = readOnlyConnection || readOnlyPresentation;
 
   // Hide the entire indicator when there's nothing meaningful to display (Session Manager)
   const hasInfo = showLockIcon || !!readOnlyStatus || hasRowIdentifier || isVirtualKey || isPrimaryKey;

@@ -10,7 +10,7 @@ import type { IServiceProvider } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { AsyncTaskInfoEventHandler, AsyncTaskInfoService } from '@cloudbeaver/core-root';
 import { type AsyncTaskInfo, GraphQLService } from '@cloudbeaver/core-sdk';
-import { DatabaseDataFeature, DataReadonlyReason } from '@cloudbeaver/plugin-data-viewer';
+import { DatabaseDataFeature } from '@cloudbeaver/plugin-data-viewer';
 import { type IDataQueryOptions, QueryDataSource } from '@cloudbeaver/plugin-sql-editor';
 
 export interface IDataGroupingOptions extends IDataQueryOptions {
@@ -31,10 +31,6 @@ export class GroupingDataSource extends QueryDataSource<IDataGroupingOptions> {
   ) {
     super(serviceProvider, commonDialogService, asyncTaskInfoEventHandler, graphQLService, asyncTaskInfoService);
     this.setFeature(DatabaseDataFeature.Grouping);
-  }
-
-  override getReadonlyReason(_resultIndex: number): DataReadonlyReason | null {
-    return DataReadonlyReason.Presentation;
   }
 
   protected override async executeQuery(
