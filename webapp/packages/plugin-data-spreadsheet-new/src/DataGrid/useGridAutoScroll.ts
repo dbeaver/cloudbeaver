@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { useEffect, useRef, useState } from 'react';
-import { clamp } from '@dbeaver/js-helpers';
+import { getCellLookupPoint } from './helpers/getCellLookupPoint.js';
 import { getEdgeSpeed } from './helpers/getEdgeSpeed.js';
 
 export interface IMousePosition {
@@ -18,8 +18,6 @@ export interface IGridAutoScroll {
   update: (container: HTMLElement, cursor: IMousePosition) => void;
   stop: () => void;
 }
-
-const LOOKUP_INSET = 16;
 
 export function useGridAutoScroll(onScroll: (cellLookupPoint: IMousePosition) => void): IGridAutoScroll {
   const onScrollRef = useRef(onScroll);
@@ -59,12 +57,14 @@ export function useGridAutoScroll(onScroll: (cellLookupPoint: IMousePosition) =>
         return;
       }
 
-      const bodyTop = headerRow ? headerRow.getBoundingClientRect().bottom : rect.top;
+      const body = {
+        left: rect.left,
+        top: headerRow ? headerRow.getBoundingClientRect().bottom : rect.top,
+        right: rect.right,
+        bottom: rect.bottom,
+      };
 
-      onScrollRef.current({
-        x: clamp(cursor.x, rect.left + LOOKUP_INSET, rect.right - LOOKUP_INSET),
-        y: clamp(cursor.y, bodyTop + LOOKUP_INSET, rect.bottom - LOOKUP_INSET),
-      });
+      onScrollRef.current(getCellLookupPoint(cursor, body));
 
       frameId = requestAnimationFrame(step);
     }
