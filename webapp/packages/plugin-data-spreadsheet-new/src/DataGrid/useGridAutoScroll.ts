@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { getCellLookupPoint } from './helpers/getCellLookupPoint.js';
 import { getEdgeSpeed } from './helpers/getEdgeSpeed.js';
 
@@ -19,81 +19,91 @@ export interface IGridAutoScroll {
   stop: () => void;
 }
 
-export function useGridAutoScroll(onScroll: (cellLookupPoint: IMousePosition) => void): IGridAutoScroll {
-  const onScrollRef = useRef(onScroll);
-  useEffect(() => {
-    onScrollRef.current = onScroll;
-  }, [onScroll]);
+interface IGridAutoScrollController extends IGridAutoScroll {
+  setOnScroll: (onScroll: (cellLookupPoint: IMousePosition) => void) => void;
+}
 
-  const [controller] = useState<IGridAutoScroll>(() => {
-    let container: HTMLElement | null = null;
-    let headerRow: Element | null = null;
-    let cursor: IMousePosition | null = null;
-    let frameId: number | null = null;
+function createGridAutoScrollController(): IGridAutoScrollController {
+  let onScroll: ((cellLookupPoint: IMousePosition) => void) | null = null;
+  let container: HTMLElement | null = null;
+  let headerRow: Element | null = null;
+  let cursor: IMousePosition | null = null;
+  let frameId: number | null = null;
 
-    function step(): void {
+  function step(): void {
+    frameId = null;
+
+    if (!container || !cursor) {
+      return;
+    }
+
+    const rect = container.getBoundingClientRect();
+    const speedX = getEdgeSpeed(cursor.x, rect.left, rect.right);
+    const speedY = getEdgeSpeed(cursor.y, rect.top, rect.bottom);
+
+    if (speedX === 0 && speedY === 0) {
+      return;
+    }
+
+    const scrollLeftBefore = container.scrollLeft;
+    const scrollTopBefore = container.scrollTop;
+
+    container.scrollLeft += speedX;
+    container.scrollTop += speedY;
+
+    if (container.scrollLeft === scrollLeftBefore && container.scrollTop === scrollTopBefore) {
+      return;
+    }
+
+    const body = {
+      left: rect.left,
+      top: headerRow ? headerRow.getBoundingClientRect().bottom : rect.top,
+      right: rect.right,
+      bottom: rect.bottom,
+    };
+
+    onScroll?.(getCellLookupPoint(cursor, body));
+
+    frameId = requestAnimationFrame(step);
+  }
+
+  function stop(): void {
+    container = null;
+    headerRow = null;
+    cursor = null;
+
+    if (frameId !== null) {
+      cancelAnimationFrame(frameId);
       frameId = null;
+    }
+  }
 
-      if (!container || !cursor) {
-        return;
-      }
+  function update(nextContainer: HTMLElement, nextCursor: IMousePosition): void {
+    if (nextContainer !== container) {
+      container = nextContainer;
+      headerRow = nextContainer.querySelector('.rdg-header-row');
+    }
+    cursor = nextCursor;
 
-      const rect = container.getBoundingClientRect();
-      const speedX = getEdgeSpeed(cursor.x, rect.left, rect.right);
-      const speedY = getEdgeSpeed(cursor.y, rect.top, rect.bottom);
-
-      // cursor is back inside the inner area — pause until the next update()
-      if (speedX === 0 && speedY === 0) {
-        return;
-      }
-
-      const scrollLeftBefore = container.scrollLeft;
-      const scrollTopBefore = container.scrollTop;
-
-      container.scrollLeft += speedX;
-      container.scrollTop += speedY;
-
-      if (container.scrollLeft === scrollLeftBefore && container.scrollTop === scrollTopBefore) {
-        return;
-      }
-
-      const body = {
-        left: rect.left,
-        top: headerRow ? headerRow.getBoundingClientRect().bottom : rect.top,
-        right: rect.right,
-        bottom: rect.bottom,
-      };
-
-      onScrollRef.current(getCellLookupPoint(cursor, body));
-
+    if (frameId === null) {
       frameId = requestAnimationFrame(step);
     }
+  }
 
-    function stop(): void {
-      container = null;
-      headerRow = null;
-      cursor = null;
+  function setOnScroll(nextOnScroll: (cellLookupPoint: IMousePosition) => void): void {
+    onScroll = nextOnScroll;
+  }
 
-      if (frameId !== null) {
-        cancelAnimationFrame(frameId);
-        frameId = null;
-      }
-    }
+  return { update, stop, setOnScroll };
+}
 
-    function update(nextContainer: HTMLElement, nextCursor: IMousePosition): void {
-      if (nextContainer !== container) {
-        container = nextContainer;
-        headerRow = nextContainer.querySelector('.rdg-header-row');
-      }
-      cursor = nextCursor;
+export function useGridAutoScroll(onScroll: (cellLookupPoint: IMousePosition) => void): IGridAutoScroll {
+  const [controller] = useState(createGridAutoScrollController);
 
-      if (frameId === null) {
-        frameId = requestAnimationFrame(step);
-      }
-    }
-
-    return { update, stop };
-  });
+  // the scroll loop runs outside React (requestAnimationFrame), so keep its callback in sync from an effect
+  useEffect(() => {
+    controller.setOnScroll(onScroll);
+  }, [controller, onScroll]);
 
   useEffect(() => controller.stop, [controller]);
 
