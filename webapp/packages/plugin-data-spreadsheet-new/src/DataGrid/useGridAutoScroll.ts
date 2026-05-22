@@ -26,7 +26,7 @@ interface IGridAutoScrollController extends IGridAutoScroll {
 function createGridAutoScrollController(): IGridAutoScrollController {
   let onScroll: ((cellLookupPoint: IMousePosition) => void) | null = null;
   let container: HTMLElement | null = null;
-  let headerRow: Element | null = null;
+  let headerHeight = 0;
   let cursor: IMousePosition | null = null;
   let frameId: number | null = null;
 
@@ -57,7 +57,7 @@ function createGridAutoScrollController(): IGridAutoScrollController {
 
     const body = {
       left: rect.left,
-      top: headerRow ? headerRow.getBoundingClientRect().bottom : rect.top,
+      top: rect.top + headerHeight,
       right: rect.right,
       bottom: rect.bottom,
     };
@@ -69,7 +69,7 @@ function createGridAutoScrollController(): IGridAutoScrollController {
 
   function stop(): void {
     container = null;
-    headerRow = null;
+    headerHeight = 0;
     cursor = null;
 
     if (frameId !== null) {
@@ -81,7 +81,7 @@ function createGridAutoScrollController(): IGridAutoScrollController {
   function update(nextContainer: HTMLElement, nextCursor: IMousePosition): void {
     if (nextContainer !== container) {
       container = nextContainer;
-      headerRow = nextContainer.querySelector('.rdg-header-row');
+      headerHeight = nextContainer.querySelector('.rdg-header-row')?.getBoundingClientRect().height ?? 0;
     }
     cursor = nextCursor;
 
