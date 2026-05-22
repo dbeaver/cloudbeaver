@@ -55,12 +55,21 @@ export const CommonDialogWrapper = observer<CommonDialogWrapperProps, HTMLDivEle
       }
     }
 
+    // We need to specify persistent notifications for the dialog to make them accessible when the dialog is open.
+    function getDefaultPersistentElements(): Element[] {
+      const dialogs = document.querySelectorAll('[data-dialog]');
+      const persistentNotifications = document.querySelectorAll('[data-dialog-persistent-notification]');
+
+      return [...dialogs, ...persistentNotifications];
+    }
+
     return (
       <Dialog
         ref={ref}
         aria-label={ariaLabel}
         open={context.visible}
         data-size={size}
+        getPersistentElements={getDefaultPersistentElements}
         className={s(computedStyles, { dialog: true, fixedSize, fixedWidth, freeHeight }, 'tw:shadow-xlarge', className)}
         autoFocusOnShow={autoFocusOnShow}
         autoFocusOnHide={autoFocusOnHide}

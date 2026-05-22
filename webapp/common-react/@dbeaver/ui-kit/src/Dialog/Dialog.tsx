@@ -28,15 +28,6 @@ import {
 import clsx from 'clsx';
 import type { ComponentPropsWithoutRef, JSX } from 'react';
 
-// We need to specify persistent elements for the dialog to make them accessible when the dialog is open.
-// To add an element to the list of persistent elements, add the `data-dialog-persistent-element` attribute to it.
-function getDefaultPersistentElements(): Element[] {
-  const dialogs = document.querySelectorAll('[data-dialog]');
-  const persistentElements = document.querySelectorAll('[data-dialog-persistent-element]');
-
-  return [...dialogs, ...persistentElements];
-}
-
 import './Dialog.css';
 import { UiKitPopoverContext } from '../Popover/UiKitPopoverContext.js';
 
@@ -44,24 +35,12 @@ interface ExtendedDialogProps extends DialogProps {
   animated?: boolean;
 }
 
-function Dialog({
-  className,
-  backdrop,
-  animated = true,
-  getPersistentElements = getDefaultPersistentElements,
-  ...props
-}: ExtendedDialogProps): JSX.Element {
+function Dialog({ className, backdrop, animated = true, ...props }: ExtendedDialogProps): JSX.Element {
   const backdropElement = backdrop === true ? <div className="dbv-kit-dialog__backdrop" data-animated={animated} /> : backdrop;
 
   return (
     <UiKitPopoverContext value={{ portal: props.portal ?? true }}>
-      <AriakitDialog
-        className={clsx('dbv-kit-dialog', className)}
-        backdrop={backdropElement}
-        data-animated={animated}
-        getPersistentElements={getPersistentElements}
-        {...props}
-      />
+      <AriakitDialog className={clsx('dbv-kit-dialog', className)} backdrop={backdropElement} data-animated={animated} {...props} />
     </UiKitPopoverContext>
   );
 }
