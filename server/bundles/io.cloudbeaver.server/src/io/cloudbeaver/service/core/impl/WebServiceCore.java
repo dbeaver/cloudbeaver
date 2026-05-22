@@ -678,7 +678,7 @@ public class WebServiceCore implements DBWServiceCore {
         WebConnectionInfo connectionInfo = project.getWebConnectionInfo(connectionId);
 
         DBPDataSourceContainer dataSourceContainer = connectionInfo.getDataSourceContainer();
-        WebDataSourceUtils.disconnectDataSource(webSession, dataSourceContainer);
+        WebDataSourceUtils.disconnectDataSource(webSession, dataSourceContainer, true);
         return connectionInfo;
     }
 
