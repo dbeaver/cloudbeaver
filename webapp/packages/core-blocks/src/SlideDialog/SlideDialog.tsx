@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { useCallback, useRef } from 'react';
+import { useRef } from 'react';
 
 import { Dialog, IconButton } from '@dbeaver/ui-kit';
 
@@ -26,15 +26,6 @@ export const SlideDialog = observer<SlideDialogProps>(function SlideDialog({ ope
   const t = useTranslate();
   const overlayRef = useRef<HTMLDivElement>(null);
 
-  // We need to specify persistent elements for the dialog to make them accessible when the dialog is open.
-  // To add an element to the list of persistent elements, add the `data-dialog-persistent-element` attribute to it.
-  const getPersistentElements = useCallback(() => {
-    const dialogs = document.querySelectorAll('[data-dialog]');
-    const persistentElements = document.querySelectorAll('[data-dialog-persistent-element]');
-
-    return [...dialogs, ...persistentElements];
-  }, []);
-
   return (
     <>
       <div ref={overlayRef} className="dbv-slide-dialog__overlay" data-active={open || undefined} data-dialog-persistent-element onClick={onClose} />
@@ -45,7 +36,6 @@ export const SlideDialog = observer<SlideDialogProps>(function SlideDialog({ ope
         backdrop={false}
         preventBodyScroll={false}
         hideOnInteractOutside={false}
-        getPersistentElements={getPersistentElements}
         className="dbv-slide-dialog__dialog"
         onClose={onClose}
       >
