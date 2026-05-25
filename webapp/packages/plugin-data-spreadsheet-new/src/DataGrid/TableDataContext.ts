@@ -38,6 +38,8 @@ export interface ITableData {
   hasDescription: boolean;
   columns: Array<IColumnInfo>;
   columnKeys: IGridColumnKey[];
+  visualColumnKeys: IGridColumnKey[];
+  visualColumns: Array<IColumnInfo>;
   rows: IGridRowKey[];
   gridDiv: HTMLDivElement | null;
   inBounds: (position: IGridDataKey) => boolean;
@@ -48,6 +50,7 @@ export interface ITableData {
   getColumnInfo: (key: IGridColumnKey) => SqlResultColumn | undefined;
   getColumnsInRange: (startIndex: number, endIndex: number) => Array<IColumnInfo>;
   getColumnIndexFromColumnKey: (column: IGridColumnKey) => number;
+  getVisualColumnIndexFromColumnKey: (column: IGridColumnKey) => number;
   getRowIndexFromKey: (row: IGridRowKey) => number;
   getEditionState: (key: IGridDataKey) => DatabaseEditChangeType | null;
   isCellEdited: (key: IGridDataKey) => boolean;

@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -26,9 +26,11 @@ export * from '@codemirror/state';
 export * from '@codemirror/autocomplete';
 export * from './highlightNewLine.js';
 
+export { history } from '@codemirror/commands';
 export { html as HTML_EDITOR } from '@codemirror/lang-html';
 export { javascript as JAVASCRIPT_EDITOR } from '@codemirror/lang-javascript';
-export { json as JSON_EDITOR } from '@codemirror/lang-json';
+export { json as JSON_EDITOR, jsonParseLinter } from '@codemirror/lang-json';
+export { linter, lintGutter } from '@codemirror/lint';
 export { sql as SQL_EDITOR, SQLDialect } from '@codemirror/lang-sql';
 export { xml as XML_EDITOR } from '@codemirror/lang-xml';
 

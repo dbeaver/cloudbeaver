@@ -386,18 +386,25 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
       const authPropertiesInfo = this.connectionKey ? await this.connectionInfoAuthPropertiesResource.load(this.connectionKey) : undefined;
 
       const properties = await this.getConnectionAuthModelProperties(this.state.authModelId, authPropertiesInfo);
-      const passwordProperty = properties.find(property => property.features.includes('password'));
-      const isPasswordEmpty =
-        passwordProperty &&
-        (this.state.credentials?.[passwordProperty.id!] === getObjectPropertyDefaultValue(passwordProperty) ||
-          !this.state.credentials?.[passwordProperty.id!]);
+      const passwordProperties = properties.filter(property => property.features.includes('password'));
 
       if (isCredentialsChanged(properties, this.state.credentials!)) {
         this.state.credentials = prepareDynamicProperties(properties, toJS(this.state.credentials!));
       }
 
-      if (isPasswordEmpty) {
-        delete this.state.credentials?.[passwordProperty.id!];
+      if (passwordProperties.length > 0) {
+        for (const passwordProperty of passwordProperties) {
+          if (!passwordProperty.id) {
+            continue;
+          }
+
+          if (
+            this.state.credentials?.[passwordProperty.id] === getObjectPropertyDefaultValue(passwordProperty) ||
+            (!passwordProperty.features.includes('file') && !this.state.credentials?.[passwordProperty.id])
+          ) {
+            delete this.state.credentials?.[passwordProperty.id];
+          }
+        }
       }
     }
 

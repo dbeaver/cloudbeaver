@@ -56,6 +56,7 @@ export const TeamsTable = observer<Props>(function TeamsTable({ teams }) {
     if (column.key === ID_COLUMN.key) {
       return (
         <Command
+          render={<div />}
           tabIndex={0}
           title={row.teamId}
           className="tw:flex tw:cursor-pointer tw:items-center tw:gap-2 tw:outline-none"
