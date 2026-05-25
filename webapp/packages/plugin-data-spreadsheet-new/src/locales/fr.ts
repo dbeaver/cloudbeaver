@@ -34,6 +34,7 @@ export default [
   ['data_grid_table_virtual_key_tooltip', 'Clé virtuelle'],
   ['data_grid_table_key_column_tooltip', 'Colonne clé'],
   ['data_grid_table_readonly_connection_tooltip', 'Connexion en lecture seule'],
+  ['data_grid_table_readonly_presentation_tooltip', 'La présentation active ne prend pas en charge la modification des données'],
   ['plugin_data_spreadsheet_new_settings_disable', 'Désactiver la présentation de la table'],
   ['plugin_data_spreadsheet_new_settings_description_label', 'Show columns description'],
   ['plugin_data_spreadsheet_new_settings_description_label_description', 'Description will be shown under the column names in the table header'],

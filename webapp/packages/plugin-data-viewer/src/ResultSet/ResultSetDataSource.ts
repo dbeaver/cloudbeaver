@@ -43,9 +43,10 @@ export interface IRowIdentifierInfo {
   identifier: SqlRowIdentifier | null;
 }
 
-export abstract class ResultSetDataSource<TOptions extends IDatabaseDataOptions = IDatabaseDataOptions>
-  extends DatabaseDataSource<TOptions, IDatabaseResultSet>
-{
+export abstract class ResultSetDataSource<TOptions extends IDatabaseDataOptions = IDatabaseDataOptions> extends DatabaseDataSource<
+  TOptions,
+  IDatabaseResultSet
+> {
   executionContext: IConnectionExecutionContext | null;
   totalCountRequestTask: ITask<number> | null;
   private keepExecutionContextOnDispose: boolean;
