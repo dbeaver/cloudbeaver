@@ -60,6 +60,16 @@ export function useGridSelectedCellsPaste(
         return;
       }
 
+      if (selectedCells.length === 1) {
+        const [target] = selectedCells;
+
+        if (target && tableData.isCellEditable(target)) {
+          tableData.editor.set(target, clipboardText);
+        }
+
+        return;
+      }
+
       const matrix = parseTSV(clipboardText);
       const rows = matrix.length;
       const cols = matrix[0]?.length ?? 0;
@@ -69,7 +79,7 @@ export function useGridSelectedCellsPaste(
       }
 
       const getRowIdx = (key: IGridDataKey) => tableData.getRowIndexFromKey(key.row);
-      const getColIdx = (key: IGridDataKey) => tableData.getColumnIndexFromColumnKey(key.column);
+      const getColIdx = (key: IGridDataKey) => tableData.getVisualColumnIndexFromColumnKey(key.column);
 
       // row-major order (top-to-bottom, left-to-right)
       const targets = selectedCells.slice().sort((a, b) => {

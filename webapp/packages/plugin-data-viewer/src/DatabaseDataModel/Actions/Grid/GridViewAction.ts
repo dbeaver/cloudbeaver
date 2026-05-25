@@ -73,12 +73,29 @@ export class GridViewAction<
     return this.columnsOrder.map(index => ({ index }));
   }
 
+  get visualColumnKeys(): IGridColumnKey[] {
+    return this.columnKeys.slice().sort((a, b) => {
+      const aPinned = this.isColumnPinned(a);
+      const bPinned = this.isColumnPinned(b);
+
+      if (aPinned === bPinned) {
+        return 0;
+      }
+
+      return aPinned ? -1 : 1;
+    });
+  }
+
   get rows(): TCell[][] {
     return this.rowKeys.map(this.mapRow, this);
   }
 
   get columns(): TColumn[] {
     return this.columnKeys.map(this.mapColumn, this);
+  }
+
+  get visualColumns(): TColumn[] {
+    return this.visualColumnKeys.map(this.mapColumn, this);
   }
 
   get columnsOrder(): number[] {
@@ -124,6 +141,8 @@ export class GridViewAction<
       rowKeys: computed,
       columns: computed,
       columnKeys: computed,
+      visualColumnKeys: computed,
+      visualColumns: computed,
     });
   }
 

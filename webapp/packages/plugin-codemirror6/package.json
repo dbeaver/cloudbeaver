@@ -36,6 +36,7 @@
     "@codemirror/lang-sql": "^6",
     "@codemirror/lang-xml": "^6",
     "@codemirror/language": "^6",
+    "@codemirror/lint": "^6",
     "@codemirror/merge": "^6",
     "@codemirror/search": "^6",
     "@codemirror/state": "^6",
