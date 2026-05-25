@@ -2,7 +2,7 @@
   .dbv-slide-dialog__overlay {
     position: absolute;
     inset: 0;
-    z-index: 1;
+    z-index: 999;
     background: rgb(0 0 0 / 0%);
     transition: background var(--duration-slow) var(--ease-smooth);
     pointer-events: none;
@@ -17,7 +17,6 @@
   .dbv-slide-dialog__dialog {
     --dbv-kit-dialog-content-background: var(--theme-surface);
     overflow: visible;
-    z-index: 2;
   }
 
   .dbv-slide-dialog__close-btn {

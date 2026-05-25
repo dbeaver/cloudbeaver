@@ -106,7 +106,6 @@
     /* Slide variant (side panel from right) */
     &[data-variant='slide'] {
       position: absolute;
-      z-index: auto;
       top: 0;
       left: auto;
       right: 0;
