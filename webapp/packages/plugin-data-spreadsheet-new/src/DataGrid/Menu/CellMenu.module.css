@@ -6,18 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 
-.container {
-  display: flex;
-  align-items: center;
-}
-
 .contextMenu {
-  padding: 0;
-  height: 16px;
-  width: 16px;
-  padding: 4px;
-  box-sizing: content-box;
-  cursor: pointer;
+  height: 0;
+  width: 0;
+  visibility: none;
 }
 
 .icon {

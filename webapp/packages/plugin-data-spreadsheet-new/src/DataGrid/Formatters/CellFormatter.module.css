@@ -21,12 +21,20 @@
   align-items: center;
 }
 
-.menuContainer {
+.menuTrigger {
   display: flex;
-  box-sizing: border-box;
-  overflow: hidden;
+  align-items: center;
+  padding: 4px;
+  height: 16px;
+  width: 16px;
+  box-sizing: content-box;
+  cursor: pointer;
+  background: none;
+  border: none;
+  color: inherit;
 
-  &:empty {
-    display: none;
+  > svg {
+    width: 16px;
+    height: 16px;
   }
 }

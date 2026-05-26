@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { computed, observable, action } from 'mobx';
+import { computed, observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useContext, type HTMLAttributes } from 'react';
 
@@ -13,7 +13,13 @@ import { getComputed, useHover, useMergeRefs, useObjectRef, useObservableRef } f
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { clsx } from '@dbeaver/ui-kit';
 import { type IDataGridCellRenderer, type ICellPosition } from '@cloudbeaver/plugin-data-grid';
-import { DatabaseEditChangeType, KEY_BINDING_OPEN_CELL_CONTEXT_MENU, type IGridDataKey, type IGridRowKey } from '@cloudbeaver/plugin-data-viewer';
+import {
+  DatabaseEditChangeType,
+  GridDataKeysUtils,
+  KEY_BINDING_OPEN_CELL_CONTEXT_MENU,
+  type IGridDataKey,
+  type IGridRowKey,
+} from '@cloudbeaver/plugin-data-viewer';
 import { isObjectsEqual } from '@cloudbeaver/core-utils';
 
 import { ColumnDnDContext } from '../ColumnDnDContext.js';
@@ -21,6 +27,7 @@ import { DataGridContext } from '../DataGridContext.js';
 import { DataGridSelectionContext } from '../DataGridSelection/DataGridSelectionContext.js';
 import { TableDataContext, type IColumnInfo } from '../TableDataContext.js';
 import { CellContext } from './CellContext.js';
+import { TableMenuContext } from './TableMenuContext.js';
 import { useDataEditorDnDBox } from '../useDataEditorDnDBox.js';
 import { getDropSide } from '../getDropSide.js';
 import { isBindingPressed } from '@cloudbeaver/core-view';
@@ -40,11 +47,19 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
   const columnInfo = tableDataContext.getColumn(colIdx);
   const dndBox = useDataEditorDnDBox(dataGridContext.model, dataGridContext.resultIndex, columnInfo?.key ?? null);
 
+  const tableMenuContext = useContext(TableMenuContext);
   const hover = useHover();
 
   const cellContext = useObservableRef(
     () => ({
-      isMenuVisible: false,
+      get isMenuVisible(): boolean {
+        const activeKey = this.tableMenuContext.activeCellKey;
+        if (!activeKey || !this.cell) {
+          return false;
+        }
+
+        return GridDataKeysUtils.isElementsKeyEqual(activeKey, this.cell);
+      },
       isFocused: false,
       isHovered: false,
       get position(): ICellPosition {
@@ -72,17 +87,19 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
 
         return this.tableDataContext.getEditionState(this.cell);
       },
-      setMenuVisibility(visibility: boolean): void {
-        if (this.isMenuVisible && !visibility) {
-          this.hover.hoverOut();
-        }
 
-        this.isMenuVisible = visibility;
+      setMenuVisibility(visible: boolean): void {
+        if (visible && this.cell) {
+          const rect = (
+            document.querySelector(`[data-row-index="${this.rowIdx}"][data-column-index="${this.colIdx}"]`) as HTMLElement | null
+          )?.getBoundingClientRect();
+          this.tableMenuContext.openMenu(this.cell, rect ? rect.right - 20 : 0, rect ? rect.bottom : 0);
+        } else {
+          this.tableMenuContext.closeMenu();
+        }
       },
     }),
     {
-      isMenuVisible: observable.ref,
-      setMenuVisibility: action,
       colIdx: observable.ref,
       rowIdx: observable.ref,
       isFocused: observable.ref,
@@ -93,11 +110,22 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
       cell: computed,
       isSelected: computed,
       editionState: computed,
+      isMenuVisible: computed,
       tableDataContext: observable.ref,
       selectionContext: observable.ref,
+      tableMenuContext: observable.ref,
       hover: observable.ref,
     },
-    { colIdx, rowIdx, tableDataContext, selectionContext, hover, isFocused: props['aria-selected'] === 'true', isHovered: hover.isHovered },
+    {
+      colIdx,
+      rowIdx,
+      tableDataContext,
+      selectionContext,
+      tableMenuContext,
+      hover,
+      isFocused: props['aria-selected'] === 'true',
+      isHovered: hover.isHovered,
+    },
   );
 
   const dropSide = getComputed(() => getDropSide(columnInfo, columnDnDContext));
@@ -184,6 +212,7 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
       selectionContext,
       dataGridContext,
       cellContext,
+      tableMenuContext,
     },
     ['keyDown', 'mouseUp', 'openContextMenu'],
   );

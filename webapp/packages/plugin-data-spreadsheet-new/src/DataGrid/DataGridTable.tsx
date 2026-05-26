@@ -51,12 +51,14 @@ import {
 } from '@cloudbeaver/plugin-data-viewer';
 
 import { CellRenderer } from './CellRenderer/CellRenderer.js';
+import { TableMenuContext, type ITableMenuContext } from './CellRenderer/TableMenuContext.js';
 import { ColumnDnDContext, type IColumnDnDState } from './ColumnDnDContext.js';
 import { DataGridContext, type IDataGridContext } from './DataGridContext.js';
 import { DataGridSelectionContext } from './DataGridSelection/DataGridSelectionContext.js';
 import { useGridSelectionContext } from './DataGridSelection/useGridSelectionContext.js';
 import './DataGridTable.css';
 import { CellFormatter } from './Formatters/CellFormatter.js';
+import { CellMenu } from './Menu/CellMenu.js';
 import { FormattingContext } from './FormattingContext.js';
 import { TableDataContext } from './TableDataContext.js';
 import { useGridDragging } from './useGridDragging.js';
@@ -73,6 +75,14 @@ import type { ColumnDropSide } from './getDropSide.js';
 const ROW_HEIGHT = 24;
 export const HEADER_HEIGHT = 32;
 export const HEADER_WITH_DESC_HEIGHT = 42;
+
+// Prevent ariakit's document-level mousedown listener from treating right-clicks
+// We need it in order to re-open new context menu on 1 right click, instead of 2 clicks
+function blockRightClickDismiss(event: MouseEvent) {
+  if (event.button === 2) {
+    event.stopImmediatePropagation();
+  }
+}
 
 export const DataGridTable = observer<IDataPresentationProps>(function DataGridTable({ model, actions, resultIndex, simple, className, ...rest }) {
   const translate = useTranslate();
@@ -116,6 +126,28 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
     false,
   );
 
+  const tableMenuState = useObservableRef<ITableMenuContext>(
+    () => ({
+      activeCellKey: null,
+      menuPosition: null,
+      openMenu(cellKey, x, y) {
+        this.activeCellKey = cellKey;
+        this.menuPosition = { x, y };
+      },
+      closeMenu() {
+        this.activeCellKey = null;
+        this.menuPosition = null;
+      },
+    }),
+    {
+      activeCellKey: observable.ref,
+      menuPosition: observable.ref,
+      openMenu: action,
+      closeMenu: action,
+    },
+    false,
+  );
+
   function isGridInFocus(): boolean {
     const gridDiv = gridContainerRef.current;
     const focusSink = gridDiv?.querySelector('[aria-selected="true"]');
@@ -130,9 +162,17 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
   }
 
   function setContainersRef(element: HTMLDivElement | null) {
+    // Prevent ariakit's document-level mousedown listener from treating right-clicks
+    // as "outside clicks" that dismiss the open context menu before contextmenu fires.
+    if (gridContainerRef.current) {
+      gridContainerRef.current.removeEventListener('mousedown', blockRightClickDismiss, { capture: true });
+    }
+
     gridContainerRef.current = element;
 
     if (element) {
+      element.addEventListener('mousedown', blockRightClickDismiss, { capture: true });
+
       const gridDiv = element.firstChild;
 
       if (gridDiv instanceof HTMLDivElement) {
@@ -571,50 +611,53 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
         <DataGridSelectionContext.Provider value={gridSelectionContext}>
           <TableDataContext.Provider value={tableData}>
             <FormattingContext.Provider value={formatting}>
-              <div
-                ref={setContainersRef}
-                tabIndex={-1}
-                {...rest}
-                className={clsx('data-grid__container', 'theme-typography--caption', className)}
-                onMouseDown={onMouseDownHandler}
-                onMouseMove={onMouseMoveHandler}
-              >
-                <DataGrid
-                  ref={dataGridRef}
-                  className={clsx('data-grid__grid', className)}
-                  cell={cell}
-                  cellText={cellText}
-                  cellElement={cellElement}
-                  rowElement={rowElement}
-                  getCellEditable={isCellEditable}
-                  headerElement={headerElement}
-                  getHeaderHeight={() => headerHeight}
-                  getHeaderWidth={getHeaderWidth}
-                  getHeaderPinned={getHeaderPinned}
-                  getHeaderResizable={getHeaderResizable}
-                  getRowHeight={() => ROW_HEIGHT}
-                  getColumnKey={getColumnKey}
-                  columnCount={columnsCount}
-                  rowCount={rowsCount}
-                  columnSortable={columnSortable}
-                  columnSortingState={columnSortingState}
-                  getRowId={rowIdx => (tableData.rows[rowIdx] ? GridDataKeysUtils.serialize(tableData.rows[rowIdx]) : '')}
-                  search={{
-                    isEnabled: true,
-                    isReadOnly:
-                      model.isReadonly(resultIndex) || !(isResultSetDataSource(model.source) && model.source.hasElementIdentifier(resultIndex)),
-                    storage: searchResultsCache,
-                  }}
-                  columnSortingMultiple
-                  onFocus={handleFocusChange}
-                  onScrollToBottom={handleScrollToBottom}
-                  onColumnSort={handleSort}
-                  onCellChange={handleCellChange}
-                  onCellChangeBatch={handleCellChangeBatch}
-                  onCellKeyDown={handleCellKeyDown}
-                  onHeaderKeyDown={handleCopyPaste}
-                />
-              </div>
+              <TableMenuContext.Provider value={tableMenuState}>
+                <div
+                  ref={setContainersRef}
+                  tabIndex={-1}
+                  {...rest}
+                  className={clsx('data-grid__container', 'theme-typography--caption', className)}
+                  onMouseDown={onMouseDownHandler}
+                  onMouseMove={onMouseMoveHandler}
+                >
+                  <DataGrid
+                    ref={dataGridRef}
+                    className={clsx('data-grid__grid', className)}
+                    cell={cell}
+                    cellText={cellText}
+                    cellElement={cellElement}
+                    rowElement={rowElement}
+                    getCellEditable={isCellEditable}
+                    headerElement={headerElement}
+                    getHeaderHeight={() => headerHeight}
+                    getHeaderWidth={getHeaderWidth}
+                    getHeaderPinned={getHeaderPinned}
+                    getHeaderResizable={getHeaderResizable}
+                    getRowHeight={() => ROW_HEIGHT}
+                    getColumnKey={getColumnKey}
+                    columnCount={columnsCount}
+                    rowCount={rowsCount}
+                    columnSortable={columnSortable}
+                    columnSortingState={columnSortingState}
+                    getRowId={rowIdx => (tableData.rows[rowIdx] ? GridDataKeysUtils.serialize(tableData.rows[rowIdx]) : '')}
+                    search={{
+                      isEnabled: true,
+                      isReadOnly:
+                        model.isReadonly(resultIndex) || !(isResultSetDataSource(model.source) && model.source.hasElementIdentifier(resultIndex)),
+                      storage: searchResultsCache,
+                    }}
+                    columnSortingMultiple
+                    onFocus={handleFocusChange}
+                    onScrollToBottom={handleScrollToBottom}
+                    onColumnSort={handleSort}
+                    onCellChange={handleCellChange}
+                    onCellChangeBatch={handleCellChangeBatch}
+                    onCellKeyDown={handleCellKeyDown}
+                    onHeaderKeyDown={handleCopyPaste}
+                  />
+                </div>
+                <CellMenu onClose={() => dataGridRef.current?.restoreFocus()} />
+              </TableMenuContext.Provider>
             </FormattingContext.Provider>
           </TableDataContext.Provider>
         </DataGridSelectionContext.Provider>

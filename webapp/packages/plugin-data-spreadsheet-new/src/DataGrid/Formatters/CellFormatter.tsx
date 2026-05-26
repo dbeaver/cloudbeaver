@@ -9,15 +9,12 @@ import { observer } from 'mobx-react-lite';
 import { use, useContext } from 'react';
 import { DataGridCellInnerContext } from '@cloudbeaver/plugin-data-grid';
 
-import { getComputed, s, useObjectRef, useS } from '@cloudbeaver/core-blocks';
-import type { IDataPresentationActions, IGridDataKey } from '@cloudbeaver/plugin-data-viewer';
+import { getComputed, Icon, s, useS } from '@cloudbeaver/core-blocks';
+import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 
 import { CellContext } from '../CellRenderer/CellContext.js';
-import { DataGridContext } from '../DataGridContext.js';
-import { TableDataContext } from '../TableDataContext.js';
 import style from './CellFormatter.module.css';
 import { CellFormatterFactory } from './CellFormatterFactory.js';
-import { CellMenu } from './Menu/CellMenu.js';
 
 interface Props {
   rowIdx: number;
@@ -25,8 +22,6 @@ interface Props {
 }
 
 export const CellFormatter = observer<Props>(function CellFormatter({ rowIdx, colIdx }) {
-  const context = useContext(DataGridContext);
-  const tableDataContext = useContext(TableDataContext);
   const innerCellContext = use(DataGridCellInnerContext);
   const cellContext = useContext(CellContext);
 
@@ -36,34 +31,16 @@ export const CellFormatter = observer<Props>(function CellFormatter({ rowIdx, co
   );
   const styles = useS(style);
 
-  const spreadsheetActions = useObjectRef<IDataPresentationActions<IGridDataKey>>({
-    edit(position) {
-      const colIdx = tableDataContext.getColumnIndexFromColumnKey(position.column);
-      const rowIdx = tableDataContext.getRowIndexFromKey(position.row);
+  function handleMenuTriggerMouseUp(event: React.MouseEvent<HTMLButtonElement>) {
+    EventContext.set(event, EventStopPropagationFlag);
+  }
 
-      if (colIdx !== -1) {
-        context.getDataGridApi()?.openEditor({ colIdx, rowIdx });
-      }
-    },
-    unpinColumns(keys) {
-      tableDataContext.view.unpinColumns(keys.map(key => key.column));
-    },
-    pinColumns(keys) {
-      tableDataContext.view.pinColumns(keys.map(key => key.column));
-    },
-    isColumnPinned(key) {
-      return tableDataContext.view.isColumnPinned(key.column);
-    },
-    unpinAllColumns() {
-      tableDataContext.view.unpinAllColumns();
-    },
-    hasPinnedColumns() {
-      return tableDataContext.view.hasPinnedColumns();
-    },
-  });
+  function stopPropagation(event: React.MouseEvent) {
+    event.stopPropagation();
+  }
 
-  function handleCellMenuStateSwitch(visible: boolean): void {
-    cellContext.setMenuVisibility(visible);
+  function handleMenuTriggerClick(event: React.MouseEvent<HTMLButtonElement>) {
+    cellContext.setMenuVisibility(true);
   }
 
   return (
@@ -72,17 +49,14 @@ export const CellFormatter = observer<Props>(function CellFormatter({ rowIdx, co
         <CellFormatterFactory rowIdx={rowIdx} colIdx={colIdx} />
       </div>
       {showCellMenu && (
-        <div className={s(styles, { menuContainer: true })}>
-          <CellMenu
-            cellKey={cell!}
-            model={context.model}
-            actions={context.actions}
-            spreadsheetActions={spreadsheetActions}
-            resultIndex={context.resultIndex}
-            simple={context.simple}
-            onStateSwitch={handleCellMenuStateSwitch}
-          />
-        </div>
+        <button
+          className={s(styles, { menuTrigger: true })}
+          onDoubleClick={stopPropagation}
+          onMouseUp={handleMenuTriggerMouseUp}
+          onClick={handleMenuTriggerClick}
+        >
+          <Icon name="snack" viewBox="0 0 16 10" />
+        </button>
       )}
     </div>
   );
