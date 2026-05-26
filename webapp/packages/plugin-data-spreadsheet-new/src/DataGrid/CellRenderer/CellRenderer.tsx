@@ -7,7 +7,7 @@
  */
 import { computed, observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { useContext, type HTMLAttributes } from 'react';
+import { useContext, useEffect, type HTMLAttributes } from 'react';
 
 import { getComputed, useHover, useMergeRefs, useObjectRef, useObservableRef } from '@cloudbeaver/core-blocks';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
@@ -174,9 +174,7 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
         if (isBindingPressed(event, KEY_BINDING_OPEN_CELL_CONTEXT_MENU)) {
           event.preventDefault();
           event.stopPropagation();
-          if (this.cellContext.isMenuVisible) {
-            this.cellContext.setMenuVisibility(false);
-          } else {
+          if (!this.cellContext.isMenuVisible) {
             const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
             this.cellContext.setMenuVisibility(true, { x: rect.right - 20, y: rect.bottom });
           }
@@ -225,6 +223,15 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
   );
 
   const mergedRef = useMergeRefs(dndBox.setRef, hover.ref);
+
+  useEffect(
+    () => () => {
+      if (cellContext.isMenuVisible) {
+        cellContext.setMenuVisibility(false);
+      }
+    },
+    [],
+  );
 
   return (
     <CellContext.Provider value={cellContext}>
