@@ -240,7 +240,8 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL>
                     getArgumentVal(env, "columnIndex"),
                     new WebSQLResultsRow(getArgument(env, "row")),
                     getArgument(env, "associationName"),
-                    getDataFormat(env)
+                    getDataFormat(env),
+                    CommonUtils.toBoolean(env.getArgument("isReference"))
                 ))
             .dataFetcher("asyncSqlExecuteResults", env ->
                 getService(env).asyncGetQueryResults(

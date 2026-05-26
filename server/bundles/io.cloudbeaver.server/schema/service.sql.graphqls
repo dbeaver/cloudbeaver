@@ -75,6 +75,8 @@ input SQLDataFilter {
 type SQLResultColumnReference {
     associationName: String!
     targetEntityName: String
+    "True if this is a reverse reference (another entity's FK points to this column); false for forward foreign keys"
+    isReference: Boolean! @since(version: "26.1.0")
 }
 
 type SQLResultColumn {
@@ -101,7 +103,7 @@ type SQLResultColumn {
     "Operations supported for this attribute"
     supportedOperations: [DataTypeLogicalOperation!]!
 
-    "Foreign key references available for this column"
+    "Foreign key references for this column, plus reverse references from other tables that point to it (distinguish via SQLResultColumnReference.isReference)"
     references: [SQLResultColumnReference!]!
 
     "Description of the column"
@@ -459,7 +461,7 @@ extend type Mutation {
         dataFormat: ResultDataFormat
     ): AsyncTaskInfo!
 
-    "Creates async task for reading referenced data by foreign key cell"
+    "Creates async task for reading referenced data by foreign key cell. Set isReference=true to navigate a reverse reference (other entity's FK pointing to this row)."
     asyncSqlNavigateForeignKey(
         projectId: ID,
         connectionId: ID!,
@@ -468,7 +470,8 @@ extend type Mutation {
         columnIndex: Int!,
         row: SQLResultRow!,
         associationName: String,
-        dataFormat: ResultDataFormat
+        dataFormat: ResultDataFormat,
+        isReference: Boolean @since(version: "26.1.0")
     ): AsyncTaskInfo!
 
     "Returns transaction log info for the specified project, connection and context"

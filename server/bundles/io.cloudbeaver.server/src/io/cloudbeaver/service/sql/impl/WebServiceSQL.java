@@ -62,6 +62,7 @@ import org.jkiss.dbeaver.model.sql.semantics.completion.SQLCompletionProposalCom
 import org.jkiss.dbeaver.model.sql.semantics.completion.SQLQueryCompletionAnalyzer;
 import org.jkiss.dbeaver.model.sql.semantics.completion.SQLQueryCompletionContext;
 import org.jkiss.dbeaver.model.struct.*;
+import org.jkiss.dbeaver.model.virtual.DBVUtils;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.utils.RuntimeUtils;
 import org.jkiss.utils.CommonUtils;
@@ -611,7 +612,8 @@ public class WebServiceSQL implements DBWServiceSQL {
         @NotNull Integer columnIndex,
         @NotNull WebSQLResultsRow row,
         @Nullable String associationName,
-        @Nullable WebDataFormat dataFormat
+        @Nullable WebDataFormat dataFormat,
+        boolean isReference
     ) {
         WebAsyncTaskProcessor<String> runnable = new WebAsyncTaskProcessor<>() {
             @Override
@@ -625,40 +627,18 @@ public class WebServiceSQL implements DBWServiceSQL {
                         throw new DBWebException("Column index '" + columnIndex + "' is out of range");
                     }
                     DBDAttributeBinding attribute = attributes[columnIndex];
-                    // Get association
-                    List<DBSEntityReferrer> referrers = attribute.getReferrers();
-                    if (CommonUtils.isEmpty(referrers)) {
-                        throw new DBException("Association not found in attribute [" + attribute.getName() + "]");
-                    }
-                    DBSEntityAssociation association = null;
-                    for (DBSEntityReferrer referrer : referrers) {
-                        if (referrer instanceof DBSEntityAssociation) {
-                            DBSEntityAssociation referrerAssociation = (DBSEntityAssociation) referrer;
-                            if (CommonUtils.isEmpty(associationName) ||
-                                CommonUtils.equalObjects(associationName, referrerAssociation.getName())) {
-                                association = referrerAssociation;
-                                break;
-                            }
-                        }
-                    }
-                    if (association == null) {
-                        if (CommonUtils.isEmpty(associationName)) {
-                            throw new DBException("Association not found in attribute [" + attribute.getName() + "]");
-                        }
-                        throw new DBException("Association '" + associationName + "' not found in attribute [" + attribute.getName() + "]");
-                    }
+                    DBSEntityAssociation association = isReference
+                        ? findReverseAssociation(monitor, attribute, associationName)
+                        : findForwardAssociation(attribute, associationName);
 
                     WebDBDResultSetDataProvider dataProvider = new WebDBDResultSetDataProvider(
                         resultsId,
                         contextInfo,
                         List.of(row)
                     );
-                    DBDReferenceNavigation navigation = DBDReferenceUtils.resolveAssociationNavigation(
-                        monitor,
-                        dataProvider,
-                        association,
-                        dataProvider.getSelectedRows()
-                    );
+                    DBDReferenceNavigation navigation = isReference
+                        ? DBDReferenceUtils.resolveReferenceNavigation(monitor, dataProvider, association, dataProvider.getSelectedRows())
+                        : DBDReferenceUtils.resolveAssociationNavigation(monitor, dataProvider, association, dataProvider.getSelectedRows());
                     if (!(navigation.getTargetEntity() instanceof DBSDataContainer targetDataContainer)) {
                         throw new DBWebException("Referenced entity '" + navigation.getTargetEntity().getName() + "' is not a data container");
                     }
@@ -680,6 +660,49 @@ public class WebServiceSQL implements DBWServiceSQL {
             }
         };
         return webSession.createAndRunAsyncTask("Navigate foreign key from results " + resultsId, runnable);
+    }
+
+    @NotNull
+    private static DBSEntityAssociation findForwardAssociation(
+        @NotNull DBDAttributeBinding attribute,
+        @Nullable String associationName
+    ) throws DBException {
+        List<DBSEntityReferrer> referrers = attribute.getReferrers();
+        if (CommonUtils.isEmpty(referrers)) {
+            throw new DBException("Association not found in attribute [" + attribute.getName() + "]");
+        }
+        for (DBSEntityReferrer referrer : referrers) {
+            if (referrer instanceof DBSEntityAssociation referrerAssociation
+                && (CommonUtils.isEmpty(associationName)
+                    || CommonUtils.equalObjects(associationName, referrerAssociation.getName()))) {
+                return referrerAssociation;
+            }
+        }
+        if (CommonUtils.isEmpty(associationName)) {
+            throw new DBException("Association not found in attribute [" + attribute.getName() + "]");
+        }
+        throw new DBException("Association '" + associationName + "' not found in attribute [" + attribute.getName() + "]");
+    }
+
+    @NotNull
+    private static DBSEntityAssociation findReverseAssociation(
+        @NotNull DBRProgressMonitor monitor,
+        @NotNull DBDAttributeBinding attribute,
+        @Nullable String associationName
+    ) throws DBException {
+        DBSEntityAttribute entityAttribute = attribute.getEntityAttribute();
+        if (entityAttribute == null || entityAttribute.getParentObject() == null) {
+            throw new DBException("Can't resolve parent entity for attribute [" + attribute.getName() + "]");
+        }
+        if (CommonUtils.isEmpty(associationName)) {
+            throw new DBException("Reference name is required for reverse navigation on attribute [" + attribute.getName() + "]");
+        }
+        for (DBSEntityAssociation reverseRef : DBVUtils.getAllReferences(monitor, entityAttribute.getParentObject())) {
+            if (CommonUtils.equalObjects(associationName, reverseRef.getName())) {
+                return reverseRef;
+            }
+        }
+        throw new DBException("Reverse reference '" + associationName + "' not found for attribute [" + attribute.getName() + "]");
     }
 
     @NotNull

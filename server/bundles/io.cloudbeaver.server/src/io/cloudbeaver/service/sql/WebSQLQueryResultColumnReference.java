@@ -32,9 +32,11 @@ public class WebSQLQueryResultColumnReference {
 
     @NotNull
     private final DBSEntityAssociation association;
+    private final boolean reverse;
 
-    public WebSQLQueryResultColumnReference(@NotNull DBSEntityAssociation association) {
+    public WebSQLQueryResultColumnReference(@NotNull DBSEntityAssociation association, boolean reverse) {
         this.association = association;
+        this.reverse = reverse;
     }
 
     @NotNull
@@ -43,14 +45,28 @@ public class WebSQLQueryResultColumnReference {
         return association.getName();
     }
 
+    /**
+     * Matches desktop {@code ReferencesResultsContainer.ReferenceKey.isReference}: true for reverse
+     * references (other entity's FK points to this column), false for forward foreign keys.
+     */
+    @Property
+    public boolean isReference() {
+        return reverse;
+    }
+
     @Nullable
     @Property
     public String getTargetEntityName() {
-        DBSEntityConstraint referencedConstraint = association.getReferencedConstraint();
-        if (referencedConstraint == null) {
-            return null;
+        DBSEntity targetEntity;
+        if (reverse) {
+            targetEntity = association.getParentObject();
+        } else {
+            DBSEntityConstraint referencedConstraint = association.getReferencedConstraint();
+            if (referencedConstraint == null) {
+                return null;
+            }
+            targetEntity = referencedConstraint.getParentObject();
         }
-        DBSEntity targetEntity = referencedConstraint.getParentObject();
         if (targetEntity == null) {
             return null;
         }

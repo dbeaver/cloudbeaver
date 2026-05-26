@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,8 @@
  */
 package io.cloudbeaver.service.sql;
 
+import org.jkiss.code.NotNull;
+import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataKind;
 import org.jkiss.dbeaver.model.DBPEvaluationContext;
@@ -24,11 +26,12 @@ import org.jkiss.dbeaver.model.data.DBDAttributeBinding;
 import org.jkiss.dbeaver.model.exec.DBCLogicalOperator;
 import org.jkiss.dbeaver.model.exec.DBExecUtils;
 import org.jkiss.dbeaver.model.meta.Property;
-import org.jkiss.dbeaver.model.struct.DBSEntityAssociation;
-import org.jkiss.dbeaver.model.struct.DBSEntityReferrer;
+import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
+import org.jkiss.dbeaver.model.runtime.VoidProgressMonitor;
+import org.jkiss.dbeaver.model.struct.*;
+import org.jkiss.dbeaver.model.virtual.DBVUtils;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -138,17 +141,58 @@ public class WebSQLQueryResultColumn {
 
     @Property
     public List<WebSQLQueryResultColumnReference> getReferences() {
-        List<DBSEntityReferrer> referrers = attrMeta.getReferrers();
-        if (referrers == null || referrers.isEmpty()) {
-            return Collections.emptyList();
-        }
         List<WebSQLQueryResultColumnReference> references = new ArrayList<>();
-        for (DBSEntityReferrer referrer : referrers) {
-            if (referrer instanceof DBSEntityAssociation) {
-                references.add(new WebSQLQueryResultColumnReference((DBSEntityAssociation) referrer));
+
+        // Forward references: foreign keys where this column is the source
+        List<DBSEntityReferrer> referrers = attrMeta.getReferrers();
+        if (referrers != null) {
+            for (DBSEntityReferrer referrer : referrers) {
+                if (referrer instanceof DBSEntityAssociation association) {
+                    references.add(new WebSQLQueryResultColumnReference(association, false));
+                }
             }
         }
+
+        // Reverse references: foreign keys from other entities targeting this column
+        DBSEntityAttribute entityAttribute = attrMeta.getEntityAttribute();
+        if (entityAttribute != null) {
+            DBSEntity parentEntity = entityAttribute.getParentObject();
+            if (parentEntity != null) {
+                DBRProgressMonitor monitor = new VoidProgressMonitor();
+                for (DBSEntityAssociation reverseRef : DBVUtils.getAllReferences(monitor, parentEntity)) {
+                    try {
+                        if (referenceTargetsAttribute(monitor, reverseRef, entityAttribute)) {
+                            references.add(new WebSQLQueryResultColumnReference(reverseRef, true));
+                        }
+                    } catch (DBException e) {
+                        log.debug("Error reading attributes for reverse reference " + reverseRef.getName(), e);
+                    }
+                }
+            }
+        }
+
         return references;
+    }
+
+    private static boolean referenceTargetsAttribute(
+        @NotNull DBRProgressMonitor monitor,
+        @NotNull DBSEntityAssociation association,
+        @NotNull DBSEntityAttribute attribute
+    ) throws DBException {
+        DBSEntityConstraint refConstraint = association.getReferencedConstraint();
+        if (!(refConstraint instanceof DBSEntityReferrer referrer)) {
+            return false;
+        }
+        List<? extends DBSEntityAttributeRef> attrs = referrer.getAttributeReferences(monitor);
+        if (attrs == null) {
+            return false;
+        }
+        for (DBSEntityAttributeRef ref : attrs) {
+            if (attribute.equals(ref.getAttribute())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
