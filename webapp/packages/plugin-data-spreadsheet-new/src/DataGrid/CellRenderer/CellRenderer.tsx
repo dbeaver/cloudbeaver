@@ -9,17 +9,11 @@ import { computed, observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useContext, type HTMLAttributes } from 'react';
 
-import { getComputed, useHover, useMergeRefs, useObjectRef, useObservableRef, useViewLeave } from '@cloudbeaver/core-blocks';
+import { getComputed, useHover, useMergeRefs, useObjectRef, useObservableRef } from '@cloudbeaver/core-blocks';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { clsx } from '@dbeaver/ui-kit';
 import { type IDataGridCellRenderer, type ICellPosition } from '@cloudbeaver/plugin-data-grid';
-import {
-  DatabaseEditChangeType,
-  GridDataKeysUtils,
-  KEY_BINDING_OPEN_CELL_CONTEXT_MENU,
-  type IGridDataKey,
-  type IGridRowKey,
-} from '@cloudbeaver/plugin-data-viewer';
+import { DatabaseEditChangeType, KEY_BINDING_OPEN_CELL_CONTEXT_MENU, type IGridDataKey, type IGridRowKey } from '@cloudbeaver/plugin-data-viewer';
 import { isObjectsEqual } from '@cloudbeaver/core-utils';
 
 import { ColumnDnDContext } from '../ColumnDnDContext.js';
@@ -52,14 +46,6 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
 
   const cellContext = useObservableRef(
     () => ({
-      get isMenuVisible(): boolean {
-        const activeKey = this.tableMenuContext.activeCellKey;
-        if (!activeKey || !this.cell) {
-          return false;
-        }
-
-        return GridDataKeysUtils.isElementsKeyEqual(activeKey, this.cell);
-      },
       isFocused: false,
       isHovered: false,
       get position(): ICellPosition {
@@ -107,7 +93,6 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
       cell: computed,
       isSelected: computed,
       editionState: computed,
-      isMenuVisible: computed,
       tableDataContext: observable.ref,
       selectionContext: observable.ref,
       tableMenuContext: observable.ref,
@@ -174,10 +159,8 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
         if (isBindingPressed(event, KEY_BINDING_OPEN_CELL_CONTEXT_MENU)) {
           event.preventDefault();
           event.stopPropagation();
-          if (!this.cellContext.isMenuVisible) {
-            const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
-            this.cellContext.setMenuVisibility(true, { x: rect.right - 20, y: rect.bottom });
-          }
+          const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
+          this.cellContext.setMenuVisibility(true, { x: rect.right - 20, y: rect.bottom });
         }
       },
       openContextMenu(event: React.MouseEvent<HTMLDivElement>) {
@@ -222,13 +205,7 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
     isObjectsEqual,
   );
 
-  // Close the menu when the cell leaves the viewport
-  const viewLeaveRef = useViewLeave<HTMLElement>(() => {
-    if (cellContext.isMenuVisible) {
-      cellContext.setMenuVisibility(false);
-    }
-  });
-  const mergedRef = useMergeRefs(dndBox.setRef, hover.ref, viewLeaveRef);
+  const mergedRef = useMergeRefs(dndBox.setRef, hover.ref);
 
   return (
     <CellContext.Provider value={cellContext}>

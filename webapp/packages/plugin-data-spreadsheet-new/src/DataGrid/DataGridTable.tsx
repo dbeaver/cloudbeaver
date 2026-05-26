@@ -75,14 +75,6 @@ const ROW_HEIGHT = 24;
 export const HEADER_HEIGHT = 32;
 export const HEADER_WITH_DESC_HEIGHT = 42;
 
-// Prevent ariakit's document-level mousedown listener from treating right-clicks
-// We need it in order to re-open new context menu on 1 right click, instead of 2 clicks
-function blockRightClickDismiss(event: MouseEvent) {
-  if (event.button === 2) {
-    event.stopImmediatePropagation();
-  }
-}
-
 export const DataGridTable = observer<IDataPresentationProps>(function DataGridTable({ model, actions, resultIndex, simple, className, ...rest }) {
   const translate = useTranslate();
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
@@ -139,17 +131,9 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
   }
 
   function setContainersRef(element: HTMLDivElement | null) {
-    // Prevent ariakit's document-level mousedown listener from treating right-clicks
-    // as "outside clicks" that dismiss the open context menu before contextmenu fires.
-    if (gridContainerRef.current) {
-      gridContainerRef.current.removeEventListener('mousedown', blockRightClickDismiss, { capture: true });
-    }
-
     gridContainerRef.current = element;
 
     if (element) {
-      element.addEventListener('mousedown', blockRightClickDismiss, { capture: true });
-
       const gridDiv = element.firstChild;
 
       if (gridDiv instanceof HTMLDivElement) {

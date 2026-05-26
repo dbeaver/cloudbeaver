@@ -26,9 +26,7 @@ export const CellFormatter = observer<Props>(function CellFormatter({ rowIdx, co
   const cellContext = useContext(CellContext);
 
   const cell = cellContext.cell;
-  const showCellMenu = getComputed(
-    () => !!cell && (innerCellContext?.isFocused || cellContext.isFocused || cellContext.isHovered || cellContext.isMenuVisible),
-  );
+  const showCellMenu = getComputed(() => !!cell && (innerCellContext?.isFocused || cellContext.isFocused || cellContext.isHovered));
   const styles = useS(style);
 
   function handleMenuTriggerMouseUp(event: React.MouseEvent<HTMLButtonElement>) {
@@ -41,6 +39,8 @@ export const CellFormatter = observer<Props>(function CellFormatter({ rowIdx, co
 
   function handleMenuTriggerClick(event: React.MouseEvent<HTMLButtonElement>) {
     const rect = event.currentTarget.getBoundingClientRect();
+    event.preventDefault();
+    event.stopPropagation();
     cellContext.setMenuVisibility(true, { x: rect.right - 20, y: rect.bottom });
   }
 
