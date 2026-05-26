@@ -7,9 +7,9 @@
  */
 import { computed, observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { useContext, useEffect, type HTMLAttributes } from 'react';
+import { useContext, type HTMLAttributes } from 'react';
 
-import { getComputed, useHover, useMergeRefs, useObjectRef, useObservableRef } from '@cloudbeaver/core-blocks';
+import { getComputed, useHover, useMergeRefs, useObjectRef, useObservableRef, useViewLeave } from '@cloudbeaver/core-blocks';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { clsx } from '@dbeaver/ui-kit';
 import { type IDataGridCellRenderer, type ICellPosition } from '@cloudbeaver/plugin-data-grid';
@@ -222,16 +222,13 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
     isObjectsEqual,
   );
 
-  const mergedRef = useMergeRefs(dndBox.setRef, hover.ref);
-
-  useEffect(
-    () => () => {
-      if (cellContext.isMenuVisible) {
-        cellContext.setMenuVisibility(false);
-      }
-    },
-    [],
-  );
+  // Close the menu when the cell leaves the viewport
+  const viewLeaveRef = useViewLeave<HTMLElement>(() => {
+    if (cellContext.isMenuVisible) {
+      cellContext.setMenuVisibility(false);
+    }
+  });
+  const mergedRef = useMergeRefs(dndBox.setRef, hover.ref, viewLeaveRef);
 
   return (
     <CellContext.Provider value={cellContext}>
