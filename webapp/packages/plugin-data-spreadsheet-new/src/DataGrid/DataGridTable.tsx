@@ -51,14 +51,13 @@ import {
 } from '@cloudbeaver/plugin-data-viewer';
 
 import { CellRenderer } from './CellRenderer/CellRenderer.js';
-import { TableMenuContext, type ITableMenuContext } from './CellRenderer/TableMenuContext.js';
+import { DataGridMenuContextProvider } from './Menu/DataGridMenuContextProvider.js';
 import { ColumnDnDContext, type IColumnDnDState } from './ColumnDnDContext.js';
 import { DataGridContext, type IDataGridContext } from './DataGridContext.js';
 import { DataGridSelectionContext } from './DataGridSelection/DataGridSelectionContext.js';
 import { useGridSelectionContext } from './DataGridSelection/useGridSelectionContext.js';
 import './DataGridTable.css';
 import { CellFormatter } from './Formatters/CellFormatter.js';
-import { CellMenu } from './Menu/CellMenu.js';
 import { FormattingContext } from './FormattingContext.js';
 import { TableDataContext } from './TableDataContext.js';
 import { useGridDragging } from './useGridDragging.js';
@@ -122,28 +121,6 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
       isDragging: observable.ref,
       setDropTarget: action.bound,
       setDragging: action.bound,
-    },
-    false,
-  );
-
-  const tableMenuState = useObservableRef<ITableMenuContext>(
-    () => ({
-      activeCellKey: null,
-      menuPosition: null,
-      openMenu(cellKey, x, y) {
-        this.activeCellKey = cellKey;
-        this.menuPosition = { x, y };
-      },
-      closeMenu() {
-        this.activeCellKey = null;
-        this.menuPosition = null;
-      },
-    }),
-    {
-      activeCellKey: observable.ref,
-      menuPosition: observable.ref,
-      openMenu: action,
-      closeMenu: action,
     },
     false,
   );
@@ -611,7 +588,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
         <DataGridSelectionContext.Provider value={gridSelectionContext}>
           <TableDataContext.Provider value={tableData}>
             <FormattingContext.Provider value={formatting}>
-              <TableMenuContext.Provider value={tableMenuState}>
+              <DataGridMenuContextProvider onClose={() => dataGridRef.current?.restoreFocus()}>
                 <div
                   ref={setContainersRef}
                   tabIndex={-1}
@@ -656,8 +633,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
                     onHeaderKeyDown={handleCopyPaste}
                   />
                 </div>
-                <CellMenu onClose={() => dataGridRef.current?.restoreFocus()} />
-              </TableMenuContext.Provider>
+              </DataGridMenuContextProvider>
             </FormattingContext.Provider>
           </TableDataContext.Provider>
         </DataGridSelectionContext.Provider>
