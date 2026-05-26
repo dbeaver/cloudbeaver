@@ -21,7 +21,7 @@ export interface ICellContext {
   position: ICellPosition;
   editionState: DatabaseEditChangeType | null;
   isMenuVisible: boolean;
-  setMenuVisibility(visible: boolean): void;
+  setMenuVisibility(visible: boolean, position?: { x: number; y: number }): void;
 }
 
 export const CellContext = createContext<ICellContext>(undefined as any);

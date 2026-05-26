@@ -40,7 +40,8 @@ export const CellFormatter = observer<Props>(function CellFormatter({ rowIdx, co
   }
 
   function handleMenuTriggerClick(event: React.MouseEvent<HTMLButtonElement>) {
-    cellContext.setMenuVisibility(true);
+    const rect = event.currentTarget.getBoundingClientRect();
+    cellContext.setMenuVisibility(true, { x: rect.right - 20, y: rect.bottom });
   }
 
   return (

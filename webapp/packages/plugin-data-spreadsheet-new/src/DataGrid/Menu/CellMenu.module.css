@@ -9,7 +9,7 @@
 .contextMenu {
   height: 0;
   width: 0;
-  visibility: none;
+  visibility: hidden;
 }
 
 .icon {

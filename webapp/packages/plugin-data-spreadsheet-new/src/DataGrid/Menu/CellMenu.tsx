@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
 
-import { type IContextMenuPosition, MenuItemElementStyles, s, SContext, type StyleRegistry, useS } from '@cloudbeaver/core-blocks';
+import { type IContextMenuPosition, MenuItemElementStyles, s, SContext, type StyleRegistry, useObjectRef, useS } from '@cloudbeaver/core-blocks';
 import { useDataContextLink } from '@cloudbeaver/core-data-context';
 import { ContextMenu } from '@cloudbeaver/core-ui';
 import { useMenu } from '@cloudbeaver/core-view';
@@ -52,16 +52,7 @@ export const CellMenu = observer<Props>(function CellMenu({ onClose }) {
 
   const { activeCellKey, menuPosition } = tableMenuContext;
 
-  useDataContextLink(menu.context, (context, id) => {
-    context.set(DATA_CONTEXT_DV_DDM, dataGridContext.model, id);
-    context.set(DATA_CONTEXT_DV_DDM_RESULT_INDEX, dataGridContext.resultIndex, id);
-    context.set(DATA_CONTEXT_DV_SIMPLE, dataGridContext.simple, id);
-    context.set(DATA_CONTEXT_DV_ACTIONS, dataGridContext.actions, id);
-    context.set(DATA_CONTEXT_DV_PRESENTATION_ACTIONS, spreadsheetActions, id);
-    context.set(DATA_CONTEXT_DV_RESULT_KEY, activeCellKey, id);
-  });
-
-  const spreadsheetActions: IDataPresentationActions<IGridDataKey> = {
+  const spreadsheetActions = useObjectRef<IDataPresentationActions<IGridDataKey>>({
     edit(position) {
       const colIdx = tableDataContext.getColumnIndexFromColumnKey(position.column);
       const rowIdx = tableDataContext.getRowIndexFromKey(position.row);
@@ -84,11 +75,29 @@ export const CellMenu = observer<Props>(function CellMenu({ onClose }) {
     hasPinnedColumns() {
       return tableDataContext.view.hasPinnedColumns();
     },
-  };
+  });
+
+  useDataContextLink(menu.context, (context, id) => {
+    context.set(DATA_CONTEXT_DV_DDM, dataGridContext.model, id);
+    context.set(DATA_CONTEXT_DV_DDM_RESULT_INDEX, dataGridContext.resultIndex, id);
+    context.set(DATA_CONTEXT_DV_SIMPLE, dataGridContext.simple, id);
+    context.set(DATA_CONTEXT_DV_ACTIONS, dataGridContext.actions, id);
+    context.set(DATA_CONTEXT_DV_PRESENTATION_ACTIONS, spreadsheetActions, id);
+    context.set(DATA_CONTEXT_DV_RESULT_KEY, activeCellKey, id);
+  });
+
+  function handleStateSwitch(visible: boolean) {
+    if (!visible) {
+      tableMenuContext.closeMenu();
+      onClose();
+    }
+  }
 
   const contextMenuPosition: IContextMenuPosition | undefined = menuPosition
     ? {
         position: menuPosition,
+        // open is intentionally a no-op: the menu is opened imperatively via
+        // tableMenuContext.openMenu() and we do not need ContextMenu to re-open it.
         open: () => {},
         close: () => handleStateSwitch(false),
       }
@@ -98,20 +107,13 @@ export const CellMenu = observer<Props>(function CellMenu({ onClose }) {
     return null;
   }
 
-  function handleStateSwitch(visible: boolean) {
-    if (!visible) {
-      tableMenuContext.closeMenu();
-      onClose();
-    }
-  }
-
   return (
     <SContext registry={registry}>
       <ContextMenu
         className={s(style, { contextMenu: true })}
         menu={menu}
         contextMenuPosition={contextMenuPosition}
-        visible={activeCellKey != null}
+        visible
         autoFocusOnShow
         onVisibleSwitch={handleStateSwitch}
       />

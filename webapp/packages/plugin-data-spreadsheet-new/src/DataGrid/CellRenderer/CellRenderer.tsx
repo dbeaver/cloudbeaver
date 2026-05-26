@@ -88,12 +88,9 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
         return this.tableDataContext.getEditionState(this.cell);
       },
 
-      setMenuVisibility(visible: boolean): void {
+      setMenuVisibility(visible: boolean, position?: { x: number; y: number }): void {
         if (visible && this.cell) {
-          const rect = (
-            document.querySelector(`[data-row-index="${this.rowIdx}"][data-column-index="${this.colIdx}"]`) as HTMLElement | null
-          )?.getBoundingClientRect();
-          this.tableMenuContext.openMenu(this.cell, rect ? rect.right - 20 : 0, rect ? rect.bottom : 0);
+          this.tableMenuContext.openMenu(this.cell, position?.x ?? 0, position?.y ?? 0);
         } else {
           this.tableMenuContext.closeMenu();
         }
@@ -177,7 +174,12 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
         if (isBindingPressed(event, KEY_BINDING_OPEN_CELL_CONTEXT_MENU)) {
           event.preventDefault();
           event.stopPropagation();
-          this.cellContext.setMenuVisibility(!this.cellContext.isMenuVisible);
+          if (this.cellContext.isMenuVisible) {
+            this.cellContext.setMenuVisibility(false);
+          } else {
+            const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
+            this.cellContext.setMenuVisibility(true, { x: rect.right - 20, y: rect.bottom });
+          }
         }
       },
       openContextMenu(event: React.MouseEvent<HTMLDivElement>) {
@@ -203,7 +205,7 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
           );
         }
 
-        this.cellContext.setMenuVisibility(true);
+        this.cellContext.setMenuVisibility(true, { x: event.clientX, y: event.clientY });
       },
     }),
     {
