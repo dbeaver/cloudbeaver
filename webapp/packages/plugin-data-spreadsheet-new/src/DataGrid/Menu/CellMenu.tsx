@@ -67,7 +67,6 @@ export const CellMenu = observer<Props>(function CellMenu({ onClose }) {
       tableMenuContext.closeMenu();
     }
 
-    // scroll doesn't bubble, so capture:true catches it from any descendant scroller
     container.addEventListener('scroll', handleScroll);
     return () => container.removeEventListener('scroll', handleScroll);
   }, [activeCellKey, dataGridContext, tableMenuContext]);
