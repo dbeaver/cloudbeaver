@@ -10,6 +10,12 @@
     user-select: none;
     -webkit-user-select: none;
 
+    .ReactCodemirror,
+    [role='toolbar'] {
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
     .data-grid__container {
       user-select: text;
       -webkit-user-select: text;
@@ -63,6 +69,11 @@
 
     & .rdg-cell-custom-deleted {
       background-color: var(--theme-delete-status) !important;
+    }
+
+    & .rdg-editor-container textarea::selection {
+      background-color: Highlight;
+      color: HighlightText;
     }
   }
 
