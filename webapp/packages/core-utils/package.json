@@ -31,7 +31,7 @@
     "modern-screenshot": "^4",
     "tslib": "^2",
     "underscore": "^1",
-    "uuid": "^13",
+    "uuid": "^14",
     "vitest": "^4",
     "whatwg-mimetype": "^5",
     "zod": "^4",
