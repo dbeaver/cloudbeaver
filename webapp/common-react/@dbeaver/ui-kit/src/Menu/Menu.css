@@ -17,6 +17,7 @@
     outline: 0;
     padding-block: var(--dbv-kit-menu-popover-padding-block);
     padding-inline: var(--dbv-kit-menu-popover-padding-inline);
+    z-index: 1000;
 
     @media (prefers-reduced-motion: no-preference) {
       opacity: 0;
