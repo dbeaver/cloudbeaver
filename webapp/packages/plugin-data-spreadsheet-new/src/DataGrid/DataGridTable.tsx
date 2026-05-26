@@ -328,6 +328,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
       simple,
       isGridInFocus,
       getDataGridApi: () => dataGridRef.current,
+      getContainer: () => dataGridDivRef.current,
       focus: () => dataGridRef.current?.restoreFocus(),
     }),
     [model, actions, resultIndex, simple, dataGridRef],

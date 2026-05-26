@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { useContext } from 'react';
+import { useContext, useEffect } from 'react';
 
 import { MenuItemElementStyles, s, SContext, type StyleRegistry, useObjectRef, useS } from '@cloudbeaver/core-blocks';
 import { useDataContextLink } from '@cloudbeaver/core-data-context';
@@ -51,6 +51,26 @@ export const CellMenu = observer<Props>(function CellMenu({ onClose }) {
   const menu = useMenu({ menu: MENU_DV_CONTEXT_MENU });
 
   const { activeCellKey, menuPosition } = tableMenuContext;
+
+  useEffect(() => {
+    if (!activeCellKey) {
+      return;
+    }
+
+    const container = dataGridContext.getContainer();
+
+    if (!container) {
+      return;
+    }
+
+    function handleScroll() {
+      tableMenuContext.closeMenu();
+    }
+
+    // scroll doesn't bubble, so capture:true catches it from any descendant scroller
+    container.addEventListener('scroll', handleScroll);
+    return () => container.removeEventListener('scroll', handleScroll);
+  }, [activeCellKey, dataGridContext, tableMenuContext]);
 
   const spreadsheetActions = useObjectRef<IDataPresentationActions<IGridDataKey>>({
     edit(position) {
