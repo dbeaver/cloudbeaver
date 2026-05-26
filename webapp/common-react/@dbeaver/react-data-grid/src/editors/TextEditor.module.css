@@ -1,6 +1,13 @@
 :global(.rdg-cell) .editor {
   appearance: none;
   resize: none;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
 
   box-sizing: border-box;
   min-height: initial;
