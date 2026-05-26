@@ -7,11 +7,12 @@
  */
 import { createContext } from 'react';
 
+import type { IContextMenuPosition } from '@cloudbeaver/core-blocks';
 import type { IGridDataKey } from '@cloudbeaver/plugin-data-viewer';
 
 export interface ITableMenuContext {
   activeCellKey: IGridDataKey | null;
-  menuPosition: { x: number; y: number } | null;
+  menuPosition: IContextMenuPosition;
   openMenu(cellKey: IGridDataKey, x: number, y: number): void;
   closeMenu(): void;
 }

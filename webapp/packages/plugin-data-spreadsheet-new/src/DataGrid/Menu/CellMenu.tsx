@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
 
-import { type IContextMenuPosition, MenuItemElementStyles, s, SContext, type StyleRegistry, useObjectRef, useS } from '@cloudbeaver/core-blocks';
+import { MenuItemElementStyles, s, SContext, type StyleRegistry, useObjectRef, useS } from '@cloudbeaver/core-blocks';
 import { useDataContextLink } from '@cloudbeaver/core-data-context';
 import { ContextMenu } from '@cloudbeaver/core-ui';
 import { useMenu } from '@cloudbeaver/core-view';
@@ -93,16 +93,6 @@ export const CellMenu = observer<Props>(function CellMenu({ onClose }) {
     }
   }
 
-  const contextMenuPosition: IContextMenuPosition | undefined = menuPosition
-    ? {
-        position: menuPosition,
-        // open is intentionally a no-op: the menu is opened imperatively via
-        // tableMenuContext.openMenu() and we do not need ContextMenu to re-open it.
-        open: () => {},
-        close: () => handleStateSwitch(false),
-      }
-    : undefined;
-
   if (!activeCellKey) {
     return null;
   }
@@ -112,8 +102,8 @@ export const CellMenu = observer<Props>(function CellMenu({ onClose }) {
       <ContextMenu
         className={s(style, { contextMenu: true })}
         menu={menu}
-        contextMenuPosition={contextMenuPosition}
-        visible
+        contextMenuPosition={menuPosition}
+        visible={!!menuPosition.position}
         autoFocusOnShow
         onVisibleSwitch={handleStateSwitch}
       />

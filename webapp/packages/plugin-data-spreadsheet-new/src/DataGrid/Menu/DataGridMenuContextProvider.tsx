@@ -9,7 +9,7 @@ import { action, observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import type { PropsWithChildren } from 'react';
 
-import { useObservableRef } from '@cloudbeaver/core-blocks';
+import { useContextMenuPosition, useObservableRef } from '@cloudbeaver/core-blocks';
 import type { IGridDataKey } from '@cloudbeaver/plugin-data-viewer';
 
 import { TableMenuContext, type ITableMenuContext } from '../CellRenderer/TableMenuContext.js';
@@ -20,17 +20,19 @@ interface Props {
 }
 
 export const DataGridMenuContextProvider = observer<PropsWithChildren<Props>>(function DataGridMenuContextProvider({ onClose, children }) {
+  const menuPosition = useContextMenuPosition();
+
   const tableMenuState = useObservableRef<ITableMenuContext>(
     () => ({
       activeCellKey: null,
-      menuPosition: null,
+      menuPosition,
       openMenu(cellKey: IGridDataKey, x: number, y: number) {
         this.activeCellKey = cellKey;
-        this.menuPosition = { x, y };
+        this.menuPosition.position = { x, y };
       },
       closeMenu() {
         this.activeCellKey = null;
-        this.menuPosition = null;
+        this.menuPosition.close();
       },
     }),
     {
