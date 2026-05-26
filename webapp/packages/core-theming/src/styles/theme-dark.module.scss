@@ -10,7 +10,6 @@
 
 @include theme-matcher;
 @include colors;
-@include form-controls;
 @include link;
 @include delimiter($mdc-theme-background);
 @include branding-overflow;

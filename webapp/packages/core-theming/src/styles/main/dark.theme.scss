@@ -13,7 +13,6 @@
     @include colors;
     @include color-scheme;
     @include css-variables;
-    @include form-controls;
     @include link;
     @include delimiter($mdc-theme-secondary);
     @include branding-overflow;
