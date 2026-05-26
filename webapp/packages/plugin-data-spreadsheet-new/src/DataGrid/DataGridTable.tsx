@@ -237,6 +237,15 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
 
     function syncFocus(data: DatabaseDataSelectActionsData<Partial<IGridDataKey>>) {
       if (data.type === 'focus') {
+        const colIdx = data.key?.column ? tableData.getColumnIndexFromColumnKey(data.key.column) : -1;
+        const rowIdx = data.key?.row ? tableData.getRowIndexFromKey(data.key.row) : -1;
+
+        // Skip if the grid already has focus at this position — it was a user interaction inside the grid,
+        // not an external focus change. Avoid scheduling a deferred selectCell that would steal DOM focus.
+        if (focusedCell.current?.colIdx === colIdx && focusedCell.current?.rowIdx === rowIdx) {
+          return;
+        }
+
         handlers.focusCell(data.key, false, true);
       }
     }
