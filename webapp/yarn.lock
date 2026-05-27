@@ -4711,7 +4711,6 @@ __metadata:
     react: "npm:^19"
     react-dom: "npm:^19"
     rimraf: "npm:^6"
-    sass: "npm:^1"
     tailwindcss: "npm:4.0.7"
     tslib: "npm:^2"
     typescript: "npm:^5"
@@ -17047,7 +17046,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"sass@npm:^1, sass@npm:^1.70.0":
+"sass@npm:^1.70.0":
   version: 1.99.0
   resolution: "sass@npm:1.99.0"
   dependencies:
