@@ -62,20 +62,17 @@ export function useTableData(
       get columnKeys(): IGridColumnKey[] {
         return this.view.columnKeys;
       },
+      get visualColumnKeys(): IGridColumnKey[] {
+        return this.view.visualColumnKeys;
+      },
       get rows(): IGridRowKey[] {
         return this.view.rowKeys;
       },
       get columns() {
-        if (this.columnKeys.length === 0) {
-          return [];
-        }
-
-        const columns: Array<IColumnInfo> = this.columnKeys.map<IColumnInfo>(col => ({
-          key: col,
-        }));
-        columns.unshift({ key: null });
-
-        return columns;
+        return getColumns(this.columnKeys);
+      },
+      get visualColumns() {
+        return getColumns(this.visualColumnKeys);
       },
       get hasDescription(): boolean {
         if (!this.dataGridSettingsService.description) {
@@ -103,7 +100,10 @@ export function useTableData(
         return this.view.getCellHolder(key) as IDatabaseValueHolder<IGridDataKey, IResultSetValue>;
       },
       getColumnIndexFromColumnKey(columnKey) {
-        return this.columns.findIndex(column => column.key !== null && GridDataKeysUtils.isEqual(columnKey, column.key));
+        return getColumnIndex(columnKey, this.columns);
+      },
+      getVisualColumnIndexFromColumnKey(columnKey) {
+        return getColumnIndex(columnKey, this.visualColumns);
       },
       getRowIndexFromKey(rowKey) {
         return this.rows.findIndex(row => GridDataKeysUtils.isEqual(rowKey, row));
@@ -171,6 +171,8 @@ export function useTableData(
       columns: computed,
       rows: computed,
       columnKeys: computed,
+      visualColumns: computed,
+      visualColumnKeys: computed,
       hasDescription: computed,
       formatting: observable.ref,
       format: observable.ref,
@@ -191,4 +193,22 @@ export function useTableData(
       dataGridSettingsService,
     },
   );
+}
+
+function getColumns(columnKeys: IGridColumnKey[]): IColumnInfo[] {
+  if (columnKeys.length === 0) {
+    return [];
+  }
+
+  const columns: Array<IColumnInfo> = columnKeys.map<IColumnInfo>(col => ({
+    key: col,
+  }));
+
+  columns.unshift({ key: null });
+
+  return columns;
+}
+
+function getColumnIndex(columnKey: IGridColumnKey, columns: IColumnInfo[]): number {
+  return columns.findIndex(column => column.key !== null && GridDataKeysUtils.isEqual(column.key, columnKey));
 }

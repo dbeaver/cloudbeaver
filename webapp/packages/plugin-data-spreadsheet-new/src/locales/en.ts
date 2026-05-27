@@ -31,6 +31,7 @@ export default [
   ['data_grid_table_context_menu_save_value_error', 'Failed to save value'],
   ['data_grid_table_index_column_tooltip', 'Select whole table'],
   ['data_grid_table_readonly_connection_tooltip', 'Read-only connection'],
+  ['data_grid_table_readonly_presentation_tooltip', 'Read-only: Active presentation does not support data editing'],
   ['data_grid_table_no_key_found_tooltip', 'No unique key was found. Data modification is not possible.'],
   ['data_grid_table_virtual_key_tooltip', 'Virtual key'],
   ['data_grid_table_key_column_tooltip', 'Key column'],

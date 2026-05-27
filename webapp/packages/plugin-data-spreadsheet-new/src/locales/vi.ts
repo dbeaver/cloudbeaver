@@ -31,6 +31,7 @@ export default [
   ['data_grid_table_context_menu_save_value_error', 'Không thể lưu giá trị'],
   ['data_grid_table_index_column_tooltip', 'Chọn toàn bộ bảng'],
   ['data_grid_table_readonly_connection_tooltip', 'Kết nối chỉ đọc'],
+  ['data_grid_table_readonly_presentation_tooltip', 'Trình bày đang dùng không hỗ trợ chỉnh sửa dữ liệu'],
   ['data_grid_table_no_key_found_tooltip', 'Không tìm thấy khóa duy nhất. Không thể sửa đổi dữ liệu.'],
   ['data_grid_table_virtual_key_tooltip', 'Khóa ảo'],
   ['data_grid_table_key_column_tooltip', 'Cột khóa'],

@@ -34,6 +34,7 @@ export default [
   ['data_grid_table_virtual_key_tooltip', '虚拟键'],
   ['data_grid_table_key_column_tooltip', '键列'],
   ['data_grid_table_readonly_connection_tooltip', '只读连接'],
+  ['data_grid_table_readonly_presentation_tooltip', '当前展示形式不支持数据编辑'],
   ['plugin_data_spreadsheet_new_settings_disable', '禁用表显示'],
   ['plugin_data_spreadsheet_new_settings_description_label', '显示列描述'],
   ['plugin_data_spreadsheet_new_settings_description_label_description', '描述将显示在表头的列名下方'],
