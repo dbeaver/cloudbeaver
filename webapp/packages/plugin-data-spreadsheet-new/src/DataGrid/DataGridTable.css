@@ -71,6 +71,7 @@
       background-color: var(--theme-delete-status) !important;
     }
 
+    & .rdg-editor-container input::selection,
     & .rdg-editor-container textarea::selection {
       background-color: Highlight;
       color: HighlightText;
