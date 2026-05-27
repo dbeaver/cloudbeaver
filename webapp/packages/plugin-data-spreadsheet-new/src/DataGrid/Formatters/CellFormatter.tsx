@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 import { use, useContext } from 'react';
 import { DataGridCellInnerContext } from '@cloudbeaver/plugin-data-grid';
 
-import { getComputed, Icon, s, useS } from '@cloudbeaver/core-blocks';
+import { getComputed, IconButton, s, useS } from '@cloudbeaver/core-blocks';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 
 import { CellContext } from '../CellRenderer/CellContext.js';
@@ -38,8 +38,13 @@ export const CellFormatter = observer<Props>(function CellFormatter({ rowIdx, co
   }
 
   function handleMenuTriggerClick(event: React.MouseEvent<HTMLButtonElement>) {
-    const rect = event.currentTarget.getBoundingClientRect();
-    cellContext.setMenuVisibility(true, { x: rect.right - 20, y: rect.bottom });
+    // detail === 0 means keyboard-triggered click (e.g. Enter/Space on the button).
+    // Ignore these to prevent the menu from opening when the editor closes and focus
+    // accidentally lands on this button.
+    if (event.detail === 0) {
+      return;
+    }
+    cellContext.openMenu(event);
   }
 
   return (
@@ -48,14 +53,15 @@ export const CellFormatter = observer<Props>(function CellFormatter({ rowIdx, co
         <CellFormatterFactory rowIdx={rowIdx} colIdx={colIdx} />
       </div>
       {showCellMenu && (
-        <button
+        <IconButton
+          name="snack"
+          viewBox="0 0 16 10"
+          tabIndex={-1}
           className={s(styles, { menuTrigger: true })}
           onDoubleClick={stopPropagation}
           onMouseUp={handleMenuTriggerMouseUp}
           onClick={handleMenuTriggerClick}
-        >
-          <Icon name="snack" viewBox="0 0 16 10" />
-        </button>
+        />
       )}
     </div>
   );

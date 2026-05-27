@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { useContext, useEffect } from 'react';
+import { useContext } from 'react';
 
 import { MenuItemElementStyles, s, SContext, type StyleRegistry, useObjectRef, useS } from '@cloudbeaver/core-blocks';
 import { useDataContextLink } from '@cloudbeaver/core-data-context';
@@ -50,26 +50,7 @@ export const CellMenu = observer<Props>(function CellMenu({ onClose }) {
   const tableMenuContext = useContext(TableMenuContext);
   const menu = useMenu({ menu: MENU_DV_CONTEXT_MENU });
 
-  const { activeCellKey, menuPosition } = tableMenuContext;
-
-  useEffect(() => {
-    if (!activeCellKey) {
-      return;
-    }
-
-    const container = dataGridContext.getContainer();
-
-    if (!container) {
-      return;
-    }
-
-    function handleScroll() {
-      tableMenuContext.closeMenu();
-    }
-
-    container.addEventListener('scroll', handleScroll);
-    return () => container.removeEventListener('scroll', handleScroll);
-  }, [activeCellKey, dataGridContext, tableMenuContext]);
+  const { activeCellContext, menuPosition } = tableMenuContext;
 
   const spreadsheetActions = useObjectRef<IDataPresentationActions<IGridDataKey>>({
     edit(position) {
@@ -102,7 +83,7 @@ export const CellMenu = observer<Props>(function CellMenu({ onClose }) {
     context.set(DATA_CONTEXT_DV_SIMPLE, dataGridContext.simple, id);
     context.set(DATA_CONTEXT_DV_ACTIONS, dataGridContext.actions, id);
     context.set(DATA_CONTEXT_DV_PRESENTATION_ACTIONS, spreadsheetActions, id);
-    context.set(DATA_CONTEXT_DV_RESULT_KEY, activeCellKey, id);
+    context.set(DATA_CONTEXT_DV_RESULT_KEY, activeCellContext?.cell, id);
   });
 
   function handleStateSwitch(visible: boolean) {
@@ -112,7 +93,7 @@ export const CellMenu = observer<Props>(function CellMenu({ onClose }) {
     }
   }
 
-  if (!activeCellKey) {
+  if (!activeCellContext) {
     return null;
   }
 

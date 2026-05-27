@@ -7,11 +7,11 @@
  */
 import { action, observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import type { PropsWithChildren } from 'react';
+import { useContext, useEffect, type PropsWithChildren } from 'react';
 
 import { useContextMenuPosition, useObservableRef } from '@cloudbeaver/core-blocks';
-import type { IGridDataKey } from '@cloudbeaver/plugin-data-viewer';
 
+import { DataGridContext } from '../DataGridContext.js';
 import { TableMenuContext, type ITableMenuContext } from '../CellRenderer/TableMenuContext.js';
 import { CellMenu } from './CellMenu.js';
 
@@ -21,28 +21,39 @@ interface Props {
 
 export const DataGridMenuContextProvider = observer<PropsWithChildren<Props>>(function DataGridMenuContextProvider({ onClose, children }) {
   const menuPosition = useContextMenuPosition();
+  const dataGridContext = useContext(DataGridContext);
 
   const tableMenuState = useObservableRef<ITableMenuContext>(
     () => ({
-      activeCellKey: null,
+      activeCellContext: null,
       menuPosition,
-      openMenu(cellKey: IGridDataKey, x: number, y: number) {
-        this.activeCellKey = cellKey;
-        this.menuPosition.position = { x, y };
-      },
       closeMenu() {
-        this.activeCellKey = null;
+        this.activeCellContext = null;
         this.menuPosition.close();
       },
     }),
     {
-      activeCellKey: observable.ref,
+      activeCellContext: observable.ref,
       menuPosition: observable.ref,
-      openMenu: action,
       closeMenu: action,
     },
     false,
   );
+
+  useEffect(() => {
+    const container = dataGridContext.getContainer();
+
+    if (!container) {
+      return;
+    }
+
+    function handleScroll() {
+      tableMenuState.closeMenu();
+    }
+
+    container.addEventListener('scroll', handleScroll, { capture: true });
+    return () => container.removeEventListener('scroll', handleScroll, { capture: true });
+  }, [dataGridContext, tableMenuState]);
 
   return (
     <TableMenuContext.Provider value={tableMenuState}>

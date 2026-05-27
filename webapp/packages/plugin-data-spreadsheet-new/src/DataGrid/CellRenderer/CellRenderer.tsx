@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { computed, observable } from 'mobx';
+import { action, computed, observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useContext, type HTMLAttributes } from 'react';
 
@@ -74,12 +74,16 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
         return this.tableDataContext.getEditionState(this.cell);
       },
 
-      setMenuVisibility(visible: boolean, position?: { x: number; y: number }): void {
-        if (visible && this.cell) {
-          this.tableMenuContext.openMenu(this.cell, position?.x ?? 0, position?.y ?? 0);
-        } else {
-          this.tableMenuContext.closeMenu();
-        }
+      get isMenuVisible(): boolean {
+        return this.tableMenuContext.activeCellContext === this && this.tableMenuContext.menuPosition.position !== null;
+      },
+      openMenu(event: React.MouseEvent): void {
+        this.tableMenuContext.activeCellContext = this;
+        this.tableMenuContext.menuPosition.open(event);
+      },
+      closeMenu(): void {
+        this.tableMenuContext.activeCellContext = null;
+        this.tableMenuContext.menuPosition.close();
       },
     }),
     {
@@ -92,7 +96,10 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
       position: computed,
       cell: computed,
       isSelected: computed,
+      isMenuVisible: computed,
       editionState: computed,
+      openMenu: action,
+      closeMenu: action,
       tableDataContext: observable.ref,
       selectionContext: observable.ref,
       tableMenuContext: observable.ref,
@@ -159,8 +166,13 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
         if (isBindingPressed(event, KEY_BINDING_OPEN_CELL_CONTEXT_MENU)) {
           event.preventDefault();
           event.stopPropagation();
-          const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
-          this.cellContext.setMenuVisibility(true, { x: rect.right - 20, y: rect.bottom });
+
+          Object.assign(event, {
+            clientX: event.currentTarget.getBoundingClientRect().left + event.currentTarget.getBoundingClientRect().width,
+            clientY: event.currentTarget.getBoundingClientRect().top + event.currentTarget.getBoundingClientRect().height,
+          });
+
+          this.cellContext.openMenu(event as unknown as React.MouseEvent);
         }
       },
       openContextMenu(event: React.MouseEvent<HTMLDivElement>) {
@@ -186,7 +198,7 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
           );
         }
 
-        this.cellContext.setMenuVisibility(true, { x: event.clientX, y: event.clientY });
+        this.cellContext.openMenu(event);
       },
     }),
     {
