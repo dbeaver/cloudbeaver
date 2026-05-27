@@ -50,8 +50,6 @@ export const CellMenu = observer<Props>(function CellMenu({ onClose }) {
   const tableMenuContext = useContext(TableMenuContext);
   const menu = useMenu({ menu: MENU_DV_CONTEXT_MENU });
 
-  const { activeCellContext, menuPosition } = tableMenuContext;
-
   const spreadsheetActions = useObjectRef<IDataPresentationActions<IGridDataKey>>({
     edit(position) {
       const colIdx = tableDataContext.getColumnIndexFromColumnKey(position.column);
@@ -83,7 +81,7 @@ export const CellMenu = observer<Props>(function CellMenu({ onClose }) {
     context.set(DATA_CONTEXT_DV_SIMPLE, dataGridContext.simple, id);
     context.set(DATA_CONTEXT_DV_ACTIONS, dataGridContext.actions, id);
     context.set(DATA_CONTEXT_DV_PRESENTATION_ACTIONS, spreadsheetActions, id);
-    context.set(DATA_CONTEXT_DV_RESULT_KEY, activeCellContext?.cell, id);
+    context.set(DATA_CONTEXT_DV_RESULT_KEY, tableMenuContext.activeCell, id);
   });
 
   function handleStateSwitch(visible: boolean) {
@@ -93,7 +91,7 @@ export const CellMenu = observer<Props>(function CellMenu({ onClose }) {
     }
   }
 
-  if (!activeCellContext) {
+  if (!tableMenuContext.isMenuOpened) {
     return null;
   }
 
@@ -102,8 +100,8 @@ export const CellMenu = observer<Props>(function CellMenu({ onClose }) {
       <ContextMenu
         className={s(style, { contextMenu: true })}
         menu={menu}
-        contextMenuPosition={menuPosition}
-        visible={!!menuPosition.position}
+        contextMenuPosition={tableMenuContext.menuPosition}
+        visible
         autoFocusOnShow
         onVisibleSwitch={handleStateSwitch}
       />

@@ -5,14 +5,17 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { createContext } from 'react';
+import React, { createContext } from 'react';
 
 import type { IContextMenuPosition } from '@cloudbeaver/core-blocks';
+import type { IGridDataKey } from '@cloudbeaver/plugin-data-viewer';
 import type { ICellContext } from './CellContext.js';
 
 export interface ITableMenuContext {
-  activeCellContext: ICellContext | null;
+  activeCell: IGridDataKey | undefined | null;
   menuPosition: IContextMenuPosition;
+  isMenuOpened: boolean;
+  openMenu(cellContext: ICellContext, event: React.MouseEvent): void;
   closeMenu(): void;
 }
 

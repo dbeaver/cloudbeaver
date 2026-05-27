@@ -5,13 +5,14 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { action, observable } from 'mobx';
+import { action, computed, observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { useContext, useEffect, type PropsWithChildren } from 'react';
+import React, { useContext, useEffect, type PropsWithChildren } from 'react';
 
 import { useContextMenuPosition, useObservableRef } from '@cloudbeaver/core-blocks';
 
 import { DataGridContext } from '../DataGridContext.js';
+import type { ICellContext } from '../CellRenderer/CellContext.js';
 import { TableMenuContext, type ITableMenuContext } from '../CellRenderer/TableMenuContext.js';
 import { CellMenu } from './CellMenu.js';
 
@@ -25,16 +26,25 @@ export const DataGridMenuContextProvider = observer<PropsWithChildren<Props>>(fu
 
   const tableMenuState = useObservableRef<ITableMenuContext>(
     () => ({
-      activeCellContext: null,
+      activeCell: null,
       menuPosition,
+      get isMenuOpened() {
+        return this.menuPosition.position !== null;
+      },
+      openMenu(cellContext: ICellContext, event: React.MouseEvent) {
+        this.activeCell = cellContext.cell;
+        this.menuPosition.open(event);
+      },
       closeMenu() {
-        this.activeCellContext = null;
+        this.activeCell = null;
         this.menuPosition.close();
       },
     }),
     {
-      activeCellContext: observable.ref,
+      activeCell: observable.ref,
       menuPosition: observable.ref,
+      isMenuOpened: computed,
+      openMenu: action,
       closeMenu: action,
     },
     false,

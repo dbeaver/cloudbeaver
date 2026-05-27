@@ -46,6 +46,9 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
 
   const cellContext = useObservableRef(
     () => ({
+      get isMenuVisible(): boolean {
+        return this.tableMenuContext.isMenuOpened;
+      },
       isFocused: false,
       isHovered: false,
       get position(): ICellPosition {
@@ -73,17 +76,11 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
 
         return this.tableDataContext.getEditionState(this.cell);
       },
-
-      get isMenuVisible(): boolean {
-        return this.tableMenuContext.activeCellContext === this && this.tableMenuContext.menuPosition.position !== null;
-      },
       openMenu(event: React.MouseEvent): void {
-        this.tableMenuContext.activeCellContext = this;
-        this.tableMenuContext.menuPosition.open(event);
+        this.tableMenuContext.openMenu(this, event);
       },
       closeMenu(): void {
-        this.tableMenuContext.activeCellContext = null;
-        this.tableMenuContext.menuPosition.close();
+        this.tableMenuContext.closeMenu();
       },
     }),
     {

@@ -8,7 +8,6 @@
 
 .wrapper {
   display: flex;
-  align-items: center;
   overflow: hidden;
   box-sizing: border-box;
   gap: 6px;
@@ -24,14 +23,10 @@
 
 .menuTrigger {
   display: flex;
-  align-items: center;
-  cursor: pointer;
-  background: none;
-  border: none;
-  color: inherit;
+  box-sizing: border-box;
+  overflow: hidden;
 
-  > svg {
-    width: 16px;
-    height: 16px;
+  &:empty {
+    display: none;
   }
 }
