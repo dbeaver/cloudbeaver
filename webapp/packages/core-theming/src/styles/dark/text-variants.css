@@ -6,11 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-/* In the dark theme the 'dark' SCSS map holds light/white ink values and
-   the 'light' map holds dark ink values — opposite of the naming convention.
-   --theme-text-{variant}-on-light → dark-map ink (white-ish)
-   --theme-text-{variant}-on-dark  → light-map ink (black-ish) */
-
 @layer base {
   .theme-dark {
     --theme-text-primary-on-light: #ffffff;
