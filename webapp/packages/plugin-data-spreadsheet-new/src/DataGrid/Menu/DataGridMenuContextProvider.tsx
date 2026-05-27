@@ -12,9 +12,9 @@ import React, { useContext, useEffect, type PropsWithChildren } from 'react';
 import { useContextMenuPosition, useObservableRef } from '@cloudbeaver/core-blocks';
 
 import { DataGridContext } from '../DataGridContext.js';
-import type { ICellContext } from '../CellRenderer/CellContext.js';
 import { TableMenuContext, type ITableMenuContext } from '../CellRenderer/TableMenuContext.js';
 import { CellMenu } from './CellMenu.js';
+import type { IGridColumnKey, IGridDataKey, IGridRowKey } from '@cloudbeaver/plugin-data-viewer';
 
 interface Props {
   onClose: () => void;
@@ -31,8 +31,8 @@ export const DataGridMenuContextProvider = observer<PropsWithChildren<Props>>(fu
       get isMenuOpened() {
         return this.menuPosition.position !== null;
       },
-      openMenu(cellContext: ICellContext, event: React.MouseEvent) {
-        this.activeCell = cellContext.cell;
+      openMenu(activeCell: IGridDataKey<IGridRowKey, IGridColumnKey> | undefined, event: React.MouseEvent) {
+        this.activeCell = activeCell;
         this.menuPosition.open(event);
       },
       closeMenu() {

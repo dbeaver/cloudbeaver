@@ -8,14 +8,13 @@
 import React, { createContext } from 'react';
 
 import type { IContextMenuPosition } from '@cloudbeaver/core-blocks';
-import type { IGridDataKey } from '@cloudbeaver/plugin-data-viewer';
-import type { ICellContext } from './CellContext.js';
+import type { IGridColumnKey, IGridDataKey, IGridRowKey } from '@cloudbeaver/plugin-data-viewer';
 
 export interface ITableMenuContext {
   activeCell: IGridDataKey | undefined | null;
   menuPosition: IContextMenuPosition;
   isMenuOpened: boolean;
-  openMenu(cellContext: ICellContext, event: React.MouseEvent): void;
+  openMenu(activeCell: IGridDataKey<IGridRowKey, IGridColumnKey> | undefined, event: React.MouseEvent): void;
   closeMenu(): void;
 }
 
