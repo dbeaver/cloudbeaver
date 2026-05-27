@@ -663,7 +663,7 @@ public class WebServiceSQL implements DBWServiceSQL {
     }
 
     @NotNull
-    private static DBSEntityAssociation findForwardAssociation(
+    private DBSEntityAssociation findForwardAssociation(
         @NotNull DBDAttributeBinding attribute,
         @Nullable String associationName
     ) throws DBException {
@@ -685,13 +685,13 @@ public class WebServiceSQL implements DBWServiceSQL {
     }
 
     @NotNull
-    private static DBSEntityAssociation findReverseAssociation(
+    private DBSEntityAssociation findReverseAssociation(
         @NotNull DBRProgressMonitor monitor,
         @NotNull DBDAttributeBinding attribute,
         @Nullable String associationName
     ) throws DBException {
         DBSEntityAttribute entityAttribute = attribute.getEntityAttribute();
-        if (entityAttribute == null || entityAttribute.getParentObject() == null) {
+        if (entityAttribute == null) {
             throw new DBException("Can't resolve parent entity for attribute [" + attribute.getName() + "]");
         }
         if (CommonUtils.isEmpty(associationName)) {

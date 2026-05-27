@@ -16,11 +16,15 @@
  */
 package io.cloudbeaver.service.sql;
 
+import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
+import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPEvaluationContext;
 import org.jkiss.dbeaver.model.DBUtils;
 import org.jkiss.dbeaver.model.meta.Property;
+import org.jkiss.dbeaver.model.navigator.DBNNode;
 import org.jkiss.dbeaver.model.struct.DBSEntity;
 import org.jkiss.dbeaver.model.struct.DBSEntityAssociation;
 import org.jkiss.dbeaver.model.struct.DBSEntityConstraint;
@@ -30,11 +34,20 @@ import org.jkiss.dbeaver.model.struct.DBSEntityConstraint;
  */
 public class WebSQLQueryResultColumnReference {
 
+    private static final Log log = Log.getLog(WebSQLQueryResultColumnReference.class);
+
+    @Nullable
+    private final WebSession session;
     @NotNull
     private final DBSEntityAssociation association;
     private final boolean reverse;
 
-    public WebSQLQueryResultColumnReference(@NotNull DBSEntityAssociation association, boolean reverse) {
+    public WebSQLQueryResultColumnReference(
+        @Nullable WebSession session,
+        @NotNull DBSEntityAssociation association,
+        boolean reverse
+    ) {
+        this.session = session;
         this.association = association;
         this.reverse = reverse;
     }
@@ -45,10 +58,6 @@ public class WebSQLQueryResultColumnReference {
         return association.getName();
     }
 
-    /**
-     * Matches desktop {@code ReferencesResultsContainer.ReferenceKey.isReference}: true for reverse
-     * references (other entity's FK points to this column), false for forward foreign keys.
-     */
     @Property
     public boolean isReference() {
         return reverse;
@@ -57,19 +66,42 @@ public class WebSQLQueryResultColumnReference {
     @Nullable
     @Property
     public String getTargetEntityName() {
-        DBSEntity targetEntity;
-        if (reverse) {
-            targetEntity = association.getParentObject();
-        } else {
-            DBSEntityConstraint referencedConstraint = association.getReferencedConstraint();
-            if (referencedConstraint == null) {
-                return null;
-            }
-            targetEntity = referencedConstraint.getParentObject();
-        }
+        DBSEntity targetEntity = getTargetEntity();
         if (targetEntity == null) {
             return null;
         }
         return DBUtils.getObjectFullName(targetEntity, DBPEvaluationContext.UI);
+    }
+
+    @Nullable
+    @Property
+    public String getNodePath() {
+        if (session == null) {
+            return null;
+        }
+        DBSEntity targetEntity = getTargetEntity();
+        if (targetEntity == null) {
+            return null;
+        }
+        try {
+            DBNNode node = session.getNavigatorModelOrThrow()
+                .getNodeByObject(session.getProgressMonitor(), targetEntity, false);
+            return node == null ? null : node.getNodeUri();
+        } catch (DBException e) {
+            log.debug("Error resolving navigator node for entity " + targetEntity.getName(), e);
+            return null;
+        }
+    }
+
+    @Nullable
+    private DBSEntity getTargetEntity() {
+        if (reverse) {
+            return association.getParentObject();
+        }
+        DBSEntityConstraint referencedConstraint = association.getReferencedConstraint();
+        if (referencedConstraint == null) {
+            return null;
+        }
+        return referencedConstraint.getParentObject();
     }
 }

@@ -16,7 +16,9 @@
  */
 package io.cloudbeaver.service.sql;
 
+import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataKind;
@@ -41,9 +43,12 @@ public class WebSQLQueryResultColumn {
 
     private static final Log log = Log.getLog(WebSQLQueryResultColumn.class);
 
+    @Nullable
+    private final WebSession session;
     private final DBDAttributeBinding attrMeta;
 
-    public WebSQLQueryResultColumn(DBDAttributeBinding attrMeta) {
+    public WebSQLQueryResultColumn(@Nullable WebSession session, DBDAttributeBinding attrMeta) {
+        this.session = session;
         this.attrMeta = attrMeta;
     }
 
@@ -148,7 +153,7 @@ public class WebSQLQueryResultColumn {
         if (referrers != null) {
             for (DBSEntityReferrer referrer : referrers) {
                 if (referrer instanceof DBSEntityAssociation association) {
-                    references.add(new WebSQLQueryResultColumnReference(association, false));
+                    references.add(new WebSQLQueryResultColumnReference(session, association, false));
                 }
             }
         }
@@ -157,16 +162,14 @@ public class WebSQLQueryResultColumn {
         DBSEntityAttribute entityAttribute = attrMeta.getEntityAttribute();
         if (entityAttribute != null) {
             DBSEntity parentEntity = entityAttribute.getParentObject();
-            if (parentEntity != null) {
-                DBRProgressMonitor monitor = new VoidProgressMonitor();
-                for (DBSEntityAssociation reverseRef : DBVUtils.getAllReferences(monitor, parentEntity)) {
-                    try {
-                        if (referenceTargetsAttribute(monitor, reverseRef, entityAttribute)) {
-                            references.add(new WebSQLQueryResultColumnReference(reverseRef, true));
-                        }
-                    } catch (DBException e) {
-                        log.debug("Error reading attributes for reverse reference " + reverseRef.getName(), e);
+            DBRProgressMonitor monitor = session != null ? session.getProgressMonitor() : new VoidProgressMonitor();
+            for (DBSEntityAssociation reverseRef : DBVUtils.getAllReferences(monitor, parentEntity)) {
+                try {
+                    if (referenceTargetsAttribute(monitor, reverseRef, entityAttribute)) {
+                        references.add(new WebSQLQueryResultColumnReference(session, reverseRef, true));
                     }
+                } catch (DBException e) {
+                    log.debug("Error reading attributes for reverse reference " + reverseRef.getName(), e);
                 }
             }
         }
@@ -174,7 +177,7 @@ public class WebSQLQueryResultColumn {
         return references;
     }
 
-    private static boolean referenceTargetsAttribute(
+    private boolean referenceTargetsAttribute(
         @NotNull DBRProgressMonitor monitor,
         @NotNull DBSEntityAssociation association,
         @NotNull DBSEntityAttribute attribute

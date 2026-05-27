@@ -170,7 +170,7 @@ class WebSQLQueryDataReceiver implements DBDDataReceiver {
             }
         }
 
-        webResultSet.setColumns(bindings);
+        webResultSet.setColumns(webSession, bindings);
         webResultSet.setRows(List.of(rows.toArray(new WebSQLQueryResultSetRow[0])));
         webResultSet.setHasChildrenCollection(resultSet instanceof DBDSubCollectionResultSet);
         webResultSet.setSupportsDataFilter(dataContainer.isFeatureSupported(DBSDataContainer.FEATURE_DATA_FILTER));

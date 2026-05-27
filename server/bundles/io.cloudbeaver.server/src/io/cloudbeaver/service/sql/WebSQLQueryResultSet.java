@@ -16,6 +16,7 @@
  */
 package io.cloudbeaver.service.sql;
 
+import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.service.sql.WebSQLResultSetRowIdentifier.WebSQLResultSetRowIdentifierState;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
@@ -67,10 +68,10 @@ public class WebSQLQueryResultSet {
         this.columns = columns;
     }
 
-    public void setColumns(DBDAttributeBinding[] bindings) {
+    public void setColumns(@Nullable WebSession session, DBDAttributeBinding[] bindings) {
         WebSQLQueryResultColumn[] columns = new WebSQLQueryResultColumn[bindings.length];
         for (int i = 0; i < bindings.length; i++) {
-            columns[i] = new WebSQLQueryResultColumn(bindings[i]);
+            columns[i] = new WebSQLQueryResultColumn(session, bindings[i]);
         }
         this.columns = columns;
     }

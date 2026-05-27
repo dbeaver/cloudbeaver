@@ -480,7 +480,7 @@ public class WebSQLProcessor implements WebSessionProvider {
 
         WebSQLQueryResultSet updatedResultSet = new WebSQLQueryResultSet();
         updatedResultSet.setResultsInfo(resultsInfo);
-        updatedResultSet.setColumns(resultsInfo.getAttributes());
+        updatedResultSet.setColumns(webSession, resultsInfo.getAttributes());
 
         WebSQLQueryResults updateResults = new WebSQLQueryResults(webSession, dataFormat);
         updateResults.setUpdateRowCount(totalUpdateCount);
@@ -652,7 +652,7 @@ public class WebSQLProcessor implements WebSessionProvider {
 
             WebSQLQueryResultSet updatedResultSet = new WebSQLQueryResultSet();
             updatedResultSet.setResultsInfo(resultsInfo);
-            updatedResultSet.setColumns(resultsInfo.getAttributes());
+            updatedResultSet.setColumns(webSession, resultsInfo.getAttributes());
 
             if (!CommonUtils.isEmpty(updatedRows)) {
 

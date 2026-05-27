@@ -73,10 +73,14 @@ input SQLDataFilter {
 }
 
 type SQLResultColumnReference {
-    associationName: String!
-    targetEntityName: String
+    "Name of the association (foreign key) that connects this column to the target entity. For reverse references (isReference=true) this is the name of the association in the target entity that points back to this column)"
+    associationName: String! @since(version: "26.1.0")
+    "Fully qualified name of the entity the client will navigate to (referenced entity for forward FK, referencing entity for reverse reference)"
+    targetEntityName: String @since(version: "26.1.0")
     "True if this is a reverse reference (another entity's FK points to this column); false for forward foreign keys"
     isReference: Boolean! @since(version: "26.1.0")
+    "Navigator node path of the target entity, suitable for opening it directly in the UI. Null if the entity is not present in the navigator tree."
+    nodePath: String @since(version: "26.1.0")
 }
 
 type SQLResultColumn {
@@ -103,8 +107,8 @@ type SQLResultColumn {
     "Operations supported for this attribute"
     supportedOperations: [DataTypeLogicalOperation!]!
 
-    "Foreign key references for this column, plus reverse references from other tables that point to it (distinguish via SQLResultColumnReference.isReference)"
-    references: [SQLResultColumnReference!]!
+    "Foreign key references for this column"
+    references: [SQLResultColumnReference!]! @since(version: "26.1.0")
 
     "Description of the column"
     description: String @since(version: "25.1.3")
