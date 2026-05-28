@@ -16,11 +16,11 @@ export interface ICellContext {
   isHovered: boolean;
   isFocused: boolean;
   isSelected: boolean;
-  isMenuVisible: boolean;
   column: IColumnInfo;
   cell: IGridDataKey | undefined;
   position: ICellPosition;
   editionState: DatabaseEditChangeType | null;
+  isMenuVisible: boolean;
 }
 
 export const CellContext = createContext<ICellContext>(undefined as any);

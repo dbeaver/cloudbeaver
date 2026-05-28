@@ -86,11 +86,13 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
       },
     }),
     {
+      isMenuVisible: computed,
+      menu: observable.ref,
+      tableMenuContext: observable.ref,
       colIdx: observable.ref,
       rowIdx: observable.ref,
       isFocused: observable.ref,
       isHovered: observable.ref,
-      menu: observable.ref,
       row: computed,
       column: computed,
       position: computed,
@@ -99,7 +101,6 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
       editionState: computed,
       tableDataContext: observable.ref,
       selectionContext: observable.ref,
-      tableMenuContext: observable.ref,
       hover: observable.ref,
     },
     {

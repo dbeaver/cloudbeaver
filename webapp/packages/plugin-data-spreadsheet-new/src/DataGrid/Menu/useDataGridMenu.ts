@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { action, computed, observable } from 'mobx';
+import { action, observable } from 'mobx';
 import { useId } from 'react';
 
 import { useContextMenuPosition, useObservableRef, type IContextMenuPosition } from '@cloudbeaver/core-blocks';
@@ -16,7 +16,6 @@ import type { IGridDataKey } from '@cloudbeaver/plugin-data-viewer';
 export interface IDataGridMenu {
   menu: IMenuData;
   menuPosition: IContextMenuPosition;
-  isMenuOpened: boolean;
   openMenu(activeCell: IGridDataKey, event: React.MouseEvent): void;
   openMenuAt(activeCell: IGridDataKey, x: number, y: number): void;
   closeMenu(): void;
@@ -34,9 +33,6 @@ export function useDataGridMenu(options: IDataGridMenuOptions): Readonly<IDataGr
   const state = useObservableRef<IDataGridMenu>(
     () => ({
       menuPosition,
-      get isMenuOpened() {
-        return this.menuPosition.position !== null;
-      },
       openMenu(activeCell: IGridDataKey, event: React.MouseEvent) {
         this.menu.context.deleteForId(id);
 
@@ -61,7 +57,6 @@ export function useDataGridMenu(options: IDataGridMenuOptions): Readonly<IDataGr
     }),
     {
       menuPosition: observable.ref,
-      isMenuOpened: computed,
       openMenu: action.bound,
       openMenuAt: action.bound,
       closeMenu: action.bound,

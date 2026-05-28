@@ -41,17 +41,13 @@ export const CellMenu = observer<Props>(function CellMenu({ menu, onClose }) {
     }
   }
 
-  if (!tableMenuContext.isMenuOpened) {
-    return null;
-  }
-
   return (
     <SContext registry={registry}>
       <ContextMenu
+        key={`${tableMenuContext.menuPosition.position?.x}-${tableMenuContext.menuPosition.position?.y}`}
         className={s(style, { contextMenu: true })}
         menu={menu}
         contextMenuPosition={tableMenuContext.menuPosition}
-        visible
         autoFocusOnShow
         onVisibleSwitch={handleStateSwitch}
       />

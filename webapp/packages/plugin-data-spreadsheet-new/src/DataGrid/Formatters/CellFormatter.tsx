@@ -57,7 +57,7 @@ export const CellFormatter = observer<Props>(function CellFormatter({ rowIdx, co
       {showCellMenu && (
         <IconButton
           name="snack"
-          viewBox="0 0 16 10"
+          viewBox="0 0 16 16"
           tabIndex={-1}
           className={s(styles, { menuTrigger: true })}
           onDoubleClick={stopPropagation}
