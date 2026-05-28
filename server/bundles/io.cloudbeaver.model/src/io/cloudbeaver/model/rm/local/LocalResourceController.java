@@ -285,7 +285,7 @@ public class LocalResourceController extends BaseLocalResourceController {
         }
         validateResourcePath(name);
         validateProjectName(null, name);
-        var projectPath = sharedProjectsPath.resolve(name);
+        var projectPath = validateProjectPath(sharedProjectsPath, name);
         if (Files.exists(projectPath)) {
             throw new DBException("Project '" + name + "' already exists");
         }
