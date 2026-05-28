@@ -1113,7 +1113,7 @@ public class LocalResourceController extends BaseLocalResourceController {
                 }
                 return getGlobalProjectPath();
             case SHARED:
-                return sharedProjectsPath.resolve(projectName);
+                return validateProjectPath(sharedProjectsPath, projectName);
             case USER:
                 var activeUserCredentials = credentialsProvider.getActiveUserCredentials();
                 var userId = activeUserCredentials == null ? null : activeUserCredentials.getUserId();
@@ -1121,10 +1121,20 @@ public class LocalResourceController extends BaseLocalResourceController {
                 if (!(projectName.equals(userId) || isAdmin)) {
                     throw new DBException("No access to the project: " + projectName);
                 }
-                return userProjectsPath.resolve(projectName);
+                return validateProjectPath(userProjectsPath, projectName);
             default:
                 throw new DBException("Invalid project type [" + type + "]");
         }
+    }
+
+    @NotNull
+    private Path validateProjectPath(@NotNull Path projectParentPath, @NotNull String projectName) throws DBException {
+        Path base = projectParentPath.toAbsolutePath().normalize();
+        Path target = base.resolve(projectName).normalize();
+        if (!target.startsWith(base)) {
+            throw new DBException("Invalid project path");
+        }
+        return target;
     }
 
     private @NotNull List<RMResource> makeResourcePath(@NotNull String projectId, @NotNull Path targetPath, boolean recursive) throws DBException {
