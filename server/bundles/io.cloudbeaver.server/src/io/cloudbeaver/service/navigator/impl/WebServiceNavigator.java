@@ -462,7 +462,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                 } else {
                     node.rename(session.getProgressMonitor(), newName);
                 }
-                return node.getNodeItemPath();
+                return node.getNodeUri();
             }
             if (node instanceof DBNDatabaseNode dbNode) {
                 return renameDatabaseObject(
@@ -723,7 +723,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                         commandContext.resetChanges(true);
                         throw e;
                     }
-                    return node.getNodeItemPath();
+                    return node.getNodeUri();
                 }
             }
         }
