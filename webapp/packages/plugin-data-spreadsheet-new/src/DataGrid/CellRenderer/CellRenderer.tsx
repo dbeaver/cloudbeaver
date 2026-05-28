@@ -77,6 +77,10 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
         return this.tableDataContext.getEditionState(this.cell);
       },
       openMenu(event: React.MouseEvent): void {
+        if (!this.cell) {
+          return;
+        }
+
         this.tableMenuContext.openMenu(this.cell, event);
       },
       closeMenu(): void {

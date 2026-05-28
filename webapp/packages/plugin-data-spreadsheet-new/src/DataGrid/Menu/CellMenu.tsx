@@ -81,7 +81,10 @@ export const CellMenu = observer<Props>(function CellMenu({ onClose }) {
     context.set(DATA_CONTEXT_DV_SIMPLE, dataGridContext.simple, id);
     context.set(DATA_CONTEXT_DV_ACTIONS, dataGridContext.actions, id);
     context.set(DATA_CONTEXT_DV_PRESENTATION_ACTIONS, spreadsheetActions, id);
-    context.set(DATA_CONTEXT_DV_RESULT_KEY, tableMenuContext.activeCell, id);
+
+    if (tableMenuContext.activeCell) {
+      context.set(DATA_CONTEXT_DV_RESULT_KEY, tableMenuContext.activeCell, id);
+    }
   });
 
   function handleStateSwitch(visible: boolean) {

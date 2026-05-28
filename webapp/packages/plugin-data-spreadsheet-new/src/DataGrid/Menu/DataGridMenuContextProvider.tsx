@@ -31,7 +31,7 @@ export const DataGridMenuContextProvider = observer<PropsWithChildren<Props>>(fu
       get isMenuOpened() {
         return this.menuPosition.position !== null;
       },
-      openMenu(activeCell: IGridDataKey<IGridRowKey, IGridColumnKey> | undefined, event: React.MouseEvent) {
+      openMenu(activeCell: IGridDataKey<IGridRowKey, IGridColumnKey>, event: React.MouseEvent) {
         this.activeCell = activeCell;
         this.menuPosition.open(event);
       },

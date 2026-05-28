@@ -14,7 +14,7 @@ export interface ITableMenuContext {
   activeCell: IGridDataKey | undefined | null;
   menuPosition: IContextMenuPosition;
   isMenuOpened: boolean;
-  openMenu(activeCell: IGridDataKey<IGridRowKey, IGridColumnKey> | undefined, event: React.MouseEvent): void;
+  openMenu(activeCell: IGridDataKey<IGridRowKey, IGridColumnKey>, event: React.MouseEvent): void;
   closeMenu(): void;
 }
 
