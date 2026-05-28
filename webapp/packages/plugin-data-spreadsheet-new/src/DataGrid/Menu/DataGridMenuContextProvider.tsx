@@ -5,70 +5,23 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { action, computed, observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import React, { useContext, useEffect, type PropsWithChildren } from 'react';
+import { type PropsWithChildren } from 'react';
 
-import { useContextMenuPosition, useObservableRef } from '@cloudbeaver/core-blocks';
-
-import { DataGridContext } from '../DataGridContext.js';
-import { TableMenuContext, type ITableMenuContext } from '../CellRenderer/TableMenuContext.js';
+import { TableMenuContext } from '../CellRenderer/TableMenuContext.js';
 import { CellMenu } from './CellMenu.js';
-import type { IGridColumnKey, IGridDataKey, IGridRowKey } from '@cloudbeaver/plugin-data-viewer';
+import type { IDataGridMenu } from './useDataGridMenu.js';
 
 interface Props {
+  menu: IDataGridMenu;
   onClose: () => void;
 }
 
-export const DataGridMenuContextProvider = observer<PropsWithChildren<Props>>(function DataGridMenuContextProvider({ onClose, children }) {
-  const menuPosition = useContextMenuPosition();
-  const dataGridContext = useContext(DataGridContext);
-
-  const tableMenuState = useObservableRef<ITableMenuContext>(
-    () => ({
-      activeCell: null,
-      menuPosition,
-      get isMenuOpened() {
-        return this.menuPosition.position !== null;
-      },
-      openMenu(activeCell: IGridDataKey<IGridRowKey, IGridColumnKey>, event: React.MouseEvent) {
-        this.activeCell = activeCell;
-        this.menuPosition.open(event);
-      },
-      closeMenu() {
-        this.activeCell = null;
-        this.menuPosition.close();
-      },
-    }),
-    {
-      activeCell: observable.ref,
-      menuPosition: observable.ref,
-      isMenuOpened: computed,
-      openMenu: action,
-      closeMenu: action,
-    },
-    false,
-  );
-
-  useEffect(() => {
-    const container = dataGridContext.getContainer();
-
-    if (!container) {
-      return;
-    }
-
-    function handleScroll() {
-      tableMenuState.closeMenu();
-    }
-
-    container.addEventListener('scroll', handleScroll, { capture: true });
-    return () => container.removeEventListener('scroll', handleScroll, { capture: true });
-  }, [dataGridContext, tableMenuState]);
-
+export const DataGridMenuContextProvider = observer<PropsWithChildren<Props>>(function DataGridMenuContextProvider({ menu, onClose, children }) {
   return (
-    <TableMenuContext.Provider value={tableMenuState}>
+    <TableMenuContext.Provider value={menu}>
       {children}
-      <CellMenu onClose={onClose} />
+      <CellMenu menu={menu.menu} onClose={onClose} />
     </TableMenuContext.Provider>
   );
 });
