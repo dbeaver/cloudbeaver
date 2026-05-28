@@ -14,14 +14,13 @@ import type { IDataGridMenu } from './useDataGridMenu.js';
 
 interface Props {
   menu: IDataGridMenu;
-  onClose: () => void;
 }
 
-export const DataGridMenuContextProvider = observer<PropsWithChildren<Props>>(function DataGridMenuContextProvider({ menu, onClose, children }) {
+export const DataGridMenuContextProvider = observer<PropsWithChildren<Props>>(function DataGridMenuContextProvider({ menu, children }) {
   return (
     <TableMenuContext.Provider value={menu}>
       {children}
-      <CellMenu menu={menu.menu} onClose={onClose} />
+      <CellMenu menu={menu.menu} />
     </TableMenuContext.Provider>
   );
 });

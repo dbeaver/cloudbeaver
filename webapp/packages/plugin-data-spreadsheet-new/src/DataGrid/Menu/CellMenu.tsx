@@ -17,7 +17,6 @@ import classes from './CellMenu.module.css';
 
 interface Props {
   menu: IMenuData;
-  onClose: () => void;
 }
 
 const registry: StyleRegistry = [
@@ -30,14 +29,13 @@ const registry: StyleRegistry = [
   ],
 ];
 
-export const CellMenu = observer<Props>(function CellMenu({ menu, onClose }) {
+export const CellMenu = observer<Props>(function CellMenu({ menu }) {
   const style = useS(classes);
   const tableMenuContext = useContext(TableMenuContext);
 
   function handleStateSwitch(visible: boolean) {
     if (!visible) {
       tableMenuContext.closeMenu();
-      onClose();
     }
   }
 
