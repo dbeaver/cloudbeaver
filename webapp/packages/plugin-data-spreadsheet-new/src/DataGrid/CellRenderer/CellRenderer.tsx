@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { action, computed, observable } from 'mobx';
+import { computed, observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useContext, type HTMLAttributes } from 'react';
 
@@ -13,7 +13,13 @@ import { getComputed, useHover, useMergeRefs, useObjectRef, useObservableRef } f
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { clsx } from '@dbeaver/ui-kit';
 import { type IDataGridCellRenderer, type ICellPosition } from '@cloudbeaver/plugin-data-grid';
-import { DatabaseEditChangeType, KEY_BINDING_OPEN_CELL_CONTEXT_MENU, type IGridDataKey, type IGridRowKey } from '@cloudbeaver/plugin-data-viewer';
+import {
+  DATA_CONTEXT_DV_RESULT_KEY,
+  DatabaseEditChangeType,
+  KEY_BINDING_OPEN_CELL_CONTEXT_MENU,
+  type IGridDataKey,
+  type IGridRowKey,
+} from '@cloudbeaver/plugin-data-viewer';
 import { isObjectsEqual } from '@cloudbeaver/core-utils';
 
 import { ColumnDnDContext } from '../ColumnDnDContext.js';
@@ -25,15 +31,17 @@ import { TableMenuContext } from './TableMenuContext.js';
 import { useDataEditorDnDBox } from '../useDataEditorDnDBox.js';
 import { getDropSide } from '../getDropSide.js';
 import { isBindingPressed } from '@cloudbeaver/core-view';
+import type { IDataGridMenu } from '../Menu/useDataGridMenu.js';
 
 interface Props {
   rowIdx: number;
   colIdx: number;
+  menu: Readonly<IDataGridMenu>;
   props: HTMLAttributes<HTMLDivElement>;
   renderDefaultCell: IDataGridCellRenderer;
 }
 
-export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colIdx, props, renderDefaultCell }) {
+export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colIdx, menu, props, renderDefaultCell }) {
   const dataGridContext = useContext(DataGridContext);
   const tableDataContext = useContext(TableDataContext);
   const selectionContext = useContext(DataGridSelectionContext);
@@ -47,7 +55,7 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
   const cellContext = useObservableRef(
     () => ({
       get isMenuVisible(): boolean {
-        return this.tableMenuContext.isMenuOpened;
+        return this.cell === menu.menu.context.get(DATA_CONTEXT_DV_RESULT_KEY) && !!this.tableMenuContext.menuPosition.position;
       },
       isFocused: false,
       isHovered: false,
@@ -76,41 +84,19 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
 
         return this.tableDataContext.getEditionState(this.cell);
       },
-      openMenu(event: React.MouseEvent): void {
-        if (!this.cell) {
-          return;
-        }
-
-        this.tableMenuContext.openMenu(this.cell, event);
-      },
-      openMenuAt(element: Element): void {
-        if (!this.cell) {
-          return;
-        }
-
-        const rect = element.getBoundingClientRect();
-        const x = rect.left + rect.width - 20;
-        const y = rect.top + rect.height / 2;
-        this.tableMenuContext.openMenuAt(this.cell, x, y);
-      },
-      closeMenu(): void {
-        this.tableMenuContext.closeMenu();
-      },
     }),
     {
       colIdx: observable.ref,
       rowIdx: observable.ref,
       isFocused: observable.ref,
       isHovered: observable.ref,
+      menu: observable.ref,
       row: computed,
       column: computed,
       position: computed,
       cell: computed,
       isSelected: computed,
-      isMenuVisible: computed,
       editionState: computed,
-      openMenu: action,
-      closeMenu: action,
       tableDataContext: observable.ref,
       selectionContext: observable.ref,
       tableMenuContext: observable.ref,
@@ -119,6 +105,7 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
     {
       colIdx,
       rowIdx,
+      menu,
       tableDataContext,
       selectionContext,
       tableMenuContext,
@@ -174,14 +161,16 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
         }
       },
       keyDown(event: React.KeyboardEvent<HTMLDivElement>) {
-        if (isBindingPressed(event, KEY_BINDING_OPEN_CELL_CONTEXT_MENU)) {
+        if (isBindingPressed(event, KEY_BINDING_OPEN_CELL_CONTEXT_MENU) && this.cellContext.cell) {
           event.preventDefault();
           event.stopPropagation();
-          this.cellContext.openMenuAt(event.currentTarget);
+          const x = event.currentTarget.getBoundingClientRect().right;
+          const y = event.currentTarget.getBoundingClientRect().bottom;
+          this.tableMenuContext.openMenuAt(this.cellContext.cell, x, y);
         }
       },
       openContextMenu(event: React.MouseEvent<HTMLDivElement>) {
-        if (EventContext.has(event, EventStopPropagationFlag)) {
+        if (EventContext.has(event, EventStopPropagationFlag) || !this.cellContext.cell) {
           return;
         }
 
@@ -203,7 +192,7 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
           );
         }
 
-        this.cellContext.openMenu(event);
+        this.tableMenuContext.openMenu(this.cellContext.cell, event);
       },
     }),
     {

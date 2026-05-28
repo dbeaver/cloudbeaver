@@ -15,6 +15,7 @@ import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events
 import { CellContext } from '../CellRenderer/CellContext.js';
 import style from './CellFormatter.module.css';
 import { CellFormatterFactory } from './CellFormatterFactory.js';
+import { TableMenuContext } from '../CellRenderer/TableMenuContext.js';
 
 interface Props {
   rowIdx: number;
@@ -24,9 +25,12 @@ interface Props {
 export const CellFormatter = observer<Props>(function CellFormatter({ rowIdx, colIdx }) {
   const innerCellContext = use(DataGridCellInnerContext);
   const cellContext = useContext(CellContext);
+  const tableMenuContext = use(TableMenuContext);
 
   const cell = cellContext.cell;
-  const showCellMenu = getComputed(() => !!cell && (innerCellContext?.isFocused || cellContext.isFocused || cellContext.isHovered));
+  const showCellMenu = getComputed(
+    () => !!cell && (innerCellContext?.isFocused || cellContext.isFocused || cellContext.isHovered || cellContext.isMenuVisible),
+  );
   const styles = useS(style);
 
   function handleMenuTriggerMouseUp(event: React.MouseEvent<HTMLButtonElement>) {
@@ -38,13 +42,11 @@ export const CellFormatter = observer<Props>(function CellFormatter({ rowIdx, co
   }
 
   function handleMenuTriggerClick(event: React.MouseEvent<HTMLButtonElement>) {
-    // detail === 0 means keyboard-triggered click (e.g. Enter/Space on the button).
-    // Ignore these to prevent the menu from opening when the editor closes and focus
-    // accidentally lands on this button.
-    if (event.detail === 0) {
+    if (!cell) {
       return;
     }
-    cellContext.openMenu(event);
+
+    tableMenuContext.openMenu(cell, event);
   }
 
   return (

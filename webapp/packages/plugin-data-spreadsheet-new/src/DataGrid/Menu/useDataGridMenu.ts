@@ -8,7 +8,7 @@
 import { action, computed, observable } from 'mobx';
 import { useId } from 'react';
 
-import { useContextMenuPosition, useObjectRef, useObservableRef, type IContextMenuPosition } from '@cloudbeaver/core-blocks';
+import { useContextMenuPosition, useObservableRef, type IContextMenuPosition } from '@cloudbeaver/core-blocks';
 import type { IDataContext } from '@cloudbeaver/core-data-context';
 import type { IMenuData } from '@cloudbeaver/core-view';
 import type { IGridDataKey } from '@cloudbeaver/plugin-data-viewer';
@@ -28,8 +28,6 @@ interface IDataGridMenuOptions {
 }
 
 export function useDataGridMenu(options: IDataGridMenuOptions): Readonly<IDataGridMenu> {
-  options = useObjectRef(options);
-
   const id = useId();
   const menuPosition = useContextMenuPosition();
 
