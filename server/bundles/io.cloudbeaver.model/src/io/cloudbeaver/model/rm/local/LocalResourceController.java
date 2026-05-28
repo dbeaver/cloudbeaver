@@ -53,6 +53,7 @@ import org.jkiss.dbeaver.registry.DataSourceParseResults;
 import org.jkiss.dbeaver.registry.ResourceTypeDescriptor;
 import org.jkiss.dbeaver.registry.ResourceTypeRegistry;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
+import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.IOUtils;
 import org.jkiss.utils.Pair;
@@ -283,9 +284,9 @@ public class LocalResourceController extends BaseLocalResourceController {
                 throw new DBException("Error creating shared project path", e);
             }
         }
-        validateResourcePath(name);
+        GeneralUtils.validateResourceNameUnconditionally(name);
         validateProjectName(null, name);
-        var projectPath = validateProjectPath(sharedProjectsPath, name);
+        var projectPath = sharedProjectsPath.resolve(name);
         if (Files.exists(projectPath)) {
             throw new DBException("Project '" + name + "' already exists");
         }
@@ -1106,6 +1107,7 @@ public class LocalResourceController extends BaseLocalResourceController {
         RMProjectName project = WebRMUtils.parseProjectName(projectId);
         RMProjectType type = project.getType();
         String projectName = project.getName();
+        GeneralUtils.validateResourceNameUnconditionally(projectName);
         switch (type) {
             case GLOBAL:
                 if (!projectName.equals(globalProjectName)) {
@@ -1113,7 +1115,7 @@ public class LocalResourceController extends BaseLocalResourceController {
                 }
                 return getGlobalProjectPath();
             case SHARED:
-                return validateProjectPath(sharedProjectsPath, projectName);
+                return sharedProjectsPath.resolve(projectName);
             case USER:
                 var activeUserCredentials = credentialsProvider.getActiveUserCredentials();
                 var userId = activeUserCredentials == null ? null : activeUserCredentials.getUserId();
@@ -1121,20 +1123,10 @@ public class LocalResourceController extends BaseLocalResourceController {
                 if (!(projectName.equals(userId) || isAdmin)) {
                     throw new DBException("No access to the project: " + projectName);
                 }
-                return validateProjectPath(userProjectsPath, projectName);
+                return userProjectsPath.resolve(projectName);
             default:
                 throw new DBException("Invalid project type [" + type + "]");
         }
-    }
-
-    @NotNull
-    private Path validateProjectPath(@NotNull Path projectParentPath, @NotNull String projectName) throws DBException {
-        Path base = projectParentPath.toAbsolutePath().normalize();
-        Path target = base.resolve(projectName).normalize();
-        if (!target.startsWith(base)) {
-            throw new DBException("Invalid project path");
-        }
-        return target;
     }
 
     private @NotNull List<RMResource> makeResourcePath(@NotNull String projectId, @NotNull Path targetPath, boolean recursive) throws DBException {
