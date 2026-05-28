@@ -1,0 +1,38 @@
+/**
+ * Ripple Effect Utilities
+ *
+ * Provides hover/focus/active feedback using a pseudo-element overlay.
+ * Uses currentColor so it adapts to the parent's text color.
+ */
+
+@layer components {
+  .theme-ripple {
+    @apply tw:relative;
+
+    &::before {
+      @apply tw:absolute tw:content-[''] tw:opacity-0 tw:top-0 tw:left-0 tw:w-full tw:h-full tw:overflow-hidden tw:bg-[currentColor] tw:rounded-[inherit] tw:pointer-events-none;
+    }
+
+    &:hover::before {
+      opacity: 0.04;
+    }
+
+    &:focus::before {
+      opacity: 0.11;
+    }
+
+    &:active::before {
+      opacity: 0.11;
+    }
+
+    &[aria-expanded='true']::before {
+      opacity: 0.15;
+    }
+  }
+
+  .theme-ripple-selectable {
+    &[aria-selected='true']::before {
+      opacity: 0.15;
+    }
+  }
+}

@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@ import io.cloudbeaver.model.app.ServletApplication;
 import io.cloudbeaver.model.app.ServletAuthApplication;
 import io.cloudbeaver.websocket.CBWebSessionEventHandler;
 import org.jkiss.code.NotNull;
-import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.auth.SMAuthInfo;
@@ -56,14 +55,21 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
     @NotNull
     protected final ServletApplication application;
     protected volatile long lastAccessTime;
+    @NotNull
+    private final SessionType sessionType;
 
     private final List<CBWebSessionEventHandler> sessionEventHandlers = new CopyOnWriteArrayList<>();
     private WebSessionEventsFilter eventsFilter;
     private final WebSessionWorkspace workspace;
 
-    public BaseWebSession(@NotNull String id, @NotNull ServletApplication application) throws DBException {
+    public BaseWebSession(
+        @NotNull String id,
+        @NotNull ServletApplication application,
+        @NotNull SessionType sessionType
+    ) throws DBException {
         this.id = id;
         this.application = application;
+        this.sessionType = sessionType;
         this.createTime = System.currentTimeMillis();
         this.lastAccessTime = this.createTime;
         this.workspace = createWebWorkspace();
@@ -103,7 +109,7 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
         }
     }
 
-    public abstract void addSessionError(Throwable exception);
+    public abstract void addSessionError(@NotNull Throwable exception);
 
     public void addEventHandler(@NotNull CBWebSessionEventHandler handler) {
         synchronized (sessionEventHandlers) {
@@ -117,11 +123,11 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
         }
     }
 
-    public synchronized boolean updateSMSession(SMAuthInfo smAuthInfo) throws DBException {
+    public boolean updateSMSession(SMAuthInfo smAuthInfo) throws DBException {
         return userContext.refresh(smAuthInfo);
     }
 
-    public synchronized void refreshUserData() {
+    public void refreshUserData() {
         try {
             userContext.refreshPermissions();
             if (userContext.isAuthorizedInSecurityManager()) {
@@ -151,8 +157,8 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
         return workspace.getAuthContext();
     }
 
-    protected void clearSessionContext() {
-        this.workspace.getAuthContext().clear();
+    protected synchronized void clearSessionContext() {
+        this.workspace.getAuthContext().clearContext(false);
         this.workspace.getAuthContext().addSession(this);
     }
 
@@ -177,23 +183,29 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
         return lastAccessTime;
     }
 
-    public synchronized void touchSession() {
+    @NotNull
+    public SessionType getSessionType() {
+        return sessionType;
+    }
+
+    public void touchSession() {
         this.lastAccessTime = System.currentTimeMillis();
     }
 
     @NotNull
-    public synchronized WebUserContext getUserContext() {
+    public WebUserContext getUserContext() {
         return userContext;
     }
 
     @Override
     public void close() {
-        super.close();
         cleanUpSession(true);
+        super.close();
     }
 
     public void close(boolean clearTokens, boolean sendSessionExpiredEvent) {
         cleanUpSession(sendSessionExpiredEvent);
+        super.close();
     }
 
     private void cleanUpSession(boolean sendSessionExpiredEvent) {
@@ -227,7 +239,7 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
         this.eventsFilter = eventsFilter;
     }
 
-    public boolean isProjectAccessible(String projectId) {
+    public boolean isProjectAccessible(@NotNull String projectId) {
         return userContext.getAccessibleProjectIds().contains(projectId);
     }
 
@@ -240,11 +252,11 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
     }
 
 
-    public void removeSessionProject(@Nullable String projectId) throws DBException {
+    public void removeSessionProject(@NotNull String projectId) throws DBException {
         userContext.getAccessibleProjectIds().remove(projectId);
     }
 
-    public abstract void addSessionMessage(WebServerMessage message);
+    public abstract void addSessionMessage(@NotNull WebServerMessage message);
 
     @Property
     public boolean isValid() {
@@ -254,8 +266,12 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
     @Property
     public long getRemainingTime() {
         if (application instanceof ServletAuthApplication authApplication) {
-            return authApplication.getMaxSessionIdleTime() + lastAccessTime - System.currentTimeMillis();
+            return getMaxSessionIdleTime(authApplication) + lastAccessTime - System.currentTimeMillis();
         }
         return Integer.MAX_VALUE;
+    }
+
+    protected long getMaxSessionIdleTime(@NotNull ServletAuthApplication authApplication) {
+        return authApplication.getMaxSessionIdleTime();
     }
 }

@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,9 @@ export const defaultServerConfig: (productConfiguration?: Record<string, any>) =
   productConfiguration = defaultProductConfiguration,
 ) => ({
   serverConfig: {
-    name: 'CloudBeaver CE Server',
+    name: 'CloudBeaver Community',
     version: '22.1.2.202207140640',
     workspaceId: 'D14DGNGYNPI71M',
-    serverURL: 'https://test.ce.cloudbeaver.io',
     rootURI: '/',
     containerId: '931cdabfc0b3',
     productConfiguration: productConfiguration,
@@ -117,8 +116,7 @@ export const defaultServerConfig: (productConfiguration?: Record<string, any>) =
       id: 'io.cloudbeaver.product.ce.product',
       version: '22.1.2.202207140640',
       latestVersionInfo: WEBSITE_LINKS.LATEST_COMMUNITY_VERSION_PAGE,
-      name: 'CloudBeaver CE Server',
-      description: 'Cloudbeaver Web UI Application',
+      name: 'CloudBeaver Community',
       buildTime: 'July 14, 2022',
       releaseTime: 'July 11, 2022',
       licenseInfo: '',

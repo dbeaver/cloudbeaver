@@ -1,0 +1,19 @@
+query sqlGenerateResultSetQuery(
+  $projectId: ID
+  $connectionId: ID!
+  $contextId: ID!
+  $generatorId: SQLResultSetGeneratorId!
+  $resultsId: ID!
+  $selectedRows: [SQLResultRow!]!
+  $generatorOptions: SQLQueryGeneratorOptions
+) {
+  sqlGenerateResultSetQuery(
+    projectId: $projectId
+    connectionId: $connectionId
+    contextId: $contextId
+    generatorId: $generatorId
+    resultsId: $resultsId
+    selectedRows: $selectedRows
+    generatorOptions: $generatorOptions
+  )
+}

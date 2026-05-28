@@ -4,7 +4,7 @@ export default [
 
   ['administration_configuration_wizard_welcome', 'Welcome'],
   ['administration_configuration_wizard_welcome_step_description', 'Welcome to {alias:product_full_name}'],
-  ['administration_configuration_wizard_welcome_title', 'Welcome to {alias:product_full_name}, cloud database management system!'],
+  ['administration_configuration_wizard_welcome_title', 'Welcome to {alias:product_full_name}, cloud database management system'],
   [
     'administration_configuration_wizard_welcome_message',
     'The easy configuration wizard will guide you through several simple steps to set up the server. You will need to set server information and administrator credentials. You can set up additional server parameters once the easy configuration is completed.',
@@ -39,7 +39,7 @@ export default [
   ['administration_configuration_wizard_configuration_supported_hosts', 'Allowed Server URLs'],
   [
     'administration_configuration_wizard_configuration_supported_hosts_description',
-    'You can specify multiple server URLs separated by a new line. An empty value means that all URLs are allowed',
+    'You can specify multiple server URLs separated by a new line. An empty value means that all URLs are allowed. Access from the IP-addresses is always allowed.',
   ],
   [
     'administration_configuration_wizard_configuration_supported_hosts_warning',

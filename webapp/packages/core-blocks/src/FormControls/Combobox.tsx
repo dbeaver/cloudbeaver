@@ -7,7 +7,17 @@
  */
 import { observer } from 'mobx-react-lite';
 import { useCallback, useContext, useId, useState } from 'react';
-import { ComboboxInput, ComboboxItem, clsx, Spinner, ComboboxPopover, ComboboxDisclosure, ComboboxProvider } from '@dbeaver/ui-kit';
+import {
+  ComboboxInput,
+  ComboboxItem,
+  clsx,
+  Spinner,
+  ComboboxPopover,
+  ComboboxDisclosure,
+  ComboboxProvider,
+  ComboboxCancel,
+  useComboboxStore,
+} from '@dbeaver/ui-kit';
 
 import { filterLayoutFakeProps, getLayoutProps } from '../Containers/filterLayoutFakeProps.js';
 import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps.js';
@@ -35,6 +45,7 @@ export type ComboboxBaseProps<TKey, TValue> = Omit<
     isDisabled?: (item: TValue) => boolean;
     inline?: boolean;
     allowCustomValue?: boolean;
+    allowClear?: boolean;
     size?: 'small' | 'medium' | 'large';
     onChange?: (value: string | null) => void;
   };
@@ -73,6 +84,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
   inline,
   description,
   allowCustomValue = false,
+  allowClear = false,
   keySelector = v => v,
   valueSelector = v => v as string,
   iconSelector,
@@ -126,9 +138,9 @@ export const Combobox: ComboboxType = observer(function Combobox({
     .filter(({ isVisible }) => isVisible);
 
   const handleSelect = useCallback(
-    (selectedValue: string | string[]) => {
+    (selectedValue: string | string[] | null) => {
       const item = items.find((item, idx) => keySelector(item, idx) === selectedValue);
-      if (!item || selectedValue === selectedKey) {
+      if ((!item || selectedValue === selectedKey) && !allowClear) {
         return;
       }
 
@@ -139,10 +151,10 @@ export const Combobox: ComboboxType = observer(function Combobox({
         onSelect(selectedValue, name as undefined, selectedKey);
       }
       if (context) {
-        context.change(selectedValue as string, name);
+        context.change(typeof selectedValue === 'string' ? selectedValue : '', name);
       }
     },
-    [items, selectedKey, state, onSelect, context, keySelector, name],
+    [items, selectedKey, allowClear, name, state, onSelect, context, keySelector],
   );
 
   const icon: string | React.ReactElement | undefined = selectedItem ? iconSelector?.(selectedItem) : undefined;
@@ -163,9 +175,25 @@ export const Combobox: ComboboxType = observer(function Combobox({
     onChange?.(value);
   }
 
+  const comboboxStore = useComboboxStore({
+    value: displayValue,
+    setValue: setInputValue,
+    selectedValue: selectedValue,
+    defaultValue: comboboxDefaultValue,
+    defaultSelectedValue: comboboxDefaultSelectedValue as string,
+    setSelectedValue: handleSelect,
+  });
+
   function handleBlur() {
     if (!allowCustomValue) {
       setInputValue(null);
+    }
+  }
+
+  function handleKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
+    if (allowCustomValue && event.key === 'Enter') {
+      event.preventDefault();
+      comboboxStore.setOpen(false);
     }
   }
 
@@ -178,6 +206,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
   }
 
   const displayPopover = !allowCustomValue || items.length > 0;
+  const hasCancelButton = !!displayValue && allowClear && !disabled && !readOnly;
 
   return (
     <Field {...layoutProps} className={clsx(className, inline && 'tw:flex tw:items-center')}>
@@ -191,36 +220,38 @@ export const Combobox: ComboboxType = observer(function Combobox({
           {children}
         </FieldLabel>
       )}
-      <ComboboxProvider
-        value={displayValue}
-        setValue={setInputValue}
-        selectedValue={selectedValue}
-        defaultValue={comboboxDefaultValue}
-        defaultSelectedValue={comboboxDefaultSelectedValue as string}
-        setSelectedValue={handleSelect}
-      >
+      <ComboboxProvider store={comboboxStore}>
         <div className="tw:relative tw:flex tw:flex-1 tw:items-center tw:gap-2">
           <ComboboxInput
             defaultValue={comboboxDefaultValue}
             disabled={disabled || loading || readOnly}
             readOnly={readOnly}
             placeholder={rest.placeholder}
-            className={clsx('theme-typography--caption  tw:tracking-normal!', icon || loading ? 'tw:pl-8!' : '', 'tw:pr-6!')}
+            className={clsx(
+              'theme-typography--caption  tw:tracking-normal!',
+              icon || loading ? 'tw:pl-8!' : '',
+              hasCancelButton ? 'tw:pr-12!' : 'tw:pr-6!',
+            )}
             title={title}
             id={inputId}
             size={size}
+            autoSelect={!allowCustomValue}
             onBlur={handleBlur}
+            onKeyDown={handleKeyDown}
             {...rest}
           />
           {loading ? (
             <Spinner size="small" className="tw:absolute tw:right-2 tw:top-[50%] tw:-translate-y-1/2" />
           ) : (
-            displayPopover && (
-              <ComboboxDisclosure
-                disabled={disabled || loading || readOnly}
-                className="tw:absolute tw:right-2 tw:top-[50%] tw:-translate-y-1/2 tw:[&>svg]:fill-none! tw:text-sm! tw:cursor-pointer"
-              />
-            )
+            <>
+              {hasCancelButton && (
+                <ComboboxCancel
+                  className="tw:absolute tw:right-8 tw:top-[50%] tw:-translate-y-1/2 tw:cursor-pointer tw:hover:bg-gray-200 tw:rounded"
+                  onClick={() => handleSelect(null)}
+                />
+              )}
+              {displayPopover && <ComboboxDisclosure disabled={disabled || loading || readOnly} className="cb-combobox__disclosure-icon" />}
+            </>
           )}
           {icon && <div className="tw:absolute tw:left-3 tw:w-4 tw:h-4">{typeof icon === 'string' ? <IconOrImage icon={icon} /> : icon}</div>}
           {displayPopover && (

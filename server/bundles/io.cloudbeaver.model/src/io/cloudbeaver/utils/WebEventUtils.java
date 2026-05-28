@@ -18,6 +18,7 @@ package io.cloudbeaver.utils;
 
 import io.cloudbeaver.model.WebAsyncTaskInfo;
 import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.websocket.event.task.WSSessionTaskInfoEvent;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.app.DBPProject;
@@ -30,7 +31,6 @@ import org.jkiss.dbeaver.model.websocket.event.datasource.WSDatasourceFolderEven
 import org.jkiss.dbeaver.model.websocket.event.permissions.WSSubjectPermissionEvent;
 import org.jkiss.dbeaver.model.websocket.event.resource.WSResourceProperty;
 import org.jkiss.dbeaver.model.websocket.event.resource.WSResourceUpdatedEvent;
-import org.jkiss.dbeaver.model.websocket.event.session.WSSessionTaskInfoEvent;
 
 import java.util.List;
 

@@ -181,10 +181,10 @@ export const InputFiles: InputFilesType = observer(
           {children}
         </FieldLabel>
         <div className={s(styles, { inputContainer: true })}>
-          <UploadArea ref={ref} {...rest} name={name} value={value} required={required} onChange={handleChange}>
+          <UploadArea ref={ref} {...rest} name={name} value={value} required={required} reset onChange={handleChange}>
             <Button
               iconPlacement="start"
-              className="tw:inline-flex tw:justify-center"
+              className="tw:w-max tw:justify-center"
               icon="/icons/import.svg"
               tag="div"
               loading={loading}

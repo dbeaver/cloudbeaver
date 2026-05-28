@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,7 @@ import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dial
 
 import { EditorDialog } from './EditorDialog.js';
 import styles from './InlineEditor.module.css';
+import { Input } from '@dbeaver/ui-kit';
 
 export type InlineEditorControls = 'right' | 'top' | 'bottom' | 'inside';
 
@@ -79,12 +80,12 @@ export const InlineEditor = observer<InlineEditorProps, HTMLInputElement>(
     }, []);
 
     const handlePopup = useCallback(async () => {
-      const newValue = await commonDialogService.open(EditorDialog, props.value);
-      if (newValue === DialogueStateResult.Rejected || newValue === DialogueStateResult.Resolved) {
-        props.onReject?.();
-      } else {
-        props.onChange(newValue);
+      const { status, result } = await commonDialogService.open(EditorDialog, props.value);
+      if (status === DialogueStateResult.Resolved && result !== undefined) {
+        props.onChange(result);
         props.onSave?.();
+      } else {
+        props.onReject?.();
       }
     }, []);
 
@@ -114,7 +115,7 @@ export const InlineEditor = observer<InlineEditorProps, HTMLInputElement>(
     return (
       <div className={s(style, { editor: true, specific: true, editorActive: active }, className)} onClick={onClick} onDoubleClick={onDoubleClick}>
         <div className={s(style, { editorContainer: true })}>
-          <input
+          <Input
             ref={inputRef}
             className={s(style, { input: true })}
             lang="en"
@@ -124,6 +125,7 @@ export const InlineEditor = observer<InlineEditorProps, HTMLInputElement>(
             onChange={handleChange}
             onKeyDown={handleKeyDown}
             {...rest}
+            size="small"
           />
         </div>
         <div

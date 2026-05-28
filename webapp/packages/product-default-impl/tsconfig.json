@@ -23,6 +23,9 @@
       "path": "../core-localization"
     },
     {
+      "path": "../core-support"
+    },
+    {
       "path": "../core-version-update"
     },
     {

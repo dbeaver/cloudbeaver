@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,13 @@ import {
   DATA_CONTEXT_DV_DDM,
   DATA_CONTEXT_DV_DDM_RESULT_INDEX,
   DATA_CONTEXT_DV_RESULT_KEY,
+  DatabaseDataFeature,
   DatabaseEditChangeType,
   DataViewerService,
-  isResultSetDataSource,
+  IDatabaseDataEditAction,
+  IDatabaseDataFormatAction,
+  IDatabaseDataSelectAction,
   ResultSetDataContentAction,
-  ResultSetDataSource,
-  ResultSetEditAction,
-  ResultSetFormatAction,
 } from '@cloudbeaver/plugin-data-viewer';
 
 @injectable(() => [NotificationService, DataViewerService, ActionService, MenuService])
@@ -38,7 +38,9 @@ export class DataGridContextMenuSaveContentService {
       contexts: [DATA_CONTEXT_DV_DDM, DATA_CONTEXT_DV_DDM_RESULT_INDEX, DATA_CONTEXT_DV_RESULT_KEY],
       isApplicable: context => {
         const model = context.get(DATA_CONTEXT_DV_DDM)!;
-        return isResultSetDataSource(model.source);
+        const allowedFeatures = [DatabaseDataFeature.DataEditor, DatabaseDataFeature.QueryResult];
+
+        return allowedFeatures.some(feature => model.source.hasFeature(feature));
       },
       getItems: (context, items) => [...items, ACTION_UPLOAD, ACTION_DOWNLOAD],
     });
@@ -52,20 +54,23 @@ export class DataGridContextMenuSaveContentService {
         const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
         const key = context.get(DATA_CONTEXT_DV_RESULT_KEY)!;
 
-        const source = model.source as unknown as ResultSetDataSource;
-        const content = source.getAction(resultIndex, ResultSetDataContentAction);
-        const format = source.getAction(resultIndex, ResultSetFormatAction);
-        const editor = source.getAction(resultIndex, ResultSetEditAction);
+        const content = model.source.getAction(resultIndex, ResultSetDataContentAction);
+        const format = model.source.getAction(resultIndex, IDatabaseDataFormatAction);
+        const editor = model.source.getAction(resultIndex, IDatabaseDataEditAction);
+        const select = model.source.getAction(resultIndex, IDatabaseDataSelectAction);
+        const cellHolder = format.get(key);
+        const hasSingleCellSelected = select?.getActiveElements().length === 1;
 
         if (action === ACTION_DOWNLOAD) {
-          return !content.isDownloadable(key) || !this.dataViewerService.canExportData;
+          return !content.isDownloadable(cellHolder) || !this.dataViewerService.canExportData || !hasSingleCellSelected;
         }
 
         if (action === ACTION_UPLOAD) {
           return (
-            !format.isBinary(key) ||
+            !format.isBinary(cellHolder) ||
             model.isReadonly(resultIndex) ||
-            (format.isReadOnly(key) && editor.getElementState(key) !== DatabaseEditChangeType.add)
+            (format.isReadOnly(key) && editor.getElementState(key) !== DatabaseEditChangeType.add) ||
+            !hasSingleCellSelected
           );
         }
 
@@ -76,8 +81,7 @@ export class DataGridContextMenuSaveContentService {
         const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
         const key = context.get(DATA_CONTEXT_DV_RESULT_KEY)!;
 
-        const source = model.source as unknown as ResultSetDataSource;
-        const content = source.getAction(resultIndex, ResultSetDataContentAction);
+        const content = model.source.getAction(resultIndex, ResultSetDataContentAction);
 
         if (action === ACTION_DOWNLOAD || action === ACTION_UPLOAD) {
           return model.isLoading() || content.isLoading(key);
@@ -90,9 +94,8 @@ export class DataGridContextMenuSaveContentService {
         const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
         const key = context.get(DATA_CONTEXT_DV_RESULT_KEY)!;
 
-        const source = model.source as unknown as ResultSetDataSource;
-        const content = source.getAction(resultIndex, ResultSetDataContentAction);
-        const edit = source.getAction(resultIndex, ResultSetEditAction);
+        const content = model.source.getAction(resultIndex, ResultSetDataContentAction);
+        const edit = model.source.getAction(resultIndex, IDatabaseDataEditAction);
 
         if (action === ACTION_DOWNLOAD) {
           try {
@@ -103,12 +106,16 @@ export class DataGridContextMenuSaveContentService {
         }
 
         if (action === ACTION_UPLOAD) {
-          promptForFiles().then(files => {
+          try {
+            const files = await promptForFiles();
             const file = files?.[0] ?? undefined;
+
             if (file) {
               edit.set(key, createResultSetBlobValue(file));
             }
-          });
+          } catch (exception: any) {
+            this.notificationService.logException(exception, 'ui_upload_file_fail');
+          }
         }
       },
     });

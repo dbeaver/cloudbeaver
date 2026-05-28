@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,9 @@ import {
   InputField,
   ToolsAction,
   ToolsPanel,
-  useCustomInputValidation,
   useExecutor,
   useForm,
+  useFormCustomInputValidation,
   useObservableRef,
   usePasswordValidation,
   useTranslate,
@@ -54,13 +54,6 @@ export const ChangePassword = observer(function ChangePassword() {
   const userInfoResource = useService(UserInfoResource);
   const commonDialogService = useService(CommonDialogService);
   const disabled = userInfoResource.isLoading();
-  const passwordValidationRef = usePasswordValidation();
-  const passwordRepeatRef = useCustomInputValidation<string>(value => {
-    if (!isValuesEqual(value, state.password, null)) {
-      return translate('authentication_user_passwords_not_match');
-    }
-    return null;
-  });
 
   const form = useForm({
     async onSubmit() {
@@ -75,6 +68,13 @@ export const ChangePassword = observer(function ChangePassword() {
       }
     },
   });
+  const passwordValidationRef = usePasswordValidation(form);
+  const passwordRepeatValidation = useFormCustomInputValidation<string>(value => {
+    if (!isValuesEqual(value, state.password, null)) {
+      return translate('authentication_user_passwords_not_match');
+    }
+    return null;
+  }, form);
 
   function resetForm() {
     state.oldPassword = '';
@@ -90,13 +90,13 @@ export const ChangePassword = observer(function ChangePassword() {
         const context = contexts.getContext(userProfileContext);
 
         if ((state.oldPassword || state.password || state.repeatedPassword) && !context.force) {
-          const result = await commonDialogService.open(ConfirmationDialog, {
+          const { status } = await commonDialogService.open(ConfirmationDialog, {
             title: 'plugin_user_profile_authentication_change_password_cancel_title',
             message: 'plugin_user_profile_authentication_change_password_cancel_message',
             confirmActionText: 'ui_processing_ok',
           });
 
-          if (result === DialogueStateResult.Rejected) {
+          if (status === DialogueStateResult.Rejected) {
             ExecutorInterrupter.interrupt(contexts);
           }
         }
@@ -143,11 +143,12 @@ export const ChangePassword = observer(function ChangePassword() {
                 mapValue={(value?: string) => value?.trim() ?? ''}
                 small
                 required
+                onChange={passwordRepeatValidation.revalidate}
               >
                 {translate('plugin_user_profile_authentication_change_password_new_password')}
               </InputField>
               <InputField
-                ref={passwordRepeatRef}
+                ref={passwordRepeatValidation.ref}
                 type="password"
                 name="repeatedPassword"
                 state={state}

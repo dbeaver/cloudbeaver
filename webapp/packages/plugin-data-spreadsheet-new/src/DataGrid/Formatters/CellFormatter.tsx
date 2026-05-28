@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -10,7 +10,7 @@ import { use, useContext } from 'react';
 import { DataGridCellInnerContext } from '@cloudbeaver/plugin-data-grid';
 
 import { getComputed, s, useObjectRef, useS } from '@cloudbeaver/core-blocks';
-import type { IDataPresentationActions, IResultSetElementKey } from '@cloudbeaver/plugin-data-viewer';
+import type { IDataPresentationActions, IGridDataKey } from '@cloudbeaver/plugin-data-viewer';
 
 import { CellContext } from '../CellRenderer/CellContext.js';
 import { DataGridContext } from '../DataGridContext.js';
@@ -36,7 +36,7 @@ export const CellFormatter = observer<Props>(function CellFormatter({ rowIdx, co
   );
   const styles = useS(style);
 
-  const spreadsheetActions = useObjectRef<IDataPresentationActions<IResultSetElementKey>>({
+  const spreadsheetActions = useObjectRef<IDataPresentationActions<IGridDataKey>>({
     edit(position) {
       const colIdx = tableDataContext.getColumnIndexFromColumnKey(position.column);
       const rowIdx = tableDataContext.getRowIndexFromKey(position.row);
@@ -45,13 +45,24 @@ export const CellFormatter = observer<Props>(function CellFormatter({ rowIdx, co
         context.getDataGridApi()?.openEditor({ colIdx, rowIdx });
       }
     },
+    unpinColumns(keys) {
+      tableDataContext.view.unpinColumns(keys.map(key => key.column));
+    },
+    pinColumns(keys) {
+      tableDataContext.view.pinColumns(keys.map(key => key.column));
+    },
+    isColumnPinned(key) {
+      return tableDataContext.view.isColumnPinned(key.column);
+    },
+    unpinAllColumns() {
+      tableDataContext.view.unpinAllColumns();
+    },
+    hasPinnedColumns() {
+      return tableDataContext.view.hasPinnedColumns();
+    },
   });
 
   function handleCellMenuStateSwitch(visible: boolean): void {
-    if (cellContext.isMenuVisible && !visible) {
-      cellContext.setHover(false);
-    }
-
     cellContext.setMenuVisibility(visible);
   }
 

@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,7 @@ import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataMo
 import type { IDatabaseDataOptions } from '../../DatabaseDataModel/IDatabaseDataOptions.js';
 import { isResultSetDataModel } from '../../ResultSet/isResultSetDataModel.js';
 import { isResultSetDataSource } from '../../ResultSet/ResultSetDataSource.js';
+import { IDatabaseDataConstraintAction } from '../../DatabaseDataModel/Actions/IDatabaseDataConstraintAction.js';
 
 interface IState {
   model: IDatabaseDataModel;
@@ -51,7 +52,7 @@ export function useWhereFilter(model: IDatabaseDataModel, resultIndex: number): 
           return null;
         }
 
-        return model.source.tryGetAction(this.resultIndex, DatabaseDataConstraintAction) ?? null;
+        return model.source.tryGetAction(this.resultIndex, IDatabaseDataConstraintAction, DatabaseDataConstraintAction) ?? null;
       },
       get disabled() {
         const supported = this.constraints?.supported ?? false;

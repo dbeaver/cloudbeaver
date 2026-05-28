@@ -39,7 +39,7 @@
     </extension>
 
     <extension point="org.jkiss.dbeaver.ws.event.handler">
-        <eventHandler class="io.cloudbeaver.server.events.WSDefaultEventHandler">
+        <eventHandler class="io.cloudbeaver.server.events.WSServerConfigurationChangedEventHandler">
             <topic id="cb_config"/>
         </eventHandler>
         <eventHandler class="io.cloudbeaver.server.events.WSDataSourceUpdatedEventHandlerImpl">
@@ -59,6 +59,9 @@
         </eventHandler>
         <eventHandler class="io.cloudbeaver.server.events.WSEventHandlerWorkspaceConfigUpdate">
             <topic id="cb_workspace_configuration"/>
+        </eventHandler>
+        <eventHandler class="io.cloudbeaver.server.events.WSObjectSettingsEventHandler">
+            <topic id="cb_object_settings"/>
         </eventHandler>
     </extension>
 

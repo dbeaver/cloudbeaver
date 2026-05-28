@@ -1,24 +1,24 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 import { action, makeObservable, observable, toJS } from 'mobx';
 
-import type { IServiceProvider } from '@cloudbeaver/core-di';
-import { Executor, ExecutorInterrupter, type IExecutor, type ITask, Task } from '@cloudbeaver/core-executor';
+import { withExternal, type IServiceProvider, type IServiceScope, type SingleServiceType } from '@cloudbeaver/core-di';
+import { Executor, ExecutorInterrupter, type IExecutor, type ISyncExecutor, type ITask, SyncExecutor, Task } from '@cloudbeaver/core-executor';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
-import { DatabaseDataActions } from './DatabaseDataActions.js';
-import type { IDatabaseDataActionClass, IDatabaseDataActionInterface } from './IDatabaseDataAction.js';
-import type { IDatabaseDataActions } from './IDatabaseDataActions.js';
+import { DatabasePersistedStateStore } from './DatabasePersistedStateStore.js';
+import { IDatabaseDataActions } from './IDatabaseDataActions.js';
 import type { IDatabaseDataResult } from './IDatabaseDataResult.js';
 import {
   DatabaseDataAccessMode,
+  DatabaseDataFeature,
   DatabaseDataSourceOperation,
-  type IDatabaseDataSource,
+  IDatabaseDataSource,
   type IDatabaseDataSourceOperationEvent,
   type IRequestInfo,
 } from './IDatabaseDataSource.js';
@@ -33,9 +33,11 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
   offset: number;
   count: number;
   prevOptions: Readonly<TOptions> | null;
-  options: TOptions | null;
+  protected _options: TOptions | null;
+  readonly persistedState: DatabasePersistedStateStore;
   requestInfo: IRequestInfo;
   error: Error | null;
+  private readonly features: Set<DatabaseDataFeature | string>;
 
   get canCancel(): boolean {
     if (this.activeOperation instanceof Task) {
@@ -53,35 +55,48 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
     return false;
   }
 
+  get options(): TOptions | null {
+    return this._options;
+  }
+
   readonly serviceProvider: IServiceProvider;
   protected disabled: boolean;
   private lastAction: () => Promise<void>;
   private outdated: boolean;
 
   readonly onOperation: IExecutor<IDatabaseDataSourceOperationEvent>;
+  readonly onResultsUpdate: ISyncExecutor<TResult[]>;
   private get activeOperation(): Promise<void> | null {
     return this.activeOperationStack[this.activeOperationStack.length - 1] ?? null;
   }
   private readonly activeOperationStack: Array<Promise<any>>;
+  private readonly dataSourceScope: IServiceScope;
 
   constructor(serviceProvider: IServiceProvider) {
     this.serviceProvider = serviceProvider;
-    this.actions = new DatabaseDataActions(this);
+    this.dataSourceScope = this.serviceProvider.createScope();
+    this.actions = this.dataSourceScope.serviceProvider.getService(
+      withExternal(IDatabaseDataActions).set(IDatabaseDataSource, this as unknown),
+    ) as unknown as IDatabaseDataActions<TOptions, TResult>;
     this.access = DatabaseDataAccessMode.Default;
     this.results = [];
     this.activeOperationStack = [];
     this.offset = 0;
     this.count = 0;
     this.prevOptions = null;
-    this.options = null;
+    this._options = null;
+    this.persistedState = new DatabasePersistedStateStore();
     this.disabled = false;
     this.outdated = true;
     this.constraintsAvailable = true;
+    this.onResultsUpdate = new SyncExecutor();
     this.onOperation = new Executor();
     this.dataFormat = ResultDataFormat.Resultset;
     this.supportedDataFormats = [];
+    this.features = new Set<DatabaseDataFeature>([DatabaseDataFeature.Database]);
     this.requestInfo = {
       originalQuery: '',
+      fullQuery: '',
       requestDuration: 0,
       requestMessage: '',
       requestFilter: '',
@@ -90,15 +105,16 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
     this.error = null;
     this.lastAction = this.requestData.bind(this);
 
-    makeObservable<DatabaseDataSource<TOptions, TResult>, 'disabled' | 'activeOperationStack' | 'outdated'>(this, {
+    makeObservable<DatabaseDataSource<TOptions, TResult>, 'disabled' | 'features' | 'activeOperationStack' | 'outdated' | '_options'>(this, {
       access: observable,
       dataFormat: observable,
+      features: observable,
       supportedDataFormats: observable,
       results: observable,
       offset: observable,
       count: observable,
       prevOptions: observable,
-      options: observable,
+      _options: observable,
       requestInfo: observable,
       error: observable.ref,
       disabled: observable,
@@ -106,57 +122,43 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
       outdated: observable.ref,
       activeOperationStack: observable.shallow,
       setResults: action,
+      setFeature: action,
       setSupportedDataFormats: action,
       resetData: action,
     });
   }
 
-  tryGetAction<T extends IDatabaseDataActionClass<TOptions, TResult, any>>(resultIndex: number, action: T): InstanceType<T> | undefined;
-  tryGetAction<T extends IDatabaseDataActionClass<TOptions, TResult, any>>(result: TResult, action: T): InstanceType<T> | undefined;
-  tryGetAction<T extends IDatabaseDataActionClass<TOptions, TResult, any>>(resultIndex: number | TResult, action: T): InstanceType<T> | undefined {
+  tryGetAction<T>(resultIndex: number, action: SingleServiceType<T, any[]>): T | undefined;
+  tryGetAction<T>(result: TResult, action: SingleServiceType<T, any[]>): T | undefined;
+  tryGetAction<T>(resultIndex: number, action: SingleServiceType<unknown, unknown[]>, implementation: SingleServiceType<T, any[]>): T;
+  tryGetAction<T>(result: TResult, action: SingleServiceType<unknown, unknown[]>, implementation: SingleServiceType<T, any[]>): T;
+  tryGetAction<T>(resultIndex: number | TResult, action: SingleServiceType<T, any[]>, implementation?: SingleServiceType<unknown>): T | undefined {
     if (typeof resultIndex === 'number') {
       if (!this.hasResult(resultIndex)) {
         return undefined;
       }
-      return this.actions.tryGet(this.results[resultIndex]!, action);
+      return this.actions.tryGet(this.results[resultIndex]!, action, implementation!) as T;
     }
 
-    return this.actions.tryGet(resultIndex, action);
+    return this.actions.tryGet(resultIndex, action, implementation!) as T;
   }
 
-  getAction<T extends IDatabaseDataActionClass<TOptions, TResult, any>>(resultIndex: number, action: T): InstanceType<T>;
-  getAction<T extends IDatabaseDataActionClass<TOptions, TResult, any>>(result: TResult, action: T): InstanceType<T>;
-  getAction<T extends IDatabaseDataActionClass<TOptions, TResult, any>>(resultIndex: number | TResult, action: T): InstanceType<T> {
+  getAction<T>(resultIndex: number, action: SingleServiceType<T, any[]>): T;
+  getAction<T>(result: TResult, action: SingleServiceType<T, any[]>): T;
+  getAction<T>(resultIndex: number, action: SingleServiceType<unknown, unknown[]>, implementation: SingleServiceType<T, any[]>): T;
+  getAction<T>(result: TResult, action: SingleServiceType<unknown, unknown[]>, implementation: SingleServiceType<T, any[]>): T;
+  getAction<T>(resultIndex: number | TResult, action: SingleServiceType<T, any[]>, implementation?: SingleServiceType<unknown>): T {
     if (typeof resultIndex === 'number') {
       if (!this.hasResult(resultIndex)) {
         throw new Error('Result index out of range');
       }
-      return this.actions.get(this.results[resultIndex]!, action);
+      return this.actions.get(this.results[resultIndex]!, action, implementation!) as T;
     }
 
-    return this.actions.get(resultIndex, action);
+    return this.actions.get(resultIndex, action, implementation!) as T;
   }
 
-  getActionImplementation<T extends IDatabaseDataActionInterface<TOptions, TResult, any>>(
-    resultIndex: number,
-    action: T,
-  ): InstanceType<T> | undefined;
-  getActionImplementation<T extends IDatabaseDataActionInterface<TOptions, TResult, any>>(result: TResult, action: T): InstanceType<T> | undefined;
-  getActionImplementation<T extends IDatabaseDataActionInterface<TOptions, TResult, any>>(
-    resultIndex: number | TResult,
-    action: T,
-  ): InstanceType<T> | undefined {
-    if (typeof resultIndex === 'number') {
-      if (!this.hasResult(resultIndex)) {
-        return undefined;
-      }
-      return this.actions.getImplementation(this.results[resultIndex]!, action);
-    }
-
-    return this.actions.getImplementation(resultIndex, action);
-  }
-
-  async cancel() {
+  async cancel(): Promise<void> {
     if (this.activeOperation instanceof Task) {
       await this.activeOperation.cancel();
     }
@@ -186,6 +188,7 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
   setResults(results: TResult[]): this {
     results = observable(results);
     this.actions.updateResults(results);
+    this.onResultsUpdate.execute(results);
     this.results = results;
     return this;
   }
@@ -204,10 +207,6 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
 
   isLoadable(): boolean {
     return !this.isLoading() && !this.disabled;
-  }
-
-  hasElementIdentifier(resultIndex: number): boolean {
-    return this.getResult(resultIndex)?.data?.hasRowIdentifier === true;
   }
 
   isReadonly(resultIndex: number): boolean {
@@ -237,9 +236,17 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
   }
 
   setOptions(options: TOptions): this {
-    this.options = options;
+    this._options = options;
     return this;
   }
+
+  loadPersistedState(state: Record<string, unknown>): this {
+    this.persistedState.setStore(state);
+    this.onPersistedStateLoaded();
+    return this;
+  }
+
+  protected onPersistedStateLoaded(): void {}
 
   setDataFormat(dataFormat: ResultDataFormat): this {
     this.dataFormat = dataFormat;
@@ -255,7 +262,7 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
     return this;
   }
 
-  setConstraintsAvailable(value: boolean) {
+  setConstraintsAvailable(value: boolean): this {
     this.constraintsAvailable = value;
     return this;
   }
@@ -265,11 +272,20 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
     return this;
   }
 
+  setFeature(feature: DatabaseDataFeature | string): this {
+    this.features.add(feature);
+    return this;
+  }
+
+  hasFeature(feature: DatabaseDataFeature | string): boolean {
+    return this.features.has(feature);
+  }
+
   async retry(): Promise<void> {
     await this.lastAction();
   }
 
-  async runOperation<T>(task: () => Promise<T>): Promise<T | null> {
+  runOperation<T>(task: () => Promise<T>): Promise<T | null> {
     return this.tryExecuteOperation(DatabaseDataSourceOperation.Task, task);
   }
 
@@ -299,7 +315,7 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
       this.lastAction = this.refreshData.bind(this);
 
       if (this.prevOptions) {
-        this.options = toJS(this.prevOptions);
+        this._options = toJS(this.prevOptions);
       }
 
       return this.requestDataAction();
@@ -312,17 +328,13 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
 
       return this.save(this.results).then(data => {
         this.setResults(data);
-        //TODO: Remove this when we have virtual keys. We need to refresh the data in tables without a primary key to avoid UI glitch #5140.
-        if (!this.hasElementIdentifier(0)) {
-          this.setOutdated();
-        }
       });
     });
   }
 
   async canSafelyDispose(): Promise<boolean> {
     try {
-      const result = await this.tryExecuteOperation(DatabaseDataSourceOperation.Request, async () => true);
+      const result = await this.tryExecuteOperation(DatabaseDataSourceOperation.Request, () => Promise.resolve(true));
       return result || false;
     } catch {
       return false;
@@ -343,12 +355,13 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
 
   async dispose(): Promise<void> {
     await this.cancel();
+    this.dataSourceScope[Symbol.dispose]?.();
   }
 
   abstract request(prevResults: TResult[]): Promise<TResult[]>;
   abstract save(prevResults: TResult[]): Promise<TResult[]>;
 
-  private async requestDataAction(): Promise<TResult[]> {
+  private requestDataAction(): Promise<TResult[]> {
     this.prevOptions = toJS(this.options);
     return this.request(this.results)
       .finally(() => {

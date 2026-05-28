@@ -11,15 +11,15 @@ import { Container, Link, s, usePermission, useS, useTranslate } from '@cloudbea
 import { WEBSITE_LINKS } from '@cloudbeaver/core-links';
 import { EAdminPermission } from '@cloudbeaver/core-root';
 
-import type { IResultSetElementKey } from '../DatabaseDataModel/Actions/ResultSet/IResultSetDataKey.js';
 import { ResultSetDataContentAction } from '../DatabaseDataModel/Actions/ResultSet/ResultSetDataContentAction.js';
 import type { IDatabaseDataModel } from '../DatabaseDataModel/IDatabaseDataModel.js';
 import { ResultSetDataSource } from '../ResultSet/ResultSetDataSource.js';
 import styles from './QuotaPlaceholder.module.css';
+import type { IDatabaseValueHolder } from '../DatabaseDataModel/Actions/IDatabaseValueHolder.js';
 
 interface Props {
   className?: string;
-  elementKey: IResultSetElementKey | undefined;
+  holder: IDatabaseValueHolder<any, any> | null;
   model: IDatabaseDataModel<ResultSetDataSource>;
   resultIndex: number;
   keepSize?: boolean;
@@ -29,7 +29,7 @@ export const QuotaPlaceholder: React.FC<React.PropsWithChildren<Props>> = observ
   className,
   children,
   keepSize = false,
-  elementKey,
+  holder,
   model,
   resultIndex,
 }) {
@@ -37,7 +37,7 @@ export const QuotaPlaceholder: React.FC<React.PropsWithChildren<Props>> = observ
   const admin = usePermission(EAdminPermission.admin);
   const style = useS(styles);
   const contentAction = model.source.getAction(resultIndex, ResultSetDataContentAction);
-  const limitInfo = elementKey ? contentAction.getLimitInfo(elementKey) : null;
+  const limitInfo = holder ? contentAction.getLimitInfo(holder) : null;
 
   return (
     <Container className={className} keepSize={keepSize} vertical center>

@@ -1,95 +1,119 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { observable, action, reaction } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useCallback, useLayoutEffect, useMemo, useRef, type HTMLAttributes } from 'react';
-import { reaction } from 'mobx';
 
-import { getComputed, s, TextPlaceholder, useObjectRef, useS, useTranslate } from '@cloudbeaver/core-blocks';
-// import { useService } from '@cloudbeaver/core-di';
+import { getComputed, TextPlaceholder, useObjectRef, useObservableRef, useTranslate } from '@cloudbeaver/core-blocks';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
-// import { ClipboardService } from '@cloudbeaver/core-ui';
 import { useCaptureViewContext } from '@cloudbeaver/core-view';
 import {
   DataGrid,
   useCreateGridReactiveValue,
   type DataGridRef,
   type ICellPosition,
+  type IDataGridRowRenderer,
   type IDataGridCellRenderer,
   type DataGridProps,
+  type ICellChange,
+  type DataGridCellKeyboardEvent,
 } from '@cloudbeaver/plugin-data-grid';
 import {
   DATA_CONTEXT_DV_PRESENTATION,
   type DatabaseDataSelectActionsData,
   DatabaseEditChangeType,
-  DatabaseSelectAction,
   DataViewerPresentationType,
   type IDatabaseDataModel,
   type IDataPresentationProps,
-  type IResultSetEditActionData,
-  type IResultSetElementKey,
-  type IResultSetPartialKey,
-  isBooleanValuePresentationAvailable,
-  ResultSetDataKeysUtils,
+  GridDataKeysUtils,
   ResultSetDataSource,
   ResultSetSelectAction,
-  ResultSetViewAction,
-  DatabaseDataConstraintAction,
   getNextOrder,
   isResultSetDataModel,
+  isResultSetDataSource,
+  IDatabaseDataCacheAction,
+  IDatabaseDataSelectAction,
+  IDatabaseDataViewAction,
+  IDatabaseDataConstraintAction,
+  GridSelectAction,
+  GridViewAction,
+  ResultSetCacheAction,
+  GridHistoryAction,
+  type IGridEditActionData,
+  type IGridDataKey,
+  type IHistoryEntry,
+  getKeyFromHistoryEntry,
 } from '@cloudbeaver/plugin-data-viewer';
 
 import { CellRenderer } from './CellRenderer/CellRenderer.js';
+import { ColumnDnDContext, type IColumnDnDState } from './ColumnDnDContext.js';
 import { DataGridContext, type IDataGridContext } from './DataGridContext.js';
 import { DataGridSelectionContext } from './DataGridSelection/DataGridSelectionContext.js';
 import { useGridSelectionContext } from './DataGridSelection/useGridSelectionContext.js';
-import classes from './DataGridTable.module.css';
+import './DataGridTable.css';
 import { CellFormatter } from './Formatters/CellFormatter.js';
+import { FormattingContext } from './FormattingContext.js';
 import { TableDataContext } from './TableDataContext.js';
 import { useGridDragging } from './useGridDragging.js';
+import { useFormatting } from './useFormatting.js';
 import { useGridSelectedCellsCopy } from './useGridSelectedCellsCopy.js';
+import { useGridSelectedCellsPaste } from './useGridSelectedCellsPaste.js';
+import { useSearchResultsCache } from './useSearchResultsCache.js';
 import { useTableData } from './useTableData.js';
 import { TableColumnHeader } from './TableColumnHeader/TableColumnHeader.js';
 import { TableIndexColumnHeader } from './TableColumnHeader/TableIndexColumnHeader.js';
+import { clsx } from '@dbeaver/ui-kit';
+import type { ColumnDropSide } from './getDropSide.js';
 
 const ROW_HEIGHT = 24;
 export const HEADER_HEIGHT = 32;
 export const HEADER_WITH_DESC_HEIGHT = 42;
 
-export const DataGridTable = observer<IDataPresentationProps>(function DataGridTable({
-  model,
-  actions,
-  resultIndex,
-  simple,
-  className,
-  dataFormat,
-  ...rest
-}) {
+export const DataGridTable = observer<IDataPresentationProps>(function DataGridTable({ model, actions, resultIndex, simple, className, ...rest }) {
   const translate = useTranslate();
-  const styles = useS(classes);
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
   const dataGridDivRef = useRef<HTMLDivElement | null>(null);
   const focusedCell = useRef<ICellPosition | null>(null);
   const focusSyncRef = useRef<ICellPosition | null>(null);
   const dataGridRef = useRef<DataGridRef>(null);
 
-  const selectionAction = (model.source as unknown as ResultSetDataSource).getAction(resultIndex, ResultSetSelectAction);
-  const viewAction = (model.source as unknown as ResultSetDataSource).getAction(resultIndex, ResultSetViewAction);
+  const selectionAction = model.source.getAction(resultIndex, IDatabaseDataSelectAction, GridSelectAction);
+  const viewAction = model.source.getAction(resultIndex, IDatabaseDataViewAction, GridViewAction);
+  const cacheAction = model.source.getAction(resultIndex, IDatabaseDataCacheAction, ResultSetCacheAction);
+  const historyAction = model.source.tryGetAction(resultIndex, GridHistoryAction);
 
   const tableData = useTableData(model as unknown as IDatabaseDataModel<ResultSetDataSource>, resultIndex, dataGridDivRef);
-  const gridSelectionContext = useGridSelectionContext(tableData, selectionAction);
+  const formatting = useFormatting(tableData, cacheAction);
+  const searchResultsCache = useSearchResultsCache(cacheAction);
+  const getHeaderOrder = useCallback(() => (dataGridRef.current?.getColumnsOrdered() ?? []).map(col => col.key), [dataGridRef]);
+  const gridSelectionContext = useGridSelectionContext(tableData, selectionAction, getHeaderOrder);
 
-  const restoreFocus = useCallback(
-    function restoreFocus() {
-      const gridDiv = gridContainerRef.current;
-      const focusSink = gridDiv?.querySelector<HTMLDivElement>('[aria-selected="true"]');
-      focusSink?.focus();
+  const columnDnDState = useObservableRef<IColumnDnDState>(
+    () => ({
+      dropTargetColumnIndex: null,
+      dropSide: null,
+      isDragging: false,
+      setDropTarget(columnIndex: number | null, side?: ColumnDropSide) {
+        this.dropTargetColumnIndex = columnIndex;
+        this.dropSide = side ?? null;
+      },
+      setDragging(isDragging: boolean) {
+        this.isDragging = isDragging;
+      },
+    }),
+    {
+      dropTargetColumnIndex: observable.ref,
+      dropSide: observable.ref,
+      isDragging: observable.ref,
+      setDropTarget: action.bound,
+      setDragging: action.bound,
     },
-    [gridContainerRef],
+    false,
   );
 
   function isGridInFocus(): boolean {
@@ -125,7 +149,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
         dataGridRef.current?.selectCell(pos);
       }
     },
-    focusCell(key: Partial<IResultSetElementKey> | null, initial = false) {
+    focusCell(key: Partial<IGridDataKey> | null, initial = false, deferred = false) {
       if ((!key?.column || !key?.row) && initial) {
         const selectedElements = selectionAction.getSelectedElements();
 
@@ -134,7 +158,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
         } else {
           key = { column: viewAction.columnKeys[0], row: viewAction.rowKeys[0] };
         }
-        selectionAction.focus(key as IResultSetElementKey);
+        selectionAction.focus(key as IGridDataKey);
       }
 
       if (!key?.column || !key?.row) {
@@ -150,13 +174,19 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
       const colIdx = tableData.getColumnIndexFromColumnKey(key.column!);
       const rowIdx = tableData.getRowIndexFromKey(key.row!);
 
-      focusSyncRef.current = { colIdx, rowIdx };
-
-      this.selectCell({ colIdx, rowIdx });
+      if (deferred) {
+        if (dataGridRef.current?.selectCell({ colIdx, rowIdx }, { deferred: true })) {
+          focusSyncRef.current = { colIdx, rowIdx };
+        }
+      } else {
+        focusSyncRef.current = { colIdx, rowIdx };
+        this.selectCell({ colIdx, rowIdx });
+      }
     },
   }));
 
-  const gridSelectedCellCopy = useGridSelectedCellsCopy(tableData, selectionAction as unknown as DatabaseSelectAction, gridSelectionContext);
+  const gridSelectedCellCopy = useGridSelectedCellsCopy(tableData, selectionAction, gridSelectionContext);
+  const gridSelectedCellPaste = useGridSelectedCellsPaste(tableData, selectionAction as unknown as ResultSetSelectAction);
   const { onMouseDownHandler, onMouseMoveHandler } = useGridDragging({
     onDragStart: startPosition => {
       handlers.selectCell(startPosition);
@@ -174,9 +204,18 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
   });
 
   useLayoutEffect(() => {
-    function syncEditor(data: IResultSetEditActionData) {
+    function syncEditor(data: IGridEditActionData) {
       const editor = tableData.editor;
-      if (data.resultId !== editor.result.id || !data.value || data.value.length === 0 || data.type === DatabaseEditChangeType.delete) {
+
+      if (data.resultId !== editor?.result.id) {
+        return;
+      }
+
+      if (data.revert) {
+        dataGridRef.current?.refreshSearch();
+      }
+
+      if (!data.value || data.value.length === 0 || data.type === DatabaseEditChangeType.delete) {
         return;
       }
 
@@ -193,15 +232,11 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
       handlers.selectCell({ colIdx, rowIdx });
     }
 
-    tableData.editor.action.addHandler(syncEditor);
+    tableData.editor?.action.addHandler(syncEditor);
 
-    function syncFocus(data: DatabaseDataSelectActionsData<IResultSetPartialKey>) {
+    function syncFocus(data: DatabaseDataSelectActionsData<Partial<IGridDataKey>>) {
       if (data.type === 'focus') {
-        // TODO: we need this delay to update focus after render rows update
-        setTimeout(() => {
-          handlers.focusCell(data.key);
-          setTimeout(() => restoreFocus(), 1);
-        }, 1);
+        handlers.focusCell(data.key, false, true);
       }
     }
 
@@ -209,9 +244,39 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
     handlers.focusCell(selectionAction.getFocusedElement(), true);
 
     return () => {
-      tableData.editor.action.removeHandler(syncEditor);
+      tableData.editor?.action.removeHandler(syncEditor);
     };
-  }, [tableData.editor, selectionAction, handlers, tableData, restoreFocus]);
+  }, [tableData.editor, selectionAction, handlers, tableData]);
+
+  useLayoutEffect(() => {
+    if (!historyAction) {
+      return;
+    }
+
+    function handleHistoryChange(entry: IHistoryEntry<unknown>) {
+      dataGridRef.current?.refreshSearch();
+
+      const key = getKeyFromHistoryEntry(entry);
+      if (!key) {
+        return;
+      }
+
+      const colIdx = tableData.getColumnIndexFromColumnKey(key.column);
+      const rowIdx = tableData.getRowIndexFromKey(key.row);
+
+      if (colIdx >= 0 && rowIdx >= 0) {
+        handlers.selectCell({ colIdx, rowIdx }, true);
+      }
+    }
+
+    historyAction.onUndo.addHandler(handleHistoryChange);
+    historyAction.onRedo.addHandler(handleHistoryChange);
+
+    return () => {
+      historyAction.onUndo.removeHandler(handleHistoryChange);
+      historyAction.onRedo.removeHandler(handleHistoryChange);
+    };
+  }, [historyAction, tableData, handlers]);
 
   const handleFocusChange = (position: ICellPosition) => {
     focusedCell.current = position;
@@ -253,9 +318,9 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
       simple,
       isGridInFocus,
       getDataGridApi: () => dataGridRef.current,
-      focus: restoreFocus,
+      focus: () => dataGridRef.current?.restoreFocus(),
     }),
-    [model, actions, resultIndex, simple, dataGridRef, restoreFocus],
+    [model, actions, resultIndex, simple, dataGridRef],
   );
 
   const columnsCount = useCreateGridReactiveValue(
@@ -283,7 +348,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
       return '';
     }
 
-    return tableData.format.getText({ row, column });
+    return tableData.format.getText(tableData.format.get({ row, column }));
   }
 
   const cellText = useCreateGridReactiveValue(
@@ -299,11 +364,22 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
     return null;
   }
 
+  // Track pinnedColumns.size to trigger re-render when columns are pinned/unpinned
+  // This ensures the component re-renders when columns are pinned/unpinned
+  getComputed(() => viewAction.pinnedColumns.size);
+
   function getHeaderPinned(colIdx: number) {
     if (colIdx === 0) {
       return true;
     }
-    return false;
+
+    const column = tableData.getColumn(colIdx);
+
+    if (!column?.key) {
+      return false;
+    }
+
+    return viewAction.isColumnPinned(column.key);
   }
 
   function getHeaderResizable(colIdx: number) {
@@ -345,7 +421,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
     if (!isResultSetDataModel(model)) {
       return false;
     }
-    const constraintsAction = (model.source as unknown as ResultSetDataSource).tryGetAction(resultIndex, DatabaseDataConstraintAction);
+    const constraintsAction = model.source.tryGetAction(resultIndex, IDatabaseDataConstraintAction);
     return (
       Boolean(tableData.getColumn(colIdx) && constraintsAction?.supported && isResultSetDataModel(model) && !model.isDisabled(resultIndex)) &&
       colIdx !== 0
@@ -362,7 +438,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
     if (!isResultSetDataModel(model)) {
       return null;
     }
-    const constraintsAction = (model.source as unknown as ResultSetDataSource).tryGetAction(resultIndex, DatabaseDataConstraintAction);
+    const constraintsAction = model.source.tryGetAction(resultIndex, IDatabaseDataConstraintAction);
     const column = tableData.getColumn(colIdx)?.key;
     if (!column || !constraintsAction?.supported) {
       return null;
@@ -377,19 +453,33 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
     [tableData, model],
   );
 
-  function handleSort(colIdx: number, order: 'asc' | 'desc' | null, isMultiple: boolean) {
+  function getRowElement(rowIdx: number, props: HTMLAttributes<HTMLDivElement>, renderDefaultRow: IDataGridRowRenderer) {
+    const isFocused = getComputed(() => gridSelectionContext.getFocusedElementPosition()?.rowIdx === rowIdx);
+    return renderDefaultRow({ className: clsx(props.className, isFocused && 'rdg-row-custom-highlighted') });
+  }
+
+  const rowElement = useCreateGridReactiveValue(
+    getRowElement,
+    (onValueChange, rowIdx, props, renderDefaultRow) => reaction(() => getRowElement(rowIdx, props, renderDefaultRow), onValueChange),
+    [],
+  );
+
+  async function handleSort(colIdx: number, order: 'asc' | 'desc' | null, isMultiple: boolean) {
     const column = tableData.getColumn(colIdx)?.key;
     if (!column) {
       return;
     }
+
     const resultColumn = tableData.getColumnInfo(column);
-    if (!resultColumn) {
+
+    if (!resultColumn || model.isLoading()) {
       return;
     }
-    const constraintsAction = (model.source as unknown as ResultSetDataSource).tryGetAction(resultIndex, DatabaseDataConstraintAction);
+
+    const constraintsAction = model.source.tryGetAction(resultIndex, IDatabaseDataConstraintAction);
     const currentOrder = constraintsAction!.getOrder(resultColumn.position);
     const nextOrder = getNextOrder(currentOrder);
-    model.request(() => {
+    await model.request(() => {
       constraintsAction!.setOrder(resultColumn.position, nextOrder, isMultiple);
     });
   }
@@ -402,46 +492,31 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
       return;
     }
 
-    tableData.editor.set({ row, column }, value);
+    tableData.editor?.set({ row, column }, value);
   }
 
-  function isCellEditable(rowIdx: number, colIdx: number): boolean {
-    const row = tableData.rows[rowIdx];
-    const column = tableData.getColumn(colIdx)?.key;
+  function handleCellChangeBatch(changes: ICellChange[]) {
+    const updates = [];
 
-    if (!row || !column) {
-      return false;
+    for (const { rowIdx, colIdx, value } of changes) {
+      const row = tableData.rows[rowIdx];
+      const column = tableData.getColumn(colIdx)?.key;
+
+      if (row && column) {
+        updates.push({ key: { row, column }, value });
+      }
     }
 
-    const cell = { row, column };
-
-    const editionState = tableData.getEditionState(cell);
-
-    if (!gridContext.model.hasElementIdentifier(tableData.view.resultIndex) && editionState !== DatabaseEditChangeType.add) {
-      return false;
+    if (updates.length > 0) {
+      tableData.editor?.setMany(updates);
     }
-
-    if (tableData.format.isBinary(cell) || tableData.format.isGeometry(cell) || tableData.dataContent.isTextTruncated(cell)) {
-      return false;
-    }
-
-    const resultColumn = tableData.getColumnInfo(cell.column);
-    const value = tableData.getCellValue(cell);
-
-    if (!resultColumn || value === undefined) {
-      return false;
-    }
-
-    const handleByBooleanFormatter = isBooleanValuePresentationAvailable(value, resultColumn);
-
-    return !(handleByBooleanFormatter || tableData.isCellReadonly(cell));
   }
 
   function getColumnKey(colIdx: number) {
     const column = tableData.columns[colIdx];
 
     if (column?.key) {
-      return ResultSetDataKeysUtils.serialize(column.key);
+      return GridDataKeysUtils.serialize(column.key);
     }
 
     return `_${String(colIdx)}`;
@@ -452,7 +527,8 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
   }
 
   const handleCellKeyDown: DataGridProps['onCellKeyDown'] = (_, event) => {
-    gridSelectedCellCopy.onKeydownHandler(event);
+    handleCopyPaste(event);
+
     const cell = selectionAction.getFocusedElement();
 
     if (EventContext.has(event, EventStopPropagationFlag) || model.isReadonly(resultIndex) || !cell) {
@@ -467,47 +543,82 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
     }
   };
 
+  function handleCopyPaste(event: DataGridCellKeyboardEvent) {
+    const readonly = model.isReadonly(resultIndex);
+    gridSelectedCellCopy.onKeydownHandler(event);
+
+    if (!readonly) {
+      gridSelectedCellPaste.onKeydownHandler(event);
+    }
+  }
+
+  function isCellEditable(rowIdx: number, colIdx: number): boolean {
+    const row = tableData.rows[rowIdx];
+    const column = tableData.getColumn(colIdx)?.key;
+
+    if (!row || !column) {
+      return false;
+    }
+
+    const key: IGridDataKey = { row, column };
+
+    return tableData.isCellEditable(key);
+  }
+
   return (
-    <DataGridContext.Provider value={gridContext}>
-      <DataGridSelectionContext.Provider value={gridSelectionContext}>
-        <TableDataContext.Provider value={tableData}>
-          <div
-            ref={setContainersRef}
-            tabIndex={-1}
-            {...rest}
-            className={s(styles, { container: true }, className)}
-            onMouseDown={onMouseDownHandler}
-            onMouseMove={onMouseMoveHandler}
-          >
-            <DataGrid
-              ref={dataGridRef}
-              className={s(styles, { grid: true }, className)}
-              cell={cell}
-              cellText={cellText}
-              cellElement={cellElement}
-              getCellEditable={isCellEditable}
-              headerElement={headerElement}
-              getHeaderHeight={() => headerHeight}
-              getHeaderWidth={getHeaderWidth}
-              getHeaderPinned={getHeaderPinned}
-              getHeaderResizable={getHeaderResizable}
-              getRowHeight={() => ROW_HEIGHT}
-              getColumnKey={getColumnKey}
-              columnCount={columnsCount}
-              rowCount={rowsCount}
-              columnSortable={columnSortable}
-              columnSortingState={columnSortingState}
-              getRowId={rowIdx => (tableData.rows[rowIdx] ? ResultSetDataKeysUtils.serialize(tableData.rows[rowIdx]) : '')}
-              onFocus={handleFocusChange}
-              onScrollToBottom={handleScrollToBottom}
-              onColumnSort={handleSort}
-              onCellChange={handleCellChange}
-              onCellKeyDown={handleCellKeyDown}
-              onHeaderKeyDown={gridSelectedCellCopy.onKeydownHandler}
-            />
-          </div>
-        </TableDataContext.Provider>
-      </DataGridSelectionContext.Provider>
-    </DataGridContext.Provider>
+    <ColumnDnDContext.Provider value={columnDnDState}>
+      <DataGridContext.Provider value={gridContext}>
+        <DataGridSelectionContext.Provider value={gridSelectionContext}>
+          <TableDataContext.Provider value={tableData}>
+            <FormattingContext.Provider value={formatting}>
+              <div
+                ref={setContainersRef}
+                tabIndex={-1}
+                {...rest}
+                className={clsx('data-grid__container', 'theme-typography--caption', className)}
+                onMouseDown={onMouseDownHandler}
+                onMouseMove={onMouseMoveHandler}
+              >
+                <DataGrid
+                  ref={dataGridRef}
+                  className={clsx('data-grid__grid', className)}
+                  cell={cell}
+                  cellText={cellText}
+                  cellElement={cellElement}
+                  rowElement={rowElement}
+                  getCellEditable={isCellEditable}
+                  headerElement={headerElement}
+                  getHeaderHeight={() => headerHeight}
+                  getHeaderWidth={getHeaderWidth}
+                  getHeaderPinned={getHeaderPinned}
+                  getHeaderResizable={getHeaderResizable}
+                  getRowHeight={() => ROW_HEIGHT}
+                  getColumnKey={getColumnKey}
+                  columnCount={columnsCount}
+                  rowCount={rowsCount}
+                  columnSortable={columnSortable}
+                  columnSortingState={columnSortingState}
+                  getRowId={rowIdx => (tableData.rows[rowIdx] ? GridDataKeysUtils.serialize(tableData.rows[rowIdx]) : '')}
+                  search={{
+                    isEnabled: true,
+                    isReadOnly:
+                      model.isReadonly(resultIndex) || !(isResultSetDataSource(model.source) && model.source.hasElementIdentifier(resultIndex)),
+                    storage: searchResultsCache,
+                  }}
+                  columnSortingMultiple
+                  onFocus={handleFocusChange}
+                  onScrollToBottom={handleScrollToBottom}
+                  onColumnSort={handleSort}
+                  onCellChange={handleCellChange}
+                  onCellChangeBatch={handleCellChangeBatch}
+                  onCellKeyDown={handleCellKeyDown}
+                  onHeaderKeyDown={handleCopyPaste}
+                />
+              </div>
+            </FormattingContext.Provider>
+          </TableDataContext.Provider>
+        </DataGridSelectionContext.Provider>
+      </DataGridContext.Provider>
+    </ColumnDnDContext.Provider>
   );
 });

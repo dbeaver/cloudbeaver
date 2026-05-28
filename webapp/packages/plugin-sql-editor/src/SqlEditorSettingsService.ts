@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -56,6 +56,9 @@ const defaultSettings = schema.object({
   'plugin.sql-editor.maxFileSize': schema.coerce.number().default(10 * 1024), // kilobyte
   'plugin.sql-editor.disabled': schemaExtra.stringedBoolean().default(false),
   'plugin.sql-editor.autoSave': schemaExtra.stringedBoolean().default(true),
+  'plugin.sql-editor.highlightWhitespace': schemaExtra.stringedBoolean().default(false),
+  'sql.parameter.enabled': schemaExtra.stringedBoolean().default(true),
+  'sql.variables.enabled': schemaExtra.stringedBoolean().default(true),
   'sql.proposals.insert.table.alias': schema.coerce
     .string()
     .transform(value => {
@@ -116,8 +119,20 @@ export class SqlEditorSettingsService {
     return this.settings.getValue('sql.proposals.insert.table.alias');
   }
 
+  get parameterEnabled(): boolean {
+    return this.settings.getValue('sql.parameter.enabled');
+  }
+
+  get variablesEnabled(): boolean {
+    return this.settings.getValue('sql.variables.enabled');
+  }
+
   get longNameProposals(): boolean {
     return this.settings.getValue('SQLEditor.ContentAssistant.proposals.long.name');
+  }
+
+  get highlightWhitespace(): boolean {
+    return this.settings.getValue('plugin.sql-editor.highlightWhitespace');
   }
 
   readonly settings: SettingsProvider<typeof defaultSettings>;
@@ -210,6 +225,16 @@ export class SqlEditorSettingsService {
           description: this.serverConfigResource.isFeatureEnabled(FEATURE_GIT_ID, true)
             ? 'plugin_sql_editor_settings_auto_save_description_git_integration'
             : 'plugin_sql_editor_settings_auto_save_description',
+        },
+        {
+          group: SQL_EDITOR_SETTINGS_GROUP,
+          key: 'plugin.sql-editor.highlightWhitespace',
+          access: {
+            scope: ['client'],
+          },
+          type: ESettingsValueType.Checkbox,
+          name: 'plugin_sql_editor_settings_highlight_white_space',
+          description: 'plugin_sql_editor_settings_highlight_white_space_description',
         },
       ];
 

@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -11,7 +11,7 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 
 import { ConnectionFormService } from '../ConnectionFormService.js';
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
-import { CachedMapAllKey, getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
+import { getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
 import { getConnectionFormOptionsPart } from '../Options/getConnectionFormOptionsPart.js';
 export const ConnectionFormAuthenticationAction = importLazyComponent(() =>
   import('./ConnectionFormAuthenticationAction.js').then(m => m.ConnectionFormAuthenticationAction),
@@ -35,7 +35,16 @@ export class ConnectionOriginInfoTabService extends Bootstrap {
       order: 3,
       tab: () => OriginInfoTab,
       panel: () => OriginInfo,
-      getLoader: () => getCachedMapResourceLoaderState(this.connectionInfoOriginResource, () => CachedMapAllKey),
+      getLoader: (context, props) => {
+        const optionsPart = props?.formState ? getConnectionFormOptionsPart(props.formState) : null;
+        const key = optionsPart?.connectionKey;
+
+        if (!key) {
+          return [];
+        }
+
+        return getCachedMapResourceLoaderState(this.connectionInfoOriginResource, () => key);
+      },
       isHidden: (tabId, props) => {
         const optionsPart = props?.formState ? getConnectionFormOptionsPart(props.formState) : null;
         const key = optionsPart?.connectionKey;

@@ -1,6 +1,7 @@
 export default [
   ['plugin_connections_connection_form_part_main', 'Main'],
   ['plugin_connections_connection_form_part_properties', 'Proprietà del driver'],
+  ['plugin_connections_connection_form_part_main_auth_model', 'Modello di autenticazione'],
   ['plugin_connections_connection_form_part_main_custom_host', 'Host'],
   ['plugin_connections_connection_form_part_main_custom_port', 'Porta'],
   ['plugin_connections_connection_form_part_main_custom_server_name', 'Server name'],
@@ -10,6 +11,8 @@ export default [
   ['plugin_connections_new_connection_dialog_title', 'Nuova connessione'],
 
   ['plugin_connections_connection_edit_menu_item_title', 'Modifica Connessione'],
+  ['plugin_connections_connection_clone', 'Clona'],
+  ['plugin_connections_connection_clone_error', 'Impossibile clonare la connessione'],
   ['plugin_connections_connection_edit_cancel_title', "Conferma l'annullamento"],
   [
     'plugin_connections_connection_edit_cancel_message',
@@ -33,8 +36,14 @@ export default [
 
   ['plugin_connections_connection_ssl_enable', 'Enable SSL'],
   ['plugin_connections_connection_ssl_optional', 'All SSL parameters are optional.'],
-  ['plugin_connections_connection_ssl_description', 'You must specify SSL certificates if they are required by your server configuration. Settings on this page override Driver properties'],
-  ['plugin_connections_connection_ssl_note', '{arg:productName} does not verify SSL configuration and relies on the driver implementation. Please refer to the driver documentation for more information.'],
+  [
+    'plugin_connections_connection_ssl_description',
+    'You must specify SSL certificates if they are required by your server configuration. Settings on this page override Driver properties',
+  ],
+  [
+    'plugin_connections_connection_ssl_note',
+    '{arg:productName} does not verify SSL configuration and relies on the driver implementation. Please refer to the driver documentation for more information.',
+  ],
   ['plugin_connections_connection_ssl_docs', 'SSL configuration documentation'],
 
   ['plugin_connections_connection_form_shared_credentials_manage_info', 'You can manage credentials in the '],

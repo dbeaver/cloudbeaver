@@ -44,6 +44,7 @@ import org.jkiss.dbeaver.model.auth.SMAuthInfo;
 import org.jkiss.dbeaver.model.auth.SMAuthStatus;
 import org.jkiss.dbeaver.model.auth.SMSessionExternal;
 import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
+import org.jkiss.dbeaver.model.qm.QMConstants;
 import org.jkiss.dbeaver.model.security.SMConstants;
 import org.jkiss.dbeaver.model.security.SMController;
 import org.jkiss.dbeaver.model.security.SMSubjectType;
@@ -62,7 +63,7 @@ import java.util.Map;
 public class WebServiceAuthImpl implements DBWServiceAuth {
 
     private static final Log log = Log.getLog(WebServiceAuthImpl.class);
-    public static final String CONFIG_TEMP_ADMIN_USER_ID = "temp_config_admin";
+    private static final long DEFAULT_TIMEOUT_MILLISECONDS = 5 * 60 * 1000;
 
     @Override
     public WebAuthStatus authLogin(
@@ -120,11 +121,15 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
             if (CommonUtils.isEmpty(smAuthInfo.getRedirectUrl())) {
                 throw new DBWebException("Missing redirect URL");
             }
+            WebAsyncAuthJob job = new WebAsyncAuthJob(
+                providerId + " authentication job",
+                smAuthInfo.getAuthAttemptId(),
+                linkWithActiveUser
+            );
             WebAsyncTaskInfo authTask = webSession.createAsyncTask(providerId + " authentication");
             authTask.setRunning(true);
-            authTask.setJob(
-                new WebAsyncAuthJob(providerId + " authentication job", smAuthInfo.getAuthAttemptId(), linkWithActiveUser)
-            );
+            authTask.setJob(job);
+            new WebAsyncAuthTimeoutJob(webSession, authTask, job).schedule(DEFAULT_TIMEOUT_MILLISECONDS);
             return new WebAsyncAuthStatus(smAuthInfo.getRedirectUrl(), authTask);
         } catch (SMTooManySessionsException e) {
             throw new DBWebException("User authentication failed", e.getErrorType(), e);
@@ -265,12 +270,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
     @Override
     public WebUserInfo activeUser(@NotNull WebSession webSession) throws DBWebException {
         if (webSession.getUser() == null) {
-            ServletApplication application = webSession.getApplication();
-            if (!application.getAppConfiguration().isAnonymousAccessEnabled() || !webSession.isAuthorizedInSecurityManager()) {
-                return null;
-            }
-            SMUser anonymous = new SMUser("anonymous", true, null);
-            return new WebUserInfo(webSession, new WebUser(anonymous));
+            return getAnonymousUserInfo(webSession);
         }
         try {
             // Read user from security controller. It will also read meta parameters
@@ -369,14 +369,24 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
         @NotNull WebSession webSession,
         @NotNull Map<String, Object> parameters
     ) throws DBWebException {
-        if (webSession.getUser() == null) {
-            throw new DBWebException("Preferences cannot be changed for anonymous user");
-        }
         try {
             webSession.getUserContext().getPreferenceStore().updatePreferenceValues(parameters);
+            if (webSession.getUser() == null) {
+                return getAnonymousUserInfo(webSession);
+            }
             return new WebUserInfo(webSession, webSession.getUser());
         } catch (DBException e) {
             throw new DBWebException("Error setting user parameters", e);
         }
+    }
+
+    @Nullable
+    private WebUserInfo getAnonymousUserInfo(@NotNull WebSession webSession) {
+        ServletApplication application = webSession.getApplication();
+        if (!application.getAppConfiguration().isAnonymousAccessEnabled() || !webSession.isAuthorizedInSecurityManager()) {
+            return null;
+        }
+        SMUser anonymous = new SMUser(QMConstants.QM_ANONYMOUS_USER, true, null);
+        return new WebUserInfo(webSession, new WebUser(anonymous));
     }
 }

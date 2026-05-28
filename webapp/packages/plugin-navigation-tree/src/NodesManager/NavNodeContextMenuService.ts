@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,7 @@ import { LocalizationService } from '@cloudbeaver/core-localization';
 import {
   DATA_CONTEXT_NAV_NODE,
   ENodeFeature,
+  EObjectFeature,
   getNodePlainName,
   type INodeActions,
   isConnectionFolder,
@@ -25,6 +26,7 @@ import {
   nodeDeleteContext,
   NodeManagerUtils,
 } from '@cloudbeaver/core-navigation-tree';
+import { isConnectionNode } from '@cloudbeaver/core-connections';
 import { ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import {
   ACTION_DELETE,
@@ -39,6 +41,8 @@ import {
 
 import { DATA_CONTEXT_NAV_NODE_ACTIONS } from '../NavigationTree/ElementsTree/NavigationTreeNode/TreeNodeMenu/DATA_CONTEXT_NAV_NODE_ACTIONS.js';
 import { MENU_NAVIGATION_TREE_CREATE } from '../NavigationTree/ElementsTree/NavigationTreeNode/TreeNodeMenu/MENU_NAVIGATION_TREE_CREATE.js';
+import { MENU_NAVIGATION_TREE_MANAGE } from '../NavigationTree/ElementsTree/NavigationTreeNode/TreeNodeMenu/MENU_NAVIGATION_TREE_MANAGE.js';
+import { MENU_NAVIGATION_TREE_TOOLS } from '../NavigationTree/ElementsTree/NavigationTreeNode/TreeNodeMenu/MENU_NAVIGATION_TREE_TOOLS.js';
 
 export interface INodeMenuData {
   node: NavNode;
@@ -94,21 +98,23 @@ export class NavNodeContextMenuService extends Bootstrap {
         message = message + '\n' + this.localizationService.translate('app_navigationTree_node_folder_delete_confirmation');
       }
 
-      const result = await this.commonDialogService.open(ConfirmationDialogDelete, {
+      const { status } = await this.commonDialogService.open(ConfirmationDialogDelete, {
         title: 'ui_data_delete_confirmation',
         message,
         confirmActionText: 'ui_delete',
       });
 
-      if (result === DialogueStateResult.Rejected) {
+      if (status === DialogueStateResult.Rejected) {
         ExecutorInterrupter.interrupt(contexts);
       }
     });
 
     this.actionService.addHandler({
-      id: 'nav-node-base-handler',
+      id: 'nav-node-base-manage-menu',
+      menus: [MENU_NAVIGATION_TREE_MANAGE],
+      actions: [ACTION_RENAME, ACTION_DELETE],
       contexts: [DATA_CONTEXT_NAV_NODE],
-      isActionApplicable: (context, action): boolean => {
+      isActionApplicable: (context, action) => {
         const node = context.get(DATA_CONTEXT_NAV_NODE)!;
 
         if (NodeManagerUtils.isDatabaseObject(node.id) || isConnectionFolder(node)) {
@@ -121,29 +127,13 @@ export class NavNodeContextMenuService extends Bootstrap {
           }
         }
 
-        if (action === ACTION_OPEN) {
-          return this.navNodeManagerService.canOpen(node.id, node.parentId);
-        }
-
-        return [ACTION_OPEN, ACTION_REFRESH].includes(action);
+        return false;
       },
       handler: async (context, action) => {
         const node = context.get(DATA_CONTEXT_NAV_NODE)!;
         const name = getNodePlainName(node);
 
         switch (action) {
-          case ACTION_OPEN: {
-            this.navNodeManagerService.navToNode(node.id, node.parentId);
-            break;
-          }
-          case ACTION_REFRESH: {
-            try {
-              await this.navNodeManagerService.refreshTree(node.id);
-            } catch (exception: any) {
-              this.notificationService.logException(exception, 'app_navigationTree_refresh_error');
-            }
-            break;
-          }
           case ACTION_RENAME: {
             const actions = context.get(DATA_CONTEXT_NAV_NODE_ACTIONS);
 
@@ -162,7 +152,7 @@ export class NavNodeContextMenuService extends Bootstrap {
             if (actions?.rename) {
               actions.rename(save);
             } else {
-              const result = await this.commonDialogService.open(RenameDialog, {
+              const { status, result } = await this.commonDialogService.open(RenameDialog, {
                 name,
                 subTitle: name,
                 objectName: node.nodeType || 'Object',
@@ -170,7 +160,7 @@ export class NavNodeContextMenuService extends Bootstrap {
                 validation: name => name.trim().length > 0,
               });
 
-              if (result !== DialogueStateResult.Rejected && result !== DialogueStateResult.Resolved) {
+              if (status === DialogueStateResult.Resolved && result !== undefined) {
                 save(result);
               }
             }
@@ -191,17 +181,61 @@ export class NavNodeContextMenuService extends Bootstrap {
       },
     });
 
+    this.actionService.addHandler({
+      id: 'nav-node-base-handler',
+      contexts: [DATA_CONTEXT_NAV_NODE],
+      isActionApplicable: (context, action): boolean => {
+        const node = context.get(DATA_CONTEXT_NAV_NODE)!;
+
+        if (action === ACTION_OPEN) {
+          return this.navNodeManagerService.canOpen(node.id, node.parentId);
+        }
+
+        return [ACTION_REFRESH].includes(action);
+      },
+      handler: async (context, action) => {
+        const node = context.get(DATA_CONTEXT_NAV_NODE)!;
+
+        switch (action) {
+          case ACTION_OPEN: {
+            this.navNodeManagerService.navToNode(node.id, node.parentId);
+            break;
+          }
+          case ACTION_REFRESH: {
+            try {
+              if (isConnectionNode(node) && !node.objectFeatures.includes(EObjectFeature.dataSourceConnected)) {
+                await this.navNodeInfoResource.refresh(node.id);
+              } else {
+                await this.navNodeManagerService.refreshTree(node.id);
+              }
+            } catch (exception: any) {
+              this.notificationService.logException(exception, 'app_navigationTree_refresh_error');
+            }
+            break;
+          }
+        }
+      },
+    });
+
     this.menuService.setHandler({
       id: 'menu-navigation-tree-create',
       menus: [MENU_NAVIGATION_TREE_CREATE],
     });
 
+    this.menuService.setHandler({
+      id: 'menu-navigation-tree-manage',
+      menus: [MENU_NAVIGATION_TREE_MANAGE],
+    });
+
+    this.menuService.setHandler({
+      id: 'menu-navigation-tree-tools',
+      menus: [MENU_NAVIGATION_TREE_TOOLS],
+    });
+
     this.menuService.addCreator({
-      root: true,
+      menus: [MENU_NAVIGATION_TREE_MANAGE],
       contexts: [DATA_CONTEXT_NAV_NODE],
       getItems: (context, items) => {
-        items = [MENU_NAVIGATION_TREE_CREATE, ACTION_OPEN, ACTION_REFRESH, ...items];
-
         if (this.navTreeSettingsService.editing) {
           items.push(ACTION_RENAME);
         }
@@ -212,13 +246,24 @@ export class NavNodeContextMenuService extends Bootstrap {
 
         return items;
       },
+    });
+
+    this.menuService.addCreator({
+      root: true,
+      contexts: [DATA_CONTEXT_NAV_NODE],
+      getItems: (context, items) => [
+        ...items,
+        MENU_NAVIGATION_TREE_CREATE,
+        ACTION_OPEN,
+        ACTION_REFRESH,
+        MENU_NAVIGATION_TREE_MANAGE,
+        MENU_NAVIGATION_TREE_TOOLS,
+      ],
       orderItems: (context, items) => {
         const actionsOpen = menuExtractItems(items, [ACTION_OPEN]);
-        const actionsManage = menuExtractItems(items, [ACTION_RENAME, ACTION_DELETE]);
         const actionsRefresh = menuExtractItems(items, [ACTION_REFRESH]);
 
         items.unshift(...actionsOpen);
-        items.push(...actionsManage);
 
         if (actionsRefresh.length > 0) {
           if (items.length > 0) {

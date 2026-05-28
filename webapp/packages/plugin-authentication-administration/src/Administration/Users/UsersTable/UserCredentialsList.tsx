@@ -1,17 +1,17 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
 import { Fragment } from 'react';
-import { Menu, MenuButton, MenuItem, useMenuState } from 'reakit';
 
 import { AUTH_PROVIDER_LOCAL_ID } from '@cloudbeaver/core-authentication';
-import { BaseDropdownStyles, type PlaceholderComponent, s, StaticImage, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { type PlaceholderComponent, s, StaticImage, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import type { ObjectOrigin } from '@cloudbeaver/core-sdk';
+import { Popover } from '@dbeaver/ui-kit';
 
 import type { IUserDetailsInfoProps } from '../UsersAdministrationService.js';
 import style from './UserCredentialsList.module.css';
@@ -35,13 +35,7 @@ export const UserCredentials = observer<IUserCredentialsProps>(function UserCred
 });
 
 export const UserCredentialsList: PlaceholderComponent<IUserDetailsInfoProps> = observer(function UserCredentialsList({ user }) {
-  const styles = useS(style, BaseDropdownStyles);
-  const translate = useTranslate();
-  const menu = useMenuState({
-    placement: 'top',
-    gutter: 8,
-  });
-
+  const styles = useS(style);
   const visibleCredentials = user.origins.slice(0, MAX_VISIBLE_CREDENTIALS);
 
   return (
@@ -51,25 +45,21 @@ export const UserCredentialsList: PlaceholderComponent<IUserDetailsInfoProps> = 
       ))}
 
       {user.origins.length > MAX_VISIBLE_CREDENTIALS && (
-        <>
-          <MenuButton {...menu} className={s(styles, { menuButton: true })}>
+        <Popover placement="top">
+          <Popover.PopoverDisclosure>
             <div className={s(styles, { hasMoreIndicator: true })}>
               <span>+{user.origins.length - MAX_VISIBLE_CREDENTIALS}</span>
             </div>
-          </MenuButton>
-          <Menu className={s(styles, { menu: true })} {...menu} modal>
-            {user.origins.slice(MAX_VISIBLE_CREDENTIALS).map(origin => {
-              const isLocal = origin.type === AUTH_PROVIDER_LOCAL_ID;
-              const title = isLocal ? translate('authentication_administration_user_local') : origin.displayName;
+          </Popover.PopoverDisclosure>
 
-              return (
-                <MenuItem key={`${origin.type}${origin.subType ?? ''}`} className={s(styles, { menuItem: true })} title={title}>
-                  <UserCredentials origin={origin} />
-                </MenuItem>
-              );
-            })}
-          </Menu>
-        </>
+          <Popover.PopoverContent className="tw:flex tw:gap-2" gutter={4} modal hideOnInteractOutside>
+            {user.origins.slice(MAX_VISIBLE_CREDENTIALS).map(origin => (
+              <div key={`${origin.type}${origin.subType ?? ''}`} className="tw:p-1">
+                <UserCredentials origin={origin} />
+              </div>
+            ))}
+          </Popover.PopoverContent>
+        </Popover>
       )}
     </Fragment>
   );

@@ -32,6 +32,7 @@ export * from './NavTree/isConnectionNode.js';
 
 export * from './extensions/IConnectionProvider.js';
 export * from './extensions/IConnectionSetter.js';
+export * from './extensions/IConnectionRequiredProvider.js';
 export * from './ConnectionFolderEventHandler.js';
 export * from './ConnectionsManagerService.js';
 export * from './ConnectionFolderResource.js';
@@ -64,3 +65,4 @@ export * from './useDBDriver.js';
 export * from './USER_NAME_PROPERTY_ID.js';
 export * from './parseConnectionKey.js';
 export * from './DBDriverExpertSettingsResource.js';
+export * from './CONNECTION_CONFIG_SCHEMA.js';

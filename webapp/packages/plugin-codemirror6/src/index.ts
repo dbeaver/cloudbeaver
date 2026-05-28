@@ -1,20 +1,20 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 
 import './module.js';
-import { createComplexLoader } from '@cloudbeaver/core-blocks';
+import { createLazyLoader } from '@cloudbeaver/core-blocks';
 
 export * from './ReactCodemirrorPanel.js';
 export * from './EditorLoader.js';
 export * from './IEditorProps.js';
 export * from './IEditorRef.js';
 export * from './useEditorDefaultExtensions.js';
-export * from './useEditorAutocompletion.js';
+export * from './createEditorAutocompletion.js';
 export * from './useCodemirrorExtensions.js';
 
 export * from './Hyperlink/HyperlinkLoader.js';
@@ -24,18 +24,21 @@ export * from './Hyperlink/useHyperlink.js';
 export * from '@codemirror/view';
 export * from '@codemirror/state';
 export * from '@codemirror/autocomplete';
+export * from './highlightNewLine.js';
 
+export { history } from '@codemirror/commands';
 export { html as HTML_EDITOR } from '@codemirror/lang-html';
 export { javascript as JAVASCRIPT_EDITOR } from '@codemirror/lang-javascript';
-export { json as JSON_EDITOR } from '@codemirror/lang-json';
+export { json as JSON_EDITOR, jsonParseLinter } from '@codemirror/lang-json';
+export { linter, lintGutter } from '@codemirror/lint';
 export { sql as SQL_EDITOR, SQLDialect } from '@codemirror/lang-sql';
 export { xml as XML_EDITOR } from '@codemirror/lang-xml';
 
-export const StandardSQLLoader = createComplexLoader(async () => (await import('@codemirror/lang-sql')).StandardSQL);
-export const PostgreSQLLoader = createComplexLoader(async () => (await import('@codemirror/lang-sql')).PostgreSQL);
-export const MySQLLoader = createComplexLoader(async () => (await import('@codemirror/lang-sql')).MySQL);
-export const MariaSQLLoader = createComplexLoader(async () => (await import('@codemirror/lang-sql')).MariaSQL);
-export const MSSQLLoader = createComplexLoader(async () => (await import('@codemirror/lang-sql')).MSSQL);
-export const SQLiteLoader = createComplexLoader(async () => (await import('@codemirror/lang-sql')).SQLite);
-export const CassandraLoader = createComplexLoader(async () => (await import('@codemirror/lang-sql')).Cassandra);
-export const PLSQLLoader = createComplexLoader(async () => (await import('@codemirror/lang-sql')).PLSQL);
+export const StandardSQLLoader = createLazyLoader(async () => (await import('@codemirror/lang-sql')).StandardSQL);
+export const PostgreSQLLoader = createLazyLoader(async () => (await import('@codemirror/lang-sql')).PostgreSQL);
+export const MySQLLoader = createLazyLoader(async () => (await import('@codemirror/lang-sql')).MySQL);
+export const MariaSQLLoader = createLazyLoader(async () => (await import('@codemirror/lang-sql')).MariaSQL);
+export const MSSQLLoader = createLazyLoader(async () => (await import('@codemirror/lang-sql')).MSSQL);
+export const SQLiteLoader = createLazyLoader(async () => (await import('@codemirror/lang-sql')).SQLite);
+export const CassandraLoader = createLazyLoader(async () => (await import('@codemirror/lang-sql')).Cassandra);
+export const PLSQLLoader = createLazyLoader(async () => (await import('@codemirror/lang-sql')).PLSQL);

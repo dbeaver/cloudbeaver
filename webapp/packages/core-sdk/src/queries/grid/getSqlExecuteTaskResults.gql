@@ -4,6 +4,7 @@ mutation getSqlExecuteTaskResults($taskId: ID!) {
     statusMessage
     filterText
     fullQuery
+    originalQuery
     results {
       title
       updateRowCount
@@ -42,6 +43,14 @@ mutation getSqlExecuteTaskResults($taskId: ID!) {
         singleEntity
         hasMoreData
         hasRowIdentifier
+        rowIdentifierState
+        rowIdentifier {
+          attributes {
+            name
+            ordinalPosition
+          }
+          constraintType
+        }
         isSupportsDataFilter
         hasChildrenCollection
         hasDynamicTrace

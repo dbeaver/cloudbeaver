@@ -1,6 +1,7 @@
 export default [
   ['plugin_connections_new_connection_dialog_title', 'New connection'],
   ['plugin_connections_connection_form_part_main', 'Main'],
+  ['plugin_connections_connection_form_part_main_auth_model', 'Authentication model'],
   ['plugin_connections_connection_form_part_properties', 'Driver Properties'],
   ['plugin_connections_connection_form_part_main_custom_host', 'Host'],
   ['plugin_connections_connection_form_part_main_custom_port', 'Port'],
@@ -10,6 +11,8 @@ export default [
   ['plugin_connections_connection_form_part_main_folder', 'Folder'],
 
   ['plugin_connections_connection_edit_menu_item_title', 'Edit Connection'],
+  ['plugin_connections_connection_clone', 'Clone'],
+  ['plugin_connections_connection_clone_error', 'Failed to clone connection'],
   ['plugin_connections_connection_edit_cancel_title', 'Cancel confirmation'],
   ['plugin_connections_connection_edit_cancel_message', "You're going to cancel connection changes. Unsaved changes will be lost. Are you sure?"],
   ['plugin_connections_connection_edit_reconnect_title', 'Connection updated'],
@@ -31,8 +34,14 @@ export default [
 
   ['plugin_connections_connection_ssl_enable', 'Enable SSL'],
   ['plugin_connections_connection_ssl_optional', 'All SSL parameters are optional.'],
-  ['plugin_connections_connection_ssl_description', 'You must specify SSL certificates if they are required by your server configuration. Settings on this page override Driver properties.'],
-  ['plugin_connections_connection_ssl_note', '{arg:productName} does not verify SSL configuration and relies on the driver implementation. Please refer to the driver documentation for more information.'],
+  [
+    'plugin_connections_connection_ssl_description',
+    'You must specify SSL certificates if they are required by your server configuration. Settings on this page override Driver properties.',
+  ],
+  [
+    'plugin_connections_connection_ssl_note',
+    '{arg:productName} does not verify SSL configuration and relies on the driver implementation. Please refer to the driver documentation for more information.',
+  ],
   ['plugin_connections_connection_ssl_docs', 'SSL configuration documentation'],
 
   ['plugin_connections_connection_form_shared_credentials_manage_info', 'You can manage credentials in the '],

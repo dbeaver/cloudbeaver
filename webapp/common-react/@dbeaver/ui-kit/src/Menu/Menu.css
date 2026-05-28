@@ -2,7 +2,6 @@
 
 @layer base {
   .dbv-kit-menu__popover {
-    z-index: 1000;
     min-width: max-content;
     max-height: var(--dbv-kit-menu-popover-max-height);
     max-width: var(--dbv-kit-menu-popover-max-width);
@@ -16,6 +15,9 @@
     border-style: var(--dbv-kit-menu-border-style);
     box-shadow: var(--dbv-kit-menu-popover-shadow);
     outline: 0;
+    padding-block: var(--dbv-kit-menu-popover-padding-block);
+    padding-inline: var(--dbv-kit-menu-popover-padding-inline);
+    z-index: 1000;
 
     @media (prefers-reduced-motion: no-preference) {
       opacity: 0;
@@ -24,12 +26,10 @@
       transition-timing-function: var(--tw-ease-in-out);
       transition-duration: 150ms;
       scale: 0.95;
-      translate: 0 -0.5rem;
 
       &[data-enter] {
         opacity: 1;
         scale: 1;
-        translate: 0;
       }
     }
   }
@@ -44,6 +44,7 @@
     cursor: pointer;
     font-weight: var(--dbv-kit-menu-font-weight);
     font-size: var(--dbv-kit-menu-font-size);
+    border-radius: var(--dbv-kit-menu-item-border-radius);
 
     &:hover:not([aria-disabled='true']) {
       background-color: var(--dbv-kit-menu-item-hover-background);

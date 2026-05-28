@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -9,11 +9,11 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { ACTION_IMPORT, ActionService, menuExtractItems, MenuService } from '@cloudbeaver/core-view';
 import {
-  ContainerDataSource,
   DATA_CONTEXT_DV_DDM,
   DATA_CONTEXT_DV_DDM_RESULT_INDEX,
   DATA_CONTEXT_DV_PRESENTATION,
   DATA_VIEWER_DATA_MODEL_ACTIONS_MENU,
+  DatabaseDataFeature,
   DataViewerPresentationType,
   isResultSetDataModel,
 } from '@cloudbeaver/plugin-data-viewer';
@@ -72,23 +72,21 @@ export class DataImportBootstrap extends Bootstrap {
             throw new Error('Execution context must be provided');
           }
 
-          const state = await this.commonDialogService.open(DataImportDialogLazy, { tableName: model.name ?? model.id });
+          const { status, result: dialogResult } = await this.commonDialogService.open(DataImportDialogLazy, { tableName: model.name ?? model.id });
 
-          if (state === DialogueStateResult.Rejected || state === DialogueStateResult.Resolved) {
-            return;
-          }
+          if (status === DialogueStateResult.Resolved && dialogResult) {
+            const success = await this.dataImportService.importData(
+              executionContext.connectionId,
+              executionContext.id,
+              executionContext.projectId,
+              result.id,
+              dialogResult.processorId,
+              dialogResult.file,
+            );
 
-          const success = await this.dataImportService.importData(
-            executionContext.connectionId,
-            executionContext.id,
-            executionContext.projectId,
-            result.id,
-            state.processorId,
-            state.file,
-          );
-
-          if (success) {
-            await model.refresh();
+            if (success) {
+              await model.refresh();
+            }
           }
         }
       },
@@ -99,12 +97,13 @@ export class DataImportBootstrap extends Bootstrap {
       contexts: [DATA_CONTEXT_DV_DDM, DATA_CONTEXT_DV_DDM_RESULT_INDEX],
       isApplicable: context => {
         const model = context.get(DATA_CONTEXT_DV_DDM)!;
-        const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
         const presentation = context.get(DATA_CONTEXT_DV_PRESENTATION);
-        const isContainer = model.source instanceof ContainerDataSource;
+        const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
+        const allowedFeatures = [DatabaseDataFeature.DataEditor];
+
         return (
+          allowedFeatures.some(feature => model.source.hasFeature(feature)) &&
           !model.isReadonly(resultIndex) &&
-          isContainer &&
           !this.dataImportService.disabled &&
           !presentation?.readonly &&
           (!presentation || presentation.type === DataViewerPresentationType.Data)

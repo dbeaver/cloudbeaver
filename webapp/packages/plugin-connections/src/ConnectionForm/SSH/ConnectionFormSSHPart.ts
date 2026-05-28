@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -47,6 +47,22 @@ export class ConnectionFormSSHPart extends FormPart<INetworkHandlerConfig, IConn
     private readonly optionsPart: ConnectionFormOptionsPart,
   ) {
     super(formState, getDefaultState());
+  }
+
+  getConfig(): NetworkHandlerConfigInput {
+    const passwordChanged = isPasswordChanged(this.state, this.initialState);
+    const keyChanged = isKeyChanged(this.state, this.initialState);
+
+    const handlerConfig: NetworkHandlerConfigInput = {
+      ...this.state,
+      savePassword: this.state.savePassword || this.optionsPart.state.sharedCredentials,
+      key: this.state.authType === NetworkHandlerAuthType.PublicKey && keyChanged ? this.state.key : undefined,
+      password: passwordChanged ? this.state.password : undefined,
+    };
+
+    delete handlerConfig.secureProperties;
+
+    return handlerConfig;
   }
 
   override isOutdated(): boolean {
@@ -108,17 +124,7 @@ export class ConnectionFormSSHPart extends FormPart<INetworkHandlerConfig, IConn
       return;
     }
 
-    const passwordChanged = isPasswordChanged(this.state, this.initialState);
-    const keyChanged = isKeyChanged(this.state, this.initialState);
-
-    let handlerConfig: NetworkHandlerConfigInput = {
-      ...this.state,
-      savePassword: this.state.savePassword || this.optionsPart.state.sharedCredentials,
-      key: this.state.authType === NetworkHandlerAuthType.PublicKey && keyChanged ? this.state.key : undefined,
-      password: passwordChanged ? this.state.password : undefined,
-    };
-
-    delete handlerConfig.secureProperties;
+    const config = getTrimmedSSHConfig(this.getConfig());
 
     if (this.state.enabled && !this.state.savePassword) {
       this.formState.state.requiredNetworkHandlersIds.push(this.state.id);
@@ -126,10 +132,7 @@ export class ConnectionFormSSHPart extends FormPart<INetworkHandlerConfig, IConn
       this.formState.state.requiredNetworkHandlersIds = this.formState.state.requiredNetworkHandlersIds.filter(id => id !== this.state.id);
     }
 
-    if (handlerConfig) {
-      handlerConfig = getTrimmedSSHConfig(handlerConfig);
-      this.optionsPart.state.networkHandlersConfig!.push(handlerConfig);
-    }
+    this.optionsPart.state.networkHandlersConfig!.push(config);
   }
 
   protected override validate(

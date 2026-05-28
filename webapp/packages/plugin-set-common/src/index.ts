@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,10 @@ import coreTheming from '@cloudbeaver/core-theming/module';
 import coreUi from '@cloudbeaver/core-ui/module';
 import coreVersion from '@cloudbeaver/core-version/module';
 import coreVersionUpdate from '@cloudbeaver/core-version-update/module';
+import coreSupport from '@cloudbeaver/core-support/module';
 import coreView from '@cloudbeaver/core-view/module';
+import coreServerNotifications from '@cloudbeaver/core-server-notifications/module';
+import coreSessionActions from '@cloudbeaver/core-session-actions/module';
 
 import pluginAdministration from '@cloudbeaver/plugin-administration/module';
 import pluginAppLogo from '@cloudbeaver/plugin-app-logo/module';
@@ -58,6 +61,7 @@ import pluginDataViewerResultSetGrouping from '@cloudbeaver/plugin-data-viewer-r
 import pluginDataViewerResultTraceDetails from '@cloudbeaver/plugin-data-viewer-result-trace-details/module';
 import pluginDatasourceContextSwitch from '@cloudbeaver/plugin-datasource-context-switch/module';
 import pluginDatasourceTransactionManager from '@cloudbeaver/plugin-datasource-transaction-manager/module';
+import pluginDataViewerRequestQueryViewer from '@cloudbeaver/plugin-data-viewer-request-query-viewer/module';
 import pluginDdlViewer from '@cloudbeaver/plugin-ddl-viewer/module';
 import pluginDevTools from '@cloudbeaver/plugin-devtools/module';
 import pluginGisViewer from '@cloudbeaver/plugin-gis-viewer/module';
@@ -102,7 +106,12 @@ import pluginVersionUpdateAdministration from '@cloudbeaver/plugin-version-updat
 import pluginSystemInformationAdministration from '@cloudbeaver/plugin-system-information-administration/module';
 import pluginSettingsDefaultAdministration from '@cloudbeaver/plugin-settings-default-administration/module';
 import pluginCodemirror6 from '@cloudbeaver/plugin-codemirror6/module';
-import coreServerNotifications from '@cloudbeaver/core-server-notifications/module';
+import pluginAsyncTaskConfirmation from '@cloudbeaver/plugin-async-task-confirmation/module';
+import pluginSqlAsyncTaskConfirmation from '@cloudbeaver/plugin-sql-async-task-confirmation/module';
+import pluginDataViewerConditionalFormatting from '@cloudbeaver/plugin-data-viewer-conditional-formatting/module';
+import pluginConnectionView from '@cloudbeaver/plugin-connection-view/module';
+import pluginConnectionPreferences from '@cloudbeaver/plugin-connection-preferences/module';
+import pluginScriptExport from '@cloudbeaver/plugin-script-export/module';
 
 const core = [
   coreRouting, // important, should be first because the router starts in load phase first after all plugins register phase
@@ -127,6 +136,7 @@ const core = [
   coreView,
   coreVersion,
   coreVersionUpdate,
+  coreSupport,
   coreConnections,
   coreAdministration,
   coreDialogs,
@@ -137,6 +147,7 @@ const core = [
   coreSettingsUser,
   coreTaskManager,
   coreServerNotifications,
+  coreSessionActions,
 ];
 
 export const commonSet = [
@@ -157,9 +168,11 @@ export const commonSet = [
   pluginDataViewer,
   pluginDataViewerResultTraceDetails,
   pluginDataViewerResultSetGrouping,
+  pluginDataViewerRequestQueryViewer,
   pluginGisViewer,
   pluginDdlViewer,
   pluginObjectViewer,
+  pluginScriptExport,
   pluginSqlEditor,
   pluginSqlEditorNavigationTab,
   pluginSqlEditorScreen,
@@ -205,4 +218,9 @@ export const commonSet = [
   pluginSystemInformationAdministration,
   pluginSettingsDefaultAdministration,
   pluginCodemirror6,
+  pluginAsyncTaskConfirmation,
+  pluginSqlAsyncTaskConfirmation,
+  pluginDataViewerConditionalFormatting,
+  pluginConnectionView,
+  pluginConnectionPreferences,
 ];

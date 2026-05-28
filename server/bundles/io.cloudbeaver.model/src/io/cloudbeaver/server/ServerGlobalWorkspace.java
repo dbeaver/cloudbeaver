@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,11 +20,14 @@ import io.cloudbeaver.WebProjectImpl;
 import io.cloudbeaver.model.app.ServletApplication;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
+import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.app.DBPPlatform;
 import org.jkiss.dbeaver.model.app.DBPProject;
+import org.jkiss.dbeaver.model.auth.SMSession;
 import org.jkiss.dbeaver.model.impl.app.BaseProjectImpl;
 import org.jkiss.dbeaver.model.impl.app.BaseWorkspaceImpl;
+import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.utils.CommonUtils;
 
 import java.io.IOException;
@@ -55,8 +58,14 @@ public class ServerGlobalWorkspace extends BaseWorkspaceImpl {
         this.application = application;
     }
 
+    @NotNull
     @Override
-    public void initializeProjects() {
+    protected SMSession acquireWorkspaceSession(@NotNull DBRProgressMonitor monitor) throws DBException {
+        return new ServerGlobalWorkspaceSession(this);
+    }
+
+    @Override
+    public void initializeProjects() throws DBException {
         initializeWorkspaceSession();
 
         // Load global project
@@ -105,5 +114,10 @@ public class ServerGlobalWorkspace extends BaseWorkspaceImpl {
             return globalProject;
         }
         return null;
+    }
+
+    @Override
+    public boolean supportsRealmFeature(@NotNull String feature) {
+        return application.getAppConfiguration().isFeatureEnabled(feature);
     }
 }

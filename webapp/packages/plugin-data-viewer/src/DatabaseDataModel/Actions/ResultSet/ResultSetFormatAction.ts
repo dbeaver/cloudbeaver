@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -9,16 +9,20 @@ import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 import { isResultSetContentValue, isResultSetComplexValue, type IResultSetComplexValue } from '@dbeaver/result-set-api';
 
 import { DatabaseDataAction } from '../../DatabaseDataAction.js';
-import type { IDatabaseDataSource } from '../../IDatabaseDataSource.js';
+import { IDatabaseDataSource } from '../../IDatabaseDataSource.js';
 import type { IDatabaseResultSet } from '../../IDatabaseResultSet.js';
-import { databaseDataAction } from '../DatabaseDataActionDecorator.js';
-import { DatabaseEditChangeType } from '../IDatabaseDataEditAction.js';
+import { DatabaseEditChangeType, IDatabaseDataEditAction } from '../IDatabaseDataEditAction.js';
 import type { IDatabaseDataFormatAction } from '../IDatabaseDataFormatAction.js';
-import type { IResultSetColumnKey, IResultSetElementKey, IResultSetPartialKey } from './IResultSetDataKey.js';
 import { isResultSetFileValue } from './isResultSetFileValue.js';
 import { isResultSetGeometryValue } from './isResultSetGeometryValue.js';
 import { ResultSetEditAction } from './ResultSetEditAction.js';
 import { ResultSetViewAction } from './ResultSetViewAction.js';
+import { injectable } from '@cloudbeaver/core-di';
+import { IDatabaseDataResult } from '../../IDatabaseDataResult.js';
+import { IDatabaseDataViewAction } from '../IDatabaseDataViewAction.js';
+import type { IGridColumnKey, IGridDataKey } from '../Grid/IGridDataKey.js';
+import { isNumber } from '@cloudbeaver/core-utils';
+import type { IDatabaseValueHolder } from '../IDatabaseValueHolder.js';
 
 export type IResultSetValue =
   | string
@@ -30,23 +34,25 @@ export type IResultSetValue =
 
 const DISPLAY_STRING_LENGTH = 200;
 
-@databaseDataAction()
+@injectable(() => [IDatabaseDataSource, IDatabaseDataResult, IDatabaseDataViewAction, IDatabaseDataEditAction])
 export class ResultSetFormatAction
   extends DatabaseDataAction<any, IDatabaseResultSet>
-  implements IDatabaseDataFormatAction<IResultSetElementKey, IDatabaseResultSet>
+  implements IDatabaseDataFormatAction<IGridDataKey, IResultSetValue, IDatabaseResultSet>
 {
   static dataFormat = [ResultDataFormat.Resultset];
-
   private readonly view: ResultSetViewAction;
-  private readonly edit: ResultSetEditAction;
+  private readonly edit?: ResultSetEditAction;
 
-  constructor(source: IDatabaseDataSource<any, IDatabaseResultSet>, view: ResultSetViewAction, edit: ResultSetEditAction) {
-    super(source);
-    this.view = view;
-    this.edit = edit;
+  constructor(source: IDatabaseDataSource, result: IDatabaseDataResult, view: IDatabaseDataViewAction, edit?: IDatabaseDataEditAction) {
+    super(source as unknown as IDatabaseDataSource<unknown, IDatabaseResultSet>, result as IDatabaseResultSet);
+    this.view = view as any as ResultSetViewAction;
+    this.edit = edit as ResultSetEditAction | undefined;
   }
 
-  isReadOnly(key: IResultSetPartialKey): boolean {
+  isReadOnly(key: Partial<IGridDataKey>): boolean {
+    if (!this.edit) {
+      return true;
+    }
     let readonly = false;
 
     if (key.column) {
@@ -55,73 +61,91 @@ export class ResultSetFormatAction
 
     if (key.column && key.row) {
       if (!readonly) {
-        readonly = this.edit.getElementState(key as IResultSetElementKey) === DatabaseEditChangeType.delete;
+        readonly = this.edit.getElementState(key as IGridDataKey) === DatabaseEditChangeType.delete;
       }
     }
 
     return readonly;
   }
-  isNull(key: IResultSetElementKey): boolean {
-    return this.get(key) === null;
+
+  isNull({ value }: IDatabaseValueHolder<IGridDataKey, IResultSetValue>): boolean {
+    return value === null;
   }
 
-  isBinary(key: IResultSetPartialKey): boolean {
-    if (!key.column) {
+  isBinary(holder: IDatabaseValueHolder<Partial<IGridDataKey>, IResultSetValue>): boolean {
+    if (!holder.key.column) {
       return false;
     }
 
-    const column = this.view.getColumn(key.column);
+    const column = this.view.getColumn(holder.key.column);
     if (column?.dataKind?.toLocaleLowerCase() === 'binary') {
       return true;
     }
 
-    if (key.row) {
-      const value = this.get(key as IResultSetElementKey);
-
-      if (isResultSetFileValue(value)) {
+    if (holder.key.row) {
+      if (isResultSetFileValue(holder.value)) {
         return true;
       }
 
-      if (isResultSetContentValue(value)) {
-        return value.binary !== undefined;
+      if (isResultSetContentValue(holder.value)) {
+        return holder.value.binary !== undefined;
       }
     }
 
     return false;
   }
 
-  isGeometry(key: IResultSetPartialKey) {
-    if (key.column) {
-      const column = this.view.getColumn(key.column);
+  isGeometry(holder: IDatabaseValueHolder<Partial<IGridDataKey>, any>): boolean {
+    if (holder.key.column) {
+      const column = this.view.getColumn(holder.key.column);
       if (column?.dataKind?.toLocaleLowerCase() === 'geometry') {
         return true;
       }
     }
 
-    if (key.row) {
-      const value = this.get(key as IResultSetElementKey);
-      return isResultSetComplexValue(value) && value.$type === 'geometry';
+    if (holder.key.row) {
+      return isResultSetComplexValue(holder.value) && holder.value.$type === 'geometry';
     }
 
     return false;
   }
 
-  isText(key: IResultSetPartialKey): boolean {
-    if (!key?.column) {
+  isNumber(holder: IDatabaseValueHolder<Partial<IGridDataKey>, any>): boolean {
+    if (!holder.key?.column) {
       return false;
     }
 
-    const column = this.view.getColumn(key.column);
+    const column = this.view.getColumn(holder.key.column);
+
+    if (column?.dataKind?.toLocaleLowerCase() === 'numeric') {
+      return true;
+    }
+
+    if (holder.key.row && !this.isBinary(holder)) {
+      if (isResultSetContentValue(holder.value)) {
+        return holder.value.text !== undefined && isNumber(holder.value.text);
+      }
+
+      return isNumber(holder.value);
+    }
+
+    return false;
+  }
+
+  isText(holder: IDatabaseValueHolder<Partial<IGridDataKey>, any>): boolean {
+    if (!holder.key?.column) {
+      return false;
+    }
+
+    const column = this.view.getColumn(holder.key.column);
 
     if (column?.dataKind?.toLocaleLowerCase() === 'string') {
       return true;
     }
 
-    if (key.row && !this.isBinary(key)) {
-      const value = this.get(key as IResultSetElementKey);
-
-      if (isResultSetContentValue(value)) {
-        return value.text !== undefined;
+    if (holder.key.row && !this.isBinary(holder)) {
+      if (isResultSetContentValue(holder.value)) {
+        return holder.value.text !== undefined;
       }
     }
 
@@ -132,7 +156,7 @@ export class ResultSetFormatAction
     return this.view.columns.map(column => column.name!).filter(name => name !== undefined);
   }
 
-  getLongestCells(column?: IResultSetColumnKey, offset = 0, count?: number): string[] {
+  getLongestCells(column?: IGridColumnKey, offset = 0, count?: number): string[] {
     const cells: string[] = [];
     const columns = column ? [column] : this.view.columnKeys;
     count ??= this.view.rowKeys.length;
@@ -140,7 +164,8 @@ export class ResultSetFormatAction
     for (let rowIndex = offset; rowIndex < offset + count; rowIndex++) {
       for (let columnIndex = 0; columnIndex < columns.length; columnIndex++) {
         const key = { row: this.view.rowKeys[rowIndex]!, column: columns[columnIndex]! };
-        const displayString = this.getDisplayString(key);
+        const holder = this.get(key);
+        const displayString = this.getDisplayString(holder);
         const current = cells[columnIndex] ?? '';
 
         if (displayString.length > current.length) {
@@ -152,109 +177,164 @@ export class ResultSetFormatAction
     return cells;
   }
 
-  get(key: IResultSetElementKey): IResultSetValue {
-    return this.view.getCellValue(key);
+  get(key: IGridDataKey): IDatabaseValueHolder<IGridDataKey, IResultSetValue> {
+    return this.view.getCellHolder(key);
   }
 
-  getText(key: IResultSetElementKey): string {
-    const value = this.get(key);
-
-    if (value === null) {
+  getText(holder: IDatabaseValueHolder<IGridDataKey, IResultSetValue>): string {
+    if (holder.value === null) {
       return '';
     }
 
-    if (isResultSetContentValue(value)) {
-      if (value.text !== undefined) {
-        return value.text;
+    if (isResultSetContentValue(holder.value)) {
+      if (holder.value.text !== undefined) {
+        return holder.value.text;
       }
 
       return '';
     }
 
-    if (isResultSetGeometryValue(value)) {
-      if (value.text !== undefined) {
-        return value.text;
+    if (isResultSetGeometryValue(holder.value)) {
+      if (holder.value.text !== undefined) {
+        return holder.value.text;
       }
 
       return '';
     }
 
-    if (isResultSetComplexValue(value)) {
-      if (value.value !== undefined) {
-        if (typeof value.value === 'object' && value.value !== null) {
-          return JSON.stringify(value.value);
+    if (isResultSetComplexValue(holder.value)) {
+      if (holder.value.value !== undefined) {
+        if (typeof holder.value.value === 'object' && holder.value.value !== null) {
+          return JSON.stringify(holder.value.value);
         }
-        return String(value.value);
+        return String(holder.value.value);
       }
       return '';
     }
 
-    if (this.isBinary(key)) {
+    if (this.isBinary(holder)) {
       return '';
     }
 
-    if (value !== null && typeof value === 'object') {
-      return JSON.stringify(value);
+    if (holder.value !== null && typeof holder.value === 'object') {
+      return JSON.stringify(holder.value);
     }
 
-    if (typeof value === 'number' || typeof value === 'boolean') {
-      return String(value);
+    if (typeof holder.value === 'number' || typeof holder.value === 'boolean') {
+      return String(holder.value);
     }
 
-    return value;
+    return holder.value;
   }
 
-  getDisplayString(key: IResultSetElementKey): string {
-    const value = this.get(key);
+  getNumber(holder: IDatabaseValueHolder<IGridDataKey, IResultSetValue>): number {
+    if (holder.value === null) {
+      return NaN;
+    }
 
-    if (value === null) {
+    if (isResultSetContentValue(holder.value)) {
+      if (holder.value.text !== undefined) {
+        return parseFloat(holder.value.text);
+      }
+
+      return NaN;
+    }
+
+    if (isResultSetGeometryValue(holder.value)) {
+      if (holder.value.text !== undefined) {
+        return parseFloat(holder.value.text);
+      }
+
+      return NaN;
+    }
+
+    if (isResultSetComplexValue(holder.value)) {
+      if (holder.value.value !== undefined) {
+        if (typeof holder.value.value === 'object' && holder.value.value !== null) {
+          return NaN;
+        }
+        return parseFloat(holder.value.value);
+      }
+      return NaN;
+    }
+
+    if (this.isBinary(holder)) {
+      return NaN;
+    }
+
+    if (holder.value !== null && typeof holder.value === 'object') {
+      return NaN;
+    }
+
+    if (typeof holder.value === 'number') {
+      return holder.value;
+    }
+
+    if (typeof holder.value === 'boolean') {
+      return NaN;
+    }
+
+    return parseFloat(holder.value);
+  }
+
+  getDisplayString(holder: IDatabaseValueHolder<IGridDataKey, IResultSetValue>): string {
+    if (holder.value === null) {
       return '[null]';
     }
 
-    if (isResultSetGeometryValue(value)) {
-      if (value.text !== undefined) {
-        return this.truncateText(String(value.text), DISPLAY_STRING_LENGTH);
+    if (isResultSetGeometryValue(holder.value)) {
+      if (holder.value.text !== undefined) {
+        return this.truncateText(String(holder.value.text), DISPLAY_STRING_LENGTH);
       }
 
       return '[null]';
     }
 
-    if (this.isBinary(key)) {
-      if (isResultSetContentValue(value) && value.text === 'null') {
+    if (this.isBinary(holder)) {
+      if (isResultSetContentValue(holder.value) && holder.value.text === 'null') {
         return '[null]';
       }
 
       return '[blob]';
     }
 
-    if (isResultSetContentValue(value)) {
-      if (value.text !== undefined) {
-        return this.truncateText(String(value.text), DISPLAY_STRING_LENGTH);
+    if (isResultSetContentValue(holder.value)) {
+      if (holder.value.text !== undefined) {
+        return this.truncateText(String(holder.value.text), DISPLAY_STRING_LENGTH);
       }
 
       return '[null]';
     }
 
-    if (isResultSetComplexValue(value)) {
-      if (value.value !== undefined) {
-        if (typeof value.value === 'object' && value.value !== null) {
-          return JSON.stringify(value.value);
+    if (isResultSetComplexValue(holder.value)) {
+      if (holder.value.value !== undefined) {
+        if (typeof holder.value.value === 'object' && holder.value.value !== null) {
+          return JSON.stringify(holder.value.value);
         }
 
-        return String(value.value);
+        return String(holder.value.value);
       }
 
       return '[null]';
     }
 
-    return this.truncateText(String(value), DISPLAY_STRING_LENGTH);
+    return this.truncateText(String(holder.value), DISPLAY_STRING_LENGTH);
   }
 
   truncateText(text: string, length: number): string {
-    return text
-      .slice(0, length)
-      .split('')
-      .map(v => (v.charCodeAt(0) < 32 ? ' ' : v))
-      .join('');
+    // \p{Cc} Unicode "Other, Control" category. \r\n together for Windows newlines
+    return text.slice(0, length).replace(/\r\n|\p{Cc}/gu, ch => {
+      switch (ch) {
+        case '\r\n':
+        case '\n':
+          return '↵';
+        case '\r':
+          return '␍';
+        case '\t':
+          return '→';
+        default:
+          return ' ';
+      }
+    });
   }
 }

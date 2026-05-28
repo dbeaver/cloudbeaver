@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebProjectImpl;
 import io.cloudbeaver.model.app.BaseWebAppConfiguration;
 import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.server.CBConstants;
 import io.cloudbeaver.service.security.SMUtils;
 import io.cloudbeaver.service.sql.WebDataFormat;
 import io.cloudbeaver.utils.CBModelConstants;
@@ -39,11 +40,13 @@ import org.jkiss.dbeaver.model.impl.auth.AuthModelDatabaseNative;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.model.navigator.DBNDataSource;
+import org.jkiss.dbeaver.model.preferences.DBPPreferenceStore;
 import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
 import org.jkiss.dbeaver.model.preferences.DBPPropertySource;
 import org.jkiss.dbeaver.model.rm.RMConstants;
 import org.jkiss.dbeaver.model.rm.RMProjectPermission;
 import org.jkiss.dbeaver.model.runtime.DBRRunnableParametrized;
+import org.jkiss.dbeaver.registry.DataSourcePreferenceStore;
 import org.jkiss.dbeaver.registry.network.NetworkHandlerDescriptor;
 import org.jkiss.dbeaver.registry.network.NetworkHandlerRegistry;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
@@ -59,7 +62,6 @@ import java.util.stream.Collectors;
 public class WebConnectionInfo {
 
     private static final Log log = Log.getLog(WebConnectionInfo.class);
-    public static final String SECURED_VALUE = "********";
 
     private static final String FEATURE_HAS_TOOLS = "hasTools";
     private static final String FEATURE_CONNECTED = "connected";
@@ -127,7 +129,7 @@ public class WebConnectionInfo {
         if (canViewReadOnlyConnections()) {
             return dataSourceContainer.getConnectionConfiguration().getHostName();
         }
-        return SECURED_VALUE;
+        return CBConstants.SECURED_VALUE;
     }
 
     @Property
@@ -135,7 +137,7 @@ public class WebConnectionInfo {
         if (canViewReadOnlyConnections()) {
             return dataSourceContainer.getConnectionConfiguration().getHostPort();
         }
-        return SECURED_VALUE;
+        return CBConstants.SECURED_VALUE;
     }
 
     @Property
@@ -148,7 +150,7 @@ public class WebConnectionInfo {
         if (canViewReadOnlyConnections()) {
             return dataSourceContainer.getConnectionConfiguration().getDatabaseName();
         }
-        return SECURED_VALUE;
+        return CBConstants.SECURED_VALUE;
     }
 
     @Property
@@ -156,7 +158,7 @@ public class WebConnectionInfo {
         if (canViewReadOnlyConnections()) {
             return dataSourceContainer.getConnectionConfiguration().getUrl();
         }
-        return SECURED_VALUE;
+        return CBConstants.SECURED_VALUE;
     }
 
     @Property
@@ -289,6 +291,22 @@ public class WebConnectionInfo {
 
     @Property
     @NotNull
+    public DBNBrowseSettings getDefaultNavigatorSettings() {
+        return dataSourceContainer.getNavigatorSettings().getOriginalSettings();
+    }
+
+    @Property
+    @NotNull
+    public Map<String, String> getDefaultUserPreferences() {
+        DBPPreferenceStore preferenceStore = dataSourceContainer.getPreferenceStore();
+        if (preferenceStore instanceof DataSourcePreferenceStore dataSourcePreferenceStore) {
+            return dataSourcePreferenceStore.getProperties();
+        }
+        return Collections.emptyMap();
+    }
+
+    @Property
+    @NotNull
     public List<WebDataFormat> getSupportedDataFormats() {
         List<WebDataFormat> formats = new ArrayList<>();
         formats.add(WebDataFormat.resultset);
@@ -341,6 +359,16 @@ public class WebConnectionInfo {
         if (CommonUtils.isEmpty(authModelId)) {
             authModelId = AuthModelDatabaseNative.ID;
         }
+
+        // Patch auth model
+        DBPAuthModelDescriptor authModel = DBWorkbench.getPlatform().getDataSourceProviderRegistry().getAuthModel(authModelId);
+        if (authModel != null) {
+            DBPAuthModelDescriptor amReplace = authModel.getReplacedBy(dataSourceContainer.getDriver());
+            if (amReplace != null && amReplace != authModel) {
+                return amReplace.getId();
+            }
+        }
+
         return authModelId;
     }
 
@@ -562,4 +590,5 @@ public class WebConnectionInfo {
     public void setCredentialsSavedInSession(@Nullable Boolean credentialsSavedInSession) {
         this.credentialsSavedInSession = credentialsSavedInSession;
     }
+
 }

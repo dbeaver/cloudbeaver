@@ -1,7 +1,6 @@
 export default [
   ['core_connections_connections_settings_group', 'Подключения'],
   ['core_connections_search_database_tip', "Укажите ваши хосты, например 'localhost host1.myhost.com 192.168.0.1' и нажмите Enter"],
-  ['core_connections_new_connection', 'Создание подключения'],
   ['core_connections_connection_create_error', 'Ошибка при создании подключения'],
   ['core_connections_connection_save_error', 'Ошибка при сохранении подключения'],
   ['core_connections_connection_access_empty', 'Нет доступных пользователей и подключений'],
@@ -87,4 +86,5 @@ export default [
   ['core_connections_settings_disable_description', 'Отключить возможность создания новых подключений'],
   ['core_connections_connection_driver_not_installed', 'Драйвер не установлен'],
   ['core_connections_connection_temporary', 'Временное подключение'],
+  ['core_connections_no_connection', 'Отсутствует подключение'],
 ];

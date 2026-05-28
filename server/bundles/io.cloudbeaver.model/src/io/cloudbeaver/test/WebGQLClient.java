@@ -18,18 +18,20 @@ package io.cloudbeaver.test;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import io.cloudbeaver.server.CBConstants;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.utils.GeneralUtils;
+import org.jkiss.utils.HttpConstants;
 
+import java.net.CookieManager;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -56,10 +58,13 @@ public class WebGQLClient {
     @NotNull
     private final HttpClient httpClient;
     @NotNull
+    private final CookieManager cookieManager;
+    @NotNull
     private final String apiUrl;
 
-    public WebGQLClient(@NotNull HttpClient httpClient, @NotNull String apiUrl) {
+    public WebGQLClient(@NotNull HttpClient httpClient, @NotNull CookieManager cookieManager, @NotNull String apiUrl) {
         this.httpClient = httpClient;
+        this.cookieManager = cookieManager;
         this.apiUrl = apiUrl;
     }
 
@@ -70,9 +75,18 @@ public class WebGQLClient {
      * @param variables GraphQL query variables
      * @return GraphQL response
      */
-    @NotNull
+    @Nullable
     public <T> T sendQuery(@NotNull String query, @Nullable Map<String, Object> variables) throws Exception {
-        return sendQueryWithHeaders(query, variables, List.of());
+        return sendQueryWithHeaders(query, variables, Map.of());
+    }
+
+    @NotNull
+    public Map<String, Object> sendQueryAndGetHeaders(
+        @NotNull String query,
+        @Nullable Map<String, Object> variables,
+        @NotNull Map<String, String> requestHeaders
+    ) throws Exception {
+        return executeGQLRequest(query, variables, requestHeaders);
     }
 
     /**
@@ -87,15 +101,36 @@ public class WebGQLClient {
     public <T> T sendQueryWithHeaders(
         @NotNull String query,
         @Nullable Map<String, Object> variables,
-        @NotNull List<String> headers
+        @NotNull Map<String, String> headers
+    ) throws Exception {
+        Map<String, Object> parsed = executeGQLRequest(query, variables, headers);
+        // graphql response will be in "data" key
+        return (T) parsed.get("data");
+    }
+
+    @NotNull
+    private Map<String, Object> executeGQLRequest(
+        @NotNull String query,
+        @Nullable Map<String, Object> variables,
+        @NotNull Map<String, String> requestHeaders
+    ) throws Exception {
+        return  executeGQLRequest(query, variables, requestHeaders, "result");
+    }
+
+    @NotNull
+    public Map<String, Object> executeGQLRequest(
+        @NotNull String query,
+        @Nullable Map<String, Object> variables,
+        @NotNull Map<String, String> requestHeaders,
+        @NotNull String resultName
     ) throws Exception {
         HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
             .uri(URI.create(apiUrl))
             .POST(HttpRequest.BodyPublishers.ofString(makeGQLRequest(query, variables)))
             .setHeader("TE-Client-Version", GeneralUtils.getMajorVersion())
-            .header("Content-Type", "application/json");
-        if (!headers.isEmpty()) {
-            requestBuilder.headers(headers.toArray(String[]::new));
+            .header(HttpConstants.HEADER_CONTENT_TYPE, HttpConstants.CONTENT_TYPE_JSON);
+        if (!requestHeaders.isEmpty()) {
+            requestHeaders.forEach(requestBuilder::header);
         }
         HttpRequest request = requestBuilder.build();
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
@@ -107,8 +142,10 @@ public class WebGQLClient {
             String message = JSONUtils.getString(JSONUtils.getObjectList(body, "errors").get(0), "message");
             throw new DBException(message);
         }
-        // graphql response will be in "data" key
-        return (T) JSONUtils.getObject(body, "data").get("result");
+        Map<String, Object> parsed = new LinkedHashMap<>();
+        parsed.put("data", JSONUtils.getObject(body, "data").get(resultName));
+        parsed.put("headers", response.headers().map());
+        return parsed;
     }
 
     @NotNull
@@ -120,5 +157,14 @@ public class WebGQLClient {
         }
 
         return gson.toJson(request, Map.class);
+    }
+
+    @NotNull
+    public String getSessionIdCookie() {
+        return cookieManager.getCookieStore().getCookies().stream()
+            .filter(cookie -> cookie.getName().equals(CBConstants.CB_SESSION_COOKIE_NAME))
+            .findFirst()
+            .get()
+            .getValue();
     }
 }

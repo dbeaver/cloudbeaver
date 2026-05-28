@@ -18,7 +18,7 @@ interface Props {
   hasDetails?: boolean;
   text: string;
   className?: string;
-  onShowDetails?: () => void;
+  onShowDetails?: () => Promise<void> | void;
 }
 
 export const ErrorMessage = observer<Props>(function ErrorMessage({ text, className, hasDetails, onShowDetails }) {
@@ -27,7 +27,7 @@ export const ErrorMessage = observer<Props>(function ErrorMessage({ text, classN
 
   return (
     <div role="status" tabIndex={0} aria-label={text} className={s(style, { message: true }, className)}>
-      <IconOrImage className={s(style, { errorIcon: true })} icon="/icons/error_icon_sm.svg" />
+      <IconOrImage className={s(style, { errorIcon: true })} icon="/icons/preload/error_icon_sm.svg" />
       <div className={s(style, { messageBody: true })} title={text}>
         {text}
       </div>

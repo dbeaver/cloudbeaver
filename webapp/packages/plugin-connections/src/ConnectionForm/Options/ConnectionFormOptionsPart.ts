@@ -1,12 +1,19 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 import { FormMode, FormPart, formSubmitContext, formValidationContext, type IFormState } from '@cloudbeaver/core-ui';
-import { DriverConfigurationType, type ConnectionConfig, type ObjectPropertyInfo, type TestConnectionMutation } from '@cloudbeaver/core-sdk';
+import {
+  DriverConfigurationType,
+  getObjectPropertyDefaultValue,
+  getObjectPropertyValue,
+  type ConnectionConfig,
+  type IObjectPropertyInfo,
+  type TestConnectionMutation,
+} from '@cloudbeaver/core-sdk';
 import { Executor, ExecutorInterrupter, type IExecutionContextProvider, type IExecutor } from '@cloudbeaver/core-executor';
 import {
   ConnectionInfoAuthPropertiesResource,
@@ -125,14 +132,14 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
       delete state.networkHandlersConfig;
     }
 
-    const result = await this.commonDialogService.open(ConnectionAuthenticationDialogLoader, {
+    const { status } = await this.commonDialogService.open(ConnectionAuthenticationDialogLoader, {
       config: state,
       authModelId: state.authModelId ?? null,
       networkHandlers: this.formState.state.requiredNetworkHandlersIds,
       projectId: this.formState.state.projectId,
     });
 
-    if (result === DialogueStateResult.Rejected) {
+    if (status === DialogueStateResult.Rejected) {
       return null;
     }
 
@@ -223,7 +230,7 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     if (authPropertiesInfo.authProperties) {
       for (const property of authPropertiesInfo.authProperties) {
         if (!property.features.includes('password')) {
-          config.credentials[property.id!] = property.value;
+          config.credentials[property.id!] = getObjectPropertyValue(property);
         }
       }
     }
@@ -379,17 +386,25 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
       const authPropertiesInfo = this.connectionKey ? await this.connectionInfoAuthPropertiesResource.load(this.connectionKey) : undefined;
 
       const properties = await this.getConnectionAuthModelProperties(this.state.authModelId, authPropertiesInfo);
-      const passwordProperty = properties.find(property => property.features.includes('password'));
-      const isPasswordEmpty =
-        passwordProperty &&
-        (this.state.credentials?.[passwordProperty.id!] === passwordProperty.defaultValue || !this.state.credentials?.[passwordProperty.id!]);
+      const passwordProperties = properties.filter(property => property.features.includes('password'));
 
       if (isCredentialsChanged(properties, this.state.credentials!)) {
         this.state.credentials = prepareDynamicProperties(properties, toJS(this.state.credentials!));
       }
 
-      if (isPasswordEmpty) {
-        delete this.state.credentials?.[passwordProperty.id!];
+      if (passwordProperties.length > 0) {
+        for (const passwordProperty of passwordProperties) {
+          if (!passwordProperty.id) {
+            continue;
+          }
+
+          if (
+            this.state.credentials?.[passwordProperty.id] === getObjectPropertyDefaultValue(passwordProperty) ||
+            (!passwordProperty.features.includes('file') && !this.state.credentials?.[passwordProperty.id])
+          ) {
+            delete this.state.credentials?.[passwordProperty.id];
+          }
+        }
       }
     }
 
@@ -410,7 +425,7 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     }
   }
 
-  private async getConnectionAuthModelProperties(authModelId: string, connectionInfo?: ConnectionInfoAuthProperties): Promise<ObjectPropertyInfo[]> {
+  private async getConnectionAuthModelProperties(authModelId: string, connectionInfo?: ConnectionInfoAuthProperties): Promise<IObjectPropertyInfo[]> {
     const authModel = await this.databaseAuthModelsResource.load(authModelId);
 
     let properties = authModel.properties;
@@ -498,6 +513,8 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
 
         const uniqueName = getUniqueName(this.state.name || '', connectionNames);
         const connection = await this.connectionInfoResource.create(this.formState.state.projectId, { ...this.state, name: uniqueName });
+        
+        this.state.name = uniqueName;
         this.state.connectionId = connection.id;
         this.initialState.connectionId = connection.id;
         this.formState.setMode(FormMode.Edit);
@@ -531,7 +548,7 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
 }
 
 function prepareDynamicProperties(
-  propertiesInfo: ObjectPropertyInfo[],
+  propertiesInfo: IObjectPropertyInfo[],
   properties: Record<string, any>,
   configurationType?: DriverConfigurationType,
 ) {
@@ -548,8 +565,9 @@ function prepareDynamicProperties(
       delete result[propertyInfo.id];
     } else {
       const isDefault = isNotNullDefined(propertyInfo.defaultValue);
+
       if (!(propertyInfo.id in result) && isDefault) {
-        result[propertyInfo.id] = propertyInfo.defaultValue;
+        result[propertyInfo.id] = getObjectPropertyDefaultValue(propertyInfo);
       }
     }
   }
@@ -563,7 +581,7 @@ function prepareDynamicProperties(
   return result;
 }
 
-function isCredentialsChanged(authProperties: ObjectPropertyInfo[], credentials: Record<string, any>) {
+function isCredentialsChanged(authProperties: IObjectPropertyInfo[], credentials: Record<string, any>) {
   for (const property of authProperties) {
     const value = credentials[property.id!];
 
@@ -571,7 +589,7 @@ function isCredentialsChanged(authProperties: ObjectPropertyInfo[], credentials:
       if (value !== undefined) {
         return property.features.includes('file') ? true : !!value;
       }
-    } else if (value !== property.value) {
+    } else if (value !== getObjectPropertyValue(property)) {
       return true;
     }
   }

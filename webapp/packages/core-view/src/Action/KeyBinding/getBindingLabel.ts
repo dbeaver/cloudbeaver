@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -29,11 +29,14 @@ const FORMAT_SHORTCUT_KEYS_MAP: Record<string, string> = {
   pagedown: 'pagedown',
   del: 'delete',
   delete: 'delete',
+  period: '.',
 };
-const SOURCE_DIVIDER_REGEXP = /\+/gi;
-const APPLIED_DIVIDER = ' + ';
 
-function transformKeys(keyBinding: IKeyBinding): string[] {
+export const SHORTCUT_DIVIDER = '+';
+export const SOURCE_DIVIDER_REGEXP = /\+/gi;
+export const APPLIED_DIVIDER = ` ${SHORTCUT_DIVIDER} `;
+
+export function transformKeys(keyBinding: IKeyBinding): string[] {
   return getCommonAndOSSpecificKeys(keyBinding).map(shortcut =>
     shortcut.split(SOURCE_DIVIDER_REGEXP).map(formatKeyToDisplayKey).join(APPLIED_DIVIDER).toLocaleUpperCase(),
   );

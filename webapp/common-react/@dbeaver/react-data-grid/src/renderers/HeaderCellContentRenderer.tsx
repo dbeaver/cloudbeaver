@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -12,6 +12,7 @@ import { DataGridCellHeaderContext } from '../DataGridHeaderCellContext.js';
 import { useGridReactiveValue } from '../useGridReactiveValue.js';
 import { HeaderDnDContext } from '../useHeaderDnD.js';
 import { OrderButton } from './OrderButton.js';
+import type { DataGridCellKeyboardEvent } from '../DataGrid.js';
 
 interface Props {
   colIdx: number;
@@ -63,13 +64,15 @@ export const HeaderCellContentRenderer = memo(function HeaderCellContentRenderer
   });
 
   function handleSort(e: React.MouseEvent<HTMLElement> | React.KeyboardEvent<HTMLElement>) {
-    if (!onColumnSort) return;
+    if (!onColumnSort) {
+      return;
+    }
 
     const nextSortState = sortingState === 'asc' ? 'desc' : sortingState === 'desc' ? null : 'asc';
     onColumnSort(colIdx, nextSortState, e.ctrlKey || e.metaKey);
   }
 
-  function onKeyDown(event: React.KeyboardEvent<HTMLElement>) {
+  function onKeyDown(event: DataGridCellKeyboardEvent) {
     onHeaderKeyDown?.(event);
 
     if ((event.key === 'Enter' || event.key === ' ') && isColumnSortable && onColumnSort) {
@@ -86,8 +89,10 @@ export const HeaderCellContentRenderer = memo(function HeaderCellContentRenderer
       {...drop.props}
       onKeyDown={onKeyDown}
     >
-      <span className="tw:overflow-hidden tw:text-ellipsis">{headerElement ?? getHeaderText ?? ''}</span>
-      {isColumnSortable && onColumnSort && <OrderButton sortState={sortingState} onClick={handleSort} />}
+      <span className="tw:overflow-hidden tw:text-ellipsis tw:w-full">{headerElement ?? getHeaderText ?? ''}</span>
+      {isColumnSortable && onColumnSort && (
+        <OrderButton sortState={sortingState} columnSortingMultiple={cellHeaderContext.columnSortingMultiple} onClick={handleSort} />
+      )}
     </div>
   );
 });

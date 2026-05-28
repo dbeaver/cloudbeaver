@@ -75,6 +75,9 @@ public class WebDefaultFeatureProvider implements DBWFeatureProvider {
         if (node instanceof DBNContainer) {
             features.add(NODE_FEATURE_CONTAINER);
         }
+        if (node instanceof DBNDataSource && hasNodePermission(webSession, node, RMProjectPermission.DATA_SOURCES_EDIT)) {
+            features.add(NODE_FEATURE_CAN_RENAME);
+        }
         boolean isShared = false;
         if (node instanceof DBNDatabaseNode && !isLeaf) {
             if (node instanceof DBNDataSource dataSource) {
@@ -142,11 +145,6 @@ public class WebDefaultFeatureProvider implements DBWFeatureProvider {
         return features;
     }
 
-    @NotNull
-    private String getProjectId(@NotNull DBNNode node) {
-        return node.getOwnerProject().getId();
-    }
-
     private boolean canCreateConnectionFromFileName(String fileName) {
         String fileExtension = IOUtils.getFileExtension(fileName);
         if (CommonUtils.isEmpty(fileExtension)) {
@@ -166,11 +164,16 @@ public class WebDefaultFeatureProvider implements DBWFeatureProvider {
     }
 
     private boolean hasNodePermission(@NotNull WebSession webSession, @NotNull DBNNode node, @NotNull RMProjectPermission permission) {
-        WebProjectImpl project = webSession.getProjectById(node.getOwnerProject().getId());
-        if (project == null) {
-            return false;
+        RMProject rmProject;
+        if (node instanceof DBNResourceManagerResource rmr) {
+            rmProject = rmr.getRmProject();
+        } else {
+            WebProjectImpl project = webSession.getProjectById(node.getOwnerProject().getId());
+            if (project == null) {
+                return false;
+            }
+            rmProject = project.getRMProject();
         }
-        RMProject rmProject = project.getRMProject();
         return SMUtils.hasProjectPermission(webSession, rmProject, permission);
     }
 

@@ -16,7 +16,6 @@
  */
 package io.cloudbeaver.model.rm.local;
 
-import io.cloudbeaver.BaseWebProjectImpl;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -27,8 +26,9 @@ import org.jkiss.dbeaver.model.DBPDataSourceFolder;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.app.DBPWorkspace;
-import org.jkiss.dbeaver.model.fs.lock.FileLockController;
-import org.jkiss.dbeaver.model.impl.auth.SessionContextImpl;
+import org.jkiss.dbeaver.model.fs.lock.LockManager;
+import org.jkiss.dbeaver.model.fs.lock.LockOptions;
+import org.jkiss.dbeaver.model.fs.lock.LockTarget;
 import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.rm.RMEvent;
 import org.jkiss.dbeaver.model.rm.RMEventManager;
@@ -51,22 +51,21 @@ public abstract class BaseLocalResourceController implements RMController {
     private static final Log log = Log.getLog(BaseLocalResourceController.class);
 
     public static final String DEFAULT_CHANGE_ID = "0";
-    private static final String FILE_REGEX = "(?U)[\\w.$()@/\\\\ -]+";
-    private static final String PROJECT_REGEX = "(?U)[\\w.$()@ -]+"; // slash not allowed in project name
 
     @NotNull
     protected final DBPWorkspace workspace;
     @NotNull
-    protected final FileLockController lockController;
+    protected final LockManager lockController;
 
     protected BaseLocalResourceController(
         @NotNull DBPWorkspace workspace,
-        @NotNull FileLockController lockController
+        @NotNull LockManager lockController
     ) {
         this.workspace = workspace;
         this.lockController = lockController;
     }
 
+    @Nullable
     @Override
     public RMProject getProject(@NotNull String projectId, boolean readResources, boolean readProperties)
         throws DBException {
@@ -85,6 +84,7 @@ public abstract class BaseLocalResourceController implements RMController {
         return project;
     }
 
+    @Nullable
     @Override
     public Object getProjectProperty(@NotNull String projectId, @NotNull String propName) throws DBException {
         var project = getWebProject(projectId, false);
@@ -97,7 +97,7 @@ public abstract class BaseLocalResourceController implements RMController {
     public void setProjectProperty(
         @NotNull String projectId,
         @NotNull String propName,
-        @NotNull Object propValue
+        @Nullable Object propValue
     ) throws DBException {
         RMLocalProject webProject = getWebProject(projectId, false);
         doFileWriteOperation(projectId, webProject.getMetadataFilePath(),
@@ -159,7 +159,7 @@ public abstract class BaseLocalResourceController implements RMController {
         @NotNull String configuration,
         @Nullable List<String> dataSourceIds
     ) throws DBException {
-        try (var lock = lockController.lock(projectId, "updateProjectDataSources")) {
+        try (var ignoredLock = lockController.lock(LockTarget.of(projectId), LockOptions.of("updateProjectDataSources"))) {
             DBPProject project = getWebProject(projectId, false);
             return doFileWriteOperation(
                 projectId, project.getMetadataFolder(false),
@@ -190,7 +190,7 @@ public abstract class BaseLocalResourceController implements RMController {
         @NotNull String projectId,
         @NotNull String[] dataSourceIds
     ) throws DBException {
-        try (var projectLock = lockController.lock(projectId, "deleteDatasources")) {
+        try (var ignoredLock = lockController.lock(LockTarget.of(projectId), LockOptions.of("deleteDataSources"))) {
             DBPProject project = getWebProject(projectId, false);
             doFileWriteOperation(projectId, project.getMetadataFolder(false), () -> {
                 DBPDataSourceRegistry registry = project.getDataSourceRegistry();
@@ -215,7 +215,7 @@ public abstract class BaseLocalResourceController implements RMController {
         @NotNull String projectId,
         @NotNull String folderPath
     ) throws DBException {
-        try (var projectLock = lockController.lock(projectId, "createDatasourceFolder")) {
+        try (var ignoredLock = lockController.lock(LockTarget.of(projectId), LockOptions.of("createDatasourceFolder"))) {
             DBPProject project = getWebProject(projectId, false);
             log.debug("Creating data source folder '" + folderPath + "' in project '" + projectId + "'");
             doFileWriteOperation(projectId, project.getMetadataFolder(false),
@@ -226,8 +226,10 @@ public abstract class BaseLocalResourceController implements RMController {
                     GeneralUtils.validateResourceName(newName);
                     var parent = result.getParent();
                     var parentFolder = parent == null ? null : registry.getFolder(parent.toString().replace("\\", "/"));
-                    DBPDataSourceFolder newFolder = registry.addFolder(parentFolder, newName);
-                    ((DataSourcePersistentRegistry) registry).saveDataSources();
+                    registry.addFolder(parentFolder, newName);
+                    if (registry instanceof DataSourcePersistentRegistry pr) {
+                        pr.saveDataSources();
+                    }
                     registry.checkForErrors();
                     return null;
                 }
@@ -241,21 +243,19 @@ public abstract class BaseLocalResourceController implements RMController {
         @NotNull String[] folderPaths,
         boolean dropContents
     ) throws DBException {
-        try (var projectLock = lockController.lock(projectId, "createDatasourceFolder")) {
+        try (var ignoredLock = lockController.lock(LockTarget.of(projectId), LockOptions.of("createDatasourceFolder"))) {
             DBPProject project = getWebProject(projectId, false);
             doFileWriteOperation(projectId, project.getMetadataFolder(false),
                 () -> {
                     DBPDataSourceRegistry registry = project.getDataSourceRegistry();
                     for (String folderPath : folderPaths) {
                         DBPDataSourceFolder folder = registry.getFolder(folderPath);
-                        if (folder != null) {
-                            log.debug("Deleting data source folder '" + folderPath + "' in project '" + projectId + "'");
-                            registry.removeFolder(folder, dropContents);
-                        } else {
-                            log.warn("Can not find folder by path [" + folderPath + "] for deletion");
-                        }
+                        log.debug("Deleting data source folder '" + folderPath + "' in project '" + projectId + "'");
+                        registry.removeFolder(folder, dropContents);
                     }
-                    ((DataSourcePersistentRegistry) registry).saveDataSources();
+                    if (registry instanceof DataSourcePersistentRegistry pr) {
+                        pr.saveDataSources();
+                    }
                     registry.checkForErrors();
                     return null;
                 }
@@ -269,7 +269,7 @@ public abstract class BaseLocalResourceController implements RMController {
         @NotNull String oldPath,
         @NotNull String newPath
     ) throws DBException {
-        try (var projectLock = lockController.lock(projectId, "createDatasourceFolder")) {
+        try (var ignoredLock = lockController.lock(LockTarget.of(projectId), LockOptions.of("createDatasourceFolder"))) {
             DBPProject project = getWebProject(projectId, false);
             log.debug("Moving data source folder from '" + oldPath + "' to '" + newPath + "' in project '" + projectId + "'");
             doFileWriteOperation(projectId, project.getMetadataFolder(false),
@@ -284,19 +284,19 @@ public abstract class BaseLocalResourceController implements RMController {
         }
     }
 
-    protected abstract RMLocalProject getWebProject(String projectId, boolean refresh) throws DBException;
+    protected abstract RMLocalProject getWebProject(@NotNull String projectId, boolean refresh) throws DBException;
 
-    protected abstract <T> T doFileWriteOperation(String projectId, Path file, RMFileOperation<T> operation)
+    protected abstract <T> T doFileWriteOperation(@NotNull String projectId, @NotNull Path file, @NotNull RMFileOperation<T> operation)
         throws DBException;
 
-    protected abstract <T> T doFileReadOperation(String projectId, Path file, RMFileOperation<T> operation)
+    protected abstract <T> T doFileReadOperation(@NotNull String projectId, @NotNull Path file, @NotNull RMFileOperation<T> operation)
         throws DBException;
 
-    protected abstract <T> T doProjectOperation(String projectId, RMFileOperation<T> operation) throws DBException;
+    protected abstract <T> T doProjectOperation(@NotNull String projectId, @NotNull RMFileOperation<T> operation) throws DBException;
 
-    protected abstract RMProject makeProjectFromId(String projectId, boolean loadPermissions) throws DBException;
+    protected abstract RMProject makeProjectFromId(@NotNull String projectId, boolean loadPermissions) throws DBException;
 
-    protected void validateResourcePath(String resourcePath) throws DBException {
+    protected void validateResourcePath(@NotNull String resourcePath) throws DBException {
         var fullPath = Paths.get(resourcePath);
         for (Path path : fullPath) {
             String fileName = IOUtils.getFileNameWithoutExtension(path);
@@ -311,28 +311,6 @@ public abstract class BaseLocalResourceController implements RMController {
             } catch (IOException e) {
                 throw new DBException("Error creating folder '" + targetPath + "'");
             }
-        }
-    }
-
-    protected class InternalWebProjectImpl extends BaseWebProjectImpl {
-        public InternalWebProjectImpl(
-            @NotNull SessionContextImpl sessionContext,
-            @NotNull RMProject rmProject,
-            @NotNull Path projectPath
-        ) {
-            super(
-                BaseLocalResourceController.this.workspace,
-                BaseLocalResourceController.this,
-                sessionContext,
-                rmProject,
-                projectPath
-            );
-        }
-
-        @NotNull
-        @Override
-        protected DBPDataSourceRegistry createDataSourceRegistry() {
-            return new DataSourceRegistry(this);
         }
     }
 

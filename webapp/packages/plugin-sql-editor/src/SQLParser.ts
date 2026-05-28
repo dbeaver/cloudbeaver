@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -47,7 +47,7 @@ export class SQLParser {
     this.script = '';
     this.lastParsingArgs = [];
 
-    makeObservable<this, '_scripts' | 'script'>(this, {
+    makeObservable<this, '_scripts' | 'script' | 'getQueryAtPos'>(this, {
       actualScript: computed,
       _scripts: observable.ref,
       script: observable.ref,
@@ -109,20 +109,8 @@ export class SQLParser {
     };
   }
 
-  getQueryAtPos(position: number): ISQLScriptSegment | undefined {
-    const script = this._scripts.find(script => script.begin <= position && script.end > position);
-
-    if (script) {
-      return script;
-    }
-
-    const closestScripts = this._scripts.filter(script => script.begin <= position);
-
-    if (closestScripts.length > 0) {
-      return closestScripts[closestScripts.length - 1];
-    }
-
-    return undefined;
+  getQueriesInRange(begin: number, end: number): ISQLScriptSegment[] {
+    return this._scripts.filter(script => script.begin <= end && script.end >= begin);
   }
 
   setScript(script: string): void {
@@ -137,5 +125,19 @@ export class SQLParser {
     }));
 
     return this;
+  }
+
+  private getQueryAtPos(position: number): ISQLScriptSegment | undefined {
+    const script = this._scripts.find(script => script.begin <= position && script.end >= position);
+
+    if (script) {
+      return script;
+    }
+
+    return {
+      query: this.actualScript.substring(position, position),
+      begin: position,
+      end: position,
+    };
   }
 }

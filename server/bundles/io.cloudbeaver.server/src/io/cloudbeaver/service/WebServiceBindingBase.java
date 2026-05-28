@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2025 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
  */
 package io.cloudbeaver.service;
 
+import graphql.GraphQLContext;
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.idl.SchemaParser;
 import graphql.schema.idl.TypeDefinitionRegistry;
@@ -27,9 +28,11 @@ import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.session.WebSessionProvider;
 import io.cloudbeaver.server.WebAppUtils;
 import io.cloudbeaver.server.graphql.GraphQLEndpoint;
+import io.cloudbeaver.server.graphql.GraphQLLoggerUtil;
 import io.cloudbeaver.service.security.SMUtils;
 import io.cloudbeaver.utils.ServletAppUtils;
 import io.cloudbeaver.utils.WebDataSourceUtils;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
@@ -74,6 +77,7 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
     /**
      * Creates proxy for permission checks and other general API calls validation/logging.
      */
+    @NotNull
     protected API_TYPE getService(DataFetchingEnvironment env) {
         Object proxyImpl = Proxy.newProxyInstance(getClass().getClassLoader(), new Class[]{apiInterface}, new ServiceInvocationHandler(serviceImpl, env));
         return apiInterface.cast(proxyImpl);
@@ -96,24 +100,23 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
         }
     }
 
-    protected static HttpServletResponse getServletResponse(DataFetchingEnvironment env) {
+    @NotNull
+    protected static HttpServletResponse getServletResponse(@NotNull DataFetchingEnvironment env) {
         return GraphQLEndpoint.getServletResponse(env);
     }
 
-    protected static DBWBindingContext getBindingContext(DataFetchingEnvironment env) {
+    @NotNull
+    protected static DBWBindingContext getBindingContext(@NotNull DataFetchingEnvironment env) {
         return GraphQLEndpoint.getBindingContext(env);
     }
 
-    protected static WebSession getWebSession(DataFetchingEnvironment env) throws DBWebException {
-        if (env.getGraphQlContext().getBoolean(CloudbeaverCliConstants.CLI_MODE)) {
-            return getSessionFromContextOrThrow(env);
-        }
-        return WebAppUtils.getWebApplication().getSessionManager().getWebSession(
-            GraphQLEndpoint.getServletRequestOrThrow(env), getServletResponse(env));
+    @NotNull
+    protected static WebSession getWebSession(@NotNull DataFetchingEnvironment env) throws DBWebException {
+        return getWebSession(env, true);
     }
 
     @Nullable
-    protected static WebSession getSessionFromContext(DataFetchingEnvironment env) {
+    protected static WebSession getSessionFromContext(@NotNull DataFetchingEnvironment env) {
         return env.getGraphQlContext().get(WebSession.class.getName());
     }
 
@@ -126,6 +129,7 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
         return webSession;
     }
 
+    @NotNull
     protected static WebSession getWebSession(@NotNull DataFetchingEnvironment env, boolean errorOnNotFound) throws DBWebException {
         if (env.getGraphQlContext().getBoolean(CloudbeaverCliConstants.CLI_MODE)) {
             return getSessionFromContextOrThrow(env);
@@ -134,6 +138,7 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
             GraphQLEndpoint.getServletRequestOrThrow(env), getServletResponse(env), errorOnNotFound);
     }
 
+    @Nullable
     protected static String getProjectReference(@NotNull DataFetchingEnvironment env) {
         return env.getArgument("projectId");
     }
@@ -155,13 +160,14 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
             GraphQLEndpoint.getServletRequestOrThrow(env));
     }
 
+    @NotNull
     public static WebSession findWebSession(@NotNull DataFetchingEnvironment env, boolean errorOnNotFound) throws DBWebException {
         return WebAppUtils.getWebApplication().getSessionManager().findWebSession(
             GraphQLEndpoint.getServletRequestOrThrow(env), errorOnNotFound);
     }
 
     @NotNull
-    public static WebConnectionInfo getWebConnection(@NotNull WebSession session, @NotNull String projectId, @NotNull String connectionId) throws DBWebException {
+    public static WebConnectionInfo getWebConnection(@NotNull WebSession session, @Nullable String projectId, @NotNull String connectionId) throws DBWebException {
         return WebDataSourceUtils.getWebConnectionInfo(session, projectId, connectionId);
     }
 
@@ -262,7 +268,7 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
                     throw new DBException("Web session not instantiated");
                 }
 
-                String projectId = args[objectIdArgumentIndex] == null ? null : String.valueOf(args[objectIdArgumentIndex]);
+                String projectId = args[objectIdArgumentIndex] == null ? "" : String.valueOf(args[objectIdArgumentIndex]);
                 // we should always get the project from the session, even if projectId is null - the active project
                 // will be returned
                 WebProjectImpl project = webSession.getProjectById(projectId);
@@ -315,7 +321,7 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
                 // Check license
                 if (application.isLicenseRequired() && !application.isLicenseValid()) {
                     if (!ArrayUtils.contains(reqPermissions, DBWConstants.PERMISSION_ADMIN)) {
-                        String errorMessage = "Invalid server license";
+                        String errorMessage = "Server license is missing";
                         String licenseStatus = application.getLicenseStatus();
                         if (licenseStatus != null) {
                             errorMessage = errorMessage + ": " + licenseStatus;
@@ -340,16 +346,31 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
                 }
             }
         }
+        // Perform any checks before action call
+        protected void beforeWebActionCall(WebAction webAction, Method method, Object[] args) throws DBException {
 
-    }
+            GraphQLContext graphQlContext = this.env.getGraphQlContext();
+            HttpServletRequest request = graphQlContext.get("request");
+            if (request == null) {
+                return;
+            }
+            String sessionId = GraphQLLoggerUtil.getSmSessionId(request);
+            String userId = GraphQLLoggerUtil.getUserId(request);
+            try {
+                String loggerMessage = GraphQLLoggerUtil.buildLoggerMessage(sessionId, userId, method, args);
 
-    // Perform any checks before action call
-    protected void beforeWebActionCall(WebAction webAction, Method method, Object[] args) throws DBException {
-        setLogContext(method, args);
-    }
+                log.debug("API > " + method.getName() + loggerMessage);
+            } catch (Throwable e) {
+                log.error("Logging error", e);
+            }
 
-    protected void afterWebActionCall(WebAction webAction, Method method, Object[] args) throws DBException {
-        Log.setContext(null);
+            setLogContext(method, args);
+        }
+
+        protected void afterWebActionCall(WebAction webAction, Method method, Object[] args) throws DBException {
+            Log.setContext(null);
+        }
+
     }
 
     protected void setLogContext(Method method, @Nullable Object[] args) {

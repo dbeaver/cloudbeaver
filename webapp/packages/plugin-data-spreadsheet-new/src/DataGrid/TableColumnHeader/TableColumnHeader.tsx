@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -9,13 +9,17 @@ import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
 import { clsx } from '@dbeaver/ui-kit';
 
-import { getComputed, s, StaticImage, useS } from '@cloudbeaver/core-blocks';
+import { getComputed, s, StaticImage, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { isResultSetDataSource } from '@cloudbeaver/plugin-data-viewer';
 
+import { ColumnDnDContext } from '../ColumnDnDContext.js';
 import { DataGridContext } from '../DataGridContext.js';
 import { DataGridSelectionContext } from '../DataGridSelection/DataGridSelectionContext.js';
 import { TableDataContext } from '../TableDataContext.js';
 import style from './TableColumnHeader.module.css';
 import { useTableColumnDnD } from './useTableColumnDnD.js';
+import type { SqlResultColumn } from '@cloudbeaver/core-sdk';
+import { getDropSide } from '../getDropSide.js';
 
 interface Props {
   colIdx: number;
@@ -25,7 +29,9 @@ export const TableColumnHeader = observer<Props>(function TableColumnHeader({ co
   const dataGridContext = useContext(DataGridContext);
   const tableDataContext = useContext(TableDataContext);
   const gridSelectionContext = useContext(DataGridSelectionContext);
+  const columnDnDContext = useContext(ColumnDnDContext);
   const styles = useS(style);
+  const translate = useTranslate();
 
   const resultIndex = dataGridContext.resultIndex;
   const model = dataGridContext.model;
@@ -33,20 +39,42 @@ export const TableColumnHeader = observer<Props>(function TableColumnHeader({ co
   const columnInfo = tableDataContext.getColumn(colIdx)!;
   const dnd = useTableColumnDnD(model, resultIndex, columnInfo.key);
 
+  const dropSide = getComputed(() => getDropSide(columnInfo, columnDnDContext));
+  const dropSideClassName = getComputed(() => {
+    if (dropSide === 'left') {
+      return 'rdg-cell-column-drop-left';
+    }
+
+    if (dropSide === 'right') {
+      return 'rdg-cell-column-drop-right';
+    }
+
+    return '';
+  });
   const dataReadonly = getComputed(() => model.isReadonly(resultIndex));
-  const hasElementIdentifier = getComputed(() => model.hasElementIdentifier(resultIndex));
+  const hasElementIdentifier = getComputed(() => {
+    const source = model.source;
+    return isResultSetDataSource(source) ? source.hasElementIdentifier(resultIndex) : false;
+  });
+  const rowIdentifierInfo = getComputed(() => {
+    const source = model.source;
+    return isResultSetDataSource(source) ? source.getRowIdentifierInfo(resultIndex) : null;
+  });
 
   let icon: string | undefined;
   let columnName: string | undefined;
+  let columnRawName: string | undefined;
   let columnReadOnly = false;
   let columnTooltip: string | undefined;
   let columnDescription: string | undefined;
 
   if (columnInfo.key !== null) {
-    const column = tableDataContext.data.getColumn(columnInfo.key);
+    // TODO: fix column abstraction
+    const column = tableDataContext.data.getColumn(columnInfo.key) as SqlResultColumn | undefined;
 
     if (column) {
       columnName = column.label!;
+      columnRawName = column.name ?? undefined;
       columnDescription = column.description;
       icon = column.icon;
       columnReadOnly ||= tableDataContext.format.isReadOnly({ column: columnInfo.key });
@@ -63,6 +91,17 @@ export const TableColumnHeader = observer<Props>(function TableColumnHeader({ co
     }
   }
 
+  const isKeyColumn = getComputed(() => {
+    const identifier = rowIdentifierInfo?.identifier;
+    if (!identifier || !columnRawName) {
+      return false;
+    }
+    return identifier.attributes.some(attr => attr.name === columnRawName);
+  });
+  const keyTooltip = isKeyColumn
+    ? translate(rowIdentifierInfo?.state === 'VIRTUAL_KEY' ? 'data_grid_table_virtual_key_tooltip' : 'data_grid_table_key_column_tooltip')
+    : undefined;
+
   function handleClick(event: React.MouseEvent<HTMLDivElement>) {
     gridSelectionContext.selectColumn(colIdx, event.ctrlKey || event.metaKey);
     dataGridContext.focus();
@@ -72,8 +111,7 @@ export const TableColumnHeader = observer<Props>(function TableColumnHeader({ co
     <div
       ref={dnd.setRef}
       title={columnTooltip}
-      data-s-rearrange={dnd.side}
-      className={s(styles, { dragging: dnd.data.state.isDragging }, 'tw:h-full')}
+      className={s(styles, { dragging: dnd.data.state.isDragging, dndBox: true }, 'tw:h-full', dropSideClassName)}
       onClick={handleClick}
     >
       <div className={s(styles, { header: true })}>
@@ -95,6 +133,7 @@ export const TableColumnHeader = observer<Props>(function TableColumnHeader({ co
                 )}
               </div>
             )}
+            {isKeyColumn && <StaticImage icon="/icons/key.svg" className={s(styles, { keyImage: true })} title={keyTooltip} />}
             <div className={s(styles, { name: true }, 'tw:truncate')}>{columnName}</div>
           </div>
           {tableDataContext.hasDescription && columnDescription && (

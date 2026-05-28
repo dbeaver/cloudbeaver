@@ -31,7 +31,15 @@
 }
 
 .title {
-  color: var(--theme-primary);
   font-weight: 500;
+  line-height: 24px;
   margin: 0;
+}
+
+.alert.error {
+  background-color: rgba(255, 77, 79, 0.15);
+
+  .title {
+    color: var(--theme-error);
+  }
 }

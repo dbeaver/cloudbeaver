@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,7 @@ export type SelectBaseProps<TKey, TValue> = Omit<
     description?: string;
     placeholder?: string;
     keySelector?: (item: TValue, index: number) => TKey;
+    serializedKeySelector?: (key: TKey) => string;
     valueSelector?: (item: TValue) => string;
     titleSelector?: (item: TValue) => string | undefined;
     iconSelector?: (item: TValue) => string | React.ReactElement | undefined;
@@ -38,6 +39,7 @@ export type SelectBaseProps<TKey, TValue> = Omit<
     onSwitch?: (state: boolean) => void;
     inline?: boolean;
     children?: string;
+    portal?: boolean;
   };
 
 type ControlledProps<TKey, TValue> = SelectBaseProps<TKey, TValue> & {
@@ -65,6 +67,7 @@ export const Select: SelectType = observer(function Select({
   name,
   state,
   items,
+  portal = false,
   loading,
   children,
   title,
@@ -77,6 +80,7 @@ export const Select: SelectType = observer(function Select({
   id,
   keySelector = v => v,
   valueSelector = v => v,
+  serializedKeySelector,
   iconSelector,
   titleSelector,
   isDisabled,
@@ -178,11 +182,13 @@ export const Select: SelectType = observer(function Select({
       )}
       <SelectField
         {...rest}
+        portal={portal}
         items={items}
         value={value}
         id={inputId}
         aria-label={children || title}
         itemValue={itemValue}
+        itemValueSerialized={serializedKeySelector}
         itemRender={itemRender}
         itemDisabled={itemDisabled}
         name={name}

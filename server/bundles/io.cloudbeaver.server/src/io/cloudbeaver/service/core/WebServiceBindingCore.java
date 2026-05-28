@@ -139,7 +139,10 @@ public class WebServiceBindingCore extends WebServiceBindingBase<DBWServiceCore>
                 getWebSession(env), getProjectReference(env), getArgumentVal(env, "config")
             ))
             .dataFetcher("testNetworkHandler", env -> getService(env).testNetworkHandler(
-                getWebSession(env), new WebNetworkHandlerConfigInput(getArgument(env, "config"))
+                getWebSession(env),
+                getProjectReference(env),
+                getArgument(env, "connectionId"),
+                new WebNetworkHandlerConfigInput(getArgument(env, "config"))
             ))
             .dataFetcher("closeConnection", env -> getService(env).closeConnection(
                 getWebSession(env),
@@ -149,8 +152,22 @@ public class WebServiceBindingCore extends WebServiceBindingBase<DBWServiceCore>
             .dataFetcher("setConnectionNavigatorSettings", env -> getService(env).setConnectionNavigatorSettings(
                 getWebSession(env),
                 getProjectReference(env),
-                getArgument(env, "id"),
-                WebServiceUtils.parseNavigatorSettings(getArgument(env, "settings"))
+                getArgumentVal(env, "id"),
+                    WebServiceUtils.parseNavigatorSettings(getArgument(env, "settings"))
+                )
+            )
+            .dataFetcher(
+                "clearConnectionNavigatorSettings", env -> getService(env).clearConnectionNavigatorSettings(
+                    getWebSession(env),
+                    getProjectReference(env),
+                    getArgumentVal(env, "id")
+                )
+            )
+            .dataFetcher("setObjectSettingsForDatasource", env -> getService(env).setObjectSettingsForDatasource(
+                getWebSession(env),
+                getProjectReference(env),
+                getArgumentVal(env, "id"),
+                getArgumentVal(env, "settings")
             ))
 
             .dataFetcher("asyncTaskInfo", env -> getService(env).getAsyncTaskInfo(

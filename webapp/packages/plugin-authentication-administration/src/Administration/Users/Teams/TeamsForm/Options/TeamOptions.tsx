@@ -1,13 +1,22 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
 
-import { Container, Group, InputField, Textarea, useAutoLoad, useCustomInputValidation, useResource, useTranslate } from '@cloudbeaver/core-blocks';
+import {
+  Container,
+  Group,
+  InputField,
+  Textarea,
+  useAutoLoad,
+  useFormCustomInputValidation,
+  useResource,
+  useTranslate,
+} from '@cloudbeaver/core-blocks';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { type TabContainerPanelComponent, useTab, useTabState } from '@cloudbeaver/core-ui';
 
@@ -27,7 +36,7 @@ export const TeamOptions: TabContainerPanelComponent<TeamFormProps> = observer(f
 
   useAutoLoad(TeamOptions, tabState, tab.selected && !loaded);
 
-  const idValidationRef = useCustomInputValidation<string>(value => {
+  const { ref: idValidationRef } = useFormCustomInputValidation<string>(value => {
     const v = value.trim();
 
     if (!v) {
@@ -44,13 +53,13 @@ export const TeamOptions: TabContainerPanelComponent<TeamFormProps> = observer(f
   return (
     <Container overflow>
       <Group small gap>
-        <InputField ref={idValidationRef} name="teamId" state={tabState.state} readOnly={edit || formState.isDisabled} required tiny fill>
+        <InputField ref={idValidationRef} name="teamId" state={tabState.state} readOnly={edit || formState.isDisabled} required small fill>
           {translate('administration_teams_team_id')}
         </InputField>
-        <InputField name="teamName" state={tabState.state} readOnly={formState.isDisabled} required tiny fill>
+        <InputField name="teamName" state={tabState.state} readOnly={formState.isDisabled} required small fill>
           {translate('administration_teams_team_name')}
         </InputField>
-        <Textarea name="description" state={tabState.state} readOnly={formState.isDisabled} tiny fill>
+        <Textarea name="description" state={tabState.state} readOnly={formState.isDisabled} small fill>
           {translate('administration_teams_team_description')}
         </Textarea>
       </Group>

@@ -1,12 +1,12 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 
-import { Select, FieldCheckbox, InputField, Textarea, useCustomInputValidation, useTranslate } from '@cloudbeaver/core-blocks';
+import { Select, FieldCheckbox, InputField, Textarea, useTranslate, useFormCustomInputValidation } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import {
   ESettingsValueType,
@@ -55,7 +55,7 @@ export const SettingField = observer<Props>(function SettingField({ resolver, se
 
   value = value ?? '';
 
-  const customValidation = useCustomInputValidation(value => {
+  const { ref: customValidation } = useFormCustomInputValidation(value => {
     if (!(setting.key in settingsProviderService.schema.shape)) {
       return null;
     }
@@ -75,7 +75,6 @@ export const SettingField = observer<Props>(function SettingField({ resolver, se
   if (setting.type === ESettingsValueType.Checkbox) {
     return (
       <FieldCheckbox
-        id={String(setting.key)}
         checked={value}
         label={name}
         title={name}
@@ -92,7 +91,6 @@ export const SettingField = observer<Props>(function SettingField({ resolver, se
     const options = setting.options?.map(option => ({ ...option, name: translate(option.name) })) || [];
     return (
       <Select
-        id={String(setting.key)}
         items={options}
         keySelector={value => value.value}
         valueSelector={value => value.name}
@@ -111,15 +109,7 @@ export const SettingField = observer<Props>(function SettingField({ resolver, se
 
   if (setting.type === ESettingsValueType.Textarea) {
     return (
-      <Textarea
-        id={String(setting.key)}
-        title={value}
-        labelTooltip={description}
-        value={value}
-        disabled={disabled}
-        readOnly={readOnly}
-        onChange={handleChange}
-      >
+      <Textarea title={value} labelTooltip={description} value={value} disabled={disabled} readOnly={readOnly} onChange={handleChange}>
         {name}
       </Textarea>
     );
@@ -128,7 +118,6 @@ export const SettingField = observer<Props>(function SettingField({ resolver, se
   return (
     <InputField
       ref={customValidation}
-      id={String(setting.key)}
       type="text"
       title={value}
       labelTooltip={description}

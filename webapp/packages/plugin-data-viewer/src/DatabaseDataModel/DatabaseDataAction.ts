@@ -1,26 +1,38 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 import { makeObservable, observable } from 'mobx';
 
-import type { IDatabaseDataAction, IDatabaseDataActionClass, IDatabaseDataActionInterface } from './IDatabaseDataAction.js';
+import type { IDatabaseDataAction, IDatabaseDataActionClass } from './IDatabaseDataAction.js';
 import type { IDatabaseDataResult } from './IDatabaseDataResult.js';
 import type { IDatabaseDataSource } from './IDatabaseDataSource.js';
+import { Disposable } from '@cloudbeaver/core-di';
 
-export abstract class DatabaseDataAction<TOptions, TResult extends IDatabaseDataResult> implements IDatabaseDataAction<TOptions, TResult> {
-  result!: TResult;
+export abstract class DatabaseDataAction<TOptions, TResult extends IDatabaseDataResult>
+  extends Disposable
+  implements IDatabaseDataAction<TOptions, TResult>
+{
   resultIndex: number;
 
   readonly source: IDatabaseDataSource<TOptions, TResult>;
 
-  constructor(source: IDatabaseDataSource<TOptions, TResult>) {
+  constructor(
+    source: IDatabaseDataSource<TOptions, TResult>,
+    public result: TResult,
+  ) {
+    super();
     this.source = source;
-    this.result = undefined as any;
-    this.resultIndex = -1;
+    this.resultIndex = source.results.indexOf(result);
+
+    this.updateResult = this.updateResult.bind(this);
+    this.updateResults = this.updateResults.bind(this);
+    this.afterResultUpdate = this.afterResultUpdate.bind(this);
+
+    source.onResultsUpdate.addHandler(this.updateResults).addPostHandler(this.afterResultUpdate);
 
     makeObservable(this, {
       result: observable.ref,
@@ -33,25 +45,19 @@ export abstract class DatabaseDataAction<TOptions, TResult extends IDatabaseData
     this.resultIndex = index;
   }
 
-  updateResults(results: TResult[]): void {}
+  updateResults(results: TResult[]): void {
+    const currentResult = results.find(r => r.uniqueResultId === this.result?.uniqueResultId);
+    if (currentResult) {
+      this.updateResult(currentResult, results.indexOf(currentResult));
+    }
+  }
 
   afterResultUpdate(): void {}
 
-  tryGetAction<T extends IDatabaseDataAction<TOptions, TResult>>(action: IDatabaseDataActionClass<TOptions, TResult, T>): T | undefined {
-    return this.source.actions.tryGet(this.result, action);
+  override dispose(): void {
+    this.source.onResultsUpdate.removeHandler(this.updateResults);
+    this.source.onResultsUpdate.removePostHandler(this.afterResultUpdate);
   }
-
-  getAction<T extends IDatabaseDataAction<TOptions, TResult>>(action: IDatabaseDataActionClass<TOptions, TResult, T>): T {
-    return this.source.actions.get(this.result, action);
-  }
-
-  getActionImplementation<T extends IDatabaseDataAction<TOptions, TResult>>(
-    action: IDatabaseDataActionInterface<TOptions, TResult, T>,
-  ): T | undefined {
-    return this.source.actions.getImplementation(this.result, action);
-  }
-
-  dispose(): void {}
 }
 
 export function isDatabaseDataAction(action: any): action is IDatabaseDataActionClass<any, any, any> {

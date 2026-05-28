@@ -1,26 +1,56 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { makeObservable, observable } from 'mobx';
+import { autorun, type IReactionDisposer, makeObservable, observable } from 'mobx';
 
 import type { IConnectionExecutionContext, IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
 import type { IServiceProvider } from '@cloudbeaver/core-di';
 import type { ITask } from '@cloudbeaver/core-executor';
 import { AsyncTaskInfoService } from '@cloudbeaver/core-root';
-import type { GraphQLService } from '@cloudbeaver/core-sdk';
+import type { GraphQLService, SqlRowIdentifier, SqlRowIdentifierState } from '@cloudbeaver/core-sdk';
 
 import { DatabaseDataSource } from '../DatabaseDataModel/DatabaseDataSource.js';
 import { type IDatabaseDataOptions } from '../DatabaseDataModel/IDatabaseDataOptions.js';
 import type { IDatabaseResultSet } from '../DatabaseDataModel/IDatabaseResultSet.js';
+import {
+  applyPersistedDataFilterConstraints,
+  DatabaseDataConstraintAction,
+  persistDataFilterConstraints,
+} from '../DatabaseDataModel/Actions/DatabaseDataConstraintAction.js';
+import { DocumentDataAction } from '../DatabaseDataModel/Actions/Document/DocumentDataAction.js';
+import { DocumentEditAction } from '../DatabaseDataModel/Actions/Document/DocumentEditAction.js';
+import { IDatabaseDataCacheAction } from '../DatabaseDataModel/Actions/IDatabaseDataCacheAction.js';
+import { IDatabaseDataConstraintAction } from '../DatabaseDataModel/Actions/IDatabaseDataConstraintAction.js';
+import { IDatabaseDataEditAction } from '../DatabaseDataModel/Actions/IDatabaseDataEditAction.js';
+import { IDatabaseDataFormatAction } from '../DatabaseDataModel/Actions/IDatabaseDataFormatAction.js';
+import { IDatabaseDataResultAction } from '../DatabaseDataModel/Actions/IDatabaseDataResultAction.js';
+import { IDatabaseDataViewAction } from '../DatabaseDataModel/Actions/IDatabaseDataViewAction.js';
+import { ResultSetCacheAction } from '../DatabaseDataModel/Actions/ResultSet/ResultSetCacheAction.js';
+import { ResultSetDataAction } from '../DatabaseDataModel/Actions/ResultSet/ResultSetDataAction.js';
+import { ResultSetEditAction } from '../DatabaseDataModel/Actions/ResultSet/ResultSetEditAction.js';
+import { ResultSetFormatAction } from '../DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction.js';
+import { ResultSetSelectAction } from '../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction.js';
+import { ResultSetViewAction } from '../DatabaseDataModel/Actions/ResultSet/ResultSetViewAction.js';
+import { IDatabaseDataSelectAction } from '../DatabaseDataModel/Actions/IDatabaseDataSelectAction.js';
+import { DatabaseDataFeature } from '../DatabaseDataModel/IDatabaseDataSource.js';
 
-export abstract class ResultSetDataSource<TOptions = IDatabaseDataOptions> extends DatabaseDataSource<TOptions, IDatabaseResultSet> {
+export interface IRowIdentifierInfo {
+  state: SqlRowIdentifierState | null;
+  identifier: SqlRowIdentifier | null;
+}
+
+export abstract class ResultSetDataSource<TOptions extends IDatabaseDataOptions = IDatabaseDataOptions> extends DatabaseDataSource<
+  TOptions,
+  IDatabaseResultSet
+> {
   executionContext: IConnectionExecutionContext | null;
   totalCountRequestTask: ITask<number> | null;
   private keepExecutionContextOnDispose: boolean;
+  private readonly persistConstraintsDisposer: IReactionDisposer;
 
   constructor(
     override readonly serviceProvider: IServiceProvider,
@@ -31,11 +61,30 @@ export abstract class ResultSetDataSource<TOptions = IDatabaseDataOptions> exten
     this.totalCountRequestTask = null;
     this.executionContext = null;
     this.keepExecutionContextOnDispose = false;
+    this.setFeature(DatabaseDataFeature.ResultSet);
+
+    this.actions
+      .registerAction(IDatabaseDataResultAction, DocumentDataAction)
+      .registerAction(IDatabaseDataEditAction, DocumentEditAction)
+
+      .registerAction(IDatabaseDataResultAction, ResultSetDataAction)
+      .registerAction(IDatabaseDataEditAction, ResultSetEditAction)
+      .registerAction(IDatabaseDataViewAction, ResultSetViewAction)
+      .registerAction(IDatabaseDataSelectAction, ResultSetSelectAction)
+      .registerAction(IDatabaseDataFormatAction, ResultSetFormatAction)
+      .registerAction(IDatabaseDataCacheAction, ResultSetCacheAction)
+      .registerAction(IDatabaseDataConstraintAction, DatabaseDataConstraintAction);
 
     makeObservable(this, {
       totalCountRequestTask: observable.ref,
       executionContext: observable,
     });
+
+    this.persistConstraintsDisposer = autorun(() => persistDataFilterConstraints(this));
+  }
+
+  protected override onPersistedStateLoaded(): void {
+    applyPersistedDataFilterConstraints(this);
   }
 
   override isReadonly(resultIndex: number): boolean {
@@ -45,6 +94,14 @@ export abstract class ResultSetDataSource<TOptions = IDatabaseDataOptions> exten
   override async cancel(): Promise<void> {
     await super.cancel();
     await this.cancelLoadTotalCount();
+  }
+
+  override async saveData(): Promise<void> {
+    await super.saveData();
+    // TODO: Remove this when we have virtual keys. We need to refresh the data in tables without a primary key to avoid UI glitch #5140.
+    if (!this.hasElementIdentifier(0)) {
+      this.setOutdated();
+    }
   }
 
   async cancelLoadTotalCount(): Promise<ITask<number> | null> {
@@ -104,6 +161,7 @@ export abstract class ResultSetDataSource<TOptions = IDatabaseDataOptions> exten
   }
 
   override async dispose(): Promise<void> {
+    this.persistConstraintsDisposer();
     await super.dispose();
     if (this.keepExecutionContextOnDispose) {
       await this.closeResults(this.results);
@@ -121,6 +179,18 @@ export abstract class ResultSetDataSource<TOptions = IDatabaseDataOptions> exten
     this.executionContext = context;
     this.setOutdated();
     return this;
+  }
+
+  hasElementIdentifier(resultIndex: number): boolean {
+    return this.getResult(resultIndex)?.data?.hasRowIdentifier === true;
+  }
+
+  getRowIdentifierInfo(resultIndex: number): IRowIdentifierInfo {
+    const data = this.getResult(resultIndex)?.data;
+    return {
+      state: (data?.rowIdentifierState as SqlRowIdentifierState | undefined) ?? null,
+      identifier: (data?.rowIdentifier as SqlRowIdentifier | undefined) ?? null,
+    };
   }
 
   protected getPreviousResultId(prevResults: IDatabaseResultSet[], context: IConnectionExecutionContextInfo) {
@@ -171,6 +241,8 @@ export abstract class ResultSetDataSource<TOptions = IDatabaseDataOptions> exten
   }
 }
 
-export function isResultSetDataSource<T = IDatabaseDataOptions>(dataSource: any): dataSource is ResultSetDataSource<T> {
+export function isResultSetDataSource<T extends IDatabaseDataOptions = IDatabaseDataOptions>(
+  dataSource: unknown,
+): dataSource is ResultSetDataSource<T> {
   return dataSource instanceof ResultSetDataSource;
 }

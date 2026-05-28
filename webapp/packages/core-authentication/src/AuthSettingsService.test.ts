@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { describe, expect, test } from 'vitest';
+import { beforeEach, describe, expect, test } from 'vitest';
 
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { createGQLEndpoint } from '@cloudbeaver/core-root/__custom_mocks__/createGQLEndpoint.js';
@@ -14,12 +14,18 @@ import { mockAppInit } from '@cloudbeaver/core-root/__custom_mocks__/mockAppInit
 import { mockGraphQL } from '@cloudbeaver/core-root/__custom_mocks__/mockGraphQL.js';
 import { mockServerConfig } from '@cloudbeaver/core-root/__custom_mocks__/resolvers/mockServerConfig.js';
 import { expectNoDeprecatedSettingMessage } from '@cloudbeaver/core-settings/__custom_mocks__/expectDeprecatedSettingMessage.js';
-import { resetDeprecatedSettings } from '@cloudbeaver/core-settings/createSettingsAliasResolver.test.js';
 import { createApp, initKnownConsoleMessages } from '@cloudbeaver/tests-runner';
 
 import { mockAuthentication } from './__custom_mocks__/mockAuthentication.js';
 import { AuthSettingsService } from './AuthSettingsService.js';
 import './module.js';
+import { DEPRECATED_SETTINGS } from '@cloudbeaver/core-settings';
+
+function resetDeprecatedSettings() {
+  beforeEach(() => {
+    DEPRECATED_SETTINGS.clear();
+  });
+}
 
 describe.skip(() => {
   const endpoint = createGQLEndpoint();

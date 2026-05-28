@@ -64,7 +64,7 @@ export const TransactionLogDialog: DialogComponent<IPayload> = observer(function
       </CommonDialogBody>
       <CommonDialogFooter>
         <Flex justify="space-between">
-          <Button variant="secondary" onClick={props.rejectDialog}>
+          <Button variant="secondary" onClick={() => props.rejectDialog()}>
             {translate('ui_cancel')}
           </Button>
           <Container gap dense noWrap keepSize>

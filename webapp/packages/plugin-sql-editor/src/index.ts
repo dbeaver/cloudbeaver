@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -13,6 +13,9 @@ export * from './actions/bindings/KEY_BINDING_SQL_EDITOR_EXECUTE_SCRIPT.js';
 export * from './actions/bindings/KEY_BINDING_SQL_EDITOR_EXECUTE.js';
 export * from './actions/bindings/KEY_BINDING_SQL_EDITOR_FORMAT.js';
 export * from './actions/bindings/KEY_BINDING_SQL_EDITOR_SHOW_EXECUTION_PLAN.js';
+export * from './actions/bindings/KEY_BINDING_SQL_EDITOR_START_COMPLETION.js';
+export * from './actions/bindings/KEY_BINDING_SQL_EDITOR_ACCEPT_COMPLETION.js';
+export * from './actions/bindings/KEY_BINDING_SQL_EDITOR_ESCAPE.js';
 export * from './actions/ACTION_SQL_EDITOR_EXECUTE_NEW.js';
 export * from './actions/ACTION_SQL_EDITOR_EXECUTE_SCRIPT.js';
 export * from './actions/ACTION_SQL_EDITOR_EXECUTE.js';
@@ -51,3 +54,9 @@ export * from './SqlEditorService.js';
 export * from './SqlEditorSettingsService.js';
 export * from './SqlEditorView.js';
 export * from './SqlResultTabs/SqlQueryService.js';
+export * from './SqlResultTabs/ExecutionPlan/SqlExecutionPlanViewService.js';
+export * from './SqlResultTabs/ExecutionPlan/SqlExecutionPlanService.js';
+export * from './SqlResultTabs/ExecutionPlan/SQL_EXECUTION_PLAN_ACTIONS_MENU.js';
+export * from './SqlResultTabs/ExecutionPlan/DATA_CONTEXT_SQL_EXECUTION_PLAN_TAB.js';
+export * from './downloadSql.js';
+export type { ISqlExecutionPlanViewProps } from './SqlResultTabs/ExecutionPlan/ISqlExecutionPlanViewProps.js';

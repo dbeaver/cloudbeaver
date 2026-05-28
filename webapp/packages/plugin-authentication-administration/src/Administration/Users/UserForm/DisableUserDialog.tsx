@@ -56,7 +56,7 @@ export const DisableUserDialog: DialogComponent<IPayload> = observer(function Di
     <CommonDialogWrapper size="small" className={s(styles, { commonDialogWrapper: true })} fixedWidth>
       <CommonDialogHeader
         title={translate('authentication_administration_users_delete_user')}
-        icon="/icons/error_icon.svg"
+        icon="/icons/preload/error_icon.svg"
         bigIcon
         onReject={props.rejectDialog}
       />
@@ -64,7 +64,7 @@ export const DisableUserDialog: DialogComponent<IPayload> = observer(function Di
         <Text>{translate('authentication_administration_users_delete_user_disable_info', undefined, { username: props.payload.userId })}</Text>
       </CommonDialogBody>
       <CommonDialogFooter>
-        <Button variant="secondary" onClick={props.rejectDialog}>
+        <Button variant="secondary" onClick={() => props.rejectDialog()}>
           {translate('ui_processing_cancel')}
         </Button>
         <Fill />

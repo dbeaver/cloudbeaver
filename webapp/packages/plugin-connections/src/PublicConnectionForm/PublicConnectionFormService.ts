@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -127,10 +127,8 @@ export class PublicConnectionFormService {
   async save(): Promise<void> {
     const key = this.optionsPart?.connectionKey;
 
-    await this.close(true);
-
     if (key && this.connectionInfoResource.isConnected(key)) {
-      this.tryReconnect(key);
+      await this.tryReconnect(key);
     }
   }
 
@@ -184,23 +182,23 @@ export class PublicConnectionFormService {
       return true;
     }
 
-    const result = await this.commonDialogService.open(ConfirmationDialog, {
+    const { status } = await this.commonDialogService.open(ConfirmationDialog, {
       title: 'plugin_connections_connection_edit_cancel_title',
       message: 'plugin_connections_connection_edit_cancel_message',
       confirmActionText: 'ui_processing_ok',
     });
 
-    return result !== DialogueStateResult.Rejected;
+    return status !== DialogueStateResult.Rejected;
   }
 
   private async tryReconnect(connectionKey: IConnectionInfoParams) {
-    const result = await this.commonDialogService.open(ConfirmationDialog, {
+    const { status } = await this.commonDialogService.open(ConfirmationDialog, {
       title: 'plugin_connections_connection_edit_reconnect_title',
       message: 'plugin_connections_connection_edit_reconnect_message',
       confirmActionText: 'ui_reconnect',
     });
 
-    if (result === DialogueStateResult.Rejected) {
+    if (status === DialogueStateResult.Rejected) {
       return;
     }
 

@@ -16,7 +16,9 @@
  */
 package io.cloudbeaver.service.sql;
 
+import io.cloudbeaver.service.sql.WebSQLResultSetRowIdentifier.WebSQLResultSetRowIdentifierState;
 import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.data.DBDAttributeBinding;
 import org.jkiss.dbeaver.model.exec.DBCExecutionContext;
@@ -39,6 +41,8 @@ public class WebSQLQueryResultSet {
     private WebSQLResultsInfo resultsInfo;
     private boolean singleEntity = true;
     private boolean hasRowIdentifier;
+    private WebSQLResultSetRowIdentifierState rowIdentifierState;
+    private WebSQLResultSetRowIdentifier rowIdentifier;
 
     private boolean hasChildrenCollection;
     private boolean isSupportsDataFilter;
@@ -122,6 +126,25 @@ public class WebSQLQueryResultSet {
     }
 
     @Property
+    @Nullable
+    public WebSQLResultSetRowIdentifier getRowIdentifier() {
+        return rowIdentifier;
+    }
+
+    public void setRowIdentifier(@NotNull WebSQLResultSetRowIdentifier rowIdentifier) {
+        this.rowIdentifier = rowIdentifier;
+    }
+
+    @Property
+    public WebSQLResultSetRowIdentifierState getRowIdentifierState() {
+        return rowIdentifierState;
+    }
+
+    public void setRowIdentifierState(WebSQLResultSetRowIdentifierState rowIdentifierState) {
+        this.rowIdentifierState = rowIdentifierState;
+    }
+
+    @Property
     public boolean isHasChildrenCollection() {
         return hasChildrenCollection;
     }
@@ -161,8 +184,9 @@ public class WebSQLQueryResultSet {
     /**
      * Sets info about read-only status of a result set.
      */
-    public void setReadOnlyInfo(@NotNull DBCExecutionContext executionContext) {
+    public void setReadOnlyInfo(@Nullable DBCExecutionContext executionContext) {
         this.readOnly = DBExecUtils.isResultSetReadOnly(executionContext);
-        this.readOnlyStatus = DBExecUtils.getResultSetReadOnlyStatus(executionContext.getDataSource().getContainer());
+        this.readOnlyStatus = DBExecUtils.getResultSetReadOnlyStatus(
+            executionContext == null ? null : executionContext.getDataSource().getContainer());
     }
 }

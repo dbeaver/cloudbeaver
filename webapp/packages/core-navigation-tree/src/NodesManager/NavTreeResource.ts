@@ -1,10 +1,11 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+
 import { action, computed, makeObservable, observable, runInAction } from 'mobx';
 
 import { AppAuthService, UserInfoResource } from '@cloudbeaver/core-authentication';
@@ -19,6 +20,7 @@ import {
   CachedResourceOffsetPageTargetKey,
   getOffsetPageKeyInfo,
   type ICachedResourceMetadata,
+  hasMorePagesForResourceKey,
   isResourceAlias,
   isResourceKeyList,
   ResourceError,
@@ -131,16 +133,20 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
     if (parents.length === 0) {
       return true;
     }
+
     parents = [...parents];
 
     let parent: string | undefined;
+    let isParentHasMoreData = false;
     let children: string[] = [];
 
     while (parents.length > 0) {
       const next = parents.shift()!;
-      if (parent !== undefined && !children.includes(next)) {
+
+      if (parent !== undefined && !children.includes(next) && !isParentHasMoreData) {
         return false;
       }
+
       await this.scheduler.waitRelease(next);
 
       if (this.isLoadable(next)) {
@@ -149,9 +155,10 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
         children = this.get(next) || [];
       }
       parent = next;
+      isParentHasMoreData = hasMorePagesForResourceKey(this, next);
     }
 
-    if (nextNode !== undefined && !children.includes(nextNode)) {
+    if (nextNode !== undefined && !children.includes(nextNode) && !isParentHasMoreData) {
       return false;
     }
 
@@ -159,7 +166,7 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
   }
 
   async refreshTree(navNodeId: string, silent = false): Promise<void> {
-    this.performUpdate(navNodeId, [], async () => {
+    await this.performUpdate(navNodeId, [], async () => {
       await this.graphQLService.sdk.navRefreshNode({
         nodePath: navNodeId,
       });
@@ -172,7 +179,7 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
   }
 
   async refreshNode(navNodeId: string, silent = false): Promise<void> {
-    this.performUpdate(navNodeId, [], async () => {
+    await this.performUpdate(navNodeId, [], async () => {
       await this.graphQLService.sdk.navRefreshNode({
         nodePath: navNodeId,
       });
@@ -279,7 +286,7 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
       include,
     });
 
-    this.refreshNode(nodePath);
+    await this.refreshNode(nodePath);
   }
 
   async changeName(node: NavNode, name: string): Promise<string> {
@@ -290,20 +297,16 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
     const newNodeId = await this.performUpdate(parentId, [], async () => {
       this.markLoading(node.id, true);
       try {
-        await this.graphQLService.sdk.navRenameNode({
+        const { nodePath } = await this.graphQLService.sdk.navRenameNode({
           nodePath: node.id,
           newName: name,
         });
-
-        const parts = node.id.split('/');
-        parts.splice(parts.length - 1, 1, name);
-        const path = parts.join('/');
 
         this.markOutdated(parentId);
         this.markLoaded(node.id);
         this.onDataOutdated.execute(parentId);
 
-        return path;
+        return nodePath;
       } finally {
         this.markLoading(node.id, false);
       }

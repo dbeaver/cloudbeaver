@@ -1,6 +1,7 @@
 export default [
   ['plugin_connections_connection_form_part_main', '主要'],
   ['plugin_connections_connection_form_part_properties', '驱动属性'],
+  ['plugin_connections_connection_form_part_main_auth_model', '身份验证模型'],
   ['plugin_connections_connection_form_part_main_custom_host', '主机'],
   ['plugin_connections_connection_form_part_main_custom_port', '端口'],
   ['plugin_connections_connection_form_part_main_custom_server_name', '服务器名称'],
@@ -10,6 +11,8 @@ export default [
   ['plugin_connections_new_connection_dialog_title', '新连接'],
 
   ['plugin_connections_connection_edit_menu_item_title', '编辑连接'],
+  ['plugin_connections_connection_clone', '克隆'],
+  ['plugin_connections_connection_clone_error', '克隆连接失败'],
   ['plugin_connections_connection_edit_cancel_title', '取消确认'],
   ['plugin_connections_connection_edit_cancel_message', '您将取消连接更改。未保存的更改将丢失。您确定吗？'],
   ['plugin_connections_connection_edit_reconnect_title', '连接已更新'],
@@ -30,8 +33,14 @@ export default [
 
   ['plugin_connections_connection_ssl_enable', '启用 SSL'],
   ['plugin_connections_connection_ssl_optional', 'All SSL parameters are optional.'],
-  ['plugin_connections_connection_ssl_description', 'You must specify SSL certificates if they are required by your server configuration. Settings on this page override Driver properties'],
-  ['plugin_connections_connection_ssl_note', '{arg:productName} does not verify SSL configuration and relies on the driver implementation. Please refer to the driver documentation for more information.'],
+  [
+    'plugin_connections_connection_ssl_description',
+    'You must specify SSL certificates if they are required by your server configuration. Settings on this page override Driver properties',
+  ],
+  [
+    'plugin_connections_connection_ssl_note',
+    '{arg:productName} does not verify SSL configuration and relies on the driver implementation. Please refer to the driver documentation for more information.',
+  ],
   ['plugin_connections_connection_ssl_docs', 'SSL configuration documentation'],
 
   ['plugin_connections_connection_form_shared_credentials_manage_info', '您可在此管理凭证 '],

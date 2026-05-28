@@ -166,7 +166,7 @@ export class PluginBootstrap extends Bootstrap {
       }
     }
 
-    const result = await this.commonDialogService.open(SaveScriptDialog, {
+    const { status, result } = await this.commonDialogService.open(SaveScriptDialog, {
       defaultScriptName: name,
       projectId,
       validation: async ({ name, projectId }, setMessage) => {
@@ -195,7 +195,7 @@ export class PluginBootstrap extends Bootstrap {
       },
     });
 
-    if (result !== DialogueStateResult.Rejected && result !== DialogueStateResult.Resolved) {
+    if (status === DialogueStateResult.Resolved && result !== undefined) {
       try {
         projectId = result.projectId;
 
@@ -236,6 +236,8 @@ export class PluginBootstrap extends Bootstrap {
 
         if (!this.resourceManagerScriptsService.active) {
           this.resourceManagerScriptsService.togglePanel();
+        } else {
+          this.resourceManagerScriptsService.selectTab();
         }
       } catch (exception) {
         this.notificationService.logException(exception as any, 'plugin_sql_editor_navigation_tab_resource_save_script_error');

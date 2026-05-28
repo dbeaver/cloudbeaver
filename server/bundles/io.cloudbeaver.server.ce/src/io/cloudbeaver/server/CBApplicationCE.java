@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,6 @@
 package io.cloudbeaver.server;
 
 import io.cloudbeaver.auth.NoAuthCredentialsProvider;
-import io.cloudbeaver.model.CBWebServerConfig;
-import io.cloudbeaver.model.WebServerConfig;
 import io.cloudbeaver.model.config.CBServerConfig;
 import io.cloudbeaver.model.rm.local.LocalResourceController;
 import io.cloudbeaver.service.security.CBEmbeddedSecurityController;
@@ -77,12 +75,16 @@ public class CBApplicationCE extends CBApplication<CBServerConfig> {
         );
     }
 
-
-
+    @NotNull
     @Override
-    public RMController createResourceController(@NotNull SMCredentialsProvider credentialsProvider,
-                                                 @NotNull DBPWorkspace workspace) throws DBException {
-        return LocalResourceController.builder(credentialsProvider, workspace, this::getSecurityController).build();
+    public RMController createResourceController(
+        @NotNull SMCredentialsProvider credentialsProvider,
+        @NotNull DBPWorkspace workspace
+    ) throws DBException {
+        var lockManager = createLockManager();
+        return LocalResourceController
+            .builder(credentialsProvider, workspace, lockManager, this::getSecurityController)
+            .build();
     }
 
     @NotNull
@@ -96,17 +98,6 @@ public class CBApplicationCE extends CBApplication<CBServerConfig> {
         return serverConfigController;
     }
 
-    protected void shutdown() {
-        try {
-            if (securityController instanceof CBEmbeddedSecurityController<?> embeddedSecurityController) {
-                embeddedSecurityController.shutdown();
-            }
-        } catch (Exception e) {
-            log.error(e);
-        }
-        super.shutdown();
-    }
-
     protected void finishSecurityServiceConfiguration(
         @NotNull String adminName,
         @Nullable String adminPassword,
@@ -115,5 +106,10 @@ public class CBApplicationCE extends CBApplication<CBServerConfig> {
         if (securityController instanceof CBEmbeddedSecurityController<?> embeddedSecurityController) {
             embeddedSecurityController.finishConfiguration(adminName, adminPassword, authInfoList);
         }
+    }
+
+    @Override
+    public boolean isCommunity() {
+        return true;
     }
 }

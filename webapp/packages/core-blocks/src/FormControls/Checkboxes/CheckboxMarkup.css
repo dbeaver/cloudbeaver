@@ -42,7 +42,6 @@
   .checkbox-markup {
     --dbv-kit-checkbox-hover-shadow-color: color-mix(in srgb, var(--theme-on-secondary), white 80%);
 
-    --dbv-kit-checkbox-border-width: 2px;
     --dbv-kit-checkbox-border-radius: 2px;
 
     --dbv-kit-checkbox-small-height: 24px;
@@ -71,6 +70,10 @@
       &[data-disabled='true'] {
         & .dbv-kit-checkbox__check {
           --dbv-kit-checkbox-background-checked: color-mix(in srgb, var(--theme-on-secondary), white 30%);
+        }
+
+        & .checkbox-markup__caption {
+          color: var(--theme-on-surface);
         }
       }
     }

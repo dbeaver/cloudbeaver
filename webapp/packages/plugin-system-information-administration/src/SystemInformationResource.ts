@@ -8,11 +8,11 @@
 
 import { injectable } from '@cloudbeaver/core-di';
 import { CachedDataResource } from '@cloudbeaver/core-resource';
-import { GraphQLService, type ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
+import { GraphQLService, type IObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 import { SessionPermissionsResource, EAdminPermission } from '@cloudbeaver/core-root';
 
 @injectable(() => [GraphQLService, SessionPermissionsResource])
-export class SystemInformationResource extends CachedDataResource<ObjectPropertyInfo[]> {
+export class SystemInformationResource extends CachedDataResource<IObjectPropertyInfo[]> {
   constructor(
     private readonly graphQLService: GraphQLService,
     private readonly sessionPermissionsResource: SessionPermissionsResource,
@@ -21,7 +21,7 @@ export class SystemInformationResource extends CachedDataResource<ObjectProperty
     this.sessionPermissionsResource.require(this, EAdminPermission.admin).outdateResource(this);
   }
 
-  protected async loader(): Promise<ObjectPropertyInfo[]> {
+  protected async loader(): Promise<IObjectPropertyInfo[]> {
     const { info } = await this.graphQLService.sdk.getSystemInfo();
     return info;
   }

@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
  */
 package io.cloudbeaver.service.sql;
 
+import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.data.DBDAttributeConstraint;
 import org.jkiss.dbeaver.model.gis.DBGeometry;
 import org.jkiss.utils.CommonUtils;
@@ -27,6 +28,7 @@ import java.util.Map;
  */
 public class WebSQLDataFilterConstraint {
 
+    private String attributeName;
     private Integer attributePosition;
     private Integer orderPosition;
     private Boolean orderAsc;
@@ -38,8 +40,9 @@ public class WebSQLDataFilterConstraint {
     private WebSQLDataFilterConstraint() {
     }
 
-    public WebSQLDataFilterConstraint(Map<String, Object> map) {
-        this.attributePosition = CommonUtils.toInt(map.get("attributePosition"));
+    public WebSQLDataFilterConstraint(@NotNull Map<String, Object> map) {
+        this.attributeName = CommonUtils.toString(map.get("attributeName"));
+        this.attributePosition = CommonUtils.toInteger(map.get("attributePosition"), null);
         this.orderPosition = map.containsKey("orderPosition") ?
             CommonUtils.toInt(map.get("orderPosition")) + 1 : // Use position + 1 because 0 means no ordering (because of legacy compatibility)
             null;
@@ -64,8 +67,10 @@ public class WebSQLDataFilterConstraint {
 
     }
 
-    public static WebSQLDataFilterConstraint from(DBDAttributeConstraint constraint) {
+    @NotNull
+    public static WebSQLDataFilterConstraint from(@NotNull DBDAttributeConstraint constraint) {
         var webConstraint = new WebSQLDataFilterConstraint();
+        webConstraint.attributeName = constraint.getAttributeName();
         webConstraint.orderPosition = constraint.getOrderPosition();
         webConstraint.orderAsc = !constraint.isOrderDescending();
         webConstraint.criteria = constraint.getCriteria();
@@ -74,6 +79,10 @@ public class WebSQLDataFilterConstraint {
         }
         webConstraint.value = constraint.getValue();
         return webConstraint;
+    }
+
+    public String getAttributeName() {
+        return attributeName;
     }
 
     public Integer getAttributePosition() {

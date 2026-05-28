@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@ import { ConfigurationsList } from './AuthProviderForm/ConfigurationsList.js';
 import { FEDERATED_AUTH } from './FEDERATED_AUTH.js';
 import { getAuthProviderTabId, useAuthDialogState } from './useAuthDialogState.js';
 
-export const AuthDialog: DialogComponent<IAuthOptions, null> = observer(function AuthDialog({
+export const AuthDialog: DialogComponent<IAuthOptions> = observer(function AuthDialog({
   payload: { providerId, configurationId, linkUser = false, accessRequest = false },
   options,
   rejectDialog,
@@ -53,7 +53,7 @@ export const AuthDialog: DialogComponent<IAuthOptions, null> = observer(function
   const translate = useTranslate();
   const state = dialogData.state;
 
-  const additional = userInfo.data !== null && state.activeProvider?.id !== undefined && !userInfo.hasToken(state.activeProvider.id);
+  const additional = userInfo.isAuthenticated() && state.activeProvider?.id !== undefined && !userInfo.hasToken(state.activeProvider.id);
 
   const showTabs = getComputed(() => dialogData.tabIds.length > 1);
   const emptyTabs = getComputed(() => dialogData.tabIds.length === 0);
@@ -150,10 +150,10 @@ export const AuthDialog: DialogComponent<IAuthOptions, null> = observer(function
       }}
     >
       <CommonDialogWrapper
+        autoFocusOnShow={false}
         className={s(styles, { wrapper: true })}
         size="large"
         aria-label={translate('authentication_login_dialog_title')}
-        autofocus={false}
       >
         <CommonDialogHeader
           title={dialogTitle}

@@ -4,6 +4,7 @@ export default [
   ['plugin_help_welcome_docs_label', 'Documentation'],
   ['plugin_help_welcome_docs_description', 'Learn how to use {arg:product}'],
 
+  ['data_viewer_shortcut_open_cell_context_menu', 'Mở menu ngữ cảnh cho ô được chọn'],
   ['data_viewer_shortcut_start_inline_editing', 'Mở Trình chỉnh sửa inline cho ô được chọn'],
   ['data_viewer_shortcut_add_new_row', 'Thêm một hàng mới'],
   ['data_viewer_shortcut_duplicate_row', 'Sao chép hàng'],
@@ -18,8 +19,11 @@ export default [
   ['sql_editor_shortcut_show_execution_plan', 'Hiển thị kế hoạch thực thi'],
   ['sql_editor_shortcut_format', 'Định dạng kịch bản'],
   ['sql_editor_shortcut_open_editor_in_new_tab', 'Mở Trình chỉnh sửa SQL trong tab riêng biệt'],
-  ['sql_editor_shortcut_find', 'Tìm kiếm'],
   ['sql_editor_shortcut_comment_uncomment_selection', 'Bình luận/Bỏ bình luận lựa chọn'],
+  ['sql_editor_shortcut_start_completion', 'Hiển thị gợi ý tự động hoàn thành'],
+  ['sql_editor_shortcut_accept_completion', 'Chấp nhận tự động hoàn thành'],
+  ['sql_editor_shortcut_escape', 'Thoát khỏi trình chỉnh sửa'],
+  ['plugin_search_panel_find', 'Tìm kiếm'],
 
   ['navigation_tree_shortcut_enable_filter', 'Bật lọc'],
 

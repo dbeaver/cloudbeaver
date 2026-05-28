@@ -74,6 +74,9 @@
       "path": "../core-server-notifications"
     },
     {
+      "path": "../core-session-actions"
+    },
+    {
       "path": "../core-session-localization"
     },
     {
@@ -87,6 +90,9 @@
     },
     {
       "path": "../core-storage"
+    },
+    {
+      "path": "../core-support"
     },
     {
       "path": "../core-task-manager"
@@ -116,6 +122,9 @@
       "path": "../plugin-app-logo-administration"
     },
     {
+      "path": "../plugin-async-task-confirmation"
+    },
+    {
       "path": "../plugin-authentication"
     },
     {
@@ -131,7 +140,13 @@
       "path": "../plugin-connection-custom"
     },
     {
+      "path": "../plugin-connection-preferences"
+    },
+    {
       "path": "../plugin-connection-search"
+    },
+    {
+      "path": "../plugin-connection-view"
     },
     {
       "path": "../plugin-connections"
@@ -153,6 +168,12 @@
     },
     {
       "path": "../plugin-data-viewer"
+    },
+    {
+      "path": "../plugin-data-viewer-conditional-formatting"
+    },
+    {
+      "path": "../plugin-data-viewer-request-query-viewer"
     },
     {
       "path": "../plugin-data-viewer-result-set-grouping"
@@ -230,6 +251,9 @@
       "path": "../plugin-root"
     },
     {
+      "path": "../plugin-script-export"
+    },
+    {
       "path": "../plugin-session-expiration"
     },
     {
@@ -246,6 +270,9 @@
     },
     {
       "path": "../plugin-settings-panel"
+    },
+    {
+      "path": "../plugin-sql-async-task-confirmation"
     },
     {
       "path": "../plugin-sql-editor"

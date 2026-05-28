@@ -18,6 +18,7 @@ import {
   IconOrImage,
   ObjectPropertyInfoForm,
   s,
+  SAVED_VALUE_INDICATOR,
   Switch,
   useAdministrationSettings,
   useAutoLoad,
@@ -31,10 +32,8 @@ import { ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import type { NetworkHandlerConfigInput, NetworkHandlerDescriptor } from '@cloudbeaver/core-sdk';
 import { type TabContainerPanelComponent, useTab } from '@cloudbeaver/core-ui';
-import { isSafari } from '@cloudbeaver/core-utils';
 import { WEBSITE_LINKS } from '@cloudbeaver/core-links';
 
-import { SAVED_VALUE_INDICATOR } from './SAVED_VALUE_INDICATOR.js';
 import styles from './SSL.module.css';
 import type { IConnectionFormProps } from '../IConnectionFormState.js';
 import { ConnectionInfoNetworkHandlersResource } from '@cloudbeaver/core-connections';
@@ -64,7 +63,6 @@ export const SSL: TabContainerPanelComponent<Props> = observer(function SSL({ fo
   });
   const handlersInfo = connectionInfoNetworkHandlersService.data;
   const initialHandler = handlersInfo?.networkHandlersConfig?.find(h => h.id === handler.id);
-  const autofillToken = isSafari ? 'section-connection-authentication-ssl section-ssl' : 'new-password';
   const projectInfoResource = useService(ProjectInfoResource);
   const isSharedProject = projectInfoResource.isProjectShared(formState.state.projectId);
 
@@ -84,7 +82,7 @@ export const SSL: TabContainerPanelComponent<Props> = observer(function SSL({ fo
               category={null}
               disabled={disabled || !enabled}
               isSaved={p => !!p.id && initialHandler?.secureProperties[p.id] === SAVED_VALUE_INDICATOR}
-              autofillToken={autofillToken}
+              autocompleteSectionName="section-ssl"
               hideEmptyPlaceholder
               showRememberTip
               small
@@ -99,7 +97,7 @@ export const SSL: TabContainerPanelComponent<Props> = observer(function SSL({ fo
                 category={category}
                 disabled={disabled || !enabled}
                 isSaved={p => !!p.id && initialHandler?.secureProperties[p.id] === SAVED_VALUE_INDICATOR}
-                autofillToken={autofillToken}
+                autocompleteSectionName="section-ssl"
                 hideEmptyPlaceholder
                 showRememberTip
                 small

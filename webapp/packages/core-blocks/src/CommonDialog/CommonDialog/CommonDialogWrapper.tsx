@@ -1,17 +1,16 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { forwardRef, useContext, useEffect } from 'react';
-import { Dialog, useDialogState } from 'reakit';
+import { forwardRef, useContext } from 'react';
 
+import { Dialog } from '@dbeaver/ui-kit';
 import { Loader } from '../../Loader/Loader.js';
 import { s } from '../../s.js';
-import { useFocus } from '../../useFocus.js';
 import { useS } from '../../useS.js';
 import { DialogContext } from '../DialogContext.js';
 import styles from './CommonDialogWrapper.module.css';
@@ -24,50 +23,62 @@ export interface CommonDialogWrapperProps {
   fixedSize?: boolean;
   fixedWidth?: boolean;
   freeHeight?: boolean;
-  autofocus?: boolean;
   className?: string;
   children?: React.ReactNode;
+  autoFocusOnHide?: boolean | ((element: HTMLElement | null) => boolean) | undefined;
+  autoFocusOnShow?: boolean | ((element: HTMLElement | null) => boolean) | undefined;
+  initialFocus?: HTMLElement | React.RefObject<HTMLElement | null> | null | undefined;
 }
 
 export const CommonDialogWrapper = observer<CommonDialogWrapperProps, HTMLDivElement>(
   forwardRef(function CommonDialogWrapper(
-    { size = 'medium', fixedSize, fixedWidth, freeHeight, autofocus = true, 'aria-label': ariaLabel, className, children },
+    {
+      size = 'medium',
+      fixedSize,
+      fixedWidth,
+      freeHeight,
+      'aria-label': ariaLabel,
+      autoFocusOnHide = true,
+      autoFocusOnShow = true,
+      className,
+      initialFocus,
+      children,
+    },
     ref,
   ) {
-    const [focusedRef] = useFocus({ autofocus });
     const computedStyles = useS(styles);
     const context = useContext(DialogContext);
-    const dialogState = useDialogState({ visible: true });
 
-    useEffect(() => {
-      if (!dialogState.visible && !context.dialog.options?.persistent) {
+    function handleClose() {
+      if (!context.dialog.options?.persistent) {
         context.reject();
       }
-    });
+    }
+
+    // We need to specify persistent notifications for the dialog to make them accessible when the dialog is open.
+    function getDefaultPersistentElements(): Element[] {
+      const dialogs = document.querySelectorAll('[data-dialog]');
+      const persistentNotifications = document.querySelectorAll('[data-dialog-persistent-notification]');
+
+      return [...dialogs, ...persistentNotifications];
+    }
 
     return (
       <Dialog
-        {...dialogState}
         ref={ref}
         aria-label={ariaLabel}
-        className={s(computedStyles, { container: true })}
-        visible={context.visible}
-        hideOnClickOutside={false}
-        modal={false}
+        open={context.visible}
+        data-size={size}
+        getPersistentElements={getDefaultPersistentElements}
+        className={s(computedStyles, { dialog: true, fixedSize, fixedWidth, freeHeight }, 'tw:shadow-xlarge', className)}
+        autoFocusOnShow={autoFocusOnShow}
+        autoFocusOnHide={autoFocusOnHide}
+        initialFocus={initialFocus as HTMLElement | React.RefObject<HTMLElement> | null | undefined}
+        onClose={handleClose}
       >
-        <dialog
-          ref={focusedRef}
-          tabIndex={0}
-          className={s(
-            computedStyles,
-            { dialog: true, small: size === 'small', medium: size === 'medium', large: size === 'large', fixedSize, fixedWidth, freeHeight },
-            className,
-          )}
-        >
-          <Loader className={s(computedStyles, { loader: true })} suspense>
-            {children}
-          </Loader>
-        </dialog>
+        <Loader className={s(computedStyles, { loader: true })} suspense>
+          {children}
+        </Loader>
       </Dialog>
     );
   }),

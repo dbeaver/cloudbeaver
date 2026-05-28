@@ -17,6 +17,9 @@
       "path": "../../common-typescript/@dbeaver/cli"
     },
     {
+      "path": "../../common-typescript/@dbeaver/js-helpers"
+    },
+    {
       "path": "../../common-typescript/@dbeaver/result-set-api"
     },
     {
@@ -27,6 +30,9 @@
     },
     {
       "path": "../core-cli"
+    },
+    {
+      "path": "../core-connections"
     },
     {
       "path": "../core-data-context"
@@ -63,6 +69,12 @@
     },
     {
       "path": "../plugin-data-viewer"
+    },
+    {
+      "path": "../plugin-data-viewer-conditional-formatting"
+    },
+    {
+      "path": "../plugin-sql-generator"
     }
   ],
   "include": [

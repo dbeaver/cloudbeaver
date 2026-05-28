@@ -3,21 +3,18 @@ Bundle-ManifestVersion: 2
 Bundle-Vendor: DBeaver Corp
 Bundle-Name: Cloudbeaver Web Server
 Bundle-SymbolicName: io.cloudbeaver.server;singleton:=true
-Bundle-Version: 25.2.3.qualifier
-Bundle-Release-Date: 20251020
+Bundle-Version: 26.1.1.qualifier
+Bundle-Release-Date: 20260622
 Bundle-RequiredExecutionEnvironment: JavaSE-21
 Bundle-ActivationPolicy: lazy
-Require-Bundle: org.eclipse.core.runtime;visibility:=reexport,
- org.apache.commons.jexl,
- org.jkiss.utils;visibility:=reexport,
- org.jkiss.dbeaver.model.sql;visibility:=reexport,
+Require-Bundle: org.jkiss.dbeaver.model.sql;visibility:=reexport,
  org.jkiss.dbeaver.data.gis,
  org.jkiss.bundle.jetty.server;visibility:=reexport,
- com.google.gson;visibility:=reexport,
  org.jkiss.bundle.graphql;visibility:=reexport,
  org.jkiss.bundle.apache.dbcp,
  org.jkiss.dbeaver.net.ssh,
  io.cloudbeaver.model;visibility:=reexport,
+ io.cloudbeaver.model.cli,
  io.cloudbeaver.service.security;visibility:=reexport
 Export-Package: io.cloudbeaver,
  io.cloudbeaver.model,

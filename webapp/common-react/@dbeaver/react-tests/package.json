@@ -23,7 +23,7 @@
     "!lib/tests",
     "!.tsbuildinfo"
   ],
-  "packageManager": "yarn@4.9.2",
+  "packageManager": "yarn@4.14.1",
   "devDependencies": {
     "@dbeaver/cli": "workspace:^",
     "@dbeaver/tsconfig": "workspace:^",
@@ -34,7 +34,7 @@
     "@types/ws": "^8",
     "rimraf": "^6",
     "typescript": "^5",
-    "vitest": "^3",
+    "vitest": "^4",
     "ws": "^8"
   }
 }

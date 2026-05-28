@@ -40,6 +40,7 @@ export interface IUserDetailsInfoProps {
 export class UsersAdministrationService extends Bootstrap {
   readonly tabsContainer: TabsContainer;
   readonly userDetailsInfoPlaceholder: PlaceholderContainer<IUserDetailsInfoProps>;
+  readonly informationPlaceholder: PlaceholderContainer;
   administrationItem!: IAdministrationItem;
 
   constructor(
@@ -52,6 +53,7 @@ export class UsersAdministrationService extends Bootstrap {
     super();
     this.userDetailsInfoPlaceholder = new PlaceholderContainer();
     this.tabsContainer = new TabsContainer('Access Control');
+    this.informationPlaceholder = new PlaceholderContainer();
   }
 
   override register(): void {

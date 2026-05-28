@@ -95,7 +95,7 @@ public class DBNResourceManagerProject extends DBNAbstractResourceManagerNode {
         return true;
     }
 
-    @NotNull
+    @Nullable
     @Override
     public DBNResourceManagerResource[] getChildren(@NotNull DBRProgressMonitor monitor) throws DBException {
         if (children == null && !monitor.isForceCacheUsage()) {

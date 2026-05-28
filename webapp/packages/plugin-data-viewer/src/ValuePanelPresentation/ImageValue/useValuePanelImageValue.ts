@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -9,22 +9,24 @@ import { action, computed, observable } from 'mobx';
 
 import { useObservableRef } from '@cloudbeaver/core-blocks';
 import { promptForFiles } from '@cloudbeaver/core-browser';
+import { ConnectionInfoResource, createConnectionParam } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { download, getMIME, isImageFormat, isValidUrl } from '@cloudbeaver/core-utils';
 import { isResultSetBinaryValue } from '@dbeaver/result-set-api';
 
 import { createResultSetBlobValue } from '../../DatabaseDataModel/Actions/ResultSet/createResultSetBlobValue.js';
-import type { IResultSetElementKey } from '../../DatabaseDataModel/Actions/ResultSet/IResultSetDataKey.js';
 import { isResultSetBlobValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetBlobValue.js';
 import { isResultSetFileValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetFileValue.js';
 import { ResultSetDataContentAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetDataContentAction.js';
-import { ResultSetEditAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetEditAction.js';
-import { ResultSetFormatAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction.js';
-import { ResultSetSelectAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction.js';
 import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel.js';
 import { DataViewerService } from '../../DataViewerService.js';
 import { ResultSetDataSource } from '../../ResultSet/ResultSetDataSource.js';
+import { IDatabaseDataSelectAction } from '../../DatabaseDataModel/Actions/IDatabaseDataSelectAction.js';
+import { IDatabaseDataFormatAction } from '../../DatabaseDataModel/Actions/IDatabaseDataFormatAction.js';
+import { IDatabaseDataEditAction } from '../../DatabaseDataModel/Actions/IDatabaseDataEditAction.js';
+import { GridSelectAction } from '../../DatabaseDataModel/Actions/Grid/GridSelectAction.js';
+import type { IGridDataKey } from '../../DatabaseDataModel/Actions/Grid/IGridDataKey.js';
 
 interface Props {
   model: IDatabaseDataModel<ResultSetDataSource>;
@@ -34,22 +36,26 @@ interface Props {
 export function useValuePanelImageValue({ model, resultIndex }: Props) {
   const notificationService = useService(NotificationService);
   const dataViewerService = useService(DataViewerService);
-  const selectAction = model.source.getAction(resultIndex, ResultSetSelectAction);
-  const formatAction = model.source.getAction(resultIndex, ResultSetFormatAction);
+  const connectionInfoResource = useService(ConnectionInfoResource);
+  const selectAction = model.source.getAction(resultIndex, IDatabaseDataSelectAction, GridSelectAction);
+  const formatAction = model.source.getAction(resultIndex, IDatabaseDataFormatAction);
   const contentAction = model.source.getAction(resultIndex, ResultSetDataContentAction);
-  const editAction = model.source.getAction(resultIndex, ResultSetEditAction);
+  const editAction = model.source.getAction(resultIndex, IDatabaseDataEditAction);
 
   return useObservableRef(
     () => ({
-      get selectedCell(): IResultSetElementKey | undefined {
+      get selectedCell(): IGridDataKey | undefined {
         return this.selectAction.getActiveElements()?.[0];
       },
-      get cellValue() {
+      get cellHolder() {
         if (this.selectedCell === undefined) {
           return null;
         }
 
         return this.formatAction.get(this.selectedCell);
+      },
+      get cellValue() {
+        return this.cellHolder?.value ?? null;
       },
       get src(): string | Blob | null {
         if (isResultSetBlobValue(this.cellValue)) {
@@ -94,24 +100,29 @@ export function useValuePanelImageValue({ model, resultIndex }: Props) {
           return false;
         }
 
-        if (this.truncated && this.selectedCell) {
-          return this.contentAction.isDownloadable(this.selectedCell);
+        if (this.truncated && this.cellHolder) {
+          return this.contentAction.isDownloadable(this.cellHolder);
         }
 
-        return this.staticSrc && !this.truncated;
+        return !!this.staticSrc && !this.truncated;
       },
       get canUpload() {
-        if (!this.selectedCell) {
+        const executionContext = this.model.source.executionContext?.context;
+        const connection =
+          executionContext && this.connectionInfoResource.get(createConnectionParam(executionContext.projectId, executionContext.connectionId));
+        const isDataEditable = !!connection && this.dataViewerService.isDataEditable(connection);
+
+        if (!this.cellHolder || !connection || !isDataEditable) {
           return false;
         }
-        return this.formatAction.isBinary(this.selectedCell);
+        return this.formatAction.isBinary(this.cellHolder);
       },
       get truncated() {
         if (isResultSetFileValue(this.cellValue)) {
           return false;
         }
 
-        return this.selectedCell && this.contentAction.isBlobTruncated(this.selectedCell);
+        return !!this.cellHolder && this.contentAction.isBlobTruncated(this.cellHolder);
       },
       async download() {
         try {
@@ -130,13 +141,17 @@ export function useValuePanelImageValue({ model, resultIndex }: Props) {
           this.notificationService.logException(exception, 'data_viewer_presentation_value_content_download_error');
         }
       },
-      upload() {
-        promptForFiles().then(files => {
+      async upload() {
+        try {
+          const files = await promptForFiles();
           const file = files?.[0];
+
           if (file && this.selectedCell) {
             this.editAction.set(this.selectedCell, createResultSetBlobValue(file));
           }
-        });
+        } catch (exception: any) {
+          this.notificationService.logException(exception, 'ui_upload_file_fail');
+        }
       },
       async loadFullImage() {
         if (!this.selectedCell) {
@@ -164,6 +179,6 @@ export function useValuePanelImageValue({ model, resultIndex }: Props) {
       upload: action.bound,
       loadFullImage: action.bound,
     },
-    { model, resultIndex, notificationService, selectAction, formatAction, contentAction, editAction, dataViewerService },
+    { model, resultIndex, notificationService, selectAction, formatAction, contentAction, editAction, dataViewerService, connectionInfoResource },
   );
 }

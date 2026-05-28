@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -11,7 +11,7 @@ import { action, makeObservable, observable, runInAction, toJS } from 'mobx';
 import { AppAuthService, UserInfoResource } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
 import { Executor, ExecutorInterrupter, type ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
-import { NodeManagerUtils } from '@cloudbeaver/core-navigation-tree';
+import { NavTreeResource, NodeManagerUtils } from '@cloudbeaver/core-navigation-tree';
 import { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
 import {
   CachedMapAllKey,
@@ -26,13 +26,7 @@ import {
   resourceKeyListAliasFactory,
   ResourceKeyUtils,
 } from '@cloudbeaver/core-resource';
-import {
-  DataSynchronizationService,
-  type NavigatorViewSettings,
-  ServerEventId,
-  SessionDataResource,
-  WorkspaceConfigEventHandler,
-} from '@cloudbeaver/core-root';
+import { DataSynchronizationService, ServerEventId, SessionDataResource, WorkspaceConfigEventHandler } from '@cloudbeaver/core-root';
 import {
   type AdminConnectionGrantInfo,
   type AdminConnectionSearchInfo,
@@ -40,7 +34,6 @@ import {
   type GetUserConnectionsQueryVariables,
   GraphQLService,
   type InitConnectionMutationVariables,
-  type NavigatorSettingsInput,
   type TestConnectionMutation,
 } from '@cloudbeaver/core-sdk';
 import { schemaValidationError } from '@cloudbeaver/core-utils';
@@ -64,16 +57,6 @@ export const ConnectionInfoProjectKey = resourceKeyListAliasFactory('@connection
 
 export const ConnectionInfoActiveProjectKey = resourceKeyListAlias('@connection-info/projects-active');
 
-export const DEFAULT_NAVIGATOR_VIEW_SETTINGS: NavigatorSettingsInput = {
-  showOnlyEntities: false,
-  hideFolders: false,
-  hideVirtualModel: false,
-  hideSchemas: false,
-  mergeEntities: false,
-  showSystemObjects: false,
-  showUtilityObjects: false,
-};
-
 export interface IConnectionInfoMetadata extends ICachedResourceMetadata {
   connecting?: boolean;
 }
@@ -90,6 +73,7 @@ export interface IConnectionInfoMetadata extends ICachedResourceMetadata {
   ConnectionInfoEventHandler,
   ConnectionStateEventHandler,
   UserInfoResource,
+  NavTreeResource,
 ])
 export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoParams, Connection, ConnectionInfoIncludes, IConnectionInfoMetadata> {
   readonly onConnectionCreate: Executor<Connection>;
@@ -109,6 +93,7 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
     connectionInfoEventHandler: ConnectionInfoEventHandler,
     connectionStateEventHandler: ConnectionStateEventHandler,
     userInfoResource: UserInfoResource,
+    navTreeResource: NavTreeResource,
   ) {
     super();
 
@@ -153,6 +138,14 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
     sessionDataResource.onDataOutdated.addHandler(() => {
       this.sessionUpdate = true;
       this.markOutdated();
+    });
+
+    navTreeResource.onNodeRename.addHandler(data => {
+      const connection = this.getConnectionForNode(data.newNodeId);
+
+      if (connection) {
+        this.markOutdated(createConnectionParam(connection));
+      }
     });
 
     connectionInfoEventHandler.onEvent<ResourceKeyList<IConnectionInfoParams>>(
@@ -432,20 +425,6 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
     return this.get(key)!;
   }
 
-  async changeConnectionView(key: IConnectionInfoParams, settings: NavigatorViewSettings): Promise<Connection> {
-    const connectionNavigatorViewSettings = this.get(key)?.navigatorSettings || DEFAULT_NAVIGATOR_VIEW_SETTINGS;
-    const { connection } = await this.graphQLService.sdk.setConnectionNavigatorSettings({
-      connectionId: key.connectionId,
-      projectId: key.projectId,
-      settings: { ...connectionNavigatorViewSettings, ...settings },
-    });
-
-    this.set(createConnectionParam(connection), connection);
-    this.onDataOutdated.execute(key);
-
-    return this.get(key)!;
-  }
-
   async update(key: IConnectionInfoParams, config: ConnectionConfig): Promise<DatabaseConnection> {
     await this.performUpdate(key, [], async () => {
       const { connection } = await this.graphQLService.sdk.updateConnection({
@@ -603,7 +582,7 @@ export function isNewConnection(connection: Connection | NewConnection): connect
   return (connection as NewConnection)[NEW_CONNECTION_SYMBOL];
 }
 
-export function compareConnectionsInfo(a: DatabaseConnection, b: DatabaseConnection): number {
+export function compareConnectionsInfo<T extends Pick<DatabaseConnection, 'name'>>(a: T, b: T): number {
   return a.name.localeCompare(b.name);
 }
 

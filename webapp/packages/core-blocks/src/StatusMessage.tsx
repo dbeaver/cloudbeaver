@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ interface Props {
   exception?: Error | null;
   className?: string;
   multipleRows?: boolean;
-  onShowDetails?: () => void;
+  onShowDetails?: () => Promise<void> | void;
 }
 
 export const StatusMessage = observer<Props>(function StatusMessage({
@@ -51,12 +51,12 @@ export const StatusMessage = observer<Props>(function StatusMessage({
 
   message = translateMessage(message) || translateMessage(errorDetails.message);
 
-  let icon = '/icons/info_icon.svg';
+  let icon = '/icons/preload/info_icon.svg';
 
   if (isError) {
-    icon = '/icons/error_icon.svg';
+    icon = '/icons/preload/error_icon.svg';
   } else if (type === ENotificationType.Success) {
-    icon = '/icons/success_icon.svg';
+    icon = '/icons/preload/success_icon.svg';
   }
 
   if (errorDetails.hasDetails && !onShowDetails) {

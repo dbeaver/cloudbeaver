@@ -14,14 +14,19 @@ import { bytesToSize, download, downloadFromURL, GlobalConstants } from '@cloudb
 import { isNotNullDefined } from '@dbeaver/js-helpers';
 
 import { DatabaseDataAction } from '../../DatabaseDataAction.js';
-import type { IDatabaseDataSource } from '../../IDatabaseDataSource.js';
+import { IDatabaseDataSource } from '../../IDatabaseDataSource.js';
 import type { IDatabaseResultSet } from '../../IDatabaseResultSet.js';
-import { databaseDataAction } from '../DatabaseDataActionDecorator.js';
 import type { IResultSetDataContentAction } from './IResultSetDataContentAction.js';
-import type { IResultSetElementKey } from './IResultSetDataKey.js';
 import { ResultSetCacheAction } from './ResultSetCacheAction.js';
 import { ResultSetDataAction } from './ResultSetDataAction.js';
 import { type IResultSetValue, ResultSetFormatAction } from './ResultSetFormatAction.js';
+import { injectable } from '@cloudbeaver/core-di';
+import { IDatabaseDataResult } from '../../IDatabaseDataResult.js';
+import { IDatabaseDataCacheAction } from '../IDatabaseDataCacheAction.js';
+import { IDatabaseDataFormatAction } from '../IDatabaseDataFormatAction.js';
+import { IDatabaseDataResultAction } from '../IDatabaseDataResultAction.js';
+import type { IGridDataKey } from '../Grid/IGridDataKey.js';
+import type { IDatabaseValueHolder } from '../IDatabaseValueHolder.js';
 
 const RESULT_VALUE_PATH = 'sql-result-value';
 const CONTENT_CACHE_KEY = Symbol('content-cache-key');
@@ -32,21 +37,37 @@ interface ICacheEntry {
   loading?: boolean;
 }
 
-@databaseDataAction()
+@injectable(() => [
+  IDatabaseDataSource,
+  IDatabaseDataResult,
+  IDatabaseDataResultAction,
+  IDatabaseDataFormatAction,
+  GraphQLService,
+  ServerResourceQuotasResource,
+  QuotasService,
+  IDatabaseDataCacheAction,
+])
 export class ResultSetDataContentAction extends DatabaseDataAction<any, IDatabaseResultSet> implements IResultSetDataContentAction {
   static dataFormat = [ResultDataFormat.Resultset];
   private subscriptionDispose?: () => void;
+  private readonly data: ResultSetDataAction;
+  private readonly format: ResultSetFormatAction;
+  private readonly cache: ResultSetCacheAction;
 
   constructor(
-    source: IDatabaseDataSource<any, IDatabaseResultSet>,
-    private readonly data: ResultSetDataAction,
-    private readonly format: ResultSetFormatAction,
+    source: IDatabaseDataSource,
+    result: IDatabaseDataResult,
+    data: IDatabaseDataResultAction,
+    format: IDatabaseDataFormatAction,
     private readonly graphQLService: GraphQLService,
     private readonly serverResourceQuotasResource: ServerResourceQuotasResource,
     private readonly quotasService: QuotasService,
-    private readonly cache: ResultSetCacheAction,
+    cache: IDatabaseDataCacheAction,
   ) {
-    super(source);
+    super(source as unknown as IDatabaseDataSource<unknown, IDatabaseResultSet>, result as IDatabaseResultSet);
+    this.data = data as any as ResultSetDataAction;
+    this.format = format as any as ResultSetFormatAction;
+    this.cache = cache as any as ResultSetCacheAction;
 
     function loadQuotas() {
       setTimeout(() => serverResourceQuotasResource.load(), 0);
@@ -65,9 +86,9 @@ export class ResultSetDataContentAction extends DatabaseDataAction<any, IDatabas
     });
   }
 
-  getLimitInfo(elementKey: IResultSetElementKey) {
-    const isTextColumn = this.format.isText(elementKey);
-    const isBlob = this.format.isBinary(elementKey);
+  getLimitInfo(holder: IDatabaseValueHolder<IGridDataKey, IResultSetValue>) {
+    const isTextColumn = this.format.isText(holder);
+    const isBlob = this.format.isBinary(holder);
     const result = {
       limit: undefined as number | undefined,
       limitWithSize: undefined as string | undefined,
@@ -88,24 +109,24 @@ export class ResultSetDataContentAction extends DatabaseDataAction<any, IDatabas
     return result;
   }
 
-  isLoading(element: IResultSetElementKey) {
+  isLoading(element: IGridDataKey): boolean {
     return this.getCache(element)?.loading ?? false;
   }
 
-  isBlobTruncated(elementKey: IResultSetElementKey) {
-    const limit = this.getLimitInfo(elementKey).limit;
-    const content = this.format.get(elementKey);
+  isBlobTruncated(holder: IDatabaseValueHolder<IGridDataKey, IResultSetValue>): boolean {
+    const limit = this.getLimitInfo(holder).limit;
+    const content = holder.value;
 
-    if (!isNotNullDefined(limit) || !isResultSetContentValue(content) || !this.format.isBinary(elementKey)) {
+    if (!isNotNullDefined(limit) || !isResultSetContentValue(content) || !this.format.isBinary(holder)) {
       return false;
     }
 
     return (content.contentLength ?? 0) > limit;
   }
 
-  isTextTruncated(elementKey: IResultSetElementKey) {
-    const limit = this.getLimitInfo(elementKey).limit;
-    const content = this.format.get(elementKey);
+  isTextTruncated(holder: IDatabaseValueHolder<IGridDataKey, IResultSetValue>): boolean {
+    const limit = this.getLimitInfo(holder).limit;
+    const content = holder.value;
 
     if (!isNotNullDefined(limit) || !isResultSetContentValue(content)) {
       return false;
@@ -114,19 +135,19 @@ export class ResultSetDataContentAction extends DatabaseDataAction<any, IDatabas
     return (content.contentLength ?? 0) > limit;
   }
 
-  isDownloadable(element: IResultSetElementKey) {
-    return !!this.result.data?.hasRowIdentifier && isResultSetContentValue(this.format.get(element));
+  isDownloadable(holder: IDatabaseValueHolder<IGridDataKey, IResultSetValue>): boolean {
+    return !!this.result.data?.hasRowIdentifier && isResultSetContentValue(holder.value);
   }
 
-  retrieveFullTextFromCache(element: IResultSetElementKey) {
+  retrieveFullTextFromCache(element: IGridDataKey): string | undefined {
     return this.getCache(element)?.fullText;
   }
 
-  retrieveBlobFromCache(element: IResultSetElementKey) {
+  retrieveBlobFromCache(element: IGridDataKey): Blob | undefined {
     return this.getCache(element)?.blob;
   }
 
-  async getFileFullText(element: IResultSetElementKey) {
+  async getFileFullText(element: IGridDataKey): Promise<string> {
     const column = this.data.getColumn(element.column);
     const row = this.data.getRowValue(element.row);
 
@@ -158,7 +179,7 @@ export class ResultSetDataContentAction extends DatabaseDataAction<any, IDatabas
     return fullText;
   }
 
-  async resolveFileDataUrl(element: IResultSetElementKey) {
+  async resolveFileDataUrl(element: IGridDataKey): Promise<Blob> {
     const cachedUrl = this.retrieveBlobFromCache(element);
 
     if (cachedUrl) {
@@ -173,12 +194,12 @@ export class ResultSetDataContentAction extends DatabaseDataAction<any, IDatabas
     return blob;
   }
 
-  async downloadFileData(element: IResultSetElementKey) {
+  async downloadFileData(element: IGridDataKey): Promise<void> {
     const url = await this.getFileDataUrl(element);
     download(url);
   }
 
-  clearCache() {
+  clearCache(): void {
     this.cache.deleteAll(CONTENT_CACHE_KEY);
   }
 
@@ -187,7 +208,7 @@ export class ResultSetDataContentAction extends DatabaseDataAction<any, IDatabas
     this.clearCache();
   }
 
-  private async getFileDataUrl(element: IResultSetElementKey): Promise<string> {
+  private async getFileDataUrl(element: IGridDataKey): Promise<string> {
     const column = this.data.getColumn(element.column);
     const row = this.data.getRowValue(element.row);
 
@@ -230,16 +251,16 @@ export class ResultSetDataContentAction extends DatabaseDataAction<any, IDatabas
     return response.text;
   }
 
-  private updateCache(element: IResultSetElementKey, partialCache: Partial<ICacheEntry>) {
+  private updateCache(element: IGridDataKey, partialCache: Partial<ICacheEntry>) {
     const cachedElement = this.getCache(element) ?? {};
     this.setCache(element, { ...cachedElement, ...partialCache });
   }
 
-  private getCache(element: IResultSetElementKey) {
+  private getCache(element: IGridDataKey) {
     return this.cache.get<ICacheEntry>(element, CONTENT_CACHE_KEY);
   }
 
-  private setCache(element: IResultSetElementKey, value: ICacheEntry) {
+  private setCache(element: IGridDataKey, value: ICacheEntry) {
     this.cache.set(element, CONTENT_CACHE_KEY, value);
   }
 

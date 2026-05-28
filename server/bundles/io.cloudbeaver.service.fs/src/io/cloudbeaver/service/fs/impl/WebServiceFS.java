@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package io.cloudbeaver.service.fs.impl;
 
 import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.DBWebException;
-import io.cloudbeaver.model.fs.FSUtils;
+import io.cloudbeaver.model.fs.WebFSUtils;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.service.fs.DBWServiceFS;
 import io.cloudbeaver.service.fs.model.FSFile;
@@ -35,6 +35,7 @@ import org.jkiss.dbeaver.runtime.DBWorkbench;
 
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.text.MessageFormat;
 import java.util.Arrays;
@@ -63,10 +64,14 @@ public class WebServiceFS implements DBWServiceFS {
             }
             DBNFileSystems dbnFileSystems = projectNode.getExtraNode(DBNFileSystems.class);
             var fsRegistry = FileSystemProviderRegistry.getInstance();
-            return Arrays.stream(dbnFileSystems.getChildren(webSession.getProgressMonitor()))
+            DBNFileSystem[] children = dbnFileSystems.getChildren(webSession.getProgressMonitor());
+            if (children == null) {
+                return new FSFileSystem[0];
+            }
+            return Arrays.stream(children)
                 .map(fs -> new FSFileSystem(
-                        FSUtils.makeUniqueFsId(fs.getFileSystem()),
-                    fs.getNodeUri(),
+                    WebFSUtils.makeUniqueFsId(fs.getFileSystem()),
+                        fs.getNodeUri(),
                         fsRegistry.getProvider(fs.getFileSystem().getProviderId()).getRequiredAuth()
                     )
                 )
@@ -90,7 +95,7 @@ public class WebServiceFS implements DBWServiceFS {
             }
             var fsRegistry = FileSystemProviderRegistry.getInstance();
             return new FSFileSystem(
-                FSUtils.makeUniqueFsId(fs.getFileSystem()),
+                WebFSUtils.makeUniqueFsId(fs.getFileSystem()),
                 fs.getNodeUri(),
                 fsRegistry.getProvider(fs.getFileSystem().getProviderId()).getRequiredAuth()
             );
@@ -104,7 +109,7 @@ public class WebServiceFS implements DBWServiceFS {
     public FSFile getFile(@NotNull WebSession webSession, @NotNull String nodePath)
         throws DBWebException {
         try {
-            DBNPathBase node = FSUtils.getNodeByPath(webSession, nodePath);
+            DBNPathBase node = WebFSUtils.getNodeByPath(webSession, nodePath);
             return new FSFile(node);
         } catch (Exception e) {
             throw new DBWebException("Failed to found file: " + e.getMessage(), e);
@@ -116,8 +121,11 @@ public class WebServiceFS implements DBWServiceFS {
     public FSFile[] getFiles(@NotNull WebSession webSession, @NotNull String parentPath)
         throws DBWebException {
         try {
-            DBNPathBase folderPath = FSUtils.getNodeByPath(webSession, parentPath);
+            DBNPathBase folderPath = WebFSUtils.getNodeByPath(webSession, parentPath);
             var children = folderPath.getChildren(webSession.getProgressMonitor());
+            if (children == null) {
+                return new FSFile[0];
+            }
             return Arrays.stream(children)
                 .filter(c -> c instanceof DBNPathBase)
                 .map(c -> (DBNPathBase) c)
@@ -133,7 +141,7 @@ public class WebServiceFS implements DBWServiceFS {
     public String readFileContent(@NotNull WebSession webSession, @NotNull String nodePath)
         throws DBWebException {
         try {
-            Path filePath = FSUtils.getPathFromNode(webSession, nodePath);
+            Path filePath = WebFSUtils.getPathFromNode(webSession, nodePath);
             var data = Files.readAllBytes(filePath);
             return new String(data, StandardCharsets.UTF_8);
         } catch (Exception e) {
@@ -151,7 +159,7 @@ public class WebServiceFS implements DBWServiceFS {
         throws DBWebException {
         validateEditPermissions(webSession);
         try {
-            DBNPathBase node = FSUtils.getNodeByPath(webSession, nodePath);
+            DBNPathBase node = WebFSUtils.getNodeByPath(webSession, nodePath);
             Path filePath = node.getPath();
             if (!forceOverwrite) {
                 throw new DBException("Cannot overwrite exist file");
@@ -172,7 +180,7 @@ public class WebServiceFS implements DBWServiceFS {
     ) throws DBWebException {
         validateEditPermissions(webSession);
         try {
-            DBNPathBase parentNode = FSUtils.getNodeByPath(webSession, parentPath);
+            DBNPathBase parentNode = WebFSUtils.getNodeByPath(webSession, parentPath);
             if (!Files.isDirectory(parentNode.getPath())) {
                 throw new DBException(MessageFormat.format("Node ''{0}'' is not a directory", parentPath));
             }
@@ -193,10 +201,10 @@ public class WebServiceFS implements DBWServiceFS {
     ) throws DBWebException {
         validateEditPermissions(webSession);
         try {
-            DBNPathBase oldNode = FSUtils.getNodeByPath(webSession, oldNodePath);
+            DBNPathBase oldNode = WebFSUtils.getNodeByPath(webSession, oldNodePath);
             DBNPathBase oldParentNode = (DBNPathBase) oldNode.getParentNode();
             String fileName = oldNode.getName();
-            DBNPathBase parentNode = FSUtils.getNodeByPath(webSession, parentNodePath);
+            DBNPathBase parentNode = WebFSUtils.getNodeByPath(webSession, parentNodePath);
             Path parentPath = parentNode.getPath();
             if (!Files.isDirectory(parentPath)) {
                 throw new DBException(MessageFormat.format("Node ''{0}'' is not a directory", parentPath));
@@ -206,6 +214,8 @@ public class WebServiceFS implements DBWServiceFS {
             oldParentNode.removeChildResource(oldNode.getPath());
             parentNode.addChildResource(to);
             return new FSFile(parentNode.getChild(to));
+        } catch (NoSuchFileException e) {
+            throw new DBWebException("File not found. Please refresh the catalog and check if file exists.");
         } catch (Exception e) {
             throw new DBWebException("Failed to move file: " + e.getMessage(), e);
         }
@@ -220,7 +230,7 @@ public class WebServiceFS implements DBWServiceFS {
         validateEditPermissions(webSession);
         validateFilename(newName);
         try {
-            DBNPathBase node = FSUtils.getNodeByPath(webSession, nodePath);
+            DBNPathBase node = WebFSUtils.getNodeByPath(webSession, nodePath);
             node.rename(webSession.getProgressMonitor(), newName);
             return new FSFile(node);
         } catch (Exception e) {
@@ -236,9 +246,9 @@ public class WebServiceFS implements DBWServiceFS {
     ) throws DBWebException {
         validateEditPermissions(webSession);
         try {
-            DBNPathBase oldNode = FSUtils.getNodeByPath(webSession, oldNodePath);
+            DBNPathBase oldNode = WebFSUtils.getNodeByPath(webSession, oldNodePath);
             String fileName = oldNode.getName();
-            DBNPathBase parentNode = FSUtils.getNodeByPath(webSession, parentNodePath);
+            DBNPathBase parentNode = WebFSUtils.getNodeByPath(webSession, parentNodePath);
             Path parentPath = parentNode.getPath();
             if (!Files.isDirectory(parentPath)) {
                 throw new DBException(MessageFormat.format("Node ''{0}'' is not a directory", parentPath));
@@ -260,7 +270,7 @@ public class WebServiceFS implements DBWServiceFS {
     ) throws DBWebException {
         validateEditPermissions(webSession);
         try {
-            DBNPathBase parentNode = FSUtils.getNodeByPath(webSession, parentPath);
+            DBNPathBase parentNode = WebFSUtils.getNodeByPath(webSession, parentPath);
             if (!Files.isDirectory(parentNode.getPath())) {
                 throw new DBException(MessageFormat.format("Node ''{0}'' is not a directory", parentPath));
             }
@@ -280,7 +290,7 @@ public class WebServiceFS implements DBWServiceFS {
     ) throws DBWebException {
         validateEditPermissions(webSession);
         try {
-            DBNPathBase node = FSUtils.getNodeByPath(webSession, nodePath);
+            DBNPathBase node = WebFSUtils.getNodeByPath(webSession, nodePath);
             Path path = node.getPath();
             Files.delete(path);
             DBNPathBase parentNode = (DBNPathBase) node.getParentNode();

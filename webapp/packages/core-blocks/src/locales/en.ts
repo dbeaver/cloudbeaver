@@ -13,4 +13,8 @@ export default [
   ['core_blocks_exception_message_error_title', 'Unable to display content'],
   ['core_blocks_exception_message_error_message', 'Something went wrong.'],
   ['core_blocks_custom_input_validation_error', 'Field value is not valid'],
+  ['core_blocks_export_image_dialog_title', 'Export as Image'],
+  ['core_blocks_export_image_dialog_format', 'File Format'],
+  ['core_blocks_export_image_dialog_transparent_background', 'Transparent background'],
+  ['core_blocks_dialog_element_close_tooltip', 'Close panel'],
 ];

@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2025 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ package io.cloudbeaver.service.core.impl;
 import io.cloudbeaver.*;
 import io.cloudbeaver.model.*;
 import io.cloudbeaver.model.app.ServletApplication;
+import io.cloudbeaver.model.app.ServletSystemInformationCollector;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.registry.WebHandlerRegistry;
 import io.cloudbeaver.registry.WebSessionHandlerDescriptor;
@@ -45,7 +46,6 @@ import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.model.exec.DBCConnectException;
-import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.model.navigator.DBNDataSource;
 import org.jkiss.dbeaver.model.navigator.DBNModel;
 import org.jkiss.dbeaver.model.navigator.DBNNode;
@@ -58,10 +58,14 @@ import org.jkiss.dbeaver.model.rm.RMProjectType;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.secret.DBSSecretController;
 import org.jkiss.dbeaver.model.secret.DBSSecretValue;
+import org.jkiss.dbeaver.model.security.SMObjectType;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
+import org.jkiss.dbeaver.registry.DataSourceNavigatorSettings;
+import org.jkiss.dbeaver.registry.DataSourceNavigatorSettingsUtils;
 import org.jkiss.dbeaver.registry.DataSourceProviderRegistry;
 import org.jkiss.dbeaver.registry.network.NetworkHandlerDescriptor;
 import org.jkiss.dbeaver.registry.network.NetworkHandlerRegistry;
+import org.jkiss.dbeaver.registry.project.BaseProjectSettings;
 import org.jkiss.dbeaver.registry.settings.ProductSettingDescriptor;
 import org.jkiss.dbeaver.registry.settings.ProductSettingsRegistry;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
@@ -89,10 +93,13 @@ public class WebServiceCore implements DBWServiceCore {
 
     @Override
     public WebPropertyInfo[] getSystemInformationProperties(@NotNull WebSession webSession) {
-        return WebCommonUtils.getObjectProperties(
-            webSession,
-            WebAppUtils.getWebApplication().getSystemInformationCollector()
-        );
+        ServletSystemInformationCollector<?> collector = WebAppUtils.getWebApplication().getSystemInformationCollector();
+        try {
+            collector.collectInternalDatabaseUseInformation();
+        } catch (DBException e) {
+            log.error("Error collecting system information", e);
+        }
+        return WebCommonUtils.getObjectProperties(webSession, collector);
     }
 
     @Override
@@ -335,6 +342,7 @@ public class WebServiceCore implements DBWServiceCore {
             if (e instanceof DBCConnectException) {
                 Throwable rootCause = CommonUtils.getRootCause(e);
                 if (rootCause instanceof ClassNotFoundException) {
+                    log.error(e);
                     throwDriverNotFoundException(dataSourceContainer);
                 }
             }
@@ -368,6 +376,7 @@ public class WebServiceCore implements DBWServiceCore {
         if (saveCredentials) {
             // Save all passed credentials in the datasource container
             WebDataSourceUtils.saveAuthProperties(
+                webSession.getProgressMonitor(),
                 dataSourceContainer,
                 dataSourceContainer.getConnectionConfiguration(),
                 authProperties,
@@ -391,7 +400,9 @@ public class WebServiceCore implements DBWServiceCore {
                 dataSourceContainer,
                 dataSourceContainer.getConnectionConfiguration()
             );
-            saveConfig[0] = true;
+            // don't understand why whe need to set this flag here
+            // need to discover it, maybe we can avoid it at all
+            saveConfig[0] = sharedCredentials;
         }
         if (WebServiceUtils.isGlobalProject(dataSourceContainer.getProject())) {
             // Do not flush config for global project (only admin can do it - CB-2415)
@@ -455,12 +466,21 @@ public class WebServiceCore implements DBWServiceCore {
                 throw new DBException("Node '" + nodePath + "' is not a datasource node");
             }
             DBPDataSourceContainer dataSourceTemplate = dbnDataSource.getDataSourceContainer();
+            if (!dataSourceTemplate.isExternallyProvided()) {
+                if (!CommonUtils.equalObjects(dataSourceTemplate.getProject(), project)) {
+                    throw new DBException("Copying connection to another project is not allowed");
+                }
+            }
 
             DataSourceDescriptor newDataSource = dataSourceRegistry.createDataSource(dataSourceTemplate);
 
             ServletApplication app = ServletAppUtils.getServletApplication();
             if (app instanceof WebApplication webApplication) {
-                newDataSource.setNavigatorSettings(webApplication.getAppConfiguration().getDefaultNavigatorSettings());
+                newDataSource.setNavigatorSettings(
+                    dataSourceTemplate.isExternallyProvided() ?
+                        webApplication.getAppConfiguration().getDefaultNavigatorSettings() :
+                        dataSourceTemplate.getNavigatorSettings().getOriginalSettings()
+                );
             }
 
             WebConnectionConfig config = project.getConnectionConfigInput(connectionConfig);
@@ -490,6 +510,8 @@ public class WebServiceCore implements DBWServiceCore {
     ) throws DBWebException {
         WebSessionProjectImpl project = getProjectById(webSession, projectId);
         WebConnectionConfig configInput = project.getConnectionConfigInput(connectionConfig);
+
+        configInput.setSaveCredentials(true); // It is used in createConnectionFromConfig
 
         DataSourceDescriptor dataSource = (DataSourceDescriptor) WebDataSourceUtils.getLocalOrGlobalDataSource(
             webSession, projectId, configInput.getConnectionId());
@@ -522,6 +544,7 @@ public class WebServiceCore implements DBWServiceCore {
                 }
             }
             WebDataSourceUtils.saveAuthProperties(
+                webSession.getProgressMonitor(),
                 testDataSource,
                 testDataSource.getConnectionConfiguration(),
                 configInput.getCredentials(),
@@ -530,7 +553,7 @@ public class WebServiceCore implements DBWServiceCore {
                 true
             );
         } else {
-            testDataSource = project.getDataSourceContainerFromInput(connectionConfig);
+            testDataSource = project.getDataSourceContainerFromInput(configInput);
         }
         validateDriverLibrariesPresence(testDataSource);
         webSession.provideAuthParameters(
@@ -550,6 +573,7 @@ public class WebServiceCore implements DBWServiceCore {
                 if (ct.getConnectError() instanceof DBCConnectException error) {
                     Throwable rootCause = CommonUtils.getRootCause(error);
                     if (rootCause instanceof ClassNotFoundException) {
+                        log.error(error);
                         throwDriverNotFoundException(testDataSource);
                     }
                 }
@@ -569,6 +593,8 @@ public class WebServiceCore implements DBWServiceCore {
     @Override
     public WebNetworkEndpointInfo testNetworkHandler(
         @NotNull WebSession webSession,
+        @Nullable String projectId,
+        @Nullable String connectionId,
         @NotNull WebNetworkHandlerConfigInput nhConfig
     ) throws DBWebException {
         DBRProgressMonitor monitor = webSession.getProgressMonitor();
@@ -589,7 +615,13 @@ public class WebServiceCore implements DBWServiceCore {
                 try {
                     monitor.subTask("Initialize tunnel");
 
-                    DBWHandlerConfiguration configuration = new DBWHandlerConfiguration(handlerDescriptor, null);
+                    DBWHandlerConfiguration currentConnectionHandlerConfig =
+                        getCurrentConnectionHandlerConfig(webSession, projectId, connectionId, nhConfig.getId());
+
+                    DBWHandlerConfiguration configuration = currentConnectionHandlerConfig == null
+                        ? new DBWHandlerConfiguration(handlerDescriptor, null)
+                        : new DBWHandlerConfiguration(currentConnectionHandlerConfig);
+
                     WebDataSourceUtils.updateHandlerConfig(configuration, nhConfig);
                     configuration.setSavePassword(true);
                     configuration.setEnabled(true);
@@ -620,6 +652,22 @@ public class WebServiceCore implements DBWServiceCore {
         }
     }
 
+    @Nullable
+    private DBWHandlerConfiguration getCurrentConnectionHandlerConfig(
+        @NotNull WebSession webSession,
+        @Nullable String projectId,
+        @Nullable String connectionId,
+        @NotNull String handlerConfigId
+    ) throws DBWebException {
+        if (projectId == null || connectionId == null) {
+            return null;
+        }
+        WebSessionProjectImpl sessionProject = webSession.getAccessibleProjectById(projectId);
+        WebConnectionInfo connectionInfo = sessionProject.getWebConnectionInfo(connectionId);
+        DBPConnectionConfiguration connectionConfiguration = connectionInfo.getDataSourceContainer().getConnectionConfiguration();
+        return connectionConfiguration.getHandler(handlerConfigId);
+    }
+
     @Override
     public WebConnectionInfo closeConnection(
         @NotNull WebSession webSession,
@@ -630,7 +678,7 @@ public class WebServiceCore implements DBWServiceCore {
         WebConnectionInfo connectionInfo = project.getWebConnectionInfo(connectionId);
 
         DBPDataSourceContainer dataSourceContainer = connectionInfo.getDataSourceContainer();
-        boolean disconnected = WebDataSourceUtils.disconnectDataSource(webSession, dataSourceContainer);
+        WebDataSourceUtils.disconnectDataSource(webSession, dataSourceContainer, true);
         return connectionInfo;
     }
 
@@ -710,13 +758,62 @@ public class WebServiceCore implements DBWServiceCore {
 
     @Override
     public WebConnectionInfo setConnectionNavigatorSettings(
-        WebSession webSession, @Nullable String projectId, String id, DBNBrowseSettings settings
+        @NotNull WebSession webSession,
+        @Nullable String projectId,
+        @NotNull String id,
+        @NotNull DataSourceNavigatorSettings settings
+    ) throws DBWebException {
+        WebSessionProjectImpl project = webSession.getProjectById(projectId);
+        WebConnectionInfo connectionInfo = project != null ? project.getWebConnectionInfo(id) :
+            WebDataSourceUtils.getWebConnectionInfo(webSession, projectId, id);
+        DataSourceDescriptor dataSourceDescriptor = ((DataSourceDescriptor) connectionInfo.getDataSourceContainer());
+        try {
+            if (project != null && !project.isPrivateProject() && settings.isUserSettings()) {
+                DataSourceNavigatorSettingsUtils.updateCustomNavigatorSettings(dataSourceDescriptor, settings);
+            } else {
+                // If user has no permissions to save it will cause error
+                dataSourceDescriptor.setNavigatorSettings(settings);
+                dataSourceDescriptor.persistConfiguration();
+            }
+        } catch (DBException e) {
+            throw new DBWebException("Error saving custom navigator settings", e);
+        }
+        return connectionInfo;
+    }
+
+    @Override
+    public WebConnectionInfo clearConnectionNavigatorSettings(
+        @NotNull WebSession webSession,
+        @NotNull String projectId,
+        @NotNull String id
     ) throws DBWebException {
         WebConnectionInfo connectionInfo = WebDataSourceUtils.getWebConnectionInfo(webSession, projectId, id);
         DataSourceDescriptor dataSourceDescriptor = ((DataSourceDescriptor) connectionInfo.getDataSourceContainer());
-        dataSourceDescriptor.setNavigatorSettings(settings);
-        dataSourceDescriptor.persistConfiguration();
+        try {
+            DataSourceNavigatorSettingsUtils.clearCustomNavigatorSettings(dataSourceDescriptor);
+        } catch (DBException e) {
+            throw new DBWebException("Error deleting custom navigator settings", e);
+        }
         return connectionInfo;
+    }
+
+    @Override
+    @NotNull
+    public Map<String, String> setObjectSettingsForDatasource(
+        @NotNull WebSession webSession,
+        @NotNull String projectId,
+        @NotNull String objectId,
+        @NotNull Map<String, String> settings
+    ) throws DBException {
+
+        WebSessionProjectImpl projectById = webSession.getProjectById(projectId);
+        if (projectById == null) {
+            throw new DBWebException("Project '" + projectId + "' not found");
+        }
+        BaseProjectSettings projectSettings = projectById.getProjectSettings();
+        projectSettings.setObjectSettings(SMObjectType.datasource, objectId, settings);
+        Map<String, String> objectSettings = projectSettings.getObjectSettings(SMObjectType.datasource, objectId);
+        return objectSettings == null ? new HashMap<>() : objectSettings;
     }
 
     @Override
@@ -750,8 +847,7 @@ public class WebServiceCore implements DBWServiceCore {
         }
     }
 
-    @NotNull
-    private static String throwDriverNotFoundException(@NotNull DBPDataSourceContainer container) throws DBWebException {
+    private static void throwDriverNotFoundException(@NotNull DBPDataSourceContainer container) throws DBWebException {
         throw new DBWebException("Driver files for %s are not found. Please ask the administrator to download it."
             .formatted(container.getDriver().getName()));
     }

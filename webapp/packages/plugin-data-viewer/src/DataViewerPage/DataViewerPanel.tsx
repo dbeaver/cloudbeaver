@@ -30,6 +30,7 @@ export const DataViewerPanel: ObjectPagePanelComponent<IDataViewerPageState> = o
           presentationId,
           resultIndex: 0,
           valuePresentationId: null,
+          persistedState: {},
         });
       } else {
         pageState.presentationId = presentationId;
@@ -47,6 +48,7 @@ export const DataViewerPanel: ObjectPagePanelComponent<IDataViewerPageState> = o
           presentationId: '',
           resultIndex: 0,
           valuePresentationId,
+          persistedState: {},
         });
       } else {
         pageState.valuePresentationId = valuePresentationId;

@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -8,9 +8,10 @@
 import { observer } from 'mobx-react-lite';
 import { useEffect, useRef, useState } from 'react';
 
-import { Container, Form, getComputed, s, useS } from '@cloudbeaver/core-blocks';
+import { Container, Form, getComputed, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { type ICustomMenuItemComponent } from '@cloudbeaver/core-view';
+import { Input } from '@dbeaver/ui-kit';
 
 import { DATA_CONTEXT_DV_DDM } from '../../../../DatabaseDataModel/DataContext/DATA_CONTEXT_DV_DDM.js';
 import { DataViewerSettingsService } from '../../../../DataViewerSettingsService.js';
@@ -22,6 +23,7 @@ export const FetchSizeAction: ICustomMenuItemComponent = observer(function Fetch
   const [limit, setLimit] = useState(model.countGain + '');
   const dataViewerSettingsService = useService(DataViewerSettingsService);
   const style = useS(styles);
+  const translate = useTranslate();
 
   async function handleChange() {
     if (!ref.current) {
@@ -47,15 +49,17 @@ export const FetchSizeAction: ICustomMenuItemComponent = observer(function Fetch
   return (
     <Container className={s(style, { count: true })} keepSize noGrow center>
       <Form contents onSubmit={handleChange}>
-        <input
+        <Input
           ref={ref}
+          title={translate('plugin_data_viewer_fetch_size')}
           className={s(style, { input: true })}
           type="number"
           value={limit}
           disabled={disabled}
           min={dataViewerSettingsService.minFetchSize}
           max={dataViewerSettingsService.maxFetchSize}
-          onChange={e => setLimit(e.target.value)}
+          size="small"
+          onChange={event => setLimit(event.target.value)}
           onBlur={handleChange}
         />
       </Form>

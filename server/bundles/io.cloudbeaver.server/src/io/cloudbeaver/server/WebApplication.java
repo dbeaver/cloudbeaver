@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import io.cloudbeaver.model.app.WebAppConfiguration;
 import io.cloudbeaver.model.app.WebServerConfiguration;
 import io.cloudbeaver.registry.WebDriverRegistry;
 import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 
 import java.net.InetAddress;
 import java.util.List;
@@ -31,25 +32,33 @@ import java.util.Map;
  * Base interface for applications with web ui
  */
 public interface WebApplication extends ServletApplication {
+    @NotNull
     WebServerConfiguration getServerConfiguration();
 
+    @NotNull
     WebAppSessionManager getSessionManager();
 
+    @NotNull
     WebDriverRegistry getDriverRegistry();
 
+    @NotNull
     WebAppConfiguration getAppConfiguration();
 
     @NotNull
     Map<String, Object> getProductConfiguration();
 
+    @NotNull
     List<InetAddress> getLocalInetAddresses();
 
+    @NotNull
     Map<String, String> getInitActions();
 
     boolean isLicenseValid();
 
+    @Nullable
     String getLicenseStatus();
 
+    @NotNull
     WebServerConfig getWebServerConfig();
 
 }

@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2025 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -72,12 +72,25 @@ public interface DBWServiceSQL extends DBWService {
         @NotNull WebSession session,
         @NotNull List<String> nodePathList) throws DBWebException;
 
+    @NotNull
     @WebAction
     String generateEntityQuery(
         @NotNull WebSession session,
         @NotNull String generatorId,
-        @NotNull Map<String, Object> options,
-        @NotNull List<String> nodePathList) throws DBWebException;
+        @NotNull List<String> nodePathList,
+        @NotNull WebSQLGeneratorOptions options
+    ) throws DBWebException;
+
+    @NotNull
+    @WebAction
+    String sqlGenerateResultSetQuery(
+        @NotNull WebSession session,
+        @NotNull WebSQLContextInfo sqlContext,
+        @NotNull String generatorId,
+        @NotNull String resultsId,
+        @NotNull List<WebSQLResultsRow> selectedRows,
+        @NotNull WebSQLGeneratorOptions options
+    ) throws DBWebException;
 
     @WebAction
     WebSQLContextInfo createContext(
@@ -101,7 +114,8 @@ public interface DBWServiceSQL extends DBWService {
         @Nullable String resultId,
         @Nullable WebSQLDataFilter filter,
         @Nullable WebDataFormat dataFormat,
-        boolean readLogs
+        boolean readLogs,
+        boolean useEvents
     ) throws DBException;
 
     @WebAction
@@ -200,11 +214,26 @@ public interface DBWServiceSQL extends DBWService {
     WebSQLQueryInfo parseSqlQuery(@NotNull WebConnectionInfo connectionInfo, @NotNull String sqlScript, int cursorPosition) throws DBWebException;
 
     @WebAction
+    @Deprecated
     String generateGroupByQuery(@NotNull WebSQLContextInfo contextInfo,
                                 @NotNull String resultsId,
                                 @NotNull List<String> columnsList,
                                 @Nullable List<String> functions,
                                 @Nullable Boolean showDuplicatesOnly) throws DBWebException;
+
+    @WebAction
+    WebAsyncTaskInfo getGroupingSqlResultSet(
+        @NotNull WebSession webSession,
+        @NotNull WebSQLContextInfo contextInfo,
+        @NotNull String originalResultsId,
+        @Nullable String currentResultsId,
+        @NotNull List<String> columnsList,
+        @Nullable List<String> functions,
+        @Nullable Boolean showDuplicatesOnly,
+        @Nullable WebSQLDataFilter filter,
+        @Nullable WebDataFormat dataFormat,
+        boolean isInteractive
+    ) throws DBException;
 
     @WebAction
     WebAsyncTaskInfo getRowDataCount(@NotNull WebSession webSession, @NotNull WebSQLContextInfo contextInfo, @NotNull String resultsId) throws DBWebException;

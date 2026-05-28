@@ -37,12 +37,12 @@ export class UserProfileSettingsPluginBootstrap extends Bootstrap {
         return;
       }
 
-      const result = await this.commonDialogService.open(ConfirmationDialog, {
+      const { status } = await this.commonDialogService.open(ConfirmationDialog, {
         title: 'ui_save_reminder',
         message: 'ui_are_you_sure',
       });
 
-      if (result === DialogueStateResult.Rejected) {
+      if (status === DialogueStateResult.Rejected) {
         ExecutorInterrupter.interrupt(context);
         return;
       }
@@ -76,8 +76,8 @@ export class UserProfileSettingsPluginBootstrap extends Bootstrap {
           tooltip: 'plugin_user_profile_settings_action_description',
         };
       },
-      handler: () => {
-        this.userProfileOptionsPanelService.open(SETTINGS_TAB_ID);
+      handler: async () => {
+        await this.userProfileOptionsPanelService.open(SETTINGS_TAB_ID);
       },
     });
   }

@@ -15,7 +15,6 @@
 @layer components {
   .dbv-kit-select,
   .dbv-kit-select__popover {
-    --dbv-kit-select-border-width: 2px;
     --dbv-kit-select-font-size: 12px;
     --dbv-kit-select-hover-border-color: var(--theme-background);
 
@@ -38,9 +37,13 @@
     --dbv-kit-control-outline-offset: -2px;
   }
 
+  .dbv-kit-select__arrow-icon {
+    --dbv-kit-select-disabled-foreground: var(--theme-input-color-disabled);
+  }
+
   .dbv-kit-select {
     padding-left: 12px;
-    padding-right: 4px;
+    padding-right: 6px;
   }
 
   .dbv-kit-select__item {

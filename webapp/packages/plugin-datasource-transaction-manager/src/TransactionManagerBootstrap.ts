@@ -162,7 +162,7 @@ export class TransactionManagerBootstrap extends Bootstrap {
           const icon = `/icons/commit_mode_${auto ? 'auto' : 'manual'}_m.svg`;
           const label = `plugin_datasource_transaction_manager_commit_mode_switch_to_${auto ? 'manual' : 'auto'}`;
 
-          return { ...action.info, icon, label, tooltip: label };
+          return { ...action.info, icon, label: '', tooltip: label };
         }
 
         return action.info;
@@ -255,17 +255,25 @@ export class TransactionManagerBootstrap extends Bootstrap {
           const transaction = this.connectionExecutionContextService.get(context.id);
 
           if (transaction?.autoCommit === false) {
+            const key = createTransactionInfoParam(context.connectionId, context.projectId, context.id);
+            const count = await this.transactionLogCountResource.load(key);
+
+            if (count === 0) {
+              return;
+            }
+
             const connectionData = this.connectionInfoResource.get(connectionKey);
-            const state = await this.commonDialogService.open(ConfirmationDialog, {
+
+            const { status, result } = await this.commonDialogService.open(ConfirmationDialog, {
               title: `${this.localizationService.translate('plugin_datasource_transaction_manager_commit')} (${connectionData?.name ?? context.id})`,
               message: 'plugin_datasource_transaction_manager_commit_confirmation_message',
               confirmActionText: 'plugin_datasource_transaction_manager_commit',
-              extraStatus: 'no',
+              showExtraAction: true,
             });
 
-            if (state === DialogueStateResult.Resolved) {
+            if (status === DialogueStateResult.Resolved) {
               await this.commit(transaction, () => ExecutorInterrupter.interrupt(contexts));
-            } else if (state === DialogueStateResult.Rejected) {
+            } else if (!result?.isExtraAction) {
               ExecutorInterrupter.interrupt(contexts);
             }
           }

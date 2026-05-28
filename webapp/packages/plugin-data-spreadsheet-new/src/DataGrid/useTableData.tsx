@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -11,21 +11,30 @@ import { useObservableRef } from '@cloudbeaver/core-blocks';
 import {
   DatabaseEditChangeType,
   type IDatabaseDataModel,
-  type IResultSetColumnKey,
-  type IResultSetElementKey,
-  type IResultSetRowKey,
-  ResultSetDataAction,
   ResultSetDataContentAction,
-  ResultSetDataKeysUtils,
+  GridDataKeysUtils,
   ResultSetDataSource,
-  ResultSetEditAction,
-  ResultSetFormatAction,
-  ResultSetViewAction,
+  IDatabaseDataResultAction,
+  IDatabaseDataEditAction,
+  IDatabaseDataViewAction,
+  IDatabaseDataFormatAction,
+  GridDataResultAction,
+  GridEditAction,
+  GridViewAction,
+  type IDatabaseValueHolder,
+  type IResultSetValue,
+  type IGridRowKey,
+  type IGridColumnKey,
+  type IGridDataKey,
+  isBooleanValuePresentationAvailable,
+  isResultSetDataSource,
 } from '@cloudbeaver/plugin-data-viewer';
 
-import type { IColumnInfo, ITableData } from './TableDataContext.js';
+import { type IColumnInfo, type ITableData } from './TableDataContext.js';
 import { useService } from '@cloudbeaver/core-di';
 import { DataGridSettingsService } from '../DataGridSettingsService.js';
+import type { SqlResultColumn } from '@cloudbeaver/core-sdk';
+import { GridConditionalFormattingAction } from '@cloudbeaver/plugin-data-viewer-conditional-formatting';
 
 interface ITableDataPrivate extends ITableData {
   dataGridSettingsService: DataGridSettingsService;
@@ -37,10 +46,11 @@ export function useTableData(
   resultIndex: number,
   gridDIVElement: React.RefObject<HTMLDivElement | null>,
 ): ITableData {
-  const format = model.source.getAction(resultIndex, ResultSetFormatAction);
-  const data = model.source.getAction(resultIndex, ResultSetDataAction);
-  const editor = model.source.getAction(resultIndex, ResultSetEditAction);
-  const view = model.source.getAction(resultIndex, ResultSetViewAction);
+  const formatting = model.source.getAction(resultIndex, GridConditionalFormattingAction);
+  const format = model.source.getAction(resultIndex, IDatabaseDataFormatAction);
+  const data = model.source.getAction(resultIndex, IDatabaseDataResultAction, GridDataResultAction);
+  const editor = model.source.tryGetAction(resultIndex, IDatabaseDataEditAction, GridEditAction);
+  const view = model.source.getAction(resultIndex, IDatabaseDataViewAction, GridViewAction);
   const dataContent = model.source.getAction(resultIndex, ResultSetDataContentAction);
   const dataGridSettingsService = useService(DataGridSettingsService);
 
@@ -49,30 +59,28 @@ export function useTableData(
       get gridDiv(): HTMLDivElement | null {
         return this.gridDIVElement.current;
       },
-      get columnKeys(): IResultSetColumnKey[] {
+      get columnKeys(): IGridColumnKey[] {
         return this.view.columnKeys;
       },
-      get rows(): IResultSetRowKey[] {
+      get visualColumnKeys(): IGridColumnKey[] {
+        return this.view.visualColumnKeys;
+      },
+      get rows(): IGridRowKey[] {
         return this.view.rowKeys;
       },
       get columns() {
-        if (this.columnKeys.length === 0) {
-          return [];
-        }
-
-        const columns: Array<IColumnInfo> = this.columnKeys.map<IColumnInfo>(col => ({
-          key: col,
-        }));
-        columns.unshift({ key: null });
-
-        return columns;
+        return getColumns(this.columnKeys);
+      },
+      get visualColumns() {
+        return getColumns(this.visualColumnKeys);
       },
       get hasDescription(): boolean {
         if (!this.dataGridSettingsService.description) {
           return false;
         }
 
-        return Boolean(this.data?.columns?.some(column => column.description));
+        // TODO: fix column abstraction
+        return Boolean(this.data?.columns?.some(column => (column as SqlResultColumn).description));
       },
       getRow(rowIndex) {
         return this.rows[rowIndex];
@@ -81,19 +89,24 @@ export function useTableData(
         return this.columns[columnIndex];
       },
       getColumnByDataIndex(key) {
-        return this.columns.find(column => column.key !== null && ResultSetDataKeysUtils.isEqual(column.key, key))!;
+        return this.columns.find(column => column.key !== null && GridDataKeysUtils.isEqual(column.key, key))!;
       },
       getColumnInfo(key) {
-        return this.data.getColumn(key);
+        // TODO: fix column abstraction
+        return this.data.getColumn(key) as SqlResultColumn | undefined;
       },
-      getCellValue(key) {
-        return this.view.getCellValue(key);
+      getCellHolder(key) {
+        // TODO: fix cell value abstraction
+        return this.view.getCellHolder(key) as IDatabaseValueHolder<IGridDataKey, IResultSetValue>;
       },
       getColumnIndexFromColumnKey(columnKey) {
-        return this.columns.findIndex(column => column.key !== null && ResultSetDataKeysUtils.isEqual(columnKey, column.key));
+        return getColumnIndex(columnKey, this.columns);
+      },
+      getVisualColumnIndexFromColumnKey(columnKey) {
+        return getColumnIndex(columnKey, this.visualColumns);
       },
       getRowIndexFromKey(rowKey) {
-        return this.rows.findIndex(row => ResultSetDataKeysUtils.isEqual(rowKey, row));
+        return this.rows.findIndex(row => GridDataKeysUtils.isEqual(rowKey, row));
       },
       getColumnsInRange(startIndex, endIndex): IColumnInfo[] {
         if (startIndex === endIndex) {
@@ -105,13 +118,13 @@ export function useTableData(
         return this.columns.slice(firstIndex, lastIndex + 1);
       },
       getEditionState(key) {
-        return this.editor.getElementState(key);
+        return this.editor?.getElementState(key) ?? null;
       },
       inBounds(position) {
         return this.view.has(position);
       },
       isCellEdited(key) {
-        return this.editor.isElementEdited(key);
+        return this.editor?.isElementEdited(key) ?? false;
       },
       isIndexColumn(columnKey) {
         return columnKey.key === null;
@@ -122,19 +135,46 @@ export function useTableData(
       isReadOnly() {
         return dataContent.source.isReadonly(resultIndex);
       },
-      isCellReadonly(key: IResultSetElementKey) {
+      isCellReadonly(key: IGridDataKey) {
         if (!key.column) {
           return true;
         }
 
-        return model.isReadonly(resultIndex) || (this.format.isReadOnly(key) && this.editor.getElementState(key) !== DatabaseEditChangeType.add);
+        return model.isReadonly(resultIndex) || (this.format.isReadOnly(key) && this.editor?.getElementState(key) !== DatabaseEditChangeType.add);
+      },
+      isCellEditable(key: IGridDataKey) {
+        const editionState = this.getEditionState(key);
+
+        const source = dataContent.source;
+        const hasElementIdentifier = isResultSetDataSource(source) ? source.hasElementIdentifier(this.view.resultIndex) : false;
+        if (!hasElementIdentifier && editionState !== DatabaseEditChangeType.add) {
+          return false;
+        }
+
+        const holder = this.getCellHolder(key);
+        if (this.format.isBinary(holder) || this.format.isGeometry(holder) || this.dataContent.isTextTruncated(holder)) {
+          return false;
+        }
+
+        const resultColumn = this.getColumnInfo(key.column);
+
+        if (!resultColumn || holder.value === undefined) {
+          return false;
+        }
+
+        const handleByBooleanFormatter = isBooleanValuePresentationAvailable(holder.value, resultColumn);
+
+        return !(handleByBooleanFormatter || this.isCellReadonly(key));
       },
     }),
     {
       columns: computed,
       rows: computed,
       columnKeys: computed,
+      visualColumns: computed,
+      visualColumnKeys: computed,
       hasDescription: computed,
+      formatting: observable.ref,
       format: observable.ref,
       dataContent: observable.ref,
       data: observable.ref,
@@ -143,6 +183,7 @@ export function useTableData(
       gridDIVElement: observable.ref,
     },
     {
+      formatting,
       format,
       dataContent,
       data,
@@ -152,4 +193,22 @@ export function useTableData(
       dataGridSettingsService,
     },
   );
+}
+
+function getColumns(columnKeys: IGridColumnKey[]): IColumnInfo[] {
+  if (columnKeys.length === 0) {
+    return [];
+  }
+
+  const columns: Array<IColumnInfo> = columnKeys.map<IColumnInfo>(col => ({
+    key: col,
+  }));
+
+  columns.unshift({ key: null });
+
+  return columns;
+}
+
+function getColumnIndex(columnKey: IGridColumnKey, columns: IColumnInfo[]): number {
+  return columns.findIndex(column => column.key !== null && GridDataKeysUtils.isEqual(column.key, columnKey));
 }

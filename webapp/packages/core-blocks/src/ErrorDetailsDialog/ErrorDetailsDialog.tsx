@@ -42,7 +42,7 @@ function DisplayErrorInfo({ error }: { error: IErrorInfo }) {
   );
 }
 
-export const ErrorDetailsDialog: DialogComponent<Error | string, null> = observer(function ErrorDetailsDialog(props) {
+export const ErrorDetailsDialog: DialogComponent<Error | string> = observer(function ErrorDetailsDialog(props) {
   const translate = useTranslate();
   const styles = useS(style);
 
@@ -53,7 +53,7 @@ export const ErrorDetailsDialog: DialogComponent<Error | string, null> = observe
 
   return (
     <CommonDialogWrapper size="large">
-      <CommonDialogHeader title="core_eventsLog_dbeaverErrorDetails" icon="/icons/error_icon.svg" bigIcon onReject={props.rejectDialog} />
+      <CommonDialogHeader title="core_eventsLog_dbeaverErrorDetails" icon="/icons/preload/error_icon.svg" bigIcon onReject={props.rejectDialog} />
       <CommonDialogBody>
         {error.errors.map((error, id) => (
           <div key={id} className={s(styles, { errorInfoContainer: true })}>
@@ -68,7 +68,7 @@ export const ErrorDetailsDialog: DialogComponent<Error | string, null> = observe
             {translate('ui_copy_to_clipboard')}
           </Button>
         )}
-        <Button type="button" onClick={props.rejectDialog}>
+        <Button type="button" onClick={() => props.rejectDialog()}>
           {translate('ui_close')}
         </Button>
       </CommonDialogFooter>

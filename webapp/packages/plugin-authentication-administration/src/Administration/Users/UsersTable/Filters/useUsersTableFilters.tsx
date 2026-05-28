@@ -51,7 +51,7 @@ export function useUsersTableFilters() {
     () => ({
       search: '',
       role: USER_ROLE_ALL,
-      status: 'true',
+      status: 'all',
       get isSearching() {
         return this.search.trim() !== '';
       },

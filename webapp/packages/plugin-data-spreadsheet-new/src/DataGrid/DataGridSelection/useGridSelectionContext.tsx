@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -9,39 +9,37 @@ import { action, observable } from 'mobx';
 import { useState } from 'react';
 
 import { useObjectRef } from '@cloudbeaver/core-blocks';
-import {
-  type IResultSetColumnKey,
-  type IResultSetElementKey,
-  type IResultSetRowKey,
-  ResultSetDataKeysUtils,
-  ResultSetSelectAction,
-} from '@cloudbeaver/plugin-data-viewer';
+import { type IGridColumnKey, type IGridDataKey, type IGridRowKey, GridDataKeysUtils, GridSelectAction } from '@cloudbeaver/plugin-data-viewer';
 
-import type { ITableData } from '../TableDataContext.js';
+import { isColumnInfo, type IColumnInfo, type ITableData } from '../TableDataContext.js';
 import type { IDraggingPosition } from '../useGridDragging.js';
 import type { IDataGridSelectionContext } from './DataGridSelectionContext.js';
 
 interface IGridSelectionState {
   range: boolean;
-  temporarySelection: Map<string, IResultSetElementKey[]>;
+  temporarySelection: Map<string, IGridDataKey[]>;
   lastSelectedCell: IDraggingPosition | null;
 }
 
-export function useGridSelectionContext(tableData: ITableData, selectionAction: ResultSetSelectAction): IDataGridSelectionContext {
-  const props = useObjectRef({ tableData, selectionAction });
+export function useGridSelectionContext(
+  tableData: ITableData,
+  selectionAction: GridSelectAction,
+  getHeaderOrder: () => string[],
+): IDataGridSelectionContext {
+  const props = useObjectRef({ tableData, selectionAction, getHeaderOrder });
 
   const [state] = useState<IGridSelectionState>(() =>
     observable({
       range: false,
-      temporarySelection: new Map<string, IResultSetElementKey[]>(),
+      temporarySelection: new Map<string, IGridDataKey[]>(),
       lastSelectedCell: null,
     }),
   );
 
   const selectRows = action(function selectRows(
-    startRow: IResultSetRowKey,
-    lastRow: IResultSetRowKey,
-    columns: IResultSetColumnKey[] = [],
+    startRow: IGridRowKey,
+    lastRow: IGridRowKey,
+    columns: IGridColumnKey[] = [],
     multiple = false,
     temporary = false,
   ) {
@@ -55,8 +53,8 @@ export function useGridSelectionContext(tableData: ITableData, selectionAction: 
     const lastRowIndex = Math.max(startPosition, lastPosition);
 
     let selected = true;
-    const rowsSelection: IResultSetElementKey[][] = [];
-    const columnsToSelect: Array<IResultSetColumnKey | undefined> = columns.length > 0 ? columns : [undefined];
+    const rowsSelection: IGridDataKey[][] = [];
+    const columnsToSelect: Array<IGridColumnKey | undefined> = columns.length > 0 ? columns : [undefined];
 
     for (let rowIndex = firstRowIndex; rowIndex <= lastRowIndex; rowIndex++) {
       const row = props.tableData.getRow(rowIndex)!;
@@ -92,14 +90,14 @@ export function useGridSelectionContext(tableData: ITableData, selectionAction: 
       for (let rowIdx = firstRowIndex; rowIdx <= lastRowIndex; rowIdx++) {
         const row = props.tableData.getRow(rowIdx)!;
         const newElements = rowSelection
-          .filter(element => !rowsSelection[i]!.some(column => ResultSetDataKeysUtils.isEqual(column.column, element)))
-          .map<IResultSetElementKey>(column => ({ row, column }));
+          .filter(element => !rowsSelection[i]!.some(column => GridDataKeysUtils.isEqual(column.column, element)))
+          .map<IGridDataKey>(column => ({ row, column }));
 
         temporarySelection.set(
-          ResultSetDataKeysUtils.serialize(row),
+          GridDataKeysUtils.serialize(row),
           [...rowsSelection[i]!, ...newElements].filter(column => {
             if (selected) {
-              return !rowSelection.some(key => ResultSetDataKeysUtils.isEqual(key, column.column));
+              return !rowSelection.some(key => GridDataKeysUtils.isEqual(key, column.column));
             }
             return true;
           }),
@@ -120,7 +118,14 @@ export function useGridSelectionContext(tableData: ITableData, selectionAction: 
 
   function selectRange(startPosition: IDraggingPosition, lastPosition: IDraggingPosition, multiple: boolean, temporary = false) {
     state.range = temporary;
-    const columnsInRange = props.tableData.getColumnsInRange(startPosition.colIdx, lastPosition.colIdx);
+    const startColumn = props.tableData.getColumn(startPosition.colIdx);
+    const lastColumn = props.tableData.getColumn(lastPosition.colIdx);
+
+    if (!startColumn?.key || !lastColumn?.key) {
+      return;
+    }
+
+    const columnsInRange = getColumnsInSelectionRange(GridDataKeysUtils.serialize(startColumn.key), GridDataKeysUtils.serialize(lastColumn.key));
     const isIndexColumnInRange = props.tableData.isIndexColumnInRange(columnsInRange);
     const startRow = props.tableData.getRow(startPosition.rowIdx);
     const lastRow = props.tableData.getRow(lastPosition.rowIdx);
@@ -134,6 +139,25 @@ export function useGridSelectionContext(tableData: ITableData, selectionAction: 
         temporary,
       );
     }
+  }
+
+  function getColumnsInSelectionRange(startColIdx: string, endColIdx: string): IColumnInfo[] {
+    const { getHeaderOrder, tableData } = props;
+
+    const visualOrder = getHeaderOrder();
+
+    const startVisualPos = visualOrder.indexOf(startColIdx);
+    const endVisualPos = visualOrder.indexOf(endColIdx);
+
+    if (startVisualPos === -1 || endVisualPos === -1) {
+      return [];
+    }
+
+    const minVisualPos = Math.min(startVisualPos, endVisualPos);
+    const maxVisualPos = Math.max(startVisualPos, endVisualPos);
+    const dataIndicesInRange = visualOrder.slice(minVisualPos, maxVisualPos + 1);
+
+    return dataIndicesInRange.map(key => tableData.getColumn(tableData.getColumnIndexFromColumnKey({ index: Number(key) }))).filter(isColumnInfo);
   }
 
   const selectColumn = action(function selectColumn(colIdx: number, multiple: boolean) {
@@ -166,19 +190,19 @@ export function useGridSelectionContext(tableData: ITableData, selectionAction: 
       return false;
     }
 
-    const temporaryRowSelection = state.temporarySelection.get(ResultSetDataKeysUtils.serialize(row));
+    const temporaryRowSelection = state.temporarySelection.get(GridDataKeysUtils.serialize(row));
 
     if (temporaryRowSelection) {
       if (column === undefined) {
         return (temporaryRowSelection || []).length === props.tableData.columnKeys.length;
       }
-      return temporaryRowSelection.some(key => ResultSetDataKeysUtils.isEqual(key.column, column));
+      return temporaryRowSelection.some(key => GridDataKeysUtils.isEqual(key.column, column));
     }
 
     return props.selectionAction.isElementSelected({ row, column });
   }
 
-  function selectCell(key: IResultSetElementKey, multiple: boolean) {
+  function selectCell(key: IGridDataKey, multiple: boolean) {
     const { temporarySelection } = state;
     const { selectionAction } = props;
     temporarySelection.clear();
@@ -251,6 +275,11 @@ export function useGridSelectionContext(tableData: ITableData, selectionAction: 
     return { rowIdx: row, columnIdx: column };
   }
 
+  function clearSelection() {
+    state.temporarySelection.clear();
+    props.selectionAction.clear();
+  }
+
   return useObjectRef<IDataGridSelectionContext>(
     () => ({
       get selectedCells() {
@@ -262,6 +291,7 @@ export function useGridSelectionContext(tableData: ITableData, selectionAction: 
       getFocusedElementPosition,
       isSelected,
       selectRange,
+      clearSelection,
     }),
     false,
   );

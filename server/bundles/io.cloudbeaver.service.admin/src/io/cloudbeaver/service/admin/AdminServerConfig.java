@@ -34,7 +34,6 @@ public class AdminServerConfig {
     private static final Log log = Log.getLog(AdminServerConfig.class);
 
     private String serverName;
-    private String serverURL;
 
     private String adminName;
     private String adminPassword;
@@ -60,7 +59,6 @@ public class AdminServerConfig {
 
     public AdminServerConfig(Map<String, Object> params) {
         this.serverName = JSONUtils.getString(params, "serverName");
-        this.serverURL = JSONUtils.getString(params, "serverURL");
         this.adminName = JSONUtils.getString(params, "adminName");
         this.adminPassword = JSONUtils.getString(params, "adminPassword");
 
@@ -131,14 +129,6 @@ public class AdminServerConfig {
 
     public void setServerName(String serverName) {
         this.serverName = serverName;
-    }
-
-    public String getServerURL() {
-        return serverURL;
-    }
-
-    public void setServerURL(String serverURL) {
-        this.serverURL = serverURL;
     }
 
     public String getAdminName() {

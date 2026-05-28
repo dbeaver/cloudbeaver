@@ -1,17 +1,19 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
+import { useContext } from 'react';
 
 import { Icon, MenuItemElementStyles, s, SContext, type StyleRegistry, useS } from '@cloudbeaver/core-blocks';
 import { useDataContextLink } from '@cloudbeaver/core-data-context';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { ContextMenu } from '@cloudbeaver/core-ui';
 import { useMenu } from '@cloudbeaver/core-view';
+import { CellContext } from '../../CellRenderer/CellContext.js';
 import {
   DATA_CONTEXT_DV_ACTIONS,
   DATA_CONTEXT_DV_DDM,
@@ -22,7 +24,7 @@ import {
   type IDatabaseDataModel,
   type IDataPresentationActions,
   type IDataTableActions,
-  type IResultSetElementKey,
+  type IGridDataKey,
   MENU_DV_CONTEXT_MENU,
 } from '@cloudbeaver/plugin-data-viewer';
 
@@ -31,9 +33,9 @@ import classes from './CellMenu.module.css';
 interface Props {
   model: IDatabaseDataModel;
   actions: IDataTableActions;
-  spreadsheetActions: IDataPresentationActions<IResultSetElementKey>;
+  spreadsheetActions: IDataPresentationActions<IGridDataKey>;
   resultIndex: number;
-  cellKey: IResultSetElementKey;
+  cellKey: IGridDataKey;
   simple: boolean;
   onStateSwitch?: (state: boolean) => void;
 }
@@ -51,6 +53,7 @@ const registry: StyleRegistry = [
 export const CellMenu = observer<Props>(function CellMenu({ model, actions, spreadsheetActions, resultIndex, cellKey, simple, onStateSwitch }) {
   const style = useS(classes);
   const menu = useMenu({ menu: MENU_DV_CONTEXT_MENU });
+  const cellContext = useContext(CellContext);
 
   useDataContextLink(menu.context, (context, id) => {
     context.set(DATA_CONTEXT_DV_DDM, model, id);
@@ -75,15 +78,11 @@ export const CellMenu = observer<Props>(function CellMenu({ model, actions, spre
         <ContextMenu
           className={s(style, { contextMenu: true })}
           menu={menu}
-          placement="auto-end"
-          tabIndex={-1}
-          modal
-          disclosure
+          visible={cellContext.isMenuVisible}
+          autoFocusOnShow
           onVisibleSwitch={onStateSwitch}
         >
-          <div role="button" className={s(style, { trigger: true })}>
-            <Icon className={s(style, { icon: true })} name="snack" viewBox="0 0 16 10" />
-          </div>
+          <Icon className={s(style, { icon: true })} name="snack" viewBox="0 0 16 10" />
         </ContextMenu>
       </div>
     </SContext>

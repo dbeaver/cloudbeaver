@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -55,6 +55,7 @@ import { ACTION_NEW_FOLDER, ActionService, type IAction, MenuService } from '@cl
 import {
   DATA_CONTEXT_ELEMENTS_TREE,
   MENU_ELEMENTS_TREE_TOOLS,
+  MENU_NAVIGATION_TREE_CREATE,
   NavigationTreeService,
   TreeSelectionService,
 } from '@cloudbeaver/plugin-navigation-tree';
@@ -127,13 +128,13 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
         return;
       }
 
-      const result = await this.commonDialogService.open(ConfirmationDialogDelete, {
+      const { status } = await this.commonDialogService.open(ConfirmationDialogDelete, {
         title: 'ui_data_delete_confirmation',
         message: this.localizationService.translate('plugin_connections_connection_folder_delete_confirmation', undefined, { name: nodes }),
         confirmActionText: 'ui_delete',
       });
 
-      if (result === DialogueStateResult.Rejected) {
+      if (status === DialogueStateResult.Rejected) {
         ExecutorInterrupter.interrupt(contexts);
       } else {
         deleteContext.confirm();
@@ -176,7 +177,7 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
     });
 
     this.menuService.addCreator({
-      root: true,
+      menus: [MENU_NAVIGATION_TREE_CREATE],
       contexts: [DATA_CONTEXT_NAV_NODE, DATA_CONTEXT_ELEMENTS_TREE],
       isApplicable: context => {
         const node = context.get(DATA_CONTEXT_NAV_NODE)!;
@@ -316,7 +317,7 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
           parentFolderParam = getConnectionFolderIdFromNodeId(targetNode.folderId);
         }
 
-        const result = await this.commonDialogService.open(FolderDialog, {
+        const { status, result } = await this.commonDialogService.open(FolderDialog, {
           value: this.localizationService.translate('ui_folder_new_default_name'),
           projectId: targetNode.projectId,
           folder: parentFolderParam?.folderId,
@@ -343,7 +344,7 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
           },
         });
 
-        if (result !== DialogueStateResult.Rejected && result !== DialogueStateResult.Resolved) {
+        if (status == DialogueStateResult.Resolved && result) {
           try {
             await this.connectionFolderResource.create(result.projectId, result.name, result.folder);
             this.navTreeResource.markOutdated(

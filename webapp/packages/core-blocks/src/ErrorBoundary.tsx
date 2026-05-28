@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,7 @@ import { DisplayError } from './DisplayError.js';
 import style from './ErrorBoundary.module.css';
 import { ErrorContext, type IExceptionContext } from './ErrorContext.js';
 import { ExceptionMessage } from './ExceptionMessage.js';
+import { Spinner } from '@dbeaver/ui-kit';
 
 interface Props {
   simple?: boolean;
@@ -74,7 +75,7 @@ export class ErrorBoundary extends React.Component<React.PropsWithChildren<Props
 
     for (const errorData of this.state.exceptions) {
       if (this.props.simple) {
-        const stack = errorData.errorInfo?.componentStack || errorData.error.stack;
+        const stack = errorData.error.stack;
         return (
           <Suspense fallback={<>Loading...</>}>
             <div>
@@ -94,9 +95,14 @@ export class ErrorBoundary extends React.Component<React.PropsWithChildren<Props
                 </div>
               )}
               <div>
-                {errorData.error.toString()}
-                {stack && <br />}
-                {stack}
+                {stack ? stack : errorData.error.toString()}
+                {errorData.errorInfo?.componentStack && (
+                  <>
+                    <br />
+                    <br />
+                    {errorData.errorInfo.componentStack}
+                  </>
+                )}
               </div>
               {this.props.fallback}
             </div>
@@ -139,7 +145,7 @@ export class ErrorBoundary extends React.Component<React.PropsWithChildren<Props
 
     return (
       <ErrorContext.Provider value={this}>
-        <Suspense fallback={<>Loading...</>}>{children}</Suspense>
+        <Suspense fallback={<Spinner size="large" />}>{children}</Suspense>
       </ErrorContext.Provider>
     );
   }

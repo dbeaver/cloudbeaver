@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ import type { ResourceKeyAlias } from './ResourceKeyAlias.js';
 import { isResourceKeyList, resourceKeyList, ResourceKeyList } from './ResourceKeyList.js';
 import { ResourceKeyListAlias, resourceKeyListAlias } from './ResourceKeyListAlias.js';
 import { ResourceKeyUtils } from './ResourceKeyUtils.js';
+import { CachedResourceOffsetPageTargetKey } from './CachedResourceOffsetPageKeys.js';
 
 export type CachedMapResourceKey<TResource> = CachedResourceKey<TResource>;
 export type CachedMapResourceValue<TResource> = TResource extends CachedResource<Map<any, infer T>, any, any, any, any> ? T : never;
@@ -63,6 +64,12 @@ export abstract class CachedMapResource<
     this.onItemDelete = new SyncExecutor<ResourceKeySimple<TKey>>(null);
 
     this.aliases.add(CachedMapAllKey, () => resourceKeyList(this.keys));
+
+    this.onItemDelete.addHandler(key => {
+      ResourceKeyUtils.forEach(key, key => {
+        this.metadata.delete(CachedResourceOffsetPageTargetKey(key));
+      });
+    });
 
     makeObservable<this, 'dataSet' | 'dataDelete'>(this, {
       set: action,

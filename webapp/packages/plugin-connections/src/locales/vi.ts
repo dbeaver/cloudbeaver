@@ -2,6 +2,7 @@ export default [
   ['plugin_connections_new_connection_dialog_title', 'Kết nối mới'],
   ['plugin_connections_connection_form_part_main', 'Chính'],
   ['plugin_connections_connection_form_part_properties', 'Thuộc tính Trình điều khiển (driver)'],
+  ['plugin_connections_connection_form_part_main_auth_model', 'Mô hình xác thực'],
   ['plugin_connections_connection_form_part_main_custom_host', 'Máy chủ'],
   ['plugin_connections_connection_form_part_main_custom_port', 'Cổng'],
   ['plugin_connections_connection_form_part_main_custom_server_name', 'Tên máy chủ'],
@@ -10,6 +11,8 @@ export default [
   ['plugin_connections_connection_form_part_main_folder', 'Thư mục'],
 
   ['plugin_connections_connection_edit_menu_item_title', 'Chỉnh sửa Kết nối'],
+  ['plugin_connections_connection_clone', 'Sao chép'],
+  ['plugin_connections_connection_clone_error', 'Không thể sao chép kết nối'],
   ['plugin_connections_connection_edit_cancel_title', 'Xác nhận Hủy'],
   ['plugin_connections_connection_edit_cancel_message', 'Bạn sắp hủy các thay đổi của kết nối. Các thay đổi chưa lưu sẽ bị mất. Bạn có chắc không?'],
   ['plugin_connections_connection_edit_reconnect_title', 'Kết nối đã được cập nhật'],
@@ -31,8 +34,14 @@ export default [
 
   ['plugin_connections_connection_ssl_enable', 'Bật SSL'],
   ['plugin_connections_connection_ssl_optional', 'All SSL parameters are optional.'],
-  ['plugin_connections_connection_ssl_description', 'You must specify SSL certificates if they are required by your server configuration. Settings on this page override Driver properties'],
-  ['plugin_connections_connection_ssl_note', '{arg:productName} does not verify SSL configuration and relies on the driver implementation. Please refer to the driver documentation for more information.'],
+  [
+    'plugin_connections_connection_ssl_description',
+    'You must specify SSL certificates if they are required by your server configuration. Settings on this page override Driver properties',
+  ],
+  [
+    'plugin_connections_connection_ssl_note',
+    '{arg:productName} does not verify SSL configuration and relies on the driver implementation. Please refer to the driver documentation for more information.',
+  ],
   ['plugin_connections_connection_ssl_docs', 'SSL configuration documentation'],
 
   ['plugin_connections_connection_form_shared_credentials_manage_info', 'Bạn có thể quản lý thông tin xác thực trong '],

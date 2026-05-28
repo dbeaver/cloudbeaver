@@ -1,28 +1,33 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { computed, makeObservable } from 'mobx';
 
-import { type DataTypeLogicalOperation, ResultDataFormat, type SqlResultColumn } from '@cloudbeaver/core-sdk';
+import { type DataTypeLogicalOperation, ResultDataFormat, type SqlResultColumn, type SqlResultRowMetaData } from '@cloudbeaver/core-sdk';
 import { isResultSetContentValue, type IResultSetContentValue } from '@dbeaver/result-set-api';
 
-import type { IDatabaseDataSource } from '../../IDatabaseDataSource.js';
+import { IDatabaseDataSource } from '../../IDatabaseDataSource.js';
 import type { IDatabaseResultSet } from '../../IDatabaseResultSet.js';
-import { databaseDataAction } from '../DatabaseDataActionDecorator.js';
-import { DatabaseDataResultAction } from '../DatabaseDataResultAction.js';
-import type { IResultSetColumnKey, IResultSetElementKey, IResultSetRowKey } from './IResultSetDataKey.js';
-import { ResultSetDataKeysUtils } from './ResultSetDataKeysUtils.js';
 import type { IResultSetValue } from './ResultSetFormatAction.js';
+import { GridDataResultAction } from '../Grid/GridDataResultAction.js';
+import { injectable } from '@cloudbeaver/core-di';
+import { IDatabaseDataResult } from '../../IDatabaseDataResult.js';
+import type { IGridColumnKey, IGridDataKey, IGridRowKey } from '../Grid/IGridDataKey.js';
 
-@databaseDataAction()
-export class ResultSetDataAction extends DatabaseDataResultAction<IResultSetElementKey, IDatabaseResultSet> {
+@injectable(() => [IDatabaseDataSource, IDatabaseDataResult])
+export class ResultSetDataAction extends GridDataResultAction<
+  SqlResultColumn,
+  SqlResultRowMetaData,
+  IGridDataKey,
+  IResultSetValue,
+  IDatabaseResultSet
+> {
   static override dataFormat = [ResultDataFormat.Resultset];
 
-  get rows() {
+  get rows(): SqlResultRowMetaData[] {
     return this.result.data?.rowsWithMetaData || [];
   }
 
@@ -30,39 +35,15 @@ export class ResultSetDataAction extends DatabaseDataResultAction<IResultSetElem
     return this.result.data?.columns || [];
   }
 
-  constructor(source: IDatabaseDataSource<any, IDatabaseResultSet>) {
-    super(source);
-    makeObservable(this, {
-      rows: computed,
-      columns: computed,
-    });
+  constructor(source: IDatabaseDataSource, result: IDatabaseDataResult) {
+    super(source as unknown as IDatabaseDataSource<unknown, IDatabaseResultSet>, result as IDatabaseResultSet);
   }
 
-  getIdentifier(key: IResultSetElementKey): string {
-    return ResultSetDataKeysUtils.serialize(key.column);
+  override getColumnName(key: IGridColumnKey): string | undefined {
+    return this.getColumn(key)?.name;
   }
 
-  serialize(key: IResultSetElementKey): string {
-    return ResultSetDataKeysUtils.serializeElementKey(key);
-  }
-
-  serializeRowKey(key: IResultSetRowKey): string {
-    return ResultSetDataKeysUtils.serialize(key);
-  }
-
-  getDefaultKey(): IResultSetElementKey {
-    return {
-      row: {
-        index: 0,
-        subIndex: 0,
-      },
-      column: {
-        index: 0,
-      },
-    };
-  }
-
-  insertRow(row: IResultSetRowKey, value: IResultSetValue[], shift = 0): IResultSetRowKey | undefined {
+  insertRow(row: IGridRowKey, value: IResultSetValue[], shift = 0): IGridRowKey | undefined {
     if (this.result.data?.rowsWithMetaData) {
       const index = row.index + shift;
       this.result.data.rowsWithMetaData.splice(index, 0, { data: value, metaData: {} });
@@ -73,7 +54,7 @@ export class ResultSetDataAction extends DatabaseDataResultAction<IResultSetElem
     return undefined;
   }
 
-  removeRow(row: IResultSetRowKey, shift = 0): IResultSetRowKey | undefined {
+  removeRow(row: IGridRowKey, shift = 0): IGridRowKey | undefined {
     if (this.result.data?.rowsWithMetaData) {
       const index = row.index + shift;
       this.result.data.rowsWithMetaData.splice(index, 1);
@@ -83,13 +64,13 @@ export class ResultSetDataAction extends DatabaseDataResultAction<IResultSetElem
     return undefined;
   }
 
-  setRowValue(row: IResultSetRowKey, value: IResultSetValue[], shift = 0): void {
+  setRowValue(row: IGridRowKey, value: IResultSetValue[], shift = 0): void {
     if (this.result.data?.rowsWithMetaData) {
       this.result.data.rowsWithMetaData[row.index + shift] = { data: value, metaData: this.getRowMetadata(row) };
     }
   }
 
-  getRowValue(row: IResultSetRowKey): IResultSetValue[] | undefined {
+  getRowValue(row: IGridRowKey): IResultSetValue[] | undefined {
     if (row.index >= this.rows.length) {
       return undefined;
     }
@@ -97,7 +78,7 @@ export class ResultSetDataAction extends DatabaseDataResultAction<IResultSetElem
     return this.rows[row.index]?.data;
   }
 
-  getRowMetadata(row: IResultSetRowKey) {
+  getRowMetadata(row: IGridRowKey): Record<string, any> | undefined {
     if (row.index >= this.rows.length) {
       return undefined;
     }
@@ -105,16 +86,9 @@ export class ResultSetDataAction extends DatabaseDataResultAction<IResultSetElem
     return this.rows[row.index]?.metaData;
   }
 
-  getCellValue(cell: IResultSetElementKey): IResultSetValue | undefined {
-    if (cell.row === undefined || cell.column === undefined || cell.row.index >= this.rows.length || cell.column.index >= this.columns.length) {
-      return undefined;
-    }
-
-    return this.rows[cell.row.index]?.data?.[cell.column.index];
-  }
-
-  getContent(cell: IResultSetElementKey): IResultSetContentValue | null {
-    const value = this.getCellValue(cell);
+  getContent(cell: IGridDataKey): IResultSetContentValue | null {
+    const row = this.getRowValue(cell.row);
+    const value = row?.[cell.column.index];
 
     if (isResultSetContentValue(value)) {
       return value;
@@ -123,21 +97,7 @@ export class ResultSetDataAction extends DatabaseDataResultAction<IResultSetElem
     return null;
   }
 
-  findColumnKey(predicate: (column: SqlResultColumn) => boolean): IResultSetColumnKey | undefined {
-    const index = this.columns.findIndex(predicate);
-
-    return index === -1 ? undefined : { index };
-  }
-
-  getColumn(key: IResultSetColumnKey): SqlResultColumn | undefined {
-    if (key.index >= this.columns.length) {
-      return undefined;
-    }
-
-    return this.columns[key.index];
-  }
-
-  getColumnOperations(key: IResultSetColumnKey): DataTypeLogicalOperation[] {
+  getColumnOperations(key: IGridColumnKey): DataTypeLogicalOperation[] {
     const column = this.getColumn(key);
 
     if (!column) {

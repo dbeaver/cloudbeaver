@@ -3,21 +3,20 @@ Bundle-ManifestVersion: 2
 Bundle-Vendor: DBeaver Corp
 Bundle-Name: Cloudbeaver Web Model
 Bundle-SymbolicName: io.cloudbeaver.model;singleton:=true
-Bundle-Version: 1.0.87.qualifier
-Bundle-Release-Date: 20251020
+Bundle-Version: 1.0.103.qualifier
+Bundle-Release-Date: 20260622
 Bundle-RequiredExecutionEnvironment: JavaSE-21
 Bundle-ActivationPolicy: lazy
 Require-Bundle: org.jkiss.dbeaver.data.gis;visibility:=reexport,
  org.jkiss.dbeaver.model;visibility:=reexport,
- org.jkiss.dbeaver.model.cli;visibility:=reexport,
  org.jkiss.dbeaver.model.sm;visibility:=reexport,
  org.jkiss.dbeaver.model.event;visibility:=reexport,
  org.jkiss.dbeaver.model.nio;visibility:=reexport,
  org.jkiss.dbeaver.registry;visibility:=reexport,
  org.jkiss.dbeaver.net.ssh,
+ org.jkiss.bundle.logback;visibility:=reexport,
  org.jkiss.bundle.graphql;visibility:=reexport,
  org.jkiss.bundle.apache.dbcp,
- com.google.gson;visibility:=reexport,
  jakarta.servlet-api;bundle-version:="6.0.0";visibility:=reexport
 Export-Package: io.cloudbeaver,
  io.cloudbeaver.auth,
@@ -26,17 +25,21 @@ Export-Package: io.cloudbeaver,
  io.cloudbeaver.auth.provider.local,
  io.cloudbeaver.auth.provisioning,
  io.cloudbeaver.websocket,
+ io.cloudbeaver.websocket.event.client,
+ io.cloudbeaver.websocket.event.task,
  io.cloudbeaver.model,
+ io.cloudbeaver.model.api.annotation,
+ io.cloudbeaver.model.api.annotation.enums,
+ io.cloudbeaver.model.api.annotation.media,
+ io.cloudbeaver.model.api.annotation.responses,
+ io.cloudbeaver.model.api.annotation.tags,
  io.cloudbeaver.model.app,
  io.cloudbeaver.model.config,
  io.cloudbeaver.model.apilog,
- io.cloudbeaver.model.cli,
- io.cloudbeaver.model.events,
  io.cloudbeaver.model.fs,
  io.cloudbeaver.model.log,
  io.cloudbeaver.model.rm,
  io.cloudbeaver.model.rm.local,
- io.cloudbeaver.model.rm.lock,
  io.cloudbeaver.model.session,
  io.cloudbeaver.model.user,
  io.cloudbeaver.model.utils,

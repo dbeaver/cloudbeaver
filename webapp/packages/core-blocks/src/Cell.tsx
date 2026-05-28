@@ -11,38 +11,42 @@ import style from './Cell.module.css';
 import { Container } from './Containers/Container.js';
 import { s } from './s.js';
 import { useS } from './useS.js';
+import { Command, type CommandProps } from '@dbeaver/ui-kit';
 
-interface Props {
-  description?: React.ReactElement | string;
+interface Props extends CommandProps {
+  description?: React.ReactNode | string;
   before?: React.ReactElement;
   after?: React.ReactElement;
   ripple?: boolean;
   big?: boolean;
   className?: string;
   children?: React.ReactNode;
+  render?: React.ReactElement;
 }
 
-export const Cell = observer<Props>(function Cell({ before, after, description, className, ripple = true, big, children }) {
+export const Cell = observer(function Cell({ render, before, after, description, className, ripple = true, big, children, ...rest }: Props) {
   const styles = useS(style);
 
   return (
-    <div className={s(styles, { ripple, big }, className)}>
+    <Command {...rest} render={render ?? <div />} className={s(styles, { ripple, big }, className)}>
       <Container className={s(styles, { main: true })} gap parent center dense>
         {before && (
           <Container className={s(styles, { before: true })} keepSize>
             {before}
           </Container>
         )}
-        <Container className={s(styles, { info: true })} zeroBasis>
-          {children}
-          {description && <Container className={s(styles, { description: true })}>{description}</Container>}
-        </Container>
+        {(children || description) && (
+          <Container className={s(styles, { info: true })} zeroBasis>
+            {children}
+            {description && <Container className={s(styles, { description: true })}>{description}</Container>}
+          </Container>
+        )}
         {after && (
           <Container className={s(styles, { after: true })} keepSize>
             {after}
           </Container>
         )}
       </Container>
-    </div>
+    </Command>
   );
 });

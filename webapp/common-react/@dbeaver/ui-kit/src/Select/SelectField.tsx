@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,12 @@ type PropertyGetter<ItemType, ValueType> = (item: ItemType) => ValueType;
 export interface SelectFieldProps<T, ItemType = SelectItem<T>> {
   /** Options array - can be SelectOption objects or arbitrary objects */
   items: ItemType[];
+
+  /**
+   * Function to extract serialized value from items
+   * Example: (key) => JSON.stringify(key)
+   */
+  itemValueSerialized?: PropertyGetter<T, string>;
 
   /**
    * Function to extract value from items
@@ -72,11 +78,13 @@ export interface SelectFieldProps<T, ItemType = SelectItem<T>> {
 
   store?: SelectProviderProps['store'];
 
+  portal?: boolean;
+
   autoFocusItemsOnShow?: boolean;
 
-  'aria-labelledby'?: string, 
+  'aria-labelledby'?: string;
 
-  'aria-label'?: string
+  'aria-label'?: string;
 
   id?: string;
 }
@@ -91,6 +99,7 @@ export function SelectField<T, ItemType extends {} = SelectItem<T>>({
   value,
   onChange,
   itemValue,
+  itemValueSerialized,
   itemRender,
   itemDisabled,
   label,
@@ -99,6 +108,7 @@ export function SelectField<T, ItemType extends {} = SelectItem<T>>({
   disabled,
   required,
   className,
+  portal = false,
   selectedRender,
   arrowIcon,
   store,
@@ -109,6 +119,9 @@ export function SelectField<T, ItemType extends {} = SelectItem<T>>({
   const getItemValue = (item: ItemType): T =>
     getValueByPath<ItemType, T>(item, itemValue, i => ('value' in i ? (i as unknown as SelectItem<T>).value : (i as unknown as T)));
 
+  const getItemValueSerialized = (item: ItemType): string =>
+    getValueByPath<T, string>(getItemValue(item), itemValueSerialized, key => JSON.stringify(key));
+
   const renderItem = (item: ItemType): React.ReactNode =>
     getValueByPath<ItemType, React.ReactNode>(item, itemRender, i => ('label' in i ? (i as unknown as SelectItem<T>).label : String(i)));
 
@@ -116,44 +129,53 @@ export function SelectField<T, ItemType extends {} = SelectItem<T>>({
     getValueByPath<ItemType, boolean>(item, itemDisabled, i => ('disabled' in i ? Boolean((i as unknown as SelectItem<T>).disabled) : false));
 
   const [selectedValue, setSelectedValue] = useState<T | undefined>(() => {
-    if (value !== undefined) return value;
+    if (value !== undefined) {
+      return value;
+    }
 
     const firstEnabledItem = items.find(item => !isItemDisabled(item));
     return firstEnabledItem ? getItemValue(firstEnabledItem) : undefined;
   });
 
-  const handleChange = (newValue: T) => {
-    setSelectedValue(newValue);
-    onChange?.(newValue);
+  const handleChange = (newValue: string | readonly string[]) => {
+    // TODO: add support for multi-select
+
+    const newItem = items.find(item => getItemValueSerialized(item) === newValue);
+    if (!newItem) {
+      return;
+    }
+    const newItemValue = getItemValue(newItem);
+    setSelectedValue(newItemValue);
+    onChange?.(newItemValue);
   };
 
   const currentValue = value !== undefined ? value : selectedValue;
+  let currentValueSerialized = undefined;
 
-  const selectedItem = items.find(item => getItemValue(item) === currentValue);
+  if (currentValue !== undefined) {
+    currentValueSerialized = itemValueSerialized ? itemValueSerialized(currentValue) : JSON.stringify(currentValue);
+  }
 
+  const selectedItem = currentValue !== undefined ? items.find(item => getItemValueSerialized(item) === currentValueSerialized) : undefined;
   const displayValue = selectedRender ? selectedRender(currentValue, selectedItem) : selectedItem ? renderItem(selectedItem) : '';
 
   return (
     <div className={clsx('dbv-kit-select-field', className)}>
-      <SelectProvider value={currentValue as any} setValue={val => handleChange(val as T)} store={store}> 
+      <SelectProvider value={currentValueSerialized} setValue={val => handleChange(val)} store={store}>
         {label && <SelectLabel className={clsx(required && 'dbv-kit-select__label--required')}>{label}</SelectLabel>}
 
         <Select id={id} name={name} disabled={disabled} required={required}>
           {displayValue}
-          {arrowIcon ?? <Select.Arrow className='dbv-kit-select__arrow-icon' />}
+          {arrowIcon ?? <Select.Arrow className="dbv-kit-select__arrow-icon tw:text-sm!" />}
         </Select>
         {description && <span className="dbv-kit-select__description">{description}</span>}
 
-        <SelectPopover autoFocusOnShow={autoFocusItemsOnShow} gutter={4} unmountOnHide>
+        <SelectPopover autoFocusOnShow={autoFocusItemsOnShow} portal={portal} gutter={4} unmountOnHide>
           {items.length === 0 ? (
             <div className="dbv-kit-select__empty">{noItemsPlaceholder}</div>
           ) : (
             items.map(item => (
-              <SelectItem
-                key={String(getItemValue(item))}
-                value={getItemValue(item) as any}
-                disabled={isItemDisabled(item)}
-              >
+              <SelectItem key={getItemValueSerialized(item)} value={getItemValueSerialized(item)} disabled={isItemDisabled(item)}>
                 {renderItem(item)}
               </SelectItem>
             ))

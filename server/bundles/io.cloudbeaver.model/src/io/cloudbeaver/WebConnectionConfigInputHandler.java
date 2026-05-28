@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package io.cloudbeaver;
 
 import io.cloudbeaver.model.WebConnectionConfig;
 import io.cloudbeaver.model.app.WebAppConfiguration;
+import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.utils.ServletAppUtils;
 import io.cloudbeaver.utils.WebDataSourceUtils;
 import org.jkiss.code.NotNull;
@@ -26,14 +27,17 @@ import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
+import org.jkiss.dbeaver.registry.DataSourcePreferenceStore;
 import org.jkiss.utils.CommonUtils;
 
 public class WebConnectionConfigInputHandler<T extends WebConnectionConfig, C extends DataSourceDescriptor> {
     private static final Log log = Log.getLog(WebConnectionConfigInputHandler.class);
     protected final T input;
     protected final DBPDataSourceRegistry registry;
+    protected final WebSession webSession;
 
-    public WebConnectionConfigInputHandler(@NotNull DBPDataSourceRegistry registry, T configInput) {
+    public WebConnectionConfigInputHandler(@NotNull WebSession webSession, @NotNull DBPDataSourceRegistry registry, T configInput) {
+        this.webSession = webSession;
         this.registry = registry;
         this.input = configInput;
     }
@@ -52,6 +56,7 @@ public class WebConnectionConfigInputHandler<T extends WebConnectionConfig, C ex
         }
 
         WebDataSourceUtils.saveAuthProperties(
+            webSession.getProgressMonitor(),
             newDataSource,
             newDataSource.getConnectionConfiguration(),
             input.getCredentials(),
@@ -73,7 +78,7 @@ public class WebConnectionConfigInputHandler<T extends WebConnectionConfig, C ex
 
         dataSource.setFolder(input.getFolder() != null ? registry.getFolder(input.getFolder()) : null);
         if (input.isDefaultAutoCommit() != null) {
-            dataSource.setDefaultAutoCommit(input.isDefaultAutoCommit());
+            dataSource.getConnectionConfiguration().getBootstrap().setDefaultAutoCommit(input.isDefaultAutoCommit());
         }
         WebDataSourceUtils.setConnectionConfiguration(
             dataSource.getDriver(),
@@ -81,6 +86,7 @@ public class WebConnectionConfigInputHandler<T extends WebConnectionConfig, C ex
             input
         );
         WebDataSourceUtils.saveAuthProperties(
+            webSession.getProgressMonitor(),
             dataSource,
             dataSource.getConnectionConfiguration(),
             input.getCredentials(),
@@ -88,6 +94,9 @@ public class WebConnectionConfigInputHandler<T extends WebConnectionConfig, C ex
             input.isSharedCredentials()
         );
         dataSource.setConnectionReadOnly(input.isReadOnly());
+        DataSourcePreferenceStore preferenceStore = dataSource.getPreferenceStore();
+        preferenceStore.clear();
+        preferenceStore.setProperties(input.getDefaultUserPreferences());
     }
 
     @NotNull

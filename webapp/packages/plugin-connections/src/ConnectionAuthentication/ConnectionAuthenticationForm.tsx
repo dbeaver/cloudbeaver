@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import { DatabaseAuthModelsResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
-import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
+import type { IObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 
 import type { IConnectionAuthenticationConfig } from './IConnectionAuthenticationConfig.js';
 import { NetworkHandlers } from './NetworkHandlers.js';
@@ -29,7 +29,7 @@ import { NetworkHandlers } from './NetworkHandlers.js';
 export interface ConnectionAuthenticationFormProps {
   config: Partial<IConnectionAuthenticationConfig>;
   authModelId: string | null;
-  authProperties?: ObjectPropertyInfo[];
+  authProperties?: IObjectPropertyInfo[];
   networkHandlers?: string[];
   formId?: string;
   allowSaveCredentials?: boolean;
@@ -76,7 +76,7 @@ export const ConnectionAuthenticationForm = observer<ConnectionAuthenticationFor
             <>
               {!!networkHandlers?.length && <GroupTitle>{translate('connections_database_authentication')}</GroupTitle>}
               <ObjectPropertyInfoForm
-                autofillToken={`section-${formId || ''} section-auth`}
+                autocompleteSectionName="section-db-auth"
                 properties={properties}
                 state={config.credentials}
                 disabled={disabled}

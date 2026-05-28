@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -11,20 +11,21 @@ import {
   DATA_CONTEXT_DV_DDM,
   DATA_CONTEXT_DV_DDM_RESULT_INDEX,
   DATA_CONTEXT_DV_RESULT_KEY,
-  DatabaseDataConstraintAction,
   EOrder,
+  GridDataResultAction,
+  IDatabaseDataConstraintAction,
   type IDatabaseDataModel,
   type IDatabaseDataOptions,
-  type IResultSetColumnKey,
+  IDatabaseDataResultAction,
+  type IGridColumnKey,
   isResultSetDataModel,
   isResultSetDataSource,
   type Order,
-  ResultSetDataAction,
-  ResultSetDataSource,
 } from '@cloudbeaver/plugin-data-viewer';
 
 import { ACTION_DATA_GRID_ORDERING_DISABLE_ALL } from '../Actions/Ordering/ACTION_DATA_GRID_ORDERING_DISABLE_ALL.js';
 import { MENU_DATA_GRID_ORDERING } from './MENU_DATA_GRID_ORDERING.js';
+import type { SqlResultColumn } from '@cloudbeaver/core-sdk';
 
 @injectable(() => [ActionService, MenuService])
 export class DataGridContextMenuOrderService {
@@ -33,14 +34,15 @@ export class DataGridContextMenuOrderService {
     private readonly menuService: MenuService,
   ) {}
 
-  private async changeOrder(unknownModel: IDatabaseDataModel, resultIndex: number, column: IResultSetColumnKey, order: Order) {
+  private async changeOrder(unknownModel: IDatabaseDataModel, resultIndex: number, column: IGridColumnKey, order: Order) {
     const model = unknownModel as any;
     if (!isResultSetDataModel<IDatabaseDataOptions>(model)) {
       throw new Error('Unsupported data model');
     }
-    const data = model.source.getAction(resultIndex, ResultSetDataAction);
-    const constraints = model.source.getAction(resultIndex, DatabaseDataConstraintAction);
-    const resultColumn = data.getColumn(column);
+    const data = model.source.getAction(resultIndex, IDatabaseDataResultAction, GridDataResultAction);
+    const constraints = model.source.getAction(resultIndex, IDatabaseDataConstraintAction);
+    // TODO: fix column abstraction
+    const resultColumn = data.getColumn(column) as SqlResultColumn | undefined;
 
     if (!resultColumn) {
       throw new Error(`Failed to get result column info for the following column index: "${column.index}"`);
@@ -59,13 +61,11 @@ export class DataGridContextMenuOrderService {
         const model = context.get(DATA_CONTEXT_DV_DDM)!;
         const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
 
-        const source = model.source as unknown as ResultSetDataSource;
-
-        if (!isResultSetDataSource(source)) {
+        if (!isResultSetDataSource(model.source)) {
           return false;
         }
 
-        const constraints = source.getAction(resultIndex, DatabaseDataConstraintAction);
+        const constraints = model.source.getAction(resultIndex, IDatabaseDataConstraintAction);
         return constraints.supported && !model.isDisabled(resultIndex);
       },
       getItems: (context, items) => [...items, MENU_DATA_GRID_ORDERING],
@@ -78,10 +78,10 @@ export class DataGridContextMenuOrderService {
         const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
         const key = context.get(DATA_CONTEXT_DV_RESULT_KEY)!;
 
-        const source = model.source as unknown as ResultSetDataSource;
-        const data = source.getAction(resultIndex, ResultSetDataAction);
-        const constraints = source.getAction(resultIndex, DatabaseDataConstraintAction);
-        const resultColumn = data.getColumn(key.column);
+        const data = model.source.getAction(resultIndex, IDatabaseDataResultAction, GridDataResultAction);
+        const constraints = model.source.getAction(resultIndex, IDatabaseDataConstraintAction);
+        // TODO: fix column abstraction
+        const resultColumn = data.getColumn(key.column) as SqlResultColumn | undefined;
 
         const result = [...items];
 
@@ -117,8 +117,7 @@ export class DataGridContextMenuOrderService {
         const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
 
         if (action === ACTION_DATA_GRID_ORDERING_DISABLE_ALL) {
-          const source = model.source as unknown as ResultSetDataSource;
-          const constraints = source.getAction(resultIndex, DatabaseDataConstraintAction);
+          const constraints = model.source.getAction(resultIndex, IDatabaseDataConstraintAction);
           return !constraints.orderConstraints.length;
         }
 
@@ -131,11 +130,10 @@ export class DataGridContextMenuOrderService {
       handler: async (context, action) => {
         const model = context.get(DATA_CONTEXT_DV_DDM)!;
         const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
-        const source = model.source as unknown as ResultSetDataSource;
 
         switch (action) {
           case ACTION_DATA_GRID_ORDERING_DISABLE_ALL: {
-            const constraints = source.getAction(resultIndex, DatabaseDataConstraintAction);
+            const constraints = model.source.getAction(resultIndex, IDatabaseDataConstraintAction);
 
             await model.request(() => {
               constraints.deleteOrders();

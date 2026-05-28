@@ -9,20 +9,21 @@
 $mdc-theme-primary: #2a7cb4; // main menu background
 $mdc-theme-on-primary: #ffffff; // main text color
 $mdc-theme-secondary: #f2f2f2;
-$mdc-theme-on-secondary: #6d6d6d;
+$mdc-theme-on-secondary: #4d4d4d;
 
 $mdc-theme-sub-secondary: #f8f8f8;
-$mdc-theme-on-sub-secondary: #6d6d6d;
+$mdc-theme-on-sub-secondary: #4d4d4d;
 
 $mdc-theme-surface: #ffffff;
 $mdc-theme-on-surface: #353535;
 $mdc-theme-background: #dedede;
+$mdc-theme-error: #e94948;
 
 $color-scheme: light;
 $color-positive: #52c41a;
 $color-on-positive: #fff;
 $color-negative: #e73e52;
-$color-status: #ff9900;
+$color-status: #fab31a;
 
 $link-color: $mdc-theme-primary;
 $link-color-focus: #3f96d1;

@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -13,16 +13,18 @@ import { getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
 import { MenuBaseItem, MenuService } from '@cloudbeaver/core-view';
 
 import { MENU_SQL_GENERATORS } from './MENU_SQL_GENERATORS.js';
-import { SqlGeneratorsResource } from './SqlGeneratorsResource.js';
+import { getDefaultQueryGeneratorOptions, SqlGeneratorsResource } from './SqlGeneratorsResource.js';
+import { NotificationService } from '@cloudbeaver/core-events';
 
 const GeneratedSqlDialog = importLazyComponent(() => import('./GeneratedSqlDialog.js').then(m => m.GeneratedSqlDialog));
 
-@injectable(() => [SqlGeneratorsResource, CommonDialogService, MenuService])
+@injectable(() => [SqlGeneratorsResource, CommonDialogService, MenuService, NotificationService])
 export class SqlGeneratorsBootstrap extends Bootstrap {
   constructor(
     private readonly sqlGeneratorsResource: SqlGeneratorsResource,
     private readonly commonDialogService: CommonDialogService,
     private readonly menuService: MenuService,
+    private readonly notificationService: NotificationService,
   ) {
     super();
   }
@@ -37,7 +39,7 @@ export class SqlGeneratorsBootstrap extends Bootstrap {
 
         return this.sqlGeneratorsResource.get(node.id)?.length === 0;
       },
-      getLoader: (context, action) => {
+      getLoader: context => {
         const node = context.get(DATA_CONTEXT_NAV_NODE)!;
 
         return getCachedMapResourceLoaderState(this.sqlGeneratorsResource, () => node.id);
@@ -77,11 +79,18 @@ export class SqlGeneratorsBootstrap extends Bootstrap {
                   tooltip: action.description,
                 },
                 {
-                  onSelect: () => {
-                    this.commonDialogService.open(GeneratedSqlDialog, {
-                      generatorId: action.id,
-                      pathId: node.id,
-                    });
+                  onSelect: async () => {
+                    try {
+                      const query = await this.sqlGeneratorsResource.generateEntityQuery(action.id, node.id, getDefaultQueryGeneratorOptions());
+                      await this.commonDialogService.open(GeneratedSqlDialog, {
+                        query,
+                        nodeId: node.id,
+                        options: getDefaultQueryGeneratorOptions(),
+                        regenerateQuery: options => this.sqlGeneratorsResource.generateEntityQuery(action.id, node.id, options),
+                      });
+                    } catch (e: any) {
+                      this.notificationService.logException(e, 'app_shared_sql_generators_error_title');
+                    }
                   },
                 },
               ),

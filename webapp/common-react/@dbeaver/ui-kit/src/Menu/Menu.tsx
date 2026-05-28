@@ -7,6 +7,7 @@
  */
 
 import {
+  Menubar as AriaMenubar,
   MenuProvider as AriaMenuProvider,
   Menu as AriaMenu,
   MenuButton as AriaMenuButton,
@@ -20,6 +21,8 @@ import {
   MenuGroupLabel as AriaMenuGroupLabel,
   MenuItemCheckbox as AriaMenuItemCheckbox,
   MenuItemRadio as AriaMenuItemRadio,
+  MenuList as AriaMenuList,
+  MenuItemCheck as AriaMenuItemCheck,
   type MenuProviderProps,
   type MenuProps,
   type MenuButtonProps,
@@ -32,17 +35,39 @@ import {
   type MenuGroupLabelProps,
   type MenuItemCheckboxProps,
   type MenuItemRadioProps,
+  type HovercardStoreState,
   useMenuStore,
   useMenuContext,
   useStoreState,
+  useMenubarStore,
   type MenuStoreProps,
   type MenuArrowProps,
-  MenuItemCheck,
+  type MenuListProps,
+  type MenuBarProps,
+  type MenuItemCheckProps,
+  type MenuStore,
+  type MenuStoreState
 } from '@ariakit/react';
 import clsx from 'clsx';
 
 import './Menu.css';
 import type { ReactElement } from 'react';
+
+export function MenuList({ children, className, ...props }: MenuListProps): ReactElement {
+  return (
+    <AriaMenuList className={clsx('dbv-kit-menu__list', className)} {...props}>
+      {children}
+    </AriaMenuList>
+  );
+}
+
+export function Menubar({ children, className, ...props }: MenuBarProps): ReactElement {
+  return (
+    <AriaMenubar className={clsx('dbv-kit-menubar', className)} {...props}>
+      {children}
+    </AriaMenubar>
+  );
+}
 
 export function MenuProvider({ children, ...props }: MenuProviderProps): ReactElement {
   return <AriaMenuProvider {...props}>{children}</AriaMenuProvider>;
@@ -115,16 +140,18 @@ export function MenuGroupLabel({ children, className, ...props }: MenuGroupLabel
 export function MenuItemCheckbox({ children, className, ...props }: MenuItemCheckboxProps): ReactElement {
   return (
     <AriaMenuItemCheckbox className={clsx('dbv-kit-menu__item dbv-kit-menu__item--checkbox', className)} {...props}>
-      <MenuItemCheck />
       {children}
     </AriaMenuItemCheckbox>
   );
 }
 
+export function MenuItemCheck({ className, ...props }: MenuItemCheckProps): ReactElement {
+  return <AriaMenuItemCheck className={clsx('dbv-kit-menu__item-check', className)} {...props} />;
+}
+
 export function MenuItemRadio({ children, className, ...props }: MenuItemRadioProps): ReactElement {
   return (
     <AriaMenuItemRadio className={clsx('dbv-kit-menu__item dbv-kit-menu__item--radio', className)} {...props}>
-      <MenuItemCheck />
       {children}
     </AriaMenuItemRadio>
   );
@@ -134,6 +161,7 @@ export {
   useMenuStore,
   useStoreState,
   useMenuContext,
+  useMenubarStore,
   type MenuProviderProps,
   type MenuProps,
   type MenuButtonProps,
@@ -148,6 +176,9 @@ export {
   type MenuItemRadioProps,
   type MenuStoreProps,
   type MenuArrowProps,
+  type HovercardStoreState,
+  type MenuStore,
+  type MenuStoreState
 };
 
 Menu.Provider = MenuProvider;

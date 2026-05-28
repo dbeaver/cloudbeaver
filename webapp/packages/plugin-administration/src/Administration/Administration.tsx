@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -14,23 +14,12 @@ import {
   filterOnlyActive,
   type IAdministrationItemRoute,
 } from '@cloudbeaver/core-administration';
-import {
-  Loader,
-  s,
-  SContext,
-  SlideBox,
-  SlideElement,
-  SlideOverlay,
-  type StyleRegistry,
-  ToolsActionStyles,
-  ToolsPanelStyles,
-  useAutoLoad,
-  useS,
-} from '@cloudbeaver/core-blocks';
+import { s, SContext, SlideDialog, type StyleRegistry, ToolsActionStyles, ToolsPanelStyles, useAutoLoad, useS } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { OptionsPanelService, TabList, TabListStyles, TabsState, TabStyles } from '@cloudbeaver/core-ui';
 import type { ILoadableState } from '@cloudbeaver/core-utils';
 import { CaptureView } from '@cloudbeaver/core-view';
+import { SupportService } from '@cloudbeaver/core-support';
 
 import { AdministrationCaptureViewContext } from './AdministrationCaptureViewContext.js';
 import { AdministrationViewService } from './AdministrationViewService.js';
@@ -93,6 +82,7 @@ export const Administration = observer<React.PropsWithChildren<Props>>(function 
   const administrationViewService = useService(AdministrationViewService);
   const administrationItemService = useService(AdministrationItemService);
   const optionsPanelService = useService(OptionsPanelService);
+  const supportService = useService(SupportService);
 
   const OptionsPanel = optionsPanelService.getPanelComponent();
   const visibleItems = administrationItemService.getActiveItems(configurationWizard);
@@ -109,12 +99,14 @@ export const Administration = observer<React.PropsWithChildren<Props>>(function 
     optionsPanelService.close();
   }
 
+  const SupportInstruction = supportService.supportInstruction?.();
+
   return (
     <CaptureView view={administrationViewService} className={s(styles, { captureView: true })}>
       <AdministrationCaptureViewContext />
       <TabsState currentTabId={activeScreen?.item} localState={administrationScreenService.itemState} orientation="vertical">
         <SContext registry={tabsRegistry}>
-          <TabList aria-label="Administration items" vertical>
+          <TabList aria-label="Administration items" data-dialog-persistent-element vertical>
             {visibleItems.map(item => (
               <DrawerItem
                 key={item.name}
@@ -124,26 +116,27 @@ export const Administration = observer<React.PropsWithChildren<Props>>(function 
                 onSelect={onItemSelect}
               />
             ))}
+
+            {!configurationWizard && SupportInstruction && (
+              <div className="tw:mt-auto tw:p-2">
+                <SupportInstruction />
+              </div>
+            )}
           </TabList>
         </SContext>
         <div ref={contentRef} className={s(styles, { contentContainer: true })}>
           {children}
           <SContext registry={adminPageRegistry}>
-            <SlideBox className={s(styles, { slideBox: true })} open={optionsPanelService.active} onClose={close}>
-              <SlideElement className={s(styles, { slideElement: true })}>
+            <div className={s(styles, { container: true })}>
+              <div className={s(styles, { mainContent: true })}>
+                <ItemContent activeScreen={activeScreen} configurationWizard={configurationWizard} />
+              </div>
+              <SlideDialog open={optionsPanelService.active} onClose={close}>
                 <div className={s(styles, { content: true })}>
-                  <ItemContent activeScreen={activeScreen} configurationWizard={configurationWizard} />
+                  <OptionsPanel />
                 </div>
-                <SlideOverlay onClick={close} />
-              </SlideElement>
-              <SlideElement className={s(styles, { slideElement: true })}>
-                <Loader className={s(styles, { loader: true })} suspense>
-                  <div className={s(styles, { content: true })}>
-                    <OptionsPanel />
-                  </div>
-                </Loader>
-              </SlideElement>
-            </SlideBox>
+              </SlideDialog>
+            </div>
           </SContext>
         </div>
       </TabsState>

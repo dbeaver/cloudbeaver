@@ -26,6 +26,11 @@
   height: 16px;
   display: block;
 }
+.keyImage {
+  flex-shrink: 0;
+  height: 10px;
+  width: 10px;
+}
 .name {
   font-weight: 400;
   flex-grow: 1;
@@ -47,19 +52,9 @@
 .dragging {
   opacity: 0.5;
 }
-.header:before {
-  position: absolute;
-  z-index: 10;
-  height: 100%;
-  border-left: solid 2px var(--theme-primary);
-}
-[data-s-rearrange='left']:before {
-  content: '';
-  left: 0;
-}
-[data-s-rearrange='right']:before {
-  content: '';
-  right: 0;
+.dndBox {
+  width: 100%;
+  position: relative;
 }
 .description {
   composes: theme-typography--caption from global;

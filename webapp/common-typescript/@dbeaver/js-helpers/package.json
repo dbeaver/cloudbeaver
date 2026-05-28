@@ -23,17 +23,18 @@
     "!lib/tests",
     "!.tsbuildinfo"
   ],
-  "packageManager": "yarn@4.9.2",
+  "packageManager": "yarn@4.14.1",
   "devDependencies": {
     "@dbeaver/cli": "workspace:^",
     "@dbeaver/tsconfig": "workspace:^",
     "rimraf": "^6",
     "typescript": "^5",
-    "vitest": "^3"
+    "vitest": "^4"
   },
   "dependencies": {
     "async-mutex": "^0",
-    "p-debounce": "^4.0.0",
+    "color": "^5.0.2",
+    "p-debounce": "^5",
     "p-memoize": "^8.0.0",
     "quick-lru": "^7.1.0"
   }

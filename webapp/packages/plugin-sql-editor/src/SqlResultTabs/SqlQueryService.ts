@@ -10,15 +10,15 @@ import { makeObservable, observable } from 'mobx';
 import { ConnectionExecutionContextService, ConnectionInfoResource, createConnectionParam } from '@cloudbeaver/core-connections';
 import { injectable, IServiceProvider } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { AsyncTaskInfoService } from '@cloudbeaver/core-root';
+import { AsyncTaskInfoEventHandler, AsyncTaskInfoService } from '@cloudbeaver/core-root';
 import { GraphQLService } from '@cloudbeaver/core-sdk';
 import {
   DatabaseDataAccessMode,
   DatabaseDataModel,
-  DatabaseEditAction,
   DataViewerDataChangeConfirmationService,
   DataViewerService,
   DataViewerSettingsService,
+  IDatabaseDataEditAction,
   type IDatabaseDataModel,
   TableViewerStorageService,
 } from '@cloudbeaver/plugin-data-viewer';
@@ -29,6 +29,7 @@ import { SqlDataSourceService } from '../SqlDataSource/SqlDataSourceService.js';
 import { SqlQueryResultService } from './SqlQueryResultService.js';
 import { SqlEditorSettingsService } from '../SqlEditorSettingsService.js';
 import { Executor, type IExecutor } from '@cloudbeaver/core-executor';
+import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 
 interface IQueryExecutionOptions {
   onQueryExecutionStart?: (query: string, index: number) => void;
@@ -57,6 +58,8 @@ export interface IQueryExecutionStatistics {
   SqlDataSourceService,
   DataViewerSettingsService,
   SqlEditorSettingsService,
+  CommonDialogService,
+  AsyncTaskInfoEventHandler,
 ])
 export class SqlQueryService {
   private readonly statisticsMap: Map<string, IQueryExecutionStatistics>;
@@ -76,6 +79,8 @@ export class SqlQueryService {
     private readonly sqlDataSourceService: SqlDataSourceService,
     private readonly dataViewerSettingsService: DataViewerSettingsService,
     private readonly sqlEditorSettingsService: SqlEditorSettingsService,
+    private readonly commonDialogService: CommonDialogService,
+    private readonly asyncTaskInfoEventHandler: AsyncTaskInfoEventHandler,
   ) {
     this.statisticsMap = new Map();
     this.onQueryExecution = new Executor();
@@ -158,7 +163,13 @@ export class SqlQueryService {
       tabGroup = this.sqlQueryResultService.getSelectedGroup(editorState);
 
       if (inNewTab || !tabGroup) {
-        source = new QueryDataSource(this.serviceProvider, this.graphQLService, this.asyncTaskInfoService);
+        source = new QueryDataSource(
+          this.serviceProvider,
+          this.commonDialogService,
+          this.asyncTaskInfoEventHandler,
+          this.graphQLService,
+          this.asyncTaskInfoService,
+        );
         model = this.tableViewerStorageService.add(new DatabaseDataModel(source));
         this.dataViewerDataChangeConfirmationService.trackTableDataUpdate(model.id);
         tabGroup = this.sqlQueryResultService.createGroup(editorState, model.id, query);
@@ -185,7 +196,8 @@ export class SqlQueryService {
           constraints: [],
           whereFilter: '',
           readLogs: isOutputLogsTabOpened,
-        });
+        })
+        .resetQueryParameters();
 
       this.sqlQueryResultService.updateGroupTabs(editorState, model, tabGroup.groupId, true);
 
@@ -253,7 +265,13 @@ export class SqlQueryService {
         options?.onQueryExecutionStart?.(query, i);
 
         if (!model || !source) {
-          source = new QueryDataSource(this.serviceProvider, this.graphQLService, this.asyncTaskInfoService);
+          source = new QueryDataSource(
+            this.serviceProvider,
+            this.commonDialogService,
+            this.asyncTaskInfoEventHandler,
+            this.graphQLService,
+            this.asyncTaskInfoService,
+          );
           model = this.tableViewerStorageService.add(new DatabaseDataModel(source));
           this.dataViewerDataChangeConfirmationService.trackTableDataUpdate(model.id);
         }
@@ -273,7 +291,8 @@ export class SqlQueryService {
             constraints: [],
             whereFilter: '',
             readLogs: isOutputLogsTabOpened,
-          });
+          })
+          .resetQueryParameters();
 
         try {
           await model.setCountGain(this.dataViewerSettingsService.getDefaultRowsCount()).setSlice(0).request();
@@ -337,7 +356,7 @@ export class SqlQueryService {
       if (stage === 'request') {
         const activeGroupId = this.sqlQueryResultService.getSelectedGroup(editorState)?.groupId;
         for (const result of model.source.getResults()) {
-          const editor = model.source.getActionImplementation(result, DatabaseEditAction);
+          const editor = model.source.tryGetAction(result, IDatabaseDataEditAction);
 
           const edited = editor?.isEdited() && model.source.executionContext?.context;
 

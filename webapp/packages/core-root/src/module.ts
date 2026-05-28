@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -39,6 +39,7 @@ import { DefaultNavigatorSettingsResource } from './DefaultNavigatorSettingsReso
 import { DataSynchronizationService } from './DataSynchronization/DataSynchronizationService.js';
 import { AsyncTaskInfoService } from './AsyncTask/AsyncTaskInfoService.js';
 import { AsyncTaskInfoEventHandler } from './AsyncTask/AsyncTaskInfoEventHandler.js';
+import { ServerDefaultSettingsService } from './Settings/ServerDefaultSettingsService.js';
 
 export default ModuleRegistry.add({
   name: '@cloudbeaver/core-root',
@@ -65,6 +66,7 @@ export default ModuleRegistry.add({
       .addSingleton(Dependency, proxy(ServerSettingsResource))
       .addSingleton(AsyncTaskInfoEventHandler)
       .addSingleton(ServerSettingsService)
+      .addSingleton(ServerDefaultSettingsService)
       .addSingleton(WorkspaceConfigEventHandler)
       .addSingleton(WindowEventsService)
       .addSingleton(ServerSettingsResource)

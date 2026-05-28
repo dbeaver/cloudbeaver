@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,35 +16,49 @@
  */
 package io.cloudbeaver.server.graphql;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import io.cloudbeaver.WebParameterSecure;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.WebAppUtils;
 import io.cloudbeaver.server.WebApplication;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
+import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
+import org.jkiss.dbeaver.model.navigator.DBNNode;
+import org.jkiss.dbeaver.model.qm.QMConstants;
 import org.jkiss.utils.CommonUtils;
 
-import java.util.Map;
-import java.util.Set;
+import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
+import java.util.StringJoiner;
 
 public class GraphQLLoggerUtil {
 
     public static final String LOG_API_GRAPHQL_DEBUG_PARAMETER = "log.api.graphql.debug";
-    private static final Set<String> PROHIBITED_VARIABLES =
-        Set.of("password", "config", "parameters", "settings", "licenseText", "credentials", "username");
+    public static final Gson GSON = new GsonBuilder().create();
+    public static final String MASK_STRING = "****";
 
-    public static String getUserId(HttpServletRequest request) {
+    @Nullable
+    public static String getUserId(@NotNull HttpServletRequest request) {
         WebSession session = getWebSession(request);
         if (session == null) {
-            return null;
+            return QMConstants.QM_UNAUTHORIZED_USER;
         }
         String userId = session.getUserContext().getUserId();
-        if (userId == null && session.getUserContext().isAuthorizedInSecurityManager()) {
-            return "anonymous";
+        if (userId == null) {
+            if (session.getUserContext().isAuthorizedInSecurityManager()) {
+                return QMConstants.QM_ANONYMOUS_USER;
+            }
+            return QMConstants.QM_UNAUTHORIZED_USER;
         }
         return userId;
     }
 
-    public static String getSmSessionId(HttpServletRequest request) {
+    @Nullable
+    public static String getSmSessionId(@NotNull HttpServletRequest request) {
         WebSession session = getWebSession(request);
         if (session == null) {
             return null;
@@ -53,7 +67,7 @@ public class GraphQLLoggerUtil {
     }
 
     @Nullable
-    public static WebSession getWebSession(HttpServletRequest request) {
+    public static WebSession getWebSession(@NotNull HttpServletRequest request) {
         if (request.getSession() == null) {
             return null;
         }
@@ -63,43 +77,77 @@ public class GraphQLLoggerUtil {
             .findWebSession(request);
     }
 
-    public static String buildLoggerMessage(String sessionId, String userId, Map<String, Object> variables) {
-        StringBuilder loggerMessage = new StringBuilder(" [user: ").append(userId)
-            .append(", sessionId: ").append(sessionId).append("]");
+    @NotNull
+    public static String buildLoggerMessage(
+        @NotNull String sessionId,
+        @NotNull String userId,
+        @NotNull Method method,
+        @NotNull Object[] args
+    ) {
+        StringBuilder sb = new StringBuilder(64)
+            .append(" [").append(userId)
+            .append(", session: ").append(sessionId)
+            .append("]");
 
-        if (WebAppUtils.getWebPlatform().getPreferenceStore().getBoolean(LOG_API_GRAPHQL_DEBUG_PARAMETER)
-                && variables != null
-        ) {
-            loggerMessage.append(" [variables] ");
-            String parsedVariables = parseVarialbes(variables);
-            if (CommonUtils.isNotEmpty(parsedVariables)) {
-                loggerMessage.append(parseVarialbes(variables));
+        if (WebAppUtils.getWebPlatform().getPreferenceStore().getBoolean(LOG_API_GRAPHQL_DEBUG_PARAMETER)) {
+            sb.append('(');
+            String text = maskArgsToString(method, args);
+            if (CommonUtils.isNotEmpty(text)) {
+                sb.append(text);
             }
+            sb.append(')');
         }
-        return loggerMessage.toString();
+        return sb.toString();
     }
 
-    private static String parseVarialbes(Map<String, Object> map) {
-        StringBuilder result = new StringBuilder();
+    @NotNull
+    public static String maskArgsToString(@NotNull Method method, @Nullable Object[] args) {
+        Parameter[] params = method.getParameters();
+        if (params.length == 0 || args == null || args.length == 0) {
+            return "";
+        }
 
-        for (Map.Entry<String, Object> entry : map.entrySet()) {
-            String key = entry.getKey();
-            Object value = entry.getValue();
+        int limit = Math.min(args.length, params.length);
+        StringJoiner joiner = new StringJoiner(", ");
 
-            boolean isProhibited = PROHIBITED_VARIABLES.stream()
-                .anyMatch(prohibitedKey -> key.toLowerCase().contains(prohibitedKey.toLowerCase()));
-
-            if (isProhibited) {
-                result.append(key).append(": ").append("******** ");
+        for (int i = 0; i < limit; i++) {
+            Object value = args[i];
+            if (value instanceof WebSession || value instanceof ServletRequest || value instanceof ServletResponse) {
+                //we already log sessionId
                 continue;
             }
+            if (params[i].isAnnotationPresent(WebParameterSecure.class)) {
+                joiner.add(MASK_STRING);
+                continue;
+            }
+            if (value instanceof String sv && CommonUtils.isEmpty(sv)) {
+                continue;
+            }
+            if (value instanceof DBNNode node) {
+                value = node.getNodeUri();
+            }
 
-            if (value instanceof Map) {
-                result.append(parseVarialbes((Map<String, Object>) value));
+            if (value != null && !isSimple(value.getClass())) {
+                String stringValue;
+                try {
+                    stringValue = GSON.toJson(value);
+                } catch (Exception e) {
+                    stringValue = value.toString();
+                }
+                joiner.add(stringValue);
             } else {
-                result.append(key).append(": ").append(value).append(" ");
+                joiner.add(String.valueOf(value));
             }
         }
-        return result.toString().trim();
+        return joiner.toString();
     }
+
+    private static boolean isSimple(Class<?> cls) {
+        return cls.isPrimitive()
+            || Number.class.isAssignableFrom(cls)
+            || CharSequence.class.isAssignableFrom(cls)
+            || Boolean.class.equals(cls)
+            || Enum.class.isAssignableFrom(cls);
+    }
+
 }

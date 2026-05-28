@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2025 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,7 @@
  */
 package io.cloudbeaver.service.admin.impl;
 
-import io.cloudbeaver.DBWFeatureSet;
-import io.cloudbeaver.DBWebException;
-import io.cloudbeaver.WebProjectImpl;
-import io.cloudbeaver.WebServiceUtils;
+import io.cloudbeaver.*;
 import io.cloudbeaver.auth.provider.local.LocalAuthProvider;
 import io.cloudbeaver.model.WebPropertyInfo;
 import io.cloudbeaver.model.config.CBAppConfig;
@@ -41,6 +38,7 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.DBConstants;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPProject;
@@ -54,6 +52,7 @@ import org.jkiss.dbeaver.model.security.*;
 import org.jkiss.dbeaver.model.security.user.SMTeam;
 import org.jkiss.dbeaver.model.security.user.SMUser;
 import org.jkiss.dbeaver.utils.GeneralUtils;
+import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
 
 import java.text.MessageFormat;
@@ -164,7 +163,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         if (userName.isEmpty()) {
             throw new DBWebException("Empty user name");
         }
-        String userId = userName.toLowerCase();
+        String userId = userName.trim().toLowerCase();
         try {
             GeneralUtils.validateResourceNameUnconditionally(userId);
         } catch (DBException e) {
@@ -363,7 +362,11 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     }
 
     @Override
-    public boolean setUserCredentials(@NotNull WebSession webSession, @NotNull String userID, @NotNull String providerId, @NotNull Map<String, Object> credentials) throws DBWebException {
+    public boolean setUserCredentials(@NotNull WebSession webSession,
+                                      @NotNull String userID,
+                                      @NotNull String providerId,
+                                      @WebParameterSecure @NotNull Map<String, Object> credentials
+    ) throws DBWebException {
         WebAuthProviderDescriptor authProvider = WebAuthProviderRegistry.getInstance().getAuthProvider(providerId);
         if (authProvider == null) {
             throw new DBWebException("Invalid auth provider '" + providerId + "'");
@@ -456,7 +459,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
 
     @Override
     public List<DBWFeatureSet> listFeatureSets(@NotNull WebSession webSession) throws DBWebException {
-        return WebFeatureRegistry.getInstance().getWebFeatures();
+        return ServletAppUtils.getServletApplication().getFeatureRegistry().getWebFeatures();
     }
 
     ////////////////////////////////////////////////////////////////////
@@ -495,7 +498,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         @NotNull HttpServletRequest request,
         @NotNull WebSession webSession,
         @Nullable String providerId
-    ) throws DBWebException {
+    ) {
         String origin = ServletAppUtils.getOriginFromRequest(request);
         List<WebAuthProviderConfiguration> result = new ArrayList<>();
         for (SMAuthProviderCustomConfiguration cfg : CBApplication.getInstance().getAppConfiguration().getAuthCustomConfigurations()) {
@@ -504,7 +507,11 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             }
             WebAuthProviderDescriptor authProvider = WebAuthProviderRegistry.getInstance().getAuthProvider(cfg.getProvider());
             if (authProvider != null) {
-                result.add(new WebAuthProviderConfiguration(authProvider, cfg, origin));
+                result.add(new WebAuthProviderConfiguration(
+                    authProvider,
+                    maskSecuredConfigParameters(authProvider.getConfigurationParameters(), cfg),
+                    origin
+                ));
             }
         }
         return result;
@@ -520,7 +527,8 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         boolean disabled,
         @Nullable String iconURL,
         @Nullable String description,
-        @Nullable Map<String, Object> parameters) throws DBWebException {
+        @Nullable Map<String, Object> parameters
+    ) throws DBWebException {
         WebAuthProviderDescriptor authProvider = WebAuthProviderRegistry.getInstance().getAuthProvider(providerId);
         if (authProvider == null) {
             throw new DBWebException("Auth provider '" + providerId + "' not found");
@@ -533,6 +541,14 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         providerConfig.setDisabled(disabled);
         providerConfig.setIconURL(iconURL);
         providerConfig.setDescription(description);
+        SMAuthProviderCustomConfiguration savedConfig = getProviderConfig(id);
+        if (parameters != null && savedConfig != null) {
+            for (Map.Entry<String, Object> entry : parameters.entrySet()) {
+                if (CBConstants.SECURED_VALUE.equals(entry.getValue())) {
+                    parameters.put(entry.getKey(), savedConfig.getParameter(entry.getKey()));
+                }
+            }
+        }
         providerConfig.setParameters(parameters);
         CBApplication.getInstance().getAppConfiguration().addAuthProviderConfiguration(providerConfig);
         try {
@@ -546,7 +562,11 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             providerConfig.getProvider(),
             webSession.getUserId()
         ));
-        return new WebAuthProviderConfiguration(authProvider, providerConfig, ServletAppUtils.getOriginFromRequest(request));
+        return new WebAuthProviderConfiguration(
+            authProvider,
+            maskSecuredConfigParameters(authProvider.getConfigurationParameters(), providerConfig),
+            ServletAppUtils.getOriginFromRequest(request)
+        );
     }
 
     @Override
@@ -575,7 +595,6 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             CBAppConfig appConfig = new CBAppConfig(CBApplication.getInstance().getAppConfiguration());
             CBServerConfig serverConfig = new CBServerConfig();
             serverConfig.setServerName(CBApplication.getInstance().getServerName());
-            serverConfig.setServerURL(CBApplication.getInstance().getServerURL());
             serverConfig.setMaxSessionIdleTime(CBApplication.getInstance().getMaxSessionIdleTime());
             String adminName = null;
             String adminPassword = null;
@@ -605,7 +624,6 @@ public class WebServiceAdmin implements DBWServiceAdmin {
                 adminName = config.getAdminName();
                 adminPassword = config.getAdminPassword();
                 serverConfig.setServerName(config.getServerName());
-                serverConfig.setServerURL(config.getServerURL());
                 serverConfig.setMaxSessionIdleTime(config.getSessionExpireTime());
                 if (config.getForceHttps() != null) {
                     serverConfig.setForceHttps(config.getForceHttps());
@@ -665,10 +683,12 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             if (configurationMode) {
                 // In config mode we always refresh because admin user doesn't exist yet
                 webSession.resetUserState();
-            } else {
+            }
+            else {
                 // Just reload session state
                 webSession.refreshUserData();
             }
+
             WebAppUtils.getWebApplication().getDriverRegistry().refreshApplicableDrivers();
         } catch (Throwable e) {
             throw new DBWebException("Error configuring server", e);
@@ -676,10 +696,11 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         return true;
     }
 
-    private void updateDisabledFeaturesConfig(CBAppConfig appConfig, List<String> enabledFeatures) {
+    private void updateDisabledFeaturesConfig(@NotNull CBAppConfig appConfig, @NotNull List<String> enabledFeatures) {
         Set<String> enabledIds = new LinkedHashSet<>(enabledFeatures);
         appConfig.setEnabledFeatures(enabledFeatures.toArray(new String[0]));
-        String[] disabledFeatures = WebFeatureRegistry.getInstance().getWebFeatures().stream().map(DBWFeatureSet::getId)
+        String[] disabledFeatures = ServletAppUtils.getServletApplication().getFeatureRegistry().getWebFeatures().stream()
+            .map(DBWFeatureSet::getId)
             .filter(id -> !enabledIds.contains(id))
             .toArray(String[]::new);
         appConfig.setDisabledFeatures(disabledFeatures);
@@ -954,5 +975,34 @@ public class WebServiceAdmin implements DBWServiceAdmin {
                 ));
             }
         }
+    }
+
+    @NotNull
+    private SMAuthProviderCustomConfiguration maskSecuredConfigParameters(
+        @NotNull List<WebAuthProviderProperty> configProperties,
+        @NotNull SMAuthProviderCustomConfiguration config
+    ) {
+        SMAuthProviderCustomConfiguration securedConfig = new SMAuthProviderCustomConfiguration(config);
+        for (WebAuthProviderProperty property : configProperties) {
+            String[] features = property.getFeatures();
+            if (features != null && ArrayUtils.contains(features, DBConstants.PROP_FEATURE_PASSWORD)) {
+                String propertyId = property.getId();
+                Object securedParameterValue = config.getParameter(propertyId);
+                if (securedParameterValue != null && !securedParameterValue.toString().isEmpty()) {
+                    securedConfig.getParameters().put(propertyId, CBConstants.SECURED_VALUE);
+                }
+            }
+        }
+        return securedConfig;
+    }
+
+    @Nullable
+    private SMAuthProviderCustomConfiguration getProviderConfig(@NotNull String configId) {
+        return CBApplication.getInstance().getAppConfiguration().getAuthCustomConfigurations().stream()
+            .filter(cfg -> Objects.equals(cfg.getId(), configId))
+            .filter(cfg ->
+                WebAuthProviderRegistry.getInstance().getAuthProvider(cfg.getProvider()) != null
+            ).findFirst()
+            .orElse(null);
     }
 }

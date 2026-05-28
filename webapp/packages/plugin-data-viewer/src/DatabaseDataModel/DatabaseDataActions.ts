@@ -1,120 +1,128 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { action, makeObservable, runInAction } from 'mobx';
+import { action, makeObservable, observable, untracked } from 'mobx';
 
 import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
-import { MetadataMap } from '@cloudbeaver/core-utils';
 
-import { getDependingDataActions } from './Actions/DatabaseDataActionDecorator.js';
-import { isDatabaseDataAction } from './DatabaseDataAction.js';
-import type { IDatabaseDataAction, IDatabaseDataActionClass, IDatabaseDataActionInterface } from './IDatabaseDataAction.js';
+import type { IDatabaseDataAction, IDatabaseDataActionClass } from './IDatabaseDataAction.js';
 import type { IDatabaseDataActions } from './IDatabaseDataActions.js';
-import type { IDatabaseDataResult } from './IDatabaseDataResult.js';
-import type { IDatabaseDataSource } from './IDatabaseDataSource.js';
+import { IDatabaseDataResult } from './IDatabaseDataResult.js';
+import { IDatabaseDataSource } from './IDatabaseDataSource.js';
+import { Disposable, injectable, IServiceProvider, withExternal, type IServiceScope, type SingleServiceType } from '@cloudbeaver/core-di';
 
-type ActionsList<TOptions, TResult extends IDatabaseDataResult> = Array<IDatabaseDataAction<TOptions, TResult>>;
+@injectable(() => [IDatabaseDataSource, IServiceProvider])
+export class DatabaseDataActions<TOptions, TResult extends IDatabaseDataResult>
+  extends Disposable
+  implements IDatabaseDataActions<TOptions, TResult>
+{
+  readonly registeredActions: Map<SingleServiceType<unknown>, SingleServiceType<unknown>[]>;
+  private resultScopes: Map<string, IServiceScope>;
 
-export class DatabaseDataActions<TOptions, TResult extends IDatabaseDataResult> implements IDatabaseDataActions<TOptions, TResult> {
-  private readonly actions: MetadataMap<string, ActionsList<TOptions, TResult>>;
-  private readonly source: IDatabaseDataSource<TOptions, TResult>;
+  constructor(
+    private readonly source: IDatabaseDataSource<TOptions, TResult>,
+    private readonly serviceProvider: IServiceProvider,
+  ) {
+    super();
+    this.registeredActions = new Map();
+    this.resultScopes = new Map();
 
-  constructor(source: IDatabaseDataSource<TOptions, TResult>) {
-    this.actions = new MetadataMap(() => []);
-    this.source = source;
-
-    makeObservable<this>(this, {
+    makeObservable<this, 'resultScopes'>(this, {
       updateResults: action,
+      resultScopes: observable.shallow,
     });
   }
 
-  tryGet<T extends IDatabaseDataAction<TOptions, TResult>>(result: TResult, Action: IDatabaseDataActionClass<TOptions, TResult, T>): T | undefined {
-    if (Action.dataFormat && !Action.dataFormat.includes(result.dataFormat)) {
+  registerAction<T>(service: SingleServiceType<any>, implementation: SingleServiceType<T>): this {
+    let implementations = this.registeredActions.get(service);
+    if (!implementations) {
+      implementations = [];
+      this.registeredActions.set(service, implementations);
+    }
+    if (!implementations.includes(implementation)) {
+      implementations.push(implementation);
+    }
+    return this;
+  }
+  unregisterAction<T>(service: SingleServiceType<any>, implementation: SingleServiceType<T>): this {
+    const implementations = this.registeredActions.get(service);
+    if (implementations) {
+      const index = implementations.indexOf(implementation);
+      if (index !== -1) {
+        implementations.splice(index, 1);
+      }
+    }
+    return this;
+  }
+
+  getConstructor<T extends IDatabaseDataAction<TOptions, TResult>>(service: SingleServiceType<T>): SingleServiceType<T> {
+    const possibleImplementations = this.registeredActions
+      .get(service)
+      ?.filter(action => isActionSupportsFormat(action as any, this.source.dataFormat));
+    const impl = possibleImplementations?.[possibleImplementations.length - 1];
+    if (!impl) {
+      throw new Error(`Action ${service.name} not found for format ${this.source.dataFormat}`);
+    }
+    return impl as SingleServiceType<T>;
+  }
+
+  tryGet<T>(result: TResult, Action: SingleServiceType<T, any[]>): T | undefined;
+  tryGet<T>(result: TResult, Action: SingleServiceType<unknown>, implementation: SingleServiceType<T, any[]>): T | undefined;
+  tryGet<T>(result: TResult, Action: SingleServiceType<T, any[]>, implementation?: SingleServiceType<unknown>): T | undefined {
+    try {
+      return this.get(result, Action, implementation!) as T;
+    } catch {
       return undefined;
     }
-
-    return this.get(result, Action);
   }
 
-  get<T extends IDatabaseDataAction<TOptions, TResult>>(result: TResult, Action: IDatabaseDataActionClass<TOptions, TResult, T>): T {
-    if (!isActionSupportsFormat(Action, result.dataFormat)) {
-      throw new Error('DataFormat unsupported');
+  get<T>(result: TResult, Action: SingleServiceType<T, any[]>): T;
+  get<T>(result: TResult, Action: SingleServiceType<unknown>, implementation: SingleServiceType<T, any[]>): T;
+  get<T>(result: TResult, Action: SingleServiceType<T, any[]>, implementation?: SingleServiceType<unknown>): T {
+    const scope = this.resultScopes.get(result.uniqueResultId);
+    if (!scope) {
+      throw new Error(`Result ${result.uniqueResultId} not found in the source`);
+    }
+    const value = untracked(() =>
+      scope.serviceProvider.getService(
+        withExternal(Action)
+          .set(IDatabaseDataResult, result)
+          .set(IDatabaseDataSource, this.source as unknown),
+      ),
+    );
+
+    if (implementation && !(value instanceof implementation)) {
+      throw new Error(`Action ${Action.name} not found for format ${this.source.dataFormat}`);
     }
 
-    const actions = this.actions.get(result.uniqueResultId);
-
-    let action = actions.find(action => action instanceof Action && isActionSupportsFormat(action, result.dataFormat));
-
-    if (!action) {
-      runInAction(() => {
-        const allDeps = getDependingDataActions(Action).slice(1); // skip source argument
-
-        const depends: any[] = [];
-
-        for (const dependency of allDeps) {
-          if (isDatabaseDataAction(dependency)) {
-            depends.push(this.get(result, dependency));
-          } else {
-            depends.push(this.source.serviceProvider.getService(dependency as any));
-          }
-        }
-
-        if (allDeps.length !== depends.length) {
-          throw new Error('Unsupported inject in: ' + Action.name);
-        }
-
-        action = new Action(this.source, ...depends);
-        action.updateResult(result, this.source.results.indexOf(result));
-        action.afterResultUpdate();
-        this.actions.set(result.uniqueResultId, [...this.actions.get(result.uniqueResultId), action]);
-      });
-    }
-
-    return action as T;
+    return value;
   }
 
-  getImplementation<T extends IDatabaseDataAction<TOptions, TResult>>(
-    result: TResult,
-    Action: IDatabaseDataActionInterface<TOptions, TResult, T>,
-  ): T | undefined {
-    const actions = this.actions.get(result.uniqueResultId);
-    const action = actions?.find(action => action instanceof Action && isActionSupportsFormat(action, result.dataFormat));
+  updateResults(results: TResult[]): this {
+    const scopes = Array.from(this.resultScopes.entries()).filter(([key]) => !results.find(result => result.uniqueResultId === key));
 
-    return action as T | undefined;
+    for (const [key, scope] of scopes) {
+      scope[Symbol.dispose]?.();
+      this.resultScopes.delete(key);
+    }
+
+    for (const result of results) {
+      if (!this.resultScopes.has(result.uniqueResultId)) {
+        this.resultScopes.set(result.uniqueResultId, this.serviceProvider.createScope());
+      }
+    }
+    return this;
   }
 
-  updateResults(results: TResult[]): void {
-    let actionsMap = Array.from(this.actions.entries());
-
-    for (const [key, actions] of actionsMap) {
-      const result = results.find(result => result.uniqueResultId === key);
-
-      for (const action of actions) {
-        action.updateResults(results);
-
-        if (!result) {
-          action.dispose();
-        } else {
-          action.updateResult(result, results.indexOf(result));
-        }
-      }
-
-      if (!result) {
-        this.actions.delete(key);
-      }
+  protected override dispose(): Promise<void> | void {
+    for (const scope of this.resultScopes.values()) {
+      scope[Symbol.dispose]?.();
     }
-
-    actionsMap = Array.from(this.actions.entries());
-
-    for (const [, actions] of actionsMap) {
-      for (const action of actions) {
-        action.afterResultUpdate();
-      }
-    }
+    this.resultScopes.clear();
   }
 }
 

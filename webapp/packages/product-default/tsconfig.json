@@ -17,6 +17,9 @@
       "path": "../plugin-sso"
     },
     {
+      "path": "../plugin-tailwindcss-theme"
+    },
+    {
       "path": "../product-base"
     },
     {

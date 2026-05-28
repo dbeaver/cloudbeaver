@@ -8,6 +8,7 @@
     "./*": "./lib/*.js"
   },
   "scripts": {
+    "build": "tsc -b",
     "clear": "rimraf lib"
   },
   "files": [
@@ -24,7 +25,7 @@
     "!lib/tests",
     "!.tsbuildinfo"
   ],
-  "packageManager": "yarn@4.9.2",
+  "packageManager": "yarn@4.14.1",
   "devDependencies": {
     "@dbeaver/tsconfig": "workspace:^",
     "@types/react": "^19",
@@ -33,10 +34,12 @@
     "typescript": "^5"
   },
   "dependencies": {
+    "@dbeaver/js-helpers": "workspace:*",
     "@dbeaver/react-dnd": "workspace:^",
+    "@dbeaver/react-translate": "workspace:^",
     "@dbeaver/ui-kit": "workspace:^",
-    "react": "^19",
-    "react-data-grid": "7.0.0-beta.57",
-    "react-dom": "^19"
+    "react": "^19.2",
+    "react-data-grid": "file:./artifacts",
+    "react-dom": "^19.2"
   }
 }
