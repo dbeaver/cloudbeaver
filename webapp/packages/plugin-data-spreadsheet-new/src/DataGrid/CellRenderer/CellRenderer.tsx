@@ -83,6 +83,16 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
 
         this.tableMenuContext.openMenu(this.cell, event);
       },
+      openMenuAt(element: Element): void {
+        if (!this.cell) {
+          return;
+        }
+
+        const rect = element.getBoundingClientRect();
+        const x = rect.left + rect.width - 20;
+        const y = rect.top + rect.height / 2;
+        this.tableMenuContext.openMenuAt(this.cell, x, y);
+      },
       closeMenu(): void {
         this.tableMenuContext.closeMenu();
       },
@@ -167,13 +177,7 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
         if (isBindingPressed(event, KEY_BINDING_OPEN_CELL_CONTEXT_MENU)) {
           event.preventDefault();
           event.stopPropagation();
-
-          Object.assign(event, {
-            clientX: event.currentTarget.getBoundingClientRect().left + event.currentTarget.getBoundingClientRect().width,
-            clientY: event.currentTarget.getBoundingClientRect().top + event.currentTarget.getBoundingClientRect().height,
-          });
-
-          this.cellContext.openMenu(event as unknown as React.MouseEvent);
+          this.cellContext.openMenuAt(event.currentTarget);
         }
       },
       openContextMenu(event: React.MouseEvent<HTMLDivElement>) {

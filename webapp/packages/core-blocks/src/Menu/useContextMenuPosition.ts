@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@ export interface IContextMenuPositionCoords {
 export interface IContextMenuPosition {
   position: IContextMenuPositionCoords | null;
   open: (event: React.MouseEvent) => void;
+  openAt: (x: number, y: number) => void;
   close: () => void;
 }
 
@@ -42,10 +43,10 @@ export function useContextMenuPosition(): IContextMenuPosition {
           y = rect.top + rect.height / 2;
         }
 
-        this.position = {
-          x,
-          y,
-        };
+        this.openAt(x, y);
+      },
+      openAt(x: number, y: number) {
+        this.position = { x, y };
       },
       close() {
         this.position = null;
@@ -53,6 +54,6 @@ export function useContextMenuPosition(): IContextMenuPosition {
     }),
     { position: observable.ref },
     false,
-    ['open', 'close'],
+    ['open', 'openAt', 'close'],
   );
 }

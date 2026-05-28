@@ -14,6 +14,7 @@ export interface ITableMenuContext {
   menuPosition: IContextMenuPosition;
   isMenuOpened: boolean;
   openMenu(activeCell: IGridDataKey, event: React.MouseEvent): void;
+  openMenuAt(activeCell: IGridDataKey, x: number, y: number): void;
   closeMenu(): void;
 }
 
