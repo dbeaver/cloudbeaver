@@ -22,7 +22,7 @@
     --theme-on-positive: #ffffff;
     --theme-negative: #e73e52;
     --theme-status: #fab31a;
-    --theme-link-color: #2a7cb4;
+    --theme-link-color: var(--theme-primary);
     --theme-link-color-focus: #3f96d1;
   }
 }

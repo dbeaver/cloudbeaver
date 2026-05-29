@@ -22,7 +22,7 @@
     --theme-on-positive: #ffffff;
     --theme-negative: hsl(0, 95%, 65%);
     --theme-status: #f5bb41;
-    --theme-link-color: #3f97d2;
+    --theme-link-color: oklch(from var(--theme-primary) calc(l + 0.09) c h);
     --theme-link-color-focus: #3f96d1;
   }
 }
