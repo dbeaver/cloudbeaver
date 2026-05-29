@@ -10,6 +10,7 @@ import * as modernScreenshot from 'modern-screenshot';
 import type { Options } from 'modern-screenshot';
 import { download } from './download.js';
 import { isImageBroken } from './isBrokenImage.js';
+import { svgToBlob } from './svgToBlob.js';
 
 export type { Options as IScreenshotOptions };
 
@@ -18,7 +19,7 @@ const BROKEN_IMAGE_ERROR_MESSAGE = 'Something went wrong. Please try to select a
 export async function downloadSvg<T extends Node>(element: T, options: Options, fileName: string): Promise<void> {
   const svg = await modernScreenshot.domToForeignObjectSvg<T>(element, options);
   const svgData = new XMLSerializer().serializeToString(svg);
-  const blob = new Blob(['<?xml version="1.0" standalone="no"?>\r\n', svgData], { type: 'image/svg+xml;charset=utf-8' });
+  const blob = svgToBlob(svgData);
   const uri = URL.createObjectURL(blob);
   const isBrokenImage = await isImageBroken(uri);
 

@@ -71,7 +71,7 @@ export * from './createPath.js';
 export * from './debounce.js';
 export * from './schema.js';
 export * from './schemaValidationError.js';
-export * from './svgToDataUri.js';
+export * from './svgToBlob.js';
 export * from './TempMap.js';
 export * from './textToHex.js';
 export * from './uriToBlob.js';
