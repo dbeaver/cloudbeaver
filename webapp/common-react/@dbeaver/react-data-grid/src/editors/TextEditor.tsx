@@ -45,6 +45,7 @@ export function TextEditor({ rowIdx, colIdx, onClose }: IProps) {
       ref={autoFocusAndSelect}
       className={classes['editor']}
       rows={1}
+      wrap="off"
       value={value}
       onChange={event => cellContext?.onCellChange?.(rowIdx, colIdx, event.target.value)}
       onBlur={() => onClose()}
