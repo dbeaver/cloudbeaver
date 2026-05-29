@@ -2264,7 +2264,7 @@ __metadata:
     fast-deep-equal: "npm:^3"
     md5: "npm:^2"
     mobx: "npm:^6"
-    modern-screenshot: "npm:^4"
+    modern-screenshot: "npm:4.6.7"
     rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
@@ -15162,10 +15162,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"modern-screenshot@npm:^4":
-  version: 4.7.0
-  resolution: "modern-screenshot@npm:4.7.0"
-  checksum: 10c0/9c5fbe4f4c73d3dcf0ba7fb76c1671ad148fdedffc84700e0b8ca1c1640a6ab1930718ae1424b0a6517b98d8f18c898ea0e62ee0ca57a25bfce7b914df721a63
+"modern-screenshot@npm:4.6.7":
+  version: 4.6.7
+  resolution: "modern-screenshot@npm:4.6.7"
+  checksum: 10c0/b105a15027776c2e30ebe5c0ac1501803ed04dc845d2f3fc2f4b1629172ae49b149afefb54cf4d191fdd78056ef19c065bae1974f44894353c434d3c6b02ab2c
   languageName: node
   linkType: hard
 
