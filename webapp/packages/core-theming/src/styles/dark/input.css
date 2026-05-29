@@ -8,14 +8,14 @@
 
 @layer base {
   .theme-dark {
-    --theme-input-color: #d6d6d6;
-    --theme-input-color-disabled: #bcbcbc;
-    --theme-input-color-readonly: #c9c9c9;
-    --theme-input-color-placeholder: #a3a3a3;
+    --theme-input-color: var(--theme-on-secondary);
+    --theme-input-color-disabled: oklch(from var(--theme-input-color) calc(l - 0.03) 0 h);
+    --theme-input-color-placeholder: oklch(from var(--theme-input-color) calc(l - 0.15) 0 h);
+    --theme-input-color-readonly: oklch(from var(--theme-input-color) calc(l - 0.03) 0 h);
     --theme-input-border: #585958;
-    --theme-input-border-readonly: #4b4b4b;
-    --theme-input-border-disabled: #3f3f3f;
-    --theme-input-background: hsl(240, 10%, 14%);
+    --theme-input-border-disabled: oklch(from var(--theme-input-border) calc(l - 0.07) 0 h);
+    --theme-input-border-readonly: oklch(from var(--theme-input-border) calc(l - 0.03) 0 h);
+    --theme-input-background: var(--theme-surface);
     --theme-input-background-disabled: #3e3e3e;
     --theme-input-background-readonly: #3e3e3e;
     --theme-switch-thumb: hsl(240, 10%, 19%);
