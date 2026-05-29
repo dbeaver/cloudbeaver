@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,17 +26,18 @@ import io.cloudbeaver.utils.CBModelConstants;
 import io.cloudbeaver.utils.ServletAppUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
+import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPEvaluationContext;
 import org.jkiss.dbeaver.model.data.*;
 import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.exec.DBCSession;
+import org.jkiss.dbeaver.model.exec.DBExecUtils;
 import org.jkiss.dbeaver.model.gis.DBGeometry;
 import org.jkiss.dbeaver.model.gis.GisConstants;
 import org.jkiss.dbeaver.model.gis.GisTransformUtils;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
-import org.jkiss.dbeaver.model.struct.DBSAttributeBase;
-import org.jkiss.dbeaver.model.struct.DBSTypedObject;
+import org.jkiss.dbeaver.model.struct.*;
 import org.jkiss.dbeaver.model.websocket.event.WSEvent;
 import org.jkiss.dbeaver.utils.ContentUtils;
 import org.jkiss.dbeaver.utils.GeneralUtils;
@@ -50,6 +51,7 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.function.Function;
 
 /**
  * Web SQL utils.
@@ -328,5 +330,85 @@ public class WebSQLUtils {
         } finally {
             webSession.removeAttribute(attributeName);
         }
+    }
+
+    @NotNull
+    public static List<WebSQLQueryResultReference> collectReferences(
+        @NotNull WebSession session,
+        @NotNull DBDAttributeBinding[] bindings
+    ) {
+        Map<DBSEntityAttribute, Integer> attrToIndex = new HashMap<>();
+        LinkedHashSet<DBSEntity> entities = new LinkedHashSet<>();
+        for (int i = 0; i < bindings.length; i++) {
+            DBSEntityAttribute ea = bindings[i].getEntityAttribute();
+            if (ea == null) {
+                continue;
+            }
+            attrToIndex.putIfAbsent(ea, i);
+            DBSEntity parent = ea.getParentObject();
+            entities.add(parent);
+        }
+
+        Function<DBSEntityAttribute, DBDAttributeBinding> attrToBinding = attr -> {
+            Integer idx = attrToIndex.get(attr);
+            return idx == null ? null : bindings[idx];
+        };
+
+        List<WebSQLQueryResultReference> result = new ArrayList<>();
+        DBRProgressMonitor monitor = session.getProgressMonitor();
+        for (DBSEntity entity : entities) {
+            try {
+                for (DBSEntityAssociation fk : DBExecUtils.readAssociations(monitor, entity, attrToBinding)) {
+                    List<Integer> columnIndex = collectOwnColumnIndex(monitor, fk, false, attrToIndex);
+                    if (columnIndex != null) {
+                        result.add(new WebSQLQueryResultReference(session, fk, false, columnIndex));
+                    }
+                }
+                for (DBSEntityAssociation ref : DBExecUtils.readReferences(monitor, entity, attrToBinding)) {
+                    List<Integer> columnIndex = collectOwnColumnIndex(monitor, ref, true, attrToIndex);
+                    if (columnIndex != null) {
+                        result.add(new WebSQLQueryResultReference(session, ref, true, columnIndex));
+                    }
+                }
+            } catch (DBException e) {
+                log.debug("Error collecting references for entity " + entity.getName(), e);
+            }
+        }
+        return result;
+    }
+
+    @Nullable
+    private static List<Integer> collectOwnColumnIndex(
+        @NotNull DBRProgressMonitor monitor,
+        @NotNull DBSEntityAssociation association,
+        boolean reverse,
+        @NotNull Map<DBSEntityAttribute, Integer> attrToIndex
+    ) throws DBException {
+        DBSEntityReferrer ownSide;
+        if (reverse) {
+            DBSEntityConstraint refConstraint = association.getReferencedConstraint();
+            if (!(refConstraint instanceof DBSEntityReferrer referrer)) {
+                return null;
+            }
+            ownSide = referrer;
+        } else {
+            if (!(association instanceof DBSEntityReferrer associationRef)) {
+                return null;
+            }
+            ownSide = associationRef;
+        }
+        List<? extends DBSEntityAttributeRef> attrs = ownSide.getAttributeReferences(monitor);
+        if (attrs == null || attrs.isEmpty()) {
+            return null;
+        }
+        List<Integer> indexList = new ArrayList<>(attrs.size());
+        for (DBSEntityAttributeRef attrRef : attrs) {
+            Integer idx = attrToIndex.get(attrRef.getAttribute());
+            if (idx == null) {
+                return null;
+            }
+            indexList.add(idx);
+        }
+        return indexList;
     }
 }

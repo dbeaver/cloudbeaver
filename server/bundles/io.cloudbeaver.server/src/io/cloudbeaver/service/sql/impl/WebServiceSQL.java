@@ -657,7 +657,7 @@ public class WebServiceSQL implements DBWServiceSQL {
     }
 
     @NotNull
-    private static DBSEntity resolveSourceEntity(
+    private DBSEntity resolveSourceEntity(
         @NotNull DBDAttributeBinding[] attributes,
         int columnIndex
     ) throws DBException {
