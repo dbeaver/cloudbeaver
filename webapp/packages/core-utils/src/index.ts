@@ -74,7 +74,6 @@ export * from './schemaValidationError.js';
 export * from './svgToBlob.js';
 export * from './TempMap.js';
 export * from './textToHex.js';
-export * from './uriToBlob.js';
 export * from './utf8ToBase64.js';
 export * from './createLastPromiseGetter.js';
 export * from './removeMetadataFromDataURL.js';
