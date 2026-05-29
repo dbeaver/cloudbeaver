@@ -131,11 +131,11 @@ public interface DBWServiceSQL extends DBWService {
         @NotNull WebSession webSession,
         @NotNull WebSQLContextInfo contextInfo,
         @NotNull String resultsId,
-        @NotNull Integer columnIndex,
         @NotNull WebSQLResultsRow row,
-        @Nullable String associationName,
-        @Nullable WebDataFormat dataFormat,
-        boolean isReference) throws DBException;
+        int columnIndex,
+        @NotNull String associationName,
+        boolean isReference,
+        @Nullable WebDataFormat dataFormat) throws DBException;
 
     /**
      * Reads dynamic trace from provided database results.

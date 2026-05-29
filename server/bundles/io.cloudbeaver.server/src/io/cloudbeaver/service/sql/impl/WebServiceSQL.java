@@ -62,7 +62,6 @@ import org.jkiss.dbeaver.model.sql.semantics.completion.SQLCompletionProposalCom
 import org.jkiss.dbeaver.model.sql.semantics.completion.SQLQueryCompletionAnalyzer;
 import org.jkiss.dbeaver.model.sql.semantics.completion.SQLQueryCompletionContext;
 import org.jkiss.dbeaver.model.struct.*;
-import org.jkiss.dbeaver.model.virtual.DBVUtils;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.utils.RuntimeUtils;
 import org.jkiss.utils.CommonUtils;
@@ -609,27 +608,22 @@ public class WebServiceSQL implements DBWServiceSQL {
         @NotNull WebSession webSession,
         @NotNull WebSQLContextInfo contextInfo,
         @NotNull String resultsId,
-        @NotNull Integer columnIndex,
         @NotNull WebSQLResultsRow row,
-        @Nullable String associationName,
-        @Nullable WebDataFormat dataFormat,
-        boolean isReference
+        int columnIndex,
+        @NotNull String associationName,
+        boolean isReference,
+        @Nullable WebDataFormat dataFormat
     ) {
         WebAsyncTaskProcessor<String> runnable = new WebAsyncTaskProcessor<>() {
             @Override
             public void run(DBRProgressMonitor monitor) throws InvocationTargetException {
                 try {
                     monitor.beginTask("Navigate foreign key", 1);
-                    //Get bindings
                     WebSQLResultsInfo resultsInfo = contextInfo.getResults(resultsId);
-                    DBDAttributeBinding[] attributes = resultsInfo.getAttributes();
-                    if (columnIndex < 0 || columnIndex >= attributes.length) {
-                        throw new DBWebException("Column index '" + columnIndex + "' is out of range");
-                    }
-                    DBDAttributeBinding attribute = attributes[columnIndex];
+                    DBSEntity sourceEntity = resolveSourceEntity(resultsInfo.getAttributes(), columnIndex);
                     DBSEntityAssociation association = isReference
-                        ? findReverseAssociation(monitor, attribute, associationName)
-                        : findForwardAssociation(attribute, associationName);
+                        ? DBExecUtils.findReverseAssociationByName(monitor, sourceEntity, associationName)
+                        : DBExecUtils.findForwardAssociationByName(monitor, sourceEntity, associationName);
 
                     WebDBDResultSetDataProvider dataProvider = new WebDBDResultSetDataProvider(
                         resultsId,
@@ -663,46 +657,18 @@ public class WebServiceSQL implements DBWServiceSQL {
     }
 
     @NotNull
-    private DBSEntityAssociation findForwardAssociation(
-        @NotNull DBDAttributeBinding attribute,
-        @Nullable String associationName
+    private static DBSEntity resolveSourceEntity(
+        @NotNull DBDAttributeBinding[] attributes,
+        int columnIndex
     ) throws DBException {
-        List<DBSEntityReferrer> referrers = attribute.getReferrers();
-        if (CommonUtils.isEmpty(referrers)) {
-            throw new DBException("Association not found in attribute [" + attribute.getName() + "]");
+        if (columnIndex < 0 || columnIndex >= attributes.length) {
+            throw new DBWebException("Column index '" + columnIndex + "' is out of range");
         }
-        for (DBSEntityReferrer referrer : referrers) {
-            if (referrer instanceof DBSEntityAssociation referrerAssociation
-                && (CommonUtils.isEmpty(associationName)
-                    || CommonUtils.equalObjects(associationName, referrerAssociation.getName()))) {
-                return referrerAssociation;
-            }
-        }
-        if (CommonUtils.isEmpty(associationName)) {
-            throw new DBException("Association not found in attribute [" + attribute.getName() + "]");
-        }
-        throw new DBException("Association '" + associationName + "' not found in attribute [" + attribute.getName() + "]");
-    }
-
-    @NotNull
-    private DBSEntityAssociation findReverseAssociation(
-        @NotNull DBRProgressMonitor monitor,
-        @NotNull DBDAttributeBinding attribute,
-        @Nullable String associationName
-    ) throws DBException {
-        DBSEntityAttribute entityAttribute = attribute.getEntityAttribute();
+        DBSEntityAttribute entityAttribute = attributes[columnIndex].getEntityAttribute();
         if (entityAttribute == null) {
-            throw new DBException("Can't resolve parent entity for attribute [" + attribute.getName() + "]");
+            throw new DBException("Column [" + attributes[columnIndex].getName() + "] is not bound to any entity");
         }
-        if (CommonUtils.isEmpty(associationName)) {
-            throw new DBException("Reference name is required for reverse navigation on attribute [" + attribute.getName() + "]");
-        }
-        for (DBSEntityAssociation reverseRef : DBVUtils.getAllReferences(monitor, entityAttribute.getParentObject())) {
-            if (CommonUtils.equalObjects(associationName, reverseRef.getName())) {
-                return reverseRef;
-            }
-        }
-        throw new DBException("Reverse reference '" + associationName + "' not found for attribute [" + attribute.getName() + "]");
+        return entityAttribute.getParentObject();
     }
 
     @NotNull

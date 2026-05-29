@@ -16,10 +16,6 @@
  */
 package io.cloudbeaver.service.sql;
 
-import io.cloudbeaver.model.session.WebSession;
-import org.jkiss.code.NotNull;
-import org.jkiss.code.Nullable;
-import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataKind;
 import org.jkiss.dbeaver.model.DBPEvaluationContext;
@@ -28,13 +24,6 @@ import org.jkiss.dbeaver.model.data.DBDAttributeBinding;
 import org.jkiss.dbeaver.model.exec.DBCLogicalOperator;
 import org.jkiss.dbeaver.model.exec.DBExecUtils;
 import org.jkiss.dbeaver.model.meta.Property;
-import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
-import org.jkiss.dbeaver.model.runtime.VoidProgressMonitor;
-import org.jkiss.dbeaver.model.struct.*;
-import org.jkiss.dbeaver.model.virtual.DBVUtils;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Web SQL query resultset.
@@ -43,12 +32,9 @@ public class WebSQLQueryResultColumn {
 
     private static final Log log = Log.getLog(WebSQLQueryResultColumn.class);
 
-    @Nullable
-    private final WebSession session;
     private final DBDAttributeBinding attrMeta;
 
-    public WebSQLQueryResultColumn(@Nullable WebSession session, DBDAttributeBinding attrMeta) {
-        this.session = session;
+    public WebSQLQueryResultColumn(DBDAttributeBinding attrMeta) {
         this.attrMeta = attrMeta;
     }
 
@@ -142,60 +128,6 @@ public class WebSQLQueryResultColumn {
     @Property
     public DBCLogicalOperator[] getSupportedOperations() {
         return attrMeta.getValueHandler().getSupportedOperators(attrMeta);
-    }
-
-    @Property
-    public List<WebSQLQueryResultColumnReference> getReferences() {
-        List<WebSQLQueryResultColumnReference> references = new ArrayList<>();
-
-        // Forward references: foreign keys where this column is the source
-        List<DBSEntityReferrer> referrers = attrMeta.getReferrers();
-        if (referrers != null) {
-            for (DBSEntityReferrer referrer : referrers) {
-                if (referrer instanceof DBSEntityAssociation association) {
-                    references.add(new WebSQLQueryResultColumnReference(session, association, false));
-                }
-            }
-        }
-
-        // Reverse references: foreign keys from other entities targeting this column
-        DBSEntityAttribute entityAttribute = attrMeta.getEntityAttribute();
-        if (entityAttribute != null) {
-            DBSEntity parentEntity = entityAttribute.getParentObject();
-            DBRProgressMonitor monitor = session != null ? session.getProgressMonitor() : new VoidProgressMonitor();
-            for (DBSEntityAssociation reverseRef : DBVUtils.getAllReferences(monitor, parentEntity)) {
-                try {
-                    if (referenceTargetsAttribute(monitor, reverseRef, entityAttribute)) {
-                        references.add(new WebSQLQueryResultColumnReference(session, reverseRef, true));
-                    }
-                } catch (DBException e) {
-                    log.debug("Error reading attributes for reverse reference " + reverseRef.getName(), e);
-                }
-            }
-        }
-
-        return references;
-    }
-
-    private boolean referenceTargetsAttribute(
-        @NotNull DBRProgressMonitor monitor,
-        @NotNull DBSEntityAssociation association,
-        @NotNull DBSEntityAttribute attribute
-    ) throws DBException {
-        DBSEntityConstraint refConstraint = association.getReferencedConstraint();
-        if (!(refConstraint instanceof DBSEntityReferrer referrer)) {
-            return false;
-        }
-        List<? extends DBSEntityAttributeRef> attrs = referrer.getAttributeReferences(monitor);
-        if (attrs == null) {
-            return false;
-        }
-        for (DBSEntityAttributeRef ref : attrs) {
-            if (attribute.equals(ref.getAttribute())) {
-                return true;
-            }
-        }
-        return false;
     }
 
     @Override

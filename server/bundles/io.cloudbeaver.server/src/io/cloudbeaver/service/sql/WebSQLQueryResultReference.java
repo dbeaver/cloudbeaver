@@ -29,27 +29,30 @@ import org.jkiss.dbeaver.model.struct.DBSEntity;
 import org.jkiss.dbeaver.model.struct.DBSEntityAssociation;
 import org.jkiss.dbeaver.model.struct.DBSEntityConstraint;
 
-/**
- * Web SQL query result column reference.
- */
-public class WebSQLQueryResultColumnReference {
+import java.util.List;
 
-    private static final Log log = Log.getLog(WebSQLQueryResultColumnReference.class);
+public class WebSQLQueryResultReference {
+
+    private static final Log log = Log.getLog(WebSQLQueryResultReference.class);
 
     @Nullable
     private final WebSession session;
     @NotNull
     private final DBSEntityAssociation association;
     private final boolean reverse;
+    @NotNull
+    private final List<Integer> columnIndexList;
 
-    public WebSQLQueryResultColumnReference(
+    public WebSQLQueryResultReference(
         @Nullable WebSession session,
         @NotNull DBSEntityAssociation association,
-        boolean reverse
+        boolean reverse,
+        @NotNull List<Integer> columnIndexList
     ) {
         this.session = session;
         this.association = association;
         this.reverse = reverse;
+        this.columnIndexList = columnIndexList;
     }
 
     @NotNull
@@ -73,6 +76,7 @@ public class WebSQLQueryResultColumnReference {
         return DBUtils.getObjectFullName(targetEntity, DBPEvaluationContext.UI);
     }
 
+
     @Nullable
     @Property
     public String getNodePath() {
@@ -91,6 +95,12 @@ public class WebSQLQueryResultColumnReference {
             log.debug("Error resolving navigator node for entity " + targetEntity.getName(), e);
             return null;
         }
+    }
+
+    @NotNull
+    @Property
+    public List<Integer> getColumnIndexList() {
+        return columnIndexList;
     }
 
     @Nullable
