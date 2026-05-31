@@ -2,7 +2,6 @@
 
 @layer base {
   .dbv-kit-menu__popover {
-    z-index: 1000;
     min-width: max-content;
     max-height: var(--dbv-kit-menu-popover-max-height);
     max-width: var(--dbv-kit-menu-popover-max-width);
@@ -18,6 +17,7 @@
     outline: 0;
     padding-block: var(--dbv-kit-menu-popover-padding-block);
     padding-inline: var(--dbv-kit-menu-popover-padding-inline);
+    z-index: 1000;
 
     @media (prefers-reduced-motion: no-preference) {
       opacity: 0;

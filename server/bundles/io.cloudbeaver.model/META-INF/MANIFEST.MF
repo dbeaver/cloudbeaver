@@ -3,8 +3,8 @@ Bundle-ManifestVersion: 2
 Bundle-Vendor: DBeaver Corp
 Bundle-Name: Cloudbeaver Web Model
 Bundle-SymbolicName: io.cloudbeaver.model;singleton:=true
-Bundle-Version: 1.0.100.qualifier
-Bundle-Release-Date: 20260504
+Bundle-Version: 1.0.103.qualifier
+Bundle-Release-Date: 20260622
 Bundle-RequiredExecutionEnvironment: JavaSE-21
 Bundle-ActivationPolicy: lazy
 Require-Bundle: org.jkiss.dbeaver.data.gis;visibility:=reexport,
@@ -28,6 +28,11 @@ Export-Package: io.cloudbeaver,
  io.cloudbeaver.websocket.event.client,
  io.cloudbeaver.websocket.event.task,
  io.cloudbeaver.model,
+ io.cloudbeaver.model.api.annotation,
+ io.cloudbeaver.model.api.annotation.enums,
+ io.cloudbeaver.model.api.annotation.media,
+ io.cloudbeaver.model.api.annotation.responses,
+ io.cloudbeaver.model.api.annotation.tags,
  io.cloudbeaver.model.app,
  io.cloudbeaver.model.config,
  io.cloudbeaver.model.apilog,

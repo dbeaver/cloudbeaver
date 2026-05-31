@@ -4,6 +4,7 @@ export default [
   ['plugin_help_welcome_docs_label', 'Documentation'],
   ['plugin_help_welcome_docs_description', 'Learn how to use {arg:product}'],
 
+  ['data_viewer_shortcut_open_cell_context_menu', 'Mở menu ngữ cảnh cho ô được chọn'],
   ['data_viewer_shortcut_start_inline_editing', 'Mở Trình chỉnh sửa inline cho ô được chọn'],
   ['data_viewer_shortcut_add_new_row', 'Thêm một hàng mới'],
   ['data_viewer_shortcut_duplicate_row', 'Sao chép hàng'],

@@ -210,8 +210,7 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
     if (this.options?.query !== options.query) {
       this.resetQueryParameters();
     }
-    this.options = options;
-    return this;
+    return super.setOptions(options);
   }
 
   async request(prevResults: IDatabaseResultSet[]): Promise<IDatabaseResultSet[]> {

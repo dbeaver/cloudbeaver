@@ -37,6 +37,7 @@ export const Editor = observer<IEditorProps & IDefaultExtensions, IEditorRef>(
       keymap,
       lineWrapping,
       search,
+      tabIndentation,
       ...rest
     },
     ref,
@@ -61,6 +62,7 @@ export const Editor = observer<IEditorProps & IDefaultExtensions, IEditorRef>(
       keymap,
       lineWrapping,
       search,
+      tabIndentation,
     });
 
     extensions.set(...defaultExtensions);

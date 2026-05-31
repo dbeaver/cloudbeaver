@@ -23,6 +23,7 @@ export class SqlExecutionPlanViewBootstrap extends Bootstrap {
     this.sqlExecutionPlanViewService.tabs.add({
       key: 'table',
       name: 'plugin_sql_execution_plan_view_table',
+      icon: 'table-icon',
       order: 0,
       panel: () => ExecutionPlanTreeView,
     });

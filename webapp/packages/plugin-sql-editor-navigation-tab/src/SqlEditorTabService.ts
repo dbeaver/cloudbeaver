@@ -314,11 +314,11 @@ export class SqlEditorTabService extends Bootstrap {
     }
 
     const dataSource = this.sqlDataSourceService.create(tab.handlerState, tab.handlerState.datasourceKey);
+
+    await this.connectionInfoResource.load(ConnectionInfoActiveProjectKey);
     const executionContext = dataSource.executionContext;
 
     if (executionContext) {
-      await this.connectionInfoResource.load(ConnectionInfoActiveProjectKey);
-
       const contextConnection = createConnectionParam(executionContext.projectId, executionContext.connectionId);
 
       if (!this.connectionInfoResource.has(contextConnection)) {
@@ -404,11 +404,11 @@ export class SqlEditorTabService extends Bootstrap {
     return true;
   }
 
-  async setConnectionId(tab: ITab<ISqlEditorTabState>, connectionKey: IConnectionInfoParams, catalogId?: string, schemaId?: string) {
+  async setConnectionId(tab: ITab<ISqlEditorTabState>, connectionKey: IConnectionInfoParams | null, catalogId?: string, schemaId?: string) {
     const state = await this.sqlEditorService.setConnection(tab.handlerState, connectionKey, catalogId, schemaId);
 
     if (state) {
-      this.attachToProject(tab, connectionKey.projectId);
+      this.attachToProject(tab, connectionKey?.projectId ?? null);
     }
 
     return state;

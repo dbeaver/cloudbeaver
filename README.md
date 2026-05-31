@@ -25,6 +25,78 @@ You can see a live demo of CloudBeaver here: https://demo.cloudbeaver.io
 
 ## Changelog
 
+### 26.0.5 2026-05-18
+- Authorization:
+    - Added HTTP header authentication support for GraphQL queries. Users can provide API tokens via Authorization or X-Api-Key headers, allowing external data tools to authenticate without modifying request bodies.
+- Data Editor:
+    - Added a DDL generation option to the Data Editor and Result Set. Users can view table schemas directly while editing or reviewing records.
+    - Fixed the copying of Boolean values in the clipboard in the Data Editor.
+- SQL Editor:
+    - Updated the SQL Editor to use real tab characters for indentation. The application displayed tabs as four-space gaps with a distinct visual marker.
+    - Added an ability to view and edit scripts without connecting to the database.
+    - Added more settings to the Generated SQL window, including the ability to select fully qualified names for query or use compact SQL formatting.
+    - Added the ability to open generated queries right from the Generate SQL window.
+- General:
+    - Updated the manifest.webmanifest file to dynamically generate the environment variable according to the CLOUDBEAVER_ROOT_URI. (thanks to @houssemexo26 )
+- Databases:
+    - PostgreSQL:
+        - Updated driver to version 42.7.11.
+        - Fixed missing INOUT parameters in CHECK generation for procedures and functions.
+        - Fixed handling of 24:xx values in time columns.
+    - Snowflake: Updated driver to version 4.1.0.
+    - SQL Server: Fixed the issue with connecting to the database after the Java update.
+- Security:
+    - Added an administrative setting to restrict SSH tunneling capabilities. Administrators can now limit tunnel configuration to authorized users, reducing the risk of unauthorized network access.
+    - Fixed the high vulnerability (CVE-2026-42035) in the axios library. The library was updated to version 1.15.1.
+    - Fixed the medium vulnerability (CVE-2026-41305) in the postcss library. The library was updated to version 8.5.14.
+
+### 26.0.4 2026-05-04
+
+- Data Editor:
+    - Added the ability to copy-paste multiple cells at once. Pasted values will be distributed across separate cells, not put in a single cell.
+    - Data Editor started to keep the state of column configurations, such as filters, sorting, and ordering, after the reconnect, page refresh, and re-login.
+- SQL Editor:
+    - Updated the SQL Editor to use real tab characters for indentation. The application displayed tabs as four-space gaps with a distinct visual marker.
+    - Added the ability to view and edit scripts without connecting to the database.
+    - Added more settings to the Generated SQL window, including the ability to select fully qualified names for query or use compact SQL formatting.
+    - Added the ability to open in the SQL Editor generated queries right from the Generate SQL window.
+- Accessibility:
+    - Fixed contrast for elements across different application parts in the light and dark themes to meet WCAG requirements.
+- General:
+    - Removed the "Folders" setting from the available settings for the Navigator Tree.
+- Databases:
+    - DuckDB: Fixed map rendering for GEOMETRY types with CRS parameters.
+    - Firebird: Expanded database-specific SQL dialect coverage for the SQL Editor. Added more keywords, built-in functions, and SQL generators.
+    - MySQL: Fixed query boundaries recognition in the SQL Editor for scripts with the DELIMITER keyword.
+    - SQL Server: Fixed DDL generation for external tables.
+- Security:
+    - Updated session handling to prompt the application to generate a new session identifier for each login.
+    - Fixed the high vulnerability (CVE-2026-3505) in the bcpg-jdk18on library. The library was updated to version 1.84.0.
+
+### 26.0.3 2026-04-20
+
+- Data Editor:
+    - Added key column mark for tables with unique keys in the data grid.
+    - Added the ability to paste a copied cell into multiple cells and to set multiple cells to NULL.
+    - Fixed the ability to calculate row count for non-standard SELECT statements. (thanks to @fdcastel)
+- Navigator Tree:
+    - Reorganized the context menu on the connection level to make it more compact.
+    - Added support for special symbols (pipe, comma, and asterisk) for the search field.
+- Accessibility:
+    - Added the Skip to content option for quick keyboard access to the Navigator Tree, editors, and shortcuts to improve application accessibility.
+- General:
+    - SQL Editor: Fixed keyword autocompletion for partially typed keywords. There are no extra letters for them after completion.
+    - Added support for custom startup arguments when running CloudBeaver in a container. Administrators can specify configuration file locations to adapt the application to their environment. (thanks to @MalteHei)
+    - Fixed custom driver properties display for the connection page.
+    - Fixed data export in SQL format for values containing single quotes.
+- Databases:
+    - ClickHouse: Fixed the display of Array(JSON) types in the data grid.
+    - Added support for the "prompt=false" connection property for DB2 for IBM i to turn off interactive prompts and prevent related errors.
+- Security:
+    - Fixed the critical vulnerability (CVE-2025-62718) in the axios library. The library was updated to version 1.15.0.
+    - Fixed the high vulnerability (CVE-2026-4800) in the lodash library. The library was updated to version 4.18.0.
+    - Fixed the high vulnerability (CVE-2026-39363) in the vite library. The library was updated to version 7.3.2.
+ 
 ### 26.0.2 2026-04-06
 
 - UI improvements:
