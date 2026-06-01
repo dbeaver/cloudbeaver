@@ -209,8 +209,8 @@ public class WebNavigatorNodeInfo {
             return DBFUtils.getUriFromPath(dbnPath.getPath()).toString();
         } else if (node instanceof DBNFileSystem dbnFs) {
             return WebFSUtils.makeUniqueFsId(dbnFs.getFileSystem());
-        } else if (node instanceof DBNDataSource ds) {
-            return ds.getDataSourceContainer().getId();
+        } else if (node instanceof DBNDatabaseNode dbNode) {
+            return dbNode.getDataSourceContainer().getId();
         }
         return null;
     }
