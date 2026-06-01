@@ -1,0 +1,32 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2025 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+
+@layer base {
+  :root {
+    /* Switch dimensions */
+    --dbv-kit-switch-width: 36px;
+    --dbv-kit-switch-height: 20px;
+    --dbv-kit-switch-track-height: 14px;
+    --dbv-kit-switch-track-radius: 7px;
+    --dbv-kit-switch-thumb-size: 20px;
+    --dbv-kit-switch-thumb-offset: -2px;
+    --dbv-kit-switch-checked-offset: 18px;
+    --dbv-kit-switch-gap: 18px;
+    --dbv-kit-switch-label-weight: normal;
+
+    /* Switch colors */
+    --dbv-kit-switch-track-color: #000000;
+    --dbv-kit-switch-thumb-color: #ffffff;
+    --dbv-kit-switch-surface-color: #ffffff;
+    --dbv-kit-switch-checked-color: #2a7cb4;
+
+    /* Transitions */
+    --dbv-kit-switch-transition-duration: 100ms;
+    --dbv-kit-switch-transition-easing: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}

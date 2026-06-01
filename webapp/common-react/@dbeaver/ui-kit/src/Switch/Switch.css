@@ -1,0 +1,125 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2025 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+
+@import './_base.css';
+
+@layer base {
+  .dbv-kit-switch {
+    display: flex;
+    align-items: center;
+    gap: var(--dbv-kit-switch-gap);
+  }
+
+  .dbv-kit-switch__control {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    width: var(--dbv-kit-switch-width);
+    height: var(--dbv-kit-switch-height);
+    vertical-align: middle;
+    outline: none;
+    flex-shrink: 0;
+  }
+
+  .dbv-kit-switch__control:not(.dbv-kit-switch__control--disabled):hover .dbv-kit-switch__thumb {
+    box-shadow:
+      0px 3px 1px -2px rgba(0, 0, 0, 0.2),
+      0px 2px 2px 0px rgba(0, 0, 0, 0.14),
+      0px 1px 5px 0px rgba(0, 0, 0, 0.12),
+      0px 0px 0px 8px color-mix(in srgb, var(--dbv-kit-switch-track-color) 4%, transparent);
+  }
+
+  .dbv-kit-switch__control:not(.dbv-kit-switch__control--disabled):has(.dbv-kit-switch__input:focus-visible) .dbv-kit-switch__thumb {
+    box-shadow:
+      0px 3px 1px -2px rgba(0, 0, 0, 0.2),
+      0px 2px 2px 0px rgba(0, 0, 0, 0.14),
+      0px 1px 5px 0px rgba(0, 0, 0, 0.12),
+      0px 0px 0px 12px color-mix(in srgb, var(--dbv-kit-switch-track-color) 8%, transparent);
+  }
+
+  .dbv-kit-switch__input {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0 !important;
+    cursor: pointer;
+    margin: 0;
+    padding: 0;
+    z-index: 2;
+  }
+
+  .dbv-kit-switch__input:disabled {
+    cursor: default;
+    pointer-events: none;
+  }
+
+  .dbv-kit-switch__track {
+    box-sizing: border-box;
+    position: absolute;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+    width: 100%;
+    height: var(--dbv-kit-switch-track-height);
+    border-radius: var(--dbv-kit-switch-track-radius);
+    background-color: var(--dbv-kit-switch-track-color);
+    opacity: 0.38;
+    border: none;
+    transition:
+      background-color var(--dbv-kit-switch-transition-duration) var(--dbv-kit-switch-transition-easing),
+      border-color var(--dbv-kit-switch-transition-duration) var(--dbv-kit-switch-transition-easing),
+      opacity var(--dbv-kit-switch-transition-duration) var(--dbv-kit-switch-transition-easing);
+  }
+
+  .dbv-kit-switch__underlay {
+    margin-left: var(--dbv-kit-switch-thumb-offset);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: margin-left var(--dbv-kit-switch-transition-duration) var(--dbv-kit-switch-transition-easing);
+  }
+
+  .dbv-kit-switch__thumb {
+    box-sizing: border-box;
+    width: var(--dbv-kit-switch-thumb-size);
+    height: var(--dbv-kit-switch-thumb-size);
+    border: calc(var(--dbv-kit-switch-thumb-size) / 2) solid var(--dbv-kit-switch-thumb-color);
+    border-radius: 50%;
+    background-color: var(--dbv-kit-switch-surface-color);
+    box-shadow:
+      0px 3px 1px -2px rgba(0, 0, 0, 0.2),
+      0px 2px 2px 0px rgba(0, 0, 0, 0.14),
+      0px 1px 5px 0px rgba(0, 0, 0, 0.12);
+    pointer-events: none;
+    z-index: 1;
+    transition:
+      background-color var(--dbv-kit-switch-transition-duration) var(--dbv-kit-switch-transition-easing),
+      border-color var(--dbv-kit-switch-transition-duration) var(--dbv-kit-switch-transition-easing);
+  }
+
+  .dbv-kit-switch__control--checked .dbv-kit-switch__track {
+    background-color: color-mix(in srgb, var(--dbv-kit-switch-checked-color) 50%, transparent);
+    opacity: 1;
+  }
+
+  .dbv-kit-switch__control--checked .dbv-kit-switch__underlay {
+    margin-left: var(--dbv-kit-switch-checked-offset);
+  }
+
+  .dbv-kit-switch__control--checked .dbv-kit-switch__thumb {
+    background-color: var(--dbv-kit-switch-checked-color);
+    border-color: var(--dbv-kit-switch-checked-color);
+  }
+
+  .dbv-kit-switch__control--disabled {
+    opacity: 0.38;
+    pointer-events: none;
+  }
+}

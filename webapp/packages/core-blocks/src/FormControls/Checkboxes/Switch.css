@@ -1,0 +1,72 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+
+@layer components {
+  .switch-field {
+    --dbv-kit-control-outline-offset: -8px;
+    position: relative;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: var(--dbv-kit-control-outline-offset);
+      left: var(--dbv-kit-control-outline-offset);
+      right: var(--dbv-kit-control-outline-offset);
+      bottom: var(--dbv-kit-control-outline-offset);
+      border-radius: var(--dbv-kit-control-border-radius);
+      border: var(--dbv-kit-control-outline-width) solid transparent;
+      pointer-events: none;
+    }
+
+    &:has(.dbv-kit-switch__input:focus-visible)::before {
+      border-color: var(--dbv-kit-control-outline-color);
+      border-width: var(--dbv-kit-control-outline-width);
+    }
+  }
+
+  .switch-body {
+    --dbv-kit-switch-track-color: var(--theme-on-surface, #000000);
+    --dbv-kit-switch-thumb-color: var(--theme-switch-thumb, #ffffff);
+    --dbv-kit-switch-surface-color: var(--theme-surface, #ffffff);
+    --dbv-kit-switch-checked-color: var(--theme-primary, #2a7cb4);
+    --dbv-kit-switch-transition-duration: var(--duration-fast, 100ms);
+    --dbv-kit-switch-transition-easing: var(--ease-smooth-start, cubic-bezier(0.4, 0, 0.2, 1));
+    --dbv-kit-switch-label-weight: normal;
+  }
+
+  .switch-body--primary {
+    --dbv-kit-switch-label-weight: 500;
+  }
+
+  .switch-field .switch-body--dense {
+    --dbv-kit-switch-width: 24px;
+    --dbv-kit-switch-height: 16px;
+    --dbv-kit-switch-track-height: 10px;
+    --dbv-kit-switch-track-radius: 5px;
+    --dbv-kit-switch-thumb-size: 14px;
+    --dbv-kit-switch-thumb-offset: -3px;
+    --dbv-kit-switch-checked-offset: 13px;
+  }
+
+  .switch-field .switch-body--dense .dbv-kit-switch__control--disabled .dbv-kit-switch__thumb {
+    box-shadow: none;
+  }
+
+  .switch-label {
+    cursor: pointer;
+    user-select: none;
+    display: block;
+    min-width: 50px;
+    white-space: pre-wrap !important;
+    font-weight: var(--dbv-kit-switch-label-weight);
+  }
+
+  .switch-label--dense {
+    font-weight: initial;
+  }
+}
