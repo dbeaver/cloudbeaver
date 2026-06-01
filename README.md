@@ -70,7 +70,7 @@ You can see a live demo of CloudBeaver here: https://demo.cloudbeaver.io
     - Fixed data export in SQL format for values containing single quotes.
 - Databases and drivers:
     - ClickHouse:
-          - Fixed the display of Array(JSON) types in the data grid.
+        - Fixed the display of Array(JSON) types in the data grid.
         - Updated driver version to 0.9.7.
         - Fixed IP address display in the Data Editor by removing the leading slash.
     - Added support for the "prompt=false" connection property for DB2 for IBM i to turn off interactive prompts and prevent related errors.
@@ -106,12 +106,3 @@ You can see a live demo of CloudBeaver here: https://demo.cloudbeaver.io
     - Fixed the high vulnerability (CVE-2026-27959) in the koa library. The library was updated to version 2.16.4.
     - Fixed the high vulnerability (CVE-2026-32141) in the flatted library. The library was updated to version 4.4.0.
     - Fixed the medium vulnerability (CVE-2026-41305) in the postcss library. The library was updated to version 8.5.14.
-
-
-## Contribution
-As a community-driven open-source project, we warmly welcome contributions through GitHub pull requests. 
-
-[We are happy to reward](https://dbeaver.com/help-dbeaver/) our most active contributors every major sprint.
-The most significant contribution to our code for the major release 26.1.0 was made by:
-1. [houssemexo26](https://github.com/houssemexo26) - for updating the manifest.webmanifest generation to work dynamically based on the CLOUDBEAVER_ROOT_URI environment variable.
-2. [MalteHei](https://github.com/MalteHei) - for fixing container entrypoint argument handling, allowing custom startup parameters such as -web-config to be passed correctly.
