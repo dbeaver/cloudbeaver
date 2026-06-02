@@ -17,7 +17,6 @@
 package io.cloudbeaver.server.events;
 
 import io.cloudbeaver.model.session.BaseWebSession;
-import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 
@@ -25,15 +24,6 @@ import java.util.Objects;
 
 public class WSWebUtils {
     public static boolean isSessionIdEquals(@NotNull BaseWebSession webSession, @Nullable String sessionId) {
-        if (sessionId == null) {
-            return false;
-        }
-        if (Objects.equals(webSession.getSessionId(), sessionId)) {
-            return true;
-        }
-        if (webSession instanceof WebSession) {
-            return Objects.equals(webSession.getUserContext().getSmSessionId(), sessionId);
-        }
-        return false;
+        return Objects.equals(webSession.getUserContext().getSmSessionId(), sessionId);
     }
 }
