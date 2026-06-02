@@ -8,7 +8,6 @@
 
 @layer base {
   :root {
-    /* Switch dimensions — thumb is contained inside the track (iOS-style) */
     --dbv-kit-switch-width: 44px;
     --dbv-kit-switch-height: 22px;
     --dbv-kit-switch-track-height: 22px;

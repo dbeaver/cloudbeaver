@@ -51,13 +51,13 @@ export const Dense: Story = {
       className="tw:flex tw:flex-col tw:gap-4"
       style={
         {
-          '--dbv-kit-switch-width': '24px',
+          '--dbv-kit-switch-width': '28px',
           '--dbv-kit-switch-height': '16px',
-          '--dbv-kit-switch-track-height': '10px',
-          '--dbv-kit-switch-track-radius': '5px',
-          '--dbv-kit-switch-thumb-size': '14px',
-          '--dbv-kit-switch-thumb-offset': '-3px',
-          '--dbv-kit-switch-checked-offset': '13px',
+          '--dbv-kit-switch-track-height': '16px',
+          '--dbv-kit-switch-track-radius': '8px',
+          '--dbv-kit-switch-thumb-size': '12px',
+          '--dbv-kit-switch-thumb-offset': '2px',
+          '--dbv-kit-switch-checked-offset': '14px',
         } as React.CSSProperties
       }
     >
