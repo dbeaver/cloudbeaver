@@ -33,8 +33,8 @@
     --dbv-kit-switch-track-color: color-mix(in srgb, var(--theme-on-surface, #000000) 38%, transparent);
     --dbv-kit-switch-thumb-color: var(--theme-switch-thumb, #ffffff);
     --dbv-kit-switch-checked-color: var(--theme-primary, #2a7cb4);
-    --dbv-kit-switch-transition-duration: var(--duration-slow);
-    --dbv-kit-switch-transition-easing: var(--ease-spring);
+    --dbv-kit-switch-transition-duration: var(--duration-medium);
+    --dbv-kit-switch-transition-easing: var(--ease-smooth);
     --dbv-kit-switch-label-weight: normal;
   }
 

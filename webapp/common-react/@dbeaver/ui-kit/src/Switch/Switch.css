@@ -35,6 +35,10 @@
     border-radius: var(--dbv-kit-switch-track-radius);
     background-color: var(--dbv-kit-switch-track-color);
     transition: background-color var(--dbv-kit-switch-transition-duration) var(--dbv-kit-switch-transition-easing);
+
+    @media (prefers-reduced-motion: reduce) {
+      transition: none !important;
+    }
   }
 
   .dbv-kit-switch__input {
@@ -59,6 +63,10 @@
     display: flex;
     align-items: center;
     transition: margin-left var(--dbv-kit-switch-transition-duration) var(--dbv-kit-switch-transition-easing);
+
+    @media (prefers-reduced-motion: reduce) {
+      transition: none !important;
+    }
   }
 
   .dbv-kit-switch__thumb {
@@ -70,18 +78,10 @@
     box-shadow: var(--shadow-small, 0px 1px 3px 0px rgba(0, 0, 0, 0.3), 0px 1px 1px 0px rgba(0, 0, 0, 0.2));
     pointer-events: none;
     transition: transform var(--dbv-kit-switch-transition-duration) var(--dbv-kit-switch-transition-easing);
-  }
 
-  /* Pressed unchecked — expand toward the right */
-  .dbv-kit-switch__control:not(.dbv-kit-switch__control--checked):not(.dbv-kit-switch__control--disabled):active .dbv-kit-switch__thumb {
-    transform-origin: left center;
-    transform: scaleX(1.2); /* 16px → ~19px */
-  }
-
-  /* Pressed checked — expand toward the left */
-  .dbv-kit-switch__control--checked:not(.dbv-kit-switch__control--disabled):active .dbv-kit-switch__thumb {
-    transform-origin: right center;
-    transform: scaleX(1.2);
+    @media (prefers-reduced-motion: reduce) {
+      transition: none !important;
+    }
   }
 
   /* Focus-visible — outline on the control shell */
