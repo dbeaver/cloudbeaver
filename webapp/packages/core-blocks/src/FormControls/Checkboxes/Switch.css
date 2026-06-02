@@ -22,11 +22,6 @@
       border: var(--dbv-kit-control-outline-width) solid transparent;
       pointer-events: none;
     }
-
-    &:has(.dbv-kit-switch__input:focus-visible)::before {
-      border-color: var(--dbv-kit-control-outline-color);
-      border-width: var(--dbv-kit-control-outline-width);
-    }
   }
 
   .switch-body {
