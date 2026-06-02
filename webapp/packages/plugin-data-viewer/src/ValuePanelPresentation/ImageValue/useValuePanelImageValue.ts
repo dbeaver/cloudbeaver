@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -9,6 +9,7 @@ import { action, computed, observable } from 'mobx';
 
 import { useObservableRef } from '@cloudbeaver/core-blocks';
 import { promptForFiles } from '@cloudbeaver/core-browser';
+import { ConnectionInfoResource, createConnectionParam } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { download, getMIME, isImageFormat, isValidUrl } from '@cloudbeaver/core-utils';
@@ -35,6 +36,7 @@ interface Props {
 export function useValuePanelImageValue({ model, resultIndex }: Props) {
   const notificationService = useService(NotificationService);
   const dataViewerService = useService(DataViewerService);
+  const connectionInfoResource = useService(ConnectionInfoResource);
   const selectAction = model.source.getAction(resultIndex, IDatabaseDataSelectAction, GridSelectAction);
   const formatAction = model.source.getAction(resultIndex, IDatabaseDataFormatAction);
   const contentAction = model.source.getAction(resultIndex, ResultSetDataContentAction);
@@ -105,7 +107,12 @@ export function useValuePanelImageValue({ model, resultIndex }: Props) {
         return !!this.staticSrc && !this.truncated;
       },
       get canUpload() {
-        if (!this.cellHolder) {
+        const executionContext = this.model.source.executionContext?.context;
+        const connection =
+          executionContext && this.connectionInfoResource.get(createConnectionParam(executionContext.projectId, executionContext.connectionId));
+        const isDataEditable = !!connection && this.dataViewerService.isDataEditable(connection);
+
+        if (!this.cellHolder || !connection || !isDataEditable) {
           return false;
         }
         return this.formatAction.isBinary(this.cellHolder);
@@ -172,6 +179,6 @@ export function useValuePanelImageValue({ model, resultIndex }: Props) {
       upload: action.bound,
       loadFullImage: action.bound,
     },
-    { model, resultIndex, notificationService, selectAction, formatAction, contentAction, editAction, dataViewerService },
+    { model, resultIndex, notificationService, selectAction, formatAction, contentAction, editAction, dataViewerService, connectionInfoResource },
   );
 }

@@ -162,18 +162,24 @@ public class WebDataSourceUtils {
     }
 
 
-    public static boolean disconnectDataSource(@NotNull WebSession webSession, @NotNull DBPDataSourceContainer dataSource) {
+    public static boolean disconnectDataSource(
+        @NotNull WebSession webSession,
+        @NotNull DBPDataSourceContainer dataSource,
+        boolean sendDisconnectEvent
+    ) {
         if (dataSource.isConnected()) {
             try {
                 dataSource.disconnect(webSession.getProgressMonitor());
-                webSession.addSessionEvent(
-                    new WSDataSourceDisconnectEvent(
-                        dataSource.getProject().getId(),
-                        dataSource.getId(),
-                        webSession.getSessionId(),
-                        webSession.getUserId()
-                    )
-                );
+                if (sendDisconnectEvent) {
+                    webSession.addSessionEvent(
+                        new WSDataSourceDisconnectEvent(
+                            dataSource.getProject().getId(),
+                            dataSource.getId(),
+                            webSession.getSessionId(),
+                            webSession.getUserId()
+                        )
+                    );
+                }
                 return true;
             } catch (DBException e) {
                 log.error("Error closing connection", e);

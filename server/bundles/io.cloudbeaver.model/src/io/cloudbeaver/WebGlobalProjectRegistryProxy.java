@@ -363,6 +363,11 @@ public class WebGlobalProjectRegistryProxy implements DBPDataSourceRegistry, Dat
     }
 
     @Override
+    public void initializeDataSources() {
+        dataSourceRegistry.initializeDataSources();
+    }
+
+    @Override
     public DataSourceParseResults loadDataSources(
         @NotNull List<DBPDataSourceConfigurationStorage> storages,
         @NotNull DataSourceConfigurationManager manager,

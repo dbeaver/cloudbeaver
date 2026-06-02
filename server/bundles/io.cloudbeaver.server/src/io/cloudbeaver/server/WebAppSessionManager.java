@@ -24,16 +24,20 @@ import io.cloudbeaver.model.session.WebSession;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.jkiss.code.NotNull;
+import org.jkiss.code.NotNullWhen;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 
 import java.util.Collection;
 
 public interface WebAppSessionManager {
+    @Nullable
     BaseWebSession closeSession(@NotNull HttpServletRequest request);
 
+    @Nullable
     BaseWebSession closeSession(@NotNull String sessionId);
 
+    @Nullable
     BaseWebSession closeSession(@NotNull String sessionId, boolean sendSessionExpiredEvent);
 
     @NotNull
@@ -53,21 +57,25 @@ public interface WebAppSessionManager {
     BaseWebSession getSession(@NotNull String sessionId);
 
     @Nullable
-    WebSession findWebSession(HttpServletRequest request);
+    WebSession findWebSession(@NotNull HttpServletRequest request);
 
-    WebSession findWebSession(HttpServletRequest request, boolean errorOnNoFound) throws DBWebException;
+    @NotNullWhen("errorOnNoFound")
+    WebSession findWebSession(@NotNull HttpServletRequest request, boolean errorOnNoFound) throws DBWebException;
 
+    @NotNull
     Collection<BaseWebSession> getAllActiveSessions();
 
-    WebSession getOrRestoreWebSession(WebHttpRequestInfo httpRequest);
+    @NotNull
+    WebSession getOrRestoreWebSession(@NotNull WebHttpRequestInfo httpRequest);
 
+    @NotNullWhen("!create")
     WebHeadlessSession getHeadlessSession(
         @Nullable String smAccessToken,
         @NotNull WebHttpRequestInfo requestInfo,
         boolean create
     ) throws DBException;
 
-    boolean touchSession(HttpServletRequest request, HttpServletResponse response) throws DBWebException;
+    boolean touchSession(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response) throws DBWebException;
 
     default void expireIdleSessions() {
 

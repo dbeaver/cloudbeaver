@@ -77,6 +77,7 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
     /**
      * Creates proxy for permission checks and other general API calls validation/logging.
      */
+    @NotNull
     protected API_TYPE getService(DataFetchingEnvironment env) {
         Object proxyImpl = Proxy.newProxyInstance(getClass().getClassLoader(), new Class[]{apiInterface}, new ServiceInvocationHandler(serviceImpl, env));
         return apiInterface.cast(proxyImpl);
@@ -99,20 +100,23 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
         }
     }
 
-    protected static HttpServletResponse getServletResponse(DataFetchingEnvironment env) {
+    @NotNull
+    protected static HttpServletResponse getServletResponse(@NotNull DataFetchingEnvironment env) {
         return GraphQLEndpoint.getServletResponse(env);
     }
 
-    protected static DBWBindingContext getBindingContext(DataFetchingEnvironment env) {
+    @NotNull
+    protected static DBWBindingContext getBindingContext(@NotNull DataFetchingEnvironment env) {
         return GraphQLEndpoint.getBindingContext(env);
     }
 
-    protected static WebSession getWebSession(DataFetchingEnvironment env) throws DBWebException {
+    @NotNull
+    protected static WebSession getWebSession(@NotNull DataFetchingEnvironment env) throws DBWebException {
         return getWebSession(env, true);
     }
 
     @Nullable
-    protected static WebSession getSessionFromContext(DataFetchingEnvironment env) {
+    protected static WebSession getSessionFromContext(@NotNull DataFetchingEnvironment env) {
         return env.getGraphQlContext().get(WebSession.class.getName());
     }
 
@@ -125,6 +129,7 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
         return webSession;
     }
 
+    @NotNull
     protected static WebSession getWebSession(@NotNull DataFetchingEnvironment env, boolean errorOnNotFound) throws DBWebException {
         if (env.getGraphQlContext().getBoolean(CloudbeaverCliConstants.CLI_MODE)) {
             return getSessionFromContextOrThrow(env);
@@ -133,6 +138,7 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
             GraphQLEndpoint.getServletRequestOrThrow(env), getServletResponse(env), errorOnNotFound);
     }
 
+    @Nullable
     protected static String getProjectReference(@NotNull DataFetchingEnvironment env) {
         return env.getArgument("projectId");
     }
@@ -154,6 +160,7 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
             GraphQLEndpoint.getServletRequestOrThrow(env));
     }
 
+    @NotNull
     public static WebSession findWebSession(@NotNull DataFetchingEnvironment env, boolean errorOnNotFound) throws DBWebException {
         return WebAppUtils.getWebApplication().getSessionManager().findWebSession(
             GraphQLEndpoint.getServletRequestOrThrow(env), errorOnNotFound);
@@ -261,7 +268,7 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
                     throw new DBException("Web session not instantiated");
                 }
 
-                String projectId = args[objectIdArgumentIndex] == null ? null : String.valueOf(args[objectIdArgumentIndex]);
+                String projectId = args[objectIdArgumentIndex] == null ? "" : String.valueOf(args[objectIdArgumentIndex]);
                 // we should always get the project from the session, even if projectId is null - the active project
                 // will be returned
                 WebProjectImpl project = webSession.getProjectById(projectId);
