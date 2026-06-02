@@ -11,9 +11,6 @@
     "clear": "rimraf -g '@dbeaver/*/{dist,lib}'",
     "test": "dbeaver-test"
   },
-  "resolutions": {
-    "happy-dom": ">=20.8.8"
-  },
   "devDependencies": {
     "@dbeaver/cli": "workspace:^",
     "@dbeaver/prettier-config": "workspace:^",

@@ -12597,7 +12597,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"happy-dom@npm:>=20.8.8":
+"happy-dom@npm:^20":
   version: 20.9.0
   resolution: "happy-dom@npm:20.9.0"
   dependencies:

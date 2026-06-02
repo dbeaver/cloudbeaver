@@ -26,7 +26,6 @@
     "serialize-javascript": ">=7.0.5",
     "flatted": ">=3.4.2",
     "picomatch": ">=2.3.2",
-    "happy-dom": ">=20.8.8",
     "vite": "7.3.2",
     "@codemirror/autocomplete": "6.20.1",
     "@codemirror/commands": "6.10.3",
