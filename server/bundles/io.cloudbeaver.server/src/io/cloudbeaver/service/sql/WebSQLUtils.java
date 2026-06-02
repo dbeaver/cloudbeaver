@@ -32,7 +32,6 @@ import org.jkiss.dbeaver.model.DBPEvaluationContext;
 import org.jkiss.dbeaver.model.data.*;
 import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.exec.DBCSession;
-import org.jkiss.dbeaver.model.exec.DBExecUtils;
 import org.jkiss.dbeaver.model.gis.DBGeometry;
 import org.jkiss.dbeaver.model.gis.GisConstants;
 import org.jkiss.dbeaver.model.gis.GisTransformUtils;
@@ -358,13 +357,13 @@ public class WebSQLUtils {
         DBRProgressMonitor monitor = session.getProgressMonitor();
         for (DBSEntity entity : entities) {
             try {
-                for (DBSEntityAssociation fk : DBExecUtils.readAssociations(monitor, entity, attrToBinding)) {
+                for (DBSEntityAssociation fk : DBStructUtils.readAssociations(monitor, entity, attrToBinding)) {
                     List<Integer> columnIndex = collectOwnColumnIndex(monitor, fk, false, attrToIndex);
                     if (columnIndex != null) {
                         result.add(new WebSQLQueryResultReference(session, fk, false, columnIndex));
                     }
                 }
-                for (DBSEntityAssociation ref : DBExecUtils.readReferences(monitor, entity, attrToBinding)) {
+                for (DBSEntityAssociation ref : DBStructUtils.readReferences(monitor, entity, attrToBinding)) {
                     List<Integer> columnIndex = collectOwnColumnIndex(monitor, ref, true, attrToIndex);
                     if (columnIndex != null) {
                         result.add(new WebSQLQueryResultReference(session, ref, true, columnIndex));

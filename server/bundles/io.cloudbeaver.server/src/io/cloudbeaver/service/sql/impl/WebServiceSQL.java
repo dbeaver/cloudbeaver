@@ -622,8 +622,8 @@ public class WebServiceSQL implements DBWServiceSQL {
                     WebSQLResultsInfo resultsInfo = contextInfo.getResults(resultsId);
                     DBSEntity sourceEntity = resolveSourceEntity(resultsInfo.getAttributes(), columnIndex);
                     DBSEntityAssociation association = isReference
-                        ? DBExecUtils.findReverseAssociationByName(monitor, sourceEntity, associationName)
-                        : DBExecUtils.findForwardAssociationByName(monitor, sourceEntity, associationName);
+                        ? DBStructUtils.findReverseAssociationByName(monitor, sourceEntity, associationName)
+                        : DBStructUtils.findForwardAssociationByName(monitor, sourceEntity, associationName);
 
                     WebDBDResultSetDataProvider dataProvider = new WebDBDResultSetDataProvider(
                         resultsId,
