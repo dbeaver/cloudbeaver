@@ -19,3 +19,4 @@ export * from './getLocalizedDisplayName.js';
 export * from './formatNumber.js';
 export * from './isNumber.js';
 export * from './replaceMiddle.js';
+export * from './uuid.js';
