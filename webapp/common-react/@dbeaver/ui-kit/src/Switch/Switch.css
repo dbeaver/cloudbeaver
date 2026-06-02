@@ -24,30 +24,22 @@
     vertical-align: middle;
     outline: none;
     flex-shrink: 0;
+    border-radius: var(--dbv-kit-switch-track-radius);
+    cursor: pointer;
   }
 
-  .dbv-kit-switch__control:not(.dbv-kit-switch__control--disabled):hover .dbv-kit-switch__thumb {
-    box-shadow:
-      0px 3px 1px -2px rgba(0, 0, 0, 0.2),
-      0px 2px 2px 0px rgba(0, 0, 0, 0.14),
-      0px 1px 5px 0px rgba(0, 0, 0, 0.12),
-      0px 0px 0px 8px color-mix(in srgb, var(--dbv-kit-switch-track-color) 4%, transparent);
-  }
-
-  .dbv-kit-switch__control:not(.dbv-kit-switch__control--disabled):has(.dbv-kit-switch__input:focus-visible) .dbv-kit-switch__thumb {
-    box-shadow:
-      0px 3px 1px -2px rgba(0, 0, 0, 0.2),
-      0px 2px 2px 0px rgba(0, 0, 0, 0.14),
-      0px 1px 5px 0px rgba(0, 0, 0, 0.12),
-      0px 0px 0px 12px color-mix(in srgb, var(--dbv-kit-switch-track-color) 8%, transparent);
+  .dbv-kit-switch__track {
+    box-sizing: border-box;
+    position: absolute;
+    inset: 0;
+    border-radius: var(--dbv-kit-switch-track-radius);
+    background-color: var(--dbv-kit-switch-track-color);
+    transition: background-color var(--dbv-kit-switch-transition-duration) var(--dbv-kit-switch-transition-easing);
   }
 
   .dbv-kit-switch__input {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    inset: 0;
     opacity: 0 !important;
     cursor: pointer;
     margin: 0;
@@ -60,29 +52,12 @@
     pointer-events: none;
   }
 
-  .dbv-kit-switch__track {
-    box-sizing: border-box;
-    position: absolute;
-    top: 50%;
-    left: 0;
-    transform: translateY(-50%);
-    width: 100%;
-    height: var(--dbv-kit-switch-track-height);
-    border-radius: var(--dbv-kit-switch-track-radius);
-    background-color: var(--dbv-kit-switch-track-color);
-    opacity: 0.38;
-    border: none;
-    transition:
-      background-color var(--dbv-kit-switch-transition-duration) var(--dbv-kit-switch-transition-easing),
-      border-color var(--dbv-kit-switch-transition-duration) var(--dbv-kit-switch-transition-easing),
-      opacity var(--dbv-kit-switch-transition-duration) var(--dbv-kit-switch-transition-easing);
-  }
-
   .dbv-kit-switch__underlay {
+    position: relative;
+    z-index: 1;
     margin-left: var(--dbv-kit-switch-thumb-offset);
     display: flex;
     align-items: center;
-    justify-content: center;
     transition: margin-left var(--dbv-kit-switch-transition-duration) var(--dbv-kit-switch-transition-easing);
   }
 
@@ -90,36 +65,46 @@
     box-sizing: border-box;
     width: var(--dbv-kit-switch-thumb-size);
     height: var(--dbv-kit-switch-thumb-size);
-    border: calc(var(--dbv-kit-switch-thumb-size) / 2) solid var(--dbv-kit-switch-thumb-color);
     border-radius: 50%;
-    background-color: var(--dbv-kit-switch-surface-color);
-    box-shadow:
-      0px 3px 1px -2px rgba(0, 0, 0, 0.2),
-      0px 2px 2px 0px rgba(0, 0, 0, 0.14),
-      0px 1px 5px 0px rgba(0, 0, 0, 0.12);
+    background-color: var(--dbv-kit-switch-thumb-color);
+    box-shadow: var(--shadow-small, 0px 1px 3px 0px rgba(0, 0, 0, 0.3), 0px 1px 1px 0px rgba(0, 0, 0, 0.2));
     pointer-events: none;
-    z-index: 1;
-    transition:
-      background-color var(--dbv-kit-switch-transition-duration) var(--dbv-kit-switch-transition-easing),
-      border-color var(--dbv-kit-switch-transition-duration) var(--dbv-kit-switch-transition-easing);
+    transition: transform var(--dbv-kit-switch-transition-duration) var(--dbv-kit-switch-transition-easing);
+  }
+
+  /* Pressed unchecked — expand toward the right */
+  .dbv-kit-switch__control:not(.dbv-kit-switch__control--checked):not(.dbv-kit-switch__control--disabled):active .dbv-kit-switch__thumb {
+    transform-origin: left center;
+    transform: scaleX(1.2); /* 16px → ~19px */
+  }
+
+  /* Pressed checked — expand toward the left */
+  .dbv-kit-switch__control--checked:not(.dbv-kit-switch__control--disabled):active .dbv-kit-switch__thumb {
+    transform-origin: right center;
+    transform: scaleX(1.2);
+  }
+
+  /* Focus-visible — outline on the control shell */
+  .dbv-kit-switch__control:not(.dbv-kit-switch__control--disabled):has(.dbv-kit-switch__input:focus-visible) {
+    outline: 2px solid var(--dbv-kit-control-outline-color, #3b82f6);
+    outline-offset: 2px;
   }
 
   .dbv-kit-switch__control--checked .dbv-kit-switch__track {
-    background-color: color-mix(in srgb, var(--dbv-kit-switch-checked-color) 50%, transparent);
-    opacity: 1;
+    background-color: var(--dbv-kit-switch-checked-color);
   }
 
   .dbv-kit-switch__control--checked .dbv-kit-switch__underlay {
     margin-left: var(--dbv-kit-switch-checked-offset);
   }
 
-  .dbv-kit-switch__control--checked .dbv-kit-switch__thumb {
-    background-color: var(--dbv-kit-switch-checked-color);
-    border-color: var(--dbv-kit-switch-checked-color);
-  }
-
   .dbv-kit-switch__control--disabled {
-    opacity: 0.38;
+    opacity: 0.4;
     pointer-events: none;
+    cursor: default;
+
+    & .dbv-kit-switch__thumb {
+      box-shadow: none;
+    }
   }
 }

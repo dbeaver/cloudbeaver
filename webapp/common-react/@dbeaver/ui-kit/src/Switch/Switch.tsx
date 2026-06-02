@@ -23,19 +23,19 @@ export function SwitchBase({ checked, disabled, children, className, id, onChang
         })}
       >
         <div className="dbv-kit-switch__track" />
+        <input
+          {...inputRest}
+          type="checkbox"
+          id={id}
+          role="switch"
+          aria-checked={checked}
+          checked={checked}
+          disabled={disabled}
+          className="dbv-kit-switch__input"
+          onChange={onChange}
+        />
         <div className="dbv-kit-switch__underlay">
           <div className="dbv-kit-switch__thumb" />
-          <input
-            {...inputRest}
-            type="checkbox"
-            id={id}
-            role="switch"
-            aria-checked={checked}
-            checked={checked}
-            disabled={disabled}
-            className="dbv-kit-switch__input"
-            onChange={onChange}
-          />
         </div>
       </div>
       {children}

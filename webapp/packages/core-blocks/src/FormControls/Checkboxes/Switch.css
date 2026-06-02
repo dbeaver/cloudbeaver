@@ -30,12 +30,11 @@
   }
 
   .switch-body {
-    --dbv-kit-switch-track-color: var(--theme-on-surface, #000000);
+    --dbv-kit-switch-track-color: color-mix(in srgb, var(--theme-on-surface, #000000) 38%, transparent);
     --dbv-kit-switch-thumb-color: var(--theme-switch-thumb, #ffffff);
-    --dbv-kit-switch-surface-color: var(--theme-surface, #ffffff);
     --dbv-kit-switch-checked-color: var(--theme-primary, #2a7cb4);
-    --dbv-kit-switch-transition-duration: var(--duration-fast, 100ms);
-    --dbv-kit-switch-transition-easing: var(--ease-smooth-start, cubic-bezier(0.4, 0, 0.2, 1));
+    --dbv-kit-switch-transition-duration: var(--duration-slow);
+    --dbv-kit-switch-transition-easing: var(--ease-spring);
     --dbv-kit-switch-label-weight: normal;
   }
 
@@ -43,18 +42,15 @@
     --dbv-kit-switch-label-weight: 500;
   }
 
+  /* Dense mod — 28×16 pill, 12px thumb; checked-offset = 28 - 12 - 2 = 14 */
   .switch-field .switch-body--dense {
-    --dbv-kit-switch-width: 24px;
+    --dbv-kit-switch-width: 28px;
     --dbv-kit-switch-height: 16px;
-    --dbv-kit-switch-track-height: 10px;
-    --dbv-kit-switch-track-radius: 5px;
-    --dbv-kit-switch-thumb-size: 14px;
-    --dbv-kit-switch-thumb-offset: -3px;
-    --dbv-kit-switch-checked-offset: 13px;
-  }
-
-  .switch-field .switch-body--dense .dbv-kit-switch__control--disabled .dbv-kit-switch__thumb {
-    box-shadow: none;
+    --dbv-kit-switch-track-height: 16px;
+    --dbv-kit-switch-track-radius: 8px;
+    --dbv-kit-switch-thumb-size: 12px;
+    --dbv-kit-switch-thumb-offset: 2px;
+    --dbv-kit-switch-checked-offset: 14px;
   }
 
   .switch-label {

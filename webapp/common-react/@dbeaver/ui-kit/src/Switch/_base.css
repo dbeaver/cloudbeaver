@@ -8,25 +8,25 @@
 
 @layer base {
   :root {
-    /* Switch dimensions */
-    --dbv-kit-switch-width: 36px;
-    --dbv-kit-switch-height: 20px;
-    --dbv-kit-switch-track-height: 14px;
-    --dbv-kit-switch-track-radius: 7px;
-    --dbv-kit-switch-thumb-size: 20px;
-    --dbv-kit-switch-thumb-offset: -2px;
-    --dbv-kit-switch-checked-offset: 18px;
-    --dbv-kit-switch-gap: 18px;
+    /* Switch dimensions — thumb is contained inside the track (iOS-style) */
+    --dbv-kit-switch-width: 44px;
+    --dbv-kit-switch-height: 22px;
+    --dbv-kit-switch-track-height: 22px;
+    --dbv-kit-switch-track-radius: 11px;
+    --dbv-kit-switch-thumb-size: 16px;
+    --dbv-kit-switch-thumb-offset: 3px;
+    /* checked-offset = width - thumb-size - thumb-offset = 44 - 16 - 3 */
+    --dbv-kit-switch-checked-offset: 25px;
+    --dbv-kit-switch-gap: 10px;
     --dbv-kit-switch-label-weight: normal;
 
     /* Switch colors */
-    --dbv-kit-switch-track-color: #000000;
+    --dbv-kit-switch-track-color: #b3b3b3;
     --dbv-kit-switch-thumb-color: #ffffff;
-    --dbv-kit-switch-surface-color: #ffffff;
     --dbv-kit-switch-checked-color: #2a7cb4;
 
     /* Transitions */
-    --dbv-kit-switch-transition-duration: 100ms;
-    --dbv-kit-switch-transition-easing: cubic-bezier(0.4, 0, 0.2, 1);
+    --dbv-kit-switch-transition-duration: 200ms;
+    --dbv-kit-switch-transition-easing: cubic-bezier(0, 0, 0.2, 1);
   }
 }
