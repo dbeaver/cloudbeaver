@@ -1,15 +1,13 @@
-/*
- * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
- *
- * Licensed under the Apache License, Version 2.0.
- * you may not use this file except in compliance with the License.
- */
-
 @import './_base.css';
 
 @layer base {
   .dbv-kit-switch {
+    display: flex;
+    align-items: center;
+    gap: var(--dbv-kit-switch-gap);
+  }
+
+  .dbv-kit-switch__label {
     display: flex;
     align-items: center;
     gap: var(--dbv-kit-switch-gap);
@@ -29,7 +27,6 @@
   }
 
   .dbv-kit-switch__track {
-    box-sizing: border-box;
     position: absolute;
     inset: 0;
     border-radius: var(--dbv-kit-switch-track-radius);
@@ -56,35 +53,27 @@
     pointer-events: none;
   }
 
-  .dbv-kit-switch__underlay {
+  .dbv-kit-switch__thumb {
     position: relative;
     z-index: 1;
-    margin-left: var(--dbv-kit-switch-thumb-offset);
-    display: flex;
-    align-items: center;
-    transition: margin-left var(--dbv-kit-switch-transition-duration) var(--dbv-kit-switch-transition-easing);
 
-    @media (prefers-reduced-motion: reduce) {
-      transition: none !important;
-    }
-  }
-
-  .dbv-kit-switch__thumb {
-    box-sizing: border-box;
     width: var(--dbv-kit-switch-thumb-size);
     height: var(--dbv-kit-switch-thumb-size);
+    margin-left: var(--dbv-kit-switch-thumb-offset);
     border-radius: 50%;
     background-color: var(--dbv-kit-switch-thumb-color);
     box-shadow: var(--shadow-small, 0px 1px 3px 0px rgba(0, 0, 0, 0.3), 0px 1px 1px 0px rgba(0, 0, 0, 0.2));
     pointer-events: none;
-    transition: transform var(--dbv-kit-switch-transition-duration) var(--dbv-kit-switch-transition-easing);
+
+    transition:
+      margin-left var(--dbv-kit-switch-transition-duration) var(--dbv-kit-switch-transition-easing),
+      transform var(--dbv-kit-switch-transition-duration) var(--dbv-kit-switch-transition-easing);
 
     @media (prefers-reduced-motion: reduce) {
       transition: none !important;
     }
   }
 
-  /* Focus-visible — outline on the control shell */
   .dbv-kit-switch__control:not(.dbv-kit-switch__control--disabled):has(.dbv-kit-switch__input:focus-visible) {
     outline: 2px solid var(--dbv-kit-control-outline-color, #3b82f6);
     outline-offset: 2px;
@@ -94,7 +83,7 @@
     background-color: var(--dbv-kit-switch-checked-color);
   }
 
-  .dbv-kit-switch__control--checked .dbv-kit-switch__underlay {
+  .dbv-kit-switch__control--checked .dbv-kit-switch__thumb {
     margin-left: var(--dbv-kit-switch-checked-offset);
   }
 
@@ -102,9 +91,9 @@
     opacity: 0.4;
     pointer-events: none;
     cursor: default;
+  }
 
-    & .dbv-kit-switch__thumb {
-      box-shadow: none;
-    }
+  .dbv-kit-switch__control--disabled .dbv-kit-switch__thumb {
+    box-shadow: none;
   }
 }

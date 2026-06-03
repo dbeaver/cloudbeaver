@@ -7,7 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { clsx, SwitchBase } from '@dbeaver/ui-kit';
+import { clsx, Switch as SwitchBase } from '@dbeaver/ui-kit';
 
 import { filterLayoutFakeProps } from '../../Containers/filterLayoutFakeProps.js';
 import type { ILayoutSizeProps } from '../../Containers/ILayoutSizeProps.js';

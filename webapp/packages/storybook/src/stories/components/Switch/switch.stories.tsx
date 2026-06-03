@@ -8,7 +8,7 @@
 
 import { useState } from 'react';
 
-import { SwitchBase, type SwitchBaseProps } from '@dbeaver/ui-kit';
+import { Switch as SwitchBase, type SwitchProps } from '@dbeaver/ui-kit';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 const meta = {
@@ -19,7 +19,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-function Switch({ checked: initialChecked = false, disabled, children, ...rest }: SwitchBaseProps): React.ReactElement {
+function Switch({ checked: initialChecked = false, disabled, children, ...rest }: SwitchProps): React.ReactElement {
   const [checked, setChecked] = useState(initialChecked);
   return (
     <SwitchBase {...rest} checked={checked} disabled={disabled} onChange={e => !disabled && setChecked(e.target.checked)}>
