@@ -319,8 +319,7 @@ public class ServletAppUtils {
             if (log.isTraceEnabled()) {
                 log.trace("forwarded origin: " + origin);
             }
-        }
-        if (CommonUtils.isEmpty(origin)) {
+        } else if (CommonUtils.isEmpty(origin)) {
             URI requestUrl = URI.create(request.getRequestURL().toString());
             if (log.isTraceEnabled()) {
                 log.trace("Request URL: " + requestUrl);
@@ -344,13 +343,34 @@ public class ServletAppUtils {
                 log.error("Failed to parse port from header: " + request.getHeader(HEADER_FORWARDED_PORT), e);
             }
         }
+
+        String usedScheme = uri.getScheme();
+        String usedHost = uri.getHost();
+        int usedPort = port;
+        boolean changed = false;
+        if (CommonUtils.isNotEmpty(forwardedScheme) && !forwardedScheme.equals(uri.getScheme())) {
+            usedScheme = forwardedScheme;
+            changed = true;
+        }
+        if (CommonUtils.isNotEmpty(forwardedHost) && !forwardedHost.equals(uri.getHost())) {
+            usedHost = forwardedHost;
+            changed = true;
+        }
         if (DEFAULT_PORTS.contains(port)) {
+            usedPort = -1;
+            changed = true;
+        }
+        if (log.isTraceEnabled()) {
+            log.trace("Origin URI: " + origin);
+        }
+
+        if (changed) {
             try {
                 origin = new URI(
-                    uri.getScheme(),
+                    usedScheme,
                     uri.getUserInfo(),
-                    uri.getHost(),
-                    -1,
+                    usedHost,
+                    usedPort,
                     uri.getPath(),
                     uri.getQuery(),
                     uri.getFragment()
@@ -358,9 +378,6 @@ public class ServletAppUtils {
             } catch (URISyntaxException e) {
                 log.error("Failed to create URI without port", e);
             }
-        }
-        if (log.isTraceEnabled()) {
-            log.trace("Origin URI: " + origin);
         }
 
         return origin;
