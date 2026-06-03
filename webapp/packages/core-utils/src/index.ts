@@ -90,3 +90,5 @@ export * from './isNumber.js';
 export * from './getSubjectDifferences.js';
 export * from './downloadImage.js';
 export * from './submitForm.js';
+export * from './isMouseEvent.js';
+export * from './isKeyboardEvent.js';

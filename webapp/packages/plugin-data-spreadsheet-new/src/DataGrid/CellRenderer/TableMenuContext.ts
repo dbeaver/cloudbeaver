@@ -12,8 +12,7 @@ import type { IGridDataKey } from '@cloudbeaver/plugin-data-viewer';
 
 export interface ITableMenuContext {
   menuPosition: IContextMenuPosition;
-  openMenu(activeCell: IGridDataKey, event: React.MouseEvent): void;
-  openMenuAt(activeCell: IGridDataKey, x: number, y: number): void;
+  openMenu(activeCell: IGridDataKey, event: React.MouseEvent | React.KeyboardEvent): void;
   closeMenu(): void;
 }
 

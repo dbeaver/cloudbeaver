@@ -165,9 +165,7 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
         if (isBindingPressed(event, KEY_BINDING_OPEN_CELL_CONTEXT_MENU) && this.cellContext.cell) {
           event.preventDefault();
           event.stopPropagation();
-          const x = event.currentTarget.getBoundingClientRect().right - 14;
-          const y = event.currentTarget.getBoundingClientRect().top + event.currentTarget.getBoundingClientRect().height / 2;
-          this.tableMenuContext.openMenuAt(this.cellContext.cell, x, y);
+          this.tableMenuContext.openMenu(this.cellContext.cell, event);
         }
       },
       openContextMenu(event: React.MouseEvent<HTMLDivElement>) {

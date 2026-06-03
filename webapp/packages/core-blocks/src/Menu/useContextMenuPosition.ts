@@ -8,6 +8,7 @@
 import { observable } from 'mobx';
 
 import { useObservableRef } from '../useObservableRef.js';
+import { isKeyboardEvent, isMouseEvent } from '@cloudbeaver/core-utils';
 
 export interface IContextMenuPositionCoords {
   x: number;
@@ -16,7 +17,7 @@ export interface IContextMenuPositionCoords {
 
 export interface IContextMenuPosition {
   position: IContextMenuPositionCoords | null;
-  open: (event: React.MouseEvent) => void;
+  open: (event: React.MouseEvent | React.KeyboardEvent) => void;
   openAt: (x: number, y: number) => void;
   close: () => void;
 }
@@ -25,7 +26,7 @@ export function useContextMenuPosition(): IContextMenuPosition {
   return useObservableRef<IContextMenuPosition>(
     () => ({
       position: null,
-      open(event: React.MouseEvent) {
+      open(event: React.MouseEvent | React.KeyboardEvent) {
         if (!event.currentTarget.contains(event.target as Node)) {
           return;
         }
@@ -33,8 +34,16 @@ export function useContextMenuPosition(): IContextMenuPosition {
         event.preventDefault();
         event.stopPropagation();
 
-        let x = event.clientX;
-        let y = event.clientY;
+        let x = 0;
+        let y = 0;
+
+        if (isMouseEvent(event)) {
+          x = event.clientX;
+          y = event.clientY;
+        } else if (isKeyboardEvent(event)) {
+          x = event.currentTarget.getBoundingClientRect().right;
+          y = event.currentTarget.getBoundingClientRect().bottom;
+        }
 
         if (x === 0 && y === 0) {
           const rect = event.currentTarget.getBoundingClientRect();
