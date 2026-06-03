@@ -344,20 +344,20 @@ public class ServletAppUtils {
             }
         }
 
-        String usedScheme = uri.getScheme();
-        String usedHost = uri.getHost();
-        int usedPort = port;
+        String finalScheme = uri.getScheme();
+        String finalHost = uri.getHost();
+        int finalPort = port;
         boolean changed = false;
-        if (CommonUtils.isNotEmpty(forwardedScheme) && !forwardedScheme.equals(uri.getScheme())) {
-            usedScheme = forwardedScheme;
+        if (CommonUtils.isNotEmpty(forwardedScheme) && !forwardedScheme.equals(finalScheme)) {
+            finalScheme = forwardedScheme;
             changed = true;
         }
-        if (CommonUtils.isNotEmpty(forwardedHost) && !forwardedHost.equals(uri.getHost())) {
-            usedHost = forwardedHost;
+        if (CommonUtils.isNotEmpty(forwardedHost) && !forwardedHost.equals(finalHost)) {
+            finalHost = forwardedHost;
             changed = true;
         }
         if (DEFAULT_PORTS.contains(port)) {
-            usedPort = -1;
+            finalPort = -1;
             changed = true;
         }
         if (log.isTraceEnabled()) {
@@ -367,10 +367,10 @@ public class ServletAppUtils {
         if (changed) {
             try {
                 origin = new URI(
-                    usedScheme,
+                    finalScheme,
                     uri.getUserInfo(),
-                    usedHost,
-                    usedPort,
+                    finalHost,
+                    finalPort,
                     uri.getPath(),
                     uri.getQuery(),
                     uri.getFragment()
