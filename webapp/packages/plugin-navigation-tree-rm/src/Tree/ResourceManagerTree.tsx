@@ -131,7 +131,7 @@ export const ResourceManagerTree: React.FC<Props> = observer(function ResourceMa
             <div className={s(styles, { message: true })}>{children}</div>
           </div>
         )}
-        onOpen={node => navTreeService.navToNode(node.id, node.parentId)}
+        onOpen={node => navTreeService.navToNode(node.uri, node.parentId)}
       />
     </CaptureView>
   );

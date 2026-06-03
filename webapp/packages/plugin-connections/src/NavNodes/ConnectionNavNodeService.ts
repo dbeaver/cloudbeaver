@@ -77,10 +77,12 @@ export class ConnectionNavNodeService {
       ServerEventId.CbDatasourceFolderCreated,
       data => {
         const parents = data.nodePaths.map(nodeId => {
-          const parents = getFolderNodeParents(nodeId);
+          const node = this.navNodeInfoResource.get(nodeId);
+          const parents = node ? getFolderNodeParents(node) : [];
 
           return parents[parents.length - 1]!;
         });
+
         this.navTreeResource.markOutdated(resourceKeyList(parents));
       },
       undefined,
@@ -90,7 +92,8 @@ export class ConnectionNavNodeService {
       ServerEventId.CbDatasourceFolderDeleted,
       data => {
         const parents = data.nodePaths.map(nodeId => {
-          const parents = getFolderNodeParents(nodeId);
+          const node = this.navNodeInfoResource.get(nodeId);
+          const parents = node ? getFolderNodeParents(node) : [];
 
           return parents[parents.length - 1]!;
         });
@@ -197,7 +200,7 @@ export class ConnectionNavNodeService {
           return;
         }
 
-        const nodePath = connectionInfo.nodePath ?? NodeManagerUtils.connectionIdToConnectionNodeId(key.connectionId);
+        const nodePath = connectionInfo.nodePath ?? NodeManagerUtils.connectionIdToConnectionNodeId(key.projectId, key.connectionId);
 
         const node = this.navNodeInfoResource.get(nodePath);
         const folder = node?.parentId ?? getProjectNodeId(key.projectId);
@@ -307,9 +310,9 @@ export class ConnectionNavNodeService {
         ResourceKeyUtils.some(
           key,
           key =>
-            value.parentNode?.id === key ||
-            value.catalogList.some(catalog => catalog.catalog?.id === key || catalog.schemaList.some(schema => schema?.id === key)) ||
-            value.schemaList.some(schema => schema?.id === key),
+            value.parentNode?.uri === key ||
+            value.catalogList.some(catalog => catalog.catalog?.uri === key || catalog.schemaList.some(schema => schema?.uri === key)) ||
+            value.schemaList.some(schema => schema?.uri === key),
         ),
       )
       .map(([key]) => key);

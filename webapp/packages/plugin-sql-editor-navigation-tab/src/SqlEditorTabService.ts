@@ -235,10 +235,10 @@ export class SqlEditorTabService extends Bootstrap {
       schema = this.containerResource.getSchema(connectionKey, defaultSchema);
     }
 
-    let nodeId = schema?.id ?? catalogData?.catalog.id;
+    let nodeId = schema?.uri ?? catalogData?.catalog.uri;
 
     if (!nodeId) {
-      nodeId = NodeManagerUtils.connectionIdToConnectionNodeId(connectionId);
+      nodeId = NodeManagerUtils.connectionIdToConnectionNodeId(projectId, connectionId);
     }
 
     const parents = this.navNodeInfoResource.getParents(nodeId);

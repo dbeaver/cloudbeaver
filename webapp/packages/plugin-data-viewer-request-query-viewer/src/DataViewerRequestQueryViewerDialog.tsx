@@ -46,7 +46,7 @@ export const DataViewerRequestQueryViewerDialog: DialogComponent<IPayload> = obs
   }
 
   function openSqlEditor() {
-    const nodeId = NodeManagerUtils.connectionIdToConnectionNodeId(props.payload.connectionKey.connectionId);
+    const nodeId = NodeManagerUtils.connectionIdToConnectionNodeId(props.payload.connectionKey.projectId, props.payload.connectionKey.connectionId);
     const container = navNodeManagerService.getNodeContainerInfo(nodeId);
     const connection = connectionInfoResource.get(props.payload.connectionKey);
     const name = connection?.name ? '<' + connection.name + '> ' : 'SQL';

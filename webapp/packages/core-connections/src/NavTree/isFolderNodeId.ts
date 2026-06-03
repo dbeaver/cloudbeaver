@@ -6,6 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
-export function isFolderNodeId(nodeId: string): boolean {
-  return nodeId.startsWith('folder://');
+import { NAV_NODE_TYPE_FOLDER, type NavNode } from '@cloudbeaver/core-navigation-tree';
+
+export function isFolderNodeId(node: NavNode): boolean {
+  return node.nodeType === NAV_NODE_TYPE_FOLDER;
 }

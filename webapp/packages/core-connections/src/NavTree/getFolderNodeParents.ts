@@ -7,12 +7,13 @@
  */
 import { getProjectNodeId } from '@cloudbeaver/core-projects';
 import { getPathParents } from '@cloudbeaver/core-utils';
+import type { NavNode } from '@cloudbeaver/core-navigation-tree';
 
 import { isFolderNodeId } from './isFolderNodeId.js';
 
-export function getFolderNodeParents(nodeId: string): string[] {
-  if (isFolderNodeId(nodeId)) {
-    const parents = getPathParents(nodeId);
+export function getFolderNodeParents(node: NavNode): string[] {
+  if (isFolderNodeId(node)) {
+    const parents = getPathParents(node.uri);
 
     return [parents[0]!, getProjectNodeId(parents[1]!.replace('folder://', '')), ...parents.slice(2)];
   }
