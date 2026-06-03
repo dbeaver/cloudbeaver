@@ -17,6 +17,7 @@
 package io.cloudbeaver.utils;
 
 import io.cloudbeaver.model.WebAsyncTaskInfo;
+import io.cloudbeaver.model.session.BaseWebSession;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.websocket.event.task.WSSessionTaskInfoEvent;
 import org.jkiss.code.NotNull;
@@ -27,6 +28,8 @@ import org.jkiss.dbeaver.model.websocket.event.WSEvent;
 import org.jkiss.dbeaver.model.websocket.event.permissions.WSSubjectPermissionEvent;
 import org.jkiss.dbeaver.model.websocket.event.resource.WSResourceProperty;
 import org.jkiss.dbeaver.model.websocket.event.resource.WSResourceUpdatedEvent;
+
+import java.util.Objects;
 
 public class WebEventUtils {
 
@@ -112,9 +115,12 @@ public class WebEventUtils {
         ServletAppUtils.getServletApplication().getEventController().addEvent(event);
     }
 
-    @NotNull
-    public static String getSmSessionId(@NotNull WebSession webSession) {
+    @Nullable
+    public static String getSmSessionId(@NotNull BaseWebSession webSession) {
         return webSession.getUserContext().getSmSessionId();
     }
 
+    public static boolean isSmSessionIdEquals(@NotNull BaseWebSession webSession, @Nullable String smSessionId) {
+        return Objects.equals(getSmSessionId(webSession), smSessionId);
+    }
 }

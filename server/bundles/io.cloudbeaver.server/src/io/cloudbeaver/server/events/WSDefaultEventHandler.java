@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package io.cloudbeaver.server.events;
 
 import io.cloudbeaver.model.session.BaseWebSession;
 import io.cloudbeaver.server.WebAppUtils;
+import io.cloudbeaver.utils.WebEventUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.Log;
@@ -62,6 +63,6 @@ public abstract class WSDefaultEventHandler<EVENT extends WSEvent> implements WS
     }
 
     protected boolean isAcceptableInSession(@NotNull BaseWebSession activeUserSession, @NotNull EVENT event) {
-        return !WSWebUtils.isSessionIdEquals(activeUserSession, event.getSessionId()); // skip events from current session
+        return !WebEventUtils.isSmSessionIdEquals(activeUserSession, event.getSessionId()); // skip events from current session
     }
 }
