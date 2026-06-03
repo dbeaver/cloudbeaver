@@ -71,12 +71,12 @@ export const ContextMenu = observer<IContextMenuNewProps>(function ContextMenuIn
     ['getAnchorRect', 'handleVisibleSwitch'],
   );
 
-  const showAtPosition = !!contextMenuPosition?.position;
   useLayoutEffect(() => {
-    if (showAtPosition) {
+    if (contextMenuPosition?.position) {
       menu.show();
+      menu.render();
     }
-  }, [showAtPosition, menu]);
+  }, [contextMenuPosition?.position, menu]);
 
   const menuContext = useMemo<IMenuContext>(() => ({ menu: menuData, rtl: isRtl }), [menuData, isRtl]);
 
