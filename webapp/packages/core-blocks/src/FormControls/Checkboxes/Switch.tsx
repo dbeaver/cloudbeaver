@@ -13,7 +13,6 @@ import { filterLayoutFakeProps } from '../../Containers/filterLayoutFakeProps.js
 import type { ILayoutSizeProps } from '../../Containers/ILayoutSizeProps.js';
 import { Field } from '../Field.js';
 import { FieldDescription } from '../FieldDescription.js';
-import { FieldLabel } from '../FieldLabel.js';
 import { isControlPresented } from '../isControlPresented.js';
 import type { ICheckboxControlledProps, ICheckboxObjectProps } from './Checkbox.js';
 import './Switch.css';
@@ -73,21 +72,14 @@ export const Switch: SwitchType = observer(function Switch({
         disabled={disabled}
         className={clsx(
           'switch-body',
-          'theme-typography--body1',
+          mod.includes('primary') && 'theme-typography--body1',
+          mod.includes('dense') && 'theme-typography--body2',
+          mod.map(m => `switch-label--${String(m)}`),
           mod.map(m => `switch-body--${String(m)}`),
         )}
         onChange={checkboxState.change}
       >
-        <FieldLabel
-          htmlFor={id || value || name}
-          className={clsx(
-            'switch-label',
-            mod.includes('dense') && 'theme-typography--body2',
-            mod.map(m => `switch-label--${String(m)}`),
-          )}
-        >
-          {children}
-        </FieldLabel>
+        {children}
       </SwitchBase>
       {description && <FieldDescription>{description}</FieldDescription>}
     </Field>

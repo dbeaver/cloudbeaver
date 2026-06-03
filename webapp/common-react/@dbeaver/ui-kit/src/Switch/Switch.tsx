@@ -7,6 +7,7 @@
  */
 import clsx from 'clsx';
 import './Switch.css';
+import { useId } from 'react';
 
 export interface SwitchBaseProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type'> {
   className?: string;
@@ -14,8 +15,10 @@ export interface SwitchBaseProps extends Omit<React.InputHTMLAttributes<HTMLInpu
 }
 
 export function SwitchBase({ checked, disabled, children, className, id, onChange, ...inputRest }: SwitchBaseProps): React.ReactElement {
+  const labelId = useId();
+
   return (
-    <div className={clsx('dbv-kit-switch', className)}>
+    <label className={clsx('dbv-kit-switch', className)}>
       <div
         className={clsx('dbv-kit-switch__control', {
           'dbv-kit-switch__control--checked': checked,
@@ -26,7 +29,7 @@ export function SwitchBase({ checked, disabled, children, className, id, onChang
         <input
           {...inputRest}
           type="checkbox"
-          id={id}
+          id={id || labelId}
           role="switch"
           aria-checked={checked}
           checked={checked}
@@ -39,6 +42,6 @@ export function SwitchBase({ checked, disabled, children, className, id, onChang
         </div>
       </div>
       {children}
-    </div>
+    </label>
   );
 }

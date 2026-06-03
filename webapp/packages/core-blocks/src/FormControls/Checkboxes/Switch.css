@@ -31,6 +31,12 @@
     --dbv-kit-switch-transition-duration: var(--duration-medium);
     --dbv-kit-switch-transition-easing: var(--ease-smooth);
     --dbv-kit-switch-label-weight: normal;
+
+    cursor: pointer;
+    user-select: none;
+    min-width: 50px;
+    white-space: pre-wrap !important;
+    font-weight: var(--dbv-kit-switch-label-weight);
   }
 
   .switch-body--primary {
@@ -46,15 +52,6 @@
     --dbv-kit-switch-thumb-size: 12px;
     --dbv-kit-switch-thumb-offset: 2px;
     --dbv-kit-switch-checked-offset: 14px;
-  }
-
-  .switch-label {
-    cursor: pointer;
-    user-select: none;
-    display: block;
-    min-width: 50px;
-    white-space: pre-wrap !important;
-    font-weight: var(--dbv-kit-switch-label-weight);
   }
 
   .switch-label--dense {
