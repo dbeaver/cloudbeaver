@@ -337,7 +337,7 @@ public class WebSQLUtils {
         @NotNull DBDAttributeBinding[] bindings
     ) {
         Map<DBSEntityAttribute, Integer> attrToIndex = new HashMap<>();
-        LinkedHashSet<DBSEntity> entities = new LinkedHashSet<>();
+        Set<DBSEntity> entities = new LinkedHashSet<>();
         for (int i = 0; i < bindings.length; i++) {
             DBSEntityAttribute ea = bindings[i].getEntityAttribute();
             if (ea == null) {
