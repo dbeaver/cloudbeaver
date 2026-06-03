@@ -16,6 +16,7 @@ import { type IDataGridCellRenderer, type ICellPosition } from '@cloudbeaver/plu
 import {
   DATA_CONTEXT_DV_RESULT_KEY,
   DatabaseEditChangeType,
+  GridDataKeysUtils,
   KEY_BINDING_OPEN_CELL_CONTEXT_MENU,
   type IGridDataKey,
   type IGridRowKey,
@@ -55,7 +56,14 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
   const cellContext = useObservableRef(
     () => ({
       get isMenuVisible(): boolean {
-        return this.cell === menu.menu.context.get(DATA_CONTEXT_DV_RESULT_KEY) && !!this.tableMenuContext.menuPosition.position;
+        const currentCell = this.cell;
+        const activeCell = menu.menu.context.get(DATA_CONTEXT_DV_RESULT_KEY);
+
+        if (!currentCell || !activeCell) {
+          return false;
+        }
+
+        return GridDataKeysUtils.isElementsKeyEqual(currentCell, activeCell) && !!this.tableMenuContext.menuPosition.position;
       },
       isFocused: false,
       isHovered: false,
