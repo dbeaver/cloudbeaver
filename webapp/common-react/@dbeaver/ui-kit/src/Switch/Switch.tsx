@@ -7,15 +7,17 @@
  */
 import clsx from 'clsx';
 import './Switch.css';
-import { useId } from 'react';
+import { useId, useState } from 'react';
 
 export interface SwitchBaseProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type'> {
   className?: string;
   children?: React.ReactNode;
 }
 
-export function SwitchBase({ checked, disabled, children, className, id, onChange, ...inputRest }: SwitchBaseProps): React.ReactElement {
+export function SwitchBase({ disabled, children, className, id, ...props }: SwitchBaseProps): React.ReactElement {
   const labelId = useId();
+  const [innerChecked, setInnerChecked] = useState(props.defaultChecked ?? false);
+  const checked = props.checked ?? innerChecked;
 
   return (
     <label className={clsx('dbv-kit-switch', className)}>
@@ -27,7 +29,7 @@ export function SwitchBase({ checked, disabled, children, className, id, onChang
       >
         <div className="dbv-kit-switch__track" />
         <input
-          {...inputRest}
+          {...props}
           type="checkbox"
           id={id || labelId}
           role="switch"
@@ -35,7 +37,10 @@ export function SwitchBase({ checked, disabled, children, className, id, onChang
           checked={checked}
           disabled={disabled}
           className="dbv-kit-switch__input"
-          onChange={onChange}
+          onChange={event => {
+            setInnerChecked(event.target.checked);
+            props.onChange?.(event);
+          }}
         />
         <div className="dbv-kit-switch__underlay">
           <div className="dbv-kit-switch__thumb" />
