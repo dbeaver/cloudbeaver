@@ -18,7 +18,6 @@ export interface IContextMenuPositionCoords {
 export interface IContextMenuPosition {
   position: IContextMenuPositionCoords | null;
   open: (event: React.MouseEvent | React.KeyboardEvent) => void;
-  openAt: (x: number, y: number) => void;
   close: () => void;
 }
 
@@ -52,10 +51,10 @@ export function useContextMenuPosition(): IContextMenuPosition {
           y = rect.top + rect.height / 2;
         }
 
-        this.openAt(x, y);
-      },
-      openAt(x: number, y: number) {
-        this.position = { x, y };
+        this.position = {
+          x,
+          y,
+        };
       },
       close() {
         this.position = null;
@@ -63,6 +62,6 @@ export function useContextMenuPosition(): IContextMenuPosition {
     }),
     { position: observable.ref },
     false,
-    ['open', 'openAt', 'close'],
+    ['open', 'close'],
   );
 }
