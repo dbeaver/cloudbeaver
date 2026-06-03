@@ -50,7 +50,6 @@ import {
   type IHistoryEntry,
   getKeyFromHistoryEntry,
   MENU_DV_CONTEXT_MENU,
-  DATA_CONTEXT_DV_RESULT_KEY,
   DATA_CONTEXT_DV_DDM,
   DATA_CONTEXT_DV_DDM_RESULT_INDEX,
   DATA_CONTEXT_DV_SIMPLE,
@@ -198,9 +197,6 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
 
   const menu = useDataGridMenu({
     menu: useMenu({ menu: MENU_DV_CONTEXT_MENU }),
-    setContext(context, id, activeCell) {
-      context.set(DATA_CONTEXT_DV_RESULT_KEY, activeCell, id);
-    },
   });
 
   const spreadsheetActions = useObjectRef<IDataPresentationActions<IGridDataKey>>({

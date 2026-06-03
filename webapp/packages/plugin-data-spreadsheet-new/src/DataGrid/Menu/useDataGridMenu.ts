@@ -9,20 +9,19 @@ import { action, observable } from 'mobx';
 import { useId } from 'react';
 
 import { useContextMenuPosition, useObservableRef, type IContextMenuPosition } from '@cloudbeaver/core-blocks';
-import type { IDataContext } from '@cloudbeaver/core-data-context';
 import type { IMenuData } from '@cloudbeaver/core-view';
-import type { IGridDataKey } from '@cloudbeaver/plugin-data-viewer';
+import { DATA_CONTEXT_DV_RESULT_KEY, type IGridDataKey } from '@cloudbeaver/plugin-data-viewer';
 
 export interface IDataGridMenu {
   menu: IMenuData;
   menuPosition: IContextMenuPosition;
+  id: string;
   openMenu(activeCell: IGridDataKey, event: React.MouseEvent): void;
   closeMenu(): void;
 }
 
 interface IDataGridMenuOptions {
   menu: IMenuData;
-  setContext?: (context: IDataContext, id: string, activeCell: IGridDataKey) => void;
 }
 
 export function useDataGridMenu(options: IDataGridMenuOptions): Readonly<IDataGridMenu> {
@@ -31,14 +30,11 @@ export function useDataGridMenu(options: IDataGridMenuOptions): Readonly<IDataGr
 
   const state = useObservableRef<IDataGridMenu>(
     () => ({
+      id,
       menuPosition,
       openMenu(activeCell: IGridDataKey, event: React.MouseEvent) {
         this.menu.context.deleteForId(id);
-
-        if (options.setContext) {
-          options.setContext(this.menu.context, id, activeCell);
-        }
-
+        this.menu.context.set(DATA_CONTEXT_DV_RESULT_KEY, activeCell, this.id);
         this.menuPosition.open(event);
       },
       closeMenu() {
@@ -50,7 +46,7 @@ export function useDataGridMenu(options: IDataGridMenuOptions): Readonly<IDataGr
       openMenu: action.bound,
       closeMenu: action.bound,
     },
-    { menu: options.menu },
+    { menu: options.menu, id },
   );
 
   return state;
