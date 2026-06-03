@@ -10,14 +10,9 @@ import { useContext } from 'react';
 
 import { MenuItemElementStyles, s, SContext, type StyleRegistry, useS } from '@cloudbeaver/core-blocks';
 import { ContextMenu } from '@cloudbeaver/core-ui';
-import type { IMenuData } from '@cloudbeaver/core-view';
 
 import { TableMenuContext } from '../CellRenderer/TableMenuContext.js';
 import classes from './CellMenu.module.css';
-
-interface Props {
-  menu: IMenuData;
-}
 
 const registry: StyleRegistry = [
   [
@@ -29,9 +24,10 @@ const registry: StyleRegistry = [
   ],
 ];
 
-export const CellMenu = observer<Props>(function CellMenu({ menu }) {
+export const CellMenu = observer(function CellMenu() {
   const style = useS(classes);
   const tableMenuContext = useContext(TableMenuContext);
+  const menu = tableMenuContext.menu;
 
   function handleStateSwitch(visible: boolean) {
     if (!visible) {
@@ -42,7 +38,6 @@ export const CellMenu = observer<Props>(function CellMenu({ menu }) {
   return (
     <SContext registry={registry}>
       <ContextMenu
-        key={`${tableMenuContext.menuPosition.position?.x}-${tableMenuContext.menuPosition.position?.y}`}
         className={s(style, { contextMenu: true })}
         menu={menu}
         contextMenuPosition={tableMenuContext.menuPosition}

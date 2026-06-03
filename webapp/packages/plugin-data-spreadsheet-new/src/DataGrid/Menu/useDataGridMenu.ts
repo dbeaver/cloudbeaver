@@ -16,7 +16,7 @@ export interface IDataGridMenu {
   menu: IMenuData;
   menuPosition: IContextMenuPosition;
   id: string;
-  openMenu(activeCell: IGridDataKey, event: React.MouseEvent): void;
+  openMenu(activeCell: IGridDataKey, event: React.MouseEvent | React.KeyboardEvent): void;
   closeMenu(): void;
 }
 
@@ -32,7 +32,7 @@ export function useDataGridMenu(options: IDataGridMenuOptions): Readonly<IDataGr
     () => ({
       id,
       menuPosition,
-      openMenu(activeCell: IGridDataKey, event: React.MouseEvent) {
+      openMenu(activeCell: IGridDataKey, event: React.MouseEvent | React.KeyboardEvent) {
         this.menu.context.deleteForId(id);
         this.menu.context.set(DATA_CONTEXT_DV_RESULT_KEY, activeCell, this.id);
         this.menuPosition.open(event);

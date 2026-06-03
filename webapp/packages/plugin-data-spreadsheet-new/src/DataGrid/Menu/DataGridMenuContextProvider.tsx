@@ -20,7 +20,7 @@ export const DataGridMenuContextProvider = observer<PropsWithChildren<Props>>(fu
   return (
     <TableMenuContext.Provider value={menu}>
       {children}
-      <CellMenu menu={menu.menu} />
+      <CellMenu />
     </TableMenuContext.Provider>
   );
 });

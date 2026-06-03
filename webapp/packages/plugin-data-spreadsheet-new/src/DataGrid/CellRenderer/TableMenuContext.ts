@@ -6,14 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 import { createContext } from 'react';
+import type { IDataGridMenu } from '../Menu/useDataGridMenu.js';
 
-import type { IContextMenuPosition } from '@cloudbeaver/core-blocks';
-import type { IGridDataKey } from '@cloudbeaver/plugin-data-viewer';
-
-export interface ITableMenuContext {
-  menuPosition: IContextMenuPosition;
-  openMenu(activeCell: IGridDataKey, event: React.MouseEvent | React.KeyboardEvent): void;
-  closeMenu(): void;
-}
-
-export const TableMenuContext = createContext<ITableMenuContext>(undefined as any);
+export const TableMenuContext = createContext<IDataGridMenu>(undefined as any);
