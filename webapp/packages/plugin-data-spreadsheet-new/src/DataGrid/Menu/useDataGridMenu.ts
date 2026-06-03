@@ -17,7 +17,6 @@ export interface IDataGridMenu {
   menu: IMenuData;
   menuPosition: IContextMenuPosition;
   openMenu(activeCell: IGridDataKey, event: React.MouseEvent): void;
-  openMenuAt(activeCell: IGridDataKey, x: number, y: number): void;
   closeMenu(): void;
 }
 
@@ -42,15 +41,6 @@ export function useDataGridMenu(options: IDataGridMenuOptions): Readonly<IDataGr
 
         this.menuPosition.open(event);
       },
-      openMenuAt(activeCell: IGridDataKey, x: number, y: number) {
-        this.menu.context.deleteForId(id);
-
-        if (options.setContext) {
-          options.setContext(this.menu.context, id, activeCell);
-        }
-
-        this.menuPosition.openAt(x, y);
-      },
       closeMenu() {
         this.menuPosition.close();
       },
@@ -58,7 +48,6 @@ export function useDataGridMenu(options: IDataGridMenuOptions): Readonly<IDataGr
     {
       menuPosition: observable.ref,
       openMenu: action.bound,
-      openMenuAt: action.bound,
       closeMenu: action.bound,
     },
     { menu: options.menu },
