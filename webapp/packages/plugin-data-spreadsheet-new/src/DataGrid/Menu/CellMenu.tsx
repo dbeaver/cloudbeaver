@@ -13,6 +13,7 @@ import { ContextMenu } from '@cloudbeaver/core-ui';
 
 import { TableMenuContext } from '../CellRenderer/TableMenuContext.js';
 import classes from './CellMenu.module.css';
+import { DataGridContext } from '../DataGridContext.js';
 
 const registry: StyleRegistry = [
   [
@@ -28,10 +29,12 @@ export const CellMenu = observer(function CellMenu() {
   const style = useS(classes);
   const tableMenuContext = useContext(TableMenuContext);
   const menu = tableMenuContext.menu;
+  const gridContext = useContext(DataGridContext);
 
   function handleStateSwitch(visible: boolean) {
     if (!visible) {
       tableMenuContext.closeMenu();
+      gridContext.focus();
     }
   }
 
