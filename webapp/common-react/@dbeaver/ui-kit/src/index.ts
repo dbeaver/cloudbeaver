@@ -24,6 +24,7 @@ export {
 export { Button, ButtonBase, type ButtonProps, ButtonIcon, type ButtonIconProps, UnstyledButton, type UnstyledButtonProps } from './Button/Button.js';
 export { IconButton, IconButtonBase, type IconButtonProps } from './IconButton/IconButton.js';
 export { Checkbox, CheckboxBase, type CheckboxProps } from './Checkbox/Checkbox.js';
+export { CheckboxIndicator, type CheckboxIndicatorProps } from './Checkbox/CheckboxIndicator.js';
 export { ColorPicker } from './ColorPicker/ColorPicker.js';
 export { ColorPickerBase, type ColorPickerProps } from './ColorPicker/ColorPickerBase.js';
 export { Input, InputBase, type InputProps } from './Input/Input.js';
@@ -50,6 +51,9 @@ export { Popover, usePopoverStore, type PopoverStore } from './Popover/Popover.j
 export { SelectField, type SelectFieldProps, type SelectItem } from './Select/SelectField.js';
 export { Spinner, type SpinnerProps } from './Spinner/Spinner.js';
 export { Radio, RadioGroup, useRadioContext, useRadioStore, type RadioProviderProps, type RadioProps, type RadioGroupProps } from './Radio/index.js';
+export { RadioControl, type RadioControlProps } from './Radio/RadioControl.js';
+export { RadioRoot, type RadioRootProps } from './Radio/RadioRoot.js';
+export { RadioLabel, type RadioLabelProps } from './Radio/RadioLabel.js';
 export { Icon, type IconProps } from './Icon/Icon.js';
 export * from './utils/clsx.js';
 export * from './ComponentProvider.js';
