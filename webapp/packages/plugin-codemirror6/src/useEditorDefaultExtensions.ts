@@ -22,7 +22,7 @@ import {
   tooltips,
 } from '@codemirror/view';
 import { classHighlighter } from '@lezer/highlight';
-import { useRef } from 'react';
+import { useState } from 'react';
 
 import { GlobalConstants, isObjectsEqual } from '@cloudbeaver/core-utils';
 import { clsx } from '@dbeaver/ui-kit';
@@ -119,16 +119,18 @@ const DEFAULT_EXTENSIONS_COMPARTMENT = new Compartment();
 
 /** Provides the necessary extensions to establish a basic editor */
 export function useEditorDefaultExtensions(options?: IDefaultExtensions): [Compartment, Extension] {
-  const previousOptions = useRef(options);
-  const isOptionsChanged = !isObjectsEqual(options, previousOptions.current);
-  const extensions = useRef<[Compartment, Extension] | null>(null);
+  const [state, setState] = useState<{ options: IDefaultExtensions | undefined; result: [Compartment, Extension] }>(() => ({
+    options,
+    result: createExtensions(options),
+  }));
 
-  if (isOptionsChanged || extensions.current === null) {
-    previousOptions.current = options;
-    extensions.current = createExtensions(options);
+  if (!isObjectsEqual(options, state.options)) {
+    const result = createExtensions(options);
+    setState({ options, result });
+    return result;
   }
 
-  return extensions.current;
+  return state.result;
 }
 
 function createExtensions(options?: IDefaultExtensions): [Compartment, Extension] {
