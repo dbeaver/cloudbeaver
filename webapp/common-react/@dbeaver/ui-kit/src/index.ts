@@ -72,3 +72,4 @@ export {
   type CompositeProviderProps,
   type CompositeStore,
 } from './Composite/Composite.js';
+export { type ControlSize } from './types/controls.js';
