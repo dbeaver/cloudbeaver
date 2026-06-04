@@ -65,22 +65,33 @@ export const Switch: SwitchType = observer(function Switch({
 
   return (
     <Field title={rest.title} className={clsx('switch-field', className)}>
-      <SwitchBase
+      <SwitchBase.Provider
         {...rest}
         id={id || value || name}
         checked={checkboxState.checked}
         disabled={disabled}
         className={clsx(
           'switch-body',
-          mod.includes('primary') && 'theme-typography--body1',
-          mod.includes('dense') && 'theme-typography--body2',
-          mod.map(m => `switch-label--${String(m)}`),
           mod.map(m => `switch-body--${String(m)}`),
         )}
         onChange={checkboxState.change}
       >
-        {children}
-      </SwitchBase>
+        <SwitchBase.Track />
+        <SwitchBase.Input />
+        <SwitchBase.Thumb />
+        {children && (
+          <SwitchBase.Label
+            className={clsx(
+              'switch-label',
+              mod.includes('primary') && 'theme-typography--body1',
+              mod.includes('dense') && 'theme-typography--body2',
+              mod.map(m => `switch-label--${String(m)}`),
+            )}
+          >
+            {children}
+          </SwitchBase.Label>
+        )}
+      </SwitchBase.Provider>
       {description && <FieldDescription>{description}</FieldDescription>}
     </Field>
   );

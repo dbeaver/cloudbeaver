@@ -5,73 +5,98 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import clsx from 'clsx';
 import './Switch.css';
-import { useId, useState } from 'react';
+import clsx from 'clsx';
+import { useSwitchContext } from './SwitchContext.js';
+import { SwitchProvider } from './SwitchProvider.js';
 
 export interface SwitchProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type'> {
   className?: string;
   children?: React.ReactNode;
 }
 
-function SwitchBase({ disabled, children, className, id, ...props }: SwitchProps): React.ReactElement {
-  const labelId = useId();
-  const [innerChecked, setInnerChecked] = useState(props.defaultChecked ?? false);
-  const checked = props.checked ?? innerChecked;
+function SwitchInput({ className, id, onBlur, onChange, onFocus, ...props }: React.InputHTMLAttributes<HTMLInputElement>): React.ReactElement {
+  const { checked, disabled, focusVisible, inputId, inputProps, handleBlur, handleChange, handleFocus } = useSwitchContext();
 
   return (
-    <Switch.Label className={clsx('dbv-kit-switch', className)}>
-      <Switch.Control
-        className={clsx({
-          'dbv-kit-switch__control--checked': checked,
-          'dbv-kit-switch__control--disabled': disabled,
-        })}
-      >
-        <Switch.Track />
-        <Switch.Input
-          {...props}
-          type="checkbox"
-          id={id || labelId}
-          role="switch"
-          aria-checked={checked}
-          checked={checked}
-          disabled={disabled}
-          onChange={event => {
-            setInnerChecked(event.target.checked);
-            props.onChange?.(event);
-          }}
-        />
-        <Switch.Thumb />
-      </Switch.Control>
-      {children}
-    </Switch.Label>
+    <input
+      {...inputProps}
+      {...props}
+      type="checkbox"
+      role="switch"
+      id={id || inputId}
+      aria-checked={checked}
+      checked={checked}
+      disabled={disabled}
+      data-checked={checked || undefined}
+      data-disabled={disabled || undefined}
+      data-focus-visible={focusVisible || undefined}
+      className={clsx('dbv-kit-switch__input', className)}
+      onChange={event => {
+        handleChange(event);
+        onChange?.(event);
+      }}
+      onFocus={event => {
+        handleFocus(event);
+        onFocus?.(event);
+      }}
+      onBlur={event => {
+        handleBlur(event);
+        onBlur?.(event);
+      }}
+    />
   );
 }
 
-function SwitchControl({ children, className }: { children?: React.ReactNode; className?: string }) {
-  return <div className={clsx('dbv-kit-switch__control', className)}>{children}</div>;
+function SwitchLabel({ children, className, htmlFor, ...props }: React.LabelHTMLAttributes<HTMLLabelElement>): React.ReactElement {
+  const { checked, disabled, focusVisible, inputId } = useSwitchContext();
+
+  return (
+    <label
+      {...props}
+      className={clsx('dbv-kit-switch__label', className)}
+      htmlFor={htmlFor || inputId}
+      data-checked={checked || undefined}
+      data-disabled={disabled || undefined}
+      data-focus-visible={focusVisible || undefined}
+    >
+      {children}
+    </label>
+  );
 }
 
-function SwitchInput({ className, role, type, ...props }: React.InputHTMLAttributes<HTMLInputElement>) {
-  return <input {...props} type="checkbox" role="switch" className={clsx('dbv-kit-switch__input', className)} />;
+function SwitchTrack(): React.ReactElement {
+  const { checked, disabled, focusVisible } = useSwitchContext();
+
+  return (
+    <div
+      className="dbv-kit-switch__track"
+      data-checked={checked || undefined}
+      data-disabled={disabled || undefined}
+      data-focus-visible={focusVisible || undefined}
+    />
+  );
 }
 
-function SwitchLabel({ children, className }: { children?: React.ReactNode; className?: string }) {
-  return <label className={clsx('dbv-kit-switch__label', className)}>{children}</label>;
+function SwitchThumb(): React.ReactElement {
+  const { checked, disabled, focusVisible } = useSwitchContext();
+
+  return (
+    <div
+      className="dbv-kit-switch__thumb"
+      data-checked={checked || undefined}
+      data-disabled={disabled || undefined}
+      data-focus-visible={focusVisible || undefined}
+    />
+  );
 }
 
-function SwitchTrack() {
-  return <div className="dbv-kit-switch__track" />;
-}
-
-function SwitchThumb() {
-  return <div className="dbv-kit-switch__thumb" />;
-}
-
-export const Switch = Object.assign(SwitchBase, {
-  Control: SwitchControl,
+export const Switch = {
+  Provider: SwitchProvider,
   Input: SwitchInput,
   Track: SwitchTrack,
   Thumb: SwitchThumb,
   Label: SwitchLabel,
-});
+};
+
+export { useSwitchContext };

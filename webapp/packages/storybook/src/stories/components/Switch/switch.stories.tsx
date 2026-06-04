@@ -13,7 +13,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 
 const meta = {
   title: 'Components/Switch',
-  component: SwitchBase,
+  component: SwitchBase.Provider,
 } satisfies Meta<typeof SwitchBase>;
 
 export default meta;
@@ -22,9 +22,12 @@ type Story = StoryObj<typeof meta>;
 function Switch({ checked: initialChecked = false, disabled, children, ...rest }: SwitchProps): React.ReactElement {
   const [checked, setChecked] = useState(initialChecked);
   return (
-    <SwitchBase {...rest} checked={checked} disabled={disabled} onChange={e => !disabled && setChecked(e.target.checked)}>
-      {children}
-    </SwitchBase>
+    <SwitchBase.Provider {...rest} checked={checked} disabled={disabled} onChange={e => !disabled && setChecked(e.target.checked)}>
+      <SwitchBase.Track />
+      <SwitchBase.Input />
+      <SwitchBase.Thumb />
+      {children && <SwitchBase.Label>{children}</SwitchBase.Label>}
+    </SwitchBase.Provider>
   );
 }
 

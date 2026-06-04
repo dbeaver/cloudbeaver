@@ -36,6 +36,9 @@
     user-select: none;
     min-width: 50px;
     white-space: pre-wrap !important;
+  }
+
+  .switch-label {
     font-weight: var(--dbv-kit-switch-label-weight);
   }
 
