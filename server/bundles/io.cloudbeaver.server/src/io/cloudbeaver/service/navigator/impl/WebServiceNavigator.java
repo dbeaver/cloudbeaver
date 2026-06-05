@@ -173,16 +173,12 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                 throw new DBWebException("Node '" + nodePath + "' not found");
             }
 
-            boolean shouldSkipProjectNode = nodePath.startsWith(DBNNode.NodePathType.ext.getPrefix());
             List<WebNavigatorNodeInfo> nodeParents = new ArrayList<>();
             for (DBNNode parent = getLogicalParentNode(node);
                  parent != null && !(parent instanceof DBNRoot);
-                 parent = getLogicalParentNode(parent)) {
-                //FIXME remove after node path refactoring
+                 parent = getLogicalParentNode(parent)
+            ) {
                 if (parent instanceof DBNProjectDatabases) {
-                    continue;
-                }
-                if (parent instanceof DBNProject && shouldSkipProjectNode) {
                     continue;
                 }
                 nodeParents.add(new WebNavigatorNodeInfo(session, parent));
