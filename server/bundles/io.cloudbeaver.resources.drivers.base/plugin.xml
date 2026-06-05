@@ -9,6 +9,7 @@
         <resource name="drivers/mariadb"/>
         <resource name="drivers/oracle"/>
         <resource name="drivers/postgresql"/>
+        <resource name="drivers/postgresql-cockroach-jdbc"/>
         <resource name="drivers/clickhouse"/>
         <resource name="drivers/clickhouse_com"/>
         <resource name="drivers/jaybird"/>
@@ -32,6 +33,7 @@
         <bundle id="drivers.mariadb" label="MariaDB drivers"/>
         <bundle id="drivers.oracle" label="Oracle drivers"/>
         <bundle id="drivers.postgresql" label="PostgreSQL drivers"/>
+        <bundle id="drivers.postgresql-cockroach-jdbc" label="CockroachDB drivers"/>
         <bundle id="drivers.clickhouse" label="Clickhouse (legacy) drivers"/>
         <bundle id="drivers.clickhouse_com" label="Clickhouse drivers"/>
         <bundle id="drivers.firebird" label="Firebird drivers"/>
