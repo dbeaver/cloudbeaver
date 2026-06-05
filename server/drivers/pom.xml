@@ -31,6 +31,7 @@
         <module>mariadb</module>
         <module>oracle</module>
         <module>postgresql</module>
+        <module>postgresql-cockroach-jdbc</module>
         <module>sqlite</module>
         <module>sqlserver</module>
         <module>trino</module>
