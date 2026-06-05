@@ -217,8 +217,13 @@ public class WebSessionWorkspace implements DBPWorkspace {
     @Override
     public synchronized DBFFileSystemManager getFileSystemManager() {
         if (fileSystemManager == null) {
-            fileSystemManager = new DBFFileSystemManager(session.getWorkspace());
+            synchronized (this) {
+                if (fileSystemManager == null) {
+                    fileSystemManager = new DBFFileSystemManager(session.getWorkspace());
+                }
+            }
         }
+
         return fileSystemManager;
     }
 }
