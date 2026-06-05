@@ -1,1 +1,4 @@
-export default [['plugin_project_info_tree_menu_item_title', 'Info du projet']];
+export default [
+  ['plugin_project_info_tree_menu_item_title', 'Info du projet'],
+  ['plugin_project_info_form_tab_options', 'Options'],
+];

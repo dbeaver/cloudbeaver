@@ -11,6 +11,9 @@
       "path": "../../common-typescript/@dbeaver/cli"
     },
     {
+      "path": "../core-blocks"
+    },
+    {
       "path": "../core-cli"
     },
     {
@@ -20,7 +23,7 @@
       "path": "../core-di"
     },
     {
-      "path": "../core-di/tsconfig.json"
+      "path": "../core-events"
     },
     {
       "path": "../core-localization"
@@ -30,6 +33,9 @@
     },
     {
       "path": "../core-projects"
+    },
+    {
+      "path": "../core-ui"
     },
     {
       "path": "../core-view"

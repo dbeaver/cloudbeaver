@@ -6,6 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-import './module.js';
-
-export { ProjectInfoFormService } from './ProjectInfoForm/ProjectInfoFormService.js';
+export interface IProjectInfoFormState {
+  projectId: string;
+}

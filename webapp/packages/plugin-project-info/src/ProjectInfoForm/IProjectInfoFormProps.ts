@@ -6,6 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
-import './module.js';
+import type { IFormProps } from '@cloudbeaver/core-ui';
 
-export { ProjectInfoFormService } from './ProjectInfoForm/ProjectInfoFormService.js';
+import type { IProjectInfoFormState } from './IProjectInfoFormState.js';
+
+export interface IProjectInfoFormProps extends IFormProps<IProjectInfoFormState> {}
