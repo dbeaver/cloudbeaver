@@ -12,7 +12,7 @@ import { ProjectInfoFormService } from '../ProjectInfoFormService.js';
 import { ProjectInfoFormOptions } from './ProjectInfoFormOptions.js';
 
 @injectable(() => [ProjectInfoFormService])
-export class ProjectInfoFormOptionsTabService extends Bootstrap {
+export class ProjectInfoFormOptionsTabBootstrap extends Bootstrap {
   constructor(private readonly projectInfoFormService: ProjectInfoFormService) {
     super();
   }

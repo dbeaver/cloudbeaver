@@ -11,23 +11,19 @@ import { DATA_CONTEXT_NAV_NODE } from '@cloudbeaver/core-navigation-tree';
 import { ActionService, MenuService } from '@cloudbeaver/core-view';
 
 import { ACTION_PROJECT_INFO } from './actions/ACTION_PROJECT_INFO.js';
-import { ProjectInfoFormOptionsTabService } from './ProjectInfoForm/Options/ProjectInfoFormOptionsTabService.js';
 import { ProjectInfoFormService } from './ProjectInfoForm/ProjectInfoFormService.js';
 
-@injectable(() => [ActionService, MenuService, ProjectInfoFormService, ProjectInfoFormOptionsTabService])
-export class PluginProjectInfoBootstrap extends Bootstrap {
+@injectable(() => [ActionService, MenuService, ProjectInfoFormService])
+export class ProjectInfoTreeMenuBootstrap extends Bootstrap {
   constructor(
     private readonly actionService: ActionService,
     private readonly menuService: MenuService,
     private readonly projectInfoFormService: ProjectInfoFormService,
-    private readonly projectInfoFormOptionsTabService: ProjectInfoFormOptionsTabService,
   ) {
     super();
   }
 
   override register() {
-    this.projectInfoFormOptionsTabService.register();
-
     this.menuService.addCreator({
       root: true,
       contexts: [DATA_CONTEXT_NAV_NODE],
