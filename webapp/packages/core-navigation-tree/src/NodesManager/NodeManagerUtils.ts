@@ -6,14 +6,14 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { getPathParts } from '@cloudbeaver/core-utils';
+import { createPath, getPathParts } from '@cloudbeaver/core-utils';
 
 export const NODE_PATH_PREFIX = 'node://';
 export const NODE_DATASOURCES_SEGMENT = 'datasources';
 
 export const NodeManagerUtils = {
   connectionIdToConnectionNodeId(projectId: string, connectionId: string): string {
-    return `${NODE_PATH_PREFIX}${projectId}/${NODE_DATASOURCES_SEGMENT}/${connectionId}`;
+    return `${NODE_PATH_PREFIX}${createPath(projectId, NODE_DATASOURCES_SEGMENT, connectionId)}`;
   },
 
   concatSchemaAndCatalog(catalogId?: string, schemaId?: string): string {

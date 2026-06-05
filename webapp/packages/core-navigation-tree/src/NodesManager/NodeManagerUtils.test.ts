@@ -18,7 +18,7 @@ describe('NodeManagerUtils', () => {
     });
 
     it('should work with different connectionId values', () => {
-      expect(NodeManagerUtils.connectionIdToConnectionNodeId('project,', 'abc')).toBe('node://project/datasources/abc');
+      expect(NodeManagerUtils.connectionIdToConnectionNodeId('project', 'abc')).toBe('node://project/datasources/abc');
       expect(NodeManagerUtils.connectionIdToConnectionNodeId('project', '')).toBe('node://project/datasources');
     });
   });

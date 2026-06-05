@@ -7,7 +7,7 @@
  */
 
 import { describe, expect, test } from 'vitest';
-import type { NavNode } from '@cloudbeaver/core-navigation-tree';
+import { NAV_NODE_TYPE_FOLDER, type NavNode } from '@cloudbeaver/core-navigation-tree';
 
 import { getConnectionFolderIdFromNodeId } from './getConnectionFolderIdFromNodeId.js';
 
@@ -20,6 +20,7 @@ describe('getConnectionFolderIdFromNodeId', () => {
     navigable: false,
     filtered: false,
     objectFeatures: [],
+    nodeType: NAV_NODE_TYPE_FOLDER,
   };
 
   test('should extract projectId and folderId from a valid nodeId', () => {
@@ -33,6 +34,7 @@ describe('getConnectionFolderIdFromNodeId', () => {
 
     node.uri = id;
     node.folder = false;
+    delete node.nodeType;
 
     expect(getConnectionFolderIdFromNodeId(node)).toEqual(undefined);
   });
@@ -52,9 +54,6 @@ describe('getConnectionFolderIdFromNodeId', () => {
   test('should return undefined if folderId is not passed', () => {
     const id = 'node://u_cbadmin/';
     node.uri = id;
-    expect(getConnectionFolderIdFromNodeId(node)).toEqual({
-      projectId: 'u_cbadmin',
-      folderId: '',
-    });
+    expect(getConnectionFolderIdFromNodeId(node)).toEqual(undefined);
   });
 });
