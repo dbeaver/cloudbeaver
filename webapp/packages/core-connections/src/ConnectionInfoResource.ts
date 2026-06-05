@@ -323,8 +323,14 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
       return;
     }
 
-    const connectionNodeId = NodeManagerUtils.connectionIdToConnectionNodeId(node.projectId, node.objectId);
-    const connectionId = this.nodeIdMap.get(connectionNodeId);
+    const connectionEnd = nodeId.indexOf(node.objectId);
+
+    if (connectionEnd === -1) {
+      return;
+    }
+
+    const connectionPart = nodeId.substring(0, connectionEnd + node.objectId.length);
+    const connectionId = this.nodeIdMap.get(connectionPart);
 
     if (connectionId) {
       return this.get(connectionId);
