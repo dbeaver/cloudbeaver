@@ -25,7 +25,6 @@ import { SQLCodeEditor, useSqlDialectExtension } from '@cloudbeaver/plugin-sql-e
 import { ConnectionDialectResource, ConnectionInfoResource, type IConnectionInfoParams } from '@cloudbeaver/core-connections';
 import { NavNodeManagerService, NodeManagerUtils } from '@cloudbeaver/core-navigation-tree';
 import { SqlEditorNavigatorService } from '@cloudbeaver/plugin-sql-editor-navigation-tab';
-import { toJS } from 'mobx';
 
 interface IPayload {
   query: string;
