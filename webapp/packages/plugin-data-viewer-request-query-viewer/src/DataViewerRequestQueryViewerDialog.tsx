@@ -25,6 +25,7 @@ import { SQLCodeEditor, useSqlDialectExtension } from '@cloudbeaver/plugin-sql-e
 import { ConnectionDialectResource, ConnectionInfoResource, type IConnectionInfoParams } from '@cloudbeaver/core-connections';
 import { NavNodeManagerService, NodeManagerUtils } from '@cloudbeaver/core-navigation-tree';
 import { SqlEditorNavigatorService } from '@cloudbeaver/plugin-sql-editor-navigation-tab';
+import { toJS } from 'mobx';
 
 interface IPayload {
   query: string;
@@ -46,15 +47,16 @@ export const DataViewerRequestQueryViewerDialog: DialogComponent<IPayload> = obs
   }
 
   function openSqlEditor() {
-    const nodeId = NodeManagerUtils.connectionIdToConnectionNodeId(props.payload.connectionKey.projectId, props.payload.connectionKey.connectionId);
+    const key = props.payload.connectionKey;
+    const connection = connectionInfoResource.get(key);
+    const nodeId = connection?.nodePath ?? NodeManagerUtils.connectionIdToConnectionNodeId(key.projectId, key.connectionId);
     const container = navNodeManagerService.getNodeContainerInfo(nodeId);
-    const connection = connectionInfoResource.get(props.payload.connectionKey);
     const name = connection?.name ? '<' + connection.name + '> ' : 'SQL';
 
     sqlEditorNavigatorService.openNewEditor({
       name,
       dataSourceKey: LocalStorageSqlDataSource.key,
-      connectionKey: props.payload.connectionKey,
+      connectionKey: key,
       catalogId: container.catalogId,
       schemaId: container.schemaId,
       query: props.payload.query,
