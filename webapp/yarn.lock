@@ -3700,6 +3700,26 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@cloudbeaver/plugin-project-info@workspace:*, @cloudbeaver/plugin-project-info@workspace:packages/plugin-project-info":
+  version: 0.0.0-use.local
+  resolution: "@cloudbeaver/plugin-project-info@workspace:packages/plugin-project-info"
+  dependencies:
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-data-context": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-navigation-tree": "workspace:*"
+    "@cloudbeaver/core-projects": "workspace:*"
+    "@cloudbeaver/core-view": "workspace:*"
+    "@cloudbeaver/plugin-navigation-tree": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
+    "@dbeaver/cli": "workspace:*"
+    rimraf: "npm:^6"
+    tslib: "npm:^2"
+    typescript: "npm:^5"
+  languageName: unknown
+  linkType: soft
+
 "@cloudbeaver/plugin-projects@workspace:*, @cloudbeaver/plugin-projects@workspace:packages/plugin-projects":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-projects@workspace:packages/plugin-projects"
@@ -3964,6 +3984,7 @@ __metadata:
     "@cloudbeaver/plugin-object-viewer-nav-tree-link": "workspace:*"
     "@cloudbeaver/plugin-product": "workspace:*"
     "@cloudbeaver/plugin-product-information-administration": "workspace:*"
+    "@cloudbeaver/plugin-project-info": "workspace:*"
     "@cloudbeaver/plugin-projects": "workspace:*"
     "@cloudbeaver/plugin-resource-manager": "workspace:*"
     "@cloudbeaver/plugin-resource-manager-administration": "workspace:*"
