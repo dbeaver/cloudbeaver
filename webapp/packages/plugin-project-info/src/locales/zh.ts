@@ -7,8 +7,4 @@ export default [
   ['plugin_project_info_form_options_field_description', '描述'],
   ['plugin_project_info_form_options_field_shared', '共享'],
   ['plugin_project_info_form_options_field_global', '全局'],
-  ['plugin_project_info_form_options_resource_types', '资源类型'],
-  ['plugin_project_info_form_options_resource_type_name', '名称'],
-  ['plugin_project_info_form_options_resource_type_extensions', '文件扩展名'],
-  ['plugin_project_info_form_options_resource_type_folder', '根目录'],
 ];
