@@ -9,7 +9,7 @@
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 
 import { ProjectInfoFormService } from '../ProjectInfoFormService.js';
-import { ProjectInfoFormOptionsPanel } from './ProjectInfoFormOptionsPanel.js';
+import { ProjectInfoFormOptions } from './ProjectInfoFormOptions.js';
 
 @injectable(() => [ProjectInfoFormService])
 export class ProjectInfoFormOptionsTabService extends Bootstrap {
@@ -22,7 +22,7 @@ export class ProjectInfoFormOptionsTabService extends Bootstrap {
       key: 'options',
       name: 'plugin_project_info_form_tab_options',
       order: 1,
-      panel: () => ProjectInfoFormOptionsPanel,
+      panel: () => ProjectInfoFormOptions,
     });
   }
 }

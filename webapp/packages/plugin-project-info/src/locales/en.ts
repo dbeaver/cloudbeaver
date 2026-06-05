@@ -1,4 +1,14 @@
 export default [
   ['plugin_project_info_tree_menu_item_title', 'Project Info'],
   ['plugin_project_info_form_tab_options', 'Options'],
+  ['plugin_project_info_form_options_info', 'Info'],
+  ['plugin_project_info_form_options_field_name', 'Name'],
+  ['plugin_project_info_form_options_field_id', 'ID'],
+  ['plugin_project_info_form_options_field_description', 'Description'],
+  ['plugin_project_info_form_options_field_shared', 'Shared'],
+  ['plugin_project_info_form_options_field_global', 'Global'],
+  ['plugin_project_info_form_options_resource_types', 'Resource Types'],
+  ['plugin_project_info_form_options_resource_type_name', 'Name'],
+  ['plugin_project_info_form_options_resource_type_extensions', 'File Extensions'],
+  ['plugin_project_info_form_options_resource_type_folder', 'Root Folder'],
 ];
