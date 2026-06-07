@@ -23,7 +23,6 @@ import {
   ConnectionInfoResource,
   ContainerResource,
   ConnectionsManagerService,
-  getFolderNodeParents,
   type Connection,
   ConnectionInfoActiveProjectKey,
   type IConnectionInfoParams,
@@ -77,9 +76,7 @@ export class ConnectionNavNodeService {
       ServerEventId.CbDatasourceFolderCreated,
       data => {
         const parents = data.nodePaths.map(nodeId => {
-          const node = this.navNodeInfoResource.get(nodeId);
-          const parents = node ? getFolderNodeParents(node) : [];
-
+          const parents = this.navNodeInfoResource.getParents(nodeId);
           return parents[parents.length - 1]!;
         });
 
@@ -92,9 +89,7 @@ export class ConnectionNavNodeService {
       ServerEventId.CbDatasourceFolderDeleted,
       data => {
         const parents = data.nodePaths.map(nodeId => {
-          const node = this.navNodeInfoResource.get(nodeId);
-          const parents = node ? getFolderNodeParents(node) : [];
-
+          const parents = this.navNodeInfoResource.getParents(nodeId);
           return parents[parents.length - 1]!;
         });
 

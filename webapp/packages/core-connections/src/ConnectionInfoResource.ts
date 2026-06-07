@@ -296,7 +296,6 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
     return this.get(key).every(connection => connection?.connected ?? false);
   }
 
-  // TODO: we need here node path ie ['', 'project://', 'database://...', '...']
   getConnectionIdForNodeId(projectId: string, nodeId: string): IConnectionInfoParams | undefined {
     if (!NodeManagerUtils.isDatabaseObject(nodeId)) {
       return;
@@ -311,7 +310,6 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
     return createConnectionParam(projectId, node.objectId);
   }
 
-  // TODO: we need here node path ie ['', 'project://', 'database://...', '...']
   getConnectionForNode(nodeId: string): Connection | undefined {
     if (!NodeManagerUtils.isDatabaseObject(nodeId)) {
       return;
