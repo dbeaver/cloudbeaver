@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { action, observable } from 'mobx';
+import { action } from 'mobx';
 import { useId } from 'react';
 
 import { useContextMenuPosition, useObservableRef, type IContextMenuPosition } from '@cloudbeaver/core-blocks';
@@ -14,10 +14,9 @@ import { DATA_CONTEXT_DV_RESULT_KEY, type IGridDataKey } from '@cloudbeaver/plug
 
 export interface IDataGridMenu {
   menu: IMenuData;
-  menuPosition: IContextMenuPosition;
+  position: IContextMenuPosition;
   id: string;
   openMenu(activeCell: IGridDataKey, event: React.MouseEvent | React.KeyboardEvent): void;
-  closeMenu(): void;
 }
 
 interface IDataGridMenuOptions {
@@ -26,27 +25,21 @@ interface IDataGridMenuOptions {
 
 export function useDataGridMenu(options: IDataGridMenuOptions): Readonly<IDataGridMenu> {
   const id = useId();
-  const menuPosition = useContextMenuPosition();
+  const position = useContextMenuPosition();
 
   const state = useObservableRef<IDataGridMenu>(
     () => ({
-      id,
-      menuPosition,
       openMenu(activeCell: IGridDataKey, event: React.MouseEvent | React.KeyboardEvent) {
-        this.menu.context.deleteForId(id);
+        this.menu.context.deleteForId(this.id);
         this.menu.context.set(DATA_CONTEXT_DV_RESULT_KEY, activeCell, this.id);
-        this.menuPosition.open(event);
-      },
-      closeMenu() {
-        this.menuPosition.close();
+
+        this.position.open(event);
       },
     }),
     {
-      menuPosition: observable.ref,
       openMenu: action.bound,
-      closeMenu: action.bound,
     },
-    { menu: options.menu, id },
+    { menu: options.menu, id, position },
   );
 
   return state;

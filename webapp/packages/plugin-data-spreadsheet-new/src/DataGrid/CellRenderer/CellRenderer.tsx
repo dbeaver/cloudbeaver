@@ -32,17 +32,15 @@ import { TableMenuContext } from './TableMenuContext.js';
 import { useDataEditorDnDBox } from '../useDataEditorDnDBox.js';
 import { getDropSide } from '../getDropSide.js';
 import { isBindingPressed } from '@cloudbeaver/core-view';
-import type { IDataGridMenu } from '../Menu/useDataGridMenu.js';
 
 interface Props {
   rowIdx: number;
   colIdx: number;
-  menu: Readonly<IDataGridMenu>;
   props: HTMLAttributes<HTMLDivElement>;
   renderDefaultCell: IDataGridCellRenderer;
 }
 
-export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colIdx, menu, props, renderDefaultCell }) {
+export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colIdx, props, renderDefaultCell }) {
   const dataGridContext = useContext(DataGridContext);
   const tableDataContext = useContext(TableDataContext);
   const selectionContext = useContext(DataGridSelectionContext);
@@ -57,13 +55,13 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
     () => ({
       get isMenuVisible(): boolean {
         const currentCell = this.cell;
-        const activeCell = menu.menu.context.get(DATA_CONTEXT_DV_RESULT_KEY);
+        const activeCell = this.tableMenuContext.menu.context.get(DATA_CONTEXT_DV_RESULT_KEY);
 
         if (!currentCell || !activeCell) {
           return false;
         }
 
-        return GridDataKeysUtils.isElementsKeyEqual(currentCell, activeCell) && !!this.tableMenuContext.menuPosition.position;
+        return GridDataKeysUtils.isElementsKeyEqual(currentCell, activeCell) && !!this.tableMenuContext.position.position;
       },
       isFocused: false,
       isHovered: false,
@@ -95,7 +93,6 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
     }),
     {
       isMenuVisible: computed,
-      menu: observable.ref,
       tableMenuContext: observable.ref,
       colIdx: observable.ref,
       rowIdx: observable.ref,
@@ -114,7 +111,6 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
     {
       colIdx,
       rowIdx,
-      menu,
       tableDataContext,
       selectionContext,
       tableMenuContext,

@@ -33,7 +33,7 @@ export const CellFormatter = observer<Props>(function CellFormatter({ rowIdx, co
   );
   const styles = useS(style);
 
-  function handleMenuTriggerMouseUp(event: React.MouseEvent<HTMLButtonElement>) {
+  function handleMouseUp(event: React.MouseEvent<HTMLButtonElement>) {
     EventContext.set(event, EventStopPropagationFlag);
   }
 
@@ -41,7 +41,7 @@ export const CellFormatter = observer<Props>(function CellFormatter({ rowIdx, co
     event.stopPropagation();
   }
 
-  function handleMenuTriggerClick(event: React.MouseEvent<HTMLButtonElement>) {
+  function openMenu(event: React.MouseEvent<HTMLButtonElement>) {
     if (!cell) {
       return;
     }
@@ -61,8 +61,8 @@ export const CellFormatter = observer<Props>(function CellFormatter({ rowIdx, co
           tabIndex={-1}
           className={s(styles, { menuTrigger: true })}
           onDoubleClick={stopPropagation}
-          onMouseUp={handleMenuTriggerMouseUp}
-          onClick={handleMenuTriggerClick}
+          onMouseUp={handleMouseUp}
+          onClick={openMenu}
         />
       )}
     </div>

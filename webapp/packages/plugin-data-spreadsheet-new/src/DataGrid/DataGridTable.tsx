@@ -454,7 +454,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
   );
 
   function getCellElement(rowIdx: number, colIdx: number, props: HTMLAttributes<HTMLDivElement>, renderDefaultCell: IDataGridCellRenderer) {
-    return <CellRenderer menu={menu} rowIdx={rowIdx} colIdx={colIdx} props={props} renderDefaultCell={renderDefaultCell} />;
+    return <CellRenderer rowIdx={rowIdx} colIdx={colIdx} props={props} renderDefaultCell={renderDefaultCell} />;
   }
 
   const cellElement = useCreateGridReactiveValue(

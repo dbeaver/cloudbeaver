@@ -8,7 +8,6 @@
 import { observable } from 'mobx';
 
 import { useObservableRef } from '../useObservableRef.js';
-import { isKeyboardEvent, isMouseEvent } from '@cloudbeaver/core-utils';
 
 export interface IContextMenuPositionCoords {
   x: number;
@@ -36,12 +35,9 @@ export function useContextMenuPosition(): IContextMenuPosition {
         let x = 0;
         let y = 0;
 
-        if (isMouseEvent(event)) {
+        if ('clientX' in event && 'clientY' in event) {
           x = event.clientX;
           y = event.clientY;
-        } else if (isKeyboardEvent(event)) {
-          x = event.currentTarget.getBoundingClientRect().right;
-          y = event.currentTarget.getBoundingClientRect().bottom;
         }
 
         if (x === 0 && y === 0) {

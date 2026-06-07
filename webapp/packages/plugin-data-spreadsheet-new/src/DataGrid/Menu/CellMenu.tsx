@@ -5,15 +5,16 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { observer } from 'mobx-react-lite';
-import { useContext } from 'react';
 
-import { MenuItemElementStyles, s, SContext, type StyleRegistry, useS } from '@cloudbeaver/core-blocks';
+import { useContext } from 'react';
+import { observer } from 'mobx-react-lite';
+
+import { MenuItemElementStyles, s, SContext, useS, type StyleRegistry } from '@cloudbeaver/core-blocks';
 import { ContextMenu } from '@cloudbeaver/core-ui';
 
-import { TableMenuContext } from '../CellRenderer/TableMenuContext.js';
-import classes from './CellMenu.module.css';
+import type { IDataGridMenu } from './useDataGridMenu.js';
 import { DataGridContext } from '../DataGridContext.js';
+import classes from './CellMenu.module.css';
 
 const registry: StyleRegistry = [
   [
@@ -25,28 +26,26 @@ const registry: StyleRegistry = [
   ],
 ];
 
-export const CellMenu = observer(function CellMenu() {
+interface Props {
+  menu: IDataGridMenu;
+}
+
+export const CellMenu = observer<Props>(function CellMenu({ menu }) {
   const style = useS(classes);
-  const tableMenuContext = useContext(TableMenuContext);
-  const menu = tableMenuContext.menu;
+
   const gridContext = useContext(DataGridContext);
 
-  function handleStateSwitch(visible: boolean) {
+  function handleVisibleSwitch(visible: boolean) {
     if (!visible) {
-      tableMenuContext.closeMenu();
       gridContext.focus();
     }
   }
 
   return (
     <SContext registry={registry}>
-      <ContextMenu
-        className={s(style, { contextMenu: true })}
-        menu={menu}
-        contextMenuPosition={tableMenuContext.menuPosition}
-        autoFocusOnShow
-        onVisibleSwitch={handleStateSwitch}
-      />
+      <div className={s(style, { contextMenu: true })}>
+        <ContextMenu menu={menu.menu} contextMenuPosition={menu.position} autoFocusOnShow onVisibleSwitch={handleVisibleSwitch} />
+      </div>
     </SContext>
   );
 });
