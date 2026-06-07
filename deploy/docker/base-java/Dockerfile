@@ -1,4 +1,5 @@
-FROM ubuntu:24.04
+# Ubuntu 24.04 (Noble Numbat)
+FROM ubuntu:noble
 
 MAINTAINER DBeaver Corp, devops@dbeaver.com
 
@@ -31,7 +32,7 @@ RUN set -eux; \
 ENV LANG=en_US.UTF-8
 
 ENV JAVA_HOME=/opt/java/openjdk
-COPY --from=eclipse-temurin:21 $JAVA_HOME $JAVA_HOME
+COPY --from=eclipse-temurin:25-jdk-noble $JAVA_HOME $JAVA_HOME
 ENV PATH="${JAVA_HOME}/bin:${PATH}"
 
 RUN set -eux; \
