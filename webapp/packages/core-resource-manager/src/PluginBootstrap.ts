@@ -10,6 +10,8 @@ import { ProjectsNavNodeService } from '@cloudbeaver/core-navigation-tree';
 
 import { NAV_NODE_TYPE_RM_PROJECT } from './NAV_NODE_TYPE_RM_PROJECT.js';
 
+const RM_PROJECT_PREFIX = 'rm';
+
 @injectable(() => [ProjectsNavNodeService])
 export class PluginBootstrap extends Bootstrap {
   constructor(private readonly projectsNavNodeService: ProjectsNavNodeService) {
@@ -22,6 +24,6 @@ export class PluginBootstrap extends Bootstrap {
 
   private addRmProjectIds() {
     this.projectsNavNodeService.addProjectType(NAV_NODE_TYPE_RM_PROJECT);
-    this.projectsNavNodeService.addProjectPrefix('rm/');
+    this.projectsNavNodeService.addProjectPrefix(RM_PROJECT_PREFIX + '/');
   }
 }
