@@ -37,7 +37,7 @@ public class ConfigGenerator {
     public static void main(String[] args) throws Exception {
         String baseConfigPath = System.getProperty("config.base");
         if (baseConfigPath == null || baseConfigPath.isEmpty()) {
-            URL resource = ConfigGenerator.class.getResource("/cloudbeaver-base.conf");
+            URL resource = ConfigGenerator.class.getClassLoader().getResource("config/cloudbeaver-base.conf");
             if (resource == null) {
                 System.out.println("Base config path is required");
                 return;
