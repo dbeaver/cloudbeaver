@@ -11,13 +11,13 @@ import type { ComponentPropsWithoutRef, ElementType } from 'react';
 import type { ControlSize } from '../types/controls.js';
 import './Radio.css';
 
-interface RadioRootOwnProps {
+interface Props {
   size?: ControlSize;
 }
 
-export type RadioRootProps<T extends ElementType = 'span'> = RadioRootOwnProps & {
+export type RadioRootProps<T extends ElementType = 'span'> = Props & {
   as?: T;
-} & Omit<ComponentPropsWithoutRef<T>, keyof RadioRootOwnProps | 'as'>;
+} & Omit<ComponentPropsWithoutRef<T>, keyof Props | 'as'>;
 
 export function RadioRoot<T extends ElementType = 'span'>({ as, size = 'medium', className, ...props }: RadioRootProps<T>): React.ReactElement {
   const Component: ElementType = as ?? 'span';
