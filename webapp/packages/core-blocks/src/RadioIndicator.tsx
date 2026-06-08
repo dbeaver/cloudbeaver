@@ -9,14 +9,14 @@
 import { RadioRoot, RadioControl, type ControlSize } from '@dbeaver/ui-kit';
 import './FormControls/Radio.css';
 
-interface RadioIndicatorProps {
+interface Props {
   checked?: boolean;
   disabled?: boolean;
   size?: ControlSize;
   className?: string;
 }
 
-export function RadioIndicator({ checked, disabled, size = 'medium', className }: RadioIndicatorProps): React.ReactElement {
+export function RadioIndicator({ checked, disabled, size = 'medium', className }: Props): React.ReactElement {
   return (
     <RadioRoot size={size} className={className}>
       <RadioControl checked={checked} disabled={disabled} />
