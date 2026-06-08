@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { CheckboxIndicator as UiKitCheckboxIndicator, type CheckboxIndicatorProps as UiKitCheckboxIndicatorProps } from '@dbeaver/ui-kit';
+import { CheckboxIndicator as UiKitCheckboxIndicator, type ICheckboxIndicatorProps as UiKitCheckboxIndicatorProps } from '@dbeaver/ui-kit';
 import { useS } from '../../useS.js';
 import { s } from '../../s.js';
 import './CheckboxMarkup.css';

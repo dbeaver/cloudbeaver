@@ -10,7 +10,7 @@ import clsx from 'clsx';
 import './Checkbox.css';
 import type { ControlSize } from '../types/controls.js';
 
-export interface CheckboxIndicatorProps {
+export interface ICheckboxIndicatorProps {
   checked?: boolean | 'mixed';
   indeterminate?: boolean;
   disabled?: boolean;
@@ -30,7 +30,7 @@ export function CheckboxIndicator({
   icon,
   indeterminateIcon,
   className,
-}: CheckboxIndicatorProps): React.ReactElement {
+}: ICheckboxIndicatorProps): React.ReactElement {
   return (
     <div
       className={clsx('dbv-kit-checkbox__check', `dbv-kit-checkbox--${size}`, className)}
