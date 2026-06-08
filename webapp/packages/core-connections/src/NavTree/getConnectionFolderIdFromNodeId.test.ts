@@ -12,7 +12,7 @@ import { NAV_NODE_TYPE_FOLDER, type NavNode } from '@cloudbeaver/core-navigation
 import { getConnectionFolderIdFromNodeId } from './getConnectionFolderIdFromNodeId.js';
 
 describe('getConnectionFolderIdFromNodeId', () => {
-  const node: NavNode = {
+  const getNode = (overrides: Partial<NavNode> = {}): NavNode => ({
     uri: '',
     folder: true,
     hasChildren: false,
@@ -21,39 +21,36 @@ describe('getConnectionFolderIdFromNodeId', () => {
     filtered: false,
     objectFeatures: [],
     nodeType: NAV_NODE_TYPE_FOLDER,
-  };
+    ...overrides,
+  });
 
   test('should extract projectId and folderId from a valid nodeId', () => {
-    const id = 'node://u_cbadmin/datasources/QAtestRegress';
-    node.uri = id;
+    const node = getNode({ uri: 'node://u_cbadmin/datasources/QAtestRegress' });
     expect(getConnectionFolderIdFromNodeId(node)).toEqual({ projectId: 'u_cbadmin', folderId: 'QAtestRegress' });
   });
 
   test('should return undefined for non-folder ids', () => {
-    const id = 'node://u_cbadmin/datasources/QAtestRegress';
-
-    node.uri = id;
-    node.folder = false;
-    delete node.nodeType;
+    const node = getNode({
+      uri: 'node://u_cbadmin/datasources/QAtestRegress',
+      folder: false,
+      nodeType: undefined,
+    });
 
     expect(getConnectionFolderIdFromNodeId(node)).toEqual(undefined);
   });
 
   test('should return undefined when an empty string is passed', () => {
-    const id = '';
-    node.uri = id;
+    const node = getNode({ uri: '' });
     expect(getConnectionFolderIdFromNodeId(node)).toEqual(undefined);
   });
 
   test('should return undefined if no projectId and folderId', () => {
-    const id = 'node://';
-    node.uri = id;
+    const node = getNode({ uri: 'node://' });
     expect(getConnectionFolderIdFromNodeId(node)).toEqual(undefined);
   });
 
   test('should return undefined if folderId is not passed', () => {
-    const id = 'node://u_cbadmin/';
-    node.uri = id;
+    const node = getNode({ uri: 'node://u_cbadmin/' });
     expect(getConnectionFolderIdFromNodeId(node)).toEqual(undefined);
   });
 });

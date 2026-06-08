@@ -9,10 +9,10 @@
 import { NODE_DATASOURCES_SEGMENT, NodeManagerUtils, type NavNode } from '@cloudbeaver/core-navigation-tree';
 import { getPathParts } from '@cloudbeaver/core-utils';
 
-import { isFolderNodeId } from './isFolderNodeId.js';
+import { isFolderNode } from './isFolderNode.js';
 
 export function getFolderPathWithProjectId(node: NavNode): string {
-  if (!isFolderNodeId(node)) {
+  if (!isFolderNode(node)) {
     throw new Error('Invalid folder id');
   }
 
