@@ -22,6 +22,7 @@ export interface IDataGridContext {
   simple: boolean;
   isGridInFocus: () => boolean;
   getDataGridApi: () => DataGridRef | null;
+  getScrollContainer: () => HTMLDivElement | null;
   focus: () => void;
 }
 
