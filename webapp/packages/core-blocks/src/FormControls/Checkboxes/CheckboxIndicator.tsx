@@ -13,15 +13,15 @@ import './CheckboxMarkup.css';
 import CheckboxMarkupStyles from './CheckboxMarkup.module.css';
 import type { JSX } from 'react';
 
-interface ICheckboxIndicatorProps extends UiKitCheckboxIndicatorProps {
-  theme?: 'primary' | 'secondary' | 'tertiary';
+interface Props extends UiKitCheckboxIndicatorProps {
+  variant?: 'primary' | 'secondary' | 'tertiary';
 }
 
-export function CheckboxIndicator({ theme = 'primary', className, ...rest }: ICheckboxIndicatorProps): JSX.Element {
+export function CheckboxIndicator({ variant = 'primary', className, ...rest }: Props): JSX.Element {
   const styles = useS(CheckboxMarkupStyles);
 
   return (
-    <span className={s(styles, { container: true }, 'checkbox-markup', `checkbox-markup-theme--${theme}`)}>
+    <span className={s(styles, { container: true }, 'checkbox-markup', `checkbox-markup-theme--${variant}`)}>
       <UiKitCheckboxIndicator className={className} {...rest} />
     </span>
   );
