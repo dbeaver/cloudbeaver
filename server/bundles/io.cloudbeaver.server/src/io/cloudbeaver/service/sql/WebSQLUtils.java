@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -116,8 +116,7 @@ public class WebSQLUtils {
             Map<String, Object> map = createMapOfType(WebSQLConstants.VALUE_TYPE_COLLECTION);
             map.put("value", items);
             return map;
-        } else if (value instanceof DBDComposite) {
-            DBDComposite composite = (DBDComposite)value;
+        } else if (value instanceof DBDComposite composite && composite.getAttributes().length > 0) {
             Map<String, Object> struct = new LinkedHashMap<>();
             for (DBSAttributeBase attr : composite.getAttributes()) {
                 struct.put(attr.getName(), makeWebCellValue(session, attr, composite.getAttributeValue(attr), dataFormat));

@@ -6,7 +6,6 @@
     "./lib/index.js",
     "lib/service-worker.js",
     "src/**/*.css",
-    "src/**/*.scss",
     "public/**/*"
   ],
   "version": "0.1.0",

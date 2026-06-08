@@ -52,7 +52,7 @@
       width: 100%;
       height: 22px;
       min-height: unset !important;
-      padding: calc(2 * var(--tw-spacing));
+      padding: calc(2 * var(--tw-spacing)) !important;
     }
   }
 

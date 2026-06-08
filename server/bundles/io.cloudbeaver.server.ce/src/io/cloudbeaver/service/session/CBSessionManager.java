@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2025 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,6 +60,7 @@ public class CBSessionManager implements WebAppSessionManager {
     /**
      * Closes Web Session, associated to HttpSession from {@code request}
      */
+    @Nullable
     @Override
     public BaseWebSession closeSession(@NotNull HttpServletRequest request) {
         HttpSession session = request.getSession();
@@ -69,11 +70,13 @@ public class CBSessionManager implements WebAppSessionManager {
         return null;
     }
 
+    @Nullable
     @Override
     public BaseWebSession closeSession(@NotNull String sessionId) {
         return closeSession(sessionId, true);
     }
 
+    @Nullable
     @Override
     public BaseWebSession closeSession(@NotNull String sessionId, boolean sendSessionExpiredEvent) {
         BaseWebSession webSession;
@@ -204,7 +207,7 @@ public class CBSessionManager implements WebAppSessionManager {
      *
      * @return WebSession object or null, if session expired or invalid
      */
-    @Nullable
+    @NotNull
     public WebSession getOrRestoreWebSession(@NotNull WebHttpRequestInfo requestInfo) {
         final var sessionId = requestInfo.getId();
         if (sessionId == null) {
@@ -283,7 +286,7 @@ public class CBSessionManager implements WebAppSessionManager {
 
     @Override
     @Nullable
-    public WebSession findWebSession(HttpServletRequest request) {
+    public WebSession findWebSession(@NotNull HttpServletRequest request) {
         String sessionId = getSessionId(request);
         synchronized (sessionMap) {
             var session = sessionMap.get(sessionId);
@@ -294,8 +297,9 @@ public class CBSessionManager implements WebAppSessionManager {
         }
     }
 
+    @Nullable
     @Override
-    public WebSession findWebSession(HttpServletRequest request, boolean errorOnNoFound) throws DBWebException {
+    public WebSession findWebSession(@NotNull HttpServletRequest request, boolean errorOnNoFound) throws DBWebException {
         WebSession webSession = findWebSession(request);
         if (webSession != null) {
             return webSession;
@@ -323,6 +327,7 @@ public class CBSessionManager implements WebAppSessionManager {
         }
     }
 
+    @NotNull
     @Override
     public Collection<BaseWebSession> getAllActiveSessions() {
         synchronized (sessionMap) {
