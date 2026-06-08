@@ -8,7 +8,17 @@
 
 import { observer } from 'mobx-react-lite';
 
-import { ColoredContainer, Container, Group, GroupTitle, InputField, Textarea, useAutoLoad, useTranslate } from '@cloudbeaver/core-blocks';
+import {
+  ColoredContainer,
+  Container,
+  FieldCheckbox,
+  Group,
+  GroupTitle,
+  InputField,
+  Textarea,
+  useAutoLoad,
+  useTranslate,
+} from '@cloudbeaver/core-blocks';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 
 import type { IProjectInfoFormProps } from '../IProjectInfoFormProps.js';
@@ -17,32 +27,35 @@ import { getProjectInfoFormOptionsPart } from './getProjectInfoFormOptionsPart.j
 export const ProjectInfoFormOptions: TabContainerPanelComponent<IProjectInfoFormProps> = observer(function ProjectInfoFormOptions({ formState }) {
   const translate = useTranslate();
   const part = getProjectInfoFormOptionsPart(formState);
-  const project = part.state.projectInfo;
 
   useAutoLoad(ProjectInfoFormOptions, part);
+
+  if (!part.state) {
+    return null;
+  }
 
   return (
     <ColoredContainer wrap overflow parent gap>
       <Container medium gap>
         <Group form gap>
           <GroupTitle>{translate('plugin_project_info_form_options_info')}</GroupTitle>
-          <InputField name="name" value={project?.name ?? ''} readOnly>
+          <InputField name="name" state={part.state} readOnly>
             {translate('plugin_project_info_form_options_field_name')}
           </InputField>
-          <InputField name="id" value={project?.id ?? ''} readOnly>
+          <InputField name="id" state={part.state} readOnly>
             {translate('plugin_project_info_form_options_field_id')}
           </InputField>
-          {project?.description && (
-            <Textarea name="description" value={project.description} readOnly>
+          {part.state.description && (
+            <Textarea name="description" state={part.state} readOnly>
               {translate('plugin_project_info_form_options_field_description')}
             </Textarea>
           )}
-          <InputField name="shared" value={project ? translate(project.shared ? 'ui_yes' : 'ui_no') : ''} readOnly>
+          <FieldCheckbox state={part.state} name="shared" title={translate('plugin_project_info_form_options_field_shared')} readOnly small>
             {translate('plugin_project_info_form_options_field_shared')}
-          </InputField>
-          <InputField name="global" value={project ? translate(project.global ? 'ui_yes' : 'ui_no') : ''} readOnly>
+          </FieldCheckbox>
+          <FieldCheckbox state={part.state} name="global" title={translate('plugin_project_info_form_options_field_global')} readOnly small>
             {translate('plugin_project_info_form_options_field_global')}
-          </InputField>
+          </FieldCheckbox>
         </Group>
       </Container>
     </ColoredContainer>

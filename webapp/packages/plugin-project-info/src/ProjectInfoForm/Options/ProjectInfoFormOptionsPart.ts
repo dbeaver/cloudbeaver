@@ -7,20 +7,21 @@
  */
 
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
-import type { ProjectInfo, ProjectInfoResource } from '@cloudbeaver/core-projects';
+import type { ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { FormPart, type IFormState } from '@cloudbeaver/core-ui';
 
 import type { IProjectInfoFormState } from '../IProjectInfoFormState.js';
+import type { IProjectInfoOptionsSchema } from './ProjectInfoOptionsSchema.js';
 
-export interface IProjectInfoFormOptionsState {
-  projectInfo: ProjectInfo | null;
-}
-
-const getDefaultState = (): IProjectInfoFormOptionsState => ({
-  projectInfo: null,
+const getDefaultState = (): IProjectInfoOptionsSchema => ({
+  description: '',
+  global: false,
+  id: '',
+  name: '',
+  shared: false,
 });
 
-export class ProjectInfoFormOptionsPart extends FormPart<IProjectInfoFormOptionsState, IProjectInfoFormState> {
+export class ProjectInfoFormOptionsPart extends FormPart<IProjectInfoOptionsSchema, IProjectInfoFormState> {
   constructor(
     formState: IFormState<IProjectInfoFormState>,
     private readonly projectInfoResource: ProjectInfoResource,
@@ -34,7 +35,13 @@ export class ProjectInfoFormOptionsPart extends FormPart<IProjectInfoFormOptions
 
   protected override async loader(): Promise<void> {
     const projectInfo = await this.projectInfoResource.load(this.formState.state.projectId);
-    this.setInitialState({ projectInfo });
+    this.setInitialState({
+      description: projectInfo.description,
+      global: projectInfo.global,
+      id: projectInfo.id,
+      name: projectInfo.name,
+      shared: projectInfo.shared,
+    });
   }
 
   protected override async saveChanges(

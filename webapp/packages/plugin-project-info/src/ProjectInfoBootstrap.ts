@@ -7,14 +7,14 @@
  */
 
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import { DATA_CONTEXT_NAV_NODE } from '@cloudbeaver/core-navigation-tree';
+import { DATA_CONTEXT_NAV_NODE, isProjectNode } from '@cloudbeaver/core-navigation-tree';
 import { ActionService, MenuService } from '@cloudbeaver/core-view';
 
 import { ACTION_PROJECT_INFO } from './actions/ACTION_PROJECT_INFO.js';
 import { ProjectInfoFormService } from './ProjectInfoForm/ProjectInfoFormService.js';
 
 @injectable(() => [ActionService, MenuService, ProjectInfoFormService])
-export class ProjectInfoTreeMenuBootstrap extends Bootstrap {
+export class ProjectInfoBootstrap extends Bootstrap {
   constructor(
     private readonly actionService: ActionService,
     private readonly menuService: MenuService,
@@ -36,7 +36,7 @@ export class ProjectInfoTreeMenuBootstrap extends Bootstrap {
       contexts: [DATA_CONTEXT_NAV_NODE],
       isActionApplicable: context => {
         const node = context.get(DATA_CONTEXT_NAV_NODE);
-        return !!node?.projectId;
+        return isProjectNode(node);
       },
       handler: context => {
         const node = context.get(DATA_CONTEXT_NAV_NODE);

@@ -41,6 +41,9 @@
       "path": "../core-ui"
     },
     {
+      "path": "../core-utils"
+    },
+    {
       "path": "../core-view"
     },
     {

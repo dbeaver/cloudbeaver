@@ -10,14 +10,14 @@ import { Bootstrap, ModuleRegistry } from '@cloudbeaver/core-di';
 import { LocaleService } from './LocaleService.js';
 import { ProjectInfoFormOptionsTabBootstrap } from './ProjectInfoForm/Options/ProjectInfoFormOptionsTabBootstrap.js';
 import { ProjectInfoFormService } from './ProjectInfoForm/ProjectInfoFormService.js';
-import { ProjectInfoTreeMenuBootstrap } from './ProjectInfoTreeMenuBootstrap.js';
+import { ProjectInfoBootstrap } from './ProjectInfoBootstrap.js';
 
 export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-project-info',
 
   configure: serviceCollection => {
     serviceCollection
-      .addSingleton(Bootstrap, ProjectInfoTreeMenuBootstrap)
+      .addSingleton(Bootstrap, ProjectInfoBootstrap)
       .addSingleton(Bootstrap, LocaleService)
       .addSingleton(Bootstrap, ProjectInfoFormOptionsTabBootstrap)
       .addSingleton(ProjectInfoFormService);

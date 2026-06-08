@@ -7,8 +7,6 @@
  */
 
 import { observer } from 'mobx-react-lite';
-
-import { Button, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { TabList, TabPanelList, TabsState } from '@cloudbeaver/core-ui';
 
@@ -17,27 +15,13 @@ import { ProjectInfoFormService } from './ProjectInfoFormService.js';
 
 export const ProjectInfoFormPanel = observer<IProjectInfoFormProps>(function ProjectInfoFormPanel({ formState }) {
   const service = useService(ProjectInfoFormService);
-  const translate = useTranslate();
 
   return (
     <TabsState container={service.parts} localState={formState.parts} formState={formState}>
       <div className="tw:flex tw:flex-col tw:flex-1 tw:h-full tw:overflow-auto theme-background-secondary theme-text-on-secondary">
         <div className="tw:relative tw:flex tw:items-end tw:border-b-2 theme-border-color-background theme-background-secondary theme-text-on-secondary">
-          <div className="tw:flex-1 tw:overflow-hidden">
+          <div className="tw:flex-1 tw:overflow-hidden tw:pt-2">
             <TabList disabled={formState.isDisabled} underline big />
-          </div>
-          <div className="tw:flex tw:items-center tw:px-6 tw:py-3 tw:gap-4">
-            <Button type="button" disabled={formState.isDisabled} variant="secondary" onClick={() => service.close()}>
-              {translate('ui_processing_cancel')}
-            </Button>
-            <Button
-              type="button"
-              disabled={formState.isDisabled || formState.isReadOnly || !formState.isChanged}
-              loader
-              onClick={() => formState.save()}
-            >
-              {translate('ui_processing_save')}
-            </Button>
           </div>
         </div>
         <div className="tw:relative tw:flex tw:flex-1 tw:flex-col tw:overflow-auto theme-background-secondary theme-border-color-background">
