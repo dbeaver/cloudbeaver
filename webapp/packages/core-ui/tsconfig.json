@@ -61,7 +61,6 @@
     "src/**/*",
     "src/**/*.json",
     "src/**/*.css",
-    "src/**/*.scss",
     "../core-blocks/src/AuthenticationProvider.tsx",
     "../core-blocks/src/useAuthenticationAction.ts",
     "../core-blocks/src/AuthenticationProviderLoader.ts"

@@ -5,7 +5,6 @@
     "./lib/index.js",
     "./lib/module.js",
     "src/**/*.css",
-    "src/**/*.scss",
     "public/**/*"
   ],
   "version": "0.1.0",
