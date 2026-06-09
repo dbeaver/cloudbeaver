@@ -40,6 +40,7 @@ interface IDraggingCallbacks {
 }
 
 const THRESHOLD = 10;
+const BODY_DRAGGING_ATTRIBUTE = 'data-grid-dragging';
 
 function getDelta(startPosition: IMousePosition | null, currentPosition: IMousePosition | null) {
   if (!startPosition || !currentPosition) {
@@ -105,6 +106,7 @@ export function useGridDragging(props: IDraggingCallbacks) {
     state.mouseDown = true;
     state.startMousePosition = { x: event.pageX, y: event.pageY };
     state.startDraggingCell = { colIdx: position.colIdx, rowIdx: position.rowIdx };
+    document.body.setAttribute(BODY_DRAGGING_ATTRIBUTE, '');
   }, []);
 
   const onMouseMoveHandler = useCallback((event: React.MouseEvent<HTMLDivElement>) => {
@@ -157,6 +159,7 @@ export function useGridDragging(props: IDraggingCallbacks) {
   const onMouseUpHandler = useCallback((event: React.MouseEvent<HTMLDivElement> | MouseEvent) => {
     state.mouseDown = false;
     state.startMousePosition = null;
+    document.body.removeAttribute(BODY_DRAGGING_ATTRIBUTE);
 
     if (!state.dragging || !state.startDraggingCell || !state.currentDraggingCell) {
       return;
