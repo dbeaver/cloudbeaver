@@ -68,12 +68,6 @@ public class WebNavigatorNodeInfo {
     ///////////////////////////////////
 
     @Property
-    @Deprecated(forRemoval = true)
-    public String getId() {
-        return node.getNodeUri();
-    }
-
-    @Property
     public String getUri() {
         return node.getNodeUri();
     }
