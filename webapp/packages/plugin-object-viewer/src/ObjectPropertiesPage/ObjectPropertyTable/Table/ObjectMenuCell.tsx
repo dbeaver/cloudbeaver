@@ -23,7 +23,7 @@ interface Props {
 }
 
 export const ObjectMenuCell = observer<Props>(function ObjectMenuCell({ object }) {
-  const { node } = useNode(object.id);
+  const { node } = useNode(object.uri);
 
   if (!node) {
     throw new Error('Node not found');
