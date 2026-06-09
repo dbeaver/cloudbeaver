@@ -40,6 +40,10 @@
     & .switch-label {
       font-weight: var(--dbv-kit-switch-label-weight);
     }
+
+    & .switch-label--dense {
+      font-weight: initial;
+    }
   }
 
   .switch-body--primary {
@@ -55,9 +59,5 @@
     --dbv-kit-switch-thumb-size: 12px;
     --dbv-kit-switch-thumb-offset: 2px;
     --dbv-kit-switch-checked-offset: 14px;
-  }
-
-  .switch-label--dense {
-    font-weight: initial;
   }
 }
