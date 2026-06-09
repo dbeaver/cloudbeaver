@@ -33,7 +33,7 @@ export function useNavTreeDropBox(targetNode: NavNode | undefined, nodeState?: I
 
       updateCanMove(targetNode, moveContexts).catch(() => {});
 
-      return navNodeManagerService.getNavNodeCache(targetNode.id).canMove;
+      return navNodeManagerService.getNavNodeCache(targetNode.uri).canMove;
     },
     onDrop(moveContexts) {
       if (targetNode) {

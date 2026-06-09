@@ -223,16 +223,16 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
 
     const move = contexts.getContext(navNodeMoveContext);
     const nodes = getNodesFromContext(moveContexts);
-    const nodeIdList = nodes.map(node => node.id);
-    const children = this.navTreeResource.get(targetNode.id) ?? [];
-    const targetProject = this.projectsNavNodeService.getProject(targetNode.id);
+    const nodeIdList = nodes.map(node => node.uri);
+    const children = this.navTreeResource.get(targetNode.uri) ?? [];
+    const targetProject = this.projectsNavNodeService.getProject(targetNode.uri);
 
     const supported = nodes.every(node => {
       if (
         ![isConnectionNode, isConnectionFolder, isProjectNode].some(check => check(node)) ||
-        targetProject !== this.projectsNavNodeService.getProject(node.id) ||
-        children.includes(node.id) ||
-        targetNode.id === node.id
+        targetProject !== this.projectsNavNodeService.getProject(node.uri) ||
+        children.includes(node.uri) ||
+        targetNode.uri === node.uri
       ) {
         return false;
       }
@@ -254,7 +254,7 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
         node =>
           isConnectionFolder(node) &&
           (childrenNode.some(child => child && isConnectionFolder(child) && child.name === node.name) ||
-            nodes.some(child => isConnectionFolder(child) && child.name === node.name && child.id !== node.id)),
+            nodes.some(child => isConnectionFolder(child) && child.name === node.name && child.uri !== node.uri)),
       );
 
       if (folderDuplicates.length > 0) {
@@ -268,7 +268,7 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
       }
 
       try {
-        await this.navTreeResource.moveTo(resourceKeyList(nodeIdList), targetNode.id);
+        await this.navTreeResource.moveTo(resourceKeyList(nodeIdList), targetNode.uri);
         const connections = nodeIdList
           .map(nodeId => {
             const connection = this.connectionInfoResource.getConnectionForNode(nodeId);
@@ -314,7 +314,8 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
         let parentFolderParam: IConnectionFolderParam | undefined;
 
         if (targetNode.folderId) {
-          parentFolderParam = getConnectionFolderIdFromNodeId(targetNode.folderId);
+          const node = this.navNodeInfoResource.get(targetNode.folderId);
+          parentFolderParam = node ? getConnectionFolderIdFromNodeId(node) : undefined;
         }
 
         const { status, result } = await this.commonDialogService.open(FolderDialog, {

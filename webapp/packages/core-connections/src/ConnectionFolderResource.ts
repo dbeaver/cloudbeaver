@@ -20,6 +20,7 @@ import {
 } from '@cloudbeaver/core-resource';
 import { SessionDataResource } from '@cloudbeaver/core-root';
 import { type ConnectionFolderInfoFragment, GraphQLService } from '@cloudbeaver/core-sdk';
+import { NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
 
 import { createConnectionFolderParam } from './createConnectionFolderParam.js';
 import { getConnectionFolderIdFromNodeId } from './NavTree/getConnectionFolderIdFromNodeId.js';
@@ -35,10 +36,11 @@ export const CONNECTION_FOLDER_NAME_VALIDATION = /^(?!\.)[^\\/:\\"'<>|?*]+$/u;
 
 export const ConnectionFolderProjectKey = resourceKeyAliasFactory('@connection-folder/project', (projectId: string) => ({ projectId }));
 
-@injectable(() => [GraphQLService, SessionDataResource, AppAuthService])
+@injectable(() => [GraphQLService, NavNodeInfoResource, SessionDataResource, AppAuthService])
 export class ConnectionFolderResource extends CachedMapResource<IConnectionFolderParam, ConnectionFolder> {
   constructor(
     private readonly graphQLService: GraphQLService,
+    private readonly navNodeInfoResource: NavNodeInfoResource,
     sessionDataResource: SessionDataResource,
     appAuthService: AppAuthService,
   ) {
@@ -79,7 +81,13 @@ export class ConnectionFolderResource extends CachedMapResource<IConnectionFolde
   }
 
   fromNodeId(nodeId: string): ConnectionFolder | undefined {
-    const key = getConnectionFolderIdFromNodeId(nodeId);
+    const node = this.navNodeInfoResource.get(nodeId);
+
+    if (!node) {
+      return;
+    }
+
+    const key = getConnectionFolderIdFromNodeId(node);
 
     if (key) {
       return this.get(key);
