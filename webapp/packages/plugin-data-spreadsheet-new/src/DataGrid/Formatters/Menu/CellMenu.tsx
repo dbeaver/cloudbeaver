@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
 
-import { Icon, MenuItemElementStyles, s, SContext, type StyleRegistry, useS } from '@cloudbeaver/core-blocks';
+import { Icon, MenuItemElementStyles, s, SContext, type StyleRegistry, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useDataContextLink } from '@cloudbeaver/core-data-context';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { ContextMenu } from '@cloudbeaver/core-ui';
@@ -52,6 +52,7 @@ const registry: StyleRegistry = [
 
 export const CellMenu = observer<Props>(function CellMenu({ model, actions, spreadsheetActions, resultIndex, cellKey, simple, onStateSwitch }) {
   const style = useS(classes);
+  const translate = useTranslate();
   const menu = useMenu({ menu: MENU_DV_CONTEXT_MENU });
   const cellContext = useContext(CellContext);
 
@@ -83,6 +84,7 @@ export const CellMenu = observer<Props>(function CellMenu({ model, actions, spre
           onVisibleSwitch={onStateSwitch}
         >
           <Icon className={s(style, { icon: true })} name="snack" viewBox="0 0 16 10" />
+          <span className="tw:sr-only">{translate('data_grid_table_context_menu_aria_label')}</span>
         </ContextMenu>
       </div>
     </SContext>
