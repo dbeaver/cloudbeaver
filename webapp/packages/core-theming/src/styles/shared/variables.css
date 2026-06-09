@@ -1,0 +1,18 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2026 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+
+@layer base {
+  :root {
+    --app-height: 100vh;
+    --theme-form-element-radius: 3px;
+    --theme-group-element-radius: 4px;
+    --theme-menu-bar-small-action-radius: 3px;
+    --theme-font-family: Roboto, sans-serif;
+    --theme-font-family-mono: RobotoMono, sans-serif;
+  }
+}
