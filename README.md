@@ -19,7 +19,7 @@ See our [WIKI](https://github.com/dbeaver/cloudbeaver/wiki) for more details.
 
 ## Demo server
 
-You can see a live demo of CloudBeaver here: https://demo.cloudbeaver.io  
+You can see a live demo of CloudBeaver server here: https://demo.cloudbeaver.io  
 
 [Database access instructions](https://github.com/dbeaver/cloudbeaver/wiki/Demo-Server)
 
