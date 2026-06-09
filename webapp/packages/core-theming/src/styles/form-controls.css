@@ -1,0 +1,108 @@
+fieldset {
+  padding: 0;
+  border: none;
+  margin: 0;
+
+  &[disabled] {
+    opacity: 1;
+  }
+}
+
+textarea {
+  resize: vertical;
+  min-height: 40px;
+}
+
+input {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-height: 24px;
+  &[type='search']::-ms-clear {
+    display: none;
+    width: 0;
+    height: 0;
+  }
+  &[type='search']::-ms-reveal {
+    display: none;
+    width: 0;
+    height: 0;
+  }
+  /* clears the 'X' from Chrome */
+  &[type='search']::-webkit-search-decoration,
+  &[type='search']::-webkit-search-cancel-button,
+  &[type='search']::-webkit-search-results-button,
+  &[type='search']::-webkit-search-results-decoration {
+    display: none;
+  }
+}
+
+input,
+textarea {
+  --dbv-kit-input-placeholder-foreground: var(--theme-input-color-placeholder);
+  box-sizing: border-box;
+  padding: 7px 12px;
+  width: 100%;
+  border: 1px solid;
+  outline: none !important;
+  border-radius: var(--theme-form-element-radius);
+
+  color: var(--theme-input-color);
+  border-color: var(--theme-input-border);
+  background-color: var(--theme-input-background);
+
+  /* we use box-shadow to overlap internal background-color style, we can't override it due to chrome bug */
+  &:-internal-autofill-selected,
+  &:-internal-autofill-previewed {
+    -webkit-text-fill-color: var(--theme-on-secondary);
+    box-shadow: 0 0 0 50px var(--theme-input-background) inset;
+  }
+
+  &:user-invalid {
+    border-color: var(--theme-negative);
+  }
+
+  &[type='color'] {
+    padding: 0;
+    &::-webkit-color-swatch-wrapper {
+      padding: 0;
+    }
+    &::-webkit-color-swatch {
+      border: none;
+    }
+  }
+
+  &:focus,
+  &[data-focus='true'] {
+    border-color: var(--theme-primary);
+  }
+
+  &:not([data-select='true'])[readonly] {
+    color: var(--theme-input-color-readonly);
+    border-color: var(--theme-input-border-readonly);
+    background-color: var(--theme-input-background-readonly);
+    opacity: 1;
+    &:-internal-autofill-selected,
+    &:-internal-autofill-previewed {
+      box-shadow: 0 0 0 50px var(--theme-input-background-readonly) inset;
+    }
+  }
+
+  &[disabled] {
+    color: var(--theme-input-color-readonly);
+    border-color: var(--theme-input-border-readonly);
+    background-color: var(--theme-input-background-readonly);
+    pointer-events: all;
+    opacity: 1;
+    &:-internal-autofill-selected,
+    &:-internal-autofill-previewed {
+      box-shadow: 0 0 0 50px var(--theme-input-background-readonly) inset;
+    }
+  }
+  &[data-embedded='true'] {
+    &[disabled],
+    &:not([data-select='true'])[readonly] {
+      border-color: var(--theme-background);
+      background-color: var(--theme-input-background);
+    }
+  }
+}

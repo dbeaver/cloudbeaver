@@ -1,0 +1,23 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2026 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+
+@layer base {
+  .theme-light {
+    --theme-input-color: var(--theme-on-surface);
+    --theme-input-color-disabled: oklch(from var(--theme-input-color) calc(l + 0.13) c h);
+    --theme-input-color-placeholder: oklch(from var(--theme-input-color) calc(l + 0.32) c h);
+    --theme-input-color-readonly: var(--theme-input-color);
+    --theme-input-border: #d9d9d9;
+    --theme-input-border-disabled: var(--theme-input-border);
+    --theme-input-border-readonly: var(--theme-input-border);
+    --theme-input-background: var(--theme-surface);
+    --theme-input-background-disabled: #e9e9e9;
+    --theme-input-background-readonly: #e9e9e9;
+    --theme-switch-thumb: oklch(from var(--theme-surface) calc(l + 0.05) c h);
+  }
+}
