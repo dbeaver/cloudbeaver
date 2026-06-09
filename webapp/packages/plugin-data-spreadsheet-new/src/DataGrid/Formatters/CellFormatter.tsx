@@ -60,13 +60,13 @@ export const CellFormatter = observer<Props>(function CellFormatter({ rowIdx, co
           <IconButton
             name="snack"
             viewBox="0 0 16 16"
-            aria-label={translate('data_grid_table_context_menu_aria_label')}
             tabIndex={-1}
             className={s(styles, { menuTrigger: true })}
             onDoubleClick={stopPropagation}
             onMouseUp={handleMouseUp}
             onClick={openMenu}
           />
+          <span className="tw:sr-only">{translate('data_grid_table_context_menu_aria_label')}</span>
         </>
       )}
     </div>
