@@ -20,7 +20,7 @@ export const ProjectInfoFormPanel = observer<IProjectInfoFormProps>(function Pro
     <TabsState container={service.parts} localState={formState.parts} formState={formState}>
       <div className="tw:flex tw:flex-col tw:flex-1 tw:h-full tw:overflow-auto theme-background-secondary theme-text-on-secondary">
         <div className="tw:relative tw:flex tw:items-end tw:border-b-2 theme-border-color-background theme-background-secondary theme-text-on-secondary">
-          <div className="tw:flex-1 tw:overflow-hidden tw:pt-2">
+          <div className="tw:flex-1 tw:overflow-hidden">
             <TabList disabled={formState.isDisabled} underline big />
           </div>
         </div>
