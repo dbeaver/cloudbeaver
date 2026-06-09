@@ -2,7 +2,6 @@
   "name": "@cloudbeaver/browserslist-config",
   "sideEffects": [
     "src/**/*.css",
-    "src/**/*.scss",
     "public/**/*"
   ],
   "version": "0.1.0",

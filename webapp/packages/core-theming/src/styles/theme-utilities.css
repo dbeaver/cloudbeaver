@@ -1,0 +1,292 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2026 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ *
+ * Theme-agnostic utility classes that reference CSS custom properties
+ * defined by .theme-light / .theme-dark. These classes work in both themes
+ * without duplication.
+ */
+
+@layer utilities {
+  /* ── theme-text-{color} ─────────────────────────────────────────── */
+  .theme-text-primary {
+    color: var(--theme-primary);
+    & svg,
+    & > svg {
+      fill: var(--theme-primary);
+    }
+  }
+  .theme-text-on-primary {
+    color: var(--theme-on-primary);
+    & svg,
+    & > svg {
+      fill: var(--theme-on-primary);
+    }
+  }
+  .theme-text-secondary {
+    color: var(--theme-secondary);
+    & svg,
+    & > svg {
+      fill: var(--theme-secondary);
+    }
+  }
+  .theme-text-on-secondary {
+    color: var(--theme-on-secondary);
+    & svg,
+    & > svg {
+      fill: var(--theme-on-secondary);
+    }
+  }
+  .theme-text-error {
+    color: var(--theme-error);
+    & svg,
+    & > svg {
+      fill: var(--theme-error);
+    }
+  }
+  .theme-text-on-error {
+    color: var(--theme-on-error);
+    & svg,
+    & > svg {
+      fill: var(--theme-on-error);
+    }
+  }
+  .theme-text-surface {
+    color: var(--theme-surface);
+    & svg,
+    & > svg {
+      fill: var(--theme-surface);
+    }
+  }
+  .theme-text-on-surface {
+    color: var(--theme-on-surface);
+    & svg,
+    & > svg {
+      fill: var(--theme-on-surface);
+    }
+  }
+  .theme-text-background {
+    color: var(--theme-background);
+    & svg,
+    & > svg {
+      fill: var(--theme-background);
+    }
+  }
+  .theme-text-positive {
+    color: var(--theme-positive);
+    & svg,
+    & > svg {
+      fill: var(--theme-positive);
+    }
+  }
+  .theme-text-negative {
+    color: var(--theme-negative);
+    & svg,
+    & > svg {
+      fill: var(--theme-negative);
+    }
+  }
+  .theme-text-status {
+    color: var(--theme-status);
+    & svg,
+    & > svg {
+      fill: var(--theme-status);
+    }
+  }
+
+  /* ── theme-border-color-{color} ────────────────────────────────── */
+  .theme-border-color-primary {
+    border-color: var(--theme-primary) !important;
+  }
+  .theme-border-color-on-primary {
+    border-color: var(--theme-on-primary) !important;
+  }
+  .theme-border-color-secondary {
+    border-color: var(--theme-secondary) !important;
+  }
+  .theme-border-color-on-secondary {
+    border-color: var(--theme-on-secondary) !important;
+  }
+  .theme-border-color-error {
+    border-color: var(--theme-error) !important;
+  }
+  .theme-border-color-on-error {
+    border-color: var(--theme-on-error) !important;
+  }
+  .theme-border-color-surface {
+    border-color: var(--theme-surface) !important;
+  }
+  .theme-border-color-on-surface {
+    border-color: var(--theme-on-surface) !important;
+  }
+  .theme-border-color-background {
+    border-color: var(--theme-background) !important;
+  }
+  .theme-border-color-positive {
+    border-color: var(--theme-positive) !important;
+  }
+  .theme-border-color-negative {
+    border-color: var(--theme-negative) !important;
+  }
+  .theme-border-color-status {
+    border-color: var(--theme-status) !important;
+  }
+
+  /* ── theme-fill-{color} ─────────────────────────────────────────── */
+  .theme-fill-primary {
+    fill: var(--theme-primary);
+  }
+  .theme-fill-on-primary {
+    fill: var(--theme-on-primary);
+  }
+  .theme-fill-secondary {
+    fill: var(--theme-secondary);
+  }
+  .theme-fill-on-secondary {
+    fill: var(--theme-on-secondary);
+  }
+  .theme-fill-error {
+    fill: var(--theme-error);
+  }
+  .theme-fill-on-error {
+    fill: var(--theme-on-error);
+  }
+  .theme-fill-surface {
+    fill: var(--theme-surface);
+  }
+  .theme-fill-on-surface {
+    fill: var(--theme-on-surface);
+  }
+  .theme-fill-background {
+    fill: var(--theme-background);
+  }
+  .theme-fill-positive {
+    fill: var(--theme-positive);
+  }
+  .theme-fill-negative {
+    fill: var(--theme-negative);
+  }
+  .theme-fill-status {
+    fill: var(--theme-status);
+  }
+
+  /* ── theme-background-{color} ───────────────────────────────────── */
+  .theme-background-primary {
+    background-color: var(--theme-primary);
+  }
+  .theme-background-secondary {
+    background-color: var(--theme-secondary);
+  }
+  .theme-background-surface {
+    background-color: var(--theme-surface);
+  }
+  .theme-background-background {
+    background-color: var(--theme-background);
+  }
+  .theme-background-positive {
+    background-color: var(--theme-positive);
+  }
+
+  /* ── theme-text-text-{variant}-on-{tone} ───────────────────────── */
+  .theme-text-text-primary-on-light {
+    color: var(--theme-text-primary-on-light);
+    & svg,
+    & > svg {
+      fill: var(--theme-text-primary-on-light);
+    }
+  }
+  .theme-text-text-primary-on-dark {
+    color: var(--theme-text-primary-on-dark);
+    & svg,
+    & > svg {
+      fill: var(--theme-text-primary-on-dark);
+    }
+  }
+  .theme-text-text-secondary-on-light {
+    color: var(--theme-text-secondary-on-light);
+    & svg,
+    & > svg {
+      fill: var(--theme-text-secondary-on-light);
+    }
+  }
+  .theme-text-text-secondary-on-dark {
+    color: var(--theme-text-secondary-on-dark);
+    & svg,
+    & > svg {
+      fill: var(--theme-text-secondary-on-dark);
+    }
+  }
+  .theme-text-text-sub-secondary-on-light {
+    color: var(--theme-text-sub-secondary-on-light);
+    & svg,
+    & > svg {
+      fill: var(--theme-text-sub-secondary-on-light);
+    }
+  }
+  .theme-text-text-sub-secondary-on-dark {
+    color: var(--theme-text-sub-secondary-on-dark);
+    & svg,
+    & > svg {
+      fill: var(--theme-text-sub-secondary-on-dark);
+    }
+  }
+  .theme-text-text-hint-on-light {
+    color: var(--theme-text-hint-on-light);
+    & svg,
+    & > svg {
+      fill: var(--theme-text-hint-on-light);
+    }
+  }
+  .theme-text-text-hint-on-dark {
+    color: var(--theme-text-hint-on-dark);
+    & svg,
+    & > svg {
+      fill: var(--theme-text-hint-on-dark);
+    }
+  }
+  .theme-text-text-disabled-on-light {
+    color: var(--theme-text-disabled-on-light);
+    & svg,
+    & > svg {
+      fill: var(--theme-text-disabled-on-light);
+    }
+  }
+  .theme-text-text-disabled-on-dark {
+    color: var(--theme-text-disabled-on-dark);
+    & svg,
+    & > svg {
+      fill: var(--theme-text-disabled-on-dark);
+    }
+  }
+  .theme-text-text-icon-on-light {
+    color: var(--theme-text-icon-on-light);
+    & svg,
+    & > svg {
+      fill: var(--theme-text-icon-on-light);
+    }
+  }
+  .theme-text-text-icon-on-dark {
+    color: var(--theme-text-icon-on-dark);
+    & svg,
+    & > svg {
+      fill: var(--theme-text-icon-on-dark);
+    }
+  }
+  .theme-text-text-negative-on-light {
+    color: var(--theme-text-negative-on-light);
+    & svg,
+    & > svg {
+      fill: var(--theme-text-negative-on-light);
+    }
+  }
+  .theme-text-text-negative-on-dark {
+    color: var(--theme-text-negative-on-dark);
+    & svg,
+    & > svg {
+      fill: var(--theme-text-negative-on-dark);
+    }
+  }
+}
