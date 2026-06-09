@@ -29,8 +29,8 @@ import org.jkiss.dbeaver.model.sql.SQLDialect;
 import org.jkiss.dbeaver.model.sql.translate.SQLQueryTranslator;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.utils.GeneralUtils;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -208,10 +208,10 @@ public class    SQLQueryTranslatorTest extends CloudbeaverMockTest {
                 preferenceStore,
                 basicSql
             );
-            Assert.assertEquals(
-                entry.getKey().getDialectId() + " has invalid syntax " + translated,
+            Assertions.assertEquals(
                 normalizeScript(entry.getValue()),
-                normalizeScript(translated)
+                normalizeScript(translated),
+                entry.getKey().getDialectId() + " has invalid syntax " + translated
             );
         }
     }
