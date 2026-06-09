@@ -85,6 +85,8 @@
     &:disabled {
       cursor: default;
       pointer-events: none;
+      /* resets default input styles so it doesn't interfere with the switch appearance */
+      opacity: 0 !important;
     }
   }
 

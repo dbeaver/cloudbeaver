@@ -117,8 +117,7 @@ public class WebSQLUtils {
             Map<String, Object> map = createMapOfType(WebSQLConstants.VALUE_TYPE_COLLECTION);
             map.put("value", items);
             return map;
-        } else if (value instanceof DBDComposite) {
-            DBDComposite composite = (DBDComposite)value;
+        } else if (value instanceof DBDComposite composite && composite.getAttributes().length > 0) {
             Map<String, Object> struct = new LinkedHashMap<>();
             for (DBSAttributeBase attr : composite.getAttributes()) {
                 struct.put(attr.getName(), makeWebCellValue(session, attr, composite.getAttributeValue(attr), dataFormat));
