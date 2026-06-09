@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 import { use, useContext } from 'react';
 import { DataGridCellInnerContext } from '@cloudbeaver/plugin-data-grid';
 
-import { getComputed, IconButton, s, useS } from '@cloudbeaver/core-blocks';
+import { getComputed, IconButton, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 
 import { CellContext } from '../CellRenderer/CellContext.js';
@@ -26,6 +26,7 @@ export const CellFormatter = observer<Props>(function CellFormatter({ rowIdx, co
   const innerCellContext = use(DataGridCellInnerContext);
   const cellContext = useContext(CellContext);
   const tableMenuContext = use(TableMenuContext);
+  const translate = useTranslate();
 
   const cell = cellContext.cell;
   const showCellMenu = getComputed(
@@ -55,15 +56,18 @@ export const CellFormatter = observer<Props>(function CellFormatter({ rowIdx, co
         <CellFormatterFactory rowIdx={rowIdx} colIdx={colIdx} />
       </div>
       {showCellMenu && (
-        <IconButton
-          name="snack"
-          viewBox="0 0 16 16"
-          tabIndex={-1}
-          className={s(styles, { menuTrigger: true })}
-          onDoubleClick={stopPropagation}
-          onMouseUp={handleMouseUp}
-          onClick={openMenu}
-        />
+        <>
+          <IconButton
+            name="snack"
+            viewBox="0 0 16 16"
+            tabIndex={-1}
+            className={s(styles, { menuTrigger: true })}
+            onDoubleClick={stopPropagation}
+            onMouseUp={handleMouseUp}
+            onClick={openMenu}
+          />
+          <span className="tw:sr-only">{translate('data_grid_table_context_menu_aria_label')}</span>
+        </>
       )}
     </div>
   );
