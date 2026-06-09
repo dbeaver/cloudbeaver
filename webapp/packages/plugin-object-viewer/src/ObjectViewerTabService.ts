@@ -28,6 +28,7 @@ import {
   type INodeNavigationData,
   NavNodeManagerService,
   NavTreeResource,
+  NODE_PATH_PREFIX,
   NodeManagerUtils,
   objectNavNodeProvider,
 } from '@cloudbeaver/core-navigation-tree';
@@ -379,6 +380,10 @@ export class ObjectViewerTabService {
         if (!this.connectionInfoResource.has(tab.handlerState.connectionKey)) {
           return false;
         }
+      }
+
+      if (!tab.handlerState.objectId.startsWith(NODE_PATH_PREFIX)) {
+        return false;
       }
 
       runInAction(() => {
