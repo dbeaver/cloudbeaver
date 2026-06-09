@@ -5,6 +5,4 @@ export default [
   ['plugin_project_info_form_options_field_name', '名称'],
   ['plugin_project_info_form_options_field_id', '标识符'],
   ['plugin_project_info_form_options_field_description', '描述'],
-  ['plugin_project_info_form_options_field_shared', '共享'],
-  ['plugin_project_info_form_options_field_global', '全局'],
 ];

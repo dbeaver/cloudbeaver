@@ -8,17 +8,7 @@
 
 import { observer } from 'mobx-react-lite';
 
-import {
-  ColoredContainer,
-  Container,
-  FieldCheckbox,
-  Group,
-  GroupTitle,
-  InputField,
-  Textarea,
-  useAutoLoad,
-  useTranslate,
-} from '@cloudbeaver/core-blocks';
+import { ColoredContainer, Container, Group, GroupTitle, InputField, Textarea, useAutoLoad, useTranslate } from '@cloudbeaver/core-blocks';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 
 import type { IProjectInfoFormProps } from '../IProjectInfoFormProps.js';
@@ -50,12 +40,6 @@ export const ProjectInfoFormOptions: TabContainerPanelComponent<IProjectInfoForm
               {translate('plugin_project_info_form_options_field_description')}
             </Textarea>
           )}
-          <FieldCheckbox state={part.state} name="shared" title={translate('plugin_project_info_form_options_field_shared')} readOnly small>
-            {translate('plugin_project_info_form_options_field_shared')}
-          </FieldCheckbox>
-          <FieldCheckbox state={part.state} name="global" title={translate('plugin_project_info_form_options_field_global')} readOnly small>
-            {translate('plugin_project_info_form_options_field_global')}
-          </FieldCheckbox>
         </Group>
       </Container>
     </ColoredContainer>

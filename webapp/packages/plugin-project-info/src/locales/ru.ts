@@ -5,6 +5,4 @@ export default [
   ['plugin_project_info_form_options_field_name', 'Название'],
   ['plugin_project_info_form_options_field_id', 'Идентификатор'],
   ['plugin_project_info_form_options_field_description', 'Описание'],
-  ['plugin_project_info_form_options_field_shared', 'Общий'],
-  ['plugin_project_info_form_options_field_global', 'Глобальный'],
 ];

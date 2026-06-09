@@ -9,11 +9,9 @@
 import { schema } from '@cloudbeaver/core-utils';
 
 export const ProjectInfoOptionsSchema = schema.object({
-  description: schema.string().optional(),
-  global: schema.boolean(),
   id: schema.string().nonempty(),
   name: schema.string().nonempty(),
-  shared: schema.boolean(),
+  description: schema.string().optional(),
 });
 
 export type IProjectInfoOptionsSchema = schema.infer<typeof ProjectInfoOptionsSchema>;

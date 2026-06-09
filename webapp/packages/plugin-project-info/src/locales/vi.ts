@@ -5,6 +5,4 @@ export default [
   ['plugin_project_info_form_options_field_name', 'Tên'],
   ['plugin_project_info_form_options_field_id', 'ID'],
   ['plugin_project_info_form_options_field_description', 'Mô tả'],
-  ['plugin_project_info_form_options_field_shared', 'Chia sẻ'],
-  ['plugin_project_info_form_options_field_global', 'Toàn cục'],
 ];

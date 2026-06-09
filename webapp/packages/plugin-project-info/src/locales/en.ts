@@ -5,6 +5,4 @@ export default [
   ['plugin_project_info_form_options_field_name', 'Name'],
   ['plugin_project_info_form_options_field_id', 'ID'],
   ['plugin_project_info_form_options_field_description', 'Description'],
-  ['plugin_project_info_form_options_field_shared', 'Shared'],
-  ['plugin_project_info_form_options_field_global', 'Global'],
 ];

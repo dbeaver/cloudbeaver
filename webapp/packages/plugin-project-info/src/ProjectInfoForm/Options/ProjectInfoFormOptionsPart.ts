@@ -15,10 +15,8 @@ import type { IProjectInfoOptionsSchema } from './ProjectInfoOptionsSchema.js';
 
 const getDefaultState = (): IProjectInfoOptionsSchema => ({
   description: '',
-  global: false,
   id: '',
   name: '',
-  shared: false,
 });
 
 export class ProjectInfoFormOptionsPart extends FormPart<IProjectInfoOptionsSchema, IProjectInfoFormState> {
@@ -37,10 +35,8 @@ export class ProjectInfoFormOptionsPart extends FormPart<IProjectInfoOptionsSche
     const projectInfo = await this.projectInfoResource.load(this.formState.state.projectId);
     this.setInitialState({
       description: projectInfo.description,
-      global: projectInfo.global,
       id: projectInfo.id,
       name: projectInfo.name,
-      shared: projectInfo.shared,
     });
   }
 
