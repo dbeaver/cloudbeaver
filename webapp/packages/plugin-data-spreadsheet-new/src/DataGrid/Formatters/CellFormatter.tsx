@@ -56,7 +56,7 @@ export const CellFormatter = observer<Props>(function CellFormatter({ rowIdx, co
         <CellFormatterFactory rowIdx={rowIdx} colIdx={colIdx} />
       </div>
       {showCellMenu && (
-        <>
+        <span>
           <IconButton
             name="snack"
             viewBox="0 0 16 16"
@@ -67,7 +67,7 @@ export const CellFormatter = observer<Props>(function CellFormatter({ rowIdx, co
             onClick={openMenu}
           />
           <span className="tw:sr-only">{translate('data_grid_table_context_menu_aria_label')}</span>
-        </>
+        </span>
       )}
     </div>
   );
