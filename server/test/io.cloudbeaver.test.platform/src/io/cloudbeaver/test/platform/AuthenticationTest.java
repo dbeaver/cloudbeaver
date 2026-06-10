@@ -25,8 +25,8 @@ import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.auth.SMAuthStatus;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.utils.SecurityUtils;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -56,7 +56,7 @@ public class AuthenticationTest extends CloudbeaverMockTest {
     public void testLoginUser() throws Exception {
         WebGQLClient client = CEAppStarter.createClient();
         Map<String, Object> authInfo = CEAppStarter.authenticateTestUser(client);
-        Assert.assertEquals(SMAuthStatus.SUCCESS.name(), JSONUtils.getString(authInfo, "authStatus"));
+        Assertions.assertEquals(SMAuthStatus.SUCCESS.name(), JSONUtils.getString(authInfo, "authStatus"));
     }
 
 
@@ -67,14 +67,14 @@ public class AuthenticationTest extends CloudbeaverMockTest {
             Map<String, Object> credsWithCamelCase = getUserCredentials(userId);
             // authenticating with user
             Map<String, Object> authInfo = CEAppStarter.authenticateTestUser(client, credsWithCamelCase);
-            Assert.assertEquals(SMAuthStatus.SUCCESS.name(), JSONUtils.getString(authInfo, "authStatus"));
+            Assertions.assertEquals(SMAuthStatus.SUCCESS.name(), JSONUtils.getString(authInfo, "authStatus"));
             Map<String, Object> activeUser = client.sendQuery(GQL_ACTIVE_USER, null);
-            Assert.assertEquals(userId.toLowerCase(), JSONUtils.getString(activeUser, "userId"));
+            Assertions.assertEquals(userId.toLowerCase(), JSONUtils.getString(activeUser, "userId"));
             // making logout
             client.sendQuery(GQL_AUTH_LOGOUT, Map.of("provider", "local"));
 
             activeUser = client.sendQuery(GQL_ACTIVE_USER, null);
-            Assert.assertNotEquals(userId.toLowerCase(), JSONUtils.getString(activeUser, "userId"));
+            Assertions.assertNotEquals(userId.toLowerCase(), JSONUtils.getString(activeUser, "userId"));
         }
     }
 
@@ -95,9 +95,9 @@ public class AuthenticationTest extends CloudbeaverMockTest {
         headers.put(RPAuthProvider.X_USER, testUserId);
         headers.put(RPAuthProvider.X_TEAM, "user");
         Map<String, Object> sessionInfo = client.sendQueryWithHeaders(GQL_OPEN_SESSION, null, headers);
-        Assert.assertTrue(JSONUtils.getBoolean(sessionInfo, "valid"));
+        Assertions.assertTrue(JSONUtils.getBoolean(sessionInfo, "valid"));
 
         Map<String, Object> activeUser = client.sendQuery(GQL_ACTIVE_USER, null);
-        Assert.assertEquals(testUserId, JSONUtils.getString(activeUser, "userId"));
+        Assertions.assertEquals(testUserId, JSONUtils.getString(activeUser, "userId"));
     }
 }

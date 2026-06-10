@@ -18,8 +18,8 @@ package io.cloudbeaver.test.platform;
 
 import io.cloudbeaver.CloudbeaverMockTest;
 import io.cloudbeaver.app.CEAppStarter;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.net.CookieManager;
 import java.net.URI;
@@ -44,6 +44,6 @@ public class NoSessionTest extends CloudbeaverMockTest {
 
         httpClient.send(request, HttpResponse.BodyHandlers.ofByteArray());
 
-        Assert.assertTrue(cookieManager.getCookieStore().getCookies().isEmpty());
+        Assertions.assertTrue(cookieManager.getCookieStore().getCookies().isEmpty());
     }
 }

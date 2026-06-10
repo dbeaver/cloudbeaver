@@ -22,8 +22,8 @@ import io.cloudbeaver.service.navigator.WebNavigatorNodeInfo;
 import org.jkiss.dbeaver.model.navigator.DBNDatabaseNode;
 import org.jkiss.dbeaver.model.navigator.DBNNode;
 import org.jkiss.dbeaver.model.struct.DBSObject;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 public class WebNavigatorNodeInfoTest extends CloudbeaverMockTest {
@@ -44,13 +44,13 @@ public class WebNavigatorNodeInfoTest extends CloudbeaverMockTest {
 
         WebNavigatorNodeInfo info = new WebNavigatorNodeInfo(session, node);
 
-        Assert.assertEquals("node/path", info.getId());
-        Assert.assertEquals("node://uri", info.getUri());
-        Assert.assertEquals("NodeName", info.getName());
-        Assert.assertEquals("A description", info.getDescription());
-        Assert.assertEquals("nodeType", info.getNodeType());
-        Assert.assertTrue(info.isHasChildren());
-        Assert.assertEquals("node://uri", info.toString());
+        Assertions.assertEquals("node/path", info.getId());
+        Assertions.assertEquals("node://uri", info.getUri());
+        Assertions.assertEquals("NodeName", info.getName());
+        Assertions.assertEquals("A description", info.getDescription());
+        Assertions.assertEquals("nodeType", info.getNodeType());
+        Assertions.assertTrue(info.isHasChildren());
+        Assertions.assertEquals("node://uri", info.toString());
     }
 
     @Test
@@ -66,11 +66,11 @@ public class WebNavigatorNodeInfoTest extends CloudbeaverMockTest {
 
         WebNavigatorNodeInfo info = new WebNavigatorNodeInfo(session, dbNode);
 
-        Assert.assertNotNull(info.getObject());
-        Assert.assertEquals("DBNodeName", info.getName());
+        Assertions.assertNotNull(info.getObject());
+        Assertions.assertEquals("DBNodeName", info.getName());
 
         Mockito.when(session.getLocale()).thenReturn("es");
-        Assert.assertEquals("DBNodeName1", info.getName());
+        Assertions.assertEquals("DBNodeName1", info.getName());
 
 
     }
