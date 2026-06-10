@@ -319,8 +319,7 @@ public class ServletAppUtils {
             if (log.isTraceEnabled()) {
                 log.trace("forwarded origin: " + origin);
             }
-        }
-        if (CommonUtils.isEmpty(origin)) {
+        } else if (CommonUtils.isEmpty(origin)) {
             URI requestUrl = URI.create(request.getRequestURL().toString());
             if (log.isTraceEnabled()) {
                 log.trace("Request URL: " + requestUrl);
@@ -344,13 +343,34 @@ public class ServletAppUtils {
                 log.error("Failed to parse port from header: " + request.getHeader(HEADER_FORWARDED_PORT), e);
             }
         }
+
+        String finalScheme = uri.getScheme();
+        String finalHost = uri.getHost();
+        int finalPort = port;
+        boolean changed = false;
+        if (CommonUtils.isNotEmpty(forwardedScheme) && !forwardedScheme.equals(finalScheme)) {
+            finalScheme = forwardedScheme;
+            changed = true;
+        }
+        if (CommonUtils.isNotEmpty(forwardedHost) && !forwardedHost.equals(finalHost)) {
+            finalHost = forwardedHost;
+            changed = true;
+        }
         if (DEFAULT_PORTS.contains(port)) {
+            finalPort = -1;
+            changed = true;
+        }
+        if (log.isTraceEnabled()) {
+            log.trace("Origin URI: " + origin);
+        }
+
+        if (changed) {
             try {
                 origin = new URI(
-                    uri.getScheme(),
+                    finalScheme,
                     uri.getUserInfo(),
-                    uri.getHost(),
-                    -1,
+                    finalHost,
+                    finalPort,
                     uri.getPath(),
                     uri.getQuery(),
                     uri.getFragment()
@@ -358,9 +378,6 @@ public class ServletAppUtils {
             } catch (URISyntaxException e) {
                 log.error("Failed to create URI without port", e);
             }
-        }
-        if (log.isTraceEnabled()) {
-            log.trace("Origin URI: " + origin);
         }
 
         return origin;
