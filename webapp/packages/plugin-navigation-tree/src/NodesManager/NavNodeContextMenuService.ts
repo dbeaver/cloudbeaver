@@ -188,7 +188,7 @@ export class NavNodeContextMenuService extends Bootstrap {
         const node = context.get(DATA_CONTEXT_NAV_NODE)!;
 
         if (action === ACTION_OPEN) {
-          return this.navNodeManagerService.canOpen(node.uri, node.parentId) && !node.folder;
+          return this.navNodeManagerService.canOpen(node.uri, node.parentId);
         }
 
         return [ACTION_REFRESH].includes(action);
