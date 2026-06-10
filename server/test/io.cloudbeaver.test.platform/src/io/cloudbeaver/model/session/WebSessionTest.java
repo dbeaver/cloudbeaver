@@ -22,9 +22,9 @@ import io.cloudbeaver.model.app.ServletAuthApplication;
 import org.jkiss.dbeaver.model.websocket.event.WSEventController;
 import org.jkiss.utils.function.ThrowableConsumer;
 import org.jkiss.utils.function.ThrowableFunction;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.util.Collections;
@@ -35,7 +35,7 @@ public class WebSessionTest extends CloudbeaverMockTest {
 
     private WebSession session;
 
-    @Before
+    @BeforeEach
     public void initWebSession() throws Exception {
         session = new WebSession(getFakeRequestInfo(), mockApplication(), Collections.emptyMap());
     }
@@ -44,13 +44,13 @@ public class WebSessionTest extends CloudbeaverMockTest {
     public void localeAndBasicAttributes() throws Exception {
         // Locale
         session.setLocale("test-locale");
-        Assert.assertEquals("test-locale", session.getLocale());
+        Assertions.assertEquals("test-locale", session.getLocale());
         session.setLocale(null);
-        Assert.assertEquals(Locale.getDefault().getLanguage(), session.getLocale());
+        Assertions.assertEquals(Locale.getDefault().getLanguage(), session.getLocale());
 
         // Persistent attribute must survive reset/close
         session.setAttribute("persistentKey", "persistValue", true);
-        Assert.assertEquals("persistValue", session.getAttribute("persistentKey"));
+        Assertions.assertEquals("persistValue", session.getAttribute("persistentKey"));
 
         // Non-persistent attribute created via getAttribute with creator/disposer
         AtomicBoolean disposed = new AtomicBoolean(false);
@@ -60,24 +60,23 @@ public class WebSessionTest extends CloudbeaverMockTest {
         };
 
         String created = session.getAttribute("createdKey", creator, disposer);
-        Assert.assertEquals("created", created);
+        Assertions.assertEquals("created", created);
 
         // persistent attribute should still be available
-        Assert.assertEquals("persistValue", session.getAttribute("persistentKey"));
+        Assertions.assertEquals("persistValue", session.getAttribute("persistentKey"));
 
         session.close();
 
         // persistent attribute should иу тгдд
-        Assert.assertNull("persistValue", session.getAttribute("persistentKey"));
-
-        Assert.assertTrue("disposer must be invoked during close()", disposed.get());
+        Assertions.assertNull(session.getAttribute("persistentKey"), "persistValue");
+        Assertions.assertTrue(disposed.get(), "disposer must be invoked during close()");
     }
 
     @Test
     public void asyncTaskStatusNotFound() throws Exception {
-        Assert.assertThrows(
-            "DBWebException must be thrown for unknown async task",
-            DBWebException.class, () -> session.asyncTaskStatus("nonexistent-task", false)
+        Assertions.assertThrows(
+            DBWebException.class, () -> session.asyncTaskStatus("nonexistent-task", false),
+            "DBWebException must be thrown for unknown async task"
         );
     }
 
