@@ -61,11 +61,6 @@ public class WebSQLQueryResultReference {
         return association.getName();
     }
 
-    @Property
-    public boolean isReference() {
-        return reverse;
-    }
-
     @Nullable
     @Property
     public String getTargetEntityName() {

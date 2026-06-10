@@ -331,9 +331,26 @@ public class WebSQLUtils {
     }
 
     @NotNull
+    public static List<WebSQLQueryResultReference> collectAssociations(
+        @NotNull WebSession session,
+        @NotNull DBDAttributeBinding[] bindings
+    ) {
+        return collectWebSQLQueryResultReference(session, bindings, false);
+    }
+
+    @NotNull
     public static List<WebSQLQueryResultReference> collectReferences(
         @NotNull WebSession session,
         @NotNull DBDAttributeBinding[] bindings
+    ) {
+        return collectWebSQLQueryResultReference(session, bindings, true);
+    }
+
+    @NotNull
+    private static List<WebSQLQueryResultReference> collectWebSQLQueryResultReference(
+        @NotNull WebSession session,
+        @NotNull DBDAttributeBinding[] bindings,
+        boolean reverse
     ) {
         Map<DBSEntityAttribute, Integer> attrToIndex = new HashMap<>();
         Set<DBSEntity> entities = new LinkedHashSet<>();
@@ -356,16 +373,13 @@ public class WebSQLUtils {
         DBRProgressMonitor monitor = session.getProgressMonitor();
         for (DBSEntity entity : entities) {
             try {
-                for (DBSEntityAssociation fk : DBStructUtils.readAssociations(monitor, entity, attrToBinding)) {
-                    List<Integer> columnIndex = collectOwnColumnIndex(monitor, fk, false, attrToIndex);
+                List<DBSEntityAssociation> source = reverse
+                    ? DBStructUtils.readReferences(monitor, entity, attrToBinding)
+                    : DBStructUtils.readAssociations(monitor, entity, attrToBinding);
+                for (DBSEntityAssociation association : source) {
+                    List<Integer> columnIndex = collectOwnColumnIndex(monitor, association, reverse, attrToIndex);
                     if (columnIndex != null) {
-                        result.add(new WebSQLQueryResultReference(session, fk, false, columnIndex));
-                    }
-                }
-                for (DBSEntityAssociation ref : DBStructUtils.readReferences(monitor, entity, attrToBinding)) {
-                    List<Integer> columnIndex = collectOwnColumnIndex(monitor, ref, true, attrToIndex);
-                    if (columnIndex != null) {
-                        result.add(new WebSQLQueryResultReference(session, ref, true, columnIndex));
+                        result.add(new WebSQLQueryResultReference(session, association, reverse, columnIndex));
                     }
                 }
             } catch (DBException e) {

@@ -84,6 +84,14 @@ public class WebSQLQueryResultSet {
 
     @NotNull
     @Property
+    public List<WebSQLQueryResultReference> getAssociations() {
+        return session != null && referencesBindings != null
+            ? WebSQLUtils.collectAssociations(session, referencesBindings)
+            : Collections.emptyList();
+    }
+
+    @NotNull
+    @Property
     public List<WebSQLQueryResultReference> getReferences() {
         return session != null && referencesBindings != null
             ? WebSQLUtils.collectReferences(session, referencesBindings)
