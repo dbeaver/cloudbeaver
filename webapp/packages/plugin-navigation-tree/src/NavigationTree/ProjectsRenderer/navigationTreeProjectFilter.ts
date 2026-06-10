@@ -44,7 +44,7 @@ export function navigationTreeProjectFilter(
           return navTreeResource.get(node.uri)?.length;
         }
 
-        return NodeManagerUtils.isDatabaseObject(node.uri);
+        return NodeManagerUtils.isDatabaseObject(node);
       })
       .map(node => node.uri);
 

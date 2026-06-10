@@ -122,7 +122,7 @@ export class ConnectionNavNodeService {
     if (isResourceAlias(key)) {
       return;
     }
-    if (!ResourceKeyUtils.some(key, key => NodeManagerUtils.isDatabaseObject(key))) {
+    if (!ResourceKeyUtils.some(key, key => NodeManagerUtils.isDatabaseObject(this.navNodeInfoResource.get(key)))) {
       return;
     }
 
@@ -290,7 +290,7 @@ export class ConnectionNavNodeService {
   private async navigateHandler({ nodeId }: INodeNavigationData, contexts: IExecutionContextProvider<INodeNavigationData>): Promise<void> {
     let connection: Connection | undefined | null = await contexts.getContext(this.navigationNavNodeConnectionContext);
 
-    if (NodeManagerUtils.isDatabaseObject(nodeId) && connection) {
+    if (NodeManagerUtils.isDatabaseObject(this.navNodeInfoResource.get(nodeId)) && connection) {
       connection = await this.connectionsManagerService.requireConnection(createConnectionParam(connection));
 
       if (!connection?.connected) {

@@ -6,7 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { createPath, getPathParts } from '@cloudbeaver/core-utils';
+import { createPath } from '@cloudbeaver/core-utils';
+
+import type { NavNode } from './EntityTypes.js';
+import { isNotNullDefined } from '@dbeaver/js-helpers';
 
 export const NODE_PATH_PREFIX = 'node://';
 export const NODE_DATASOURCES_SEGMENT = 'datasources';
@@ -20,9 +23,8 @@ export const NodeManagerUtils = {
     return `${schemaId || ''}${schemaId && catalogId ? '@' : ''}${catalogId || ''}`;
   },
 
-  isDatabaseObject(nodeId: string): boolean {
-    const segments = getPathParts(this.getPlainPath(nodeId));
-    return segments[1] === NODE_DATASOURCES_SEGMENT;
+  isDatabaseObject(node: NavNode | undefined): boolean {
+    return isNotNullDefined(node?.objectId);
   },
   getPlainPath(nodeId: string): string {
     return nodeId.startsWith(NODE_PATH_PREFIX) ? nodeId.slice(NODE_PATH_PREFIX.length) : nodeId;
