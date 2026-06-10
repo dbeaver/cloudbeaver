@@ -72,9 +72,11 @@ export const ContextMenu = observer<IContextMenuNewProps>(function ContextMenuIn
   );
 
   const showAtPosition = !!contextMenuPosition?.position;
+
   useLayoutEffect(() => {
     if (showAtPosition) {
       menu.show();
+      menu.render();
     }
   }, [showAtPosition, menu]);
 
