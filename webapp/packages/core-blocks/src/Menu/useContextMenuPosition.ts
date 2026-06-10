@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@ export interface IContextMenuPositionCoords {
 
 export interface IContextMenuPosition {
   position: IContextMenuPositionCoords | null;
-  open: (event: React.MouseEvent) => void;
+  open: (event: React.MouseEvent | React.KeyboardEvent) => void;
   close: () => void;
 }
 
@@ -24,7 +24,7 @@ export function useContextMenuPosition(): IContextMenuPosition {
   return useObservableRef<IContextMenuPosition>(
     () => ({
       position: null,
-      open(event: React.MouseEvent) {
+      open(event: React.MouseEvent | React.KeyboardEvent) {
         if (!event.currentTarget.contains(event.target as Node)) {
           return;
         }
@@ -32,8 +32,13 @@ export function useContextMenuPosition(): IContextMenuPosition {
         event.preventDefault();
         event.stopPropagation();
 
-        let x = event.clientX;
-        let y = event.clientY;
+        let x = 0;
+        let y = 0;
+
+        if ('clientX' in event && 'clientY' in event) {
+          x = event.clientX;
+          y = event.clientY;
+        }
 
         if (x === 0 && y === 0) {
           const rect = event.currentTarget.getBoundingClientRect();

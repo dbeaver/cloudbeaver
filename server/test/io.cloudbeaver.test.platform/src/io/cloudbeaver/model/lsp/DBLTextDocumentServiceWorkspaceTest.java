@@ -25,9 +25,9 @@ import org.jkiss.dbeaver.model.lsp.DBLServerSessionProvider;
 import org.jkiss.dbeaver.model.lsp.DBLTextDocumentService;
 import org.jkiss.dbeaver.model.lsp.context.ContextAwareDocument;
 import org.jkiss.dbeaver.registry.DataSourceRegistry;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 
@@ -35,12 +35,12 @@ public class DBLTextDocumentServiceWorkspaceTest extends H2DataSourceTest {
     private static final String PROJECT_ID = "DBLTextDocumentServiceProject";
     private static final String DATA_SOURCE_ID = "workspace-test-data-source";
 
-    private DBLTextDocumentService service = new DBLTextDocumentService(new TestSessionProvider());
+    private DBLTextDocumentService service;
 
     protected DBPWorkspace workspace;
     protected DBPProject project;
 
-    @Before
+    @BeforeEach
     public void setUpWorkspace() {
         workspace = Mockito.mock(DBPWorkspace.class);
         project = Mockito.mock(DBPProject.class);
@@ -71,7 +71,7 @@ public class DBLTextDocumentServiceWorkspaceTest extends H2DataSourceTest {
         service.didOpen(new DidOpenTextDocumentParams(document));
 
         ContextAwareDocument contextAwareDocument = DocumentServiceTestUtils.getDocument(service, document.getUri());
-        Assert.assertNotNull(contextAwareDocument);
-        Assert.assertEquals(dataSourceDescriptor.getDataSource(), contextAwareDocument.getDataSource());
+        Assertions.assertNotNull(contextAwareDocument);
+        Assertions.assertEquals(dataSourceDescriptor.getDataSource(), contextAwareDocument.getDataSource());
     }
 }
