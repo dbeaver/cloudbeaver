@@ -29,6 +29,7 @@ export default [
   ['data_grid_table_context_menu_filter_dialog_title', 'Редактировать значение'],
   ['data_grid_table_context_menu_filter_clipboard_permission', 'Дать доступ к буферу обмена'],
   ['data_grid_table_context_menu_save_value_error', 'Не удалось сохранить значение'],
+  ['data_grid_table_context_menu_aria_label', 'Контекстное меню'],
   ['data_grid_table_index_column_tooltip', 'Выбрать всю таблицу'],
   ['data_grid_table_readonly_connection_tooltip', 'Подключение только для чтения'],
   ['data_grid_table_readonly_presentation_tooltip', 'Активное представление не поддерживает редактирование данных'],
