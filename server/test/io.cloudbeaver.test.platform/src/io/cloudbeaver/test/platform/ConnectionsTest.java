@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,8 +25,8 @@ import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.utils.GeneralUtils;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.nio.file.Path;
 import java.util.LinkedHashMap;
@@ -82,24 +82,24 @@ public class ConnectionsTest extends CloudbeaverMockTest {
         Map<String, Object> configuration = new LinkedHashMap<>();
         Map<String, Object> variables = new LinkedHashMap<>();
         variables.put("config", configuration);
-        Assert.assertThrows(
-            "Template connection or driver must be specified",
+        Assertions.assertThrows(
             DBException.class,
-            () -> client.sendQuery(GQL_CONNECTIONS_CREATE, variables)
+            () -> client.sendQuery(GQL_CONNECTIONS_CREATE, variables),
+            "Template connection or driver must be specified"
         );
         String templateId = "test_template";
         configuration.put("templateId", templateId);
-        Assert.assertThrows(
-            "Template connection '" + templateId + "' not found",
+        Assertions.assertThrows(
             DBException.class,
-            () -> client.sendQuery(GQL_CONNECTIONS_CREATE, variables)
+            () -> client.sendQuery(GQL_CONNECTIONS_CREATE, variables),
+            "Template connection '" + templateId + "' not found"
         );
 
         configuration.remove("templateId");
         configuration.put("driverId", "postgresql:postgres-jdbc");
 
         Map<String, Object> addedConnection = client.sendQuery(GQL_CONNECTIONS_CREATE, variables);
-        Assert.assertNotNull(addedConnection);
+        Assertions.assertNotNull(addedConnection);
         checkAddedConnection(client, addedConnection);
 
         String addedConnectionId = JSONUtils.getString(addedConnection, "id");
@@ -111,24 +111,26 @@ public class ConnectionsTest extends CloudbeaverMockTest {
         variables1.put("config", config1);
         variables1.put("nodePath", nodePath);
 
-        Assert.assertThrows(
+        Assertions.assertThrows(
             DBException.class,
             () -> client.sendQuery(GQL_COPY_CONNECTION_FROM_NODE, variables1)
         );
         variables1.put("projectId", "u_test");
         Map<String, Object> copiedConnection = client.sendQuery(GQL_COPY_CONNECTION_FROM_NODE, variables1);
-        Assert.assertNotNull(copiedConnection);
+        Assertions.assertNotNull(copiedConnection);
         checkAddedConnection(client, copiedConnection);
         String copiedConnectionId = JSONUtils.getString(copiedConnection, "id");
-        Assert.assertTrue(client.sendQuery(GQL_CONNECTIONS_DELETE, Map.of("id", addedConnectionId)));
-        Assert.assertTrue(client.sendQuery(GQL_CONNECTIONS_DELETE, Map.of("id", copiedConnectionId)));
+        Boolean deleted1 = client.sendQuery(GQL_CONNECTIONS_DELETE, Map.of("id", addedConnectionId));
+        Assertions.assertTrue(deleted1);
+        Boolean deleted2 = client.sendQuery(GQL_CONNECTIONS_DELETE, Map.of("id", copiedConnectionId));
+        Assertions.assertTrue(deleted2);
     }
 
     private void checkAddedConnection(@NotNull WebGQLClient client, @NotNull Map<String, Object> addedConnection) throws Exception {
         List<Map<String, Object>> connections = client.sendQuery(GQL_CONNECTIONS_GET, null);
-        Assert.assertTrue(connections.contains(addedConnection));
-        Assert.assertNotNull(JSONUtils.getString(addedConnection, "id"));
+        Assertions.assertTrue(connections.contains(addedConnection));
+        Assertions.assertNotNull(JSONUtils.getString(addedConnection, "id"));
         String nodePath = JSONUtils.getString(addedConnection, "nodePath");
-        Assert.assertNotNull(nodePath);
+        Assertions.assertNotNull(nodePath);
     }
 }

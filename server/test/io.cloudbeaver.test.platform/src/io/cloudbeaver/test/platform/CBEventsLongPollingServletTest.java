@@ -29,9 +29,9 @@ import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.websocket.WSConstants;
 import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.HttpConstants;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -47,7 +47,7 @@ public class CBEventsLongPollingServletTest extends CloudbeaverMockTest {
     @Mock
     WebHeadlessSession headlessSession;
 
-    @Before
+    @BeforeEach
     public void initMocks() {
         request = Mockito.mock(HttpServletRequest.class);
         sessionManager = Mockito.mock(WebAppSessionManager.class);
@@ -98,7 +98,7 @@ public class CBEventsLongPollingServletTest extends CloudbeaverMockTest {
 
         BaseWebSession resolved = invokeResolve(new TestServlet(), request);
 
-        Assert.assertSame(headlessSession, resolved);
+        Assertions.assertSame(headlessSession, resolved);
     }
 
     @Test
@@ -111,7 +111,7 @@ public class CBEventsLongPollingServletTest extends CloudbeaverMockTest {
                 ArgumentMatchers.any(), ArgumentMatchers.anyBoolean()))
             .thenReturn(null);
 
-        Assert.assertNull(invokeResolve(new TestServlet(), request));
+        Assertions.assertNull(invokeResolve(new TestServlet(), request));
     }
 
     @Test
@@ -125,7 +125,7 @@ public class CBEventsLongPollingServletTest extends CloudbeaverMockTest {
                 ArgumentMatchers.any(WebHttpRequestInfo.class), ArgumentMatchers.eq(true)))
             .thenThrow(new RuntimeException("Get HeadlessSession failed"));
 
-        Assert.assertNull(invokeResolve(new TestServlet(), request));
+        Assertions.assertNull(invokeResolve(new TestServlet(), request));
     }
 
     private BaseWebSession invokeResolve(TestServlet servlet, HttpServletRequest req) {
