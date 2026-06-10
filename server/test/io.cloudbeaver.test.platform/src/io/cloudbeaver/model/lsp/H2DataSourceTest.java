@@ -30,8 +30,8 @@ import org.jkiss.dbeaver.model.runtime.LoggingProgressMonitor;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.utils.PrefUtils;
-import org.junit.Assert;
-import org.junit.Before;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 
 import java.nio.file.Path;
 import java.sql.SQLException;
@@ -45,7 +45,7 @@ public abstract class H2DataSourceTest extends CloudbeaverMockTest {
 
     protected DBLTextDocumentService service;
 
-    @Before
+    @BeforeEach
     public void setUp() throws DBException {
         PrefUtils.setDefaultPreferenceValue(
             DBWorkbench.getPlatform().getPreferenceStore(),
@@ -64,11 +64,11 @@ public abstract class H2DataSourceTest extends CloudbeaverMockTest {
         );
 
         try (JDBCStatement stmt = databaseSession.createStatement()) {
-            Assert.assertFalse(stmt.execute("CREATE TABLE TEST_TABLE1 (id IDENTITY NOT NULL PRIMARY KEY, a VARCHAR, b INT)"));
-            Assert.assertFalse(stmt.execute("CREATE TABLE TEST_TABLE2 (id IDENTITY NOT NULL PRIMARY KEY, a VARCHAR, b INT)"));
+            Assertions.assertFalse(stmt.execute("CREATE TABLE TEST_TABLE1 (id IDENTITY NOT NULL PRIMARY KEY, a VARCHAR, b INT)"));
+            Assertions.assertFalse(stmt.execute("CREATE TABLE TEST_TABLE2 (id IDENTITY NOT NULL PRIMARY KEY, a VARCHAR, b INT)"));
             for (int i = 0; i < 100; i++) {
-                Assert.assertFalse(stmt.execute("INSERT INTO TEST_TABLE1 (a, b) VALUES ('test" + i + "', " + i + ")"));
-                Assert.assertFalse(stmt.execute("INSERT INTO TEST_TABLE2 (a, b) VALUES ('test" + i + "', " + i + ")"));
+                Assertions.assertFalse(stmt.execute("INSERT INTO TEST_TABLE1 (a, b) VALUES ('test" + i + "', " + i + ")"));
+                Assertions.assertFalse(stmt.execute("INSERT INTO TEST_TABLE2 (a, b) VALUES ('test" + i + "', " + i + ")"));
             }
         } catch (SQLException e) {
             throw new IllegalStateException(e);

@@ -21,10 +21,15 @@
   align-items: center;
 }
 
-.menuContainer {
+.menuTrigger {
   display: flex;
-  box-sizing: border-box;
   overflow: hidden;
+
+  height: 16px;
+  width: 16px;
+  padding: 4px;
+  margin: 0;
+  box-sizing: content-box;
 
   &:empty {
     display: none;

@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,9 +27,9 @@ import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.auth.SMAuthStatus;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.utils.IOUtils;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.nio.file.Path;
 import java.util.Map;
@@ -68,34 +68,34 @@ public class ResourceManagerTest extends CloudbeaverMockTest {
           }
         }""";
 
-    @BeforeClass
+    @BeforeAll
     public static void init() throws Exception {
-        Assert.assertTrue(CBApplication.getInstance().getAppConfiguration().isResourceManagerEnabled());
+        Assertions.assertTrue(CBApplication.getInstance().getAppConfiguration().isResourceManagerEnabled());
         client = CEAppStarter.createClient();
         Map<String, Object> authInfo = CEAppStarter.authenticateTestUser(client);
-        Assert.assertEquals(SMAuthStatus.SUCCESS.name(), JSONUtils.getString(authInfo, "authStatus"));
+        Assertions.assertEquals(SMAuthStatus.SUCCESS.name(), JSONUtils.getString(authInfo, "authStatus"));
     }
 
     @Test
     public void createDeleteResourceTest() throws Exception {
         String projectId = "u_test";
         String resourcePath = "testScript.sql";
-        Assert.assertTrue(createResource(projectId, resourcePath, false));
-        Assert.assertThrows(
-            "Resource '" + IOUtils.getFileNameWithoutExtension(Path.of(resourcePath)) + "' already exists",
+        Assertions.assertTrue(createResource(projectId, resourcePath, false));
+        Assertions.assertThrows(
             DBException.class,
-            () -> createResource(projectId, resourcePath, false)
+            () -> createResource(projectId, resourcePath, false),
+            "Resource '" + IOUtils.getFileNameWithoutExtension(Path.of(resourcePath)) + "' already exists"
         );
-        Assert.assertTrue(createResource(projectId, resourcePath, true));
-        Assert.assertTrue(deleteResource(projectId, resourcePath));
+        Assertions.assertTrue(createResource(projectId, resourcePath, true));
+        Assertions.assertTrue(deleteResource(projectId, resourcePath));
     }
 
     @Test
     public void listResourcesWithInvalidProjectId() throws Exception {
-        Assert.assertThrows(
-            "Project id is empty",
+        Assertions.assertThrows(
             DBException.class,
-            () -> client.sendQuery(GQL_RESOURCES_LIST, Map.of("projectId", ""))
+            () -> client.sendQuery(GQL_RESOURCES_LIST, Map.of("projectId", "")),
+            "Project id is empty"
         );
     }
 

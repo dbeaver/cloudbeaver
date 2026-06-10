@@ -29,6 +29,7 @@ export default [
   ['data_grid_table_context_menu_filter_dialog_title', 'Modifier la valeur'],
   ['data_grid_table_context_menu_filter_clipboard_permission', 'Donner accès au presse-papiers'],
   ['data_grid_table_context_menu_save_value_error', 'Échec de la sauvegarde de la valeur'],
+  ['data_grid_table_context_menu_aria_label', 'Menu contextuel'],
   ['data_grid_table_index_column_tooltip', 'Sélectionner toute la table'],
   ['data_grid_table_no_key_found_tooltip', "Aucune clé unique n'a été trouvée. La modification des données n'est pas possible."],
   ['data_grid_table_virtual_key_tooltip', 'Clé virtuelle'],
