@@ -54,7 +54,7 @@ class WebSQLQueryDataReceiver implements DBDDataReceiver {
     private final WebDataFormat dataFormat;
     @Nullable
     private final DBDDataFilter dataFilter;
-    private final WebSQLQueryResultSet webResultSet = new WebSQLQueryResultSet();
+    private final WebSQLQueryResultSet webResultSet;
 
     private DBDAttributeBinding[] bindings;
     private DBCTrace trace;
@@ -71,6 +71,7 @@ class WebSQLQueryDataReceiver implements DBDDataReceiver {
         this.dataContainer = dataContainer;
         this.dataFormat = dataFormat;
         this.dataFilter = dataFilter;
+        this.webResultSet = new WebSQLQueryResultSet(contextInfo.getProcessor().getWebSession());
         rowLimit = ServletAppUtils.getServletApplication()
             .getAppConfiguration()
             .getResourceQuota(WebSQLConstants.QUOTA_PROP_ROW_LIMIT);
@@ -170,7 +171,7 @@ class WebSQLQueryDataReceiver implements DBDDataReceiver {
             }
         }
 
-        webResultSet.setColumns(webSession, bindings);
+        webResultSet.setColumns(bindings);
         webResultSet.setRows(List.of(rows.toArray(new WebSQLQueryResultSetRow[0])));
         webResultSet.setHasChildrenCollection(resultSet instanceof DBDSubCollectionResultSet);
         webResultSet.setSupportsDataFilter(dataContainer.isFeatureSupported(DBSDataContainer.FEATURE_DATA_FILTER));

@@ -478,9 +478,9 @@ public class WebSQLProcessor implements WebSessionProvider {
             sendTransactionalEvent(contextInfo);
         }
 
-        WebSQLQueryResultSet updatedResultSet = new WebSQLQueryResultSet();
+        WebSQLQueryResultSet updatedResultSet = new WebSQLQueryResultSet(webSession);
         updatedResultSet.setResultsInfo(resultsInfo);
-        updatedResultSet.setColumns(webSession, resultsInfo.getAttributes());
+        updatedResultSet.setColumns(resultsInfo.getAttributes());
 
         WebSQLQueryResults updateResults = new WebSQLQueryResults(webSession, dataFormat);
         updateResults.setUpdateRowCount(totalUpdateCount);
@@ -650,9 +650,9 @@ public class WebSQLProcessor implements WebSessionProvider {
             DBDAttributeBinding[] allAttributes = resultsInfo.getAttributes();
             DBDAttributeBinding[] keyAttributes = rowIdentifier.getAttributes().toArray(new DBDAttributeBinding[0]);
 
-            WebSQLQueryResultSet updatedResultSet = new WebSQLQueryResultSet();
+            WebSQLQueryResultSet updatedResultSet = new WebSQLQueryResultSet(webSession);
             updatedResultSet.setResultsInfo(resultsInfo);
-            updatedResultSet.setColumns(webSession, resultsInfo.getAttributes());
+            updatedResultSet.setColumns(resultsInfo.getAttributes());
 
             if (!CommonUtils.isEmpty(updatedRows)) {
 

@@ -36,8 +36,11 @@ public class WebSQLQueryResultSet {
 
     private static final Log log = Log.getLog(WebSQLQueryResultSet.class);
 
+    @Nullable
+    private final WebSession session;
+    @Nullable
+    private DBDAttributeBinding[] referencesBindings;
     private WebSQLQueryResultColumn[] columns;
-    private List<WebSQLQueryResultReference> references = Collections.emptyList();
     private List<WebSQLQueryResultSetRow> rows = Collections.emptyList();
     private boolean hasMoreData;
     private WebSQLResultsInfo resultsInfo;
@@ -52,7 +55,8 @@ public class WebSQLQueryResultSet {
     private boolean readOnly;
     private String readOnlyStatus;
 
-    public WebSQLQueryResultSet() {
+    public WebSQLQueryResultSet(@Nullable WebSession session) {
+        this.session = session;
     }
 
     @Property
@@ -69,19 +73,21 @@ public class WebSQLQueryResultSet {
         this.columns = columns;
     }
 
-    public void setColumns(@NotNull WebSession session, @NotNull DBDAttributeBinding[] bindings) {
+    public void setColumns(@NotNull DBDAttributeBinding[] bindings) {
         WebSQLQueryResultColumn[] columns = new WebSQLQueryResultColumn[bindings.length];
         for (int i = 0; i < bindings.length; i++) {
             columns[i] = new WebSQLQueryResultColumn(bindings[i]);
         }
         this.columns = columns;
-        this.references = WebSQLUtils.collectReferences(session, bindings);
+        this.referencesBindings = bindings;
     }
 
     @NotNull
     @Property
     public List<WebSQLQueryResultReference> getReferences() {
-        return references;
+        return session != null && referencesBindings != null
+            ? WebSQLUtils.collectReferences(session, referencesBindings)
+            : Collections.emptyList();
     }
 
     @Property
