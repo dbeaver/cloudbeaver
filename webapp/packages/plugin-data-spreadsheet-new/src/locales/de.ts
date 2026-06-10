@@ -23,6 +23,7 @@ export default [
   ['data_grid_table_disable_all_orders', 'Alle deaktivieren'],
   ['data_grid_table_delete_filters_and_orders', 'Filter / Sortierung zurücksetzen'],
   ['data_grid_table_context_menu_filter_dialog_title', 'Wert bearbeiten'],
+  ['data_grid_table_context_menu_aria_label', 'Kontextmenü'],
   ['data_grid_table_index_column_tooltip', 'Wählen ganze Tabelle aus'],
   ['data_grid_table_readonly_connection_tooltip', 'Schreibgeschützte Verbindung'],
   ['data_grid_table_readonly_presentation_tooltip', 'Die aktive Darstellung unterstützt keine Datenbearbeitung'],
