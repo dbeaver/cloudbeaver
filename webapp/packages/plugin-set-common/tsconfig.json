@@ -236,6 +236,9 @@
       "path": "../plugin-product-information-administration"
     },
     {
+      "path": "../plugin-project-info"
+    },
+    {
       "path": "../plugin-projects"
     },
     {
