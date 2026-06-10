@@ -26,6 +26,7 @@ import type { IExecutionContextProvider, ISyncContextLoader } from '@cloudbeaver
 import {
   type INavNodeRenameData,
   type INodeNavigationData,
+  isConnectionFolder,
   NavNodeInfoResource,
   NavNodeManagerService,
   NavTreeResource,
@@ -144,7 +145,7 @@ export class ObjectViewerTabService {
 
     const isSupported = (): boolean => {
       const node = this.navNodeInfoResource.get(data.nodeId);
-      return NodeManagerUtils.isDatabaseObject(data.nodeId) && !node?.folder;
+      return NodeManagerUtils.isDatabaseObject(data.nodeId) && !isConnectionFolder(node);
     };
 
     if (isSupported()) {
