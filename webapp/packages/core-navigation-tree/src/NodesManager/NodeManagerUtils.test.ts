@@ -8,11 +8,6 @@
 import { describe, expect, it } from 'vitest';
 
 import { NodeManagerUtils } from './NodeManagerUtils.js';
-import type { NavNode } from './EntityTypes.js';
-
-function makeNode(objectId?: string): NavNode {
-  return { uri: '', objectId, folder: false, hasChildren: false, inline: false, navigable: false, filtered: false, objectFeatures: [] };
-}
 
 describe('NodeManagerUtils', () => {
   describe('connectionIdToConnectionNodeId', () => {
@@ -29,17 +24,15 @@ describe('NodeManagerUtils', () => {
   });
 
   describe('isDatabaseObject', () => {
-    it('should return true for nodes with an objectId', () => {
-      expect(NodeManagerUtils.isDatabaseObject(makeNode('connection-123'))).toBe(true);
-      expect(NodeManagerUtils.isDatabaseObject(makeNode('schema-abc'))).toBe(true);
+    it('should return true for objectIds containing "datasources at first segment"', () => {
+      expect(NodeManagerUtils.isDatabaseObject('node://project/datasources/123')).toBe(true);
+      expect(NodeManagerUtils.isDatabaseObject('node://project/datasources/abc')).toBe(true);
     });
 
-    it('should return false for connection folders and navigation-only nodes without objectId', () => {
-      expect(NodeManagerUtils.isDatabaseObject(makeNode(undefined))).toBe(false);
-    });
-
-    it('should return false for undefined', () => {
-      expect(NodeManagerUtils.isDatabaseObject(undefined)).toBe(false);
+    it('should return false for objectIds not containing "datasources"', () => {
+      expect(NodeManagerUtils.isDatabaseObject('http://example.com')).toBe(false);
+      expect(NodeManagerUtils.isDatabaseObject('12345')).toBe(false);
+      expect(NodeManagerUtils.isDatabaseObject('')).toBe(false);
     });
   });
 

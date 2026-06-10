@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2026 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -139,10 +139,8 @@ export class ObjectViewerTabService {
       tabInfo.registerTab(tab);
     }
 
-    const node = this.navNodeManagerService.getNode(data.nodeId);
-
     function isSupported(): boolean {
-      return NodeManagerUtils.isDatabaseObject(node);
+      return NodeManagerUtils.isDatabaseObject(data.nodeId);
     }
 
     if (isSupported()) {

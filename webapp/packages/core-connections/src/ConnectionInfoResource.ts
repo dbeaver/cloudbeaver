@@ -297,9 +297,13 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
   }
 
   getConnectionIdForNodeId(projectId: string, nodeId: string): IConnectionInfoParams | undefined {
+    if (!NodeManagerUtils.isDatabaseObject(nodeId)) {
+      return;
+    }
+
     const node = this.navNodeInfoResource.get(nodeId);
 
-    if (!node || !NodeManagerUtils.isDatabaseObject(node) || !node.objectId) {
+    if (!node || !node.objectId) {
       return;
     }
 
@@ -307,9 +311,13 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
   }
 
   getConnectionForNode(nodeId: string): Connection | undefined {
+    if (!NodeManagerUtils.isDatabaseObject(nodeId)) {
+      return;
+    }
+
     const node = this.navNodeInfoResource.get(nodeId);
 
-    if (!node || !NodeManagerUtils.isDatabaseObject(node) || !node.objectId || !node.projectId) {
+    if (!node || !node.objectId || !node.projectId) {
       return;
     }
 

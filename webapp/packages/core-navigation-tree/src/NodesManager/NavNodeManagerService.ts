@@ -338,7 +338,7 @@ export class NavNodeManagerService extends Bootstrap {
       projectId ||= node.projectId;
       features = node.features;
 
-      if (NodeManagerUtils.isDatabaseObject(node)) {
+      if (NodeManagerUtils.isDatabaseObject(nodeId)) {
         if (node.folder) {
           const parent = this.getParent(node);
           folderId = nodeId;
