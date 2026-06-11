@@ -10,9 +10,13 @@ import { expect, describe, it, vi } from 'vitest';
 import { ErrorMessage } from './ErrorMessage.js';
 import { renderInApp } from '@cloudbeaver/tests-runner';
 
-vi.mock('@cloudbeaver/core-di', () => ({
-  useService: vi.fn(),
-}));
+vi.mock('@cloudbeaver/core-di', async importOriginal => {
+  const actual = await importOriginal();
+  return {
+    ...(actual as object),
+    useService: vi.fn(),
+  };
+});
 
 vi.mock('./localization/useTranslate.js', () => ({
   useTranslate: () => (key: string) => key,
