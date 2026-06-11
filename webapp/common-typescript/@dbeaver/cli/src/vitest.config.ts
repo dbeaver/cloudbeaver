@@ -11,7 +11,7 @@ export default defineConfig({
   test: {
     include: ['**/lib/**/*.test.js'],
     exclude: ['node_modules/**'],
-    isolate: true,
+    isolate: false,
     watch: false,
   },
   esbuild: false,
