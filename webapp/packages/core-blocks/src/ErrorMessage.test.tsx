@@ -10,15 +10,15 @@ import { expect, describe, it, vi } from 'vitest';
 import { ErrorMessage } from './ErrorMessage.js';
 import { renderInApp } from '@cloudbeaver/tests-runner';
 
-vi.mock('./localization/useTranslate', () => ({
+vi.mock('./localization/useTranslate.js', () => ({
   useTranslate: () => (key: string) => key,
 }));
 
-vi.mock('./Button', () => ({
+vi.mock('./Button.js', () => ({
   Button: (props: any) => <button {...props} />,
 }));
 
-vi.mock('./IconOrImage', () => ({
+vi.mock('./IconOrImage.js', () => ({
   IconOrImage: (props: any) => <svg {...props} />,
 }));
 

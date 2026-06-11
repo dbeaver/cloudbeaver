@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,19 @@ import { StatusMessage } from './StatusMessage.js';
 import { renderInApp } from '@cloudbeaver/tests-runner';
 import * as ErrorDetailsModule from './useErrorDetails.js';
 
-vi.mock('./localization/useTranslate', () => ({
+vi.mock('./localization/useTranslate.js', () => ({
   useTranslate: () => (key: string) => key,
 }));
 
-vi.mock('./IconOrImage', () => ({
+vi.mock('./IconOrImage.js', () => ({
   IconOrImage: (props: any) => <svg {...props} />,
 }));
 
-vi.mock('./Link', () => ({
+vi.mock('./Link.js', () => ({
   Link: (props: any) => <a {...props} />,
 }));
 
-vi.mock('./useErrorDetails', () => ({
+vi.mock('./useErrorDetails.js', () => ({
   useErrorDetails: (exception: Error | null) => ({
     message: exception?.message || '',
     hasDetails: false,
