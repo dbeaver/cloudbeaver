@@ -709,7 +709,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
             SMUser user;
             try (PreparedStatement dbStat = dbCon.prepareStatement(
                 """
-                    SELECT U.USER_ID,U.IS_ACTIVE,U.DEFAULT_AUTH_ROLE,S.IS_SECRET_STORAGE,U.CHANGE_DATE,U.DISABLED_BY,U.DISABLE_REASON
+                    SELECT U.USER_ID,U.IS_ACTIVE,U.DEFAULT_AUTH_ROLE,S.IS_SECRET_STORAGE,U.CHANGE_DATE,U.DISABLED_BY,U.DISABLE_REASON,U.LAST_LOGIN_TIME
                     FROM {table_prefix}CB_USER U, {table_prefix}CB_AUTH_SUBJECT S
                     WHERE U.USER_ID=? AND U.USER_ID=S.SUBJECT_ID""")
             ) {
@@ -783,7 +783,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
             // Read users
             try (PreparedStatement dbStat = dbCon.prepareStatement(
                 "SELECT USER_ID,IS_ACTIVE,DEFAULT_AUTH_ROLE,CHANGE_DATE,DISABLED_BY,"
-                    + "DISABLE_REASON FROM {table_prefix}CB_USER"
+                    + "DISABLE_REASON,LAST_LOGIN_TIME FROM {table_prefix}CB_USER"
                     + buildUsersFilter(filter) + "\nORDER BY USER_ID " + getOffsetLimitPart(filter))) {
                 setUsersFilterValues(dbStat, filter, 1);
 
@@ -1484,11 +1484,23 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         );
     }
 
+    private void updateUserLastLoginTime(@NotNull Connection dbCon, @NotNull String userId) throws SQLException {
+        try (PreparedStatement dbStat = dbCon.prepareStatement(
+            "UPDATE {table_prefix}CB_USER SET LAST_LOGIN_TIME=? WHERE USER_ID=?"
+        )) {
+            dbStat.setTimestamp(1, Timestamp.from(Instant.now()));
+            dbStat.setString(2, userId);
+            dbStat.executeUpdate();
+        }
+    }
+
     @NotNull
     private SMUser fetchUser(ResultSet dbResult, boolean checkSecretStorage) throws SQLException {
         Timestamp timestamp = dbResult.getTimestamp("CHANGE_DATE");
         Instant disableDate = timestamp != null ? timestamp.toInstant() : null;
-        return new SMUser(
+        Timestamp lastLoginTimestamp = dbResult.getTimestamp("LAST_LOGIN_TIME");
+        Instant lastLoginTime = lastLoginTimestamp != null ? lastLoginTimestamp.toInstant() : null;
+        SMUser user = new SMUser(
             dbResult.getString("USER_ID"),
             stringToBoolean(dbResult.getString("IS_ACTIVE")),
             dbResult.getString("DEFAULT_AUTH_ROLE"),
@@ -1497,6 +1509,8 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
             dbResult.getString("DISABLED_BY"),
             dbResult.getString("DISABLE_REASON")
         );
+        user.setLastLoginTime(lastLoginTime);
+        return user;
     }
 
     @Override
@@ -2643,6 +2657,9 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                     permissions = new SMAuthPermissions(
                         activeUserId, smSessionId, getUserPermissions(activeUserId, tokenAuthRole)
                     );
+                    if (CommonUtils.isNotEmpty(activeUserId)) {
+                        updateUserLastLoginTime(dbCon, activeUserId);
+                    }
                     txn.commit();
                 }
             } catch (SQLException e) {

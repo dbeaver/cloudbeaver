@@ -478,7 +478,7 @@ public class WebSQLProcessor implements WebSessionProvider {
             sendTransactionalEvent(contextInfo);
         }
 
-        WebSQLQueryResultSet updatedResultSet = new WebSQLQueryResultSet();
+        WebSQLQueryResultSet updatedResultSet = new WebSQLQueryResultSet(webSession);
         updatedResultSet.setResultsInfo(resultsInfo);
         updatedResultSet.setColumns(resultsInfo.getAttributes());
 
@@ -650,7 +650,7 @@ public class WebSQLProcessor implements WebSessionProvider {
             DBDAttributeBinding[] allAttributes = resultsInfo.getAttributes();
             DBDAttributeBinding[] keyAttributes = rowIdentifier.getAttributes().toArray(new DBDAttributeBinding[0]);
 
-            WebSQLQueryResultSet updatedResultSet = new WebSQLQueryResultSet();
+            WebSQLQueryResultSet updatedResultSet = new WebSQLQueryResultSet(webSession);
             updatedResultSet.setResultsInfo(resultsInfo);
             updatedResultSet.setColumns(resultsInfo.getAttributes());
 

@@ -1,0 +1,20 @@
+@layer base {
+  :root {
+    --dbv-kit-switch-width: 44px;
+    --dbv-kit-switch-height: 22px;
+    --dbv-kit-switch-track-height: 22px;
+    --dbv-kit-switch-track-radius: 11px;
+    --dbv-kit-switch-thumb-size: 16px;
+    --dbv-kit-switch-thumb-offset: 3px;
+    --dbv-kit-switch-checked-offset: 25px;
+    --dbv-kit-switch-gap: 10px;
+    --dbv-kit-switch-label-weight: normal;
+
+    --dbv-kit-switch-track-color: #b3b3b3;
+    --dbv-kit-switch-thumb-color: #ffffff;
+    --dbv-kit-switch-checked-color: #2a7cb4;
+
+    --dbv-kit-switch-transition-duration: 200ms;
+    --dbv-kit-switch-transition-easing: cubic-bezier(0, 0, 0.2, 1);
+  }
+}
