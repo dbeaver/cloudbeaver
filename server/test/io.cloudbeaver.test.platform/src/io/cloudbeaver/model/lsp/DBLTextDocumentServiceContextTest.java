@@ -19,8 +19,8 @@ package io.cloudbeaver.model.lsp;
 import org.eclipse.lsp4j.*;
 import org.jkiss.dbeaver.ext.h2.model.H2SQLDialect;
 import org.jkiss.dbeaver.model.lsp.context.ContextAwareDocument;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -35,12 +35,12 @@ public class DBLTextDocumentServiceContextTest extends H2DataSourceTest {
         );
 
         ContextAwareDocument contextedDocument = DocumentServiceTestUtils.getDocument(service, document.getUri());
-        Assert.assertNotNull(contextedDocument);
-        Assert.assertEquals(dataSourceDescriptor.getDataSource(), contextedDocument.getDataSource());
-        Assert.assertNotNull(contextedDocument.getExecutionContext());
-        Assert.assertEquals(dataSourceDescriptor.getDataSource(), contextedDocument.getExecutionContext().getDataSource());
-        Assert.assertTrue(contextedDocument.getSyntaxManager().getDialect() instanceof H2SQLDialect);
-        Assert.assertNotNull(contextedDocument.getRuleManager());
+        Assertions.assertNotNull(contextedDocument);
+        Assertions.assertEquals(dataSourceDescriptor.getDataSource(), contextedDocument.getDataSource());
+        Assertions.assertNotNull(contextedDocument.getExecutionContext());
+        Assertions.assertEquals(dataSourceDescriptor.getDataSource(), contextedDocument.getExecutionContext().getDataSource());
+        Assertions.assertTrue(contextedDocument.getSyntaxManager().getDialect() instanceof H2SQLDialect);
+        Assertions.assertNotNull(contextedDocument.getRuleManager());
     }
 
     @Test
@@ -69,14 +69,14 @@ public class DBLTextDocumentServiceContextTest extends H2DataSourceTest {
                 profile->>'name' AS name;
             """.trim();
 
-        Assert.assertEquals(expectedQuery.trim(), edit.getNewText());
+        Assertions.assertEquals(expectedQuery.trim(), edit.getNewText());
         Position start = edit.getRange().getStart();
-        Assert.assertEquals(0, start.getLine());
-        Assert.assertEquals(0, start.getCharacter());
+        Assertions.assertEquals(0, start.getLine());
+        Assertions.assertEquals(0, start.getCharacter());
 
         Position end = edit.getRange().getEnd();
-        Assert.assertEquals(1, end.getLine());
-        Assert.assertEquals(97, end.getCharacter());
+        Assertions.assertEquals(1, end.getLine());
+        Assertions.assertEquals(97, end.getCharacter());
     }
 
     @Test
@@ -90,8 +90,8 @@ public class DBLTextDocumentServiceContextTest extends H2DataSourceTest {
 
         CompletionList completions = service.completion(completionParams).get().getRight();
 
-        Assert.assertNotNull(completions);
-        Assert.assertTrue(completions.getItems().isEmpty());
+        Assertions.assertNotNull(completions);
+        Assertions.assertTrue(completions.getItems().isEmpty());
     }
 
     @Test
@@ -105,9 +105,9 @@ public class DBLTextDocumentServiceContextTest extends H2DataSourceTest {
 
         CompletionList completions = service.completion(completionParams).get().getRight();
 
-        Assert.assertNotNull(completions);
-        Assert.assertFalse(completions.getItems().isEmpty());
-        Assert.assertEquals("SELECT", completions.getItems().getFirst().getLabel());
+        Assertions.assertNotNull(completions);
+        Assertions.assertFalse(completions.getItems().isEmpty());
+        Assertions.assertEquals("SELECT", completions.getItems().getFirst().getLabel());
     }
 
     @Test
@@ -124,8 +124,8 @@ public class DBLTextDocumentServiceContextTest extends H2DataSourceTest {
 
         CompletionList completions = service.completion(completionParams).get().getRight();
 
-        Assert.assertNotNull(completions);
-        Assert.assertEquals(1, completions.getItems().size());
-        Assert.assertEquals("FROM", completions.getItems().getFirst().getLabel());
+        Assertions.assertNotNull(completions);
+        Assertions.assertEquals(1, completions.getItems().size());
+        Assertions.assertEquals("FROM", completions.getItems().getFirst().getLabel());
     }
 }

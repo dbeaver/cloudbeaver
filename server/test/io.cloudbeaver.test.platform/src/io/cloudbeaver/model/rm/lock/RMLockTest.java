@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2025 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,10 @@ package io.cloudbeaver.model.rm.lock;
 import io.cloudbeaver.CloudbeaverMockTest;
 import io.cloudbeaver.app.CEAppStarter;
 import org.jkiss.dbeaver.Log;
-import org.junit.*;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -35,16 +38,17 @@ public class RMLockTest extends CloudbeaverMockTest {
     private static final Log log = Log.getLog(RMLockTest.class);
     private final String project1 = "s_fakeProject1";
     private final String project2 = "s_fakeProject2";
-    private static final ExecutorService executor = Executors.newFixedThreadPool(2);
+    private static ExecutorService executor;
 
-    @AfterClass
-    public static void shutdown() {
-        executor.shutdown();
-    }
-
-    @BeforeClass
+    @BeforeAll
     public static void startServer() throws Exception {
         CEAppStarter.startServerIfNotStarted();
+        executor = Executors.newFixedThreadPool(2);
+    }
+
+    @AfterAll
+    public static void shutdown() {
+        executor.shutdown();
     }
 
     @Test
@@ -90,8 +94,8 @@ public class RMLockTest extends CloudbeaverMockTest {
         Runnable runnable2 = () -> {
             try {
                 thread2CDL.await(1, TimeUnit.MINUTES);
-                Assert.assertTrue("Project not locket by thread 1", isLockedByThread1.get());
-                Assert.assertTrue("Project not locked", lockController2.isFileLocked(project1));
+                Assertions.assertTrue(isLockedByThread1.get(), "Project not locket by thread 1");
+                Assertions.assertTrue(lockController2.isFileLocked(project1), "Project not locked");
                 try (var lock = lockController2.lock(project1, "testThatProjectLocked2")) {
                     //that we were really waiting for the file and the lock was not removed earlier
                     Mockito.verify(lockController2, Mockito.atLeast(atLeastWaitCalls)).awaitingUnlock(Mockito.any());
@@ -110,7 +114,7 @@ public class RMLockTest extends CloudbeaverMockTest {
         if (exceptionReference.get() != null) {
             throw exceptionReference.get();
         }
-        Assert.assertFalse(lockController2.isFileLocked(project1));
+        Assertions.assertFalse(lockController2.isFileLocked(project1));
     }
 
     @Test
@@ -130,7 +134,7 @@ public class RMLockTest extends CloudbeaverMockTest {
                 isLockedByThread1.set(true);
                 thread2InitCDL.countDown();
                 thread1CDL.await(1, TimeUnit.MINUTES);
-                Assert.assertTrue("Project2 not locked by thread2", isLockedByThread2.get());
+                Assertions.assertTrue(isLockedByThread2.get(), "Project2 not locked by thread2");
                 thread2CDL.countDown();
             } catch (Throwable e) {
                 log.error(e);
@@ -146,7 +150,7 @@ public class RMLockTest extends CloudbeaverMockTest {
             try {
                 try (var lock = lockController2.lock(project2, "testAccessToDifferentProjects2")) {
                     thread2InitCDL.await();
-                    Assert.assertTrue("Project1 not locket by thread1", isLockedByThread1.get());
+                    Assertions.assertTrue(isLockedByThread1.get(), "Project1 not locket by thread1");
                     isLockedByThread2.set(true);
                     thread1CDL.countDown();
                     thread2CDL.await();
@@ -167,8 +171,8 @@ public class RMLockTest extends CloudbeaverMockTest {
             throw exceptionReference.get();
         }
 
-        Assert.assertFalse(lockController2.isFileLocked(project1));
-        Assert.assertFalse(lockController2.isFileLocked(project2));
+        Assertions.assertFalse(lockController2.isFileLocked(project1));
+        Assertions.assertFalse(lockController2.isFileLocked(project2));
     }
 
     @Test
@@ -197,7 +201,7 @@ public class RMLockTest extends CloudbeaverMockTest {
         Runnable runnable2 = () -> {
             try {
                 try (var lock = lockController2.lock(project1, "testForceUnlock2")) {
-                    Assert.assertTrue("Project1 not locket by thread1", isLockedByThread1.get());
+                    Assertions.assertTrue(isLockedByThread1.get(), "Project1 not locket by thread1");
                     Mockito.verify(lockController2, Mockito.atLeast(5)).isLocked(Mockito.any());
                     thread1CDL.countDown();
                 }
@@ -215,6 +219,6 @@ public class RMLockTest extends CloudbeaverMockTest {
         if (exceptionReference.get() != null) {
             throw exceptionReference.get();
         }
-        Assert.assertFalse(lockController2.isFileLocked(project1));
+        Assertions.assertFalse(lockController2.isFileLocked(project1));
     }
 }

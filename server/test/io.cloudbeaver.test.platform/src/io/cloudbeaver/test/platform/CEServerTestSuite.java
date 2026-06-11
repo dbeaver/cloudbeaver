@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2025 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,13 +23,13 @@ import io.cloudbeaver.model.rm.RMNIOTest;
 import io.cloudbeaver.model.rm.lock.RMLockTest;
 import io.cloudbeaver.model.session.WebSessionProjectTest;
 import io.cloudbeaver.model.session.WebSessionTest;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.platform.suite.api.SelectClasses;
+import org.junit.platform.suite.api.Suite;
 
-@RunWith(Suite.class)
-@Suite.SuiteClasses(
+@Suite
+@SelectClasses(
     {
         ConnectionsTest.class,
         SQLQueryTranslatorTest.class,
@@ -45,12 +45,12 @@ import org.junit.runners.Suite;
 )
 public class CEServerTestSuite {
 
-    @BeforeClass
+    @BeforeAll
     public static void startServer() throws Exception {
         CEAppStarter.startServerIfNotStarted();
     }
 
-    @AfterClass
+    @AfterAll
     public static void shutdownServer() {
         CEAppStarter.shutdownServer();
     }
