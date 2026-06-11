@@ -7,16 +7,13 @@
  */
 import { describe, expect, it, vi } from 'vitest';
 import { fireEvent } from '@testing-library/react';
+import './__mocks__/localization/useTranslateMock.js';
 
 import { ENotificationType } from '@cloudbeaver/core-events';
 
 import { StatusMessage } from './StatusMessage.js';
 import { renderInApp } from '@cloudbeaver/tests-runner';
 import * as ErrorDetailsModule from './useErrorDetails.js';
-
-vi.mock('./localization/useTranslate.js', () => ({
-  useTranslate: () => (key: string) => key,
-}));
 
 vi.mock('./IconOrImage.js', () => ({
   IconOrImage: (props: any) => <svg {...props} />,

@@ -7,6 +7,7 @@
  */
 import { beforeEach, describe, expect, it, vitest } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
+import './__mocks__/localization/useTranslateMock.js';
 import * as coreDi from '@cloudbeaver/core-di';
 import { DetailsError } from '@cloudbeaver/core-sdk';
 import { LoadingError } from '@cloudbeaver/core-utils';
@@ -21,10 +22,6 @@ vitest.mock('@cloudbeaver/core-di', () => ({
 
 vitest.mock('./ErrorDetailsDialog/ErrorDetailsDialog.js', () => ({
   ErrorDetailsDialog: vitest.fn(),
-}));
-
-vitest.mock('./localization/useTranslate.js', () => ({
-  useTranslate: () => (key: string) => key,
 }));
 
 vitest.mock('@cloudbeaver/core-sdk', () => ({
