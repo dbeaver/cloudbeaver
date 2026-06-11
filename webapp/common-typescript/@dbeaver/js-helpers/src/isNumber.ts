@@ -5,4 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-export { replaceMiddle } from '@dbeaver/js-helpers';
+export function isNumber(value: unknown): value is number {
+  return !isNaN(parseFloat(value as string)) && isFinite(value as number);
+}
