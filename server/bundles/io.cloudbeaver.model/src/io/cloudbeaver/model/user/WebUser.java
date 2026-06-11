@@ -114,4 +114,9 @@ public class WebUser {
     public String getDisableReason() {
         return user.getDisableReason();
     }
+
+    @Nullable
+    public Instant getLastLoginTime() {
+        return user.getLastLoginTime();
+    }
 }

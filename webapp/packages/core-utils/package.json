@@ -30,7 +30,6 @@
     "modern-screenshot": "4.6.8",
     "tslib": "^2",
     "underscore": "^1",
-    "uuid": "^14",
     "vitest": "^4",
     "whatwg-mimetype": "^5",
     "zod": "^4",
