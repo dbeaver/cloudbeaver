@@ -6,9 +6,12 @@
  * you may not use this file except in compliance with the License.
  */
 import { expect, describe, it, vi } from 'vitest';
-import './__mocks__/localization/useTranslateMock.js';
 import { ErrorMessage } from './ErrorMessage.js';
 import { renderInApp } from '@cloudbeaver/tests-runner';
+
+vi.mock('./localization/useTranslate.js', () => ({
+  useTranslate: () => (key: string) => key,
+}));
 
 vi.mock('./Button.js', () => ({
   Button: (props: any) => <button {...props} />,

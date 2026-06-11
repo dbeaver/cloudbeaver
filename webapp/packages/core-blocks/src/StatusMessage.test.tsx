@@ -7,7 +7,10 @@
  */
 import { describe, expect, it, vi } from 'vitest';
 import { fireEvent } from '@testing-library/react';
-import './__mocks__/localization/useTranslateMock.js';
+
+vi.mock('./localization/useTranslate.js', () => ({
+  useTranslate: () => (key: string) => key,
+}));
 
 import { ENotificationType } from '@cloudbeaver/core-events';
 

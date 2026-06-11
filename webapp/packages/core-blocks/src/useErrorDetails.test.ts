@@ -7,7 +7,6 @@
  */
 import { beforeEach, describe, expect, it, vitest } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
-import './__mocks__/localization/useTranslateMock.js';
 import * as coreDi from '@cloudbeaver/core-di';
 import { DetailsError } from '@cloudbeaver/core-sdk';
 import { LoadingError } from '@cloudbeaver/core-utils';
@@ -16,9 +15,17 @@ import { useErrorDetails } from './useErrorDetails.js';
 // eslint-disable-next-line @cloudbeaver/no-sync-component-import
 import { ErrorDetailsDialog } from './ErrorDetailsDialog/ErrorDetailsDialog.js';
 
-vitest.mock('@cloudbeaver/core-di', () => ({
-  useService: vitest.fn(),
+vitest.mock('./localization/useTranslate.js', () => ({
+  useTranslate: () => (key: string) => key,
 }));
+
+vitest.mock('@cloudbeaver/core-di', async importOriginal => {
+  const actual = await importOriginal();
+  return {
+    ...(actual as object),
+    useService: vitest.fn(),
+  };
+});
 
 vitest.mock('./ErrorDetailsDialog/ErrorDetailsDialog.js', () => ({
   ErrorDetailsDialog: vitest.fn(),
