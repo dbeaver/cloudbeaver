@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2025 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import io.cloudbeaver.model.WebTransactionLogItemInfo;
 import io.cloudbeaver.model.session.WebAsyncTaskProcessor;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.session.WebSessionProvider;
+import io.cloudbeaver.utils.WebEventUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
@@ -299,6 +300,7 @@ public class WebSQLContextInfo implements WebSessionProvider {
     }
 
 
+    @NotNull
     public WebAsyncTaskInfo commitTransaction() {
         DBCExecutionContext context = processor.getExecutionContext();
         DBCTransactionManager txnManager = DBUtils.getTransactionManager(context);
@@ -323,7 +325,7 @@ public class WebSQLContextInfo implements WebSessionProvider {
                 }
                 processor.getWebSession().addSessionEvent(
                     new WSTransactionalCountEvent(
-                        processor.getWebSession().getSessionId(),
+                        WebEventUtils.getSmSessionId(processor.getWebSession()),
                         processor.getWebSession().getUserId(),
                         getProjectId(),
                         getId(),
@@ -338,6 +340,7 @@ public class WebSQLContextInfo implements WebSessionProvider {
     }
 
 
+    @NotNull
     public WebAsyncTaskInfo rollbackTransaction() {
         DBCExecutionContext context = processor.getExecutionContext();
         DBCTransactionManager txnManager = DBUtils.getTransactionManager(context);
@@ -361,7 +364,7 @@ public class WebSQLContextInfo implements WebSessionProvider {
                     );
                     processor.getWebSession().addSessionEvent(
                         new WSTransactionalCountEvent(
-                            processor.getWebSession().getSessionId(),
+                            WebEventUtils.getSmSessionId(processor.getWebSession()),
                             processor.getWebSession().getUserId(),
                             getProjectId(),
                             getId(),

@@ -42,6 +42,9 @@ copy ..\config\DefaultConfiguration\GlobalConfiguration\.dbeaver\data-sources.js
 
 move drivers cloudbeaver >NUL
 
+echo Generate cloudbeaver.conf file
+call mvn -f ..\apps\config-generator compile exec:java -Dconfig.output="cloudbeaver\conf\cloudbeaver.conf" || goto :error
+
 echo "Build static content"
 
 mkdir .\cloudbeaver\web
