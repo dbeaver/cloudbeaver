@@ -42,13 +42,13 @@ export const NavigationTreeFiltersDialog = observer<DialogComponentProps<Payload
   const style = useS(styles);
   const notificationService = useService(NotificationService);
   const navTreeResource = useService(NavTreeResource);
-  const state = useFilters(payload.node.id);
+  const state = useFilters(payload.node.uri);
 
   useAutoLoad(NavigationTreeFiltersDialog, state);
 
   async function submit() {
     try {
-      await navTreeResource.setFilter(payload.node.id, state.filters.include, state.filters.exclude);
+      await navTreeResource.setFilter(payload.node.uri, state.filters.include, state.filters.exclude);
       resolveDialog();
     } catch (exception: any) {
       notificationService.logException(exception, 'plugin_navigation_tree_filters_submit_fail');

@@ -40,7 +40,7 @@ describe('submitForm', () => {
     const form = getForm();
     expect(form.tagName).toBe('FORM');
     expect(form.method.toLowerCase()).toBe('post');
-    expect(form.action).toContain('/api/test');
+    expect(form.getAttribute('action')).toBe('/api/test');
     expect(form.target).toBe('_blank');
     expect(form.style.display).toBe('none');
   });

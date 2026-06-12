@@ -1,5 +1,5 @@
 fragment NavNodeDBObjectInfo on NavigatorNodeInfo {
-  id
+  uri
   object {
     type
     features

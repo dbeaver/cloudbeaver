@@ -55,6 +55,6 @@ public class FSFile {
     @Property
     //TODO: node URI after finish migration to the new node path format
     public String getNodePath() {
-        return node.getNodeItemPath();
+        return node.getNodeUri();
     }
 }

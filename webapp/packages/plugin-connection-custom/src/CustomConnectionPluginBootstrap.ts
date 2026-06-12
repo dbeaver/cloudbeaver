@@ -10,7 +10,7 @@ import { ConnectionsManagerService, getFolderPath } from '@cloudbeaver/core-conn
 import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
-import { DATA_CONTEXT_NAV_NODE, isConnectionFolder, isProjectNode } from '@cloudbeaver/core-navigation-tree';
+import { DATA_CONTEXT_NAV_NODE, isConnectionFolder, isProjectNode, NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
 import { getProjectNodeId, ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey, getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
 import { ActionService, DATA_CONTEXT_MENU, type IAction, MenuService } from '@cloudbeaver/core-view';
@@ -38,6 +38,7 @@ const WelcomeNewConnection = importLazyComponent(() => import('./WelcomeNewConne
   CustomConnectionSettingsService,
   TreeSelectionService,
   NavigationTabsService,
+  NavNodeInfoResource,
 ])
 export class CustomConnectionPluginBootstrap extends Bootstrap {
   constructor(
@@ -49,6 +50,7 @@ export class CustomConnectionPluginBootstrap extends Bootstrap {
     private readonly customConnectionSettingsService: CustomConnectionSettingsService,
     private readonly treeSelectionService: TreeSelectionService,
     private readonly navigationTabsService: NavigationTabsService,
+    private readonly navNodeInfoResource: NavNodeInfoResource,
   ) {
     super();
   }
@@ -124,7 +126,9 @@ export class CustomConnectionPluginBootstrap extends Bootstrap {
           isProjectNode,
           isConnectionFolder,
         );
-        const folderPath = selectedNode?.folderId ? getFolderPath(selectedNode.folderId) : undefined;
+
+        const node = selectedNode?.folderId ? this.navNodeInfoResource.get(selectedNode.folderId) : undefined;
+        const folderPath = node ? getFolderPath(node) : undefined;
         await this.openConnectionsDialog(projectId, folderPath);
         break;
       }

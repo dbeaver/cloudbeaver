@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2025 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import io.cloudbeaver.model.session.WebSessionProvider;
 import io.cloudbeaver.server.WebAppUtils;
 import io.cloudbeaver.server.jobs.SqlOutputLogReaderJob;
 import io.cloudbeaver.service.sql.messages.WebSQLMessages;
+import io.cloudbeaver.utils.WebEventUtils;
 import io.cloudbeaver.websocket.event.task.WSSessionTaskConfirmationRequestEvent;
 import io.cloudbeaver.websocket.event.task.WSSessionTaskQueryConfirmationRequestEvent;
 import org.eclipse.jface.text.Document;
@@ -494,11 +495,11 @@ public class WebSQLProcessor implements WebSessionProvider {
         return result;
     }
 
-    private void sendTransactionalEvent(WebSQLContextInfo contextInfo) {
+    private void sendTransactionalEvent(@NotNull WebSQLContextInfo contextInfo) {
         int count = QMUtils.getTransactionState(getExecutionContext()).getUpdateCount();
         webSession.addSessionEvent(
             new WSTransactionalCountEvent(
-                contextInfo.getWebSession().getSessionId(),
+                WebEventUtils.getSmSessionId(webSession),
                 contextInfo.getWebSession().getUserId(),
                 contextInfo.getProjectId(),
                 contextInfo.getId(),

@@ -9,8 +9,8 @@ import { observer } from 'mobx-react-lite';
 import React, { useCallback } from 'react';
 
 import {
-  Checkbox,
-  Radio,
+  CheckboxIndicator,
+  RadioIndicator,
   useTranslate,
   type IMenuItemElementProps,
   type IMenuItemGroupArrowElementProps,
@@ -105,7 +105,7 @@ export const RenderMenuItem = observer<IRenderMenuItemProps>(function RenderMenu
         value={item.label}
         checked={item.checked}
         render={
-          <MenuItemElement label={item.label} icon={<span style={{ pointerEvents: 'none' }}><Checkbox checked={item.checked} size="small" /></span>} onlyIcons={onlyIcons} tooltip={item.tooltip} />
+          <MenuItemElement label={item.label} icon={<CheckboxIndicator checked={item.checked} size="small" />} onlyIcons={onlyIcons} tooltip={item.tooltip} />
         }
         onClick={onClick}
       />
@@ -123,7 +123,7 @@ export const RenderMenuItem = observer<IRenderMenuItemProps>(function RenderMenu
         value={item.label}
         checked={item.checked}
         render={
-          <MenuItemElement label={item.label} icon={<span style={{ pointerEvents: 'none' }}><Radio size="small" checked={item.checked} /></span>} onlyIcons={onlyIcons} tooltip={item.tooltip} />
+          <MenuItemElement label={item.label} icon={<RadioIndicator size="small" checked={item.checked} />} onlyIcons={onlyIcons} tooltip={item.tooltip} />
         }
         onClick={onClick}
       />

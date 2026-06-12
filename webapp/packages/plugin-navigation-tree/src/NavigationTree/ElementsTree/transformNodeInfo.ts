@@ -11,7 +11,7 @@ import type { INavTreeNodeInfo } from './INavTreeNodeInfo.js';
 import type { IElementsTreeCustomNodeInfo } from './useElementsTree.js';
 
 export function transformNodeInfo(node: NavNode, transformers: IElementsTreeCustomNodeInfo[]): INavTreeNodeInfo {
-  return transformers.reduce((info, transformer) => transformer(node.id, info), {
+  return transformers.reduce((info, transformer) => transformer(node.uri, info), {
     name: node.name,
     tooltip: node.name,
     icon: node.icon,

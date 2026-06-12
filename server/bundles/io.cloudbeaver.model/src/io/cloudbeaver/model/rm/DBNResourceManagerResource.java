@@ -160,13 +160,6 @@ public class DBNResourceManagerResource extends DBNAbstractResourceManagerNode {
         throw new DBException("Can't detect resource root node");
     }
 
-    @NotNull
-    @Deprecated
-    @Override
-    public String getNodeItemPath() {
-        return getParentNode().getNodeItemPath() + "/" + getNodeDisplayName();
-    }
-
     @Nullable
     @Override
     public DBNNode refreshNode(@NotNull DBRProgressMonitor monitor, @Nullable Object source) throws DBException {
