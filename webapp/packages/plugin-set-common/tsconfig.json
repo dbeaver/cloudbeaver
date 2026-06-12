@@ -140,6 +140,9 @@
       "path": "../plugin-connection-custom"
     },
     {
+      "path": "../plugin-connection-network-handlers"
+    },
+    {
       "path": "../plugin-connection-preferences"
     },
     {

@@ -14,7 +14,7 @@ import { ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { NetworkHandlerAuthType, type NetworkHandlerConfigInput } from '@cloudbeaver/core-sdk';
 
-import { SSHKeyUploader } from '../ConnectionForm/SSH/SSHKeyUploader.js';
+import { SSHKeyUploader } from '@cloudbeaver/plugin-connection-network-handlers';
 import { PROPERTY_FEATURE_SECURED } from '../ConnectionForm/SSL/PROPERTY_FEATURE_SECURED.js';
 
 interface Props {

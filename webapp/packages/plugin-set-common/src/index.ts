@@ -40,6 +40,7 @@ import coreSupport from '@cloudbeaver/core-support/module';
 import coreView from '@cloudbeaver/core-view/module';
 import coreServerNotifications from '@cloudbeaver/core-server-notifications/module';
 import coreSessionActions from '@cloudbeaver/core-session-actions/module';
+import pluginConnectionNetworkHandlers from '@cloudbeaver/plugin-connection-network-handlers/module';
 
 import pluginAdministration from '@cloudbeaver/plugin-administration/module';
 import pluginAppLogo from '@cloudbeaver/plugin-app-logo/module';
@@ -225,4 +226,5 @@ export const commonSet = [
   pluginConnectionView,
   pluginConnectionPreferences,
   pluginProjectInfo,
+  pluginConnectionNetworkHandlers,
 ];
