@@ -2317,7 +2317,6 @@ __metadata:
     tslib: "npm:^2"
     typescript: "npm:^5"
     underscore: "npm:^1"
-    uuid: "npm:^14"
     vitest: "npm:^4"
     whatwg-mimetype: "npm:^5"
     zod: "npm:^4"
@@ -5082,6 +5081,7 @@ __metadata:
     quick-lru: "npm:^7.1.0"
     rimraf: "npm:^6"
     typescript: "npm:^5"
+    uuid: "npm:^14"
     vitest: "npm:^4"
   languageName: unknown
   linkType: soft

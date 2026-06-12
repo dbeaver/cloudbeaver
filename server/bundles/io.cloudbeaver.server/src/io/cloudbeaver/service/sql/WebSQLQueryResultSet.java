@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
  */
 package io.cloudbeaver.service.sql;
 
+import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.service.sql.WebSQLResultSetRowIdentifier.WebSQLResultSetRowIdentifierState;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
@@ -35,6 +36,10 @@ public class WebSQLQueryResultSet {
 
     private static final Log log = Log.getLog(WebSQLQueryResultSet.class);
 
+    @Nullable
+    private final WebSession session;
+    @Nullable
+    private DBDAttributeBinding[] referencesBindings;
     private WebSQLQueryResultColumn[] columns;
     private List<WebSQLQueryResultSetRow> rows = Collections.emptyList();
     private boolean hasMoreData;
@@ -50,7 +55,8 @@ public class WebSQLQueryResultSet {
     private boolean readOnly;
     private String readOnlyStatus;
 
-    public WebSQLQueryResultSet() {
+    public WebSQLQueryResultSet(@Nullable WebSession session) {
+        this.session = session;
     }
 
     @Property
@@ -67,12 +73,29 @@ public class WebSQLQueryResultSet {
         this.columns = columns;
     }
 
-    public void setColumns(DBDAttributeBinding[] bindings) {
+    public void setColumns(@NotNull DBDAttributeBinding[] bindings) {
         WebSQLQueryResultColumn[] columns = new WebSQLQueryResultColumn[bindings.length];
         for (int i = 0; i < bindings.length; i++) {
             columns[i] = new WebSQLQueryResultColumn(bindings[i]);
         }
         this.columns = columns;
+        this.referencesBindings = bindings;
+    }
+
+    @NotNull
+    @Property
+    public List<WebSQLQueryResultReference> getAssociations() {
+        return session != null && referencesBindings != null
+            ? WebSQLUtils.collectAssociations(session, referencesBindings)
+            : Collections.emptyList();
+    }
+
+    @NotNull
+    @Property
+    public List<WebSQLQueryResultReference> getReferences() {
+        return session != null && referencesBindings != null
+            ? WebSQLUtils.collectReferences(session, referencesBindings)
+            : Collections.emptyList();
     }
 
     @Property

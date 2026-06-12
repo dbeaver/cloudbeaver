@@ -1,33 +1,25 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
 
+import { clsx, Switch as SwitchBase } from '@dbeaver/ui-kit';
+
 import { filterLayoutFakeProps } from '../../Containers/filterLayoutFakeProps.js';
 import type { ILayoutSizeProps } from '../../Containers/ILayoutSizeProps.js';
-import { s } from '../../s.js';
-import { useS } from '../../useS.js';
 import { Field } from '../Field.js';
 import { FieldDescription } from '../FieldDescription.js';
-import { FieldLabel } from '../FieldLabel.js';
 import { isControlPresented } from '../isControlPresented.js';
 import type { ICheckboxControlledProps, ICheckboxObjectProps } from './Checkbox.js';
-import switchStyles from './Switch.module.css';
-import denseModStyles from './SwitchDense.module.css';
-import primaryModStyles from './SwitchPrimary.module.css';
+import './Switch.css';
 import { useCheckboxState } from './useCheckboxState.js';
 
-const switchMod = {
-  primary: primaryModStyles,
-  dense: denseModStyles,
-};
-
 interface IBaseProps {
-  mod?: Array<keyof typeof switchMod>;
+  mod?: Array<'primary' | 'dense'>;
   description?: React.ReactNode;
   inverse?: boolean;
 }
@@ -66,36 +58,40 @@ export const Switch: SwitchType = observer(function Switch({
     onChange,
   });
   rest = filterLayoutFakeProps(rest);
-  const styles = useS(switchStyles, ...mod.map(mod => switchMod[mod]));
 
   if (autoHide && !isControlPresented(name, state)) {
     return null;
   }
 
   return (
-    <Field title={rest.title} className={s(styles, { field: true }, className)}>
-      <div className={styles['switchBody']}>
-        <div className={s(styles, { switchControl: true, disabled: disabled, checked: checkboxState.checked })}>
-          <div className={styles['switchControlTrack']} />
-          <div className={styles['switchControlUnderlay']}>
-            <div className={styles['switchControlThumb']} />
-            <input
-              {...rest}
-              type="checkbox"
-              id={id || value || name}
-              role="switch"
-              aria-checked={checkboxState.checked}
-              checked={checkboxState.checked}
-              disabled={disabled}
-              className={styles['switchInput']}
-              onChange={checkboxState.change}
-            />
-          </div>
-        </div>
-        <FieldLabel htmlFor={id || value || name} className={styles['fieldLabel']}>
-          {children}
-        </FieldLabel>
-      </div>
+    <Field title={rest.title} className={clsx('switch-field', className)}>
+      <SwitchBase.Provider
+        {...rest}
+        id={id || value || name}
+        checked={checkboxState.checked}
+        disabled={disabled}
+        className={clsx(
+          'switch-body',
+          mod.map(m => `switch-body--${String(m)}`),
+        )}
+        onChange={checkboxState.change}
+      >
+        <SwitchBase.Track />
+        <SwitchBase.Input />
+        <SwitchBase.Thumb />
+        {children && (
+          <SwitchBase.Label
+            className={clsx(
+              'switch-label',
+              mod.includes('primary') && 'theme-typography--body1',
+              mod.includes('dense') && 'theme-typography--body2',
+              mod.map(m => `switch-label--${String(m)}`),
+            )}
+          >
+            {children}
+          </SwitchBase.Label>
+        )}
+      </SwitchBase.Provider>
       {description && <FieldDescription>{description}</FieldDescription>}
     </Field>
   );

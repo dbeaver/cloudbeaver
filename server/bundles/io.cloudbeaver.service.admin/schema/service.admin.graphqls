@@ -88,6 +88,8 @@ type AdminUserInfo {
     disabledBy: String @since(version: "25.0.2")
     "Reason why the user was disabled"
     disableReason: String @since(version: "25.0.2")
+    "Date of the user's last successful login"
+    lastLoginTime: DateTime @since(version: "26.1.1")
 
 }
 
