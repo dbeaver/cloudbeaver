@@ -8,6 +8,8 @@
 
 import './module.js';
 
-export * from './SSHForm.js';
-export * from './SSHKeyUploader.js';
-export * from './authTypes.js';
+export * from './SSH/SSHForm.js';
+export * from './SSH/SSHKeyUploader.js';
+export * from './SSH/sshAuthTypes.js';
+export * from './SSH/validateSSHConfig.js';
+export * from './SSH/getNetworkHandlerDefaultProperties.js';

@@ -20,7 +20,7 @@ import {
 } from '@cloudbeaver/core-blocks';
 import { NetworkHandlerAuthType, type NetworkHandlerConfigInput } from '@cloudbeaver/core-sdk';
 
-import { authTypes } from './authTypes.js';
+import { sshAuthTypes } from './sshAuthTypes.js';
 import { SSHKeyUploader } from './SSHKeyUploader.js';
 import { SSH_TUNNEL_ID } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
@@ -69,7 +69,7 @@ export const SSHForm = observer<ISSHFormProps>(function SSHForm({ state, initial
       <Select
         name="authType"
         state={state}
-        items={authTypes}
+        items={sshAuthTypes}
         keySelector={value => value.key}
         valueSelector={value => value.label}
         disabled={isDisabled}

@@ -14,17 +14,12 @@ import {
   type NetworkHandlerConfigInput,
   type NetworkHandlerDescriptor,
 } from '@cloudbeaver/core-sdk';
-import {
-  ConnectionInfoNetworkHandlersResource,
-  getNetworkHandlerDefaultProperties,
-  NetworkHandlerResource,
-  SSH_TUNNEL_ID,
-  validateSSHConfig,
-} from '@cloudbeaver/core-connections';
+import { ConnectionInfoNetworkHandlersResource, NetworkHandlerResource, SSH_TUNNEL_ID } from '@cloudbeaver/core-connections';
 import { toJS } from 'mobx';
 import type { IConnectionFormState } from '../IConnectionFormState.js';
 import type { INetworkHandlerConfig } from '../Options/IConnectionNetworkHanler.js';
 import { ConnectionFormOptionsPart } from '../Options/ConnectionFormOptionsPart.js';
+import { getNetworkHandlerDefaultProperties, validateSSHConfig } from '@cloudbeaver/plugin-connection-network-handlers';
 
 const getDefaultState = () =>
   ({
