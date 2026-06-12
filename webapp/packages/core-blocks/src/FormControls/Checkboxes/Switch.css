@@ -1,0 +1,63 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+
+@layer components {
+  .switch-field {
+    --dbv-kit-control-outline-offset: -8px;
+    position: relative;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: var(--dbv-kit-control-outline-offset);
+      left: var(--dbv-kit-control-outline-offset);
+      right: var(--dbv-kit-control-outline-offset);
+      bottom: var(--dbv-kit-control-outline-offset);
+      border-radius: var(--dbv-kit-control-border-radius);
+      border: var(--dbv-kit-control-outline-width) solid transparent;
+      pointer-events: none;
+    }
+  }
+
+  .switch-body {
+    --dbv-kit-switch-track-color: color-mix(in srgb, var(--theme-on-surface, #000000) 38%, transparent);
+    --dbv-kit-switch-thumb-color: var(--theme-switch-thumb, #ffffff);
+    --dbv-kit-switch-checked-color: var(--theme-primary, #2a7cb4);
+    --dbv-kit-switch-transition-duration: var(--duration-medium);
+    --dbv-kit-switch-transition-easing: var(--ease-smooth);
+    --dbv-kit-switch-label-weight: normal;
+
+    cursor: pointer;
+    user-select: none;
+    min-width: 50px;
+    white-space: pre-wrap !important;
+
+    & .switch-label {
+      font-weight: var(--dbv-kit-switch-label-weight);
+    }
+
+    & .switch-label--dense {
+      font-weight: initial;
+    }
+  }
+
+  .switch-body--primary {
+    --dbv-kit-switch-label-weight: 500;
+  }
+
+  /* Dense mod — 28×16 pill, 12px thumb; checked-offset = 28 - 12 - 2 = 14 */
+  .switch-field .switch-body--dense {
+    --dbv-kit-switch-width: 28px;
+    --dbv-kit-switch-height: 16px;
+    --dbv-kit-switch-track-height: 16px;
+    --dbv-kit-switch-track-radius: 8px;
+    --dbv-kit-switch-thumb-size: 12px;
+    --dbv-kit-switch-thumb-offset: 2px;
+    --dbv-kit-switch-checked-offset: 14px;
+  }
+}

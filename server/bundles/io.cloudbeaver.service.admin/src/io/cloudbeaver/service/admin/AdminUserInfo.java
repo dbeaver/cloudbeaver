@@ -142,4 +142,9 @@ public class AdminUserInfo {
     public String getDisableReason() {
         return user.getDisableReason();
     }
+
+    @Nullable
+    public String getLastLoginTime() {
+        return user.getLastLoginTime() == null ? null : CBModelConstants.ISO_DATE_FORMAT.format(user.getLastLoginTime());
+    }
 }

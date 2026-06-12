@@ -40,6 +40,18 @@ mutation getSqlExecuteTaskResults($taskId: ID!) {
           data
           metaData
         }
+        associations {
+          associationName
+          targetEntityName
+          nodePath
+          columnIndexList
+        }
+        references {
+          associationName
+          targetEntityName
+          nodePath
+          columnIndexList
+        }
         singleEntity
         hasMoreData
         hasRowIdentifier
