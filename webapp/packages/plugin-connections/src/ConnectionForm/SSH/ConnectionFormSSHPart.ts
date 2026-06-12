@@ -14,7 +14,13 @@ import {
   type NetworkHandlerConfigInput,
   type NetworkHandlerDescriptor,
 } from '@cloudbeaver/core-sdk';
-import { ConnectionInfoNetworkHandlersResource, NetworkHandlerResource, SSH_TUNNEL_ID } from '@cloudbeaver/core-connections';
+import {
+  ConnectionInfoNetworkHandlersResource,
+  getNetworkHandlerDefaultProperties,
+  NetworkHandlerResource,
+  SSH_TUNNEL_ID,
+  validateSSHConfig,
+} from '@cloudbeaver/core-connections';
 import { toJS } from 'mobx';
 import type { IConnectionFormState } from '../IConnectionFormState.js';
 import type { INetworkHandlerConfig } from '../Options/IConnectionNetworkHanler.js';
@@ -94,17 +100,8 @@ export class ConnectionFormSSHPart extends FormPart<INetworkHandlerConfig, IConn
   }
 
   private copyInitialHandlerProperties(handlerDescriptor: NetworkHandlerDescriptor, state: INetworkHandlerConfig): void {
-    const properties: Record<string, any> = {};
-    if (handlerDescriptor) {
-      for (const property of handlerDescriptor.properties) {
-        if (!property.features.includes('password')) {
-          properties[property.id!] = property.value;
-        }
-      }
-    }
-
     state.properties = {
-      ...properties,
+      ...getNetworkHandlerDefaultProperties(handlerDescriptor),
       ...state.properties,
     };
   }
@@ -145,29 +142,8 @@ export class ConnectionFormSSHPart extends FormPart<INetworkHandlerConfig, IConn
       return;
     }
 
-    if (this.state.savePassword && !this.state.userName?.length) {
-      validation.error("Field SSH 'User' can't be empty");
-    }
-
-    if (!this.state.properties?.['host']?.length) {
-      validation.error("Field SSH 'Host' can't be empty");
-    }
-
-    const port = Number(this.state.properties?.['port']);
-    if (Number.isNaN(port) || port < 1) {
-      validation.error("Field SSH 'Port' can't be empty");
-    }
-
-    const keyAuth = this.state.authType === NetworkHandlerAuthType.PublicKey;
-    const keySaved = this.initialState?.key === '';
-    if (keyAuth && this.state.savePassword && !keySaved && !this.state.key?.length) {
-      validation.error("Field SSH 'Private key' can't be empty");
-    }
-
-    const passwordSaved = this.initialState?.password === '' && this.initialState?.authType === this.state.authType;
-
-    if (!keyAuth && this.state.savePassword && !passwordSaved && !this.state.password?.length) {
-      validation.error("Field SSH 'Password' can't be empty");
+    for (const error of validateSSHConfig(this.state, this.initialState)) {
+      validation.error(error);
     }
   }
 }

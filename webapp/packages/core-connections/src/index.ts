@@ -59,6 +59,8 @@ export * from './DBDriverResource.js';
 export * from './CONNECTION_INFO_PARAM_SCHEMA.js';
 export * from './isJDBCConnection.js';
 export * from './NetworkHandlerResource.js';
+export * from './getNetworkHandlerDefaultProperties.js';
+export * from './validateSSHConfig.js';
 export * from './useConnectionInfo.js';
 export * from './useDBDriver.js';
 export * from './USER_NAME_PROPERTY_ID.js';
