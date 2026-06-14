@@ -10,7 +10,6 @@ import { FormPart, formValidationContext, type IFormState } from '@cloudbeaver/c
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import {
   DriverConfigurationType,
-  NetworkHandlerAuthType,
   type NetworkHandlerConfigInput,
   type NetworkHandlerDescriptor,
 } from '@cloudbeaver/core-sdk';
@@ -19,26 +18,9 @@ import { toJS } from 'mobx';
 import type { IConnectionFormState } from '../IConnectionFormState.js';
 import type { INetworkHandlerConfig } from '../Options/IConnectionNetworkHanler.js';
 import { ConnectionFormOptionsPart } from '../Options/ConnectionFormOptionsPart.js';
-import { getNetworkHandlerDefaultProperties, validateSSHConfig } from '@cloudbeaver/plugin-connection-network-handlers';
+import { getNetworkHandlerDefaultProperties, getSSHHandlerConfig, SSH_DEFAULT_HANDLER_CONFIG, validateSSHConfig } from '@cloudbeaver/plugin-connection-network-handlers';
 
-const getDefaultState = () =>
-  ({
-    id: SSH_TUNNEL_ID,
-    enabled: false,
-    authType: NetworkHandlerAuthType.Password,
-    // should initially undefined cause if it's empty string it counts as saved password
-    password: undefined,
-    savePassword: false,
-    userName: '',
-    // should initially undefined cause if it's empty string it counts as saved private key
-    key: undefined,
-    properties: {
-      port: 22,
-      host: '',
-      aliveInterval: '0',
-      sshConnectTimeout: '10000',
-    },
-  }) as INetworkHandlerConfig;
+const getDefaultState = (): INetworkHandlerConfig => SSH_DEFAULT_HANDLER_CONFIG() as INetworkHandlerConfig;
 
 export class ConnectionFormSSHPart extends FormPart<INetworkHandlerConfig, IConnectionFormState> {
   constructor(
@@ -51,19 +33,7 @@ export class ConnectionFormSSHPart extends FormPart<INetworkHandlerConfig, IConn
   }
 
   getConfig(): NetworkHandlerConfigInput {
-    const passwordChanged = isPasswordChanged(this.state, this.initialState);
-    const keyChanged = isKeyChanged(this.state, this.initialState);
-
-    const handlerConfig: NetworkHandlerConfigInput = {
-      ...this.state,
-      savePassword: this.state.savePassword || this.optionsPart.state.sharedCredentials,
-      key: this.state.authType === NetworkHandlerAuthType.PublicKey && keyChanged ? this.state.key : undefined,
-      password: passwordChanged ? this.state.password : undefined,
-    };
-
-    delete handlerConfig.secureProperties;
-
-    return handlerConfig;
+    return getSSHHandlerConfig(this.state, this.initialState, this.optionsPart.state.sharedCredentials);
   }
 
   override isOutdated(): boolean {
@@ -116,7 +86,7 @@ export class ConnectionFormSSHPart extends FormPart<INetworkHandlerConfig, IConn
       return;
     }
 
-    const config = getTrimmedSSHConfig(this.getConfig());
+    const config = this.getConfig();
 
     if (this.state.enabled && !this.state.savePassword) {
       this.formState.state.requiredNetworkHandlersIds.push(this.state.id);
@@ -141,41 +111,4 @@ export class ConnectionFormSSHPart extends FormPart<INetworkHandlerConfig, IConn
       validation.error(error);
     }
   }
-}
-
-function getTrimmedSSHConfig(input: NetworkHandlerConfigInput): NetworkHandlerConfigInput {
-  const trimmedInput = toJS(input);
-  const attributesToTrim = Object.keys(input) as (keyof NetworkHandlerConfigInput)[];
-
-  for (const key of attributesToTrim) {
-    if (typeof trimmedInput[key] === 'string') {
-      trimmedInput[key] = trimmedInput[key]?.trim();
-    }
-  }
-
-  for (const key in trimmedInput.properties) {
-    if (typeof trimmedInput.properties[key] === 'string') {
-      trimmedInput.properties[key] = trimmedInput.properties[key]?.trim();
-    }
-  }
-
-  return trimmedInput;
-}
-
-function isPasswordChanged(handler: NetworkHandlerConfigInput, initial?: NetworkHandlerConfigInput) {
-  if (!initial && !handler.enabled) {
-    return false;
-  }
-
-  return (
-    (((initial?.password === null && handler.password !== null) || initial?.password === '') && handler.password !== '') || !!handler.password?.length
-  );
-}
-
-function isKeyChanged(handler: NetworkHandlerConfigInput, initial?: NetworkHandlerConfigInput) {
-  if (!initial && !handler.enabled) {
-    return false;
-  }
-
-  return (((initial?.key === null && handler.key !== null) || initial?.key === '') && handler.key !== '') || !!handler.key?.length;
 }
