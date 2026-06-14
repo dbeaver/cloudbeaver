@@ -53,7 +53,7 @@ export function getSSHHandlerConfig(
 
   const handlerConfig: NetworkHandlerConfigInput = {
     ...state,
-    savePassword: state.savePassword || (savePassword ?? false),
+    savePassword: (state.savePassword ?? false) || (savePassword ?? false),
     key: state.authType === NetworkHandlerAuthType.PublicKey && keyChanged ? state.key : undefined,
     password: passwordChanged ? state.password : undefined,
   };

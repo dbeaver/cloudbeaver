@@ -44,7 +44,7 @@ export interface ISSHFormProps {
   projectId: string;
 }
 
-export const SSHForm = observer<ISSHFormProps>(function SSHForm({ state, initialState, disabled, readonly, sharedCredentials, projectId }) {
+export const SSHForm = observer<ISSHFormProps>(function SSHForm({ state, initialState, disabled, readonly, sharedCredentials = false, projectId }) {
   const translate = useTranslate();
 
   const enabled = state.enabled;
@@ -61,6 +61,7 @@ export const SSHForm = observer<ISSHFormProps>(function SSHForm({ state, initial
   const { credentialsSavingEnabled } = useAdministrationSettings();
   const projectInfoResource = useService(ProjectInfoResource);
   const isSharedProject = projectInfoResource.isProjectShared(projectId);
+  const showSaveCredentials = credentialsSavingEnabled && !sharedCredentials;
 
   const handleAuthTypeChange = useCallback(() => {
     state.password = '';
@@ -119,7 +120,7 @@ export const SSHForm = observer<ISSHFormProps>(function SSHForm({ state, initial
         </InputField>
         {keyAuth && <SSHKeyUploader state={state} saved={keySaved} disabled={disabledInternal} readonly={readonly} />}
       </Container>
-      {credentialsSavingEnabled && !sharedCredentials && (
+      {showSaveCredentials && (
         <FieldCheckbox
           id={SSH_TUNNEL_ID + '_savePassword'}
           title={translate(
