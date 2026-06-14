@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -11,25 +11,25 @@ import { NodeManagerUtils } from './NodeManagerUtils.js';
 
 describe('NodeManagerUtils', () => {
   describe('connectionIdToConnectionNodeId', () => {
-    it('should prepend "database://" to the connectionId', () => {
+    it('should prepend "node://" to the connectionId', () => {
       const connectionId = '12345';
-      const result = NodeManagerUtils.connectionIdToConnectionNodeId(connectionId);
-      expect(result).toBe('database://12345');
+      const result = NodeManagerUtils.connectionIdToConnectionNodeId('project', connectionId);
+      expect(result).toBe('node://project/datasources/12345');
     });
 
     it('should work with different connectionId values', () => {
-      expect(NodeManagerUtils.connectionIdToConnectionNodeId('abc')).toBe('database://abc');
-      expect(NodeManagerUtils.connectionIdToConnectionNodeId('')).toBe('database://');
+      expect(NodeManagerUtils.connectionIdToConnectionNodeId('project', 'abc')).toBe('node://project/datasources/abc');
+      expect(NodeManagerUtils.connectionIdToConnectionNodeId('project', '')).toBe('node://project/datasources');
     });
   });
 
   describe('isDatabaseObject', () => {
-    it('should return true for objectIds starting with "database://"', () => {
-      expect(NodeManagerUtils.isDatabaseObject('database://123')).toBe(true);
-      expect(NodeManagerUtils.isDatabaseObject('database://abc')).toBe(true);
+    it('should return true for objectIds containing "datasources at first segment"', () => {
+      expect(NodeManagerUtils.isDatabaseObject('node://project/datasources/123')).toBe(true);
+      expect(NodeManagerUtils.isDatabaseObject('node://project/datasources/abc')).toBe(true);
     });
 
-    it('should return false for objectIds not starting with "database://"', () => {
+    it('should return false for objectIds not containing "datasources"', () => {
       expect(NodeManagerUtils.isDatabaseObject('http://example.com')).toBe(false);
       expect(NodeManagerUtils.isDatabaseObject('12345')).toBe(false);
       expect(NodeManagerUtils.isDatabaseObject('')).toBe(false);

@@ -32,20 +32,20 @@ export function navigationTreeResourceTypeFilter(
             return true;
           }
 
-          const project = projectsNavNodeService.getProject(node.id);
+          const project = projectsNavNodeService.getProject(node.uri);
 
           if (project) {
             const resourceType = projectInfoResource.getResourceType(project, resourceTypeId);
 
             if (resourceType) {
-              return isResourceOfType(resourceType, node.id);
+              return isResourceOfType(resourceType, node.uri);
             }
           }
           return false;
         }
         return true;
       })
-      .map(node => node.id);
+      .map(node => node.uri);
 
     return nodes;
   };

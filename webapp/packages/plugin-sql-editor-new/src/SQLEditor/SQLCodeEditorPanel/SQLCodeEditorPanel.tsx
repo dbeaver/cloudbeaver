@@ -73,7 +73,7 @@ export const SQLCodeEditorPanel: TabContainerPanelComponent<ISqlEditorModeProps>
           const alias: string[] = [];
 
           for (const node of nodes) {
-            alias.push(await navNodeManagerService.getNodeDatabaseAlias(node.id));
+            alias.push(await navNodeManagerService.getNodeDatabaseAlias(node.uri));
           }
 
           const replacement = alias.join(', ');
@@ -130,8 +130,8 @@ export const SQLCodeEditorPanel: TabContainerPanelComponent<ISqlEditorModeProps>
           <>
             <ReactCodemirrorPanel className={styles['reactCodemirrorPanel']} top>
               <Button
-                variant='ghost'
-                size='small'
+                variant="ghost"
+                size="small"
                 title={translate('plugin_sql_editor_new_merge_conflict_keep_current_tooltip')}
                 onClick={keepCurrent}
               >
@@ -140,8 +140,8 @@ export const SQLCodeEditorPanel: TabContainerPanelComponent<ISqlEditorModeProps>
             </ReactCodemirrorPanel>
             <ReactCodemirrorPanel className={styles['reactCodemirrorPanel']} top incomingView>
               <Button
-                variant='ghost'
-                size='small'
+                variant="ghost"
+                size="small"
                 title={translate('plugin_sql_editor_new_merge_conflict_accept_incoming_tooltip')}
                 onClick={applyIncoming}
               >

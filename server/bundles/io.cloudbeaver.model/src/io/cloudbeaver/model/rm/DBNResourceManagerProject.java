@@ -115,13 +115,6 @@ public class DBNResourceManagerProject extends DBNAbstractResourceManagerNode {
         return ((DBNResourceManagerRoot) getParentNode()).getResourceController();
     }
 
-    @NotNull
-    @Deprecated
-    @Override
-    public String getNodeItemPath() {
-        return getParentNode().getNodeItemPath() + "/" + getName();
-    }
-
     @Nullable
     @Override
     public DBNNode refreshNode(@NotNull DBRProgressMonitor monitor, @Nullable Object source) throws DBException {

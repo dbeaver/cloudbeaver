@@ -26,7 +26,7 @@ export const NavigationNodeProjectControl: NavTreeControlComponent = observer<Na
     const treeNodeContext = useContext(TreeNodeContext);
     const elementsTreeContext = useContext(ElementsTreeContext);
     const navNodeInfoResource = useService(NavNodeInfoResource);
-    const outdated = getComputed(() => navNodeInfoResource.isOutdated(node.id) && !treeNodeContext.loading);
+    const outdated = getComputed(() => navNodeInfoResource.isOutdated(node.uri) && !treeNodeContext.loading);
     const selected = treeNodeContext.selected;
 
     const isDragging = getComputed(() => {
@@ -52,7 +52,7 @@ export const NavigationNodeProjectControl: NavTreeControlComponent = observer<Na
     }
 
     function handleDbClick(event: React.MouseEvent<HTMLDivElement>) {
-      elementsTreeContext?.tree.open(node, navNodeInfoResource.getParents(node.id), false);
+      elementsTreeContext?.tree.open(node, navNodeInfoResource.getParents(node.uri), false);
     }
 
     if (elementsTreeContext?.tree.settings?.projects === false && !isDragging) {

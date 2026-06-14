@@ -23,7 +23,7 @@ interface Props {
 }
 
 export const ObjectMenuCell = observer<Props>(function ObjectMenuCell({ object }) {
-  const { node } = useNode(object.id);
+  const { node } = useNode(object.uri);
 
   if (!node) {
     throw new Error('Node not found');
@@ -35,9 +35,9 @@ export const ObjectMenuCell = observer<Props>(function ObjectMenuCell({ object }
   const menu = useMenu({ menu: MENU_NAV_TREE });
   const mouse = useMouse<HTMLDivElement>();
   const [menuOpened, switchState] = useState(false);
-  const connection = connectionsInfoResource.getConnectionForNode(node.id);
+  const connection = connectionsInfoResource.getConnectionForNode(node.uri);
   const contextMenuPosition = useContextMenuPosition();
-  const connectionKey = connectionsInfoResource.getConnectionIdForNodeId(node.projectId!, node.id);
+  const connectionKey = connectionsInfoResource.getConnectionIdForNodeId(node.projectId!, node.uri!);
 
   useDataContextLink(menu.context, (context, id) => {
     context.set(DATA_CONTEXT_NAV_NODE, node, id);
@@ -48,7 +48,7 @@ export const ObjectMenuCell = observer<Props>(function ObjectMenuCell({ object }
   });
 
   function openNode() {
-    navNodeManagerService.navToNode(node!.id, node!.parentId);
+    navNodeManagerService.navToNode(node!.uri, node!.parentId);
   }
 
   const mouseEnter = useStateDelay(mouse.state.mouseEnter, 33); // track mouse update only 30 times per second

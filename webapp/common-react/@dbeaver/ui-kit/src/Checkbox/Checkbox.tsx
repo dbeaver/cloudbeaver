@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -12,6 +12,7 @@ import clsx from 'clsx';
 import './Checkbox.css';
 import type { ControlSize } from '../types/controls.js';
 import { componentProviderWrapper } from '../componentProviderWrapper.js';
+import { CheckboxIndicator } from './CheckboxIndicator.js'; 
 
 export interface CheckboxProps extends Omit<AriaKitCheckboxProps, 'render' | 'size'> {
   size?: ControlSize;
@@ -20,7 +21,7 @@ export interface CheckboxProps extends Omit<AriaKitCheckboxProps, 'render' | 'si
   indeterminateIcon?: React.ReactNode;
 }
 
-export function CheckboxBase({ children, className, icon, indeterminate, indeterminateIcon, size = 'medium', ...props }: CheckboxProps) {
+export function CheckboxBase({ children, className, icon, indeterminate, indeterminateIcon, size = 'medium', ...props }: CheckboxProps): React.ReactElement {
   const [innerChecked, setInnerChecked] = useState(props.defaultChecked ?? false);
   const checked = props.checked ?? innerChecked;
 
@@ -46,30 +47,19 @@ export function CheckboxBase({ children, className, icon, indeterminate, indeter
         />
       </VisuallyHidden>
 
-      <div
-        className="dbv-kit-checkbox__check"
-        data-indeterminate={indeterminate}
-        data-checked={checked}
-        data-focus-visible={focusVisible || undefined}
-      >
-        {checked &&
-          (icon ?? (
-            <svg stroke="currentColor" strokeWidth="2" viewBox="0 0 16 16">
-              <polyline fill="none" points="3,7 7,11 13,4" />
-            </svg>
-          ))}
-        {indeterminate &&
-          !checked &&
-          (indeterminateIcon ?? (
-            <svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 16 16">
-              <line x1="3" y1="8" x2="13" y2="8" />
-            </svg>
-          ))}
-      </div>
+      <CheckboxIndicator
+        checked={checked}
+        indeterminate={indeterminate}
+        disabled={props.disabled}
+        focusVisible={focusVisible}
+        size={size}
+        icon={icon}
+        indeterminateIcon={indeterminateIcon}
+      />
 
       <span className="dbv-kit-checkbox__text">{children}</span>
     </label>
   );
 }
 
-export const Checkbox = componentProviderWrapper('Checkbox', CheckboxBase);
+export const Checkbox = Object.assign(componentProviderWrapper('Checkbox', CheckboxBase), { Indicator: CheckboxIndicator });
