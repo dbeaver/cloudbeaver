@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
 
-import { Button, ColoredContainer, Form, Group, GroupItem, s, Switch, useAutoLoad, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { Button, ColoredContainer, Form, Group, GroupItem, s, useAutoLoad, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { NetworkHandlerAuthType, type NetworkHandlerConfigInput } from '@cloudbeaver/core-sdk';
 import { NetworkHandlerResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
@@ -57,13 +57,10 @@ export const SSH: TabContainerPanelComponent<Props> = observer(function SSH({ fo
     <Form className={s(style, { form: true })}>
       <ColoredContainer parent>
         <Group form gap keepSize large>
-          <Switch id="ssh-enable-switch" name="enabled" state={handlerState} mod={['primary']} disabled={disabled}>
-            {translate('connections_network_handler_ssh_tunnel_enable')}
-          </Switch>
           <SSHForm
             state={handlerState}
             initialState={SSHPart.initialState}
-            disabled={disabled || !enabled}
+            disabled={disabled}
             readonly={formState.isReadOnly}
             sharedCredentials={optionsPart.state.sharedCredentials}
             projectId={formState.state.projectId}

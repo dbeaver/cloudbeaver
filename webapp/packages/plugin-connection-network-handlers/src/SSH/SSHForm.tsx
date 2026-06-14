@@ -14,6 +14,7 @@ import {
   FieldCheckbox,
   InputField,
   Select,
+  Switch,
   useAdministrationSettings,
   useResource,
   useTranslate,
@@ -46,7 +47,8 @@ export interface ISSHFormProps {
 export const SSHForm = observer<ISSHFormProps>(function SSHForm({ state, initialState, disabled, readonly, sharedCredentials, projectId }) {
   const translate = useTranslate();
 
-  const isDisabled = disabled || readonly;
+  const enabled = state.enabled;
+  const disabledInternal = disabled || readonly || enabled === false;
   const keyAuth = state.authType === NetworkHandlerAuthType.PublicKey;
   const serverConfigResource = useResource(SSHForm, ServerConfigResource, undefined);
 
@@ -66,23 +68,26 @@ export const SSHForm = observer<ISSHFormProps>(function SSHForm({ state, initial
 
   return (
     <>
+      <Switch id="ssh-enable-switch" name="enabled" state={state} mod={['primary']} disabled={disabled || readonly}>
+        {translate('connections_network_handler_ssh_tunnel_enable')}
+      </Switch>
       <Select
         name="authType"
         state={state}
         items={sshAuthTypes}
         keySelector={value => value.key}
         valueSelector={value => value.label}
-        disabled={isDisabled}
+        disabled={disabledInternal}
         tiny
         onSelect={handleAuthTypeChange}
       >
         {translate('plugin_connection_network_handlers_ssh_tunnel_auth_type')}
       </Select>
       <Container wrap gap>
-        <InputField type="text" name="host" state={state.properties} autoComplete="on" readOnly={isDisabled} required small>
+        <InputField type="text" name="host" state={state.properties} autoComplete="on" readOnly={disabledInternal} required small>
           {translate('plugin_connection_network_handlers_ssh_tunnel_host')}
         </InputField>
-        <InputField type="number" name="port" state={state.properties} autoComplete="on" readOnly={isDisabled} required tiny>
+        <InputField type="number" name="port" state={state.properties} autoComplete="on" readOnly={disabledInternal} required tiny>
           {translate('plugin_connection_network_handlers_ssh_tunnel_port')}
         </InputField>
       </Container>
@@ -91,7 +96,7 @@ export const SSHForm = observer<ISSHFormProps>(function SSHForm({ state, initial
           type="text"
           name="userName"
           state={state}
-          readOnly={isDisabled}
+          readOnly={disabledInternal}
           required={state.savePassword}
           autoComplete="section-ssh-authentication username"
           tiny
@@ -104,7 +109,7 @@ export const SSHForm = observer<ISSHFormProps>(function SSHForm({ state, initial
           name="password"
           autoComplete="section-ssh-authentication new-password"
           state={state}
-          readOnly={isDisabled}
+          readOnly={disabledInternal}
           required={!passwordSaved && !keyAuth && state.savePassword}
           description={passwordSaved ? translate('ui_processing_saved') : undefined}
           tiny
@@ -112,7 +117,7 @@ export const SSHForm = observer<ISSHFormProps>(function SSHForm({ state, initial
         >
           {passwordLabel}
         </InputField>
-        {keyAuth && <SSHKeyUploader state={state} saved={keySaved} disabled={isDisabled} readonly={readonly} />}
+        {keyAuth && <SSHKeyUploader state={state} saved={keySaved} disabled={disabledInternal} readonly={readonly} />}
       </Container>
       {credentialsSavingEnabled && !sharedCredentials && (
         <FieldCheckbox
@@ -124,7 +129,7 @@ export const SSHForm = observer<ISSHFormProps>(function SSHForm({ state, initial
           )}
           name="savePassword"
           state={state}
-          disabled={isDisabled}
+          disabled={disabledInternal}
         >
           {translate(
             !isSharedProject || serverConfigResource.data?.distributed
@@ -136,10 +141,24 @@ export const SSHForm = observer<ISSHFormProps>(function SSHForm({ state, initial
       <Container gap>
         <Expandable label={translate('plugin_connection_network_handlers_ssh_tunnel_advanced_settings')}>
           <Container gap>
-            <InputField type="number" name="aliveInterval" state={state.properties} readOnly={isDisabled} labelTooltip={aliveIntervalLabel} tiny>
+            <InputField
+              type="number"
+              name="aliveInterval"
+              state={state.properties}
+              readOnly={disabledInternal}
+              labelTooltip={aliveIntervalLabel}
+              tiny
+            >
               {aliveIntervalLabel}
             </InputField>
-            <InputField type="number" name="sshConnectTimeout" state={state.properties} readOnly={isDisabled} labelTooltip={connectTimeoutLabel} tiny>
+            <InputField
+              type="number"
+              name="sshConnectTimeout"
+              state={state.properties}
+              readOnly={disabledInternal}
+              labelTooltip={connectTimeoutLabel}
+              tiny
+            >
               {connectTimeoutLabel}
             </InputField>
           </Container>
