@@ -22,7 +22,7 @@ export function elementsTreeNameFilter(
   compare: NavNodeFilterCompareFn = elementsTreeNameFilterNode,
 ): IElementsTreeFilter {
   return (tree, filter, node, children, state) => {
-    const nodeState = state.get(node.id);
+    const nodeState = state.get(node.uri);
 
     if (filter === '' || nodeState.showInFilter || compare(tree, node, filter) === EEquality.full) {
       return children;
@@ -33,7 +33,7 @@ export function elementsTreeNameFilter(
       .filter(isDefined)
       .filter(child => filterNode(tree, navTreeResource, navNodeInfoResource, compare, filter, child, state));
 
-    return nodes.map(node => node.id);
+    return nodes.map(node => node.uri);
   };
 }
 
@@ -46,14 +46,14 @@ function filterNode(
   node: NavNode,
   state: MetadataMap<string, ITreeNodeState>,
 ): boolean {
-  const nodeState = state.get(node.id);
+  const nodeState = state.get(node.uri);
 
   if (compare(tree, node, filter) !== EEquality.none || nodeState.showInFilter) {
     return true;
   }
 
   // if (nodeState.expanded) {
-  const children = navTreeResource.get(node.id) || [];
+  const children = navTreeResource.get(node.uri) || [];
 
   return navNodeInfoResource
     .get(resourceKeyList(children))

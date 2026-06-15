@@ -5,12 +5,15 @@
 Cloud Database Manager - Community Edition.  
 CloudBeaver is a web server that provides a rich web interface. The server itself is a Java application, and the web part is written in TypeScript and React.  
 It is free to use and open-source (licensed under [Apache 2](https://github.com/dbeaver/cloudbeaver/blob/devel/LICENSE) license).  
-See our [WIKI](https://github.com/dbeaver/cloudbeaver/wiki) for more details. 
 
 <a><img src="https://github.com/dbeaver/cloudbeaver/wiki/images/connection-creation-demo.png" width="400"/></a>
 <img src="https://github.com/dbeaver/cloudbeaver/wiki/images/gis-demo.png" width="400"/>
 <img src="https://github.com/dbeaver/cloudbeaver/wiki/images/data-transfer-demo.png" width="400"/>
 <img src="https://github.com/dbeaver/cloudbeaver/wiki/images/sql-editor-demo.png" width="400"/>
+
+## Documentation
+- [GitHub WIKI](https://github.com/dbeaver/cloudbeaver/wiki)
+- [Official documentation](https://dbeaver.com/docs/cloudbeaver/)
 
 ## Run in Docker
 

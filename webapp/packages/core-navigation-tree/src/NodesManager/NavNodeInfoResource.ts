@@ -26,7 +26,7 @@ import type { NavNode } from './EntityTypes.js';
 
 type NavNodeInfo = NavNodeInfoFragment;
 
-export const ROOT_NODE_PATH = '';
+export const ROOT_NODE_PATH = 'node://';
 
 interface INodeMetadata extends ICachedResourceMetadata {
   withDetails: boolean;
@@ -109,7 +109,7 @@ export class NavNodeInfoResource extends CachedMapResource<string, NavNode, Reco
   }
 
   navNodeInfoToNavNode(node: NavNodeInfo, parentId?: string): NavNode {
-    const oldNode = this.get(node.id);
+    const oldNode = this.get(node.uri);
 
     let newNode: NavNode = {
       ...node,
@@ -169,11 +169,11 @@ export class NavNodeInfoResource extends CachedMapResource<string, NavNode, Reco
     });
 
     return runInAction(() => {
-      const navNode = this.navNodeInfoToNavNode(node, parents[0]?.id);
+      const navNode = this.navNodeInfoToNavNode(node, parents[0]?.uri);
 
-      this.set(resourceKeyList([...parents.map(node => node.id), navNode.id]), [
+      this.set(resourceKeyList([...parents.map(node => node.uri), navNode.uri]), [
         ...parents.reduce((list, node, index, array) => {
-          list.push(this.navNodeInfoToNavNode(node, array[index + 1]?.id));
+          list.push(this.navNodeInfoToNavNode(node, array[index + 1]?.uri));
           return list;
         }, [] as NavNode[]),
         navNode,
@@ -199,7 +199,7 @@ export class NavNodeInfoResource extends CachedMapResource<string, NavNode, Reco
 }
 
 export function getNodeDisplayName(node: NavNode): string {
-  return node.name ?? node.id;
+  return node.name ?? node.uri;
 }
 
 export function getNodePlainName(node: NavNode): string {

@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2025 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,6 @@ public class WebNavigatorNodeInfoTest extends CloudbeaverMockTest {
         DBNNode node = Mockito.mock(DBNNode.class);
         Mockito.when(node.getParentNode()).thenReturn(null);
         Mockito.when(node.getNodeId()).thenReturn("uri");
-        Mockito.when(node.getNodeItemPath()).thenReturn("node/path");
         Mockito.when(node.getLocalizedName("en")).thenReturn("NodeName");
         Mockito.when(node.getNodeDescription()).thenReturn("A description");
         Mockito.when(node.getNodeType()).thenReturn("nodeType");
@@ -44,7 +43,6 @@ public class WebNavigatorNodeInfoTest extends CloudbeaverMockTest {
 
         WebNavigatorNodeInfo info = new WebNavigatorNodeInfo(session, node);
 
-        Assertions.assertEquals("node/path", info.getId());
         Assertions.assertEquals("node://uri", info.getUri());
         Assertions.assertEquals("NodeName", info.getName());
         Assertions.assertEquals("A description", info.getDescription());

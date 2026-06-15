@@ -581,22 +581,22 @@ export function useElementsTree(options: IOptions): IElementsTree {
         await options.onOpen?.(node, false);
       },
       async expand(node: NavNode, state: boolean) {
-        if (!this.isNodeExpandable(node.id)) {
+        if (!this.isNodeExpandable(node.uri)) {
           return;
         }
 
-        const treeNodeState = this.state.get(node.id);
+        const treeNodeState = this.state.get(node.uri);
 
         try {
           if (state || (this.filtering && !treeNodeState.showInFilter)) {
-            state = await handleLoadChildren(node.id, true);
+            state = await handleLoadChildren(node.uri, true);
           }
 
           if (this.filtering) {
             treeNodeState.showInFilter = !treeNodeState.showInFilter && state;
 
             if (!treeNodeState.showInFilter) {
-              const nested = functionsRef.getNestedChildren(node.id);
+              const nested = functionsRef.getNestedChildren(node.uri);
 
               for (const nodeId of nested) {
                 const treeNodeState = this.state.get(nodeId);
@@ -605,11 +605,11 @@ export function useElementsTree(options: IOptions): IElementsTree {
             }
           } else {
             await options.onExpand?.(node, state);
-            treeNodeState.expanded = state && this.getNodeChildren(node.id).length > 0;
+            treeNodeState.expanded = state && this.getNodeChildren(node.uri).length > 0;
           }
 
           if (state) {
-            await functionsRef.loadTree(node.id);
+            await functionsRef.loadTree(node.uri);
           }
         } catch {
           treeNodeState.expanded = false;
@@ -629,17 +629,17 @@ export function useElementsTree(options: IOptions): IElementsTree {
           await options.beforeSelect(node, multiple, nested);
         }
 
-        const selected = this.isNodeSelected(node.id);
+        const selected = this.isNodeSelected(node.uri);
 
         if (!multiple) {
-          await functionsRef.clearSelection(node.id);
+          await functionsRef.clearSelection(node.uri);
 
           if (selected) {
             return;
           }
         }
 
-        await functionsRef.setSelection(node.id, !selected);
+        await functionsRef.setSelection(node.uri, !selected);
       },
       async resetSelection(): Promise<void> {
         if (options.customSelectReset) {

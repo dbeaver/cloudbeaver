@@ -15,7 +15,7 @@ export const NAVIGATION_TREE_LIMIT = {
 
 export function elementsTreeLimitFilter(navTreeResource: NavTreeResource): IElementsTreeFilter {
   return (tree, filter, node, children) => {
-    if (hasMorePagesForResourceKey(navTreeResource, node.id)) {
+    if (hasMorePagesForResourceKey(navTreeResource, node.uri)) {
       return [...children, NAVIGATION_TREE_LIMIT.limit];
     }
 

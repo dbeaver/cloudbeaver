@@ -60,7 +60,7 @@ export class ObjectPropertyTableFooterService {
           const nodes = selected.filter(node => node.features?.includes(ENodeFeature.canDelete));
 
           try {
-            await this.navTreeResource.deleteNode(resourceKeyList(nodes.map(node => node.id)));
+            await this.navTreeResource.deleteNode(resourceKeyList(nodes.map(node => node.uri)));
           } catch (exception: any) {
             this.notificationService.logException(exception, 'plugin_object_viewer_delete_object_fail');
           }

@@ -31,6 +31,9 @@ if [[ "$?" -ne 0 ]] ; then
 fi
 cd ../../../deploy
 
+echo "Generate cloudbeaver.conf file"
+mvn -f ../apps/config-generator compile exec:java -Dconfig.output="cloudbeaver/conf/cloudbeaver.conf"
+
 echo "Copy server packages"
 
 cp -rp ../server/product/web-server/target/products/io.cloudbeaver.product/all/all/all/* ./cloudbeaver/server

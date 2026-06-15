@@ -175,7 +175,7 @@ public class WebDataSourceUtils {
                         new WSDataSourceDisconnectEvent(
                             dataSource.getProject().getId(),
                             dataSource.getId(),
-                            webSession.getSessionId(),
+                            WebEventUtils.getSmSessionId(webSession),
                             webSession.getUserId()
                         )
                     );
