@@ -139,7 +139,7 @@ export class DataExportMenuService {
           connectionKey,
           name: node.name,
           fileName,
-          containerNodePath: node.id,
+          containerNodePath: node.uri,
         });
       },
     });

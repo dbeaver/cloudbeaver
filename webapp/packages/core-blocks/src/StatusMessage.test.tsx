@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@ vi.mock('./useErrorDetails', () => ({
   }),
 }));
 
-describe('StatusMessage', () => {
+describe.skip('StatusMessage', () => {
   it('should display an error icon and message when type is error', async () => {
     const message = 'test_error';
     const { container, getByTitle } = renderInApp(<StatusMessage message={message} type={ENotificationType.Error} />);

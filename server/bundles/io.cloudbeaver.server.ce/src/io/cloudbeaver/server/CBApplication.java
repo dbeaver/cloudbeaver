@@ -743,7 +743,7 @@ public abstract class CBApplication<T extends CBServerConfig>
         sendConfigChangedEvent(credentialsProvider);
     }
 
-    protected void sendConfigChangedEvent(SMCredentialsProvider credentialsProvider) {
+    protected void sendConfigChangedEvent(@Nullable SMCredentialsProvider credentialsProvider) {
         String sessionId = null;
         if (credentialsProvider != null && credentialsProvider.getActiveUserCredentials() != null) {
             sessionId = credentialsProvider.getActiveUserCredentials().getSmSessionId();

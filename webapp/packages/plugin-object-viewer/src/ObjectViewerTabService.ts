@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -26,8 +26,11 @@ import type { IExecutionContextProvider, ISyncContextLoader } from '@cloudbeaver
 import {
   type INavNodeRenameData,
   type INodeNavigationData,
+  isConnectionFolder,
+  NavNodeInfoResource,
   NavNodeManagerService,
   NavTreeResource,
+  NODE_PATH_PREFIX,
   NodeManagerUtils,
   objectNavNodeProvider,
 } from '@cloudbeaver/core-navigation-tree';
@@ -54,6 +57,7 @@ const ObjectViewerTab = importLazyComponent(() => import('./ObjectViewerTab.js')
   ConnectionNavNodeService,
   NavTreeResource,
   ConnectionExecutionContextResource,
+  NavNodeInfoResource,
 ])
 export class ObjectViewerTabService {
   readonly tabHandler: TabHandler<IObjectViewerTabState>;
@@ -67,6 +71,7 @@ export class ObjectViewerTabService {
     private readonly connectionNavNodeService: ConnectionNavNodeService,
     private readonly navTreeResource: NavTreeResource,
     private readonly connectionExecutionContextResource: ConnectionExecutionContextResource,
+    private readonly navNodeInfoResource: NavNodeInfoResource,
   ) {
     this.tabHandler = this.navigationTabsService.registerTabHandler<IObjectViewerTabState>({
       key: objectViewerTabHandlerKey,
@@ -138,9 +143,10 @@ export class ObjectViewerTabService {
       tabInfo.registerTab(tab);
     }
 
-    function isSupported(): boolean {
-      return NodeManagerUtils.isDatabaseObject(data.nodeId);
-    }
+    const isSupported = (): boolean => {
+      const node = this.navNodeInfoResource.get(data.nodeId);
+      return NodeManagerUtils.isDatabaseObject(data.nodeId) && !isConnectionFolder(node);
+    };
 
     if (isSupported()) {
       nodeInfo.markOpen();
@@ -379,6 +385,10 @@ export class ObjectViewerTabService {
         if (!this.connectionInfoResource.has(tab.handlerState.connectionKey)) {
           return false;
         }
+      }
+
+      if (!tab.handlerState.objectId.startsWith(NODE_PATH_PREFIX)) {
+        return false;
       }
 
       runInAction(() => {

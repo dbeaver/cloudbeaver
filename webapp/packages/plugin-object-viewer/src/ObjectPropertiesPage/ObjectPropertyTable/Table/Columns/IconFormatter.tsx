@@ -18,7 +18,7 @@ interface Props {
 }
 
 export const IconFormatter = observer<Props>(function IconFormatter({ object }) {
-  const { node } = useNode(object.id);
+  const { node } = useNode(object.uri);
   const styles = useS(style);
 
   return (

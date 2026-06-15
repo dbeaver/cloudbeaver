@@ -313,7 +313,7 @@ public class WebSession extends BaseWebSession
 
             loadProjects();
 
-            this.navigatorModel = new DBNModel(DBWorkbench.getPlatform(), getWorkspace().getProjects());
+            this.navigatorModel = new DBNModel(DBWorkbench.getPlatform(), getWorkspace());
             this.navigatorModel.setModelAuthContext(getWorkspace().getAuthContext());
             this.navigatorModel.initialize();
 

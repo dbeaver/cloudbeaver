@@ -36,6 +36,7 @@
     "color": "^5.0.2",
     "p-debounce": "^5",
     "p-memoize": "^8.0.0",
-    "quick-lru": "^7.1.0"
+    "quick-lru": "^7.1.0",
+    "uuid": "^14"
   }
 }
