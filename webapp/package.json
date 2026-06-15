@@ -12,7 +12,8 @@
     "immutable": ">3.8.3",
     "glob": ">11.1.0",
     "inflight": ">1.0.6",
-    "node-domexception": ">1.0.0"
+    "node-domexception": ">1.0.0",
+    "shell-quote": ">1.8.3"
   },
   "scripts": {
     "test": "dbeaver-test",

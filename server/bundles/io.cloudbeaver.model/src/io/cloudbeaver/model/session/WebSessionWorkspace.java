@@ -27,6 +27,7 @@ import org.jkiss.dbeaver.model.DBPImage;
 import org.jkiss.dbeaver.model.app.DBPPlatform;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.app.DBPWorkspace;
+import org.jkiss.dbeaver.model.fs.DBFFileSystemManager;
 import org.jkiss.dbeaver.model.impl.auth.SessionContextImpl;
 import org.jkiss.dbeaver.model.rm.RMUtils;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
@@ -46,6 +47,7 @@ public class WebSessionWorkspace implements DBPWorkspace {
     private final SessionContextImpl workspaceAuthContext;
     private final List<WebSessionProjectImpl> accessibleProjects = new ArrayList<>();
     private WebSessionProjectImpl activeProject;
+    private DBFFileSystemManager fileSystemManager;
 
     public WebSessionWorkspace(BaseWebSession session) {
         this.session = session;
@@ -211,4 +213,17 @@ public class WebSessionWorkspace implements DBPWorkspace {
         return ServletAppUtils.getServletApplication().getAppConfiguration().isFeatureEnabled(feature);
     }
 
+    @NotNull
+    @Override
+    public synchronized DBFFileSystemManager getFileSystemManager() {
+        if (fileSystemManager == null) {
+            synchronized (this) {
+                if (fileSystemManager == null) {
+                    fileSystemManager = new DBFFileSystemManager(session.getWorkspace());
+                }
+            }
+        }
+
+        return fileSystemManager;
+    }
 }

@@ -26,7 +26,6 @@ export * from './NavTree/getConnectionFolderId.js';
 export * from './NavTree/getFolderPathWithProjectId.js';
 export * from './NavTree/getFolderPath.js';
 export * from './NavTree/getConnectionParentId.js';
-export * from './NavTree/getFolderNodeParents.js';
 export * from './NavTree/NAV_NODE_TYPE_CONNECTION.js';
 export * from './NavTree/isConnectionNode.js';
 

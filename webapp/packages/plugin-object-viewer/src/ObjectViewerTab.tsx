@@ -33,7 +33,7 @@ export const ObjectViewerTab: TabHandlerTabComponent<IObjectViewerTabState> = ob
   const title = node?.name || tab.handlerState.tabTitle;
   const connection = tab.handlerState.connectionKey ? connectionInfoResource.get(tab.handlerState.connectionKey) : undefined;
   const project = connection ? projectInfoResource.get(connection.projectId) : undefined;
-  const nodeInfo = node ? navNodeManagerService.getNodeContainerInfo(node.id) : undefined;
+  const nodeInfo = node ? navNodeManagerService.getNodeContainerInfo(node.uri) : undefined;
 
   const tooltip = useObjectInfoTooltip(connection?.name, nodeInfo?.catalogId, nodeInfo?.schemaId, project?.name);
 

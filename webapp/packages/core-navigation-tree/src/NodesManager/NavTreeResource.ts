@@ -295,26 +295,26 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
       throw new Error("Root node can't be renamed");
     }
     const newNodeId = await this.performUpdate(parentId, [], async () => {
-      this.markLoading(node.id, true);
+      this.markLoading(node.uri, true);
       try {
         const { nodePath } = await this.graphQLService.sdk.navRenameNode({
-          nodePath: node.id,
+          nodePath: node.uri,
           newName: name,
         });
 
         this.markOutdated(parentId);
-        this.markLoaded(node.id);
+        this.markLoaded(node.uri);
         this.onDataOutdated.execute(parentId);
 
         return nodePath;
       } finally {
-        this.markLoading(node.id, false);
+        this.markLoading(node.uri, false);
       }
     });
 
     await this.onNodeRename.execute({
       projectId: node.projectId,
-      nodeId: node.id,
+      nodeId: node.uri,
       newNodeId,
     });
     return newNodeId;
@@ -328,7 +328,7 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
 
     const node = this.navNodeInfoResource.get(from);
     if (node) {
-      node.id = to;
+      node.uri = to;
       node.name = getPathName(to);
       node.parentId = toParent;
       this.navNodeInfoResource.set(to, node);
@@ -513,7 +513,7 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
         isPageListKey
           ? CachedResourceOffsetPageListKey(offset, navNodeChildren.navNodeChildren.length).setParent(CachedResourceOffsetPageTargetKey(nodeId))
           : CachedResourceOffsetPageKey(offset, navNodeChildren.navNodeChildren.length).setParent(CachedResourceOffsetPageTargetKey(nodeId)),
-        navNodeChildren.navNodeChildren.map(node => node.id),
+        navNodeChildren.navNodeChildren.map(node => node.uri),
         navNodeChildren.navNodeChildren.length === limit,
       ]);
     });
@@ -560,11 +560,11 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
       for (const node of data) {
         const metadata = this.metadata.get(node.parentPath);
 
-        this.setDetails(resourceKeyList([node.navNodeInfo.id, ...node.navNodeChildren.map(node => node.id)]), metadata.withDetails);
+        this.setDetails(resourceKeyList([node.navNodeInfo.uri, ...node.navNodeChildren.map(node => node.uri)]), metadata.withDetails);
       }
 
       this.navNodeInfoResource.set(
-        resourceKeyList([...data.map(data => data.parentPath), ...data.map(data => data.navNodeChildren.map(node => node.id)).flat()]),
+        resourceKeyList([...data.map(data => data.parentPath), ...data.map(data => data.navNodeChildren.map(node => node.uri)).flat()]),
         [
           ...data.map(data => this.navNodeInfoResource.navNodeInfoToNavNode(data.navNodeInfo)).flat(),
           ...data.map(data => data.navNodeChildren.map(node => this.navNodeInfoResource.navNodeInfoToNavNode(node, data.parentPath))).flat(),
@@ -578,9 +578,9 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
     } else {
       const metadata = this.metadata.get(data.parentPath);
 
-      this.setDetails(resourceKeyList([data.navNodeInfo.id, ...data.navNodeChildren.map(node => node.id)]), metadata.withDetails);
+      this.setDetails(resourceKeyList([data.navNodeInfo.uri, ...data.navNodeChildren.map(node => node.uri)]), metadata.withDetails);
 
-      this.navNodeInfoResource.set(resourceKeyList([data.parentPath, ...data.navNodeChildren.map(node => node.id)]), [
+      this.navNodeInfoResource.set(resourceKeyList([data.parentPath, ...data.navNodeChildren.map(node => node.uri)]), [
         this.navNodeInfoResource.navNodeInfoToNavNode(data.navNodeInfo),
         ...data.navNodeChildren.map(node => this.navNodeInfoResource.navNodeInfoToNavNode(node, data.parentPath)),
       ]);
@@ -592,7 +592,7 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
   private insertSlice(data: NavNodeChildrenQuery, offset: number, limit: number): string[] {
     let children = [...(this.get(data.parentPath) || [])];
 
-    children.splice(offset, limit, ...data.navNodeChildren.map(node => node.id));
+    children.splice(offset, limit, ...data.navNodeChildren.map(node => node.uri));
 
     if (data.navNodeChildren.length < limit) {
       children.splice(offset + data.navNodeChildren.length, children.length - offset - data.navNodeChildren.length);
