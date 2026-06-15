@@ -185,7 +185,7 @@ public class WebDatabaseDriverInfo {
         cfg.setHostPort(driver.getDefaultPort());
         cfg.setDatabaseName(driver.getDefaultDatabase());
         cfg.setUrl(driver.getConnectionURL(cfg));
-        return WebServiceUtils.getDriverProperties(webSession, driver, cfg);
+        return WebServiceUtils.getDriverProperties(webSession, driver, null, cfg);
     }
 
     @Property

@@ -41,11 +41,8 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBConstants;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.DBPDataSourceFolder;
-import org.jkiss.dbeaver.model.access.DBAAuthCredentials;
-import org.jkiss.dbeaver.model.access.DBAAuthModel;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPProject;
-import org.jkiss.dbeaver.model.connection.DBPAuthModelDescriptor;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.model.exec.DBCConnectException;
@@ -315,36 +312,12 @@ public class WebServiceCore implements DBWServiceCore {
             webSession, projectId, configInput.getConnectionId());
         DataSourceDescriptor testDataSource = getDataSourceDescriptor(webSession, dataSource, configInput, project);
         DBPConnectionConfiguration connectionConfiguration = new DBPConnectionConfiguration(testDataSource.getConnectionConfiguration());
-
-        DBPAuthModelDescriptor authModelDescriptor = testDataSource.getDriver().getDataSourceProvider().detectConnectionAuthModel(
+        return WebServiceUtils.getDriverProperties(
+            webSession,
             testDataSource.getDriver(),
+            testDataSource,
             connectionConfiguration
         );
-        DBAAuthModel<DBAAuthCredentials> authModel = authModelDescriptor.getInstance();
-        Properties properties = new Properties();
-        try {
-            authModel.collectConnectionProperties(
-                testDataSource,
-                authModel.loadCredentials(testDataSource, connectionConfiguration),
-                connectionConfiguration,
-                properties
-            );
-            Map<String, String> connProps = properties.entrySet()
-                .stream()
-                .collect(Collectors.toMap(
-                    e -> CommonUtils.toString(e.getKey()),
-                    e -> CommonUtils.toString(e.getValue())
-                ));
-            connectionConfiguration.setProperties(connProps);
-
-            return WebServiceUtils.getDriverProperties(
-                webSession,
-                testDataSource.getDriver(),
-                connectionConfiguration
-            );
-        } catch (DBException e) {
-            return new WebPropertyInfo[0];
-        }
 
     }
 

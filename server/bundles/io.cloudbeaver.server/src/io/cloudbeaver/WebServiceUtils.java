@@ -199,12 +199,14 @@ public class WebServiceUtils extends WebCommonUtils {
     public static WebPropertyInfo[] getDriverProperties(
         @NotNull WebSession webSession,
         @NotNull DBPDriver driver,
+        @Nullable DBPDataSourceContainer dataSourceContainer,
         @NotNull DBPConnectionConfiguration cfg
     ) {
         try {
             DBPPropertyDescriptor[] properties = driver.getDataSourceProvider().getConnectionProperties(
                 webSession.getProgressMonitor(),
                 driver,
+                dataSourceContainer,
                 cfg
             );
             Map<String, Object> connectionProperties = driver.getConnectionProperties();
@@ -227,7 +229,6 @@ public class WebServiceUtils extends WebCommonUtils {
             if (properties == null) {
                 return new WebPropertyInfo[0];
             }
-
 
             PropertySourceCustom propertySource = new PropertySourceCustom(
                 properties,
