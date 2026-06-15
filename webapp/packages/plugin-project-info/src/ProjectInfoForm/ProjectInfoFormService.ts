@@ -23,6 +23,7 @@ const formGetter = () => ProjectInfoForm;
 @injectable(() => [LocalizationService, NotificationService, OptionsPanelService, IServiceProvider])
 export class ProjectInfoFormService extends FormBaseService<IProjectInfoFormState> {
   formState: FormState<IProjectInfoFormState> | null;
+  defaultSelectedId: string | undefined;
 
   constructor(
     localizationService: LocalizationService,
@@ -33,21 +34,23 @@ export class ProjectInfoFormService extends FormBaseService<IProjectInfoFormStat
     super(localizationService, notificationService, 'ProjectInfoForm');
 
     this.formState = null;
+    this.defaultSelectedId = undefined;
 
     makeObservable(this, {
       formState: observable.shallow,
+      defaultSelectedId: observable,
       open: action.bound,
       close: action.bound,
     });
   }
 
-  async open(projectId: string): Promise<boolean> {
-    const opened = await this.optionsPanelService.open(formGetter);
+  async open(projectId: string, selectedTab?: string): Promise<boolean> {
+    const opened = await this.optionsPanelService.open(formGetter, () => {
+      this.defaultSelectedId = selectedTab;
+    });
 
-    if (opened) {
-      this.formState?.dispose();
-      this.formState = new FormState<IProjectInfoFormState>(this.serviceProvider, this, { projectId }).setMode(FormMode.Edit);
-    }
+    this.formState?.dispose();
+    this.formState = new FormState<IProjectInfoFormState>(this.serviceProvider, this, { projectId }).setMode(FormMode.Edit);
 
     return opened;
   }
@@ -55,6 +58,7 @@ export class ProjectInfoFormService extends FormBaseService<IProjectInfoFormStat
   async close(): Promise<void> {
     this.formState?.dispose();
     this.formState = null;
+    this.defaultSelectedId = undefined;
     await this.optionsPanelService.close();
   }
 }

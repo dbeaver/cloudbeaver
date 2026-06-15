@@ -17,7 +17,7 @@ export const ProjectInfoFormPanel = observer<IProjectInfoFormProps>(function Pro
   const service = useService(ProjectInfoFormService);
 
   return (
-    <TabsState container={service.parts} localState={formState.parts} formState={formState}>
+    <TabsState container={service.parts} localState={formState.parts} selectedId={service.defaultSelectedId} formState={formState}>
       <div className="tw:flex tw:flex-col tw:flex-1 tw:h-full tw:overflow-auto theme-background-secondary theme-text-on-secondary">
         <div className="tw:relative tw:flex tw:items-end tw:border-b-2 theme-border-color-background theme-background-secondary theme-text-on-secondary">
           <div className="tw:flex-1 tw:overflow-hidden">
