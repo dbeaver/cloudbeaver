@@ -2637,7 +2637,7 @@ __metadata:
     "@codemirror/language": "npm:^6"
     "@codemirror/lint": "npm:^6"
     "@codemirror/merge": "npm:^6"
-    "@codemirror/search": "npm:^6"
+    "@codemirror/search": "npm:6.6.0"
     "@codemirror/state": "npm:^6"
     "@codemirror/view": "npm:^6"
     "@dbeaver/ui-kit": "workspace:*"
@@ -5001,14 +5001,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@codemirror/search@npm:^6":
-  version: 6.7.0
-  resolution: "@codemirror/search@npm:6.7.0"
+"@codemirror/search@npm:6.6.0":
+  version: 6.6.0
+  resolution: "@codemirror/search@npm:6.6.0"
   dependencies:
     "@codemirror/state": "npm:^6.0.0"
     "@codemirror/view": "npm:^6.37.0"
     crelt: "npm:^1.0.5"
-  checksum: 10c0/eaf34f62d37e89d6df89be4a7728e9533e7995eb38bd65deb1db8661afb5be4db02fa334110726ae5a02cc5e7b3ff9692223651fa293dff122af76d624130231
+  checksum: 10c0/dacb6dbf94dbc4513b681ea2ea215b5771b478bc940c88e52976b7981dc135b3f17cfcb1e3e929579078f334b42e91bdfee89b9ec874638ddaf82f87cefa0de2
   languageName: node
   linkType: hard
 
