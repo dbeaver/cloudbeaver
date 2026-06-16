@@ -43,6 +43,13 @@ public class ConfigGenerator {
                 return;
             }
             baseConfigPath = resource.toURI().getPath();
+            if (System.getProperty("os.name").toLowerCase().contains("win")) {
+                // Fix for Windows in dev mode. Resource URI starts with / (e.g. /C:/some/folder)
+                // And this breaks Java NIO
+                if (baseConfigPath.startsWith("/")) {
+                    baseConfigPath = baseConfigPath.substring(1);
+                }
+            }
         }
         String outputPath = System.getProperty("config.output");
         if (outputPath == null || outputPath.isEmpty()) {
