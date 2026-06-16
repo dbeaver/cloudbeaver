@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,18 +42,23 @@ import java.util.List;
  */
 public interface DBWServiceDataTransfer extends DBWService {
 
+    @NotNull
     @WebAction
-    List<WebDataTransferStreamProcessor> getAvailableStreamProcessors(WebSession session) throws DBWebException;
+    List<WebDataTransferStreamProcessor> getAvailableStreamProcessors(@NotNull WebSession session) throws DBWebException;
 
+    @NotNull
     @WebAction
-    List<WebDataTransferStreamProcessor> getAvailableImportStreamProcessors(WebSession session) throws DBWebException;
+    List<WebDataTransferStreamProcessor> getAvailableImportStreamProcessors(@NotNull WebSession session) throws DBWebException;
 
-    @WebAction
+    @NotNull
+    @WebAction(requireGlobalPermissions = RMConstants.PERMISSION_DATA_EDITOR_EXPORT)
     WebAsyncTaskInfo dataTransferExportDataFromContainer(
-        WebSQLProcessor sqlProcessor,
-        String containerNodePath,
-        WebDataTransferParameters parameters) throws DBWebException;
+        @NotNull WebSQLProcessor sqlProcessor,
+        @NotNull String containerNodePath,
+        @NotNull WebDataTransferParameters parameters
+    ) throws DBWebException;
 
+    @NotNull
     @WebAction
     WebAsyncTaskInfo asyncImportDataContainer(
         @NotNull String processorId,
@@ -61,20 +66,24 @@ public interface DBWServiceDataTransfer extends DBWService {
         @NotNull WebSQLResultsInfo webSQLResultsInfo,
         @NotNull WebSession webSession) throws DBWebException;
 
+    @NotNull
     @WebAction(requireGlobalPermissions = RMConstants.PERMISSION_DATA_EDITOR_EXPORT)
     WebAsyncTaskInfo dataTransferExportDataFromResults(
-        WebSQLContextInfo sqlContextInfo,
-        String resultsId,
-        WebDataTransferParameters parameters) throws DBWebException;
+        @NotNull WebSQLContextInfo sqlContextInfo,
+        @NotNull String resultsId,
+        @NotNull WebDataTransferParameters parameters
+    ) throws DBWebException;
 
     /**
      * It's deprecated because now we use streaming file to response directly, and we don't need to clean up any files
      * after data transfer.
      */
+    @NotNull
     @WebAction
     @Deprecated
-    Boolean dataTransferRemoveDataFile(WebSession session, String dataFileId) throws DBWebException;
+    Boolean dataTransferRemoveDataFile(@NotNull WebSession session, @NotNull String dataFileId) throws DBWebException;
 
+    @NotNull
     WebDataTransferDefaultExportSettings defaultExportSettings();
 
     /**
