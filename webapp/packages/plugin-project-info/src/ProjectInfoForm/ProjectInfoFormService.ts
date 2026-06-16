@@ -45,6 +45,10 @@ export class ProjectInfoFormService extends FormBaseService<IProjectInfoFormStat
   }
 
   async open(projectId: string, selectedTab?: string): Promise<boolean> {
+    if (this.optionsPanelService.isOpen(formGetter)) {
+      return true;
+    }
+
     const opened = await this.optionsPanelService.open(formGetter, () => {
       this.defaultSelectedId = selectedTab;
     });

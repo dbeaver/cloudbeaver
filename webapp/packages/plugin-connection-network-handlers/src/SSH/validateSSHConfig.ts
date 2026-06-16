@@ -10,16 +10,16 @@ import { NetworkHandlerAuthType, type NetworkHandlerConfigInput } from '@cloudbe
 export function validateSSHConfig(state: NetworkHandlerConfigInput, initialState?: NetworkHandlerConfigInput | null): string[] {
   const errors: string[] = [];
 
-  if (!state.properties?.['host']?.length) {
+  if (!state.properties?.['host']?.trim().length) {
     errors.push("Field SSH 'Host' can't be empty");
   }
 
-  const port = Number(state.properties?.['port']);
-  if (Number.isNaN(port) || port < 1) {
-    errors.push("Field SSH 'Port' can't be empty");
+  const port = Number(String(state.properties?.['port'] ?? '').trim());
+  if (isNaN(port) || port < 1) {
+    errors.push("Field SSH 'Port' must be a positive number");
   }
 
-  if (state.savePassword && !state.userName?.length) {
+  if (state.savePassword && !state.userName?.trim()?.length) {
     errors.push("Field SSH 'User' can't be empty");
   }
 
