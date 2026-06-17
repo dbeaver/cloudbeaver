@@ -787,6 +787,9 @@ extend type Query {
 
     "Reads session log entries"
     readSessionLog(maxEntries: Int, clearEntries: Boolean): [ LogEntry! ]!
+
+    "Returns connection driver properties based on configuration"
+    listConnectionDriverProperties( projectId: ID!, config: ConnectionConfig! ): [ObjectPropertyInfo!]!
 }
 
 extend type Mutation {

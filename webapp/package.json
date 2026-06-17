@@ -14,7 +14,8 @@
     "inflight": ">1.0.6",
     "node-domexception": ">1.0.0",
     "shell-quote": ">1.8.3",
-    "esbuild": ">=0.28.1"
+    "esbuild": ">=0.28.1",
+    "form-data": ">=4.0.6"
   },
   "scripts": {
     "test": "dbeaver-test",
