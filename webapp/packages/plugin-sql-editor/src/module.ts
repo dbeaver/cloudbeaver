@@ -14,9 +14,6 @@ import { OutputMenuBootstrap } from './SqlResultTabs/OutputLogs/OutputMenuBootst
 import { OutputLogsService } from './SqlResultTabs/OutputLogs/OutputLogsService.js';
 import { OutputLogsResource } from './SqlResultTabs/OutputLogs/OutputLogsResource.js';
 import { OutputLogsEventHandler } from './SqlResultTabs/OutputLogs/OutputLogsEventHandler.js';
-import { SqlExecutionPlanService } from './SqlResultTabs/ExecutionPlan/SqlExecutionPlanService.js';
-import { SqlExecutionPlanViewService } from './SqlResultTabs/ExecutionPlan/SqlExecutionPlanViewService.js';
-import { SqlExecutionPlanViewBootstrap } from './SqlResultTabs/ExecutionPlan/SqlExecutionPlanViewBootstrap.js';
 import { SqlEditorView } from './SqlEditorView.js';
 import { SqlEditorSettingsService } from './SqlEditorSettingsService.js';
 import { SqlEditorService } from './SqlEditorService.js';
@@ -50,9 +47,6 @@ export default ModuleRegistry.add({
       .addSingleton(OutputLogsService)
       .addSingleton(OutputLogsResource)
       .addSingleton(OutputLogsEventHandler)
-      .addSingleton(SqlExecutionPlanService)
-      .addSingleton(SqlExecutionPlanViewService)
-      .addSingleton(Bootstrap, SqlExecutionPlanViewBootstrap)
       .addSingleton(SqlEditorView)
       .addSingleton(SqlEditorSettingsService)
       .addSingleton(SqlEditorService)

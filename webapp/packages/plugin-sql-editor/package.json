@@ -46,7 +46,7 @@
     "@cloudbeaver/plugin-navigation-tabs": "workspace:*",
     "@cloudbeaver/plugin-script-export": "workspace:*",
     "@cloudbeaver/plugin-sql-editor-codemirror": "workspace:*",
-    "@dbeaver/js-helpers": "workspace:^",
+    "@dbeaver/js-helpers": "workspace:*",
     "mobx": "^6",
     "mobx-react-lite": "^4",
     "react": "^19",

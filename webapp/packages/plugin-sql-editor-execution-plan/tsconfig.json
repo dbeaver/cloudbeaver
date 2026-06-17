@@ -8,31 +8,28 @@
   },
   "references": [
     {
-      "path": "../../common-react/@dbeaver/ui-kit"
-    },
-    {
-      "path": "../core-app"
+      "path": "../../common-typescript/@dbeaver/cli"
     },
     {
       "path": "../core-blocks"
     },
     {
-      "path": "../core-browser"
+      "path": "../core-cli"
     },
     {
-      "path": "../core-cli"
+      "path": "../core-connections"
+    },
+    {
+      "path": "../core-data-context"
     },
     {
       "path": "../core-di"
     },
     {
-      "path": "../core-dialogs"
-    },
-    {
       "path": "../core-events"
     },
     {
-      "path": "../core-links"
+      "path": "../core-executor"
     },
     {
       "path": "../core-localization"
@@ -41,7 +38,10 @@
       "path": "../core-root"
     },
     {
-      "path": "../core-routing"
+      "path": "../core-sdk"
+    },
+    {
+      "path": "../core-ui"
     },
     {
       "path": "../core-utils"
@@ -50,28 +50,7 @@
       "path": "../core-view"
     },
     {
-      "path": "../plugin-data-viewer"
-    },
-    {
-      "path": "../plugin-navigation-tabs"
-    },
-    {
-      "path": "../plugin-navigation-tree"
-    },
-    {
-      "path": "../plugin-object-viewer-nav-tree-link"
-    },
-    {
       "path": "../plugin-sql-editor"
-    },
-    {
-      "path": "../plugin-sql-editor-execution-plan"
-    },
-    {
-      "path": "../plugin-sql-editor-navigation-tab-script"
-    },
-    {
-      "path": "../plugin-top-app-bar"
     }
   ],
   "include": [
