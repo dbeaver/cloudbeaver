@@ -30,12 +30,12 @@ export const SSH: TabContainerPanelComponent<Props> = observer(function SSH({ fo
   const [loading, setLoading] = useState(false);
   const networkHandlerResource = useService(NetworkHandlerResource);
 
-  const SSHPart = getConnectionFormSSHPart(formState);
+  const sshPart = getConnectionFormSSHPart(formState);
   const optionsPart = getConnectionFormOptionsPart(formState);
 
   async function testConnection() {
     setLoading(true);
-    const config = SSHPart.getConfig();
+    const config = sshPart.getConfig();
     try {
       await networkHandlerResource.test(config, formState.state.projectId, formState.state.connectionId);
     } finally {
@@ -48,10 +48,10 @@ export const SSH: TabContainerPanelComponent<Props> = observer(function SSH({ fo
   const disabled = formState.isDisabled || loading || formState.isReadOnly;
   const enabled = handlerState.enabled || false;
   const keyAuth = handlerState.authType === NetworkHandlerAuthType.PublicKey;
-  const passwordFilled = (SSHPart.initialState?.password === null && handlerState.password !== '') || !!handlerState.password?.length;
+  const passwordFilled = (sshPart.initialState?.password === null && handlerState.password !== '') || !!handlerState.password?.length;
   const testAvailable = keyAuth ? !!handlerState.key?.length : passwordFilled;
 
-  useAutoLoad(SSH, [SSHPart, optionsPart], selected);
+  useAutoLoad(SSH, [sshPart, optionsPart], selected);
 
   return (
     <Form className={s(style, { form: true })}>
@@ -59,7 +59,7 @@ export const SSH: TabContainerPanelComponent<Props> = observer(function SSH({ fo
         <Group form gap keepSize large>
           <SSHForm
             state={handlerState}
-            initialState={SSHPart.initialState}
+            initialState={sshPart.initialState}
             disabled={disabled}
             readonly={formState.isReadOnly}
             sharedCredentials={optionsPart.state.sharedCredentials}

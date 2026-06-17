@@ -8,50 +8,41 @@
 
 import { action, makeObservable, observable } from 'mobx';
 
-import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { injectable, IServiceProvider } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { LocalizationService } from '@cloudbeaver/core-localization';
-import { FormBaseService, FormMode, FormState, OptionsPanelService } from '@cloudbeaver/core-ui';
+import { FormBaseService, FormMode, FormState } from '@cloudbeaver/core-ui';
 
 import type { IProjectInfoFormState } from './IProjectInfoFormState.js';
+import { ProjectInfoOptionsPanelService } from './ProjectInfoOptionsPanelService.js';
 
-const ProjectInfoForm = importLazyComponent(() => import('./ProjectInfoForm.js').then(m => m.ProjectInfoForm));
-
-const formGetter = () => ProjectInfoForm;
-
-@injectable(() => [LocalizationService, NotificationService, OptionsPanelService, IServiceProvider])
+@injectable(() => [LocalizationService, NotificationService, ProjectInfoOptionsPanelService, IServiceProvider])
 export class ProjectInfoFormService extends FormBaseService<IProjectInfoFormState> {
   formState: FormState<IProjectInfoFormState> | null;
-  defaultSelectedId: string | undefined;
 
   constructor(
     localizationService: LocalizationService,
     notificationService: NotificationService,
-    private readonly optionsPanelService: OptionsPanelService,
+    private readonly projectInfoOptionsPanelService: ProjectInfoOptionsPanelService,
     private readonly serviceProvider: IServiceProvider,
   ) {
     super(localizationService, notificationService, 'ProjectInfoForm');
 
     this.formState = null;
-    this.defaultSelectedId = undefined;
 
     makeObservable(this, {
       formState: observable.shallow,
-      defaultSelectedId: observable,
       open: action.bound,
       close: action.bound,
     });
   }
 
-  async open(projectId: string, selectedTab?: string): Promise<boolean> {
-    if (this.optionsPanelService.isOpen(formGetter)) {
+  async open(projectId: string, tabId?: string): Promise<boolean> {
+    if (this.projectInfoOptionsPanelService.isOpen()) {
       return true;
     }
 
-    const opened = await this.optionsPanelService.open(formGetter, () => {
-      this.defaultSelectedId = selectedTab;
-    });
+    const opened = await this.projectInfoOptionsPanelService.open(tabId);
 
     this.formState?.dispose();
     this.formState = new FormState<IProjectInfoFormState>(this.serviceProvider, this, { projectId }).setMode(FormMode.Edit);
@@ -62,7 +53,6 @@ export class ProjectInfoFormService extends FormBaseService<IProjectInfoFormStat
   async close(): Promise<void> {
     this.formState?.dispose();
     this.formState = null;
-    this.defaultSelectedId = undefined;
-    await this.optionsPanelService.close();
+    await this.projectInfoOptionsPanelService.close();
   }
 }
