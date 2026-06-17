@@ -296,6 +296,31 @@ public class WebServiceCore implements DBWServiceCore {
         return WebDataSourceUtils.getWebConnectionInfo(webSession, projectId, connectionId);
     }
 
+    @NotNull
+    @Override
+    public WebPropertyInfo[] getDriverProperties(
+        @NotNull WebSession webSession,
+        @NotNull String projectId,
+        @NotNull Map<String, Object> connectionConfig
+    ) throws DBWebException {
+        WebSessionProjectImpl project = getProjectById(webSession, projectId);
+        WebConnectionConfig configInput = project.getConnectionConfigInput(connectionConfig);
+
+        configInput.setSaveCredentials(true); // It is used in createConnectionFromConfig
+
+        DataSourceDescriptor dataSource = (DataSourceDescriptor) WebDataSourceUtils.getLocalOrGlobalDataSource(
+            webSession, projectId, configInput.getConnectionId());
+        DataSourceDescriptor testDataSource = getDataSourceDescriptor(webSession, dataSource, configInput, project);
+        DBPConnectionConfiguration connectionConfiguration = new DBPConnectionConfiguration(testDataSource.getConnectionConfiguration());
+        return WebServiceUtils.getDriverProperties(
+            webSession,
+            testDataSource.getDriver(),
+            testDataSource,
+            connectionConfiguration
+        );
+
+    }
+
 
     @Override
     public WebConnectionInfo initConnection(
@@ -515,7 +540,41 @@ public class WebServiceCore implements DBWServiceCore {
 
         DataSourceDescriptor dataSource = (DataSourceDescriptor) WebDataSourceUtils.getLocalOrGlobalDataSource(
             webSession, projectId, configInput.getConnectionId());
+        DataSourceDescriptor testDataSource = getDataSourceDescriptor(webSession, dataSource, configInput, project);
+        try {
+            ConnectionTestJob ct = new ConnectionTestJob(
+                testDataSource, param -> {
+            }
+            );
+            ct.run(webSession.getProgressMonitor());
+            if (ct.getConnectError() != null) {
+                if (ct.getConnectError() instanceof DBCConnectException error) {
+                    Throwable rootCause = CommonUtils.getRootCause(error);
+                    if (rootCause instanceof ClassNotFoundException) {
+                        log.error(error);
+                        throwDriverNotFoundException(testDataSource);
+                    }
+                }
+                throw new DBWebException("Connection failed", ct.getConnectError());
+            }
+            WebConnectionInfo connectionInfo = project.createConnectionInfo(testDataSource);
+            connectionInfo.setConnectError(ct.getConnectError());
+            connectionInfo.setServerVersion(ct.getServerVersion());
+            connectionInfo.setClientVersion(ct.getClientVersion());
+            connectionInfo.setConnectTime(RuntimeUtils.formatExecutionTime(ct.getConnectTime()));
+            return connectionInfo;
+        } catch (DBException e) {
+            throw new DBWebException("Error connecting to database", e);
+        }
+    }
 
+    @NotNull
+    private DataSourceDescriptor getDataSourceDescriptor(
+        @NotNull WebSession webSession,
+        @Nullable DataSourceDescriptor dataSource,
+        @NotNull WebConnectionConfig configInput,
+        @NotNull WebSessionProjectImpl project
+    ) throws DBWebException {
         DataSourceDescriptor testDataSource;
         if (dataSource != null) {
             try {
@@ -563,31 +622,7 @@ public class WebServiceCore implements DBWServiceCore {
         );
         testDataSource.setSavePassword(true); // We need for test to avoid password callback
         testDataSource.setAccessCheckRequired(!webSession.hasPermission(DBWConstants.PERMISSION_ADMIN));
-        try {
-            ConnectionTestJob ct = new ConnectionTestJob(
-                testDataSource, param -> {
-            }
-            );
-            ct.run(webSession.getProgressMonitor());
-            if (ct.getConnectError() != null) {
-                if (ct.getConnectError() instanceof DBCConnectException error) {
-                    Throwable rootCause = CommonUtils.getRootCause(error);
-                    if (rootCause instanceof ClassNotFoundException) {
-                        log.error(error);
-                        throwDriverNotFoundException(testDataSource);
-                    }
-                }
-                throw new DBWebException("Connection failed", ct.getConnectError());
-            }
-            WebConnectionInfo connectionInfo = project.createConnectionInfo(testDataSource);
-            connectionInfo.setConnectError(ct.getConnectError());
-            connectionInfo.setServerVersion(ct.getServerVersion());
-            connectionInfo.setClientVersion(ct.getClientVersion());
-            connectionInfo.setConnectTime(RuntimeUtils.formatExecutionTime(ct.getConnectTime()));
-            return connectionInfo;
-        } catch (DBException e) {
-            throw new DBWebException("Error connecting to database", e);
-        }
+        return testDataSource;
     }
 
     @Override
