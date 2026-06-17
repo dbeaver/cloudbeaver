@@ -173,7 +173,7 @@ public class GroupingEndpointTest extends CloudbeaverDBTest {
         groupVars.put("connectionId", databaseContainer.getId());
         groupVars.put("resultsId", resultId);
         groupVars.put("columnNames", columnNames);
-        groupVars.put("functions", "COUNT(*)");
+        groupVars.put("functions", List.of("COUNT(*)"));
         groupVars.put("showDuplicatesOnly", false);
         groupVars.put("filter", null);
         groupVars.put("dataFormat", null);
