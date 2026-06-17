@@ -22,35 +22,28 @@ import io.cloudbeaver.service.sql.WebServiceBindingSQL;
 import io.cloudbeaver.test.platform.CloudbeaverDBTest;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
+import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.model.DBUtils;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.exec.jdbc.JDBCStatement;
+import org.jkiss.dbeaver.model.navigator.DBNDatabaseNode;
+import org.jkiss.dbeaver.model.navigator.DBNModel;
+import org.jkiss.dbeaver.model.navigator.DBNProject;
+import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
+import org.jkiss.dbeaver.model.struct.DBSEntity;
+import org.jkiss.dbeaver.model.struct.DBSObject;
+import org.jkiss.dbeaver.model.struct.DBSObjectContainer;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 
 public class DataFilterConstraintsTest extends CloudbeaverDBTest {
-
-    private static final String GQL_NAV_STRUCT_CONTAINERS = """
-        query navGetStructContainers($projectId: ID, $connectionId: ID!) {
-          result: navGetStructContainers(projectId: $projectId, connectionId: $connectionId) {
-            parentNode { uri }
-          }
-        }""";
-
-    private static final String GQL_NAV_NODE_CHILDREN = """
-        query navNodeChildren($parentPath: ID!) {
-          result: navNodeChildren(parentPath: $parentPath) {
-            uri
-            name
-            folder
-            hasChildren
-          }
-        }""";
 
     private static WebSQLContextInfo sqlProcessorContext;
 
@@ -167,49 +160,48 @@ public class DataFilterConstraintsTest extends CloudbeaverDBTest {
         Assertions.assertFalse(responseJson.contains("value_3"));
     }
 
-    /**
-     * Resolves the real navigator node URI of the table by browsing the tree, instead of guessing
-     * the path. Browsing also materializes the node so that {@code asyncReadDataFromContainer} can
-     * resolve it on the server side.
-     */
     @NotNull
     private String resolveNodePath() throws Exception {
-        String connectionNodeUri = findConnectionNodeUri();
-        String tableNodeUri = findNodeUriByName(connectionNodeUri, "TEST_TABLE", 5);
-        Assertions.assertNotNull(tableNodeUri, "TEST_TABLE navigator node not found");
-        return tableNodeUri;
-    }
+        DBRProgressMonitor monitor = webSession.getProgressMonitor();
+        DBNModel navigatorModel = webSession.getNavigatorModelOrThrow();
 
-    @NotNull
-    private String findConnectionNodeUri() throws Exception {
-        Map<String, Object> containers = client.sendQuery(
-            GQL_NAV_STRUCT_CONTAINERS,
-            Map.of("projectId", globalProject.getId(), "connectionId", databaseContainer.getId())
-        );
-        Assertions.assertNotNull(containers);
-        String uri = JSONUtils.getString(JSONUtils.getObject(containers, "parentNode"), "uri");
-        Assertions.assertNotNull(uri, "Connection navigator node not found");
-        return uri;
+        DBNProject projectNode = navigatorModel.getRoot().getProjectNode(globalProject);
+        Assertions.assertNotNull(projectNode, "Project navigator node not found");
+        projectNode.getDatabases().getChildren(monitor);
+
+        DBSObjectContainer rootContainer = DBUtils.getAdapter(DBSObjectContainer.class, webConnectionInfo.getDataSource());
+        Assertions.assertNotNull(rootContainer, "Connection is not a database object container");
+        DBSEntity table = findEntity(monitor, rootContainer, "TEST_TABLE", 4);
+        Assertions.assertNotNull(table, "TEST_TABLE entity not found");
+
+        DBNDatabaseNode tableNode = navigatorModel.getNodeByObject(monitor, table, true);
+        Assertions.assertNotNull(tableNode, "Navigator node for TEST_TABLE not found");
+        return tableNode.getNodeUri();
     }
 
     @Nullable
-    private String findNodeUriByName(@NotNull String parentUri, @NotNull String name, int maxDepth) throws Exception {
-        List<Map<String, Object>> children = client.sendQuery(GQL_NAV_NODE_CHILDREN, Map.of("parentPath", parentUri));
+    private DBSEntity findEntity(
+        @NotNull DBRProgressMonitor monitor,
+        @NotNull DBSObjectContainer container,
+        @NotNull String name,
+        int depth
+    ) throws DBException {
+        DBSObject direct = container.getChild(monitor, name);
+        if (direct instanceof DBSEntity entity) {
+            return entity;
+        }
+        if (depth <= 0) {
+            return null;
+        }
+        Collection<? extends DBSObject> children = container.getChildren(monitor);
         if (children == null) {
             return null;
         }
-        for (Map<String, Object> child : children) {
-            if (name.equals(JSONUtils.getString(child, "name"))) {
-                return JSONUtils.getString(child, "uri");
-            }
-        }
-        if (maxDepth > 0) {
-            for (Map<String, Object> child : children) {
-                if (JSONUtils.getBoolean(child, "folder") || JSONUtils.getBoolean(child, "hasChildren")) {
-                    String found = findNodeUriByName(JSONUtils.getString(child, "uri"), name, maxDepth - 1);
-                    if (found != null) {
-                        return found;
-                    }
+        for (DBSObject child : children) {
+            if (child instanceof DBSObjectContainer sub) {
+                DBSEntity found = findEntity(monitor, sub, name, depth - 1);
+                if (found != null) {
+                    return found;
                 }
             }
         }
