@@ -82,4 +82,6 @@ public class CBConstants {
     public static final String DEFAULT_CLOUD_PROJECT_NAME = "GlobalConfiguration";
 
     public static final String SECURED_VALUE = "******";
+    public static final String PREF_DATA_EDITOR_EXPORT_DISABLED_OLD = "plugin.data-viewer.export.disabled";
+    public static final String PREF_DATA_EDITOR_IMPORT_DISABLED_OLD = "plugin.data-import.disabled";
 }
