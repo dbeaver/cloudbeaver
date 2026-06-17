@@ -21,6 +21,7 @@ import io.cloudbeaver.service.sql.WebSQLProcessor;
 import io.cloudbeaver.service.sql.WebServiceBindingSQL;
 import io.cloudbeaver.test.platform.CloudbeaverDBTest;
 import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.exec.jdbc.JDBCStatement;
 import org.junit.jupiter.api.Assertions;
@@ -33,6 +34,23 @@ import java.util.Map;
 
 
 public class DataFilterConstraintsTest extends CloudbeaverDBTest {
+
+    private static final String GQL_NAV_STRUCT_CONTAINERS = """
+        query navGetStructContainers($projectId: ID, $connectionId: ID!) {
+          result: navGetStructContainers(projectId: $projectId, connectionId: $connectionId) {
+            parentNode { uri }
+          }
+        }""";
+
+    private static final String GQL_NAV_NODE_CHILDREN = """
+        query navNodeChildren($parentPath: ID!) {
+          result: navNodeChildren(parentPath: $parentPath) {
+            uri
+            name
+            folder
+            hasChildren
+          }
+        }""";
 
     private static WebSQLContextInfo sqlProcessorContext;
 
@@ -149,12 +167,53 @@ public class DataFilterConstraintsTest extends CloudbeaverDBTest {
         Assertions.assertFalse(responseJson.contains("value_3"));
     }
 
+    /**
+     * Resolves the real navigator node URI of the table by browsing the tree, instead of guessing
+     * the path. Browsing also materializes the node so that {@code asyncReadDataFromContainer} can
+     * resolve it on the server side.
+     */
     @NotNull
-    private String resolveNodePath() {
-        return String.format(
-            "database://%s/PUBLIC/org.jkiss.dbeaver.ext.h2.model.H2Table/TEST_TABLE",
-            databaseContainer.getId()
+    private String resolveNodePath() throws Exception {
+        String connectionNodeUri = findConnectionNodeUri();
+        String tableNodeUri = findNodeUriByName(connectionNodeUri, "TEST_TABLE", 5);
+        Assertions.assertNotNull(tableNodeUri, "TEST_TABLE navigator node not found");
+        return tableNodeUri;
+    }
+
+    @NotNull
+    private String findConnectionNodeUri() throws Exception {
+        Map<String, Object> containers = client.sendQuery(
+            GQL_NAV_STRUCT_CONTAINERS,
+            Map.of("projectId", globalProject.getId(), "connectionId", databaseContainer.getId())
         );
+        Assertions.assertNotNull(containers);
+        String uri = JSONUtils.getString(JSONUtils.getObject(containers, "parentNode"), "uri");
+        Assertions.assertNotNull(uri, "Connection navigator node not found");
+        return uri;
+    }
+
+    @Nullable
+    private String findNodeUriByName(@NotNull String parentUri, @NotNull String name, int maxDepth) throws Exception {
+        List<Map<String, Object>> children = client.sendQuery(GQL_NAV_NODE_CHILDREN, Map.of("parentPath", parentUri));
+        if (children == null) {
+            return null;
+        }
+        for (Map<String, Object> child : children) {
+            if (name.equals(JSONUtils.getString(child, "name"))) {
+                return JSONUtils.getString(child, "uri");
+            }
+        }
+        if (maxDepth > 0) {
+            for (Map<String, Object> child : children) {
+                if (JSONUtils.getBoolean(child, "folder") || JSONUtils.getBoolean(child, "hasChildren")) {
+                    String found = findNodeUriByName(JSONUtils.getString(child, "uri"), name, maxDepth - 1);
+                    if (found != null) {
+                        return found;
+                    }
+                }
+            }
+        }
+        return null;
     }
 
 }
