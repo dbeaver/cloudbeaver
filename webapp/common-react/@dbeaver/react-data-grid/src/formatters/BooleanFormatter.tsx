@@ -31,7 +31,7 @@ export function BooleanFormatter({ value, className, onClick, onKeyDown, focusab
       onKeyDown={handleKeyDown}
       onClick={onClick}
     >
-      {value === null ? <NullFormatter /> : <CheckboxIndicator className="tw:mt-0!" size="small" checked={value} />}
+      {value === null ? <NullFormatter /> : <CheckboxIndicator size="small" checked={value} />}
     </Focusable>
   );
 }
