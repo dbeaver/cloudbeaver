@@ -1268,10 +1268,23 @@ public class WebSQLProcessor implements WebSessionProvider {
         throws DBException {
         if (cellRow instanceof Map<?, ?> variables) {
             if (variables.get(FILE_ID) != null) {
-                Path path = WebAppUtils.getWebPlatform()
+                String fileId = variables.get(FILE_ID).toString();
+                try {
+                    // file id must be UUID
+                    UUID.fromString(fileId);
+                } catch (IllegalArgumentException e) {
+                    throw new DBException("File ID is invalid");
+                }
+
+                Path uploadFolder = WebAppUtils.getWebPlatform()
                     .getTempFolder(webSession.getProgressMonitor(), TEMP_FILE_FOLDER)
                     .resolve(webSession.getSessionId())
-                    .resolve(variables.get(FILE_ID).toString());
+                    .normalize();
+                Path path = uploadFolder.resolve(fileId).normalize();
+                // ensure the resolved path stays within the session upload directory
+                if (!path.startsWith(uploadFolder)) {
+                    throw new DBException("File ID is invalid");
+                }
 
                 try {
                     var file = Files.newInputStream(path);
