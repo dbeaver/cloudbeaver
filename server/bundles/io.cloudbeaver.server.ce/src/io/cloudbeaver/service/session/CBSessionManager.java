@@ -208,7 +208,7 @@ public class CBSessionManager implements WebAppSessionManager {
     @NotNull
     public WebSession rotateSession(
         @NotNull HttpServletRequest request,
-        @NotNull WebSession webSession
+        @NotNull WebSession oldWebSession
     ) throws DBWebException {
         HttpSession oldHttpSession = request.getSession(false);
         if (oldHttpSession != null) {
@@ -216,9 +216,9 @@ public class CBSessionManager implements WebAppSessionManager {
         }
         String newSessionId = request.getSession(true).getId();
 
-        String locale = webSession.getLocale();
-        String remoteAddr = webSession.getLastRemoteAddr();
-        String remoteUserAgent = webSession.getLastRemoteUserAgent();
+        String locale = oldWebSession.getLocale();
+        String remoteAddr = oldWebSession.getLastRemoteAddr();
+        String remoteUserAgent = oldWebSession.getLastRemoteUserAgent();
         var requestInfo = new WebHttpRequestInfo(newSessionId, locale, remoteAddr, remoteUserAgent);
         WebSession newWebSession;
         try {
@@ -226,13 +226,13 @@ public class CBSessionManager implements WebAppSessionManager {
         } catch (DBException e) {
             throw new DBWebException(e);
         }
-        webSession.migrateEventHandlersTo(newWebSession);
-        String oldSessionId = webSession.getSessionId();
+        oldWebSession.migrateEventHandlersTo(newWebSession);
+        String oldSessionId = oldWebSession.getSessionId();
         synchronized (sessionMap) {
             sessionMap.remove(oldSessionId);
             sessionMap.put(newSessionId, newWebSession);
         }
-        webSession.close(false, false);
+        oldWebSession.close(false, false);
 
         log.debug("Session rotated '" + oldSessionId + "' -> '" + newSessionId + "'");
         return newWebSession;

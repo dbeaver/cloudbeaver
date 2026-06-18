@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,8 @@
  */
 package io.cloudbeaver.websocket;
 
+import io.cloudbeaver.model.session.BaseWebSession;
+import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.websocket.event.WSEvent;
 
@@ -23,5 +25,7 @@ public interface CBWebSessionEventHandler {
     void handleWebSessionEvent(WSEvent event) throws DBException;
 
     void close();
+
+    void migrateToSession(@NotNull BaseWebSession newSession);
 
 }

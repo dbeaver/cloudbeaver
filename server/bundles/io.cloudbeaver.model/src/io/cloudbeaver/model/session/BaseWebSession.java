@@ -125,7 +125,10 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
 
     public void migrateEventHandlersTo(@NotNull BaseWebSession target) {
         synchronized (sessionEventHandlers) {
-            sessionEventHandlers.forEach(target::addEventHandler);
+            for (CBWebSessionEventHandler handler : sessionEventHandlers) {
+                handler.migrateToSession(target);
+                target.addEventHandler(handler);
+            }
             sessionEventHandlers.clear();
         }
     }
