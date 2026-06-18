@@ -22,9 +22,9 @@ import {
   tooltips,
 } from '@codemirror/view';
 import { classHighlighter } from '@lezer/highlight';
-import { useState } from 'react';
+import { useMemo } from 'react';
 
-import { GlobalConstants, isObjectsEqual } from '@cloudbeaver/core-utils';
+import { GlobalConstants } from '@cloudbeaver/core-utils';
 import { clsx } from '@dbeaver/ui-kit';
 
 // @TODO allow to configure bindings outside of the component
@@ -119,18 +119,67 @@ const DEFAULT_EXTENSIONS_COMPARTMENT = new Compartment();
 
 /** Provides the necessary extensions to establish a basic editor */
 export function useEditorDefaultExtensions(options?: IDefaultExtensions): [Compartment, Extension] {
-  const [state, setState] = useState<{ options: IDefaultExtensions | undefined; result: [Compartment, Extension] }>(() => ({
-    options,
-    result: createExtensions(options),
-  }));
+  const {
+    lineNumbers,
+    tooltips,
+    highlightSpecialChars,
+    syntaxHighlighting,
+    bracketMatching,
+    dropCursor,
+    crosshairCursor,
+    foldGutter,
+    highlightActiveLineGutter,
+    highlightSelectionMatches,
+    highlightActiveLine,
+    indentOnInput,
+    rectangularSelection,
+    keymap,
+    lineWrapping,
+    search,
+    tabIndentation,
+  } = options ?? {};
 
-  if (!isObjectsEqual(options, state.options)) {
-    const result = createExtensions(options);
-    setState({ options, result });
-    return result;
-  }
-
-  return state.result;
+  return useMemo(
+    () =>
+      createExtensions({
+        lineNumbers,
+        tooltips,
+        highlightSpecialChars,
+        syntaxHighlighting,
+        bracketMatching,
+        dropCursor,
+        crosshairCursor,
+        foldGutter,
+        highlightActiveLineGutter,
+        highlightSelectionMatches,
+        highlightActiveLine,
+        indentOnInput,
+        rectangularSelection,
+        keymap,
+        lineWrapping,
+        search,
+        tabIndentation,
+      }),
+    [
+      lineNumbers,
+      tooltips,
+      highlightSpecialChars,
+      syntaxHighlighting,
+      bracketMatching,
+      dropCursor,
+      crosshairCursor,
+      foldGutter,
+      highlightActiveLineGutter,
+      highlightSelectionMatches,
+      highlightActiveLine,
+      indentOnInput,
+      rectangularSelection,
+      keymap,
+      lineWrapping,
+      search,
+      tabIndentation,
+    ],
+  );
 }
 
 function createExtensions(options?: IDefaultExtensions): [Compartment, Extension] {
