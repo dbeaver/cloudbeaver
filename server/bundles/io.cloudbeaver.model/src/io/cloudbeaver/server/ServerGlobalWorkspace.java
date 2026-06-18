@@ -54,7 +54,7 @@ public class ServerGlobalWorkspace extends BaseWorkspaceImpl {
         @NotNull DBPPlatform platform,
         @NotNull ServletApplication application
     ) {
-        super(platform, application.getWorkspaceDirectory());
+        super(platform, application.getWorkspacePath());
         this.application = application;
     }
 
