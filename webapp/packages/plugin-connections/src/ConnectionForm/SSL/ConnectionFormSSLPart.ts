@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -12,12 +12,12 @@ import type { IConnectionFormState } from '../IConnectionFormState.js';
 import { getObjectPropertyDefaultValue, type NetworkHandlerConfigInput } from '@cloudbeaver/core-sdk';
 import { isNotNullDefined } from '@dbeaver/js-helpers';
 import { getSSLDriverHandler } from './getSSLDriverHandler.js';
-import { ConnectionInfoNetworkHandlersResource, type DBDriverResource, type NetworkHandlerResource } from '@cloudbeaver/core-connections';
+import { ConnectionInfoNetworkHandlersResource, type DBDriverResource } from '@cloudbeaver/core-connections';
+import { type INetworkHandlerConfig, type NetworkHandlerResource } from '@cloudbeaver/core-network-handlers';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import { makeObservable, observable, toJS } from 'mobx';
 import { PROPERTY_FEATURE_SECURED } from './PROPERTY_FEATURE_SECURED.js';
 import { SSL_CODE_NAME } from './SSL_CODE_NAME.js';
-import type { INetworkHandlerConfig } from '../Options/IConnectionNetworkHanler.js';
 import { getSSLDefaultConfig } from './getSSLDefaultConfig.js';
 import { ConnectionFormOptionsPart } from '../Options/ConnectionFormOptionsPart.js';
 

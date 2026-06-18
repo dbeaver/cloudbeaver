@@ -23,9 +23,9 @@
   },
   "dependencies": {
     "@cloudbeaver/core-blocks": "workspace:*",
-    "@cloudbeaver/core-connections": "workspace:*",
     "@cloudbeaver/core-di": "workspace:*",
     "@cloudbeaver/core-localization": "workspace:*",
+    "@cloudbeaver/core-network-handlers": "workspace:*",
     "@cloudbeaver/core-projects": "workspace:*",
     "@cloudbeaver/core-root": "workspace:*",
     "@cloudbeaver/core-sdk": "workspace:*",

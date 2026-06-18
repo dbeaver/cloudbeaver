@@ -17,9 +17,6 @@
       "path": "../core-cli"
     },
     {
-      "path": "../core-connections"
-    },
-    {
       "path": "../core-di"
     },
     {
@@ -27,6 +24,9 @@
     },
     {
       "path": "../core-localization"
+    },
+    {
+      "path": "../core-network-handlers"
     },
     {
       "path": "../core-projects"

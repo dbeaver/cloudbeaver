@@ -10,7 +10,7 @@ import { useState } from 'react';
 
 import { Button, ColoredContainer, Form, Group, GroupItem, s, useAutoLoad, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { NetworkHandlerAuthType, type NetworkHandlerConfigInput } from '@cloudbeaver/core-sdk';
-import { NetworkHandlerResource } from '@cloudbeaver/core-connections';
+import { NetworkHandlerResource } from '@cloudbeaver/core-network-handlers';
 import { useService } from '@cloudbeaver/core-di';
 import { useTab, type IFormState, type TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 

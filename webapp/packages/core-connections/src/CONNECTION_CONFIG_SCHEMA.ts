@@ -6,22 +6,11 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { DriverConfigurationType, NetworkHandlerAuthType } from '@cloudbeaver/core-sdk';
+import { CONNECTION_NETWORK_HANDLER_SCHEMA } from '@cloudbeaver/core-network-handlers';
+import { DriverConfigurationType } from '@cloudbeaver/core-sdk';
 import { schema } from '@cloudbeaver/core-utils';
 
 export const CONNECTION_PROPERTIES_SCHEMA = schema.record(schema.string(), schema.any());
-
-export const CONNECTION_NETWORK_HANDLER_SCHEMA = schema.object({
-  id: schema.string(),
-  authType: schema.nativeEnum(NetworkHandlerAuthType).optional(),
-  enabled: schema.boolean().optional(),
-  key: schema.string().optional(),
-  password: schema.string().optional(),
-  properties: schema.record(schema.string(), schema.any()).optional(),
-  savePassword: schema.boolean().optional(),
-  secureProperties: schema.record(schema.string(), schema.any()).optional(),
-  userName: schema.string().optional(),
-});
 
 export const CONNECTION_CONFIG_SCHEMA = schema.object({
   authModelId: schema.string().optional(),

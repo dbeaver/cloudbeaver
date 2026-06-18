@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { SSH_TUNNEL_ID } from '@cloudbeaver/core-connections';
+import { SSH_TUNNEL_ID } from '@cloudbeaver/core-network-handlers';
 import { NetworkHandlerAuthType, type NetworkHandlerConfigInput } from '@cloudbeaver/core-sdk';
 import { toJS } from 'mobx';
 

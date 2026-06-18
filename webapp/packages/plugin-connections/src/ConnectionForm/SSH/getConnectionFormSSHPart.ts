@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -8,7 +8,8 @@
 import { createDataContext, DATA_CONTEXT_DI_PROVIDER } from '@cloudbeaver/core-data-context';
 import type { IFormState } from '@cloudbeaver/core-ui';
 import { ConnectionFormSSHPart } from './ConnectionFormSSHPart.js';
-import { ConnectionInfoNetworkHandlersResource, NetworkHandlerResource } from '@cloudbeaver/core-connections';
+import { ConnectionInfoNetworkHandlersResource } from '@cloudbeaver/core-connections';
+import { NetworkHandlerResource } from '@cloudbeaver/core-network-handlers';
 import type { IConnectionFormState } from '../IConnectionFormState.js';
 import { getConnectionFormOptionsPart } from '../Options/getConnectionFormOptionsPart.js';
 

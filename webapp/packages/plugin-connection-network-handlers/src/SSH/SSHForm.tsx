@@ -23,7 +23,7 @@ import { NetworkHandlerAuthType, type NetworkHandlerConfigInput } from '@cloudbe
 
 import { sshAuthTypes } from './sshAuthTypes.js';
 import { SSHKeyUploader } from './SSHKeyUploader.js';
-import { SSH_TUNNEL_ID } from '@cloudbeaver/core-connections';
+import { SSH_TUNNEL_ID } from '@cloudbeaver/core-network-handlers';
 import { useService } from '@cloudbeaver/core-di';
 import { ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { ServerConfigResource } from '@cloudbeaver/core-root';

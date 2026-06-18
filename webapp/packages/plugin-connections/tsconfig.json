@@ -50,6 +50,9 @@
       "path": "../core-navigation-tree"
     },
     {
+      "path": "../core-network-handlers"
+    },
+    {
       "path": "../core-projects"
     },
     {

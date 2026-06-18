@@ -1,5 +1,5 @@
 {
-  "name": "@cloudbeaver/core-connections",
+  "name": "@cloudbeaver/core-network-handlers",
   "type": "module",
   "sideEffects": [
     "./lib/module.js",
@@ -22,37 +22,19 @@
     "validate-dependencies": "core-cli-validate-dependencies"
   },
   "dependencies": {
-    "@cloudbeaver/core-authentication": "workspace:*",
-    "@cloudbeaver/core-blocks": "workspace:*",
-    "@cloudbeaver/core-data-context": "workspace:*",
     "@cloudbeaver/core-di": "workspace:*",
-    "@cloudbeaver/core-dialogs": "workspace:*",
     "@cloudbeaver/core-events": "workspace:*",
-    "@cloudbeaver/core-executor": "workspace:*",
-    "@cloudbeaver/core-extensions": "workspace:*",
-    "@cloudbeaver/core-localization": "workspace:*",
-    "@cloudbeaver/core-navigation-tree": "workspace:*",
-    "@cloudbeaver/core-network-handlers": "workspace:*",
-    "@cloudbeaver/core-projects": "workspace:*",
     "@cloudbeaver/core-resource": "workspace:*",
     "@cloudbeaver/core-root": "workspace:*",
     "@cloudbeaver/core-sdk": "workspace:*",
-    "@cloudbeaver/core-settings": "workspace:*",
-    "@cloudbeaver/core-utils": "workspace:*",
-    "@dbeaver/js-helpers": "workspace:*",
-    "mobx": "^6",
-    "react": "^19",
-    "tslib": "^2"
+    "@cloudbeaver/core-utils": "workspace:*"
   },
   "devDependencies": {
     "@cloudbeaver/core-cli": "workspace:*",
-    "@cloudbeaver/tests-runner": "workspace:*",
     "@cloudbeaver/tsconfig": "workspace:*",
     "@dbeaver/cli": "workspace:*",
-    "@dbeaver/react-tests": "workspace:*",
-    "@types/react": "^19",
     "rimraf": "^6",
-    "typescript": "^5",
-    "vitest": "^4"
+    "tslib": "^2",
+    "typescript": "^5"
   }
 }
