@@ -10,16 +10,18 @@ import { FormPart, formValidationContext, type IFormState } from '@cloudbeaver/c
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { DriverConfigurationType, type NetworkHandlerConfigInput, type NetworkHandlerDescriptor } from '@cloudbeaver/core-sdk';
 import { ConnectionInfoNetworkHandlersResource } from '@cloudbeaver/core-connections';
-import { NetworkHandlerResource, SSH_TUNNEL_ID, type INetworkHandlerConfig } from '@cloudbeaver/core-network-handlers';
-import { toJS } from 'mobx';
-import type { IConnectionFormState } from '../IConnectionFormState.js';
-import { ConnectionFormOptionsPart } from '../Options/ConnectionFormOptionsPart.js';
 import {
   getNetworkHandlerDefaultProperties,
   getSSHHandlerConfig,
+  NetworkHandlerResource,
   SSH_DEFAULT_HANDLER_CONFIG,
+  SSH_TUNNEL_ID,
   validateSSHConfig,
-} from '@cloudbeaver/plugin-connection-network-handlers';
+  type INetworkHandlerConfig,
+} from '@cloudbeaver/core-network-handlers';
+import { toJS } from 'mobx';
+import type { IConnectionFormState } from '../IConnectionFormState.js';
+import { ConnectionFormOptionsPart } from '../Options/ConnectionFormOptionsPart.js';
 
 const getDefaultState = (): INetworkHandlerConfig => SSH_DEFAULT_HANDLER_CONFIG() as INetworkHandlerConfig;
 

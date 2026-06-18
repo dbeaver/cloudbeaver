@@ -9,3 +9,9 @@
 import './module.js';
 export * from './NetworkHandlerResource.js';
 export * from './CONNECTION_NETWORK_HANDLER_SCHEMA.js';
+export * from './SSH/getNetworkHandlerDefaultProperties.js';
+export * from './SSH/sshAuthTypes.js';
+export * from './SSH/SSHForm.js';
+export * from './SSH/sshHelpers.js';
+export * from './SSH/SSHKeyUploader.js';
+export * from './SSH/validateSSHConfig.js';

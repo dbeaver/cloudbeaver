@@ -6,13 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { Bootstrap, ModuleRegistry } from '@cloudbeaver/core-di';
-import { LocaleService } from './LocaleService.js';
+import { ModuleRegistry } from '@cloudbeaver/core-di';
 
 export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-connection-network-handlers',
 
-  configure: serviceCollection => {
-    serviceCollection.addSingleton(Bootstrap, LocaleService);
-  },
+  configure: serviceCollection => {},
 });

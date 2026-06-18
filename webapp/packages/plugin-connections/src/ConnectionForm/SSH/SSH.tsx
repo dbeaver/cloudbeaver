@@ -10,14 +10,13 @@ import { useState } from 'react';
 
 import { Button, ColoredContainer, Form, Group, GroupItem, s, useAutoLoad, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { NetworkHandlerAuthType, type NetworkHandlerConfigInput } from '@cloudbeaver/core-sdk';
-import { NetworkHandlerResource } from '@cloudbeaver/core-network-handlers';
+import { NetworkHandlerResource, SSHForm } from '@cloudbeaver/core-network-handlers';
 import { useService } from '@cloudbeaver/core-di';
 import { useTab, type IFormState, type TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 
 import styles from './SSH.module.css';
 import { getConnectionFormSSHPart } from './getConnectionFormSSHPart.js';
 import { getConnectionFormOptionsPart } from '../Options/getConnectionFormOptionsPart.js';
-import { SSHForm } from '@cloudbeaver/plugin-connection-network-handlers';
 import type { IConnectionFormState } from '../IConnectionFormState.js';
 
 interface Props {

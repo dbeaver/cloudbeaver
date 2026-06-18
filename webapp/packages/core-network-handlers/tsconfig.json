@@ -11,6 +11,9 @@
       "path": "../../common-typescript/@dbeaver/cli"
     },
     {
+      "path": "../core-blocks"
+    },
+    {
       "path": "../core-cli"
     },
     {
@@ -21,6 +24,12 @@
     },
     {
       "path": "../core-events"
+    },
+    {
+      "path": "../core-localization"
+    },
+    {
+      "path": "../core-projects"
     },
     {
       "path": "../core-resource"

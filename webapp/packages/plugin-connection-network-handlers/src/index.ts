@@ -8,9 +8,4 @@
 
 import './module.js';
 
-export * from './SSH/SSHForm.js';
-export * from './SSH/SSHKeyUploader.js';
-export * from './SSH/sshAuthTypes.js';
-export * from './SSH/validateSSHConfig.js';
-export * from './SSH/getNetworkHandlerDefaultProperties.js';
-export * from './SSH/sshHelpers.js';
+// TODO register SSH network handler to plugin-connection form

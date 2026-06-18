@@ -11,9 +11,6 @@
       "path": "../../common-typescript/@dbeaver/cli"
     },
     {
-      "path": "../core-blocks"
-    },
-    {
       "path": "../core-cli"
     },
     {
@@ -23,22 +20,7 @@
       "path": "../core-di/tsconfig.json"
     },
     {
-      "path": "../core-localization"
-    },
-    {
       "path": "../core-network-handlers"
-    },
-    {
-      "path": "../core-projects"
-    },
-    {
-      "path": "../core-root"
-    },
-    {
-      "path": "../core-sdk"
-    },
-    {
-      "path": "../core-utils"
     }
   ],
   "include": [

@@ -22,24 +22,13 @@
     "validate-dependencies": "core-cli-validate-dependencies"
   },
   "dependencies": {
-    "@cloudbeaver/core-blocks": "workspace:*",
     "@cloudbeaver/core-di": "workspace:*",
-    "@cloudbeaver/core-localization": "workspace:*",
-    "@cloudbeaver/core-network-handlers": "workspace:*",
-    "@cloudbeaver/core-projects": "workspace:*",
-    "@cloudbeaver/core-root": "workspace:*",
-    "@cloudbeaver/core-sdk": "workspace:*",
-    "@cloudbeaver/core-utils": "workspace:*",
-    "mobx": "^6",
-    "mobx-react-lite": "^4",
-    "react": "^19",
-    "react-dom": "^19"
+    "@cloudbeaver/core-network-handlers": "workspace:*"
   },
   "devDependencies": {
     "@cloudbeaver/core-cli": "workspace:*",
     "@cloudbeaver/tsconfig": "workspace:*",
     "@dbeaver/cli": "workspace:*",
-    "@types/react": "^19",
     "rimraf": "^6",
     "tslib": "^2",
     "typescript": "^5"

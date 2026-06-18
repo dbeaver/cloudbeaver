@@ -8,13 +8,11 @@
 import { observer } from 'mobx-react-lite';
 
 import { FieldCheckbox, GroupTitle, InputField, ObjectPropertyInfoForm, useResource, useTranslate } from '@cloudbeaver/core-blocks';
-import { NetworkHandlerResource, SSH_TUNNEL_ID } from '@cloudbeaver/core-network-handlers';
+import { NetworkHandlerResource, SSH_TUNNEL_ID, SSHKeyUploader } from '@cloudbeaver/core-network-handlers';
 import { useService } from '@cloudbeaver/core-di';
 import { ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { NetworkHandlerAuthType, type NetworkHandlerConfigInput } from '@cloudbeaver/core-sdk';
-
-import { SSHKeyUploader } from '@cloudbeaver/plugin-connection-network-handlers';
 import { PROPERTY_FEATURE_SECURED } from '../ConnectionForm/SSL/PROPERTY_FEATURE_SECURED.js';
 
 interface Props {
