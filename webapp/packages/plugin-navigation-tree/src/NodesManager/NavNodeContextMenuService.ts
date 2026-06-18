@@ -14,6 +14,7 @@ import { LocalizationService } from '@cloudbeaver/core-localization';
 import {
   DATA_CONTEXT_NAV_NODE,
   ENodeFeature,
+  EObjectFeature,
   getNodePlainName,
   type INodeActions,
   isConnectionFolder,
@@ -25,6 +26,7 @@ import {
   nodeDeleteContext,
   NodeManagerUtils,
 } from '@cloudbeaver/core-navigation-tree';
+import { isConnectionNode } from '@cloudbeaver/core-connections';
 import { ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import {
   ACTION_DELETE,
@@ -115,7 +117,7 @@ export class NavNodeContextMenuService extends Bootstrap {
       isActionApplicable: (context, action) => {
         const node = context.get(DATA_CONTEXT_NAV_NODE)!;
 
-        if (NodeManagerUtils.isDatabaseObject(node.id) || isConnectionFolder(node)) {
+        if (NodeManagerUtils.isDatabaseObject(node.uri) || isConnectionFolder(node)) {
           if (action === ACTION_RENAME) {
             return node.features?.includes(ENodeFeature.canRename) ?? false;
           }
@@ -166,7 +168,7 @@ export class NavNodeContextMenuService extends Bootstrap {
           }
           case ACTION_DELETE: {
             try {
-              await this.navTreeResource.deleteNode(node.id);
+              await this.navTreeResource.deleteNode(node.uri);
             } catch (exception: any) {
               this.notificationService.logException(
                 exception,
@@ -186,7 +188,7 @@ export class NavNodeContextMenuService extends Bootstrap {
         const node = context.get(DATA_CONTEXT_NAV_NODE)!;
 
         if (action === ACTION_OPEN) {
-          return this.navNodeManagerService.canOpen(node.id, node.parentId);
+          return this.navNodeManagerService.canOpen(node.uri, node.parentId);
         }
 
         return [ACTION_REFRESH].includes(action);
@@ -196,12 +198,16 @@ export class NavNodeContextMenuService extends Bootstrap {
 
         switch (action) {
           case ACTION_OPEN: {
-            this.navNodeManagerService.navToNode(node.id, node.parentId);
+            this.navNodeManagerService.navToNode(node.uri, node.parentId);
             break;
           }
           case ACTION_REFRESH: {
             try {
-              await this.navNodeManagerService.refreshTree(node.id);
+              if (isConnectionNode(node) && !node.objectFeatures.includes(EObjectFeature.dataSourceConnected)) {
+                await this.navNodeInfoResource.refresh(node.uri);
+              } else {
+                await this.navNodeManagerService.refreshTree(node.uri);
+              }
             } catch (exception: any) {
               this.notificationService.logException(exception, 'app_navigationTree_refresh_error');
             }

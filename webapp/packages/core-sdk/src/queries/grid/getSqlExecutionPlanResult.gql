@@ -9,6 +9,10 @@ mutation getSqlExecutionPlanResult($taskId: ID!) {
       type
       condition
       description
+      cost
+      rowCount
+      duration
+      percent
       properties {
         id
         required

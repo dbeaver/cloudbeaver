@@ -113,7 +113,7 @@ export class DBObjectResource extends CachedMapResource<string, DBObject> {
       const dbObjects = await this.loadFromChildren(nodeId, offset, limit);
 
       runInAction(() => {
-        const keys = dbObjects.map(dbObject => dbObject.id);
+        const keys = dbObjects.map(dbObject => dbObject.uri);
         this.set(resourceKeyList(keys), dbObjects);
 
         this.offsetPagination.setPage(

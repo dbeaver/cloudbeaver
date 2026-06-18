@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,17 +19,15 @@ package io.cloudbeaver.server.jobs;
 import io.cloudbeaver.model.session.BaseWebSession;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.WebAppSessionManager;
+import io.cloudbeaver.utils.WebEventUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.app.DBPPlatform;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceDisconnectEvent;
-import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceEvent;
-import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceProperty;
 import org.jkiss.dbeaver.runtime.jobs.DataSourceMonitorJob;
 
 import java.util.Collection;
-import java.util.List;
 
 /**
  * Web data source monitor job.
@@ -62,7 +60,7 @@ public class WebDataSourceMonitorJob extends DataSourceMonitorJob {
                 new WSDataSourceDisconnectEvent(
                     project.getId(),
                     dataSource.getContainer().getId(),
-                    webSession.getSessionId(),
+                    WebEventUtils.getSmSessionId(webSession),
                     webSession.getUserId()
                 )
             );

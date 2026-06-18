@@ -11,7 +11,7 @@ import { action, makeObservable, observable, runInAction, toJS } from 'mobx';
 import { AppAuthService, UserInfoResource } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
 import { Executor, ExecutorInterrupter, type ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
-import { NavTreeResource, NodeManagerUtils } from '@cloudbeaver/core-navigation-tree';
+import { NavNodeInfoResource, NavTreeResource, NodeManagerUtils } from '@cloudbeaver/core-navigation-tree';
 import { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
 import {
   CachedMapAllKey,
@@ -67,6 +67,7 @@ export interface IConnectionInfoMetadata extends ICachedResourceMetadata {
   ProjectInfoResource,
   DataSynchronizationService,
   WorkspaceConfigEventHandler,
+  NavNodeInfoResource,
   DBDriverResource,
   SessionDataResource,
   AppAuthService,
@@ -87,6 +88,7 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
     private readonly projectInfoResource: ProjectInfoResource,
     private readonly dataSynchronizationService: DataSynchronizationService,
     private readonly workspaceConfigEventHandler: WorkspaceConfigEventHandler,
+    private readonly navNodeInfoResource: NavNodeInfoResource,
     dbDriverResource: DBDriverResource,
     sessionDataResource: SessionDataResource,
     appAuthService: AppAuthService,
@@ -294,24 +296,38 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
     return this.get(key).every(connection => connection?.connected ?? false);
   }
 
-  // TODO: we need here node path ie ['', 'project://', 'database://...', '...']
   getConnectionIdForNodeId(projectId: string, nodeId: string): IConnectionInfoParams | undefined {
     if (!NodeManagerUtils.isDatabaseObject(nodeId)) {
       return;
     }
 
-    return createConnectionParam(projectId, NodeManagerUtils.getConnectionId(nodeId));
+    const node = this.navNodeInfoResource.get(nodeId);
+
+    if (!node || !node.objectId) {
+      return;
+    }
+
+    return createConnectionParam(projectId, node.objectId);
   }
 
-  // TODO: we need here node path ie ['', 'project://', 'database://...', '...']
   getConnectionForNode(nodeId: string): Connection | undefined {
     if (!NodeManagerUtils.isDatabaseObject(nodeId)) {
       return;
     }
 
-    const indexOfConnectionPart = nodeId.indexOf('/', 11);
-    const connectionPart = nodeId.slice(0, indexOfConnectionPart > -1 ? indexOfConnectionPart : nodeId.length);
+    const node = this.navNodeInfoResource.get(nodeId);
 
+    if (!node || !node.objectId || !node.projectId) {
+      return;
+    }
+
+    const connectionEnd = nodeId.indexOf(node.objectId);
+
+    if (connectionEnd === -1) {
+      return;
+    }
+
+    const connectionPart = nodeId.substring(0, connectionEnd + node.objectId.length);
     const connectionId = this.nodeIdMap.get(connectionPart);
 
     if (connectionId) {

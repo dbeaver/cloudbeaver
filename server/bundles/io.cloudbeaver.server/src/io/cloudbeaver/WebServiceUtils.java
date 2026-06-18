@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2025 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,9 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPProject;
+import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
+import org.jkiss.dbeaver.model.impl.PropertyDescriptor;
 import org.jkiss.dbeaver.model.navigator.DBNContainer;
 import org.jkiss.dbeaver.model.navigator.DBNDataSource;
 import org.jkiss.dbeaver.model.navigator.DBNNode;
@@ -47,6 +49,8 @@ import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
 import org.jkiss.dbeaver.model.rm.RMProjectType;
 import org.jkiss.dbeaver.registry.DataSourceNavigatorSettings;
 import org.jkiss.dbeaver.runtime.properties.PropertyCollector;
+import org.jkiss.dbeaver.runtime.properties.PropertySourceCustom;
+import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
 
 import java.io.InputStream;
@@ -189,5 +193,53 @@ public class WebServiceUtils extends WebCommonUtils {
         return (node instanceof DBNContainer && !(node instanceof DBNDataSource))
             || (node instanceof DBNResourceManagerResource
             && ((DBNResourceManagerResource) node).getResource().isFolder());
+    }
+
+    @NotNull
+    public static WebPropertyInfo[] getDriverProperties(
+        @NotNull WebSession webSession,
+        @NotNull DBPDriver driver,
+        @Nullable DBPDataSourceContainer dataSourceContainer,
+        @NotNull DBPConnectionConfiguration cfg
+    ) {
+        try {
+            DBPPropertyDescriptor[] properties = driver.getDataSourceProvider().getConnectionProperties(
+                webSession.getProgressMonitor(),
+                driver,
+                dataSourceContainer,
+                cfg
+            );
+            Map<String, Object> connectionProperties = driver.getConnectionProperties();
+            for (Map.Entry<String, Object> connProp : connectionProperties.entrySet()) {
+                String propName = connProp.getKey();
+                Object propValue = connProp.getValue();
+                DBPPropertyDescriptor dbpPropertyDescriptor = new PropertyDescriptor(
+                    null,
+                    propName,
+                    propName,
+                    null,
+                    false,
+                    String.class,
+                    propValue,
+                    null
+                );
+                properties = ArrayUtils.add(DBPPropertyDescriptor.class, properties, dbpPropertyDescriptor);
+                cfg.setProperty(propName, (String) propValue);
+            }
+            if (properties == null) {
+                return new WebPropertyInfo[0];
+            }
+
+            PropertySourceCustom propertySource = new PropertySourceCustom(
+                properties,
+                cfg.getProperties()
+            );
+
+            return Arrays.stream(properties)
+                .map(p -> new WebPropertyInfo(webSession, p, propertySource)).toArray(WebPropertyInfo[]::new);
+        } catch (DBException e) {
+            log.error("Error reading driver properties:\n" + e.getMessage());
+            return new WebPropertyInfo[0];
+        }
     }
 }

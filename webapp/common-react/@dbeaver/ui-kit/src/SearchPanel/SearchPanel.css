@@ -35,7 +35,7 @@
     border-radius: var(--dbv-kit-input-radius);
 
     .dbv-kit-input {
-      border: none;
+      border: none !important;
       flex: 1 1 auto;
       min-width: 0;
       width: auto;

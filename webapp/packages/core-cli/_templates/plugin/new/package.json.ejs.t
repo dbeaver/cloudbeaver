@@ -8,7 +8,7 @@ to: <%= name %>/package.json
     "./lib/module.js",
     "./lib/index.js",
     "src/**/*.css",
-    "src/**/*.scss",
+    
     "public/**/*"
   ],
   "version": "0.1.0",

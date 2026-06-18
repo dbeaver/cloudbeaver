@@ -56,7 +56,7 @@ export class NavTreeRMContextMenuBootstrap extends Bootstrap {
       },
       handler: async (context, action) => {
         const node = context.get(DATA_CONTEXT_NAV_NODE)!;
-        const resourceKey = getResourceKeyFromNodeId(node.id);
+        const resourceKey = getResourceKeyFromNodeId(node.uri);
 
         if (!resourceKey) {
           return;
@@ -68,7 +68,7 @@ export class NavTreeRMContextMenuBootstrap extends Bootstrap {
         let resourceType: ProjectInfoResourceType | undefined = undefined;
         if (project) {
           for (const type of project.resourceTypes) {
-            if (isResourceOfType(type, node.id)) {
+            if (isResourceOfType(type, node.uri)) {
               resourceType = type;
               break;
             }

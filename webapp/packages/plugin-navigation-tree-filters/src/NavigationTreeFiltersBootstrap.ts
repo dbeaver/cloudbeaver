@@ -82,7 +82,7 @@ export class NavigationTreeFiltersBootstrap extends Bootstrap {
               {
                 onSelect: async () => {
                   try {
-                    await this.navTreeResource.setFilter(node.id, [], []);
+                    await this.navTreeResource.setFilter(node.uri, [], []);
                   } catch (exception: any) {
                     this.notificationService.logException(exception, 'plugin_navigation_tree_filters_reset_fail');
                   }

@@ -24,9 +24,9 @@ import io.cloudbeaver.registry.WebSessionHandlerDescriptor;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBConstants;
 import io.cloudbeaver.server.WebAppSessionManager;
-import io.cloudbeaver.server.events.WSWebUtils;
 import io.cloudbeaver.service.DBWSessionHandler;
 import io.cloudbeaver.utils.ServletAppUtils;
+import io.cloudbeaver.utils.WebEventUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -51,7 +51,7 @@ public class CBSessionManager implements WebAppSessionManager {
     private static final Log log = Log.getLog(CBSessionManager.class);
 
     private final CBApplication<?> application;
-    private final Map<String, BaseWebSession> sessionMap = new HashMap<>();
+    protected final Map<String, BaseWebSession> sessionMap = new HashMap<>();
 
     public CBSessionManager(CBApplication<?> application) {
         this.application = application;
@@ -60,6 +60,7 @@ public class CBSessionManager implements WebAppSessionManager {
     /**
      * Closes Web Session, associated to HttpSession from {@code request}
      */
+    @Nullable
     @Override
     public BaseWebSession closeSession(@NotNull HttpServletRequest request) {
         HttpSession session = request.getSession();
@@ -69,11 +70,13 @@ public class CBSessionManager implements WebAppSessionManager {
         return null;
     }
 
+    @Nullable
     @Override
     public BaseWebSession closeSession(@NotNull String sessionId) {
         return closeSession(sessionId, true);
     }
 
+    @Nullable
     @Override
     public BaseWebSession closeSession(@NotNull String sessionId, boolean sendSessionExpiredEvent) {
         BaseWebSession webSession;
@@ -240,7 +243,7 @@ public class CBSessionManager implements WebAppSessionManager {
      *
      * @return WebSession object or null, if session expired or invalid
      */
-    @Nullable
+    @NotNull
     public WebSession getOrRestoreWebSession(@NotNull WebHttpRequestInfo requestInfo) {
         final var sessionId = requestInfo.getId();
         if (sessionId == null) {
@@ -329,8 +332,9 @@ public class CBSessionManager implements WebAppSessionManager {
         return webSession;
     }
 
+    @Nullable
     @Override
-    public WebSession findWebSession(HttpServletRequest request, boolean errorOnNoFound) throws DBWebException {
+    public WebSession findWebSession(@NotNull HttpServletRequest request, boolean errorOnNoFound) throws DBWebException {
         WebSession webSession = findWebSession(request);
         if (webSession != null) {
             return webSession;
@@ -358,6 +362,7 @@ public class CBSessionManager implements WebAppSessionManager {
         }
     }
 
+    @NotNull
     @Override
     public Collection<BaseWebSession> getAllActiveSessions() {
         synchronized (sessionMap) {
@@ -536,7 +541,7 @@ public class CBSessionManager implements WebAppSessionManager {
             for (Iterator<BaseWebSession> iterator = sessionMap.values().iterator(); iterator.hasNext(); ) {
                 var session = iterator.next();
                 iterator.remove();
-                session.close(false, !WSWebUtils.isSessionIdEquals(session, initiatorSessionId));
+                session.close(false, !WebEventUtils.isSmSessionIdEquals(session, initiatorSessionId));
             }
         }
     }
@@ -562,4 +567,5 @@ public class CBSessionManager implements WebAppSessionManager {
         log.debug("> Expire session '" + session.getSessionId() + "'");
         session.close();
     }
+
 }

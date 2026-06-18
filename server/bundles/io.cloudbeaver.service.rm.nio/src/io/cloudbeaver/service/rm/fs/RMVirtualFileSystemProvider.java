@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@ package io.cloudbeaver.service.rm.fs;
 
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
-import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.fs.AbstractFileSystemProvider;
+import org.jkiss.dbeaver.model.fs.DBFFileSystemContainer;
 import org.jkiss.dbeaver.model.fs.DBFVirtualFileSystem;
 import org.jkiss.dbeaver.model.rm.RMControllerProvider;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
@@ -27,15 +27,16 @@ import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 public class RMVirtualFileSystemProvider extends AbstractFileSystemProvider {
     private static final Log log = Log.getLog(RMVirtualFileSystemProvider.class);
 
+    @NotNull
     @Override
     public DBFVirtualFileSystem[] getAvailableFileSystems(
         @NotNull DBRProgressMonitor monitor,
-        @NotNull DBPProject project
+        @NotNull DBFFileSystemContainer fsContainer
     ) {
-        if (!(project instanceof RMControllerProvider)) {
+        if (!(fsContainer instanceof RMControllerProvider)) {
             return new DBFVirtualFileSystem[0];
         }
-        RMControllerProvider rmControllerProvider = (RMControllerProvider) project;
+        RMControllerProvider rmControllerProvider = (RMControllerProvider) fsContainer;
         return new DBFVirtualFileSystem[]{new RMVirtualFileSystem(rmControllerProvider.getResourceController(),
             rmControllerProvider.getRMProject())};
     }

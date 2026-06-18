@@ -89,7 +89,7 @@ export const NavigationNodeControlRenderer = observer<Props, HTMLDivElement>(
     }
 
     const Control = navNode.control || externalControl || NavigationNodeControlLoader;
-    const outdated = getComputed(() => navNodeInfoResource.isOutdated(node.id) && !treeNodeContext.loading);
+    const outdated = getComputed(() => navNodeInfoResource.isOutdated(node.uri) && !treeNodeContext.loading);
     const nodeInfo = contextRef.context?.tree.getTransformedNodeInfo(node);
 
     function onClickHandler(event: React.MouseEvent<HTMLDivElement>) {

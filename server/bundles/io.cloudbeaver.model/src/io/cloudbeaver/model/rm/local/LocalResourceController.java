@@ -33,6 +33,7 @@ import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPWorkspace;
 import org.jkiss.dbeaver.model.auth.SMCredentials;
 import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
+import org.jkiss.dbeaver.model.auth.SMObjectType;
 import org.jkiss.dbeaver.model.fs.lock.LockManager;
 import org.jkiss.dbeaver.model.fs.lock.LockOptions;
 import org.jkiss.dbeaver.model.fs.lock.LockTarget;
@@ -41,7 +42,6 @@ import org.jkiss.dbeaver.model.impl.auth.SessionContextImpl;
 import org.jkiss.dbeaver.model.navigator.DBNLocalFolder;
 import org.jkiss.dbeaver.model.rm.*;
 import org.jkiss.dbeaver.model.security.SMAdminController;
-import org.jkiss.dbeaver.model.security.SMObjectType;
 import org.jkiss.dbeaver.model.sql.DBQuotaException;
 import org.jkiss.dbeaver.model.websocket.event.MessageType;
 import org.jkiss.dbeaver.model.websocket.event.WSSessionLogUpdatedEvent;
@@ -53,6 +53,7 @@ import org.jkiss.dbeaver.registry.DataSourceParseResults;
 import org.jkiss.dbeaver.registry.ResourceTypeDescriptor;
 import org.jkiss.dbeaver.registry.ResourceTypeRegistry;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
+import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.IOUtils;
 import org.jkiss.utils.Pair;
@@ -283,7 +284,7 @@ public class LocalResourceController extends BaseLocalResourceController {
                 throw new DBException("Error creating shared project path", e);
             }
         }
-        validateResourcePath(name);
+        GeneralUtils.validateResourceNameUnconditionally(name);
         validateProjectName(null, name);
         var projectPath = sharedProjectsPath.resolve(name);
         if (Files.exists(projectPath)) {
@@ -1106,6 +1107,7 @@ public class LocalResourceController extends BaseLocalResourceController {
         RMProjectName project = WebRMUtils.parseProjectName(projectId);
         RMProjectType type = project.getType();
         String projectName = project.getName();
+        GeneralUtils.validateResourceNameUnconditionally(projectName);
         switch (type) {
             case GLOBAL:
                 if (!projectName.equals(globalProjectName)) {
