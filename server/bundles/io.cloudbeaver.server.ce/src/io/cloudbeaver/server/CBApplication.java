@@ -47,14 +47,14 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBConstants;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.app.DBPPlatform;
-import org.jkiss.dbeaver.model.auth.AuthInfo;
+import org.jkiss.dbeaver.model.auth.SMAuthConfiguration;
 import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
+import org.jkiss.dbeaver.model.auth.SMObjectType;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.impl.app.BaseApplicationImpl;
 import org.jkiss.dbeaver.model.security.SMAdminController;
 import org.jkiss.dbeaver.model.security.SMConstants;
-import org.jkiss.dbeaver.model.security.SMObjectType;
 import org.jkiss.dbeaver.model.websocket.event.WSEventController;
 import org.jkiss.dbeaver.model.websocket.event.WSServerConfigurationChangedEvent;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
@@ -534,7 +534,7 @@ public abstract class CBApplication<T extends CBServerConfig>
     public synchronized void finishConfiguration(
         @NotNull String adminName,
         @Nullable String adminPassword,
-        @NotNull List<AuthInfo> authInfoList,
+        @NotNull List<SMAuthConfiguration> authInfoList,
         @NotNull CBServerConfig serverConfig,
         @NotNull CBAppConfig appConfig,
         @Nullable SMCredentialsProvider credentialsProvider
@@ -591,7 +591,7 @@ public abstract class CBApplication<T extends CBServerConfig>
     protected abstract void finishSecurityServiceConfiguration(
         @NotNull String adminName,
         @Nullable String adminPassword,
-        @NotNull List<AuthInfo> authInfoList
+        @NotNull List<SMAuthConfiguration> authInfoList
     ) throws DBException;
 
     public synchronized void flushConfiguration(SMCredentialsProvider webSession) throws DBException {
