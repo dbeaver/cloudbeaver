@@ -1,5 +1,13 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2026 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+
 import { NullFormatter } from './NullFormatter.js';
-import { Checkbox, clsx, Focusable } from '@dbeaver/ui-kit';
+import { CheckboxIndicator, clsx, Focusable } from '@dbeaver/ui-kit';
 
 interface Props {
   value: boolean | null;
@@ -9,7 +17,7 @@ interface Props {
   onKeyDown?: React.KeyboardEventHandler<HTMLElement>;
 }
 
-export function BooleanFormatter({ value, className, onClick, onKeyDown, focusable }: Props) {
+export function BooleanFormatter({ value, className, onClick, onKeyDown, focusable }: Props): React.ReactElement {
   const handleKeyDown = (event: React.KeyboardEvent<HTMLElement>) => {
     if (event.code === 'Enter' || event.code === 'Space') {
       event.preventDefault();
@@ -23,7 +31,7 @@ export function BooleanFormatter({ value, className, onClick, onKeyDown, focusab
       onKeyDown={handleKeyDown}
       onClick={onClick}
     >
-      {value === null ? <NullFormatter /> : <Checkbox className="tw:data-disabled:opacity-100!" disabled size="small" checked={value} />}
+      {value === null ? <NullFormatter /> : <CheckboxIndicator size="small" checked={value} />}
     </Focusable>
   );
 }

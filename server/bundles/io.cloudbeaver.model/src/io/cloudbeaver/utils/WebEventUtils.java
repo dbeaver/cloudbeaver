@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,119 +17,21 @@
 package io.cloudbeaver.utils;
 
 import io.cloudbeaver.model.WebAsyncTaskInfo;
+import io.cloudbeaver.model.session.BaseWebSession;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.websocket.event.task.WSSessionTaskInfoEvent;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
-import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.security.SMSubjectType;
 import org.jkiss.dbeaver.model.websocket.WSConstants;
 import org.jkiss.dbeaver.model.websocket.event.WSEvent;
-import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceEvent;
-import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceProperty;
-import org.jkiss.dbeaver.model.websocket.event.datasource.WSDatasourceFolderEvent;
 import org.jkiss.dbeaver.model.websocket.event.permissions.WSSubjectPermissionEvent;
 import org.jkiss.dbeaver.model.websocket.event.resource.WSResourceProperty;
 import org.jkiss.dbeaver.model.websocket.event.resource.WSResourceUpdatedEvent;
 
-import java.util.List;
+import java.util.Objects;
 
 public class WebEventUtils {
-    /**
-     * adds events of updated datasource to event controller
-     *
-     * @param project      project of updated database
-     * @param session      web session
-     * @param datasourceId id of datasource
-     * @param eventAction  type of event
-     */
-    public static void addDataSourceUpdatedEvent(
-        DBPProject project,
-        WebSession session,
-        String datasourceId,
-        WSConstants.EventAction eventAction,
-        WSDataSourceProperty property
-    ) {
-        if (project == null) {
-            return;
-        }
-        WSEvent event = null;
-        switch (eventAction) {
-            case CREATE:
-                event = WSDataSourceEvent.create(
-                    session.getUserContext().getSmSessionId(),
-                    session.getUserId(),
-                    project.getId(),
-                    List.of(datasourceId),
-                    property
-                );
-                break;
-            case DELETE:
-                event = WSDataSourceEvent.delete(
-                    session.getUserContext().getSmSessionId(),
-                    session.getUserId(),
-                    project.getId(),
-                    List.of(datasourceId),
-                    property
-                );
-                break;
-            case UPDATE:
-                event = WSDataSourceEvent.update(
-                    session.getUserContext().getSmSessionId(),
-                    session.getUserId(),
-                    project.getId(),
-                    List.of(datasourceId),
-                    property
-                );
-                break;
-        }
-        if (event == null) {
-            return;
-        }
-        ServletAppUtils.getServletApplication().getEventController().addEvent(event);
-    }
-
-    public static void addNavigatorNodeUpdatedEvent(
-        DBPProject project,
-        WebSession session,
-        String nodePath,
-        WSConstants.EventAction eventAction
-    ) {
-        if (project == null) {
-            return;
-        }
-        WSEvent event = null;
-        switch (eventAction) {
-            case CREATE:
-                event = WSDatasourceFolderEvent.create(
-                    session.getUserContext().getSmSessionId(),
-                    session.getUserId(),
-                    project.getId(),
-                    List.of(nodePath)
-                );
-                break;
-            case DELETE:
-                event = WSDatasourceFolderEvent.delete(
-                    session.getUserContext().getSmSessionId(),
-                    session.getUserId(),
-                    project.getId(),
-                    List.of(nodePath)
-                );
-                break;
-            case UPDATE:
-                event = WSDatasourceFolderEvent.update(
-                    session.getUserContext().getSmSessionId(),
-                    session.getUserId(),
-                    project.getId(),
-                    List.of(nodePath)
-                );
-                break;
-        }
-        if (event == null) {
-            return;
-        }
-        ServletAppUtils.getServletApplication().getEventController().addEvent(event);
-    }
 
     public static void addRmResourceUpdatedEvent(
         String projectId,
@@ -153,7 +55,7 @@ public class WebEventUtils {
         switch (eventAction) {
             case CREATE:
                 event = WSResourceUpdatedEvent.create(
-                    session.getUserContext().getSmSessionId(),
+                    WebEventUtils.getSmSessionId(session),
                     session.getUserId(),
                     projectId,
                     resourcePath,
@@ -163,7 +65,7 @@ public class WebEventUtils {
                 break;
             case DELETE:
                 event = WSResourceUpdatedEvent.delete(
-                    session.getUserContext().getSmSessionId(),
+                    WebEventUtils.getSmSessionId(session),
                     session.getUserId(),
                     projectId,
                     resourcePath,
@@ -173,7 +75,7 @@ public class WebEventUtils {
                 break;
             case UPDATE:
                 event = WSResourceUpdatedEvent.update(
-                    session.getUserContext().getSmSessionId(),
+                    WebEventUtils.getSmSessionId(session),
                     session.getUserId(),
                     projectId,
                     resourcePath,
@@ -213,4 +115,12 @@ public class WebEventUtils {
         ServletAppUtils.getServletApplication().getEventController().addEvent(event);
     }
 
+    @Nullable
+    public static String getSmSessionId(@NotNull BaseWebSession webSession) {
+        return webSession.getUserContext().getSmSessionId();
+    }
+
+    public static boolean isSmSessionIdEquals(@NotNull BaseWebSession webSession, @Nullable String smSessionId) {
+        return Objects.equals(getSmSessionId(webSession), smSessionId);
+    }
 }

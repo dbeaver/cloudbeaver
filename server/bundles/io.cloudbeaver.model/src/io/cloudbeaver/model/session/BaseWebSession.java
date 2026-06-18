@@ -209,7 +209,7 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
     }
 
     private void cleanUpSession(boolean sendSessionExpiredEvent) {
-        application.getEventController().addEvent(new WSEventDeleteTempFile(getSessionId()));
+        application.getEventController().addEvent(new WSEventDeleteTempFile(getUserContext().getSmSessionId()));
         synchronized (sessionEventHandlers) {
             var sessionExpiredEvent = new WSSessionExpiredEvent();
             for (CBWebSessionEventHandler sessionEventHandler : sessionEventHandlers) {

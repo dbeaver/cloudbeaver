@@ -5,7 +5,6 @@
     "./lib/module.js",
     "./lib/index.js",
     "src/**/*.css",
-    "src/**/*.scss",
     "public/**/*"
   ],
   "version": "0.1.0",
@@ -97,6 +96,7 @@
     "@cloudbeaver/plugin-object-viewer-nav-tree-link": "workspace:*",
     "@cloudbeaver/plugin-product": "workspace:*",
     "@cloudbeaver/plugin-product-information-administration": "workspace:*",
+    "@cloudbeaver/plugin-project-info": "workspace:*",
     "@cloudbeaver/plugin-projects": "workspace:*",
     "@cloudbeaver/plugin-resource-manager": "workspace:*",
     "@cloudbeaver/plugin-resource-manager-administration": "workspace:*",

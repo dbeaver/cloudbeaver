@@ -5,6 +5,4 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-export function isNumber(value: any): value is number {
-  return !isNaN(parseFloat(value)) && isFinite(value);
-}
+export { isNumber } from '@dbeaver/js-helpers';

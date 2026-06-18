@@ -111,6 +111,19 @@
     }
   }
 
+  .dbv-kit-radio__control[data-checked='true'] {
+    border-color: var(--dbv-kit-radio-active-border);
+    background-color: var(--dbv-kit-radio-active-background);
+
+    &::after {
+      scale: 1;
+    }
+  }
+
+  .dbv-kit-radio__control[data-disabled='true'] {
+    opacity: var(--dbv-kit-control-disabled-opacity);
+  }
+
   .dbv-kit-radio__title {
     display: inline-block;
     vertical-align: middle;

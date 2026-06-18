@@ -15,7 +15,7 @@ export const themes: ITheme[] = [
     type: 'light',
     loaded: false,
     loader: async (): Promise<void> => {
-      await import('./styles/main/light.theme.scss');
+      await import('./styles/main/light.theme.css');
     },
   },
   {
@@ -25,7 +25,7 @@ export const themes: ITheme[] = [
     type: 'dark',
     loaded: false,
     loader: async (): Promise<void> => {
-      await import('./styles/main/dark.theme.scss');
+      await import('./styles/main/dark.theme.css');
     },
   },
 ];

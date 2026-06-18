@@ -37,12 +37,12 @@ export class SqlGeneratorsBootstrap extends Bootstrap {
       isDisabled: context => {
         const node = context.get(DATA_CONTEXT_NAV_NODE)!;
 
-        return this.sqlGeneratorsResource.get(node.id)?.length === 0;
+        return this.sqlGeneratorsResource.get(node.uri)?.length === 0;
       },
       getLoader: context => {
         const node = context.get(DATA_CONTEXT_NAV_NODE)!;
 
-        return getCachedMapResourceLoaderState(this.sqlGeneratorsResource, () => node.id);
+        return getCachedMapResourceLoaderState(this.sqlGeneratorsResource, () => node.uri);
       },
     });
     this.menuService.addCreator({
@@ -66,7 +66,7 @@ export class SqlGeneratorsBootstrap extends Bootstrap {
       getItems: (context, items) => {
         const node = context.get(DATA_CONTEXT_NAV_NODE)!;
 
-        const actions = this.sqlGeneratorsResource.get(node.id) || [];
+        const actions = this.sqlGeneratorsResource.get(node.uri) || [];
 
         return [
           ...items,
@@ -81,12 +81,12 @@ export class SqlGeneratorsBootstrap extends Bootstrap {
                 {
                   onSelect: async () => {
                     try {
-                      const query = await this.sqlGeneratorsResource.generateEntityQuery(action.id, node.id, getDefaultQueryGeneratorOptions());
+                      const query = await this.sqlGeneratorsResource.generateEntityQuery(action.id, node.uri, getDefaultQueryGeneratorOptions());
                       await this.commonDialogService.open(GeneratedSqlDialog, {
                         query,
-                        nodeId: node.id,
+                        nodeId: node.uri,
                         options: getDefaultQueryGeneratorOptions(),
-                        regenerateQuery: options => this.sqlGeneratorsResource.generateEntityQuery(action.id, node.id, options),
+                        regenerateQuery: options => this.sqlGeneratorsResource.generateEntityQuery(action.id, node.uri, options),
                       });
                     } catch (e: any) {
                       this.notificationService.logException(e, 'app_shared_sql_generators_error_title');

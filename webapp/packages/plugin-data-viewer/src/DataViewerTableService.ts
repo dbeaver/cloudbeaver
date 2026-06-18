@@ -42,7 +42,7 @@ export class DataViewerTableService {
   ) {}
 
   create(connection: Connection, node: NavNode | undefined): IDatabaseDataModel<ContainerDataSource> {
-    const nodeInfo = this.navNodeManagerService.getNodeContainerInfo(node?.id ?? '');
+    const nodeInfo = this.navNodeManagerService.getNodeContainerInfo(node?.uri ?? '');
 
     const source = new ContainerDataSource(
       this.serviceProvider,
@@ -54,7 +54,7 @@ export class DataViewerTableService {
     source
       .setOptions({
         connectionKey: createConnectionParam(connection),
-        containerNodePath: node?.id ?? '',
+        containerNodePath: node?.uri ?? '',
         schema: nodeInfo.schemaId,
         catalog: nodeInfo.catalogId,
         constraints: [],

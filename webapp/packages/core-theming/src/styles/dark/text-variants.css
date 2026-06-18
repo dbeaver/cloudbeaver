@@ -1,0 +1,26 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2026 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+
+@layer base {
+  .theme-dark {
+    --theme-text-primary-on-light: #ffffff;
+    --theme-text-primary-on-dark: rgba(0, 0, 0, 0.87);
+    --theme-text-secondary-on-light: rgba(255, 255, 255, 0.75);
+    --theme-text-secondary-on-dark: rgba(0, 0, 0, 0.45);
+    --theme-text-sub-secondary-on-light: rgba(255, 255, 255, 0.75);
+    --theme-text-sub-secondary-on-dark: rgba(255, 255, 255, 0.7);
+    --theme-text-hint-on-light: rgba(255, 255, 255, 0.6);
+    --theme-text-hint-on-dark: rgba(0, 0, 0, 0.55);
+    --theme-text-disabled-on-light: rgba(255, 255, 255, 0.45);
+    --theme-text-disabled-on-dark: rgba(0, 0, 0, 0.2);
+    --theme-text-icon-on-light: rgba(255, 255, 255, 0.5);
+    --theme-text-icon-on-dark: rgba(0, 0, 0, 0.38);
+    --theme-text-negative-on-light: hsl(0, 95%, 65%);
+    --theme-text-negative-on-dark: hsl(0, 95%, 65%);
+  }
+}
