@@ -16,8 +16,7 @@ import { useTab, type IFormState, type TabContainerPanelComponent } from '@cloud
 
 import styles from './SSH.module.css';
 import { getConnectionFormSSHPart } from './getConnectionFormSSHPart.js';
-import { getConnectionFormOptionsPart } from '../Options/getConnectionFormOptionsPart.js';
-import type { IConnectionFormState } from '../IConnectionFormState.js';
+import { getConnectionFormOptionsPart, type IConnectionFormState } from '@cloudbeaver/plugin-connections';
 
 interface Props {
   handlerState: NetworkHandlerConfigInput;

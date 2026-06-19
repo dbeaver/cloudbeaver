@@ -6,13 +6,17 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { Dependency, ModuleRegistry, proxy } from '@cloudbeaver/core-di';
+import { Bootstrap, Dependency, ModuleRegistry, proxy } from '@cloudbeaver/core-di';
 import { NetworkHandlerResource } from './NetworkHandlerResource.js';
+import { LocaleService } from './LocaleService.js';
 
 export default ModuleRegistry.add({
   name: '@cloudbeaver/core-network-handlers',
 
   configure: serviceCollection => {
-    serviceCollection.addSingleton(Dependency, proxy(NetworkHandlerResource)).addSingleton(NetworkHandlerResource);
+    serviceCollection
+      .addSingleton(Dependency, proxy(NetworkHandlerResource))
+      .addSingleton(NetworkHandlerResource)
+      .addSingleton(Bootstrap, LocaleService);
   },
 });

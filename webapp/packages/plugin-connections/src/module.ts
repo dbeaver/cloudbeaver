@@ -17,7 +17,6 @@ import { LocaleService } from './LocaleService.js';
 import { ConnectionMenuBootstrap } from './ContextMenu/ConnectionMenuBootstrap.js';
 import { ConnectionSSLTabService } from './ConnectionForm/SSL/ConnectionSSLTabService.js';
 import { ConnectionOriginInfoTabService } from './ConnectionForm/OriginInfo/ConnectionOriginInfoTabService.js';
-import { ConnectionSSHTabService } from './ConnectionForm/SSH/ConnectionSSHTabService.js';
 import { ConnectionOptionsTabService } from './ConnectionForm/Options/ConnectionOptionsTabService.js';
 import { ConnectionDriverPropertiesTabService } from './ConnectionForm/DriverProperties/ConnectionDriverPropertiesTabService.js';
 import { ConnectionFormService } from './ConnectionForm/ConnectionFormService.js';
@@ -34,7 +33,6 @@ export default ModuleRegistry.add({
       .addSingleton(Bootstrap, proxy(ConnectionOptionsTabService))
       .addSingleton(Bootstrap, proxy(ConnectionOriginInfoTabService))
       .addSingleton(Bootstrap, proxy(ConnectionsExplorerBootstrap))
-      .addSingleton(Bootstrap, proxy(ConnectionSSHTabService))
       .addSingleton(Bootstrap, proxy(ConnectionSSLTabService))
       .addSingleton(Bootstrap, LocaleService)
       .addSingleton(Bootstrap, PluginBootstrap)
@@ -50,7 +48,6 @@ export default ModuleRegistry.add({
       .addSingleton(ConnectionMenuBootstrap)
       .addSingleton(ConnectionSSLTabService)
       .addSingleton(ConnectionOriginInfoTabService)
-      .addSingleton(ConnectionSSHTabService)
       .addSingleton(ConnectionOptionsTabService)
       .addSingleton(ConnectionDriverPropertiesTabService)
       .addSingleton(ConnectionFormService);

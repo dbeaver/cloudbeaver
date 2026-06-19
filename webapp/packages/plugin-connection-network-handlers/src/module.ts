@@ -6,10 +6,15 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { ModuleRegistry } from '@cloudbeaver/core-di';
+import { Bootstrap, ModuleRegistry, proxy } from '@cloudbeaver/core-di';
+import { ConnectionSSHTabService } from './SSH/ConnectionSSHTabService.js';
 
 export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-connection-network-handlers',
 
-  configure: serviceCollection => {},
+  configure: serviceCollection => {
+    serviceCollection
+      .addSingleton(Bootstrap, proxy(ConnectionSSHTabService))
+      .addSingleton(ConnectionSSHTabService);
+  },
 });

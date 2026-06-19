@@ -10,13 +10,13 @@ import type { IFormState } from '@cloudbeaver/core-ui';
 import { ConnectionFormSSHPart } from './ConnectionFormSSHPart.js';
 import { ConnectionInfoNetworkHandlersResource } from '@cloudbeaver/core-connections';
 import { NetworkHandlerResource } from '@cloudbeaver/core-network-handlers';
-import type { IConnectionFormState } from '../IConnectionFormState.js';
-import { getConnectionFormOptionsPart } from '../Options/getConnectionFormOptionsPart.js';
+import type { IConnectionFormState } from '@cloudbeaver/plugin-connections';
+import { getConnectionFormOptionsPart } from '@cloudbeaver/plugin-connections';
 
-const DATA_CONTEXT_CONNECTION_FORM_OPTIONS_PART = createDataContext<ConnectionFormSSHPart>('Connection Form SSH Part');
+const DATA_CONTEXT_CONNECTION_FORM_SSH_PART = createDataContext<ConnectionFormSSHPart>('Connection Form SSH Part');
 
 export function getConnectionFormSSHPart(formState: IFormState<IConnectionFormState>): ConnectionFormSSHPart {
-  return formState.getPart(DATA_CONTEXT_CONNECTION_FORM_OPTIONS_PART, context => {
+  return formState.getPart(DATA_CONTEXT_CONNECTION_FORM_SSH_PART, context => {
     const di = context.get(DATA_CONTEXT_DI_PROVIDER)!;
     const connectionInfoNetworkHandlersResource = di.getService(ConnectionInfoNetworkHandlersResource);
     const networkHandlerResource = di.getService(NetworkHandlerResource);

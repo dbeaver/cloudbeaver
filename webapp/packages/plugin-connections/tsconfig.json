@@ -83,9 +83,6 @@
       "path": "../plugin-authentication"
     },
     {
-      "path": "../plugin-connection-network-handlers"
-    },
-    {
       "path": "../plugin-navigation-tree"
     },
     {

@@ -11,7 +11,16 @@
       "path": "../../common-typescript/@dbeaver/cli"
     },
     {
+      "path": "../core-blocks"
+    },
+    {
       "path": "../core-cli"
+    },
+    {
+      "path": "../core-connections"
+    },
+    {
+      "path": "../core-data-context"
     },
     {
       "path": "../core-di"
@@ -20,7 +29,25 @@
       "path": "../core-di/tsconfig.json"
     },
     {
+      "path": "../core-executor"
+    },
+    {
       "path": "../core-network-handlers"
+    },
+    {
+      "path": "../core-resource"
+    },
+    {
+      "path": "../core-sdk"
+    },
+    {
+      "path": "../core-ui"
+    },
+    {
+      "path": "../core-utils"
+    },
+    {
+      "path": "../plugin-connections"
     }
   ],
   "include": [

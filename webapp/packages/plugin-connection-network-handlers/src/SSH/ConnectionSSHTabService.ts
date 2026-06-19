@@ -10,8 +10,7 @@ import { DBDriverResource } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { DriverConfigurationType } from '@cloudbeaver/core-sdk';
 
-import { ConnectionFormService } from '../ConnectionFormService.js';
-import { getConnectionFormOptionsPart } from '../Options/getConnectionFormOptionsPart.js';
+import { ConnectionFormService, getConnectionFormOptionsPart } from '@cloudbeaver/plugin-connections';
 import { getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { SSH_TUNNEL_ID } from '@cloudbeaver/core-network-handlers';

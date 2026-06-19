@@ -7,5 +7,3 @@
  */
 
 import './module.js';
-
-// TODO register SSH network handler to plugin-connection form
