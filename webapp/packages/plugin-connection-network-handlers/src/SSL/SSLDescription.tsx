@@ -17,10 +17,10 @@ export function SSLDescription(): ReactNode {
 
   return (
     <>
-      <div>{translate('plugin_connections_connection_ssl_optional')}</div>
-      <div className="tw:text-balance">{translate('plugin_connections_connection_ssl_description')}</div>
+      <div>{translate('plugin_connection_network_handlers_connection_ssl_optional')}</div>
+      <div className="tw:text-balance">{translate('plugin_connection_network_handlers_connection_ssl_description')}</div>
       <div className="tw:flex tw:items-center tw:gap-4 tw:mt-2 tw:text-balance">
-        <IconOrImage icon="/icons/preload/info_icon_sm.svg" /> {translate('plugin_connections_connection_ssl_note', undefined, { productName })}
+        <IconOrImage icon="/icons/preload/info_icon_sm.svg" /> {translate('plugin_connection_network_handlers_connection_ssl_note', undefined, { productName })}
       </div>
     </>
   );

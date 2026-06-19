@@ -38,6 +38,9 @@
       "path": "../core-links"
     },
     {
+      "path": "../core-localization"
+    },
+    {
       "path": "../core-network-handlers"
     },
     {

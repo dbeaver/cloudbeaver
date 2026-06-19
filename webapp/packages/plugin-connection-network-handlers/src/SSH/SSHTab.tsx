@@ -21,7 +21,7 @@ export const SSHTab: TabContainerTabComponent<IConnectionFormProps> = observer(f
   return (
     <Tab {...props} title={handler.data?.description}>
       <TabTitle>
-        <Translate token={handler.data?.label || 'connections_network_handler_ssh_tunnel_title'} />
+        <Translate token={handler.data?.label || 'plugin_connection_network_handlers_ssh_tunnel_title'} />
       </TabTitle>
     </Tab>
   );

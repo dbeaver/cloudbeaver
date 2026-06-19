@@ -48,7 +48,7 @@ export const SSHKeyUploader = observer<Props>(function SSHKeyUploader({ state, s
         required={state.savePassword && !saved}
         medium
       >
-        {translate('core_connection_network_handlers_ssh_tunnel_private_key')}
+        {translate('core_network_handlers_ssh_tunnel_private_key')}
       </Textarea>
       <GroupItem>
         <UploadArea disabled={disabled || readonly} reset onChange={handleKeyUpload}>

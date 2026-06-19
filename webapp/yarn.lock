@@ -2730,6 +2730,7 @@ __metadata:
     "@cloudbeaver/core-di": "workspace:*"
     "@cloudbeaver/core-executor": "workspace:*"
     "@cloudbeaver/core-links": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
     "@cloudbeaver/core-network-handlers": "workspace:*"
     "@cloudbeaver/core-projects": "workspace:*"
     "@cloudbeaver/core-resource": "workspace:*"

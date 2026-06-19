@@ -72,7 +72,7 @@ export const SSL: TabContainerPanelComponent<Props> = observer(function SSL({ fo
       <ColoredContainer parent>
         <Group gap form large vertical>
           <Switch id="ssl-enable-switch" name="enabled" state={handlerState} description={<SSLDescription />} mod={['primary']} disabled={disabled}>
-            {translate('plugin_connections_connection_ssl_enable')}
+            {translate('plugin_connection_network_handlers_connection_ssl_enable')}
           </Switch>
           {isUncategorizedExists && (
             <ObjectPropertyInfoForm
@@ -111,14 +111,14 @@ export const SSL: TabContainerPanelComponent<Props> = observer(function SSL({ fo
               disabled={disabled || !enabled || optionsPart.state.sharedCredentials}
               title={translate(
                 !isSharedProject || serverConfigResource.data?.distributed
-                  ? 'connections_connection_authentication_save_credentials_for_user_tooltip'
-                  : 'connections_connection_edit_save_credentials_shared_tooltip',
+                  ? 'plugin_connection_network_handlers_save_credentials_for_user_tooltip'
+                  : 'plugin_connection_network_handlers_save_credentials_shared_tooltip',
               )}
             >
               {translate(
                 !isSharedProject || serverConfigResource.data?.distributed
-                  ? 'connections_connection_authentication_save_credentials_for_user'
-                  : 'connections_connection_edit_save_credentials_shared',
+                  ? 'plugin_connection_network_handlers_save_credentials_for_user'
+                  : 'plugin_connection_network_handlers_save_credentials_shared',
               )}
             </FieldCheckbox>
           )}
@@ -129,7 +129,7 @@ export const SSL: TabContainerPanelComponent<Props> = observer(function SSL({ fo
             target="_blank"
             rel="noreferrer"
           >
-            <IconOrImage width={16} icon="/icons/documentation_link_sm.svg" /> {translate('plugin_connections_connection_ssl_docs')}
+            <IconOrImage width={16} icon="/icons/documentation_link_sm.svg" /> {translate('plugin_connection_network_handlers_connection_ssl_docs')}
           </a>
         </Group>
       </ColoredContainer>

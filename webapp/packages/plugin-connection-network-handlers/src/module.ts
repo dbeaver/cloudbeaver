@@ -7,6 +7,7 @@
  */
 
 import { Bootstrap, ModuleRegistry, proxy } from '@cloudbeaver/core-di';
+import { LocaleService } from './LocaleService.js';
 import { ConnectionSSHTabService } from './SSH/ConnectionSSHTabService.js';
 import { ConnectionSSLTabService } from './SSL/ConnectionSSLTabService.js';
 
@@ -15,8 +16,10 @@ export default ModuleRegistry.add({
 
   configure: serviceCollection => {
     serviceCollection
+      .addSingleton(Bootstrap, LocaleService)
       .addSingleton(Bootstrap, proxy(ConnectionSSHTabService))
       .addSingleton(Bootstrap, proxy(ConnectionSSLTabService))
+      .addSingleton(LocaleService)
       .addSingleton(ConnectionSSHTabService)
       .addSingleton(ConnectionSSLTabService);
   },
