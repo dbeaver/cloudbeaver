@@ -19,6 +19,7 @@ package io.cloudbeaver.model;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.server.CBConstants;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBConstants;
@@ -181,7 +182,7 @@ public class WebDatabaseDriverInfo {
     public WebPropertyInfo[] getDriverProperties() throws DBWebException {
         DBPConnectionConfiguration cfg = new DBPConnectionConfiguration();
         cfg.setUrl(CommonUtils.notEmpty(driver.getSampleURL()));
-        cfg.setHostName(driver.getDefaultHost());
+        cfg.setHostName(CBConstants.HOST_LOCALHOST);
         cfg.setHostPort(driver.getDefaultPort());
         cfg.setDatabaseName(driver.getDefaultDatabase());
         cfg.setUrl(driver.getConnectionURL(cfg));
