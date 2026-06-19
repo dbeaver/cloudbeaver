@@ -41,18 +41,23 @@ public class WebSQLQueryResultReference {
     private final DBSEntityAssociation association;
     private final boolean reverse;
     @NotNull
-    private final List<Integer> columnIndexList;
+    private final List<WebSQLReferenceColumnMapping> columnMapping;
 
     public WebSQLQueryResultReference(
         @Nullable WebSession session,
         @NotNull DBSEntityAssociation association,
         boolean reverse,
-        @NotNull List<Integer> columnIndexList
+        @NotNull List<WebSQLReferenceColumnMapping> columnMapping
     ) {
         this.session = session;
         this.association = association;
         this.reverse = reverse;
-        this.columnIndexList = columnIndexList;
+        this.columnMapping = columnMapping;
+    }
+
+    @Property
+    public boolean isReference() {
+        return reverse;
     }
 
     @NotNull
@@ -94,8 +99,8 @@ public class WebSQLQueryResultReference {
 
     @NotNull
     @Property
-    public List<Integer> getColumnIndexList() {
-        return columnIndexList;
+    public List<WebSQLReferenceColumnMapping> getColumnMapping() {
+        return columnMapping;
     }
 
     @Nullable

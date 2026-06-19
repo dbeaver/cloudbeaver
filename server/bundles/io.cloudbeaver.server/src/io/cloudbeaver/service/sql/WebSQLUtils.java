@@ -377,9 +377,9 @@ public class WebSQLUtils {
                     ? DBStructUtils.readReferences(monitor, entity, attrToBinding)
                     : DBStructUtils.readAssociations(monitor, entity, attrToBinding);
                 for (DBSEntityAssociation association : source) {
-                    List<Integer> columnIndex = collectOwnColumnIndex(monitor, association, reverse, attrToIndex);
-                    if (columnIndex != null) {
-                        result.add(new WebSQLQueryResultReference(session, association, reverse, columnIndex));
+                    List<WebSQLReferenceColumnMapping> mapping = collectColumnMapping(monitor, association, reverse, attrToIndex);
+                    if (mapping != null) {
+                        result.add(new WebSQLQueryResultReference(session, association, reverse, mapping));
                     }
                 }
             } catch (DBException e) {
@@ -389,38 +389,45 @@ public class WebSQLUtils {
         return result;
     }
 
+    /**
+     * Pairs source-side attributes (in our result set) with target-side attributes
+     */
     @Nullable
-    private static List<Integer> collectOwnColumnIndex(
+    private static List<WebSQLReferenceColumnMapping> collectColumnMapping(
         @NotNull DBRProgressMonitor monitor,
         @NotNull DBSEntityAssociation association,
         boolean reverse,
         @NotNull Map<DBSEntityAttribute, Integer> attrToIndex
     ) throws DBException {
-        DBSEntityReferrer ownSide;
-        if (reverse) {
-            DBSEntityConstraint refConstraint = association.getReferencedConstraint();
-            if (!(refConstraint instanceof DBSEntityReferrer referrer)) {
-                return null;
-            }
-            ownSide = referrer;
-        } else {
-            if (!(association instanceof DBSEntityReferrer associationRef)) {
-                return null;
-            }
-            ownSide = associationRef;
-        }
-        List<? extends DBSEntityAttributeRef> attrs = ownSide.getAttributeReferences(monitor);
-        if (attrs == null || attrs.isEmpty()) {
+        if (!(association instanceof DBSEntityReferrer associationReferrer)) {
             return null;
         }
-        List<Integer> indexList = new ArrayList<>(attrs.size());
-        for (DBSEntityAttributeRef attrRef : attrs) {
-            Integer idx = attrToIndex.get(attrRef.getAttribute());
-            if (idx == null) {
+        DBSEntityConstraint refConstraint = association.getReferencedConstraint();
+        if (!(refConstraint instanceof DBSEntityReferrer constraintReferrer)) {
+            return null;
+        }
+        DBSEntityReferrer sourceSide = reverse ? constraintReferrer : associationReferrer;
+        DBSEntityReferrer targetSide = reverse ? associationReferrer : constraintReferrer;
+
+        List<? extends DBSEntityAttributeRef> sourceAttrs = sourceSide.getAttributeReferences(monitor);
+        List<? extends DBSEntityAttributeRef> targetAttrs = targetSide.getAttributeReferences(monitor);
+        if (sourceAttrs == null || targetAttrs == null
+            || sourceAttrs.isEmpty() || sourceAttrs.size() != targetAttrs.size()
+        ) {
+            return null;
+        }
+        List<WebSQLReferenceColumnMapping> mapping = new ArrayList<>(sourceAttrs.size());
+        for (int i = 0; i < sourceAttrs.size(); i++) {
+            Integer sourceIdx = attrToIndex.get(sourceAttrs.get(i).getAttribute());
+            if (sourceIdx == null) {
                 return null;
             }
-            indexList.add(idx);
+            DBSEntityAttribute targetAttr = targetAttrs.get(i).getAttribute();
+            if (targetAttr == null) {
+                return null;
+            }
+            mapping.add(new WebSQLReferenceColumnMapping(sourceIdx, targetAttr.getName()));
         }
-        return indexList;
+        return mapping;
     }
 }
