@@ -39,13 +39,16 @@
     "@cloudbeaver/plugin-connections": "workspace:*",
     "@dbeaver/js-helpers": "workspace:*",
     "mobx": "^6",
-    "mobx-react-lite": "^4"
+    "mobx-react-lite": "^4",
+    "react": "^19",
+    "react-dom": "^19"
   },
   "devDependencies": {
     "@cloudbeaver/core-cli": "workspace:*",
     "@cloudbeaver/tsconfig": "workspace:*",
     "@dbeaver/cli": "workspace:*",
     "@types/react": "^19",
+    "@types/react-dom": "^19",
     "rimraf": "^6",
     "tslib": "^2",
     "typescript": "^5"
