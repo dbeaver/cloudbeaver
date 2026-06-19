@@ -8,7 +8,6 @@
 import { FormPart, formSubmitContext, type IFormState } from '@cloudbeaver/core-ui';
 
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
-import type { IConnectionFormState } from '../IConnectionFormState.js';
 import { getObjectPropertyDefaultValue, type NetworkHandlerConfigInput } from '@cloudbeaver/core-sdk';
 import { isNotNullDefined } from '@dbeaver/js-helpers';
 import { getSSLDriverHandler } from './getSSLDriverHandler.js';
@@ -16,10 +15,9 @@ import { ConnectionInfoNetworkHandlersResource, type DBDriverResource } from '@c
 import { type INetworkHandlerConfig, type NetworkHandlerResource } from '@cloudbeaver/core-network-handlers';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import { makeObservable, observable, toJS } from 'mobx';
-import { PROPERTY_FEATURE_SECURED } from './PROPERTY_FEATURE_SECURED.js';
+import { ConnectionFormOptionsPart, PROPERTY_FEATURE_SECURED, type IConnectionFormState } from '@cloudbeaver/plugin-connections';
 import { SSL_CODE_NAME } from './SSL_CODE_NAME.js';
 import { getSSLDefaultConfig } from './getSSLDefaultConfig.js';
-import { ConnectionFormOptionsPart } from '../Options/ConnectionFormOptionsPart.js';
 
 const getDefaultState = () =>
   ({

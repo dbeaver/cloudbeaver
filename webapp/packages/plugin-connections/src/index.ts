@@ -9,6 +9,7 @@
 import './module.js';
 
 export * from './ConnectionAuthentication/IConnectionAuthenticationConfig.js';
+export * from './ConnectionAuthentication/PROPERTY_FEATURE_SECURED.js';
 export * from './ConnectionAuthentication/ConnectionAuthenticationFormLoader.js';
 export * from './ConnectionForm/Options/ConnectionOptionsTabService.js';
 export * from './ConnectionForm/DriverProperties/ConnectionDriverPropertiesTabService.js';

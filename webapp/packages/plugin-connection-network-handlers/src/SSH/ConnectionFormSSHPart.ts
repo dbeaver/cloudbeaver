@@ -20,8 +20,7 @@ import {
   type INetworkHandlerConfig,
 } from '@cloudbeaver/core-network-handlers';
 import { toJS } from 'mobx';
-import type { IConnectionFormState } from '@cloudbeaver/plugin-connections';
-import { ConnectionFormOptionsPart } from '@cloudbeaver/plugin-connections';
+import type { ConnectionFormOptionsPart, IConnectionFormState } from '@cloudbeaver/plugin-connections';
 
 const getDefaultState = (): INetworkHandlerConfig => SSH_DEFAULT_HANDLER_CONFIG() as INetworkHandlerConfig;
 

@@ -16,8 +16,7 @@ import type { TabContainerTabComponent } from '@cloudbeaver/core-ui';
 import { getSSLDriverHandler } from './getSSLDriverHandler.js';
 import { SSL } from './SSL.js';
 import { getConnectionFormSSLPart } from './getConnectionFormSSLPart.js';
-import type { IConnectionFormProps } from '../IConnectionFormState.js';
-import { getConnectionFormOptionsPart } from '../Options/getConnectionFormOptionsPart.js';
+import { getConnectionFormOptionsPart, type IConnectionFormProps } from '@cloudbeaver/plugin-connections';
 
 export const SSLPanel: TabContainerTabComponent<IConnectionFormProps> = observer(function SSLPanel(props) {
   const networkHandlerResource = useResource(SSLPanel, NetworkHandlerResource, CachedMapAllKey);

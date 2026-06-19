@@ -15,8 +15,7 @@ import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import { Tab, type TabContainerTabComponent, TabTitle, useTab } from '@cloudbeaver/core-ui';
 
 import { getSSLDriverHandler } from './getSSLDriverHandler.js';
-import type { IConnectionFormProps } from '../IConnectionFormState.js';
-import { getConnectionFormOptionsPart } from '../Options/getConnectionFormOptionsPart.js';
+import { getConnectionFormOptionsPart, type IConnectionFormProps } from '@cloudbeaver/plugin-connections';
 
 export const SSLTab: TabContainerTabComponent<IConnectionFormProps> = observer(function SSLTab(props) {
   const { selected } = useTab(props.tabId);

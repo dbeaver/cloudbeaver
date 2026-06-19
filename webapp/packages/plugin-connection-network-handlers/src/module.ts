@@ -8,6 +8,7 @@
 
 import { Bootstrap, ModuleRegistry, proxy } from '@cloudbeaver/core-di';
 import { ConnectionSSHTabService } from './SSH/ConnectionSSHTabService.js';
+import { ConnectionSSLTabService } from './SSL/ConnectionSSLTabService.js';
 
 export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-connection-network-handlers',
@@ -15,6 +16,8 @@ export default ModuleRegistry.add({
   configure: serviceCollection => {
     serviceCollection
       .addSingleton(Bootstrap, proxy(ConnectionSSHTabService))
-      .addSingleton(ConnectionSSHTabService);
+      .addSingleton(Bootstrap, proxy(ConnectionSSLTabService))
+      .addSingleton(ConnectionSSHTabService)
+      .addSingleton(ConnectionSSLTabService);
   },
 });

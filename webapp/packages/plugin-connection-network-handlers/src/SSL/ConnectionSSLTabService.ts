@@ -10,9 +10,8 @@ import React from 'react';
 import { DBDriverResource } from '@cloudbeaver/core-connections';
 import { NetworkHandlerResource } from '@cloudbeaver/core-network-handlers';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import { getConnectionFormOptionsPart } from '../Options/getConnectionFormOptionsPart.js';
 import { getSSLDriverHandler } from './getSSLDriverHandler.js';
-import { ConnectionFormService } from '../ConnectionFormService.js';
+import { ConnectionFormService, getConnectionFormOptionsPart } from '@cloudbeaver/plugin-connections';
 import { CachedMapAllKey, getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
 
 const SSLTab = React.lazy(async () => {
