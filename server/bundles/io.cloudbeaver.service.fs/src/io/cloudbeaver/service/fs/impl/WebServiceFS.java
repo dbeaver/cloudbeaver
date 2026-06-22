@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2025 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,8 +25,6 @@ import io.cloudbeaver.service.fs.model.FSFile;
 import io.cloudbeaver.service.fs.model.FSFileSystem;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
-import org.jkiss.dbeaver.model.app.DBPProject;
-import org.jkiss.dbeaver.model.navigator.DBNProject;
 import org.jkiss.dbeaver.model.navigator.fs.DBNFileSystem;
 import org.jkiss.dbeaver.model.navigator.fs.DBNFileSystems;
 import org.jkiss.dbeaver.model.navigator.fs.DBNPathBase;
@@ -51,18 +49,12 @@ public class WebServiceFS implements DBWServiceFS {
 
     @NotNull
     @Override
-    public FSFileSystem[] getAvailableFileSystems(@NotNull WebSession webSession, @NotNull String projectId)
-        throws DBWebException {
+    public FSFileSystem[] getAvailableFileSystems(@NotNull WebSession webSession, @NotNull String projectId) throws DBWebException {
         try {
-            DBPProject project = webSession.getProjectById(projectId);
-            if (project == null) {
-                throw new DBException(MessageFormat.format("Project ''{0}'' is not found in session", projectId));
+            DBNFileSystems dbnFileSystems = webSession.getNavigatorModelOrThrow().getRoot().getExtraNode(DBNFileSystems.class);
+            if (dbnFileSystems == null) {
+                throw new DBWebException("File systems not found in navigator");
             }
-            DBNProject projectNode = webSession.getNavigatorModelOrThrow().getRoot().getProjectNode(project);
-            if (projectNode == null) {
-                throw new DBException(MessageFormat.format("Project ''{0}'' is not found in navigator model", projectId));
-            }
-            DBNFileSystems dbnFileSystems = projectNode.getExtraNode(DBNFileSystems.class);
             var fsRegistry = FileSystemProviderRegistry.getInstance();
             DBNFileSystem[] children = dbnFileSystems.getChildren(webSession.getProgressMonitor());
             if (children == null) {

@@ -71,6 +71,10 @@
         & .dbv-kit-checkbox__check {
           --dbv-kit-checkbox-background-checked: color-mix(in srgb, var(--theme-on-secondary), white 30%);
         }
+
+        & .checkbox-markup__caption {
+          color: var(--theme-on-surface);
+        }
       }
     }
 

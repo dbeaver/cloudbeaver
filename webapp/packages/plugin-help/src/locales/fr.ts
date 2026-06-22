@@ -4,6 +4,7 @@ export default [
   ['plugin_help_welcome_docs_label', 'Documentation'],
   ['plugin_help_welcome_docs_description', 'Apprenez à utiliser {arg:product}'],
 
+  ['data_viewer_shortcut_open_cell_context_menu', 'Ouvrir le menu contextuel pour la cellule sélectionnée'],
   ['data_viewer_shortcut_start_inline_editing', "Ouvrir l'éditeur en ligne pour la cellule sélectionnée"],
   ['data_viewer_shortcut_add_new_row', 'Ajouter une nouvelle ligne'],
   ['data_viewer_shortcut_duplicate_row', 'Dupliquer la ligne'],

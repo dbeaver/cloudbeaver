@@ -1,4 +1,7 @@
 export default [
+  ['app_skip_nav_label', 'Быстрая навигация'],
+  ['app_skip_nav_navigator', 'Перейти к навигатору'],
+  ['app_skip_nav_main_content', 'Перейти к основному содержимому'],
   ['app_shared_settingsMenu_config', 'Настройки'],
   ['app_shared_settingsMenu_theme', 'Тема'],
   ['app_shared_settingsMenu_lang', 'Язык'],

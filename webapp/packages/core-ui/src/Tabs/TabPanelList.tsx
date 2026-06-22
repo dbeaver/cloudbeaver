@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,10 @@ import { TabsContext } from './TabsContext.js';
 
 export interface TabPanelListProps {
   contents?: boolean;
+  className?: string;
 }
 
-export const TabPanelList = observer<React.PropsWithChildren<TabPanelListProps>>(function TabPanelList({ contents, children }) {
+export const TabPanelList = observer<React.PropsWithChildren<TabPanelListProps>>(function TabPanelList({ contents, children, className }) {
   const state = useContext(TabsContext);
 
   if (!state) {
@@ -41,7 +42,7 @@ export const TabPanelList = observer<React.PropsWithChildren<TabPanelListProps>>
         .map(
           generateTabElement(
             (tabInfo, key) => (
-              <TabPanel key={key} tabId={key} contents={contents}>
+              <TabPanel key={key} tabId={key} contents={contents} className={className}>
                 {renderPanel(tabInfo, key)}
               </TabPanel>
             ),

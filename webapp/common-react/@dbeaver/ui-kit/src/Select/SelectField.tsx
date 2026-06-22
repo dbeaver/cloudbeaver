@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -78,6 +78,8 @@ export interface SelectFieldProps<T, ItemType = SelectItem<T>> {
 
   store?: SelectProviderProps['store'];
 
+  portal?: boolean;
+
   autoFocusItemsOnShow?: boolean;
 
   'aria-labelledby'?: string;
@@ -106,6 +108,7 @@ export function SelectField<T, ItemType extends {} = SelectItem<T>>({
   disabled,
   required,
   className,
+  portal = false,
   selectedRender,
   arrowIcon,
   store,
@@ -167,7 +170,7 @@ export function SelectField<T, ItemType extends {} = SelectItem<T>>({
         </Select>
         {description && <span className="dbv-kit-select__description">{description}</span>}
 
-        <SelectPopover autoFocusOnShow={autoFocusItemsOnShow} gutter={4} unmountOnHide>
+        <SelectPopover autoFocusOnShow={autoFocusItemsOnShow} portal={portal} gutter={4} unmountOnHide>
           {items.length === 0 ? (
             <div className="dbv-kit-select__empty">{noItemsPlaceholder}</div>
           ) : (

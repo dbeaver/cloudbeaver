@@ -5,7 +5,6 @@
     "./lib/module.js",
     "./lib/index.js",
     "src/**/*.css",
-    "src/**/*.scss",
     "public/**/*"
   ],
   "version": "0.1.0",
@@ -45,6 +44,7 @@
     "@cloudbeaver/plugin-codemirror6": "workspace:*",
     "@cloudbeaver/plugin-data-viewer": "workspace:*",
     "@cloudbeaver/plugin-navigation-tabs": "workspace:*",
+    "@cloudbeaver/plugin-script-export": "workspace:*",
     "@cloudbeaver/plugin-sql-editor-codemirror": "workspace:*",
     "@dbeaver/js-helpers": "workspace:^",
     "mobx": "^6",

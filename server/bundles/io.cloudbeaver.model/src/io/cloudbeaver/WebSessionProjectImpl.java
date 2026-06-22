@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2025 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,11 +29,11 @@ import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.DBPObjectSettingsProvider;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistryCache;
+import org.jkiss.dbeaver.model.auth.SMObjectType;
 import org.jkiss.dbeaver.model.navigator.DBNModel;
 import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.rm.RMUtils;
 import org.jkiss.dbeaver.model.security.SMControllerUtils;
-import org.jkiss.dbeaver.model.security.SMObjectType;
 import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceEvent;
 import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceProperty;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
@@ -252,14 +252,14 @@ public class WebSessionProjectImpl extends WebProjectImpl implements DBPAdaptabl
                 }
                 case WSDataSourceEvent.UPDATED ->  {
                     if (event.getProperty() == WSDataSourceProperty.CONFIGURATION) {
-                        WebDataSourceUtils.disconnectDataSource(webSession, ds);
+                        WebDataSourceUtils.disconnectDataSource(webSession, ds, true);
                     }
                     if (event.getProperty() != WSDataSourceProperty.INTERNAL) {
                         sendDataSourceUpdatedEvent = true;
                     }
                 }
                 case WSDataSourceEvent.DELETED -> {
-                    WebDataSourceUtils.disconnectDataSource(webSession, ds);
+                    WebDataSourceUtils.disconnectDataSource(webSession, ds, false);
                     if (registry instanceof DBPDataSourceRegistryCache dsrc) {
                         dsrc.removeDataSourceFromList(ds);
                     }
@@ -345,7 +345,7 @@ public class WebSessionProjectImpl extends WebProjectImpl implements DBPAdaptabl
     @NotNull
     private WebConnectionInfo closeAndDeleteConnection(@NotNull WebConnectionInfo connectionInfo) throws DBWebException {
         DBPDataSourceContainer dataSourceContainer = connectionInfo.getDataSourceContainer();
-        WebDataSourceUtils.disconnectDataSource(webSession, dataSourceContainer);
+        WebDataSourceUtils.disconnectDataSource(webSession, dataSourceContainer, false);
         DBPDataSourceRegistry registry = getDataSourceRegistry();
         registry.removeDataSource(dataSourceContainer);
         removeConnection(dataSourceContainer);

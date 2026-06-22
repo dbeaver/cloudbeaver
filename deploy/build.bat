@@ -20,7 +20,6 @@ echo Pull dbeaver platform
 
 IF NOT EXIST dbeaver git clone https://github.com/dbeaver/dbeaver.git
 IF NOT EXIST dbeaver-common git clone https://github.com/dbeaver/dbeaver-common.git
-IF NOT EXIST dbeaver-jdbc-libsql git clone https://github.com/dbeaver/dbeaver-jdbc-libsql.git
 
 cd cloudbeaver\deploy
 
@@ -42,6 +41,9 @@ copy ..\config\core\* cloudbeaver\conf >NUL
 copy ..\config\DefaultConfiguration\GlobalConfiguration\.dbeaver\data-sources.json cloudbeaver\conf\initial-data-sources.conf >NUL
 
 move drivers cloudbeaver >NUL
+
+echo Generate cloudbeaver.conf file
+call mvn -f ..\apps\config-generator compile exec:java -Dconfig.output="cloudbeaver\conf\cloudbeaver.conf" || goto :error
 
 echo "Build static content"
 

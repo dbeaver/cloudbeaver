@@ -116,7 +116,8 @@ public class WebSession extends BaseWebSession
             CommonUtils.toString(requestInfo.getLocale()),
             application,
             sessionHandlers,
-            requestInfo.getLastRemoteAddress()
+            requestInfo.getLastRemoteAddress(),
+            requestInfo.getSessionType()
         );
         updateSessionParameters(requestInfo);
     }
@@ -128,7 +129,18 @@ public class WebSession extends BaseWebSession
         @NotNull Map<String, DBWSessionHandler<WebSession>> sessionHandlers,
         @Nullable String remoteAddr
     ) throws DBException {
-        super(id, application);
+        this(id, locale, application, sessionHandlers, remoteAddr, SessionType.WEB);
+    }
+
+    protected WebSession(
+        @NotNull String id,
+        @Nullable String locale,
+        @NotNull ServletApplication application,
+        @NotNull Map<String, DBWSessionHandler<WebSession>> sessionHandlers,
+        @Nullable String remoteAddr,
+        @NotNull SessionType sessionType
+    ) throws DBException {
+        super(id, application, sessionType);
         if (CommonUtils.isEmpty(remoteAddr)) {
             throw new DBException("Remote address cannot be empty");
         }
@@ -301,7 +313,7 @@ public class WebSession extends BaseWebSession
 
             loadProjects();
 
-            this.navigatorModel = new DBNModel(DBWorkbench.getPlatform(), getWorkspace().getProjects());
+            this.navigatorModel = new DBNModel(DBWorkbench.getPlatform(), getWorkspace());
             this.navigatorModel.setModelAuthContext(getWorkspace().getAuthContext());
             this.navigatorModel.initialize();
 
@@ -607,11 +619,13 @@ public class WebSession extends BaseWebSession
         }
     }
 
+    @NotNull
     public WebAsyncTaskInfo createAndRunAsyncTask(@NotNull String taskName, @NotNull WebAsyncTaskProcessor<?> runnable) {
         WebAsyncTaskInfo asyncTask = createAsyncTask(taskName);
         return runAsyncTask(asyncTask, runnable);
     }
 
+    @NotNull
     public WebAsyncTaskInfo runAsyncTask(@NotNull WebAsyncTaskInfo asyncTask, @NotNull WebAsyncTaskProcessor<?> runnable) {
         AbstractJob job = new AbstractCancelableJob(asyncTask.getName()) {
             @NotNull

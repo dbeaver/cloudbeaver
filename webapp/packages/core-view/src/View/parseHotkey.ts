@@ -7,6 +7,10 @@
  */
 
 import type { Hotkey } from '@cloudbeaver/core-blocks';
+import type { KeyboardEvent } from 'react';
+
+import { getCommonAndOSSpecificKeys } from '../Action/KeyBinding/getCommonAndOSSpecificKeys.js';
+import type { IKeyBinding } from '../Action/KeyBinding/IKeyBinding.js';
 
 const reservedModifierKeywords = ['shift', 'alt', 'meta', 'mod', 'ctrl'];
 
@@ -45,6 +49,36 @@ export function isHotkeyModifier(key: string): boolean {
 
 export function parseKeysHookInput(keys: string, splitKey = ','): string[] {
   return keys.split(splitKey);
+}
+
+export function isBindingPressed<T extends HTMLElement>(event: KeyboardEvent<T>, binding: IKeyBinding, combinationKey = '+'): boolean {
+  const keys = getCommonAndOSSpecificKeys(binding);
+
+  return keys.some(hotkey => {
+    const parsed = parseHotkey(hotkey, combinationKey);
+    const mod = event.ctrlKey || event.metaKey;
+
+    if (!!parsed.shift !== event.shiftKey) {
+      return false;
+    }
+    if (!!parsed.alt !== event.altKey) {
+      return false;
+    }
+    if (parsed.mod) {
+      if (!mod) {
+        return false;
+      }
+    } else {
+      if (event.ctrlKey !== !!parsed.ctrl) {
+        return false;
+      }
+      if (event.metaKey !== !!parsed.meta) {
+        return false;
+      }
+    }
+
+    return parsed.keys?.some(k => mapKey(event.key) === k) ?? false;
+  });
 }
 
 export function parseHotkey(hotkey: string, combinationKey = '+'): Hotkey {

@@ -43,7 +43,7 @@ function sortManageable(): (nodeA: NavNode, nodeB: NavNode) => number {
 
 export function navigationTreeConnectionGroupFilter(resource: NavNodeInfoResource): IElementsTreeFilter {
   return (tree, filter, node, children) => {
-    if (node.id !== ROOT_NODE_PATH) {
+    if (node.uri !== ROOT_NODE_PATH) {
       return children;
     }
 
@@ -71,7 +71,7 @@ export function navigationTreeConnectionGroupFilter(resource: NavNodeInfoResourc
         lastGroup = nextGroup;
       }
 
-      groupedChildren.push(node.id);
+      groupedChildren.push(node.uri);
     }
 
     if (groups === 1) {

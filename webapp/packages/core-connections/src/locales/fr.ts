@@ -1,7 +1,6 @@
 export default [
   ['core_connections_connections_settings_group', 'Connexions'],
   ['core_connections_search_database_tip', "Saisissez vos hôtes ici, par exemple 'localhost host1.myhost.com 192.168.0.1' et appuyez sur Entrée"],
-  ['core_connections_new_connection', 'Nouvelle connexion'],
   ['core_connections_connection_create_error', 'Erreur de création de connexion'],
   ['core_connections_connection_save_error', 'Erreur de sauvegarde de connexion'],
   ['core_connections_connection_access_empty', 'Aucun utilisateur et équipe disponibles'],
@@ -86,4 +85,5 @@ export default [
   ['core_connections_settings_disable_description', 'Disable the ability to create new connections'],
   ['core_connections_connection_driver_not_installed', 'Driver is not installed'],
   ['core_connections_connection_temporary', 'Temporary connection'],
+  ['core_connections_no_connection', 'Aucune connexion'],
 ];

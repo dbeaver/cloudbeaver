@@ -158,7 +158,7 @@ export class NavNodeManagerService extends Bootstrap {
 
     const move = contexts.getContext(navNodeMoveContext);
 
-    const cache = this.syncNodeInfoCache.get(targetNode.id);
+    const cache = this.syncNodeInfoCache.get(targetNode.uri);
     cache.canMove = move.canMove;
 
     return move.canMove;
@@ -303,7 +303,7 @@ export class NavNodeManagerService extends Bootstrap {
         res.projectId = object.projectId;
       }
       if (object.objectFeatures.includes(EObjectFeature.dataSource)) {
-        res.connectionNodeId = object.id;
+        res.connectionNodeId = object.uri;
       }
       if (object.objectFeatures.includes(EObjectFeature.catalog)) {
         res.catalogId = object.name; // note that catalogId is node name
@@ -343,7 +343,7 @@ export class NavNodeManagerService extends Bootstrap {
           const parent = this.getParent(node);
           folderId = nodeId;
           if (parent && !parent.folder) {
-            nodeId = parent.id;
+            nodeId = parent.uri;
             parentId = parent.parentId;
             name = parent.name;
             icon = parent.icon;
@@ -373,7 +373,7 @@ export class NavNodeManagerService extends Bootstrap {
 
       for (const node of nodes) {
         node.parentId = parentId;
-        parentId = node.id;
+        parentId = node.uri;
       }
     };
 

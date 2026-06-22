@@ -11,6 +11,7 @@ import {
   KEY_BINDING_CANCEL,
   KEY_BINDING_DELETE_ROW,
   KEY_BINDING_DUPLICATE_ROW,
+  KEY_BINDING_OPEN_CELL_CONTEXT_MENU,
   KEY_BINDING_REVERT_INLINE_EDITOR_CHANGES,
   KEY_BINDING_SAVE,
 } from '@cloudbeaver/plugin-data-viewer';
@@ -41,6 +42,10 @@ const KEY_BINDING_FIND = createKeyBinding({
 import type { IShortcut } from './IShortcut.js';
 
 export const DATA_VIEWER_SHORTCUTS: IShortcut[] = [
+  {
+    label: 'data_viewer_shortcut_open_cell_context_menu',
+    code: transformKeys(KEY_BINDING_OPEN_CELL_CONTEXT_MENU),
+  },
   {
     label: 'data_viewer_shortcut_revert_inline_editor_changes',
     code: transformKeys(KEY_BINDING_REVERT_INLINE_EDITOR_CHANGES),

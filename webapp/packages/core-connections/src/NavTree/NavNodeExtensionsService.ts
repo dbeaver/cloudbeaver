@@ -41,10 +41,12 @@ export class NavNodeExtensionsService {
 
   getConnection(navNodeId: string): IConnectionInfoParams | undefined {
     const node = this.navNodeInfoResource.get(navNodeId);
+
     if (!node?.projectId) {
       return;
     }
-    const connectionKey = this.connectionInfoResource.getConnectionIdForNodeId(node.projectId, navNodeId);
+
+    const connectionKey = this.connectionInfoResource.getConnectionIdForNodeId(node.projectId, node.uri);
 
     if (!connectionKey) {
       return;

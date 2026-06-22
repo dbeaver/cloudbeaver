@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2025 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,13 +42,17 @@ import org.jkiss.dbeaver.model.DBConstants;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPProject;
-import org.jkiss.dbeaver.model.auth.AuthInfo;
+import org.jkiss.dbeaver.model.auth.SMAuthConfiguration;
+import org.jkiss.dbeaver.model.auth.SMObjectType;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
 import org.jkiss.dbeaver.model.rm.RMProjectType;
 import org.jkiss.dbeaver.model.secret.DBSSecretController;
-import org.jkiss.dbeaver.model.security.*;
+import org.jkiss.dbeaver.model.security.SMAuthProviderCustomConfiguration;
+import org.jkiss.dbeaver.model.security.SMConstants;
+import org.jkiss.dbeaver.model.security.SMDataSourceGrant;
+import org.jkiss.dbeaver.model.security.SMSubjectType;
 import org.jkiss.dbeaver.model.security.user.SMTeam;
 import org.jkiss.dbeaver.model.security.user.SMUser;
 import org.jkiss.dbeaver.utils.GeneralUtils;
@@ -163,7 +167,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         if (userName.isEmpty()) {
             throw new DBWebException("Empty user name");
         }
-        String userId = userName.toLowerCase();
+        String userId = userName.trim().toLowerCase();
         try {
             GeneralUtils.validateResourceNameUnconditionally(userId);
         } catch (DBException e) {
@@ -642,7 +646,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
                 adminName = curUser == null ? null : curUser.getUserId();
                 adminPassword = null;
             }
-            List<AuthInfo> authInfos = new ArrayList<>();
+            List<SMAuthConfiguration> authInfos = new ArrayList<>();
             List<WebAuthInfo> authInfoList = webSession.getAllAuthInfo();
             if (CommonUtils.isEmpty(adminName)) {
                 // Try to get admin name from existing authentications (first one)
@@ -654,7 +658,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
                 adminName = CBConstants.DEFAULT_ADMIN_NAME;
             }
             for (WebAuthInfo webAuthInfo : authInfoList) {
-                authInfos.add(new AuthInfo(
+                authInfos.add(new SMAuthConfiguration(
                     webAuthInfo.getAuthProviderDescriptor().getId(),
                     webAuthInfo.getUserCredentials()));
             }

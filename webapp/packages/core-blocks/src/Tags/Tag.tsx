@@ -19,7 +19,7 @@ export interface ITag<T extends string | number = string> {
 }
 
 interface Props<T extends string | number> extends ITag<T> {
-  onRemove: (id: T) => void;
+  onRemove?: (id: T) => void;
   className?: string;
 }
 
@@ -34,11 +34,13 @@ export const Tag = observer(function Tag<T extends string | number>({ id, label,
         </div>
       )}
       <div className={s(styles, { tagContent: true })}>{label}</div>
-      <div className={s(styles, { tagActions: true })}>
-        <div className={s(styles, { tagAction: true })} onClick={() => onRemove(id)}>
-          <IconOrImage className={s(styles, { iconOrImage: true })} icon="cross" />
+      {onRemove && (
+        <div className={s(styles, { tagActions: true })}>
+          <div className={s(styles, { tagAction: true })} onClick={() => onRemove(id)}>
+            <IconOrImage className={s(styles, { iconOrImage: true })} icon="cross" />
+          </div>
         </div>
-      </div>
+      )}
     </li>
   );
 });

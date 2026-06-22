@@ -1,30 +1,34 @@
-mutation getSqlExecutionPlanResult(
-    $taskId: ID!
-) {
-    result: asyncSqlExplainExecutionPlanResult(
-        taskId: $taskId
-    ) {
-        query
-        nodes {
-          id
-          parentId
-          kind
-          name
-          type
-          condition
-          description
-          properties {
-            id
-            required
-            category
-            dataType
-            description
-            displayName
-            length
-            features
-            value
-            order
-          }
-        }
+mutation getSqlExecutionPlanResult($taskId: ID!) {
+  result: asyncSqlExplainExecutionPlanResult(taskId: $taskId) {
+    query
+    nodes {
+      id
+      parentId
+      kind
+      name
+      type
+      condition
+      description
+      cost
+      rowCount
+      duration
+      percent
+      properties {
+        id
+        required
+        category
+        dataType
+        description
+        displayName
+        length
+        features
+        value
+        order
+      }
     }
+    hasCost
+    hasRows
+    hasDuration
+    durationMeasure
+  }
 }

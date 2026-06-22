@@ -11,8 +11,6 @@ export default [
   ['app_navigationTree_settings_filter_all_description', '显示已收缩的文件夹中已过滤的内容'],
   ['app_navigationTree_settings_state_title', '保存树状态'],
   ['app_navigationTree_settings_state_description', '页面刷新后重新打开展开的节点'],
-  ['app_navigationTree_settings_folders_title', '文件夹'],
-  ['app_navigationTree_settings_folders_description', '打开任意节点作为根节点'],
   ['app_navigationTree_node_delete_confirmation', '确定删除 "{arg:name}" ?'],
   ['app_navigationTree_node_folder_delete_confirmation', '所选文件夹下所有内容将全部删除.'],
   ['app_navigationTree_node_delete_error', '删除 "{arg:name} 失败'],

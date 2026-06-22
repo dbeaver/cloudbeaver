@@ -1,7 +1,6 @@
 export default [
   ['core_connections_connections_settings_group', 'Connections'],
   ['core_connections_search_database_tip', "Digita gli hosts qui, p.e. 'localhost host1.myhost.com 192.168.0.1' e premi Invio"],
-  ['core_connections_new_connection', 'Nuova Connessione'],
   ['core_connections_connection_create_error', 'Errore di creazione connessione'],
   ['core_connections_connection_save_error', 'Errore di salvataggio connessione'],
   ['core_connections_connection_no_information', 'Nessuna informazione disponibile'],
@@ -79,4 +78,5 @@ export default [
   ['core_connections_settings_disable_description', 'Disable the ability to create new connections'],
   ['core_connections_connection_driver_not_installed', 'Driver is not installed'],
   ['core_connections_connection_temporary', 'Temporary connection'],
+  ['core_connections_no_connection', 'Nessuna connessione'],
 ];

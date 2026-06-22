@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
 import { clsx } from '@dbeaver/ui-kit';
 
-import { getComputed, s, StaticImage, useS } from '@cloudbeaver/core-blocks';
+import { getComputed, s, StaticImage, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { isResultSetDataSource } from '@cloudbeaver/plugin-data-viewer';
 
 import { ColumnDnDContext } from '../ColumnDnDContext.js';
@@ -31,6 +31,7 @@ export const TableColumnHeader = observer<Props>(function TableColumnHeader({ co
   const gridSelectionContext = useContext(DataGridSelectionContext);
   const columnDnDContext = useContext(ColumnDnDContext);
   const styles = useS(style);
+  const translate = useTranslate();
 
   const resultIndex = dataGridContext.resultIndex;
   const model = dataGridContext.model;
@@ -55,9 +56,14 @@ export const TableColumnHeader = observer<Props>(function TableColumnHeader({ co
     const source = model.source;
     return isResultSetDataSource(source) ? source.hasElementIdentifier(resultIndex) : false;
   });
+  const rowIdentifierInfo = getComputed(() => {
+    const source = model.source;
+    return isResultSetDataSource(source) ? source.getRowIdentifierInfo(resultIndex) : null;
+  });
 
   let icon: string | undefined;
   let columnName: string | undefined;
+  let columnRawName: string | undefined;
   let columnReadOnly = false;
   let columnTooltip: string | undefined;
   let columnDescription: string | undefined;
@@ -68,6 +74,7 @@ export const TableColumnHeader = observer<Props>(function TableColumnHeader({ co
 
     if (column) {
       columnName = column.label!;
+      columnRawName = column.name ?? undefined;
       columnDescription = column.description;
       icon = column.icon;
       columnReadOnly ||= tableDataContext.format.isReadOnly({ column: columnInfo.key });
@@ -83,6 +90,17 @@ export const TableColumnHeader = observer<Props>(function TableColumnHeader({ co
       }
     }
   }
+
+  const isKeyColumn = getComputed(() => {
+    const identifier = rowIdentifierInfo?.identifier;
+    if (!identifier || !columnRawName) {
+      return false;
+    }
+    return identifier.attributes.some(attr => attr.name === columnRawName);
+  });
+  const keyTooltip = isKeyColumn
+    ? translate(rowIdentifierInfo?.state === 'VIRTUAL_KEY' ? 'data_grid_table_virtual_key_tooltip' : 'data_grid_table_key_column_tooltip')
+    : undefined;
 
   function handleClick(event: React.MouseEvent<HTMLDivElement>) {
     gridSelectionContext.selectColumn(colIdx, event.ctrlKey || event.metaKey);
@@ -115,6 +133,7 @@ export const TableColumnHeader = observer<Props>(function TableColumnHeader({ co
                 )}
               </div>
             )}
+            {isKeyColumn && <StaticImage icon="/icons/key.svg" className={s(styles, { keyImage: true })} title={keyTooltip} />}
             <div className={s(styles, { name: true }, 'tw:truncate')}>{columnName}</div>
           </div>
           {tableDataContext.hasDescription && columnDescription && (

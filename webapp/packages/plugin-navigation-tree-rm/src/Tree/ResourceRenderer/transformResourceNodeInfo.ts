@@ -19,7 +19,7 @@ export function transformResourceNodeInfo(
   return function transformResourceNodeInfo(nodeId, info) {
     const node = navNodeInfoResource.get(nodeId);
     if (node && isRMResourceNode(node) && resourceTypeId) {
-      const project = projectsNavNodeService.getProject(node.id);
+      const project = projectsNavNodeService.getProject(node.uri);
 
       if (project) {
         return {

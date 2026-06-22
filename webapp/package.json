@@ -8,25 +8,14 @@
     "packages/*"
   ],
   "resolutions": {
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "react": "^19",
-    "react-dom": "^19",
-    "mobx": "^6",
-    "mobx-react-lite": "^4",
-    "glob": "^13",
-    "tar": ">=7.5.11",
-    "lodash": ">=4.17.23",
-    "@isaacs/brace-expansion": ">=5.0.1",
-    "axios": ">= 1.13.5",
-    "minimatch": ">=10.2.3",
-    "rollup": ">=4.59.0",
-    "koa": ">=2.16.4",
-    "immutable": ">=4.3.8",
-    "serialize-javascript": ">=7.0.3",
-    "flatted": ">=3.4.2",
-    "picomatch": ">=2.3.2",
-    "happy-dom": ">=20.8.8"
+    "lodash": ">4.17.23",
+    "immutable": ">3.8.3",
+    "glob": ">11.1.0",
+    "inflight": ">1.0.6",
+    "node-domexception": ">1.0.0",
+    "shell-quote": ">1.8.3",
+    "esbuild": ">=0.28.1",
+    "form-data": ">=4.0.6"
   },
   "scripts": {
     "test": "dbeaver-test",
@@ -66,5 +55,5 @@
     "typescript-plugin-css-modules": "^5",
     "vitest": "^4"
   },
-  "packageManager": "yarn@4.9.2"
+  "packageManager": "yarn@4.14.1"
 }

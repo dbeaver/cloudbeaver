@@ -5,7 +5,6 @@
     "./lib/module.js",
     "./lib/index.js",
     "src/**/*.css",
-    "src/**/*.scss",
     "public/**/*"
   ],
   "version": "0.1.0",
@@ -41,6 +40,7 @@
     "@cloudbeaver/plugin-sql-editor": "workspace:*",
     "@cloudbeaver/plugin-sql-editor-navigation-tab-script": "workspace:*",
     "@cloudbeaver/plugin-top-app-bar": "workspace:*",
+    "@dbeaver/ui-kit": "workspace:^",
     "mobx": "^6",
     "mobx-react-lite": "^4",
     "react": "^19",

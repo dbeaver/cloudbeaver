@@ -6,6 +6,22 @@
  * you may not use this file except in compliance with the License.
  */
 @layer components {
+  body[data-grid-dragging] {
+    user-select: none;
+    -webkit-user-select: none;
+
+    .ReactCodemirror,
+    [role='toolbar'] {
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    .data-grid__container {
+      user-select: text;
+      -webkit-user-select: text;
+    }
+  }
+
   .theme-dark {
     --theme-add-status: #65974c;
     --theme-delete-status: #b55d68;
@@ -31,8 +47,11 @@
     --data-grid-selected-row-color: var(--theme-secondary) !important;
     outline: 0;
     overflow: auto;
-    user-select: none;
-    -webkit-user-select: none;
+
+    & ::selection {
+      background: transparent;
+      color: inherit;
+    }
 
     & .rdg-cell-frozen {
       &:nth-last-child(1 of &) {
@@ -50,6 +69,12 @@
 
     & .rdg-cell-custom-deleted {
       background-color: var(--theme-delete-status) !important;
+    }
+
+    & .rdg-editor-container input::selection,
+    & .rdg-editor-container textarea::selection {
+      background-color: Highlight;
+      color: HighlightText;
     }
   }
 

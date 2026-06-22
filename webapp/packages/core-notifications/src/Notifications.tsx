@@ -22,7 +22,7 @@ export const Notifications = observer(function Notifications() {
 
   return (
     <Portal>
-      <div className={s(style, { notifications: true })} data-dialog-persistent-element>
+      <div className={s(style, { notifications: true })} data-dialog-persistent-element data-dialog-persistent-notification>
         {notificationService.visibleNotifications.map(notification => (
           <NotificationsItem key={notification.id} notification={notification} />
         ))}

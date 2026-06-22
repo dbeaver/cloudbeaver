@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package io.cloudbeaver.server.events;
 
 import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.model.session.BaseWebSession;
+import io.cloudbeaver.utils.WebEventUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
@@ -54,7 +55,7 @@ public class WSProjectUpdatedEventHandler extends WSAbstractProjectEventHandler<
 
     @Override
     protected boolean isAcceptableInSession(@NotNull BaseWebSession activeUserSession, @NotNull WSProjectUpdateEvent event) {
-        return !WSWebUtils.isSessionIdEquals(activeUserSession, event.getSessionId()) &&
+        return !WebEventUtils.isSmSessionIdEquals(activeUserSession, event.getSessionId()) &&
             (!event.getId().equals(WSProjectUpdateEvent.ADDED) ||
             activeUserSession.getUserContext().hasPermission(DBWConstants.PERMISSION_ADMIN));
     }

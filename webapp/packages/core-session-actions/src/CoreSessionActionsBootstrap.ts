@@ -31,7 +31,7 @@ export class CoreSessionActionsBootstrap extends Bootstrap {
   }
 
   private async handleOpenUrlEvent(event: WsOpenUrlEvent): Promise<void> {
-    const { url, timestamp } = event;
+    const { url, timestamp, actionId } = event;
 
     try {
       const { status } = await this.commonDialogService.open(ConfirmationDialog, {
@@ -52,7 +52,14 @@ export class CoreSessionActionsBootstrap extends Bootstrap {
           this.notificationService.logError({
             title: 'core_session_actions_popup_blocked',
           });
+
+          this.sessionActionsEventHandler.cancelAuth(actionId);
+          return;
         }
+      }
+
+      if (status === DialogueStateResult.Rejected) {
+        this.sessionActionsEventHandler.cancelAuth(actionId);
       }
     } catch (exception: any) {
       this.notificationService.logException(exception, 'core_session_actions_open_url_error');
