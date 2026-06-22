@@ -91,18 +91,6 @@ public class GraphQLTestConstant {
                    argumentCount
                  }
                 }
-                associations {
-                  associationName
-                  targetEntityName
-                  nodePath
-                  columnIndexList
-                }
-                references {
-                  associationName
-                  targetEntityName
-                  nodePath
-                  columnIndexList
-                }
                 rowsWithMetaData {
                   data
                   metaData
@@ -113,30 +101,30 @@ public class GraphQLTestConstant {
         }
         """;
 
-    public static final String GQL_ASYNC_SQL_NAVIGATE_FOREIGN_KEY = """
-        mutation asyncSqlNavigateForeignKey(
+    public static final String GQL_SQL_RESULT_ASSOCIATIONS = """
+        query sqlResultAssociations(
           $projectId: ID,
           $connectionId: ID!,
           $contextId: ID!,
           $resultsId: ID!,
-          $row: SQLResultRow!,
-          $columnIndex: Int!,
-          $associationName: String!,
-          $isReference: Boolean!,
-          $dataFormat: ResultDataFormat
+          $isReference: Boolean!
         ) {
-          result: asyncSqlNavigateForeignKey(
+          result: sqlResultAssociations(
             projectId: $projectId,
             connectionId: $connectionId,
             contextId: $contextId,
             resultsId: $resultsId,
-            row: $row,
-            columnIndex: $columnIndex,
-            associationName: $associationName,
-            isReference: $isReference,
-            dataFormat: $dataFormat
+            isReference: $isReference
           ) {
-            id
+            isReference
+            associationName
+            targetEntitySchemaName
+            targetEntityName
+            targetEntityNodePath
+            columnMapping {
+              sourceColumnIndex
+              targetColumnName
+            }
           }
         }
         """;
@@ -217,6 +205,7 @@ public class GraphQLTestConstant {
             $connectionId: ID!,
             $contextId: ID!,
             $containerNodePath: ID!,
+            $resultId: ID,
             $filter: SQLDataFilter
         ) {
             result: asyncReadDataFromContainer(
@@ -224,6 +213,7 @@ public class GraphQLTestConstant {
                 connectionId: $connectionId,
                 contextId: $contextId,
                 containerNodePath: $containerNodePath,
+                resultId: $resultId,
                 filter: $filter
             ) {
                 id

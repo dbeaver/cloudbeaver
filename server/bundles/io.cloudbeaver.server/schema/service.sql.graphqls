@@ -85,10 +85,12 @@ type SQLResultReference @since(version: "26.1.1") {
     isReference: Boolean!
     "Name of the association (foreign key)"
     associationName: String!
-    "Fully qualified name of the entity"
+    "Name of the schema the target entity belongs to"
+    targetEntitySchemaName: String
+    "Plain name of the target entity"
     targetEntityName: String
     "Navigator node URI of the target entity, suitable for opening it directly in the UI. Null if the entity is not present in the navigator tree"
-    nodePath: String
+    targetEntityNodePath: String
     "List of column mappings between the source result set and the target entity"
     columnMapping: [SQLReferenceColumnMapping!]!
 }

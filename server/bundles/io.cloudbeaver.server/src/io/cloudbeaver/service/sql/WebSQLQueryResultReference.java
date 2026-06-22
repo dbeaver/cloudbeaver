@@ -21,13 +21,13 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
-import org.jkiss.dbeaver.model.DBPEvaluationContext;
 import org.jkiss.dbeaver.model.DBUtils;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.navigator.DBNNode;
 import org.jkiss.dbeaver.model.struct.DBSEntity;
 import org.jkiss.dbeaver.model.struct.DBSEntityAssociation;
 import org.jkiss.dbeaver.model.struct.DBSEntityConstraint;
+import org.jkiss.dbeaver.model.struct.rdb.DBSSchema;
 
 import java.util.List;
 
@@ -68,18 +68,25 @@ public class WebSQLQueryResultReference {
 
     @Nullable
     @Property
-    public String getTargetEntityName() {
+    public String getTargetEntitySchemaName() {
         DBSEntity targetEntity = getTargetEntity();
         if (targetEntity == null) {
             return null;
         }
-        return DBUtils.getObjectFullName(targetEntity, DBPEvaluationContext.UI);
+        DBSSchema schema = DBUtils.getParentOfType(DBSSchema.class, targetEntity);
+        return schema == null ? null : schema.getName();
     }
-
 
     @Nullable
     @Property
-    public String getNodePath() {
+    public String getTargetEntityName() {
+        DBSEntity targetEntity = getTargetEntity();
+        return targetEntity == null ? null : targetEntity.getName();
+    }
+
+    @Nullable
+    @Property
+    public String getTargetEntityNodePath() {
         if (session == null) {
             return null;
         }
