@@ -3549,7 +3549,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
     public void finishConfiguration(
         @NotNull String adminName,
         @Nullable String adminPassword,
-        @NotNull List<AuthInfo> authInfoList
+        @NotNull List<SMAuthConfiguration> authInfoList
     ) throws DBException {
         database.finishConfiguration(adminName, adminPassword, authInfoList);
     }

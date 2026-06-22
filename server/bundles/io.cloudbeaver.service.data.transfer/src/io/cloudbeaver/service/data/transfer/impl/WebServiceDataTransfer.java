@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2025 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,14 @@
  */
 package io.cloudbeaver.service.data.transfer.impl;
 
+import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.WebAsyncTaskInfo;
 import io.cloudbeaver.model.session.WebAsyncTaskProcessor;
 import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.server.CBConstants;
 import io.cloudbeaver.server.CBPlatform;
+import io.cloudbeaver.server.WebAppUtils;
 import io.cloudbeaver.service.data.transfer.DBWServiceDataTransfer;
 import io.cloudbeaver.service.sql.WebSQLContextInfo;
 import io.cloudbeaver.service.sql.WebSQLProcessor;
@@ -73,8 +76,9 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
         }
     }
 
+    @NotNull
     @Override
-    public List<WebDataTransferStreamProcessor> getAvailableStreamProcessors(WebSession session) {
+    public List<WebDataTransferStreamProcessor> getAvailableStreamProcessors(@NotNull WebSession session) {
         List<DataTransferProcessorDescriptor> processors = DataTransferRegistry.getInstance()
                 .getAvailableProcessors(StreamTransferConsumer.class, DBSEntity.class);
         if (CommonUtils.isEmpty(processors)) {
@@ -84,8 +88,9 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
         return processors.stream().map(x -> new WebDataTransferStreamProcessor(session, x)).collect(Collectors.toList());
     }
 
+    @NotNull
     @Override
-    public List<WebDataTransferStreamProcessor> getAvailableImportStreamProcessors(WebSession session) {
+    public List<WebDataTransferStreamProcessor> getAvailableImportStreamProcessors(@NotNull WebSession session) {
         List<DataTransferProcessorDescriptor> processors =
                 DataTransferRegistry.getInstance().getAvailableProcessors(StreamTransferProducer.class, DBSEntity.class);
         if (CommonUtils.isEmpty(processors)) {
@@ -95,12 +100,16 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
         return processors.stream().map(x -> new WebDataTransferStreamProcessor(session, x)).collect(Collectors.toList());
     }
 
+    @NotNull
     @Override
     public WebAsyncTaskInfo dataTransferExportDataFromContainer(
-        WebSQLProcessor sqlProcessor,
-        String containerNodePath,
-        WebDataTransferParameters parameters) throws DBWebException {
-
+        @NotNull WebSQLProcessor sqlProcessor,
+        @NotNull String containerNodePath,
+        @NotNull WebDataTransferParameters parameters
+    ) throws DBWebException {
+        if (!validateExportPermission(sqlProcessor.getWebSession())) {
+            throw new DBWebException("Data export was disabled by administrator");
+        }
         DBSDataContainer dataContainer;
         try {
             dataContainer = sqlProcessor.getDataContainerByNodePath(sqlProcessor.getWebSession().getProgressMonitor(), containerNodePath, DBSDataContainer.class);
@@ -111,11 +120,23 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
         return asyncExportFromDataContainer(sqlProcessor, parameters, dataContainer, null);
     }
 
+    private boolean validateExportPermission(@NotNull WebSession webSession) {
+        if (!WebAppUtils.getWebApplication().isCommunity()) {
+            // global permission is already checked
+            return true;
+        }
+        Map<String, Object> productSettings = WebAppUtils.getWebApplication().getServerConfiguration().getProductSettings();
+        // we need to check in product settings
+        // product settings parameter saves only disabled state that's why we invert result
+        return webSession.hasPermission(DBWConstants.PERMISSION_ADMIN) ||
+            !CommonUtils.getOption(productSettings, CBConstants.PREF_DATA_EDITOR_EXPORT_DISABLED_OLD, false);
+    }
+
     @NotNull
     private String makeUniqueFileName(
-            WebSQLProcessor sqlProcessor,
-            DataTransferProcessorDescriptor processor,
-            Map<String, Object> processorProperties
+        @NotNull WebSQLProcessor sqlProcessor,
+        @NotNull DataTransferProcessorDescriptor processor,
+        @Nullable Map<String, Object> processorProperties
     ) {
         if (processorProperties != null && processorProperties.get(StreamConsumerSettings.PROP_FILE_EXTENSION) != null) {
             return sqlProcessor.getWebSession().getSessionId() + "_" + UUID.randomUUID() +
@@ -124,25 +145,31 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
         return sqlProcessor.getWebSession().getSessionId() + "_" + UUID.randomUUID() + "." + WebDataTransferUtils.getProcessorFileExtension(processor);
     }
 
+    @NotNull
     @Override
     public WebAsyncTaskInfo dataTransferExportDataFromResults(
-        WebSQLContextInfo sqlContext,
-        String resultsId,
-        WebDataTransferParameters parameters) throws DBWebException {
-
+        @NotNull WebSQLContextInfo sqlContext,
+        @NotNull String resultsId,
+        @NotNull WebDataTransferParameters parameters
+    ) throws DBWebException {
+        if (!validateExportPermission(sqlContext.getProcessor().getWebSession())) {
+            throw new DBWebException("Data export was disabled by administrator");
+        }
         WebSQLResultsInfo results = sqlContext.getResults(resultsId);
 
         return asyncExportFromDataContainer(sqlContext.getProcessor(), parameters, results.getDataContainer(), results);
     }
 
+    @NotNull
     @Override
     public WebDataTransferDefaultExportSettings defaultExportSettings() {
         return new WebDataTransferDefaultExportSettings();
     }
 
+    @NotNull
     @Override
     @Deprecated
-    public Boolean dataTransferRemoveDataFile(WebSession webSession, String dataFileId) throws DBWebException {
+    public Boolean dataTransferRemoveDataFile(@NotNull WebSession webSession, @NotNull String dataFileId) throws DBWebException {
         //deprecated
         return true;
     }
@@ -158,7 +185,9 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
         DBSDataContainer dataContainer = taskConfig.getDataContainer();
         WebSQLResultsInfo resultsInfo = taskConfig.getResultsInfo();
         DataTransferProcessorDescriptor processor = DataTransferRegistry.getInstance().getProcessor(parameters.getProcessorId());
-
+        if (processor == null) {
+            throw new DBException("Wrong data processor '" + parameters.getProcessorId() + "'");
+        }
         try {
             exportData(monitor, processor, dataContainer, parameters, resultsInfo, outputStream);
         } catch (Exception e) {
@@ -166,16 +195,20 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
         }
     }
 
+    @NotNull
     private WebAsyncTaskInfo asyncExportFromDataContainer(
         @NotNull WebSQLProcessor sqlProcessor,
         @NotNull WebDataTransferParameters parameters,
         @NotNull DBSDataContainer dataContainer,
         @Nullable WebSQLResultsInfo resultsInfo
-    ) {
+    ) throws DBWebException {
         sqlProcessor.getWebSession().addInfoMessage("Export data");
         log.info(String.format("Data export started: [userId=%s]", sqlProcessor.getWebSession().getUserId()));
 
         DataTransferProcessorDescriptor processor = DataTransferRegistry.getInstance().getProcessor(parameters.getProcessorId());
+        if (processor == null) {
+            throw new DBWebException("Wrong data processor '" + parameters.getProcessorId() + "'");
+        }
         String uniqueFileName = makeUniqueFileName(sqlProcessor, processor, parameters.getProcessorProperties());
         var outputSettings = parameters.getOutputSettings();
         String fileNameKey = WebDataTransferUtils.normalizeFileName(uniqueFileName, outputSettings);
@@ -199,18 +232,24 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
         );
     }
 
-    public WebAsyncTaskInfo asyncImportDataContainer(@NotNull String processorId,
-                                                     @NotNull Path path,
-                                                     @NotNull WebSQLResultsInfo sqlContext,
-                                                     @NotNull WebSession webSession) throws DBWebException {
+    @NotNull
+    public WebAsyncTaskInfo asyncImportDataContainer(
+        @NotNull String processorId,
+        @NotNull Path path,
+        @NotNull WebSQLResultsInfo sqlContext,
+        @NotNull WebSession webSession
+    ) throws DBWebException {
         webSession.addInfoMessage("Import data");
         DataTransferProcessorDescriptor processor = DataTransferRegistry.getInstance().getProcessor(processorId);
+        if (processor == null) {
+            throw new DBWebException("Wrong data processor '" + processorId + "'");
+        }
 
         log.info(String.format("Data import started: [userId=%s]", webSession.getUserId()));
         DBSDataContainer dataContainer = sqlContext.getDataContainer();
         WebAsyncTaskProcessor<String> runnable = new WebAsyncTaskProcessor<>() {
             @Override
-            public void run(DBRProgressMonitor monitor) throws InvocationTargetException {
+            public void run(@NotNull DBRProgressMonitor monitor) throws InvocationTargetException {
                 monitor.beginTask("Import data", 1);
                 try {
                     monitor.subTask("Import data using " + processor.getName());
@@ -238,13 +277,13 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
     }
 
     private void exportData(
-        DBRProgressMonitor monitor,
-        DataTransferProcessorDescriptor processor,
-        DBSDataContainer dataContainer,
-        WebDataTransferParameters parameters,
-        WebSQLResultsInfo resultsInfo,
-        OutputStream outputStream
-    ) throws DBException, IOException {
+        @NotNull DBRProgressMonitor monitor,
+        @NotNull DataTransferProcessorDescriptor processor,
+        @NotNull DBSDataContainer dataContainer,
+        @NotNull WebDataTransferParameters parameters,
+        @NotNull WebSQLResultsInfo resultsInfo,
+        @NotNull OutputStream outputStream
+    ) throws DBException {
         IDataTransferProcessor processorInstance = processor.getInstance();
         if (!(processorInstance instanceof IStreamDataExporter exporter)) {
             throw new DBException("Invalid processor. " + IStreamDataExporter.class.getSimpleName() + " expected");
@@ -300,10 +339,11 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
     }
 
     private void importData(
-            DBRProgressMonitor monitor,
-            DataTransferProcessorDescriptor processor,
-            @NotNull DBSDataManipulator dataContainer,
-            Path path) throws DBException {
+        @NotNull DBRProgressMonitor monitor,
+        @NotNull DataTransferProcessorDescriptor processor,
+        @NotNull DBSDataManipulator dataContainer,
+        @NotNull Path path
+    ) throws DBException {
         IDataTransferProcessor processorInstance = processor.getInstance();
 
         StreamTransferProducer producer;
@@ -323,10 +363,11 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
             }
             producerSettings.setProcessorProperties(properties);
             producerSettings.updateProducerSettingsFromStream(
-                    monitor,
-                    producer,
-                    processorInstance,
-                    properties);
+                monitor,
+                producer,
+                processorInstance,
+                properties
+            );
             DatabaseMappingContainer databaseMappingContainer =
                 new DatabaseMappingContainer(monitor, databaseConsumerSettings, producer.getDatabaseObject(), consumer.getTargetObject());
             databaseMappingContainer.getAttributeMappings(monitor);

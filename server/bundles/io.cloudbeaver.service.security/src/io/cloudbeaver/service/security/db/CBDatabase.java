@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2025 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
-import org.jkiss.dbeaver.model.auth.AuthInfo;
+import org.jkiss.dbeaver.model.auth.SMAuthConfiguration;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.model.impl.app.ApplicationRegistry;
 import org.jkiss.dbeaver.model.impl.jdbc.JDBCUtils;
@@ -250,7 +250,7 @@ public class CBDatabase extends InternalDB<WebDatabaseConfig> {
     public void finishConfiguration(
         @NotNull String adminName,
         @Nullable String adminPassword,
-        @NotNull List<AuthInfo> authInfoList
+        @NotNull List<SMAuthConfiguration> authInfoList
     ) throws DBException {
         if (!application.isConfigurationMode()) {
             throw new DBException("Database is already configured");
@@ -267,7 +267,7 @@ public class CBDatabase extends InternalDB<WebDatabaseConfig> {
         createAdminUser(adminName, adminPassword);
 
         // Associate all auth credentials with admin user
-        for (AuthInfo ai : authInfoList) {
+        for (SMAuthConfiguration ai : authInfoList) {
             if (!ai.getAuthProvider().equals(LocalAuthProviderConstants.PROVIDER_ID)) {
                 Map<String, Object> userCredentials = ai.getUserCredentials();
                 if (!CommonUtils.isEmpty(userCredentials)) {

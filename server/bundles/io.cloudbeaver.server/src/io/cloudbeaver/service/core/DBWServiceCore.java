@@ -108,6 +108,12 @@ public interface DBWServiceCore extends DBWService {
 
     ///////////////////////////////////////////
     // Connections
+    @NotNull
+    WebPropertyInfo[] getDriverProperties(
+        @NotNull WebSession webSession,
+        @NotNull String projectId,
+        @NotNull Map<String, Object> connectionConfig
+    ) throws DBWebException;
 
     @WebAction
     WebConnectionInfo getConnectionState(WebSession webSession, @Nullable String projectId, String connectionId) throws DBWebException;
