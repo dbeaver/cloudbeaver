@@ -63,4 +63,3 @@ export * from './useDBDriver.js';
 export * from './USER_NAME_PROPERTY_ID.js';
 export * from './parseConnectionKey.js';
 export * from './DBDriverExpertSettingsResource.js';
-export * from './CONNECTION_CONFIG_SCHEMA.js';

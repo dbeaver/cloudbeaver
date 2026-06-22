@@ -1,5 +1,5 @@
 {
-  "name": "@cloudbeaver/core-network-handlers",
+  "name": "@cloudbeaver/plugin-network-handlers",
   "type": "module",
   "sideEffects": [
     "./lib/module.js",

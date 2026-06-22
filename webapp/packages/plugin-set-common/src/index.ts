@@ -40,7 +40,7 @@ import coreSupport from '@cloudbeaver/core-support/module';
 import coreView from '@cloudbeaver/core-view/module';
 import coreServerNotifications from '@cloudbeaver/core-server-notifications/module';
 import coreSessionActions from '@cloudbeaver/core-session-actions/module';
-import coreNetworkHandlers from '@cloudbeaver/core-network-handlers/module';
+import pluginNetworkHandlers from '@cloudbeaver/plugin-network-handlers/module';
 
 import pluginConnectionNetworkHandlers from '@cloudbeaver/plugin-connection-network-handlers/module';
 import pluginAdministration from '@cloudbeaver/plugin-administration/module';
@@ -151,7 +151,6 @@ const core = [
   coreTaskManager,
   coreServerNotifications,
   coreSessionActions,
-  coreNetworkHandlers,
 ];
 
 export const commonSet = [
@@ -229,4 +228,5 @@ export const commonSet = [
   pluginConnectionPreferences,
   pluginProjectInfo,
   pluginConnectionNetworkHandlers,
+  pluginNetworkHandlers,
 ];

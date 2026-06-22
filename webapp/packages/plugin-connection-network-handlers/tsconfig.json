@@ -41,9 +41,6 @@
       "path": "../core-localization"
     },
     {
-      "path": "../core-network-handlers"
-    },
-    {
       "path": "../core-projects"
     },
     {
@@ -63,6 +60,9 @@
     },
     {
       "path": "../plugin-connections"
+    },
+    {
+      "path": "../plugin-network-handlers"
     }
   ],
   "include": [

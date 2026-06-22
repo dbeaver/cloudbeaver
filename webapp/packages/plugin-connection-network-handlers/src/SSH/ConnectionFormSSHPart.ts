@@ -18,7 +18,7 @@ import {
   SSH_TUNNEL_ID,
   validateSSHConfig,
   type INetworkHandlerConfig,
-} from '@cloudbeaver/core-network-handlers';
+} from '@cloudbeaver/plugin-network-handlers';
 import { toJS } from 'mobx';
 import type { ConnectionFormOptionsPart, IConnectionFormState } from '@cloudbeaver/plugin-connections';
 

@@ -9,7 +9,7 @@ import { createDataContext, DATA_CONTEXT_DI_PROVIDER } from '@cloudbeaver/core-d
 import type { IFormState } from '@cloudbeaver/core-ui';
 import { ConnectionFormSSLPart } from './ConnectionFormSSLPart.js';
 import { ConnectionInfoNetworkHandlersResource, DBDriverResource } from '@cloudbeaver/core-connections';
-import { NetworkHandlerResource } from '@cloudbeaver/core-network-handlers';
+import { NetworkHandlerResource } from '@cloudbeaver/plugin-network-handlers';
 import { getConnectionFormOptionsPart, type IConnectionFormState } from '@cloudbeaver/plugin-connections';
 
 const DATA_CONTEXT_CONNECTION_FORM_SSL_PART = createDataContext<ConnectionFormSSLPart>('Connection Form SSL Part');

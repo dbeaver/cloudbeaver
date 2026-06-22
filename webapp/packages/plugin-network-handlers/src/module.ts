@@ -11,7 +11,7 @@ import { NetworkHandlerResource } from './NetworkHandlerResource.js';
 import { LocaleService } from './LocaleService.js';
 
 export default ModuleRegistry.add({
-  name: '@cloudbeaver/core-network-handlers',
+  name: '@cloudbeaver/plugin-network-handlers',
 
   configure: serviceCollection => {
     serviceCollection

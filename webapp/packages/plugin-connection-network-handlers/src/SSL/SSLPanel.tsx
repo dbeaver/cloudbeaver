@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 
 import { useAutoLoad, useResource } from '@cloudbeaver/core-blocks';
 import { DBDriverResource } from '@cloudbeaver/core-connections';
-import { NetworkHandlerResource } from '@cloudbeaver/core-network-handlers';
+import { NetworkHandlerResource } from '@cloudbeaver/plugin-network-handlers';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import type { TabContainerTabComponent } from '@cloudbeaver/core-ui';
 

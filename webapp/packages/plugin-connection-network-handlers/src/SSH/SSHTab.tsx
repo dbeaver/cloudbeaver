@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 
 import { Translate, useResource } from '@cloudbeaver/core-blocks';
-import { NetworkHandlerResource, SSH_TUNNEL_ID } from '@cloudbeaver/core-network-handlers';
+import { NetworkHandlerResource, SSH_TUNNEL_ID } from '@cloudbeaver/plugin-network-handlers';
 import { Tab, type TabContainerTabComponent, TabTitle, useTab } from '@cloudbeaver/core-ui';
 import type { IConnectionFormProps } from '@cloudbeaver/plugin-connections';
 

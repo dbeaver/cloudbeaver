@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { CONNECTION_NETWORK_HANDLER_SCHEMA } from '@cloudbeaver/core-network-handlers';
+import { CONNECTION_NETWORK_HANDLER_SCHEMA } from '@cloudbeaver/plugin-network-handlers';
 import { DriverConfigurationType } from '@cloudbeaver/core-sdk';
 import { schema } from '@cloudbeaver/core-utils';
 

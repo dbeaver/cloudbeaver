@@ -8,7 +8,7 @@
 import React from 'react';
 
 import { DBDriverResource } from '@cloudbeaver/core-connections';
-import { NetworkHandlerResource } from '@cloudbeaver/core-network-handlers';
+import { NetworkHandlerResource } from '@cloudbeaver/plugin-network-handlers';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { getSSLDriverHandler } from './getSSLDriverHandler.js';
 import { ConnectionFormService, getConnectionFormOptionsPart } from '@cloudbeaver/plugin-connections';

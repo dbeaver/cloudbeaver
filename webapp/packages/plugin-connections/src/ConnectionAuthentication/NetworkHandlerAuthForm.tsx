@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 
 import { FieldCheckbox, GroupTitle, InputField, ObjectPropertyInfoForm, useResource, useTranslate } from '@cloudbeaver/core-blocks';
-import { NetworkHandlerResource, SSH_TUNNEL_ID, SSHKeyUploader } from '@cloudbeaver/core-network-handlers';
+import { NetworkHandlerResource, SSH_TUNNEL_ID, SSHKeyUploader } from '@cloudbeaver/plugin-network-handlers';
 import { useService } from '@cloudbeaver/core-di';
 import { ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { ServerConfigResource } from '@cloudbeaver/core-root';

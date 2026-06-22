@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 
 import { Translate, useResource } from '@cloudbeaver/core-blocks';
 import { DBDriverResource } from '@cloudbeaver/core-connections';
-import { NetworkHandlerResource } from '@cloudbeaver/core-network-handlers';
+import { NetworkHandlerResource } from '@cloudbeaver/plugin-network-handlers';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import { Tab, type TabContainerTabComponent, TabTitle, useTab } from '@cloudbeaver/core-ui';
 

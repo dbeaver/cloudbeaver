@@ -50,9 +50,6 @@
       "path": "../core-navigation-tree"
     },
     {
-      "path": "../core-network-handlers"
-    },
-    {
       "path": "../core-product"
     },
     {
@@ -228,6 +225,9 @@
     },
     {
       "path": "../plugin-navigation-tree-rm"
+    },
+    {
+      "path": "../plugin-network-handlers"
     },
     {
       "path": "../plugin-object-viewer"

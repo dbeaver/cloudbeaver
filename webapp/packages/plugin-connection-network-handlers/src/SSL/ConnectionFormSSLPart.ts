@@ -12,7 +12,7 @@ import { getObjectPropertyDefaultValue, type NetworkHandlerConfigInput } from '@
 import { isNotNullDefined } from '@dbeaver/js-helpers';
 import { getSSLDriverHandler } from './getSSLDriverHandler.js';
 import { ConnectionInfoNetworkHandlersResource, type DBDriverResource } from '@cloudbeaver/core-connections';
-import { type INetworkHandlerConfig, type NetworkHandlerResource } from '@cloudbeaver/core-network-handlers';
+import { type INetworkHandlerConfig, type NetworkHandlerResource } from '@cloudbeaver/plugin-network-handlers';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import { makeObservable, observable, toJS } from 'mobx';
 import { ConnectionFormOptionsPart, PROPERTY_FEATURE_SECURED, type IConnectionFormState } from '@cloudbeaver/plugin-connections';

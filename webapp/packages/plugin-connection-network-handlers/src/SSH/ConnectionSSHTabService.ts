@@ -13,7 +13,7 @@ import { DriverConfigurationType } from '@cloudbeaver/core-sdk';
 import { ConnectionFormService, getConnectionFormOptionsPart } from '@cloudbeaver/plugin-connections';
 import { getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
-import { SSH_TUNNEL_ID } from '@cloudbeaver/core-network-handlers';
+import { SSH_TUNNEL_ID } from '@cloudbeaver/plugin-network-handlers';
 
 const SSHTab = importLazyComponent(() => import('./SSHTab.js').then(m => m.SSHTab));
 const SSHPanel = importLazyComponent(() => import('./SSHPanel.js').then(m => m.SSHPanel));
