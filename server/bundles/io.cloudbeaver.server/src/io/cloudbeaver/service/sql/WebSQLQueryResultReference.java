@@ -27,6 +27,7 @@ import org.jkiss.dbeaver.model.navigator.DBNNode;
 import org.jkiss.dbeaver.model.struct.DBSEntity;
 import org.jkiss.dbeaver.model.struct.DBSEntityAssociation;
 import org.jkiss.dbeaver.model.struct.DBSEntityConstraint;
+import org.jkiss.dbeaver.model.struct.rdb.DBSCatalog;
 import org.jkiss.dbeaver.model.struct.rdb.DBSSchema;
 
 import java.util.List;
@@ -64,6 +65,17 @@ public class WebSQLQueryResultReference {
     @Property
     public String getAssociationName() {
         return association.getName();
+    }
+
+    @Nullable
+    @Property
+    public String getTargetEntityCatalogName() {
+        DBSEntity targetEntity = getTargetEntity();
+        if (targetEntity == null) {
+            return null;
+        }
+        DBSCatalog catalog = DBUtils.getParentOfType(DBSCatalog.class, targetEntity);
+        return catalog == null ? null : catalog.getName();
     }
 
     @Nullable

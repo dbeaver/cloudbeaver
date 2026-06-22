@@ -59,7 +59,7 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL>
                     getWebSession(env),
                     getSQLContext(env),
                     getArgumentVal(env, "resultsId"),
-                    CommonUtils.toBoolean(getArgument(env, "isReference"))
+                    getArgument(env, "isReference")
                 )
             )
             .dataFetcher("sqlListContexts", env ->

@@ -131,7 +131,7 @@ public interface DBWServiceSQL extends DBWService {
         @NotNull WebSession webSession,
         @NotNull WebSQLContextInfo contextInfo,
         @NotNull String resultsId,
-        boolean isReference
+        @Nullable Boolean isReference
     ) throws DBException;
 
     /**

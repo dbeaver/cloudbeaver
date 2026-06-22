@@ -85,6 +85,8 @@ type SQLResultReference @since(version: "26.1.1") {
     isReference: Boolean!
     "Name of the association (foreign key)"
     associationName: String!
+    "Name of the catalog the target entity belongs to"
+    targetEntityCatalogName: String
     "Name of the schema the target entity belongs to"
     targetEntitySchemaName: String
     "Plain name of the target entity"
@@ -335,13 +337,13 @@ type TransactionLogInfos {
 
 extend type Query {
 
-    "Foreign-key navigation metadata for the given result set. Set isReference to true to request reverse references instead of forward associations"
+    "Foreign-key navigation metadata for the given result set. Set isReference to true for reverse references, false for forward associations, or omit it to get both"
     sqlResultAssociations(
         projectId: ID,
         connectionId: ID!,
         contextId: ID!,
         resultsId: ID!,
-        isReference: Boolean!
+        isReference: Boolean
     ): [SQLResultReference!]! @since(version: "26.1.1")
 
     "Returns SQL dialect info for the specified connection"

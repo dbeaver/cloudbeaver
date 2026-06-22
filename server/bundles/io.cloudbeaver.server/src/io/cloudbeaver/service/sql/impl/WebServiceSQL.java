@@ -609,9 +609,16 @@ public class WebServiceSQL implements DBWServiceSQL {
         @NotNull WebSession webSession,
         @NotNull WebSQLContextInfo contextInfo,
         @NotNull String resultsId,
-        boolean isReference
+        @Nullable Boolean isReference
     ) throws DBException {
         DBDAttributeBinding[] attributes = contextInfo.getResults(resultsId).getAttributes();
+        if (isReference == null) {
+            // Both forward associations and reverse references
+            List<WebSQLQueryResultReference> associations =
+                new ArrayList<>(WebSQLUtils.collectAssociations(webSession, attributes));
+            associations.addAll(WebSQLUtils.collectReferences(webSession, attributes));
+            return associations;
+        }
         return isReference
             ? WebSQLUtils.collectReferences(webSession, attributes)
             : WebSQLUtils.collectAssociations(webSession, attributes);
