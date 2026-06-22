@@ -310,14 +310,20 @@ public class WebServiceCore implements DBWServiceCore {
 
         DataSourceDescriptor dataSource = (DataSourceDescriptor) WebDataSourceUtils.getLocalOrGlobalDataSource(
             webSession, projectId, configInput.getConnectionId());
-        DataSourceDescriptor testDataSource = getDataSourceDescriptor(webSession, dataSource, configInput, project);
-        DBPConnectionConfiguration connectionConfiguration = new DBPConnectionConfiguration(testDataSource.getConnectionConfiguration());
-        return WebServiceUtils.getDriverProperties(
-            webSession,
-            testDataSource.getDriver(),
-            testDataSource,
-            connectionConfiguration
-        );
+        try {
+            DataSourceDescriptor testDataSource = getDataSourceDescriptor(webSession, dataSource, configInput, project);
+            DBPConnectionConfiguration connectionConfiguration
+                = new DBPConnectionConfiguration(testDataSource.getConnectionConfiguration());
+            return WebServiceUtils.getDriverProperties(
+                webSession,
+                testDataSource.getDriver(),
+                testDataSource,
+                connectionConfiguration
+            );
+        } catch (DBWebException e) {
+            log.error("Error getting driver properties", e);
+            return new WebPropertyInfo[0];
+        }
 
     }
 
