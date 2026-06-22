@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package io.cloudbeaver.service.sql;
 
 import io.cloudbeaver.server.WebAppUtils;
+import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
@@ -35,9 +36,10 @@ public class WebSQLDataLOBReceiver extends WebSQLCellValueReceiver {
     private static final Log log = Log.getLog(WebSQLDataLOBReceiver.class);
     public static final Path DATA_EXPORT_FOLDER = WebAppUtils.getWebPlatform().getTempFolder(new VoidProgressMonitor(), "sql-lob" +
         "-files");
+    @NotNull
     private final String tableName;
 
-    WebSQLDataLOBReceiver(String tableName, DBSDataContainer dataContainer, int rowIndex) {
+    WebSQLDataLOBReceiver(@NotNull String tableName, @NotNull DBSDataContainer dataContainer, int rowIndex) {
         super(dataContainer, rowIndex);
         this.tableName = tableName;
         if (!Files.exists(DATA_EXPORT_FOLDER)) {
@@ -50,7 +52,8 @@ public class WebSQLDataLOBReceiver extends WebSQLCellValueReceiver {
 
     }
 
-    public String createLobFile(DBRProgressMonitor monitor) throws DBCException, IOException {
+    @NotNull
+    public String createLobFile(@NotNull DBRProgressMonitor monitor) throws DBCException, IOException {
         String exportFileName = CommonUtils.truncateString(tableName, 32);
         StringBuilder fileName = new StringBuilder(exportFileName);
         fileName.append("_")

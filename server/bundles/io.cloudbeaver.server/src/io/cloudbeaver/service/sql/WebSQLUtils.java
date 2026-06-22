@@ -28,6 +28,7 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.DBPDataKind;
 import org.jkiss.dbeaver.model.DBPEvaluationContext;
 import org.jkiss.dbeaver.model.DBUtils;
 import org.jkiss.dbeaver.model.data.*;
@@ -479,5 +480,74 @@ public class WebSQLUtils {
                 sourceIdx, sourceAttr.getName(), targetIdx, targetAttr.getName()));
         }
         return mapping;
+    }
+
+    @Nullable
+    public static Object convertInputCellValue(
+        @NotNull DBCSession session,
+        @NotNull DBDAttributeBinding updateAttribute,
+        @NotNull Object cellRawValue,
+        boolean justGenerateScript
+    ) throws DBCException {
+        cellRawValue = makePlainCellValue(session, updateAttribute, cellRawValue);
+        Object realCellValue = cellRawValue;
+        // In some cases we already have final value here
+        if (!(realCellValue instanceof DBDValue)) {
+            try {
+                realCellValue = updateAttribute.getValueHandler().getValueFromObject(
+                    session,
+                    updateAttribute,
+                    cellRawValue,
+                    false,
+                    true
+                );
+                //FIXME: fix array editing for nosql databases
+                if (realCellValue == null && cellRawValue != null && updateAttribute.getDataKind() == DBPDataKind.ARRAY) {
+                    throw new DBCException("Array update is not supported");
+                }
+            } catch (DBCException e) {
+                //checks if this function is used only for script generation
+                if (justGenerateScript) {
+                    return null;
+                } else {
+                    throw e;
+                }
+            }
+        }
+        return realCellValue;
+    }
+
+    @NotNull
+    public static DBDDocument makeDocumentInputValue(
+        @NotNull DBCSession session,
+        @NotNull DBSDocumentLocator dataContainer,
+        @NotNull WebSQLResultsInfo resultsInfo,
+        @NotNull WebSQLResultsRow row,
+        @Nullable Map<String, Object> metaData
+    ) throws DBException {
+        // Document reference
+        DBDDocument document = null;
+        Map<String, Object> keyMap = new LinkedHashMap<>();
+        DBDAttributeBinding[] attributes = resultsInfo.getAttributes();
+        for (int j = 0; j < attributes.length; j++) {
+            DBDAttributeBinding attr = attributes[j];
+            Object plainValue = makePlainCellValue(session, attr, row.getData()[j]);
+            if (plainValue instanceof DBDDocument dbdDocument) {
+                // FIXME: Hack for DynamoDB. We pass entire document as a key
+                // FIXME: Let's just return it back for now
+                if (dataContainer.isDocumentValid(dbdDocument)) {
+                    document = dbdDocument;
+                    break;
+                }
+            }
+            keyMap.put(attr.getName(), plainValue);
+        }
+        if (document == null) {
+            document = dataContainer.findDocument(session, keyMap, metaData);
+            if (document == null) {
+                throw new DBCException("Error finding document by key " + keyMap);
+            }
+        }
+        return document;
     }
 }

@@ -576,6 +576,7 @@ public class WebServiceSQL implements DBWServiceSQL {
         }
     }
 
+    @NotNull
     @Override
     public String updateResultsDataBatchScript(@NotNull WebSQLContextInfo contextInfo, @NotNull String resultsId, @Nullable List<WebSQLResultsRow> updatedRows, @Nullable List<WebSQLResultsRow> deletedRows, @Nullable List<WebSQLResultsRow> addedRows, WebDataFormat dataFormat) throws DBWebException {
         checkDataEditPermission(contextInfo);
