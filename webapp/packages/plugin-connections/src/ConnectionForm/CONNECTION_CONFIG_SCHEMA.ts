@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { CONNECTION_NETWORK_HANDLER_SCHEMA } from '@cloudbeaver/plugin-network-handlers';
+import { NETWORK_HANDLER_SCHEMA } from '@cloudbeaver/plugin-network-handlers';
 import { DriverConfigurationType } from '@cloudbeaver/core-sdk';
 import { schema } from '@cloudbeaver/core-utils';
 
@@ -26,7 +26,7 @@ export const CONNECTION_CONFIG_SCHEMA = schema.object({
   mainPropertyValues: schema.record(schema.string(), schema.any()).optional(),
   expertSettingsValues: schema.record(schema.string(), schema.any()).optional(),
   name: schema.string().optional(),
-  networkHandlersConfig: schema.array(CONNECTION_NETWORK_HANDLER_SCHEMA).optional(),
+  networkHandlersConfig: schema.array(NETWORK_HANDLER_SCHEMA).optional(),
   port: schema.string().optional(),
   properties: CONNECTION_PROPERTIES_SCHEMA.optional(),
   providerProperties: schema.record(schema.string(), schema.any()).optional(),

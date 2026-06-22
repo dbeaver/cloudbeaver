@@ -5,9 +5,9 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { CONNECTION_NETWORK_HANDLER_SCHEMA } from '@cloudbeaver/plugin-network-handlers';
+import { NETWORK_HANDLER_SCHEMA } from '@cloudbeaver/plugin-network-handlers';
 import { schema } from '@cloudbeaver/core-utils';
 
-export const CONNECTION_FORM_SSH_SCHEMA = schema.object({}).extend(CONNECTION_NETWORK_HANDLER_SCHEMA.shape);
+export const CONNECTION_FORM_SSH_SCHEMA = schema.object({}).extend(NETWORK_HANDLER_SCHEMA.shape);
 
 export type IConnectionFromSSHState = schema.infer<typeof CONNECTION_FORM_SSH_SCHEMA>;

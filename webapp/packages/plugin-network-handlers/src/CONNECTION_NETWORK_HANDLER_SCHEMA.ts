@@ -9,7 +9,7 @@
 import { NetworkHandlerAuthType } from '@cloudbeaver/core-sdk';
 import { schema } from '@cloudbeaver/core-utils';
 
-export const CONNECTION_NETWORK_HANDLER_SCHEMA = schema.object({
+export const NETWORK_HANDLER_SCHEMA = schema.object({
   id: schema.string(),
   authType: schema.nativeEnum(NetworkHandlerAuthType).optional(),
   enabled: schema.boolean().optional(),
@@ -21,4 +21,4 @@ export const CONNECTION_NETWORK_HANDLER_SCHEMA = schema.object({
   userName: schema.string().optional(),
 });
 
-export type INetworkHandlerConfig = schema.infer<typeof CONNECTION_NETWORK_HANDLER_SCHEMA>;
+export type INetworkHandlerConfig = schema.infer<typeof NETWORK_HANDLER_SCHEMA>;
