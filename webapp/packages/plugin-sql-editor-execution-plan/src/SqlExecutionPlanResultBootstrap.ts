@@ -20,13 +20,13 @@ export class SqlExecutionPlanResultBootstrap extends Bootstrap {
     private readonly sqlExecutionPlanService: SqlExecutionPlanService,
   ) {
     super();
-  }
-
-  override register(): void {
-    this.sqlResultTabsService.resultPanels.add(SqlExecutionPlanPanel, 0, ({ tabId }) => !this.sqlExecutionPlanService.has(tabId));
 
     this.sqlResultTabsService.onResultTabClose.addHandler(({ state, tabId }) => {
       this.sqlExecutionPlanService.removeExecutionPlanTab(state, tabId);
     });
+  }
+
+  override register(): void {
+    this.sqlResultTabsService.resultPanels.add(SqlExecutionPlanPanel, 0, ({ tabId }) => !this.sqlExecutionPlanService.has(tabId));
   }
 }
