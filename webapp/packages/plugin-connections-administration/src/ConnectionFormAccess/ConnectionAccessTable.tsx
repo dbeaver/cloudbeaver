@@ -102,8 +102,10 @@ export const ConnectionAccessTable: TabContainerPanelComponent<IConnectionFormPr
     }
 
     if (colKey === LAST_LOGIN_COLUMN.key && !isTeam) {
-      const lastLogin = item.lastLoginTime ? new Date(item.lastLoginTime).toLocaleString() : '-';
-      return <span title={lastLogin}>{lastLogin}</span>;
+      const lastLoginFullTime = item.lastLoginTime ? new Date(item.lastLoginTime).toLocaleString() : '-';
+      const lastLoginDate = item.lastLoginTime ? new Date(item.lastLoginTime).toLocaleDateString() : '-';
+
+      return <span title={lastLoginFullTime}>{lastLoginDate}</span>;
     }
 
     return null;

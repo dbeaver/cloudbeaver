@@ -133,8 +133,9 @@ export const UsersTable = observer<Props>(function UsersTable({ users, isManagea
     }
 
     if (column.key === LAST_LOGIN_COLUMN.key) {
-      const lastLogin = row.lastLoginTime ? new Date(row.lastLoginTime).toLocaleString() : '-';
-      return <span title={lastLogin}>{lastLogin}</span>;
+      const lastLoginFullTime = row.lastLoginTime ? new Date(row.lastLoginTime).toLocaleString() : '-';
+      const lastLoginDate = row.lastLoginTime ? new Date(row.lastLoginTime).toLocaleDateString() : '-';
+      return <span title={lastLoginFullTime}>{lastLoginDate}</span>;
     }
 
     return null;
