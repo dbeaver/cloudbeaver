@@ -5,6 +5,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: var(--dbv-kit-select-label-padding-inline);
     position: relative;
     cursor: pointer;
     text-align: left;
@@ -35,6 +36,14 @@
       outline-style: solid;
       outline-offset: var(--dbv-kit-control-outline-offset);
     }
+  }
+
+  .dbv-kit-select__value {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .dbv-kit-select__label {
