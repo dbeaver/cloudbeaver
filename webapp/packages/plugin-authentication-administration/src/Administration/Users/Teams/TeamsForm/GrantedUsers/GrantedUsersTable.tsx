@@ -26,12 +26,13 @@ import type { TeamFormProps } from '../TeamsAdministrationFormService.js';
 import type { GrantedUsersFormPart } from './GrantedUsersFormPart.js';
 
 const USER_ID_COLUMN: IGrantManagementTableColumn = { key: 'userId', label: 'administration_teams_team_granted_users_user_id' };
+const LAST_LOGIN_COLUMN: IGrantManagementTableColumn = { key: 'lastLogin', label: 'plugin_authentication_administration_user_last_login' };
 const TEAM_ROLE_COLUMN: IGrantManagementTableColumn = {
   key: 'teamRole',
   label: 'plugin_authentication_administration_team_user_team_role_supervisor',
 };
 
-const COLUMNS: IGrantManagementTableColumn[] = [USER_ID_COLUMN];
+const COLUMNS: IGrantManagementTableColumn[] = [USER_ID_COLUMN, LAST_LOGIN_COLUMN];
 
 export const GrantedUsersTable: TabContainerPanelComponent<TeamFormProps> = observer(function GrantedUsersTable({ tabId, formState }) {
   const translate = useTranslate();
@@ -104,6 +105,11 @@ export const GrantedUsersTable: TabContainerPanelComponent<TeamFormProps> = obse
           <span className="tw:truncate">{name}</span>
         </div>
       );
+    }
+
+    if (colKey === LAST_LOGIN_COLUMN.key) {
+      const lastLogin = user.lastLoginTime ? new Date(user.lastLoginTime).toLocaleString() : '-';
+      return <span title={lastLogin}>{lastLogin}</span>;
     }
 
     if (colKey === TEAM_ROLE_COLUMN.key) {
