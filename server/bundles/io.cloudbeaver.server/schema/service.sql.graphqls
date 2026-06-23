@@ -76,6 +76,8 @@ input SQLDataFilter {
 type SQLReferenceColumnMapping @since(version: "26.1.1") {
     "Position in the result-set bindings"
     sourceColumnIndex: Int!
+    "Column name in the source result set"
+    sourceColumnName: String!
     "Column name in the target entity"
     targetColumnName: String!
 }
@@ -86,13 +88,13 @@ type SQLResultReference @since(version: "26.1.1") {
     "Name of the association (foreign key)"
     associationName: String!
     "Name of the catalog the target entity belongs to"
-    targetEntityCatalogName: String
+    targetCatalogName: String
     "Name of the schema the target entity belongs to"
-    targetEntitySchemaName: String
+    targetSchemaName: String
     "Plain name of the target entity"
     targetEntityName: String
     "Navigator node URI of the target entity, suitable for opening it directly in the UI. Null if the entity is not present in the navigator tree"
-    targetEntityNodePath: String
+    targetNodePath: String
     "List of column mappings between the source result set and the target entity"
     columnMapping: [SQLReferenceColumnMapping!]!
 }

@@ -118,11 +118,13 @@ public class GraphQLTestConstant {
           ) {
             isReference
             associationName
-            targetEntitySchemaName
+            targetCatalogName
+            targetSchemaName
             targetEntityName
-            targetEntityNodePath
+            targetNodePath
             columnMapping {
               sourceColumnIndex
+              sourceColumnName
               targetColumnName
             }
           }

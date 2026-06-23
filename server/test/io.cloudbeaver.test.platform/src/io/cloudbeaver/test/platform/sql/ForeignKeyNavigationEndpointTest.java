@@ -79,8 +79,8 @@ public class ForeignKeyNavigationEndpointTest extends CloudbeaverDBTest {
         Assertions.assertNotNull(forwardRef, "Forward FK is missing on FK_NAV_ORDER result set");
         Assertions.assertEquals("FK_NAV_ORDER_CUSTOMER", JSONUtils.getString(forwardRef, "associationName"));
         Assertions.assertEquals("FK_NAV_CUSTOMER", JSONUtils.getString(forwardRef, "targetEntityName"));
-        Assertions.assertEquals("PUBLIC", JSONUtils.getString(forwardRef, "targetEntitySchemaName"));
-        Assertions.assertNotNull(JSONUtils.getString(forwardRef, "targetEntityNodePath"));
+        Assertions.assertEquals("PUBLIC", JSONUtils.getString(forwardRef, "targetSchemaName"));
+        Assertions.assertNotNull(JSONUtils.getString(forwardRef, "targetNodePath"));
 
         List<Map<String, Object>> orderRows = JSONUtils.getObjectList(orderResultSet, "rowsWithMetaData");
         Assertions.assertEquals(2, orderRows.size());
@@ -118,7 +118,7 @@ public class ForeignKeyNavigationEndpointTest extends CloudbeaverDBTest {
         Map<String, Object> reverseRef = references.getFirst();
         Assertions.assertEquals("FK_NAV_ORDER_CUSTOMER", JSONUtils.getString(reverseRef, "associationName"));
         Assertions.assertEquals("FK_NAV_ORDER", JSONUtils.getString(reverseRef, "targetEntityName"));
-        Assertions.assertEquals("PUBLIC", JSONUtils.getString(reverseRef, "targetEntitySchemaName"));
+        Assertions.assertEquals("PUBLIC", JSONUtils.getString(reverseRef, "targetSchemaName"));
 
         List<Map<String, Object>> mapping = JSONUtils.getObjectList(reverseRef, "columnMapping");
         Assertions.assertEquals(1, mapping.size());
@@ -192,7 +192,7 @@ public class ForeignKeyNavigationEndpointTest extends CloudbeaverDBTest {
         Map<String, Object> reference,
         Map<String, Object> sourceRow
     ) throws Exception {
-        String containerNodePath = JSONUtils.getString(reference, "targetEntityNodePath");
+        String containerNodePath = JSONUtils.getString(reference, "targetNodePath");
 
         String openTaskId = clientWrapper.asyncReadDataFromContainer(
             globalProject, sqlProcessorContext, databaseContainer.getId(), containerNodePath, Map.of());

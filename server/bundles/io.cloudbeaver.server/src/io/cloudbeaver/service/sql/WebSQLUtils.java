@@ -418,7 +418,8 @@ public class WebSQLUtils {
         }
         List<WebSQLReferenceColumnMapping> mapping = new ArrayList<>(sourceAttrs.size());
         for (int i = 0; i < sourceAttrs.size(); i++) {
-            Integer sourceIdx = attrToIndex.get(sourceAttrs.get(i).getAttribute());
+            DBSEntityAttribute sourceAttr = sourceAttrs.get(i).getAttribute();
+            Integer sourceIdx = sourceAttr == null ? null : attrToIndex.get(sourceAttr);
             if (sourceIdx == null) {
                 return null;
             }
@@ -426,7 +427,7 @@ public class WebSQLUtils {
             if (targetAttr == null) {
                 return null;
             }
-            mapping.add(new WebSQLReferenceColumnMapping(sourceIdx, targetAttr.getName()));
+            mapping.add(new WebSQLReferenceColumnMapping(sourceIdx, sourceAttr.getName(), targetAttr.getName()));
         }
         return mapping;
     }

@@ -69,7 +69,7 @@ public class WebSQLQueryResultReference {
 
     @Nullable
     @Property
-    public String getTargetEntityCatalogName() {
+    public String getTargetCatalogName() {
         DBSEntity targetEntity = getTargetEntity();
         if (targetEntity == null) {
             return null;
@@ -80,7 +80,7 @@ public class WebSQLQueryResultReference {
 
     @Nullable
     @Property
-    public String getTargetEntitySchemaName() {
+    public String getTargetSchemaName() {
         DBSEntity targetEntity = getTargetEntity();
         if (targetEntity == null) {
             return null;
@@ -98,7 +98,7 @@ public class WebSQLQueryResultReference {
 
     @Nullable
     @Property
-    public String getTargetEntityNodePath() {
+    public String getTargetNodePath() {
         if (session == null) {
             return null;
         }
