@@ -52,12 +52,12 @@ export const SSHForm = observer<ISSHFormProps>(function SSHForm({ state, initial
   const keyAuth = state.authType === NetworkHandlerAuthType.PublicKey;
   const serverConfigResource = useResource(SSHForm, ServerConfigResource, undefined);
 
-  const passwordLabel = keyAuth ? 'Passphrase' : translate('core_network_handlers_ssh_tunnel_password');
+  const passwordLabel = keyAuth ? 'Passphrase' : translate('plugin_network_handlers_ssh_tunnel_password');
   const passwordSaved = initialState?.password === '' && initialState?.authType === state.authType;
   const keySaved = initialState?.key === '';
 
-  const aliveIntervalLabel = translate('core_network_handlers_ssh_tunnel_advanced_settings_alive_interval');
-  const connectTimeoutLabel = translate('core_network_handlers_ssh_tunnel_advanced_settings_connect_timeout');
+  const aliveIntervalLabel = translate('plugin_network_handlers_ssh_tunnel_advanced_settings_alive_interval');
+  const connectTimeoutLabel = translate('plugin_network_handlers_ssh_tunnel_advanced_settings_connect_timeout');
   const { credentialsSavingEnabled } = useAdministrationSettings();
   const projectInfoResource = useService(ProjectInfoResource);
   const isSharedProject = projectInfoResource.isProjectShared(projectId);
@@ -70,7 +70,7 @@ export const SSHForm = observer<ISSHFormProps>(function SSHForm({ state, initial
   return (
     <>
       <Switch id="ssh-enable-switch" name="enabled" state={state} mod={['primary']} disabled={disabled || readonly}>
-        {translate('core_network_handlers_ssh_tunnel_enable')}
+        {translate('plugin_network_handlers_ssh_tunnel_enable')}
       </Switch>
       <Select
         name="authType"
@@ -82,14 +82,14 @@ export const SSHForm = observer<ISSHFormProps>(function SSHForm({ state, initial
         tiny
         onSelect={handleAuthTypeChange}
       >
-        {translate('core_network_handlers_ssh_tunnel_auth_type')}
+        {translate('plugin_network_handlers_ssh_tunnel_auth_type')}
       </Select>
       <Container wrap gap>
         <InputField type="text" name="host" state={state.properties} autoComplete="on" readOnly={disabledInternal} required small>
-          {translate('core_network_handlers_ssh_tunnel_host')}
+          {translate('plugin_network_handlers_ssh_tunnel_host')}
         </InputField>
         <InputField type="number" name="port" state={state.properties} autoComplete="on" readOnly={disabledInternal} required tiny>
-          {translate('core_network_handlers_ssh_tunnel_port')}
+          {translate('plugin_network_handlers_ssh_tunnel_port')}
         </InputField>
       </Container>
       <Container wrap gap>
@@ -103,7 +103,7 @@ export const SSHForm = observer<ISSHFormProps>(function SSHForm({ state, initial
           tiny
           fill
         >
-          {translate('core_network_handlers_ssh_tunnel_user')}
+          {translate('plugin_network_handlers_ssh_tunnel_user')}
         </InputField>
         <InputField
           type="password"
@@ -125,8 +125,8 @@ export const SSHForm = observer<ISSHFormProps>(function SSHForm({ state, initial
           id={SSH_TUNNEL_ID + '_savePassword'}
           title={translate(
             !isSharedProject || serverConfigResource.data?.distributed
-              ? 'core_network_handlers_save_credentials_for_user_tooltip'
-              : 'core_network_handlers_save_credentials_shared_tooltip',
+              ? 'plugin_network_handlers_save_credentials_for_user_tooltip'
+              : 'plugin_network_handlers_save_credentials_shared_tooltip',
           )}
           name="savePassword"
           state={state}
@@ -134,13 +134,13 @@ export const SSHForm = observer<ISSHFormProps>(function SSHForm({ state, initial
         >
           {translate(
             !isSharedProject || serverConfigResource.data?.distributed
-              ? 'core_network_handlers_save_credentials_for_user'
-              : 'core_network_handlers_save_credentials_shared',
+              ? 'plugin_network_handlers_save_credentials_for_user'
+              : 'plugin_network_handlers_save_credentials_shared',
           )}
         </FieldCheckbox>
       )}
       <Container gap>
-        <Expandable label={translate('core_network_handlers_ssh_tunnel_advanced_settings')}>
+        <Expandable label={translate('plugin_network_handlers_ssh_tunnel_advanced_settings')}>
           <Container gap>
             <InputField
               type="number"
