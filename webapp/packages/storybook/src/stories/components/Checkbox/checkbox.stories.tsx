@@ -161,3 +161,13 @@ export const Controlled = () => {
     </div>
   );
 };
+
+export const Multiline = () => (
+  <div>
+    <h2 className="tw:text-lg tw:my-2">Multiline checkbox</h2>
+    <p>Checkbox indicator should be aligned with the first line of text.</p>
+    <div className="tw:w-64">
+      <Checkbox>Checkbox indicator should be aligned with the first line of text.</Checkbox>
+    </div>
+  </div>
+);

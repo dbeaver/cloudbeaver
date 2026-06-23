@@ -228,11 +228,11 @@ public abstract class CBApplication<T extends CBServerConfig>
         Location instanceLoc = Platform.getInstanceLocation();
         try {
             if (!instanceLoc.isSet()) { // always false?
-                URL wsLocationURL = getWorkspaceDirectory().toUri().toURL();
+                URL wsLocationURL = getWorkspacePath().toUri().toURL();
                 instanceLoc.set(wsLocationURL, true);
             }
         } catch (Exception e) {
-            log.error("Error setting workspace location to " + getWorkspaceDirectory().toAbsolutePath(), e);
+            log.error("Error setting workspace location to " + getWorkspacePath().toAbsolutePath(), e);
             return;
         }
         this.systemInformationCollector = createSystemInformationCollector();
@@ -443,7 +443,7 @@ public abstract class CBApplication<T extends CBServerConfig>
 
     @NotNull
     public Path getDataDirectory(boolean create) {
-        Path dataDir = getWorkspaceDirectory().resolve(CBConstants.RUNTIME_DATA_DIR_NAME);
+        Path dataDir = getWorkspacePath().resolve(CBConstants.RUNTIME_DATA_DIR_NAME);
         if (create && !Files.exists(dataDir)) {
             try {
                 Files.createDirectories(dataDir);
