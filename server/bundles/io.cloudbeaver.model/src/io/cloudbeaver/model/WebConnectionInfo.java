@@ -39,7 +39,8 @@ import org.jkiss.dbeaver.model.connection.DBPDriverConfigurationType;
 import org.jkiss.dbeaver.model.impl.auth.AuthModelDatabaseNative;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
-import org.jkiss.dbeaver.model.navigator.DBNDataSource;
+import org.jkiss.dbeaver.model.navigator.DBNDatabaseNode;
+import org.jkiss.dbeaver.model.navigator.DBNUtils;
 import org.jkiss.dbeaver.model.preferences.DBPPreferenceStore;
 import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
 import org.jkiss.dbeaver.model.preferences.DBPPropertySource;
@@ -213,7 +214,8 @@ public class WebConnectionInfo {
 
     @Property
     public String getNodePath() {
-        return DBNDataSource.makeDataSourceItemPath(dataSourceContainer);
+        DBNDatabaseNode dsNode = DBNUtils.getNodeByObject(dataSourceContainer);
+        return dsNode == null ? null : dsNode.getNodeUri();
     }
 
     @Property

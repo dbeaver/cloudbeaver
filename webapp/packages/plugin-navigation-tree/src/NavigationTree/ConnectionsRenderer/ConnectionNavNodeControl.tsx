@@ -44,7 +44,7 @@ export const ConnectionNavNodeControl: NavTreeControlComponent = observer<NavTre
     const hoverHook = useHover();
     const mergedRef = useMergeRefs(hoverHook.ref, ref);
 
-    const error = getComputed(() => !!navNodeInfoResource.getException(node.id) || !!navTreeResource.getException(node.id));
+    const error = getComputed(() => !!navNodeInfoResource.getException(node.uri) || !!navTreeResource.getException(node.uri));
     const connected = getComputed(() => node.objectFeatures.includes(EObjectFeature.dataSourceConnected));
 
     let icon = nodeInfo.icon;
@@ -81,7 +81,7 @@ export const ConnectionNavNodeControl: NavTreeControlComponent = observer<NavTre
         onClick={onClick}
         onContextMenu={handleContextMenuOpen}
       >
-        <NavigationNodeExpand nodeId={node.id} />
+        <NavigationNodeExpand nodeId={node.uri} />
         <TreeNodeIcon>
           <ConnectionImageWithMask icon={icon} connected={connected} maskId="tree-node-icon" />
         </TreeNodeIcon>

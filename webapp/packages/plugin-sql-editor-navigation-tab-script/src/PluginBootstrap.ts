@@ -326,11 +326,11 @@ export class PluginBootstrap extends Bootstrap {
       return false;
     }
 
-    if (!node || node.nodeType !== NAV_NODE_TYPE_RM_RESOURCE || !isResourceOfType(resourceType, node.id)) {
+    if (!node || node.nodeType !== NAV_NODE_TYPE_RM_RESOURCE || !isResourceOfType(resourceType, node.uri)) {
       return false;
     }
 
-    const resourceKey = getResourceKeyFromNodeId(node.id);
+    const resourceKey = getResourceKeyFromNodeId(node.uri);
 
     if (!resourceKey) {
       return false;

@@ -89,12 +89,6 @@ public abstract class BaseServletApplication extends BaseApplicationImpl impleme
         return new SharedFileLockManager(getApplicationInstanceId());
     }
 
-    @Nullable
-    @Override
-    public Path getDefaultWorkingFolder() {
-        return getServerConfigurationController().getWorkspacePath();
-    }
-
     @Override
     public boolean isHeadlessMode() {
         return true;
@@ -218,6 +212,8 @@ public abstract class BaseServletApplication extends BaseApplicationImpl impleme
     @Override
     public Object start(IApplicationContext context) {
         initializeApplicationServices();
+        setWorkspacePath(getServerConfigurationController().getWorkspacePath());
+
         try {
             startServer();
         } catch (Exception e) {
@@ -253,13 +249,6 @@ public abstract class BaseServletApplication extends BaseApplicationImpl impleme
     public String getWorkspaceIdProperty() throws DBException {
         return BaseWorkspaceImpl.readWorkspaceIdProperty();
     }
-
-    @NotNull
-    @Override
-    public Path getWorkspaceDirectory() {
-        return getServerConfigurationController().getWorkspacePath();
-    }
-
 
     public String getApplicationId() {
         try {

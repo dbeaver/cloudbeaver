@@ -31,7 +31,7 @@ export function useNavigationTree(): INavigationTree {
       async handleOpen(node: NavNode, folder: boolean) {
         if (!folder) {
           try {
-            await this.navigationTreeService.navToNode(node.id, node.parentId);
+            await this.navigationTreeService.navToNode(node.uri, node.parentId);
           } catch (exception: any) {
             notificationService.logException(exception);
             throw exception;
@@ -39,7 +39,7 @@ export function useNavigationTree(): INavigationTree {
         }
       },
       handleSelect(node: NavNode, state: boolean) {
-        return this.navigationTreeService.selectNode(node.id, state);
+        return this.navigationTreeService.selectNode(node.uri, state);
       },
       handleSelectReset() {
         this.navigationTreeService.unselectAll();

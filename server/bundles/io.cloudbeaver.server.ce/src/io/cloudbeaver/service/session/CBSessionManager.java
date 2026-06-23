@@ -24,9 +24,9 @@ import io.cloudbeaver.registry.WebSessionHandlerDescriptor;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBConstants;
 import io.cloudbeaver.server.WebAppSessionManager;
-import io.cloudbeaver.server.events.WSWebUtils;
 import io.cloudbeaver.service.DBWSessionHandler;
 import io.cloudbeaver.utils.ServletAppUtils;
+import io.cloudbeaver.utils.WebEventUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -506,7 +506,7 @@ public class CBSessionManager implements WebAppSessionManager {
             for (Iterator<BaseWebSession> iterator = sessionMap.values().iterator(); iterator.hasNext(); ) {
                 var session = iterator.next();
                 iterator.remove();
-                session.close(false, !WSWebUtils.isSessionIdEquals(session, initiatorSessionId));
+                session.close(false, !WebEventUtils.isSmSessionIdEquals(session, initiatorSessionId));
             }
         }
     }

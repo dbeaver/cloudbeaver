@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,12 +29,16 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.auth.SMObjectType;
 import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.rm.RMProjectInfo;
 import org.jkiss.dbeaver.model.rm.RMResource;
 import org.jkiss.dbeaver.model.secret.DBSSecretController;
-import org.jkiss.dbeaver.model.security.*;
+import org.jkiss.dbeaver.model.security.SMAdminController;
+import org.jkiss.dbeaver.model.security.SMConstants;
+import org.jkiss.dbeaver.model.security.SMController;
+import org.jkiss.dbeaver.model.security.SMObjectPermissionsGrant;
 import org.jkiss.dbeaver.model.websocket.WSConstants;
 import org.jkiss.dbeaver.model.websocket.event.WSProjectUpdateEvent;
 import org.jkiss.dbeaver.model.websocket.event.permissions.WSObjectPermissionEvent;
@@ -259,7 +263,7 @@ public class WebServiceRM implements DBWServiceRM {
             RMProject rmProject = getResourceController(session).createProject(name, description);
             session.addSessionProject(rmProject.getId());
             ServletAppUtils.getServletApplication().getEventController().addEvent(
-                WSProjectUpdateEvent.create(session.getSessionId(), session.getUserId(), rmProject.getId())
+                WSProjectUpdateEvent.create(WebEventUtils.getSmSessionId(session), session.getUserId(), rmProject.getId())
             );
             return rmProject;
         } catch (DBException e) {
@@ -284,7 +288,7 @@ public class WebServiceRM implements DBWServiceRM {
             project.updateProject(rmProject.getName(), rmProject.getDescription());
 
             ServletAppUtils.getServletApplication().getEventController().addEvent(
-                WSProjectUpdateEvent.update(session.getSessionId(), session.getUserId(), rmProject.getId(), projectInfo)
+                WSProjectUpdateEvent.update(WebEventUtils.getSmSessionId(session), session.getUserId(), rmProject.getId(), projectInfo)
             );
             return project.getRMProject();
         } catch (DBException e) {
@@ -306,7 +310,7 @@ public class WebServiceRM implements DBWServiceRM {
             getResourceController(session).deleteProject(projectId);
             session.removeSessionProject(projectId);
             ServletAppUtils.getServletApplication().getEventController().addEvent(
-                WSProjectUpdateEvent.delete(session.getSessionId(), session.getUserId(), projectId)
+                WSProjectUpdateEvent.delete(WebEventUtils.getSmSessionId(session), session.getUserId(), projectId)
             );
             return true;
         } catch (DBException e) {
@@ -354,7 +358,7 @@ public class WebServiceRM implements DBWServiceRM {
         @NotNull String projectId
     ) {
         var event = WSObjectPermissionEvent.update(
-            webSession.getUserContext().getSmSessionId(),
+            WebEventUtils.getSmSessionId(webSession),
             webSession.getUserId(),
             SMObjectType.project,
             projectId

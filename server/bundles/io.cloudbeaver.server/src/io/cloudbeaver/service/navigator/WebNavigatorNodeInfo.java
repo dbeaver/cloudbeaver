@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2025 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,12 +66,6 @@ public class WebNavigatorNodeInfo {
     ///////////////////////////////////
     // General properties
     ///////////////////////////////////
-
-    @Property
-    @Deprecated(forRemoval = true)
-    public String getId() {
-        return node.getNodeItemPath();
-    }
 
     @Property
     public String getUri() {
@@ -209,6 +203,8 @@ public class WebNavigatorNodeInfo {
             return DBFUtils.getUriFromPath(dbnPath.getPath()).toString();
         } else if (node instanceof DBNFileSystem dbnFs) {
             return WebFSUtils.makeUniqueFsId(dbnFs.getFileSystem());
+        } else if (node instanceof DBNDatabaseNode dbNode) {
+            return dbNode.getDataSourceContainer().getId();
         }
         return null;
     }
