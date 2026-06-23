@@ -227,6 +227,6 @@ export const commonSet = [
   pluginConnectionView,
   pluginConnectionPreferences,
   pluginProjectInfo,
-  pluginConnectionNetworkHandlers,
   pluginNetworkHandlers,
+  pluginConnectionNetworkHandlers,
 ];
