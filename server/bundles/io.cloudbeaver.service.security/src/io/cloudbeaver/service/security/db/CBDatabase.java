@@ -502,7 +502,7 @@ public class CBDatabase extends InternalDB<WebDatabaseConfig> {
     }
 
     public static boolean isDefaultH2Configuration(WebDatabaseConfig databaseConfiguration) {
-        var workspace = ServletAppUtils.getServletApplication().getWorkspaceDirectory();
+        var workspace = ServletAppUtils.getServletApplication().getWorkspacePath();
         var v1Path = workspace.resolve(".data").resolve(V1_DB_NAME);
         var v2Path = workspace.resolve(".data").resolve(V2_DB_NAME);
         var v1DefaultUrl = "jdbc:h2:" + v1Path;

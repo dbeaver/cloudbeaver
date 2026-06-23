@@ -29,11 +29,14 @@
       pointer-events: none;
       opacity: var(--dbv-kit-control-disabled-opacity);
     }
+
+    .dbv-kit-checkbox__check {
+      margin-top: calc(var(--dbv-kit-checkbox-height) * (calc(1 - var(--dbv-kit-checkbox-check-size)) / 2));
+    }
   }
 
   .dbv-kit-checkbox__check {
     --check-size: round(calc(var(--dbv-kit-checkbox-height) * var(--dbv-kit-checkbox-check-size)), 2px);
-    margin-top: calc(var(--dbv-kit-checkbox-height) * (calc(1 - var(--dbv-kit-checkbox-check-size)) / 2));
     height: var(--check-size);
     line-height: var(--check-size);
     width: var(--check-size);

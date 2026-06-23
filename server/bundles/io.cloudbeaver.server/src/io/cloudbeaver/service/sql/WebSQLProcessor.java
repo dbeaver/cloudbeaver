@@ -1131,7 +1131,7 @@ public class WebSQLProcessor implements WebSessionProvider {
         @NotNull WebSQLExecuteInfo executeInfo,
         @NotNull DBDDataFilter filter
     ) throws DBException {
-        if (!filter.getConstraints().isEmpty() || !CommonUtils.isEmpty(filter.getWhere())) {
+        if (filter.getConstraintsCount() > 0 || !CommonUtils.isEmpty(filter.getWhere())) {
             StringBuilder where = new StringBuilder();
             SQLUtils.appendConditionString(
                 filter,
