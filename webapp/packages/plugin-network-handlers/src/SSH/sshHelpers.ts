@@ -73,7 +73,7 @@ function trimSSHConfig(input: NetworkHandlerConfigInput): NetworkHandlerConfigIn
     }
   }
 
-  for (const key in trimmedInput.properties) {
+  for (const key in (trimmedInput.properties ?? {})) {
     if (typeof trimmedInput.properties[key] === 'string') {
       trimmedInput.properties[key] = trimmedInput.properties[key]?.trim();
     }

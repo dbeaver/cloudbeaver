@@ -19,7 +19,6 @@ export default ModuleRegistry.add({
       .addSingleton(Bootstrap, LocaleService)
       .addSingleton(Bootstrap, proxy(ConnectionSSHTabService))
       .addSingleton(Bootstrap, proxy(ConnectionSSLTabService))
-      .addSingleton(LocaleService)
       .addSingleton(ConnectionSSHTabService)
       .addSingleton(ConnectionSSLTabService);
   },

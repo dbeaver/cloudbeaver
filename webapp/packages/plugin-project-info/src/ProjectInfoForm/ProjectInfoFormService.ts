@@ -39,6 +39,14 @@ export class ProjectInfoFormService extends FormBaseService<IProjectInfoFormStat
 
   async open(projectId: string, tabId?: string): Promise<boolean> {
     if (this.projectInfoOptionsPanelService.isOpen()) {
+      const projectChanged = this.formState?.state.projectId !== projectId;
+
+      if (projectChanged) {
+        this.formState?.dispose();
+        this.formState = new FormState<IProjectInfoFormState>(this.serviceProvider, this, { projectId }).setMode(FormMode.Edit);
+      }
+
+      this.projectInfoOptionsPanelService.itemId = tabId ?? null;
       return true;
     }
 
