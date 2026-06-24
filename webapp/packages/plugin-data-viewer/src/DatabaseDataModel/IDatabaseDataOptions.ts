@@ -16,5 +16,6 @@ export interface IDatabaseDataOptions {
   whereFilter: string;
   /** A complex object that can represent filters and sorting options of the result set */
   constraints: SqlDataFilterConstraint[];
+  anyConstraint?: boolean;
   readLogs?: boolean;
 }

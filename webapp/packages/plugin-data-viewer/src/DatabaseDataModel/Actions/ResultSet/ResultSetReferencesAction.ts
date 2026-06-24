@@ -1,0 +1,64 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2026 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+
+import { makeObservable, observable } from 'mobx';
+
+import { GraphQLService, ResultDataFormat, type SqlResultReference } from '@cloudbeaver/core-sdk';
+import { injectable } from '@cloudbeaver/core-di';
+
+import { IDatabaseDataSource } from '../../IDatabaseDataSource.js';
+import type { IDatabaseResultSet } from '../../IDatabaseResultSet.js';
+import { IDatabaseDataResult } from '../../IDatabaseDataResult.js';
+import { DatabaseDataAction } from '../../DatabaseDataAction.js';
+import type { IDatabaseReferencesAction } from '../IDatabaseReferencesAction.js';
+
+@injectable(() => [IDatabaseDataSource, IDatabaseDataResult, GraphQLService])
+export class ResultSetReferencesAction extends DatabaseDataAction<any, IDatabaseResultSet> implements IDatabaseReferencesAction<IDatabaseResultSet> {
+  static dataFormat = [ResultDataFormat.Resultset];
+
+  associations: SqlResultReference[];
+
+  constructor(
+    source: IDatabaseDataSource,
+    result: IDatabaseDataResult,
+    private readonly graphQLService: GraphQLService,
+  ) {
+    super(source as unknown as IDatabaseDataSource<unknown, IDatabaseResultSet>, result as IDatabaseResultSet);
+    this.associations = [];
+
+    makeObservable(this, {
+      associations: observable.ref,
+    });
+
+    setTimeout(() => {
+      this.loadAssociations();
+    }, 0);
+  }
+
+  getAssociation(name: string): SqlResultReference | undefined {
+    return this.associations.find(association => association.associationName === name);
+  }
+
+  async loadAssociations(): Promise<SqlResultReference[]> {
+    const result = this.result;
+
+    if (!result.id) {
+      throw new Error("Result's id must be provided");
+    }
+
+    const { associations } = await this.graphQLService.sdk.getSqlResultAssociations({
+      resultsId: result.id,
+      projectId: result.projectId,
+      connectionId: result.connectionId,
+      contextId: result.contextId,
+    });
+
+    this.associations = associations;
+    return this.associations;
+  }
+}

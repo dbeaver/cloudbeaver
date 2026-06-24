@@ -1,0 +1,122 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2026 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+
+import { observable } from 'mobx';
+import { observer } from 'mobx-react-lite';
+
+import { Button } from '@dbeaver/ui-kit';
+import { CaptureViewScope } from '@cloudbeaver/core-view';
+import { Select, TextPlaceholder, useTranslate } from '@cloudbeaver/core-blocks';
+import { useService } from '@cloudbeaver/core-di';
+import { NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
+import {
+  type DataPresentationComponent,
+  IDatabaseDataMetadataAction,
+  IDatabaseReferencesAction,
+  isResultSetDataModel,
+  ResultSetReferencesAction,
+  TableViewerLoader,
+} from '@cloudbeaver/plugin-data-viewer';
+
+import type { IDataViewerReferencesPresentationState } from './IDataViewerReferencesState.js';
+import { useReferencesDataModel } from './useReferencesDataModel.js';
+
+export const DataViewerReferencesPresentation: DataPresentationComponent = observer(function DataViewerReferencesPresentation({
+  model: unknownModel,
+  resultIndex,
+}) {
+  const originalModel = unknownModel as any;
+
+  const translate = useTranslate();
+  const navNodeManagerService = useService(NavNodeManagerService);
+
+  if (!isResultSetDataModel(originalModel)) {
+    throw new Error('DataViewerReferencesPresentation can only be used with ResultSetDataSource');
+  }
+
+  const metadataAction = originalModel.source.getAction(resultIndex, IDatabaseDataMetadataAction);
+  const referencesAction = originalModel.source.getAction(resultIndex, IDatabaseReferencesAction, ResultSetReferencesAction);
+
+  const state = metadataAction.get<IDataViewerReferencesPresentationState>(`references-panel-${originalModel.id}`, () =>
+    observable({
+      presentationId: '',
+      valuePresentationId: null,
+      modelId: '',
+      association: '',
+    }),
+  );
+
+  const model = useReferencesDataModel(originalModel, resultIndex, state);
+  const associations = referencesAction.associations;
+  const defaultAssociation = associations[0];
+
+  if (!state.association && defaultAssociation) {
+    state.association = defaultAssociation.associationName;
+  }
+
+  //@TODO Find a better way to check whether model is ready to be used
+  if (!associations.length || !model.model.source.options) {
+    return <TextPlaceholder>{translate('plugin_data_viewer_references_no_references')}</TextPlaceholder>;
+  }
+
+  const currentAssociation = associations.find(a => a.associationName === state.association);
+
+  if (!currentAssociation) {
+    return <TextPlaceholder>{translate('plugin_data_viewer_references_no_reference')}</TextPlaceholder>;
+  }
+
+  function openAssociation() {
+    if (!currentAssociation?.targetNodePath) {
+      throw new Error('Target node path is not defined');
+    }
+
+    navNodeManagerService.navToNode(currentAssociation.targetNodePath);
+  }
+
+  return (
+    <CaptureViewScope>
+      <div className="tw:flex tw:flex-col tw:h-full tw:gap-2 tw:bg-(--theme-secondary)">
+        <div className="tw:flex tw:gap-2 tw:items-center">
+          <Select
+            className="tw:flex-1"
+            state={state}
+            name="association"
+            items={associations.map(a => a.associationName)}
+            valueSelector={a => {
+              const assotiation = referencesAction.getAssociation(a);
+
+              if (!assotiation) {
+                return a;
+              }
+
+              return `${assotiation.targetEntityName} (${assotiation.associationName})`;
+            }}
+          />
+          {currentAssociation.targetNodePath && (
+            <Button size="small" variant="secondary" onClick={openAssociation}>
+              {translate('ui_open')}
+            </Button>
+          )}
+        </div>
+        <TableViewerLoader
+          tableId={model.model.id}
+          resultIndex={resultIndex}
+          presentationId={state.presentationId}
+          valuePresentationId={state.valuePresentationId}
+          simple
+          onPresentationChange={presentationId => {
+            state.presentationId = presentationId;
+          }}
+          onValuePresentationChange={presentationId => {
+            state.valuePresentationId = presentationId;
+          }}
+        />
+      </div>
+    </CaptureViewScope>
+  );
+});
