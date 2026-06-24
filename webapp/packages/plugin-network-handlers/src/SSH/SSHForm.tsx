@@ -6,12 +6,14 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 
 import {
+  Button,
   Container,
   Expandable,
   FieldCheckbox,
+  GroupItem,
   InputField,
   Select,
   Switch,
@@ -19,12 +21,12 @@ import {
   useResource,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
+import { useService } from '@cloudbeaver/core-di';
 import { NetworkHandlerAuthType, type NetworkHandlerConfigInput } from '@cloudbeaver/core-sdk';
 
 import { sshAuthTypes } from './sshAuthTypes.js';
 import { SSHKeyUploader } from './SSHKeyUploader.js';
-import { SSH_TUNNEL_ID } from '../NetworkHandlerResource.js';
-import { useService } from '@cloudbeaver/core-di';
+import { NetworkHandlerResource, SSH_TUNNEL_ID } from '../NetworkHandlerResource.js';
 import { ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 
@@ -42,15 +44,39 @@ export interface ISSHFormProps {
   readonly?: boolean;
   sharedCredentials?: boolean;
   projectId: string;
+  connectionId?: string;
 }
 
-export const SSHForm = observer<ISSHFormProps>(function SSHForm({ state, initialState, disabled, readonly, sharedCredentials = false, projectId }) {
+export const SSHForm = observer<ISSHFormProps>(function SSHForm({
+  state,
+  initialState,
+  disabled,
+  readonly,
+  sharedCredentials = false,
+  projectId,
+  connectionId,
+}) {
   const translate = useTranslate();
+  const networkHandlerResource = useService(NetworkHandlerResource);
+  const [testLoading, setTestLoading] = useState(false);
 
   const enabled = state.enabled;
   const disabledInternal = disabled || readonly || enabled === false;
   const keyAuth = state.authType === NetworkHandlerAuthType.PublicKey;
+
+  const passwordFilled = (initialState?.password === null && state.password !== '') || !!state.password?.length;
+  const testAvailable = keyAuth ? !!state.key?.length : passwordFilled;
+
   const serverConfigResource = useResource(SSHForm, ServerConfigResource, undefined);
+
+  async function testTunnel() {
+    setTestLoading(true);
+    try {
+      await networkHandlerResource.test(state, projectId, connectionId);
+    } finally {
+      setTestLoading(false);
+    }
+  }
 
   const passwordLabel = keyAuth ? 'Passphrase' : translate('plugin_network_handlers_ssh_tunnel_password');
   const passwordSaved = initialState?.password === '' && initialState?.authType === state.authType;
@@ -165,6 +191,11 @@ export const SSHForm = observer<ISSHFormProps>(function SSHForm({ state, initial
           </Container>
         </Expandable>
       </Container>
+      <GroupItem>
+        <Button type="button" disabled={disabled || !enabled || testLoading || !testAvailable} loader onClick={testTunnel}>
+          {translate('plugin_connection_network_handlers_ssh_test')}
+        </Button>
+      </GroupItem>
     </>
   );
 });
