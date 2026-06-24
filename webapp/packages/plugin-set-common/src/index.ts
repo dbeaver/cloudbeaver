@@ -113,6 +113,7 @@ import pluginConnectionView from '@cloudbeaver/plugin-connection-view/module';
 import pluginConnectionPreferences from '@cloudbeaver/plugin-connection-preferences/module';
 import pluginScriptExport from '@cloudbeaver/plugin-script-export/module';
 import pluginProjectInfo from '@cloudbeaver/plugin-project-info/module';
+import pluginDataViewerReferences from '@cloudbeaver/plugin-data-viewer-references/module';
 
 const core = [
   coreRouting, // important, should be first because the router starts in load phase first after all plugins register phase
@@ -225,4 +226,5 @@ export const commonSet = [
   pluginConnectionView,
   pluginConnectionPreferences,
   pluginProjectInfo,
+  pluginDataViewerReferences,
 ];

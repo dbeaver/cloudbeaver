@@ -3066,7 +3066,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/plugin-data-viewer-references@workspace:packages/plugin-data-viewer-references":
+"@cloudbeaver/plugin-data-viewer-references@workspace:*, @cloudbeaver/plugin-data-viewer-references@workspace:packages/plugin-data-viewer-references":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-data-viewer-references@workspace:packages/plugin-data-viewer-references"
   dependencies:
@@ -4053,6 +4053,7 @@ __metadata:
     "@cloudbeaver/plugin-data-spreadsheet-new": "workspace:*"
     "@cloudbeaver/plugin-data-viewer": "workspace:*"
     "@cloudbeaver/plugin-data-viewer-conditional-formatting": "workspace:*"
+    "@cloudbeaver/plugin-data-viewer-references": "workspace:*"
     "@cloudbeaver/plugin-data-viewer-request-query-viewer": "workspace:*"
     "@cloudbeaver/plugin-data-viewer-result-set-grouping": "workspace:*"
     "@cloudbeaver/plugin-data-viewer-result-trace-details": "workspace:*"

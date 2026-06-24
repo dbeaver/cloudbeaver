@@ -10,11 +10,9 @@ import type { ConnectionExecutionContextService } from '@cloudbeaver/core-connec
 import type { IServiceProvider } from '@cloudbeaver/core-di';
 import { AsyncTaskInfoService } from '@cloudbeaver/core-root';
 import { GraphQLService } from '@cloudbeaver/core-sdk';
-import { ContainerDataSource, DatabaseDataFeature, type IDatabaseResultSet, type IDataContainerOptions } from '@cloudbeaver/plugin-data-viewer';
+import { ContainerDataSource, DatabaseDataFeature, type IDataContainerOptions } from '@cloudbeaver/plugin-data-viewer';
 
-export interface IDataReferencesOptions extends IDataContainerOptions {}
-
-export class DataViewerReferencesDataSource extends ContainerDataSource<IDataReferencesOptions> {
+export class DataViewerReferencesDataSource extends ContainerDataSource<IDataContainerOptions> {
   constructor(
     serviceProvider: IServiceProvider,
     connectionExecutionContextService: ConnectionExecutionContextService,
@@ -23,9 +21,5 @@ export class DataViewerReferencesDataSource extends ContainerDataSource<IDataRef
   ) {
     super(serviceProvider, graphQLService, asyncTaskInfoService, connectionExecutionContextService);
     this.setFeature(DatabaseDataFeature.References);
-  }
-
-  override request(prevResults: IDatabaseResultSet[]): Promise<IDatabaseResultSet[]> {
-    return super.request(prevResults);
   }
 }

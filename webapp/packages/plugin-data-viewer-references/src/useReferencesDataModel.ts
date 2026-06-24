@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { reaction, toJS } from 'mobx';
+import { reaction } from 'mobx';
 import { useEffect, useRef } from 'react';
 
 import { useObjectRef, useResource } from '@cloudbeaver/core-blocks';
@@ -140,16 +140,13 @@ export function useReferencesDataModel(
           if (context) {
             const connectionKey = createConnectionParam(context.projectId, context.connectionId);
             const references = referencesAction.associations;
-
-            console.log(toJS(references));
             const currentReference = references.find(r => r.associationName === association);
 
             if (currentReference?.targetNodePath) {
               const sourceColumn = data.columns.find(c => currentReference.columnMapping.find(m => m.sourceColumnName === c.name));
               const targetColumn = data.columns.find(c => currentReference.columnMapping.find(m => m.targetColumnName === c.name));
-              const targetMapping = currentReference.columnMapping.find(m => m.sourceColumnName === sourceColumn?.name);
 
-              console.log(toJS(sourceColumn), toJS(targetColumn), toJS(targetMapping));
+              const targetMapping = currentReference.columnMapping.find(m => m.sourceColumnName === sourceColumn?.name);
               const operation = sourceColumn?.supportedOperations.find(o => o.id === 'EQUALS');
 
               const rows = activeRows.map(r => r.row);
@@ -167,7 +164,6 @@ export function useReferencesDataModel(
                 if (rowValue) {
                   const targetValue = sourceColumn ? rowValue[sourceColumn.position] : undefined;
 
-                  console.log('target defined', !!targetValue, 'operation defined', !!operation);
                   if (targetValue && operation) {
                     constraints.push({
                       attributeName: currentReference.isReference ? targetMapping?.targetColumnName : targetColumn?.name,
