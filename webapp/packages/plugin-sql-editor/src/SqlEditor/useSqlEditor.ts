@@ -27,7 +27,6 @@ import type { ISqlEditorCursor } from '../SqlDataSource/ISqlDataSource.js';
 import { SqlDialectInfoService } from '../SqlDialectInfoService.js';
 import { SqlEditorService } from '../SqlEditorService.js';
 import { type ISQLScriptSegment } from '../SQLParser.js';
-import { SqlExecutionPlanService } from '../SqlResultTabs/ExecutionPlan/SqlExecutionPlanService.js';
 import { OUTPUT_LOGS_TAB_ID } from '../SqlResultTabs/OutputLogs/OUTPUT_LOGS_TAB_ID.js';
 import { SqlQueryService } from '../SqlResultTabs/SqlQueryService.js';
 import { SqlResultTabsService } from '../SqlResultTabs/SqlResultTabsService.js';
@@ -41,7 +40,6 @@ interface ISQLEditorDataPrivate extends ISQLEditorData {
   readonly sqlQueryService: SqlQueryService;
   readonly sqlEditorService: SqlEditorService;
   readonly notificationService: NotificationService;
-  readonly sqlExecutionPlanService: SqlExecutionPlanService;
   readonly sqlEditorSettingsService: SqlEditorSettingsService;
   readonly commonDialogService: CommonDialogService;
   readonly sqlResultTabsService: SqlResultTabsService;
@@ -65,7 +63,6 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
   const sqlDialectInfoService = useService(SqlDialectInfoService);
   const sqlEditorService = useService(SqlEditorService);
   const notificationService = useService(NotificationService);
-  const sqlExecutionPlanService = useService(SqlExecutionPlanService);
   const sqlResultTabsService = useService(SqlResultTabsService);
   const commonDialogService = useService(CommonDialogService);
   const sqlEditorSettingsService = useService(SqlEditorSettingsService);
@@ -213,19 +210,6 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
         }
       },
 
-      async showExecutionPlan(): Promise<void> {
-        const isQuery = this.model.dataSource?.hasFeature(ESqlDataSourceFeatures.query);
-
-        if (!isQuery || !this.isExecutionAllowed || !this.dialect?.supportsExplainExecutionPlan) {
-          return;
-        }
-
-        try {
-          const segment = await this.model.getResolvedSegment();
-          await this.executeQueryAction(segment, query => this.sqlExecutionPlanService.executeExecutionPlan(this.state, query.query));
-        } catch {}
-      },
-
       async executeScript(): Promise<void> {
         if (!this.isExecutionAllowed || this.isDisabled || this.isScriptEmpty) {
           return;
@@ -349,7 +333,6 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
       getHintProposals: action.bound,
       formatScript: action.bound,
       executeQuery: action.bound,
-      showExecutionPlan: action.bound,
       executeScript: action.bound,
       isDisabled: computed,
       value: computed,
@@ -370,7 +353,6 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
       sqlQueryService,
       sqlDialectInfoService,
       sqlEditorService,
-      sqlExecutionPlanService,
       sqlResultTabsService,
       notificationService,
       commonDialogService,

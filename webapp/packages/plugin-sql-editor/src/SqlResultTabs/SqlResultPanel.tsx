@@ -1,20 +1,19 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
 
-import { importLazyComponent } from '@cloudbeaver/core-blocks';
+import { importLazyComponent, Placeholder } from '@cloudbeaver/core-blocks';
+import { useService } from '@cloudbeaver/core-di';
 
 import type { ISqlEditorTabState } from '../ISqlEditorTabState.js';
+import { SqlResultTabsService } from './SqlResultTabsService.js';
 import classes from './SqlResultPanel.module.css';
 
-const SqlExecutionPlanPanel = importLazyComponent(() =>
-  import('./ExecutionPlan/SqlExecutionPlanPanel.js').then(module => module.SqlExecutionPlanPanel),
-);
 const OutputLogsPanel = importLazyComponent(() => import('./OutputLogs/OutputLogsPanel.js').then(module => module.OutputLogsPanel));
 const SqlResultSetPanel = importLazyComponent(() => import('./SqlResultSetPanel.js').then(module => module.SqlResultSetPanel));
 const SqlScriptStatisticsPanel = importLazyComponent(() => import('./SqlScriptStatisticsPanel.js').then(module => module.SqlScriptStatisticsPanel));
@@ -25,6 +24,7 @@ interface Props {
 }
 
 export const SqlResultPanel = observer<Props>(function SqlResultPanel({ state, id }) {
+  const sqlResultTabsService = useService(SqlResultTabsService);
   const resultTab = state.resultTabs.find(tab => tab.tabId === id);
 
   if (resultTab) {
@@ -35,12 +35,10 @@ export const SqlResultPanel = observer<Props>(function SqlResultPanel({ state, i
     );
   }
 
-  const executionPlanTab = state.executionPlanTabs.find(tab => tab.tabId === id);
-
-  if (executionPlanTab) {
+  if (sqlResultTabsService.resultPanels.getDisplayed({ state, tabId: id }).length > 0) {
     return (
       <div className={classes['resultPanel']}>
-        <SqlExecutionPlanPanel executionPlanTab={executionPlanTab} />
+        <Placeholder container={sqlResultTabsService.resultPanels} state={state} tabId={id} />
       </div>
     );
   }
