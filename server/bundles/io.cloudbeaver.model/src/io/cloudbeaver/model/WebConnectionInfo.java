@@ -586,6 +586,11 @@ public class WebConnectionInfo {
         return tools;
     }
 
+    @NotNull
+    public String getConnectionType() {
+        return dataSourceContainer.getConnectionConfiguration().getConnectionType().getId();
+    }
+
     /**
      * Updates param that checks whether credentials were saved only in session.
      */

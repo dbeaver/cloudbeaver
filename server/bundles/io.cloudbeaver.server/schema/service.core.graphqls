@@ -570,6 +570,8 @@ type ConnectionInfo {
 
     "List of tools that can be used with this connection. Returns empty list if no tools are available"
     tools: [String!]! @since(version: "24.1.3")
+
+    connectionType: ID! @since(version: "26.1.2")
 }
 
 type ConnectionFolderInfo {
@@ -631,6 +633,19 @@ type LogEntry {
     type: String!
     message: String
     stackTrace: String
+}
+
+type ConnectionType @since(version: "26.1.2") {
+    "Unique identifier of the connection type"
+    id: ID!
+    "Human-readable name of the connection type"
+    name: String!
+    "Description of the connection type"
+    description: String
+    "Color of the connection type (for light theme)"
+    color: String!
+    "Alternative color of the connection type (for dark theme)"
+    alternativeColor: String
 }
 
 ####################################################
@@ -745,6 +760,8 @@ input ConnectionConfig {
     defaultSchemaName: String @since(version: "25.0.5") @deprecated(reason: "25.2.1 use expertPropertyValues instead")
     "Default user settings for connection"
     defaultUserPreferences: Object @since(version: "26.0.2")
+
+    connectionType: ID @since(version: "26.1.2")
 }
 
 ####################################################
@@ -790,6 +807,8 @@ extend type Query {
 
     "Returns connection driver properties based on configuration"
     listConnectionDriverProperties( projectId: ID!, config: ConnectionConfig! ): [ObjectPropertyInfo!]!
+
+    listConnectionTypes: [ConnectionType!]! @since(version: "26.1.2")
 }
 
 extend type Mutation {
