@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -45,15 +45,6 @@ export const SQL_EDITOR_RESULT_TAB_SCHEMA = schema.object({
 
 export type ISqlEditorResultTab = schema.infer<typeof SQL_EDITOR_RESULT_TAB_SCHEMA>;
 
-export const EXECUTION_PLAN_TAB_SCHEMA = schema.object({
-  tabId: schema.string(),
-  order: schema.number(),
-  query: schema.string(),
-  options: schema.record(schema.string(), schema.any()).optional(),
-});
-
-export type IExecutionPlanTab = schema.infer<typeof EXECUTION_PLAN_TAB_SCHEMA>;
-
 const OUTPUT_LOGS_TAB_SCHEMA = SQL_EDITOR_RESULT_TAB_SCHEMA.extend({
   selectedLogTypes: schema.array(schema.enum(OUTPUT_LOG_TYPES)),
 });
@@ -70,7 +61,6 @@ export const SQL_EDITOR_TAB_STATE_SCHEMA = schema.object({
   resultGroups: schema.array(RESULT_GROUP_SCHEMA),
   resultTabs: schema.array(RESULT_TAB_SCHEMA),
   statisticsTabs: schema.array(STATISTIC_TAB_SCHEMA),
-  executionPlanTabs: schema.array(EXECUTION_PLAN_TAB_SCHEMA),
   outputLogsTab: OUTPUT_LOGS_TAB_SCHEMA.optional(),
   currentModeId: schema.string().optional(),
   modeState: schema.array(schema.tuple([schema.string(), schema.any()])),

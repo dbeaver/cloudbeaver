@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -9,6 +9,7 @@ import type { ISyncExecutor } from '@cloudbeaver/core-executor';
 import type { SqlDialectInfo } from '@cloudbeaver/core-sdk';
 
 import type { ISqlEditorCursor } from '../SqlDataSource/ISqlDataSource.js';
+import type { ISqlEditorTabState } from '../ISqlEditorTabState.js';
 import type { SQLProposal } from '../SqlEditorService.js';
 import type { ISQLScriptSegment } from '../SQLParser.js';
 import type { ISqlEditorModel } from '../SqlEditorModel/ISqlEditorModel.js';
@@ -19,6 +20,7 @@ export interface ISegmentExecutionData {
 }
 
 export interface ISQLEditorData {
+  readonly state: ISqlEditorTabState;
   readonly model: ISqlEditorModel;
   readonly dialect: SqlDialectInfo | undefined;
   readonly readonly: boolean;
@@ -40,7 +42,6 @@ export interface ISQLEditorData {
   setCursor(begin: number, end?: number): void;
   formatScript(): Promise<void>;
   executeQuery(inNewTab?: boolean): Promise<void>;
-  showExecutionPlan(): Promise<void>;
   executeScript(): Promise<void>;
   getHintProposals(position: number, simple: boolean): Promise<SQLProposal[]>;
   executeQueryAction<T>(
