@@ -30,10 +30,13 @@ jobs:
     uses: ./.github/workflows/frontend-build.yml
     secrets: inherit
 
-#  lint-server:
-#    name: Server
-#    uses: dbeaver/dbeaver-common/.github/workflows/java-checkstyle.yml@devel
-#    secrets: inherit
+  lint-server:
+    name: Server
+    uses: dbeaver/dbeaver-common/.github/workflows/java-checkstyle.yml@devel
+    secrets: inherit
+    permissions:
+      contents: read
+      pull-requests: read
 
   lint-frontend:
     name: Frontend
