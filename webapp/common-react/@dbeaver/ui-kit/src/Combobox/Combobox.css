@@ -69,6 +69,8 @@
   .dbv-kit-combobox__item {
     display: block;
     width: 100%;
+    font-weight: var(--dbv-kit-combobox-font-weight);
+    font-size: var(--dbv-kit-combobox-font-size);
     padding-inline: var(--dbv-kit-combobox-item-padding-inline);
     padding-block: var(--dbv-kit-combobox-item-padding-block);
     text-align: left;

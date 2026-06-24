@@ -15,7 +15,8 @@
     "node-domexception": ">1.0.0",
     "shell-quote": ">1.8.3",
     "esbuild": ">=0.28.1",
-    "form-data": ">=4.0.6"
+    "form-data": ">=4.0.6",
+    "undici": ">=6.27.0"
   },
   "scripts": {
     "test": "dbeaver-test",

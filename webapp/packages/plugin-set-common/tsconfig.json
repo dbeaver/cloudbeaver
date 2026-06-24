@@ -281,6 +281,9 @@
       "path": "../plugin-sql-editor"
     },
     {
+      "path": "../plugin-sql-editor-execution-plan"
+    },
+    {
       "path": "../plugin-sql-editor-navigation-tab"
     },
     {
