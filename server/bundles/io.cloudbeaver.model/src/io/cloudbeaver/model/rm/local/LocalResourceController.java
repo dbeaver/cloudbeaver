@@ -40,6 +40,7 @@ import org.jkiss.dbeaver.model.fs.lock.LockTarget;
 import org.jkiss.dbeaver.model.impl.app.BaseProjectImpl;
 import org.jkiss.dbeaver.model.impl.auth.SessionContextImpl;
 import org.jkiss.dbeaver.model.navigator.DBNLocalFolder;
+import org.jkiss.dbeaver.model.net.DBWNetworkProfile;
 import org.jkiss.dbeaver.model.rm.*;
 import org.jkiss.dbeaver.model.security.SMAdminController;
 import org.jkiss.dbeaver.model.sql.DBQuotaException;
@@ -48,6 +49,7 @@ import org.jkiss.dbeaver.model.websocket.event.WSSessionLogUpdatedEvent;
 import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceEvent;
 import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceProperty;
 import org.jkiss.dbeaver.model.websocket.event.datasource.WSDatasourceFolderEvent;
+import org.jkiss.dbeaver.model.websocket.event.profile.WSNetworkProfileEvent;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
 import org.jkiss.dbeaver.registry.DataSourceParseResults;
 import org.jkiss.dbeaver.registry.ResourceTypeDescriptor;
@@ -407,8 +409,13 @@ public class LocalResourceController extends BaseLocalResourceController {
                     registry::createDataSource
                 )
             );
+        Map<String, DBWNetworkProfile> oldNetworkProfiles = registry.getNetworkProfiles().getProfiles().stream()
+            .collect(Collectors.toMap(
+                DBWNetworkProfile::getProfileId,
+                p -> p
+            ));
         DataSourceParseResults parseResults = super.updateProjectDataSourcesConfig(projectId, configuration, dataSourceIds);
-        sendDataSourcesConfigUpdatedEvent(registry, oldDataSources, parseResults);
+        sendConfigUpdatedEvent(registry, oldDataSources, oldNetworkProfiles, parseResults);
         return parseResults != null;
     }
 
@@ -501,9 +508,10 @@ public class LocalResourceController extends BaseLocalResourceController {
         return DBNLocalFolder.makeLocalFolderItemPath(projectId, folderPath);
     }
 
-    private void sendDataSourcesConfigUpdatedEvent(
+    private void sendConfigUpdatedEvent(
         @NotNull DBPDataSourceRegistry registry,
         @NotNull Map<String, DataSourceDescriptor> oldDataSources,
+        @NotNull Map<String, DBWNetworkProfile> oldNetworkProfiles,
         @Nullable DataSourceParseResults parseResults
     ) {
         if (parseResults == null || credentialsProvider.getActiveUserCredentials() == null || oldDataSources.isEmpty()) {
@@ -613,6 +621,48 @@ public class LocalResourceController extends BaseLocalResourceController {
             );
         }
 
+        if (!parseResults.addedProfiles.isEmpty()) {
+            ServletAppUtils.getServletApplication().getEventController().addEvent(
+                WSNetworkProfileEvent.create(
+                    credentialsProvider.getActiveUserCredentials().getSmSessionId(),
+                    credentialsProvider.getActiveUserCredentials().getUserId(),
+                    registry.getProject().getId(),
+                    parseResults.addedProfiles.stream().map(DBWNetworkProfile::getProfileName).toList()
+                )
+            );
+        }
+
+        List<String> updatedProfileNames = new ArrayList<>();
+
+        for (DBWNetworkProfile updatedProfile : parseResults.updatedProfiles) {
+            if (oldNetworkProfiles.containsKey(updatedProfile.getProfileId())) {
+                DBWNetworkProfile oldProfile = oldNetworkProfiles.get(updatedProfile.getProfileId());
+                if (!oldProfile.equalConfigurations(updatedProfile)) {
+                    updatedProfileNames.add(updatedProfile.getProfileName());
+                }
+            }
+        }
+
+        if (!updatedProfileNames.isEmpty()) {
+            ServletAppUtils.getServletApplication().getEventController().addEvent(
+                WSNetworkProfileEvent.update(
+                    credentialsProvider.getActiveUserCredentials().getSmSessionId(),
+                    credentialsProvider.getActiveUserCredentials().getUserId(),
+                    registry.getProject().getId(),
+                    updatedProfileNames
+                )
+            );
+        }
+        if (!parseResults.removedProfiles.isEmpty()) {
+            ServletAppUtils.getServletApplication().getEventController().addEvent(
+                WSNetworkProfileEvent.delete(
+                    credentialsProvider.getActiveUserCredentials().getSmSessionId(),
+                    credentialsProvider.getActiveUserCredentials().getUserId(),
+                    registry.getProject().getId(),
+                    parseResults.removedProfiles.stream().map(DBWNetworkProfile::getProfileName).toList()
+                )
+            );
+        }
     }
 
     @NotNull
