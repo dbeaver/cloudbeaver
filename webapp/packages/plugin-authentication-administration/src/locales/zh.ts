@@ -118,6 +118,7 @@ export default [
 
   ['plugin_authentication_administration_team_form_edit_label', 'Team editing form'],
   ['plugin_authentication_administration_user_form_edit_label', 'User editing form'],
+  ['plugin_authentication_administration_user_last_login', '最后登录'],
 
   [
     'plugin_authentication_administration_user_username_validation_error',
