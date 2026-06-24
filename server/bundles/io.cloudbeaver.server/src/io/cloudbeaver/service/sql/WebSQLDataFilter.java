@@ -41,6 +41,7 @@ public class WebSQLDataFilter {
     private int offset;
     private int limit;
     private String where;
+    private boolean anyConstraint;
     private final List<WebSQLDataFilterConstraint> constraints = new ArrayList<>();
 
     public WebSQLDataFilter() {
@@ -57,6 +58,7 @@ public class WebSQLDataFilter {
             this.limit = MAX_ROWS_NUMBER;
         }
         this.where = CommonUtils.toString(filterProps.get("where"), null);
+        this.anyConstraint = CommonUtils.toBoolean(filterProps.get("anyConstraint"));
         Object constraints = filterProps.get("constraints");
         if (constraints instanceof Collection) {
             for (Object constrItem : (Collection<?>) constraints) {
@@ -92,10 +94,15 @@ public class WebSQLDataFilter {
         return where;
     }
 
+    public boolean isAnyConstraint() {
+        return anyConstraint;
+    }
+
     @NotNull
     public static WebSQLDataFilter from(@NotNull DBDDataFilter filter) {
         var webFilter = new WebSQLDataFilter();
         webFilter.where = filter.getWhere();
+        webFilter.anyConstraint = filter.isAnyConstraint();
         for (DBDAttributeConstraint constraint : filter.getConstraints()) {
             webFilter.constraints.add(WebSQLDataFilterConstraint.from(constraint));
         }
@@ -106,6 +113,7 @@ public class WebSQLDataFilter {
     public DBDDataFilter makeDataFilter(@Nullable WebSQLResultsInfo resultInfo) throws DBException {
         DBDDataFilter dataFilter = new DBDDataFilter();
         dataFilter.setWhere(where);
+        dataFilter.setAnyConstraint(anyConstraint);
         if (CommonUtils.isEmpty(constraints)) {
             return dataFilter;
         }

@@ -68,6 +68,8 @@ input SQLDataFilter {
     limit: Int
 
     constraints: [ SQLDataFilterConstraint ]
+    "When true constraints are combined with OR instead of AND"
+    anyConstraint: Boolean
     where: String
     orderBy: String
 }
