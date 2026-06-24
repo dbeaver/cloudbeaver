@@ -50,7 +50,7 @@ export const NavigationNode: NavigationNodeComponent = observer(function Navigat
       navNode.setDnDState(dndData, true);
 
       // strange way to preload alias while dragging
-      await navNodeManagerService.getNodeDatabaseAlias(node.id);
+      await navNodeManagerService.getNodeDatabaseAlias(node.uri);
     },
     onDragEnd: () => {
       navNode.setDnDState(dndData, false);
@@ -103,7 +103,7 @@ export const NavigationNode: NavigationNodeComponent = observer(function Navigat
     >
       {/* <DNDPreview data={dndData} src="/icons/empty.svg" /> */}
       <NavigationNodeControlRenderer ref={controlRef} navNode={navNode} dragging={dndData.state.isDragging} control={externalControl} node={node} />
-      {expanded && <NavigationNodeNested nodeId={node.id} path={path} component={component} className={s(styles, { navNodeNested: true })} />}
+      {expanded && <NavigationNodeNested nodeId={node.uri} path={path} component={component} className={s(styles, { navNodeNested: true })} />}
     </TreeNode>
   );
 });

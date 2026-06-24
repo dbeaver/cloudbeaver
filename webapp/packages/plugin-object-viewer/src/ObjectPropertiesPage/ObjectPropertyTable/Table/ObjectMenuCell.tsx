@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { Icon, Link, Loader, s, StaticImage, useContextMenuPosition, useMouse, useS, useStateDelay } from '@cloudbeaver/core-blocks';
+import { Icon, Loader, s, StaticImage, useContextMenuPosition, useMouse, useS, useStateDelay } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource, DATA_CONTEXT_CONNECTION } from '@cloudbeaver/core-connections';
 import { useDataContextLink } from '@cloudbeaver/core-data-context';
 import { useService } from '@cloudbeaver/core-di';
@@ -15,15 +15,17 @@ import { MENU_NAV_TREE, useNode } from '@cloudbeaver/plugin-navigation-tree';
 import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
 import classes from './ObjectMenuCell.module.css';
-import { useMenu } from '@cloudbeaver/core-view';
+import { isBindingPressed, useMenu } from '@cloudbeaver/core-view';
 import { getObjectPropertyDisplayValue } from '@cloudbeaver/core-sdk';
+import { Command } from '@dbeaver/ui-kit';
+import { KEY_BINDING_OPEN_OBJECT_CONTEXT_MENU } from '../OBJECT_PROPERTY_TABLE_KEY_BINDINGS.js';
 
 interface Props {
   object: DBObject;
 }
 
 export const ObjectMenuCell = observer<Props>(function ObjectMenuCell({ object }) {
-  const { node } = useNode(object.id);
+  const { node } = useNode(object.uri);
 
   if (!node) {
     throw new Error('Node not found');
@@ -35,9 +37,9 @@ export const ObjectMenuCell = observer<Props>(function ObjectMenuCell({ object }
   const menu = useMenu({ menu: MENU_NAV_TREE });
   const mouse = useMouse<HTMLDivElement>();
   const [menuOpened, switchState] = useState(false);
-  const connection = connectionsInfoResource.getConnectionForNode(node.id);
+  const connection = connectionsInfoResource.getConnectionForNode(node.uri);
   const contextMenuPosition = useContextMenuPosition();
-  const connectionKey = connectionsInfoResource.getConnectionIdForNodeId(node.projectId!, node.id);
+  const connectionKey = connectionsInfoResource.getConnectionIdForNodeId(node.projectId!, node.uri!);
 
   useDataContextLink(menu.context, (context, id) => {
     context.set(DATA_CONTEXT_NAV_NODE, node, id);
@@ -48,15 +50,22 @@ export const ObjectMenuCell = observer<Props>(function ObjectMenuCell({ object }
   });
 
   function openNode() {
-    navNodeManagerService.navToNode(node!.id, node!.parentId);
+    navNodeManagerService.navToNode(node!.uri, node!.parentId);
   }
 
   const mouseEnter = useStateDelay(mouse.state.mouseEnter, 33); // track mouse update only 30 times per second
 
-  const menuEmpty = !menuOpened && !mouseEnter;
+  const menuEmpty = !menuOpened && !mouseEnter && !contextMenuPosition.position;
 
   function contextMenuOpenHandler(event: React.MouseEvent<HTMLDivElement>) {
     contextMenuPosition.open(event);
+  }
+
+  function handleKeyDown(event: React.KeyboardEvent<HTMLElement>) {
+    if (isBindingPressed(event, KEY_BINDING_OPEN_OBJECT_CONTEXT_MENU)) {
+      event.stopPropagation();
+      contextMenuPosition.open(event);
+    }
   }
 
   const property = object.object?.properties?.[0];
@@ -68,9 +77,9 @@ export const ObjectMenuCell = observer<Props>(function ObjectMenuCell({ object }
         <div className={s(styles, { objectIconBox: true })}>
           {node?.icon && <StaticImage icon={node.icon} className={s(styles, { objectIcon: true })} />}
         </div>
-        <Link className={s(styles, { value: true })} title={value} inline onClick={openNode}>
+        <Command render={<span />} className={s(styles, { value: true })} title={value} focusable onClick={openNode} onKeyDown={handleKeyDown}>
           {value}
-        </Link>
+        </Command>
         <div className={s(styles, { menuBox: true })}>
           {!menuEmpty && (
             <Loader suspense small fullSize>
@@ -78,6 +87,7 @@ export const ObjectMenuCell = observer<Props>(function ObjectMenuCell({ object }
                 className={s(styles, { contextMenu: true })}
                 contextMenuPosition={contextMenuPosition}
                 menu={menu}
+                autoFocusOnShow
                 onVisibleSwitch={switchState}
               >
                 <Icon className={s(styles, { menuIcon: true })} name="snack" viewBox="0 0 16 10" />

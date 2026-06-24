@@ -101,7 +101,7 @@ export class NavigationTreeService extends View<string> {
         return false;
       }
 
-      const connectionParam = this.connectionInfoResource.getConnectionIdForNodeId(node.projectId, id);
+      const connectionParam = this.connectionInfoResource.getConnectionIdForNodeId(node.projectId, node.uri);
       let connection: Connection | undefined;
       if (connectionParam) {
         connection = await this.connectionInfoResource.load(connectionParam);

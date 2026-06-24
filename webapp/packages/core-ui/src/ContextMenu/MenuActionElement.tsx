@@ -7,7 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { Checkbox, getComputed, Radio, registry, useTranslate, type IMenuItemElementProps } from '@cloudbeaver/core-blocks';
+import { CheckboxIndicator, getComputed, RadioIndicator, registry, useTranslate, type IMenuItemElementProps } from '@cloudbeaver/core-blocks';
 import { getBindingLabel, type IMenuActionItem, type IMenuInfo } from '@cloudbeaver/core-view';
 import type { IContextMenuItemProps } from './IContextMenuItemProps.js';
 import { MenuItem, MenuItemCheckbox, MenuItemRadio } from '@dbeaver/ui-kit';
@@ -70,8 +70,7 @@ export const MenuActionElement = registry(
           name={item.id}
           value={label}
           checked={checked}
-          style={{ pointerEvents: 'auto' }}
-          render={renderMenuItem({ icon: <Radio checked={checked} size="small" /> })}
+          render={renderMenuItem({ icon: <RadioIndicator checked={checked} size="small" /> })}
           focusable
           onClick={handleClick}
         />
@@ -89,8 +88,7 @@ export const MenuActionElement = registry(
           name={item.id}
           value={label}
           checked={checked}
-          style={{ pointerEvents: 'auto' }}
-          render={renderMenuItem({ icon: <Checkbox checked={checked} size="small" /> })}
+          render={renderMenuItem({ icon: <CheckboxIndicator checked={checked} size="small" /> })}
           focusable
           onClick={handleClick}
         />

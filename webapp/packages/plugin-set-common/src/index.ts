@@ -88,6 +88,7 @@ import pluginSettingsMenu from '@cloudbeaver/plugin-settings-menu/module';
 import pluginSettingsMenuAdministration from '@cloudbeaver/plugin-settings-menu-administration/module';
 import pluginSettingsPanel from '@cloudbeaver/plugin-settings-panel/module';
 import pluginSqlEditor from '@cloudbeaver/plugin-sql-editor/module';
+import pluginSqlEditorExecutionPlan from '@cloudbeaver/plugin-sql-editor-execution-plan/module';
 import pluginSqlEditorNavigationTab from '@cloudbeaver/plugin-sql-editor-navigation-tab/module';
 import pluginSqlEditorNavigationTabScript from '@cloudbeaver/plugin-sql-editor-navigation-tab-script/module';
 import pluginSqlEditorNew from '@cloudbeaver/plugin-sql-editor-new/module';
@@ -111,6 +112,8 @@ import pluginSqlAsyncTaskConfirmation from '@cloudbeaver/plugin-sql-async-task-c
 import pluginDataViewerConditionalFormatting from '@cloudbeaver/plugin-data-viewer-conditional-formatting/module';
 import pluginConnectionView from '@cloudbeaver/plugin-connection-view/module';
 import pluginConnectionPreferences from '@cloudbeaver/plugin-connection-preferences/module';
+import pluginScriptExport from '@cloudbeaver/plugin-script-export/module';
+import pluginProjectInfo from '@cloudbeaver/plugin-project-info/module';
 
 const core = [
   coreRouting, // important, should be first because the router starts in load phase first after all plugins register phase
@@ -171,7 +174,9 @@ export const commonSet = [
   pluginGisViewer,
   pluginDdlViewer,
   pluginObjectViewer,
+  pluginScriptExport,
   pluginSqlEditor,
+  pluginSqlEditorExecutionPlan,
   pluginSqlEditorNavigationTab,
   pluginSqlEditorScreen,
   pluginSqlEditorNew,
@@ -221,4 +226,5 @@ export const commonSet = [
   pluginDataViewerConditionalFormatting,
   pluginConnectionView,
   pluginConnectionPreferences,
+  pluginProjectInfo,
 ];

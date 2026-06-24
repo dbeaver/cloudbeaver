@@ -14,8 +14,6 @@ export default [
   ['app_navigationTree_settings_filter_all_description', 'Показывает скрытые элементы при использовании фильтра'],
   ['app_navigationTree_settings_state_title', 'Сохранять состояние дерева'],
   ['app_navigationTree_settings_state_description', 'Восстанавливает открытые узлы после обновления страницы'],
-  ['app_navigationTree_settings_folders_title', 'Папки'],
-  ['app_navigationTree_settings_folders_description', 'Позволяет открыть любой узел как начальный'],
   ['app_navigationTree_node_delete_confirmation', 'Вы собираетесь удалить "{arg:name}". Вы уверены?'],
   ['app_navigationTree_node_folder_delete_confirmation', 'Все содержимое выбранной папки будет удалено.'],
   ['app_navigationTree_node_delete_error', 'Ошибка удаления "{arg:name}'],

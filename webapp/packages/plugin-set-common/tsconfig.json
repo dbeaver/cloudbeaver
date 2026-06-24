@@ -236,6 +236,9 @@
       "path": "../plugin-product-information-administration"
     },
     {
+      "path": "../plugin-project-info"
+    },
+    {
       "path": "../plugin-projects"
     },
     {
@@ -249,6 +252,9 @@
     },
     {
       "path": "../plugin-root"
+    },
+    {
+      "path": "../plugin-script-export"
     },
     {
       "path": "../plugin-session-expiration"
@@ -273,6 +279,9 @@
     },
     {
       "path": "../plugin-sql-editor"
+    },
+    {
+      "path": "../plugin-sql-editor-execution-plan"
     },
     {
       "path": "../plugin-sql-editor-navigation-tab"
@@ -327,8 +336,7 @@
     "__custom_mocks__/**/*",
     "src/**/*",
     "src/**/*.json",
-    "src/**/*.css",
-    "src/**/*.scss"
+    "src/**/*.css"
   ],
   "exclude": [
     "**/node_modules",

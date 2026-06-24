@@ -58,6 +58,7 @@
                     <application>io.cloudbeaver.product.ce.application</application>
                     <product>io.cloudbeaver.product.ce.product</product>
                     <testRuntime>default</testRuntime>
+                    <providerHint>junit6</providerHint>
                     <testClass>io.cloudbeaver.test.platform.CEServerTestSuite</testClass>
                     <appArgLine>-web-config workspace/conf/cloudbeaver.conf</appArgLine>
                     <environmentVariables>

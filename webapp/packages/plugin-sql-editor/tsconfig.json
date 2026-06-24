@@ -86,6 +86,9 @@
       "path": "../plugin-navigation-tabs"
     },
     {
+      "path": "../plugin-script-export"
+    },
+    {
       "path": "../plugin-sql-editor-codemirror"
     }
   ],
@@ -93,8 +96,7 @@
     "__custom_mocks__/**/*",
     "src/**/*",
     "src/**/*.json",
-    "src/**/*.css",
-    "src/**/*.scss"
+    "src/**/*.css"
   ],
   "exclude": [
     "**/node_modules",

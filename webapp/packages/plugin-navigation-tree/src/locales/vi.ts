@@ -12,8 +12,6 @@ export default [
   ['app_navigationTree_settings_filter_all_description', 'Hiển thị các phần tử được lọc trong các thư mục đã thu gọn'],
   ['app_navigationTree_settings_state_title', 'Lưu trạng thái cây'],
   ['app_navigationTree_settings_state_description', 'Mở lại các nút đã mở rộng sau khi làm mới trang'],
-  ['app_navigationTree_settings_folders_title', 'Thư mục'],
-  ['app_navigationTree_settings_folders_description', 'Mở bất kỳ nút nào làm nút gốc của cây'],
   ['app_navigationTree_node_delete_confirmation', 'Bạn sắp xóa "{arg:name}". Bạn có chắc chắn không?'],
   ['app_navigationTree_node_folder_delete_confirmation', 'Tất cả nội dung trong thư mục đã chọn sẽ bị xóa.'],
   ['app_navigationTree_node_delete_error', 'Không thể xóa "{arg:name}"'],

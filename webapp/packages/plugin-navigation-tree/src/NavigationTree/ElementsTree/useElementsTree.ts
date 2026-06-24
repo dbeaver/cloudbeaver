@@ -65,7 +65,6 @@ export interface IElementsTreeSettings {
   filter: boolean;
   filterAll: boolean;
   saveExpanded: boolean;
-  foldersTree: boolean;
   saveFilter: boolean;
   showFolderExplorerPath: boolean;
   configurable: boolean;
@@ -247,19 +246,6 @@ export function useElementsTree(options: IOptions): IElementsTree {
       if (expanded && elementsTree.isNodeExpandable(nodeId) && elementsTree.getNodeChildren(nodeId).length === 0 && !elementsTree.filtering) {
         elementsTree.collapse(nodeId);
         return;
-      }
-
-      if (
-        elementsTree.settings?.foldersTree &&
-        options.folderExplorer.options.expandFoldersWithSingleElement &&
-        nodeId === options.root &&
-        elementsTree.getNodeChildren(nodeId).length === 1
-      ) {
-        const nextNode = elementsTree.getNodeChildren(nodeId)[0]!;
-
-        if (elementsTree.isNodeExpandable(nextNode) || elementsTree.isNodeExpanded(nextNode)) {
-          options.folderExplorer.open(navNodeInfoResource.getParents(nextNode), nextNode);
-        }
       }
 
       await this.loadNodes(...(navTreeResource.get(nodeId) || []));
@@ -592,37 +578,25 @@ export function useElementsTree(options: IOptions): IElementsTree {
         await options.onClick?.(node);
       },
       async open(node: NavNode, path: string[], leaf: boolean) {
-        const expandableOrExpanded = this.isNodeExpandable(node.id) || this.isNodeExpanded(node.id);
-        if (!leaf && this.settings?.foldersTree && expandableOrExpanded) {
-          const nodeId = node.id;
-
-          const loaded = await handleLoadChildren(node.id, false);
-          if (loaded) {
-            this.setFilter('');
-            options.folderExplorer.open(path, nodeId);
-          }
-        }
-
-        const folder = (!leaf && this.settings?.foldersTree) || false;
-        await options.onOpen?.(node, folder);
+        await options.onOpen?.(node, false);
       },
       async expand(node: NavNode, state: boolean) {
-        if (!this.isNodeExpandable(node.id)) {
+        if (!this.isNodeExpandable(node.uri)) {
           return;
         }
 
-        const treeNodeState = this.state.get(node.id);
+        const treeNodeState = this.state.get(node.uri);
 
         try {
           if (state || (this.filtering && !treeNodeState.showInFilter)) {
-            state = await handleLoadChildren(node.id, true);
+            state = await handleLoadChildren(node.uri, true);
           }
 
           if (this.filtering) {
             treeNodeState.showInFilter = !treeNodeState.showInFilter && state;
 
             if (!treeNodeState.showInFilter) {
-              const nested = functionsRef.getNestedChildren(node.id);
+              const nested = functionsRef.getNestedChildren(node.uri);
 
               for (const nodeId of nested) {
                 const treeNodeState = this.state.get(nodeId);
@@ -631,11 +605,11 @@ export function useElementsTree(options: IOptions): IElementsTree {
             }
           } else {
             await options.onExpand?.(node, state);
-            treeNodeState.expanded = state && this.getNodeChildren(node.id).length > 0;
+            treeNodeState.expanded = state && this.getNodeChildren(node.uri).length > 0;
           }
 
           if (state) {
-            await functionsRef.loadTree(node.id);
+            await functionsRef.loadTree(node.uri);
           }
         } catch {
           treeNodeState.expanded = false;
@@ -655,17 +629,17 @@ export function useElementsTree(options: IOptions): IElementsTree {
           await options.beforeSelect(node, multiple, nested);
         }
 
-        const selected = this.isNodeSelected(node.id);
+        const selected = this.isNodeSelected(node.uri);
 
         if (!multiple) {
-          await functionsRef.clearSelection(node.id);
+          await functionsRef.clearSelection(node.uri);
 
           if (selected) {
             return;
           }
         }
 
-        await functionsRef.setSelection(node.id, !selected);
+        await functionsRef.setSelection(node.uri, !selected);
       },
       async resetSelection(): Promise<void> {
         if (options.customSelectReset) {

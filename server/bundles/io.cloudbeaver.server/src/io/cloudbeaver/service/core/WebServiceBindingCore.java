@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2025 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -81,6 +81,13 @@ public class WebServiceBindingCore extends WebServiceBindingBase<DBWServiceCore>
                     getArgument(env, "maxEntries"),
                     getArgument(env, "clearEntries"));
             })
+            .dataFetcher(
+                "listConnectionDriverProperties", env -> getService(env).getDriverProperties(
+                    getWebSession(env),
+                    getArgumentVal(env, "projectId"),
+                    getArgumentVal(env, "config")
+                )
+            )
         ;
 
         model.getMutationType()
@@ -163,6 +170,12 @@ public class WebServiceBindingCore extends WebServiceBindingBase<DBWServiceCore>
                     getArgumentVal(env, "id")
                 )
             )
+            .dataFetcher("setObjectSettingsForDatasource", env -> getService(env).setObjectSettingsForDatasource(
+                getWebSession(env),
+                getProjectReference(env),
+                getArgumentVal(env, "id"),
+                getArgumentVal(env, "settings")
+            ))
 
             .dataFetcher("asyncTaskInfo", env -> getService(env).getAsyncTaskInfo(
                 getWebSession(env),

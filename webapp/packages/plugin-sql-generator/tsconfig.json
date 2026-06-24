@@ -57,14 +57,16 @@
     },
     {
       "path": "../plugin-sql-editor-codemirror"
+    },
+    {
+      "path": "../plugin-sql-editor-navigation-tab"
     }
   ],
   "include": [
     "__custom_mocks__/**/*",
     "src/**/*",
     "src/**/*.json",
-    "src/**/*.css",
-    "src/**/*.scss"
+    "src/**/*.css"
   ],
   "exclude": [
     "**/node_modules",

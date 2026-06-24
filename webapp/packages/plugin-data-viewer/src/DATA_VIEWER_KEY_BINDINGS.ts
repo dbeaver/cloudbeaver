@@ -37,3 +37,9 @@ export const KEY_BINDING_CANCEL: IKeyBinding = {
   id: 'data-viewer-cancel',
   keys: ['mod+period'],
 };
+
+export const KEY_BINDING_OPEN_CELL_CONTEXT_MENU: IKeyBinding = {
+  id: 'data-viewer-open-cell-context-menu',
+  keys: ['mod+/'],
+  preventDefault: true,
+};

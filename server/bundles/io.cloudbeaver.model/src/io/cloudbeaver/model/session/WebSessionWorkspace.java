@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package io.cloudbeaver.model.session;
 
 import io.cloudbeaver.WebSessionProjectImpl;
+import io.cloudbeaver.utils.ServletAppUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -26,6 +27,7 @@ import org.jkiss.dbeaver.model.DBPImage;
 import org.jkiss.dbeaver.model.app.DBPPlatform;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.app.DBPWorkspace;
+import org.jkiss.dbeaver.model.fs.DBFFileSystemManager;
 import org.jkiss.dbeaver.model.impl.auth.SessionContextImpl;
 import org.jkiss.dbeaver.model.rm.RMUtils;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
@@ -45,6 +47,7 @@ public class WebSessionWorkspace implements DBPWorkspace {
     private final SessionContextImpl workspaceAuthContext;
     private final List<WebSessionProjectImpl> accessibleProjects = new ArrayList<>();
     private WebSessionProjectImpl activeProject;
+    private DBFFileSystemManager fileSystemManager;
 
     public WebSessionWorkspace(BaseWebSession session) {
         this.session = session;
@@ -199,12 +202,28 @@ public class WebSessionWorkspace implements DBPWorkspace {
 
     @Override
     public boolean hasRealmPermission(@NotNull String permission) {
+        if (getWebSession() instanceof WebSession webSession) {
+            return webSession.getSessionPermissions().contains(permission);
+        }
         return false;
     }
 
     @Override
     public boolean supportsRealmFeature(@NotNull String feature) {
-        return false;
+        return ServletAppUtils.getServletApplication().getAppConfiguration().isFeatureEnabled(feature);
     }
 
+    @NotNull
+    @Override
+    public synchronized DBFFileSystemManager getFileSystemManager() {
+        if (fileSystemManager == null) {
+            synchronized (this) {
+                if (fileSystemManager == null) {
+                    fileSystemManager = new DBFFileSystemManager(session.getWorkspace());
+                }
+            }
+        }
+
+        return fileSystemManager;
+    }
 }

@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2025 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
  */
 package io.cloudbeaver.server;
 
+import graphql.execution.instrumentation.Instrumentation;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.auth.NoAuthCredentialsProvider;
 import io.cloudbeaver.model.CBWebServerConfig;
@@ -29,6 +30,7 @@ import io.cloudbeaver.model.config.CBAppConfig;
 import io.cloudbeaver.model.config.CBServerConfig;
 import io.cloudbeaver.registry.WebDriverRegistry;
 import io.cloudbeaver.registry.WebServiceRegistry;
+import io.cloudbeaver.server.graphql.GraphQLEndpoint;
 import io.cloudbeaver.server.jetty.CBJettyServer;
 import io.cloudbeaver.service.DBWServiceInitializer;
 import io.cloudbeaver.service.DBWServiceServerConfigurator;
@@ -45,14 +47,14 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBConstants;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.app.DBPPlatform;
-import org.jkiss.dbeaver.model.auth.AuthInfo;
+import org.jkiss.dbeaver.model.auth.SMAuthConfiguration;
 import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
+import org.jkiss.dbeaver.model.auth.SMObjectType;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.impl.app.BaseApplicationImpl;
 import org.jkiss.dbeaver.model.security.SMAdminController;
 import org.jkiss.dbeaver.model.security.SMConstants;
-import org.jkiss.dbeaver.model.security.SMObjectType;
 import org.jkiss.dbeaver.model.websocket.event.WSEventController;
 import org.jkiss.dbeaver.model.websocket.event.WSServerConfigurationChangedEvent;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
@@ -226,11 +228,11 @@ public abstract class CBApplication<T extends CBServerConfig>
         Location instanceLoc = Platform.getInstanceLocation();
         try {
             if (!instanceLoc.isSet()) { // always false?
-                URL wsLocationURL = getWorkspaceDirectory().toUri().toURL();
+                URL wsLocationURL = getWorkspacePath().toUri().toURL();
                 instanceLoc.set(wsLocationURL, true);
             }
         } catch (Exception e) {
-            log.error("Error setting workspace location to " + getWorkspaceDirectory().toAbsolutePath(), e);
+            log.error("Error setting workspace location to " + getWorkspacePath().toAbsolutePath(), e);
             return;
         }
         this.systemInformationCollector = createSystemInformationCollector();
@@ -441,7 +443,7 @@ public abstract class CBApplication<T extends CBServerConfig>
 
     @NotNull
     public Path getDataDirectory(boolean create) {
-        Path dataDir = getWorkspaceDirectory().resolve(CBConstants.RUNTIME_DATA_DIR_NAME);
+        Path dataDir = getWorkspacePath().resolve(CBConstants.RUNTIME_DATA_DIR_NAME);
         if (create && !Files.exists(dataDir)) {
             try {
                 Files.createDirectories(dataDir);
@@ -532,7 +534,7 @@ public abstract class CBApplication<T extends CBServerConfig>
     public synchronized void finishConfiguration(
         @NotNull String adminName,
         @Nullable String adminPassword,
-        @NotNull List<AuthInfo> authInfoList,
+        @NotNull List<SMAuthConfiguration> authInfoList,
         @NotNull CBServerConfig serverConfig,
         @NotNull CBAppConfig appConfig,
         @Nullable SMCredentialsProvider credentialsProvider
@@ -589,7 +591,7 @@ public abstract class CBApplication<T extends CBServerConfig>
     protected abstract void finishSecurityServiceConfiguration(
         @NotNull String adminName,
         @Nullable String adminPassword,
-        @NotNull List<AuthInfo> authInfoList
+        @NotNull List<SMAuthConfiguration> authInfoList
     ) throws DBException;
 
     public synchronized void flushConfiguration(SMCredentialsProvider webSession) throws DBException {
@@ -686,6 +688,11 @@ public abstract class CBApplication<T extends CBServerConfig>
     }
 
     @NotNull
+    public GraphQLEndpoint createGraphQLEndpoint(@NotNull Instrumentation instrumentation) {
+        return new GraphQLEndpoint(instrumentation);
+    }
+
+    @NotNull
     public WebDriverRegistry getDriverRegistry() {
         return WebDriverRegistry.getInstance();
     }
@@ -736,7 +743,7 @@ public abstract class CBApplication<T extends CBServerConfig>
         sendConfigChangedEvent(credentialsProvider);
     }
 
-    protected void sendConfigChangedEvent(SMCredentialsProvider credentialsProvider) {
+    protected void sendConfigChangedEvent(@Nullable SMCredentialsProvider credentialsProvider) {
         String sessionId = null;
         if (credentialsProvider != null && credentialsProvider.getActiveUserCredentials() != null) {
             sessionId = credentialsProvider.getActiveUserCredentials().getSmSessionId();

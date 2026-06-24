@@ -36,6 +36,8 @@ import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.DBUtils;
 import org.jkiss.dbeaver.model.data.DBDAttributeBinding;
+import org.jkiss.dbeaver.model.data.DBDReferenceNavigation;
+import org.jkiss.dbeaver.model.data.DBDReferenceUtils;
 import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.exec.DBCLogicalOperator;
 import org.jkiss.dbeaver.model.exec.DBExecUtils;
@@ -59,9 +61,7 @@ import org.jkiss.dbeaver.model.sql.registry.SQLGeneratorDescriptor;
 import org.jkiss.dbeaver.model.sql.semantics.completion.SQLCompletionProposalComparator;
 import org.jkiss.dbeaver.model.sql.semantics.completion.SQLQueryCompletionAnalyzer;
 import org.jkiss.dbeaver.model.sql.semantics.completion.SQLQueryCompletionContext;
-import org.jkiss.dbeaver.model.struct.DBSDataContainer;
-import org.jkiss.dbeaver.model.struct.DBSObject;
-import org.jkiss.dbeaver.model.struct.DBSWrapper;
+import org.jkiss.dbeaver.model.struct.*;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.utils.RuntimeUtils;
 import org.jkiss.utils.CommonUtils;
@@ -243,23 +243,37 @@ public class WebServiceSQL implements DBWServiceSQL {
         return SQLGeneratorConfigurationRegistry.getInstance().getApplicableGenerators(objectList, session).toArray(new SQLGeneratorDescriptor[0]);
     }
 
+    @NotNull
     @Override
-    public String generateEntityQuery(@NotNull WebSession session, @NotNull String generatorId, @NotNull Map<String, Object> options, @NotNull List<String> nodePathList) throws DBWebException {
+    public String generateEntityQuery(
+        @NotNull WebSession session,
+        @NotNull String generatorId,
+        @NotNull List<String> nodePathList,
+        @NotNull WebSQLGeneratorOptions options
+    ) throws DBWebException {
         List<DBSObject> objectList = getObjectListFromNodeIds(session, nodePathList);
-        return createAndRunGenerator(session, generatorId, objectList);
+        return createAndRunGenerator(
+            session, generatorId, objectList,
+            options.useFullyQualifiedNames(), options.compactSql()
+        );
     }
 
+    @NotNull
     @Override
     public String sqlGenerateResultSetQuery(
         @NotNull WebSession webSession,
         @NotNull WebSQLContextInfo sqlContext,
         @NotNull String generatorId,
         @NotNull String resultsId,
-        @NotNull List<WebSQLResultsRow> selectedRows
+        @NotNull List<WebSQLResultsRow> selectedRows,
+        @NotNull WebSQLGeneratorOptions options
     ) throws DBWebException {
         checkAndFillTruncatedData(sqlContext, resultsId, selectedRows);
         WebDBDResultSetDataProvider dataProvider = new WebDBDResultSetDataProvider(resultsId, sqlContext, selectedRows);
-        return createAndRunGenerator(webSession, generatorId, Collections.singletonList(dataProvider));
+        return createAndRunGenerator(
+            webSession, generatorId, Collections.singletonList(dataProvider),
+            options.useFullyQualifiedNames(), options.compactSql()
+        );
     }
 
     private void checkAndFillTruncatedData(
@@ -289,10 +303,13 @@ public class WebServiceSQL implements DBWServiceSQL {
             dataKind.equals(DBPDataKind.BINARY);
     }
 
+    @NotNull
     private String createAndRunGenerator(
         @NotNull WebSession session,
         @NotNull String generatorId,
-        @NotNull List<DBSObject> objectList
+        @NotNull List<DBSObject> objectList,
+        boolean useFullyQualifiedNames,
+        boolean compactSql
     ) throws DBWebException {
         SQLGeneratorDescriptor generator = SQLGeneratorConfigurationRegistry.getInstance().getGenerator(generatorId);
         if (generator == null) {
@@ -300,6 +317,8 @@ public class WebServiceSQL implements DBWServiceSQL {
         }
         try {
             SQLGenerator<DBSObject> generatorInstance = generator.createGenerator(objectList);
+            generatorInstance.setFullyQualifiedNames(useFullyQualifiedNames);
+            generatorInstance.setCompactSQL(compactSql);
             generatorInstance.run(session.getProgressMonitor());
             return generatorInstance.getResult();
         } catch (DBException e) {
@@ -582,6 +601,74 @@ public class WebServiceSQL implements DBWServiceSQL {
             }
         };
         return contextInfo.getProcessor().getWebSession().createAndRunAsyncTask("Read data from container " + nodePath, runnable);
+    }
+
+    @Override
+    public WebAsyncTaskInfo asyncNavigateForeignKey(
+        @NotNull WebSession webSession,
+        @NotNull WebSQLContextInfo contextInfo,
+        @NotNull String resultsId,
+        @NotNull WebSQLResultsRow row,
+        int columnIndex,
+        @NotNull String associationName,
+        boolean isReference,
+        @Nullable WebDataFormat dataFormat
+    ) {
+        WebAsyncTaskProcessor<String> runnable = new WebAsyncTaskProcessor<>() {
+            @Override
+            public void run(DBRProgressMonitor monitor) throws InvocationTargetException {
+                try {
+                    monitor.beginTask("Navigate foreign key", 1);
+                    WebSQLResultsInfo resultsInfo = contextInfo.getResults(resultsId);
+                    DBSEntity sourceEntity = resolveSourceEntity(resultsInfo.getAttributes(), columnIndex);
+                    DBSEntityAssociation association = isReference
+                        ? DBStructUtils.findReverseAssociationByName(monitor, sourceEntity, associationName)
+                        : DBStructUtils.findForwardAssociationByName(monitor, sourceEntity, associationName);
+
+                    WebDBDResultSetDataProvider dataProvider = new WebDBDResultSetDataProvider(
+                        resultsId,
+                        contextInfo,
+                        List.of(row)
+                    );
+                    DBDReferenceNavigation navigation = isReference
+                        ? DBDReferenceUtils.resolveReferenceNavigation(monitor, dataProvider, association, dataProvider.getSelectedRows())
+                        : DBDReferenceUtils.resolveAssociationNavigation(monitor, dataProvider, association, dataProvider.getSelectedRows());
+                    if (!(navigation.getTargetEntity() instanceof DBSDataContainer targetDataContainer)) {
+                        throw new DBWebException("Referenced entity '" + navigation.getTargetEntity().getName() + "' is not a data container");
+                    }
+                    WebSQLExecuteInfo executeResults = contextInfo.getProcessor().readDataFromContainer(
+                        contextInfo,
+                        monitor,
+                        targetDataContainer,
+                        null,
+                        WebSQLDataFilter.from(navigation.getTargetFilter()),
+                        dataFormat
+                    );
+                    this.result = executeResults.getStatusMessage();
+                    this.extendedResults = executeResults;
+                } catch (Throwable e) {
+                    throw new InvocationTargetException(e);
+                } finally {
+                    monitor.done();
+                }
+            }
+        };
+        return webSession.createAndRunAsyncTask("Navigate foreign key from results " + resultsId, runnable);
+    }
+
+    @NotNull
+    private DBSEntity resolveSourceEntity(
+        @NotNull DBDAttributeBinding[] attributes,
+        int columnIndex
+    ) throws DBException {
+        if (columnIndex < 0 || columnIndex >= attributes.length) {
+            throw new DBWebException("Column index '" + columnIndex + "' is out of range");
+        }
+        DBSEntityAttribute entityAttribute = attributes[columnIndex].getEntityAttribute();
+        if (entityAttribute == null) {
+            throw new DBException("Column [" + attributes[columnIndex].getName() + "] is not bound to any entity");
+        }
+        return entityAttribute.getParentObject();
     }
 
     @NotNull

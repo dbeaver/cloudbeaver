@@ -5,6 +5,7 @@ query sqlGenerateResultSetQuery(
   $generatorId: SQLResultSetGeneratorId!
   $resultsId: ID!
   $selectedRows: [SQLResultRow!]!
+  $generatorOptions: SQLQueryGeneratorOptions
 ) {
   sqlGenerateResultSetQuery(
     projectId: $projectId
@@ -13,5 +14,6 @@ query sqlGenerateResultSetQuery(
     generatorId: $generatorId
     resultsId: $resultsId
     selectedRows: $selectedRows
+    generatorOptions: $generatorOptions
   )
 }

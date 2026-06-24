@@ -24,7 +24,7 @@ export function navigationTreeProjectFilter(
 ): IElementsTreeFilter {
   return (tree, filter, node, children) => {
     if (isRMProjectNode(node) && resourceTypeId !== undefined) {
-      const project = projectsNavNodeService.getProject(node.id);
+      const project = projectsNavNodeService.getProject(node.uri);
 
       if (!project) {
         return children;
@@ -42,17 +42,17 @@ export function navigationTreeProjectFilter(
         .get(resourceKeyList(children))
         .filter(isDefined)
         .filter(node => {
-          if (node.id === folderNodeId) {
-            return navTreeResource.get(node.id)?.length;
+          if (node.uri === folderNodeId) {
+            return navTreeResource.get(node.uri)?.length;
           }
           return false;
         })
-        .map(node => node.id);
+        .map(node => node.uri);
 
       return nodes;
     }
 
-    if (node.id !== RESOURCES_NODE_PATH) {
+    if (node.uri !== RESOURCES_NODE_PATH) {
       return children;
     }
 
@@ -61,7 +61,7 @@ export function navigationTreeProjectFilter(
       .filter<NavNode>((node => node !== undefined) as (node: NavNode | undefined) => node is NavNode)
       .filter(node => {
         if (isRMProjectNode(node)) {
-          const project = projectsNavNodeService.getProject(node.id);
+          const project = projectsNavNodeService.getProject(node.uri);
 
           if (!project || !projectsService.activeProjects.includes(project)) {
             return false;
@@ -74,11 +74,11 @@ export function navigationTreeProjectFilter(
             return (navTreeResource.get(folderNodeId)?.length || 0) > 0;
           }
 
-          return (navTreeResource.get(node.id)?.length || 0) > 0;
+          return (navTreeResource.get(node.uri)?.length || 0) > 0;
         }
         return true;
       })
-      .map(node => node.id);
+      .map(node => node.uri);
 
     return nodes;
   };

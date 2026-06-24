@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -10,12 +10,17 @@ import { ConnectionsManagerService, getFolderPath } from '@cloudbeaver/core-conn
 import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
-import { DATA_CONTEXT_NAV_NODE, isConnectionFolder, isProjectNode } from '@cloudbeaver/core-navigation-tree';
+import { DATA_CONTEXT_NAV_NODE, isConnectionFolder, isProjectNode, NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
 import { getProjectNodeId, ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey, getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
 import { ActionService, DATA_CONTEXT_MENU, type IAction, MenuService } from '@cloudbeaver/core-view';
 import { ACTION_TREE_CREATE_CONNECTION, MENU_CONNECTIONS, MENU_TREE_CREATE_CONNECTION } from '@cloudbeaver/plugin-connections';
-import { DATA_CONTEXT_ELEMENTS_TREE, MENU_ELEMENTS_TREE_TOOLS, TreeSelectionService } from '@cloudbeaver/plugin-navigation-tree';
+import {
+  DATA_CONTEXT_ELEMENTS_TREE,
+  MENU_ELEMENTS_TREE_TOOLS,
+  MENU_NAVIGATION_TREE_CREATE,
+  TreeSelectionService,
+} from '@cloudbeaver/plugin-navigation-tree';
 import { NavigationTabsService } from '@cloudbeaver/plugin-navigation-tabs';
 
 import { ACTION_CONNECTION_CUSTOM } from './Actions/ACTION_CONNECTION_CUSTOM.js';
@@ -33,6 +38,7 @@ const WelcomeNewConnection = importLazyComponent(() => import('./WelcomeNewConne
   CustomConnectionSettingsService,
   TreeSelectionService,
   NavigationTabsService,
+  NavNodeInfoResource,
 ])
 export class CustomConnectionPluginBootstrap extends Bootstrap {
   constructor(
@@ -44,6 +50,7 @@ export class CustomConnectionPluginBootstrap extends Bootstrap {
     private readonly customConnectionSettingsService: CustomConnectionSettingsService,
     private readonly treeSelectionService: TreeSelectionService,
     private readonly navigationTabsService: NavigationTabsService,
+    private readonly navNodeInfoResource: NavNodeInfoResource,
   ) {
     super();
   }
@@ -62,7 +69,7 @@ export class CustomConnectionPluginBootstrap extends Bootstrap {
     });
 
     this.menuService.addCreator({
-      root: true,
+      menus: [MENU_NAVIGATION_TREE_CREATE],
       contexts: [DATA_CONTEXT_NAV_NODE, DATA_CONTEXT_ELEMENTS_TREE],
       isApplicable: context => {
         const node = context.get(DATA_CONTEXT_NAV_NODE);
@@ -119,7 +126,9 @@ export class CustomConnectionPluginBootstrap extends Bootstrap {
           isProjectNode,
           isConnectionFolder,
         );
-        const folderPath = selectedNode?.folderId ? getFolderPath(selectedNode.folderId) : undefined;
+
+        const node = selectedNode?.folderId ? this.navNodeInfoResource.get(selectedNode.folderId) : undefined;
+        const folderPath = node ? getFolderPath(node) : undefined;
         await this.openConnectionsDialog(projectId, folderPath);
         break;
       }

@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2025 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,10 +25,13 @@ import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBFileController;
+import org.jkiss.dbeaver.model.app.DBPLockManagerProvider;
 import org.jkiss.dbeaver.model.app.DBPWorkspace;
 import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
 import org.jkiss.dbeaver.model.auth.SMSessionContext;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
+import org.jkiss.dbeaver.model.fs.lock.LockManager;
+import org.jkiss.dbeaver.model.fs.lock.shared.SharedFileLockManager;
 import org.jkiss.dbeaver.model.impl.app.ApplicationRegistry;
 import org.jkiss.dbeaver.model.impl.app.BaseApplicationImpl;
 import org.jkiss.dbeaver.model.impl.app.BaseWorkspaceImpl;
@@ -48,7 +51,7 @@ import java.util.Map;
 /**
  * Servlet application
  */
-public abstract class BaseServletApplication extends BaseApplicationImpl implements ServletApplication {
+public abstract class BaseServletApplication extends BaseApplicationImpl implements ServletApplication, DBPLockManagerProvider {
 
     public static final String DEFAULT_CONFIG_FILE_PATH = "/etc/cloudbeaver.conf";
     public static final String CUSTOM_CONFIG_FOLDER = "custom";
@@ -59,6 +62,7 @@ public abstract class BaseServletApplication extends BaseApplicationImpl impleme
 
     private String instanceId;
 
+    @NotNull
     @Override
     public RMController createResourceController(
         @NotNull SMCredentialsProvider credentialsProvider,
@@ -73,10 +77,16 @@ public abstract class BaseServletApplication extends BaseApplicationImpl impleme
         throw new IllegalStateException("File controller is not supported by " + getClass().getSimpleName());
     }
 
-    @Nullable
+    @NotNull
     @Override
-    public Path getDefaultWorkingFolder() {
-        return getServerConfigurationController().getWorkspacePath();
+    public LockManager createLockManager(@NotNull String applicationId, @NotNull Path metadataFolder) throws DBException {
+        return new SharedFileLockManager(applicationId, metadataFolder);
+    }
+
+    @NotNull
+    @Override
+    public LockManager createLockManager() throws DBException {
+        return new SharedFileLockManager(getApplicationInstanceId());
     }
 
     @Override
@@ -202,6 +212,8 @@ public abstract class BaseServletApplication extends BaseApplicationImpl impleme
     @Override
     public Object start(IApplicationContext context) {
         initializeApplicationServices();
+        setWorkspacePath(getServerConfigurationController().getWorkspacePath());
+
         try {
             startServer();
         } catch (Exception e) {
@@ -237,13 +249,6 @@ public abstract class BaseServletApplication extends BaseApplicationImpl impleme
     public String getWorkspaceIdProperty() throws DBException {
         return BaseWorkspaceImpl.readWorkspaceIdProperty();
     }
-
-    @NotNull
-    @Override
-    public Path getWorkspaceDirectory() {
-        return getServerConfigurationController().getWorkspacePath();
-    }
-
 
     public String getApplicationId() {
         try {

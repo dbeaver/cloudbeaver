@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2025 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@ import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.model.net.DBWNetworkProfile;
+import org.jkiss.dbeaver.model.net.DBWNetworkProfileManager;
 import org.jkiss.dbeaver.model.preferences.DBPPreferenceStore;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.secret.DBSSecretController;
@@ -258,26 +259,10 @@ public class WebGlobalProjectRegistryProxy implements DBPDataSourceRegistry, Dat
         dataSourceRegistry.removeSavedFilter(filterName);
     }
 
-    @Nullable
-    @Override
-    public DBWNetworkProfile getNetworkProfile(@Nullable String source, @NotNull String name) {
-        return dataSourceRegistry.getNetworkProfile(source, name);
-    }
-
     @NotNull
     @Override
-    public List<DBWNetworkProfile> getNetworkProfiles() {
+    public DBWNetworkProfileManager getNetworkProfiles() {
         return dataSourceRegistry.getNetworkProfiles();
-    }
-
-    @Override
-    public void updateNetworkProfile(@NotNull DBWNetworkProfile profile) {
-        dataSourceRegistry.updateNetworkProfile(profile);
-    }
-
-    @Override
-    public void removeNetworkProfile(@NotNull DBWNetworkProfile profile) {
-        dataSourceRegistry.removeNetworkProfile(profile);
     }
 
     @Nullable
@@ -378,6 +363,11 @@ public class WebGlobalProjectRegistryProxy implements DBPDataSourceRegistry, Dat
     }
 
     @Override
+    public void initializeDataSources() {
+        dataSourceRegistry.initializeDataSources();
+    }
+
+    @Override
     public DataSourceParseResults loadDataSources(
         @NotNull List<DBPDataSourceConfigurationStorage> storages,
         @NotNull DataSourceConfigurationManager manager,
@@ -407,12 +397,12 @@ public class WebGlobalProjectRegistryProxy implements DBPDataSourceRegistry, Dat
     }
 
     @Override
-    public void persistSecrets(DBSSecretController secretController) throws DBException {
+    public void persistSecrets(@NotNull DBSSecretController secretController) throws DBException {
         dataSourceRegistry.persistSecrets(secretController);
     }
 
     @Override
-    public void resolveSecrets(DBSSecretController secretController) throws DBException {
+    public void resolveSecrets(@NotNull DBSSecretController secretController) throws DBException {
         dataSourceRegistry.resolveSecrets(secretController);
     }
 

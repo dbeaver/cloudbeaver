@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,9 @@ import { getConnectionFormAccessPart } from './getConnectionFormAccessPart.js';
 
 const NAME_COLUMN: IGrantManagementTableColumn = { key: 'name', label: 'connections_connection_access_user_or_team_name' };
 const DESCRIPTION_COLUMN: IGrantManagementTableColumn = { key: 'description', label: 'connections_connection_description' };
+const LAST_LOGIN_COLUMN: IGrantManagementTableColumn = { key: 'lastLogin', label: 'plugin_connections_administration_user_last_login' };
 
-const COLUMNS: IGrantManagementTableColumn[] = [NAME_COLUMN, DESCRIPTION_COLUMN];
+const COLUMNS: IGrantManagementTableColumn[] = [NAME_COLUMN, DESCRIPTION_COLUMN, LAST_LOGIN_COLUMN];
 
 export const ConnectionAccessTable: TabContainerPanelComponent<IConnectionFormProps> = observer(function ConnectionAccessTable({ tabId, formState }) {
   const translate = useTranslate();
@@ -98,6 +99,13 @@ export const ConnectionAccessTable: TabContainerPanelComponent<IConnectionFormPr
           {description}
         </span>
       );
+    }
+
+    if (colKey === LAST_LOGIN_COLUMN.key && !isTeam) {
+      const lastLoginFullTime = item.lastLoginTime ? new Date(item.lastLoginTime).toLocaleString() : '-';
+      const lastLoginDate = item.lastLoginTime ? new Date(item.lastLoginTime).toLocaleDateString() : '-';
+
+      return <span title={lastLoginFullTime}>{lastLoginDate}</span>;
     }
 
     return null;

@@ -6,6 +6,7 @@ on:
       - opened
       - synchronize
       - reopened
+      - ready_for_review
   push:
     branches: [devel]
 
@@ -23,11 +24,6 @@ jobs:
       project-directory: ./cloudbeaver/server/product/aggregate
       project-deps: ./cloudbeaver/project.deps
       timeout-minutes: 5
-
-  # build-server:
-  #   name: Server
-  #   uses: ./.github/workflows/backend-build.yml
-  #   secrets: inherit
 
   build-frontend:
     name: Frontend

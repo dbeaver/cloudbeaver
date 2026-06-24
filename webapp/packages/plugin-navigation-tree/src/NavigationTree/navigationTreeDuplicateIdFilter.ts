@@ -15,7 +15,7 @@ export function navigationTreeDuplicateFilter(navNodeViewService: NavNodeViewSer
     const { nodes, duplicates } = navNodeViewService.filterDuplicates(children);
 
     untracked(() => {
-      navNodeViewService.logDuplicates(node.id, Array.from(duplicates));
+      navNodeViewService.logDuplicates(node.uri, Array.from(duplicates));
     });
 
     return Array.from(nodes);

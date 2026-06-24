@@ -22,7 +22,7 @@ export function elementsTreeNameFilter(
   compare: NavNodeFilterCompareFn = elementsTreeNameFilterNode,
 ): IElementsTreeFilter {
   return (tree, filter, node, children, state) => {
-    const nodeState = state.get(node.id);
+    const nodeState = state.get(node.uri);
 
     if (filter === '' || nodeState.showInFilter || compare(tree, node, filter) === EEquality.full) {
       return children;
@@ -33,7 +33,7 @@ export function elementsTreeNameFilter(
       .filter(isDefined)
       .filter(child => filterNode(tree, navTreeResource, navNodeInfoResource, compare, filter, child, state));
 
-    return nodes.map(node => node.id);
+    return nodes.map(node => node.uri);
   };
 }
 
@@ -46,14 +46,14 @@ function filterNode(
   node: NavNode,
   state: MetadataMap<string, ITreeNodeState>,
 ): boolean {
-  const nodeState = state.get(node.id);
+  const nodeState = state.get(node.uri);
 
   if (compare(tree, node, filter) !== EEquality.none || nodeState.showInFilter) {
     return true;
   }
 
   // if (nodeState.expanded) {
-  const children = navTreeResource.get(node.id) || [];
+  const children = navTreeResource.get(node.uri) || [];
 
   return navNodeInfoResource
     .get(resourceKeyList(children))
@@ -73,5 +73,67 @@ export function elementsTreeNameFilterNode(tree: IElementsTree, node: NavNode, f
     return EEquality.full;
   }
 
-  return nodeName?.includes(filterToLower) ? EEquality.partially : EEquality.none;
+  return createFilter(filterToLower)(nodeName) ? EEquality.partially : EEquality.none;
+}
+
+function wildcardMatch(value: string, pattern: string): boolean {
+  const s = value.toLowerCase();
+  const p = pattern.trim().toLowerCase();
+  const parts = p.split('*');
+
+  if (parts.length === 1) {
+    return s.includes(parts[0]!);
+  }
+
+  let pos = 0;
+
+  for (let i = 0; i < parts.length; i++) {
+    const part = parts[i];
+    if (!part) {
+      continue;
+    }
+
+    const idx = s.indexOf(part, pos);
+    if (idx === -1) {
+      return false;
+    }
+
+    if (i === 0 && !p.startsWith('*') && idx !== 0) {
+      return false;
+    }
+
+    pos = idx + part.length;
+  }
+
+  if (!p.endsWith('*') && parts[parts.length - 1]) {
+    if (!s.endsWith(parts[parts.length - 1]!)) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+function matchesFilter(value: string, filter: string): boolean {
+  const groups = filter
+    .split(',')
+    .map(g => g.trim())
+    .filter(Boolean);
+
+  if (!groups.length) {
+    return true;
+  }
+
+  return groups.every(group => {
+    const alts = group
+      .split('|')
+      .map(a => a.trim())
+      .filter(Boolean);
+
+    return alts.some(alt => wildcardMatch(value, alt));
+  });
+}
+
+function createFilter(filter: string): (value: string) => boolean {
+  return (value: string) => matchesFilter(value, filter);
 }

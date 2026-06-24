@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,12 @@
 package io.cloudbeaver.service.sql;
 
 import io.cloudbeaver.model.session.WebSession;
+import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.exec.plan.DBCPlan;
+import org.jkiss.dbeaver.model.exec.plan.DBCPlanCostNode;
 import org.jkiss.dbeaver.model.exec.plan.DBCPlanNode;
+import org.jkiss.utils.CommonUtils;
 
 import java.util.*;
 
@@ -30,16 +33,43 @@ public class WebSQLExecutionPlan {
 
     private static final Log log = Log.getLog(WebSQLExecutionPlan.class);
 
+    @NotNull
     private final WebSession webSession;
+    @NotNull
     private final DBCPlan plan;
 
-    public WebSQLExecutionPlan(WebSession webSession, DBCPlan plan) {
+    public WebSQLExecutionPlan(@NotNull WebSession webSession, @NotNull DBCPlan plan) {
         this.webSession = webSession;
         this.plan = plan;
     }
 
+    @NotNull
+    public DBCPlan getPlan() {
+        return plan;
+    }
+
     public String getQuery() {
         return plan.getQueryString();
+    }
+
+    public boolean isHasCost() {
+        return CommonUtils.toBoolean(plan.getPlanFeature(DBCPlanCostNode.FEATURE_PLAN_COST));
+    }
+
+    public boolean isHasRows() {
+        return CommonUtils.toBoolean(plan.getPlanFeature(DBCPlanCostNode.FEATURE_PLAN_ROWS));
+    }
+
+    public boolean isHasDuration() {
+        return CommonUtils.toBoolean(plan.getPlanFeature(DBCPlanCostNode.FEATURE_PLAN_DURATION));
+    }
+
+    public String getDurationMeasure() {
+        if (!isHasDuration()) {
+            return null;
+        }
+        Object value = plan.getPlanFeature(DBCPlanCostNode.PLAN_DURATION_MEASURE);
+        return value == null ? null : String.valueOf(value);
     }
 
     public WebSQLExecutionPlanNode[] getNodes() {

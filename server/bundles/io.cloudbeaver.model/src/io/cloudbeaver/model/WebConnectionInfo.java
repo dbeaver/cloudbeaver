@@ -39,12 +39,15 @@ import org.jkiss.dbeaver.model.connection.DBPDriverConfigurationType;
 import org.jkiss.dbeaver.model.impl.auth.AuthModelDatabaseNative;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
-import org.jkiss.dbeaver.model.navigator.DBNDataSource;
+import org.jkiss.dbeaver.model.navigator.DBNDatabaseNode;
+import org.jkiss.dbeaver.model.navigator.DBNUtils;
+import org.jkiss.dbeaver.model.preferences.DBPPreferenceStore;
 import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
 import org.jkiss.dbeaver.model.preferences.DBPPropertySource;
 import org.jkiss.dbeaver.model.rm.RMConstants;
 import org.jkiss.dbeaver.model.rm.RMProjectPermission;
 import org.jkiss.dbeaver.model.runtime.DBRRunnableParametrized;
+import org.jkiss.dbeaver.registry.DataSourcePreferenceStore;
 import org.jkiss.dbeaver.registry.network.NetworkHandlerDescriptor;
 import org.jkiss.dbeaver.registry.network.NetworkHandlerRegistry;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
@@ -211,7 +214,8 @@ public class WebConnectionInfo {
 
     @Property
     public String getNodePath() {
-        return DBNDataSource.makeDataSourceItemPath(dataSourceContainer);
+        DBNDatabaseNode dsNode = DBNUtils.getNodeByObject(dataSourceContainer);
+        return dsNode == null ? null : dsNode.getNodeUri();
     }
 
     @Property
@@ -291,6 +295,16 @@ public class WebConnectionInfo {
     @NotNull
     public DBNBrowseSettings getDefaultNavigatorSettings() {
         return dataSourceContainer.getNavigatorSettings().getOriginalSettings();
+    }
+
+    @Property
+    @NotNull
+    public Map<String, String> getDefaultUserPreferences() {
+        DBPPreferenceStore preferenceStore = dataSourceContainer.getPreferenceStore();
+        if (preferenceStore instanceof DataSourcePreferenceStore dataSourcePreferenceStore) {
+            return dataSourcePreferenceStore.getProperties();
+        }
+        return Collections.emptyMap();
     }
 
     @Property
@@ -578,4 +592,5 @@ public class WebConnectionInfo {
     public void setCredentialsSavedInSession(@Nullable Boolean credentialsSavedInSession) {
         this.credentialsSavedInSession = credentialsSavedInSession;
     }
+
 }

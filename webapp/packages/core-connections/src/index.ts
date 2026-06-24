@@ -26,12 +26,12 @@ export * from './NavTree/getConnectionFolderId.js';
 export * from './NavTree/getFolderPathWithProjectId.js';
 export * from './NavTree/getFolderPath.js';
 export * from './NavTree/getConnectionParentId.js';
-export * from './NavTree/getFolderNodeParents.js';
 export * from './NavTree/NAV_NODE_TYPE_CONNECTION.js';
 export * from './NavTree/isConnectionNode.js';
 
 export * from './extensions/IConnectionProvider.js';
 export * from './extensions/IConnectionSetter.js';
+export * from './extensions/IConnectionRequiredProvider.js';
 export * from './ConnectionFolderEventHandler.js';
 export * from './ConnectionsManagerService.js';
 export * from './ConnectionFolderResource.js';

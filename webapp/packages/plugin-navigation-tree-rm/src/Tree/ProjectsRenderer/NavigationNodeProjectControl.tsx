@@ -40,7 +40,7 @@ export const NavigationNodeProjectControl: NavTreeControlComponent = observer<Na
     const navNodeInfoResource = useService(NavNodeInfoResource);
     const resourceManagerService = useService(ResourceManagerService);
 
-    const outdated = getComputed(() => navNodeInfoResource.isOutdated(node.id) && !treeNodeContext.loading);
+    const outdated = getComputed(() => navNodeInfoResource.isOutdated(node.uri) && !treeNodeContext.loading);
     const selected = treeNodeContext.selected;
     const resourceType = viewContext?.get(DATA_CONTEXT_RESOURCE_MANAGER_TREE_RESOURCE_TYPE_ID);
 

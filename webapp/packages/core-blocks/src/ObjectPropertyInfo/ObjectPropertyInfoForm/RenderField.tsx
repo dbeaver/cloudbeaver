@@ -147,7 +147,15 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
 
   const passwordSaved = showRememberTip && ((isPassword && !!property.value) || saved);
   const passwordSavedMessage = passwordSaved ? translate('core_blocks_object_property_info_password_saved') : undefined;
-  const placeholder = passwordSavedMessage || property.description;
+
+  function getPlaceholder() {
+    if (passwordSaved && isPassword) {
+      return SAVED_VALUE_INDICATOR;
+    }
+    return passwordSavedMessage || property.description;
+  }
+
+  const placeholder = getPlaceholder();
 
   if (controlType === 'selector') {
     if (state !== undefined) {

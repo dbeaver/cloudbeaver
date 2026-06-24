@@ -94,4 +94,5 @@ export default [
   ['connections_templates_deprecated_message', 'Kết nối mẫu đã bị ngừng hỗ trợ và sẽ bị xóa trong các phiên bản tương lai'],
   ['core_connections_connection_driver_not_installed', 'Trình điều khiển (driver) chưa được cài đặt'],
   ['core_connections_connection_temporary', 'Kết nối tạm thời'],
+  ['core_connections_no_connection', 'Không có kết nối nào'],
 ];

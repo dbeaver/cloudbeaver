@@ -5,9 +5,9 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { computed, makeObservable } from 'mobx';
+import { action, computed, makeObservable, runInAction } from 'mobx';
 
-import { type DataTypeLogicalOperation, ResultDataFormat, type SqlDataFilterConstraint } from '@cloudbeaver/core-sdk';
+import { type DataTypeLogicalOperation, ResultDataFormat, type SqlDataFilterConstraint, type SqlResultColumn } from '@cloudbeaver/core-sdk';
 
 import { DatabaseDataAction } from '../DatabaseDataAction.js';
 import type { IDatabaseDataOptions } from '../IDatabaseDataOptions.js';
@@ -21,10 +21,47 @@ import { IDatabaseDataResult } from '../IDatabaseDataResult.js';
 export const IS_NULL_ID = 'IS_NULL';
 export const IS_NOT_NULL_ID = 'IS_NOT_NULL';
 
+const CONSTRAINTS_KEY = 'constraints';
+const WHERE_FILTER_KEY = 'whereFilter';
+
+export function persistDataFilterConstraints<TOptions extends IDatabaseDataOptions>(
+  source: IDatabaseDataSource<TOptions, IDatabaseResultSet>,
+): void {
+  const options = source.options;
+  if (!options) {
+    return;
+  }
+
+  source.persistedState.set(CONSTRAINTS_KEY, options.constraints.filter(hasConstraintIdentity));
+  source.persistedState.set(WHERE_FILTER_KEY, options.whereFilter || '');
+}
+
+export function applyPersistedDataFilterConstraints<TOptions extends IDatabaseDataOptions>(
+  source: IDatabaseDataSource<TOptions, IDatabaseResultSet>,
+): void {
+  const options = source.options;
+  if (!options) {
+    return;
+  }
+
+  const constraints = source.persistedState.get<SqlDataFilterConstraint[]>(CONSTRAINTS_KEY);
+  const whereFilter = source.persistedState.get<string>(WHERE_FILTER_KEY);
+
+  if (!Array.isArray(constraints) || typeof whereFilter !== 'string') {
+    return;
+  }
+
+  runInAction(() => {
+    options.constraints = constraints.map(constraint => ({ ...constraint }));
+    options.whereFilter = whereFilter;
+  });
+}
+
 @injectable(() => [IDatabaseDataSource, IDatabaseDataResult])
 export class DatabaseDataConstraintAction
   extends DatabaseDataAction<IDatabaseDataOptions, IDatabaseResultSet>
-  implements IDatabaseDataConstraintAction<IDatabaseResultSet> {
+  implements IDatabaseDataConstraintAction<IDatabaseResultSet>
+{
   static dataFormat = [ResultDataFormat.Resultset, ResultDataFormat.Document];
 
   get supported(): boolean {
@@ -54,6 +91,16 @@ export class DatabaseDataConstraintAction
     makeObservable(this, {
       orderConstraints: computed,
       filterConstraints: computed,
+      deleteAll: action,
+      deleteFilter: action,
+      deleteFilters: action,
+      deleteOrders: action,
+      deleteOrder: action,
+      deleteDataFilters: action,
+      deleteData: action,
+      setWhereFilter: action,
+      setFilter: action,
+      setOrder: action,
     });
   }
 
@@ -161,7 +208,7 @@ export class DatabaseDataConstraintAction
     this.resetWhereFilter();
   }
 
-  setWhereFilter(value: string) {
+  setWhereFilter(value: string): void {
     if (!this.source.options) {
       throw new Error('Options must be provided');
     }
@@ -169,11 +216,11 @@ export class DatabaseDataConstraintAction
     this.source.options.whereFilter = value;
   }
 
-  resetWhereFilter() {
+  resetWhereFilter(): void {
     this.setWhereFilter('');
   }
 
-  setFilter(attributePosition: number, operator: string, value?: any): void {
+  setFilter(attributePosition: number, operator: string, value?: unknown): void {
     if (!this.source.options) {
       throw new Error('Options must be provided');
     }
@@ -182,6 +229,7 @@ export class DatabaseDataConstraintAction
 
     if (currentConstraint) {
       currentConstraint.operator = operator;
+      currentConstraint.attributeName = this.getColumnNameAt(attributePosition);
       if (value !== undefined) {
         currentConstraint.value = value;
       } else if (currentConstraint.value !== undefined) {
@@ -192,6 +240,7 @@ export class DatabaseDataConstraintAction
 
     const constraint: SqlDataFilterConstraint = {
       attributePosition,
+      attributeName: this.getColumnNameAt(attributePosition),
       operator,
     };
 
@@ -219,6 +268,7 @@ export class DatabaseDataConstraintAction
       if (!resetOrder) {
         this.source.options.constraints.push({
           attributePosition,
+          attributeName: this.getColumnNameAt(attributePosition),
           orderPosition: this.getMaxOrderPosition(),
           orderAsc: order === EOrder.asc,
         });
@@ -257,6 +307,10 @@ export class DatabaseDataConstraintAction
   override updateResult(result: IDatabaseResultSet): void {
     updateConstraintsForResult(this.source, result);
   }
+
+  private getColumnNameAt(colIdx: number): string | undefined {
+    return this.result.data?.columns?.find(c => c.position === colIdx)?.name;
+  }
 }
 
 function updateConstraintsForResult(source: IDatabaseDataSource<IDatabaseDataOptions, IDatabaseResultSet>, result: IDatabaseResultSet) {
@@ -264,31 +318,66 @@ function updateConstraintsForResult(source: IDatabaseDataSource<IDatabaseDataOpt
     return;
   }
 
-  for (const constraint of source.options.constraints) {
-    const prevColumn = result.data?.columns?.find(column => column.position === constraint.attributePosition);
+  const columns = result.data?.columns ?? [];
 
-    if (!prevColumn) {
-      return;
-    }
+  if (columns.length === 0) {
+    return;
+  }
 
-    let column = result.data?.columns?.find(column => column.position === prevColumn.position);
+  runInAction(() => {
+    for (const constraint of source.options!.constraints) {
+      if (!hasConstraintIdentity(constraint)) {
+        resetDataFilterState(source);
+        return;
+      }
 
-    if (!column || column.label !== prevColumn.label) {
-      column = result.data?.columns?.find(column => column.label === prevColumn.label);
-    }
+      const initialPosition = constraint.attributePosition;
+      const initialName = constraint.attributeName;
 
-    if (column && prevColumn.position !== column.position) {
+      const resolvedColumn = resolveConstraintColumn(columns, initialName, initialPosition);
+
+      if (!resolvedColumn) {
+        resetDataFilterState(source);
+        return;
+      }
+
+      constraint.attributeName = resolvedColumn.name;
+      constraint.attributePosition = resolvedColumn.position;
+
       const prevConstraint = source.prevOptions?.constraints.find(
-        prevConstraint => prevConstraint.attributePosition === constraint.attributePosition,
+        prevConstraint => prevConstraint.attributePosition === initialPosition && prevConstraint.attributeName === initialName,
       );
 
-      constraint.attributePosition = column.position;
-
       if (prevConstraint) {
+        prevConstraint.attributeName = constraint.attributeName;
         prevConstraint.attributePosition = constraint.attributePosition;
       }
     }
-  }
+  });
+}
+
+function resetDataFilterState(source: IDatabaseDataSource<IDatabaseDataOptions, IDatabaseResultSet>): void {
+  source.options!.constraints = [];
+  source.options!.whereFilter = '';
+  source.persistedState.delete(CONSTRAINTS_KEY);
+  source.persistedState.delete(WHERE_FILTER_KEY);
+}
+
+function resolveConstraintColumn(
+  columns: SqlResultColumn[],
+  attributeName: string,
+  attributePosition: number,
+): (SqlResultColumn & { name: string; position: number }) | undefined {
+  return columns.find(
+    (column): column is SqlResultColumn & { name: string; position: number } =>
+      typeof column.name === 'string' && typeof column.position === 'number' && column.position === attributePosition && column.name === attributeName,
+  );
+}
+
+function hasConstraintIdentity(
+  constraint: SqlDataFilterConstraint,
+): constraint is SqlDataFilterConstraint & { attributeName: string; attributePosition: number } {
+  return typeof constraint.attributeName === 'string' && constraint.attributeName.length > 0 && typeof constraint.attributePosition === 'number';
 }
 
 export function nullOperationsFilter(operation: DataTypeLogicalOperation): boolean {
@@ -306,12 +395,12 @@ export function getNextOrder(order: Order): Order {
   }
 }
 
-export function wrapOperationArgument(operationId: string, argument: any): string {
+export function wrapOperationArgument(operationId: string, argument: unknown): string {
   if (operationId === 'LIKE') {
     return `%${argument}%`;
   }
 
-  return argument;
+  return String(argument);
 }
 
 export function isFilterConstraint(constraint: SqlDataFilterConstraint): boolean {
