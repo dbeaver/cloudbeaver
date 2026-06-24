@@ -22,7 +22,7 @@ import {
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { Settings } from '@cloudbeaver/plugin-settings-panel';
-import { TabList, TabsState, type ITabData } from '@cloudbeaver/core-ui';
+import { TabList, TabsState, type ITabData, useUnsavedChanges } from '@cloudbeaver/core-ui';
 import { SettingsAdministrationService } from './SettingsAdministrationService.js';
 import { useState } from 'react';
 import { SettingsResolverService } from '@cloudbeaver/core-settings';
@@ -38,15 +38,17 @@ export const SettingsAdministration = observer<AdministrationItemContentProps>(f
   const accessor = tabInfo?.options?.accessor;
   const changed = settingsSource?.isEdited() || false;
 
-  async function handleSave() {
+  async function handleSave(): Promise<boolean> {
     if (!changed) {
-      return;
+      return true;
     }
     try {
       await settingsSource?.save();
       notificationService.logSuccess({ title: translate('plugin_settings_administration_settings_save_success') });
+      return true;
     } catch (error: any) {
       notificationService.logException(error, 'plugin_settings_administration_settings_save_fail');
+      return false;
     }
   }
 
@@ -59,6 +61,14 @@ export const SettingsAdministration = observer<AdministrationItemContentProps>(f
   function handleReset() {
     settingsSource?.clear();
   }
+
+  useUnsavedChanges({
+    get isChanged() {
+      return settingsSource?.isEdited() ?? false;
+    },
+    save: handleSave,
+    reset: handleReset,
+  });
 
   function handleRestoreDefaults() {
     settingsSource?.restoreDefaults?.();

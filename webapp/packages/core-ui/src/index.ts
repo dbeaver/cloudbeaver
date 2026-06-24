@@ -48,6 +48,8 @@ export * from './InlineEditor/InlineEditorLoader.js';
 
 export * from './Screens/AppScreen/NavigationService.js';
 export * from './Screens/AppScreen/OptionsPanelService.js';
+export * from './Screens/AppScreen/UnsavedChangesService.js';
+export * from './Screens/AppScreen/useUnsavedChanges.js';
 
 export * from './Tabs/ITab.js';
 export * from './Tabs/TabContext.js';

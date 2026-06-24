@@ -12,6 +12,7 @@ import { SideBarPanelService } from './SideBarPanel/SideBarPanelService.js';
 import { LeftBarPanelService } from './SideBarPanel/LeftBarPanelService.js';
 import { NavigationService } from './Screens/AppScreen/NavigationService.js';
 import { OptionsPanelService } from './Screens/AppScreen/OptionsPanelService.js';
+import { UnsavedChangesService } from './Screens/AppScreen/UnsavedChangesService.js';
 import { LocaleService } from './LocaleService.js';
 import { ClipboardBootstrap } from './Clipboard/ClipboardBootstrap.js';
 import { ClipboardService } from './Clipboard/ClipboardService.js';
@@ -30,6 +31,7 @@ export default ModuleRegistry.add({
       .addSingleton(LeftBarPanelService)
       .addSingleton(NavigationService)
       .addSingleton(OptionsPanelService)
+      .addSingleton(UnsavedChangesService)
       .addSingleton(ClipboardBootstrap);
   },
 });

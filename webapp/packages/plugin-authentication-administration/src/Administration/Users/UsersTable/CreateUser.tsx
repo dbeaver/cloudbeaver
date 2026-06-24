@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 
 import { Container, Group, GroupTitle, Loader, s, Translate, useS } from '@cloudbeaver/core-blocks';
-import type { IFormState } from '@cloudbeaver/core-ui';
+import { type IFormState, useUnsavedChanges } from '@cloudbeaver/core-ui';
 
 import { AdministrationUserForm } from '../UserForm/AdministrationUserForm.js';
 import type { IUserFormState } from '../UserForm/AdministrationUserFormService.js';
@@ -21,6 +21,8 @@ interface Props {
 
 export const CreateUser = observer<Props>(function CreateUser({ state, onCancel }) {
   const styles = useS(style);
+
+  useUnsavedChanges(state);
 
   return (
     <Group aria-labelledby="create-user-title" className={s(styles, { box: true })} gap vertical noWrap>

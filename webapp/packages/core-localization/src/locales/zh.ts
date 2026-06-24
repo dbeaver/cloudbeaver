@@ -19,6 +19,7 @@ export default [
   ['ui_processing_ok', '好'],
   ['ui_processing_create', '创建'],
   ['ui_processing_save', '保存'],
+  ['ui_processing_dont_save', '不保存'],
   ['ui_processing_saving', '保存中...'],
   ['ui_processing_do_you_want_to_proceed', '是否继续?'],
   ['ui_processing_saved', '已保存'],

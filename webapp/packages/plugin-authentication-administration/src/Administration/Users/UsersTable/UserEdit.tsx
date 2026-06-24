@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 
 import {
   ColoredContainer,
-  ConfirmationDialog,
+  confirmUnsavedChanges,
   GroupBack,
   GroupTitle,
   Loader,
@@ -19,7 +19,7 @@ import {
   useTranslate,
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
+import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { ExecutorInterrupter } from '@cloudbeaver/core-executor';
 import { FormMode } from '@cloudbeaver/core-ui';
 
@@ -37,16 +37,19 @@ export const UserEdit = observer<TableItemExpandProps<string>>(function UserEdit
     executor: usersTableOptionsPanelService.onClose,
     handlers: [
       async function closeHandler(event, contexts) {
-        if (state.isChanged && event === 'before') {
-          const { status } = await commonDialogService.open(ConfirmationDialog, {
-            title: 'ui_save_reminder',
-            message: 'ui_are_you_sure',
-            confirmActionText: 'ui_yes',
-          });
+        if (event !== 'before') {
+          return;
+        }
 
-          if (status === DialogueStateResult.Rejected) {
-            ExecutorInterrupter.interrupt(contexts);
-          }
+        const confirmed = await confirmUnsavedChanges(commonDialogService, {
+          isChanged: state.isChanged,
+          isSaving: state.isSaving,
+          save: () => state.save(),
+          reset: () => state.reset(),
+        });
+
+        if (!confirmed) {
+          ExecutorInterrupter.interrupt(contexts);
         }
       },
     ],
