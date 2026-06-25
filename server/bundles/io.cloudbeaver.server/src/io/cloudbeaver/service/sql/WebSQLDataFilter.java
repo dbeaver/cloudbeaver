@@ -147,12 +147,34 @@ public class WebSQLDataFilter {
 
     private void fillEmptyConstrains(@NotNull List<DBDAttributeConstraint> emptyConstraints) throws DBException {
         for (WebSQLDataFilterConstraint webConstr : constraints) {
-            if (webConstr.getAttributePosition() >= emptyConstraints.size()) {
-                throw new DBException(MessageFormat.format("Incorrect column position ''{0}'' in order clause", webConstr.getAttributePosition()));
-            }
-            DBDAttributeConstraint dbConstr = emptyConstraints.get(webConstr.getAttributePosition());
+            DBDAttributeConstraint dbConstr = findConstraintToFill(emptyConstraints, webConstr);
             fillEmptyConstraint(dbConstr, webConstr);
         }
+    }
+
+    @NotNull
+    private DBDAttributeConstraint findConstraintToFill(
+        @NotNull List<DBDAttributeConstraint> emptyConstraints,
+        @NotNull WebSQLDataFilterConstraint webConstr
+    ) throws DBException {
+        Integer attributePosition = webConstr.getAttributePosition();
+        if (attributePosition != null) {
+            if (attributePosition < 0 || attributePosition >= emptyConstraints.size()) {
+                throw new DBException(MessageFormat.format("Incorrect column position ''{0}'' in order clause", attributePosition));
+            }
+            return emptyConstraints.get(attributePosition);
+        }
+        // try by attribute name
+        String attributeName = webConstr.getAttributeName();
+        if (!CommonUtils.isEmpty(attributeName)) {
+            for (DBDAttributeConstraint dbConstr : emptyConstraints) {
+                if (CommonUtils.equalObjects(dbConstr.getAttributeName(), attributeName)) {
+                    return dbConstr;
+                }
+            }
+            throw new DBException(MessageFormat.format("Constraint attribute ''{0}'' not found in result set", attributeName));
+        }
+        throw new DBException("Constraint must specify either attributePosition or attributeName");
     }
 
     @NotNull
