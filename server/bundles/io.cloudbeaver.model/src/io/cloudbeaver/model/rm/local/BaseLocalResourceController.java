@@ -171,7 +171,7 @@ public abstract class BaseLocalResourceController implements RMController {
                         manager,
                         dataSourceIds,
                         true,
-                        dataSourceIds != null
+                        dataSourceIds == null
                     );
                     registry.checkForErrors();
                     log.debug("Save data sources configuration in project '" + projectId + "'");
