@@ -12,7 +12,8 @@
   "license": "Apache-2.0",
   "exports": {
     ".": "./lib/index.js",
-    "./module": "./lib/module.js"
+    "./module": "./lib/module.js",
+    "./*.css": "./src/*.css"
   },
   "scripts": {
     "build": "tsc -b",
