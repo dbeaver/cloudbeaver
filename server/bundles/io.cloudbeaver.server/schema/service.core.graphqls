@@ -646,6 +646,24 @@ type ConnectionType @since(version: "26.1.2") {
     color: String!
     "Alternative color of the connection type (for dark theme)"
     alternativeColor: String
+    "Is autocommit enabled for this connection type"
+    autocommit: Boolean!
+
+    confirmExecute: Boolean!
+    "Confirm data change operations (INSERT, UPDATE, DELETE) for this connection type"
+    confirmDataChange: Boolean!
+    "Smart commit mode is enabled for this connection type"
+    smartCommit: Boolean!
+    "Recover smart commit mode is enabled for this connection type"
+    smartCommitRecover: Boolean!
+    "Auto-close transactions is enabled for this connection type"
+    autoCloseTransactions: Boolean!
+    "Auto-close idle transactions period in seconds for this connection type"
+    closeIdleTransactionPeriod: Int!
+    "Auto-close connections is enabled for this connection type"
+    autoCloseConnections: Boolean!
+    "Auto-close idle connections period in seconds for this connection type"
+    closeIdleConnectionPeriod: Int!
 }
 
 ####################################################
