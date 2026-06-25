@@ -14,11 +14,13 @@ import type { ITask } from '@cloudbeaver/core-executor';
 import { AsyncTaskInfoService } from '@cloudbeaver/core-root';
 import { GraphQLService, type SqlExecutionPlan } from '@cloudbeaver/core-sdk';
 import { uuid } from '@cloudbeaver/core-utils';
+import { type ISqlEditorTabState, SqlDataSourceService } from '@cloudbeaver/plugin-sql-editor';
 
-import type { ISqlEditorTabState } from '../../ISqlEditorTabState.js';
-import { SqlDataSourceService } from '../../SqlDataSource/SqlDataSourceService.js';
+import type { IExecutionPlanTab } from './IExecutionPlanTab.js';
 
-interface IExecutionPlanData {
+export interface IExecutionPlanData {
+  tab: IExecutionPlanTab;
+  editorId: string;
   task: ITask<SqlExecutionPlan>;
   executionPlan: SqlExecutionPlan | null;
 }
@@ -41,6 +43,10 @@ export class SqlExecutionPlanService {
     });
   }
 
+  has(tabId: string): boolean {
+    return this.data.has(tabId);
+  }
+
   async executeExecutionPlan(editorState: ISqlEditorTabState, query: string): Promise<void> {
     const dataSource = this.sqlDataSourceService.get(editorState.editorId);
     const contextInfo = dataSource?.executionContext;
@@ -51,9 +57,6 @@ export class SqlExecutionPlanService {
       console.error('executeExecutionPlan executionContext is not provided');
       return;
     }
-
-    const tabId = this.createExecutionPlanTab(editorState, query);
-    editorState.currentTabId = tabId;
 
     const asyncTask = this.asyncTaskInfoService.create(async () => {
       const { taskInfo } = await this.graphQLService.sdk.asyncSqlExplainExecutionPlan({
@@ -78,10 +81,8 @@ export class SqlExecutionPlanService {
       () => this.asyncTaskInfoService.remove(asyncTask.id),
     );
 
-    this.data.set(tabId, {
-      task,
-      executionPlan: null,
-    });
+    const tabId = this.createExecutionPlanTab(editorState, query, task);
+    editorState.currentTabId = tabId;
 
     try {
       const executionPlan = await task;
@@ -93,10 +94,11 @@ export class SqlExecutionPlanService {
         return;
       }
 
-      this.data.set(tabId, {
-        task,
-        executionPlan,
-      });
+      const data = this.data.get(tabId);
+
+      if (data) {
+        this.data.set(tabId, { ...data, executionPlan });
+      }
     } catch (exception: any) {
       const cancelled = task.cancelled;
       const message = cancelled ? 'Execution plan process has been canceled' : undefined;
@@ -107,6 +109,16 @@ export class SqlExecutionPlanService {
         throw exception;
       }
     }
+  }
+
+  removeExecutionPlanTab(state: ISqlEditorTabState, tabId: string): void {
+    const data = this.data.get(tabId);
+
+    if (data) {
+      data.task.cancel();
+    }
+
+    this.data.delete(tabId);
   }
 
   private removeTab(state: ISqlEditorTabState, tabId: string) {
@@ -123,23 +135,7 @@ export class SqlExecutionPlanService {
     }
   }
 
-  removeExecutionPlanTab(state: ISqlEditorTabState, tabId: string): void {
-    const executionPlanTab = state.executionPlanTabs.find(executionPlanTab => executionPlanTab.tabId === tabId);
-
-    if (executionPlanTab) {
-      state.executionPlanTabs.splice(state.executionPlanTabs.indexOf(executionPlanTab), 1);
-    }
-
-    const data = this.data.get(tabId);
-
-    if (data) {
-      data.task.cancel();
-    }
-
-    this.data.delete(tabId);
-  }
-
-  private createExecutionPlanTab(state: ISqlEditorTabState, query: string) {
+  private createExecutionPlanTab(state: ISqlEditorTabState, query: string, task: ITask<SqlExecutionPlan>): string {
     const dataSource = this.sqlDataSourceService.get(state.editorId);
     if (!dataSource) {
       throw new Error('SQL Data Source is not provided');
@@ -147,12 +143,20 @@ export class SqlExecutionPlanService {
 
     const id = uuid();
     const order = Math.max(0, ...state.tabs.map(tab => tab.order + 1));
-    const nameOrder = Math.max(1, ...state.executionPlanTabs.map(tab => tab.order + 1));
+    const editorTabs = [...this.data.values()].filter(data => data.editorId === state.editorId);
+    const nameOrder = Math.max(1, ...editorTabs.map(data => data.tab.order + 1));
 
-    state.executionPlanTabs.push({
+    const tab: IExecutionPlanTab = {
       tabId: id,
       order: nameOrder,
       query,
+    };
+
+    this.data.set(id, {
+      tab,
+      editorId: state.editorId,
+      task,
+      executionPlan: null,
     });
 
     state.tabs.push({
