@@ -9,6 +9,7 @@
 import { reaction } from 'mobx';
 import { useEffect, useRef } from 'react';
 
+import { isNotNullDefined } from '@dbeaver/js-helpers';
 import { useObjectRef, useResource } from '@cloudbeaver/core-blocks';
 import { ConnectionExecutionContextService, ConnectionInfoResource, createConnectionParam } from '@cloudbeaver/core-connections';
 import { IServiceProvider, useService } from '@cloudbeaver/core-di';
@@ -139,38 +140,35 @@ export function useReferencesDataModel(
 
           if (context) {
             const connectionKey = createConnectionParam(context.projectId, context.connectionId);
-            const references = referencesAction.associations;
-            const currentReference = references.find(r => r.associationName === association);
+            const associations = referencesAction.associations;
+            const currentAssociation = associations.find(r => r.associationName === association);
 
-            if (currentReference?.targetNodePath) {
-              const sourceColumn = data.columns.find(c => currentReference.columnMapping.find(m => m.sourceColumnName === c.name));
-              const targetColumn = data.columns.find(c => currentReference.columnMapping.find(m => m.targetColumnName === c.name));
-
-              const targetMapping = currentReference.columnMapping.find(m => m.sourceColumnName === sourceColumn?.name);
-              const operation = sourceColumn?.supportedOperations.find(o => o.id === 'EQUALS');
-
-              const rows = activeRows.map(r => r.row);
-              const defaultRow = view.rowKeys[0];
-
-              if (!rows.length && defaultRow) {
-                rows.push(defaultRow);
-              }
-
+            if (currentAssociation?.targetNodePath) {
               const constraints: SqlDataFilterConstraint[] = [];
 
-              for (const row of rows) {
-                const rowValue = data.getRowValue(row);
+              // Restrict the related result to only rows that are linked to the current row via this association.
+              // The target attribute name differs depending on which side of the relationship owns the foreign key.
+              for (const mapping of currentAssociation.columnMapping) {
+                const rows = activeRows.map(r => r.row);
+                const defaultRow = view.rowKeys[0];
 
-                if (rowValue) {
-                  const targetValue = sourceColumn ? rowValue[sourceColumn.position] : undefined;
+                if (!rows.length && defaultRow) {
+                  rows.push(defaultRow);
+                }
 
-                  if (targetValue && operation) {
-                    constraints.push({
-                      attributeName: currentReference.isReference ? targetMapping?.targetColumnName : targetColumn?.name,
-                      operator: operation.id,
-                      value: String(targetValue),
-                      criteria: operation.expression,
-                    });
+                for (const row of rows) {
+                  const rowValue = data.getRowValue(row);
+
+                  if (rowValue) {
+                    const targetValue = rowValue[mapping.sourceColumnIndex];
+
+                    if (isNotNullDefined(targetValue)) {
+                      constraints.push({
+                        attributeName: mapping.targetColumnName,
+                        operator: 'EQUALS',
+                        value: targetValue,
+                      });
+                    }
                   }
                 }
               }
@@ -179,11 +177,11 @@ export function useReferencesDataModel(
                 .setCountGain(dataViewerSettingsService.getDefaultRowsCount())
                 .setSlice(0)
                 .source.setOptions({
-                  containerNodePath: currentReference.targetNodePath,
+                  containerNodePath: currentAssociation.targetNodePath,
                   connectionKey,
                   constraints,
                   whereFilter: '',
-                  anyConstraint: true,
+                  anyConstraint: currentAssociation.columnMapping.length === 1,
                 })
                 .resetData();
             }

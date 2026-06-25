@@ -6,7 +6,7 @@ query getSqlResultAssociations($projectId: ID!, $connectionId: ID!, $contextId: 
     resultsId: $resultsId
     isReference: $isReference
   ) {
-    isReference
+    reference
     associationName
     targetEntityName
     targetNodePath

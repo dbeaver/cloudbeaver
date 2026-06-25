@@ -8,7 +8,7 @@
 
 import { makeObservable, observable } from 'mobx';
 
-import { GraphQLService, ResultDataFormat, type SqlResultReference } from '@cloudbeaver/core-sdk';
+import { GraphQLService, ResultDataFormat, type SqlResultAssociation } from '@cloudbeaver/core-sdk';
 import { injectable } from '@cloudbeaver/core-di';
 
 import { IDatabaseDataSource } from '../../IDatabaseDataSource.js';
@@ -21,7 +21,7 @@ import type { IDatabaseReferencesAction } from '../IDatabaseReferencesAction.js'
 export class ResultSetReferencesAction extends DatabaseDataAction<any, IDatabaseResultSet> implements IDatabaseReferencesAction<IDatabaseResultSet> {
   static dataFormat = [ResultDataFormat.Resultset];
 
-  associations: SqlResultReference[];
+  associations: SqlResultAssociation[];
 
   constructor(
     source: IDatabaseDataSource,
@@ -40,11 +40,11 @@ export class ResultSetReferencesAction extends DatabaseDataAction<any, IDatabase
     }, 0);
   }
 
-  getAssociation(name: string): SqlResultReference | undefined {
+  getAssociation(name: string): SqlResultAssociation | undefined {
     return this.associations.find(association => association.associationName === name);
   }
 
-  async loadAssociations(): Promise<SqlResultReference[]> {
+  async loadAssociations(): Promise<SqlResultAssociation[]> {
     const result = this.result;
 
     if (!result.id) {

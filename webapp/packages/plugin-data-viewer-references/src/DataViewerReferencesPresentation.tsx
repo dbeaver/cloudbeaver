@@ -30,7 +30,7 @@ export const DataViewerReferencesPresentation: DataPresentationComponent = obser
   model: unknownModel,
   resultIndex,
 }) {
-  const originalModel = unknownModel as any;
+  const originalModel = unknownModel;
 
   const translate = useTranslate();
   const navNodeManagerService = useService(NavNodeManagerService);
@@ -88,13 +88,13 @@ export const DataViewerReferencesPresentation: DataPresentationComponent = obser
             name="association"
             items={associations.map(a => a.associationName)}
             valueSelector={a => {
-              const assotiation = referencesAction.getAssociation(a);
+              const association = referencesAction.getAssociation(a);
 
-              if (!assotiation) {
+              if (!association) {
                 return a;
               }
 
-              return `${assotiation.targetEntityName} (${assotiation.associationName})`;
+              return `${association.targetEntityName ? `${association.targetEntityName} ` : ''}(${association.associationName})`;
             }}
           />
           {currentAssociation.targetNodePath && (
