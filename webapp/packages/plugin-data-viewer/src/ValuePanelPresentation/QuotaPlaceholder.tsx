@@ -53,7 +53,7 @@ export const QuotaPlaceholder: React.FC<React.PropsWithChildren<Props>> = observ
               target="_blank"
               indicator
             >
-              {translate('ui_limit')}
+              {`${translate('ui_limit')}${limitInfo?.limitWithSize ? ` (${limitInfo.limitWithSize})` : ''}`}
             </Link>
           ) : (
             translate('ui_limit')
