@@ -331,23 +331,23 @@ public class WebSQLUtils {
     }
 
     @NotNull
-    public static List<WebSQLQueryResultReference> collectAssociations(
+    public static List<WebSQLQueryResultAssociation> collectAssociations(
         @NotNull WebSession session,
         @NotNull DBDAttributeBinding[] bindings
     ) {
-        return collectWebSQLQueryResultReference(session, bindings, false);
+        return collectWebSQLQueryResultAssociation(session, bindings, false);
     }
 
     @NotNull
-    public static List<WebSQLQueryResultReference> collectReferences(
+    public static List<WebSQLQueryResultAssociation> collectReferences(
         @NotNull WebSession session,
         @NotNull DBDAttributeBinding[] bindings
     ) {
-        return collectWebSQLQueryResultReference(session, bindings, true);
+        return collectWebSQLQueryResultAssociation(session, bindings, true);
     }
 
     @NotNull
-    private static List<WebSQLQueryResultReference> collectWebSQLQueryResultReference(
+    private static List<WebSQLQueryResultAssociation> collectWebSQLQueryResultAssociation(
         @NotNull WebSession session,
         @NotNull DBDAttributeBinding[] bindings,
         boolean reverse
@@ -369,7 +369,7 @@ public class WebSQLUtils {
             return idx == null ? null : bindings[idx];
         };
 
-        List<WebSQLQueryResultReference> result = new ArrayList<>();
+        List<WebSQLQueryResultAssociation> result = new ArrayList<>();
         DBRProgressMonitor monitor = session.getProgressMonitor();
         for (DBSEntity entity : entities) {
             try {
@@ -379,7 +379,7 @@ public class WebSQLUtils {
                 for (DBSEntityAssociation association : source) {
                     List<WebSQLReferenceColumnMapping> mapping = collectColumnMapping(monitor, association, reverse, attrToIndex);
                     if (mapping != null) {
-                        result.add(new WebSQLQueryResultReference(session, association, reverse, mapping));
+                        result.add(new WebSQLQueryResultAssociation(session, association, reverse, mapping));
                     }
                 }
             } catch (DBException e) {

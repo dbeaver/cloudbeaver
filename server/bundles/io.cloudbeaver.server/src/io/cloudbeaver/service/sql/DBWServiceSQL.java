@@ -127,7 +127,7 @@ public interface DBWServiceSQL extends DBWService {
         @Nullable WebDataFormat dataFormat) throws DBWebException;
 
     @WebAction
-    List<WebSQLQueryResultReference> getSqlResultAssociations(
+    List<WebSQLQueryResultAssociation> getSqlResultAssociations(
         @NotNull WebSession webSession,
         @NotNull WebSQLContextInfo contextInfo,
         @NotNull String resultsId,

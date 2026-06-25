@@ -75,7 +75,7 @@ input SQLDataFilter {
 }
 
 "Pair (source-row column index, target-entity column name) used to build a navigation filter"
-type SQLReferenceColumnMapping @since(version: "26.1.1") {
+type SQLReferenceColumnMapping @since(version: "26.1.2") {
     "Position in the result-set bindings"
     sourceColumnIndex: Int!
     "Column name in the source result set"
@@ -84,9 +84,9 @@ type SQLReferenceColumnMapping @since(version: "26.1.1") {
     targetColumnName: String!
 }
 
-type SQLResultReference @since(version: "26.1.1") {
+type SQLResultAssociation @since(version: "26.1.1") {
     "True for reverse references (incoming FKs)"
-    isReference: Boolean!
+    reference: Boolean!
     "Name of the association (foreign key)"
     associationName: String!
     "Name of the catalog the target entity belongs to"
@@ -348,7 +348,7 @@ extend type Query {
         contextId: ID!,
         resultsId: ID!,
         isReference: Boolean
-    ): [SQLResultReference!]! @since(version: "26.1.1")
+    ): [SQLResultAssociation!]! @since(version: "26.1.1")
 
     "Returns SQL dialect info for the specified connection"
     sqlDialectInfo( projectId: ID, connectionId: ID! ): SQLDialectInfo

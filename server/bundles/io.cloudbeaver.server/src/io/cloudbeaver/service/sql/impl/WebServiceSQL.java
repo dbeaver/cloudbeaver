@@ -605,7 +605,7 @@ public class WebServiceSQL implements DBWServiceSQL {
 
     @NotNull
     @Override
-    public List<WebSQLQueryResultReference> getSqlResultAssociations(
+    public List<WebSQLQueryResultAssociation> getSqlResultAssociations(
         @NotNull WebSession webSession,
         @NotNull WebSQLContextInfo contextInfo,
         @NotNull String resultsId,
@@ -614,7 +614,7 @@ public class WebServiceSQL implements DBWServiceSQL {
         DBDAttributeBinding[] attributes = contextInfo.getResults(resultsId).getAttributes();
         if (isReference == null) {
             // Both forward associations and reverse references
-            List<WebSQLQueryResultReference> associations =
+            List<WebSQLQueryResultAssociation> associations =
                 new ArrayList<>(WebSQLUtils.collectAssociations(webSession, attributes));
             associations.addAll(WebSQLUtils.collectReferences(webSession, attributes));
             return associations;

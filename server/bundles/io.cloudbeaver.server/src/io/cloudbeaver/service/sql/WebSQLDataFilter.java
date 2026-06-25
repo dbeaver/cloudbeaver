@@ -94,6 +94,9 @@ public class WebSQLDataFilter {
         return where;
     }
 
+    /**
+     * When true constraints are combined with OR instead of AND
+     */
     public boolean isAnyConstraint() {
         return anyConstraint;
     }

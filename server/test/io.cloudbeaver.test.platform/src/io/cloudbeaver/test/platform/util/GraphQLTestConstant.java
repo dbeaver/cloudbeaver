@@ -116,7 +116,7 @@ public class GraphQLTestConstant {
             resultsId: $resultsId,
             isReference: $isReference
           ) {
-            isReference
+            reference
             associationName
             targetCatalogName
             targetSchemaName

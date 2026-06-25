@@ -32,9 +32,9 @@ import org.jkiss.dbeaver.model.struct.rdb.DBSSchema;
 
 import java.util.List;
 
-public class WebSQLQueryResultReference {
+public class WebSQLQueryResultAssociation {
 
-    private static final Log log = Log.getLog(WebSQLQueryResultReference.class);
+    private static final Log log = Log.getLog(WebSQLQueryResultAssociation.class);
 
     @Nullable
     private final WebSession session;
@@ -44,7 +44,7 @@ public class WebSQLQueryResultReference {
     @NotNull
     private final List<WebSQLReferenceColumnMapping> columnMapping;
 
-    public WebSQLQueryResultReference(
+    public WebSQLQueryResultAssociation(
         @Nullable WebSession session,
         @NotNull DBSEntityAssociation association,
         boolean reverse,
