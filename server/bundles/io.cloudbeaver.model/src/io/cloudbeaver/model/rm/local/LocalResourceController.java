@@ -49,7 +49,7 @@ import org.jkiss.dbeaver.model.websocket.event.WSSessionLogUpdatedEvent;
 import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceEvent;
 import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceProperty;
 import org.jkiss.dbeaver.model.websocket.event.datasource.WSDatasourceFolderEvent;
-import org.jkiss.dbeaver.model.websocket.event.profile.WSNetworkProfileEvent;
+import org.jkiss.dbeaver.model.websocket.event.datasource.WSNetworkProfileEvent;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
 import org.jkiss.dbeaver.registry.DataSourceParseResults;
 import org.jkiss.dbeaver.registry.ResourceTypeDescriptor;
@@ -621,45 +621,31 @@ public class LocalResourceController extends BaseLocalResourceController {
             );
         }
 
-        if (!parseResults.addedProfiles.isEmpty()) {
-            ServletAppUtils.getServletApplication().getEventController().addEvent(
-                WSNetworkProfileEvent.create(
-                    credentialsProvider.getActiveUserCredentials().getSmSessionId(),
-                    credentialsProvider.getActiveUserCredentials().getUserId(),
-                    registry.getProject().getId(),
-                    parseResults.addedProfiles.stream().map(DBWNetworkProfile::getProfileName).toList()
-                )
-            );
-        }
+        boolean profilesChanged = !parseResults.removedProfiles.isEmpty();
 
-        List<String> updatedProfileNames = new ArrayList<>();
-
-        for (DBWNetworkProfile updatedProfile : parseResults.updatedProfiles) {
-            if (oldNetworkProfiles.containsKey(updatedProfile.getProfileId())) {
-                DBWNetworkProfile oldProfile = oldNetworkProfiles.get(updatedProfile.getProfileId());
-                if (!oldProfile.equalConfigurations(updatedProfile)) {
-                    updatedProfileNames.add(updatedProfile.getProfileName());
+        // We don't need to check for updated profiles if there are already added or removed profiles
+        if (!profilesChanged) {
+            for (DBWNetworkProfile updatedProfile : parseResults.updatedProfiles) {
+                if (oldNetworkProfiles.containsKey(updatedProfile.getProfileId())) {
+                    DBWNetworkProfile oldProfile = oldNetworkProfiles.get(updatedProfile.getProfileId());
+                    if (!oldProfile.equalConfigurations(updatedProfile)) {
+                        profilesChanged = true;
+                        break;
+                    }
+                } else {
+                    // profile was added
+                    profilesChanged = true;
+                    break;
                 }
             }
         }
 
-        if (!updatedProfileNames.isEmpty()) {
+        if (profilesChanged) {
             ServletAppUtils.getServletApplication().getEventController().addEvent(
                 WSNetworkProfileEvent.update(
                     credentialsProvider.getActiveUserCredentials().getSmSessionId(),
                     credentialsProvider.getActiveUserCredentials().getUserId(),
-                    registry.getProject().getId(),
-                    updatedProfileNames
-                )
-            );
-        }
-        if (!parseResults.removedProfiles.isEmpty()) {
-            ServletAppUtils.getServletApplication().getEventController().addEvent(
-                WSNetworkProfileEvent.delete(
-                    credentialsProvider.getActiveUserCredentials().getSmSessionId(),
-                    credentialsProvider.getActiveUserCredentials().getUserId(),
-                    registry.getProject().getId(),
-                    parseResults.removedProfiles.stream().map(DBWNetworkProfile::getProfileName).toList()
+                    registry.getProject().getId()
                 )
             );
         }

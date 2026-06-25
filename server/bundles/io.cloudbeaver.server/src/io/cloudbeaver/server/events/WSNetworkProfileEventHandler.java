@@ -21,7 +21,7 @@ import io.cloudbeaver.model.session.BaseWebSession;
 import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
-import org.jkiss.dbeaver.model.websocket.event.profile.WSNetworkProfileEvent;
+import org.jkiss.dbeaver.model.websocket.event.datasource.WSNetworkProfileEvent;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 
 public class WSNetworkProfileEventHandler extends WSDefaultEventHandler<WSNetworkProfileEvent> {
