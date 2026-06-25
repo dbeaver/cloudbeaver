@@ -367,6 +367,7 @@ public class WebGlobalProjectRegistryProxy implements DBPDataSourceRegistry, Dat
         dataSourceRegistry.initializeDataSources();
     }
 
+    @NotNull
     @Override
     public DataSourceParseResults loadDataSources(
         @NotNull List<DBPDataSourceConfigurationStorage> storages,
@@ -382,6 +383,7 @@ public class WebGlobalProjectRegistryProxy implements DBPDataSourceRegistry, Dat
         dataSourceRegistry.saveDataSources();
     }
 
+    @NotNull
     @Override
     public DataSourceConfigurationManager getConfigurationManager() {
         return dataSourceRegistry.getConfigurationManager();

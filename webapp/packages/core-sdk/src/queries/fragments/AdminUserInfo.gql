@@ -11,4 +11,5 @@ fragment AdminUserInfo on AdminUserInfo {
   disabledBy
   disableDate
   disableReason
+  lastLoginTime
 }
