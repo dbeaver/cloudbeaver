@@ -643,9 +643,9 @@ type ConnectionType @since(version: "26.1.2") {
     "Description of the connection type"
     description: String
     "Color of the connection type (for light theme)"
-    color: String!
+    colorLight: String!
     "Alternative color of the connection type (for dark theme)"
-    alternativeColor: String
+    colorDark: String
     "Is autocommit enabled for this connection type"
     autocommit: Boolean!
 
