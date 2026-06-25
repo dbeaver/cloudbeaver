@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -8,10 +8,9 @@
 import { observer } from 'mobx-react-lite';
 import { useCallback } from 'react';
 
-import { Checkbox, getComputed, s, TableState, useS } from '@cloudbeaver/core-blocks';
+import { Command } from '@dbeaver/ui-kit';
+import { CheckboxIndicator, getComputed, TableState } from '@cloudbeaver/core-blocks';
 import type { DBObject } from '@cloudbeaver/core-navigation-tree';
-
-import style from './SelectorFormatter.module.css';
 
 interface Props {
   tableState: TableState<string>;
@@ -21,15 +20,19 @@ interface Props {
 export const SelectorFormatter = observer<Props>(function SelectorFormatter({ tableState, object }) {
   const id = object.uri;
   const selected = getComputed(() => tableState?.selected.get(id) ?? false);
-  const styles = useS(style);
 
   const select = useCallback(() => {
     tableState?.selected.set(id, !selected);
   }, [tableState, id, selected]);
 
   return (
-    <div className={s(styles, { container: true })}>
-      <Checkbox className={s(styles, { checkbox: true })} checked={selected} onClick={select} />
-    </div>
+    <Command
+      className="tw:flex tw:w-full tw:h-full tw:items-center tw:justify-center tw:outline-0!"
+      disabled={!tableState}
+      tabIndex={0}
+      onClick={select}
+    >
+      <CheckboxIndicator checked={selected} />
+    </Command>
   );
 });

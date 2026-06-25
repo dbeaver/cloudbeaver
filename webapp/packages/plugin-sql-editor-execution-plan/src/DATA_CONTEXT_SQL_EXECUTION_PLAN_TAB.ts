@@ -7,6 +7,6 @@
  */
 import { createDataContext } from '@cloudbeaver/core-data-context';
 
-import type { IExecutionPlanTab } from '../../ISqlEditorTabState.js';
+import type { IExecutionPlanTab } from './IExecutionPlanTab.js';
 
 export const DATA_CONTEXT_SQL_EXECUTION_PLAN_TAB = createDataContext<IExecutionPlanTab>('sql-execution-plan-tab');

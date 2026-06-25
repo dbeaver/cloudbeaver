@@ -36,12 +36,10 @@ import { ACTION_SQL_EDITOR_EXECUTE } from './actions/ACTION_SQL_EDITOR_EXECUTE.j
 import { ACTION_SQL_EDITOR_EXECUTE_NEW } from './actions/ACTION_SQL_EDITOR_EXECUTE_NEW.js';
 import { ACTION_SQL_EDITOR_EXECUTE_SCRIPT } from './actions/ACTION_SQL_EDITOR_EXECUTE_SCRIPT.js';
 import { ACTION_SQL_EDITOR_FORMAT } from './actions/ACTION_SQL_EDITOR_FORMAT.js';
-import { ACTION_SQL_EDITOR_SHOW_EXECUTION_PLAN } from './actions/ACTION_SQL_EDITOR_SHOW_EXECUTION_PLAN.js';
 import { KEY_BINDING_SQL_EDITOR_EXECUTE } from './actions/bindings/KEY_BINDING_SQL_EDITOR_EXECUTE.js';
 import { KEY_BINDING_SQL_EDITOR_EXECUTE_NEW } from './actions/bindings/KEY_BINDING_SQL_EDITOR_EXECUTE_NEW.js';
 import { KEY_BINDING_SQL_EDITOR_EXECUTE_SCRIPT } from './actions/bindings/KEY_BINDING_SQL_EDITOR_EXECUTE_SCRIPT.js';
 import { KEY_BINDING_SQL_EDITOR_FORMAT } from './actions/bindings/KEY_BINDING_SQL_EDITOR_FORMAT.js';
-import { KEY_BINDING_SQL_EDITOR_SHOW_EXECUTION_PLAN } from './actions/bindings/KEY_BINDING_SQL_EDITOR_SHOW_EXECUTION_PLAN.js';
 import { DATA_CONTEXT_SQL_EDITOR_STATE } from './DATA_CONTEXT_SQL_EDITOR_STATE.js';
 import { ESqlDataSourceFeatures } from './SqlDataSource/ESqlDataSourceFeatures.js';
 import { SqlDataSourceService } from './SqlDataSource/SqlDataSourceService.js';
@@ -56,12 +54,7 @@ import { downloadSql } from './downloadSql.js';
 
 const SYNC_DELAY = 5 * 60 * 1000;
 
-const EXECUTIONS_ACTIONS = [
-  ACTION_SQL_EDITOR_EXECUTE,
-  ACTION_SQL_EDITOR_EXECUTE_NEW,
-  ACTION_SQL_EDITOR_EXECUTE_SCRIPT,
-  ACTION_SQL_EDITOR_SHOW_EXECUTION_PLAN,
-];
+const EXECUTIONS_ACTIONS = [ACTION_SQL_EDITOR_EXECUTE, ACTION_SQL_EDITOR_EXECUTE_NEW, ACTION_SQL_EDITOR_EXECUTE_SCRIPT];
 
 const LOCAL_EXPORT_TAB_ID = 'sql-editor-local-export-tab';
 const LocalExportPanel = importLazyComponent(() => import('./LocalExport/LocalExportPanel.js').then(module => module.LocalExportPanel));
@@ -258,14 +251,10 @@ export class MenuBootstrap extends Bootstrap {
           return !!sqlEditorData.model.dataSource?.hasFeature(ESqlDataSourceFeatures.script);
         }
 
-        if (action === ACTION_SQL_EDITOR_SHOW_EXECUTION_PLAN) {
-          return !!sqlEditorData.model.dataSource?.hasFeature(ESqlDataSourceFeatures.query) && !!sqlEditorData.dialect?.supportsExplainExecutionPlan;
-        }
-
         // TODO we have to add check for output action ?
         if (
           !sqlEditorData.model.dataSource?.hasFeature(ESqlDataSourceFeatures.query) &&
-          [ACTION_SQL_EDITOR_EXECUTE, ACTION_SQL_EDITOR_EXECUTE_NEW, ACTION_SQL_EDITOR_SHOW_EXECUTION_PLAN].includes(action)
+          [ACTION_SQL_EDITOR_EXECUTE, ACTION_SQL_EDITOR_EXECUTE_NEW].includes(action)
         ) {
           return false;
         }
@@ -353,14 +342,6 @@ export class MenuBootstrap extends Bootstrap {
       handler: this.sqlEditorActionHandler.bind(this),
     });
 
-    this.keyBindingService.addKeyBindingHandler({
-      id: 'sql-editor-show-execution-plan',
-      binding: KEY_BINDING_SQL_EDITOR_SHOW_EXECUTION_PLAN,
-      contexts: [DATA_CONTEXT_SQL_EDITOR_DATA],
-      isBindingApplicable: (contexts, action) => action === ACTION_SQL_EDITOR_SHOW_EXECUTION_PLAN,
-      handler: this.sqlEditorActionHandler.bind(this),
-    });
-
     // this.menuService.addCreator({
     //   isApplicable: context => (
     //     context.get(DATA_CONTEXT_SQL_EDITOR_DATA) !== undefined
@@ -413,9 +394,6 @@ export class MenuBootstrap extends Bootstrap {
         break;
       case ACTION_REDO:
         data.model.dataSource?.history.redo();
-        break;
-      case ACTION_SQL_EDITOR_SHOW_EXECUTION_PLAN:
-        data.showExecutionPlan();
         break;
     }
   }
