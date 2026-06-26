@@ -14,6 +14,7 @@ import { CaptureViewScope } from '@cloudbeaver/core-view';
 import { Select, TextPlaceholder, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
+import { NotificationService } from '@cloudbeaver/core-events';
 import {
   type DataPresentationComponent,
   IDatabaseDataMetadataAction,
@@ -34,6 +35,7 @@ export const DataViewerReferencesPresentation: DataPresentationComponent = obser
 
   const translate = useTranslate();
   const navNodeManagerService = useService(NavNodeManagerService);
+  const notificationService = useService(NotificationService);
 
   if (!isResultSetDataModel(originalModel)) {
     throw new Error('DataViewerReferencesPresentation can only be used with ResultSetDataSource');
@@ -72,7 +74,8 @@ export const DataViewerReferencesPresentation: DataPresentationComponent = obser
 
   function openAssociation() {
     if (!currentAssociation?.targetNodePath) {
-      throw new Error('Target node path is not defined');
+      notificationService.logError({ title: 'plugin_data_viewer_references_no_target_node' });
+      return;
     }
 
     navNodeManagerService.navToNode(currentAssociation.targetNodePath);

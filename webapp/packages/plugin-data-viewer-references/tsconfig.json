@@ -32,6 +32,9 @@
       "path": "../core-dialogs"
     },
     {
+      "path": "../core-events"
+    },
+    {
       "path": "../core-localization"
     },
     {
