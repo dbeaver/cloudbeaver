@@ -27,7 +27,7 @@ export class DataViewerReferencesBootstrap extends Bootstrap {
     this.dataPresentationService.add({
       id: 'references-presentation',
       type: DataPresentationType.toolsPanel,
-      title: 'references',
+      title: 'plugin_data_viewer_references',
       icon: '/icons/plugin_data_viewer_result_set_grouping_m.svg',
       dataFormat: ResultDataFormat.Resultset,
       hidden: (dataFormat, model, resultIndex) => {

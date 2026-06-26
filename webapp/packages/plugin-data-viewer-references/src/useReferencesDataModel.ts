@@ -170,6 +170,7 @@ export function useReferencesDataModel(
                       if (isNotNullDefined(targetValue)) {
                         constraints.push({
                           attributeName: mapping.targetColumnName,
+                          attributePosition: mapping.targetColumnIndex,
                           operator: 'EQUALS',
                           value: targetValue,
                         });

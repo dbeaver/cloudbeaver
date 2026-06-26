@@ -13,6 +13,7 @@ query getSqlResultAssociations($projectId: ID!, $connectionId: ID!, $contextId: 
     columnMapping {
       sourceColumnIndex
       sourceColumnName
+      targetColumnIndex
       targetColumnName
     }
   }
