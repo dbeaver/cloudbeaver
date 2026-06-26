@@ -648,7 +648,7 @@ type ConnectionType @since(version: "26.1.2") {
     colorDark: String
     "Is autocommit enabled for this connection type"
     autocommit: Boolean!
-
+    "Confirm execution of queries for this connection type"
     confirmExecute: Boolean!
     "Confirm data change operations (INSERT, UPDATE, DELETE) for this connection type"
     confirmDataChange: Boolean!
