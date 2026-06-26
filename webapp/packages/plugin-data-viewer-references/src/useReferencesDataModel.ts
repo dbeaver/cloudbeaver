@@ -19,6 +19,7 @@ import { isObjectsEqual } from '@cloudbeaver/core-utils';
 import {
   DatabaseDataAccessMode,
   DatabaseDataModel,
+  DataViewerService,
   DataViewerSettingsService,
   GridViewAction,
   type IDatabaseDataModel,
@@ -50,6 +51,7 @@ export function useReferencesDataModel(
   const asyncTaskInfoService = useService(AsyncTaskInfoService);
   const dataViewerSettingsService = useService(DataViewerSettingsService);
   const connectionExecutionContextService = useService(ConnectionExecutionContextService);
+  const dataViewerService = useService(DataViewerService);
 
   const referencesAction = sourceModel.source.getAction(sourceResultIndex, IDatabaseReferencesAction, ResultSetReferencesAction);
   const selection = sourceModel.source.getAction(sourceResultIndex, ResultSetSelectAction);
@@ -85,7 +87,11 @@ export function useReferencesDataModel(
       // eslint-disable-next-line react-hooks/immutability
       state.modelId = model.id;
 
-      model.setAccess(DatabaseDataAccessMode.Readonly).setCountGain(dataViewerSettingsService.getDefaultRowsCount()).setSlice(0);
+      const editable = connectionInfo ? dataViewerService.isDataEditable(connectionInfo) : false;
+      model
+        .setAccess(editable ? DatabaseDataAccessMode.Default : DatabaseDataAccessMode.Readonly)
+        .setCountGain(dataViewerSettingsService.getDefaultRowsCount())
+        .setSlice(0);
 
       return {
         source,
@@ -183,6 +189,7 @@ export function useReferencesDataModel(
               model.model
                 .setCountGain(dataViewerSettingsService.getDefaultRowsCount())
                 .setSlice(0)
+                .setName(currentAssociation.associationName)
                 .source.setOptions({
                   containerNodePath: currentAssociation.targetNodePath,
                   connectionKey,

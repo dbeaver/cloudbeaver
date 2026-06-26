@@ -9,9 +9,9 @@
 import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 
-import { Button } from '@dbeaver/ui-kit';
+import { Button, clsx } from '@dbeaver/ui-kit';
 import { CaptureViewScope } from '@cloudbeaver/core-view';
-import { Select, TextPlaceholder, useTranslate } from '@cloudbeaver/core-blocks';
+import { IconOrImage, Select, TextPlaceholder, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -89,16 +89,15 @@ export const DataViewerReferencesPresentation: DataPresentationComponent = obser
             className="tw:flex-1"
             state={state}
             name="association"
-            items={associations.map(a => a.associationName)}
-            valueSelector={a => {
-              const association = referencesAction.getAssociation(a);
-
-              if (!association) {
-                return a;
-              }
-
-              return `${association.reference ? '← ' : '→ '}${association.targetEntityName ? `${association.targetEntityName} ` : ''}(${association.associationName})`;
-            }}
+            items={associations}
+            keySelector={association => association.associationName}
+            valueSelector={association => `${association.targetEntityName ? `${association.targetEntityName} ` : ''}(${association.associationName})`}
+            iconSelector={association => (
+              <IconOrImage
+                className={clsx(association.reference && 'tw:rotate-180')}
+                icon="/icons/plugin_data_viewer_references_panel_arrow_sm.svg"
+              />
+            )}
           />
           {currentAssociation.targetNodePath && (
             <Button size="small" variant="secondary" onClick={openAssociation}>
