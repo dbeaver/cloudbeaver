@@ -21,6 +21,7 @@ import io.cloudbeaver.service.sql.WebSQLProcessor;
 import io.cloudbeaver.service.sql.WebServiceBindingSQL;
 import io.cloudbeaver.test.platform.CloudbeaverDBTest;
 import io.cloudbeaver.test.platform.util.GraphQLTestConstant;
+import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.exec.DBCLogicalOperator;
 import org.jkiss.dbeaver.model.exec.jdbc.JDBCStatement;
@@ -187,10 +188,11 @@ public class ForeignKeyNavigationEndpointTest extends CloudbeaverDBTest {
         return refs.isEmpty() ? null : refs.getFirst();
     }
 
+    @NotNull
     private Map<String, Object> navigateByReference(
-        WebSQLContextInfo sqlProcessorContext,
-        Map<String, Object> reference,
-        Map<String, Object> sourceRow
+        @NotNull WebSQLContextInfo sqlProcessorContext,
+        @NotNull Map<String, Object> reference,
+        @NotNull Map<String, Object> sourceRow
     ) throws Exception {
         String containerNodePath = JSONUtils.getString(reference, "targetNodePath");
 

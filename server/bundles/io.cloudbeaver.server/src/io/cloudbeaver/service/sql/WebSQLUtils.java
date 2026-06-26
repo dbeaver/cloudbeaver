@@ -427,7 +427,8 @@ public class WebSQLUtils {
             if (targetAttr == null) {
                 return null;
             }
-            mapping.add(new WebSQLReferenceColumnMapping(sourceIdx, sourceAttr.getName(), targetAttr.getName()));
+            mapping.add(new WebSQLReferenceColumnMapping(
+                sourceIdx, sourceAttr.getName(), targetAttr.getOrdinalPosition(), targetAttr.getName()));
         }
         return mapping;
     }

@@ -24,16 +24,19 @@ public class WebSQLReferenceColumnMapping {
     private final int sourceColumnIndex;
     @NotNull
     private final String sourceColumnName;
+    private final int targetColumnIndex;
     @NotNull
     private final String targetColumnName;
 
     public WebSQLReferenceColumnMapping(
         int sourceColumnIndex,
         @NotNull String sourceColumnName,
+        int targetColumnIndex,
         @NotNull String targetColumnName
     ) {
         this.sourceColumnIndex = sourceColumnIndex;
         this.sourceColumnName = sourceColumnName;
+        this.targetColumnIndex = targetColumnIndex;
         this.targetColumnName = targetColumnName;
     }
 
@@ -46,6 +49,11 @@ public class WebSQLReferenceColumnMapping {
     @Property
     public String getSourceColumnName() {
         return sourceColumnName;
+    }
+
+    @Property
+    public int getTargetColumnIndex() {
+        return targetColumnIndex;
     }
 
     @NotNull

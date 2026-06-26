@@ -80,11 +80,13 @@ type SQLReferenceColumnMapping @since(version: "26.1.2") {
     sourceColumnIndex: Int!
     "Column name in the source result set"
     sourceColumnName: String!
+    "Ordinal position of the column in the target entity definition"
+    targetColumnIndex: Int!
     "Column name in the target entity"
     targetColumnName: String!
 }
 
-type SQLResultAssociation @since(version: "26.1.1") {
+type SQLResultAssociation @since(version: "26.1.2") {
     "True for reverse references (incoming FKs)"
     reference: Boolean!
     "Name of the association (foreign key)"
@@ -348,7 +350,7 @@ extend type Query {
         contextId: ID!,
         resultsId: ID!,
         isReference: Boolean
-    ): [SQLResultAssociation!]! @since(version: "26.1.1")
+    ): [SQLResultAssociation!]! @since(version: "26.1.2")
 
     "Returns SQL dialect info for the specified connection"
     sqlDialectInfo( projectId: ID, connectionId: ID! ): SQLDialectInfo
