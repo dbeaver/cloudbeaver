@@ -203,6 +203,42 @@ public class CBSessionManager implements WebAppSessionManager {
     }
 
     /**
+     * Invalidates the current HTTP session, creates a new one, and binds a new {@link WebSession} to it.
+     */
+    @NotNull
+    public WebSession rotateSession(
+        @NotNull HttpServletRequest request,
+        @NotNull WebSession oldWebSession
+    ) throws DBWebException {
+        HttpSession oldHttpSession = request.getSession(false);
+        if (oldHttpSession != null) {
+            oldHttpSession.invalidate();
+        }
+        String newSessionId = request.getSession(true).getId();
+
+        String locale = oldWebSession.getLocale();
+        String remoteAddr = oldWebSession.getLastRemoteAddr();
+        String remoteUserAgent = oldWebSession.getLastRemoteUserAgent();
+        var requestInfo = new WebHttpRequestInfo(newSessionId, locale, remoteAddr, remoteUserAgent);
+        WebSession newWebSession;
+        try {
+            newWebSession = createWebSessionImpl(requestInfo);
+        } catch (DBException e) {
+            throw new DBWebException(e);
+        }
+        oldWebSession.migrateEventHandlersTo(newWebSession);
+        String oldSessionId = oldWebSession.getSessionId();
+        synchronized (sessionMap) {
+            sessionMap.remove(oldSessionId);
+            sessionMap.put(newSessionId, newWebSession);
+        }
+        oldWebSession.close(false, false);
+
+        log.debug("Session rotated '" + oldSessionId + "' -> '" + newSessionId + "'");
+        return newWebSession;
+    }
+
+    /**
      * Returns not expired session from cache, or restore it.
      *
      * @return WebSession object or null, if session expired or invalid
@@ -288,13 +324,12 @@ public class CBSessionManager implements WebAppSessionManager {
     @Nullable
     public WebSession findWebSession(@NotNull HttpServletRequest request) {
         String sessionId = getSessionId(request);
+        WebSession webSession;
         synchronized (sessionMap) {
             var session = sessionMap.get(sessionId);
-            if (session instanceof WebSession) {
-                return (WebSession) session;
-            }
-            return null;
+            webSession = (session instanceof WebSession) ? (WebSession) session : null;
         }
+        return webSession;
     }
 
     @Nullable

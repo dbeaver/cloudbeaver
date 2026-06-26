@@ -147,6 +147,7 @@ export default [
 
   ['plugin_authentication_administration_team_form_edit_label', 'Форма редактирования команды'],
   ['plugin_authentication_administration_user_form_edit_label', 'Форма редактирования пользователя'],
+  ['plugin_authentication_administration_user_last_login', 'Последний вход'],
 
   [
     'plugin_authentication_administration_user_username_validation_error',
