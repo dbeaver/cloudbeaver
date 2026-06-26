@@ -14,7 +14,7 @@ import { useObjectRef, useResource } from '@cloudbeaver/core-blocks';
 import { ConnectionExecutionContextService, ConnectionInfoResource, createConnectionParam } from '@cloudbeaver/core-connections';
 import { IServiceProvider, useService } from '@cloudbeaver/core-di';
 import { AsyncTaskInfoService } from '@cloudbeaver/core-root';
-import { GraphQLService, type SqlDataFilterConstraint } from '@cloudbeaver/core-sdk';
+import { GraphQLService, type SqlDataFilterConstraint, type SqlReferenceColumnMapping } from '@cloudbeaver/core-sdk';
 import { isObjectsEqual } from '@cloudbeaver/core-utils';
 import {
   DatabaseDataAccessMode,
@@ -24,6 +24,7 @@ import {
   type IDatabaseDataModel,
   IDatabaseDataViewAction,
   IDatabaseReferencesAction,
+  type IGridRowKey,
   ResultSetDataAction,
   ResultSetDataSource,
   ResultSetReferencesAction,
@@ -143,31 +144,36 @@ export function useReferencesDataModel(
             const associations = referencesAction.associations;
             const currentAssociation = associations.find(r => r.associationName === association);
 
+            // Restrict the related result to only rows that are linked to the current row via this association.
+            // The target attribute name differs depending on which side of the relationship owns the foreign key.
             if (currentAssociation?.targetNodePath) {
+              const rows = activeRows.map(r => r.row);
+              const defaultRow = view.rowKeys[0];
+
+              if (!rows.length && defaultRow) {
+                rows.push(defaultRow);
+              }
+
               const constraints: SqlDataFilterConstraint[] = [];
+              const isCompositeKey = currentAssociation.columnMapping.length > 1;
+              const shouldFallback = isCompositeKey && rows.length > 1;
+              const whereFilter = shouldFallback ? getCompositeKeyFilter(rows, currentAssociation.columnMapping, data) : '';
 
-              // Restrict the related result to only rows that are linked to the current row via this association.
-              // The target attribute name differs depending on which side of the relationship owns the foreign key.
-              for (const mapping of currentAssociation.columnMapping) {
-                const rows = activeRows.map(r => r.row);
-                const defaultRow = view.rowKeys[0];
+              if (!whereFilter) {
+                for (const mapping of currentAssociation.columnMapping) {
+                  for (const row of rows) {
+                    const rowValue = data.getRowValue(row);
 
-                if (!rows.length && defaultRow) {
-                  rows.push(defaultRow);
-                }
+                    if (rowValue) {
+                      const targetValue = rowValue[mapping.sourceColumnIndex];
 
-                for (const row of rows) {
-                  const rowValue = data.getRowValue(row);
-
-                  if (rowValue) {
-                    const targetValue = rowValue[mapping.sourceColumnIndex];
-
-                    if (isNotNullDefined(targetValue)) {
-                      constraints.push({
-                        attributeName: mapping.targetColumnName,
-                        operator: 'EQUALS',
-                        value: targetValue,
-                      });
+                      if (isNotNullDefined(targetValue)) {
+                        constraints.push({
+                          attributeName: mapping.targetColumnName,
+                          operator: 'EQUALS',
+                          value: targetValue,
+                        });
+                      }
                     }
                   }
                 }
@@ -180,8 +186,8 @@ export function useReferencesDataModel(
                   containerNodePath: currentAssociation.targetNodePath,
                   connectionKey,
                   constraints,
-                  whereFilter: '',
-                  anyConstraint: currentAssociation.columnMapping.length === 1,
+                  whereFilter,
+                  anyConstraint: !isCompositeKey,
                 })
                 .resetData();
             }
@@ -203,4 +209,34 @@ export function useReferencesDataModel(
   }, [state, sourceModel, sourceResultIndex]);
 
   return model;
+}
+
+function getCompositeKeyFilter(rows: IGridRowKey[], columnMapping: SqlReferenceColumnMapping[], data: ResultSetDataAction): string {
+  const orGroups: string[] = [];
+
+  for (const row of rows) {
+    const rowValue = data.getRowValue(row);
+
+    if (rowValue) {
+      const andParts: string[] = [];
+
+      for (const mapping of columnMapping) {
+        const targetValue = rowValue[mapping.sourceColumnIndex];
+
+        if (isNotNullDefined(targetValue)) {
+          andParts.push(`${mapping.targetColumnName} = ${targetValue}`);
+        }
+      }
+
+      if (andParts.length === columnMapping.length) {
+        orGroups.push(`(${andParts.join(' AND ')})`);
+      }
+    }
+  }
+
+  if (!orGroups.length) {
+    return '';
+  }
+
+  return orGroups.join(' OR ');
 }
