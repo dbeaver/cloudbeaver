@@ -94,7 +94,7 @@ export const DataViewerReferencesPresentation: DataPresentationComponent = obser
                 return a;
               }
 
-              return `${association.targetEntityName ? `${association.targetEntityName} ` : ''}(${association.associationName})`;
+              return `${association.reference ? '← ' : '→ '}${association.targetEntityName ? `${association.targetEntityName} ` : ''}(${association.associationName})`;
             }}
           />
           {currentAssociation.targetNodePath && (
