@@ -427,8 +427,10 @@ public class WebSQLUtils {
             if (targetAttr == null) {
                 return null;
             }
+            // getOrdinalPosition() is 1-based. Normalize to 0-based to match sourceColumnIndex
+            int targetIdx = targetAttr.getOrdinalPosition() - 1;
             mapping.add(new WebSQLReferenceColumnMapping(
-                sourceIdx, sourceAttr.getName(), targetAttr.getOrdinalPosition(), targetAttr.getName()));
+                sourceIdx, sourceAttr.getName(), targetIdx, targetAttr.getName()));
         }
         return mapping;
     }
