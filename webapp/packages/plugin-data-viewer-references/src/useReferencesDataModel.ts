@@ -7,7 +7,7 @@
  */
 
 import { reaction } from 'mobx';
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 
 import { isNotNullDefined } from '@dbeaver/js-helpers';
 import { useObjectRef, useResource } from '@cloudbeaver/core-blocks';
@@ -106,12 +106,6 @@ export function useReferencesDataModel(
     ['dispose'],
   );
 
-  const prevStateRef = useRef({
-    association: state.association,
-    sourceResultId: sourceModel.source.getResult(sourceResultIndex)?.id,
-    activeRows: selection.getActiveRows(),
-  });
-
   useEffect(() => {
     sourceModel.onDispose.addHandler(model.dispose);
     return () => {
@@ -132,14 +126,6 @@ export function useReferencesDataModel(
         };
       },
       ({ association, sourceResultId, activeRows }) => {
-        const prevState = prevStateRef.current;
-
-        if (association == prevState.association && sourceResultId == prevState.sourceResultId && isObjectsEqual(activeRows, prevState.activeRows)) {
-          return;
-        }
-
-        prevStateRef.current = { association, sourceResultId, activeRows };
-
         if (association && sourceResultId) {
           const executionContext = sourceModel.source.executionContext;
           model.source.setExecutionContext(executionContext).setSupportedDataFormats(connectionInfo?.supportedDataFormats ?? []);
@@ -186,6 +172,13 @@ export function useReferencesDataModel(
                 }
               }
 
+              const prevConstraints = model.model.source.options?.constraints ?? [];
+              const prevWhereFilter = model.model.source.options?.whereFilter ?? '';
+
+              if (isObjectsEqual(prevConstraints, constraints) && prevWhereFilter === whereFilter) {
+                return;
+              }
+
               model.model
                 .setCountGain(dataViewerSettingsService.getDefaultRowsCount())
                 .setSlice(0)
@@ -197,7 +190,8 @@ export function useReferencesDataModel(
                   whereFilter,
                   anyConstraint: !isCompositeKey,
                 })
-                .resetData();
+                .clearError()
+                .setOutdated();
             }
           }
         } else {
