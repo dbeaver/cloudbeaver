@@ -514,9 +514,42 @@ public class LocalResourceController extends BaseLocalResourceController {
         @NotNull Map<String, DBWNetworkProfile> oldNetworkProfiles,
         @Nullable DataSourceParseResults parseResults
     ) {
-        if (parseResults == null || credentialsProvider.getActiveUserCredentials() == null || oldDataSources.isEmpty()) {
+        if (parseResults == null || credentialsProvider.getActiveUserCredentials() == null) {
             return;
         }
+        boolean profilesChanged = !parseResults.removedProfiles.isEmpty();
+
+        // We don't need to check for updated profiles if there are already added or removed profiles
+        if (!profilesChanged) {
+            for (DBWNetworkProfile updatedProfile : parseResults.updatedProfiles) {
+                if (oldNetworkProfiles.containsKey(updatedProfile.getProfileId())) {
+                    DBWNetworkProfile oldProfile = oldNetworkProfiles.get(updatedProfile.getProfileId());
+                    if (!oldProfile.equalConfigurations(updatedProfile)) {
+                        profilesChanged = true;
+                        break;
+                    }
+                } else {
+                    // profile was added
+                    profilesChanged = true;
+                    break;
+                }
+            }
+        }
+
+        if (profilesChanged) {
+            ServletAppUtils.getServletApplication().getEventController().addEvent(
+                WSNetworkProfileEvent.update(
+                    credentialsProvider.getActiveUserCredentials().getSmSessionId(),
+                    credentialsProvider.getActiveUserCredentials().getUserId(),
+                    registry.getProject().getId()
+                )
+            );
+        }
+
+        if (oldDataSources.isEmpty()) {
+            return;
+        }
+
         List<String> updatedConfigurationDataSourceIds = new ArrayList<>();
         List<String> updatedNameDataSourceIds = new ArrayList<>();
         List<String> updatedInternalConfigurationDataSourceIds = new ArrayList<>();
@@ -617,35 +650,6 @@ public class LocalResourceController extends BaseLocalResourceController {
                     parseResults.removedFolders.stream().map(
                         f -> createNodePathFromFolderPath(registry.getProject().getId(), f.getFolderPath())
                     ).toList()
-                )
-            );
-        }
-
-        boolean profilesChanged = !parseResults.removedProfiles.isEmpty();
-
-        // We don't need to check for updated profiles if there are already added or removed profiles
-        if (!profilesChanged) {
-            for (DBWNetworkProfile updatedProfile : parseResults.updatedProfiles) {
-                if (oldNetworkProfiles.containsKey(updatedProfile.getProfileId())) {
-                    DBWNetworkProfile oldProfile = oldNetworkProfiles.get(updatedProfile.getProfileId());
-                    if (!oldProfile.equalConfigurations(updatedProfile)) {
-                        profilesChanged = true;
-                        break;
-                    }
-                } else {
-                    // profile was added
-                    profilesChanged = true;
-                    break;
-                }
-            }
-        }
-
-        if (profilesChanged) {
-            ServletAppUtils.getServletApplication().getEventController().addEvent(
-                WSNetworkProfileEvent.update(
-                    credentialsProvider.getActiveUserCredentials().getSmSessionId(),
-                    credentialsProvider.getActiveUserCredentials().getUserId(),
-                    registry.getProject().getId()
                 )
             );
         }
