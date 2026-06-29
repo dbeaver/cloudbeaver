@@ -1,5 +1,5 @@
-# Ubuntu 24.04 (Noble Numbat)
-FROM ubuntu:noble
+# Debian 13 (trixie)
+FROM debian:trixie-slim
 
 MAINTAINER DBeaver Corp, devops@dbeaver.com
 
