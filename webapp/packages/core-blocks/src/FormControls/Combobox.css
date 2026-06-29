@@ -29,6 +29,10 @@
     padding-block: calc(var(--tw-spacing) * 2);
     gap: calc(var(--tw-spacing) * 2);
     letter-spacing: var(--tw-tracking-normal);
+    font-family: var(--tw-font-roboto);
+    font-size: var(--tw-text-caption);
+    font-weight: var(--tw-font-weight-caption);
+    letter-spacing: var(--tw-tracking-caption);
     line-height: 1.25;
   }
 

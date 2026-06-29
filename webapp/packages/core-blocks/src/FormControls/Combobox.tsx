@@ -264,13 +264,10 @@ export const Combobox: IComboboxType = observer(function Combobox({
                     disabled={itemDisabled}
                     title={itemTitle}
                     setValueOnClick={handleSetValueOnClick}
-                    className={clsx(
-                      {
-                        'tw:cursor-pointer': !itemDisabled,
-                        'tw:cursor-not-allowed': itemDisabled,
-                      },
-                      'theme-typography--caption',
-                    )}
+                    className={clsx({
+                      'tw:cursor-pointer': !itemDisabled,
+                      'tw:cursor-not-allowed': itemDisabled,
+                    })}
                   >
                     {iconSelector && (
                       <div className="tw:w-4 tw:h-4 tw:shrink-0">
