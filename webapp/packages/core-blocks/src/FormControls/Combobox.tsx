@@ -64,12 +64,12 @@ type ObjectProps<TValue, TKey extends keyof TState, TState> = ComboboxBaseProps<
   value?: never;
 };
 
-export interface ComboboxType {
+export interface IComboboxType {
   <TKey, TValue>(props: ControlledProps<TKey, TValue>): React.JSX.Element;
   <TValue, TKey extends keyof TState, TState>(props: ObjectProps<TValue, TKey, TState>): React.JSX.Element;
 }
 
-export const Combobox: ComboboxType = observer(function Combobox({
+export const Combobox: IComboboxType = observer(function Combobox({
   value: controlledValue,
   defaultValue,
   name,
