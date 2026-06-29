@@ -31,6 +31,12 @@
     letter-spacing: var(--tw-tracking-normal);
     line-height: 1.25;
   }
+
+  .combobox__item-value {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
 }
 
 @layer base.components {
