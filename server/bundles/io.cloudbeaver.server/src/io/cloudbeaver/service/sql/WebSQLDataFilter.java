@@ -58,8 +58,8 @@ public class WebSQLDataFilter {
         }
         this.where = CommonUtils.toString(filterProps.get("where"), null);
         Object constraints = filterProps.get("constraints");
-        if (constraints instanceof Collection) {
-            for (Object constrItem : (Collection<?>) constraints) {
+        if (constraints instanceof Collection<?> col) {
+            for (Object constrItem : col) {
                 if (constrItem instanceof Map) {
                     this.constraints.add(
                         new WebSQLDataFilterConstraint((Map<String, Object>) constrItem));
@@ -148,8 +148,10 @@ public class WebSQLDataFilter {
     }
 
     @NotNull
-    private DBDAttributeConstraint fillEmptyConstraint(@NotNull DBDAttributeConstraint dbConstr,
-                                                       @NotNull WebSQLDataFilterConstraint webConstr) {
+    private DBDAttributeConstraint fillEmptyConstraint(
+        @NotNull DBDAttributeConstraint dbConstr,
+        @NotNull WebSQLDataFilterConstraint webConstr
+    ) {
         dbConstr.setPlainNameReference(true);
 
         if (webConstr.getOrderPosition() != null) {
@@ -168,6 +170,7 @@ public class WebSQLDataFilter {
         return dbConstr;
     }
 
+    @NotNull
     private List<DBDAttributeConstraint> getDbdConstraints() {
         List<DBDAttributeConstraint> dbConstraints = new ArrayList<>();
         for (WebSQLDataFilterConstraint constraint : constraints) {
@@ -182,7 +185,10 @@ public class WebSQLDataFilter {
         return dbConstraints;
     }
 
-    private static int getOriginalVisualPosition(WebSQLDataFilterConstraint constraint, String attributeName) {
+    private static int getOriginalVisualPosition(
+        @NotNull WebSQLDataFilterConstraint constraint,
+        @NotNull String attributeName
+    ) {
         Integer attributePosition = constraint.getAttributePosition();
 
         if (CommonUtils.isEmpty(attributeName)) {
