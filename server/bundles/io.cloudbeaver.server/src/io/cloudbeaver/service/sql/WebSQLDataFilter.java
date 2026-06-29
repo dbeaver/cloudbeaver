@@ -151,6 +151,12 @@ public class WebSQLDataFilter {
     private void fillEmptyConstrains(@NotNull List<DBDAttributeConstraint> emptyConstraints) throws DBException {
         for (WebSQLDataFilterConstraint webConstr : constraints) {
             DBDAttributeConstraint dbConstr = findConstraintToFill(emptyConstraints, webConstr);
+            if (dbConstr.hasCondition()) {
+                // The attribute already has a condition from a previous constraint
+                dbConstr = new DBDAttributeConstraint(dbConstr);
+                dbConstr.reset();
+                emptyConstraints.add(dbConstr);
+            }
             fillEmptyConstraint(dbConstr, webConstr);
         }
     }
