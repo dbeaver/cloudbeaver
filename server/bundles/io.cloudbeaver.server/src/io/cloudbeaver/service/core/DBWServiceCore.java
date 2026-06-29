@@ -162,14 +162,14 @@ public interface DBWServiceCore extends DBWService {
     @WebProjectAction(requireProjectPermissions = {RMConstants.PERMISSION_PROJECT_DATASOURCES_EDIT})
     WebConnectionInfo testConnection(
         @NotNull WebSession webSession,
-        @Nullable String projectId,
+        @Nullable @WebObjectId String projectId,
         @NotNull Map<String, Object> connectionConfig
     ) throws DBWebException;
 
     @WebProjectAction(requireProjectPermissions = {RMConstants.PERMISSION_PROJECT_DATASOURCES_EDIT})
     WebNetworkEndpointInfo testNetworkHandler(
         @NotNull WebSession webSession,
-        @Nullable String projectId,
+        @Nullable @WebObjectId String projectId,
         @Nullable String connectionId,
         @NotNull WebNetworkHandlerConfigInput nhConfig
     ) throws DBWebException;
