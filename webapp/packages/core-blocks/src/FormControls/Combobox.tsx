@@ -255,7 +255,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
           )}
           {icon && <div className="tw:absolute tw:left-3 tw:w-4 tw:h-4">{typeof icon === 'string' ? <IconOrImage icon={icon} /> : icon}</div>}
           {displayPopover && (
-            <ComboboxPopover className="theme-text-on-surface theme-background-surface theme-typography--caption">
+            <ComboboxPopover className="theme-text-on-surface theme-background-surface">
               {filteredItems.length > 0 ? (
                 filteredItems.map(({ itemKey, itemValue, itemTitle, itemIcon, itemDisabled }) => (
                   <ComboboxItem
@@ -264,10 +264,13 @@ export const Combobox: ComboboxType = observer(function Combobox({
                     disabled={itemDisabled}
                     title={itemTitle}
                     setValueOnClick={handleSetValueOnClick}
-                    className={clsx({
-                      'tw:cursor-pointer': !itemDisabled,
-                      'tw:cursor-not-allowed': itemDisabled,
-                    })}
+                    className={clsx(
+                      {
+                        'tw:cursor-pointer': !itemDisabled,
+                        'tw:cursor-not-allowed': itemDisabled,
+                      },
+                      'theme-typography--caption',
+                    )}
                   >
                     {iconSelector && (
                       <div className="tw:w-4 tw:h-4 tw:shrink-0">
