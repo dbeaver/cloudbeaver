@@ -49,7 +49,7 @@ export const DataViewerReferencesPresentation: DataPresentationComponent = obser
       presentationId: '',
       valuePresentationId: null,
       modelId: '',
-      association: '',
+      associationId: '',
     }),
   );
 
@@ -57,15 +57,15 @@ export const DataViewerReferencesPresentation: DataPresentationComponent = obser
   const associations = referencesAction.associations;
   const defaultAssociation = associations[0];
 
-  if (!state.association && defaultAssociation) {
-    state.association = defaultAssociation.associationName;
+  if (!associations.some(a => a.id === state.associationId)) {
+    state.associationId = defaultAssociation?.id ?? '';
   }
 
   if (!associations.length) {
     return <TextPlaceholder>{translate('plugin_data_viewer_references_no_references')}</TextPlaceholder>;
   }
 
-  const currentAssociation = associations.find(a => a.associationName === state.association);
+  const currentAssociation = associations.find(a => a.id === state.associationId);
 
   if (!currentAssociation) {
     return <TextPlaceholder>{translate('plugin_data_viewer_references_no_reference')}</TextPlaceholder>;
@@ -89,9 +89,9 @@ export const DataViewerReferencesPresentation: DataPresentationComponent = obser
             <Select
               className="tw:flex-1"
               state={state}
-              name="association"
+              name="associationId"
               items={associations}
-              keySelector={association => association.associationName}
+              keySelector={association => association.id}
               valueSelector={association =>
                 `${association.targetEntityName ? `${association.targetEntityName} ` : ''}(${association.associationName})`
               }

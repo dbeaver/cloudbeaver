@@ -7,3 +7,5 @@
  */
 
 import './module.js';
+
+export * from './DataViewerReferencesSettingsService.js';

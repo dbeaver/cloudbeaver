@@ -8,18 +8,21 @@
 
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
-import { ActionService, MenuService } from '@cloudbeaver/core-view';
 import { DataPresentationService, DataPresentationType, IDatabaseDataResultAction, isResultSetDataSource } from '@cloudbeaver/plugin-data-viewer';
+
+import { DataViewerReferencesSettingsService } from './DataViewerReferencesSettingsService.js';
 
 const DataViewerReferencesPresentation = importLazyComponent(() =>
   import('./DataViewerReferencesPresentation.js').then(module => module.DataViewerReferencesPresentation),
 );
 
-@injectable(() => [DataPresentationService, MenuService, ActionService, CommonDialogService])
+@injectable(() => [DataPresentationService, DataViewerReferencesSettingsService])
 export class DataViewerReferencesBootstrap extends Bootstrap {
-  constructor(private readonly dataPresentationService: DataPresentationService) {
+  constructor(
+    private readonly dataPresentationService: DataPresentationService,
+    private readonly dataViewerReferencesSettingsService: DataViewerReferencesSettingsService,
+  ) {
     super();
   }
 
@@ -32,7 +35,7 @@ export class DataViewerReferencesBootstrap extends Bootstrap {
       dataFormat: ResultDataFormat.Resultset,
       hidden: (dataFormat, model, resultIndex) => {
         const source = model.source;
-        if (!isResultSetDataSource(source) || !source.hasResult(resultIndex)) {
+        if (!isResultSetDataSource(source) || !source.hasResult(resultIndex) || this.dataViewerReferencesSettingsService.disabled) {
           return true;
         }
 

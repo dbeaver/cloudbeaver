@@ -7,7 +7,7 @@
  */
 
 export interface IDataViewerReferencesState {
-  association: string;
+  associationId: string;
 }
 
 export interface IDataViewerReferencesPresentationState extends IDataViewerReferencesState {

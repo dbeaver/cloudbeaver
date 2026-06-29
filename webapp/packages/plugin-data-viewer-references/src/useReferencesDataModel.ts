@@ -120,13 +120,13 @@ export function useReferencesDataModel(
         const activeRows = selection.getActiveRows();
 
         return {
-          association: state.association,
+          associationId: state.associationId,
           sourceResultId: result?.id,
           activeRows,
         };
       },
-      ({ association, sourceResultId, activeRows }) => {
-        if (association && sourceResultId) {
+      ({ associationId, sourceResultId, activeRows }) => {
+        if (associationId && sourceResultId) {
           const executionContext = sourceModel.source.executionContext;
           model.source.setExecutionContext(executionContext).setSupportedDataFormats(connectionInfo?.supportedDataFormats ?? []);
           const context = executionContext?.context;
@@ -134,7 +134,7 @@ export function useReferencesDataModel(
           if (context) {
             const connectionKey = createConnectionParam(context.projectId, context.connectionId);
             const associations = referencesAction.associations;
-            const currentAssociation = associations.find(r => r.associationName === association);
+            const currentAssociation = associations.find(a => a.id === associationId);
 
             // Restrict the related result to only rows that are linked to the current row via this association.
             // The target attribute name differs depending on which side of the relationship owns the foreign key.

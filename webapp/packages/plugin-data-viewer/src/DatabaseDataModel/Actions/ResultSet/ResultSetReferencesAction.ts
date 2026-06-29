@@ -17,11 +17,15 @@ import { IDatabaseDataResult } from '../../IDatabaseDataResult.js';
 import { DatabaseDataAction } from '../../DatabaseDataAction.js';
 import type { IDatabaseReferencesAction } from '../IDatabaseReferencesAction.js';
 
+interface ISqlResultAssociation extends SqlResultAssociation {
+  id: string;
+}
+
 @injectable(() => [IDatabaseDataSource, IDatabaseDataResult, GraphQLService])
 export class ResultSetReferencesAction extends DatabaseDataAction<any, IDatabaseResultSet> implements IDatabaseReferencesAction<IDatabaseResultSet> {
   static dataFormat = [ResultDataFormat.Resultset];
 
-  associations: SqlResultAssociation[];
+  associations: ISqlResultAssociation[];
 
   constructor(
     source: IDatabaseDataSource,
@@ -40,11 +44,12 @@ export class ResultSetReferencesAction extends DatabaseDataAction<any, IDatabase
     }, 0);
   }
 
-  getAssociation(name: string): SqlResultAssociation | undefined {
-    return this.associations.find(association => association.associationName === name);
+  override updateResult(result: IDatabaseResultSet, index: number): void {
+    super.updateResult(result, index);
+    this.loadAssociations();
   }
 
-  async loadAssociations(): Promise<SqlResultAssociation[]> {
+  async loadAssociations(): Promise<ISqlResultAssociation[]> {
     const result = this.result;
 
     if (!result.id) {
@@ -58,7 +63,7 @@ export class ResultSetReferencesAction extends DatabaseDataAction<any, IDatabase
       contextId: result.contextId,
     });
 
-    this.associations = associations;
+    this.associations = associations.map(a => ({ ...a, id: `${a.associationName}_${a.reference}` }));
     return this.associations;
   }
 }
