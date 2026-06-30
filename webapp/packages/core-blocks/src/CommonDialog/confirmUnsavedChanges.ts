@@ -13,7 +13,8 @@ import { ConfirmationDialog } from './ConfirmationDialog.js';
 export interface IUnsavedChangesProvider {
   readonly isChanged: boolean;
   readonly isSaving?: boolean;
-  save(): Promise<boolean>;
+  /** Returns whether the save succeeded. `undefined` means there was nothing to save and navigation may proceed. */
+  save(): Promise<boolean> | undefined;
   reset(): void;
   title?: string;
   subTitle?: string;
@@ -45,7 +46,7 @@ export async function confirmUnsavedChanges(commonDialogService: CommonDialogSer
   });
 
   if (status === DialogueStateResult.Resolved) {
-    return provider.save();
+    return (await provider.save()) ?? true;
   }
 
   if (result?.isExtraAction) {

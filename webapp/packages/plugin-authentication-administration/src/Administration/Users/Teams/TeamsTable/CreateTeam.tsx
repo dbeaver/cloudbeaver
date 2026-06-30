@@ -27,7 +27,7 @@ export const CreateTeam: React.FC = observer(function CreateTeam() {
     get isSaving() {
       return service.data?.isSaving;
     },
-    save: () => service.data?.save() ?? Promise.resolve(true),
+    save: () => service.data?.save(),
     reset: () => service.data?.reset(),
   });
 
