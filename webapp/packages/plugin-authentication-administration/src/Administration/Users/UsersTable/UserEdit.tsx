@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -41,12 +41,7 @@ export const UserEdit = observer<TableItemExpandProps<string>>(function UserEdit
           return;
         }
 
-        const confirmed = await confirmUnsavedChanges(commonDialogService, {
-          isChanged: state.isChanged,
-          isSaving: state.isSaving,
-          save: () => state.save(),
-          reset: () => state.reset(),
-        });
+        const confirmed = await confirmUnsavedChanges(commonDialogService, state);
 
         if (!confirmed) {
           ExecutorInterrupter.interrupt(contexts);

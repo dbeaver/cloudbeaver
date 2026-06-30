@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -8,7 +8,16 @@
 import { observer } from 'mobx-react-lite';
 
 import { TeamsResource } from '@cloudbeaver/core-authentication';
-import { ColoredContainer, confirmUnsavedChanges, GroupBack, GroupTitle, Text, useExecutor, useResource, useTranslate } from '@cloudbeaver/core-blocks';
+import {
+  ColoredContainer,
+  confirmUnsavedChanges,
+  GroupBack,
+  GroupTitle,
+  Text,
+  useExecutor,
+  useResource,
+  useTranslate,
+} from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { ExecutorInterrupter } from '@cloudbeaver/core-executor';
@@ -39,12 +48,7 @@ export const TeamEdit = observer<Props>(function TeamEdit({ item }) {
           return;
         }
 
-        const confirmed = await confirmUnsavedChanges(commonDialogService, {
-          isChanged: formState.isChanged,
-          isSaving: formState.isSaving,
-          save: () => formState.save(),
-          reset: () => formState.reset(),
-        });
+        const confirmed = await confirmUnsavedChanges(commonDialogService, formState);
 
         if (!confirmed) {
           ExecutorInterrupter.interrupt(contexts);
