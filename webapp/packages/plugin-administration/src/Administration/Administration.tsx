@@ -104,7 +104,7 @@ export const Administration = observer<React.PropsWithChildren<Props>>(function 
   return (
     <CaptureView view={administrationViewService} className={s(styles, { captureView: true })}>
       <AdministrationCaptureViewContext />
-      <TabsState currentTabId={activeScreen?.item} localState={administrationScreenService.itemState} orientation="vertical">
+      <TabsState currentTabId={activeScreen?.item} localState={administrationScreenService.itemState} orientation="vertical" controlledSelection>
         <SContext registry={tabsRegistry}>
           <TabList aria-label="Administration items" data-dialog-persistent-element vertical>
             {visibleItems.map(item => (
