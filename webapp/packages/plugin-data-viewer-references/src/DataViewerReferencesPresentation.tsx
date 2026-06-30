@@ -80,11 +80,6 @@ export const DataViewerReferencesPresentation: DataPresentationComponent = obser
     navNodeManagerService.navToNode(currentAssociation.targetNodePath);
   }
 
-  //@TODO Find a better way to check whether model is ready to be used
-  if (!model.model.source.options) {
-    return <TextPlaceholder>{translate('data_viewer_nodata_message')}</TextPlaceholder>;
-  }
-
   return (
     <CaptureViewScope>
       <div className="tw:flex tw:flex-col tw:h-full tw:gap-2 tw:bg-(--theme-secondary)">
@@ -109,19 +104,24 @@ export const DataViewerReferencesPresentation: DataPresentationComponent = obser
             </Button>
           )}
         </div>
-        <TableViewerLoader
-          tableId={model.model.id}
-          resultIndex={resultIndex}
-          presentationId={state.presentationId}
-          valuePresentationId={state.valuePresentationId}
-          simple
-          onPresentationChange={presentationId => {
-            state.presentationId = presentationId;
-          }}
-          onValuePresentationChange={presentationId => {
-            state.valuePresentationId = presentationId;
-          }}
-        />
+        {model.model.source.options ? (
+          <TableViewerLoader
+            tableId={model.model.id}
+            resultIndex={resultIndex}
+            presentationId={state.presentationId}
+            valuePresentationId={state.valuePresentationId}
+            simple
+            onPresentationChange={presentationId => {
+              state.presentationId = presentationId;
+            }}
+            onValuePresentationChange={presentationId => {
+              state.valuePresentationId = presentationId;
+            }}
+          />
+        ) : (
+          //@TODO Find a better way to check whether model is ready to be used
+          <TextPlaceholder>{translate('data_viewer_nodata_message')}</TextPlaceholder>
+        )}
       </div>
     </CaptureViewScope>
   );
