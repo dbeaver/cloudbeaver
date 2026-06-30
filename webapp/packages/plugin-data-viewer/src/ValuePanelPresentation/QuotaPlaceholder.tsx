@@ -39,6 +39,12 @@ export const QuotaPlaceholder: React.FC<React.PropsWithChildren<Props>> = observ
   const contentAction = model.source.getAction(resultIndex, ResultSetDataContentAction);
   const limitInfo = holder ? contentAction.getLimitInfo(holder) : null;
 
+  let limitText = translate('ui_limit');
+
+  if (limitInfo?.limitWithSize) {
+    limitText += ` (${limitInfo.limitWithSize})`;
+  }
+
   return (
     <Container className={className} keepSize={keepSize} vertical center>
       <div className="tw:mb-2 tw:text-center">
@@ -53,10 +59,10 @@ export const QuotaPlaceholder: React.FC<React.PropsWithChildren<Props>> = observ
               target="_blank"
               indicator
             >
-              {translate('ui_limit')}
+              {limitText}
             </Link>
           ) : (
-            translate('ui_limit')
+            limitText
           )}
         </span>
       </div>

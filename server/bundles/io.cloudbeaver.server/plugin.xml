@@ -45,6 +45,9 @@
         <eventHandler class="io.cloudbeaver.server.events.WSDataSourceUpdatedEventHandlerImpl">
             <topic id="cb_datasource"/>
         </eventHandler>
+        <eventHandler class="io.cloudbeaver.server.events.WSNetworkProfileEventHandler">
+            <topic id="cb_profiles"/>
+        </eventHandler>
         <eventHandler class="io.cloudbeaver.server.events.WSFolderUpdatedEventHandlerImpl">
             <topic id="cb_datasource_folder"/>
         </eventHandler>

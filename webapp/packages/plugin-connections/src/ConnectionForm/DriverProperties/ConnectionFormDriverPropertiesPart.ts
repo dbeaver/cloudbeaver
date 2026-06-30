@@ -7,12 +7,13 @@
  */
 import { FormPart, type IFormState } from '@cloudbeaver/core-ui';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
-import { CONNECTION_PROPERTIES_SCHEMA, ConnectionInfoPropertiesResource, ConnectionInfoResource } from '@cloudbeaver/core-connections';
+import { ConnectionInfoPropertiesResource } from '@cloudbeaver/core-connections';
 import type { IConnectionFormState } from '../IConnectionFormState.js';
 import { runInAction, toJS } from 'mobx';
 import type { ConnectionFormOptionsPart } from '../Options/ConnectionFormOptionsPart.js';
 import type { schema } from '@cloudbeaver/core-utils';
 import { getObjectPropertyOptionValue } from '@cloudbeaver/core-sdk';
+import type { CONNECTION_PROPERTIES_SCHEMA } from '../CONNECTION_CONFIG_SCHEMA.js';
 
 type ConnectionProperties = schema.infer<typeof CONNECTION_PROPERTIES_SCHEMA>;
 

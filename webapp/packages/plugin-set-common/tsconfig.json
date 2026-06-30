@@ -140,6 +140,9 @@
       "path": "../plugin-connection-custom"
     },
     {
+      "path": "../plugin-connection-network-handlers"
+    },
+    {
       "path": "../plugin-connection-preferences"
     },
     {
@@ -222,6 +225,9 @@
     },
     {
       "path": "../plugin-navigation-tree-rm"
+    },
+    {
+      "path": "../plugin-network-handlers"
     },
     {
       "path": "../plugin-object-viewer"
