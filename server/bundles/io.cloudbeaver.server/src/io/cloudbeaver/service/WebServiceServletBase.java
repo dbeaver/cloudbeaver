@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -71,7 +71,7 @@ public abstract class WebServiceServletBase extends HttpServlet {
         } catch (Exception e) {
             log.error(e);
             errorMessage = e.getMessage();
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Error processing request: " + errorMessage);
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Error processing request: " + flattenForResponse(errorMessage));
         } finally {
             if (WebAppUtils.getWebApplication() instanceof ApiCallInterceptor apiCallInterceptor) {
                 apiCallInterceptor.onApiCallEvent(
@@ -82,6 +82,17 @@ public abstract class WebServiceServletBase extends HttpServlet {
     }
 
     protected abstract void processServiceRequest(WebSession session, HttpServletRequest request, HttpServletResponse response) throws DBException, IOException;
+
+    /**
+     * Replaces control characters (line breaks, tabs, etc.) with spaces so the message can be safely
+     * embedded into the JSON error body produced by the servlet container's error handler.
+     */
+    private String flattenForResponse(String message) {
+        if (message == null) {
+            return null;
+        }
+        return message.replaceAll("\\p{Cntrl}+", " ").trim();
+    }
 
     protected Map<String, Object> getVariables(HttpServletRequest request) {
         return gson.fromJson(request.getParameter(REQUEST_PARAM_VARIABLES), MAP_STRING_OBJECT_TYPE);

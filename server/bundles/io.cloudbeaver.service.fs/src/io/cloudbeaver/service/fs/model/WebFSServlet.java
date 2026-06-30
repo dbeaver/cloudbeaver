@@ -128,12 +128,19 @@ public class WebFSServlet extends WebServiceServletBase {
         if (baseName == null || baseName.toString().isBlank()) {
             throw new DBException("Invalid file name");
         }
-        Path normalizedParent = parent.normalize();
-        Path resolved = normalizedParent.resolve(baseName.toString()).normalize();
-        if (!resolved.startsWith(normalizedParent) || resolved.equals(normalizedParent)) {
+        if (submittedFileName.isBlank()
+            || ".".equals(submittedFileName)
+            || "..".equals(submittedFileName)
+            || submittedFileName.indexOf('/') >= 0
+            || submittedFileName.indexOf('\\') >= 0
+        ) {
             throw new DBException("Invalid file name");
         }
-        return resolved;
+        try {
+            return parent.normalize().resolve(submittedFileName).normalize();
+        } catch (InvalidPathException e) {
+            throw new DBException("Invalid file name");
+        }
     }
 
     @Override
