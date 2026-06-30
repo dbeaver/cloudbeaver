@@ -11,7 +11,7 @@ import { observer } from 'mobx-react-lite';
 
 import { Button, clsx } from '@dbeaver/ui-kit';
 import { CaptureViewScope } from '@cloudbeaver/core-view';
-import { IconOrImage, Loader, Select, TextPlaceholder, useTranslate } from '@cloudbeaver/core-blocks';
+import { IconOrImage, Select, TextPlaceholder, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -80,49 +80,49 @@ export const DataViewerReferencesPresentation: DataPresentationComponent = obser
     navNodeManagerService.navToNode(currentAssociation.targetNodePath);
   }
 
+  //@TODO Find a better way to check whether model is ready to be used
+  if (!model.model.source.options) {
+    return <TextPlaceholder>{translate('data_viewer_nodata_message')}</TextPlaceholder>;
+  }
+
   return (
-    //@TODO Find a better way to check whether model is ready to be used
-    <Loader loading={!model.model.source.options}>
-      <CaptureViewScope>
-        <div className="tw:flex tw:flex-col tw:h-full tw:gap-2 tw:bg-(--theme-secondary)">
-          <div className="tw:flex tw:gap-2 tw:items-center">
-            <Select
-              className="tw:flex-1"
-              state={state}
-              name="associationId"
-              items={associations}
-              keySelector={association => association.id}
-              valueSelector={association =>
-                `${association.targetEntityName ? `${association.targetEntityName} ` : ''}(${association.associationName})`
-              }
-              iconSelector={association => (
-                <IconOrImage
-                  className={clsx(association.reference && 'tw:rotate-180')}
-                  icon="/icons/plugin_data_viewer_references_panel_arrow_sm.svg"
-                />
-              )}
-            />
-            {currentAssociation.targetNodePath && (
-              <Button size="small" variant="secondary" onClick={openAssociation}>
-                {translate('ui_open')}
-              </Button>
+    <CaptureViewScope>
+      <div className="tw:flex tw:flex-col tw:h-full tw:gap-2 tw:bg-(--theme-secondary)">
+        <div className="tw:flex tw:gap-2 tw:items-center">
+          <Select
+            className="tw:flex-1"
+            state={state}
+            name="associationId"
+            items={associations}
+            keySelector={association => association.id}
+            valueSelector={association => `${association.targetEntityName ? `${association.targetEntityName} ` : ''}(${association.associationName})`}
+            iconSelector={association => (
+              <IconOrImage
+                className={clsx(association.reference && 'tw:rotate-180')}
+                icon="/icons/plugin_data_viewer_references_panel_arrow_sm.svg"
+              />
             )}
-          </div>
-          <TableViewerLoader
-            tableId={model.model.id}
-            resultIndex={resultIndex}
-            presentationId={state.presentationId}
-            valuePresentationId={state.valuePresentationId}
-            simple
-            onPresentationChange={presentationId => {
-              state.presentationId = presentationId;
-            }}
-            onValuePresentationChange={presentationId => {
-              state.valuePresentationId = presentationId;
-            }}
           />
+          {currentAssociation.targetNodePath && (
+            <Button size="small" variant="secondary" onClick={openAssociation}>
+              {translate('ui_open')}
+            </Button>
+          )}
         </div>
-      </CaptureViewScope>
-    </Loader>
+        <TableViewerLoader
+          tableId={model.model.id}
+          resultIndex={resultIndex}
+          presentationId={state.presentationId}
+          valuePresentationId={state.valuePresentationId}
+          simple
+          onPresentationChange={presentationId => {
+            state.presentationId = presentationId;
+          }}
+          onValuePresentationChange={presentationId => {
+            state.valuePresentationId = presentationId;
+          }}
+        />
+      </div>
+    </CaptureViewScope>
   );
 });
