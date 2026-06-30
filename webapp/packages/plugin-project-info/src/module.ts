@@ -10,6 +10,7 @@ import { Bootstrap, ModuleRegistry } from '@cloudbeaver/core-di';
 import { LocaleService } from './LocaleService.js';
 import { ProjectInfoFormOptionsTabBootstrap } from './ProjectInfoForm/Options/ProjectInfoFormOptionsTabBootstrap.js';
 import { ProjectInfoFormService } from './ProjectInfoForm/ProjectInfoFormService.js';
+import { ProjectInfoOptionsPanelService } from './ProjectInfoForm/ProjectInfoOptionsPanelService.js';
 import { ProjectInfoBootstrap } from './ProjectInfoBootstrap.js';
 
 export default ModuleRegistry.add({
@@ -20,6 +21,7 @@ export default ModuleRegistry.add({
       .addSingleton(Bootstrap, ProjectInfoBootstrap)
       .addSingleton(Bootstrap, LocaleService)
       .addSingleton(Bootstrap, ProjectInfoFormOptionsTabBootstrap)
+      .addSingleton(ProjectInfoOptionsPanelService)
       .addSingleton(ProjectInfoFormService);
   },
 });
