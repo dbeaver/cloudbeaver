@@ -8,6 +8,7 @@
 import { FormPart, formValidationContext, type IFormState } from '@cloudbeaver/core-ui';
 
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
+import { action, makeObservable, observable, toJS } from 'mobx';
 import { DriverConfigurationType, type NetworkHandlerConfigInput, type NetworkHandlerDescriptor } from '@cloudbeaver/core-sdk';
 import { ConnectionInfoNetworkHandlersResource } from '@cloudbeaver/core-connections';
 import {
@@ -19,12 +20,13 @@ import {
   validateSSHConfig,
   type INetworkHandlerConfig,
 } from '@cloudbeaver/plugin-network-handlers';
-import { toJS } from 'mobx';
 import type { ConnectionFormOptionsPart, IConnectionFormState } from '@cloudbeaver/plugin-connections';
 
 const getDefaultState = (): INetworkHandlerConfig => SSH_DEFAULT_HANDLER_CONFIG() as INetworkHandlerConfig;
 
 export class ConnectionFormSSHPart extends FormPart<INetworkHandlerConfig, IConnectionFormState> {
+  networkProfileConfig: INetworkHandlerConfig | null;
+
   constructor(
     formState: IFormState<IConnectionFormState>,
     private readonly networkHandlerResource: NetworkHandlerResource,
@@ -32,10 +34,30 @@ export class ConnectionFormSSHPart extends FormPart<INetworkHandlerConfig, IConn
     private readonly optionsPart: ConnectionFormOptionsPart,
   ) {
     super(formState, getDefaultState());
+
+    this.networkProfileConfig = null;
+
+    makeObservable(this, {
+      networkProfileConfig: observable.ref,
+      applyNetworkProfileConfig: action.bound,
+      resetNetworkProfileConfig: action.bound,
+    });
   }
 
   getConfig(): NetworkHandlerConfigInput {
     return getSSHHandlerConfig(this.state, this.initialState, this.optionsPart.state.sharedCredentials);
+  }
+
+  resetNetworkProfileConfig(): void {
+    this.isReadOnly = false;
+    this.networkProfileConfig = null;
+    this.setState(getDefaultState());
+  }
+
+  applyNetworkProfileConfig(config: INetworkHandlerConfig): void {
+    this.isReadOnly = true;
+    this.networkProfileConfig = config;
+    this.setState(config);
   }
 
   override isOutdated(): boolean {
@@ -109,7 +131,7 @@ export class ConnectionFormSSHPart extends FormPart<INetworkHandlerConfig, IConn
       return;
     }
 
-    for (const error of validateSSHConfig(this.state, this.initialState)) {
+    for (const error of validateSSHConfig(this.state, this.networkProfileConfig || this.initialState)) {
       validation.error(error);
     }
   }

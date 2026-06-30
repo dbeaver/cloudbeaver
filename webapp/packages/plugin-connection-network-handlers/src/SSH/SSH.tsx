@@ -35,9 +35,9 @@ export const SSH: TabContainerPanelComponent<Props> = observer(function SSH({ fo
         <Group form gap keepSize large>
           <SSHForm
             state={handlerState}
-            initialState={sshPart.initialState}
+            initialState={sshPart.networkProfileConfig || sshPart.initialState}
             disabled={formState.isDisabled || formState.isReadOnly}
-            readonly={formState.isReadOnly}
+            readonly={formState.isReadOnly || sshPart.isReadOnly}
             sharedCredentials={optionsPart.state.sharedCredentials}
             projectId={formState.state.projectId}
             connectionId={formState.state.connectionId}

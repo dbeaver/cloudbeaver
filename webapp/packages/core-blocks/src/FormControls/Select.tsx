@@ -36,6 +36,7 @@ export type SelectBaseProps<TKey, TValue> = Omit<
     titleSelector?: (item: TValue) => string | undefined;
     iconSelector?: (item: TValue) => string | React.ReactElement | undefined;
     isDisabled?: (item: TValue) => boolean;
+    isSeparator?: (item: TValue) => boolean;
     onSwitch?: (state: boolean) => void;
     inline?: boolean;
     children?: string;
@@ -84,6 +85,7 @@ export const Select: SelectType = observer(function Select({
   iconSelector,
   titleSelector,
   isDisabled,
+  isSeparator,
   onSelect,
   onSwitch,
   ...rest
@@ -191,6 +193,7 @@ export const Select: SelectType = observer(function Select({
         itemValueSerialized={serializedKeySelector}
         itemRender={itemRender}
         itemDisabled={itemDisabled}
+        isSeparator={isSeparator}
         name={name}
         disabled={disabled || readOnly}
         noItemsPlaceholder={translate('combobox_no_results_placeholder')}

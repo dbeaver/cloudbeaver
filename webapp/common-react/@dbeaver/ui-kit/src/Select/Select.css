@@ -83,8 +83,13 @@
     }
   }
 
+  .dbv-kit-select__group {
+    border-top: 1px solid var(--dbv-kit-select-border-color);
+  }
+
   .dbv-kit-select__item {
-    display: block;
+    display: flex;
+    align-items: center;
     width: 100%;
     font-weight: var(--dbv-kit-select-font-weight);
     font-size: var(--dbv-kit-select-font-size);

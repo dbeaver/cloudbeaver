@@ -8,7 +8,7 @@
 
 import { useState } from 'react';
 import clsx from 'clsx';
-import { SelectProvider, Select, SelectPopover, SelectItem, SelectLabel, type SelectProviderProps } from './Select.js';
+import { SelectProvider, Select, SelectPopover, SelectItem, SelectLabel, SelectGroup, type SelectProviderProps } from './Select.js';
 import './SelectField.css';
 
 export interface SelectItem<T> {
@@ -46,6 +46,12 @@ export interface SelectFieldProps<T, ItemType = SelectItem<T>> {
    * Example: (item) => !item.isActive
    */
   itemDisabled?: PropertyGetter<ItemType, boolean>;
+
+  /**
+   * When true for an item, it acts as a group boundary — items are split into
+   * SelectGroup chunks separated by a CSS border. Separator items are not rendered.
+   */
+  isSeparator?: PropertyGetter<ItemType, boolean>;
 
   value?: T;
 
@@ -94,6 +100,18 @@ function getValueByPath<Item, Value>(item: Item, getter: PropertyGetter<Item, Va
   return getter ? getter(item) : defaultGetter(item);
 }
 
+function splitIntoGroups<ItemType>(items: ItemType[], isSeparator: PropertyGetter<ItemType, boolean>): ItemType[][] {
+  const groups: ItemType[][] = [[]];
+  for (const item of items) {
+    if (isSeparator(item)) {
+      groups.push([]);
+    } else {
+      groups[groups.length - 1]!.push(item);
+    }
+  }
+  return groups.filter(g => g.length > 0);
+}
+
 export function SelectField<T, ItemType extends {} = SelectItem<T>>({
   items,
   value,
@@ -102,6 +120,7 @@ export function SelectField<T, ItemType extends {} = SelectItem<T>>({
   itemValueSerialized,
   itemRender,
   itemDisabled,
+  isSeparator,
   label,
   noItemsPlaceholder = 'No items',
   description,
@@ -159,6 +178,30 @@ export function SelectField<T, ItemType extends {} = SelectItem<T>>({
   const selectedItem = currentValue !== undefined ? items.find(item => getItemValueSerialized(item) === currentValueSerialized) : undefined;
   const displayValue = selectedRender ? selectedRender(currentValue, selectedItem) : selectedItem ? renderItem(selectedItem) : '';
 
+  function renderSelectItem(item: ItemType) {
+    return (
+      <SelectItem key={getItemValueSerialized(item)} value={getItemValueSerialized(item)} disabled={isItemDisabled(item)}>
+        {renderItem(item)}
+      </SelectItem>
+    );
+  }
+
+  function renderItems(): React.ReactNode {
+    if (items.length === 0) {
+      return <div className="dbv-kit-select__empty">{noItemsPlaceholder}</div>;
+    }
+
+    if (isSeparator) {
+      return splitIntoGroups(items, isSeparator).map(group => (
+        <SelectGroup key={getItemValueSerialized(group[0]!)}>
+          {group.map(renderSelectItem)}
+        </SelectGroup>
+      ));
+    }
+
+    return items.map(renderSelectItem);
+  }
+
   return (
     <div className={clsx('dbv-kit-select-field', className)}>
       <SelectProvider value={currentValueSerialized} setValue={val => handleChange(val)} store={store}>
@@ -171,15 +214,7 @@ export function SelectField<T, ItemType extends {} = SelectItem<T>>({
         {description && <span className="dbv-kit-select__description">{description}</span>}
 
         <SelectPopover autoFocusOnShow={autoFocusItemsOnShow} portal={portal} gutter={4} unmountOnHide>
-          {items.length === 0 ? (
-            <div className="dbv-kit-select__empty">{noItemsPlaceholder}</div>
-          ) : (
-            items.map(item => (
-              <SelectItem key={getItemValueSerialized(item)} value={getItemValueSerialized(item)} disabled={isItemDisabled(item)}>
-                {renderItem(item)}
-              </SelectItem>
-            ))
-          )}
+          {renderItems()}
         </SelectPopover>
       </SelectProvider>
     </div>

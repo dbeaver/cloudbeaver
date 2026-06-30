@@ -19,6 +19,7 @@ export abstract class FormPart<TPartState extends object, TFormState = any> impl
   state: TPartState;
   initialState: TPartState;
   isSaving: boolean;
+  isReadOnly: boolean;
 
   exception: Error | null;
   promise: Promise<any> | null;
@@ -35,6 +36,7 @@ export abstract class FormPart<TPartState extends object, TFormState = any> impl
     this.initialState = initialState;
     this.state = toJS(this.initialState);
     this.isSaving = false;
+    this.isReadOnly = false;
 
     this.exception = null;
     this.promise = null;
@@ -54,6 +56,7 @@ export abstract class FormPart<TPartState extends object, TFormState = any> impl
       exception: observable.ref,
       promise: observable.ref,
       isSaving: observable.ref,
+      isReadOnly: observable.ref,
       loaded: observable,
       loading: observable,
       setInitialState: action,
