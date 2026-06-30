@@ -19,20 +19,15 @@ package io.cloudbeaver.service.admin.impl;
 import io.cloudbeaver.*;
 import io.cloudbeaver.auth.provider.local.LocalAuthProvider;
 import io.cloudbeaver.model.WebPropertyInfo;
-import io.cloudbeaver.model.config.CBAppConfig;
-import io.cloudbeaver.model.config.CBServerConfig;
 import io.cloudbeaver.model.session.WebAuthInfo;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.registry.*;
-import io.cloudbeaver.server.CBApplication;
-import io.cloudbeaver.server.CBConstants;
-import io.cloudbeaver.server.WebAppUtils;
+import io.cloudbeaver.server.*;
 import io.cloudbeaver.service.DBWServiceServerConfigurator;
 import io.cloudbeaver.service.admin.*;
 import io.cloudbeaver.service.security.SMUtils;
 import io.cloudbeaver.utils.ServletAppUtils;
-import io.cloudbeaver.utils.WebDataSourceUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
@@ -44,7 +39,6 @@ import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.auth.SMAuthConfiguration;
 import org.jkiss.dbeaver.model.auth.SMObjectType;
-import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
 import org.jkiss.dbeaver.model.rm.RMProjectType;
@@ -596,50 +590,12 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     @Override
     public boolean configureServer(@NotNull WebSession webSession, @NotNull Map<String, Object> params) throws DBWebException {
         try {
-            CBAppConfig appConfig = new CBAppConfig(CBApplication.getInstance().getAppConfiguration());
-            CBServerConfig serverConfig = new CBServerConfig();
-            serverConfig.setServerName(CBApplication.getInstance().getServerName());
-            serverConfig.setMaxSessionIdleTime(CBApplication.getInstance().getMaxSessionIdleTime());
-            String adminName = null;
-            String adminPassword = null;
 
-            if (!params.isEmpty()) {    // FE can send an empty configuration
-                var config = new AdminServerConfig(params);
-                appConfig.setAnonymousAccessEnabled(config.isAnonymousAccessEnabled());
-                appConfig.setSupportsCustomConnections(config.isCustomConnectionsEnabled());
-                appConfig.setPublicCredentialsSaveEnabled(config.isPublicCredentialsSaveEnabled());
-                appConfig.setAdminCredentialsSaveEnabled(config.isAdminCredentialsSaveEnabled());
-                updateDisabledFeaturesConfig(appConfig, config.getEnabledFeatures());
-                // custom logic for enabling embedded drivers
-                updateDisabledDriversConfig(appConfig, config.getDisabledDrivers());
-                appConfig.setResourceManagerEnabled(config.isResourceManagerEnabled());
-                appConfig.setSecretManagerEnabled(config.isSecretManagerEnabled());
-
-                if (CommonUtils.isEmpty(config.getEnabledAuthProviders())) {
-                    // All of them
-                    appConfig.setEnabledAuthProviders(new String[0]);
-                } else {
-                    appConfig.setEnabledAuthProviders(config.getEnabledAuthProviders().toArray(new String[0]));
-                }
-
-                appConfig.setDefaultNavigatorSettings(
-                    CBApplication.getInstance().getAppConfiguration().getDefaultNavigatorSettings());
-
-                adminName = config.getAdminName();
-                adminPassword = config.getAdminPassword();
-                serverConfig.setServerName(config.getServerName());
-                serverConfig.setMaxSessionIdleTime(config.getSessionExpireTime());
-                if (config.getForceHttps() != null) {
-                    serverConfig.setForceHttps(config.getForceHttps());
-                }
-                if (config.getSupportedHosts() != null) {
-                    serverConfig.setSupportedHosts(config.getSupportedHosts());
-                }
-                if (config.getBindSessionToIp() != null) {
-                    serverConfig.setBindSessionToIp(config.getBindSessionToIp());
-                }
-            }
-
+            CBServerConfigurationMapper<?, ?> mapper = CBApplication.getInstance()
+                .getServerConfigurationController().createServerConfigurationInputMapper();
+            CBServerConfigurations configurations = mapper.loadServerConfigurationsFromParams(params);
+            String adminName = configurations.adminName();
+            String adminPassword = configurations.adminPassword();
             if (CommonUtils.isEmpty(adminName)) {
                 // Grant admin permissions to the current user
                 WebUser curUser = webSession.getUser();
@@ -651,7 +607,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             if (CommonUtils.isEmpty(adminName)) {
                 // Try to get admin name from existing authentications (first one)
                 if (!authInfoList.isEmpty()) {
-                    adminName = authInfoList.get(0).getUserId();
+                    adminName = authInfoList.getFirst().getUserId();
                 }
             }
             if (CommonUtils.isEmpty(adminName)) {
@@ -666,7 +622,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             // Patch configuration by services
             for (DBWServiceServerConfigurator wsc : WebServiceRegistry.getInstance().getWebServices(DBWServiceServerConfigurator.class)) {
                 try {
-                    wsc.configureServer(CBApplication.getInstance(), webSession, serverConfig, appConfig);
+                    wsc.configureServer(CBApplication.getInstance(), webSession, configurations.serverConfig(), configurations.appConfig());
                 } catch (Exception e) {
                     log.warn("Error configuring server by web service " + wsc.getClass().getName(), e);
                 }
@@ -678,8 +634,8 @@ public class WebServiceAdmin implements DBWServiceAdmin {
                 adminName,
                 adminPassword,
                 authInfos,
-                serverConfig,
-                appConfig,
+                configurations.serverConfig(),
+                configurations.appConfig(),
                 webSession
             );
 
@@ -687,8 +643,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             if (configurationMode) {
                 // In config mode we always refresh because admin user doesn't exist yet
                 webSession.resetUserState();
-            }
-            else {
+            } else {
                 // Just reload session state
                 webSession.refreshUserData();
             }
@@ -698,46 +653,6 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             throw new DBWebException("Error configuring server", e);
         }
         return true;
-    }
-
-    private void updateDisabledFeaturesConfig(@NotNull CBAppConfig appConfig, @NotNull List<String> enabledFeatures) {
-        Set<String> enabledIds = new LinkedHashSet<>(enabledFeatures);
-        appConfig.setEnabledFeatures(enabledFeatures.toArray(new String[0]));
-        String[] disabledFeatures = ServletAppUtils.getServletApplication().getFeatureRegistry().getWebFeatures().stream()
-            .map(DBWFeatureSet::getId)
-            .filter(id -> !enabledIds.contains(id))
-            .toArray(String[]::new);
-        appConfig.setDisabledFeatures(disabledFeatures);
-    }
-
-    // we disable embedded drivers by default and enable it in enabled drivers list
-    // that's why we need so complicated logic for disabling drivers
-    private void updateDisabledDriversConfig(CBAppConfig appConfig, String[] disabledDriversConfig) {
-        Set<String> disabledIds = new LinkedHashSet<>(Arrays.asList(disabledDriversConfig));
-        Set<String> enabledIds = new LinkedHashSet<>(Arrays.asList(appConfig.getEnabledDrivers()));
-
-        // remove all disabled embedded drivers from enabled drivers list
-        enabledIds.removeAll(disabledIds);
-
-        // enable embedded driver if it is not in disabled drivers list
-        for (String driverId : appConfig.getDisabledDrivers()) {
-            if (disabledIds.contains(driverId)) {
-                // driver is also disabled
-                continue;
-            }
-            // driver is removed from disabled list
-            // we need to enable if it is embedded
-            try {
-                DBPDriver driver = WebDataSourceUtils.getDriverById(driverId);
-                if (driver.isEmbedded()) {
-                    enabledIds.add(driverId);
-                }
-            } catch (DBWebException e) {
-                log.error("Failed to find driver by id", e);
-            }
-        }
-        appConfig.setDisabledDrivers(disabledDriversConfig);
-        appConfig.setEnabledDrivers(enabledIds.toArray(String[]::new));
     }
 
     @Override
