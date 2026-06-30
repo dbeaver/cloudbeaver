@@ -32,7 +32,6 @@
     font-family: var(--tw-font-roboto);
     font-size: var(--tw-text-caption);
     font-weight: var(--tw-font-weight-caption);
-    letter-spacing: var(--tw-tracking-caption);
     line-height: 1.25;
   }
 
