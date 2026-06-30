@@ -23,6 +23,7 @@ import {
   useObservableRef,
   useS,
   useSplitUserState,
+  useStateDelay,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
@@ -68,7 +69,7 @@ export const TableViewer = observer<TableViewerProps, HTMLDivElement>(
     const tableViewerStorageService = useService(TableViewerStorageService);
     const dataModel = tableViewerStorageService.get(tableId);
     const result = dataModel?.source.getResult(resultIndex);
-    const loading = dataModel?.isLoading() ?? true;
+    const loading = useStateDelay(dataModel?.isLoading() ?? true, 100);
     const dataFormat = result?.dataFormat || ResultDataFormat.Resultset;
     const splitState = useSplitUserState('table-viewer');
     const navRef = useListKeyboardNavigation(

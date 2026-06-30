@@ -1,0 +1,56 @@
+{
+  "name": "@cloudbeaver/plugin-connection-network-handlers",
+  "type": "module",
+  "sideEffects": [
+    "./lib/module.js",
+    "./lib/index.js",
+    "src/**/*.css",
+    "public/**/*"
+  ],
+  "version": "0.1.0",
+  "description": "",
+  "license": "Apache-2.0",
+  "exports": {
+    ".": "./lib/index.js",
+    "./module": "./lib/module.js"
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "clean": "rimraf --glob lib",
+    "lint": "eslint ./src/ --ext .ts,.tsx",
+    "test": "dbeaver-test",
+    "validate-dependencies": "core-cli-validate-dependencies"
+  },
+  "dependencies": {
+    "@cloudbeaver/core-blocks": "workspace:*",
+    "@cloudbeaver/core-connections": "workspace:*",
+    "@cloudbeaver/core-data-context": "workspace:*",
+    "@cloudbeaver/core-di": "workspace:*",
+    "@cloudbeaver/core-executor": "workspace:*",
+    "@cloudbeaver/core-links": "workspace:*",
+    "@cloudbeaver/core-localization": "workspace:*",
+    "@cloudbeaver/core-projects": "workspace:*",
+    "@cloudbeaver/core-resource": "workspace:*",
+    "@cloudbeaver/core-root": "workspace:*",
+    "@cloudbeaver/core-sdk": "workspace:*",
+    "@cloudbeaver/core-ui": "workspace:*",
+    "@cloudbeaver/core-utils": "workspace:*",
+    "@cloudbeaver/plugin-connections": "workspace:*",
+    "@cloudbeaver/plugin-network-handlers": "workspace:*",
+    "@dbeaver/js-helpers": "workspace:*",
+    "mobx": "^6",
+    "mobx-react-lite": "^4",
+    "react": "^19",
+    "react-dom": "^19"
+  },
+  "devDependencies": {
+    "@cloudbeaver/core-cli": "workspace:*",
+    "@cloudbeaver/tsconfig": "workspace:*",
+    "@dbeaver/cli": "workspace:*",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "rimraf": "^6",
+    "tslib": "^2",
+    "typescript": "^5"
+  }
+}

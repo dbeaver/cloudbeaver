@@ -54,6 +54,14 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL>
             .dataFetcher("sqlDialectInfo", env ->
                 getService(env).getDialectInfo(getWebConnection(env))
             )
+            .dataFetcher("sqlResultAssociations", env ->
+                getService(env).getSqlResultAssociations(
+                    getWebSession(env),
+                    getSQLContext(env),
+                    getArgumentVal(env, "resultsId"),
+                    getArgument(env, "isReference")
+                )
+            )
             .dataFetcher("sqlListContexts", env ->
                 getService(env).listContexts(getWebSession(env),
                     getProjectReference(env),
@@ -230,17 +238,6 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL>
                     getArgumentVal(env, "containerNodePath"),
                     getArgument(env, "resultId"),
                     getDataFilter(env),
-                    getDataFormat(env)
-                ))
-            .dataFetcher("asyncSqlNavigateForeignKey", env ->
-                getService(env).asyncNavigateForeignKey(
-                    getWebSession(env),
-                    getSQLContext(env),
-                    getArgumentVal(env, "resultsId"),
-                    new WebSQLResultsRow(getArgument(env, "row")),
-                    getArgumentVal(env, "columnIndex"),
-                    getArgumentVal(env, "associationName"),
-                    CommonUtils.toBoolean(env.getArgument("isReference")),
                     getDataFormat(env)
                 ))
             .dataFetcher("asyncSqlExecuteResults", env ->

@@ -1,0 +1,21 @@
+export default [
+  ['plugin_network_handlers_ssh_tunnel_auth_type', 'Authentication method'],
+  ['plugin_network_handlers_ssh_tunnel_host', 'Host'],
+  ['plugin_network_handlers_ssh_tunnel_port', 'Port'],
+  ['plugin_network_handlers_ssh_tunnel_user', 'User'],
+  ['plugin_network_handlers_ssh_tunnel_password', 'Password'],
+  ['plugin_network_handlers_ssh_tunnel_private_key', 'Private Key'],
+  ['plugin_network_handlers_ssh_tunnel_advanced_settings', 'Advanced Settings'],
+  ['plugin_network_handlers_ssh_tunnel_advanced_settings_alive_interval', 'Alive interval (ms)'],
+  ['plugin_network_handlers_ssh_tunnel_advanced_settings_connect_timeout', 'Connect timeout (ms)'],
+  ['plugin_network_handlers_save_credentials_for_user', 'Save credentials for the current user'],
+  ['plugin_network_handlers_save_credentials_for_user_tooltip', 'These credentials will be used to make automatic connection'],
+  ['plugin_network_handlers_save_credentials_shared', 'Save credentials for all users with access'],
+  [
+    'plugin_network_handlers_save_credentials_shared_tooltip',
+    'These credentials will be used to make automatic connection for all users having access',
+  ],
+  ['plugin_network_handlers_ssh_tunnel_enable', 'Use SSH Tunnel'],
+  ['plugin_network_handlers_ssh_test_fail', 'Tunnel test failed'],
+  ['plugin_network_handlers_ssh_test_success', 'Tunnel test success'],
+];

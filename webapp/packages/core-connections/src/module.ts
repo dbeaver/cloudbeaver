@@ -1,13 +1,12 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 
 import { Bootstrap, Dependency, ModuleRegistry, proxy } from '@cloudbeaver/core-di';
-import { NetworkHandlerResource } from './NetworkHandlerResource.js';
 import { NavNodeExtensionsService } from './NavTree/NavNodeExtensionsService.js';
 import { DBDriverResource } from './DBDriverResource.js';
 import { DatabaseAuthModelsResource } from './DatabaseAuthModelsResource.js';
@@ -42,7 +41,6 @@ export default ModuleRegistry.add({
       .addSingleton(Bootstrap, ConnectionsLocaleService)
       .addSingleton(Dependency, proxy(ConnectionsSettingsService))
       .addSingleton(Dependency, proxy(ConnectionDialectResource))
-      .addSingleton(Dependency, proxy(NetworkHandlerResource))
       .addSingleton(Dependency, proxy(DBDriverResource))
       .addSingleton(Dependency, proxy(DatabaseAuthModelsResource))
       .addSingleton(Dependency, proxy(ContainerResource))
@@ -60,7 +58,6 @@ export default ModuleRegistry.add({
       .addSingleton(Dependency, proxy(ConnectionExecutionContextResource))
       .addSingleton(Dependency, proxy(DBDriverExpertSettingsResource))
       .addSingleton(ConnectionDialectResource)
-      .addSingleton(NetworkHandlerResource)
       .addSingleton(NavNodeExtensionsService)
       .addSingleton(DBDriverResource)
       .addSingleton(DBDriverExpertSettingsResource)

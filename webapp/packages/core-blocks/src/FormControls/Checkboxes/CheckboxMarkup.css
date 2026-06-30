@@ -22,7 +22,6 @@
   --dbv-kit-checkbox-border-color: var(--theme-on-secondary);
   --dbv-kit-checkbox-border-color-checked: var(--theme-on-secondary);
   --dbv-kit-checkbox-icon-color: var(--theme-on-secondary);
-  --dbv-kit-control-outline-color: var(--theme-primary);
 }
 
 @layer components {
@@ -53,6 +52,9 @@
     --dbv-kit-checkbox-medium-font-size: 14px;
     --dbv-kit-checkbox-large-font-size: 16px;
     --dbv-kit-checkbox-xlarge-font-size: 18px;
+
+    --dbv-kit-control-outline-color: var(--theme-primary);
+    --dbv-kit-control-outline-width: 1px;
 
     & .checkbox-markup__label {
       color: var(--theme-on-surface);
