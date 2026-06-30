@@ -14,11 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.cloudbeaver.service.admin;
+package io.cloudbeaver.model.config;
 
-import io.cloudbeaver.model.config.CBAppConfig;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBConstants;
+import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
@@ -57,7 +57,7 @@ public class AdminServerConfig {
     @Nullable
     private String bindSessionToIp;
 
-    public AdminServerConfig(Map<String, Object> params) {
+    public AdminServerConfig(@NotNull Map<String, Object> params) {
         this.serverName = JSONUtils.getString(params, "serverName");
         this.adminName = JSONUtils.getString(params, "adminName");
         this.adminPassword = JSONUtils.getString(params, "adminPassword");
