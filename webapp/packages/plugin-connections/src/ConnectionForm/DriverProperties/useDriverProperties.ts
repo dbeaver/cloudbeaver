@@ -12,15 +12,16 @@ import { observable, reaction, toJS } from 'mobx';
 import { useObservableRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { type ConnectionConfig, type ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
-import type { ILoadableState } from '@cloudbeaver/core-utils';
+import { type ILoadableState } from '@cloudbeaver/core-utils';
 import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
-import type { IFormState } from '@cloudbeaver/core-ui';
+import { type IFormState } from '@cloudbeaver/core-ui';
 
 import type { IConnectionFormState } from '../IConnectionFormState.js';
 
 interface Payload {
   formState: IFormState<IConnectionFormState>;
   config: ConnectionConfig;
+  selected: boolean;
 }
 
 interface State extends ILoadableState {
@@ -97,12 +98,14 @@ export function useDriverProperties(payload: Payload) {
         };
       },
       () => {
-        state.reset();
+        if (!payload.selected) {
+          state.reset();
+        }
       },
     );
 
     return () => disposer();
-  }, [payload.config, state]);
+  }, [payload.config, payload.selected, state]);
 
   return state;
 }
