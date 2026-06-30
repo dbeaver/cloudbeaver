@@ -7,7 +7,7 @@
  */
 import { FormPart, type IFormState } from '@cloudbeaver/core-ui';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
-import { ConnectionInfoPropertiesResource } from '@cloudbeaver/core-connections';
+import { ConnectionInfoPropertiesResource, ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import type { IConnectionFormState } from '../IConnectionFormState.js';
 import { runInAction, toJS } from 'mobx';
 import type { ConnectionFormOptionsPart } from '../Options/ConnectionFormOptionsPart.js';
