@@ -43,10 +43,11 @@ export async function confirmUnsavedChanges(commonDialogService: CommonDialogSer
     extraActionText: 'ui_processing_dont_save',
     cancelActionText: 'ui_processing_cancel',
     showExtraAction: true,
+    onConfirm: async () => (await provider.save()) ?? true,
   });
 
   if (status === DialogueStateResult.Resolved) {
-    return (await provider.save()) ?? true;
+    return true;
   }
 
   if (result?.isExtraAction) {

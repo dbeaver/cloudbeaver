@@ -37,6 +37,11 @@ export interface ConfirmationDialogPayload {
   confirmActionText?: TLocalizationToken;
   cancelActionText?: TLocalizationToken;
   extraActionText?: TLocalizationToken;
+  /**
+   * Async action run when the confirm button is pressed. While it runs the confirm button shows a loader and the
+   * other actions are disabled. The dialog resolves only if it returns `true`; otherwise it is rejected (no confirm).
+   */
+  onConfirm?: () => Promise<boolean>;
 }
 
 export interface ConfirmationDialogResult {
@@ -67,10 +72,25 @@ export const ConfirmationDialog: DialogComponent<ConfirmationDialogPayload, Conf
     confirmActionText,
     cancelActionText,
     extraActionText,
+    onConfirm,
   } = payload;
   const [skipConfirmations, setSkipConfirmations] = useState(false);
 
-  function resolve() {
+  async function resolve() {
+    if (onConfirm) {
+      let success = false;
+      try {
+        success = await onConfirm();
+      } catch {
+        success = false;
+      }
+
+      if (!success) {
+        rejectDialog({ skipConfirmations });
+        return;
+      }
+    }
+
     resolveDialog({
       skipConfirmations,
     });
@@ -116,7 +136,7 @@ export const ConfirmationDialog: DialogComponent<ConfirmationDialogPayload, Conf
             <Translate token={extraActionText || 'ui_no'} />
           </Button>
         )}
-        <Button type="button" className="tw:shrink-0" onClick={resolve}>
+        <Button type="button" className="tw:shrink-0" loader onClick={resolve}>
           <Translate token={confirmActionText || 'ui_processing_ok'} />
         </Button>
       </CommonDialogFooter>
