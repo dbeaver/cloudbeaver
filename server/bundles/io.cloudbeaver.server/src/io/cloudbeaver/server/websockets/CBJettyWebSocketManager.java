@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,6 +37,25 @@ public class CBJettyWebSocketManager {
 
     public static void registerWebSocket(@NotNull String webSessionId, @NotNull CBEventsWebSocket webSocket) {
         socketBySessionId.computeIfAbsent(webSessionId, key -> new CopyOnWriteArrayList<>()).add(webSocket);
+    }
+
+    /**
+     * Re-keys a live web socket from the old session id to the new one after a session rotation,
+     * so that keep-alive pings keep being delivered to it.
+     */
+    public static void migrateWebSocket(
+        @NotNull String oldSessionId,
+        @NotNull String newSessionId,
+        @NotNull CBEventsWebSocket webSocket
+    ) {
+        List<CBEventsWebSocket> oldSockets = socketBySessionId.get(oldSessionId);
+        if (oldSockets != null) {
+            oldSockets.remove(webSocket);
+            if (oldSockets.isEmpty()) {
+                socketBySessionId.remove(oldSessionId);
+            }
+        }
+        registerWebSocket(newSessionId, webSocket);
     }
 
     public static void sendPing() {

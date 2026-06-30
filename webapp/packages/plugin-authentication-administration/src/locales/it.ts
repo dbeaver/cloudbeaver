@@ -86,6 +86,7 @@ export default [
 
   ['plugin_authentication_administration_team_form_edit_label', 'Team editing form'],
   ['plugin_authentication_administration_user_form_edit_label', 'User editing form'],
+  ['plugin_authentication_administration_user_last_login', 'Ultimo accesso'],
 
   [
     'plugin_authentication_administration_user_username_validation_error',

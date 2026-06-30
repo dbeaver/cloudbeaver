@@ -13,8 +13,8 @@ import { useDataContextLink } from '@cloudbeaver/core-data-context';
 import { useService } from '@cloudbeaver/core-di';
 import { TabPanelList, TabsState } from '@cloudbeaver/core-ui';
 import { useMenu } from '@cloudbeaver/core-view';
+import type { ISqlResultPanelProps } from '@cloudbeaver/plugin-sql-editor';
 
-import type { IExecutionPlanTab } from '../../ISqlEditorTabState.js';
 import { PropertiesPanel } from './PropertiesPanel/PropertiesPanel.js';
 import { DATA_CONTEXT_SQL_EXECUTION_PLAN_TAB } from './DATA_CONTEXT_SQL_EXECUTION_PLAN_TAB.js';
 import { SQL_EXECUTION_PLAN_ACTIONS_MENU } from './SQL_EXECUTION_PLAN_ACTIONS_MENU.js';
@@ -24,24 +24,23 @@ import { SqlExecutionPlanViewBar } from './SqlExecutionPlanViewBar.js';
 import { SqlExecutionPlanViewService } from './SqlExecutionPlanViewService.js';
 import style from './SqlExecutionPlanPanel.module.css';
 
-interface Props {
-  executionPlanTab: IExecutionPlanTab;
-}
-
-export const SqlExecutionPlanPanel = observer<Props>(function SqlExecutionPlanPanel({ executionPlanTab }) {
+export const SqlExecutionPlanPanel = observer<ISqlResultPanelProps>(function SqlExecutionPlanPanel({ tabId }) {
   const styles = useS(style);
   const sqlExecutionPlanService = useService(SqlExecutionPlanService);
   const sqlExecutionPlanViewService = useService(SqlExecutionPlanViewService);
-  const data = sqlExecutionPlanService.data.get(executionPlanTab.tabId);
+  const data = sqlExecutionPlanService.data.get(tabId);
+  const executionPlanTab = data?.tab;
   const [selectedNode, setSelectedNode] = useState<string | null>(null);
   const splitState = useSplitUserState('execution-plan');
   const menu = useMenu({ menu: SQL_EXECUTION_PLAN_ACTIONS_MENU });
 
   useDataContextLink(menu.context, (context, id) => {
-    context.set(DATA_CONTEXT_SQL_EXECUTION_PLAN_TAB, executionPlanTab, id);
+    if (executionPlanTab) {
+      context.set(DATA_CONTEXT_SQL_EXECUTION_PLAN_TAB, executionPlanTab, id);
+    }
   });
 
-  if (data?.task.executing || !data?.executionPlan) {
+  if (!data || data.task.executing || !data.executionPlan) {
     return <Loader cancelDisabled={!data?.task.cancellable} onCancel={() => data?.task.cancel()} />;
   }
 

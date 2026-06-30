@@ -40,7 +40,7 @@ public class CBEventsLongPolling implements CBWebSessionEventHandler {
 
     private static final int QUEUE_CAPACITY = 1000;
 
-    private final BaseWebSession webSession;
+    private volatile BaseWebSession webSession;
     private final BlockingQueue<WSEvent> queue = new LinkedBlockingQueue<>(QUEUE_CAPACITY);
     private final CBClientEventProcessor processor;
     private volatile long lastPoll;
@@ -86,6 +86,12 @@ public class CBEventsLongPolling implements CBWebSessionEventHandler {
         result.add(first);
         queue.drainTo(result);
         return result;
+    }
+
+    @Override
+    public void migrateToSession(@NotNull BaseWebSession newSession) {
+        this.webSession = newSession;
+        this.processor.setWebSession(newSession);
     }
 
     @Override
