@@ -7,8 +7,14 @@
  */
 import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import { ActionService, KeyBindingService, MenuService } from '@cloudbeaver/core-view';
-import { DATA_CONTEXT_SQL_EDITOR_DATA, ESqlDataSourceFeatures, SQL_EDITOR_ACTIONS_MENU, SqlEditorView } from '@cloudbeaver/plugin-sql-editor';
+import { ActionService, KeyBindingService, menuExtractItems, MenuService } from '@cloudbeaver/core-view';
+import {
+  ACTION_SQL_EDITOR_SHOW_OUTPUT,
+  DATA_CONTEXT_SQL_EDITOR_DATA,
+  ESqlDataSourceFeatures,
+  SQL_EDITOR_ACTIONS_MENU,
+  SqlEditorView,
+} from '@cloudbeaver/plugin-sql-editor';
 
 import { ACTION_SQL_EDITOR_SHOW_EXECUTION_PLAN } from './actions/ACTION_SQL_EDITOR_SHOW_EXECUTION_PLAN.js';
 import { KEY_BINDING_SQL_EDITOR_SHOW_EXECUTION_PLAN } from './actions/bindings/KEY_BINDING_SQL_EDITOR_SHOW_EXECUTION_PLAN.js';
@@ -33,6 +39,12 @@ export class SqlExecutionPlanMenuBootstrap extends Bootstrap {
       menus: [SQL_EDITOR_ACTIONS_MENU],
       contexts: [DATA_CONTEXT_SQL_EDITOR_DATA],
       getItems: (context, items) => [...items, ACTION_SQL_EDITOR_SHOW_EXECUTION_PLAN],
+      orderItems: (_context, items) => {
+        const extracted = menuExtractItems(items, [ACTION_SQL_EDITOR_SHOW_EXECUTION_PLAN]);
+        const outputIndex = items.indexOf(ACTION_SQL_EDITOR_SHOW_OUTPUT);
+        items.splice(outputIndex !== -1 ? outputIndex : items.length, 0, ...extracted);
+        return items;
+      },
     });
 
     this.actionService.addHandler({
