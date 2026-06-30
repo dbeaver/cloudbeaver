@@ -121,8 +121,7 @@ export class ResultSetDataContentAction extends DatabaseDataAction<any, IDatabas
       return false;
     }
 
-    const loadedBlob = this.retrieveBlobFromCache(holder.key);
-    return !loadedBlob && (content.contentLength ?? 0) > limit;
+    return (content.contentLength ?? 0) > limit;
   }
 
   isTextTruncated(holder: IDatabaseValueHolder<IGridDataKey, IResultSetValue>): boolean {
@@ -133,8 +132,7 @@ export class ResultSetDataContentAction extends DatabaseDataAction<any, IDatabas
       return false;
     }
 
-    const loadedText = this.retrieveFullTextFromCache(holder.key);
-    return !loadedText && (content.contentLength ?? 0) > limit;
+    return (content.contentLength ?? 0) > limit;
   }
 
   isDownloadable(holder: IDatabaseValueHolder<IGridDataKey, IResultSetValue>): boolean {
