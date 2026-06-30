@@ -204,6 +204,6 @@ export abstract class FormPart<TPartState extends object, TFormState = any> impl
   protected validate(data: IFormState<TFormState>, contexts: IExecutionContextProvider<IFormState<TFormState>>): void | Promise<void> {}
 
   protected abstract loader(): Promise<void>;
-  protected abstract saveChanges(data: IFormState<TFormState>, contexts: IExecutionContextProvider<IFormState<TFormState>>): Promise<void>;
+  protected abstract saveChanges(data: IFormState<TFormState>, contexts: IExecutionContextProvider<IFormState<TFormState>>): void | Promise<void>;
   dispose(): void | Promise<void> {}
 }

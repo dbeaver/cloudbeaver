@@ -35,6 +35,7 @@
     "@cloudbeaver/core-ui": "workspace:*",
     "@cloudbeaver/core-utils": "workspace:*",
     "@cloudbeaver/core-view": "workspace:*",
+    "@cloudbeaver/plugin-connections": "workspace:*",
     "@cloudbeaver/plugin-navigation-tree": "workspace:*",
     "@dbeaver/js-helpers": "workspace:*",
     "mobx": "^6",

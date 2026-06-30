@@ -9,10 +9,10 @@
 import './module.js';
 
 export * from './ConnectionAuthentication/IConnectionAuthenticationConfig.js';
+export * from './ConnectionAuthentication/PROPERTY_FEATURE_SECURED.js';
 export * from './ConnectionAuthentication/ConnectionAuthenticationFormLoader.js';
 export * from './ConnectionForm/Options/ConnectionOptionsTabService.js';
 export * from './ConnectionForm/DriverProperties/ConnectionDriverPropertiesTabService.js';
-export * from './ConnectionForm/SSH/ConnectionSSHTabService.js';
 export * from './ConnectionForm/OriginInfo/ConnectionOriginInfoTabService.js';
 export * from './ConnectionForm/ConnectionFormBaseActionsLoader.js';
 export * from './ConnectionForm/ConnectionFormLoader.js';
@@ -20,6 +20,7 @@ export * from './ConnectionForm/IConnectionFormState.js';
 export * from './ConnectionForm/ConnectionFormState.js';
 export * from './ConnectionForm/useConnectionFormState.js';
 export * from './ConnectionForm/ConnectionFormService.js';
+export * from './ConnectionForm/CONNECTION_CONFIG_SCHEMA.js';
 export * from './ConnectionForm/Options/getConnectionFormOptionsPart.js';
 export * from './ConnectionForm/Options/ConnectionFormOptionsPart.js';
 export * from './ConnectionForm/SharedCredentials/CONNECTION_FORM_SHARED_CREDENTIALS_TAB_ID.js';

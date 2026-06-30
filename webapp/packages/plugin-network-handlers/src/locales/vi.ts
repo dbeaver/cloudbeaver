@@ -1,0 +1,21 @@
+export default [
+  ['plugin_network_handlers_ssh_tunnel_auth_type', 'Phương thức xác thực'],
+  ['plugin_network_handlers_ssh_tunnel_host', 'Máy chủ'],
+  ['plugin_network_handlers_ssh_tunnel_port', 'Cổng'],
+  ['plugin_network_handlers_ssh_tunnel_user', 'Người dùng'],
+  ['plugin_network_handlers_ssh_tunnel_password', 'Mật khẩu'],
+  ['plugin_network_handlers_ssh_tunnel_private_key', 'Khóa riêng'],
+  ['plugin_network_handlers_ssh_tunnel_advanced_settings', 'Cài đặt nâng cao'],
+  ['plugin_network_handlers_ssh_tunnel_advanced_settings_alive_interval', 'Khoảng thời gian giữ kết nối (ms)'],
+  ['plugin_network_handlers_ssh_tunnel_advanced_settings_connect_timeout', 'Thời gian chờ kết nối (ms)'],
+  ['plugin_network_handlers_save_credentials_for_user', 'Lưu thông tin xác thực cho người dùng hiện tại'],
+  ['plugin_network_handlers_save_credentials_for_user_tooltip', 'Thông tin xác thực này sẽ được sử dụng để kết nối tự động'],
+  ['plugin_network_handlers_save_credentials_shared', 'Lưu thông tin xác thực cho tất cả người dùng có quyền truy cập'],
+  [
+    'plugin_network_handlers_save_credentials_shared_tooltip',
+    'Thông tin xác thực này sẽ được sử dụng để kết nối tự động cho tất cả người dùng có quyền truy cập',
+  ],
+  ['plugin_network_handlers_ssh_tunnel_enable', 'Sử dụng Tunnel SSH'],
+  ['plugin_network_handlers_ssh_test_fail', 'Kiểm tra tunnel thất bại'],
+  ['plugin_network_handlers_ssh_test_success', 'Kiểm tra tunnel thành công'],
+];

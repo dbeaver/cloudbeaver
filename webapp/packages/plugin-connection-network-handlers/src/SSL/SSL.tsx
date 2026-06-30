@@ -1,0 +1,138 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2026 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+
+import { observer } from 'mobx-react-lite';
+import React from 'react';
+
+import {
+  ColoredContainer,
+  FieldCheckbox,
+  Form,
+  Group,
+  GroupTitle,
+  IconOrImage,
+  ObjectPropertyInfoForm,
+  s,
+  SAVED_VALUE_INDICATOR,
+  Switch,
+  useAdministrationSettings,
+  useAutoLoad,
+  useObjectPropertyCategories,
+  useResource,
+  useS,
+  useTranslate,
+} from '@cloudbeaver/core-blocks';
+import { useService } from '@cloudbeaver/core-di';
+import { ProjectInfoResource } from '@cloudbeaver/core-projects';
+import { ServerConfigResource } from '@cloudbeaver/core-root';
+import type { NetworkHandlerConfigInput, NetworkHandlerDescriptor } from '@cloudbeaver/core-sdk';
+import { type TabContainerPanelComponent, useTab } from '@cloudbeaver/core-ui';
+import { WEBSITE_LINKS } from '@cloudbeaver/core-links';
+
+import styles from './SSL.module.css';
+import { ConnectionInfoNetworkHandlersResource } from '@cloudbeaver/core-connections';
+import { getConnectionFormOptionsPart, type IConnectionFormProps } from '@cloudbeaver/plugin-connections';
+import { SSLDescription } from './SSLDescription.js';
+
+interface Props extends IConnectionFormProps {
+  handler: NetworkHandlerDescriptor;
+  handlerState: NetworkHandlerConfigInput;
+}
+
+export const SSL: TabContainerPanelComponent<Props> = observer(function SSL({ formState, handler, handlerState, tabId }) {
+  const translate = useTranslate();
+  const { selected } = useTab(tabId);
+  const style = useS(styles);
+  const { credentialsSavingEnabled } = useAdministrationSettings();
+  const { categories, isUncategorizedExists } = useObjectPropertyCategories(handler.properties);
+  const serverConfigResource = useResource(SSL, ServerConfigResource, undefined, {
+    active: selected,
+  });
+
+  const disabled = formState.isDisabled || formState.isReadOnly;
+  const enabled = handlerState.enabled || false;
+  const optionsPart = getConnectionFormOptionsPart(formState);
+  const connectionInfoNetworkHandlersService = useResource(SSL, ConnectionInfoNetworkHandlersResource, optionsPart.connectionKey, {
+    active: selected,
+  });
+  const handlersInfo = connectionInfoNetworkHandlersService.data;
+  const initialHandler = handlersInfo?.networkHandlersConfig?.find(h => h.id === handler.id);
+  const projectInfoResource = useService(ProjectInfoResource);
+  const isSharedProject = projectInfoResource.isProjectShared(formState.state.projectId);
+
+  useAutoLoad(SSL, optionsPart, enabled);
+
+  return (
+    <Form className={s(style, { form: true })}>
+      <ColoredContainer parent>
+        <Group gap form large vertical>
+          <Switch id="ssl-enable-switch" name="enabled" state={handlerState} description={<SSLDescription />} mod={['primary']} disabled={disabled}>
+            {translate('plugin_connection_network_handlers_connection_ssl_enable')}
+          </Switch>
+          {isUncategorizedExists && (
+            <ObjectPropertyInfoForm
+              state={handlerState.properties}
+              properties={handler.properties}
+              category={null}
+              disabled={disabled || !enabled}
+              isSaved={p => !!p.id && initialHandler?.secureProperties[p.id] === SAVED_VALUE_INDICATOR}
+              autocompleteSectionName="section-ssl"
+              hideEmptyPlaceholder
+              showRememberTip
+              small
+            />
+          )}
+          {categories.map(category => (
+            <React.Fragment key={category}>
+              <GroupTitle keepSize>{category}</GroupTitle>
+              <ObjectPropertyInfoForm
+                state={handlerState.properties}
+                properties={handler.properties}
+                category={category}
+                disabled={disabled || !enabled}
+                isSaved={p => !!p.id && initialHandler?.secureProperties[p.id] === SAVED_VALUE_INDICATOR}
+                autocompleteSectionName="section-ssl"
+                hideEmptyPlaceholder
+                showRememberTip
+                small
+              />
+            </React.Fragment>
+          ))}
+          {credentialsSavingEnabled && !optionsPart.state.sharedCredentials && (
+            <FieldCheckbox
+              id={handler.id + '_savePassword'}
+              name="savePassword"
+              state={handlerState}
+              disabled={disabled || !enabled || optionsPart.state.sharedCredentials}
+              title={translate(
+                !isSharedProject || serverConfigResource.data?.distributed
+                  ? 'plugin_connection_network_handlers_save_credentials_for_user_tooltip'
+                  : 'plugin_connection_network_handlers_save_credentials_shared_tooltip',
+              )}
+            >
+              {translate(
+                !isSharedProject || serverConfigResource.data?.distributed
+                  ? 'plugin_connection_network_handlers_save_credentials_for_user'
+                  : 'plugin_connection_network_handlers_save_credentials_shared',
+              )}
+            </FieldCheckbox>
+          )}
+
+          <a
+            className="tw:flex tw:items-center tw:gap-2 tw:text-balance"
+            href={WEBSITE_LINKS.SSL_CONFIGURATION_DOCUMENTATION_PAGE}
+            target="_blank"
+            rel="noreferrer"
+          >
+            <IconOrImage width={16} icon="/icons/documentation_link_sm.svg" /> {translate('plugin_connection_network_handlers_connection_ssl_docs')}
+          </a>
+        </Group>
+      </ColoredContainer>
+    </Form>
+  );
+});

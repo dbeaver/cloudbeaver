@@ -1,18 +1,19 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 import { FormPart, type IFormState } from '@cloudbeaver/core-ui';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
-import { CONNECTION_PROPERTIES_SCHEMA, ConnectionInfoPropertiesResource, DBDriverResource } from '@cloudbeaver/core-connections';
+import { ConnectionInfoPropertiesResource, DBDriverResource } from '@cloudbeaver/core-connections';
 import type { IConnectionFormState } from '../IConnectionFormState.js';
 import { runInAction, toJS } from 'mobx';
 import type { ConnectionFormOptionsPart } from '../Options/ConnectionFormOptionsPart.js';
 import type { schema } from '@cloudbeaver/core-utils';
 import { getObjectPropertyOptionValue } from '@cloudbeaver/core-sdk';
+import type { CONNECTION_PROPERTIES_SCHEMA } from '../CONNECTION_CONFIG_SCHEMA.js';
 
 type ConnectionProperties = schema.infer<typeof CONNECTION_PROPERTIES_SCHEMA>;
 
