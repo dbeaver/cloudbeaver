@@ -14,9 +14,12 @@ import { useService } from '@cloudbeaver/core-di';
 import { type ConnectionConfig, type ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 import type { ILoadableState } from '@cloudbeaver/core-utils';
 import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
+import type { IFormState } from '@cloudbeaver/core-ui';
+
+import type { IConnectionFormState } from '../IConnectionFormState.js';
 
 interface Payload {
-  projectId: string;
+  formState: IFormState<IConnectionFormState>;
   config: ConnectionConfig;
 }
 
@@ -53,7 +56,11 @@ export function useDriverProperties(payload: Payload) {
         try {
           this.exception = null;
 
-          this.promise = this.connectionInfoResource.getConnectionDriverProperties(this.payload.projectId, this.payload.config);
+          // We are executing a format task, so the config was fully updated with defaults.
+          // We need to guarantee that the config is the same as the one sent to the test connection function;
+          // otherwise, the backend will return only partial data.
+          await this.payload.formState.formatTask.execute(this.payload.formState);
+          this.promise = this.connectionInfoResource.getConnectionDriverProperties(this.payload.formState.state.projectId, this.payload.config);
           const properties = await this.promise;
           this.properties = properties;
         } catch (exception: any) {
@@ -84,6 +91,7 @@ export function useDriverProperties(payload: Payload) {
         return {
           driverId: state.driverId,
           authModelId: state.authModelId,
+          host: state.host,
           mainPropertyValues: toJS(state.mainPropertyValues),
           credentials: toJS(state.credentials),
         };

@@ -58,7 +58,7 @@ export const DriverProperties: TabContainerPanelComponent<IConnectionFormProps> 
     ],
   });
 
-  const propertiesState = useDriverProperties({ projectId: formState.state.projectId, config: optionsPart.state });
+  const propertiesState = useDriverProperties({ formState, config: optionsPart.state });
 
   runInAction(() => {
     if (propertiesState.properties) {
