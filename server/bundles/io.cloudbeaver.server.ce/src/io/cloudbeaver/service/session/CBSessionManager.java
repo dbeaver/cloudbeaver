@@ -227,6 +227,7 @@ public class CBSessionManager implements WebAppSessionManager {
             throw new DBWebException(e);
         }
         oldWebSession.migrateEventHandlersTo(newWebSession);
+        oldWebSession.getEventsFilter().migrateTo(newWebSession.getEventsFilter());
         String oldSessionId = oldWebSession.getSessionId();
         synchronized (sessionMap) {
             sessionMap.remove(oldSessionId);
