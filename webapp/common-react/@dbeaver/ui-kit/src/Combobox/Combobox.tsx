@@ -45,14 +45,15 @@ export interface ComboboxPopoverProps extends AriaComboboxPopoverProps {
 /**
  * ComboboxPopover - Wrapper around AriaKit's popover with default styles
  */
-export function ComboboxPopover({ children, className, ...props }: ComboboxPopoverProps): React.JSX.Element {
+export function ComboboxPopover({ children, className, portal: portalProp, ...props }: ComboboxPopoverProps): React.JSX.Element {
   const popoverContext = use(UiKitPopoverContext);
+  const portal = (popoverContext.portal || portalProp) ?? false;
 
   return (
     <AriaComboboxPopover
       gutter={8}
       className={clsx('dbv-kit-combobox__popover', className)}
-      portal={(popoverContext.portal || props.portal) ?? false}
+      portal={portal}
       sameWidth
       unmountOnHide
       {...props}

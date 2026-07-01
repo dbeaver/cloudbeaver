@@ -87,6 +87,11 @@ public class WebServiceBindingCore extends WebServiceBindingBase<DBWServiceCore>
                     getArgumentVal(env, "projectId"),
                     getArgumentVal(env, "config")
                 )
+            ).dataFetcher(
+                "listConnectionTypes", env -> getService(env).getConnectionTypes(
+                    getWebSession(env),
+                    getArgument(env, "id")
+                )
             )
         ;
 

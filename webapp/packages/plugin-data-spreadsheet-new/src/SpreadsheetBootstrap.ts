@@ -17,6 +17,7 @@ import {
   DATA_CONTEXT_DV_PRESENTATION_ACTIONS,
   DATA_CONTEXT_DV_RESULT_KEY,
   DATA_CONTEXT_DV_SIMPLE,
+  DatabaseDataFeature,
   DataPresentationService,
   IDatabaseDataConstraintAction,
   IDatabaseDataSelectAction,
@@ -170,7 +171,7 @@ export class SpreadsheetBootstrap extends Bootstrap {
         }
 
         if (action === ACTION_DATA_GRID_FILTERS_RESET_OR_SORTING) {
-          if (!isResultSetDataSource(model.source)) {
+          if (!isResultSetDataSource(model.source) || model.source.hasFeature(DatabaseDataFeature.References)) {
             return false;
           }
 
