@@ -350,7 +350,7 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL>
     }
 
     @Override
-    public void addServlets(ServletApplication application, DBWServletContext servletContext) throws DBException {
+    public void addServlets(@NotNull ServletApplication application, @NotNull DBWServletContext servletContext) throws DBException {
         servletContext.addServlet(
             "sqlResultValueViewer",
             new WebSQLResultServlet(application, getServiceImpl()),

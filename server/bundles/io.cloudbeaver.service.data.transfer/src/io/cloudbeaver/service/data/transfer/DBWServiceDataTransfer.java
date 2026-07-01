@@ -59,7 +59,7 @@ public interface DBWServiceDataTransfer extends DBWService {
     ) throws DBWebException;
 
     @NotNull
-    @WebAction
+    @WebAction(requireGlobalPermissions = RMConstants.PERMISSION_DATA_EDITOR_IMPORT)
     WebAsyncTaskInfo asyncImportDataContainer(
         @NotNull String processorId,
         @NotNull Path path,
@@ -79,7 +79,7 @@ public interface DBWServiceDataTransfer extends DBWService {
      * after data transfer.
      */
     @NotNull
-    @WebAction
+    @WebAction(requireGlobalPermissions = RMConstants.PERMISSION_DATA_EDITOR_IMPORT)
     @Deprecated
     Boolean dataTransferRemoveDataFile(@NotNull WebSession session, @NotNull String dataFileId) throws DBWebException;
 
