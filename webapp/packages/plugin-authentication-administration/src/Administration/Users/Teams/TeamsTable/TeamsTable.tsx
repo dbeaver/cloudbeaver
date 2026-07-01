@@ -6,6 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { use } from 'react';
 import { observer } from 'mobx-react-lite';
 import { reaction } from 'mobx';
 
@@ -13,7 +14,13 @@ import { Link, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import type { TeamInfo } from '@cloudbeaver/core-authentication';
 import { ADMINISTRATION_TABLE_DEFAULT_ROW_HEIGHT, AdministrationTableStyles } from '@cloudbeaver/core-administration';
-import { DataGrid, useCreateGridReactiveValue, TableRowSelect } from '@cloudbeaver/plugin-data-grid';
+import {
+  DataGrid,
+  useCreateGridReactiveValue,
+  TableRowSelect,
+  TableSelectionContext,
+  type DataGridCellKeyboardEvent,
+} from '@cloudbeaver/plugin-data-grid';
 
 import { TeamsTableOptionsPanelService } from './TeamsTableOptionsPanelService.js';
 import { Command } from '@dbeaver/ui-kit';
@@ -28,11 +35,28 @@ const NAME_COLUMN = { key: 'name', label: 'administration_teams_team_name' };
 const DESCRIPTION_COLUMN = { key: 'description', label: 'administration_teams_team_description' };
 
 const COLUMNS = [SELECT_COLUMN, ID_COLUMN, NAME_COLUMN, DESCRIPTION_COLUMN];
+const SELECT_COLUMN_ARIA_INDEX = String(COLUMNS.indexOf(SELECT_COLUMN) + 1);
 
 export const TeamsTable = observer<Props>(function TeamsTable({ teams }) {
   const translate = useTranslate();
   const styles = useS(AdministrationTableStyles);
   const teamsTableOptionsPanelService = useService(TeamsTableOptionsPanelService);
+  const selection = use(TableSelectionContext);
+
+  function handleHeaderKeyDown(event: DataGridCellKeyboardEvent) {
+    if (!selection || selection.keys.length === 0 || (event.key !== 'Enter' && event.key !== ' ')) {
+      return;
+    }
+
+    const colIndex = event.currentTarget.closest('[aria-colindex]')?.getAttribute('aria-colindex');
+
+    if (colIndex !== SELECT_COLUMN_ARIA_INDEX) {
+      return;
+    }
+
+    event.preventDefault();
+    selection.selectRoot();
+  }
 
   const columnsCount = useCreateGridReactiveValue(() => COLUMNS.length, null, [COLUMNS]);
   const rowsCount = useCreateGridReactiveValue(
@@ -120,6 +144,7 @@ export const TeamsTable = observer<Props>(function TeamsTable({ teams }) {
         headerElement={headerElement}
         cell={cell}
         className={s(styles, { table: true })}
+        onHeaderKeyDown={handleHeaderKeyDown}
       />
     </div>
   );
