@@ -51,7 +51,7 @@ export class ConnectionFormSSHPart extends FormPart<INetworkHandlerConfig, IConn
   resetNetworkProfileConfig(): void {
     this.isReadOnly = false;
     this.networkProfileConfig = null;
-    this.setState(getDefaultState());
+    this.reset();
   }
 
   applyNetworkProfileConfig(config: INetworkHandlerConfig): void {
