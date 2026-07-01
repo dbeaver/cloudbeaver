@@ -67,7 +67,7 @@ export const CaptureView = observer<React.PropsWithChildren<ICaptureViewProps>>(
     {
       enabled: allKeys.length > 0,
       useKey: true,
-      enableOnFormTags: ['INPUT', 'SELECT', 'TEXTAREA'],
+      enableOnFormTags: ['INPUT', 'SELECT', 'TEXTAREA', 'textbox'],
       preventDefault(event, handler) {
         // Don't prevent default if event was already handled by a child view
         if (EventContext.has(event, EventStopPropagationFlag)) {
