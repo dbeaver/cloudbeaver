@@ -104,6 +104,7 @@ export class DataExportMenuService {
             filter: {
               constraints: source.options.constraints,
               where: source.options.whereFilter,
+              anyConstraint: source.options.anyConstraint,
             },
           });
         }

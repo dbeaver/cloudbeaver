@@ -51,8 +51,12 @@ export class TableHeaderService extends Bootstrap {
   }
 
   override register(): void {
-    this.tableHeaderPlaceholder.add(TableWhereFilter, 1, props => !isResultSetDataSource(props.model.source));
-    this.tableHeaderPlaceholder.add(TableHeaderMenu, 2);
+    this.tableHeaderPlaceholder.add(
+      TableWhereFilter,
+      1,
+      props => !isResultSetDataSource(props.model.source) || props.model.source.hasFeature(DatabaseDataFeature.References),
+    );
+    this.tableHeaderPlaceholder.add(TableHeaderMenu, 2, props => props.model.source.hasFeature(DatabaseDataFeature.References));
 
     this.actionService.addHandler({
       id: 'table-header-menu-base-handler',

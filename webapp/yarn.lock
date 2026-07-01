@@ -3103,6 +3103,41 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@cloudbeaver/plugin-data-viewer-references@workspace:*, @cloudbeaver/plugin-data-viewer-references@workspace:packages/plugin-data-viewer-references":
+  version: 0.0.0-use.local
+  resolution: "@cloudbeaver/plugin-data-viewer-references@workspace:packages/plugin-data-viewer-references"
+  dependencies:
+    "@cloudbeaver/core-blocks": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-connections": "workspace:*"
+    "@cloudbeaver/core-data-context": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-dialogs": "workspace:*"
+    "@cloudbeaver/core-events": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-navigation-tree": "workspace:*"
+    "@cloudbeaver/core-root": "workspace:*"
+    "@cloudbeaver/core-sdk": "workspace:*"
+    "@cloudbeaver/core-settings": "workspace:*"
+    "@cloudbeaver/core-ui": "workspace:*"
+    "@cloudbeaver/core-utils": "workspace:*"
+    "@cloudbeaver/core-view": "workspace:*"
+    "@cloudbeaver/plugin-data-viewer": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
+    "@dbeaver/js-helpers": "workspace:*"
+    "@dbeaver/ui-kit": "workspace:*"
+    "@types/react": "npm:^19"
+    mobx: "npm:^6"
+    mobx-react-lite: "npm:^4"
+    react: "npm:^19"
+    react-dom: "npm:^19"
+    rimraf: "npm:^6"
+    tslib: "npm:^2"
+    typescript: "npm:^5"
+    typescript-plugin-css-modules: "npm:^5"
+  languageName: unknown
+  linkType: soft
+
 "@cloudbeaver/plugin-data-viewer-request-query-viewer@workspace:*, @cloudbeaver/plugin-data-viewer-request-query-viewer@workspace:packages/plugin-data-viewer-request-query-viewer":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-data-viewer-request-query-viewer@workspace:packages/plugin-data-viewer-request-query-viewer"
@@ -4087,6 +4122,7 @@ __metadata:
     "@cloudbeaver/plugin-data-spreadsheet-new": "workspace:*"
     "@cloudbeaver/plugin-data-viewer": "workspace:*"
     "@cloudbeaver/plugin-data-viewer-conditional-formatting": "workspace:*"
+    "@cloudbeaver/plugin-data-viewer-references": "workspace:*"
     "@cloudbeaver/plugin-data-viewer-request-query-viewer": "workspace:*"
     "@cloudbeaver/plugin-data-viewer-result-set-grouping": "workspace:*"
     "@cloudbeaver/plugin-data-viewer-result-trace-details": "workspace:*"

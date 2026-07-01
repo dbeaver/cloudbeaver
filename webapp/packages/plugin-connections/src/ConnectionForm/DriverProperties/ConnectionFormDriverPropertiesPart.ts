@@ -7,7 +7,7 @@
  */
 import { FormPart, type IFormState } from '@cloudbeaver/core-ui';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
-import { ConnectionInfoPropertiesResource, DBDriverResource } from '@cloudbeaver/core-connections';
+import { ConnectionInfoPropertiesResource, ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import type { IConnectionFormState } from '../IConnectionFormState.js';
 import { runInAction, toJS } from 'mobx';
 import type { ConnectionFormOptionsPart } from '../Options/ConnectionFormOptionsPart.js';
@@ -25,7 +25,7 @@ export class ConnectionFormDriverPropertiesPart extends FormPart<ConnectionPrope
   constructor(
     formState: IFormState<IConnectionFormState>,
     private readonly connectionInfoPropertiesResource: ConnectionInfoPropertiesResource,
-    private readonly dbDriverResource: DBDriverResource,
+    private readonly connectionInfoResource: ConnectionInfoResource,
     private readonly optionsPart: ConnectionFormOptionsPart,
   ) {
     super(formState, getDefaultState());
@@ -94,13 +94,13 @@ export class ConnectionFormDriverPropertiesPart extends FormPart<ConnectionPrope
       return config;
     }
 
-    const properties = await this.dbDriverResource.load(this.optionsPart.state.driverId, ['includeDriverProperties']);
+    const properties = await this.connectionInfoResource.getConnectionDriverProperties(this.formState.state.projectId, this.optionsPart.state);
 
     /* Default property values must not be returned. If they are included in the request, the backend will send them back with modified values (e.g., null converted to an empty string).
     To avoid this behavior, only properties that were explicitly changed should be sent. Any properties that still contain default values must be removed from the object before sending the request
     */
     for (const [key, value] of Object.entries(config)) {
-      const property = properties?.driverProperties.find(property => property.id === key);
+      const property = properties?.find(property => property.id === key);
       if (property && value === getObjectPropertyOptionValue(property.defaultValue)) {
         delete config[key];
       }

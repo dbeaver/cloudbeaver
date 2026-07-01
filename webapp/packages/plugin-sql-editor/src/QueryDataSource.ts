@@ -285,6 +285,7 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
         limit,
         constraints: options.constraints,
         where: options.whereFilter || undefined,
+        anyConstraint: options.anyConstraint,
       },
       dataFormat: this.dataFormat,
       readLogs: options.readLogs,

@@ -181,6 +181,7 @@ public abstract class CBApplication<T extends CBServerConfig>
         return getServerConfigurationController().getServerConfiguration();
     }
 
+    @NotNull
     @Override
     public ServletAuthConfiguration getAuthConfiguration() {
         return getAppConfiguration();
@@ -751,6 +752,7 @@ public abstract class CBApplication<T extends CBServerConfig>
         eventController.addEvent(new WSServerConfigurationChangedEvent(sessionId, null));
     }
 
+    @NotNull
     @Override
     public abstract CBServerConfigurationController<T> getServerConfigurationController();
 

@@ -21,19 +21,20 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
-import org.jkiss.dbeaver.model.DBPEvaluationContext;
 import org.jkiss.dbeaver.model.DBUtils;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.navigator.DBNNode;
 import org.jkiss.dbeaver.model.struct.DBSEntity;
 import org.jkiss.dbeaver.model.struct.DBSEntityAssociation;
 import org.jkiss.dbeaver.model.struct.DBSEntityConstraint;
+import org.jkiss.dbeaver.model.struct.rdb.DBSCatalog;
+import org.jkiss.dbeaver.model.struct.rdb.DBSSchema;
 
 import java.util.List;
 
-public class WebSQLQueryResultReference {
+public class WebSQLQueryResultAssociation {
 
-    private static final Log log = Log.getLog(WebSQLQueryResultReference.class);
+    private static final Log log = Log.getLog(WebSQLQueryResultAssociation.class);
 
     @Nullable
     private final WebSession session;
@@ -41,18 +42,23 @@ public class WebSQLQueryResultReference {
     private final DBSEntityAssociation association;
     private final boolean reverse;
     @NotNull
-    private final List<Integer> columnIndexList;
+    private final List<WebSQLReferenceColumnMapping> columnMapping;
 
-    public WebSQLQueryResultReference(
+    public WebSQLQueryResultAssociation(
         @Nullable WebSession session,
         @NotNull DBSEntityAssociation association,
         boolean reverse,
-        @NotNull List<Integer> columnIndexList
+        @NotNull List<WebSQLReferenceColumnMapping> columnMapping
     ) {
         this.session = session;
         this.association = association;
         this.reverse = reverse;
-        this.columnIndexList = columnIndexList;
+        this.columnMapping = columnMapping;
+    }
+
+    @Property
+    public boolean isReference() {
+        return reverse;
     }
 
     @NotNull
@@ -63,18 +69,36 @@ public class WebSQLQueryResultReference {
 
     @Nullable
     @Property
-    public String getTargetEntityName() {
+    public String getTargetCatalogName() {
         DBSEntity targetEntity = getTargetEntity();
         if (targetEntity == null) {
             return null;
         }
-        return DBUtils.getObjectFullName(targetEntity, DBPEvaluationContext.UI);
+        DBSCatalog catalog = DBUtils.getParentOfType(DBSCatalog.class, targetEntity);
+        return catalog == null ? null : catalog.getName();
     }
-
 
     @Nullable
     @Property
-    public String getNodePath() {
+    public String getTargetSchemaName() {
+        DBSEntity targetEntity = getTargetEntity();
+        if (targetEntity == null) {
+            return null;
+        }
+        DBSSchema schema = DBUtils.getParentOfType(DBSSchema.class, targetEntity);
+        return schema == null ? null : schema.getName();
+    }
+
+    @Nullable
+    @Property
+    public String getTargetEntityName() {
+        DBSEntity targetEntity = getTargetEntity();
+        return targetEntity == null ? null : targetEntity.getName();
+    }
+
+    @Nullable
+    @Property
+    public String getTargetNodePath() {
         if (session == null) {
             return null;
         }
@@ -94,8 +118,8 @@ public class WebSQLQueryResultReference {
 
     @NotNull
     @Property
-    public List<Integer> getColumnIndexList() {
-        return columnIndexList;
+    public List<WebSQLReferenceColumnMapping> getColumnMapping() {
+        return columnMapping;
     }
 
     @Nullable
