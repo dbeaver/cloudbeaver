@@ -1,0 +1,20 @@
+query getSqlResultAssociations($projectId: ID!, $connectionId: ID!, $contextId: ID!, $resultsId: ID!, $isReference: Boolean) {
+  associations: sqlResultAssociations(
+    projectId: $projectId
+    connectionId: $connectionId
+    contextId: $contextId
+    resultsId: $resultsId
+    isReference: $isReference
+  ) {
+    reference
+    associationName
+    targetEntityName
+    targetNodePath
+    columnMapping {
+      sourceColumnIndex
+      sourceColumnName
+      targetColumnIndex
+      targetColumnName
+    }
+  }
+}

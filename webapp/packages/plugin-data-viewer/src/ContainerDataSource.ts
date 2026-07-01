@@ -32,7 +32,7 @@ export interface IDataContainerOptions extends IDatabaseDataOptions {
   containerNodePath: string;
 }
 
-export class ContainerDataSource extends ResultSetDataSource<IDataContainerOptions> {
+export class ContainerDataSource<TOptions extends IDataContainerOptions = IDataContainerOptions> extends ResultSetDataSource<TOptions> {
   currentTask: ITask<SqlExecuteInfo> | null;
 
   override get canCancel(): boolean {
@@ -216,6 +216,7 @@ export class ContainerDataSource extends ResultSetDataSource<IDataContainerOptio
         limit,
         constraints: options.constraints,
         where: options.whereFilter || undefined,
+        anyConstraint: options.anyConstraint,
       },
       dataFormat: this.dataFormat,
     };

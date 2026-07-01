@@ -1,0 +1,54 @@
+{
+  "extends": "@cloudbeaver/tsconfig/tsconfig.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "lib",
+    "tsBuildInfoFile": "lib/tsconfig.tsbuildinfo",
+    "composite": true
+  },
+  "references": [
+    {
+      "path": "../../common-typescript/@dbeaver/cli"
+    },
+    {
+      "path": "../core-blocks"
+    },
+    {
+      "path": "../core-cli"
+    },
+    {
+      "path": "../core-di"
+    },
+    {
+      "path": "../core-events"
+    },
+    {
+      "path": "../core-localization"
+    },
+    {
+      "path": "../core-projects"
+    },
+    {
+      "path": "../core-resource"
+    },
+    {
+      "path": "../core-root"
+    },
+    {
+      "path": "../core-sdk"
+    },
+    {
+      "path": "../core-utils"
+    }
+  ],
+  "include": [
+    "__custom_mocks__/**/*",
+    "src/**/*",
+    "src/**/*.json",
+    "src/**/*.css"
+  ],
+  "exclude": [
+    "**/node_modules",
+    "lib/**/*"
+  ]
+}

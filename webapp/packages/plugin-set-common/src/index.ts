@@ -40,7 +40,9 @@ import coreSupport from '@cloudbeaver/core-support/module';
 import coreView from '@cloudbeaver/core-view/module';
 import coreServerNotifications from '@cloudbeaver/core-server-notifications/module';
 import coreSessionActions from '@cloudbeaver/core-session-actions/module';
+import pluginNetworkHandlers from '@cloudbeaver/plugin-network-handlers/module';
 
+import pluginConnectionNetworkHandlers from '@cloudbeaver/plugin-connection-network-handlers/module';
 import pluginAdministration from '@cloudbeaver/plugin-administration/module';
 import pluginAppLogo from '@cloudbeaver/plugin-app-logo/module';
 import pluginAppLogoAdministration from '@cloudbeaver/plugin-app-logo-administration/module';
@@ -114,6 +116,7 @@ import pluginConnectionView from '@cloudbeaver/plugin-connection-view/module';
 import pluginConnectionPreferences from '@cloudbeaver/plugin-connection-preferences/module';
 import pluginScriptExport from '@cloudbeaver/plugin-script-export/module';
 import pluginProjectInfo from '@cloudbeaver/plugin-project-info/module';
+import pluginDataViewerReferences from '@cloudbeaver/plugin-data-viewer-references/module';
 
 const core = [
   coreRouting, // important, should be first because the router starts in load phase first after all plugins register phase
@@ -227,4 +230,7 @@ export const commonSet = [
   pluginConnectionView,
   pluginConnectionPreferences,
   pluginProjectInfo,
+  pluginNetworkHandlers,
+  pluginConnectionNetworkHandlers,
+  pluginDataViewerReferences,
 ];

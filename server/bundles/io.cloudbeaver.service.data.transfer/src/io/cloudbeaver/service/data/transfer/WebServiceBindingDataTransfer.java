@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2025 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,12 +26,13 @@ import io.cloudbeaver.service.data.transfer.impl.WebDataTransferParameters;
 import io.cloudbeaver.service.data.transfer.impl.WebDataTransferServlet;
 import io.cloudbeaver.service.data.transfer.impl.WebServiceDataTransfer;
 import io.cloudbeaver.service.sql.WebServiceBindingSQL;
+import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 
 /**
  * Web service implementation
  */
-public class WebServiceBindingDataTransfer extends WebServiceBindingBase<DBWServiceDataTransfer> implements DBWServiceBindingServlet<CBApplication> {
+public class WebServiceBindingDataTransfer extends WebServiceBindingBase<DBWServiceDataTransfer> implements DBWServiceBindingServlet<CBApplication<?>> {
 
     public WebServiceBindingDataTransfer() {
         super(DBWServiceDataTransfer.class, new WebServiceDataTransfer(), "schema/service.data.transfer.graphqls");
@@ -47,17 +48,17 @@ public class WebServiceBindingDataTransfer extends WebServiceBindingBase<DBWServ
                 env -> getService(env).getAvailableImportStreamProcessors(getWebSession(env)))
             .dataFetcher("dataTransferExportDataFromContainer", env -> getService(env).dataTransferExportDataFromContainer(
                 WebServiceBindingSQL.getSQLProcessor(env),
-                getArgument(env, "containerNodePath"),
+                getArgumentVal(env, "containerNodePath"),
                 new WebDataTransferParameters(getArgument(env, "parameters"))
             ))
             .dataFetcher("dataTransferExportDataFromResults", env -> getService(env).dataTransferExportDataFromResults(
                 WebServiceBindingSQL.getSQLContext(env),
-                getArgument(env, "resultsId"),
+                getArgumentVal(env, "resultsId"),
                 new WebDataTransferParameters(getArgument(env, "parameters"))
             ))
             .dataFetcher("dataTransferRemoveDataFile", env -> getService(env).dataTransferRemoveDataFile(
                 getWebSession(env),
-                getArgument(env, "dataFileId")
+                getArgumentVal(env, "dataFileId")
             ))
             .dataFetcher("dataTransferDefaultExportSettings", env -> getService(env).defaultExportSettings())
         ;
@@ -65,7 +66,7 @@ public class WebServiceBindingDataTransfer extends WebServiceBindingBase<DBWServ
     }
 
     @Override
-    public void addServlets(CBApplication application, DBWServletContext servletContext) throws DBException {
+    public void addServlets(@NotNull CBApplication<?> application, @NotNull DBWServletContext servletContext) throws DBException {
         if (!application.isMultiuser()) {
             return;
         }

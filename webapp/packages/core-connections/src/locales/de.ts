@@ -38,10 +38,6 @@ export default [
   ['connections_connection_test_fail', 'Verbindungstest ist fehlgeschlagen'],
   ['connections_network_handler_default_user', 'Benutzer'],
   ['connections_network_handler_default_password', 'Passwort'],
-  ['connections_network_handler_ssh_tunnel_user', 'Benutzer'],
-  ['connections_network_handler_ssh_tunnel_password', 'Passwort'],
-  ['connections_network_handler_ssh_tunnel_auth_type', 'Authentifizierungsmethode'],
-  ['connections_network_handler_ssh_tunnel_advanced_settings', 'Erweiterte Einstellungen'],
   ['connections_not_found', 'Es wurden keine Datenbankverbindungen gefunden'],
 
   ['core_connections_settings_disable', 'Disable'],

@@ -38,14 +38,15 @@ export function Select({ className, ...props }: SelectProps) {
   return <AriaSelect className={clsx('dbv-kit-select', className)} {...props} />;
 }
 
-export function SelectPopover({ children, className, ...props }: SelectPopoverProps) {
+export function SelectPopover({ children, className, portal: portalProp, ...props }: SelectPopoverProps) {
   const popoverContext = use(UiKitPopoverContext);
+  const portal = (popoverContext.portal || portalProp) ?? false;
 
   return (
     <AriaSelectPopover
       className={clsx('dbv-kit-select__popover', className)}
       sameWidth={props.sameWidth ?? true}
-      portal={(popoverContext.portal || props.portal) ?? false}
+      portal={portal}
       {...props}
     >
       {children}

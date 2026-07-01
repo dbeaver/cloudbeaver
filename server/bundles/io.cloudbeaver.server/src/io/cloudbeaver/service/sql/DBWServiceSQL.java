@@ -127,15 +127,12 @@ public interface DBWServiceSQL extends DBWService {
         @Nullable WebDataFormat dataFormat) throws DBWebException;
 
     @WebAction
-    WebAsyncTaskInfo asyncNavigateForeignKey(
+    List<WebSQLQueryResultAssociation> getSqlResultAssociations(
         @NotNull WebSession webSession,
         @NotNull WebSQLContextInfo contextInfo,
         @NotNull String resultsId,
-        @NotNull WebSQLResultsRow row,
-        int columnIndex,
-        @NotNull String associationName,
-        boolean isReference,
-        @Nullable WebDataFormat dataFormat) throws DBException;
+        @Nullable Boolean isReference
+    ) throws DBException;
 
     /**
      * Reads dynamic trace from provided database results.

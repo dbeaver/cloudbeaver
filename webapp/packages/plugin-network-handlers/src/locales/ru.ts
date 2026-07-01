@@ -1,0 +1,21 @@
+export default [
+  ['plugin_network_handlers_ssh_tunnel_auth_type', 'Метод аутентификации'],
+  ['plugin_network_handlers_ssh_tunnel_host', 'Хост'],
+  ['plugin_network_handlers_ssh_tunnel_port', 'Порт'],
+  ['plugin_network_handlers_ssh_tunnel_user', 'Пользователь'],
+  ['plugin_network_handlers_ssh_tunnel_password', 'Пароль'],
+  ['plugin_network_handlers_ssh_tunnel_private_key', 'Приватный ключ'],
+  ['plugin_network_handlers_ssh_tunnel_advanced_settings', 'Дополнительные настройки'],
+  ['plugin_network_handlers_ssh_tunnel_advanced_settings_alive_interval', 'Интервал keep-alive (мс)'],
+  ['plugin_network_handlers_ssh_tunnel_advanced_settings_connect_timeout', 'Тайм-аут подключения (мс)'],
+  ['plugin_network_handlers_save_credentials_for_user', 'Сохранить данные для текущего пользователя'],
+  ['plugin_network_handlers_save_credentials_for_user_tooltip', 'Эти учетные данные будут использоваться для автоматического подключения'],
+  ['plugin_network_handlers_save_credentials_shared', 'Запомнить данные для всех пользователей с доступом'],
+  [
+    'plugin_network_handlers_save_credentials_shared_tooltip',
+    'Эти учетные данные будут использоваться для автоматического подключения для всех пользователей с доступом',
+  ],
+  ['plugin_network_handlers_ssh_tunnel_enable', 'Использовать SSH Тунель'],
+  ['plugin_network_handlers_ssh_test_fail', 'Не удалось установить соединение'],
+  ['plugin_network_handlers_ssh_test_success', 'Соединение установлено'],
+];
