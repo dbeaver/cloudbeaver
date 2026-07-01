@@ -11,7 +11,7 @@ import clsx from 'clsx';
 import { SelectProvider, Select, SelectPopover, SelectItem, SelectLabel, SelectGroup, type SelectProviderProps } from './Select.js';
 import './SelectField.css';
 
-export interface SelectItem<T> {
+export interface ISelectItem<T> {
   value: T;
   label: string;
   disabled?: boolean;
@@ -19,7 +19,7 @@ export interface SelectItem<T> {
 
 type PropertyGetter<ItemType, ValueType> = (item: ItemType) => ValueType;
 
-export interface SelectFieldProps<T, ItemType = SelectItem<T>> {
+export interface ISelectFieldProps<T, ItemType = ISelectItem<T>> {
   /** Options array - can be SelectOption objects or arbitrary objects */
   items: ItemType[];
 
@@ -112,7 +112,7 @@ function splitIntoGroups<ItemType>(items: ItemType[], isSeparator: PropertyGette
   return groups.filter(g => g.length > 0);
 }
 
-export function SelectField<T, ItemType extends {} = SelectItem<T>>({
+export function SelectField<T, ItemType extends {} = ISelectItem<T>>({
   items,
   value,
   onChange,
@@ -134,18 +134,18 @@ export function SelectField<T, ItemType extends {} = SelectItem<T>>({
   autoFocusItemsOnShow,
   name,
   id,
-}: SelectFieldProps<T, ItemType>) {
+}: ISelectFieldProps<T, ItemType>) {
   const getItemValue = (item: ItemType): T =>
-    getValueByPath<ItemType, T>(item, itemValue, i => ('value' in i ? (i as unknown as SelectItem<T>).value : (i as unknown as T)));
+    getValueByPath<ItemType, T>(item, itemValue, i => ('value' in i ? (i as unknown as ISelectItem<T>).value : (i as unknown as T)));
 
   const getItemValueSerialized = (item: ItemType): string =>
     getValueByPath<T, string>(getItemValue(item), itemValueSerialized, key => JSON.stringify(key));
 
   const renderItem = (item: ItemType): React.ReactNode =>
-    getValueByPath<ItemType, React.ReactNode>(item, itemRender, i => ('label' in i ? (i as unknown as SelectItem<T>).label : String(i)));
+    getValueByPath<ItemType, React.ReactNode>(item, itemRender, i => ('label' in i ? (i as unknown as ISelectItem<T>).label : String(i)));
 
   const isItemDisabled = (item: ItemType): boolean =>
-    getValueByPath<ItemType, boolean>(item, itemDisabled, i => ('disabled' in i ? Boolean((i as unknown as SelectItem<T>).disabled) : false));
+    getValueByPath<ItemType, boolean>(item, itemDisabled, i => ('disabled' in i ? Boolean((i as unknown as ISelectItem<T>).disabled) : false));
 
   const [selectedValue, setSelectedValue] = useState<T | undefined>(() => {
     if (value !== undefined) {
@@ -193,9 +193,7 @@ export function SelectField<T, ItemType extends {} = SelectItem<T>>({
 
     if (isSeparator) {
       return splitIntoGroups(items, isSeparator).map(group => (
-        <SelectGroup key={getItemValueSerialized(group[0]!)}>
-          {group.map(renderSelectItem)}
-        </SelectGroup>
+        <SelectGroup key={getItemValueSerialized(group[0]!)}>{group.map(renderSelectItem)}</SelectGroup>
       ));
     }
 

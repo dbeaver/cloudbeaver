@@ -57,12 +57,12 @@ type ObjectProps<TValue, TKey extends keyof TState, TState> = SelectBaseProps<TS
   value?: never;
 };
 
-export interface SelectType {
+export interface ISelectType {
   <TKey, TValue>(props: ControlledProps<TKey, TValue>): React.JSX.Element;
   <TValue, TKey extends keyof TState, TState>(props: ObjectProps<TValue, TKey, TState>): React.JSX.Element;
 }
 
-export const Select: SelectType = observer(function Select({
+export const Select: ISelectType = observer(function Select({
   value: controlledValue,
   defaultValue,
   name,
