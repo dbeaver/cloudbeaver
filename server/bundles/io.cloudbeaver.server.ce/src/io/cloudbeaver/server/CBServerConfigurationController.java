@@ -371,6 +371,7 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
         try (Writer out = new OutputStreamWriter(Files.newOutputStream(runtimeConfigPath), StandardCharsets.UTF_8)) {
             Gson gson = new GsonBuilder()
                 .setStrictness(Strictness.LENIENT)
+                .setObjectToNumberStrategy(ToNumberPolicy.LONG_OR_DOUBLE)
                 .setPrettyPrinting()
                 .create();
             gson.toJson(configurationProperties, out);

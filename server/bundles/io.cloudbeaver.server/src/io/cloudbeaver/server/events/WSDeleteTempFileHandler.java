@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ package io.cloudbeaver.server.events;
 import io.cloudbeaver.server.BaseWebPlatform;
 import io.cloudbeaver.server.WebAppUtils;
 import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.runtime.VoidProgressMonitor;
 import org.jkiss.dbeaver.model.websocket.WSEventHandler;
@@ -33,7 +34,10 @@ public class WSDeleteTempFileHandler implements WSEventHandler<WSEventDeleteTemp
 
     private static final Log log = Log.getLog(WSDeleteTempFileHandler.class);
 
-    public void resetTempFolder(String sessionId) {
+    public void resetTempFolder(@Nullable String sessionId) {
+        if (sessionId == null) {
+            return;
+        }
         Path path = WebAppUtils.getWebPlatform()
             .getTempFolder(new VoidProgressMonitor(), BaseWebPlatform.TEMP_FILE_FOLDER)
             .resolve(sessionId);
