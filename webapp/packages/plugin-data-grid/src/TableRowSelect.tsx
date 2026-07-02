@@ -9,8 +9,7 @@
 import { observer } from 'mobx-react-lite';
 import { use } from 'react';
 
-import { Command } from '@dbeaver/ui-kit';
-import { CheckboxIndicator } from '@cloudbeaver/core-blocks';
+import { Checkbox, useTranslate } from '@cloudbeaver/core-blocks';
 
 import { TableSelectionContext } from './TableSelectionContext.js';
 
@@ -28,10 +27,11 @@ export interface ITableRowSelectProps extends BaseProps {
   isRoot?: never;
 }
 
-const CELL_CLASS_NAME = 'tw:flex tw:w-full tw:h-full tw:items-center tw:justify-center tw:outline-0!';
+const CELL_CLASS_NAME = 'tw:flex tw:w-full tw:h-full tw:items-center tw:justify-center';
 
 export const TableRowSelect = observer<ITableRowRootSelectProps | ITableRowSelectProps>(function TableRowSelect({ isRoot, id, disabled }) {
   const selection = use(TableSelectionContext);
+  const translate = useTranslate();
 
   if (!selection) {
     throw new Error('TableRowSelect must be used within a TableSelectionContext provider');
@@ -43,17 +43,28 @@ export const TableRowSelect = observer<ITableRowRootSelectProps | ITableRowSelec
     const rootDisabled = disabled || selection.keys.length === 0;
 
     return (
-      <div className={CELL_CLASS_NAME} onClick={rootDisabled ? undefined : selection.selectRoot}>
-        <CheckboxIndicator checked={checked} indeterminate={indeterminate} disabled={rootDisabled} />
-      </div>
+      <Checkbox
+        className={CELL_CLASS_NAME}
+        aria-label={translate('ui_select_all')}
+        tabIndex={0}
+        checked={checked}
+        indeterminate={indeterminate}
+        disabled={rootDisabled}
+        onChange={selection.selectRoot}
+      />
     );
   }
 
   const checked = selection.selected.includes(id);
 
   return (
-    <Command className={CELL_CLASS_NAME} disabled={disabled} tabIndex={0} onClick={() => selection.select(id)}>
-      <CheckboxIndicator checked={checked} disabled={disabled} />
-    </Command>
+    <Checkbox
+      className={CELL_CLASS_NAME}
+      aria-label={translate('plugin_data_grid_table_row_select')}
+      tabIndex={0}
+      checked={checked}
+      disabled={disabled}
+      onChange={() => selection.select(id)}
+    />
   );
 });
