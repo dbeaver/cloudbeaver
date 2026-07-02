@@ -54,6 +54,14 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL>
             .dataFetcher("sqlDialectInfo", env ->
                 getService(env).getDialectInfo(getWebConnection(env))
             )
+            .dataFetcher("sqlResultAssociations", env ->
+                getService(env).getSqlResultAssociations(
+                    getWebSession(env),
+                    getSQLContext(env),
+                    getArgumentVal(env, "resultsId"),
+                    getArgument(env, "isReference")
+                )
+            )
             .dataFetcher("sqlListContexts", env ->
                 getService(env).listContexts(getWebSession(env),
                     getProjectReference(env),
@@ -232,17 +240,6 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL>
                     getDataFilter(env),
                     getDataFormat(env)
                 ))
-            .dataFetcher("asyncSqlNavigateForeignKey", env ->
-                getService(env).asyncNavigateForeignKey(
-                    getWebSession(env),
-                    getSQLContext(env),
-                    getArgumentVal(env, "resultsId"),
-                    new WebSQLResultsRow(getArgument(env, "row")),
-                    getArgumentVal(env, "columnIndex"),
-                    getArgumentVal(env, "associationName"),
-                    CommonUtils.toBoolean(env.getArgument("isReference")),
-                    getDataFormat(env)
-                ))
             .dataFetcher("asyncSqlExecuteResults", env ->
                 getService(env).asyncGetQueryResults(
                     getWebSession(env), getArgumentVal(env, "taskId")
@@ -353,7 +350,7 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL>
     }
 
     @Override
-    public void addServlets(ServletApplication application, DBWServletContext servletContext) throws DBException {
+    public void addServlets(@NotNull ServletApplication application, @NotNull DBWServletContext servletContext) throws DBException {
         servletContext.addServlet(
             "sqlResultValueViewer",
             new WebSQLResultServlet(application, getServiceImpl()),

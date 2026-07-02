@@ -30,6 +30,7 @@ import {
   IDatabaseDataFormatAction,
   IDatabaseDataViewAction,
   GridViewAction,
+  DatabaseDataFeature,
 } from '@cloudbeaver/plugin-data-viewer';
 
 import { ACTION_DATA_GRID_FILTERS_RESET_ALL } from '../../Actions/Filters/ACTION_DATA_GRID_FILTERS_RESET_ALL.js';
@@ -92,7 +93,7 @@ export class DataGridContextMenuFilterService {
         }
 
         const constraints = model.source.getAction(resultIndex, IDatabaseDataConstraintAction);
-        return constraints.supported && !model.isDisabled(resultIndex);
+        return !model.source.hasFeature(DatabaseDataFeature.References) && constraints.supported && !model.isDisabled(resultIndex);
       },
       getItems: (context, items) => [...items, MENU_DATA_GRID_FILTERS],
     });

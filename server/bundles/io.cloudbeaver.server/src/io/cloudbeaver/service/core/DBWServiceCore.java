@@ -25,6 +25,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.model.connection.DBPConnectionType;
 import org.jkiss.dbeaver.model.rm.RMConstants;
 import org.jkiss.dbeaver.registry.DataSourceNavigatorSettings;
 import org.jkiss.dbeaver.registry.settings.ProductSettingDescriptor;
@@ -114,6 +115,9 @@ public interface DBWServiceCore extends DBWService {
         @NotNull String projectId,
         @NotNull Map<String, Object> connectionConfig
     ) throws DBWebException;
+
+    @NotNull
+    List<DBPConnectionType> getConnectionTypes(@NotNull WebSession webSession, @Nullable String id);
 
     @WebAction
     WebConnectionInfo getConnectionState(WebSession webSession, @Nullable String projectId, String connectionId) throws DBWebException;

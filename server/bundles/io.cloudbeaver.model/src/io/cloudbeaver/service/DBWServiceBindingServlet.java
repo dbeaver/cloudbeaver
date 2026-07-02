@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2025 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ public interface DBWServiceBindingServlet<APPLICATION extends ServletApplication
         return true;
     }
 
-    void addServlets(APPLICATION application, DBWServletContext servletContext) throws DBException;
+    void addServlets(@NotNull APPLICATION application, @NotNull DBWServletContext servletContext) throws DBException;
 
     @NotNull
     default List<String> getExcludedServletPaths(@NotNull APPLICATION application) {

@@ -37,6 +37,8 @@ import { ResultSetSelectAction } from '../DatabaseDataModel/Actions/ResultSet/Re
 import { ResultSetViewAction } from '../DatabaseDataModel/Actions/ResultSet/ResultSetViewAction.js';
 import { IDatabaseDataSelectAction } from '../DatabaseDataModel/Actions/IDatabaseDataSelectAction.js';
 import { DatabaseDataFeature } from '../DatabaseDataModel/IDatabaseDataSource.js';
+import { IDatabaseReferencesAction } from '../DatabaseDataModel/Actions/IDatabaseReferencesAction.js';
+import { ResultSetReferencesAction } from '../DatabaseDataModel/Actions/ResultSet/ResultSetReferencesAction.js';
 
 export interface IRowIdentifierInfo {
   state: SqlRowIdentifierState | null;
@@ -73,7 +75,8 @@ export abstract class ResultSetDataSource<TOptions extends IDatabaseDataOptions 
       .registerAction(IDatabaseDataSelectAction, ResultSetSelectAction)
       .registerAction(IDatabaseDataFormatAction, ResultSetFormatAction)
       .registerAction(IDatabaseDataCacheAction, ResultSetCacheAction)
-      .registerAction(IDatabaseDataConstraintAction, DatabaseDataConstraintAction);
+      .registerAction(IDatabaseDataConstraintAction, DatabaseDataConstraintAction)
+      .registerAction(IDatabaseReferencesAction, ResultSetReferencesAction);
 
     makeObservable(this, {
       totalCountRequestTask: observable.ref,

@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import io.cloudbeaver.service.DBWServletContext;
 import io.cloudbeaver.service.WebServiceBindingBase;
 import io.cloudbeaver.service.fs.impl.WebServiceFS;
 import io.cloudbeaver.service.fs.model.WebFSServlet;
+import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.utils.CommonUtils;
 
@@ -117,7 +118,7 @@ public class WebServiceBindingFS extends WebServiceBindingBase<DBWServiceFS> imp
     }
 
     @Override
-    public void addServlets(CBApplication<?> application, DBWServletContext servletContext) throws DBException {
+    public void addServlets(@NotNull CBApplication<?> application, @NotNull DBWServletContext servletContext) throws DBException {
         if (!application.isMultiuser()) {
             return;
         }

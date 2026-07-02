@@ -570,6 +570,8 @@ type ConnectionInfo {
 
     "List of tools that can be used with this connection. Returns empty list if no tools are available"
     tools: [String!]! @since(version: "24.1.3")
+
+    connectionType: ID! @since(version: "26.1.2")
 }
 
 type ConnectionFolderInfo {
@@ -631,6 +633,37 @@ type LogEntry {
     type: String!
     message: String
     stackTrace: String
+}
+
+type ConnectionType @since(version: "26.1.2") {
+    "Unique identifier of the connection type"
+    id: ID!
+    "Human-readable name of the connection type"
+    name: String!
+    "Description of the connection type"
+    description: String
+    "Color of the connection type (for light theme)"
+    colorLight: String!
+    "Alternative color of the connection type (for dark theme)"
+    colorDark: String
+    "Is autocommit enabled for this connection type"
+    autocommit: Boolean!
+    "Confirm execution of queries for this connection type"
+    confirmExecute: Boolean!
+    "Confirm data change operations (INSERT, UPDATE, DELETE) for this connection type"
+    confirmDataChange: Boolean!
+    "Smart commit mode is enabled for this connection type"
+    smartCommit: Boolean!
+    "Recover smart commit mode is enabled for this connection type"
+    smartCommitRecover: Boolean!
+    "Auto-close transactions is enabled for this connection type"
+    autoCloseTransactions: Boolean!
+    "Auto-close idle transactions period in seconds for this connection type"
+    closeIdleTransactionPeriod: Int!
+    "Auto-close connections is enabled for this connection type"
+    autoCloseConnections: Boolean!
+    "Auto-close idle connections period in seconds for this connection type"
+    closeIdleConnectionPeriod: Int!
 }
 
 ####################################################
@@ -745,6 +778,8 @@ input ConnectionConfig {
     defaultSchemaName: String @since(version: "25.0.5") @deprecated(reason: "25.2.1 use expertPropertyValues instead")
     "Default user settings for connection"
     defaultUserPreferences: Object @since(version: "26.0.2")
+
+    connectionType: ID @since(version: "26.1.2")
 }
 
 ####################################################
@@ -790,6 +825,8 @@ extend type Query {
 
     "Returns connection driver properties based on configuration"
     listConnectionDriverProperties( projectId: ID!, config: ConnectionConfig! ): [ObjectPropertyInfo!]!
+
+    listConnectionTypes: [ConnectionType!]! @since(version: "26.1.2")
 }
 
 extend type Mutation {
