@@ -9,6 +9,7 @@
 import { NetworkHandlerAuthType } from '@cloudbeaver/core-sdk';
 import { schema } from '@cloudbeaver/core-utils';
 
+// TODO remove it
 const nullToUndefined = <T>(val: T) => (val === null ? undefined : val);
 
 export const NETWORK_HANDLER_SCHEMA = schema.object({
