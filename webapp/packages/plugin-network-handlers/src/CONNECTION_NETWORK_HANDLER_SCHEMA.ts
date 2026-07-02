@@ -9,19 +9,16 @@
 import { NetworkHandlerAuthType } from '@cloudbeaver/core-sdk';
 import { schema } from '@cloudbeaver/core-utils';
 
-// TODO remove it
-const nullToUndefined = <T>(val: T) => (val === null ? undefined : val);
-
 export const NETWORK_HANDLER_SCHEMA = schema.object({
   id: schema.string(),
-  authType: schema.preprocess(nullToUndefined, schema.nativeEnum(NetworkHandlerAuthType).optional()),
-  enabled: schema.preprocess(nullToUndefined, schema.boolean().optional()),
-  key: schema.preprocess(nullToUndefined, schema.string().optional()),
-  password: schema.preprocess(nullToUndefined, schema.string().optional()),
-  properties: schema.preprocess(nullToUndefined, schema.record(schema.string(), schema.any()).optional()),
-  savePassword: schema.preprocess(nullToUndefined, schema.boolean().optional()),
-  secureProperties: schema.preprocess(nullToUndefined, schema.record(schema.string(), schema.any()).optional()),
-  userName: schema.preprocess(nullToUndefined, schema.string().optional()),
+  authType: schema.nativeEnum(NetworkHandlerAuthType).optional(),
+  enabled: schema.boolean().optional(),
+  key: schema.string().optional(),
+  password: schema.string().optional(),
+  properties: schema.record(schema.string(), schema.any()).optional(),
+  savePassword: schema.boolean().optional(),
+  secureProperties: schema.record(schema.string(), schema.any()).optional(),
+  userName: schema.string().optional(),
 });
 
 export type INetworkHandlerConfig = schema.infer<typeof NETWORK_HANDLER_SCHEMA>;

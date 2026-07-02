@@ -8,7 +8,6 @@
 import { FormPart, formValidationContext, type IFormState } from '@cloudbeaver/core-ui';
 
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
-import { toJS } from 'mobx';
 import { DriverConfigurationType, type NetworkHandlerConfigInput, type NetworkHandlerDescriptor } from '@cloudbeaver/core-sdk';
 import { ConnectionInfoNetworkHandlersResource } from '@cloudbeaver/core-connections';
 import {
@@ -20,6 +19,7 @@ import {
   validateSSHConfig,
   type INetworkHandlerConfig,
 } from '@cloudbeaver/plugin-network-handlers';
+import { toJS } from 'mobx';
 import type { ConnectionFormOptionsPart, IConnectionFormState } from '@cloudbeaver/plugin-connections';
 
 const getDefaultState = (): INetworkHandlerConfig => SSH_DEFAULT_HANDLER_CONFIG() as INetworkHandlerConfig;
