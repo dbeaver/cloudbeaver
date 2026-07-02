@@ -33,6 +33,7 @@ import org.jkiss.dbeaver.model.access.DBAAuthCredentials;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
+import org.jkiss.dbeaver.model.connection.DBPConnectionType;
 import org.jkiss.dbeaver.model.connection.DBPDataSourceProviderDescriptor;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.model.impl.auth.AuthModelDatabaseNativeCredentials;
@@ -40,6 +41,7 @@ import org.jkiss.dbeaver.model.net.DBWHandlerConfiguration;
 import org.jkiss.dbeaver.model.net.ssh.SSHConstants;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceDisconnectEvent;
+import org.jkiss.dbeaver.registry.DataSourceProviderRegistry;
 import org.jkiss.dbeaver.registry.network.NetworkHandlerDescriptor;
 import org.jkiss.dbeaver.registry.network.NetworkHandlerRegistry;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
@@ -320,6 +322,13 @@ public class WebDataSourceUtils {
         if (config.getConfigurationType() != null) {
             dsConfig.setConfigurationType(config.getConfigurationType());
         }
+        if (config.getConnectionType() != null) {
+            DBPConnectionType connectionType = DataSourceProviderRegistry.getInstance().getConnectionType(config.getConnectionType(), null);
+            if (connectionType != null) {
+                dsConfig.setConnectionType(connectionType);
+            }
+        }
+
         if (CommonUtils.isEmpty(config.getUrl())) {
             dsConfig.setUrl(driver.getConnectionURL(dsConfig));
         }

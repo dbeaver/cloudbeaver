@@ -21,13 +21,17 @@ import io.cloudbeaver.service.sql.WebSQLProcessor;
 import io.cloudbeaver.service.sql.WebServiceBindingSQL;
 import io.cloudbeaver.test.platform.CloudbeaverDBTest;
 import io.cloudbeaver.test.platform.util.GraphQLTestConstant;
+import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
+import org.jkiss.dbeaver.model.exec.DBCLogicalOperator;
 import org.jkiss.dbeaver.model.exec.jdbc.JDBCStatement;
+import org.jkiss.dbeaver.model.navigator.DBNModel;
+import org.jkiss.dbeaver.model.navigator.DBNProject;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,7 +39,7 @@ import java.util.Map;
 public class ForeignKeyNavigationEndpointTest extends CloudbeaverDBTest {
 
     @BeforeEach
-    public void prepareTables() throws SQLException {
+    public void prepareTables() throws Exception {
         try (JDBCStatement stmt = databaseSession.createStatement()) {
             Assertions.assertFalse(stmt.execute("DROP TABLE IF EXISTS FK_NAV_ORDER"));
             Assertions.assertFalse(stmt.execute("DROP TABLE IF EXISTS FK_NAV_CUSTOMER"));
@@ -52,11 +56,15 @@ public class ForeignKeyNavigationEndpointTest extends CloudbeaverDBTest {
             Assertions.assertFalse(stmt.execute("INSERT INTO FK_NAV_ORDER (ID, CUSTOMER_ID) VALUES (10, 1)"));
             Assertions.assertFalse(stmt.execute("INSERT INTO FK_NAV_ORDER (ID, CUSTOMER_ID) VALUES (11, 2)"));
         }
+        DBNModel navigatorModel = webSession.getNavigatorModelOrThrow();
+        DBNProject projectNode = navigatorModel.getRoot().getProjectNode(globalProject);
+        Assertions.assertNotNull(projectNode, "Project navigator node not found");
+        projectNode.getDatabases().getChildren(monitor);
     }
 
     @Test
     public void shouldReadReferencedRowByForeignKeyCell() throws Exception {
-        // Given: an order result set exposing a forward FK from CUSTOMER_ID to FK_NAV_CUSTOMER.
+        // Given
         WebSQLProcessor sqlProcessor = WebServiceBindingSQL.getSQLProcessor(webConnectionInfo);
         WebSQLContextInfo sqlProcessorContext = sqlProcessor.createContext(null, "PUBLIC", globalProject.getId());
         String taskId = clientWrapper.asyncSqlExecute(
@@ -68,42 +76,23 @@ public class ForeignKeyNavigationEndpointTest extends CloudbeaverDBTest {
         clientWrapper.waitTaskCompleted(taskId);
 
         Map<String, Object> orderResultSet = clientWrapper.readTaskResultSet(taskId);
-        List<Map<String, Object>> associations = JSONUtils.getObjectList(orderResultSet, "associations");
-        Assertions.assertFalse(associations.isEmpty(), "Forward FK is missing on FK_NAV_ORDER result set");
-        Map<String, Object> forwardRef = associations.getFirst();
+        Map<String, Object> forwardRef = fetchFirstReference(sqlProcessorContext, orderResultSet, false);
+        Assertions.assertNotNull(forwardRef, "Forward FK is missing on FK_NAV_ORDER result set");
         Assertions.assertEquals("FK_NAV_ORDER_CUSTOMER", JSONUtils.getString(forwardRef, "associationName"));
-        Assertions.assertTrue(
-            JSONUtils.getString(forwardRef, "targetEntityName").contains("FK_NAV_CUSTOMER"),
-            "Forward target should be FK_NAV_CUSTOMER"
-        );
+        Assertions.assertEquals("FK_NAV_CUSTOMER", JSONUtils.getString(forwardRef, "targetEntityName"));
+        Assertions.assertEquals("PUBLIC", JSONUtils.getString(forwardRef, "targetSchemaName"));
+        Assertions.assertNotNull(JSONUtils.getString(forwardRef, "targetNodePath"));
 
         List<Map<String, Object>> orderRows = JSONUtils.getObjectList(orderResultSet, "rowsWithMetaData");
         Assertions.assertEquals(2, orderRows.size());
         Map<String, Object> orderRow = orderRows.getFirst();
 
-        // When: navigating from the FK cell value to the referenced customer row.
-        int columnIndex = asIntegerList(forwardRef.get("columnIndexList")).getFirst();
-        Map<String, Object> navigateVars = new HashMap<>();
-        navigateVars.put("projectId", globalProject.getId());
-        navigateVars.put("connectionId", databaseContainer.getId());
-        navigateVars.put("contextId", sqlProcessorContext.getId());
-        navigateVars.put("resultsId", String.valueOf(orderResultSet.get("id")));
-        navigateVars.put("row", orderRow);
-        navigateVars.put("columnIndex", columnIndex);
-        navigateVars.put("associationName", JSONUtils.getString(forwardRef, "associationName"));
-        navigateVars.put("isReference", false);
-        navigateVars.put("dataFormat", null);
+        // When
+        Map<String, Object> customerResultSet = navigateByReference(sqlProcessorContext, forwardRef, orderRow);
 
-        Map<String, Object> navigateResponse = client.sendQuery(GraphQLTestConstant.GQL_ASYNC_SQL_NAVIGATE_FOREIGN_KEY, navigateVars);
-        Assertions.assertNotNull(navigateResponse);
-        String navigateTaskId = JSONUtils.getString(navigateResponse, "id");
-        Assertions.assertNotNull(navigateTaskId);
-        clientWrapper.waitTaskCompleted(navigateTaskId);
-
-        // Then: the navigation result contains only the referenced customer.
-        Map<String, Object> customerResultSet = clientWrapper.readTaskResultSet(navigateTaskId);
+        // Then
         List<Map<String, Object>> customerRows = JSONUtils.getObjectList(customerResultSet, "rowsWithMetaData");
-        Assertions.assertEquals(1, customerRows.size());
+          
         List<?> customerData = (List<?>) customerRows.getFirst().get("data");
         Assertions.assertEquals("1", String.valueOf(customerData.get(0)));
         Assertions.assertEquals("Alice", customerData.get(1));
@@ -111,7 +100,7 @@ public class ForeignKeyNavigationEndpointTest extends CloudbeaverDBTest {
 
     @Test
     public void shouldExposeReverseReferenceOnReferencedColumn() throws Exception {
-        // Given: a customer result set; FK_NAV_ORDER.CUSTOMER_ID references FK_NAV_CUSTOMER.ID.
+        // Given
         WebSQLProcessor sqlProcessor = WebServiceBindingSQL.getSQLProcessor(webConnectionInfo);
         WebSQLContextInfo sqlProcessorContext = sqlProcessor.createContext(null, "PUBLIC", globalProject.getId());
         String taskId = clientWrapper.asyncSqlExecute(
@@ -124,30 +113,28 @@ public class ForeignKeyNavigationEndpointTest extends CloudbeaverDBTest {
 
         Map<String, Object> customerResultSet = clientWrapper.readTaskResultSet(taskId);
 
-        // Then: result set carries a reverse reference describing the FK from FK_NAV_ORDER,
-        // attached to the PK column (ID at index 0) via columnIndexList.
-        List<Map<String, Object>> references = JSONUtils.getObjectList(customerResultSet, "references");
+        // Then
+        List<Map<String, Object>> references = fetchReferences(sqlProcessorContext, customerResultSet, true);
         Assertions.assertFalse(references.isEmpty(), "Reverse reference is missing on FK_NAV_CUSTOMER result set");
         Map<String, Object> reverseRef = references.getFirst();
         Assertions.assertEquals("FK_NAV_ORDER_CUSTOMER", JSONUtils.getString(reverseRef, "associationName"));
-        String reverseTarget = JSONUtils.getString(reverseRef, "targetEntityName");
-        Assertions.assertNotNull(reverseTarget);
-        Assertions.assertTrue(
-            reverseTarget.contains("FK_NAV_ORDER"),
-            "Reverse reference target should point to the referencing entity FK_NAV_ORDER, got: " + reverseTarget
-        );
-        // Reverse ref targets the PK column ID at index 0
-        Assertions.assertEquals(List.of(0), asIntegerList(reverseRef.get("columnIndexList")));
+        Assertions.assertEquals("FK_NAV_ORDER", JSONUtils.getString(reverseRef, "targetEntityName"));
+        Assertions.assertEquals("PUBLIC", JSONUtils.getString(reverseRef, "targetSchemaName"));
+
+        List<Map<String, Object>> mapping = JSONUtils.getObjectList(reverseRef, "columnMapping");
+        Assertions.assertEquals(1, mapping.size());
+        Assertions.assertEquals(0, ((Number) mapping.getFirst().get("sourceColumnIndex")).intValue());
+        Assertions.assertEquals("CUSTOMER_ID", mapping.getFirst().get("targetColumnName"));
 
         Assertions.assertTrue(
-            JSONUtils.getObjectList(customerResultSet, "associations").isEmpty(),
+            fetchReferences(sqlProcessorContext, customerResultSet, false).isEmpty(),
             "FK_NAV_CUSTOMER result set should not expose any forward associations"
         );
     }
 
     @Test
     public void shouldNavigateReverseReferenceFromParentRow() throws Exception {
-        // Given: a customer result set positioned on Alice (ID=1).
+        // Given
         WebSQLProcessor sqlProcessor = WebServiceBindingSQL.getSQLProcessor(webConnectionInfo);
         WebSQLContextInfo sqlProcessorContext = sqlProcessor.createContext(null, "PUBLIC", globalProject.getId());
         String taskId = clientWrapper.asyncSqlExecute(
@@ -159,35 +146,17 @@ public class ForeignKeyNavigationEndpointTest extends CloudbeaverDBTest {
         clientWrapper.waitTaskCompleted(taskId);
 
         Map<String, Object> customerResultSet = clientWrapper.readTaskResultSet(taskId);
-        List<Map<String, Object>> references = JSONUtils.getObjectList(customerResultSet, "references");
-        Assertions.assertFalse(references.isEmpty(), "Reverse reference is missing");
-        Map<String, Object> reverseRef = references.getFirst();
+        Map<String, Object> reverseRef = fetchFirstReference(sqlProcessorContext, customerResultSet, true);
+        Assertions.assertNotNull(reverseRef, "Reverse reference is missing");
 
         List<Map<String, Object>> customerRows = JSONUtils.getObjectList(customerResultSet, "rowsWithMetaData");
         Assertions.assertEquals(2, customerRows.size());
         Map<String, Object> aliceRow = customerRows.getFirst();
 
-        // When: navigating using any one of columnIndexList to identify the source entity.
-        int columnIndex = asIntegerList(reverseRef.get("columnIndexList")).getFirst();
-        Map<String, Object> navigateVars = new HashMap<>();
-        navigateVars.put("projectId", globalProject.getId());
-        navigateVars.put("connectionId", databaseContainer.getId());
-        navigateVars.put("contextId", sqlProcessorContext.getId());
-        navigateVars.put("resultsId", String.valueOf(customerResultSet.get("id")));
-        navigateVars.put("row", aliceRow);
-        navigateVars.put("columnIndex", columnIndex);
-        navigateVars.put("associationName", JSONUtils.getString(reverseRef, "associationName"));
-        navigateVars.put("isReference", true);
-        navigateVars.put("dataFormat", null);
+        // When
+        Map<String, Object> orderResultSet = navigateByReference(sqlProcessorContext, reverseRef, aliceRow);
 
-        Map<String, Object> navigateResponse = client.sendQuery(GraphQLTestConstant.GQL_ASYNC_SQL_NAVIGATE_FOREIGN_KEY, navigateVars);
-        Assertions.assertNotNull(navigateResponse);
-        String navigateTaskId = JSONUtils.getString(navigateResponse, "id");
-        Assertions.assertNotNull(navigateTaskId);
-        clientWrapper.waitTaskCompleted(navigateTaskId);
-
-        // Then: navigation returns Alice's single order (ID=10, CUSTOMER_ID=1).
-        Map<String, Object> orderResultSet = clientWrapper.readTaskResultSet(navigateTaskId);
+        // Then
         List<Map<String, Object>> orderRows = JSONUtils.getObjectList(orderResultSet, "rowsWithMetaData");
         Assertions.assertEquals(1, orderRows.size());
         List<?> orderData = (List<?>) orderRows.getFirst().get("data");
@@ -195,8 +164,83 @@ public class ForeignKeyNavigationEndpointTest extends CloudbeaverDBTest {
         Assertions.assertEquals("1", String.valueOf(orderData.get(1)));
     }
 
-    private static List<Integer> asIntegerList(Object value) {
-        List<?> raw = (List<?>) value;
-        return raw.stream().map(n -> ((Number) n).intValue()).toList();
+    private List<Map<String, Object>> fetchReferences(
+        WebSQLContextInfo sqlProcessorContext,
+        Map<String, Object> resultSet,
+        boolean isReference
+    ) throws Exception {
+        Map<String, Object> vars = new HashMap<>();
+        vars.put("projectId", globalProject.getId());
+        vars.put("connectionId", databaseContainer.getId());
+        vars.put("contextId", sqlProcessorContext.getId());
+        vars.put("resultsId", String.valueOf(resultSet.get("id")));
+        vars.put("isReference", isReference);
+        List<Map<String, Object>> references = client.sendQuery(GraphQLTestConstant.GQL_SQL_RESULT_ASSOCIATIONS, vars);
+        return references == null ? List.of() : references;
+    }
+
+    private Map<String, Object> fetchFirstReference(
+        WebSQLContextInfo sqlProcessorContext,
+        Map<String, Object> resultSet,
+        boolean isReference
+    ) throws Exception {
+        List<Map<String, Object>> refs = fetchReferences(sqlProcessorContext, resultSet, isReference);
+        return refs.isEmpty() ? null : refs.getFirst();
+    }
+
+    @NotNull
+    private Map<String, Object> navigateByReference(
+        @NotNull WebSQLContextInfo sqlProcessorContext,
+        @NotNull Map<String, Object> reference,
+        @NotNull Map<String, Object> sourceRow
+    ) throws Exception {
+        String containerNodePath = JSONUtils.getString(reference, "targetNodePath");
+
+        String openTaskId = clientWrapper.asyncReadDataFromContainer(
+            globalProject, sqlProcessorContext, databaseContainer.getId(), containerNodePath, Map.of());
+        clientWrapper.waitTaskCompleted(openTaskId);
+        Map<String, Object> openedResultSet = clientWrapper.readTaskResultSet(openTaskId);
+        String resultId = String.valueOf(openedResultSet.get("id"));
+
+        List<?> rowData = (List<?>) sourceRow.get("data");
+        List<Map<String, Object>> mapping = JSONUtils.getObjectList(reference, "columnMapping");
+        List<Map<String, Object>> constraints = new ArrayList<>();
+        for (Map<String, Object> pair : mapping) {
+            int sourceIdx = ((Number) pair.get("sourceColumnIndex")).intValue();
+            String targetCol = (String) pair.get("targetColumnName");
+            Map<String, Object> constraint = new HashMap<>();
+            constraint.put("attributePosition", findColumnPosition(openedResultSet, targetCol));
+            constraint.put("attributeName", targetCol);
+            constraint.put("operator", DBCLogicalOperator.EQUALS.getId());
+            constraint.put("value", rowData.get(sourceIdx));
+            constraints.add(constraint);
+        }
+        Map<String, Object> filter = new HashMap<>();
+        filter.put("constraints", constraints);
+
+        Map<String, Object> vars = new HashMap<>();
+        vars.put("projectId", globalProject.getId());
+        vars.put("connectionId", databaseContainer.getId());
+        vars.put("contextId", sqlProcessorContext.getId());
+        vars.put("containerNodePath", containerNodePath);
+        vars.put("resultId", resultId);
+        vars.put("filter", filter);
+
+        Map<String, Object> response = client.sendQuery(GraphQLTestConstant.GQL_ASYNC_READ_DATA_FROM_CONTAINER, vars);
+        Assertions.assertNotNull(response);
+        String navTaskId = JSONUtils.getString(response, "id");
+        Assertions.assertNotNull(navTaskId);
+        clientWrapper.waitTaskCompleted(navTaskId);
+        return clientWrapper.readTaskResultSet(navTaskId);
+    }
+
+    private static int findColumnPosition(Map<String, Object> resultSet, String columnName) {
+        List<Map<String, Object>> columns = JSONUtils.getObjectList(resultSet, "columns");
+        for (int i = 0; i < columns.size(); i++) {
+            if (columnName.equals(JSONUtils.getString(columns.get(i), "name"))) {
+                return i;
+            }
+        }
+        throw new IllegalStateException("Column '" + columnName + "' not found in target result set");
     }
 }

@@ -34,6 +34,7 @@ import {
   type GetUserConnectionsQueryVariables,
   GraphQLService,
   type InitConnectionMutationVariables,
+  type ObjectPropertyInfo,
   type TestConnectionMutation,
 } from '@cloudbeaver/core-sdk';
 import { schemaValidationError } from '@cloudbeaver/core-utils';
@@ -468,6 +469,15 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
     });
 
     return this.get(key)!;
+  }
+
+  async getConnectionDriverProperties(projectId: string, config: ConnectionConfig): Promise<ObjectPropertyInfo[]> {
+    const { properties } = await this.graphQLService.sdk.getConnectionDriverProperties({
+      projectId,
+      config,
+    });
+
+    return properties;
   }
 
   deleteConnection(key: IConnectionInfoParams): Promise<void>;

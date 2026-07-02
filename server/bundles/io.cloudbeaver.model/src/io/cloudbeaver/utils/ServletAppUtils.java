@@ -303,6 +303,10 @@ public class ServletAppUtils {
         if (log.isTraceEnabled()) {
             log.trace("Origin header: " + origin);
         }
+        if ("null".equals(origin)) {
+            //strange identity provider bug
+            origin = null;
+        }
         if (CommonUtils.isEmpty(origin)) {
             origin = request.getHeader(HEADER_X_ORIGIN);
             if (log.isTraceEnabled()) {
