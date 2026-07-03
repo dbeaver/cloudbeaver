@@ -17,53 +17,37 @@
 package io.cloudbeaver.service.sql.impl;
 
 import io.cloudbeaver.DBWebException;
+import io.cloudbeaver.service.sql.WebAbstractDBDResultSetModel;
 import io.cloudbeaver.service.sql.WebSQLContextInfo;
+import io.cloudbeaver.service.sql.WebSQLResultsInfo;
 import io.cloudbeaver.service.sql.WebSQLResultsRow;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.DBPDataSource;
-import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.DBUtils;
-import org.jkiss.dbeaver.model.data.*;
+import org.jkiss.dbeaver.model.data.DBDAttributeBinding;
+import org.jkiss.dbeaver.model.data.DBDResultSetDataProvider;
+import org.jkiss.dbeaver.model.data.DBDValueRow;
+import org.jkiss.dbeaver.model.data.ResultSetValuePath;
 import org.jkiss.dbeaver.model.data.hints.DBDValueHintContext;
 import org.jkiss.dbeaver.model.exec.DBCExecutionContext;
-import org.jkiss.dbeaver.model.impl.data.ResultSetHintContext;
-import org.jkiss.dbeaver.model.struct.DBSEntity;
 import org.jkiss.dbeaver.model.struct.DBSObject;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-public class WebDBDResultSetDataProvider implements DBDResultSetDataProvider, DBSObject {
+public class WebDBDResultSetDataProvider extends WebAbstractDBDResultSetModel implements DBDResultSetDataProvider, DBSObject {
 
-    private final String resultsId;
-    private final WebSQLContextInfo contextInfo;
     private final List<WebSQLResultsRow> selectedRows;
-    private final DBDValueHintContext hintContext;
 
-    WebDBDResultSetDataProvider(
-        @NotNull String resultsId,
+    public WebDBDResultSetDataProvider(
         @NotNull WebSQLContextInfo contextInfo,
+        @NotNull WebSQLResultsInfo resultsInfo,
         @NotNull List<WebSQLResultsRow> selectedRows
     ) {
-        this.resultsId = resultsId;
-        this.contextInfo = contextInfo;
+        super(contextInfo, resultsInfo);
         this.selectedRows = selectedRows;
-        this.hintContext = new ResultSetHintContext(() -> null, () -> null);
-    }
-
-    @NotNull
-    @Override
-    public DBDAttributeBinding[] getAttributes() throws DBWebException {
-        return contextInfo.getResults(resultsId).getAttributes();
-    }
-
-    @NotNull
-    @Override
-    public List<DBDAttributeBinding> getVisibleAttributes() throws DBException {
-        return Arrays.asList(getAttributes());
     }
 
     @NotNull
@@ -82,32 +66,11 @@ public class WebDBDResultSetDataProvider implements DBDResultSetDataProvider, DB
         List<WebDBDValueRow> rows = new ArrayList<>();
         for (int rowNumber = 0; rowNumber < selectedRows.size(); rowNumber++) {
             WebSQLResultsRow row = selectedRows.get(rowNumber);
-            if (row != null && row.getData() != null) {
-                rows.add(new WebDBDValueRow(rowNumber, row.getData()));
+            if (row != null && row.getValues() != null) {
+                rows.add(new WebDBDValueRow(rowNumber, row.getValues()));
             }
         }
         return rows;
-    }
-
-    @Nullable
-    @Override
-    public DBSEntity getSingleSource() throws DBWebException {
-        DBDRowIdentifier rowIdentifier = contextInfo.getResults(resultsId).getDefaultRowIdentifier();
-        if (rowIdentifier == null) {
-            return null;
-        } else {
-            return rowIdentifier.getEntity();
-        }
-    }
-
-    @Nullable
-    @Override
-    public DBDRowIdentifier getDefaultRowIdentifier() {
-        try {
-            return contextInfo.getResults(resultsId).getDefaultRowIdentifier();
-        } catch (DBWebException e) {
-            return null;
-        }
     }
 
     @Nullable
@@ -138,11 +101,6 @@ public class WebDBDResultSetDataProvider implements DBDResultSetDataProvider, DB
         return hintContext;
     }
 
-    @Nullable
-    @Override
-    public String getReadOnlyStatus(@Nullable DBPDataSourceContainer dataSourceContainer) {
-        return null;
-    }
 
     @Nullable
     @Override
@@ -177,4 +135,5 @@ public class WebDBDResultSetDataProvider implements DBDResultSetDataProvider, DB
     public boolean isPersisted() {
         return false;
     }
+
 }

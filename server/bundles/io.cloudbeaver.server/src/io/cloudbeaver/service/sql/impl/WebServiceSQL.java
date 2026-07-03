@@ -289,7 +289,8 @@ public class WebServiceSQL implements DBWServiceSQL {
         @NotNull WebSQLGeneratorOptions options
     ) throws DBWebException {
         checkAndFillTruncatedData(sqlContext, resultsId, selectedRows);
-        WebDBDResultSetDataProvider dataProvider = new WebDBDResultSetDataProvider(resultsId, sqlContext, selectedRows);
+        WebSQLResultsInfo resultsInfo = sqlContext.getResults(resultsId);
+        WebDBDResultSetDataProvider dataProvider = new WebDBDResultSetDataProvider(sqlContext, resultsInfo, selectedRows);
         return createAndRunGenerator(webSession, generatorId, Collections.singletonList(dataProvider), options);
     }
 
@@ -302,7 +303,7 @@ public class WebServiceSQL implements DBWServiceSQL {
             .filter(attr -> canBeTruncated(attr.getDataKind()))
             .toList();
         for (WebSQLResultsRow row : selectedRows) {
-            Object[] data = row.getData();
+            Object[] data = row.getValues();
             for (DBDAttributeBinding attribute : attributes) {
                 int position = attribute.getOrdinalPosition();
                 boolean valueIsTruncated = data[position] != null &&

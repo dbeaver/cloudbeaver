@@ -24,8 +24,8 @@ import io.cloudbeaver.model.session.WebSessionPreferenceStore;
 import io.cloudbeaver.model.session.WebSessionProvider;
 import io.cloudbeaver.server.jobs.SqlOutputLogReaderJob;
 import io.cloudbeaver.service.sql.messages.WebSQLMessages;
+import io.cloudbeaver.service.sql.resultset.WebDBDResultSetDataModel;
 import io.cloudbeaver.service.sql.resultset.WebSQLDataUpdater;
-import io.cloudbeaver.service.sql.resultset.WebSQLDataUpdaterBuilder;
 import io.cloudbeaver.utils.WebEventUtils;
 import io.cloudbeaver.websocket.event.task.WSSessionTaskConfirmationRequestEvent;
 import io.cloudbeaver.websocket.event.task.WSSessionTaskQueryConfirmationRequestEvent;
@@ -38,6 +38,7 @@ import org.jkiss.dbeaver.model.DBPDataKind;
 import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.DBUtils;
 import org.jkiss.dbeaver.model.data.*;
+import org.jkiss.dbeaver.model.data.resultset.ResultSetSaveSettings;
 import org.jkiss.dbeaver.model.edit.DBEPersistAction;
 import org.jkiss.dbeaver.model.exec.*;
 import org.jkiss.dbeaver.model.exec.output.DBCServerOutputReader;
@@ -396,20 +397,27 @@ public class WebSQLProcessor implements WebSessionProvider {
 
         DBCExecutionContext executionContext = getExecutionContext(resultsInfo.getDataContainer());
 
-        WebSQLDataUpdater updater;
-        try (DBCSession session = executionContext.openSession(monitor, DBCExecutionPurpose.USER, "Preparing statements for update")) {
-            updater = new WebSQLDataUpdaterBuilder(webSession, resultsInfo, rowIdentifierList, session)
-                .prepareUpdateStatements(updatedRows)
-                .prepareInsertStatements(addedRows)
-                .prepareDeleteStatements(deletedRows)
-                .build(executionContext);
-        }
+        WebDBDResultSetDataModel dataProvider = new WebDBDResultSetDataModel(
+            contextInfo,
+            resultsInfo,
+            addedRows,
+            updatedRows,
+            deletedRows
+        );
 
+        WebSQLDataUpdater updater = new WebSQLDataUpdater(
+            webSession,
+            dataProvider,
+            resultsInfo,
+            executionContext
+        );
 
-        Throwable throwable = updater.executeStatements(monitor);
-        if (throwable != null) {
-            throw new DBException("Error updating data", throwable);
-        }
+        ResultSetSaveSettings settings = new ResultSetSaveSettings();
+        updater.prepareStatements(monitor, settings);
+        updater.execute(
+            monitor, false, settings, (x) -> {
+            }
+        );
 
         getUpdatedRowsInfo(resultsInfo, updater.getUpdatedResultSetRows(), dataFormat, monitor);
 
@@ -560,27 +568,29 @@ public class WebSQLProcessor implements WebSessionProvider {
         );
 
         DBCExecutionContext executionContext = getExecutionContext(resultsInfo.getDataContainer());
-        List<DBEPersistAction> actions = new ArrayList<>();
+        WebDBDResultSetDataModel dataProvider = new WebDBDResultSetDataModel(
+            contextInfo,
+            resultsInfo,
+            addedRows,
+            updatedRows,
+            deletedRows
+        );
 
-        WebSQLDataUpdater updater;
-        try (DBCSession session = executionContext.openSession(monitor, DBCExecutionPurpose.USER, "Preparing statements for update")) {
-            updater = new WebSQLDataUpdaterBuilder(webSession, resultsInfo, rowIdentifierList, session)
-                .prepareUpdateStatements(updatedRows)
-                .prepareInsertStatements(addedRows)
-                .prepareDeleteStatements(deletedRows)
-                .setWithoutExecution(true)
-                .withActions(actions)
-                .build(executionContext);
-        }
+        WebSQLDataUpdater updater = new WebSQLDataUpdater(
+            webSession,
+            dataProvider,
+            resultsInfo,
+            executionContext
+        );
 
         StringBuilder sqlBuilder = new StringBuilder();
-
-        Throwable throwable = updater.executeStatements(monitor);
-        if (throwable != null) {
-            throw new DBException("Error generating script from data", throwable);
-        }
+        updater.prepareStatements(monitor, new ResultSetSaveSettings());
+        updater.execute(
+            monitor, true, new ResultSetSaveSettings(), (x) -> {
+            }
+        );
         sqlBuilder.append(
-            SQLUtils.generateScript(executionContext.getDataSource(), actions.toArray(new DBEPersistAction[0]), false)
+            SQLUtils.generateScript(executionContext.getDataSource(), updater.getActions().toArray(new DBEPersistAction[0]), false)
         );
         return sqlBuilder.toString();
     }
@@ -697,7 +707,7 @@ public class WebSQLProcessor implements WebSessionProvider {
                 rowValues[i] =
                     WebSQLUtils.makeDocumentInputValue(session, (DBSDocumentLocator) dataContainer, resultsInfo, row, null);
             } else {
-                Object inputCellValue = row.getData()[keyAttribute.getOrdinalPosition()];
+                Object inputCellValue = row.getValues()[keyAttribute.getOrdinalPosition()];
                 rowValues[i] = keyAttribute.getValueHandler().getValueFromObject(
                     session,
                     keyAttribute,

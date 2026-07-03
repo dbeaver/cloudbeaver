@@ -531,7 +531,7 @@ public class WebSQLUtils {
         DBDAttributeBinding[] attributes = resultsInfo.getAttributes();
         for (int j = 0; j < attributes.length; j++) {
             DBDAttributeBinding attr = attributes[j];
-            Object plainValue = makePlainCellValue(session, attr, row.getData()[j]);
+            Object plainValue = makePlainCellValue(session, attr, row.getValues()[j]);
             if (plainValue instanceof DBDDocument dbdDocument) {
                 // FIXME: Hack for DynamoDB. We pass entire document as a key
                 // FIXME: Let's just return it back for now

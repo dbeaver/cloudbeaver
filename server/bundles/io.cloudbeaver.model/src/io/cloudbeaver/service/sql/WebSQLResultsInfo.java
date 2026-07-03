@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,6 +40,8 @@ public class WebSQLResultsInfo {
     @NotNull
     private final String id;
     private DBDAttributeBinding[] attributes;
+    private DBDAttributeBinding documentAttribute;
+
     // TODO: find a way to remove isSingleRow and use virtual keys for reading BLOB and string cell values.
     private boolean isSingleRow;
     private DBCTrace trace;
@@ -162,5 +164,14 @@ public class WebSQLResultsInfo {
 
     public void setDataFilter(@Nullable DBDDataFilter dataFilter) {
         this.dataFilter = dataFilter;
+    }
+
+    @Nullable
+    public DBDAttributeBinding getDocumentAttribute() {
+        return documentAttribute;
+    }
+
+    public void setDocumentAttribute(@Nullable DBDAttributeBinding documentAttribute) {
+        this.documentAttribute = documentAttribute;
     }
 }
