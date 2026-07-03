@@ -9,7 +9,6 @@ import { observer } from 'mobx-react-lite';
 
 import { Container, Group, GroupTitle, Loader, s, Translate, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { useUnsavedChanges } from '@cloudbeaver/core-ui';
 
 import { TeamForm } from '../TeamsForm/TeamForm.js';
 import style from './CreateTeam.module.css';
@@ -19,17 +18,6 @@ export const CreateTeam: React.FC = observer(function CreateTeam() {
   const translate = useTranslate();
   const styles = useS(style);
   const service = useService(CreateTeamService);
-
-  useUnsavedChanges({
-    get isChanged() {
-      return service.data?.isChanged ?? false;
-    },
-    get isSaving() {
-      return service.data?.isSaving;
-    },
-    save: () => service.data?.save(),
-    reset: () => service.data?.reset(),
-  });
 
   if (!service.data) {
     return null;
