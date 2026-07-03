@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -9,8 +9,9 @@ import React from 'react';
 
 import { AdministrationItemService, type IAdministrationItem } from '@cloudbeaver/core-administration';
 import { type AdminUser, TeamsResource, UsersResource } from '@cloudbeaver/core-authentication';
-import { PlaceholderContainer } from '@cloudbeaver/core-blocks';
+import { confirmUnsavedChanges, PlaceholderContainer } from '@cloudbeaver/core-blocks';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { TabsContainer } from '@cloudbeaver/core-ui';
 
 import { CreateTeamService } from './Teams/TeamsTable/CreateTeamService.js';
@@ -36,7 +37,7 @@ export interface IUserDetailsInfoProps {
   user: AdminUser;
 }
 
-@injectable(() => [AdministrationItemService, CreateUserService, TeamsResource, CreateTeamService, UsersResource])
+@injectable(() => [AdministrationItemService, CreateUserService, TeamsResource, CreateTeamService, UsersResource, CommonDialogService])
 export class UsersAdministrationService extends Bootstrap {
   readonly tabsContainer: TabsContainer;
   readonly userDetailsInfoPlaceholder: PlaceholderContainer<IUserDetailsInfoProps>;
@@ -49,6 +50,7 @@ export class UsersAdministrationService extends Bootstrap {
     private readonly teamsResource: TeamsResource,
     private readonly createTeamService: CreateTeamService,
     private readonly usersResource: UsersResource,
+    private readonly commonDialogService: CommonDialogService,
   ) {
     super();
     this.userDetailsInfoPlaceholder = new PlaceholderContainer();
@@ -66,11 +68,13 @@ export class UsersAdministrationService extends Bootstrap {
         },
         {
           name: EUsersAdministrationSub.Users,
+          canDeActivate: this.confirmUserCreate.bind(this),
           onDeActivate: this.cancelUserCreate.bind(this),
         },
         {
           name: EUsersAdministrationSub.Teams,
           onActivate: this.loadTeams.bind(this),
+          canDeActivate: this.confirmTeamCreate.bind(this),
           onDeActivate: this.cancelTeamCreate.bind(this),
         },
       ],
@@ -79,6 +83,26 @@ export class UsersAdministrationService extends Bootstrap {
       getDrawerComponent: () => UsersDrawerItem,
     });
     this.userDetailsInfoPlaceholder.add(UserCredentialsList, 0);
+  }
+
+  private confirmUserCreate() {
+    const state = this.createUserService.state;
+
+    if (!state) {
+      return true;
+    }
+
+    return confirmUnsavedChanges(this.commonDialogService, state);
+  }
+
+  private confirmTeamCreate() {
+    const data = this.createTeamService.data;
+
+    if (!data) {
+      return true;
+    }
+
+    return confirmUnsavedChanges(this.commonDialogService, data);
   }
 
   private cancelUserCreate(param: string | null, configurationWizard: boolean, outside: boolean) {
