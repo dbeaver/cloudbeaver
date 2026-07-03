@@ -9,7 +9,9 @@
 
     --dbv-kit-combobox-disabled-background: var(--theme-input-background-disabled);
 
-    --dbv-kit-control-outline-offset: -2px;
+    --dbv-kit-control-outline-offset: -1px;
+    --dbv-kit-control-outline-width: 1px;
+    --dbv-kit-control-outline-color: var(--theme-primary);
 
     --dbv-kit-combobox-popover-background: var(--theme-input-background);
     --dbv-kit-combobox-popover-foreground: var(--theme-input-color);
@@ -27,7 +29,16 @@
     padding-block: calc(var(--tw-spacing) * 2);
     gap: calc(var(--tw-spacing) * 2);
     letter-spacing: var(--tw-tracking-normal);
+    font-family: var(--tw-font-roboto);
+    font-size: var(--tw-text-caption);
+    font-weight: var(--tw-font-weight-caption);
     line-height: 1.25;
+  }
+
+  .combobox__item-value {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 }
 

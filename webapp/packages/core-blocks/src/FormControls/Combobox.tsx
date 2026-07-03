@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -64,12 +64,12 @@ type ObjectProps<TValue, TKey extends keyof TState, TState> = ComboboxBaseProps<
   value?: never;
 };
 
-export interface ComboboxType {
+export interface IComboboxType {
   <TKey, TValue>(props: ControlledProps<TKey, TValue>): React.JSX.Element;
   <TValue, TKey extends keyof TState, TState>(props: ObjectProps<TValue, TKey, TState>): React.JSX.Element;
 }
 
-export const Combobox: ComboboxType = observer(function Combobox({
+export const Combobox: IComboboxType = observer(function Combobox({
   value: controlledValue,
   defaultValue,
   name,
@@ -255,7 +255,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
           )}
           {icon && <div className="tw:absolute tw:left-3 tw:w-4 tw:h-4">{typeof icon === 'string' ? <IconOrImage icon={icon} /> : icon}</div>}
           {displayPopover && (
-            <ComboboxPopover className="theme-text-on-surface theme-background-surface theme-typography--caption">
+            <ComboboxPopover className="theme-text-on-surface theme-background-surface">
               {filteredItems.length > 0 ? (
                 filteredItems.map(({ itemKey, itemValue, itemTitle, itemIcon, itemDisabled }) => (
                   <ComboboxItem
@@ -274,7 +274,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
                         {itemIcon && typeof itemIcon === 'string' ? <IconOrImage icon={itemIcon} /> : itemIcon}
                       </div>
                     )}
-                    <div className="tw:truncate">{itemValue}</div>
+                    <div className="combobox__item-value">{itemValue}</div>
                   </ComboboxItem>
                 ))
               ) : (

@@ -9,3 +9,4 @@
 import './module.js';
 
 export { ProjectInfoFormService } from './ProjectInfoForm/ProjectInfoFormService.js';
+export { ProjectInfoOptionsPanelService } from './ProjectInfoForm/ProjectInfoOptionsPanelService.js';

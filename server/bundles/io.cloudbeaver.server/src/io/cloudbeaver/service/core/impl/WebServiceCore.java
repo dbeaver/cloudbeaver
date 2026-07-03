@@ -45,6 +45,7 @@ import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.auth.SMObjectType;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
+import org.jkiss.dbeaver.model.connection.DBPConnectionType;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.model.exec.DBCConnectException;
 import org.jkiss.dbeaver.model.navigator.DBNDataSource;
@@ -310,15 +311,30 @@ public class WebServiceCore implements DBWServiceCore {
 
         DataSourceDescriptor dataSource = (DataSourceDescriptor) WebDataSourceUtils.getLocalOrGlobalDataSource(
             webSession, projectId, configInput.getConnectionId());
-        DataSourceDescriptor testDataSource = getDataSourceDescriptor(webSession, dataSource, configInput, project);
-        DBPConnectionConfiguration connectionConfiguration = new DBPConnectionConfiguration(testDataSource.getConnectionConfiguration());
-        return WebServiceUtils.getDriverProperties(
-            webSession,
-            testDataSource.getDriver(),
-            testDataSource,
-            connectionConfiguration
-        );
+        try {
+            DataSourceDescriptor testDataSource = getDataSourceDescriptor(webSession, dataSource, configInput, project);
+            DBPConnectionConfiguration connectionConfiguration
+                = new DBPConnectionConfiguration(testDataSource.getConnectionConfiguration());
+            return WebServiceUtils.getDriverProperties(
+                webSession,
+                testDataSource.getDriver(),
+                testDataSource,
+                connectionConfiguration
+            );
+        } catch (DBWebException e) {
+            log.error("Error getting driver properties", e);
+            return new WebPropertyInfo[0];
+        }
 
+    }
+
+    @NotNull
+    @Override
+    public List<DBPConnectionType> getConnectionTypes(@NotNull WebSession webSession, @Nullable String id) {
+        return DataSourceProviderRegistry.getInstance().getConnectionTypes().stream()
+            .map(ct -> id == null || id.equals(ct.getId()) ? ct : null)
+            .filter(Objects::nonNull)
+            .toList();
     }
 
 
