@@ -40,6 +40,7 @@ import org.jkiss.dbeaver.model.fs.lock.LockTarget;
 import org.jkiss.dbeaver.model.impl.app.BaseProjectImpl;
 import org.jkiss.dbeaver.model.impl.auth.SessionContextImpl;
 import org.jkiss.dbeaver.model.navigator.DBNLocalFolder;
+import org.jkiss.dbeaver.model.net.DBWNetworkProfile;
 import org.jkiss.dbeaver.model.rm.*;
 import org.jkiss.dbeaver.model.security.SMAdminController;
 import org.jkiss.dbeaver.model.sql.DBQuotaException;
@@ -48,6 +49,7 @@ import org.jkiss.dbeaver.model.websocket.event.WSSessionLogUpdatedEvent;
 import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceEvent;
 import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceProperty;
 import org.jkiss.dbeaver.model.websocket.event.datasource.WSDatasourceFolderEvent;
+import org.jkiss.dbeaver.model.websocket.event.datasource.WSNetworkProfileEvent;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
 import org.jkiss.dbeaver.registry.DataSourceParseResults;
 import org.jkiss.dbeaver.registry.ResourceTypeDescriptor;
@@ -407,8 +409,13 @@ public class LocalResourceController extends BaseLocalResourceController {
                     registry::createDataSource
                 )
             );
+        Map<String, DBWNetworkProfile> oldNetworkProfiles = registry.getNetworkProfiles().getProfiles().stream()
+            .collect(Collectors.toMap(
+                DBWNetworkProfile::getProfileId,
+                p -> p
+            ));
         DataSourceParseResults parseResults = super.updateProjectDataSourcesConfig(projectId, configuration, dataSourceIds);
-        sendDataSourcesConfigUpdatedEvent(registry, oldDataSources, parseResults);
+        sendConfigUpdatedEvent(registry, oldDataSources, oldNetworkProfiles, parseResults);
         return parseResults != null;
     }
 
@@ -501,14 +508,48 @@ public class LocalResourceController extends BaseLocalResourceController {
         return DBNLocalFolder.makeLocalFolderItemPath(projectId, folderPath);
     }
 
-    private void sendDataSourcesConfigUpdatedEvent(
+    private void sendConfigUpdatedEvent(
         @NotNull DBPDataSourceRegistry registry,
         @NotNull Map<String, DataSourceDescriptor> oldDataSources,
+        @NotNull Map<String, DBWNetworkProfile> oldNetworkProfiles,
         @Nullable DataSourceParseResults parseResults
     ) {
-        if (parseResults == null || credentialsProvider.getActiveUserCredentials() == null || oldDataSources.isEmpty()) {
+        if (parseResults == null || credentialsProvider.getActiveUserCredentials() == null) {
             return;
         }
+        boolean profilesChanged = !parseResults.removedProfiles.isEmpty();
+
+        // We don't need to check for updated profiles if there are already added or removed profiles
+        if (!profilesChanged) {
+            for (DBWNetworkProfile updatedProfile : parseResults.updatedProfiles) {
+                if (oldNetworkProfiles.containsKey(updatedProfile.getProfileId())) {
+                    DBWNetworkProfile oldProfile = oldNetworkProfiles.get(updatedProfile.getProfileId());
+                    if (!oldProfile.equalConfigurations(updatedProfile)) {
+                        profilesChanged = true;
+                        break;
+                    }
+                } else {
+                    // profile was added
+                    profilesChanged = true;
+                    break;
+                }
+            }
+        }
+
+        if (profilesChanged) {
+            ServletAppUtils.getServletApplication().getEventController().addEvent(
+                WSNetworkProfileEvent.update(
+                    credentialsProvider.getActiveUserCredentials().getSmSessionId(),
+                    credentialsProvider.getActiveUserCredentials().getUserId(),
+                    registry.getProject().getId()
+                )
+            );
+        }
+
+        if (oldDataSources.isEmpty()) {
+            return;
+        }
+
         List<String> updatedConfigurationDataSourceIds = new ArrayList<>();
         List<String> updatedNameDataSourceIds = new ArrayList<>();
         List<String> updatedInternalConfigurationDataSourceIds = new ArrayList<>();
@@ -612,7 +653,6 @@ public class LocalResourceController extends BaseLocalResourceController {
                 )
             );
         }
-
     }
 
     @NotNull

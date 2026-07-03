@@ -41,6 +41,7 @@ import { GridEditAction } from './DatabaseDataModel/Actions/Grid/GridEditAction.
 import { GridViewAction } from './DatabaseDataModel/Actions/Grid/GridViewAction.js';
 import { GridHistoryAction } from './DatabaseDataModel/Actions/Grid/GridHistoryAction.js';
 import { IDatabaseDataViewAction } from './DatabaseDataModel/Actions/IDatabaseDataViewAction.js';
+import { IDatabaseReferencesAction } from './DatabaseDataModel/Actions/IDatabaseReferencesAction.js';
 import { ResultSetDataAction } from './DatabaseDataModel/Actions/ResultSet/ResultSetDataAction.js';
 import { ResultSetEditAction } from './DatabaseDataModel/Actions/ResultSet/ResultSetEditAction.js';
 import { ResultSetViewAction } from './DatabaseDataModel/Actions/ResultSet/ResultSetViewAction.js';
@@ -49,6 +50,7 @@ import { IDatabaseDataFormatAction } from './DatabaseDataModel/Actions/IDatabase
 import { ResultSetFormatAction } from './DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction.js';
 import { IDatabaseDataMetadataAction } from './DatabaseDataModel/Actions/IDatabaseDataMetadataAction.js';
 import { ResultSetDataContentAction } from './DatabaseDataModel/Actions/ResultSet/ResultSetDataContentAction.js';
+import { ResultSetReferencesAction } from './DatabaseDataModel/Actions/ResultSet/ResultSetReferencesAction.js';
 import { IDatabaseDataCacheAction } from './DatabaseDataModel/Actions/IDatabaseDataCacheAction.js';
 import { ResultSetCacheAction } from './DatabaseDataModel/Actions/ResultSet/ResultSetCacheAction.js';
 import { IDatabaseDataResult } from './DatabaseDataModel/IDatabaseDataResult.js';
@@ -112,6 +114,7 @@ export default ModuleRegistry.add({
       .addScoped(ResultSetCacheAction)
       .addScoped(DatabaseDataConstraintAction)
       .addScoped(ResultSetDataContentAction)
+      .addScoped(ResultSetReferencesAction)
 
       .addScoped(
         IDatabaseDataResultAction,
@@ -124,6 +127,10 @@ export default ModuleRegistry.add({
       .addScoped(
         IDatabaseDataViewAction,
         conditional(actions => proxy(actions.actions.getConstructor(IDatabaseDataViewAction)), IDatabaseDataSource),
+      )
+      .addScoped(
+        IDatabaseReferencesAction,
+        conditional(actions => proxy(actions.actions.getConstructor(IDatabaseReferencesAction)), IDatabaseDataSource),
       )
       .addScoped(
         IDatabaseDataFormatAction,

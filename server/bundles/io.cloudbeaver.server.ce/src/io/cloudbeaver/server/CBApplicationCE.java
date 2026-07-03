@@ -93,6 +93,7 @@ public class CBApplicationCE extends CBApplication<CBServerConfig> {
         return new LocalFileController(DBWorkbench.getPlatform().getWorkspace().getAbsolutePath().resolve(DBFileController.DATA_FOLDER));
     }
 
+    @NotNull
     @Override
     public CBServerConfigurationControllerEmbedded<CBServerConfig> getServerConfigurationController() {
         return serverConfigController;

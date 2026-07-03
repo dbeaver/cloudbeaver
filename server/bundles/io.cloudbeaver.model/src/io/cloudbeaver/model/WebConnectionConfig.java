@@ -65,6 +65,7 @@ public class WebConnectionConfig {
     private Boolean defaultAutoCommit;
     private String defaultCatalogName;
     private String defaultSchemaName;
+    private String connectionType;
     @NotNull
     private Map<String, String> defaultUserPreferences = new LinkedHashMap<>();
 
@@ -120,6 +121,7 @@ public class WebConnectionConfig {
         for (Map<String, Object> nhc : JSONUtils.getObjectList(params, "networkHandlersConfig")) {
             networkHandlersConfig.add(new WebNetworkHandlerConfigInput(nhc));
         }
+        connectionType = JSONUtils.getString(params, "connectionType");
     }
 
     @Property
@@ -380,5 +382,14 @@ public class WebConnectionConfig {
 
     public void setDefaultUserPreferences(@NotNull Map<String, String> defaultUserPreferences) {
         this.defaultUserPreferences = defaultUserPreferences;
+    }
+
+    @Nullable
+    public String getConnectionType() {
+        return connectionType;
+    }
+
+    public void setConnectionType(@Nullable String connectionType) {
+        this.connectionType = connectionType;
     }
 }

@@ -83,6 +83,9 @@
       "path": "../plugin-navigation-tree"
     },
     {
+      "path": "../plugin-network-handlers"
+    },
+    {
       "path": "../plugin-projects"
     },
     {
