@@ -27,7 +27,7 @@ import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBFileController;
 import org.jkiss.dbeaver.model.app.DBPWorkspace;
-import org.jkiss.dbeaver.model.auth.AuthInfo;
+import org.jkiss.dbeaver.model.auth.SMAuthConfiguration;
 import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
 import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.security.SMAdminController;
@@ -93,6 +93,7 @@ public class CBApplicationCE extends CBApplication<CBServerConfig> {
         return new LocalFileController(DBWorkbench.getPlatform().getWorkspace().getAbsolutePath().resolve(DBFileController.DATA_FOLDER));
     }
 
+    @NotNull
     @Override
     public CBServerConfigurationControllerEmbedded<CBServerConfig> getServerConfigurationController() {
         return serverConfigController;
@@ -101,7 +102,7 @@ public class CBApplicationCE extends CBApplication<CBServerConfig> {
     protected void finishSecurityServiceConfiguration(
         @NotNull String adminName,
         @Nullable String adminPassword,
-        @NotNull List<AuthInfo> authInfoList
+        @NotNull List<SMAuthConfiguration> authInfoList
     ) throws DBException {
         if (securityController instanceof CBEmbeddedSecurityController<?> embeddedSecurityController) {
             embeddedSecurityController.finishConfiguration(adminName, adminPassword, authInfoList);

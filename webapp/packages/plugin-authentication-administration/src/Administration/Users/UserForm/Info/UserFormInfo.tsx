@@ -1,13 +1,23 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
 
-import { Container, FieldCheckbox, Group, GroupTitle, Placeholder, useAutoLoad, useResource, useTranslate } from '@cloudbeaver/core-blocks';
+import {
+  Container,
+  FieldCheckbox,
+  Group,
+  GroupTitle,
+  InputField,
+  Placeholder,
+  useAutoLoad,
+  useResource,
+  useTranslate,
+} from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { type TabContainerPanelComponent, useTab, useTabState } from '@cloudbeaver/core-ui';
 
@@ -36,6 +46,7 @@ export const UserFormInfo: TabContainerPanelComponent<UserFormProps> = observer(
 
   const disabled = tabState.isLoading();
   const userManagementDisabled = administrationUsersManagementService.externalUserProviderEnabled;
+  const lastLoginTime = user.data?.lastLoginTime ? new Date(user.data.lastLoginTime).toLocaleString() : null;
 
   return (
     <Container overflow>
@@ -53,6 +64,11 @@ export const UserFormInfo: TabContainerPanelComponent<UserFormProps> = observer(
           state={tabState.state}
           disabled={disabled || userManagementDisabled}
         />
+        {lastLoginTime && (
+          <InputField value={lastLoginTime ?? ''} readOnly>
+            {translate('plugin_authentication_administration_user_last_login')}
+          </InputField>
+        )}
         <UserFormInfoTeams formState={formState} tabState={tabState} tabSelected={tab.selected} disabled={disabled} />
       </Group>
       <UserFormInfoMetaParameters formState={formState} tabState={tabState} tabSelected={tab.selected} disabled={disabled} />

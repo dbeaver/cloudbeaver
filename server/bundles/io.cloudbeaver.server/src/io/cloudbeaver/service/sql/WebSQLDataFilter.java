@@ -41,6 +41,7 @@ public class WebSQLDataFilter {
     private int offset;
     private int limit;
     private String where;
+    private boolean anyConstraint;
     private final List<WebSQLDataFilterConstraint> constraints = new ArrayList<>();
 
     public WebSQLDataFilter() {
@@ -57,6 +58,7 @@ public class WebSQLDataFilter {
             this.limit = MAX_ROWS_NUMBER;
         }
         this.where = CommonUtils.toString(filterProps.get("where"), null);
+        this.anyConstraint = CommonUtils.toBoolean(filterProps.get("anyConstraint"));
         Object constraints = filterProps.get("constraints");
         if (constraints instanceof Collection) {
             for (Object constrItem : (Collection<?>) constraints) {
@@ -92,10 +94,18 @@ public class WebSQLDataFilter {
         return where;
     }
 
+    /**
+     * When true constraints are combined with OR instead of AND
+     */
+    public boolean isAnyConstraint() {
+        return anyConstraint;
+    }
+
     @NotNull
     public static WebSQLDataFilter from(@NotNull DBDDataFilter filter) {
         var webFilter = new WebSQLDataFilter();
         webFilter.where = filter.getWhere();
+        webFilter.anyConstraint = filter.isAnyConstraint();
         for (DBDAttributeConstraint constraint : filter.getConstraints()) {
             webFilter.constraints.add(WebSQLDataFilterConstraint.from(constraint));
         }
@@ -106,6 +116,7 @@ public class WebSQLDataFilter {
     public DBDDataFilter makeDataFilter(@Nullable WebSQLResultsInfo resultInfo) throws DBException {
         DBDDataFilter dataFilter = new DBDDataFilter();
         dataFilter.setWhere(where);
+        dataFilter.setAnyConstraint(anyConstraint);
         if (CommonUtils.isEmpty(constraints)) {
             return dataFilter;
         }
@@ -139,12 +150,40 @@ public class WebSQLDataFilter {
 
     private void fillEmptyConstrains(@NotNull List<DBDAttributeConstraint> emptyConstraints) throws DBException {
         for (WebSQLDataFilterConstraint webConstr : constraints) {
-            if (webConstr.getAttributePosition() >= emptyConstraints.size()) {
-                throw new DBException(MessageFormat.format("Incorrect column position ''{0}'' in order clause", webConstr.getAttributePosition()));
+            DBDAttributeConstraint dbConstr = findConstraintToFill(emptyConstraints, webConstr);
+            if (dbConstr.hasCondition()) {
+                // The attribute already has a condition from a previous constraint
+                dbConstr = new DBDAttributeConstraint(dbConstr);
+                dbConstr.reset();
+                emptyConstraints.add(dbConstr);
             }
-            DBDAttributeConstraint dbConstr = emptyConstraints.get(webConstr.getAttributePosition());
             fillEmptyConstraint(dbConstr, webConstr);
         }
+    }
+
+    @NotNull
+    private DBDAttributeConstraint findConstraintToFill(
+        @NotNull List<DBDAttributeConstraint> emptyConstraints,
+        @NotNull WebSQLDataFilterConstraint webConstr
+    ) throws DBException {
+        Integer attributePosition = webConstr.getAttributePosition();
+        if (attributePosition != null) {
+            if (attributePosition < 0 || attributePosition >= emptyConstraints.size()) {
+                throw new DBException(MessageFormat.format("Incorrect column position ''{0}'' in order clause", attributePosition));
+            }
+            return emptyConstraints.get(attributePosition);
+        }
+        // try by attribute name
+        String attributeName = webConstr.getAttributeName();
+        if (!CommonUtils.isEmpty(attributeName)) {
+            for (DBDAttributeConstraint dbConstr : emptyConstraints) {
+                if (CommonUtils.equalObjects(dbConstr.getAttributeName(), attributeName)) {
+                    return dbConstr;
+                }
+            }
+            throw new DBException(MessageFormat.format("Constraint attribute ''{0}'' not found in result set", attributeName));
+        }
+        throw new DBException("Constraint must specify either attributePosition or attributeName");
     }
 
     @NotNull

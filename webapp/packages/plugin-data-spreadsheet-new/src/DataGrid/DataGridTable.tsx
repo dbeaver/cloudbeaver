@@ -288,7 +288,10 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
     }
 
     selectionAction.actions.addHandler(syncFocus);
-    handlers.focusCell(selectionAction.getFocusedElement(), true);
+
+    if (!simple) {
+      handlers.focusCell(selectionAction.getFocusedElement(), true);
+    }
 
     return () => {
       tableData.editor?.action.removeHandler(syncEditor);

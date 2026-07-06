@@ -34,8 +34,9 @@ const ROLE_COLUMN = { key: 'role', label: 'authentication_user_role' };
 const TEAM_COLUMN = { key: 'team', label: 'authentication_user_team' };
 const ENABLED_COLUMN = { key: 'enabled', label: 'authentication_user_enabled' };
 const AUTH_COLUMN = { key: 'auth', label: 'authentication_administration_user_auth_methods' };
+const LAST_LOGIN_COLUMN = { key: 'lastLogin', label: 'plugin_authentication_administration_user_last_login' };
 
-const COLUMNS = [ID_COLUMN, TEAM_COLUMN, ENABLED_COLUMN, AUTH_COLUMN];
+const COLUMNS = [ID_COLUMN, TEAM_COLUMN, ENABLED_COLUMN, AUTH_COLUMN, LAST_LOGIN_COLUMN];
 
 export const UsersTable = observer<Props>(function UsersTable({ users, isManageable, displayAuthRole, onLoadMore }) {
   const translate = useTranslate();
@@ -129,6 +130,12 @@ export const UsersTable = observer<Props>(function UsersTable({ users, isManagea
           <Placeholder container={usersAdministrationService.userDetailsInfoPlaceholder} user={row} />
         </div>
       );
+    }
+
+    if (column.key === LAST_LOGIN_COLUMN.key) {
+      const lastLoginFullTime = row.lastLoginTime ? new Date(row.lastLoginTime).toLocaleString() : '-';
+      const lastLoginDate = row.lastLoginTime ? new Date(row.lastLoginTime).toLocaleDateString() : '-';
+      return <span title={lastLoginFullTime}>{lastLoginDate}</span>;
     }
 
     return null;

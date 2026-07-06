@@ -16,7 +16,6 @@
  */
 package io.cloudbeaver.service.sql;
 
-import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.service.sql.WebSQLResultSetRowIdentifier.WebSQLResultSetRowIdentifierState;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
@@ -36,10 +35,6 @@ public class WebSQLQueryResultSet {
 
     private static final Log log = Log.getLog(WebSQLQueryResultSet.class);
 
-    @Nullable
-    private final WebSession session;
-    @Nullable
-    private DBDAttributeBinding[] referencesBindings;
     private WebSQLQueryResultColumn[] columns;
     private List<WebSQLQueryResultSetRow> rows = Collections.emptyList();
     private boolean hasMoreData;
@@ -55,8 +50,7 @@ public class WebSQLQueryResultSet {
     private boolean readOnly;
     private String readOnlyStatus;
 
-    public WebSQLQueryResultSet(@Nullable WebSession session) {
-        this.session = session;
+    public WebSQLQueryResultSet() {
     }
 
     @Property
@@ -79,23 +73,6 @@ public class WebSQLQueryResultSet {
             columns[i] = new WebSQLQueryResultColumn(bindings[i]);
         }
         this.columns = columns;
-        this.referencesBindings = bindings;
-    }
-
-    @NotNull
-    @Property
-    public List<WebSQLQueryResultReference> getAssociations() {
-        return session != null && referencesBindings != null
-            ? WebSQLUtils.collectAssociations(session, referencesBindings)
-            : Collections.emptyList();
-    }
-
-    @NotNull
-    @Property
-    public List<WebSQLQueryResultReference> getReferences() {
-        return session != null && referencesBindings != null
-            ? WebSQLUtils.collectReferences(session, referencesBindings)
-            : Collections.emptyList();
     }
 
     @Property

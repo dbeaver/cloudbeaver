@@ -34,6 +34,15 @@
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
+    cursor: pointer;
+    color: var(--theme-link-color);
+    outline: none;
+
+    &:hover,
+    &:focus {
+      color: var(--theme-link-color-focus);
+      text-decoration: underline;
+    }
   }
 
   & .menuBox {

@@ -140,6 +140,9 @@
       "path": "../plugin-connection-custom"
     },
     {
+      "path": "../plugin-connection-network-handlers"
+    },
+    {
       "path": "../plugin-connection-preferences"
     },
     {
@@ -171,6 +174,9 @@
     },
     {
       "path": "../plugin-data-viewer-conditional-formatting"
+    },
+    {
+      "path": "../plugin-data-viewer-references"
     },
     {
       "path": "../plugin-data-viewer-request-query-viewer"
@@ -222,6 +228,9 @@
     },
     {
       "path": "../plugin-navigation-tree-rm"
+    },
+    {
+      "path": "../plugin-network-handlers"
     },
     {
       "path": "../plugin-object-viewer"
@@ -279,6 +288,9 @@
     },
     {
       "path": "../plugin-sql-editor"
+    },
+    {
+      "path": "../plugin-sql-editor-execution-plan"
     },
     {
       "path": "../plugin-sql-editor-navigation-tab"

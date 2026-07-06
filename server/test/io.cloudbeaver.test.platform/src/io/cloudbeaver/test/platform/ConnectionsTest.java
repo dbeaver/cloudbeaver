@@ -66,7 +66,7 @@ public class ConnectionsTest extends CloudbeaverMockTest {
             System.out.println("APP:: " + GeneralUtils.getProductTitle());
             //CBPlatform.setApplication(testApp);
 
-            Path defaultWorkingFolder = DBWorkbench.getPlatform().getApplication().getDefaultWorkingFolder();
+            Path defaultWorkingFolder = DBWorkbench.getPlatform().getApplication().getWorkspacePath();
             System.out.println("DBeaver application: " + defaultWorkingFolder);
 
         } catch (Exception e) {

@@ -37,7 +37,6 @@ import org.jkiss.dbeaver.model.impl.app.BaseApplicationImpl;
 import org.jkiss.dbeaver.model.impl.app.BaseWorkspaceImpl;
 import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.secret.DBSSecretController;
-import org.jkiss.dbeaver.model.websocket.event.WSEventController;
 import org.jkiss.dbeaver.runtime.IVariableResolver;
 import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.dbeaver.utils.RuntimeUtils;
@@ -87,12 +86,6 @@ public abstract class BaseServletApplication extends BaseApplicationImpl impleme
     @Override
     public LockManager createLockManager() throws DBException {
         return new SharedFileLockManager(getApplicationInstanceId());
-    }
-
-    @Nullable
-    @Override
-    public Path getDefaultWorkingFolder() {
-        return getServerConfigurationController().getWorkspacePath();
     }
 
     @Override
@@ -192,20 +185,20 @@ public abstract class BaseServletApplication extends BaseApplicationImpl impleme
 
     @SuppressWarnings("unchecked")
     public static void patchConfigurationWithProperties(
-        Map<String, Object> configProps, IVariableResolver varResolver
+        @NotNull Map<String, Object> configProps,
+        @NotNull IVariableResolver varResolver
     ) {
         for (Map.Entry<String, Object> entry : configProps.entrySet()) {
             Object propValue = entry.getValue();
-            if (propValue instanceof String) {
-                entry.setValue(GeneralUtils.replaceVariables((String) propValue, varResolver));
+            if (propValue instanceof String strValue) {
+                entry.setValue(GeneralUtils.replaceVariables(strValue, varResolver));
             } else if (propValue instanceof Map) {
                 patchConfigurationWithProperties((Map<String, Object>) propValue, varResolver);
-            } else if (propValue instanceof List) {
-                List value = (List) propValue;
+            } else if (propValue instanceof List value) {
                 for (int i = 0; i < value.size(); i++) {
                     Object colItem = value.get(i);
-                    if (colItem instanceof String) {
-                        value.set(i, GeneralUtils.replaceVariables((String) colItem, varResolver));
+                    if (colItem instanceof String strItem) {
+                        value.set(i, GeneralUtils.replaceVariables(strItem, varResolver));
                     } else if (colItem instanceof Map) {
                         patchConfigurationWithProperties((Map<String, Object>) colItem, varResolver);
                     }
@@ -218,6 +211,8 @@ public abstract class BaseServletApplication extends BaseApplicationImpl impleme
     @Override
     public Object start(IApplicationContext context) {
         initializeApplicationServices();
+        setWorkspacePath(getServerConfigurationController().getWorkspacePath());
+
         try {
             startServer();
         } catch (Exception e) {
@@ -255,27 +250,17 @@ public abstract class BaseServletApplication extends BaseApplicationImpl impleme
     }
 
     @NotNull
-    @Override
-    public Path getWorkspaceDirectory() {
-        return getServerConfigurationController().getWorkspacePath();
-    }
-
-
     public String getApplicationId() {
         try {
             return getApplicationInstanceId();
         } catch (DBException e) {
-            return null;
+            // Fallback to hash code
+            return getClass().getSimpleName() + "#" + hashCode();
         }
     }
 
     @NotNull
-    @Override
-    public WSEventController getEventController() {
-        return null;
-    }
-
-    public abstract ServletServerConfigurationController getServerConfigurationController();
+    public abstract ServletServerConfigurationController<?> getServerConfigurationController();
 
     @Override
     public boolean isEnvironmentVariablesAccessible() {

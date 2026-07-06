@@ -34,4 +34,5 @@ Require-Bundle: org.eclipse.core.runtime,
  org.jkiss.dbeaver.ext.generic,
  org.eclipse.lsp4j,
  org.eclipse.lsp4j.jsonrpc
-Export-Package: io.cloudbeaver.test.platform
+Export-Package: io.cloudbeaver.test.platform,
+ io.cloudbeaver.test.platform.util

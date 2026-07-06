@@ -24,9 +24,13 @@ import org.jkiss.code.NotNull;
 
 public class WebSocketPingPongCallback implements MessageHandler.Whole<PongMessage> {
     @NotNull
-    private final BaseWebSession webSession;
+    private volatile BaseWebSession webSession;
 
     public WebSocketPingPongCallback(@NotNull BaseWebSession webSession) {
+        this.webSession = webSession;
+    }
+
+    void setWebSession(@NotNull BaseWebSession webSession) {
         this.webSession = webSession;
     }
 

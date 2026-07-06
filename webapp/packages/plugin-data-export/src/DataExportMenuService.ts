@@ -104,6 +104,7 @@ export class DataExportMenuService {
             filter: {
               constraints: source.options.constraints,
               where: source.options.whereFilter,
+              anyConstraint: source.options.anyConstraint,
             },
           });
         }
@@ -139,7 +140,7 @@ export class DataExportMenuService {
           connectionKey,
           name: node.name,
           fileName,
-          containerNodePath: node.id,
+          containerNodePath: node.uri,
         });
       },
     });

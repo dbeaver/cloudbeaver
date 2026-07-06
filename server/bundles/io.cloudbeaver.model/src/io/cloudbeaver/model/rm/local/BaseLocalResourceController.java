@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2025 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -67,8 +67,7 @@ public abstract class BaseLocalResourceController implements RMController {
 
     @Nullable
     @Override
-    public RMProject getProject(@NotNull String projectId, boolean readResources, boolean readProperties)
-        throws DBException {
+    public RMProject getProject(@NotNull String projectId, boolean readResources, boolean readProperties) throws DBException {
         RMProject project = makeProjectFromId(projectId, true);
         if (project == null) {
             return null;
@@ -110,8 +109,7 @@ public abstract class BaseLocalResourceController implements RMController {
     }
 
     @Override
-    public String getProjectsDataSources(@NotNull String projectId, @Nullable String[] dataSourceIds)
-        throws DBException {
+    public String getProjectsDataSources(@NotNull String projectId, @Nullable String[] dataSourceIds) throws DBException {
         DBPProject projectMetadata = getWebProject(projectId, false);
         return doFileReadOperation(
             projectId,

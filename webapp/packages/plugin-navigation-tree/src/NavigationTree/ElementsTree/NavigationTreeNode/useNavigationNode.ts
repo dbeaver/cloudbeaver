@@ -47,23 +47,23 @@ export function useNavigationNode(node: NavNode, path: string[]): INavigationNod
   const contextRef = useObjectRef({
     context: useContext(ElementsTreeContext),
   });
-  const { isLoading, isLoaded, isOutdated } = useNode(node.id);
-  const children = useChildren(node.id);
+  const { isLoading, isLoaded, isOutdated } = useNode(node.uri);
+  const children = useChildren(node.uri);
 
   const outdated = getComputed(() => isOutdated() || children.isOutdated());
   const loading = getComputed(() => isLoading() || children.isLoading());
   const loaded = getComputed(() => children.children !== undefined && children.isLoaded() && isLoaded());
-  const showInFilter = getComputed(() => contextRef.context?.tree.getNodeState(node.id).showInFilter || false);
-  const isExpanded = getComputed(() => contextRef.context?.tree.isNodeExpanded(node.id) || false);
+  const showInFilter = getComputed(() => contextRef.context?.tree.getNodeState(node.uri).showInFilter || false);
+  const isExpanded = getComputed(() => contextRef.context?.tree.isNodeExpanded(node.uri) || false);
   const leaf = getComputed(() => isLeaf(node, children.children, contextRef.context?.tree, outdated));
   const group = getComputed(() => contextRef.context?.tree.isGroup?.(node) || false);
   const empty = getComputed(() => children.children?.length === 0);
   const expanded = getComputed(() => isExpanded);
   const control = getComputed(() => contextRef.context?.control);
   const disabled = getComputed(() => contextRef.context?.tree.disabled || false);
-  const selected = getComputed(() => contextRef.context?.tree.isNodeSelected(node.id) || false);
+  const selected = getComputed(() => contextRef.context?.tree.isNodeSelected(node.uri) || false);
   const getSelected = () => navNodeInfoResource.get(resourceKeyList(contextRef.context?.tree.getSelected() || [])).filter(Boolean) as NavNode[];
-  const indeterminateSelected = getComputed(() => contextRef.context?.tree.isNodeIndeterminateSelected(node.id) || false);
+  const indeterminateSelected = getComputed(() => contextRef.context?.tree.isNodeIndeterminateSelected(node.uri) || false);
 
   const handleClick = async (leaf: boolean) => await contextRef.context?.tree.click(node, path, leaf);
   const handleOpen = async (leaf: boolean) => await contextRef.context?.tree.open(node, path, leaf);
@@ -83,7 +83,7 @@ export function useNavigationNode(node: NavNode, path: string[]): INavigationNod
   useEffect(
     () => () => {
       if (!contextRef.context?.selectionTree) {
-        if (contextRef.context?.tree.isNodeSelected(node.id)) {
+        if (contextRef.context?.tree.isNodeSelected(node.uri)) {
           contextRef.context.tree.select(node, true, false);
         }
       }
@@ -92,7 +92,7 @@ export function useNavigationNode(node: NavNode, path: string[]): INavigationNod
   );
 
   useEffect(() => {
-    if (contextRef.context?.tree.isNodeSelected(node.id)) {
+    if (contextRef.context?.tree.isNodeSelected(node.uri)) {
       elementRef.current?.scrollIntoView();
     }
   }, []);
@@ -101,7 +101,7 @@ export function useNavigationNode(node: NavNode, path: string[]): INavigationNod
     executor: contextRef.context?.tree.actions,
     handlers: [
       function refreshRoot({ type, nodeId }) {
-        if (type === 'show' && nodeId === node.id) {
+        if (type === 'show' && nodeId === node.uri) {
           elementRef.current?.scrollIntoView();
         }
       },

@@ -43,6 +43,7 @@
     "@cloudbeaver/core-view": "workspace:*",
     "@cloudbeaver/plugin-authentication": "workspace:*",
     "@cloudbeaver/plugin-navigation-tree": "workspace:*",
+    "@cloudbeaver/plugin-network-handlers": "workspace:*",
     "@cloudbeaver/plugin-projects": "workspace:*",
     "@cloudbeaver/plugin-top-app-bar": "workspace:*",
     "@dbeaver/jdbc-uri-parser": "workspace:*",

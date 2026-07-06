@@ -37,7 +37,7 @@
     "@codemirror/language": "^6",
     "@codemirror/lint": "^6",
     "@codemirror/merge": "^6",
-    "@codemirror/search": "^6",
+    "@codemirror/search": "6.6.0",
     "@codemirror/state": "^6",
     "@codemirror/view": "^6",
     "@dbeaver/ui-kit": "workspace:*",

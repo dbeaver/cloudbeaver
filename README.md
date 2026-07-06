@@ -5,12 +5,15 @@
 Cloud Database Manager - Community Edition.  
 CloudBeaver is a web server that provides a rich web interface. The server itself is a Java application, and the web part is written in TypeScript and React.  
 It is free to use and open-source (licensed under [Apache 2](https://github.com/dbeaver/cloudbeaver/blob/devel/LICENSE) license).  
-See our [WIKI](https://github.com/dbeaver/cloudbeaver/wiki) for more details. 
 
 <a><img src="https://github.com/dbeaver/cloudbeaver/wiki/images/connection-creation-demo.png" width="400"/></a>
 <img src="https://github.com/dbeaver/cloudbeaver/wiki/images/gis-demo.png" width="400"/>
 <img src="https://github.com/dbeaver/cloudbeaver/wiki/images/data-transfer-demo.png" width="400"/>
 <img src="https://github.com/dbeaver/cloudbeaver/wiki/images/sql-editor-demo.png" width="400"/>
+
+## Documentation
+- [GitHub WIKI](https://github.com/dbeaver/cloudbeaver/wiki)
+- [Official documentation](https://dbeaver.com/docs/cloudbeaver/)
 
 ## Run in Docker
 
@@ -24,6 +27,16 @@ You can see a live demo of CloudBeaver server here: https://demo.cloudbeaver.io
 [Database access instructions](https://github.com/dbeaver/cloudbeaver/wiki/Demo-Server)
 
 ## Changelog
+
+### 26.1.1 2026-06-22
+
+### Changes since 26.1.0:
+
+- General: Added a "Project Info" tab containing the project description to the project context menu.
+- Security:
+	- Fixed a cross-site scripting vulnerability caused by unsanitized user input in the web interface.
+	- Resolved a security flaw related to user-controlled file paths by adding strict validation to prevent unauthorized resource access.
+	- Fixed the critical vulnerability (CVE-2026-9277) in the shell-quote library (updated to version 1.8.4).
 
 ### 26.1.0 2026-06-01
 

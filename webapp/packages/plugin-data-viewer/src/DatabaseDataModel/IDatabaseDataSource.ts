@@ -60,6 +60,8 @@ export enum DatabaseDataFeature {
   QueryResult = 'QueryResult',
   /** Data grouping and aggregation functionality. Used for GROUP BY operations. */
   Grouping = 'Grouping',
+  /** Displays incoming and outgoing table references for the selected table. */
+  References = 'References',
 }
 
 export type GetDatabaseDataSourceOptions<TSource extends IDatabaseDataSource<any, any>> =

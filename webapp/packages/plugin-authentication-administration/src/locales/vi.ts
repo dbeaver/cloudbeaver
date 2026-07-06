@@ -137,6 +137,7 @@ export default [
   ],
   ['plugin_authentication_administration_team_form_edit_label', 'Biểu mẫu chỉnh sửa nhóm'],
   ['plugin_authentication_administration_user_form_edit_label', 'Biểu mẫu chỉnh sửa người dùng'],
+  ['plugin_authentication_administration_user_last_login', 'Lần đăng nhập cuối'],
 
   [
     'plugin_authentication_administration_user_username_validation_error',

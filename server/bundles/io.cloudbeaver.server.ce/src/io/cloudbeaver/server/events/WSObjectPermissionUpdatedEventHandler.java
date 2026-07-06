@@ -24,6 +24,7 @@ import io.cloudbeaver.server.WebAppUtils;
 import io.cloudbeaver.service.security.SMUtils;
 import io.cloudbeaver.utils.ServletAppUtils;
 import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.security.SMAdminController;
@@ -33,7 +34,6 @@ import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceEvent;
 import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceProperty;
 import org.jkiss.dbeaver.model.websocket.event.permissions.WSObjectPermissionEvent;
 
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -43,10 +43,11 @@ import java.util.stream.Collectors;
 public class WSObjectPermissionUpdatedEventHandler extends WSDefaultEventHandler<WSObjectPermissionEvent> {
     private static final Log log = Log.getLog(WSObjectPermissionUpdatedEventHandler.class);
 
+    @Nullable
     @Override
-    public void handleEvent(@NotNull WSObjectPermissionEvent event) {
+    protected Consumer<BaseWebSession> getEventConsumer(@NotNull WSObjectPermissionEvent event) {
         String objectId = event.getObjectId();
-        Consumer<BaseWebSession> runnable = switch (event.getSmObjectType()) {
+        return switch (event.getSmObjectType()) {
             case project:
                 yield getUpdateUserProjectsInfoConsumer(event, objectId);
             case datasource:
@@ -61,23 +62,6 @@ public class WSObjectPermissionUpdatedEventHandler extends WSDefaultEventHandler
                     yield null;
                 }
         };
-        if (runnable == null) {
-            return;
-        }
-        log.debug(event.getTopicId() + " event handled");
-        Collection<BaseWebSession> allSessions = CBApplication.getInstance().getSessionManager().getAllActiveSessions();
-        for (var activeUserSession : allSessions) {
-            if (!isAcceptableInSession(activeUserSession, event)) {
-                log.debug("Cannot handle %s event '%s' in session %s".formatted(
-                    event.getTopicId(),
-                    event.getId(),
-                    activeUserSession.getSessionId()
-                ));
-                continue;
-            }
-            log.debug("%s event '%s' handled".formatted(event.getTopicId(), event.getId()));
-            runnable.accept(activeUserSession);
-        }
     }
 
     @NotNull

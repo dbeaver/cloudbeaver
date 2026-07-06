@@ -54,7 +54,7 @@ class WebSQLQueryDataReceiver implements DBDDataReceiver {
     private final WebDataFormat dataFormat;
     @Nullable
     private final DBDDataFilter dataFilter;
-    private final WebSQLQueryResultSet webResultSet;
+    private final WebSQLQueryResultSet webResultSet = new WebSQLQueryResultSet();
 
     private DBDAttributeBinding[] bindings;
     private DBCTrace trace;
@@ -71,7 +71,6 @@ class WebSQLQueryDataReceiver implements DBDDataReceiver {
         this.dataContainer = dataContainer;
         this.dataFormat = dataFormat;
         this.dataFilter = dataFilter;
-        this.webResultSet = new WebSQLQueryResultSet(contextInfo.getProcessor().getWebSession());
         rowLimit = ServletAppUtils.getServletApplication()
             .getAppConfiguration()
             .getResourceQuota(WebSQLConstants.QUOTA_PROP_ROW_LIMIT);
