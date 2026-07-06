@@ -28,9 +28,22 @@ You can see a live demo of CloudBeaver server here: https://demo.cloudbeaver.io
 
 ## Changelog
 
-### 26.1.1 2026-06-22
+### 26.1.2 2026-07-06
 
-### Changes since 26.1.0:
+- Data Editor:
+    - Added the References panel showing related records from other tables connected by foreign keys. It helps to explore table relationships directly in the Data editor.
+    - Resolved an issue where the Data Editor ignored the text preview's maximum length quota. Increasing this quota now enables the ability to edit large values.
+- General:
+    - Added the Last Login time to the user form and the user table in the administration part.
+    - Fixed the bug with the inability to select entered text in the Find and Replace panel in editors.
+- Accessibility:
+    - Added the ability to use the Enter or Space key to turn checkboxes on/off in the connection properties tab.
+- Security:
+    - Fixed CVE-2026-55449. Resolved a local file disclosure vulnerability by enforcing strict validation of file identifiers and path containment during data updates.
+    - Updated session handling to prevent session fixation vulnerabilities. The application generates new session identifiers upon login.
+    - Fixed the high vulnerability (CVE-2026-12151) in the undici library. The library was updated to version 6.27.0.
+
+### 26.1.1 2026-06-22
 
 - General: Added a "Project Info" tab containing the project description to the project context menu.
 - Security:
