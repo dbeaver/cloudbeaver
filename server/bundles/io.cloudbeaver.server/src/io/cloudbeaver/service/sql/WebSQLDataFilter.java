@@ -60,8 +60,8 @@ public class WebSQLDataFilter {
         this.where = CommonUtils.toString(filterProps.get("where"), null);
         this.anyConstraint = CommonUtils.toBoolean(filterProps.get("anyConstraint"));
         Object constraints = filterProps.get("constraints");
-        if (constraints instanceof Collection) {
-            for (Object constrItem : (Collection<?>) constraints) {
+        if (constraints instanceof Collection<?> col) {
+            for (Object constrItem : col) {
                 if (constrItem instanceof Map) {
                     this.constraints.add(
                         new WebSQLDataFilterConstraint((Map<String, Object>) constrItem));
@@ -207,6 +207,7 @@ public class WebSQLDataFilter {
         return dbConstr;
     }
 
+    @NotNull
     private List<DBDAttributeConstraint> getDbdConstraints() {
         List<DBDAttributeConstraint> dbConstraints = new ArrayList<>();
         for (WebSQLDataFilterConstraint constraint : constraints) {
@@ -221,7 +222,10 @@ public class WebSQLDataFilter {
         return dbConstraints;
     }
 
-    private static int getOriginalVisualPosition(WebSQLDataFilterConstraint constraint, String attributeName) {
+    private static int getOriginalVisualPosition(
+        @NotNull WebSQLDataFilterConstraint constraint,
+        @NotNull String attributeName
+    ) {
         Integer attributePosition = constraint.getAttributePosition();
 
         if (CommonUtils.isEmpty(attributeName)) {
