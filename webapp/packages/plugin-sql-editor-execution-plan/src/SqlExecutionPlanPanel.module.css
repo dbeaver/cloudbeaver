@@ -62,7 +62,7 @@
     --dbv-plan-node-cost-bar-color: var(--theme-status);
 
     /* Edges */
-    --dbv-plan-edge-color: var(--theme-input-border);
+    --dbv-plan-edge-color: #999;
 
     /* Toolbar */
     --dbv-plan-toolbar-border: var(--theme-input-border);
