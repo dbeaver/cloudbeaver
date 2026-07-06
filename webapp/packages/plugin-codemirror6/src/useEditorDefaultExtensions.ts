@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { defaultKeymap, indentWithTab } from '@codemirror/commands';
-import { bracketMatching, foldGutter, indentOnInput, indentUnit, syntaxHighlighting } from '@codemirror/language';
+import { bracketMatching, foldGutter, foldKeymap, indentOnInput, indentUnit, syntaxHighlighting } from '@codemirror/language';
 import { highlightSelectionMatches, searchKeymap } from '@codemirror/search';
 import { Compartment, type Extension } from '@codemirror/state';
 import {
@@ -37,6 +37,7 @@ DEFAULT_KEY_MAP.push({
   run: () => true,
 });
 DEFAULT_KEY_MAP.push(...searchKeymap);
+DEFAULT_KEY_MAP.push(...foldKeymap);
 
 const defaultExtensionsFlags: IDefaultExtensions = {
   lineNumbers: false,
