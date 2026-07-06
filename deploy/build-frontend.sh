@@ -9,6 +9,7 @@ cd ../../cloudbeaver/webapp
 
 yarn install --immutable
 cd ./packages/product-default
+yarn tsc -b --clean
 yarn run bundle
 
 if [[ "$?" -ne 0 ]] ; then
