@@ -10,7 +10,7 @@ import { useCallback, useMemo } from 'react';
 import { observer } from 'mobx-react-lite';
 import { reaction } from 'mobx';
 
-import { FieldCheckbox, Link, Placeholder, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { Checkbox, Link, Placeholder, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import type { AdminUserInfoFragment } from '@cloudbeaver/core-sdk';
 import { UsersResource } from '@cloudbeaver/core-authentication';
@@ -110,17 +110,19 @@ export const UsersTable = observer<Props>(function UsersTable({ users, isManagea
 
     if (column.key === ENABLED_COLUMN.key) {
       const isActive = usersResource.isActiveUser(row.userId);
+      const disabled = isActive || !isManageable;
       const title = isActive ? translate('administration_teams_team_granted_users_permission_denied') : undefined;
 
       return (
-        <div className="tw:flex tw:items-center tw:justify-center">
-          <FieldCheckbox
-            title={title}
-            checked={row.enabled}
-            disabled={isActive || !isManageable}
-            onChange={() => enableUser(row.userId, !row.enabled)}
-          />
-        </div>
+        <Checkbox
+          className="tw:flex tw:w-full tw:h-full tw:items-center tw:justify-center"
+          aria-label={translate('authentication_user_enabled')}
+          tabIndex={0}
+          title={title}
+          checked={row.enabled}
+          disabled={disabled}
+          onChange={() => enableUser(row.userId, !row.enabled)}
+        />
       );
     }
 

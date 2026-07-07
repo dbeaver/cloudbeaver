@@ -275,6 +275,12 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
                 if (project == null) {
                     throw new DBException("Project not found:" + projectId);
                 }
+                var customConnectionsEnabled =
+                    ServletAppUtils.getServletApplication().getAppConfiguration().isSupportsCustomConnections();
+                if (!customConnectionsEnabled && project.isPrivateProject()) {
+                    throw new DBWebExceptionAccessDenied("Access to private project is denied");
+                }
+
                 RMProject rmProject = project.getRMProject();
 
                 for (String reqProjectPermission : requireProjectPermissions) {
