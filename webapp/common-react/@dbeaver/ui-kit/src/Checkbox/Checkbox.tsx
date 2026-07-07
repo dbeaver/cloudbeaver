@@ -12,7 +12,7 @@ import clsx from 'clsx';
 import './Checkbox.css';
 import type { ControlSize } from '../types/controls.js';
 import { componentProviderWrapper } from '../componentProviderWrapper.js';
-import { CheckboxIndicator } from './CheckboxIndicator.js'; 
+import { CheckboxIndicator } from './CheckboxIndicator.js';
 
 export interface CheckboxProps extends Omit<AriaKitCheckboxProps, 'render' | 'size'> {
   size?: ControlSize;
@@ -21,7 +21,15 @@ export interface CheckboxProps extends Omit<AriaKitCheckboxProps, 'render' | 'si
   indeterminateIcon?: React.ReactNode;
 }
 
-export function CheckboxBase({ children, className, icon, indeterminate, indeterminateIcon, size = 'medium', ...props }: CheckboxProps): React.ReactElement {
+export function CheckboxBase({
+  children,
+  className,
+  icon,
+  indeterminate,
+  indeterminateIcon,
+  size = 'medium',
+  ...props
+}: CheckboxProps): React.ReactElement {
   const [innerChecked, setInnerChecked] = useState(props.defaultChecked ?? false);
   const checked = props.checked ?? innerChecked;
 
@@ -36,6 +44,7 @@ export function CheckboxBase({ children, className, icon, indeterminate, indeter
       <VisuallyHidden>
         <AriaCheckbox
           {...props}
+          checked={indeterminate ? 'mixed' : checked}
           className="dbv-kit-checkbox__input"
           clickOnEnter
           onFocusVisible={() => setFocusVisible(true)}
