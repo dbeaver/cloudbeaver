@@ -139,10 +139,14 @@ describe('parseHotkey', () => {
     expect(result.keys).toContain('a');
   });
 
-  it('sets isSequence and useKey to false', () => {
+  it('sets isSequence to false', () => {
     const result = parseHotkey('ctrl+a');
     expect(result.isSequence).toBe(false);
-    expect(result.useKey).toBe(false);
+  });
+
+  it('sets useKey to true', () => {
+    const result = parseHotkey('ctrl+a');
+    expect(result.useKey).toBe(true);
   });
 
   it('does not include modifiers in keys array', () => {
