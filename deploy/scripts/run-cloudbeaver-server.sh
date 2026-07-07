@@ -11,6 +11,7 @@ echo "Starting Cloudbeaver Server"
 
 exec java ${JAVA_OPTS} \
   -Dfile.encoding=UTF-8 \
+  --enable-native-access=ALL-UNNAMED \
   --add-modules=ALL-DEFAULT \
   --add-opens=java.base/java.io=ALL-UNNAMED \
   --add-opens=java.base/java.lang=ALL-UNNAMED \
@@ -27,7 +28,6 @@ exec java ${JAVA_OPTS} \
   --add-opens=java.base/jdk.internal.misc=ALL-UNNAMED \
   --add-opens=java.base/sun.nio.ch=ALL-UNNAMED \
   --add-opens=java.base/sun.security.ssl=ALL-UNNAMED \
-  --add-opens=java.base/sun.security.action=ALL-UNNAMED \
   --add-opens=java.base/sun.security.util=ALL-UNNAMED \
   --add-opens=java.security.jgss/sun.security.jgss=ALL-UNNAMED \
   --add-opens=java.security.jgss/sun.security.krb5=ALL-UNNAMED \
