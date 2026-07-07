@@ -39,6 +39,28 @@ const KEY_BINDING_FIND = createKeyBinding({
   keys: ['mod+f'],
 });
 
+const KEY_BINDING_SQL_EDITOR_FOLD_CODE = createKeyBinding({
+  id: 'sql-editor-fold-code',
+  keysMac: ['cmd+alt+['],
+  keysWin: ['ctrl+shift+['],
+});
+
+const KEY_BINDING_SQL_EDITOR_UNFOLD_CODE = createKeyBinding({
+  id: 'sql-editor-unfold-code',
+  keysMac: ['cmd+alt+]'],
+  keysWin: ['ctrl+shift+]'],
+});
+
+const KEY_BINDING_SQL_EDITOR_FOLD_ALL = createKeyBinding({
+  id: 'sql-editor-fold-all',
+  keys: ['ctrl+alt+['],
+});
+
+const KEY_BINDING_SQL_EDITOR_UNFOLD_ALL = createKeyBinding({
+  id: 'sql-editor-unfold-all',
+  keys: ['ctrl+alt+]'],
+});
+
 import type { IShortcut } from './IShortcut.js';
 
 export const DATA_VIEWER_SHORTCUTS: IShortcut[] = [
@@ -104,6 +126,22 @@ export const SQL_EDITOR_SHORTCUTS: IShortcut[] = [
   {
     label: 'sql_editor_shortcut_format',
     code: transformKeys(KEY_BINDING_SQL_EDITOR_FORMAT),
+  },
+  {
+    label: 'sql_editor_shortcut_fold_code',
+    code: transformKeys(KEY_BINDING_SQL_EDITOR_FOLD_CODE),
+  },
+  {
+    label: 'sql_editor_shortcut_unfold_code',
+    code: transformKeys(KEY_BINDING_SQL_EDITOR_UNFOLD_CODE),
+  },
+  {
+    label: 'sql_editor_shortcut_fold_all',
+    code: transformKeys(KEY_BINDING_SQL_EDITOR_FOLD_ALL),
+  },
+  {
+    label: 'sql_editor_shortcut_unfold_all',
+    code: transformKeys(KEY_BINDING_SQL_EDITOR_UNFOLD_ALL),
   },
   {
     label: 'ui_processing_save',
