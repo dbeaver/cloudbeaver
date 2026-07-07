@@ -38,7 +38,9 @@ export interface ConfirmationDialogPayload {
   cancelActionText?: TLocalizationToken;
   extraActionText?: TLocalizationToken;
   /**
-   * Async action run when the confirm button is pressed. While it runs the confirm button shows a loader and is disabled. The dialog resolves only if it returns `true`; otherwise it is rejected (no confirm).
+   * Async action run when the confirm button is pressed.
+   * While it runs the confirm button shows a loader and is disabled.
+   * The dialog resolves only if it returns `true`.
    */
   onConfirm?: () => Promise<boolean>;
 }
