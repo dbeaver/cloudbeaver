@@ -1,5 +1,5 @@
 #!/bin/bash
-set -Eeuox pipefail
+set -Eeuo pipefail
 
 echo "Build static content"
 
@@ -8,8 +8,15 @@ mkdir -p ./cloudbeaver/web
 cd ../../cloudbeaver/webapp
 
 yarn install --immutable
-cd ./packages/product-default
-yarn tsc -b --clean
+yarn clear
+
+cd common-react
+yarn clear
+
+cd ../common-typescript
+yarn clear
+
+cd ../packages/product-default
 yarn run bundle
 
 if [[ "$?" -ne 0 ]] ; then
