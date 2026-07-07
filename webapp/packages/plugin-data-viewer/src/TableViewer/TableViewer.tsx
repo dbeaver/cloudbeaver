@@ -29,6 +29,7 @@ import {
 import { useService } from '@cloudbeaver/core-di';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 import { CaptureView } from '@cloudbeaver/core-view';
+import { ConnectionTypeService, createConnectionParam } from '@cloudbeaver/core-connections';
 
 import { type IDatabaseDataOptions } from '../DatabaseDataModel/IDatabaseDataOptions.js';
 import { DataPresentationService, DataPresentationType } from '../DataPresentationService.js';
@@ -44,6 +45,7 @@ import { TableToolsPanel } from './TableToolsPanel.js';
 import style from './TableViewer.module.css';
 import { TableViewerStorageService } from './TableViewerStorageService.js';
 import { IDatabaseDataConstraintAction } from '../DatabaseDataModel/Actions/IDatabaseDataConstraintAction.js';
+import { ResultSetDataSource } from '../ResultSet/ResultSetDataSource.js';
 
 export interface TableViewerProps {
   tableId: string;
@@ -67,6 +69,7 @@ export const TableViewer = observer<TableViewerProps, HTMLDivElement>(
     const dataViewerView = useService(DataViewerViewService);
     const dataPresentationService = useService(DataPresentationService);
     const tableViewerStorageService = useService(TableViewerStorageService);
+    const connectionTypeService = useService(ConnectionTypeService);
     const dataModel = tableViewerStorageService.get(tableId);
     const result = dataModel?.source.getResult(resultIndex);
     const loading = useStateDelay(dataModel?.isLoading() ?? true, 100);
@@ -206,9 +209,19 @@ export const TableViewer = observer<TableViewerProps, HTMLDivElement>(
       resultExist &&
       !simple;
 
+    let typeColor: string | undefined;
+
+    if (dataModel.source instanceof ResultSetDataSource) {
+      const context = dataModel.source.executionContext?.context;
+
+      if (context) {
+        typeColor = connectionTypeService.getConnectionTypeColor(createConnectionParam(context.projectId, context.connectionId));
+      }
+    }
+
     return (
       <CaptureView className={s(styles, { captureView: true })} view={dataViewerView}>
-        <div ref={mergedRef} tabIndex={0} className={s(styles, { tableViewer: true }, className)}>
+        <div ref={mergedRef} tabIndex={0} className={s(styles, { tableViewer: true }, className)} style={{ background: typeColor }}>
           <div className={s(styles, { tableContent: true })}>
             {!isStatistics && (
               <TablePresentationBar
@@ -292,7 +305,14 @@ export const TableViewer = observer<TableViewerProps, HTMLDivElement>(
               />
             )}
           </div>
-          <TableFooter model={dataModel} resultIndex={resultIndex} simple={simple} tabIndex={0} data-presentation-tools />
+          <TableFooter
+            style={{ background: typeColor }}
+            model={dataModel}
+            resultIndex={resultIndex}
+            simple={simple}
+            tabIndex={0}
+            data-presentation-tools
+          />
         </div>
       </CaptureView>
     );

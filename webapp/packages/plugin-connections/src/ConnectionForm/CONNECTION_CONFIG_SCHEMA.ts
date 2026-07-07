@@ -37,4 +37,5 @@ export const CONNECTION_CONFIG_SCHEMA = schema.object({
   url: schema.string().optional(),
   userName: schema.string().optional(),
   userPassword: schema.string().optional(),
+  connectionType: schema.string().optional(),
 });

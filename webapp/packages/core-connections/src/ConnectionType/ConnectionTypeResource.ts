@@ -1,0 +1,95 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2026 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+
+import { injectable } from '@cloudbeaver/core-di';
+import { CachedMapAllKey, CachedMapResource, resourceKeyList, type ResourceKey } from '@cloudbeaver/core-resource';
+import { SessionResource } from '@cloudbeaver/core-root';
+import { GraphQLService, type ConnectionType as ConnectionTypeFragment } from '@cloudbeaver/core-sdk';
+
+export type ConnectionType = ConnectionTypeFragment;
+
+export const NEW_CONNECTION_TYPE_SYMBOL = Symbol('new-connection-type');
+export type NewConnectionType = ConnectionType & { [NEW_CONNECTION_TYPE_SYMBOL]: boolean; timestamp: number };
+
+@injectable(() => [GraphQLService, SessionResource])
+export class ConnectionTypeResource extends CachedMapResource<string, ConnectionType> {
+  constructor(
+    private readonly graphQLService: GraphQLService,
+    sessionResource: SessionResource,
+  ) {
+    super();
+
+    this.sync(
+      sessionResource,
+      () => {},
+      () => CachedMapAllKey,
+    );
+  }
+
+  protected async loader(originalKey: ResourceKey<string>): Promise<Map<string, ConnectionType>> {
+    const all = this.aliases.isAlias(originalKey, CachedMapAllKey);
+
+    const { types } = await this.graphQLService.sdk.getConnectionTypes();
+
+    const key = resourceKeyList(types.map(type => type.id));
+    if (all) {
+      this.replace(key, types);
+    } else {
+      this.set(key, types);
+    }
+
+    return this.data;
+  }
+
+  compare(connectionTypeA: ConnectionType, connectionTypeB: ConnectionType): number {
+    return connectionTypeA.name.localeCompare(connectionTypeB.name);
+  }
+
+  cleanNewFlags(): void {
+    for (const connection of this.data.values()) {
+      (connection as NewConnectionType)[NEW_CONNECTION_TYPE_SYMBOL] = false;
+    }
+  }
+
+  async refreshAll(): Promise<Map<string, ConnectionType>> {
+    await this.refresh(CachedMapAllKey);
+    return this.data;
+  }
+
+  protected override validateKey(key: string): boolean {
+    return typeof key === 'string';
+  }
+}
+
+function isNewConnectionType(connection: ConnectionType | NewConnectionType): connection is NewConnectionType {
+  return (connection as NewConnectionType)[NEW_CONNECTION_TYPE_SYMBOL];
+}
+
+export function compareNewConnectionTypes(a: ConnectionType, b: ConnectionType): number {
+  if (isNewConnectionType(a) && isNewConnectionType(b)) {
+    return b.timestamp - a.timestamp;
+  }
+
+  if (isNewConnectionType(b)) {
+    return 1;
+  }
+
+  if (isNewConnectionType(a)) {
+    return -1;
+  }
+
+  return 0;
+}
+
+export function mapColorValue(value: string): string {
+  return `rgb(${value})`;
+}
+
+export const DEFAULT_LIGHT_COLOR = '0,0,0';
+export const DEFAULT_DARK_COLOR = '255,255,255';
+export const PREDEFINED_UNSET_COLOR = '255,255,255';

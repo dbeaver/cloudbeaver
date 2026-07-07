@@ -44,4 +44,6 @@ export default [
   ['plugin_connections_connection_client_version', 'Client version: {arg:version} \n'],
   ['plugin_connections_connection_server_version', 'Server version: {arg:version} \n'],
   ['plugin_connections_connection_connection_time', 'Connection time: {arg:time} \n'],
+
+  ['plugin_connections_connection_type_label', 'Connection type'],
 ];
