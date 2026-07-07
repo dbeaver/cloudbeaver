@@ -1,5 +1,5 @@
 #!/bin/bash
-set -Eeuo pipefail
+set -Eeuox pipefail
 
 echo "Build static content"
 
