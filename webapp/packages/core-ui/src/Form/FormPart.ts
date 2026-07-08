@@ -202,7 +202,7 @@ export abstract class FormPart<TPartState extends object, TFormState = any> impl
 
   extendSchema<TExtension extends schema.ZodRawShape>(extension: TExtension): void {
     if (this.schema instanceof schema.ZodObject) {
-      this.schema = this.schema.extend(extension) as schema.ZodType<TPartState>;
+      this.schema = this.schema.safeExtend(extension) as schema.ZodType<TPartState>;
     }
   }
 
