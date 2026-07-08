@@ -58,11 +58,11 @@
     --dbv-plan-node-metric-value-color: var(--theme-on-surface);
 
     /* Node cost bar */
-    --dbv-plan-node-cost-bar-bg: var(--theme-input-border);
+    --dbv-plan-node-cost-bar-bg: var(--theme-background);
     --dbv-plan-node-cost-bar-color: var(--theme-status);
 
     /* Edges */
-    --dbv-plan-edge-color: var(--theme-text-hint-on-light);
+    --dbv-plan-edge-color: #999;
 
     /* Toolbar */
     --dbv-plan-toolbar-border: var(--theme-input-border);
@@ -70,5 +70,18 @@
     --dbv-plan-toolbar-color: var(--theme-on-surface);
     --dbv-plan-toolbar-hover-bg: var(--theme-sub-secondary);
     --dbv-plan-toolbar-active-bg: var(--theme-secondary);
+  }
+}
+
+:global(.theme-light) .pane {
+  &:first-child {
+    /* Node */
+    --dbv-plan-node-bg: var(--theme-surface);
+
+    /* Edges */
+    --dbv-plan-edge-color: #c0c0c0;
+
+    /* Node caption */
+    --dbv-plan-node-caption-bg: var(--theme-secondary);
   }
 }
