@@ -70,7 +70,7 @@ export const ServerConfigurationPage: AdministrationItemContentComponent = obser
     }
   }
 
-  const changed = part?.isChanged ?? false;
+  const changed = formState?.isChanged ?? false;
 
   async function save() {
     if (!formState || !part) {
@@ -154,7 +154,7 @@ export const ServerConfigurationPage: AdministrationItemContentComponent = obser
         )}
         <Form ref={focusedRef} context={form} name="server_config" contents onChange={handleChange}>
           <Container wrap gap grid medium>
-            <ServerConfigurationInfoForm state={part.state} />
+            <ServerConfigurationInfoForm state={part.state} formState={formState} configurationWizard={configurationWizard} />
             <Group form gap>
               <GroupTitle>{translate('administration_configuration_wizard_configuration_plugins')}</GroupTitle>
               <ServerConfigurationConfigurationForm serverConfig={part.state.serverConfig} />

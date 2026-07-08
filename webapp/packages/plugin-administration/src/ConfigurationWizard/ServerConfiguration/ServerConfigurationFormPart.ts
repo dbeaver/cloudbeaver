@@ -18,7 +18,7 @@ import {
   DEFAULT_NAVIGATOR_VIEW_SETTINGS,
 } from '@cloudbeaver/core-root';
 import { FormPart, formValidationContext, type IFormState } from '@cloudbeaver/core-ui';
-import { isIp, isObjectsEqual, isValuesEqual } from '@cloudbeaver/core-utils';
+import { isIp, isObjectsEqual, isValuesEqual, schema } from '@cloudbeaver/core-utils';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 
 import { MIN_SESSION_EXPIRE_TIME } from './Form/MIN_SESSION_EXPIRE_TIME.js';
@@ -60,6 +60,17 @@ export class ServerConfigurationFormPart extends FormPart<IServerConfigurationFo
     private readonly localizationService: LocalizationService,
   ) {
     super(formState, DEFAULT_STATE_GETTER(), ServerConfigStateSchema);
+  }
+
+  extendServerConfigSchema<TExtension extends schema.ZodRawShape>(extension: TExtension): void {
+    if (this.schema instanceof schema.ZodObject) {
+      const serverConfigShape = (this.schema.shape as any).serverConfig;
+      if (serverConfigShape instanceof schema.ZodObject) {
+        (this as { schema: unknown }).schema = this.schema.extend({
+          serverConfig: serverConfigShape.extend(extension),
+        });
+      }
+    }
   }
 
   override isOutdated(): boolean {

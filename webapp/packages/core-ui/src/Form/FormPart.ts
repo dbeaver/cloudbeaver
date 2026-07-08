@@ -25,7 +25,7 @@ export abstract class FormPart<TPartState extends object, TFormState = any> impl
 
   protected loaded: boolean;
   protected loading: boolean;
-  readonly schema: schema.ZodType<TPartState> | null;
+  schema: schema.ZodType<TPartState> | null;
 
   constructor(
     protected readonly formState: IFormState<TFormState>,
@@ -198,6 +198,12 @@ export abstract class FormPart<TPartState extends object, TFormState = any> impl
 
   protected setState(state: TPartState): void {
     this.state = state;
+  }
+
+  extendSchema<TExtension extends schema.ZodRawShape>(extension: TExtension): void {
+    if (this.schema instanceof schema.ZodObject) {
+      this.schema = this.schema.extend(extension) as schema.ZodType<TPartState>;
+    }
   }
 
   protected format(data: IFormState<TFormState>, contexts: IExecutionContextProvider<IFormState<TFormState>>): void | Promise<void> {}
