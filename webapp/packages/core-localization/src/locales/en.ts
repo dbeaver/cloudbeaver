@@ -2,6 +2,7 @@ export default [
   ['name', 'en'],
   ['ui_rename_taken_or_invalid', 'This name is unavailable or invalid'],
   ['ui_tag_new', 'New'],
+  ['ui_theme', 'Theme'],
   ['ui_light_theme', 'Light'],
   ['ui_dark_theme', 'Dark'],
   ['ui_system_theme', 'Device'],

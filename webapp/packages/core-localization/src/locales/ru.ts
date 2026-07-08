@@ -2,6 +2,7 @@ export default [
   ['name', 'ru'],
   ['ui_rename_taken_or_invalid', 'Имя занято или недопустимо'],
   ['ui_tag_new', 'Новый'],
+  ['ui_theme', 'Тема'],
   ['ui_light_theme', 'Светлая'],
   ['ui_dark_theme', 'Темная'],
   ['ui_system_theme', 'Устройство'],
