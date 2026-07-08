@@ -78,8 +78,8 @@ const RenderParametersForm = observer(function RenderParametersForm({
   }
 
   return (
-    <div className="tw:flex tw:flex-col tw:overflow-auto tw:gap-3 tw:min-h-full">
-      <div className="tw:overflow-auto tw:flex-auto tw:flex">
+    <div className="tw:flex tw:flex-col tw:overflow-auto tw:gap-3 tw:h-full">
+      <div className="tw:overflow-auto tw:flex tw:shrink tw:max-h-2/3">
         <PropertiesTable
           properties={orderedParameters.map((paramName, index) => ({
             id: `${index}:${paramName}`,
@@ -96,7 +96,7 @@ const RenderParametersForm = observer(function RenderParametersForm({
         />
       </div>
       {!sqlEditorSettingsService.disabled && (
-        <SQLCodeEditor value={query} extensions={extensions} className="tw:overflow-auto tw:flex-1/3" readonly />
+        <SQLCodeEditor value={query} extensions={extensions} className="tw:overflow-auto tw:flex-1 tw:min-h-1/3" readonly />
       )}
       <div className="theme-typography--body2 tw:p-2 tw:bg-(--theme-secondary) tw:flex tw:flex-row tw:gap-2 tw:items-center tw:rounded">
         <IconOrImage icon="/icons/preload/info_icon_sm.svg" className="tw:size-3" />
