@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
 
 import { useObjectInfoTooltip } from '@cloudbeaver/core-blocks';
-import { ConnectionInfoResource, ConnectionTypeService } from '@cloudbeaver/core-connections';
+import { ConnectionInfoResource, useConnectionTypeColor } from '@cloudbeaver/core-connections';
 import { useDataContext } from '@cloudbeaver/core-data-context';
 import { useService } from '@cloudbeaver/core-di';
 import { NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
@@ -25,7 +25,6 @@ export const ObjectViewerTab: TabHandlerTabComponent<IObjectViewerTabState> = ob
   const connectionInfoResource = useService(ConnectionInfoResource);
   const navNodeManagerService = useService(NavNodeManagerService);
   const projectInfoResource = useService(ProjectInfoResource);
-  const connectionTypeService = useService(ConnectionTypeService);
   const viewContext = useContext(CaptureViewContext);
   const tabMenuContext = useDataContext(viewContext);
   const { node } = useNode(tab.handlerState.objectId);
@@ -38,12 +37,7 @@ export const ObjectViewerTab: TabHandlerTabComponent<IObjectViewerTabState> = ob
 
   const tooltip = useObjectInfoTooltip(connection?.name, nodeInfo?.catalogId, nodeInfo?.schemaId, project?.name);
   const { selected } = useTab(tab.id);
-
-  let typeColor: string | undefined;
-
-  if (tab.handlerState.connectionKey) {
-    typeColor = connectionTypeService.getConnectionTypeColor(tab.handlerState.connectionKey);
-  }
+  const typeColor = useConnectionTypeColor(tab.handlerState.connectionKey);
 
   return (
     <Tab

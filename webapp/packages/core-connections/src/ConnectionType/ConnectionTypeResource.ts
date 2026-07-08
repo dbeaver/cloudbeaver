@@ -47,6 +47,10 @@ export class ConnectionTypeResource extends CachedMapResource<string, Connection
   }
 
   compare(connectionTypeA: ConnectionType, connectionTypeB: ConnectionType): number {
+    if (connectionTypeA.predefined !== connectionTypeB.predefined) {
+      return connectionTypeA.predefined ? -1 : 1;
+    }
+
     return connectionTypeA.name.localeCompare(connectionTypeB.name);
   }
 

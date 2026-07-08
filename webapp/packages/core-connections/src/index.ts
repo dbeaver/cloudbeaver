@@ -66,3 +66,4 @@ export * from './DBDriverExpertSettingsResource.js';
 
 export * from './ConnectionType/ConnectionTypeResource.js';
 export * from './ConnectionType/ConnectionTypeService.js';
+export * from './ConnectionType/useConnectionTypeColor.js';
