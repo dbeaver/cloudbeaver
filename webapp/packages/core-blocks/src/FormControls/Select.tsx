@@ -156,9 +156,9 @@ export const Select: ISelectType = observer(function Select({
 
   function itemRender(item: (typeof items)[number]): React.ReactNode {
     return (
-      <div className="select__item tw:truncate" title={item ? titleSelector?.(item) : undefined}>
+      <div className="select__item">
         {renderIcon(item)}
-        {valueSelector(item)}
+        <span className="tw:truncate tw:min-w-0" title={titleSelector?.(item) ?? valueSelector(item)}>{valueSelector(item)}</span>
       </div>
     );
   }
