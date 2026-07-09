@@ -72,6 +72,18 @@ export interface ISelectFieldProps<T, ItemType = ISelectItem<T>> {
   noItemsPlaceholder?: React.ReactNode;
 
   /**
+   * Items pinned above the scrollable list, always visible at the top of the popover.
+   * Uses the same item API (itemValue, itemRender, itemDisabled) as the main items list.
+   */
+  headerItems?: ItemType[];
+
+  /**
+   * Items pinned below the scrollable list, always visible at the bottom of the popover.
+   * Uses the same item API (itemValue, itemRender, itemDisabled) as the main items list.
+   */
+  footerItems?: ItemType[];
+
+  /**
    * Custom renderer for the selected value, overrides itemRenderer for the selected state
    * Only needed for special formatting of the selected value different from list items
    */
@@ -123,6 +135,8 @@ export function SelectField<T, ItemType extends {} = ISelectItem<T>>({
   isSeparator,
   label,
   noItemsPlaceholder = 'No items',
+  headerItems,
+  footerItems,
   description,
   disabled,
   required,
@@ -159,7 +173,8 @@ export function SelectField<T, ItemType extends {} = ISelectItem<T>>({
   const handleChange = (newValue: string | readonly string[]) => {
     // TODO: add support for multi-select
 
-    const newItem = items.find(item => getItemValueSerialized(item) === newValue);
+    const allItems = [...(headerItems ?? []), ...items, ...(footerItems ?? [])];
+    const newItem = allItems.find(item => getItemValueSerialized(item) === newValue);
     if (!newItem) {
       return;
     }
@@ -212,7 +227,13 @@ export function SelectField<T, ItemType extends {} = ISelectItem<T>>({
         {description && <span className="dbv-kit-select__description">{description}</span>}
 
         <SelectPopover autoFocusOnShow={autoFocusItemsOnShow} portal={portal} gutter={4} unmountOnHide>
-          {renderItems()}
+          {headerItems && headerItems.length > 0 && (
+            <SelectGroup className="dbv-kit-select__popover-header">{headerItems.map(renderSelectItem)}</SelectGroup>
+          )}
+          <div className="dbv-kit-select__popover-items">{renderItems()}</div>
+          {footerItems && footerItems.length > 0 && (
+            <SelectGroup className="dbv-kit-select__popover-footer">{footerItems.map(renderSelectItem)}</SelectGroup>
+          )}
         </SelectPopover>
       </SelectProvider>
     </div>

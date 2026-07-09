@@ -41,6 +41,8 @@ export type SelectBaseProps<TKey, TValue> = Omit<
     inline?: boolean;
     children?: string;
     portal?: boolean;
+    headerItems?: TValue[];
+    footerItems?: TValue[];
   };
 
 type ControlledProps<TKey, TValue> = SelectBaseProps<TKey, TValue> & {
@@ -78,6 +80,8 @@ export const Select: ISelectType = observer(function Select({
   inline,
   description,
   placeholder,
+  headerItems,
+  footerItems,
   id,
   keySelector = v => v,
   valueSelector = v => v,
@@ -194,6 +198,8 @@ export const Select: ISelectType = observer(function Select({
         itemRender={itemRender}
         itemDisabled={itemDisabled}
         isSeparator={isSeparator}
+        headerItems={headerItems}
+        footerItems={footerItems}
         name={name}
         disabled={disabled || readOnly}
         noItemsPlaceholder={translate('combobox_no_results_placeholder')}
