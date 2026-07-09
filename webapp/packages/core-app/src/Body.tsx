@@ -18,7 +18,6 @@ import { ScreenService } from '@cloudbeaver/core-routing';
 import { ThemeService } from '@cloudbeaver/core-theming';
 import { DNDProvider } from '@cloudbeaver/core-ui';
 import { useAppVersion } from '@cloudbeaver/core-version';
-import { ConnectionTypeResource } from '@cloudbeaver/core-connections';
 
 import style from './Body.module.css';
 import { useAppHeight } from './useAppHeight.js';
@@ -37,7 +36,6 @@ export const Body = observer(function Body() {
 
   // TODO: must be loaded in place where it is used
   useResource(Body, ProjectInfoResource, CachedMapAllKey, { silent: true });
-  useResource(Body, ConnectionTypeResource, CachedMapAllKey, { silent: true });
 
   // sync classes from theme with body for popup components and etc
   useLayoutEffect(() => {

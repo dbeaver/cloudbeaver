@@ -20,9 +20,6 @@
       "path": "../core-client-activity"
     },
     {
-      "path": "../core-connections"
-    },
-    {
       "path": "../core-di"
     },
     {

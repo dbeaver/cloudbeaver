@@ -23,7 +23,6 @@
   "dependencies": {
     "@cloudbeaver/core-blocks": "workspace:*",
     "@cloudbeaver/core-client-activity": "workspace:*",
-    "@cloudbeaver/core-connections": "workspace:*",
     "@cloudbeaver/core-di": "workspace:*",
     "@cloudbeaver/core-executor": "workspace:*",
     "@cloudbeaver/core-localization": "workspace:*",
