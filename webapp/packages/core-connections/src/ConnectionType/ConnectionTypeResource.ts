@@ -10,19 +10,27 @@ import { injectable } from '@cloudbeaver/core-di';
 import { CachedMapAllKey, CachedMapResource, resourceKeyList, type ResourceKey } from '@cloudbeaver/core-resource';
 import { SessionResource } from '@cloudbeaver/core-root';
 import { GraphQLService, type ConnectionType as ConnectionTypeFragment } from '@cloudbeaver/core-sdk';
+import { isNotNullDefined } from '@dbeaver/js-helpers';
+
+import { ConnectionInfoResource, createConnectionParam } from '../ConnectionInfoResource.js';
 
 export type ConnectionType = ConnectionTypeFragment;
 
 export const NEW_CONNECTION_TYPE_SYMBOL = Symbol('new-connection-type');
 export type NewConnectionType = ConnectionType & { [NEW_CONNECTION_TYPE_SYMBOL]: boolean; timestamp: number };
 
-@injectable(() => [GraphQLService, SessionResource])
+@injectable(() => [GraphQLService, ConnectionInfoResource, SessionResource])
 export class ConnectionTypeResource extends CachedMapResource<string, ConnectionType> {
   constructor(
     private readonly graphQLService: GraphQLService,
+    private readonly connectionInfoResource: ConnectionInfoResource,
     sessionResource: SessionResource,
   ) {
     super();
+
+    this.onItemDelete.addHandler(this.handleTypeChanges.bind(this));
+    this.onItemUpdate.addHandler(this.handleTypeChanges.bind(this));
+    this.onDataOutdated.addHandler(this.handleTypeChanges.bind(this));
 
     this.sync(
       sessionResource,
@@ -67,6 +75,31 @@ export class ConnectionTypeResource extends CachedMapResource<string, Connection
 
   protected override validateKey(key: string): boolean {
     return typeof key === 'string';
+  }
+
+  private handleTypeChanges(key: ResourceKey<string>) {
+    const types = this.get(key);
+
+    if (!types) {
+      return;
+    }
+
+    const typeIds: string[] = [];
+
+    if (Array.isArray(types)) {
+      typeIds.push(...types.filter(isNotNullDefined).map(type => type.id));
+    } else {
+      typeIds.push(types.id);
+    }
+
+    const connections = this.connectionInfoResource.values.filter(connection => typeIds.includes(connection.connectionType));
+
+    if (!connections.length) {
+      return;
+    }
+
+    const result = resourceKeyList(connections.map(connection => createConnectionParam(connection.projectId, connection.id)));
+    this.connectionInfoResource.markOutdated(result);
   }
 }
 
