@@ -82,10 +82,9 @@ export function isBindingPressed<T extends HTMLElement>(event: KeyboardEvent<T>,
 }
 
 export function parseHotkey(hotkey: string, combinationKey = '+'): Hotkey {
-  const keys = hotkey
-    .toLocaleLowerCase()
-    .split(combinationKey)
-    .map(k => mapKey(k));
+  hotkey = hotkey.toLocaleLowerCase();
+
+  const keys = hotkey.split(combinationKey).map(k => mapKey(k));
 
   const modifiers: Record<string, boolean> = {
     alt: keys.includes('alt'),
@@ -99,9 +98,11 @@ export function parseHotkey(hotkey: string, combinationKey = '+'): Hotkey {
 
   return {
     ...modifiers,
+    hotkey,
     keys: singleCharKeys,
     isSequence: false,
-    useKey: false,
+    metadata: undefined,
+    useKey: true,
     description: undefined,
   };
 }

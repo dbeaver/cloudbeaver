@@ -8,7 +8,15 @@ mkdir -p ./cloudbeaver/web
 cd ../../cloudbeaver/webapp
 
 yarn install --immutable
-cd ./packages/product-default
+yarn clear
+
+cd common-react
+yarn clear
+
+cd ../common-typescript
+yarn clear
+
+cd ../packages/product-default
 yarn run bundle
 
 if [[ "$?" -ne 0 ]] ; then
