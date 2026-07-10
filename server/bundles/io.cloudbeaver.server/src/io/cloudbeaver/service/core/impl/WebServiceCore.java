@@ -601,11 +601,7 @@ public class WebServiceCore implements DBWServiceCore {
             }
 
             testDataSource = (DataSourceDescriptor) dataSource.createCopy(dataSource.getRegistry());
-            WebDataSourceUtils.setConnectionConfiguration(
-                testDataSource.getDriver(),
-                testDataSource.getConnectionConfiguration(),
-                configInput
-            );
+            project.updateDataSourceContainerFromInput(configInput, testDataSource);
             if (configInput.getSelectedSecretId() != null) {
                 try {
                     dataSource.listSharedCredentials()

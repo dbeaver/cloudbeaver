@@ -357,6 +357,13 @@ public class WebSessionProjectImpl extends WebProjectImpl implements DBPAdaptabl
         return getInputConfigHandler(configInput).createDataSourceContainer();
     }
 
+    public void updateDataSourceContainerFromInput(
+        @NotNull WebConnectionConfig configInput,
+        @NotNull DataSourceDescriptor dataSource
+    ) throws DBWebException {
+        getInputConfigHandler(configInput).updateDataSource(dataSource);
+    }
+
     @NotNull
     public WebConnectionConfig getConnectionConfigInput(@Nullable Map<String, Object> configMap) {
         return new WebConnectionConfig(configMap == null ? Map.of() : configMap);
