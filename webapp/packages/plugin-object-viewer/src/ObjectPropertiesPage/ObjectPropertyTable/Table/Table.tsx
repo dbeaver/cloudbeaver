@@ -22,7 +22,7 @@ import { ObjectPropertyTableFooter } from '../ObjectPropertyTableFooter.js';
 import classes from './Table.module.css';
 import { ObjectMenuCell } from './ObjectMenuCell.js';
 import { SelectorFormatter } from './Columns/ColumnSelect/SelectorFormatter.js';
-import { createConnectionParam, useConnectionTypeColor, type IConnectionInfoParams } from '@cloudbeaver/core-connections';
+import { createConnectionParam, useConnectionTypeColor } from '@cloudbeaver/core-connections';
 
 export interface ITableProps {
   objects: DBObject[];
