@@ -29,7 +29,7 @@ import {
 import { useService } from '@cloudbeaver/core-di';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 import { CaptureView } from '@cloudbeaver/core-view';
-import { ConnectionTypeService, createConnectionParam } from '@cloudbeaver/core-connections';
+import { createConnectionParam, useConnectionTypeColor } from '@cloudbeaver/core-connections';
 
 import { type IDatabaseDataOptions } from '../DatabaseDataModel/IDatabaseDataOptions.js';
 import { DataPresentationService, DataPresentationType } from '../DataPresentationService.js';
@@ -69,7 +69,6 @@ export const TableViewer = observer<TableViewerProps, HTMLDivElement>(
     const dataViewerView = useService(DataViewerViewService);
     const dataPresentationService = useService(DataPresentationService);
     const tableViewerStorageService = useService(TableViewerStorageService);
-    const connectionTypeService = useService(ConnectionTypeService);
     const dataModel = tableViewerStorageService.get(tableId);
     const result = dataModel?.source.getResult(resultIndex);
     const loading = useStateDelay(dataModel?.isLoading() ?? true, 100);
@@ -185,6 +184,10 @@ export const TableViewer = observer<TableViewerProps, HTMLDivElement>(
     //   }
     // }, [dataFormat]);
 
+    const context = dataModel?.source instanceof ResultSetDataSource ? dataModel.source.executionContext?.context : undefined;
+    const connectionKey = context ? createConnectionParam(context.projectId, context.connectionId) : undefined;
+    const typeColor = useConnectionTypeColor(connectionKey);
+
     if (!dataModel) {
       return <TextPlaceholder>{translate('plugin_data_viewer_no_available_presentation')}</TextPlaceholder>;
     }
@@ -208,16 +211,6 @@ export const TableViewer = observer<TableViewerProps, HTMLDivElement>(
       overlay &&
       resultExist &&
       !simple;
-
-    let typeColor: string | undefined;
-
-    if (dataModel.source instanceof ResultSetDataSource) {
-      const context = dataModel.source.executionContext?.context;
-
-      if (context) {
-        typeColor = connectionTypeService.getConnectionTypeColor(createConnectionParam(context.projectId, context.connectionId));
-      }
-    }
 
     return (
       <CaptureView className={s(styles, { captureView: true })} view={dataViewerView}>

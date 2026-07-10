@@ -10,8 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { useDeferredValue } from 'react';
 
 import { s, useS, useVisible } from '@cloudbeaver/core-blocks';
-import { ConnectionTypeService } from '@cloudbeaver/core-connections';
-import { useService } from '@cloudbeaver/core-di';
+import { useConnectionTypeColor } from '@cloudbeaver/core-connections';
 import { isNotNullDefined } from '@dbeaver/js-helpers';
 
 import styles from './ConnectionIcon.module.css';
@@ -23,13 +22,11 @@ export const ConnectionIcon = observer<ConnectionIconProps>(function ConnectionI
   const { isVisible, setRef } = useVisible();
 
   const deferredIsVisible = useDeferredValue(isVisible);
-  const connectionTypeService = useService(ConnectionTypeService);
+  const typeColor = useConnectionTypeColor(connectionKey ?? undefined);
 
   if (!isNotNullDefined(connectionKey)) {
     return null;
   }
-
-  const typeColor = connectionTypeService.getConnectionTypeColor(connectionKey);
 
   return (
     <div ref={setRef} className={s(style, { connectionIcon: true }, className)}>

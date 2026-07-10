@@ -45,8 +45,6 @@ export class ConnectionTypeService {
       color = connectionType.colorDark;
     }
 
-    color = color ?? connectionType.colorLight;
-
     if (connectionType.predefined && color === PREDEFINED_UNSET_COLOR) {
       return;
     }

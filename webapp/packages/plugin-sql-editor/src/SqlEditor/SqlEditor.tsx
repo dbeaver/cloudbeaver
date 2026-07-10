@@ -13,7 +13,7 @@ import { useService } from '@cloudbeaver/core-di';
 import { type ITabData, TabList, TabListStyles, TabPanelList, TabsState, TabStyles } from '@cloudbeaver/core-ui';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 import { useCaptureViewContext } from '@cloudbeaver/core-view';
-import { ConnectionTypeService, createConnectionParam } from '@cloudbeaver/core-connections';
+import { createConnectionParam, useConnectionTypeColor } from '@cloudbeaver/core-connections';
 
 import { type ISqlEditorModeProps, SqlEditorModeService } from '../SqlEditorModeService.js';
 import { DATA_CONTEXT_SQL_EDITOR_DATA } from './DATA_CONTEXT_SQL_EDITOR_DATA.js';
@@ -34,7 +34,6 @@ export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ state, c
   const split = useSplit();
   const style = useS(styles, SqlEditorTab);
   const sqlEditorModeService = useService(SqlEditorModeService);
-  const connectionTypeService = useService(ConnectionTypeService);
 
   const data = useSqlEditor(state);
   useActiveQuery(data);
@@ -63,12 +62,9 @@ export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ state, c
     }
   }, [isEditorEmpty]);
 
-  let typeColor: string | undefined;
-
   const context = data.model.dataSource?.executionContext;
-  if (context) {
-    typeColor = connectionTypeService.getConnectionTypeColor(createConnectionParam(context.projectId, context.connectionId));
-  }
+  const connectionKey = context ? createConnectionParam(context.projectId, context.connectionId) : undefined;
+  const typeColor = useConnectionTypeColor(connectionKey);
 
   return (
     <TabsState

@@ -11,7 +11,7 @@ import { observer } from 'mobx-react-lite';
 import { Translate, TreeNodeNestedMessage } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NavNodeInfoResource, NodeManagerUtils } from '@cloudbeaver/core-navigation-tree';
-import { createConnectionParam, ConnectionTypeService } from '@cloudbeaver/core-connections';
+import { createConnectionParam, useConnectionTypeColor } from '@cloudbeaver/core-connections';
 import { clsx } from '@dbeaver/ui-kit';
 
 import type { NavigationNodeRendererComponent } from '../ElementsTree/NavigationNodeComponent.js';
@@ -40,7 +40,9 @@ const ConnectionTypeRenderer: NavigationNodeRendererComponent = observer(functio
 }) {
   const navNodeInfoResource = useService(NavNodeInfoResource);
   const node = navNodeInfoResource.get(nodeId);
-  const connectionTypeService = useService(ConnectionTypeService);
+
+  const connectionKey = node?.projectId && node.objectId ? createConnectionParam(node.projectId, node.objectId) : undefined;
+  const typeColor = useConnectionTypeColor(connectionKey);
 
   if (!node) {
     return (
@@ -50,25 +52,14 @@ const ConnectionTypeRenderer: NavigationNodeRendererComponent = observer(functio
     );
   }
 
-  const key = node.projectId && node.objectId ? createConnectionParam(node.projectId, node.objectId) : undefined;
-  let color: string | undefined;
-
-  if (key) {
-    const typeColor = connectionTypeService.getConnectionTypeColor(key);
-
-    if (typeColor) {
-      color = typeColor;
-    }
-  }
-
   return (
     <NavigationNodeRendererLoader
       node={node}
       path={path}
       expanded={expanded}
       dragging={dragging}
-      className={clsx(color && 'tw:[&>*:first-child]:border-l-2 tw:[&>*:first-child]:border-l-[var(--connection-type-color)]', className)}
-      style={color ? ({ ['--connection-type-color']: color } as React.CSSProperties) : undefined}
+      className={clsx(typeColor && 'tw:[&>*:first-child]:border-l-2 tw:[&>*:first-child]:border-l-[var(--connection-type-color)]', className)}
+      style={typeColor ? ({ ['--connection-type-color']: typeColor } as React.CSSProperties) : undefined}
       component={component}
     />
   );

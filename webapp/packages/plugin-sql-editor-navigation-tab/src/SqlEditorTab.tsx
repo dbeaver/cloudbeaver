@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
 
 import { IconOrImage, s, useObjectInfoTooltip, useTranslate } from '@cloudbeaver/core-blocks';
-import { ConnectionInfoResource, ConnectionTypeService, createConnectionParam } from '@cloudbeaver/core-connections';
+import { ConnectionInfoResource, createConnectionParam, useConnectionTypeColor } from '@cloudbeaver/core-connections';
 import { useDataContext, useDataContextLink } from '@cloudbeaver/core-data-context';
 import { useService } from '@cloudbeaver/core-di';
 import { ProjectInfoResource } from '@cloudbeaver/core-projects';
@@ -42,7 +42,6 @@ export const SqlEditorTab: TabHandlerTabComponent<ISqlEditorTabState> = observer
   const sqlDataSourceService = useService(SqlDataSourceService);
   const connectionInfo = useService(ConnectionInfoResource);
   const projectInfo = useService(ProjectInfoResource);
-  const connectionTypeService = useService(ConnectionTypeService);
 
   const translate = useTranslate();
 
@@ -64,12 +63,8 @@ export const SqlEditorTab: TabHandlerTabComponent<ISqlEditorTabState> = observer
   const handleClose = onClose ? ({ tabId }: ITabData<any>) => onClose(tabId) : undefined;
 
   const tooltip = useObjectInfoTooltip(connection?.name, executionContext?.defaultCatalog, executionContext?.defaultSchema, project?.name);
-
-  let typeColor: string | undefined;
-
-  if (executionContext) {
-    typeColor = connectionTypeService.getConnectionTypeColor(createConnectionParam(executionContext.projectId, executionContext.connectionId));
-  }
+  const connectionKey = executionContext ? createConnectionParam(executionContext.projectId, executionContext.connectionId) : undefined;
+  const typeColor = useConnectionTypeColor(connectionKey);
 
   return (
     <Tab
