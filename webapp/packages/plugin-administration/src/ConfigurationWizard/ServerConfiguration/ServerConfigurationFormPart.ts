@@ -20,6 +20,7 @@ import {
 import { FormPart, formValidationContext, type IFormState } from '@cloudbeaver/core-ui';
 import { isIp, isObjectsEqual, isValuesEqual, schema } from '@cloudbeaver/core-utils';
 import { LocalizationService } from '@cloudbeaver/core-localization';
+import { observable } from 'mobx';
 
 import { MIN_SESSION_EXPIRE_TIME } from './Form/MIN_SESSION_EXPIRE_TIME.js';
 import { ServerConfigStateSchema, type IServerConfigurationFormPartState } from './IServerConfigurationFormPartState.js';
@@ -66,9 +67,11 @@ export class ServerConfigurationFormPart extends FormPart<IServerConfigurationFo
     if (this.schema instanceof schema.ZodObject) {
       const serverConfigShape = (this.schema.shape as any).serverConfig;
       if (serverConfigShape instanceof schema.ZodObject) {
-        (this as { schema: unknown }).schema = this.schema.extend({
-          serverConfig: serverConfigShape.extend(extension),
-        });
+        this.schema = observable(
+          this.schema.extend({
+            serverConfig: serverConfigShape.extend(extension),
+          }) as unknown as schema.ZodType<IServerConfigurationFormPartState>,
+        );
       }
     }
   }
