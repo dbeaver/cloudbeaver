@@ -13,12 +13,14 @@ import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import { useService } from '@cloudbeaver/core-di';
 import { isNotNullDefined } from '@dbeaver/js-helpers';
 import { ColorIndicator } from '@dbeaver/ui-kit';
-import { ConnectionTypeResource, ConnectionTypeService } from '@cloudbeaver/core-connections';
+import { ConnectionTypeResource, ConnectionTypeService, DEFAULT_TYPE_ID } from '@cloudbeaver/core-connections';
 import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
 
 interface Props {
   config: ConnectionConfig;
 }
+
+const TRANSPARENT_COLOR_VALUE = 'rgba(0,0,0,0)';
 
 export const ConnectionTypeForm = observer<Props>(function ConnectionTypeForm({ config }) {
   const translate = useTranslate();
@@ -36,10 +38,10 @@ export const ConnectionTypeForm = observer<Props>(function ConnectionTypeForm({ 
           name="connectionType"
           state={config}
           keySelector={t => t.id}
-          valueSelector={t => t.name}
+          valueSelector={t => (t.id === DEFAULT_TYPE_ID ? `${t.name} (${translate('ui_default')})` : t.name)}
           iconSelector={t => {
             const color = connectionTypeService.getTypeColor(t.id);
-            return color ? <ColorIndicator className="tw:w-3.5! tw:h-3.5!" color={color} /> : undefined;
+            return <ColorIndicator className="tw:w-3.5! tw:h-3.5!" color={color ?? TRANSPARENT_COLOR_VALUE} />;
           }}
         />
       </Container>

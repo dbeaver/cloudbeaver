@@ -158,6 +158,7 @@ export default [
   ['ui_allow', 'Allow'],
   ['ui_decline', 'Decline'],
   ['ui_declined', 'Declined'],
+  ['ui_default', 'Default'],
 
   ['root_permission_denied', "You don't have permissions"],
   ['root_permission_no_permission', "You don't have permission for this action"],

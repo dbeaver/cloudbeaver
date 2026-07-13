@@ -130,3 +130,5 @@ export function mapColorValue(value: string): string {
 export const DEFAULT_LIGHT_COLOR = '0,0,0';
 export const DEFAULT_DARK_COLOR = '255,255,255';
 export const PREDEFINED_UNSET_COLOR = '255,255,255';
+
+export const DEFAULT_TYPE_ID = 'dev';
