@@ -8,7 +8,7 @@
 
 import { injectable } from '@cloudbeaver/core-di';
 import { CachedMapAllKey, CachedMapResource, resourceKeyList, type ResourceKey } from '@cloudbeaver/core-resource';
-import { SessionResource } from '@cloudbeaver/core-root';
+import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { GraphQLService, type ConnectionType as ConnectionTypeFragment } from '@cloudbeaver/core-sdk';
 import { isNotNullDefined } from '@dbeaver/js-helpers';
 
@@ -19,12 +19,12 @@ export type ConnectionType = ConnectionTypeFragment;
 export const NEW_CONNECTION_TYPE_SYMBOL = Symbol('new-connection-type');
 export type NewConnectionType = ConnectionType & { [NEW_CONNECTION_TYPE_SYMBOL]: boolean; timestamp: number };
 
-@injectable(() => [GraphQLService, ConnectionInfoResource, SessionResource])
+@injectable(() => [GraphQLService, ConnectionInfoResource, ServerConfigResource])
 export class ConnectionTypeResource extends CachedMapResource<string, ConnectionType> {
   constructor(
     private readonly graphQLService: GraphQLService,
     private readonly connectionInfoResource: ConnectionInfoResource,
-    sessionResource: SessionResource,
+    serverConfigResource: ServerConfigResource,
   ) {
     super();
 
@@ -33,7 +33,7 @@ export class ConnectionTypeResource extends CachedMapResource<string, Connection
     this.onDataOutdated.addHandler(this.handleTypeChanges.bind(this));
 
     this.sync(
-      sessionResource,
+      serverConfigResource,
       () => {},
       () => CachedMapAllKey,
     );

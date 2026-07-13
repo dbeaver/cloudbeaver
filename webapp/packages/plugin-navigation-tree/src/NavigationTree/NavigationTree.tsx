@@ -13,6 +13,7 @@ import { useService } from '@cloudbeaver/core-di';
 import { NavNodeInfoResource, NavTreeResource, ProjectsNavNodeService, ROOT_NODE_PATH } from '@cloudbeaver/core-navigation-tree';
 import { ProjectsService } from '@cloudbeaver/core-projects';
 import { CaptureView } from '@cloudbeaver/core-view';
+import { useConnectionTypeLoader } from '@cloudbeaver/core-connections';
 
 import { ElementsTreeToolsStyles } from '../index.js';
 import { NavNodeViewService } from '../NodesManager/NavNodeView/NavNodeViewService.js';
@@ -40,7 +41,6 @@ import { navigationTreeProjectsRendererRenderer } from './ProjectsRenderer/navig
 import { ProjectsSettingsPlaceholderElement } from './ProjectsRenderer/ProjectsSettingsForm.js';
 import { useNavigationTree } from './useNavigationTree.js';
 import { TableContentsSettingsPlaceholderElement } from './ElementsTree/ElementsTreeTools/NavigationTreeSettings/TableContentsSettingsForm.js';
-import { navTreeConnectionTypeRenderer } from './ConnectionTypeRenderer/navTreeConnectionTypeRenderer.js';
 
 const registry: StyleRegistry = [
   [
@@ -62,6 +62,8 @@ export const NavigationTree = observer(function NavigationTree() {
   const navTreeResource = useService(NavTreeResource);
   const navNodeViewService = useService(NavNodeViewService);
 
+  useConnectionTypeLoader();
+
   const root = ROOT_NODE_PATH;
   const { handleOpen, handleSelect, handleSelectReset } = useNavigationTree();
 
@@ -76,7 +78,6 @@ export const NavigationTree = observer(function NavigationTree() {
 
   const duplicateFilter = useMemo(() => navigationTreeDuplicateFilter(navNodeViewService), [navNodeViewService]);
   const connectionRenderer = useMemo(() => navTreeConnectionRenderer(navNodeInfoResource), [navNodeInfoResource]);
-  const connectionTypeRenderer = useMemo(() => navTreeConnectionTypeRenderer(navNodeInfoResource), [navNodeInfoResource]);
   const projectsRendererRenderer = useMemo(() => navigationTreeProjectsRendererRenderer(navNodeInfoResource), [navNodeInfoResource]);
   const projectsExpandStateGetter = useMemo(
     () => navigationTreeProjectsExpandStateGetter(navNodeInfoResource, projectsService, projectsNavNodeService),
@@ -113,7 +114,7 @@ export const NavigationTree = observer(function NavigationTree() {
           root={root}
           localState={navTreeService.treeState}
           filters={[duplicateFilter, connectionGroupFilter, projectFilter]}
-          renderers={[projectsRendererRenderer, navigationTreeConnectionGroupRenderer, connectionRenderer, connectionTypeRenderer]}
+          renderers={[projectsRendererRenderer, navigationTreeConnectionGroupRenderer, connectionRenderer]}
           navNodeFilterCompare={navigationTreeProjectSearchCompare}
           nodeInfoTransformers={[transformFilteredNode, transformDescriptionNode]}
           expandStateGetters={[projectsExpandStateGetter]}

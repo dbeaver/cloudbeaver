@@ -8,15 +8,12 @@
 
 import { ConnectionTypeResource } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 
 @injectable(() => [ConnectionTypeResource])
 export class PluginBootstrap extends Bootstrap {
-  constructor(private readonly connectionTypeResource: ConnectionTypeResource) {
+  constructor() {
     super();
   }
 
-  override async load(): Promise<void> {
-    await this.connectionTypeResource.load(CachedMapAllKey);
-  }
+  override async load(): Promise<void> {}
 }
