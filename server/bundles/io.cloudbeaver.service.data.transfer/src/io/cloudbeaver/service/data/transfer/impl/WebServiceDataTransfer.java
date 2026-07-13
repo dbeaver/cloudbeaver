@@ -317,7 +317,7 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
             properties,
             producer.getProject());
 
-        producer.transferData(monitor, consumer, null, producerSettings, null);
+        producer.transferData(monitor, consumer, null, producerSettings, null, -1);
 
         consumer.finishTransfer(monitor, false);
     }
@@ -374,7 +374,7 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
             databaseMappingContainer.setTarget(dataContainer);
             consumer.setContainerMapping(databaseMappingContainer);
             try {
-                producer.transferData(monitor, consumer, processorInstance, producerSettings, null);
+                producer.transferData(monitor, consumer, processorInstance, producerSettings, null, -1);
                 if (monitor.isCanceled()) {
                     throw new DBWebException("Import is canceled");
                 }
