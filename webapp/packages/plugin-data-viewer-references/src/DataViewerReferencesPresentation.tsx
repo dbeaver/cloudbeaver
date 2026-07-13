@@ -19,6 +19,7 @@ import {
   type DataPresentationComponent,
   IDatabaseDataMetadataAction,
   IDatabaseReferencesAction,
+  type ISqlResultAssociation,
   isResultSetDataModel,
   ResultSetReferencesAction,
   TableViewerLoader,
@@ -85,12 +86,13 @@ export const DataViewerReferencesPresentation: DataPresentationComponent = obser
       <div className="tw:flex tw:flex-col tw:h-full tw:gap-2 tw:bg-(--theme-secondary)">
         <div className="tw:flex tw:gap-2 tw:items-center">
           <Select
-            className="tw:flex-1"
+            className="tw:flex-1 tw:min-w-18"
             state={state}
             name="associationId"
             items={associations}
             keySelector={association => association.id}
-            valueSelector={association => `${association.targetEntityName ? `${association.targetEntityName} ` : ''}(${association.associationName})`}
+            titleSelector={getValueSelector}
+            valueSelector={getValueSelector}
             iconSelector={association => (
               <IconOrImage
                 className={clsx(association.reference && 'tw:rotate-180')}
@@ -126,3 +128,7 @@ export const DataViewerReferencesPresentation: DataPresentationComponent = obser
     </CaptureViewScope>
   );
 });
+
+function getValueSelector(association: ISqlResultAssociation): string {
+  return `${association.targetEntityName ? `${association.targetEntityName} ` : ''}(${association.associationName})`;
+}
