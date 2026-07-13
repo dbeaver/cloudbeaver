@@ -128,5 +128,5 @@ export function mapColorValue(value: string): string {
 }
 
 export const PREDEFINED_UNSET_COLOR = '255,255,255';
-
+export const MAPPED_PREDEFINED_UNSET_COLOR = `rgba(${PREDEFINED_UNSET_COLOR}, 0)`;
 export const DEFAULT_TYPE_ID = 'dev';
