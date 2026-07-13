@@ -52,6 +52,7 @@ public class RPAuthProvider implements SMAuthProviderExternal<SMSession>, SMSign
     public static final String X_FULL_NAME = "X-Full-name";
     public static final String AUTH_PROVIDER = "reverseProxy";
     public static final String LOGOUT_URL = "logout-url";
+    public static final String PARAM_AUTO_USER_PROVISIONING = "auto-user-provisioning";
 
     @NotNull
     @Override

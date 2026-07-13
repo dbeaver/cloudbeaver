@@ -20,7 +20,12 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import io.cloudbeaver.DBWConstants;
-import io.cloudbeaver.auth.*;
+import io.cloudbeaver.auth.SMAuthProviderAssigner;
+import io.cloudbeaver.auth.SMAuthProviderExternal;
+import io.cloudbeaver.auth.SMAuthProviderFederated;
+import io.cloudbeaver.auth.SMAutoAssign;
+import io.cloudbeaver.auth.SMBruteForceProtected;
+import io.cloudbeaver.auth.provider.rp.RPAuthProvider;
 import io.cloudbeaver.model.app.ServletAuthApplication;
 import io.cloudbeaver.model.app.ServletAuthConfiguration;
 import io.cloudbeaver.model.config.SMControllerConfiguration;
@@ -39,7 +44,19 @@ import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPConnectionInformation;
 import org.jkiss.dbeaver.model.DBPPage;
-import org.jkiss.dbeaver.model.auth.*;
+import org.jkiss.dbeaver.model.auth.AuthPropertyDescriptor;
+import org.jkiss.dbeaver.model.auth.AuthPropertyEncryption;
+import org.jkiss.dbeaver.model.auth.SMAuthConfiguration;
+import org.jkiss.dbeaver.model.auth.SMAuthConfigurationReference;
+import org.jkiss.dbeaver.model.auth.SMAuthInfo;
+import org.jkiss.dbeaver.model.auth.SMAuthProvider;
+import org.jkiss.dbeaver.model.auth.SMAuthStatus;
+import org.jkiss.dbeaver.model.auth.SMAuthenticationManager;
+import org.jkiss.dbeaver.model.auth.SMCredentials;
+import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
+import org.jkiss.dbeaver.model.auth.SMObjectType;
+import org.jkiss.dbeaver.model.auth.SMSessionType;
+import org.jkiss.dbeaver.model.auth.SMTokenInfo;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.impl.jdbc.JDBCUtils;
@@ -47,11 +64,30 @@ import org.jkiss.dbeaver.model.impl.jdbc.exec.JDBCTransaction;
 import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.runtime.LoggingProgressMonitor;
-import org.jkiss.dbeaver.model.security.*;
+import org.jkiss.dbeaver.model.security.SMAdminController;
+import org.jkiss.dbeaver.model.security.SMAuthCredentialsProfile;
+import org.jkiss.dbeaver.model.security.SMAuthProviderCustomConfiguration;
+import org.jkiss.dbeaver.model.security.SMAuthProviderDescriptor;
+import org.jkiss.dbeaver.model.security.SMConstants;
+import org.jkiss.dbeaver.model.security.SMObjectPermissionsGrant;
+import org.jkiss.dbeaver.model.security.SMObjectSettings;
+import org.jkiss.dbeaver.model.security.SMPropertyDescriptor;
+import org.jkiss.dbeaver.model.security.SMStandardMeta;
+import org.jkiss.dbeaver.model.security.SMSubjectType;
+import org.jkiss.dbeaver.model.security.SMTeamMemberInfo;
+import org.jkiss.dbeaver.model.security.SMTokens;
 import org.jkiss.dbeaver.model.security.exception.SMAccessTokenExpiredException;
 import org.jkiss.dbeaver.model.security.exception.SMException;
 import org.jkiss.dbeaver.model.security.exception.SMRefreshTokenExpiredException;
-import org.jkiss.dbeaver.model.security.user.*;
+import org.jkiss.dbeaver.model.security.user.SMAuthPermissions;
+import org.jkiss.dbeaver.model.security.user.SMObjectPermissions;
+import org.jkiss.dbeaver.model.security.user.SMSubject;
+import org.jkiss.dbeaver.model.security.user.SMTeam;
+import org.jkiss.dbeaver.model.security.user.SMUser;
+import org.jkiss.dbeaver.model.security.user.SMUserFilter;
+import org.jkiss.dbeaver.model.security.user.SMUserImportList;
+import org.jkiss.dbeaver.model.security.user.SMUserProvisioning;
+import org.jkiss.dbeaver.model.security.user.SMUserTeam;
 import org.jkiss.dbeaver.model.sql.SQLUtils;
 import org.jkiss.dbeaver.model.websocket.event.WSObjectSettingsEvent;
 import org.jkiss.dbeaver.model.websocket.event.WSUserCloseSessionsEvent;
@@ -65,10 +101,27 @@ import org.jkiss.utils.SecurityUtils;
 
 import java.lang.reflect.Type;
 import java.net.URI;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.sql.Types;
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -2883,7 +2936,13 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                 + authProvider.getId() + "' auth provider with credentials of user '"
                 + userIdFromCredentials + "'");
         }
-        if (userId == null && createNewUserIfNotExist) {
+        boolean createUser = createNewUserIfNotExist;
+        if (RPAuthProvider.AUTH_PROVIDER.equals(authProvider.getId())) {
+            // For reverse proxy, automatic creation of a missing user is controlled by a config flag.
+            // When the flag is absent we keep the previous behavior and create the user (backward compatibility).
+            createUser = createUser && isReverseProxyAutoUserProvisioningEnabled(providerConfig);
+        }
+        if (userId == null && createUser) {
             if (!(authProvider.getInstance() instanceof SMAuthProviderExternal<?>)) {
                 return null;
             }
@@ -2913,6 +2972,16 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
             }
         }
         return userId;
+    }
+
+    private boolean isReverseProxyAutoUserProvisioningEnabled(@Nullable SMAuthProviderCustomConfiguration providerConfig) {
+        if (providerConfig == null) {
+            return true;
+        }
+        return CommonUtils.getBoolean(
+            providerConfig.getParameters().get(RPAuthProvider.PARAM_AUTO_USER_PROVISIONING),
+            true
+        );
     }
 
     @Nullable
