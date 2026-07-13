@@ -50,14 +50,7 @@ export function ComboboxPopover({ children, className, portal: portalProp, ...pr
   const portal = (popoverContext.portal || portalProp) ?? false;
 
   return (
-    <AriaComboboxPopover
-      gutter={8}
-      className={clsx('dbv-kit-combobox__popover', className)}
-      portal={portal}
-      sameWidth
-      unmountOnHide
-      {...props}
-    >
+    <AriaComboboxPopover gutter={4} className={clsx('dbv-kit-combobox__popover', className)} portal={portal} sameWidth unmountOnHide {...props}>
       {children}
     </AriaComboboxPopover>
   );
