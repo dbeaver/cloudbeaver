@@ -13,6 +13,7 @@ import { useService } from '@cloudbeaver/core-di';
 import { NavNodeInfoResource, NavTreeResource, ProjectsNavNodeService, ROOT_NODE_PATH } from '@cloudbeaver/core-navigation-tree';
 import { ProjectsService } from '@cloudbeaver/core-projects';
 import { CaptureView } from '@cloudbeaver/core-view';
+import { useConnectionTypeLoader } from '@cloudbeaver/core-connections';
 
 import { ElementsTreeToolsStyles } from '../index.js';
 import { NavNodeViewService } from '../NodesManager/NavNodeView/NavNodeViewService.js';
@@ -60,6 +61,8 @@ export const NavigationTree = observer(function NavigationTree() {
   const navNodeInfoResource = useService(NavNodeInfoResource);
   const navTreeResource = useService(NavTreeResource);
   const navNodeViewService = useService(NavNodeViewService);
+
+  useConnectionTypeLoader();
 
   const root = ROOT_NODE_PATH;
   const { handleOpen, handleSelect, handleSelectReset } = useNavigationTree();

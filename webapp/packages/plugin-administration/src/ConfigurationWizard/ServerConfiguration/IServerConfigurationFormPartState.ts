@@ -7,7 +7,7 @@
  */
 import { schema } from '@cloudbeaver/core-utils';
 
-const ServerConfigurationFormPartStateConfigSchema = schema.object({
+const ServerConfigurationFormPartStateConfigSchema = schema.looseObject({
   adminCredentialsSaveEnabled: schema.boolean().optional(),
   adminName: schema.string().trim().optional(),
   adminPassword: schema.string().trim().optional(),
