@@ -16,7 +16,7 @@ import { useDNDData } from '@cloudbeaver/core-ui';
 
 import { useNavTreeDropBox } from '../../useNavTreeDropBox.js';
 import type { NavigationNodeComponent } from '../NavigationNodeComponent.js';
-import style from './NavigationNode.module.css';
+import componentStyle from './NavigationNode.module.css';
 import { DATA_ATTRIBUTE_NODE_EDITING } from './NavigationNode/DATA_ATTRIBUTE_NODE_EDITING.js';
 import { NavigationNodeNested } from './NavigationNode/NavigationNodeNested.js';
 import { NavigationNodeControlRenderer } from './NavigationNodeControlRenderer.js';
@@ -29,8 +29,9 @@ export const NavigationNode: NavigationNodeComponent = observer(function Navigat
   control: externalControl,
   expanded: externalExpanded,
   className,
+  style,
 }) {
-  const styles = useS(style);
+  const styles = useS(componentStyle);
   const navNodeManagerService = useService(NavNodeManagerService);
   const navNode = useNavigationNode(node, path);
   const context = useDataContext();
@@ -96,6 +97,7 @@ export const NavigationNode: NavigationNodeComponent = observer(function Navigat
       externalExpanded={externalExpanded}
       leaf={navNode.leaf}
       className={s(styles, { treeNode: true, hovered: hasNodes, expanded: externalExpanded ?? navNode.expanded }, className)}
+      style={style}
       onExpand={navNode.expand}
       onClick={navNode.click}
       onOpen={navNode.open}

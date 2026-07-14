@@ -13,19 +13,19 @@ import { getComputed, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
 
 import { TabContext } from '../TabContext.js';
 import { useTabDragAndDrop } from '../useTabDragAndDrop.js';
-import style from './Tab.module.css';
+import componentStyles from './Tab.module.css';
 import { TabActions } from './TabActions.js';
 import type { TabProps } from './TabProps.js';
 import { useTab } from './useTab.js';
 
 export const Tab = observer<TabProps>(function Tab({ after, ...props }) {
   const translate = useTranslate();
-  const { tabId, title, disabled, className, children, onOpen, onClose, onClick } = props;
+  const { tabId, title, disabled, className, style, children, onOpen, onClose, onClick } = props;
   const ref = useRef<HTMLButtonElement>(null);
   const tabContext = useMemo(() => ({ tabId }), [tabId]);
   const tab = useTab(tabId, onOpen, onClose, onClick);
   const info = tab.getInfo();
-  const styles = useS(style);
+  const styles = useS(componentStyles);
   const canClose = getComputed(() => !!onClose || (tab.closable && tab.state.closable));
 
   const {
@@ -76,6 +76,7 @@ export const Tab = observer<TabProps>(function Tab({ after, ...props }) {
             title={translate(title ?? info?.title)}
             id={tabId}
             className={s(styles, { tab: true }, className)}
+            style={style}
             disabled={disabled}
             tabbable
             onClick={tab.handleOpen}

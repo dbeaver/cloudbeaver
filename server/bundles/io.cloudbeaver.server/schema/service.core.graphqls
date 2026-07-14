@@ -664,6 +664,8 @@ type ConnectionType @since(version: "26.1.2") {
     autoCloseConnections: Boolean!
     "Auto-close idle connections period in seconds for this connection type"
     closeIdleConnectionPeriod: Int!
+    "Specifies whether this connection type is system-defined or user-defined. System-defined connection types cannot be deleted."
+    predefined: Boolean!
 }
 
 ####################################################

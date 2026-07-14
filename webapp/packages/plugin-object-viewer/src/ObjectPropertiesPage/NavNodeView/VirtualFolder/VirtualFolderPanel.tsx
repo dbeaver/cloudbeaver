@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -49,7 +49,7 @@ export const VirtualFolderPanel: NavNodeTransformViewComponent = observer(functi
         <TextPlaceholder>{translate('plugin_object_viewer_table_no_items')}</TextPlaceholder>
       ) : (
         <div className={classes['tabWrapper']}>
-          <TableLoader objects={objects} hasNextPage={pagination?.hasNextPage ?? false} loadMore={pagination.loadMore} />
+          <TableLoader objects={objects} objectId={nodeId} hasNextPage={pagination?.hasNextPage ?? false} loadMore={pagination.loadMore} />
         </div>
       )}
     </>

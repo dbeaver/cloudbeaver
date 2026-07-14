@@ -28,7 +28,7 @@
   }
 
   &:not(:global([aria-selected='true'])) {
-    background-color: transparent !important;
+    background-color: transparent;
   }
 }
 

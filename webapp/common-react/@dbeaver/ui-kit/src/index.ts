@@ -26,7 +26,9 @@ export { IconButton, IconButtonBase, type IconButtonProps } from './IconButton/I
 export { Checkbox, CheckboxBase, type CheckboxProps } from './Checkbox/Checkbox.js';
 export { CheckboxIndicator, type ICheckboxIndicatorProps } from './Checkbox/CheckboxIndicator.js';
 export { ColorPicker } from './ColorPicker/ColorPicker.js';
+export { ColorIndicator } from './ColorPicker/ColorIndicator.js';
 export { ColorPickerBase, type ColorPickerProps } from './ColorPicker/ColorPickerBase.js';
+export { normalizeColorToRgb } from './ColorPicker/colorUtils.js';
 export { Input, InputBase, type InputProps } from './Input/Input.js';
 export {
   SearchPanel,

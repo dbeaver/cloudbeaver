@@ -29,6 +29,7 @@ import {
 import { useService } from '@cloudbeaver/core-di';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 import { CaptureView } from '@cloudbeaver/core-view';
+import { createConnectionParam, useConnectionTypeColor } from '@cloudbeaver/core-connections';
 
 import { type IDatabaseDataOptions } from '../DatabaseDataModel/IDatabaseDataOptions.js';
 import { DataPresentationService, DataPresentationType } from '../DataPresentationService.js';
@@ -44,6 +45,7 @@ import { TableToolsPanel } from './TableToolsPanel.js';
 import style from './TableViewer.module.css';
 import { TableViewerStorageService } from './TableViewerStorageService.js';
 import { IDatabaseDataConstraintAction } from '../DatabaseDataModel/Actions/IDatabaseDataConstraintAction.js';
+import { ResultSetDataSource } from '../ResultSet/ResultSetDataSource.js';
 
 export interface TableViewerProps {
   tableId: string;
@@ -182,6 +184,10 @@ export const TableViewer = observer<TableViewerProps, HTMLDivElement>(
     //   }
     // }, [dataFormat]);
 
+    const context = dataModel?.source instanceof ResultSetDataSource ? dataModel.source.executionContext?.context : undefined;
+    const connectionKey = context ? createConnectionParam(context.projectId, context.connectionId) : undefined;
+    const typeColor = useConnectionTypeColor(connectionKey);
+
     if (!dataModel) {
       return <TextPlaceholder>{translate('plugin_data_viewer_no_available_presentation')}</TextPlaceholder>;
     }
@@ -208,7 +214,7 @@ export const TableViewer = observer<TableViewerProps, HTMLDivElement>(
 
     return (
       <CaptureView className={s(styles, { captureView: true })} view={dataViewerView}>
-        <div ref={mergedRef} tabIndex={0} className={s(styles, { tableViewer: true }, className)}>
+        <div ref={mergedRef} tabIndex={0} className={s(styles, { tableViewer: true }, className)} style={{ background: typeColor }}>
           <div className={s(styles, { tableContent: true })}>
             {!isStatistics && (
               <TablePresentationBar
@@ -292,7 +298,14 @@ export const TableViewer = observer<TableViewerProps, HTMLDivElement>(
               />
             )}
           </div>
-          <TableFooter model={dataModel} resultIndex={resultIndex} simple={simple} tabIndex={0} data-presentation-tools />
+          <TableFooter
+            style={{ background: typeColor }}
+            model={dataModel}
+            resultIndex={resultIndex}
+            simple={simple}
+            tabIndex={0}
+            data-presentation-tools
+          />
         </div>
       </CaptureView>
     );
