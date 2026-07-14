@@ -2866,7 +2866,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         @Nullable String activeUserId,
         boolean createNewUserIfNotExist,
         @Nullable String authRole,
-        SMAuthProviderCustomConfiguration providerConfig
+        @Nullable SMAuthProviderCustomConfiguration providerConfig
     ) throws DBException {
         SMAuthProvider<?> smAuthProviderInstance = authProvider.getInstance();
 
@@ -2887,7 +2887,6 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         if (createUser && providerConfig != null
             && smAuthProviderInstance instanceof SMAuthProviderExternal<?> externalProvider) {
             // Whether a missing user is auto-provisioned is decided by the provider itself
-            // (default true; reverse proxy consults its auto-user-provisioning config parameter).
             createUser = externalProvider.isAutoUserProvisioningEnabled(providerConfig);
         }
         if (userId == null && createUser) {
