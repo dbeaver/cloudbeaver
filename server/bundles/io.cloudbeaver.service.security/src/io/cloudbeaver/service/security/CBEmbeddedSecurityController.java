@@ -2883,17 +2883,16 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                 + authProvider.getId() + "' auth provider with credentials of user '"
                 + userIdFromCredentials + "'");
         }
-        boolean createUser = createNewUserIfNotExist;
-        if (createUser && providerConfig != null
-            && smAuthProviderInstance instanceof SMAuthProviderExternal<?> externalProvider) {
-            // Whether a missing user is auto-provisioned is decided by the provider itself
-            createUser = externalProvider.isAutoUserProvisioningEnabled(providerConfig);
-        }
-        if (userId == null && createUser) {
-            if (!(authProvider.getInstance() instanceof SMAuthProviderExternal<?>)) {
+        if (userId == null && createNewUserIfNotExist) {
+            if (!(smAuthProviderInstance instanceof SMAuthProviderExternal<?> externalProvider)) {
                 return null;
             }
-
+            if (providerConfig != null) {
+                return null;
+            }
+            if (!externalProvider.isAutoUserProvisioningEnabled(providerConfig)) {
+                return null;
+            }
             userId = authProvider.isCaseInsensitive() ? userIdFromCredentials.toLowerCase() : userIdFromCredentials;
             if (!isSubjectExists(userId)) {
                 log.debug("Create user: " + userId);
