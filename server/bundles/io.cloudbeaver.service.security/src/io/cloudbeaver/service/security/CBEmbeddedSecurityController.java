@@ -2887,9 +2887,6 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
             if (!(smAuthProviderInstance instanceof SMAuthProviderExternal<?> externalProvider)) {
                 return null;
             }
-            if (providerConfig == null) {
-                return null;
-            }
             if (!externalProvider.isAutoUserProvisioningEnabled(providerConfig)) {
                 return null;
             }

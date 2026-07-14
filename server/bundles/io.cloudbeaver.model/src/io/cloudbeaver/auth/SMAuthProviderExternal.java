@@ -72,7 +72,7 @@ public interface SMAuthProviderExternal<AUTH_SESSION extends SMSession> extends 
     /**
      * Whether a user that is not found should be provisioned (auto-created) on external login.
      */
-    default boolean isAutoUserProvisioningEnabled(@NotNull SMAuthProviderCustomConfiguration providerConfig) {
+    default boolean isAutoUserProvisioningEnabled(@Nullable SMAuthProviderCustomConfiguration providerConfig) {
         return true;
     }
 
