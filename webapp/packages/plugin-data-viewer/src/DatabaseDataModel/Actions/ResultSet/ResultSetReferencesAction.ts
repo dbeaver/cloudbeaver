@@ -17,7 +17,7 @@ import { IDatabaseDataResult } from '../../IDatabaseDataResult.js';
 import { DatabaseDataAction } from '../../DatabaseDataAction.js';
 import type { IDatabaseReferencesAction } from '../IDatabaseReferencesAction.js';
 
-interface ISqlResultAssociation extends SqlResultAssociation {
+export interface ISqlResultAssociation extends SqlResultAssociation {
   id: string;
 }
 
