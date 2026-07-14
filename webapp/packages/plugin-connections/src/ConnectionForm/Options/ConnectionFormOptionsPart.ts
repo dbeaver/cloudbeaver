@@ -58,6 +58,7 @@ const defaultStateGetter = (connectionId?: string, credentials?: Record<string, 
     expertSettingsValues: {},
     networkHandlersConfig: [],
     providerProperties: {},
+    connectionType: 'dev',
   }) as IConnectionFormOptionsState;
 
 export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsState, IConnectionFormState> {
@@ -200,10 +201,11 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
       return;
     }
 
-    const [authPropertiesInfo, customOptionsInfo, providerPropertiesInfo] = await Promise.all([
+    const [authPropertiesInfo, customOptionsInfo, providerPropertiesInfo, connection] = await Promise.all([
       this.connectionInfoAuthPropertiesResource.load(this.connectionKey),
       this.connectionInfoCustomOptionsResource.load(this.connectionKey),
       this.connectionInfoProviderPropertiesResource.load(this.connectionKey),
+      this.connectionInfoResource.load(this.connectionKey),
     ]);
 
     const config: ConnectionConfig = defaultStateGetter();
@@ -222,6 +224,8 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
 
     config.url = customOptionsInfo.url;
     config.folder = customOptionsInfo.folder;
+
+    config.connectionType = connection.connectionType;
 
     config.authModelId = authPropertiesInfo.authModel;
     config.saveCredentials = authPropertiesInfo.credentialsSaved;

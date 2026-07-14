@@ -13,4 +13,5 @@ fragment DatabaseConnection on ConnectionInfo {
   canViewSettings
   canEdit
   canDelete
+  connectionType
 }
