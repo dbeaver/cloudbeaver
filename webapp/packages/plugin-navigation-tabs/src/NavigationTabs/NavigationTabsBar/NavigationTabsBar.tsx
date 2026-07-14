@@ -14,6 +14,7 @@ import { Loader, SContext, type StyleRegistry, useExecutor } from '@cloudbeaver/
 import { useService } from '@cloudbeaver/core-di';
 import { type ITabData, TabList, TabPanel, TabsState, TabStyles } from '@cloudbeaver/core-ui';
 import { CaptureView } from '@cloudbeaver/core-view';
+import { useConnectionTypeLoader } from '@cloudbeaver/core-connections';
 import { clsx } from '@dbeaver/ui-kit';
 
 import { NavigationTabsService } from '../NavigationTabsService.js';
@@ -47,6 +48,8 @@ export const NavigationTabsBar = observer<Props>(function NavigationTabsBar({ cl
 
   const handleSelect = useCallback((tabId: string) => navigation.selectTab(tabId), [navigation]);
   const handleClose = useCallback((tabId: string) => navigation.closeTab(tabId), [navigation]);
+
+  useConnectionTypeLoader();
 
   function unloadTabs() {
     navigation.unloadTabs();
@@ -107,7 +110,12 @@ export const NavigationTabsBar = observer<Props>(function NavigationTabsBar({ cl
           onReorder={handleReorder}
         >
           <div className="tw:outline-none tw:flex-1 tw:flex tw:flex-col tw:max-w-full">
-            <TabList className={clsx("tw:overflow-auto tw:max-w-full theme-background-secondary theme-text-on-secondary", navigationSettings.hasMultipleRows && 'tw:flex-wrap')}>
+            <TabList
+              className={clsx(
+                'tw:overflow-auto tw:max-w-full theme-background-secondary theme-text-on-secondary',
+                navigationSettings.hasMultipleRows && 'tw:flex-wrap',
+              )}
+            >
               <SContext registry={tabsRegistry}>
                 {navigation.tabIdList.map(tabId => (
                   <TabHandlerTab key={tabId} tabId={tabId} onSelect={handleSelect} onClose={handleClose} />

@@ -2,6 +2,7 @@ export default [
   ['name', 'ru'],
   ['ui_rename_taken_or_invalid', 'Имя занято или недопустимо'],
   ['ui_tag_new', 'Новый'],
+  ['ui_theme', 'Тема'],
   ['ui_light_theme', 'Светлая'],
   ['ui_dark_theme', 'Темная'],
   ['ui_system_theme', 'Устройство'],
@@ -154,6 +155,7 @@ export default [
   ['ui_allow', 'Разрешить'],
   ['ui_decline', 'Отклонить'],
   ['ui_declined', 'Отклонено'],
+  ['ui_default', 'По умолчанию'],
 
   ['root_permission_denied', 'Отказано в доступе'],
   ['root_permission_no_permission', 'У вас нет разрешения на это действие'],

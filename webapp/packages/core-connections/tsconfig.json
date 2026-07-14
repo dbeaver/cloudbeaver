@@ -65,6 +65,9 @@
       "path": "../core-settings"
     },
     {
+      "path": "../core-theming"
+    },
+    {
       "path": "../core-utils"
     },
     {

@@ -25,6 +25,7 @@
     "@cloudbeaver/core-app": "workspace:*",
     "@cloudbeaver/core-authentication": "workspace:*",
     "@cloudbeaver/core-blocks": "workspace:*",
+    "@cloudbeaver/core-connections": "workspace:*",
     "@cloudbeaver/core-di": "workspace:*",
     "@cloudbeaver/core-events": "workspace:*",
     "@cloudbeaver/core-executor": "workspace:*",
