@@ -26,6 +26,7 @@ import {
 import { useService } from '@cloudbeaver/core-di';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { EObjectFeature, NavNodeInfoResource, NavTreeResource } from '@cloudbeaver/core-navigation-tree';
+import { createConnectionParam, useConnectionTypeColor } from '@cloudbeaver/core-connections';
 
 import type { NavTreeControlComponent, NavTreeControlProps } from '../ElementsTree/NavigationNodeComponent.js';
 import style from '../ElementsTree/NavigationTreeNode/NavigationNode/NavigationNodeControl.module.css';
@@ -74,10 +75,14 @@ export const ConnectionNavNodeControl: NavTreeControlComponent = observer<NavTre
       tooltip += `\n${translate('ui_type')}: ${translate('core_connections_connection_temporary')}`;
     }
 
+    const key = node.projectId && node.objectId ? createConnectionParam(node.projectId, node.objectId) : undefined;
+    const typeColor = useConnectionTypeColor(key);
+
     return (
       <TreeNodeControl
         ref={mergedRef}
         className={s(styles, { treeNodeControl: true, dragging: !!dndElement }, className)}
+        style={{ background: typeColor }}
         onClick={onClick}
         onContextMenu={handleContextMenuOpen}
       >

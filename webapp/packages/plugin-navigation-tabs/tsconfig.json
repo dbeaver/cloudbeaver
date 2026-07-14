@@ -29,6 +29,9 @@
       "path": "../core-cli"
     },
     {
+      "path": "../core-connections"
+    },
+    {
       "path": "../core-di"
     },
     {

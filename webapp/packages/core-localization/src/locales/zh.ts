@@ -146,7 +146,7 @@ export default [
   ['ui_project', 'Project'],
   ['ui_type', 'Type'],
   ['ui_field_is_required', 'Please fill in this field'],
-  ['ui_delete_confirmation_message', 'You are about to delete "{arg:item}". Are you sure?'],
+  ['ui_delete_confirmation_message', 'You are about to delete {arg:item}. Are you sure?'],
   ['ui_not_selected', 'Not selected'],
   ['ui_reset', 'Reset'],
   ['ui_documentaion', '文档'],
