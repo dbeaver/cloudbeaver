@@ -72,6 +72,14 @@ public class RPAuthProvider implements SMAuthProviderExternal<SMSession>, SMSign
         }
     }
 
+    @Override
+    public boolean isAutoUserProvisioningEnabled(@NotNull SMAuthProviderCustomConfiguration providerConfig) {
+        return CommonUtils.getBoolean(
+            providerConfig.getParameters().get(PARAM_AUTO_USER_PROVISIONING),
+            true
+        );
+    }
+
     @NotNull
     @Override
     public DBWUserIdentity getUserIdentity(

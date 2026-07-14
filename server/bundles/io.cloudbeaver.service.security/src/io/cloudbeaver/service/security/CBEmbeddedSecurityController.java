@@ -21,7 +21,6 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.auth.*;
-import io.cloudbeaver.auth.provider.rp.RPAuthProvider;
 import io.cloudbeaver.model.app.ServletAuthApplication;
 import io.cloudbeaver.model.app.ServletAuthConfiguration;
 import io.cloudbeaver.model.config.SMControllerConfiguration;
@@ -2885,10 +2884,11 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                 + userIdFromCredentials + "'");
         }
         boolean createUser = createNewUserIfNotExist;
-        if (RPAuthProvider.AUTH_PROVIDER.equals(authProvider.getId())) {
-            // For reverse proxy, automatic creation of a missing user is controlled by a config flag.
-            // When the flag is absent we keep the previous behavior and create the user (backward compatibility).
-            createUser = createUser && isReverseProxyAutoUserProvisioningEnabled(providerConfig);
+        if (createUser && providerConfig != null
+            && smAuthProviderInstance instanceof SMAuthProviderExternal<?> externalProvider) {
+            // Whether a missing user is auto-provisioned is decided by the provider itself
+            // (default true; reverse proxy consults its auto-user-provisioning config parameter).
+            createUser = externalProvider.isAutoUserProvisioningEnabled(providerConfig);
         }
         if (userId == null && createUser) {
             if (!(authProvider.getInstance() instanceof SMAuthProviderExternal<?>)) {
@@ -2920,16 +2920,6 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
             }
         }
         return userId;
-    }
-
-    private boolean isReverseProxyAutoUserProvisioningEnabled(@Nullable SMAuthProviderCustomConfiguration providerConfig) {
-        if (providerConfig == null) {
-            return true;
-        }
-        return CommonUtils.getBoolean(
-            providerConfig.getParameters().get(RPAuthProvider.PARAM_AUTO_USER_PROVISIONING),
-            true
-        );
     }
 
     @Nullable
