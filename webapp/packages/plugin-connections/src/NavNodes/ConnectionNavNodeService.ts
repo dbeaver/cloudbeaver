@@ -162,10 +162,6 @@ export class ConnectionNavNodeService {
 
         const folderId = node?.parentId; // current parent
 
-        if (folderId && folderId !== parentId && this.navTreeResource.has(parentId)) {
-          this.navTreeResource.moveToNode(connectionInfo.nodePath, parentId);
-        }
-
         if (folderId && !outdatedTrees.includes(folderId)) {
           outdatedTrees.push(folderId);
         }
