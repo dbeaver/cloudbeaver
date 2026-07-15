@@ -50,7 +50,7 @@ export {
 export * from './Combobox/Combobox.js';
 export * from './Command/Command.js';
 export { Popover, usePopoverStore, type PopoverStore } from './Popover/Popover.js';
-export { SelectField, type SelectFieldProps, type SelectItem } from './Select/SelectField.js';
+export { SelectField, type ISelectFieldProps, type ISelectItem } from './Select/SelectField.js';
 export { Spinner, type SpinnerProps } from './Spinner/Spinner.js';
 export { Switch, useSwitchContext, type SwitchProps } from './Switch/Switch.js';
 export { SwitchProvider, type SwitchProviderProps } from './Switch/SwitchProvider.js';

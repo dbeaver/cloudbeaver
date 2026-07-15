@@ -279,7 +279,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                     // in that way all related scripts will use the same context and overwrite the user's define context
                     // So why we need restore the default execution context after refreshing datasource
                     DBCExecutionContext defaultContext = DBUtils.getDefaultContext(refreshableObject, false);
-                    DBCExecutionContextDefaults contextDefaults = defaultContext.getContextDefaults();
+                    DBCExecutionContextDefaults<?, ?> contextDefaults = defaultContext.getContextDefaults();
                     refreshableObject.refreshObject(monitor);
                     if (contextDefaults != null && contextDefaults.getDefaultSchema() != null
                         && contextDefaults.getDefaultCatalog() != null) {
@@ -603,8 +603,8 @@ public class WebServiceNavigator implements DBWServiceNavigator {
     }
 
     private void checkProjectEditAccess(@NotNull DBNNode node, @NotNull WebSession session) throws DBException {
-        BaseWebProjectImpl project = (BaseWebProjectImpl) node.getOwnerProject();
-        if (project == null || !hasNodeEditPermission(session, node, project.getRMProject())) {
+        var project = node.getOwnerProject();
+        if (!(project instanceof BaseWebProjectImpl bwp) || !hasNodeEditPermission(session, node, bwp.getRMProject())) {
             throw new DBException("Access denied");
         }
     }

@@ -13,25 +13,32 @@ import {
   Link,
   IconOrImage,
   InputField,
+  Placeholder,
   Switch,
   Textarea,
   useResource,
   useTranslate,
   useFormCustomInputValidation,
 } from '@cloudbeaver/core-blocks';
+import { useService } from '@cloudbeaver/core-di';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
+import type { IFormState } from '@cloudbeaver/core-ui';
 
 import type { IServerConfigurationPageState } from '../IServerConfigurationPageState.js';
+import { ServerConfigurationService } from '../ServerConfigurationService.js';
 import { MIN_SESSION_EXPIRE_TIME } from './MIN_SESSION_EXPIRE_TIME.js';
 import { WEBSITE_LINKS } from '@cloudbeaver/core-links';
 import { isIp } from '@cloudbeaver/core-utils';
 
 interface Props {
   state: IServerConfigurationPageState;
+  formState: IFormState<null>;
+  configurationWizard: boolean;
 }
 
-export const ServerConfigurationInfoForm = observer<Props>(function ServerConfigurationInfoForm({ state }) {
+export const ServerConfigurationInfoForm = observer<Props>(function ServerConfigurationInfoForm({ state, formState, configurationWizard }) {
   const serverConfigLoader = useResource(ServerConfigurationInfoForm, ServerConfigResource, undefined);
+  const serverConfigurationService = useService(ServerConfigurationService);
   const translate = useTranslate();
   const { ref: validation } = useFormCustomInputValidation<string, HTMLTextAreaElement>(value => {
     const currentHost = window.location.host;
@@ -112,6 +119,12 @@ export const ServerConfigurationInfoForm = observer<Props>(function ServerConfig
           )}
         </div>
       </Switch>
+      <Placeholder
+        container={serverConfigurationService.serverInfoContainer}
+        configurationWizard={configurationWizard}
+        state={state}
+        formState={formState}
+      />
     </Group>
   );
 });

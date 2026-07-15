@@ -36,10 +36,13 @@ export type SelectBaseProps<TKey, TValue> = Omit<
     titleSelector?: (item: TValue) => string | undefined;
     iconSelector?: (item: TValue) => string | React.ReactElement | undefined;
     isDisabled?: (item: TValue) => boolean;
+    isSeparator?: (item: TValue) => boolean;
     onSwitch?: (state: boolean) => void;
     inline?: boolean;
     children?: string;
     portal?: boolean;
+    headerItems?: TValue[];
+    footerItems?: TValue[];
   };
 
 type ControlledProps<TKey, TValue> = SelectBaseProps<TKey, TValue> & {
@@ -56,12 +59,12 @@ type ObjectProps<TValue, TKey extends keyof TState, TState> = SelectBaseProps<TS
   value?: never;
 };
 
-export interface SelectType {
+export interface ISelectType {
   <TKey, TValue>(props: ControlledProps<TKey, TValue>): React.JSX.Element;
   <TValue, TKey extends keyof TState, TState>(props: ObjectProps<TValue, TKey, TState>): React.JSX.Element;
 }
 
-export const Select: SelectType = observer(function Select({
+export const Select: ISelectType = observer(function Select({
   value: controlledValue,
   defaultValue,
   name,
@@ -77,6 +80,8 @@ export const Select: SelectType = observer(function Select({
   inline,
   description,
   placeholder,
+  headerItems,
+  footerItems,
   id,
   keySelector = v => v,
   valueSelector = v => v,
@@ -84,6 +89,7 @@ export const Select: SelectType = observer(function Select({
   iconSelector,
   titleSelector,
   isDisabled,
+  isSeparator,
   onSelect,
   onSwitch,
   ...rest
@@ -150,9 +156,9 @@ export const Select: SelectType = observer(function Select({
 
   function itemRender(item: (typeof items)[number]): React.ReactNode {
     return (
-      <div className="select__item tw:truncate" title={item ? titleSelector?.(item) : undefined}>
+      <div className="select__item">
         {renderIcon(item)}
-        {valueSelector(item)}
+        <span className="tw:truncate tw:min-w-0" title={titleSelector?.(item) ?? valueSelector(item)}>{valueSelector(item)}</span>
       </div>
     );
   }
@@ -191,6 +197,9 @@ export const Select: SelectType = observer(function Select({
         itemValueSerialized={serializedKeySelector}
         itemRender={itemRender}
         itemDisabled={itemDisabled}
+        isSeparator={isSeparator}
+        headerItems={headerItems}
+        footerItems={footerItems}
         name={name}
         disabled={disabled || readOnly}
         noItemsPlaceholder={translate('combobox_no_results_placeholder')}

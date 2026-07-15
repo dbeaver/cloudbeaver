@@ -78,10 +78,11 @@
   }
 
   .select__item {
-    display: inline-flex;
+    display: flex;
     gap: 8px;
     letter-spacing: normal;
     align-items: center;
+    min-width: 0;
   }
 
   .select__item--placeholder {
@@ -94,6 +95,7 @@
   }
 
   .select__input-icon {
+    flex-shrink: 0;
     width: 16px;
 
     & .select__icon {

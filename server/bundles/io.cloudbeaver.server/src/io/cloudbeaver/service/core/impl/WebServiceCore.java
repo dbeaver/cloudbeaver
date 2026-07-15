@@ -557,6 +557,9 @@ public class WebServiceCore implements DBWServiceCore {
         DataSourceDescriptor dataSource = (DataSourceDescriptor) WebDataSourceUtils.getLocalOrGlobalDataSource(
             webSession, projectId, configInput.getConnectionId());
         DataSourceDescriptor testDataSource = getDataSourceDescriptor(webSession, dataSource, configInput, project);
+        testDataSource.setTemporary(true);
+        WebConnectionInfo connectionInfo = project.addConnection(testDataSource);
+        connectionInfo.setSavedCredentials(configInput.getCredentials(), configInput.getNetworkHandlersConfig());
         try {
             ConnectionTestJob ct = new ConnectionTestJob(
                 testDataSource, param -> {
@@ -573,7 +576,6 @@ public class WebServiceCore implements DBWServiceCore {
                 }
                 throw new DBWebException("Connection failed", ct.getConnectError());
             }
-            WebConnectionInfo connectionInfo = project.createConnectionInfo(testDataSource);
             connectionInfo.setConnectError(ct.getConnectError());
             connectionInfo.setServerVersion(ct.getServerVersion());
             connectionInfo.setClientVersion(ct.getClientVersion());
@@ -581,6 +583,8 @@ public class WebServiceCore implements DBWServiceCore {
             return connectionInfo;
         } catch (DBException e) {
             throw new DBWebException("Error connecting to database", e);
+        } finally {
+            project.removeConnection(testDataSource);
         }
     }
 
@@ -601,11 +605,7 @@ public class WebServiceCore implements DBWServiceCore {
             }
 
             testDataSource = (DataSourceDescriptor) dataSource.createCopy(dataSource.getRegistry());
-            WebDataSourceUtils.setConnectionConfiguration(
-                testDataSource.getDriver(),
-                testDataSource.getConnectionConfiguration(),
-                configInput
-            );
+            project.updateDataSourceContainerFromInput(configInput, testDataSource);
             if (configInput.getSelectedSecretId() != null) {
                 try {
                     dataSource.listSharedCredentials()

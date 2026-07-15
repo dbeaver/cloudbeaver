@@ -5,5 +5,6 @@
     --dbv-kit-btn-foreground: var(--theme-text-hint-on-light);
     --dbv-kit-btn-background: var(--theme-surface);
     --dbv-kit-btn-padding-inline: 8px;
+    --dbv-kit-btn-outline-offset: -2px;
   }
 }
