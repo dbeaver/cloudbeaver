@@ -137,6 +137,9 @@
       "path": "../plugin-codemirror6"
     },
     {
+      "path": "../plugin-connection-administration"
+    },
+    {
       "path": "../plugin-connection-custom"
     },
     {

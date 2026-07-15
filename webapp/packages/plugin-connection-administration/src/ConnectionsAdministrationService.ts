@@ -1,0 +1,59 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2026 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+
+import {
+  AdministrationItemService,
+  type AdministrationItemContentProps,
+  type AdministrationItemSubEvent,
+  type IAdministrationItem,
+} from '@cloudbeaver/core-administration';
+import { importLazyComponent } from '@cloudbeaver/core-blocks';
+import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { TabsContainer, type ITabInfoOptions } from '@cloudbeaver/core-ui';
+
+import { ADMINISTRATION_CONNECTIONS_ITEM } from './ADMINISTRATION_CONNECTIONS_ITEM.js';
+
+const ConnectionsAdministration = importLazyComponent(() => import('./ConnectionsAdministration.js').then(m => m.ConnectionsAdministration));
+
+const ConnectionsDrawerItem = importLazyComponent(() => import('./ConnectionsDrawerItem.js').then(m => m.ConnectionsDrawerItem));
+
+export interface IConnectionsTabOptions extends ITabInfoOptions<AdministrationItemContentProps> {
+  onActivate?: AdministrationItemSubEvent;
+  onDeActivate?: AdministrationItemSubEvent;
+}
+
+@injectable(() => [AdministrationItemService])
+export class ConnectionsAdministrationService extends Bootstrap {
+  readonly tabsContainer: TabsContainer<AdministrationItemContentProps>;
+
+  private item!: IAdministrationItem;
+
+  constructor(private readonly administrationItemService: AdministrationItemService) {
+    super();
+    this.tabsContainer = new TabsContainer('Connections administration tabs');
+  }
+
+  addTab({ onActivate, onDeActivate, ...tabInfo }: IConnectionsTabOptions): void {
+    this.tabsContainer.add(tabInfo);
+
+    if (!this.item.sub.some(sub => sub.name === tabInfo.key)) {
+      this.item.sub.push({ name: tabInfo.key, onActivate, onDeActivate });
+    }
+
+    this.item.defaultSub ??= tabInfo.key;
+  }
+
+  override register(): void {
+    this.item = this.administrationItemService.create({
+      name: ADMINISTRATION_CONNECTIONS_ITEM,
+      order: 7,
+      getContentComponent: () => ConnectionsAdministration,
+      getDrawerComponent: () => ConnectionsDrawerItem,
+    });
+  }
+}

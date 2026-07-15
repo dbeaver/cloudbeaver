@@ -43,7 +43,8 @@ export interface ISSHFormProps {
   disabled?: boolean;
   readonly?: boolean;
   sharedCredentials?: boolean;
-  projectId: string;
+  /** Omit for handlers not bound to any particular project, e.g. global network profiles */
+  projectId?: string;
   connectionId?: string;
 }
 
@@ -86,7 +87,7 @@ export const SSHForm = observer<ISSHFormProps>(function SSHForm({
   const connectTimeoutLabel = translate('plugin_network_handlers_ssh_tunnel_advanced_settings_connect_timeout');
   const { credentialsSavingEnabled } = useAdministrationSettings();
   const projectInfoResource = useService(ProjectInfoResource);
-  const isSharedProject = projectInfoResource.isProjectShared(projectId);
+  const isSharedProject = projectInfoResource.isProjectShared(projectId ?? null);
   const showSaveCredentials = credentialsSavingEnabled && !sharedCredentials;
 
   const handleAuthTypeChange = useCallback(() => {
