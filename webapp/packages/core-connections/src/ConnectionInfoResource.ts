@@ -45,6 +45,7 @@ import { ConnectionStateEventHandler, type IWsDataSourceConnectEvent, type IWsDa
 import type { DatabaseConnection } from './DatabaseConnection.js';
 import { DBDriverResource } from './DBDriverResource.js';
 import { parseConnectionKey } from './parseConnectionKey.js';
+import { isNotNullDefined } from '@dbeaver/js-helpers';
 
 export type Connection = DatabaseConnection;
 export type ConnectionInitConfig = InitConnectionMutationVariables;
@@ -96,7 +97,7 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
     connectionInfoEventHandler: ConnectionInfoEventHandler,
     connectionStateEventHandler: ConnectionStateEventHandler,
     userInfoResource: UserInfoResource,
-    navTreeResource: NavTreeResource,
+    private readonly navTreeResource: NavTreeResource,
   ) {
     super();
 
@@ -214,18 +215,18 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
     connectionInfoEventHandler.onEvent<ResourceKeyList<IConnectionInfoParams>>(
       ServerEventId.CbDatasourceUpdated,
       key => {
-        if (this.isConnected(key)) {
+        if (this.isConnected(key) && !this.isOutdated(key)) {
           const connection = this.get(key);
 
           this.dataSynchronizationService
             .requestSynchronization('connection', connection.map(connection => connection?.name).join('\n'))
             .then(state => {
               if (state) {
-                this.markOutdated(key);
+                this.updateFromEvent(key);
               }
             });
         } else {
-          this.markOutdated(key);
+          this.updateFromEvent(key);
         }
       },
       data =>
@@ -295,6 +296,55 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
   isConnected(key: ResourceKey<IConnectionInfoParams>): boolean {
     key = ResourceKeyUtils.toList(this.aliases.transformToKey(key));
     return this.get(key).every(connection => connection?.connected ?? false);
+  }
+
+  private async updateFromEvent(key: ResourceKeyList<IConnectionInfoParams>): Promise<void> {
+    this.markOutdated(key);
+
+    const treeNodeIds = this.findTreeNodeIds(key);
+
+    try {
+      await this.load(key);
+    } catch (exception: any) {
+      this.logger.warn(`Failed to load the connection info on a server event: ${exception?.message}`);
+      return;
+    }
+
+    const connections = this.get(key);
+    const staleParents = treeNodeIds
+      .filter(nodeId => !connections.some(connection => connection?.nodePath === nodeId))
+      .map(nodeId => this.navNodeInfoResource.get(nodeId)?.parentId)
+      .filter(isNotNullDefined);
+
+    if (staleParents.length > 0) {
+      this.navTreeResource.markOutdated(resourceKeyList(staleParents));
+    }
+  }
+
+  /**
+   * Finds the connection nodes in the loaded part of the navigation tree by the connection id,
+   * independently of the cached nodePath which may be stale or missing
+   */
+  private findTreeNodeIds(keys: ResourceKeyList<IConnectionInfoParams>): string[] {
+    const nodeIds: string[] = [];
+
+    for (const param of keys) {
+      const suffix = `/${param.connectionId}`;
+
+      for (const nodeId of this.navNodeInfoResource.keys) {
+        if (!nodeId.endsWith(suffix) || !NodeManagerUtils.isDatabaseObject(nodeId)) {
+          continue;
+        }
+
+        const node = this.navNodeInfoResource.get(nodeId);
+
+        if (node?.projectId === param.projectId && node.parentId !== undefined && this.navTreeResource.get(node.parentId)?.includes(nodeId)) {
+          nodeIds.push(nodeId);
+        }
+      }
+    }
+
+    return nodeIds;
   }
 
   getConnectionIdForNodeId(projectId: string, nodeId: string): IConnectionInfoParams | undefined {
