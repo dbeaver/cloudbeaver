@@ -11,6 +11,9 @@
       "path": "../core-cli"
     },
     {
+      "path": "../core-connections"
+    },
+    {
       "path": "../core-data-context"
     },
     {
@@ -18,6 +21,9 @@
     },
     {
       "path": "../core-localization"
+    },
+    {
+      "path": "../core-navigation-tree"
     },
     {
       "path": "../core-view"
