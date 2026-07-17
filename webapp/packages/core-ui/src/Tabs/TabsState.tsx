@@ -149,10 +149,12 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
           return;
         }
 
-        dynamic.selectedId = data.tabId;
+        if (!dynamic.controlled) {
+          dynamic.selectedId = data.tabId;
 
-        if (!dynamic.controlled && dynamic.store.getState().selectedId !== data.tabId) {
-          dynamic.store.setSelectedId(data.tabId);
+          if (dynamic.store.getState().selectedId !== data.tabId) {
+            dynamic.store.setSelectedId(data.tabId);
+          }
         }
 
         dynamic.open?.(data);
