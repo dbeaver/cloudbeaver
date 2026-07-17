@@ -26,7 +26,9 @@ export { IconButton, IconButtonBase, type IconButtonProps } from './IconButton/I
 export { Checkbox, CheckboxBase, type CheckboxProps } from './Checkbox/Checkbox.js';
 export { CheckboxIndicator, type ICheckboxIndicatorProps } from './Checkbox/CheckboxIndicator.js';
 export { ColorPicker } from './ColorPicker/ColorPicker.js';
+export { ColorIndicator } from './ColorPicker/ColorIndicator.js';
 export { ColorPickerBase, type ColorPickerProps } from './ColorPicker/ColorPickerBase.js';
+export { normalizeColorToRgb } from './ColorPicker/colorUtils.js';
 export { Input, InputBase, type InputProps } from './Input/Input.js';
 export {
   SearchPanel,
@@ -48,7 +50,7 @@ export {
 export * from './Combobox/Combobox.js';
 export * from './Command/Command.js';
 export { Popover, usePopoverStore, type PopoverStore } from './Popover/Popover.js';
-export { SelectField, type SelectFieldProps, type SelectItem } from './Select/SelectField.js';
+export { SelectField, type ISelectFieldProps, type ISelectItem } from './Select/SelectField.js';
 export { Spinner, type SpinnerProps } from './Spinner/Spinner.js';
 export { Switch, useSwitchContext, type SwitchProps } from './Switch/Switch.js';
 export { SwitchProvider, type SwitchProviderProps } from './Switch/SwitchProvider.js';

@@ -117,7 +117,7 @@ export function useReferencesDataModel(
     const sub = reaction(
       () => {
         const result = sourceModel.source.getResult(sourceResultIndex);
-        const activeRows = selection.getActiveRows();
+        const activeRows = selection.getActiveRows().map(r => r.row);
 
         return {
           associationId: state.associationId,
@@ -129,6 +129,7 @@ export function useReferencesDataModel(
         if (associationId && sourceResultId) {
           const executionContext = sourceModel.source.executionContext;
           model.source.setExecutionContext(executionContext).setSupportedDataFormats(connectionInfo?.supportedDataFormats ?? []);
+
           const context = executionContext?.context;
 
           if (context) {
@@ -139,27 +140,26 @@ export function useReferencesDataModel(
             // Restrict the related result to only rows that are linked to the current row via this association.
             // The target attribute name differs depending on which side of the relationship owns the foreign key.
             if (currentAssociation?.targetNodePath) {
-              const rows = activeRows.map(r => r.row);
               const defaultRow = view.rowKeys[0];
 
-              if (!rows.length && defaultRow) {
-                rows.push(defaultRow);
+              if (!activeRows.length && defaultRow) {
+                activeRows.push(defaultRow);
               }
 
               const constraints: SqlDataFilterConstraint[] = [];
               const isCompositeKey = currentAssociation.columnMapping.length > 1;
-              const shouldFallback = isCompositeKey && rows.length > 1;
-              const whereFilter = shouldFallback ? getCompositeKeyFilter(rows, currentAssociation.columnMapping, data) : '';
+              const shouldFallback = isCompositeKey && activeRows.length > 1;
+              const whereFilter = shouldFallback ? getCompositeKeyFilter(activeRows, currentAssociation.columnMapping, data) : '';
 
               if (!whereFilter) {
                 for (const mapping of currentAssociation.columnMapping) {
-                  for (const row of rows) {
+                  for (const row of activeRows) {
                     const rowValue = data.getRowValue(row);
 
                     if (rowValue) {
                       const targetValue = rowValue[mapping.sourceColumnIndex];
 
-                      if (isNotNullDefined(targetValue)) {
+                      if (targetValue !== undefined) {
                         constraints.push({
                           attributeName: mapping.targetColumnName,
                           attributePosition: mapping.targetColumnIndex,

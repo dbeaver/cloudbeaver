@@ -13,6 +13,7 @@ import { useService } from '@cloudbeaver/core-di';
 import { type ITabData, TabList, TabListStyles, TabPanelList, TabsState, TabStyles } from '@cloudbeaver/core-ui';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 import { useCaptureViewContext } from '@cloudbeaver/core-view';
+import { createConnectionParam, useConnectionTypeColor } from '@cloudbeaver/core-connections';
 
 import { type ISqlEditorModeProps, SqlEditorModeService } from '../SqlEditorModeService.js';
 import { DATA_CONTEXT_SQL_EDITOR_DATA } from './DATA_CONTEXT_SQL_EDITOR_DATA.js';
@@ -33,6 +34,7 @@ export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ state, c
   const split = useSplit();
   const style = useS(styles, SqlEditorTab);
   const sqlEditorModeService = useService(SqlEditorModeService);
+
   const data = useSqlEditor(state);
   useActiveQuery(data);
   const [modesState] = useState(() => new MetadataMap<string, any>());
@@ -60,6 +62,10 @@ export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ state, c
     }
   }, [isEditorEmpty]);
 
+  const context = data.model.dataSource?.executionContext;
+  const connectionKey = context ? createConnectionParam(context.projectId, context.connectionId) : undefined;
+  const typeColor = useConnectionTypeColor(connectionKey);
+
   return (
     <TabsState
       currentTabId={state.currentModeId}
@@ -72,10 +78,10 @@ export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ state, c
     >
       <SContext registry={sqlEditorRegistry}>
         <div className={s(style, { sqlEditor: true }, className)}>
-          <SQLEditorActions data={data} state={state} />
+          <SQLEditorActions data={data} state={state} style={{ background: typeColor }} />
           <TabPanelList />
           {displayedEditors > 1 ? (
-            <div className={s(style, { tabs: true })}>
+            <div className={s(style, { tabs: true })} style={{ background: typeColor }}>
               <TabList vertical rotated />
             </div>
           ) : null}

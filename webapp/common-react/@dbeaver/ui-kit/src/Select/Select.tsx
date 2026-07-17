@@ -14,6 +14,7 @@ import {
   SelectLabel as AriaSelectLabel,
   SelectValue as AriaSelectValue,
   SelectArrow as AriaSelectArrow,
+  SelectGroup as AriaSelectGroup,
   type SelectProviderProps,
   type SelectProps,
   type SelectLabelProps,
@@ -21,6 +22,7 @@ import {
   type SelectItemProps,
   type SelectValueProps,
   type SelectArrowProps,
+  type SelectGroupProps,
   useSelectContext,
   useSelectStore,
 } from '@ariakit/react';
@@ -70,6 +72,14 @@ export function SelectLabel({ children, className, ...props }: SelectLabelProps)
   );
 }
 
+export function SelectGroup({ children, className, ...props }: SelectGroupProps) {
+  return (
+    <AriaSelectGroup className={clsx('dbv-kit-select__group', className)} {...props}>
+      {children}
+    </AriaSelectGroup>
+  );
+}
+
 export {
   useSelectContext,
   useSelectStore,
@@ -80,11 +90,13 @@ export {
   type SelectItemProps,
   type SelectValueProps,
   type SelectArrowProps,
+  type SelectGroupProps,
 };
 
 Select.Provider = SelectProvider;
 Select.Popover = SelectPopover;
 Select.Item = SelectItem;
 Select.Label = SelectLabel;
+Select.Group = SelectGroup;
 Select.Value = AriaSelectValue;
 Select.Arrow = AriaSelectArrow;

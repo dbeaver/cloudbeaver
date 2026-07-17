@@ -12,6 +12,7 @@ export interface IFormPart<TState> extends ILoadableState {
   readonly initialState: TState;
   isSaving: boolean;
   readonly isDisabled: boolean;
+  isReadOnly: boolean;
 
   readonly isChanged: boolean;
 

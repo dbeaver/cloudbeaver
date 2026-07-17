@@ -252,7 +252,8 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
         NamingEnumeration<SearchResult> results = findByFilter(
             serviceContext,
             ldapSettings,
-            buildSearchFilter(ldapSettings, userIdentifier),
+            buildSearchFilter(ldapSettings),
+            new Object[]{userIdentifier},
             searchControls
         );
 
@@ -272,9 +273,21 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
         @NotNull String searchFilter,
         @NotNull SearchControls searchControls
     ) throws DBException {
+        return findByFilter(serviceContext, ldapSettings, searchFilter, null, searchControls);
+    }
+
+    public NamingEnumeration<SearchResult> findByFilter(
+        @NotNull DirContext serviceContext,
+        @NotNull LdapSettings ldapSettings,
+        @NotNull String searchFilter,
+        @Nullable Object[] filterArgs,
+        @NotNull SearchControls searchControls
+    ) throws DBException {
         try {
             String baseDN = getBaseDN(serviceContext, ldapSettings);
-            return serviceContext.search(baseDN, searchFilter, searchControls);
+            return filterArgs == null
+                ? serviceContext.search(baseDN, searchFilter, searchControls)
+                : serviceContext.search(baseDN, searchFilter, filterArgs, searchControls);
         } catch (Exception e) {
             throw new DBException("Error finding user DN: " + e.getMessage(), e);
         }
@@ -287,8 +300,8 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
         return ldapSettings.getBaseDN();
     }
 
-    private String buildSearchFilter(LdapSettings ldapSettings, String userIdentifier) {
-        String userFilter = String.format("(%s=%s)", ldapSettings.getLoginAttribute(), userIdentifier);
+    private String buildSearchFilter(LdapSettings ldapSettings) {
+        String userFilter = String.format("(%s={0})", ldapSettings.getLoginAttribute());
         if (CommonUtils.isNotEmpty(ldapSettings.getFilter())) {
             return String.format("(&%s%s)", userFilter, ldapSettings.getFilter());
         }

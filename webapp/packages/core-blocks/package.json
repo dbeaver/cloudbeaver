@@ -42,7 +42,7 @@
     "mobx-react-lite": "^4",
     "react": "^19",
     "react-dom": "^19",
-    "react-hotkeys-hook": "5.1.0",
+    "react-hotkeys-hook": "^5",
     "react-minisearch": "^7",
     "subscript": "^9",
     "tslib": "^2"

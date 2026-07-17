@@ -1,0 +1,5 @@
+query getConnectionTypes {
+  types: listConnectionTypes {
+    ...ConnectionType
+  }
+}

@@ -576,4 +576,9 @@
       </clipPath>
     </defs>
   </symbol>
+  <symbol id="document" viewBox="0 0 32 32">
+    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M5.5 2C4.94772 2 4.5 2.44771 4.5 3V29C4.5 29.5523 4.94772 30 5.5 30H26.5C27.0523 30 27.5 29.5523 27.5 29V7.38374C27.5 7.13669 27.4086 6.8984 27.2433 6.71477L23.2979 2.33104C23.1083 2.12032 22.8381 2 22.5546 2H5.5ZM10 10H21V13H10V10ZM21 16H10V19H21V16ZM10 22H17V25H10V22Z" fill="#338ECC"/>
+    </svg>
+  </symbol>
 </svg>
