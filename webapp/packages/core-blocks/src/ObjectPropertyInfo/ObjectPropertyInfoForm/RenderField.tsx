@@ -175,6 +175,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
           readOnly={readonly}
           description={property.hint}
           className={className}
+          portal={true}
         >
           {property.displayName ?? ''}
         </Select>
@@ -196,6 +197,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
         readOnly={readonly}
         description={hint}
         className={className}
+        portal={true}
       >
         {property.displayName ?? ''}
       </Select>
