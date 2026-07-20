@@ -8,6 +8,7 @@
 import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
+import { LocalizationService } from '@cloudbeaver/core-localization';
 import { SqlResultSetGeneratorId, type SqlQueryGeneratorOptions, type SqlResultRow } from '@cloudbeaver/core-sdk';
 import { ActionService, MenuService, type IAction } from '@cloudbeaver/core-view';
 import {
@@ -42,7 +43,7 @@ import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
 import { getDefaultQueryGeneratorOptions, GeneratedSqlDialog, SqlGeneratorsResource, DDL_GENERATOR_ID } from '@cloudbeaver/plugin-sql-generator';
 import { isNotNullDefined } from '@dbeaver/js-helpers';
 
-@injectable(() => [ActionService, MenuService, CommonDialogService, NotificationService, SqlGeneratorsResource])
+@injectable(() => [ActionService, MenuService, CommonDialogService, NotificationService, SqlGeneratorsResource, LocalizationService])
 export class DataGridContextMenuGenerateSqlService {
   constructor(
     private readonly actionService: ActionService,
@@ -50,6 +51,7 @@ export class DataGridContextMenuGenerateSqlService {
     private readonly commonDialogService: CommonDialogService,
     private readonly notificationService: NotificationService,
     private readonly sqlGenerationResource: SqlGeneratorsResource,
+    private readonly localizationService: LocalizationService,
   ) {}
 
   register(): void {
@@ -107,15 +109,17 @@ export class DataGridContextMenuGenerateSqlService {
           return;
         }
 
-        await this.openSqlDialog(context, mapGeneratorIdFromAction(action));
+        await this.openSqlDialog(context, mapGeneratorIdFromAction(action), action.info.label);
       },
     });
   }
 
-  private async openSqlDialog(context: IDataContextProvider, generatorId: SqlResultSetGeneratorId): Promise<void> {
+  private async openSqlDialog(context: IDataContextProvider, generatorId: SqlResultSetGeneratorId, generatorLabel: string): Promise<void> {
     const model = context.get(DATA_CONTEXT_DV_DDM)!;
     const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
     const key = context.get(DATA_CONTEXT_DV_RESULT_KEY);
+    const options = model.source.options as IDataContainerOptions | undefined;
+    const containerNodePath = options?.containerNodePath;
 
     if (!isResultSetDataModel(model)) {
       return;
@@ -163,6 +167,8 @@ export class DataGridContextMenuGenerateSqlService {
       await this.commonDialogService.open(GeneratedSqlDialog, {
         query,
         nodeId: connectionId,
+        nodeName: getEntityNameFromNodePath(containerNodePath),
+        generatorName: this.localizationService.translate(generatorLabel),
         options: getDefaultQueryGeneratorOptions(),
         regenerateQuery: options =>
           this.generateQuery({
@@ -216,6 +222,8 @@ export class DataGridContextMenuGenerateSqlService {
       await this.commonDialogService.open(GeneratedSqlDialog, {
         query,
         nodeId: connectionId,
+        nodeName: getEntityNameFromNodePath(nodePathList),
+        generatorName: createGenerator.label,
         options: getDefaultQueryGeneratorOptions(),
         regenerateQuery: genOptions => this.sqlGenerationResource.generateEntityQuery(createGenerator.id, nodePathList, genOptions),
       });
@@ -257,6 +265,10 @@ export class DataGridContextMenuGenerateSqlService {
 
     return query;
   }
+}
+
+function getEntityNameFromNodePath(nodePath: string | undefined): string | undefined {
+  return nodePath?.split('/').pop();
 }
 
 function mapGeneratorIdFromAction(action: IAction): SqlResultSetGeneratorId {
