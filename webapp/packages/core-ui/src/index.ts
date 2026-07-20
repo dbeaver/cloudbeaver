@@ -27,6 +27,7 @@ export * from './DragAndDrop/DNDPreviewLoader.js';
 export * from './DragAndDrop/DNDProviderLoader.js';
 export * from './DragAndDrop/useDNDBox.js';
 export * from './DragAndDrop/useDNDData.js';
+export * from './DragAndDrop/DNDScrollContainerLoader.js';
 
 export * from './Form/Components/IBaseFormProps.js';
 export * from './Form/Components/BaseFormLazy.js';
