@@ -15,7 +15,7 @@ import type { ISqlEditorTabState } from '../ISqlEditorTabState.js';
 import { DATA_CONTEXT_SQL_EDITOR_DATA } from './DATA_CONTEXT_SQL_EDITOR_DATA.js';
 import { DATA_CONTEXT_SQL_EDITOR_STATE } from '../DATA_CONTEXT_SQL_EDITOR_STATE.js';
 import type { ISQLEditorData } from './ISQLEditorData.js';
-import style from './SQLEditorActions.module.css';
+import componentStyle from './SQLEditorActions.module.css';
 import { SqlEditorActionsMenu } from './SqlEditorActionsMenu.js';
 import { SqlEditorTools } from './SqlEditorTools.js';
 import { SQL_EDITOR_ACTIONS_MENU } from './SQL_EDITOR_ACTIONS_MENU.js';
@@ -24,10 +24,11 @@ interface Props {
   data: ISQLEditorData;
   state: ISqlEditorTabState;
   className?: string;
+  style?: React.CSSProperties;
 }
 
-export const SQLEditorActions = observer<Props>(function SQLEditorActions({ data, state, className }) {
-  const styles = useS(style);
+export const SQLEditorActions = observer<Props>(function SQLEditorActions({ data, state, className, style }) {
+  const styles = useS(componentStyle);
   const menu = useMenu({ menu: SQL_EDITOR_ACTIONS_MENU });
 
   useDataContextLink(menu.context, (context, id) => {
@@ -38,7 +39,7 @@ export const SQLEditorActions = observer<Props>(function SQLEditorActions({ data
   });
 
   return (
-    <div className={s(styles, { container: true }, className)}>
+    <div className={s(styles, { container: true }, className)} style={style}>
       <div className={s(styles, { actions: true })} onMouseDown={preventFocusHandler}>
         <SqlEditorActionsMenu state={state} context={menu.context} />
       </div>

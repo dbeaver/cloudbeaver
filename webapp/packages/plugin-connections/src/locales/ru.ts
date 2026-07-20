@@ -47,4 +47,6 @@ export default [
   ['plugin_connections_connection_client_version', 'Версия клиента: {arg:version} \n'],
   ['plugin_connections_connection_server_version', 'Версия сервера: {arg:version} \n'],
   ['plugin_connections_connection_connection_time', 'Время подключения: {arg:time} \n'],
+
+  ['plugin_connections_connection_type_label', 'Тип подключения'],
 ];

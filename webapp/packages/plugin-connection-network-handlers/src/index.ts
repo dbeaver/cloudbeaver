@@ -7,3 +7,4 @@
  */
 
 import './module.js';
+export * from './SSH/getConnectionFormSSHPart.js';

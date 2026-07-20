@@ -115,13 +115,15 @@ export const ObjectFolders = observer<IProps>(function ObjectFolders({ tab }) {
   return folders.length > 0 ? (
     <TabsState currentTabId={folderId} orientation="vertical" localState={innerTabState} lazy onChange={openFolder}>
       <SContext registry={objectFoldersRegistry}>
-        <TabList aria-label="Object folders" vertical>
-          {folders.map(folderId => (
-            <FolderTabRenderer key={folderId} nodeId={nodeId} folderId={folderId} parents={parents} />
-          ))}
-        </TabList>
+        <div>
+          <TabList aria-label="Object folders" vertical>
+            {folders.map(folderId => (
+              <FolderTabRenderer key={folderId} nodeId={nodeId} folderId={folderId} parents={parents} />
+            ))}
+          </TabList>
+        </div>
         {folders.map(folderId => (
-          <TabPanel key={folderId} tabId={folderId}>
+          <TabPanel key={folderId} className="theme-background-surface" tabId={folderId}>
             <FolderPanelRenderer key={folderId} nodeId={nodeId} folderId={folderId} parents={parents} />
           </TabPanel>
         ))}

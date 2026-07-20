@@ -106,3 +106,9 @@ textarea {
     }
   }
 }
+
+@layer base {
+  *:focus-visible {
+    outline: 1px solid var(--theme-primary);
+  }
+}

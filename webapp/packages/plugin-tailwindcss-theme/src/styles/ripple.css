@@ -14,7 +14,7 @@
     }
 
     &:hover::before {
-      opacity: 0.04;
+      opacity: 0.06;
     }
 
     &:focus::before {

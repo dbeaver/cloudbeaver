@@ -394,18 +394,30 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         }
     }
 
+    @NotNull
     @Override
-    public void importUsers(@NotNull SMUserImportList userImportList) throws DBException {
-       try (var dbCon = database.openConnection()) {
-            importUsers(dbCon, userImportList);
+    public List<SMUserProvisioning> importUsers(@NotNull SMUserImportList userImportList) throws DBException {
+        try (Connection dbCon = database.openConnection();
+            JDBCTransaction txn = new JDBCTransaction(dbCon)) {
+            try {
+                List<SMUserProvisioning> importedUsers = importUsers(dbCon, userImportList);
+                txn.commit();
+                return importedUsers;
+            } catch (Exception e) {
+                txn.rollback();
+                throw e;
+            }
        } catch (SQLException e) {
            log.error("Failed attempt import user: " + e.getMessage());
+           return List.of();
        }
     }
 
-    protected void importUsers(@NotNull Connection connection, @NotNull SMUserImportList userImportList)
+    @NotNull
+    protected List<SMUserProvisioning> importUsers(@NotNull Connection connection, @NotNull SMUserImportList userImportList)
         throws DBException, SQLException {
         List<SMUserProvisioning> users = userImportList.getUsers();
+        List<SMUserProvisioning> importedUsers = new ArrayList<>();
         Set<String> seen = new HashSet<>();
         outer:
         for (SMUserProvisioning user : users) {
@@ -436,7 +448,9 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                 }
             }
             insertUser(connection, userId.toLowerCase(), metaParameters, true, authRole);
+            importedUsers.add(user);
         }
+        return importedUsers;
     }
 
     @Override

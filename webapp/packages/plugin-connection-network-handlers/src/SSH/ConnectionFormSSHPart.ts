@@ -105,7 +105,7 @@ export class ConnectionFormSSHPart extends FormPart<INetworkHandlerConfig, IConn
   ): void | Promise<void> {
     const validation = contexts.getContext(formValidationContext);
 
-    if (!this.isChanged || !this.state.enabled) {
+    if (!this.isChanged || !this.state.enabled || this.isReadOnly) {
       return;
     }
 

@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -9,11 +9,11 @@ import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
 
 import { IconOrImage, s, useObjectInfoTooltip, useTranslate } from '@cloudbeaver/core-blocks';
-import { ConnectionInfoResource, createConnectionParam } from '@cloudbeaver/core-connections';
+import { ConnectionInfoResource, createConnectionParam, useConnectionTypeColor } from '@cloudbeaver/core-connections';
 import { useDataContext, useDataContextLink } from '@cloudbeaver/core-data-context';
 import { useService } from '@cloudbeaver/core-di';
 import { ProjectInfoResource } from '@cloudbeaver/core-projects';
-import { type ITabData, Tab, TabIcon, TabTitle } from '@cloudbeaver/core-ui';
+import { type ITabData, Tab, TabIcon, TabTitle, useTab } from '@cloudbeaver/core-ui';
 import { CaptureViewContext } from '@cloudbeaver/core-view';
 import type { TabHandlerTabComponent } from '@cloudbeaver/plugin-navigation-tabs';
 import {
@@ -31,6 +31,8 @@ export const SqlEditorTab: TabHandlerTabComponent<ISqlEditorTabState> = observer
   const viewContext = useContext(CaptureViewContext);
   const tabMenuContext = useDataContext(viewContext);
   const handlerState = tab.handlerState;
+
+  const { selected } = useTab(tab.id);
 
   useDataContextLink(tabMenuContext, (context, id) => {
     context.set(DATA_CONTEXT_SQL_EDITOR_TAB, true, id);
@@ -61,9 +63,18 @@ export const SqlEditorTab: TabHandlerTabComponent<ISqlEditorTabState> = observer
   const handleClose = onClose ? ({ tabId }: ITabData<any>) => onClose(tabId) : undefined;
 
   const tooltip = useObjectInfoTooltip(connection?.name, executionContext?.defaultCatalog, executionContext?.defaultSchema, project?.name);
+  const connectionKey = executionContext ? createConnectionParam(executionContext.projectId, executionContext.connectionId) : undefined;
+  const typeColor = useConnectionTypeColor(connectionKey);
 
   return (
-    <Tab tabId={tab.id} title={`${name}${tooltip ? '\n' + tooltip : ''}`} menuContext={tabMenuContext} onOpen={handleSelect} onClose={handleClose}>
+    <Tab
+      style={{ backgroundColor: selected ? undefined : typeColor }}
+      tabId={tab.id}
+      title={`${name}${tooltip ? '\n' + tooltip : ''}`}
+      menuContext={tabMenuContext}
+      onOpen={handleSelect}
+      onClose={handleClose}
+    >
       <TabIcon icon={icon} />
       <TabTitle>{name}</TabTitle>
       {isReadonly && isScript && (
