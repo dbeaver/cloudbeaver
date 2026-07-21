@@ -21,7 +21,6 @@ import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.WebAsyncTaskInfo;
 import io.cloudbeaver.model.session.WebAsyncTaskProcessor;
 import io.cloudbeaver.model.session.WebSession;
-import io.cloudbeaver.server.BaseWebPlatform;
 import io.cloudbeaver.server.CBConstants;
 import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.server.WebAppUtils;
@@ -256,17 +255,44 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
         if (!validateImportPermission(webSession)) {
             throw new DBWebException("Data import was disabled by administrator");
         }
-        webSession.addInfoMessage("Import data");
         DataTransferProcessorDescriptor processor = DataTransferRegistry.getInstance().getProcessor(parameters.getProcessorId());
         if (processor == null) {
             throw new DBWebException("Wrong data processor '" + parameters.getProcessorId() + "'");
         }
         WebSQLResultsInfo results = sqlContext.getResults(resultsId);
-        Path path = resolveImportFile(webSession, parameters.getFileId());
-        Map<String, Object> settings = parameters.getSettings();
+        if (!(results.getDataContainer() instanceof DBSDataManipulator)) {
+            throw new DBWebException("Results '" + resultsId + "' do not support data import");
+        }
 
+        // The task is created but not started: it is executed once the file is uploaded for this task id
+        WebAsyncTaskInfo taskInfo = webSession.createAsyncTask("Data import");
+        WebDataTransferUtils.getSessionDataTransferConfig(webSession)
+            .addImportTask(new WebDataTransferImportTaskConfig(taskInfo.getId(), results, processor, parameters));
+        return taskInfo;
+    }
+
+    @NotNull
+    @Override
+    public WebAsyncTaskInfo runImportDataTask(
+        @NotNull WebSession webSession,
+        @NotNull String taskId,
+        @NotNull Path path
+    ) throws DBWebException {
+        WebDataTransferImportTaskConfig importTask =
+            WebDataTransferUtils.getSessionDataTransferConfig(webSession).consumeImportTask(taskId);
+        if (importTask == null) {
+            throw new DBWebException("Data import task '" + taskId + "' not found");
+        }
+        WebAsyncTaskInfo taskInfo = webSession.getAsyncTask(taskId, "Data import", false);
+        if (taskInfo == null) {
+            throw new DBWebException("Data import task '" + taskId + "' not found");
+        }
+        webSession.addInfoMessage("Import data");
         log.info(String.format("Data import started: [userId=%s]", webSession.getUserId()));
-        DBSDataContainer dataContainer = results.getDataContainer();
+
+        DataTransferProcessorDescriptor processor = importTask.getProcessor();
+        DBSDataContainer dataContainer = importTask.getResults().getDataContainer();
+        Map<String, Object> settings = importTask.getParameters().getSettings();
         WebAsyncTaskProcessor<String> runnable = new WebAsyncTaskProcessor<>() {
             @Override
             public void run(@NotNull DBRProgressMonitor monitor) throws InvocationTargetException {
@@ -289,30 +315,11 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
                     } catch (IOException e) {
                         log.error("Failed to delete file: " + e.getMessage(), e);
                     }
-                    WebDataTransferUtils.getSessionDataTransferConfig(webSession).removeImportFile(parameters.getFileId());
                     monitor.done();
                 }
             }
         };
-        return webSession.createAndRunAsyncTask("Data import", runnable);
-    }
-
-    /**
-     * Resolves a previously uploaded import file by its id, validating it belongs to the session
-     * and stays within the import temp folder.
-     */
-    @NotNull
-    private Path resolveImportFile(@NotNull WebSession webSession, @Nullable String fileId) throws DBWebException {
-        if (CommonUtils.isEmpty(fileId) || !WebDataTransferUtils.getSessionDataTransferConfig(webSession).hasImportFile(fileId)) {
-            throw new DBWebException("Import file '" + fileId + "' not found");
-        }
-        Path tempFolder = WebAppUtils.getWebPlatform()
-            .getTempFolder(webSession.getProgressMonitor(), BaseWebPlatform.TEMP_FILE_IMPORT_FOLDER);
-        Path path = tempFolder.resolve(fileId).normalize();
-        if (!path.startsWith(tempFolder) || !Files.exists(path)) {
-            throw new DBWebException("Import file '" + fileId + "' not found");
-        }
-        return path;
+        return webSession.runAsyncTask(taskInfo, runnable);
     }
 
     private void exportData(

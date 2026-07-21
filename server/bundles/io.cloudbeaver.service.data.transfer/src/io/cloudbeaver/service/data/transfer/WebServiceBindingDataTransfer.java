@@ -80,7 +80,7 @@ public class WebServiceBindingDataTransfer extends WebServiceBindingBase<DBWServ
         );
         servletContext.addServlet(
                 "dataTransferImport",
-                new WebDataTransferImportServlet(application),
+                new WebDataTransferImportServlet(application, getServiceImpl()),
                 application.getServicesURI() + "data/import/*"
         );
     }

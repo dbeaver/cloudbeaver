@@ -35,8 +35,6 @@ type DataTransferDefaultExportSettings {
 }
 
 input DataTransferImportParameters {
-    "Id of the file previously uploaded via the data import servlet (POST .../data/import)"
-    fileId: String!
     "Import processor ID"
     processorId: ID!
     """

@@ -19,12 +19,14 @@ package io.cloudbeaver.service.data.transfer.impl;
 import com.google.gson.stream.JsonWriter;
 import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.DBWebException;
+import io.cloudbeaver.model.WebAsyncTaskInfo;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.BaseWebPlatform;
 import io.cloudbeaver.server.CBConstants;
 import io.cloudbeaver.server.WebAppUtils;
 import io.cloudbeaver.server.WebApplication;
 import io.cloudbeaver.service.WebServiceServletBase;
+import io.cloudbeaver.service.data.transfer.DBWServiceDataTransfer;
 import jakarta.servlet.MultipartConfigElement;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
@@ -33,10 +35,10 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
+import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.HttpConstants;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.LinkedHashMap;
@@ -54,9 +56,13 @@ import java.util.UUID;
 public class WebDataTransferImportServlet extends WebServiceServletBase {
 
     public static final String ECLIPSE_JETTY_MULTIPART_CONFIG = "org.eclipse.jetty.multipartConfig";
+    private static final String PARAM_TASK_ID = "taskId";
 
-    public WebDataTransferImportServlet(WebApplication application) {
+    private final DBWServiceDataTransfer dbwServiceDataTransfer;
+
+    public WebDataTransferImportServlet(WebApplication application, DBWServiceDataTransfer dbwServiceDataTransfer) {
         super(application);
+        this.dbwServiceDataTransfer = dbwServiceDataTransfer;
     }
 
     @Override
@@ -84,20 +90,35 @@ public class WebDataTransferImportServlet extends WebServiceServletBase {
 
             request.setAttribute(ECLIPSE_JETTY_MULTIPART_CONFIG, MULTI_PART_CONFIG);
 
-            String fileId = UUID.randomUUID().toString();
-            Path filePath = tempFolder.resolve(fileId);
+            String taskId = request.getParameter(PARAM_TASK_ID);
+            if (CommonUtils.isEmpty(taskId)) {
+                throw new IllegalArgumentException("Missing required parameter '" + PARAM_TASK_ID + "'");
+            }
+
+            String fileName = UUID.randomUUID().toString();
+            Path filePath = tempFolder.resolve(fileName);
             try {
-                InputStream file = request.getPart("fileData").getInputStream();
-                Files.write(filePath, file.readAllBytes());
+                request.getPart("fileData").write(fileName);
             } catch (ServletException e) {
                 throw new DBWebException(e.getMessage());
             }
-            // Remember the file in the session so only this user can import it later
-            WebDataTransferUtils.getSessionDataTransferConfig(session).addImportFile(fileId);
+
+            WebAsyncTaskInfo importTask;
+            try {
+                importTask = dbwServiceDataTransfer.runImportDataTask(session, taskId, filePath);
+            } catch (Exception e) {
+                Files.deleteIfExists(filePath);
+                throw e;
+            }
 
             response.setContentType(HttpConstants.CONTENT_TYPE_JSON);
             Map<String, Object> result = new LinkedHashMap<>();
-            result.put("id", fileId);
+            result.put("id", importTask.getId());
+            result.put("name", importTask.getName());
+            result.put("running", importTask.isRunning());
+            result.put("status", importTask.getStatus());
+            result.put("error", importTask.getError());
+            result.put("taskResult", importTask.getTaskResult());
             try (JsonWriter writer = new JsonWriter(response.getWriter())) {
                 JSONUtils.serializeMap(writer, result);
             }

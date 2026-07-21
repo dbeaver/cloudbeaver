@@ -30,6 +30,7 @@ import org.jkiss.dbeaver.model.rm.RMConstants;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 
 import java.io.OutputStream;
+import java.nio.file.Path;
 import java.util.List;
 
 /**
@@ -60,6 +61,12 @@ public interface DBWServiceDataTransfer extends DBWService {
         @NotNull String resultsId,
         @NotNull WebDataTransferImportParameters parameters,
         @NotNull WebSession webSession) throws DBWebException;
+
+    @NotNull
+    WebAsyncTaskInfo runImportDataTask(
+        @NotNull WebSession webSession,
+        @NotNull String taskId,
+        @NotNull Path path) throws DBWebException;
 
     @NotNull
     @WebAction(requireGlobalPermissions = RMConstants.PERMISSION_DATA_EDITOR_EXPORT)
