@@ -22,7 +22,6 @@ import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.WebAsyncTaskInfo;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.BaseWebPlatform;
-import io.cloudbeaver.server.CBConstants;
 import io.cloudbeaver.server.WebAppUtils;
 import io.cloudbeaver.server.WebApplication;
 import io.cloudbeaver.service.WebServiceServletBase;
@@ -32,7 +31,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.CommonUtils;
@@ -45,13 +43,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
 
-/**
- * Accepts a multipart file upload for data import and stores it in a temporary, session-scoped location.
- * <p>
- * The servlet only transfers the file bytes and returns the generated file id. The import itself (processor,
- * target results and settings) is triggered separately via the {@code dataTransferImportDataIntoResults}
- * GraphQL query, which references the returned file id.
- */
 @MultipartConfig
 public class WebDataTransferImportServlet extends WebServiceServletBase {
 
@@ -79,7 +70,7 @@ public class WebDataTransferImportServlet extends WebServiceServletBase {
             response.sendError(HttpServletResponse.SC_FORBIDDEN, "Permission denied");
             return;
         }
-        if (validateImportPermission(session)) {
+        if (dbwServiceDataTransfer.validateImportPermission(session)) {
             response.sendError(HttpServletResponse.SC_FORBIDDEN, "Import is not allowed for this user");
             return;
         }
@@ -123,13 +114,5 @@ public class WebDataTransferImportServlet extends WebServiceServletBase {
                 JSONUtils.serializeMap(writer, result);
             }
         }
-    }
-
-    private boolean validateImportPermission(@NotNull WebSession session) {
-        if (WebAppUtils.getWebApplication().isCommunity()) {
-            Map<String, Object> productSettings = WebAppUtils.getWebApplication().getServerConfiguration().getProductSettings();
-            return JSONUtils.getBoolean(productSettings, CBConstants.PREF_DATA_EDITOR_IMPORT_DISABLED_OLD, false);
-        }
-        return !session.hasGlobalPermission(DBWConstants.GLOBAL_PERMISSION_DATA_EDITOR_IMPORT);
     }
 }

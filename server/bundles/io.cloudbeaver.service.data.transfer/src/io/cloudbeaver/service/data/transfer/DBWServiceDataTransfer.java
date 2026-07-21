@@ -96,4 +96,9 @@ public interface DBWServiceDataTransfer extends DBWService {
         @NotNull WebDataTransferTaskConfig taskConfig,
         @NotNull OutputStream outputStream
     ) throws DBException;
+
+    /**
+     * Validate if the user has permission to import data. It checks if the user has the required global permissions.
+     */
+    boolean validateImportPermission(@NotNull WebSession session);
 }

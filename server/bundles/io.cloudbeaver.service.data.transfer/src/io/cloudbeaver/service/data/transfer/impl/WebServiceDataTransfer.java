@@ -32,6 +32,7 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.runtime.VoidProgressMonitor;
@@ -131,17 +132,6 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
         // product settings parameter saves only disabled state that's why we invert result
         return webSession.hasPermission(DBWConstants.PERMISSION_ADMIN) ||
             !CommonUtils.getOption(productSettings, CBConstants.PREF_DATA_EDITOR_EXPORT_DISABLED_OLD, false);
-    }
-
-    private boolean validateImportPermission(@NotNull WebSession webSession) {
-        if (!WebAppUtils.getWebApplication().isCommunity()) {
-            // global permission is already checked
-            return true;
-        }
-        Map<String, Object> productSettings = WebAppUtils.getWebApplication().getServerConfiguration().getProductSettings();
-        // product settings parameter saves only disabled state that's why we invert result
-        return webSession.hasPermission(DBWConstants.PERMISSION_ADMIN) ||
-            !CommonUtils.getOption(productSettings, CBConstants.PREF_DATA_EDITOR_IMPORT_DISABLED_OLD, false);
     }
 
     @NotNull
@@ -253,7 +243,7 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
         @NotNull WebSession webSession
     ) throws DBWebException {
         if (!validateImportPermission(webSession)) {
-            throw new DBWebException("Data import was disabled by administrator");
+            throw new DBWebException("Permission denied. Data import is not allowed for this user");
         }
         DataTransferProcessorDescriptor processor = DataTransferRegistry.getInstance().getProcessor(parameters.getProcessorId());
         if (processor == null) {
@@ -320,6 +310,14 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
             }
         };
         return webSession.runAsyncTask(taskInfo, runnable);
+    }
+
+    public boolean validateImportPermission(@NotNull WebSession session) {
+        if (WebAppUtils.getWebApplication().isCommunity()) {
+            Map<String, Object> productSettings = WebAppUtils.getWebApplication().getServerConfiguration().getProductSettings();
+            return JSONUtils.getBoolean(productSettings, CBConstants.PREF_DATA_EDITOR_IMPORT_DISABLED_OLD, false);
+        }
+        return !session.hasGlobalPermission(DBWConstants.GLOBAL_PERMISSION_DATA_EDITOR_IMPORT);
     }
 
     private void exportData(
