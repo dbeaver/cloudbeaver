@@ -296,6 +296,8 @@ type SQLQueryGenerator {
 input SQLQueryGeneratorOptions {
     useFullyQualifiedNames: Boolean!
     compactSql: Boolean!
+    "Include nested objects, comments and permissions in generated DDL (since 26.0.4)"
+    showFullDdl: Boolean
 }
 
 ####################################################

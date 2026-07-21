@@ -252,10 +252,7 @@ public class WebServiceSQL implements DBWServiceSQL {
         @NotNull WebSQLGeneratorOptions options
     ) throws DBWebException {
         List<DBSObject> objectList = getObjectListFromNodeIds(session, nodePathList);
-        return createAndRunGenerator(
-            session, generatorId, objectList,
-            options.useFullyQualifiedNames(), options.compactSql()
-        );
+        return createAndRunGenerator(session, generatorId, objectList, options);
     }
 
     @NotNull
@@ -270,10 +267,7 @@ public class WebServiceSQL implements DBWServiceSQL {
     ) throws DBWebException {
         checkAndFillTruncatedData(sqlContext, resultsId, selectedRows);
         WebDBDResultSetDataProvider dataProvider = new WebDBDResultSetDataProvider(resultsId, sqlContext, selectedRows);
-        return createAndRunGenerator(
-            webSession, generatorId, Collections.singletonList(dataProvider),
-            options.useFullyQualifiedNames(), options.compactSql()
-        );
+        return createAndRunGenerator(webSession, generatorId, Collections.singletonList(dataProvider), options);
     }
 
     private void checkAndFillTruncatedData(
@@ -308,8 +302,7 @@ public class WebServiceSQL implements DBWServiceSQL {
         @NotNull WebSession session,
         @NotNull String generatorId,
         @NotNull List<DBSObject> objectList,
-        boolean useFullyQualifiedNames,
-        boolean compactSql
+        @NotNull WebSQLGeneratorOptions options
     ) throws DBWebException {
         SQLGeneratorDescriptor generator = SQLGeneratorConfigurationRegistry.getInstance().getGenerator(generatorId);
         if (generator == null) {
@@ -317,8 +310,13 @@ public class WebServiceSQL implements DBWServiceSQL {
         }
         try {
             SQLGenerator<DBSObject> generatorInstance = generator.createGenerator(objectList);
-            generatorInstance.setFullyQualifiedNames(useFullyQualifiedNames);
-            generatorInstance.setCompactSQL(compactSql);
+            generatorInstance.setFullyQualifiedNames(options.useFullyQualifiedNames());
+            generatorInstance.setCompactSQL(options.compactSql());
+            if (options.showFullDdl()) {
+                generatorInstance.setShowFullDdl(true);
+                generatorInstance.setShowComments(true);
+                generatorInstance.setShowPermissions(true);
+            }
             generatorInstance.run(session.getProgressMonitor());
             return generatorInstance.getResult();
         } catch (DBException e) {

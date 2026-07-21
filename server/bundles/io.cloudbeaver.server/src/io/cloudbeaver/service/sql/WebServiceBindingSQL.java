@@ -429,11 +429,12 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL>
     private static WebSQLGeneratorOptions getGeneratorOptions(@NotNull DataFetchingEnvironment env) {
         Map<String, Object> optionsMap = getArgument(env, "generatorOptions");
         if (optionsMap == null) {
-            return new WebSQLGeneratorOptions(true, false);
+            return new WebSQLGeneratorOptions(true, false, false);
         }
         return new WebSQLGeneratorOptions(
             CommonUtils.toBoolean(optionsMap.get("useFullyQualifiedNames")),
-            CommonUtils.toBoolean(optionsMap.get("compactSql"))
+            CommonUtils.toBoolean(optionsMap.get("compactSql")),
+            CommonUtils.toBoolean(optionsMap.get("showFullDdl"))
         );
     }
 

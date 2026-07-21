@@ -25,15 +25,21 @@ import org.jkiss.dbeaver.model.DBPScriptObjectExt;
 import org.jkiss.dbeaver.model.navigator.DBNDatabaseNode;
 import org.jkiss.dbeaver.model.navigator.DBNNode;
 import org.jkiss.dbeaver.model.struct.DBSObject;
+import org.jkiss.utils.CommonUtils;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Web service implementation
  */
 public class WebServiceMetadata implements DBWServiceMetadata {
 
+    private static final Set<String> SUPPORTED_DDL_OPTIONS = Set.of(
+        DBPScriptObject.OPTION_INCLUDE_NESTED_OBJECTS,
+        DBPScriptObject.OPTION_INCLUDE_COMMENTS,
+        DBPScriptObject.OPTION_INCLUDE_PERMISSIONS);
 
     @Override
     public String getNodeDDL(WebSession webSession, DBNNode dbNode, Map<String, Object> options) throws DBWebException {
@@ -42,11 +48,16 @@ public class WebServiceMetadata implements DBWServiceMetadata {
         if (!(object instanceof DBPScriptObject)) {
             throw new DBWebException("Object '" + dbNode.getNodeUri() + "' doesn't support DDL");
         }
-        if (options == null) {
-            options = new LinkedHashMap<>();
+        Map<String, Object> ddlOptions = new LinkedHashMap<>();
+        if (options != null) {
+            for (String option : SUPPORTED_DDL_OPTIONS) {
+                if (options.containsKey(option)) {
+                    ddlOptions.put(option, CommonUtils.toBoolean(options.get(option)));
+                }
+            }
         }
         try {
-            return ((DBPScriptObject) object).getObjectDefinitionText(webSession.getProgressMonitor(), options);
+            return ((DBPScriptObject) object).getObjectDefinitionText(webSession.getProgressMonitor(), ddlOptions);
         } catch (DBException e) {
             throw new DBWebException("Error extracting DDL", e);
         }
