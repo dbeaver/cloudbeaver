@@ -23,7 +23,7 @@ import {
 import { ConnectionDialectResource, ConnectionInfoResource, createConnectionParam } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import type { DialogComponentProps } from '@cloudbeaver/core-dialogs';
-import { download } from '@cloudbeaver/core-utils';
+import { download, withTimestamp } from '@cloudbeaver/core-utils';
 import { useCodemirrorExtensions } from '@cloudbeaver/plugin-codemirror6';
 import { SqlEditorNavigatorService } from '@cloudbeaver/plugin-sql-editor-navigation-tab';
 import { SQLCodeEditor, useSqlDialectExtension } from '@cloudbeaver/plugin-sql-editor-codemirror';
@@ -39,16 +39,6 @@ interface Payload {
   query: string;
   options?: SqlQueryGeneratorOptions;
   regenerateQuery: (options: SqlQueryGeneratorOptions) => Promise<string>;
-}
-
-function getFileName(parts: Array<string | undefined>): string {
-  const date = new Date().toISOString().slice(0, 10);
-  const name = [...parts, date]
-    .filter(Boolean)
-    .join('-')
-    .replace(/[^\w-]+/g, '_');
-
-  return `${name}.sql`;
 }
 
 export const GeneratedSqlDialog = observer<DialogComponentProps<Payload>>(function GeneratedSqlDialog({ rejectDialog, payload }) {
@@ -118,8 +108,10 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<Payload>>(functi
   }
 
   function handleSaveToFile() {
-    const blob = new Blob([state.query], { type: 'text/plain' });
-    download(blob, getFileName([payload.nodeName, payload.generatorName]));
+    const blob = new Blob([state.query], { type: 'application/sql' });
+    const name = [payload.nodeName, payload.generatorName].join('-') || 'Generated';
+
+    download(blob, `${withTimestamp(name)}.sql`);
   }
 
   return (
