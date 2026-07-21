@@ -44,14 +44,14 @@ public class WebDriverConfiguration {
      */
     @Property
     @NotNull
-    public List<WebDriverConfigurationValueInfo> getOnDuplicateKeyMethod() {
+    public List<WebDictionaryValueInfo> getSupportedInsertReplaceMethods() {
         SQLDialectMetadata dialect = dataSourceContainer.getDriver().getScriptDialect();
         List<SQLDialectInsertReplaceMethod> replaceMethods = dialect.getSupportedInsertReplaceMethodsDescriptors();
         if (CommonUtils.isEmpty(replaceMethods)) {
             return Collections.emptyList();
         }
         return replaceMethods.stream()
-            .map(method -> new WebDriverConfigurationValueInfo(method.getId(), method.getLabel(), method.getDescription()))
+            .map(method -> new WebDictionaryValueInfo(method.getId(), method.getLabel(), method.getDescription()))
             .collect(Collectors.toList());
     }
 
@@ -59,7 +59,7 @@ public class WebDriverConfiguration {
      * Whether the connection's database supports bulk load during data import
      */
     @Property
-    public boolean isUseBulkLoad() {
+    public boolean isSupportsBulkLoad() {
         DBPDataSource dataSource = dataSourceContainer.getDataSource();
         return dataSource != null && DBUtils.getAdapter(DBSDataBulkLoader.class, dataSource) != null;
     }
@@ -68,7 +68,7 @@ public class WebDriverConfiguration {
      * Whether the connection's database supports transaction
      */
     @Property
-    public boolean isUseTransactions() {
+    public boolean isSupportsTransactions() {
         DBPDataSource dataSource = dataSourceContainer.getDataSource();
         return dataSource != null && dataSource.getInfo().supportsTransactions();
     }

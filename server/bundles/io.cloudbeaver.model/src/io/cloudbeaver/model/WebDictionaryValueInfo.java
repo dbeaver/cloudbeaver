@@ -20,7 +20,10 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.meta.Property;
 
-public class WebDriverConfigurationValueInfo {
+/**
+ * Generic id/name/description dictionary value.
+ */
+public class WebDictionaryValueInfo {
 
     @NotNull
     private final String id;
@@ -29,7 +32,7 @@ public class WebDriverConfigurationValueInfo {
     @Nullable
     private final String description;
 
-    public WebDriverConfigurationValueInfo(@NotNull String id, @NotNull String name, @Nullable String description) {
+    public WebDictionaryValueInfo(@NotNull String id, @NotNull String name, @Nullable String description) {
         this.id = id;
         this.name = name;
         this.description = description;

@@ -577,19 +577,19 @@ type ConnectionInfo {
     driverConfiguration: DriverConfiguration! @since(version: "26.1.2")
 }
 
-"Database-dependent metadata describing the driver configuration"
+"Database-dependent metadata describing features supported by the driver"
 type DriverConfiguration {
     "Supported 'on duplicate key' replace methods for this connection's SQL dialect"
-    onDuplicateKeyMethod: [DriverConfigurationValueInfo!]!
+    supportedInsertReplaceMethods: [DictionaryValueInfo!]!
     "Whether the connection's database supports bulk load during data import"
-    useBulkLoad: Boolean!
+    supportsBulkLoad: Boolean!
     "Whether the connection's database supports transactions"
-    useTransactions: Boolean!
+    supportsTransactions: Boolean!
 }
 
-"Generic metadata of a single allowed value (option) of a driver configuration setting"
-type DriverConfigurationValueInfo {
-    "Value ID. Passed back in the import query 'settings' map for the corresponding setting"
+"Generic dictionary value: an identifier with a human readable name and an optional description"
+type DictionaryValueInfo {
+    "Value ID"
     id: ID!
     "Human readable value name"
     name: String!

@@ -34,14 +34,25 @@ type DataTransferDefaultExportSettings {
     supportedEncodings: [String!]!
 }
 
+"""
+Database dependent data import settings.
+Which of them are supported by a particular connection is reported by ConnectionInfo.driverConfiguration.
+New database dependent import settings should be added here.
+"""
+input DataTransferImportSettings {
+    "Id of the 'on duplicate key' replace method"
+    onDuplicateKeyMethod: ID
+    "Use bulk load during import"
+    useBulkLoad: Boolean
+    "Use transactions during import"
+    useTransactions: Boolean
+}
+
 input DataTransferImportParameters {
     "Import processor ID"
     processorId: ID!
-    """
-    Import settings, keyed by ConnectionInfo.driverConfiguration keys
-    (e.g. onDuplicateKeyMethod, useBulkLoad, useTransactions)
-    """
-    settings: Object
+    "Import settings. Omitted settings keep their default value"
+    settings: DataTransferImportSettings
 }
 
 input DataTransferParameters {

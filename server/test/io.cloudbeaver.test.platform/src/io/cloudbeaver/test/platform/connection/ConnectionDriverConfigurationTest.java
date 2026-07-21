@@ -31,13 +31,13 @@ public class ConnectionDriverConfigurationTest extends CloudbeaverDBTest {
           result: connectionInfo(projectId: $projectId, id: $connectionId) {
             id
             driverConfiguration {
-              onDuplicateKeyMethod {
+              supportedInsertReplaceMethods {
                 id
                 name
                 description
               }
-              useBulkLoad
-              useTransactions
+              supportsBulkLoad
+              supportsTransactions
             }
           }
         }""";
@@ -57,8 +57,9 @@ public class ConnectionDriverConfigurationTest extends CloudbeaverDBTest {
         Map<String, Object> driverConfiguration = JSONUtils.getObjectOrNull(connection, "driverConfiguration");
         Assertions.assertNotNull(driverConfiguration, "driverConfiguration must be present on a connection");
 
-        List<Map<String, Object>> replaceMethods = JSONUtils.getObjectList(driverConfiguration, "onDuplicateKeyMethod");
-        Assertions.assertNotNull(replaceMethods, "onDuplicateKeyMethod must be a non-null list");
+        List<Map<String, Object>> replaceMethods =
+            JSONUtils.getObjectList(driverConfiguration, "supportedInsertReplaceMethods");
+        Assertions.assertNotNull(replaceMethods, "supportedInsertReplaceMethods must be a non-null list");
 
         for (Map<String, Object> replaceMethod : replaceMethods) {
             Assertions.assertNotNull(JSONUtils.getString(replaceMethod, "id"), "replace method id must not be null");
