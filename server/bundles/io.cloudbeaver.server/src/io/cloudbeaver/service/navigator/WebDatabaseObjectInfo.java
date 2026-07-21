@@ -168,7 +168,7 @@ public class WebDatabaseObjectInfo {
         return features.toArray(new String[0]);
     }
 
-    private void getObjectFeatures(DBSObject object, List<String> features) {
+    private void getObjectFeatures(@NotNull DBSObject object, @NotNull List<String> features) {
         if (object instanceof DBPScriptObject) {
             features.add(OBJECT_FEATURE_SCRIPT);
         }
