@@ -541,12 +541,9 @@ public class WebConnectionInfo {
     }
 
     @Property
-    public boolean isAutocommit() {
-        Boolean isAutoCommit = dataSourceContainer.getConnectionConfiguration().getBootstrap().getDefaultAutoCommit();
-        if (isAutoCommit == null) {
-            return true;
-        }
-        return isAutoCommit;
+    @Nullable
+    public Boolean isAutocommit() {
+        return dataSourceContainer.getConnectionConfiguration().getBootstrap().getDefaultAutoCommit();
     }
 
     @Property
