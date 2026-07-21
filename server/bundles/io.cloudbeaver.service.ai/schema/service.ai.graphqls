@@ -24,8 +24,6 @@ enum AIDatabaseScope @since(version: "25.1.1") {
 type AISettingsInfo @since(version: "23.2.2") {
     activeEngine: ID!
     defaultConfiguration: ID
-    ragEnabled: Boolean!
-    "Language that is used as a default for AI responses"
     language: String
 }
 
@@ -155,7 +153,6 @@ type AIFunctionResult @since(version: "26.0.3") {
 input AISettingsConfig @since(version: "23.2.2") {
     "Default configuration profile ID. May be null if AI wasn't configured"
     defaultConfiguration: ID
-    ragEnabled: Boolean
     "Language to be used as a default for AI responses"
     language: String
 }
