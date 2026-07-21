@@ -119,4 +119,9 @@ public class WebAIChatConversation {
     public String getProfile() {
         return conversation.getProfile() == null ? null : conversation.getProfile().getProfileId();
     }
+
+    @NotNull
+    public AIChatConversation getConversation() {
+        return conversation;
+    }
 }

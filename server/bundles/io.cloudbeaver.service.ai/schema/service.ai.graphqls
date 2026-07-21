@@ -178,6 +178,8 @@ input AIChatConversationInput {
     dataSourceId: DataSourceIdInput
     caption: String
     settings: AIChatConversationSettingsInput
+    "ID of the prompt generator to use for this conversation (sql - by default)."
+    promptGeneratorId: ID
 }
 
 input AIChatConversationSettingsInput {
@@ -216,6 +218,9 @@ extend type Query @since(version: "23.2.2") {
     aiSettings: AISettingsInfo!
     "Returns the properties of the specified AI engine for displaying it in the UI. In case settings are passed, fills it with defaults and returns back."
     aiListEngineProperties(engineId: ID!, profileId: ID, settings : AIEngineConfig): [ObjectPropertyInfo!]!
+
+    "Return the list of available AI functions."
+    aiListFunctions: [AIFunction!] @since(version: "26.0.4")
 
     "Returns the list of available AI engine configuration profiles."
     aiListProfiles: [AIConfigurationProfileInfo!]! @since(version: "26.1.3")
