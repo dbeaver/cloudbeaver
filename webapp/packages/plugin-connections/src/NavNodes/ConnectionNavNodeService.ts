@@ -149,7 +149,7 @@ export class ConnectionNavNodeService {
       connectionInfos = Array.isArray(connectionInfos) ? connectionInfos : [connectionInfos];
       for (const connectionInfo of connectionInfos) {
         if (!connectionInfo?.nodePath) {
-          continue;
+          return;
         }
 
         const node = this.navNodeInfoResource.get(connectionInfo.nodePath);
