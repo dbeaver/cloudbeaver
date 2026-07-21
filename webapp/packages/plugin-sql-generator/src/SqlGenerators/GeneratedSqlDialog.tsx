@@ -8,6 +8,7 @@
 import { observer } from 'mobx-react-lite';
 
 import {
+  ActionIconButton,
   Button,
   Checkbox,
   CommonDialogBody,
@@ -145,17 +146,29 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<Payload>>(functi
               />
             </div>
           </div>
-          <div className="tw:flex tw:justify-end tw:w-full tw:gap-6">
-            <Button variant="secondary" disabled={!state.query || visibleLoading} onClick={handleSaveToFile}>
-              {translate('ui_download')}
-            </Button>
-            <Button variant="secondary" disabled={!state.query || visibleLoading} onClick={() => copy(state.query, true)}>
-              {translate('ui_copy_to_clipboard')}
-            </Button>
-            <Button variant="secondary" disabled={!state.query || visibleLoading} onClick={handleOpenInEditor}>
-              {translate('app_shared_sql_generators_open_in_editor')}
-            </Button>
-            <Button onClick={() => rejectDialog()}>{translate('ui_close')}</Button>
+          <div className="tw:flex tw:items-center tw:justify-between tw:w-full tw:gap-6">
+            <div className="tw:flex tw:items-center tw:gap-2">
+              <ActionIconButton
+                title={translate('ui_download')}
+                name="/icons/export.svg"
+                disabled={!state.query || visibleLoading}
+                img
+                onClick={handleSaveToFile}
+              />
+              <ActionIconButton
+                title={translate('ui_copy_to_clipboard')}
+                name="copy"
+                viewBox="0 0 32 32"
+                disabled={!state.query || visibleLoading}
+                onClick={() => copy(state.query, true)}
+              />
+            </div>
+            <div className="tw:flex tw:items-center tw:gap-6">
+              <Button variant="secondary" disabled={!state.query || visibleLoading} onClick={handleOpenInEditor}>
+                {translate('app_shared_sql_generators_open_in_editor')}
+              </Button>
+              <Button onClick={() => rejectDialog()}>{translate('ui_close')}</Button>
+            </div>
           </div>
         </div>
       </CommonDialogFooter>
