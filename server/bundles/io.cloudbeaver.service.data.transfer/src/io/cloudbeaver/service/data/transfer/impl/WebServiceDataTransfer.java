@@ -21,6 +21,7 @@ import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.WebAsyncTaskInfo;
 import io.cloudbeaver.model.session.WebAsyncTaskProcessor;
 import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.server.BaseWebPlatform;
 import io.cloudbeaver.server.CBConstants;
 import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.server.WebAppUtils;
@@ -39,6 +40,7 @@ import org.jkiss.dbeaver.model.struct.DBSDataContainer;
 import org.jkiss.dbeaver.model.struct.DBSDataManipulator;
 import org.jkiss.dbeaver.model.struct.DBSEntity;
 import org.jkiss.dbeaver.model.struct.DBSObjectContainer;
+import org.jkiss.dbeaver.tools.transfer.DTConstants;
 import org.jkiss.dbeaver.tools.transfer.IDataTransferConsumer;
 import org.jkiss.dbeaver.tools.transfer.IDataTransferProcessor;
 import org.jkiss.dbeaver.tools.transfer.database.*;
@@ -130,6 +132,17 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
         // product settings parameter saves only disabled state that's why we invert result
         return webSession.hasPermission(DBWConstants.PERMISSION_ADMIN) ||
             !CommonUtils.getOption(productSettings, CBConstants.PREF_DATA_EDITOR_EXPORT_DISABLED_OLD, false);
+    }
+
+    private boolean validateImportPermission(@NotNull WebSession webSession) {
+        if (!WebAppUtils.getWebApplication().isCommunity()) {
+            // global permission is already checked
+            return true;
+        }
+        Map<String, Object> productSettings = WebAppUtils.getWebApplication().getServerConfiguration().getProductSettings();
+        // product settings parameter saves only disabled state that's why we invert result
+        return webSession.hasPermission(DBWConstants.PERMISSION_ADMIN) ||
+            !CommonUtils.getOption(productSettings, CBConstants.PREF_DATA_EDITOR_IMPORT_DISABLED_OLD, false);
     }
 
     @NotNull
@@ -233,20 +246,27 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
     }
 
     @NotNull
+    @Override
     public WebAsyncTaskInfo asyncImportDataContainer(
-        @NotNull String processorId,
-        @NotNull Path path,
-        @NotNull WebSQLResultsInfo sqlContext,
+        @NotNull WebSQLContextInfo sqlContext,
+        @NotNull String resultsId,
+        @NotNull WebDataTransferImportParameters parameters,
         @NotNull WebSession webSession
     ) throws DBWebException {
-        webSession.addInfoMessage("Import data");
-        DataTransferProcessorDescriptor processor = DataTransferRegistry.getInstance().getProcessor(processorId);
-        if (processor == null) {
-            throw new DBWebException("Wrong data processor '" + processorId + "'");
+        if (!validateImportPermission(webSession)) {
+            throw new DBWebException("Data import was disabled by administrator");
         }
+        webSession.addInfoMessage("Import data");
+        DataTransferProcessorDescriptor processor = DataTransferRegistry.getInstance().getProcessor(parameters.getProcessorId());
+        if (processor == null) {
+            throw new DBWebException("Wrong data processor '" + parameters.getProcessorId() + "'");
+        }
+        WebSQLResultsInfo results = sqlContext.getResults(resultsId);
+        Path path = resolveImportFile(webSession, parameters.getFileId());
+        Map<String, Object> settings = parameters.getSettings();
 
         log.info(String.format("Data import started: [userId=%s]", webSession.getUserId()));
-        DBSDataContainer dataContainer = sqlContext.getDataContainer();
+        DBSDataContainer dataContainer = results.getDataContainer();
         WebAsyncTaskProcessor<String> runnable = new WebAsyncTaskProcessor<>() {
             @Override
             public void run(@NotNull DBRProgressMonitor monitor) throws InvocationTargetException {
@@ -254,7 +274,7 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
                 try {
                     monitor.subTask("Import data using " + processor.getName());
                     try {
-                        importData(monitor, processor, (DBSDataManipulator) dataContainer, path);
+                        importData(monitor, processor, (DBSDataManipulator) dataContainer, path, settings);
                     } catch (Exception e) {
                         if (e instanceof DBException) {
                             throw e;
@@ -269,11 +289,30 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
                     } catch (IOException e) {
                         log.error("Failed to delete file: " + e.getMessage(), e);
                     }
+                    WebDataTransferUtils.getSessionDataTransferConfig(webSession).removeImportFile(parameters.getFileId());
                     monitor.done();
                 }
             }
         };
         return webSession.createAndRunAsyncTask("Data import", runnable);
+    }
+
+    /**
+     * Resolves a previously uploaded import file by its id, validating it belongs to the session
+     * and stays within the import temp folder.
+     */
+    @NotNull
+    private Path resolveImportFile(@NotNull WebSession webSession, @Nullable String fileId) throws DBWebException {
+        if (CommonUtils.isEmpty(fileId) || !WebDataTransferUtils.getSessionDataTransferConfig(webSession).hasImportFile(fileId)) {
+            throw new DBWebException("Import file '" + fileId + "' not found");
+        }
+        Path tempFolder = WebAppUtils.getWebPlatform()
+            .getTempFolder(webSession.getProgressMonitor(), BaseWebPlatform.TEMP_FILE_IMPORT_FOLDER);
+        Path path = tempFolder.resolve(fileId).normalize();
+        if (!path.startsWith(tempFolder) || !Files.exists(path)) {
+            throw new DBWebException("Import file '" + fileId + "' not found");
+        }
+        return path;
     }
 
     private void exportData(
@@ -342,7 +381,8 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
         @NotNull DBRProgressMonitor monitor,
         @NotNull DataTransferProcessorDescriptor processor,
         @NotNull DBSDataManipulator dataContainer,
-        @NotNull Path path
+        @NotNull Path path,
+        @Nullable Map<String, Object> settings
     ) throws DBException {
         IDataTransferProcessor processorInstance = processor.getInstance();
 
@@ -354,6 +394,7 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
             DatabaseConsumerSettings databaseConsumerSettings = new DatabaseConsumerSettings();
             databaseConsumerSettings.setContainer((DBSObjectContainer) dataContainer.getDataSource());
             databaseConsumerSettings.setEnableQmLogging(true);
+            applyImportSettings(databaseConsumerSettings, settings);
             consumer.setSettings(databaseConsumerSettings);
 
             StreamProducerSettings producerSettings = new StreamProducerSettings();
@@ -382,6 +423,24 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
                 throw new DBWebException("Import failed cause: " + e.getMessage());
             }
         }
+    }
+
+    private void applyImportSettings(
+        @NotNull DatabaseConsumerSettings consumerSettings,
+        @Nullable Map<String, Object> settings
+    ) {
+        if (CommonUtils.isEmpty(settings)) {
+            return;
+        }
+        consumerSettings.setOnDuplicateKeyInsertMethodId(CommonUtils.toString(
+            settings.get(DTConstants.PROP_ON_DUPLICATE_KEY_METHOD),
+            consumerSettings.getOnDuplicateKeyInsertMethodId()));
+        consumerSettings.setUseBulkLoad(CommonUtils.getBoolean(
+            settings.get(DTConstants.PROP_USE_BULK_LOAD),
+            consumerSettings.isUseBulkLoad()));
+        consumerSettings.setUseTransactions(CommonUtils.getBoolean(
+            settings.get(DTConstants.PROP_USE_TRANSACTIONS),
+            consumerSettings.isUseTransactions()));
     }
 
 }

@@ -34,6 +34,18 @@ type DataTransferDefaultExportSettings {
     supportedEncodings: [String!]!
 }
 
+input DataTransferImportParameters {
+    "Id of the file previously uploaded via the data import servlet (POST .../data/import)"
+    fileId: String!
+    "Import processor ID"
+    processorId: ID!
+    """
+    Import settings, keyed by ConnectionInfo.driverConfiguration keys
+    (e.g. onDuplicateKeyMethod, useBulkLoad, useTransactions)
+    """
+    settings: Object
+}
+
 input DataTransferParameters {
     "Processor ID"
     processorId: ID!
@@ -76,6 +88,15 @@ extend type Query {
         contextId: ID!,
         resultsId: ID!,
         parameters: DataTransferParameters!
+    ): AsyncTaskInfo!
+
+    "Creates async task for data transfer import of a previously uploaded file into the results"
+    dataTransferImportDataIntoResults(
+        projectId: ID,
+        connectionId: ID!,
+        contextId: ID!,
+        resultsId: ID!,
+        parameters: DataTransferImportParameters!
     ): AsyncTaskInfo!
 
     "Deletes data transfer file by ID"

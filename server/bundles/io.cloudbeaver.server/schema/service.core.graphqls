@@ -572,6 +572,29 @@ type ConnectionInfo {
     tools: [String!]! @since(version: "24.1.3")
 
     connectionType: ID! @since(version: "26.1.2")
+
+    "Driver configuration"
+    driverConfiguration: DriverConfiguration! @since(version: "26.1.2")
+}
+
+"Database-dependent metadata describing the driver configuration"
+type DriverConfiguration {
+    "Supported 'on duplicate key' replace methods for this connection's SQL dialect"
+    onDuplicateKeyMethod: [DriverConfigurationValueInfo!]!
+    "Whether the connection's database supports bulk load during data import"
+    useBulkLoad: Boolean!
+    "Whether the connection's database supports transactions"
+    useTransactions: Boolean!
+}
+
+"Generic metadata of a single allowed value (option) of a driver configuration setting"
+type DriverConfigurationValueInfo {
+    "Value ID. Passed back in the import query 'settings' map for the corresponding setting"
+    id: ID!
+    "Human readable value name"
+    name: String!
+    "Value description"
+    description: String
 }
 
 type ConnectionFolderInfo {

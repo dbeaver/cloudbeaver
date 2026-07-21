@@ -18,10 +18,15 @@ package io.cloudbeaver.service.data.transfer.impl;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class WebDataTransferSessionConfig {
 
     private final Map<String, WebDataTransferTaskConfig> tasks = new HashMap<>();
+    // Ids of files uploaded for import (via the import servlet) but not yet imported. Scoped to the session
+    // so a user can only import files they uploaded themselves.
+    private final Set<String> importFileIds = ConcurrentHashMap.newKeySet();
 
     public WebDataTransferSessionConfig() {
     }
@@ -36,10 +41,23 @@ public class WebDataTransferSessionConfig {
         }
     }
 
+    public void addImportFile(String fileId) {
+        importFileIds.add(fileId);
+    }
+
+    public boolean hasImportFile(String fileId) {
+        return importFileIds.contains(fileId);
+    }
+
+    public void removeImportFile(String fileId) {
+        importFileIds.remove(fileId);
+    }
+
     public WebDataTransferSessionConfig deleteExportFiles() {
         synchronized (tasks) {
             tasks.clear();
         }
+        importFileIds.clear();
         return this;
     }
 
