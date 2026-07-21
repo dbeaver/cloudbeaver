@@ -169,9 +169,12 @@ public class WebDatabaseObjectInfo {
     }
 
     private void getObjectFeatures(DBSObject object, List<String> features) {
-        boolean isDiagramSupported = true;
-        if (object instanceof DBPScriptObject) features.add(OBJECT_FEATURE_SCRIPT);
-        if (object instanceof DBPScriptObjectExt) features.add(OBJECT_FEATURE_SCRIPT_EXTENDED);
+        if (object instanceof DBPScriptObject) {
+            features.add(OBJECT_FEATURE_SCRIPT);
+        }
+        if (object instanceof DBPScriptObjectExt) {
+            features.add(OBJECT_FEATURE_SCRIPT_EXTENDED);
+        }
         if (object instanceof DBPScriptObjectExt2 scriptObjectExt2 && (
             scriptObjectExt2.supportsObjectDefinitionOption(DBPScriptObject.OPTION_INCLUDE_NESTED_OBJECTS)
                 || scriptObjectExt2.supportsObjectDefinitionOption(DBPScriptObject.OPTION_INCLUDE_COMMENTS)
@@ -179,6 +182,7 @@ public class WebDatabaseObjectInfo {
         ) {
             features.add(OBJECT_FEATURE_SUPPORTS_FULL_DDL);
         }
+        boolean isDiagramSupported = true;
         if (object instanceof DBSDataContainer) {
             features.add(OBJECT_FEATURE_DATA_CONTAINER);
             if (((DBSDataContainer) object).isFeatureSupported(DBSDataContainer.FEATURE_DATA_FILTER)) {
@@ -188,7 +192,9 @@ public class WebDatabaseObjectInfo {
                 isDiagramSupported = false;
             }
         }
-        if (object instanceof DBSDataManipulator) features.add(OBJECT_FEATURE_DATA_MANIPULATOR);
+        if (object instanceof DBSDataManipulator) {
+            features.add(OBJECT_FEATURE_DATA_MANIPULATOR);
+        }
         if (object instanceof DBSEntity) {
             features.add(OBJECT_FEATURE_ENTITY);
             if (object instanceof DBSDataType
@@ -199,8 +205,12 @@ public class WebDatabaseObjectInfo {
                 features.add(OBJECT_FEATURE_RELATIONAL_ENTITY);
             }
         }
-        if (object instanceof DBSSchema) features.add(OBJECT_FEATURE_SCHEMA);
-        if (object instanceof DBSCatalog) features.add(OBJECT_FEATURE_CATALOG);
+        if (object instanceof DBSSchema) {
+            features.add(OBJECT_FEATURE_SCHEMA);
+        }
+        if (object instanceof DBSCatalog) {
+            features.add(OBJECT_FEATURE_CATALOG);
+        }
         if (object instanceof DBSObjectContainer objectContainer) {
             features.add(OBJECT_FEATURE_OBJECT_CONTAINER);
             try {

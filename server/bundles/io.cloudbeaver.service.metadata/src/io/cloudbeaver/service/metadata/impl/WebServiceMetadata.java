@@ -19,6 +19,8 @@ package io.cloudbeaver.service.metadata.impl;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.service.metadata.DBWServiceMetadata;
+import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.DBPScriptObject;
 import org.jkiss.dbeaver.model.DBPScriptObjectExt;
@@ -41,8 +43,13 @@ public class WebServiceMetadata implements DBWServiceMetadata {
         DBPScriptObject.OPTION_INCLUDE_COMMENTS,
         DBPScriptObject.OPTION_INCLUDE_PERMISSIONS);
 
+    @Nullable
     @Override
-    public String getNodeDDL(WebSession webSession, DBNNode dbNode, Map<String, Object> options) throws DBWebException {
+    public String getNodeDDL(
+        @NotNull WebSession webSession,
+        @NotNull DBNNode dbNode,
+        @Nullable Map<String, Object> options
+    ) throws DBWebException {
         validateDatabaseNode(dbNode);
         DBSObject object = ((DBNDatabaseNode) dbNode).getObject();
         if (!(object instanceof DBPScriptObject)) {
@@ -63,8 +70,9 @@ public class WebServiceMetadata implements DBWServiceMetadata {
         }
     }
 
+    @Nullable
     @Override
-    public String getNodeExtendedDDL(WebSession webSession, DBNNode dbNode) throws DBWebException {
+    public String getNodeExtendedDDL(@NotNull WebSession webSession, @NotNull DBNNode dbNode) throws DBWebException {
         validateDatabaseNode(dbNode);
         DBSObject object = ((DBNDatabaseNode) dbNode).getObject();
         if (!(object instanceof DBPScriptObjectExt)) {
@@ -77,7 +85,7 @@ public class WebServiceMetadata implements DBWServiceMetadata {
         }
     }
 
-    private void validateDatabaseNode(DBNNode dbNode) throws DBWebException {
+    private void validateDatabaseNode(@NotNull DBNNode dbNode) throws DBWebException {
         if (!(dbNode instanceof DBNDatabaseNode)) {
             throw new DBWebException("Node '" + dbNode.getNodeUri() + "' is not database node");
         }
