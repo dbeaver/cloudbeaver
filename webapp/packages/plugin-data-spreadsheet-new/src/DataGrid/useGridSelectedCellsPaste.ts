@@ -39,7 +39,8 @@ export function useGridSelectedCellsPaste(
 
   const onKeydownHandler = useCallback(
     async (event: DataGridCellKeyboardEvent) => {
-      const isPasteShortcut = (event.ctrlKey || event.metaKey) && event.nativeEvent.code === EVENT_KEY_CODE.V;
+      const isPasteShortcut =
+        (event.ctrlKey || event.metaKey) && !event.altKey && (event.key.toLowerCase() === 'v' || event.nativeEvent.code === EVENT_KEY_CODE.V);
       const selectedCells = selectAction?.getActiveElements();
 
       if (!isPasteShortcut) {
