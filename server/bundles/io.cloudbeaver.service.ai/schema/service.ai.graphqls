@@ -39,6 +39,7 @@ type AIEngineInfo @since(version: "23.2.2") {
 type AIChatConversationInfo @since(version: "25.1.1") {
     dataSourceId: DataSourceId
     id: ID!
+    promptGeneratorId: ID
     caption: String!
     "Last message creation time."
     time: DateTime!

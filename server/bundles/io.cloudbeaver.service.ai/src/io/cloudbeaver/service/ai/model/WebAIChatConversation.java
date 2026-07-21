@@ -78,6 +78,11 @@ public class WebAIChatConversation {
     }
 
     @NotNull
+    public String getPromptGeneratorId() {
+        return conversation.getPromptGenerator().generatorId();
+    }
+
+    @NotNull
     public String getCaption() {
         return conversation.getCaption();
     }
