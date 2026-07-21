@@ -21,6 +21,7 @@ import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.CBConstants;
 import org.jkiss.code.NotNull;
+import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBConstants;
 import org.jkiss.dbeaver.model.connection.*;
@@ -180,13 +181,17 @@ public class WebDatabaseDriverInfo {
     @NotNull
     @Property
     public WebPropertyInfo[] getDriverProperties() throws DBWebException {
-        DBPConnectionConfiguration cfg = new DBPConnectionConfiguration();
-        cfg.setUrl(CommonUtils.notEmpty(driver.getSampleURL()));
-        cfg.setHostName(CBConstants.HOST_LOCALHOST);
-        cfg.setHostPort(driver.getDefaultPort());
-        cfg.setDatabaseName(driver.getDefaultDatabase());
-        cfg.setUrl(driver.getConnectionURL(cfg));
-        return WebServiceUtils.getDriverProperties(webSession, driver, null, cfg);
+        try {
+            DBPConnectionConfiguration cfg = new DBPConnectionConfiguration();
+            cfg.setUrl(CommonUtils.notEmpty(driver.getSampleURL()));
+            cfg.setHostName(CBConstants.HOST_LOCALHOST);
+            cfg.setHostPort(driver.getDefaultPort());
+            cfg.setDatabaseName(driver.getDefaultDatabase());
+            cfg.setUrl(driver.getConnectionURL(cfg));
+            return WebServiceUtils.getDriverProperties(webSession, driver, null, cfg);
+        } catch (DBException e) {
+            throw new DBWebException("Error obtaining driver properties", e);
+        }
     }
 
     @Property
