@@ -13,7 +13,7 @@ import {
   type IAdministrationItem,
 } from '@cloudbeaver/core-administration';
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { injectable } from '@cloudbeaver/core-di';
 import { TabsContainer, type ITabInfoOptions } from '@cloudbeaver/core-ui';
 
 import { ADMINISTRATION_CONNECTIONS_ITEM } from './ADMINISTRATION_CONNECTIONS_ITEM.js';
@@ -28,17 +28,16 @@ export interface IConnectionsTabOptions extends ITabInfoOptions<AdministrationIt
 }
 
 @injectable(() => [AdministrationItemService])
-export class ConnectionsAdministrationService extends Bootstrap {
+export class ConnectionsAdministrationTabService {
   readonly tabsContainer: TabsContainer<AdministrationItemContentProps>;
 
   private item!: IAdministrationItem;
 
   constructor(private readonly administrationItemService: AdministrationItemService) {
-    super();
     this.tabsContainer = new TabsContainer('Connections administration tabs');
   }
 
-  addTab({ onActivate, onDeActivate, ...tabInfo }: IConnectionsTabOptions): void {
+  addSubTab({ onActivate, onDeActivate, ...tabInfo }: IConnectionsTabOptions): void {
     this.tabsContainer.add(tabInfo);
 
     if (!this.item.sub.some(sub => sub.name === tabInfo.key)) {
@@ -48,7 +47,7 @@ export class ConnectionsAdministrationService extends Bootstrap {
     this.item.defaultSub ??= tabInfo.key;
   }
 
-  override register(): void {
+  createRootTab(): void {
     this.item = this.administrationItemService.create({
       name: ADMINISTRATION_CONNECTIONS_ITEM,
       order: 7,

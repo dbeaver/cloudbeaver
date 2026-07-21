@@ -5,11 +5,12 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { Bootstrap, ModuleRegistry, proxy } from '@cloudbeaver/core-di';
+import { Bootstrap, ModuleRegistry } from '@cloudbeaver/core-di';
 
-import { ConnectionsAdministrationService } from './ConnectionsAdministrationService.js';
+import { ConnectionsAdministrationTabService } from './ConnectionsAdministrationTabService.js';
 import { ConnectionsAdministrationNavService } from './ConnectionsAdministrationNavService.js';
 import { LocaleService } from './LocaleService.js';
+import { ConnectionsAdministrationServiceBootstrap } from './ConnectionsAdministrationServiceBootstrap.js';
 
 export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-connection-administration',
@@ -17,8 +18,8 @@ export default ModuleRegistry.add({
   configure: serviceCollection => {
     serviceCollection
       .addSingleton(Bootstrap, LocaleService)
-      .addSingleton(Bootstrap, proxy(ConnectionsAdministrationService))
-      .addSingleton(ConnectionsAdministrationService)
+      .addSingleton(Bootstrap, ConnectionsAdministrationServiceBootstrap)
+      .addSingleton(ConnectionsAdministrationTabService)
       .addSingleton(ConnectionsAdministrationNavService);
   },
 });

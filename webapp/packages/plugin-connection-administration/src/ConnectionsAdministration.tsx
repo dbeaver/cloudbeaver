@@ -18,7 +18,7 @@ import tabStyle from './shared/ConnectionsAdministrationTab.module.css';
 import tabPanelStyle from './shared/ConnectionsAdministrationTabPanel.module.css';
 import TabTitleModuleStyles from './shared/ConnectionsAdministrationTabTitle.module.css';
 import { ConnectionsAdministrationNavService } from './ConnectionsAdministrationNavService.js';
-import { ConnectionsAdministrationService } from './ConnectionsAdministrationService.js';
+import { ConnectionsAdministrationTabService } from './ConnectionsAdministrationTabService.js';
 
 const tabPanelRegistry: StyleRegistry = [[TabPanelStyles, { mode: 'append', styles: [tabPanelStyle] }]];
 
@@ -35,7 +35,7 @@ export const ConnectionsAdministration: AdministrationItemContentComponent = obs
 }) {
   const translate = useTranslate();
   const connectionsAdministrationNavService = useService(ConnectionsAdministrationNavService);
-  const connectionsAdministrationService = useService(ConnectionsAdministrationService);
+  const connectionsAdministrationTabService = useService(ConnectionsAdministrationTabService);
   const styles = useS(style, tabStyle);
 
   function openSub({ tabId }: ITabData<AdministrationItemContentProps>) {
@@ -49,7 +49,7 @@ export const ConnectionsAdministration: AdministrationItemContentComponent = obs
   return (
     <TabsState
       selectedId={sub?.name}
-      container={connectionsAdministrationService.tabsContainer}
+      container={connectionsAdministrationTabService.tabsContainer}
       item={item}
       configurationWizard={configurationWizard}
       sub={sub}
