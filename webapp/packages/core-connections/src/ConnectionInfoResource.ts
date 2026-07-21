@@ -300,14 +300,7 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
   private async updateFromEvent(key: ResourceKeyList<IConnectionInfoParams>): Promise<void> {
     for (const connectionKey of key) {
       const currentConnection = this.get(connectionKey);
-      let newConnection: Connection | undefined;
-      
-      try {
-        newConnection = await this.refresh(connectionKey);
-      } catch (exception: any) {
-        this.logger.warn(`Failed to refresh the connection info on a server event: ${exception?.message}`);
-        continue;
-      }
+      const newConnection = await this.refresh(connectionKey);
 
       if (currentConnection?.nodePath !== newConnection?.nodePath) {
         if (currentConnection?.nodePath) {
