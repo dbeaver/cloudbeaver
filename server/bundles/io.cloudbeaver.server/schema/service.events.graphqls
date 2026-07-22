@@ -57,6 +57,8 @@ enum CBEventTopic {
     cb_workspace_configuration @since(version: "25.1.1")
     cb_notification @since(version: "25.2.1")
     cb_session_action @since(version: "25.3.1")
+    cb_object_settings_updated @since(version: "26.1.4")
+    cb_object_settings_deleted @since(version: "26.1.4")
 }
 
 "Base server event interface"
