@@ -28,6 +28,29 @@ You can see a live demo of CloudBeaver server here: https://demo.cloudbeaver.io
 
 ## Changelog
 
+### 26.1.3 2026-07-20
+
+- Data Editor:
+    - Fixed copying of large JSON values in the Data Editor - now the full value can be copied and transferred.
+    - Updated the Reference panel to show only relevant rows when a foreign key is null.
+- General:
+    - Added connection types to visually distinguish database environments using background colors across the Database Navigator and application UI. Users with edit permissions can assign built-in environment types color-coded configurations.
+- Data Transfer:
+    - Improved memory usage when importing large CSV files.
+    - Fixed CSV export with multi-character quotes and improved quote/delimiter validation
+- Accessibility:
+    - Enabled the use of the Enter or space keys to toggle checkboxes in the administration tabs and the metadata viewer.
+    - Added the ability to expand and collapse code block elements, including JSON, using the keyboard.
+    - Fixed shortcuts behavior for AZERTY keyboards. Now shortcuts like Ctrl/Cmd + Z work correctly.
+- Security:
+    - Resolved an authorization vulnerability when testing connections by enforcing strict permission checks. This mitigation prevented unauthenticated users from exploiting JDBC requests to read arbitrary server files.
+    - Resolved an LDAP injection vulnerability by properly escaping user input in the authentication username field, preventing attackers from manipulating search filters, bypassing access restrictions, and enumerating directory users.
+    - Fixed the high vulnerability (GHSA-gv7w-rqvm-qjhr) in the esbuild library. The library was updated to version 0.28.1.
+    - Fixed the high vulnerability (CVE-2026-12143) in the form-data library. The library was updated to version 4.0.6.
+- Databases and drivers:
+    - The Databend driver was updated to version 0.4.8.
+    - Fixed an issue related to the display of metadata in the navigation tree for DB2, Firebird, and MySQL.
+
 ### 26.1.2 2026-07-06
 
 - Data Editor:
