@@ -81,7 +81,8 @@ public class WebDataTransferImportServlet extends WebServiceServletBase {
 
             request.setAttribute(ECLIPSE_JETTY_MULTIPART_CONFIG, MULTI_PART_CONFIG);
 
-            String taskId = request.getParameter(PARAM_TASK_ID);
+            Map<String, Object> variables = getVariables(request);
+            String taskId = JSONUtils.getString(variables, "taskId");
             if (CommonUtils.isEmpty(taskId)) {
                 throw new IllegalArgumentException("Missing required parameter '" + PARAM_TASK_ID + "'");
             }
