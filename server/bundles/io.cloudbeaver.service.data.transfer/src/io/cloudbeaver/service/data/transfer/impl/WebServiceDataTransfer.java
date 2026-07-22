@@ -313,15 +313,11 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
     }
 
     public boolean validateImportPermission(@NotNull WebSession session) {
-        if (session.hasPermission(DBWConstants.PERMISSION_ADMIN)) {
-            // admin is allowed to import regardless of the product setting / global permission
-            return false;
-        }
         if (WebAppUtils.getWebApplication().isCommunity()) {
             Map<String, Object> productSettings = WebAppUtils.getWebApplication().getServerConfiguration().getProductSettings();
-            return JSONUtils.getBoolean(productSettings, CBConstants.PREF_DATA_EDITOR_IMPORT_DISABLED_OLD, false);
+            return !JSONUtils.getBoolean(productSettings, CBConstants.PREF_DATA_EDITOR_IMPORT_DISABLED_OLD, false);
         }
-        return !session.hasGlobalPermission(DBWConstants.GLOBAL_PERMISSION_DATA_EDITOR_IMPORT);
+        return session.hasGlobalPermission(DBWConstants.GLOBAL_PERMISSION_DATA_EDITOR_IMPORT);
     }
 
     private void exportData(

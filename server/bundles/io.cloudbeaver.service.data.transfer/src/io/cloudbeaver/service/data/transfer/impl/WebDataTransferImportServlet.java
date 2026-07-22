@@ -70,7 +70,7 @@ public class WebDataTransferImportServlet extends WebServiceServletBase {
             response.sendError(HttpServletResponse.SC_FORBIDDEN, "Permission denied");
             return;
         }
-        if (dbwServiceDataTransfer.validateImportPermission(session)) {
+        if (!dbwServiceDataTransfer.validateImportPermission(session)) {
             response.sendError(HttpServletResponse.SC_FORBIDDEN, "Import is not allowed for this user");
             return;
         }
