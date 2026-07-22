@@ -15,6 +15,7 @@ import { GrantManagementTable, type IGrantManagementTableColumn } from '@cloudbe
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import {
   compareUsers,
+  compareUsersByLastLogin,
   TeamRolesResource,
   USER_TEAM_ROLE_SUPERVISOR,
   UsersResource,
@@ -28,12 +29,12 @@ import type { GrantedUsersFormPart } from './GrantedUsersFormPart.js';
 const USER_ID_COLUMN: IGrantManagementTableColumn<AdminUser> = {
   key: 'userId',
   label: 'administration_teams_team_granted_users_user_id',
-  compare: (a, b) => a.userId.localeCompare(b.userId),
+  compare: compareUsers,
 };
 const LAST_LOGIN_COLUMN: IGrantManagementTableColumn<AdminUser> = {
   key: 'lastLogin',
   label: 'plugin_authentication_administration_user_last_login',
-  compare: (a, b) => (a.lastLoginTime ? new Date(a.lastLoginTime).getTime() : 0) - (b.lastLoginTime ? new Date(b.lastLoginTime).getTime() : 0),
+  compare: compareUsersByLastLogin,
 };
 const TEAM_ROLE_COLUMN_KEY = 'teamRole';
 

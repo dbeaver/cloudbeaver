@@ -30,6 +30,7 @@ export * from './UsersResource.js';
 export * from './UsersOriginDetailsResource.js';
 export * from './UserInfoMetaParametersResource.js';
 export * from './TeamMetaParametersResource.js';
+export * from './compareGrantSubjects.js';
 export * from './AUTH_SETTINGS_GROUP.js';
 export * from './PasswordPolicyService.js';
 export * from './TeamRolesResource.js';

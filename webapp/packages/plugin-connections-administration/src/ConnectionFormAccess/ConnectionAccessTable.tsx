@@ -12,7 +12,15 @@ import { Alert, StaticImage, useAutoLoad, useResource, useTranslate } from '@clo
 import { useTab, type TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 import { getConnectionFormOptionsPart, type IConnectionFormProps } from '@cloudbeaver/plugin-connections';
 import { CachedMapAllKey, CachedResourceOffsetPageListKey } from '@cloudbeaver/core-resource';
-import { isUser, TeamsResource, UsersResource, UsersResourceFilterKey, type AdminUser, type TeamInfo } from '@cloudbeaver/core-authentication';
+import {
+  compareGrantSubjectsByLastLogin,
+  compareGrantSubjectsByName,
+  TeamsResource,
+  UsersResource,
+  UsersResourceFilterKey,
+  type AdminUser,
+  type TeamInfo,
+} from '@cloudbeaver/core-authentication';
 import { ConnectionInfoOriginResource, ConnectionInfoResource, createConnectionParam, isCloudConnection } from '@cloudbeaver/core-connections';
 import { GrantManagementTable, type IGrantManagementTableColumn } from '@cloudbeaver/plugin-data-grid';
 
@@ -21,21 +29,13 @@ import { getConnectionFormAccessPart } from './getConnectionFormAccessPart.js';
 const NAME_COLUMN: IGrantManagementTableColumn<AdminUser | TeamInfo> = {
   key: 'name',
   label: 'connections_connection_access_user_or_team_name',
-  compare: (a, b) => {
-    const aName = isUser(a) ? a.userId : a.teamName;
-    const bName = isUser(b) ? b.userId : b.teamName;
-    return (aName ?? '').localeCompare(bName ?? '');
-  },
+  compare: compareGrantSubjectsByName,
 };
 const DESCRIPTION_COLUMN: IGrantManagementTableColumn<AdminUser | TeamInfo> = { key: 'description', label: 'connections_connection_description' };
 const LAST_LOGIN_COLUMN: IGrantManagementTableColumn<AdminUser | TeamInfo> = {
   key: 'lastLogin',
   label: 'plugin_connections_administration_user_last_login',
-  compare: (a, b) => {
-    const aTime = isUser(a) && a.lastLoginTime ? new Date(a.lastLoginTime).getTime() : 0;
-    const bTime = isUser(b) && b.lastLoginTime ? new Date(b.lastLoginTime).getTime() : 0;
-    return aTime - bTime;
-  },
+  compare: compareGrantSubjectsByLastLogin,
 };
 
 const COLUMNS: IGrantManagementTableColumn<AdminUser | TeamInfo>[] = [NAME_COLUMN, DESCRIPTION_COLUMN, LAST_LOGIN_COLUMN];

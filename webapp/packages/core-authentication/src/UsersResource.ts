@@ -345,6 +345,12 @@ export function compareUsers<T extends Pick<AdminUser, 'userId'>>(a: T, b: T): n
   return a.userId.localeCompare(b.userId);
 }
 
+export function compareUsersByLastLogin<T extends Pick<AdminUser, 'lastLoginTime'>>(a: T, b: T): number {
+  const aTime = a.lastLoginTime ? new Date(a.lastLoginTime).getTime() : 0;
+  const bTime = b.lastLoginTime ? new Date(b.lastLoginTime).getTime() : 0;
+  return aTime - bTime;
+}
+
 export function compareNewUsers(a: AdminUser, b: AdminUser): number {
   const aIsNew = isNewUser(a);
   const bIsNew = isNewUser(b);
