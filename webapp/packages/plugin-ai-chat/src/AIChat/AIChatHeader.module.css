@@ -1,0 +1,20 @@
+.container {
+  composes: theme-border-color-background from global;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px 12px;
+  border-bottom: 1px solid;
+}
+
+.title {
+  composes: theme-background-secondary from global;
+  padding: 4px 8px;
+  border-radius: var(--theme-form-element-radius);
+  font-weight: 600;
+  overflow: hidden;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}

@@ -1,0 +1,7 @@
+fragment AiChatConversationMetrics on AIChatConversationInfo {
+  id
+  metrics {
+    totalInputTokens
+    totalOutputTokens
+  }
+}

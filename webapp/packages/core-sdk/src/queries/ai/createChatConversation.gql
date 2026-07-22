@@ -1,0 +1,5 @@
+mutation createChatConversation($config: AIChatConversationInput!) {
+  conversation: aiCreateChatConversation(config: $config) {
+    ...AiChatConversation
+  }
+}

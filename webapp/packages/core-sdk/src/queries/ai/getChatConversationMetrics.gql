@@ -1,0 +1,5 @@
+query getChatConversationMetrics($conversationId: ID!) {
+  result: aiChatConversationInfo(conversationId: $conversationId, loadMetrics: true) {
+    ...AiChatConversationMetrics
+  }
+}

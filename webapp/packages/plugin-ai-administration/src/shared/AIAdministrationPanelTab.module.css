@@ -1,0 +1,16 @@
+.administrationTabs {
+  & .tab {
+    height: 100%;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 0 4px;
+  }
+
+  & .tabInner {
+    height: 100%;
+  }
+
+  & .tabOuter {
+    height: 100%;
+  }
+}

@@ -1,0 +1,5 @@
+mutation saveUserConnectionAiSettings($dataSourceId: DataSourceIdInput!, $settings: AIDataSourceSettingsInput!) {
+  settings: aiSaveDataSourceSettings(dataSourceId: $dataSourceId, settings: $settings) {
+    ...ConnectionInfoAiSettings
+  }
+}
