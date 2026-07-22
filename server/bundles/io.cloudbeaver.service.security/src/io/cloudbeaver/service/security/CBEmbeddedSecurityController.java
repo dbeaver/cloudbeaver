@@ -2901,11 +2901,17 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
             if (!(smAuthProviderInstance instanceof SMAuthProviderExternal<?> externalProvider)) {
                 return null;
             }
-            if (!externalProvider.isAutoUserProvisioningEnabled(providerConfig)) {
-                return null;
-            }
             userId = authProvider.isCaseInsensitive() ? userIdFromCredentials.toLowerCase() : userIdFromCredentials;
             if (!isSubjectExists(userId)) {
+                // Users are looked up by the credentials of this particular provider, so an already
+                // existing user that has no credentials for it yet is not found above. This is a typical
+                // reverse proxy case: the user was created earlier (by an admin or another provider) and
+                // only gets its reverse proxy credentials linked below on the first login.
+                // Therefore auto provisioning is checked here only, where the user really does not exist.
+                if (!externalProvider.isAutoUserProvisioningEnabled(providerConfig)) {
+                    log.debug("User '" + userId + "' not found and auto user provisioning is disabled");
+                    return null;
+                }
                 log.debug("Create user: " + userId);
                 validateAndCreateUser(
                     userId,
