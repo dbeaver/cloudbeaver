@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -335,6 +335,10 @@ export function isLocalUser(user: AdminUser): boolean {
 
 export function isNewUser(user: AdminUser | AdminUserNew): user is AdminUserNew {
   return NEW_USER_SYMBOL in user && user[NEW_USER_SYMBOL] === true && 'createdAt' in user && Boolean(user.createdAt);
+}
+
+export function isUser(user: object): user is AdminUser {
+  return !!user && 'userId' in user && 'grantedTeams' in user && 'enabled' in user;
 }
 
 export function compareUsers<T extends Pick<AdminUser, 'userId'>>(a: T, b: T): number {

@@ -25,14 +25,19 @@ import {
 import type { TeamFormProps } from '../TeamsAdministrationFormService.js';
 import type { GrantedUsersFormPart } from './GrantedUsersFormPart.js';
 
-const USER_ID_COLUMN: IGrantManagementTableColumn = { key: 'userId', label: 'administration_teams_team_granted_users_user_id' };
-const LAST_LOGIN_COLUMN: IGrantManagementTableColumn = { key: 'lastLogin', label: 'plugin_authentication_administration_user_last_login' };
-const TEAM_ROLE_COLUMN: IGrantManagementTableColumn = {
-  key: 'teamRole',
-  label: 'plugin_authentication_administration_team_user_team_role_supervisor',
+const USER_ID_COLUMN: IGrantManagementTableColumn<AdminUser> = {
+  key: 'userId',
+  label: 'administration_teams_team_granted_users_user_id',
+  compare: (a, b) => a.userId.localeCompare(b.userId),
 };
+const LAST_LOGIN_COLUMN: IGrantManagementTableColumn<AdminUser> = {
+  key: 'lastLogin',
+  label: 'plugin_authentication_administration_user_last_login',
+  compare: (a, b) => (a.lastLoginTime ? new Date(a.lastLoginTime).getTime() : 0) - (b.lastLoginTime ? new Date(b.lastLoginTime).getTime() : 0),
+};
+const TEAM_ROLE_COLUMN_KEY = 'teamRole';
 
-const COLUMNS: IGrantManagementTableColumn[] = [USER_ID_COLUMN, LAST_LOGIN_COLUMN];
+const COLUMNS: IGrantManagementTableColumn<AdminUser>[] = [USER_ID_COLUMN, LAST_LOGIN_COLUMN];
 
 export const GrantedUsersTable: TabContainerPanelComponent<TeamFormProps> = observer(function GrantedUsersTable({ tabId, formState }) {
   const translate = useTranslate();
@@ -78,10 +83,24 @@ export const GrantedUsersTable: TabContainerPanelComponent<TeamFormProps> = obse
     return !usersLoader.resource.isActiveUser(user.userId);
   }
 
+  function getTeamRoleRank(user: AdminUser) {
+    const granted = tabState.state.grantedUsers.find(grantedUser => grantedUser.userId === user.userId);
+
+    if (!granted) {
+      return 0;
+    }
+
+    return granted.teamRole === USER_TEAM_ROLE_SUPERVISOR ? 2 : 1;
+  }
+
   const columns = [...COLUMNS];
 
   if (teamRolesResource.data.length > 0) {
-    columns.push(TEAM_ROLE_COLUMN);
+    columns.push({
+      key: TEAM_ROLE_COLUMN_KEY,
+      label: 'plugin_authentication_administration_team_user_team_role_supervisor',
+      compare: (a, b) => getTeamRoleRank(a) - getTeamRoleRank(b),
+    });
   }
 
   function getCell(user: AdminUser, colKey: string) {
@@ -114,7 +133,7 @@ export const GrantedUsersTable: TabContainerPanelComponent<TeamFormProps> = obse
       return <span title={lastLoginFullTime}>{lastLoginDate}</span>;
     }
 
-    if (colKey === TEAM_ROLE_COLUMN.key) {
+    if (colKey === TEAM_ROLE_COLUMN_KEY) {
       const granted = tabState.state.grantedUsers.find(grantedUser => grantedUser.userId === user.userId);
 
       if (granted) {
