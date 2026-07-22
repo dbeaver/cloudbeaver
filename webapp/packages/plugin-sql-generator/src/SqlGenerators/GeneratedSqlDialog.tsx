@@ -8,7 +8,6 @@
 import { observer } from 'mobx-react-lite';
 
 import {
-  ActionIconButton,
   Button,
   Checkbox,
   CommonDialogBody,
@@ -148,18 +147,20 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<Payload>>(functi
           </div>
           <div className="tw:flex tw:items-center tw:justify-between tw:w-full tw:gap-6">
             <div className="tw:flex tw:items-center tw:gap-2">
-              <ActionIconButton
+              <Button
+                variant="secondary"
+                icon="/icons/export.svg"
                 title={translate('ui_download')}
-                name="/icons/export.svg"
                 disabled={!state.query || visibleLoading}
-                img
+                className="tw:aspect-square tw:!min-w-0 tw:!px-0"
                 onClick={handleSaveToFile}
               />
-              <ActionIconButton
+              <Button
+                variant="secondary"
+                icon="copy"
                 title={translate('ui_copy_to_clipboard')}
-                name="copy"
-                viewBox="0 0 32 32"
                 disabled={!state.query || visibleLoading}
+                className="tw:aspect-square tw:!min-w-0 tw:!px-0"
                 onClick={() => copy(state.query, true)}
               />
             </div>
