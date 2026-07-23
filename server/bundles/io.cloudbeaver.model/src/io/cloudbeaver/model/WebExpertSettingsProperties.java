@@ -21,6 +21,7 @@ import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.DBPObject;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.model.connection.DBPDriverConstants;
+import org.jkiss.dbeaver.model.meta.IPropertyValueListProvider;
 import org.jkiss.dbeaver.model.meta.IPropertyValueValidator;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.utils.CommonUtils;
@@ -31,6 +32,7 @@ import org.jkiss.utils.CommonUtils;
 public class WebExpertSettingsProperties implements DBPObject {
     public static final String PROP_READ_ONLY = "readOnly";
     public static final String PROP_AUTO_COMMIT = "autocommit";
+    public static final String PROP_AUTO_COMMIT_MODE = "autoCommitMode";
     public static final String PROP_KEEP_ALIVE_INTERVAL = "keepAliveInterval";
     public static final String PROP_DEFAULT_CATALOG = "defaultCatalogName";
     public static final String PROP_DEFAULT_SCHEMA = "defaultSchemaName";
@@ -46,10 +48,15 @@ public class WebExpertSettingsProperties implements DBPObject {
         return 0;
     }
 
-    @Nullable
-    @Property(order = 2, id = PROP_AUTO_COMMIT, visibleIf = AutoCommitFieldValidator.class)
-    public Boolean isAutoCommit() {
-        return null;
+    @NotNull
+    @Property(
+        order = 2,
+        id = PROP_AUTO_COMMIT_MODE,
+        visibleIf = AutoCommitFieldValidator.class,
+        listProvider = AutoCommitListProvider.class
+    )
+    public AutoCommitMode isAutoCommitMode() {
+        return AutoCommitMode.DEFAULT;
     }
 
     @Property(order = 3, id = PROP_READ_ONLY, visibleIf = ReadOnlyFieldValidator.class)
@@ -102,6 +109,20 @@ public class WebExpertSettingsProperties implements DBPObject {
         @Override
         public boolean isValidValue(@NotNull WebExpertSettingsProperties object, @Nullable Object value) throws IllegalArgumentException {
             return CommonUtils.toBoolean(object.driver.getDriverParameter(DBPDriverConstants.PARAM_SUPPORTS_SCHEMA_SELECTION), true);
+        }
+    }
+
+    public static class AutoCommitListProvider implements IPropertyValueListProvider<WebExpertSettingsProperties> {
+
+        @Override
+        public boolean allowCustomValue() {
+            return false;
+        }
+
+        @Nullable
+        @Override
+        public Object[] getPossibleValues(@Nullable WebExpertSettingsProperties object) {
+            return AutoCommitMode.values();
         }
     }
 }
