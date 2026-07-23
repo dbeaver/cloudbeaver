@@ -1,3 +1,19 @@
+/*
+ * DBeaver - Universal Database Manager
+ * Copyright (C) 2010-2026 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package io.cloudbeaver.model;
 
 import org.jkiss.code.NotNull;
@@ -30,9 +46,10 @@ public class WebExpertSettingsProperties implements DBPObject {
         return 0;
     }
 
+    @Nullable
     @Property(order = 2, id = PROP_AUTO_COMMIT, visibleIf = AutoCommitFieldValidator.class)
-    public boolean isAutoCommit() {
-        return true;
+    public Boolean isAutoCommit() {
+        return null;
     }
 
     @Property(order = 3, id = PROP_READ_ONLY, visibleIf = ReadOnlyFieldValidator.class)
@@ -40,11 +57,13 @@ public class WebExpertSettingsProperties implements DBPObject {
         return false;
     }
 
+    @Nullable
     @Property(order = 4, id = PROP_DEFAULT_CATALOG, visibleIf = DefaultCatalogFieldVisibleValidator.class)
     public String getDefaultCatalog() {
         return null;
     }
 
+    @Nullable
     @Property(order = 5, id = PROP_DEFAULT_SCHEMA, visibleIf = DefaultSchemaFieldVisibleValidator.class)
     public String getDefaultSchema() {
         return null;
