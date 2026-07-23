@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -68,7 +68,7 @@ export const ObjectViewerPanel: TabHandlerPanelComponent<IObjectViewerTabState> 
     <ConnectionShieldLazy connectionKey={connectionKey}>
       {node.tryGetData ? (
         <TabsState currentTabId={tab.handlerState.pageId} localState={innerTabState}>
-          <div className="tw:outline-none tw:flex-1 tw:flex tw:flex-col tw:max-w-full">
+          <div className="tw:outline-none! tw:flex-1 tw:flex tw:flex-col tw:max-w-full">
             <TabList className="theme-background-background theme-text-text-primary-on-light">
               <SContext registry={tabsRegistry}>
                 {pages.map(page => (

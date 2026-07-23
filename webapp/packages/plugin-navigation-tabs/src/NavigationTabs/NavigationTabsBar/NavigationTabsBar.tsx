@@ -109,7 +109,7 @@ export const NavigationTabsBar = observer<Props>(function NavigationTabsBar({ cl
           onChange={handleTabChange}
           onReorder={handleReorder}
         >
-          <div className="tw:outline-none tw:flex-1 tw:flex tw:flex-col tw:max-w-full">
+          <div className="tw:outline-none! tw:flex-1 tw:flex tw:flex-col tw:max-w-full">
             <TabList
               className={clsx(
                 'tw:overflow-auto tw:max-w-full theme-background-secondary theme-text-on-secondary',
