@@ -27,7 +27,7 @@ export function BooleanFormatter({ value, className, onClick, onKeyDown, focusab
   return (
     <Focusable
       focusable={focusable}
-      className={clsx('tw:flex tw:items-center tw:outline-none tw:hover:cursor-pointer', className)}
+      className={clsx('tw:flex tw:items-center tw:outline-none! tw:hover:cursor-pointer', className)}
       onKeyDown={handleKeyDown}
       onClick={onClick}
     >
