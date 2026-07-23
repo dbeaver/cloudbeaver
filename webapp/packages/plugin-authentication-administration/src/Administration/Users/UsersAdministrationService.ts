@@ -92,8 +92,10 @@ export class UsersAdministrationService extends Bootstrap {
 
       if (edited) {
         const { status } = await this.commonDialogService.open(ConfirmationDialog, {
-          title: 'ui_save_reminder',
-          message: 'ui_are_you_sure',
+          title: 'ui_discard_changes',
+          message: 'ui_discard_changes_message',
+          confirmActionText: 'ui_discard',
+          cancelActionText: 'ui_keep_editing',
         });
 
         if (status === DialogueStateResult.Rejected) {
