@@ -40,6 +40,7 @@ import { DataSynchronizationService } from './DataSynchronization/DataSynchroniz
 import { AsyncTaskInfoService } from './AsyncTask/AsyncTaskInfoService.js';
 import { AsyncTaskInfoEventHandler } from './AsyncTask/AsyncTaskInfoEventHandler.js';
 import { ServerDefaultSettingsService } from './Settings/ServerDefaultSettingsService.js';
+import { ObjectSettingsEventHandler } from './ObjectSettingsEventHandler.js';
 
 export default ModuleRegistry.add({
   name: '@cloudbeaver/core-root',
@@ -88,6 +89,7 @@ export default ModuleRegistry.add({
       .addSingleton(ServerConfigResource)
       .addSingleton(RootBootstrap)
       .addSingleton(ServerConfigEventHandler)
+      .addSingleton(ObjectSettingsEventHandler)
       .addSingleton(QuotasService)
       .addSingleton(ProductInfoResource)
       .addSingleton(PermissionsService)
