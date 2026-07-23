@@ -27,6 +27,7 @@ export * from './UserInfoResource.js';
 export * from './UserMetaParametersResource.js';
 export * from './UsersMetaParametersResource.js';
 export * from './UsersResource.js';
+export * from './compareUser.js';
 export * from './UsersOriginDetailsResource.js';
 export * from './UserInfoMetaParametersResource.js';
 export * from './TeamMetaParametersResource.js';

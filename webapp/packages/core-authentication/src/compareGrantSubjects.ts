@@ -5,8 +5,9 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { compareUsersByLastLogin, isUser, type AdminUser } from './UsersResource.js';
+import { compareUsersByLastLogin, isUser } from './compareUser.js';
 import type { TeamInfo } from './TeamsResource.js';
+import type { AdminUser } from './UsersResource.js';
 
 export function compareGrantSubjectsByName(a: AdminUser | TeamInfo, b: AdminUser | TeamInfo): number {
   const aName = isUser(a) ? a.userId : a.teamName;
