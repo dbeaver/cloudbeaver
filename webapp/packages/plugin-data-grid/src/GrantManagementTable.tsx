@@ -21,7 +21,7 @@ import { TableSelectionContext } from './TableSelectionContext.js';
 import { TableRowSelect } from './TableRowSelect.js';
 import classes from './GrantManagementTable.module.css';
 
-export interface IGrantManagementTableColumn<T = any> {
+export interface IGrantManagementTableColumn<T = unknown> {
   key: string;
   label: TLocalizationToken;
   compare?: (a: T, b: T) => number;

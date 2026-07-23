@@ -14,7 +14,7 @@ import { CachedResourceOffsetPageListKey } from '@cloudbeaver/core-resource';
 import { GrantManagementTable, type IGrantManagementTableColumn } from '@cloudbeaver/plugin-data-grid';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import {
-  compareUsers,
+  compareUsersById,
   compareUsersByLastLogin,
   TeamRolesResource,
   USER_TEAM_ROLE_SUPERVISOR,
@@ -29,7 +29,7 @@ import type { GrantedUsersFormPart } from './GrantedUsersFormPart.js';
 const USER_ID_COLUMN: IGrantManagementTableColumn<AdminUser> = {
   key: 'userId',
   label: 'administration_teams_team_granted_users_user_id',
-  compare: compareUsers,
+  compare: compareUsersById,
 };
 const LAST_LOGIN_COLUMN: IGrantManagementTableColumn<AdminUser> = {
   key: 'lastLogin',
@@ -154,7 +154,7 @@ export const GrantedUsersTable: TabContainerPanelComponent<TeamFormProps> = obse
     return null;
   }
 
-  const items = (usersLoader.data.filter(user => user?.enabled) as AdminUser[]).sort(compareUsers);
+  const items = (usersLoader.data.filter(user => user?.enabled) as AdminUser[]).sort(compareUsersById);
 
   return (
     <GrantManagementTable

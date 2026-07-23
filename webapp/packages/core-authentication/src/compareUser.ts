@@ -24,7 +24,7 @@ export function isUser(user: unknown): user is AdminUser {
   return !!user && typeof user === 'object' && 'userId' in user && 'grantedTeams' in user && 'enabled' in user;
 }
 
-export function compareUsers<T extends Pick<AdminUser, 'userId'>>(a: T, b: T): number {
+export function compareUsersById<T extends Pick<AdminUser, 'userId'>>(a: T, b: T): number {
   return a.userId.localeCompare(b.userId);
 }
 
@@ -34,7 +34,7 @@ export function compareUsersByLastLogin<T extends Pick<AdminUser, 'lastLoginTime
   return aTime - bTime;
 }
 
-export function compareNewUsers<T extends AdminUser>(a: T, b: T): number {
+export function compareUsersByNewness<T extends AdminUser>(a: T, b: T): number {
   const aIsNew = isNewUser(a);
   const bIsNew = isNewUser(b);
 

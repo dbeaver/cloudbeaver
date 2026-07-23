@@ -35,7 +35,7 @@ import { Executor } from '@cloudbeaver/core-executor';
 import { AUTH_PROVIDER_LOCAL_ID } from './AUTH_PROVIDER_LOCAL_ID.js';
 import { AuthInfoService } from './AuthInfoService.js';
 import { AuthProviderService } from './AuthProviderService.js';
-import { compareUsers, isNewUser, NEW_USER_SYMBOL, type AdminUserNew } from './compareUser.js';
+import { compareUsersById, isNewUser, NEW_USER_SYMBOL, type AdminUserNew } from './compareUser.js';
 import type { IAuthCredentials } from './IAuthCredentials.js';
 
 export type AdminUser = AdminUserInfoFragment;
@@ -94,7 +94,7 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
     this.aliases.add(UsersResourceNewUsers, () => {
       const orderedKeys = this.entries
         .filter(k => isNewUser(k[1]))
-        .sort((a, b) => compareUsers(a[1], b[1]))
+        .sort((a, b) => compareUsersById(a[1], b[1]))
         .map(([key]) => key);
       return resourceKeyList(orderedKeys);
     });
