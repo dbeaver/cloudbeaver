@@ -37,6 +37,7 @@
                     <property id="last-name-header" label="%last-name-header" type="string" description="%last-name-header.description"/>
                     <property id="full-name-header" label="%full-name-header" type="string" description="%full-name-header.description"/>
                     <property id="role-header" label="%role-header" type="string" description="%role-header.description" requiredFeatures="distributed"/>
+                    <property id="auto-user-provisioning" label="%auto-user-provisioning" type="boolean" description="%auto-user-provisioning.description" defaultValue="true"/>
                 </propertyGroup>
             </configuration>
         </authProvider>
