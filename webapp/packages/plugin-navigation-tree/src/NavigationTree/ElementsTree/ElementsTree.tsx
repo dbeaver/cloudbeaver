@@ -26,6 +26,7 @@ import {
 import { useService } from '@cloudbeaver/core-di';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { EObjectFeature, type NavNode, NavNodeInfoResource, NavTreeResource, ROOT_NODE_PATH } from '@cloudbeaver/core-navigation-tree';
+import { DNDScrollContainer } from '@cloudbeaver/core-ui';
 
 import { useNavTreeDropBox } from '../useNavTreeDropBox.js';
 import style from './ElementsTree.module.css';
@@ -172,7 +173,7 @@ export const ElementsTree = observer(
     return (
       <>
         <ElementsTreeTools tree={tree} settingsElements={settingsElements} />
-        <div ref={treeMergedRef} className={s(styles, { treeBox: true })}>
+        <DNDScrollContainer ref={treeMergedRef} className={s(styles, { treeBox: true })} isDragging={!!dndBox.state.context}>
           <ElementsTreeContext.Provider value={context}>
             <div className={s(styles, { box: true }, className)}>
               <FolderExplorer state={folderExplorer}>
@@ -210,7 +211,7 @@ export const ElementsTree = observer(
               </FolderExplorer>
             </div>
           </ElementsTreeContext.Provider>
-        </div>
+        </DNDScrollContainer>
       </>
     );
   }),
