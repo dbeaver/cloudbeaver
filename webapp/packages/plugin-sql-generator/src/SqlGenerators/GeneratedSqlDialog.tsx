@@ -23,6 +23,7 @@ import {
 import { ConnectionDialectResource, ConnectionInfoResource, createConnectionParam } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import type { DialogComponentProps } from '@cloudbeaver/core-dialogs';
+import { NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
 import { useCodemirrorExtensions } from '@cloudbeaver/plugin-codemirror6';
 import { SqlEditorNavigatorService } from '@cloudbeaver/plugin-sql-editor-navigation-tab';
 import { SQLCodeEditor, useSqlDialectExtension } from '@cloudbeaver/plugin-sql-editor-codemirror';
@@ -80,6 +81,7 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<Payload>>(functi
 
   const connectionInfoResource = useService(ConnectionInfoResource);
   const sqlEditorNavigatorService = useService(SqlEditorNavigatorService);
+  const navNodeManagerService = useService(NavNodeManagerService);
   const connection = connectionInfoResource.getConnectionForNode(payload.nodeId);
 
   const connectionDialectResource = useResource(GeneratedSqlDialog, ConnectionDialectResource, connection ? createConnectionParam(connection) : null);
@@ -94,8 +96,12 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<Payload>>(functi
 
   async function handleOpenInEditor() {
     try {
+      const container = navNodeManagerService.getNodeContainerInfo(payload.nodeId);
+
       await sqlEditorNavigatorService.openNewEditor({
         connectionKey: connection ? createConnectionParam(connection) : undefined,
+        catalogId: container.catalogId,
+        schemaId: container.schemaId,
         query: state.query,
       });
       rejectDialog();
