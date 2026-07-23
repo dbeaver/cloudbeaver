@@ -7,9 +7,6 @@
                  class="io.cloudbeaver.service.ai.gql.WebServiceAIConfigurator">
         </service>
     </extension>
-    <extension point="io.cloudbeaver.feature">
-        <feature id="ai" label="AI Integration" description="Enables AI-powered features throughout the application, including AI Chat, database object descriptions, intelligent SQL query optimization, and error correction."/>
-    </extension>
 
     <extension point="io.cloudbeaver.object.feature.provider">
         <featureProvider id="AIFeatureProvider" class="io.cloudbeaver.service.ai.WebAIFeatureProvider"/>
