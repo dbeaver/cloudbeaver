@@ -16,9 +16,8 @@
         </product>
     </extension>
 
-    <extension point="io.cloudbeaver.service">
-        <service id="ai" label="AI Service" description="AI service"
-                 class="io.cloudbeaver.service.ai.gql.WebServiceBindingAI"/>
+    <extension point="io.cloudbeaver.feature">
+        <feature id="ai" label="AI Integration" description="Enables AI Chat in the application."/>
     </extension>
 
     <extension point="org.jkiss.dbeaver.application">
