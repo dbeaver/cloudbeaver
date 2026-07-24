@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2025 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -83,7 +83,7 @@ public class CBEventsLongPollingServlet extends HttpServlet {
                 return;
             }
 
-            CBEventsLongPolling ps = getOrCreatePollSession(ws);
+            CBEventsLongPolling ps = getOrCreatePollSession(ws, resp);
             ps.onPoll();
 
             List<WSEvent> events = ps.pollEvents(POLL_TIMEOUT_SEC);
@@ -111,7 +111,7 @@ public class CBEventsLongPollingServlet extends HttpServlet {
             return;
         }
 
-        CBEventsLongPolling ps = getOrCreatePollSession(ws);
+        CBEventsLongPolling ps = getOrCreatePollSession(ws, resp);
         ps.onUserActivity();
 
         String json = new String(req.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
@@ -163,18 +163,7 @@ public class CBEventsLongPollingServlet extends HttpServlet {
     ) {
 
         try {
-            BaseWebSession ws = resolveSession(req);
-
-            resp.setHeader(WSConstants.WS_SESSION_HEADER, ws.getSessionId());
-            ServletAppUtils.addResponseCookie(
-                req,
-                resp,
-                CBConstants.CB_SESSION_COOKIE_NAME,
-                ws.getSessionId(),
-                -1
-            );
-
-            return ws;
+            return resolveSession(req);
         } catch (SMException e) {
             log.debug("LP request rejected: access token expired");
             sendError(resp, HttpConstants.CODE_TOKEN_EXPIRED, e.getMessage());
@@ -214,7 +203,7 @@ public class CBEventsLongPollingServlet extends HttpServlet {
     }
 
     @NotNull
-    private CBEventsLongPolling getOrCreatePollSession(@NotNull BaseWebSession ws) {
+    private CBEventsLongPolling getOrCreatePollSession(@NotNull BaseWebSession ws, @NotNull HttpServletResponse resp) {
         final String sid = ws.getSessionId();
 
         return sessions.compute(sid, (key, existing) -> {
@@ -222,9 +211,10 @@ public class CBEventsLongPollingServlet extends HttpServlet {
                 return existing;
             }
 
-            CBEventsLongPolling ps = new CBEventsLongPolling(ws);
+            CBEventsLongPolling ps = new CBEventsLongPolling(ws, this);
 
             ps.handleWebSessionEvent(new WSSocketConnectedEvent(ws.getApplication().getApplicationRunId()));
+            resp.setHeader(WSConstants.WS_SESSION_HEADER, sid);
             log.debug("HTTP Long-Poll channel opened for session " + sid);
 
             return ps;
@@ -253,7 +243,8 @@ public class CBEventsLongPollingServlet extends HttpServlet {
 
     @NotNull
     protected static WebHttpRequestInfo createRequestInfo(
-        @Nullable String sessionId, @NotNull HttpServletRequest req
+        @Nullable String sessionId,
+        @NotNull HttpServletRequest req
     ) {
         return new WebHttpRequestInfo(
             sessionId,
@@ -261,6 +252,13 @@ public class CBEventsLongPollingServlet extends HttpServlet {
             req.getRemoteAddr(),
             req.getHeader(HttpConstants.HEADER_USER_AGENT)
         );
+    }
+
+    void rekeySession(@NotNull String oldSid, @NotNull String newSid) {
+        CBEventsLongPolling moved = sessions.get(oldSid);
+        if (moved != null) {
+            sessions.put(newSid, moved);
+        }
     }
 
     /**

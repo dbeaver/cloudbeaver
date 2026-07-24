@@ -96,7 +96,7 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
     connectionInfoEventHandler: ConnectionInfoEventHandler,
     connectionStateEventHandler: ConnectionStateEventHandler,
     userInfoResource: UserInfoResource,
-    navTreeResource: NavTreeResource,
+    private readonly navTreeResource: NavTreeResource,
   ) {
     super();
 
@@ -214,18 +214,18 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
     connectionInfoEventHandler.onEvent<ResourceKeyList<IConnectionInfoParams>>(
       ServerEventId.CbDatasourceUpdated,
       key => {
-        if (this.isConnected(key)) {
+        if (this.isConnected(key) && !this.isOutdated(key)) {
           const connection = this.get(key);
 
           this.dataSynchronizationService
             .requestSynchronization('connection', connection.map(connection => connection?.name).join('\n'))
             .then(state => {
               if (state) {
-                this.markOutdated(key);
+                this.updateFromEvent(key);
               }
             });
         } else {
-          this.markOutdated(key);
+          this.updateFromEvent(key);
         }
       },
       data =>
@@ -295,6 +295,32 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
   isConnected(key: ResourceKey<IConnectionInfoParams>): boolean {
     key = ResourceKeyUtils.toList(this.aliases.transformToKey(key));
     return this.get(key).every(connection => connection?.connected ?? false);
+  }
+
+  private async updateFromEvent(key: ResourceKeyList<IConnectionInfoParams>): Promise<void> {
+    for (const connectionKey of key) {
+      const currentConnection = this.get(connectionKey);
+      const newConnection = await this.refresh(connectionKey);
+
+      if (currentConnection?.nodePath !== newConnection?.nodePath) {
+        if (currentConnection?.nodePath) {
+          const parent = this.navNodeInfoResource.getParent(currentConnection.nodePath);
+
+          if (parent) {
+            this.navTreeResource.markOutdated(parent);
+          }
+        }
+
+        if (newConnection?.nodePath) {
+          await this.navNodeInfoResource.loadNodeParents(newConnection.nodePath);
+          const parent = this.navNodeInfoResource.getParent(newConnection.nodePath);
+
+          if (parent) {
+            this.navTreeResource.markOutdated(parent);
+          }
+        }
+      }
+    }
   }
 
   getConnectionIdForNodeId(projectId: string, nodeId: string): IConnectionInfoParams | undefined {
