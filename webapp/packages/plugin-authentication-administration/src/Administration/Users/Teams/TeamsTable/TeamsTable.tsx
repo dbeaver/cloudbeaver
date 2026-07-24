@@ -59,7 +59,7 @@ export const TeamsTable = observer<Props>(function TeamsTable({ teams }) {
           render={<div />}
           tabIndex={0}
           title={row.teamId}
-          className="tw:flex tw:cursor-pointer tw:items-center tw:gap-2 tw:outline-none"
+          className="tw:flex tw:cursor-pointer tw:items-center tw:gap-2 tw:outline-none!"
           onClick={() => teamsTableOptionsPanelService.open(row.teamId)}
         >
           <Link truncate>{row.teamId}</Link>

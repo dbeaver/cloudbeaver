@@ -14,6 +14,10 @@
     --dbv-kit-switch-thumb-color: #ffffff;
     --dbv-kit-switch-checked-color: #2a7cb4;
 
+    --dbv-kit-switch-outline-offset: var(--dbv-kit-control-outline-offset);
+    --dbv-kit-switch-outline-color: var(--dbv-kit-control-outline-color);
+    --dbv-kit-switch-outline-width: var(--dbv-kit-control-outline-width);
+
     --dbv-kit-switch-transition-duration: 200ms;
     --dbv-kit-switch-transition-easing: cubic-bezier(0, 0, 0.2, 1);
   }
