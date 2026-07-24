@@ -25,6 +25,7 @@ import {
 
 import type { TeamFormProps } from '../TeamsAdministrationFormService.js';
 import type { GrantedUsersFormPart } from './GrantedUsersFormPart.js';
+import { useMemo } from 'react';
 
 const USER_ID_COLUMN: IGrantManagementTableColumn<AdminUser> = {
   key: 'userId',
@@ -54,6 +55,7 @@ export const GrantedUsersTable: TabContainerPanelComponent<TeamFormProps> = obse
   const usersLoader = useResource(GrantedUsersTable, UsersResource, CachedResourceOffsetPageListKey(0, 1000).setParent(UsersResourceFilterKey()), {
     active,
   });
+  const grantedUsersIdsMap = useMemo(() => new Map(tabState.state.grantedUsers.map(user => [user.userId, user])), [tabState.state.grantedUsers]);
 
   useAutoLoad(GrantedUsersTable, tabState, active);
 
@@ -85,7 +87,7 @@ export const GrantedUsersTable: TabContainerPanelComponent<TeamFormProps> = obse
   }
 
   function getTeamRoleRank(user: AdminUser) {
-    const granted = tabState.state.grantedUsers.find(grantedUser => grantedUser.userId === user.userId);
+    const granted = grantedUsersIdsMap.get(user.userId);
 
     if (!granted) {
       return 0;
