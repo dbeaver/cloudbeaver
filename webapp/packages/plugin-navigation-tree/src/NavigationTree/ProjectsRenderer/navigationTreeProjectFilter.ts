@@ -37,7 +37,7 @@ export function navigationTreeProjectFilter(
         if (isProjectNode(node)) {
           const project = projectsNavNodeService.getProject(node.uri);
 
-          if (!project || !projectsService.activeProjects.includes(project)) {
+          if (!project || !projectsService.activeProjects.some(({ id }) => id === project.id)) {
             return false;
           }
 
