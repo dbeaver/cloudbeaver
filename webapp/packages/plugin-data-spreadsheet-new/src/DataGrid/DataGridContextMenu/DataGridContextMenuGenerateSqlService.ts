@@ -135,6 +135,8 @@ export class DataGridContextMenuGenerateSqlService {
       return;
     }
 
+    const options = model.source.options as IDataContainerOptions | undefined;
+    const nodePath = options?.containerNodePath;
     const select = model.source.tryGetAction(resultIndex, IDatabaseDataSelectAction, GridSelectAction);
     const projectId = model.source.executionContext?.context?.projectId;
     const connectionId = model.source.executionContext?.context?.connectionId;
@@ -176,7 +178,7 @@ export class DataGridContextMenuGenerateSqlService {
 
       await this.commonDialogService.open(GeneratedSqlDialog, {
         query,
-        nodeId: connectionId,
+        nodeId: nodePath ?? connectionId,
         nodeName: this.getEntityNameFromNodePath(containerNodePath, model.name),
         generatorName: this.localizationService.translate(generatorLabel),
         options: getDefaultQueryGeneratorOptions(),
@@ -231,7 +233,7 @@ export class DataGridContextMenuGenerateSqlService {
 
       await this.commonDialogService.open(GeneratedSqlDialog, {
         query,
-        nodeId: connectionId,
+        nodeId: nodePathList,
         nodeName: this.getEntityNameFromNodePath(nodePathList, model.name),
         generatorName: createGenerator.label,
         options: getDefaultQueryGeneratorOptions(),
