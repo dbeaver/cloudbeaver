@@ -13,8 +13,6 @@ export default [
   ['plugin_connections_connection_edit_menu_item_title', 'Изменить подключение'],
   ['plugin_connections_connection_clone', 'Клонировать'],
   ['plugin_connections_connection_clone_error', 'Не удалось клонировать подключение'],
-  ['plugin_connections_connection_edit_cancel_title', 'Отмена редактирования'],
-  ['plugin_connections_connection_edit_cancel_message', 'Вы собираетесь закрыть редактор, несохраненные изменения не будут применены. Вы уверены?'],
   ['plugin_connections_connection_edit_reconnect_title', 'Подключение обновлено'],
   ['plugin_connections_connection_edit_reconnect_message', 'Подключение было обновлено. Вы хотите переподключиться?'],
   ['plugin_connections_connection_edit_reconnect_failed', 'Не удалось переподключиться'],

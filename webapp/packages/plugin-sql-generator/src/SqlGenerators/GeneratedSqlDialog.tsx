@@ -23,6 +23,7 @@ import {
 import { ConnectionDialectResource, ConnectionInfoResource, createConnectionParam } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import type { DialogComponentProps } from '@cloudbeaver/core-dialogs';
+import { download, withTimestamp } from '@cloudbeaver/core-utils';
 import { NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
 import { useCodemirrorExtensions } from '@cloudbeaver/plugin-codemirror6';
 import { SqlEditorNavigatorService } from '@cloudbeaver/plugin-sql-editor-navigation-tab';
@@ -34,6 +35,8 @@ import type { SqlQueryGeneratorOptions } from '@cloudbeaver/core-sdk';
 
 interface Payload {
   nodeId: string;
+  nodeName?: string;
+  generatorName?: string;
   query: string;
   options?: SqlQueryGeneratorOptions;
   regenerateQuery: (options: SqlQueryGeneratorOptions) => Promise<string>;
@@ -110,6 +113,13 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<Payload>>(functi
     }
   }
 
+  function handleSaveToFile() {
+    const blob = new Blob([state.query], { type: 'application/sql' });
+    const name = [payload.nodeName, payload.generatorName].join('-') || 'Generated';
+
+    download(blob, `${withTimestamp(name)}.sql`);
+  }
+
   return (
     <CommonDialogWrapper size="large">
       <CommonDialogHeader title="app_shared_sql_generators_dialog_title" icon="sql-script" onReject={rejectDialog} />
@@ -141,14 +151,31 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<Payload>>(functi
               />
             </div>
           </div>
-          <div className="tw:flex tw:justify-end tw:w-full tw:gap-6">
-            <Button variant="secondary" disabled={!state.query || visibleLoading} onClick={() => copy(state.query, true)}>
-              {translate('ui_copy_to_clipboard')}
-            </Button>
-            <Button variant="secondary" disabled={!state.query || visibleLoading} onClick={handleOpenInEditor}>
-              {translate('app_shared_sql_generators_open_in_editor')}
-            </Button>
-            <Button onClick={() => rejectDialog()}>{translate('ui_close')}</Button>
+          <div className="tw:flex tw:items-center tw:justify-between tw:w-full tw:gap-6">
+            <div className="tw:flex tw:items-center tw:gap-2">
+              <Button
+                variant="secondary"
+                icon="/icons/export.svg"
+                title={translate('ui_download')}
+                disabled={!state.query || visibleLoading}
+                className="tw:aspect-square tw:!min-w-0 tw:!px-0"
+                onClick={handleSaveToFile}
+              />
+              <Button
+                variant="secondary"
+                icon="copy"
+                title={translate('ui_copy_to_clipboard')}
+                disabled={!state.query || visibleLoading}
+                className="tw:aspect-square tw:!min-w-0 tw:!px-0"
+                onClick={() => copy(state.query, true)}
+              />
+            </div>
+            <div className="tw:flex tw:items-center tw:gap-6">
+              <Button variant="secondary" disabled={!state.query || visibleLoading} onClick={handleOpenInEditor}>
+                {translate('app_shared_sql_generators_open_in_editor')}
+              </Button>
+              <Button onClick={() => rejectDialog()}>{translate('ui_close')}</Button>
+            </div>
           </div>
         </div>
       </CommonDialogFooter>
