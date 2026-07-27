@@ -265,7 +265,7 @@ public class WebServiceSQL implements DBWServiceSQL {
     ) throws DBWebException {
         WebAsyncTaskProcessor<String> runnable = new WebAsyncTaskProcessor<>() {
             @Override
-            public void run(DBRProgressMonitor monitor) throws InvocationTargetException {
+            public void run(@NotNull DBRProgressMonitor monitor) throws InvocationTargetException {
                 try {
                     monitor.beginTask("Generate SQL", 1);
                     monitor.subTask("Generate '" + generatorId + "' SQL");
