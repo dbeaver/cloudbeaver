@@ -35,14 +35,14 @@ type BaseProps = Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'onChan
     uploadable?: boolean;
   };
 
-type ControlledProps = BaseProps & {
+export type TextareaControlledProps = BaseProps & {
   name?: string;
   value?: string;
   onChange?: (value: string, name?: string) => any;
   state?: never;
 };
 
-type ObjectProps<TKey extends keyof TState, TState> = BaseProps & {
+export type TextareaObjectProps<TKey extends keyof TState, TState> = BaseProps & {
   name: TKey;
   state: TState;
   onChange?: (value: string, name: TKey) => any;
@@ -50,8 +50,8 @@ type ObjectProps<TKey extends keyof TState, TState> = BaseProps & {
 };
 
 interface TextareaType {
-  (props: ControlledProps): React.JSX.Element;
-  <TKey extends keyof TState, TState>(props: ObjectProps<TKey, TState>): React.JSX.Element;
+  (props: TextareaControlledProps): React.JSX.Element;
+  <TKey extends keyof TState, TState>(props: TextareaObjectProps<TKey, TState>): React.JSX.Element;
 }
 
 export const Textarea: TextareaType = observer(function Textarea({
@@ -70,7 +70,7 @@ export const Textarea: TextareaType = observer(function Textarea({
   onKeyDown,
   onChange = () => {},
   ...rest
-}: ControlledProps | ObjectProps<any, any>) {
+}: TextareaControlledProps | TextareaObjectProps<any, any>) {
   const translate = useTranslate();
   const inputId = useId();
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);

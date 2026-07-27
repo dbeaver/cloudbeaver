@@ -13,8 +13,6 @@ export default [
   ['plugin_connections_connection_edit_menu_item_title', 'Chỉnh sửa Kết nối'],
   ['plugin_connections_connection_clone', 'Sao chép'],
   ['plugin_connections_connection_clone_error', 'Không thể sao chép kết nối'],
-  ['plugin_connections_connection_edit_cancel_title', 'Xác nhận Hủy'],
-  ['plugin_connections_connection_edit_cancel_message', 'Bạn sắp hủy các thay đổi của kết nối. Các thay đổi chưa lưu sẽ bị mất. Bạn có chắc không?'],
   ['plugin_connections_connection_edit_reconnect_title', 'Kết nối đã được cập nhật'],
   ['plugin_connections_connection_edit_reconnect_message', 'Kết nối đã được cập nhật. Bạn có muốn kết nối lại không?'],
   ['plugin_connections_connection_edit_reconnect_failed', 'Không thể kết nối lại'],

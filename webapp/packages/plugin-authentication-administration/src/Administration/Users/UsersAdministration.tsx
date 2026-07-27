@@ -57,7 +57,7 @@ export const UsersAdministration: AdministrationItemContentComponent = observer(
   }
 
   return (
-    <TabsState selectedId={subName} autoSelect={false} container={usersAdministrationService.tabsContainer} lazy onChange={openSub}>
+    <TabsState currentTabId={subName} autoSelect={false} container={usersAdministrationService.tabsContainer} lazy onChange={openSub}>
       <ToolsPanel bottomBorder>
         <SContext registry={mainTabsRegistry}>
           <TabList
