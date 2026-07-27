@@ -135,7 +135,6 @@ export class DataGridContextMenuGenerateSqlService {
       return;
     }
 
-    const options = model.source.options as IDataContainerOptions | undefined;
     const nodePath = options?.containerNodePath;
     const select = model.source.tryGetAction(resultIndex, IDatabaseDataSelectAction, GridSelectAction);
     const projectId = model.source.executionContext?.context?.projectId;
