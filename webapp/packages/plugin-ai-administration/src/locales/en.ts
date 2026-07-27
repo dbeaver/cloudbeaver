@@ -41,8 +41,6 @@ export default [
   ['plugin_ai_administration_profile_form_field_name', 'Profile name'],
   ['plugin_ai_administration_profile_form_field_engine', 'Engine'],
   ['plugin_ai_administration_profile_form_tab_options', 'Profile'],
-  ['plugin_ai_administration_profile_edit_cancel_title', 'Cancel confirmation'],
-  ['plugin_ai_administration_profile_edit_cancel_message', "You're going to cancel profile changes. Unsaved changes will be lost. Are you sure?"],
   ['plugin_ai_administration_profile_name_max_length', 'Profile name must not exceed {arg:length} characters'],
   ['plugin_ai_administration_profile_name_min_length', 'Profile name must be at least {arg:length} characters'],
 ];

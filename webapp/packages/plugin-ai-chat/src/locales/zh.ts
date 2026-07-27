@@ -65,4 +65,5 @@ export default [
   ['plugin_ai_chat_action_params_unknown', '未知的参数'],
   ['plugin_ai_chat_mcp_function_request', '想要运行以下工具:'],
   ['plugin_ai_chat_mcp_single_function_request', '运行工具'],
+  ['plugin_ai_chat_ai_notice', 'AI 可能会出错。请仔细检查响应。'],
 ];

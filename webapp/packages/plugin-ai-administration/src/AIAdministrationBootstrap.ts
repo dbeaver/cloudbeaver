@@ -10,9 +10,11 @@ import React from 'react';
 import { AdministrationItemService, AdministrationItemType, type IAdministrationItem } from '@cloudbeaver/core-administration';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { FEATURE_AI_ID, ServerConfigResource } from '@cloudbeaver/core-root';
+import { ConfirmationDialog } from '@cloudbeaver/core-blocks';
+import { getCachedDataResourceLoaderState } from '@cloudbeaver/core-resource';
+import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 
 import { ADMINISTRATION_AI_PAGE } from './ADMINISTRATION_AI_PAGE.js';
-import { getCachedDataResourceLoaderState } from '@cloudbeaver/core-resource';
 import { AISettingsService } from './AISettingsService.js';
 import { EAIAdministrationSub } from './AIAdministrationNavigationService.js';
 
@@ -26,7 +28,7 @@ const AIDrawerItem = React.lazy(async () => {
   return { default: AIDrawerItem };
 });
 
-@injectable(() => [AdministrationItemService, ServerConfigResource, AISettingsService])
+@injectable(() => [AdministrationItemService, ServerConfigResource, AISettingsService, CommonDialogService])
 export class AIAdministrationBootstrap extends Bootstrap {
   administrationItem!: IAdministrationItem;
 
@@ -34,6 +36,7 @@ export class AIAdministrationBootstrap extends Bootstrap {
     private readonly administrationItemService: AdministrationItemService,
     private readonly serverConfigResource: ServerConfigResource,
     private readonly aiSettingsService: AISettingsService,
+    private readonly commonDialogService: CommonDialogService,
   ) {
     super();
   }
@@ -48,6 +51,24 @@ export class AIAdministrationBootstrap extends Bootstrap {
       getDrawerComponent: () => AIDrawerItem,
       getLoader: () => getCachedDataResourceLoaderState(this.serverConfigResource, () => undefined),
       onActivate: this.aiSettingsService.create.bind(this.aiSettingsService),
+      canDeActivate: async () => {
+        const edited = this.aiSettingsService.formState?.isChanged;
+
+        if (edited) {
+          const { status } = await this.commonDialogService.open(ConfirmationDialog, {
+            title: 'ui_discard_changes',
+            message: 'ui_discard_changes_message',
+            confirmActionText: 'ui_discard',
+            cancelActionText: 'ui_keep_editing',
+          });
+
+          if (status === DialogueStateResult.Rejected) {
+            return false;
+          }
+        }
+
+        return true;
+      },
       onDeActivate: this.aiSettingsService.dispose.bind(this.aiSettingsService),
       isHidden: () => !this.serverConfigResource.isFeatureEnabled(FEATURE_AI_ID, true),
     });

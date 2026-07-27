@@ -41,7 +41,7 @@ export const AIAdministrationPanel = observer<AdministrationItemContentProps>(fu
   }
 
   return (
-    <TabsState selectedId={subName} autoSelect={false} container={aiAdministrationTabsService.tabsContainer} lazy onChange={openSub}>
+    <TabsState currentTabId={subName} autoSelect={false} container={aiAdministrationTabsService.tabsContainer} lazy onChange={openSub}>
       <ToolsPanel hidden={hasOneTab} bottomBorder>
         <SContext registry={mainTabsRegistry}>
           <TabList className={s(styles, { tabList: true, administrationTabs: true })} underline />

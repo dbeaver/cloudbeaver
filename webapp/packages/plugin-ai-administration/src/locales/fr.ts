@@ -41,11 +41,6 @@ export default [
   ['plugin_ai_administration_profile_form_field_name', 'Nom du profil'],
   ['plugin_ai_administration_profile_form_field_engine', "Modèle d'IA"],
   ['plugin_ai_administration_profile_form_tab_options', 'Profil'],
-  ['plugin_ai_administration_profile_edit_cancel_title', "Confirmation d'annulation"],
-  [
-    'plugin_ai_administration_profile_edit_cancel_message',
-    'Vous êtes sur le point d’annuler les modifications du profil. Les modifications non enregistrées seront perdues. Êtes-vous sûr ?',
-  ],
   ['plugin_ai_administration_profile_name_max_length', 'Le nom du profil ne doit pas dépasser {arg:length} caractères'],
   ['plugin_ai_administration_profile_name_min_length', 'Le nom du profil doit contenir au moins {arg:length} caractères'],
 ];

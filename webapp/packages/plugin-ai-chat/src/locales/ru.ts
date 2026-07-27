@@ -65,4 +65,5 @@ export default [
   ['plugin_ai_chat_action_params_unknown', 'Неизвестные параметры'],
   ['plugin_ai_chat_mcp_function_request', 'хочет выполнить следующие инструменты:'],
   ['plugin_ai_chat_mcp_single_function_request', 'выполнить инструмент'],
+  ['plugin_ai_chat_ai_notice', 'AI может ошибаться. Пожалуйста, перепроверяйте ответы.'],
 ];

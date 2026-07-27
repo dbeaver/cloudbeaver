@@ -41,11 +41,6 @@ export default [
   ['plugin_ai_administration_profile_form_field_name', 'Profilname'],
   ['plugin_ai_administration_profile_form_field_engine', 'Engine'],
   ['plugin_ai_administration_profile_form_tab_options', 'Profil'],
-  ['plugin_ai_administration_profile_edit_cancel_title', 'Abbruch bestätigen'],
-  [
-    'plugin_ai_administration_profile_edit_cancel_message',
-    'Sie sind dabei, die Profiländerungen abzubrechen. Nicht gespeicherte Änderungen gehen verloren. Sind Sie sicher?',
-  ],
   ['plugin_ai_administration_profile_name_max_length', 'Der Profilname darf {arg:length} Zeichen nicht überschreiten'],
   ['plugin_ai_administration_profile_name_min_length', 'Der Profilname muss mindestens {arg:length} Zeichen lang sein'],
 ];

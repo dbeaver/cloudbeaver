@@ -10,6 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { Suspense, useEffect } from 'react';
 
 import { useService } from '@cloudbeaver/core-di';
+import { useTranslate } from '@cloudbeaver/core-blocks';
 
 import { AIChatMessageForm } from './AIChatMessage/AIChatMessageForm.js';
 import { AIChatHeader } from './AIChatHeader.js';
@@ -22,6 +23,7 @@ import { AIChatConversationMetrics } from './AIChatConversation/AIChatConversati
 import { AIChatService } from './AIChatService.js';
 
 export const AIChatWindow = observer(function AIChatWindow() {
+  const translate = useTranslate();
   const aiChatService = useService(AIChatService);
   const aiChatContextService = useService(AIChatContextService);
   const aiChatConversationsService = useService(AIChatConversationsService);
@@ -43,7 +45,9 @@ export const AIChatWindow = observer(function AIChatWindow() {
           </Suspense>
         )}
         <AIChatMessageList currentConversationId={conversationId} disabled={disabled} />
-        <AIChatMessageForm currentConversationId={conversationId} />
+        <AIChatMessageForm currentConversationId={conversationId}>
+          <div className="tw:text-(--theme-text-hint-on-light) tw:text-xs tw:text-center tw:mt-1">{translate('plugin_ai_chat_ai_notice')}</div>
+        </AIChatMessageForm>
       </div>
     </AIChatContext>
   );

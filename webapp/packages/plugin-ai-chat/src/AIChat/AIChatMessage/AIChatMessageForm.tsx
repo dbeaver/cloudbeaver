@@ -7,9 +7,9 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useContext, useState } from 'react';
+import { useContext, useState, type PropsWithChildren } from 'react';
 
-import { ActionIconButton, Form, s, Textarea, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { ActionIconButton, AutoResizeTextarea, Form, s, Textarea, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { getOS, OperatingSystem } from '@cloudbeaver/core-utils';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -23,7 +23,7 @@ interface Props {
   currentConversationId: string | null;
 }
 
-export const AIChatMessageForm = observer<Props>(function AIChatMessageForm({ currentConversationId }) {
+export const AIChatMessageForm = observer<PropsWithChildren<Props>>(function AIChatMessageForm({ currentConversationId, children }) {
   const styles = useS(classes);
   const translate = useTranslate();
   const context = useContext(AIChatContext);
@@ -67,10 +67,17 @@ export const AIChatMessageForm = observer<Props>(function AIChatMessageForm({ cu
     <div className={s(styles, { container: true })}>
       <Form className="tw:flex tw:items-end tw:gap-2" disableEnterSubmit={disabled} contents onSubmit={sendMessage}>
         <div className={s(styles, { textareaContainer: true })}>
-          <Textarea className={s(styles, { textarea: true })} placeholder={getPlaceholder()} value={value} autoFocus onChange={v => setValue(v)} />
+          <AutoResizeTextarea
+            className={s(styles, { textarea: true })}
+            placeholder={getPlaceholder()}
+            value={value}
+            autoFocus
+            onChange={v => setValue(v)}
+          />
           <ActionIconButton name="/icons/send.svg" disabled={disabled} img onClick={sendMessage} />
         </div>
       </Form>
+      {children}
     </div>
   );
 });

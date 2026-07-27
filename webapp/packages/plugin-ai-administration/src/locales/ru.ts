@@ -41,11 +41,6 @@ export default [
   ['plugin_ai_administration_profile_form_field_name', 'Название профиля'],
   ['plugin_ai_administration_profile_form_field_engine', 'Энджин'],
   ['plugin_ai_administration_profile_form_tab_options', 'Профиль'],
-  ['plugin_ai_administration_profile_edit_cancel_title', 'Подтверждение отмены'],
-  [
-    'plugin_ai_administration_profile_edit_cancel_message',
-    'Вы собираетесь отменить изменения профиля. Несохранённые изменения будут потеряны. Вы уверены?',
-  ],
   ['plugin_ai_administration_profile_name_max_length', 'Название профиля не должно превышать {arg:length} символов'],
   ['plugin_ai_administration_profile_name_min_length', 'Название профиля должно содержать не менее {arg:length} символов'],
 ];

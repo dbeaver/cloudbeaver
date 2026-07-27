@@ -65,4 +65,5 @@ export default [
   ['plugin_ai_chat_action_params_unknown', 'Unknown params'],
   ['plugin_ai_chat_mcp_function_request', 'wants to run following tools:'],
   ['plugin_ai_chat_mcp_single_function_request', 'to run tool'],
+  ['plugin_ai_chat_ai_notice', 'AI can make mistakes. Please double-check responses.'],
 ];
