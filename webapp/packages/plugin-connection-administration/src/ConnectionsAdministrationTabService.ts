@@ -51,6 +51,7 @@ export class ConnectionsAdministrationTabService {
     this.item = this.administrationItemService.create({
       name: ADMINISTRATION_CONNECTIONS_ITEM,
       order: 7,
+      isHidden: () => this.item.sub.length === 0,
       getContentComponent: () => ConnectionsAdministration,
       getDrawerComponent: () => ConnectionsDrawerItem,
     });
