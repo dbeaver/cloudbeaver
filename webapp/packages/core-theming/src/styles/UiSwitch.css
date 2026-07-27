@@ -1,0 +1,6 @@
+@layer components {
+  .dbv-kit-switch {
+    --dbv-kit-switch-outline-offset: 2px;
+    --dbv-kit-switch-outline-color: var(--theme-primary);
+  }
+}

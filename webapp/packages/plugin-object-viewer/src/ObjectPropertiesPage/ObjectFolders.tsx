@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -115,8 +115,8 @@ export const ObjectFolders = observer<IProps>(function ObjectFolders({ tab }) {
   return folders.length > 0 ? (
     <TabsState currentTabId={folderId} orientation="vertical" localState={innerTabState} lazy onChange={openFolder}>
       <SContext registry={objectFoldersRegistry}>
-        <div>
-          <TabList aria-label="Object folders" vertical>
+        <div className="theme-border-color-background tw:border-r tw:border-t">
+          <TabList aria-label="Object folders" className="tw:border-none!" vertical>
             {folders.map(folderId => (
               <FolderTabRenderer key={folderId} nodeId={nodeId} folderId={folderId} parents={parents} />
             ))}

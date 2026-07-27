@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,12 +44,17 @@ public class CBEventsLongPolling implements CBWebSessionEventHandler {
     private final BlockingQueue<WSEvent> queue = new LinkedBlockingQueue<>(QUEUE_CAPACITY);
     private final CBClientEventProcessor processor;
     private volatile long lastPoll;
+    private final CBEventsLongPollingServlet servlet;
 
-    public CBEventsLongPolling(@NotNull BaseWebSession webSession) {
+    public CBEventsLongPolling(
+        @NotNull BaseWebSession webSession,
+        @NotNull CBEventsLongPollingServlet owner
+    ) {
         this.webSession = webSession;
         this.lastPoll = System.currentTimeMillis();
         this.webSession.addEventHandler(this);
         this.processor = new CBClientEventProcessor(this.webSession);
+        this.servlet = owner;
     }
 
     @NotNull
@@ -90,8 +95,10 @@ public class CBEventsLongPolling implements CBWebSessionEventHandler {
 
     @Override
     public void migrateToSession(@NotNull BaseWebSession newSession) {
+        String oldSid = this.webSession.getSessionId();
         this.webSession = newSession;
         this.processor.setWebSession(newSession);
+        servlet.rekeySession(oldSid, newSession.getSessionId());
     }
 
     @Override
@@ -112,6 +119,7 @@ public class CBEventsLongPolling implements CBWebSessionEventHandler {
         queue.clear();
     }
 
+    @NotNull
     @Override
     public String toString() {
         return "CBEventsLongPolling{" +

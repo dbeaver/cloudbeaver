@@ -24,6 +24,7 @@ import './styles/UiInput.css';
 import './styles/UISearch.css';
 import './styles/UiPopover.css';
 import './styles/UiColorPicker.css';
+import './styles/UiSwitch.css';
 import './styles/form-controls.css';
 import { FALLBACK_THEME_ID, themes } from './themes.js';
 import { ThemeSettingsService } from './ThemeSettingsService.js';

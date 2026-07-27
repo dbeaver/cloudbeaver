@@ -90,7 +90,7 @@ export const UsersTable = observer<Props>(function UsersTable({ users, isManagea
           render={<div />}
           tabIndex={0}
           title={row.userId}
-          className="tw:flex tw:cursor-pointer tw:items-center tw:gap-2 tw:outline-none"
+          className="tw:flex tw:cursor-pointer tw:items-center tw:gap-2 tw:outline-none!"
           onClick={() => usersTableOptionsPanelService.open(row.userId)}
         >
           <Link truncate>{row.userId}</Link>
