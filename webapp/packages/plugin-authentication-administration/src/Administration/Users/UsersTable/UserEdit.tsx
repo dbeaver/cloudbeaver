@@ -39,9 +39,10 @@ export const UserEdit = observer<TableItemExpandProps<string>>(function UserEdit
       async function closeHandler(event, contexts) {
         if (state.isChanged && event === 'before') {
           const { status } = await commonDialogService.open(ConfirmationDialog, {
-            title: 'ui_save_reminder',
-            message: 'ui_are_you_sure',
-            confirmActionText: 'ui_yes',
+            title: 'ui_discard_changes',
+            message: 'ui_discard_changes_message',
+            confirmActionText: 'ui_discard',
+            cancelActionText: 'ui_keep_editing',
           });
 
           if (status === DialogueStateResult.Rejected) {

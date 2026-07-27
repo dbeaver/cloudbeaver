@@ -17,9 +17,4 @@ export default [
   ['plugin_user_profile_authentication_change_password_submit_label', 'Đổi'],
   ['plugin_user_profile_authentication_change_password_passwords_not_match', 'Mật khẩu không khớp'],
   ['plugin_user_profile_authentication_change_password_password_validation_error', 'Xác thực mật khẩu thất bại'],
-  ['plugin_user_profile_authentication_change_password_cancel_title', 'Hủy đổi mật khẩu'],
-  [
-    'plugin_user_profile_authentication_change_password_cancel_message',
-    'Bạn đang hủy thay đổi mật khẩu. Các thay đổi chưa lưu sẽ bị mất. Bạn có chắc chắn không?',
-  ],
 ];
