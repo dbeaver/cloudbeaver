@@ -28,7 +28,6 @@ import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBConstants;
-import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.access.DBAAuthCredentials;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
@@ -41,7 +40,6 @@ import org.jkiss.dbeaver.model.impl.auth.AuthModelDatabaseNativeCredentials;
 import org.jkiss.dbeaver.model.net.DBWHandlerConfiguration;
 import org.jkiss.dbeaver.model.net.ssh.SSHConstants;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
-import org.jkiss.dbeaver.model.struct.DBSObject;
 import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceDisconnectEvent;
 import org.jkiss.dbeaver.registry.DataSourceProviderRegistry;
 import org.jkiss.dbeaver.registry.network.NetworkHandlerDescriptor;
@@ -57,16 +55,6 @@ public class WebDataSourceUtils {
     private static final Log log = Log.getLog(WebDataSourceUtils.class);
 
     private WebDataSourceUtils() {
-    }
-
-    /**
-     * Checks that the object's driver belongs to the given data source provider family
-     * (the provider itself or any of its descendants, e.g. "greenplum" matches the "postgresql" family).
-     */
-    public static boolean isDriverOfProviderFamily(@NotNull DBSObject object, @NotNull String providerId) {
-        DBPDataSource dataSource = object.getDataSource();
-        return dataSource != null && dataSource.getContainer().getDriver()
-            .getProviderDescriptor().matchesId(providerId);
     }
 
     public static void saveCredentialsInDataSource(
