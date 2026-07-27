@@ -21,7 +21,6 @@ import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.service.DBWBindingContext;
 import io.cloudbeaver.service.WebServiceBindingBase;
 import io.cloudbeaver.service.metadata.impl.WebServiceMetadata;
-import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.navigator.DBNNode;
 
@@ -47,25 +46,14 @@ public class WebServiceBindingMetadata extends WebServiceBindingBase<DBWServiceM
                 getWebSession(env),
                 getNodeFromPath(env)
             ));
-        model.getMutationType()
-            .dataFetcher("asyncMetadataGetNodeDDL", env -> getService(env).asyncGetNodeDDL(
-                getWebSession(env),
-                getArgumentVal(env, "nodeId"),
-                getArgument(env, "options"))
-            );
     }
 
-    @NotNull
-    private DBNNode getNodeFromPath(@NotNull DataFetchingEnvironment env) throws DBException {
+    private DBNNode getNodeFromPath(DataFetchingEnvironment env) throws DBException {
         WebSession webSession = getWebSession(env);
         String nodePath = getArgument(env, "nodeId");
         if (nodePath == null) {
             throw new DBException("Node path is null");
         }
-        DBNNode node = webSession.getNavigatorModelOrThrow().getNodeByPath(webSession.getProgressMonitor(), nodePath);
-        if (node == null) {
-            throw new DBException("Node '" + nodePath + "' not found");
-        }
-        return node;
+        return webSession.getNavigatorModelOrThrow().getNodeByPath(webSession.getProgressMonitor(), nodePath);
     }
 }
