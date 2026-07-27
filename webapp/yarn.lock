@@ -3049,6 +3049,7 @@ __metadata:
     "@cloudbeaver/core-dialogs": "workspace:*"
     "@cloudbeaver/core-events": "workspace:*"
     "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-navigation-tree": "workspace:*"
     "@cloudbeaver/core-sdk": "workspace:*"
     "@cloudbeaver/core-settings": "workspace:*"
     "@cloudbeaver/core-ui": "workspace:*"
@@ -12762,10 +12763,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fast-uri@npm:^3.0.1":
-  version: 3.1.2
-  resolution: "fast-uri@npm:3.1.2"
-  checksum: 10c0/5b35641895959f3f7ab7a7b1b5542bded159346f25ec9f256817b206d50b64eda5828e90d605a2e2fc645c90519a7259c2bab2c942ee728c88b88e5be21b090d
+"fast-uri@npm:>3.1.3":
+  version: 4.1.1
+  resolution: "fast-uri@npm:4.1.1"
+  checksum: 10c0/669e12d1e7c3ba931b93d94def9a0a7352288503f09479f62e31b7bd731fe73f9b62ff411724e2d452c39a57d756cdce4169ea6d1b80424c2c254c1eecde10e5
   languageName: node
   linkType: hard
 
@@ -13826,10 +13827,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"immutable@npm:>3.8.3":
-  version: 5.1.6
-  resolution: "immutable@npm:5.1.6"
-  checksum: 10c0/79eb033f68ca70fca60fb052c87b5420034e460e306ce9bea2558fd7b5e0b3b59c28c4a4653867305992b4a30e169b353175d78126c1be6ed0113794b27e3317
+"immutable@npm:>=5.1.8":
+  version: 5.1.9
+  resolution: "immutable@npm:5.1.9"
+  checksum: 10c0/ae7032b60b81b682f3e7e4df13e1ec9a401a603eb81b15bb3e37331ed6666e318c71994c6936e1462eb443d32d04769396562a7e2669da22457c8ba279c03ad2
   languageName: node
   linkType: hard
 
