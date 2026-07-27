@@ -399,7 +399,7 @@ extend type Query {
         options: Object @deprecated(reason: "use generatorOptions (26.0.3)")
         nodePathList: [String!]!,
         generatorOptions: SQLQueryGeneratorOptions
-    ): String!
+    ): String! @deprecated(reason: "use asyncSqlGenerateEntityQuery")
 
     """
     Returns an auto-generated SQL query based on provided rows data.
