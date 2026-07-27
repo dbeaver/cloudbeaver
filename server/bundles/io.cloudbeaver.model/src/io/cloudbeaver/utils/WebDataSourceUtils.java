@@ -69,7 +69,11 @@ public class WebDataSourceUtils {
             .getProviderDescriptor().matchesId(providerId);
     }
 
-    public static void saveCredentialsInDataSource(WebConnectionInfo webConnectionInfo, DBPDataSourceContainer dataSourceContainer, DBPConnectionConfiguration configuration) {
+    public static void saveCredentialsInDataSource(
+        @NotNull WebConnectionInfo webConnectionInfo,
+        @NotNull DBPDataSourceContainer dataSourceContainer,
+        @NotNull DBPConnectionConfiguration configuration
+    ) {
         // Properties passed from web
         // webConnectionInfo may be null in some cases (e.g. connection test when no actual connection exist yet)
         Map<String, Object> authProperties = webConnectionInfo.getSavedAuthProperties();

@@ -33,7 +33,12 @@ import java.util.Map;
 public interface DBWServiceMetadata extends DBWService {
 
     @WebAction
-    String getNodeDDL(WebSession webSession, DBNNode node, Map<String, Object> options) throws DBWebException;
+    @Nullable
+    String getNodeDDL(
+        @NotNull WebSession webSession,
+        @NotNull DBNNode node,
+        @Nullable Map<String, Object> options
+    ) throws DBWebException;
 
     @WebAction
     @NotNull
@@ -44,6 +49,7 @@ public interface DBWServiceMetadata extends DBWService {
     ) throws DBWebException;
 
     @WebAction
-    String getNodeExtendedDDL(WebSession webSession, DBNNode node) throws DBWebException;
+    @Nullable
+    String getNodeExtendedDDL(@NotNull WebSession webSession, @NotNull DBNNode node) throws DBWebException;
 
 }
