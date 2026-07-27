@@ -6,9 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 import { AdministrationItemService, AdministrationItemType, ConfigurationWizardService } from '@cloudbeaver/core-administration';
-import { ConfirmationDialog, importLazyComponent } from '@cloudbeaver/core-blocks';
+import { confirmUnsavedChanges, importLazyComponent } from '@cloudbeaver/core-blocks';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
+import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { SessionDataResource } from '@cloudbeaver/core-root';
 import { formValidationContext } from '@cloudbeaver/core-ui';
 import { getFirstException } from '@cloudbeaver/core-utils';
@@ -112,25 +112,15 @@ export class ConfigurationWizardPagesBootstrapService extends Bootstrap {
 
         this.serverConfigurationFormStateManager.destroy();
       },
-      canDeActivate: async configurationWizard => {
+      canDeActivate: configurationWizard => {
         const state = this.serverConfigurationFormStateManager.formState;
 
-        if (state?.isSaving) {
-          return false;
-        }
-
-        if (!configurationWizard && state?.isChanged) {
-          const { status } = await this.commonDialogService.open(ConfirmationDialog, {
-            title: 'ui_save_reminder',
-            message: 'ui_are_you_sure',
-          });
-
-          if (status === DialogueStateResult.Rejected) {
-            return false;
-          }
-        }
-
-        return true;
+        return confirmUnsavedChanges(this.commonDialogService, {
+          isChanged: !configurationWizard && !!state?.isChanged,
+          isSaving: state?.isSaving,
+          save: () => this.serverConfigurationFormStateManager.save(),
+          reset: () => state?.reset(),
+        });
       },
       getContentComponent: () => ServerConfigurationPage,
       getDrawerComponent: () => ServerConfigurationDrawerItem,

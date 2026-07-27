@@ -9,7 +9,7 @@
 import { TabProvider, useStoreState, useTabStore } from '@dbeaver/ui-kit';
 import { action, observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useState } from 'react';
 
 import { useAutoLoad, useExecutor, useObjectRef, useObservableRef } from '@cloudbeaver/core-blocks';
 import { useDataContext } from '@cloudbeaver/core-data-context';
@@ -28,7 +28,7 @@ export type TabsStateProps<T = Record<string, any>> = ExtractContainerProps<T> &
     /** Default selected tab id */
     selectedId?: string;
     orientation?: 'horizontal' | 'vertical';
-    /** Provide a tab Id to control tabs state */
+    /** Provide a tab Id to fully control the selected tab: the selection always mirrors `currentTabId`. */
     currentTabId?: string | null;
     container?: ITabsContainer<T, any>;
     localState?: MetadataMap<string, any>;
@@ -109,15 +109,16 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
       selected,
       store,
       tabList,
+      currentTabId,
     },
   );
 
-  useEffect(() => {
-    if (isNotNullDefined(currentTabId)) {
+  useLayoutEffect(() => {
+    if (isNotNullDefined(currentTabId) && selected !== currentTabId) {
       dynamic.store.setSelectedId(currentTabId);
       dynamic.selectedId = currentTabId;
     }
-  }, [currentTabId]);
+  }, [currentTabId, selected]);
 
   useEffect(() => {
     if (displayed.length > 0 && autoSelect) {
@@ -137,6 +138,9 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
         dynamic.open?.(data);
         if (dynamic.selectedId === data.tabId) {
           ExecutorInterrupter.interrupt(contexts);
+          return;
+        }
+        if (isNotNullDefined(dynamic.currentTabId)) {
           return;
         }
         dynamic.selectedId = data.tabId;
@@ -159,7 +163,7 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
   const currentSelectedId = selected;
 
   useEffect(() => {
-    if (!isNotNullDefined(currentSelectedId) || dynamic.selectedId === currentSelectedId) {
+    if (isNotNullDefined(currentTabId) || !isNotNullDefined(currentSelectedId) || dynamic.selectedId === currentSelectedId) {
       return;
     }
 
@@ -167,7 +171,7 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
       tabId: currentSelectedId,
       props,
     });
-  }, [currentSelectedId]);
+  }, [currentSelectedId, currentTabId]);
 
   const value = useObservableRef<ITabsContext<T>>(
     () => ({

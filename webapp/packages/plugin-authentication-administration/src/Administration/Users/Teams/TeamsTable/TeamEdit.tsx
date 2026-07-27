@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -8,9 +8,18 @@
 import { observer } from 'mobx-react-lite';
 
 import { TeamsResource } from '@cloudbeaver/core-authentication';
-import { ColoredContainer, ConfirmationDialog, GroupBack, GroupTitle, Text, useExecutor, useResource, useTranslate } from '@cloudbeaver/core-blocks';
+import {
+  ColoredContainer,
+  confirmUnsavedChanges,
+  GroupBack,
+  GroupTitle,
+  Text,
+  useExecutor,
+  useResource,
+  useTranslate,
+} from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
+import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { ExecutorInterrupter } from '@cloudbeaver/core-executor';
 import { FormMode } from '@cloudbeaver/core-ui';
 
@@ -35,16 +44,14 @@ export const TeamEdit = observer<Props>(function TeamEdit({ item }) {
     executor: teamsTableOptionsPanelService.onClose,
     handlers: [
       async function closeHandler(event, contexts) {
-        if (formState.isChanged && event === 'before') {
-          const { status } = await commonDialogService.open(ConfirmationDialog, {
-            title: 'ui_save_reminder',
-            message: 'ui_are_you_sure',
-            confirmActionText: 'ui_yes',
-          });
+        if (event !== 'before') {
+          return;
+        }
 
-          if (status === DialogueStateResult.Rejected) {
-            ExecutorInterrupter.interrupt(contexts);
-          }
+        const confirmed = await confirmUnsavedChanges(commonDialogService, formState);
+
+        if (!confirmed) {
+          ExecutorInterrupter.interrupt(contexts);
         }
       },
     ],

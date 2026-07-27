@@ -20,6 +20,7 @@ export default [
   ['ui_processing_ok', 'Ok'],
   ['ui_processing_create', 'Créer'],
   ['ui_processing_save', 'Sauvegarder'],
+  ['ui_processing_dont_save', 'Ne pas sauvegarder'],
   ['ui_processing_saved', 'Sauvegardé'],
   ['ui_processing_stop', 'Arrêter'],
   ['ui_processing_skip', 'Passer'],

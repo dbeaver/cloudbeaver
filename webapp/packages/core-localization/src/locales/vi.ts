@@ -20,6 +20,7 @@ export default [
   ['ui_processing_ok', 'Đồng ý'],
   ['ui_processing_create', 'Tạo'],
   ['ui_processing_save', 'Lưu'],
+  ['ui_processing_dont_save', 'Không lưu'],
   ['ui_processing_saving', 'Đang lưu...'],
   ['ui_processing_do_you_want_to_proceed', 'Bạn có muốn tiếp tục không?'],
   ['ui_processing_saved', 'Đã lưu'],

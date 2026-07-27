@@ -45,6 +45,7 @@ export interface IFormState<TState> {
   isError: boolean;
   isCancelled: boolean;
   isChanged: boolean;
+  isSaving: boolean;
   isReadOnly: boolean;
 
   save(providedContext?: IExecutionContext<IFormState<TState>>): Promise<boolean>;
