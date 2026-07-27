@@ -9,3 +9,10 @@ extend type Query {
     metadataGetNodeExtendedDDL(nodeId: ID!): String
 
 }
+
+extend type Mutation {
+
+    "Creates async task to generate DDL for the specified node ID. Generated DDL is returned in the taskResult field"
+    asyncMetadataGetNodeDDL(nodeId: ID!, options: Object): AsyncTaskInfo! @since(version: "26.1.4")
+
+}

@@ -21,6 +21,7 @@ import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.model.WebPropertyInfo;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.service.security.SMUtils;
+import io.cloudbeaver.utils.WebDataSourceUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.Log;
@@ -58,6 +59,8 @@ public class WebDatabaseObjectInfo {
     public static final String OBJECT_FEATURE_SCRIPT = "script";
     public static final String OBJECT_FEATURE_SCRIPT_EXTENDED = "scriptExtended";
     public static final String OBJECT_FEATURE_SUPPORTS_FULL_DDL = "supportsFullDdl";
+
+    private static final String POSTGRESQL_PROVIDER_ID = "postgresql";
 
     private final WebSession session;
     private final DBSObject object;
@@ -175,7 +178,8 @@ public class WebDatabaseObjectInfo {
         if (object instanceof DBPScriptObjectExt) {
             features.add(OBJECT_FEATURE_SCRIPT_EXTENDED);
         }
-        if (object instanceof DBPScriptObjectExt2 scriptObjectExt2 && (
+        if (object instanceof DBPScriptObjectExt2 scriptObjectExt2
+            && WebDataSourceUtils.isDriverOfProviderFamily(object, POSTGRESQL_PROVIDER_ID) && (
             scriptObjectExt2.supportsObjectDefinitionOption(DBPScriptObject.OPTION_INCLUDE_NESTED_OBJECTS)
                 || scriptObjectExt2.supportsObjectDefinitionOption(DBPScriptObject.OPTION_INCLUDE_COMMENTS)
                 || scriptObjectExt2.supportsObjectDefinitionOption(DBPScriptObject.OPTION_INCLUDE_PERMISSIONS))

@@ -18,8 +18,11 @@ package io.cloudbeaver.service.metadata;
 
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebAction;
+import io.cloudbeaver.model.WebAsyncTaskInfo;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.service.DBWService;
+import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.navigator.DBNNode;
 
 import java.util.Map;
@@ -31,6 +34,14 @@ public interface DBWServiceMetadata extends DBWService {
 
     @WebAction
     String getNodeDDL(WebSession webSession, DBNNode node, Map<String, Object> options) throws DBWebException;
+
+    @WebAction
+    @NotNull
+    WebAsyncTaskInfo asyncGetNodeDDL(
+        @NotNull WebSession webSession,
+        @NotNull String nodeId,
+        @Nullable Map<String, Object> options
+    ) throws DBWebException;
 
     @WebAction
     String getNodeExtendedDDL(WebSession webSession, DBNNode node) throws DBWebException;

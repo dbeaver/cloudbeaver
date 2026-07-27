@@ -257,6 +257,32 @@ public class WebServiceSQL implements DBWServiceSQL {
 
     @NotNull
     @Override
+    public WebAsyncTaskInfo asyncGenerateEntityQuery(
+        @NotNull WebSession session,
+        @NotNull String generatorId,
+        @NotNull List<String> nodePathList,
+        @NotNull WebSQLGeneratorOptions options
+    ) throws DBWebException {
+        WebAsyncTaskProcessor<String> runnable = new WebAsyncTaskProcessor<>() {
+            @Override
+            public void run(DBRProgressMonitor monitor) throws InvocationTargetException {
+                try {
+                    monitor.beginTask("Generate SQL", 1);
+                    monitor.subTask("Generate '" + generatorId + "' SQL");
+                    List<DBSObject> objectList = getObjectListFromNodeIds(session, monitor, nodePathList);
+                    this.result = createAndRunGenerator(monitor, generatorId, objectList, options);
+                } catch (Throwable e) {
+                    throw new InvocationTargetException(e);
+                } finally {
+                    monitor.done();
+                }
+            }
+        };
+        return session.createAndRunAsyncTask("Generate SQL", runnable);
+    }
+
+    @NotNull
+    @Override
     public String sqlGenerateResultSetQuery(
         @NotNull WebSession webSession,
         @NotNull WebSQLContextInfo sqlContext,
@@ -304,6 +330,16 @@ public class WebServiceSQL implements DBWServiceSQL {
         @NotNull List<DBSObject> objectList,
         @NotNull WebSQLGeneratorOptions options
     ) throws DBWebException {
+        return createAndRunGenerator(session.getProgressMonitor(), generatorId, objectList, options);
+    }
+
+    @NotNull
+    private String createAndRunGenerator(
+        @NotNull DBRProgressMonitor monitor,
+        @NotNull String generatorId,
+        @NotNull List<DBSObject> objectList,
+        @NotNull WebSQLGeneratorOptions options
+    ) throws DBWebException {
         SQLGeneratorDescriptor generator = SQLGeneratorConfigurationRegistry.getInstance().getGenerator(generatorId);
         if (generator == null) {
             throw new DBWebException("Generator '" + generatorId + "' not found");
@@ -317,7 +353,7 @@ public class WebServiceSQL implements DBWServiceSQL {
                 generatorInstance.setShowComments(true);
                 generatorInstance.setShowPermissions(true);
             }
-            generatorInstance.run(session.getProgressMonitor());
+            generatorInstance.run(monitor);
             return generatorInstance.getResult();
         } catch (DBException e) {
             throw new DBWebException("Error creating SQL generator", e);
@@ -329,12 +365,24 @@ public class WebServiceSQL implements DBWServiceSQL {
     }
 
     @NotNull
-    private List<DBSObject> getObjectListFromNodeIds(@NotNull WebSession session, @NotNull List<String> nodePathList) throws DBWebException {
+    private List<DBSObject> getObjectListFromNodeIds(
+        @NotNull WebSession session,
+        @NotNull List<String> nodePathList
+    ) throws DBWebException {
+        return getObjectListFromNodeIds(session, session.getProgressMonitor(), nodePathList);
+    }
+
+    @NotNull
+    private List<DBSObject> getObjectListFromNodeIds(
+        @NotNull WebSession session,
+        @NotNull DBRProgressMonitor monitor,
+        @NotNull List<String> nodePathList
+    ) throws DBWebException {
         try {
             List<DBSObject> objectList = new ArrayList<>(nodePathList.size());
             DBNModel navigatorModel = session.getNavigatorModelOrThrow();
             for (String nodePath : nodePathList) {
-                DBNNode node = navigatorModel.getNodeByPath(session.getProgressMonitor(), nodePath);
+                DBNNode node = navigatorModel.getNodeByPath(monitor, nodePath);
                 if (node == null) {
                     throw new DBException("Node '" + nodePath + "' not found");
                 }

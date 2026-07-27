@@ -46,6 +46,12 @@ public class WebServiceBindingMetadata extends WebServiceBindingBase<DBWServiceM
                 getWebSession(env),
                 getNodeFromPath(env)
             ));
+        model.getMutationType()
+            .dataFetcher("asyncMetadataGetNodeDDL", env -> getService(env).asyncGetNodeDDL(
+                getWebSession(env),
+                getArgumentVal(env, "nodeId"),
+                getArgument(env, "options"))
+            );
     }
 
     private DBNNode getNodeFromPath(DataFetchingEnvironment env) throws DBException {

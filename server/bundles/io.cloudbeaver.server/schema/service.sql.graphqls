@@ -595,6 +595,13 @@ extend type Mutation {
     "Returns row count for async SQL row data count task"
     asyncSqlRowDataCountResult(taskId: ID!): Int!
 
+    "Creates async task to generate entity SQL. Generated SQL is returned in the taskResult field"
+    asyncSqlGenerateEntityQuery(
+        generatorId: String!,
+        nodePathList: [String!]!,
+        generatorOptions: SQLQueryGeneratorOptions
+    ): AsyncTaskInfo! @since(version: "26.1.4")
+
     "Reads dynamic trace from provided database results"
     sqlGetDynamicTrace(
         projectId: ID,

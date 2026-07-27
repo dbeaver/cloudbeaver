@@ -17,6 +17,8 @@
 package io.cloudbeaver.service.metadata.impl;
 
 import io.cloudbeaver.DBWebException;
+import io.cloudbeaver.model.WebAsyncTaskInfo;
+import io.cloudbeaver.model.session.WebAsyncTaskProcessor;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.service.metadata.DBWServiceMetadata;
 import org.jkiss.code.NotNull;
@@ -26,9 +28,11 @@ import org.jkiss.dbeaver.model.DBPScriptObject;
 import org.jkiss.dbeaver.model.DBPScriptObjectExt;
 import org.jkiss.dbeaver.model.navigator.DBNDatabaseNode;
 import org.jkiss.dbeaver.model.navigator.DBNNode;
+import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.struct.DBSObject;
 import org.jkiss.utils.CommonUtils;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
@@ -50,6 +54,43 @@ public class WebServiceMetadata implements DBWServiceMetadata {
         @NotNull DBNNode dbNode,
         @Nullable Map<String, Object> options
     ) throws DBWebException {
+        return generateNodeDDL(webSession.getProgressMonitor(), dbNode, options);
+    }
+
+    @NotNull
+    @Override
+    public WebAsyncTaskInfo asyncGetNodeDDL(
+        @NotNull WebSession webSession,
+        @NotNull String nodeId,
+        @Nullable Map<String, Object> options
+    ) throws DBWebException {
+        WebAsyncTaskProcessor<String> runnable = new WebAsyncTaskProcessor<>() {
+            @Override
+            public void run(DBRProgressMonitor monitor) throws InvocationTargetException {
+                try {
+                    monitor.beginTask("Generate DDL", 1);
+                    monitor.subTask("Generate DDL for node '" + nodeId + "'");
+                    DBNNode node = webSession.getNavigatorModelOrThrow().getNodeByPath(monitor, nodeId);
+                    if (node == null) {
+                        throw new DBWebException("Node '" + nodeId + "' not found");
+                    }
+                    this.result = generateNodeDDL(monitor, node, options);
+                } catch (Throwable e) {
+                    throw new InvocationTargetException(e);
+                } finally {
+                    monitor.done();
+                }
+            }
+        };
+        return webSession.createAndRunAsyncTask("Generate DDL", runnable);
+    }
+
+    @Nullable
+    private String generateNodeDDL(
+        @NotNull DBRProgressMonitor monitor,
+        @NotNull DBNNode dbNode,
+        @Nullable Map<String, Object> options
+    ) throws DBWebException {
         validateDatabaseNode(dbNode);
         DBSObject object = ((DBNDatabaseNode) dbNode).getObject();
         if (!(object instanceof DBPScriptObject)) {
@@ -64,7 +105,7 @@ public class WebServiceMetadata implements DBWServiceMetadata {
             }
         }
         try {
-            return ((DBPScriptObject) object).getObjectDefinitionText(webSession.getProgressMonitor(), ddlOptions);
+            return ((DBPScriptObject) object).getObjectDefinitionText(monitor, ddlOptions);
         } catch (DBException e) {
             throw new DBWebException("Error extracting DDL", e);
         }
