@@ -9,7 +9,7 @@
 import { observer } from 'mobx-react-lite';
 import { useContext, useState, type PropsWithChildren } from 'react';
 
-import { ActionIconButton, AutoResizeTextarea, Form, s, Textarea, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { ActionIconButton, AutoResizeTextarea, Form, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { getOS, OperatingSystem } from '@cloudbeaver/core-utils';
 import { NotificationService } from '@cloudbeaver/core-events';
