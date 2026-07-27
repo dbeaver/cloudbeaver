@@ -600,7 +600,7 @@ extend type Mutation {
         generatorId: String!,
         nodePathList: [String!]!,
         generatorOptions: SQLQueryGeneratorOptions
-    ): AsyncTaskInfo! @since(version: "26.1.4")
+    ): AsyncTaskInfo!
 
     "Reads dynamic trace from provided database results"
     sqlGetDynamicTrace(
