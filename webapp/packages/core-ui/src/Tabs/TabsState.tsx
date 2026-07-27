@@ -66,6 +66,8 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
   const context = useDataContext();
   const props = useMemo(() => rest as any as T, [...Object.values(rest)]);
 
+  const controlled = currentTabId !== undefined;
+
   let displayed: string[] = [];
 
   if (container) {
@@ -85,11 +87,19 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
   const [closeExecutor] = useState(() => new Executor<ITabData<T>>());
   const [openExecutor] = useState(() => new Executor<ITabData<T>>());
 
+  function select(id: string | null | undefined): void | undefined {
+    if (isNotNullDefined(id) && id !== currentTabId) {
+      openExecutor.execute({ tabId: id, props });
+    }
+  }
+
   const store = useTabStore({
     defaultSelectedId: selectedId ?? null,
     orientation,
     selectOnMove: false,
     focusLoop: false,
+    selectedId: controlled ? currentTabId : undefined,
+    setSelectedId: controlled ? select : undefined,
   });
 
   const selected = useStoreState(store, 'selectedId');
@@ -109,12 +119,12 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
       selected,
       store,
       tabList,
+      controlled,
     },
   );
 
   useEffect(() => {
     if (isNotNullDefined(currentTabId)) {
-      dynamic.store.setSelectedId(currentTabId);
       dynamic.selectedId = currentTabId;
     }
   }, [currentTabId]);
@@ -134,15 +144,20 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
     executor: openExecutor,
     handlers: [
       function openHandler(data, contexts) {
-        dynamic.open?.(data);
         if (dynamic.selectedId === data.tabId) {
           ExecutorInterrupter.interrupt(contexts);
           return;
         }
-        dynamic.selectedId = data.tabId;
-        if (dynamic.store.getState().selectedId !== data.tabId) {
-          dynamic.store.setSelectedId(data.tabId);
+
+        if (!dynamic.controlled) {
+          dynamic.selectedId = data.tabId;
+
+          if (dynamic.store.getState().selectedId !== data.tabId) {
+            dynamic.store.setSelectedId(data.tabId);
+          }
         }
+
+        dynamic.open?.(data);
       },
     ],
   });
@@ -159,6 +174,10 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
   const currentSelectedId = selected;
 
   useEffect(() => {
+    if (controlled) {
+      return;
+    }
+
     if (!isNotNullDefined(currentSelectedId) || dynamic.selectedId === currentSelectedId) {
       return;
     }
@@ -167,7 +186,7 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
       tabId: currentSelectedId,
       props,
     });
-  }, [currentSelectedId]);
+  }, [currentSelectedId, controlled]);
 
   const value = useObservableRef<ITabsContext<T>>(
     () => ({
