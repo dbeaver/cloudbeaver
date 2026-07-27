@@ -85,6 +85,8 @@ export class SqlGeneratorsBootstrap extends Bootstrap {
                       await this.commonDialogService.open(GeneratedSqlDialog, {
                         query,
                         nodeId: node.uri,
+                        nodeName: node.name,
+                        generatorName: action.label,
                         options: getDefaultQueryGeneratorOptions(),
                         regenerateQuery: options => this.sqlGeneratorsResource.generateEntityQuery(action.id, node.uri, options),
                       });
