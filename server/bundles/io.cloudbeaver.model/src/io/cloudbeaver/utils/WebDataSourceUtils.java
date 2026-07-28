@@ -331,7 +331,7 @@ public class WebDataSourceUtils {
             try {
                 dsConfig.setUrl(driver.getConnectionURL(dsConfig));
             } catch (DBException e) {
-                throw new IllegalStateException("Error preparing connection URL", e);
+                log.error("Error preparing connection URL", e);
             }
         }
         // Save network handlers
