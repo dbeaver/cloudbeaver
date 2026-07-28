@@ -21,13 +21,9 @@ import io.cloudbeaver.WebAction;
 import io.cloudbeaver.model.WebAsyncTaskInfo;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.service.DBWService;
-import io.cloudbeaver.service.data.transfer.impl.WebDataTransferDefaultExportSettings;
-import io.cloudbeaver.service.data.transfer.impl.WebDataTransferParameters;
-import io.cloudbeaver.service.data.transfer.impl.WebDataTransferStreamProcessor;
-import io.cloudbeaver.service.data.transfer.impl.WebDataTransferTaskConfig;
+import io.cloudbeaver.service.data.transfer.impl.*;
 import io.cloudbeaver.service.sql.WebSQLContextInfo;
 import io.cloudbeaver.service.sql.WebSQLProcessor;
-import io.cloudbeaver.service.sql.WebSQLResultsInfo;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.rm.RMConstants;
@@ -61,10 +57,16 @@ public interface DBWServiceDataTransfer extends DBWService {
     @NotNull
     @WebAction(requireGlobalPermissions = RMConstants.PERMISSION_DATA_EDITOR_IMPORT)
     WebAsyncTaskInfo asyncImportDataContainer(
-        @NotNull String processorId,
-        @NotNull Path path,
-        @NotNull WebSQLResultsInfo webSQLResultsInfo,
+        @NotNull WebSQLContextInfo sqlContextInfo,
+        @NotNull String resultsId,
+        @NotNull WebDataTransferImportParameters parameters,
         @NotNull WebSession webSession) throws DBWebException;
+
+    @NotNull
+    WebAsyncTaskInfo runImportDataTask(
+        @NotNull WebSession webSession,
+        @NotNull String taskId,
+        @NotNull Path path) throws DBWebException;
 
     @NotNull
     @WebAction(requireGlobalPermissions = RMConstants.PERMISSION_DATA_EDITOR_EXPORT)
@@ -94,4 +96,10 @@ public interface DBWServiceDataTransfer extends DBWService {
         @NotNull WebDataTransferTaskConfig taskConfig,
         @NotNull OutputStream outputStream
     ) throws DBException;
+
+    /**
+     * Checks if the user has permission to import data.
+     * Returns {@code true} if import is allowed, {@code false} otherwise.
+     */
+    boolean validateImportPermission(@NotNull WebSession session);
 }

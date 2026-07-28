@@ -20,31 +20,23 @@ import com.google.gson.stream.JsonWriter;
 import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.WebAsyncTaskInfo;
-import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.BaseWebPlatform;
-import io.cloudbeaver.server.CBConstants;
 import io.cloudbeaver.server.WebAppUtils;
 import io.cloudbeaver.server.WebApplication;
 import io.cloudbeaver.service.WebServiceServletBase;
 import io.cloudbeaver.service.data.transfer.DBWServiceDataTransfer;
-import io.cloudbeaver.service.sql.WebSQLContextInfo;
-import io.cloudbeaver.service.sql.WebSQLProcessor;
-import io.cloudbeaver.service.sql.WebSQLResultsInfo;
-import io.cloudbeaver.service.sql.WebServiceBindingSQL;
 import jakarta.servlet.MultipartConfigElement;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.jkiss.code.NotNull;
-import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
+import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.HttpConstants;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.LinkedHashMap;
@@ -54,11 +46,10 @@ import java.util.UUID;
 @MultipartConfig
 public class WebDataTransferImportServlet extends WebServiceServletBase {
 
-    private static final Log log = Log.getLog(WebDataTransferImportServlet.class);
     public static final String ECLIPSE_JETTY_MULTIPART_CONFIG = "org.eclipse.jetty.multipartConfig";
+    private static final String PARAM_TASK_ID = "taskId";
 
-    DBWServiceDataTransfer dbwServiceDataTransfer;
-
+    private final DBWServiceDataTransfer dbwServiceDataTransfer;
 
     public WebDataTransferImportServlet(WebApplication application, DBWServiceDataTransfer dbwServiceDataTransfer) {
         super(application);
@@ -79,7 +70,7 @@ public class WebDataTransferImportServlet extends WebServiceServletBase {
             response.sendError(HttpServletResponse.SC_FORBIDDEN, "Permission denied");
             return;
         }
-        if (validateImportPermission(session)) {
+        if (!dbwServiceDataTransfer.validateImportPermission(session)) {
             response.sendError(HttpServletResponse.SC_FORBIDDEN, "Import is not allowed for this user");
             return;
         }
@@ -91,57 +82,38 @@ public class WebDataTransferImportServlet extends WebServiceServletBase {
             request.setAttribute(ECLIPSE_JETTY_MULTIPART_CONFIG, MULTI_PART_CONFIG);
 
             Map<String, Object> variables = getVariables(request);
-
-            String projectId = JSONUtils.getString(variables, "projectId");
-            String connectionId = JSONUtils.getString(variables, "connectionId");
-            String contextId = JSONUtils.getString(variables, "contextId");
-            String resultId = JSONUtils.getString(variables, "resultsId");
-            String processorId = JSONUtils.getString(variables, "processorId");
-
-            if (projectId == null || connectionId == null || contextId == null || resultId == null || processorId == null) {
-                throw new IllegalArgumentException("Missing required parameters");
+            String taskId = JSONUtils.getString(variables, "taskId");
+            if (CommonUtils.isEmpty(taskId)) {
+                throw new IllegalArgumentException("Missing required parameter '" + PARAM_TASK_ID + "'");
             }
 
-            WebConnectionInfo webConnectionInfo = session.getAccessibleProjectById(projectId).getWebConnectionInfo(connectionId);
-            WebSQLProcessor processor = WebServiceBindingSQL.getSQLProcessor(webConnectionInfo);
-            WebSQLContextInfo webSQLContextInfo = processor.getContext(contextId);
-
-            if (webSQLContextInfo == null) {
-                throw new DBWebException("Context is empty");
-            }
-
-            WebSQLResultsInfo webSQLResultsInfo = webSQLContextInfo.getResults(resultId);
-            Path filePath;
-
+            String fileName = UUID.randomUUID().toString();
+            Path filePath = tempFolder.resolve(fileName);
             try {
-                InputStream file = request.getPart("fileData").getInputStream();
-                filePath = tempFolder.resolve(UUID.randomUUID().toString());
-                Files.write(filePath, file.readAllBytes());
+                request.getPart("fileData").write(fileName);
             } catch (ServletException e) {
                 throw new DBWebException(e.getMessage());
             }
 
-            WebAsyncTaskInfo asyncImportDataContainer =
-                    dbwServiceDataTransfer.asyncImportDataContainer(processorId, filePath, webSQLResultsInfo, session);
+            WebAsyncTaskInfo importTask;
+            try {
+                importTask = dbwServiceDataTransfer.runImportDataTask(session, taskId, filePath);
+            } catch (Exception e) {
+                Files.deleteIfExists(filePath);
+                throw e;
+            }
+
             response.setContentType(HttpConstants.CONTENT_TYPE_JSON);
-            Map<String, Object> parameters = new LinkedHashMap<>();
-            parameters.put("id", asyncImportDataContainer.getId());
-            parameters.put("name", asyncImportDataContainer.getName());
-            parameters.put("running", asyncImportDataContainer.isRunning());
-            parameters.put("status", asyncImportDataContainer.getStatus());
-            parameters.put("error", asyncImportDataContainer.getError());
-            parameters.put("taskResult", asyncImportDataContainer.getTaskResult());
+            Map<String, Object> result = new LinkedHashMap<>();
+            result.put("id", importTask.getId());
+            result.put("name", importTask.getName());
+            result.put("running", importTask.isRunning());
+            result.put("status", importTask.getStatus());
+            result.put("error", importTask.getError());
+            result.put("taskResult", importTask.getTaskResult());
             try (JsonWriter writer = new JsonWriter(response.getWriter())) {
-                JSONUtils.serializeMap(writer, parameters);
+                JSONUtils.serializeMap(writer, result);
             }
         }
-    }
-
-    private boolean validateImportPermission(@NotNull WebSession session) {
-        if (WebAppUtils.getWebApplication().isCommunity()) {
-            Map<String, Object> productSettings = WebAppUtils.getWebApplication().getServerConfiguration().getProductSettings();
-            return JSONUtils.getBoolean(productSettings, CBConstants.PREF_DATA_EDITOR_IMPORT_DISABLED_OLD, false);
-        }
-        return !session.hasGlobalPermission(DBWConstants.GLOBAL_PERMISSION_DATA_EDITOR_IMPORT);
     }
 }

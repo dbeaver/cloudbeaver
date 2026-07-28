@@ -834,9 +834,36 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                     }
                 }
             }
+            if (filter.isIncludeLinkedProviders()) {
+                readUsersLinkedProviders(dbCon, result);
+            }
             return result.values().toArray(new SMUser[0]);
         } catch (SQLException e) {
             throw new DBCException("Error while loading users", e);
+        }
+    }
+
+    private void readUsersLinkedProviders(@NotNull Connection dbCon, @NotNull Map<String, SMUser> users)
+        throws SQLException {
+        String credentialsSql =
+            "SELECT DISTINCT USER_ID,PROVIDER_ID FROM {table_prefix}CB_USER_CREDENTIALS\n" +
+            "WHERE USER_ID IN (" + SQLUtils.generateParamList(users.size()) + ")";
+        try (PreparedStatement dbStat = dbCon.prepareStatement(credentialsSql)) {
+            int parameterIndex = 1;
+            for (String userId : users.keySet()) {
+                dbStat.setString(parameterIndex++, userId);
+            }
+            try (ResultSet dbResult = dbStat.executeQuery()) {
+                while (dbResult.next()) {
+                    String userId = dbResult.getString(1);
+                    String providerId = dbResult.getString(2);
+                    SMUser user = users.get(userId);
+                    if (user != null) {
+                        user.setLinkedAuthProviders(
+                            ArrayUtils.add(String.class, user.getLinkedAuthProviders(), providerId));
+                    }
+                }
+            }
         }
     }
 
@@ -853,6 +880,9 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         if (filter.getEnabledState() != null) {
             whereParts.add("IS_ACTIVE=?");
         }
+        if (!CommonUtils.isEmpty(filter.getAuthRoles())) {
+            whereParts.add("DEFAULT_AUTH_ROLE IN (" + SQLUtils.generateParamList(filter.getAuthRoles().size()) + ")");
+        }
         if (!whereParts.isEmpty()) {
             where.append(whereParts.stream().collect(Collectors.joining(" AND ", " WHERE ", "")));
         }
@@ -866,6 +896,11 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         }
         if (filter.getEnabledState() != null) {
             dbStat.setString(parameterIndex++, filter.getEnabledState() ? CHAR_BOOL_TRUE : CHAR_BOOL_FALSE);
+        }
+        if (!CommonUtils.isEmpty(filter.getAuthRoles())) {
+            for (String authRole : filter.getAuthRoles()) {
+                dbStat.setString(parameterIndex++, authRole);
+            }
         }
 
         return parameterIndex;
