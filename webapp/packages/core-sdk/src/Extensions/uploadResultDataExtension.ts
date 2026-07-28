@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -12,11 +12,7 @@ import type { AsyncTaskInfo } from '../sdk.js';
 
 export interface IUploadResultDataExtension {
   uploadResultData: (
-    connectionId: string,
-    contextId: string,
-    projectId: string,
-    resultsId: string,
-    processorId: string,
+    taskId: string,
     file: File,
     onUploadProgress?: (event: UploadProgressEvent) => void,
     signal?: AbortSignal,
@@ -26,23 +22,12 @@ export interface IUploadResultDataExtension {
 export function uploadResultDataExtension(client: CustomGraphQLClient): IUploadResultDataExtension {
   return {
     uploadResultData(
-      connectionId: string,
-      contextId: string,
-      projectId: string,
-      resultsId: string,
-      processorId: string,
+      taskId: string,
       file: File,
       onUploadProgress?: (event: UploadProgressEvent) => void,
       signal?: AbortSignal,
     ): Promise<AsyncTaskInfo> {
-      return client.uploadFile(
-        GlobalConstants.absoluteServiceUrl('data', 'import'),
-        file,
-        undefined,
-        { connectionId, contextId, projectId, resultsId, processorId },
-        onUploadProgress,
-        signal,
-      );
+      return client.uploadFile(GlobalConstants.absoluteServiceUrl('data', 'import'), file, undefined, { taskId }, onUploadProgress, signal);
     },
   };
 }
