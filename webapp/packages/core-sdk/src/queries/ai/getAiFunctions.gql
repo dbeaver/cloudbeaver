@@ -1,0 +1,9 @@
+query getAiFunctions {
+  functions: aiListFunctions {
+    id
+    name
+    description
+    icon
+    system
+  }
+}

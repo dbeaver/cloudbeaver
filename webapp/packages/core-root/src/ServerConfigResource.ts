@@ -14,6 +14,7 @@ import { DataSynchronizationService } from './DataSynchronization/DataSynchroniz
 import { ServerConfigEventHandler } from './ServerConfigEventHandler.js';
 
 export const FEATURE_GIT_ID = 'git';
+export const FEATURE_AI_ID = 'ai';
 
 export type ServerConfig = ServerConfigFragment;
 

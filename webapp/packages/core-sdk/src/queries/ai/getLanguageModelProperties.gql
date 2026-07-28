@@ -1,0 +1,20 @@
+query getEngineProperties($engineId: ID!, $profileId: ID, $settings: AIEngineConfig) {
+  properties: aiListEngineProperties(engineId: $engineId, profileId: $profileId, settings: $settings) {
+    id
+    displayName
+    description
+    hint
+    value
+    category
+    required
+    dataType
+    defaultValue
+    validValues
+    length
+    features
+    order
+    conditions {
+      ...Condition
+    }
+  }
+}

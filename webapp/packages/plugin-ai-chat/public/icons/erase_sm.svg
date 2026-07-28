@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+  <path d="M9.5,2.41l4.09,4.09-7.5,7.5h-1.17l-3.5-3.5L9.5,2.41M9.5,1L0,10.5l4.5,4.5h2L15,6.5,9.5,1h0Z" fill="#3387c5"/>
+  <rect x="6.05" y="3.42" width="6.96" height="6" transform="translate(-1.75 8.62) rotate(-45)" fill="#3387c5"/>
+  <polygon points="15 14 4.5 14 4.5 15 6.6 15 15 15 15 14" fill="#3387c5"/>
+</svg>

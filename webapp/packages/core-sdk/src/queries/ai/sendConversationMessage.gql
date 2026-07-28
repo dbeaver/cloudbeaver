@@ -1,0 +1,5 @@
+mutation sendConversationMessage($conversationId: ID!, $prompt: String!) {
+  message: aiSendChatMessage(conversationId: $conversationId, prompt: $prompt) {
+    ...AiSendChatMessageInfo
+  }
+}

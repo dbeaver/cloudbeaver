@@ -1,0 +1,35 @@
+.container {
+  composes: theme-border-color-background from global;
+  padding: 8px;
+  padding-bottom: 4px;
+  border-top: 1px solid;
+}
+
+.textareaContainer {
+  composes: theme-border-color-background from global;
+  display: flex;
+  align-items: flex-end;
+  flex: 1;
+  border: 2px solid;
+  border-radius: 8px;
+  background: var(--theme-surface);
+}
+
+.textareaContainer button {
+  width: 28px !important;
+  height: 28px !important;
+  margin-right: 8px !important;
+  margin-bottom: 12px !important;
+  flex-shrink: 0;
+}
+
+.textarea {
+  display: flex;
+  flex: 1;
+}
+
+.textarea textarea {
+  border: none;
+  resize: none;
+  background: none;
+}

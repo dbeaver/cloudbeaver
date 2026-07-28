@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin>
+    <extension point="io.cloudbeaver.service">
+        <service id="ai" label="AI Service" description="AI service"
+                 class="io.cloudbeaver.service.ai.gql.WebServiceBindingAI"/>
+        <service id="ai.configurator" label="AI Configurator" description="AI configurator"
+                 class="io.cloudbeaver.service.ai.gql.WebServiceAIConfigurator">
+        </service>
+    </extension>
+
+    <extension point="io.cloudbeaver.object.feature.provider">
+        <featureProvider id="AIFeatureProvider" class="io.cloudbeaver.service.ai.WebAIFeatureProvider"/>
+    </extension>
+
+    <extension point="org.jkiss.dbeaver.ws.event">
+        <clientEvent id="cb_client_ai_function_call_confirmation"
+            class="io.cloudbeaver.service.ai.model.events.WSAiFunctionCallConfirmationClientEvent"
+            handler="io.cloudbeaver.service.ai.model.events.WSAiFunctionCallConfirmationHandler"/>
+    </extension>
+</plugin>
