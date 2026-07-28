@@ -13,11 +13,6 @@ export default [
   ['plugin_connections_connection_edit_menu_item_title', 'Modifica Connessione'],
   ['plugin_connections_connection_clone', 'Clona'],
   ['plugin_connections_connection_clone_error', 'Impossibile clonare la connessione'],
-  ['plugin_connections_connection_edit_cancel_title', "Conferma l'annullamento"],
-  [
-    'plugin_connections_connection_edit_cancel_message',
-    'Stai per annullare le modifiche alla connessione. Modifiche non salvate saranno perse. Sei sicuro?',
-  ],
   ['plugin_connections_connection_edit_reconnect_title', 'Connection updated'],
   ['plugin_connections_connection_edit_reconnect_message', 'Connection has been updated. Do you want to reconnect?'],
   ['plugin_connections_connection_edit_reconnect_failed', 'Failed to reconnect'],
