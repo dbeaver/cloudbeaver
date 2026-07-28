@@ -181,6 +181,7 @@ export * from './FormControls/Radio.js';
 export * from './FormControls/RadioGroup.js';
 export * from './FormControls/Form.js';
 export * from './FormControls/Textarea.js';
+export * from './FormControls/AutoResizeTextarea.js';
 export * from './FormControls/useCapsLockTracker.js';
 export * from './FormControls/useCustomInputValidation.js';
 export * from './FormControls/useFormCustomInputValidation.js';
