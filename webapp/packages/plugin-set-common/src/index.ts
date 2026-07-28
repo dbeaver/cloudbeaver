@@ -49,6 +49,7 @@ import pluginAppLogoAdministration from '@cloudbeaver/plugin-app-logo-administra
 import pluginAuthentication from '@cloudbeaver/plugin-authentication/module';
 import pluginAuthenticationAdministration from '@cloudbeaver/plugin-authentication-administration/module';
 import pluginBrowser from '@cloudbeaver/plugin-browser/module';
+import pluginConnectionAdministration from '@cloudbeaver/plugin-connection-administration/module';
 import pluginConnectionCustom from '@cloudbeaver/plugin-connection-custom/module';
 import pluginConnectionSearch from '@cloudbeaver/plugin-connection-search/module';
 import pluginConnections from '@cloudbeaver/plugin-connections/module';
@@ -169,6 +170,7 @@ export const commonSet = [
   pluginAuthenticationAdministration,
   pluginTheme,
   pluginLocalization,
+  pluginConnectionAdministration,
   pluginConnectionCustom,
   pluginConnectionSearch,
   pluginDataExport,
