@@ -91,9 +91,10 @@ export const ChangePassword = observer(function ChangePassword() {
 
         if ((state.oldPassword || state.password || state.repeatedPassword) && !context.force) {
           const { status } = await commonDialogService.open(ConfirmationDialog, {
-            title: 'plugin_user_profile_authentication_change_password_cancel_title',
-            message: 'plugin_user_profile_authentication_change_password_cancel_message',
-            confirmActionText: 'ui_processing_ok',
+            title: 'ui_discard_changes',
+            message: 'ui_discard_changes_message',
+            confirmActionText: 'ui_discard',
+            cancelActionText: 'ui_keep_editing',
           });
 
           if (status === DialogueStateResult.Rejected) {

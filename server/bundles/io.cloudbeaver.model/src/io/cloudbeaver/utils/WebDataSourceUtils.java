@@ -333,7 +333,11 @@ public class WebDataSourceUtils {
         }
 
         if (CommonUtils.isEmpty(config.getUrl())) {
-            dsConfig.setUrl(driver.getConnectionURL(dsConfig));
+            try {
+                dsConfig.setUrl(driver.getConnectionURL(dsConfig));
+            } catch (DBException e) {
+                throw new IllegalStateException("Error preparing connection URL", e);
+            }
         }
         // Save network handlers
         if (config.getNetworkHandlersConfig() != null) {
