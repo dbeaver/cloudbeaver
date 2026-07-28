@@ -1,0 +1,8 @@
+mutation updateChatConversation($conversationId: ID!, $config: AIChatConversationInput!) {
+  conversation: aiUpdateChatConversation(conversationId: $conversationId, config: $config) {
+    ...AiChatConversation
+    settings {
+      scope
+    }
+  }
+}

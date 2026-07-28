@@ -1,0 +1,10 @@
+mutation updateAiProfile($config: AIConfigurationProfileInput!) {
+  profile: aiUpdateProfile(config: $config) {
+    id
+    name
+    engineId
+    configuration {
+      ...ObjectPropertyInfo
+    }
+  }
+}

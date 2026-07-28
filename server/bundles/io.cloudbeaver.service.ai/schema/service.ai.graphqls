@@ -1,0 +1,274 @@
+# AI admin queries
+enum AIMessageType {
+    SYSTEM,
+    USER,
+    ASSISTANT,
+    ERROR,
+    WARNING,
+    CONFIRMATION,
+    ATTACHMENT,
+    FUNCTION
+}
+
+"""
+Scope of the AI chat conversation.
+Can be a database connection, a current database, a current schema or a custom scope.
+"""
+enum AIDatabaseScope @since(version: "25.1.1") {
+    CURRENT_SCHEMA
+    CURRENT_DATABASE
+    CURRENT_DATASOURCE
+    CUSTOM
+}
+
+type AISettingsInfo @since(version: "23.2.2") {
+    activeEngine: ID!
+    defaultConfiguration: ID
+    language: String
+}
+
+type AIEngineInfo @since(version: "23.2.2") {
+    "Unique identifier of the AI engine."
+    id: ID!
+    "Name of the AI engine."
+    name: String!
+}
+
+type AIChatConversationInfo @since(version: "25.1.1") {
+    dataSourceId: DataSourceId
+    id: ID!
+    promptGeneratorId: ID
+    caption: String!
+    "Last message creation time."
+    time: DateTime!
+    messages: [AIMessage!]!
+    settings: AIChatConversationSettings
+    waitingForResponse: Boolean! @since(version: "25.1.5")
+    metrics: AIChatConversationMetrics @since(version: "25.3.5")
+    "ID of the AI engine configuration profile used for this conversation."
+    profile: ID @since(version: "26.1.3")
+}
+
+type AIChatConversationMetrics @since(version: "25.3.5") {
+    totalInputTokens: Int!
+    totalOutputTokens: Int!
+}
+
+type AIChatConversationSettings {
+    metaTransferConfirmed: Boolean!
+    scope: AIDatabaseScope
+    "If the scope is set to CUSTOM, this field is required."
+    customObjectIds: [ID!]
+}
+
+type AIMessage {
+    conversationId: ID!
+    id: ID!
+    role: AIMessageType!
+    content: String!
+    displayMessage: String!
+    time: DateTime!
+    "Present only with CONFIRMATION role"
+    functionConfirmation: AIFunctionConfirmation
+    "Present only with FUNCTION role"
+    functionCall: AIFunctionCall
+    "Present only with FUNCTION role"
+    functionResult: AIFunctionResult
+}
+
+type AISendChatMessageInfo @since(version: "25.1.1") {
+    conversation: AIChatConversationInfo!
+    userMessage: AIMessage!
+    "Message that would be received via websockets."
+    assistantMessage: AIMessage!
+}
+
+type AIDataSourceSettingsInfo @since(version: "25.3.3") {
+    "Indicates whether user confirmed meta transfer to AI for the current data source."
+    metaTransferConfirmed: Boolean!
+    "Default scope for AI operations in this data source."
+    scope: AIDatabaseScope
+    "If the scope is set to CUSTOM, this field is required."
+    customObjectIds: [ID!]
+}
+
+type DataSourceId @since(version: "25.1.1") {
+    projectId: ID!
+    connectionId: ID!
+}
+
+type AIConfigurationProfileInfo @since(version: "26.1.3") {
+    "Unique identifier of the AI engine profile."
+    id: ID!
+    "Name of the AI engine profile."
+    name: String!
+    "ID of the AI engine that this profile belongs to."
+    engineId: ID!
+}
+
+type AIAdminConfigurationProfileInfo @since(version: "26.1.3") {
+    "Unique identifier of the AI engine profile."
+    id: ID!
+    "Name of the AI engine profile."
+    name: String!
+    "ID of the AI engine that this profile belongs to."
+    engineId: ID!
+    "Configuration of the AI engine profile."
+    configuration: [ObjectPropertyInfo!]!
+}
+
+type AIFunction @since(version: "26.0.4") {
+    "Unique identifier of the function (combines toolbox ID and function ID)"
+    id: ID!
+    "Human-readable name of the function"
+    name: String!
+    "Detailed description of what the function does"
+    description: String
+    "URL or path to the function icon"
+    icon: String
+    "Indicates whether the function is a system function (can be auto-confirmed when required)"
+    system: Boolean!
+}
+
+type AIFunctionCall @since(version: "26.0.3") {
+    id: ID!
+    functionName: String!
+    arguments: Object
+    hint: String
+}
+
+type AIFunctionConfirmation @since(version: "26.0.3") {
+    functionCalls: [AIFunctionCall!]!
+}
+
+enum AIFunctionType {
+    ACTION
+    INFORMATION
+}
+
+type AIFunctionResult @since(version: "26.0.3") {
+    type: AIFunctionType!
+    value: Object!
+}
+
+input AISettingsConfig @since(version: "23.2.2") {
+    "Default configuration profile ID. May be null if AI wasn't configured"
+    defaultConfiguration: ID
+    "Language to be used as a default for AI responses"
+    language: String
+}
+
+input AIEngineConfig @since(version: "23.2.2") {
+    properties: Object
+}
+
+input AIDatabaseScopeInput {
+    id: AIDatabaseScope!
+    "If custom scope is selected, this field is required."
+    customScopes: [ID!]
+}
+
+input DataSourceIdInput @since(version: "25.1.1") {
+    projectId: ID!
+    connectionId: ID!
+}
+
+input AIChatConversationInput {
+    dataSourceId: DataSourceIdInput
+    caption: String
+    settings: AIChatConversationSettingsInput
+    "ID of the prompt generator to use for this conversation (sql - by default)."
+    promptGeneratorId: ID
+}
+
+input AIChatConversationSettingsInput {
+    metaTransferConfirmed: Boolean
+    scope: AIDatabaseScope
+    profile: ID
+    customObjectIds: [ID!]
+}
+
+input AIDataSourceSettingsInput @since(version: "25.3.3") {
+    "Flag indicating whether MCP integration is enabled for the current data source."
+    mcpEnabled: Boolean
+    "Flag indicating whether user confirmed meta transfer to AI."
+    metaTransferConfirmed: Boolean
+    "Default scope for AI operations in this data source."
+    scope: AIDatabaseScope
+    "If custom scope is selected, this field is required."
+    customObjectIds: [ID!]
+}
+
+input AIConfigurationProfileInput @since(version: "26.1.3") {
+    "Unique identifier of the AI engine profile."
+    profileId: ID!
+    "Name of the AI engine profile."
+    profileName: String
+    "ID of the AI engine that this profile belongs to."
+    engineId: ID
+    "Configuration of the AI engine profile."
+    configuration: AIEngineConfig
+}
+
+extend type Query @since(version: "23.2.2") {
+    "Returns the list of available AI engines."
+    aiListEngines: [AIEngineInfo!]
+    "Returns the global AI settings."
+    aiSettings: AISettingsInfo!
+    "Returns the properties of the specified AI engine for displaying it in the UI. In case settings are passed, fills it with defaults and returns back."
+    aiListEngineProperties(engineId: ID!, profileId: ID, settings : AIEngineConfig): [ObjectPropertyInfo!]!
+
+    "Return the list of available AI functions."
+    aiListFunctions: [AIFunction!] @since(version: "26.0.4")
+
+    "Returns the list of available AI engine configuration profiles."
+    aiListProfiles: [AIConfigurationProfileInfo!]! @since(version: "26.1.3")
+
+    "Returns AI chat conversation info for the specified conversation ID."
+    aiChatConversationInfo(conversationId: ID!, loadMetrics: Boolean): AIChatConversationInfo! @since(version: "25.1.1")
+    "Returns list of AI chat conversations for the specified connection."
+    aiListChatConversations(dataSourceId: DataSourceIdInput): [AIChatConversationInfo!]! @since(version: "25.1.1")
+
+    "Returns AI settings for the specified connection."
+    aiDataSourceSettings(dataSourceId: DataSourceIdInput!): AIDataSourceSettingsInfo! @since(version: "25.3.3")
+}
+
+extend type Mutation @since(version: "23.2.2") {
+    "Saves the global AI settings (active AI engine)."
+    aiSaveSettings(settings: AISettingsConfig!): AISettingsInfo!
+    "Saves the configuration of the specified AI engine."
+    aiSaveEngineConfiguration(profileId: ID!, settings : AIEngineConfig!): Boolean! @deprecated(reason: "use profiles api")
+    "Creates an anync task to perform AI query completion."
+    asyncAiPerformQueryCompletion(projectId: ID, connectionId: ID!, contextId: ID!, request: String!): AsyncTaskInfo!
+    "Retrieves the result of an async AI query completion task."
+    asyncAiPerformQueryCompletionResult(taskId: ID!): String
+
+    "Creates a new AI engine configuration profile."
+    aiCreateProfile(config: AIConfigurationProfileInput!): AIAdminConfigurationProfileInfo! @since(version: "26.1.3")
+    "Updates the configuration of the specified AI engine configuration profile."
+    aiUpdateProfile(config: AIConfigurationProfileInput!): AIAdminConfigurationProfileInfo! @since(version: "26.1.3")
+    "Deletes the specified AI engine configuration profile."
+    aiDeleteProfile(profileId: ID!): Boolean! @since(version: "26.1.3")
+
+    """
+    Creates a new AI chat conversation.
+    Conversation is created in the context of a project and connection.
+    If the connection and project are not specified, the conversation will be created without a context.
+    """
+    aiCreateChatConversation(config: AIChatConversationInput!): AIChatConversationInfo! @since(version: "25.1.1")
+
+    "Updates the caption of the AI chat conversation"
+    aiUpdateChatConversation(conversationId: ID!, config: AIChatConversationInput!): AIChatConversationInfo! @since(version: "25.1.1")
+
+    "Deletes the specified AI chat conversation"
+    aiDeleteChatConversation(conversationId: ID!): Boolean! @since(version: "25.1.1")
+
+    "Sends a chat message to the AI chat conversation and returns a message ID from response. The response will be received partially via websockets."
+    aiSendChatMessage(conversationId: ID!, prompt: String!): AISendChatMessageInfo! @since(version: "25.1.1")
+
+    "Clears the chat messages in the AI chat conversation. The messages will be removed from the conversation."
+    aiClearLastChatMessages(conversationId: ID!, messageId: ID!): Boolean! @since(version: "25.1.1")
+
+    "Saves AI settings (e.g. supporting confirming metadata transfer) for the specified connection."
+    aiSaveDataSourceSettings(dataSourceId: DataSourceIdInput!, settings: AIDataSourceSettingsInput!): AIDataSourceSettingsInfo! @since(version: "25.3.3")
+}

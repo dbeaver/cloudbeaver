@@ -1,0 +1,5 @@
+query getChatConversation($conversationId: ID!) {
+  conversation: aiChatConversationInfo(conversationId: $conversationId) {
+    ...AiChatConversation
+  }
+}

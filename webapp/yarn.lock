@@ -2462,6 +2462,88 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@cloudbeaver/plugin-ai-administration@workspace:*, @cloudbeaver/plugin-ai-administration@workspace:packages/plugin-ai-administration":
+  version: 0.0.0-use.local
+  resolution: "@cloudbeaver/plugin-ai-administration@workspace:packages/plugin-ai-administration"
+  dependencies:
+    "@cloudbeaver/core-administration": "workspace:*"
+    "@cloudbeaver/core-blocks": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-data-context": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-dialogs": "workspace:*"
+    "@cloudbeaver/core-events": "workspace:*"
+    "@cloudbeaver/core-executor": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-resource": "workspace:*"
+    "@cloudbeaver/core-root": "workspace:*"
+    "@cloudbeaver/core-sdk": "workspace:*"
+    "@cloudbeaver/core-ui": "workspace:*"
+    "@cloudbeaver/core-utils": "workspace:*"
+    "@cloudbeaver/plugin-data-grid": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
+    "@dbeaver/js-helpers": "workspace:*"
+    "@dbeaver/ui-kit": "workspace:*"
+    "@types/react": "npm:^19"
+    mobx: "npm:^6"
+    mobx-react-lite: "npm:^4"
+    react: "npm:^19"
+    react-dom: "npm:^19"
+    rimraf: "npm:^6"
+    tslib: "npm:^2"
+    typescript: "npm:^5"
+  languageName: unknown
+  linkType: soft
+
+"@cloudbeaver/plugin-ai-chat@workspace:*, @cloudbeaver/plugin-ai-chat@workspace:packages/plugin-ai-chat":
+  version: 0.0.0-use.local
+  resolution: "@cloudbeaver/plugin-ai-chat@workspace:packages/plugin-ai-chat"
+  dependencies:
+    "@cloudbeaver/core-authentication": "workspace:*"
+    "@cloudbeaver/core-blocks": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-connections": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-dialogs": "workspace:*"
+    "@cloudbeaver/core-events": "workspace:*"
+    "@cloudbeaver/core-executor": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-navigation-tree": "workspace:*"
+    "@cloudbeaver/core-projects": "workspace:*"
+    "@cloudbeaver/core-resource": "workspace:*"
+    "@cloudbeaver/core-root": "workspace:*"
+    "@cloudbeaver/core-sdk": "workspace:*"
+    "@cloudbeaver/core-settings": "workspace:*"
+    "@cloudbeaver/core-ui": "workspace:*"
+    "@cloudbeaver/core-utils": "workspace:*"
+    "@cloudbeaver/core-view": "workspace:*"
+    "@cloudbeaver/plugin-codemirror6": "workspace:*"
+    "@cloudbeaver/plugin-datasource-context-switch": "workspace:*"
+    "@cloudbeaver/plugin-navigation-tabs": "workspace:*"
+    "@cloudbeaver/plugin-navigation-tree": "workspace:*"
+    "@cloudbeaver/plugin-sql-editor": "workspace:*"
+    "@cloudbeaver/plugin-sql-editor-codemirror": "workspace:*"
+    "@cloudbeaver/plugin-sql-editor-navigation-tab": "workspace:*"
+    "@cloudbeaver/plugin-top-app-bar": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
+    "@dbeaver/cli": "workspace:*"
+    "@dbeaver/js-helpers": "workspace:*"
+    "@dbeaver/ui-kit": "workspace:*"
+    "@types/react": "npm:^19"
+    marked: "npm:^18"
+    mobx: "npm:^6"
+    mobx-react-lite: "npm:^4"
+    react: "npm:^19"
+    react-dom: "npm:^19"
+    react-markdown: "npm:^10"
+    remark-gfm: "npm:^4"
+    rimraf: "npm:^6"
+    tslib: "npm:^2"
+    typescript: "npm:^5"
+    typescript-plugin-css-modules: "npm:^5"
+  languageName: unknown
+  linkType: soft
+
 "@cloudbeaver/plugin-app-logo-administration@workspace:*, @cloudbeaver/plugin-app-logo-administration@workspace:packages/plugin-app-logo-administration":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-app-logo-administration@workspace:packages/plugin-app-logo-administration"
@@ -2712,6 +2794,43 @@ __metadata:
     tslib: "npm:^2"
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
+  languageName: unknown
+  linkType: soft
+
+"@cloudbeaver/plugin-connection-form-ai@workspace:*, @cloudbeaver/plugin-connection-form-ai@workspace:packages/plugin-connection-form-ai":
+  version: 0.0.0-use.local
+  resolution: "@cloudbeaver/plugin-connection-form-ai@workspace:packages/plugin-connection-form-ai"
+  dependencies:
+    "@cloudbeaver/core-blocks": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-connections": "workspace:*"
+    "@cloudbeaver/core-data-context": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-dialogs": "workspace:*"
+    "@cloudbeaver/core-events": "workspace:*"
+    "@cloudbeaver/core-executor": "workspace:*"
+    "@cloudbeaver/core-links": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-projects": "workspace:*"
+    "@cloudbeaver/core-resource": "workspace:*"
+    "@cloudbeaver/core-root": "workspace:*"
+    "@cloudbeaver/core-sdk": "workspace:*"
+    "@cloudbeaver/core-ui": "workspace:*"
+    "@cloudbeaver/core-utils": "workspace:*"
+    "@cloudbeaver/plugin-ai-chat": "workspace:*"
+    "@cloudbeaver/plugin-codemirror6": "workspace:*"
+    "@cloudbeaver/plugin-connections": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
+    "@dbeaver/cli": "workspace:*"
+    "@types/react": "npm:^19"
+    "@types/react-dom": "npm:^19"
+    mobx: "npm:^6"
+    mobx-react-lite: "npm:^4"
+    react: "npm:^19"
+    react-dom: "npm:^19"
+    rimraf: "npm:^6"
+    tslib: "npm:^2"
+    typescript: "npm:^5"
   languageName: unknown
   linkType: soft
 
@@ -4129,6 +4248,8 @@ __metadata:
     "@cloudbeaver/core-version-update": "workspace:*"
     "@cloudbeaver/core-view": "workspace:*"
     "@cloudbeaver/plugin-administration": "workspace:*"
+    "@cloudbeaver/plugin-ai-administration": "workspace:*"
+    "@cloudbeaver/plugin-ai-chat": "workspace:*"
     "@cloudbeaver/plugin-app-logo": "workspace:*"
     "@cloudbeaver/plugin-app-logo-administration": "workspace:*"
     "@cloudbeaver/plugin-async-task-confirmation": "workspace:^"
@@ -4138,6 +4259,7 @@ __metadata:
     "@cloudbeaver/plugin-codemirror6": "workspace:*"
     "@cloudbeaver/plugin-connection-administration": "workspace:*"
     "@cloudbeaver/plugin-connection-custom": "workspace:*"
+    "@cloudbeaver/plugin-connection-form-ai": "workspace:*"
     "@cloudbeaver/plugin-connection-network-handlers": "workspace:*"
     "@cloudbeaver/plugin-connection-preferences": "workspace:*"
     "@cloudbeaver/plugin-connection-search": "workspace:*"
@@ -15083,6 +15205,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"marked@npm:^18":
+  version: 18.0.7
+  resolution: "marked@npm:18.0.7"
+  bin:
+    marked: bin/marked.js
+  checksum: 10c0/84fc25d8583ff5c7b200dc6719e238472bb50e93b656b724ddfac4469c71ab1ef36bc8b4c1b2b26efabe713fd9a3437e3fd8af8555379c988dd902299842a730
+  languageName: node
+  linkType: hard
+
 "math-intrinsics@npm:^1.1.0":
   version: 1.1.0
   resolution: "math-intrinsics@npm:1.1.0"
@@ -17555,7 +17686,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"remark-gfm@npm:^4.0.0":
+"remark-gfm@npm:^4, remark-gfm@npm:^4.0.0":
   version: 4.0.1
   resolution: "remark-gfm@npm:4.0.1"
   dependencies:

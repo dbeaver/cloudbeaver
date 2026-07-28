@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+  <circle cx="11.5" cy="11.5" r="4.5" fill="#3387c5"/>
+  <polyline points="11.5 8.5 11.5 11.67 13.5 13" fill="none" stroke="#f2f2f2" stroke-miterlimit="10"/>
+  <polygon points="1 2 1 15 4 12 7 12 7 11 3.59 11 2 12.59 2 3 14 3 14 9 15 9 15 2 1 2" fill="#3387c5"/>
+  <rect x="3" y="4" width="7" height="1" fill="#3387c5"/>
+  <rect x="3" y="6.5" width="4.5" height="1" fill="#3387c5"/>
+  <rect x="3" y="9" width="3" height="1" fill="#3387c5"/>
+</svg>
