@@ -244,6 +244,13 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL>
                 getService(env).asyncGetQueryResults(
                     getWebSession(env), getArgumentVal(env, "taskId")
                 ))
+            .dataFetcher("asyncSqlGenerateEntityQuery", env ->
+                getService(env).asyncGenerateEntityQuery(
+                    getWebSession(env),
+                    getArgumentVal(env, "generatorId"),
+                    getArgumentVal(env, "nodePathList"),
+                    getGeneratorOptions(env)
+                ))
             .dataFetcher("asyncSqlExplainExecutionPlan", env ->
                 getService(env).asyncSqlExplainExecutionPlan(
                     getSQLContext(env),
@@ -429,11 +436,12 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL>
     private static WebSQLGeneratorOptions getGeneratorOptions(@NotNull DataFetchingEnvironment env) {
         Map<String, Object> optionsMap = getArgument(env, "generatorOptions");
         if (optionsMap == null) {
-            return new WebSQLGeneratorOptions(true, false);
+            return new WebSQLGeneratorOptions(true, false, false);
         }
         return new WebSQLGeneratorOptions(
             CommonUtils.toBoolean(optionsMap.get("useFullyQualifiedNames")),
-            CommonUtils.toBoolean(optionsMap.get("compactSql"))
+            CommonUtils.toBoolean(optionsMap.get("compactSql")),
+            CommonUtils.toBoolean(optionsMap.get("showFullDdl"))
         );
     }
 

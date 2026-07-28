@@ -296,6 +296,8 @@ type SQLQueryGenerator {
 input SQLQueryGeneratorOptions {
     useFullyQualifiedNames: Boolean!
     compactSql: Boolean!
+    "Include nested objects, comments and permissions in generated DDL (since 26.0.4)"
+    showFullDdl: Boolean
 }
 
 ####################################################
@@ -397,7 +399,7 @@ extend type Query {
         options: Object @deprecated(reason: "use generatorOptions (26.0.3)")
         nodePathList: [String!]!,
         generatorOptions: SQLQueryGeneratorOptions
-    ): String!
+    ): String! @deprecated(reason: "use asyncSqlGenerateEntityQuery")
 
     """
     Returns an auto-generated SQL query based on provided rows data.
@@ -592,6 +594,13 @@ extend type Mutation {
 
     "Returns row count for async SQL row data count task"
     asyncSqlRowDataCountResult(taskId: ID!): Int!
+
+    "Creates async task to generate entity SQL. Generated SQL is returned in the taskResult field"
+    asyncSqlGenerateEntityQuery(
+        generatorId: String!,
+        nodePathList: [String!]!,
+        generatorOptions: SQLQueryGeneratorOptions
+    ): AsyncTaskInfo!
 
     "Reads dynamic trace from provided database results"
     sqlGetDynamicTrace(
