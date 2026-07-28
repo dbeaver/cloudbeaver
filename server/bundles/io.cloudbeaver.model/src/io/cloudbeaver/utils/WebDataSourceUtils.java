@@ -307,9 +307,7 @@ public class WebDataSourceUtils {
         if (config.getKeepAliveInterval() >= 0) {
             dsConfig.setKeepAliveInterval(config.getKeepAliveInterval());
         }
-        if (config.isDefaultAutoCommit() != null) {
-            dsConfig.getBootstrap().setDefaultAutoCommit(config.isDefaultAutoCommit());
-        }
+        dsConfig.getBootstrap().setDefaultAutoCommit(config.isDefaultAutoCommit());
         dsConfig.getBootstrap().setDefaultCatalogName(config.getDefaultCatalogName());
         dsConfig.getBootstrap().setDefaultSchemaName(config.getDefaultSchemaName());
         // Save provider props
@@ -330,7 +328,11 @@ public class WebDataSourceUtils {
         }
 
         if (CommonUtils.isEmpty(config.getUrl())) {
-            dsConfig.setUrl(driver.getConnectionURL(dsConfig));
+            try {
+                dsConfig.setUrl(driver.getConnectionURL(dsConfig));
+            } catch (DBException e) {
+                throw new IllegalStateException("Error preparing connection URL", e);
+            }
         }
         // Save network handlers
         if (config.getNetworkHandlersConfig() != null) {

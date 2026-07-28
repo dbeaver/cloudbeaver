@@ -13,7 +13,7 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import type { ITask } from '@cloudbeaver/core-executor';
 import { AsyncTaskInfoService } from '@cloudbeaver/core-root';
 import { GraphQLService, type SqlExecutionPlan } from '@cloudbeaver/core-sdk';
-import { uuid } from '@cloudbeaver/core-utils';
+import { MetadataMap, uuid } from '@cloudbeaver/core-utils';
 import { type ISqlEditorTabState, SqlDataSourceService } from '@cloudbeaver/plugin-sql-editor';
 
 import type { IExecutionPlanTab } from './IExecutionPlanTab.js';
@@ -23,6 +23,9 @@ export interface IExecutionPlanData {
   editorId: string;
   task: ITask<SqlExecutionPlan>;
   executionPlan: SqlExecutionPlan | null;
+  localState: MetadataMap<string, any>;
+  currentViewId: string | null;
+  selectedNode: string | null;
 }
 
 @injectable(() => [GraphQLService, NotificationService, AsyncTaskInfoService, ConnectionExecutionContextService, SqlDataSourceService])
@@ -157,6 +160,9 @@ export class SqlExecutionPlanService {
       editorId: state.editorId,
       task,
       executionPlan: null,
+      localState: new MetadataMap(),
+      currentViewId: null,
+      selectedNode: null,
     });
 
     state.tabs.push({
