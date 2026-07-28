@@ -1,0 +1,8 @@
+.markdown code {
+  background-color: var(--theme-surface);
+  color: var(--theme-on-surface);
+  border-radius: 4px;
+  display: block;
+  max-height: 200px;
+  overflow: auto;
+}

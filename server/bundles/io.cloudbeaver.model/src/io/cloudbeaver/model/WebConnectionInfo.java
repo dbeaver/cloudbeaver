@@ -595,4 +595,13 @@ public class WebConnectionInfo {
         this.credentialsSavedInSession = credentialsSavedInSession;
     }
 
+    /**
+     * Database-dependent driver configuration used to drive data import
+     */
+    @Property
+    @NotNull
+    public WebDriverConfiguration getDriverConfiguration() {
+        return new WebDriverConfiguration(dataSourceContainer);
+    }
+
 }

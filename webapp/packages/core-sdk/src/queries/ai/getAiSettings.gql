@@ -1,0 +1,7 @@
+query getAiSettings {
+  settings: aiSettings {
+    activeEngine
+    defaultConfiguration
+    language
+  }
+}

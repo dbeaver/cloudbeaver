@@ -1,0 +1,26 @@
+fragment AiChatMessage on AIMessage {
+  conversationId
+  id
+  role
+  content
+  displayMessage
+  time
+  functionCall {
+    id
+    functionName
+    arguments
+    hint
+  }
+  functionResult {
+    type
+    value
+  }
+  functionConfirmation {
+    functionCalls {
+      id
+      functionName
+      arguments
+      hint
+    }
+  }
+}

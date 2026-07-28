@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+  <circle cx="17.25" cy="17.25" r="6.75" fill="#3387c5"/>
+  <polygon points="19.83 20.12 16.5 17.9 16.5 12.75 18 12.75 18 17.1 20.67 18.88 19.83 20.12" fill="#f2f2f2"/>
+  <polygon points="1.5 3 1.5 22.5 6.75 18 10.5 18 10.5 16.5 6.13 16.5 3 19.5 3 4.5 21 4.5 21 12 22.5 13.5 22.5 3 1.5 3" fill="#3387c5"/>
+  <rect x="4.5" y="6" width="9.75" height="1.5" fill="#3387c5"/>
+  <rect x="4.5" y="9.75" width="6.75" height="1.5" fill="#3387c5"/>
+  <rect x="4.5" y="13.5" width="3.75" height="1.5" fill="#3387c5"/>
+</svg>
