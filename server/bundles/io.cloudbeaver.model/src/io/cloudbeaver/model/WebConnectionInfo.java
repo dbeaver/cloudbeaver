@@ -467,7 +467,7 @@ public class WebConnectionInfo {
     @Property
     public Map<String, Object> getExpertSettingsValues() {
         Map<String, Object> expertSettings = new LinkedHashMap<>();
-        expertSettings.put(WebExpertSettingsProperties.PROP_AUTO_COMMIT, isAutocommit());
+        expertSettings.put(WebExpertSettingsProperties.PROP_AUTO_COMMIT_MODE, AutoCommitMode.fromValue(isAutocommit()));
         expertSettings.put(WebExpertSettingsProperties.PROP_KEEP_ALIVE_INTERVAL, getKeepAliveInterval());
         expertSettings.put(WebExpertSettingsProperties.PROP_READ_ONLY, isReadOnly());
         expertSettings.put(WebExpertSettingsProperties.PROP_DEFAULT_CATALOG, getDefaultCatalogName());
@@ -541,12 +541,9 @@ public class WebConnectionInfo {
     }
 
     @Property
-    public boolean isAutocommit() {
-        Boolean isAutoCommit = dataSourceContainer.getConnectionConfiguration().getBootstrap().getDefaultAutoCommit();
-        if (isAutoCommit == null) {
-            return true;
-        }
-        return isAutoCommit;
+    @Nullable
+    public Boolean isAutocommit() {
+        return dataSourceContainer.getConnectionConfiguration().getBootstrap().getDefaultAutoCommit();
     }
 
     @Property
@@ -596,6 +593,15 @@ public class WebConnectionInfo {
      */
     public void setCredentialsSavedInSession(@Nullable Boolean credentialsSavedInSession) {
         this.credentialsSavedInSession = credentialsSavedInSession;
+    }
+
+    /**
+     * Database-dependent driver configuration used to drive data import
+     */
+    @Property
+    @NotNull
+    public WebDriverConfiguration getDriverConfiguration() {
+        return new WebDriverConfiguration(dataSourceContainer);
     }
 
 }

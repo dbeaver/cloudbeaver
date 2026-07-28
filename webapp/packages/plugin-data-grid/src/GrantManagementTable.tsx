@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -21,19 +21,18 @@ import { TableSelectionContext } from './TableSelectionContext.js';
 import { TableRowSelect } from './TableRowSelect.js';
 import classes from './GrantManagementTable.module.css';
 
-export interface IGrantManagementTableColumn {
+export interface IGrantManagementTableColumn<T = unknown> {
   key: string;
   label: TLocalizationToken;
+  compare?: (a: T, b: T) => number;
 }
 
 const SELECT_COLUMN: IGrantManagementTableColumn = { key: 'gmt_select', label: '' };
-const STATUS_COLUMN: IGrantManagementTableColumn = { key: 'gmt_status', label: 'ui_granted' };
-
-const DEFAULT_COLUMNS: IGrantManagementTableColumn[] = [SELECT_COLUMN, STATUS_COLUMN];
+const STATUS_COLUMN_KEY = 'gmt_status';
 
 export interface IGrantManagementTableProps<T> {
   items: T[];
-  columns: IGrantManagementTableColumn[];
+  columns: IGrantManagementTableColumn<T>[];
   getItemId: (item: T) => string;
   isGranted: (item: T) => boolean;
   isEdited: (item: T) => boolean;
@@ -61,7 +60,7 @@ export const GrantManagementTable = observer(function GrantManagementTable<T>({
   const translate = useTranslate();
   const styles = useS(classes);
 
-  const [sort, setSort] = useState<'asc' | 'desc' | null>('desc');
+  const [sort, setSort] = useState<{ colIdx: number; order: 'asc' | 'desc' } | null>({ colIdx: 1, order: 'desc' });
   const [filter, setFilter] = useState('');
   const deferredFilter = useDeferredValue(filter);
 
@@ -73,23 +72,28 @@ export const GrantManagementTable = observer(function GrantManagementTable<T>({
     return items;
   }, [isVisible, items, deferredFilter]);
 
+  const allColumns = useMemo<IGrantManagementTableColumn<T>[]>(() => {
+    const statusColumn: IGrantManagementTableColumn<T> = {
+      key: STATUS_COLUMN_KEY,
+      label: 'ui_granted',
+      compare: (a, b) => Number(isGranted(a)) - Number(isGranted(b)),
+    };
+
+    return [SELECT_COLUMN, statusColumn, ...columns];
+  }, [columns, isGranted]);
+
   const sortedItems = useMemo(() => {
     if (sort) {
-      return visibleItems.slice().sort((a, b) => {
-        const aGranted = isGranted(a);
-        const bGranted = isGranted(b);
+      const column = allColumns[sort.colIdx];
 
-        if (aGranted === bGranted) {
-          return 0;
-        }
-
-        const granted = sort === 'asc' ? aGranted : !aGranted;
-        return granted ? 1 : -1;
-      });
+      if (column?.compare) {
+        const compare = column.compare;
+        return visibleItems.slice().sort((a, b) => (sort.order === 'asc' ? compare(a, b) : compare(b, a)));
+      }
     }
 
     return visibleItems;
-  }, [visibleItems, sort, isGranted]);
+  }, [visibleItems, sort, allColumns]);
 
   const keys = useMemo(() => {
     const filtered = isManageable ? visibleItems.filter(isManageable) : visibleItems;
@@ -114,11 +118,9 @@ export const GrantManagementTable = observer(function GrantManagementTable<T>({
     selection.clear();
   }
 
-  const _columns = useMemo(() => [...DEFAULT_COLUMNS, ...columns], [columns]);
-
   function _getCell(rowIdx: number, colIdx: number) {
     const row = sortedItems[rowIdx] as T;
-    const column = _columns[colIdx];
+    const column = allColumns[colIdx];
 
     if (!row || !column) {
       return null;
@@ -128,7 +130,7 @@ export const GrantManagementTable = observer(function GrantManagementTable<T>({
       return <TableRowSelect id={getItemId(row)} disabled={isManageable?.(row) === false} />;
     }
 
-    if (column.key === STATUS_COLUMN.key) {
+    if (column.key === STATUS_COLUMN_KEY) {
       const granted = isGranted(row);
       return (
         <div
@@ -142,7 +144,7 @@ export const GrantManagementTable = observer(function GrantManagementTable<T>({
 
   const cell = useCreateGridReactiveValue(_getCell, (onValueChange, rowIds, colIdx) => reaction(() => _getCell(rowIds, colIdx), onValueChange), [
     sortedItems,
-    _columns,
+    allColumns,
     isGranted,
     isManageable,
     getCell,
@@ -169,9 +171,9 @@ export const GrantManagementTable = observer(function GrantManagementTable<T>({
   );
 
   const columnsCount = useCreateGridReactiveValue(
-    () => _columns.length,
-    onValueChange => reaction(() => _columns.length, onValueChange),
-    [_columns],
+    () => allColumns.length,
+    onValueChange => reaction(() => allColumns.length, onValueChange),
+    [allColumns],
   );
 
   const rowsCount = useCreateGridReactiveValue(
@@ -181,7 +183,7 @@ export const GrantManagementTable = observer(function GrantManagementTable<T>({
   );
 
   function getHeaderText(colIdx: number) {
-    return translate(_columns[colIdx]?.label) ?? '';
+    return translate(allColumns[colIdx]?.label) ?? '';
   }
 
   function getHeaderElement(colIdx: number) {
@@ -195,27 +197,27 @@ export const GrantManagementTable = observer(function GrantManagementTable<T>({
   const headerElement = useCreateGridReactiveValue(
     getHeaderElement,
     (onValueChange, colIdx) => reaction(() => getHeaderElement(colIdx), onValueChange),
-    [_columns, translate],
+    [allColumns, translate],
   );
 
   const headerText = useCreateGridReactiveValue(getHeaderText, (onValueChange, colIdx) => reaction(() => getHeaderText(colIdx), onValueChange), [
-    _columns,
+    allColumns,
     translate,
   ]);
 
   function getColumnSortable(colIdx: number) {
-    return colIdx === 1;
+    return allColumns[colIdx]?.compare !== undefined;
   }
 
   const columnSortable = useCreateGridReactiveValue(
     getColumnSortable,
     (onValueChange, colIdx) => reaction(() => getColumnSortable(colIdx), onValueChange),
-    [],
+    [allColumns],
   );
 
   function getColumnSortingState(colIdx: number) {
-    if (colIdx === 1) {
-      return sort;
+    if (sort?.colIdx === colIdx) {
+      return sort.order;
     }
 
     return null;
@@ -228,9 +230,7 @@ export const GrantManagementTable = observer(function GrantManagementTable<T>({
   );
 
   function handleSort(colIdx: number, order: 'asc' | 'desc' | null) {
-    if (colIdx === 1) {
-      setSort(order);
-    }
+    setSort(order ? { colIdx, order } : null);
   }
 
   return (

@@ -50,6 +50,9 @@
       "path": "../core-localization"
     },
     {
+      "path": "../core-navigation-tree"
+    },
+    {
       "path": "../core-sdk"
     },
     {

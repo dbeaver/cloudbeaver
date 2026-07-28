@@ -1,0 +1,8 @@
+query getChatConversationScope($conversationId: ID!) {
+  result: aiChatConversationInfo(conversationId: $conversationId) {
+    id
+    settings {
+        scope
+    }
+  }
+}

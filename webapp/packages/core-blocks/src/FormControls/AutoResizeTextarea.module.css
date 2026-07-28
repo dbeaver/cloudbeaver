@@ -1,0 +1,7 @@
+.autoResize textarea {
+    resize: none;
+    box-sizing: border-box;
+    min-height: 52px;
+    max-height: clamp(120px, 40dvh, 400px);
+    overflow-y: auto;
+  }
