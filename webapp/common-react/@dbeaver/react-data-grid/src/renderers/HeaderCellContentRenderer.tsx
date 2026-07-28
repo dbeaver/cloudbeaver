@@ -86,7 +86,7 @@ export const HeaderCellContentRenderer = memo(function HeaderCellContentRenderer
   return (
     <div
       tabIndex={ownsFocus ? tabIndex : -1}
-      className="tw:w-full tw:h-full tw:content-center tw:flex tw:items-center tw:justify-between tw:gap-1 tw:outline-none tw:group"
+      className="tw:w-full tw:h-full tw:content-center tw:flex tw:items-center tw:justify-between tw:gap-1 tw:outline-none! tw:group"
       {...drag.props}
       {...drop.props}
       onKeyDown={onKeyDown}

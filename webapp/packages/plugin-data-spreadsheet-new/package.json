@@ -30,6 +30,7 @@
     "@cloudbeaver/core-dialogs": "workspace:*",
     "@cloudbeaver/core-events": "workspace:*",
     "@cloudbeaver/core-localization": "workspace:*",
+    "@cloudbeaver/core-navigation-tree": "workspace:*",
     "@cloudbeaver/core-sdk": "workspace:*",
     "@cloudbeaver/core-settings": "workspace:*",
     "@cloudbeaver/core-ui": "workspace:*",

@@ -134,9 +134,10 @@ export class ConnectionSearchService {
     }
 
     const { status } = await this.commonDialogService.open(ConfirmationDialog, {
-      title: 'plugin_connections_connection_edit_cancel_title',
-      message: 'plugin_connections_connection_edit_cancel_message',
-      confirmActionText: 'ui_processing_ok',
+      title: 'ui_discard_changes',
+      message: 'ui_discard_changes_message',
+      confirmActionText: 'ui_discard',
+      cancelActionText: 'ui_keep_editing',
     });
 
     return status !== DialogueStateResult.Rejected;
