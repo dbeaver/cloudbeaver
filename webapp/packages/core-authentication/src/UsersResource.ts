@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -35,14 +35,12 @@ import { Executor } from '@cloudbeaver/core-executor';
 import { AUTH_PROVIDER_LOCAL_ID } from './AUTH_PROVIDER_LOCAL_ID.js';
 import { AuthInfoService } from './AuthInfoService.js';
 import { AuthProviderService } from './AuthProviderService.js';
+import { compareUsersById, isNewUser, NEW_USER_SYMBOL, type AdminUserNew } from './compareUser.js';
 import type { IAuthCredentials } from './IAuthCredentials.js';
-
-const NEW_USER_SYMBOL = Symbol('new-user');
 
 export type AdminUser = AdminUserInfoFragment;
 export type AdminUserOrigin = AdminUserInfoFragment['origins'][number];
 
-type AdminUserNew = AdminUser & { [NEW_USER_SYMBOL]: boolean; createdAt: number };
 export type UserResourceIncludes = Omit<GetUsersListQueryVariables, 'userId' | 'page' | 'filter'>;
 
 interface IUserResourceFilterOptions {
@@ -96,7 +94,7 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
     this.aliases.add(UsersResourceNewUsers, () => {
       const orderedKeys = this.entries
         .filter(k => isNewUser(k[1]))
-        .sort((a, b) => compareUsers(a[1], b[1]))
+        .sort((a, b) => compareUsersById(a[1], b[1]))
         .map(([key]) => key);
       return resourceKeyList(orderedKeys);
     });
@@ -327,35 +325,4 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
   protected validateKey(key: string): boolean {
     return typeof key === 'string';
   }
-}
-
-export function isLocalUser(user: AdminUser): boolean {
-  return user.origins.some(origin => origin.type === AUTH_PROVIDER_LOCAL_ID);
-}
-
-export function isNewUser(user: AdminUser | AdminUserNew): user is AdminUserNew {
-  return NEW_USER_SYMBOL in user && user[NEW_USER_SYMBOL] === true && 'createdAt' in user && Boolean(user.createdAt);
-}
-
-export function compareUsers<T extends Pick<AdminUser, 'userId'>>(a: T, b: T): number {
-  return a.userId.localeCompare(b.userId);
-}
-
-export function compareNewUsers(a: AdminUser, b: AdminUser): number {
-  const aIsNew = isNewUser(a);
-  const bIsNew = isNewUser(b);
-
-  if (aIsNew && !bIsNew) {
-    return -1;
-  }
-
-  if (!aIsNew && bIsNew) {
-    return 1;
-  }
-
-  if (aIsNew && bIsNew) {
-    return b.createdAt - a.createdAt;
-  }
-
-  return 0;
 }

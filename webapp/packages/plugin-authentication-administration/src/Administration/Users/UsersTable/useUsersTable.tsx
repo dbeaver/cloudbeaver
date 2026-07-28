@@ -7,7 +7,7 @@
  */
 import { action, computed, observable } from 'mobx';
 
-import { type AdminUser, compareUsers, compareNewUsers, UsersResource, UsersResourceFilterKey } from '@cloudbeaver/core-authentication';
+import { type AdminUser, compareUsersById, compareUsersByNewness, UsersResource, UsersResourceFilterKey } from '@cloudbeaver/core-authentication';
 import { TableState, useExecutor, useObservableRef, useOffsetPagination, useResource } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -35,13 +35,13 @@ export function useUsersTable(filters: IUserFilters) {
   const notificationService = useService(NotificationService);
 
   useExecutor({
-    executor: usersLoader.resource.onUserCreate, handlers: [
+    executor: usersLoader.resource.onUserCreate,
+    handlers: [
       function handleUserCreation() {
         pagination.refresh();
       },
     ],
   });
-
 
   const state: State = useObservableRef(
     () => ({
@@ -61,8 +61,8 @@ export function useUsersTable(filters: IUserFilters) {
             ]),
           )
             .filter(isDefined)
-            .sort(compareUsers)
-            .sort(compareNewUsers),
+            .sort(compareUsersById)
+            .sort(compareUsersByNewness),
         );
       },
       update() {
