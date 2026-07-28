@@ -1,0 +1,7 @@
+query getChatConversationMessages($conversationId: ID!) {
+  result: aiChatConversationInfo(conversationId: $conversationId) {
+    messages {
+      ...AiChatMessage
+    }
+  }
+}

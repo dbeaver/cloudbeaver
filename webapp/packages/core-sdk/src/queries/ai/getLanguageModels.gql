@@ -1,0 +1,6 @@
+query getEngines {
+  engines: aiListEngines {
+    id
+    name
+  }
+}
