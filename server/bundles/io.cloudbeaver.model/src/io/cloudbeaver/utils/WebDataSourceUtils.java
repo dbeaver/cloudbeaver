@@ -307,9 +307,7 @@ public class WebDataSourceUtils {
         if (config.getKeepAliveInterval() >= 0) {
             dsConfig.setKeepAliveInterval(config.getKeepAliveInterval());
         }
-        if (config.isDefaultAutoCommit() != null) {
-            dsConfig.getBootstrap().setDefaultAutoCommit(config.isDefaultAutoCommit());
-        }
+        dsConfig.getBootstrap().setDefaultAutoCommit(config.isDefaultAutoCommit());
         dsConfig.getBootstrap().setDefaultCatalogName(config.getDefaultCatalogName());
         dsConfig.getBootstrap().setDefaultSchemaName(config.getDefaultSchemaName());
         // Save provider props
