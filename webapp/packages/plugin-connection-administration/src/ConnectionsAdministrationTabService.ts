@@ -8,8 +8,9 @@
 
 import {
   AdministrationItemService,
-  type AdministrationItemContentProps,
+  type AdministrationItemSubCanActivateEvent,
   type AdministrationItemSubEvent,
+  type AdministrationItemContentProps,
   type IAdministrationItem,
 } from '@cloudbeaver/core-administration';
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
@@ -25,6 +26,8 @@ const ConnectionsDrawerItem = importLazyComponent(() => import('./ConnectionsDra
 export interface IConnectionsTabOptions extends ITabInfoOptions<AdministrationItemContentProps> {
   onActivate?: AdministrationItemSubEvent;
   onDeActivate?: AdministrationItemSubEvent;
+  canActivate?: AdministrationItemSubCanActivateEvent;
+  canDeActivate?: AdministrationItemSubCanActivateEvent;
 }
 
 @injectable(() => [AdministrationItemService])
@@ -37,11 +40,11 @@ export class ConnectionsAdministrationTabService {
     this.tabsContainer = new TabsContainer('Connections administration tabs');
   }
 
-  addSubTab({ onActivate, onDeActivate, ...tabInfo }: IConnectionsTabOptions): void {
+  addSubTab({ onActivate, onDeActivate, canActivate, canDeActivate, ...tabInfo }: IConnectionsTabOptions): void {
     this.tabsContainer.add(tabInfo);
 
     if (!this.item.sub.some(sub => sub.name === tabInfo.key)) {
-      this.item.sub.push({ name: tabInfo.key, onActivate, onDeActivate });
+      this.item.sub.push({ name: tabInfo.key, onActivate, onDeActivate, canActivate, canDeActivate });
     }
 
     this.item.defaultSub ??= tabInfo.key;
