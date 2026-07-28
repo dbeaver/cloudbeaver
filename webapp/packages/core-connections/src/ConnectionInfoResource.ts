@@ -355,7 +355,7 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
     }
 
     const connectionPart = nodeId.substring(0, connectionEnd + node.objectId.length);
-    const connectionId = this.nodeIdMap.get(connectionPart);
+    const connectionId = this.nodeIdMap.get(connectionPart) || this.getConnectionIdForNodeId(node.projectId, nodeId);
 
     if (connectionId) {
       return this.get(connectionId);
