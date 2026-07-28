@@ -19,9 +19,10 @@
     "form-data": ">=4.0.6",
     "undici": ">=6.27.0",
     "tar": ">=7.5.19",
-    "js-yaml": ">=4.3.0",
-    "brace-expansion": ">=5.0.7",
-    "axios": ">=1.18.0"
+    "js-yaml": ">=5.2.2",
+    "brace-expansion": ">=5.0.8",
+    "axios": ">=1.18.0",
+    "postcss": ">=8.5.18"
   },
   "scripts": {
     "test": "dbeaver-test",
