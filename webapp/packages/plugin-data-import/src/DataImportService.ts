@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@ export class DataImportService {
     });
   }
 
-  async importData(connectionId: string, contextId: string, projectId: string, resultsId: string, processorId: string, file: File) {
+  async importData(connectionId: string, contextId: string, projectId: string, resultsId: string, processorId: string, file: File): Promise<boolean> {
     const abortController = new AbortController();
     let cancelImplementation: (() => void | Promise<void>) | null;
     let isCancelled = false;
@@ -63,12 +63,20 @@ export class DataImportService {
     try {
       cancelImplementation = () => abortController.abort();
 
-      const result = await this.graphQLService.sdk.uploadResultData(
-        connectionId,
-        contextId,
-        projectId,
-        resultsId,
-        processorId,
+      const { taskInfo } = await this.graphQLService.sdk.dataTransferImportDataIntoResults(
+        {
+          connectionId,
+          contextId,
+          projectId,
+          resultsId,
+          parameters: { processorId },
+        },
+        undefined,
+        abortController.signal,
+      );
+
+      await this.graphQLService.sdk.uploadResultData(
+        taskInfo.id,
         file,
         event => {
           if (isCancelled) {
@@ -87,8 +95,8 @@ export class DataImportService {
       );
 
       const task = this.asyncTaskInfoService.create(async () => {
-        const { taskInfo } = await this.graphQLService.sdk.getAsyncTaskInfo({ taskId: result.id, removeOnFinish: false });
-        return taskInfo;
+        const { taskInfo: info } = await this.graphQLService.sdk.getAsyncTaskInfo({ taskId: taskInfo.id, removeOnFinish: false });
+        return info;
       });
 
       cancelImplementation = () => this.asyncTaskInfoService.cancel(task.id);
