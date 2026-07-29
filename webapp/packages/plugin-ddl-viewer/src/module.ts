@@ -9,8 +9,8 @@
 import { Bootstrap, Dependency, ModuleRegistry, proxy } from '@cloudbeaver/core-di';
 import { ExtendedDDLResource } from './ExtendedDDLViewer/ExtendedDDLResource.js';
 import { DdlViewerBootstrap } from './DdlViewerBootstrap.js';
-import { DdlResource } from './DdlViewer/DdlResource.js';
 import { DDLViewerFooterService } from './DdlViewer/DDLViewerFooterService.js';
+import { LocaleService } from './LocaleService.js';
 
 export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-ddl-viewer',
@@ -18,10 +18,9 @@ export default ModuleRegistry.add({
   configure: serviceCollection => {
     serviceCollection
       .addSingleton(Bootstrap, DdlViewerBootstrap)
+      .addSingleton(Bootstrap, LocaleService)
       .addSingleton(Dependency, proxy(ExtendedDDLResource))
-      .addSingleton(Dependency, proxy(DdlResource))
       .addSingleton(DDLViewerFooterService)
-      .addSingleton(ExtendedDDLResource)
-      .addSingleton(DdlResource);
+      .addSingleton(ExtendedDDLResource);
   },
 });

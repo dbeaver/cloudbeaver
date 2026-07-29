@@ -2184,6 +2184,23 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@cloudbeaver/core-sql-generator@workspace:*, @cloudbeaver/core-sql-generator@workspace:packages/core-sql-generator":
+  version: 0.0.0-use.local
+  resolution: "@cloudbeaver/core-sql-generator@workspace:packages/core-sql-generator"
+  dependencies:
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-navigation-tree": "workspace:*"
+    "@cloudbeaver/core-resource": "workspace:*"
+    "@cloudbeaver/core-root": "workspace:*"
+    "@cloudbeaver/core-sdk": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
+    rimraf: "npm:^6"
+    tslib: "npm:^2"
+    typescript: "npm:^5"
+  languageName: unknown
+  linkType: soft
+
 "@cloudbeaver/core-storage@workspace:*, @cloudbeaver/core-storage@workspace:packages/core-storage":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/core-storage@workspace:packages/core-storage"
@@ -3503,9 +3520,12 @@ __metadata:
     "@cloudbeaver/core-connections": "workspace:*"
     "@cloudbeaver/core-data-context": "workspace:*"
     "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-events": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
     "@cloudbeaver/core-navigation-tree": "workspace:*"
     "@cloudbeaver/core-resource": "workspace:*"
     "@cloudbeaver/core-sdk": "workspace:*"
+    "@cloudbeaver/core-sql-generator": "workspace:*"
     "@cloudbeaver/core-ui": "workspace:*"
     "@cloudbeaver/core-utils": "workspace:*"
     "@cloudbeaver/core-view": "workspace:*"
@@ -4239,6 +4259,7 @@ __metadata:
     "@cloudbeaver/core-settings": "workspace:*"
     "@cloudbeaver/core-settings-localization": "workspace:*"
     "@cloudbeaver/core-settings-user": "workspace:*"
+    "@cloudbeaver/core-sql-generator": "workspace:*"
     "@cloudbeaver/core-storage": "workspace:*"
     "@cloudbeaver/core-support": "workspace:*"
     "@cloudbeaver/core-task-manager": "workspace:*"
@@ -4717,8 +4738,8 @@ __metadata:
     "@cloudbeaver/core-localization": "workspace:*"
     "@cloudbeaver/core-navigation-tree": "workspace:*"
     "@cloudbeaver/core-resource": "workspace:*"
-    "@cloudbeaver/core-root": "workspace:*"
     "@cloudbeaver/core-sdk": "workspace:*"
+    "@cloudbeaver/core-sql-generator": "workspace:*"
     "@cloudbeaver/core-utils": "workspace:*"
     "@cloudbeaver/core-view": "workspace:*"
     "@cloudbeaver/plugin-codemirror6": "workspace:*"

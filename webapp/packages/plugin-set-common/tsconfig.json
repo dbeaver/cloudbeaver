@@ -89,6 +89,9 @@
       "path": "../core-settings-user"
     },
     {
+      "path": "../core-sql-generator"
+    },
+    {
       "path": "../core-storage"
     },
     {

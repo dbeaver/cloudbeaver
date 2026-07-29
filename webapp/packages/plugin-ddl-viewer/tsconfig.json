@@ -23,6 +23,12 @@
       "path": "../core-di"
     },
     {
+      "path": "../core-events"
+    },
+    {
+      "path": "../core-localization"
+    },
+    {
       "path": "../core-navigation-tree"
     },
     {
@@ -30,6 +36,9 @@
     },
     {
       "path": "../core-sdk"
+    },
+    {
+      "path": "../core-sql-generator"
     },
     {
       "path": "../core-ui"

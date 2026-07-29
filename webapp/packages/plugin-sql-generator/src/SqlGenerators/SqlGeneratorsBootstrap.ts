@@ -9,11 +9,11 @@ import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { DATA_CONTEXT_NAV_NODE, EObjectFeature } from '@cloudbeaver/core-navigation-tree';
+import { getDefaultQueryGeneratorOptions, SqlGeneratorsResource } from '@cloudbeaver/core-sql-generator';
 import { getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
 import { MenuBaseItem, MenuService } from '@cloudbeaver/core-view';
 
 import { MENU_SQL_GENERATORS } from './MENU_SQL_GENERATORS.js';
-import { getDefaultQueryGeneratorOptions, SqlGeneratorsResource } from './SqlGeneratorsResource.js';
 import { NotificationService } from '@cloudbeaver/core-events';
 
 const GeneratedSqlDialog = importLazyComponent(() => import('./GeneratedSqlDialog.js').then(m => m.GeneratedSqlDialog));

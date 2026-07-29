@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -13,6 +13,8 @@ import { ACTION_SAVE, ActionService, MenuService } from '@cloudbeaver/core-view'
 import { LocalStorageSqlDataSource } from '@cloudbeaver/plugin-sql-editor';
 import { ACTION_SQL_EDITOR_OPEN, SqlEditorNavigatorService } from '@cloudbeaver/plugin-sql-editor-navigation-tab';
 
+import { ACTION_DDL_VIEWER_FULL_DDL } from './ACTION_DDL_VIEWER_FULL_DDL.js';
+import { DATA_CONTEXT_DDL_VIEWER_FULL_DDL } from './DATA_CONTEXT_DDL_VIEWER_FULL_DDL.js';
 import { DATA_CONTEXT_DDL_VIEWER_NODE } from './DATA_CONTEXT_DDL_VIEWER_NODE.js';
 import { DATA_CONTEXT_DDL_VIEWER_VALUE } from './DATA_CONTEXT_DDL_VIEWER_VALUE.js';
 import { MENU_DDL_VIEWER_FOOTER } from './MENU_DDL_VIEWER_FOOTER.js';
@@ -91,6 +93,33 @@ export class DDLViewerFooterService {
     this.menuService.addCreator({
       menus: [MENU_DDL_VIEWER_FOOTER],
       getItems: (context, items) => [...items, ACTION_SAVE, ACTION_SQL_EDITOR_OPEN],
+    });
+
+    this.menuService.addCreator({
+      menus: [MENU_DDL_VIEWER_FOOTER],
+      getItems: (context, items) => {
+        if (!context.get(DATA_CONTEXT_DDL_VIEWER_FULL_DDL)) {
+          return items;
+        }
+
+        return [...items, ACTION_DDL_VIEWER_FULL_DDL];
+      },
+    });
+
+    this.actionsService.addHandler({
+      id: 'ddl-viewer-footer-full-ddl-handler',
+      menus: [MENU_DDL_VIEWER_FOOTER],
+      actions: [ACTION_DDL_VIEWER_FULL_DDL],
+      contexts: [DATA_CONTEXT_DDL_VIEWER_FULL_DDL],
+      isChecked: context => context.get(DATA_CONTEXT_DDL_VIEWER_FULL_DDL)!.value,
+      isDisabled: context => context.get(DATA_CONTEXT_DDL_VIEWER_FULL_DDL)!.loading,
+      isLoading: context => context.get(DATA_CONTEXT_DDL_VIEWER_FULL_DDL)!.loading,
+      handler: (context, action) => {
+        if (action === ACTION_DDL_VIEWER_FULL_DDL) {
+          const fullDdlState = context.get(DATA_CONTEXT_DDL_VIEWER_FULL_DDL)!;
+          fullDdlState.onChange(!fullDdlState.value);
+        }
+      },
     });
   }
 }

@@ -25,6 +25,7 @@ import coreResourceManager from '@cloudbeaver/core-resource-manager/module';
 import coreRoot from '@cloudbeaver/core-root/module';
 import coreRouting from '@cloudbeaver/core-routing/module';
 import coreSdk from '@cloudbeaver/core-sdk/module';
+import coreSqlGenerator from '@cloudbeaver/core-sql-generator/module';
 import coreServerLocalization from '@cloudbeaver/core-server-localization/module';
 import coreSessionLocalization from '@cloudbeaver/core-session-localization/module';
 import coreSettings from '@cloudbeaver/core-settings/module';
@@ -150,6 +151,7 @@ const core = [
   coreAdministration,
   coreDialogs,
   coreResourceManager,
+  coreSqlGenerator,
   coreApp,
   coreClientActivity,
   coreNavigationTree,
