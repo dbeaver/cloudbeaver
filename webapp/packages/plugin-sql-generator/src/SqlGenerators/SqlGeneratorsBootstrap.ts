@@ -86,6 +86,7 @@ export class SqlGeneratorsBootstrap extends Bootstrap {
                         query,
                         nodeId: node.uri,
                         nodeName: node.name,
+                        generatorId: action.id,
                         generatorName: action.label,
                         options: getDefaultQueryGeneratorOptions(),
                         regenerateQuery: options => this.sqlGeneratorsResource.generateEntityQuery(action.id, node.uri, options),
