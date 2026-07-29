@@ -125,7 +125,7 @@ export class AuthenticationService extends Bootstrap {
     const redirectLinks = userLogoutInfo.redirectLinks;
 
     if (redirectLinks.length) {
-      const redirectLink = redirectLinks[0] as UserLogoutInfo['redirectLinks'][0];
+      const redirectLink = redirectLinks[0]!;
 
       if (redirectLink.sameTabRedirect) {
         window.location.replace(redirectLink.url);
