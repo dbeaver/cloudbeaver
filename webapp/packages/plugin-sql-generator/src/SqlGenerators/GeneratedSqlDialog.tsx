@@ -24,7 +24,7 @@ import { ConnectionDialectResource, ConnectionInfoResource, createConnectionPara
 import { useService } from '@cloudbeaver/core-di';
 import type { DialogComponentProps } from '@cloudbeaver/core-dialogs';
 import { download, withTimestamp } from '@cloudbeaver/core-utils';
-import { NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
+import { EObjectFeature, NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
 import { useCodemirrorExtensions } from '@cloudbeaver/plugin-codemirror6';
 import { SqlEditorNavigatorService } from '@cloudbeaver/plugin-sql-editor-navigation-tab';
 import { SQLCodeEditor, useSqlDialectExtension } from '@cloudbeaver/plugin-sql-editor-codemirror';
@@ -103,6 +103,9 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<Payload>>(functi
 
   const visibleLoading = useStateDelay(state.loading, 300);
   const isDdlGenerator = payload.generatorId.toLowerCase().includes(DDL_GENERATOR_ID.toLowerCase());
+  const node = navNodeManagerService.getNode(payload.nodeId);
+  const supportsFullDdl = node?.objectFeatures.includes(EObjectFeature.supportsFullDdl) ?? false;
+  const hasFullDdl = isDdlGenerator && supportsFullDdl;
 
   async function handleOpenInEditor() {
     try {
@@ -155,7 +158,7 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<Payload>>(functi
                 label={translate('app_shared_sql_generators_compact_sql')}
                 onChange={value => state.handleOptionChange('compactSql', value)}
               />
-              {isDdlGenerator && (
+              {hasFullDdl && (
                 <Checkbox
                   id="show-full-ddl"
                   state={state}

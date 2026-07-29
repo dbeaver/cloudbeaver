@@ -18,6 +18,7 @@ import {
 import { useDataContextLink } from '@cloudbeaver/core-data-context';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
+import { EObjectFeature, NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
 import { MenuBar, MenuBarGroupStyles, MenuBarItemStyles, MenuBarStyles } from '@cloudbeaver/core-ui';
 import { useMenu } from '@cloudbeaver/core-view';
 import { useCodemirrorExtensions } from '@cloudbeaver/plugin-codemirror6';
@@ -42,6 +43,10 @@ export const DDLViewerTabPanel: NavNodeTransformViewComponent = observer(functio
 
   const sqlGeneratorsResource = useResource(DDLViewerTabPanel, SqlGeneratorsResource, nodeId);
   const ddlGenerator = sqlGeneratorsResource.data?.find(generator => generator.id.toLowerCase().includes(DDL_GENERATOR_ID.toLowerCase()));
+
+  const navNodeInfoResource = useResource(DDLViewerTabPanel, NavNodeInfoResource, nodeId);
+  const supportsFullDdl = navNodeInfoResource.data?.objectFeatures.includes(EObjectFeature.supportsFullDdl) ?? false;
+  const hasFullDdl = !!ddlGenerator && supportsFullDdl;
 
   const connectionInfoResource = useResource(DDLViewerTabPanel, ConnectionInfoResource, ConnectionInfoActiveProjectKey);
   const connection = connectionInfoResource.resource.getConnectionForNode(nodeId);
@@ -87,7 +92,7 @@ export const DDLViewerTabPanel: NavNodeTransformViewComponent = observer(functio
     context.set(DATA_CONTEXT_DDL_VIEWER_NODE, nodeId, id);
     context.set(DATA_CONTEXT_DDL_VIEWER_VALUE, query, id);
 
-    if (ddlGenerator) {
+    if (hasFullDdl) {
       context.set(DATA_CONTEXT_DDL_VIEWER_FULL_DDL, { value: isFullDdl, loading: ddlLoading, onChange: handleFullDdlChange }, id);
     }
   });
