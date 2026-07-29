@@ -10,15 +10,16 @@ import { toJS } from 'mobx';
 import {
   CONNECTION_INFO_PARAM_SCHEMA,
   ConnectionInfoResource,
+  createConnectionParam,
   type IConnectionInfoParams,
   isConnectionInfoParamEqual,
 } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
-import { CachedMapResource, isResourceAlias, type ResourceKey, ResourceKeyUtils } from '@cloudbeaver/core-resource';
-import { type GetConnectionImportDriverConfigurationQuery, GraphQLService } from '@cloudbeaver/core-sdk';
+import { CachedMapResource, isResourceAlias, type ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-resource';
+import { type DriverConfigurationFragment, type GetConnectionImportDriverConfigurationQuery, GraphQLService } from '@cloudbeaver/core-sdk';
 import { schemaValidationError } from '@cloudbeaver/core-utils';
 
-export type IDataImportDriverConfiguration = GetConnectionImportDriverConfigurationQuery['connections'][number]['driverConfiguration'];
+export type IDataImportDriverConfiguration = DriverConfigurationFragment;
 
 @injectable(() => [GraphQLService, ConnectionInfoResource])
 export class DataImportDriverConfigurationResource extends CachedMapResource<IConnectionInfoParams, IDataImportDriverConfiguration> {
@@ -41,6 +42,8 @@ export class DataImportDriverConfigurationResource extends CachedMapResource<ICo
       throw new Error('Aliases are not supported by this resource');
     }
 
+    const connectionsList: GetConnectionImportDriverConfigurationQuery['connections'] = [];
+
     await ResourceKeyUtils.forEachAsync(originalKey, async key => {
       if (!this.connectionInfoResource.isConnected(key)) {
         throw new Error(`Connection is not connected (${key.projectId}, ${key.connectionId})`);
@@ -51,14 +54,17 @@ export class DataImportDriverConfigurationResource extends CachedMapResource<ICo
         connectionId: key.connectionId,
       });
 
-      const connection = connections.find(item => item.id === key.connectionId);
-
-      if (!connection) {
+      if (!connections.some(connection => connection.id === key.connectionId)) {
         throw new Error(`Connection is not found (${key.connectionId})`);
       }
 
-      this.set(key, connection.driverConfiguration);
+      connectionsList.push(...connections);
     });
+
+    this.set(
+      resourceKeyList(connectionsList.map(createConnectionParam)),
+      connectionsList.map(connection => connection.driverConfiguration),
+    );
 
     return this.data;
   }
