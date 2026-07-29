@@ -72,7 +72,11 @@ export class DataImportBootstrap extends Bootstrap {
             throw new Error('Execution context must be provided');
           }
 
-          const { status, result: dialogResult } = await this.commonDialogService.open(DataImportDialogLazy, { tableName: model.name ?? model.id });
+          const { status, result: dialogResult } = await this.commonDialogService.open(DataImportDialogLazy, {
+            tableName: model.name ?? model.id,
+            projectId: executionContext.projectId,
+            connectionId: executionContext.connectionId,
+          });
 
           if (status === DialogueStateResult.Resolved && dialogResult) {
             const success = await this.dataImportService.importData(
@@ -82,6 +86,7 @@ export class DataImportBootstrap extends Bootstrap {
               result.id,
               dialogResult.processorId,
               dialogResult.file,
+              dialogResult.settings, 
             );
 
             if (success) {

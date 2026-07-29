@@ -4,4 +4,7 @@ export default [
   ['plugin_data_import_process_success', 'Données importées avec succès'],
   ['plugin_data_import_process_fail', "Échec de l'importation des données"],
   ['plugin_data_import_process_file_processing_step_message', 'Fichier téléchargé, en cours de traitement...'],
+  ['plugin_data_import_settings_on_duplicate_key', 'En cas de clé dupliquée'],
+  ['plugin_data_import_settings_use_bulk_load', 'Utiliser le chargement en masse'],
+  ['plugin_data_import_settings_use_transactions', 'Utiliser les transactions'],
 ];
