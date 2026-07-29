@@ -425,7 +425,7 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
                     throw new DBWebException("Import is canceled");
                 }
             } catch (DBException e) {
-                throw new DBWebException("Import failed cause: " + e.getMessage());
+                throw new DBWebException("Import failed", e);
             }
         }
     }
