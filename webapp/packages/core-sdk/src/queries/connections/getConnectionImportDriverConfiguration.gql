@@ -1,0 +1,14 @@
+query getConnectionImportDriverConfiguration($projectId: ID, $connectionId: ID!) {
+  connections: userConnections(projectId: $projectId, id: $connectionId) {
+    id
+    driverConfiguration {
+      supportedInsertReplaceMethods {
+        id
+        name
+        description
+      }
+      supportsBulkLoad
+      supportsTransactions
+    }
+  }
+}
