@@ -2462,6 +2462,88 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@cloudbeaver/plugin-ai-administration@workspace:*, @cloudbeaver/plugin-ai-administration@workspace:packages/plugin-ai-administration":
+  version: 0.0.0-use.local
+  resolution: "@cloudbeaver/plugin-ai-administration@workspace:packages/plugin-ai-administration"
+  dependencies:
+    "@cloudbeaver/core-administration": "workspace:*"
+    "@cloudbeaver/core-blocks": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-data-context": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-dialogs": "workspace:*"
+    "@cloudbeaver/core-events": "workspace:*"
+    "@cloudbeaver/core-executor": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-resource": "workspace:*"
+    "@cloudbeaver/core-root": "workspace:*"
+    "@cloudbeaver/core-sdk": "workspace:*"
+    "@cloudbeaver/core-ui": "workspace:*"
+    "@cloudbeaver/core-utils": "workspace:*"
+    "@cloudbeaver/plugin-data-grid": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
+    "@dbeaver/js-helpers": "workspace:*"
+    "@dbeaver/ui-kit": "workspace:*"
+    "@types/react": "npm:^19"
+    mobx: "npm:^6"
+    mobx-react-lite: "npm:^4"
+    react: "npm:^19"
+    react-dom: "npm:^19"
+    rimraf: "npm:^6"
+    tslib: "npm:^2"
+    typescript: "npm:^5"
+  languageName: unknown
+  linkType: soft
+
+"@cloudbeaver/plugin-ai-chat@workspace:*, @cloudbeaver/plugin-ai-chat@workspace:packages/plugin-ai-chat":
+  version: 0.0.0-use.local
+  resolution: "@cloudbeaver/plugin-ai-chat@workspace:packages/plugin-ai-chat"
+  dependencies:
+    "@cloudbeaver/core-authentication": "workspace:*"
+    "@cloudbeaver/core-blocks": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-connections": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-dialogs": "workspace:*"
+    "@cloudbeaver/core-events": "workspace:*"
+    "@cloudbeaver/core-executor": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-navigation-tree": "workspace:*"
+    "@cloudbeaver/core-projects": "workspace:*"
+    "@cloudbeaver/core-resource": "workspace:*"
+    "@cloudbeaver/core-root": "workspace:*"
+    "@cloudbeaver/core-sdk": "workspace:*"
+    "@cloudbeaver/core-settings": "workspace:*"
+    "@cloudbeaver/core-ui": "workspace:*"
+    "@cloudbeaver/core-utils": "workspace:*"
+    "@cloudbeaver/core-view": "workspace:*"
+    "@cloudbeaver/plugin-codemirror6": "workspace:*"
+    "@cloudbeaver/plugin-datasource-context-switch": "workspace:*"
+    "@cloudbeaver/plugin-navigation-tabs": "workspace:*"
+    "@cloudbeaver/plugin-navigation-tree": "workspace:*"
+    "@cloudbeaver/plugin-sql-editor": "workspace:*"
+    "@cloudbeaver/plugin-sql-editor-codemirror": "workspace:*"
+    "@cloudbeaver/plugin-sql-editor-navigation-tab": "workspace:*"
+    "@cloudbeaver/plugin-top-app-bar": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
+    "@dbeaver/cli": "workspace:*"
+    "@dbeaver/js-helpers": "workspace:*"
+    "@dbeaver/ui-kit": "workspace:*"
+    "@types/react": "npm:^19"
+    marked: "npm:^18"
+    mobx: "npm:^6"
+    mobx-react-lite: "npm:^4"
+    react: "npm:^19"
+    react-dom: "npm:^19"
+    react-markdown: "npm:^10"
+    remark-gfm: "npm:^4"
+    rimraf: "npm:^6"
+    tslib: "npm:^2"
+    typescript: "npm:^5"
+    typescript-plugin-css-modules: "npm:^5"
+  languageName: unknown
+  linkType: soft
+
 "@cloudbeaver/plugin-app-logo-administration@workspace:*, @cloudbeaver/plugin-app-logo-administration@workspace:packages/plugin-app-logo-administration":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-app-logo-administration@workspace:packages/plugin-app-logo-administration"
@@ -2657,6 +2739,29 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@cloudbeaver/plugin-connection-administration@workspace:*, @cloudbeaver/plugin-connection-administration@workspace:packages/plugin-connection-administration":
+  version: 0.0.0-use.local
+  resolution: "@cloudbeaver/plugin-connection-administration@workspace:packages/plugin-connection-administration"
+  dependencies:
+    "@cloudbeaver/core-administration": "workspace:*"
+    "@cloudbeaver/core-blocks": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-ui": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
+    "@dbeaver/cli": "workspace:*"
+    "@types/react": "npm:^19"
+    mobx-react-lite: "npm:^4"
+    react: "npm:^19"
+    react-dom: "npm:^19"
+    rimraf: "npm:^6"
+    tslib: "npm:^2"
+    typescript: "npm:^5"
+    typescript-plugin-css-modules: "npm:^5"
+  languageName: unknown
+  linkType: soft
+
 "@cloudbeaver/plugin-connection-custom@workspace:*, @cloudbeaver/plugin-connection-custom@workspace:packages/plugin-connection-custom":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-connection-custom@workspace:packages/plugin-connection-custom"
@@ -2689,6 +2794,43 @@ __metadata:
     tslib: "npm:^2"
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
+  languageName: unknown
+  linkType: soft
+
+"@cloudbeaver/plugin-connection-form-ai@workspace:*, @cloudbeaver/plugin-connection-form-ai@workspace:packages/plugin-connection-form-ai":
+  version: 0.0.0-use.local
+  resolution: "@cloudbeaver/plugin-connection-form-ai@workspace:packages/plugin-connection-form-ai"
+  dependencies:
+    "@cloudbeaver/core-blocks": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-connections": "workspace:*"
+    "@cloudbeaver/core-data-context": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-dialogs": "workspace:*"
+    "@cloudbeaver/core-events": "workspace:*"
+    "@cloudbeaver/core-executor": "workspace:*"
+    "@cloudbeaver/core-links": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-projects": "workspace:*"
+    "@cloudbeaver/core-resource": "workspace:*"
+    "@cloudbeaver/core-root": "workspace:*"
+    "@cloudbeaver/core-sdk": "workspace:*"
+    "@cloudbeaver/core-ui": "workspace:*"
+    "@cloudbeaver/core-utils": "workspace:*"
+    "@cloudbeaver/plugin-ai-chat": "workspace:*"
+    "@cloudbeaver/plugin-codemirror6": "workspace:*"
+    "@cloudbeaver/plugin-connections": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
+    "@dbeaver/cli": "workspace:*"
+    "@types/react": "npm:^19"
+    "@types/react-dom": "npm:^19"
+    mobx: "npm:^6"
+    mobx-react-lite: "npm:^4"
+    react: "npm:^19"
+    react-dom: "npm:^19"
+    rimraf: "npm:^6"
+    tslib: "npm:^2"
+    typescript: "npm:^5"
   languageName: unknown
   linkType: soft
 
@@ -4106,6 +4248,8 @@ __metadata:
     "@cloudbeaver/core-version-update": "workspace:*"
     "@cloudbeaver/core-view": "workspace:*"
     "@cloudbeaver/plugin-administration": "workspace:*"
+    "@cloudbeaver/plugin-ai-administration": "workspace:*"
+    "@cloudbeaver/plugin-ai-chat": "workspace:*"
     "@cloudbeaver/plugin-app-logo": "workspace:*"
     "@cloudbeaver/plugin-app-logo-administration": "workspace:*"
     "@cloudbeaver/plugin-async-task-confirmation": "workspace:^"
@@ -4113,7 +4257,9 @@ __metadata:
     "@cloudbeaver/plugin-authentication-administration": "workspace:*"
     "@cloudbeaver/plugin-browser": "workspace:*"
     "@cloudbeaver/plugin-codemirror6": "workspace:*"
+    "@cloudbeaver/plugin-connection-administration": "workspace:*"
     "@cloudbeaver/plugin-connection-custom": "workspace:*"
+    "@cloudbeaver/plugin-connection-form-ai": "workspace:*"
     "@cloudbeaver/plugin-connection-network-handlers": "workspace:*"
     "@cloudbeaver/plugin-connection-preferences": "workspace:*"
     "@cloudbeaver/plugin-connection-search": "workspace:*"
@@ -10362,12 +10508,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"brace-expansion@npm:>=5.0.7":
-  version: 5.0.7
-  resolution: "brace-expansion@npm:5.0.7"
+"brace-expansion@npm:>=5.0.8":
+  version: 5.0.8
+  resolution: "brace-expansion@npm:5.0.8"
   dependencies:
     balanced-match: "npm:^4.0.2"
-  checksum: 10c0/4769109c3c082de178e449a371bcad50d51ab468f644bce2dd9188efe0cf0a080ed102105d7fc8577382cedc45bad7e6443a91bf3d8102264ee8cf927dbaf205
+  checksum: 10c0/73304caafd00fdc5b0168e693ac15bf25b6357dec76d1195fcd628fe2cf99c46f9c889a7ecfa3cfe236dbd2d5ce3e27a6ccc4370b46d475d0d19081e11f86019
   languageName: node
   linkType: hard
 
@@ -14481,14 +14627,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"js-yaml@npm:>=4.3.0":
-  version: 5.2.1
-  resolution: "js-yaml@npm:5.2.1"
+"js-yaml@npm:>=5.2.2":
+  version: 5.2.2
+  resolution: "js-yaml@npm:5.2.2"
   dependencies:
     argparse: "npm:^2.0.1"
   bin:
     js-yaml: bin/js-yaml.mjs
-  checksum: 10c0/8eadf08efc738a656c2838f6617b0cc508944f66f568eb4d435e858261b889a6806d98f44fb6ffdba21a0c68e4bdff1ac35516724882e1dab8fc2cc59150c881
+  checksum: 10c0/e8ded203b235b3d562818c67bf362122abbcee89e507b62bddcdd3085b2f2dd866071e5e78f8e617d41d1a0c0baa1cec12a8fdec5859c571bf862adf585e2684
   languageName: node
   linkType: hard
 
@@ -15056,6 +15202,15 @@ __metadata:
   version: 3.0.4
   resolution: "markdown-table@npm:3.0.4"
   checksum: 10c0/1257b31827629a54c24a5030a3dac952256c559174c95ce3ef89bebd6bff0cb1444b1fd667b1a1bb53307f83278111505b3e26f0c4e7b731e0060d435d2d930b
+  languageName: node
+  linkType: hard
+
+"marked@npm:^18":
+  version: 18.0.7
+  resolution: "marked@npm:18.0.7"
+  bin:
+    marked: bin/marked.js
+  checksum: 10c0/84fc25d8583ff5c7b200dc6719e238472bb50e93b656b724ddfac4469c71ab1ef36bc8b4c1b2b26efabe713fd9a3437e3fd8af8555379c988dd902299842a730
   languageName: node
   linkType: hard
 
@@ -15998,12 +16153,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"nanoid@npm:^3.3.12":
-  version: 3.3.12
-  resolution: "nanoid@npm:3.3.12"
+"nanoid@npm:^3.3.16":
+  version: 3.3.16
+  resolution: "nanoid@npm:3.3.16"
   bin:
     nanoid: bin/nanoid.cjs
-  checksum: 10c0/ba142b7b39e11e80c16dd74b0365d407880c87c1cf7e1480956981ae940ee36060fa5b6f092cd1e315184dd19244c657bd017d03327bd3c62247d691c5e8edfb
+  checksum: 10c0/bbf2dcffe22d2b62d16de2711752070b539c0f644c7916f823ad6521986b2078cbe524f2d6240f58c46e9141ea0c7b87a029e100c0f7f175228cacaf30e41bba
   languageName: node
   linkType: hard
 
@@ -16914,14 +17069,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"postcss@npm:^8.0.0, postcss@npm:^8.4.35, postcss@npm:^8.5.15, postcss@npm:^8.5.3, postcss@npm:^8.5.6":
-  version: 8.5.15
-  resolution: "postcss@npm:8.5.15"
+"postcss@npm:>=8.5.18":
+  version: 8.5.23
+  resolution: "postcss@npm:8.5.23"
   dependencies:
-    nanoid: "npm:^3.3.12"
+    nanoid: "npm:^3.3.16"
     picocolors: "npm:^1.1.1"
     source-map-js: "npm:^1.2.1"
-  checksum: 10c0/7f2e63ae22fbe43aace1bf652bd99da4e90737c64194d49e51ddc9cd0f9e51ff2861a7d734379b494deffa03a880a5c65eec70bc29ee9ebaa7136dde3eee8f31
+  checksum: 10c0/ed714e635b330bb42666ecdd0c0b4f30224ded15b0b0052d6bc2b92832f2cf17d1c1141359453f96f0a84f8fbf4c405a74df187f559163b8f31131b2535455aa
   languageName: node
   linkType: hard
 
@@ -17531,7 +17686,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"remark-gfm@npm:^4.0.0":
+"remark-gfm@npm:^4, remark-gfm@npm:^4.0.0":
   version: 4.0.1
   resolution: "remark-gfm@npm:4.0.1"
   dependencies:

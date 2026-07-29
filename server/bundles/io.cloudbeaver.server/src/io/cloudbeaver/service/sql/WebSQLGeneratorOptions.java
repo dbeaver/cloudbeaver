@@ -18,6 +18,7 @@ package io.cloudbeaver.service.sql;
 
 public record WebSQLGeneratorOptions(
     boolean useFullyQualifiedNames,
-    boolean compactSql
+    boolean compactSql,
+    boolean showFullDdl
 ) {
 }

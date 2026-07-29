@@ -1,0 +1,3 @@
+mutation deleteAiProfile($profileId: ID!) {
+  result: aiDeleteProfile(profileId: $profileId)
+}

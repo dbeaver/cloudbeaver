@@ -24,6 +24,7 @@ export * from './PermissionsService.js';
 export * from './ProductInfoResource.js';
 export * from './ServerConfigResource.js';
 export * from './WorkspaceConfigEventHandler.js';
+export * from './ObjectSettingsEventHandler.js';
 export * from './SessionEventSource.js';
 export * from './QuotasService.js';
 export * from './SessionResource.js';

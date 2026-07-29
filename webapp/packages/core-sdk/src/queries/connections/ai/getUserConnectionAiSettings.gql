@@ -1,0 +1,5 @@
+query getUserConnectionAiSettings($dataSourceId: DataSourceIdInput!) {
+  settings: aiDataSourceSettings(dataSourceId: $dataSourceId) {
+    ...ConnectionInfoAiSettings
+  }
+}

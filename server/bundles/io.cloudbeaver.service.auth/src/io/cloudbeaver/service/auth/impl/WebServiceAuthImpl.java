@@ -129,7 +129,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
         }
         try {
             Map<String, Object> authParameters = new HashMap<>();
-            authParameters.put(SMConstants.USER_ORIGIN, ServletAppUtils.getOriginFromRequest(httpRequest));
+            authParameters.put(SMConstants.USER_ORIGIN, ServletAppUtils.getHostOriginFromRequest(httpRequest));
 
             var smAuthInfo = initiateAuthentication(webSession, providerId, providerConfigurationId, authParameters, forceSessionsLogout);
             if (smAuthInfo.getAuthStatus() != SMAuthStatus.IN_PROGRESS) {

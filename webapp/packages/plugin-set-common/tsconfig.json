@@ -116,6 +116,12 @@
       "path": "../plugin-administration"
     },
     {
+      "path": "../plugin-ai-administration"
+    },
+    {
+      "path": "../plugin-ai-chat"
+    },
+    {
       "path": "../plugin-app-logo"
     },
     {
@@ -137,7 +143,13 @@
       "path": "../plugin-codemirror6"
     },
     {
+      "path": "../plugin-connection-administration"
+    },
+    {
       "path": "../plugin-connection-custom"
+    },
+    {
+      "path": "../plugin-connection-form-ai"
     },
     {
       "path": "../plugin-connection-network-handlers"

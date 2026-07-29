@@ -19,6 +19,7 @@
         <module>io.cloudbeaver.server.ce</module>
         <module>io.cloudbeaver.slf4j</module>
 
+        <module>io.cloudbeaver.service.ai</module>
         <module>io.cloudbeaver.service.admin</module>
         <module>io.cloudbeaver.service.auth</module>
         <module>io.cloudbeaver.service.metadata</module>

@@ -26,7 +26,14 @@ import {
   resourceKeyListAliasFactory,
   ResourceKeyUtils,
 } from '@cloudbeaver/core-resource';
-import { DataSynchronizationService, ServerEventId, SessionDataResource, WorkspaceConfigEventHandler } from '@cloudbeaver/core-root';
+import {
+  DataSynchronizationService,
+  type IObjectSettingsEvent,
+  ObjectSettingsEventHandler,
+  ServerEventId,
+  SessionDataResource,
+  WorkspaceConfigEventHandler,
+} from '@cloudbeaver/core-root';
 import {
   type AdminConnectionGrantInfo,
   type AdminConnectionSearchInfo,
@@ -36,6 +43,7 @@ import {
   type InitConnectionMutationVariables,
   type ObjectPropertyInfo,
   type TestConnectionMutation,
+  WsObjectSettingsType,
 } from '@cloudbeaver/core-sdk';
 import { schemaValidationError } from '@cloudbeaver/core-utils';
 
@@ -76,6 +84,7 @@ export interface IConnectionInfoMetadata extends ICachedResourceMetadata {
   ConnectionStateEventHandler,
   UserInfoResource,
   NavTreeResource,
+  ObjectSettingsEventHandler,
 ])
 export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoParams, Connection, ConnectionInfoIncludes, IConnectionInfoMetadata> {
   readonly onConnectionCreate: Executor<Connection>;
@@ -97,6 +106,7 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
     connectionStateEventHandler: ConnectionStateEventHandler,
     userInfoResource: UserInfoResource,
     private readonly navTreeResource: NavTreeResource,
+    objectSettingsEventHandler: ObjectSettingsEventHandler,
   ) {
     super();
 
@@ -265,6 +275,20 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
       this,
     );
 
+    objectSettingsEventHandler.onEvent<IObjectSettingsEvent>(
+      ServerEventId.CbObjectSettingsUpdated,
+      this.syncConnectionSettings.bind(this),
+      undefined,
+      this,
+    );
+
+    objectSettingsEventHandler.onEvent<IObjectSettingsEvent>(
+      ServerEventId.CbObjectSettingsDeleted,
+      this.syncConnectionSettings.bind(this),
+      undefined,
+      this,
+    );
+
     makeObservable<this, 'nodeIdMap'>(this, {
       nodeIdMap: observable,
       create: action,
@@ -355,7 +379,7 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
     }
 
     const connectionPart = nodeId.substring(0, connectionEnd + node.objectId.length);
-    const connectionId = this.nodeIdMap.get(connectionPart);
+    const connectionId = this.nodeIdMap.get(connectionPart) || this.getConnectionIdForNodeId(node.projectId, nodeId);
 
     if (connectionId) {
       return this.get(connectionId);
@@ -583,6 +607,31 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
     this.sessionUpdate = false;
 
     return this.data;
+  }
+
+  private async syncConnectionSettings(data: IObjectSettingsEvent): Promise<void> {
+    if (data.smObjectType !== WsObjectSettingsType.Datasource || !data.projectId) {
+      return;
+    }
+
+    const key = createConnectionParam(data.projectId, data.objectId);
+
+    if (this.isConnected(key)) {
+      const connection = this.get(key);
+      const state = await this.dataSynchronizationService.requestSynchronization('connection', connection?.name ?? '');
+
+      if (!state) {
+        return;
+      }
+    }
+
+    this.markOutdated(key);
+
+    const connection = await this.load(key);
+
+    if (connection.nodePath && connection.connected) {
+      await this.navTreeResource.refreshNode(connection.nodePath);
+    }
   }
 
   protected override dataSet(key: IConnectionInfoParams, value: Connection): void {

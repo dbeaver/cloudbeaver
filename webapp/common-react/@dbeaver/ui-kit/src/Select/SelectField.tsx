@@ -104,6 +104,8 @@ export interface ISelectFieldProps<T, ItemType = ISelectItem<T>> {
 
   'aria-label'?: string;
 
+  title?: string;
+
   id?: string;
 }
 
@@ -147,6 +149,7 @@ export function SelectField<T, ItemType extends {} = ISelectItem<T>>({
   store,
   autoFocusItemsOnShow,
   name,
+  title,
   id,
 }: ISelectFieldProps<T, ItemType>) {
   const getItemValue = (item: ItemType): T =>
@@ -220,7 +223,7 @@ export function SelectField<T, ItemType extends {} = ISelectItem<T>>({
       <SelectProvider value={currentValueSerialized} setValue={val => handleChange(val)} store={store}>
         {label && <SelectLabel className={clsx(required && 'dbv-kit-select__label--required')}>{label}</SelectLabel>}
 
-        <Select id={id} name={name} disabled={disabled} required={required}>
+        <Select id={id} name={name} title={title} disabled={disabled} required={required}>
           <span className="dbv-kit-select__value">{displayValue}</span>
           {arrowIcon ?? <Select.Arrow className="dbv-kit-select__arrow-icon tw:text-sm!" />}
         </Select>

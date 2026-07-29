@@ -49,6 +49,7 @@ import pluginAppLogoAdministration from '@cloudbeaver/plugin-app-logo-administra
 import pluginAuthentication from '@cloudbeaver/plugin-authentication/module';
 import pluginAuthenticationAdministration from '@cloudbeaver/plugin-authentication-administration/module';
 import pluginBrowser from '@cloudbeaver/plugin-browser/module';
+import pluginConnectionAdministration from '@cloudbeaver/plugin-connection-administration/module';
 import pluginConnectionCustom from '@cloudbeaver/plugin-connection-custom/module';
 import pluginConnectionSearch from '@cloudbeaver/plugin-connection-search/module';
 import pluginConnections from '@cloudbeaver/plugin-connections/module';
@@ -117,6 +118,9 @@ import pluginConnectionPreferences from '@cloudbeaver/plugin-connection-preferen
 import pluginScriptExport from '@cloudbeaver/plugin-script-export/module';
 import pluginProjectInfo from '@cloudbeaver/plugin-project-info/module';
 import pluginDataViewerReferences from '@cloudbeaver/plugin-data-viewer-references/module';
+import pluginAiChat from '@cloudbeaver/plugin-ai-chat/module';
+import pluginAiAdministration from '@cloudbeaver/plugin-ai-administration/module';
+import pluginConnectionFormAi from '@cloudbeaver/plugin-connection-form-ai/module';
 
 const core = [
   coreRouting, // important, should be first because the router starts in load phase first after all plugins register phase
@@ -166,6 +170,7 @@ export const commonSet = [
   pluginAuthenticationAdministration,
   pluginTheme,
   pluginLocalization,
+  pluginConnectionAdministration,
   pluginConnectionCustom,
   pluginConnectionSearch,
   pluginDataExport,
@@ -233,4 +238,7 @@ export const commonSet = [
   pluginNetworkHandlers,
   pluginConnectionNetworkHandlers,
   pluginDataViewerReferences,
+  pluginAiChat,
+  pluginAiAdministration,
+  pluginConnectionFormAi,
 ];

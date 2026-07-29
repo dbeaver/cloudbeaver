@@ -1,0 +1,78 @@
+.markdown h1 {
+  margin-top: 0;
+  margin-bottom: 8px;
+}
+
+.markdown h2 {
+  margin-top: 12px;
+  margin-bottom: 8px;
+}
+
+.markdown h3 {
+  margin-top: 10px;
+  margin-bottom: 8px;
+}
+
+.markdown h4 {
+  margin-bottom: 8px;
+}
+
+.markdown h5,
+.markdown h6 {
+  margin: 0;
+}
+
+.markdown p {
+  margin-bottom: 4px;
+}
+
+.markdown hr {
+  margin-bottom: 8px;
+  margin-top: 8px;
+}
+
+.markdown blockquote {
+  margin-top: 8px;
+  margin-bottom: 8px;
+}
+
+.markdown p:not(:first-child) {
+  margin-top: 4px;
+}
+
+.markdown ul,
+.markdown ol {
+  margin-bottom: 4px;
+  padding-left: 14px;
+}
+
+.markdown p + :where(ol, ul) {
+  margin-top: 0;
+}
+
+.markdown li {
+  margin-bottom: 4px;
+  margin-top: 4px;
+  white-space: normal;
+}
+
+.markdown li p {
+  display: inline;
+}
+
+.markdown table {
+  margin: 8px 0;
+}
+
+.markdown li::marker {
+  font-weight: bold;
+  color: var(--theme-primary);
+}
+
+.markdown :where(ol, ul) > li > :last-child {
+  margin-bottom: 0;
+}
+
+.markdown p + :where(ol, ul) {
+  margin-top: 0;
+}
