@@ -65,6 +65,7 @@
     "@cloudbeaver/plugin-authentication-administration": "workspace:*",
     "@cloudbeaver/plugin-browser": "workspace:*",
     "@cloudbeaver/plugin-codemirror6": "workspace:*",
+    "@cloudbeaver/plugin-connection-administration": "workspace:*",
     "@cloudbeaver/plugin-connection-custom": "workspace:*",
     "@cloudbeaver/plugin-connection-form-ai": "workspace:*",
     "@cloudbeaver/plugin-connection-network-handlers": "workspace:*",

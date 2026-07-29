@@ -192,13 +192,16 @@ public class ServletAppUtils {
         @NotNull String serviceId,
         @NotNull String origin
     ) throws DBException {
-        String finalOrigin =  webAuthApplication.modifyOrigin(origin);
+        String finalOrigin = ServletAppUtils.substringBeforeRootURI(webAuthApplication.modifyOrigin(origin));
         String serviceUriSegment = removeSideSlashes(webAuthApplication.getAuthServiceUriSegment());
         String rootUri = removeSideSlashes(getServletApplication().getRootURI());
         if (finalOrigin.endsWith("/" + rootUri) && serviceUriSegment.startsWith(rootUri + "/")) {
             finalOrigin = finalOrigin.substring(0, finalOrigin.length() - rootUri.length());
         }
         StringBuilder authUriBuilder = new StringBuilder(removeSideSlashes(finalOrigin));
+        if (CommonUtils.isNotEmpty(rootUri)) {
+            authUriBuilder.append("/").append(rootUri);
+        }
         if (CommonUtils.isNotEmpty(serviceUriSegment)) {
             authUriBuilder.append("/").append(serviceUriSegment);
         }
@@ -295,6 +298,11 @@ public class ServletAppUtils {
 
             flattenResult(result, prefix, key, value);
         }
+    }
+
+    @NotNull
+    public static String getHostOriginFromRequest(@NotNull HttpServletRequest request) {
+        return substringBeforeRootURI(getOriginFromRequest(request));
     }
 
     @NotNull

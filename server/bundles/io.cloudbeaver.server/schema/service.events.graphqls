@@ -31,6 +31,10 @@ enum CBServerEventId {
 
     "Open URL request in client"
     cb_open_url @since(version: "25.3.1")
+    "User-specific object settings updated"
+    cb_object_settings_updated @since(version: "26.1.4")
+    "User-specific object settings deleted"
+    cb_object_settings_deleted @since(version: "26.1.4")
 }
 
 "Events sent by client"
@@ -57,6 +61,7 @@ enum CBEventTopic {
     cb_workspace_configuration @since(version: "25.1.1")
     cb_notification @since(version: "25.2.1")
     cb_session_action @since(version: "25.3.1")
+    cb_object_settings @since(version: "26.1.4")
 }
 
 "Base server event interface"
@@ -176,6 +181,26 @@ type WSOpenUrlEvent implements CBServerEvent @since(version: "25.3.1") {
     timestamp: Int!
     url: String!
     actionId: String!
+}
+
+"Type of the object that owns user-specific settings"
+enum WSObjectSettingsType @since(version: "26.1.4") {
+    datasource
+    project
+}
+
+"User-specific object settings change event (e.g. navigator view)"
+type WSObjectSettingsEvent implements CBServerEvent @since(version: "26.1.4") {
+    id: CBServerEventId!
+    topicId: CBEventTopic!
+    "Type of the object the settings belong to"
+    smObjectType: WSObjectSettingsType!
+    "Project of the object"
+    projectId: String
+    "Id of the object"
+    objectId: String!
+    "Ids of the settings that were changed"
+    settingIds: [String!]!
 }
 
 extend type Query {
