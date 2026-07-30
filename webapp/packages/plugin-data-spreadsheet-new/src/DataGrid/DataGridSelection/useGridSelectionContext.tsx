@@ -181,6 +181,10 @@ export function useGridSelectionContext(
     props.selectionAction.set({}, true);
   }
 
+  function focusCell(key: IGridDataKey) {
+    props.selectionAction.focus(key);
+  }
+
   function isSelected(rowIdx: number, colIdx: number) {
     const column = props.tableData.getColumn(colIdx)?.key ?? undefined;
 
@@ -286,6 +290,7 @@ export function useGridSelectionContext(
         return props.selectionAction.selectedElements;
       },
       select,
+      focusCell,
       selectColumn,
       selectTable,
       getFocusedElementPosition,

@@ -15,6 +15,7 @@ export interface IDataGridSelectionContext {
   selectedCells: Map<string, IGridDataKey[]>;
   clearSelection: VoidFunction;
   select: (cell: IDraggingPosition, multiple: boolean, range: boolean, temporary: boolean) => void;
+  focusCell: (key: IGridDataKey) => void;
   selectColumn: (colIdx: number, multiple: boolean) => void;
   selectTable: () => void;
   isSelected: (rowIdx: number, colIdx: number) => boolean;

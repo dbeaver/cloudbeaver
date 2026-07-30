@@ -195,6 +195,7 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
           );
         }
 
+        this.selectionContext.focusCell(this.cellContext.cell);
         this.tableMenuContext.openMenu(this.cellContext.cell, event);
       },
     }),
