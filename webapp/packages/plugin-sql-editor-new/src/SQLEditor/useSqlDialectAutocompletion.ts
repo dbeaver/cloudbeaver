@@ -44,35 +44,20 @@ export function useSqlDialectAutocompletion(data: ISQLEditorData): [Compartment,
       if (word === '*') {
         filteredProposals = proposals;
       } else {
-        const matchResults = fuzzyMatch({
-          query: word,
-          items: proposals.filter(
-            ({ replacementString, displayString }) =>
-              sanitizeProposal(displayString) !== wordLowerCase && replacementString.toLocaleLowerCase() !== wordLowerCase,
-          ),
-          fields: ['displayString', 'replacementString'],
-        });
+        const candidates = proposals.filter(
+          ({ replacementString, displayString }) =>
+            sanitizeProposal(displayString) !== wordLowerCase && replacementString.toLocaleLowerCase() !== wordLowerCase,
+        );
 
-        filteredProposals = matchResults
-          .sort((a, b) => {
-            const aDisplayLower = sanitizeProposal(a.item.displayString).toLocaleLowerCase();
-            const aReplacementLower = a.item.replacementString.toLocaleLowerCase();
-            const bDisplayLower = sanitizeProposal(b.item.displayString).toLocaleLowerCase();
-            const bReplacementLower = b.item.replacementString.toLocaleLowerCase();
+        const matchedItems = new Set(
+          fuzzyMatch({
+            query: word,
+            items: candidates,
+            fields: ['displayString', 'replacementString'],
+          }).map(r => r.item),
+        );
 
-            const aIncludes = aDisplayLower.includes(wordLowerCase) || aReplacementLower.includes(wordLowerCase);
-            const bIncludes = bDisplayLower.includes(wordLowerCase) || bReplacementLower.includes(wordLowerCase);
-
-            if (aIncludes && !bIncludes) {
-              return -1;
-            }
-            if (!aIncludes && bIncludes) {
-              return 1;
-            }
-
-            return (b.score ?? 0) - (a.score ?? 0);
-          })
-          .map(r => r.item);
+        filteredProposals = candidates.filter(proposal => matchedItems.has(proposal));
       }
 
       if (filteredProposals.length === 0 && !hasSameName && explicit) {
