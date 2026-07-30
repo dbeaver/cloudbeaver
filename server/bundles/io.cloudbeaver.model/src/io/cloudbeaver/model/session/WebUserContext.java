@@ -47,7 +47,7 @@ import java.util.stream.Collectors;
  * Contains user state and services based on available permissions
  */
 //TODO: split to authenticated and non authenticated context
-public class WebUserContext implements SMCredentialsProvider {
+public class WebUserContext  implements SMCredentialsProvider {
     private static final Log log = Log.getLog(WebUserContext.class);
 
     private final ServletApplication application;
@@ -238,8 +238,8 @@ public class WebUserContext implements SMCredentialsProvider {
     }
 
     @NotNull
-    public DBSSecretController getSecretController() throws DBException {
-        if (this.securityController == null) {
+    public DBSSecretController getSecretController()  throws DBException {
+        if (this.secretController == null) {
             this.secretController = application.getSecretController(this, workspace.getAuthContext());
         }
         return secretController;
