@@ -1,3 +1,7 @@
+####################################################
+# SQL events
+####################################################
+
 extend enum CBServerEventId {
     "Database output log updated (e.g., DBMS in Oracle)"
     cb_database_output_log_updated,
