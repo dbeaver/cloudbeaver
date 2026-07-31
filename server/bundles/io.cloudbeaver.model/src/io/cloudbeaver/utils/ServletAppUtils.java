@@ -235,6 +235,14 @@ public class ServletAppUtils {
         response.addCookie(sessionCookie);
     }
 
+    public static String getHeaderOrLegacy(HttpServletRequest request, String headerName, String legacyHeaderName) {
+        String value = request.getHeader(headerName);
+        if (CommonUtils.isEmpty(value)) {
+            value = request.getHeader(legacyHeaderName);
+        }
+        return value;
+    }
+
     public static String getRequestCookie(HttpServletRequest request, String cookieName) {
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {

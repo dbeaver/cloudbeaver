@@ -215,6 +215,7 @@ public class CBEventsLongPollingServlet extends HttpServlet {
 
             ps.handleWebSessionEvent(new WSSocketConnectedEvent(ws.getApplication().getApplicationRunId()));
             resp.setHeader(WSConstants.WS_SESSION_HEADER, sid);
+            resp.setHeader(WSConstants.WS_SESSION_HEADER_LEGACY, sid);
             log.debug("HTTP Long-Poll channel opened for session " + sid);
 
             return ps;
@@ -304,7 +305,7 @@ public class CBEventsLongPollingServlet extends HttpServlet {
         @Override
         public BaseWebSession resolve(@NotNull HttpServletRequest req) throws SMException {
 
-            String sid = req.getHeader(WSConstants.WS_SESSION_HEADER);
+            String sid = ServletAppUtils.getHeaderOrLegacy(req, WSConstants.WS_SESSION_HEADER, WSConstants.WS_SESSION_HEADER_LEGACY);
             String token = req.getHeader(WSConstants.WS_AUTH_HEADER);
 
             if (CommonUtils.isEmpty(sid) && CommonUtils.isEmpty(token)) {
