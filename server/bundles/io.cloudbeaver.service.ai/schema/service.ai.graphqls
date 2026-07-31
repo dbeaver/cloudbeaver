@@ -32,6 +32,8 @@ type AIEngineInfo @since(version: "23.2.2") {
     id: ID!
     "Name of the AI engine."
     name: String!
+    "Path to the AI engine icon."
+    icon: String
 }
 
 type AIChatConversationInfo @since(version: "25.1.1") {
