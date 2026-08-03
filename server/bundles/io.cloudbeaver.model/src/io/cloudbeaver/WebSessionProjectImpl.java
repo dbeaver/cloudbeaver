@@ -103,7 +103,7 @@ public class WebSessionProjectImpl extends WebProjectImpl implements DBPAdaptabl
         return projectSettings;
     }
 
-    @Nullable
+    @NotNull
     @Override
     public DBNModel getNavigatorModel() {
         return webSession.getNavigatorModel();
