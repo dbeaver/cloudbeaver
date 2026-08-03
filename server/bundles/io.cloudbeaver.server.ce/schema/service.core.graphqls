@@ -1,3 +1,7 @@
+####################################################
+# Core API
+####################################################
+
 extend type ServerConfig {
     serverURL: String! @deprecated
     rootURI: String!
