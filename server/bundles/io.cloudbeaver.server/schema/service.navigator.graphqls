@@ -1,4 +1,6 @@
+####################################################
 # Nodes, objects and properties
+####################################################
 
 type ObjectDescriptor {
     id: Int
@@ -143,7 +145,7 @@ extend type Query {
     "Refreshes node based on the node path"
     navRefreshNode( nodePath: ID! ): Boolean @deprecated # Use navReloadNode method from Mutation (24.2.4)
 
-    # contextId currently not using
+    "contextId currently not using"
     navGetStructContainers( projectId: ID, connectionId: ID!, contextId: ID, catalog: ID ): DatabaseStructContainers!
 
 }

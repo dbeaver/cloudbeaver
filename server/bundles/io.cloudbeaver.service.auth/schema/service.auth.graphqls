@@ -1,3 +1,7 @@
+####################################################
+# Authentication API
+####################################################
+
 enum AuthCredentialEncryption {
     none,
     plain,
@@ -15,11 +19,11 @@ type AuthCredentialInfo {
     displayName: String!
     description: String
 
-    # This field must be shown in admin panel
+    "This field must be shown in admin panel"
     admin: Boolean!
-    # This field must be shown in login form
+    "This field must be shown in login form"
     user: Boolean!
-    # This field can be used as user identifier
+    "This field can be used as user identifier"
 
     identifying: Boolean!
     possibleValues: [String]
