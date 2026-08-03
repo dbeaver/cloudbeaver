@@ -32,6 +32,7 @@ import { LANGUAGE_OPTIONS } from './AISettingsForm/getLanguageOptions.js';
 import type { AdministrationAISettingsFormState } from './AISettingsForm/AdministrationAISettingsFormState.js';
 import { getFirstException } from '@cloudbeaver/core-utils';
 import { isDefined } from '@dbeaver/js-helpers';
+import { AiEnginesResource } from '@cloudbeaver/plugin-ai';
 
 export const AIAdministrationPage = observer<{
   formState: AdministrationAISettingsFormState;
@@ -39,6 +40,7 @@ export const AIAdministrationPage = observer<{
   const translate = useTranslate();
   const notificationService = useService(NotificationService);
   const profilesLoader = useResource(AIAdministrationPage, AIProfilesResource, CachedMapAllKey);
+  const aiEnginesResource = useResource(AIAdministrationPage, AiEnginesResource, undefined);
   const profiles = profilesLoader.data.filter(isDefined);
 
   const settingsInfoPart = getAdministrationAISettingsFormInfoPart(formState);
@@ -102,6 +104,7 @@ export const AIAdministrationPage = observer<{
               value={settingsInfoPart.state.defaultConfiguration}
               description={translate('plugin_ai_administration_default_profile_description')}
               disabled={!profiles.length}
+              iconSelector={value => aiEnginesResource.data.find(e => e.id === value.engineId)?.icon}
               small
               onSelect={selectDefaultProfile}
             >
