@@ -9,3 +9,4 @@
 import './module.js';
 
 export * from './SqlGeneratorsResource.js';
+export * from './SqlEntityQueryResource.js';

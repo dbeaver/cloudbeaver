@@ -6,12 +6,17 @@
  * you may not use this file except in compliance with the License.
  */
 import { Dependency, ModuleRegistry, proxy } from '@cloudbeaver/core-di';
+import { SqlEntityQueryResource } from './SqlEntityQueryResource.js';
 import { SqlGeneratorsResource } from './SqlGeneratorsResource.js';
 
 export default ModuleRegistry.add({
   name: '@cloudbeaver/core-sql-generator',
 
   configure: serviceCollection => {
-    serviceCollection.addSingleton(Dependency, proxy(SqlGeneratorsResource)).addSingleton(SqlGeneratorsResource);
+    serviceCollection
+      .addSingleton(Dependency, proxy(SqlGeneratorsResource))
+      .addSingleton(SqlGeneratorsResource)
+      .addSingleton(Dependency, proxy(SqlEntityQueryResource))
+      .addSingleton(SqlEntityQueryResource);
   },
 });
