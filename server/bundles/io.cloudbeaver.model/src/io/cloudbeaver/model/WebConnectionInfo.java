@@ -71,6 +71,9 @@ public class WebConnectionInfo {
     private static final String FEATURE_READ_ONLY = "readOnly";
     private static final String FEATURE_PROVIDED = "provided";
     private static final String FEATURE_MANAGEABLE = "manageable";
+    private static final String FEATURE_RESTRICT_DATA_EDIT = "restrictDataEdit";
+    private static final String FEATURE_RESTRICT_SCRIPT_EXECUTE = "restrictScriptExecute";
+    private static final String FEATURE_RESTRICT_DATA_IMPORT = "restrictDataImport";
 
     private static final String TOOL_SESSION_MANAGER = "sessionManager";
     
@@ -274,6 +277,15 @@ public class WebConnectionInfo {
         }
         if (dataSourceContainer.isConnectionReadOnly()) {
             features.add(FEATURE_READ_ONLY);
+        }
+        if (!dataSourceContainer.hasModifyPermission(DBPDataSourcePermission.PERMISSION_EDIT_DATA)) {
+            features.add(FEATURE_RESTRICT_DATA_EDIT);
+        }
+        if (!dataSourceContainer.hasModifyPermission(DBPDataSourcePermission.PERMISSION_EXECUTE_SCRIPTS)) {
+            features.add(FEATURE_RESTRICT_SCRIPT_EXECUTE);
+        }
+        if (!dataSourceContainer.hasModifyPermission(DBPDataSourcePermission.PERMISSION_IMPORT_DATA)) {
+            features.add(FEATURE_RESTRICT_DATA_IMPORT);
         }
         if (dataSourceContainer.isProvided()) {
             features.add(FEATURE_PROVIDED);
