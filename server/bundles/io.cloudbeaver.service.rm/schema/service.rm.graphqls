@@ -1,4 +1,6 @@
+####################################################
 # Metadata queries
+####################################################
 
 type RMProject {
     id: ID!
@@ -17,7 +19,7 @@ type RMResource {
     name: String!
     folder: Boolean!
     length: Int!
-    # Properties map
+    "Properties map"
     properties: Object
 }
 
