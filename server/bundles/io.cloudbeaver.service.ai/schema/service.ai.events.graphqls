@@ -1,3 +1,7 @@
+####################################################
+# AI events
+####################################################
+
 extend enum CBServerEventId {
     cb_ai_chat_message_chunk @since(version: "25.1.1")
     cb_ai_chat_message_error @since(version: "25.1.1")
