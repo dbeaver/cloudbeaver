@@ -48,6 +48,7 @@ import java.util.*;
 import javax.naming.Context;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
+import javax.naming.PartialResultException;
 import javax.naming.directory.*;
 import javax.naming.ldap.LdapName;
 import javax.naming.ldap.Rdn;
@@ -562,12 +563,22 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
             }
 
             context = initConnection(environment);
-            List<String> groupsByMemberOfAttribute = findGroupsByMemberOfAttribute(fullDN, context);
-            log.debug("Found " + groupsByMemberOfAttribute.size() + " groups by memberOf attribute");
-            result.addAll(groupsByMemberOfAttribute);
-            List<String> groupsByMemberAttribute = findGroupsByMemberAttribute(fullDN, ldapSettings, context);
-            log.debug("Found " + groupsByMemberAttribute.size() + " groups by member attribute");
-            result.addAll(groupsByMemberAttribute);
+            // Run both lookups independently: a failure in one must not discard the groups
+            // already collected by the other.
+            try {
+                List<String> groupsByMemberOfAttribute = findGroupsByMemberOfAttribute(fullDN, context);
+                log.debug("Found " + groupsByMemberOfAttribute.size() + " groups by memberOf attribute");
+                result.addAll(groupsByMemberOfAttribute);
+            } catch (Exception e) {
+                log.error("Failed to fetch groups by memberOf attribute. " + e.getMessage());
+            }
+            try {
+                List<String> groupsByMemberAttribute = findGroupsByMemberAttribute(fullDN, ldapSettings, context);
+                log.debug("Found " + groupsByMemberAttribute.size() + " groups by member attribute");
+                result.addAll(groupsByMemberAttribute);
+            } catch (Exception e) {
+                log.error("Failed to fetch groups by member attribute. " + e.getMessage());
+            }
         } catch (Exception e) {
             log.error("Group not found. " + e.getMessage());
         } finally {
@@ -579,6 +590,7 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
                 log.error("Close resource of ldap group search failed", e);
             }
         }
+        log.debug("Resolved " + result.size() + " external group id(s) for member '" + fullDN + "': " + result);
         return new ArrayList<>(result);
     }
 
@@ -602,6 +614,8 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
                     }
                 }
             }
+        } catch (PartialResultException e) {
+          log.debug("Ignoring LDAP continuation references while reading memberOf for '" + fullDN + "'");
         } finally {
             if (userRecord != null) {
                 userRecord.close();
@@ -634,6 +648,8 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
                     log.error("Failed fetch user group. " + e.getMessage());
                 }
             }
+        } catch (PartialResultException e) {
+            log.debug("Ignoring LDAP continuation references during member group search for '" + fullDN + "'");
         } finally {
             if (searchResults != null) {
                 searchResults.close();

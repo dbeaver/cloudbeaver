@@ -26,7 +26,6 @@ import {
   type IGridRowKey,
   type IGridColumnKey,
   type IGridDataKey,
-  isBooleanValuePresentationAvailable,
   isResultSetDataSource,
 } from '@cloudbeaver/plugin-data-viewer';
 
@@ -162,9 +161,7 @@ export function useTableData(
           return false;
         }
 
-        const handleByBooleanFormatter = isBooleanValuePresentationAvailable(holder.value, resultColumn);
-
-        return !(handleByBooleanFormatter || this.isCellReadonly(key));
+        return !this.isCellReadonly(key);
       },
     }),
     {
