@@ -75,7 +75,10 @@ export function useGridSelectedCellsCopy(
   const copyEventHandler = useDataViewerCopyHandler();
 
   const onKeydownHandler = useCallback((event: React.KeyboardEvent) => {
-    if ((event.ctrlKey || event.metaKey) && event.nativeEvent.code === EVENT_KEY_CODE.C) {
+    const isCopyShortcut =
+      (event.ctrlKey || event.metaKey) && !event.altKey && (event.key.toLowerCase() === 'c' || event.nativeEvent.code === EVENT_KEY_CODE.C);
+
+    if (isCopyShortcut) {
       const activeElement = document.activeElement as HTMLElement | null;
       const isEditing = activeElement?.matches('input, textarea, [contenteditable="true"]');
 

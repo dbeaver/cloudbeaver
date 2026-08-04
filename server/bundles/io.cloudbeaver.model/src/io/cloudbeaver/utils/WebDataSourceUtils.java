@@ -57,9 +57,12 @@ public class WebDataSourceUtils {
     private WebDataSourceUtils() {
     }
 
-    public static void saveCredentialsInDataSource(WebConnectionInfo webConnectionInfo, DBPDataSourceContainer dataSourceContainer, DBPConnectionConfiguration configuration) {
+    public static void saveCredentialsInDataSource(
+        @NotNull WebConnectionInfo webConnectionInfo,
+        @NotNull DBPDataSourceContainer dataSourceContainer,
+        @NotNull DBPConnectionConfiguration configuration
+    ) {
         // Properties passed from web
-        // webConnectionInfo may be null in some cases (e.g. connection test when no actual connection exist yet)
         Map<String, Object> authProperties = webConnectionInfo.getSavedAuthProperties();
         if (authProperties != null) {
             authProperties.forEach((s, o) -> configuration.setAuthProperty(s, CommonUtils.toString(o)));
@@ -307,9 +310,7 @@ public class WebDataSourceUtils {
         if (config.getKeepAliveInterval() >= 0) {
             dsConfig.setKeepAliveInterval(config.getKeepAliveInterval());
         }
-        if (config.isDefaultAutoCommit() != null) {
-            dsConfig.getBootstrap().setDefaultAutoCommit(config.isDefaultAutoCommit());
-        }
+        dsConfig.getBootstrap().setDefaultAutoCommit(config.isDefaultAutoCommit());
         dsConfig.getBootstrap().setDefaultCatalogName(config.getDefaultCatalogName());
         dsConfig.getBootstrap().setDefaultSchemaName(config.getDefaultSchemaName());
         // Save provider props
@@ -330,7 +331,11 @@ public class WebDataSourceUtils {
         }
 
         if (CommonUtils.isEmpty(config.getUrl())) {
-            dsConfig.setUrl(driver.getConnectionURL(dsConfig));
+            try {
+                dsConfig.setUrl(driver.getConnectionURL(dsConfig));
+            } catch (DBException e) {
+                log.error("Error preparing connection URL", e);
+            }
         }
         // Save network handlers
         if (config.getNetworkHandlersConfig() != null) {

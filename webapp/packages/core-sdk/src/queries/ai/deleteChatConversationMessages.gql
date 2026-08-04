@@ -1,0 +1,3 @@
+mutation deleteChatConversationMessage($conversationId: ID!, $messageId: ID!) {
+  aiClearLastChatMessages(conversationId: $conversationId, messageId: $messageId)
+}

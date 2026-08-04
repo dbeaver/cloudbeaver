@@ -556,7 +556,7 @@ type ConnectionInfo {
     supportedDataFormats: [ ResultDataFormat! ]!
     configurationType: DriverConfigurationType
 
-    #Access properties
+    "Access properties"
     canViewSettings: Boolean!
     canEdit: Boolean!
     canDelete: Boolean!
@@ -572,6 +572,29 @@ type ConnectionInfo {
     tools: [String!]! @since(version: "24.1.3")
 
     connectionType: ID! @since(version: "26.1.2")
+
+    "Driver configuration"
+    driverConfiguration: DriverConfiguration! @since(version: "26.1.2")
+}
+
+"Database-dependent metadata describing features supported by the driver"
+type DriverConfiguration {
+    "Supported 'on duplicate key' replace methods for this connection's SQL dialect"
+    supportedInsertReplaceMethods: [DictionaryValueInfo!]!
+    "Whether the connection's database supports bulk load during data import"
+    supportsBulkLoad: Boolean!
+    "Whether the connection's database supports transactions"
+    supportsTransactions: Boolean!
+}
+
+"Generic dictionary value: an identifier with a human readable name and an optional description"
+type DictionaryValueInfo {
+    "Value ID"
+    id: ID!
+    "Human readable value name"
+    name: String!
+    "Value description"
+    description: String
 }
 
 type ConnectionFolderInfo {
@@ -714,7 +737,7 @@ input ConnectionConfig {
     "ID of database driver"
     driverId: ID
 
-    # Custom connection parameters (all optional)
+    "Custom connection parameters (all optional)"
     host: String
     port: String
     serverName: String

@@ -71,8 +71,8 @@
   }
 
   .dbv-kit-switch__track[data-focus-visible]:not([data-disabled]) {
-    outline: 2px solid var(--dbv-kit-control-outline-color, #3b82f6);
-    outline-offset: 2px;
+    outline: var(--dbv-kit-switch-outline-width, 1px) solid var(--dbv-kit-switch-outline-color);
+    outline-offset: var(--dbv-kit-switch-outline-offset);
   }
 
   .dbv-kit-switch__track[data-checked] {

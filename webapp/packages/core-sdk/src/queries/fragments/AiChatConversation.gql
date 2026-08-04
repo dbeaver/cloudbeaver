@@ -1,0 +1,16 @@
+fragment AiChatConversation on AIChatConversationInfo {
+  id
+  caption
+  time
+  dataSourceId {
+    projectId
+    connectionId
+  }
+  settings {
+    metaTransferConfirmed
+    customObjectIds
+  }
+  waitingForResponse
+  promptGeneratorId
+  profile
+}

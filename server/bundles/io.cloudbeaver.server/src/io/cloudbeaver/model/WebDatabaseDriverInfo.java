@@ -21,8 +21,10 @@ import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.CBConstants;
 import org.jkiss.code.NotNull;
+import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBConstants;
+import org.jkiss.dbeaver.model.DatabaseURL;
 import org.jkiss.dbeaver.model.connection.*;
 import org.jkiss.dbeaver.model.impl.auth.AuthModelDatabaseNative;
 import org.jkiss.dbeaver.model.meta.Property;
@@ -180,13 +182,26 @@ public class WebDatabaseDriverInfo {
     @NotNull
     @Property
     public WebPropertyInfo[] getDriverProperties() throws DBWebException {
-        DBPConnectionConfiguration cfg = new DBPConnectionConfiguration();
-        cfg.setUrl(CommonUtils.notEmpty(driver.getSampleURL()));
-        cfg.setHostName(CBConstants.HOST_LOCALHOST);
-        cfg.setHostPort(driver.getDefaultPort());
-        cfg.setDatabaseName(driver.getDefaultDatabase());
-        cfg.setUrl(driver.getConnectionURL(cfg));
-        return WebServiceUtils.getDriverProperties(webSession, driver, null, cfg);
+        try {
+            DBPConnectionConfiguration cfg = new DBPConnectionConfiguration();
+            cfg.setUrl(CommonUtils.notEmpty(driver.getSampleURL()));
+            DatabaseURL.Pattern dbUrlPattern = DatabaseURL.getUrlPattern(CommonUtils.notEmpty(driver.getSampleURL()));
+            for (String propName : dbUrlPattern.getMandatoryPropertyNames()) {
+                switch (propName) {
+                    case DBConstants.PROP_HOST -> cfg.setHostName(CBConstants.HOST_LOCALHOST);
+                    case DBConstants.PROP_PORT -> cfg.setHostPort(CommonUtils.notNull(driver.getDefaultPort(), "0"));
+                    case DBConstants.PROP_SERVER -> cfg.setServerName(CommonUtils.notNull(driver.getDefaultServer(), propName));
+                    case DBConstants.PROP_USER -> cfg.setUserName(CommonUtils.notNull(driver.getDefaultUser(), propName));
+                    case DBConstants.PROP_DATABASE, DBConstants.PROP_FOLDER, DBConstants.PROP_FILE ->
+                        cfg.setDatabaseName(CommonUtils.notNull(driver.getDefaultDatabase(), propName));
+                    default -> log.debug("Unexpected mandatory URL property " + propName);
+                }
+            }
+            cfg.setUrl(driver.getConnectionURL(cfg));
+            return WebServiceUtils.getDriverProperties(webSession, driver, null, cfg);
+        } catch (DBException e) {
+            throw new DBWebException("Error obtaining driver properties", e);
+        }
     }
 
     @Property

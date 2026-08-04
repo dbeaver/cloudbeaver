@@ -1,0 +1,17 @@
+query dataTransferImportDataIntoResults(
+  $projectId: ID
+  $connectionId: ID!
+  $contextId: ID!
+  $resultsId: ID!
+  $parameters: DataTransferImportParameters!
+) {
+  taskInfo: dataTransferImportDataIntoResults(
+    projectId: $projectId
+    connectionId: $connectionId
+    contextId: $contextId
+    resultsId: $resultsId
+    parameters: $parameters
+  ) {
+    ...AsyncTaskInfo
+  }
+}

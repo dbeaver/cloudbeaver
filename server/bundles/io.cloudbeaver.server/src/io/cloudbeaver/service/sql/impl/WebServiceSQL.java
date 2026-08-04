@@ -252,10 +252,33 @@ public class WebServiceSQL implements DBWServiceSQL {
         @NotNull WebSQLGeneratorOptions options
     ) throws DBWebException {
         List<DBSObject> objectList = getObjectListFromNodeIds(session, nodePathList);
-        return createAndRunGenerator(
-            session, generatorId, objectList,
-            options.useFullyQualifiedNames(), options.compactSql()
-        );
+        return createAndRunGenerator(session, generatorId, objectList, options);
+    }
+
+    @NotNull
+    @Override
+    public WebAsyncTaskInfo asyncGenerateEntityQuery(
+        @NotNull WebSession session,
+        @NotNull String generatorId,
+        @NotNull List<String> nodePathList,
+        @NotNull WebSQLGeneratorOptions options
+    ) throws DBWebException {
+        WebAsyncTaskProcessor<String> runnable = new WebAsyncTaskProcessor<>() {
+            @Override
+            public void run(@NotNull DBRProgressMonitor monitor) throws InvocationTargetException {
+                try {
+                    monitor.beginTask("Generate SQL", 1);
+                    monitor.subTask("Generate '" + generatorId + "' SQL");
+                    List<DBSObject> objectList = getObjectListFromNodeIds(session, monitor, nodePathList);
+                    this.result = createAndRunGenerator(monitor, generatorId, objectList, options);
+                } catch (Throwable e) {
+                    throw new InvocationTargetException(e);
+                } finally {
+                    monitor.done();
+                }
+            }
+        };
+        return session.createAndRunAsyncTask("Generate SQL", runnable);
     }
 
     @NotNull
@@ -270,10 +293,7 @@ public class WebServiceSQL implements DBWServiceSQL {
     ) throws DBWebException {
         checkAndFillTruncatedData(sqlContext, resultsId, selectedRows);
         WebDBDResultSetDataProvider dataProvider = new WebDBDResultSetDataProvider(resultsId, sqlContext, selectedRows);
-        return createAndRunGenerator(
-            webSession, generatorId, Collections.singletonList(dataProvider),
-            options.useFullyQualifiedNames(), options.compactSql()
-        );
+        return createAndRunGenerator(webSession, generatorId, Collections.singletonList(dataProvider), options);
     }
 
     private void checkAndFillTruncatedData(
@@ -308,8 +328,17 @@ public class WebServiceSQL implements DBWServiceSQL {
         @NotNull WebSession session,
         @NotNull String generatorId,
         @NotNull List<DBSObject> objectList,
-        boolean useFullyQualifiedNames,
-        boolean compactSql
+        @NotNull WebSQLGeneratorOptions options
+    ) throws DBWebException {
+        return createAndRunGenerator(session.getProgressMonitor(), generatorId, objectList, options);
+    }
+
+    @NotNull
+    private String createAndRunGenerator(
+        @NotNull DBRProgressMonitor monitor,
+        @NotNull String generatorId,
+        @NotNull List<DBSObject> objectList,
+        @NotNull WebSQLGeneratorOptions options
     ) throws DBWebException {
         SQLGeneratorDescriptor generator = SQLGeneratorConfigurationRegistry.getInstance().getGenerator(generatorId);
         if (generator == null) {
@@ -317,9 +346,14 @@ public class WebServiceSQL implements DBWServiceSQL {
         }
         try {
             SQLGenerator<DBSObject> generatorInstance = generator.createGenerator(objectList);
-            generatorInstance.setFullyQualifiedNames(useFullyQualifiedNames);
-            generatorInstance.setCompactSQL(compactSql);
-            generatorInstance.run(session.getProgressMonitor());
+            generatorInstance.setFullyQualifiedNames(options.useFullyQualifiedNames());
+            generatorInstance.setCompactSQL(options.compactSql());
+            if (options.showFullDdl()) {
+                generatorInstance.setShowFullDdl(true);
+                generatorInstance.setShowComments(true);
+                generatorInstance.setShowPermissions(true);
+            }
+            generatorInstance.run(monitor);
             return generatorInstance.getResult();
         } catch (DBException e) {
             throw new DBWebException("Error creating SQL generator", e);
@@ -331,12 +365,24 @@ public class WebServiceSQL implements DBWServiceSQL {
     }
 
     @NotNull
-    private List<DBSObject> getObjectListFromNodeIds(@NotNull WebSession session, @NotNull List<String> nodePathList) throws DBWebException {
+    private List<DBSObject> getObjectListFromNodeIds(
+        @NotNull WebSession session,
+        @NotNull List<String> nodePathList
+    ) throws DBWebException {
+        return getObjectListFromNodeIds(session, session.getProgressMonitor(), nodePathList);
+    }
+
+    @NotNull
+    private List<DBSObject> getObjectListFromNodeIds(
+        @NotNull WebSession session,
+        @NotNull DBRProgressMonitor monitor,
+        @NotNull List<String> nodePathList
+    ) throws DBWebException {
         try {
             List<DBSObject> objectList = new ArrayList<>(nodePathList.size());
             DBNModel navigatorModel = session.getNavigatorModelOrThrow();
             for (String nodePath : nodePathList) {
-                DBNNode node = navigatorModel.getNodeByPath(session.getProgressMonitor(), nodePath);
+                DBNNode node = navigatorModel.getNodeByPath(monitor, nodePath);
                 if (node == null) {
                     throw new DBException("Node '" + nodePath + "' not found");
                 }

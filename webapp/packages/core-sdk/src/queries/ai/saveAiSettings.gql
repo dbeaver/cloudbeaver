@@ -1,0 +1,7 @@
+mutation saveAiSettings($settings: AISettingsConfig!) {
+  result: aiSaveSettings(settings: $settings) {
+    activeEngine
+    defaultConfiguration
+    language
+  }
+}
