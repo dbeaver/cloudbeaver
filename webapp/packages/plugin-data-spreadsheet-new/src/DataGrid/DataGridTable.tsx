@@ -56,6 +56,7 @@ import {
   DATA_CONTEXT_DV_ACTIONS,
   DATA_CONTEXT_DV_PRESENTATION_ACTIONS,
   type IDataPresentationActions,
+  isBooleanValuePresentationAvailable,
 } from '@cloudbeaver/plugin-data-viewer';
 
 import { CellRenderer } from './CellRenderer/CellRenderer.js';
@@ -613,7 +614,15 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
 
     const key: IGridDataKey = { row, column };
 
-    return tableData.isCellEditable(key);
+    const editable = tableData.isCellEditable(key);
+    const holder = tableData.getCellHolder(key);
+    const resultColumn = tableData.getColumnInfo(key.column);
+
+    if (resultColumn) {
+      return editable && !isBooleanValuePresentationAvailable(holder.value, resultColumn);
+    }
+
+    return editable;
   }
 
   return (
