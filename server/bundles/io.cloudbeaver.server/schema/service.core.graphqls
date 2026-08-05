@@ -556,7 +556,7 @@ type ConnectionInfo {
     supportedDataFormats: [ ResultDataFormat! ]!
     configurationType: DriverConfigurationType
 
-    #Access properties
+    "Access properties"
     canViewSettings: Boolean!
     canEdit: Boolean!
     canDelete: Boolean!
@@ -737,7 +737,7 @@ input ConnectionConfig {
     "ID of database driver"
     driverId: ID
 
-    # Custom connection parameters (all optional)
+    "Custom connection parameters (all optional)"
     host: String
     port: String
     serverName: String
