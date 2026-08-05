@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 
 import { Button, CommonDialogBody, CommonDialogFooter, CommonDialogHeader, CommonDialogWrapper, useResource, useTranslate } from '@cloudbeaver/core-blocks';
-import { createConnectionParam } from '@cloudbeaver/core-connections';
+import type { IConnectionInfoParams } from '@cloudbeaver/core-connections';
 import type { DialogComponent } from '@cloudbeaver/core-dialogs';
 import type { DataTransferImportSettings } from '@cloudbeaver/core-sdk';
 
@@ -28,8 +28,7 @@ export interface IDataImportDialogResult {
 
 export interface IDataImportDialogPayload {
   tableName: string;
-  projectId: string;
-  connectionId: string;
+  connectionKey: IConnectionInfoParams;
   initialState?: IDataImportDialogState;
 }
 
@@ -43,7 +42,7 @@ export const DataImportDialog: DialogComponent<IDataImportDialogPayload, IDataIm
   const driverConfigurationResource = useResource(
     DataImportDialog,
     DataImportDriverConfigurationResource,
-    createConnectionParam(payload.projectId, payload.connectionId),
+    payload.connectionKey,
     { silent: true },
   );
 

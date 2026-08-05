@@ -8,6 +8,7 @@
 import { computed, makeObservable } from 'mobx';
 
 import { ProcessSnackbar } from '@cloudbeaver/core-blocks';
+import type { IConnectionInfoParams } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { AsyncTaskInfoService, EAdminPermission, SessionPermissionsResource } from '@cloudbeaver/core-root';
@@ -39,9 +40,8 @@ export class DataImportService {
   }
 
   async importData(
-    connectionId: string,
+    connectionKey: IConnectionInfoParams,
     contextId: string,
-    projectId: string,
     resultsId: string,
     processorId: string,
     file: File,
@@ -73,9 +73,9 @@ export class DataImportService {
 
       const { taskInfo } = await this.graphQLService.sdk.dataTransferImportDataIntoResults(
         {
-          connectionId,
           contextId,
-          projectId,
+          connectionId: connectionKey.connectionId,
+          projectId: connectionKey.projectId,
           resultsId,
           parameters: { processorId, settings },
         },
