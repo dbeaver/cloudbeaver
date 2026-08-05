@@ -11,4 +11,7 @@ fragment UserConnectionNetworkHandlerProperties on ObjectPropertyInfo {
   length
   features
   required
+  conditions {
+    ...Condition
+  }
 }

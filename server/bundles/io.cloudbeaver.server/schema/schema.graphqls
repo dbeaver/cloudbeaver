@@ -1,6 +1,10 @@
-# Any object (JSON)
+####################################################
+# Base schema
+####################################################
+
+"Any object (JSON)"
 scalar Object
-# Date/Time
+"Date/Time"
 scalar DateTime
 scalar Date
 

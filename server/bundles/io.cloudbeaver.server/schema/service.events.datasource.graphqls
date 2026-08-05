@@ -1,4 +1,7 @@
 ####################################################
+# Datasource events
+####################################################
+
 extend enum CBServerEventId {
 
     "Datasource created"
