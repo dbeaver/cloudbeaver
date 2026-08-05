@@ -168,7 +168,7 @@ public class CBEventsLongPollingServlet extends HttpServlet {
             log.debug("LP request rejected: access token expired");
             sendError(resp, HttpConstants.CODE_TOKEN_EXPIRED, e.getMessage());
         } catch (SecurityException e) {
-            log.warn("LP session resolve failed", e);
+            log.debug("LP request rejected: " + e.getMessage());
             sendError(resp, HttpConstants.CODE_UNAUTHORIZED, e.getMessage());
         }
         return null;
