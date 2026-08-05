@@ -108,9 +108,9 @@ export class AuthenticationService extends Bootstrap {
     try {
       const logoutResult = await this.userInfoResource.logout(providerId, configurationId);
 
-      const sameTabRedirect = this.handleRedirectLinks(logoutResult.result);
+      this.handleRedirectLinks(logoutResult.result);
 
-      if (!sameTabRedirect && !this.administrationScreenService.isConfigurationMode && !providerId) {
+      if (!this.administrationScreenService.isConfigurationMode && !providerId) {
         this.screenService.navigateToRoot();
       }
 
@@ -121,8 +121,7 @@ export class AuthenticationService extends Bootstrap {
   }
 
   // TODO handle all redirect links once we know what to do with multiple popups issue
-  /** @returns true if a full-page redirect in the current tab*/
-  private handleRedirectLinks(userLogoutInfo: UserLogoutInfo): boolean {
+  private handleRedirectLinks(userLogoutInfo: UserLogoutInfo) {
     const redirectLinks = userLogoutInfo.redirectLinks;
 
     if (redirectLinks.length) {
@@ -130,7 +129,7 @@ export class AuthenticationService extends Bootstrap {
 
       if (redirectLink.sameTabRedirect) {
         window.location.replace(redirectLink.url);
-        return true;
+        return;
       }
 
       const id = `okta-logout-id-${uuid()}`;
@@ -147,8 +146,6 @@ export class AuthenticationService extends Bootstrap {
         window.focus();
       }
     }
-
-    return false;
   }
 
   private async auth(persistent: boolean, options: IAuthOptions) {
