@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,12 @@ package io.cloudbeaver.service.auth;
 
 import org.jkiss.code.NotNull;
 
-import java.util.List;
-
-public record WebLogoutInfo(@NotNull List<WebLogoutLink> redirectLinks) {
+/**
+ * A single logout redirect link.
+ *
+ * @param url             the URL to open on logout
+ * @param sameTabRedirect if true, the URL must be opened as a full-page redirect
+ *                        in the current tab instead of a popup window
+ */
+public record WebLogoutLink(@NotNull String url, boolean sameTabRedirect) {
 }
