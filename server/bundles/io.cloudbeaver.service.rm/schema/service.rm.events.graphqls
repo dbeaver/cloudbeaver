@@ -1,3 +1,7 @@
+####################################################
+# Resource manager events
+####################################################
+
 extend enum CBServerEventId {
     "Resource manager resource created"
     cb_rm_resource_created,

@@ -56,6 +56,7 @@ import {
   DATA_CONTEXT_DV_ACTIONS,
   DATA_CONTEXT_DV_PRESENTATION_ACTIONS,
   type IDataPresentationActions,
+  isBooleanValuePresentationAvailable,
 } from '@cloudbeaver/plugin-data-viewer';
 
 import { CellRenderer } from './CellRenderer/CellRenderer.js';
@@ -209,15 +210,21 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
     },
     unpinColumns(keys) {
       tableData.view.unpinColumns(keys.map(key => key.column));
+      // re-select the focused cell so the highlight follows the column to its new position after reordering
+      handlers.focusCell(selectionAction.getFocusedElement(), false, true);
     },
     pinColumns(keys) {
       tableData.view.pinColumns(keys.map(key => key.column));
+      // re-select the focused cell so the highlight follows the column to its new position after reordering
+      handlers.focusCell(selectionAction.getFocusedElement(), false, true);
     },
     isColumnPinned(key) {
       return tableData.view.isColumnPinned(key.column);
     },
     unpinAllColumns() {
       tableData.view.unpinAllColumns();
+      // re-select the focused cell so the highlight follows the column to its new position after reordering
+      handlers.focusCell(selectionAction.getFocusedElement(), false, true);
     },
     hasPinnedColumns() {
       return tableData.view.hasPinnedColumns();
@@ -613,7 +620,15 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
 
     const key: IGridDataKey = { row, column };
 
-    return tableData.isCellEditable(key);
+    const editable = tableData.isCellEditable(key);
+    const holder = tableData.getCellHolder(key);
+    const resultColumn = tableData.getColumnInfo(key.column);
+
+    if (resultColumn) {
+      return editable && !isBooleanValuePresentationAvailable(holder.value, resultColumn);
+    }
+
+    return editable;
   }
 
   return (
