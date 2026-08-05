@@ -25,6 +25,10 @@ export * from './CommonDialog/DialogsPortal.js';
 export * from './ExportImageDialog/ExportImageDialogLazy.js';
 export * from './ExportImageDialog/ExportImageFormats.js';
 
+export * from './Export/ExportButtonLazy.js';
+export * from './Export/GridAction.js';
+export * from './Export/IExportFilterEntry.js';
+
 export * from './ErrorDetailsDialog/ErrorDetailsDialog.js';
 
 export * from './ComponentsRegistry/CRegistryLoader.js';

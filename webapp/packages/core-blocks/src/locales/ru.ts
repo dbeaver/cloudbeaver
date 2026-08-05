@@ -13,5 +13,10 @@ export default [
   ['core_blocks_export_image_dialog_title', 'Экспортировать как изображение'],
   ['core_blocks_export_image_dialog_format', 'Формат файла'],
   ['core_blocks_export_image_dialog_transparent_background', 'Прозрачный фон'],
+  ['core_blocks_export_title', 'Экспорт в CSV'],
+  ['core_blocks_export_confirm_title', 'Экспорт'],
+  ['core_blocks_export_confirm_with_filters', 'Экспорт будет включать данные со следующими фильтрами:'],
+  ['core_blocks_export_confirm_default', 'Будут экспортированы все данные.'],
+  ['core_blocks_export_change_filters', 'Изменить фильтры'],
   ['core_blocks_dialog_element_close_tooltip', 'Закрыть панель'],
 ];

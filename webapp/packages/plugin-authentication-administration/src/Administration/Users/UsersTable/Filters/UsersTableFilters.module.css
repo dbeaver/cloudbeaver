@@ -16,10 +16,20 @@
 }
 
 .actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.buttonBox {
   composes: theme-form-element-radius theme-background-surface theme-text-on-surface theme theme-border-color-background from global;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   box-sizing: border-box;
   border: 2px solid;
   height: 32px;
+  overflow: hidden;
 }
 
 .button {
