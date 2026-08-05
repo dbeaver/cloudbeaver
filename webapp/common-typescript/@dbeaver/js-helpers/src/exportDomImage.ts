@@ -87,5 +87,5 @@ function resolveSize(node: Element, config?: IDomImageExportConfig): { width: nu
 
   const rect = node.getBoundingClientRect();
 
-  return { width: config?.width ?? rect.width, height: config?.height ?? rect.height };
+  return { width: rect.width, height: rect.height };
 }
