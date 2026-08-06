@@ -76,7 +76,7 @@ export const SubMenuElement = observer<ISubMenuElementProps>(function SubMenuEle
     }
 
     const hasVisibleItems = subMenuData.items.some(item => !item.hidden);
-    const canLazyLoadItems = subMenuData.loaders.length > 0;
+    const canLazyLoadItems = subMenuData.loaders.some(loader => !loader.isLoaded());
 
     return !hasVisibleItems && !canLazyLoadItems;
   });
