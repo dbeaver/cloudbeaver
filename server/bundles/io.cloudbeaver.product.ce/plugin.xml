@@ -17,7 +17,7 @@
     </extension>
 
     <extension point="io.cloudbeaver.feature">
-        <feature id="ai" label="AI Integration" description="Enables AI Chat in the application."/>
+        <feature id="ai" label="AI Integration" description="Enables AI Chat in the application." enabledByDefault="true"/>
     </extension>
 
     <extension point="org.jkiss.dbeaver.application">

@@ -29,6 +29,7 @@ public class WebRegistryConstant {
     public static final String ATTR_REQUIRED = "required";
     public static final String ATTR_AUTH_HIDDEN = "authHidden";
     public static final String ATTR_CASE_INSENSITIVE = "caseInsensitive";
+    public static final String ATTR_SAME_TAB_LOGOUT_REDIRECT = "sameTabRedirectOnLogout";
     public static final String ATTR_REQUIRED_FEATURES = "requiredFeatures";
     public static final String ATTR_CATEGORIES = "categories";
     public static final String ATTR_SERVICE_PROVIDER = "serviceProvider";
