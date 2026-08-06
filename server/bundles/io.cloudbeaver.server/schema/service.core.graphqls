@@ -585,6 +585,8 @@ type DriverConfiguration {
     supportsBulkLoad: Boolean!
     "Whether the connection's database supports transactions"
     supportsTransactions: Boolean!
+    "Default value for the 'open new connection(s)' import setting"
+    defaultOpenNewConnection: Boolean!
 }
 
 "Generic dictionary value: an identifier with a human readable name and an optional description"

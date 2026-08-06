@@ -446,6 +446,9 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
         consumerSettings.setUseTransactions(CommonUtils.getBoolean(
             settings.get(DTConstants.PROP_USE_TRANSACTIONS),
             consumerSettings.isUseTransactions()));
+        consumerSettings.setOpenNewConnections(CommonUtils.getBoolean(
+            settings.get(DTConstants.PROP_OPEN_NEW_CONNECTION),
+            consumerSettings.isOpenNewConnections()));
     }
 
 }

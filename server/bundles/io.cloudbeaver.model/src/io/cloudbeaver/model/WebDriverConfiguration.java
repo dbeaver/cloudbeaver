@@ -72,4 +72,13 @@ public class WebDriverConfiguration {
         DBPDataSource dataSource = dataSourceContainer.getDataSource();
         return dataSource != null && dataSource.getInfo().supportsTransactions();
     }
+
+    /**
+     * Default value for the 'open new connection(s)' import setting.
+     * Not driver-dependent
+     */
+    @Property
+    public boolean isDefaultOpenNewConnection() {
+        return true;
+    }
 }
