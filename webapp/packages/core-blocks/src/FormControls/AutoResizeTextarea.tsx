@@ -45,7 +45,11 @@ export const AutoResizeTextarea: Props = observer(function AutoResizeTextarea({
   }, []);
 
   useLayoutEffect(() => {
-    adjustHeight();
+    const frame = requestAnimationFrame(() => {
+      adjustHeight();
+    });
+
+    return () => cancelAnimationFrame(frame);
   }, [value, adjustHeight]);
 
   const mergedRef = useMergeRefs(...[innerRef, ref!].filter(Boolean));
