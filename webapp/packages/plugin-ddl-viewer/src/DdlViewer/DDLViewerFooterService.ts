@@ -8,7 +8,7 @@
 import { ConnectionInfoResource, createConnectionParam } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { EObjectFeature, NavNodeInfoResource, NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
-import { download, withTimestamp } from '@cloudbeaver/core-utils';
+import { download, MetadataMap, withTimestamp } from '@cloudbeaver/core-utils';
 import { ACTION_SAVE, ActionService, MenuService } from '@cloudbeaver/core-view';
 import { DDL_GENERATOR_ID, SqlGeneratorsResource } from '@cloudbeaver/plugin-sql-generator';
 import { LocalStorageSqlDataSource } from '@cloudbeaver/plugin-sql-editor';
@@ -17,7 +17,6 @@ import { ACTION_SQL_EDITOR_OPEN, SqlEditorNavigatorService } from '@cloudbeaver/
 import { ACTION_DDL_VIEWER_FULL_DDL } from './ACTION_DDL_VIEWER_FULL_DDL.js';
 import { DATA_CONTEXT_DDL_VIEWER_NODE } from './DATA_CONTEXT_DDL_VIEWER_NODE.js';
 import { DATA_CONTEXT_DDL_VIEWER_QUERY } from './DATA_CONTEXT_DDL_VIEWER_QUERY.js';
-import { DDLQueryStateService } from './DDLQueryStateService.js';
 import { MENU_DDL_VIEWER_FOOTER } from './MENU_DDL_VIEWER_FOOTER.js';
 
 @injectable(() => [
@@ -26,21 +25,33 @@ import { MENU_DDL_VIEWER_FOOTER } from './MENU_DDL_VIEWER_FOOTER.js';
   MenuService,
   SqlEditorNavigatorService,
   ConnectionInfoResource,
-  DDLQueryStateService,
   NavNodeInfoResource,
   SqlGeneratorsResource,
 ])
 export class DDLViewerFooterService {
+  private readonly fullDdlState = new MetadataMap<string, boolean>(() => false);
+
   constructor(
     private readonly navNodeManagerService: NavNodeManagerService,
     private readonly actionsService: ActionService,
     private readonly menuService: MenuService,
     private readonly sqlEditorNavigatorService: SqlEditorNavigatorService,
     private readonly connectionInfoResource: ConnectionInfoResource,
-    private readonly ddlQueryStateService: DDLQueryStateService,
     private readonly navNodeInfoResource: NavNodeInfoResource,
     private readonly sqlGeneratorsResource: SqlGeneratorsResource,
   ) {}
+
+  isFullDdlEnabled(nodeId: string): boolean {
+    return this.fullDdlState.get(nodeId);
+  }
+
+  setFullDdlEnabled(nodeId: string, value: boolean): void {
+    this.fullDdlState.set(nodeId, value);
+  }
+
+  toggleFullDdl(nodeId: string): void {
+    this.setFullDdlEnabled(nodeId, !this.isFullDdlEnabled(nodeId));
+  }
 
   register(): void {
     this.actionsService.addHandler({
@@ -111,7 +122,7 @@ export class DDLViewerFooterService {
     this.menuService.addCreator({
       menus: [MENU_DDL_VIEWER_FOOTER],
       contexts: [DATA_CONTEXT_DDL_VIEWER_NODE],
-      isApplicable: context => this.hasFullDdl(context.get(DATA_CONTEXT_DDL_VIEWER_NODE)!),
+      isApplicable: context => this.isFullDDLSupported(context.get(DATA_CONTEXT_DDL_VIEWER_NODE)!),
       getItems: (context, items) => [...items, ACTION_DDL_VIEWER_FULL_DDL],
     });
 
@@ -120,16 +131,16 @@ export class DDLViewerFooterService {
       menus: [MENU_DDL_VIEWER_FOOTER],
       actions: [ACTION_DDL_VIEWER_FULL_DDL],
       contexts: [DATA_CONTEXT_DDL_VIEWER_NODE],
-      isChecked: context => this.ddlQueryStateService.isFullDdlEnabled(context.get(DATA_CONTEXT_DDL_VIEWER_NODE)!),
+      isChecked: context => this.isFullDdlEnabled(context.get(DATA_CONTEXT_DDL_VIEWER_NODE)!),
       handler: (context, action) => {
         if (action === ACTION_DDL_VIEWER_FULL_DDL) {
-          this.ddlQueryStateService.toggleFullDdl(context.get(DATA_CONTEXT_DDL_VIEWER_NODE)!);
+          this.toggleFullDdl(context.get(DATA_CONTEXT_DDL_VIEWER_NODE)!);
         }
       },
     });
   }
 
-  private hasFullDdl(nodeId: string): boolean {
+  private isFullDDLSupported(nodeId: string): boolean {
     const supportsFullDdl = this.navNodeInfoResource.get(nodeId)?.objectFeatures.includes(EObjectFeature.supportsFullDdl) ?? false;
     const ddlGenerator = this.sqlGeneratorsResource
       .get(nodeId)

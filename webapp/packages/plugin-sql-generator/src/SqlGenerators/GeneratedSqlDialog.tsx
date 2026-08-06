@@ -144,16 +144,12 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<Payload>>(functi
             <div className="tw:flex tw:flex-row tw:gap-3 tw:w-full">
               <Checkbox
                 id="use-fully-qualified-names"
-                state={state}
-                name="useFullyQualifiedNames"
                 disabled={visibleLoading}
                 label={translate('app_shared_sql_generators_use_fully_qualified_names')}
                 onChange={value => state.handleOptionChange('useFullyQualifiedNames', value)}
               />
               <Checkbox
                 id="compact-sql"
-                state={state}
-                name="compactSql"
                 disabled={visibleLoading}
                 label={translate('app_shared_sql_generators_compact_sql')}
                 onChange={value => state.handleOptionChange('compactSql', value)}
@@ -161,8 +157,6 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<Payload>>(functi
               {hasFullDdl && (
                 <Checkbox
                   id="show-full-ddl"
-                  state={state}
-                  name="showFullDdl"
                   disabled={visibleLoading}
                   label={translate('app_shared_sql_generators_full_ddl')}
                   onChange={value => state.handleOptionChange('showFullDdl', value)}

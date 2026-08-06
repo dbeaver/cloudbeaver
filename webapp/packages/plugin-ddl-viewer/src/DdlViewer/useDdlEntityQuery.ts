@@ -11,7 +11,7 @@ import { useObservableRef, useResource } from '@cloudbeaver/core-blocks';
 import type { ILoadableState } from '@cloudbeaver/core-utils';
 import { DDL_GENERATOR_ID, getDefaultQueryGeneratorOptions, SqlGeneratorsResource } from '@cloudbeaver/plugin-sql-generator';
 import { useService } from '@cloudbeaver/core-di';
-import { DDLQueryStateService } from './DDLQueryStateService.js';
+import { DDLViewerFooterService } from './DDLViewerFooterService.js';
 
 interface IState extends ILoadableState {
   query: string | null;
@@ -21,12 +21,12 @@ interface IState extends ILoadableState {
   nodeId: string;
   sqlGeneratorsResource: SqlGeneratorsResource;
   ddlGeneratorId: string | null;
-  ddlViewerService: DDLQueryStateService;
+  ddlViewerFooterService: DDLViewerFooterService;
   getCurrentKey: () => string | null;
 }
 
 export function useDdlEntityQuery(nodeId: string): IState {
-  const ddlViewerService = useService(DDLQueryStateService);
+  const ddlViewerFooterService = useService(DDLViewerFooterService);
   const sqlGeneratorsResource = useResource(useDdlEntityQuery, SqlGeneratorsResource, nodeId);
   const ddlGenerator = sqlGeneratorsResource.data?.find(generator => generator.id.toLowerCase().includes(DDL_GENERATOR_ID.toLowerCase()));
   const ddlGeneratorId = ddlGenerator?.id ?? null;
@@ -57,7 +57,7 @@ export function useDdlEntityQuery(nodeId: string): IState {
           return null;
         }
 
-        const isFullDdl = this.ddlViewerService.isFullDdlEnabled(this.nodeId);
+        const isFullDdl = this.ddlViewerFooterService.isFullDdlEnabled(this.nodeId);
 
         return `${this.nodeId}::${this.ddlGeneratorId}::${isFullDdl}`;
       },
@@ -67,7 +67,7 @@ export function useDdlEntityQuery(nodeId: string): IState {
         }
 
         const key = this.getCurrentKey();
-        const isFullDdl = this.ddlViewerService.isFullDdlEnabled(this.nodeId);
+        const isFullDdl = this.ddlViewerFooterService.isFullDdlEnabled(this.nodeId);
 
         try {
           this.exception = null;
@@ -92,7 +92,7 @@ export function useDdlEntityQuery(nodeId: string): IState {
       nodeId: observable.ref,
       ddlGeneratorId: observable.ref,
     },
-    { nodeId, ddlGeneratorId, sqlGeneratorsResource: sqlGeneratorsResource.resource, ddlViewerService },
+    { nodeId, ddlGeneratorId, sqlGeneratorsResource: sqlGeneratorsResource.resource, ddlViewerFooterService },
   );
 
   return state;
