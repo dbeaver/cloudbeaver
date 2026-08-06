@@ -1038,7 +1038,7 @@ public class LocalResourceController extends BaseLocalResourceController {
                     throw new DBException("Resource points to project root");
                 }
                 String firstSegment = relative.getName(0).toString();
-                if (ResourceTypeRegistry.getInstance().getResourceType(firstSegment) == null) {
+                if (ResourceTypeRegistry.getInstance().getResourceTypeByRootPath(null, firstSegment) == null) {
                     throw new DBException("Invalid resource type");
                 }
             }
