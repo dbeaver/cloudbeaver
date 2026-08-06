@@ -40,6 +40,8 @@ export default [
   ['authentication_administration_users_export_confirm_with_filters', 'The export will include users matching the following filters:'],
   ['authentication_administration_users_export_confirm_default', 'All users will be exported.'],
   ['authentication_administration_users_export_filter_search', 'Search'],
+  ['authentication_administration_users_export_fail', 'Users export failed'],
+  ['authentication_administration_users_export_fail_status', 'Failed to export users, status: {arg:status}'],
   ['authentication_administration_users_empty', 'There are no users'],
   ['authentication_administration_users_delete_user', 'Delete user'],
   ['authentication_administration_users_delete_user_fail', 'Failed to delete user'],

@@ -9,7 +9,9 @@ import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
 
 import { ExportButton, Filter, Group, IconOrImage, type IExportFilterEntry, Loader, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
-import { GlobalConstants, objectToFormFields, submitForm } from '@cloudbeaver/core-utils';
+import { NotificationService } from '@cloudbeaver/core-events';
+import { useService } from '@cloudbeaver/core-di';
+import { download, GlobalConstants } from '@cloudbeaver/core-utils';
 
 import styles from './UsersTableFilters.module.css';
 import { UsersTableFiltersDetails } from './UsersTableFiltersDetails.js';
@@ -22,6 +24,7 @@ interface Props {
 export const UsersTableFilters = observer<Props>(function UsersTableFilters({ filters }) {
   const translate = useTranslate();
   const style = useS(styles);
+  const notificationService = useService(NotificationService);
 
   const [open, setOpen] = useState(false);
 
@@ -38,21 +41,47 @@ export const UsersTableFilters = observer<Props>(function UsersTableFilters({ fi
     exportFilters.push({ key: 'role', label: 'authentication_user_role', value: filters.role });
   }
 
-  function exportUsers() {
-    const options: Record<string, unknown> = {};
-    const userIdMask = filters.search.trim();
+  async function exportUsers() {
+    try {
+      const options: Record<string, string> = {};
+      const userIdMask = filters.search.trim();
 
-    if (userIdMask) {
-      options['userIdMask'] = userIdMask;
-    }
-    if (filters.status !== 'all') {
-      options['status'] = filters.status === 'true';
-    }
-    if (filters.role !== USER_ROLE_ALL) {
-      options['authRole'] = filters.role;
-    }
+      if (userIdMask) {
+        options['userIdMask'] = userIdMask;
+      }
 
-    submitForm(GlobalConstants.absoluteServiceUrl('admin', 'export-users-csv'), objectToFormFields(options));
+      if (filters.status !== 'all') {
+        options['status'] = String(filters.status === 'true');
+      }
+
+      if (filters.role !== USER_ROLE_ALL) {
+        options['authRole'] = filters.role;
+      }
+
+      const response = await fetch(GlobalConstants.absoluteServiceUrl('admin', 'export-users-csv'), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(options),
+      });
+
+      if (!response.ok) {
+        notificationService.logError({
+          title: 'authentication_administration_users_export_fail',
+          message: translate('authentication_administration_users_export_fail_status', undefined, { status: response.status }),
+        });
+        return;
+      }
+
+      const contentDisposition = response.headers.get('Content-Disposition');
+      const fileName = contentDisposition?.match(/filename="?([^"]+)"?/)?.[1] ?? 'users.csv';
+
+      const blob = await response.blob();
+      download(blob, fileName);
+    } catch (exception: any) {
+      notificationService.logException(exception, 'authentication_administration_users_export_fail');
+    }
   }
 
   return (

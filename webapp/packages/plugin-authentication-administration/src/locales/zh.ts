@@ -39,6 +39,8 @@ export default [
   ['authentication_administration_users_export_confirm_with_filters', '导出将包含符合以下筛选条件的用户：'],
   ['authentication_administration_users_export_confirm_default', '将导出所有用户。'],
   ['authentication_administration_users_export_filter_search', '搜索'],
+  ['authentication_administration_users_export_fail', '用户导出失败'],
+  ['authentication_administration_users_export_fail_status', '用户导出失败，状态：{arg:status}'],
   ['authentication_administration_users_empty', '无用户'],
   ['authentication_administration_users_delete_user', '删除用户'],
   ['authentication_administration_users_delete_user_fail', '删除用户失败'],

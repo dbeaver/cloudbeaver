@@ -40,6 +40,8 @@ export default [
   ['authentication_administration_users_export_confirm_with_filters', 'The export will include users matching the following filters:'],
   ['authentication_administration_users_export_confirm_default', 'All users will be exported.'],
   ['authentication_administration_users_export_filter_search', 'Search'],
+  ['authentication_administration_users_export_fail', 'Xuất người dùng thất bại'],
+  ['authentication_administration_users_export_fail_status', 'Xuất người dùng thất bại, trạng thái: {arg:status}'],
   ['authentication_administration_users_empty', 'Không có người dùng nào'],
   ['authentication_administration_users_delete_user', 'Xóa người dùng'],
   ['authentication_administration_users_delete_user_fail', 'Xóa người dùng thất bại'],

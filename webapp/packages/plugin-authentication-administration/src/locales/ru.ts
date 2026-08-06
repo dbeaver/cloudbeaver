@@ -40,6 +40,8 @@ export default [
   ['authentication_administration_users_export_confirm_with_filters', 'Экспорт будет включать пользователей, соответствующих следующим фильтрам:'],
   ['authentication_administration_users_export_confirm_default', 'Будут экспортированы все пользователи.'],
   ['authentication_administration_users_export_filter_search', 'Поиск'],
+  ['authentication_administration_users_export_fail', 'Не удалось экспортировать пользователей'],
+  ['authentication_administration_users_export_fail_status', 'Не удалось экспортировать пользователей, статус: {arg:status}'],
   ['authentication_administration_users_empty', 'Нет пользователей'],
   ['authentication_administration_users_delete_user', 'Удалить пользователя'],
   ['authentication_administration_users_delete_user_fail', 'Не удалось удалить пользователя'],
