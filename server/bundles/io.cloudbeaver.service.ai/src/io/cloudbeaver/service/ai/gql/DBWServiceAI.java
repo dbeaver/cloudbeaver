@@ -139,6 +139,12 @@ public interface DBWServiceAI extends DBWService {
         @NotNull String messageId
     ) throws DBWebException;
 
+    @WebAction
+    boolean cancelChatMessage(
+        @NotNull WebSession webSession,
+        @NotNull String conversationId
+    ) throws DBWebException;
+
     @NotNull
     @WebAction
     WebAIDataSourceSettings getDataSourceAiSettings(
