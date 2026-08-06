@@ -15,6 +15,7 @@ import { TableSelectionContext } from './TableSelectionContext.js';
 
 interface BaseProps {
   disabled?: boolean;
+  title?: string;
 }
 
 export interface ITableRowRootSelectProps extends BaseProps {
@@ -29,7 +30,7 @@ export interface ITableRowSelectProps extends BaseProps {
 
 const CELL_CLASS_NAME = 'tw:flex tw:w-full tw:h-full tw:items-center tw:justify-center';
 
-export const TableRowSelect = observer<ITableRowRootSelectProps | ITableRowSelectProps>(function TableRowSelect({ isRoot, id, disabled }) {
+export const TableRowSelect = observer<ITableRowRootSelectProps | ITableRowSelectProps>(function TableRowSelect({ isRoot, id, disabled, title }) {
   const selection = use(TableSelectionContext);
   const translate = useTranslate();
 
@@ -47,6 +48,7 @@ export const TableRowSelect = observer<ITableRowRootSelectProps | ITableRowSelec
         className={CELL_CLASS_NAME}
         aria-label={translate('ui_select_all')}
         tabIndex={0}
+        title={title}
         checked={checked}
         indeterminate={indeterminate}
         disabled={rootDisabled}
@@ -61,6 +63,7 @@ export const TableRowSelect = observer<ITableRowRootSelectProps | ITableRowSelec
     <Checkbox
       className={CELL_CLASS_NAME}
       aria-label={translate('plugin_data_grid_table_row_select')}
+      title={title}
       tabIndex={0}
       checked={checked}
       disabled={disabled}

@@ -43,6 +43,10 @@ export default [
   ['plugin_ai_administration_profile_form_tab_options', 'Profile'],
   ['plugin_ai_administration_profile_name_max_length', 'Profile name must not exceed {arg:length} characters'],
   ['plugin_ai_administration_profile_name_min_length', 'Profile name must be at least {arg:length} characters'],
+  [
+    'plugin_ai_administration_profile_default_delete_info',
+    'The default profile cannot be deleted. Please select another profile as the default before deleting this profile.',
+  ],
   ['plugin_ai_administration_profile_create', 'New Profile'],
   ['plugin_ai_administration_profile_edit', 'Edit Profile'],
 ];
