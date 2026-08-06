@@ -8,14 +8,13 @@
 import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
 
-import { ExportButton, Filter, Group, IconOrImage, type IExportFilterEntry, Loader, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
-import { NotificationService } from '@cloudbeaver/core-events';
+import { Filter, Group, IconOrImage, Loader, Placeholder, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { download, GlobalConstants } from '@cloudbeaver/core-utils';
 
+import { UsersAdministrationService } from '../../UsersAdministrationService.js';
 import styles from './UsersTableFilters.module.css';
 import { UsersTableFiltersDetails } from './UsersTableFiltersDetails.js';
-import { type IUserFilters, USER_ROLE_ALL, USER_STATUSES } from './useUsersTableFilters.js';
+import type { IUserFilters } from './useUsersTableFilters.js';
 
 interface Props {
   filters: IUserFilters;
@@ -24,65 +23,9 @@ interface Props {
 export const UsersTableFilters = observer<Props>(function UsersTableFilters({ filters }) {
   const translate = useTranslate();
   const style = useS(styles);
-  const notificationService = useService(NotificationService);
+  const usersAdministrationService = useService(UsersAdministrationService);
 
   const [open, setOpen] = useState(false);
-
-  const exportFilters: IExportFilterEntry[] = [];
-  const search = filters.search.trim();
-  if (search) {
-    exportFilters.push({ key: 'search', label: 'authentication_administration_users_export_filter_search', value: search });
-  }
-  if (filters.status !== 'all') {
-    const status = USER_STATUSES.find(item => item.value === filters.status);
-    exportFilters.push({ key: 'status', label: 'authentication_user_status', value: status ? translate(status.label) : filters.status });
-  }
-  if (filters.role !== USER_ROLE_ALL) {
-    exportFilters.push({ key: 'role', label: 'authentication_user_role', value: filters.role });
-  }
-
-  async function exportUsers() {
-    try {
-      const options: Record<string, string> = {};
-      const userIdMask = filters.search.trim();
-
-      if (userIdMask) {
-        options['userIdMask'] = userIdMask;
-      }
-
-      if (filters.status !== 'all') {
-        options['status'] = String(filters.status === 'true');
-      }
-
-      if (filters.role !== USER_ROLE_ALL) {
-        options['authRole'] = filters.role;
-      }
-
-      const response = await fetch(GlobalConstants.absoluteServiceUrl('admin', 'export-users-csv'), {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(options),
-      });
-
-      if (!response.ok) {
-        notificationService.logError({
-          title: 'authentication_administration_users_export_fail',
-          message: translate('authentication_administration_users_export_fail_status', undefined, { status: response.status }),
-        });
-        return;
-      }
-
-      const contentDisposition = response.headers.get('Content-Disposition');
-      const fileName = contentDisposition?.match(/filename="?([^"]+)"?/)?.[1] ?? 'users.csv';
-
-      const blob = await response.blob();
-      download(blob, fileName);
-    } catch (exception: any) {
-      notificationService.logException(exception, 'authentication_administration_users_export_fail');
-    }
-  }
 
   return (
     <Group parent compact gap>
@@ -99,16 +42,11 @@ export const UsersTableFilters = observer<Props>(function UsersTableFilters({ fi
               <IconOrImage className={s(style, { iconOrImage: true })} icon="filter" />
             </div>
           </div>
-          <div className={s(style, { buttonBox: true })}>
-            <ExportButton
-              filters={exportFilters}
-              title="authentication_administration_users_export_title"
-              confirmTitle="authentication_administration_users_export_confirm_title"
-              descriptionWithFilters="authentication_administration_users_export_confirm_with_filters"
-              descriptionDefault="authentication_administration_users_export_confirm_default"
-              exportHandler={exportUsers}
-            />
-          </div>
+          {usersAdministrationService.exportPlaceholder.getDisplayed({ filters }).length > 0 && (
+            <div className={s(style, { buttonBox: true })}>
+              <Placeholder container={usersAdministrationService.exportPlaceholder} filters={filters} />
+            </div>
+          )}
         </div>
       </div>
 

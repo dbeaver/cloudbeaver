@@ -17,6 +17,7 @@ import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dial
 import { CreateTeamService } from './Teams/TeamsTable/CreateTeamService.js';
 import { EUsersAdministrationSub, UsersAdministrationNavigationService } from './UsersAdministrationNavigationService.js';
 import { CreateUserService } from './UsersTable/CreateUserService.js';
+import type { IUserFilters } from './UsersTable/Filters/useUsersTableFilters.js';
 
 const UserCredentialsList = React.lazy(async () => {
   const { UserCredentialsList } = await import('./UsersTable/UserCredentialsList.js');
@@ -37,11 +38,16 @@ export interface IUserDetailsInfoProps {
   user: AdminUser;
 }
 
+export interface IUsersExportProps {
+  filters: IUserFilters;
+}
+
 @injectable(() => [AdministrationItemService, CreateUserService, TeamsResource, CreateTeamService, UsersResource, CommonDialogService])
 export class UsersAdministrationService extends Bootstrap {
   readonly tabsContainer: TabsContainer;
   readonly userDetailsInfoPlaceholder: PlaceholderContainer<IUserDetailsInfoProps>;
   readonly informationPlaceholder: PlaceholderContainer;
+  readonly exportPlaceholder: PlaceholderContainer<IUsersExportProps>;
   administrationItem!: IAdministrationItem;
 
   constructor(
@@ -56,6 +62,7 @@ export class UsersAdministrationService extends Bootstrap {
     this.userDetailsInfoPlaceholder = new PlaceholderContainer();
     this.tabsContainer = new TabsContainer('Access Control');
     this.informationPlaceholder = new PlaceholderContainer();
+    this.exportPlaceholder = new PlaceholderContainer();
   }
 
   override register(): void {
