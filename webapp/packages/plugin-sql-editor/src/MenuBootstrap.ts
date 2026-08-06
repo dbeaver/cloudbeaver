@@ -313,7 +313,7 @@ export class MenuBootstrap extends Bootstrap {
       contexts: [DATA_CONTEXT_SQL_EDITOR_DATA],
       isBindingApplicable: (contexts, action) => {
         const sqlEditorData = contexts.get(DATA_CONTEXT_SQL_EDITOR_DATA);
-        return action === ACTION_SQL_EDITOR_EXECUTE_SCRIPT && sqlEditorData?.isExecutionAllowed === true;
+        return action === ACTION_SQL_EDITOR_EXECUTE_SCRIPT && sqlEditorData?.isExecutionAllowed() === true;
       },
       handler: this.sqlEditorActionHandler.bind(this),
     });

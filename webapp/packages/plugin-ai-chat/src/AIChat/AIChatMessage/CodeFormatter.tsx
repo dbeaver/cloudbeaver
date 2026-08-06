@@ -62,7 +62,7 @@ export const CodeFormatter = observer<Props>(function CodeFormatter({ code, conv
           <ActionIconButton
             name="/icons/sql_exec.svg"
             title={translate('plugin_ai_chat_query_execute')}
-            hidden={!aiChatMessageActionsService.isAllowed}
+            hidden={!aiChatMessageActionsService.isAllowed(connectionKey)}
             disabled={disabled}
             img
             onClick={execute}
