@@ -10,6 +10,7 @@ import { Bootstrap, Dependency, ModuleRegistry, proxy } from '@cloudbeaver/core-
 import { ExtendedDDLResource } from './ExtendedDDLViewer/ExtendedDDLResource.js';
 import { DdlViewerBootstrap } from './DdlViewerBootstrap.js';
 import { DDLViewerFooterService } from './DdlViewer/DDLViewerFooterService.js';
+import { DDLQueryStateService } from './DdlViewer/DDLQueryStateService.js';
 import { LocaleService } from './LocaleService.js';
 
 export default ModuleRegistry.add({
@@ -21,6 +22,7 @@ export default ModuleRegistry.add({
       .addSingleton(Bootstrap, LocaleService)
       .addSingleton(Dependency, proxy(ExtendedDDLResource))
       .addSingleton(DDLViewerFooterService)
+      .addSingleton(DDLQueryStateService)
       .addSingleton(ExtendedDDLResource);
   },
 });

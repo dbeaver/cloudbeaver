@@ -7,29 +7,30 @@
  */
 import { observable } from 'mobx';
 
-import { useObservableRef } from '@cloudbeaver/core-blocks';
+import { useObservableRef, useResource } from '@cloudbeaver/core-blocks';
 import type { ILoadableState } from '@cloudbeaver/core-utils';
-import { getDefaultQueryGeneratorOptions, SqlGeneratorsResource } from '@cloudbeaver/plugin-sql-generator';
+import { DDL_GENERATOR_ID, getDefaultQueryGeneratorOptions, SqlGeneratorsResource } from '@cloudbeaver/plugin-sql-generator';
 import { useService } from '@cloudbeaver/core-di';
-
-interface IPayload {
-  nodeId: string;
-  generatorId: string | null;
-  showFullDdl: boolean;
-}
+import { DDLQueryStateService } from './DDLQueryStateService.js';
 
 interface IState extends ILoadableState {
   query: string | null;
   exception: Error | null;
   promise: Promise<string> | null;
   key: string | null;
-  payload: IPayload;
+  nodeId: string;
   sqlGeneratorsResource: SqlGeneratorsResource;
+  ddlGeneratorId: string | null;
+  ddlViewerService: DDLQueryStateService;
   getCurrentKey: () => string | null;
 }
 
-export function useDdlEntityQuery(payload: IPayload): IState {
-  const sqlGeneratorsResource = useService(SqlGeneratorsResource);
+export function useDdlEntityQuery(nodeId: string): IState {
+  const ddlViewerService = useService(DDLQueryStateService);
+  const sqlGeneratorsResource = useResource(useDdlEntityQuery, SqlGeneratorsResource, nodeId);
+  const ddlGenerator = sqlGeneratorsResource.data?.find(generator => generator.id.toLowerCase().includes(DDL_GENERATOR_ID.toLowerCase()));
+  const ddlGeneratorId = ddlGenerator?.id ?? null;
+
   const state = useObservableRef<IState>(
     () => ({
       query: null,
@@ -37,7 +38,7 @@ export function useDdlEntityQuery(payload: IPayload): IState {
       promise: null,
       key: null,
       isLoadable() {
-        return this.payload.generatorId !== null;
+        return this.ddlGeneratorId !== null;
       },
       isLoaded() {
         return this.query !== null;
@@ -52,26 +53,27 @@ export function useDdlEntityQuery(payload: IPayload): IState {
         return this.getCurrentKey() !== this.key;
       },
       getCurrentKey() {
-        const { generatorId, nodeId, showFullDdl } = this.payload;
-
-        if (generatorId === null) {
+        if (this.ddlGeneratorId === null) {
           return null;
         }
 
-        return `${nodeId}::${generatorId}::${showFullDdl}`;
+        const isFullDdl = this.ddlViewerService.isFullDdlEnabled(this.nodeId);
+
+        return `${this.nodeId}::${this.ddlGeneratorId}::${isFullDdl}`;
       },
       async load() {
-        if (this.payload.generatorId === null) {
+        if (this.ddlGeneratorId === null) {
           return;
         }
 
         const key = this.getCurrentKey();
+        const isFullDdl = this.ddlViewerService.isFullDdlEnabled(this.nodeId);
 
         try {
           this.exception = null;
-          this.promise = this.sqlGeneratorsResource.generateEntityQuery(this.payload.generatorId, this.payload.nodeId, {
+          this.promise = this.sqlGeneratorsResource.generateEntityQuery(this.ddlGeneratorId, this.nodeId, {
             ...getDefaultQueryGeneratorOptions(),
-            showFullDdl: this.payload.showFullDdl,
+            showFullDdl: isFullDdl,
           });
           this.query = await this.promise;
           this.key = key;
@@ -87,9 +89,10 @@ export function useDdlEntityQuery(payload: IPayload): IState {
       exception: observable.ref,
       promise: observable.ref,
       key: observable.ref,
-      payload: observable.ref,
+      nodeId: observable.ref,
+      ddlGeneratorId: observable.ref,
     },
-    { payload, sqlGeneratorsResource },
+    { nodeId, ddlGeneratorId, sqlGeneratorsResource: sqlGeneratorsResource.resource, ddlViewerService },
   );
 
   return state;
