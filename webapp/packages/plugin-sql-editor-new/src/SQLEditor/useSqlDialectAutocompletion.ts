@@ -28,6 +28,18 @@ export function useSqlDialectAutocompletion(data: ISQLEditorData): [Compartment,
   const localizationService = useService(LocalizationService);
   const optionsRef = useObjectRef({ data });
 
+  function fuzzyFilterProposals(proposals: SQLProposal[], word: string): SQLProposal[] {
+    const matchedResults = new Set(
+      fuzzyMatch({
+        query: word,
+        items: proposals,
+        fields: ['displayString', 'replacementString'],
+      }).map(r => r.item),
+    );
+
+    return proposals.filter(proposal => matchedResults.has(proposal));
+  }
+
   const config = useMemo<CompletionConfig>(() => {
     if (!codemirror) {
       return undefined;
@@ -44,35 +56,24 @@ export function useSqlDialectAutocompletion(data: ISQLEditorData): [Compartment,
       if (word === '*') {
         filteredProposals = proposals;
       } else {
-        const matchResults = fuzzyMatch({
-          query: word,
-          items: proposals.filter(
-            ({ replacementString, displayString }) =>
-              sanitizeProposal(displayString) !== wordLowerCase && replacementString.toLocaleLowerCase() !== wordLowerCase,
-          ),
-          fields: ['displayString', 'replacementString'],
+        filteredProposals = fuzzyFilterProposals(proposals, word).sort((a, b) => {
+          const aDisplayLower = sanitizeProposal(a.displayString).toLocaleLowerCase();
+          const aReplacementLower = a.replacementString.toLocaleLowerCase();
+          const bDisplayLower = sanitizeProposal(b.displayString).toLocaleLowerCase();
+          const bReplacementLower = b.replacementString.toLocaleLowerCase();
+
+          const aIncludes = aDisplayLower.includes(wordLowerCase) || aReplacementLower.includes(wordLowerCase);
+          const bIncludes = bDisplayLower.includes(wordLowerCase) || bReplacementLower.includes(wordLowerCase);
+
+          if (aIncludes && !bIncludes) {
+            return -1;
+          }
+          if (!aIncludes && bIncludes) {
+            return 1;
+          }
+
+          return (b.score ?? 0) - (a.score ?? 0);
         });
-
-        filteredProposals = matchResults
-          .sort((a, b) => {
-            const aDisplayLower = sanitizeProposal(a.item.displayString).toLocaleLowerCase();
-            const aReplacementLower = a.item.replacementString.toLocaleLowerCase();
-            const bDisplayLower = sanitizeProposal(b.item.displayString).toLocaleLowerCase();
-            const bReplacementLower = b.item.replacementString.toLocaleLowerCase();
-
-            const aIncludes = aDisplayLower.includes(wordLowerCase) || aReplacementLower.includes(wordLowerCase);
-            const bIncludes = bDisplayLower.includes(wordLowerCase) || bReplacementLower.includes(wordLowerCase);
-
-            if (aIncludes && !bIncludes) {
-              return -1;
-            }
-            if (!aIncludes && bIncludes) {
-              return 1;
-            }
-
-            return (b.score ?? 0) - (a.score ?? 0);
-          })
-          .map(r => r.item);
       }
 
       if (filteredProposals.length === 0 && !hasSameName && explicit) {
