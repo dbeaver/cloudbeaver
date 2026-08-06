@@ -28,6 +28,43 @@ You can see a live demo of CloudBeaver server here: https://demo.cloudbeaver.io
 
 ## Changelog
 
+### 26.1.4 2026-08-03
+
+- AI Assistant:
+    - Added AI Chat to help users generate and fix queries and explore data more easily. It’s integrated with the SQL Editor to run generated queries instantly. Access it from the top toolbar. All AI features can be turned off in the Server configuration.
+    - Added the option to configure AI profiles in the Administration panel, usable in the AI Chat and for the @ai command in the SQL Editor. Both OpenAI and Copilot engines can be utilized for configuration.
+- Connectivity:
+    - Resolved the issue where the application could no longer connect to the database after running for an extended period.
+    - Resolved the issue where user connection settings required re-login in a new session to apply their changes.
+- Accessibility:
+    - Added a loader to the Save button in the Administration panel for visualizing the loading process.
+    - Improved drag-and-drop in the Navigator Tree for objects by enlarging the auto-scroll trigger areas.
+- General:
+    - Added the ability to export generated SQL to a .sql file from the Generate SQL dialog.
+    - Improved "Open in SQL Editor" behavior by preserving the source table context for the Generate SQL dialog.
+    - Fixed synchronization between instances eliminates the need to refresh to see the updated connection or folder in another instance.
+- Security:
+    - Added a new "Auto-create users" setting for the reverse proxy provider, allowing new user creation on login. It is enabled by default.
+    - Updated the PostgreSQL JDBC driver to version 42.7.13, including a fix for a high-severity security vulnerability (CVE-2026-54291).
+    - Fixed the critical vulnerability (CVE-2026-59873) in the tar library. The library was updated to version 7.5.19.
+    - Fixed the high vulnerability (CVE-2026-10050) in the jetty-security library. The library was updated to version 12.1.11.
+    - Fixed the high vulnerability (CVE-2026-14257) in the brace-expansion library. The library was updated to version 5.0.8.
+    - Fixed the high vulnerability (GHSA-r28c-9q8g-f849) in the postcss library. The library was updated to version 8.5.18.
+    - Fixed the high vulnerability (GHSA-pm4m-ph32-ghv5) in the js-yaml library. The library was updated to version 5.2.2.
+    - Fixed the high vulnerability (CVE-2026-59880) in the immutable library. The library was updated to version 5.1.8.
+    - Fixed the high vulnerability (CVE-2026-59879) in the fast-uri library. The library was updated to version 3.1.3.
+    - Fixed the high vulnerability (CVE-2026-13311) in the shell-quote library. The library was updated to version 1.9.0.
+    - Fixed the high vulnerability (GHSA-gcfj-64vw-6mp9) in the axios library. The library was updated to version 1.18.0.
+- Databases and drivers:
+    - ClickHouse
+        - The driver was updated to version 0.10.0.
+        - Improved JSON display in the Value panel.
+    - MySQL: Fixed support for comments starting with '#' symbol in the SQL Editor.
+    - PostgreSQL:
+        - The driver was updated to version 42.7.13.
+        - Fixed an error that occurred when applying filters to database nodes.
+        - Fixed generated calls for procedures with OUT parameters.
+
 ### 26.1.3 2026-07-20
 
 - Data Editor:

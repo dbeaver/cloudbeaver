@@ -42,63 +42,58 @@ import java.util.*;
  * Web connection info
  */
 public class WebPropertyInfo {
-    private WebSession session;
-    private DBPPropertyDescriptor property;
-    private DBPPropertySource propertySource;
-    private boolean showProtected;
+    @NotNull
+    private final WebSession session;
+    @NotNull
+    private final DBPPropertyDescriptor property;
+    @Nullable
+    private final DBPPropertySource propertySource;
 
-    private Object[] validValues;
-
-    private String[] supportedConfigurationTypes = new String[0];
-
-    private Object defaultValue;
-
-    public WebPropertyInfo(WebSession session, DBPPropertyDescriptor property, DBPPropertySource propertySource) {
+    public WebPropertyInfo(
+        @NotNull WebSession session,
+        @NotNull DBPPropertyDescriptor property,
+        @Nullable DBPPropertySource propertySource
+    ) {
         this.session = session;
         this.property = property;
         this.propertySource = propertySource;
     }
 
-    public WebPropertyInfo(WebSession session, DBPPropertyDescriptor property) {
-        this.session = session;
-        this.property = property;
-    }
-
-    public boolean isShowProtected() {
-        return showProtected;
-    }
-
-    public void setShowProtected(boolean showProtected) {
-        this.showProtected = showProtected;
+    public WebPropertyInfo(@NotNull WebSession session, @NotNull DBPPropertyDescriptor property) {
+        this(session, property, null);
     }
 
     ///////////////////////////////////
     // General properties
     ///////////////////////////////////
 
+    @NotNull
     @Property
     public String getId() {
         return CommonUtils.toString(property.getId());
     }
 
+    @NotNull
     @Property
     public String getDisplayName() {
-        if (property instanceof DBPNamedObjectLocalized) {
-            return ((DBPNamedObjectLocalized) property).getLocalizedName(session.getLocale());
+        if (property instanceof DBPNamedObjectLocalized localized) {
+            return localized.getLocalizedName(session.getLocale());
         } else {
             return property.getDisplayName();
         }
     }
 
+    @Nullable
     @Property
     public String getDescription() {
-        if (property instanceof DBPObjectWithDescriptionLocalized) {
-            return ((DBPObjectWithDescriptionLocalized) property).getLocalizedDescription(session.getLocale());
+        if (property instanceof DBPObjectWithDescriptionLocalized localized) {
+            return localized.getLocalizedDescription(session.getLocale());
         } else {
             return property.getDescription();
         }
     }
 
+    @Nullable
     @Property
     public String getHint() {
         return property.getHint();
@@ -109,38 +104,47 @@ public class WebPropertyInfo {
         return property instanceof ObjectPropertyDescriptor ? ((ObjectPropertyDescriptor) property).getOrderNumber() : -1;
     }
 
+    @Nullable
     @Property
     public String getCategory() {
         return property.getCategory();
     }
 
+    @Nullable
     @Property
     public String getType() {
         return getDataType();
     }
 
+    @Nullable
     @Property
     public String getDataType() {
         Class<?> dataType = property.getDataType();
         return dataType == null ? null : dataType.getSimpleName();
     }
 
+    @NotNull
     @Property
     public PropertyLength getLength() {
         return property.getLength();
     }
 
+    @Nullable
     @Property
     public Object getDefaultValue() throws DBException {
-        var defaultValue = property.getDefaultValue() == null ? this.defaultValue : property.getDefaultValue();
-        return defaultValue == null ? getValue() : defaultValue;
+        Object defaultValue = property.getDefaultValue();
+        if (property instanceof ObjectPropertyDescriptor && defaultValue == null) {
+            return getValue();
+        }
+        return defaultValue;
     }
 
+    @Nullable
     @Property
     public Object getValue() throws DBException {
         Object value = propertySource == null ? null : propertySource.getPropertyValue(session.getProgressMonitor(), property.getId());
         if (property instanceof ObjectPropertyDescriptor opd &&
-            (!showProtected && opd.isPassword() || opd.isHidden())
+            (opd.isPassword() || opd.isHidden())
         ) {
             return maskValue(value);
         } else if (property instanceof PropertyDescriptor pd) {
@@ -152,6 +156,7 @@ public class WebPropertyInfo {
         return value == null ? null : makePropertyValue(value);
     }
 
+    @Nullable
     @Property
     public Object[] getValidValues() {
         if (property instanceof IPropertyValueListProvider) {
@@ -164,17 +169,18 @@ public class WebPropertyInfo {
                 }
                 return validValues;
             }
-            return validValues;
         }
-        return validValues;
+        return null;
     }
 
+    @NotNull
     @Property
     public String[] getFeatures() {
         String[] features = property.getFeatures();
         return features == null ? new String[0] : features;
     }
 
+    @NotNull
     @Property
     public String[] getSupportedConfigurationTypes() {
         if (property instanceof ProviderPropertyDescriptor) {
@@ -182,7 +188,7 @@ public class WebPropertyInfo {
                 .map(DBPDriverConfigurationType::toString)
                 .toArray(String[]::new);
         }
-        return supportedConfigurationTypes;
+        return new String[0];
     }
 
     @Property
@@ -203,12 +209,14 @@ public class WebPropertyInfo {
         return false;
     }
 
+    @NotNull
     @Override
     public String toString() {
         return CommonUtils.toString(property.getId());
     }
 
-    private Object makePropertyValue(Object value) {
+    @Nullable
+    private Object makePropertyValue(@Nullable Object value) {
         if (value == null) {
             return null;
 //        } else if (value instanceof DBSObject) {
@@ -288,21 +296,6 @@ public class WebPropertyInfo {
             conditions.add(new Condition(activeExpr, Condition.Type.READ_ONLY));
         }
         return conditions;
-    }
-
-
-    //TODO: delete after refactoring on front-end
-    public void setDefaultValue(String defaultValue) {
-        this.defaultValue = defaultValue;
-    }
-    //TODO: delete after refactoring on front-end
-    public void setValidValues(Object[] validValues) {
-        this.validValues = validValues;
-    }
-
-    //TODO: delete after refactoring on front-end
-    public void setSupportedConfigurationTypes(String[] supportedConfigurationTypes) {
-        this.supportedConfigurationTypes = supportedConfigurationTypes;
     }
 
     public record Condition(@NotNull String expression, @NotNull Type conditionType) {
