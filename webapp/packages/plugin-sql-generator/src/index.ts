@@ -8,7 +8,7 @@
 
 import './module.js';
 
-export * from '@cloudbeaver/core-sql-generator';
+export * from './SqlGenerators/SqlGeneratorsResource.js';
 export * from './SqlGenerators/SqlGeneratorsBootstrap.js';
 export * from './actions/ACTION_SQL_GENERATE.js';
 export * from './SqlGenerators/GeneratedSqlDialog.js';

@@ -41,13 +41,7 @@ import { ACTION_DATA_GRID_GENERATE_SQL_SELECT_MANY } from '../Actions/GenerateSQ
 import { ACTION_DATA_GRID_GENERATE_SQL_UPDATE } from '../Actions/GenerateSQL/ACTION_DATA_GRID_GENERATE_SQL_UPDATE.js';
 import { MENU_DATA_GRID_GENERATE_SQL } from './GenerateSQL/MENU_DATA_GRID_GENERATE_SQL.js';
 import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
-import {
-  getDefaultQueryGeneratorOptions,
-  GeneratedSqlDialog,
-  SqlEntityQueryResource,
-  SqlGeneratorsResource,
-  DDL_GENERATOR_ID,
-} from '@cloudbeaver/plugin-sql-generator';
+import { getDefaultQueryGeneratorOptions, GeneratedSqlDialog, SqlGeneratorsResource, DDL_GENERATOR_ID } from '@cloudbeaver/plugin-sql-generator';
 import { isNotNullDefined } from '@dbeaver/js-helpers';
 
 @injectable(() => [
@@ -56,7 +50,6 @@ import { isNotNullDefined } from '@dbeaver/js-helpers';
   CommonDialogService,
   NotificationService,
   SqlGeneratorsResource,
-  SqlEntityQueryResource,
   LocalizationService,
   NavNodeInfoResource,
 ])
@@ -67,7 +60,6 @@ export class DataGridContextMenuGenerateSqlService {
     private readonly commonDialogService: CommonDialogService,
     private readonly notificationService: NotificationService,
     private readonly sqlGenerationResource: SqlGeneratorsResource,
-    private readonly sqlEntityQueryResource: SqlEntityQueryResource,
     private readonly localizationService: LocalizationService,
     private readonly navNodeInfoResource: NavNodeInfoResource,
   ) {}
@@ -237,11 +229,7 @@ export class DataGridContextMenuGenerateSqlService {
         return;
       }
 
-      const query = await this.sqlEntityQueryResource.load({
-        nodeId: nodePathList,
-        generatorId: createGenerator.id,
-        options: getDefaultQueryGeneratorOptions(),
-      });
+      const query = await this.sqlGenerationResource.generateEntityQuery(createGenerator.id, nodePathList, getDefaultQueryGeneratorOptions());
 
       await this.commonDialogService.open(GeneratedSqlDialog, {
         query,
@@ -250,8 +238,7 @@ export class DataGridContextMenuGenerateSqlService {
         generatorId: createGenerator.id,
         generatorName: createGenerator.label,
         options: getDefaultQueryGeneratorOptions(),
-        regenerateQuery: genOptions =>
-          this.sqlEntityQueryResource.load({ nodeId: nodePathList, generatorId: createGenerator.id, options: genOptions }),
+        regenerateQuery: genOptions => this.sqlGenerationResource.generateEntityQuery(createGenerator.id, nodePathList, genOptions),
       });
     } catch (e: any) {
       this.notificationService.logException(e, 'data_grid_table_generate_sql_error_title');

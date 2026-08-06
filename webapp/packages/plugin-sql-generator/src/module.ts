@@ -6,8 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { Bootstrap, ModuleRegistry } from '@cloudbeaver/core-di';
+import { Bootstrap, Dependency, ModuleRegistry, proxy } from '@cloudbeaver/core-di';
 import { SqlGeneratorsBootstrap } from './SqlGenerators/SqlGeneratorsBootstrap.js';
+import { SqlGeneratorsResource } from './SqlGenerators/SqlGeneratorsResource.js';
 import { ScriptPreviewService } from './ScriptPreview/ScriptPreviewService.js';
 import { LocaleService } from './LocaleService.js';
 import { GeneratorMenuBootstrap } from './GeneratorMenuBootstrap.js';
@@ -17,9 +18,11 @@ export default ModuleRegistry.add({
 
   configure: serviceCollection => {
     serviceCollection
+      .addSingleton(Dependency, proxy(SqlGeneratorsResource))
       .addSingleton(Bootstrap, GeneratorMenuBootstrap)
       .addSingleton(Bootstrap, SqlGeneratorsBootstrap)
       .addSingleton(Bootstrap, LocaleService)
+      .addSingleton(SqlGeneratorsResource)
       .addSingleton(ScriptPreviewService);
   },
 });

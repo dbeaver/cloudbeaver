@@ -38,10 +38,10 @@
       "path": "../core-resource"
     },
     {
-      "path": "../core-sdk"
+      "path": "../core-root"
     },
     {
-      "path": "../core-sql-generator"
+      "path": "../core-sdk"
     },
     {
       "path": "../core-utils"

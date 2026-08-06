@@ -38,9 +38,6 @@
       "path": "../core-sdk"
     },
     {
-      "path": "../core-sql-generator"
-    },
-    {
       "path": "../core-ui"
     },
     {
@@ -63,6 +60,9 @@
     },
     {
       "path": "../plugin-sql-editor-navigation-tab"
+    },
+    {
+      "path": "../plugin-sql-generator"
     }
   ],
   "include": [

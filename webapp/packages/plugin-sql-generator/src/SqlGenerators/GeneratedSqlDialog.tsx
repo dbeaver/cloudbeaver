@@ -33,7 +33,7 @@ import { action, observable } from 'mobx';
 import { NotificationService } from '@cloudbeaver/core-events';
 import type { SqlQueryGeneratorOptions } from '@cloudbeaver/core-sdk';
 
-import { DDL_GENERATOR_ID } from '@cloudbeaver/core-sql-generator';
+import { DDL_GENERATOR_ID } from './SqlGeneratorsResource.js';
 
 interface Payload {
   nodeId: string;

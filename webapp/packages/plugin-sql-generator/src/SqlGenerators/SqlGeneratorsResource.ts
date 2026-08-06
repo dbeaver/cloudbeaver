@@ -8,6 +8,7 @@
 import { injectable } from '@cloudbeaver/core-di';
 import { NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
 import { CachedMapResource, isResourceAlias, type ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-resource';
+import { AsyncTaskInfoService } from '@cloudbeaver/core-root';
 import {
   GraphQLService,
   type SqlGenerateResultSetQueryQueryVariables,
@@ -23,16 +24,34 @@ export const getDefaultQueryGeneratorOptions = (): SqlQueryGeneratorOptions => (
 });
 export const DDL_GENERATOR_ID = 'tableDDL';
 
-@injectable(() => [GraphQLService, NavNodeInfoResource])
+@injectable(() => [GraphQLService, AsyncTaskInfoService, NavNodeInfoResource])
 export class SqlGeneratorsResource extends CachedMapResource<string, SqlQueryGenerator[]> {
   constructor(
     private readonly graphQLService: GraphQLService,
+    private readonly asyncTaskInfoService: AsyncTaskInfoService,
     private readonly navNodeInfoResource: NavNodeInfoResource,
   ) {
     super();
 
     this.navNodeInfoResource.outdateResource(this);
     this.navNodeInfoResource.deleteInResource(this);
+  }
+
+  async generateEntityQuery(generatorId: string, nodePathList: string | string[], options?: SqlQueryGeneratorOptions): Promise<string> {
+    const task = this.asyncTaskInfoService.create(async () => {
+      const { taskInfo } = await this.graphQLService.sdk.asyncSqlGenerateEntityQuery({
+        generatorId,
+        nodePathList,
+        generatorOptions: options,
+      });
+
+      return taskInfo;
+    });
+
+    const info = await this.asyncTaskInfoService.run(task);
+    await this.asyncTaskInfoService.remove(task.id);
+
+    return info.taskResult;
   }
 
   async generateResultSetSql(params: SqlGenerateResultSetQueryQueryVariables): Promise<string | null> {

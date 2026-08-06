@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
 
-import { s, useResource, useS } from '@cloudbeaver/core-blocks';
+import { s, useAutoLoad, useResource, useS } from '@cloudbeaver/core-blocks';
 import {
   ConnectionDialectResource,
   ConnectionInfoActiveProjectKey,
@@ -22,13 +22,14 @@ import { useMenu } from '@cloudbeaver/core-view';
 import { useCodemirrorExtensions } from '@cloudbeaver/plugin-codemirror6';
 import type { NavNodeTransformViewComponent } from '@cloudbeaver/plugin-navigation-tree';
 import { SQLCodeEditor, useSqlDialectExtension } from '@cloudbeaver/plugin-sql-editor-codemirror';
-import { DDL_GENERATOR_ID, getDefaultQueryGeneratorOptions, SqlEntityQueryResource, SqlGeneratorsResource } from '@cloudbeaver/core-sql-generator';
+import { DDL_GENERATOR_ID, SqlGeneratorsResource } from '@cloudbeaver/plugin-sql-generator';
 
 import { DATA_CONTEXT_DDL_VIEWER_FULL_DDL } from './DATA_CONTEXT_DDL_VIEWER_FULL_DDL.js';
 import { DATA_CONTEXT_DDL_VIEWER_NODE } from './DATA_CONTEXT_DDL_VIEWER_NODE.js';
 import { DATA_CONTEXT_DDL_VIEWER_VALUE } from './DATA_CONTEXT_DDL_VIEWER_VALUE.js';
 import style from './DDLViewerTabPanel.module.css';
 import { MENU_DDL_VIEWER_FOOTER } from './MENU_DDL_VIEWER_FOOTER.js';
+import { useDdlEntityQuery } from './useDdlEntityQuery.js';
 
 export const DDLViewerTabPanel: NavNodeTransformViewComponent = observer(function DDLViewerTabPanel({ nodeId, folderId }) {
   const styles = useS(style, MenuBarStyles, MenuBarItemStyles, MenuBarGroupStyles);
@@ -53,22 +54,16 @@ export const DDLViewerTabPanel: NavNodeTransformViewComponent = observer(functio
     extensions.set(...sqlDialect);
   }
 
-  const ddlEntityQueryResource = useResource(
-    DDLViewerTabPanel,
-    SqlEntityQueryResource,
-    ddlGenerator
-      ? {
-          nodeId,
-          generatorId: ddlGenerator.id,
-          options: {
-            ...getDefaultQueryGeneratorOptions(),
-            showFullDdl: isFullDdl,
-          },
-        }
-      : null,
-  );
-  const query = ddlEntityQueryResource.data ?? '';
-  const ddlLoading = ddlEntityQueryResource.isLoading();
+  const ddlQueryState = useDdlEntityQuery({
+    nodeId,
+    generatorId: ddlGenerator?.id ?? null,
+    showFullDdl: isFullDdl,
+  });
+
+  useAutoLoad(DDLViewerTabPanel, ddlQueryState);
+
+  const query = ddlQueryState.query ?? '';
+  const ddlLoading = ddlQueryState.isLoading();
 
   function handleFullDdlChange(value: boolean) {
     setIsFullDdl(value);
