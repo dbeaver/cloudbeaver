@@ -78,8 +78,9 @@ export const AIProfilesTable = observer<Props>(function AIProfilesTable({ profil
 
       if (engine?.icon) {
         return (
-          <div title={title} className="tw:flex tw:justify-center">
+          <div title={title} className="tw:flex tw:gap-2">
             <IconOrImage icon={engine.icon} />
+            <span className="tw:truncate">{title}</span>
           </div>
         );
       }
