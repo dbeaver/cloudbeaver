@@ -51,8 +51,16 @@ export const AIProfilesTable = observer<Props>(function AIProfilesTable({ profil
       return null;
     }
 
+    const isDefault = profile.id === defaultProfileId;
+
     if (column.key === SELECT_COLUMN.key) {
-      return <TableRowSelect id={profile.id} />;
+      return (
+        <TableRowSelect
+          id={profile.id}
+          disabled={isDefault}
+          title={isDefault ? translate('plugin_ai_administration_profile_default_delete_info') : undefined}
+        />
+      );
     }
 
     if (column.key === NAME_COLUMN.key) {
@@ -65,7 +73,7 @@ export const AIProfilesTable = observer<Props>(function AIProfilesTable({ profil
           onClick={() => aiProfileFormService.open(profile.id, profile.name)}
         >
           <Link truncate>{profile.name}</Link>
-          {profile.id === defaultProfileId && (
+          {isDefault && (
             <span className="tw:text-xs tw:opacity-60 tw:whitespace-nowrap">{translate('plugin_ai_administration_profile_default_badge')}</span>
           )}
         </Command>
