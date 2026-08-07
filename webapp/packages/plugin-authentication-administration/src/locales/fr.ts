@@ -35,6 +35,7 @@ export default [
   ['authentication_administration_users_filters_status_enabled', 'ACTIVÉ'],
   ['authentication_administration_users_filters_status_disabled', 'DÉSACTIVÉ'],
   ['authentication_administration_users_filters_status_all', 'TOUS'],
+  ['authentication_administration_users_filters_filter_label', 'Filter'],
   ['authentication_administration_users_empty', "Il n'y a pas d'utilisateurs"],
   ['authentication_administration_users_delete_user', "Supprimer l'utilisateur"],
   ['authentication_administration_users_delete_user_fail', "Échec de la suppression de l'utilisateur"],

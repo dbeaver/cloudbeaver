@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -8,7 +8,7 @@
 import { ConnectionInfoResource, createConnectionParam } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
-import { download, withTimestamp } from '@cloudbeaver/core-utils';
+import { download, withTimestamp } from '@dbeaver/js-helpers';
 import { ACTION_SAVE, ActionService, MenuService } from '@cloudbeaver/core-view';
 import { LocalStorageSqlDataSource } from '@cloudbeaver/plugin-sql-editor';
 import { ACTION_SQL_EDITOR_OPEN, SqlEditorNavigatorService } from '@cloudbeaver/plugin-sql-editor-navigation-tab';
