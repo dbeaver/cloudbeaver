@@ -7,4 +7,7 @@ export default [
   ['plugin_data_import_settings_on_duplicate_key', 'При дублировании ключа'],
   ['plugin_data_import_settings_use_bulk_load', 'Использовать массовую загрузку'],
   ['plugin_data_import_settings_use_transactions', 'Использовать транзакции'],
+  ['plugin_data_import_settings_on_duplicate_key_placeholder', 'Нет'],
+  ['plugin_data_import_settings_open_new_connection', 'Открыть новое соединение'],
+  ['plugin_data_import_settings_on_duplicate_key_help', 'Узнать больше о параметре "При дублировании ключа"'],
 ];

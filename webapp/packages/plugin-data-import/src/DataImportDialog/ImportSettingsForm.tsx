@@ -7,7 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { Combobox, Container, FieldCheckbox, useTranslate } from '@cloudbeaver/core-blocks';
+import { Combobox, Container, FieldCheckbox, Link, useTranslate } from '@cloudbeaver/core-blocks';
 import type { DataTransferImportSettings } from '@cloudbeaver/core-sdk';
 
 import type { IDataImportDriverConfiguration } from '../DataImportDriverConfigurationResource.js';
@@ -19,24 +19,30 @@ interface Props {
 
 export const ImportSettingsForm = observer<Props>(function ImportSettingsForm({ settings, driverConfiguration }) {
   const translate = useTranslate();
-  const { supportedInsertReplaceMethods, supportsBulkLoad, supportsTransactions } = driverConfiguration;
+  const { supportedInsertReplaceMethods, supportsBulkLoad, supportsTransactions, defaultOpenNewConnection } = driverConfiguration;
 
   return (
     <Container gap parent>
       {supportedInsertReplaceMethods.length > 0 && (
-        <Combobox
-          name="onDuplicateKeyMethod"
-          state={settings}
-          items={supportedInsertReplaceMethods}
-          keySelector={method => method.id}
-          valueSelector={method => method.name}
-          titleSelector={method => method.description ?? undefined}
-        >
-          {translate('plugin_data_import_settings_on_duplicate_key')}
-        </Combobox>
+        <div>
+          <Combobox
+            name="onDuplicateKeyMethod"
+            state={settings}
+            items={supportedInsertReplaceMethods}
+            keySelector={method => method.id}
+            valueSelector={method => method.name}
+            titleSelector={method => method.description ?? undefined}
+            placeholder={translate('plugin_data_import_settings_on_duplicate_key_placeholder')}
+          >
+            {translate('plugin_data_import_settings_on_duplicate_key')}
+          </Combobox>
+          <Link className="tw:text-xs" href="https://dbeaver.com/docs/cloudbeaver/Data-Import-and-Replace/" target="_blank">
+            {translate('plugin_data_import_settings_on_duplicate_key_help')}
+          </Link>
+        </div>
       )}
       {(supportsBulkLoad || supportsTransactions) && (
-        <Container vertical gap>
+        <Container vertical>
           {supportsBulkLoad && (
             <FieldCheckbox name="useBulkLoad" state={settings}>
               {translate('plugin_data_import_settings_use_bulk_load')}
@@ -45,6 +51,11 @@ export const ImportSettingsForm = observer<Props>(function ImportSettingsForm({ 
           {supportsTransactions && (
             <FieldCheckbox name="useTransactions" state={settings}>
               {translate('plugin_data_import_settings_use_transactions')}
+            </FieldCheckbox>
+          )}
+          {defaultOpenNewConnection && (
+            <FieldCheckbox name="openNewConnection" state={settings}>
+              {translate('plugin_data_import_settings_open_new_connection')}
             </FieldCheckbox>
           )}
         </Container>

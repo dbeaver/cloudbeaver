@@ -45,6 +45,10 @@ function getDefaultSettings(configuration: IDataImportDriverConfiguration): Data
     settings.useBulkLoad = false;
   }
 
+  if (configuration.defaultOpenNewConnection) {
+    settings.openNewConnection = true;
+  }
+
   return settings;
 }
 

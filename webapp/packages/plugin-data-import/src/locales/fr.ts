@@ -7,4 +7,7 @@ export default [
   ['plugin_data_import_settings_on_duplicate_key', 'En cas de clé dupliquée'],
   ['plugin_data_import_settings_use_bulk_load', 'Utiliser le chargement en masse'],
   ['plugin_data_import_settings_use_transactions', 'Utiliser les transactions'],
+  ['plugin_data_import_settings_on_duplicate_key_placeholder', 'Aucune'],
+  ['plugin_data_import_settings_open_new_connection', 'Ouvrir une nouvelle connexion'],
+  ['plugin_data_import_settings_on_duplicate_key_help', 'En savoir plus sur le paramètre "En cas de clé dupliquée"'],
 ];

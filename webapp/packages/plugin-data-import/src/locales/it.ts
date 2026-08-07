@@ -7,4 +7,7 @@ export default [
   ['plugin_data_import_settings_on_duplicate_key', 'On duplicate key'],
   ['plugin_data_import_settings_use_bulk_load', 'Use bulk load'],
   ['plugin_data_import_settings_use_transactions', 'Use transactions'],
+  ['plugin_data_import_settings_on_duplicate_key_placeholder', 'None'],
+  ['plugin_data_import_settings_open_new_connection', 'Open new connection'],
+  ['plugin_data_import_settings_on_duplicate_key_help', 'Learn more about the "On duplicate key" setting'],
 ];
