@@ -35,6 +35,7 @@ export default [
   ['authentication_administration_users_filters_status_enabled', 'ВКЛЮЧЕН'],
   ['authentication_administration_users_filters_status_disabled', 'ВЫКЛЮЧЕН'],
   ['authentication_administration_users_filters_status_all', 'ВСЕ'],
+  ['authentication_administration_users_filters_filter_label', 'Фильтр'],
   ['authentication_administration_users_empty', 'Нет пользователей'],
   ['authentication_administration_users_delete_user', 'Удалить пользователя'],
   ['authentication_administration_users_delete_user_fail', 'Не удалось удалить пользователя'],
