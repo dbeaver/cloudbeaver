@@ -40,6 +40,7 @@ export const ImportSettingsForm = observer<Props>(function ImportSettingsForm({ 
             valueSelector={method => method.name}
             titleSelector={method => method.description ?? undefined}
             disabled={settings.useBulkLoad}
+            title={translate('plugin_data_import_settings_on_duplicate_key_title')}
             placeholder={translate('plugin_data_import_settings_on_duplicate_key_placeholder')}
           >
             {translate('plugin_data_import_settings_on_duplicate_key')}
@@ -52,17 +53,17 @@ export const ImportSettingsForm = observer<Props>(function ImportSettingsForm({ 
       {(supportsBulkLoad || supportsTransactions) && (
         <Container vertical>
           {supportsBulkLoad && (
-            <FieldCheckbox name="useBulkLoad" state={settings}>
+            <FieldCheckbox title={translate('plugin_data_import_settings_use_bulk_load_title')} name="useBulkLoad" state={settings}>
               {translate('plugin_data_import_settings_use_bulk_load')}
             </FieldCheckbox>
           )}
           {supportsTransactions && (
-            <FieldCheckbox name="useTransactions" state={settings}>
+            <FieldCheckbox title={translate('plugin_data_import_settings_use_transactions_title')} name="useTransactions" state={settings}>
               {translate('plugin_data_import_settings_use_transactions')}
             </FieldCheckbox>
           )}
           {defaultOpenNewConnection && (
-            <FieldCheckbox name="openNewConnection" state={settings}>
+            <FieldCheckbox title={translate('plugin_data_import_settings_open_new_connection_title')} name="openNewConnection" state={settings}>
               {translate('plugin_data_import_settings_open_new_connection')}
             </FieldCheckbox>
           )}
