@@ -34,6 +34,7 @@ export default [
   ['authentication_administration_users_filters_status_enabled', '启用'],
   ['authentication_administration_users_filters_status_disabled', '禁用'],
   ['authentication_administration_users_filters_status_all', '全部'],
+  ['authentication_administration_users_filters_filter_label', 'Filter'],
   ['authentication_administration_users_empty', '无用户'],
   ['authentication_administration_users_delete_user', '删除用户'],
   ['authentication_administration_users_delete_user_fail', '删除用户失败'],
