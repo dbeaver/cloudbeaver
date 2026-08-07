@@ -6,5 +6,4 @@ fragment DriverConfiguration on DriverConfiguration {
   }
   supportsBulkLoad
   supportsTransactions
-  defaultOpenNewConnection
 }

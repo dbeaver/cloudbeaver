@@ -31,7 +31,9 @@ const DEFAULT_STATE_GETTER: () => IDataImportDialogState = () => ({
 });
 
 function getDefaultSettings(configuration: IDataImportDriverConfiguration): DataTransferImportSettings {
-  const settings: DataTransferImportSettings = {};
+  const settings: DataTransferImportSettings = {
+    openNewConnection: true,
+  };
 
   if (configuration.supportsTransactions) {
     settings.useTransactions = true;
@@ -43,10 +45,6 @@ function getDefaultSettings(configuration: IDataImportDriverConfiguration): Data
 
   if (configuration.supportsBulkLoad) {
     settings.useBulkLoad = false;
-  }
-
-  if (configuration.defaultOpenNewConnection) {
-    settings.openNewConnection = true;
   }
 
   return settings;

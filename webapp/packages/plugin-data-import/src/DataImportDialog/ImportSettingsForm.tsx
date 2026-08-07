@@ -20,7 +20,7 @@ interface Props {
 
 export const ImportSettingsForm = observer<Props>(function ImportSettingsForm({ settings, driverConfiguration }) {
   const translate = useTranslate();
-  const { supportedInsertReplaceMethods, supportsBulkLoad, supportsTransactions, defaultOpenNewConnection } = driverConfiguration;
+  const { supportedInsertReplaceMethods, supportsBulkLoad, supportsTransactions } = driverConfiguration;
 
   useEffect(() => {
     if (settings.useBulkLoad) {
@@ -62,11 +62,9 @@ export const ImportSettingsForm = observer<Props>(function ImportSettingsForm({ 
               {translate('plugin_data_import_settings_use_transactions')}
             </FieldCheckbox>
           )}
-          {defaultOpenNewConnection && (
-            <FieldCheckbox title={translate('plugin_data_import_settings_open_new_connection_title')} name="openNewConnection" state={settings}>
-              {translate('plugin_data_import_settings_open_new_connection')}
-            </FieldCheckbox>
-          )}
+          <FieldCheckbox title={translate('plugin_data_import_settings_open_new_connection_title')} name="openNewConnection" state={settings}>
+            {translate('plugin_data_import_settings_open_new_connection')}
+          </FieldCheckbox>
         </Container>
       )}
     </Container>
