@@ -23,6 +23,7 @@ import {
   useTranslate,
 } from '@cloudbeaver/core-blocks';
 import type { SqlExecutionPlanNode } from '@cloudbeaver/core-sdk';
+import { Composite, CompositeProvider } from '@dbeaver/ui-kit';
 
 import style from './ExecutionPlanTreeBlock.module.css';
 import { NestedNode } from './NestedNode.js';
@@ -57,11 +58,13 @@ export const ExecutionPlanTreeBlock = observer<Props>(function ExecutionPlanTree
                 );
               })}
             </TableHeader>
-            <TableBody>
-              {state.nodes.map(node => (
-                <NestedNode key={node.id} columns={state.columns} node={node} depth={0} />
-              ))}
-            </TableBody>
+            <CompositeProvider orientation="vertical">
+              <Composite render={<TableBody />}>
+                {state.nodes.map(node => (
+                  <NestedNode key={node.id} columns={state.columns} node={node} depth={0} />
+                ))}
+              </Composite>
+            </CompositeProvider>
           </Table>
         ) : (
           <TextPlaceholder>{translate('plugin_sql_execution_plan_placeholder')}</TextPlaceholder>
