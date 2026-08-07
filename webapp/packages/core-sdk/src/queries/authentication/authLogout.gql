@@ -1,5 +1,8 @@
 query authLogout($provider: ID, $configuration: ID) {
   result: authLogoutExtended(provider: $provider, configuration: $configuration) {
-    redirectLinks
+    redirectLinks {
+      url
+      sameTabRedirect
+    }
   }
 }

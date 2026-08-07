@@ -59,6 +59,7 @@ public class WebAuthProviderDescriptor extends AbstractDescriptor {
     private final boolean isPrivate;
     private final boolean isAuthHidden;
     private final boolean isCaseInsensitive;
+    private final boolean sameTabRedirectOnLogout;
     private final boolean serviceProvider;
     private final String[] requiredFeatures;
     private final boolean isRequired;
@@ -75,6 +76,7 @@ public class WebAuthProviderDescriptor extends AbstractDescriptor {
         this.isRequired = CommonUtils.toBoolean(cfg.getAttribute(WebRegistryConstant.ATTR_REQUIRED));
         this.isAuthHidden = CommonUtils.toBoolean(cfg.getAttribute(WebRegistryConstant.ATTR_AUTH_HIDDEN));
         this.isCaseInsensitive = CommonUtils.toBoolean(cfg.getAttribute(WebRegistryConstant.ATTR_CASE_INSENSITIVE));
+        this.sameTabRedirectOnLogout = CommonUtils.toBoolean(cfg.getAttribute(WebRegistryConstant.ATTR_SAME_TAB_LOGOUT_REDIRECT));
         this.serviceProvider = CommonUtils.toBoolean(cfg.getAttribute(WebRegistryConstant.ATTR_SERVICE_PROVIDER));
 
         for (IConfigurationElement cfgElement : cfg.getChildren(WebRegistryConstant.TAG_CONFIGURATION)) {
@@ -127,6 +129,10 @@ public class WebAuthProviderDescriptor extends AbstractDescriptor {
 
     public boolean isTrusted() {
         return trusted;
+    }
+
+    public boolean isSameTabRedirectOnLogout() {
+        return sameTabRedirectOnLogout;
     }
 
     public boolean isPrivate() {
