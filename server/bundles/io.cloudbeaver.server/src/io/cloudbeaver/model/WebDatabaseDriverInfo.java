@@ -192,6 +192,7 @@ public class WebDatabaseDriverInfo {
                     case DBConstants.PROP_PORT -> cfg.setHostPort(CommonUtils.notNull(driver.getDefaultPort(), "0"));
                     case DBConstants.PROP_SERVER -> cfg.setServerName(CommonUtils.notNull(driver.getDefaultServer(), propName));
                     case DBConstants.PROP_USER -> cfg.setUserName(CommonUtils.notNull(driver.getDefaultUser(), propName));
+                    case DBConstants.PROP_PASSWORD -> cfg.setUserPassword("password");
                     case DBConstants.PROP_DATABASE, DBConstants.PROP_FOLDER, DBConstants.PROP_FILE ->
                         cfg.setDatabaseName(CommonUtils.notNull(driver.getDefaultDatabase(), propName));
                     default -> log.debug("Unexpected mandatory URL property " + propName);
