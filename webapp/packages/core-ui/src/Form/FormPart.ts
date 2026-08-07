@@ -91,7 +91,7 @@ export abstract class FormPart<TPartState extends object, TFormState = any> impl
   }
 
   get isChanged(): boolean {
-    if (!this.loaded || this.initialState === this.state) {
+    if (!this.loaded || this.initialState === this.state || this.isReadOnly) {
       return false;
     }
 
