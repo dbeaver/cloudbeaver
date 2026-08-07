@@ -25,7 +25,6 @@ import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.service.ai.WebAIUtils;
 import io.cloudbeaver.service.ai.model.*;
-import io.cloudbeaver.service.ai.model.events.WSAiChatMessageEvent;
 import io.cloudbeaver.service.ai.model.inputs.DataSourceId;
 import io.cloudbeaver.service.ai.model.inputs.WebAIChatConversationInput;
 import io.cloudbeaver.service.ai.model.inputs.WebAIConfigurationProfileInput;
@@ -407,10 +406,6 @@ public class WebServiceAI implements DBWServiceAI {
         AIChatConversation conversation = WebAIUtils.getAiChatConversation(webSession, conversationId);
         conversation.cancelConversation();
         webSession.removeAttribute(WebAIUtils.getWaitingAttr(conversation));
-
-        AIChatMessage cancelMessage = conversation.addMessage(
-            AIMessage.warningMessage("Response generation cancelled by user."));
-        webSession.addSessionEvent(new WSAiChatMessageEvent(new WebAIMessage(cancelMessage, conversation)));
         return true;
     }
 
