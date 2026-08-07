@@ -49,11 +49,11 @@ const MAIN_PROPERTY_HOST_KEY = 'host';
 const MAIN_PROPERTY_PORT_KEY = 'port';
 const MAIN_PROPERTY_SERVER_KEY = 'server';
 
-const defaultStateGetter = (connectionId?: string, credentials?: Record<string, any>) =>
+const defaultStateGetter = (connectionId?: string) =>
   ({
     connectionId,
     configurationType: DriverConfigurationType.Manual,
-    credentials: credentials ?? {},
+    credentials: {},
     mainPropertyValues: {},
     expertSettingsValues: {},
     networkHandlersConfig: [],
@@ -185,13 +185,11 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
 
   protected override async loader(): Promise<void> {
     if (this.formState.mode === 'create') {
-      const credentials = this.state.authModelId
-        ? getObjectPropertyDefaults(await this.getConnectionAuthModelProperties(this.state.authModelId))
-        : undefined;
-
-      this.setInitialState(defaultStateGetter(this.initialState.connectionId ?? this.formState.state.connectionId, credentials));
+      const defaults = await this.getDefaults();
 
       await this.setDriverId(this.state.driverId);
+
+      this.setInitialState(defaults);
 
       return;
     }
@@ -338,6 +336,36 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     }
 
     this.state.authModelId = modelId;
+  }
+
+  private async getDefaults() {
+    const config = defaultStateGetter(this.initialState.connectionId ?? this.formState.state.connectionId);
+
+    if (this.state.driverId) {
+      config.driverId = this.state.driverId;
+    }
+
+    if (this.state.authModelId) {
+      const authProperties = await this.getConnectionAuthModelProperties(this.state.authModelId);
+      config.credentials = getObjectPropertyDefaults(authProperties);
+    }
+
+    if (config.driverId) {
+      const driver = await this.dbDriverResource.load(config.driverId, ['includeMainProperties']);
+
+      if (config.mainPropertyValues) {
+        for (const property of driver.mainProperties) {
+          // We don't use getObjectPropertyDefaults because, in this case, the backend returns default values in the value field.
+          const value = getObjectPropertyDefaultValue(property) || getObjectPropertyValue(property);
+
+          if (property.id) {
+            config.mainPropertyValues[property.id] = value;
+          }
+        }
+      }
+    }
+
+    return config;
   }
 
   protected override async format(

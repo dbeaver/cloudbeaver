@@ -91,7 +91,10 @@ export class PublicConnectionFormService {
       connectionId: config.connectionId,
     }).setMode(config.connectionId ? FormMode.Edit : FormMode.Create);
 
-    await this.optionsPart?.load();
+    // Don't call load in create mode. There we rely on the defaults set here, and useAutoLoad will load the part on mount.
+    if (this.formState.mode === FormMode.Edit) {
+      await this.optionsPart?.load();
+    }
 
     if (config.driverId) {
       await this.optionsPart?.setDriverId(config.driverId);
