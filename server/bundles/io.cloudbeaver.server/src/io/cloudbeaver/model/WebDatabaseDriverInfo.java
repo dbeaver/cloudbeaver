@@ -37,8 +37,11 @@ import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * Web driver configuration
@@ -192,13 +195,23 @@ public class WebDatabaseDriverInfo {
                     case DBConstants.PROP_PORT -> cfg.setHostPort(CommonUtils.notNull(driver.getDefaultPort(), "0"));
                     case DBConstants.PROP_SERVER -> cfg.setServerName(CommonUtils.notNull(driver.getDefaultServer(), propName));
                     case DBConstants.PROP_USER -> cfg.setUserName(CommonUtils.notNull(driver.getDefaultUser(), propName));
-                    case DBConstants.PROP_PASSWORD -> cfg.setUserPassword("password");
                     case DBConstants.PROP_DATABASE, DBConstants.PROP_FOLDER, DBConstants.PROP_FILE ->
                         cfg.setDatabaseName(CommonUtils.notNull(driver.getDefaultDatabase(), propName));
                     default -> log.debug("Unexpected mandatory URL property " + propName);
                 }
             }
-            cfg.setUrl(driver.getConnectionURL(cfg));
+            try {
+                cfg.setUrl(driver.getConnectionURL(cfg));
+            } catch (DBException e) {
+                log.debug("Error generating fake connection URL to obtain driver properties", e); // FIXME: why do we even need parameters?
+
+                // prepare an extra map containing fake values for all the required parameters,
+                // including non-well-known or prohibited in normal scenarios
+                Map<String, String> allParams = dbUrlPattern.getMandatoryPropertyNames().stream()
+                    .collect(Collectors.toMap(Function.identity(), Function.identity()));
+
+                cfg.setUrl(DatabaseURL.generateUrlByTemplate(driver.getSampleURL(), cfg, allParams));
+            }
             return WebServiceUtils.getDriverProperties(webSession, driver, null, cfg);
         } catch (DBException e) {
             throw new DBWebException("Error obtaining driver properties", e);
