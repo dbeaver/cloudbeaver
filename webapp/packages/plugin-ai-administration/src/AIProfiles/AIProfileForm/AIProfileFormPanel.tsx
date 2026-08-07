@@ -42,15 +42,22 @@ export const AIProfileFormPanel = observer<IAIProfileFormProps>(function AIProfi
     },
   });
 
+  const label = translate(creating ? 'plugin_ai_administration_profile_create' : 'plugin_ai_administration_profile_edit');
+
   return (
     <Form context={form} contents>
       <TabsState container={aiProfileFormService.parts} localState={formState.parts} formState={formState}>
-        <div className="tw:flex tw:flex-col tw:flex-1 tw:h-full tw:overflow-auto theme-background-secondary theme-text-on-secondary">
+        <div
+          aria-label={label}
+          className="tw:flex tw:flex-col tw:flex-1 tw:h-full tw:overflow-auto theme-background-secondary theme-text-on-secondary"
+        >
           <div className="tw:relative tw:flex tw:items-end tw:border-b-2 theme-border-color-background theme-background-secondary theme-text-on-secondary">
             <div className="tw:flex-1 tw:overflow-hidden tw:pt-2 tw:pl-2">
               <GroupTitle header>
                 <GroupBack onClick={() => aiProfileFormService.close()}>
-                  <Text truncate>{formState.state.name || translate('ui_stepper_back')}</Text>
+                  <Text truncate>
+                    {creating ? translate('plugin_ai_administration_profile_create') : `${translate('ui_edit')} "${formState.state.name}"`}
+                  </Text>
                 </GroupBack>
               </GroupTitle>
               <div className="tw:p-2">
