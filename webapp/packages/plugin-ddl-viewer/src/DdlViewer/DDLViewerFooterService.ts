@@ -8,7 +8,8 @@
 import { ConnectionInfoResource, createConnectionParam } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { EObjectFeature, NavNodeInfoResource, NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
-import { download, MetadataMap, withTimestamp } from '@cloudbeaver/core-utils';
+import { MetadataMap } from '@cloudbeaver/core-utils';
+import { download, withTimestamp } from '@dbeaver/js-helpers';
 import { ACTION_SAVE, ActionService, MenuService } from '@cloudbeaver/core-view';
 import { DDL_GENERATOR_ID, SqlGeneratorsResource } from '@cloudbeaver/plugin-sql-generator';
 import { LocalStorageSqlDataSource } from '@cloudbeaver/plugin-sql-editor';

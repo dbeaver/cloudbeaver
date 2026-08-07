@@ -39,6 +39,7 @@
     "@cloudbeaver/plugin-sql-editor-codemirror": "workspace:*",
     "@cloudbeaver/plugin-sql-editor-navigation-tab": "workspace:*",
     "@cloudbeaver/plugin-sql-generator": "workspace:*",
+    "@dbeaver/js-helpers": "workspace:*",
     "mobx": "^6",
     "mobx-react-lite": "^4",
     "react": "^19",

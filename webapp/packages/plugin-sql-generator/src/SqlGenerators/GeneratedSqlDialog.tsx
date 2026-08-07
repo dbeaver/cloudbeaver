@@ -23,8 +23,8 @@ import {
 import { ConnectionDialectResource, ConnectionInfoResource, createConnectionParam } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import type { DialogComponentProps } from '@cloudbeaver/core-dialogs';
-import { download, withTimestamp } from '@cloudbeaver/core-utils';
 import { EObjectFeature, NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
+import { download, withTimestamp } from '@dbeaver/js-helpers';
 import { useCodemirrorExtensions } from '@cloudbeaver/plugin-codemirror6';
 import { SqlEditorNavigatorService } from '@cloudbeaver/plugin-sql-editor-navigation-tab';
 import { SQLCodeEditor, useSqlDialectExtension } from '@cloudbeaver/plugin-sql-editor-codemirror';

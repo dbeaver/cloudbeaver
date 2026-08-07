@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -13,6 +13,7 @@ import { Filter, Group, IconOrImage, Loader, s, useS, useTranslate } from '@clou
 import styles from './UsersTableFilters.module.css';
 import { UsersTableFiltersDetails } from './UsersTableFiltersDetails.js';
 import { type IUserFilters } from './useUsersTableFilters.js';
+import { IconButton } from '@dbeaver/ui-kit';
 
 interface Props {
   filters: IUserFilters;
@@ -34,9 +35,14 @@ export const UsersTableFilters = observer<Props>(function UsersTableFilters({ fi
           onChange={filters.setSearch}
         />
         <div className={s(style, { actions: true })}>
-          <div className={s(style, { button: true, buttonActive: open })} onClick={() => setOpen(!open)}>
+          <IconButton
+            className={s(style, { button: true, buttonActive: open })}
+            size="small"
+            aria-label={translate('authentication_administration_users_filters_filter_label')}
+            onClick={() => setOpen(!open)}
+          >
             <IconOrImage className={s(style, { iconOrImage: true })} icon="filter" />
-          </div>
+          </IconButton>
         </div>
       </div>
 
