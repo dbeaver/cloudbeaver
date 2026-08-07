@@ -14,7 +14,8 @@ import { useService } from '@cloudbeaver/core-di';
 import { UsersAdministrationService } from '../../UsersAdministrationService.js';
 import styles from './UsersTableFilters.module.css';
 import { UsersTableFiltersDetails } from './UsersTableFiltersDetails.js';
-import type { IUserFilters } from './useUsersTableFilters.js';
+import { type IUserFilters } from './useUsersTableFilters.js';
+import { IconButton } from '@dbeaver/ui-kit';
 
 interface Props {
   filters: IUserFilters;
@@ -38,9 +39,14 @@ export const UsersTableFilters = observer<Props>(function UsersTableFilters({ fi
         />
         <div className={s(style, { actions: true })}>
           <div className={s(style, { buttonBox: true })}>
-            <div className={s(style, { button: true, buttonActive: open })} onClick={() => setOpen(!open)}>
+            <IconButton
+              className={s(style, { button: true, buttonActive: open })}
+              size="small"
+              aria-label={translate('authentication_administration_users_filters_filter_label')}
+              onClick={() => setOpen(!open)}
+            >
               <IconOrImage className={s(style, { iconOrImage: true })} icon="filter" />
-            </div>
+            </IconButton>
           </div>
           {usersAdministrationService.exportPlaceholder.getDisplayed({ filters }).length > 0 && (
             <div className={s(style, { buttonBox: true })}>
