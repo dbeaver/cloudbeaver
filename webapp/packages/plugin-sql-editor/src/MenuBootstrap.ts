@@ -8,7 +8,8 @@
 import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { WindowEventsService } from '@cloudbeaver/core-root';
-import { getTextFileReadingProcess, throttle, withTimestamp } from '@cloudbeaver/core-utils';
+import { getTextFileReadingProcess, throttle } from '@cloudbeaver/core-utils';
+import { withTimestamp } from '@dbeaver/js-helpers';
 import {
   ACTION_DOWNLOAD,
   ACTION_REDO,

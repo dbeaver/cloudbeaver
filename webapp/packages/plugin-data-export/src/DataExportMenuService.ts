@@ -11,7 +11,7 @@ import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { DATA_CONTEXT_NAV_NODE, EObjectFeature } from '@cloudbeaver/core-navigation-tree';
-import { withTimestamp } from '@cloudbeaver/core-utils';
+import { withTimestamp } from '@dbeaver/js-helpers';
 import { ACTION_EXPORT, ActionService, menuExtractItems, MenuService } from '@cloudbeaver/core-view';
 import {
   DATA_CONTEXT_DV_DDM,
