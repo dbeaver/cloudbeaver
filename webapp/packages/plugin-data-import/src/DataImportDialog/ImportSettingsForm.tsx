@@ -6,6 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
+import { useEffect } from 'react';
 
 import { Combobox, Container, FieldCheckbox, Link, useTranslate } from '@cloudbeaver/core-blocks';
 import type { DataTransferImportSettings } from '@cloudbeaver/core-sdk';
@@ -21,6 +22,12 @@ export const ImportSettingsForm = observer<Props>(function ImportSettingsForm({ 
   const translate = useTranslate();
   const { supportedInsertReplaceMethods, supportsBulkLoad, supportsTransactions, defaultOpenNewConnection } = driverConfiguration;
 
+  useEffect(() => {
+    if (settings.useBulkLoad) {
+      settings.onDuplicateKeyMethod = undefined;
+    }
+  }, [settings.useBulkLoad]);
+
   return (
     <Container gap parent>
       {supportedInsertReplaceMethods.length > 0 && (
@@ -32,6 +39,7 @@ export const ImportSettingsForm = observer<Props>(function ImportSettingsForm({ 
             keySelector={method => method.id}
             valueSelector={method => method.name}
             titleSelector={method => method.description ?? undefined}
+            disabled={settings.useBulkLoad}
             placeholder={translate('plugin_data_import_settings_on_duplicate_key_placeholder')}
           >
             {translate('plugin_data_import_settings_on_duplicate_key')}
