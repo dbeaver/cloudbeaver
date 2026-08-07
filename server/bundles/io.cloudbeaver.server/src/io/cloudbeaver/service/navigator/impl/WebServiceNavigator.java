@@ -546,9 +546,9 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                     throw new DBWebException("Navigator node '"  + path + "' not found");
                 }
                 checkProjectEditAccess(node, session);
-                if (node instanceof DBNDatabaseNode) {
-                    checkMetadataEditPermission((DBNDatabaseNode) node);
-                    DBSObject object = ((DBNDatabaseNode) node).getObject();
+                if (node instanceof DBNDatabaseNode dbnDatabaseNode) {
+                    checkMetadataEditPermission(dbnDatabaseNode);
+                    DBSObject object = dbnDatabaseNode.getObject();
                     DBEObjectMaker objectDeleter = DBWorkbench.getPlatform().getEditorsRegistry().getObjectManager(
                         object.getClass(), DBEObjectMaker.class);
                     if (objectDeleter == null || !objectDeleter.canDeleteObject(object)) {
