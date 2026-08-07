@@ -17,6 +17,7 @@ import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dial
 import { CreateTeamService } from './Teams/TeamsTable/CreateTeamService.js';
 import { EUsersAdministrationSub, UsersAdministrationNavigationService } from './UsersAdministrationNavigationService.js';
 import { CreateUserService } from './UsersTable/CreateUserService.js';
+import { UsersTableFilterButton } from './UsersTable/Filters/UsersTableFilterButton.js';
 import type { IUserFilters } from './UsersTable/Filters/useUsersTableFilters.js';
 
 const UserCredentialsList = React.lazy(async () => {
@@ -42,12 +43,16 @@ export interface IUsersExportProps {
   filters: IUserFilters;
 }
 
+export interface IUsersActionButtonProps {
+  filters: IUserFilters;
+}
+
 @injectable(() => [AdministrationItemService, CreateUserService, TeamsResource, CreateTeamService, UsersResource, CommonDialogService])
 export class UsersAdministrationService extends Bootstrap {
   readonly tabsContainer: TabsContainer;
   readonly userDetailsInfoPlaceholder: PlaceholderContainer<IUserDetailsInfoProps>;
   readonly informationPlaceholder: PlaceholderContainer;
-  readonly exportPlaceholder: PlaceholderContainer<IUsersExportProps>;
+  readonly actionButtonsPlaceholder: PlaceholderContainer<IUsersActionButtonProps>;
   administrationItem!: IAdministrationItem;
 
   constructor(
@@ -62,7 +67,7 @@ export class UsersAdministrationService extends Bootstrap {
     this.userDetailsInfoPlaceholder = new PlaceholderContainer();
     this.tabsContainer = new TabsContainer('Access Control');
     this.informationPlaceholder = new PlaceholderContainer();
-    this.exportPlaceholder = new PlaceholderContainer();
+    this.actionButtonsPlaceholder = new PlaceholderContainer();
   }
 
   override register(): void {
@@ -90,6 +95,7 @@ export class UsersAdministrationService extends Bootstrap {
       getDrawerComponent: () => UsersDrawerItem,
     });
     this.userDetailsInfoPlaceholder.add(UserCredentialsList, 0);
+    this.actionButtonsPlaceholder.add(UsersTableFilterButton, 0);
   }
 
   private async handleDeactivate(sub: EUsersAdministrationSub) {

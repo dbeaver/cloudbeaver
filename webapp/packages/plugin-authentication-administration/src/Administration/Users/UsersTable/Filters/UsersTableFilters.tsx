@@ -6,16 +6,16 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
-import { Filter, Group, IconOrImage, Loader, Placeholder, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { Filter, Group, Loader, Placeholder, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 
 import { UsersAdministrationService } from '../../UsersAdministrationService.js';
 import styles from './UsersTableFilters.module.css';
 import { UsersTableFiltersDetails } from './UsersTableFiltersDetails.js';
+import { UsersTableFiltersOpenContext } from './UsersTableFiltersOpenContext.js';
 import { type IUserFilters } from './useUsersTableFilters.js';
-import { IconButton } from '@dbeaver/ui-kit';
 
 interface Props {
   filters: IUserFilters;
@@ -27,6 +27,8 @@ export const UsersTableFilters = observer<Props>(function UsersTableFilters({ fi
   const usersAdministrationService = useService(UsersAdministrationService);
 
   const [open, setOpen] = useState(false);
+  const onToggle = useCallback(() => setOpen(open => !open), []);
+  const openContext = useMemo(() => ({ open, onToggle }), [open, onToggle]);
 
   return (
     <Group parent compact gap>
@@ -38,21 +40,9 @@ export const UsersTableFilters = observer<Props>(function UsersTableFilters({ fi
           onChange={filters.setSearch}
         />
         <div className={s(style, { actions: true })}>
-          <div className={s(style, { buttonBox: true })}>
-            <IconButton
-              className={s(style, { button: true, buttonActive: open })}
-              size="small"
-              aria-label={translate('authentication_administration_users_filters_filter_label')}
-              onClick={() => setOpen(!open)}
-            >
-              <IconOrImage className={s(style, { iconOrImage: true })} icon="filter" />
-            </IconButton>
-          </div>
-          {usersAdministrationService.exportPlaceholder.getDisplayed({ filters }).length > 0 && (
-            <div className={s(style, { buttonBox: true })}>
-              <Placeholder container={usersAdministrationService.exportPlaceholder} filters={filters} />
-            </div>
-          )}
+          <UsersTableFiltersOpenContext.Provider value={openContext}>
+            <Placeholder container={usersAdministrationService.actionButtonsPlaceholder} filters={filters} />
+          </UsersTableFiltersOpenContext.Provider>
         </div>
       </div>
 
