@@ -1027,20 +1027,12 @@ public class LocalResourceController extends BaseLocalResourceController {
         }
         try {
             while (resourcePath.startsWith("/")) resourcePath = resourcePath.substring(1);
+            for (Path part : projectPath.resolve(resourcePath)) {
+                GeneralUtils.validateResourceNameUnconditionally(part.toString());
+            }
             Path targetPath = projectPath.resolve(resourcePath).normalize();
             if (!targetPath.startsWith(projectPath)) {
                 throw new DBException("Invalid resource path");
-            }
-            if (ServletAppUtils.getServletApplication().isMultiNode()) {
-                // we need to check that the resource path starts with a valid resource type folder
-                Path relative = projectPath.relativize(targetPath);
-                if (relative.getNameCount() == 0) {
-                    throw new DBException("Resource points to project root");
-                }
-                String firstSegment = relative.getName(0).toString();
-                if (ResourceTypeRegistry.getInstance().getResourceTypeByRootPath(null, firstSegment) == null) {
-                    throw new DBException("Invalid resource type");
-                }
             }
             return targetPath;
         } catch (InvalidPathException e) {
