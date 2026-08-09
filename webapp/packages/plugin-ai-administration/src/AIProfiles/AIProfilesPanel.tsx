@@ -55,7 +55,7 @@ export const AIProfilesPanel = observer<Props>(function AIProfilesPanel({ formSt
   const profiles = profilesLoader.data.filter(isDefined);
   const defaultProfileId = settingsInfoPart.initialState.defaultConfiguration;
 
-  const selection = useTableSelection(profiles.map(p => p.id));
+  const selection = useTableSelection(profiles.filter(p => p.id !== defaultProfileId).map(p => p.id));
   const table = useAIProfilesTable(selection);
 
   return (
