@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { download } from '@cloudbeaver/core-utils';
+import { download } from '@dbeaver/js-helpers';
 
 function sanitizeFilename(filename: string): string {
   // Remove or replace invalid filesystem characters

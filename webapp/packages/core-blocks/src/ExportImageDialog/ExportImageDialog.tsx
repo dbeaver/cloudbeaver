@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -92,7 +92,7 @@ export const ExportImageDialog = observer<DialogComponentProps<ExportImagePayloa
         <Button type="button" variant="secondary" onClick={() => props.rejectDialog()}>
           {translate('app_shared_inlineEditor_dialog_cancel')}
         </Button>
-        <Button type="button" onClick={onExportHandler}>
+        <Button type="button" loader onClick={onExportHandler}>
           {translate('ui_export')}
         </Button>
       </CommonDialogFooter>

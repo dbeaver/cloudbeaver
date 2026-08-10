@@ -47,4 +47,6 @@ export default [
     'plugin_ai_administration_profile_default_delete_info',
     'Le profil par défaut ne peut pas être supprimé. Veuillez sélectionner un autre profil comme profil par défaut avant de supprimer ce profil.',
   ],
+  ['plugin_ai_administration_profile_create', 'Nouveau profil'],
+  ['plugin_ai_administration_profile_edit', 'Modifier le profil'],
 ];
