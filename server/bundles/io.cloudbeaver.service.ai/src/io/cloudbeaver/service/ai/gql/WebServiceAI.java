@@ -25,6 +25,7 @@ import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.service.ai.WebAIUtils;
 import io.cloudbeaver.service.ai.model.*;
+import io.cloudbeaver.service.ai.model.events.WSAiChatMessageEvent;
 import io.cloudbeaver.service.ai.model.inputs.DataSourceId;
 import io.cloudbeaver.service.ai.model.inputs.WebAIChatConversationInput;
 import io.cloudbeaver.service.ai.model.inputs.WebAIConfigurationProfileInput;
@@ -52,6 +53,7 @@ import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.logical.DBSLogicalDataSource;
 import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
+import org.jkiss.dbeaver.model.runtime.AbstractJob;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.websocket.event.WSWorkspaceConfigurationChangedEvent;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
@@ -404,8 +406,21 @@ public class WebServiceAI implements DBWServiceAI {
     ) throws DBWebException {
         WebAIUtils.validateAiPluginEnabled();
         AIChatConversation conversation = WebAIUtils.getAiChatConversation(webSession, conversationId);
+        boolean completionStarted = conversation.isActive();
         conversation.cancelConversation();
+        boolean hadPendingJob = false;
+        if (webSession.getAttribute(WebAIUtils.getWaitingAttr(conversation)) instanceof AbstractJob job) {
+            hadPendingJob = true;
+            job.cancel();
+        }
         webSession.removeAttribute(WebAIUtils.getWaitingAttr(conversation));
+        if (hadPendingJob && !completionStarted) {
+            // The completion job was still queued, so its response consumer will not be called.
+            // We need to add a cancellation message to the conversation and notify the client.
+            AIChatMessage cancelMessage = conversation.addMessage(
+                AIMessage.warningMessage(WebAIUtils.CHAT_CANCELLED_MESSAGE));
+            webSession.addSessionEvent(new WSAiChatMessageEvent(new WebAIMessage(cancelMessage, conversation)));
+        }
         return true;
     }
 

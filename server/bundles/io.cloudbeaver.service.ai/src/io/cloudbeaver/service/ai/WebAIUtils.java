@@ -24,6 +24,8 @@ import io.cloudbeaver.service.ai.model.WebAISendChatMessageInfo;
 import io.cloudbeaver.service.ai.model.WebAiChatResponseConsumer;
 import io.cloudbeaver.service.ai.model.events.WSAiChatMessageEvent;
 import io.cloudbeaver.utils.ServletAppUtils;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -39,9 +41,9 @@ import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.navigator.DBNDatabaseNode;
 import org.jkiss.dbeaver.model.navigator.DBNNode;
 import org.jkiss.dbeaver.model.navigator.DBNUtils;
+import org.jkiss.dbeaver.model.runtime.AbstractJob;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.struct.DBSObject;
-import org.jkiss.dbeaver.utils.RuntimeUtils;
 import org.jkiss.utils.CommonUtils;
 
 import java.time.Clock;
@@ -54,6 +56,7 @@ public class WebAIUtils {
     private static final String AI_WAITING_ATTR = "ai.waiting.";
     public static final String AI_CHAT_ATTR = "ai_chat";
     public static final String AI_CHAT_USER_ATTR = "ai_chat_user";
+    public static final String CHAT_CANCELLED_MESSAGE = "Response generation cancelled by user.";
 
     @NotNull
     public static List<String> convertObjectIdsToNodePaths(
@@ -139,10 +142,11 @@ public class WebAIUtils {
         @Nullable AIConfirmation confirmation,
         @NotNull String jobName
     ) {
-        webSession.setAttribute(getWaitingAttr(conversation), true);
         CompletableFuture<AIChatConversation> result = new CompletableFuture<>();
-        RuntimeUtils.scheduleJob(
-            jobName, monitor -> {
+        AbstractJob job = new AbstractJob(jobName) {
+            @NotNull
+            @Override
+            protected IStatus run(@NotNull DBRProgressMonitor monitor) {
                 try {
                     AIChatResponseConsumer subscriber = new WebAiChatResponseConsumer(conversation, webSession, aiChatSession);
                     aiChatSession.processAICompletion(
@@ -159,15 +163,25 @@ public class WebAIUtils {
                         }
                     });
                 } catch (DBException e) {
-                    log.error("Error processing AI completion", e);
-                    var errorMessage = conversation.addMessage(AIMessage.errorMessage(e));
-                    webSession.addSessionEvent(new WSAiChatMessageEvent(new WebAIMessage(errorMessage, conversation)));
-                    aiChatSession.notifyMessageAdd(conversation, errorMessage);
+                    if (monitor.isCanceled()) {
+                        log.debug("AI completion cancelled", e);
+                    } else {
+                        log.error("Error processing AI completion", e);
+                        var errorMessage = conversation.addMessage(AIMessage.errorMessage(e));
+                        webSession.addSessionEvent(new WSAiChatMessageEvent(new WebAIMessage(errorMessage, conversation)));
+                        aiChatSession.notifyMessageAdd(conversation, errorMessage);
+                    }
                 } finally {
-                    webSession.removeAttribute(getWaitingAttr(conversation));
+                    // Only clear the flag if it still points to this job
+                    if (webSession.getAttribute(getWaitingAttr(conversation)) == this) {
+                        webSession.removeAttribute(getWaitingAttr(conversation));
+                    }
                 }
+                return Status.OK_STATUS;
             }
-        );
+        };
+        webSession.setAttribute(getWaitingAttr(conversation), job);
+        job.schedule();
         return result;
     }
 

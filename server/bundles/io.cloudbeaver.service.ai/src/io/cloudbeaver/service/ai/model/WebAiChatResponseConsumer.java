@@ -17,6 +17,7 @@
 package io.cloudbeaver.service.ai.model;
 
 import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.service.ai.WebAIUtils;
 import io.cloudbeaver.service.ai.model.events.WSAiChatMessageChunkEvent;
 import io.cloudbeaver.service.ai.model.events.WSAiChatMessageErrorEvent;
 import io.cloudbeaver.service.ai.model.events.WSAiChatMessageEvent;
@@ -100,6 +101,9 @@ public class WebAiChatResponseConsumer implements AIChatResponseConsumer {
     @Override
     public void complete(@NotNull List<AIMessageMeta> meta, boolean finishConversation, boolean isCanceled) {
         if (responseBuilder.isEmpty()) {
+            if (isCanceled) {
+                warning(WebAIUtils.CHAT_CANCELLED_MESSAGE);
+            }
             return;
         }
         AIChatMessage responseMessage = conversation.addMessage(AIMessage.assistantMessage(responseBuilder.toString(), meta));
@@ -107,7 +111,7 @@ public class WebAiChatResponseConsumer implements AIChatResponseConsumer {
         webSession.addSessionEvent(new WSAiChatMessageChunkEvent(conversation.getId(), responseMessage.id(), null, true));
 
         if (isCanceled) {
-            warning("Response generation cancelled by user.");
+            warning(WebAIUtils.CHAT_CANCELLED_MESSAGE);
         }
     }
 }
