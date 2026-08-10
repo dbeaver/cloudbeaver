@@ -23,8 +23,8 @@ import {
 import { ConnectionDialectResource, ConnectionInfoResource, createConnectionParam } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import type { DialogComponentProps } from '@cloudbeaver/core-dialogs';
+import { EObjectFeature, NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
 import { download, withTimestamp } from '@dbeaver/js-helpers';
-import { NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
 import { useCodemirrorExtensions } from '@cloudbeaver/plugin-codemirror6';
 import { SqlEditorNavigatorService } from '@cloudbeaver/plugin-sql-editor-navigation-tab';
 import { SQLCodeEditor, useSqlDialectExtension } from '@cloudbeaver/plugin-sql-editor-codemirror';
@@ -33,9 +33,12 @@ import { action, observable } from 'mobx';
 import { NotificationService } from '@cloudbeaver/core-events';
 import type { SqlQueryGeneratorOptions } from '@cloudbeaver/core-sdk';
 
+import { DDL_GENERATOR_ID } from './SqlGeneratorsResource.js';
+
 interface Payload {
   nodeId: string;
   nodeName?: string;
+  generatorId: string;
   generatorName?: string;
   query: string;
   options?: SqlQueryGeneratorOptions;
@@ -51,6 +54,7 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<Payload>>(functi
     () => ({
       useFullyQualifiedNames: payload.options?.useFullyQualifiedNames ?? true,
       compactSql: payload.options?.compactSql ?? false,
+      showFullDdl: payload.options?.showFullDdl,
       query: payload.query,
       loading: false,
       handleOptionChange: async function handleOptionChange<T extends keyof typeof state>(key: T, value: (typeof state)[T]) {
@@ -61,6 +65,7 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<Payload>>(functi
           this.query = await this.payload.regenerateQuery({
             compactSql: this.compactSql,
             useFullyQualifiedNames: this.useFullyQualifiedNames,
+            showFullDdl: this.showFullDdl,
           });
         } catch (error: any) {
           this.notificationService.logException(error, 'app_shared_sql_generators_error_title');
@@ -73,6 +78,7 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<Payload>>(functi
       handleOptionChange: action.bound,
       useFullyQualifiedNames: observable.ref,
       compactSql: observable.ref,
+      showFullDdl: observable.ref,
       query: observable.ref,
       loading: observable.ref,
     },
@@ -96,6 +102,10 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<Payload>>(functi
   }
 
   const visibleLoading = useStateDelay(state.loading, 300);
+  const isDdlGenerator = payload.generatorId.toLowerCase().includes(DDL_GENERATOR_ID.toLowerCase());
+  const node = navNodeManagerService.getNode(payload.nodeId);
+  const supportsFullDdl = node?.objectFeatures.includes(EObjectFeature.supportsFullDdl) ?? false;
+  const hasFullDdl = isDdlGenerator && supportsFullDdl;
 
   async function handleOpenInEditor() {
     try {
@@ -134,21 +144,24 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<Payload>>(functi
             <div className="tw:flex tw:flex-row tw:gap-3 tw:w-full">
               <Checkbox
                 id="use-fully-qualified-names"
-                state={state}
-                name="useFullyQualifiedNames"
                 disabled={visibleLoading}
                 label={translate('app_shared_sql_generators_use_fully_qualified_names')}
                 onChange={value => state.handleOptionChange('useFullyQualifiedNames', value)}
               />
-
               <Checkbox
                 id="compact-sql"
-                state={state}
-                name="compactSql"
                 disabled={visibleLoading}
                 label={translate('app_shared_sql_generators_compact_sql')}
                 onChange={value => state.handleOptionChange('compactSql', value)}
               />
+              {hasFullDdl && (
+                <Checkbox
+                  id="show-full-ddl"
+                  disabled={visibleLoading}
+                  label={translate('app_shared_sql_generators_full_ddl')}
+                  onChange={value => state.handleOptionChange('showFullDdl', value)}
+                />
+              )}
             </div>
           </div>
           <div className="tw:flex tw:items-center tw:justify-between tw:w-full tw:gap-6">
