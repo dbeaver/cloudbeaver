@@ -12,7 +12,8 @@ import { promptForFiles } from '@cloudbeaver/core-browser';
 import { ConnectionInfoResource, createConnectionParam } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { download, getMIME, isImageFormat, isValidUrl } from '@cloudbeaver/core-utils';
+import { getMIME, isImageFormat, isValidUrl } from '@cloudbeaver/core-utils';
+import { download } from '@dbeaver/js-helpers';
 import { isResultSetBinaryValue } from '@dbeaver/result-set-api';
 
 import { createResultSetBlobValue } from '../../DatabaseDataModel/Actions/ResultSet/createResultSetBlobValue.js';

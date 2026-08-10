@@ -1027,6 +1027,9 @@ public class LocalResourceController extends BaseLocalResourceController {
         }
         try {
             while (resourcePath.startsWith("/")) resourcePath = resourcePath.substring(1);
+            for (Path part : projectPath.resolve(resourcePath)) {
+                GeneralUtils.validateResourceNameUnconditionally(part.toString());
+            }
             Path targetPath = projectPath.resolve(resourcePath).normalize();
             if (!targetPath.startsWith(projectPath)) {
                 throw new DBException("Invalid resource path");
