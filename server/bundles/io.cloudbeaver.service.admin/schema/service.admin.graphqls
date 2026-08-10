@@ -1,3 +1,7 @@
+####################################################
+# Administration API
+####################################################
+
 "Describes the type of the administrative subject (user or team)"
 enum AdminSubjectType {
     "User"

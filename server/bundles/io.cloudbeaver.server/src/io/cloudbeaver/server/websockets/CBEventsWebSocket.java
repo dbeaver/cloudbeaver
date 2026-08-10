@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,6 +47,11 @@ public class CBEventsWebSocket extends CBAbstractWebSocket implements CBWebSessi
         } else {
             this.webSession = (BaseWebSession) session.getUserProperties()
                 .get(CBWebSocketServerConfigurator.PROP_WEB_SESSION);
+            if (this.webSession == null) {
+                log.debug("No web session for websocket connection, closing");
+                close();
+                return;
+            }
             this.webSession.addEventHandler(this);
             handleEvent(new WSSocketConnectedEvent(webSession.getApplication().getApplicationRunId()));
             log.debug("EventWebSocket connected to the " + webSession.getSessionId() + " session");
