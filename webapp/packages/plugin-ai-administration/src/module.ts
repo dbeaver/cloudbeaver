@@ -8,7 +8,6 @@
 
 import { Bootstrap, Dependency, ModuleRegistry, proxy } from '@cloudbeaver/core-di';
 import { LocaleService } from './LocaleService.js';
-import { EnginesResource } from './Engines/EnginesResource.js';
 import { AISettingsResource } from './AISettingsResource.js';
 import { AISettingsService } from './AISettingsService.js';
 import { AIEnginePropertiesResource } from './AIProfiles/AIEnginePropertiesResource.js';
@@ -29,11 +28,9 @@ export default ModuleRegistry.add({
       .addSingleton(AIAdministrationBootstrap)
       .addSingleton(Bootstrap, LocaleService)
       .addSingleton(Bootstrap, proxy(AIAdministrationTabsService))
-      .addSingleton(Dependency, proxy(EnginesResource))
       .addSingleton(Dependency, proxy(AISettingsResource))
       .addSingleton(Dependency, proxy(AIProfilesResource))
       .addSingleton(Dependency, proxy(AIEnginePropertiesResource))
-      .addSingleton(EnginesResource)
       .addSingleton(AISettingsResource)
       .addSingleton(AISettingsService)
       .addSingleton(AIProfilesResource)
