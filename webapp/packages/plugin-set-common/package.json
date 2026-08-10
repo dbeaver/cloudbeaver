@@ -56,6 +56,7 @@
     "@cloudbeaver/core-version-update": "workspace:*",
     "@cloudbeaver/core-view": "workspace:*",
     "@cloudbeaver/plugin-administration": "workspace:*",
+    "@cloudbeaver/plugin-ai": "workspace:*",
     "@cloudbeaver/plugin-ai-administration": "workspace:*",
     "@cloudbeaver/plugin-ai-chat": "workspace:*",
     "@cloudbeaver/plugin-app-logo": "workspace:*",
