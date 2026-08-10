@@ -42,6 +42,7 @@ export const ImportSettingsForm = observer<Props>(function ImportSettingsForm({ 
             disabled={settings.useBulkLoad}
             title={translate('plugin_data_import_settings_on_duplicate_key_title')}
             placeholder={translate('plugin_data_import_settings_on_duplicate_key_placeholder')}
+            allowClear
           >
             {translate('plugin_data_import_settings_on_duplicate_key')}
           </Combobox>
