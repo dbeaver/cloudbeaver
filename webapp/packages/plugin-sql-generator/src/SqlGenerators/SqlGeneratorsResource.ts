@@ -8,6 +8,7 @@
 import { injectable } from '@cloudbeaver/core-di';
 import { NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
 import { CachedMapResource, isResourceAlias, type ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-resource';
+import { AsyncTaskInfoService } from '@cloudbeaver/core-root';
 import {
   GraphQLService,
   type SqlGenerateResultSetQueryQueryVariables,
@@ -19,13 +20,15 @@ export const MAX_GENERATORS_LENGTH = 15;
 export const getDefaultQueryGeneratorOptions = (): SqlQueryGeneratorOptions => ({
   useFullyQualifiedNames: true,
   compactSql: false,
+  showFullDdl: false,
 });
 export const DDL_GENERATOR_ID = 'tableDDL';
 
-@injectable(() => [GraphQLService, NavNodeInfoResource])
+@injectable(() => [GraphQLService, AsyncTaskInfoService, NavNodeInfoResource])
 export class SqlGeneratorsResource extends CachedMapResource<string, SqlQueryGenerator[]> {
   constructor(
     private readonly graphQLService: GraphQLService,
+    private readonly asyncTaskInfoService: AsyncTaskInfoService,
     private readonly navNodeInfoResource: NavNodeInfoResource,
   ) {
     super();
@@ -35,13 +38,20 @@ export class SqlGeneratorsResource extends CachedMapResource<string, SqlQueryGen
   }
 
   async generateEntityQuery(generatorId: string, nodePathList: string | string[], options?: SqlQueryGeneratorOptions): Promise<string> {
-    const result = await this.graphQLService.sdk.sqlGenerateEntityQuery({
-      generatorId,
-      nodePathList,
-      generatorOptions: options,
+    const task = this.asyncTaskInfoService.create(async () => {
+      const { taskInfo } = await this.graphQLService.sdk.asyncSqlGenerateEntityQuery({
+        generatorId,
+        nodePathList,
+        generatorOptions: options,
+      });
+
+      return taskInfo;
     });
 
-    return result.sqlGenerateEntityQuery;
+    const info = await this.asyncTaskInfoService.run(task);
+    await this.asyncTaskInfoService.remove(task.id);
+
+    return info.taskResult;
   }
 
   async generateResultSetSql(params: SqlGenerateResultSetQueryQueryVariables): Promise<string | null> {

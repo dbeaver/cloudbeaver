@@ -179,6 +179,7 @@ export class DataGridContextMenuGenerateSqlService {
         query,
         nodeId: nodePath ?? connectionId,
         nodeName: this.getEntityNameFromNodePath(containerNodePath, model.name),
+        generatorId,
         generatorName: this.localizationService.translate(generatorLabel),
         options: getDefaultQueryGeneratorOptions(),
         regenerateQuery: options =>
@@ -234,6 +235,7 @@ export class DataGridContextMenuGenerateSqlService {
         query,
         nodeId: nodePathList,
         nodeName: this.getEntityNameFromNodePath(nodePathList, model.name),
+        generatorId: createGenerator.id,
         generatorName: createGenerator.label,
         options: getDefaultQueryGeneratorOptions(),
         regenerateQuery: genOptions => this.sqlGenerationResource.generateEntityQuery(createGenerator.id, nodePathList, genOptions),
