@@ -9,9 +9,10 @@
 import { observer } from 'mobx-react-lite';
 
 import { MenuGroup, MenuGroupLabel, MenuItemRadio } from '@dbeaver/ui-kit';
-import { RadioIndicator, useTranslate } from '@cloudbeaver/core-blocks';
+import { IconOrImage, RadioIndicator, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
+import { AiEnginesResource } from '@cloudbeaver/plugin-ai';
 
 import type { AIChatProfile } from '../../../AIChatProfilesResource.js';
 import type { AIChatConversationInfo } from '../AIChatConversationsResource.js';
@@ -27,6 +28,8 @@ export const AIChatConversationProfile = observer<Props>(function AIChatConversa
   const translate = useTranslate();
   const notificationService = useService(NotificationService);
   const aiChatConversationsService = useService(AIChatConversationsService);
+
+  const aiEnginesResource = useResource(AIChatConversationProfile, AiEnginesResource, undefined);
 
   async function selectProfile(profileId: string) {
     try {
@@ -46,6 +49,7 @@ export const AIChatConversationProfile = observer<Props>(function AIChatConversa
 
       {profiles.map(profile => {
         const isCurrent = conversation.profile === profile.id;
+        const engine = aiEnginesResource.data.find(e => e.id === profile.engineId);
 
         return (
           <MenuItemRadio
@@ -62,6 +66,7 @@ export const AIChatConversationProfile = observer<Props>(function AIChatConversa
           >
             <div className="tw:flex tw:items-center tw:gap-2 tw:overflow-hidden">
               <RadioIndicator size="small" checked={isCurrent} />
+              {engine?.icon && <IconOrImage className="tw:w-[14px]" icon={engine.icon} />}
               <span className="tw:truncate">{profile.name}</span>
             </div>
           </MenuItemRadio>

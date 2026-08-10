@@ -71,6 +71,9 @@
       "path": "../core-view"
     },
     {
+      "path": "../plugin-ai"
+    },
+    {
       "path": "../plugin-codemirror6"
     },
     {
