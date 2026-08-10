@@ -51,6 +51,13 @@ export class SettingsAdministrationPluginBootstrap extends Bootstrap {
 
         return true;
       },
+      onDeActivate: () => {
+        this.settingsAdministrationService.tabsContainer.getDisplayed().forEach(tab => {
+          if (tab.options?.source.isEdited()) {
+            tab.options?.source.clear();
+          }
+        });
+      },
       getContentComponent: () => SettingsAdministration,
       getDrawerComponent: () => SettingsDrawerItem,
     });
