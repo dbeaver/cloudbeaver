@@ -1,3 +1,0 @@
-query sqlGenerateEntityQuery($generatorId: String!, $nodePathList: [String!]!, $generatorOptions: SQLQueryGeneratorOptions) {
-  sqlGenerateEntityQuery(generatorId: $generatorId, nodePathList: $nodePathList, generatorOptions: $generatorOptions)
-}
