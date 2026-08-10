@@ -57,7 +57,6 @@ public class CBAppConfig extends BaseWebAppConfiguration implements ServletAuthC
     private boolean anonymousAccessEnabled;
     private boolean grantConnectionsAccessToAnonymousTeam;
     private boolean systemVariablesResolvingEnabled;
-    private boolean qmSaveMetadataQueries;
     @Deprecated
     private String anonymousUserRole;
     private String anonymousUserTeam;
@@ -91,7 +90,6 @@ public class CBAppConfig extends BaseWebAppConfiguration implements ServletAuthC
         this.linkExternalCredentialsWithUser = true;
         this.grantConnectionsAccessToAnonymousTeam = false;
         this.systemVariablesResolvingEnabled = false;
-        this.qmSaveMetadataQueries = true;
     }
 
     public CBAppConfig(CBAppConfig src) {
@@ -116,7 +114,6 @@ public class CBAppConfig extends BaseWebAppConfiguration implements ServletAuthC
         this.linkExternalCredentialsWithUser = src.linkExternalCredentialsWithUser;
         this.grantConnectionsAccessToAnonymousTeam = src.grantConnectionsAccessToAnonymousTeam;
         this.systemVariablesResolvingEnabled = src.systemVariablesResolvingEnabled;
-        this.qmSaveMetadataQueries = src.qmSaveMetadataQueries;
     }
 
     @Override
@@ -267,10 +264,6 @@ public class CBAppConfig extends BaseWebAppConfiguration implements ServletAuthC
 
     public boolean isSystemVariablesResolvingEnabled() {
         return systemVariablesResolvingEnabled;
-    }
-
-    public boolean isQmSaveMetadataQueries() {
-        return qmSaveMetadataQueries;
     }
 
     @Override
