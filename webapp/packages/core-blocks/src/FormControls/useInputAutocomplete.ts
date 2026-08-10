@@ -115,6 +115,9 @@ export const useInputAutocomplete = (
         this.selectionStart = null;
         this.position = { x: 0, y: 0 };
       },
+      setPosition(position: IContextMenuPositionCoords) {
+        this.position = position;
+      },
     }),
     {
       proposals: computed,
@@ -123,6 +126,7 @@ export const useInputAutocomplete = (
       currentWord: computed,
       resetState: action.bound,
       replaceCurrentWord: action.bound,
+      setPosition: action.bound,
       position: observable.ref,
       inputValue: observable.ref,
     },
@@ -182,8 +186,13 @@ export const useInputAutocomplete = (
   });
 
   useLayoutEffect(() => {
-    const inputElement = inputRef.current!;
-    const caretPosition = inputElement.selectionStart || 0;
+    const inputElement = inputRef.current;
+
+    if (!inputElement || state.selectionStart === null) {
+      return;
+    }
+
+    const caretPosition = inputElement.selectionStart ?? state.selectionStart;
     const inputStyle = window.getComputedStyle(inputElement);
 
     const span = document.createElement('span');
@@ -199,14 +208,14 @@ export const useInputAutocomplete = (
 
     document.body.appendChild(span);
     const spanRect = span.getBoundingClientRect();
-    const letterWidth = spanRect.width / span.textContent.length;
+    const letterWidth = span.textContent.length > 0 ? spanRect.width / span.textContent.length : 0;
     document.body.removeChild(span);
 
-    state.position = {
+    state.setPosition({
       x: spanRect.width + letterWidth,
       y: spanRect.height + CONTEXT_INPUT_OFFSET_Y,
-    };
-  }, [state.inputValue]);
+    });
+  }, [state.inputValue, state.selectionStart]);
 
   return state as Readonly<State>;
 };
