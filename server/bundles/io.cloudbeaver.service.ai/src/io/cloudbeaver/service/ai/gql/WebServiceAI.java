@@ -47,6 +47,7 @@ import org.jkiss.dbeaver.model.ai.engine.AIDatabaseContext;
 import org.jkiss.dbeaver.model.ai.engine.AIEngine;
 import org.jkiss.dbeaver.model.ai.engine.AIEngineProperties;
 import org.jkiss.dbeaver.model.ai.engine.AIModel;
+import org.jkiss.dbeaver.model.ai.internal.AIChatMessages;
 import org.jkiss.dbeaver.model.ai.prompt.AIPromptGenerateSql;
 import org.jkiss.dbeaver.model.ai.registry.*;
 import org.jkiss.dbeaver.model.app.DBPProject;
@@ -418,7 +419,7 @@ public class WebServiceAI implements DBWServiceAI {
             // The completion job was still queued, so its response consumer will not be called.
             // We need to add a cancellation message to the conversation and notify the client.
             AIChatMessage cancelMessage = conversation.addMessage(
-                AIMessage.warningMessage(WebAIUtils.CHAT_CANCELLED_MESSAGE));
+                AIMessage.warningMessage(AIChatMessages.ai_chat_conversation_cancelled));
             webSession.addSessionEvent(new WSAiChatMessageEvent(new WebAIMessage(cancelMessage, conversation)));
         }
         return true;

@@ -56,7 +56,6 @@ public class WebAIUtils {
     private static final String AI_WAITING_ATTR = "ai.waiting.";
     public static final String AI_CHAT_ATTR = "ai_chat";
     public static final String AI_CHAT_USER_ATTR = "ai_chat_user";
-    public static final String CHAT_CANCELLED_MESSAGE = "Response generation cancelled by user.";
 
     @NotNull
     public static List<String> convertObjectIdsToNodePaths(
