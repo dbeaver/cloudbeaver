@@ -407,8 +407,6 @@ public class WebServiceAI implements DBWServiceAI {
     ) throws DBWebException {
         WebAIUtils.validateAiPluginEnabled();
         AIChatConversation conversation = WebAIUtils.getAiChatConversation(webSession, conversationId);
-        // Serialize on the conversation so concurrent cancel/submit requests do not race on the
-        // waiting-attribute check-then-act or on the (non-thread-safe) conversation message list.
         synchronized (conversation) {
             boolean completionStarted = conversation.isActive();
             conversation.cancelConversation();

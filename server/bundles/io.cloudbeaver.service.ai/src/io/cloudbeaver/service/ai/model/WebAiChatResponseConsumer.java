@@ -81,9 +81,11 @@ public class WebAiChatResponseConsumer implements AIChatResponseConsumer {
     @Override
     public void error(@NotNull Throwable throwable) {
 
-        AIMessage aiMessage = throwable instanceof CancellationException cancellationException? AIMessage.warningMessage(cancellationException.getMessage()) : AIMessage.errorMessage(throwable);
+        AIMessage aiMessage = throwable instanceof CancellationException cancellationException
+            ? AIMessage.warningMessage(cancellationException.getMessage())
+            : AIMessage.errorMessage(throwable);
 
-        AIChatMessage errorMessage  = conversation.addMessage(aiMessage);
+        AIChatMessage errorMessage = conversation.addMessage(aiMessage);
         if (responseBuilder.isEmpty()) {
             webSession.addSessionEvent(
                 new WSAiChatMessageEvent(new WebAIMessage(errorMessage, conversation)));
