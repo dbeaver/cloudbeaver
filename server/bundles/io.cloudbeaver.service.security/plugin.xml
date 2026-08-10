@@ -20,6 +20,7 @@
                       description="Reverse proxy header based authentication"
                       trusted="true"
                       configurable="true"
+                      sameTabRedirectOnLogout="true"
                       class="io.cloudbeaver.auth.provider.rp.RPAuthProvider"
                       icon="platform:/plugin/org.jkiss.dbeaver.model/icons/tree/key.svg">
             <credentials>

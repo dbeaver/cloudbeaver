@@ -27,8 +27,8 @@ import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { FormMode, type TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 import { getObjectPropertyOptionName, getObjectPropertyOptionValue } from '@cloudbeaver/core-sdk';
+import { AiEnginesResource } from '@cloudbeaver/plugin-ai';
 
-import { EnginesResource } from '../../../Engines/EnginesResource.js';
 import { AIEnginePropertiesResource, MODEL_PROPERTY_ID } from '../../AIEnginePropertiesResource.js';
 import type { IAIProfileFormProps } from '../IAIProfileFormProps.js';
 import { AI_PROFILE_NAME_MAX_LENGTH, AI_PROFILE_NAME_MIN_LENGTH } from './AIProfileSchema.js';
@@ -37,7 +37,7 @@ import { getAIProfileFormPart } from './getAIProfileFormPart.js';
 export const AIProfileOptions: TabContainerPanelComponent<IAIProfileFormProps> = observer(function AIProfileOptions({ formState }) {
   const translate = useTranslate();
   const notificationService = useService(NotificationService);
-  const enginesLoader = useResource(AIProfileOptions, EnginesResource, undefined);
+  const enginesLoader = useResource(AIProfileOptions, AiEnginesResource, undefined);
   const part = getAIProfileFormPart(formState);
   const propertiesLoader = useResource(AIProfileOptions, AIEnginePropertiesResource, part.state.engineId || null);
   const propertiesInfo = propertiesLoader.data ?? [];
@@ -96,6 +96,7 @@ export const AIProfileOptions: TabContainerPanelComponent<IAIProfileFormProps> =
             keySelector={value => value.id}
             value={part.state.engineId}
             disabled={formState.isDisabled || isEditMode}
+            iconSelector={value => value.icon}
             small
             required
             onSelect={value => value && part.changeEngine(value)}

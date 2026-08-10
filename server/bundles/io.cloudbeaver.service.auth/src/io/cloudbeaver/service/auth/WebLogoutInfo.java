@@ -20,5 +20,5 @@ import org.jkiss.code.NotNull;
 
 import java.util.List;
 
-public record WebLogoutInfo(@NotNull List<String> redirectLinks) {
+public record WebLogoutInfo(@NotNull List<WebLogoutLink> redirectLinks) {
 }

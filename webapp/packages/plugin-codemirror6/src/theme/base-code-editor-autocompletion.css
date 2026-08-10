@@ -3,11 +3,19 @@
   &.cm-tooltip-autocomplete {
     & > ul {
       border-radius: var(--theme-form-element-radius);
+      width: 320px;
     }
 
     & li {
       display: flex;
       align-items: center;
+      overflow: hidden;
+
+      & .cm-completionLabel {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
 
       &:hover {
         background: var(--theme-sub-secondary);

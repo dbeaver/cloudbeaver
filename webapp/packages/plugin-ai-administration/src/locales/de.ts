@@ -43,4 +43,10 @@ export default [
   ['plugin_ai_administration_profile_form_tab_options', 'Profil'],
   ['plugin_ai_administration_profile_name_max_length', 'Der Profilname darf {arg:length} Zeichen nicht überschreiten'],
   ['plugin_ai_administration_profile_name_min_length', 'Der Profilname muss mindestens {arg:length} Zeichen lang sein'],
+  [
+    'plugin_ai_administration_profile_default_delete_info',
+    'Das Standardprofil kann nicht gelöscht werden. Bitte wählen Sie ein anderes Profil als Standard aus, bevor Sie dieses Profil löschen.',
+  ],
+  ['plugin_ai_administration_profile_create', 'Neues Profil'],
+  ['plugin_ai_administration_profile_edit', 'Profil bearbeiten'],
 ];

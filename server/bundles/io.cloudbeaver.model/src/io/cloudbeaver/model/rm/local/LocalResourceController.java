@@ -1028,8 +1028,24 @@ public class LocalResourceController extends BaseLocalResourceController {
         try {
             while (resourcePath.startsWith("/")) resourcePath = resourcePath.substring(1);
             Path targetPath = projectPath.resolve(resourcePath).normalize();
-            if (!targetPath.startsWith(projectPath)) {
-                throw new DBException("Invalid resource path");
+            // hack for custom path implementations that returns / as root path
+            Iterator<Path> projectParts = projectPath.iterator();
+            Iterator<Path> targetParts = targetPath.iterator();
+            Iterator<Path> unnormalizedTargetParts = projectPath.resolve(resourcePath).iterator();
+            while (projectParts.hasNext()) {
+                if (!targetParts.hasNext()) {
+                    throw new DBException("Invalid resource path");
+                }
+                Path projectPart = projectParts.next();
+                Path targetPart = targetParts.next();
+                unnormalizedTargetParts.next();
+                if (!projectPart.equals(targetPart)) {
+                    throw new DBException("Invalid resource path");
+                }
+            }
+            // validating unnormalized target parts to avoid invalid characters in resource names
+            while (unnormalizedTargetParts.hasNext()) {
+                GeneralUtils.validateResourceNameUnconditionally(unnormalizedTargetParts.next().toString());
             }
             return targetPath;
         } catch (InvalidPathException e) {

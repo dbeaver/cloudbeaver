@@ -1,0 +1,29 @@
+/*
+ * DBeaver - Universal Database Manager
+ * Copyright (C) 2010-2025 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package io.cloudbeaver.service.auth;
+
+import org.jkiss.code.NotNull;
+
+/**
+ * A single logout redirect link.
+ *
+ * @param url             the URL to open on logout
+ * @param sameTabRedirect if true, the URL must be opened as a full-page redirect
+ *                        in the current tab instead of a popup window
+ */
+public record WebLogoutLink(@NotNull String url, boolean sameTabRedirect) {
+}

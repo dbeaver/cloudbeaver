@@ -34,6 +34,7 @@
     "@cloudbeaver/core-sdk": "workspace:*",
     "@cloudbeaver/core-ui": "workspace:*",
     "@cloudbeaver/core-utils": "workspace:*",
+    "@cloudbeaver/plugin-ai": "workspace:*",
     "@cloudbeaver/plugin-data-grid": "workspace:*",
     "@dbeaver/js-helpers": "workspace:*",
     "@dbeaver/ui-kit": "workspace:*",
