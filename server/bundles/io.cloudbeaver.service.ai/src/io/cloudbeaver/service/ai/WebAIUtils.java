@@ -270,21 +270,25 @@ public class WebAIUtils {
             throw new DBWebException("AI services restricted for '%s'. Please contact your administrator if you need it.".formatted(
                 conversation.getDataSource()));
         }
-        String caption = conversation.getCaption();
-        AIChatMessage promptMessage = conversation.addMessage(message);
-        webSession.addSessionEvent(new WSAiChatMessageEvent(new WebAIMessage(promptMessage, conversation)));
-        aiChatSession.notifyMessageAdd(conversation, promptMessage);
-        if (!CommonUtils.equalObjects(caption, conversation.getCaption())) {
-            aiChatSession.notifyConversationRenamed(conversation, conversation.getCaption());
+        AIChatMessage promptMessage;
+        AIChatMessage result;
+        synchronized (conversation) {
+            String caption = conversation.getCaption();
+            promptMessage = conversation.addMessage(message);
+            webSession.addSessionEvent(new WSAiChatMessageEvent(new WebAIMessage(promptMessage, conversation)));
+            aiChatSession.notifyMessageAdd(conversation, promptMessage);
+            if (!CommonUtils.equalObjects(caption, conversation.getCaption())) {
+                aiChatSession.notifyConversationRenamed(conversation, conversation.getCaption());
+            }
+            if (!AIUtils.hasValidConfiguration()) {
+                throw new DBWebException("Invalid AI configuration");
+            }
+            if (webSession.getAttribute(WebAIUtils.getWaitingAttr(conversation)) != null) {
+                throw new DBWebException("Conversation is already waiting for response");
+            }
+            result = new AIChatMessage(conversation.getNextMessageId(), AIMessage.assistantMessage("", null));
+            WebAIUtils.scheduleConversationSubmission(webSession, aiChatSession, conversation, null, "AI completion");
         }
-        if (!AIUtils.hasValidConfiguration()) {
-            throw new DBWebException("Invalid AI configuration");
-        }
-        if (webSession.getAttribute(WebAIUtils.getWaitingAttr(conversation)) != null) {
-            throw new DBWebException("Conversation is already waiting for response");
-        }
-        AIChatMessage result = new AIChatMessage(conversation.getNextMessageId(), AIMessage.assistantMessage("", null));
-        WebAIUtils.scheduleConversationSubmission(webSession, aiChatSession, conversation, null, "AI completion");
         return new WebAISendChatMessageInfo(
             new WebAIChatConversation(webSession, conversation),
             new WebAIMessage(promptMessage, conversation),
