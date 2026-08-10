@@ -26,6 +26,12 @@
       "path": "../core-di"
     },
     {
+      "path": "../core-events"
+    },
+    {
+      "path": "../core-localization"
+    },
+    {
       "path": "../core-navigation-tree"
     },
     {
@@ -57,6 +63,9 @@
     },
     {
       "path": "../plugin-sql-editor-navigation-tab"
+    },
+    {
+      "path": "../plugin-sql-generator"
     }
   ],
   "include": [
