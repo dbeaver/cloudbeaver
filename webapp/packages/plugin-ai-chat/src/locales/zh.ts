@@ -44,6 +44,8 @@ export default [
   ['plugin_ai_chat_conversation_history_date_group_last_7_days', 'Last 7 days'],
   ['plugin_ai_chat_conversation_history_date_group_over_week_ago', 'Over a week ago'],
 
+  ['plugin_ai_chat_conversation_cancel_failed', '无法取消对话'],
+
   ['plugin_ai_chat_scope_change', 'Configure AI context'],
   ['plugin_ai_chat_scope_change_fail', 'Failed to change context'],
   ['plugin_ai_chat_profile_group', 'Active configuration'],

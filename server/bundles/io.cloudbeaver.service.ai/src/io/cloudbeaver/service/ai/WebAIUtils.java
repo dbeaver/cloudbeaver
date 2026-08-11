@@ -24,6 +24,8 @@ import io.cloudbeaver.service.ai.model.WebAISendChatMessageInfo;
 import io.cloudbeaver.service.ai.model.WebAiChatResponseConsumer;
 import io.cloudbeaver.service.ai.model.events.WSAiChatMessageEvent;
 import io.cloudbeaver.utils.ServletAppUtils;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -39,9 +41,9 @@ import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.navigator.DBNDatabaseNode;
 import org.jkiss.dbeaver.model.navigator.DBNNode;
 import org.jkiss.dbeaver.model.navigator.DBNUtils;
+import org.jkiss.dbeaver.model.runtime.AbstractJob;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.struct.DBSObject;
-import org.jkiss.dbeaver.utils.RuntimeUtils;
 import org.jkiss.utils.CommonUtils;
 
 import java.time.Clock;
@@ -139,10 +141,11 @@ public class WebAIUtils {
         @Nullable AIConfirmation confirmation,
         @NotNull String jobName
     ) {
-        webSession.setAttribute(getWaitingAttr(conversation), true);
         CompletableFuture<AIChatConversation> result = new CompletableFuture<>();
-        RuntimeUtils.scheduleJob(
-            jobName, monitor -> {
+        AbstractJob job = new AbstractJob(jobName) {
+            @NotNull
+            @Override
+            protected IStatus run(@NotNull DBRProgressMonitor monitor) {
                 try {
                     AIChatResponseConsumer subscriber = new WebAiChatResponseConsumer(conversation, webSession, aiChatSession);
                     aiChatSession.processAICompletion(
@@ -159,15 +162,25 @@ public class WebAIUtils {
                         }
                     });
                 } catch (DBException e) {
-                    log.error("Error processing AI completion", e);
-                    var errorMessage = conversation.addMessage(AIMessage.errorMessage(e));
-                    webSession.addSessionEvent(new WSAiChatMessageEvent(new WebAIMessage(errorMessage, conversation)));
-                    aiChatSession.notifyMessageAdd(conversation, errorMessage);
+                    if (monitor.isCanceled()) {
+                        log.debug("AI completion cancelled", e);
+                    } else {
+                        log.error("Error processing AI completion", e);
+                        var errorMessage = conversation.addMessage(AIMessage.errorMessage(e));
+                        webSession.addSessionEvent(new WSAiChatMessageEvent(new WebAIMessage(errorMessage, conversation)));
+                        aiChatSession.notifyMessageAdd(conversation, errorMessage);
+                    }
                 } finally {
-                    webSession.removeAttribute(getWaitingAttr(conversation));
+                    // Only clear the flag if it still points to this job
+                    if (webSession.getAttribute(getWaitingAttr(conversation)) == this) {
+                        webSession.removeAttribute(getWaitingAttr(conversation));
+                    }
                 }
+                return Status.OK_STATUS;
             }
-        );
+        };
+        webSession.setAttribute(getWaitingAttr(conversation), job);
+        job.schedule();
         return result;
     }
 
@@ -257,21 +270,25 @@ public class WebAIUtils {
             throw new DBWebException("AI services restricted for '%s'. Please contact your administrator if you need it.".formatted(
                 conversation.getDataSource()));
         }
-        String caption = conversation.getCaption();
-        AIChatMessage promptMessage = conversation.addMessage(message);
-        webSession.addSessionEvent(new WSAiChatMessageEvent(new WebAIMessage(promptMessage, conversation)));
-        aiChatSession.notifyMessageAdd(conversation, promptMessage);
-        if (!CommonUtils.equalObjects(caption, conversation.getCaption())) {
-            aiChatSession.notifyConversationRenamed(conversation, conversation.getCaption());
+        AIChatMessage promptMessage;
+        AIChatMessage result;
+        synchronized (conversation) {
+            String caption = conversation.getCaption();
+            promptMessage = conversation.addMessage(message);
+            webSession.addSessionEvent(new WSAiChatMessageEvent(new WebAIMessage(promptMessage, conversation)));
+            aiChatSession.notifyMessageAdd(conversation, promptMessage);
+            if (!CommonUtils.equalObjects(caption, conversation.getCaption())) {
+                aiChatSession.notifyConversationRenamed(conversation, conversation.getCaption());
+            }
+            if (!AIUtils.hasValidConfiguration()) {
+                throw new DBWebException("Invalid AI configuration");
+            }
+            if (webSession.getAttribute(WebAIUtils.getWaitingAttr(conversation)) != null) {
+                throw new DBWebException("Conversation is already waiting for response");
+            }
+            result = new AIChatMessage(conversation.getNextMessageId(), AIMessage.assistantMessage("", null));
+            WebAIUtils.scheduleConversationSubmission(webSession, aiChatSession, conversation, null, "AI completion");
         }
-        if (!AIUtils.hasValidConfiguration()) {
-            throw new DBWebException("Invalid AI configuration");
-        }
-        if (webSession.getAttribute(WebAIUtils.getWaitingAttr(conversation)) != null) {
-            throw new DBWebException("Conversation is already waiting for response");
-        }
-        AIChatMessage result = new AIChatMessage(conversation.getNextMessageId(), AIMessage.assistantMessage("", null));
-        WebAIUtils.scheduleConversationSubmission(webSession, aiChatSession, conversation, null, "AI completion");
         return new WebAISendChatMessageInfo(
             new WebAIChatConversation(webSession, conversation),
             new WebAIMessage(promptMessage, conversation),
