@@ -430,7 +430,7 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
                     throw new DBWebException("Import is canceled");
                 }
             } catch (DBException e) {
-                throw new DBWebException("Import failed cause: " + e.getMessage());
+                throw new DBWebException("Import failed", e);
             }
         }
     }
@@ -451,6 +451,9 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
         consumerSettings.setUseTransactions(CommonUtils.getBoolean(
             settings.get(DTConstants.PROP_USE_TRANSACTIONS),
             consumerSettings.isUseTransactions()));
+        consumerSettings.setOpenNewConnections(CommonUtils.getBoolean(
+            settings.get(DTConstants.PROP_OPEN_NEW_CONNECTION),
+            consumerSettings.isOpenNewConnections()));
     }
 
 }
