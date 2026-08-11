@@ -31,6 +31,10 @@
         opacity: 1;
         scale: 1;
       }
+
+      &[data-leave] {
+        transition-duration: 0ms;
+      }
     }
   }
 
