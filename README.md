@@ -14,6 +14,7 @@ It is free to use and open-source (licensed under [Apache 2](https://github.com/
 ## Documentation
 - [GitHub WIKI](https://github.com/dbeaver/cloudbeaver/wiki)
 - [Official documentation](https://dbeaver.com/docs/cloudbeaver/)
+- [Build from source (prerequisites)](deploy/README.md)
 
 ## Run in Docker
 
