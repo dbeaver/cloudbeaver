@@ -51,23 +51,22 @@ export const ImportSettingsForm = observer<Props>(function ImportSettingsForm({ 
           </Link>
         </div>
       )}
-      {(supportsBulkLoad || supportsTransactions) && (
-        <Container vertical>
-          {supportsBulkLoad && (
-            <FieldCheckbox title={translate('plugin_data_import_settings_use_bulk_load_title')} name="useBulkLoad" state={settings}>
-              {translate('plugin_data_import_settings_use_bulk_load')}
-            </FieldCheckbox>
-          )}
-          {supportsTransactions && (
-            <FieldCheckbox title={translate('plugin_data_import_settings_use_transactions_title')} name="useTransactions" state={settings}>
-              {translate('plugin_data_import_settings_use_transactions')}
-            </FieldCheckbox>
-          )}
-          <FieldCheckbox title={translate('plugin_data_import_settings_open_new_connection_title')} name="openNewConnection" state={settings}>
-            {translate('plugin_data_import_settings_open_new_connection')}
+
+      <Container vertical>
+        {supportsBulkLoad && (
+          <FieldCheckbox title={translate('plugin_data_import_settings_use_bulk_load_title')} name="useBulkLoad" state={settings}>
+            {translate('plugin_data_import_settings_use_bulk_load')}
           </FieldCheckbox>
-        </Container>
-      )}
+        )}
+        {supportsTransactions && (
+          <FieldCheckbox title={translate('plugin_data_import_settings_use_transactions_title')} name="useTransactions" state={settings}>
+            {translate('plugin_data_import_settings_use_transactions')}
+          </FieldCheckbox>
+        )}
+        <FieldCheckbox title={translate('plugin_data_import_settings_open_new_connection_title')} name="openNewConnection" state={settings}>
+          {translate('plugin_data_import_settings_open_new_connection')}
+        </FieldCheckbox>
+      </Container>
     </Container>
   );
 });

@@ -17,7 +17,7 @@ import type { IDataImportDialogState } from './IDataImportDialogState.js';
 interface IDialog {
   state: IDataImportDialogState;
   stepBack: () => void;
-  goToSettings: (configuration: IDataImportDriverConfiguration) => void;
+  goToSettings: (configuration: IDataImportDriverConfiguration | null) => void;
   selectProcessor: (processor: DataTransferProcessorInfo) => void;
   deleteFile: () => void;
   reset: () => void;
@@ -61,8 +61,10 @@ export function useDataImportDialog(initialState?: IDataImportDialogState): IDia
           this.state.step = EDataImportDialogStep.Processor;
         }
       },
-      goToSettings(configuration: IDataImportDriverConfiguration) {
-        this.state.settings = { ...getDefaultSettings(configuration), ...this.state.settings };
+      goToSettings(configuration: IDataImportDriverConfiguration | null) {
+        if (configuration) {
+          this.state.settings = { ...getDefaultSettings(configuration), ...this.state.settings };
+        }
         this.state.step = EDataImportDialogStep.Settings;
       },
       selectProcessor(processor: DataTransferProcessorInfo) {

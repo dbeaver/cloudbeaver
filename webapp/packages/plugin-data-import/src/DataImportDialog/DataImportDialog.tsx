@@ -7,7 +7,15 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { Button, CommonDialogBody, CommonDialogFooter, CommonDialogHeader, CommonDialogWrapper, useResource, useTranslate } from '@cloudbeaver/core-blocks';
+import {
+  Button,
+  CommonDialogBody,
+  CommonDialogFooter,
+  CommonDialogHeader,
+  CommonDialogWrapper,
+  useResource,
+  useTranslate,
+} from '@cloudbeaver/core-blocks';
 import type { IConnectionInfoParams } from '@cloudbeaver/core-connections';
 import type { DialogComponent } from '@cloudbeaver/core-dialogs';
 import type { DataTransferImportSettings } from '@cloudbeaver/core-sdk';
@@ -39,19 +47,9 @@ export const DataImportDialog: DialogComponent<IDataImportDialogPayload, IDataIm
 }) {
   const translate = useTranslate();
   const dialog = useDataImportDialog(payload.initialState);
-  const driverConfigurationResource = useResource(
-    DataImportDialog,
-    DataImportDriverConfigurationResource,
-    payload.connectionKey,
-    { silent: true },
-  );
+  const driverConfigurationResource = useResource(DataImportDialog, DataImportDriverConfigurationResource, payload.connectionKey, { silent: true });
 
   const driverConfiguration = driverConfigurationResource.tryGetData ?? null;
-  const hasSettings =
-    !!driverConfiguration &&
-    (driverConfiguration.supportsBulkLoad ||
-      driverConfiguration.supportsTransactions ||
-      driverConfiguration.supportedInsertReplaceMethods.length > 0);
 
   let title = translate('plugin_data_import_title');
   let icon = '/icons/data-import.svg';
@@ -64,14 +62,6 @@ export const DataImportDialog: DialogComponent<IDataImportDialogPayload, IDataIm
   function importData() {
     if (dialog.state.file && dialog.state.selectedProcessor) {
       resolveDialog({ file: dialog.state.file, processorId: dialog.state.selectedProcessor.id, settings: dialog.state.settings });
-    }
-  }
-
-  function submitFileStep() {
-    if (driverConfiguration && hasSettings) {
-      dialog.goToSettings(driverConfiguration);
-    } else {
-      importData();
     }
   }
 
@@ -99,9 +89,9 @@ export const DataImportDialog: DialogComponent<IDataImportDialogPayload, IDataIm
               type="button"
               loading={driverConfigurationResource.isLoading()}
               disabled={!dialog.state.file || !dialog.state.selectedProcessor}
-              onClick={submitFileStep}
+              onClick={() => dialog.goToSettings(driverConfiguration)}
             >
-              {translate(hasSettings ? 'ui_stepper_next' : 'ui_import')}
+              {translate('ui_stepper_next')}
             </Button>
           </div>
         )}
