@@ -5,13 +5,16 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+
 import { observer } from 'mobx-react-lite';
+import { useState } from 'react';
 
 import { AUTH_PROVIDER_LOCAL_ID, AuthProvidersResource, isLocalUser, UsersResource } from '@cloudbeaver/core-authentication';
 import {
   Container,
   GroupTitle,
   InputField,
+  useExecutor,
   useFormCustomInputValidation,
   usePasswordValidation,
   useResource,
@@ -39,6 +42,8 @@ export const UserFormInfoCredentials = observer<Props>(function UserFormInfoCred
   const authProvidersResource = useResource(UserFormInfoCredentials, AuthProvidersResource, null);
   const passwordValidationRef = usePasswordValidation();
 
+  const [repeatedPassword, setRepeatedPassword] = useState('');
+
   let local = authProvidersResource.resource.isEnabled(AUTH_PROVIDER_LOCAL_ID);
 
   if (!local) {
@@ -64,6 +69,15 @@ export const UserFormInfoCredentials = observer<Props>(function UserFormInfoCred
       return translate('authentication_user_passwords_not_match');
     }
     return null;
+  });
+
+  useExecutor({
+    executor: formState.submitTask,
+    handlers: [
+      function handleSubmit(data) {
+        setRepeatedPassword('');
+      },
+    ],
   });
 
   return (
@@ -102,13 +116,14 @@ export const UserFormInfoCredentials = observer<Props>(function UserFormInfoCred
           <InputField
             ref={passwordRepeatRef}
             type="password"
-            name="passwordRepeat"
             placeholder={editing ? PASSWORD_PLACEHOLDER : ''}
             readOnly={disabled}
             required={!editing}
-            canShowPassword
+            value={repeatedPassword}
+            canShowPassword={repeatedPassword !== ''}
             keepSize
             tiny
+            onChange={v => setRepeatedPassword(v)}
           >
             {translate('authentication_user_password_repeat')}
           </InputField>
