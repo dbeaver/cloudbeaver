@@ -8,42 +8,30 @@
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { injectable } from '@cloudbeaver/core-di';
-import { ExecutionContext, Executor, ExecutorInterrupter, type IExecutor, type ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
+import { ExecutionContext, type ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import { BaseOptionsPanelService, OptionsPanelService } from '@cloudbeaver/core-ui';
 
 import { userProfileContext } from './userProfileContext.js';
-import { UserProfileTabsService } from './UserProfileTabsService.js';
 
 const UserProfileOptionsPanel = importLazyComponent(() => import('./UserProfileOptionsPanel.js').then(m => m.UserProfileOptionsPanel));
 const panelGetter = () => UserProfileOptionsPanel;
 
-@injectable(() => [OptionsPanelService, UserInfoResource, UserProfileTabsService])
-export class UserProfileOptionsPanelService extends BaseOptionsPanelService<string | undefined> {
+@injectable(() => [OptionsPanelService, UserInfoResource])
+export class UserProfileOptionsPanelService extends BaseOptionsPanelService<void> {
   readonly onOpen: ISyncExecutor;
-  readonly onBeforeTabChange: IExecutor<string>;
 
   constructor(
     optionsPanelService: OptionsPanelService,
     private readonly userInfoResource: UserInfoResource,
-    private readonly userProfileTabsService: UserProfileTabsService,
   ) {
     super(optionsPanelService, panelGetter);
 
     this.onOpen = new SyncExecutor();
-    this.onBeforeTabChange = new Executor();
     this.userInfoResource.onDataUpdate.addHandler(this.userUpdateHandler.bind(this));
   }
 
-  override async open(tabId?: string): Promise<boolean> {
-    if (this.isOpen()) {
-      if (tabId !== undefined) {
-        await this.selectTab(tabId);
-      }
-
-      return true;
-    }
-
-    const state = await super.open(tabId ?? this.userProfileTabsService.tabContainer.getIdList()[0]);
+  override async open(): Promise<boolean> {
+    const state = await super.open();
 
     if (state) {
       this.onOpen.execute();
@@ -65,20 +53,6 @@ export class UserProfileOptionsPanelService extends BaseOptionsPanelService<stri
     }
 
     await this.optionsPanelService.close(context);
-  }
-
-  private async selectTab(tabId: string): Promise<void> {
-    if (this.itemId === tabId) {
-      return;
-    }
-
-    const contexts = await this.onBeforeTabChange.execute(tabId);
-
-    if (ExecutorInterrupter.isInterrupted(contexts)) {
-      return;
-    }
-
-    this.itemId = tabId;
   }
 
   private userUpdateHandler() {

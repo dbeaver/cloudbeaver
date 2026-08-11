@@ -15,23 +15,21 @@ import { TabList, TabPanelList, TabsState, TabStyles } from '@cloudbeaver/core-u
 import style from './UserProfileOptionsPanel.module.css';
 import UserProfileTabStyles from './UserProfileTab.module.css';
 import { UserProfileTabsService } from './UserProfileTabsService.js';
-import { UserProfileOptionsPanelService } from './UserProfileOptionsPanelService.js';
 
 export const tabsStyleRegistry: StyleRegistry = [[TabStyles, { mode: 'append', styles: [UserProfileTabStyles] }]];
 
 export const UserProfileOptionsPanel = observer(function UserProfileOptionsPanel() {
   const styles = useS(style);
   const userProfileTabsService = useService(UserProfileTabsService);
-  const userProfileOptionsPanelService = useService(UserProfileOptionsPanelService);
 
   return (
     <ColoredContainer className={s(styles, { userProfileOptionsPanel: true })} overflow parent compact vertical noWrap maximum>
       <TabsState
         container={userProfileTabsService.tabContainer}
-        currentTabId={userProfileOptionsPanelService.itemId ?? undefined}
+        currentTabId={userProfileTabsService.selectedTabId}
         autoSelect={false}
         lazy
-        onChange={tab => userProfileOptionsPanelService.open(tab.tabId)}
+        onChange={tab => userProfileTabsService.open(tab.tabId)}
       >
         <Group overflow box keepSize noWrap>
           <SContext registry={tabsStyleRegistry}>

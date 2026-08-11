@@ -33,7 +33,7 @@ export class UserProfileSettingsPluginBootstrap extends Bootstrap {
 
   override register(): void {
     this.userProfileOptionsPanelService.onClose.addHandler(this.confirmDiscardChanges.bind(this));
-    this.userProfileOptionsPanelService.onBeforeTabChange.addHandler(this.confirmDiscardChanges.bind(this));
+    this.userProfileTabsService.onBeforeTabChange.addHandler(this.confirmDiscardChanges.bind(this));
 
     this.userProfileTabsService.tabContainer.add({
       key: SETTINGS_TAB_ID,
@@ -62,7 +62,7 @@ export class UserProfileSettingsPluginBootstrap extends Bootstrap {
         };
       },
       handler: async () => {
-        await this.userProfileOptionsPanelService.open(SETTINGS_TAB_ID);
+        await this.userProfileTabsService.open(SETTINGS_TAB_ID);
       },
     });
   }
