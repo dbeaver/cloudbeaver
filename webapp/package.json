@@ -22,7 +22,8 @@
     "js-yaml": ">=5.2.2",
     "brace-expansion": ">=5.0.9",
     "axios": ">=1.18.0",
-    "postcss": ">=8.5.18"
+    "postcss": ">=8.5.18",
+    "nanoid": ">=3.3.17"
   },
   "scripts": {
     "test": "dbeaver-test",
