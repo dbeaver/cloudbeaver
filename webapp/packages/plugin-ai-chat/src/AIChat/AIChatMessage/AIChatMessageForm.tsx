@@ -13,10 +13,12 @@ import { ActionIconButton, AutoResizeTextarea, Form, s, useS, useTranslate } fro
 import { useService } from '@cloudbeaver/core-di';
 import { getOS, OperatingSystem } from '@cloudbeaver/core-utils';
 import { NotificationService } from '@cloudbeaver/core-events';
+import { Command } from '@dbeaver/ui-kit';
 
 import { AIChatMessageService } from './AIChatMessageService.js';
 import { AIChatConversationsService } from '../AIChatConversation/AIChatConversationsService.js';
 import { AIChatContext } from '../AIChatContext.js';
+import { AIChatConversationsResource } from '../AIChatConversation/AIChatConversationsResource.js';
 import classes from './AIChatMessageForm.module.css';
 
 interface Props {
@@ -30,6 +32,7 @@ export const AIChatMessageForm = observer<PropsWithChildren<Props>>(function AIC
   const notificationService = useService(NotificationService);
   const aiChatMessageService = useService(AIChatMessageService);
   const aiChatConversationsService = useService(AIChatConversationsService);
+  const aiChatConversationsResource = useService(AIChatConversationsResource);
 
   const [value, setValue] = useState('');
 
@@ -54,6 +57,16 @@ export const AIChatMessageForm = observer<PropsWithChildren<Props>>(function AIC
     }
   }
 
+  async function cancel() {
+    if (currentConversationId) {
+      try {
+        await aiChatConversationsResource.cancelConversation(currentConversationId);
+      } catch (exception: any) {
+        notificationService.logException(exception, 'plugin_ai_chat_conversation_cancel_failed');
+      }
+    }
+  }
+
   function getPlaceholder() {
     const OS = getOS();
     const symbol = OS === OperatingSystem.macOS ? '⌘' : 'Ctrl';
@@ -65,7 +78,12 @@ export const AIChatMessageForm = observer<PropsWithChildren<Props>>(function AIC
 
   return (
     <div className={s(styles, { container: true })}>
-      <Form className="tw:flex tw:items-end tw:gap-2" disableEnterSubmit={disabled} contents onSubmit={sendMessage}>
+      <Form
+        className="tw:flex tw:items-end tw:gap-2"
+        disableEnterSubmit={disabled}
+        contents
+        onSubmit={aiChatConversationsService.processing ? cancel : sendMessage}
+      >
         <div className={s(styles, { textareaContainer: true })}>
           <AutoResizeTextarea
             className={s(styles, { textarea: true })}
@@ -74,7 +92,16 @@ export const AIChatMessageForm = observer<PropsWithChildren<Props>>(function AIC
             autoFocus
             onChange={v => setValue(v)}
           />
-          <ActionIconButton name="/icons/send.svg" disabled={disabled} img onClick={sendMessage} />
+          {!aiChatConversationsService.processing ? (
+            <ActionIconButton name="/icons/send.svg" disabled={disabled} img onClick={sendMessage} />
+          ) : (
+            <Command
+              className="tw:cursor-pointer tw:w-10 tw:h-10 tw:bg-[var(--theme-primary)] tw:rounded-md tw:flex tw:items-center tw:justify-center tw:focus:opacity-80 tw:hover:opacity-80 tw:transition-opacity"
+              onClick={cancel}
+            >
+              <div className="tw:w-3 tw:h-3 tw:bg-[var(--theme-surface)] tw:rounded-xs" />
+            </Command>
+          )}
         </div>
       </Form>
       {children}
