@@ -50,6 +50,7 @@ export const DataImportDialog: DialogComponent<IDataImportDialogPayload, IDataIm
   const driverConfigurationResource = useResource(DataImportDialog, DataImportDriverConfigurationResource, payload.connectionKey, { silent: true });
 
   const driverConfiguration = driverConfigurationResource.tryGetData ?? null;
+  const isSettingsStep = dialog.state.step === EDataImportDialogStep.Settings;
 
   let title = translate('plugin_data_import_title');
   let icon = '/icons/data-import.svg';
@@ -80,7 +81,7 @@ export const DataImportDialog: DialogComponent<IDataImportDialogPayload, IDataIm
         <Button type="button" variant="secondary" onClick={() => rejectDialog()}>
           {translate('ui_processing_cancel')}
         </Button>
-        {dialog.state.step === EDataImportDialogStep.File && (
+        {dialog.state.step !== EDataImportDialogStep.Processor && (
           <div className="tw:flex tw:ml-auto tw:gap-2">
             <Button type="button" variant="secondary" onClick={dialog.stepBack}>
               {translate('ui_stepper_back')}
@@ -89,19 +90,9 @@ export const DataImportDialog: DialogComponent<IDataImportDialogPayload, IDataIm
               type="button"
               loading={driverConfigurationResource.isLoading()}
               disabled={!dialog.state.file || !dialog.state.selectedProcessor}
-              onClick={() => dialog.goToSettings(driverConfiguration)}
+              onClick={isSettingsStep ? importData : () => dialog.goToSettings(driverConfiguration)}
             >
-              {translate('ui_stepper_next')}
-            </Button>
-          </div>
-        )}
-        {dialog.state.step === EDataImportDialogStep.Settings && (
-          <div className="tw:flex tw:ml-auto tw:gap-2">
-            <Button type="button" variant="secondary" onClick={dialog.stepBack}>
-              {translate('ui_stepper_back')}
-            </Button>
-            <Button type="button" disabled={!dialog.state.file || !dialog.state.selectedProcessor} onClick={importData}>
-              {translate('ui_import')}
+              {translate(isSettingsStep ? 'ui_import' : 'ui_stepper_next')}
             </Button>
           </div>
         )}
