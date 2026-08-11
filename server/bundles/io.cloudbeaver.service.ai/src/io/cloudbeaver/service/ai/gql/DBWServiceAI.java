@@ -45,7 +45,7 @@ public interface DBWServiceAI extends DBWService {
     WebAISettingsConfig getAiSettings() throws DBWebException;
 
     @NotNull
-    @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
+    @WebAction
     List<WebAIEngine> getEngineConfigurations() throws DBWebException;
 
     @NotNull

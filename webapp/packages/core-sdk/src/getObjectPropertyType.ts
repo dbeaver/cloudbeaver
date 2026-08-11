@@ -7,10 +7,12 @@
  */
 import type { IObjectPropertyInfo } from './IObjectPropertyInfo.js';
 
-export type ObjectPropertyType = 'checkbox' | 'selector' | 'link' | 'textarea' | 'file' | 'input';
+export type ObjectPropertyType = 'checkbox' | 'selector' | 'link' | 'textarea' | 'file' | 'input' | 'uploadable-textarea';
 
 export function getObjectPropertyType(property: IObjectPropertyInfo): ObjectPropertyType {
   const dataType = property.dataType?.toLowerCase();
+  const isTextarea = dataType === 'string' && property.length === 'MULTILINE';
+  const isFile = property.features.includes('file');
 
   if (dataType === 'boolean') {
     return 'checkbox';
@@ -18,9 +20,11 @@ export function getObjectPropertyType(property: IObjectPropertyInfo): ObjectProp
     return 'selector';
   } else if (property.features.includes('href')) {
     return 'link';
-  } else if (dataType === 'string' && property.length === 'MULTILINE') {
+  } else if (isTextarea && isFile) {
+    return 'uploadable-textarea';
+  } else if (isTextarea) {
     return 'textarea';
-  } else if (property.features.includes('file')) {
+  } else if (isFile) {
     return 'file';
   }
 
