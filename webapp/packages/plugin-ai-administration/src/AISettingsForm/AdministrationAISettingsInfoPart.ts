@@ -29,27 +29,11 @@ export class AdministrationAISettingsInfoPart extends FormPart<IAdministrationAI
   }
 
   override isOutdated(): boolean {
-    if (this.aiProfilesResource.isOutdated(CachedMapAllKey)) {
-      return true;
-    }
-
-    if (!this.aiProfilesResource.values.length) {
-      return false;
-    }
-
-    return this.aiSettingsResource.isOutdated();
+    return this.aiSettingsResource.isOutdated() || this.aiProfilesResource.isOutdated(CachedMapAllKey);
   }
 
   override isLoaded(): boolean {
-    if (!this.loaded || !this.aiProfilesResource.isLoaded(CachedMapAllKey)) {
-      return false;
-    }
-
-    if (!this.aiProfilesResource.values.length) {
-      return true;
-    }
-
-    return this.aiSettingsResource.isLoaded();
+    return this.loaded && this.aiSettingsResource.isLoaded() && this.aiProfilesResource.isLoaded(CachedMapAllKey);
   }
 
   protected override format(): void {
@@ -81,17 +65,11 @@ export class AdministrationAISettingsInfoPart extends FormPart<IAdministrationAI
   }
 
   protected override async loader(): Promise<void> {
-    const profiles = await this.aiProfilesResource.load(CachedMapAllKey);
-
-    if (!profiles.length) {
-      this.setInitialState(DEFAULT_STATE_GETTER());
-      return;
-    }
-
-    const settings = await this.aiSettingsResource.load();
+    const [settings] = await Promise.all([this.aiSettingsResource.load(), this.aiProfilesResource.load(CachedMapAllKey)]);
 
     const defaultConfiguration = settings?.defaultConfiguration ?? null;
-    const hasDefaultConfiguration = defaultConfiguration !== null && profiles.some(profile => profile.id === defaultConfiguration);
+    const hasDefaultConfiguration =
+      defaultConfiguration !== null && this.aiProfilesResource.values.some(profile => profile.id === defaultConfiguration);
 
     this.setInitialState({
       defaultConfiguration: hasDefaultConfiguration ? defaultConfiguration : null,
