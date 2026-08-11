@@ -8,12 +8,14 @@
 import { observer } from 'mobx-react-lite';
 
 import {
+  Alert,
   ColoredContainer,
   Select,
   Container,
   Form,
   Group,
   GroupTitle,
+  Text,
   ToolsAction,
   ToolsPanel,
   useAutoLoad,
@@ -51,16 +53,6 @@ export const AIAdministrationPage = observer<{
     onSubmit: handleSave,
   });
 
-  function handleLanguageChange(value: string | null) {
-    settingsInfoPart.state.language = value ?? '';
-  }
-
-  function selectDefaultProfile(value: string | null) {
-    if (value) {
-      settingsInfoPart.state.defaultConfiguration = value;
-    }
-  }
-
   async function handleSave() {
     const saved = await formState.save();
 
@@ -94,31 +86,37 @@ export const AIAdministrationPage = observer<{
             </ToolsAction>
           </ToolsPanel>
         </Group>
+
         <Container gap overflow>
           <Group gap keepSize medium>
             <GroupTitle>{translate('ai_administration_settings')}</GroupTitle>
+            {!profiles.length && !settingsInfoPart.state.defaultConfiguration && (
+              <Alert title={translate('plugin_ai_administration_default_profile_no_profiles_title')}>
+                <Text>{translate('plugin_ai_administration_default_profile_no_profiles_message')}</Text>
+              </Alert>
+            )}
             <Select
               items={profiles}
               valueSelector={value => value.name}
               keySelector={value => value.id}
-              value={settingsInfoPart.state.defaultConfiguration}
+              state={settingsInfoPart.state}
+              name="defaultConfiguration"
               description={translate('plugin_ai_administration_default_profile_description')}
               disabled={!profiles.length}
               iconSelector={value => aiEnginesResource.data.find(e => e.id === value.engineId)?.icon}
               small
-              onSelect={selectDefaultProfile}
             >
               {translate('plugin_ai_administration_default_profile_label')}
             </Select>
 
             <Combobox
-              value={settingsInfoPart.state.language}
+              name="language"
+              state={settingsInfoPart.state}
               items={LANGUAGE_OPTIONS}
               description={translate('plugin_ai_administration_language_description')}
               allowCustomValue
               allowClear
               small
-              onChange={handleLanguageChange}
             >
               {translate('plugin_ai_administration_language_label')}
             </Combobox>

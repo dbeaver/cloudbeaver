@@ -51,6 +51,10 @@ export class AdministrationAISettingsInfoPart extends FormPart<IAdministrationAI
     if (language && language.length > 128) {
       validation.error('plugin_ai_administration_language_length_validation_error');
     }
+
+    if (!this.state.defaultConfiguration) {
+      validation.error('plugin_ai_administration_default_profile_validation_error');
+    }
   }
 
   protected override async saveChanges(): Promise<void> {
