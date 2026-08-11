@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,13 @@ export const UserProfileOptionsPanel = observer(function UserProfileOptionsPanel
 
   return (
     <ColoredContainer className={s(styles, { userProfileOptionsPanel: true })} overflow parent compact vertical noWrap maximum>
-      <TabsState container={userProfileTabsService.tabContainer} selectedId={userProfileOptionsPanelService.itemId ?? undefined} lazy>
+      <TabsState
+        container={userProfileTabsService.tabContainer}
+        currentTabId={userProfileOptionsPanelService.itemId ?? undefined}
+        autoSelect={false}
+        lazy
+        onChange={tab => userProfileOptionsPanelService.open(tab.tabId)}
+      >
         <Group overflow box keepSize noWrap>
           <SContext registry={tabsStyleRegistry}>
             <TabList underline />
