@@ -206,7 +206,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
       async executeQuery(inNewTab = false): Promise<void> {
         const isQuery = this.model.dataSource?.hasFeature(ESqlDataSourceFeatures.query);
 
-        if (!isQuery || !this.isExecutionAllowed) {
+        if (!isQuery || !this.isExecutionAllowed()) {
           return;
         }
 
@@ -223,7 +223,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
       },
 
       async executeScript(): Promise<void> {
-        if (!this.isExecutionAllowed || this.isDisabled || this.isScriptEmpty) {
+        if (!this.isExecutionAllowed() || this.isDisabled || this.isScriptEmpty) {
           return;
         }
 

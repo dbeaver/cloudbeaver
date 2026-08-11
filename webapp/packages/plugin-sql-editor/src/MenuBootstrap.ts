@@ -244,7 +244,7 @@ export class MenuBootstrap extends Bootstrap {
           return false;
         }
 
-        if (!sqlEditorData.isExecutionAllowed && EXECUTIONS_ACTIONS.includes(action)) {
+        if (!sqlEditorData.isExecutionAllowed() && EXECUTIONS_ACTIONS.includes(action)) {
           return false;
         }
 
