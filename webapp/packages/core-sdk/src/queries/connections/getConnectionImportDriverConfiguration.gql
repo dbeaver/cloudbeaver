@@ -1,0 +1,9 @@
+query getConnectionImportDriverConfiguration($projectId: ID, $connectionId: ID!) {
+  connections: userConnections(projectId: $projectId, id: $connectionId) {
+    id
+    projectId
+    driverConfiguration {
+      ...DriverConfiguration
+    }
+  }
+}

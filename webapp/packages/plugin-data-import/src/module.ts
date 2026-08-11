@@ -10,6 +10,7 @@ import { Dependency, ModuleRegistry, proxy, Bootstrap } from '@cloudbeaver/core-
 import { LocaleService } from './LocaleService.js';
 import { DataImportService } from './DataImportService.js';
 import { DataImportProcessorsResource } from './DataImportProcessorsResource.js';
+import { DataImportDriverConfigurationResource } from './DataImportDriverConfigurationResource.js';
 import { DataImportSettingsService } from './DataImportSettingsService.js';
 import { DataImportBootstrap } from './DataImportBootstrap.js';
 
@@ -25,6 +26,7 @@ export default ModuleRegistry.add({
       .addSingleton(Bootstrap, LocaleService)
       .addSingleton(DataImportService)
       .addSingleton(DataImportProcessorsResource)
+      .addSingleton(DataImportDriverConfigurationResource)
       .addSingleton(DataImportSettingsService);
   },
 });

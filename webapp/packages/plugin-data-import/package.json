@@ -23,6 +23,7 @@
   },
   "dependencies": {
     "@cloudbeaver/core-blocks": "workspace:*",
+    "@cloudbeaver/core-connections": "workspace:*",
     "@cloudbeaver/core-di": "workspace:*",
     "@cloudbeaver/core-dialogs": "workspace:*",
     "@cloudbeaver/core-events": "workspace:*",

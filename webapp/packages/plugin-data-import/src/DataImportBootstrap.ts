@@ -5,6 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { createConnectionParam } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { ACTION_IMPORT, ActionService, menuExtractItems, MenuService } from '@cloudbeaver/core-view';
@@ -72,16 +73,20 @@ export class DataImportBootstrap extends Bootstrap {
             throw new Error('Execution context must be provided');
           }
 
-          const { status, result: dialogResult } = await this.commonDialogService.open(DataImportDialogLazy, { tableName: model.name ?? model.id });
+          const connectionKey = createConnectionParam(executionContext.projectId, executionContext.connectionId);
+          const { status, result: dialogResult } = await this.commonDialogService.open(DataImportDialogLazy, {
+            tableName: model.name ?? model.id,
+            connectionKey,
+          });
 
           if (status === DialogueStateResult.Resolved && dialogResult) {
             const success = await this.dataImportService.importData(
-              executionContext.connectionId,
+              connectionKey,
               executionContext.id,
-              executionContext.projectId,
               result.id,
               dialogResult.processorId,
               dialogResult.file,
+              dialogResult.settings,
             );
 
             if (success) {
