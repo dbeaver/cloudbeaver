@@ -22,3 +22,5 @@ export * from './AdministrationUsersManagementService.js';
 export * from './externalUserProviderStatusContext.js';
 export * from './Administration/Users/Teams/TeamsForm/Options/getTeamOptionsFormPart.js';
 export * from './Administration/Users/UsersTable/UsersTableOptionsPanelService.js';
+export * from './Administration/Users/UsersTable/Filters/useUsersTableFilters.js';
+export * from './Administration/Users/UsersTable/Filters/FiltersActionButton.js';
