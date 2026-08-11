@@ -116,6 +116,9 @@
       "path": "../plugin-administration"
     },
     {
+      "path": "../plugin-ai"
+    },
+    {
       "path": "../plugin-ai-administration"
     },
     {

@@ -60,6 +60,9 @@
       "path": "../core-utils"
     },
     {
+      "path": "../plugin-ai"
+    },
+    {
       "path": "../plugin-data-grid"
     }
   ],
