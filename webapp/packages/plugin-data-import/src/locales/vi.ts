@@ -18,6 +18,9 @@ export default [
   ],
   ['plugin_data_import_settings_on_duplicate_key_placeholder', 'Không có'],
   ['plugin_data_import_settings_open_new_connection', 'Mở kết nối mới'],
-  ['plugin_data_import_settings_open_new_connection_title', 'Mở kết nối mới sau khi nhập hoàn tất'],
+  [
+    'plugin_data_import_settings_open_new_connection_title',
+    'Sử dụng tùy chọn này để tăng tốc độ truyền dữ liệu. Nếu được chọn, một kết nối mới sẽ được mở và việc truyền dữ liệu sẽ không ảnh hưởng đến các cuộc gọi khác đến cơ sở dữ liệu nơi dữ liệu đang được truyền đến',
+  ],
   ['plugin_data_import_settings_on_duplicate_key_help', 'Tìm hiểu thêm về cài đặt "Khi trùng lặp khóa"'],
 ];

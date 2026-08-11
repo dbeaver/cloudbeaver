@@ -19,6 +19,9 @@ export default [
   ],
   ['plugin_data_import_settings_on_duplicate_key_placeholder', 'None'],
   ['plugin_data_import_settings_open_new_connection', 'Open new connection'],
-  ['plugin_data_import_settings_open_new_connection_title', 'Open a new connection after the import is complete'],
+  [
+    'plugin_data_import_settings_open_new_connection_title',
+    'Use this option to speed up data transfer. If selected, a new connection will be opened and the data transfer will not interfere with other calls to the database where data is being transferred to.',
+  ],
   ['plugin_data_import_settings_on_duplicate_key_help', 'Learn more about the "On duplicate key" setting'],
 ];

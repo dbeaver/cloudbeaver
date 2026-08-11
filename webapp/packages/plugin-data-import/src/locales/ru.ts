@@ -19,6 +19,9 @@ export default [
   ],
   ['plugin_data_import_settings_on_duplicate_key_placeholder', 'Нет'],
   ['plugin_data_import_settings_open_new_connection', 'Открыть новое соединение'],
-  ['plugin_data_import_settings_open_new_connection_title', 'Открыть новое соединение после завершения импорта'],
+  [
+    'plugin_data_import_settings_open_new_connection_title',
+    'Используйте эту опцию, чтобы ускорить передачу данных. Если выбран этот параметр, будет открыто новое соединение, и передача данных не будет мешать другим вызовам к базе данных, в которую передаются данные',
+  ],
   ['plugin_data_import_settings_on_duplicate_key_help', 'Узнать больше о параметре "При дублировании ключа"'],
 ];

@@ -18,6 +18,9 @@ export default [
   ],
   ['plugin_data_import_settings_on_duplicate_key_placeholder', 'Aucune'],
   ['plugin_data_import_settings_open_new_connection', 'Ouvrir une nouvelle connexion'],
-  ['plugin_data_import_settings_open_new_connection_title', "Ouvrir une nouvelle connexion après l'importation"],
+  [
+    'plugin_data_import_settings_open_new_connection_title',
+    "Utilisez cette option pour accélérer le transfert de données. Si elle est sélectionnée, une nouvelle connexion sera ouverte et le transfert de données n'interférera pas avec les autres appels à la base de données vers laquelle les données sont transférées.",
+  ],
   ['plugin_data_import_settings_on_duplicate_key_help', 'En savoir plus sur le paramètre "En cas de clé dupliquée"'],
 ];
