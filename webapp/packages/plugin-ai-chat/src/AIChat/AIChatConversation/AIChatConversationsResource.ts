@@ -92,6 +92,11 @@ export class AIChatConversationsResource extends CachedMapResource<string, AICha
     return this.get(conversation.id)!;
   }
 
+  async cancelConversation(conversationId: string): Promise<boolean> {
+    const { result } = await this.graphQLService.sdk.cancelConversation({ conversationId });
+    return result;
+  }
+
   protected async loader(originalKey: ResourceKey<string>): Promise<Map<string, AIChatConversationInfo>> {
     const conversationList: AIChatConversationInfo[] = [];
 
