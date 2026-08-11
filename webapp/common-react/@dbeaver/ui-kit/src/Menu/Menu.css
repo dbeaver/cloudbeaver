@@ -92,6 +92,7 @@
 
   .dbv-kit-menu__group {
     padding-block: 0.25rem;
+    max-height: var(--dbv-kit-menu-popover-max-height);
   }
 
   .dbv-kit-menu__group-label {
