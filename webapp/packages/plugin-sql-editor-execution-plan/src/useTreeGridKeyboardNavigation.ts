@@ -18,7 +18,7 @@ interface Options {
  * ArrowLeft collapses or moves to the parent row.
  * Vertical navigation is handled by the composite.
  */
-export function useTreeGridKeyDown({ expanded, parentItemId, setExpanded }: Options): (event: React.KeyboardEvent<HTMLElement>) => void {
+export function useTreeGridKeyboardNavigation({ expanded, parentItemId, setExpanded }: Options): (event: React.KeyboardEvent<HTMLElement>) => void {
   const compositeStore = useCompositeContext();
 
   return function handleKeyDown(event) {

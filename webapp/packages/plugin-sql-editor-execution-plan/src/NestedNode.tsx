@@ -16,7 +16,7 @@ import type { IExecutionPlanNode } from './ExecutionPlanTreeContext.js';
 import { Expand } from './Expand.js';
 import { getPropertyValue } from './getPropertyValue.js';
 import classes from './NestedNode.module.css';
-import { useTreeGridKeyDown } from './useTreeGridKeyDown.js';
+import { useTreeGridKeyboardNavigation } from './useTreeGridKeyboardNavigation.js';
 
 interface Props {
   columns: IObjectPropertyInfo[];
@@ -38,7 +38,7 @@ export const NestedNode: React.FC<Props> = function NestedNode({ columns, node, 
   }, []);
 
   const hasChildren = node.children.length > 0;
-  const handleKeyDown = useTreeGridKeyDown({
+  const handleKeyDown = useTreeGridKeyboardNavigation({
     expanded: hasChildren ? expanded : undefined,
     parentItemId: node.parentId ? getNodeItemId(node.parentId) : undefined,
     setExpanded,

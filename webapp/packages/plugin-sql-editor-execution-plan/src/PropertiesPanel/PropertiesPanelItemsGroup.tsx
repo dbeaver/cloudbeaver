@@ -13,7 +13,7 @@ import { CompositeItem } from '@dbeaver/ui-kit';
 
 import { Expand } from '../Expand.js';
 import { getPropertyValue } from '../getPropertyValue.js';
-import { useTreeGridKeyDown } from '../useTreeGridKeyDown.js';
+import { useTreeGridKeyboardNavigation } from '../useTreeGridKeyboardNavigation.js';
 import classes from './PropertiesPanelItemsGroup.module.css';
 
 interface Props {
@@ -25,8 +25,8 @@ export const PropertiesPanelItemsGroup: React.FC<Props> = function PropertiesPan
   const groupItemId = useId();
   const [expanded, setExpanded] = useState(true);
 
-  const handleGroupKeyDown = useTreeGridKeyDown({ expanded, setExpanded });
-  const handlePropertyKeyDown = useTreeGridKeyDown({ expanded: undefined, parentItemId: groupItemId });
+  const handleGroupKeyDown = useTreeGridKeyboardNavigation({ expanded, setExpanded });
+  const handlePropertyKeyDown = useTreeGridKeyboardNavigation({ expanded: undefined, parentItemId: groupItemId });
 
   return (
     <>
