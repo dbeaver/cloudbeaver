@@ -8,10 +8,11 @@
 import { computed, makeObservable } from 'mobx';
 
 import { ProcessSnackbar } from '@cloudbeaver/core-blocks';
+import type { IConnectionInfoParams } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { AsyncTaskInfoService, EAdminPermission, SessionPermissionsResource } from '@cloudbeaver/core-root';
-import { GraphQLService } from '@cloudbeaver/core-sdk';
+import { type DataTransferImportSettings, GraphQLService } from '@cloudbeaver/core-sdk';
 import { getProgressPercent } from '@cloudbeaver/core-utils';
 
 import { DataImportSettingsService } from './DataImportSettingsService.js';
@@ -38,7 +39,14 @@ export class DataImportService {
     });
   }
 
-  async importData(connectionId: string, contextId: string, projectId: string, resultsId: string, processorId: string, file: File): Promise<boolean> {
+  async importData(
+    connectionKey: IConnectionInfoParams,
+    contextId: string,
+    resultsId: string,
+    processorId: string,
+    file: File,
+    settings?: DataTransferImportSettings,
+  ): Promise<boolean> {
     const abortController = new AbortController();
     let cancelImplementation: (() => void | Promise<void>) | null;
     let isCancelled = false;
@@ -65,11 +73,11 @@ export class DataImportService {
 
       const { taskInfo } = await this.graphQLService.sdk.dataTransferImportDataIntoResults(
         {
-          connectionId,
           contextId,
-          projectId,
+          connectionId: connectionKey.connectionId,
+          projectId: connectionKey.projectId,
           resultsId,
-          parameters: { processorId },
+          parameters: { processorId, settings },
         },
         undefined,
         abortController.signal,
