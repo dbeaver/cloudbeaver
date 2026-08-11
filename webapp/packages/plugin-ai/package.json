@@ -1,5 +1,5 @@
 {
-  "name": "@cloudbeaver/plugin-ai-administration",
+  "name": "@cloudbeaver/plugin-ai",
   "type": "module",
   "sideEffects": [
     "./lib/module.js",
@@ -21,23 +21,10 @@
     "validate-dependencies": "core-cli-validate-dependencies"
   },
   "dependencies": {
-    "@cloudbeaver/core-administration": "workspace:*",
-    "@cloudbeaver/core-blocks": "workspace:*",
-    "@cloudbeaver/core-data-context": "workspace:*",
     "@cloudbeaver/core-di": "workspace:*",
-    "@cloudbeaver/core-dialogs": "workspace:*",
-    "@cloudbeaver/core-events": "workspace:*",
-    "@cloudbeaver/core-executor": "workspace:*",
-    "@cloudbeaver/core-localization": "workspace:*",
     "@cloudbeaver/core-resource": "workspace:*",
     "@cloudbeaver/core-root": "workspace:*",
     "@cloudbeaver/core-sdk": "workspace:*",
-    "@cloudbeaver/core-ui": "workspace:*",
-    "@cloudbeaver/core-utils": "workspace:*",
-    "@cloudbeaver/plugin-ai": "workspace:*",
-    "@cloudbeaver/plugin-data-grid": "workspace:*",
-    "@dbeaver/js-helpers": "workspace:*",
-    "@dbeaver/ui-kit": "workspace:*",
     "mobx": "^6",
     "mobx-react-lite": "^4",
     "react": "^19",

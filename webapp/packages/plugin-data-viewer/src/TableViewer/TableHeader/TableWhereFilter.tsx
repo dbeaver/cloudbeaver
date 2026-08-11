@@ -82,6 +82,7 @@ export const TableWhereFilter: PlaceholderComponent<ITableHeaderPlaceholderProps
           </Popover.Anchor>
           <InputAutocompletionMenu
             proposals={autocompleteState.proposals}
+            position={autocompleteState.position}
             onSelect={handleSelect}
           />
         </Popover>
