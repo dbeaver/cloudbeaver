@@ -50,7 +50,6 @@ import org.jkiss.dbeaver.model.rm.RMProjectType;
 import org.jkiss.dbeaver.registry.DataSourceNavigatorSettings;
 import org.jkiss.dbeaver.runtime.properties.PropertyCollector;
 import org.jkiss.dbeaver.runtime.properties.PropertySourceCustom;
-import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
 
 import java.io.InputStream;
@@ -203,15 +202,19 @@ public class WebServiceUtils extends WebCommonUtils {
         @NotNull DBPConnectionConfiguration cfg
     ) {
         try {
-            DBPPropertyDescriptor[] properties = driver.getDataSourceProvider().getConnectionProperties(
+            List<DBPPropertyDescriptor> propertyList = Arrays.asList(driver.getDataSourceProvider().getConnectionProperties(
                 webSession.getProgressMonitor(),
                 driver,
                 dataSourceContainer,
                 cfg
-            );
-            Map<String, Object> connectionProperties = driver.getConnectionProperties();
+            ));
+            Set<String> propertyNames = propertyList.stream().map(DBPPropertyDescriptor::getId).collect(Collectors.toSet());
+            Map<String, Object> connectionProperties = new LinkedHashMap<>(driver.getConnectionProperties());
             for (Map.Entry<String, Object> connProp : connectionProperties.entrySet()) {
                 String propName = connProp.getKey();
+                if (propertyNames.contains(propName)) {
+                    continue;
+                }
                 Object propValue = connProp.getValue();
                 DBPPropertyDescriptor dbpPropertyDescriptor = new PropertyDescriptor(
                     null,
@@ -223,19 +226,20 @@ public class WebServiceUtils extends WebCommonUtils {
                     propValue,
                     null
                 );
-                properties = ArrayUtils.add(DBPPropertyDescriptor.class, properties, dbpPropertyDescriptor);
+                propertyList.add(dbpPropertyDescriptor);
                 cfg.setProperty(propName, (String) propValue);
             }
-            if (properties == null) {
+            if (propertyList.isEmpty()) {
                 return new WebPropertyInfo[0];
             }
+            connectionProperties.putAll(cfg.getProperties());
 
             PropertySourceCustom propertySource = new PropertySourceCustom(
-                properties,
-                cfg.getProperties()
+                propertyList,
+                connectionProperties
             );
 
-            return Arrays.stream(properties)
+            return propertyList.stream()
                 .map(p -> new WebPropertyInfo(webSession, p, propertySource)).toArray(WebPropertyInfo[]::new);
         } catch (DBException e) {
             log.error("Error reading driver properties:\n" + e.getMessage());
