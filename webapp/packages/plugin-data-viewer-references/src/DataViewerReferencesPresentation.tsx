@@ -99,6 +99,7 @@ export const DataViewerReferencesPresentation: DataPresentationComponent = obser
                 icon="/icons/plugin_data_viewer_references_panel_arrow_sm.svg"
               />
             )}
+            portal
           />
           {currentAssociation.targetNodePath && (
             <Button size="small" variant="secondary" onClick={openAssociation}>
