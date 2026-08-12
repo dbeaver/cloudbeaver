@@ -1,0 +1,3 @@
+mutation cancelConversation($conversationId: ID!) {
+  result: aiCancelChatMessage(conversationId: $conversationId)
+}
