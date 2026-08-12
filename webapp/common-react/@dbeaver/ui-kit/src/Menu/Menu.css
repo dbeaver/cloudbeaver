@@ -3,7 +3,7 @@
 @layer base {
   .dbv-kit-menu__popover {
     min-width: max-content;
-    max-height: var(--dbv-kit-menu-popover-max-height);
+    max-height: var(--popover-available-height);
     max-width: var(--dbv-kit-menu-popover-max-width);
     overflow-y: auto;
     overflow-x: hidden;
@@ -92,7 +92,6 @@
 
   .dbv-kit-menu__group {
     padding-block: 0.25rem;
-    max-height: var(--dbv-kit-menu-popover-max-height);
   }
 
   .dbv-kit-menu__group-label {
