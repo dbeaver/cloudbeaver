@@ -78,14 +78,6 @@ export const GrantedUsersTable: TabContainerPanelComponent<TeamFormProps> = obse
     return !initial !== !current || initial?.teamRole !== current?.teamRole;
   }
 
-  function isManageable(user: AdminUser) {
-    if (serverConfigResource.data?.distributed) {
-      return true;
-    }
-
-    return !usersLoader.resource.isActiveUser(user.userId);
-  }
-
   function getTeamRoleRank(user: AdminUser) {
     const granted = grantedUsersIdsMap.get(user.userId);
 
@@ -111,14 +103,10 @@ export const GrantedUsersTable: TabContainerPanelComponent<TeamFormProps> = obse
       const isMe = usersLoader.resource.isActiveUser(user.userId);
 
       let name = user.userId;
-      let title = user.userId;
+      const title = user.userId;
 
       if (isMe) {
         name += ` (${translate('ui_you')})`;
-      }
-
-      if (!isManageable(user)) {
-        title += ` - ${translate('administration_teams_team_granted_users_permission_denied')}`;
       }
 
       return (
@@ -166,7 +154,6 @@ export const GrantedUsersTable: TabContainerPanelComponent<TeamFormProps> = obse
       isGranted={isGranted}
       isEdited={isEdited}
       isVisible={(user, filter) => user.userId.toLowerCase().includes(filter.toLowerCase())}
-      isManageable={isManageable}
       getCell={getCell}
       disabled={formState.isDisabled}
       onGrant={tabState.grant}
