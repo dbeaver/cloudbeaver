@@ -93,13 +93,13 @@ export const DataViewerReferencesPresentation: DataPresentationComponent = obser
             keySelector={association => association.id}
             titleSelector={getValueSelector}
             valueSelector={getValueSelector}
+            overflowPadding={0}
             iconSelector={association => (
               <IconOrImage
                 className={clsx(association.reference && 'tw:rotate-180')}
                 icon="/icons/plugin_data_viewer_references_panel_arrow_sm.svg"
               />
             )}
-            portal
           />
           {currentAssociation.targetNodePath && (
             <Button size="small" variant="secondary" onClick={openAssociation}>

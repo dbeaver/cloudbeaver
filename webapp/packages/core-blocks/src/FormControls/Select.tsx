@@ -41,6 +41,7 @@ export type SelectBaseProps<TKey, TValue> = Omit<
     inline?: boolean;
     children?: string;
     portal?: boolean;
+    overflowPadding?: number;
     headerItems?: TValue[];
     footerItems?: TValue[];
   };
@@ -71,6 +72,7 @@ export const Select: ISelectType = observer(function Select({
   state,
   items,
   portal = false,
+  overflowPadding,
   loading,
   children,
   title,
@@ -158,7 +160,9 @@ export const Select: ISelectType = observer(function Select({
     return (
       <div className="select__item">
         {renderIcon(item)}
-        <span className="tw:truncate tw:min-w-0" title={titleSelector?.(item) ?? valueSelector(item)}>{valueSelector(item)}</span>
+        <span className="tw:truncate tw:min-w-0" title={titleSelector?.(item) ?? valueSelector(item)}>
+          {valueSelector(item)}
+        </span>
       </div>
     );
   }
@@ -189,6 +193,7 @@ export const Select: ISelectType = observer(function Select({
       <SelectField
         {...rest}
         portal={portal}
+        overflowPadding={overflowPadding}
         items={items}
         value={value}
         id={inputId}
