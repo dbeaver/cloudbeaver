@@ -86,11 +86,10 @@ export const AIAdministrationPage = observer<{
             </ToolsAction>
           </ToolsPanel>
         </Group>
-
         <Container gap overflow>
           <Group gap keepSize medium>
             <GroupTitle>{translate('ai_administration_settings')}</GroupTitle>
-            {!profiles.length && !settingsInfoPart.state.defaultConfiguration && (
+            {!profiles.length && (
               <Alert title={translate('plugin_ai_administration_default_profile_no_profiles_title')}>
                 <Text>{translate('plugin_ai_administration_default_profile_no_profiles_message')}</Text>
               </Alert>
