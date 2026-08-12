@@ -3,7 +3,7 @@
 @layer base {
   .dbv-kit-menu__popover {
     min-width: max-content;
-    max-height: var(--popover-available-height);
+    max-height: var(--popover-available-height, 30rem);
     max-width: var(--dbv-kit-menu-popover-max-width);
     overflow-y: auto;
     overflow-x: hidden;
