@@ -29,8 +29,11 @@ import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPEvaluationContext;
+import org.jkiss.dbeaver.model.DBUtils;
 import org.jkiss.dbeaver.model.data.*;
 import org.jkiss.dbeaver.model.exec.DBCException;
+import org.jkiss.dbeaver.model.exec.DBCExecutionContext;
+import org.jkiss.dbeaver.model.exec.DBCExecutionPurpose;
 import org.jkiss.dbeaver.model.exec.DBCSession;
 import org.jkiss.dbeaver.model.gis.DBGeometry;
 import org.jkiss.dbeaver.model.gis.GisConstants;
@@ -264,6 +267,46 @@ public class WebSQLUtils {
             }
         }
         return value;
+    }
+
+
+    public static void convertConstraintValues(
+        @NotNull DBRProgressMonitor monitor,
+        @NotNull WebSQLResultsInfo resultInfo,
+        @NotNull List<DBDAttributeConstraint> constraints
+    ) {
+        DBCExecutionContext executionContext = DBUtils.getDefaultContext(resultInfo.getDataContainer(), false);
+        if (executionContext == null || !executionContext.isConnected()) {
+            return;
+        }
+        DBCSession session = null;
+        try {
+            for (DBDAttributeConstraint constraint : constraints) {
+                if (!(constraint.getValue() instanceof String strValue) ||
+                    !(constraint.getAttribute() instanceof DBDAttributeBinding binding)
+                ) {
+                    continue;
+                }
+                if (session == null) {
+                    session = executionContext.openSession(monitor, DBCExecutionPurpose.UTIL, "Convert filter values");
+                }
+                try {
+                    Object value = binding.getValueHandler().getValueFromObject(session, binding, strValue, false, false);
+                    if (value != null) {
+                        constraint.setValue(value);
+                    }
+                } catch (Exception e) {
+                    log.debug(
+                        "Can't convert filter value '" + strValue + "' for attribute '"
+                            + binding.getName() + "'", e
+                    );
+                }
+            }
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
     }
 
     /**
