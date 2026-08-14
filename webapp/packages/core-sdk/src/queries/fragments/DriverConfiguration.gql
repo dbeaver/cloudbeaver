@@ -1,0 +1,9 @@
+fragment DriverConfiguration on DriverConfiguration {
+  supportedInsertReplaceMethods {
+    id
+    name
+    description
+  }
+  supportsBulkLoad
+  supportsTransactions
+}

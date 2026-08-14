@@ -45,7 +45,7 @@ public interface DBWServiceAI extends DBWService {
     WebAISettingsConfig getAiSettings() throws DBWebException;
 
     @NotNull
-    @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
+    @WebAction
     List<WebAIEngine> getEngineConfigurations() throws DBWebException;
 
     @NotNull
@@ -137,6 +137,12 @@ public interface DBWServiceAI extends DBWService {
         @NotNull WebSession webSession,
         @NotNull String conversationId,
         @NotNull String messageId
+    ) throws DBWebException;
+
+    @WebAction
+    boolean cancelChatMessage(
+        @NotNull WebSession webSession,
+        @NotNull String conversationId
     ) throws DBWebException;
 
     @NotNull

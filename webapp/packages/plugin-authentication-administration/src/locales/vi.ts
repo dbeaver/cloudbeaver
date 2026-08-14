@@ -35,6 +35,7 @@ export default [
   ['authentication_administration_users_filters_status_enabled', 'BẬT'],
   ['authentication_administration_users_filters_status_disabled', 'TẮT'],
   ['authentication_administration_users_filters_status_all', 'TẤT CẢ'],
+  ['authentication_administration_users_filters_filter_label', 'Filter'],
   ['authentication_administration_users_empty', 'Không có người dùng nào'],
   ['authentication_administration_users_delete_user', 'Xóa người dùng'],
   ['authentication_administration_users_delete_user_fail', 'Xóa người dùng thất bại'],

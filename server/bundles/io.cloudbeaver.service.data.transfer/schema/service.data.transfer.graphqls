@@ -48,6 +48,8 @@ input DataTransferImportSettings {
     useBulkLoad: Boolean
     "Use transactions during import"
     useTransactions: Boolean
+    "Open new connection(s) for the import task"
+    openNewConnection: Boolean
 }
 
 input DataTransferImportParameters {

@@ -1,0 +1,5 @@
+mutation asyncSqlGenerateEntityQuery($generatorId: String!, $nodePathList: [String!]!, $generatorOptions: SQLQueryGeneratorOptions) {
+  taskInfo: asyncSqlGenerateEntityQuery(generatorId: $generatorId, nodePathList: $nodePathList, generatorOptions: $generatorOptions) {
+    ...AsyncTaskInfo
+  }
+}

@@ -47,4 +47,6 @@ export default [
     'plugin_ai_administration_profile_default_delete_info',
     'Профиль по умолчанию нельзя удалить. Перед удалением этого профиля выберите другой профиль по умолчанию.',
   ],
+  ['plugin_ai_administration_profile_create', 'Новый профиль'],
+  ['plugin_ai_administration_profile_edit', 'Редактировать профиль'],
 ];

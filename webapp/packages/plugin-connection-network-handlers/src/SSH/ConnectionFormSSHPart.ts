@@ -34,6 +34,14 @@ export class ConnectionFormSSHPart extends FormPart<INetworkHandlerConfig, IConn
     super(formState, getDefaultState());
   }
 
+  override get isChanged(): boolean {
+    // readonly mode enables if network profile is applied
+    // we don't want to save changes or show closing state changed dialog in this case
+    // probably in the future when we will supposed different network handlers for profiles we
+    // may want to move this logic in FormPart level for all readonly parts
+    return super.isChanged && !this.isReadOnly;
+  }
+
   getConfig(): NetworkHandlerConfigInput {
     return getSSHHandlerConfig(this.state, this.initialState, this.optionsPart.state.sharedCredentials);
   }
