@@ -126,6 +126,7 @@ export default [
   ['administration_teams_team_granted_users_user_name', 'Tên Người dùng'],
   ['administration_teams_team_granted_users_empty', 'Không có người dùng nào khả dụng'],
   ['administration_teams_team_granted_users_permission_denied', 'Bạn không thể chỉnh sửa quyền của chính mình'],
+  ['administration_teams_team_granted_users_only_admin_team', 'Bạn không thể quản lý chính mình trong nhóm duy nhất có quyền quản trị viên'],
   ['administration_teams_team_granted_connections_tab_title', 'Kết nối'],
   ['administration_teams_team_granted_connections_search_placeholder', 'Tìm kiếm tên kết nối...'],
   ['administration_teams_team_granted_connections_empty', 'Không có kết nối nào khả dụng'],

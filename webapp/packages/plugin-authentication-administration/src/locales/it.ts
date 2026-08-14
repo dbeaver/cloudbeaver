@@ -81,6 +81,7 @@ export default [
   ['administration_identity_providers_provider_configuration_description', 'Descrizione'],
 
   ['plugin_authentication_administration_user_team_default_readonly_tooltip', "Default team. Can't be revoked"],
+  ['administration_teams_team_granted_users_only_admin_team', "Non puoi gestire te stesso nell'unico team con autorizzazioni di amministratore"],
   ['plugin_authentication_administration_team_default_users_tooltip', 'Default team. Contains all users'],
   ['plugin_authentication_administration_team_user_team_role_supervisor', 'Supervisor'],
   ['plugin_authentication_administration_team_user_team_role_supervisor_description', 'Supervisors can view their team’s executed queries'],

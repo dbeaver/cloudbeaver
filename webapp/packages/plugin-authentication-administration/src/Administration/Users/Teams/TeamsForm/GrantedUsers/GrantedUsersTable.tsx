@@ -10,17 +10,19 @@ import { observer } from 'mobx-react-lite';
 
 import { useTab, useTabState, type TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 import { Alert, Checkbox, StaticImage, useAutoLoad, useResource, useTranslate } from '@cloudbeaver/core-blocks';
-import { CachedResourceOffsetPageListKey } from '@cloudbeaver/core-resource';
+import { CachedMapAllKey, CachedResourceOffsetPageListKey } from '@cloudbeaver/core-resource';
 import { GrantManagementTable, type IGrantManagementTableColumn } from '@cloudbeaver/plugin-data-grid';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import {
   compareUsersById,
   compareUsersByLastLogin,
+  TeamsResource,
   TeamRolesResource,
   USER_TEAM_ROLE_SUPERVISOR,
   UsersResource,
   UsersResourceFilterKey,
   type AdminUser,
+  type TeamInfo,
 } from '@cloudbeaver/core-authentication';
 
 import type { TeamFormProps } from '../TeamsAdministrationFormService.js';
@@ -52,10 +54,12 @@ export const GrantedUsersTable: TabContainerPanelComponent<TeamFormProps> = obse
 
   const active = selected && !isDefaultTeam;
   const teamRolesResource = useResource(GrantedUsersTable, TeamRolesResource, undefined, { active });
+  const teamsResource = useResource(GrantedUsersTable, TeamsResource, CachedMapAllKey, { active });
   const usersLoader = useResource(GrantedUsersTable, UsersResource, CachedResourceOffsetPageListKey(0, 1000).setParent(UsersResourceFilterKey()), {
     active,
   });
   const grantedUsersIdsMap = useMemo(() => new Map(tabState.state.grantedUsers.map(user => [user.userId, user])), [tabState.state.grantedUsers]);
+  const currentUser = usersLoader.data.find(user => user && usersLoader.resource.isActiveUser(user.userId));
 
   useAutoLoad(GrantedUsersTable, tabState, active);
 
@@ -154,6 +158,12 @@ export const GrantedUsersTable: TabContainerPanelComponent<TeamFormProps> = obse
       isGranted={isGranted}
       isEdited={isEdited}
       isVisible={(user, filter) => user.userId.toLowerCase().includes(filter.toLowerCase())}
+      isManageable={user => canManageUser(user, currentUser, teamsResource.resource.values, formState.state.teamId ?? undefined)}
+      getSelectTitle={user =>
+        canManageUser(user, currentUser, teamsResource.resource.values, formState.state.teamId ?? undefined)
+          ? undefined
+          : translate('administration_teams_team_granted_users_only_admin_team')
+      }
       getCell={getCell}
       disabled={formState.isDisabled}
       onGrant={tabState.grant}
@@ -161,3 +171,24 @@ export const GrantedUsersTable: TabContainerPanelComponent<TeamFormProps> = obse
     />
   );
 });
+
+export function canManageUser(user: AdminUser, currentUser: AdminUser | undefined, teams: TeamInfo[], teamId: string | null | undefined): boolean {
+  if (!currentUser || user.userId !== currentUser.userId) {
+    return true;
+  }
+
+  if (!teamId || !currentUser.grantedTeams.includes(teamId)) {
+    return true;
+  }
+
+  const currentTeam = teams.find(team => team.teamId === teamId);
+  if (!currentTeam) {
+    return false;
+  }
+
+  const grantedTeams = new Set(user.grantedTeams);
+  const teamsPermissions = new Map(teams.map(team => [team.teamId, team.teamPermissions]));
+  const adminTeamsCount = teams.filter(team => grantedTeams.has(team.teamId) && teamsPermissions.get(team.teamId)?.includes('admin')).length;
+
+  return !currentTeam.teamPermissions.includes('admin') || adminTeamsCount > 1;
+}

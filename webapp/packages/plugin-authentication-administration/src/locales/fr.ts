@@ -127,6 +127,7 @@ export default [
     'administration_teams_delete_confirmation_users_note',
     "Notez que les utilisateurs perdront leur affiliation à l'équipe et toutes les permissions associées",
   ],
+  ['administration_teams_team_granted_users_only_admin_team', "Vous ne pouvez pas gérer votre propre compte dans votre seule équipe disposant des permissions d'administration"],
   ['plugin_authentication_administration_team_form_edit_label', 'Team editing form'],
   ['plugin_authentication_administration_user_form_edit_label', 'User editing form'],
   ['plugin_authentication_administration_user_last_login', 'Dernière connexion'],
