@@ -40,7 +40,6 @@ export interface IGrantManagementTableProps<T> {
   onRevoke: (ids: string[]) => void;
   disabled?: boolean;
   isManageable?: (item: T) => boolean;
-  getSelectTitle?: (item: T) => string | undefined;
   isVisible?: (item: T, filter: string) => boolean;
   getCell?: (item: T, colKey: string) => React.ReactNode;
 }
@@ -55,7 +54,6 @@ export const GrantManagementTable = observer(function GrantManagementTable<T>({
   onRevoke,
   disabled,
   isManageable,
-  getSelectTitle,
   isVisible,
   getCell,
 }: IGrantManagementTableProps<T>) {
@@ -129,7 +127,7 @@ export const GrantManagementTable = observer(function GrantManagementTable<T>({
     }
 
     if (column.key === SELECT_COLUMN.key) {
-      return <TableRowSelect id={getItemId(row)} disabled={isManageable?.(row) === false} title={getSelectTitle?.(row)} />;
+      return <TableRowSelect id={getItemId(row)} disabled={isManageable?.(row) === false} />;
     }
 
     if (column.key === STATUS_COLUMN_KEY) {
@@ -149,7 +147,6 @@ export const GrantManagementTable = observer(function GrantManagementTable<T>({
     allColumns,
     isGranted,
     isManageable,
-    getSelectTitle,
     getCell,
     getItemId,
   ]);

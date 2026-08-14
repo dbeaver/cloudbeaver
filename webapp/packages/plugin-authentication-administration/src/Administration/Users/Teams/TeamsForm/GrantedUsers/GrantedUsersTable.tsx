@@ -6,6 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { useMemo } from 'react';
 import { observer } from 'mobx-react-lite';
 
 import { useTab, useTabState, type TabContainerPanelComponent } from '@cloudbeaver/core-ui';
@@ -22,12 +23,10 @@ import {
   UsersResource,
   UsersResourceFilterKey,
   type AdminUser,
-  type TeamInfo,
 } from '@cloudbeaver/core-authentication';
 
 import type { TeamFormProps } from '../TeamsAdministrationFormService.js';
 import type { GrantedUsersFormPart } from './GrantedUsersFormPart.js';
-import { useMemo } from 'react';
 
 const USER_ID_COLUMN: IGrantManagementTableColumn<AdminUser> = {
   key: 'userId',
@@ -59,7 +58,6 @@ export const GrantedUsersTable: TabContainerPanelComponent<TeamFormProps> = obse
     active,
   });
   const grantedUsersIdsMap = useMemo(() => new Map(tabState.state.grantedUsers.map(user => [user.userId, user])), [tabState.state.grantedUsers]);
-  const currentUser = usersLoader.data.find(user => user && usersLoader.resource.isActiveUser(user.userId));
 
   useAutoLoad(GrantedUsersTable, tabState, active);
 
@@ -80,6 +78,29 @@ export const GrantedUsersTable: TabContainerPanelComponent<TeamFormProps> = obse
     const current = tabState.state.grantedUsers.find(grantedUser => grantedUser.userId === user.userId);
 
     return !initial !== !current || initial?.teamRole !== current?.teamRole;
+  }
+
+  function isManageable(user: AdminUser) {
+    if (serverConfigResource.data?.distributed || !usersLoader.resource.isActiveUser(user.userId)) {
+      return true;
+    }
+
+    const teamId = formState.state.teamId;
+    if (!teamId || !user.grantedTeams.includes(teamId)) {
+      return true;
+    }
+
+    const currentTeam = teamsResource.resource.values.find(team => team.teamId === teamId);
+    if (!currentTeam) {
+      return false;
+    }
+
+    const grantedTeams = new Set(user.grantedTeams);
+    const adminTeamsCount = teamsResource.resource.values.filter(
+      team => grantedTeams.has(team.teamId) && team.teamPermissions.includes('admin'),
+    ).length;
+
+    return !currentTeam.teamPermissions.includes('admin') || adminTeamsCount > 1;
   }
 
   function getTeamRoleRank(user: AdminUser) {
@@ -107,10 +128,14 @@ export const GrantedUsersTable: TabContainerPanelComponent<TeamFormProps> = obse
       const isMe = usersLoader.resource.isActiveUser(user.userId);
 
       let name = user.userId;
-      const title = user.userId;
+      let title = user.userId;
 
       if (isMe) {
         name += ` (${translate('ui_you')})`;
+      }
+
+      if (!isManageable(user)) {
+        title += ` - ${translate('administration_teams_team_granted_users_only_admin_team')}`;
       }
 
       return (
@@ -158,12 +183,7 @@ export const GrantedUsersTable: TabContainerPanelComponent<TeamFormProps> = obse
       isGranted={isGranted}
       isEdited={isEdited}
       isVisible={(user, filter) => user.userId.toLowerCase().includes(filter.toLowerCase())}
-      isManageable={user => canManageUser(user, currentUser, teamsResource.resource.values, formState.state.teamId ?? undefined)}
-      getSelectTitle={user =>
-        canManageUser(user, currentUser, teamsResource.resource.values, formState.state.teamId ?? undefined)
-          ? undefined
-          : translate('administration_teams_team_granted_users_only_admin_team')
-      }
+      isManageable={isManageable}
       getCell={getCell}
       disabled={formState.isDisabled}
       onGrant={tabState.grant}
@@ -171,24 +191,3 @@ export const GrantedUsersTable: TabContainerPanelComponent<TeamFormProps> = obse
     />
   );
 });
-
-export function canManageUser(user: AdminUser, currentUser: AdminUser | undefined, teams: TeamInfo[], teamId: string | null | undefined): boolean {
-  if (!currentUser || user.userId !== currentUser.userId) {
-    return true;
-  }
-
-  if (!teamId || !currentUser.grantedTeams.includes(teamId)) {
-    return true;
-  }
-
-  const currentTeam = teams.find(team => team.teamId === teamId);
-  if (!currentTeam) {
-    return false;
-  }
-
-  const grantedTeams = new Set(user.grantedTeams);
-  const teamsPermissions = new Map(teams.map(team => [team.teamId, team.teamPermissions]));
-  const adminTeamsCount = teams.filter(team => grantedTeams.has(team.teamId) && teamsPermissions.get(team.teamId)?.includes('admin')).length;
-
-  return !currentTeam.teamPermissions.includes('admin') || adminTeamsCount > 1;
-}
