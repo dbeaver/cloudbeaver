@@ -53,3 +53,4 @@ export * from './SqlEditorSettingsService.js';
 export * from './SqlEditorView.js';
 export * from './SqlResultTabs/SqlQueryService.js';
 export * from './downloadSql.js';
+export * from './SqlEditorPermissionService.js';
