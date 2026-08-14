@@ -270,6 +270,9 @@ public class WebSQLUtils {
     }
 
 
+    /**
+     * Need to convert string values in constraints to real values using value handlers
+     */
     public static void convertConstraintValues(
         @NotNull DBRProgressMonitor monitor,
         @NotNull WebSQLResultsInfo resultInfo,
