@@ -461,6 +461,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                 return node.getNodeUri();
             }
             if (node instanceof DBNDatabaseNode dbNode) {
+                checkMetadataEditPermission(dbNode);
                 return renameDatabaseObject(
                     session,
                     dbNode,
@@ -545,8 +546,9 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                     throw new DBWebException("Navigator node '"  + path + "' not found");
                 }
                 checkProjectEditAccess(node, session);
-                if (node instanceof DBNDatabaseNode) {
-                    DBSObject object = ((DBNDatabaseNode) node).getObject();
+                if (node instanceof DBNDatabaseNode dbnDatabaseNode) {
+                    checkMetadataEditPermission(dbnDatabaseNode);
+                    DBSObject object = dbnDatabaseNode.getObject();
                     DBEObjectMaker objectDeleter = DBWorkbench.getPlatform().getEditorsRegistry().getObjectManager(
                         object.getClass(), DBEObjectMaker.class);
                     if (objectDeleter == null || !objectDeleter.canDeleteObject(object)) {
@@ -599,6 +601,12 @@ public class WebServiceNavigator implements DBWServiceNavigator {
 
         } catch (DBException e) {
             throw new DBWebException("Error deleting navigator nodes " + nodePaths, e);
+        }
+    }
+
+    private void checkMetadataEditPermission(@NotNull DBNDatabaseNode node) throws DBException {
+        if (!node.getDataSourceContainer().hasModifyPermission(DBPDataSourcePermission.PERMISSION_EDIT_METADATA)) {
+            throw new DBWebException("Structure edit is restricted for this connection");
         }
     }
 
