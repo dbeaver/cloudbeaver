@@ -79,3 +79,17 @@ For a focused check, use a package's existing script, for example `yarn workspac
 ```
 
 ## Backend
+
+- Before backend work, read and follow `../dbeaver/AGENTS.md` for inherited Java and Tycho conventions.
+- Cloudbeaver does not use SWT or Eclipse RCP, and its backend is headless.
+- Configuration file is generated using `apps/config-generator`. For making changes there, update `config/template/cloudbeaver-base.conf` or use patches (for specific product parameters).
+
+### GraphQL API
+
+- Use consistent names. IDs must use type `ID`; ID arguments and inputs must end with `Id`, for example `projectId`.
+- Top-level methods follow `{pluginId}{methodName}`, for example `authLogin`, `rmListProjects`, and `navNodeChildren`. Mark new public API with `@since`.
+- Preserve released APIs: deprecate instead of renaming or removing, include the deprecation version, and remove only after more than one year. EA-only APIs may change before public release.
+- New arguments and input fields added to a released API must be optional.
+
+### License header
+- Please use header from ../dbeaver/docs/license_header.txt for backend source files.
