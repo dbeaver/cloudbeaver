@@ -107,7 +107,7 @@ export default [
   ['administration_teams_team_granted_users_user_name', '用户名称'],
   ['administration_teams_team_granted_users_empty', '没有可用用户'],
   ['administration_teams_team_granted_users_permission_denied', '您不能编辑自己的权限'],
-  ['administration_teams_team_granted_users_only_admin_team', '您无法在唯一拥有管理员权限的团队中管理自己'],
+  ['administration_teams_team_granted_users_only_admin_team', '您无法管理自己的权限，因为这是您所属的唯一管理员团队'],
 
   ['administration_teams_team_granted_connections_tab_title', '连接'],
   ['administration_teams_team_granted_connections_search_placeholder', '搜索连接名称...'],

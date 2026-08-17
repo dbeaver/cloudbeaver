@@ -133,7 +133,7 @@ export default [
   ['administration_teams_team_granted_users_user_name', 'Имя пользователя'],
   ['administration_teams_team_granted_users_empty', 'Нет доступных пользователей'],
   ['administration_teams_team_granted_users_permission_denied', 'Вы не можете редактировать свои настройки доступа'],
-  ['administration_teams_team_granted_users_only_admin_team', 'Вы не можете управлять собой в своей единственной команде с правами администратора'],
+  ['administration_teams_team_granted_users_only_admin_team', 'Вы не можете управлять своими правами доступа, поскольку это единственная команда администраторов, в которой вы состоите'],
 
   ['administration_teams_team_granted_connections_tab_title', 'Подключения'],
   ['administration_teams_team_granted_connections_search_placeholder', 'Поиск по названию подключения...'],

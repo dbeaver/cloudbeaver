@@ -128,7 +128,7 @@ export default [
   ['administration_teams_team_granted_users_user_name', 'User name'],
   ['administration_teams_team_granted_users_empty', 'No available users'],
   ['administration_teams_team_granted_users_permission_denied', "You can't edit your own permissions"],
-  ['administration_teams_team_granted_users_only_admin_team', "You can't manage yourself from your only team with admin permissions"],
+  ['administration_teams_team_granted_users_only_admin_team', "You can't manage your own permissions because it is the only admin team you participate in"],
 
   ['administration_teams_team_granted_connections_tab_title', 'Connections'],
   ['administration_teams_team_granted_connections_search_placeholder', 'Search for connection name...'],
