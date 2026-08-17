@@ -26,7 +26,7 @@ import {
   nodeDeleteContext,
   NodeManagerUtils,
 } from '@cloudbeaver/core-navigation-tree';
-import { isConnectionNode } from '@cloudbeaver/core-connections';
+import { ConnectionInfoResource, DATA_CONTEXT_CONNECTION, EConnectionFeature, isConnectionNode } from '@cloudbeaver/core-connections';
 import { ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import {
   ACTION_DELETE,
@@ -59,6 +59,7 @@ export interface INodeMenuData {
   LocalizationService,
   NavNodeInfoResource,
   NavTreeSettingsService,
+  ConnectionInfoResource,
 ])
 export class NavNodeContextMenuService extends Bootstrap {
   constructor(
@@ -71,6 +72,7 @@ export class NavNodeContextMenuService extends Bootstrap {
     private readonly localizationService: LocalizationService,
     private readonly navNodeInfoResource: NavNodeInfoResource,
     private readonly navTreeSettingsService: NavTreeSettingsService,
+    private readonly connectionInfoResource: ConnectionInfoResource,
   ) {
     super();
   }
@@ -116,6 +118,13 @@ export class NavNodeContextMenuService extends Bootstrap {
       contexts: [DATA_CONTEXT_NAV_NODE],
       isActionApplicable: (context, action) => {
         const node = context.get(DATA_CONTEXT_NAV_NODE)!;
+        const connectionKey = context.get(DATA_CONTEXT_CONNECTION)!;
+
+        const connection = this.connectionInfoResource.get(connectionKey);
+
+        if (connection?.features.includes(EConnectionFeature.restrictMetadataEdit)) {
+          return false;
+        }
 
         if (NodeManagerUtils.isDatabaseObject(node.uri) || isConnectionFolder(node)) {
           if (action === ACTION_RENAME) {

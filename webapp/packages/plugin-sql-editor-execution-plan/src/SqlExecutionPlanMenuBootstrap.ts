@@ -54,7 +54,7 @@ export class SqlExecutionPlanMenuBootstrap extends Bootstrap {
       isActionApplicable: contexts => {
         const data = contexts.get(DATA_CONTEXT_SQL_EDITOR_DATA);
 
-        if (!data || !data.isExecutionAllowed) {
+        if (!data || !data.isExecutionAllowed()) {
           return false;
         }
 
@@ -86,7 +86,7 @@ export class SqlExecutionPlanMenuBootstrap extends Bootstrap {
 
     const isQuery = data.model.dataSource?.hasFeature(ESqlDataSourceFeatures.query);
 
-    if (!isQuery || !data.isExecutionAllowed || !data.dialect?.supportsExplainExecutionPlan) {
+    if (!isQuery || !data.isExecutionAllowed() || !data.dialect?.supportsExplainExecutionPlan) {
       return;
     }
 
