@@ -86,26 +86,28 @@ export const AIProfileOptions: TabContainerPanelComponent<IAIProfileFormProps> =
   return (
     <ColoredContainer wrap overflow parent gap>
       <Container medium gap>
-        <Group form gap>
-          <InputField ref={nameRef} name="name" state={part.state} disabled={formState.isDisabled} small required>
-            {translate('plugin_ai_administration_profile_form_field_name')}
-          </InputField>
-          <Select
-            items={enginesLoader.data}
-            valueSelector={value => value.name}
-            keySelector={value => value.id}
-            value={part.state.engineId}
-            disabled={formState.isDisabled || isEditMode}
-            iconSelector={value => value.icon}
-            small
-            required
-            onSelect={value => value && part.changeEngine(value)}
-          >
-            {translate('plugin_ai_administration_profile_form_field_engine')}
-          </Select>
+        <Group gap>
+          <Container vertical gap>
+            <InputField ref={nameRef} name="name" state={part.state} disabled={formState.isDisabled} small required>
+              {translate('plugin_ai_administration_profile_form_field_name')}
+            </InputField>
+            <Select
+              items={enginesLoader.data}
+              valueSelector={value => value.name}
+              keySelector={value => value.id}
+              value={part.state.engineId}
+              disabled={formState.isDisabled || isEditMode}
+              iconSelector={value => value.icon}
+              small
+              required
+              onSelect={value => value && part.changeEngine(value)}
+            >
+              {translate('plugin_ai_administration_profile_form_field_engine')}
+            </Select>
+          </Container>
         </Group>
         {!!part.state.engineId && (
-          <Group gap keepSize medium>
+          <Group gap medium>
             <GroupTitle>{translate('ai_administration_language_model_settings')}</GroupTitle>
             <Container vertical gap>
               {hasModels && (
