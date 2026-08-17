@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
-import { Loader } from '@cloudbeaver/core-blocks';
+import { Link, Loader } from '@cloudbeaver/core-blocks';
 
 import { CodeFormatter } from './CodeFormatter.js';
 
@@ -24,6 +24,7 @@ export const MarkdownFormatter = observer<Props>(function MarkdownFormatter({ co
     <ReactMarkdown
       remarkPlugins={[remarkGfm]}
       components={{
+        a: ({ node, ...props }) => <Link target="_blank" rel="noopener noreferrer" indicator inline {...props} />,
         h1: ({ node, ...props }) => <h1 className="tw:text-xl! tw:font-semibold" {...props} />,
         h2: ({ node, ...props }) => <h2 className="tw:text-lg! tw:font-semibold" {...props} />,
         h3: ({ node, ...props }) => <h3 className="tw:text-lg! tw:font-semibold" {...props} />,
