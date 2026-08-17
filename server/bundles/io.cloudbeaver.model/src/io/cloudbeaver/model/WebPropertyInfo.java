@@ -141,6 +141,15 @@ public class WebPropertyInfo {
 
     @Nullable
     @Property
+    public Integer getMinValue() {
+        if (property instanceof ObjectPropertyDescriptor descriptor && descriptor.getMinValue() != Integer.MIN_VALUE) {
+            return descriptor.getMinValue();
+        }
+        return null;
+    }
+
+    @Nullable
+    @Property
     public Object getValue() throws DBException {
         Object value = propertySource == null ? null : propertySource.getPropertyValue(session.getProgressMonitor(), property.getId());
         if (property instanceof ObjectPropertyDescriptor opd &&

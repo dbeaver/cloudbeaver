@@ -25,6 +25,8 @@ type ObjectPropertyInfo {
     validValues: [ Object ]
     "Default property value"
     defaultValue: Object
+    "Minimum allowed value for numeric properties"
+    minValue: Int @since(version: "26.2.0")
     "Property value length"
     length: ObjectPropertyLength!
     "List of supported features (e.g., system, hidden, inherited, foreign, expensive)"
@@ -924,4 +926,3 @@ extend type Mutation {
     "Get async task info by ID"
     asyncTaskInfo(id: String!, removeOnFinish: Boolean!): AsyncTaskInfo!
 }
-

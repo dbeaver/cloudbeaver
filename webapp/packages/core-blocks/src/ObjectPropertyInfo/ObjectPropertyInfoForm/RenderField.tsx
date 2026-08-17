@@ -305,6 +305,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
       <InputField
         required={required}
         type={type}
+        min={property.minValue}
         title={isPassword ? property.description || property.displayName : undefined}
         labelTooltip={property.description || property.displayName}
         name={property.id!}
@@ -328,6 +329,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
     <InputField
       required={required}
       type={type}
+      min={property.minValue ?? undefined}
       title={isPassword ? property.description || property.displayName : undefined}
       labelTooltip={property.description || property.displayName}
       name={property.id!}
