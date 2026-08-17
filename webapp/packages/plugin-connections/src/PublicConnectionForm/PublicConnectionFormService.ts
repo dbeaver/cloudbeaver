@@ -83,7 +83,8 @@ export class PublicConnectionFormService {
 
   async change(projectId: string, config: ConnectionConfig, availableDrivers?: string[]): Promise<void> {
     this.formState?.dispose();
-    this.formState = new ConnectionFormState(this.serviceProvider, this.connectionFormService, {
+
+    const formState = new ConnectionFormState(this.serviceProvider, this.connectionFormService, {
       projectId,
       availableDrivers: availableDrivers ?? [],
       type: 'public',
@@ -91,18 +92,18 @@ export class PublicConnectionFormService {
       connectionId: config.connectionId,
     }).setMode(config.connectionId ? FormMode.Edit : FormMode.Create);
 
-    // Don't call load in create mode. There we rely on the defaults set here, and useAutoLoad will load the part on mount.
-    if (this.formState.mode === FormMode.Edit) {
-      await this.optionsPart?.load();
-    }
+    const optionsPart = getConnectionFormOptionsPart(formState);
 
     if (config.driverId) {
-      await this.optionsPart?.setDriverId(config.driverId);
+      await optionsPart.setDriverId(config.driverId);
     }
 
-    Object.assign(this.optionsPart!.state, config);
+    await optionsPart.load();
 
-    this.formState.disposeTask.addHandler(this.close.bind(this, true));
+    Object.assign(optionsPart.state, config);
+
+    formState.disposeTask.addHandler(this.close.bind(this, true));
+    this.formState = formState;
   }
 
   async open(projectId: string, config: ConnectionConfig, availableDrivers?: string[]): Promise<boolean> {

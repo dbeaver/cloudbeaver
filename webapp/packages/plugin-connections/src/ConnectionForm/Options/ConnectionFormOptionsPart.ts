@@ -339,7 +339,8 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
   }
 
   private async getDefaults() {
-    const config = defaultStateGetter(this.initialState.connectionId ?? this.formState.state.connectionId);
+    const defaults = defaultStateGetter(this.initialState.connectionId ?? this.formState.state.connectionId);
+    const config = toJS({ ...defaults, ...this.state });
 
     if (this.state.driverId) {
       config.driverId = this.state.driverId;
