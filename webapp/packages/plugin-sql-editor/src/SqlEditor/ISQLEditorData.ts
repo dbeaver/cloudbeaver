@@ -30,13 +30,13 @@ export interface ISQLEditorData {
   readonly isIncomingChanges: boolean;
   readonly value: string;
   readonly incomingValue?: string;
-  readonly isExecutionAllowed: boolean;
   readonly onExecute: ISyncExecutor<boolean>;
   readonly onSegmentExecute: ISyncExecutor<ISegmentExecutionData>;
   readonly onFormat: ISyncExecutor<[ISQLScriptSegment, string]>;
   /** displays if last getHintProposals call ended with limit */
   readonly hintsLimitIsMet: boolean;
 
+  isExecutionAllowed(): boolean;
   updateParserScriptsDebounced(): Promise<void>;
   setScript(query: string, source?: string, cursor?: ISqlEditorCursor): void;
   setCursor(begin: number, end?: number): void;

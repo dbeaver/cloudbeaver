@@ -31,10 +31,7 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
-import org.jkiss.dbeaver.model.DBPDataKind;
-import org.jkiss.dbeaver.model.DBPDataSource;
-import org.jkiss.dbeaver.model.DBPDataSourceContainer;
-import org.jkiss.dbeaver.model.DBUtils;
+import org.jkiss.dbeaver.model.*;
 import org.jkiss.dbeaver.model.data.DBDAttributeBinding;
 import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.exec.DBCLogicalOperator;
@@ -509,6 +506,7 @@ public class WebServiceSQL implements DBWServiceSQL {
         @Nullable List<WebSQLResultsRow> addedRows,
         @Nullable WebDataFormat dataFormat
     ) throws DBException {
+        checkDataEditPermission(contextInfo);
         WebSQLExecuteInfo[] result = new WebSQLExecuteInfo[1];
 
         DBExecUtils.tryExecuteRecover(
@@ -519,6 +517,13 @@ public class WebServiceSQL implements DBWServiceSQL {
                     monitor1, contextInfo, resultsId, updatedRows, deletedRows, addedRows, dataFormat)
         );
         return result[0];
+    }
+
+    private void checkDataEditPermission(@NotNull WebSQLContextInfo contextInfo) throws DBWebException {
+        if (!contextInfo.getProcessor().getConnection().getDataSourceContainer()
+            .hasModifyPermission(DBPDataSourcePermission.PERMISSION_EDIT_DATA)) {
+            throw new DBWebException("Data edit is restricted for this connection");
+        }
     }
 
     @FunctionalInterface
@@ -573,6 +578,7 @@ public class WebServiceSQL implements DBWServiceSQL {
 
     @Override
     public String updateResultsDataBatchScript(@NotNull WebSQLContextInfo contextInfo, @NotNull String resultsId, @Nullable List<WebSQLResultsRow> updatedRows, @Nullable List<WebSQLResultsRow> deletedRows, @Nullable List<WebSQLResultsRow> addedRows, WebDataFormat dataFormat) throws DBWebException {
+        checkDataEditPermission(contextInfo);
         try {
             return contextInfo.getProcessor().generateResultsDataUpdateScript(
                 contextInfo.getProcessor().getWebSession().getProgressMonitor(),
@@ -598,6 +604,10 @@ public class WebServiceSQL implements DBWServiceSQL {
     ) throws DBException {
         if (DBWorkbench.isDistributed() && !webSession.hasPermission(DBWConstants.PERMISSION_SQL_EXECUTE_QUERY)) {
             throw new DBWebException("Permission denied");
+        }
+        if (!contextInfo.getProcessor().getConnection().getDataSourceContainer()
+            .hasModifyPermission(DBPDataSourcePermission.PERMISSION_EXECUTE_SCRIPTS)) {
+            throw new DBWebException("Script execution is restricted for this connection");
         }
         return WebSQLUtils.createAsyncTaskExecuteSqlQuery(
             webSession,
