@@ -120,7 +120,7 @@ export class NavNodeContextMenuService extends Bootstrap {
         const node = context.get(DATA_CONTEXT_NAV_NODE)!;
         const connectionKey = context.get(DATA_CONTEXT_CONNECTION);
 
-        const connection = connectionKey ? this.connectionInfoResource.get(connectionKey) : undefined;
+        const connection = connectionKey ? this.connectionInfoResource.get(connectionKey) : null;
 
         if (connection?.features.includes(EConnectionFeature.restrictMetadataEdit)) {
           return false;
