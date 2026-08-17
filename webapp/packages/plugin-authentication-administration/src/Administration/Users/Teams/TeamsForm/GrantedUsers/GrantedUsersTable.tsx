@@ -13,7 +13,7 @@ import { useTab, useTabState, type TabContainerPanelComponent } from '@cloudbeav
 import { Alert, Checkbox, StaticImage, useAutoLoad, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 import { CachedMapAllKey, CachedResourceOffsetPageListKey } from '@cloudbeaver/core-resource';
 import { GrantManagementTable, type IGrantManagementTableColumn } from '@cloudbeaver/plugin-data-grid';
-import { ServerConfigResource } from '@cloudbeaver/core-root';
+import { EAdminPermission, ServerConfigResource } from '@cloudbeaver/core-root';
 import {
   compareUsersById,
   compareUsersByLastLogin,
@@ -97,10 +97,10 @@ export const GrantedUsersTable: TabContainerPanelComponent<TeamFormProps> = obse
 
     const grantedTeams = new Set(user.grantedTeams);
     const adminTeamsCount = teamsResource.resource.values.filter(
-      team => grantedTeams.has(team.teamId) && team.teamPermissions.includes('admin'),
+      team => grantedTeams.has(team.teamId) && team.teamPermissions.includes(EAdminPermission.admin),
     ).length;
 
-    return !currentTeam.teamPermissions.includes('admin') || adminTeamsCount > 1;
+    return !currentTeam.teamPermissions.includes(EAdminPermission.admin) || adminTeamsCount > 1;
   }
 
   function getTeamRoleRank(user: AdminUser) {
