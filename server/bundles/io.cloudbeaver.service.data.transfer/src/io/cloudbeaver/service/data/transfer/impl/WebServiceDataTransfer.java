@@ -356,7 +356,7 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
         StreamConsumerSettings settings = makeStreamConsumerSettings(parameters);
         DatabaseTransferProducer producer = new DatabaseTransferProducer(
             dataContainer,
-            parameters.getFilter() == null ? null : parameters.getFilter().makeDataFilter(resultsInfo));
+            parameters.getFilter() == null ? null : parameters.getFilter().makeDataFilter(monitor, resultsInfo));
 
         consumer.initTransfer(
             dataContainer,
