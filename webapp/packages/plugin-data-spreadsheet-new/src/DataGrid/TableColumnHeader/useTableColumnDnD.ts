@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { useContext } from 'react';
+import { useCallback, useContext } from 'react';
 
 import { useCombinedRef } from '@cloudbeaver/core-blocks';
 import { useDataContext, useDataContextLink } from '@cloudbeaver/core-data-context';
@@ -22,9 +22,13 @@ import { ColumnDnDContext } from '../ColumnDnDContext.js';
 import { useDataEditorDnDBox } from '../useDataEditorDnDBox.js';
 
 interface TableColumnDnD {
-  setRef: (element: React.ReactElement | Element | null) => void;
+  setRef: React.RefCallback<HTMLDivElement>;
   data: IDNDData;
   box: IDNDBox;
+}
+
+export function getColumnHeaderDropTarget(element: Element | null): Element | null {
+  return element?.closest('[role="columnheader"]') ?? element;
 }
 
 export function useTableColumnDnD(model: IDatabaseDataModel, resultIndex: number, columnKey: IGridColumnKey | null): TableColumnDnD {
@@ -50,7 +54,8 @@ export function useTableColumnDnD(model: IDatabaseDataModel, resultIndex: number
 
   const dndBox = useDataEditorDnDBox(model, resultIndex, columnKey);
 
-  const setRef = useCombinedRef(dndData.setTargetRef, dndBox.setRef);
+  const setDropTargetRef = useCallback((element: HTMLDivElement | null) => dndBox.setRef(getColumnHeaderDropTarget(element)), [dndBox]);
+  const setRef = useCombinedRef(dndData.setTargetRef, setDropTargetRef);
 
   return { setRef, data: dndData, box: dndBox };
 }
