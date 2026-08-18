@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -146,19 +146,19 @@ public class DBWebException extends DBException implements GraphQLError {
             } else {
                 return message;
             }
-        } else if (cause.getMessage() == null && cause.getCause() != null) {
-            return message + ":\n" + cause.getCause().getClass().getSimpleName();
+        }
+        Throwable rootCause = CommonUtils.getRootCause(cause);
+        String causeMessage = rootCause.getMessage();
+        if (CommonUtils.isEmpty(causeMessage)) {
+            causeMessage = rootCause.getClass().getSimpleName();
         }
         if (CommonUtils.isEmpty(message)) {
-            if (cause.getMessage() != null) {
-                return cause.getMessage();
-            }
-            return cause.getClass().getName();
+            return causeMessage;
         }
-        if (CommonUtils.equalObjects(message, cause.getMessage())) {
+        if (CommonUtils.equalObjects(message, causeMessage)) {
             return message;
         }
-        return message + ":\n" + cause.getMessage();
+        return message + ":\n" + causeMessage;
     }
 
 }
