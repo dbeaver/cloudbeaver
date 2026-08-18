@@ -21,6 +21,8 @@ export default [
   ['plugin_ai_administration_language_length_validation_error', 'La langue ne doit pas dépasser 128 caractères'],
   ['plugin_ai_administration_default_profile_label', 'Profil par défaut'],
   ['plugin_ai_administration_default_profile_description', "Profil utilisé par défaut pour les fonctionnalités d'IA"],
+  ['plugin_ai_administration_default_profile_no_profiles_title', 'No profiles available'],
+  ['plugin_ai_administration_default_profile_no_profiles_message', 'Create a profile in the "{alias:plugin_ai_administration_profiles_title}" tab'],
   ['plugin_ai_administration_profiles_title', 'Profils'],
   ['plugin_ai_administration_profiles_table_empty_placeholder', 'Aucun profil trouvé. Créez un nouveau profil'],
   ['plugin_ai_administration_profile_column_name', 'Nom'],

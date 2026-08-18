@@ -33,6 +33,7 @@ import { SqlResultTabsService } from '../SqlResultTabs/SqlResultTabsService.js';
 import type { ISQLEditorData } from './ISQLEditorData.js';
 import { SqlEditorSettingsService } from '../SqlEditorSettingsService.js';
 import { SqlEditorModelService } from '../SqlEditorModel/SqlEditorModelService.js';
+import { SqlEditorPermissionService } from '../SqlEditorPermissionService.js';
 
 interface ISQLEditorDataPrivate extends ISQLEditorData {
   readonly sqlDialectInfoService: SqlDialectInfoService;
@@ -44,6 +45,7 @@ interface ISQLEditorDataPrivate extends ISQLEditorData {
   readonly commonDialogService: CommonDialogService;
   readonly sqlResultTabsService: SqlResultTabsService;
   readonly connectionInfoResource: ConnectionInfoResource;
+  readonly sqlEditorPermissionService: SqlEditorPermissionService;
   readonly getLastAutocomplete: LastPromiseGetter<SqlCompletionProposal[]>;
   readonly parseScript: LastPromiseGetter<SqlScriptInfoFragment>;
 
@@ -68,6 +70,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
   const sqlEditorSettingsService = useService(SqlEditorSettingsService);
   const sqlEditorModelService = useService(SqlEditorModelService);
   const connectionInfoResource = useService(ConnectionInfoResource);
+  const sqlEditorPermissionService = useService(SqlEditorPermissionService);
 
   const model = sqlEditorModelService.getOrCreate(state);
 
@@ -119,10 +122,6 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
         return this.model.dataSource?.incomingScript;
       },
 
-      get isExecutionAllowed(): boolean {
-        return !!this.model.dataSource?.hasFeature(ESqlDataSourceFeatures.executable) && this.sqlEditorSettingsService.scriptExecutionEnabled;
-      },
-
       onExecute: new SyncExecutor(),
       onSegmentExecute: new SyncExecutor(),
 
@@ -130,6 +129,19 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
       executingScript: false,
       reactionDisposer: null,
       hintsLimitIsMet: false,
+
+      isExecutionAllowed(): boolean {
+        const executionContext = this.model.dataSource?.executionContext;
+
+        if (!executionContext) {
+          return false;
+        }
+
+        const key = createConnectionParam(executionContext.projectId, executionContext.connectionId);
+        return (
+          !!this.model.dataSource?.hasFeature(ESqlDataSourceFeatures.executable) && this.sqlEditorPermissionService.isScriptExecutionEnabled(key)
+        );
+      },
 
       setCursor(begin: number, end = begin): void {
         this.model.dataSource?.setCursor(begin, end);
@@ -194,7 +206,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
       async executeQuery(inNewTab = false): Promise<void> {
         const isQuery = this.model.dataSource?.hasFeature(ESqlDataSourceFeatures.query);
 
-        if (!isQuery || !this.isExecutionAllowed) {
+        if (!isQuery || !this.isExecutionAllowed()) {
           return;
         }
 
@@ -211,7 +223,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
       },
 
       async executeScript(): Promise<void> {
-        if (!this.isExecutionAllowed || this.isDisabled || this.isScriptEmpty) {
+        if (!this.isExecutionAllowed() || this.isDisabled || this.isScriptEmpty) {
           return;
         }
 
@@ -358,6 +370,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
       commonDialogService,
       sqlEditorSettingsService,
       connectionInfoResource,
+      sqlEditorPermissionService,
     },
   );
 
