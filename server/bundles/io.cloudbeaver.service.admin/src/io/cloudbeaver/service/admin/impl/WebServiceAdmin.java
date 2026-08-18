@@ -338,7 +338,9 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         if (CommonUtils.equalObjects(subjectID, CBConstants.DEFAULT_ADMIN_TEAM)) {
             throw new DBWebException("Cannot change permissions for team '" + subjectID + "'");
         }
-        if (!permissions.contains(DBWConstants.PERMISSION_ADMIN)) {
+        if (!permissions.contains(DBWConstants.PERMISSION_ADMIN)
+            && isOwnSubject(webSession, grantor.getUserId(), subjectID)
+        ) {
             checkAdminPermissionsRetained(webSession, grantor.getUserId(), subjectID);
         }
         webSession.addInfoMessage("Set permissions to subject - " + subjectID);
@@ -353,6 +355,29 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         } catch (Exception e) {
             throw new DBWebException("Error setting subject permissions", e);
         }
+    }
+
+    /**
+     * Checks that the specified subject is the user himself or one of his teams.
+     */
+    private boolean isOwnSubject(
+        @NotNull WebSession webSession,
+        @NotNull String userId,
+        @NotNull String subjectId
+    ) throws DBWebException {
+        if (subjectId.equals(userId)) {
+            return true;
+        }
+        try {
+            for (SMTeam userTeam : webSession.getAdminSecurityController().getUserTeams(userId)) {
+                if (userTeam.getTeamId().equals(subjectId)) {
+                    return true;
+                }
+            }
+        } catch (DBException e) {
+            throw new DBWebException("Error reading teams of user " + userId, e);
+        }
+        return false;
     }
 
     /**
