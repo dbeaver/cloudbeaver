@@ -86,8 +86,8 @@ export const AIAdministrationPage = observer<{
             </ToolsAction>
           </ToolsPanel>
         </Group>
-        <Container gap overflow>
-          <Group gap keepSize medium>
+        <Group gap keepSize medium>
+          <Container gap vertical>
             <GroupTitle>{translate('ai_administration_settings')}</GroupTitle>
             {!profiles.length && (
               <Alert title={translate('plugin_ai_administration_default_profile_no_profiles_title')}>
@@ -119,8 +119,8 @@ export const AIAdministrationPage = observer<{
             >
               {translate('plugin_ai_administration_language_label')}
             </Combobox>
-          </Group>
-        </Container>
+          </Container>
+        </Group>
       </ColoredContainer>
     </Form>
   );
