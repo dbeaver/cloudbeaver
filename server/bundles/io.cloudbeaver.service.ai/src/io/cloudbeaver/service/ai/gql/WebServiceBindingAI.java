@@ -164,6 +164,12 @@ public class WebServiceBindingAI extends WebServiceBindingBase<DBWServiceAI> imp
                     getArgumentVal(env, "messageId")
                 )
             ).dataFetcher(
+                "aiCancelChatMessage",
+                env -> getService(env).cancelChatMessage(
+                    getWebSession(env),
+                    getArgumentVal(env, "conversationId")
+                )
+            ).dataFetcher(
                 "aiCreateProfile", env -> getService(env).createProfile(
                     getWebSession(env),
                     JSONUtils.deserializeObject(getArgumentVal(env, "config"), WebAIConfigurationProfileInput.class)

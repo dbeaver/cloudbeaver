@@ -9,13 +9,13 @@
 import { reaction } from 'mobx';
 import { observer } from 'mobx-react-lite';
 
-import { Link, s, TextPlaceholder, useResource, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { IconOrImage, Link, s, TextPlaceholder, useResource, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { ADMINISTRATION_TABLE_DEFAULT_ROW_HEIGHT, AdministrationTableStyles } from '@cloudbeaver/core-administration';
 import { DataGrid, TableRowSelect, useCreateGridReactiveValue } from '@cloudbeaver/plugin-data-grid';
+import { AiEnginesResource } from '@cloudbeaver/plugin-ai';
 import { Command } from '@dbeaver/ui-kit';
 
-import { EnginesResource } from '../Engines/EnginesResource.js';
 import { AIProfileFormService } from './AIProfileForm/AIProfileFormService.js';
 import type { AIProfile } from './AIProfilesResource.js';
 
@@ -34,7 +34,7 @@ export const AIProfilesTable = observer<Props>(function AIProfilesTable({ profil
   const translate = useTranslate();
   const styles = useS(AdministrationTableStyles);
   const aiProfileFormService = useService(AIProfileFormService);
-  const enginesLoader = useResource(AIProfilesTable, EnginesResource, undefined);
+  const enginesLoader = useResource(AIProfilesTable, AiEnginesResource, undefined);
 
   const columnsCount = useCreateGridReactiveValue(() => COLUMNS.length, null, [COLUMNS]);
   const rowsCount = useCreateGridReactiveValue(
@@ -82,7 +82,18 @@ export const AIProfilesTable = observer<Props>(function AIProfilesTable({ profil
 
     if (column.key === ENGINE_COLUMN.key) {
       const engine = enginesLoader.data.find(engine => engine.id === profile.engineId);
-      return <span>{engine?.name ?? profile.engineId}</span>;
+      const title = engine?.name ?? profile.engineId;
+
+      if (engine?.icon) {
+        return (
+          <div title={title} className="tw:flex tw:gap-2">
+            <IconOrImage icon={engine.icon} />
+            <span className="tw:truncate">{title}</span>
+          </div>
+        );
+      }
+
+      return <span title={title}>{title}</span>;
     }
 
     return null;

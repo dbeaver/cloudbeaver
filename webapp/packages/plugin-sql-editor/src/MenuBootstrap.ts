@@ -8,7 +8,8 @@
 import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { WindowEventsService } from '@cloudbeaver/core-root';
-import { getTextFileReadingProcess, throttle, withTimestamp } from '@cloudbeaver/core-utils';
+import { getTextFileReadingProcess, throttle } from '@cloudbeaver/core-utils';
+import { withTimestamp } from '@dbeaver/js-helpers';
 import {
   ACTION_DOWNLOAD,
   ACTION_REDO,
@@ -243,7 +244,7 @@ export class MenuBootstrap extends Bootstrap {
           return false;
         }
 
-        if (!sqlEditorData.isExecutionAllowed && EXECUTIONS_ACTIONS.includes(action)) {
+        if (!sqlEditorData.isExecutionAllowed() && EXECUTIONS_ACTIONS.includes(action)) {
           return false;
         }
 
@@ -313,7 +314,7 @@ export class MenuBootstrap extends Bootstrap {
       contexts: [DATA_CONTEXT_SQL_EDITOR_DATA],
       isBindingApplicable: (contexts, action) => {
         const sqlEditorData = contexts.get(DATA_CONTEXT_SQL_EDITOR_DATA);
-        return action === ACTION_SQL_EDITOR_EXECUTE_SCRIPT && sqlEditorData?.isExecutionAllowed === true;
+        return action === ACTION_SQL_EDITOR_EXECUTE_SCRIPT && sqlEditorData?.isExecutionAllowed() === true;
       },
       handler: this.sqlEditorActionHandler.bind(this),
     });

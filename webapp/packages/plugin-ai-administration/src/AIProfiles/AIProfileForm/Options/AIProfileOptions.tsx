@@ -27,8 +27,8 @@ import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { FormMode, type TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 import { getObjectPropertyOptionName, getObjectPropertyOptionValue } from '@cloudbeaver/core-sdk';
+import { AiEnginesResource } from '@cloudbeaver/plugin-ai';
 
-import { EnginesResource } from '../../../Engines/EnginesResource.js';
 import { AIEnginePropertiesResource, MODEL_PROPERTY_ID } from '../../AIEnginePropertiesResource.js';
 import type { IAIProfileFormProps } from '../IAIProfileFormProps.js';
 import { AI_PROFILE_NAME_MAX_LENGTH, AI_PROFILE_NAME_MIN_LENGTH } from './AIProfileSchema.js';
@@ -37,7 +37,7 @@ import { getAIProfileFormPart } from './getAIProfileFormPart.js';
 export const AIProfileOptions: TabContainerPanelComponent<IAIProfileFormProps> = observer(function AIProfileOptions({ formState }) {
   const translate = useTranslate();
   const notificationService = useService(NotificationService);
-  const enginesLoader = useResource(AIProfileOptions, EnginesResource, undefined);
+  const enginesLoader = useResource(AIProfileOptions, AiEnginesResource, undefined);
   const part = getAIProfileFormPart(formState);
   const propertiesLoader = useResource(AIProfileOptions, AIEnginePropertiesResource, part.state.engineId || null);
   const propertiesInfo = propertiesLoader.data ?? [];
@@ -86,25 +86,28 @@ export const AIProfileOptions: TabContainerPanelComponent<IAIProfileFormProps> =
   return (
     <ColoredContainer wrap overflow parent gap>
       <Container medium gap>
-        <Group form gap>
-          <InputField ref={nameRef} name="name" state={part.state} disabled={formState.isDisabled} small required>
-            {translate('plugin_ai_administration_profile_form_field_name')}
-          </InputField>
-          <Select
-            items={enginesLoader.data}
-            valueSelector={value => value.name}
-            keySelector={value => value.id}
-            value={part.state.engineId}
-            disabled={formState.isDisabled || isEditMode}
-            small
-            required
-            onSelect={value => value && part.changeEngine(value)}
-          >
-            {translate('plugin_ai_administration_profile_form_field_engine')}
-          </Select>
+        <Group gap>
+          <Container vertical gap>
+            <InputField ref={nameRef} name="name" state={part.state} disabled={formState.isDisabled} small required>
+              {translate('plugin_ai_administration_profile_form_field_name')}
+            </InputField>
+            <Select
+              items={enginesLoader.data}
+              valueSelector={value => value.name}
+              keySelector={value => value.id}
+              value={part.state.engineId}
+              disabled={formState.isDisabled || isEditMode}
+              iconSelector={value => value.icon}
+              small
+              required
+              onSelect={value => value && part.changeEngine(value)}
+            >
+              {translate('plugin_ai_administration_profile_form_field_engine')}
+            </Select>
+          </Container>
         </Group>
         {!!part.state.engineId && (
-          <Group gap keepSize medium>
+          <Group gap medium>
             <GroupTitle>{translate('ai_administration_language_model_settings')}</GroupTitle>
             <Container vertical gap>
               {hasModels && (

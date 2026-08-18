@@ -16,7 +16,9 @@
  */
 package io.cloudbeaver.service.ai.gql;
 
+import io.cloudbeaver.WebServiceUtils;
 import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.ai.registry.AIEngineDescriptor;
 import org.jkiss.dbeaver.model.meta.Property;
 
@@ -39,6 +41,12 @@ public class WebAIEngine {
     @Property
     public String getName() {
         return descriptor.getLabel();
+    }
+
+    @Nullable
+    @Property
+    public String getIcon() {
+        return WebServiceUtils.makeIconId(descriptor.getIcon());
     }
 
 }

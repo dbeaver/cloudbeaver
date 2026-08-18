@@ -98,6 +98,8 @@ export interface ISelectFieldProps<T, ItemType = ISelectItem<T>> {
 
   portal?: boolean;
 
+  overflowPadding?: number;
+
   autoFocusItemsOnShow?: boolean;
 
   'aria-labelledby'?: string;
@@ -144,6 +146,7 @@ export function SelectField<T, ItemType extends {} = ISelectItem<T>>({
   required,
   className,
   portal = false,
+  overflowPadding,
   selectedRender,
   arrowIcon,
   store,
@@ -229,7 +232,7 @@ export function SelectField<T, ItemType extends {} = ISelectItem<T>>({
         </Select>
         {description && <span className="dbv-kit-select__description">{description}</span>}
 
-        <SelectPopover autoFocusOnShow={autoFocusItemsOnShow} portal={portal} gutter={4} unmountOnHide>
+        <SelectPopover autoFocusOnShow={autoFocusItemsOnShow} portal={portal} overflowPadding={overflowPadding} gutter={4} unmountOnHide>
           {headerItems && headerItems.length > 0 && (
             <SelectGroup className="dbv-kit-select__popover-header">{headerItems.map(renderSelectItem)}</SelectGroup>
           )}

@@ -16,9 +16,9 @@ import {
   ESqlDataSourceFeatures,
   LocalStorageSqlDataSource,
   SqlDataSourceService,
+  SqlEditorPermissionService,
   SqlEditorService,
   type ILocalStorageSqlDataSourceState,
-  SqlEditorSettingsService,
   type ISqlEditorTabState,
 } from '@cloudbeaver/plugin-sql-editor';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -41,12 +41,9 @@ const AI_CHAT_ID_METADATA_KEY = 'aiChatId';
   SqlDataSourceService,
   LocalizationService,
   CommonDialogService,
-  SqlEditorSettingsService,
+  SqlEditorPermissionService,
 ])
 export class AIChatMessageActionsService {
-  get isAllowed(): boolean {
-    return this.sqlEditorSettingsService.scriptExecutionEnabled;
-  }
   get isDisabled(): boolean {
     return !this.aiChatContextService.currentContext;
   }
@@ -61,11 +58,19 @@ export class AIChatMessageActionsService {
     private readonly sqlDataSourceService: SqlDataSourceService,
     private readonly localizationService: LocalizationService,
     private readonly commonDialogService: CommonDialogService,
-    private readonly sqlEditorSettingsService: SqlEditorSettingsService,
+    private readonly sqlEditorPermissionService: SqlEditorPermissionService,
   ) {
     makeObservable(this, {
       isDisabled: computed,
     });
+  }
+
+  isAllowed(connectionKey: IConnectionInfoParams | null): boolean {
+    if (!connectionKey) {
+      return false;
+    }
+
+    return this.sqlEditorPermissionService.isScriptExecutionEnabled(connectionKey);
   }
 
   async executeQuery(conversationId: string | undefined | null, connectionKey: IConnectionInfoParams | null, query: string): Promise<void> {

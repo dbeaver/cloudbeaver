@@ -3,8 +3,8 @@ Bundle-ManifestVersion: 2
 Bundle-Vendor: DBeaver Corp
 Bundle-Name: Cloudbeaver Web Model
 Bundle-SymbolicName: io.cloudbeaver.model.cli;singleton:=true
-Bundle-Version: 1.0.16.qualifier
-Bundle-Release-Date: 20260817
+Bundle-Version: 1.0.17.qualifier
+Bundle-Release-Date: 20260831
 Bundle-RequiredExecutionEnvironment: JavaSE-21
 Bundle-ActivationPolicy: lazy
 Require-Bundle: org.jkiss.dbeaver.model.cli;visibility:=reexport

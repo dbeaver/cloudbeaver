@@ -4,4 +4,17 @@ export default [
   ['plugin_data_import_process_success', '数据导入成功'],
   ['plugin_data_import_process_fail', '数据导入失败'],
   ['plugin_data_import_process_file_processing_step_message', '文件已上传，正在处理...'],
+  ['plugin_data_import_settings_on_duplicate_key', '当重复键时'],
+  ['plugin_data_import_settings_on_duplicate_key_title', '选择如何处理目标表中已存在的行，基于主键或唯一键'],
+  ['plugin_data_import_settings_use_bulk_load', '使用批量加载'],
+  ['plugin_data_import_settings_use_bulk_load_title', '使用批量加载以更快地导入数据'],
+  ['plugin_data_import_settings_use_transactions', '使用事务'],
+  ['plugin_data_import_settings_use_transactions_title', '在数据库事务中执行导入。如果导入失败，所有更改都可以回滚'],
+  ['plugin_data_import_settings_on_duplicate_key_placeholder', '无'],
+  ['plugin_data_import_settings_open_new_connection', '打开新连接'],
+  [
+    'plugin_data_import_settings_open_new_connection_title',
+    '使用此选项可加快数据传输。如果选中，将打开一个新连接，数据传输不会干扰对目标数据库的其他调用。',
+  ],
+  ['plugin_data_import_settings_on_duplicate_key_help', '了解有关“当重复键时”设置的更多信息'],
 ];

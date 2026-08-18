@@ -22,7 +22,7 @@ import type { NavNodeTransformViewComponent } from '@cloudbeaver/plugin-navigati
 import { SQLCodeEditor, useSqlDialectExtension } from '@cloudbeaver/plugin-sql-editor-codemirror';
 
 import { DATA_CONTEXT_DDL_VIEWER_NODE } from '../DdlViewer/DATA_CONTEXT_DDL_VIEWER_NODE.js';
-import { DATA_CONTEXT_DDL_VIEWER_VALUE } from '../DdlViewer/DATA_CONTEXT_DDL_VIEWER_VALUE.js';
+import { DATA_CONTEXT_DDL_VIEWER_QUERY } from '../DdlViewer/DATA_CONTEXT_DDL_VIEWER_QUERY.js';
 import style from '../DdlViewer/DDLViewerTabPanel.module.css';
 import { MENU_DDL_VIEWER_FOOTER } from '../DdlViewer/MENU_DDL_VIEWER_FOOTER.js';
 import { ExtendedDDLResource } from './ExtendedDDLResource.js';
@@ -46,7 +46,7 @@ export const ExtendedDDLViewerTabPanel: NavNodeTransformViewComponent = observer
 
   useDataContextLink(menu.context, (context, id) => {
     context.set(DATA_CONTEXT_DDL_VIEWER_NODE, nodeId, id);
-    context.set(DATA_CONTEXT_DDL_VIEWER_VALUE, extendedDDlData, id);
+    context.set(DATA_CONTEXT_DDL_VIEWER_QUERY, extendedDDlData, id);
   });
 
   return (

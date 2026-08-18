@@ -8,6 +8,7 @@
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { ACTION_IMPORT, ActionService, menuExtractItems, MenuService } from '@cloudbeaver/core-view';
+import { ConnectionInfoResource, createConnectionParam, EConnectionFeature } from '@cloudbeaver/core-connections';
 import {
   DATA_CONTEXT_DV_DDM,
   DATA_CONTEXT_DV_DDM_RESULT_INDEX,
@@ -16,18 +17,21 @@ import {
   DatabaseDataFeature,
   DataViewerPresentationType,
   isResultSetDataModel,
+  ResultSetDataSource,
+  type IDatabaseDataModel,
 } from '@cloudbeaver/plugin-data-viewer';
 
 import { DataImportDialogLazy } from './DataImportDialog/DataImportDialogLazy.js';
 import { DataImportService } from './DataImportService.js';
 
-@injectable(() => [MenuService, ActionService, CommonDialogService, DataImportService])
+@injectable(() => [MenuService, ActionService, CommonDialogService, DataImportService, ConnectionInfoResource])
 export class DataImportBootstrap extends Bootstrap {
   constructor(
     private readonly menuService: MenuService,
     private readonly actionService: ActionService,
     private readonly commonDialogService: CommonDialogService,
     private readonly dataImportService: DataImportService,
+    private readonly connectionInfoResource: ConnectionInfoResource,
   ) {
     super();
   }
@@ -72,16 +76,20 @@ export class DataImportBootstrap extends Bootstrap {
             throw new Error('Execution context must be provided');
           }
 
-          const { status, result: dialogResult } = await this.commonDialogService.open(DataImportDialogLazy, { tableName: model.name ?? model.id });
+          const connectionKey = createConnectionParam(executionContext.projectId, executionContext.connectionId);
+          const { status, result: dialogResult } = await this.commonDialogService.open(DataImportDialogLazy, {
+            tableName: model.name ?? model.id,
+            connectionKey,
+          });
 
           if (status === DialogueStateResult.Resolved && dialogResult) {
             const success = await this.dataImportService.importData(
-              executionContext.connectionId,
+              connectionKey,
               executionContext.id,
-              executionContext.projectId,
               result.id,
               dialogResult.processorId,
               dialogResult.file,
+              dialogResult.settings,
             );
 
             if (success) {
@@ -96,9 +104,21 @@ export class DataImportBootstrap extends Bootstrap {
       menus: [DATA_VIEWER_DATA_MODEL_ACTIONS_MENU],
       contexts: [DATA_CONTEXT_DV_DDM, DATA_CONTEXT_DV_DDM_RESULT_INDEX],
       isApplicable: context => {
-        const model = context.get(DATA_CONTEXT_DV_DDM)!;
+        const model = context.get(DATA_CONTEXT_DV_DDM)! as unknown as IDatabaseDataModel<ResultSetDataSource>;
         const presentation = context.get(DATA_CONTEXT_DV_PRESENTATION);
         const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
+
+        const executionContext = model.source.executionContext?.context;
+
+        if (executionContext) {
+          const connectionKey = createConnectionParam(executionContext.projectId, executionContext.connectionId);
+          const connection = this.connectionInfoResource.get(connectionKey);
+
+          if (connection?.features.includes(EConnectionFeature.restrictDataImport)) {
+            return false;
+          }
+        }
+
         const allowedFeatures = [DatabaseDataFeature.DataEditor];
 
         return (

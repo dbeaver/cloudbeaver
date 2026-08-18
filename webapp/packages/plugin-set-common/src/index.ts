@@ -119,6 +119,7 @@ import pluginScriptExport from '@cloudbeaver/plugin-script-export/module';
 import pluginProjectInfo from '@cloudbeaver/plugin-project-info/module';
 import pluginDataViewerReferences from '@cloudbeaver/plugin-data-viewer-references/module';
 import pluginAiChat from '@cloudbeaver/plugin-ai-chat/module';
+import pluginAi from '@cloudbeaver/plugin-ai/module';
 import pluginAiAdministration from '@cloudbeaver/plugin-ai-administration/module';
 import pluginConnectionFormAi from '@cloudbeaver/plugin-connection-form-ai/module';
 
@@ -239,6 +240,7 @@ export const commonSet = [
   pluginConnectionNetworkHandlers,
   pluginDataViewerReferences,
   pluginAiChat,
+  pluginAi,
   pluginAiAdministration,
   pluginConnectionFormAi,
 ];
