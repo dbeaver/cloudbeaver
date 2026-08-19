@@ -54,13 +54,9 @@ export class AdministrationAISettingsInfoPart extends FormPart<IAdministrationAI
   }
 
   protected override async saveChanges(): Promise<void> {
-    if (!this.state.defaultConfiguration) {
-      return;
-    }
-
     await this.aiSettingsResource.saveSettings({
-      defaultConfiguration: this.state.defaultConfiguration,
-      language: this.state.language ?? undefined,
+      defaultConfiguration: this.state.defaultConfiguration ?? undefined,
+      language: this.state.language ?? '',
     });
   }
 
