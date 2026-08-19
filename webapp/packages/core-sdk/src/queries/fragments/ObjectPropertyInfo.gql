@@ -12,9 +12,6 @@ fragment ObjectPropertyInfo on ObjectPropertyInfo {
   constraints {
     min
     max
-    step
-    minLength
-    maxLength
   }
   length
   features

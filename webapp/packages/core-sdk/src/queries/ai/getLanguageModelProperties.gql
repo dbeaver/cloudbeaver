@@ -12,9 +12,6 @@ query getEngineProperties($engineId: ID!, $profileId: ID, $settings: AIEngineCon
     constraints {
       min
       max
-      step
-      minLength
-      maxLength
     }
     validValues
     length

@@ -48,12 +48,6 @@ type PropertyConstraints @since(version: "26.2.0") {
     min: Float
     "Maximum allowed value for numeric properties"
     max: Float
-    "Step for numeric properties"
-    step: Float
-    "Minimum allowed length for string properties"
-    minLength: Int
-    "Maximum allowed length for string properties"
-    maxLength: Int
 }
 
 enum ObjectPropertyLength {
