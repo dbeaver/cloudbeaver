@@ -84,10 +84,7 @@ export const AIProfileOptions: TabContainerPanelComponent<IAIProfileFormProps> =
         return;
       }
 
-      if (model.contextWindowSize != null) {
-        part.state.properties[CONTEXT_WINDOW_SIZE_PROPERTY_ID] = model.contextWindowSize;
-      }
-
+      part.state.properties[CONTEXT_WINDOW_SIZE_PROPERTY_ID] = model.contextWindowSize;
       part.state.properties[TEMPERATURE_PROPERTY_ID] = model.defaultTemperature;
     },
     [models, part],
@@ -171,8 +168,9 @@ export const AIProfileOptions: TabContainerPanelComponent<IAIProfileFormProps> =
                 properties={propertiesBeforeModel}
               />
               {hasModels && (
-                <div className="tw:flex tw:items-start tw:gap-2">
+                <Container className="tw:w-full" small>
                   <Combobox
+                    className="tw:w-full"
                     value={part.state.properties[MODEL_PROPERTY_ID]}
                     items={chatModels}
                     keySelector={model => model.id}
@@ -180,14 +178,6 @@ export const AIProfileOptions: TabContainerPanelComponent<IAIProfileFormProps> =
                     disabled={formState.isDisabled}
                     loading={isLoading}
                     description={translate('ai_administration_models_refresh_description')}
-                    action={
-                      <ActionIconButton
-                        name="refresh"
-                        title={translate('ai_administration_models_refresh')}
-                        disabled={isLoading || formState.isDisabled}
-                        onClick={refreshModels}
-                      />
-                    }
                     allowCustomValue
                     required
                     small
@@ -195,7 +185,15 @@ export const AIProfileOptions: TabContainerPanelComponent<IAIProfileFormProps> =
                   >
                     {translate('ai_administration_select_language_model_selector_title')}
                   </Combobox>
-                </div>
+                  <div className="tw:absolute tw:top-9 tw:-right-9">
+                    <ActionIconButton
+                      name="refresh"
+                      title={translate('ai_administration_models_refresh')}
+                      disabled={isLoading || formState.isDisabled}
+                      onClick={refreshModels}
+                    />
+                  </div>
+                </Container>
               )}
               <AIProfilePropertiesForm disabled={isLoading || formState.isDisabled} state={part.state.properties} properties={propertiesAfterModel} />
             </Container>

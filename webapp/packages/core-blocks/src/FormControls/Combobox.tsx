@@ -46,7 +46,6 @@ export type ComboboxBaseProps<TKey, TValue> = Omit<
     inline?: boolean;
     allowCustomValue?: boolean;
     allowClear?: boolean;
-    action?: React.ReactNode | ((open: () => void) => React.ReactNode);
     size?: 'small' | 'medium' | 'large';
     onChange?: (value: string | null) => void;
   };
@@ -83,7 +82,6 @@ export const Combobox: IComboboxType = observer(function Combobox({
   readOnly,
   disabled,
   inline,
-  action,
   description,
   allowCustomValue = false,
   allowClear = false,
@@ -223,70 +221,67 @@ export const Combobox: IComboboxType = observer(function Combobox({
         </FieldLabel>
       )}
       <ComboboxProvider store={comboboxStore}>
-        <div className="tw:flex tw:items-center tw:gap-2">
-          <div className="tw:relative tw:flex tw:flex-1 tw:items-center tw:gap-2">
-            <ComboboxInput
-              defaultValue={comboboxDefaultValue}
-              disabled={disabled || loading || readOnly}
-              readOnly={readOnly}
-              placeholder={rest.placeholder}
-              className={clsx(
-                'theme-typography--caption  tw:tracking-normal!',
-                icon || loading ? 'tw:pl-8!' : '',
-                hasCancelButton ? 'tw:pr-12!' : 'tw:pr-6!',
+        <div className="tw:relative tw:flex tw:flex-1 tw:items-center tw:gap-2">
+          <ComboboxInput
+            defaultValue={comboboxDefaultValue}
+            disabled={disabled || loading || readOnly}
+            readOnly={readOnly}
+            placeholder={rest.placeholder}
+            className={clsx(
+              'theme-typography--caption  tw:tracking-normal!',
+              icon || loading ? 'tw:pl-8!' : '',
+              hasCancelButton ? 'tw:pr-12!' : 'tw:pr-6!',
+            )}
+            title={title}
+            id={inputId}
+            size={size}
+            autoSelect={!allowCustomValue}
+            onBlur={handleBlur}
+            onKeyDown={handleKeyDown}
+            {...rest}
+          />
+          {loading ? (
+            <Spinner size="small" className="tw:absolute tw:right-2 tw:top-[50%] tw:-translate-y-1/2" />
+          ) : (
+            <>
+              {hasCancelButton && (
+                <ComboboxCancel
+                  className="tw:absolute tw:right-8 tw:top-[50%] tw:-translate-y-1/2 tw:cursor-pointer tw:hover:bg-gray-200 tw:rounded"
+                  onClick={() => handleSelect(null)}
+                />
               )}
-              title={title}
-              id={inputId}
-              size={size}
-              autoSelect={!allowCustomValue}
-              onBlur={handleBlur}
-              onKeyDown={handleKeyDown}
-              {...rest}
-            />
-            {loading ? (
-              <Spinner size="small" className="tw:absolute tw:right-2 tw:top-[50%] tw:-translate-y-1/2" />
-            ) : (
-              <>
-                {hasCancelButton && (
-                  <ComboboxCancel
-                    className="tw:absolute tw:right-8 tw:top-[50%] tw:-translate-y-1/2 tw:cursor-pointer tw:hover:bg-gray-200 tw:rounded"
-                    onClick={() => handleSelect(null)}
-                  />
-                )}
-                {displayPopover && <ComboboxDisclosure disabled={disabled || loading || readOnly} className="cb-combobox__disclosure-icon" />}
-              </>
-            )}
-            {icon && <div className="tw:absolute tw:left-3 tw:w-4 tw:h-4">{typeof icon === 'string' ? <IconOrImage icon={icon} /> : icon}</div>}
-            {displayPopover && (
-              <ComboboxPopover className="theme-text-on-surface theme-background-surface">
-                {filteredItems.length > 0 ? (
-                  filteredItems.map(({ itemKey, itemValue, itemTitle, itemIcon, itemDisabled }) => (
-                    <ComboboxItem
-                      key={itemKey}
-                      value={itemKey}
-                      disabled={itemDisabled}
-                      title={itemTitle}
-                      setValueOnClick={handleSetValueOnClick}
-                      className={clsx({
-                        'tw:cursor-pointer': !itemDisabled,
-                        'tw:cursor-not-allowed': itemDisabled,
-                      })}
-                    >
-                      {iconSelector && (
-                        <div className="tw:w-4 tw:h-4 tw:shrink-0">
-                          {itemIcon && typeof itemIcon === 'string' ? <IconOrImage icon={itemIcon} /> : itemIcon}
-                        </div>
-                      )}
-                      <div className="combobox__item-value">{itemValue}</div>
-                    </ComboboxItem>
-                  ))
-                ) : (
-                  <div className="tw:p-2">{translate('combobox_no_results_placeholder')}</div>
-                )}
-              </ComboboxPopover>
-            )}
-          </div>
-          {typeof action === 'function' ? action(() => comboboxStore.setOpen(true)) : action}
+              {displayPopover && <ComboboxDisclosure disabled={disabled || loading || readOnly} className="cb-combobox__disclosure-icon" />}
+            </>
+          )}
+          {icon && <div className="tw:absolute tw:left-3 tw:w-4 tw:h-4">{typeof icon === 'string' ? <IconOrImage icon={icon} /> : icon}</div>}
+          {displayPopover && (
+            <ComboboxPopover className="theme-text-on-surface theme-background-surface">
+              {filteredItems.length > 0 ? (
+                filteredItems.map(({ itemKey, itemValue, itemTitle, itemIcon, itemDisabled }) => (
+                  <ComboboxItem
+                    key={itemKey}
+                    value={itemKey}
+                    disabled={itemDisabled}
+                    title={itemTitle}
+                    setValueOnClick={handleSetValueOnClick}
+                    className={clsx({
+                      'tw:cursor-pointer': !itemDisabled,
+                      'tw:cursor-not-allowed': itemDisabled,
+                    })}
+                  >
+                    {iconSelector && (
+                      <div className="tw:w-4 tw:h-4 tw:shrink-0">
+                        {itemIcon && typeof itemIcon === 'string' ? <IconOrImage icon={itemIcon} /> : itemIcon}
+                      </div>
+                    )}
+                    <div className="combobox__item-value">{itemValue}</div>
+                  </ComboboxItem>
+                ))
+              ) : (
+                <div className="tw:p-2">{translate('combobox_no_results_placeholder')}</div>
+              )}
+            </ComboboxPopover>
+          )}
         </div>
       </ComboboxProvider>
       {description && <FieldDescription>{description}</FieldDescription>}
