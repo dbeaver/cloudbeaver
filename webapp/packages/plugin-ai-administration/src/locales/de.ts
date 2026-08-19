@@ -9,6 +9,7 @@ export default [
   ['ai_administration_settings_load_fail', 'KI-Einstellungen konnten nicht geladen werden'],
   ['ai_administration_language_model_settings_save_fail', 'Einstellungen der KI-Engine konnten nicht gespeichert werden'],
   ['ai_administration_models_refresh', 'Modelle aktualisieren'],
+  ['ai_administration_models_refresh_description', 'Pflichtfelder ausfüllen und dann aktualisieren, um Modelle zu laden'],
   ['ai_administration_models_refresh_fail', 'Modelle konnten nicht aktualisiert werden'],
   ['plugin_ai_administration_rag_label', 'Nur relevante Objekte an die KI senden (Experimentell)'],
   [

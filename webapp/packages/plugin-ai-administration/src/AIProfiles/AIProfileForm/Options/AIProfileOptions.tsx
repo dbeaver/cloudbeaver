@@ -72,6 +72,13 @@ export const AIProfileOptions: TabContainerPanelComponent<IAIProfileFormProps> =
       setIsLoading(true);
       const loadedModels = await part.loadModels();
       setModels(loadedModels);
+
+      const availableModels = loadedModels.filter(model => model.features.map(f => f.toLowerCase()).includes('chat'));
+      const currentModelId = part.state.properties[MODEL_PROPERTY_ID];
+      if (!availableModels.some(model => model.id === currentModelId)) {
+        const firstModel = availableModels[0];
+        part.selectModel(firstModel?.id ?? null, firstModel);
+      }
     } catch (error: any) {
       notificationService.logException(error, 'ai_administration_models_refresh_fail');
     } finally {
@@ -124,7 +131,7 @@ export const AIProfileOptions: TabContainerPanelComponent<IAIProfileFormProps> =
                 properties={propertiesBeforeModel}
               />
               {hasModels && (
-                <div className="tw:flex tw:items-end tw:gap-2">
+                <div className="tw:flex tw:items-start tw:gap-2">
                   <Combobox
                     value={part.state.properties[MODEL_PROPERTY_ID]}
                     items={chatModels}
@@ -132,6 +139,15 @@ export const AIProfileOptions: TabContainerPanelComponent<IAIProfileFormProps> =
                     valueSelector={model => model.id}
                     disabled={formState.isDisabled}
                     loading={isLoading}
+                    description={translate('ai_administration_models_refresh_description')}
+                    action={
+                      <ActionIconButton
+                        name="refresh"
+                        title={translate('ai_administration_models_refresh')}
+                        disabled={isLoading || formState.isDisabled}
+                        onClick={refreshModels}
+                      />
+                    }
                     allowCustomValue
                     required
                     small
@@ -139,12 +155,6 @@ export const AIProfileOptions: TabContainerPanelComponent<IAIProfileFormProps> =
                   >
                     {translate('ai_administration_select_language_model_selector_title')}
                   </Combobox>
-                  <ActionIconButton
-                    name="refresh"
-                    title={translate('ai_administration_models_refresh')}
-                    disabled={isLoading || formState.isDisabled}
-                    onClick={refreshModels}
-                  />
                 </div>
               )}
               <AIProfilePropertiesForm disabled={isLoading || formState.isDisabled} state={part.state.properties} properties={propertiesAfterModel} />
