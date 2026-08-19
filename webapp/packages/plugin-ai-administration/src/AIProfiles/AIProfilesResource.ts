@@ -40,6 +40,7 @@ export class AIProfilesResource extends CachedMapResource<string, AIProfile> {
     permissionsResource.require(this, EAdminPermission.admin).outdateResource(this);
 
     this.onItemDelete.addHandler(() => aiSettingsResource.markOutdated());
+    this.onItemUpdate.addHandler(() => aiSettingsResource.markOutdated());
   }
 
   async create(config: AIProfileInput): Promise<AIAdminProfile> {
