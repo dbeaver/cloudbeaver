@@ -58,7 +58,6 @@ import org.jkiss.dbeaver.model.runtime.AbstractJob;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.websocket.event.WSWorkspaceConfigurationChangedEvent;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
-import org.jkiss.dbeaver.runtime.properties.ObjectPropertyDescriptor;
 import org.jkiss.dbeaver.runtime.properties.PropertySourceEditable;
 import org.jkiss.utils.CommonUtils;
 
@@ -161,25 +160,17 @@ public class WebServiceAI implements DBWServiceAI {
         @NotNull AIConfigurationProfile sourceProfile
     ) throws DBException {
         AIEngineProperties source = sourceProfile.getConfiguration();
-        AIEngineProperties target = sourceProfile.getEngineDescriptor().createPropertiesInstance();
         PropertySourceEditable sourceProperties = new PropertySourceEditable(source, source);
-        PropertySourceEditable targetProperties = new PropertySourceEditable(target, target);
         sourceProperties.collectProperties();
-        targetProperties.collectProperties();
 
-        try {
-            for (DBPPropertyDescriptor property : targetProperties.getProperties()) {
-                if (property instanceof ObjectPropertyDescriptor objectProperty) {
-                    objectProperty.writeValue(target, sourceProperties.getPropertyValue(monitor, property.getId()));
-                }
-            }
-        } catch (ReflectiveOperationException e) {
-            throw new DBException("Error copying AI engine configuration", e);
+        Map<String, Object> sourceValues = new HashMap<>();
+        for (DBPPropertyDescriptor property : sourceProperties.getProperties()) {
+            sourceValues.put(property.getId(), sourceProperties.getPropertyValue(monitor, property.getId()));
         }
 
         AIConfigurationProfile targetProfile = new AIConfigurationProfile();
         targetProfile.setEngineId(sourceProfile.getEngineId());
-        targetProfile.setConfiguration(target);
+        targetProfile.setConfiguration(toEngineConfiguration(monitor, targetProfile, Map.of("properties", sourceValues)));
         return targetProfile;
     }
 
