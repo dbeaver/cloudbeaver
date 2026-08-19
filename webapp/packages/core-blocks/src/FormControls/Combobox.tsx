@@ -46,7 +46,7 @@ export type ComboboxBaseProps<TKey, TValue> = Omit<
     inline?: boolean;
     allowCustomValue?: boolean;
     allowClear?: boolean;
-    action?: React.ReactNode;
+    action?: React.ReactNode | ((open: () => void) => React.ReactNode);
     size?: 'small' | 'medium' | 'large';
     onChange?: (value: string | null) => void;
   };
@@ -286,7 +286,7 @@ export const Combobox: IComboboxType = observer(function Combobox({
               </ComboboxPopover>
             )}
           </div>
-          {action}
+          {typeof action === 'function' ? action(() => comboboxStore.setOpen(true)) : action}
         </div>
       </ComboboxProvider>
       {description && <FieldDescription>{description}</FieldDescription>}

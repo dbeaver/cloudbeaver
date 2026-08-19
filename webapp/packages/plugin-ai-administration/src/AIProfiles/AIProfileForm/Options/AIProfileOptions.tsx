@@ -57,17 +57,21 @@ export const AIProfileOptions: TabContainerPanelComponent<IAIProfileFormProps> =
     return null;
   });
 
-  const modelProperty = propertiesInfo.find(property => property.id === MODEL_PROPERTY_ID);
-  const models = part.models.filter(model => model.features.includes('CHAT')).sort((a, b) => a.id.localeCompare(b.id));
+  const modelPropertyIndex = propertiesInfo.findIndex(property => property.id === MODEL_PROPERTY_ID);
+  const modelProperty = propertiesInfo[modelPropertyIndex];
+  const models = part.models.filter(model => model.features.includes('CHAT'));
   const hasModels = !!modelProperty;
-  const currentEngineProperties = propertiesInfo.filter(property => property.id !== MODEL_PROPERTY_ID);
+  const propertiesBeforeModel = hasModels ? propertiesInfo.slice(0, modelPropertyIndex) : propertiesInfo;
+  const propertiesAfterModel = hasModels ? propertiesInfo.slice(modelPropertyIndex + 1) : [];
 
-  async function refreshModels() {
+  async function refreshModels(): Promise<boolean> {
     try {
       setIsLoading(true);
       await part.refreshModels();
+      return true;
     } catch (error: any) {
       notificationService.logException(error, 'ai_administration_models_refresh_fail');
+      return false;
     } finally {
       setIsLoading(false);
     }
@@ -104,6 +108,16 @@ export const AIProfileOptions: TabContainerPanelComponent<IAIProfileFormProps> =
           <Group gap medium>
             <GroupTitle>{translate('ai_administration_language_model_settings')}</GroupTitle>
             <Container vertical gap>
+              <ObjectPropertyInfoForm
+                autocompleteSectionName="section-ai-profile"
+                autocompletePasswordType="new-password"
+                disabled={isLoading || formState.isDisabled}
+                state={part.state.properties}
+                properties={propertiesBeforeModel}
+                showRememberTip
+                hideEmptyPlaceholder
+                small
+              />
               {hasModels && (
                 <Combobox
                   value={part.state.properties[MODEL_PROPERTY_ID]}
@@ -112,14 +126,18 @@ export const AIProfileOptions: TabContainerPanelComponent<IAIProfileFormProps> =
                   valueSelector={model => model.id}
                   disabled={formState.isDisabled}
                   loading={isLoading}
-                  action={
+                  action={open => (
                     <ActionIconButton
                       name="refresh"
                       title={translate('ai_administration_models_refresh')}
                       disabled={isLoading || formState.isDisabled}
-                      onClick={refreshModels}
+                      onClick={async () => {
+                        if (await refreshModels()) {
+                          open();
+                        }
+                      }}
                     />
-                  }
+                  )}
                   allowCustomValue
                   required
                   small
@@ -133,8 +151,9 @@ export const AIProfileOptions: TabContainerPanelComponent<IAIProfileFormProps> =
                 autocompletePasswordType="new-password"
                 disabled={isLoading || formState.isDisabled}
                 state={part.state.properties}
-                properties={currentEngineProperties}
+                properties={propertiesAfterModel}
                 showRememberTip
+                hideEmptyPlaceholder
                 small
               />
             </Container>
