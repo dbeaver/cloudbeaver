@@ -22,7 +22,9 @@ export const GroupNodeControl: NodeControlComponent = observer(
     return (
       <TreeNodeControl ref={ref} style={{ height }}>
         <TreeNodeExpand leaf={node.leaf} />
-        <TreeNodeName title={node.tooltip}>{node.name}</TreeNodeName>
+        <TreeNodeName className="tw:flex-1 tw:min-w-0 tw:overflow-hidden" title={node.tooltip ?? node.name}>
+          <div className="tw:min-w-0 tw:truncate">{node.name}</div>
+        </TreeNodeName>
       </TreeNodeControl>
     );
   }),
