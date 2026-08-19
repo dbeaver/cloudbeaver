@@ -62,22 +62,6 @@ export const AIProfileOptions: TabContainerPanelComponent<IAIProfileFormProps> =
   const hasModels = !!modelProperty;
   const currentEngineProperties = propertiesInfo.filter(property => property.id !== MODEL_PROPERTY_ID);
 
-  async function handleModelBlur() {
-    if (!part.isActiveModelChanged) {
-      return;
-    }
-
-    try {
-      setIsLoading(true);
-      await part.loadEngineProperties();
-    } catch (error: any) {
-      notificationService.logException(error, 'ai_administration_settings_preview_fail');
-      part.state.properties[MODEL_PROPERTY_ID] = '';
-    } finally {
-      setIsLoading(false);
-    }
-  }
-
   async function refreshModels() {
     try {
       setIsLoading(true);
@@ -90,7 +74,7 @@ export const AIProfileOptions: TabContainerPanelComponent<IAIProfileFormProps> =
   }
 
   function handleModelChange(value: string | null) {
-    part.state.properties[MODEL_PROPERTY_ID] = value;
+    part.selectModel(value);
   }
 
   return (
@@ -133,7 +117,6 @@ export const AIProfileOptions: TabContainerPanelComponent<IAIProfileFormProps> =
                       name="refresh"
                       title={translate('ai_administration_models_refresh')}
                       disabled={isLoading || formState.isDisabled}
-                      onMouseDown={event => event.preventDefault()}
                       onClick={refreshModels}
                     />
                   }
@@ -141,7 +124,6 @@ export const AIProfileOptions: TabContainerPanelComponent<IAIProfileFormProps> =
                   required
                   small
                   onChange={handleModelChange}
-                  onBlur={handleModelBlur}
                 >
                   {translate('ai_administration_select_language_model_selector_title')}
                 </Combobox>
