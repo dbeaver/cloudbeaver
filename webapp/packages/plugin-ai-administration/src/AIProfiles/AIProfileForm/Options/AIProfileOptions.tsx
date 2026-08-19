@@ -132,7 +132,6 @@ export const AIProfileOptions: TabContainerPanelComponent<IAIProfileFormProps> =
   async function handleEngineChange(engineId: string): Promise<void> {
     await part.changeEngine(engineId);
     setModels(null);
-    await refreshModels();
   }
 
   return (
