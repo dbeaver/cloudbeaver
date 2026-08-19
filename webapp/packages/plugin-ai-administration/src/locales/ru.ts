@@ -8,7 +8,6 @@ export default [
   ['ai_administration_settings_save_fail', 'Не удалось сохранить настройки AI'],
   ['ai_administration_settings_load_fail', 'Не удалось загрузить настройки AI'],
   ['ai_administration_language_model_settings_save_fail', 'Не удалось сохранить настройки энджина'],
-  ['ai_administration_settings_preview_fail', 'Не удалось загрузить свойства модели'],
   ['ai_administration_models_refresh', 'Обновить модели'],
   ['ai_administration_models_refresh_fail', 'Не удалось обновить модели'],
   ['plugin_ai_administration_rag_label', 'Отправлять в ИИ только релевантные объекты (Экспериментально)'],

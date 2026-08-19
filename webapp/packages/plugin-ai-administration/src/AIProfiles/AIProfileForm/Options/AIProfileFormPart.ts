@@ -22,6 +22,7 @@ import { getObjectPropertiesValues } from '../../utils/getObjectPropertiesValues
 import { prepareProperties } from '../../utils/prepareProperties.js';
 import type { IAIProfileFormState } from '../IAIProfileFormState.js';
 import type { IAIProfileOptionsState } from './AIProfileSchema.js';
+import { isNotNullDefined } from '@dbeaver/js-helpers';
 
 const getDefaultState = (): IAIProfileOptionsState => ({
   name: '',
@@ -93,9 +94,11 @@ export class AIProfileFormPart extends FormPart<IAIProfileOptionsState, IAIProfi
     if (!model) {
       return;
     }
-    if (model.contextWindowSize != null) {
+
+    if (isNotNullDefined(model.contextWindowSize)) {
       this.state.properties[CONTEXT_WINDOW_SIZE_PROPERTY_ID] = model.contextWindowSize;
     }
+
     this.state.properties[TEMPERATURE_PROPERTY_ID] = model.defaultTemperature;
   }
 

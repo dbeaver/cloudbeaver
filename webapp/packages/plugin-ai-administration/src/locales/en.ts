@@ -8,7 +8,6 @@ export default [
   ['ai_administration_settings_save_fail', 'Failed to save AI settings'],
   ['ai_administration_settings_load_fail', 'Failed to load AI settings'],
   ['ai_administration_language_model_settings_save_fail', 'Failed to save engine settings'],
-  ['ai_administration_settings_preview_fail', 'Cannot load model properties'],
   ['ai_administration_models_refresh', 'Refresh models'],
   ['ai_administration_models_refresh_fail', 'Failed to refresh models'],
   ['plugin_ai_administration_rag_label', 'Send only relevant objects to AI (Experimental)'],

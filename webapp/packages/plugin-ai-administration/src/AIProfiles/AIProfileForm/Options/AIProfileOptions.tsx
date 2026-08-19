@@ -17,7 +17,6 @@ import {
   Group,
   GroupTitle,
   InputField,
-  ObjectPropertyInfoForm,
   Select,
   useAutoLoad,
   useFormCustomInputValidation,
@@ -32,6 +31,7 @@ import { AiEnginesResource } from '@cloudbeaver/plugin-ai';
 
 import { AIEnginePropertiesResource, MODEL_PROPERTY_ID } from '../../AIEnginePropertiesResource.js';
 import type { IAIProfileFormProps } from '../IAIProfileFormProps.js';
+import { AIProfilePropertiesForm } from './AIProfilePropertiesForm.js';
 import { AI_PROFILE_NAME_MAX_LENGTH, AI_PROFILE_NAME_MIN_LENGTH } from './AIProfileSchema.js';
 import { getAIProfileFormPart } from './getAIProfileFormPart.js';
 
@@ -62,7 +62,7 @@ export const AIProfileOptions: TabContainerPanelComponent<IAIProfileFormProps> =
 
   const modelPropertyIndex = propertiesInfo.findIndex(property => property.id === MODEL_PROPERTY_ID);
   const modelProperty = propertiesInfo[modelPropertyIndex];
-  const chatModels = models.filter(model => model.features.includes('CHAT'));
+  const chatModels = models.filter(model => model.features.map(f => f.toLowerCase()).includes('chat'));
   const hasModels = !!modelProperty;
   const propertiesBeforeModel = hasModels ? propertiesInfo.slice(0, modelPropertyIndex) : propertiesInfo;
   const propertiesAfterModel = hasModels ? propertiesInfo.slice(modelPropertyIndex + 1) : [];
@@ -118,15 +118,10 @@ export const AIProfileOptions: TabContainerPanelComponent<IAIProfileFormProps> =
           <Group gap medium>
             <GroupTitle>{translate('ai_administration_language_model_settings')}</GroupTitle>
             <Container vertical gap>
-              <ObjectPropertyInfoForm
-                autocompleteSectionName="section-ai-profile"
-                autocompletePasswordType="new-password"
+              <AIProfilePropertiesForm
                 disabled={isLoading || formState.isDisabled}
                 state={part.state.properties}
                 properties={propertiesBeforeModel}
-                showRememberTip
-                hideEmptyPlaceholder
-                small
               />
               {hasModels && (
                 <div className="tw:flex tw:items-end tw:gap-2">
@@ -152,16 +147,7 @@ export const AIProfileOptions: TabContainerPanelComponent<IAIProfileFormProps> =
                   />
                 </div>
               )}
-              <ObjectPropertyInfoForm
-                autocompleteSectionName="section-ai-profile"
-                autocompletePasswordType="new-password"
-                disabled={isLoading || formState.isDisabled}
-                state={part.state.properties}
-                properties={propertiesAfterModel}
-                showRememberTip
-                hideEmptyPlaceholder
-                small
-              />
+              <AIProfilePropertiesForm disabled={isLoading || formState.isDisabled} state={part.state.properties} properties={propertiesAfterModel} />
             </Container>
           </Group>
         )}
