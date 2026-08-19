@@ -71,6 +71,7 @@ export {
   Composite,
   CompositeItem,
   CompositeProvider,
+  useCompositeContext,
   useCompositeStore,
   type CompositeProps,
   type CompositeItemProps,
