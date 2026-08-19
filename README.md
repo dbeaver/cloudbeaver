@@ -28,6 +28,35 @@ You can see a live demo of CloudBeaver server here: https://demo.cloudbeaver.io
 
 ## Changelog
 
+### 26.1.5 2026-08-17
+- AI Assistant:
+    - Added the ability to cancel a response in AI Chat to stop response generation when needed.
+    - The "Endpoint" setting was renamed to "API Base URL" for the OpenAI provider.
+    - Added AI engine icons to AI configuration profiles, making it easier to identify AI providers in the Administration panel and AI Chat configuration.
+- Administration:
+    - Fixed the issue of fetching groups during LDAP authorization. CloudBeaver now provides all matched groups regardless of fetching errors.
+    - Added database and driver connection version information to diagnostic logs.
+- Connectivity:
+    - Added the option to upload files for certificates and keys in the SSL authorization configuration.
+- Accessibility:
+    - Improved keyboard accessibility for the user search filter in the Administration panel, allowing it to be focused and used with keyboard navigation with the Tab button.
+- General:
+    - Added advanced data import settings, including database-specific replace methods, transaction support, bulk loading, and the option to use a separate connection for data transfer.
+    - Improved autocompletion in the Data Editor filter by displaying suggestions under the cursor for easier selection.
+    - Improved SQL autocomplete suggestion ordering for object names. Now suggestions are sorted alphabetically.
+    - Resolved the issue where the reverse proxy logout opened a popup window rather than redirecting in the same tab.
+- Security:
+    - Removed the ability to rename SQL scripts that start with dots to prevent them from being moved outside the Scripts directory into the root Tree.
+    - Fixed the high vulnerability (CVE-2026-67213) in the nanoid library. The library was updated to version 3.3.17.
+    - Fixed the high vulnerability (CVE-2025-71329) in the less library. The library was updated to version 4.7.0.
+    - Fixed the high vulnerability (CVE-2026-13697) in the undici library. The library was updated to version 8.9.0.
+    - Fixed the high vulnerability (CVE-2026-18446) in the fast-uri library. The library was updated to version 4.1.2.
+    - Fixed the high vulnerability (CVE-2026-69152) in the brace-expansion library. The library was updated to version 5.0.9.
+- Databases and drivers:
+    - ClickHouse: Added support for maps data type visualisation for the Data Editor.
+    - LibSQL: Added support for database views.
+    - Added a Show full DDL option for PostgreSQL schemas and tables to generate complete DDL, including objects within a schema and object comments and privileges.
+
 ### 26.1.4 2026-08-03
 
 - AI Assistant:

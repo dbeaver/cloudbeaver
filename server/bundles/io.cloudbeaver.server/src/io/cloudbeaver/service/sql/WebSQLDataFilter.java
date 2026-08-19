@@ -22,6 +22,7 @@ import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.data.DBDAttributeConstraint;
 import org.jkiss.dbeaver.model.data.DBDDataFilter;
 import org.jkiss.dbeaver.model.exec.DBCLogicalOperator;
+import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.struct.DBSAttributeBase;
 import org.jkiss.utils.CommonUtils;
 
@@ -113,25 +114,32 @@ public class WebSQLDataFilter {
     }
 
     @NotNull
-    public DBDDataFilter makeDataFilter(@Nullable WebSQLResultsInfo resultInfo) throws DBException {
+    public DBDDataFilter makeDataFilter(
+        @NotNull DBRProgressMonitor monitor,
+        @Nullable WebSQLResultsInfo resultInfo
+    ) throws DBException {
         DBDDataFilter dataFilter = new DBDDataFilter();
         dataFilter.setWhere(where);
         dataFilter.setAnyConstraint(anyConstraint);
         if (CommonUtils.isEmpty(constraints)) {
             return dataFilter;
         }
-        dataFilter.addConstraints(mapWebConstrainsToDbdConstrains(resultInfo));
+        dataFilter.addConstraints(mapWebConstrainsToDbdConstrains(monitor, resultInfo));
         return dataFilter;
     }
 
 
     @NotNull
-    private List<DBDAttributeConstraint> mapWebConstrainsToDbdConstrains(@Nullable WebSQLResultsInfo resultInfo) throws DBException {
+    private List<DBDAttributeConstraint> mapWebConstrainsToDbdConstrains(
+        @NotNull DBRProgressMonitor monitor,
+        @Nullable WebSQLResultsInfo resultInfo
+    ) throws DBException {
         if (resultInfo == null) {
             return getDbdConstraints();
         }
         List<DBDAttributeConstraint> constraints = generateEmptyConstrains(resultInfo);
         fillEmptyConstrains(constraints);
+        WebSQLUtils.convertConstraintValues(monitor, resultInfo, constraints);
         return constraints;
     }
 

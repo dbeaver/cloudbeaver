@@ -10,6 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
 
 import { ActionIconButton, Fill, RenameDialog, s, useResource, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { Command } from '@dbeaver/ui-kit';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
@@ -74,10 +75,14 @@ export const AIChatHeader = observer<Props>(function AIChatHeader({ currentConve
 
       <div className="tw:flex tw:items-center tw:justify-between tw:gap-2">
         {currentConversation && (
-          <div className={s(styles, { title: true })} title={currentConversation.caption} onClick={() => updateCaption(currentConversation)}>
+          <Command
+            className={s(styles, { title: true })}
+            title={currentConversation.caption}
+            onClick={() => updateCaption(currentConversation)}
+          >
             <AIChatConversationType conversation={currentConversation} />
             <span className="tw:truncate">{currentConversation.caption}</span>
-          </div>
+          </Command>
         )}
         <Fill />
         <div className="tw:flex tw:items-center">
