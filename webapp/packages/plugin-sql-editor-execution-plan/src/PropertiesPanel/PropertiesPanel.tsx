@@ -11,6 +11,7 @@ import { useMemo } from 'react';
 
 import { Table, TableBody, TableColumnHeader, TableHeader, TextPlaceholder, useTranslate } from '@cloudbeaver/core-blocks';
 import type { ObjectPropertyInfo, SqlExecutionPlanNode } from '@cloudbeaver/core-sdk';
+import { Composite, CompositeProvider } from '@dbeaver/ui-kit';
 
 import { isVisibleProperty } from '../useExecutionPlanTreeState.js';
 import { PropertiesPanelItemsGroup } from './PropertiesPanelItemsGroup.js';
@@ -62,14 +63,16 @@ export const PropertiesPanel = observer<Props>(function PropertiesPanel({ select
         <TableColumnHeader title={nameColumnTitle}>{nameColumnTitle}</TableColumnHeader>
         <TableColumnHeader title={valueColumnTitle}>{valueColumnTitle}</TableColumnHeader>
       </TableHeader>
-      <TableBody>
-        {!!general.length && (
-          <PropertiesPanelItemsGroup properties={general} name={translate('plugin_sql_execution_plan_properties_panel_general')} />
-        )}
-        {!!details.length && (
-          <PropertiesPanelItemsGroup properties={details} name={translate('plugin_sql_execution_plan_properties_panel_details')} />
-        )}
-      </TableBody>
+      <CompositeProvider orientation="vertical">
+        <Composite render={<TableBody />}>
+          {!!general.length && (
+            <PropertiesPanelItemsGroup properties={general} name={translate('plugin_sql_execution_plan_properties_panel_general')} />
+          )}
+          {!!details.length && (
+            <PropertiesPanelItemsGroup properties={details} name={translate('plugin_sql_execution_plan_properties_panel_details')} />
+          )}
+        </Composite>
+      </CompositeProvider>
     </Table>
   );
 });

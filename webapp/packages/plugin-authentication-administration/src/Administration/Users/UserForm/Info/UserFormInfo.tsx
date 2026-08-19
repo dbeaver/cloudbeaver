@@ -37,9 +37,9 @@ export const UserFormInfo: TabContainerPanelComponent<UserFormProps> = observer(
   const tabState = useTabState<UserFormInfoPart>();
   const userFormInfoPartService = useService(UserFormInfoPartService);
   const administrationUsersManagementService = useService(AdministrationUsersManagementService);
-  const userId = tabState.state.userId ?? formState.state.userId;
+  const userId = formState.state.userId;
   const user = useResource(UserFormInfo, UsersResource, userId, {
-    active: formState.mode === 'edit',
+    active: !!userId,
   });
 
   useAutoLoad(UserFormInfo, [tabState, ...administrationUsersManagementService.loaders], tab.selected);
