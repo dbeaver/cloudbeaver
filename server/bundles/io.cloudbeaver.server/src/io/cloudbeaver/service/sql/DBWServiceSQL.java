@@ -72,6 +72,7 @@ public interface DBWServiceSQL extends DBWService {
         @NotNull WebSession session,
         @NotNull List<String> nodePathList) throws DBWebException;
 
+    @NotNull
     @WebAction
     SQLGeneratorDescriptor[] getResultSetQueryGenerators(
         @NotNull WebSession session,

@@ -237,9 +237,12 @@ public class WebServiceSQL implements DBWServiceSQL {
         throws DBWebException
     {
         List<DBSObject> objectList = getObjectListFromNodeIds(session, nodePathList);
-        return SQLGeneratorConfigurationRegistry.getInstance().getApplicableGenerators(objectList, session).toArray(new SQLGeneratorDescriptor[0]);
+        return SQLGeneratorConfigurationRegistry.getInstance()
+            .getApplicableGenerators(objectList, session)
+            .toArray(new SQLGeneratorDescriptor[0]);
     }
 
+    @NotNull
     @Override
     public SQLGeneratorDescriptor[] getResultSetQueryGenerators(
         @NotNull WebSession session,
