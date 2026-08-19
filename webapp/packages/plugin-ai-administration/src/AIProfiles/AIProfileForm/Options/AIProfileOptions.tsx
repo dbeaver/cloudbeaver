@@ -10,6 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
 
 import {
+  ActionIconButton,
   ColoredContainer,
   Combobox,
   Container,
@@ -26,10 +27,9 @@ import {
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { FormMode, type TabContainerPanelComponent } from '@cloudbeaver/core-ui';
-import { getObjectPropertyOptionName, getObjectPropertyOptionValue } from '@cloudbeaver/core-sdk';
 import { AiEnginesResource } from '@cloudbeaver/plugin-ai';
 
-import { AIEnginePropertiesResource, MODEL_PROPERTY_ID } from '../../AIEnginePropertiesResource.js';
+import { MODEL_PROPERTY_ID } from '../../AIEnginePropertiesResource.js';
 import type { IAIProfileFormProps } from '../IAIProfileFormProps.js';
 import { AI_PROFILE_NAME_MAX_LENGTH, AI_PROFILE_NAME_MIN_LENGTH } from './AIProfileSchema.js';
 import { getAIProfileFormPart } from './getAIProfileFormPart.js';
@@ -39,8 +39,7 @@ export const AIProfileOptions: TabContainerPanelComponent<IAIProfileFormProps> =
   const notificationService = useService(NotificationService);
   const enginesLoader = useResource(AIProfileOptions, AiEnginesResource, undefined);
   const part = getAIProfileFormPart(formState);
-  const propertiesLoader = useResource(AIProfileOptions, AIEnginePropertiesResource, part.state.engineId || null);
-  const propertiesInfo = propertiesLoader.data ?? [];
+  const propertiesInfo = part.propertiesInfo;
   const isEditMode = formState.mode === FormMode.Edit;
   const [isLoading, setIsLoading] = useState(false);
 
@@ -59,7 +58,7 @@ export const AIProfileOptions: TabContainerPanelComponent<IAIProfileFormProps> =
   });
 
   const modelProperty = propertiesInfo.find(property => property.id === MODEL_PROPERTY_ID);
-  const models = [...(modelProperty?.validValues ?? [])].sort((a, b) => getObjectPropertyOptionName(a).localeCompare(getObjectPropertyOptionName(b)));
+  const models = part.models.filter(model => model.features.includes('CHAT')).sort((a, b) => a.id.localeCompare(b.id));
   const hasModels = !!modelProperty;
   const currentEngineProperties = propertiesInfo.filter(property => property.id !== MODEL_PROPERTY_ID);
 
@@ -79,6 +78,17 @@ export const AIProfileOptions: TabContainerPanelComponent<IAIProfileFormProps> =
     }
   }
 
+  async function refreshModels() {
+    try {
+      setIsLoading(true);
+      await part.refreshModels();
+    } catch (error: any) {
+      notificationService.logException(error, 'ai_administration_models_refresh_fail');
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
   function handleModelChange(value: string | null) {
     part.state.properties[MODEL_PROPERTY_ID] = value;
   }
@@ -88,7 +98,7 @@ export const AIProfileOptions: TabContainerPanelComponent<IAIProfileFormProps> =
       <Container medium gap>
         <Group gap>
           <Container vertical gap>
-            <InputField ref={nameRef} name="name" state={part.state} disabled={formState.isDisabled} small required>
+            <InputField ref={nameRef} name="name" state={part.state} disabled={formState.isDisabled} autoComplete="off" small required>
               {translate('plugin_ai_administration_profile_form_field_name')}
             </InputField>
             <Select
@@ -114,10 +124,19 @@ export const AIProfileOptions: TabContainerPanelComponent<IAIProfileFormProps> =
                 <Combobox
                   value={part.state.properties[MODEL_PROPERTY_ID]}
                   items={models}
-                  keySelector={getObjectPropertyOptionValue}
-                  valueSelector={getObjectPropertyOptionName}
+                  keySelector={model => model.id}
+                  valueSelector={model => model.id}
                   disabled={formState.isDisabled}
                   loading={isLoading}
+                  action={
+                    <ActionIconButton
+                      name="refresh"
+                      title={translate('ai_administration_models_refresh')}
+                      disabled={isLoading || formState.isDisabled}
+                      onMouseDown={event => event.preventDefault()}
+                      onClick={refreshModels}
+                    />
+                  }
                   allowCustomValue
                   required
                   small
@@ -128,6 +147,8 @@ export const AIProfileOptions: TabContainerPanelComponent<IAIProfileFormProps> =
                 </Combobox>
               )}
               <ObjectPropertyInfoForm
+                autocompleteSectionName="section-ai-profile"
+                autocompletePasswordType="new-password"
                 disabled={isLoading || formState.isDisabled}
                 state={part.state.properties}
                 properties={currentEngineProperties}

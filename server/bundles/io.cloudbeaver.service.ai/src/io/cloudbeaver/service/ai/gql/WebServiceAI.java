@@ -58,6 +58,7 @@ import org.jkiss.dbeaver.model.runtime.AbstractJob;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.websocket.event.WSWorkspaceConfigurationChangedEvent;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
+import org.jkiss.dbeaver.runtime.properties.ObjectPropertyDescriptor;
 import org.jkiss.dbeaver.runtime.properties.PropertySourceEditable;
 import org.jkiss.utils.CommonUtils;
 
@@ -104,7 +105,10 @@ public class WebServiceAI implements DBWServiceAI {
     ) throws DBWebException {
         WebAIUtils.validateAiPluginEnabled();
         try {
-            AIConfigurationProfile profile = getDefaultConfiguration(engineId, profileId);
+            AIConfigurationProfile profile = copyConfigurationProfile(
+                webSession.getProgressMonitor(),
+                getDefaultConfiguration(engineId, profileId)
+            );
 
             AIEngineProperties engineConfiguration;
             if (settingsInput != null) {
@@ -123,6 +127,60 @@ public class WebServiceAI implements DBWServiceAI {
         } catch (DBException e) {
             throw new DBWebException("Error getting engine configuration parameters", e);
         }
+    }
+
+    @NotNull
+    @Override
+    public List<WebAIModel> getEngineModels(
+        @NotNull WebSession webSession,
+        @NotNull String engineId,
+        @Nullable String profileId,
+        @Nullable Map<String, Object> settingsInput
+    ) throws DBWebException {
+        WebAIUtils.validateAiPluginEnabled();
+        try {
+            AIConfigurationProfile profile = copyConfigurationProfile(
+                webSession.getProgressMonitor(),
+                getDefaultConfiguration(engineId, profileId)
+            );
+            AIEngineProperties configuration = settingsInput == null
+                ? profile.getConfiguration()
+                : toEngineConfiguration(webSession.getProgressMonitor(), profile, settingsInput);
+
+            try (AIEngine<?> engine = profile.getEngineDescriptor().createEngineInstance(configuration)) {
+                return engine.getModels(webSession.getProgressMonitor()).stream().map(WebAIModel::new).toList();
+            }
+        } catch (DBException e) {
+            throw new DBWebException("Error getting AI engine models", e);
+        }
+    }
+
+    @NotNull
+    private AIConfigurationProfile copyConfigurationProfile(
+        @NotNull DBRProgressMonitor monitor,
+        @NotNull AIConfigurationProfile sourceProfile
+    ) throws DBException {
+        AIEngineProperties source = sourceProfile.getConfiguration();
+        AIEngineProperties target = sourceProfile.getEngineDescriptor().createPropertiesInstance();
+        PropertySourceEditable sourceProperties = new PropertySourceEditable(source, source);
+        PropertySourceEditable targetProperties = new PropertySourceEditable(target, target);
+        sourceProperties.collectProperties();
+        targetProperties.collectProperties();
+
+        try {
+            for (DBPPropertyDescriptor property : targetProperties.getProperties()) {
+                if (property instanceof ObjectPropertyDescriptor objectProperty) {
+                    objectProperty.writeValue(target, sourceProperties.getPropertyValue(monitor, property.getId()));
+                }
+            }
+        } catch (ReflectiveOperationException e) {
+            throw new DBException("Error copying AI engine configuration", e);
+        }
+
+        AIConfigurationProfile targetProfile = new AIConfigurationProfile();
+        targetProfile.setEngineId(sourceProfile.getEngineId());
+        targetProfile.setConfiguration(target);
+        return targetProfile;
     }
 
     @NotNull

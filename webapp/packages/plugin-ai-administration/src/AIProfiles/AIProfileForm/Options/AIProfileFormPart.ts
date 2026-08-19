@@ -5,13 +5,15 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { runInAction } from 'mobx';
+import { makeObservable, observable, runInAction } from 'mobx';
 
 import { SAVED_VALUE_INDICATOR } from '@cloudbeaver/core-blocks';
+import type { AiModelInfo, IObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 import { FormMode, FormPart, type IFormState } from '@cloudbeaver/core-ui';
 import { getUniqueName } from '@cloudbeaver/core-utils';
 
 import { AIEnginePropertiesResource, MODEL_PROPERTY_ID } from '../../AIEnginePropertiesResource.js';
+import { AIModelsService } from '../../AIModelsService.js';
 import { type AIAdminProfile, type AIProfileInput, AIProfilesResource } from '../../AIProfilesResource.js';
 import { getObjectPropertiesValues } from '../../utils/getObjectPropertiesValues.js';
 import { prepareProperties } from '../../utils/prepareProperties.js';
@@ -25,12 +27,22 @@ const getDefaultState = (): IAIProfileOptionsState => ({
 });
 
 export class AIProfileFormPart extends FormPart<IAIProfileOptionsState, IAIProfileFormState> {
+  // Property metadata may depend on profile credentials, so keep dynamic model values local to the form.
+  propertiesInfo: IObjectPropertyInfo[] = [];
+  models: AiModelInfo[] = [];
+
   constructor(
     formState: IFormState<IAIProfileFormState>,
     private readonly aiProfilesResource: AIProfilesResource,
     private readonly aiEnginePropertiesResource: AIEnginePropertiesResource,
+    private readonly aiModelsService: AIModelsService,
   ) {
     super(formState, getDefaultState());
+
+    makeObservable(this, {
+      propertiesInfo: observable.ref,
+      models: observable.ref,
+    });
   }
 
   get isActiveModelChanged(): boolean {
@@ -83,6 +95,8 @@ export class AIProfileFormPart extends FormPart<IAIProfileOptionsState, IAIProfi
     runInAction(() => {
       this.state.engineId = engineId;
       this.state.properties = getObjectPropertiesValues(propertiesInfo ?? []);
+      this.propertiesInfo = propertiesInfo ?? [];
+      this.models = [];
     });
   }
 
@@ -91,16 +105,8 @@ export class AIProfileFormPart extends FormPart<IAIProfileOptionsState, IAIProfi
       return;
     }
 
-    const profileId = this.formState.mode === FormMode.Edit ? this.formState.state.profileId : undefined;
     const currentProperties = this.state.properties;
-
-    const propertiesInfo = await this.aiEnginePropertiesResource.loadProperties(this.state.engineId, profileId, {
-      properties: prepareProperties({
-        engineProperties: this.state.properties,
-        initialEngineProperties: this.initialState.properties,
-        infoProperties: this.aiEnginePropertiesResource.get(this.state.engineId) ?? [],
-      }),
-    });
+    const propertiesInfo = await this.loadCurrentEngineProperties();
 
     runInAction(() => {
       const properties = getObjectPropertiesValues(propertiesInfo);
@@ -118,6 +124,20 @@ export class AIProfileFormPart extends FormPart<IAIProfileOptionsState, IAIProfi
       }
 
       this.state.properties = properties;
+      this.propertiesInfo = propertiesInfo;
+    });
+  }
+
+  async refreshModels(): Promise<void> {
+    if (!this.state.engineId) {
+      return;
+    }
+
+    const profileId = this.formState.mode === FormMode.Edit ? this.formState.state.profileId : undefined;
+    const models = await this.aiModelsService.load(this.state.engineId, profileId, this.getCurrentEngineSettings());
+
+    runInAction(() => {
+      this.models = models;
     });
   }
 
@@ -147,7 +167,7 @@ export class AIProfileFormPart extends FormPart<IAIProfileOptionsState, IAIProfi
         properties: prepareProperties({
           engineProperties: this.state.properties,
           initialEngineProperties: this.initialState.properties,
-          infoProperties: this.aiEnginePropertiesResource.get(this.state.engineId) ?? [],
+          infoProperties: this.propertiesInfo,
         }),
       },
     };
@@ -176,24 +196,55 @@ export class AIProfileFormPart extends FormPart<IAIProfileOptionsState, IAIProfi
 
   protected override async loader(): Promise<void> {
     if (this.formState.mode !== FormMode.Edit) {
-      this.setInitialState(getDefaultState());
+      runInAction(() => {
+        this.propertiesInfo = [];
+        this.models = [];
+        this.setInitialState(getDefaultState());
+      });
       return;
     }
 
     const profile = await this.aiProfilesResource.load(this.formState.state.profileId);
 
     if (!profile) {
-      this.setInitialState(getDefaultState());
+      runInAction(() => {
+        this.propertiesInfo = [];
+        this.models = [];
+        this.setInitialState(getDefaultState());
+      });
       return;
     }
 
     await this.aiEnginePropertiesResource.load(profile.engineId);
     const propertiesInfo = await this.aiEnginePropertiesResource.loadProperties(profile.engineId, this.formState.state.profileId);
 
-    this.setInitialState({
-      name: profile.name,
-      engineId: profile.engineId,
-      properties: getObjectPropertiesValues(propertiesInfo),
+    runInAction(() => {
+      this.propertiesInfo = propertiesInfo;
+      this.models = [];
+      this.setInitialState({
+        name: profile.name,
+        engineId: profile.engineId,
+        properties: getObjectPropertiesValues(propertiesInfo),
+      });
     });
+  }
+
+  private async loadCurrentEngineProperties(): Promise<IObjectPropertyInfo[]> {
+    if (!this.state.engineId) {
+      return [];
+    }
+
+    const profileId = this.formState.mode === FormMode.Edit ? this.formState.state.profileId : undefined;
+    return this.aiEnginePropertiesResource.loadProperties(this.state.engineId, profileId, this.getCurrentEngineSettings());
+  }
+
+  private getCurrentEngineSettings() {
+    return {
+      properties: prepareProperties({
+        engineProperties: this.state.properties,
+        initialEngineProperties: this.initialState.properties,
+        infoProperties: this.propertiesInfo,
+      }),
+    };
   }
 }

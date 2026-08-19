@@ -11,6 +11,7 @@ import { LocaleService } from './LocaleService.js';
 import { AISettingsResource } from './AISettingsResource.js';
 import { AISettingsService } from './AISettingsService.js';
 import { AIEnginePropertiesResource } from './AIProfiles/AIEnginePropertiesResource.js';
+import { AIModelsService } from './AIProfiles/AIModelsService.js';
 import { AIProfilesResource } from './AIProfiles/AIProfilesResource.js';
 import { AIProfileFormService } from './AIProfiles/AIProfileForm/AIProfileFormService.js';
 import { AIProfileFormTabBootstrap } from './AIProfiles/AIProfileForm/AIProfileFormTabBootstrap.js';
@@ -35,6 +36,7 @@ export default ModuleRegistry.add({
       .addSingleton(AISettingsService)
       .addSingleton(AIProfilesResource)
       .addSingleton(AIEnginePropertiesResource)
+      .addSingleton(AIModelsService)
       .addSingleton(AIProfileFormService)
       .addSingleton(Bootstrap, AIProfileFormTabBootstrap)
       .addSingleton(AIAdministrationTabsService)
