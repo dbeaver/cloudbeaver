@@ -305,7 +305,11 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
       <InputField
         required={required}
         type={type}
-        min={property.minValue}
+        min={property.constraints?.min}
+        max={property.constraints?.max}
+        step={property.constraints?.step}
+        minLength={property.constraints?.minLength}
+        maxLength={property.constraints?.maxLength}
         title={isPassword ? property.description || property.displayName : undefined}
         labelTooltip={property.description || property.displayName}
         name={property.id!}
@@ -329,7 +333,11 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
     <InputField
       required={required}
       type={type}
-      min={property.minValue ?? undefined}
+      min={property.constraints?.min}
+      max={property.constraints?.max}
+      step={property.constraints?.step}
+      minLength={property.constraints?.minLength}
+      maxLength={property.constraints?.maxLength}
       title={isPassword ? property.description || property.displayName : undefined}
       labelTooltip={property.description || property.displayName}
       name={property.id!}
