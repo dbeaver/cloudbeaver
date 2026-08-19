@@ -7,7 +7,7 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useCallback, useState } from 'react';
+import { useState } from 'react';
 
 import {
   ActionIconButton,
@@ -75,47 +75,41 @@ export const AIProfileOptions: TabContainerPanelComponent<IAIProfileFormProps> =
   const propertiesBeforeModel = hasModels ? propertiesInfo.slice(0, modelPropertyIndex) : propertiesInfo;
   const propertiesAfterModel = hasModels ? propertiesInfo.slice(modelPropertyIndex + 1) : [];
 
-  const applyModelToProfile = useCallback(
-    (modelId: string | null, availableModels = models ?? []): void => {
-      const model = availableModels.find(model => model.id === modelId);
-      part.state.properties[MODEL_PROPERTY_ID] = modelId;
+  function applyModelToProfile(modelId: string | null, availableModels = models ?? []): void {
+    const model = availableModels.find(model => model.id === modelId);
+    part.state.properties[MODEL_PROPERTY_ID] = modelId;
 
-      if (!model) {
-        return;
+    if (!model) {
+      return;
+    }
+
+    part.state.properties[CONTEXT_WINDOW_SIZE_PROPERTY_ID] = model.contextWindowSize;
+    part.state.properties[TEMPERATURE_PROPERTY_ID] = model.defaultTemperature;
+  }
+
+  async function loadModels(notifyOnError: boolean): Promise<AiModelInfo[] | null> {
+    const engineId = part.state.engineId;
+    if (!engineId) {
+      return null;
+    }
+
+    try {
+      setIsLoading(true);
+      const profileId = formState.mode === FormMode.Edit ? formState.state.profileId : undefined;
+      const loadedModels = await aiProfilesResource.loadModels(engineId, profileId, part.getCurrentEngineSettings());
+      setModels(loadedModels);
+      return loadedModels;
+    } catch (error: any) {
+      if (notifyOnError) {
+        notificationService.logException(error, 'ai_administration_models_refresh_fail');
       }
+      return null;
+    } finally {
+      setIsLoading(false);
+    }
+  }
 
-      part.state.properties[CONTEXT_WINDOW_SIZE_PROPERTY_ID] = model.contextWindowSize;
-      part.state.properties[TEMPERATURE_PROPERTY_ID] = model.defaultTemperature;
-    },
-    [models, part],
-  );
-
-  const loadModels = useCallback(
-    async (notifyOnError: boolean): Promise<AiModelInfo[] | null> => {
-      const engineId = part.state.engineId;
-      if (!engineId) {
-        return null;
-      }
-
-      try {
-        setIsLoading(true);
-        const profileId = formState.mode === FormMode.Edit ? formState.state.profileId : undefined;
-        const loadedModels = await aiProfilesResource.loadModels(engineId, profileId, part.getCurrentEngineSettings());
-        setModels(loadedModels);
-        return loadedModels;
-      } catch (error: any) {
-        if (notifyOnError) {
-          notificationService.logException(error, 'ai_administration_models_refresh_fail');
-        }
-        return null;
-      } finally {
-        setIsLoading(false);
-      }
-    },
-    [aiProfilesResource, formState, notificationService, part],
-  );
-
-  const refreshModels = useCallback(async (): Promise<void> => {
+  async function refreshModels(): Promise<void> {
     const loadedModels = await loadModels(true);
     const currentModelId = part.state.properties[MODEL_PROPERTY_ID];
     if (loadedModels === null || currentModelId) {
@@ -126,7 +120,7 @@ export const AIProfileOptions: TabContainerPanelComponent<IAIProfileFormProps> =
     if (firstChatModel) {
       applyModelToProfile(firstChatModel.id, loadedModels);
     }
-  }, [applyModelToProfile, loadModels, part]);
+  }
 
   useExecutor({
     executor: formState.loadedTask,
