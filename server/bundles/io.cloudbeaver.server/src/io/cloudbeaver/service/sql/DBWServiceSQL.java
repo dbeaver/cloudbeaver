@@ -72,6 +72,12 @@ public interface DBWServiceSQL extends DBWService {
         @NotNull WebSession session,
         @NotNull List<String> nodePathList) throws DBWebException;
 
+    @WebAction
+    SQLGeneratorDescriptor[] getResultSetQueryGenerators(
+        @NotNull WebSession session,
+        @NotNull WebSQLContextInfo sqlContext,
+        @NotNull String resultsId) throws DBWebException;
+
     @NotNull
     @WebAction
     String generateEntityQuery(
@@ -95,7 +101,8 @@ public interface DBWServiceSQL extends DBWService {
     String sqlGenerateResultSetQuery(
         @NotNull WebSession session,
         @NotNull WebSQLContextInfo sqlContext,
-        @NotNull String generatorId,
+        @Nullable String generatorId,
+        @Nullable String generatorKey,
         @NotNull String resultsId,
         @NotNull List<WebSQLResultsRow> selectedRows,
         @NotNull WebSQLGeneratorOptions options

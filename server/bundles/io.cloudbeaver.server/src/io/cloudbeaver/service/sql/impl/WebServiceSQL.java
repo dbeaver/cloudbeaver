@@ -240,6 +240,16 @@ public class WebServiceSQL implements DBWServiceSQL {
         return SQLGeneratorConfigurationRegistry.getInstance().getApplicableGenerators(objectList, session).toArray(new SQLGeneratorDescriptor[0]);
     }
 
+    @Override
+    public SQLGeneratorDescriptor[] getResultSetQueryGenerators(
+        @NotNull WebSession session,
+        @NotNull WebSQLContextInfo sqlContext,
+        @NotNull String resultsId
+    ) throws DBWebException {
+        return getApplicableResultSetGenerators(session, sqlContext, resultsId, Collections.emptyList())
+            .toArray(new SQLGeneratorDescriptor[0]);
+    }
+
     @NotNull
     @Override
     public String generateEntityQuery(
@@ -283,14 +293,49 @@ public class WebServiceSQL implements DBWServiceSQL {
     public String sqlGenerateResultSetQuery(
         @NotNull WebSession webSession,
         @NotNull WebSQLContextInfo sqlContext,
-        @NotNull String generatorId,
+        @Nullable String generatorId,
+        @Nullable String generatorKey,
         @NotNull String resultsId,
         @NotNull List<WebSQLResultsRow> selectedRows,
         @NotNull WebSQLGeneratorOptions options
     ) throws DBWebException {
+        if ((generatorId == null) == (generatorKey == null)) {
+            throw new DBWebException("Exactly one of generatorId or generatorKey must be specified");
+        }
+        if (selectedRows.isEmpty()) {
+            throw new DBWebException("At least one row must be selected");
+        }
+        String requestedGeneratorId = generatorKey != null ? generatorKey : generatorId;
+        List<SQLGeneratorDescriptor> applicableGenerators = getApplicableResultSetGenerators(
+            webSession,
+            sqlContext,
+            resultsId,
+            selectedRows
+        );
+        if (applicableGenerators.stream().noneMatch(generator -> generator.getId().equals(requestedGeneratorId))) {
+            throw new DBWebException("Generator '" + requestedGeneratorId + "' is not applicable to this result set");
+        }
         checkAndFillTruncatedData(sqlContext, resultsId, selectedRows);
         WebDBDResultSetDataProvider dataProvider = new WebDBDResultSetDataProvider(resultsId, sqlContext, selectedRows);
-        return createAndRunGenerator(webSession, generatorId, Collections.singletonList(dataProvider), options);
+        return createAndRunGenerator(webSession, requestedGeneratorId, Collections.singletonList(dataProvider), options);
+    }
+
+    @NotNull
+    private List<SQLGeneratorDescriptor> getApplicableResultSetGenerators(
+        @NotNull WebSession session,
+        @NotNull WebSQLContextInfo sqlContext,
+        @NotNull String resultsId,
+        @NotNull List<WebSQLResultsRow> selectedRows
+    ) throws DBWebException {
+        sqlContext.getResults(resultsId);
+        WebDBDResultSetDataProvider dataProvider = new WebDBDResultSetDataProvider(resultsId, sqlContext, selectedRows);
+        if (dataProvider.getSingleSource() == null || dataProvider.getAttributes().length == 0) {
+            return Collections.emptyList();
+        }
+        return SQLGeneratorConfigurationRegistry.getInstance().getApplicableGenerators(
+            Collections.singletonList(dataProvider),
+            session
+        );
     }
 
     private void checkAndFillTruncatedData(

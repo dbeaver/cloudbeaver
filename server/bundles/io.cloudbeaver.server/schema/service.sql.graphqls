@@ -187,15 +187,15 @@ enum SQLRowIdentifierState {
 
 enum SQLResultSetGeneratorId {
     "SELECT .. WHERE .. ="
-    dataSelect,
+    dataSelect @deprecated(reason: "use generatorKey (26.2.0)"),
     "SELECT .. WHERE .. IN"
-    dataSelectMany,
+    dataSelectMany @deprecated(reason: "use generatorKey (26.2.0)"),
     "INSERT"
-    dataInsert,
+    dataInsert @deprecated(reason: "use generatorKey (26.2.0)"),
     "UPDATE"
-    dataUpdate,
+    dataUpdate @deprecated(reason: "use generatorKey (26.2.0)"),
     "DELETE by Unique Key"
-    dataDeleteByUniqueKey,
+    dataDeleteByUniqueKey @deprecated(reason: "use generatorKey (26.2.0)"),
 }
 
 type SQLRowIdentifier {
@@ -393,6 +393,14 @@ extend type Query {
     "Returns list of all available entity query generators"
     sqlEntityQueryGenerators(nodePathList: [String!]!): [SQLQueryGenerator!]!
 
+    "Returns SQL query generators applicable to the specified result set"
+    sqlResultSetQueryGenerators(
+        projectId: ID,
+        connectionId: ID!,
+        contextId: ID!,
+        resultsId: ID!
+    ): [SQLQueryGenerator!]! @since(version: "26.2.0")
+
     """
     Generates SQL query for the specified entity query generator.
     """
@@ -405,13 +413,14 @@ extend type Query {
 
     """
     Returns an auto-generated SQL query based on provided rows data.
-    Uses generatorId value to establish the type of query (e.g. SELECT or INSERT)
+    Uses the requested generator identifier to establish the type of query (e.g. SELECT or INSERT)
     """
     sqlGenerateResultSetQuery(
         projectId: ID,
         connectionId: ID!,
         contextId: ID!,
-        generatorId: SQLResultSetGeneratorId!,
+        generatorId: SQLResultSetGeneratorId @deprecated(reason: "use generatorKey (26.2.0)"),
+        generatorKey: String @since(version: "26.2.0"),
         resultsId: ID!,
         selectedRows: [SQLResultRow!]!,
         generatorOptions: SQLQueryGeneratorOptions
