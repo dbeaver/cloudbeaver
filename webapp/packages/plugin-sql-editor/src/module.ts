@@ -26,6 +26,7 @@ import { MenuBootstrap } from './MenuBootstrap.js';
 import { LocaleService } from './LocaleService.js';
 import { SqlEditorModel } from './SqlEditorModel/SqlEditorModel.js';
 import { SqlEditorModelService } from './SqlEditorModel/SqlEditorModelService.js';
+import { SqlEditorPermissionService } from './SqlEditorPermissionService.js';
 
 export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-sql-editor',
@@ -56,6 +57,7 @@ export default ModuleRegistry.add({
       .addSingleton(SqlDataSourceService)
       .addSingleton(LocalStorageSqlDataSourceBootstrap)
       .addSingleton(SqlEditorModelService)
-      .addSingleton(MenuBootstrap);
+      .addSingleton(MenuBootstrap)
+      .addSingleton(SqlEditorPermissionService);
   },
 });

@@ -24,6 +24,7 @@ export const SettingsGroups = observer<Props>(function SettingsGroups({ treeData
 
   return (
     <Tree
+      className="tw:w-full tw:max-w-full tw:min-w-0"
       data={treeData}
       getNodeHeight={getNodeHeight}
       nodeRenderers={[groupNodeRenderer]}

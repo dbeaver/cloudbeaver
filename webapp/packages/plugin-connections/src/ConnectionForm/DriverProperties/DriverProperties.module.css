@@ -20,3 +20,7 @@
   max-height: 100%;
   box-sizing: border-box;
 }
+
+.propertiesList {
+  max-height: 100%;
+}

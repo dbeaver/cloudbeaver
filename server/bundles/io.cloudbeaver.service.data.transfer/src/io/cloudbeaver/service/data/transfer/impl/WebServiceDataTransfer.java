@@ -32,6 +32,7 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.DBPDataSourcePermission;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
@@ -245,6 +246,10 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
         if (!validateImportPermission(webSession)) {
             throw new DBWebException("Permission denied. Data import is not allowed for this user");
         }
+        if (!sqlContext.getProcessor().getConnection().getDataSourceContainer()
+            .hasModifyPermission(DBPDataSourcePermission.PERMISSION_IMPORT_DATA)) {
+            throw new DBWebException("Data import is restricted for this connection");
+        }
         DataTransferProcessorDescriptor processor = DataTransferRegistry.getInstance().getProcessor(parameters.getProcessorId());
         if (processor == null) {
             throw new DBWebException("Wrong data processor '" + parameters.getProcessorId() + "'");
@@ -351,7 +356,7 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
         StreamConsumerSettings settings = makeStreamConsumerSettings(parameters);
         DatabaseTransferProducer producer = new DatabaseTransferProducer(
             dataContainer,
-            parameters.getFilter() == null ? null : parameters.getFilter().makeDataFilter(resultsInfo));
+            parameters.getFilter() == null ? null : parameters.getFilter().makeDataFilter(monitor, resultsInfo));
 
         consumer.initTransfer(
             dataContainer,

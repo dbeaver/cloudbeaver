@@ -75,16 +75,12 @@ public class WebServiceAI implements DBWServiceAI {
     public WebAISettingsConfig getAiSettings() throws DBWebException {
         WebAIUtils.validateAiPluginEnabled();
         AISettings settings = AISettingsManager.getInstance().getSettings();
-        try {
-            AIConfigurationProfile configuration = settings.getDefaultConfiguration();
-            return new WebAISettingsConfig(
-                configuration.getEngineId(),
-                configuration.getProfileId(),
-                getAiLanguage()
-            );
-        } catch (DBException e) {
-            throw new DBWebException(e);
-        }
+        AIConfigurationProfile configuration = settings.getDefaultConfigurationOrNull();
+        return new WebAISettingsConfig(
+            configuration == null ? "" : configuration.getEngineId(),
+            configuration == null ? null : configuration.getProfileId(),
+            getAiLanguage()
+        );
     }
 
     @NotNull

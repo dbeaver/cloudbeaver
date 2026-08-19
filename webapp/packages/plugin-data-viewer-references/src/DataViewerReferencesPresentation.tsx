@@ -93,6 +93,7 @@ export const DataViewerReferencesPresentation: DataPresentationComponent = obser
             keySelector={association => association.id}
             titleSelector={getValueSelector}
             valueSelector={getValueSelector}
+            overflowPadding={0}
             iconSelector={association => (
               <IconOrImage
                 className={clsx(association.reference && 'tw:rotate-180')}
