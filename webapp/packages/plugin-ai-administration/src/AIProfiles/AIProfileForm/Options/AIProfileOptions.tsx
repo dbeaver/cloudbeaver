@@ -111,13 +111,15 @@ export const AIProfileOptions: TabContainerPanelComponent<IAIProfileFormProps> =
 
   async function refreshModels(): Promise<void> {
     const loadedModels = await loadModels(true);
-    const currentModelId = part.state.properties[MODEL_PROPERTY_ID];
-    if (loadedModels === null || currentModelId) {
+
+    if (loadedModels === null) {
       return;
     }
 
+    const currentModelId = part.state.properties[MODEL_PROPERTY_ID];
     const firstChatModel = loadedModels.find(model => model.features.some(feature => feature.toLowerCase() === 'chat'));
-    if (firstChatModel) {
+
+    if (firstChatModel && !currentModelId) {
       applyModelToProfile(firstChatModel.id, loadedModels);
     }
   }
