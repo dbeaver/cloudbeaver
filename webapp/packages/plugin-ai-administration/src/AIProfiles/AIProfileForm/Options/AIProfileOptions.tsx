@@ -7,7 +7,7 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 
 import {
   ActionIconButton,
@@ -19,34 +19,42 @@ import {
   InputField,
   Select,
   useAutoLoad,
+  useExecutor,
   useFormCustomInputValidation,
   useResource,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
+import type { AiModelInfo } from '@cloudbeaver/core-sdk';
 import { FormMode, type TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 import { AiEnginesResource } from '@cloudbeaver/plugin-ai';
 
-import { AIEnginePropertiesResource, MODEL_PROPERTY_ID } from '../../AIEnginePropertiesResource.js';
+import {
+  AIEnginePropertiesResource,
+  CONTEXT_WINDOW_SIZE_PROPERTY_ID,
+  MODEL_PROPERTY_ID,
+  TEMPERATURE_PROPERTY_ID,
+} from '../../AIEnginePropertiesResource.js';
+import { AIProfilesResource } from '../../AIProfilesResource.js';
 import type { IAIProfileFormProps } from '../IAIProfileFormProps.js';
 import { AIProfilePropertiesForm } from './AIProfilePropertiesForm.js';
 import { AI_PROFILE_NAME_MAX_LENGTH, AI_PROFILE_NAME_MIN_LENGTH } from './AIProfileSchema.js';
 import { getAIProfileFormPart } from './getAIProfileFormPart.js';
-import { getAIProfileModelsFormPart } from './getAIProfileModelsFormPart.js';
 
 export const AIProfileOptions: TabContainerPanelComponent<IAIProfileFormProps> = observer(function AIProfileOptions({ formState }) {
   const translate = useTranslate();
   const notificationService = useService(NotificationService);
+  const aiProfilesResource = useService(AIProfilesResource);
   const enginesLoader = useResource(AIProfileOptions, AiEnginesResource, undefined);
   const part = getAIProfileFormPart(formState);
-  const modelsPart = getAIProfileModelsFormPart(formState, part);
   const propertiesLoader = useResource(AIProfileOptions, AIEnginePropertiesResource, part.state.engineId || null);
   const propertiesInfo = propertiesLoader.data ?? [];
   const isEditMode = formState.mode === FormMode.Edit;
   const [isLoading, setIsLoading] = useState(false);
+  const [models, setModels] = useState<AiModelInfo[] | null>(null);
 
-  useAutoLoad(AIProfileOptions, [part, modelsPart]);
+  useAutoLoad(AIProfileOptions, part);
 
   const { ref: nameRef } = useFormCustomInputValidation<string, HTMLInputElement>(value => {
     if (value.trim().length > AI_PROFILE_NAME_MAX_LENGTH) {
@@ -62,29 +70,72 @@ export const AIProfileOptions: TabContainerPanelComponent<IAIProfileFormProps> =
 
   const modelPropertyIndex = propertiesInfo.findIndex(property => property.id === MODEL_PROPERTY_ID);
   const modelProperty = propertiesInfo[modelPropertyIndex];
-  const chatModels = modelsPart.state.models.filter(model => model.features.map((feature: string) => feature.toLowerCase()).includes('chat'));
+  const chatModels = (models ?? []).filter(model => model.features.map(feature => feature.toLowerCase()).includes('chat'));
   const hasModels = !!modelProperty;
   const propertiesBeforeModel = hasModels ? propertiesInfo.slice(0, modelPropertyIndex) : propertiesInfo;
   const propertiesAfterModel = hasModels ? propertiesInfo.slice(modelPropertyIndex + 1) : [];
 
-  async function refreshModels(): Promise<void> {
+  const applyModelToProfile = useCallback(
+    (modelId: string | null, availableModels = models ?? []): void => {
+      const model = availableModels.find(model => model.id === modelId);
+      part.state.properties[MODEL_PROPERTY_ID] = modelId;
+
+      if (!model) {
+        return;
+      }
+
+      if (model.contextWindowSize != null) {
+        part.state.properties[CONTEXT_WINDOW_SIZE_PROPERTY_ID] = model.contextWindowSize;
+      }
+
+      part.state.properties[TEMPERATURE_PROPERTY_ID] = model.defaultTemperature;
+    },
+    [models, part],
+  );
+
+  const refreshModels = useCallback(async (): Promise<void> => {
+    const engineId = part.state.engineId;
+    if (!engineId) {
+      return;
+    }
+
     try {
       setIsLoading(true);
-      await modelsPart.loadModels();
+      const profileId = formState.mode === FormMode.Edit ? formState.state.profileId : undefined;
+      const loadedModels = await aiProfilesResource.loadModels(engineId, profileId, part.getCurrentEngineSettings());
+      setModels(loadedModels);
+
+      const availableModels = loadedModels.filter(model => model.features.map(feature => feature.toLowerCase()).includes('chat'));
+      const currentModelId = part.state.properties[MODEL_PROPERTY_ID];
+      if (!availableModels.some(model => model.id === currentModelId)) {
+        applyModelToProfile(availableModels[0]?.id ?? null, loadedModels);
+      }
     } catch (error: any) {
       notificationService.logException(error, 'ai_administration_models_refresh_fail');
     } finally {
       setIsLoading(false);
     }
-  }
+  }, [aiProfilesResource, applyModelToProfile, formState, notificationService, part]);
+
+  useExecutor({
+    executor: formState.loadedTask,
+    handlers: [
+      async () => {
+        if (isEditMode && part.state.engineId && models === null) {
+          await refreshModels();
+        }
+      },
+    ],
+  });
 
   function handleModelChange(value: string | null) {
-    modelsPart.applyModelToProfile(value);
+    applyModelToProfile(value);
   }
 
   async function handleEngineChange(engineId: string): Promise<void> {
     await part.changeEngine(engineId);
-    await modelsPart.loadModels();
+    setModels(null);
+    await refreshModels();
   }
 
   return (
