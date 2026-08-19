@@ -10,3 +10,7 @@
   flex-direction: column;
   overflow: auto;
 }
+
+.itemList {
+  scrollbar-gutter: stable;
+}
