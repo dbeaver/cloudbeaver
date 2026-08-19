@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ export interface TableItemExpandProps<T> {
   onClose: () => void;
 }
 
-interface Props<T> extends React.PropsWithChildren {
+interface Props<T> extends Omit<React.ComponentProps<'tr'>, 'onClick' | 'onDoubleClick'> {
   item: T;
   expandElement?: React.FunctionComponent<TableItemExpandProps<T>>;
   selectOnItem?: boolean;
@@ -53,6 +53,7 @@ export const TableItem: ITableItemComponent = observer(function TableItem({
   className,
   onClick,
   onDoubleClick,
+  ...rest
 }) {
   const context = useContext(TableContext);
   const props = useObjectRef({ selectOnItem });
@@ -117,6 +118,7 @@ export const TableItem: ITableItemComponent = observer(function TableItem({
       <tr
         title={title}
         className={s(styles, { selected: isSelected, expanded: isExpanded, disabled, row: true }, className)}
+        {...rest}
         onClick={handleClick}
         onDoubleClick={handleDoubleClick}
       >
