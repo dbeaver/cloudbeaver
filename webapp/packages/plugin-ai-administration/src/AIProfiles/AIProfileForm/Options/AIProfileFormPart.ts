@@ -7,22 +7,16 @@
  */
 import { runInAction } from 'mobx';
 
-import type { AiModelInfo } from '@cloudbeaver/core-sdk';
 import { FormMode, FormPart, type IFormState } from '@cloudbeaver/core-ui';
+import type { AiEngineConfig } from '@cloudbeaver/core-sdk';
 import { getUniqueName } from '@cloudbeaver/core-utils';
 
-import {
-  AIEnginePropertiesResource,
-  CONTEXT_WINDOW_SIZE_PROPERTY_ID,
-  MODEL_PROPERTY_ID,
-  TEMPERATURE_PROPERTY_ID,
-} from '../../AIEnginePropertiesResource.js';
+import { AIEnginePropertiesResource } from '../../AIEnginePropertiesResource.js';
 import { type AIAdminProfile, type AIProfileInput, AIProfilesResource } from '../../AIProfilesResource.js';
 import { getObjectPropertiesValues } from '../../utils/getObjectPropertiesValues.js';
 import { prepareProperties } from '../../utils/prepareProperties.js';
 import type { IAIProfileFormState } from '../IAIProfileFormState.js';
 import type { IAIProfileOptionsState } from './AIProfileSchema.js';
-import { isNotNullDefined } from '@dbeaver/js-helpers';
 
 const getDefaultState = (): IAIProfileOptionsState => ({
   name: '',
@@ -86,29 +80,6 @@ export class AIProfileFormPart extends FormPart<IAIProfileOptionsState, IAIProfi
       this.state.engineId = engineId;
       this.state.properties = getObjectPropertiesValues(propertiesInfo ?? []);
     });
-  }
-
-  selectModel(modelId: string | null, model?: AiModelInfo): void {
-    this.state.properties[MODEL_PROPERTY_ID] = modelId;
-
-    if (!model) {
-      return;
-    }
-
-    if (isNotNullDefined(model.contextWindowSize)) {
-      this.state.properties[CONTEXT_WINDOW_SIZE_PROPERTY_ID] = model.contextWindowSize;
-    }
-
-    this.state.properties[TEMPERATURE_PROPERTY_ID] = model.defaultTemperature;
-  }
-
-  loadModels(): Promise<AiModelInfo[]> {
-    if (!this.state.engineId) {
-      return Promise.resolve([]);
-    }
-
-    const profileId = this.formState.mode === FormMode.Edit ? this.formState.state.profileId : undefined;
-    return this.aiProfilesResource.loadModels(this.state.engineId, profileId, this.getCurrentEngineSettings());
   }
 
   protected override format(): void {
@@ -187,7 +158,7 @@ export class AIProfileFormPart extends FormPart<IAIProfileOptionsState, IAIProfi
     });
   }
 
-  private getCurrentEngineSettings() {
+  getCurrentEngineSettings(): AiEngineConfig {
     return {
       properties: prepareProperties({
         engineProperties: this.state.properties,
