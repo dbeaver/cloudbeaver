@@ -10,6 +10,7 @@ import {
     Composite as AriakitComposite,
     CompositeItem as AriakitCompositeItem,
     CompositeProvider as AriakitCompositeProvider,
+    useCompositeContext,
     useCompositeStore,
     type CompositeProps,
     type CompositeItemProps,
@@ -29,4 +30,11 @@ export function CompositeItem({ children, ...props }: CompositeItemProps) {
     return <AriakitCompositeItem {...props}>{children}</AriakitCompositeItem>;
 }
 
-export { useCompositeStore, type CompositeProps, type CompositeItemProps, type CompositeProviderProps, type CompositeStore };
+export {
+    useCompositeContext,
+    useCompositeStore,
+    type CompositeProps,
+    type CompositeItemProps,
+    type CompositeProviderProps,
+    type CompositeStore,
+};
