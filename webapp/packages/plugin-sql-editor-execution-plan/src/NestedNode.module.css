@@ -6,6 +6,11 @@
  * you may not use this file except in compliance with the License.
  */
 
+.row:focus-visible {
+  outline: 1px solid var(--theme-primary);
+  outline-offset: -1px;
+}
+
 .tableColumnValue {
   white-space: pre;
   cursor: pointer;
