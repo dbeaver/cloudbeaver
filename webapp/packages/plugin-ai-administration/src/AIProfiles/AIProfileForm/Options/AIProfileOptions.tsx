@@ -90,36 +90,50 @@ export const AIProfileOptions: TabContainerPanelComponent<IAIProfileFormProps> =
     [models, part],
   );
 
+  const loadModels = useCallback(
+    async (notifyOnError: boolean): Promise<AiModelInfo[] | null> => {
+      const engineId = part.state.engineId;
+      if (!engineId) {
+        return null;
+      }
+
+      try {
+        setIsLoading(true);
+        const profileId = formState.mode === FormMode.Edit ? formState.state.profileId : undefined;
+        const loadedModels = await aiProfilesResource.loadModels(engineId, profileId, part.getCurrentEngineSettings());
+        setModels(loadedModels);
+        return loadedModels;
+      } catch (error: any) {
+        if (notifyOnError) {
+          notificationService.logException(error, 'ai_administration_models_refresh_fail');
+        }
+        return null;
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [aiProfilesResource, formState, notificationService, part],
+  );
+
   const refreshModels = useCallback(async (): Promise<void> => {
-    const engineId = part.state.engineId;
-    if (!engineId) {
+    const loadedModels = await loadModels(true);
+    const currentModelId = part.state.properties[MODEL_PROPERTY_ID];
+    if (loadedModels === null || currentModelId) {
       return;
     }
 
-    try {
-      setIsLoading(true);
-      const profileId = formState.mode === FormMode.Edit ? formState.state.profileId : undefined;
-      const loadedModels = await aiProfilesResource.loadModels(engineId, profileId, part.getCurrentEngineSettings());
-      setModels(loadedModels);
-
-      const availableModels = loadedModels.filter(model => model.features.map(feature => feature.toLowerCase()).includes('chat'));
-      const currentModelId = part.state.properties[MODEL_PROPERTY_ID];
-      if (!availableModels.some(model => model.id === currentModelId)) {
-        applyModelToProfile(availableModels[0]?.id ?? null, loadedModels);
-      }
-    } catch (error: any) {
-      notificationService.logException(error, 'ai_administration_models_refresh_fail');
-    } finally {
-      setIsLoading(false);
+    const firstChatModel = loadedModels.find(model => model.features.some(feature => feature.toLowerCase() === 'chat'));
+    if (firstChatModel) {
+      applyModelToProfile(firstChatModel.id, loadedModels);
     }
-  }, [aiProfilesResource, applyModelToProfile, formState, notificationService, part]);
+  }, [applyModelToProfile, loadModels, part]);
 
   useExecutor({
     executor: formState.loadedTask,
     handlers: [
       async () => {
         if (isEditMode && part.state.engineId && models === null) {
-          await refreshModels();
+          await loadModels(false);
         }
       },
     ],
