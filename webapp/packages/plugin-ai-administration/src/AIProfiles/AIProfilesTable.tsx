@@ -24,6 +24,8 @@ interface Props {
   defaultProfileId: string | null;
 }
 
+const ENGINE_COLUMN_WIDTH = 160;
+
 const SELECT_COLUMN = { key: 'select', label: '' };
 const NAME_COLUMN = { key: 'name', label: 'plugin_ai_administration_profile_column_name' };
 const ENGINE_COLUMN = { key: 'engine', label: 'plugin_ai_administration_profile_column_engine' };
@@ -134,6 +136,16 @@ export const AIProfilesTable = observer<Props>(function AIProfilesTable({ profil
     return <TextPlaceholder>{translate('plugin_ai_administration_profiles_table_empty_placeholder')}</TextPlaceholder>;
   }
 
+  function getHeaderWidth(idx: number) {
+    const column = COLUMNS[idx];
+
+    if (column?.key === ENGINE_COLUMN.key) {
+      return ENGINE_COLUMN_WIDTH;
+    }
+
+    return null;
+  }
+
   return (
     <div className="tw:overflow-auto tw:h-full tw:max-w-full theme-text-on-surface">
       <DataGrid
@@ -144,6 +156,7 @@ export const AIProfilesTable = observer<Props>(function AIProfilesTable({ profil
         getHeaderPinned={colIdx => colIdx <= 0}
         headerText={headerText}
         headerElement={headerElement}
+        getHeaderWidth={getHeaderWidth}
         cell={cell}
         className={s(styles, { table: true })}
       />
