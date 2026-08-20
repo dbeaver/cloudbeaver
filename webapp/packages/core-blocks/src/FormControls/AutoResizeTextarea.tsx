@@ -40,6 +40,11 @@ export const AutoResizeTextarea: Props = observer(function AutoResizeTextarea({
       return;
     }
 
+    if (!el.value) {
+      el.style.removeProperty('height');
+      return;
+    }
+
     el.style.height = 'auto';
     el.style.height = `${el.scrollHeight}px`;
   }, []);

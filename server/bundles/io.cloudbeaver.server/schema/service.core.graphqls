@@ -25,6 +25,8 @@ type ObjectPropertyInfo {
     validValues: [ Object ]
     "Default property value"
     defaultValue: Object
+    "Constraints for the property value"
+    constraints: PropertyConstraints @since(version: "26.2.0")
     "Property value length"
     length: ObjectPropertyLength!
     "List of supported features (e.g., system, hidden, inherited, foreign, expensive)"
@@ -39,6 +41,13 @@ type ObjectPropertyInfo {
     scopes: [String!]
     "Dynamic conditions for the property (e.g., visibility or read-only)"
     conditions: [Condition!] @since(version: "25.0.1")
+}
+
+type PropertyConstraints @since(version: "26.2.0") {
+    "Minimum allowed value for numeric properties"
+    min: Float
+    "Maximum allowed value for numeric properties"
+    max: Float
 }
 
 enum ObjectPropertyLength {
@@ -924,4 +933,3 @@ extend type Mutation {
     "Get async task info by ID"
     asyncTaskInfo(id: String!, removeOnFinish: Boolean!): AsyncTaskInfo!
 }
-
