@@ -27,6 +27,7 @@ import org.jkiss.dbeaver.model.impl.PropertyDescriptor;
 import org.jkiss.dbeaver.model.impl.ProviderPropertyDescriptor;
 import org.jkiss.dbeaver.model.meta.IPropertyValueListProvider;
 import org.jkiss.dbeaver.model.meta.Property;
+import org.jkiss.dbeaver.model.meta.PropertyConstraints;
 import org.jkiss.dbeaver.model.meta.PropertyLength;
 import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
 import org.jkiss.dbeaver.model.preferences.DBPPropertySource;
@@ -137,6 +138,12 @@ public class WebPropertyInfo {
             return getValue();
         }
         return defaultValue;
+    }
+
+    @Nullable
+    @Property
+    public PropertyConstraints getConstraints() {
+        return property instanceof ObjectPropertyDescriptor descriptor ? descriptor.getConstraints() : null;
     }
 
     @Nullable

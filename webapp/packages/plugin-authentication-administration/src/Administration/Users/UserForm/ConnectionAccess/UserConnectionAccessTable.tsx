@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ import { isDefined } from '@dbeaver/js-helpers';
 import type { UserFormProps } from '../AdministrationUserFormService.js';
 import type { UserFormConnectionAccessPart } from './UserFormConnectionAccessPart.js';
 import { getUserFormInfoPart } from '../Info/getUserFormInfoPart.js';
+import { EAdminPermission } from '@cloudbeaver/core-root';
 
 const NAME_COLUMN: IGrantManagementTableColumn = { key: 'name', label: 'connections_connection_name' };
 const GRANTED_BY_COLUMN: IGrantManagementTableColumn = {
@@ -53,7 +54,7 @@ export const UserConnectionAccessTable: TabContainerPanelComponent<UserFormProps
 
   const connectionsOrigins = connectionsOriginsLoader.data.filter(isDefined);
   const isCloud = connectionsOrigins.some(connectionOrigin => isCloudConnection(connectionOrigin.origin));
-  const isAdmin = userFormInfoPart.state.teams.includes('admin');
+  const isAdmin = userFormInfoPart.state.teams.includes(EAdminPermission.admin);
 
   const items = connectionsLoader.data
     .filter(isDefined)
