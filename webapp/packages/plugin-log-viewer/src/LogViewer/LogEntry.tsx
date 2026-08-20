@@ -9,6 +9,7 @@ import { observer } from 'mobx-react-lite';
 
 import { Container, IconOrImage, Link, s, TableColumnValue, TableItem, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { isSameDay } from '@cloudbeaver/core-utils';
+import { Command } from '@dbeaver/ui-kit';
 
 import type { ILogEntry } from './ILogEntry.js';
 import classes from './LogEntry.module.css';
@@ -52,9 +53,9 @@ export const LogEntry = observer<Props>(function LogEntry({ item, onSelect, sele
         <div className={s(styles, { messageCell: true })}>
           <div className={s(styles, { message: true })} title={message}>
             {isError ? (
-              <Link className={s(styles, { link: true })} onClick={() => onSelect(item)}>
-                {message}
-              </Link>
+              <Command render={<div />} focusable onClick={() => onSelect(item)}>
+                <Link className={s(styles, { link: true })}>{message}</Link>
+              </Command>
             ) : (
               message
             )}

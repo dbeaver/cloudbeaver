@@ -9,6 +9,6 @@ import { createKeyBinding } from '@cloudbeaver/core-view';
 
 export const KEY_BINDING_SQL_EDITOR_SHOW_OUTPUT = createKeyBinding({
   id: 'sql-editor-show-output',
-  keys: 'shift+ctrl+o',
+  keys: 'shift+mod+o',
   preventDefault: true,
 });
