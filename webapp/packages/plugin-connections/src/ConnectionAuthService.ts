@@ -10,6 +10,7 @@ import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import {
   type Connection,
   ConnectionInfoAuthPropertiesResource,
+  ConnectionInfoExternalNetworkHandlersService,
   type ConnectionInfoNetworkHandlers,
   ConnectionInfoNetworkHandlersResource,
   ConnectionInfoResource,
@@ -25,12 +26,11 @@ import { AuthenticationService } from '@cloudbeaver/plugin-authentication';
 
 const DatabaseAuthDialog = importLazyComponent(() => import('./DatabaseAuthDialog/DatabaseAuthDialog.js').then(m => m.DatabaseAuthDialog));
 
-export type excludedNetworkHandlerIdsProvider = (key: IConnectionInfoParams, handlerIds: readonly string[]) => Promise<readonly string[]>;
-
 @injectable(() => [
   ConnectionInfoResource,
   ConnectionInfoNetworkHandlersResource,
   ConnectionInfoAuthPropertiesResource,
+  ConnectionInfoExternalNetworkHandlersService,
   CommonDialogService,
   AuthProviderService,
   UserInfoResource,
@@ -38,12 +38,11 @@ export type excludedNetworkHandlerIdsProvider = (key: IConnectionInfoParams, han
   AuthenticationService,
 ])
 export class ConnectionAuthService {
-  private readonly excludedNetworkHandlerProviders: excludedNetworkHandlerIdsProvider[] = [];
-
   constructor(
     private readonly connectionInfoResource: ConnectionInfoResource,
     private readonly connectionInfoNetworkHandlersResource: ConnectionInfoNetworkHandlersResource,
     private readonly connectionInfoAuthPropertiesResource: ConnectionInfoAuthPropertiesResource,
+    private readonly connectionInfoExternalNetworkHandlersService: ConnectionInfoExternalNetworkHandlersService,
     private readonly commonDialogService: CommonDialogService,
     private readonly authProviderService: AuthProviderService,
     userInfoResource: UserInfoResource,
@@ -67,10 +66,6 @@ export class ConnectionAuthService {
       }),
       state => state === 'before',
     );
-  }
-
-  addExcludedNetworkHandlerIdProvider(provider: excludedNetworkHandlerIdsProvider): void {
-    this.excludedNetworkHandlerProviders.push(provider);
   }
 
   private async connectionDialog(data: IRequireConnectionExecutorData, context: IExecutionContextProvider<IRequireConnectionExecutorData | null>) {
@@ -116,14 +111,9 @@ export class ConnectionAuthService {
       this.connectionInfoResource.load(key),
     ]);
 
-    const networkHandlerIds = connectionNetworkHandlers.networkHandlersConfig!.map(handler => handler.id);
-    const excludedNetworkHandlerIds = new Set(
-      (await Promise.all(this.excludedNetworkHandlerProviders.map(provider => provider(key, networkHandlerIds)))).flat(),
-    );
+    const externalHandlers = new Set(await this.connectionInfoExternalNetworkHandlersService.getProvidedHandlers(key));
     const networkHandlers = connectionNetworkHandlers
-      .networkHandlersConfig!.filter(
-        handler => !excludedNetworkHandlerIds.has(handler.id) && handler.enabled && (!handler.savePassword || resetCredentials),
-      )
+      .networkHandlersConfig!.filter(handler => !externalHandlers.has(handler.id) && handler.enabled && (!handler.savePassword || resetCredentials))
       .map(handler => handler.id);
 
     if (connectionAuthProperties.authNeeded || (connectionAuthProperties.credentialsSaved && resetCredentials) || networkHandlers.length > 0) {
