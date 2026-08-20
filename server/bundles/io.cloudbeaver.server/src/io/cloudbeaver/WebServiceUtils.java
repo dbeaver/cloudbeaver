@@ -211,6 +211,8 @@ public class WebServiceUtils extends WebCommonUtils {
             List<DBPPropertyDescriptor> propertyList = new ArrayList<>(Arrays.asList(properties));
             Set<String> propertyNames = propertyList.stream().map(DBPPropertyDescriptor::getId).collect(Collectors.toSet());
             Map<String, Object> connectionProperties = new LinkedHashMap<>(driver.getConnectionProperties());
+            // In case of collision, value from connectionProperties will be used for a driver property.
+            // Default value of property will be from driver.
             for (Map.Entry<String, Object> connProp : connectionProperties.entrySet()) {
                 String propName = connProp.getKey();
                 if (propertyNames.contains(propName)) {
