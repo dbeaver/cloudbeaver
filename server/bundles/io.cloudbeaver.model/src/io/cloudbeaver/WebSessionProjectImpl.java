@@ -237,6 +237,18 @@ public class WebSessionProjectImpl extends WebProjectImpl implements DBPAdaptabl
     public synchronized boolean updateProjectDataSources(@NotNull WSDataSourceEvent event) {
         var sendDataSourceUpdatedEvent = false;
         DBPDataSourceRegistry registry = getDataSourceRegistry();
+        Map<String, DataSourceDescriptor> dataSourceSnapshots = new HashMap<>();
+        if (WSDataSourceEvent.UPDATED.equals(event.getId())) {
+            for (String dsId : event.getDataSourceIds()) {
+                DBPDataSourceContainer dataSource = registry.getDataSource(dsId);
+                if (dataSource instanceof DataSourceDescriptor descriptor) {
+                    DBPDataSourceContainer snapshot = registry.createDataSource(descriptor);
+                    if (snapshot instanceof DataSourceDescriptor snapshotDescriptor) {
+                        dataSourceSnapshots.put(dsId, snapshotDescriptor);
+                    }
+                }
+            }
+        }
         if (WSDataSourceEvent.CREATED.equals(event.getId()) || WSDataSourceEvent.UPDATED.equals(event.getId())) {
             registry.refreshConfig(event.getDataSourceIds());
         }
@@ -251,6 +263,10 @@ public class WebSessionProjectImpl extends WebProjectImpl implements DBPAdaptabl
                     sendDataSourceUpdatedEvent = true;
                 }
                 case WSDataSourceEvent.UPDATED ->  {
+                    DataSourceDescriptor snapshot = dataSourceSnapshots.get(dsId);
+                    if (snapshot != null && !event.getProperty().hasEffectiveChanges(snapshot, ds)) {
+                        continue;
+                    }
                     if (event.getProperty() == WSDataSourceProperty.CONFIGURATION) {
                         WebDataSourceUtils.disconnectDataSource(webSession, ds, true);
                     }
