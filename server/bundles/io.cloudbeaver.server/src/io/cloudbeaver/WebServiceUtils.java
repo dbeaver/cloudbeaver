@@ -202,12 +202,13 @@ public class WebServiceUtils extends WebCommonUtils {
         @NotNull DBPConnectionConfiguration cfg
     ) {
         try {
-            List<DBPPropertyDescriptor> propertyList = Arrays.asList(driver.getDataSourceProvider().getConnectionProperties(
+            DBPPropertyDescriptor[] properties = driver.getDataSourceProvider().getConnectionProperties(
                 webSession.getProgressMonitor(),
                 driver,
                 dataSourceContainer,
                 cfg
-            ));
+            );
+            List<DBPPropertyDescriptor> propertyList = new ArrayList<>(Arrays.asList(properties));
             Set<String> propertyNames = propertyList.stream().map(DBPPropertyDescriptor::getId).collect(Collectors.toSet());
             Map<String, Object> connectionProperties = new LinkedHashMap<>(driver.getConnectionProperties());
             for (Map.Entry<String, Object> connProp : connectionProperties.entrySet()) {
