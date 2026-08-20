@@ -70,9 +70,7 @@ export const AIProfileOptions: TabContainerPanelComponent<IAIProfileFormProps> =
 
   const modelPropertyIndex = propertiesInfo.findIndex(property => property.id === MODEL_PROPERTY_ID);
   const modelProperty = propertiesInfo[modelPropertyIndex];
-  const chatModels = (models ?? [])
-    .filter(model => model.features.map(feature => feature.toLowerCase()).includes('chat'))
-    .toSorted((a, b) => a.id.localeCompare(b.id));
+  const chatModels = (models ?? []).filter(model => model.features.map(feature => feature.toLowerCase()).includes('chat'));
   const hasModels = !!modelProperty;
   const propertiesBeforeModel = hasModels ? propertiesInfo.slice(0, modelPropertyIndex) : propertiesInfo;
   const propertiesAfterModel = hasModels ? propertiesInfo.slice(modelPropertyIndex + 1) : [];
@@ -98,7 +96,9 @@ export const AIProfileOptions: TabContainerPanelComponent<IAIProfileFormProps> =
     try {
       setIsLoading(true);
       const profileId = formState.mode === FormMode.Edit ? formState.state.profileId : undefined;
-      const loadedModels = await aiProfilesResource.loadModels(engineId, profileId, part.getCurrentEngineSettings());
+      const loadedModels = (await aiProfilesResource.loadModels(engineId, profileId, part.getCurrentEngineSettings())).toSorted((a, b) =>
+        a.id.localeCompare(b.id),
+      );
       setModels(loadedModels);
       return loadedModels;
     } catch (error: any) {
