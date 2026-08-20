@@ -12,7 +12,7 @@ import classes from './Expand.module.css';
 interface Props {
   expanded: boolean;
   className?: string;
-  onClick: (event: React.MouseEvent<any>) => void;
+  onClick?: (event: React.MouseEvent<any>) => void;
 }
 
 export const Expand: React.FC<Props> = function Expand({ expanded, className, onClick }) {

@@ -293,11 +293,6 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         if (grantor == null) {
             throw new DBWebException("Cannot grant team in anonymous mode");
         }
-        if (!ServletAppUtils.getServletApplication().isDistributed()
-            && CommonUtils.equalObjects(user, webSession.getUser().getUserId())
-        ) {
-            throw new DBWebException("You cannot edit your own permissions");
-        }
         try {
             var adminSecurityController = webSession.getAdminSecurityController();
             adminSecurityController.addUserTeams(user, new String[]{team}, grantor.getUserId());
@@ -314,10 +309,8 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         if (grantor == null) {
             throw new DBWebException("Cannot revoke team in anonymous mode");
         }
-        if (!ServletAppUtils.getServletApplication().isDistributed() &&
-            CommonUtils.equalObjects(user, webSession.getUser().getUserId())
-        ) {
-            throw new DBWebException("You cannot edit your own permissions");
+        if (CommonUtils.equalObjects(user, grantor.getUserId())) {
+            checkAdminPermissionsRetained(webSession, user, team);
         }
         try {
             var adminSecurityController = webSession.getAdminSecurityController();
@@ -345,6 +338,11 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         if (CommonUtils.equalObjects(subjectID, CBConstants.DEFAULT_ADMIN_TEAM)) {
             throw new DBWebException("Cannot change permissions for team '" + subjectID + "'");
         }
+        if (!permissions.contains(DBWConstants.PERMISSION_ADMIN)
+            && isOwnSubject(webSession, grantor.getUserId(), subjectID)
+        ) {
+            checkAdminPermissionsRetained(webSession, grantor.getUserId(), subjectID);
+        }
         webSession.addInfoMessage("Set permissions to subject - " + subjectID);
 
         try {
@@ -357,6 +355,62 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         } catch (Exception e) {
             throw new DBWebException("Error setting subject permissions", e);
         }
+    }
+
+    /**
+     * Checks that the specified subject is the user himself or one of his teams.
+     */
+    private boolean isOwnSubject(
+        @NotNull WebSession webSession,
+        @NotNull String userId,
+        @NotNull String subjectId
+    ) throws DBWebException {
+        if (subjectId.equals(userId)) {
+            return true;
+        }
+        try {
+            for (SMTeam userTeam : webSession.getAdminSecurityController().getUserTeams(userId)) {
+                if (userTeam.getTeamId().equals(subjectId)) {
+                    return true;
+                }
+            }
+        } catch (DBException e) {
+            throw new DBWebException("Error reading teams of user " + userId, e);
+        }
+        return false;
+    }
+
+    /**
+     * Checks that the user still has administrative permission after revoking permissions from the specified subject.
+     * Prevents the last administrator from locking himself out of the server.
+     */
+    private void checkAdminPermissionsRetained(
+        @NotNull WebSession webSession,
+        @NotNull String userId,
+        @NotNull String revokedSubjectId
+    ) throws DBWebException {
+        if (ServletAppUtils.getServletApplication().isDistributed()) {
+            // permissions are granted by auth roles, not by subjects
+            return;
+        }
+        try {
+            var adminSecurityController = webSession.getAdminSecurityController();
+            if (!adminSecurityController.getSubjectPermissions(revokedSubjectId).contains(DBWConstants.PERMISSION_ADMIN)) {
+                // subject doesn't grant administrative permission, nothing to lose
+                return;
+            }
+            for (SMTeam userTeam : adminSecurityController.getUserTeams(userId)) {
+                String teamId = userTeam.getTeamId();
+                if (!teamId.equals(revokedSubjectId)
+                    && adminSecurityController.getSubjectPermissions(teamId).contains(DBWConstants.PERMISSION_ADMIN)
+                ) {
+                    return;
+                }
+            }
+        } catch (DBException e) {
+            throw new DBWebException("Error reading permissions of user " + userId, e);
+        }
+        throw new DBWebException("You cannot revoke your own administrative permissions");
     }
 
     @Override
