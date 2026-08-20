@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,8 @@ import { AuthenticationService } from '@cloudbeaver/plugin-authentication';
 
 const DatabaseAuthDialog = importLazyComponent(() => import('./DatabaseAuthDialog/DatabaseAuthDialog.js').then(m => m.DatabaseAuthDialog));
 
+export type excludedNetworkHandlerIdsProvider = (key: IConnectionInfoParams, handlerIds: readonly string[]) => Promise<readonly string[]>;
+
 @injectable(() => [
   ConnectionInfoResource,
   ConnectionInfoNetworkHandlersResource,
@@ -36,6 +38,8 @@ const DatabaseAuthDialog = importLazyComponent(() => import('./DatabaseAuthDialo
   AuthenticationService,
 ])
 export class ConnectionAuthService {
+  private readonly excludedNetworkHandlerProviders: excludedNetworkHandlerIdsProvider[] = [];
+
   constructor(
     private readonly connectionInfoResource: ConnectionInfoResource,
     private readonly connectionInfoNetworkHandlersResource: ConnectionInfoNetworkHandlersResource,
@@ -63,6 +67,10 @@ export class ConnectionAuthService {
       }),
       state => state === 'before',
     );
+  }
+
+  addExcludedNetworkHandlerIdProvider(provider: excludedNetworkHandlerIdsProvider): void {
+    this.excludedNetworkHandlerProviders.push(provider);
   }
 
   private async connectionDialog(data: IRequireConnectionExecutorData, context: IExecutionContextProvider<IRequireConnectionExecutorData | null>) {
@@ -108,8 +116,14 @@ export class ConnectionAuthService {
       this.connectionInfoResource.load(key),
     ]);
 
+    const networkHandlerIds = connectionNetworkHandlers.networkHandlersConfig!.map(handler => handler.id);
+    const excludedNetworkHandlerIds = new Set(
+      (await Promise.all(this.excludedNetworkHandlerProviders.map(provider => provider(key, networkHandlerIds)))).flat(),
+    );
     const networkHandlers = connectionNetworkHandlers
-      .networkHandlersConfig!.filter(handler => handler.enabled && (!handler.savePassword || resetCredentials))
+      .networkHandlersConfig!.filter(
+        handler => !excludedNetworkHandlerIds.has(handler.id) && handler.enabled && (!handler.savePassword || resetCredentials),
+      )
       .map(handler => handler.id);
 
     if (connectionAuthProperties.authNeeded || (connectionAuthProperties.credentialsSaved && resetCredentials) || networkHandlers.length > 0) {
