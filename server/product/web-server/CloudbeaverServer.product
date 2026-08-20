@@ -12,6 +12,7 @@
         <programArgsMac></programArgsMac>
         <vmArgs>
             -Dfile.encoding=UTF-8 
+            --sun-misc-unsafe-memory-access=allow
             --enable-native-access=ALL-UNNAMED
             --add-modules=ALL-DEFAULT
             --add-opens=java.base/java.io=ALL-UNNAMED
