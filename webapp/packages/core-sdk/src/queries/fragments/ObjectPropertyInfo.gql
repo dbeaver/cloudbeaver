@@ -9,6 +9,10 @@ fragment ObjectPropertyInfo on ObjectPropertyInfo {
   value
   validValues
   defaultValue
+  constraints {
+    min
+    max
+  }
   length
   features
   order
