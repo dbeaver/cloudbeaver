@@ -538,6 +538,8 @@ public class WebServiceAI implements DBWServiceAI {
             AISettings settings = AISettingsManager.getInstance().getSettings();
             AIConfigurationProfile profile = settings.getConfiguration(profileId);
             settings.removeConfiguration(profile);
+            AISettingsManager.getInstance().saveSettings();
+            addAISettingsChangedEvent(webSession);
         } catch (DBException e) {
             throw new DBWebException("Error deleting AI configuration " + profileId, e);
         }
