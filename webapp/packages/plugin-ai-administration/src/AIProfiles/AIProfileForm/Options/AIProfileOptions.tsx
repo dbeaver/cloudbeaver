@@ -70,7 +70,9 @@ export const AIProfileOptions: TabContainerPanelComponent<IAIProfileFormProps> =
 
   const modelPropertyIndex = propertiesInfo.findIndex(property => property.id === MODEL_PROPERTY_ID);
   const modelProperty = propertiesInfo[modelPropertyIndex];
-  const chatModels = (models ?? []).filter(model => model.features.map(feature => feature.toLowerCase()).includes('chat'));
+  const chatModels = (models ?? [])
+    .filter(model => model.features.map(feature => feature.toLowerCase()).includes('chat'))
+    .toSorted((a, b) => a.id.localeCompare(b.id));
   const hasModels = !!modelProperty;
   const propertiesBeforeModel = hasModels ? propertiesInfo.slice(0, modelPropertyIndex) : propertiesInfo;
   const propertiesAfterModel = hasModels ? propertiesInfo.slice(modelPropertyIndex + 1) : [];
