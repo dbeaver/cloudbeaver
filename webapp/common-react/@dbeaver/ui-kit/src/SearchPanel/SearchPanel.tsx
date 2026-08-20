@@ -155,7 +155,7 @@ export const SearchPanel = forwardRef<SearchPanelRef, SearchPanelProps>(function
           title={translate('ui_search_panel_replace_toggle', 'Toggle replace')}
           onClick={handleToggleReplace}
         >
-          <Icon className={clsx(showReplace && 'tw:rotate-180')} size="small" name="chevron" />
+          <Icon className={clsx('search-panel__replace-toggle-icon', showReplace && 'tw:rotate-180')} size="small" name="chevron" />
         </IconButton>
       )}
 
