@@ -113,7 +113,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
 
   const driverMap = useResource(Options, DBDriverResource, {
     key: optionsPart.state.driverId || null,
-    includes: ['includeProviderProperties', 'includeMainProperties', 'includeDriverProperties'] as const,
+    includes: ['includeProviderProperties', 'includeMainProperties'] as const,
   });
 
   const driver = driverMap.data;
