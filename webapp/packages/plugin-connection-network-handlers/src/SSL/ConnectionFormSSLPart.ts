@@ -150,7 +150,9 @@ export class ConnectionFormSSLPart extends FormPart<INetworkHandlerConfig, IConn
       }
     }
 
-    if (this.state.enabled && !this.state.savePassword) {
+    const shouldRequire = descriptor && descriptor.properties.length > 0;
+
+    if (shouldRequire && this.state.enabled && !this.state.savePassword) {
       this.formState.state.requiredNetworkHandlersIds.push(this.state.id);
     } else if (!this.state.enabled) {
       this.formState.state.requiredNetworkHandlersIds = this.formState.state.requiredNetworkHandlersIds.filter(id => id !== this.state.id);

@@ -54,7 +54,16 @@ public interface DBWServiceAI extends DBWService {
         @NotNull WebSession webSession,
         @NotNull String engineId,
         @Nullable String profileId,
-        @Nullable Map<String, Object> engineSettings
+        @WebParameterSecure @Nullable Map<String, Object> engineSettings
+    ) throws DBWebException;
+
+    @NotNull
+    @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
+    List<WebAIModel> getEngineModels(
+        @NotNull WebSession webSession,
+        @NotNull String engineId,
+        @Nullable String profileId,
+        @WebParameterSecure @Nullable Map<String, Object> engineSettings
     ) throws DBWebException;
 
     @NotNull

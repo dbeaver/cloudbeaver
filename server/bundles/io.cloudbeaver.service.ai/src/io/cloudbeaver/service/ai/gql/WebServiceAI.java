@@ -104,7 +104,10 @@ public class WebServiceAI implements DBWServiceAI {
     ) throws DBWebException {
         WebAIUtils.validateAiPluginEnabled();
         try {
-            AIConfigurationProfile profile = getDefaultConfiguration(engineId, profileId);
+            AIConfigurationProfile profile = copyConfigurationProfile(
+                webSession.getProgressMonitor(),
+                getDefaultConfiguration(engineId, profileId)
+            );
 
             AIEngineProperties engineConfiguration;
             if (settingsInput != null) {
@@ -123,6 +126,52 @@ public class WebServiceAI implements DBWServiceAI {
         } catch (DBException e) {
             throw new DBWebException("Error getting engine configuration parameters", e);
         }
+    }
+
+    @NotNull
+    @Override
+    public List<WebAIModel> getEngineModels(
+        @NotNull WebSession webSession,
+        @NotNull String engineId,
+        @Nullable String profileId,
+        @Nullable Map<String, Object> settingsInput
+    ) throws DBWebException {
+        WebAIUtils.validateAiPluginEnabled();
+        try {
+            AIConfigurationProfile profile = copyConfigurationProfile(
+                webSession.getProgressMonitor(),
+                getDefaultConfiguration(engineId, profileId)
+            );
+            AIEngineProperties configuration = settingsInput == null
+                ? profile.getConfiguration()
+                : toEngineConfiguration(webSession.getProgressMonitor(), profile, settingsInput);
+
+            try (AIEngine<?> engine = profile.getEngineDescriptor().createEngineInstance(configuration)) {
+                return engine.getModels(webSession.getProgressMonitor()).stream().map(WebAIModel::new).toList();
+            }
+        } catch (DBException e) {
+            throw new DBWebException("Error getting AI engine models", e);
+        }
+    }
+
+    @NotNull
+    private AIConfigurationProfile copyConfigurationProfile(
+        @NotNull DBRProgressMonitor monitor,
+        @NotNull AIConfigurationProfile sourceProfile
+    ) throws DBException {
+        AIEngineProperties source = sourceProfile.getConfiguration();
+        PropertySourceEditable sourceProperties = new PropertySourceEditable(source, source);
+        sourceProperties.collectProperties();
+
+        Map<String, Object> sourceValues = new HashMap<>();
+        for (DBPPropertyDescriptor property : sourceProperties.getProperties()) {
+            sourceValues.put(property.getId(), sourceProperties.getPropertyValue(monitor, property.getId()));
+        }
+
+        AIConfigurationProfile targetProfile = new AIConfigurationProfile();
+        targetProfile.setEngineId(sourceProfile.getEngineId());
+        targetProfile.setConfiguration(toEngineConfiguration(monitor, targetProfile, Map.of("properties", sourceValues)));
+        return targetProfile;
     }
 
     @NotNull
