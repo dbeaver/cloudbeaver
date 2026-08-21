@@ -56,6 +56,10 @@
     gap: calc(var(--tw-spacing) / 2);
   }
 
+  .search-panel__replace-toggle-icon {
+    color: var(--mdc-theme-on-secondary, #6d6d6d);
+  }
+
   .search-panel__buttons {
     flex: 0 0 80px;
     display: flex;

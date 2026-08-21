@@ -17,10 +17,6 @@
       --dbv-kit-icon-btn-primary-background-hover: color-mix(in srgb, transparent, var(--theme-primary) 10%) !important;
       --dbv-kit-icon-btn-secondary-background-hover: color-mix(in srgb, transparent, var(--theme-primary) 10%) !important;
     }
-
-    & .search-panel__replace-toggle-icon {
-      color: var(--mdc-theme-on-secondary, #6d6d6d);
-    }
   }
 
   .rdg-cell-search-match {
