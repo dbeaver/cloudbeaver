@@ -59,10 +59,11 @@ export default [
   ['data_grid_table_generate_sql_select_many_tooltip', 'Générer une instruction SELECT avec clause WHERE IN'],
   ['data_grid_table_generate_sql_create', 'DDL'],
   ['data_grid_table_generate_sql_create_tooltip', "Générer une instruction DDL pour l'entité"],
-  ['data_grid_table_generate_sql_error_title', 'Erreur de génération SQL'],
+  ['data_grid_table_generate_sql_error_title', 'Échec de la génération SQL'],
   ['data_grid_table_generate_sql_error_no_query', 'Aucune requête disponible pour le résultat actuel'],
   ['data_grid_table_generate_sql_error_no_connection', "Contexte d'exécution inconnu"],
   ['data_grid_table_generate_sql_error_no_rows', 'Aucune ligne sélectionnée'],
   ['data_grid_table_generate_sql_error_no_result', 'Aucun ensemble de résultats disponible'],
   ['data_grid_table_generate_sql_error_no_context', "Aucun contexte d'exécution disponible"],
+  ['data_grid_table_generate_sql_ddl_no_support', 'Le conteneur ne prend pas en charge la structure DDL standard'],
 ];
