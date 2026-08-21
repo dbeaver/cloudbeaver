@@ -171,6 +171,15 @@ public interface DBWServiceCore extends DBWService {
     ) throws DBWebException;
 
     @WebProjectAction(requireProjectPermissions = {RMConstants.PERMISSION_PROJECT_DATASOURCES_EDIT})
+    boolean changeConnectionUserPassword(
+        @NotNull WebSession webSession,
+        @Nullable @WebObjectId String projectId,
+        @NotNull String connectionId,
+        @WebParameterSecure @NotNull String oldPassword,
+        @WebParameterSecure @NotNull String newPassword
+    ) throws DBWebException;
+
+    @WebProjectAction(requireProjectPermissions = {RMConstants.PERMISSION_PROJECT_DATASOURCES_EDIT})
     WebNetworkEndpointInfo testNetworkHandler(
         @NotNull WebSession webSession,
         @Nullable @WebObjectId String projectId,

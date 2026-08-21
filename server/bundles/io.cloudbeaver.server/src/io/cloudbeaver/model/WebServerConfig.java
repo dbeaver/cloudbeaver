@@ -83,6 +83,11 @@ public class WebServerConfig {
     }
 
     @Property
+    public boolean isDbUserPasswordChangeEnabled() {
+        return application.getAppConfiguration().isDbUserPasswordChangeEnabled();
+    }
+
+    @Property
     public boolean isLicenseRequired() {
         return application.isLicenseRequired();
     }
