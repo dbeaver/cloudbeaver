@@ -14,6 +14,8 @@ import { EAdminPermission, SessionPermissionsResource } from '@cloudbeaver/core-
 import { GraphQLService, type AiEngineConfig, type IObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 
 export const MODEL_PROPERTY_ID = 'model';
+export const CONTEXT_WINDOW_SIZE_PROPERTY_ID = 'contextWindowSize';
+export const TEMPERATURE_PROPERTY_ID = 'temperature';
 
 @injectable(() => [GraphQLService, SessionPermissionsResource])
 export class AIEnginePropertiesResource extends CachedMapResource<string, IObjectPropertyInfo[]> {

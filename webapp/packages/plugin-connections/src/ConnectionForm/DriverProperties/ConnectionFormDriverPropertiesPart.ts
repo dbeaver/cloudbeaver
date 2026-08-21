@@ -12,7 +12,7 @@ import type { IConnectionFormState } from '../IConnectionFormState.js';
 import { runInAction, toJS } from 'mobx';
 import type { ConnectionFormOptionsPart } from '../Options/ConnectionFormOptionsPart.js';
 import type { schema } from '@cloudbeaver/core-utils';
-import { getObjectPropertyOptionValue } from '@cloudbeaver/core-sdk';
+import { getObjectPropertyDefaultValue, getObjectPropertyOptionValue, getObjectPropertyValue } from '@cloudbeaver/core-sdk';
 import type { CONNECTION_PROPERTIES_SCHEMA } from '../CONNECTION_CONFIG_SCHEMA.js';
 
 type ConnectionProperties = schema.infer<typeof CONNECTION_PROPERTIES_SCHEMA>;
@@ -33,8 +33,9 @@ export class ConnectionFormDriverPropertiesPart extends FormPart<ConnectionPrope
     this.optionsPart.onDriverIdChange.addHandler(this.onDriverIdChangeHandler.bind(this));
   }
 
-  private onDriverIdChangeHandler(driverId: string | undefined) {
-    this.reset();
+  private async onDriverIdChangeHandler(driverId: string | undefined) {
+    const defaults = await this.getDefaultConfig();
+    this.setState(defaults);
   }
 
   override isOutdated(): boolean {
@@ -57,7 +58,8 @@ export class ConnectionFormDriverPropertiesPart extends FormPart<ConnectionPrope
 
   protected override async loader(): Promise<void> {
     if (!this.optionsPart.connectionKey) {
-      this.setInitialState(getDefaultState());
+      const defaults = await this.getDefaultConfig();
+      this.setInitialState(defaults);
       return;
     }
 
@@ -103,6 +105,26 @@ export class ConnectionFormDriverPropertiesPart extends FormPart<ConnectionPrope
       const property = properties?.find(property => property.id === key);
       if (property && value === getObjectPropertyOptionValue(property.defaultValue)) {
         delete config[key];
+      }
+    }
+
+    return config;
+  }
+
+  private async getDefaultConfig() {
+    const config: ConnectionProperties = {};
+    const properties = await this.connectionInfoResource.getConnectionDriverProperties(this.formState.state.projectId, this.optionsPart.state);
+
+    for (const property of properties) {
+      const value = getObjectPropertyValue(property);
+      const defaultValue = getObjectPropertyDefaultValue(property);
+
+      /** 
+      The backend can override some driver properties by default. These overridden properties will be stored in the value field,
+       so we set them here to allow the user to change them or reset them to their default driver values later. 
+      */
+      if (value && value !== defaultValue && property.id) {
+        config[property.id] = value;
       }
     }
 
