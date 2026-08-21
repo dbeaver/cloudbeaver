@@ -293,21 +293,6 @@ public class WebServiceSQL implements DBWServiceSQL {
 
     @NotNull
     @Override
-    public String sqlGenerateResultSetQuery(
-        @NotNull WebSession webSession,
-        @NotNull WebSQLContextInfo sqlContext,
-        @NotNull String generatorId,
-        @NotNull String resultsId,
-        @NotNull List<WebSQLResultsRow> selectedRows,
-        @NotNull WebSQLGeneratorOptions options
-    ) throws DBWebException {
-        checkAndFillTruncatedData(sqlContext, resultsId, selectedRows);
-        WebDBDResultSetDataProvider dataProvider = new WebDBDResultSetDataProvider(resultsId, sqlContext, selectedRows);
-        return createAndRunGenerator(webSession, generatorId, Collections.singletonList(dataProvider), options);
-    }
-
-    @NotNull
-    @Override
     public String sqlGenerateResultSetQueryByGenerator(
         @NotNull WebSession webSession,
         @NotNull WebSQLContextInfo sqlContext,

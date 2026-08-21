@@ -189,6 +189,27 @@ public class GenerateSQLResultSetTest extends CloudbeaverDBTest {
     }
 
     @Test
+    public void shouldRejectLegacyGeneratorIdNotApplicableToResultSet() throws Exception {
+        String taskId = clientWrapper.asyncSqlExecute(
+            globalProject,
+            sqlProcessorContext,
+            databaseContainer.getId(),
+            "SELECT 1 AS VALUE"
+        );
+        clientWrapper.waitTaskCompleted(taskId);
+        Map<String, Object> resultSet = clientWrapper.readTaskResultSet(taskId);
+        resultId = resultSet.get("id").toString();
+        List<Map<String, Object>> rows = JSONUtils.getObjectList(resultSet, "rowsWithMetaData");
+
+        DBException exception = Assertions.assertThrows(
+            DBException.class,
+            () -> generateQuery("dataSelect", rows)
+        );
+
+        Assertions.assertTrue(exception.getMessage().contains("not applicable to this result set"));
+    }
+
+    @Test
     public void shouldNotDiscoverGeneratorsWithoutSingleSource() throws Exception {
         String taskId = clientWrapper.asyncSqlExecute(
             globalProject,

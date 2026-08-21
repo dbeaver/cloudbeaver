@@ -109,7 +109,7 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL>
                 )
             )
             .dataFetcher("sqlGenerateResultSetQuery", env ->
-                getService(env).sqlGenerateResultSetQuery(
+                getService(env).sqlGenerateResultSetQueryByGenerator(
                     getWebSession(env),
                     getSQLContext(env),
                     getArgumentVal(env, "generatorId"),
