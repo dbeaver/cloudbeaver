@@ -8,7 +8,9 @@ export default [
   ['ai_administration_settings_save_fail', "Échec de l'enregistrement des réglages de l'IA"],
   ['ai_administration_settings_load_fail', "Échec du chargement des paramètres de l'IA"],
   ['ai_administration_language_model_settings_save_fail', "Échec de l'enregistrement des réglages du modèle"],
-  ['ai_administration_settings_preview_fail', 'Impossible de charger les propriétés du modèle'],
+  ['ai_administration_models_refresh', 'Actualiser les modèles'],
+  ['ai_administration_models_refresh_description', 'Remplissez les champs requis, puis actualisez pour charger les modèles'],
+  ['ai_administration_models_refresh_fail', "Échec de l'actualisation des modèles"],
   ['plugin_ai_administration_rag_label', 'Envoyer uniquement les objets pertinents à l’IA (Expérimental)'],
   [
     'plugin_ai_administration_rag_description',

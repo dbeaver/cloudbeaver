@@ -24,7 +24,7 @@ public class WSServerConfigurationChangedEventHandler extends WSDefaultEventHand
 
     @Override
     protected void updateSessionData(@NotNull BaseWebSession activeUserSession, @NotNull WSServerConfigurationChangedEvent event) {
-        activeUserSession.refreshUserData();
+        activeUserSession.refreshUserPermissions();
         super.updateSessionData(activeUserSession, event);
     }
 }
