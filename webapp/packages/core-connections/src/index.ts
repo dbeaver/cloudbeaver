@@ -21,6 +21,7 @@ export * from './extensions/IObjectSchemaSetter.js';
 export * from './extensions/IObjectLoaderProvider.js';
 export * from './extensions/IExecutionContextProvider.js';
 export * from './NavTree/NavNodeExtensionsService.js';
+export * from './NavTree/getConnectionFolderParentId.js';
 export * from './NavTree/getConnectionFolderIdFromNodeId.js';
 export * from './NavTree/getConnectionFolderId.js';
 export * from './NavTree/getFolderPathWithProjectId.js';

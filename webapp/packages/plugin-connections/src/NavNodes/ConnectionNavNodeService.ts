@@ -27,6 +27,7 @@ import {
   ConnectionInfoActiveProjectKey,
   type IConnectionInfoParams,
   getConnectionParentId,
+  getConnectionFolderParentId,
   createConnectionParam,
   ConnectionFolderEventHandler,
   type IConnectionFolderEvent,
@@ -75,10 +76,9 @@ export class ConnectionNavNodeService {
     this.connectionFolderEventHandler.onEvent<IConnectionFolderEvent>(
       ServerEventId.CbDatasourceFolderCreated,
       data => {
-        const parents = data.nodePaths.map(nodeId => {
-          const parents = this.navNodeInfoResource.getParents(nodeId);
-          return parents[parents.length - 1]!;
-        });
+        const parents = data.nodePaths.map(nodeId =>
+          getConnectionFolderParentId(data.projectId, nodeId, this.navNodeInfoResource.get(nodeId)?.parentId),
+        );
 
         this.navTreeResource.markOutdated(resourceKeyList(parents));
       },
@@ -88,10 +88,9 @@ export class ConnectionNavNodeService {
     this.connectionFolderEventHandler.onEvent<IConnectionFolderEvent>(
       ServerEventId.CbDatasourceFolderDeleted,
       data => {
-        const parents = data.nodePaths.map(nodeId => {
-          const parents = this.navNodeInfoResource.getParents(nodeId);
-          return parents[parents.length - 1]!;
-        });
+        const parents = data.nodePaths.map(nodeId =>
+          getConnectionFolderParentId(data.projectId, nodeId, this.navNodeInfoResource.get(nodeId)?.parentId),
+        );
 
         this.navTreeResource.deleteInNode(
           resourceKeyList(parents),
