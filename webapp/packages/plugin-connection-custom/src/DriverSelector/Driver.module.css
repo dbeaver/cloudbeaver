@@ -16,6 +16,10 @@
   min-width: 24px;
 }
 
+.cell {
+  width: 50%;
+}
+
 .indicator {
   position: absolute;
   bottom: 2px;

@@ -82,6 +82,7 @@ export * from './Placeholder/PlaceholderContainer.js';
 
 export * from './PropertiesTable/PropertiesTable.js';
 export * from './PropertiesTable/IProperty.js';
+export { default as PropertiesTableStyles } from './PropertiesTable/PropertiesTable.module.css';
 
 export * from './SLIDE_PANEL_CLOSE_BUTTON_ID.js';
 export * from './SlideDialog/SlideDialog.js';
