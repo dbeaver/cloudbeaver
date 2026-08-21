@@ -60,6 +60,11 @@
     color: var(--mdc-theme-on-secondary, #6d6d6d);
   }
 
+  .search-panel .dbv-kit-icon-button {
+    --dbv-kit-icon-btn-primary-background-hover: color-mix(in srgb, transparent, var(--theme-primary) 10%) !important;
+    --dbv-kit-icon-btn-secondary-background-hover: color-mix(in srgb, transparent, var(--theme-primary) 10%) !important;
+  }
+
   .search-panel__buttons {
     flex: 0 0 80px;
     display: flex;
