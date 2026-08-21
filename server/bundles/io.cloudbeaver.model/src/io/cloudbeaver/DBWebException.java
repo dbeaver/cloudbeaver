@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import graphql.ErrorClassification;
 import graphql.ErrorType;
 import graphql.GraphQLError;
 import graphql.language.SourceLocation;
+import org.jkiss.dbeaver.DBDatabaseException;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.sql.SQLState;
 import org.jkiss.utils.CommonUtils;
@@ -146,19 +147,22 @@ public class DBWebException extends DBException implements GraphQLError {
             } else {
                 return message;
             }
-        } else if (cause.getMessage() == null && cause.getCause() != null) {
-            return message + ":\n" + cause.getCause().getClass().getSimpleName();
+        }
+        // Preserve enriched web/database messages, but unwrap generic exceptions to their most specific cause.
+        Throwable messageCause = cause instanceof DBWebException || cause instanceof DBDatabaseException
+            ? cause
+            : CommonUtils.getRootCause(cause);
+        String causeMessage = messageCause.getMessage();
+        if (CommonUtils.isEmpty(causeMessage)) {
+            causeMessage = messageCause.getClass().getSimpleName();
         }
         if (CommonUtils.isEmpty(message)) {
-            if (cause.getMessage() != null) {
-                return cause.getMessage();
-            }
-            return cause.getClass().getName();
+            return causeMessage;
         }
-        if (CommonUtils.equalObjects(message, cause.getMessage())) {
+        if (CommonUtils.equalObjects(message, causeMessage)) {
             return message;
         }
-        return message + ":\n" + cause.getMessage();
+        return message + ":\n" + causeMessage;
     }
 
 }
