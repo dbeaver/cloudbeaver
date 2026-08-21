@@ -155,6 +155,17 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
         }
     }
 
+    /**
+     * Refreshes user permissions, teams and accessible projects.
+     * <p>
+     * Unlike {@link #refreshUserData()} this method must not re-create heavyweight session state
+     * (navigator model, session projects, connection caches), so it is safe to call
+     * for foreign sessions on server-wide events.
+     */
+    public void refreshUserPermissions() {
+        refreshUserData();
+    }
+
     @NotNull
     @Override
     public SMAuthSpace getSessionSpace() {
