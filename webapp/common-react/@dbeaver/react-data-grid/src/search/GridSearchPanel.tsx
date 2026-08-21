@@ -7,7 +7,7 @@
  */
 
 import { forwardRef, useContext, useEffect, useImperativeHandle, useRef } from 'react';
-import { clsx, SearchPanel, type SearchPanelRef } from '@dbeaver/ui-kit';
+import { clsx, SearchPanel, type ISearchPanelRef } from '@dbeaver/ui-kit';
 
 import { DataGridCellContext, type ICellChange } from '../DataGridCellContext.js';
 import { DataGridRowContext } from '../DataGridRowContext.js';
@@ -36,7 +36,7 @@ export const GridSearchPanel = forwardRef<GridSearchPanelRef, GridSearchPanelPro
   { columnCount, scrollToCell, onReplace, onClose, onReplacingChange, isReadOnly, storage, open },
   ref,
 ) {
-  const panelRef = useRef<SearchPanelRef>(null);
+  const panelRef = useRef<ISearchPanelRef>(null);
   const { cellText } = useContext(DataGridCellContext) ?? {};
   const rowContext = useContext(DataGridRowContext);
   const rowCount = useGridReactiveValue(rowContext?.rowCount);

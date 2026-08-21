@@ -16,11 +16,11 @@ import { Input } from '../Input/Input.js';
 
 import './SearchPanel.css';
 
-export interface SearchPanelRef {
+export interface ISearchPanelRef {
   focus: () => void;
 }
 
-export interface SearchPanelQuery {
+export interface ISearchPanelQuery {
   search: string;
   replace?: string;
   caseSensitive?: boolean;
@@ -28,7 +28,7 @@ export interface SearchPanelQuery {
   regexp?: boolean;
 }
 
-export interface SearchPanelStrings {
+export interface ISearchPanelStrings {
   searchPlaceholder: string;
   replacePlaceholder: string;
   toggleReplace: string;
@@ -44,9 +44,9 @@ export interface SearchPanelStrings {
   matchesNone: string;
 }
 
-export interface SearchPanelProps {
+export interface ISearchPanelProps {
   isReadOnly?: boolean;
-  query: SearchPanelQuery;
+  query: ISearchPanelQuery;
   searchMatchesCount?: { count: number; current: number };
   className?: string;
   enableReplace?: boolean;
@@ -67,7 +67,7 @@ export interface SearchPanelProps {
   onClose: () => void;
 }
 
-export const SearchPanel = forwardRef<SearchPanelRef, SearchPanelProps>(function SearchPanel(
+export const SearchPanel = forwardRef<ISearchPanelRef, ISearchPanelProps>(function SearchPanel(
   {
     isReadOnly,
     query,
