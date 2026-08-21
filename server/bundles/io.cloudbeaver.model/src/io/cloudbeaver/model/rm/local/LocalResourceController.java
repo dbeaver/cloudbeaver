@@ -29,6 +29,7 @@ import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
+import org.jkiss.dbeaver.model.DBPDataSourceFolder;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPWorkspace;
 import org.jkiss.dbeaver.model.auth.SMCredentials;
@@ -465,6 +466,7 @@ public class LocalResourceController extends BaseLocalResourceController {
         @NotNull String oldPath,
         @NotNull String newPath
     ) throws DBException {
+        List<String> affectedDataSourceIds = getDataSourceIdsInFolders(projectId, List.of(oldPath));
         super.moveProjectDataSourceFolder(projectId, oldPath, newPath);
         if (credentialsProvider.getActiveUserCredentials() != null) {
             ServletAppUtils.getServletApplication().getEventController().addEvent(
@@ -483,16 +485,47 @@ public class LocalResourceController extends BaseLocalResourceController {
                     List.of(createNodePathFromFolderPath(projectId, newPath))
                 )
             );
+            if (!affectedDataSourceIds.isEmpty()) {
+                ServletAppUtils.getServletApplication().getEventController().addEvent(
+                    WSDataSourceEvent.update(
+                        credentialsProvider.getActiveUserCredentials().getSmSessionId(),
+                        credentialsProvider.getActiveUserCredentials().getUserId(),
+                        projectId,
+                        affectedDataSourceIds,
+                        WSDataSourceProperty.NAVIGATION
+                    )
+                );
+            }
         }
     }
 
     @Override
     public void deleteProjectDataSourceFolders(@NotNull String projectId, @NotNull String[] folderPaths, boolean dropContents)
     throws DBException {
+        List<String> affectedDataSourceIds = getDataSourceIdsInFolders(projectId, Arrays.asList(folderPaths));
         super.deleteProjectDataSourceFolders(projectId, folderPaths, dropContents);
         if (credentialsProvider.getActiveUserCredentials() != null) {
+            if (!affectedDataSourceIds.isEmpty()) {
+                ServletAppUtils.getServletApplication().getEventController().addEvent(
+                    dropContents ?
+                        WSDataSourceEvent.delete(
+                            credentialsProvider.getActiveUserCredentials().getSmSessionId(),
+                            credentialsProvider.getActiveUserCredentials().getUserId(),
+                            projectId,
+                            affectedDataSourceIds,
+                            WSDataSourceProperty.CONFIGURATION
+                        ) :
+                        WSDataSourceEvent.update(
+                            credentialsProvider.getActiveUserCredentials().getSmSessionId(),
+                            credentialsProvider.getActiveUserCredentials().getUserId(),
+                            projectId,
+                            affectedDataSourceIds,
+                            WSDataSourceProperty.NAVIGATION
+                        )
+                );
+            }
             ServletAppUtils.getServletApplication().getEventController().addEvent(
-                WSDatasourceFolderEvent.create(
+                WSDatasourceFolderEvent.delete(
                     credentialsProvider.getActiveUserCredentials().getSmSessionId(),
                     credentialsProvider.getActiveUserCredentials().getUserId(),
                     projectId,
@@ -502,6 +535,29 @@ public class LocalResourceController extends BaseLocalResourceController {
                 )
             );
         }
+    }
+
+    @NotNull
+    private List<String> getDataSourceIdsInFolders(
+        @NotNull String projectId,
+        @NotNull Collection<String> folderPaths
+    ) throws DBException {
+        DBPDataSourceRegistry registry = getWebProject(projectId, false).getDataSourceRegistry();
+        Set<DBPDataSourceFolder> folders = folderPaths.stream()
+            .map(registry::getFolder)
+            .filter(Objects::nonNull)
+            .collect(Collectors.toSet());
+        return registry.getDataSources().stream()
+            .filter(dataSource -> {
+                for (DBPDataSourceFolder folder = dataSource.getFolder(); folder != null; folder = folder.getParent()) {
+                    if (folders.contains(folder)) {
+                        return true;
+                    }
+                }
+                return false;
+            })
+            .map(DBPDataSourceContainer::getId)
+            .toList();
     }
 
     private String createNodePathFromFolderPath(String projectId, String folderPath) {
@@ -546,12 +602,9 @@ public class LocalResourceController extends BaseLocalResourceController {
             );
         }
 
-        if (oldDataSources.isEmpty()) {
-            return;
-        }
-
         List<String> updatedConfigurationDataSourceIds = new ArrayList<>();
         List<String> updatedNameDataSourceIds = new ArrayList<>();
+        List<String> updatedNavigationDataSourceIds = new ArrayList<>();
         List<String> updatedInternalConfigurationDataSourceIds = new ArrayList<>();
 
         for (Map.Entry<String, DataSourceDescriptor> entry : oldDataSources.entrySet()) {
@@ -561,12 +614,14 @@ public class LocalResourceController extends BaseLocalResourceController {
             if (newDs == null) {
                 continue;
             }
-            if (!oldDs.equalConfiguration(newDs)) {
-                updatedConfigurationDataSourceIds.add(dsId);
-            } else if (!oldDs.isLooselyEqualTo(newDs)) {
-                updatedNameDataSourceIds.add(dsId);
-            } else if (!oldDs.equalInternalConfiguration(newDs)) {
-                updatedInternalConfigurationDataSourceIds.add(dsId);
+            WSDataSourceProperty property = getChangedDataSourceProperty(oldDs, newDs);
+            if (property != null) {
+                switch (property) {
+                    case CONFIGURATION -> updatedConfigurationDataSourceIds.add(dsId);
+                    case NAME -> updatedNameDataSourceIds.add(dsId);
+                    case NAVIGATION -> updatedNavigationDataSourceIds.add(dsId);
+                    case INTERNAL -> updatedInternalConfigurationDataSourceIds.add(dsId);
+                }
             }
         }
 
@@ -592,6 +647,17 @@ public class LocalResourceController extends BaseLocalResourceController {
                 )
             );
         }
+        if (!updatedNavigationDataSourceIds.isEmpty()) {
+            ServletAppUtils.getServletApplication().getEventController().addEvent(
+                WSDataSourceEvent.update(
+                    credentialsProvider.getActiveUserCredentials().getSmSessionId(),
+                    credentialsProvider.getActiveUserCredentials().getUserId(),
+                    registry.getProject().getId(),
+                    updatedNavigationDataSourceIds,
+                    WSDataSourceProperty.NAVIGATION
+                )
+            );
+        }
         if (!updatedInternalConfigurationDataSourceIds.isEmpty()) {
             ServletAppUtils.getServletApplication().getEventController().addEvent(
                 WSDataSourceEvent.update(
@@ -610,7 +676,7 @@ public class LocalResourceController extends BaseLocalResourceController {
                     credentialsProvider.getActiveUserCredentials().getSmSessionId(),
                     credentialsProvider.getActiveUserCredentials().getUserId(),
                     registry.getProject().getId(),
-                    updatedNameDataSourceIds,
+                    parseResults.addedDataSources.stream().map(DBPDataSourceContainer::getId).toList(),
                     WSDataSourceProperty.CONFIGURATION
                 )
             );
@@ -622,7 +688,7 @@ public class LocalResourceController extends BaseLocalResourceController {
                     credentialsProvider.getActiveUserCredentials().getSmSessionId(),
                     credentialsProvider.getActiveUserCredentials().getUserId(),
                     registry.getProject().getId(),
-                    updatedNameDataSourceIds,
+                    parseResults.removedDataSources.stream().map(DBPDataSourceContainer::getId).toList(),
                     WSDataSourceProperty.CONFIGURATION
                 )
             );
@@ -653,6 +719,26 @@ public class LocalResourceController extends BaseLocalResourceController {
                 )
             );
         }
+    }
+
+    @Nullable
+    private static WSDataSourceProperty getChangedDataSourceProperty(
+        @NotNull DataSourceDescriptor oldDataSource,
+        @NotNull DataSourceDescriptor newDataSource
+    ) {
+        if (!oldDataSource.equalConfiguration(newDataSource)) {
+            return WSDataSourceProperty.CONFIGURATION;
+        }
+        if (!oldDataSource.isLooselyEqualTo(newDataSource)) {
+            return WSDataSourceProperty.NAME;
+        }
+        if (!oldDataSource.equalNavigation(newDataSource)) {
+            return WSDataSourceProperty.NAVIGATION;
+        }
+        if (!oldDataSource.equalInternalConfiguration(newDataSource)) {
+            return WSDataSourceProperty.INTERNAL;
+        }
+        return null;
     }
 
     @NotNull

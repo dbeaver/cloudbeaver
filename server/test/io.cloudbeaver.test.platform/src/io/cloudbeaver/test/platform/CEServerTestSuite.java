@@ -20,6 +20,7 @@ package io.cloudbeaver.test.platform;
 import io.cloudbeaver.app.CEAppStarter;
 import io.cloudbeaver.model.navigator.WebNavigatorNodeInfoTest;
 import io.cloudbeaver.model.rm.RMNIOTest;
+import io.cloudbeaver.model.rm.local.LocalResourceControllerTest;
 import io.cloudbeaver.model.rm.lock.RMLockTest;
 import io.cloudbeaver.model.session.WebSessionProjectTest;
 import io.cloudbeaver.model.session.WebSessionTest;
@@ -40,6 +41,7 @@ import org.junit.platform.suite.api.Suite;
         ResourceManagerTest.class,
         RMLockTest.class,
         RMNIOTest.class,
+        LocalResourceControllerTest.class,
         NoSessionTest.class,
         WebSessionTest.class,
         WebSessionProjectTest.class,

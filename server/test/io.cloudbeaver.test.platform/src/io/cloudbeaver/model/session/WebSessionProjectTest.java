@@ -176,6 +176,11 @@ public class WebSessionProjectTest extends CloudbeaverMockTest {
         Assertions.assertNotNull(info);
         Assertions.assertEquals("ds1", info.getDataSourceContainer().getId());
 
+        Mockito.when(ds.isConnected()).thenReturn(true);
+        Mockito.when(event.getProperty()).thenReturn(WSDataSourceProperty.NAVIGATION);
+        Assertions.assertTrue(project.updateProjectDataSources(event));
+        Mockito.verify(ds, Mockito.never()).disconnect(Mockito.any());
+
         Mockito.when(event.getProperty()).thenReturn(WSDataSourceProperty.INTERNAL);
         Assertions.assertFalse(project.updateProjectDataSources(event));
 
