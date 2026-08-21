@@ -10,39 +10,49 @@ import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
 
 import {
+  ActionIconButton,
   ColoredContainer,
   Combobox,
   Container,
   Group,
   GroupTitle,
   InputField,
-  ObjectPropertyInfoForm,
   Select,
   useAutoLoad,
+  useExecutor,
   useFormCustomInputValidation,
   useResource,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
+import type { AiModelInfo } from '@cloudbeaver/core-sdk';
 import { FormMode, type TabContainerPanelComponent } from '@cloudbeaver/core-ui';
-import { getObjectPropertyOptionName, getObjectPropertyOptionValue } from '@cloudbeaver/core-sdk';
 import { AiEnginesResource } from '@cloudbeaver/plugin-ai';
 
-import { AIEnginePropertiesResource, MODEL_PROPERTY_ID } from '../../AIEnginePropertiesResource.js';
+import {
+  AIEnginePropertiesResource,
+  CONTEXT_WINDOW_SIZE_PROPERTY_ID,
+  MODEL_PROPERTY_ID,
+  TEMPERATURE_PROPERTY_ID,
+} from '../../AIEnginePropertiesResource.js';
+import { AIProfilesResource } from '../../AIProfilesResource.js';
 import type { IAIProfileFormProps } from '../IAIProfileFormProps.js';
+import { AIProfilePropertiesForm } from './AIProfilePropertiesForm.js';
 import { AI_PROFILE_NAME_MAX_LENGTH, AI_PROFILE_NAME_MIN_LENGTH } from './AIProfileSchema.js';
 import { getAIProfileFormPart } from './getAIProfileFormPart.js';
 
 export const AIProfileOptions: TabContainerPanelComponent<IAIProfileFormProps> = observer(function AIProfileOptions({ formState }) {
   const translate = useTranslate();
   const notificationService = useService(NotificationService);
+  const aiProfilesResource = useService(AIProfilesResource);
   const enginesLoader = useResource(AIProfileOptions, AiEnginesResource, undefined);
   const part = getAIProfileFormPart(formState);
   const propertiesLoader = useResource(AIProfileOptions, AIEnginePropertiesResource, part.state.engineId || null);
   const propertiesInfo = propertiesLoader.data ?? [];
   const isEditMode = formState.mode === FormMode.Edit;
   const [isLoading, setIsLoading] = useState(false);
+  const [models, setModels] = useState<AiModelInfo[] | null>(null);
 
   useAutoLoad(AIProfileOptions, part);
 
@@ -58,29 +68,82 @@ export const AIProfileOptions: TabContainerPanelComponent<IAIProfileFormProps> =
     return null;
   });
 
-  const modelProperty = propertiesInfo.find(property => property.id === MODEL_PROPERTY_ID);
-  const models = [...(modelProperty?.validValues ?? [])].sort((a, b) => getObjectPropertyOptionName(a).localeCompare(getObjectPropertyOptionName(b)));
+  const modelPropertyIndex = propertiesInfo.findIndex(property => property.id === MODEL_PROPERTY_ID);
+  const modelProperty = propertiesInfo[modelPropertyIndex];
+  const chatModels = (models ?? []).filter(model => model.features.map(feature => feature.toLowerCase()).includes('chat'));
   const hasModels = !!modelProperty;
-  const currentEngineProperties = propertiesInfo.filter(property => property.id !== MODEL_PROPERTY_ID);
+  const propertiesBeforeModel = hasModels ? propertiesInfo.slice(0, modelPropertyIndex) : propertiesInfo;
+  const propertiesAfterModel = hasModels ? propertiesInfo.slice(modelPropertyIndex + 1) : [];
 
-  async function handleModelBlur() {
-    if (!part.isActiveModelChanged) {
+  function applyModelToProfile(modelId: string | null, availableModels = models ?? []): void {
+    const model = availableModels.find(model => model.id === modelId);
+    part.state.properties[MODEL_PROPERTY_ID] = modelId;
+
+    if (!model) {
       return;
+    }
+
+    part.state.properties[CONTEXT_WINDOW_SIZE_PROPERTY_ID] = model.contextWindowSize;
+    part.state.properties[TEMPERATURE_PROPERTY_ID] = model.defaultTemperature;
+  }
+
+  async function loadModels(notifyOnError: boolean): Promise<AiModelInfo[] | null> {
+    const engineId = part.state.engineId;
+    if (!engineId) {
+      return null;
     }
 
     try {
       setIsLoading(true);
-      await part.loadEngineProperties();
+      const profileId = formState.mode === FormMode.Edit ? formState.state.profileId : undefined;
+      const loadedModels = (await aiProfilesResource.loadModels(engineId, profileId, part.getCurrentEngineSettings())).toSorted((a, b) =>
+        a.id.localeCompare(b.id),
+      );
+      setModels(loadedModels);
+      return loadedModels;
     } catch (error: any) {
-      notificationService.logException(error, 'ai_administration_settings_preview_fail');
-      part.state.properties[MODEL_PROPERTY_ID] = '';
+      if (notifyOnError) {
+        notificationService.logException(error, 'ai_administration_models_refresh_fail');
+      }
+      return null;
     } finally {
       setIsLoading(false);
     }
   }
 
+  async function refreshModels(): Promise<void> {
+    const loadedModels = await loadModels(true);
+
+    if (loadedModels === null) {
+      return;
+    }
+
+    const currentModelId = part.state.properties[MODEL_PROPERTY_ID];
+    const firstChatModel = loadedModels.find(model => model.features.some(feature => feature.toLowerCase() === 'chat'));
+
+    if (firstChatModel && !currentModelId) {
+      applyModelToProfile(firstChatModel.id, loadedModels);
+    }
+  }
+
+  useExecutor({
+    executor: formState.loadedTask,
+    handlers: [
+      async () => {
+        if (isEditMode && part.state.engineId && models === null) {
+          await loadModels(false);
+        }
+      },
+    ],
+  });
+
   function handleModelChange(value: string | null) {
-    part.state.properties[MODEL_PROPERTY_ID] = value;
+    applyModelToProfile(value);
+  }
+
+  async function handleEngineChange(engineId: string): Promise<void> {
+    await part.changeEngine(engineId);
+    setModels(null);
   }
 
   return (
@@ -88,7 +151,7 @@ export const AIProfileOptions: TabContainerPanelComponent<IAIProfileFormProps> =
       <Container medium gap>
         <Group gap>
           <Container vertical gap>
-            <InputField ref={nameRef} name="name" state={part.state} disabled={formState.isDisabled} small required>
+            <InputField ref={nameRef} name="name" state={part.state} disabled={formState.isDisabled} autoComplete="off" small required>
               {translate('plugin_ai_administration_profile_form_field_name')}
             </InputField>
             <Select
@@ -100,7 +163,7 @@ export const AIProfileOptions: TabContainerPanelComponent<IAIProfileFormProps> =
               iconSelector={value => value.icon}
               small
               required
-              onSelect={value => value && part.changeEngine(value)}
+              onSelect={value => value && handleEngineChange(value)}
             >
               {translate('plugin_ai_administration_profile_form_field_engine')}
             </Select>
@@ -110,30 +173,40 @@ export const AIProfileOptions: TabContainerPanelComponent<IAIProfileFormProps> =
           <Group gap medium>
             <GroupTitle>{translate('ai_administration_language_model_settings')}</GroupTitle>
             <Container vertical gap>
-              {hasModels && (
-                <Combobox
-                  value={part.state.properties[MODEL_PROPERTY_ID]}
-                  items={models}
-                  keySelector={getObjectPropertyOptionValue}
-                  valueSelector={getObjectPropertyOptionName}
-                  disabled={formState.isDisabled}
-                  loading={isLoading}
-                  allowCustomValue
-                  required
-                  small
-                  onChange={handleModelChange}
-                  onBlur={handleModelBlur}
-                >
-                  {translate('ai_administration_select_language_model_selector_title')}
-                </Combobox>
-              )}
-              <ObjectPropertyInfoForm
+              <AIProfilePropertiesForm
                 disabled={isLoading || formState.isDisabled}
                 state={part.state.properties}
-                properties={currentEngineProperties}
-                showRememberTip
-                small
+                properties={propertiesBeforeModel}
               />
+              {hasModels && (
+                <Container className="tw:w-full" small>
+                  <Combobox
+                    className="tw:w-full"
+                    value={part.state.properties[MODEL_PROPERTY_ID]}
+                    items={chatModels}
+                    keySelector={model => model.id}
+                    valueSelector={model => model.id}
+                    disabled={formState.isDisabled}
+                    loading={isLoading}
+                    description={translate('ai_administration_models_refresh_description')}
+                    allowCustomValue
+                    required
+                    small
+                    onChange={handleModelChange}
+                  >
+                    {translate('ai_administration_select_language_model_selector_title')}
+                  </Combobox>
+                  <div className="tw:absolute tw:top-9 tw:-right-9">
+                    <ActionIconButton
+                      name="refresh"
+                      title={translate('ai_administration_models_refresh')}
+                      disabled={isLoading || formState.isDisabled}
+                      onClick={refreshModels}
+                    />
+                  </div>
+                </Container>
+              )}
+              <AIProfilePropertiesForm disabled={isLoading || formState.isDisabled} state={part.state.properties} properties={propertiesAfterModel} />
             </Container>
           </Group>
         )}

@@ -10,9 +10,11 @@ import { CachedMapAllKey, CachedMapResource, resourceKeyList } from '@cloudbeave
 import { EAdminPermission, ServerConfigResource, SessionPermissionsResource } from '@cloudbeaver/core-root';
 import {
   GraphQLService,
+  type AiEngineConfig,
   type AiAdminConfigurationProfileInfo,
   type AiConfigurationProfileInfo,
   type AiConfigurationProfileInput,
+  type AiModelInfo,
 } from '@cloudbeaver/core-sdk';
 
 import { AISettingsResource } from '../AISettingsResource.js';
@@ -63,6 +65,11 @@ export class AIProfilesResource extends CachedMapResource<string, AIProfile> {
     await this.graphQLService.sdk.deleteAiProfile({ profileId });
 
     this.delete(profileId);
+  }
+
+  async loadModels(engineId: string, profileId?: string, settings?: AiEngineConfig): Promise<AiModelInfo[]> {
+    const { models } = await this.graphQLService.sdk.getEngineModels({ engineId, profileId, settings });
+    return models;
   }
 
   protected async loader(): Promise<Map<string, AIProfile>> {

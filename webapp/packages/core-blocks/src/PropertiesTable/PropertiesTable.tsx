@@ -7,7 +7,7 @@
  */
 import { computed } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useDeferredValue, useMemo, useState } from 'react';
 
 import { getObjectPropertyOptionValue } from '@cloudbeaver/core-sdk';
 import { isNotNullDefined } from '@dbeaver/js-helpers';
@@ -47,6 +47,7 @@ export const PropertiesTable = observer<Props>(function PropertiesTable(props) {
   const style = useS(styles);
 
   const [filterValue, setFilterValue] = useState('');
+  const deferredFilterValue = useDeferredValue(filterValue);
 
   const sortedProperties = useMemo(
     () =>
@@ -54,9 +55,9 @@ export const PropertiesTable = observer<Props>(function PropertiesTable(props) {
         ((propsRef.sortByName ?? true)
           ? propsRef.properties.slice().sort((a, b) => (a.displayName ?? '').localeCompare(b.displayName ?? ''))
           : propsRef.properties
-        ).filter(p => p.new || p.key.toLocaleLowerCase().includes(filterValue.toLocaleLowerCase())),
+        ).filter(p => p.new || p.key.toLocaleLowerCase().includes(deferredFilterValue.toLocaleLowerCase())),
       ),
-    [propsRef.properties, propsRef.sortByName, filterValue],
+    [propsRef.properties, propsRef.sortByName, deferredFilterValue],
   );
 
   const changeName = useCallback((id: string, key: string) => {

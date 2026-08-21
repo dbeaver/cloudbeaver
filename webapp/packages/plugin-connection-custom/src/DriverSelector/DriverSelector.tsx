@@ -34,7 +34,7 @@ export const DriverSelector = observer<Props>(function DriverSelector({ drivers,
   return (
     <div ref={focusedRef} className={s(styles, { wrapper: true })}>
       <ItemListSearch placeholder={translate('connections_driver_search_placeholder')} onChange={setSearch} />
-      <ItemList className={className}>
+      <ItemList className={s(styles, { itemList: true }, className)}>
         {filteredDrivers.map(driver => (
           <Driver key={driver.id} driver={driver} onSelect={onSelect} />
         ))}

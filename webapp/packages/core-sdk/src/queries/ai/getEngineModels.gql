@@ -1,0 +1,8 @@
+query getEngineModels($engineId: ID!, $profileId: ID, $settings: AIEngineConfig) {
+  models: aiListEngineModels(engineId: $engineId, profileId: $profileId, settings: $settings) {
+    id
+    contextWindowSize
+    defaultTemperature
+    features
+  }
+}
