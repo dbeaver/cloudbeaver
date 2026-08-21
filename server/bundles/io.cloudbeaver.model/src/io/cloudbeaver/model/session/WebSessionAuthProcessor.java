@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2025 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -64,9 +64,7 @@ public class WebSessionAuthProcessor {
                 case SUCCESS:
                     return finishWebSessionAuthorization(smAuthInfo);
                 case ERROR:
-                    var e = new DBException(smAuthInfo.getError());
-                    webSession.addSessionError(e);
-                    throw e;
+                    throw new DBException(smAuthInfo.getError());
                 case IN_PROGRESS:
                     throw new DBException("Authorization didn't complete");
                 default:
