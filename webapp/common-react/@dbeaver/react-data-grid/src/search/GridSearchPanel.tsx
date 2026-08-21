@@ -15,7 +15,7 @@ import type { IGridReactiveValue } from '../IGridReactiveValue.js';
 import { useGridReactiveValue } from '../useGridReactiveValue.js';
 import { type IGridSearchStorage, useGridSearch } from './useGridSearch.js';
 
-export interface GridSearchPanelRef {
+export interface IGridSearchPanelRef {
   focus: () => void;
   refresh: () => void;
   getCellClassName: IGridReactiveValue<string | undefined, [number, number]>;
@@ -32,7 +32,7 @@ interface GridSearchPanelProps {
   open?: boolean;
 }
 
-export const GridSearchPanel = forwardRef<GridSearchPanelRef, GridSearchPanelProps>(function GridSearchPanel(
+export const GridSearchPanel = forwardRef<IGridSearchPanelRef, GridSearchPanelProps>(function GridSearchPanel(
   { columnCount, scrollToCell, onReplace, onClose, onReplacingChange, isReadOnly, storage, open },
   ref,
 ) {
