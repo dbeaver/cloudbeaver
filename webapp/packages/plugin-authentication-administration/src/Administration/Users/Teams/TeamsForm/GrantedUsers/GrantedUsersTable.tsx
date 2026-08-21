@@ -6,16 +6,18 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { useMemo } from 'react';
 import { observer } from 'mobx-react-lite';
 
 import { useTab, useTabState, type TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 import { Alert, Checkbox, StaticImage, useAutoLoad, useResource, useTranslate } from '@cloudbeaver/core-blocks';
-import { CachedResourceOffsetPageListKey } from '@cloudbeaver/core-resource';
+import { CachedMapAllKey, CachedResourceOffsetPageListKey } from '@cloudbeaver/core-resource';
 import { GrantManagementTable, type IGrantManagementTableColumn } from '@cloudbeaver/plugin-data-grid';
-import { ServerConfigResource } from '@cloudbeaver/core-root';
+import { EAdminPermission, ServerConfigResource } from '@cloudbeaver/core-root';
 import {
   compareUsersById,
   compareUsersByLastLogin,
+  TeamsResource,
   TeamRolesResource,
   USER_TEAM_ROLE_SUPERVISOR,
   UsersResource,
@@ -25,7 +27,6 @@ import {
 
 import type { TeamFormProps } from '../TeamsAdministrationFormService.js';
 import type { GrantedUsersFormPart } from './GrantedUsersFormPart.js';
-import { useMemo } from 'react';
 
 const USER_ID_COLUMN: IGrantManagementTableColumn<AdminUser> = {
   key: 'userId',
@@ -52,6 +53,7 @@ export const GrantedUsersTable: TabContainerPanelComponent<TeamFormProps> = obse
 
   const active = selected && !isDefaultTeam;
   const teamRolesResource = useResource(GrantedUsersTable, TeamRolesResource, undefined, { active });
+  const teamsResource = useResource(GrantedUsersTable, TeamsResource, CachedMapAllKey, { active });
   const usersLoader = useResource(GrantedUsersTable, UsersResource, CachedResourceOffsetPageListKey(0, 1000).setParent(UsersResourceFilterKey()), {
     active,
   });
@@ -79,11 +81,26 @@ export const GrantedUsersTable: TabContainerPanelComponent<TeamFormProps> = obse
   }
 
   function isManageable(user: AdminUser) {
-    if (serverConfigResource.data?.distributed) {
+    if (serverConfigResource.data?.distributed || !usersLoader.resource.isActiveUser(user.userId)) {
       return true;
     }
 
-    return !usersLoader.resource.isActiveUser(user.userId);
+    const teamId = formState.state.teamId;
+    if (!teamId || !user.grantedTeams.includes(teamId)) {
+      return true;
+    }
+
+    const currentTeam = teamsResource.resource.values.find(team => team.teamId === teamId);
+    if (!currentTeam) {
+      return false;
+    }
+
+    const grantedTeams = new Set(user.grantedTeams);
+    const adminTeamsCount = teamsResource.resource.values.filter(
+      team => grantedTeams.has(team.teamId) && team.teamPermissions.includes(EAdminPermission.admin),
+    ).length;
+
+    return !currentTeam.teamPermissions.includes(EAdminPermission.admin) || adminTeamsCount > 1;
   }
 
   function getTeamRoleRank(user: AdminUser) {
@@ -118,7 +135,7 @@ export const GrantedUsersTable: TabContainerPanelComponent<TeamFormProps> = obse
       }
 
       if (!isManageable(user)) {
-        title += ` - ${translate('administration_teams_team_granted_users_permission_denied')}`;
+        title += ` - ${translate('administration_teams_team_granted_users_only_admin_team')}`;
       }
 
       return (

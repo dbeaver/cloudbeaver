@@ -9,6 +9,10 @@ query getEngineProperties($engineId: ID!, $profileId: ID, $settings: AIEngineCon
     required
     dataType
     defaultValue
+    constraints {
+      min
+      max
+    }
     validValues
     length
     features
