@@ -60,10 +60,11 @@ export default [
   ['data_grid_table_generate_sql_select_many_tooltip', 'Сгенерировать SELECT-запрос с WHERE IN'],
   ['data_grid_table_generate_sql_create', 'DDL'],
   ['data_grid_table_generate_sql_create_tooltip', 'Сгенерировать DDL-запрос для сущности'],
-  ['data_grid_table_generate_sql_error_title', 'Ошибка генерации SQL'],
+  ['data_grid_table_generate_sql_error_title', 'Не удалось сгенерировать SQL'],
   ['data_grid_table_generate_sql_error_no_query', 'Нет запроса для текущего результата'],
   ['data_grid_table_generate_sql_error_no_connection', 'Неизвестный контекст выполнения'],
   ['data_grid_table_generate_sql_error_no_rows', 'Не выбрано ни одной строки'],
   ['data_grid_table_generate_sql_error_no_result', 'Результаты недоступны'],
   ['data_grid_table_generate_sql_error_no_context', 'Контекст выполнения недоступен'],
+  ['data_grid_table_generate_sql_ddl_no_support', 'Контейнер не поддерживает стандартную структуру DDL'],
 ];

@@ -222,9 +222,9 @@ export class DataGridContextMenuGenerateSqlService {
       const createGenerator = generators.find(g => g.id.toLowerCase().includes(DDL_GENERATOR_ID.toLowerCase()));
 
       if (!createGenerator) {
-        this.notificationService.logError({
+        this.notificationService.logInfo({
           title: 'data_grid_table_generate_sql_error_title',
-          message: 'data_grid_table_generate_sql_error_no_query',
+          message: 'data_grid_table_generate_sql_ddl_no_support',
         });
         return;
       }
