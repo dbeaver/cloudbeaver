@@ -52,15 +52,15 @@ public class GenerateSQLResultSetTest extends CloudbeaverDBTest {
           }
         """;
 
-    private static final String GQL_GENERATE_QUERY_FROM_RESULTSET_BY_KEY = """
-          query($projectId: ID, $connectionId: ID!, $contextId: ID!, $generatorKey: String!,
+    private static final String GQL_GENERATE_QUERY_BY_GENERATOR = """
+          query($projectId: ID, $connectionId: ID!, $contextId: ID!, $generatorId: String!,
               $resultsId: ID!, $selectedRows: [SQLResultRow!]!
           ) {
-            sqlGenerateResultSetQuery(
+            sqlGenerateResultSetQueryByGenerator(
               projectId: $projectId
               connectionId: $connectionId
               contextId: $contextId
-              generatorKey: $generatorKey
+              generatorId: $generatorId
               resultsId: $resultsId
               selectedRows: $selectedRows
             )
@@ -81,22 +81,6 @@ public class GenerateSQLResultSetTest extends CloudbeaverDBTest {
               order
               multiObject
             }
-          }
-        """;
-
-    private static final String GQL_GENERATE_QUERY_WITH_OPTIONAL_GENERATORS = """
-          query($projectId: ID, $connectionId: ID!, $contextId: ID!, $generatorId: SQLResultSetGeneratorId,
-              $generatorKey: String, $resultsId: ID!, $selectedRows: [SQLResultRow!]!
-          ) {
-            sqlGenerateResultSetQuery(
-              projectId: $projectId
-              connectionId: $connectionId
-              contextId: $contextId
-              generatorId: $generatorId
-              generatorKey: $generatorKey
-              resultsId: $resultsId
-              selectedRows: $selectedRows
-            )
           }
         """;
 
@@ -175,8 +159,8 @@ public class GenerateSQLResultSetTest extends CloudbeaverDBTest {
     }
 
     @Test
-    public void shouldGenerateQueryByDiscoveredGeneratorKey() throws Exception {
-        String query = generateQuery("dataSelectMany", selectedRows, GQL_GENERATE_QUERY_FROM_RESULTSET_BY_KEY, null, "generatorKey");
+    public void shouldGenerateQueryByDiscoveredGenerator() throws Exception {
+        String query = generateQueryByGenerator("dataSelectMany", selectedRows);
 
         Assertions.assertEquals("""
             SELECT ID, FIELD
@@ -185,47 +169,20 @@ public class GenerateSQLResultSetTest extends CloudbeaverDBTest {
     }
 
     @Test
-    public void shouldRejectInapplicableGeneratorKey() {
+    public void shouldRejectInapplicableGenerator() {
         DBException exception = Assertions.assertThrows(
             DBException.class,
-            () -> generateQuery("tableDDL", selectedRows, GQL_GENERATE_QUERY_FROM_RESULTSET_BY_KEY, null, "generatorKey")
+            () -> generateQueryByGenerator("tableDDL", selectedRows)
         );
 
         Assertions.assertTrue(exception.getMessage().contains("not applicable to this result set"));
     }
 
     @Test
-    public void shouldRejectMissingGeneratorArguments() {
-        DBException exception = Assertions.assertThrows(
-            DBException.class,
-            () -> executeGenerationQuery(GQL_GENERATE_QUERY_WITH_OPTIONAL_GENERATORS, Map.of())
-        );
-
-        Assertions.assertTrue(exception.getMessage().contains("Exactly one of generatorId or generatorKey must be specified"));
-    }
-
-    @Test
-    public void shouldRejectConflictingGeneratorArguments() {
-        DBException exception = Assertions.assertThrows(
-            DBException.class,
-            () -> executeGenerationQuery(
-                GQL_GENERATE_QUERY_WITH_OPTIONAL_GENERATORS,
-                Map.of("generatorId", "dataSelect", "generatorKey", "dataSelect")
-            )
-        );
-
-        Assertions.assertTrue(exception.getMessage().contains("Exactly one of generatorId or generatorKey must be specified"));
-    }
-
-    @Test
     public void shouldRejectEmptySelectedRows() {
         DBException exception = Assertions.assertThrows(
             DBException.class,
-            () -> executeGenerationQuery(
-                GQL_GENERATE_QUERY_WITH_OPTIONAL_GENERATORS,
-                Map.of("generatorKey", "dataSelect"),
-                List.of()
-            )
+            () -> generateQueryByGenerator("dataSelect", List.of())
         );
 
         Assertions.assertTrue(exception.getMessage().contains("At least one row must be selected"));
@@ -439,19 +396,8 @@ public class GenerateSQLResultSetTest extends CloudbeaverDBTest {
         @NotNull String gqlQuery,
         @Nullable Map<String, Object> variables
     ) throws Exception {
-        return generateQuery(generatorId, selectedRows, gqlQuery, variables, "generatorId");
-    }
-
-    @Nullable
-    private String generateQuery(
-        @NotNull String generatorId,
-        @NotNull List<Map<String, Object>> selectedRows,
-        @NotNull String gqlQuery,
-        @Nullable Map<String, Object> variables,
-        @NotNull String generatorArgument
-    ) throws Exception {
         Map<String, Object> queryVariables = getBaseVariables();
-        queryVariables.put(generatorArgument, generatorId);
+        queryVariables.put("generatorId", generatorId);
         queryVariables.put("selectedRows", selectedRows);
         if (variables != null && !variables.isEmpty()) {
             queryVariables.putAll(variables);
@@ -459,6 +405,22 @@ public class GenerateSQLResultSetTest extends CloudbeaverDBTest {
         Map<String, Object> response = client.executeGQLRequest(
             gqlQuery, queryVariables,
             Map.of(), "sqlGenerateResultSetQuery"
+        );
+        return response.get("data")
+            .toString();
+    }
+
+    @Nullable
+    private String generateQueryByGenerator(
+        @NotNull String generatorId,
+        @NotNull List<Map<String, Object>> selectedRows
+    ) throws Exception {
+        Map<String, Object> queryVariables = getBaseVariables();
+        queryVariables.put("generatorId", generatorId);
+        queryVariables.put("selectedRows", selectedRows);
+        Map<String, Object> response = client.executeGQLRequest(
+            GQL_GENERATE_QUERY_BY_GENERATOR, queryVariables,
+            Map.of(), "sqlGenerateResultSetQueryByGenerator"
         );
         return response.get("data")
             .toString();
@@ -474,18 +436,4 @@ public class GenerateSQLResultSetTest extends CloudbeaverDBTest {
         return queryVariables;
     }
 
-    private void executeGenerationQuery(@NotNull String query, @NotNull Map<String, Object> generatorVariables) throws Exception {
-        executeGenerationQuery(query, generatorVariables, selectedRows);
-    }
-
-    private void executeGenerationQuery(
-        @NotNull String query,
-        @NotNull Map<String, Object> generatorVariables,
-        @NotNull List<Map<String, Object>> rows
-    ) throws Exception {
-        Map<String, Object> variables = getBaseVariables();
-        variables.put("selectedRows", rows);
-        variables.putAll(generatorVariables);
-        client.executeGQLRequest(query, variables, Map.of(), "sqlGenerateResultSetQuery");
-    }
 }

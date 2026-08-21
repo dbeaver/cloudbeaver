@@ -187,15 +187,15 @@ enum SQLRowIdentifierState {
 
 enum SQLResultSetGeneratorId {
     "SELECT .. WHERE .. ="
-    dataSelect @deprecated(reason: "use generatorKey (26.2.0)"),
+    dataSelect,
     "SELECT .. WHERE .. IN"
-    dataSelectMany @deprecated(reason: "use generatorKey (26.2.0)"),
+    dataSelectMany,
     "INSERT"
-    dataInsert @deprecated(reason: "use generatorKey (26.2.0)"),
+    dataInsert,
     "UPDATE"
-    dataUpdate @deprecated(reason: "use generatorKey (26.2.0)"),
+    dataUpdate,
     "DELETE by Unique Key"
-    dataDeleteByUniqueKey @deprecated(reason: "use generatorKey (26.2.0)"),
+    dataDeleteByUniqueKey,
 }
 
 type SQLRowIdentifier {
@@ -413,18 +413,32 @@ extend type Query {
 
     """
     Returns an auto-generated SQL query based on provided rows data.
-    Uses the requested generator identifier to establish the type of query (e.g. SELECT or INSERT)
+    Uses generatorId value to establish the type of query (e.g. SELECT or INSERT)
     """
     sqlGenerateResultSetQuery(
         projectId: ID,
         connectionId: ID!,
         contextId: ID!,
-        generatorId: SQLResultSetGeneratorId @deprecated(reason: "use generatorKey (26.2.0)"),
-        generatorKey: String @since(version: "26.2.0"),
+        generatorId: SQLResultSetGeneratorId!,
         resultsId: ID!,
         selectedRows: [SQLResultRow!]!,
         generatorOptions: SQLQueryGeneratorOptions
     ): String!
+
+    """
+    Returns an auto-generated SQL query based on provided rows data.
+    Accepts any generator id returned by sqlResultSetQueryGenerators and
+    validates that the generator is applicable to the specified result set.
+    """
+    sqlGenerateResultSetQueryByGenerator(
+        projectId: ID,
+        connectionId: ID!,
+        contextId: ID!,
+        generatorId: String!,
+        resultsId: ID!,
+        selectedRows: [SQLResultRow!]!,
+        generatorOptions: SQLQueryGeneratorOptions
+    ): String! @since(version: "26.2.0")
 
     "Parses SQL script and returns script info with queries start and end positions"
     sqlParseScript(
