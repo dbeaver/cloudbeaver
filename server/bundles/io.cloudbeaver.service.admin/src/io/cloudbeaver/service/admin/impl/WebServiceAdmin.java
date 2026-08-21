@@ -699,7 +699,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
                 webSession.resetUserState();
             } else {
                 // Just reload session state
-                webSession.refreshUserData();
+                webSession.refreshUserPermissions();
             }
 
             WebAppUtils.getWebApplication().getDriverRegistry().refreshApplicableDrivers();
