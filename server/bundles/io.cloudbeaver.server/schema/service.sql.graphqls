@@ -423,7 +423,7 @@ extend type Query {
         resultsId: ID!,
         selectedRows: [SQLResultRow!]!,
         generatorOptions: SQLQueryGeneratorOptions
-    ): String!
+    ): String! @deprecated(reason: "use sqlGenerateResultSetQueryByGenerator (26.2.0)")
 
     """
     Returns an auto-generated SQL query based on provided rows data.

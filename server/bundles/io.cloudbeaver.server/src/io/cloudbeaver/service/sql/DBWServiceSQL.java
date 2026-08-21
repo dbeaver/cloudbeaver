@@ -99,6 +99,7 @@ public interface DBWServiceSQL extends DBWService {
 
     @NotNull
     @WebAction
+    @Deprecated // use sqlGenerateResultSetQueryByGenerator
     String sqlGenerateResultSetQuery(
         @NotNull WebSession session,
         @NotNull WebSQLContextInfo sqlContext,
@@ -119,6 +120,7 @@ public interface DBWServiceSQL extends DBWService {
         @NotNull WebSQLGeneratorOptions options
     ) throws DBWebException;
 
+    @NotNull
     @WebAction
     WebSQLContextInfo createContext(
         @NotNull WebSQLProcessor processor,

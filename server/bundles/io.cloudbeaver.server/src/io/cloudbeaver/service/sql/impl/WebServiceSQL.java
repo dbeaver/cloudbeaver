@@ -230,6 +230,7 @@ public class WebServiceSQL implements DBWServiceSQL {
         return attribute.getValueHandler().getSupportedOperators(attribute);
     }
 
+    @NotNull
     @Override
     public SQLGeneratorDescriptor[] getEntityQueryGenerators(
         @NotNull WebSession session,
