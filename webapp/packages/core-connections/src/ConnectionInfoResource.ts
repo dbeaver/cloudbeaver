@@ -522,9 +522,16 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
   }
 
   async getConnectionDriverProperties(projectId: string, config: ConnectionConfig): Promise<ObjectPropertyInfo[]> {
+    const options = toJS(config);
+    /* 
+      We should not pass properties here. If we do, the values in ObjectPropertyInfo will be taken from the properties in the config.
+      By deleting them, we always get the values that are actually saved on the server.
+     */
+    delete options.properties;
+
     const { properties } = await this.graphQLService.sdk.getConnectionDriverProperties({
       projectId,
-      config,
+      config: options,
     });
 
     return properties;
