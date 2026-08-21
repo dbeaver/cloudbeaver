@@ -621,6 +621,7 @@ public class LocalResourceController extends BaseLocalResourceController {
                     case NAME -> updatedNameDataSourceIds.add(dsId);
                     case NAVIGATION -> updatedNavigationDataSourceIds.add(dsId);
                     case INTERNAL -> updatedInternalConfigurationDataSourceIds.add(dsId);
+                    default -> throw new IllegalStateException("Unsupported data source property: " + property);
                 }
             }
         }
@@ -722,7 +723,7 @@ public class LocalResourceController extends BaseLocalResourceController {
     }
 
     @Nullable
-    private static WSDataSourceProperty getChangedDataSourceProperty(
+    public static WSDataSourceProperty getChangedDataSourceProperty(
         @NotNull DataSourceDescriptor oldDataSource,
         @NotNull DataSourceDescriptor newDataSource
     ) {

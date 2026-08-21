@@ -24,7 +24,7 @@ import org.mockito.Mockito;
 
 public class LocalResourceControllerTest {
     @Test
-    public void testFolderChangeIsNavigationChange() throws Exception {
+    public void testFolderChangeIsNavigationChange() {
         DataSourceDescriptor oldDataSource = Mockito.mock(DataSourceDescriptor.class);
         DataSourceDescriptor newDataSource = Mockito.mock(DataSourceDescriptor.class);
         Mockito.when(oldDataSource.equalConfiguration(newDataSource)).thenReturn(true);
@@ -33,12 +33,12 @@ public class LocalResourceControllerTest {
 
         Assertions.assertEquals(
             WSDataSourceProperty.NAVIGATION,
-            getChangedDataSourceProperty(oldDataSource, newDataSource)
+            LocalResourceController.getChangedDataSourceProperty(oldDataSource, newDataSource)
         );
     }
 
     @Test
-    public void testConfigurationChangeTakesPrecedenceOverNavigationChange() throws Exception {
+    public void testConfigurationChangeTakesPrecedenceOverNavigationChange() {
         DataSourceDescriptor oldDataSource = Mockito.mock(DataSourceDescriptor.class);
         DataSourceDescriptor newDataSource = Mockito.mock(DataSourceDescriptor.class);
         Mockito.when(oldDataSource.equalConfiguration(newDataSource)).thenReturn(false);
@@ -46,20 +46,7 @@ public class LocalResourceControllerTest {
 
         Assertions.assertEquals(
             WSDataSourceProperty.CONFIGURATION,
-            getChangedDataSourceProperty(oldDataSource, newDataSource)
+            LocalResourceController.getChangedDataSourceProperty(oldDataSource, newDataSource)
         );
-    }
-
-    private static WSDataSourceProperty getChangedDataSourceProperty(
-        DataSourceDescriptor oldDataSource,
-        DataSourceDescriptor newDataSource
-    ) throws Exception {
-        var method = LocalResourceController.class.getDeclaredMethod(
-            "getChangedDataSourceProperty",
-            DataSourceDescriptor.class,
-            DataSourceDescriptor.class
-        );
-        method.setAccessible(true);
-        return (WSDataSourceProperty) method.invoke(null, oldDataSource, newDataSource);
     }
 }
