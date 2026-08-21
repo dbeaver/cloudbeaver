@@ -65,6 +65,8 @@ export const SSL: TabContainerPanelComponent<Props> = observer(function SSL({ fo
   const projectInfoResource = useService(ProjectInfoResource);
   const isSharedProject = projectInfoResource.isProjectShared(formState.state.projectId);
 
+  const canSave = handler.properties.length > 0 && credentialsSavingEnabled;
+
   useAutoLoad(SSL, optionsPart, enabled);
 
   return (
@@ -103,7 +105,7 @@ export const SSL: TabContainerPanelComponent<Props> = observer(function SSL({ fo
               />
             </React.Fragment>
           ))}
-          {credentialsSavingEnabled && !optionsPart.state.sharedCredentials && (
+          {canSave && !optionsPart.state.sharedCredentials && (
             <FieldCheckbox
               id={handler.id + '_savePassword'}
               name="savePassword"
