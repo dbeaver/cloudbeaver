@@ -22,7 +22,10 @@ import {
 import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
+import { CachedMapAllKey } from '@cloudbeaver/core-resource';
+import type { NetworkHandlerDescriptor } from '@cloudbeaver/core-sdk';
 import { AuthenticationService } from '@cloudbeaver/plugin-authentication';
+import { NetworkHandlerResource } from '@cloudbeaver/plugin-network-handlers';
 
 const DatabaseAuthDialog = importLazyComponent(() => import('./DatabaseAuthDialog/DatabaseAuthDialog.js').then(m => m.DatabaseAuthDialog));
 
@@ -36,6 +39,7 @@ const DatabaseAuthDialog = importLazyComponent(() => import('./DatabaseAuthDialo
   UserInfoResource,
   ConnectionsManagerService,
   AuthenticationService,
+  NetworkHandlerResource,
 ])
 export class ConnectionAuthService {
   constructor(
@@ -48,6 +52,7 @@ export class ConnectionAuthService {
     userInfoResource: UserInfoResource,
     private readonly connectionsManagerService: ConnectionsManagerService,
     private readonly authenticationService: AuthenticationService,
+    private readonly networkHandlerResource: NetworkHandlerResource,
   ) {
     connectionsManagerService.connectionExecutor.addHandler(this.connectionDialog.bind(this));
     this.authenticationService.onLogin.before(
@@ -85,6 +90,7 @@ export class ConnectionAuthService {
     }
 
     let connectionNetworkHandlers: ConnectionInfoNetworkHandlers | null = null;
+    let handlers: NetworkHandlerDescriptor[] = [];
     let connection = await this.connectionInfoResource.load(key);
     const isConnectedInitially = connection?.connected;
 
@@ -106,14 +112,23 @@ export class ConnectionAuthService {
       }
     }
 
-    [connectionNetworkHandlers, connection] = await Promise.all([
+    [connectionNetworkHandlers, connection, handlers] = await Promise.all([
       this.connectionInfoNetworkHandlersResource.load(key),
       this.connectionInfoResource.load(key),
+      this.networkHandlerResource.load(CachedMapAllKey),
     ]);
 
     const externalHandlers = new Set(await this.connectionInfoExternalNetworkHandlersService.getProvidedHandlers(key));
     const networkHandlers = connectionNetworkHandlers
-      .networkHandlersConfig!.filter(handler => !externalHandlers.has(handler.id) && handler.enabled && (!handler.savePassword || resetCredentials))
+      .networkHandlersConfig!.filter(handler => {
+        const target = handlers.find(h => h.id === handler.id);
+
+        if (target && target.properties.length === 0) {
+          return false;
+        }
+
+        return !externalHandlers.has(handler.id) && handler.enabled && (!handler.savePassword || resetCredentials);
+      })
       .map(handler => handler.id);
 
     if (connectionAuthProperties.authNeeded || (connectionAuthProperties.credentialsSaved && resetCredentials) || networkHandlers.length > 0) {

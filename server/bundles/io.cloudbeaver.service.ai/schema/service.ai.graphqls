@@ -39,6 +39,17 @@ type AIEngineInfo @since(version: "23.2.2") {
     icon: String
 }
 
+type AIModelInfo @since(version: "26.2.0") {
+    "Unique model identifier used by the AI provider."
+    id: ID!
+    "Maximum model context window size, if reported by the provider."
+    contextWindowSize: Int
+    "Default model temperature."
+    defaultTemperature: Float!
+    "Capabilities reported for the model."
+    features: [String!]!
+}
+
 type AIChatConversationInfo @since(version: "25.1.1") {
     dataSourceId: DataSourceId
     id: ID!
@@ -222,6 +233,8 @@ extend type Query @since(version: "23.2.2") {
     aiSettings: AISettingsInfo!
     "Returns the properties of the specified AI engine for displaying it in the UI. In case settings are passed, fills it with defaults and returns back."
     aiListEngineProperties(engineId: ID!, profileId: ID, settings : AIEngineConfig): [ObjectPropertyInfo!]!
+    "Returns models available for the specified AI engine configuration."
+    aiListEngineModels(engineId: ID!, profileId: ID, settings: AIEngineConfig): [AIModelInfo!]! @since(version: "26.2.0")
 
     "Return the list of available AI functions."
     aiListFunctions: [AIFunction!] @since(version: "26.0.4")
