@@ -14,6 +14,7 @@ import {
   NavNodeInfoResource,
   NavNodeManagerService,
   NavTreeResource,
+  NODE_DATASOURCES_SEGMENT,
   NodeManagerUtils,
 } from '@cloudbeaver/core-navigation-tree';
 import { getProjectNodeId } from '@cloudbeaver/core-projects';
@@ -27,12 +28,13 @@ import {
   ConnectionInfoActiveProjectKey,
   type IConnectionInfoParams,
   getConnectionParentId,
-  getConnectionFolderParentId,
   createConnectionParam,
   ConnectionFolderEventHandler,
   type IConnectionFolderEvent,
 } from '@cloudbeaver/core-connections';
 import { NavigationTreeService } from '@cloudbeaver/plugin-navigation-tree';
+import { isDefined } from '@dbeaver/js-helpers';
+import { getPathParts } from '@cloudbeaver/core-utils';
 
 @injectable(() => [
   ConnectionInfoResource,
@@ -76,9 +78,7 @@ export class ConnectionNavNodeService {
     this.connectionFolderEventHandler.onEvent<IConnectionFolderEvent>(
       ServerEventId.CbDatasourceFolderCreated,
       data => {
-        const parents = data.nodePaths.map(nodeId =>
-          getConnectionFolderParentId(data.projectId, nodeId, this.navNodeInfoResource.get(nodeId)?.parentId),
-        );
+        const parents = data.nodePaths.map(nodeId => this.resolveParent(nodeId)).filter(isDefined);
 
         this.navTreeResource.markOutdated(resourceKeyList(parents));
       },
@@ -88,9 +88,7 @@ export class ConnectionNavNodeService {
     this.connectionFolderEventHandler.onEvent<IConnectionFolderEvent>(
       ServerEventId.CbDatasourceFolderDeleted,
       data => {
-        const parents = data.nodePaths.map(nodeId =>
-          getConnectionFolderParentId(data.projectId, nodeId, this.navNodeInfoResource.get(nodeId)?.parentId),
-        );
+        const parents = data.nodePaths.map(nodeId => this.resolveParent(nodeId)).filter(isDefined);
 
         this.navTreeResource.deleteInNode(
           resourceKeyList(parents),
@@ -312,5 +310,22 @@ export class ConnectionNavNodeService {
       .map(([key]) => key);
 
     this.containerResource.markOutdated(resourceKeyList(outdateKeys));
+  }
+
+  private resolveParent(nodeId: string): string | undefined {
+    const parents = this.navNodeInfoResource.getParents(nodeId);
+    const parent = parents[parents.length - 1];
+
+    if (parent === undefined) {
+      return undefined;
+    }
+
+    const path = getPathParts(NodeManagerUtils.getPlainPath(parent));
+
+    if (path[path.length - 1] === NODE_DATASOURCES_SEGMENT) {
+      return parents[parents.length - 2];
+    }
+
+    return parent;
   }
 }
