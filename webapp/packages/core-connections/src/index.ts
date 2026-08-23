@@ -45,6 +45,7 @@ export * from './ConnectionInfoCustomOptionsResource.js';
 export * from './ConnectionInfoPropertiesResource.js';
 export * from './ConnectionInfoProviderPropertiesResource.js';
 export * from './ConnectionInfoNetworkHandlersResource.js';
+export * from './ConnectionInfoExternalNetworkHandlersService.js';
 export * from './CONNECTIONS_SETTINGS_GROUP.js';
 export * from './EConnectionFeature.js';
 export * from './ConnectionsSettingsService.js';
