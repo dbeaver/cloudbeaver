@@ -502,6 +502,25 @@ public class WebSession extends BaseWebSession
             navigatorModelLock.readLock().unlock();
         }
     }
+
+    /**
+     * Initializes the project's lazy database branch while preventing the navigator model from being replaced.
+     */
+    public void initializeProjectNavigator(@NotNull WebSessionProjectImpl project) {
+        navigatorModelLock.readLock().lock();
+        try {
+            if (navigatorModel == null) {
+                return;
+            }
+            var projectNode = navigatorModel.getRoot().getProjectNode(project);
+            if (projectNode != null) {
+                projectNode.getDatabases();
+            }
+        } finally {
+            navigatorModelLock.readLock().unlock();
+        }
+    }
+
     /**
      * Returns and clears progress messages
      */
