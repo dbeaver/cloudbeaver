@@ -135,8 +135,11 @@ public class WebSessionProjectImpl extends WebProjectImpl implements DBPAdaptabl
         if (registryIsLoaded) {
             return;
         }
-        getDataSourceRegistry().getDataSources().forEach(this::addConnection);
-        Throwable lastError = getDataSourceRegistry().getLastError();
+        DBPDataSourceRegistry dataSourceRegistry = getDataSourceRegistry();
+        // Connection node paths are resolved through the navigator model, so materialize its lazy database branch first.
+        webSession.initializeProjectNavigator(this);
+        dataSourceRegistry.getDataSources().forEach(this::addConnection);
+        Throwable lastError = dataSourceRegistry.getLastError();
         if (lastError != null) {
             webSession.addSessionError(lastError);
             log.error("Error refreshing connections from project '" + getId() + "'", lastError);

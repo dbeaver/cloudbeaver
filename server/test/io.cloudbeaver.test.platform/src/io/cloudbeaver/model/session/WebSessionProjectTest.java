@@ -114,7 +114,9 @@ public class WebSessionProjectTest extends CloudbeaverMockTest {
 
         List<?> connections = project.getConnections();
 
-        Mockito.verify(registry, Mockito.times(1)).getDataSources();
+        var initializationOrder = Mockito.inOrder(webSession, registry);
+        initializationOrder.verify(webSession).initializeProjectNavigator(project);
+        initializationOrder.verify(registry).getDataSources();
         Assertions.assertNotNull(connections);
         Assertions.assertEquals(1, connections.size());
         Assertions.assertEquals("ds1", project.getConnections().getFirst().getDataSourceContainer().getId());

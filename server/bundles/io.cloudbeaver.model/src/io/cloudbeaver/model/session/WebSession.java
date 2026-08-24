@@ -262,10 +262,52 @@ public class WebSession extends BaseWebSession
 
     @Override
     public void refreshUserData() {
-        super.refreshUserData();
-        refreshSessionAuth();
+        refreshUserPermissions();
 
         initNavigatorModel();
+    }
+
+    @Override
+    public void refreshUserPermissions() {
+        super.refreshUserData();
+        refreshSessionAuth();
+        if (getUserId() == null && globalProject != null) {
+            // refreshSessionAuth() updates accessible connections for named users only,
+            // for anonymous sessions this was done by initNavigatorModel()
+            globalProject.refreshAccessibleConnectionIds();
+        }
+        syncSessionProjects();
+    }
+
+    /**
+     * Adds/removes only those session projects whose accessibility actually changed.
+     * <p>
+     * Unlike {@link #initNavigatorModel()} this keeps existing projects, and therefore
+     * their live connections and SQL contexts, intact.
+     */
+    private void syncSessionProjects() {
+        if (getNavigatorModel() == null) {
+            // model was never initialized for this session - nothing to sync
+            return;
+        }
+        try {
+            Map<String, RMProject> actualProjects = new LinkedHashMap<>();
+            for (RMProject rmProject : getRmController().listAccessibleProjects()) {
+                actualProjects.put(rmProject.getId(), rmProject);
+            }
+            for (WebSessionProjectImpl project : new ArrayList<>(getWorkspace().getProjects())) {
+                if (actualProjects.remove(project.getId()) == null && !project.isInMemory()) {
+                    // in-memory (anonymous) projects are never listed by RM
+                    deleteSessionProject(project);
+                }
+            }
+            for (RMProject rmProject : actualProjects.values()) {
+                createWebProject(rmProject);
+            }
+        } catch (DBException e) {
+            addSessionError(e);
+            log.error("Error synchronizing accessible projects", e);
+        }
     }
 
     // Note: for admin use only
@@ -460,6 +502,25 @@ public class WebSession extends BaseWebSession
             navigatorModelLock.readLock().unlock();
         }
     }
+
+    /**
+     * Initializes the project's lazy database branch while preventing the navigator model from being replaced.
+     */
+    public void initializeProjectNavigator(@NotNull WebSessionProjectImpl project) {
+        navigatorModelLock.readLock().lock();
+        try {
+            if (navigatorModel == null) {
+                return;
+            }
+            var projectNode = navigatorModel.getRoot().getProjectNode(project);
+            if (projectNode != null) {
+                projectNode.getDatabases();
+            }
+        } finally {
+            navigatorModelLock.readLock().unlock();
+        }
+    }
+
     /**
      * Returns and clears progress messages
      */
