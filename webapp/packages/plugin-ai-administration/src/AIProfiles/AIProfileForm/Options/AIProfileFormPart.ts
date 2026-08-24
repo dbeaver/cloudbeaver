@@ -7,11 +7,11 @@
  */
 import { runInAction } from 'mobx';
 
-import { SAVED_VALUE_INDICATOR } from '@cloudbeaver/core-blocks';
 import { FormMode, FormPart, type IFormState } from '@cloudbeaver/core-ui';
+import type { AiEngineConfig } from '@cloudbeaver/core-sdk';
 import { getUniqueName } from '@cloudbeaver/core-utils';
 
-import { AIEnginePropertiesResource, MODEL_PROPERTY_ID } from '../../AIEnginePropertiesResource.js';
+import { AIEnginePropertiesResource } from '../../AIEnginePropertiesResource.js';
 import { type AIAdminProfile, type AIProfileInput, AIProfilesResource } from '../../AIProfilesResource.js';
 import { getObjectPropertiesValues } from '../../utils/getObjectPropertiesValues.js';
 import { prepareProperties } from '../../utils/prepareProperties.js';
@@ -31,10 +31,6 @@ export class AIProfileFormPart extends FormPart<IAIProfileOptionsState, IAIProfi
     private readonly aiEnginePropertiesResource: AIEnginePropertiesResource,
   ) {
     super(formState, getDefaultState());
-  }
-
-  get isActiveModelChanged(): boolean {
-    return this.state.properties[MODEL_PROPERTY_ID] !== this.initialState.properties[MODEL_PROPERTY_ID];
   }
 
   override isOutdated(): boolean {
@@ -83,41 +79,6 @@ export class AIProfileFormPart extends FormPart<IAIProfileOptionsState, IAIProfi
     runInAction(() => {
       this.state.engineId = engineId;
       this.state.properties = getObjectPropertiesValues(propertiesInfo ?? []);
-    });
-  }
-
-  async loadEngineProperties(): Promise<void> {
-    if (!this.state.engineId) {
-      return;
-    }
-
-    const profileId = this.formState.mode === FormMode.Edit ? this.formState.state.profileId : undefined;
-    const currentProperties = this.state.properties;
-
-    const propertiesInfo = await this.aiEnginePropertiesResource.loadProperties(this.state.engineId, profileId, {
-      properties: prepareProperties({
-        engineProperties: this.state.properties,
-        initialEngineProperties: this.initialState.properties,
-        infoProperties: this.aiEnginePropertiesResource.get(this.state.engineId) ?? [],
-      }),
-    });
-
-    runInAction(() => {
-      const properties = getObjectPropertiesValues(propertiesInfo);
-
-      for (const property of propertiesInfo) {
-        if (!property.id || !property.features.includes('password')) {
-          continue;
-        }
-
-        const current = currentProperties[property.id];
-
-        if (properties[property.id] === SAVED_VALUE_INDICATOR && current && current !== SAVED_VALUE_INDICATOR) {
-          properties[property.id] = current;
-        }
-      }
-
-      this.state.properties = properties;
     });
   }
 
@@ -195,5 +156,15 @@ export class AIProfileFormPart extends FormPart<IAIProfileOptionsState, IAIProfi
       engineId: profile.engineId,
       properties: getObjectPropertiesValues(propertiesInfo),
     });
+  }
+
+  getCurrentEngineSettings(): AiEngineConfig {
+    return {
+      properties: prepareProperties({
+        engineProperties: this.state.properties,
+        initialEngineProperties: this.initialState.properties,
+        infoProperties: this.aiEnginePropertiesResource.get(this.state.engineId) ?? [],
+      }),
+    };
   }
 }

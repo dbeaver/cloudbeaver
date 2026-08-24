@@ -62,6 +62,14 @@ public class WebServiceBindingAI extends WebServiceBindingBase<DBWServiceAI> imp
                     getArgument(env, "profileId"),
                     env.getArgument("settings")
                 )
+            ).dataFetcher(
+                "aiListEngineModels",
+                env -> getService(env).getEngineModels(
+                    getWebSession(env),
+                    getArgumentVal(env, "engineId"),
+                    getArgument(env, "profileId"),
+                    env.getArgument("settings")
+                )
             ).dataFetcher("aiListFunctions", env -> getService(env).getFunctions(getWebSession(env))
             ).dataFetcher("aiListProfiles", env -> getService(env).getProfiles(getWebSession(env))
             ).dataFetcher(
