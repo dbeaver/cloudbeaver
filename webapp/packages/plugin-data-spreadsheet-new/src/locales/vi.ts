@@ -60,10 +60,11 @@ export default [
   ['data_grid_table_generate_sql_select_many_tooltip', 'Tạo câu lệnh SELECT với điều kiện WHERE IN'],
   ['data_grid_table_generate_sql_create', 'DDL'],
   ['data_grid_table_generate_sql_create_tooltip', 'Tạo câu lệnh DDL cho thực thể'],
-  ['data_grid_table_generate_sql_error_title', 'Lỗi Tạo SQL'],
+  ['data_grid_table_generate_sql_error_title', 'Không thể tạo SQL'],
   ['data_grid_table_generate_sql_error_no_query', 'Không có truy vấn nào cho kết quả hiện tại'],
   ['data_grid_table_generate_sql_error_no_connection', 'Ngữ cảnh thực thi không xác định'],
   ['data_grid_table_generate_sql_error_no_rows', 'Không có hàng nào được chọn'],
   ['data_grid_table_generate_sql_error_no_result', 'Không có tập kết quả'],
   ['data_grid_table_generate_sql_error_no_context', 'Không có ngữ cảnh thực thi'],
+  ['data_grid_table_generate_sql_ddl_no_support', 'Vùng chứa không hỗ trợ cấu trúc DDL tiêu chuẩn'],
 ];
