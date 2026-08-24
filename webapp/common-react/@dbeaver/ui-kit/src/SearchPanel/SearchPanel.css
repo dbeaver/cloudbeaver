@@ -47,7 +47,6 @@
   }
 
   .search-panel__inputs {
-    background-color: var(--dbv-kit-input-background);
     display: flex;
     flex-direction: column;
     flex: 1 1 420px;
@@ -61,8 +60,8 @@
   }
 
   .search-panel .dbv-kit-icon-button {
-    --dbv-kit-icon-btn-primary-background-hover: color-mix(in srgb, transparent, var(--theme-primary) 10%) !important;
-    --dbv-kit-icon-btn-secondary-background-hover: color-mix(in srgb, transparent, var(--theme-primary) 10%) !important;
+    --dbv-kit-icon-btn-primary-background-hover: color-mix(in srgb, var(--theme-secondary), var(--theme-on-secondary) 7%) !important;
+    --dbv-kit-icon-btn-secondary-background-hover: color-mix(in srgb, var(--theme-secondary), var(--theme-on-secondary) 7%) !important;
   }
 
   .search-panel__buttons {
