@@ -23,6 +23,7 @@ import { ConnectionInfoPropertiesResource } from './ConnectionInfoPropertiesReso
 import { ConnectionInfoOriginResource } from './ConnectionInfoOriginResource.js';
 import { ConnectionInfoOriginDetailsResource } from './ConnectionInfoOriginDetailsResource.js';
 import { ConnectionInfoNetworkHandlersResource } from './ConnectionInfoNetworkHandlersResource.js';
+import { ConnectionInfoExternalNetworkHandlersService } from './ConnectionInfoExternalNetworkHandlersService.js';
 import { ConnectionInfoAuthPropertiesResource } from './ConnectionInfoAuthPropertiesResource.js';
 import { ConnectionInfoEventHandler } from './ConnectionInfoEventHandler.js';
 import { ConnectionInfoCustomOptionsResource } from './ConnectionInfoCustomOptionsResource.js';
@@ -77,6 +78,7 @@ export default ModuleRegistry.add({
       .addSingleton(ConnectionInfoOriginResource)
       .addSingleton(ConnectionInfoOriginDetailsResource)
       .addSingleton(ConnectionInfoNetworkHandlersResource)
+      .addSingleton(ConnectionInfoExternalNetworkHandlersService)
       .addSingleton(ConnectionInfoAuthPropertiesResource)
       .addSingleton(ConnectionInfoEventHandler)
       .addSingleton(ConnectionInfoCustomOptionsResource)

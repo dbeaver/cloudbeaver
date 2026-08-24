@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -10,6 +10,7 @@ import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import {
   type Connection,
   ConnectionInfoAuthPropertiesResource,
+  ConnectionInfoExternalNetworkHandlersService,
   type ConnectionInfoNetworkHandlers,
   ConnectionInfoNetworkHandlersResource,
   ConnectionInfoResource,
@@ -32,6 +33,7 @@ const DatabaseAuthDialog = importLazyComponent(() => import('./DatabaseAuthDialo
   ConnectionInfoResource,
   ConnectionInfoNetworkHandlersResource,
   ConnectionInfoAuthPropertiesResource,
+  ConnectionInfoExternalNetworkHandlersService,
   CommonDialogService,
   AuthProviderService,
   UserInfoResource,
@@ -44,6 +46,7 @@ export class ConnectionAuthService {
     private readonly connectionInfoResource: ConnectionInfoResource,
     private readonly connectionInfoNetworkHandlersResource: ConnectionInfoNetworkHandlersResource,
     private readonly connectionInfoAuthPropertiesResource: ConnectionInfoAuthPropertiesResource,
+    private readonly connectionInfoExternalNetworkHandlersService: ConnectionInfoExternalNetworkHandlersService,
     private readonly commonDialogService: CommonDialogService,
     private readonly authProviderService: AuthProviderService,
     userInfoResource: UserInfoResource,
@@ -115,6 +118,7 @@ export class ConnectionAuthService {
       this.networkHandlerResource.load(CachedMapAllKey),
     ]);
 
+    const externalHandlers = new Set(await this.connectionInfoExternalNetworkHandlersService.getProvidedHandlers(key));
     const networkHandlers = connectionNetworkHandlers
       .networkHandlersConfig!.filter(handler => {
         const target = handlers.find(h => h.id === handler.id);
@@ -123,7 +127,7 @@ export class ConnectionAuthService {
           return false;
         }
 
-        return handler.enabled && (!handler.savePassword || resetCredentials);
+        return !externalHandlers.has(handler.id) && handler.enabled && (!handler.savePassword || resetCredentials);
       })
       .map(handler => handler.id);
 
