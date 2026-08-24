@@ -59,6 +59,7 @@ class BaseProjectSettingsTest {
                 @NotNull String objectId,
                 @NotNull Map<String, String> settings
             ) {
+                throw new UnsupportedOperationException();
             }
         };
     }
