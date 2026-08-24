@@ -10,7 +10,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 import type { ICellChange } from './DataGridCellContext.js';
 import type { IGridReactiveValue } from './IGridReactiveValue.js';
-import type { GridSearchPanelRef } from './search/GridSearchPanel.js';
+import type { IGridSearchPanelRef } from './search/GridSearchPanel.js';
 import type { IGridSearchStorage } from './search/useGridSearch.js';
 
 interface UseDataGridSearchOptions {
@@ -23,21 +23,21 @@ interface UseDataGridSearchOptions {
 export function useDataGridSearch({ containerRef, searchStorage, getCellEditable, onCellChangeBatch }: UseDataGridSearchOptions): {
   searchOpen: boolean;
   searchCellClassName: IGridReactiveValue<string | undefined, [number, number]> | undefined;
-  searchPanelRef: React.RefObject<GridSearchPanelRef | null>;
-  setSearchPanelRef: (instance: GridSearchPanelRef | null) => void;
+  searchPanelRef: React.RefObject<IGridSearchPanelRef | null>;
+  setSearchPanelRef: (instance: IGridSearchPanelRef | null) => void;
   isReplacingRef: React.RefObject<boolean>;
   handleSearchOpen: () => void;
   handleSearchClose: () => void;
   onReplace: (updates: { rowIdx: number; colIdx: number; value: string }[]) => void;
   handleReplacingChange: (value: boolean) => void;
 } {
-  const searchPanelRef = useRef<GridSearchPanelRef | null>(null);
+  const searchPanelRef = useRef<IGridSearchPanelRef | null>(null);
   const isReplacingRef = useRef<boolean>(false);
 
   const [searchOpen, setSearchOpen] = useState(() => searchStorage?.get()?.open ?? false);
   const [searchCellClassName, setSearchCellClassName] = useState<IGridReactiveValue<string | undefined, [number, number]>>();
 
-  const setSearchPanelRef = useCallback((instance: GridSearchPanelRef | null) => {
+  const setSearchPanelRef = useCallback((instance: IGridSearchPanelRef | null) => {
     searchPanelRef.current = instance;
     setSearchCellClassName(instance?.getCellClassName);
   }, []);
