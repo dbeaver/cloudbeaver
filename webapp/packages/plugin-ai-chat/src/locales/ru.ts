@@ -1,7 +1,7 @@
 export default [
   ['plugin_ai_chat_label', 'AI Чат'],
   ['plugin_ai_chat_tooltip', 'Включить AI помощника базы данных'],
-  ['plugin_ai_chat_no_messages_placeholder', 'Чем я могу помочь?'],
+  ['plugin_ai_chat_no_messages_placeholder', 'Получайте полезную информацию из данных. Попросите AI создать запрос к вашей базе данных.'],
   ['plugin_ai_chat_genegate_message_placeholder', 'Думаю...'],
   ['plugin_ai_chat_submit_message_placeholder', 'Нажмите {arg:symbol}↵ чтобы отправить сообщение, нажмите Enter чтобы добавить новую строку'],
   ['plugin_ai_chat_current_conversation_hint', 'Текущая'],
