@@ -64,6 +64,7 @@ import { ProviderPropertiesForm } from './ProviderPropertiesForm.js';
 import { getConnectionFormOptionsPart } from './getConnectionFormOptionsPart.js';
 import type { IConnectionFormProps } from '../IConnectionFormState.js';
 import { ConnectionFormService } from '../ConnectionFormService.js';
+import { ConnectionTypeForm } from './ConnectionTypeForm.js';
 
 const PROFILE_AUTH_MODEL_ID = 'profile';
 
@@ -112,7 +113,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
 
   const driverMap = useResource(Options, DBDriverResource, {
     key: optionsPart.state.driverId || null,
-    includes: ['includeProviderProperties', 'includeMainProperties', 'includeDriverProperties'] as const,
+    includes: ['includeProviderProperties', 'includeMainProperties'] as const,
   });
 
   const driver = driverMap.data;
@@ -309,6 +310,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
               )}
             </Group>
           )}
+          <ConnectionTypeForm config={optionsPart.state} />
           <Placeholder container={connectionFormService.connectionContainer} formState={formState} />
         </Container>
         <Container medium gap>

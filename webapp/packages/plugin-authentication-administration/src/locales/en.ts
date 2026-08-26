@@ -35,6 +35,7 @@ export default [
   ['authentication_administration_users_filters_status_enabled', 'ENABLED'],
   ['authentication_administration_users_filters_status_disabled', 'DISABLED'],
   ['authentication_administration_users_filters_status_all', 'ALL'],
+  ['authentication_administration_users_filters_filter_label', 'Filter'],
   ['authentication_administration_users_empty', 'There are no users'],
   ['authentication_administration_users_delete_user', 'Delete user'],
   ['authentication_administration_users_delete_user_fail', 'Failed to delete user'],
@@ -127,6 +128,7 @@ export default [
   ['administration_teams_team_granted_users_user_name', 'User name'],
   ['administration_teams_team_granted_users_empty', 'No available users'],
   ['administration_teams_team_granted_users_permission_denied', "You can't edit your own permissions"],
+  ['administration_teams_team_granted_users_only_admin_team', "You can't manage your own permissions because it is the only admin team you participate in"],
 
   ['administration_teams_team_granted_connections_tab_title', 'Connections'],
   ['administration_teams_team_granted_connections_search_placeholder', 'Search for connection name...'],
@@ -139,6 +141,7 @@ export default [
 
   ['plugin_authentication_administration_team_form_edit_label', 'Team editing form'],
   ['plugin_authentication_administration_user_form_edit_label', 'User editing form'],
+  ['plugin_authentication_administration_user_last_login', 'Last login'],
 
   [
     'plugin_authentication_administration_user_username_validation_error',

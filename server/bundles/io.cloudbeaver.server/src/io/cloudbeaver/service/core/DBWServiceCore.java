@@ -25,6 +25,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.model.connection.DBPConnectionType;
 import org.jkiss.dbeaver.model.rm.RMConstants;
 import org.jkiss.dbeaver.registry.DataSourceNavigatorSettings;
 import org.jkiss.dbeaver.registry.settings.ProductSettingDescriptor;
@@ -108,6 +109,15 @@ public interface DBWServiceCore extends DBWService {
 
     ///////////////////////////////////////////
     // Connections
+    @NotNull
+    WebPropertyInfo[] getDriverProperties(
+        @NotNull WebSession webSession,
+        @NotNull String projectId,
+        @NotNull Map<String, Object> connectionConfig
+    ) throws DBWebException;
+
+    @NotNull
+    List<DBPConnectionType> getConnectionTypes(@NotNull WebSession webSession, @Nullable String id);
 
     @WebAction
     WebConnectionInfo getConnectionState(WebSession webSession, @Nullable String projectId, String connectionId) throws DBWebException;
@@ -153,17 +163,17 @@ public interface DBWServiceCore extends DBWService {
         @NotNull Map<String, Object> connectionConfig
     ) throws DBWebException;
 
-    @WebAction
+    @WebProjectAction(requireProjectPermissions = {RMConstants.PERMISSION_PROJECT_DATASOURCES_EDIT})
     WebConnectionInfo testConnection(
         @NotNull WebSession webSession,
-        @Nullable String projectId,
+        @Nullable @WebObjectId String projectId,
         @NotNull Map<String, Object> connectionConfig
     ) throws DBWebException;
 
-    @WebAction
+    @WebProjectAction(requireProjectPermissions = {RMConstants.PERMISSION_PROJECT_DATASOURCES_EDIT})
     WebNetworkEndpointInfo testNetworkHandler(
         @NotNull WebSession webSession,
-        @Nullable String projectId,
+        @Nullable @WebObjectId String projectId,
         @Nullable String connectionId,
         @NotNull WebNetworkHandlerConfigInput nhConfig
     ) throws DBWebException;

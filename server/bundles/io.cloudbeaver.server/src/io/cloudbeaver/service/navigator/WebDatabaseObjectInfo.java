@@ -33,7 +33,6 @@ import org.jkiss.dbeaver.model.struct.rdb.DBSSchema;
 import org.jkiss.dbeaver.model.struct.rdb.DBSTable;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 
@@ -58,6 +57,7 @@ public class WebDatabaseObjectInfo {
     public static final String OBJECT_FEATURE_SCHEMA = "schema";
     public static final String OBJECT_FEATURE_SCRIPT = "script";
     public static final String OBJECT_FEATURE_SCRIPT_EXTENDED = "scriptExtended";
+    public static final String OBJECT_FEATURE_SUPPORTS_FULL_DDL = "supportsFullDdl";
 
     private final WebSession session;
     private final DBSObject object;
@@ -168,10 +168,21 @@ public class WebDatabaseObjectInfo {
         return features.toArray(new String[0]);
     }
 
-    private void getObjectFeatures(DBSObject object, List<String> features) {
+    private void getObjectFeatures(@NotNull DBSObject object, @NotNull List<String> features) {
+        if (object instanceof DBPScriptObject) {
+            features.add(OBJECT_FEATURE_SCRIPT);
+        }
+        if (object instanceof DBPScriptObjectExt) {
+            features.add(OBJECT_FEATURE_SCRIPT_EXTENDED);
+        }
+        if (object instanceof DBPScriptObjectExt2 scriptObjectExt2 && (
+            scriptObjectExt2.supportsObjectDefinitionOption(DBPScriptObject.OPTION_INCLUDE_NESTED_OBJECTS)
+                || scriptObjectExt2.supportsObjectDefinitionOption(DBPScriptObject.OPTION_INCLUDE_COMMENTS)
+                || scriptObjectExt2.supportsObjectDefinitionOption(DBPScriptObject.OPTION_INCLUDE_PERMISSIONS))
+        ) {
+            features.add(OBJECT_FEATURE_SUPPORTS_FULL_DDL);
+        }
         boolean isDiagramSupported = true;
-        if (object instanceof DBPScriptObject) features.add(OBJECT_FEATURE_SCRIPT);
-        if (object instanceof DBPScriptObjectExt) features.add(OBJECT_FEATURE_SCRIPT_EXTENDED);
         if (object instanceof DBSDataContainer) {
             features.add(OBJECT_FEATURE_DATA_CONTAINER);
             if (((DBSDataContainer) object).isFeatureSupported(DBSDataContainer.FEATURE_DATA_FILTER)) {
@@ -181,7 +192,9 @@ public class WebDatabaseObjectInfo {
                 isDiagramSupported = false;
             }
         }
-        if (object instanceof DBSDataManipulator) features.add(OBJECT_FEATURE_DATA_MANIPULATOR);
+        if (object instanceof DBSDataManipulator) {
+            features.add(OBJECT_FEATURE_DATA_MANIPULATOR);
+        }
         if (object instanceof DBSEntity) {
             features.add(OBJECT_FEATURE_ENTITY);
             if (object instanceof DBSDataType
@@ -192,8 +205,12 @@ public class WebDatabaseObjectInfo {
                 features.add(OBJECT_FEATURE_RELATIONAL_ENTITY);
             }
         }
-        if (object instanceof DBSSchema) features.add(OBJECT_FEATURE_SCHEMA);
-        if (object instanceof DBSCatalog) features.add(OBJECT_FEATURE_CATALOG);
+        if (object instanceof DBSSchema) {
+            features.add(OBJECT_FEATURE_SCHEMA);
+        }
+        if (object instanceof DBSCatalog) {
+            features.add(OBJECT_FEATURE_CATALOG);
+        }
         if (object instanceof DBSObjectContainer objectContainer) {
             features.add(OBJECT_FEATURE_OBJECT_CONTAINER);
             try {

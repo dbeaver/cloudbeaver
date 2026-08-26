@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,17 +26,20 @@ import io.cloudbeaver.utils.CBModelConstants;
 import io.cloudbeaver.utils.ServletAppUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
+import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPEvaluationContext;
+import org.jkiss.dbeaver.model.DBUtils;
 import org.jkiss.dbeaver.model.data.*;
 import org.jkiss.dbeaver.model.exec.DBCException;
+import org.jkiss.dbeaver.model.exec.DBCExecutionContext;
+import org.jkiss.dbeaver.model.exec.DBCExecutionPurpose;
 import org.jkiss.dbeaver.model.exec.DBCSession;
 import org.jkiss.dbeaver.model.gis.DBGeometry;
 import org.jkiss.dbeaver.model.gis.GisConstants;
 import org.jkiss.dbeaver.model.gis.GisTransformUtils;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
-import org.jkiss.dbeaver.model.struct.DBSAttributeBase;
-import org.jkiss.dbeaver.model.struct.DBSTypedObject;
+import org.jkiss.dbeaver.model.struct.*;
 import org.jkiss.dbeaver.model.websocket.event.WSEvent;
 import org.jkiss.dbeaver.utils.ContentUtils;
 import org.jkiss.dbeaver.utils.GeneralUtils;
@@ -50,6 +53,7 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.function.Function;
 
 /**
  * Web SQL utils.
@@ -116,8 +120,7 @@ public class WebSQLUtils {
             Map<String, Object> map = createMapOfType(WebSQLConstants.VALUE_TYPE_COLLECTION);
             map.put("value", items);
             return map;
-        } else if (value instanceof DBDComposite) {
-            DBDComposite composite = (DBDComposite)value;
+        } else if (value instanceof DBDComposite composite && composite.getAttributes().length > 0) {
             Map<String, Object> struct = new LinkedHashMap<>();
             for (DBSAttributeBase attr : composite.getAttributes()) {
                 struct.put(attr.getName(), makeWebCellValue(session, attr, composite.getAttributeValue(attr), dataFormat));
@@ -266,6 +269,49 @@ public class WebSQLUtils {
         return value;
     }
 
+
+    /**
+     * Need to convert string values in constraints to real values using value handlers
+     */
+    public static void convertConstraintValues(
+        @NotNull DBRProgressMonitor monitor,
+        @NotNull WebSQLResultsInfo resultInfo,
+        @NotNull List<DBDAttributeConstraint> constraints
+    ) {
+        DBCExecutionContext executionContext = DBUtils.getDefaultContext(resultInfo.getDataContainer(), false);
+        if (executionContext == null || !executionContext.isConnected()) {
+            return;
+        }
+        DBCSession session = null;
+        try {
+            for (DBDAttributeConstraint constraint : constraints) {
+                if (!(constraint.getValue() instanceof String strValue) ||
+                    !(constraint.getAttribute() instanceof DBDAttributeBinding binding)
+                ) {
+                    continue;
+                }
+                if (session == null) {
+                    session = executionContext.openSession(monitor, DBCExecutionPurpose.UTIL, "Convert filter values");
+                }
+                try {
+                    Object value = binding.getValueHandler().getValueFromObject(session, binding, strValue, false, false);
+                    if (value != null) {
+                        constraint.setValue(value);
+                    }
+                } catch (Exception e) {
+                    log.debug(
+                        "Can't convert filter value '" + strValue + "' for attribute '"
+                            + binding.getName() + "'", e
+                    );
+                }
+            }
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
+    }
+
     /**
      * Returns fully qualified name for a column.
      */
@@ -328,5 +374,110 @@ public class WebSQLUtils {
         } finally {
             webSession.removeAttribute(attributeName);
         }
+    }
+
+    @NotNull
+    public static List<WebSQLQueryResultAssociation> collectAssociations(
+        @NotNull WebSession session,
+        @NotNull DBDAttributeBinding[] bindings
+    ) {
+        return collectWebSQLQueryResultAssociation(session, bindings, false);
+    }
+
+    @NotNull
+    public static List<WebSQLQueryResultAssociation> collectReferences(
+        @NotNull WebSession session,
+        @NotNull DBDAttributeBinding[] bindings
+    ) {
+        return collectWebSQLQueryResultAssociation(session, bindings, true);
+    }
+
+    @NotNull
+    private static List<WebSQLQueryResultAssociation> collectWebSQLQueryResultAssociation(
+        @NotNull WebSession session,
+        @NotNull DBDAttributeBinding[] bindings,
+        boolean reverse
+    ) {
+        Map<DBSEntityAttribute, Integer> attrToIndex = new HashMap<>();
+        Set<DBSEntity> entities = new LinkedHashSet<>();
+        for (int i = 0; i < bindings.length; i++) {
+            DBSEntityAttribute ea = bindings[i].getEntityAttribute();
+            if (ea == null) {
+                continue;
+            }
+            attrToIndex.putIfAbsent(ea, i);
+            DBSEntity parent = ea.getParentObject();
+            entities.add(parent);
+        }
+
+        Function<DBSEntityAttribute, DBDAttributeBinding> attrToBinding = attr -> {
+            Integer idx = attrToIndex.get(attr);
+            return idx == null ? null : bindings[idx];
+        };
+
+        List<WebSQLQueryResultAssociation> result = new ArrayList<>();
+        DBRProgressMonitor monitor = session.getProgressMonitor();
+        for (DBSEntity entity : entities) {
+            try {
+                List<DBSEntityAssociation> source = reverse
+                    ? DBStructUtils.readReferences(monitor, entity, attrToBinding)
+                    : DBStructUtils.readAssociations(monitor, entity, attrToBinding);
+                for (DBSEntityAssociation association : source) {
+                    List<WebSQLReferenceColumnMapping> mapping = collectColumnMapping(monitor, association, reverse, attrToIndex);
+                    if (mapping != null) {
+                        result.add(new WebSQLQueryResultAssociation(session, association, reverse, mapping));
+                    }
+                }
+            } catch (DBException e) {
+                log.debug("Error collecting references for entity " + entity.getName(), e);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Pairs source-side attributes (in our result set) with target-side attributes
+     */
+    @Nullable
+    private static List<WebSQLReferenceColumnMapping> collectColumnMapping(
+        @NotNull DBRProgressMonitor monitor,
+        @NotNull DBSEntityAssociation association,
+        boolean reverse,
+        @NotNull Map<DBSEntityAttribute, Integer> attrToIndex
+    ) throws DBException {
+        if (!(association instanceof DBSEntityReferrer associationReferrer)) {
+            return null;
+        }
+        DBSEntityConstraint refConstraint = association.getReferencedConstraint();
+        if (!(refConstraint instanceof DBSEntityReferrer constraintReferrer)) {
+            return null;
+        }
+        DBSEntityReferrer sourceSide = reverse ? constraintReferrer : associationReferrer;
+        DBSEntityReferrer targetSide = reverse ? associationReferrer : constraintReferrer;
+
+        List<? extends DBSEntityAttributeRef> sourceAttrs = sourceSide.getAttributeReferences(monitor);
+        List<? extends DBSEntityAttributeRef> targetAttrs = targetSide.getAttributeReferences(monitor);
+        if (sourceAttrs == null || targetAttrs == null
+            || sourceAttrs.isEmpty() || sourceAttrs.size() != targetAttrs.size()
+        ) {
+            return null;
+        }
+        List<WebSQLReferenceColumnMapping> mapping = new ArrayList<>(sourceAttrs.size());
+        for (int i = 0; i < sourceAttrs.size(); i++) {
+            DBSEntityAttribute sourceAttr = sourceAttrs.get(i).getAttribute();
+            Integer sourceIdx = sourceAttr == null ? null : attrToIndex.get(sourceAttr);
+            if (sourceIdx == null) {
+                return null;
+            }
+            DBSEntityAttribute targetAttr = targetAttrs.get(i).getAttribute();
+            if (targetAttr == null) {
+                return null;
+            }
+            // getOrdinalPosition() is 1-based. Normalize to 0-based to match sourceColumnIndex
+            int targetIdx = targetAttr.getOrdinalPosition() - 1;
+            mapping.add(new WebSQLReferenceColumnMapping(
+                sourceIdx, sourceAttr.getName(), targetIdx, targetAttr.getName()));
+        }
+        return mapping;
     }
 }

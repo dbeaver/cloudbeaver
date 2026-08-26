@@ -1,30 +1,30 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 
-const CONNECTION_NODE_ID_PREFIX = 'database://';
+import { createPath, getPathParts } from '@cloudbeaver/core-utils';
+
+export const NODE_PATH_PREFIX = 'node://';
+export const NODE_DATASOURCES_SEGMENT = 'datasources';
 
 export const NodeManagerUtils = {
-  getConnectionId(nodeId: string) {
-    const indexOfConnectionPart = nodeId.indexOf('/', CONNECTION_NODE_ID_PREFIX.length);
-    const connectionId = nodeId.slice(CONNECTION_NODE_ID_PREFIX.length, indexOfConnectionPart > -1 ? indexOfConnectionPart : nodeId.length);
-
-    return connectionId;
-  },
-
-  connectionIdToConnectionNodeId(connectionId: string): string {
-    return `${CONNECTION_NODE_ID_PREFIX}${connectionId}`;
-  },
-
-  isDatabaseObject(nodeId: string): boolean {
-    return nodeId.startsWith(CONNECTION_NODE_ID_PREFIX);
+  connectionIdToConnectionNodeId(projectId: string, connectionId: string): string {
+    return `${NODE_PATH_PREFIX}${createPath(projectId, NODE_DATASOURCES_SEGMENT, connectionId)}`;
   },
 
   concatSchemaAndCatalog(catalogId?: string, schemaId?: string): string {
     return `${schemaId || ''}${schemaId && catalogId ? '@' : ''}${catalogId || ''}`;
+  },
+
+  isDatabaseObject(nodeId: string): boolean {
+    const segments = getPathParts(this.getPlainPath(nodeId));
+    return segments[1] === NODE_DATASOURCES_SEGMENT;
+  },
+  getPlainPath(nodeId: string): string {
+    return nodeId.startsWith(NODE_PATH_PREFIX) ? nodeId.slice(NODE_PATH_PREFIX.length) : nodeId;
   },
 };

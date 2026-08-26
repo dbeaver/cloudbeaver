@@ -32,14 +32,23 @@ export const TableIndexColumnHeader = observer(function TableIndexColumnHeader()
     dataGridContext.focus();
   }
 
+  function handleKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      handleClick();
+    }
+  }
+
   return (
     <>
       <TableStatusIndicator />
       <div
         role="button"
+        tabIndex={0}
         title={translate('data_grid_table_index_column_tooltip')}
         className={s(styles, { clickAreaOverlay: true })}
         onClick={handleClick}
+        onKeyDown={handleKeyDown}
       />
     </>
   );

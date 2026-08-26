@@ -12,6 +12,6 @@ export function normalizeColorToHex(color: string): string {
   return ColorConvert(color).hex();
 }
 
-export function normalizeColorToRgb(color: string): string {
-  return ColorConvert(color).rgb().string();
+export function normalizeColorToRgb(color: string): ReturnType<typeof ColorConvert.rgb> {
+  return ColorConvert(color).rgb();
 }

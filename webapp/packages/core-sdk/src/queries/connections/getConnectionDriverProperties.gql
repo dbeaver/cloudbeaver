@@ -1,0 +1,5 @@
+query getConnectionDriverProperties($projectId: ID!, $config: ConnectionConfig!) {
+  properties: listConnectionDriverProperties(projectId: $projectId, config: $config) {
+    ...ObjectPropertyInfo
+  }
+}

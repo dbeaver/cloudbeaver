@@ -2,9 +2,8 @@
 
 @layer base {
   .dbv-kit-menu__popover {
-    z-index: 1000;
     min-width: max-content;
-    max-height: var(--dbv-kit-menu-popover-max-height);
+    max-height: var(--popover-available-height, 30rem);
     max-width: var(--dbv-kit-menu-popover-max-width);
     overflow-y: auto;
     overflow-x: hidden;
@@ -18,6 +17,7 @@
     outline: 0;
     padding-block: var(--dbv-kit-menu-popover-padding-block);
     padding-inline: var(--dbv-kit-menu-popover-padding-inline);
+    z-index: 1000;
 
     @media (prefers-reduced-motion: no-preference) {
       opacity: 0;
@@ -30,6 +30,10 @@
       &[data-enter] {
         opacity: 1;
         scale: 1;
+      }
+
+      &[data-leave] {
+        transition-duration: 0ms;
       }
     }
   }

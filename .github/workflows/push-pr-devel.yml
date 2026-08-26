@@ -6,6 +6,7 @@ on:
       - opened
       - synchronize
       - reopened
+      - ready_for_review
   push:
     branches: [devel]
 
@@ -24,11 +25,6 @@ jobs:
       project-deps: ./cloudbeaver/project.deps
       timeout-minutes: 5
 
-  # build-server:
-  #   name: Server
-  #   uses: ./.github/workflows/backend-build.yml
-  #   secrets: inherit
-
   build-frontend:
     name: Frontend
     uses: ./.github/workflows/frontend-build.yml
@@ -38,6 +34,9 @@ jobs:
     name: Server
     uses: dbeaver/dbeaver-common/.github/workflows/java-checkstyle.yml@devel
     secrets: inherit
+    permissions:
+      contents: read
+      pull-requests: read
 
   lint-frontend:
     name: Frontend

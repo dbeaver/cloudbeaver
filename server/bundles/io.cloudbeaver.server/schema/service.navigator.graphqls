@@ -1,4 +1,6 @@
+####################################################
 # Nodes, objects and properties
+####################################################
 
 type ObjectDescriptor {
     id: Int
@@ -55,8 +57,6 @@ type DatabaseObjectInfo {
 }
 
 type NavigatorNodeInfo {
-    "Node ID - generally a full path to the node from root of tree"
-    id: ID!
     "Node URI - a unique path to a node including all parent nodes"
     uri: ID! @since(version: "23.3.1")
     "Node human readable name"
@@ -145,7 +145,7 @@ extend type Query {
     "Refreshes node based on the node path"
     navRefreshNode( nodePath: ID! ): Boolean @deprecated # Use navReloadNode method from Mutation (24.2.4)
 
-    # contextId currently not using
+    "contextId currently not using"
     navGetStructContainers( projectId: ID, connectionId: ID!, contextId: ID, catalog: ID ): DatabaseStructContainers!
 
 }

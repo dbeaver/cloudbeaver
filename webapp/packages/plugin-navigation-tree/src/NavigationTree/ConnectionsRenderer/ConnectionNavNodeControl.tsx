@@ -26,6 +26,7 @@ import {
 import { useService } from '@cloudbeaver/core-di';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { EObjectFeature, NavNodeInfoResource, NavTreeResource } from '@cloudbeaver/core-navigation-tree';
+import { createConnectionParam, useConnectionTypeColor } from '@cloudbeaver/core-connections';
 
 import type { NavTreeControlComponent, NavTreeControlProps } from '../ElementsTree/NavigationNodeComponent.js';
 import style from '../ElementsTree/NavigationTreeNode/NavigationNode/NavigationNodeControl.module.css';
@@ -44,7 +45,7 @@ export const ConnectionNavNodeControl: NavTreeControlComponent = observer<NavTre
     const hoverHook = useHover();
     const mergedRef = useMergeRefs(hoverHook.ref, ref);
 
-    const error = getComputed(() => !!navNodeInfoResource.getException(node.id) || !!navTreeResource.getException(node.id));
+    const error = getComputed(() => !!navNodeInfoResource.getException(node.uri) || !!navTreeResource.getException(node.uri));
     const connected = getComputed(() => node.objectFeatures.includes(EObjectFeature.dataSourceConnected));
 
     let icon = nodeInfo.icon;
@@ -74,14 +75,18 @@ export const ConnectionNavNodeControl: NavTreeControlComponent = observer<NavTre
       tooltip += `\n${translate('ui_type')}: ${translate('core_connections_connection_temporary')}`;
     }
 
+    const key = node.projectId && node.objectId ? createConnectionParam(node.projectId, node.objectId) : undefined;
+    const typeColor = useConnectionTypeColor(key);
+
     return (
       <TreeNodeControl
         ref={mergedRef}
         className={s(styles, { treeNodeControl: true, dragging: !!dndElement }, className)}
+        style={{ background: typeColor }}
         onClick={onClick}
         onContextMenu={handleContextMenuOpen}
       >
-        <NavigationNodeExpand nodeId={node.id} />
+        <NavigationNodeExpand nodeId={node.uri} />
         <TreeNodeIcon>
           <ConnectionImageWithMask icon={icon} connected={connected} maskId="tree-node-icon" />
         </TreeNodeIcon>

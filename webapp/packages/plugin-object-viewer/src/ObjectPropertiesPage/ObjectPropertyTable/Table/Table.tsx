@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -15,20 +15,23 @@ import { type DBObject, NavTreeResource } from '@cloudbeaver/core-navigation-tre
 import { useTabLocalState } from '@cloudbeaver/core-ui';
 import { DataGrid, useCreateGridReactiveValue } from '@cloudbeaver/plugin-data-grid';
 import { getObjectPropertyDisplayValue, getObjectPropertyType, getObjectPropertyValue } from '@cloudbeaver/core-sdk';
-import { Checkbox } from '@dbeaver/ui-kit';
+import { CheckboxIndicator } from '@dbeaver/ui-kit';
+import { useNode } from '@cloudbeaver/plugin-navigation-tree';
 
 import { ObjectPropertyTableFooter } from '../ObjectPropertyTableFooter.js';
 import classes from './Table.module.css';
 import { ObjectMenuCell } from './ObjectMenuCell.js';
 import { SelectorFormatter } from './Columns/ColumnSelect/SelectorFormatter.js';
+import { createConnectionParam, useConnectionTypeColor } from '@cloudbeaver/core-connections';
 
-export interface TableProps {
+export interface ITableProps {
   objects: DBObject[];
   hasNextPage: boolean;
+  objectId: string;
   loadMore: () => void;
 }
 
-export const Table = observer<TableProps>(function Table({ objects, hasNextPage, loadMore }) {
+export const Table = observer<ITableProps>(function Table({ objects, hasNextPage, objectId, loadMore }) {
   const styles = useS(classes);
   const navTreeResource = useService(NavTreeResource);
 
@@ -37,6 +40,7 @@ export const Table = observer<TableProps>(function Table({ objects, hasNextPage,
 
   const tableState = useTable();
   const tabLocalState = useTabLocalState<IScrollState>(() => ({ scrollTop: 0, scrollLeft: 0 }));
+  const { node } = useNode(objectId);
 
   const scrollBox = tableContainer?.querySelector<HTMLDivElement>('[role="grid"]') ?? null;
   useControlledScroll(scrollBox, tabLocalState);
@@ -83,7 +87,11 @@ export const Table = observer<TableProps>(function Table({ objects, hasNextPage,
 
       if (type === 'checkbox') {
         const value = getObjectPropertyValue(property);
-        return <Checkbox className={s(styles, { boolean: true })} size="small" checked={value} disabled />;
+        return (
+          <div className={s(styles, { boolean: true })}>
+            <CheckboxIndicator size="small" checked={value} />
+          </div>
+        );
       }
 
       return getObjectPropertyDisplayValue(property);
@@ -131,6 +139,9 @@ export const Table = observer<TableProps>(function Table({ objects, hasNextPage,
     return colIdx !== 0;
   }
 
+  const connectionKey = node?.objectId && node.projectId ? createConnectionParam(node.projectId, node.objectId) : undefined;
+  const typeColor = useConnectionTypeColor(connectionKey);
+
   if (objects.length === 0) {
     return null;
   }
@@ -156,7 +167,7 @@ export const Table = observer<TableProps>(function Table({ objects, hasNextPage,
           </Link>
         </div>
       )}
-      <ObjectPropertyTableFooter className={s(styles, { objectPropertyTableFooter: true })} state={tableState} />
+      <ObjectPropertyTableFooter className={s(styles, { objectPropertyTableFooter: true })} state={tableState} style={{ background: typeColor }} />
     </div>
   );
 });

@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2025 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,10 +18,12 @@ package io.cloudbeaver.service.data.transfer.impl;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class WebDataTransferSessionConfig {
 
     private final Map<String, WebDataTransferTaskConfig> tasks = new HashMap<>();
+    private final Map<String, WebDataTransferImportTaskConfig> importTasks = new ConcurrentHashMap<>();
 
     public WebDataTransferSessionConfig() {
     }
@@ -36,10 +38,19 @@ public class WebDataTransferSessionConfig {
         }
     }
 
+    public void addImportTask(WebDataTransferImportTaskConfig importTaskConfig) {
+        importTasks.put(importTaskConfig.getTaskId(), importTaskConfig);
+    }
+
+    public WebDataTransferImportTaskConfig consumeImportTask(String taskId) {
+        return importTasks.remove(taskId);
+    }
+
     public WebDataTransferSessionConfig deleteExportFiles() {
         synchronized (tasks) {
             tasks.clear();
         }
+        importTasks.clear();
         return this;
     }
 

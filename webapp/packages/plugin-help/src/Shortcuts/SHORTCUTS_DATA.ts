@@ -11,6 +11,7 @@ import {
   KEY_BINDING_CANCEL,
   KEY_BINDING_DELETE_ROW,
   KEY_BINDING_DUPLICATE_ROW,
+  KEY_BINDING_OPEN_CELL_CONTEXT_MENU,
   KEY_BINDING_REVERT_INLINE_EDITOR_CHANGES,
   KEY_BINDING_SAVE,
 } from '@cloudbeaver/plugin-data-viewer';
@@ -21,11 +22,11 @@ import {
   KEY_BINDING_SQL_EDITOR_EXECUTE_NEW,
   KEY_BINDING_SQL_EDITOR_EXECUTE_SCRIPT,
   KEY_BINDING_SQL_EDITOR_FORMAT,
-  KEY_BINDING_SQL_EDITOR_SHOW_EXECUTION_PLAN,
   KEY_BINDING_SQL_EDITOR_START_COMPLETION,
   KEY_BINDING_SQL_EDITOR_ACCEPT_COMPLETION,
   KEY_BINDING_SQL_EDITOR_ESCAPE,
 } from '@cloudbeaver/plugin-sql-editor';
+import { KEY_BINDING_SQL_EDITOR_SHOW_EXECUTION_PLAN } from '@cloudbeaver/plugin-sql-editor-execution-plan';
 import { KEY_BINDING_SQL_EDITOR_SAVE_AS_SCRIPT } from '@cloudbeaver/plugin-sql-editor-navigation-tab-script';
 
 const KEY_BINDING_SQL_EDITOR_COMMENT = createKeyBinding({
@@ -38,9 +39,35 @@ const KEY_BINDING_FIND = createKeyBinding({
   keys: ['mod+f'],
 });
 
+const KEY_BINDING_SQL_EDITOR_FOLD_CODE = createKeyBinding({
+  id: 'sql-editor-fold-code',
+  keysMac: ['cmd+alt+['],
+  keysWin: ['ctrl+shift+['],
+});
+
+const KEY_BINDING_SQL_EDITOR_UNFOLD_CODE = createKeyBinding({
+  id: 'sql-editor-unfold-code',
+  keysMac: ['cmd+alt+]'],
+  keysWin: ['ctrl+shift+]'],
+});
+
+const KEY_BINDING_SQL_EDITOR_FOLD_ALL = createKeyBinding({
+  id: 'sql-editor-fold-all',
+  keys: ['ctrl+alt+['],
+});
+
+const KEY_BINDING_SQL_EDITOR_UNFOLD_ALL = createKeyBinding({
+  id: 'sql-editor-unfold-all',
+  keys: ['ctrl+alt+]'],
+});
+
 import type { IShortcut } from './IShortcut.js';
 
 export const DATA_VIEWER_SHORTCUTS: IShortcut[] = [
+  {
+    label: 'data_viewer_shortcut_open_cell_context_menu',
+    code: transformKeys(KEY_BINDING_OPEN_CELL_CONTEXT_MENU),
+  },
   {
     label: 'data_viewer_shortcut_revert_inline_editor_changes',
     code: transformKeys(KEY_BINDING_REVERT_INLINE_EDITOR_CHANGES),
@@ -99,6 +126,22 @@ export const SQL_EDITOR_SHORTCUTS: IShortcut[] = [
   {
     label: 'sql_editor_shortcut_format',
     code: transformKeys(KEY_BINDING_SQL_EDITOR_FORMAT),
+  },
+  {
+    label: 'sql_editor_shortcut_fold_code',
+    code: transformKeys(KEY_BINDING_SQL_EDITOR_FOLD_CODE),
+  },
+  {
+    label: 'sql_editor_shortcut_unfold_code',
+    code: transformKeys(KEY_BINDING_SQL_EDITOR_UNFOLD_CODE),
+  },
+  {
+    label: 'sql_editor_shortcut_fold_all',
+    code: transformKeys(KEY_BINDING_SQL_EDITOR_FOLD_ALL),
+  },
+  {
+    label: 'sql_editor_shortcut_unfold_all',
+    code: transformKeys(KEY_BINDING_SQL_EDITOR_UNFOLD_ALL),
   },
   {
     label: 'ui_processing_save',

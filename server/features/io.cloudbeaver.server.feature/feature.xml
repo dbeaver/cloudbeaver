@@ -2,7 +2,7 @@
 <feature
         id="io.cloudbeaver.server.feature"
         label="%featureName"
-        version="26.0.4.qualifier"
+        version="26.2.1.qualifier"
         provider-name="%providerName"
         plugin="io.cloudbeaver.server">
 
@@ -32,6 +32,7 @@
     <plugin id="org.jkiss.dbeaver.launcher" version="0.0.0"/>
     <plugin id="io.cloudbeaver.server" version="0.0.0"/>
     <plugin id="io.cloudbeaver.server.ce" version="0.0.0"/>
+    <plugin id="io.cloudbeaver.service.ai" version="0.0.0"/>
     <plugin id="io.cloudbeaver.service.admin" version="0.0.0"/>
     <plugin id="io.cloudbeaver.service.auth" version="0.0.0"/>
     <plugin id="io.cloudbeaver.service.data.transfer" version="0.0.0"/>

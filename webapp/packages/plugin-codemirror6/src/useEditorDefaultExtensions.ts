@@ -1,12 +1,12 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 import { defaultKeymap, indentWithTab } from '@codemirror/commands';
-import { bracketMatching, foldGutter, indentOnInput, syntaxHighlighting } from '@codemirror/language';
+import { bracketMatching, foldGutter, foldKeymap, indentOnInput, indentUnit, syntaxHighlighting } from '@codemirror/language';
 import { highlightSelectionMatches, searchKeymap } from '@codemirror/search';
 import { Compartment, type Extension } from '@codemirror/state';
 import {
@@ -29,6 +29,7 @@ import { clsx } from '@dbeaver/ui-kit';
 
 // @TODO allow to configure bindings outside of the component
 const DEFAULT_KEY_MAP = defaultKeymap.filter(binding => binding.mac !== 'Ctrl-f' && binding.key !== 'Mod-Enter');
+export const EDITOR_INDENT_UNIT = '\t';
 
 DEFAULT_KEY_MAP.push(indentWithTab);
 DEFAULT_KEY_MAP.push({
@@ -36,6 +37,7 @@ DEFAULT_KEY_MAP.push({
   run: () => true,
 });
 DEFAULT_KEY_MAP.push(...searchKeymap);
+DEFAULT_KEY_MAP.push(...foldKeymap);
 
 const defaultExtensionsFlags: IDefaultExtensions = {
   lineNumbers: false,
@@ -54,6 +56,7 @@ const defaultExtensionsFlags: IDefaultExtensions = {
   keymap: true,
   lineWrapping: false,
   search: true,
+  tabIndentation: true,
 };
 
 export interface IDefaultExtensions {
@@ -73,6 +76,7 @@ export interface IDefaultExtensions {
   keymap?: boolean;
   lineWrapping?: boolean;
   search?: boolean;
+  tabIndentation?: boolean;
 }
 
 const extensionMap = {
@@ -109,6 +113,7 @@ const extensionMap = {
   rectangularSelection,
   keymap: () => keymap.of(DEFAULT_KEY_MAP),
   lineWrapping: () => EditorView.lineWrapping,
+  tabIndentation: () => indentUnit.of(EDITOR_INDENT_UNIT),
 };
 
 const DEFAULT_EXTENSIONS_COMPARTMENT = new Compartment();

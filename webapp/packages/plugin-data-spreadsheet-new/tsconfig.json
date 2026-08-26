@@ -32,6 +32,9 @@
       "path": "../core-cli"
     },
     {
+      "path": "../core-connections"
+    },
+    {
       "path": "../core-data-context"
     },
     {
@@ -45,6 +48,9 @@
     },
     {
       "path": "../core-localization"
+    },
+    {
+      "path": "../core-navigation-tree"
     },
     {
       "path": "../core-sdk"
@@ -78,8 +84,7 @@
     "__custom_mocks__/**/*",
     "src/**/*",
     "src/**/*.json",
-    "src/**/*.css",
-    "src/**/*.scss"
+    "src/**/*.css"
   ],
   "exclude": [
     "**/node_modules",

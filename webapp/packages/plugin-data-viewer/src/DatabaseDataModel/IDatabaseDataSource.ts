@@ -10,6 +10,7 @@ import type { IExecutor, ISyncExecutor } from '@cloudbeaver/core-executor';
 import { type TLocalizationToken } from '@cloudbeaver/core-localization';
 import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
+import type { IDatabasePersistedStateStore } from './IDatabasePersistedStateStore.js';
 import type { IDatabaseDataActions } from './IDatabaseDataActions.js';
 import type { IDatabaseDataResult } from './IDatabaseDataResult.js';
 
@@ -59,6 +60,8 @@ export enum DatabaseDataFeature {
   QueryResult = 'QueryResult',
   /** Data grouping and aggregation functionality. Used for GROUP BY operations. */
   Grouping = 'Grouping',
+  /** Displays incoming and outgoing table references for the selected table. */
+  References = 'References',
 }
 
 export type GetDatabaseDataSourceOptions<TSource extends IDatabaseDataSource<any, any>> =
@@ -80,6 +83,7 @@ export interface IDatabaseDataSource<TOptions = unknown, TResult extends IDataba
   /** Options of the previous request */
   readonly prevOptions: Readonly<TOptions> | null;
   readonly options: TOptions | null;
+  readonly persistedState: IDatabasePersistedStateStore;
   readonly requestInfo: IRequestInfo;
   readonly error: Error | null;
   readonly canCancel: boolean;
@@ -116,6 +120,7 @@ export interface IDatabaseDataSource<TOptions = unknown, TResult extends IDataba
   setAccess: (access: DatabaseDataAccessMode) => this;
   setSlice: (offset: number, count: number) => this;
   setOptions: (options: TOptions) => this;
+  loadPersistedState: (state: Record<string, unknown>) => this;
   setDataFormat: (dataFormat: ResultDataFormat) => this;
   setSupportedDataFormats: (dataFormats: ResultDataFormat[]) => this;
   setFeature: (feature: DatabaseDataFeature) => this;

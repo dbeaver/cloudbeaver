@@ -55,14 +55,21 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
     @NotNull
     protected final ServletApplication application;
     protected volatile long lastAccessTime;
+    @NotNull
+    private final SessionType sessionType;
 
     private final List<CBWebSessionEventHandler> sessionEventHandlers = new CopyOnWriteArrayList<>();
     private WebSessionEventsFilter eventsFilter;
     private final WebSessionWorkspace workspace;
 
-    public BaseWebSession(@NotNull String id, @NotNull ServletApplication application) throws DBException {
+    public BaseWebSession(
+        @NotNull String id,
+        @NotNull ServletApplication application,
+        @NotNull SessionType sessionType
+    ) throws DBException {
         this.id = id;
         this.application = application;
+        this.sessionType = sessionType;
         this.createTime = System.currentTimeMillis();
         this.lastAccessTime = this.createTime;
         this.workspace = createWebWorkspace();
@@ -116,6 +123,16 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
         }
     }
 
+    public void migrateEventHandlersTo(@NotNull BaseWebSession target) {
+        synchronized (sessionEventHandlers) {
+            for (CBWebSessionEventHandler handler : sessionEventHandlers) {
+                handler.migrateToSession(target);
+                target.addEventHandler(handler);
+            }
+            sessionEventHandlers.clear();
+        }
+    }
+
     public boolean updateSMSession(SMAuthInfo smAuthInfo) throws DBException {
         return userContext.refresh(smAuthInfo);
     }
@@ -136,6 +153,17 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
             addSessionError(e);
             log.error("Error refreshing accessible projects", e);
         }
+    }
+
+    /**
+     * Refreshes user permissions, teams and accessible projects.
+     * <p>
+     * Unlike {@link #refreshUserData()} this method must not re-create heavyweight session state
+     * (navigator model, session projects, connection caches), so it is safe to call
+     * for foreign sessions on server-wide events.
+     */
+    public void refreshUserPermissions() {
+        refreshUserData();
     }
 
     @NotNull
@@ -176,6 +204,11 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
         return lastAccessTime;
     }
 
+    @NotNull
+    public SessionType getSessionType() {
+        return sessionType;
+    }
+
     public void touchSession() {
         this.lastAccessTime = System.currentTimeMillis();
     }
@@ -197,7 +230,7 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
     }
 
     private void cleanUpSession(boolean sendSessionExpiredEvent) {
-        application.getEventController().addEvent(new WSEventDeleteTempFile(getSessionId()));
+        application.getEventController().addEvent(new WSEventDeleteTempFile(getUserContext().getSmSessionId()));
         synchronized (sessionEventHandlers) {
             var sessionExpiredEvent = new WSSessionExpiredEvent();
             for (CBWebSessionEventHandler sessionEventHandler : sessionEventHandlers) {

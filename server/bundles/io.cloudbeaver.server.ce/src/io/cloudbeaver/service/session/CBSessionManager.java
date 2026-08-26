@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2025 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,9 +24,9 @@ import io.cloudbeaver.registry.WebSessionHandlerDescriptor;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBConstants;
 import io.cloudbeaver.server.WebAppSessionManager;
-import io.cloudbeaver.server.events.WSWebUtils;
 import io.cloudbeaver.service.DBWSessionHandler;
 import io.cloudbeaver.utils.ServletAppUtils;
+import io.cloudbeaver.utils.WebEventUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -51,7 +51,7 @@ public class CBSessionManager implements WebAppSessionManager {
     private static final Log log = Log.getLog(CBSessionManager.class);
 
     private final CBApplication<?> application;
-    private final Map<String, BaseWebSession> sessionMap = new HashMap<>();
+    protected final Map<String, BaseWebSession> sessionMap = new HashMap<>();
 
     public CBSessionManager(CBApplication<?> application) {
         this.application = application;
@@ -60,6 +60,7 @@ public class CBSessionManager implements WebAppSessionManager {
     /**
      * Closes Web Session, associated to HttpSession from {@code request}
      */
+    @Nullable
     @Override
     public BaseWebSession closeSession(@NotNull HttpServletRequest request) {
         HttpSession session = request.getSession();
@@ -69,11 +70,13 @@ public class CBSessionManager implements WebAppSessionManager {
         return null;
     }
 
+    @Nullable
     @Override
     public BaseWebSession closeSession(@NotNull String sessionId) {
         return closeSession(sessionId, true);
     }
 
+    @Nullable
     @Override
     public BaseWebSession closeSession(@NotNull String sessionId, boolean sendSessionExpiredEvent) {
         BaseWebSession webSession;
@@ -200,11 +203,48 @@ public class CBSessionManager implements WebAppSessionManager {
     }
 
     /**
+     * Invalidates the current HTTP session, creates a new one, and binds a new {@link WebSession} to it.
+     */
+    @NotNull
+    public WebSession rotateSession(
+        @NotNull HttpServletRequest request,
+        @NotNull WebSession oldWebSession
+    ) throws DBWebException {
+        HttpSession oldHttpSession = request.getSession(false);
+        if (oldHttpSession != null) {
+            oldHttpSession.invalidate();
+        }
+        String newSessionId = request.getSession(true).getId();
+
+        String locale = oldWebSession.getLocale();
+        String remoteAddr = oldWebSession.getLastRemoteAddr();
+        String remoteUserAgent = oldWebSession.getLastRemoteUserAgent();
+        var requestInfo = new WebHttpRequestInfo(newSessionId, locale, remoteAddr, remoteUserAgent);
+        WebSession newWebSession;
+        try {
+            newWebSession = createWebSessionImpl(requestInfo);
+        } catch (DBException e) {
+            throw new DBWebException(e);
+        }
+        oldWebSession.migrateEventHandlersTo(newWebSession);
+        oldWebSession.getEventsFilter().migrateTo(newWebSession.getEventsFilter());
+        String oldSessionId = oldWebSession.getSessionId();
+        synchronized (sessionMap) {
+            sessionMap.remove(oldSessionId);
+            sessionMap.put(newSessionId, newWebSession);
+        }
+        oldWebSession.close(false, false);
+
+        log.debug("Session rotated '" + oldSessionId + "' -> '" + newSessionId + "'");
+        return newWebSession;
+    }
+
+    /**
      * Returns not expired session from cache, or restore it.
      *
      * @return WebSession object or null, if session expired or invalid
      */
-    @Nullable
+    @NotNull
     public WebSession getOrRestoreWebSession(@NotNull WebHttpRequestInfo requestInfo) {
         final var sessionId = requestInfo.getId();
         if (sessionId == null) {
@@ -283,19 +323,19 @@ public class CBSessionManager implements WebAppSessionManager {
 
     @Override
     @Nullable
-    public WebSession findWebSession(HttpServletRequest request) {
+    public WebSession findWebSession(@NotNull HttpServletRequest request) {
         String sessionId = getSessionId(request);
+        WebSession webSession;
         synchronized (sessionMap) {
             var session = sessionMap.get(sessionId);
-            if (session instanceof WebSession) {
-                return (WebSession) session;
-            }
-            return null;
+            webSession = (session instanceof WebSession) ? (WebSession) session : null;
         }
+        return webSession;
     }
 
+    @Nullable
     @Override
-    public WebSession findWebSession(HttpServletRequest request, boolean errorOnNoFound) throws DBWebException {
+    public WebSession findWebSession(@NotNull HttpServletRequest request, boolean errorOnNoFound) throws DBWebException {
         WebSession webSession = findWebSession(request);
         if (webSession != null) {
             return webSession;
@@ -323,6 +363,7 @@ public class CBSessionManager implements WebAppSessionManager {
         }
     }
 
+    @NotNull
     @Override
     public Collection<BaseWebSession> getAllActiveSessions() {
         synchronized (sessionMap) {
@@ -501,7 +542,7 @@ public class CBSessionManager implements WebAppSessionManager {
             for (Iterator<BaseWebSession> iterator = sessionMap.values().iterator(); iterator.hasNext(); ) {
                 var session = iterator.next();
                 iterator.remove();
-                session.close(false, !WSWebUtils.isSessionIdEquals(session, initiatorSessionId));
+                session.close(false, !WebEventUtils.isSmSessionIdEquals(session, initiatorSessionId));
             }
         }
     }
@@ -527,4 +568,5 @@ public class CBSessionManager implements WebAppSessionManager {
         log.debug("> Expire session '" + session.getSessionId() + "'");
         session.close();
     }
+
 }

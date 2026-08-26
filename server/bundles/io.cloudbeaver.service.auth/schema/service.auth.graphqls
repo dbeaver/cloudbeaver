@@ -1,3 +1,7 @@
+####################################################
+# Authentication API
+####################################################
+
 enum AuthCredentialEncryption {
     none,
     plain,
@@ -15,11 +19,11 @@ type AuthCredentialInfo {
     displayName: String!
     description: String
 
-    # This field must be shown in admin panel
+    "This field must be shown in admin panel"
     admin: Boolean!
-    # This field must be shown in login form
+    "This field must be shown in login form"
     user: Boolean!
-    # This field can be used as user identifier
+    "This field can be used as user identifier"
 
     identifying: Boolean!
     possibleValues: [String]
@@ -104,8 +108,14 @@ type FederatedAuthResult @since(version: "25.0.3") {
     userTokens: [UserAuthToken!]! @since(version: "25.0.3")
 }
 
+type LogoutLink @since(version: "26.1.4") {
+    url: String!
+    "If true, the URL must be opened as a full-page redirect in the current tab instead of a popup window"
+    sameTabRedirect: Boolean!
+}
+
 type LogoutInfo @since(version: "23.3.3") {
-    redirectLinks: [String!]!
+    redirectLinks: [LogoutLink!]!
 }
 
 type UserAuthToken {

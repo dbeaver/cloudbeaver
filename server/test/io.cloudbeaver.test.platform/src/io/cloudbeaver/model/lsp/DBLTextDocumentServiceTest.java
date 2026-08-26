@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2025 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,9 +23,9 @@ import org.jkiss.dbeaver.model.lsp.DBLTextDocumentService;
 import org.jkiss.dbeaver.model.lsp.context.ContextAwareDocument;
 import org.jkiss.dbeaver.model.sql.SQLSyntaxManager;
 import org.jkiss.dbeaver.model.sql.parser.SQLRuleManager;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Objects;
@@ -38,7 +38,7 @@ import java.util.concurrent.ExecutionException;
 public class DBLTextDocumentServiceTest extends CloudbeaverMockTest {
     private DBLTextDocumentService service;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         service = new DBLTextDocumentService();
     }
@@ -55,9 +55,9 @@ public class DBLTextDocumentServiceTest extends CloudbeaverMockTest {
         service.didOpen(params);
 
         ContextAwareDocument document = DocumentServiceTestUtils.getDocument(service, uri);
-        Assert.assertNotNull(document);
-        Assert.assertEquals(document.getSyntaxManager().getDialect(), BasicSQLDialect.INSTANCE);
-        Assert.assertNull(document.getExecutionContext());
+        Assertions.assertNotNull(document);
+        Assertions.assertEquals(document.getSyntaxManager().getDialect(), BasicSQLDialect.INSTANCE);
+        Assertions.assertNull(document.getExecutionContext());
     }
 
     @Test
@@ -67,14 +67,14 @@ public class DBLTextDocumentServiceTest extends CloudbeaverMockTest {
         service.didOpen(new DidOpenTextDocumentParams(textDocument));
 
         ContextAwareDocument savedDocument = DocumentServiceTestUtils.getDocument(service, textDocument.getUri());
-        Assert.assertNotNull(savedDocument);
-        Assert.assertEquals(query, savedDocument.getText());
+        Assertions.assertNotNull(savedDocument);
+        Assertions.assertEquals(query, savedDocument.getText());
 
         SQLSyntaxManager syntaxManager = savedDocument.getSyntaxManager();
-        Assert.assertNotNull(syntaxManager);
-        Assert.assertEquals(BasicSQLDialect.INSTANCE, syntaxManager.getDialect());
+        Assertions.assertNotNull(syntaxManager);
+        Assertions.assertEquals(BasicSQLDialect.INSTANCE, syntaxManager.getDialect());
         SQLRuleManager ruleManager = savedDocument.getRuleManager();
-        Assert.assertNotNull(ruleManager);
+        Assertions.assertNotNull(ruleManager);
     }
 
     @Test
@@ -84,10 +84,10 @@ public class DBLTextDocumentServiceTest extends CloudbeaverMockTest {
 
         ContextAwareDocument savedDocument = Objects.requireNonNull(DocumentServiceTestUtils.getDocument(service, textDocument.getUri()));
         SQLSyntaxManager syntaxManager = savedDocument.getSyntaxManager();
-        Assert.assertNotNull(syntaxManager);
-        Assert.assertEquals(BasicSQLDialect.INSTANCE, syntaxManager.getDialect());
+        Assertions.assertNotNull(syntaxManager);
+        Assertions.assertEquals(BasicSQLDialect.INSTANCE, syntaxManager.getDialect());
         SQLRuleManager ruleManager = savedDocument.getRuleManager();
-        Assert.assertNotNull(ruleManager);
+        Assertions.assertNotNull(ruleManager);
     }
 
     @Test
@@ -103,8 +103,8 @@ public class DBLTextDocumentServiceTest extends CloudbeaverMockTest {
         service.didChange(new DidChangeTextDocumentParams(textDocumentChange, contentChanges));
 
         ContextAwareDocument updatedDocument = DocumentServiceTestUtils.getDocument(service, textDocument.getUri());
-        Assert.assertNotNull(updatedDocument);
-        Assert.assertEquals(updatedSql, updatedDocument.getText());
+        Assertions.assertNotNull(updatedDocument);
+        Assertions.assertEquals(updatedSql, updatedDocument.getText());
     }
 
     @Test
@@ -120,10 +120,10 @@ public class DBLTextDocumentServiceTest extends CloudbeaverMockTest {
         TextDocumentContentChangeEvent event2 = new TextDocumentContentChangeEvent(updatedSql2);
         List<TextDocumentContentChangeEvent> contentChanges = List.of(event1, event2);
 
-        Assert.assertThrows(
-            "Unexpected number of document changes: 2",
+        Assertions.assertThrows(
             IllegalArgumentException.class,
-            () -> service.didChange(new DidChangeTextDocumentParams(textDocumentChange, contentChanges))
+            () -> service.didChange(new DidChangeTextDocumentParams(textDocumentChange, contentChanges)),
+            "Unexpected number of document changes: 2"
         );
     }
 
@@ -138,7 +138,7 @@ public class DBLTextDocumentServiceTest extends CloudbeaverMockTest {
         service.didClose(closeParams);
 
         ContextAwareDocument updatedDocument = DocumentServiceTestUtils.getDocument(service, textDocument.getUri());
-        Assert.assertNull(updatedDocument);
+        Assertions.assertNull(updatedDocument);
     }
 
     @Test
@@ -155,15 +155,15 @@ public class DBLTextDocumentServiceTest extends CloudbeaverMockTest {
             FROM
                 tablename AS alias;
             """;
-        Assert.assertEquals(expectedQuery.trim(), textEdit.getNewText());
+        Assertions.assertEquals(expectedQuery.trim(), textEdit.getNewText());
 
         Position start = textEdit.getRange().getStart();
-        Assert.assertEquals(0, start.getCharacter());
-        Assert.assertEquals(0, start.getLine());
+        Assertions.assertEquals(0, start.getCharacter());
+        Assertions.assertEquals(0, start.getLine());
 
         Position end = textEdit.getRange().getEnd();
-        Assert.assertEquals(0, end.getLine());
-        Assert.assertEquals(42, end.getCharacter());
+        Assertions.assertEquals(0, end.getLine());
+        Assertions.assertEquals(42, end.getCharacter());
     }
 
     @Test
@@ -190,15 +190,15 @@ public class DBLTextDocumentServiceTest extends CloudbeaverMockTest {
                 schemaname3.tablename3
             ;
             """.trim();
-        Assert.assertEquals(expectedQuery.trim(), textEdit.getNewText());
+        Assertions.assertEquals(expectedQuery.trim(), textEdit.getNewText());
 
         Position start = textEdit.getRange().getStart();
-        Assert.assertEquals(0, start.getCharacter());
-        Assert.assertEquals(0, start.getLine());
+        Assertions.assertEquals(0, start.getCharacter());
+        Assertions.assertEquals(0, start.getLine());
 
         Position end = textEdit.getRange().getEnd();
-        Assert.assertEquals(3, end.getLine());
-        Assert.assertEquals(1, end.getCharacter());
+        Assertions.assertEquals(3, end.getLine());
+        Assertions.assertEquals(1, end.getCharacter());
     }
 
     @Test
@@ -223,10 +223,10 @@ public class DBLTextDocumentServiceTest extends CloudbeaverMockTest {
             END $$;
             """.trim();
 
-        Assert.assertEquals(expectedQuery.trim(), textEdit.getNewText());
+        Assertions.assertEquals(expectedQuery.trim(), textEdit.getNewText());
         Position end = textEdit.getRange().getEnd();
-        Assert.assertEquals(1, end.getLine());
-        Assert.assertEquals(63, end.getCharacter());
+        Assertions.assertEquals(1, end.getLine());
+        Assertions.assertEquals(63, end.getCharacter());
     }
 
     @Test
@@ -238,7 +238,7 @@ public class DBLTextDocumentServiceTest extends CloudbeaverMockTest {
         SemanticTokensParams params = new SemanticTokensParams(new TextDocumentIdentifier(document.getUri()));
         Integer[] tokensData = service.semanticTokensFull(params).get().getData().toArray(new Integer[0]);
 
-        Assert.assertArrayEquals(
+        Assertions.assertArrayEquals(
             new Integer[] {0, 0, 6, 0, 0},
             tokensData
         );
@@ -259,7 +259,7 @@ public class DBLTextDocumentServiceTest extends CloudbeaverMockTest {
             0, 23, 5, 0, 0,  // WHERE
             0, 39, 5, 1, 0   // 'Doe'
         };
-        Assert.assertArrayEquals(
+        Assertions.assertArrayEquals(
             expectedData,
             tokensData
         );
@@ -286,7 +286,7 @@ public class DBLTextDocumentServiceTest extends CloudbeaverMockTest {
             3, 0, 5, 0, 0,   // WHERE
             4, 14, 5, 1, 0   // 'Doe'
         };
-        Assert.assertArrayEquals(
+        Assertions.assertArrayEquals(
             expectedData,
             tokensData
         );

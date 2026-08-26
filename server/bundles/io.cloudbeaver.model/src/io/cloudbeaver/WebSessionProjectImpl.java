@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2025 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,11 +29,11 @@ import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.DBPObjectSettingsProvider;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistryCache;
+import org.jkiss.dbeaver.model.auth.SMObjectType;
 import org.jkiss.dbeaver.model.navigator.DBNModel;
 import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.rm.RMUtils;
 import org.jkiss.dbeaver.model.security.SMControllerUtils;
-import org.jkiss.dbeaver.model.security.SMObjectType;
 import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceEvent;
 import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceProperty;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
@@ -103,7 +103,7 @@ public class WebSessionProjectImpl extends WebProjectImpl implements DBPAdaptabl
         return projectSettings;
     }
 
-    @Nullable
+    @NotNull
     @Override
     public DBNModel getNavigatorModel() {
         return webSession.getNavigatorModel();
@@ -135,8 +135,11 @@ public class WebSessionProjectImpl extends WebProjectImpl implements DBPAdaptabl
         if (registryIsLoaded) {
             return;
         }
-        getDataSourceRegistry().getDataSources().forEach(this::addConnection);
-        Throwable lastError = getDataSourceRegistry().getLastError();
+        DBPDataSourceRegistry dataSourceRegistry = getDataSourceRegistry();
+        // Connection node paths are resolved through the navigator model, so materialize its lazy database branch first.
+        webSession.initializeProjectNavigator(this);
+        dataSourceRegistry.getDataSources().forEach(this::addConnection);
+        Throwable lastError = dataSourceRegistry.getLastError();
         if (lastError != null) {
             webSession.addSessionError(lastError);
             log.error("Error refreshing connections from project '" + getId() + "'", lastError);
@@ -237,6 +240,18 @@ public class WebSessionProjectImpl extends WebProjectImpl implements DBPAdaptabl
     public synchronized boolean updateProjectDataSources(@NotNull WSDataSourceEvent event) {
         var sendDataSourceUpdatedEvent = false;
         DBPDataSourceRegistry registry = getDataSourceRegistry();
+        Map<String, DataSourceDescriptor> dataSourceSnapshots = new HashMap<>();
+        if (WSDataSourceEvent.UPDATED.equals(event.getId())) {
+            for (String dsId : event.getDataSourceIds()) {
+                DBPDataSourceContainer dataSource = registry.getDataSource(dsId);
+                if (dataSource instanceof DataSourceDescriptor descriptor) {
+                    DBPDataSourceContainer snapshot = registry.createDataSource(descriptor);
+                    if (snapshot instanceof DataSourceDescriptor snapshotDescriptor) {
+                        dataSourceSnapshots.put(dsId, snapshotDescriptor);
+                    }
+                }
+            }
+        }
         if (WSDataSourceEvent.CREATED.equals(event.getId()) || WSDataSourceEvent.UPDATED.equals(event.getId())) {
             registry.refreshConfig(event.getDataSourceIds());
         }
@@ -251,15 +266,19 @@ public class WebSessionProjectImpl extends WebProjectImpl implements DBPAdaptabl
                     sendDataSourceUpdatedEvent = true;
                 }
                 case WSDataSourceEvent.UPDATED ->  {
+                    DataSourceDescriptor snapshot = dataSourceSnapshots.get(dsId);
+                    if (snapshot != null && !event.getProperty().hasEffectiveChanges(snapshot, ds)) {
+                        continue;
+                    }
                     if (event.getProperty() == WSDataSourceProperty.CONFIGURATION) {
-                        WebDataSourceUtils.disconnectDataSource(webSession, ds);
+                        WebDataSourceUtils.disconnectDataSource(webSession, ds, true);
                     }
                     if (event.getProperty() != WSDataSourceProperty.INTERNAL) {
                         sendDataSourceUpdatedEvent = true;
                     }
                 }
                 case WSDataSourceEvent.DELETED -> {
-                    WebDataSourceUtils.disconnectDataSource(webSession, ds);
+                    WebDataSourceUtils.disconnectDataSource(webSession, ds, false);
                     if (registry instanceof DBPDataSourceRegistryCache dsrc) {
                         dsrc.removeDataSourceFromList(ds);
                     }
@@ -345,7 +364,7 @@ public class WebSessionProjectImpl extends WebProjectImpl implements DBPAdaptabl
     @NotNull
     private WebConnectionInfo closeAndDeleteConnection(@NotNull WebConnectionInfo connectionInfo) throws DBWebException {
         DBPDataSourceContainer dataSourceContainer = connectionInfo.getDataSourceContainer();
-        WebDataSourceUtils.disconnectDataSource(webSession, dataSourceContainer);
+        WebDataSourceUtils.disconnectDataSource(webSession, dataSourceContainer, false);
         DBPDataSourceRegistry registry = getDataSourceRegistry();
         registry.removeDataSource(dataSourceContainer);
         removeConnection(dataSourceContainer);
@@ -355,6 +374,13 @@ public class WebSessionProjectImpl extends WebProjectImpl implements DBPAdaptabl
     @NotNull
     public DataSourceDescriptor getDataSourceContainerFromInput(@NotNull WebConnectionConfig configInput) throws DBWebException {
         return getInputConfigHandler(configInput).createDataSourceContainer();
+    }
+
+    public void updateDataSourceContainerFromInput(
+        @NotNull WebConnectionConfig configInput,
+        @NotNull DataSourceDescriptor dataSource
+    ) throws DBWebException {
+        getInputConfigHandler(configInput).updateDataSource(dataSource);
     }
 
     @NotNull

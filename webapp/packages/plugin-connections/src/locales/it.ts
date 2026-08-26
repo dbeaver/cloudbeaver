@@ -13,11 +13,6 @@ export default [
   ['plugin_connections_connection_edit_menu_item_title', 'Modifica Connessione'],
   ['plugin_connections_connection_clone', 'Clona'],
   ['plugin_connections_connection_clone_error', 'Impossibile clonare la connessione'],
-  ['plugin_connections_connection_edit_cancel_title', "Conferma l'annullamento"],
-  [
-    'plugin_connections_connection_edit_cancel_message',
-    'Stai per annullare le modifiche alla connessione. Modifiche non salvate saranno perse. Sei sicuro?',
-  ],
   ['plugin_connections_connection_edit_reconnect_title', 'Connection updated'],
   ['plugin_connections_connection_edit_reconnect_message', 'Connection has been updated. Do you want to reconnect?'],
   ['plugin_connections_connection_edit_reconnect_failed', 'Failed to reconnect'],
@@ -33,18 +28,6 @@ export default [
   ['plugin_connections_settings', 'Connections'],
   ['plugin_connections_settings_hide_connections_view_name', 'Hide connection view management'],
   ['plugin_connections_settings_hide_connections_view_description', 'Connections view submenu will be hidden for all users except administrators'],
-
-  ['plugin_connections_connection_ssl_enable', 'Enable SSL'],
-  ['plugin_connections_connection_ssl_optional', 'All SSL parameters are optional.'],
-  [
-    'plugin_connections_connection_ssl_description',
-    'You must specify SSL certificates if they are required by your server configuration. Settings on this page override Driver properties',
-  ],
-  [
-    'plugin_connections_connection_ssl_note',
-    '{arg:productName} does not verify SSL configuration and relies on the driver implementation. Please refer to the driver documentation for more information.',
-  ],
-  ['plugin_connections_connection_ssl_docs', 'SSL configuration documentation'],
 
   ['plugin_connections_connection_form_shared_credentials_manage_info', 'You can manage credentials in the '],
   ['plugin_connections_connection_form_shared_credentials_manage_info_tab_link', 'Credentials tab'],

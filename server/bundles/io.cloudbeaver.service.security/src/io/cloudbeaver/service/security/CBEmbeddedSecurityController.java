@@ -394,18 +394,30 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         }
     }
 
+    @NotNull
     @Override
-    public void importUsers(@NotNull SMUserImportList userImportList) throws DBException {
-       try (var dbCon = database.openConnection()) {
-            importUsers(dbCon, userImportList);
+    public List<SMUserProvisioning> importUsers(@NotNull SMUserImportList userImportList) throws DBException {
+        try (Connection dbCon = database.openConnection();
+            JDBCTransaction txn = new JDBCTransaction(dbCon)) {
+            try {
+                List<SMUserProvisioning> importedUsers = importUsers(dbCon, userImportList);
+                txn.commit();
+                return importedUsers;
+            } catch (Exception e) {
+                txn.rollback();
+                throw e;
+            }
        } catch (SQLException e) {
            log.error("Failed attempt import user: " + e.getMessage());
+           return List.of();
        }
     }
 
-    protected void importUsers(@NotNull Connection connection, @NotNull SMUserImportList userImportList)
+    @NotNull
+    protected List<SMUserProvisioning> importUsers(@NotNull Connection connection, @NotNull SMUserImportList userImportList)
         throws DBException, SQLException {
         List<SMUserProvisioning> users = userImportList.getUsers();
+        List<SMUserProvisioning> importedUsers = new ArrayList<>();
         Set<String> seen = new HashSet<>();
         outer:
         for (SMUserProvisioning user : users) {
@@ -436,7 +448,9 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                 }
             }
             insertUser(connection, userId.toLowerCase(), metaParameters, true, authRole);
+            importedUsers.add(user);
         }
+        return importedUsers;
     }
 
     @Override
@@ -709,7 +723,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
             SMUser user;
             try (PreparedStatement dbStat = dbCon.prepareStatement(
                 """
-                    SELECT U.USER_ID,U.IS_ACTIVE,U.DEFAULT_AUTH_ROLE,S.IS_SECRET_STORAGE,U.CHANGE_DATE,U.DISABLED_BY,U.DISABLE_REASON
+                    SELECT U.USER_ID,U.IS_ACTIVE,U.DEFAULT_AUTH_ROLE,S.IS_SECRET_STORAGE,U.CHANGE_DATE,U.DISABLED_BY,U.DISABLE_REASON,U.LAST_LOGIN_TIME
                     FROM {table_prefix}CB_USER U, {table_prefix}CB_AUTH_SUBJECT S
                     WHERE U.USER_ID=? AND U.USER_ID=S.SUBJECT_ID""")
             ) {
@@ -783,7 +797,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
             // Read users
             try (PreparedStatement dbStat = dbCon.prepareStatement(
                 "SELECT USER_ID,IS_ACTIVE,DEFAULT_AUTH_ROLE,CHANGE_DATE,DISABLED_BY,"
-                    + "DISABLE_REASON FROM {table_prefix}CB_USER"
+                    + "DISABLE_REASON,LAST_LOGIN_TIME FROM {table_prefix}CB_USER"
                     + buildUsersFilter(filter) + "\nORDER BY USER_ID " + getOffsetLimitPart(filter))) {
                 setUsersFilterValues(dbStat, filter, 1);
 
@@ -820,9 +834,36 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                     }
                 }
             }
+            if (filter.isIncludeLinkedProviders()) {
+                readUsersLinkedProviders(dbCon, result);
+            }
             return result.values().toArray(new SMUser[0]);
         } catch (SQLException e) {
             throw new DBCException("Error while loading users", e);
+        }
+    }
+
+    private void readUsersLinkedProviders(@NotNull Connection dbCon, @NotNull Map<String, SMUser> users)
+        throws SQLException {
+        String credentialsSql =
+            "SELECT DISTINCT USER_ID,PROVIDER_ID FROM {table_prefix}CB_USER_CREDENTIALS\n" +
+            "WHERE USER_ID IN (" + SQLUtils.generateParamList(users.size()) + ")";
+        try (PreparedStatement dbStat = dbCon.prepareStatement(credentialsSql)) {
+            int parameterIndex = 1;
+            for (String userId : users.keySet()) {
+                dbStat.setString(parameterIndex++, userId);
+            }
+            try (ResultSet dbResult = dbStat.executeQuery()) {
+                while (dbResult.next()) {
+                    String userId = dbResult.getString(1);
+                    String providerId = dbResult.getString(2);
+                    SMUser user = users.get(userId);
+                    if (user != null) {
+                        user.setLinkedAuthProviders(
+                            ArrayUtils.add(String.class, user.getLinkedAuthProviders(), providerId));
+                    }
+                }
+            }
         }
     }
 
@@ -839,6 +880,9 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         if (filter.getEnabledState() != null) {
             whereParts.add("IS_ACTIVE=?");
         }
+        if (!CommonUtils.isEmpty(filter.getAuthRoles())) {
+            whereParts.add("DEFAULT_AUTH_ROLE IN (" + SQLUtils.generateParamList(filter.getAuthRoles().size()) + ")");
+        }
         if (!whereParts.isEmpty()) {
             where.append(whereParts.stream().collect(Collectors.joining(" AND ", " WHERE ", "")));
         }
@@ -852,6 +896,11 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         }
         if (filter.getEnabledState() != null) {
             dbStat.setString(parameterIndex++, filter.getEnabledState() ? CHAR_BOOL_TRUE : CHAR_BOOL_FALSE);
+        }
+        if (!CommonUtils.isEmpty(filter.getAuthRoles())) {
+            for (String authRole : filter.getAuthRoles()) {
+                dbStat.setString(parameterIndex++, authRole);
+            }
         }
 
         return parameterIndex;
@@ -1484,11 +1533,23 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         );
     }
 
+    private void updateUserLastLoginTime(@NotNull Connection dbCon, @NotNull String userId) throws SQLException {
+        try (PreparedStatement dbStat = dbCon.prepareStatement(
+            "UPDATE {table_prefix}CB_USER SET LAST_LOGIN_TIME=? WHERE USER_ID=?"
+        )) {
+            dbStat.setTimestamp(1, Timestamp.from(Instant.now()));
+            dbStat.setString(2, userId);
+            dbStat.executeUpdate();
+        }
+    }
+
     @NotNull
     private SMUser fetchUser(ResultSet dbResult, boolean checkSecretStorage) throws SQLException {
         Timestamp timestamp = dbResult.getTimestamp("CHANGE_DATE");
         Instant disableDate = timestamp != null ? timestamp.toInstant() : null;
-        return new SMUser(
+        Timestamp lastLoginTimestamp = dbResult.getTimestamp("LAST_LOGIN_TIME");
+        Instant lastLoginTime = lastLoginTimestamp != null ? lastLoginTimestamp.toInstant() : null;
+        SMUser user = new SMUser(
             dbResult.getString("USER_ID"),
             stringToBoolean(dbResult.getString("IS_ACTIVE")),
             dbResult.getString("DEFAULT_AUTH_ROLE"),
@@ -1497,6 +1558,8 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
             dbResult.getString("DISABLED_BY"),
             dbResult.getString("DISABLE_REASON")
         );
+        user.setLastLoginTime(lastLoginTime);
+        return user;
     }
 
     @Override
@@ -2643,6 +2706,9 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                     permissions = new SMAuthPermissions(
                         activeUserId, smSessionId, getUserPermissions(activeUserId, tokenAuthRole)
                     );
+                    if (CommonUtils.isNotEmpty(activeUserId)) {
+                        updateUserLastLoginTime(dbCon, activeUserId);
+                    }
                     txn.commit();
                 }
             } catch (SQLException e) {
@@ -2849,7 +2915,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         @Nullable String activeUserId,
         boolean createNewUserIfNotExist,
         @Nullable String authRole,
-        SMAuthProviderCustomConfiguration providerConfig
+        @Nullable SMAuthProviderCustomConfiguration providerConfig
     ) throws DBException {
         SMAuthProvider<?> smAuthProviderInstance = authProvider.getInstance();
 
@@ -2867,12 +2933,20 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                 + userIdFromCredentials + "'");
         }
         if (userId == null && createNewUserIfNotExist) {
-            if (!(authProvider.getInstance() instanceof SMAuthProviderExternal<?>)) {
+            if (!(smAuthProviderInstance instanceof SMAuthProviderExternal<?> externalProvider)) {
                 return null;
             }
-
             userId = authProvider.isCaseInsensitive() ? userIdFromCredentials.toLowerCase() : userIdFromCredentials;
             if (!isSubjectExists(userId)) {
+                // Users are looked up by the credentials of this particular provider, so an already
+                // existing user that has no credentials for it yet is not found above. This is a typical
+                // reverse proxy case: the user was created earlier (by an admin or another provider) and
+                // only gets its reverse proxy credentials linked below on the first login.
+                // Therefore auto provisioning is checked here only, where the user really does not exist.
+                if (!externalProvider.isAutoUserProvisioningEnabled(providerConfig)) {
+                    log.debug("User '" + userId + "' not found and auto user provisioning is disabled");
+                    return null;
+                }
                 log.debug("Create user: " + userId);
                 validateAndCreateUser(
                     userId,
@@ -3532,7 +3606,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
     public void finishConfiguration(
         @NotNull String adminName,
         @Nullable String adminPassword,
-        @NotNull List<AuthInfo> authInfoList
+        @NotNull List<SMAuthConfiguration> authInfoList
     ) throws DBException {
         database.finishConfiguration(adminName, adminPassword, authInfoList);
     }

@@ -4,6 +4,7 @@ export default [
   ['plugin_help_welcome_docs_label', 'Documentation'],
   ['plugin_help_welcome_docs_description', 'Apprenez à utiliser {arg:product}'],
 
+  ['data_viewer_shortcut_open_cell_context_menu', 'Ouvrir le menu contextuel pour la cellule sélectionnée'],
   ['data_viewer_shortcut_start_inline_editing', "Ouvrir l'éditeur en ligne pour la cellule sélectionnée"],
   ['data_viewer_shortcut_add_new_row', 'Ajouter une nouvelle ligne'],
   ['data_viewer_shortcut_duplicate_row', 'Dupliquer la ligne'],
@@ -16,6 +17,10 @@ export default [
   ['sql_editor_shortcut_execute_script', 'Exécuter le script'],
   ['sql_editor_shortcut_show_execution_plan', "Afficher le plan d'exécution"],
   ['sql_editor_shortcut_format', 'Formater le script'],
+  ['sql_editor_shortcut_fold_code', 'Plier le bloc de code'],
+  ['sql_editor_shortcut_unfold_code', 'Déplier le bloc de code'],
+  ['sql_editor_shortcut_fold_all', 'Plier tous les blocs de code'],
+  ['sql_editor_shortcut_unfold_all', 'Déplier tous les blocs de code'],
   ['sql_editor_shortcut_open_editor_in_new_tab', "Ouvrir l'éditeur SQL dans un nouvel onglet"],
   ['sql_editor_shortcut_comment_uncomment_selection', 'Commenter/Décommenter la sélection'],
   ['sql_editor_shortcut_start_completion', 'Afficher les suggestions de saisie semi-automatique'],

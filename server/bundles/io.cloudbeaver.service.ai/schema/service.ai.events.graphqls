@@ -1,0 +1,62 @@
+####################################################
+# AI events
+####################################################
+
+extend enum CBServerEventId {
+    cb_ai_chat_message_chunk @since(version: "25.1.1")
+    cb_ai_chat_message_error @since(version: "25.1.1")
+    cb_ai_chat_message @since(version: "25.3.5")
+}
+
+extend enum CBClientEventId {
+    cb_client_ai_function_call_confirmation @since(version: "26.0.3")
+}
+
+extend enum CBEventTopic {
+    cb_ai @since(version: "25.1.1")
+}
+
+type WSAIChatMessageChunkEvent implements CBServerEvent @since(version: "25.1.1") {
+    id: CBServerEventId!
+    topicId: CBEventTopic
+    conversationId: ID!
+    messageId: ID!
+    chunk: String
+    completed: Boolean!
+}
+
+type WSAIChatMessageErrorEvent implements CBServerEvent @since(version: "25.1.1") {
+    id: CBServerEventId!
+    topicId: CBEventTopic
+    conversationId: ID!
+    messageId: ID!
+    errorMessage: String
+}
+
+type WSAIChatMessageEvent implements CBServerEvent @since(version: "25.3.5") {
+    id: CBServerEventId!
+    topicId: CBEventTopic
+    conversationId: ID!
+    messageId: ID!
+    role: String!
+    content: String!
+    displayMessage: String!
+    time: String!
+    "Present only with CONFIRMATION role"
+    functionConfirmation: AIFunctionConfirmation
+    "Present only with FUNCTION role"
+    functionCall: AIFunctionCall
+    "Present only with FUNCTION role"
+    functionResult: AIFunctionResult
+}
+
+type WSAIFunctionCallConfirmationEvent implements CBClientEvent @since(version: "26.0.3") {
+    id: CBClientEventId!
+    topicId: CBEventTopic
+    conversationId: ID!
+    messageId: ID!
+    "Returns a list of confirmed functions"
+    confirmedFunctionCalls: [ID!]
+    "Returns a list of declined functions"
+    declinedFunctionCalls: [ID!]
+}

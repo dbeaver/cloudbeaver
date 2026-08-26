@@ -1,0 +1,18 @@
+fragment ConnectionType on ConnectionType {
+  id
+  name
+  description
+  colorLight
+  colorDark
+
+  autocommit
+  confirmExecute
+  confirmDataChange
+  smartCommit
+  smartCommitRecover
+  autoCloseTransactions
+  closeIdleTransactionPeriod
+  autoCloseConnections
+  closeIdleConnectionPeriod
+  predefined
+}

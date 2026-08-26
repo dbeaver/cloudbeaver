@@ -1,4 +1,6 @@
+####################################################
 # Data transfer queries
+####################################################
 
 type DataTransferProcessorInfo {
     id: ID!
@@ -32,6 +34,29 @@ type DataTransferOutputSettings {
 type DataTransferDefaultExportSettings {
     outputSettings : DataTransferOutputSettings!
     supportedEncodings: [String!]!
+}
+
+"""
+Database dependent data import settings.
+Which of them are supported by a particular connection is reported by ConnectionInfo.driverConfiguration.
+New database dependent import settings should be added here.
+"""
+input DataTransferImportSettings {
+    "Id of the 'on duplicate key' replace method"
+    onDuplicateKeyMethod: ID
+    "Use bulk load during import"
+    useBulkLoad: Boolean
+    "Use transactions during import"
+    useTransactions: Boolean
+    "Open new connection(s) for the import task"
+    openNewConnection: Boolean
+}
+
+input DataTransferImportParameters {
+    "Import processor ID"
+    processorId: ID!
+    "Import settings. Omitted settings keep their default value"
+    settings: DataTransferImportSettings
 }
 
 input DataTransferParameters {
@@ -76,6 +101,15 @@ extend type Query {
         contextId: ID!,
         resultsId: ID!,
         parameters: DataTransferParameters!
+    ): AsyncTaskInfo!
+
+    "Creates async task for data transfer import of a previously uploaded file into the results"
+    dataTransferImportDataIntoResults(
+        projectId: ID,
+        connectionId: ID!,
+        contextId: ID!,
+        resultsId: ID!,
+        parameters: DataTransferImportParameters!
     ): AsyncTaskInfo!
 
     "Deletes data transfer file by ID"

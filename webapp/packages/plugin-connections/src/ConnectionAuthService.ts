@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -10,6 +10,7 @@ import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import {
   type Connection,
   ConnectionInfoAuthPropertiesResource,
+  ConnectionInfoExternalNetworkHandlersService,
   type ConnectionInfoNetworkHandlers,
   ConnectionInfoNetworkHandlersResource,
   ConnectionInfoResource,
@@ -21,7 +22,10 @@ import {
 import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
+import { CachedMapAllKey } from '@cloudbeaver/core-resource';
+import type { NetworkHandlerDescriptor } from '@cloudbeaver/core-sdk';
 import { AuthenticationService } from '@cloudbeaver/plugin-authentication';
+import { NetworkHandlerResource } from '@cloudbeaver/plugin-network-handlers';
 
 const DatabaseAuthDialog = importLazyComponent(() => import('./DatabaseAuthDialog/DatabaseAuthDialog.js').then(m => m.DatabaseAuthDialog));
 
@@ -29,22 +33,26 @@ const DatabaseAuthDialog = importLazyComponent(() => import('./DatabaseAuthDialo
   ConnectionInfoResource,
   ConnectionInfoNetworkHandlersResource,
   ConnectionInfoAuthPropertiesResource,
+  ConnectionInfoExternalNetworkHandlersService,
   CommonDialogService,
   AuthProviderService,
   UserInfoResource,
   ConnectionsManagerService,
   AuthenticationService,
+  NetworkHandlerResource,
 ])
 export class ConnectionAuthService {
   constructor(
     private readonly connectionInfoResource: ConnectionInfoResource,
     private readonly connectionInfoNetworkHandlersResource: ConnectionInfoNetworkHandlersResource,
     private readonly connectionInfoAuthPropertiesResource: ConnectionInfoAuthPropertiesResource,
+    private readonly connectionInfoExternalNetworkHandlersService: ConnectionInfoExternalNetworkHandlersService,
     private readonly commonDialogService: CommonDialogService,
     private readonly authProviderService: AuthProviderService,
     userInfoResource: UserInfoResource,
     private readonly connectionsManagerService: ConnectionsManagerService,
     private readonly authenticationService: AuthenticationService,
+    private readonly networkHandlerResource: NetworkHandlerResource,
   ) {
     connectionsManagerService.connectionExecutor.addHandler(this.connectionDialog.bind(this));
     this.authenticationService.onLogin.before(
@@ -82,6 +90,7 @@ export class ConnectionAuthService {
     }
 
     let connectionNetworkHandlers: ConnectionInfoNetworkHandlers | null = null;
+    let handlers: NetworkHandlerDescriptor[] = [];
     let connection = await this.connectionInfoResource.load(key);
     const isConnectedInitially = connection?.connected;
 
@@ -103,13 +112,23 @@ export class ConnectionAuthService {
       }
     }
 
-    [connectionNetworkHandlers, connection] = await Promise.all([
+    [connectionNetworkHandlers, connection, handlers] = await Promise.all([
       this.connectionInfoNetworkHandlersResource.load(key),
       this.connectionInfoResource.load(key),
+      this.networkHandlerResource.load(CachedMapAllKey),
     ]);
 
+    const externalHandlers = new Set(await this.connectionInfoExternalNetworkHandlersService.getProvidedHandlers(key));
     const networkHandlers = connectionNetworkHandlers
-      .networkHandlersConfig!.filter(handler => handler.enabled && (!handler.savePassword || resetCredentials))
+      .networkHandlersConfig!.filter(handler => {
+        const target = handlers.find(h => h.id === handler.id);
+
+        if (target && target.properties.length === 0) {
+          return false;
+        }
+
+        return !externalHandlers.has(handler.id) && handler.enabled && (!handler.savePassword || resetCredentials);
+      })
       .map(handler => handler.id);
 
     if (connectionAuthProperties.authNeeded || (connectionAuthProperties.credentialsSaved && resetCredentials) || networkHandlers.length > 0) {

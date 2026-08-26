@@ -35,6 +35,7 @@ export default [
   ['authentication_administration_users_filters_status_enabled', 'ACTIVÉ'],
   ['authentication_administration_users_filters_status_disabled', 'DÉSACTIVÉ'],
   ['authentication_administration_users_filters_status_all', 'TOUS'],
+  ['authentication_administration_users_filters_filter_label', 'Filter'],
   ['authentication_administration_users_empty', "Il n'y a pas d'utilisateurs"],
   ['authentication_administration_users_delete_user', "Supprimer l'utilisateur"],
   ['authentication_administration_users_delete_user_fail', "Échec de la suppression de l'utilisateur"],
@@ -126,8 +127,10 @@ export default [
     'administration_teams_delete_confirmation_users_note',
     "Notez que les utilisateurs perdront leur affiliation à l'équipe et toutes les permissions associées",
   ],
+  ['administration_teams_team_granted_users_only_admin_team', "Vous ne pouvez pas gérer vos propres permissions, car il s'agit de la seule équipe d'administration à laquelle vous participez"],
   ['plugin_authentication_administration_team_form_edit_label', 'Team editing form'],
   ['plugin_authentication_administration_user_form_edit_label', 'User editing form'],
+  ['plugin_authentication_administration_user_last_login', 'Dernière connexion'],
 
   [
     'plugin_authentication_administration_user_username_validation_error',

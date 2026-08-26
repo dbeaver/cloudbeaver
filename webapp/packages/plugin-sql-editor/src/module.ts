@@ -14,9 +14,6 @@ import { OutputMenuBootstrap } from './SqlResultTabs/OutputLogs/OutputMenuBootst
 import { OutputLogsService } from './SqlResultTabs/OutputLogs/OutputLogsService.js';
 import { OutputLogsResource } from './SqlResultTabs/OutputLogs/OutputLogsResource.js';
 import { OutputLogsEventHandler } from './SqlResultTabs/OutputLogs/OutputLogsEventHandler.js';
-import { SqlExecutionPlanService } from './SqlResultTabs/ExecutionPlan/SqlExecutionPlanService.js';
-import { SqlExecutionPlanViewService } from './SqlResultTabs/ExecutionPlan/SqlExecutionPlanViewService.js';
-import { SqlExecutionPlanViewBootstrap } from './SqlResultTabs/ExecutionPlan/SqlExecutionPlanViewBootstrap.js';
 import { SqlEditorView } from './SqlEditorView.js';
 import { SqlEditorSettingsService } from './SqlEditorSettingsService.js';
 import { SqlEditorService } from './SqlEditorService.js';
@@ -29,6 +26,7 @@ import { MenuBootstrap } from './MenuBootstrap.js';
 import { LocaleService } from './LocaleService.js';
 import { SqlEditorModel } from './SqlEditorModel/SqlEditorModel.js';
 import { SqlEditorModelService } from './SqlEditorModel/SqlEditorModelService.js';
+import { SqlEditorPermissionService } from './SqlEditorPermissionService.js';
 
 export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-sql-editor',
@@ -50,9 +48,6 @@ export default ModuleRegistry.add({
       .addSingleton(OutputLogsService)
       .addSingleton(OutputLogsResource)
       .addSingleton(OutputLogsEventHandler)
-      .addSingleton(SqlExecutionPlanService)
-      .addSingleton(SqlExecutionPlanViewService)
-      .addSingleton(Bootstrap, SqlExecutionPlanViewBootstrap)
       .addSingleton(SqlEditorView)
       .addSingleton(SqlEditorSettingsService)
       .addSingleton(SqlEditorService)
@@ -62,6 +57,7 @@ export default ModuleRegistry.add({
       .addSingleton(SqlDataSourceService)
       .addSingleton(LocalStorageSqlDataSourceBootstrap)
       .addSingleton(SqlEditorModelService)
-      .addSingleton(MenuBootstrap);
+      .addSingleton(MenuBootstrap)
+      .addSingleton(SqlEditorPermissionService);
   },
 });

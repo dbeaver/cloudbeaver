@@ -15,5 +15,5 @@
   flex-direction: column-reverse;
   flex-wrap: nowrap;
   justify-content: flex-end;
-  z-index: 1000; /* modal dialogs is 999, but more correct way is place notifications after dialogs in the dom */
+  z-index: 1100; /* Dialog has z-index: 1000 so to show it above backdrop we need to keep it higher */
 }

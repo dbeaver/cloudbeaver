@@ -11,11 +11,6 @@ export default [
   ['plugin_connections_new_connection_dialog_title', 'Nouvelle connexion'],
 
   ['plugin_connections_connection_edit_menu_item_title', 'Modifier la connexion'],
-  ['plugin_connections_connection_edit_cancel_title', "Confirmation d'annulation"],
-  [
-    'plugin_connections_connection_edit_cancel_message',
-    'Vous allez annuler les modifications de la connexion. Les modifications non enregistrées seront perdues. Êtes-vous sûr ?',
-  ],
   ['plugin_connections_connection_edit_reconnect_title', 'Connexion mise à jour'],
   ['plugin_connections_connection_edit_reconnect_message', 'La connexion a été mise à jour. Voulez-vous vous reconnecter ?'],
   ['plugin_connections_connection_edit_reconnect_failed', 'Échec de la reconnexion'],
@@ -41,18 +36,6 @@ export default [
   ['plugin_connections_settings', 'Connexions'],
   ['plugin_connections_settings_hide_connections_view_name', 'Hide connection view management'],
   ['plugin_connections_settings_hide_connections_view_description', 'Connections view submenu will be hidden for all users except administrators'],
-
-  ['plugin_connections_connection_ssl_enable', 'Activer SSL'],
-  ['plugin_connections_connection_ssl_optional', 'All SSL parameters are optional.'],
-  [
-    'plugin_connections_connection_ssl_description',
-    'You must specify SSL certificates if they are required by your server configuration. Settings on this page override Driver properties',
-  ],
-  [
-    'plugin_connections_connection_ssl_note',
-    '{arg:productName} does not verify SSL configuration and relies on the driver implementation. Please refer to the driver documentation for more information.',
-  ],
-  ['plugin_connections_connection_ssl_docs', 'SSL configuration documentation'],
 
   ['plugin_connections_connection_form_shared_credentials_manage_info', "Vous pouvez gérer les identifiants dans l'onglet "],
   ['plugin_connections_connection_form_shared_credentials_manage_info_tab_link', 'Onglet Identifiants'],

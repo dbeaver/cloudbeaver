@@ -8,11 +8,13 @@
 
 import { Bootstrap, ModuleRegistry } from '@cloudbeaver/core-di';
 import { ConnectionFormAccessTabBootstrap } from './ConnectionFormAccess/ConnectionFormAccessTabBootstrap.js';
+import { LocaleService } from './LocaleService.js';
 
 export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-connections-administration',
 
   configure: serviceCollection => {
+    serviceCollection.addSingleton(Bootstrap, LocaleService);
     serviceCollection.addSingleton(Bootstrap, ConnectionFormAccessTabBootstrap);
   },
 });

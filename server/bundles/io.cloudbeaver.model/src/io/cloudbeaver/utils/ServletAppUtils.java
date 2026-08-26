@@ -192,13 +192,16 @@ public class ServletAppUtils {
         @NotNull String serviceId,
         @NotNull String origin
     ) throws DBException {
-        String finalOrigin =  webAuthApplication.modifyOrigin(origin);
+        String finalOrigin = ServletAppUtils.substringBeforeRootURI(webAuthApplication.modifyOrigin(origin));
         String serviceUriSegment = removeSideSlashes(webAuthApplication.getAuthServiceUriSegment());
         String rootUri = removeSideSlashes(getServletApplication().getRootURI());
         if (finalOrigin.endsWith("/" + rootUri) && serviceUriSegment.startsWith(rootUri + "/")) {
             finalOrigin = finalOrigin.substring(0, finalOrigin.length() - rootUri.length());
         }
         StringBuilder authUriBuilder = new StringBuilder(removeSideSlashes(finalOrigin));
+        if (CommonUtils.isNotEmpty(rootUri)) {
+            authUriBuilder.append("/").append(rootUri);
+        }
         if (CommonUtils.isNotEmpty(serviceUriSegment)) {
             authUriBuilder.append("/").append(serviceUriSegment);
         }
@@ -230,6 +233,14 @@ public class ServletAppUtils {
         sessionCookie.setHttpOnly(true);
         sessionCookie.setPath(path);
         response.addCookie(sessionCookie);
+    }
+
+    public static String getHeaderOrLegacy(HttpServletRequest request, String headerName, String legacyHeaderName) {
+        String value = request.getHeader(headerName);
+        if (CommonUtils.isEmpty(value)) {
+            value = request.getHeader(legacyHeaderName);
+        }
+        return value;
     }
 
     public static String getRequestCookie(HttpServletRequest request, String cookieName) {
@@ -298,10 +309,19 @@ public class ServletAppUtils {
     }
 
     @NotNull
+    public static String getHostOriginFromRequest(@NotNull HttpServletRequest request) {
+        return substringBeforeRootURI(getOriginFromRequest(request));
+    }
+
+    @NotNull
     public static String getOriginFromRequest(@NotNull HttpServletRequest request) {
         String origin = request.getHeader(HEADER_ORIGIN);
         if (log.isTraceEnabled()) {
             log.trace("Origin header: " + origin);
+        }
+        if ("null".equals(origin)) {
+            //strange identity provider bug
+            origin = null;
         }
         if (CommonUtils.isEmpty(origin)) {
             origin = request.getHeader(HEADER_X_ORIGIN);
@@ -319,8 +339,7 @@ public class ServletAppUtils {
             if (log.isTraceEnabled()) {
                 log.trace("forwarded origin: " + origin);
             }
-        }
-        if (CommonUtils.isEmpty(origin)) {
+        } else if (CommonUtils.isEmpty(origin)) {
             URI requestUrl = URI.create(request.getRequestURL().toString());
             if (log.isTraceEnabled()) {
                 log.trace("Request URL: " + requestUrl);
@@ -344,13 +363,34 @@ public class ServletAppUtils {
                 log.error("Failed to parse port from header: " + request.getHeader(HEADER_FORWARDED_PORT), e);
             }
         }
+
+        String finalScheme = uri.getScheme();
+        String finalHost = uri.getHost();
+        int finalPort = port;
+        boolean changed = false;
+        if (CommonUtils.isNotEmpty(forwardedScheme) && !forwardedScheme.equals(finalScheme)) {
+            finalScheme = forwardedScheme;
+            changed = true;
+        }
+        if (CommonUtils.isNotEmpty(forwardedHost) && !forwardedHost.equals(finalHost)) {
+            finalHost = forwardedHost;
+            changed = true;
+        }
         if (DEFAULT_PORTS.contains(port)) {
+            finalPort = -1;
+            changed = true;
+        }
+        if (log.isTraceEnabled()) {
+            log.trace("Origin URI: " + origin);
+        }
+
+        if (changed) {
             try {
                 origin = new URI(
-                    uri.getScheme(),
+                    finalScheme,
                     uri.getUserInfo(),
-                    uri.getHost(),
-                    -1,
+                    finalHost,
+                    finalPort,
                     uri.getPath(),
                     uri.getQuery(),
                     uri.getFragment()
@@ -358,9 +398,6 @@ public class ServletAppUtils {
             } catch (URISyntaxException e) {
                 log.error("Failed to create URI without port", e);
             }
-        }
-        if (log.isTraceEnabled()) {
-            log.trace("Origin URI: " + origin);
         }
 
         return origin;

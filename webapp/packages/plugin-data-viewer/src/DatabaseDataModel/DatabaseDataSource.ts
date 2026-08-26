@@ -11,6 +11,7 @@ import { withExternal, type IServiceProvider, type IServiceScope, type SingleSer
 import { Executor, ExecutorInterrupter, type IExecutor, type ISyncExecutor, type ITask, SyncExecutor, Task } from '@cloudbeaver/core-executor';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
+import { DatabasePersistedStateStore } from './DatabasePersistedStateStore.js';
 import { IDatabaseDataActions } from './IDatabaseDataActions.js';
 import type { IDatabaseDataResult } from './IDatabaseDataResult.js';
 import {
@@ -32,7 +33,8 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
   offset: number;
   count: number;
   prevOptions: Readonly<TOptions> | null;
-  options: TOptions | null;
+  protected _options: TOptions | null;
+  readonly persistedState: DatabasePersistedStateStore;
   requestInfo: IRequestInfo;
   error: Error | null;
   private readonly features: Set<DatabaseDataFeature | string>;
@@ -51,6 +53,10 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
     }
 
     return false;
+  }
+
+  get options(): TOptions | null {
+    return this._options;
   }
 
   readonly serviceProvider: IServiceProvider;
@@ -78,7 +84,8 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
     this.offset = 0;
     this.count = 0;
     this.prevOptions = null;
-    this.options = null;
+    this._options = null;
+    this.persistedState = new DatabasePersistedStateStore();
     this.disabled = false;
     this.outdated = true;
     this.constraintsAvailable = true;
@@ -98,7 +105,7 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
     this.error = null;
     this.lastAction = this.requestData.bind(this);
 
-    makeObservable<DatabaseDataSource<TOptions, TResult>, 'disabled' | 'features' | 'activeOperationStack' | 'outdated'>(this, {
+    makeObservable<DatabaseDataSource<TOptions, TResult>, 'disabled' | 'features' | 'activeOperationStack' | 'outdated' | '_options'>(this, {
       access: observable,
       dataFormat: observable,
       features: observable,
@@ -107,7 +114,7 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
       offset: observable,
       count: observable,
       prevOptions: observable,
-      options: observable,
+      _options: observable,
       requestInfo: observable,
       error: observable.ref,
       disabled: observable,
@@ -229,9 +236,17 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
   }
 
   setOptions(options: TOptions): this {
-    this.options = options;
+    this._options = options;
     return this;
   }
+
+  loadPersistedState(state: Record<string, unknown>): this {
+    this.persistedState.setStore(state);
+    this.onPersistedStateLoaded();
+    return this;
+  }
+
+  protected onPersistedStateLoaded(): void {}
 
   setDataFormat(dataFormat: ResultDataFormat): this {
     this.dataFormat = dataFormat;
@@ -300,7 +315,7 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
       this.lastAction = this.refreshData.bind(this);
 
       if (this.prevOptions) {
-        this.options = toJS(this.prevOptions);
+        this._options = toJS(this.prevOptions);
       }
 
       return this.requestDataAction();

@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -9,8 +9,19 @@ import { computed, observable, runInAction } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useMemo, useState } from 'react';
 
-import { ColoredContainer, Group, type IProperty, PropertiesTable, s, useAutoLoad, useExecutor, useResource, useS } from '@cloudbeaver/core-blocks';
-import { DBDriverResource } from '@cloudbeaver/core-connections';
+import {
+  ColoredContainer,
+  Group,
+  type IProperty,
+  PropertiesTable,
+  PropertiesTableStyles,
+  s,
+  SContext,
+  type StyleRegistry,
+  useAutoLoad,
+  useExecutor,
+  useS,
+} from '@cloudbeaver/core-blocks';
 import { type TabContainerPanelComponent, useTab } from '@cloudbeaver/core-ui';
 import { uuid } from '@cloudbeaver/core-utils';
 
@@ -18,6 +29,9 @@ import styles from './DriverProperties.module.css';
 import { getConnectionFormDriverPropertiesPart } from './getConnectionFormDriverPropertiesPart.js';
 import type { IConnectionFormProps } from '../IConnectionFormState.js';
 import { getConnectionFormOptionsPart } from '../Options/getConnectionFormOptionsPart.js';
+import { useDriverProperties } from './useDriverProperties.js';
+
+const registry: StyleRegistry = [[PropertiesTableStyles, { mode: 'append', styles: [styles] }]];
 
 export const DriverProperties: TabContainerPanelComponent<IConnectionFormProps> = observer(function DriverProperties({ tabId, formState }) {
   const { selected } = useTab(tabId);
@@ -58,15 +72,12 @@ export const DriverProperties: TabContainerPanelComponent<IConnectionFormProps> 
     ],
   });
 
-  const driver = useResource(DriverProperties, DBDriverResource, {
-    key: (selected && optionsPart.state.driverId) || null,
-    includes: ['includeDriverProperties'] as const,
-  });
+  const propertiesState = useDriverProperties({ formState, config: optionsPart.state, selected });
 
   runInAction(() => {
-    if (driver.data) {
+    if (propertiesState.properties) {
       for (const key of Object.keys(driverPropertiesPart.state)) {
-        if (driver.data.driverProperties.some(property => property.id === key) || state.propertiesList.some(property => property.key === key)) {
+        if (propertiesState.properties.some(property => property.id === key) || state.propertiesList.some(property => property.key === key)) {
           continue;
         }
 
@@ -79,8 +90,8 @@ export const DriverProperties: TabContainerPanelComponent<IConnectionFormProps> 
     () =>
       computed<IProperty[]>(() => [
         ...state.propertiesList,
-        ...(driver.data?.driverProperties
-          ? driver.data.driverProperties.map<IProperty>(property => ({
+        ...(propertiesState.properties
+          ? propertiesState.properties.map<IProperty>(property => ({
               id: property.id!,
               key: property.id!,
               keyPlaceholder: property.id,
@@ -92,23 +103,26 @@ export const DriverProperties: TabContainerPanelComponent<IConnectionFormProps> 
             }))
           : []),
       ]),
-    [driver.data],
+    [propertiesState.properties],
   );
 
   useAutoLoad(DriverProperties, driverPropertiesPart, selected);
+  useAutoLoad(DriverProperties, propertiesState, selected, undefined, true);
 
   return (
     <ColoredContainer className={s(style, { coloredContainer: true })} parent>
       <Group className={s(style, { group: true })} box large>
-        <PropertiesTable
-          className={s(style, { propertiesTable: true })}
-          properties={joinedProperties.get()}
-          propertiesState={driverPropertiesPart.state}
-          readOnly={formState.isDisabled || formState.isReadOnly}
-          filterable
-          onAdd={state.add}
-          onRemove={state.remove}
-        />
+        <SContext registry={registry}>
+          <PropertiesTable
+            className={s(style, { propertiesTable: true })}
+            properties={joinedProperties.get()}
+            propertiesState={driverPropertiesPart.state}
+            readOnly={formState.isDisabled || formState.isReadOnly}
+            filterable
+            onAdd={state.add}
+            onRemove={state.remove}
+          />
+        </SContext>
       </Group>
     </ColoredContainer>
   );

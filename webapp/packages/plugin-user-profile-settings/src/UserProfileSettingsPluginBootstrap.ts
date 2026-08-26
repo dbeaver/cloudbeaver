@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -8,7 +8,7 @@
 import { ConfirmationDialog, importLazyComponent } from '@cloudbeaver/core-blocks';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
-import { ExecutorInterrupter } from '@cloudbeaver/core-executor';
+import { ExecutorInterrupter, type IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { UserSettingsService } from '@cloudbeaver/core-settings-user';
 import { ACTION_SETTINGS, ActionService, MenuService } from '@cloudbeaver/core-view';
 import { TOP_NAV_BAR_SETTINGS_MENU } from '@cloudbeaver/plugin-settings-menu';
@@ -32,23 +32,8 @@ export class UserProfileSettingsPluginBootstrap extends Bootstrap {
   }
 
   override register(): void {
-    this.userProfileOptionsPanelService.onClose.addHandler(async (data, context) => {
-      if (!this.userSettingsService.isEdited()) {
-        return;
-      }
-
-      const { status } = await this.commonDialogService.open(ConfirmationDialog, {
-        title: 'ui_save_reminder',
-        message: 'ui_are_you_sure',
-      });
-
-      if (status === DialogueStateResult.Rejected) {
-        ExecutorInterrupter.interrupt(context);
-        return;
-      }
-
-      this.userSettingsService.resetChanges();
-    });
+    this.userProfileOptionsPanelService.onClose.addHandler(this.confirmDiscardChanges.bind(this));
+    this.userProfileTabsService.onBeforeTabChange.addHandler(this.confirmDiscardChanges.bind(this));
 
     this.userProfileTabsService.tabContainer.add({
       key: SETTINGS_TAB_ID,
@@ -77,8 +62,28 @@ export class UserProfileSettingsPluginBootstrap extends Bootstrap {
         };
       },
       handler: async () => {
-        await this.userProfileOptionsPanelService.open(SETTINGS_TAB_ID);
+        await this.userProfileTabsService.open(SETTINGS_TAB_ID);
       },
     });
+  }
+
+  private async confirmDiscardChanges(_: unknown, contexts: IExecutionContextProvider<any>): Promise<void> {
+    if (!this.userSettingsService.isEdited()) {
+      return;
+    }
+
+    const { status } = await this.commonDialogService.open(ConfirmationDialog, {
+      title: 'ui_discard_changes',
+      message: 'ui_discard_changes_message',
+      confirmActionText: 'ui_discard',
+      cancelActionText: 'ui_keep_editing',
+    });
+
+    if (status === DialogueStateResult.Rejected) {
+      ExecutorInterrupter.interrupt(contexts);
+      return;
+    }
+
+    this.userSettingsService.resetChanges();
   }
 }

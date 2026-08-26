@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2025 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,8 @@ import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
 import org.jkiss.dbeaver.model.security.SMAuthCredentialsProfile;
 import org.jkiss.dbeaver.model.security.SMAuthProviderDescriptor;
 import org.jkiss.dbeaver.model.security.SMSubjectType;
+import org.jkiss.dbeaver.utils.GeneralUtils;
+import org.jkiss.dbeaver.utils.SystemVariablesResolver;
 import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
 
@@ -57,6 +59,7 @@ public class WebAuthProviderDescriptor extends AbstractDescriptor {
     private final boolean isPrivate;
     private final boolean isAuthHidden;
     private final boolean isCaseInsensitive;
+    private final boolean sameTabRedirectOnLogout;
     private final boolean serviceProvider;
     private final String[] requiredFeatures;
     private final boolean isRequired;
@@ -73,6 +76,7 @@ public class WebAuthProviderDescriptor extends AbstractDescriptor {
         this.isRequired = CommonUtils.toBoolean(cfg.getAttribute(WebRegistryConstant.ATTR_REQUIRED));
         this.isAuthHidden = CommonUtils.toBoolean(cfg.getAttribute(WebRegistryConstant.ATTR_AUTH_HIDDEN));
         this.isCaseInsensitive = CommonUtils.toBoolean(cfg.getAttribute(WebRegistryConstant.ATTR_CASE_INSENSITIVE));
+        this.sameTabRedirectOnLogout = CommonUtils.toBoolean(cfg.getAttribute(WebRegistryConstant.ATTR_SAME_TAB_LOGOUT_REDIRECT));
         this.serviceProvider = CommonUtils.toBoolean(cfg.getAttribute(WebRegistryConstant.ATTR_SERVICE_PROVIDER));
 
         for (IConfigurationElement cfgElement : cfg.getChildren(WebRegistryConstant.TAG_CONFIGURATION)) {
@@ -110,7 +114,9 @@ public class WebAuthProviderDescriptor extends AbstractDescriptor {
     }
 
     public String getDescription() {
-        return cfg.getAttribute(WebRegistryConstant.ATTR_DESCRIPTION);
+        return GeneralUtils.replaceVariables(
+            cfg.getAttribute(WebRegistryConstant.ATTR_DESCRIPTION), SystemVariablesResolver.INSTANCE
+        );
     }
 
     public DBPImage getIcon() {
@@ -123,6 +129,10 @@ public class WebAuthProviderDescriptor extends AbstractDescriptor {
 
     public boolean isTrusted() {
         return trusted;
+    }
+
+    public boolean isSameTabRedirectOnLogout() {
+        return sameTabRedirectOnLogout;
     }
 
     public boolean isPrivate() {

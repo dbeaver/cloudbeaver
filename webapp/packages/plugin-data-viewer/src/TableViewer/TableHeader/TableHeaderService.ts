@@ -51,8 +51,12 @@ export class TableHeaderService extends Bootstrap {
   }
 
   override register(): void {
-    this.tableHeaderPlaceholder.add(TableWhereFilter, 1, props => !isResultSetDataSource(props.model.source));
-    this.tableHeaderPlaceholder.add(TableHeaderMenu, 2);
+    this.tableHeaderPlaceholder.add(
+      TableWhereFilter,
+      1,
+      props => !isResultSetDataSource(props.model.source) || props.model.source.hasFeature(DatabaseDataFeature.References),
+    );
+    this.tableHeaderPlaceholder.add(TableHeaderMenu, 2, props => props.model.source.hasFeature(DatabaseDataFeature.References));
 
     this.actionService.addHandler({
       id: 'table-header-menu-base-handler',
@@ -91,10 +95,22 @@ export class TableHeaderService extends Bootstrap {
             const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
             const constraints = model.source.tryGetAction(resultIndex, IDatabaseDataConstraintAction);
 
+            let updated = false;
+
             if (constraints) {
               constraints.deleteData();
+              updated = true;
+            }
+
+            if (!updated && model.source.options) {
+              model.source.options.whereFilter = '';
+              updated = true;
+            }
+
+            if (updated) {
               await model.request();
             }
+
             break;
           }
           case ACTION_UNDO: {

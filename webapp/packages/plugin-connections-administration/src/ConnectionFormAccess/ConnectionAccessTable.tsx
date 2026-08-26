@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -12,16 +12,33 @@ import { Alert, StaticImage, useAutoLoad, useResource, useTranslate } from '@clo
 import { useTab, type TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 import { getConnectionFormOptionsPart, type IConnectionFormProps } from '@cloudbeaver/plugin-connections';
 import { CachedMapAllKey, CachedResourceOffsetPageListKey } from '@cloudbeaver/core-resource';
-import { TeamsResource, UsersResource, UsersResourceFilterKey, type AdminUser, type TeamInfo } from '@cloudbeaver/core-authentication';
+import {
+  compareGrantSubjectsByLastLogin,
+  compareGrantSubjectsByName,
+  TeamsResource,
+  UsersResource,
+  UsersResourceFilterKey,
+  type AdminUser,
+  type TeamInfo,
+} from '@cloudbeaver/core-authentication';
 import { ConnectionInfoOriginResource, ConnectionInfoResource, createConnectionParam, isCloudConnection } from '@cloudbeaver/core-connections';
 import { GrantManagementTable, type IGrantManagementTableColumn } from '@cloudbeaver/plugin-data-grid';
 
 import { getConnectionFormAccessPart } from './getConnectionFormAccessPart.js';
 
-const NAME_COLUMN: IGrantManagementTableColumn = { key: 'name', label: 'connections_connection_access_user_or_team_name' };
-const DESCRIPTION_COLUMN: IGrantManagementTableColumn = { key: 'description', label: 'connections_connection_description' };
+const NAME_COLUMN: IGrantManagementTableColumn<AdminUser | TeamInfo> = {
+  key: 'name',
+  label: 'connections_connection_access_user_or_team_name',
+  compare: compareGrantSubjectsByName,
+};
+const DESCRIPTION_COLUMN: IGrantManagementTableColumn<AdminUser | TeamInfo> = { key: 'description', label: 'connections_connection_description' };
+const LAST_LOGIN_COLUMN: IGrantManagementTableColumn<AdminUser | TeamInfo> = {
+  key: 'lastLogin',
+  label: 'plugin_connections_administration_user_last_login',
+  compare: compareGrantSubjectsByLastLogin,
+};
 
-const COLUMNS: IGrantManagementTableColumn[] = [NAME_COLUMN, DESCRIPTION_COLUMN];
+const COLUMNS: IGrantManagementTableColumn<AdminUser | TeamInfo>[] = [NAME_COLUMN, DESCRIPTION_COLUMN, LAST_LOGIN_COLUMN];
 
 export const ConnectionAccessTable: TabContainerPanelComponent<IConnectionFormProps> = observer(function ConnectionAccessTable({ tabId, formState }) {
   const translate = useTranslate();
@@ -98,6 +115,13 @@ export const ConnectionAccessTable: TabContainerPanelComponent<IConnectionFormPr
           {description}
         </span>
       );
+    }
+
+    if (colKey === LAST_LOGIN_COLUMN.key && !isTeam) {
+      const lastLoginFullTime = item.lastLoginTime ? new Date(item.lastLoginTime).toLocaleString() : '-';
+      const lastLoginDate = item.lastLoginTime ? new Date(item.lastLoginTime).toLocaleDateString() : '-';
+
+      return <span title={lastLoginFullTime}>{lastLoginDate}</span>;
     }
 
     return null;

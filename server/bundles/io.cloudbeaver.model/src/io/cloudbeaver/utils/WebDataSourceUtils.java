@@ -33,6 +33,7 @@ import org.jkiss.dbeaver.model.access.DBAAuthCredentials;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
+import org.jkiss.dbeaver.model.connection.DBPConnectionType;
 import org.jkiss.dbeaver.model.connection.DBPDataSourceProviderDescriptor;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.model.impl.auth.AuthModelDatabaseNativeCredentials;
@@ -40,6 +41,7 @@ import org.jkiss.dbeaver.model.net.DBWHandlerConfiguration;
 import org.jkiss.dbeaver.model.net.ssh.SSHConstants;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceDisconnectEvent;
+import org.jkiss.dbeaver.registry.DataSourceProviderRegistry;
 import org.jkiss.dbeaver.registry.network.NetworkHandlerDescriptor;
 import org.jkiss.dbeaver.registry.network.NetworkHandlerRegistry;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
@@ -55,9 +57,12 @@ public class WebDataSourceUtils {
     private WebDataSourceUtils() {
     }
 
-    public static void saveCredentialsInDataSource(WebConnectionInfo webConnectionInfo, DBPDataSourceContainer dataSourceContainer, DBPConnectionConfiguration configuration) {
+    public static void saveCredentialsInDataSource(
+        @NotNull WebConnectionInfo webConnectionInfo,
+        @NotNull DBPDataSourceContainer dataSourceContainer,
+        @NotNull DBPConnectionConfiguration configuration
+    ) {
         // Properties passed from web
-        // webConnectionInfo may be null in some cases (e.g. connection test when no actual connection exist yet)
         Map<String, Object> authProperties = webConnectionInfo.getSavedAuthProperties();
         if (authProperties != null) {
             authProperties.forEach((s, o) -> configuration.setAuthProperty(s, CommonUtils.toString(o)));
@@ -162,18 +167,24 @@ public class WebDataSourceUtils {
     }
 
 
-    public static boolean disconnectDataSource(@NotNull WebSession webSession, @NotNull DBPDataSourceContainer dataSource) {
+    public static boolean disconnectDataSource(
+        @NotNull WebSession webSession,
+        @NotNull DBPDataSourceContainer dataSource,
+        boolean sendDisconnectEvent
+    ) {
         if (dataSource.isConnected()) {
             try {
                 dataSource.disconnect(webSession.getProgressMonitor());
-                webSession.addSessionEvent(
-                    new WSDataSourceDisconnectEvent(
-                        dataSource.getProject().getId(),
-                        dataSource.getId(),
-                        webSession.getSessionId(),
-                        webSession.getUserId()
-                    )
-                );
+                if (sendDisconnectEvent) {
+                    webSession.addSessionEvent(
+                        new WSDataSourceDisconnectEvent(
+                            dataSource.getProject().getId(),
+                            dataSource.getId(),
+                            WebEventUtils.getSmSessionId(webSession),
+                            webSession.getUserId()
+                        )
+                    );
+                }
                 return true;
             } catch (DBException e) {
                 log.error("Error closing connection", e);
@@ -299,9 +310,7 @@ public class WebDataSourceUtils {
         if (config.getKeepAliveInterval() >= 0) {
             dsConfig.setKeepAliveInterval(config.getKeepAliveInterval());
         }
-        if (config.isDefaultAutoCommit() != null) {
-            dsConfig.getBootstrap().setDefaultAutoCommit(config.isDefaultAutoCommit());
-        }
+        dsConfig.getBootstrap().setDefaultAutoCommit(config.isDefaultAutoCommit());
         dsConfig.getBootstrap().setDefaultCatalogName(config.getDefaultCatalogName());
         dsConfig.getBootstrap().setDefaultSchemaName(config.getDefaultSchemaName());
         // Save provider props
@@ -314,8 +323,19 @@ public class WebDataSourceUtils {
         if (config.getConfigurationType() != null) {
             dsConfig.setConfigurationType(config.getConfigurationType());
         }
+        if (config.getConnectionType() != null) {
+            DBPConnectionType connectionType = DataSourceProviderRegistry.getInstance().getConnectionType(config.getConnectionType(), null);
+            if (connectionType != null) {
+                dsConfig.setConnectionType(connectionType);
+            }
+        }
+
         if (CommonUtils.isEmpty(config.getUrl())) {
-            dsConfig.setUrl(driver.getConnectionURL(dsConfig));
+            try {
+                dsConfig.setUrl(driver.getConnectionURL(dsConfig));
+            } catch (DBException e) {
+                log.error("Error preparing connection URL", e);
+            }
         }
         // Save network handlers
         if (config.getNetworkHandlersConfig() != null) {

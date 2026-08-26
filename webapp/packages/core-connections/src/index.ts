@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -26,12 +26,12 @@ export * from './NavTree/getConnectionFolderId.js';
 export * from './NavTree/getFolderPathWithProjectId.js';
 export * from './NavTree/getFolderPath.js';
 export * from './NavTree/getConnectionParentId.js';
-export * from './NavTree/getFolderNodeParents.js';
 export * from './NavTree/NAV_NODE_TYPE_CONNECTION.js';
 export * from './NavTree/isConnectionNode.js';
 
 export * from './extensions/IConnectionProvider.js';
 export * from './extensions/IConnectionSetter.js';
+export * from './extensions/IConnectionRequiredProvider.js';
 export * from './ConnectionFolderEventHandler.js';
 export * from './ConnectionsManagerService.js';
 export * from './ConnectionFolderResource.js';
@@ -45,6 +45,7 @@ export * from './ConnectionInfoCustomOptionsResource.js';
 export * from './ConnectionInfoPropertiesResource.js';
 export * from './ConnectionInfoProviderPropertiesResource.js';
 export * from './ConnectionInfoNetworkHandlersResource.js';
+export * from './ConnectionInfoExternalNetworkHandlersService.js';
 export * from './CONNECTIONS_SETTINGS_GROUP.js';
 export * from './EConnectionFeature.js';
 export * from './ConnectionsSettingsService.js';
@@ -58,10 +59,13 @@ export * from './DatabaseConnection.js';
 export * from './DBDriverResource.js';
 export * from './CONNECTION_INFO_PARAM_SCHEMA.js';
 export * from './isJDBCConnection.js';
-export * from './NetworkHandlerResource.js';
 export * from './useConnectionInfo.js';
 export * from './useDBDriver.js';
 export * from './USER_NAME_PROPERTY_ID.js';
 export * from './parseConnectionKey.js';
 export * from './DBDriverExpertSettingsResource.js';
-export * from './CONNECTION_CONFIG_SCHEMA.js';
+
+export * from './ConnectionType/ConnectionTypeResource.js';
+export * from './ConnectionType/ConnectionTypeService.js';
+export * from './ConnectionType/useConnectionTypeColor.js';
+export * from './ConnectionType/useConnectionTypeLoader.js';

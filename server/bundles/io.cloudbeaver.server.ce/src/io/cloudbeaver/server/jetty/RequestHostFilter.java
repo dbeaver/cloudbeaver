@@ -156,10 +156,10 @@ public class RequestHostFilter implements Filter {
             if (!availableHosts.contains(requestHost)) {
                 for (String errorPath : errorPaths) {
                     if (httpRequest.getServletPath().contains(errorPath)) {
+                        log.warn("Request host '" + requestHost + "' is not allowed. Available hosts: " + availableHosts);
                         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                        response.getWriter().write(
-                            "Request host '" + requestHost + "' is not allowed. Available hosts: " + availableHosts
-                        );
+                        response.setContentType("text/plain;charset=UTF-8");
+                        response.getWriter().write("Request host is not allowed. Available hosts: " + availableHosts);
                         return false;
                     }
                 }

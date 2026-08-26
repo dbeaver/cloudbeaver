@@ -53,6 +53,7 @@ export class GroupingDataSource extends QueryDataSource<IDataGroupingOptions> {
         limit,
         constraints: options.constraints,
         where: options.whereFilter || undefined,
+        anyConstraint: options.anyConstraint,
       },
       dataFormat: this.dataFormat,
     });

@@ -173,16 +173,12 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                 throw new DBWebException("Node '" + nodePath + "' not found");
             }
 
-            boolean shouldSkipProjectNode = nodePath.startsWith(DBNNode.NodePathType.ext.getPrefix());
             List<WebNavigatorNodeInfo> nodeParents = new ArrayList<>();
             for (DBNNode parent = getLogicalParentNode(node);
                  parent != null && !(parent instanceof DBNRoot);
-                 parent = getLogicalParentNode(parent)) {
-                //FIXME remove after node path refactoring
+                 parent = getLogicalParentNode(parent)
+            ) {
                 if (parent instanceof DBNProjectDatabases) {
-                    continue;
-                }
-                if (parent instanceof DBNProject && shouldSkipProjectNode) {
                     continue;
                 }
                 nodeParents.add(new WebNavigatorNodeInfo(session, parent));
@@ -283,7 +279,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                     // in that way all related scripts will use the same context and overwrite the user's define context
                     // So why we need restore the default execution context after refreshing datasource
                     DBCExecutionContext defaultContext = DBUtils.getDefaultContext(refreshableObject, false);
-                    DBCExecutionContextDefaults contextDefaults = defaultContext.getContextDefaults();
+                    DBCExecutionContextDefaults<?, ?> contextDefaults = defaultContext.getContextDefaults();
                     refreshableObject.refreshObject(monitor);
                     if (contextDefaults != null && contextDefaults.getDefaultSchema() != null
                         && contextDefaults.getDefaultCatalog() != null) {
@@ -462,9 +458,10 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                 } else {
                     node.rename(session.getProgressMonitor(), newName);
                 }
-                return node.getNodeItemPath();
+                return node.getNodeUri();
             }
             if (node instanceof DBNDatabaseNode dbNode) {
+                checkMetadataEditPermission(dbNode);
                 return renameDatabaseObject(
                     session,
                     dbNode,
@@ -549,8 +546,9 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                     throw new DBWebException("Navigator node '"  + path + "' not found");
                 }
                 checkProjectEditAccess(node, session);
-                if (node instanceof DBNDatabaseNode) {
-                    DBSObject object = ((DBNDatabaseNode) node).getObject();
+                if (node instanceof DBNDatabaseNode dbnDatabaseNode) {
+                    checkMetadataEditPermission(dbnDatabaseNode);
+                    DBSObject object = dbnDatabaseNode.getObject();
                     DBEObjectMaker objectDeleter = DBWorkbench.getPlatform().getEditorsRegistry().getObjectManager(
                         object.getClass(), DBEObjectMaker.class);
                     if (objectDeleter == null || !objectDeleter.canDeleteObject(object)) {
@@ -606,9 +604,15 @@ public class WebServiceNavigator implements DBWServiceNavigator {
         }
     }
 
+    private void checkMetadataEditPermission(@NotNull DBNDatabaseNode node) throws DBException {
+        if (!node.getDataSourceContainer().hasModifyPermission(DBPDataSourcePermission.PERMISSION_EDIT_METADATA)) {
+            throw new DBWebException("Structure edit is restricted for this connection");
+        }
+    }
+
     private void checkProjectEditAccess(@NotNull DBNNode node, @NotNull WebSession session) throws DBException {
-        BaseWebProjectImpl project = (BaseWebProjectImpl) node.getOwnerProject();
-        if (project == null || !hasNodeEditPermission(session, node, project.getRMProject())) {
+        var project = node.getOwnerProject();
+        if (!(project instanceof BaseWebProjectImpl bwp) || !hasNodeEditPermission(session, node, bwp.getRMProject())) {
             throw new DBException("Access denied");
         }
     }
@@ -723,7 +727,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                         commandContext.resetChanges(true);
                         throw e;
                     }
-                    return node.getNodeItemPath();
+                    return node.getNodeUri();
                 }
             }
         }

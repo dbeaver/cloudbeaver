@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -9,13 +9,15 @@ import React from 'react';
 
 import { AdministrationItemService, type IAdministrationItem } from '@cloudbeaver/core-administration';
 import { type AdminUser, TeamsResource, UsersResource } from '@cloudbeaver/core-authentication';
-import { PlaceholderContainer } from '@cloudbeaver/core-blocks';
+import { ConfirmationDialog, PlaceholderContainer } from '@cloudbeaver/core-blocks';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { TabsContainer } from '@cloudbeaver/core-ui';
+import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 
 import { CreateTeamService } from './Teams/TeamsTable/CreateTeamService.js';
 import { EUsersAdministrationSub, UsersAdministrationNavigationService } from './UsersAdministrationNavigationService.js';
 import { CreateUserService } from './UsersTable/CreateUserService.js';
+import type { IUserFilters } from './UsersTable/Filters/useUsersTableFilters.js';
 
 const UserCredentialsList = React.lazy(async () => {
   const { UserCredentialsList } = await import('./UsersTable/UserCredentialsList.js');
@@ -32,15 +34,25 @@ const UsersAdministration = React.lazy(async () => {
   return { default: UsersAdministration };
 });
 
+const UsersTableFilterButton = React.lazy(async () => {
+  const { UsersTableFilterButton } = await import('./UsersTable/Filters/UsersTableFilterButton.js');
+  return { default: UsersTableFilterButton };
+});
+
 export interface IUserDetailsInfoProps {
   user: AdminUser;
 }
 
-@injectable(() => [AdministrationItemService, CreateUserService, TeamsResource, CreateTeamService, UsersResource])
+export interface IUsersActionButtonProps {
+  filters: IUserFilters;
+}
+
+@injectable(() => [AdministrationItemService, CreateUserService, TeamsResource, CreateTeamService, UsersResource, CommonDialogService])
 export class UsersAdministrationService extends Bootstrap {
   readonly tabsContainer: TabsContainer;
   readonly userDetailsInfoPlaceholder: PlaceholderContainer<IUserDetailsInfoProps>;
   readonly informationPlaceholder: PlaceholderContainer;
+  readonly actionButtonsPlaceholder: PlaceholderContainer<IUsersActionButtonProps>;
   administrationItem!: IAdministrationItem;
 
   constructor(
@@ -49,11 +61,13 @@ export class UsersAdministrationService extends Bootstrap {
     private readonly teamsResource: TeamsResource,
     private readonly createTeamService: CreateTeamService,
     private readonly usersResource: UsersResource,
+    private readonly commonDialogService: CommonDialogService,
   ) {
     super();
     this.userDetailsInfoPlaceholder = new PlaceholderContainer();
     this.tabsContainer = new TabsContainer('Access Control');
     this.informationPlaceholder = new PlaceholderContainer();
+    this.actionButtonsPlaceholder = new PlaceholderContainer();
   }
 
   override register(): void {
@@ -66,10 +80,12 @@ export class UsersAdministrationService extends Bootstrap {
         },
         {
           name: EUsersAdministrationSub.Users,
+          canDeActivate: () => this.handleDeactivate(EUsersAdministrationSub.Users),
           onDeActivate: this.cancelUserCreate.bind(this),
         },
         {
           name: EUsersAdministrationSub.Teams,
+          canDeActivate: () => this.handleDeactivate(EUsersAdministrationSub.Teams),
           onActivate: this.loadTeams.bind(this),
           onDeActivate: this.cancelTeamCreate.bind(this),
         },
@@ -79,6 +95,31 @@ export class UsersAdministrationService extends Bootstrap {
       getDrawerComponent: () => UsersDrawerItem,
     });
     this.userDetailsInfoPlaceholder.add(UserCredentialsList, 0);
+    this.actionButtonsPlaceholder.add(UsersTableFilterButton, 0);
+  }
+
+  private async handleDeactivate(sub: EUsersAdministrationSub) {
+    if (sub === EUsersAdministrationSub.Users || sub === EUsersAdministrationSub.Teams) {
+      const users = sub === EUsersAdministrationSub.Users;
+      const edited = users ? this.createUserService.state?.isChanged : this.createTeamService.data?.isChanged;
+
+      if (edited) {
+        const { status } = await this.commonDialogService.open(ConfirmationDialog, {
+          title: 'ui_discard_changes',
+          message: 'ui_discard_changes_message',
+          confirmActionText: 'ui_discard',
+          cancelActionText: 'ui_keep_editing',
+        });
+
+        if (status === DialogueStateResult.Rejected) {
+          return false;
+        }
+      }
+
+      return true;
+    }
+
+    return true;
   }
 
   private cancelUserCreate(param: string | null, configurationWizard: boolean, outside: boolean) {

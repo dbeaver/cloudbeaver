@@ -1,0 +1,21 @@
+fragment AiSendChatMessageInfo on AISendChatMessageInfo {
+  conversation {
+    id
+    dataSourceId {
+      projectId
+      connectionId
+    }
+    caption
+    time
+    waitingForResponse
+    promptGeneratorId
+  }
+
+  userMessage {
+    ...AiChatMessage
+  }
+
+  assistantMessage {
+    ...AiChatMessage
+  }
+}

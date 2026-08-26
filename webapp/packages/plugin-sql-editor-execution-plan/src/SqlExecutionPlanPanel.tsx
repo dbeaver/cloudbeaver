@@ -1,0 +1,90 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2026 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+import { observer } from 'mobx-react-lite';
+import { useCallback } from 'react';
+
+import { Loader, Pane, ResizerControls, s, Split, useS, useSplitUserState } from '@cloudbeaver/core-blocks';
+import { useDataContextLink } from '@cloudbeaver/core-data-context';
+import { useService } from '@cloudbeaver/core-di';
+import { TabPanelList, TabsState } from '@cloudbeaver/core-ui';
+import { useMenu } from '@cloudbeaver/core-view';
+import type { ISqlResultPanelProps } from '@cloudbeaver/plugin-sql-editor';
+
+import { PropertiesPanel } from './PropertiesPanel/PropertiesPanel.js';
+import { DATA_CONTEXT_SQL_EXECUTION_PLAN_TAB } from './DATA_CONTEXT_SQL_EXECUTION_PLAN_TAB.js';
+import { SQL_EXECUTION_PLAN_ACTIONS_MENU } from './SQL_EXECUTION_PLAN_ACTIONS_MENU.js';
+import { SqlExecutionPlanActionsMenu } from './SqlExecutionPlanActionsMenu.js';
+import { SqlExecutionPlanService } from './SqlExecutionPlanService.js';
+import { SqlExecutionPlanViewBar } from './SqlExecutionPlanViewBar.js';
+import { SqlExecutionPlanViewService } from './SqlExecutionPlanViewService.js';
+import style from './SqlExecutionPlanPanel.module.css';
+
+export const SqlExecutionPlanPanel = observer<ISqlResultPanelProps>(function SqlExecutionPlanPanel({ tabId }) {
+  const styles = useS(style);
+  const sqlExecutionPlanService = useService(SqlExecutionPlanService);
+  const sqlExecutionPlanViewService = useService(SqlExecutionPlanViewService);
+  const data = sqlExecutionPlanService.data.get(tabId);
+  const executionPlanTab = data?.tab;
+  const splitState = useSplitUserState('execution-plan');
+  const menu = useMenu({ menu: SQL_EXECUTION_PLAN_ACTIONS_MENU });
+
+  const selectNode = useCallback(
+    (nodeId: string | null) => {
+      if (data) {
+        data.selectedNode = nodeId;
+      }
+    },
+    [data],
+  );
+
+  useDataContextLink(menu.context, (context, id) => {
+    if (executionPlanTab) {
+      context.set(DATA_CONTEXT_SQL_EXECUTION_PLAN_TAB, executionPlanTab, id);
+    }
+  });
+
+  if (!data || data.task.executing || !data.executionPlan) {
+    return <Loader cancelDisabled={!data?.task.cancellable} onCancel={() => data?.task.cancel()} />;
+  }
+
+  return (
+    <Split {...splitState} mode={data.selectedNode ? splitState.mode : 'minimize'} disable={!data.selectedNode} sticky={30}>
+      <Pane className={s(styles, { pane: true })}>
+        <TabsState
+          container={sqlExecutionPlanViewService.tabs}
+          currentTabId={data.currentViewId}
+          localState={data.localState}
+          nodes={data.executionPlan.nodes}
+          query={data.executionPlan.query}
+          hasCost={data.executionPlan.hasCost}
+          hasRows={data.executionPlan.hasRows}
+          hasDuration={data.executionPlan.hasDuration}
+          durationMeasure={data.executionPlan.durationMeasure}
+          selectedNode={data.selectedNode}
+          lazy
+          onChange={tab => {
+            data.currentViewId = tab.tabId;
+          }}
+          onNodeSelect={selectNode}
+        >
+          <div className={s(styles, { tabsLayout: true })}>
+            <div className={s(styles, { actionsBar: true })}>
+              <SqlExecutionPlanActionsMenu context={menu.context} />
+            </div>
+            <TabPanelList className={s(styles, { tabPanelList: true })} />
+            <SqlExecutionPlanViewBar />
+          </div>
+        </TabsState>
+      </Pane>
+      <ResizerControls />
+      <Pane className={s(styles, { pane: true })} basis="30%" main>
+        {data.selectedNode && <PropertiesPanel selectedNode={data.selectedNode} nodeList={data.executionPlan.nodes} />}
+      </Pane>
+    </Split>
+  );
+});

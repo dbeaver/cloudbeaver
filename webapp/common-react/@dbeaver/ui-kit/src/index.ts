@@ -24,15 +24,18 @@ export {
 export { Button, ButtonBase, type ButtonProps, ButtonIcon, type ButtonIconProps, UnstyledButton, type UnstyledButtonProps } from './Button/Button.js';
 export { IconButton, IconButtonBase, type IconButtonProps } from './IconButton/IconButton.js';
 export { Checkbox, CheckboxBase, type CheckboxProps } from './Checkbox/Checkbox.js';
+export { CheckboxIndicator, type ICheckboxIndicatorProps } from './Checkbox/CheckboxIndicator.js';
 export { ColorPicker } from './ColorPicker/ColorPicker.js';
+export { ColorIndicator } from './ColorPicker/ColorIndicator.js';
 export { ColorPickerBase, type ColorPickerProps } from './ColorPicker/ColorPickerBase.js';
+export { normalizeColorToRgb } from './ColorPicker/colorUtils.js';
 export { Input, InputBase, type InputProps } from './Input/Input.js';
 export {
   SearchPanel,
-  type SearchPanelProps,
-  type SearchPanelRef,
-  type SearchPanelQuery,
-  type SearchPanelStrings,
+  type ISearchPanelProps,
+  type ISearchPanelRef,
+  type ISearchPanelQuery,
+  type ISearchPanelStrings,
 } from './SearchPanel/SearchPanel.js';
 export {
   Select,
@@ -47,9 +50,15 @@ export {
 export * from './Combobox/Combobox.js';
 export * from './Command/Command.js';
 export { Popover, usePopoverStore, type PopoverStore } from './Popover/Popover.js';
-export { SelectField, type SelectFieldProps, type SelectItem } from './Select/SelectField.js';
+export { SelectField, type ISelectFieldProps, type ISelectItem } from './Select/SelectField.js';
 export { Spinner, type SpinnerProps } from './Spinner/Spinner.js';
+export { Switch, useSwitchContext, type SwitchProps } from './Switch/Switch.js';
+export { SwitchProvider, type SwitchProviderProps } from './Switch/SwitchProvider.js';
+export { type SwitchContextValue, SwitchContext } from './Switch/SwitchContext.js';
 export { Radio, RadioGroup, useRadioContext, useRadioStore, type RadioProviderProps, type RadioProps, type RadioGroupProps } from './Radio/index.js';
+export { RadioControl, type RadioControlProps } from './Radio/RadioControl.js';
+export { RadioRoot, type RadioRootProps } from './Radio/RadioRoot.js';
+export { RadioLabel, type RadioLabelProps } from './Radio/RadioLabel.js';
 export { Icon, type IconProps } from './Icon/Icon.js';
 export * from './utils/clsx.js';
 export * from './ComponentProvider.js';
@@ -62,9 +71,11 @@ export {
   Composite,
   CompositeItem,
   CompositeProvider,
+  useCompositeContext,
   useCompositeStore,
   type CompositeProps,
   type CompositeItemProps,
   type CompositeProviderProps,
   type CompositeStore,
 } from './Composite/Composite.js';
+export { type ControlSize } from './types/controls.js';

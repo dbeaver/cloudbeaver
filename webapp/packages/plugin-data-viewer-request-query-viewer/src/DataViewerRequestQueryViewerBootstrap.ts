@@ -8,7 +8,7 @@
 
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
-import { isResultSetDataSource, TableHeaderService } from '@cloudbeaver/plugin-data-viewer';
+import { DatabaseDataFeature, isResultSetDataSource, TableHeaderService } from '@cloudbeaver/plugin-data-viewer';
 
 import { DataViewerRequestQueryViewerSettingsService } from './DataViewerRequestQueryViewerSettingsService.js';
 
@@ -29,7 +29,10 @@ export class DataViewerRequestQueryViewerBootstrap extends Bootstrap {
     this.tableHeaderService.tableHeaderPlaceholder.add(
       DataViewerRequestQueryViewer,
       Number.MIN_SAFE_INTEGER,
-      props => !isResultSetDataSource(props.model.source) || this.dataViewerRequestQueryViewerSettingsService.disabled,
+      props =>
+        !isResultSetDataSource(props.model.source) ||
+        this.dataViewerRequestQueryViewerSettingsService.disabled ||
+        props.model.source.hasFeature(DatabaseDataFeature.References),
     );
   }
 }

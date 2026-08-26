@@ -10,8 +10,9 @@ import { observer } from 'mobx-react-lite';
 import { useCallback, useLayoutEffect, useMemo, useRef, type HTMLAttributes } from 'react';
 
 import { getComputed, TextPlaceholder, useObjectRef, useObservableRef, useTranslate } from '@cloudbeaver/core-blocks';
+import { useDataContextLink } from '@cloudbeaver/core-data-context';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
-import { useCaptureViewContext } from '@cloudbeaver/core-view';
+import { useCaptureViewContext, useMenu } from '@cloudbeaver/core-view';
 import {
   DataGrid,
   useCreateGridReactiveValue,
@@ -27,7 +28,6 @@ import {
   DATA_CONTEXT_DV_PRESENTATION,
   type DatabaseDataSelectActionsData,
   DatabaseEditChangeType,
-  DatabaseSelectAction,
   DataViewerPresentationType,
   type IDatabaseDataModel,
   type IDataPresentationProps,
@@ -49,9 +49,19 @@ import {
   type IGridDataKey,
   type IHistoryEntry,
   getKeyFromHistoryEntry,
+  MENU_DV_CONTEXT_MENU,
+  DATA_CONTEXT_DV_DDM,
+  DATA_CONTEXT_DV_DDM_RESULT_INDEX,
+  DATA_CONTEXT_DV_SIMPLE,
+  DATA_CONTEXT_DV_ACTIONS,
+  DATA_CONTEXT_DV_PRESENTATION_ACTIONS,
+  type IDataPresentationActions,
+  isBooleanValuePresentationAvailable,
 } from '@cloudbeaver/plugin-data-viewer';
 
 import { CellRenderer } from './CellRenderer/CellRenderer.js';
+import { DataGridMenuContextProvider } from './Menu/DataGridMenuContextProvider.js';
+import { useDataGridMenu } from './Menu/useDataGridMenu.js';
 import { ColumnDnDContext, type IColumnDnDState } from './ColumnDnDContext.js';
 import { DataGridContext, type IDataGridContext } from './DataGridContext.js';
 import { DataGridSelectionContext } from './DataGridSelection/DataGridSelectionContext.js';
@@ -186,7 +196,50 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
     },
   }));
 
-  const gridSelectedCellCopy = useGridSelectedCellsCopy(tableData, selectionAction as unknown as DatabaseSelectAction, gridSelectionContext);
+  const menu = useDataGridMenu({
+    menu: useMenu({ menu: MENU_DV_CONTEXT_MENU }),
+  });
+
+  const spreadsheetActions = useObjectRef<IDataPresentationActions<IGridDataKey>>({
+    edit(position) {
+      const colIdx = tableData.getColumnIndexFromColumnKey(position.column);
+      const rowIdx = tableData.getRowIndexFromKey(position.row);
+      if (colIdx !== -1) {
+        dataGridRef.current?.openEditor({ colIdx, rowIdx });
+      }
+    },
+    unpinColumns(keys) {
+      tableData.view.unpinColumns(keys.map(key => key.column));
+      // re-select the focused cell so the highlight follows the column to its new position after reordering
+      handlers.focusCell(selectionAction.getFocusedElement(), false, true);
+    },
+    pinColumns(keys) {
+      tableData.view.pinColumns(keys.map(key => key.column));
+      // re-select the focused cell so the highlight follows the column to its new position after reordering
+      handlers.focusCell(selectionAction.getFocusedElement(), false, true);
+    },
+    isColumnPinned(key) {
+      return tableData.view.isColumnPinned(key.column);
+    },
+    unpinAllColumns() {
+      tableData.view.unpinAllColumns();
+      // re-select the focused cell so the highlight follows the column to its new position after reordering
+      handlers.focusCell(selectionAction.getFocusedElement(), false, true);
+    },
+    hasPinnedColumns() {
+      return tableData.view.hasPinnedColumns();
+    },
+  });
+
+  useDataContextLink(menu.menu.context, (context, id) => {
+    context.set(DATA_CONTEXT_DV_DDM, model, id);
+    context.set(DATA_CONTEXT_DV_DDM_RESULT_INDEX, resultIndex, id);
+    context.set(DATA_CONTEXT_DV_SIMPLE, simple, id);
+    context.set(DATA_CONTEXT_DV_ACTIONS, actions, id);
+    context.set(DATA_CONTEXT_DV_PRESENTATION_ACTIONS, spreadsheetActions, id);
+  });
+
+  const gridSelectedCellCopy = useGridSelectedCellsCopy(tableData, selectionAction, gridSelectionContext);
   const gridSelectedCellPaste = useGridSelectedCellsPaste(tableData, selectionAction as unknown as ResultSetSelectAction);
   const { onMouseDownHandler, onMouseMoveHandler } = useGridDragging({
     onDragStart: startPosition => {
@@ -242,7 +295,10 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
     }
 
     selectionAction.actions.addHandler(syncFocus);
-    handlers.focusCell(selectionAction.getFocusedElement(), true);
+
+    if (!simple) {
+      handlers.focusCell(selectionAction.getFocusedElement(), true);
+    }
 
     return () => {
       tableData.editor?.action.removeHandler(syncEditor);
@@ -319,6 +375,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
       simple,
       isGridInFocus,
       getDataGridApi: () => dataGridRef.current,
+      getContainer: () => dataGridDivRef.current,
       focus: () => dataGridRef.current?.restoreFocus(),
     }),
     [model, actions, resultIndex, simple, dataGridRef],
@@ -563,7 +620,15 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
 
     const key: IGridDataKey = { row, column };
 
-    return tableData.isCellEditable(key);
+    const editable = tableData.isCellEditable(key);
+    const holder = tableData.getCellHolder(key);
+    const resultColumn = tableData.getColumnInfo(key.column);
+
+    if (resultColumn) {
+      return editable && !isBooleanValuePresentationAvailable(holder.value, resultColumn);
+    }
+
+    return editable;
   }
 
   return (
@@ -572,50 +637,52 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
         <DataGridSelectionContext.Provider value={gridSelectionContext}>
           <TableDataContext.Provider value={tableData}>
             <FormattingContext.Provider value={formatting}>
-              <div
-                ref={setContainersRef}
-                tabIndex={-1}
-                {...rest}
-                className={clsx('data-grid__container', 'theme-typography--caption', className)}
-                onMouseDown={onMouseDownHandler}
-                onMouseMove={onMouseMoveHandler}
-              >
-                <DataGrid
-                  ref={dataGridRef}
-                  className={clsx('data-grid__grid', className)}
-                  cell={cell}
-                  cellText={cellText}
-                  cellElement={cellElement}
-                  rowElement={rowElement}
-                  getCellEditable={isCellEditable}
-                  headerElement={headerElement}
-                  getHeaderHeight={() => headerHeight}
-                  getHeaderWidth={getHeaderWidth}
-                  getHeaderPinned={getHeaderPinned}
-                  getHeaderResizable={getHeaderResizable}
-                  getRowHeight={() => ROW_HEIGHT}
-                  getColumnKey={getColumnKey}
-                  columnCount={columnsCount}
-                  rowCount={rowsCount}
-                  columnSortable={columnSortable}
-                  columnSortingState={columnSortingState}
-                  getRowId={rowIdx => (tableData.rows[rowIdx] ? GridDataKeysUtils.serialize(tableData.rows[rowIdx]) : '')}
-                  search={{
-                    isEnabled: true,
-                    isReadOnly:
-                      model.isReadonly(resultIndex) || !(isResultSetDataSource(model.source) && model.source.hasElementIdentifier(resultIndex)),
-                    storage: searchResultsCache,
-                  }}
-                  columnSortingMultiple
-                  onFocus={handleFocusChange}
-                  onScrollToBottom={handleScrollToBottom}
-                  onColumnSort={handleSort}
-                  onCellChange={handleCellChange}
-                  onCellChangeBatch={handleCellChangeBatch}
-                  onCellKeyDown={handleCellKeyDown}
-                  onHeaderKeyDown={handleCopyPaste}
-                />
-              </div>
+              <DataGridMenuContextProvider menu={menu}>
+                <div
+                  ref={setContainersRef}
+                  tabIndex={-1}
+                  {...rest}
+                  className={clsx('data-grid__container', 'theme-typography--caption', className)}
+                  onMouseDown={onMouseDownHandler}
+                  onMouseMove={onMouseMoveHandler}
+                >
+                  <DataGrid
+                    ref={dataGridRef}
+                    className={clsx('data-grid__grid', className)}
+                    cell={cell}
+                    cellText={cellText}
+                    cellElement={cellElement}
+                    rowElement={rowElement}
+                    getCellEditable={isCellEditable}
+                    headerElement={headerElement}
+                    getHeaderHeight={() => headerHeight}
+                    getHeaderWidth={getHeaderWidth}
+                    getHeaderPinned={getHeaderPinned}
+                    getHeaderResizable={getHeaderResizable}
+                    getRowHeight={() => ROW_HEIGHT}
+                    getColumnKey={getColumnKey}
+                    columnCount={columnsCount}
+                    rowCount={rowsCount}
+                    columnSortable={columnSortable}
+                    columnSortingState={columnSortingState}
+                    getRowId={rowIdx => (tableData.rows[rowIdx] ? GridDataKeysUtils.serialize(tableData.rows[rowIdx]) : '')}
+                    search={{
+                      isEnabled: true,
+                      isReadOnly:
+                        model.isReadonly(resultIndex) || !(isResultSetDataSource(model.source) && model.source.hasElementIdentifier(resultIndex)),
+                      storage: searchResultsCache,
+                    }}
+                    columnSortingMultiple
+                    onFocus={handleFocusChange}
+                    onScrollToBottom={handleScrollToBottom}
+                    onColumnSort={handleSort}
+                    onCellChange={handleCellChange}
+                    onCellChangeBatch={handleCellChangeBatch}
+                    onCellKeyDown={handleCellKeyDown}
+                    onHeaderKeyDown={handleCopyPaste}
+                  />
+                </div>
+              </DataGridMenuContextProvider>
             </FormattingContext.Provider>
           </TableDataContext.Provider>
         </DataGridSelectionContext.Provider>

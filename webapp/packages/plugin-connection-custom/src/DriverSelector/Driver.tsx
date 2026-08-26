@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -40,8 +40,12 @@ export const Driver = observer<Props>(function Driver({ driver, onSelect }) {
           </div>
         )}
       </ListItemIcon>
-      <ListItemName>{driver.name}</ListItemName>
-      <ListItemDescription>{driver.description}</ListItemDescription>
+      <ListItemName className={s(styles, { cell: true })}>
+        <span title={driver.name}>{driver.name}</span>
+      </ListItemName>
+      <ListItemDescription className={s(styles, { cell: true })} title={driver.description}>
+        {driver.description}
+      </ListItemDescription>
     </ListItem>
   );
 });

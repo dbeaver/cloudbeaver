@@ -7,7 +7,7 @@
  */
 
 import { schema } from '@cloudbeaver/core-utils';
-import { CONNECTION_CONFIG_SCHEMA } from '@cloudbeaver/core-connections';
+import { CONNECTION_CONFIG_SCHEMA } from '@cloudbeaver/plugin-connections';
 
 export const CONNECTION_PREFERENCES_FORM_INFO_STATE_SCHEMA = CONNECTION_CONFIG_SCHEMA.pick({
   name: true,

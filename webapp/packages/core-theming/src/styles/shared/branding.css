@@ -1,0 +1,23 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2026 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+
+@layer base {
+  hr {
+    border-color: var(--theme-secondary);
+    border-style: solid;
+    border-bottom: none;
+  }
+
+  .branding-overflow {
+    background-image: linear-gradient(to top, var(--theme-surface), color-mix(in srgb, var(--theme-surface) 0%, transparent));
+  }
+
+  .branding-overflow-inverse {
+    background-image: linear-gradient(to bottom, var(--theme-surface), color-mix(in srgb, var(--theme-surface) 0%, transparent));
+  }
+}

@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2025 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,20 +19,15 @@ package io.cloudbeaver.service.admin.impl;
 import io.cloudbeaver.*;
 import io.cloudbeaver.auth.provider.local.LocalAuthProvider;
 import io.cloudbeaver.model.WebPropertyInfo;
-import io.cloudbeaver.model.config.CBAppConfig;
-import io.cloudbeaver.model.config.CBServerConfig;
 import io.cloudbeaver.model.session.WebAuthInfo;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.registry.*;
-import io.cloudbeaver.server.CBApplication;
-import io.cloudbeaver.server.CBConstants;
-import io.cloudbeaver.server.WebAppUtils;
+import io.cloudbeaver.server.*;
 import io.cloudbeaver.service.DBWServiceServerConfigurator;
 import io.cloudbeaver.service.admin.*;
 import io.cloudbeaver.service.security.SMUtils;
 import io.cloudbeaver.utils.ServletAppUtils;
-import io.cloudbeaver.utils.WebDataSourceUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
@@ -42,13 +37,16 @@ import org.jkiss.dbeaver.model.DBConstants;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPProject;
-import org.jkiss.dbeaver.model.auth.AuthInfo;
-import org.jkiss.dbeaver.model.connection.DBPDriver;
+import org.jkiss.dbeaver.model.auth.SMAuthConfiguration;
+import org.jkiss.dbeaver.model.auth.SMObjectType;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
 import org.jkiss.dbeaver.model.rm.RMProjectType;
 import org.jkiss.dbeaver.model.secret.DBSSecretController;
-import org.jkiss.dbeaver.model.security.*;
+import org.jkiss.dbeaver.model.security.SMAuthProviderCustomConfiguration;
+import org.jkiss.dbeaver.model.security.SMConstants;
+import org.jkiss.dbeaver.model.security.SMDataSourceGrant;
+import org.jkiss.dbeaver.model.security.SMSubjectType;
 import org.jkiss.dbeaver.model.security.user.SMTeam;
 import org.jkiss.dbeaver.model.security.user.SMUser;
 import org.jkiss.dbeaver.utils.GeneralUtils;
@@ -163,7 +161,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         if (userName.isEmpty()) {
             throw new DBWebException("Empty user name");
         }
-        String userId = userName.toLowerCase();
+        String userId = userName.trim().toLowerCase();
         try {
             GeneralUtils.validateResourceNameUnconditionally(userId);
         } catch (DBException e) {
@@ -295,11 +293,6 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         if (grantor == null) {
             throw new DBWebException("Cannot grant team in anonymous mode");
         }
-        if (!ServletAppUtils.getServletApplication().isDistributed()
-            && CommonUtils.equalObjects(user, webSession.getUser().getUserId())
-        ) {
-            throw new DBWebException("You cannot edit your own permissions");
-        }
         try {
             var adminSecurityController = webSession.getAdminSecurityController();
             adminSecurityController.addUserTeams(user, new String[]{team}, grantor.getUserId());
@@ -316,10 +309,8 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         if (grantor == null) {
             throw new DBWebException("Cannot revoke team in anonymous mode");
         }
-        if (!ServletAppUtils.getServletApplication().isDistributed() &&
-            CommonUtils.equalObjects(user, webSession.getUser().getUserId())
-        ) {
-            throw new DBWebException("You cannot edit your own permissions");
+        if (CommonUtils.equalObjects(user, grantor.getUserId())) {
+            checkAdminPermissionsRetained(webSession, user, team);
         }
         try {
             var adminSecurityController = webSession.getAdminSecurityController();
@@ -347,6 +338,11 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         if (CommonUtils.equalObjects(subjectID, CBConstants.DEFAULT_ADMIN_TEAM)) {
             throw new DBWebException("Cannot change permissions for team '" + subjectID + "'");
         }
+        if (!permissions.contains(DBWConstants.PERMISSION_ADMIN)
+            && isOwnSubject(webSession, grantor.getUserId(), subjectID)
+        ) {
+            checkAdminPermissionsRetained(webSession, grantor.getUserId(), subjectID);
+        }
         webSession.addInfoMessage("Set permissions to subject - " + subjectID);
 
         try {
@@ -359,6 +355,62 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         } catch (Exception e) {
             throw new DBWebException("Error setting subject permissions", e);
         }
+    }
+
+    /**
+     * Checks that the specified subject is the user himself or one of his teams.
+     */
+    private boolean isOwnSubject(
+        @NotNull WebSession webSession,
+        @NotNull String userId,
+        @NotNull String subjectId
+    ) throws DBWebException {
+        if (subjectId.equals(userId)) {
+            return true;
+        }
+        try {
+            for (SMTeam userTeam : webSession.getAdminSecurityController().getUserTeams(userId)) {
+                if (userTeam.getTeamId().equals(subjectId)) {
+                    return true;
+                }
+            }
+        } catch (DBException e) {
+            throw new DBWebException("Error reading teams of user " + userId, e);
+        }
+        return false;
+    }
+
+    /**
+     * Checks that the user still has administrative permission after revoking permissions from the specified subject.
+     * Prevents the last administrator from locking himself out of the server.
+     */
+    private void checkAdminPermissionsRetained(
+        @NotNull WebSession webSession,
+        @NotNull String userId,
+        @NotNull String revokedSubjectId
+    ) throws DBWebException {
+        if (ServletAppUtils.getServletApplication().isDistributed()) {
+            // permissions are granted by auth roles, not by subjects
+            return;
+        }
+        try {
+            var adminSecurityController = webSession.getAdminSecurityController();
+            if (!adminSecurityController.getSubjectPermissions(revokedSubjectId).contains(DBWConstants.PERMISSION_ADMIN)) {
+                // subject doesn't grant administrative permission, nothing to lose
+                return;
+            }
+            for (SMTeam userTeam : adminSecurityController.getUserTeams(userId)) {
+                String teamId = userTeam.getTeamId();
+                if (!teamId.equals(revokedSubjectId)
+                    && adminSecurityController.getSubjectPermissions(teamId).contains(DBWConstants.PERMISSION_ADMIN)
+                ) {
+                    return;
+                }
+            }
+        } catch (DBException e) {
+            throw new DBWebException("Error reading permissions of user " + userId, e);
+        }
+        throw new DBWebException("You cannot revoke your own administrative permissions");
     }
 
     @Override
@@ -592,69 +644,31 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     @Override
     public boolean configureServer(@NotNull WebSession webSession, @NotNull Map<String, Object> params) throws DBWebException {
         try {
-            CBAppConfig appConfig = new CBAppConfig(CBApplication.getInstance().getAppConfiguration());
-            CBServerConfig serverConfig = new CBServerConfig();
-            serverConfig.setServerName(CBApplication.getInstance().getServerName());
-            serverConfig.setMaxSessionIdleTime(CBApplication.getInstance().getMaxSessionIdleTime());
-            String adminName = null;
-            String adminPassword = null;
 
-            if (!params.isEmpty()) {    // FE can send an empty configuration
-                var config = new AdminServerConfig(params);
-                appConfig.setAnonymousAccessEnabled(config.isAnonymousAccessEnabled());
-                appConfig.setSupportsCustomConnections(config.isCustomConnectionsEnabled());
-                appConfig.setPublicCredentialsSaveEnabled(config.isPublicCredentialsSaveEnabled());
-                appConfig.setAdminCredentialsSaveEnabled(config.isAdminCredentialsSaveEnabled());
-                updateDisabledFeaturesConfig(appConfig, config.getEnabledFeatures());
-                // custom logic for enabling embedded drivers
-                updateDisabledDriversConfig(appConfig, config.getDisabledDrivers());
-                appConfig.setResourceManagerEnabled(config.isResourceManagerEnabled());
-                appConfig.setSecretManagerEnabled(config.isSecretManagerEnabled());
-
-                if (CommonUtils.isEmpty(config.getEnabledAuthProviders())) {
-                    // All of them
-                    appConfig.setEnabledAuthProviders(new String[0]);
-                } else {
-                    appConfig.setEnabledAuthProviders(config.getEnabledAuthProviders().toArray(new String[0]));
-                }
-
-                appConfig.setDefaultNavigatorSettings(
-                    CBApplication.getInstance().getAppConfiguration().getDefaultNavigatorSettings());
-
-                adminName = config.getAdminName();
-                adminPassword = config.getAdminPassword();
-                serverConfig.setServerName(config.getServerName());
-                serverConfig.setMaxSessionIdleTime(config.getSessionExpireTime());
-                if (config.getForceHttps() != null) {
-                    serverConfig.setForceHttps(config.getForceHttps());
-                }
-                if (config.getSupportedHosts() != null) {
-                    serverConfig.setSupportedHosts(config.getSupportedHosts());
-                }
-                if (config.getBindSessionToIp() != null) {
-                    serverConfig.setBindSessionToIp(config.getBindSessionToIp());
-                }
-            }
-
+            CBServerConfigurationMapper<?, ?> mapper = CBApplication.getInstance()
+                .getServerConfigurationController().createServerConfigurationInputMapper();
+            CBServerConfigurations configurations = mapper.loadServerConfigurationsFromParams(params);
+            String adminName = configurations.adminName();
+            String adminPassword = configurations.adminPassword();
             if (CommonUtils.isEmpty(adminName)) {
                 // Grant admin permissions to the current user
                 WebUser curUser = webSession.getUser();
                 adminName = curUser == null ? null : curUser.getUserId();
                 adminPassword = null;
             }
-            List<AuthInfo> authInfos = new ArrayList<>();
+            List<SMAuthConfiguration> authInfos = new ArrayList<>();
             List<WebAuthInfo> authInfoList = webSession.getAllAuthInfo();
             if (CommonUtils.isEmpty(adminName)) {
                 // Try to get admin name from existing authentications (first one)
                 if (!authInfoList.isEmpty()) {
-                    adminName = authInfoList.get(0).getUserId();
+                    adminName = authInfoList.getFirst().getUserId();
                 }
             }
             if (CommonUtils.isEmpty(adminName)) {
                 adminName = CBConstants.DEFAULT_ADMIN_NAME;
             }
             for (WebAuthInfo webAuthInfo : authInfoList) {
-                authInfos.add(new AuthInfo(
+                authInfos.add(new SMAuthConfiguration(
                     webAuthInfo.getAuthProviderDescriptor().getId(),
                     webAuthInfo.getUserCredentials()));
             }
@@ -662,7 +676,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             // Patch configuration by services
             for (DBWServiceServerConfigurator wsc : WebServiceRegistry.getInstance().getWebServices(DBWServiceServerConfigurator.class)) {
                 try {
-                    wsc.configureServer(CBApplication.getInstance(), webSession, serverConfig, appConfig);
+                    wsc.configureServer(CBApplication.getInstance(), webSession, configurations.serverConfig(), configurations.appConfig());
                 } catch (Exception e) {
                     log.warn("Error configuring server by web service " + wsc.getClass().getName(), e);
                 }
@@ -674,8 +688,8 @@ public class WebServiceAdmin implements DBWServiceAdmin {
                 adminName,
                 adminPassword,
                 authInfos,
-                serverConfig,
-                appConfig,
+                configurations.serverConfig(),
+                configurations.appConfig(),
                 webSession
             );
 
@@ -683,10 +697,9 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             if (configurationMode) {
                 // In config mode we always refresh because admin user doesn't exist yet
                 webSession.resetUserState();
-            }
-            else {
+            } else {
                 // Just reload session state
-                webSession.refreshUserData();
+                webSession.refreshUserPermissions();
             }
 
             WebAppUtils.getWebApplication().getDriverRegistry().refreshApplicableDrivers();
@@ -694,46 +707,6 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             throw new DBWebException("Error configuring server", e);
         }
         return true;
-    }
-
-    private void updateDisabledFeaturesConfig(@NotNull CBAppConfig appConfig, @NotNull List<String> enabledFeatures) {
-        Set<String> enabledIds = new LinkedHashSet<>(enabledFeatures);
-        appConfig.setEnabledFeatures(enabledFeatures.toArray(new String[0]));
-        String[] disabledFeatures = ServletAppUtils.getServletApplication().getFeatureRegistry().getWebFeatures().stream()
-            .map(DBWFeatureSet::getId)
-            .filter(id -> !enabledIds.contains(id))
-            .toArray(String[]::new);
-        appConfig.setDisabledFeatures(disabledFeatures);
-    }
-
-    // we disable embedded drivers by default and enable it in enabled drivers list
-    // that's why we need so complicated logic for disabling drivers
-    private void updateDisabledDriversConfig(CBAppConfig appConfig, String[] disabledDriversConfig) {
-        Set<String> disabledIds = new LinkedHashSet<>(Arrays.asList(disabledDriversConfig));
-        Set<String> enabledIds = new LinkedHashSet<>(Arrays.asList(appConfig.getEnabledDrivers()));
-
-        // remove all disabled embedded drivers from enabled drivers list
-        enabledIds.removeAll(disabledIds);
-
-        // enable embedded driver if it is not in disabled drivers list
-        for (String driverId : appConfig.getDisabledDrivers()) {
-            if (disabledIds.contains(driverId)) {
-                // driver is also disabled
-                continue;
-            }
-            // driver is removed from disabled list
-            // we need to enable if it is embedded
-            try {
-                DBPDriver driver = WebDataSourceUtils.getDriverById(driverId);
-                if (driver.isEmbedded()) {
-                    enabledIds.add(driverId);
-                }
-            } catch (DBWebException e) {
-                log.error("Failed to find driver by id", e);
-            }
-        }
-        appConfig.setDisabledDrivers(disabledDriversConfig);
-        appConfig.setEnabledDrivers(enabledIds.toArray(String[]::new));
     }
 
     @Override

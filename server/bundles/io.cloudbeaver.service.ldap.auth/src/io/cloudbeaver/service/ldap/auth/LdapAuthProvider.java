@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2025 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,6 +48,7 @@ import java.util.*;
 import javax.naming.Context;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
+import javax.naming.PartialResultException;
 import javax.naming.directory.*;
 import javax.naming.ldap.LdapName;
 import javax.naming.ldap.Rdn;
@@ -252,7 +253,8 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
         NamingEnumeration<SearchResult> results = findByFilter(
             serviceContext,
             ldapSettings,
-            buildSearchFilter(ldapSettings, userIdentifier),
+            buildSearchFilter(ldapSettings),
+            new Object[]{userIdentifier},
             searchControls
         );
 
@@ -272,9 +274,21 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
         @NotNull String searchFilter,
         @NotNull SearchControls searchControls
     ) throws DBException {
+        return findByFilter(serviceContext, ldapSettings, searchFilter, null, searchControls);
+    }
+
+    public NamingEnumeration<SearchResult> findByFilter(
+        @NotNull DirContext serviceContext,
+        @NotNull LdapSettings ldapSettings,
+        @NotNull String searchFilter,
+        @Nullable Object[] filterArgs,
+        @NotNull SearchControls searchControls
+    ) throws DBException {
         try {
             String baseDN = getBaseDN(serviceContext, ldapSettings);
-            return serviceContext.search(baseDN, searchFilter, searchControls);
+            return filterArgs == null
+                ? serviceContext.search(baseDN, searchFilter, searchControls)
+                : serviceContext.search(baseDN, searchFilter, filterArgs, searchControls);
         } catch (Exception e) {
             throw new DBException("Error finding user DN: " + e.getMessage(), e);
         }
@@ -287,8 +301,8 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
         return ldapSettings.getBaseDN();
     }
 
-    private String buildSearchFilter(LdapSettings ldapSettings, String userIdentifier) {
-        String userFilter = String.format("(%s=%s)", ldapSettings.getLoginAttribute(), userIdentifier);
+    private String buildSearchFilter(LdapSettings ldapSettings) {
+        String userFilter = String.format("(%s={0})", ldapSettings.getLoginAttribute());
         if (CommonUtils.isNotEmpty(ldapSettings.getFilter())) {
             return String.format("(&%s%s)", userFilter, ldapSettings.getFilter());
         }
@@ -549,14 +563,24 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
             }
 
             context = initConnection(environment);
-            List<String> groupsByMemberOfAttribute = findGroupsByMemberOfAttribute(fullDN, context);
-            log.debug("Found " + groupsByMemberOfAttribute.size() + " groups by memberOf attribute");
-            result.addAll(groupsByMemberOfAttribute);
-            List<String> groupsByMemberAttribute = findGroupsByMemberAttribute(fullDN, ldapSettings, context);
-            log.debug("Found " + groupsByMemberAttribute.size() + " groups by member attribute");
-            result.addAll(groupsByMemberAttribute);
+            // Run both lookups independently: a failure in one must not discard the groups
+            // already collected by the other.
+            try {
+                List<String> groupsByMemberOfAttribute = findGroupsByMemberOfAttribute(fullDN, context);
+                log.debug("Found " + groupsByMemberOfAttribute.size() + " groups by memberOf attribute");
+                result.addAll(groupsByMemberOfAttribute);
+            } catch (Exception e) {
+                log.error("Failed to fetch groups by memberOf attribute. " + e.getMessage());
+            }
+            try {
+                List<String> groupsByMemberAttribute = findGroupsByMemberAttribute(fullDN, ldapSettings, context);
+                log.debug("Found " + groupsByMemberAttribute.size() + " groups by member attribute");
+                result.addAll(groupsByMemberAttribute);
+            } catch (Exception e) {
+                log.error("Failed to fetch groups by member attribute. " + e.getMessage());
+            }
         } catch (Exception e) {
-            log.error("Group not found", e);
+            log.error("Group not found. " + e.getMessage());
         } finally {
             try {
                 if (context != null) {
@@ -566,6 +590,7 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
                 log.error("Close resource of ldap group search failed", e);
             }
         }
+        log.debug("Resolved " + result.size() + " external group id(s) for member '" + fullDN + "': " + result);
         return new ArrayList<>(result);
     }
 
@@ -589,6 +614,8 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
                     }
                 }
             }
+        } catch (PartialResultException e) {
+          log.debug("Ignoring LDAP continuation references while reading memberOf for '" + fullDN + "'");
         } finally {
             if (userRecord != null) {
                 userRecord.close();
@@ -618,9 +645,11 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
                     //add relative dn to base dn
                     result.add(next.getName());
                 } catch (Exception e) {
-                    log.error("Failed fetch user group. Skipping...", e);
+                    log.error("Failed fetch user group. " + e.getMessage());
                 }
             }
+        } catch (PartialResultException e) {
+            log.debug("Ignoring LDAP continuation references during member group search for '" + fullDN + "'");
         } finally {
             if (searchResults != null) {
                 searchResults.close();

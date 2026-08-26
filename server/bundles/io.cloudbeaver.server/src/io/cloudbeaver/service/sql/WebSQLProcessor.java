@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2025 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import io.cloudbeaver.model.session.WebSessionProvider;
 import io.cloudbeaver.server.WebAppUtils;
 import io.cloudbeaver.server.jobs.SqlOutputLogReaderJob;
 import io.cloudbeaver.service.sql.messages.WebSQLMessages;
+import io.cloudbeaver.utils.WebEventUtils;
 import io.cloudbeaver.websocket.event.task.WSSessionTaskConfirmationRequestEvent;
 import io.cloudbeaver.websocket.event.task.WSSessionTaskQueryConfirmationRequestEvent;
 import org.eclipse.jface.text.Document;
@@ -194,7 +195,8 @@ public class WebSQLProcessor implements WebSessionProvider {
         DBCExecutionContext context = getExecutionContext(dataContainer);
 
         try {
-            final DBDDataFilter dataFilter = filter.makeDataFilter((resultId == null ? null : contextInfo.getResults(resultId)));
+            final DBDDataFilter dataFilter = filter.makeDataFilter(
+                monitor, (resultId == null ? null : contextInfo.getResults(resultId)));
             if (dataFilter.hasFilters()) {
                 sql = context.getDataSource().getSQLDialect().addFiltersToQuery(
                     monitor,
@@ -345,7 +347,8 @@ public class WebSQLProcessor implements WebSessionProvider {
         WebSQLExecuteInfo executeInfo = new WebSQLExecuteInfo();
 
         DBCExecutionContext executionContext = DBUtils.getOrOpenDefaultContext(dataContainer, false);
-        DBDDataFilter dataFilter = filter.makeDataFilter((resultId == null ? null : contextInfo.getResults(resultId)));
+        DBDDataFilter dataFilter = filter.makeDataFilter(
+            monitor, (resultId == null ? null : contextInfo.getResults(resultId)));
         DBExecUtils.tryExecuteRecover(monitor, connection.getDataSource(), param -> {
             try (DBCSession session = executionContext.openSession(monitor, resolveQueryPurpose(dataFilter), "Read data from container")) {
                 try (
@@ -494,11 +497,11 @@ public class WebSQLProcessor implements WebSessionProvider {
         return result;
     }
 
-    private void sendTransactionalEvent(WebSQLContextInfo contextInfo) {
+    private void sendTransactionalEvent(@NotNull WebSQLContextInfo contextInfo) {
         int count = QMUtils.getTransactionState(getExecutionContext()).getUpdateCount();
         webSession.addSessionEvent(
             new WSTransactionalCountEvent(
-                contextInfo.getWebSession().getSessionId(),
+                WebEventUtils.getSmSessionId(webSession),
                 contextInfo.getWebSession().getUserId(),
                 contextInfo.getProjectId(),
                 contextInfo.getId(),
@@ -1130,7 +1133,7 @@ public class WebSQLProcessor implements WebSessionProvider {
         @NotNull WebSQLExecuteInfo executeInfo,
         @NotNull DBDDataFilter filter
     ) throws DBException {
-        if (!filter.getConstraints().isEmpty() || !CommonUtils.isEmpty(filter.getWhere())) {
+        if (filter.getConstraintsCount() > 0 || !CommonUtils.isEmpty(filter.getWhere())) {
             StringBuilder where = new StringBuilder();
             SQLUtils.appendConditionString(
                 filter,
@@ -1267,10 +1270,23 @@ public class WebSQLProcessor implements WebSessionProvider {
         throws DBException {
         if (cellRow instanceof Map<?, ?> variables) {
             if (variables.get(FILE_ID) != null) {
-                Path path = WebAppUtils.getWebPlatform()
+                String fileId = variables.get(FILE_ID).toString();
+                try {
+                    // file id must be UUID
+                    UUID.fromString(fileId);
+                } catch (IllegalArgumentException e) {
+                    throw new DBException("File ID is invalid");
+                }
+
+                Path uploadFolder = WebAppUtils.getWebPlatform()
                     .getTempFolder(webSession.getProgressMonitor(), TEMP_FILE_FOLDER)
                     .resolve(webSession.getSessionId())
-                    .resolve(variables.get(FILE_ID).toString());
+                    .normalize();
+                Path path = uploadFolder.resolve(fileId).normalize();
+                // ensure the resolved path stays within the session upload directory
+                if (!path.startsWith(uploadFolder)) {
+                    throw new DBException("File ID is invalid");
+                }
 
                 try {
                     var file = Files.newInputStream(path);

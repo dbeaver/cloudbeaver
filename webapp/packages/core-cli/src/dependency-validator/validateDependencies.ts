@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ export function validateDependencies(currentPackageRoot: string) {
   const selfImports = new Set<string>();
   let isSuccess = true;
 
-  const sourceFilesIterator = glob.globIterateSync('**/*.{ts,tsx,scss,css}', { cwd: currentPackageSrcPath });
+  const sourceFilesIterator = glob.globIterateSync('**/*.{ts,tsx,css}', { cwd: currentPackageSrcPath });
   const referenceRegex = /^\/\/\/\s+<reference\s+types="(.*?)"/gm;
   const importRegex = /^(import|export) ((type |)([\w,\s*]*?)(\{[\w\s\n,]*?\}|) from |)['"]((@[\w-]*\/[\w-]*)|([^\\.].*?))(\/.*)*['"]/gm;
   const testFileRegex = /((__custom_mocks__|__tests__).*|\.test)\.tsx?$/i;
@@ -154,7 +154,7 @@ export function validateDependencies(currentPackageRoot: string) {
 
   currentPackage.sideEffects = currentPackage.sideEffects || [];
 
-  const sideEffects = ['src/**/*.css', 'src/**/*.scss', 'public/**/*'];
+  const sideEffects = ['src/**/*.css', 'public/**/*'];
 
   for (const sideEffect of sideEffects) {
     if (!currentPackage.sideEffects.includes(sideEffect)) {

@@ -4,6 +4,7 @@ export default [
   ['plugin_help_welcome_docs_label', 'Documentation'],
   ['plugin_help_welcome_docs_description', 'Learn how to use {arg:product}'],
 
+  ['data_viewer_shortcut_open_cell_context_menu', '打开所选单元格的上下文菜单'],
   ['data_viewer_shortcut_start_inline_editing', '为所选单元格打开内联编辑器'],
   ['data_viewer_shortcut_add_new_row', '添加行'],
   ['data_viewer_shortcut_duplicate_row', '复制行'],
@@ -17,6 +18,10 @@ export default [
   ['sql_editor_shortcut_execute_script', '执行脚本'],
   ['sql_editor_shortcut_show_execution_plan', '显示执行计划'],
   ['sql_editor_shortcut_format', '格式化脚本'],
+  ['sql_editor_shortcut_fold_code', '折叠代码块'],
+  ['sql_editor_shortcut_unfold_code', '展开代码块'],
+  ['sql_editor_shortcut_fold_all', '折叠所有代码块'],
+  ['sql_editor_shortcut_unfold_all', '展开所有代码块'],
   ['sql_editor_shortcut_open_editor_in_new_tab', '在单独的浏览器标签下打开SQL编辑器'],
   ['sql_editor_shortcut_comment_uncomment_selection', '注释/取消注释所选内容'],
   ['sql_editor_shortcut_start_completion', '显示自动完成建议'],

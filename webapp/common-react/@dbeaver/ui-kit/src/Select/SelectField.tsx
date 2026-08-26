@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -8,10 +8,10 @@
 
 import { useState } from 'react';
 import clsx from 'clsx';
-import { SelectProvider, Select, SelectPopover, SelectItem, SelectLabel, type SelectProviderProps } from './Select.js';
+import { SelectProvider, Select, SelectPopover, SelectItem, SelectLabel, SelectGroup, type SelectProviderProps } from './Select.js';
 import './SelectField.css';
 
-export interface SelectItem<T> {
+export interface ISelectItem<T> {
   value: T;
   label: string;
   disabled?: boolean;
@@ -19,7 +19,7 @@ export interface SelectItem<T> {
 
 type PropertyGetter<ItemType, ValueType> = (item: ItemType) => ValueType;
 
-export interface SelectFieldProps<T, ItemType = SelectItem<T>> {
+export interface ISelectFieldProps<T, ItemType = ISelectItem<T>> {
   /** Options array - can be SelectOption objects or arbitrary objects */
   items: ItemType[];
 
@@ -47,6 +47,12 @@ export interface SelectFieldProps<T, ItemType = SelectItem<T>> {
    */
   itemDisabled?: PropertyGetter<ItemType, boolean>;
 
+  /**
+   * When true for an item, it acts as a group boundary — items are split into
+   * SelectGroup chunks separated by a CSS border. Separator items are not rendered.
+   */
+  isSeparator?: PropertyGetter<ItemType, boolean>;
+
   value?: T;
 
   onChange?: (value: T) => void;
@@ -66,6 +72,18 @@ export interface SelectFieldProps<T, ItemType = SelectItem<T>> {
   noItemsPlaceholder?: React.ReactNode;
 
   /**
+   * Items pinned above the scrollable list, always visible at the top of the popover.
+   * Uses the same item API (itemValue, itemRender, itemDisabled) as the main items list.
+   */
+  headerItems?: ItemType[];
+
+  /**
+   * Items pinned below the scrollable list, always visible at the bottom of the popover.
+   * Uses the same item API (itemValue, itemRender, itemDisabled) as the main items list.
+   */
+  footerItems?: ItemType[];
+
+  /**
    * Custom renderer for the selected value, overrides itemRenderer for the selected state
    * Only needed for special formatting of the selected value different from list items
    */
@@ -78,11 +96,17 @@ export interface SelectFieldProps<T, ItemType = SelectItem<T>> {
 
   store?: SelectProviderProps['store'];
 
+  portal?: boolean;
+
+  overflowPadding?: number;
+
   autoFocusItemsOnShow?: boolean;
 
   'aria-labelledby'?: string;
 
   'aria-label'?: string;
+
+  title?: string;
 
   id?: string;
 }
@@ -92,7 +116,19 @@ function getValueByPath<Item, Value>(item: Item, getter: PropertyGetter<Item, Va
   return getter ? getter(item) : defaultGetter(item);
 }
 
-export function SelectField<T, ItemType extends {} = SelectItem<T>>({
+function splitIntoGroups<ItemType>(items: ItemType[], isSeparator: PropertyGetter<ItemType, boolean>): ItemType[][] {
+  const groups: ItemType[][] = [[]];
+  for (const item of items) {
+    if (isSeparator(item)) {
+      groups.push([]);
+    } else {
+      groups[groups.length - 1]!.push(item);
+    }
+  }
+  return groups.filter(g => g.length > 0);
+}
+
+export function SelectField<T, ItemType extends {} = ISelectItem<T>>({
   items,
   value,
   onChange,
@@ -100,30 +136,36 @@ export function SelectField<T, ItemType extends {} = SelectItem<T>>({
   itemValueSerialized,
   itemRender,
   itemDisabled,
+  isSeparator,
   label,
   noItemsPlaceholder = 'No items',
+  headerItems,
+  footerItems,
   description,
   disabled,
   required,
   className,
+  portal = false,
+  overflowPadding,
   selectedRender,
   arrowIcon,
   store,
   autoFocusItemsOnShow,
   name,
+  title,
   id,
-}: SelectFieldProps<T, ItemType>) {
+}: ISelectFieldProps<T, ItemType>) {
   const getItemValue = (item: ItemType): T =>
-    getValueByPath<ItemType, T>(item, itemValue, i => ('value' in i ? (i as unknown as SelectItem<T>).value : (i as unknown as T)));
+    getValueByPath<ItemType, T>(item, itemValue, i => ('value' in i ? (i as unknown as ISelectItem<T>).value : (i as unknown as T)));
 
   const getItemValueSerialized = (item: ItemType): string =>
     getValueByPath<T, string>(getItemValue(item), itemValueSerialized, key => JSON.stringify(key));
 
   const renderItem = (item: ItemType): React.ReactNode =>
-    getValueByPath<ItemType, React.ReactNode>(item, itemRender, i => ('label' in i ? (i as unknown as SelectItem<T>).label : String(i)));
+    getValueByPath<ItemType, React.ReactNode>(item, itemRender, i => ('label' in i ? (i as unknown as ISelectItem<T>).label : String(i)));
 
   const isItemDisabled = (item: ItemType): boolean =>
-    getValueByPath<ItemType, boolean>(item, itemDisabled, i => ('disabled' in i ? Boolean((i as unknown as SelectItem<T>).disabled) : false));
+    getValueByPath<ItemType, boolean>(item, itemDisabled, i => ('disabled' in i ? Boolean((i as unknown as ISelectItem<T>).disabled) : false));
 
   const [selectedValue, setSelectedValue] = useState<T | undefined>(() => {
     if (value !== undefined) {
@@ -137,7 +179,8 @@ export function SelectField<T, ItemType extends {} = SelectItem<T>>({
   const handleChange = (newValue: string | readonly string[]) => {
     // TODO: add support for multi-select
 
-    const newItem = items.find(item => getItemValueSerialized(item) === newValue);
+    const allItems = [...(headerItems ?? []), ...items, ...(footerItems ?? [])];
+    const newItem = allItems.find(item => getItemValueSerialized(item) === newValue);
     if (!newItem) {
       return;
     }
@@ -156,26 +199,46 @@ export function SelectField<T, ItemType extends {} = SelectItem<T>>({
   const selectedItem = currentValue !== undefined ? items.find(item => getItemValueSerialized(item) === currentValueSerialized) : undefined;
   const displayValue = selectedRender ? selectedRender(currentValue, selectedItem) : selectedItem ? renderItem(selectedItem) : '';
 
+  function renderSelectItem(item: ItemType) {
+    return (
+      <SelectItem key={getItemValueSerialized(item)} value={getItemValueSerialized(item)} disabled={isItemDisabled(item)}>
+        {renderItem(item)}
+      </SelectItem>
+    );
+  }
+
+  function renderItems(): React.ReactNode {
+    if (items.length === 0) {
+      return <div className="dbv-kit-select__empty">{noItemsPlaceholder}</div>;
+    }
+
+    if (isSeparator) {
+      return splitIntoGroups(items, isSeparator).map(group => (
+        <SelectGroup key={getItemValueSerialized(group[0]!)}>{group.map(renderSelectItem)}</SelectGroup>
+      ));
+    }
+
+    return items.map(renderSelectItem);
+  }
+
   return (
     <div className={clsx('dbv-kit-select-field', className)}>
       <SelectProvider value={currentValueSerialized} setValue={val => handleChange(val)} store={store}>
         {label && <SelectLabel className={clsx(required && 'dbv-kit-select__label--required')}>{label}</SelectLabel>}
 
-        <Select id={id} name={name} disabled={disabled} required={required}>
-          {displayValue}
+        <Select id={id} name={name} title={title} disabled={disabled} required={required}>
+          <span className="dbv-kit-select__value">{displayValue}</span>
           {arrowIcon ?? <Select.Arrow className="dbv-kit-select__arrow-icon tw:text-sm!" />}
         </Select>
         {description && <span className="dbv-kit-select__description">{description}</span>}
 
-        <SelectPopover autoFocusOnShow={autoFocusItemsOnShow} gutter={4} unmountOnHide>
-          {items.length === 0 ? (
-            <div className="dbv-kit-select__empty">{noItemsPlaceholder}</div>
-          ) : (
-            items.map(item => (
-              <SelectItem key={getItemValueSerialized(item)} value={getItemValueSerialized(item)} disabled={isItemDisabled(item)}>
-                {renderItem(item)}
-              </SelectItem>
-            ))
+        <SelectPopover autoFocusOnShow={autoFocusItemsOnShow} portal={portal} overflowPadding={overflowPadding} gutter={4} unmountOnHide>
+          {headerItems && headerItems.length > 0 && (
+            <SelectGroup className="dbv-kit-select__popover-header">{headerItems.map(renderSelectItem)}</SelectGroup>
+          )}
+          <div className="dbv-kit-select__popover-items">{renderItems()}</div>
+          {footerItems && footerItems.length > 0 && (
+            <SelectGroup className="dbv-kit-select__popover-footer">{footerItems.map(renderSelectItem)}</SelectGroup>
           )}
         </SelectPopover>
       </SelectProvider>

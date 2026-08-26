@@ -1,4 +1,5 @@
-FROM ubuntu:24.04
+# Ubuntu 24.04 (Noble Numbat)
+FROM ubuntu:noble
 
 MAINTAINER DBeaver Corp, devops@dbeaver.com
 
@@ -8,8 +9,6 @@ RUN set -eux; \
     apt-get update && \
     apt-get dist-upgrade -y --no-install-recommends && \
     apt-get install -y --no-install-recommends \
-        # curl required for historical reasons, see https://github.com/adoptium/containers/issues/255
-        curl \
         # java.lang.UnsatisfiedLinkError: libfontmanager.so: libfreetype.so.6: cannot open shared object file: No such file or directory
         # java.lang.NoClassDefFoundError: Could not initialize class sun.awt.X11FontManager
         # https://github.com/docker-library/openjdk/pull/235#issuecomment-424466077
@@ -31,7 +30,7 @@ RUN set -eux; \
 ENV LANG=en_US.UTF-8
 
 ENV JAVA_HOME=/opt/java/openjdk
-COPY --from=eclipse-temurin:21 $JAVA_HOME $JAVA_HOME
+COPY --from=eclipse-temurin:25-jdk-noble $JAVA_HOME $JAVA_HOME
 ENV PATH="${JAVA_HOME}/bin:${PATH}"
 
 RUN set -eux; \

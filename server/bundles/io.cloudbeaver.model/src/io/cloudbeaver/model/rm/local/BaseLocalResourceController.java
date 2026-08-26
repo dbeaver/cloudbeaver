@@ -69,8 +69,7 @@ public abstract class BaseLocalResourceController implements RMController {
 
     @Nullable
     @Override
-    public RMProject getProject(@NotNull String projectId, boolean readResources, boolean readProperties)
-        throws DBException {
+    public RMProject getProject(@NotNull String projectId, boolean readResources, boolean readProperties) throws DBException {
         RMProject project = makeProjectFromId(projectId, true);
         if (project == null) {
             return null;
@@ -112,8 +111,7 @@ public abstract class BaseLocalResourceController implements RMController {
     }
 
     @Override
-    public String getProjectsDataSources(@NotNull String projectId, @Nullable String[] dataSourceIds)
-        throws DBException {
+    public String getProjectsDataSources(@NotNull String projectId, @Nullable String[] dataSourceIds) throws DBException {
         DBPProject projectMetadata = getWebProject(projectId, false);
         return doFileReadOperation(
             projectId,

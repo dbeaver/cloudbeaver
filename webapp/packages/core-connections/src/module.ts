@@ -1,13 +1,12 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 
 import { Bootstrap, Dependency, ModuleRegistry, proxy } from '@cloudbeaver/core-di';
-import { NetworkHandlerResource } from './NetworkHandlerResource.js';
 import { NavNodeExtensionsService } from './NavTree/NavNodeExtensionsService.js';
 import { DBDriverResource } from './DBDriverResource.js';
 import { DatabaseAuthModelsResource } from './DatabaseAuthModelsResource.js';
@@ -24,6 +23,7 @@ import { ConnectionInfoPropertiesResource } from './ConnectionInfoPropertiesReso
 import { ConnectionInfoOriginResource } from './ConnectionInfoOriginResource.js';
 import { ConnectionInfoOriginDetailsResource } from './ConnectionInfoOriginDetailsResource.js';
 import { ConnectionInfoNetworkHandlersResource } from './ConnectionInfoNetworkHandlersResource.js';
+import { ConnectionInfoExternalNetworkHandlersService } from './ConnectionInfoExternalNetworkHandlersService.js';
 import { ConnectionInfoAuthPropertiesResource } from './ConnectionInfoAuthPropertiesResource.js';
 import { ConnectionInfoEventHandler } from './ConnectionInfoEventHandler.js';
 import { ConnectionInfoCustomOptionsResource } from './ConnectionInfoCustomOptionsResource.js';
@@ -33,6 +33,8 @@ import { ConnectionFolderEventHandler } from './ConnectionFolderEventHandler.js'
 import { ConnectionExecutionContextResource } from './ConnectionExecutionContext/ConnectionExecutionContextResource.js';
 import { ConnectionDialectResource } from './ConnectionDialectResource.js';
 import { DBDriverExpertSettingsResource } from './DBDriverExpertSettingsResource.js';
+import { ConnectionTypeService } from './ConnectionType/ConnectionTypeService.js';
+import { ConnectionTypeResource } from './ConnectionType/ConnectionTypeResource.js';
 
 export default ModuleRegistry.add({
   name: '@cloudbeaver/core-connections',
@@ -42,7 +44,6 @@ export default ModuleRegistry.add({
       .addSingleton(Bootstrap, ConnectionsLocaleService)
       .addSingleton(Dependency, proxy(ConnectionsSettingsService))
       .addSingleton(Dependency, proxy(ConnectionDialectResource))
-      .addSingleton(Dependency, proxy(NetworkHandlerResource))
       .addSingleton(Dependency, proxy(DBDriverResource))
       .addSingleton(Dependency, proxy(DatabaseAuthModelsResource))
       .addSingleton(Dependency, proxy(ContainerResource))
@@ -59,8 +60,8 @@ export default ModuleRegistry.add({
       .addSingleton(Dependency, proxy(ConnectionFolderResource))
       .addSingleton(Dependency, proxy(ConnectionExecutionContextResource))
       .addSingleton(Dependency, proxy(DBDriverExpertSettingsResource))
+      .addSingleton(Dependency, proxy(ConnectionTypeResource))
       .addSingleton(ConnectionDialectResource)
-      .addSingleton(NetworkHandlerResource)
       .addSingleton(NavNodeExtensionsService)
       .addSingleton(DBDriverResource)
       .addSingleton(DBDriverExpertSettingsResource)
@@ -77,12 +78,15 @@ export default ModuleRegistry.add({
       .addSingleton(ConnectionInfoOriginResource)
       .addSingleton(ConnectionInfoOriginDetailsResource)
       .addSingleton(ConnectionInfoNetworkHandlersResource)
+      .addSingleton(ConnectionInfoExternalNetworkHandlersService)
       .addSingleton(ConnectionInfoAuthPropertiesResource)
       .addSingleton(ConnectionInfoEventHandler)
       .addSingleton(ConnectionInfoCustomOptionsResource)
       .addSingleton(ConnectionFolderResource)
       .addSingleton(ConnectionExecutionContextService)
       .addSingleton(ConnectionFolderEventHandler)
-      .addSingleton(ConnectionExecutionContextResource);
+      .addSingleton(ConnectionExecutionContextResource)
+      .addSingleton(ConnectionTypeResource)
+      .addSingleton(ConnectionTypeService);
   },
 });

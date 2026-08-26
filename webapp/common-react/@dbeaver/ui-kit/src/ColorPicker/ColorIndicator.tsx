@@ -13,9 +13,10 @@ import { memo } from 'react';
 interface Props {
   color: string;
   isSelected?: boolean;
+  className?: string;
 }
 
-export const ColorIndicator = memo(function ColorIndicator({ color, isSelected }: Props) {
+export const ColorIndicator = memo(function ColorIndicator({ color, isSelected, className }: Props) {
   const isLight = ColorConvert(color).isLight();
   const selectedMark = isLight ? 'dbv-kit-color-picker__color--selected-light' : 'dbv-kit-color-picker__color--selected-dark';
 
@@ -24,6 +25,7 @@ export const ColorIndicator = memo(function ColorIndicator({ color, isSelected }
       className={clsx(
         'dbv_kit_color-picker__color tw:w-5 tw:h-5 tw:rounded-full tw:border tw:border-(--dbv-kit-color-picker-border-color)',
         isSelected && selectedMark,
+        className,
       )}
       style={{ backgroundColor: color }}
     />

@@ -18,6 +18,7 @@ export type NavTreeNodeComponent = React.FC<{
   expanded?: boolean;
   big?: boolean;
   className?: string;
+  style?: React.CSSProperties;
 }>;
 
 export type NavTreeControlProps = {
@@ -27,6 +28,7 @@ export type NavTreeControlProps = {
   dndPlaceholder?: boolean;
   expanded?: boolean;
   className?: string;
+  style?: React.CSSProperties;
   onClick?: (event: React.MouseEvent<HTMLDivElement>) => void;
 };
 
@@ -40,6 +42,7 @@ export type NavigationNodeComponent = React.FC<{
   dragging?: boolean;
   expanded?: boolean;
   className?: string;
+  style?: React.CSSProperties;
 }>;
 
 export type NavigationNodeRendererComponent = React.FC<{
@@ -49,4 +52,5 @@ export type NavigationNodeRendererComponent = React.FC<{
   expanded?: boolean;
   dragging?: boolean;
   className?: string;
+  style?: React.CSSProperties;
 }>;

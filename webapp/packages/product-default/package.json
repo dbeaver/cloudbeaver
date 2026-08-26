@@ -5,11 +5,10 @@
     "./lib/module.js",
     "./lib/index.js",
     "src/**/*.ts",
-    "src/**/*.scss",
     "public/**/*",
     "src/**/*.css"
   ],
-  "version": "26.0.4",
+  "version": "26.2.1",
   "description": "CloudBeaver Community",
   "license": "DBeaver Corp",
   "exports": {
@@ -49,7 +48,6 @@
     "@types/react-dom": "^19",
     "concurrently": "^9",
     "rimraf": "^6",
-    "sass": "^1",
     "tailwindcss": "4.0.7",
     "typescript": "^5"
   }

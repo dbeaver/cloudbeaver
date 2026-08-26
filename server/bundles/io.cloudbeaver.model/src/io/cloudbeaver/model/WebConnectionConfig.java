@@ -65,6 +65,7 @@ public class WebConnectionConfig {
     private Boolean defaultAutoCommit;
     private String defaultCatalogName;
     private String defaultSchemaName;
+    private String connectionType;
     @NotNull
     private Map<String, String> defaultUserPreferences = new LinkedHashMap<>();
 
@@ -102,8 +103,14 @@ public class WebConnectionConfig {
             expertSettingsValues != null ? expertSettingsValues : params, WebExpertSettingsProperties.PROP_KEEP_ALIVE_INTERVAL, -1);
         readOnly = JSONUtils.getBoolean(
             expertSettingsValues != null ? expertSettingsValues : params, WebExpertSettingsProperties.PROP_READ_ONLY);
-        defaultAutoCommit = JSONUtils.getBoolean(
-            expertSettingsValues != null ? expertSettingsValues : params, WebExpertSettingsProperties.PROP_AUTO_COMMIT, true);
+
+        if (expertSettingsValues != null) {
+            defaultAutoCommit = AutoCommitMode.from(
+                JSONUtils.getString(expertSettingsValues, WebExpertSettingsProperties.PROP_AUTO_COMMIT_MODE));
+        } else {
+            defaultAutoCommit = JSONUtils.getBoolean(params, WebExpertSettingsProperties.PROP_AUTO_COMMIT, true);
+        }
+
         defaultCatalogName = JSONUtils.getString(
             expertSettingsValues != null ? expertSettingsValues : params, WebExpertSettingsProperties.PROP_DEFAULT_CATALOG);
         defaultSchemaName = JSONUtils.getString(
@@ -120,6 +127,7 @@ public class WebConnectionConfig {
         for (Map<String, Object> nhc : JSONUtils.getObjectList(params, "networkHandlersConfig")) {
             networkHandlersConfig.add(new WebNetworkHandlerConfigInput(nhc));
         }
+        connectionType = JSONUtils.getString(params, "connectionType");
     }
 
     @Property
@@ -380,5 +388,14 @@ public class WebConnectionConfig {
 
     public void setDefaultUserPreferences(@NotNull Map<String, String> defaultUserPreferences) {
         this.defaultUserPreferences = defaultUserPreferences;
+    }
+
+    @Nullable
+    public String getConnectionType() {
+        return connectionType;
+    }
+
+    public void setConnectionType(@Nullable String connectionType) {
+        this.connectionType = connectionType;
     }
 }

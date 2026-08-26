@@ -8,6 +8,9 @@
 
 import './module.js';
 
+import './FormControls/Select.css';
+import './FormControls/Combobox.css';
+
 export * from './AuthenticationProviderLoader.js';
 export * from './useAuthenticationAction.js';
 export * from './CommonDialog/CommonDialog/CommonDialogBody.js';
@@ -79,6 +82,7 @@ export * from './Placeholder/PlaceholderContainer.js';
 
 export * from './PropertiesTable/PropertiesTable.js';
 export * from './PropertiesTable/IProperty.js';
+export { default as PropertiesTableStyles } from './PropertiesTable/PropertiesTable.module.css';
 
 export * from './SLIDE_PANEL_CLOSE_BUTTON_ID.js';
 export * from './SlideDialog/SlideDialog.js';
@@ -139,6 +143,7 @@ export { default as TreeNodeStyles } from './Tree/TreeNode/TreeNode.module.css';
 export * from './FormControls/Checkboxes/Checkbox.js';
 export * from './FormControls/Checkboxes/FieldCheckbox.js';
 export * from './FormControls/Checkboxes/CheckboxMarkup.js';
+export * from './FormControls/Checkboxes/CheckboxIndicator.js';
 export * from './FormControls/Checkboxes/Switch.js';
 export * from './FormControls/Checkboxes/useCheckboxState.js';
 export * from './FormControls/Filter.js';
@@ -177,6 +182,7 @@ export * from './FormControls/Radio.js';
 export * from './FormControls/RadioGroup.js';
 export * from './FormControls/Form.js';
 export * from './FormControls/Textarea.js';
+export * from './FormControls/AutoResizeTextarea.js';
 export * from './FormControls/useCapsLockTracker.js';
 export * from './FormControls/useCustomInputValidation.js';
 export * from './FormControls/useFormCustomInputValidation.js';
@@ -197,6 +203,7 @@ export * from './ActionIconButton.js';
 export { default as IconButtonStyles } from './IconButton.module.css';
 export { default as ActionIconButtonStyles } from './ActionIconButton.module.css';
 export * from './IconOrImage.js';
+export * from './RadioIndicator.js';
 export * from './s.js';
 export * from './SContext.js';
 export * from './StaticImage.js';
@@ -254,3 +261,5 @@ export * from './ObjectPropertyInfo/evaluate.js';
 export * from './ObjectPropertyInfo/getObjectPropertyDefaults.js';
 export * from './useVisible.js';
 export * from './SAVED_VALUE_INDICATOR.js';
+export * from './FormControls/Field.js';
+export * from './FormControls/FieldLabel.js';

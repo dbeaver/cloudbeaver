@@ -4,6 +4,7 @@ export default [
   ['plugin_help_welcome_docs_label', 'Документация'],
   ['plugin_help_welcome_docs_description', 'Узнайте как использовать {arg:product}'],
 
+  ['data_viewer_shortcut_open_cell_context_menu', 'Открыть контекстное меню для выбранной ячейки'],
   ['data_viewer_shortcut_start_inline_editing', 'Начать редактирование ячейки во встроенном редакторе'],
   ['data_viewer_shortcut_add_new_row', 'Добавить новую строку'],
   ['data_viewer_shortcut_duplicate_row', 'Продублировать строку'],
@@ -17,6 +18,10 @@ export default [
   ['sql_editor_shortcut_execute_script', 'Выполнить скрипт'],
   ['sql_editor_shortcut_show_execution_plan', 'Показать план выполнения'],
   ['sql_editor_shortcut_format', 'Форматировать скрипт'],
+  ['sql_editor_shortcut_fold_code', 'Свернуть блок кода'],
+  ['sql_editor_shortcut_unfold_code', 'Развернуть блок кода'],
+  ['sql_editor_shortcut_fold_all', 'Свернуть все блоки кода'],
+  ['sql_editor_shortcut_unfold_all', 'Развернуть все блоки кода'],
   ['sql_editor_shortcut_open_editor_in_new_tab', 'Открыть SQL редактор в новой бразуерной вкладке'],
   ['sql_editor_shortcut_comment_uncomment_selection', 'Закомментировать/раскомментировать выделение'],
   ['sql_editor_shortcut_start_completion', 'Показать подсказки автодополнения'],

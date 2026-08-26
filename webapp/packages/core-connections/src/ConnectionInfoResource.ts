@@ -11,7 +11,7 @@ import { action, makeObservable, observable, runInAction, toJS } from 'mobx';
 import { AppAuthService, UserInfoResource } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
 import { Executor, ExecutorInterrupter, type ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
-import { NavTreeResource, NodeManagerUtils } from '@cloudbeaver/core-navigation-tree';
+import { NavNodeInfoResource, NavTreeResource, NodeManagerUtils } from '@cloudbeaver/core-navigation-tree';
 import { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
 import {
   CachedMapAllKey,
@@ -26,7 +26,14 @@ import {
   resourceKeyListAliasFactory,
   ResourceKeyUtils,
 } from '@cloudbeaver/core-resource';
-import { DataSynchronizationService, ServerEventId, SessionDataResource, WorkspaceConfigEventHandler } from '@cloudbeaver/core-root';
+import {
+  DataSynchronizationService,
+  type IObjectSettingsEvent,
+  ObjectSettingsEventHandler,
+  ServerEventId,
+  SessionDataResource,
+  WorkspaceConfigEventHandler,
+} from '@cloudbeaver/core-root';
 import {
   type AdminConnectionGrantInfo,
   type AdminConnectionSearchInfo,
@@ -34,7 +41,9 @@ import {
   type GetUserConnectionsQueryVariables,
   GraphQLService,
   type InitConnectionMutationVariables,
+  type ObjectPropertyInfo,
   type TestConnectionMutation,
+  WsObjectSettingsType,
 } from '@cloudbeaver/core-sdk';
 import { schemaValidationError } from '@cloudbeaver/core-utils';
 
@@ -67,6 +76,7 @@ export interface IConnectionInfoMetadata extends ICachedResourceMetadata {
   ProjectInfoResource,
   DataSynchronizationService,
   WorkspaceConfigEventHandler,
+  NavNodeInfoResource,
   DBDriverResource,
   SessionDataResource,
   AppAuthService,
@@ -74,6 +84,7 @@ export interface IConnectionInfoMetadata extends ICachedResourceMetadata {
   ConnectionStateEventHandler,
   UserInfoResource,
   NavTreeResource,
+  ObjectSettingsEventHandler,
 ])
 export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoParams, Connection, ConnectionInfoIncludes, IConnectionInfoMetadata> {
   readonly onConnectionCreate: Executor<Connection>;
@@ -87,13 +98,15 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
     private readonly projectInfoResource: ProjectInfoResource,
     private readonly dataSynchronizationService: DataSynchronizationService,
     private readonly workspaceConfigEventHandler: WorkspaceConfigEventHandler,
+    private readonly navNodeInfoResource: NavNodeInfoResource,
     dbDriverResource: DBDriverResource,
     sessionDataResource: SessionDataResource,
     appAuthService: AppAuthService,
     connectionInfoEventHandler: ConnectionInfoEventHandler,
     connectionStateEventHandler: ConnectionStateEventHandler,
     userInfoResource: UserInfoResource,
-    navTreeResource: NavTreeResource,
+    private readonly navTreeResource: NavTreeResource,
+    objectSettingsEventHandler: ObjectSettingsEventHandler,
   ) {
     super();
 
@@ -211,18 +224,18 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
     connectionInfoEventHandler.onEvent<ResourceKeyList<IConnectionInfoParams>>(
       ServerEventId.CbDatasourceUpdated,
       key => {
-        if (this.isConnected(key)) {
+        if (this.isConnected(key) && !this.isOutdated(key)) {
           const connection = this.get(key);
 
           this.dataSynchronizationService
             .requestSynchronization('connection', connection.map(connection => connection?.name).join('\n'))
             .then(state => {
               if (state) {
-                this.markOutdated(key);
+                this.updateFromEvent(key);
               }
             });
         } else {
-          this.markOutdated(key);
+          this.updateFromEvent(key);
         }
       },
       data =>
@@ -262,6 +275,20 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
       this,
     );
 
+    objectSettingsEventHandler.onEvent<IObjectSettingsEvent>(
+      ServerEventId.CbObjectSettingsUpdated,
+      this.syncConnectionSettings.bind(this),
+      undefined,
+      this,
+    );
+
+    objectSettingsEventHandler.onEvent<IObjectSettingsEvent>(
+      ServerEventId.CbObjectSettingsDeleted,
+      this.syncConnectionSettings.bind(this),
+      undefined,
+      this,
+    );
+
     makeObservable<this, 'nodeIdMap'>(this, {
       nodeIdMap: observable,
       create: action,
@@ -294,25 +321,65 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
     return this.get(key).every(connection => connection?.connected ?? false);
   }
 
-  // TODO: we need here node path ie ['', 'project://', 'database://...', '...']
+  private async updateFromEvent(key: ResourceKeyList<IConnectionInfoParams>): Promise<void> {
+    for (const connectionKey of key) {
+      const currentConnection = this.get(connectionKey);
+      const newConnection = await this.refresh(connectionKey);
+
+      if (currentConnection?.nodePath !== newConnection?.nodePath) {
+        if (currentConnection?.nodePath) {
+          const parent = this.navNodeInfoResource.getParent(currentConnection.nodePath);
+
+          if (parent) {
+            this.navTreeResource.markOutdated(parent);
+          }
+        }
+
+        if (newConnection?.nodePath) {
+          await this.navNodeInfoResource.loadNodeParents(newConnection.nodePath);
+          const parent = this.navNodeInfoResource.getParent(newConnection.nodePath);
+
+          if (parent) {
+            this.navTreeResource.markOutdated(parent);
+          }
+        }
+      }
+    }
+  }
+
   getConnectionIdForNodeId(projectId: string, nodeId: string): IConnectionInfoParams | undefined {
     if (!NodeManagerUtils.isDatabaseObject(nodeId)) {
       return;
     }
 
-    return createConnectionParam(projectId, NodeManagerUtils.getConnectionId(nodeId));
+    const node = this.navNodeInfoResource.get(nodeId);
+
+    if (!node || !node.objectId) {
+      return;
+    }
+
+    return createConnectionParam(projectId, node.objectId);
   }
 
-  // TODO: we need here node path ie ['', 'project://', 'database://...', '...']
   getConnectionForNode(nodeId: string): Connection | undefined {
     if (!NodeManagerUtils.isDatabaseObject(nodeId)) {
       return;
     }
 
-    const indexOfConnectionPart = nodeId.indexOf('/', 11);
-    const connectionPart = nodeId.slice(0, indexOfConnectionPart > -1 ? indexOfConnectionPart : nodeId.length);
+    const node = this.navNodeInfoResource.get(nodeId);
 
-    const connectionId = this.nodeIdMap.get(connectionPart);
+    if (!node || !node.objectId || !node.projectId) {
+      return;
+    }
+
+    const connectionEnd = nodeId.indexOf(node.objectId);
+
+    if (connectionEnd === -1) {
+      return;
+    }
+
+    const connectionPart = nodeId.substring(0, connectionEnd + node.objectId.length);
+    const connectionId = this.nodeIdMap.get(connectionPart) || this.getConnectionIdForNodeId(node.projectId, nodeId);
 
     if (connectionId) {
       return this.get(connectionId);
@@ -454,6 +521,22 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
     return this.get(key)!;
   }
 
+  async getConnectionDriverProperties(projectId: string, config: ConnectionConfig): Promise<ObjectPropertyInfo[]> {
+    const options = toJS(config);
+    /* 
+      We should not pass properties here. If we do, the values in ObjectPropertyInfo will be taken from the properties in the config.
+      By deleting them, we always get the values that are actually saved on the server.
+     */
+    delete options.properties;
+
+    const { properties } = await this.graphQLService.sdk.getConnectionDriverProperties({
+      projectId,
+      config: options,
+    });
+
+    return properties;
+  }
+
   deleteConnection(key: IConnectionInfoParams): Promise<void>;
   deleteConnection(key: ResourceKeyList<IConnectionInfoParams>): Promise<void>;
   deleteConnection(key: ResourceKey<IConnectionInfoParams>): Promise<void>;
@@ -531,6 +614,31 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
     this.sessionUpdate = false;
 
     return this.data;
+  }
+
+  private async syncConnectionSettings(data: IObjectSettingsEvent): Promise<void> {
+    if (data.smObjectType !== WsObjectSettingsType.Datasource || !data.projectId) {
+      return;
+    }
+
+    const key = createConnectionParam(data.projectId, data.objectId);
+
+    if (this.isConnected(key)) {
+      const connection = this.get(key);
+      const state = await this.dataSynchronizationService.requestSynchronization('connection', connection?.name ?? '');
+
+      if (!state) {
+        return;
+      }
+    }
+
+    this.markOutdated(key);
+
+    const connection = await this.load(key);
+
+    if (connection.nodePath && connection.connected) {
+      await this.navTreeResource.refreshNode(connection.nodePath);
+    }
   }
 
   protected override dataSet(key: IConnectionInfoParams, value: Connection): void {

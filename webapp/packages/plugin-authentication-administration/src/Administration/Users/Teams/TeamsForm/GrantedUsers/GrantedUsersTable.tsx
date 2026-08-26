@@ -1,20 +1,23 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 
+import { useMemo } from 'react';
 import { observer } from 'mobx-react-lite';
 
 import { useTab, useTabState, type TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 import { Alert, Checkbox, StaticImage, useAutoLoad, useResource, useTranslate } from '@cloudbeaver/core-blocks';
-import { CachedResourceOffsetPageListKey } from '@cloudbeaver/core-resource';
+import { CachedMapAllKey, CachedResourceOffsetPageListKey } from '@cloudbeaver/core-resource';
 import { GrantManagementTable, type IGrantManagementTableColumn } from '@cloudbeaver/plugin-data-grid';
-import { ServerConfigResource } from '@cloudbeaver/core-root';
+import { EAdminPermission, ServerConfigResource } from '@cloudbeaver/core-root';
 import {
-  compareUsers,
+  compareUsersById,
+  compareUsersByLastLogin,
+  TeamsResource,
   TeamRolesResource,
   USER_TEAM_ROLE_SUPERVISOR,
   UsersResource,
@@ -25,13 +28,19 @@ import {
 import type { TeamFormProps } from '../TeamsAdministrationFormService.js';
 import type { GrantedUsersFormPart } from './GrantedUsersFormPart.js';
 
-const USER_ID_COLUMN: IGrantManagementTableColumn = { key: 'userId', label: 'administration_teams_team_granted_users_user_id' };
-const TEAM_ROLE_COLUMN: IGrantManagementTableColumn = {
-  key: 'teamRole',
-  label: 'plugin_authentication_administration_team_user_team_role_supervisor',
+const USER_ID_COLUMN: IGrantManagementTableColumn<AdminUser> = {
+  key: 'userId',
+  label: 'administration_teams_team_granted_users_user_id',
+  compare: compareUsersById,
 };
+const LAST_LOGIN_COLUMN: IGrantManagementTableColumn<AdminUser> = {
+  key: 'lastLogin',
+  label: 'plugin_authentication_administration_user_last_login',
+  compare: compareUsersByLastLogin,
+};
+const TEAM_ROLE_COLUMN_KEY = 'teamRole';
 
-const COLUMNS: IGrantManagementTableColumn[] = [USER_ID_COLUMN];
+const COLUMNS: IGrantManagementTableColumn<AdminUser>[] = [USER_ID_COLUMN, LAST_LOGIN_COLUMN];
 
 export const GrantedUsersTable: TabContainerPanelComponent<TeamFormProps> = observer(function GrantedUsersTable({ tabId, formState }) {
   const translate = useTranslate();
@@ -44,9 +53,11 @@ export const GrantedUsersTable: TabContainerPanelComponent<TeamFormProps> = obse
 
   const active = selected && !isDefaultTeam;
   const teamRolesResource = useResource(GrantedUsersTable, TeamRolesResource, undefined, { active });
+  const teamsResource = useResource(GrantedUsersTable, TeamsResource, CachedMapAllKey, { active });
   const usersLoader = useResource(GrantedUsersTable, UsersResource, CachedResourceOffsetPageListKey(0, 1000).setParent(UsersResourceFilterKey()), {
     active,
   });
+  const grantedUsersIdsMap = useMemo(() => new Map(tabState.state.grantedUsers.map(user => [user.userId, user])), [tabState.state.grantedUsers]);
 
   useAutoLoad(GrantedUsersTable, tabState, active);
 
@@ -70,17 +81,46 @@ export const GrantedUsersTable: TabContainerPanelComponent<TeamFormProps> = obse
   }
 
   function isManageable(user: AdminUser) {
-    if (serverConfigResource.data?.distributed) {
+    if (serverConfigResource.data?.distributed || !usersLoader.resource.isActiveUser(user.userId)) {
       return true;
     }
 
-    return !usersLoader.resource.isActiveUser(user.userId);
+    const teamId = formState.state.teamId;
+    if (!teamId || !user.grantedTeams.includes(teamId)) {
+      return true;
+    }
+
+    const currentTeam = teamsResource.resource.values.find(team => team.teamId === teamId);
+    if (!currentTeam) {
+      return false;
+    }
+
+    const grantedTeams = new Set(user.grantedTeams);
+    const adminTeamsCount = teamsResource.resource.values.filter(
+      team => grantedTeams.has(team.teamId) && team.teamPermissions.includes(EAdminPermission.admin),
+    ).length;
+
+    return !currentTeam.teamPermissions.includes(EAdminPermission.admin) || adminTeamsCount > 1;
+  }
+
+  function getTeamRoleRank(user: AdminUser) {
+    const granted = grantedUsersIdsMap.get(user.userId);
+
+    if (!granted) {
+      return 0;
+    }
+
+    return granted.teamRole === USER_TEAM_ROLE_SUPERVISOR ? 2 : 1;
   }
 
   const columns = [...COLUMNS];
 
   if (teamRolesResource.data.length > 0) {
-    columns.push(TEAM_ROLE_COLUMN);
+    columns.push({
+      key: TEAM_ROLE_COLUMN_KEY,
+      label: 'plugin_authentication_administration_team_user_team_role_supervisor',
+      compare: (a, b) => getTeamRoleRank(a) - getTeamRoleRank(b),
+    });
   }
 
   function getCell(user: AdminUser, colKey: string) {
@@ -95,7 +135,7 @@ export const GrantedUsersTable: TabContainerPanelComponent<TeamFormProps> = obse
       }
 
       if (!isManageable(user)) {
-        title += ` - ${translate('administration_teams_team_granted_users_permission_denied')}`;
+        title += ` - ${translate('administration_teams_team_granted_users_only_admin_team')}`;
       }
 
       return (
@@ -106,7 +146,14 @@ export const GrantedUsersTable: TabContainerPanelComponent<TeamFormProps> = obse
       );
     }
 
-    if (colKey === TEAM_ROLE_COLUMN.key) {
+    if (colKey === LAST_LOGIN_COLUMN.key) {
+      const lastLoginFullTime = user.lastLoginTime ? new Date(user.lastLoginTime).toLocaleString() : '-';
+      const lastLoginDate = user.lastLoginTime ? new Date(user.lastLoginTime).toLocaleDateString() : '-';
+
+      return <span title={lastLoginFullTime}>{lastLoginDate}</span>;
+    }
+
+    if (colKey === TEAM_ROLE_COLUMN_KEY) {
       const granted = tabState.state.grantedUsers.find(grantedUser => grantedUser.userId === user.userId);
 
       if (granted) {
@@ -126,7 +173,7 @@ export const GrantedUsersTable: TabContainerPanelComponent<TeamFormProps> = obse
     return null;
   }
 
-  const items = (usersLoader.data.filter(user => user?.enabled) as AdminUser[]).sort(compareUsers);
+  const items = (usersLoader.data.filter(user => user?.enabled) as AdminUser[]).sort(compareUsersById);
 
   return (
     <GrantManagementTable

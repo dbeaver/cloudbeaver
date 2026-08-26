@@ -18,7 +18,6 @@ cd ../..
 echo "Pull dbeaver platform"
 [ ! -d dbeaver ] && git clone --depth 1 https://github.com/dbeaver/dbeaver.git
 [ ! -d dbeaver-common ] && git clone --depth 1 https://github.com/dbeaver/dbeaver-common.git
-[ ! -d dbeaver-jdbc-libsql ] && git clone --depth 1 https://github.com/dbeaver/dbeaver-jdbc-libsql.git
 
 
 cd cloudbeaver/deploy
@@ -31,6 +30,9 @@ if [[ "$?" -ne 0 ]] ; then
   echo 'Could not perform package'; exit $rc
 fi
 cd ../../../deploy
+
+echo "Generate cloudbeaver.conf file"
+mvn -f ../apps/config-generator compile exec:java -Dconfig.output="cloudbeaver/conf/cloudbeaver.conf"
 
 echo "Copy server packages"
 

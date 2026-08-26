@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,11 @@ public class CBEventsWebSocket extends CBAbstractWebSocket implements CBWebSessi
     private static final Log log = Log.getLog(CBEventsWebSocket.class);
 
     @Nullable
-    private BaseWebSession webSession;
+    private volatile BaseWebSession webSession;
+    @Nullable
+    private FromUserEventHandler eventProcessor;
+    @Nullable
+    private WebSocketPingPongCallback pingPongCallback;
 
     @Override
     public void onOpen(Session session, EndpointConfig config) {
@@ -43,16 +47,39 @@ public class CBEventsWebSocket extends CBAbstractWebSocket implements CBWebSessi
         } else {
             this.webSession = (BaseWebSession) session.getUserProperties()
                 .get(CBWebSocketServerConfigurator.PROP_WEB_SESSION);
+            if (this.webSession == null) {
+                log.debug("No web session for websocket connection, closing");
+                close();
+                return;
+            }
             this.webSession.addEventHandler(this);
             handleEvent(new WSSocketConnectedEvent(webSession.getApplication().getApplicationRunId()));
             log.debug("EventWebSocket connected to the " + webSession.getSessionId() + " session");
 
             session.setMaxIdleTimeout(Duration.ofMinutes(5).toMillis());
-            session.addMessageHandler(String.class, new FromUserEventHandler(webSession));
-            session.addMessageHandler(PongMessage.class, new WebSocketPingPongCallback(webSession));
+            this.eventProcessor = new FromUserEventHandler(webSession);
+            session.addMessageHandler(String.class, eventProcessor);
+            this.pingPongCallback = new WebSocketPingPongCallback(webSession);
+            session.addMessageHandler(PongMessage.class, pingPongCallback);
 
             CBJettyWebSocketManager.registerWebSocket(webSession.getSessionId(), this);
         }
+    }
+
+    @Override
+    public void migrateToSession(@NotNull BaseWebSession newSession) {
+        BaseWebSession oldSession = this.webSession;
+        this.webSession = newSession;
+        if (eventProcessor != null) {
+            eventProcessor.setWebSession(newSession);
+        }
+        if (pingPongCallback != null) {
+            pingPongCallback.setWebSession(newSession);
+        }
+        if (oldSession != null) {
+            CBJettyWebSocketManager.migrateWebSocket(oldSession.getSessionId(), newSession.getSessionId(), this);
+        }
+        log.debug("EventWebSocket migrated to the " + newSession.getSessionId() + " session");
     }
 
     private static class FromUserEventHandler extends CBClientEventProcessor implements MessageHandler.Whole<String> {

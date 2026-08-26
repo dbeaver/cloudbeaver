@@ -24,8 +24,10 @@ import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.app.DBPPlatform;
 import org.jkiss.dbeaver.model.app.DBPProject;
+import org.jkiss.dbeaver.model.auth.SMSession;
 import org.jkiss.dbeaver.model.impl.app.BaseProjectImpl;
 import org.jkiss.dbeaver.model.impl.app.BaseWorkspaceImpl;
+import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.utils.CommonUtils;
 
 import java.io.IOException;
@@ -52,8 +54,14 @@ public class ServerGlobalWorkspace extends BaseWorkspaceImpl {
         @NotNull DBPPlatform platform,
         @NotNull ServletApplication application
     ) {
-        super(platform, application.getWorkspaceDirectory());
+        super(platform, application.getWorkspacePath());
         this.application = application;
+    }
+
+    @NotNull
+    @Override
+    protected SMSession acquireWorkspaceSession(@NotNull DBRProgressMonitor monitor) throws DBException {
+        return new ServerGlobalWorkspaceSession(this);
     }
 
     @Override
@@ -106,5 +114,10 @@ public class ServerGlobalWorkspace extends BaseWorkspaceImpl {
             return globalProject;
         }
         return null;
+    }
+
+    @Override
+    public boolean supportsRealmFeature(@NotNull String feature) {
+        return application.getAppConfiguration().isFeatureEnabled(feature);
     }
 }

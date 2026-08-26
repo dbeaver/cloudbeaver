@@ -35,7 +35,7 @@
     border-radius: var(--dbv-kit-input-radius);
 
     .dbv-kit-input {
-      border: none;
+      border: none !important;
       flex: 1 1 auto;
       min-width: 0;
       width: auto;
@@ -47,13 +47,21 @@
   }
 
   .search-panel__inputs {
-    background-color: var(--dbv-kit-input-background);
     display: flex;
     flex-direction: column;
     flex: 1 1 420px;
     min-width: 120px;
     max-width: var(--tw-container-lg);
     gap: calc(var(--tw-spacing) / 2);
+  }
+
+  .search-panel__replace-toggle-icon {
+    color: var(--mdc-theme-on-secondary, #6d6d6d);
+  }
+
+  .search-panel .dbv-kit-icon-button {
+    --dbv-kit-icon-btn-primary-background-hover: color-mix(in srgb, var(--theme-secondary), var(--theme-on-secondary) 7%) !important;
+    --dbv-kit-icon-btn-secondary-background-hover: color-mix(in srgb, var(--theme-secondary), var(--theme-on-secondary) 7%) !important;
   }
 
   .search-panel__buttons {

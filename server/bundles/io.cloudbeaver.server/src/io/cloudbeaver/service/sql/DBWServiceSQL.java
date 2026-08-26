@@ -83,6 +83,15 @@ public interface DBWServiceSQL extends DBWService {
 
     @NotNull
     @WebAction
+    WebAsyncTaskInfo asyncGenerateEntityQuery(
+        @NotNull WebSession session,
+        @NotNull String generatorId,
+        @NotNull List<String> nodePathList,
+        @NotNull WebSQLGeneratorOptions options
+    ) throws DBWebException;
+
+    @NotNull
+    @WebAction
     String sqlGenerateResultSetQuery(
         @NotNull WebSession session,
         @NotNull WebSQLContextInfo sqlContext,
@@ -125,6 +134,14 @@ public interface DBWServiceSQL extends DBWService {
         @Nullable String resultId,
         @Nullable WebSQLDataFilter filter,
         @Nullable WebDataFormat dataFormat) throws DBWebException;
+
+    @WebAction
+    List<WebSQLQueryResultAssociation> getSqlResultAssociations(
+        @NotNull WebSession webSession,
+        @NotNull WebSQLContextInfo contextInfo,
+        @NotNull String resultsId,
+        @Nullable Boolean isReference
+    ) throws DBException;
 
     /**
      * Reads dynamic trace from provided database results.

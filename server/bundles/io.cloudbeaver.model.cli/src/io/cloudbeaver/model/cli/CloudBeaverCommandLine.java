@@ -22,7 +22,10 @@ import org.jkiss.dbeaver.model.cli.ApplicationCommandLine;
 import org.jkiss.dbeaver.model.cli.ApplicationInstanceController;
 import org.jkiss.dbeaver.model.cli.CLIContextImpl;
 import org.jkiss.dbeaver.model.cli.CLIRunMeta;
+import org.jkiss.dbeaver.model.cli.registry.CLICommandDescriptor;
 import picocli.CommandLine;
+
+import java.util.List;
 
 public class CloudBeaverCommandLine extends ApplicationCommandLine<ApplicationInstanceController> {
     private final CloudBeaverMixin mixin;
@@ -53,9 +56,10 @@ public class CloudBeaverCommandLine extends ApplicationCommandLine<ApplicationIn
     protected CommandLine initCommandLine(
         @Nullable ApplicationInstanceController applicationInstanceController,
         @NotNull CLIContextImpl context,
-        @NotNull CLIRunMeta runMeta
+        @NotNull CLIRunMeta runMeta,
+        @NotNull List<CLICommandDescriptor> commandsToExecute
     ) {
-        var cmd = super.initCommandLine(applicationInstanceController, context, runMeta);
+        var cmd = super.initCommandLine(applicationInstanceController, context, runMeta, commandsToExecute);
         cmd.addMixin("cloudbeaver", mixin);
         return cmd;
     }

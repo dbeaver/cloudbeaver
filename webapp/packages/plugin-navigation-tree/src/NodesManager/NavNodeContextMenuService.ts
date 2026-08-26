@@ -14,6 +14,7 @@ import { LocalizationService } from '@cloudbeaver/core-localization';
 import {
   DATA_CONTEXT_NAV_NODE,
   ENodeFeature,
+  EObjectFeature,
   getNodePlainName,
   type INodeActions,
   isConnectionFolder,
@@ -25,6 +26,7 @@ import {
   nodeDeleteContext,
   NodeManagerUtils,
 } from '@cloudbeaver/core-navigation-tree';
+import { ConnectionInfoResource, DATA_CONTEXT_CONNECTION, EConnectionFeature, isConnectionNode } from '@cloudbeaver/core-connections';
 import { ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import {
   ACTION_DELETE,
@@ -57,6 +59,7 @@ export interface INodeMenuData {
   LocalizationService,
   NavNodeInfoResource,
   NavTreeSettingsService,
+  ConnectionInfoResource,
 ])
 export class NavNodeContextMenuService extends Bootstrap {
   constructor(
@@ -69,6 +72,7 @@ export class NavNodeContextMenuService extends Bootstrap {
     private readonly localizationService: LocalizationService,
     private readonly navNodeInfoResource: NavNodeInfoResource,
     private readonly navTreeSettingsService: NavTreeSettingsService,
+    private readonly connectionInfoResource: ConnectionInfoResource,
   ) {
     super();
   }
@@ -114,8 +118,15 @@ export class NavNodeContextMenuService extends Bootstrap {
       contexts: [DATA_CONTEXT_NAV_NODE],
       isActionApplicable: (context, action) => {
         const node = context.get(DATA_CONTEXT_NAV_NODE)!;
+        const connectionKey = context.get(DATA_CONTEXT_CONNECTION);
 
-        if (NodeManagerUtils.isDatabaseObject(node.id) || isConnectionFolder(node)) {
+        const connection = connectionKey ? this.connectionInfoResource.get(connectionKey) : null;
+
+        if (connection?.features.includes(EConnectionFeature.restrictMetadataEdit)) {
+          return false;
+        }
+
+        if (NodeManagerUtils.isDatabaseObject(node.uri) || isConnectionFolder(node)) {
           if (action === ACTION_RENAME) {
             return node.features?.includes(ENodeFeature.canRename) ?? false;
           }
@@ -166,7 +177,7 @@ export class NavNodeContextMenuService extends Bootstrap {
           }
           case ACTION_DELETE: {
             try {
-              await this.navTreeResource.deleteNode(node.id);
+              await this.navTreeResource.deleteNode(node.uri);
             } catch (exception: any) {
               this.notificationService.logException(
                 exception,
@@ -186,7 +197,7 @@ export class NavNodeContextMenuService extends Bootstrap {
         const node = context.get(DATA_CONTEXT_NAV_NODE)!;
 
         if (action === ACTION_OPEN) {
-          return this.navNodeManagerService.canOpen(node.id, node.parentId);
+          return this.navNodeManagerService.canOpen(node.uri, node.parentId);
         }
 
         return [ACTION_REFRESH].includes(action);
@@ -196,12 +207,16 @@ export class NavNodeContextMenuService extends Bootstrap {
 
         switch (action) {
           case ACTION_OPEN: {
-            this.navNodeManagerService.navToNode(node.id, node.parentId);
+            this.navNodeManagerService.navToNode(node.uri, node.parentId);
             break;
           }
           case ACTION_REFRESH: {
             try {
-              await this.navNodeManagerService.refreshTree(node.id);
+              if (isConnectionNode(node) && !node.objectFeatures.includes(EObjectFeature.dataSourceConnected)) {
+                await this.navNodeInfoResource.refresh(node.uri);
+              } else {
+                await this.navNodeManagerService.refreshTree(node.uri);
+              }
             } catch (exception: any) {
               this.notificationService.logException(exception, 'app_navigationTree_refresh_error');
             }

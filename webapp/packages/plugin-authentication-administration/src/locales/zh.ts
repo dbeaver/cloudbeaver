@@ -34,6 +34,7 @@ export default [
   ['authentication_administration_users_filters_status_enabled', '启用'],
   ['authentication_administration_users_filters_status_disabled', '禁用'],
   ['authentication_administration_users_filters_status_all', '全部'],
+  ['authentication_administration_users_filters_filter_label', 'Filter'],
   ['authentication_administration_users_empty', '无用户'],
   ['authentication_administration_users_delete_user', '删除用户'],
   ['authentication_administration_users_delete_user_fail', '删除用户失败'],
@@ -106,6 +107,7 @@ export default [
   ['administration_teams_team_granted_users_user_name', '用户名称'],
   ['administration_teams_team_granted_users_empty', '没有可用用户'],
   ['administration_teams_team_granted_users_permission_denied', '您不能编辑自己的权限'],
+  ['administration_teams_team_granted_users_only_admin_team', '您无法管理自己的权限，因为这是您所属的唯一管理员团队'],
 
   ['administration_teams_team_granted_connections_tab_title', '连接'],
   ['administration_teams_team_granted_connections_search_placeholder', '搜索连接名称...'],
@@ -118,6 +120,7 @@ export default [
 
   ['plugin_authentication_administration_team_form_edit_label', 'Team editing form'],
   ['plugin_authentication_administration_user_form_edit_label', 'User editing form'],
+  ['plugin_authentication_administration_user_last_login', '最后登录'],
 
   [
     'plugin_authentication_administration_user_username_validation_error',

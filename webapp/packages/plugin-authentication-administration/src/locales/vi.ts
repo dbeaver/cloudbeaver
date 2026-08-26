@@ -35,6 +35,7 @@ export default [
   ['authentication_administration_users_filters_status_enabled', 'BẬT'],
   ['authentication_administration_users_filters_status_disabled', 'TẮT'],
   ['authentication_administration_users_filters_status_all', 'TẤT CẢ'],
+  ['authentication_administration_users_filters_filter_label', 'Filter'],
   ['authentication_administration_users_empty', 'Không có người dùng nào'],
   ['authentication_administration_users_delete_user', 'Xóa người dùng'],
   ['authentication_administration_users_delete_user_fail', 'Xóa người dùng thất bại'],
@@ -125,6 +126,7 @@ export default [
   ['administration_teams_team_granted_users_user_name', 'Tên Người dùng'],
   ['administration_teams_team_granted_users_empty', 'Không có người dùng nào khả dụng'],
   ['administration_teams_team_granted_users_permission_denied', 'Bạn không thể chỉnh sửa quyền của chính mình'],
+  ['administration_teams_team_granted_users_only_admin_team', 'Bạn không thể quản lý quyền của chính mình vì đây là nhóm quản trị viên duy nhất mà bạn tham gia'],
   ['administration_teams_team_granted_connections_tab_title', 'Kết nối'],
   ['administration_teams_team_granted_connections_search_placeholder', 'Tìm kiếm tên kết nối...'],
   ['administration_teams_team_granted_connections_empty', 'Không có kết nối nào khả dụng'],
@@ -137,6 +139,7 @@ export default [
   ],
   ['plugin_authentication_administration_team_form_edit_label', 'Biểu mẫu chỉnh sửa nhóm'],
   ['plugin_authentication_administration_user_form_edit_label', 'Biểu mẫu chỉnh sửa người dùng'],
+  ['plugin_authentication_administration_user_last_login', 'Lần đăng nhập cuối'],
 
   [
     'plugin_authentication_administration_user_username_validation_error',

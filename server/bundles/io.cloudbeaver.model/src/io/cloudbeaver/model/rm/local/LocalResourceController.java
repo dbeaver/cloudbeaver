@@ -34,6 +34,7 @@ import org.jkiss.dbeaver.model.app.DBPWorkspace;
 import org.jkiss.dbeaver.model.auth.SMCredentials;
 import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
+import org.jkiss.dbeaver.model.auth.SMObjectType;
 import org.jkiss.dbeaver.model.fs.lock.LockManager;
 import org.jkiss.dbeaver.model.fs.lock.LockOptions;
 import org.jkiss.dbeaver.model.fs.lock.LockTarget;
@@ -41,21 +42,23 @@ import org.jkiss.dbeaver.model.impl.app.BaseProjectImpl;
 import org.jkiss.dbeaver.model.impl.auth.SessionContextImpl;
 import org.jkiss.dbeaver.model.navigator.DBNLocalFolder;
 import org.jkiss.dbeaver.model.net.DBWHandlerConfiguration;
+import org.jkiss.dbeaver.model.net.DBWNetworkProfile;
 import org.jkiss.dbeaver.model.rm.*;
 import org.jkiss.dbeaver.model.security.SMAdminController;
-import org.jkiss.dbeaver.model.security.SMObjectType;
 import org.jkiss.dbeaver.model.sql.DBQuotaException;
 import org.jkiss.dbeaver.model.websocket.event.MessageType;
 import org.jkiss.dbeaver.model.websocket.event.WSSessionLogUpdatedEvent;
 import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceEvent;
 import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceProperty;
 import org.jkiss.dbeaver.model.websocket.event.datasource.WSDatasourceFolderEvent;
+import org.jkiss.dbeaver.model.websocket.event.datasource.WSNetworkProfileEvent;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
 import org.jkiss.dbeaver.registry.DataSourceParseResults;
 import org.jkiss.dbeaver.registry.ResourceTypeDescriptor;
 import org.jkiss.dbeaver.registry.ResourceTypeRegistry;
 import org.jkiss.dbeaver.registry.network.NetworkHandlerDescriptor;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
+import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.IOUtils;
 import org.jkiss.utils.Pair;
@@ -286,7 +289,7 @@ public class LocalResourceController extends BaseLocalResourceController {
                 throw new DBException("Error creating shared project path", e);
             }
         }
-        validateResourcePath(name);
+        GeneralUtils.validateResourceNameUnconditionally(name);
         validateProjectName(null, name);
         var projectPath = sharedProjectsPath.resolve(name);
         if (Files.exists(projectPath)) {
@@ -409,8 +412,13 @@ public class LocalResourceController extends BaseLocalResourceController {
                     registry::createDataSource
                 )
             );
+        Map<String, DBWNetworkProfile> oldNetworkProfiles = registry.getNetworkProfiles().getProfiles().stream()
+            .collect(Collectors.toMap(
+                DBWNetworkProfile::getProfileId,
+                p -> p
+            ));
         DataSourceParseResults parseResults = super.updateProjectDataSourcesConfig(projectId, configuration, dataSourceIds);
-        sendDataSourcesConfigUpdatedEvent(registry, oldDataSources, parseResults);
+        sendConfigUpdatedEvent(registry, oldDataSources, oldNetworkProfiles, parseResults);
         return parseResults != null;
     }
 
@@ -604,14 +612,48 @@ public class LocalResourceController extends BaseLocalResourceController {
         return DBNLocalFolder.makeLocalFolderItemPath(projectId, folderPath);
     }
 
-    private void sendDataSourcesConfigUpdatedEvent(
+    private void sendConfigUpdatedEvent(
         @NotNull DBPDataSourceRegistry registry,
         @NotNull Map<String, DataSourceDescriptor> oldDataSources,
+        @NotNull Map<String, DBWNetworkProfile> oldNetworkProfiles,
         @Nullable DataSourceParseResults parseResults
     ) {
-        if (parseResults == null || credentialsProvider.getActiveUserCredentials() == null || oldDataSources.isEmpty()) {
+        if (parseResults == null || credentialsProvider.getActiveUserCredentials() == null) {
             return;
         }
+        boolean profilesChanged = !parseResults.removedProfiles.isEmpty();
+
+        // We don't need to check for updated profiles if there are already added or removed profiles
+        if (!profilesChanged) {
+            for (DBWNetworkProfile updatedProfile : parseResults.updatedProfiles) {
+                if (oldNetworkProfiles.containsKey(updatedProfile.getProfileId())) {
+                    DBWNetworkProfile oldProfile = oldNetworkProfiles.get(updatedProfile.getProfileId());
+                    if (!oldProfile.equalConfigurations(updatedProfile)) {
+                        profilesChanged = true;
+                        break;
+                    }
+                } else {
+                    // profile was added
+                    profilesChanged = true;
+                    break;
+                }
+            }
+        }
+
+        if (profilesChanged) {
+            ServletAppUtils.getServletApplication().getEventController().addEvent(
+                WSNetworkProfileEvent.update(
+                    credentialsProvider.getActiveUserCredentials().getSmSessionId(),
+                    credentialsProvider.getActiveUserCredentials().getUserId(),
+                    registry.getProject().getId()
+                )
+            );
+        }
+
+        if (oldDataSources.isEmpty()) {
+            return;
+        }
+
         List<String> updatedConfigurationDataSourceIds = new ArrayList<>();
         List<String> updatedNameDataSourceIds = new ArrayList<>();
         List<String> updatedInternalConfigurationDataSourceIds = new ArrayList<>();
@@ -715,7 +757,6 @@ public class LocalResourceController extends BaseLocalResourceController {
                 )
             );
         }
-
     }
 
     @NotNull
@@ -1091,8 +1132,24 @@ public class LocalResourceController extends BaseLocalResourceController {
         try {
             while (resourcePath.startsWith("/")) resourcePath = resourcePath.substring(1);
             Path targetPath = projectPath.resolve(resourcePath).normalize();
-            if (!targetPath.startsWith(projectPath)) {
-                throw new DBException("Invalid resource path");
+            // hack for custom path implementations that returns / as root path
+            Iterator<Path> projectParts = projectPath.iterator();
+            Iterator<Path> targetParts = targetPath.iterator();
+            Iterator<Path> unnormalizedTargetParts = projectPath.resolve(resourcePath).iterator();
+            while (projectParts.hasNext()) {
+                if (!targetParts.hasNext()) {
+                    throw new DBException("Invalid resource path");
+                }
+                Path projectPart = projectParts.next();
+                Path targetPart = targetParts.next();
+                unnormalizedTargetParts.next();
+                if (!projectPart.equals(targetPart)) {
+                    throw new DBException("Invalid resource path");
+                }
+            }
+            // validating unnormalized target parts to avoid invalid characters in resource names
+            while (unnormalizedTargetParts.hasNext()) {
+                GeneralUtils.validateResourceNameUnconditionally(unnormalizedTargetParts.next().toString());
             }
             return targetPath;
         } catch (InvalidPathException e) {
@@ -1210,6 +1267,7 @@ public class LocalResourceController extends BaseLocalResourceController {
         RMProjectName project = WebRMUtils.parseProjectName(projectId);
         RMProjectType type = project.getType();
         String projectName = project.getName();
+        GeneralUtils.validateResourceNameUnconditionally(projectName);
         switch (type) {
             case GLOBAL:
                 if (!projectName.equals(globalProjectName)) {

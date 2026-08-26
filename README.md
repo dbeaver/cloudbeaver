@@ -5,12 +5,15 @@
 Cloud Database Manager - Community Edition.  
 CloudBeaver is a web server that provides a rich web interface. The server itself is a Java application, and the web part is written in TypeScript and React.  
 It is free to use and open-source (licensed under [Apache 2](https://github.com/dbeaver/cloudbeaver/blob/devel/LICENSE) license).  
-See our [WIKI](https://github.com/dbeaver/cloudbeaver/wiki) for more details. 
 
 <a><img src="https://github.com/dbeaver/cloudbeaver/wiki/images/connection-creation-demo.png" width="400"/></a>
 <img src="https://github.com/dbeaver/cloudbeaver/wiki/images/gis-demo.png" width="400"/>
 <img src="https://github.com/dbeaver/cloudbeaver/wiki/images/data-transfer-demo.png" width="400"/>
 <img src="https://github.com/dbeaver/cloudbeaver/wiki/images/sql-editor-demo.png" width="400"/>
+
+## Documentation
+- [GitHub WIKI](https://github.com/dbeaver/cloudbeaver/wiki)
+- [Official documentation](https://dbeaver.com/docs/cloudbeaver/)
 
 ## Run in Docker
 
@@ -19,133 +22,202 @@ See our [WIKI](https://github.com/dbeaver/cloudbeaver/wiki) for more details.
 
 ## Demo server
 
-You can see a live demo of CloudBeaver here: https://demo.cloudbeaver.io  
+You can see a live demo of CloudBeaver server here: https://demo.cloudbeaver.io  
 
 [Database access instructions](https://github.com/dbeaver/cloudbeaver/wiki/Demo-Server)
 
 ## Changelog
 
-### 26.0.3 2026-04-20
+### 26.1.5 2026-08-17
+- AI Assistant:
+    - Added the ability to cancel a response in AI Chat to stop response generation when needed.
+    - The "Endpoint" setting was renamed to "API Base URL" for the OpenAI provider.
+    - Added AI engine icons to AI configuration profiles, making it easier to identify AI providers in the Administration panel and AI Chat configuration.
+- Administration:
+    - Fixed the issue of fetching groups during LDAP authorization. CloudBeaver now provides all matched groups regardless of fetching errors.
+    - Added database and driver connection version information to diagnostic logs.
+- Connectivity:
+    - Added the option to upload files for certificates and keys in the SSL authorization configuration.
+- Accessibility:
+    - Improved keyboard accessibility for the user search filter in the Administration panel, allowing it to be focused and used with keyboard navigation with the Tab button.
+- General:
+    - Added advanced data import settings, including database-specific replace methods, transaction support, bulk loading, and the option to use a separate connection for data transfer.
+    - Improved autocompletion in the Data Editor filter by displaying suggestions under the cursor for easier selection.
+    - Improved SQL autocomplete suggestion ordering for object names. Now suggestions are sorted alphabetically.
+    - Resolved the issue where the reverse proxy logout opened a popup window rather than redirecting in the same tab.
+- Security:
+    - Removed the ability to rename SQL scripts that start with dots to prevent them from being moved outside the Scripts directory into the root Tree.
+    - Fixed the high vulnerability (CVE-2026-67213) in the nanoid library. The library was updated to version 3.3.17.
+    - Fixed the high vulnerability (CVE-2025-71329) in the less library. The library was updated to version 4.7.0.
+    - Fixed the high vulnerability (CVE-2026-13697) in the undici library. The library was updated to version 8.9.0.
+    - Fixed the high vulnerability (CVE-2026-18446) in the fast-uri library. The library was updated to version 4.1.2.
+    - Fixed the high vulnerability (CVE-2026-69152) in the brace-expansion library. The library was updated to version 5.0.9.
+- Databases and drivers:
+    - ClickHouse: Added support for maps data type visualisation for the Data Editor.
+    - LibSQL: Added support for database views.
+    - Added a Show full DDL option for PostgreSQL schemas and tables to generate complete DDL, including objects within a schema and object comments and privileges.
+
+### 26.1.4 2026-08-03
+
+- AI Assistant:
+    - Added AI Chat to help users generate and fix queries and explore data more easily. It’s integrated with the SQL Editor to run generated queries instantly. Access it from the top toolbar. All AI features can be turned off in the Server configuration.
+    - Added the option to configure AI profiles in the Administration panel, usable in the AI Chat and for the @ai command in the SQL Editor. Both OpenAI and Copilot engines can be utilized for configuration.
+- Connectivity:
+    - Resolved the issue where the application could no longer connect to the database after running for an extended period.
+    - Resolved the issue where user connection settings required re-login in a new session to apply their changes.
+- Accessibility:
+    - Added a loader to the Save button in the Administration panel for visualizing the loading process.
+    - Improved drag-and-drop in the Navigator Tree for objects by enlarging the auto-scroll trigger areas.
+- General:
+    - Added the ability to export generated SQL to a .sql file from the Generate SQL dialog.
+    - Improved "Open in SQL Editor" behavior by preserving the source table context for the Generate SQL dialog.
+    - Fixed synchronization between instances eliminates the need to refresh to see the updated connection or folder in another instance.
+- Security:
+    - Added a new "Auto-create users" setting for the reverse proxy provider, allowing new user creation on login. It is enabled by default.
+    - Updated the PostgreSQL JDBC driver to version 42.7.13, including a fix for a high-severity security vulnerability (CVE-2026-54291).
+    - Fixed the critical vulnerability (CVE-2026-59873) in the tar library. The library was updated to version 7.5.19.
+    - Fixed the high vulnerability (CVE-2026-10050) in the jetty-security library. The library was updated to version 12.1.11.
+    - Fixed the high vulnerability (CVE-2026-14257) in the brace-expansion library. The library was updated to version 5.0.8.
+    - Fixed the high vulnerability (GHSA-r28c-9q8g-f849) in the postcss library. The library was updated to version 8.5.18.
+    - Fixed the high vulnerability (GHSA-pm4m-ph32-ghv5) in the js-yaml library. The library was updated to version 5.2.2.
+    - Fixed the high vulnerability (CVE-2026-59880) in the immutable library. The library was updated to version 5.1.8.
+    - Fixed the high vulnerability (CVE-2026-59879) in the fast-uri library. The library was updated to version 3.1.3.
+    - Fixed the high vulnerability (CVE-2026-13311) in the shell-quote library. The library was updated to version 1.9.0.
+    - Fixed the high vulnerability (GHSA-gcfj-64vw-6mp9) in the axios library. The library was updated to version 1.18.0.
+- Databases and drivers:
+    - ClickHouse
+        - The driver was updated to version 0.10.0.
+        - Improved JSON display in the Value panel.
+    - MySQL: Fixed support for comments starting with '#' symbol in the SQL Editor.
+    - PostgreSQL:
+        - The driver was updated to version 42.7.13.
+        - Fixed an error that occurred when applying filters to database nodes.
+        - Fixed generated calls for procedures with OUT parameters.
+
+### 26.1.3 2026-07-20
 
 - Data Editor:
+    - Fixed copying of large JSON values in the Data Editor - now the full value can be copied and transferred.
+    - Updated the Reference panel to show only relevant rows when a foreign key is null.
+- General:
+    - Added connection types to visually distinguish database environments using background colors across the Database Navigator and application UI. Users with edit permissions can assign built-in environment types color-coded configurations.
+- Data Transfer:
+    - Improved memory usage when importing large CSV files.
+    - Fixed CSV export with multi-character quotes and improved quote/delimiter validation
+- Accessibility:
+    - Enabled the use of the Enter or space keys to toggle checkboxes in the administration tabs and the metadata viewer.
+    - Added the ability to expand and collapse code block elements, including JSON, using the keyboard.
+    - Fixed shortcuts behavior for AZERTY keyboards. Now shortcuts like Ctrl/Cmd + Z work correctly.
+- Security:
+    - Resolved an authorization vulnerability when testing connections by enforcing strict permission checks. This mitigation prevented unauthenticated users from exploiting JDBC requests to read arbitrary server files.
+    - Resolved an LDAP injection vulnerability by properly escaping user input in the authentication username field, preventing attackers from manipulating search filters, bypassing access restrictions, and enumerating directory users.
+    - Fixed the high vulnerability (GHSA-gv7w-rqvm-qjhr) in the esbuild library. The library was updated to version 0.28.1.
+    - Fixed the high vulnerability (CVE-2026-12143) in the form-data library. The library was updated to version 4.0.6.
+- Databases and drivers:
+    - The Databend driver was updated to version 0.4.8.
+    - Fixed an issue related to the display of metadata in the navigation tree for DB2, Firebird, and MySQL.
+
+### 26.1.2 2026-07-06
+
+- Data Editor:
+    - Added the References panel showing related records from other tables connected by foreign keys. It helps to explore table relationships directly in the Data editor.
+    - Resolved an issue where the Data Editor ignored the text preview's maximum length quota. Increasing this quota now enables the ability to edit large values.
+- General:
+    - Added the Last Login time to the user form and the user table in the administration part.
+    - Fixed the bug with the inability to select entered text in the Find and Replace panel in editors.
+- Accessibility:
+    - Added the ability to use the Enter or Space key to turn checkboxes on/off in the connection properties tab.
+- Security:
+    - Fixed CVE-2026-55449. Resolved a local file disclosure vulnerability by enforcing strict validation of file identifiers and path containment during data updates.
+    - Updated session handling to prevent session fixation vulnerabilities. The application generates new session identifiers upon login.
+    - Fixed the high vulnerability (CVE-2026-12151) in the undici library. The library was updated to version 6.27.0.
+
+### 26.1.1 2026-06-22
+
+- General: Added a "Project Info" tab containing the project description to the project context menu.
+- Security:
+	- Fixed a cross-site scripting vulnerability caused by unsanitized user input in the web interface.
+	- Resolved a security flaw related to user-controlled file paths by adding strict validation to prevent unauthorized resource access.
+	- Fixed the critical vulnerability (CVE-2026-9277) in the shell-quote library (updated to version 1.8.4).
+
+### 26.1.0 2026-06-01
+
+### Changes since 26.0.0:
+
+- Administration:
+    - Added support for custom startup arguments when running CloudBeaver in a container. Administrators can specify configuration file locations to adapt the application to their environment. (thanks to @MalteHei)
+    - Updated the manifest.webmanifest file to generate dynamically based on the CLOUDBEAVER_ROOT_URI environment variable. (thanks to @houssemexo26)
+- Authorization:
+    - Added HTTP header authentication support for GraphQL queries. Users can provide API tokens via Authorization or X-Api-Key headers, allowing external data tools to authenticate without modifying request bodies.
+    - Fixed a bug in the authentication form: the existing password is now required for password changes.
+- SQL Editor:
+    - Updated the SQL Editor to use real tab characters for indentation. The application displayed tabs as four-space gaps with a distinct visual marker.
+    - Added an ability to view and edit scripts without connecting to the database.
+    - Added the ability to open generated queries right from the Generate SQL window.
+    - Added fuzzy search to SQL Editor auto-completion for object names. The feature allows users to find tables and containers even with typos or incorrect letter ordering.
+    - Added the tooltip about quoting rules for the Bind variables parameters dialog.
+    - Fixed keyword autocompletion for partially typed keywords to avoid redundant letters.
+- Data Editor:
+    - Added the ability to copy-paste multiple cells at once. Pasted values will be distributed across selected cells.
+    - Added an ability to add, duplicate, delete, or set values to NULL in multiple highlighted rows via the Data Editor context menu.
+    - Added the Find and Replace functionality for the Data Editor with the ability to find data by matching case, whole word, or using regular expressions.
+    - Data Editor started to keep the state of column configurations, such as filters, sorting, and ordering, after the reconnect, page refresh, and re-login.
     - Added key column mark for tables with unique keys in the data grid.
-    - Added the ability to paste a copied cell into multiple cells and to set multiple cells to NULL.
+    - Added more settings to the Generated SQL window, including the ability to select fully qualified names for query or use compact SQL formatting.
+    - Added a DDL generation option to the Data Editor and Result Set context menu.
+    - Fixed copy and paste behavior for multiline and special characters in the Data Editor. Added visual glyphs to indicate line breaks and tabs in the data grid.
+    - Fixed the ability to copy Boolean values in the clipboard in the Data Editor.
     - Fixed the ability to calculate row count for non-standard SELECT statements. (thanks to @fdcastel)
-- Navigator Tree:
+- Navigator tree:
     - Reorganized the context menu on the connection level to make it more compact.
     - Added support for special symbols (pipe, comma, and asterisk) for the search field.
+    - Removed the "Folders" setting from the settings list for the Navigator Tree.
 - Accessibility:
-    - Added the Skip to content option for quick keyboard access to the Navigator Tree, editors, and shortcuts to improve application accessibility.
+    - Added the Skip to content option for quick keyboard access to the Navigator Tree, editors, and shortcuts list tab to improve application accessibility.
+    - Improved keyboard navigation for context menu and buttons for Data Editor, SQL Editor, and Navigator tree.
+    - Added the Ctrl + / keyboard shortcut to open the context menu for selected cells in the Data Editor.
+    - Fixed the ability to switch tabs in the Data Editor using the keyboard.
+    - Fixed contrast for elements across different application parts in the light and dark themes to meet WCAG requirements.
 - General:
-    - SQL Editor: Fixed keyword autocompletion for partially typed keywords. There are no extra letters for them after completion.
-    - Added support for custom startup arguments when running CloudBeaver in a container. Administrators can specify configuration file locations to adapt the application to their environment. (thanks to @MalteHei)
+    - Marked icons for non-saved (temporary) scripts with the hourglass symbol to add visual distinction from the saved ones.
+    - Added the ability to set to NULL any value in the Driver Properties.
     - Fixed custom driver properties display for the connection page.
     - Fixed data export in SQL format for values containing single quotes.
-- Databases:
-    - ClickHouse: Fixed the display of Array(JSON) types in the data grid.
+- Databases and drivers:
+    - ClickHouse:
+        - Fixed the display of Array(JSON) types in the data grid.
+        - Updated driver version to 0.9.7.
+        - Fixed IP address display in the Data Editor by removing the leading slash.
     - Added support for the "prompt=false" connection property for DB2 for IBM i to turn off interactive prompts and prevent related errors.
+    - DuckDB:
+        - Fixed map rendering for GEOMETRY types with CRS parameters.
+        - Fixed geometry type display for database versions > 1.5.
+    - H2 database:
+        - Added new embedded driver version 2.4.2.
+        - Updated server driver to version 2.4.2.
+    - Firebird: Expanded database-specific SQL dialect coverage for the SQL Editor. Added more keywords, built-in functions, and SQL generators.
+    - MySQL: Fixed query boundaries recognition in the SQL Editor for scripts with the DELIMITER keyword.
+    - PostgreSQL:
+        - Updated driver to version 42.7.11
+        - Fixed missing INOUT parameters in CHECK generation for procedures and functions.
+        - Fixed handling of 24:xx values in time columns.
+        - Fixed an error when connecting via URL if the database name contains a hyphen.
+    - SQL Server:
+        - Fixed DDL generation for external tables.
+        - Fixed the database connectivity issue after the Java update.
 - Security:
+    - Added an administrative setting to restrict SSH tunneling capabilities. Administrators can now limit tunnel configuration to authorized users, reducing the risk of unauthorized network access.
     - Fixed the critical vulnerability (CVE-2025-62718) in the axios library. The library was updated to version 1.15.0.
     - Fixed the high vulnerability (CVE-2026-4800) in the lodash library. The library was updated to version 4.18.0.
     - Fixed the high vulnerability (CVE-2026-39363) in the vite library. The library was updated to version 7.3.2.
- 
-### 26.0.2 2026-04-06
-
-- UI improvements:
-    - Marked icons for non-saved (temporary) scripts with the hourglass symbol to add visual distinction from the saved ones.
-    - Added the tooltip about quoting rules for the Bind variables parameters dialog.
-    - Improved keyboard navigation for context menu and buttons for Data Editor, SQL Editor, and Navigator tree.
-- Authentication:
-    - Fixed the bug with the authentication form. Now the same password is required for the password change operation.
-    - Fixed the display of authentication fields for SQL Server with Active Directory - MSI. The unnecessary Password field was removed.
-- Databases and drivers:
-    - DuckDB: Fixed geometry type display for database versions > 1.5. (thanks @EastLord).
-    - H2 database:
-        - Added new embedded driver version 2.4.2.
-        - Updated server driver to the version 2.4.2.
-- Security:
+    - Fixed the high vulnerability (CVE-2026-42035) in the axios library. The library was updated to version 1.15.1.
+    - Fixed the high vulnerability (CVE-2026-3505) in the bcpg-jdk18on library. The library was updated to version 1.84.0.
     - Fixed the high vulnerability (CVE-2026-33671) in the picomatch library. The library was updated to version 2.3.2.
     - Fixed the high vulnerability (CVE-2026-33943) in the happy-dom library. The library was updated to version 20.8.8.
-    - Fixed the high vulnerability (CVE-2026-33228) in the flatted library. The library was updated to version 3.4.2.
-
-### 26.0.1 2026-03-23
-
-  - Data Editor:
-    - Added the Find and Replace functionality for the Data Editor with the ability to find data by matching case, whole word, or using regular expressions.
-    - Added support for adding, duplicating, deleting, or setting values to NULL in multiple highlighted rows via the Data Editor context menu.
-    - SQL query generation in the Data Editor is now available for columns containing large object data.
-    - Improved column drag-and-drop behavior in the Data Editor. Users could drag columns from any area within the header and drop them onto any part of the target column or table body.
-  - SQL Editor:
-    - Added fuzzy search to SQL Editor auto-completion for object names. The feature allowed users to find tables and containers even with typos or incorrect letter ordering by matching strings that start with, contain, or resemble the input.
-    - Fixed data editing for SQL scripts with variables.
-  - General:
-    - Added a close button to the right tab when it is the only open tab (ex. Scripts). Users no longer needed to use the main menu to close a single tab.
-    - Replaced the generic "Something went wrong" message with a specific network error notification when the application cannot connect to the server.
-    - Null or empty values can now be assigned to the Driver properties for all drivers.
-    - Fixed an issue where re-selecting an existing SSH key file during connection edits caused problems.
-    - Fixed the ability to switch tabs in the Data editor using the keyboard.
-    - Fixed error notification spelling. Thanks to @Malcolm-B-Breaks.
-  - ClickHouse:
-    - Updated driver version to 0.9.7.
-    - Fixed IP address display in the Data Editor by removing the leading slash.
-  - PostgreSQL: Fixed an error when connecting via URL if the database name contains a hyphen.
-  - Security:
     - Fixed the high vulnerability (CVE-2025-45141) in the tar library. The library was updated to version 7.5.11.
     - Fixed the high vulnerability (CVE-2026-27148) in the storybook library. The library was updated to version 10.2.10.
     - Fixed the high vulnerability (CVE-2026-27606) in the rollup library. The library was updated to version 4.59.0.
     - Fixed the high vulnerability (CVE-2026-27904) in the minimatch library. The library was updated to version 3.1.3.
     - Fixed the high vulnerability (CVE-2026-27959) in the koa library. The library was updated to version 2.16.4.
     - Fixed the high vulnerability (CVE-2026-32141) in the flatted library. The library was updated to version 4.4.0.
-
-### 26.0.0 2026-03-02
-
-### Changes since 25.3.0:
-
-  - Security:
-    - Enforced complete logout and screen data clearance upon session expiration;
-    - Fixed the high vulnerability (CVE-2026-25639) in the axios library. The library was updated to version 1.13.5.
-  - Administration:
-    - Added support for mapping users to CloudBeaver teams based on LDAP memberOf group membership;
-    - Change the User list settings in the Administration part to show both active and inactive users by default.
-  - SQL Editor:
-    - Added support for parameters and variables in queries. This feature allows queries to be reused by changing parameters at execution time. Enabled by default and configurable in personal preferences;
-    - Added SQL preview to the Bind parameters/variables dialog to review queries with changed values on the fly;
-    - Enabled Tab key for autocompletion in the SQL Editor alongside the Enter key;
-    - Added a new setting in the SQL Editor to highlight spaces, tabs, and other whitespace characters to help users read, debug, and maintain their scripts. It is turned off by default and can be configured in personal preferences;
-    - Dangerous query confirmation is now shown for all DROP statements, not just for tables.
-  - Data Editor:
-    - Added ability to automatically generate INSERT, SELECT, DELETE, and UPDATE statements for the selected values;
-    - Added undo and redo functionality for cell edits, row operations, and other data modifications. Retains the last 50 actions across the Data Editor, result sets, and related panels;
-    - Added "Use local formatting" setting. Users can choose how to display numbers and dates: using the OS locale, a custom locale, or keeping values unformatted. This formatting applies only to displayed values. Data in the database remains unchanged;
-    - Added column pinning to keep key columns (e.g., IDs, names) visible while horizontal scrolling through wide tables;
-    - Added status indicator icon in the top-left corner with tooltips explaining table editability. Indicates presence of primary keys, read-only connection settings, or read-only columns;
-    - Added shortcut Ctrl/Cmd + . to cancel operations in Data Editor;
-    - Fixed application freeze in canceling fetch size requests for large tables.
-  - Navigator tree:
-    - Added the ability to duplicate connection configuration in the project navigation tree. The "Clone connection" feature is available in the context menu;
-    - Added the ability for users to configure the Simple or Advanced view in the Navigation tree for all connections or for each connection separately;
-    - Added the ability to show table objects, such as columns or keys, in the Navigation tree. The setting is disabled by default and can be turned on in the Navigator settings panel;
-    - Added the ability to rename connections via context menu in the Navigation Tree;
-    - Added Connection Info tab to display basic information about the current connection for all users.
-  - General:
-    - Added support for long polling as a fallback when WebSockets are unavailable or blocked. Ensures reliable communication for metadata updates and SQL execution;
-    - Extended browser support to versions up to three years old;
-    - Redesigned the connection configuration page. Reorganized form fields and sections to provide more input space and reduce visual clutter;
-    - Expanded pointer target areas for icons in the Navigator, editors, and tabs according to the accessibility standards;
-    - Fixed a keyboard navigation issue for panels to keep the focus inside;
-    - Renamed "Database Native" authentication type to "Username/password" in the connection dialog;
-    - Fixed issue where the missing pg_dump utility caused errors during initialization or deployment updates when PostgreSQL was selected as the inner database.
-  - Databases:
-  - ClickHouse:
-    - Updated driver to version 0.9.5
-    - Added spatial data support
-    - Fixed an issue with displaying arrays of UUID, IPv4/IPv6, and Map types
-    - Fixed JSON data type reading
-    - Resolved an issue with CTE expressions
-  - DuckDB:
-    - Updated driver to version 1.4.4.0;
-    - Added support for the dollar-quoted string syntax for the SQL Editor
-  - Oracle: Added a new "Set Username to OS_USER" option in the Misc section of Oracle connection settings. Automatically uses the current database username as the operating system user identifier in session metadata when enabled;
-  - PostgreSQL: Added DDL display support for PostgreSQL policies.
-
-[We are happy to reward](https://dbeaver.com/help-dbeaver/) our most active contributors every major sprint.
+    - Fixed the medium vulnerability (CVE-2026-41305) in the postcss library. The library was updated to version 8.5.14.
