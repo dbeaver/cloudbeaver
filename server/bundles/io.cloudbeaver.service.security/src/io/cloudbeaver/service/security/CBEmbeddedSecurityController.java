@@ -473,7 +473,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         @NotNull String authProviderId
     ) throws SQLException {
         try (PreparedStatement dbStat = connection.prepareStatement(
-            "SELECT USER_ID FROM {table_prefix}CB_USER WHERE USER_ID=? FOR UPDATE"
+            "SELECT USER_ID FROM {table_prefix}CB_USER WHERE USER_ID=?"
         )) {
             dbStat.setString(1, userId);
             try (ResultSet dbResult = dbStat.executeQuery()) {
