@@ -47,8 +47,6 @@ public class WebSQLDataUpdater extends DBDResultSetDataUpdater<WebSQLDataStateme
     private final WebSession webSession;
     private final WebSQLResultsInfo resultsInfo;
 
-    private Throwable executionError;
-
     public WebSQLDataUpdater(
         @NotNull WebSession webSession,
         @NotNull WebDBDResultSetDataModel model,
@@ -77,11 +75,6 @@ public class WebSQLDataUpdater extends DBDResultSetDataUpdater<WebSQLDataStateme
     private static WebSQLQueryResultSetRow toResultSetRow(@NotNull WebSQLResultsRow row) {
         Object[] values = row.getFinalRow() == null ? row.getValues() : row.getFinalRow();
         return new WebSQLQueryResultSetRow(values, row.getMetaData());
-    }
-
-    @Nullable
-    public Throwable getExecutionError() {
-        return executionError;
     }
 
     @NotNull
@@ -214,11 +207,6 @@ public class WebSQLDataUpdater extends DBDResultSetDataUpdater<WebSQLDataStateme
             }
         }
         return WebSQLUtils.convertInputCellValue(session, attribute, value, false);
-    }
-
-    @Override
-    public void processReflectChanges(@Nullable Throwable error) {
-        executionError = error;
     }
 
     @Override

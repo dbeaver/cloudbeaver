@@ -38,6 +38,7 @@ import org.jkiss.dbeaver.model.DBPDataKind;
 import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.DBUtils;
 import org.jkiss.dbeaver.model.data.*;
+import org.jkiss.dbeaver.model.data.resultset.DBDResultSetDataUpdater;
 import org.jkiss.dbeaver.model.data.resultset.ResultSetSaveSettings;
 import org.jkiss.dbeaver.model.edit.DBEPersistAction;
 import org.jkiss.dbeaver.model.exec.*;
@@ -415,11 +416,12 @@ public class WebSQLProcessor implements WebSessionProvider {
 
         ResultSetSaveSettings settings = new ResultSetSaveSettings();
         updater.prepareStatements(monitor, settings);
-        if (!updater.execute(monitor, false, settings, null)) {
-            Throwable error = updater.getExecutionError();
+        DBDResultSetDataUpdater.ExecutionResult executionResult =
+            updater.executeSynchronously(monitor, false, settings, null);
+        if (!executionResult.isSuccess()) {
             throw new DBCException(
                 "Error persisting data changes",
-                error == null ? new DBException("Data update failed") : error
+                executionResult.error()
             );
         }
 
@@ -623,11 +625,12 @@ public class WebSQLProcessor implements WebSessionProvider {
 
         StringBuilder sqlBuilder = new StringBuilder();
         updater.prepareStatements(monitor, new ResultSetSaveSettings());
-        if (!updater.execute(monitor, true, new ResultSetSaveSettings(), null)) {
-            Throwable error = updater.getExecutionError();
+        DBDResultSetDataUpdater.ExecutionResult executionResult =
+            updater.executeSynchronously(monitor, true, new ResultSetSaveSettings(), null);
+        if (!executionResult.isSuccess()) {
             throw new DBCException(
                 "Error generating data update script",
-                error == null ? new DBException("Script generation failed") : error
+                executionResult.error()
             );
         }
         sqlBuilder.append(
