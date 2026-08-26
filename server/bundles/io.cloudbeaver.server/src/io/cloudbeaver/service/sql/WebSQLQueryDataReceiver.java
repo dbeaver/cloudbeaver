@@ -90,6 +90,7 @@ class WebSQLQueryDataReceiver implements DBDDataReceiver {
         // Detect document attribute
         // It has to be only one attribute in list (excluding pseudo attributes).
         DBDAttributeBinding realAttr = null;
+        boolean hasMultipleRealAttributes = false;
 
         bindings = new DBDAttributeBindingMeta[attributes.size()];
         for (int i = 0; i < attributes.size(); i++) {
@@ -99,12 +100,12 @@ class WebSQLQueryDataReceiver implements DBDDataReceiver {
             if (attributes.size() == 1) {
                 realAttr = bindings[i];
             } else if (!bindings[i].isPseudoAttribute()) {
-                if (realAttr != null) {
-                    // more than one
+                if (realAttr == null && !hasMultipleRealAttributes) {
+                    realAttr = bindings[i];
+                } else {
+                    hasMultipleRealAttributes = true;
                     realAttr = null;
-                    break;
                 }
-                realAttr = bindings[i];
             }
         }
         if (realAttr != null && dataContainer instanceof DBSDocumentLocator) {

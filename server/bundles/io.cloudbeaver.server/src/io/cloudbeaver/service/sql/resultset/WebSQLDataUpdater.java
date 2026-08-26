@@ -17,28 +17,29 @@
 package io.cloudbeaver.service.sql.resultset;
 
 import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.server.BaseWebPlatform;
+import io.cloudbeaver.server.WebAppUtils;
 import io.cloudbeaver.service.sql.*;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.DBPDataKind;
 import org.jkiss.dbeaver.model.DBUtils;
-import org.jkiss.dbeaver.model.data.DBDAttributeBinding;
-import org.jkiss.dbeaver.model.data.DBDDataReceiver;
+import org.jkiss.dbeaver.model.data.*;
 import org.jkiss.dbeaver.model.data.resultset.DBDDataStatementInfo;
 import org.jkiss.dbeaver.model.data.resultset.DBDResultSetDataUpdater;
-import org.jkiss.dbeaver.model.data.resultset.DataUpdaterJob;
-import org.jkiss.dbeaver.model.data.resultset.ISmartTransactionManager;
 import org.jkiss.dbeaver.model.exec.DBCExecutionContext;
 import org.jkiss.dbeaver.model.exec.DBCExecutionSource;
 import org.jkiss.dbeaver.model.exec.DBCSession;
-import org.jkiss.dbeaver.model.exec.DBCStatistics;
 import org.jkiss.dbeaver.model.struct.DBSDataManipulator;
 import org.jkiss.dbeaver.model.struct.DBSDocumentLocator;
 import org.jkiss.dbeaver.model.struct.DBSEntity;
 import org.jkiss.dbeaver.model.struct.rdb.DBSManipulationType;
 import org.jkiss.utils.CommonUtils;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 
 public class WebSQLDataUpdater extends DBDResultSetDataUpdater<WebSQLDataStatementInfo, WebSQLResultsRow, WebDBDResultSetDataModel> {
@@ -46,7 +47,7 @@ public class WebSQLDataUpdater extends DBDResultSetDataUpdater<WebSQLDataStateme
     private final WebSession webSession;
     private final WebSQLResultsInfo resultsInfo;
 
-    private Set<WebSQLQueryResultSetRow> updatedResultSetRows;
+    private Throwable executionError;
 
     public WebSQLDataUpdater(
         @NotNull WebSession webSession,
@@ -57,11 +58,30 @@ public class WebSQLDataUpdater extends DBDResultSetDataUpdater<WebSQLDataStateme
         super(model, executionContext);
         this.webSession = webSession;
         this.resultsInfo = resultsInfo;
+        collectChanges();
     }
 
     @NotNull
     public Set<WebSQLQueryResultSetRow> getUpdatedResultSetRows() {
-        return updatedResultSetRows;
+        Set<WebSQLQueryResultSetRow> rows = new LinkedHashSet<>();
+        for (WebSQLResultsRow row : changedRows) {
+            rows.add(toResultSetRow(row));
+        }
+        for (WebSQLResultsRow row : addedRows) {
+            rows.add(toResultSetRow(row));
+        }
+        return rows;
+    }
+
+    @NotNull
+    private static WebSQLQueryResultSetRow toResultSetRow(@NotNull WebSQLResultsRow row) {
+        Object[] values = row.getFinalRow() == null ? row.getValues() : row.getFinalRow();
+        return new WebSQLQueryResultSetRow(values, row.getMetaData());
+    }
+
+    @Nullable
+    public Throwable getExecutionError() {
+        return executionError;
     }
 
     @NotNull
@@ -71,7 +91,8 @@ public class WebSQLDataUpdater extends DBDResultSetDataUpdater<WebSQLDataStateme
         @NotNull WebSQLResultsRow row,
         @NotNull DBSEntity entity
     ) {
-        return new WebSQLDataStatementInfo(entity, row.getValues());
+        Object[] finalRow = Objects.requireNonNull(row.getFinalRow(), "Final row values were not loaded");
+        return new WebSQLDataStatementInfo(entity, finalRow);
     }
 
     @Nullable
@@ -80,7 +101,9 @@ public class WebSQLDataUpdater extends DBDResultSetDataUpdater<WebSQLDataStateme
         DBDAttributeBinding[] allAttributes = model.getResultsInfo().getAttributes();
         Map<DBDAttributeBinding, Object> updateChanges = new LinkedHashMap<>();
         for (Map.Entry<String, Object> v : row.getUpdateValues().entrySet()) {
-            updateChanges.put(allAttributes[CommonUtils.toInt(v.getKey())], row.getValues()[CommonUtils.toInt(v.getKey())]);
+            int index = CommonUtils.toInt(v.getKey());
+            Object originalValue = row.getOriginalKeyValue(index);
+            updateChanges.put(allAttributes[index], originalValue == null ? row.getValues()[index] : originalValue);
         }
 
         return updateChanges;
@@ -96,6 +119,24 @@ public class WebSQLDataUpdater extends DBDResultSetDataUpdater<WebSQLDataStateme
             int index = CommonUtils.toInt(entry.getKey());
             finalRow[index] = entry.getValue();
         }
+        boolean added = addedRows.contains(row);
+        boolean[] attributesToConvert = new boolean[finalRow.length];
+        boolean[] identifierAttributes = new boolean[finalRow.length];
+        if (added) {
+            Arrays.fill(attributesToConvert, true);
+        } else {
+            for (DBDRowIdentifier identifier : resultsInfo.getRowIdentifiers()) {
+                for (DBDAttributeBinding attribute : identifier.getAttributes()) {
+                    int index = attribute.getOrdinalPosition();
+                    attributesToConvert[index] = true;
+                    identifierAttributes[index] = true;
+                }
+            }
+            for (String indexValue : row.getUpdateValues().keySet()) {
+                attributesToConvert[CommonUtils.toInt(indexValue)] = true;
+            }
+        }
+        Map<Integer, Object> originalValues = new HashMap<>();
         try (
             DBCSession session = DBUtils.openUtilSession(
                 webSession.getProgressMonitor(),
@@ -104,82 +145,91 @@ public class WebSQLDataUpdater extends DBDResultSetDataUpdater<WebSQLDataStateme
             )
         ) {
             for (int i = 0; i < finalRow.length; i++) {
+                if (!attributesToConvert[i]) {
+                    continue;
+                }
                 DBDAttributeBinding attr = model.getAttributes()[i];
-                boolean isDocumentValue = model.getAttributes().length == 1
+                boolean isDocumentValue = !added
+                    && model.getAttributes().length == 1
                     && attr.getDataKind() == DBPDataKind.DOCUMENT
                     && attr.getDataContainer() instanceof DBSDocumentLocator;
                 if (isDocumentValue) {
-                    finalRow[i] =
-                        WebSQLUtils.makeDocumentInputValue(
+                    DBDDocument document = WebSQLUtils.makeDocumentInputValue(
                             session,
                             (DBSDocumentLocator) attr.getDataContainer(),
                             resultsInfo,
                             row,
-                            null
+                            row.getMetaData()
                         );
+                    if (document instanceof DBDComposite composite) {
+                        for (Map.Entry<String, Object> entry : row.getUpdateValues().entrySet()) {
+                            DBDAttributeBinding updateAttribute = model.getAttributes()[CommonUtils.toInt(entry.getKey())];
+                            composite.setAttributeValue(
+                                updateAttribute,
+                                convertInputCellValue(session, updateAttribute, entry.getValue())
+                            );
+                        }
+                    }
+                    finalRow[i] = document;
+                    if (identifierAttributes[i]) {
+                        originalValues.put(i, document);
+                    }
                 } else {
-                    finalRow[i] = attr.getValueHandler().getValueFromObject(
-                        session,
-                        attr,
-                        WebSQLUtils.convertInputCellValue(
-                            session,
-                            attr,
-                            finalRow[i],
-                            false
-                        ),
-                        false,
-                        true
-                    );
+                    if (identifierAttributes[i]) {
+                        originalValues.put(i, convertInputCellValue(session, attr, row.getValues()[i]));
+                    }
+                    finalRow[i] = convertInputCellValue(session, attr, finalRow[i]);
                 }
             }
         }
+        row.setOriginalKeyValues(originalValues);
         row.setFinalRow(finalRow);
+    }
+
+    @Nullable
+    private Object convertInputCellValue(
+        @NotNull DBCSession session,
+        @NotNull DBDAttributeBinding attribute,
+        @Nullable Object value
+    ) throws DBException {
+        if (value instanceof Map<?, ?> variables && variables.get("fileId") != null) {
+            String fileId = variables.get("fileId").toString();
+            try {
+                UUID.fromString(fileId);
+            } catch (IllegalArgumentException e) {
+                throw new DBException("File ID is invalid", e);
+            }
+            Path uploadFolder = WebAppUtils.getWebPlatform()
+                .getTempFolder(webSession.getProgressMonitor(), BaseWebPlatform.TEMP_FILE_FOLDER)
+                .resolve(webSession.getSessionId())
+                .normalize();
+            Path path = uploadFolder.resolve(fileId).normalize();
+            if (!path.startsWith(uploadFolder)) {
+                throw new DBException("File ID is invalid");
+            }
+            try {
+                value = Files.newInputStream(path);
+            } catch (IOException e) {
+                throw new DBException("Error reading uploaded file", e);
+            }
+        }
+        return WebSQLUtils.convertInputCellValue(session, attribute, value, false);
     }
 
     @Override
     public void processReflectChanges(@Nullable Throwable error) {
-
-    }
-
-    @Override
-    public void showError(@NotNull Throwable error) {
-
-    }
-
-    @Override
-    public void before(@NotNull DataUpdaterJob job) {
-
-    }
-
-    @Override
-    public void after() {
-
-    }
-
-    @Nullable
-    @Override
-    protected ISmartTransactionManager getSmartTransactionManager() {
-        return null;
+        executionError = error;
     }
 
     @Override
     protected void collectUpdatedRows() {
-        Set<WebSQLQueryResultSetRow> updatedResultSetRows = new LinkedHashSet<>();
         for (WebSQLResultsRow row : model.getUpdatedRows()) {
             changedRows.add(row);
-            updatedResultSetRows.add(new WebSQLQueryResultSetRow(row.getValues(), null));
         }
         for (WebSQLResultsRow row : model.getAddedRows()) {
             super.addedRows.add(row);
-            updatedResultSetRows.add(new WebSQLQueryResultSetRow(row.getValues(), null));
         }
         super.deletedRows.addAll(model.getDeletedRows());
-        this.updatedResultSetRows = updatedResultSetRows;
-    }
-
-    @Override
-    protected void notifyContainer(@NotNull DBCStatistics statistics) {
-
     }
 
     @NotNull
@@ -191,7 +241,10 @@ public class WebSQLDataUpdater extends DBDResultSetDataUpdater<WebSQLDataStateme
     @Nullable
     @Override
     protected DBDDataReceiver getKeyReceiver(@NotNull DBDDataStatementInfo statement) {
-        return new KeyDataReceiver(model.getAttributes());
+        if (statement instanceof WebSQLDataStatementInfo webStatement) {
+            return new KeyDataReceiver(model.getAttributes(), webStatement.getFinalRow());
+        }
+        return null;
     }
 
     public long getUpdatedRowsCount() {

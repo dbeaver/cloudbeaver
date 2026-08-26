@@ -36,14 +36,14 @@ public class WebDBDResultSetDataModel extends WebAbstractDBDResultSetModel {
     public WebDBDResultSetDataModel(
         @NotNull WebSQLContextInfo contextInfo,
         @NotNull WebSQLResultsInfo resultsInfo,
-        @NotNull List<WebSQLResultsRow> addedRows,
-        @NotNull List<WebSQLResultsRow> updatedRows,
-        @NotNull List<WebSQLResultsRow> deletedRows
+        @Nullable List<WebSQLResultsRow> addedRows,
+        @Nullable List<WebSQLResultsRow> updatedRows,
+        @Nullable List<WebSQLResultsRow> deletedRows
     ) {
         super(contextInfo, resultsInfo);
-        this.addedRows = addedRows;
-        this.updatedRows = updatedRows;
-        this.deletedRows = deletedRows;
+        this.addedRows = addedRows == null ? List.of() : addedRows;
+        this.updatedRows = updatedRows == null ? List.of() : updatedRows;
+        this.deletedRows = deletedRows == null ? List.of() : deletedRows;
     }
 
     @NotNull

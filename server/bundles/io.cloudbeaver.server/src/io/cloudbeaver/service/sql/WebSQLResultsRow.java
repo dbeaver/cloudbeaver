@@ -21,6 +21,7 @@ import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.data.DBDValueRow;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 
+import java.util.Collections;
 import java.util.Map;
 
 /**
@@ -29,8 +30,9 @@ import java.util.Map;
 public class WebSQLResultsRow implements DBDValueRow {
 
     private Object[] data;
-    private Map<String, Object> updateValues;
+    private Map<String, Object> updateValues = Collections.emptyMap();
     private Object[] finalRow;
+    private Map<Integer, Object> originalKeyValues = Collections.emptyMap();
 
     @Nullable
     private Map<String, Object> metaData;
@@ -40,7 +42,10 @@ public class WebSQLResultsRow implements DBDValueRow {
 
     public WebSQLResultsRow(@NotNull Map<String, Object> map) {
         data = JSONUtils.getObjectList(map, "data").toArray();
-        updateValues = JSONUtils.getObject(map, "updateValues");
+        Map<String, Object> updates = JSONUtils.getObject(map, "updateValues");
+        if (updates != null) {
+            updateValues = updates;
+        }
         metaData = JSONUtils.getObject(map, "metaData");
     }
 
@@ -72,5 +77,14 @@ public class WebSQLResultsRow implements DBDValueRow {
 
     public void setFinalRow(@NotNull Object[] finalRow) {
         this.finalRow = finalRow;
+    }
+
+    @Nullable
+    public Object getOriginalKeyValue(int index) {
+        return originalKeyValues.get(index);
+    }
+
+    public void setOriginalKeyValues(@NotNull Map<Integer, Object> originalKeyValues) {
+        this.originalKeyValues = originalKeyValues;
     }
 }

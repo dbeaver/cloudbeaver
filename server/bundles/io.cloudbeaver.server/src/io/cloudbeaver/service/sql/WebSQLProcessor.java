@@ -394,6 +394,7 @@ public class WebSQLProcessor implements WebSessionProvider {
             deletedRows,
             addedRows
         );
+        validateRowIdentifiers(resultsInfo, rowIdentifierList, updatedRows, deletedRows, addedRows);
 
         DBCExecutionContext executionContext = getExecutionContext(resultsInfo.getDataContainer());
 
@@ -414,10 +415,13 @@ public class WebSQLProcessor implements WebSessionProvider {
 
         ResultSetSaveSettings settings = new ResultSetSaveSettings();
         updater.prepareStatements(monitor, settings);
-        updater.execute(
-            monitor, false, settings, (x) -> {
-            }
-        );
+        if (!updater.execute(monitor, false, settings, null)) {
+            Throwable error = updater.getExecutionError();
+            throw new DBCException(
+                "Error persisting data changes",
+                error == null ? new DBException("Data update failed") : error
+            );
+        }
 
         getUpdatedRowsInfo(resultsInfo, updater.getUpdatedResultSetRows(), dataFormat, monitor);
 
@@ -441,6 +445,39 @@ public class WebSQLProcessor implements WebSessionProvider {
         result.setResults(queryResults.toArray(new WebSQLQueryResults[0]));
 
         return result;
+    }
+
+    private void validateRowIdentifiers(
+        @NotNull WebSQLResultsInfo resultsInfo,
+        @NotNull Set<DBDRowIdentifier> rowIdentifiers,
+        @Nullable List<WebSQLResultsRow> updatedRows,
+        @Nullable List<WebSQLResultsRow> deletedRows,
+        @Nullable List<WebSQLResultsRow> addedRows
+    ) throws DBCException {
+        if (!CommonUtils.isEmpty(deletedRows) || !CommonUtils.isEmpty(addedRows)) {
+            for (DBDRowIdentifier identifier : rowIdentifiers) {
+                if (identifier == null || !identifier.isValidIdentifier()) {
+                    throw new DBCException("Can't detect a valid row identifier for data update");
+                }
+            }
+        }
+        if (!CommonUtils.isEmpty(updatedRows)) {
+            DBDAttributeBinding[] attributes = resultsInfo.getAttributes();
+            for (WebSQLResultsRow row : updatedRows) {
+                for (String indexValue : row.getUpdateValues().keySet()) {
+                    int index = CommonUtils.toInt(indexValue, -1);
+                    if (index < 0 || index >= attributes.length) {
+                        throw new DBCException("Invalid updated attribute index: " + indexValue);
+                    }
+                    DBDRowIdentifier identifier = attributes[index].getRowIdentifier();
+                    if (identifier == null || !identifier.isValidIdentifier()) {
+                        throw new DBCException(
+                            "Attribute '" + attributes[index].getName() + "' has no valid row identifier"
+                        );
+                    }
+                }
+            }
+        }
     }
 
     @NotNull
@@ -566,6 +603,7 @@ public class WebSQLProcessor implements WebSessionProvider {
             deletedRows,
             addedRows
         );
+        validateRowIdentifiers(resultsInfo, rowIdentifierList, updatedRows, deletedRows, addedRows);
 
         DBCExecutionContext executionContext = getExecutionContext(resultsInfo.getDataContainer());
         WebDBDResultSetDataModel dataProvider = new WebDBDResultSetDataModel(
@@ -585,10 +623,13 @@ public class WebSQLProcessor implements WebSessionProvider {
 
         StringBuilder sqlBuilder = new StringBuilder();
         updater.prepareStatements(monitor, new ResultSetSaveSettings());
-        updater.execute(
-            monitor, true, new ResultSetSaveSettings(), (x) -> {
-            }
-        );
+        if (!updater.execute(monitor, true, new ResultSetSaveSettings(), null)) {
+            Throwable error = updater.getExecutionError();
+            throw new DBCException(
+                "Error generating data update script",
+                error == null ? new DBException("Script generation failed") : error
+            );
+        }
         sqlBuilder.append(
             SQLUtils.generateScript(executionContext.getDataSource(), updater.getActions().toArray(new DBEPersistAction[0]), false)
         );
