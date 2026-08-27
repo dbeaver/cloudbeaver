@@ -186,7 +186,8 @@ public abstract class BaseLocalResourceController implements RMController {
                             storedDataSourceConfigurations
                         );
                     } catch (DBException e) {
-                        registry.checkForErrors();
+                        registry.refreshConfig();
+                        throw e;
                     }
                     log.debug("Save data sources configuration in project '" + projectId + "'");
                     ((DataSourcePersistentRegistry) registry).saveDataSources();
