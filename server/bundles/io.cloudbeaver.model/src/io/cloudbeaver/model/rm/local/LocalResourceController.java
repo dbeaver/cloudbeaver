@@ -33,8 +33,8 @@ import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPWorkspace;
 import org.jkiss.dbeaver.model.auth.SMCredentials;
 import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
-import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.auth.SMObjectType;
+import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.fs.lock.LockManager;
 import org.jkiss.dbeaver.model.fs.lock.LockOptions;
 import org.jkiss.dbeaver.model.fs.lock.LockTarget;
@@ -437,11 +437,22 @@ public class LocalResourceController extends BaseLocalResourceController {
     }
 
     @Override
+    @NotNull
+    protected Map<String, DBWNetworkProfile> captureCurrentNetworkProfiles(@NotNull RMLocalProject project) {
+        return project.getDataSourceRegistry().getNetworkProfiles().getProfiles().stream()
+            .collect(Collectors.toMap(
+                DBWNetworkProfile::getProfileId,
+                profile -> copyNetworkProfile(project, profile)
+            ));
+    }
+
+    @Override
     protected void processLoadedDataSourceConfigurationUpdate(
         @NotNull RMLocalProject project,
         @NotNull String projectId,
         @Nullable List<String> dataSourceIds,
-        @NotNull Map<String, DBPConnectionConfiguration> storedDataSourceConfigurations
+        @NotNull Map<String, DBPConnectionConfiguration> storedDataSourceConfigurations,
+        @NotNull Map<String, DBWNetworkProfile> storedNetworkProfiles
     ) throws DBException {
         Set<RMProjectPermission> userProjectPermissions = getProjectPermissions(projectId, project.getProjectType());
         Set<String> grantedPermissions = userProjectPermissions.stream()
@@ -460,6 +471,95 @@ public class LocalResourceController extends BaseLocalResourceController {
                 grantedPermissions
             );
         }
+
+        Map<String, DBWNetworkProfile> updatedNetworkProfiles = project.getDataSourceRegistry()
+            .getNetworkProfiles()
+            .getProfiles()
+            .stream()
+            .collect(Collectors.toMap(DBWNetworkProfile::getProfileId, profile -> profile));
+        reconcileNetworkProfiles(storedNetworkProfiles, updatedNetworkProfiles, grantedPermissions);
+    }
+
+    @NotNull
+    private DBWNetworkProfile copyNetworkProfile(
+        @NotNull RMLocalProject project,
+        @NotNull DBWNetworkProfile source
+    ) {
+        DBWNetworkProfile copy = new DBWNetworkProfile(project);
+        copy.setProfileId(source.getProfileId());
+        copy.setProfileName(source.getProfileName());
+        copy.setProfileDescription(source.getProfileDescription());
+        copy.setProperties(new LinkedHashMap<>(source.getProperties()));
+        source.getConfigurations().stream()
+            .map(DBWHandlerConfiguration::new)
+            .forEach(copy::updateConfiguration);
+        return copy;
+    }
+
+    private void reconcileNetworkProfiles(
+        @NotNull Map<String, DBWNetworkProfile> storedProfiles,
+        @NotNull Map<String, DBWNetworkProfile> updatedProfiles,
+        @NotNull Set<String> grantedPermissions
+    ) throws DBException {
+        Set<String> profileIds = new LinkedHashSet<>(storedProfiles.keySet());
+        profileIds.addAll(updatedProfiles.keySet());
+
+        for (String profileId : profileIds) {
+            DBWNetworkProfile storedProfile = storedProfiles.get(profileId);
+            DBWNetworkProfile updatedProfile = updatedProfiles.get(profileId);
+            if (!hasRestrictedNetworkHandler(storedProfile, grantedPermissions)
+                && !hasRestrictedNetworkHandler(updatedProfile, grantedPermissions)) {
+                continue;
+            }
+
+            if (storedProfile == null) {
+                throw new DBException("No permissions to configure network profile '" + profileId + "'");
+            }
+            if (updatedProfile == null) {
+                throw new DBException("No permissions to delete network profile '" + profileId + "'");
+            }
+            if (!areSameNetworkProfile(storedProfile, updatedProfile)) {
+                throw new DBException("No permissions to modify network profile '" + profileId + "'");
+            }
+        }
+    }
+
+    private boolean hasRestrictedNetworkHandler(
+        @Nullable DBWNetworkProfile profile,
+        @NotNull Set<String> grantedPermissions
+    ) {
+        if (profile == null) {
+            return false;
+        }
+        for (DBWHandlerConfiguration configuration : profile.getConfigurations()) {
+            if (configuration.getHandlerDescriptor() instanceof NetworkHandlerDescriptor descriptor
+                && !descriptor.getRequiredPermissions().isEmpty()
+                && !grantedPermissions.containsAll(descriptor.getRequiredPermissions())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean areSameNetworkProfile(
+        @NotNull DBWNetworkProfile storedProfile,
+        @NotNull DBWNetworkProfile updatedProfile
+    ) {
+        if (!Objects.equals(storedProfile.getProfileId(), updatedProfile.getProfileId())
+            || !Objects.equals(storedProfile.getProfileName(), updatedProfile.getProfileName())
+            || !Objects.equals(storedProfile.getProfileDescription(), updatedProfile.getProfileDescription())
+            || !Objects.equals(storedProfile.getProperties(), updatedProfile.getProperties())
+            || storedProfile.getConfigurations().size() != updatedProfile.getConfigurations().size()) {
+            return false;
+        }
+        for (DBWHandlerConfiguration storedConfiguration : storedProfile.getConfigurations()) {
+            DBWHandlerConfiguration updatedConfiguration = updatedProfile.getConfiguration(storedConfiguration.getId());
+            if (updatedConfiguration == null
+                || !areSameHandlerConfiguration(storedConfiguration, updatedConfiguration)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private void reconcileNetworkHandlers(

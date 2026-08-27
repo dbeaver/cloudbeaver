@@ -30,6 +30,7 @@ import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.fs.lock.LockManager;
 import org.jkiss.dbeaver.model.fs.lock.LockOptions;
 import org.jkiss.dbeaver.model.fs.lock.LockTarget;
+import org.jkiss.dbeaver.model.net.DBWNetworkProfile;
 import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.rm.RMEvent;
 import org.jkiss.dbeaver.model.rm.RMEventManager;
@@ -163,6 +164,7 @@ public abstract class BaseLocalResourceController implements RMController {
             RMLocalProject project = getWebProject(projectId, false);
             Map<String, DBPConnectionConfiguration> storedDataSourceConfigurations =
                 captureCurrentDataSourceConfigurations(project, dataSourceIds);
+            Map<String, DBWNetworkProfile> storedNetworkProfiles = captureCurrentNetworkProfiles(project);
             return doFileWriteOperation(
                 projectId, project.getMetadataFolder(false),
                 () -> {
@@ -183,7 +185,8 @@ public abstract class BaseLocalResourceController implements RMController {
                             project,
                             projectId,
                             dataSourceIds,
-                            storedDataSourceConfigurations
+                            storedDataSourceConfigurations,
+                            storedNetworkProfiles
                         );
                     } catch (DBException e) {
                         registry.refreshConfig();
@@ -206,11 +209,17 @@ public abstract class BaseLocalResourceController implements RMController {
         return Map.of();
     }
 
+    @NotNull
+    protected Map<String, DBWNetworkProfile> captureCurrentNetworkProfiles(@NotNull RMLocalProject project) {
+        return Map.of();
+    }
+
     protected void processLoadedDataSourceConfigurationUpdate(
         @NotNull RMLocalProject project,
         @NotNull String projectId,
         @Nullable List<String> dataSourceIds,
-        @NotNull Map<String, DBPConnectionConfiguration> storedDataSourceConfigurations
+        @NotNull Map<String, DBPConnectionConfiguration> storedDataSourceConfigurations,
+        @NotNull Map<String, DBWNetworkProfile> storedNetworkProfiles
     ) throws DBException {
     }
 
