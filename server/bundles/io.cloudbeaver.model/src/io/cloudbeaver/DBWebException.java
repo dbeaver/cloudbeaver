@@ -20,6 +20,7 @@ import graphql.ErrorClassification;
 import graphql.ErrorType;
 import graphql.GraphQLError;
 import graphql.language.SourceLocation;
+import org.jkiss.dbeaver.DBDatabaseException;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.sql.SQLState;
 import org.jkiss.utils.CommonUtils;
@@ -147,10 +148,13 @@ public class DBWebException extends DBException implements GraphQLError {
                 return message;
             }
         }
-        Throwable rootCause = CommonUtils.getRootCause(cause);
-        String causeMessage = rootCause.getMessage();
+        // Preserve enriched web/database messages, but unwrap generic exceptions to their most specific cause.
+        Throwable messageCause = cause instanceof DBWebException || cause instanceof DBDatabaseException
+            ? cause
+            : CommonUtils.getRootCause(cause);
+        String causeMessage = messageCause.getMessage();
         if (CommonUtils.isEmpty(causeMessage)) {
-            causeMessage = rootCause.getClass().getSimpleName();
+            causeMessage = messageCause.getClass().getSimpleName();
         }
         if (CommonUtils.isEmpty(message)) {
             return causeMessage;
