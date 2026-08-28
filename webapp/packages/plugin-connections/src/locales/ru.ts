@@ -1,6 +1,9 @@
 export default [
   ['plugin_connections_connection_form_part_main', 'Главное'],
   ['plugin_connections_connection_form_part_properties', 'Параметры драйвера'],
+  ['plugin_connections_connection_form_part_advanced', 'Расширенные настройки'],
+  ['plugin_connections_connection_form_part_initialization_settings', 'Настройки инициализации'],
+  ['plugin_connections_connection_form_connection_details', 'Параметры подключения'],
   ['plugin_connections_connection_form_part_main_auth_model', 'Модель аутентификации'],
   ['plugin_connections_connection_form_part_main_custom_host', 'Хост'],
   ['plugin_connections_connection_form_part_main_custom_port', 'Порт'],
