@@ -56,7 +56,7 @@ import org.jkiss.dbeaver.registry.DataSourceDescriptor;
 import org.jkiss.dbeaver.registry.DataSourceParseResults;
 import org.jkiss.dbeaver.registry.ResourceTypeDescriptor;
 import org.jkiss.dbeaver.registry.ResourceTypeRegistry;
-import org.jkiss.dbeaver.registry.network.NetworkHandlerDescriptor;
+import org.jkiss.dbeaver.registry.network.NetworkHandlerRegistry;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.utils.CommonUtils;
@@ -69,6 +69,7 @@ import java.text.MessageFormat;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -456,8 +457,13 @@ public class LocalResourceController extends BaseLocalResourceController {
     ) throws DBException {
         Set<RMProjectPermission> userProjectPermissions = getProjectPermissions(projectId, project.getProjectType());
         Set<String> grantedPermissions = userProjectPermissions.stream()
+            .filter(Objects::nonNull)
             .flatMap(permission -> permission.getAllPermissions().stream())
             .collect(Collectors.toSet());
+        Predicate<String> hasPermission = permission ->
+            grantedPermissions.contains(permission) ||
+            credentialsProvider.hasPermission(DBWConstants.PERMISSION_ADMIN) ||
+            credentialsProvider.hasPermission(permission);
 
         for (DBPDataSourceContainer dataSource : project.getDataSourceRegistry().getDataSources()) {
             if (dataSourceIds != null && !dataSourceIds.contains(dataSource.getId())) {
@@ -465,10 +471,10 @@ public class LocalResourceController extends BaseLocalResourceController {
             }
 
             DBPConnectionConfiguration storedConfiguration = storedDataSourceConfigurations.get(dataSource.getId());
-            reconcileNetworkHandlers(
+            NetworkHandlerRegistry.getInstance().validateHandlerConfigurationUpdate(
                 storedConfiguration,
                 dataSource.getConnectionConfiguration(),
-                grantedPermissions
+                hasPermission
             );
         }
 
@@ -477,7 +483,17 @@ public class LocalResourceController extends BaseLocalResourceController {
             .getProfiles()
             .stream()
             .collect(Collectors.toMap(DBWNetworkProfile::getProfileId, profile -> profile));
-        reconcileNetworkProfiles(storedNetworkProfiles, updatedNetworkProfiles, grantedPermissions);
+        Set<String> profileIds = new LinkedHashSet<>(storedNetworkProfiles.keySet());
+        profileIds.addAll(updatedNetworkProfiles.keySet());
+        for (String profileId : profileIds) {
+            DBWNetworkProfile storedProfile = storedNetworkProfiles.get(profileId);
+            DBWNetworkProfile updatedProfile = updatedNetworkProfiles.get(profileId);
+            NetworkHandlerRegistry.getInstance().validateHandlerConfigurationUpdate(
+                storedProfile == null ? List.of() : storedProfile.getConfigurations(),
+                updatedProfile == null ? List.of() : updatedProfile.getConfigurations(),
+                hasPermission
+            );
+        }
     }
 
     @NotNull
@@ -494,133 +510,6 @@ public class LocalResourceController extends BaseLocalResourceController {
             .map(DBWHandlerConfiguration::new)
             .forEach(copy::updateConfiguration);
         return copy;
-    }
-
-    private void reconcileNetworkProfiles(
-        @NotNull Map<String, DBWNetworkProfile> storedProfiles,
-        @NotNull Map<String, DBWNetworkProfile> updatedProfiles,
-        @NotNull Set<String> grantedPermissions
-    ) throws DBException {
-        Set<String> profileIds = new LinkedHashSet<>(storedProfiles.keySet());
-        profileIds.addAll(updatedProfiles.keySet());
-
-        for (String profileId : profileIds) {
-            DBWNetworkProfile storedProfile = storedProfiles.get(profileId);
-            DBWNetworkProfile updatedProfile = updatedProfiles.get(profileId);
-            if (!hasRestrictedNetworkHandler(storedProfile, grantedPermissions)
-                && !hasRestrictedNetworkHandler(updatedProfile, grantedPermissions)) {
-                continue;
-            }
-
-            if (storedProfile == null) {
-                throw new DBException("No permissions to configure network profile '" + profileId + "'");
-            }
-            if (updatedProfile == null) {
-                throw new DBException("No permissions to delete network profile '" + profileId + "'");
-            }
-            if (!areSameNetworkProfile(storedProfile, updatedProfile)) {
-                throw new DBException("No permissions to modify network profile '" + profileId + "'");
-            }
-        }
-    }
-
-    private boolean hasRestrictedNetworkHandler(
-        @Nullable DBWNetworkProfile profile,
-        @NotNull Set<String> grantedPermissions
-    ) {
-        if (profile == null) {
-            return false;
-        }
-        for (DBWHandlerConfiguration configuration : profile.getConfigurations()) {
-            if (configuration.getHandlerDescriptor() instanceof NetworkHandlerDescriptor descriptor
-                && !descriptor.getRequiredPermissions().isEmpty()
-                && !grantedPermissions.containsAll(descriptor.getRequiredPermissions())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private boolean areSameNetworkProfile(
-        @NotNull DBWNetworkProfile storedProfile,
-        @NotNull DBWNetworkProfile updatedProfile
-    ) {
-        if (!Objects.equals(storedProfile.getProfileId(), updatedProfile.getProfileId())
-            || !Objects.equals(storedProfile.getProfileName(), updatedProfile.getProfileName())
-            || !Objects.equals(storedProfile.getProfileDescription(), updatedProfile.getProfileDescription())
-            || !Objects.equals(storedProfile.getProperties(), updatedProfile.getProperties())
-            || storedProfile.getConfigurations().size() != updatedProfile.getConfigurations().size()) {
-            return false;
-        }
-        for (DBWHandlerConfiguration storedConfiguration : storedProfile.getConfigurations()) {
-            DBWHandlerConfiguration updatedConfiguration = updatedProfile.getConfiguration(storedConfiguration.getId());
-            if (updatedConfiguration == null
-                || !areSameHandlerConfiguration(storedConfiguration, updatedConfiguration)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private void reconcileNetworkHandlers(
-        @Nullable DBPConnectionConfiguration storedConfiguration,
-        @NotNull DBPConnectionConfiguration updatedConfiguration,
-        @NotNull Set<String> grantedPermissions
-    ) throws DBException {
-
-        // Getting all handlers ids from both stored and updated configurations to check permissions for all of them
-        // and to add missing handlers if user has no permissions to add new ones
-        Set<String> handlerIds = new LinkedHashSet<>();
-        if (storedConfiguration != null) {
-            storedConfiguration.getHandlers().stream()
-                .map(DBWHandlerConfiguration::getId)
-                .forEach(handlerIds::add);
-        }
-        updatedConfiguration.getHandlers().stream()
-            .map(DBWHandlerConfiguration::getId)
-            .forEach(handlerIds::add);
-
-        for (String handlerId : handlerIds) {
-            DBWHandlerConfiguration storedHandler = storedConfiguration == null ? null : storedConfiguration.getHandler(handlerId);
-            DBWHandlerConfiguration updatedHandler = updatedConfiguration.getHandler(handlerId);
-            DBWHandlerConfiguration descriptorSource = updatedHandler != null ? updatedHandler : storedHandler;
-            if (descriptorSource == null
-                || !(descriptorSource.getHandlerDescriptor() instanceof NetworkHandlerDescriptor descriptor)) {
-                continue;
-            }
-
-            if (descriptor.getRequiredPermissions().isEmpty()
-                || grantedPermissions.containsAll(descriptor.getRequiredPermissions())) {
-                continue;
-            }
-
-            if (storedHandler == null) {
-                throw new DBException("No permissions to configure network handler '" + handlerId + "'");
-            }
-
-            // if user doesn't have permissions to add new handler, we should keep old one
-            if (updatedHandler == null) {
-                updatedConfiguration.updateHandler(new DBWHandlerConfiguration(storedHandler));
-                continue;
-            }
-
-            if (!areSameHandlerConfiguration(storedHandler, updatedHandler)) {
-                throw new DBException("No permissions to modify network handler '" + handlerId + "'");
-            }
-        }
-    }
-
-    private boolean areSameHandlerConfiguration(
-        @NotNull DBWHandlerConfiguration storedHandler,
-        @NotNull DBWHandlerConfiguration updatedHandler
-    ) {
-        DBWHandlerConfiguration storedHandlerCopy = new DBWHandlerConfiguration(storedHandler);
-        storedHandlerCopy.setDataSource(null);
-
-        DBWHandlerConfiguration updatedHandlerCopy = new DBWHandlerConfiguration(updatedHandler);
-        updatedHandlerCopy.setDataSource(null);
-
-        return storedHandlerCopy.equals(updatedHandlerCopy);
     }
 
     @Override

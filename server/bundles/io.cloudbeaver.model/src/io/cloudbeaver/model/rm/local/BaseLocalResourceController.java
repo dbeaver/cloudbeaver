@@ -172,15 +172,15 @@ public abstract class BaseLocalResourceController implements RMController {
                     DBPDataSourceConfigurationStorage storage = new DataSourceMemoryStorage(configuration.getBytes(
                         StandardCharsets.UTF_8));
                     DataSourceConfigurationManager manager = new DataSourceConfigurationManagerBuffer();
-                    final DataSourceParseResults parseResults = ((DataSourcePersistentRegistry) registry).loadDataSources(
-                        List.of(storage),
-                        manager,
-                        dataSourceIds,
-                        true,
-                        dataSourceIds == null
-                    );
-                    registry.checkForErrors();
                     try {
+                        final DataSourceParseResults parseResults = ((DataSourcePersistentRegistry) registry).loadDataSources(
+                            List.of(storage),
+                            manager,
+                            dataSourceIds,
+                            true,
+                            dataSourceIds == null
+                        );
+                        registry.checkForErrors();
                         processLoadedDataSourceConfigurationUpdate(
                             project,
                             projectId,
@@ -188,14 +188,14 @@ public abstract class BaseLocalResourceController implements RMController {
                             storedDataSourceConfigurations,
                             storedNetworkProfiles
                         );
-                    } catch (DBException e) {
+                        log.debug("Save data sources configuration in project '" + projectId + "'");
+                        ((DataSourcePersistentRegistry) registry).saveDataSources();
+                        registry.checkForErrors();
+                        return parseResults;
+                    } catch (DBException | RuntimeException e) {
                         registry.refreshConfig();
                         throw e;
                     }
-                    log.debug("Save data sources configuration in project '" + projectId + "'");
-                    ((DataSourcePersistentRegistry) registry).saveDataSources();
-                    registry.checkForErrors();
-                    return parseResults;
                 }
             );
         }
