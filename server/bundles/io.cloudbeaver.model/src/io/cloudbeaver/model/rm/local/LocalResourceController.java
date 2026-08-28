@@ -41,7 +41,6 @@ import org.jkiss.dbeaver.model.fs.lock.LockTarget;
 import org.jkiss.dbeaver.model.impl.app.BaseProjectImpl;
 import org.jkiss.dbeaver.model.impl.auth.SessionContextImpl;
 import org.jkiss.dbeaver.model.navigator.DBNLocalFolder;
-import org.jkiss.dbeaver.model.net.DBWHandlerConfiguration;
 import org.jkiss.dbeaver.model.net.DBWNetworkProfile;
 import org.jkiss.dbeaver.model.rm.*;
 import org.jkiss.dbeaver.model.security.SMAdminController;
@@ -443,7 +442,7 @@ public class LocalResourceController extends BaseLocalResourceController {
         return project.getDataSourceRegistry().getNetworkProfiles().getProfiles().stream()
             .collect(Collectors.toMap(
                 DBWNetworkProfile::getProfileId,
-                profile -> copyNetworkProfile(project, profile)
+                DBWNetworkProfile::new
             ));
     }
 
@@ -494,22 +493,6 @@ public class LocalResourceController extends BaseLocalResourceController {
                 hasPermission
             );
         }
-    }
-
-    @NotNull
-    private DBWNetworkProfile copyNetworkProfile(
-        @NotNull RMLocalProject project,
-        @NotNull DBWNetworkProfile source
-    ) {
-        DBWNetworkProfile copy = new DBWNetworkProfile(project);
-        copy.setProfileId(source.getProfileId());
-        copy.setProfileName(source.getProfileName());
-        copy.setProfileDescription(source.getProfileDescription());
-        copy.setProperties(new LinkedHashMap<>(source.getProperties()));
-        source.getConfigurations().stream()
-            .map(DBWHandlerConfiguration::new)
-            .forEach(copy::updateConfiguration);
-        return copy;
     }
 
     @Override
