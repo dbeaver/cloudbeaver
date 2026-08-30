@@ -9,5 +9,4 @@ import { createAction } from '@cloudbeaver/core-view';
 
 export const ACTION_CONNECTION_CHANGE_DB_PASSWORD = createAction('connection-change-db-password', {
   label: 'plugin_connections_change_db_password_menu_title',
-  icon: '/icons/key.svg',
 });

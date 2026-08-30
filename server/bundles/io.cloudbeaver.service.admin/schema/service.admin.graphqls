@@ -205,8 +205,8 @@ input ServerConfigInput {
     publicCredentialsSaveEnabled: Boolean
     "Whether saving credentials is allowed"
     adminCredentialsSaveEnabled: Boolean
-    "Whether the change-DB-password mutation is enabled server-wide"
-    dbUserPasswordChangeEnabled: Boolean
+    "Enables database user password changes."
+    dbUserPasswordChangeEnabled: Boolean @since(version: "26.2.1")
     "Whether the resource manager is enabled"
     resourceManagerEnabled: Boolean
     "Whether the secret manager is enabled"

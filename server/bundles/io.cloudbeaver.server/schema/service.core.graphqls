@@ -192,8 +192,8 @@ type ServerConfig {
     "Defines is it is possible to save global database credentials"
     adminCredentialsSaveEnabled: Boolean!
 
-    "Defines if the change-DB-password mutation is enabled server-wide"
-    dbUserPasswordChangeEnabled: Boolean!
+    "Enables database user password changes."
+    dbUserPasswordChangeEnabled: Boolean! @since(version: "26.2.1")
 
     "Defines if the server requires a license"
     licenseRequired: Boolean!
@@ -906,16 +906,16 @@ extend type Mutation {
     testConnection( config: ConnectionConfig!, projectId: ID): ConnectionInfo!
 
     """
-    Change the DB user password backing this connection.
-    Requires PERMISSION_PROJECT_DATASOURCES_EDIT on the connection's project.
-    DBWebException surfaces the driver's exception verbatim on DB rejection.
+    Change the DB user password for this connection.
+    The caller MUST have PERMISSION_PROJECT_DATASOURCES_EDIT on the connection's project.
+    Driver exceptions propagate to the caller when the database rejects the change.
     """
     changeConnectionUserPassword(
         projectId: ID,
         connectionId: ID!,
         oldPassword: String!,
         newPassword: String!
-    ): Boolean!
+    ): Boolean! @since(version: "26.2.1")
 
     "Test network handler connectivity"
     testNetworkHandler(projectId: ID, connectionId: ID, config: NetworkHandlerConfigInput! ): NetworkEndpointInfo!
