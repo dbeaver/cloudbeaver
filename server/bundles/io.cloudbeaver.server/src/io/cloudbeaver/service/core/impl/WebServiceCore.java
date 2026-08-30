@@ -699,7 +699,7 @@ public class WebServiceCore implements DBWServiceCore {
             String userName = resolveUserName(webSession, container, projectId, connectionId);
             applyPasswordChange(webSession, container, projectId, connectionId, manager, userName, oldPassword, newPassword);
             persistNewPassword(webSession, container, projectId, connectionId, newPassword);
-            safeDisconnect(webSession, container);
+            WebDataSourceUtils.disconnectDataSource(webSession, container, true);
             emitPasswordChangeAudit(webSession, container, projectId, connectionId,
                 WSSecurityAuditEvent.Kind.SUCCEEDED, null, null);
             return true;
@@ -813,7 +813,10 @@ public class WebServiceCore implements DBWServiceCore {
         @Nullable String projectId,
         @NotNull String connectionId
     ) throws DBWebException {
-        String userName = container.getConnectionConfiguration().getUserName();
+        String userName = container.getActualConnectionConfiguration().getUserName();
+        if (CommonUtils.isEmpty(userName)) {
+            userName = container.getConnectionConfiguration().getUserName();
+        }
         if (!CommonUtils.isEmpty(userName)) {
             return userName;
         }
@@ -855,8 +858,12 @@ public class WebServiceCore implements DBWServiceCore {
         try {
             container.getConnectionConfiguration().setUserPassword(newPassword);
             container.getActualConnectionConfiguration().setUserPassword(newPassword);
+            var project = container.getProject();
+            if (project.isUseSecretStorage()) {
+                container.persistSecrets(DBSSecretController.getProjectSecretController(project));
+            }
             persisted = container.isTemporary() || container.persistConfiguration();
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             failureClass = e.getClass().getName();
             persisted = false;
         }
@@ -868,14 +875,6 @@ public class WebServiceCore implements DBWServiceCore {
         throw new DBWebException(
             "Database password was changed but CloudBeaver failed to persist the new credential. "
                 + "The connection will require re-entry of the new password.");
-    }
-
-    private void safeDisconnect(@NotNull WebSession webSession, @NotNull DBPDataSourceContainer container) {
-        try {
-            container.disconnect(webSession.getProgressMonitor());
-        } catch (DBException ignored) {
-            // Reconnect on next use is acceptable.
-        }
     }
 
     @Override

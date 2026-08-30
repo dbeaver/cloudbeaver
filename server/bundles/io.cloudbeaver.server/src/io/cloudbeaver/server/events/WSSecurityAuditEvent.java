@@ -25,13 +25,13 @@ public class WSSecurityAuditEvent extends WSAbstractEvent {
     public static final String ID = "cb_security_audit_updated";
 
     public enum Kind {
-        /** Fires before invoking the DBeaver core password-change handler. */
+        /** Emitted before invoking the DBeaver core password-change handler. */
         ATTEMPTED,
-        /** Fires after handler success and credential-store persistence. */
+        /** Emitted after handler completes and credentials are persisted. */
         SUCCEEDED,
-        /** Fires on handler exception or credential-store persistence failure. */
+        /** Emitted when the handler raises an exception or credential persistence fails. */
         FAILED,
-        /** Fires on any of the pre-invocation gate rejections. */
+        /** Emitted when any pre-invocation gate rejects the request. */
         GATE_REJECTED
     }
 

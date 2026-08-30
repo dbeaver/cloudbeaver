@@ -33,7 +33,6 @@ import { ACTION_CONNECTION_DISCONNECT } from './Actions/ACTION_CONNECTION_DISCON
 import { ACTION_CONNECTION_DISCONNECT_ALL } from './Actions/ACTION_CONNECTION_DISCONNECT_ALL.js';
 import { ACTION_CONNECTION_EDIT } from './Actions/ACTION_CONNECTION_EDIT.js';
 import { ChangeDatabasePasswordDialog } from './ChangeDatabasePasswordDialog/ChangeDatabasePasswordDialog.js';
-import { MENU_CONNECTION_SECURITY } from './MENU_CONNECTION_SECURITY.js';
 import { MENU_CONNECTIONS } from './MENU_CONNECTIONS.js';
 import { MENU_NAVIGATION_TREE_MANAGE } from '@cloudbeaver/plugin-navigation-tree';
 
@@ -78,7 +77,7 @@ export class ConnectionMenuBootstrap extends Bootstrap {
     this.menuService.addCreator({
       root: true,
       contexts: [DATA_CONTEXT_CONNECTION],
-      getItems: (context, items) => [...items, ACTION_CONNECTION_CHANGE_CREDENTIALS, ACTION_CONNECTION_DISCONNECT, ACTION_CONNECTION_DISCONNECT_ALL],
+      getItems: (context, items) => [...items, ACTION_CONNECTION_CHANGE_DB_PASSWORD, ACTION_CONNECTION_CHANGE_CREDENTIALS, ACTION_CONNECTION_DISCONNECT, ACTION_CONNECTION_DISCONNECT_ALL],
       orderItems(context, items) {
         const disconnect = menuExtractItems(items, [ACTION_CONNECTION_DISCONNECT, ACTION_CONNECTION_DISCONNECT_ALL]);
 
@@ -166,7 +165,7 @@ export class ConnectionMenuBootstrap extends Bootstrap {
 
     this.actionService.addHandler({
       id: 'connection-management',
-      actions: [ACTION_CONNECTION_CHANGE_CREDENTIALS, ACTION_CONNECTION_DISCONNECT, ACTION_CONNECTION_DISCONNECT_ALL],
+      actions: [ACTION_CONNECTION_CHANGE_DB_PASSWORD, ACTION_CONNECTION_CHANGE_CREDENTIALS, ACTION_CONNECTION_DISCONNECT, ACTION_CONNECTION_DISCONNECT_ALL],
       contexts: [DATA_CONTEXT_CONNECTION, DATA_CONTEXT_NAV_NODE],
       isActionApplicable: context => {
         const node = context.get(DATA_CONTEXT_NAV_NODE)!;
@@ -192,6 +191,10 @@ export class ConnectionMenuBootstrap extends Bootstrap {
         if (action === ACTION_CONNECTION_CHANGE_CREDENTIALS) {
           const auth = this.connectionInfoAuthPropertiesResource.get(connectionKey);
           return !this.serverConfigResource.distributed || !!auth?.sharedCredentials;
+        }
+
+        if (action === ACTION_CONNECTION_CHANGE_DB_PASSWORD) {
+          return !this.serverConfigResource.dbUserPasswordChangeEnabled || !connection.canEdit;
         }
 
         return true;
@@ -222,45 +225,18 @@ export class ConnectionMenuBootstrap extends Bootstrap {
             await this.connectionsManagerService.requireConnection({ connectionId: connection.id, projectId: connection.projectId }, true);
             break;
           }
+
+          case ACTION_CONNECTION_CHANGE_DB_PASSWORD: {
+            await this.commonDialogService.open(ChangeDatabasePasswordDialog, {
+              projectId: connection.projectId,
+              connectionId: connection.id,
+            });
+            break;
+          }
         }
       },
     });
 
-    // UX-only gate. Backend re-checks PERMISSION_PROJECT_DATASOURCES_EDIT on the mutation.
-    this.menuService.addCreator({
-      root: true,
-      contexts: [DATA_CONTEXT_CONNECTION],
-      getItems: (context, items) => {
-        const connectionKey = context.get(DATA_CONTEXT_CONNECTION)!;
-        const connection = this.connectionInfoResource.get(connectionKey);
-        if (!this.serverConfigResource.dbUserPasswordChangeEnabled) return items;
-        if (!connection?.canEdit) return items;
-        return [...items, MENU_CONNECTION_SECURITY];
-      },
-    });
-
-    this.menuService.addCreator({
-      menus: [MENU_CONNECTION_SECURITY],
-      getItems: (context, items) => [...items, ACTION_CONNECTION_CHANGE_DB_PASSWORD],
-    });
-
-    this.actionService.addHandler({
-      id: 'connection-change-db-password-handler',
-      actions: [ACTION_CONNECTION_CHANGE_DB_PASSWORD],
-      contexts: [DATA_CONTEXT_CONNECTION],
-      isDisabled: context => {
-        const connectionKey = context.get(DATA_CONTEXT_CONNECTION);
-        return !connectionKey || !this.connectionInfoResource.get(connectionKey);
-      },
-      handler: async context => {
-        const connectionKey = context.get(DATA_CONTEXT_CONNECTION);
-        if (!connectionKey) return;
-        await this.commonDialogService.open(ChangeDatabasePasswordDialog, {
-          projectId: connectionKey.projectId,
-          connectionId: connectionKey.connectionId,
-        });
-      },
-    });
   }
 
   private addConnectionsMenuToTopAppBar() {

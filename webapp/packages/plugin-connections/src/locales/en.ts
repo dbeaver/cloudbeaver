@@ -1,15 +1,4 @@
 export default [
-  ['plugin_connections_menu_security', 'Security'],
-  ['plugin_connections_change_db_password_menu_title', 'Change database password'],
-  ['plugin_connections_change_db_password_dialog_title', 'Change database password'],
-  ['plugin_connections_change_db_password_current', 'Current password'],
-  ['plugin_connections_change_db_password_new', 'New password'],
-  ['plugin_connections_change_db_password_repeat', 'Repeat new password'],
-  ['plugin_connections_change_db_password_submit', 'Change'],
-  ['plugin_connections_change_db_password_success', 'Database password changed'],
-  ['plugin_connections_change_db_password_mismatch', 'New passwords do not match'],
-  ['plugin_connections_change_db_password_failed', 'Password change failed'],
-
   ['plugin_connections_new_connection_dialog_title', 'New connection'],
   ['plugin_connections_connection_form_part_main', 'Main'],
   ['plugin_connections_connection_form_part_main_auth_model', 'Authentication model'],
@@ -55,4 +44,15 @@ export default [
   ['plugin_connections_connection_connection_time', 'Connection time: {arg:time} \n'],
 
   ['plugin_connections_connection_type_label', 'Connection type'],
+
+  ['plugin_connections_menu_security', 'Security'],
+  ['plugin_connections_change_db_password_menu_title', 'Change database password'],
+  ['plugin_connections_change_db_password_dialog_title', 'Change database password'],
+  ['plugin_connections_change_db_password_current', 'Current password'],
+  ['plugin_connections_change_db_password_new', 'New password'],
+  ['plugin_connections_change_db_password_repeat', 'Confirm password'],
+  ['plugin_connections_change_db_password_submit', 'Change'],
+  ['plugin_connections_change_db_password_success', 'Database password changed'],
+  ['plugin_connections_change_db_password_mismatch', 'New passwords do not match'],
+  ['plugin_connections_change_db_password_failed', 'Password change failed'],
 ];
