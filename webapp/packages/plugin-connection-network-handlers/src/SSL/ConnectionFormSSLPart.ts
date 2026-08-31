@@ -95,7 +95,7 @@ export class ConnectionFormSSLPart extends FormPart<INetworkHandlerConfig, IConn
     this.setInitialState(initialConfig ?? getDefaultState());
   }
 
-  protected override async format(
+  protected override async prepare(
     data: IFormState<IConnectionFormState>,
     contexts: IExecutionContextProvider<IFormState<IConnectionFormState>>,
   ): Promise<void> {
@@ -158,10 +158,15 @@ export class ConnectionFormSSLPart extends FormPart<INetworkHandlerConfig, IConn
       this.formState.state.requiredNetworkHandlersIds = this.formState.state.requiredNetworkHandlersIds.filter(id => id !== this.state.id);
     }
 
+    this.optionsPart.state.networkHandlersConfig!.push(handlerConfig);
+  }
+
+  protected override format(): void {
+    trimSSLConfig(this.state);
+
+    const handlerConfig = this.optionsPart.state.networkHandlersConfig?.find(config => config.id === this.state.id);
     if (handlerConfig) {
       trimSSLConfig(handlerConfig);
-
-      this.optionsPart.state.networkHandlersConfig!.push(handlerConfig);
     }
   }
 

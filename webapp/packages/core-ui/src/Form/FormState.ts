@@ -48,6 +48,7 @@ export class FormState<TState> implements IFormState<TState> {
   readonly formStateTask: IExecutor<TState>;
   readonly loadedTask: IExecutor<IFormState<TState>>;
   readonly submitTask: IExecutor<IFormState<TState>>;
+  readonly prepareTask: IExecutor<IFormState<TState>>;
   readonly formatTask: IExecutor<IFormState<TState>>;
   readonly validationTask: IExecutor<IFormState<TState>>;
   readonly disposeTask: IExecutor<IFormState<TState>>;
@@ -72,8 +73,11 @@ export class FormState<TState> implements IFormState<TState> {
     this.loadedTask = new Executor(this as IFormState<TState>, () => true);
     this.loadedTask.addCollection(service.onLoaded).next(this.formStateTask);
 
+    this.prepareTask = new Executor(this as IFormState<TState>, () => true);
+    this.prepareTask.addCollection(service.onPrepare);
+
     this.formatTask = new Executor(this as IFormState<TState>, () => true);
-    this.formatTask.addCollection(service.onFormat);
+    this.formatTask.addCollection(service.onFormat).before(this.prepareTask);
 
     this.validationTask = new Executor(this as IFormState<TState>, () => true);
     this.validationTask.addCollection(service.onValidate).before(this.formatTask);

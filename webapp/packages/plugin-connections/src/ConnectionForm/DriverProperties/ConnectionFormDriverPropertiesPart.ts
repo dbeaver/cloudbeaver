@@ -83,9 +83,15 @@ export class ConnectionFormDriverPropertiesPart extends FormPart<ConnectionPrope
         if (typeof this.state[key] === 'string') {
           this.state[key] = this.state[key].trim();
         }
+
+        if (typeof this.optionsPart.state.properties?.[key] === 'string') {
+          this.optionsPart.state.properties[key] = this.optionsPart.state.properties[key].trim();
+        }
       }
     });
+  }
 
+  protected override async prepare(): Promise<void> {
     this.optionsPart.state.properties = await this.getPropertiesConfig();
   }
 

@@ -60,10 +60,10 @@ export function getSSHHandlerConfig(
 
   delete handlerConfig.secureProperties;
 
-  return trimSSHConfig(handlerConfig);
+  return handlerConfig;
 }
 
-function trimSSHConfig(input: NetworkHandlerConfigInput): NetworkHandlerConfigInput {
+export function trimSSHConfig(input: NetworkHandlerConfigInput): NetworkHandlerConfigInput {
   const trimmedInput = toJS(input);
   const attributesToTrim = Object.keys(input) as (keyof NetworkHandlerConfigInput)[];
 

@@ -351,7 +351,7 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     return config;
   }
 
-  protected override async format(
+  protected override async prepare(
     data: IFormState<IConnectionFormState>,
     contexts: IExecutionContextProvider<IFormState<IConnectionFormState>>,
   ): Promise<void> {
@@ -367,31 +367,26 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     this.formState.state.requiredNetworkHandlersIds = observable([]);
     this.state.networkHandlersConfig = observable([]);
 
-    this.state.name = this.state.name?.trim();
-    this.state.description = this.state.description?.trim();
-
     if (!this.state.folder) {
       delete this.state.folder;
     }
 
-    if (this.state.configurationType === DriverConfigurationType.Url) {
-      this.state.url = this.state.url?.trim();
-    } else {
+    if (this.state.configurationType !== DriverConfigurationType.Url) {
       // if manual type configuration set, it helps to keep host, port, etc. properties (not saved on backend)
       delete this.state.url;
     }
 
     // databaseName, host, port, serverName only saves on backend like this
     if (this.state.configurationType === DriverConfigurationType.Manual && !driver.useCustomPage) {
-      this.state.mainPropertyValues![MAIN_PROPERTY_DATABASE_KEY] = this.state.databaseName?.trim();
+      this.state.mainPropertyValues![MAIN_PROPERTY_DATABASE_KEY] = this.state.databaseName;
 
       if (!driver.embedded) {
-        this.state.mainPropertyValues![MAIN_PROPERTY_HOST_KEY] = this.state.host?.trim();
-        this.state.mainPropertyValues![MAIN_PROPERTY_PORT_KEY] = this.state.port?.trim();
+        this.state.mainPropertyValues![MAIN_PROPERTY_HOST_KEY] = this.state.host;
+        this.state.mainPropertyValues![MAIN_PROPERTY_PORT_KEY] = this.state.port;
       }
 
       if (driver.requiresServerName) {
-        this.state.mainPropertyValues![MAIN_PROPERTY_SERVER_KEY] = this.state.serverName?.trim();
+        this.state.mainPropertyValues![MAIN_PROPERTY_SERVER_KEY] = this.state.serverName;
       }
     }
 
@@ -438,6 +433,18 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     if (expertSettings.length > 0) {
       this.state.expertSettingsValues = prepareDynamicProperties(expertSettings, this.state.expertSettingsValues!);
     }
+  }
+
+  protected override format(): void {
+    this.state.name = this.state.name?.trim();
+    this.state.description = this.state.description?.trim();
+    this.state.url = this.state.url?.trim();
+
+    formatDynamicProperties(this.state.credentials);
+    formatDynamicProperties(this.state.properties);
+    formatDynamicProperties(this.state.providerProperties);
+    formatDynamicProperties(this.state.mainPropertyValues);
+    formatDynamicProperties(this.state.expertSettingsValues);
   }
 
   private async getConnectionAuthModelProperties(authModelId: string, connectionInfo?: ConnectionInfoAuthProperties): Promise<IObjectPropertyInfo[]> {
@@ -587,13 +594,19 @@ function prepareDynamicProperties(
     }
   }
 
-  for (const key of Object.keys(result)) {
-    if (typeof result[key] === 'string') {
-      result[key] = result[key]?.trim();
-    }
+  return result;
+}
+
+function formatDynamicProperties(properties: Record<string, any> | undefined): void {
+  if (!properties) {
+    return;
   }
 
-  return result;
+  for (const key of Object.keys(properties)) {
+    if (typeof properties[key] === 'string') {
+      properties[key] = properties[key].trim();
+    }
+  }
 }
 
 function applyDriverDefaults(config: IConnectionFormOptionsState, driver: DBDriver, prevDriver?: DBDriver): void {
