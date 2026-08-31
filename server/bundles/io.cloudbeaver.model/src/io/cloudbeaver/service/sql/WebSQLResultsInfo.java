@@ -65,11 +65,12 @@ public class WebSQLResultsInfo {
         return dataContainer;
     }
 
+    @NotNull
     public DBDAttributeBinding[] getAttributes() {
         return attributes;
     }
 
-    public void setAttributes(DBDAttributeBinding[] attributes) {
+    public void setAttributes(@NotNull DBDAttributeBinding[] attributes) {
         this.attributes = attributes;
     }
 
@@ -147,6 +148,7 @@ public class WebSQLResultsInfo {
         return binding == null ? null : binding.getAttribute();
     }
 
+    @Nullable
     public DBSTypedObject getAttributeByPosition(int pos) {
         return pos >= 0 && pos < attributes.length ? attributes[pos] : null;
     }

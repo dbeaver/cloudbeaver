@@ -22,6 +22,7 @@ import io.cloudbeaver.service.sql.WebSQLProcessor;
 import io.cloudbeaver.service.sql.WebSQLResultsRow;
 import io.cloudbeaver.service.sql.WebServiceBindingSQL;
 import io.cloudbeaver.test.platform.CloudbeaverDBTest;
+import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.exec.jdbc.JDBCResultSet;
 import org.jkiss.dbeaver.model.exec.jdbc.JDBCStatement;
@@ -154,7 +155,7 @@ public class WebSQLDataUpdateTest extends CloudbeaverDBTest {
         }
     }
 
-    private void executeStatements(String... queries) throws Exception {
+    private void executeStatements(@NotNull String... queries) throws Exception {
         try (JDBCStatement statement = databaseSession.createStatement()) {
             for (String query : queries) {
                 Assertions.assertFalse(statement.execute(query));
@@ -162,7 +163,11 @@ public class WebSQLDataUpdateTest extends CloudbeaverDBTest {
         }
     }
 
-    private Object[] updateFirstRow(String query, Map<String, Object> updates) throws Exception {
+    @NotNull
+    private Object[] updateFirstRow(
+        @NotNull String query,
+        @NotNull Map<String, Object> updates
+    ) throws Exception {
         QueryRow queryRow = queryFirstRow(query);
         Map<String, Object> row = new HashMap<>(queryRow.row());
         row.put("updateValues", updates);
@@ -179,7 +184,8 @@ public class WebSQLDataUpdateTest extends CloudbeaverDBTest {
         return result.getResults()[0].getResultSet().getRowsWithMetaData().getFirst().getData();
     }
 
-    private QueryRow queryFirstRow(String query) throws Exception {
+    @NotNull
+    private QueryRow queryFirstRow(@NotNull String query) throws Exception {
         WebSQLProcessor sqlProcessor = WebServiceBindingSQL.getSQLProcessor(webConnectionInfo);
         WebSQLContextInfo context = sqlProcessor.createContext(null, "PUBLIC", globalProject.getId());
         String taskId = clientWrapper.asyncSqlExecute(
@@ -197,10 +203,10 @@ public class WebSQLDataUpdateTest extends CloudbeaverDBTest {
     }
 
     private record QueryRow(
-        WebSQLProcessor processor,
-        WebSQLContextInfo context,
-        String resultId,
-        Map<String, Object> row
+        @NotNull WebSQLProcessor processor,
+        @NotNull WebSQLContextInfo context,
+        @NotNull String resultId,
+        @NotNull Map<String, Object> row
     ) {
     }
 }

@@ -16,6 +16,7 @@
  */
 package io.cloudbeaver.service.sql;
 
+import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataKind;
 import org.jkiss.dbeaver.model.DBPEvaluationContext;
@@ -35,15 +36,17 @@ public class WebSQLQueryResultColumn {
     private final DBDAttributeBinding attrMeta;
     private final int position;
 
-    public WebSQLQueryResultColumn(DBDAttributeBinding attrMeta, int position) {
+    public WebSQLQueryResultColumn(@NotNull DBDAttributeBinding attrMeta, int position) {
         this.attrMeta = attrMeta;
         this.position = position;
     }
 
+    @NotNull
     DBDAttributeBinding getAttribute() {
         return attrMeta;
     }
 
+    @NotNull
     @Property
     public Integer getPosition() {
         return position;
