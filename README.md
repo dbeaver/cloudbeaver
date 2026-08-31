@@ -30,7 +30,7 @@ You can see a live demo of CloudBeaver server here: https://demo.cloudbeaver.io
 
 ### 26.2.0 2026-08-31
 
-### Changes since 26.1.0:
+### Changes since 26.1.0
 
 - AI Assistant:
   - Added AI Chat to help users generate and fix queries and explore data more easily. It’s integrated with the SQL Editor to run generated queries instantly. All AI features can be turned off in the Server configuration.
