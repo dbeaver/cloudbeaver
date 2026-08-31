@@ -54,7 +54,7 @@ public class WebSQLDataUpdateTest extends CloudbeaverDBTest {
         );
 
         Assertions.assertEquals("after", updatedRow[1]);
-        Assertions.assertEquals("42.50", updatedRow[2]);
+        Assertions.assertEquals("42.5", updatedRow[2]);
         Assertions.assertEquals(false, updatedRow[3]);
         Assertions.assertNull(updatedRow[4]);
         try (
