@@ -411,7 +411,8 @@ public class WebSQLProcessor implements WebSessionProvider {
             webSession,
             dataProvider,
             resultsInfo,
-            executionContext
+            executionContext,
+            false
         );
 
         ResultSetSaveSettings settings = new ResultSetSaveSettings();
@@ -544,7 +545,12 @@ public class WebSQLProcessor implements WebSessionProvider {
                     if (attr.getRowIdentifier() == null) {
                         continue;
                     }
-                    final Object keyValue = row.getData()[attr.getOrdinalPosition()];
+                    int position = resultsInfo.getAttributePosition(attr);
+                    if (position < 0) {
+                        hasKey = false;
+                        break;
+                    }
+                    final Object keyValue = row.getData()[position];
                     if (DBUtils.isNullValue(keyValue)) {
                         hasKey = false;
                         break;
@@ -620,7 +626,8 @@ public class WebSQLProcessor implements WebSessionProvider {
             webSession,
             dataProvider,
             resultsInfo,
-            executionContext
+            executionContext,
+            true
         );
 
         StringBuilder sqlBuilder = new StringBuilder();
@@ -751,7 +758,11 @@ public class WebSQLProcessor implements WebSessionProvider {
                 rowValues[i] =
                     WebSQLUtils.makeDocumentInputValue(session, (DBSDocumentLocator) dataContainer, resultsInfo, row, null);
             } else {
-                Object inputCellValue = row.getValues()[keyAttribute.getOrdinalPosition()];
+                int position = resultsInfo.getAttributePosition(keyAttribute);
+                if (position < 0) {
+                    throw new DBCException("Result key attribute '" + keyAttribute.getName() + "' is not present in the row");
+                }
+                Object inputCellValue = row.getValues()[position];
                 rowValues[i] = keyAttribute.getValueHandler().getValueFromObject(
                     session,
                     keyAttribute,

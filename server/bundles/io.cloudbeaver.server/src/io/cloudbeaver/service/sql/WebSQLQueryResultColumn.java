@@ -33,9 +33,11 @@ public class WebSQLQueryResultColumn {
     private static final Log log = Log.getLog(WebSQLQueryResultColumn.class);
 
     private final DBDAttributeBinding attrMeta;
+    private final int position;
 
-    public WebSQLQueryResultColumn(DBDAttributeBinding attrMeta) {
+    public WebSQLQueryResultColumn(DBDAttributeBinding attrMeta, int position) {
         this.attrMeta = attrMeta;
+        this.position = position;
     }
 
     DBDAttributeBinding getAttribute() {
@@ -44,7 +46,7 @@ public class WebSQLQueryResultColumn {
 
     @Property
     public Integer getPosition() {
-        return attrMeta.getOrdinalPosition();
+        return position;
     }
 
     @Property

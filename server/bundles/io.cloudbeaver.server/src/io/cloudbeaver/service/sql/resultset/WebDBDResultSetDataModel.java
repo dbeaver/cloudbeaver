@@ -70,8 +70,13 @@ public class WebDBDResultSetDataModel extends WebAbstractDBDResultSetModel {
     @Nullable
     @Override
     public Object getCellValue(@NotNull DBDAttributeBinding attribute, @NotNull DBDValueRow row) throws DBException {
-        if (row instanceof WebSQLResultsRow webSQLResultsRow && webSQLResultsRow.getFinalRow() != null) {
-            return webSQLResultsRow.getFinalRow()[attribute.getOrdinalPosition()];
+        if (row instanceof WebSQLResultsRow webSQLResultsRow) {
+            if (webSQLResultsRow.getFinalRow() != null) {
+                int position = resultsInfo.getAttributePosition(attribute);
+                if (position >= 0) {
+                    return webSQLResultsRow.getFinalRow()[position];
+                }
+            }
         }
         return super.getCellValue(attribute, row);
     }

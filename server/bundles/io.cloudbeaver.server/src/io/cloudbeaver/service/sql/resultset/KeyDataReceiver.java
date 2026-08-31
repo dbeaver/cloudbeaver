@@ -63,7 +63,7 @@ public class KeyDataReceiver implements DBDDataReceiver {
             if (!CommonUtils.isEmpty(keyAttribute.getName())) {
                 DBDAttributeBinding binding = DBUtils.findObject(attributes, keyAttribute.getName());
                 if (binding != null) {
-                    int index = binding.getOrdinalPosition();
+                    int index = getAttributePosition(binding);
                     row[index] = keyValue;
                     updatedAttributes.add(index);
                     continue;
@@ -88,5 +88,14 @@ public class KeyDataReceiver implements DBDDataReceiver {
 
     @Override
     public void close() {
+    }
+
+    private int getAttributePosition(@NotNull DBDAttributeBinding attribute) throws DBCException {
+        for (int i = 0; i < attributes.length; i++) {
+            if (attributes[i] == attribute) {
+                return i;
+            }
+        }
+        throw new DBCException("Generated key attribute '" + attribute.getName() + "' is not present in the row");
     }
 }

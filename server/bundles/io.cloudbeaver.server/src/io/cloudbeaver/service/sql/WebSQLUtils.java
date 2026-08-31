@@ -322,6 +322,59 @@ public class WebSQLUtils {
     }
 
     @NotNull
+    public static Map<String, Object> makeDocumentValueMap(
+        @NotNull DBDAttributeBinding documentAttribute,
+        @NotNull DBDAttributeBinding[] attributes,
+        @NotNull Object[] values
+    ) {
+        if (attributes.length != values.length) {
+            throw new IllegalArgumentException("Document attributes and values have different sizes");
+        }
+        Map<String, Object> document = new LinkedHashMap<>();
+        for (int i = 0; i < attributes.length; i++) {
+            putDocumentValue(document, documentAttribute, attributes[i], values[i]);
+        }
+        return document;
+    }
+
+    private static void putDocumentValue(
+        @NotNull Map<String, Object> document,
+        @NotNull DBDAttributeBinding documentAttribute,
+        @NotNull DBDAttributeBinding attribute,
+        @Nullable Object value
+    ) {
+        LinkedList<String> path = new LinkedList<>();
+        for (DBDAttributeBinding current = attribute; current != null && current != documentAttribute;
+             current = current.getParentObject()) {
+            path.addFirst(current.getName());
+        }
+        if (path.isEmpty() || attribute.getTopParent() != documentAttribute) {
+            return;
+        }
+        Map<String, Object> target = document;
+        while (path.size() > 1) {
+            String name = path.removeFirst();
+            Object nestedValue = target.get(name);
+            if (nestedValue instanceof Map<?, ?> nestedMap) {
+                @SuppressWarnings("unchecked")
+                Map<String, Object> typedNestedMap = (Map<String, Object>) nestedMap;
+                target = typedNestedMap;
+            } else if (nestedValue != null) {
+                throw new IllegalArgumentException("Conflicting document attribute path at '" + name + "'");
+            } else {
+                Map<String, Object> nestedMap = new LinkedHashMap<>();
+                target.put(name, nestedMap);
+                target = nestedMap;
+            }
+        }
+        String name = path.getFirst();
+        if (target.containsKey(name)) {
+            throw new IllegalArgumentException("Duplicate document attribute path at '" + name + "'");
+        }
+        target.put(name, value);
+    }
+
+    @NotNull
     public static WebAsyncTaskInfo createAsyncTaskExecuteSqlQuery(
         @NotNull WebSession webSession,
         @NotNull WebSQLContextInfo contextInfo,

@@ -47,6 +47,8 @@ import org.junit.platform.suite.api.Suite;
         AdminCreateUserTest.class,
         AdminLastLoginTimeTest.class,
         GenerateSQLResultSetTest.class,
+        WebSQLDataUpdateTest.class,
+        WebSQLResultsInfoTest.class,
         RowIdResultSetTest.class,
         GroupingEndpointTest.class,
         ForeignKeyNavigationEndpointTest.class,

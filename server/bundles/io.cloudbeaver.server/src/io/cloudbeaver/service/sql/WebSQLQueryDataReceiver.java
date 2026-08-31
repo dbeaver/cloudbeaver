@@ -33,7 +33,6 @@ import org.jkiss.dbeaver.model.impl.data.DBDValueError;
 import org.jkiss.dbeaver.model.meta.MetaData;
 import org.jkiss.dbeaver.model.sql.DBQuotaException;
 import org.jkiss.dbeaver.model.struct.DBSDataContainer;
-import org.jkiss.dbeaver.model.struct.DBSDocumentLocator;
 import org.jkiss.dbeaver.model.struct.DBSEntity;
 import org.jkiss.utils.CommonUtils;
 
@@ -59,6 +58,7 @@ class WebSQLQueryDataReceiver implements DBDDataReceiver {
 
     private DBDAttributeBinding[] bindings;
     private DBDAttributeBinding documentAttribute;
+    private String documentIdAttributeName;
     private DBCTrace trace;
     private List<WebSQLQueryResultSetRow> rows = new ArrayList<>();
     private final Number rowLimit;
@@ -84,6 +84,8 @@ class WebSQLQueryDataReceiver implements DBDDataReceiver {
 
     @Override
     public void fetchStart(@NotNull DBCSession session, @NotNull DBCResultSet dbResult, long offset, long maxRows) throws DBCException {
+        documentAttribute = null;
+        documentIdAttributeName = null;
         DBCResultSetMetaData meta = dbResult.getMeta();
         List<? extends DBCAttributeMetaData> attributes = meta.getAttributes();
 
@@ -108,7 +110,7 @@ class WebSQLQueryDataReceiver implements DBDDataReceiver {
                 }
             }
         }
-        if (realAttr != null && dataContainer instanceof DBSDocumentLocator) {
+        if (realAttr != null) {
             if (realAttr.getDataKind() == DBPDataKind.DOCUMENT || realAttr.getDataKind() == DBPDataKind.CONTENT) {
                 documentAttribute = realAttr;
             }
@@ -133,6 +135,12 @@ class WebSQLQueryDataReceiver implements DBDDataReceiver {
                     binding.getMetaAttribute(),
                     i);
                 row[i] = cellValue;
+                if (documentIdAttributeName == null && cellValue instanceof DBDDocument document) {
+                    Object idAttributeName = document.getDocumentProperty(DBDDocument.PROP_ID_ATTRIBUTE_NAME);
+                    if (idAttributeName instanceof String name) {
+                        documentIdAttributeName = name;
+                    }
+                }
                 if (cellValue != null) {
                     Method[] methods = cellValue.getClass().getMethods();
                     for (Method method : methods) {
@@ -174,7 +182,6 @@ class WebSQLQueryDataReceiver implements DBDDataReceiver {
         if (dataFormat != WebDataFormat.document) {
             convertComplexValuesToRelationalView(session);
         }
-
         // Set proper order position
         for (int i = 0; i < bindings.length; i++) {
             DBDAttributeBinding binding = bindings[i];
@@ -202,6 +209,7 @@ class WebSQLQueryDataReceiver implements DBDDataReceiver {
         webResultSet.setReadOnlyInfo(contextInfo.getProcessor().getExecutionContext());
 
         WebSQLResultsInfo resultsInfo = contextInfo.saveResult(dataContainer, trace, bindings, documentAttribute, rows.size() == 1);
+        resultsInfo.setDocumentIdAttributeName(documentIdAttributeName);
         resultsInfo.setDataFilter(dataFilter);
         resultsInfo.setQueryText(resultSet.getSourceStatement().getQueryString());
         webResultSet.setResultsInfo(resultsInfo);
@@ -217,7 +225,7 @@ class WebSQLQueryDataReceiver implements DBDDataReceiver {
             webResultSet.setHasRowIdentifier(true);
             webResultSet.setRowIdentifierState(WebSQLResultSetRowIdentifierState.PRIMARY_KEY);
             List<WebSQLResultSetRowIdentifierAttribute> attributes = rowIdentifier.getAttributes().stream()
-                .map(a -> new WebSQLResultSetRowIdentifierAttribute(a.getName(), a.getOrdinalPosition()))
+                .map(a -> new WebSQLResultSetRowIdentifierAttribute(a.getName(), resultsInfo.getAttributePosition(a)))
                 .toList();
             String constraintTypeName = rowIdentifier.getUniqueKey().getConstraintType().getName();
             webResultSet.setRowIdentifier(

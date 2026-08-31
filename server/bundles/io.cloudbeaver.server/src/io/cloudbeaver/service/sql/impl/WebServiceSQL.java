@@ -299,13 +299,14 @@ public class WebServiceSQL implements DBWServiceSQL {
         @NotNull String resultsId,
         @NotNull List<WebSQLResultsRow> selectedRows
     ) throws DBWebException {
-        List<DBDAttributeBinding> attributes = Arrays.stream(sqlContext.getResults(resultsId).getAttributes())
-            .filter(attr -> canBeTruncated(attr.getDataKind()))
-            .toList();
+        DBDAttributeBinding[] attributes = sqlContext.getResults(resultsId).getAttributes();
         for (WebSQLResultsRow row : selectedRows) {
             Object[] data = row.getValues();
-            for (DBDAttributeBinding attribute : attributes) {
-                int position = attribute.getOrdinalPosition();
+            for (int position = 0; position < attributes.length; position++) {
+                DBDAttributeBinding attribute = attributes[position];
+                if (!canBeTruncated(attribute.getDataKind())) {
+                    continue;
+                }
                 boolean valueIsTruncated = data[position] != null &&
                     data[position].toString().length() == WebSQLConstants.TEXT_PREVIEW_MAX_LENGTH;
                 if (valueIsTruncated) {

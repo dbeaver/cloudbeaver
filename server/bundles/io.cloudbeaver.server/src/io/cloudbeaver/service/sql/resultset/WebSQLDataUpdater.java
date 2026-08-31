@@ -28,6 +28,7 @@ import org.jkiss.dbeaver.model.DBUtils;
 import org.jkiss.dbeaver.model.data.*;
 import org.jkiss.dbeaver.model.data.resultset.DBDDataStatementInfo;
 import org.jkiss.dbeaver.model.data.resultset.DBDResultSetDataUpdater;
+import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.exec.DBCExecutionContext;
 import org.jkiss.dbeaver.model.exec.DBCExecutionSource;
 import org.jkiss.dbeaver.model.exec.DBCSession;
@@ -46,16 +47,21 @@ public class WebSQLDataUpdater extends DBDResultSetDataUpdater<WebSQLDataStateme
 
     private final WebSession webSession;
     private final WebSQLResultsInfo resultsInfo;
+    private final boolean generateScript;
+    private final Map<WebSQLResultsRow, Map<DBDAttributeBinding, Object>> documentKeyValues = new IdentityHashMap<>();
+    private final Map<WebSQLResultsRow, Object> insertDocumentValues = new IdentityHashMap<>();
 
     public WebSQLDataUpdater(
         @NotNull WebSession webSession,
         @NotNull WebDBDResultSetDataModel model,
         @NotNull WebSQLResultsInfo resultsInfo,
-        @NotNull DBCExecutionContext executionContext
+        @NotNull DBCExecutionContext executionContext,
+        boolean generateScript
     ) {
         super(model, executionContext);
         this.webSession = webSession;
         this.resultsInfo = resultsInfo;
+        this.generateScript = generateScript;
         collectChanges();
     }
 
@@ -107,28 +113,8 @@ public class WebSQLDataUpdater extends DBDResultSetDataUpdater<WebSQLDataStateme
         if (row.getFinalRow() != null) {
             return;
         }
-        Object[] finalRow = Arrays.copyOf(row.getValues(), row.getValues().length);
-        for (Map.Entry<String, Object> entry : row.getUpdateValues().entrySet()) {
-            int index = CommonUtils.toInt(entry.getKey());
-            finalRow[index] = entry.getValue();
-        }
+        Object[] finalRow = getFinalRow(row);
         boolean added = addedRows.contains(row);
-        boolean[] attributesToConvert = new boolean[finalRow.length];
-        boolean[] identifierAttributes = new boolean[finalRow.length];
-        if (added) {
-            Arrays.fill(attributesToConvert, true);
-        } else {
-            for (DBDRowIdentifier identifier : resultsInfo.getRowIdentifiers()) {
-                for (DBDAttributeBinding attribute : identifier.getAttributes()) {
-                    int index = attribute.getOrdinalPosition();
-                    attributesToConvert[index] = true;
-                    identifierAttributes[index] = true;
-                }
-            }
-            for (String indexValue : row.getUpdateValues().keySet()) {
-                attributesToConvert[CommonUtils.toInt(indexValue)] = true;
-            }
-        }
         Map<Integer, Object> originalValues = new HashMap<>();
         try (
             DBCSession session = DBUtils.openUtilSession(
@@ -137,46 +123,197 @@ public class WebSQLDataUpdater extends DBDResultSetDataUpdater<WebSQLDataStateme
                 "Load final row"
             )
         ) {
-            for (int i = 0; i < finalRow.length; i++) {
-                if (!attributesToConvert[i]) {
-                    continue;
-                }
-                DBDAttributeBinding attr = model.getAttributes()[i];
-                boolean isDocumentValue = !added
-                    && model.getAttributes().length == 1
-                    && attr.getDataKind() == DBPDataKind.DOCUMENT
-                    && attr.getDataContainer() instanceof DBSDocumentLocator;
-                if (isDocumentValue) {
-                    DBDDocument document = WebSQLUtils.makeDocumentInputValue(
-                            session,
-                            (DBSDocumentLocator) attr.getDataContainer(),
-                            resultsInfo,
-                            row,
-                            row.getMetaData()
-                        );
-                    if (document instanceof DBDComposite composite) {
-                        for (Map.Entry<String, Object> entry : row.getUpdateValues().entrySet()) {
-                            DBDAttributeBinding updateAttribute = model.getAttributes()[CommonUtils.toInt(entry.getKey())];
-                            composite.setAttributeValue(
-                                updateAttribute,
-                                convertInputCellValue(session, updateAttribute, entry.getValue())
-                            );
-                        }
-                    }
-                    finalRow[i] = document;
-                    if (identifierAttributes[i]) {
-                        originalValues.put(i, document);
-                    }
-                } else {
-                    if (identifierAttributes[i]) {
-                        originalValues.put(i, convertInputCellValue(session, attr, row.getValues()[i]));
-                    }
-                    finalRow[i] = convertInputCellValue(session, attr, finalRow[i]);
-                }
+            Map<Integer, DBDAttributeBinding> identifierAttributes = added
+                ? Collections.emptyMap()
+                : resolveIdentifierAttributes(session, row);
+            convertRowValues(session, row, finalRow, added, identifierAttributes, originalValues);
+            DBDAttributeBinding documentAttribute = resultsInfo.getDocumentAttribute();
+            if (added && documentAttribute != null && resultsInfo.getAttributePosition(documentAttribute) < 0) {
+                insertDocumentValues.put(row, createDocumentValue(session, documentAttribute, finalRow));
             }
         }
         row.setOriginalKeyValues(originalValues);
         row.setFinalRow(finalRow);
+    }
+
+    @NotNull
+    private static Object[] getFinalRow(@NotNull WebSQLResultsRow row) {
+        Object[] finalRow = Arrays.copyOf(row.getValues(), row.getValues().length);
+        for (Map.Entry<String, Object> entry : row.getUpdateValues().entrySet()) {
+            finalRow[CommonUtils.toInt(entry.getKey())] = entry.getValue();
+        }
+        return finalRow;
+    }
+
+    @NotNull
+    private Map<Integer, DBDAttributeBinding> resolveIdentifierAttributes(
+        @NotNull DBCSession session,
+        @NotNull WebSQLResultsRow row
+    ) throws DBException {
+        Map<Integer, DBDAttributeBinding> attributes = new HashMap<>();
+        DBDDocument resolvedDocument = null;
+        for (DBDRowIdentifier identifier : resultsInfo.getRowIdentifiers()) {
+            for (DBDAttributeBinding attribute : identifier.getAttributes()) {
+                int position = resultsInfo.getAttributePosition(attribute);
+                if (position >= 0) {
+                    attributes.put(position, attribute);
+                } else if (resultsInfo.getDataContainer() instanceof DBSDocumentLocator documentLocator) {
+                    if (resolvedDocument == null) {
+                        resolvedDocument = WebSQLUtils.makeDocumentInputValue(
+                            session,
+                            documentLocator,
+                            resultsInfo,
+                            row,
+                            row.getMetaData()
+                        );
+                    }
+                    documentKeyValues.computeIfAbsent(row, key -> new IdentityHashMap<>()).put(attribute, resolvedDocument);
+                } else {
+                    int keyPosition = resultsInfo.getDocumentIdAttributePosition(attribute);
+                    if (keyPosition < 0 || keyPosition >= row.getValues().length) {
+                        throw new DBCException(
+                            "Document ID attribute for '" + attribute.getName() + "' is not present in the row"
+                        );
+                    }
+                    attributes.put(keyPosition, attribute);
+                    Object keyValue = convertInputCellValue(session, attribute, row.getValues()[keyPosition]);
+                    documentKeyValues.computeIfAbsent(row, key -> new IdentityHashMap<>()).put(attribute, keyValue);
+                }
+            }
+        }
+        return attributes;
+    }
+
+    @Nullable
+    @Override
+    protected Object getKeyValue(@NotNull DBDAttributeBinding attribute, @NotNull WebSQLResultsRow row) throws DBException {
+        Map<DBDAttributeBinding, Object> rowKeyValues = documentKeyValues.get(row);
+        if (rowKeyValues != null && rowKeyValues.containsKey(attribute)) {
+            return rowKeyValues.get(attribute);
+        }
+        return super.getKeyValue(attribute, row);
+    }
+
+    @Nullable
+    @Override
+    protected Object getInsertDocumentValue(
+        @NotNull DBDAttributeBinding attribute,
+        @NotNull WebSQLResultsRow row
+    ) throws DBException {
+        if (insertDocumentValues.containsKey(row)) {
+            return insertDocumentValues.get(row);
+        }
+        return super.getInsertDocumentValue(attribute, row);
+    }
+
+    @NotNull
+    @Override
+    protected DBDAttributeValue getDeleteKeyAttributeValue(
+        @NotNull DBDAttributeBinding attribute,
+        @NotNull WebSQLResultsRow row
+    ) throws DBException {
+        if (attribute.getDataKind() == DBPDataKind.DOCUMENT
+            && !(resultsInfo.getDataContainer() instanceof DBSDocumentLocator)) {
+            int idPosition = resultsInfo.getDocumentIdAttributePosition(attribute);
+            if (idPosition >= 0) {
+                return new DBDAttributeValue(model.getAttributes()[idPosition], getKeyValue(attribute, row));
+            }
+        }
+        return super.getDeleteKeyAttributeValue(attribute, row);
+    }
+
+    private void convertRowValues(
+        @NotNull DBCSession session,
+        @NotNull WebSQLResultsRow row,
+        @NotNull Object[] finalRow,
+        boolean added,
+        @NotNull Map<Integer, DBDAttributeBinding> identifierAttributes,
+        @NotNull Map<Integer, Object> originalValues
+    ) throws DBException {
+        BitSet positionsToConvert = new BitSet();
+        identifierAttributes.keySet().forEach(positionsToConvert::set);
+        if (added) {
+            positionsToConvert.set(0, finalRow.length);
+        } else {
+            for (String indexValue : row.getUpdateValues().keySet()) {
+                positionsToConvert.set(CommonUtils.toInt(indexValue));
+            }
+        }
+        for (int position = positionsToConvert.nextSetBit(0);
+             position >= 0;
+             position = positionsToConvert.nextSetBit(position + 1)) {
+            DBDAttributeBinding attribute = model.getAttributes()[position];
+            DBDAttributeBinding identifierAttribute = identifierAttributes.get(position);
+            if (!added && attribute.getDataKind() == DBPDataKind.DOCUMENT
+                && attribute.getDataContainer() instanceof DBSDocumentLocator documentLocator) {
+                DBDDocument document = resolveDocumentValue(session, row, documentLocator);
+                finalRow[position] = document;
+                if (identifierAttribute != null) {
+                    originalValues.put(position, document);
+                }
+            } else {
+                if (identifierAttribute != null) {
+                    Object identifierValue = getDocumentKeyValue(row, identifierAttribute);
+                    if (identifierValue == null) {
+                        identifierValue = convertInputCellValue(session, identifierAttribute, row.getValues()[position]);
+                    }
+                    originalValues.put(position, identifierValue);
+                    if (!row.getUpdateValues().containsKey(String.valueOf(position))) {
+                        finalRow[position] = identifierValue;
+                        continue;
+                    }
+                }
+                finalRow[position] = convertInputCellValue(session, attribute, finalRow[position]);
+            }
+        }
+    }
+
+    @Nullable
+    private Object getDocumentKeyValue(
+        @NotNull WebSQLResultsRow row,
+        @NotNull DBDAttributeBinding identifierAttribute
+    ) {
+        Map<DBDAttributeBinding, Object> rowKeyValues = documentKeyValues.get(row);
+        return rowKeyValues == null ? null : rowKeyValues.get(identifierAttribute);
+    }
+
+    @NotNull
+    private Object createDocumentValue(
+        @NotNull DBCSession session,
+        @NotNull DBDAttributeBinding documentAttribute,
+        @NotNull Object[] values
+    ) throws DBException {
+        Map<String, Object> document = WebSQLUtils.makeDocumentValueMap(
+            documentAttribute,
+            model.getAttributes(),
+            values
+        );
+        return convertInputCellValue(session, documentAttribute, document);
+    }
+
+    @NotNull
+    private DBDDocument resolveDocumentValue(
+        @NotNull DBCSession session,
+        @NotNull WebSQLResultsRow row,
+        @NotNull DBSDocumentLocator documentLocator
+    ) throws DBException {
+        DBDDocument document = WebSQLUtils.makeDocumentInputValue(
+            session,
+            documentLocator,
+            resultsInfo,
+            row,
+            row.getMetaData()
+        );
+        if (document instanceof DBDComposite composite) {
+            for (Map.Entry<String, Object> entry : row.getUpdateValues().entrySet()) {
+                DBDAttributeBinding updateAttribute = model.getAttributes()[CommonUtils.toInt(entry.getKey())];
+                composite.setAttributeValue(
+                    updateAttribute,
+                    convertInputCellValue(session, updateAttribute, entry.getValue())
+                );
+            }
+        }
+        return document;
     }
 
     @Nullable
@@ -206,7 +343,7 @@ public class WebSQLDataUpdater extends DBDResultSetDataUpdater<WebSQLDataStateme
                 throw new DBException("Error reading uploaded file", e);
             }
         }
-        return WebSQLUtils.convertInputCellValue(session, attribute, value, false);
+        return WebSQLUtils.convertInputCellValue(session, attribute, value, generateScript);
     }
 
     @Override
@@ -218,6 +355,11 @@ public class WebSQLDataUpdater extends DBDResultSetDataUpdater<WebSQLDataStateme
             super.addedRows.add(row);
         }
         super.deletedRows.addAll(model.getDeletedRows());
+    }
+
+    @Override
+    protected boolean shouldInsertAttribute(@NotNull DBDAttributeBinding attribute, @Nullable Object value) {
+        return value != null;
     }
 
     @NotNull

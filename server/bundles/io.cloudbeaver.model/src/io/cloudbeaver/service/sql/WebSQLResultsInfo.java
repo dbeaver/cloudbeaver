@@ -41,6 +41,7 @@ public class WebSQLResultsInfo {
     private final String id;
     private DBDAttributeBinding[] attributes;
     private DBDAttributeBinding documentAttribute;
+    private String documentIdAttributeName;
 
     // TODO: find a way to remove isSingleRow and use virtual keys for reading BLOB and string cell values.
     private boolean isSingleRow;
@@ -70,6 +71,28 @@ public class WebSQLResultsInfo {
 
     public void setAttributes(DBDAttributeBinding[] attributes) {
         this.attributes = attributes;
+    }
+
+    public int getAttributePosition(@NotNull DBDAttributeBinding attribute) {
+        for (int i = 0; i < attributes.length; i++) {
+            if (attributes[i] == attribute) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    public int getDocumentIdAttributePosition(@NotNull DBDAttributeBinding documentAttribute) {
+        if (documentIdAttributeName == null) {
+            return -1;
+        }
+        for (int i = 0; i < attributes.length; i++) {
+            DBDAttributeBinding attribute = attributes[i];
+            if (attribute.getTopParent() == documentAttribute && documentIdAttributeName.equals(attribute.getName())) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     public String getQueryText() {
@@ -125,12 +148,7 @@ public class WebSQLResultsInfo {
     }
 
     public DBSTypedObject getAttributeByPosition(int pos) {
-        for (DBDAttributeBinding attr : attributes) {
-            if (attr.getOrdinalPosition() == pos) {
-                return attr;
-            }
-        }
-        return null;
+        return pos >= 0 && pos < attributes.length ? attributes[pos] : null;
     }
 
     public boolean canRefreshResults() {
@@ -173,5 +191,9 @@ public class WebSQLResultsInfo {
 
     public void setDocumentAttribute(@Nullable DBDAttributeBinding documentAttribute) {
         this.documentAttribute = documentAttribute;
+    }
+
+    public void setDocumentIdAttributeName(@Nullable String documentIdAttributeName) {
+        this.documentIdAttributeName = documentIdAttributeName;
     }
 }
