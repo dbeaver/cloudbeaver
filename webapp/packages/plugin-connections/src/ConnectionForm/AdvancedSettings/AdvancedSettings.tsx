@@ -17,7 +17,7 @@ import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 import { ConnectionFormService } from '../ConnectionFormService.js';
 import { ConnectionSectionWrapper } from '../ConnectionSectionWrapper.js';
 import type { IConnectionFormProps } from '../IConnectionFormState.js';
-import { PROFILE_AUTH_MODEL_ID } from '../PROFILE_AUTH_MODEL_ID.js';
+import { isConnectionFormReadOnly } from '../isConnectionFormReadOnly.js';
 import { getConnectionFormOptionsPart } from '../Options/getConnectionFormOptionsPart.js';
 import { ProviderPropertiesForm } from '../Options/ProviderPropertiesForm.js';
 
@@ -30,7 +30,7 @@ export const AdvancedSettings: TabContainerPanelComponent<IConnectionFormProps> 
     key: optionsPart.state.driverId || null,
     includes: ['includeProviderProperties'] as const,
   });
-  const readonly = formState.isDisabled || formState.isReadOnly || connectionInfoAuthResource.data?.authModel === PROFILE_AUTH_MODEL_ID;
+  const readonly = isConnectionFormReadOnly(formState, connectionInfoAuthResource.data?.authModel);
 
   useFormValidator(formState.validationTask, formRef.current);
 

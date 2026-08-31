@@ -49,7 +49,7 @@ import { EMPTY_ARRAY } from '@cloudbeaver/core-utils';
 import { ConnectionAuthModelCredentialsForm } from '../ConnectionAuthModelCredentials/ConnectionAuthModelCredentialsForm.js';
 import { ConnectionAuthModelSelector } from '../ConnectionAuthModelCredentials/ConnectionAuthModelSelector.js';
 import { ConnectionSectionWrapper } from '../ConnectionSectionWrapper.js';
-import { PROFILE_AUTH_MODEL_ID } from '../PROFILE_AUTH_MODEL_ID.js';
+import { isConnectionFormReadOnly } from '../isConnectionFormReadOnly.js';
 import { CONNECTION_FORM_SHARED_CREDENTIALS_TAB_ID } from '../SharedCredentials/CONNECTION_FORM_SHARED_CREDENTIALS_TAB_ID.js';
 import { ParametersForm } from './ParametersForm.js';
 import { getConnectionFormOptionsPart } from './getConnectionFormOptionsPart.js';
@@ -90,7 +90,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
   const connectionInfoAuthPropertiesResource = useResource(Options, ConnectionInfoAuthPropertiesResource, optionsPart.connectionKey);
   const configurationTypeLabel = translate('connections_connection_configuration');
 
-  const readonly = formState.isDisabled || formState.isReadOnly || connectionInfoAuthResource.data?.authModel === PROFILE_AUTH_MODEL_ID;
+  const readonly = isConnectionFormReadOnly(formState, connectionInfoAuthResource.data?.authModel);
 
   useFormValidator(formState.validationTask, formRef.current);
   const { credentialsSavingEnabled } = useAdministrationSettings();

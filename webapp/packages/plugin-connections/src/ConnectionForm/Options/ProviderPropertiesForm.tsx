@@ -7,7 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { Container,  GroupTitle, ObjectPropertyInfoForm, useObjectPropertyCategories, useTranslate } from '@cloudbeaver/core-blocks';
+import { Container, GroupTitle, ObjectPropertyInfoForm, useObjectPropertyCategories, useTranslate } from '@cloudbeaver/core-blocks';
 import { type DriverPropertyInfoFragment, getObjectPropertyType } from '@cloudbeaver/core-sdk';
 import type { IFormState } from '@cloudbeaver/core-ui';
 import type { IConnectionFormState } from '../IConnectionFormState.js';
@@ -37,7 +37,7 @@ export const ProviderPropertiesForm = observer<Props>(function ProviderPropertie
   const nonBooleanProperties = supportedProperties.filter(property => !property.category && property.dataType !== 'Boolean');
 
   return (
-    <div className="tw:flex tw:flex-col tw:gap-4">
+    <section className="tw:flex tw:min-w-0 tw:flex-col tw:gap-4">
       {isUncategorizedExists && (
         <>
           <GroupTitle>{translate('ui_settings')}</GroupTitle>
@@ -84,7 +84,7 @@ export const ProviderPropertiesForm = observer<Props>(function ProviderPropertie
           </Container>
         </Container>
       ))}
-    </div>
+    </section>
   );
 });
 
