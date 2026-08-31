@@ -422,11 +422,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         List<SMUserProvisioning> importedUsers = new ArrayList<>();
         Set<String> seen = new HashSet<>();
         for (SMUserProvisioning user : users) {
-            Map<String, String> metaParameters = user.getMetaParameters();
-            String effectiveUserId = user.getUserId();
-            if (CommonUtils.isNotEmpty(metaParameters.get(SMStandardMeta.META_USER_ID))) {
-                effectiveUserId = metaParameters.get(SMStandardMeta.META_USER_ID);
-            }
+            String effectiveUserId = extractUserId(user);
             String effectiveUserIdLowerCase = effectiveUserId.toLowerCase();
             if (seen.contains(effectiveUserIdLowerCase)) {
                 log.warn("Skipping duplicate user (case-insensitive): " + effectiveUserId);
@@ -435,10 +431,9 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
             seen.add(effectiveUserIdLowerCase);
 
             String authRole = user.getAuthRole() == null ? userImportList.getAuthRole() : user.getAuthRole();
-            String userId = effectiveUserId;
             String targetUserId = null;
             boolean subjectConflict = false;
-            for (String possibleUserId : List.of(userId, userId.toLowerCase())) {
+            for (String possibleUserId : List.of(effectiveUserId, effectiveUserId.toLowerCase())) {
                 if (isSubjectExists(possibleUserId)) {
                     if (getSubjectType(possibleUserId) == SMSubjectType.team) {
                         log.error("Cannot import user '%s': a team with this name already exists.".formatted(possibleUserId));
@@ -456,8 +451,8 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                 continue;
             }
             if (targetUserId == null) {
-                targetUserId = userId.toLowerCase();
-                insertUser(connection, targetUserId, metaParameters, true, authRole);
+                targetUserId = effectiveUserId.toLowerCase();
+                insertUser(connection, targetUserId, user.getMetaParameters(), true, authRole);
                 importedUsers.add(user);
             }
             if (CommonUtils.isNotEmpty(userImportList.getAuthProviderId())) {
@@ -511,11 +506,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         try (Connection connection = database.openConnection();
              JDBCTransaction transaction = new JDBCTransaction(connection)) {
             for (SMUserProvisioning user : userImportList.getUsers()) {
-                String userId = user.getUserId();
-                String metaUserId = user.getMetaParameters().get(SMStandardMeta.META_USER_ID);
-                if (CommonUtils.isNotEmpty(metaUserId)) {
-                    userId = metaUserId;
-                }
+                String userId = extractUserId(user);
                 String existingUserId = null;
                 for (String possibleUserId : List.of(userId, userId.toLowerCase())) {
                     if (isSubjectExists(possibleUserId) && getSubjectType(possibleUserId) == SMSubjectType.user) {
@@ -532,6 +523,15 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         } catch (SQLException e) {
             throw new DBCException("Error linking provisioned auth provider", e);
         }
+    }
+
+    @NotNull
+    private String extractUserId(SMUserProvisioning user) {
+        String metaUserId = user.getMetaParameters().get(SMStandardMeta.META_USER_ID);
+        if (CommonUtils.isNotEmpty(metaUserId)) {
+            return metaUserId;
+        }
+        return user.getUserId();
     }
 
     @Override
