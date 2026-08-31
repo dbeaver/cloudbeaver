@@ -8,19 +8,19 @@
 import { observer } from 'mobx-react-lite';
 
 import { Container, Group, GroupTitle, Loader, s, Translate, useS } from '@cloudbeaver/core-blocks';
-import type { IFormState } from '@cloudbeaver/core-ui';
+import { useService } from '@cloudbeaver/core-di';
 
 import { AdministrationUserForm } from '../UserForm/AdministrationUserForm.js';
-import type { IUserFormState } from '../UserForm/AdministrationUserFormService.js';
 import style from './CreateUser.module.css';
+import { CreateUserService } from './CreateUserService.js';
 
-interface Props {
-  state: IFormState<IUserFormState>;
-  onCancel: () => void;
-}
-
-export const CreateUser = observer<Props>(function CreateUser({ state, onCancel }) {
+export const CreateUser = observer(function CreateUser() {
   const styles = useS(style);
+  const createUserService = useService(CreateUserService);
+
+  if (!createUserService.state) {
+    return null;
+  }
 
   return (
     <Group aria-labelledby="create-user-title" className={s(styles, { box: true })} gap vertical noWrap>
@@ -29,7 +29,7 @@ export const CreateUser = observer<Props>(function CreateUser({ state, onCancel 
       </GroupTitle>
       <Container overflow vertical>
         <Loader suspense>
-          <AdministrationUserForm state={state} onClose={onCancel} />
+          <AdministrationUserForm state={createUserService.state} onClose={createUserService.cancelCreate} />
         </Loader>
       </Container>
     </Group>

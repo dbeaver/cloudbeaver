@@ -1,11 +1,10 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { AdministrationScreenService } from '@cloudbeaver/core-administration';
 import { AUTH_PROVIDER_LOCAL_ID, AuthProvidersResource } from '@cloudbeaver/core-authentication';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CachedMapAllKey, getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
@@ -13,7 +12,6 @@ import { ACTION_CREATE, ACTION_REFRESH, ActionService, menuExtractItems, MenuSer
 
 import { AdministrationUsersManagementService } from '../../../AdministrationUsersManagementService.js';
 import { MENU_USERS_ADMINISTRATION } from '../../../Menus/MENU_USERS_ADMINISTRATION.js';
-import { ADMINISTRATION_ITEM_USER_CREATE_PARAM } from '../ADMINISTRATION_ITEM_USER_CREATE_PARAM.js';
 import { CreateUserService } from './CreateUserService.js';
 import { DATA_CONTEXT_USERS_ADMINISTRATION_ACTIONS } from './DATA_CONTEXT_USERS_ADMINISTRATION_ACTIONS.js';
 
@@ -23,7 +21,6 @@ import { DATA_CONTEXT_USERS_ADMINISTRATION_ACTIONS } from './DATA_CONTEXT_USERS_
   MenuService,
   ActionService,
   AdministrationUsersManagementService,
-  AdministrationScreenService,
 ])
 export class CreateUserBootstrap extends Bootstrap {
   constructor(
@@ -32,7 +29,6 @@ export class CreateUserBootstrap extends Bootstrap {
     private readonly menuService: MenuService,
     private readonly actionService: ActionService,
     private readonly administrationUsersManagementService: AdministrationUsersManagementService,
-    private readonly administrationScreenService: AdministrationScreenService,
   ) {
     super();
   }
@@ -62,7 +58,7 @@ export class CreateUserBootstrap extends Bootstrap {
       },
       isDisabled: (context, action) => {
         if (action === ACTION_CREATE) {
-          return this.administrationScreenService.activeScreen?.param === ADMINISTRATION_ITEM_USER_CREATE_PARAM && !!this.createUserService.state;
+          return !!this.createUserService.state;
         }
 
         return false;
