@@ -377,7 +377,7 @@ public class WebSQLDataUpdater extends DBDResultSetDataUpdater<WebSQLDataStateme
     @Override
     protected DBDDataReceiver getKeyReceiver(@NotNull DBDDataStatementInfo statement) {
         if (statement instanceof WebSQLDataStatementInfo webStatement) {
-            return new KeyDataReceiver(model.getAttributes(), webStatement.getFinalRow());
+            return new KeyDataReceiver(model.getAttributes(), webStatement);
         }
         return null;
     }
