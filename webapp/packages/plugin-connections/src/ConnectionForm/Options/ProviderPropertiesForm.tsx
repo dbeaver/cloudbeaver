@@ -7,7 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { Container, Expandable, GroupTitle, ObjectPropertyInfoForm, useObjectPropertyCategories, useTranslate } from '@cloudbeaver/core-blocks';
+import { Container,  GroupTitle, ObjectPropertyInfoForm, useObjectPropertyCategories, useTranslate } from '@cloudbeaver/core-blocks';
 import { type DriverPropertyInfoFragment, getObjectPropertyType } from '@cloudbeaver/core-sdk';
 import type { IFormState } from '@cloudbeaver/core-ui';
 import type { IConnectionFormState } from '../IConnectionFormState.js';
