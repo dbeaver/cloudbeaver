@@ -83,6 +83,7 @@ For a focused check, use a package's existing script, for example `yarn workspac
 - Before backend work, read and follow `../dbeaver/AGENTS.md` for inherited Java and Tycho conventions.
 - Cloudbeaver does not use SWT or Eclipse RCP, and its backend is headless.
 - Configuration file is generated using `apps/config-generator`. For making changes there, update `config/template/cloudbeaver-base.conf` or use patches (for specific product parameters).
+- The backend must support at least the following databases: PostgreSQL, MySQL, Oracle, and SQL Server. Support for additional databases is optional.
 
 ### GraphQL API
 
