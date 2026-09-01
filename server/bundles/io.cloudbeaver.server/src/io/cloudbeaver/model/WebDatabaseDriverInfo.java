@@ -217,6 +217,7 @@ public class WebDatabaseDriverInfo {
     }
 
     @Property
+    @NotNull
     public String[] getApplicableAuthModels() {
         return DataSourceProviderRegistry.getInstance().getApplicableAuthModels(driver).stream()
             .filter(s -> !s.isDesktopModel())
