@@ -8,16 +8,15 @@ Bundle-Release-Date: 20260921
 Bundle-RequiredExecutionEnvironment: JavaSE-21
 Bundle-ActivationPolicy: lazy
 Require-Bundle: org.jkiss.dbeaver.data.gis;visibility:=reexport,
- org.jkiss.dbeaver.model;visibility:=reexport,
  org.jkiss.dbeaver.model.sm;visibility:=reexport,
  org.jkiss.dbeaver.model.event;visibility:=reexport,
  org.jkiss.dbeaver.model.nio;visibility:=reexport,
  org.jkiss.dbeaver.registry;visibility:=reexport,
- org.jkiss.dbeaver.net.ssh,
+ org.jkiss.dbeaver.net.ssh;visibility:=reexport,
  org.jkiss.bundle.logback;visibility:=reexport,
  org.jkiss.bundle.graphql;visibility:=reexport,
  org.jkiss.bundle.apache.dbcp,
- jakarta.servlet-api;bundle-version:="6.0.0";visibility:=reexport
+ jakarta.servlet-api;visibility:=reexport
 Export-Package: io.cloudbeaver,
  io.cloudbeaver.auth,
  io.cloudbeaver.auth.provider,

@@ -8,6 +8,5 @@ Bundle-Release-Date: 20260921
 Bundle-RequiredExecutionEnvironment: JavaSE-21
 Bundle-ActivationPolicy: lazy
 Require-Bundle: io.cloudbeaver.server.ce,
- org.jkiss.dbeaver.data.transfer,
- org.jkiss.dbeaver.registry
+ org.jkiss.dbeaver.data.transfer
 Automatic-Module-Name: io.cloudbeaver.service.data.transfer
