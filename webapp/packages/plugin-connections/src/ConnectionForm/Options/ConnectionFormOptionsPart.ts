@@ -33,7 +33,7 @@ import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dial
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { action, computed, makeObservable, observable, reaction, toJS } from 'mobx';
-import { getUniqueName } from '@cloudbeaver/core-utils';
+import { getUniqueName, trimObjectValues } from '@cloudbeaver/core-utils';
 import { getObjectPropertyDefaults } from '@cloudbeaver/core-blocks';
 import { isNotNullDefined } from '@dbeaver/js-helpers';
 import { parseJdbcUri } from '@dbeaver/jdbc-uri-parser';
@@ -440,11 +440,11 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     this.state.description = this.state.description?.trim();
     this.state.url = this.state.url?.trim();
 
-    formatDynamicProperties(this.state.credentials);
-    formatDynamicProperties(this.state.properties);
-    formatDynamicProperties(this.state.providerProperties);
-    formatDynamicProperties(this.state.mainPropertyValues);
-    formatDynamicProperties(this.state.expertSettingsValues);
+    trimObjectValues(this.state.credentials);
+    trimObjectValues(this.state.properties);
+    trimObjectValues(this.state.providerProperties);
+    trimObjectValues(this.state.mainPropertyValues);
+    trimObjectValues(this.state.expertSettingsValues);
   }
 
   private async getConnectionAuthModelProperties(authModelId: string, connectionInfo?: ConnectionInfoAuthProperties): Promise<IObjectPropertyInfo[]> {
@@ -595,18 +595,6 @@ function prepareDynamicProperties(
   }
 
   return result;
-}
-
-function formatDynamicProperties(properties: Record<string, any> | undefined): void {
-  if (!properties) {
-    return;
-  }
-
-  for (const key of Object.keys(properties)) {
-    if (typeof properties[key] === 'string') {
-      properties[key] = properties[key].trim();
-    }
-  }
 }
 
 function applyDriverDefaults(config: IConnectionFormOptionsState, driver: DBDriver, prevDriver?: DBDriver): void {

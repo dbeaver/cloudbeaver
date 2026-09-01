@@ -14,6 +14,7 @@ import { getSSLDriverHandler } from './getSSLDriverHandler.js';
 import { ConnectionInfoNetworkHandlersResource, type DBDriverResource } from '@cloudbeaver/core-connections';
 import { type INetworkHandlerConfig, type NetworkHandlerResource } from '@cloudbeaver/plugin-network-handlers';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
+import { trimObjectValues } from '@cloudbeaver/core-utils';
 import { makeObservable, observable, toJS } from 'mobx';
 import { ConnectionFormOptionsPart, PROPERTY_FEATURE_SECURED, type IConnectionFormState } from '@cloudbeaver/plugin-connections';
 import { SSL_CODE_NAME } from './SSL_CODE_NAME.js';
@@ -183,15 +184,7 @@ function trimSSLConfig(input: INetworkHandlerConfig): INetworkHandlerConfig {
     return input;
   }
 
-  if (!Object.keys(secureProperties).length) {
-    return input;
-  }
-
-  for (const key in secureProperties) {
-    if (typeof secureProperties[key] === 'string') {
-      secureProperties[key] = secureProperties[key]?.trim();
-    }
-  }
+  trimObjectValues(secureProperties);
 
   return input;
 }

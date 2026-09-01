@@ -7,6 +7,7 @@
  */
 import { SSH_TUNNEL_ID } from '../NetworkHandlerResource.js';
 import { NetworkHandlerAuthType, type NetworkHandlerConfigInput } from '@cloudbeaver/core-sdk';
+import { trimObjectValues } from '@cloudbeaver/core-utils';
 import { toJS } from 'mobx';
 
 export const SSH_DEFAULT_HANDLER_CONFIG: () => NetworkHandlerConfigInput = () => ({
@@ -65,19 +66,12 @@ export function getSSHHandlerConfig(
 
 export function trimSSHConfig(input: NetworkHandlerConfigInput): NetworkHandlerConfigInput {
   const trimmedInput = toJS(input);
-  const attributesToTrim = Object.keys(input) as (keyof NetworkHandlerConfigInput)[];
-
-  for (const key of attributesToTrim) {
-    if (typeof trimmedInput[key] === 'string') {
-      trimmedInput[key] = trimmedInput[key]?.trim();
-    }
-  }
-
-  for (const key in (trimmedInput.properties ?? {})) {
-    if (typeof trimmedInput.properties[key] === 'string') {
-      trimmedInput.properties[key] = trimmedInput.properties[key]?.trim();
-    }
-  }
+  trimObjectValues(trimmedInput);
+  trimObjectValues(trimmedInput.properties);
 
   return trimmedInput;
+}
+
+export function trimSSHConfigInConfigurations(configurations: NetworkHandlerConfigInput[]): NetworkHandlerConfigInput[] {
+  return configurations.map(config => (config.id === SSH_TUNNEL_ID ? trimSSHConfig(config) : config));
 }

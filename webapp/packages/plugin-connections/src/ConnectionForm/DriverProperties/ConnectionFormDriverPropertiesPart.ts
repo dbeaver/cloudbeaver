@@ -11,7 +11,7 @@ import { ConnectionInfoPropertiesResource, ConnectionInfoResource } from '@cloud
 import type { IConnectionFormState } from '../IConnectionFormState.js';
 import { runInAction, toJS } from 'mobx';
 import type { ConnectionFormOptionsPart } from '../Options/ConnectionFormOptionsPart.js';
-import type { schema } from '@cloudbeaver/core-utils';
+import { type schema, trimObjectValues } from '@cloudbeaver/core-utils';
 import { getObjectPropertyDefaultValue, getObjectPropertyOptionValue, getObjectPropertyValue } from '@cloudbeaver/core-sdk';
 import type { CONNECTION_PROPERTIES_SCHEMA } from '../CONNECTION_CONFIG_SCHEMA.js';
 
@@ -74,20 +74,10 @@ export class ConnectionFormDriverPropertiesPart extends FormPart<ConnectionPrope
     contexts: IExecutionContextProvider<IFormState<IConnectionFormState>>,
   ): Promise<void> {}
 
-  protected override async format(
-    data: IFormState<IConnectionFormState>,
-    contexts: IExecutionContextProvider<IFormState<IConnectionFormState>>,
-  ): Promise<void> {
+  protected override format(): void {
     runInAction(() => {
-      for (const key of Object.keys(this.state!)) {
-        if (typeof this.state[key] === 'string') {
-          this.state[key] = this.state[key].trim();
-        }
-
-        if (typeof this.optionsPart.state.properties?.[key] === 'string') {
-          this.optionsPart.state.properties[key] = this.optionsPart.state.properties[key].trim();
-        }
-      }
+      trimObjectValues(this.state);
+      trimObjectValues(this.optionsPart.state.properties);
     });
   }
 
@@ -104,9 +94,10 @@ export class ConnectionFormDriverPropertiesPart extends FormPart<ConnectionPrope
 
     const properties = await this.connectionInfoResource.getConnectionDriverProperties(this.formState.state.projectId, this.optionsPart.state);
 
-    /* Default property values must not be returned. If they are included in the request, the backend will send them back with modified values (e.g., null converted to an empty string).
-    To avoid this behavior, only properties that were explicitly changed should be sent. Any properties that still contain default values must be removed from the object before sending the request
-    */
+    /*
+     * Default property values must not be returned. If they are included in the request, the backend will send them back with
+     * modified values (e.g., null converted to an empty string). Only explicitly changed properties should be sent.
+     */
     for (const [key, value] of Object.entries(config)) {
       const property = properties?.find(property => property.id === key);
       if (property && value === getObjectPropertyOptionValue(property.defaultValue)) {
