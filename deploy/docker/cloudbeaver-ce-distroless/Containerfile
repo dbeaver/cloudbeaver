@@ -1,21 +1,20 @@
-FROM eclipse-temurin:25-jdk-noble AS launcher
+FROM eclipse-temurin:25-jdk-noble AS builder
 
-COPY cloudbeaver /opt/cloudbeaver
-COPY scripts/CloudBeaverLauncher.java /opt/cloudbeaver/CloudBeaverLauncher.java
-WORKDIR /opt/cloudbeaver
-RUN javac --release 25 CloudBeaverLauncher.java && \
-    rm CloudBeaverLauncher.java && \
-    mkdir -p workspace/GlobalConfiguration/.dbeaver && \
-    cp conf/initial-data-sources.conf workspace/GlobalConfiguration/.dbeaver/data-sources.json
+COPY scripts/CloudBeaverLauncher.java /CloudBeaverLauncher.java
+RUN javac --release 25 CloudBeaverLauncher.java
 
+### Actual image start here
 FROM gcr.io/distroless/java25-debian13:nonroot
 
 LABEL org.opencontainers.image.authors="DBeaver Corp, devops@dbeaver.com"
 
-COPY --from=launcher --chown=8978:8978 /opt/cloudbeaver /opt/cloudbeaver
-
-EXPOSE 8978
-WORKDIR /opt/cloudbeaver
+COPY --chown=8978:8978 cloudbeaver /opt/cloudbeaver
+COPY --from=builder --chown=8978:8978 /CloudBeaverLauncher.class /opt/cloudbeaver/launcher/
 USER 8978:8978
+WORKDIR /opt/cloudbeaver
+EXPOSE 8978
 
-ENTRYPOINT ["/usr/bin/java", "-cp", "/opt/cloudbeaver", "CloudBeaverLauncher"]
+# UID 8978 has no passwd entry in distroless, so set a writable home for both the launcher and server JVMs.
+ENV HOME=/opt/cloudbeaver
+ENV JAVA_TOOL_OPTIONS="-Duser.home=/opt/cloudbeaver"
+ENTRYPOINT ["/usr/bin/java", "-cp", "/opt/cloudbeaver/launcher", "CloudBeaverLauncher"]
