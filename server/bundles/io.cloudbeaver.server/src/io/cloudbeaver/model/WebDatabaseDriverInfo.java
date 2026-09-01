@@ -210,6 +210,13 @@ public class WebDatabaseDriverInfo {
     }
 
     @Property
+    public boolean getSupportsFederatedConfiguration() {
+        return CommonUtils.toBoolean(
+            driver.getDriverParameter(DBConstants.DRIVER_PARAM_SUPPORTS_FEDERATED_CONFIGURATION)
+        );
+    }
+
+    @Property
     public String[] getApplicableAuthModels() {
         return DataSourceProviderRegistry.getInstance().getApplicableAuthModels(driver).stream()
             .filter(s -> !s.isDesktopModel())
