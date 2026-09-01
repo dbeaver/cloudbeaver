@@ -12,9 +12,10 @@ FROM gcr.io/distroless/java25-debian13:nonroot
 
 LABEL org.opencontainers.image.authors="DBeaver Corp, devops@dbeaver.com"
 
-COPY --from=launcher --chown=nonroot:nonroot /opt/cloudbeaver /opt/cloudbeaver
+COPY --from=launcher --chown=8978:8978 /opt/cloudbeaver /opt/cloudbeaver
 
 EXPOSE 8978
 WORKDIR /opt/cloudbeaver
+USER 8978:8978
 
 ENTRYPOINT ["/usr/bin/java", "-cp", "/opt/cloudbeaver", "CloudBeaverLauncher"]
