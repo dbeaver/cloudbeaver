@@ -12,7 +12,7 @@ import { Translate, useResource } from '@cloudbeaver/core-blocks';
 import { DBDriverResource } from '@cloudbeaver/core-connections';
 import { NetworkHandlerResource } from '@cloudbeaver/plugin-network-handlers';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
-import { Tab, type TabContainerTabComponent, TabTitle, useTab } from '@cloudbeaver/core-ui';
+import { Tab, type TabContainerTabComponent, TabIcon, TabTitle, useTab } from '@cloudbeaver/core-ui';
 
 import { getSSLDriverHandler } from './getSSLDriverHandler.js';
 import { getConnectionFormOptionsPart, type IConnectionFormProps } from '@cloudbeaver/plugin-connections';
@@ -33,6 +33,7 @@ export const SSLTab: TabContainerTabComponent<IConnectionFormProps> = observer(f
 
   return (
     <Tab {...props} title={handler.description}>
+      <TabIcon icon="/icons/plugin_connection_padlock.svg" viewBox="0 0 16 16" />
       <TabTitle>
         <Translate token={handler.label} />
       </TabTitle>
