@@ -53,14 +53,9 @@ Welcome! Follow these steps to install and run the frontend dev server.
 
    Start the backend server by running the launcher.
 
-   *For macOS/Linux:*
+   *For all platforms:*
    ```bash
    java CloudBeaverLauncher.java
-   ```
-
-   *For Windows:*
-   ```bash
-   ./run-cloudbeaver-server.bat
    ```
 
 4. **Navigate to the Webapp Directory**

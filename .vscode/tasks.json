@@ -91,12 +91,7 @@
     {
       "label": "Run Backend CE",
       "type": "shell",
-      "windows": {
-        "command": "./run-cloudbeaver-server.bat"
-      },
-      "osx": {
-        "command": "java CloudBeaverLauncher.java"
-      },
+      "command": "java CloudBeaverLauncher.java",
       "options": {
         "cwd": "${workspaceFolder}/deploy/cloudbeaver"
       }
