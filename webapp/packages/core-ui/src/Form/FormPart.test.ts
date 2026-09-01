@@ -7,13 +7,10 @@
  */
 import { describe, expect, it } from 'vitest';
 
-import type { IServiceProvider } from '@cloudbeaver/core-di';
-import { ExecutorHandlersCollection, ExecutorInterrupter } from '@cloudbeaver/core-executor';
+import { Executor, ExecutorInterrupter, type IExecutionContextProvider, type IExecutor } from '@cloudbeaver/core-executor';
 import { schema } from '@cloudbeaver/core-utils';
 
-import type { FormBaseService } from './FormBaseService.js';
 import { FormPart } from './FormPart.js';
-import { FormState } from './FormState.js';
 import type { IFormState } from './IFormState.js';
 import { formValidationContext } from './formValidationContext.js';
 
@@ -23,13 +20,62 @@ interface TestFormPartOptions {
   schema?: schema.ZodType<{ value: string }>;
 }
 
+class TestFormState {
+  readonly loadedTask: IExecutor<IFormState<null>>;
+  readonly submitTask: IExecutor<IFormState<null>>;
+  readonly prepareTask: IExecutor<IFormState<null>>;
+  readonly formatTask: IExecutor<IFormState<null>>;
+  readonly validationTask: IExecutor<IFormState<null>>;
+  savingPromise: Promise<IExecutionContextProvider<IFormState<null>>> | null;
+
+  constructor() {
+    const data = this.asFormState();
+
+    this.savingPromise = null;
+    this.loadedTask = new Executor(data, () => true);
+    this.prepareTask = new Executor(data, () => true);
+    this.formatTask = new Executor(data, () => true);
+    this.formatTask.before(this.prepareTask);
+
+    this.validationTask = new Executor(data, () => true);
+    this.validationTask.before(this.formatTask);
+    this.validationTask.addPostHandler((formState, contexts) => {
+      if (!contexts.getContext(formValidationContext).valid) {
+        ExecutorInterrupter.interrupt(contexts);
+      }
+    });
+
+    this.submitTask = new Executor(data, () => true);
+    this.submitTask.before(this.validationTask);
+  }
+
+  async save(): Promise<boolean> {
+    const data = this.asFormState();
+
+    try {
+      this.savingPromise = this.submitTask.execute(data);
+      const context = await this.savingPromise;
+
+      return !ExecutorInterrupter.isInterrupted(context);
+    } catch {
+      return false;
+    } finally {
+      this.savingPromise = null;
+    }
+  }
+
+  asFormState(): IFormState<null> {
+    return this as unknown as IFormState<null>;
+  }
+}
+
 class TestFormPart extends FormPart<{ value: string }> {
   constructor(
-    formState: FormState<null>,
+    formState: TestFormState,
     private readonly calls: string[],
     private readonly options: TestFormPartOptions = {},
   ) {
-    super(formState, { value: '' }, options.schema ?? null);
+    super(formState.asFormState(), { value: '' }, options.schema ?? null);
   }
 
   protected override async loader(): Promise<void> {
@@ -59,24 +105,8 @@ class TestFormPart extends FormPart<{ value: string }> {
   }
 }
 
-function createFormState(): FormState<null> {
-  const onValidate = new ExecutorHandlersCollection<IFormState<null>>();
-  onValidate.addPostHandler((data, contexts) => {
-    if (!contexts.getContext(formValidationContext).valid) {
-      ExecutorInterrupter.interrupt(contexts);
-    }
-  });
-
-  const service = {
-    onState: new ExecutorHandlersCollection<null>(),
-    onLoaded: new ExecutorHandlersCollection<IFormState<null>>(),
-    onPrepare: new ExecutorHandlersCollection<IFormState<null>>(),
-    onFormat: new ExecutorHandlersCollection<IFormState<null>>(),
-    onValidate,
-    onSubmit: new ExecutorHandlersCollection<IFormState<null>>(),
-  } as unknown as FormBaseService<null>;
-
-  return new FormState<null>({} as IServiceProvider, service, null);
+function createFormState(): TestFormState {
+  return new TestFormState();
 }
 
 describe('FormPart', () => {
@@ -109,7 +139,7 @@ describe('FormPart', () => {
     await part.load();
     calls.length = 0;
 
-    await formState.formatTask.execute(formState);
+    await formState.formatTask.execute(formState.asFormState());
 
     expect(calls).toEqual(['prepare']);
   });
@@ -122,7 +152,7 @@ describe('FormPart', () => {
     calls.length = 0;
     part.state.value = 'changed';
 
-    await formState.validationTask.execute(formState);
+    await formState.validationTask.execute(formState.asFormState());
 
     expect(calls).toEqual(['prepare', 'format', 'validate']);
   });
@@ -166,7 +196,7 @@ describe('FormPart', () => {
     await part.load();
     calls.length = 0;
 
-    const contexts = await formState.validationTask.execute(formState);
+    const contexts = await formState.validationTask.execute(formState.asFormState());
 
     expect(contexts.getContext(formValidationContext).valid).toBe(false);
     expect(calls).toEqual(['prepare']);
