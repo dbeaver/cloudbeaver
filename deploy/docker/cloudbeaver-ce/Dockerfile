@@ -11,11 +11,14 @@ RUN groupadd -g $DBEAVER_GID dbeaver && \
 
 COPY cloudbeaver /opt/cloudbeaver
 COPY scripts/launch-product.sh /opt/cloudbeaver/launch-product.sh
+COPY scripts/CloudBeaverLauncher.java /opt/cloudbeaver/CloudBeaverLauncher.java
 
 EXPOSE 8978
 RUN find /opt/cloudbeaver -type d -exec chmod 775 {} \;
 WORKDIR /opt/cloudbeaver/
 
-RUN chmod +x "run-cloudbeaver-server.sh" "/opt/cloudbeaver/launch-product.sh"
+RUN javac --release 25 CloudBeaverLauncher.java && \
+    rm CloudBeaverLauncher.java && \
+    chmod +x "/opt/cloudbeaver/launch-product.sh"
 
 ENTRYPOINT ["./launch-product.sh"]

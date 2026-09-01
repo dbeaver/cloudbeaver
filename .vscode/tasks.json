@@ -95,7 +95,7 @@
         "command": "./run-cloudbeaver-server.bat"
       },
       "osx": {
-        "command": "./run-cloudbeaver-server.sh"
+        "command": "java CloudBeaverLauncher.java"
       },
       "options": {
         "cwd": "${workspaceFolder}/deploy/cloudbeaver"
