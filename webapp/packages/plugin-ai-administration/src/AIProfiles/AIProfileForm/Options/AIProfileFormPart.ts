@@ -9,7 +9,7 @@ import { runInAction } from 'mobx';
 
 import { FormMode, FormPart, type IFormState } from '@cloudbeaver/core-ui';
 import type { AiEngineConfig } from '@cloudbeaver/core-sdk';
-import { getUniqueName } from '@cloudbeaver/core-utils';
+import { getUniqueName, trimObjectValues } from '@cloudbeaver/core-utils';
 
 import { AIEnginePropertiesResource } from '../../AIEnginePropertiesResource.js';
 import { type AIAdminProfile, type AIProfileInput, AIProfilesResource } from '../../AIProfilesResource.js';
@@ -90,13 +90,7 @@ export class AIProfileFormPart extends FormPart<IAIProfileOptionsState, IAIProfi
       this.state.name = getUniqueName(this.state.name, profileNames);
     }
 
-    for (const key of Object.keys(this.state.properties)) {
-      const value = this.state.properties[key];
-
-      if (typeof value === 'string') {
-        this.state.properties[key] = value.trim();
-      }
-    }
+    trimObjectValues(this.state.properties);
   }
 
   private getConfig(): AIProfileInput {
