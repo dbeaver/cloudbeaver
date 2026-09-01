@@ -21,7 +21,7 @@ const panelGetter = () => CreateTeam;
 
 @injectable(() => [IServiceProvider, TeamsAdministrationFormService, OptionsPanelService, CommonDialogService])
 export class CreateTeamService {
-  data: TeamsAdministrationFormState | null;
+  formState: TeamsAdministrationFormState | null;
 
   constructor(
     private readonly serviceProvider: IServiceProvider,
@@ -29,12 +29,12 @@ export class CreateTeamService {
     private readonly optionsPanelService: OptionsPanelService,
     private readonly commonDialogService: CommonDialogService,
   ) {
-    this.data = null;
+    this.formState = null;
 
     this.optionsPanelService.closeTask.addHandler(this.closeHandler);
 
     makeObservable(this, {
-      data: observable,
+      formState: observable,
       cancelCreate: action.bound,
       create: action.bound,
     });
@@ -42,6 +42,7 @@ export class CreateTeamService {
 
   async cancelCreate(): Promise<void> {
     await this.optionsPanelService.close();
+    await this.dispose();
   }
 
   async create(): Promise<void> {
@@ -52,16 +53,16 @@ export class CreateTeamService {
     const opened = await this.optionsPanelService.open(panelGetter);
 
     if (opened) {
-      this.dispose();
-      this.data = new TeamsAdministrationFormState(this.serviceProvider, this.service, {
+      await this.dispose();
+      this.formState = new TeamsAdministrationFormState(this.serviceProvider, this.service, {
         teamId: null,
       });
     }
   }
 
-  dispose(): void {
-    this.data?.dispose();
-    this.data = null;
+  async dispose(): Promise<void> {
+    await this.formState?.dispose();
+    this.formState = null;
   }
 
   private readonly closeHandler: IExecutorHandler<OptionsPanelCloseEventData> = async (data, contexts) => {
@@ -69,7 +70,7 @@ export class CreateTeamService {
       return;
     }
 
-    if (this.data?.isChanged) {
+    if (this.formState?.isChanged) {
       const { status } = await this.commonDialogService.open(ConfirmationDialog, {
         title: 'ui_discard_changes',
         message: 'ui_discard_changes_message',
@@ -83,6 +84,6 @@ export class CreateTeamService {
       }
     }
 
-    this.dispose();
+    await this.dispose();
   };
 }

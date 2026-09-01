@@ -25,7 +25,7 @@ export interface IToolsContainerProps {
 
 @injectable(() => [IServiceProvider, AdministrationUserFormService, OptionsPanelService, CommonDialogService])
 export class CreateUserService {
-  state: AdministrationUserFormState | null;
+  formState: AdministrationUserFormState | null;
   readonly toolsContainer: PlaceholderContainer<IToolsContainerProps>;
 
   constructor(
@@ -35,12 +35,12 @@ export class CreateUserService {
     private readonly commonDialogService: CommonDialogService,
   ) {
     this.toolsContainer = new PlaceholderContainer();
-    this.state = null;
+    this.formState = null;
 
     this.optionsPanelService.closeTask.addHandler(this.closeHandler);
 
     makeObservable(this, {
-      state: observable,
+      formState: observable,
       cancelCreate: action.bound,
       create: action.bound,
     });
@@ -48,6 +48,7 @@ export class CreateUserService {
 
   async cancelCreate(): Promise<void> {
     await this.optionsPanelService.close();
+    await this.dispose();
   }
 
   async create(): Promise<void> {
@@ -58,14 +59,14 @@ export class CreateUserService {
     const opened = await this.optionsPanelService.open(panelGetter);
 
     if (opened) {
-      this.clearUserTemplate();
-      this.state = new AdministrationUserFormState(this.serviceProvider, this.administrationUserFormService, { userId: null });
+      await this.dispose();
+      this.formState = new AdministrationUserFormState(this.serviceProvider, this.administrationUserFormService, { userId: null });
     }
   }
 
-  clearUserTemplate(): void {
-    this.state?.dispose();
-    this.state = null;
+  async dispose(): Promise<void> {
+    await this.formState?.dispose();
+    this.formState = null;
   }
 
   private readonly closeHandler: IExecutorHandler<OptionsPanelCloseEventData> = async (data, contexts) => {
@@ -73,7 +74,7 @@ export class CreateUserService {
       return;
     }
 
-    if (this.state?.isChanged) {
+    if (this.formState?.isChanged) {
       const { status } = await this.commonDialogService.open(ConfirmationDialog, {
         title: 'ui_discard_changes',
         message: 'ui_discard_changes_message',
@@ -87,6 +88,6 @@ export class CreateUserService {
       }
     }
 
-    this.clearUserTemplate();
+    await this.dispose();
   };
 }

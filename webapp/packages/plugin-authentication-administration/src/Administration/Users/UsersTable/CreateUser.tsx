@@ -18,7 +18,7 @@ export const CreateUser = observer(function CreateUser() {
   const styles = useS(style);
   const createUserService = useService(CreateUserService);
 
-  if (!createUserService.state) {
+  if (!createUserService.formState) {
     return null;
   }
 
@@ -29,7 +29,7 @@ export const CreateUser = observer(function CreateUser() {
       </GroupTitle>
       <Container overflow vertical>
         <Loader suspense>
-          <AdministrationUserForm state={createUserService.state} onClose={createUserService.cancelCreate} />
+          <AdministrationUserForm state={createUserService.formState} onClose={createUserService.cancelCreate} />
         </Loader>
       </Container>
     </Group>

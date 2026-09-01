@@ -41,7 +41,7 @@ export const TeamsPage = observer<Props>(function TeamsPage() {
             title={translate('administration_teams_add_tooltip')}
             icon="add"
             viewBox="0 0 24 24"
-            disabled={!!service.data || table.processing}
+            disabled={!!service.formState || table.processing}
             onClick={service.create}
           >
             {translate('ui_create')}

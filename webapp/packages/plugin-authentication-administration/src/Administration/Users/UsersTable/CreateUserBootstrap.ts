@@ -58,7 +58,7 @@ export class CreateUserBootstrap extends Bootstrap {
       },
       isDisabled: (context, action) => {
         if (action === ACTION_CREATE) {
-          return !!this.createUserService.state;
+          return !!this.createUserService.formState;
         }
 
         return false;
