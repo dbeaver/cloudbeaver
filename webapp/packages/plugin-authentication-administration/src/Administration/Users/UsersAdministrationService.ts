@@ -74,11 +74,11 @@ export class UsersAdministrationService extends Bootstrap {
         },
         {
           name: EUsersAdministrationSub.Users,
-          onDeActivate: this.cancelUserCreate.bind(this),
+          onDeActivate: this.handleUsersDeactivate.bind(this),
         },
         {
           name: EUsersAdministrationSub.Teams,
-          onDeActivate: this.cancelTeamCreate.bind(this),
+          onDeActivate: this.handleTeamsDeactivate.bind(this),
         },
       ],
       defaultSub: EUsersAdministrationSub.Users,
@@ -89,13 +89,13 @@ export class UsersAdministrationService extends Bootstrap {
     this.actionButtonsPlaceholder.add(UsersTableFilterButton, 0);
   }
 
-  private cancelUserCreate(param: string | null, configurationWizard: boolean, outside: boolean) {
+  private handleUsersDeactivate(param: string | null, configurationWizard: boolean, outside: boolean) {
     if (outside) {
       this.usersResource.cleanNewFlags();
     }
   }
 
-  private cancelTeamCreate(param: string | null, configurationWizard: boolean, outside: boolean) {
+  private handleTeamsDeactivate(param: string | null, configurationWizard: boolean, outside: boolean) {
     if (outside) {
       this.teamsResource.cleanNewFlags();
     }

@@ -30,7 +30,7 @@ export const CreateTeam: React.FC = observer(function CreateTeam() {
       </GroupTitle>
       <Container overflow vertical>
         <Loader suspense>
-          <TeamForm state={service.formState} onCancel={service.cancelCreate} onSave={service.cancelCreate} />
+          <TeamForm state={service.formState} onCancel={service.cancelCreate} />
         </Loader>
       </Container>
     </Group>
