@@ -8,13 +8,13 @@
 import { describe, expect, it } from 'vitest';
 
 import type { IServiceProvider } from '@cloudbeaver/core-di';
-import type { NotificationService } from '@cloudbeaver/core-events';
-import type { LocalizationService } from '@cloudbeaver/core-localization';
+import { ExecutorHandlersCollection, ExecutorInterrupter } from '@cloudbeaver/core-executor';
 import { schema } from '@cloudbeaver/core-utils';
 
-import { FormBaseService } from './FormBaseService.js';
+import type { FormBaseService } from './FormBaseService.js';
 import { FormPart } from './FormPart.js';
 import { FormState } from './FormState.js';
+import type { IFormState } from './IFormState.js';
 import { formValidationContext } from './formValidationContext.js';
 
 interface TestFormPartOptions {
@@ -60,13 +60,21 @@ class TestFormPart extends FormPart<{ value: string }> {
 }
 
 function createFormState(): FormState<null> {
-  const localizationService = { translate: (value: string) => value };
-  const notificationService = { notify: () => undefined };
-  const service = new FormBaseService<null>(
-    localizationService as unknown as LocalizationService,
-    notificationService as unknown as NotificationService,
-    'test',
-  );
+  const onValidate = new ExecutorHandlersCollection<IFormState<null>>();
+  onValidate.addPostHandler((data, contexts) => {
+    if (!contexts.getContext(formValidationContext).valid) {
+      ExecutorInterrupter.interrupt(contexts);
+    }
+  });
+
+  const service = {
+    onState: new ExecutorHandlersCollection<null>(),
+    onLoaded: new ExecutorHandlersCollection<IFormState<null>>(),
+    onPrepare: new ExecutorHandlersCollection<IFormState<null>>(),
+    onFormat: new ExecutorHandlersCollection<IFormState<null>>(),
+    onValidate,
+    onSubmit: new ExecutorHandlersCollection<IFormState<null>>(),
+  } as unknown as FormBaseService<null>;
 
   return new FormState<null>({} as IServiceProvider, service, null);
 }
