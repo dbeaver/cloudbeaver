@@ -14,6 +14,7 @@ export const AI_PROFILE_NAME_MAX_LENGTH = 100;
 export const AIProfileSchema = schema.object({
   name: schema.string().min(AI_PROFILE_NAME_MIN_LENGTH).max(AI_PROFILE_NAME_MAX_LENGTH),
   engineId: schema.string().min(1),
+  global: schema.boolean(),
   properties: schema.record(schema.string(), schema.any()),
 });
 

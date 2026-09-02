@@ -8,7 +8,7 @@
 import { createDataContext, DATA_CONTEXT_DI_PROVIDER } from '@cloudbeaver/core-data-context';
 import type { IFormState } from '@cloudbeaver/core-ui';
 
-import { AIProfilesResource } from '../AIProfiles/AIProfilesResource.js';
+import { AIAdminProfilesResource } from '../AIProfiles/AIProfilesResource.js';
 import { AISettingsResource } from '../AISettingsResource.js';
 import { AdministrationAISettingsInfoPart } from './AdministrationAISettingsInfoPart.js';
 
@@ -20,7 +20,7 @@ export function getAdministrationAISettingsFormInfoPart(formState: IFormState<nu
   return formState.getPart(DATA_CONTEXT_ADMINISTRATION_AI_SETTINGS_FORM_INFO_PART, context => {
     const di = context.get(DATA_CONTEXT_DI_PROVIDER)!;
     const aiSettingsResource = di.getService(AISettingsResource);
-    const aiProfilesResource = di.getService(AIProfilesResource);
+    const aiProfilesResource = di.getService(AIAdminProfilesResource);
 
     return new AdministrationAISettingsInfoPart(formState, aiSettingsResource, aiProfilesResource);
   });

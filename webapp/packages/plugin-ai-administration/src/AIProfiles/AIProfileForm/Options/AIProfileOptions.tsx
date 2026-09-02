@@ -17,6 +17,8 @@ import {
   Group,
   GroupTitle,
   InputField,
+  Radio,
+  RadioGroup,
   Select,
   useAutoLoad,
   useExecutor,
@@ -28,7 +30,7 @@ import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import type { AiModelInfo } from '@cloudbeaver/core-sdk';
 import { FormMode, type TabContainerPanelComponent } from '@cloudbeaver/core-ui';
-import { AiEnginesResource } from '@cloudbeaver/plugin-ai';
+import { AiEnginesResource, requireGlobalProfileToken, supportsUserCredentials } from '@cloudbeaver/plugin-ai';
 
 import {
   AIEnginePropertiesResource,
@@ -36,7 +38,7 @@ import {
   MODEL_PROPERTY_ID,
   TEMPERATURE_PROPERTY_ID,
 } from '../../AIEnginePropertiesResource.js';
-import { AIProfilesResource } from '../../AIProfilesResource.js';
+import { AIAdminProfilesResource } from '../../AIProfilesResource.js';
 import type { IAIProfileFormProps } from '../IAIProfileFormProps.js';
 import { AIProfilePropertiesForm } from './AIProfilePropertiesForm.js';
 import { AI_PROFILE_NAME_MAX_LENGTH, AI_PROFILE_NAME_MIN_LENGTH } from './AIProfileSchema.js';
@@ -45,11 +47,16 @@ import { getAIProfileFormPart } from './getAIProfileFormPart.js';
 export const AIProfileOptions: TabContainerPanelComponent<IAIProfileFormProps> = observer(function AIProfileOptions({ formState }) {
   const translate = useTranslate();
   const notificationService = useService(NotificationService);
-  const aiProfilesResource = useService(AIProfilesResource);
+  const aiProfilesResource = useService(AIAdminProfilesResource);
   const enginesLoader = useResource(AIProfileOptions, AiEnginesResource, undefined);
   const part = getAIProfileFormPart(formState);
   const propertiesLoader = useResource(AIProfileOptions, AIEnginePropertiesResource, part.state.engineId || null);
   const propertiesInfo = propertiesLoader.data ?? [];
+  const usesUserCredentials = !part.state.global;
+  const configurableProperties = requireGlobalProfileToken(
+    propertiesInfo.filter(property => property.id !== 'global' && (!usesUserCredentials || property.id !== 'token')),
+    part.state.global,
+  );
   const isEditMode = formState.mode === FormMode.Edit;
   const [isLoading, setIsLoading] = useState(false);
   const [models, setModels] = useState<AiModelInfo[] | null>(null);
@@ -68,12 +75,13 @@ export const AIProfileOptions: TabContainerPanelComponent<IAIProfileFormProps> =
     return null;
   });
 
-  const modelPropertyIndex = propertiesInfo.findIndex(property => property.id === MODEL_PROPERTY_ID);
-  const modelProperty = propertiesInfo[modelPropertyIndex];
+  const modelPropertyIndex = configurableProperties.findIndex(property => property.id === MODEL_PROPERTY_ID);
+  const modelProperty = configurableProperties[modelPropertyIndex];
   const chatModels = (models ?? []).filter(model => model.features.map(feature => feature.toLowerCase()).includes('chat'));
   const hasModels = !!modelProperty;
-  const propertiesBeforeModel = hasModels ? propertiesInfo.slice(0, modelPropertyIndex) : propertiesInfo;
-  const propertiesAfterModel = hasModels ? propertiesInfo.slice(modelPropertyIndex + 1) : [];
+  const userCredentialsSupported = supportsUserCredentials(propertiesInfo);
+  const propertiesBeforeModel = hasModels ? configurableProperties.slice(0, modelPropertyIndex) : configurableProperties;
+  const propertiesAfterModel = hasModels ? configurableProperties.slice(modelPropertyIndex + 1) : [];
 
   function applyModelToProfile(modelId: string | null, availableModels = models ?? []): void {
     const model = availableModels.find(model => model.id === modelId);
@@ -130,7 +138,7 @@ export const AIProfileOptions: TabContainerPanelComponent<IAIProfileFormProps> =
     executor: formState.loadedTask,
     handlers: [
       async () => {
-        if (isEditMode && part.state.engineId && models === null) {
+        if (isEditMode && part.state.engineId && models === null && !usesUserCredentials) {
           await loadModels(false);
         }
       },
@@ -144,6 +152,15 @@ export const AIProfileOptions: TabContainerPanelComponent<IAIProfileFormProps> =
   async function handleEngineChange(engineId: string): Promise<void> {
     await part.changeEngine(engineId);
     setModels(null);
+  }
+
+  function handleProfileTypeChange(value: string): void {
+    const global = value === 'global';
+    part.state.global = global;
+    part.state.properties['global'] = global;
+    if (!global) {
+      part.state.properties['token'] = null;
+    }
   }
 
   return (
@@ -167,6 +184,25 @@ export const AIProfileOptions: TabContainerPanelComponent<IAIProfileFormProps> =
             >
               {translate('plugin_ai_administration_profile_form_field_engine')}
             </Select>
+            <RadioGroup
+              name="profileType"
+              aria-label={translate('plugin_ai_administration_profile_profile_type')}
+              value={part.state.global ? 'global' : 'user'}
+              onChange={handleProfileTypeChange}
+            >
+              <Radio value="global" disabled={formState.isDisabled || isEditMode} small keepSize>
+                {translate('plugin_ai_administration_profile_global_credentials')}
+              </Radio>
+              <Radio
+                value="user"
+                disabled={formState.isDisabled || isEditMode || !userCredentialsSupported}
+                title={!userCredentialsSupported ? translate('plugin_ai_administration_profile_user_credentials_unsupported') : undefined}
+                small
+                keepSize
+              >
+                {translate('plugin_ai_administration_profile_user_credentials')}
+              </Radio>
+            </RadioGroup>
           </Container>
         </Group>
         {!!part.state.engineId && (
@@ -196,17 +232,23 @@ export const AIProfileOptions: TabContainerPanelComponent<IAIProfileFormProps> =
                   >
                     {translate('ai_administration_select_language_model_selector_title')}
                   </Combobox>
-                  <div className="tw:absolute tw:top-9 tw:-right-9">
-                    <ActionIconButton
-                      name="refresh"
-                      title={translate('ai_administration_models_refresh')}
-                      disabled={isLoading || formState.isDisabled}
-                      onClick={refreshModels}
-                    />
-                  </div>
+                  {!usesUserCredentials && (
+                    <div className="tw:absolute tw:top-9 tw:-right-9">
+                      <ActionIconButton
+                        name="refresh"
+                        title={translate('ai_administration_models_refresh')}
+                        disabled={isLoading || formState.isDisabled}
+                        onClick={refreshModels}
+                      />
+                    </div>
+                  )}
                 </Container>
               )}
-              <AIProfilePropertiesForm disabled={isLoading || formState.isDisabled} state={part.state.properties} properties={propertiesAfterModel} />
+              <AIProfilePropertiesForm
+                disabled={isLoading || formState.isDisabled}
+                state={part.state.properties}
+                properties={propertiesAfterModel}
+              />
             </Container>
           </Group>
         )}

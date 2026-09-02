@@ -30,7 +30,7 @@ import { isDefined } from '@dbeaver/js-helpers';
 import type { AdministrationAISettingsFormState } from '../AISettingsForm/AdministrationAISettingsFormState.js';
 import { getAdministrationAISettingsFormInfoPart } from '../AISettingsForm/getAdministrationAISettingsFormInfoPart.js';
 import { AIProfileFormService } from './AIProfileForm/AIProfileFormService.js';
-import { AIProfilesResource } from './AIProfilesResource.js';
+import { AIAdminProfilesResource } from './AIProfilesResource.js';
 import AIProfilesToolsPanelStyles from './AIProfilesToolsPanel.module.css';
 import { AIProfilesTable } from './AIProfilesTable.js';
 import { useAIProfilesTable } from './useAIProfilesTable.js';
@@ -51,7 +51,7 @@ export const AIProfilesPanel = observer<Props>(function AIProfilesPanel({ formSt
   const settingsInfoPart = getAdministrationAISettingsFormInfoPart(formState);
   useAutoLoad(AIProfilesPanel, settingsInfoPart);
 
-  const profilesLoader = useResource(AIProfilesPanel, AIProfilesResource, CachedMapAllKey);
+  const profilesLoader = useResource(AIProfilesPanel, AIAdminProfilesResource, CachedMapAllKey);
   const profiles = profilesLoader.data.filter(isDefined);
   const defaultProfileId = settingsInfoPart.initialState.defaultConfiguration;
 

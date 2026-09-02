@@ -9,7 +9,7 @@ import { createDataContext, DATA_CONTEXT_DI_PROVIDER } from '@cloudbeaver/core-d
 import type { IFormState } from '@cloudbeaver/core-ui';
 
 import { AIEnginePropertiesResource } from '../../AIEnginePropertiesResource.js';
-import { AIProfilesResource } from '../../AIProfilesResource.js';
+import { AIAdminProfilesResource } from '../../AIProfilesResource.js';
 import type { IAIProfileFormState } from '../IAIProfileFormState.js';
 import { AIProfileFormPart } from './AIProfileFormPart.js';
 
@@ -18,7 +18,7 @@ const DATA_CONTEXT_AI_PROFILE_FORM_PART = createDataContext<AIProfileFormPart>('
 export function getAIProfileFormPart(formState: IFormState<IAIProfileFormState>): AIProfileFormPart {
   return formState.getPart(DATA_CONTEXT_AI_PROFILE_FORM_PART, context => {
     const di = context.get(DATA_CONTEXT_DI_PROVIDER)!;
-    const aiProfilesResource = di.getService(AIProfilesResource);
+    const aiProfilesResource = di.getService(AIAdminProfilesResource);
     const aiEnginePropertiesResource = di.getService(AIEnginePropertiesResource);
 
     return new AIProfileFormPart(formState, aiProfilesResource, aiEnginePropertiesResource);

@@ -6,10 +6,6 @@
     "tsBuildInfoFile": "lib/tsconfig.tsbuildinfo",
     "composite": true
   },
-  "exclude": [
-    "lib/**/*",
-    "**/node_modules"
-  ],
   "references": [
     {
       "path": "../core-authentication"
@@ -24,9 +20,6 @@
       "path": "../core-di"
     },
     {
-      "path": "../core-dialogs"
-    },
-    {
       "path": "../core-events"
     },
     {
@@ -39,7 +32,10 @@
       "path": "../core-root"
     },
     {
-      "path": "../core-sdk"
+      "path": "../plugin-ai"
+    },
+    {
+      "path": "../plugin-user-profile"
     }
   ],
   "include": [
@@ -47,5 +43,9 @@
     "src/**/*",
     "src/**/*.json",
     "src/**/*.css"
+  ],
+  "exclude": [
+    "**/node_modules",
+    "lib/**/*"
   ]
 }

@@ -15,11 +15,11 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import type { ITableSelection } from '@cloudbeaver/plugin-data-grid';
 
-import { AIProfilesResource } from './AIProfilesResource.js';
+import { AIAdminProfilesResource } from './AIProfilesResource.js';
 
 interface State {
   processing: boolean;
-  aiProfilesResource: AIProfilesResource;
+  aiProfilesResource: AIAdminProfilesResource;
   notificationService: NotificationService;
   dialogService: CommonDialogService;
   selection: ITableSelection;
@@ -30,7 +30,7 @@ interface State {
 export function useAIProfilesTable(selection: ITableSelection): Readonly<State> {
   const notificationService = useService(NotificationService);
   const dialogService = useService(CommonDialogService);
-  const aiProfilesResource = useService(AIProfilesResource);
+  const aiProfilesResource = useService(AIAdminProfilesResource);
   const translate = useTranslate();
 
   return useObservableRef<State>(
@@ -63,7 +63,11 @@ export function useAIProfilesTable(selection: ITableSelection): Readonly<State> 
         }
 
         const names = deletionList.map(id => `"${this.aiProfilesResource.get(id)?.name ?? id}"`).join(', ');
-        const message = `${translate('plugin_ai_administration_profile_delete_confirmation')}${names}.\n\n${translate('ui_are_you_sure')}`;
+        const deletesUserCredentials = deletionList.some(id => this.aiProfilesResource.get(id)?.global === false);
+        const credentialsWarning = deletesUserCredentials
+          ? `\n\n${translate('plugin_ai_administration_profile_delete_user_credentials_warning')}`
+          : '';
+        const message = `${translate('plugin_ai_administration_profile_delete_confirmation')}${names}.${credentialsWarning}\n\n${translate('ui_are_you_sure')}`;
 
         const { status } = await this.dialogService.open(ConfirmationDialogDelete, {
           title: 'ui_data_delete_confirmation',

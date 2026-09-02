@@ -18,6 +18,7 @@ import {
   type ResourceKey,
 } from '@cloudbeaver/core-resource';
 import { type AiChatConversationFragment, type AiChatConversationInput, GraphQLService } from '@cloudbeaver/core-sdk';
+import { AISettingsResource, UserAIProfileResource } from '@cloudbeaver/plugin-ai';
 
 import type { EAIConversationPromptGeneratorId } from '../../EAIConversationPromptGeneratorId.js';
 
@@ -32,16 +33,35 @@ export const ChatConversationConnectionKey = resourceKeyListAliasFactory(
   }),
 );
 
-@injectable(() => [GraphQLService, UserInfoResource])
+@injectable(() => [GraphQLService, UserInfoResource, UserAIProfileResource, AISettingsResource])
 export class AIChatConversationsResource extends CachedMapResource<string, AIChatConversationInfo> {
   constructor(
     private readonly graphQLService: GraphQLService,
     userInfoResource: UserInfoResource,
+    userAIProfileResource: UserAIProfileResource,
+    aiSettingsResource: AISettingsResource,
   ) {
     super();
 
     userInfoResource.onUserChange.addHandler(() => {
       this.clear();
+    });
+
+    userAIProfileResource.onItemDelete.addHandler(async key => {
+      const deletedProfileIds = ResourceKeyUtils.toArray(key);
+      const conversations = this.values.filter(conversation => conversation.profile && deletedProfileIds.includes(conversation.profile));
+      if (conversations.length === 0) {
+        return;
+      }
+
+      const defaultProfileId = (await aiSettingsResource.load())?.defaultConfiguration;
+      if (!defaultProfileId || deletedProfileIds.includes(defaultProfileId)) {
+        return;
+      }
+
+      await Promise.all(
+        conversations.map(conversation => this.updateConversation(conversation.id, { settings: { profile: defaultProfileId } })),
+      );
     });
 
     this.aliases.add(ChatConversationConnectionKey, param =>

@@ -12,24 +12,24 @@ import {
   GraphQLService,
   type AiEngineConfig,
   type AiAdminConfigurationProfileInfo,
-  type AiConfigurationProfileInfo,
   type AiConfigurationProfileInput,
   type AiModelInfo,
 } from '@cloudbeaver/core-sdk';
+import { type AIProfile, UserAIProfileResource } from '@cloudbeaver/plugin-ai';
 
 import { AISettingsResource } from '../AISettingsResource.js';
 
-export type AIProfile = AiConfigurationProfileInfo;
 export type AIAdminProfile = AiAdminConfigurationProfileInfo;
 export type AIProfileInput = AiConfigurationProfileInput;
 
-@injectable(() => [GraphQLService, SessionPermissionsResource, ServerConfigResource, AISettingsResource])
-export class AIProfilesResource extends CachedMapResource<string, AIProfile> {
+@injectable(() => [GraphQLService, SessionPermissionsResource, ServerConfigResource, AISettingsResource, UserAIProfileResource])
+export class AIAdminProfilesResource extends CachedMapResource<string, AIProfile> {
   constructor(
     private readonly graphQLService: GraphQLService,
     permissionsResource: SessionPermissionsResource,
     serverConfigResource: ServerConfigResource,
     aiSettingsResource: AISettingsResource,
+    private readonly userAIProfileResource: UserAIProfileResource,
   ) {
     super();
 
@@ -48,7 +48,8 @@ export class AIProfilesResource extends CachedMapResource<string, AIProfile> {
   async create(config: AIProfileInput): Promise<AIAdminProfile> {
     const { profile } = await this.graphQLService.sdk.createAiProfile({ config });
 
-    this.set(profile.id, profile);
+    this.userAIProfileResource.setProfile(profile);
+    this.set(profile.id, this.userAIProfileResource.get(profile.id)!);
 
     return profile;
   }
@@ -56,7 +57,8 @@ export class AIProfilesResource extends CachedMapResource<string, AIProfile> {
   async update(config: AIProfileInput): Promise<AIAdminProfile> {
     const { profile } = await this.graphQLService.sdk.updateAiProfile({ config });
 
-    this.set(profile.id, profile);
+    this.userAIProfileResource.setProfile(profile);
+    this.set(profile.id, this.userAIProfileResource.get(profile.id)!);
 
     return profile;
   }
@@ -64,6 +66,7 @@ export class AIProfilesResource extends CachedMapResource<string, AIProfile> {
   async deleteProfile(profileId: string): Promise<void> {
     await this.graphQLService.sdk.deleteAiProfile({ profileId });
 
+    this.userAIProfileResource.removeProfile(profileId);
     this.delete(profileId);
   }
 
@@ -73,7 +76,8 @@ export class AIProfilesResource extends CachedMapResource<string, AIProfile> {
   }
 
   protected async loader(): Promise<Map<string, AIProfile>> {
-    const { profiles } = await this.graphQLService.sdk.getAiProfiles();
+    await this.userAIProfileResource.refresh(CachedMapAllKey);
+    const profiles = this.userAIProfileResource.values;
 
     const key = resourceKeyList(profiles.map(profile => profile.id));
     this.replace(key, profiles);

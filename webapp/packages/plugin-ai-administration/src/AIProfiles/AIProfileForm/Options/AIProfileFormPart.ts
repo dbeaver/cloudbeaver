@@ -7,27 +7,32 @@
  */
 import { runInAction } from 'mobx';
 
-import { FormMode, FormPart, type IFormState } from '@cloudbeaver/core-ui';
+import { FormMode, FormPart, formValidationContext, type IFormState } from '@cloudbeaver/core-ui';
+import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import type { AiEngineConfig } from '@cloudbeaver/core-sdk';
 import { getUniqueName, trimObjectValues } from '@cloudbeaver/core-utils';
+import { supportsUserCredentials } from '@cloudbeaver/plugin-ai';
 
 import { AIEnginePropertiesResource } from '../../AIEnginePropertiesResource.js';
-import { type AIAdminProfile, type AIProfileInput, AIProfilesResource } from '../../AIProfilesResource.js';
+import { AIAdminProfilesResource, type AIAdminProfile, type AIProfileInput } from '../../AIProfilesResource.js';
 import { getObjectPropertiesValues } from '../../utils/getObjectPropertiesValues.js';
 import { prepareProperties } from '../../utils/prepareProperties.js';
 import type { IAIProfileFormState } from '../IAIProfileFormState.js';
 import type { IAIProfileOptionsState } from './AIProfileSchema.js';
 
+const GLOBAL_PROPERTY_ID = 'global';
+
 const getDefaultState = (): IAIProfileOptionsState => ({
   name: '',
   engineId: '',
+  global: true,
   properties: {},
 });
 
 export class AIProfileFormPart extends FormPart<IAIProfileOptionsState, IAIProfileFormState> {
   constructor(
     formState: IFormState<IAIProfileFormState>,
-    private readonly aiProfilesResource: AIProfilesResource,
+    private readonly aiProfilesResource: AIAdminProfilesResource,
     private readonly aiEnginePropertiesResource: AIEnginePropertiesResource,
   ) {
     super(formState, getDefaultState());
@@ -79,6 +84,11 @@ export class AIProfileFormPart extends FormPart<IAIProfileOptionsState, IAIProfi
     runInAction(() => {
       this.state.engineId = engineId;
       this.state.properties = getObjectPropertiesValues(propertiesInfo ?? []);
+      this.state.global = this.state.properties[GLOBAL_PROPERTY_ID] !== false;
+      this.state.properties[GLOBAL_PROPERTY_ID] = this.state.global;
+      if (!supportsUserCredentials(propertiesInfo ?? [])) {
+        this.state.global = true;
+      }
     });
   }
 
@@ -93,7 +103,15 @@ export class AIProfileFormPart extends FormPart<IAIProfileOptionsState, IAIProfi
     trimObjectValues(this.state.properties);
   }
 
+  protected override validate(_: IFormState<IAIProfileFormState>, contexts: IExecutionContextProvider<IFormState<IAIProfileFormState>>): void {
+    const properties = this.aiEnginePropertiesResource.get(this.state.engineId) ?? [];
+    if (!this.state.global && !supportsUserCredentials(properties)) {
+      contexts.getContext(formValidationContext).error('plugin_ai_administration_profile_user_credentials_unsupported');
+    }
+  }
+
   private getConfig(): AIProfileInput {
+    this.state.properties[GLOBAL_PROPERTY_ID] = this.state.global;
     return {
       profileId: this.formState.state.profileId,
       profileName: this.state.name,
@@ -102,7 +120,9 @@ export class AIProfileFormPart extends FormPart<IAIProfileOptionsState, IAIProfi
         properties: prepareProperties({
           engineProperties: this.state.properties,
           initialEngineProperties: this.initialState.properties,
-          infoProperties: this.aiEnginePropertiesResource.get(this.state.engineId) ?? [],
+          infoProperties: (this.aiEnginePropertiesResource.get(this.state.engineId) ?? []).filter(
+            property => this.state.global || property.id !== 'token',
+          ),
         }),
       },
     };
@@ -125,7 +145,8 @@ export class AIProfileFormPart extends FormPart<IAIProfileOptionsState, IAIProfi
     this.setInitialState({
       name: profile.name,
       engineId: profile.engineId,
-      properties: getObjectPropertiesValues(profile.configuration),
+      global: profile.global,
+      properties: { ...getObjectPropertiesValues(profile.configuration), [GLOBAL_PROPERTY_ID]: profile.global },
     });
   }
 
@@ -148,11 +169,13 @@ export class AIProfileFormPart extends FormPart<IAIProfileOptionsState, IAIProfi
     this.setInitialState({
       name: profile.name,
       engineId: profile.engineId,
-      properties: getObjectPropertiesValues(propertiesInfo),
+      global: profile.global,
+      properties: { ...getObjectPropertiesValues(propertiesInfo), [GLOBAL_PROPERTY_ID]: profile.global },
     });
   }
 
   getCurrentEngineSettings(): AiEngineConfig {
+    this.state.properties[GLOBAL_PROPERTY_ID] = this.state.global;
     return {
       properties: prepareProperties({
         engineProperties: this.state.properties,

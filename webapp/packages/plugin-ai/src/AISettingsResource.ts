@@ -9,33 +9,25 @@
 import { injectable } from '@cloudbeaver/core-di';
 import { CachedDataResource } from '@cloudbeaver/core-resource';
 import { ServerConfigResource, ServerEventId, WorkspaceConfigEventHandler } from '@cloudbeaver/core-root';
-import { type AiConfigurationProfileInfo, GraphQLService } from '@cloudbeaver/core-sdk';
+import { type AiSettingsInfo, GraphQLService } from '@cloudbeaver/core-sdk';
 
-export type AIChatProfile = AiConfigurationProfileInfo;
+export type AISettings = AiSettingsInfo;
 
 @injectable(() => [GraphQLService, ServerConfigResource, WorkspaceConfigEventHandler])
-export class AIChatProfilesResource extends CachedDataResource<AIChatProfile[]> {
+export class AISettingsResource extends CachedDataResource<AISettings | null> {
   constructor(
     private readonly graphQLService: GraphQLService,
     serverConfigResource: ServerConfigResource,
     workspaceConfigEventHandler: WorkspaceConfigEventHandler,
   ) {
-    super(() => []);
+    super(() => null);
 
     this.sync(serverConfigResource);
-
-    workspaceConfigEventHandler.onEvent(
-      ServerEventId.CbWorkspaceConfigChanged,
-      () => {
-        this.markOutdated();
-      },
-      undefined,
-      this,
-    );
+    workspaceConfigEventHandler.onEvent(ServerEventId.CbWorkspaceConfigChanged, () => this.markOutdated(), undefined, this);
   }
 
-  protected async loader(): Promise<AIChatProfile[]> {
-    const { profiles } = await this.graphQLService.sdk.getAiProfiles();
-    return profiles;
+  protected async loader(): Promise<AISettings> {
+    const { settings } = await this.graphQLService.sdk.getAiSettings();
+    return settings;
   }
 }

@@ -13,12 +13,10 @@ import { IconOrImage, Link, s, TextPlaceholder, useResource, useS, useTranslate 
 import { useService } from '@cloudbeaver/core-di';
 import { ADMINISTRATION_TABLE_DEFAULT_ROW_HEIGHT, AdministrationTableStyles } from '@cloudbeaver/core-administration';
 import { DataGrid, TableRowSelect, useCreateGridReactiveValue } from '@cloudbeaver/plugin-data-grid';
-import { AiEnginesResource } from '@cloudbeaver/plugin-ai';
+import { AiEnginesResource, type AIProfile } from '@cloudbeaver/plugin-ai';
 import { Command } from '@dbeaver/ui-kit';
 
 import { AIProfileFormService } from './AIProfileForm/AIProfileFormService.js';
-import type { AIProfile } from './AIProfilesResource.js';
-
 interface Props {
   profiles: AIProfile[];
   defaultProfileId: string | null;
@@ -78,6 +76,7 @@ export const AIProfilesTable = observer<Props>(function AIProfilesTable({ profil
           {isDefault && (
             <span className="tw:text-xs tw:opacity-60 tw:whitespace-nowrap">{translate('plugin_ai_administration_profile_default_badge')}</span>
           )}
+          {profile.global && <IconOrImage icon="document-global" width={16} />}
         </Command>
       );
     }
@@ -89,8 +88,8 @@ export const AIProfilesTable = observer<Props>(function AIProfilesTable({ profil
       if (engine?.icon) {
         return (
           <div title={title} className="tw:flex tw:gap-2">
-            <IconOrImage icon={engine.icon} />
             <span className="tw:truncate">{title}</span>
+            <IconOrImage icon={engine.icon} width={16} />
           </div>
         );
       }

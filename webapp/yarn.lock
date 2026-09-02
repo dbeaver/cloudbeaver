@@ -2546,12 +2546,43 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@cloudbeaver/plugin-ai-user-profile@workspace:*, @cloudbeaver/plugin-ai-user-profile@workspace:packages/plugin-ai-user-profile":
+  version: 0.0.0-use.local
+  resolution: "@cloudbeaver/plugin-ai-user-profile@workspace:packages/plugin-ai-user-profile"
+  dependencies:
+    "@cloudbeaver/core-authentication": "workspace:*"
+    "@cloudbeaver/core-blocks": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-events": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-resource": "workspace:*"
+    "@cloudbeaver/core-root": "workspace:*"
+    "@cloudbeaver/plugin-ai": "workspace:*"
+    "@cloudbeaver/plugin-user-profile": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
+    "@types/react": "npm:^19"
+    mobx: "npm:^6"
+    mobx-react-lite: "npm:^4"
+    react: "npm:^19"
+    react-dom: "npm:^19"
+    rimraf: "npm:^6"
+    tslib: "npm:^2"
+    typescript: "npm:^5"
+  languageName: unknown
+  linkType: soft
+
 "@cloudbeaver/plugin-ai@workspace:*, @cloudbeaver/plugin-ai@workspace:packages/plugin-ai":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-ai@workspace:packages/plugin-ai"
   dependencies:
+    "@cloudbeaver/core-authentication": "workspace:*"
+    "@cloudbeaver/core-blocks": "workspace:*"
     "@cloudbeaver/core-cli": "workspace:*"
     "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-dialogs": "workspace:*"
+    "@cloudbeaver/core-events": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
     "@cloudbeaver/core-resource": "workspace:*"
     "@cloudbeaver/core-root": "workspace:*"
     "@cloudbeaver/core-sdk": "workspace:*"
@@ -4280,6 +4311,7 @@ __metadata:
     "@cloudbeaver/plugin-ai": "workspace:*"
     "@cloudbeaver/plugin-ai-administration": "workspace:*"
     "@cloudbeaver/plugin-ai-chat": "workspace:*"
+    "@cloudbeaver/plugin-ai-user-profile": "workspace:*"
     "@cloudbeaver/plugin-app-logo": "workspace:*"
     "@cloudbeaver/plugin-app-logo-administration": "workspace:*"
     "@cloudbeaver/plugin-async-task-confirmation": "workspace:^"

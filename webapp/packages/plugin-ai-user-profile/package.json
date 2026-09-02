@@ -1,5 +1,5 @@
 {
-  "name": "@cloudbeaver/plugin-ai",
+  "name": "@cloudbeaver/plugin-ai-user-profile",
   "type": "module",
   "sideEffects": [
     "./lib/module.js",
@@ -24,12 +24,12 @@
     "@cloudbeaver/core-authentication": "workspace:*",
     "@cloudbeaver/core-blocks": "workspace:*",
     "@cloudbeaver/core-di": "workspace:*",
-    "@cloudbeaver/core-dialogs": "workspace:*",
     "@cloudbeaver/core-events": "workspace:*",
     "@cloudbeaver/core-localization": "workspace:*",
     "@cloudbeaver/core-resource": "workspace:*",
     "@cloudbeaver/core-root": "workspace:*",
-    "@cloudbeaver/core-sdk": "workspace:*",
+    "@cloudbeaver/plugin-ai": "workspace:*",
+    "@cloudbeaver/plugin-user-profile": "workspace:*",
     "mobx": "^6",
     "mobx-react-lite": "^4",
     "react": "^19",
