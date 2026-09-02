@@ -24,7 +24,8 @@
     "axios": ">=1.18.0",
     "postcss": ">=8.5.18",
     "nanoid": ">=3.3.17",
-    "less": ">=4.7.0"
+    "less": ">=4.7.0",
+    "browserslist": ">=4.28.7"
   },
   "scripts": {
     "test": "dbeaver-test",
