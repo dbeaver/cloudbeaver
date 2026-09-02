@@ -19,6 +19,7 @@ package io.cloudbeaver.service.ai.model;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.model.WebPropertyInfo;
 import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.service.ai.WebAIProfileCredentials;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.ai.AIConfigurationProfile;
@@ -48,6 +49,14 @@ public class WebAIConfigurationProfile {
     @NotNull
     public String getEngineId() {
         return profile.getEngineId();
+    }
+
+    public boolean isGlobal() {
+        return profile.isGlobal();
+    }
+
+    public boolean isCredentialsSaved() throws DBException {
+        return WebAIProfileCredentials.areCredentialsSaved(webSession, profile);
     }
 
     @NotNull

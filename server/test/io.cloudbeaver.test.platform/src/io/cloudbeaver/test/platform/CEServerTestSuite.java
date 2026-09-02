@@ -23,6 +23,7 @@ import io.cloudbeaver.model.rm.RMNIOTest;
 import io.cloudbeaver.model.rm.lock.RMLockTest;
 import io.cloudbeaver.model.session.WebSessionProjectTest;
 import io.cloudbeaver.model.session.WebSessionTest;
+import io.cloudbeaver.service.ai.WebAIProfileCredentialsTest;
 import io.cloudbeaver.test.platform.admin.AdminCreateUserTest;
 import io.cloudbeaver.test.platform.admin.AdminImportUsersTest;
 import io.cloudbeaver.test.platform.admin.AdminLastLoginTimeTest;
@@ -45,6 +46,7 @@ import org.junit.platform.suite.api.Suite;
         WebSessionTest.class,
         WebSessionProjectTest.class,
         WebNavigatorNodeInfoTest.class,
+        WebAIProfileCredentialsTest.class,
         AdminCreateUserTest.class,
         AdminImportUsersTest.class,
         AdminLastLoginTimeTest.class,

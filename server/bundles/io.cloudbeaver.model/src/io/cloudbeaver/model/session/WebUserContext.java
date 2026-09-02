@@ -238,8 +238,8 @@ public class WebUserContext implements SMCredentialsProvider {
     }
 
     @NotNull
-    public DBSSecretController getSecretController() throws DBException {
-        if (this.securityController == null) {
+    public synchronized DBSSecretController getSecretController() throws DBException {
+        if (this.secretController == null) {
             this.secretController = application.getSecretController(this, workspace.getAuthContext());
         }
         return secretController;
