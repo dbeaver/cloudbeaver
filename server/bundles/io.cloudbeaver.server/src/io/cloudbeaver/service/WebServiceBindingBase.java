@@ -207,10 +207,7 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
                 try {
                     WebAction webAction = method.getAnnotation(WebAction.class);
                     WebApplication application = getApplication();
-                    if (application.isConfigurationMode() &&
-                        (webAction == null || !webAction.configurationModeAllowed())) {
-                        throw new DBWebExceptionAccessDenied("Action is not available in server configuration mode");
-                    }
+                    checkConfigurationModeAccess(webAction, application);
                     WebActionSet actionSet = method.getDeclaringClass().getAnnotation(WebActionSet.class);
                     if (actionSet != null) {
                         checkServicePermissions(actionSet);
@@ -300,6 +297,16 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
                         throw new DBWebExceptionAccessDenied("Access denied");
                     }
                 }
+            }
+        }
+
+        private void checkConfigurationModeAccess(
+            @Nullable WebAction webAction,
+            @NotNull WebApplication application
+        ) throws DBWebExceptionAccessDenied {
+            if (application.isConfigurationMode() &&
+                (webAction == null || !webAction.configurationModeAllowed())) {
+                throw new DBWebExceptionAccessDenied("Action is not available in server configuration mode");
             }
         }
 

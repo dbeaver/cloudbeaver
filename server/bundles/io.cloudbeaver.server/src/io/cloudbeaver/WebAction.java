@@ -37,6 +37,9 @@ public @interface WebAction {
 
     String[] requireGlobalPermissions() default {};
 
+    /**
+     * Whether this action may be invoked while the server is being configured.
+     */
     boolean configurationModeAllowed() default false;
 
 }
