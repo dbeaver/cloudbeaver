@@ -18,8 +18,11 @@ import {
   ConfirmationDialog,
   Container,
   Fill,
+  Form,
   InputField,
   SAVED_VALUE_INDICATOR,
+  useFocus,
+  useForm,
   useObservableRef,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
@@ -45,13 +48,19 @@ export const AIProfileCredentialsDialog: DialogComponent<IAIProfileCredentialsDi
   const commonDialogService = useService(CommonDialogService);
   const notificationService = useService(NotificationService);
   const aiProfilesResource = useService(AIProfilesResource);
+  const [tokenRef] = useFocus<HTMLInputElement>({ autofocus: true });
   const state = useObservableRef<CredentialsDialogState>(
     () => ({ token: '', processing: false, credentialsSaved: payload.credentialsSaved }),
     { token: observable.ref, processing: observable.ref, credentialsSaved: observable.ref },
     false,
   );
+  const form = useForm({ onSubmit: save });
 
   async function save(): Promise<void> {
+    if (state.processing || !state.token) {
+      return;
+    }
+
     try {
       state.processing = true;
       if (state.token) {
@@ -97,49 +106,52 @@ export const AIProfileCredentialsDialog: DialogComponent<IAIProfileCredentialsDi
   }
 
   return (
-    <CommonDialogWrapper size="medium">
-      <CommonDialogHeader
-        title="plugin_ai_credentials_dialog_title"
-        subTitle="plugin_ai_credentials_dialog_description"
-        icon={payload.engineIcon}
-        onReject={rejectDialog}
-      />
-      <CommonDialogBody>
-        <Container gap>
-          <InputField value={payload.profileName} disabled={state.processing} readOnly>
-            {translate('plugin_ai_credentials_profile')}
-          </InputField>
-          <InputField value={payload.engineName} disabled={state.processing} readOnly>
-            {translate('plugin_ai_credentials_engine')}
-          </InputField>
-          <InputField
-            state={state}
-            type="password"
-            name="token"
-            autoComplete="new-password"
-            required={!state.credentialsSaved}
-            disabled={state.processing}
-            placeholder={state.credentialsSaved ? SAVED_VALUE_INDICATOR : undefined}
-            description={state.credentialsSaved ? translate('ui_processing_saved') : undefined}
-          >
-            {translate('plugin_ai_credentials_token')}
-          </InputField>
-        </Container>
-      </CommonDialogBody>
-      <CommonDialogFooter>
-        {state.credentialsSaved && (
-          <Button type="button" variant="secondary" disabled={state.processing} onClick={resetCredentials}>
-            {translate('plugin_ai_credentials_reset')}
+    <Form context={form} contents>
+      <CommonDialogWrapper size="medium" autoFocusOnShow={false}>
+        <CommonDialogHeader
+          title="plugin_ai_credentials_dialog_title"
+          subTitle="plugin_ai_credentials_dialog_description"
+          icon={payload.engineIcon}
+          onReject={rejectDialog}
+        />
+        <CommonDialogBody>
+          <Container gap>
+            <InputField value={payload.profileName} disabled={state.processing} readOnly>
+              {translate('plugin_ai_credentials_profile')}
+            </InputField>
+            <InputField value={payload.engineName} disabled={state.processing} readOnly>
+              {translate('plugin_ai_credentials_engine')}
+            </InputField>
+            <InputField
+              ref={tokenRef}
+              state={state}
+              type="password"
+              name="token"
+              autoComplete="new-password"
+              required={!state.credentialsSaved}
+              disabled={state.processing}
+              placeholder={state.credentialsSaved ? SAVED_VALUE_INDICATOR : undefined}
+              description={state.credentialsSaved ? translate('ui_processing_saved') : undefined}
+            >
+              {translate('plugin_ai_credentials_token')}
+            </InputField>
+          </Container>
+        </CommonDialogBody>
+        <CommonDialogFooter>
+          {state.credentialsSaved && (
+            <Button type="button" variant="secondary" disabled={state.processing} onClick={resetCredentials}>
+              {translate('plugin_ai_credentials_reset')}
+            </Button>
+          )}
+          <Fill />
+          <Button type="button" variant="secondary" disabled={state.processing} onClick={() => rejectDialog()}>
+            {translate('ui_processing_cancel')}
           </Button>
-        )}
-        <Fill />
-        <Button type="button" variant="secondary" disabled={state.processing} onClick={() => rejectDialog()}>
-          {translate('ui_processing_cancel')}
-        </Button>
-        <Button type="button" disabled={state.processing} onClick={save}>
-          {translate('ui_processing_save')}
-        </Button>
-      </CommonDialogFooter>
-    </CommonDialogWrapper>
+          <Button type="submit" onClick={() => form.submit()} disabled={state.processing || !state.token}>
+            {translate('ui_processing_save')}
+          </Button>
+        </CommonDialogFooter>
+      </CommonDialogWrapper>
+    </Form>
   );
 });
