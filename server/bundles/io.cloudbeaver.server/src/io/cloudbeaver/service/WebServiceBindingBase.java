@@ -26,8 +26,8 @@ import io.cloudbeaver.model.app.ServletApplication;
 import io.cloudbeaver.model.cli.CloudbeaverCliConstants;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.session.WebSessionProvider;
-import io.cloudbeaver.server.WebApplication;
 import io.cloudbeaver.server.WebAppUtils;
+import io.cloudbeaver.server.WebApplication;
 import io.cloudbeaver.server.graphql.GraphQLEndpoint;
 import io.cloudbeaver.server.graphql.GraphQLLoggerUtil;
 import io.cloudbeaver.service.security.SMUtils;
@@ -200,8 +200,9 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
             this.env = env;
         }
 
+        @Nullable
         @Override
-        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        public Object invoke(@NotNull Object proxy, @NotNull Method method, @Nullable Object[] args) throws Throwable {
             try {
                 try {
                     WebAction webAction = method.getAnnotation(WebAction.class);

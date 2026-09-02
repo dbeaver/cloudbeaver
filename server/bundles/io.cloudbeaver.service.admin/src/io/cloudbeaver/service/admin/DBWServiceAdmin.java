@@ -132,6 +132,7 @@ public interface DBWServiceAdmin extends DBWService {
     ////////////////////////////////////////////////////////////////////
     // Features
 
+    @NotNull
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN, configurationModeAllowed = true)
     List<DBWFeatureSet> listFeatureSets(@NotNull WebSession webSession) throws DBWebException;
 
@@ -162,6 +163,7 @@ public interface DBWServiceAdmin extends DBWService {
 
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN, configurationModeAllowed = true)
     boolean configureServer(@NotNull WebSession webSession, @NotNull Map<String, Object> params) throws DBWebException;
+
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN, configurationModeAllowed = true)
     boolean setDefaultNavigatorSettings(@NotNull WebSession webSession, @NotNull DBNBrowseSettings settings) throws DBWebException;
 

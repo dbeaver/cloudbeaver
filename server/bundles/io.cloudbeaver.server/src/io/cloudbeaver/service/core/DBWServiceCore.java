@@ -38,6 +38,7 @@ import java.util.Map;
  */
 public interface DBWServiceCore extends DBWService {
 
+    @NotNull
     @WebAction(authRequired = false, initializationRequired = false, configurationModeAllowed = true)
     WebServerConfig getServerConfig(@Nullable WebSession webSession) throws DBWebException;
 
@@ -50,8 +51,9 @@ public interface DBWServiceCore extends DBWService {
     @WebAction
     WebGroupPropertiesInfo<ProductSettingDescriptor> getProductSettings(@NotNull WebSession webSession);
 
+    @NotNull
     @WebAction(configurationModeAllowed = true)
-    List<WebDatabaseDriverInfo> getDriverList(@NotNull WebSession webSession, String driverId) throws DBWebException;
+    List<WebDatabaseDriverInfo> getDriverList(@NotNull WebSession webSession, @Nullable String driverId) throws DBWebException;
 
     @WebAction
     List<WebDatabaseAuthModel> getAuthModels(@NotNull WebSession webSession);
@@ -70,12 +72,14 @@ public interface DBWServiceCore extends DBWService {
     List<WebConnectionFolderInfo> getConnectionFolders(
         @NotNull WebSession webSession, @Nullable String projectId, @Nullable String id) throws DBWebException;
 
+    @NotNull
     @WebAction(authRequired = false, configurationModeAllowed = true)
     String[] getSessionPermissions(@NotNull WebSession webSession) throws DBWebException;
 
     ///////////////////////////////////////////
     // Session
 
+    @NotNull
     @WebAction(authRequired = false, configurationModeAllowed = true)
     WebSession openSession(
         @NotNull WebSession webSession,
@@ -83,6 +87,7 @@ public interface DBWServiceCore extends DBWService {
         @NotNull HttpServletRequest servletRequest,
         @NotNull HttpServletResponse servletResponse) throws DBWebException;
 
+    @NotNull
     @WebAction(authRequired = false, configurationModeAllowed = true)
     WebSession getSessionState(@NotNull WebSession webSession) throws DBWebException;
 
@@ -105,7 +110,7 @@ public interface DBWServiceCore extends DBWService {
     boolean refreshSessionConnections(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response) throws DBWebException;
 
     @WebAction(configurationModeAllowed = true)
-    boolean changeSessionLanguage(@NotNull WebSession webSession, String locale) throws DBWebException;
+    boolean changeSessionLanguage(@NotNull WebSession webSession, @Nullable String locale) throws DBWebException;
 
     ///////////////////////////////////////////
     // Connections
@@ -240,10 +245,15 @@ public interface DBWServiceCore extends DBWService {
     ///////////////////////////////////////////
     // Async tasks
 
+    @NotNull
     @WebAction(authRequired = false, configurationModeAllowed = true)
-    WebAsyncTaskInfo getAsyncTaskInfo(WebSession webSession, String taskId, Boolean removeOnFinish) throws DBWebException;
+    WebAsyncTaskInfo getAsyncTaskInfo(
+        @NotNull WebSession webSession,
+        @NotNull String taskId,
+        @Nullable Boolean removeOnFinish
+    ) throws DBWebException;
 
     @WebAction(authRequired = false, configurationModeAllowed = true)
-    boolean cancelAsyncTask(WebSession webSession, String taskId) throws DBWebException;
+    boolean cancelAsyncTask(@NotNull WebSession webSession, @NotNull String taskId) throws DBWebException;
 
 }
