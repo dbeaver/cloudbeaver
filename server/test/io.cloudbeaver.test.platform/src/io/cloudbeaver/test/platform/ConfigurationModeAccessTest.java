@@ -97,6 +97,7 @@ public class ConfigurationModeAccessTest {
 
         @Override
         public void bindWiring(@NotNull DBWBindingContext model) throws DBWebException {
+            // No GraphQL wiring is needed to exercise the service proxy.
         }
     }
 }

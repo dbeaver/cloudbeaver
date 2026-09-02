@@ -213,7 +213,7 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
                         checkServicePermissions(actionSet);
                     }
                     if (webAction != null) {
-                        checkActionPermissions(method, webAction, application);
+                        checkActionPermissions(method, webAction);
                     }
                     WebProjectAction projectAction = method.getAnnotation(WebProjectAction.class);
                     if (projectAction != null) {
@@ -321,11 +321,8 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
             }
         }
 
-        private void checkActionPermissions(
-            @NotNull Method method,
-            @NotNull WebAction webAction,
-            @NotNull WebApplication application
-        ) throws DBWebException {
+        private void checkActionPermissions(@NotNull Method method, @NotNull WebAction webAction) throws DBWebException {
+            var application = WebAppUtils.getWebPlatform().getApplication();
             if (application.isInitializationMode() && webAction.initializationRequired()) {
                 String message = "Server initialization in progress: "
                     + String.join(",", application.getInitActions().values()) + ".\nDo not restart the server.";
