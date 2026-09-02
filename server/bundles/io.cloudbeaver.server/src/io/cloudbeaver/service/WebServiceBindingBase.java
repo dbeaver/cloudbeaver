@@ -26,6 +26,7 @@ import io.cloudbeaver.model.app.ServletApplication;
 import io.cloudbeaver.model.cli.CloudbeaverCliConstants;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.session.WebSessionProvider;
+import io.cloudbeaver.server.WebApplication;
 import io.cloudbeaver.server.WebAppUtils;
 import io.cloudbeaver.server.graphql.GraphQLEndpoint;
 import io.cloudbeaver.server.graphql.GraphQLLoggerUtil;
@@ -81,6 +82,11 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
     protected API_TYPE getService(DataFetchingEnvironment env) {
         Object proxyImpl = Proxy.newProxyInstance(getClass().getClassLoader(), new Class[]{apiInterface}, new ServiceInvocationHandler(serviceImpl, env));
         return apiInterface.cast(proxyImpl);
+    }
+
+    @NotNull
+    protected WebApplication getApplication() {
+        return WebAppUtils.getWebPlatform().getApplication();
     }
 
     @Nullable
@@ -198,13 +204,18 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
             try {
                 try {
+                    WebAction webAction = method.getAnnotation(WebAction.class);
+                    WebApplication application = getApplication();
+                    if (application.isConfigurationMode() &&
+                        (webAction == null || !webAction.configurationModeAllowed())) {
+                        throw new DBWebExceptionAccessDenied("Action is not available in server configuration mode");
+                    }
                     WebActionSet actionSet = method.getDeclaringClass().getAnnotation(WebActionSet.class);
                     if (actionSet != null) {
                         checkServicePermissions(actionSet);
                     }
-                    WebAction webAction = method.getAnnotation(WebAction.class);
                     if (webAction != null) {
-                        checkActionPermissions(method, webAction);
+                        checkActionPermissions(method, webAction, application);
                     }
                     WebProjectAction projectAction = method.getAnnotation(WebProjectAction.class);
                     if (projectAction != null) {
@@ -302,8 +313,11 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
             }
         }
 
-        private void checkActionPermissions(@NotNull Method method, @NotNull WebAction webAction) throws DBWebException {
-            var application = WebAppUtils.getWebPlatform().getApplication();
+        private void checkActionPermissions(
+            @NotNull Method method,
+            @NotNull WebAction webAction,
+            @NotNull WebApplication application
+        ) throws DBWebException {
             if (application.isInitializationMode() && webAction.initializationRequired()) {
                 String message = "Server initialization in progress: "
                     + String.join(",", application.getInitActions().values()) + ".\nDo not restart the server.";
