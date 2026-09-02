@@ -147,7 +147,7 @@ export const AIProfileCredentialsDialog: DialogComponent<IAIProfileCredentialsDi
           <Button type="button" variant="secondary" disabled={state.processing} onClick={() => rejectDialog()}>
             {translate('ui_processing_cancel')}
           </Button>
-          <Button type="submit" onClick={() => form.submit()} disabled={state.processing || !state.token}>
+          <Button type="submit" disabled={state.processing || !state.token} onClick={() => form.submit()}>
             {translate('ui_processing_save')}
           </Button>
         </CommonDialogFooter>
