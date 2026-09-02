@@ -29,6 +29,7 @@
     "@cloudbeaver/core-resource": "workspace:*",
     "@cloudbeaver/core-root": "workspace:*",
     "@cloudbeaver/plugin-ai": "workspace:*",
+    "@cloudbeaver/plugin-ai-profiles": "workspace:*",
     "@cloudbeaver/plugin-user-profile": "workspace:*",
     "mobx": "^6",
     "mobx-react-lite": "^4",

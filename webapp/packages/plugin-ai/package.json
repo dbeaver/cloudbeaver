@@ -21,25 +21,15 @@
     "validate-dependencies": "core-cli-validate-dependencies"
   },
   "dependencies": {
-    "@cloudbeaver/core-authentication": "workspace:*",
-    "@cloudbeaver/core-blocks": "workspace:*",
     "@cloudbeaver/core-di": "workspace:*",
-    "@cloudbeaver/core-dialogs": "workspace:*",
-    "@cloudbeaver/core-events": "workspace:*",
-    "@cloudbeaver/core-localization": "workspace:*",
     "@cloudbeaver/core-resource": "workspace:*",
     "@cloudbeaver/core-root": "workspace:*",
     "@cloudbeaver/core-sdk": "workspace:*",
-    "mobx": "^6",
-    "mobx-react-lite": "^4",
-    "react": "^19",
-    "react-dom": "^19",
     "tslib": "^2"
   },
   "devDependencies": {
     "@cloudbeaver/core-cli": "workspace:*",
     "@cloudbeaver/tsconfig": "workspace:*",
-    "@types/react": "^19",
     "rimraf": "^6",
     "typescript": "^5"
   }

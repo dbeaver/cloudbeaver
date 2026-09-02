@@ -11,10 +11,10 @@ import { FormMode, FormPart, formValidationContext, type IFormState } from '@clo
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import type { AiEngineConfig } from '@cloudbeaver/core-sdk';
 import { getUniqueName, trimObjectValues } from '@cloudbeaver/core-utils';
-import { supportsUserCredentials } from '@cloudbeaver/plugin-ai';
+import { AIProfileCredentialsService, AIProfilesResource } from '@cloudbeaver/plugin-ai-profiles';
 
 import { AIEnginePropertiesResource } from '../../AIEnginePropertiesResource.js';
-import { AIAdminProfilesResource, type AIAdminProfile, type AIProfileInput } from '../../AIProfilesResource.js';
+import { AIProfilesAdministrationService, type AIAdminProfile, type AIProfileInput } from '../../AIProfilesAdministrationService.js';
 import { getObjectPropertiesValues } from '../../utils/getObjectPropertiesValues.js';
 import { prepareProperties } from '../../utils/prepareProperties.js';
 import type { IAIProfileFormState } from '../IAIProfileFormState.js';
@@ -32,7 +32,9 @@ const getDefaultState = (): IAIProfileOptionsState => ({
 export class AIProfileFormPart extends FormPart<IAIProfileOptionsState, IAIProfileFormState> {
   constructor(
     formState: IFormState<IAIProfileFormState>,
-    private readonly aiProfilesResource: AIAdminProfilesResource,
+    private readonly aiProfilesResource: AIProfilesResource,
+    private readonly aiProfilesAdministrationService: AIProfilesAdministrationService,
+    private readonly aiProfileCredentialsService: AIProfileCredentialsService,
     private readonly aiEnginePropertiesResource: AIEnginePropertiesResource,
   ) {
     super(formState, getDefaultState());
@@ -86,7 +88,7 @@ export class AIProfileFormPart extends FormPart<IAIProfileOptionsState, IAIProfi
       this.state.properties = getObjectPropertiesValues(propertiesInfo ?? []);
       this.state.global = this.state.properties[GLOBAL_PROPERTY_ID] !== false;
       this.state.properties[GLOBAL_PROPERTY_ID] = this.state.global;
-      if (!supportsUserCredentials(propertiesInfo ?? [])) {
+      if (!this.aiProfileCredentialsService.isSupported(propertiesInfo ?? [])) {
         this.state.global = true;
       }
     });
@@ -105,7 +107,7 @@ export class AIProfileFormPart extends FormPart<IAIProfileOptionsState, IAIProfi
 
   protected override validate(_: IFormState<IAIProfileFormState>, contexts: IExecutionContextProvider<IFormState<IAIProfileFormState>>): void {
     const properties = this.aiEnginePropertiesResource.get(this.state.engineId) ?? [];
-    if (!this.state.global && !supportsUserCredentials(properties)) {
+    if (!this.state.global && !this.aiProfileCredentialsService.isSupported(properties)) {
       contexts.getContext(formValidationContext).error('plugin_ai_administration_profile_user_credentials_unsupported');
     }
   }
@@ -134,10 +136,10 @@ export class AIProfileFormPart extends FormPart<IAIProfileOptionsState, IAIProfi
     let profile: AIAdminProfile;
 
     if (this.formState.mode === FormMode.Create) {
-      profile = await this.aiProfilesResource.create(config);
+      profile = await this.aiProfilesAdministrationService.create(config);
       this.formState.setMode(FormMode.Edit);
     } else {
-      profile = await this.aiProfilesResource.update(config);
+      profile = await this.aiProfilesAdministrationService.update(config);
     }
 
     this.formState.state.name = profile.name;

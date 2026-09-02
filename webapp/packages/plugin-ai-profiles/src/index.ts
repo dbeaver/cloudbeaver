@@ -8,5 +8,7 @@
 
 import './module.js';
 
-export * from './AiEnginesResource.js';
-export * from './AISettingsResource.js';
+export * from './AIProfileCredentialsDialogLazy.js';
+export * from './AIProfileCredentialsService.js';
+export * from './AIProfilesResource.js';
+export * from './IAIProfileCredentialsDialogPayload.js';

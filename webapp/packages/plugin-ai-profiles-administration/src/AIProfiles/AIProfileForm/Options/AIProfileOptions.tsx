@@ -30,7 +30,8 @@ import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import type { AiModelInfo } from '@cloudbeaver/core-sdk';
 import { FormMode, type TabContainerPanelComponent } from '@cloudbeaver/core-ui';
-import { AiEnginesResource, requireGlobalProfileToken, supportsUserCredentials } from '@cloudbeaver/plugin-ai';
+import { AiEnginesResource } from '@cloudbeaver/plugin-ai';
+import { AIProfileCredentialsService } from '@cloudbeaver/plugin-ai-profiles';
 
 import {
   AIEnginePropertiesResource,
@@ -38,7 +39,7 @@ import {
   MODEL_PROPERTY_ID,
   TEMPERATURE_PROPERTY_ID,
 } from '../../AIEnginePropertiesResource.js';
-import { AIAdminProfilesResource } from '../../AIProfilesResource.js';
+import { AIProfilesAdministrationService } from '../../AIProfilesAdministrationService.js';
 import type { IAIProfileFormProps } from '../IAIProfileFormProps.js';
 import { AIProfilePropertiesForm } from './AIProfilePropertiesForm.js';
 import { AI_PROFILE_NAME_MAX_LENGTH, AI_PROFILE_NAME_MIN_LENGTH } from './AIProfileSchema.js';
@@ -47,16 +48,16 @@ import { getAIProfileFormPart } from './getAIProfileFormPart.js';
 export const AIProfileOptions: TabContainerPanelComponent<IAIProfileFormProps> = observer(function AIProfileOptions({ formState }) {
   const translate = useTranslate();
   const notificationService = useService(NotificationService);
-  const aiProfilesResource = useService(AIAdminProfilesResource);
+  const aiProfileCredentialsService = useService(AIProfileCredentialsService);
+  const aiProfilesAdministrationService = useService(AIProfilesAdministrationService);
   const enginesLoader = useResource(AIProfileOptions, AiEnginesResource, undefined);
   const part = getAIProfileFormPart(formState);
   const propertiesLoader = useResource(AIProfileOptions, AIEnginePropertiesResource, part.state.engineId || null);
   const propertiesInfo = propertiesLoader.data ?? [];
   const usesUserCredentials = !part.state.global;
-  const configurableProperties = requireGlobalProfileToken(
-    propertiesInfo.filter(property => property.id !== 'global' && (!usesUserCredentials || property.id !== 'token')),
-    part.state.global,
-  );
+  const configurableProperties = propertiesInfo
+    .filter(property => property.id !== 'global' && (!usesUserCredentials || property.id !== 'token'))
+    .map(property => (part.state.global && property.id === 'token' ? { ...property, required: true } : property));
   const isEditMode = formState.mode === FormMode.Edit;
   const [isLoading, setIsLoading] = useState(false);
   const [models, setModels] = useState<AiModelInfo[] | null>(null);
@@ -79,7 +80,7 @@ export const AIProfileOptions: TabContainerPanelComponent<IAIProfileFormProps> =
   const modelProperty = configurableProperties[modelPropertyIndex];
   const chatModels = (models ?? []).filter(model => model.features.map(feature => feature.toLowerCase()).includes('chat'));
   const hasModels = !!modelProperty;
-  const userCredentialsSupported = supportsUserCredentials(propertiesInfo);
+  const userCredentialsSupported = aiProfileCredentialsService.isSupported(propertiesInfo);
   const propertiesBeforeModel = hasModels ? configurableProperties.slice(0, modelPropertyIndex) : configurableProperties;
   const propertiesAfterModel = hasModels ? configurableProperties.slice(modelPropertyIndex + 1) : [];
 
@@ -104,7 +105,7 @@ export const AIProfileOptions: TabContainerPanelComponent<IAIProfileFormProps> =
     try {
       setIsLoading(true);
       const profileId = formState.mode === FormMode.Edit ? formState.state.profileId : undefined;
-      const loadedModels = (await aiProfilesResource.loadModels(engineId, profileId, part.getCurrentEngineSettings())).toSorted((a, b) =>
+    const loadedModels = (await aiProfilesAdministrationService.loadModels(engineId, profileId, part.getCurrentEngineSettings())).toSorted((a, b) =>
         a.id.localeCompare(b.id),
       );
       setModels(loadedModels);

@@ -28,7 +28,7 @@ import { CommonDialogService, DialogueStateResult, type DialogComponent } from '
 import { NotificationService } from '@cloudbeaver/core-events';
 
 import type { IAIProfileCredentialsDialogPayload } from './IAIProfileCredentialsDialogPayload.js';
-import { UserAIProfileResource } from './UserAIProfileResource.js';
+import { AIProfilesResource } from './AIProfilesResource.js';
 
 interface CredentialsDialogState {
   token: string;
@@ -36,7 +36,6 @@ interface CredentialsDialogState {
   credentialsSaved: boolean;
 }
 
-// TODO: Move this UI to a dedicated shared AI credentials UI package when package boundaries warrant it.
 export const AIProfileCredentialsDialog: DialogComponent<IAIProfileCredentialsDialogPayload> = observer(function AIProfileCredentialsDialog({
   payload,
   resolveDialog,
@@ -45,7 +44,7 @@ export const AIProfileCredentialsDialog: DialogComponent<IAIProfileCredentialsDi
   const translate = useTranslate();
   const commonDialogService = useService(CommonDialogService);
   const notificationService = useService(NotificationService);
-  const userAIProfileResource = useService(UserAIProfileResource);
+  const aiProfilesResource = useService(AIProfilesResource);
   const state = useObservableRef<CredentialsDialogState>(
     () => ({ token: '', processing: false, credentialsSaved: payload.credentialsSaved }),
     { token: observable.ref, processing: observable.ref, credentialsSaved: observable.ref },
@@ -56,7 +55,7 @@ export const AIProfileCredentialsDialog: DialogComponent<IAIProfileCredentialsDi
     try {
       state.processing = true;
       if (state.token) {
-        const saved = await userAIProfileResource.saveCredentials(payload.profileId, state.token);
+        const saved = await aiProfilesResource.saveCredentials(payload.profileId, state.token);
         if (!saved) {
           throw new Error(translate('plugin_ai_credentials_save_failed'));
         }
@@ -83,7 +82,7 @@ export const AIProfileCredentialsDialog: DialogComponent<IAIProfileCredentialsDi
     if (status === DialogueStateResult.Resolved) {
       try {
         state.processing = true;
-        const reset = await userAIProfileResource.resetCredentials(payload.profileId);
+        const reset = await aiProfilesResource.resetCredentials(payload.profileId);
         if (!reset) {
           throw new Error(translate('plugin_ai_credentials_reset_failed'));
         }

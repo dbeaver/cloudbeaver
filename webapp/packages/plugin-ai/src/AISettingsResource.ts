@@ -9,7 +9,7 @@
 import { injectable } from '@cloudbeaver/core-di';
 import { CachedDataResource } from '@cloudbeaver/core-resource';
 import { ServerConfigResource, ServerEventId, WorkspaceConfigEventHandler } from '@cloudbeaver/core-root';
-import { type AiSettingsInfo, GraphQLService } from '@cloudbeaver/core-sdk';
+import { type AiSettingsConfig, type AiSettingsInfo, GraphQLService } from '@cloudbeaver/core-sdk';
 
 export type AISettings = AiSettingsInfo;
 
@@ -24,6 +24,13 @@ export class AISettingsResource extends CachedDataResource<AISettings | null> {
 
     this.sync(serverConfigResource);
     workspaceConfigEventHandler.onEvent(ServerEventId.CbWorkspaceConfigChanged, () => this.markOutdated(), undefined, this);
+  }
+
+  async saveSettings(settings: AiSettingsConfig): Promise<void> {
+    await this.performUpdate(undefined, undefined, async () => {
+      const { result } = await this.graphQLService.sdk.saveAiSettings({ settings });
+      this.setData(result);
+    });
   }
 
   protected async loader(): Promise<AISettings> {

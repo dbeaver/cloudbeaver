@@ -18,44 +18,41 @@ import {
   ToolsActionStyles,
   ToolsPanel,
   ToolsPanelStyles,
-  useAutoLoad,
   useResource,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
+import { AISettingsResource } from '@cloudbeaver/plugin-ai';
+import { AISettingsService } from '@cloudbeaver/plugin-ai-administration';
+import { AIProfilesResource } from '@cloudbeaver/plugin-ai-profiles';
 import { TableSelectionContext, useTableSelection } from '@cloudbeaver/plugin-data-grid';
 import { isDefined } from '@dbeaver/js-helpers';
 
-import type { AdministrationAISettingsFormState } from '../AISettingsForm/AdministrationAISettingsFormState.js';
-import { getAdministrationAISettingsFormInfoPart } from '../AISettingsForm/getAdministrationAISettingsFormInfoPart.js';
 import { AIProfileFormService } from './AIProfileForm/AIProfileFormService.js';
-import { AIAdminProfilesResource } from './AIProfilesResource.js';
 import AIProfilesToolsPanelStyles from './AIProfilesToolsPanel.module.css';
 import { AIProfilesTable } from './AIProfilesTable.js';
 import { useAIProfilesTable } from './useAIProfilesTable.js';
-
-interface Props {
-  formState: AdministrationAISettingsFormState;
-}
 
 const toolsPanelRegistry: StyleRegistry = [
   [ToolsPanelStyles, { mode: 'append', styles: [AIProfilesToolsPanelStyles] }],
   [ToolsActionStyles, { mode: 'append', styles: [AIProfilesToolsPanelStyles] }],
 ];
 
-export const AIProfilesPanel = observer<Props>(function AIProfilesPanel({ formState }) {
+export const AIProfilesPanel = observer(function AIProfilesPanel() {
   const translate = useTranslate();
   const aiProfileFormService = useService(AIProfileFormService);
+  const aiSettingsService = useService(AISettingsService);
+  const aiSettingsResource = useService(AISettingsResource);
 
-  const settingsInfoPart = getAdministrationAISettingsFormInfoPart(formState);
-  useAutoLoad(AIProfilesPanel, settingsInfoPart);
-
-  const profilesLoader = useResource(AIProfilesPanel, AIAdminProfilesResource, CachedMapAllKey);
+  useResource(AIProfilesPanel, AISettingsResource, undefined);
+  const profilesLoader = useResource(AIProfilesPanel, AIProfilesResource, CachedMapAllKey);
   const profiles = profilesLoader.data.filter(isDefined);
-  const defaultProfileId = settingsInfoPart.initialState.defaultConfiguration;
+  const settingsLoaded = aiSettingsResource.isLoaded();
 
-  const selection = useTableSelection(profiles.filter(p => p.id !== defaultProfileId).map(p => p.id));
+  const selection = useTableSelection(
+    profiles.filter(profile => settingsLoaded && !aiSettingsService.isEffectiveDefaultProfile(profile.id)).map(profile => profile.id),
+  );
   const table = useAIProfilesTable(selection);
 
   return (
@@ -95,7 +92,11 @@ export const AIProfilesPanel = observer<Props>(function AIProfilesPanel({ formSt
       </Group>
       <Container overflow gap maximum>
         <TableSelectionContext value={selection}>
-          <AIProfilesTable profiles={profiles} defaultProfileId={defaultProfileId} />
+          <AIProfilesTable
+            profiles={profiles}
+            deletionDisabled={!settingsLoaded}
+            isDefaultProfile={profileId => aiSettingsService.isEffectiveDefaultProfile(profileId)}
+          />
         </TableSelectionContext>
       </Container>
     </ColoredContainer>

@@ -35,6 +35,9 @@
       "path": "../plugin-ai"
     },
     {
+      "path": "../plugin-ai-profiles"
+    },
+    {
       "path": "../plugin-user-profile"
     }
   ],

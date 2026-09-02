@@ -12,25 +12,10 @@
   ],
   "references": [
     {
-      "path": "../core-authentication"
-    },
-    {
-      "path": "../core-blocks"
-    },
-    {
       "path": "../core-cli"
     },
     {
       "path": "../core-di"
-    },
-    {
-      "path": "../core-dialogs"
-    },
-    {
-      "path": "../core-events"
-    },
-    {
-      "path": "../core-localization"
     },
     {
       "path": "../core-resource"

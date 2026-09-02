@@ -6,14 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { AIProfile } from './UserAIProfileResource.js';
+import type { AIProfile } from './AIProfilesResource.js';
 
 export function supportsUserCredentials(properties: ReadonlyArray<{ id?: string; features: readonly string[] }>): boolean {
   return properties.some(property => property.id === 'token' && property.features.includes('password'));
-}
-
-export function requireGlobalProfileToken<T extends { id?: string; required: boolean }>(properties: readonly T[], global: boolean): T[] {
-  return properties.map(property => (global && property.id === 'token' ? { ...property, required: true } : property));
 }
 
 export function requiresUserCredentials(profile: Pick<AIProfile, 'global' | 'credentialsSaved'>): boolean {

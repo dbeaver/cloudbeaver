@@ -125,6 +125,12 @@
       "path": "../plugin-ai-chat"
     },
     {
+      "path": "../plugin-ai-profiles"
+    },
+    {
+      "path": "../plugin-ai-profiles-administration"
+    },
+    {
       "path": "../plugin-ai-user-profile"
     },
     {

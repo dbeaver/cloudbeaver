@@ -13,7 +13,8 @@ import { ActionIconButton, IconOrImage, RadioIndicator, useResource, useTranslat
 import { useService } from '@cloudbeaver/core-di';
 import { DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { AIProfileCredentialsDialogService, AiEnginesResource, requiresUserCredentials, type AIProfile } from '@cloudbeaver/plugin-ai';
+import { AiEnginesResource } from '@cloudbeaver/plugin-ai';
+import { AIProfileCredentialsService, type AIProfile } from '@cloudbeaver/plugin-ai-profiles';
 
 import type { AIChatConversationInfo } from '../AIChatConversationsResource.js';
 import { AIChatConversationsService } from '../AIChatConversationsService.js';
@@ -28,16 +29,16 @@ export const AIChatConversationProfile = observer<Props>(function AIChatConversa
   const translate = useTranslate();
   const notificationService = useService(NotificationService);
   const aiChatConversationsService = useService(AIChatConversationsService);
-  const credentialsDialogService = useService(AIProfileCredentialsDialogService);
+  const credentialsService = useService(AIProfileCredentialsService);
   const menu = useMenuContext();
 
   const aiEnginesResource = useResource(AIChatConversationProfile, AiEnginesResource, undefined);
 
   async function selectProfile(profile: AIProfile) {
     try {
-      if (requiresUserCredentials(profile)) {
+      if (credentialsService.isRequired(profile)) {
         menu?.hide();
-        const { status } = await credentialsDialogService.open(profile.id);
+        const { status } = await credentialsService.open(profile.id);
         if (status !== DialogueStateResult.Resolved) {
           return;
         }
@@ -52,7 +53,7 @@ export const AIChatConversationProfile = observer<Props>(function AIChatConversa
     event.stopPropagation();
     menu?.hide();
     try {
-      await credentialsDialogService.open(profileId);
+      await credentialsService.open(profileId);
     } catch (exception: any) {
       notificationService.logException(exception, 'plugin_ai_chat_profile_credentials_edit_fail');
     }

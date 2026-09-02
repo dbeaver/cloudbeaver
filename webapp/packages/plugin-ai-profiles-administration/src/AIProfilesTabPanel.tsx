@@ -5,8 +5,10 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { observer } from 'mobx-react-lite';
 
-import './module.js';
+import { AIProfilesPanel } from './AIProfiles/AIProfilesPanel.js';
 
-export * from './AiEnginesResource.js';
-export * from './AISettingsResource.js';
+export const AIProfilesTabPanel = observer(function AIProfilesTabPanel() {
+  return <AIProfilesPanel />;
+});

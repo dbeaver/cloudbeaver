@@ -1,5 +1,5 @@
 {
-  "name": "@cloudbeaver/plugin-ai-administration",
+  "name": "@cloudbeaver/plugin-ai-profiles",
   "type": "module",
   "sideEffects": [
     "./lib/module.js",
@@ -21,21 +21,16 @@
     "validate-dependencies": "core-cli-validate-dependencies"
   },
   "dependencies": {
-    "@cloudbeaver/core-administration": "workspace:*",
+    "@cloudbeaver/core-authentication": "workspace:*",
     "@cloudbeaver/core-blocks": "workspace:*",
-    "@cloudbeaver/core-data-context": "workspace:*",
     "@cloudbeaver/core-di": "workspace:*",
     "@cloudbeaver/core-dialogs": "workspace:*",
     "@cloudbeaver/core-events": "workspace:*",
-    "@cloudbeaver/core-executor": "workspace:*",
     "@cloudbeaver/core-localization": "workspace:*",
     "@cloudbeaver/core-resource": "workspace:*",
     "@cloudbeaver/core-root": "workspace:*",
-    "@cloudbeaver/core-ui": "workspace:*",
-    "@cloudbeaver/core-utils": "workspace:*",
+    "@cloudbeaver/core-sdk": "workspace:*",
     "@cloudbeaver/plugin-ai": "workspace:*",
-    "@cloudbeaver/plugin-ai-profiles": "workspace:*",
-    "@dbeaver/js-helpers": "workspace:*",
     "mobx": "^6",
     "mobx-react-lite": "^4",
     "react": "^19",
@@ -47,7 +42,6 @@
     "@cloudbeaver/tsconfig": "workspace:*",
     "@types/react": "^19",
     "rimraf": "^6",
-    "typescript": "^5",
-    "typescript-plugin-css-modules": "^5"
+    "typescript": "^5"
   }
 }

@@ -13,13 +13,15 @@ import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
+import { AIProfilesResource } from '@cloudbeaver/plugin-ai-profiles';
 import type { ITableSelection } from '@cloudbeaver/plugin-data-grid';
 
-import { AIAdminProfilesResource } from './AIProfilesResource.js';
+import { AIProfilesAdministrationService } from './AIProfilesAdministrationService.js';
 
 interface State {
   processing: boolean;
-  aiProfilesResource: AIAdminProfilesResource;
+  aiProfilesResource: AIProfilesResource;
+  aiProfilesAdministrationService: AIProfilesAdministrationService;
   notificationService: NotificationService;
   dialogService: CommonDialogService;
   selection: ITableSelection;
@@ -30,7 +32,8 @@ interface State {
 export function useAIProfilesTable(selection: ITableSelection): Readonly<State> {
   const notificationService = useService(NotificationService);
   const dialogService = useService(CommonDialogService);
-  const aiProfilesResource = useService(AIAdminProfilesResource);
+  const aiProfilesResource = useService(AIProfilesResource);
+  const aiProfilesAdministrationService = useService(AIProfilesAdministrationService);
   const translate = useTranslate();
 
   return useObservableRef<State>(
@@ -81,7 +84,7 @@ export function useAIProfilesTable(selection: ITableSelection): Readonly<State> 
 
         try {
           this.processing = true;
-          const results = await Promise.allSettled(deletionList.map(profileId => this.aiProfilesResource.deleteProfile(profileId)));
+          const results = await Promise.allSettled(deletionList.map(profileId => this.aiProfilesAdministrationService.delete(profileId)));
           const failed = results.filter((r): r is PromiseRejectedResult => r.status === 'rejected');
 
           if (failed.length === 0) {
@@ -105,6 +108,6 @@ export function useAIProfilesTable(selection: ITableSelection): Readonly<State> 
       refresh: action.bound,
       delete: action.bound,
     },
-    { aiProfilesResource, selection, notificationService, dialogService },
+    { aiProfilesResource, aiProfilesAdministrationService, selection, notificationService, dialogService },
   );
 }

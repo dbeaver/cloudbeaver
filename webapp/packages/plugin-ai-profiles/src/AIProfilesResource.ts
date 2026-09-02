@@ -15,7 +15,7 @@ import { type AiConfigurationProfileInfo, GraphQLService } from '@cloudbeaver/co
 export type AIProfile = AiConfigurationProfileInfo;
 
 @injectable(() => [GraphQLService, ServerConfigResource, WorkspaceConfigEventHandler, UserInfoResource])
-export class UserAIProfileResource extends CachedMapResource<string, AIProfile> {
+export class AIProfilesResource extends CachedMapResource<string, AIProfile> {
   constructor(
     private readonly graphQLService: GraphQLService,
     serverConfigResource: ServerConfigResource,

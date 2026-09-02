@@ -17,7 +17,7 @@ import { ConnectionsManagerService, ContainerResource } from '@cloudbeaver/core-
 import { NotificationService } from '@cloudbeaver/core-events';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import { AiDatabaseScope } from '@cloudbeaver/core-sdk';
-import { UserAIProfileResource } from '@cloudbeaver/plugin-ai';
+import { AIProfilesResource } from '@cloudbeaver/plugin-ai-profiles';
 
 import { AIChatConversationScopeCustomDialog } from './AIChatConversationScopeCustom/AIChatConversationScopeCustomDialog.js';
 import { AIChatConversationProfile } from './AIChatConversationProfile.js';
@@ -46,7 +46,7 @@ export const AIChatConversationScope = observer<Props>(function AIChatConversati
 
   const { data: container } = useResource(AIChatConversationScope, ContainerResource, conversation.dataSourceId ?? null);
   const { data: currentScope } = useResource(AIChatConversationScope, AIChatConversationScopeResource, conversation.id);
-  const { data: profileList } = useResource(AIChatConversationScope, UserAIProfileResource, CachedMapAllKey);
+  const { data: profileList } = useResource(AIChatConversationScope, AIProfilesResource, CachedMapAllKey);
   const profiles = profileList.filter(profile => profile !== undefined);
 
   async function selectScope(scope: AiDatabaseScope) {

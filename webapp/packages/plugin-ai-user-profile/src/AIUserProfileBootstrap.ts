@@ -10,20 +10,20 @@ import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CachedMapAllKey, getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
 import { FEATURE_AI_ID, ServerConfigResource } from '@cloudbeaver/core-root';
-import { UserAIProfileResource } from '@cloudbeaver/plugin-ai';
+import { AIProfilesResource } from '@cloudbeaver/plugin-ai-profiles';
 import { UserProfileTabsService } from '@cloudbeaver/plugin-user-profile';
 
 const AIProfilesPanel = importLazyComponent(() => import('./components/AIProfilesPanel.js').then(module => module.AIProfilesPanel));
 
 const AI_PROFILES_TAB_ID = 'ai_profiles';
 
-@injectable(() => [UserProfileTabsService, AppAuthService, ServerConfigResource, UserAIProfileResource])
+@injectable(() => [UserProfileTabsService, AppAuthService, ServerConfigResource, AIProfilesResource])
 export class AIUserProfileBootstrap extends Bootstrap {
   constructor(
     private readonly userProfileTabsService: UserProfileTabsService,
     private readonly appAuthService: AppAuthService,
     private readonly serverConfigResource: ServerConfigResource,
-    private readonly userAIProfileResource: UserAIProfileResource,
+    private readonly aiProfilesResource: AIProfilesResource,
   ) {
     super();
   }
@@ -34,7 +34,7 @@ export class AIUserProfileBootstrap extends Bootstrap {
       name: 'plugin_ai_user_profile_tab_label',
       order: 4,
       getLoader: () =>
-        getCachedMapResourceLoaderState(this.userAIProfileResource, () =>
+        getCachedMapResourceLoaderState(this.aiProfilesResource, () =>
           this.appAuthService.authenticated && this.serverConfigResource.isFeatureEnabled(FEATURE_AI_ID, true) ? CachedMapAllKey : null,
         ),
       isHidden: () => !this.isAvailable(),
@@ -46,7 +46,7 @@ export class AIUserProfileBootstrap extends Bootstrap {
     return (
       this.appAuthService.authenticated &&
       this.serverConfigResource.isFeatureEnabled(FEATURE_AI_ID, true) &&
-      (!this.userAIProfileResource.isLoaded(CachedMapAllKey) || this.userAIProfileResource.values.length > 0)
+      (!this.aiProfilesResource.isLoaded(CachedMapAllKey) || this.aiProfilesResource.values.length > 0)
     );
   }
 }

@@ -6,11 +6,10 @@
     "tsBuildInfoFile": "lib/tsconfig.tsbuildinfo",
     "composite": true
   },
-  "exclude": [
-    "lib/**/*",
-    "**/node_modules"
-  ],
   "references": [
+    {
+      "path": "../../common-react/@dbeaver/ui-kit"
+    },
     {
       "path": "../../common-typescript/@dbeaver/js-helpers"
     },
@@ -48,6 +47,9 @@
       "path": "../core-root"
     },
     {
+      "path": "../core-sdk"
+    },
+    {
       "path": "../core-ui"
     },
     {
@@ -57,7 +59,13 @@
       "path": "../plugin-ai"
     },
     {
+      "path": "../plugin-ai-administration"
+    },
+    {
       "path": "../plugin-ai-profiles"
+    },
+    {
+      "path": "../plugin-data-grid"
     }
   ],
   "include": [
@@ -65,5 +73,9 @@
     "src/**/*",
     "src/**/*.json",
     "src/**/*.css"
+  ],
+  "exclude": [
+    "**/node_modules",
+    "lib/**/*"
   ]
 }

@@ -7,17 +7,20 @@
  */
 import { injectable, IServiceProvider } from '@cloudbeaver/core-di';
 import { FormMode } from '@cloudbeaver/core-ui';
+import { AISettingsResource } from '@cloudbeaver/plugin-ai';
 
 import { AdministrationAISettingsFormService } from './AISettingsForm/AdministrationAISettingsFormService.js';
 import { AdministrationAISettingsFormState } from './AISettingsForm/AdministrationAISettingsFormState.js';
+import { getAdministrationAISettingsFormInfoPart } from './AISettingsForm/getAdministrationAISettingsFormInfoPart.js';
 
-@injectable(() => [AdministrationAISettingsFormService, IServiceProvider])
+@injectable(() => [AdministrationAISettingsFormService, IServiceProvider, AISettingsResource])
 export class AISettingsService {
   formState: AdministrationAISettingsFormState | null;
 
   constructor(
     private readonly administrationAISettingsFormService: AdministrationAISettingsFormService,
     private readonly serviceProvider: IServiceProvider,
+    private readonly aiSettingsResource: AISettingsResource,
   ) {
     this.formState = null;
   }
@@ -28,8 +31,14 @@ export class AISettingsService {
     this.formState.setMode(FormMode.Edit);
   }
 
-  dispose() {
+  dispose(): void {
     this.formState?.dispose();
     this.formState = null;
+  }
+
+  isEffectiveDefaultProfile(profileId: string): boolean {
+    const persistedProfileId = this.aiSettingsResource.data?.defaultConfiguration;
+    const selectedProfileId = this.formState ? getAdministrationAISettingsFormInfoPart(this.formState).state.defaultConfiguration : null;
+    return profileId === persistedProfileId || profileId === selectedProfileId;
   }
 }

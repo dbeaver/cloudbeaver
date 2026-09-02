@@ -20,7 +20,8 @@ import {
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { AIProfileCredentialsDialogService, type EngineInfo } from '@cloudbeaver/plugin-ai';
+import type { EngineInfo } from '@cloudbeaver/plugin-ai';
+import { AIProfileCredentialsService } from '@cloudbeaver/plugin-ai-profiles';
 
 export interface IAIProfile {
   id: string;
@@ -37,12 +38,12 @@ interface Props {
 
 export const AIProfilesTable = observer<Props>(function AIProfilesTable({ profiles, engines }) {
   const translate = useTranslate();
-  const credentialsDialogService = useService(AIProfileCredentialsDialogService);
+  const credentialsService = useService(AIProfileCredentialsService);
   const notificationService = useService(NotificationService);
 
   async function editCredentials(profileId: string): Promise<void> {
     try {
-      await credentialsDialogService.open(profileId);
+      await credentialsService.open(profileId);
     } catch (exception: any) {
       notificationService.logException(exception, 'plugin_ai_user_profile_credentials_edit_failed');
     }

@@ -11,14 +11,15 @@ import { ColoredContainer, Container, Group, TextPlaceholder, ToolsAction, Tools
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { AiEnginesResource, UserAIProfileResource } from '@cloudbeaver/plugin-ai';
+import { AiEnginesResource } from '@cloudbeaver/plugin-ai';
+import { AIProfilesResource } from '@cloudbeaver/plugin-ai-profiles';
 
 import { AIProfilesTable, type IAIProfile } from './AIProfilesTable.js';
 
 export const AIProfilesPanel = observer(function AIProfilesPanel() {
   const translate = useTranslate();
   const notificationService = useService(NotificationService);
-  const profilesLoader = useResource(AIProfilesPanel, UserAIProfileResource, CachedMapAllKey);
+  const profilesLoader = useResource(AIProfilesPanel, AIProfilesResource, CachedMapAllKey);
   const enginesLoader = useResource(AIProfilesPanel, AiEnginesResource, undefined);
   const profiles = profilesLoader.data.filter((profile): profile is IAIProfile => profile !== undefined);
 

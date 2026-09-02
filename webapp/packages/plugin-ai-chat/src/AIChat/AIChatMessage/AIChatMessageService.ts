@@ -15,7 +15,8 @@ import { LocalizationService } from '@cloudbeaver/core-localization';
 import { Executor, ExecutorInterrupter } from '@cloudbeaver/core-executor';
 import { ConnectionsManagerService, type IConnectionInfoParams } from '@cloudbeaver/core-connections';
 import type { AiSendChatMessageInfoFragment } from '@cloudbeaver/core-sdk';
-import { AIProfileCredentialsDialogService, AISettingsResource, requiresUserCredentials, UserAIProfileResource } from '@cloudbeaver/plugin-ai';
+import { AISettingsResource } from '@cloudbeaver/plugin-ai';
+import { AIProfileCredentialsService, AIProfilesResource } from '@cloudbeaver/plugin-ai-profiles';
 
 import { AIChatMessagesResource, isFunctionConfirmationMessage, isFunctionMessage, type IMessageParam } from './AIChatMessagesResource.js';
 import { AIChatConversationsResource } from '../AIChatConversation/AIChatConversationsResource.js';
@@ -51,9 +52,9 @@ type MessageSendExecutorData = IMessageSendExecutorBeforeData | IMessageSendExec
   CommonDialogService,
   LocalizationService,
   ConnectionsManagerService,
-  UserAIProfileResource,
+  AIProfilesResource,
   AISettingsResource,
-  AIProfileCredentialsDialogService,
+  AIProfileCredentialsService,
 ])
 export class AIChatMessageService {
   onMessageSend: Executor<MessageSendExecutorData>;
@@ -64,9 +65,9 @@ export class AIChatMessageService {
     private readonly commonDialogService: CommonDialogService,
     private readonly localizationService: LocalizationService,
     private readonly connectionsManagerService: ConnectionsManagerService,
-    private readonly userAIProfileResource: UserAIProfileResource,
+    private readonly aiProfilesResource: AIProfilesResource,
     private readonly aiSettingsResource: AISettingsResource,
-    private readonly credentialsDialogService: AIProfileCredentialsDialogService,
+    private readonly credentialsService: AIProfileCredentialsService,
   ) {
     this.onMessageSend = new Executor();
 
@@ -129,19 +130,19 @@ export class AIChatMessageService {
     const conversation = await this.aiChatConversationsResource.load(conversationId);
     const settings = await this.aiSettingsResource.load();
     let profileId = conversation.profile ?? settings?.defaultConfiguration;
-    let profile = profileId ? await this.userAIProfileResource.load(profileId) : undefined;
+    let profile = profileId ? await this.aiProfilesResource.load(profileId) : undefined;
 
     if (!profile && conversation.profile && settings?.defaultConfiguration && conversation.profile !== settings.defaultConfiguration) {
       profileId = settings.defaultConfiguration;
-      profile = await this.userAIProfileResource.load(profileId);
+      profile = await this.aiProfilesResource.load(profileId);
       if (profile) {
         await this.aiChatConversationsResource.updateConversation(conversation.id, { settings: { profile: profileId } });
       }
     }
 
     if (profileId) {
-      if (profile && requiresUserCredentials(profile)) {
-        const { status } = await this.credentialsDialogService.open(profile.id);
+      if (profile && this.credentialsService.isRequired(profile)) {
+        const { status } = await this.credentialsService.open(profile.id);
         if (status !== DialogueStateResult.Resolved) {
           return;
         }

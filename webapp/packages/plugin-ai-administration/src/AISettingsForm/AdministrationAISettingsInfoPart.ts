@@ -8,9 +8,9 @@
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { FormPart, formValidationContext, type IFormState } from '@cloudbeaver/core-ui';
+import { AISettingsResource } from '@cloudbeaver/plugin-ai';
+import { AIProfilesResource } from '@cloudbeaver/plugin-ai-profiles';
 
-import { AIAdminProfilesResource } from '../AIProfiles/AIProfilesResource.js';
-import type { AISettingsResource } from '../AISettingsResource.js';
 import { LANGUAGE_VALIDATION_REGEX } from './getLanguageOptions.js';
 import type { IAdministrationAIInfoState } from './IAdministrationAIInfoState.js';
 
@@ -23,7 +23,7 @@ export class AdministrationAISettingsInfoPart extends FormPart<IAdministrationAI
   constructor(
     formState: IFormState<null>,
     private readonly aiSettingsResource: AISettingsResource,
-    private readonly aiProfilesResource: AIAdminProfilesResource,
+    private readonly aiProfilesResource: AIProfilesResource,
   ) {
     super(formState, DEFAULT_STATE_GETTER());
   }

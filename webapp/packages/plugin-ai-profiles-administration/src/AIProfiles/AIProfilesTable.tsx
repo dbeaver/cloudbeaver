@@ -13,13 +13,15 @@ import { IconOrImage, Link, s, TextPlaceholder, useResource, useS, useTranslate 
 import { useService } from '@cloudbeaver/core-di';
 import { ADMINISTRATION_TABLE_DEFAULT_ROW_HEIGHT, AdministrationTableStyles } from '@cloudbeaver/core-administration';
 import { DataGrid, TableRowSelect, useCreateGridReactiveValue } from '@cloudbeaver/plugin-data-grid';
-import { AiEnginesResource, type AIProfile } from '@cloudbeaver/plugin-ai';
+import { AiEnginesResource } from '@cloudbeaver/plugin-ai';
+import type { AIProfile } from '@cloudbeaver/plugin-ai-profiles';
 import { Command } from '@dbeaver/ui-kit';
 
 import { AIProfileFormService } from './AIProfileForm/AIProfileFormService.js';
 interface Props {
   profiles: AIProfile[];
-  defaultProfileId: string | null;
+  deletionDisabled: boolean;
+  isDefaultProfile: (profileId: string) => boolean;
 }
 
 const ENGINE_COLUMN_WIDTH = 160;
@@ -30,7 +32,7 @@ const ENGINE_COLUMN = { key: 'engine', label: 'plugin_ai_administration_profile_
 
 const COLUMNS = [SELECT_COLUMN, NAME_COLUMN, ENGINE_COLUMN];
 
-export const AIProfilesTable = observer<Props>(function AIProfilesTable({ profiles, defaultProfileId }) {
+export const AIProfilesTable = observer<Props>(function AIProfilesTable({ profiles, deletionDisabled, isDefaultProfile }) {
   const translate = useTranslate();
   const styles = useS(AdministrationTableStyles);
   const aiProfileFormService = useService(AIProfileFormService);
@@ -51,13 +53,13 @@ export const AIProfilesTable = observer<Props>(function AIProfilesTable({ profil
       return null;
     }
 
-    const isDefault = profile.id === defaultProfileId;
+    const isDefault = isDefaultProfile(profile.id);
 
     if (column.key === SELECT_COLUMN.key) {
       return (
         <TableRowSelect
           id={profile.id}
-          disabled={isDefault}
+          disabled={deletionDisabled || isDefault}
           title={isDefault ? translate('plugin_ai_administration_profile_default_delete_info') : undefined}
         />
       );
@@ -103,7 +105,8 @@ export const AIProfilesTable = observer<Props>(function AIProfilesTable({ profil
   const cell = useCreateGridReactiveValue(getCell, (onValueChange, rowIdx, colIdx) => reaction(() => getCell(rowIdx, colIdx), onValueChange), [
     COLUMNS,
     profiles,
-    defaultProfileId,
+    deletionDisabled,
+    isDefaultProfile,
     aiProfileFormService,
     enginesLoader.data,
   ]);
