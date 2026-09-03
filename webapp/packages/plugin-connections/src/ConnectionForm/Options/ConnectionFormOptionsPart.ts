@@ -33,7 +33,7 @@ import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dial
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { action, computed, makeObservable, observable, reaction, toJS } from 'mobx';
-import { getUniqueName } from '@cloudbeaver/core-utils';
+import { getUniqueName, trimObjectValues } from '@cloudbeaver/core-utils';
 import { getObjectPropertyDefaults } from '@cloudbeaver/core-blocks';
 import { isNotNullDefined } from '@dbeaver/js-helpers';
 import { parseJdbcUri } from '@dbeaver/jdbc-uri-parser';
@@ -351,7 +351,7 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     return config;
   }
 
-  protected override async format(
+  protected override async prepare(
     data: IFormState<IConnectionFormState>,
     contexts: IExecutionContextProvider<IFormState<IConnectionFormState>>,
   ): Promise<void> {
@@ -367,31 +367,26 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     this.formState.state.requiredNetworkHandlersIds = observable([]);
     this.state.networkHandlersConfig = observable([]);
 
-    this.state.name = this.state.name?.trim();
-    this.state.description = this.state.description?.trim();
-
     if (!this.state.folder) {
       delete this.state.folder;
     }
 
-    if (this.state.configurationType === DriverConfigurationType.Url) {
-      this.state.url = this.state.url?.trim();
-    } else {
+    if (this.state.configurationType !== DriverConfigurationType.Url) {
       // if manual type configuration set, it helps to keep host, port, etc. properties (not saved on backend)
       delete this.state.url;
     }
 
     // databaseName, host, port, serverName only saves on backend like this
     if (this.state.configurationType === DriverConfigurationType.Manual && !driver.useCustomPage) {
-      this.state.mainPropertyValues![MAIN_PROPERTY_DATABASE_KEY] = this.state.databaseName?.trim();
+      this.state.mainPropertyValues![MAIN_PROPERTY_DATABASE_KEY] = this.state.databaseName;
 
       if (!driver.embedded) {
-        this.state.mainPropertyValues![MAIN_PROPERTY_HOST_KEY] = this.state.host?.trim();
-        this.state.mainPropertyValues![MAIN_PROPERTY_PORT_KEY] = this.state.port?.trim();
+        this.state.mainPropertyValues![MAIN_PROPERTY_HOST_KEY] = this.state.host;
+        this.state.mainPropertyValues![MAIN_PROPERTY_PORT_KEY] = this.state.port;
       }
 
       if (driver.requiresServerName) {
-        this.state.mainPropertyValues![MAIN_PROPERTY_SERVER_KEY] = this.state.serverName?.trim();
+        this.state.mainPropertyValues![MAIN_PROPERTY_SERVER_KEY] = this.state.serverName;
       }
     }
 
@@ -438,6 +433,18 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     if (expertSettings.length > 0) {
       this.state.expertSettingsValues = prepareDynamicProperties(expertSettings, this.state.expertSettingsValues!);
     }
+  }
+
+  protected override format(): void {
+    this.state.name = this.state.name?.trim();
+    this.state.description = this.state.description?.trim();
+    this.state.url = this.state.url?.trim();
+
+    trimObjectValues(this.state.credentials);
+    trimObjectValues(this.state.properties);
+    trimObjectValues(this.state.providerProperties);
+    trimObjectValues(this.state.mainPropertyValues);
+    trimObjectValues(this.state.expertSettingsValues);
   }
 
   private async getConnectionAuthModelProperties(authModelId: string, connectionInfo?: ConnectionInfoAuthProperties): Promise<IObjectPropertyInfo[]> {
@@ -584,12 +591,6 @@ function prepareDynamicProperties(
       if (!(propertyInfo.id in result) && isDefault) {
         result[propertyInfo.id] = getObjectPropertyDefaultValue(propertyInfo);
       }
-    }
-  }
-
-  for (const key of Object.keys(result)) {
-    if (typeof result[key] === 'string') {
-      result[key] = result[key]?.trim();
     }
   }
 
