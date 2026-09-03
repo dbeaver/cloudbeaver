@@ -15,7 +15,6 @@ import { LocalizationService } from '@cloudbeaver/core-localization';
 import { Executor, ExecutorInterrupter } from '@cloudbeaver/core-executor';
 import { ConnectionsManagerService, type IConnectionInfoParams } from '@cloudbeaver/core-connections';
 import type { AiSendChatMessageInfoFragment } from '@cloudbeaver/core-sdk';
-import { AISettingsResource } from '@cloudbeaver/plugin-ai';
 import { AIProfileCredentialsService, AIProfilesResource } from '@cloudbeaver/plugin-ai-profiles';
 
 import { AIChatMessagesResource, isFunctionConfirmationMessage, isFunctionMessage, type IMessageParam } from './AIChatMessagesResource.js';
@@ -53,7 +52,6 @@ type MessageSendExecutorData = IMessageSendExecutorBeforeData | IMessageSendExec
   LocalizationService,
   ConnectionsManagerService,
   AIProfilesResource,
-  AISettingsResource,
   AIProfileCredentialsService,
 ])
 export class AIChatMessageService {
@@ -66,7 +64,6 @@ export class AIChatMessageService {
     private readonly localizationService: LocalizationService,
     private readonly connectionsManagerService: ConnectionsManagerService,
     private readonly aiProfilesResource: AIProfilesResource,
-    private readonly aiSettingsResource: AISettingsResource,
     private readonly credentialsService: AIProfileCredentialsService,
   ) {
     this.onMessageSend = new Executor();
@@ -128,17 +125,8 @@ export class AIChatMessageService {
 
   async processSendMessageAction(conversationId: string, action: () => Promise<IAiSendChatMessageInfo>) {
     const conversation = await this.aiChatConversationsResource.load(conversationId);
-    const settings = await this.aiSettingsResource.load();
-    let profileId = conversation.profile ?? settings?.defaultConfiguration;
-    let profile = profileId ? await this.aiProfilesResource.load(profileId) : undefined;
-
-    if (!profile && conversation.profile && settings?.defaultConfiguration && conversation.profile !== settings.defaultConfiguration) {
-      profileId = settings.defaultConfiguration;
-      profile = await this.aiProfilesResource.load(profileId);
-      if (profile) {
-        await this.aiChatConversationsResource.updateConversation(conversation.id, { settings: { profile: profileId } });
-      }
-    }
+    const profileId = conversation.profile;
+    const profile = profileId ? await this.aiProfilesResource.load(profileId) : undefined;
 
     if (profileId) {
       if (profile && this.credentialsService.isRequired(profile)) {

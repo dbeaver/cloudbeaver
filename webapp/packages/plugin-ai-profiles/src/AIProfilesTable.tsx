@@ -29,7 +29,7 @@ export interface IAIProfilesTableColumn {
 
 type TableColumn = Omit<IAIProfilesTableColumn, 'render'> & { render?: IAIProfilesTableColumn['render'] };
 
-interface Props {
+export interface IAIProfilesTableProps {
   profiles: AIProfile[];
   nameLabel: string;
   engineLabel: string;
@@ -48,7 +48,7 @@ const NAME_COLUMN = { key: 'name', minWidth: 120 };
 const ENGINE_COLUMN = { key: 'engine', width: 160 };
 const SCOPE_COLUMN = { key: 'scope', width: 120 };
 
-export const AIProfilesTable = observer<Props>(function AIProfilesTable({
+export const AIProfilesTable = observer<IAIProfilesTableProps>(function AIProfilesTable({
   profiles,
   nameLabel,
   engineLabel,

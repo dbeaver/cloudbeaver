@@ -120,7 +120,7 @@ export const AIProfileCredentialsDialog: DialogComponent<IAIProfileCredentialsDi
           title="plugin_ai_credentials_dialog_title"
           subTitle="plugin_ai_credentials_dialog_description"
           icon={payload.engineIcon}
-          onReject={rejectDialog}
+          onReject={state.processing ? undefined : rejectDialog}
         />
         <CommonDialogBody>
           <Container gap>
