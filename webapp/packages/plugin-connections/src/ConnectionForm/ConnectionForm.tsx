@@ -7,37 +7,14 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import {
-  Container,
-  Form,
-  Loader,
-  Placeholder,
-  s,
-  SContext,
-  StatusMessage,
-  type StyleRegistry,
-  useForm,
-  useObjectRef,
-  useS,
-} from '@cloudbeaver/core-blocks';
+import { Container, Form, Loader, Placeholder, s, StatusMessage, useForm, useObjectRef, useS } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { ENotificationType, NotificationService } from '@cloudbeaver/core-events';
 import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
-import {
-  FormMode,
-  formSubmitContext,
-  TabList,
-  TabListStyles,
-  TabPanelList,
-  TabsState,
-  TabStyles,
-  TabTitleStyles,
-  type IFormState,
-} from '@cloudbeaver/core-ui';
+import { FormMode, formSubmitContext, TabList, TabPanelList, TabsState, type IFormState } from '@cloudbeaver/core-ui';
 
 import { ConnectionFormActionsContext, type IConnectionFormActionsContext } from './ConnectFormActionsContext.js';
 import style from './ConnectionForm.module.css';
-import { ConnectionName } from './ConnectionName.js';
 import type { ConnectionFormState } from './ConnectionFormState.js';
 import { getFirstException } from '@cloudbeaver/core-utils';
 import { ConnectionFormService } from './ConnectionFormService.js';
@@ -45,20 +22,14 @@ import { getConnectionFormOptionsPart } from './Options/getConnectionFormOptions
 import { ExecutionContext } from '@cloudbeaver/core-executor';
 import type { IConnectionFormState } from './IConnectionFormState.js';
 
-export interface IConnectionFormComponentProps {
+export interface ConnectionFormProps {
   formState: ConnectionFormState;
   onCancel?: () => void;
   onSave?: (config: ConnectionConfig, isCreate?: boolean) => void;
   className?: string;
 }
 
-const tabsRegistry: StyleRegistry = [
-  [TabStyles, { mode: 'append', styles: [style] }],
-  [TabListStyles, { mode: 'append', styles: [style] }],
-  [TabTitleStyles, { mode: 'append', styles: [style] }],
-];
-
-export const ConnectionForm = observer<IConnectionFormComponentProps>(function ConnectionForm({ formState, onCancel, onSave = () => {}, className }) {
+export const ConnectionForm = observer<ConnectionFormProps>(function ConnectionForm({ formState, onCancel, onSave = () => {}, className }) {
   const service = useService(ConnectionFormService);
   const styles = useS(style);
   const notificationService = useService(NotificationService);
@@ -108,10 +79,10 @@ export const ConnectionForm = observer<IConnectionFormComponentProps>(function C
 
   return (
     <Form context={form} contents>
-      <TabsState container={service.parts} localState={formState.parts} orientation="vertical" formState={formState}>
+      <TabsState container={service.parts} localState={formState.parts} formState={formState}>
         <div className={s(styles, { box: true }, className)}>
           <div className={s(styles, { connectionTopBar: true })}>
-            <Container className={s(styles, { connectionTopBarStatus: true })} overflow>
+            <Container className={s(styles, { connectionTopBarTabs: true })} overflow>
               <Container className={s(styles, { connectionStatusMessage: true })} overflow>
                 <StatusMessage
                   type={exception ? ENotificationType.Error : ENotificationType.Info}
@@ -119,25 +90,18 @@ export const ConnectionForm = observer<IConnectionFormComponentProps>(function C
                   exception={exception}
                 />
               </Container>
+              <TabList className={s(styles, { tabList: true })} disabled={formState.isDisabled} underline big />
             </Container>
-            <div className={s(styles, { connectionTopBarContent: true })}>
-              {optionsPart.state.name && <ConnectionName driverId={optionsPart.state.driverId} name={optionsPart.state.name} />}
-              <div className={s(styles, { connectionTopBarActions: true })}>
-                <Loader suspense inline hideMessage hideException>
-                  <ConnectionFormActionsContext.Provider value={actionsContext}>
-                    <Placeholder container={service.actionsContainer} formState={formState} />
-                  </ConnectionFormActionsContext.Provider>
-                </Loader>
-              </div>
+            <div className={s(styles, { connectionTopBarActions: true })}>
+              <Loader suspense inline hideMessage hideException>
+                <ConnectionFormActionsContext.Provider value={actionsContext}>
+                  <Placeholder container={service.actionsContainer} formState={formState} />
+                </ConnectionFormActionsContext.Provider>
+              </Loader>
             </div>
           </div>
-          <div className={s(styles, { connectionBody: true })}>
-            <SContext registry={tabsRegistry}>
-              <TabList className={s(styles, { tabList: true })} disabled={formState.isDisabled} vertical />
-            </SContext>
-            <div className={s(styles, { contentBox: true })}>
-              <TabPanelList />
-            </div>
+          <div className={s(styles, { contentBox: true })}>
+            <TabPanelList />
           </div>
         </div>
       </TabsState>

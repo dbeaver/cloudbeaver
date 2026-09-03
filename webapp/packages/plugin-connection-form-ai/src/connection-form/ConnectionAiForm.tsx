@@ -6,8 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { Checkbox, Placeholder, useAutoLoad, useTranslate } from '@cloudbeaver/core-blocks';
-import { ConnectionSectionWrapper, getConnectionFormOptionsPart, type IConnectionFormProps } from '@cloudbeaver/plugin-connections';
+import { Checkbox, ColoredContainer, Container, Group, Placeholder, useAutoLoad, useTranslate } from '@cloudbeaver/core-blocks';
+import { getConnectionFormOptionsPart, type IConnectionFormProps } from '@cloudbeaver/plugin-connections';
 import { getConnectionAiPart } from './getConnectionAiPart.js';
 import { observer } from 'mobx-react-lite';
 import { useService } from '@cloudbeaver/core-di';
@@ -25,16 +25,20 @@ export const ConnectionAiForm: TabContainerPanelComponent<IConnectionFormProps> 
   useAutoLoad(ConnectionAiForm, [optionsFormPart, aiPart], selected);
 
   return (
-    <div className="tw:flex tw:flex-1 tw:overflow-auto">
-      <ConnectionSectionWrapper>
-        <Checkbox
-          title={translate('plugin_connection_form_ai_form_transfer_description')}
-          state={aiPart.state}
-          name="metaTransferConfirmed"
-          label={translate('plugin_connection_form_ai_form_transfer_enabled')}
-        />
-        {selected && <Placeholder container={connectionFormAiService.optionsContainer} formState={formState} />}
-      </ConnectionSectionWrapper>
-    </div>
+    <ColoredContainer wrap overflow parent gap>
+      <Container medium gap>
+        <Group>
+          <Container>
+            <Checkbox
+              title={translate('plugin_connection_form_ai_form_transfer_description')}
+              state={aiPart.state}
+              name="metaTransferConfirmed"
+              label={translate('plugin_connection_form_ai_form_transfer_enabled')}
+            />
+          </Container>
+          {selected && <Placeholder container={connectionFormAiService.optionsContainer} formState={formState} />}
+        </Group>
+      </Container>
+    </ColoredContainer>
   );
 });

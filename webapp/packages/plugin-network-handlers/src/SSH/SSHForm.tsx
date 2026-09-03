@@ -13,6 +13,7 @@ import {
   Container,
   Expandable,
   FieldCheckbox,
+  GroupItem,
   InputField,
   Select,
   Switch,
@@ -165,26 +166,37 @@ export const SSHForm = observer<ISSHFormProps>(function SSHForm({
           )}
         </FieldCheckbox>
       )}
-      <Expandable label={translate('plugin_network_handlers_ssh_tunnel_advanced_settings')}>
-        <Container gap>
-          <InputField type="number" name="aliveInterval" state={state.properties} readOnly={disabledInternal} labelTooltip={aliveIntervalLabel} tiny>
-            {aliveIntervalLabel}
-          </InputField>
-          <InputField
-            type="number"
-            name="sshConnectTimeout"
-            state={state.properties}
-            readOnly={disabledInternal}
-            labelTooltip={connectTimeoutLabel}
-            tiny
-          >
-            {connectTimeoutLabel}
-          </InputField>
-        </Container>
-      </Expandable>
-      <Button type="button" disabled={disabled || !enabled || testLoading || !testAvailable} loader onClick={testTunnel}>
-        {translate('plugin_connection_network_handlers_ssh_test')}
-      </Button>
+      <Container gap>
+        <Expandable label={translate('plugin_network_handlers_ssh_tunnel_advanced_settings')}>
+          <Container gap>
+            <InputField
+              type="number"
+              name="aliveInterval"
+              state={state.properties}
+              readOnly={disabledInternal}
+              labelTooltip={aliveIntervalLabel}
+              tiny
+            >
+              {aliveIntervalLabel}
+            </InputField>
+            <InputField
+              type="number"
+              name="sshConnectTimeout"
+              state={state.properties}
+              readOnly={disabledInternal}
+              labelTooltip={connectTimeoutLabel}
+              tiny
+            >
+              {connectTimeoutLabel}
+            </InputField>
+          </Container>
+        </Expandable>
+      </Container>
+      <GroupItem>
+        <Button type="button" disabled={disabled || !enabled || testLoading || !testAvailable} loader onClick={testTunnel}>
+          {translate('plugin_connection_network_handlers_ssh_test')}
+        </Button>
+      </GroupItem>
     </>
   );
 });

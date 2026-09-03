@@ -31,7 +31,7 @@ export class ConnectionSSHTabService extends Bootstrap {
     this.connectionFormService.parts.add({
       key: 'ssh',
       name: 'plugin_connections_connection_form_part_main',
-      order: 3,
+      order: 2.5,
       tab: () => SSHTab,
       panel: () => SSHPanel,
       getLoader: (_, props) => {

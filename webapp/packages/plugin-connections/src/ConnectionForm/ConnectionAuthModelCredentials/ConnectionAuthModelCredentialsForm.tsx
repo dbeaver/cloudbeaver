@@ -7,7 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { ObjectPropertyInfoForm, type ILayoutSizeProps } from '@cloudbeaver/core-blocks';
+import { Container, ObjectPropertyInfoForm, type ILayoutSizeProps } from '@cloudbeaver/core-blocks';
 import { getObjectPropertyType, type IObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 
 interface Props {
@@ -25,10 +25,6 @@ export const ConnectionAuthModelCredentialsForm = observer<Props>(function Conne
   readonly,
   disabled,
 }) {
-  if (properties.length === 0) {
-    return null;
-  }
-
   function getLayoutSize(property: IObjectPropertyInfo): ILayoutSizeProps {
     const type = getObjectPropertyType(property);
 
@@ -42,17 +38,19 @@ export const ConnectionAuthModelCredentialsForm = observer<Props>(function Conne
   }
 
   return (
-    <ObjectPropertyInfoForm
-      autocompleteSectionName="section-connection-authentication"
-      properties={properties}
-      state={credentials}
-      defaultState={defaultCredentials}
-      disabled={disabled}
-      readOnly={readonly}
-      getLayoutSize={getLayoutSize}
-      autocompletePasswordType="new-password"
-      showRememberTip
-      hideEmptyPlaceholder
-    />
+    <Container wrap gap hideEmpty>
+      <ObjectPropertyInfoForm
+        autocompleteSectionName="section-connection-authentication"
+        properties={properties}
+        state={credentials}
+        defaultState={defaultCredentials}
+        disabled={disabled}
+        readOnly={readonly}
+        getLayoutSize={getLayoutSize}
+        autocompletePasswordType="new-password"
+        showRememberTip
+        hideEmptyPlaceholder
+      />
+    </Container>
   );
 });

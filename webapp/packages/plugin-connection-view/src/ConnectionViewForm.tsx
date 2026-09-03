@@ -8,7 +8,7 @@
 
 import { observer } from 'mobx-react-lite';
 
-import { FieldCheckbox, GroupTitle, Radio, RadioGroup, useAutoLoad, useTranslate } from '@cloudbeaver/core-blocks';
+import { Container, FieldCheckbox, Group, GroupTitle, Radio, RadioGroup, useAutoLoad, useTranslate } from '@cloudbeaver/core-blocks';
 import { CONNECTION_NAVIGATOR_VIEW_SETTINGS, isNavigatorViewSettingsEqual } from '@cloudbeaver/core-root';
 import { getConnectionFormOptionsPart, type ConnectionFormContainerProps } from '@cloudbeaver/plugin-connections';
 
@@ -30,19 +30,14 @@ export const ConnectionViewForm = observer<ConnectionFormContainerProps>(functio
   }
 
   return (
-    <div className="tw:flex tw:flex-col tw:gap-4">
+    <Group form gap>
       <GroupTitle>{translate('plugin_connection_view_default')}</GroupTitle>
-      <div className="tw:flex tw:flex-col tw:gap-2">
-        <RadioGroup
-          name="conection_view"
-          aria-label={translate('plugin_connection_view_default')}
-          value={isSimple ? 'simple' : 'advanced'}
-          onChange={changeView}
-        >
-          <Radio value="simple" disabled={disabled} title={translate('plugin_connection_view_option_simple_description')} small keepSize>
+      <Container gap dense>
+        <RadioGroup name='conection_view' aria-label={translate('plugin_connection_view_default')} value={isSimple ? 'simple' : 'advanced'} onChange={changeView}>
+          <Radio value='simple' disabled={disabled} title={translate('plugin_connection_view_option_simple_description')} small keepSize>
             {translate('plugin_connection_view_option_simple')}
           </Radio>
-          <Radio value="advanced" disabled={disabled} title={translate('plugin_connection_view_option_advanced_description')} small keepSize>
+          <Radio value='advanced' disabled={disabled} title={translate('plugin_connection_view_option_advanced_description')} small keepSize>
             {translate('plugin_connection_view_option_advanced')}
           </Radio>
         </RadioGroup>
@@ -50,7 +45,7 @@ export const ConnectionViewForm = observer<ConnectionFormContainerProps>(functio
         <FieldCheckbox disabled={disabled} name="showSystemObjects" state={viewFormPart.state}>
           {translate('plugin_connection_view_option_show_system_objects')}
         </FieldCheckbox>
-      </div>
-    </div>
+      </Container>
+    </Group>
   );
 });

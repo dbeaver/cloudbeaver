@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2026 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@ export class ConnectionDriverPropertiesTabService extends Bootstrap {
       key: 'driver_properties',
       name: 'plugin_connections_connection_form_part_properties',
       title: 'plugin_connections_connection_form_part_properties',
-      icon: '/icons/plugin_connection_hex_nut.svg',
       order: 2,
       panel: () => DriverProperties,
       isDisabled: (tabId, props) => {

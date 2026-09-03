@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2026 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -11,25 +11,32 @@ import { useContext, useRef } from 'react';
 import { AUTH_PROVIDER_LOCAL_ID } from '@cloudbeaver/core-authentication';
 import {
   Alert,
+  ColoredContainer,
   Combobox,
+  Container,
   FieldCheckbox,
   Form,
   FormFieldDescription,
   getComputed,
+  Group,
+  GroupTitle,
   InputField,
   Link,
   ObjectPropertyInfoForm,
   Radio,
   RadioGroup,
+  s,
+  Textarea,
   useAdministrationSettings,
   useFormValidator,
   usePermission,
   useResource,
+  useS,
   useTranslate,
   useAuthenticationAction,
   useAutoLoad,
   Text,
-  GroupTitle,
+  Placeholder,
 } from '@cloudbeaver/core-blocks';
 import {
   ConnectionInfoAuthPropertiesResource,
@@ -45,15 +52,21 @@ import { EAdminPermission, ServerConfigResource } from '@cloudbeaver/core-root';
 import { DriverConfigurationType } from '@cloudbeaver/core-sdk';
 import { type TabContainerPanelComponent, TabsContext } from '@cloudbeaver/core-ui';
 import { EMPTY_ARRAY } from '@cloudbeaver/core-utils';
+import { ProjectSelect } from '@cloudbeaver/plugin-projects';
 
 import { ConnectionAuthModelCredentialsForm } from '../ConnectionAuthModelCredentials/ConnectionAuthModelCredentialsForm.js';
 import { ConnectionAuthModelSelector } from '../ConnectionAuthModelCredentials/ConnectionAuthModelSelector.js';
-import { ConnectionSectionWrapper } from '../ConnectionSectionWrapper.js';
-import { isConnectionFormReadOnly } from '../isConnectionFormReadOnly.js';
 import { CONNECTION_FORM_SHARED_CREDENTIALS_TAB_ID } from '../SharedCredentials/CONNECTION_FORM_SHARED_CREDENTIALS_TAB_ID.js';
+import { AdvancedPropertiesForm } from './AdvancedPropertiesForm.js';
+import styles from './Options.module.css';
 import { ParametersForm } from './ParametersForm.js';
+import { ProviderPropertiesForm } from './ProviderPropertiesForm.js';
 import { getConnectionFormOptionsPart } from './getConnectionFormOptionsPart.js';
 import type { IConnectionFormProps } from '../IConnectionFormState.js';
+import { ConnectionFormService } from '../ConnectionFormService.js';
+import { ConnectionTypeForm } from './ConnectionTypeForm.js';
+
+const PROFILE_AUTH_MODEL_ID = 'profile';
 
 interface IDriverConfiguration {
   name: string;
@@ -76,12 +89,13 @@ const driverConfiguration: IDriverConfiguration[] = [
   },
 ];
 
-export const Options: TabContainerPanelComponent<IConnectionFormProps> = observer(function Options({ formState }) {
+export const Options: TabContainerPanelComponent<IConnectionFormProps> = observer(function Options({ formState, tabId }) {
   const isAdmin = usePermission(EAdminPermission.admin);
   const serverConfigResource = useResource(Options, ServerConfigResource, undefined);
   const projectInfoResource = useService(ProjectInfoResource);
   const formRef = useRef<HTMLFormElement>(null);
   const translate = useTranslate();
+  const style = useS(styles);
   const tabsState = useContext(TabsContext);
   const isSharedProject = projectInfoResource.isProjectShared(formState.state.projectId);
   const optionsPart = getConnectionFormOptionsPart(formState);
@@ -89,8 +103,10 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
   const connectionInfoOriginResource = useResource(Options, ConnectionInfoOriginResource, optionsPart.connectionKey);
   const connectionInfoAuthPropertiesResource = useResource(Options, ConnectionInfoAuthPropertiesResource, optionsPart.connectionKey);
   const configurationTypeLabel = translate('connections_connection_configuration');
+  const connectionFormService = useService(ConnectionFormService);
 
-  const readonly = isConnectionFormReadOnly(formState, connectionInfoAuthResource.data?.authModel);
+  //@TODO it's here until the profile implementation in the CloudBeaver
+  const readonly = formState.isDisabled || formState.isReadOnly || connectionInfoAuthResource.data?.authModel === PROFILE_AUTH_MODEL_ID;
 
   useFormValidator(formState.validationTask, formRef.current);
   const { credentialsSavingEnabled } = useAdministrationSettings();
@@ -133,6 +149,10 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
     return formState.state.availableDrivers.includes(id);
   });
 
+  function setProject(projectId: string) {
+    formState.state.projectId = projectId;
+  }
+
   let properties = authModel?.properties;
 
   if (
@@ -144,7 +164,6 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
   }
 
   const sharedCredentials = optionsPart.state.sharedCredentials && serverConfigResource.data?.distributed;
-  const authenticationVisible = !driver?.anonymousAccess && (authentication.authorized || !edit);
 
   function openCredentialsTab(event: React.MouseEvent<HTMLAnchorElement>) {
     event.preventDefault();
@@ -158,85 +177,90 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
   useAutoLoad(Options, optionsPart);
 
   return (
-    <Form ref={formRef} className="tw:flex tw:flex-1 tw:overflow-auto" disabled={driverMap.isLoading()}>
-      <ConnectionSectionWrapper>
-        <section className="tw:flex tw:min-w-0 tw:flex-col tw:gap-4">
-          {isAdmin && !driver?.driverInstalled && (
-            <Alert title={translate('core_connections_connection_driver_not_installed')}>
-              <Text>{translate('plugin_connections_connection_driver_not_installed_message')}</Text>
-            </Alert>
-          )}
-          <div className="tw:grid tw:grid-cols-1 tw:gap-4 tw:lg:grid-cols-2">
-            <Combobox
-              name="driverId"
-              value={optionsPart.state.driverId}
-              items={drivers}
-              keySelector={driver => driver.id}
-              valueSelector={driver => driver.name ?? ''}
-              titleSelector={driver => driver.description}
-              iconSelector={driver => driver.icon}
-              readOnly={readonly || edit || drivers.length < 2}
-              disabled={formState.isDisabled}
-              loading={driverMap.isLoading()}
-              tiny
-              fill
-              onSelect={setDriverIdHandler}
-            >
-              {translate('connections_connection_driver')}
-            </Combobox>
-            {configurationTypes.length > 1 && (
-              <FormFieldDescription label={configurationTypeLabel} tiny>
-                <RadioGroup aria-label={configurationTypeLabel} name="configurationType" state={optionsPart.state}>
-                  {configurationTypes.map(conf => (
-                    <Radio key={conf.value} id={conf.value} value={conf.value} disabled={readonly} small keepSize>
-                      {conf.name}
-                    </Radio>
-                  ))}
-                </RadioGroup>
-              </FormFieldDescription>
+    <Form ref={formRef} className={s(style, { form: true })} disabled={driverMap.isLoading()}>
+      <ColoredContainer wrap overflow parent gap>
+        <Container medium gap>
+          <Group gap>
+            {isAdmin && !driver?.driverInstalled && (
+              <Alert title={translate('core_connections_connection_driver_not_installed')}>
+                <Text>{translate('plugin_connections_connection_driver_not_installed_message')}</Text>
+              </Alert>
             )}
-          </div>
-          {optionsPart.state.configurationType === DriverConfigurationType.Url && (
-            <InputField type="text" name="url" state={optionsPart.state} readOnly={readonly || formState.isDisabled} fill>
-              {translate('plugin_connections_connection_form_part_main_url_jdbc')}
-            </InputField>
-          )}
-          {optionsPart.state.configurationType === DriverConfigurationType.Manual &&
-            (driver?.useCustomPage ? (
-              <ObjectPropertyInfoForm
-                state={optionsPart.state.mainPropertyValues}
-                properties={driver.mainProperties ?? EMPTY_ARRAY}
-                disabled={formState.isDisabled}
-                readOnly={readonly}
-              />
-            ) : (
-              <ParametersForm
-                config={optionsPart.state}
-                embedded={driver?.embedded}
-                requiresServerName={driver?.requiresServerName}
-                disabled={formState.isDisabled}
-                readOnly={readonly}
-                originLocal={originLocal}
-              />
-            ))}
-        </section>
+            <Group form box gap>
+              <Container wrap gap>
+                <Combobox
+                  name="driverId"
+                  value={optionsPart.state.driverId}
+                  items={drivers}
+                  keySelector={driver => driver.id}
+                  valueSelector={driver => driver.name ?? ''}
+                  titleSelector={driver => driver.description}
+                  iconSelector={driver => driver.icon}
+                  readOnly={readonly || edit || drivers.length < 2}
+                  disabled={formState.isDisabled}
+                  loading={driverMap.isLoading()}
+                  tiny
+                  fill
+                  onSelect={setDriverIdHandler}
+                >
+                  {translate('connections_connection_driver')}
+                </Combobox>
+                {configurationTypes.length > 1 && (
+                  <FormFieldDescription label={configurationTypeLabel} tiny>
+                    <Container gap>
+                      <RadioGroup aria-label={configurationTypeLabel} name="configurationType" state={optionsPart.state}>
+                        {configurationTypes.map(conf => (
+                          <Radio key={conf.value} id={conf.value} value={conf.value} disabled={readonly} small keepSize>
+                            {conf.name}
+                          </Radio>
+                        ))}
+                      </RadioGroup>
+                    </Container>
+                  </FormFieldDescription>
+                )}
+              </Container>
+              {optionsPart.state.configurationType === DriverConfigurationType.Url && (
+                <InputField type="text" name="url" state={optionsPart.state} readOnly={readonly || formState.isDisabled}>
+                  {translate('plugin_connections_connection_form_part_main_url_jdbc')}
+                </InputField>
+              )}
 
-        {authenticationVisible && (
-          <section className="theme-border-color-background tw:flex tw:min-w-0 tw:flex-col tw:gap-4 tw:border-t tw:pt-6">
-            <GroupTitle>{translate('connections_connection_edit_authentication')}</GroupTitle>
-            {serverConfigResource.resource.distributed && isSharedProject && (
-              <FieldCheckbox
-                id={optionsPart.state.connectionId + 'isShared'}
-                name="sharedCredentials"
-                title={translate('connections_connection_share_credentials_tooltip')}
-                state={optionsPart.state}
-                disabled={formState.isDisabled || readonly}
-                keepSize
-              >
-                {translate('connections_connection_share_credentials')}
-              </FieldCheckbox>
-            )}
-            <div className="tw:grid">
+              {optionsPart.state.configurationType === DriverConfigurationType.Manual &&
+                (driver?.useCustomPage ? (
+                  <ObjectPropertyInfoForm
+                    state={optionsPart.state.mainPropertyValues}
+                    properties={driver.mainProperties ?? EMPTY_ARRAY}
+                    disabled={formState.isDisabled}
+                    readOnly={readonly}
+                  />
+                ) : (
+                  <ParametersForm
+                    config={optionsPart.state}
+                    embedded={driver?.embedded}
+                    requiresServerName={driver?.requiresServerName}
+                    disabled={formState.isDisabled}
+                    readOnly={readonly}
+                    originLocal={originLocal}
+                  />
+                ))}
+            </Group>
+          </Group>
+
+          {!driver?.anonymousAccess && (authentication.authorized || !edit) && (
+            <Group form gap>
+              <GroupTitle>{translate('connections_connection_edit_authentication')}</GroupTitle>
+              {serverConfigResource.resource.distributed && isSharedProject && (
+                <FieldCheckbox
+                  id={optionsPart.state.connectionId + 'isShared'}
+                  name="sharedCredentials"
+                  title={translate('connections_connection_share_credentials_tooltip')}
+                  state={optionsPart.state}
+                  disabled={formState.isDisabled || readonly}
+                  keepSize
+                >
+                  {translate('connections_connection_share_credentials')}
+                </FieldCheckbox>
+              )}
               <ConnectionAuthModelSelector
                 authModelCredentialsState={optionsPart.state}
                 applicableAuthModels={applicableAuthModels}
@@ -245,49 +269,77 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
                 disabled={formState.isDisabled}
                 onAuthModelChange={handleAuthModelSelect}
               />
-            </div>
-            {!sharedCredentials ? (
-              <>
-                {properties && (
-                  <ConnectionAuthModelCredentialsForm
-                    credentials={optionsPart.state.credentials}
-                    properties={properties}
-                    readonly={readonly}
-                    disabled={formState.isDisabled}
-                  />
-                )}
-              </>
-            ) : (
-              <FormFieldDescription>
-                {translate('plugin_connections_connection_form_shared_credentials_manage_info')}
-                <Link inline onClick={openCredentialsTab}>
-                  {translate('plugin_connections_connection_form_shared_credentials_manage_info_tab_link')}
-                </Link>
-              </FormFieldDescription>
-            )}
-            {!sharedCredentials && authModel && credentialsSavingEnabled && (
-              <FieldCheckbox
-                id={optionsPart.state.connectionId + 'authNeeded'}
-                name="saveCredentials"
-                state={optionsPart.state}
-                disabled={formState.isDisabled || readonly || optionsPart.state.sharedCredentials}
-                title={translate(
-                  !isSharedProject || serverConfigResource.data?.distributed
-                    ? 'connections_connection_authentication_save_credentials_for_user_tooltip'
-                    : 'connections_connection_edit_save_credentials_shared_tooltip',
-                )}
-                keepSize
-              >
-                {translate(
-                  !isSharedProject || serverConfigResource.data?.distributed
-                    ? 'connections_connection_authentication_save_credentials_for_user'
-                    : 'connections_connection_edit_save_credentials_shared',
-                )}
-              </FieldCheckbox>
-            )}
-          </section>
-        )}
-      </ConnectionSectionWrapper>
+              {!sharedCredentials ? (
+                <>
+                  {properties && (
+                    <ConnectionAuthModelCredentialsForm
+                      credentials={optionsPart.state.credentials}
+                      properties={properties}
+                      readonly={readonly}
+                      disabled={formState.isDisabled}
+                    />
+                  )}
+                </>
+              ) : (
+                <FormFieldDescription>
+                  {translate('plugin_connections_connection_form_shared_credentials_manage_info')}
+                  <Link inline onClick={openCredentialsTab}>
+                    {translate('plugin_connections_connection_form_shared_credentials_manage_info_tab_link')}
+                  </Link>
+                </FormFieldDescription>
+              )}
+              {!sharedCredentials && authModel && credentialsSavingEnabled && (
+                <FieldCheckbox
+                  id={optionsPart.state.connectionId + 'authNeeded'}
+                  name="saveCredentials"
+                  state={optionsPart.state}
+                  disabled={formState.isDisabled || readonly || optionsPart.state.sharedCredentials}
+                  title={translate(
+                    !isSharedProject || serverConfigResource.data?.distributed
+                      ? 'connections_connection_authentication_save_credentials_for_user_tooltip'
+                      : 'connections_connection_edit_save_credentials_shared_tooltip',
+                  )}
+                  keepSize
+                >
+                  {translate(
+                    !isSharedProject || serverConfigResource.data?.distributed
+                      ? 'connections_connection_authentication_save_credentials_for_user'
+                      : 'connections_connection_edit_save_credentials_shared',
+                  )}
+                </FieldCheckbox>
+              )}
+            </Group>
+          )}
+          <ConnectionTypeForm config={optionsPart.state} />
+          <Placeholder container={connectionFormService.connectionContainer} formState={formState} />
+        </Container>
+        <Container medium gap>
+          <Placeholder container={connectionFormService.providerPropertiesContainer} formState={formState} />
+          {driver?.providerProperties && <ProviderPropertiesForm formState={formState} properties={driver.providerProperties} readonly={readonly} />}
+
+          <AdvancedPropertiesForm config={optionsPart.state} disabled={formState.isDisabled} readonly={readonly} />
+          <Group form gap>
+            <Container wrap gap>
+              <InputField type="text" name="name" minLength={1} state={optionsPart.state} readOnly={readonly || formState.isDisabled} required fill>
+                {translate('connections_connection_name')}
+              </InputField>
+              <ProjectSelect
+                value={formState.state.projectId}
+                readOnly={readonly || edit}
+                disabled={formState.isDisabled}
+                autoHide
+                onChange={setProject}
+              />
+              <InputField type="text" name="folder" state={optionsPart.state} autoHide readOnly tiny fill>
+                {translate('plugin_connections_connection_form_part_main_folder')}
+              </InputField>
+            </Container>
+            <Textarea name="description" rows={3} state={optionsPart.state} readOnly={readonly || formState.isDisabled}>
+              {translate('connections_connection_description')}
+            </Textarea>
+          </Group>
+        </Container>
+      </ColoredContainer>
     </Form>
   );
 });

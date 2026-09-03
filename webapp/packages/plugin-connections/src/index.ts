@@ -23,7 +23,6 @@ export * from './ConnectionForm/ConnectionFormService.js';
 export * from './ConnectionForm/CONNECTION_CONFIG_SCHEMA.js';
 export * from './ConnectionForm/Options/getConnectionFormOptionsPart.js';
 export * from './ConnectionForm/Options/ConnectionFormOptionsPart.js';
-export * from './ConnectionForm/ConnectionSectionWrapperLazy.js';
 export * from './ConnectionForm/SharedCredentials/CONNECTION_FORM_SHARED_CREDENTIALS_TAB_ID.js';
 export * from './ConnectionForm/ConnectionAuthModelCredentials/ConnectionAuthModelCredentialsForm.js';
 export * from './ContextMenu/MENU_CONNECTIONS.js';

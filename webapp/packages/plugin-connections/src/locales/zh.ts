@@ -1,9 +1,6 @@
 export default [
   ['plugin_connections_connection_form_part_main', '主要'],
   ['plugin_connections_connection_form_part_properties', '驱动属性'],
-  ['plugin_connections_connection_form_part_advanced', '高级设置'],
-  ['plugin_connections_connection_form_part_initialization_settings', '初始化设置'],
-  ['plugin_connections_connection_form_connection_details', '连接详细信息'],
   ['plugin_connections_connection_form_part_main_auth_model', '身份验证模型'],
   ['plugin_connections_connection_form_part_main_custom_host', '主机'],
   ['plugin_connections_connection_form_part_main_custom_port', '端口'],

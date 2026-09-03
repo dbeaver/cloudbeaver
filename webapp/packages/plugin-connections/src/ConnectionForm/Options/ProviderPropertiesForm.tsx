@@ -1,13 +1,21 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2026 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
 
-import { Container, GroupTitle, ObjectPropertyInfoForm, useObjectPropertyCategories, useTranslate } from '@cloudbeaver/core-blocks';
+import {
+  Container,
+  Expandable,
+  Group,
+  GroupTitle,
+  ObjectPropertyInfoForm,
+  useObjectPropertyCategories,
+  useTranslate,
+} from '@cloudbeaver/core-blocks';
 import { type DriverPropertyInfoFragment, getObjectPropertyType } from '@cloudbeaver/core-sdk';
 import type { IFormState } from '@cloudbeaver/core-ui';
 import type { IConnectionFormState } from '../IConnectionFormState.js';
@@ -37,7 +45,7 @@ export const ProviderPropertiesForm = observer<Props>(function ProviderPropertie
   const nonBooleanProperties = supportedProperties.filter(property => !property.category && property.dataType !== 'Boolean');
 
   return (
-    <section className="tw:flex tw:min-w-0 tw:flex-col tw:gap-4">
+    <Group form gap>
       {isUncategorizedExists && (
         <>
           <GroupTitle>{translate('ui_settings')}</GroupTitle>
@@ -68,23 +76,24 @@ export const ProviderPropertiesForm = observer<Props>(function ProviderPropertie
         </>
       )}
 
-      {categories.map(category => (
+      {categories.map((category, index) => (
         <Container key={`${category}_${config.driverId}`} gap>
-          <GroupTitle>{category}</GroupTitle>
-          <Container dense={isOnlyBooleans(supportedProperties, category)} wrap gap>
-            <ObjectPropertyInfoForm
-              properties={supportedProperties}
-              state={config.providerProperties}
-              category={category}
-              disabled={disabled}
-              readOnly={readonly}
-              getLayoutSize={property => (getObjectPropertyType(property) === 'checkbox' ? { maximum: true } : { small: true, noGrow: true })}
-              hideEmptyPlaceholder
-            />
-          </Container>
+          <Expandable label={category} defaultExpanded={index === 0}>
+            <Container dense={isOnlyBooleans(supportedProperties, category)} wrap gap>
+              <ObjectPropertyInfoForm
+                properties={supportedProperties}
+                state={config.providerProperties}
+                category={category}
+                disabled={disabled}
+                readOnly={readonly}
+                getLayoutSize={property => (getObjectPropertyType(property) === 'checkbox' ? { maximum: true } : { small: true, noGrow: true })}
+                hideEmptyPlaceholder
+              />
+            </Container>
+          </Expandable>
         </Container>
       ))}
-    </section>
+    </Group>
   );
 });
 
