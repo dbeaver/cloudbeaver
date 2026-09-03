@@ -2550,7 +2550,6 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-ai-profiles-administration@workspace:packages/plugin-ai-profiles-administration"
   dependencies:
-    "@cloudbeaver/core-administration": "workspace:*"
     "@cloudbeaver/core-blocks": "workspace:*"
     "@cloudbeaver/core-cli": "workspace:*"
     "@cloudbeaver/core-data-context": "workspace:*"
@@ -2570,7 +2569,6 @@ __metadata:
     "@cloudbeaver/plugin-data-grid": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
     "@dbeaver/js-helpers": "workspace:*"
-    "@dbeaver/ui-kit": "workspace:*"
     "@types/react": "npm:^19"
     mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
@@ -2598,7 +2596,9 @@ __metadata:
     "@cloudbeaver/core-root": "workspace:*"
     "@cloudbeaver/core-sdk": "workspace:*"
     "@cloudbeaver/plugin-ai": "workspace:*"
+    "@cloudbeaver/plugin-data-grid": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
+    "@dbeaver/ui-kit": "workspace:*"
     "@types/react": "npm:^19"
     mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
@@ -2607,6 +2607,7 @@ __metadata:
     rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
+    typescript-plugin-css-modules: "npm:^5"
   languageName: unknown
   linkType: soft
 

@@ -31,7 +31,7 @@ import { isDefined } from '@dbeaver/js-helpers';
 
 import { AIProfileFormService } from './AIProfileForm/AIProfileFormService.js';
 import AIProfilesToolsPanelStyles from './AIProfilesToolsPanel.module.css';
-import { AIProfilesTable } from './AIProfilesTable.js';
+import { AIProfilesAdministrationTable } from './AIProfilesAdministrationTable.js';
 import { useAIProfilesTable } from './useAIProfilesTable.js';
 
 const toolsPanelRegistry: StyleRegistry = [
@@ -92,7 +92,7 @@ export const AIProfilesPanel = observer(function AIProfilesPanel() {
       </Group>
       <Container overflow gap maximum>
         <TableSelectionContext value={selection}>
-          <AIProfilesTable
+          <AIProfilesAdministrationTable
             profiles={profiles}
             deletionDisabled={!settingsLoaded}
             isDefaultProfile={profileId => aiSettingsService.isEffectiveDefaultProfile(profileId)}

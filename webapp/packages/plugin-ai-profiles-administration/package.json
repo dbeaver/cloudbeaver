@@ -21,7 +21,6 @@
     "validate-dependencies": "core-cli-validate-dependencies"
   },
   "dependencies": {
-    "@cloudbeaver/core-administration": "workspace:*",
     "@cloudbeaver/core-blocks": "workspace:*",
     "@cloudbeaver/core-data-context": "workspace:*",
     "@cloudbeaver/core-di": "workspace:*",
@@ -39,7 +38,6 @@
     "@cloudbeaver/plugin-ai-profiles": "workspace:*",
     "@cloudbeaver/plugin-data-grid": "workspace:*",
     "@dbeaver/js-helpers": "workspace:*",
-    "@dbeaver/ui-kit": "workspace:*",
     "mobx": "^6",
     "mobx-react-lite": "^4",
     "react": "^19",
