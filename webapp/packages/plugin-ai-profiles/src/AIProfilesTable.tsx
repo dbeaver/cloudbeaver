@@ -22,7 +22,8 @@ import AIProfilesTableStyles from './AIProfilesTable.module.css';
 export interface IAIProfilesTableColumn {
   key: string;
   label: string;
-  width?: number;
+  width?: number | string;
+  minWidth?: number;
   render: (profile: AIProfile) => ReactNode;
 }
 
@@ -43,7 +44,7 @@ interface Props {
 }
 
 const SELECT_COLUMN = { key: 'select', label: '' };
-const NAME_COLUMN = { key: 'name' };
+const NAME_COLUMN = { key: 'name', minWidth: 120 };
 const ENGINE_COLUMN = { key: 'engine', width: 160 };
 
 export const AIProfilesTable = observer<Props>(function AIProfilesTable({
@@ -85,13 +86,7 @@ export const AIProfilesTable = observer<Props>(function AIProfilesTable({
     }
 
     if (column.key === SELECT_COLUMN.key) {
-      return (
-        <TableRowSelect
-          id={profile.id}
-          disabled={selectionDisabled || !isProfileSelectable?.(profile)}
-          title={getSelectionTitle?.(profile)}
-        />
-      );
+      return <TableRowSelect id={profile.id} disabled={selectionDisabled || !isProfileSelectable?.(profile)} title={getSelectionTitle?.(profile)} />;
     }
 
     if (column.key === NAME_COLUMN.key) {
@@ -181,6 +176,10 @@ export const AIProfilesTable = observer<Props>(function AIProfilesTable({
     return columns[colIdx]?.width ?? null;
   }
 
+  function getHeaderMinWidth(colIdx: number) {
+    return columns[colIdx]?.minWidth ?? null;
+  }
+
   return (
     <div className="tw:overflow-auto tw:h-full tw:max-w-full theme-text-on-surface">
       <DataGrid
@@ -192,6 +191,7 @@ export const AIProfilesTable = observer<Props>(function AIProfilesTable({
         headerText={headerText}
         headerElement={headerElement}
         getHeaderWidth={getHeaderWidth}
+        getHeaderMinWidth={getHeaderMinWidth}
         cell={cell}
         className={s(styles, { table: true })}
       />

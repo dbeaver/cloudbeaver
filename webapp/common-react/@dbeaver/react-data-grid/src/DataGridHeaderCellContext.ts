@@ -15,6 +15,7 @@ export interface IDataGridHeaderCellContext {
   headerText?: IGridReactiveValue<string, [colIdx: number]>;
   getHeaderOrder?: () => number[];
   getHeaderWidth?: (colIdx: number) => number | string | null;
+  getHeaderMinWidth?: (colIdx: number) => number | null;
   getHeaderResizable?: (colIdx: number) => boolean;
   getHeaderHeight?: () => number;
   getHeaderPinned?: (colIdx: number) => boolean;
