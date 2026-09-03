@@ -1,0 +1,16 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Vendor: DBeaver Corp
+Bundle-Name: Cloudbeaver Web Service - DB Access Control
+Bundle-SymbolicName: io.cloudbeaver.service.dbac;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Release-Date: 20260831
+Bundle-RequiredExecutionEnvironment: JavaSE-21
+Bundle-ActivationPolicy: lazy
+Require-Bundle: io.cloudbeaver.model,
+ io.cloudbeaver.service.security,
+ org.jkiss.dbeaver.model,
+ org.jkiss.dbeaver.model.sql.jdbc
+Export-Package: io.cloudbeaver.service.dbac,
+ io.cloudbeaver.service.dbac.db
+Automatic-Module-Name: io.cloudbeaver.service.dbac

@@ -19,8 +19,8 @@ package io.cloudbeaver.server;
 import io.cloudbeaver.auth.NoAuthCredentialsProvider;
 import io.cloudbeaver.model.config.CBServerConfig;
 import io.cloudbeaver.model.rm.local.LocalResourceController;
+import io.cloudbeaver.service.dbac.DbacSecurityControllerFactory;
 import io.cloudbeaver.service.security.CBEmbeddedSecurityController;
-import io.cloudbeaver.service.security.EmbeddedSecurityControllerFactory;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -49,7 +49,7 @@ public class CBApplicationCE extends CBApplication<CBServerConfig> {
 
     @Override
     public SMController createSecurityController(@NotNull SMCredentialsProvider credentialsProvider) throws DBException {
-        return new EmbeddedSecurityControllerFactory<>().createSecurityService(
+        return new DbacSecurityControllerFactory<>().createSecurityService(
             this,
             getServerConfiguration().getDatabaseConfiguration(),
             credentialsProvider,
@@ -58,7 +58,7 @@ public class CBApplicationCE extends CBApplication<CBServerConfig> {
     }
     @Override
     public SMAdminController getAdminSecurityController(@NotNull SMCredentialsProvider credentialsProvider) throws DBException {
-        return new EmbeddedSecurityControllerFactory<>().createSecurityService(
+        return new DbacSecurityControllerFactory<>().createSecurityService(
             this,
             getServerConfiguration().getDatabaseConfiguration(),
             credentialsProvider,
@@ -67,7 +67,7 @@ public class CBApplicationCE extends CBApplication<CBServerConfig> {
     }
 
     protected SMAdminController createGlobalSecurityController() throws DBException {
-        return new EmbeddedSecurityControllerFactory<>().createSecurityService(
+        return new DbacSecurityControllerFactory<>().createSecurityService(
             this,
             getServerConfiguration().getDatabaseConfiguration(),
             new NoAuthCredentialsProvider(),

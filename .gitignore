@@ -48,3 +48,10 @@ deploy/cloudbeaver
 server/**/target
 apps/**/target
 osgi-cache/
+
+## Local agent tooling state
+.omx/
+
+## Python bytecode from .github/scripts
+__pycache__/
+*.pyc

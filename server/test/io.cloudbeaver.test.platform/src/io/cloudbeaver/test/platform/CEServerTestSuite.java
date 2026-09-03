@@ -25,6 +25,11 @@ import io.cloudbeaver.model.session.WebSessionProjectTest;
 import io.cloudbeaver.model.session.WebSessionTest;
 import io.cloudbeaver.test.platform.admin.AdminCreateUserTest;
 import io.cloudbeaver.test.platform.admin.AdminLastLoginTimeTest;
+import io.cloudbeaver.test.platform.dbac.DbacSchemaPostgresTest;
+import io.cloudbeaver.test.platform.dbac.DbacSchemaRecoveryTest;
+import io.cloudbeaver.test.platform.dbac.DbacSchemaTest;
+import io.cloudbeaver.test.platform.dbac.DbacScriptStatementsTest;
+import io.cloudbeaver.test.platform.dbac.DbacScriptTranslationTest;
 import io.cloudbeaver.test.platform.sql.*;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -50,7 +55,12 @@ import org.junit.platform.suite.api.Suite;
         RowIdResultSetTest.class,
         GroupingEndpointTest.class,
         ForeignKeyNavigationEndpointTest.class,
-        DataFilterConstraintsTest.class
+        DataFilterConstraintsTest.class,
+        DbacScriptStatementsTest.class,
+        DbacScriptTranslationTest.class,
+        DbacSchemaTest.class,
+        DbacSchemaRecoveryTest.class,
+        DbacSchemaPostgresTest.class
     }
 )
 public class CEServerTestSuite {

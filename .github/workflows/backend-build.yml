@@ -10,6 +10,30 @@ jobs:
     timeout-minutes: 10
     runs-on: ubuntu-latest
 
+    services:
+      # Disposable PostgreSQL for the DBAC metadata schema tests. Never a shared or production database:
+      # the container is created and discarded per job, and the credentials below are test-only.
+      #
+      # The host port must stay 55432 because that is the default DbacSchemaPostgresTest connects to
+      # (jdbc:postgresql://localhost:55432/dbactest, user postgres). The job runs directly on the runner,
+      # not inside a container, so it reaches the service through this published port.
+      #
+      # GitHub Actions waits for the health check to pass before any step runs and fails the job if it
+      # never does, so an unavailable database stops the build here rather than silently skipping tests.
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_PASSWORD: dbactest
+          POSTGRES_DB: dbactest
+        ports:
+          - 55432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d dbactest"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+          --health-start-period 10s
+
     steps:
       - uses: actions/checkout@v4
         with:
@@ -30,9 +54,45 @@ jobs:
       - uses: dbeaver/github-actions/install-maven@devel
 
       - name: Run build script
-        run: ./build-backend.sh
+        # Turn the DBAC PostgreSQL scenarios from optional into mandatory, in CI only.
+        #
+        # Without dbac.test.postgres.required, DbacSchemaPostgresTest aborts through Assumptions when no
+        # database is reachable - which keeps deploy/build-backend.sh usable for a developer who has no
+        # container, but would also let CI report green while verifying nothing. With the property set, an
+        # unreachable database fails the test class instead.
+        #
+        # -DdebugArgs is the documented way in to the forked test JVM: server/test/pom.xml appends
+        # ${debugArgs} to the tycho-surefire argLine, and build-backend.sh passes $MAVEN_COMMON_OPTS
+        # through to Maven.
+        #
+        # The option is appended, so an unrelated option a caller already put in MAVEN_COMMON_OPTS
+        # survives. One exception worth knowing: a caller that had already set -DdebugArgs itself would
+        # lose it, because Maven takes the last -D for a repeated property. No caller does today.
+        #
+        # MAVEN_COMMON_OPTS is deliberately NOT echoed. A caller may put credentials or proxy JVM
+        # properties in it, and workflow logs are readable by anyone who can read the repository.
+        # To confirm the property really reached the tests, read the forked JVM command line in the
+        # build log or the Surefire XML afterwards - do not print the variable.
+        run: |
+          export MAVEN_COMMON_OPTS="$MAVEN_COMMON_OPTS -DdebugArgs=-Ddbac.test.postgres.required=true"
+          ./build-backend.sh
         shell: bash
         working-directory: ./cloudbeaver/deploy
+
+      # A green Maven build does not prove the DBAC PostgreSQL scenarios ran: without the required
+      # property they abort through JUnit Assumptions, and an abort is a skip, not a failure. This step
+      # reads what the run actually recorded and fails the job if the evidence is missing.
+      #
+      # No `if:` condition on purpose. It must run only when the build step succeeded - the default
+      # behaviour - and `if: always()` would let it also run after a build failure, where a missing or
+      # stale report would produce a confusing second error on top of the real one. A non-zero exit here
+      # fails the step, and a failed step fails the job, which fails the calling workflow.
+      #
+      # python3 is preinstalled on ubuntu-latest and the script imports only the standard library, so
+      # this adds no dependency and no third-party action.
+      - name: Verify DBAC PostgreSQL scenarios actually ran
+        run: python3 cloudbeaver/.github/scripts/verify_dbac_surefire.py
+        shell: bash
 
       # - name: Archive build artifacts
       #   uses: actions/upload-artifact@v4

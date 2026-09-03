@@ -1,0 +1,21 @@
+-- DBAC schema, module CB_DBAC, upgrade to version 1.
+--
+-- No installation is ever created at version 0: version 1 is the first version this fork ships, and the
+-- create script produces it in full. This script exists for exactly one path, PostgreSQL version-only
+-- recovery.
+--
+-- When PostgreSQL holds a complete DBAC structure whose version row was lost, DbacSchemaVersionManager
+-- reports DbacSchemaConstants.RECOVERY_PENDING_VERSION (0). SQLSchemaManager then takes its upgrade
+-- branch instead of the create branch, which is what the recovery needs:
+--
+--   * the create script is never opened, so no CREATE TABLE runs against existing tables - on PostgreSQL
+--     the translator strips IF NOT EXISTS, so a replay would fail;
+--   * upgradeSchemaVersion calls updateCurrentSchemaVersion after this script, which validates the
+--     structure and writes the version row;
+--   * upgradeSchemaVersion commits that transaction itself, so the row survives.
+--
+-- This script must therefore stay stateless and must succeed on both H2 and PostgreSQL. It must not be
+-- empty either: openSchemaUpdateScript returning null makes upgradeSchemaVersion skip the step entirely,
+-- and the version would never be recorded.
+
+SELECT 1;

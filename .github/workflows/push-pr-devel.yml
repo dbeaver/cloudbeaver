@@ -25,6 +25,28 @@ jobs:
       project-deps: ./cloudbeaver/project.deps
       timeout-minutes: 5
 
+  # Fork-only gate. build-server above runs the same aggregate build, but it delegates to a reusable
+  # workflow in dbeaver-common, and a caller cannot attach a `services:` block to someone else's job.
+  # Since dbeaver-common is a platform repository this fork must not modify, the DBAC PostgreSQL
+  # scenarios can only be made mandatory by running backend-build.yml, which carries the postgres
+  # service and -Ddbac.test.postgres.required=true.
+  #
+  # This does cost a second backend build per PR. The alternative is that DbacSchemaPostgresTest keeps
+  # skipping in CI and a green build proves nothing about the PostgreSQL metadata path, so the cost is
+  # deliberate. Remove this job if the trade is not wanted - but then no report may claim PostgreSQL is
+  # verified in CI.
+  # No `secrets: inherit`: backend-build.yml references no secrets or vars context, its steps are passed
+  # none, and the repositories it clones (dbeaver, dbeaver-common) are public. Inheriting them would hand
+  # every organisation secret to a job that has no use for one, including to third-party actions.
+  verify-dbac-postgres:
+    name: DBAC PostgreSQL
+    uses: ./.github/workflows/backend-build.yml
+    # Narrowed like lint-server above. The job only needs to read the repository; it now runs on every
+    # PR and executes actions pinned to a mutable ref (dbeaver/github-actions/...@devel), so the
+    # ambient GITHUB_TOKEN should not carry write scopes it has no use for.
+    permissions:
+      contents: read
+
   build-frontend:
     name: Frontend
     uses: ./.github/workflows/frontend-build.yml
