@@ -10,8 +10,7 @@ import { runInAction } from 'mobx';
 import { FormMode, FormPart, formValidationContext, type IFormState } from '@cloudbeaver/core-ui';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import type { AiEngineConfig } from '@cloudbeaver/core-sdk';
-import { getUniqueName, trimObjectValues } from '@cloudbeaver/core-utils';
-import { AIProfileCredentialsService, AIProfilesResource } from '@cloudbeaver/plugin-ai-profiles';
+import { getUniqueName } from '@cloudbeaver/core-utils';
 
 import { AIEnginePropertiesResource } from '../../AIEnginePropertiesResource.js';
 import { AIProfilesAdministrationService, type AIAdminProfile, type AIProfileInput } from '../../AIProfilesAdministrationService.js';
@@ -102,7 +101,13 @@ export class AIProfileFormPart extends FormPart<IAIProfileOptionsState, IAIProfi
       this.state.name = getUniqueName(this.state.name, profileNames);
     }
 
-    trimObjectValues(this.state.properties);
+    for (const key of Object.keys(this.state.properties)) {
+      const value = this.state.properties[key];
+
+      if (typeof value === 'string') {
+        this.state.properties[key] = value.trim();
+      }
+    }
   }
 
   protected override validate(_: IFormState<IAIProfileFormState>, contexts: IExecutionContextProvider<IFormState<IAIProfileFormState>>): void {
