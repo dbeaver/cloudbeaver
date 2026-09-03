@@ -25,6 +25,7 @@ import io.cloudbeaver.model.rm.lock.RMLockTest;
 import io.cloudbeaver.model.session.WebSessionProjectTest;
 import io.cloudbeaver.model.session.WebSessionTest;
 import io.cloudbeaver.test.platform.admin.AdminCreateUserTest;
+import io.cloudbeaver.test.platform.admin.AdminImportUsersTest;
 import io.cloudbeaver.test.platform.admin.AdminLastLoginTimeTest;
 import io.cloudbeaver.test.platform.sql.*;
 import org.junit.jupiter.api.AfterAll;
@@ -47,6 +48,7 @@ import org.junit.platform.suite.api.Suite;
         WebSessionProjectTest.class,
         WebNavigatorNodeInfoTest.class,
         AdminCreateUserTest.class,
+        AdminImportUsersTest.class,
         AdminLastLoginTimeTest.class,
         GenerateSQLResultSetTest.class,
         RowIdResultSetTest.class,

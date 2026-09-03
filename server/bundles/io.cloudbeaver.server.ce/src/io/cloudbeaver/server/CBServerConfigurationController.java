@@ -487,6 +487,7 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
                 }
             }
             appConfigProperties.put("enabledFeatures", Arrays.asList(appConfig.getEnabledFeatures()));
+            appConfigProperties.put("disabledFeatures", Arrays.asList(appConfig.getDisabledFeatures()));
             if (appConfig.getEnabledAuthProviders() != null) {
                 appConfigProperties.put("enabledAuthProviders", Arrays.asList(appConfig.getEnabledAuthProviders()));
             }

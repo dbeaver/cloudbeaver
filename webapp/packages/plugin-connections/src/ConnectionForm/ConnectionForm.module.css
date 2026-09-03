@@ -1,43 +1,88 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 
 .tabList {
+  composes: theme-background-surface theme-text-on-surface theme-border-color-background from global;
   position: relative;
   flex-shrink: 0;
-  align-items: center;
+  align-items: stretch;
+  gap: 2px;
+  width: 176px;
+  min-width: 176px;
+  height: 100%;
+  padding: 16px 8px;
+  border-right: 1px solid;
+}
+
+.tab {
+  composes: theme-ripple from global;
+  width: 100%;
+  border-radius: 4px;
+  color: inherit;
+
+  &:global([aria-selected='true']) {
+    background-color: color-mix(in srgb, transparent, var(--theme-primary) 18%);
+    font-weight: normal;
+  }
+}
+
+.tab:global([role='tab']) {
+  height: auto;
+  min-height: 28px;
+  max-height: 48px;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  overflow: hidden;
+  box-sizing: border-box;
+  white-space: normal;
+}
+
+.tabTitle {
+  display: -webkit-box;
+  overflow: hidden;
+  max-height: 40px;
+  padding-top: 0;
+  padding-bottom: 0;
+  line-height: 20px;
+  white-space: normal;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 
 .connectionTopBar {
-  composes: theme-border-color-background theme-background-secondary theme-text-on-secondary from global;
+  composes: theme-border-color-background theme-background-surface theme-text-on-surface from global;
 }
 
 .connectionTopBar {
   position: relative;
   display: flex;
-  padding-top: 16px;
-
-  &:before {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-    border-bottom: solid 2px;
-    border-color: inherit;
-  }
+  flex-direction: column;
+  min-height: 64px;
+  padding: 8px 0 16px;
+  border-bottom: 1px solid;
+  box-sizing: border-box;
 }
 
-.connectionTopBarTabs {
-  flex: 1;
+.connectionTopBarContent {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.connectionTopBarStatus {
+  width: 100%;
+  min-width: 0;
 }
 
 .connectionTopBarActions {
   display: flex;
   align-items: center;
+  margin-left: auto;
   padding: 0 24px;
   gap: 16px;
 }
@@ -45,7 +90,7 @@
 .connectionStatusMessage {
   composes: theme-typography--caption from global;
   height: 24px;
-  padding: 0 16px;
+  padding: 0 24px;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -57,19 +102,29 @@
 }
 
 .box {
-  composes: theme-background-secondary theme-text-on-secondary from global;
+  composes: theme-background-surface theme-text-on-surface from global;
   display: flex;
   flex-direction: column;
   flex: 1;
   height: 100%;
-  overflow: auto;
+  overflow: hidden;
+}
+
+.connectionBody {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .contentBox {
-  composes: theme-background-secondary theme-border-color-background from global;
+  composes: theme-background-surface theme-text-on-surface theme-border-color-background from global;
   position: relative;
   display: flex;
   flex: 1;
   flex-direction: column;
+  min-width: 0;
+  min-height: 0;
   overflow: auto;
 }
