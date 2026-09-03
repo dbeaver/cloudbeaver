@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 
 import { Translate, useResource } from '@cloudbeaver/core-blocks';
 import { NetworkHandlerResource, SSH_TUNNEL_ID } from '@cloudbeaver/plugin-network-handlers';
-import { Tab, type TabContainerTabComponent, TabTitle, useTab } from '@cloudbeaver/core-ui';
+import { Tab, type TabContainerTabComponent, TabIcon, TabTitle, useTab } from '@cloudbeaver/core-ui';
 import type { IConnectionFormProps } from '@cloudbeaver/plugin-connections';
 
 export const SSHTab: TabContainerTabComponent<IConnectionFormProps> = observer(function SSHTab(props) {
@@ -20,6 +20,7 @@ export const SSHTab: TabContainerTabComponent<IConnectionFormProps> = observer(f
 
   return (
     <Tab {...props} title={handler.data?.description}>
+      <TabIcon icon="/icons/plugin_connection_shield_terminal.svg" viewBox="0 0 16 16" />
       <TabTitle>
         <Translate token={handler.data?.label || 'plugin_connection_network_handlers_ssh_tunnel_title'} />
       </TabTitle>

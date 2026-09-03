@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,6 @@ import { useService } from '@cloudbeaver/core-di';
 import { Spinner } from '@dbeaver/ui-kit';
 
 import { AdministrationUsersManagementService } from '../../../AdministrationUsersManagementService.js';
-import { CreateUser } from './CreateUser.js';
 import { CreateUserService } from './CreateUserService.js';
 import { UsersTableFilters } from './Filters/UsersTableFilters.js';
 import { useUsersTableFilters } from './Filters/useUsersTableFilters.js';
@@ -37,7 +36,6 @@ export const UsersPage = observer<Props>(function UsersPage({ param }) {
   const filters = useUsersTableFilters();
   const table = useUsersTable(filters);
 
-  const create = param === 'create';
   const displayAuthRole = authRolesResource.data.length > 0;
   const loading = table.loadableState.isLoading();
   const isManageable = !administrationUsersManagementService.externalUserProviderEnabled;
@@ -59,10 +57,6 @@ export const UsersPage = observer<Props>(function UsersPage({ param }) {
       </Group>
 
       <Container overflow gap maximum>
-        {create && createUserService.state && isManageable && (
-          <CreateUser state={createUserService.state} onCancel={createUserService.cancelCreate} />
-        )}
-
         <Placeholder container={createUserService.toolsContainer} param={param} />
 
         <div className="tw:h-full tw:relative">

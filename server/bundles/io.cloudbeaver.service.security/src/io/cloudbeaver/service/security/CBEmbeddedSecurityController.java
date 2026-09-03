@@ -81,6 +81,8 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
 
     protected static final String CHAR_BOOL_TRUE = "Y";
     protected static final String CHAR_BOOL_FALSE = "N";
+    private static final String CRED_ID_PROVISIONED = "$provisioned";
+    private static final String CRED_VALUE_PROVISIONED = "Y";
 
     private static final Type MAP_STRING_OBJECT_TYPE = new TypeToken<Map<String, Object>>() {
     }.getType();
@@ -419,13 +421,8 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         List<SMUserProvisioning> users = userImportList.getUsers();
         List<SMUserProvisioning> importedUsers = new ArrayList<>();
         Set<String> seen = new HashSet<>();
-        outer:
         for (SMUserProvisioning user : users) {
-            Map<String, String> metaParameters = user.getMetaParameters();
-            String effectiveUserId = user.getUserId();
-            if (CommonUtils.isNotEmpty(metaParameters.get(SMStandardMeta.META_USER_ID))) {
-                effectiveUserId = metaParameters.get(SMStandardMeta.META_USER_ID);
-            }
+            String effectiveUserId = extractUserId(user);
             String effectiveUserIdLowerCase = effectiveUserId.toLowerCase();
             if (seen.contains(effectiveUserIdLowerCase)) {
                 log.warn("Skipping duplicate user (case-insensitive): " + effectiveUserId);
@@ -434,23 +431,107 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
             seen.add(effectiveUserIdLowerCase);
 
             String authRole = user.getAuthRole() == null ? userImportList.getAuthRole() : user.getAuthRole();
-            String userId = effectiveUserId;
-            for (String possibleUserId : List.of(userId, userId.toLowerCase())) {
+            String targetUserId = null;
+            boolean subjectConflict = false;
+            for (String possibleUserId : List.of(effectiveUserId, effectiveUserId.toLowerCase())) {
                 if (isSubjectExists(possibleUserId)) {
                     if (getSubjectType(possibleUserId) == SMSubjectType.team) {
                         log.error("Cannot import user '%s': a team with this name already exists.".formatted(possibleUserId));
+                        subjectConflict = true;
                     } else {
                         log.info("User already exist : " + possibleUserId);
                         setUserAuthRole(connection, possibleUserId, authRole);
                         enableUser(connection, possibleUserId, true, null, null);
+                        targetUserId = possibleUserId;
                     }
-                    continue outer;
+                    break;
                 }
             }
-            insertUser(connection, userId.toLowerCase(), metaParameters, true, authRole);
-            importedUsers.add(user);
+            if (subjectConflict) {
+                continue;
+            }
+            if (targetUserId == null) {
+                targetUserId = effectiveUserId.toLowerCase();
+                insertUser(connection, targetUserId, user.getMetaParameters(), true, authRole);
+                importedUsers.add(user);
+            }
+            if (CommonUtils.isNotEmpty(userImportList.getAuthProviderId())) {
+                linkProvisionedAuthProvider(connection, targetUserId, userImportList.getAuthProviderId());
+            }
         }
         return importedUsers;
+    }
+
+    protected void linkProvisionedAuthProvider(
+        @NotNull Connection connection,
+        @NotNull String userId,
+        @NotNull String authProviderId
+    ) throws SQLException {
+        try (PreparedStatement dbStat = connection.prepareStatement(
+            "SELECT USER_ID FROM {table_prefix}CB_USER WHERE USER_ID=?"
+        )) {
+            dbStat.setString(1, userId);
+            try (ResultSet dbResult = dbStat.executeQuery()) {
+                if (!dbResult.next()) {
+                    throw new SQLException("User '" + userId + "' not found");
+                }
+            }
+        }
+        try (PreparedStatement dbStat = connection.prepareStatement(
+            "SELECT CRED_ID FROM {table_prefix}CB_USER_CREDENTIALS WHERE USER_ID=? AND PROVIDER_ID=?"
+        )) {
+            dbStat.setString(1, userId);
+            dbStat.setString(2, authProviderId);
+            try (ResultSet dbResult = dbStat.executeQuery()) {
+                if (dbResult.next()) {
+                    return;
+                }
+            }
+        }
+        JDBCUtils.executeStatement(
+            connection,
+            "INSERT INTO {table_prefix}CB_USER_CREDENTIALS(USER_ID,PROVIDER_ID,CRED_ID,CRED_VALUE) VALUES(?,?,?,?)",
+            userId,
+            authProviderId,
+            CRED_ID_PROVISIONED,
+            CRED_VALUE_PROVISIONED
+        );
+    }
+
+    protected void linkProvisionedAuthProviders(@NotNull SMUserImportList userImportList) throws DBException {
+        String authProviderId = userImportList.getAuthProviderId();
+        if (CommonUtils.isEmpty(authProviderId)) {
+            return;
+        }
+        try (Connection connection = database.openConnection();
+             JDBCTransaction transaction = new JDBCTransaction(connection)) {
+            for (SMUserProvisioning user : userImportList.getUsers()) {
+                String userId = extractUserId(user);
+                String existingUserId = null;
+                for (String possibleUserId : List.of(userId, userId.toLowerCase())) {
+                    if (isSubjectExists(possibleUserId) && getSubjectType(possibleUserId) == SMSubjectType.user) {
+                        existingUserId = possibleUserId;
+                        break;
+                    }
+                }
+                if (existingUserId == null) {
+                    throw new DBException("Imported user '" + userId + "' not found");
+                }
+                linkProvisionedAuthProvider(connection, existingUserId, authProviderId);
+            }
+            transaction.commit();
+        } catch (SQLException e) {
+            throw new DBCException("Error linking provisioned auth provider", e);
+        }
+    }
+
+    @NotNull
+    private String extractUserId(SMUserProvisioning user) {
+        String metaUserId = user.getMetaParameters().get(SMStandardMeta.META_USER_ID);
+        if (CommonUtils.isNotEmpty(metaUserId)) {
+            return metaUserId;
+        }
+        return user.getUserId();
     }
 
     @Override
@@ -1173,12 +1254,28 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         @NotNull String authProviderId,
         @NotNull Map<String, Object> credentials
     ) throws DBException {
-        var existUserByCredentials = findUserByCredentials(getAuthProvider(authProviderId), credentials, false);
+        try (Connection dbCon = database.openConnection()) {
+            try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
+                setUserCredentials(dbCon, userId, authProviderId, credentials);
+                txn.commit();
+            }
+        } catch (SQLException e) {
+            throw new DBCException("Error saving user credentials in database", e);
+        }
+    }
+
+    private void setUserCredentials(
+        @NotNull Connection dbCon,
+        @NotNull String userId,
+        @NotNull String authProviderId,
+        @NotNull Map<String, Object> credentials
+    ) throws DBException, SQLException {
+        WebAuthProviderDescriptor authProvider = getAuthProvider(authProviderId);
+        var existUserByCredentials = findUserByCredentials(dbCon, authProvider, credentials, false);
         if (existUserByCredentials != null && !existUserByCredentials.equals(userId)) {
             throw new DBException("Another user is already linked to the specified credentials");
         }
         List<String[]> transformedCredentials;
-        WebAuthProviderDescriptor authProvider = getAuthProvider(authProviderId);
         if (authProvider.isCaseInsensitive() && !isSubjectExists(userId) && isSubjectExists(userId.toLowerCase())) {
             log.warn("User with id '" + userId + "' not found, credentials will be set for the user: " + userId.toLowerCase());
             userId = userId.toLowerCase();
@@ -1199,35 +1296,28 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         } catch (Exception e) {
             throw new DBCException(e.getMessage(), e);
         }
-        try (Connection dbCon = database.openConnection()) {
-            try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
-                JDBCUtils.executeStatement(
-                    dbCon,
-                    "DELETE FROM {table_prefix}CB_USER_CREDENTIALS WHERE USER_ID=? AND PROVIDER_ID=?",
-                    userId,
-                    authProvider.getId()
-                );
-                if (!CommonUtils.isEmpty(credentials)) {
-                    try (PreparedStatement dbStat = dbCon.prepareStatement(
-                        "INSERT INTO {table_prefix}CB_USER_CREDENTIALS" +
-                            "(USER_ID,PROVIDER_ID,CRED_ID,CRED_VALUE) VALUES(?,?,?,?)")
-                    ) {
-                        for (String[] cred : transformedCredentials) {
-                            if (cred == null) {
-                                continue;
-                            }
-                            dbStat.setString(1, userId);
-                            dbStat.setString(2, authProvider.getId());
-                            dbStat.setString(3, cred[0]);
-                            dbStat.setString(4, cred[1]);
-                            dbStat.execute();
-                        }
+        JDBCUtils.executeStatement(
+            dbCon,
+            "DELETE FROM {table_prefix}CB_USER_CREDENTIALS WHERE USER_ID=? AND PROVIDER_ID=?",
+            userId,
+            authProvider.getId()
+        );
+        if (!CommonUtils.isEmpty(credentials)) {
+            try (PreparedStatement dbStat = dbCon.prepareStatement(
+                "INSERT INTO {table_prefix}CB_USER_CREDENTIALS" +
+                    "(USER_ID,PROVIDER_ID,CRED_ID,CRED_VALUE) VALUES(?,?,?,?)")
+            ) {
+                for (String[] cred : transformedCredentials) {
+                    if (cred == null) {
+                        continue;
                     }
+                    dbStat.setString(1, userId);
+                    dbStat.setString(2, authProvider.getId());
+                    dbStat.setString(3, cred[0]);
+                    dbStat.setString(4, cred[1]);
+                    dbStat.execute();
                 }
-                txn.commit();
             }
-        } catch (SQLException e) {
-            throw new DBCException("Error saving user credentials in database", e);
         }
         log.info(String.format("Set credentials for user: [userId=%s,providerId=%s]", userId, authProviderId));
     }
@@ -1253,16 +1343,31 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         @NotNull Map<String, Object> authParameters,
         boolean onlyActive // throws exception if user is inactive
     ) throws DBException {
-        String userId = findUserByCredentials(authProvider, authParameters, onlyActive, false);
+        try (Connection dbCon = database.openConnection()) {
+            return findUserByCredentials(dbCon, authProvider, authParameters, onlyActive);
+        } catch (SQLException e) {
+            throw new DBCException("Error while searching credentials", e);
+        }
+    }
+
+    @Nullable
+    private String findUserByCredentials(
+        @NotNull Connection dbCon,
+        @NotNull WebAuthProviderDescriptor authProvider,
+        @NotNull Map<String, Object> authParameters,
+        boolean onlyActive
+    ) throws DBCException {
+        String userId = findUserByCredentials(dbCon, authProvider, authParameters, onlyActive, false);
         if (userId == null && authProvider.isCaseInsensitive()) {
             // try to find user id with lower case is auth provider is case-insensitive
-            return findUserByCredentials(authProvider, authParameters, onlyActive, true);
+            return findUserByCredentials(dbCon, authProvider, authParameters, onlyActive, true);
         }
         return userId;
     }
 
     @Nullable
     private String findUserByCredentials(
+        @NotNull Connection dbCon,
         @NotNull WebAuthProviderDescriptor authProvider,
         @NotNull Map<String, Object> authParameters,
         boolean onlyActive,
@@ -1303,34 +1408,32 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                 .append(joinAlias).append("CRED_ID=? AND ")
                 .append(joinAlias).append("CRED_VALUE=?");
         }
-        try (Connection dbCon = database.openConnection()) {
-            try (PreparedStatement dbStat = dbCon.prepareStatement(sql.toString())) {
-                dbStat.setString(1, authProvider.getId());
-                int param = 2;
-                for (Map.Entry<String, String> credEntry : identCredentials.entrySet()) {
-                    dbStat.setString(param++, credEntry.getKey());
-                    dbStat.setString(param++, credEntry.getValue());
+        try (PreparedStatement dbStat = dbCon.prepareStatement(sql.toString())) {
+            dbStat.setString(1, authProvider.getId());
+            int param = 2;
+            for (Map.Entry<String, String> credEntry : identCredentials.entrySet()) {
+                dbStat.setString(param++, credEntry.getKey());
+                dbStat.setString(param++, credEntry.getValue());
+            }
+
+            try (ResultSet dbResult = dbStat.executeQuery()) {
+                String userId = null;
+                boolean isActive = false;
+                while (dbResult.next()) {
+                    String credUserId = dbResult.getString(1);
+                    isActive = CHAR_BOOL_TRUE.equals(dbResult.getString(2));
+                    if (userId == null) {
+                        userId = credUserId;
+                    } else if (!userId.equals(credUserId)) {
+                        log.error("Multiple users associated with the same credentials! " + credUserId + ", " + userId);
+                    }
                 }
 
-                try (ResultSet dbResult = dbStat.executeQuery()) {
-                    String userId = null;
-                    boolean isActive = false;
-                    while (dbResult.next()) {
-                        String credUserId = dbResult.getString(1);
-                        isActive = CHAR_BOOL_TRUE.equals(dbResult.getString(2));
-                        if (userId == null) {
-                            userId = credUserId;
-                        } else if (!userId.equals(credUserId)) {
-                            log.error("Multiple users associated with the same credentials! " + credUserId + ", " + userId);
-                        }
-                    }
-
-                    if (userId != null && onlyActive && !isActive) {
-                        throw new DBCException("User account is locked");
-                    }
-
-                    return userId;
+                if (userId != null && onlyActive && !isActive) {
+                    throw new DBCException("User account is locked");
                 }
+
+                return userId;
             }
         } catch (SQLException e) {
             throw new DBCException("Error while searching credentials", e);
@@ -1341,7 +1444,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
     public Map<String, Object> getUserCredentials(String userId, String authProviderId) throws DBCException {
         WebAuthProviderDescriptor authProvider = getAuthProvider(authProviderId);
         Map<String, Object> creds = getUserCredentials(authProvider, userId);
-        if (creds.isEmpty() && authProvider.isCaseInsensitive()) {
+        if (creds.isEmpty() && authProvider.isCaseInsensitive() && !isSubjectExists(userId)) {
             return getUserCredentials(authProvider, userId.toLowerCase());
         }
         return creds;
@@ -1352,10 +1455,11 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         try (Connection dbCon = database.openConnection()) {
             try (PreparedStatement dbStat = dbCon.prepareStatement(
                 "SELECT CRED_ID,CRED_VALUE FROM {table_prefix}CB_USER_CREDENTIALS\n" +
-                    "WHERE USER_ID=? AND PROVIDER_ID=?")) {
+                    "WHERE USER_ID=? AND PROVIDER_ID=? AND CRED_ID<>?")) {
                 dbStat.setString(1, userId);
 
                 dbStat.setString(2, authProvider.getId());
+                dbStat.setString(3, CRED_ID_PROVISIONED);
 
                 try (ResultSet dbResult = dbStat.executeQuery()) {
                     Map<String, Object> credentials = new LinkedHashMap<>();
