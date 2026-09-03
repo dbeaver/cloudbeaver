@@ -46,6 +46,7 @@ interface Props {
 const SELECT_COLUMN = { key: 'select', label: '' };
 const NAME_COLUMN = { key: 'name', minWidth: 120 };
 const ENGINE_COLUMN = { key: 'engine', width: 160 };
+const SCOPE_COLUMN = { key: 'scope', width: 120 };
 
 export const AIProfilesTable = observer<Props>(function AIProfilesTable({
   profiles,
@@ -68,6 +69,11 @@ export const AIProfilesTable = observer<Props>(function AIProfilesTable({
     ...(selectable ? [SELECT_COLUMN] : []),
     { ...NAME_COLUMN, label: nameLabel },
     { ...ENGINE_COLUMN, label: engineLabel },
+    {
+      ...SCOPE_COLUMN,
+      label: 'plugin_ai_profiles_scope',
+      render: profile => translate(profile.global ? 'plugin_ai_profiles_scope_global' : 'plugin_ai_profiles_scope_user'),
+    },
     ...additionalColumns,
   ];
 

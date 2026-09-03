@@ -7,6 +7,9 @@
  */
 
 export default [
+  ['plugin_ai_profiles_scope', 'Portée'],
+  ['plugin_ai_profiles_scope_global', 'Globale'],
+  ['plugin_ai_profiles_scope_user', 'Utilisateur'],
   ['plugin_ai_credentials_dialog_title', 'Identifiants du profil IA'],
   ['plugin_ai_credentials_dialog_description', 'Fournissez les identifiants utilisés par ce profil IA pour votre compte utilisateur.'],
   ['plugin_ai_credentials_profile', 'Profil'],

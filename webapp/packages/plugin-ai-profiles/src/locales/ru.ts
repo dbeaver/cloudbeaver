@@ -7,6 +7,9 @@
  */
 
 export default [
+  ['plugin_ai_profiles_scope', 'Область'],
+  ['plugin_ai_profiles_scope_global', 'Глобальная'],
+  ['plugin_ai_profiles_scope_user', 'Пользовательская'],
   ['plugin_ai_credentials_dialog_title', 'Учетные данные профиля ИИ'],
   ['plugin_ai_credentials_dialog_description', 'Укажите учетные данные, которые этот профиль ИИ будет использовать для вашей учетной записи.'],
   ['plugin_ai_credentials_profile', 'Профиль'],

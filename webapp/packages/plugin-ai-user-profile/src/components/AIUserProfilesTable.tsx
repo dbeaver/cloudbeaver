@@ -34,13 +34,6 @@ export const AIUserProfilesTable = observer<Props>(function AIUserProfilesTable(
 
   const columns: IAIProfilesTableColumn[] = [
     {
-      key: 'scope',
-      label: 'plugin_ai_user_profile_column_scope',
-      width: 180,
-      render: profile =>
-        translate(profile.global ? 'plugin_ai_user_profile_scope_global' : 'plugin_ai_user_profile_scope_user'),
-    },
-    {
       key: 'status',
       label: 'plugin_ai_user_profile_column_status',
       width: 280,

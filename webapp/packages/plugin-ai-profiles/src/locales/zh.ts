@@ -7,6 +7,9 @@
  */
 
 export default [
+  ['plugin_ai_profiles_scope', '范围'],
+  ['plugin_ai_profiles_scope_global', '全局'],
+  ['plugin_ai_profiles_scope_user', '用户'],
   ['plugin_ai_credentials_dialog_title', 'AI 配置文件凭据'],
   ['plugin_ai_credentials_dialog_description', '提供此 AI 配置文件用于您的用户账户的凭据。'],
   ['plugin_ai_credentials_profile', '配置文件'],

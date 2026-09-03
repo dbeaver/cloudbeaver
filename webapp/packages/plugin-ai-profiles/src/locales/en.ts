@@ -7,6 +7,9 @@
  */
 
 export default [
+  ['plugin_ai_profiles_scope', 'Scope'],
+  ['plugin_ai_profiles_scope_global', 'Global'],
+  ['plugin_ai_profiles_scope_user', 'User'],
   ['plugin_ai_credentials_dialog_title', 'AI profile credentials'],
   ['plugin_ai_credentials_dialog_description', 'Provide the credentials used by this AI profile for your user account.'],
   ['plugin_ai_credentials_profile', 'Profile'],
