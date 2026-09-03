@@ -11,12 +11,9 @@ import { observer } from 'mobx-react-lite';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { useTranslate } from '@cloudbeaver/core-blocks';
-import {
-  AIProfileCredentialsService,
-  AIProfilesTable,
-  type AIProfile,
-  type IAIProfilesTableColumn,
-} from '@cloudbeaver/plugin-ai-profiles';
+import { AIProfilesTable, type AIProfile, type IAIProfilesTableColumn } from '@cloudbeaver/plugin-ai-profiles';
+
+import { AIProfileCredentialsPanelService } from '../AIProfileCredentialsPanelService.js';
 
 interface Props {
   profiles: AIProfile[];
@@ -24,12 +21,12 @@ interface Props {
 
 export const AIUserProfilesTable = observer<Props>(function AIUserProfilesTable({ profiles }) {
   const translate = useTranslate();
-  const credentialsService = useService(AIProfileCredentialsService);
+  const credentialsPanelService = useService(AIProfileCredentialsPanelService);
   const notificationService = useService(NotificationService);
 
   async function editCredentials(profileId: string): Promise<void> {
     try {
-      await credentialsService.open(profileId);
+      await credentialsPanelService.open(profileId);
     } catch (exception: any) {
       notificationService.logException(exception, 'plugin_ai_user_profile_credentials_edit_failed');
     }

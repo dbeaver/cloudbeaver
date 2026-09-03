@@ -16,6 +16,8 @@ export default [
   ['plugin_ai_credentials_reset_title', 'Сброс учетных данных профиля ИИ'],
   ['plugin_ai_credentials_reset_confirmation', 'Вы уверены, что хотите сбросить сохраненные учетные данные?'],
   ['plugin_ai_credentials_profile_not_found', 'Профиль ИИ не найден'],
+  ['plugin_ai_credentials_saved', 'Учетные данные профиля ИИ сохранены'],
+  ['plugin_ai_credentials_reset_success', 'Учетные данные профиля ИИ сброшены'],
   ['plugin_ai_credentials_save_failed', 'Не удалось сохранить учетные данные профиля ИИ'],
   ['plugin_ai_credentials_reset_failed', 'Не удалось сбросить учетные данные профиля ИИ'],
 ];

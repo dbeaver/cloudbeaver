@@ -17,10 +17,19 @@
       "path": "../core-cli"
     },
     {
+      "path": "../core-data-context"
+    },
+    {
       "path": "../core-di"
     },
     {
+      "path": "../core-dialogs"
+    },
+    {
       "path": "../core-events"
+    },
+    {
+      "path": "../core-executor"
     },
     {
       "path": "../core-localization"
@@ -30,6 +39,12 @@
     },
     {
       "path": "../core-root"
+    },
+    {
+      "path": "../core-ui"
+    },
+    {
+      "path": "../core-utils"
     },
     {
       "path": "../plugin-ai"

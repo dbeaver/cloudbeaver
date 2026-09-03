@@ -7,7 +7,16 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { ColoredContainer, Container, Group, TextPlaceholder, ToolsAction, ToolsPanel, useResource, useTranslate } from '@cloudbeaver/core-blocks';
+import {
+  ColoredContainer,
+  Container,
+  Group,
+  TextPlaceholder,
+  ToolsAction,
+  ToolsPanel,
+  useResource,
+  useTranslate,
+} from '@cloudbeaver/core-blocks';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -32,7 +41,7 @@ export const AIProfilesPanel = observer(function AIProfilesPanel() {
   }
 
   return (
-    <ColoredContainer wrap gap parent vertical maximum>
+    <ColoredContainer parent overflow compact vertical noWrap gap>
       <Group box keepSize>
         <ToolsPanel rounded>
           <ToolsAction

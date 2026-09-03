@@ -20,4 +20,6 @@ export default [
   ['plugin_ai_user_profile_status_configured', 'Configured'],
   ['plugin_ai_user_profile_status_not_configured', 'Not configured'],
   ['plugin_ai_user_profile_credentials_edit_failed', 'Failed to edit AI profile credentials'],
+  ['plugin_ai_user_profile_credentials_saved', 'AI profile information saved'],
+  ['plugin_ai_user_profile_credentials_reset', 'AI profile credentials reset'],
 ];

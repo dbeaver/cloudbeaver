@@ -16,6 +16,8 @@ export default [
   ['plugin_ai_credentials_reset_title', 'Réinitialiser les identifiants du profil IA'],
   ['plugin_ai_credentials_reset_confirmation', 'Voulez-vous vraiment réinitialiser les identifiants enregistrés ?'],
   ['plugin_ai_credentials_profile_not_found', 'Profil IA introuvable'],
+  ['plugin_ai_credentials_saved', 'Identifiants du profil IA enregistrés'],
+  ['plugin_ai_credentials_reset_success', 'Identifiants du profil IA réinitialisés'],
   ['plugin_ai_credentials_save_failed', "Échec de l'enregistrement des identifiants du profil IA"],
   ['plugin_ai_credentials_reset_failed', 'Échec de la réinitialisation des identifiants du profil IA'],
 ];

@@ -16,6 +16,8 @@ export default [
   ['plugin_ai_credentials_reset_title', 'Reset AI profile credentials'],
   ['plugin_ai_credentials_reset_confirmation', 'Are you sure you want to reset the saved credentials?'],
   ['plugin_ai_credentials_profile_not_found', 'AI profile not found'],
+  ['plugin_ai_credentials_saved', 'AI profile credentials saved'],
+  ['plugin_ai_credentials_reset_success', 'AI profile credentials reset'],
   ['plugin_ai_credentials_save_failed', 'Failed to save AI profile credentials'],
   ['plugin_ai_credentials_reset_failed', 'Failed to reset AI profile credentials'],
 ];

@@ -69,6 +69,10 @@ export const AIProfileCredentialsDialog: DialogComponent<IAIProfileCredentialsDi
           throw new Error(translate('plugin_ai_credentials_save_failed'));
         }
         state.token = '';
+        notificationService.logSuccess({
+          title: 'plugin_ai_credentials_saved',
+          message: payload.profileName,
+        });
       } else if (!state.credentialsSaved) {
         return;
       }
@@ -97,6 +101,10 @@ export const AIProfileCredentialsDialog: DialogComponent<IAIProfileCredentialsDi
         }
         state.token = '';
         state.credentialsSaved = false;
+        notificationService.logSuccess({
+          title: 'plugin_ai_credentials_reset_success',
+          message: payload.profileName,
+        });
       } catch (exception: any) {
         notificationService.logException(exception, 'plugin_ai_credentials_reset_failed');
       } finally {

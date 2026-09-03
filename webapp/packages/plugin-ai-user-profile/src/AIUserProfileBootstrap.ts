@@ -13,9 +13,9 @@ import { FEATURE_AI_ID, ServerConfigResource } from '@cloudbeaver/core-root';
 import { AIProfilesResource } from '@cloudbeaver/plugin-ai-profiles';
 import { UserProfileTabsService } from '@cloudbeaver/plugin-user-profile';
 
-const AIProfilesPanel = importLazyComponent(() => import('./components/AIProfilesPanel.js').then(module => module.AIProfilesPanel));
+import { AI_PROFILES_TAB_ID } from './AI_PROFILES_TAB_ID.js';
 
-const AI_PROFILES_TAB_ID = 'ai_profiles';
+const AIProfilesPanel = importLazyComponent(() => import('./components/AIProfilesPanel.js').then(module => module.AIProfilesPanel));
 
 @injectable(() => [UserProfileTabsService, AppAuthService, ServerConfigResource, AIProfilesResource])
 export class AIUserProfileBootstrap extends Bootstrap {

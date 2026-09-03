@@ -16,6 +16,8 @@ export default [
   ['plugin_ai_credentials_reset_title', '重置 AI 配置文件凭据'],
   ['plugin_ai_credentials_reset_confirmation', '确定要重置已保存的凭据吗？'],
   ['plugin_ai_credentials_profile_not_found', '未找到 AI 配置文件'],
+  ['plugin_ai_credentials_saved', 'AI 配置文件凭据已保存'],
+  ['plugin_ai_credentials_reset_success', 'AI 配置文件凭据已重置'],
   ['plugin_ai_credentials_save_failed', '无法保存 AI 配置文件凭据'],
   ['plugin_ai_credentials_reset_failed', '无法重置 AI 配置文件凭据'],
 ];

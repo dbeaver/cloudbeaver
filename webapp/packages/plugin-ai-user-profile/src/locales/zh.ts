@@ -20,4 +20,6 @@ export default [
   ['plugin_ai_user_profile_status_configured', '已配置'],
   ['plugin_ai_user_profile_status_not_configured', '未配置'],
   ['plugin_ai_user_profile_credentials_edit_failed', '无法编辑 AI 配置文件凭据'],
+  ['plugin_ai_user_profile_credentials_saved', 'AI 配置文件信息已保存'],
+  ['plugin_ai_user_profile_credentials_reset', 'AI 配置文件凭据已重置'],
 ];

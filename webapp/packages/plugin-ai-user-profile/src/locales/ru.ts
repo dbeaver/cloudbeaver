@@ -20,4 +20,6 @@ export default [
   ['plugin_ai_user_profile_status_configured', 'Настроено'],
   ['plugin_ai_user_profile_status_not_configured', 'Не настроено'],
   ['plugin_ai_user_profile_credentials_edit_failed', 'Не удалось изменить учетные данные профиля ИИ'],
+  ['plugin_ai_user_profile_credentials_saved', 'Информация о профиле ИИ сохранена'],
+  ['plugin_ai_user_profile_credentials_reset', 'Учетные данные профиля ИИ сброшены'],
 ];
