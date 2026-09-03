@@ -107,7 +107,7 @@ export const AIProfileCredentialsDialog: DialogComponent<IAIProfileCredentialsDi
 
   return (
     <Form context={form} contents>
-      <CommonDialogWrapper size="medium" autoFocusOnShow={false}>
+      <CommonDialogWrapper size="medium" autoFocusOnShow={false} fixedWidth>
         <CommonDialogHeader
           title="plugin_ai_credentials_dialog_title"
           subTitle="plugin_ai_credentials_dialog_description"
