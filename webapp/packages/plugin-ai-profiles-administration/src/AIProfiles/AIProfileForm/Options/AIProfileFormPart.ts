@@ -18,6 +18,7 @@ import { getObjectPropertiesValues } from '../../utils/getObjectPropertiesValues
 import { prepareProperties } from '../../utils/prepareProperties.js';
 import type { IAIProfileFormState } from '../IAIProfileFormState.js';
 import type { IAIProfileOptionsState } from './AIProfileSchema.js';
+import type { AIProfileCredentialsService, AIProfilesResource } from '@cloudbeaver/plugin-ai-profiles';
 
 const GLOBAL_PROPERTY_ID = 'global';
 
