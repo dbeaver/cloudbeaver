@@ -9,7 +9,7 @@ import type { TeamInfo, TeamInfoMetaParametersResource, TeamsResource } from '@c
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import type { LocalizationService } from '@cloudbeaver/core-localization';
 import { FormMode, FormPart, formValidationContext, type IFormState } from '@cloudbeaver/core-ui';
-import { getUniqueName } from '@cloudbeaver/core-utils';
+import { getUniqueName, trimObjectValues } from '@cloudbeaver/core-utils';
 
 import type { ITeamFormState } from '../TeamsAdministrationFormService.js';
 import type { ITeamOptionsState } from './ITeamOptionsState.js';
@@ -92,13 +92,7 @@ export class TeamOptionsFormPart extends FormPart<ITeamOptionsState, ITeamFormSt
       this.state.description = this.state.description.trim();
     }
 
-    if (this.state.metaParameters) {
-      for (const key of Object.keys(this.state.metaParameters)) {
-        if (typeof this.state.metaParameters[key] === 'string') {
-          this.state.metaParameters[key] = (this.state.metaParameters[key] as any).trim();
-        }
-      }
-    }
+    trimObjectValues(this.state.metaParameters);
   }
 
   protected override async saveChanges(

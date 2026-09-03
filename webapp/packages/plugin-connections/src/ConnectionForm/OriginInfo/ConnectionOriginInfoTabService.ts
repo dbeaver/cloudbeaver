@@ -32,7 +32,8 @@ export class ConnectionOriginInfoTabService extends Bootstrap {
   override register(): void {
     this.connectionFormService.parts.add({
       key: 'origin',
-      order: 3,
+      icon: '/icons/plugin_connection_globe.svg',
+      order: 5,
       tab: () => OriginInfoTab,
       panel: () => OriginInfo,
       getLoader: (context, props) => {
