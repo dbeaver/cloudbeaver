@@ -155,7 +155,7 @@ export const AIProfileOptions: TabContainerPanelComponent<IAIProfileFormProps> =
     setModels(null);
   }
 
-  function handleProfileTypeChange(value: string): void {
+  function handleScopeChange(value: string): void {
     const global = value === 'global';
     part.state.global = global;
     part.state.properties['global'] = global;
@@ -186,13 +186,14 @@ export const AIProfileOptions: TabContainerPanelComponent<IAIProfileFormProps> =
               {translate('plugin_ai_administration_profile_form_field_engine')}
             </Select>
             <RadioGroup
-              name="profileType"
-              aria-label={translate('plugin_ai_administration_profile_profile_type')}
+              name="profileScope"
+              label={translate('plugin_ai_administration_profile_scope')}
               value={part.state.global ? 'global' : 'user'}
-              onChange={handleProfileTypeChange}
+              required
+              onChange={handleScopeChange}
             >
               <Radio value="global" disabled={formState.isDisabled || isEditMode} small keepSize>
-                {translate('plugin_ai_administration_profile_global_credentials')}
+                {translate('plugin_ai_administration_profile_scope_global')}
               </Radio>
               <Radio
                 value="user"
@@ -201,7 +202,7 @@ export const AIProfileOptions: TabContainerPanelComponent<IAIProfileFormProps> =
                 small
                 keepSize
               >
-                {translate('plugin_ai_administration_profile_user_credentials')}
+                {translate('plugin_ai_administration_profile_scope_user')}
               </Radio>
             </RadioGroup>
           </Container>
