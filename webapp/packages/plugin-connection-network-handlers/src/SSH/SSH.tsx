@@ -7,14 +7,14 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { ColoredContainer, Form, Group, s, useAutoLoad, useS } from '@cloudbeaver/core-blocks';
+import { Form, s, useAutoLoad, useS } from '@cloudbeaver/core-blocks';
 import { type NetworkHandlerConfigInput } from '@cloudbeaver/core-sdk';
 import { SSHForm } from '@cloudbeaver/plugin-network-handlers';
 import { useTab, type IFormState, type TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 
 import styles from './SSH.module.css';
 import { getConnectionFormSSHPart } from './getConnectionFormSSHPart.js';
-import { getConnectionFormOptionsPart, type IConnectionFormState } from '@cloudbeaver/plugin-connections';
+import { ConnectionSectionWrapper, getConnectionFormOptionsPart, type IConnectionFormState } from '@cloudbeaver/plugin-connections';
 
 interface Props {
   handlerState: NetworkHandlerConfigInput;
@@ -31,19 +31,17 @@ export const SSH: TabContainerPanelComponent<Props> = observer(function SSH({ fo
 
   return (
     <Form className={s(style, { form: true })}>
-      <ColoredContainer parent>
-        <Group form gap keepSize large>
-          <SSHForm
-            state={handlerState}
-            initialState={sshPart.initialState}
-            disabled={formState.isDisabled || formState.isReadOnly}
-            readonly={formState.isReadOnly || sshPart.isReadOnly}
-            sharedCredentials={optionsPart.state.sharedCredentials}
-            projectId={formState.state.projectId}
-            connectionId={formState.state.connectionId}
-          />
-        </Group>
-      </ColoredContainer>
+      <ConnectionSectionWrapper className="tw:block! tw:space-y-4">
+        <SSHForm
+          state={handlerState}
+          initialState={sshPart.initialState}
+          disabled={formState.isDisabled || formState.isReadOnly}
+          readonly={formState.isReadOnly || sshPart.isReadOnly}
+          sharedCredentials={optionsPart.state.sharedCredentials}
+          projectId={formState.state.projectId}
+          connectionId={formState.state.connectionId}
+        />
+      </ConnectionSectionWrapper>
     </Form>
   );
 });
