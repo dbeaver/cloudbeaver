@@ -29,7 +29,7 @@
         <module>io.cloudbeaver.service.data.transfer</module>
 
         <module>io.cloudbeaver.service.security</module>
-        <module>io.cloudbeaver.service.ldap.auth</module>
+        <module>io.cloudbeaver.service.auth.ldap</module>
 
         <module>io.cloudbeaver.resources.drivers.base</module>
 

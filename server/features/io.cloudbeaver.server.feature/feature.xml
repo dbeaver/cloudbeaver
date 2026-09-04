@@ -42,7 +42,7 @@
     <plugin id="io.cloudbeaver.service.rm.nio" version="0.0.0"/>
 
     <plugin id="io.cloudbeaver.service.security" version="0.0.0"/>
-    <plugin id="io.cloudbeaver.service.ldap.auth" version="0.0.0"/>
+    <plugin id="io.cloudbeaver.service.auth.ldap" version="0.0.0"/>
 
     <!-- Extra plugins -->
     <plugin id="org.jkiss.dbeaver.data.office" version="0.0.0"/>
