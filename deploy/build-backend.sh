@@ -27,9 +27,12 @@ cd cloudbeaver/deploy
 echo "Build CloudBeaver server"
 
 cd ../server/product/aggregate
-"$MVNW" clean verify $MAVEN_COMMON_OPTS -Dheadless-platform
-if [[ "$?" -ne 0 ]] ; then
-  echo 'Could not perform package'; exit $rc
+if "$MVNW" clean verify $MAVEN_COMMON_OPTS -Dheadless-platform; then
+  :
+else
+  rc=$?
+  echo 'Could not perform package'
+  exit "$rc"
 fi
 cd ../../../deploy
 
