@@ -28,16 +28,23 @@ import java.util.Map;
 public class WebDataTransferImportParameters {
 
     private final String processorId;
+    private final Map<String, Object> processorProperties;
     private final Map<String, Object> settings;
 
     public WebDataTransferImportParameters(@NotNull Map<String, Object> params) {
         this.processorId = JSONUtils.getString(params, "processorId");
+        this.processorProperties = JSONUtils.getObjectOrNull(params, "processorProperties");
         this.settings = JSONUtils.getObjectOrNull(params, "settings");
     }
 
     @Nullable
     public String getProcessorId() {
         return processorId;
+    }
+
+    @Nullable
+    public Map<String, Object> getProcessorProperties() {
+        return processorProperties;
     }
 
     @Nullable
