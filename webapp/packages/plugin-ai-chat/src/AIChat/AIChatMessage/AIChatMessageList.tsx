@@ -39,7 +39,11 @@ export const AIChatMessageList = observer<Props>(function AIChatMessageList({ cu
   }, [currentConversationId, lastMessage?.id]);
 
   if (!messages?.length) {
-    return <div className="tw:flex tw:flex-1 tw:items-center tw:justify-center">{translate('plugin_ai_chat_no_messages_placeholder')}</div>;
+    return (
+      <div className="tw:flex tw:flex-1 tw:items-center tw:justify-center tw:px-4 tw:text-center">
+        {translate('plugin_ai_chat_no_messages_placeholder')}
+      </div>
+    );
   }
 
   return (
