@@ -74,6 +74,6 @@ echo "Copy static content"
 
 xcopy /E /Q ..\webapp\packages\product-default\lib cloudbeaver\web >NUL
 
-echo "Cloudbeaver is ready. Run run-cloudbeaver-server.bat in cloudbeaver folder to start the server."
+echo "Cloudbeaver is ready. Run 'java CloudBeaverLauncher.java' in cloudbeaver folder to start the server."
 
 pause
