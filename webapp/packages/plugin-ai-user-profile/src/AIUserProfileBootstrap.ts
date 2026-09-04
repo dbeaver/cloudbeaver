@@ -33,10 +33,7 @@ export class AIUserProfileBootstrap extends Bootstrap {
       key: AI_PROFILES_TAB_ID,
       name: 'plugin_ai_user_profile_tab_label',
       order: 4,
-      getLoader: () =>
-        getCachedMapResourceLoaderState(this.aiProfilesResource, () =>
-          this.appAuthService.authenticated && this.serverConfigResource.isFeatureEnabled(FEATURE_AI_ID, true) ? CachedMapAllKey : null,
-        ),
+      getLoader: () => getCachedMapResourceLoaderState(this.aiProfilesResource, () => CachedMapAllKey),
       isHidden: () => !this.isAvailable(),
       panel: () => AIProfilesPanel,
     });
