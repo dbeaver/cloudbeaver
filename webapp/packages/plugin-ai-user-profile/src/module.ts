@@ -9,6 +9,7 @@
 import { Bootstrap, ModuleRegistry } from '@cloudbeaver/core-di';
 
 import { AIUserProfileBootstrap } from './AIUserProfileBootstrap.js';
+import { AIProfileCredentialsFormTabBootstrap } from './AIProfileCredentialsForm/AIProfileCredentialsFormTabBootstrap.js';
 import { AIProfileCredentialsPanelService } from './AIProfileCredentialsPanelService.js';
 import { LocaleService } from './LocaleService.js';
 
@@ -18,6 +19,7 @@ export default ModuleRegistry.add({
   configure: serviceCollection => {
     serviceCollection
       .addSingleton(AIProfileCredentialsPanelService)
+      .addSingleton(Bootstrap, AIProfileCredentialsFormTabBootstrap)
       .addSingleton(Bootstrap, LocaleService)
       .addSingleton(Bootstrap, AIUserProfileBootstrap);
   },

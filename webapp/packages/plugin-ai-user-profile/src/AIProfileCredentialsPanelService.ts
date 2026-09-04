@@ -18,6 +18,7 @@ import { FormBaseService, FormMode, FormState, OptionsPanelService, type Options
 import { UserProfileTabsService } from '@cloudbeaver/plugin-user-profile';
 
 import type { IAIProfileCredentialsFormState } from './AIProfileCredentialsForm/IAIProfileCredentialsFormState.js';
+import type { IAIProfileCredentialsFormProps } from './AIProfileCredentialsForm/IAIProfileCredentialsFormProps.js';
 import { AI_PROFILES_TAB_ID } from './AI_PROFILES_TAB_ID.js';
 
 const AIProfileCredentialsPanel = importLazyComponent(() =>
@@ -26,7 +27,7 @@ const AIProfileCredentialsPanel = importLazyComponent(() =>
 const panelGetter = () => AIProfileCredentialsPanel;
 
 @injectable(() => [LocalizationService, NotificationService, OptionsPanelService, UserProfileTabsService, IServiceProvider, CommonDialogService])
-export class AIProfileCredentialsPanelService extends FormBaseService<IAIProfileCredentialsFormState> {
+export class AIProfileCredentialsPanelService extends FormBaseService<IAIProfileCredentialsFormState, IAIProfileCredentialsFormProps> {
   formState: FormState<IAIProfileCredentialsFormState> | null = null;
 
   constructor(
