@@ -174,7 +174,8 @@ public class CBJettyServer {
                     Set.of(gqlServletPath)
                 ));
                 servletContextHandler.addFilter(hostsFilter, "/*", null);
-
+                FilterHolder cspFilter = new FilterHolder(new ContentSecurityPolicyFilter());
+                servletContextHandler.addFilter(cspFilter, "/*", null);
 
                 JakartaWebSocketServletContainerInitializer.configure(servletContextHandler, (context, container) -> {
                     // Add echo endpoint to server container
