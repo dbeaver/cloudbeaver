@@ -54,7 +54,8 @@ import org.junit.platform.suite.api.Suite;
         RowIdResultSetTest.class,
         GroupingEndpointTest.class,
         ForeignKeyNavigationEndpointTest.class,
-        DataFilterConstraintsTest.class
+        DataFilterConstraintsTest.class,
+        DataTransferImportTest.class
     }
 )
 public class CEServerTestSuite {

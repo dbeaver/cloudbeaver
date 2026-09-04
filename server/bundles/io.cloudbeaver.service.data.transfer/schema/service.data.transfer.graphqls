@@ -55,6 +55,8 @@ input DataTransferImportSettings {
 input DataTransferImportParameters {
     "Import processor ID"
     processorId: ID!
+    "Import processor properties. Omitted or null properties keep their default value"
+    processorProperties: Object @since(version: "26.2.1")
     "Import settings. Omitted settings keep their default value"
     settings: DataTransferImportSettings
 }
