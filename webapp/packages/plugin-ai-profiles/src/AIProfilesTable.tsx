@@ -44,7 +44,7 @@ export interface IAIProfilesTableProps {
 }
 
 const SELECT_COLUMN = { key: 'select', label: '' };
-const NAME_COLUMN = { key: 'name', minWidth: 120 };
+const NAME_COLUMN = { key: 'name', minWidth: 160 };
 const ENGINE_COLUMN = { key: 'engine', width: 160 };
 const SCOPE_COLUMN = { key: 'scope', width: 120 };
 
