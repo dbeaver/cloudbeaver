@@ -176,7 +176,7 @@ public class WebServiceFS implements DBWServiceFS {
             if (!Files.isDirectory(parentNode.getPath())) {
                 throw new DBException(MessageFormat.format("Node ''{0}'' is not a directory", parentPath));
             }
-            Path filePath = parentNode.getPath().resolve(fileName);
+            Path filePath = WebFSUtils.resolveSafeChild(parentNode.getPath(), fileName);
             Files.createFile(filePath);
             parentNode.addChildResource(filePath);
             return new FSFile(parentNode.getChild(filePath));
@@ -266,7 +266,7 @@ public class WebServiceFS implements DBWServiceFS {
             if (!Files.isDirectory(parentNode.getPath())) {
                 throw new DBException(MessageFormat.format("Node ''{0}'' is not a directory", parentPath));
             }
-            Path folderPath = parentNode.getPath().resolve(folderName);
+            Path folderPath = WebFSUtils.resolveSafeChild(parentNode.getPath(), folderName);
             Files.createDirectory(folderPath);
             parentNode.addChildResource(folderPath);
             return new FSFile(parentNode.getChild(folderPath));
