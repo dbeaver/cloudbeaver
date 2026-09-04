@@ -25,18 +25,22 @@ export const AIProfileFormPanel = observer<IAIProfileFormProps>(function AIProfi
 
   const form = useForm({
     onSubmit: async function onSubmit() {
+      const wasCreating = formState.mode === FormMode.Create;
       const saved = await formState.save();
       const exception = getFirstException(formState.exception);
 
       if (saved) {
         notificationService.logSuccess({
-          title: creating ? 'plugin_ai_administration_profile_created' : 'plugin_ai_administration_profile_updated',
+          title: wasCreating ? 'plugin_ai_administration_profile_created' : 'plugin_ai_administration_profile_updated',
           message: formState.state.name,
         });
+        if (wasCreating) {
+          await aiProfileFormService.close();
+        }
       } else if (exception) {
         notificationService.logException(
           exception,
-          creating ? 'plugin_ai_administration_profile_create_error' : 'plugin_ai_administration_profile_save_error',
+          wasCreating ? 'plugin_ai_administration_profile_create_error' : 'plugin_ai_administration_profile_save_error',
         );
       }
     },
