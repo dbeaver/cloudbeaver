@@ -35,6 +35,7 @@ import org.jkiss.dbeaver.model.app.DBPWorkspace;
 import org.jkiss.dbeaver.model.auth.SMCredentials;
 import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
 import org.jkiss.dbeaver.model.auth.SMObjectType;
+import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.fs.lock.LockManager;
 import org.jkiss.dbeaver.model.fs.lock.LockOptions;
 import org.jkiss.dbeaver.model.fs.lock.LockTarget;
@@ -55,6 +56,7 @@ import org.jkiss.dbeaver.registry.DataSourceDescriptor;
 import org.jkiss.dbeaver.registry.DataSourceParseResults;
 import org.jkiss.dbeaver.registry.ResourceTypeDescriptor;
 import org.jkiss.dbeaver.registry.ResourceTypeRegistry;
+import org.jkiss.dbeaver.registry.network.NetworkHandlerRegistry;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.utils.CommonUtils;
@@ -67,6 +69,7 @@ import java.text.MessageFormat;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -418,6 +421,79 @@ public class LocalResourceController extends BaseLocalResourceController {
         DataSourceParseResults parseResults = super.updateProjectDataSourcesConfig(projectId, configuration, dataSourceIds);
         sendConfigUpdatedEvent(registry, oldDataSources, oldNetworkProfiles, parseResults);
         return parseResults != null;
+    }
+
+    @Override
+    @NotNull
+    protected Map<String, DBPConnectionConfiguration> captureCurrentDataSourceConfigurations(
+        @NotNull RMLocalProject project,
+        @Nullable List<String> dataSourceIds
+    ) {
+        return project.getDataSourceRegistry().getDataSources().stream()
+            .filter(ds -> dataSourceIds == null || dataSourceIds.contains(ds.getId()))
+            .collect(Collectors.toMap(
+                DBPDataSourceContainer::getId,
+                ds -> new DBPConnectionConfiguration(ds.getConnectionConfiguration())
+            ));
+    }
+
+    @Override
+    @NotNull
+    protected Map<String, DBWNetworkProfile> captureCurrentNetworkProfiles(@NotNull RMLocalProject project) {
+        return project.getDataSourceRegistry().getNetworkProfiles().getProfiles().stream()
+            .collect(Collectors.toMap(
+                DBWNetworkProfile::getProfileId,
+                DBWNetworkProfile::new
+            ));
+    }
+
+    @Override
+    protected void processLoadedDataSourceConfigurationUpdate(
+        @NotNull RMLocalProject project,
+        @NotNull String projectId,
+        @Nullable List<String> dataSourceIds,
+        @NotNull Map<String, DBPConnectionConfiguration> storedDataSourceConfigurations,
+        @NotNull Map<String, DBWNetworkProfile> storedNetworkProfiles
+    ) throws DBException {
+        Set<RMProjectPermission> userProjectPermissions = getProjectPermissions(projectId, project.getProjectType());
+        Set<String> grantedPermissions = userProjectPermissions.stream()
+            .filter(Objects::nonNull)
+            .flatMap(permission -> permission.getAllPermissions().stream())
+            .collect(Collectors.toSet());
+        Predicate<String> hasPermission = permission ->
+            grantedPermissions.contains(permission) ||
+            credentialsProvider.hasPermission(DBWConstants.PERMISSION_ADMIN) ||
+            credentialsProvider.hasPermission(permission);
+
+        for (DBPDataSourceContainer dataSource : project.getDataSourceRegistry().getDataSources()) {
+            if (dataSourceIds != null && !dataSourceIds.contains(dataSource.getId())) {
+                continue;
+            }
+
+            DBPConnectionConfiguration storedConfiguration = storedDataSourceConfigurations.get(dataSource.getId());
+            NetworkHandlerRegistry.getInstance().validateHandlerConfigurationUpdate(
+                storedConfiguration,
+                dataSource.getConnectionConfiguration(),
+                hasPermission
+            );
+        }
+
+        Map<String, DBWNetworkProfile> updatedNetworkProfiles = project.getDataSourceRegistry()
+            .getNetworkProfiles()
+            .getProfiles()
+            .stream()
+            .collect(Collectors.toMap(DBWNetworkProfile::getProfileId, profile -> profile));
+        Set<String> profileIds = new LinkedHashSet<>(storedNetworkProfiles.keySet());
+        profileIds.addAll(updatedNetworkProfiles.keySet());
+        for (String profileId : profileIds) {
+            DBWNetworkProfile storedProfile = storedNetworkProfiles.get(profileId);
+            DBWNetworkProfile updatedProfile = updatedNetworkProfiles.get(profileId);
+            NetworkHandlerRegistry.getInstance().validateHandlerConfigurationUpdate(
+                storedProfile == null ? List.of() : storedProfile.getConfigurations(),
+                updatedProfile == null ? List.of() : updatedProfile.getConfigurations(),
+                hasPermission
+            );
+        }
     }
 
     @Override

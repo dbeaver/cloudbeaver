@@ -26,9 +26,11 @@ import org.jkiss.dbeaver.model.DBPDataSourceFolder;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.app.DBPWorkspace;
+import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.fs.lock.LockManager;
 import org.jkiss.dbeaver.model.fs.lock.LockOptions;
 import org.jkiss.dbeaver.model.fs.lock.LockTarget;
+import org.jkiss.dbeaver.model.net.DBWNetworkProfile;
 import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.rm.RMEvent;
 import org.jkiss.dbeaver.model.rm.RMEventManager;
@@ -45,6 +47,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Predicate;
 
 public abstract class BaseLocalResourceController implements RMController {
@@ -158,7 +161,10 @@ public abstract class BaseLocalResourceController implements RMController {
         @Nullable List<String> dataSourceIds
     ) throws DBException {
         try (var ignoredLock = lockController.lock(LockTarget.of(projectId), LockOptions.of("updateProjectDataSources"))) {
-            DBPProject project = getWebProject(projectId, false);
+            RMLocalProject project = getWebProject(projectId, false);
+            Map<String, DBPConnectionConfiguration> storedDataSourceConfigurations =
+                captureCurrentDataSourceConfigurations(project, dataSourceIds);
+            Map<String, DBWNetworkProfile> storedNetworkProfiles = captureCurrentNetworkProfiles(project);
             return doFileWriteOperation(
                 projectId, project.getMetadataFolder(false),
                 () -> {
@@ -166,21 +172,55 @@ public abstract class BaseLocalResourceController implements RMController {
                     DBPDataSourceConfigurationStorage storage = new DataSourceMemoryStorage(configuration.getBytes(
                         StandardCharsets.UTF_8));
                     DataSourceConfigurationManager manager = new DataSourceConfigurationManagerBuffer();
-                    final DataSourceParseResults parseResults = ((DataSourcePersistentRegistry) registry).loadDataSources(
-                        List.of(storage),
-                        manager,
-                        dataSourceIds,
-                        true,
-                        dataSourceIds == null
-                    );
-                    registry.checkForErrors();
-                    log.debug("Save data sources configuration in project '" + projectId + "'");
-                    ((DataSourcePersistentRegistry) registry).saveDataSources();
-                    registry.checkForErrors();
-                    return parseResults;
+                    try {
+                        final DataSourceParseResults parseResults = ((DataSourcePersistentRegistry) registry).loadDataSources(
+                            List.of(storage),
+                            manager,
+                            dataSourceIds,
+                            true,
+                            dataSourceIds == null
+                        );
+                        registry.checkForErrors();
+                        processLoadedDataSourceConfigurationUpdate(
+                            project,
+                            projectId,
+                            dataSourceIds,
+                            storedDataSourceConfigurations,
+                            storedNetworkProfiles
+                        );
+                        log.debug("Save data sources configuration in project '" + projectId + "'");
+                        ((DataSourcePersistentRegistry) registry).saveDataSources();
+                        registry.checkForErrors();
+                        return parseResults;
+                    } catch (DBException | RuntimeException e) {
+                        registry.refreshConfig();
+                        throw e;
+                    }
                 }
             );
         }
+    }
+
+    @NotNull
+    protected Map<String, DBPConnectionConfiguration> captureCurrentDataSourceConfigurations(
+        @NotNull RMLocalProject project,
+        @Nullable List<String> dataSourceIds
+    ) {
+        return Map.of();
+    }
+
+    @NotNull
+    protected Map<String, DBWNetworkProfile> captureCurrentNetworkProfiles(@NotNull RMLocalProject project) {
+        return Map.of();
+    }
+
+    protected void processLoadedDataSourceConfigurationUpdate(
+        @NotNull RMLocalProject project,
+        @NotNull String projectId,
+        @Nullable List<String> dataSourceIds,
+        @NotNull Map<String, DBPConnectionConfiguration> storedDataSourceConfigurations,
+        @NotNull Map<String, DBWNetworkProfile> storedNetworkProfiles
+    ) throws DBException {
     }
 
     @Override
