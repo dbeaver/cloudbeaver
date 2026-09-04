@@ -36,6 +36,10 @@ public interface WebAppConfiguration extends ServletAppConfiguration {
 
     boolean isAdminCredentialsSaveEnabled();
 
+    default boolean isDbUserPasswordChangeEnabled() {
+        return false;
+    }
+
     default String[] getDisabledBetaFeatures() {
         return new String[0];
     }
