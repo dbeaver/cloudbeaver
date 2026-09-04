@@ -39,7 +39,6 @@ import {
   MODEL_PROPERTY_ID,
   TEMPERATURE_PROPERTY_ID,
 } from '../../AIEnginePropertiesResource.js';
-import { AIProfilesAdministrationService } from '../../AIProfilesAdministrationService.js';
 import type { IAIProfileFormProps } from '../IAIProfileFormProps.js';
 import { AIProfilePropertiesForm } from './AIProfilePropertiesForm.js';
 import { AI_PROFILE_NAME_MAX_LENGTH, AI_PROFILE_NAME_MIN_LENGTH } from './AIProfileSchema.js';
@@ -49,7 +48,7 @@ export const AIProfileOptions: TabContainerPanelComponent<IAIProfileFormProps> =
   const translate = useTranslate();
   const notificationService = useService(NotificationService);
   const aiProfileCredentialsService = useService(AIProfileCredentialsService);
-  const aiProfilesAdministrationService = useService(AIProfilesAdministrationService);
+  const aiEnginePropertiesResource = useService(AIEnginePropertiesResource);
   const enginesLoader = useResource(AIProfileOptions, AiEnginesResource, undefined);
   const part = getAIProfileFormPart(formState);
   const propertiesLoader = useResource(AIProfileOptions, AIEnginePropertiesResource, part.state.engineId || null);
@@ -105,9 +104,9 @@ export const AIProfileOptions: TabContainerPanelComponent<IAIProfileFormProps> =
     try {
       setIsLoading(true);
       const profileId = formState.mode === FormMode.Edit ? formState.state.profileId : undefined;
-    const loadedModels = (await aiProfilesAdministrationService.loadModels(engineId, profileId, part.getCurrentEngineSettings())).toSorted((a, b) =>
-        a.id.localeCompare(b.id),
-      );
+      const loadedModels = (
+        await aiEnginePropertiesResource.loadModels(engineId, profileId, part.getCurrentEngineSettings())
+      ).toSorted((a, b) => a.id.localeCompare(b.id));
       setModels(loadedModels);
       return loadedModels;
     } catch (error: any) {

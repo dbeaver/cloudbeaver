@@ -46,7 +46,7 @@ export class AIUserProfileBootstrap extends Bootstrap {
     return (
       this.appAuthService.authenticated &&
       this.serverConfigResource.isFeatureEnabled(FEATURE_AI_ID, true) &&
-      (!this.aiProfilesResource.isLoaded(CachedMapAllKey) || this.aiProfilesResource.values.length > 0)
+      this.aiProfilesResource.values.length > 0
     );
   }
 }

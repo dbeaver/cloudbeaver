@@ -24,7 +24,6 @@ import {
 import { useService } from '@cloudbeaver/core-di';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import { AISettingsResource } from '@cloudbeaver/plugin-ai';
-import { AISettingsService } from '@cloudbeaver/plugin-ai-administration';
 import { AIProfilesResource } from '@cloudbeaver/plugin-ai-profiles';
 import { TableSelectionContext, useTableSelection } from '@cloudbeaver/plugin-data-grid';
 import { isDefined } from '@dbeaver/js-helpers';
@@ -42,16 +41,16 @@ const toolsPanelRegistry: StyleRegistry = [
 export const AIProfilesPanel = observer(function AIProfilesPanel() {
   const translate = useTranslate();
   const aiProfileFormService = useService(AIProfileFormService);
-  const aiSettingsService = useService(AISettingsService);
   const aiSettingsResource = useService(AISettingsResource);
 
   useResource(AIProfilesPanel, AISettingsResource, undefined);
   const profilesLoader = useResource(AIProfilesPanel, AIProfilesResource, CachedMapAllKey);
   const profiles = profilesLoader.data.filter(isDefined);
   const settingsLoaded = aiSettingsResource.isLoaded();
+  const defaultProfileId = aiSettingsResource.data?.defaultConfiguration;
 
   const selection = useTableSelection(
-    profiles.filter(profile => settingsLoaded && !aiSettingsService.isEffectiveDefaultProfile(profile.id)).map(profile => profile.id),
+    profiles.filter(profile => settingsLoaded && profile.id !== defaultProfileId).map(profile => profile.id),
   );
   const table = useAIProfilesTable(selection);
 
@@ -95,7 +94,7 @@ export const AIProfilesPanel = observer(function AIProfilesPanel() {
           <AIProfilesAdministrationTable
             profiles={profiles}
             deletionDisabled={!settingsLoaded}
-            isDefaultProfile={profileId => aiSettingsService.isEffectiveDefaultProfile(profileId)}
+            isDefaultProfile={profileId => profileId === defaultProfileId}
           />
         </TableSelectionContext>
       </Container>

@@ -9,11 +9,10 @@ import { runInAction } from 'mobx';
 
 import { FormMode, FormPart, formValidationContext, type IFormState } from '@cloudbeaver/core-ui';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
-import type { AiEngineConfig } from '@cloudbeaver/core-sdk';
+import type { AiConfigurationProfileInput, AiEngineConfig } from '@cloudbeaver/core-sdk';
 import { getUniqueName } from '@cloudbeaver/core-utils';
 
 import { AIEnginePropertiesResource } from '../../AIEnginePropertiesResource.js';
-import { AIProfilesAdministrationService, type AIAdminProfile, type AIProfileInput } from '../../AIProfilesAdministrationService.js';
 import { getObjectPropertiesValues } from '../../utils/getObjectPropertiesValues.js';
 import { prepareProperties } from '../../utils/prepareProperties.js';
 import type { IAIProfileFormState } from '../IAIProfileFormState.js';
@@ -33,7 +32,6 @@ export class AIProfileFormPart extends FormPart<IAIProfileOptionsState, IAIProfi
   constructor(
     formState: IFormState<IAIProfileFormState>,
     private readonly aiProfilesResource: AIProfilesResource,
-    private readonly aiProfilesAdministrationService: AIProfilesAdministrationService,
     private readonly aiProfileCredentialsService: AIProfileCredentialsService,
     private readonly aiEnginePropertiesResource: AIEnginePropertiesResource,
   ) {
@@ -118,7 +116,7 @@ export class AIProfileFormPart extends FormPart<IAIProfileOptionsState, IAIProfi
     }
   }
 
-  private getConfig(): AIProfileInput {
+  private getConfig(): AiConfigurationProfileInput {
     this.state.properties[GLOBAL_PROPERTY_ID] = this.state.global;
     return {
       profileId: this.formState.state.profileId,
@@ -138,14 +136,11 @@ export class AIProfileFormPart extends FormPart<IAIProfileOptionsState, IAIProfi
 
   protected override async saveChanges(): Promise<void> {
     const config = this.getConfig();
+    const creating = this.formState.mode === FormMode.Create;
+    const profile = creating ? await this.aiProfilesResource.createProfile(config) : await this.aiProfilesResource.updateProfile(config);
 
-    let profile: AIAdminProfile;
-
-    if (this.formState.mode === FormMode.Create) {
-      profile = await this.aiProfilesAdministrationService.create(config);
+    if (creating) {
       this.formState.setMode(FormMode.Edit);
-    } else {
-      profile = await this.aiProfilesAdministrationService.update(config);
     }
 
     this.formState.state.name = profile.name;

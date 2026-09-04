@@ -64,16 +64,16 @@ export const AIProfileCredentialsDialog: DialogComponent<IAIProfileCredentialsDi
     try {
       state.processing = true;
       if (state.token) {
-        const saved = await aiProfilesResource.saveCredentials(payload.profileId, state.token);
-        if (!saved) {
-          throw new Error(translate('plugin_ai_credentials_save_failed'));
-        }
+        await aiProfilesResource.saveCredentials(payload.profileId, state.token);
+
         state.token = '';
         notificationService.logSuccess({
           title: 'plugin_ai_credentials_saved',
           message: payload.profileName,
         });
-      } else if (!credentialsSaved) {
+      }
+
+      if (!credentialsSaved) {
         return;
       }
 
@@ -95,10 +95,8 @@ export const AIProfileCredentialsDialog: DialogComponent<IAIProfileCredentialsDi
     if (status === DialogueStateResult.Resolved) {
       try {
         state.processing = true;
-        const reset = await aiProfilesResource.resetCredentials(payload.profileId);
-        if (!reset) {
-          throw new Error(translate('plugin_ai_credentials_reset_failed'));
-        }
+        await aiProfilesResource.resetCredentials(payload.profileId);
+
         state.token = '';
         notificationService.logSuccess({
           title: 'plugin_ai_credentials_reset_success',

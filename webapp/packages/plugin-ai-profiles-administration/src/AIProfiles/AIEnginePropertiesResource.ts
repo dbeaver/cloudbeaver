@@ -11,7 +11,7 @@ import { runInAction } from 'mobx';
 import { injectable } from '@cloudbeaver/core-di';
 import { CachedMapResource, type ResourceKeySimple, ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import { EAdminPermission, SessionPermissionsResource } from '@cloudbeaver/core-root';
-import { GraphQLService, type AiEngineConfig, type IObjectPropertyInfo } from '@cloudbeaver/core-sdk';
+import { GraphQLService, type AiEngineConfig, type AiModelInfo, type IObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 
 export const MODEL_PROPERTY_ID = 'model';
 export const CONTEXT_WINDOW_SIZE_PROPERTY_ID = 'contextWindowSize';
@@ -31,6 +31,11 @@ export class AIEnginePropertiesResource extends CachedMapResource<string, IObjec
   async loadProperties(engineId: string, profileId?: string, settings?: AiEngineConfig): Promise<IObjectPropertyInfo[]> {
     const { properties } = await this.graphQLService.sdk.getEngineProperties({ engineId, profileId, settings });
     return properties;
+  }
+
+  async loadModels(engineId: string, profileId?: string, settings?: AiEngineConfig): Promise<AiModelInfo[]> {
+    const { models } = await this.graphQLService.sdk.getEngineModels({ engineId, profileId, settings });
+    return models;
   }
 
   protected async loader(originalKey: ResourceKeySimple<string>): Promise<Map<string, IObjectPropertyInfo[]>> {

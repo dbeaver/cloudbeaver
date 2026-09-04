@@ -10,7 +10,6 @@ import type { IFormState } from '@cloudbeaver/core-ui';
 import { AIProfileCredentialsService, AIProfilesResource } from '@cloudbeaver/plugin-ai-profiles';
 
 import { AIEnginePropertiesResource } from '../../AIEnginePropertiesResource.js';
-import { AIProfilesAdministrationService } from '../../AIProfilesAdministrationService.js';
 import type { IAIProfileFormState } from '../IAIProfileFormState.js';
 import { AIProfileFormPart } from './AIProfileFormPart.js';
 
@@ -20,14 +19,12 @@ export function getAIProfileFormPart(formState: IFormState<IAIProfileFormState>)
   return formState.getPart(DATA_CONTEXT_AI_PROFILE_FORM_PART, context => {
     const di = context.get(DATA_CONTEXT_DI_PROVIDER)!;
     const aiProfilesResource = di.getService(AIProfilesResource);
-    const aiProfilesAdministrationService = di.getService(AIProfilesAdministrationService);
     const aiProfileCredentialsService = di.getService(AIProfileCredentialsService);
     const aiEnginePropertiesResource = di.getService(AIEnginePropertiesResource);
 
     return new AIProfileFormPart(
       formState,
       aiProfilesResource,
-      aiProfilesAdministrationService,
       aiProfileCredentialsService,
       aiEnginePropertiesResource,
     );

@@ -29,16 +29,15 @@ export const AIChatConversationProfile = observer<Props>(function AIChatConversa
   const translate = useTranslate();
   const notificationService = useService(NotificationService);
   const aiChatConversationsService = useService(AIChatConversationsService);
-  const credentialsService = useService(AIProfileCredentialsService);
+  const aiProfileCredentialsService = useService(AIProfileCredentialsService);
   const menu = useMenuContext();
-
   const aiEnginesResource = useResource(AIChatConversationProfile, AiEnginesResource, undefined);
 
   async function selectProfile(profile: AIProfile) {
     try {
-      if (credentialsService.isRequired(profile)) {
+      if (aiProfileCredentialsService.isRequired(profile)) {
         menu?.hide();
-        const { status } = await credentialsService.open(profile.id);
+        const { status } = await aiProfileCredentialsService.open(profile.id);
         if (status !== DialogueStateResult.Resolved) {
           return;
         }
@@ -49,11 +48,11 @@ export const AIChatConversationProfile = observer<Props>(function AIChatConversa
     }
   }
 
-  async function editCredentials(event: React.MouseEvent, profileId: string): Promise<void> {
-    event.stopPropagation();
+  async function editCredentials(profileId: string): Promise<void> {
     menu?.hide();
+
     try {
-      await credentialsService.open(profileId);
+      await aiProfileCredentialsService.open(profileId);
     } catch (exception: any) {
       notificationService.logException(exception, 'plugin_ai_chat_profile_credentials_edit_fail');
     }
@@ -101,7 +100,7 @@ export const AIChatConversationProfile = observer<Props>(function AIChatConversa
                   disabled={disabled}
                   name="edit"
                   viewBox="0 0 13 13"
-                  onClick={event => editCredentials(event, profile.id)}
+                  onClick={() => editCredentials(profile.id)}
                 />
               )}
             </div>

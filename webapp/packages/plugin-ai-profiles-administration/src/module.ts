@@ -11,7 +11,6 @@ import { Bootstrap, Dependency, ModuleRegistry, proxy } from '@cloudbeaver/core-
 import { AIEnginePropertiesResource } from './AIProfiles/AIEnginePropertiesResource.js';
 import { AIProfileFormService } from './AIProfiles/AIProfileForm/AIProfileFormService.js';
 import { AIProfileFormTabBootstrap } from './AIProfiles/AIProfileForm/AIProfileFormTabBootstrap.js';
-import { AIProfilesAdministrationService } from './AIProfiles/AIProfilesAdministrationService.js';
 import { AIProfilesAdministrationBootstrap } from './AIProfilesAdministrationBootstrap.js';
 import { LocaleService } from './LocaleService.js';
 
@@ -25,7 +24,6 @@ export default ModuleRegistry.add({
       .addSingleton(Bootstrap, LocaleService)
       .addSingleton(Dependency, proxy(AIEnginePropertiesResource))
       .addSingleton(AIProfilesAdministrationBootstrap)
-      .addSingleton(AIProfilesAdministrationService)
       .addSingleton(AIEnginePropertiesResource)
       .addSingleton(AIProfileFormService);
   },
