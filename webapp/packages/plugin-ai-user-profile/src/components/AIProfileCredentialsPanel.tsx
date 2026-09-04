@@ -45,7 +45,7 @@ const tabs = new TabsContainer<IAIProfileCredentialsFieldsProps>('AI Profile Cre
 
 tabs.add({
   key: CREDENTIALS_TAB_ID,
-  name: 'plugin_ai_credentials_dialog_title',
+  name: 'plugin_ai_credentials_profile',
   panel: () => AIProfileCredentialsFields,
 });
 
@@ -88,8 +88,7 @@ const AIProfileCredentialsFields: TabContainerPanelComponent<IAIProfileCredentia
   }
 
   return (
-    <Group medium keepSize gap>
-      <Text>{translate('plugin_ai_credentials_dialog_description')}</Text>
+    <Group className="tw:w-full" small keepSize gap>
       <Container vertical gap>
         <InputField value={state.profileName} disabled={formState.isDisabled} readOnly>
           {translate('plugin_ai_credentials_profile')}

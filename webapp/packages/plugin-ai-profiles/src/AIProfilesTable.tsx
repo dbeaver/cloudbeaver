@@ -72,7 +72,12 @@ export const AIProfilesTable = observer<IAIProfilesTableProps>(function AIProfil
     {
       ...SCOPE_COLUMN,
       label: 'plugin_ai_profiles_scope',
-      render: profile => translate(profile.global ? 'plugin_ai_profiles_scope_global' : 'plugin_ai_profiles_scope_user'),
+      render: profile => (
+        <div className="tw:flex tw:items-center tw:gap-2">
+          <span>{translate(profile.global ? 'plugin_ai_profiles_scope_global' : 'plugin_ai_profiles_scope_user')}</span>
+          {profile.global && <IconOrImage icon="document-global" width={16} />}
+        </div>
+      ),
     },
     ...additionalColumns,
   ];
@@ -101,7 +106,6 @@ export const AIProfilesTable = observer<IAIProfilesTableProps>(function AIProfil
         <>
           {clickable ? <Link truncate>{profile.name}</Link> : <span className="tw:truncate">{profile.name}</span>}
           {getProfileBadge?.(profile)}
-          {profile.global && <IconOrImage icon="document-global" width={16} />}
         </>
       );
 
