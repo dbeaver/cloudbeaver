@@ -17,18 +17,23 @@
 package io.cloudbeaver.test.platform.sql;
 
 import io.cloudbeaver.service.sql.WebSQLContextInfo;
+import io.cloudbeaver.service.sql.WebSQLExecuteInfo;
 import io.cloudbeaver.service.sql.WebSQLProcessor;
+import io.cloudbeaver.service.sql.WebSQLQueryResultSetRow;
+import io.cloudbeaver.service.sql.WebSQLResultsRow;
 import io.cloudbeaver.service.sql.WebServiceBindingSQL;
 import io.cloudbeaver.test.platform.CloudbeaverDBTest;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
+import org.jkiss.dbeaver.model.exec.jdbc.JDBCResultSet;
 import org.jkiss.dbeaver.model.exec.jdbc.JDBCStatement;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,6 +57,7 @@ public class GenerateSQLResultSetTest extends CloudbeaverDBTest {
         """;
 
     private List<Map<String, Object>> selectedRows;
+    private WebSQLProcessor sqlProcessor;
     private WebSQLContextInfo sqlProcessorContext;
     private String resultId;
 
@@ -65,7 +71,7 @@ public class GenerateSQLResultSetTest extends CloudbeaverDBTest {
             Assertions.assertFalse(stmt.execute("INSERT INTO TEST_TABLE (field) VALUES ('value_4')"));
         }
 
-        WebSQLProcessor sqlProcessor = WebServiceBindingSQL.getSQLProcessor(webConnectionInfo);
+        sqlProcessor = WebServiceBindingSQL.getSQLProcessor(webConnectionInfo);
         sqlProcessorContext = sqlProcessor.createContext(
             null, "PUBLIC", globalProject.getId()
         );
@@ -83,6 +89,52 @@ public class GenerateSQLResultSetTest extends CloudbeaverDBTest {
         Assertions.assertNotNull(rows);
         Assertions.assertEquals(3, rows.size());
         selectedRows = rows.subList(0, 2);
+    }
+
+    @Test
+    public void shouldReturnGeneratedKeyForInsertedRow() throws Exception {
+        Map<String, Object> rowData = new HashMap<>();
+        rowData.put("data", Arrays.asList(null, "inserted_value"));
+        rowData.put("updateValues", Map.of());
+
+        WebSQLExecuteInfo result = sqlProcessor.updateResultsDataBatch(
+            sqlProcessor.getWebSession().getProgressMonitor(),
+            sqlProcessorContext,
+            resultId,
+            List.of(),
+            List.of(),
+            List.of(new WebSQLResultsRow(rowData)),
+            null
+        );
+
+        WebSQLQueryResultSetRow insertedRow = result.getResults()[0]
+            .getResultSet()
+            .getRowsWithMetaData()
+            .getFirst();
+        Assertions.assertEquals("5", insertedRow.getData()[0]);
+        Assertions.assertEquals("inserted_value", insertedRow.getData()[1]);
+        try (
+            JDBCStatement statement = databaseSession.createStatement();
+            JDBCResultSet resultSet = statement.executeQuery("SELECT field FROM TEST_TABLE WHERE id = 5")
+        ) {
+            Assertions.assertTrue(resultSet.next());
+            Assertions.assertEquals("inserted_value", resultSet.getString(1));
+        }
+    }
+
+    @Test
+    public void shouldReadResultSetWithThreeColumns() throws Exception {
+        String taskId = clientWrapper.asyncSqlExecute(
+            globalProject,
+            sqlProcessorContext,
+            databaseContainer.getId(),
+            "SELECT id, field, id AS id_copy FROM TEST_TABLE ORDER BY id"
+        );
+        clientWrapper.waitTaskCompleted(taskId);
+
+        Map<String, Object> resultSet = clientWrapper.readTaskResultSet(taskId);
+        Assertions.assertEquals(3, JSONUtils.getObjectList(resultSet, "columns").size());
+        Assertions.assertEquals(4, JSONUtils.getObjectList(resultSet, "rowsWithMetaData").size());
     }
 
     @Test

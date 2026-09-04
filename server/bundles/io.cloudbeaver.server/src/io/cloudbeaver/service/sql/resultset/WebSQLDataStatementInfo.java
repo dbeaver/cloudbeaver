@@ -14,19 +14,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.cloudbeaver.service.sql;
+package io.cloudbeaver.service.sql.resultset;
 
 import org.jkiss.code.NotNull;
-import org.jkiss.dbeaver.model.exec.DBCExecutionContext;
-import org.jkiss.dbeaver.model.impl.AbstractExecutionSource;
-import org.jkiss.dbeaver.model.struct.DBSDataContainer;
+import org.jkiss.dbeaver.model.data.resultset.DBDDataStatementInfo;
+import org.jkiss.dbeaver.model.struct.DBSEntity;
 
-public class WebExecutionSource extends AbstractExecutionSource {
-    public WebExecutionSource(
-        @NotNull DBSDataContainer dataContainer,
-        @NotNull DBCExecutionContext executionContext,
-        @NotNull Object controller
-    ) {
-        super(dataContainer, executionContext, controller);
+public class WebSQLDataStatementInfo extends DBDDataStatementInfo {
+
+    @NotNull
+    private final Object[] finalRow;
+
+    public WebSQLDataStatementInfo(@NotNull DBSEntity entity, @NotNull Object[] finalRow) {
+        super(entity);
+        this.finalRow = finalRow;
     }
+
+    @NotNull
+    public Object[] getFinalRow() {
+        return finalRow;
+    }
+
 }
