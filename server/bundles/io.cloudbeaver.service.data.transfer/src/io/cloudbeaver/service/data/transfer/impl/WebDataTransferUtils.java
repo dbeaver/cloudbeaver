@@ -58,6 +58,7 @@ class WebDataTransferUtils {
         return properties;
     }
 
+    @NotNull
     public static String normalizeFileName(
         @NotNull String fileName,
         @NotNull WebDataTransferOutputSettings outputSettings
@@ -65,7 +66,12 @@ class WebDataTransferUtils {
         return outputSettings.isCompress() ? fileName + ".zip" : fileName;
     }
 
-    public static WebDataTransferSessionConfig getSessionDataTransferConfig(WebSession session) {
-        return session.getAttribute("dataTransfer", x -> new WebDataTransferSessionConfig(), WebDataTransferSessionConfig::deleteExportFiles);
+    @NotNull
+    public static WebDataTransferSessionConfig getSessionDataTransferConfig(@NotNull WebSession session) {
+        return session.getAttribute(
+            "dataTransfer",
+            x -> new WebDataTransferSessionConfig(),
+            WebDataTransferSessionConfig::deleteExportFiles
+        );
     }
 }
