@@ -1,6 +1,9 @@
 export default [
   ['plugin_connections_connection_form_part_main', 'Principal'],
   ['plugin_connections_connection_form_part_properties', 'Propriétés du pilote'],
+  ['plugin_connections_connection_form_part_advanced', 'Paramètres avancés'],
+  ['plugin_connections_connection_form_part_initialization_settings', "Paramètres d'initialisation"],
+  ['plugin_connections_connection_form_connection_details', 'Détails de la connexion'],
   ['plugin_connections_connection_form_part_main_auth_model', "Modèle d'authentification"],
   ['plugin_connections_connection_form_part_main_custom_host', 'Hôte'],
   ['plugin_connections_connection_form_part_main_custom_port', 'Port'],
