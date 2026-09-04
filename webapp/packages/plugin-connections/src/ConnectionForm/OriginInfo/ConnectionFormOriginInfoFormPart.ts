@@ -33,7 +33,32 @@ export class ConnectionFormOriginInfoFormPart extends FormPart<IConnectionFormOr
     this.formState.formStateTask.addHandler(this.formAuthState.bind(this));
   }
 
-  private async formAuthState(data: IConnectionFormState, contexts: IExecutionContextProvider<IConnectionFormState>) {
+  private authStateTask?: Promise<void>;
+  private authStateTaskKey?: string;
+
+  // formAuthState can be called multiple times by the form flow, 
+  // which triggers multiple calls to resources and triggers "execution queue limit reached" error
+  // probably the core issue is in the resource and we need to wait to release the loader there,
+  // but we need more cases to say so 
+  private formAuthState(data: IConnectionFormState, contexts: IExecutionContextProvider<IConnectionFormState>): Promise<void> {
+    const connectionKey = this.optionsPart.connectionKey;
+    const taskKey = `${connectionKey?.projectId ?? ''}:${connectionKey?.connectionId ?? ''}:${this.optionsPart.state.driverId ?? ''}`;
+
+    if (this.authStateTask && this.authStateTaskKey === taskKey) {
+      return this.authStateTask;
+    }
+
+    const task = this.loadAuthState(contexts);
+    this.authStateTask = task;
+    this.authStateTaskKey = taskKey;
+    task.then(
+      () => this.clearAuthStateTask(task),
+      () => this.clearAuthStateTask(task),
+    );
+    return task;
+  }
+
+  private async loadAuthState(contexts: IExecutionContextProvider<IConnectionFormState>): Promise<void> {
     const stateContext = contexts.getContext(formStateContext);
 
     const info = this.optionsPart.connectionKey ? await this.connectionInfoAuthPropertiesResource.load(this.optionsPart.connectionKey) : null;
@@ -48,6 +73,13 @@ export class ConnectionFormOriginInfoFormPart extends FormPart<IConnectionFormOr
       });
       stateContext.setInfo(message);
       stateContext.readonly = this.formState.mode === 'edit';
+    }
+  }
+
+  private clearAuthStateTask(task: Promise<void>): void {
+    if (this.authStateTask === task) {
+      this.authStateTask = undefined;
+      this.authStateTaskKey = undefined;
     }
   }
 
