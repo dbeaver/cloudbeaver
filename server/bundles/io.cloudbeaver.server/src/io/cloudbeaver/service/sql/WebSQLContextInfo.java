@@ -49,10 +49,10 @@ import org.jkiss.dbeaver.model.struct.rdb.DBSSchema;
 import org.jkiss.dbeaver.model.websocket.event.WSTransactionalCountEvent;
 import org.jkiss.dbeaver.utils.RuntimeUtils;
 import org.jkiss.utils.CommonUtils;
+import org.jkiss.utils.StandardConstants;
 
 import java.lang.reflect.InvocationTargetException;
 import java.time.Instant;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -75,7 +75,7 @@ public class WebSQLContextInfo implements WebSessionProvider {
     private final AtomicInteger resultId = new AtomicInteger();
 
     public static final DateTimeFormatter ISO_DATE_FORMAT = DateTimeFormatter.ofPattern(DBConstants.DEFAULT_ISO_TIMESTAMP_FORMAT)
-        .withZone(ZoneId.of("UTC"));
+        .withZone(StandardConstants.ZONE_ID_UTC);
 
     public WebSQLContextInfo(
         WebSQLProcessor processor, String id, String catalogName, String schemaName, String projectId
