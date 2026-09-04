@@ -15,14 +15,12 @@ import type { IAIProfileCredentialsFormState } from './IAIProfileCredentialsForm
 export interface IAIProfileCredentialsPartState {
   profileName: string;
   engineName: string;
-  credentialsSaved: boolean;
   token: string;
 }
 
 const getDefaultState = (): IAIProfileCredentialsPartState => ({
   profileName: '',
   engineName: '',
-  credentialsSaved: false,
   token: '',
 });
 
@@ -33,6 +31,24 @@ export class AIProfileCredentialsFormPart extends FormPart<IAIProfileCredentials
     private readonly aiEnginesResource: AiEnginesResource,
   ) {
     super(formState, getDefaultState());
+  }
+
+  override isOutdated(): boolean {
+    if (this.aiProfilesResource.isOutdated(this.formState.state.profileId)) {
+      return true;
+    }
+
+    const profile = this.aiProfilesResource.get(this.formState.state.profileId);
+
+    if (!profile) {
+      return false;
+    }
+
+    return this.aiEnginesResource.isOutdated();
+  }
+
+  get credentialsSaved(): boolean {
+    return this.aiProfilesResource.get(this.formState.state.profileId)?.credentialsSaved ?? false;
   }
 
   async resetCredentials(): Promise<void> {
@@ -60,7 +76,6 @@ export class AIProfileCredentialsFormPart extends FormPart<IAIProfileCredentials
     this.setInitialState({
       profileName: profile.name,
       engineName: engine?.name ?? profile.engineId,
-      credentialsSaved: profile.credentialsSaved,
       token: '',
     });
   }

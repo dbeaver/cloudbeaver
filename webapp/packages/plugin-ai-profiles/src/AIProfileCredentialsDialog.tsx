@@ -36,7 +36,6 @@ import { AIProfilesResource } from './AIProfilesResource.js';
 interface CredentialsDialogState {
   token: string;
   processing: boolean;
-  credentialsSaved: boolean;
 }
 
 export const AIProfileCredentialsDialog: DialogComponent<IAIProfileCredentialsDialogPayload> = observer(function AIProfileCredentialsDialog({
@@ -50,10 +49,11 @@ export const AIProfileCredentialsDialog: DialogComponent<IAIProfileCredentialsDi
   const aiProfilesResource = useService(AIProfilesResource);
   const [tokenRef] = useFocus<HTMLInputElement>({ autofocus: true });
   const state = useObservableRef<CredentialsDialogState>(
-    () => ({ token: '', processing: false, credentialsSaved: payload.credentialsSaved }),
-    { token: observable.ref, processing: observable.ref, credentialsSaved: observable.ref },
+    () => ({ token: '', processing: false }),
+    { token: observable.ref, processing: observable.ref },
     false,
   );
+  const credentialsSaved = aiProfilesResource.get(payload.profileId)?.credentialsSaved ?? false;
   const form = useForm({ onSubmit: save });
 
   async function save(): Promise<void> {
@@ -73,7 +73,7 @@ export const AIProfileCredentialsDialog: DialogComponent<IAIProfileCredentialsDi
           title: 'plugin_ai_credentials_saved',
           message: payload.profileName,
         });
-      } else if (!state.credentialsSaved) {
+      } else if (!credentialsSaved) {
         return;
       }
 
@@ -100,7 +100,6 @@ export const AIProfileCredentialsDialog: DialogComponent<IAIProfileCredentialsDi
           throw new Error(translate('plugin_ai_credentials_reset_failed'));
         }
         state.token = '';
-        state.credentialsSaved = false;
         notificationService.logSuccess({
           title: 'plugin_ai_credentials_reset_success',
           message: payload.profileName,
@@ -136,17 +135,17 @@ export const AIProfileCredentialsDialog: DialogComponent<IAIProfileCredentialsDi
               type="password"
               name="token"
               autoComplete="new-password"
-              required={!state.credentialsSaved}
+              required={!credentialsSaved}
               disabled={state.processing}
-              placeholder={state.credentialsSaved ? SAVED_VALUE_INDICATOR : undefined}
-              description={state.credentialsSaved ? translate('ui_processing_saved') : undefined}
+              placeholder={credentialsSaved ? SAVED_VALUE_INDICATOR : undefined}
+              description={credentialsSaved ? translate('ui_processing_saved') : undefined}
             >
               {translate('plugin_ai_credentials_token')}
             </InputField>
           </Container>
         </CommonDialogBody>
         <CommonDialogFooter>
-          {state.credentialsSaved && (
+          {credentialsSaved && (
             <Button type="button" variant="secondary" disabled={state.processing} onClick={resetCredentials}>
               {translate('plugin_ai_credentials_reset')}
             </Button>

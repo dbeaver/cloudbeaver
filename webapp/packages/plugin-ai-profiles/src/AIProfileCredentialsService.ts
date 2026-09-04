@@ -38,7 +38,6 @@ export class AIProfileCredentialsService {
       profileName: profile.name,
       engineName: engine?.name ?? profile.engineId,
       engineIcon: engine?.icon,
-      credentialsSaved: profile.credentialsSaved,
     });
   }
 

@@ -11,5 +11,4 @@ export interface IAIProfileCredentialsDialogPayload {
   profileName: string;
   engineName: string;
   engineIcon?: string;
-  credentialsSaved: boolean;
 }

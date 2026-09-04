@@ -58,6 +58,7 @@ const AIProfileCredentialsFields: TabContainerPanelComponent<IAIProfileCredentia
   const [tokenRef] = useFocus<HTMLInputElement>({ autofocus: true });
   const part = getAIProfileCredentialsFormPart(formState);
   const state = part.state;
+  const credentialsSaved = part.credentialsSaved;
 
   useAutoLoad(AIProfileCredentialsFields, part);
 
@@ -102,15 +103,15 @@ const AIProfileCredentialsFields: TabContainerPanelComponent<IAIProfileCredentia
           type="password"
           name="token"
           autoComplete="new-password"
-          required={!state.credentialsSaved}
+          required={!credentialsSaved}
           disabled={formState.isDisabled}
-          placeholder={state.credentialsSaved ? SAVED_VALUE_INDICATOR : undefined}
-          description={state.credentialsSaved ? translate('ui_processing_saved') : undefined}
+          placeholder={credentialsSaved ? SAVED_VALUE_INDICATOR : undefined}
+          description={credentialsSaved ? translate('ui_processing_saved') : undefined}
         >
           {translate('plugin_ai_credentials_token')}
         </InputField>
       </Container>
-      {state.credentialsSaved && (
+      {credentialsSaved && (
         <div>
           <Button type="button" variant="secondary" disabled={formState.isDisabled} onClick={resetCredentials}>
             {translate('plugin_ai_credentials_reset')}
