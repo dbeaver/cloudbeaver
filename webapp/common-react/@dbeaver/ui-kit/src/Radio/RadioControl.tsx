@@ -16,5 +16,12 @@ export interface RadioControlProps {
 }
 
 export function RadioControl({ checked, disabled, className }: RadioControlProps): React.ReactElement {
-  return <span className={clsx('dbv-kit-radio__control', className)} data-checked={checked} data-disabled={disabled || undefined} />;
+  return (
+    <span className={clsx('dbv-kit-radio__control', className)} data-checked={checked} data-disabled={disabled || undefined}>
+      <svg className="dbv-kit-radio__icon" viewBox="0 0 16 16" aria-hidden="true">
+        <circle className="dbv-kit-radio__ring" cx="8" cy="8" r="7.5" />
+        <circle className="dbv-kit-radio__dot" cx="8" cy="8" r="8" />
+      </svg>
+    </span>
+  );
 }
