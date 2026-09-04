@@ -23,7 +23,6 @@ import { AIChatConversationScopeResource } from './AIChat/AIChatConversation/AIC
 import { AIChatConversationMetricsResource } from './AIChat/AIChatConversation/AIChatConversationMetricsResource.js';
 import { AIChatFunctionsService } from './AIChatFunctionsService.js';
 import { AIFunctionsResource } from './AIFunctionsResource.js';
-import { AIChatProfilesResource } from './AIChatProfilesResource.js';
 
 export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-ai-chat',
@@ -49,7 +48,6 @@ export default ModuleRegistry.add({
       .addSingleton(AIChatConversationScopeResource)
       .addSingleton(AIChatConversationMetricsResource)
       .addSingleton(AIChatFunctionsService)
-      .addSingleton(AIFunctionsResource)
-      .addSingleton(AIChatProfilesResource);
+      .addSingleton(AIFunctionsResource);
   },
 });

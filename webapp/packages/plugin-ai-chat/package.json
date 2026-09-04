@@ -40,6 +40,7 @@
     "@cloudbeaver/core-utils": "workspace:*",
     "@cloudbeaver/core-view": "workspace:*",
     "@cloudbeaver/plugin-ai": "workspace:*",
+    "@cloudbeaver/plugin-ai-profiles": "workspace:*",
     "@cloudbeaver/plugin-codemirror6": "workspace:*",
     "@cloudbeaver/plugin-datasource-context-switch": "workspace:*",
     "@cloudbeaver/plugin-navigation-tabs": "workspace:*",

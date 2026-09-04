@@ -1,0 +1,60 @@
+{
+  "extends": "@cloudbeaver/tsconfig/tsconfig.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "lib",
+    "tsBuildInfoFile": "lib/tsconfig.tsbuildinfo",
+    "composite": true
+  },
+  "references": [
+    {
+      "path": "../../common-react/@dbeaver/ui-kit"
+    },
+    {
+      "path": "../core-authentication"
+    },
+    {
+      "path": "../core-blocks"
+    },
+    {
+      "path": "../core-cli"
+    },
+    {
+      "path": "../core-di"
+    },
+    {
+      "path": "../core-dialogs"
+    },
+    {
+      "path": "../core-events"
+    },
+    {
+      "path": "../core-localization"
+    },
+    {
+      "path": "../core-resource"
+    },
+    {
+      "path": "../core-root"
+    },
+    {
+      "path": "../core-sdk"
+    },
+    {
+      "path": "../plugin-ai"
+    },
+    {
+      "path": "../plugin-data-grid"
+    }
+  ],
+  "include": [
+    "__custom_mocks__/**/*",
+    "src/**/*",
+    "src/**/*.json",
+    "src/**/*.css"
+  ],
+  "exclude": [
+    "**/node_modules",
+    "lib/**/*"
+  ]
+}

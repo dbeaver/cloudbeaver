@@ -7,9 +7,9 @@
  */
 import { createDataContext, DATA_CONTEXT_DI_PROVIDER } from '@cloudbeaver/core-data-context';
 import type { IFormState } from '@cloudbeaver/core-ui';
+import { AISettingsResource } from '@cloudbeaver/plugin-ai';
+import { AIProfilesResource } from '@cloudbeaver/plugin-ai-profiles';
 
-import { AIProfilesResource } from '../AIProfiles/AIProfilesResource.js';
-import { AISettingsResource } from '../AISettingsResource.js';
 import { AdministrationAISettingsInfoPart } from './AdministrationAISettingsInfoPart.js';
 
 const DATA_CONTEXT_ADMINISTRATION_AI_SETTINGS_FORM_INFO_PART = createDataContext<AdministrationAISettingsInfoPart>(

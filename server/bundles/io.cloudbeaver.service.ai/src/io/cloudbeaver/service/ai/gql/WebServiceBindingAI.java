@@ -25,6 +25,7 @@ import io.cloudbeaver.service.ai.WebAIFeatureProvider;
 import io.cloudbeaver.service.ai.model.inputs.DataSourceId;
 import io.cloudbeaver.service.ai.model.inputs.WebAIChatConversationInput;
 import io.cloudbeaver.service.ai.model.inputs.WebAIConfigurationProfileInput;
+import io.cloudbeaver.service.ai.model.inputs.WebAIProfileCredentialsInput;
 import io.cloudbeaver.service.ai.model.inputs.WebAiChatCompletionSettingsInput;
 import io.cloudbeaver.service.sql.WebServiceBindingSQL;
 import org.jkiss.code.NotNull;
@@ -191,6 +192,12 @@ public class WebServiceBindingAI extends WebServiceBindingBase<DBWServiceAI> imp
                 "aiDeleteProfile", env -> getService(env).deleteProfile(
                     getWebSession(env),
                     getArgumentVal(env, "profileId")
+                )
+            ).dataFetcher(
+                "aiSaveProfileCredentials", env -> getService(env).saveProfileCredentials(
+                    getWebSession(env),
+                    getArgumentVal(env, "profileId"),
+                    JSONUtils.deserializeObject(getArgumentVal(env, "credentials"), WebAIProfileCredentialsInput.class)
                 )
             );
     }

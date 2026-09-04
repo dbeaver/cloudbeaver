@@ -15,6 +15,7 @@ import { LocalizationService } from '@cloudbeaver/core-localization';
 import { Executor, ExecutorInterrupter } from '@cloudbeaver/core-executor';
 import { ConnectionsManagerService, type IConnectionInfoParams } from '@cloudbeaver/core-connections';
 import type { AiSendChatMessageInfoFragment } from '@cloudbeaver/core-sdk';
+import { AIProfileCredentialsService, AIProfilesResource } from '@cloudbeaver/plugin-ai-profiles';
 
 import { AIChatMessagesResource, isFunctionConfirmationMessage, isFunctionMessage, type IMessageParam } from './AIChatMessagesResource.js';
 import { AIChatConversationsResource } from '../AIChatConversation/AIChatConversationsResource.js';
@@ -44,7 +45,15 @@ interface IMessageSendExecutorAfterData {
 
 type MessageSendExecutorData = IMessageSendExecutorBeforeData | IMessageSendExecutorAfterData;
 
-@injectable(() => [AIChatMessagesResource, AIChatConversationsResource, CommonDialogService, LocalizationService, ConnectionsManagerService])
+@injectable(() => [
+  AIChatMessagesResource,
+  AIChatConversationsResource,
+  CommonDialogService,
+  LocalizationService,
+  ConnectionsManagerService,
+  AIProfilesResource,
+  AIProfileCredentialsService,
+])
 export class AIChatMessageService {
   onMessageSend: Executor<MessageSendExecutorData>;
 
@@ -54,6 +63,8 @@ export class AIChatMessageService {
     private readonly commonDialogService: CommonDialogService,
     private readonly localizationService: LocalizationService,
     private readonly connectionsManagerService: ConnectionsManagerService,
+    private readonly aiProfilesResource: AIProfilesResource,
+    private readonly credentialsService: AIProfileCredentialsService,
   ) {
     this.onMessageSend = new Executor();
 
@@ -114,6 +125,16 @@ export class AIChatMessageService {
 
   async processSendMessageAction(conversationId: string, action: () => Promise<IAiSendChatMessageInfo>) {
     const conversation = await this.aiChatConversationsResource.load(conversationId);
+    const profileId = conversation.profile;
+    const profile = profileId ? await this.aiProfilesResource.load(profileId) : undefined;
+
+    if (profile && this.credentialsService.isRequired(profile)) {
+      const { status } = await this.credentialsService.open(profile.id);
+      if (status !== DialogueStateResult.Resolved) {
+        return;
+      }
+    }
+
     const contexts = await this.onMessageSend.execute({ stage: 'before', data: { conversationId, connectionKey: conversation.dataSourceId } });
 
     if (ExecutorInterrupter.isInterrupted(contexts)) {

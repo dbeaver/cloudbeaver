@@ -18,6 +18,7 @@ import {
   type ResourceKey,
 } from '@cloudbeaver/core-resource';
 import { type AiChatConversationFragment, type AiChatConversationInput, GraphQLService } from '@cloudbeaver/core-sdk';
+import { AIProfilesResource } from '@cloudbeaver/plugin-ai-profiles';
 
 import type { EAIConversationPromptGeneratorId } from '../../EAIConversationPromptGeneratorId.js';
 
@@ -32,16 +33,26 @@ export const ChatConversationConnectionKey = resourceKeyListAliasFactory(
   }),
 );
 
-@injectable(() => [GraphQLService, UserInfoResource])
+@injectable(() => [GraphQLService, UserInfoResource, AIProfilesResource])
 export class AIChatConversationsResource extends CachedMapResource<string, AIChatConversationInfo> {
   constructor(
     private readonly graphQLService: GraphQLService,
     userInfoResource: UserInfoResource,
+    aiProfilesResource: AIProfilesResource,
   ) {
     super();
 
     userInfoResource.onUserChange.addHandler(() => {
       this.clear();
+    });
+
+    aiProfilesResource.onItemDelete.addHandler(key => {
+      const deletedProfileIds = ResourceKeyUtils.toArray(key);
+      const conversationIds = this.values
+        .filter(conversation => conversation.profile && deletedProfileIds.includes(conversation.profile))
+        .map(conversation => conversation.id);
+
+      this.markOutdated(resourceKeyList(conversationIds));
     });
 
     this.aliases.add(ChatConversationConnectionKey, param =>

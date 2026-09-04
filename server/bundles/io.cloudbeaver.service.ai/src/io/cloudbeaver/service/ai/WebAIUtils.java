@@ -36,7 +36,7 @@ import org.jkiss.dbeaver.model.ai.*;
 import org.jkiss.dbeaver.model.ai.qm.AIChatStorage;
 import org.jkiss.dbeaver.model.ai.quota.UserTokenQuotaService;
 import org.jkiss.dbeaver.model.ai.registry.AIAssistantRegistry;
-import org.jkiss.dbeaver.model.ai.utils.AIUtils;
+import org.jkiss.dbeaver.model.ai.registry.AISettingsManager;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.navigator.DBNDatabaseNode;
 import org.jkiss.dbeaver.model.navigator.DBNNode;
@@ -147,6 +147,18 @@ public class WebAIUtils {
             @Override
             protected IStatus run(@NotNull DBRProgressMonitor monitor) {
                 try {
+                    AIConfigurationProfile selectedProfile = conversation.getProfile();
+                    if (selectedProfile == null) {
+                        selectedProfile = AISettingsManager.getStaticSettings().getDefaultConfiguration();
+                    }
+                    AIConfigurationProfile effectiveProfile = WebAIProfileCredentials.getEffectiveProfile(
+                        webSession,
+                        selectedProfile
+                    );
+                    if (!effectiveProfile.getConfiguration().isValidConfiguration()) {
+                        throw new DBWebException("Invalid AI configuration");
+                    }
+                    conversation.setProfile(effectiveProfile);
                     AIChatResponseConsumer subscriber = new WebAiChatResponseConsumer(conversation, webSession, aiChatSession);
                     aiChatSession.processAICompletion(
                         monitor,
@@ -270,6 +282,15 @@ public class WebAIUtils {
             throw new DBWebException("AI services restricted for '%s'. Please contact your administrator if you need it.".formatted(
                 conversation.getDataSource()));
         }
+        AIConfigurationProfile selectedProfile = conversation.getProfile();
+        if (selectedProfile == null) {
+            selectedProfile = AISettingsManager.getStaticSettings().getDefaultConfiguration();
+        }
+        AIConfigurationProfile effectiveProfile = WebAIProfileCredentials.getEffectiveProfile(webSession, selectedProfile);
+        if (!effectiveProfile.getConfiguration().isValidConfiguration()) {
+            throw new DBWebException("Invalid AI configuration");
+        }
+        conversation.setProfile(effectiveProfile);
         AIChatMessage promptMessage;
         AIChatMessage result;
         synchronized (conversation) {
@@ -279,9 +300,6 @@ public class WebAIUtils {
             aiChatSession.notifyMessageAdd(conversation, promptMessage);
             if (!CommonUtils.equalObjects(caption, conversation.getCaption())) {
                 aiChatSession.notifyConversationRenamed(conversation, conversation.getCaption());
-            }
-            if (!AIUtils.hasValidConfiguration()) {
-                throw new DBWebException("Invalid AI configuration");
             }
             if (webSession.getAttribute(WebAIUtils.getWaitingAttr(conversation)) != null) {
                 throw new DBWebException("Conversation is already waiting for response");

@@ -12,9 +12,6 @@
   ],
   "references": [
     {
-      "path": "../../common-react/@dbeaver/ui-kit"
-    },
-    {
       "path": "../../common-typescript/@dbeaver/js-helpers"
     },
     {
@@ -51,9 +48,6 @@
       "path": "../core-root"
     },
     {
-      "path": "../core-sdk"
-    },
-    {
       "path": "../core-ui"
     },
     {
@@ -63,7 +57,7 @@
       "path": "../plugin-ai"
     },
     {
-      "path": "../plugin-data-grid"
+      "path": "../plugin-ai-profiles"
     }
   ],
   "include": [

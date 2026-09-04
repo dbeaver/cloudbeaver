@@ -2477,14 +2477,12 @@ __metadata:
     "@cloudbeaver/core-localization": "workspace:*"
     "@cloudbeaver/core-resource": "workspace:*"
     "@cloudbeaver/core-root": "workspace:*"
-    "@cloudbeaver/core-sdk": "workspace:*"
     "@cloudbeaver/core-ui": "workspace:*"
     "@cloudbeaver/core-utils": "workspace:*"
     "@cloudbeaver/plugin-ai": "workspace:*"
-    "@cloudbeaver/plugin-data-grid": "workspace:*"
+    "@cloudbeaver/plugin-ai-profiles": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
     "@dbeaver/js-helpers": "workspace:*"
-    "@dbeaver/ui-kit": "workspace:*"
     "@types/react": "npm:^19"
     mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
@@ -2493,6 +2491,7 @@ __metadata:
     rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
+    typescript-plugin-css-modules: "npm:^5"
   languageName: unknown
   linkType: soft
 
@@ -2519,6 +2518,7 @@ __metadata:
     "@cloudbeaver/core-utils": "workspace:*"
     "@cloudbeaver/core-view": "workspace:*"
     "@cloudbeaver/plugin-ai": "workspace:*"
+    "@cloudbeaver/plugin-ai-profiles": "workspace:*"
     "@cloudbeaver/plugin-codemirror6": "workspace:*"
     "@cloudbeaver/plugin-datasource-context-switch": "workspace:*"
     "@cloudbeaver/plugin-navigation-tabs": "workspace:*"
@@ -2546,6 +2546,103 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@cloudbeaver/plugin-ai-profiles-administration@workspace:*, @cloudbeaver/plugin-ai-profiles-administration@workspace:packages/plugin-ai-profiles-administration":
+  version: 0.0.0-use.local
+  resolution: "@cloudbeaver/plugin-ai-profiles-administration@workspace:packages/plugin-ai-profiles-administration"
+  dependencies:
+    "@cloudbeaver/core-blocks": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-data-context": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-dialogs": "workspace:*"
+    "@cloudbeaver/core-events": "workspace:*"
+    "@cloudbeaver/core-executor": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-resource": "workspace:*"
+    "@cloudbeaver/core-root": "workspace:*"
+    "@cloudbeaver/core-sdk": "workspace:*"
+    "@cloudbeaver/core-ui": "workspace:*"
+    "@cloudbeaver/core-utils": "workspace:*"
+    "@cloudbeaver/plugin-ai": "workspace:*"
+    "@cloudbeaver/plugin-ai-administration": "workspace:*"
+    "@cloudbeaver/plugin-ai-profiles": "workspace:*"
+    "@cloudbeaver/plugin-data-grid": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
+    "@dbeaver/js-helpers": "workspace:*"
+    "@types/react": "npm:^19"
+    mobx: "npm:^6"
+    mobx-react-lite: "npm:^4"
+    react: "npm:^19"
+    react-dom: "npm:^19"
+    rimraf: "npm:^6"
+    tslib: "npm:^2"
+    typescript: "npm:^5"
+    typescript-plugin-css-modules: "npm:^5"
+  languageName: unknown
+  linkType: soft
+
+"@cloudbeaver/plugin-ai-profiles@workspace:*, @cloudbeaver/plugin-ai-profiles@workspace:packages/plugin-ai-profiles":
+  version: 0.0.0-use.local
+  resolution: "@cloudbeaver/plugin-ai-profiles@workspace:packages/plugin-ai-profiles"
+  dependencies:
+    "@cloudbeaver/core-authentication": "workspace:*"
+    "@cloudbeaver/core-blocks": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-dialogs": "workspace:*"
+    "@cloudbeaver/core-events": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-resource": "workspace:*"
+    "@cloudbeaver/core-root": "workspace:*"
+    "@cloudbeaver/core-sdk": "workspace:*"
+    "@cloudbeaver/plugin-ai": "workspace:*"
+    "@cloudbeaver/plugin-data-grid": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
+    "@dbeaver/ui-kit": "workspace:*"
+    "@types/react": "npm:^19"
+    mobx: "npm:^6"
+    mobx-react-lite: "npm:^4"
+    react: "npm:^19"
+    react-dom: "npm:^19"
+    rimraf: "npm:^6"
+    tslib: "npm:^2"
+    typescript: "npm:^5"
+    typescript-plugin-css-modules: "npm:^5"
+  languageName: unknown
+  linkType: soft
+
+"@cloudbeaver/plugin-ai-user-profile@workspace:*, @cloudbeaver/plugin-ai-user-profile@workspace:packages/plugin-ai-user-profile":
+  version: 0.0.0-use.local
+  resolution: "@cloudbeaver/plugin-ai-user-profile@workspace:packages/plugin-ai-user-profile"
+  dependencies:
+    "@cloudbeaver/core-authentication": "workspace:*"
+    "@cloudbeaver/core-blocks": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-data-context": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-dialogs": "workspace:*"
+    "@cloudbeaver/core-events": "workspace:*"
+    "@cloudbeaver/core-executor": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-resource": "workspace:*"
+    "@cloudbeaver/core-root": "workspace:*"
+    "@cloudbeaver/core-ui": "workspace:*"
+    "@cloudbeaver/core-utils": "workspace:*"
+    "@cloudbeaver/plugin-ai": "workspace:*"
+    "@cloudbeaver/plugin-ai-profiles": "workspace:*"
+    "@cloudbeaver/plugin-user-profile": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
+    "@types/react": "npm:^19"
+    mobx: "npm:^6"
+    mobx-react-lite: "npm:^4"
+    react: "npm:^19"
+    react-dom: "npm:^19"
+    rimraf: "npm:^6"
+    tslib: "npm:^2"
+    typescript: "npm:^5"
+  languageName: unknown
+  linkType: soft
+
 "@cloudbeaver/plugin-ai@workspace:*, @cloudbeaver/plugin-ai@workspace:packages/plugin-ai":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-ai@workspace:packages/plugin-ai"
@@ -2556,11 +2653,6 @@ __metadata:
     "@cloudbeaver/core-root": "workspace:*"
     "@cloudbeaver/core-sdk": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
-    "@types/react": "npm:^19"
-    mobx: "npm:^6"
-    mobx-react-lite: "npm:^4"
-    react: "npm:^19"
-    react-dom: "npm:^19"
     rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
@@ -4284,6 +4376,9 @@ __metadata:
     "@cloudbeaver/plugin-ai": "workspace:*"
     "@cloudbeaver/plugin-ai-administration": "workspace:*"
     "@cloudbeaver/plugin-ai-chat": "workspace:*"
+    "@cloudbeaver/plugin-ai-profiles": "workspace:*"
+    "@cloudbeaver/plugin-ai-profiles-administration": "workspace:*"
+    "@cloudbeaver/plugin-ai-user-profile": "workspace:*"
     "@cloudbeaver/plugin-app-logo": "workspace:*"
     "@cloudbeaver/plugin-app-logo-administration": "workspace:*"
     "@cloudbeaver/plugin-async-task-confirmation": "workspace:^"
