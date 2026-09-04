@@ -8,7 +8,7 @@
 
 import { Bootstrap, Dependency, ModuleRegistry, proxy } from '@cloudbeaver/core-di';
 
-import { AIProfileCredentialsService } from './AIProfileCredentialsService.js';
+import { AIProfileCredentialsService } from './AIProfileCredentials/AIProfileCredentialsService.js';
 import { AIProfilesResource } from './AIProfilesResource.js';
 import { LocaleService } from './LocaleService.js';
 

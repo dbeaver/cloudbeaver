@@ -20,6 +20,7 @@ import { AIProfilesResource } from '@cloudbeaver/plugin-ai-profiles';
 export type AIAdminProfile = AiAdminConfigurationProfileInfo;
 export type AIProfileInput = AiConfigurationProfileInput;
 
+// TODO do we need this service?
 @injectable(() => [GraphQLService, AIProfilesResource, AISettingsResource])
 export class AIProfilesAdministrationService {
   constructor(

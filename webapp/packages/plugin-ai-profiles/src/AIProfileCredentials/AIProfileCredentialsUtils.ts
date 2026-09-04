@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { AIProfile } from './AIProfilesResource.js';
+import type { AIProfile } from '../AIProfilesResource.js';
 
 export function supportsUserCredentials(properties: ReadonlyArray<{ id?: string; features: readonly string[] }>): boolean {
   return properties.some(property => property.id === 'token' && property.features.includes('password'));

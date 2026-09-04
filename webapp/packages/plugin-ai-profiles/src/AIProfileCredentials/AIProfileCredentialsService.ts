@@ -13,7 +13,7 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { AiEnginesResource } from '@cloudbeaver/plugin-ai';
 import { AIProfileCredentialsDialog } from './AIProfileCredentialsDialogLazy.js';
 import { requiresUserCredentials, supportsUserCredentials } from './AIProfileCredentialsUtils.js';
-import { AIProfilesResource, type AIProfile } from './AIProfilesResource.js';
+import { AIProfilesResource, type AIProfile } from '../AIProfilesResource.js';
 
 @injectable(() => [CommonDialogService, NotificationService, AIProfilesResource, AiEnginesResource])
 export class AIProfileCredentialsService {

@@ -8,9 +8,9 @@
 
 import './module.js';
 
-export * from './AIProfileCredentialsDialogLazy.js';
-export * from './AIProfileCredentialsService.js';
+export * from './AIProfileCredentials/AIProfileCredentialsDialogLazy.js';
+export * from './AIProfileCredentials/AIProfileCredentialsService.js';
 export * from './AIProfilesResource.js';
 export { AIProfilesTable } from './AIProfilesTableLazy.js';
 export type { IAIProfilesTableColumn, IAIProfilesTableProps } from './AIProfilesTable.js';
-export * from './IAIProfileCredentialsDialogPayload.js';
+export * from './AIProfileCredentials/IAIProfileCredentialsDialogPayload.js';

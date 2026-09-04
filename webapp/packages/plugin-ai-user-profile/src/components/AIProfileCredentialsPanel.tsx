@@ -35,6 +35,7 @@ import { getFirstException } from '@cloudbeaver/core-utils';
 import { getAIProfileCredentialsFormPart } from '../AIProfileCredentialsForm/getAIProfileCredentialsFormPart.js';
 import type { IAIProfileCredentialsFormState } from '../AIProfileCredentialsForm/IAIProfileCredentialsFormState.js';
 import { AIProfileCredentialsPanelService } from '../AIProfileCredentialsPanelService.js';
+import { AIProfilesResource } from '@cloudbeaver/plugin-ai-profiles';
 
 const CREDENTIALS_TAB_ID = 'credentials';
 interface IAIProfileCredentialsFieldsProps {
@@ -57,6 +58,7 @@ const AIProfileCredentialsFields: TabContainerPanelComponent<IAIProfileCredentia
   const commonDialogService = useService(CommonDialogService);
   const [tokenRef] = useFocus<HTMLInputElement>({ autofocus: true });
   const part = getAIProfileCredentialsFormPart(formState);
+  const aiProfilesResource = useService(AIProfilesResource);
   const state = part.state;
   const credentialsSaved = part.credentialsSaved;
 
@@ -78,7 +80,7 @@ const AIProfileCredentialsFields: TabContainerPanelComponent<IAIProfileCredentia
     }
 
     try {
-      await part.resetCredentials();
+      await aiProfilesResource.resetCredentials(formState.state.profileId);
       notificationService.logSuccess({
         title: 'plugin_ai_user_profile_credentials_reset',
         message: state.profileName,

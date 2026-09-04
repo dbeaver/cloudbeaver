@@ -128,14 +128,13 @@ export class AIChatMessageService {
     const profileId = conversation.profile;
     const profile = profileId ? await this.aiProfilesResource.load(profileId) : undefined;
 
-    if (profileId) {
-      if (profile && this.credentialsService.isRequired(profile)) {
-        const { status } = await this.credentialsService.open(profile.id);
-        if (status !== DialogueStateResult.Resolved) {
-          return;
-        }
+    if (profile && this.credentialsService.isRequired(profile)) {
+      const { status } = await this.credentialsService.open(profile.id);
+      if (status !== DialogueStateResult.Resolved) {
+        return;
       }
     }
+
     const contexts = await this.onMessageSend.execute({ stage: 'before', data: { conversationId, connectionKey: conversation.dataSourceId } });
 
     if (ExecutorInterrupter.isInterrupted(contexts)) {

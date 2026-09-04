@@ -24,6 +24,7 @@ import { AIChatConversationProfile } from './AIChatConversationProfile.js';
 import type { AIChatConversationInfo } from '../AIChatConversationsResource.js';
 import { AIChatConversationsService } from '../AIChatConversationsService.js';
 import { AIChatConversationScopeResource } from '../AIChatConversationScopeResource.js';
+import { isNotNullDefined } from '@dbeaver/js-helpers';
 
 interface IScopeItem {
   id: AiDatabaseScope;
@@ -47,7 +48,7 @@ export const AIChatConversationScope = observer<Props>(function AIChatConversati
   const { data: container } = useResource(AIChatConversationScope, ContainerResource, conversation.dataSourceId ?? null);
   const { data: currentScope } = useResource(AIChatConversationScope, AIChatConversationScopeResource, conversation.id);
   const { data: profileList } = useResource(AIChatConversationScope, AIProfilesResource, CachedMapAllKey);
-  const profiles = profileList.filter(profile => profile !== undefined);
+  const profiles = profileList.filter(isNotNullDefined);
 
   async function selectScope(scope: AiDatabaseScope) {
     if (!conversation.dataSourceId) {

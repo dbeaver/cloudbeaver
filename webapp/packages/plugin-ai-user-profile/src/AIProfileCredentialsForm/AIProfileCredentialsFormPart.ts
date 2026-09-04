@@ -51,20 +51,6 @@ export class AIProfileCredentialsFormPart extends FormPart<IAIProfileCredentials
     return this.aiProfilesResource.get(this.formState.state.profileId)?.credentialsSaved ?? false;
   }
 
-  async resetCredentials(): Promise<void> {
-    try {
-      this.isSaving = true;
-      const reset = await this.aiProfilesResource.resetCredentials(this.formState.state.profileId);
-      if (!reset) {
-        throw new Error('plugin_ai_credentials_reset_failed');
-      }
-
-      await this.reload();
-    } finally {
-      this.isSaving = false;
-    }
-  }
-
   protected override async loader(): Promise<void> {
     const [profile] = await Promise.all([this.aiProfilesResource.load(this.formState.state.profileId), this.aiEnginesResource.load()]);
 

@@ -31,7 +31,7 @@ import { CommonDialogService, DialogueStateResult, type DialogComponent } from '
 import { NotificationService } from '@cloudbeaver/core-events';
 
 import type { IAIProfileCredentialsDialogPayload } from './IAIProfileCredentialsDialogPayload.js';
-import { AIProfilesResource } from './AIProfilesResource.js';
+import { AIProfilesResource } from '../AIProfilesResource.js';
 
 interface CredentialsDialogState {
   token: string;
