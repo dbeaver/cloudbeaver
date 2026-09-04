@@ -1,20 +1,31 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+
 import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
 import { NavigationTreeService, DATA_CONTEXT_ELEMENTS_TREE, MENU_ELEMENTS_TREE_TOOLS } from '@cloudbeaver/plugin-navigation-tree';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { ActionService, type IAction, KeyBindingService, MenuService } from '@cloudbeaver/core-view';
+import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
+import { NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
 import { ConnectionSchemaManagerService } from '@cloudbeaver/plugin-datasource-context-switch';
 
 import { ACTION_LINK_OBJECT } from './ACTION_LINK_OBJECT.js';
 import { KEY_BINDING_LINK_OBJECT } from './KEY_BINDING_LINK_OBJECT.js';
 
-@injectable(() => [ActionService, KeyBindingService, NavigationTreeService, ConnectionSchemaManagerService, MenuService])
+@injectable(() => [
+  ActionService,
+  KeyBindingService,
+  NavigationTreeService,
+  ConnectionSchemaManagerService,
+  MenuService,
+  ConnectionInfoResource,
+  NavNodeInfoResource,
+])
 export class ObjectViewerNavTreeLinkMenuService extends Bootstrap {
   constructor(
     private readonly actionService: ActionService,
@@ -22,6 +33,8 @@ export class ObjectViewerNavTreeLinkMenuService extends Bootstrap {
     private readonly navigationTreeService: NavigationTreeService,
     private readonly connectionSchemaManagerService: ConnectionSchemaManagerService,
     private readonly menuService: MenuService,
+    private readonly connectionInfoResource: ConnectionInfoResource,
+    private readonly navNodeInfoResource: NavNodeInfoResource,
   ) {
     super();
   }
@@ -36,9 +49,8 @@ export class ObjectViewerNavTreeLinkMenuService extends Bootstrap {
       isHidden: context => {
         const tree = context.get(DATA_CONTEXT_ELEMENTS_TREE)!;
 
-        const navNode = this.connectionSchemaManagerService.activeNavNode;
-        const nodeInTree = navNode?.path.includes(tree.baseRoot);
-        return !nodeInTree;
+        const { path } = this.getActiveNode(tree.baseRoot);
+        return !path?.includes(tree.baseRoot);
       },
       handler: this.elementsTreeActionHandler.bind(this),
     });
@@ -79,14 +91,37 @@ export class ObjectViewerNavTreeLinkMenuService extends Bootstrap {
         for (const loader of this.connectionSchemaManagerService.currentObjectLoaders) {
           await loader.load();
         }
-        const navNode = this.connectionSchemaManagerService.activeNavNode;
 
-        if (navNode) {
-          await this.navigationTreeService.showNode(navNode.nodeId, navNode.path);
+        const { id, path } = this.getActiveNode(tree.baseRoot);
+
+        if (id && path) {
+          await this.navigationTreeService.showNode(id, path);
         }
 
         break;
       }
     }
+  }
+
+  private getActiveNode(baseRoot: string): {
+    id: string | undefined;
+    path: string[] | undefined;
+  } {
+    const navNode = this.connectionSchemaManagerService.activeNavNode;
+    const activeConnectionKey = this.connectionSchemaManagerService.activeConnectionKey;
+
+    let id = navNode?.nodeId;
+    let path = navNode?.path;
+
+    if (!path?.includes(baseRoot) && activeConnectionKey) {
+      const connection = this.connectionInfoResource.get(activeConnectionKey);
+
+      if (connection?.nodePath && connection.connected) {
+        id = connection.nodePath;
+        path = this.navNodeInfoResource.getParents(connection.nodePath);
+      }
+    }
+
+    return { id, path };
   }
 }

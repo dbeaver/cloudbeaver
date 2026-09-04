@@ -3919,9 +3919,11 @@ __metadata:
   resolution: "@cloudbeaver/plugin-object-viewer-nav-tree-link@workspace:packages/plugin-object-viewer-nav-tree-link"
   dependencies:
     "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-connections": "workspace:*"
     "@cloudbeaver/core-data-context": "workspace:*"
     "@cloudbeaver/core-di": "workspace:*"
     "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-navigation-tree": "workspace:*"
     "@cloudbeaver/core-view": "workspace:*"
     "@cloudbeaver/plugin-datasource-context-switch": "workspace:*"
     "@cloudbeaver/plugin-navigation-tree": "workspace:*"
