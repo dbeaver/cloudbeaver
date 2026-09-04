@@ -16,14 +16,15 @@
  */
 package io.cloudbeaver.test.platform.util;
 
+import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.WebSessionGlobalProjectImpl;
 import io.cloudbeaver.service.sql.WebSQLContextInfo;
 import io.cloudbeaver.test.WebGQLClient;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
-import org.jkiss.utils.CommonUtils;
 import org.junit.jupiter.api.Assertions;
 
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +34,9 @@ import static io.cloudbeaver.test.platform.util.GraphQLTestConstant.*;
 
 
 public class GraphQLTestClientWrapper {
+
+    private static final Duration ASYNC_TASK_TIMEOUT = Duration.ofSeconds(30);
+    private static final long ASYNC_TASK_POLL_INTERVAL_MILLIS = 200;
 
     @NotNull
     private final WebGQLClient client;
@@ -72,32 +76,44 @@ public class GraphQLTestClientWrapper {
         return JSONUtils.getObject(firstResult, "resultSet");
     }
 
-    public void waitTaskCompleted(@NotNull String taskId) throws Exception {
+    @NotNull
+    public Map<String, Object> waitTaskCompleted(@NotNull String taskId) throws Exception {
+        Map<String, Object> taskInfo = waitTaskFinished(taskId);
+        Assertions.assertNull(taskInfo.get("error"), "Async task failed: " + taskInfo.get("error"));
+        Assertions.assertEquals(Boolean.FALSE, taskInfo.get("running"), "Async task is still running");
+        Assertions.assertEquals(DBWConstants.TASK_STATUS_FINISHED, taskInfo.get("status"));
+        return taskInfo;
+    }
+
+    @NotNull
+    public Map<String, Object> waitTaskFinished(@NotNull String taskId) throws Exception {
         Map<String, Object> taskInfoVars = new HashMap<>();
         taskInfoVars.put("id", taskId);
         taskInfoVars.put("removeOnFinish", false);
-        String taskStatus = null;
-        int attempts = 0;
-        int maxAttempts = 20;
-        while (attempts++ < maxAttempts) {
-            Map<String, Object> taskInfo = client.sendQuery(GQL_ASYNC_TASK_INFO, taskInfoVars);
-            if (taskInfo != null) {
-                Object st = taskInfo.get("status");
-                if (st != null) {
-                    taskStatus = String.valueOf(st);
+        long deadline = System.nanoTime() + ASYNC_TASK_TIMEOUT.toNanos();
+        Map<String, Object> lastTaskInfo = null;
+        while (System.nanoTime() < deadline) {
+            long remainingNanos = deadline - System.nanoTime();
+            if (remainingNanos <= 0) {
+                break;
+            }
+            lastTaskInfo = Assertions.assertTimeoutPreemptively(
+                Duration.ofNanos(remainingNanos),
+                () -> client.sendQuery(GQL_ASYNC_TASK_INFO, taskInfoVars)
+            );
+            if (lastTaskInfo != null) {
+                boolean hasError = lastTaskInfo.get("error") != null;
+                boolean running = !Boolean.FALSE.equals(lastTaskInfo.get("running"));
+                if (hasError && !running) {
+                    return lastTaskInfo;
                 }
-                if (taskStatus != null) {
-                    if (taskStatus.equalsIgnoreCase("FINISHED")) {
-                        break;
-                    }
-                    Object error = taskInfo.get("error");
-                    if (error != null && CommonUtils.isNotEmpty(error.toString())) {
-                        throw new IllegalStateException("Async task failed: " + error);
-                    }
+                if (!hasError && !running && DBWConstants.TASK_STATUS_FINISHED.equals(lastTaskInfo.get("status"))) {
+                    return lastTaskInfo;
                 }
             }
-            Thread.sleep(200);
+            Thread.sleep(ASYNC_TASK_POLL_INTERVAL_MILLIS);
         }
+        throw new AssertionError("Async task did not finish in " + ASYNC_TASK_TIMEOUT + ": " + lastTaskInfo);
     }
 
     @NotNull

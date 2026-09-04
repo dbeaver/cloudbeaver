@@ -34,7 +34,6 @@ import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataSourcePermission;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
-import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.runtime.VoidProgressMonitor;
 import org.jkiss.dbeaver.model.struct.DBSDataContainer;
@@ -288,6 +287,10 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
         DataTransferProcessorDescriptor processor = importTask.getProcessor();
         DBSDataContainer dataContainer = importTask.getResults().getDataContainer();
         Map<String, Object> settings = importTask.getParameters().getSettings();
+        Map<String, Object> processorProperties = WebDataTransferUtils.makeProcessorProperties(
+            processor,
+            importTask.getParameters().getProcessorProperties()
+        );
         WebAsyncTaskProcessor<String> runnable = new WebAsyncTaskProcessor<>() {
             @Override
             public void run(@NotNull DBRProgressMonitor monitor) throws InvocationTargetException {
@@ -295,7 +298,14 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
                 try {
                     monitor.subTask("Import data using " + processor.getName());
                     try {
-                        importData(monitor, processor, (DBSDataManipulator) dataContainer, path, settings);
+                        importData(
+                            monitor,
+                            processor,
+                            (DBSDataManipulator) dataContainer,
+                            path,
+                            settings,
+                            processorProperties
+                        );
                     } catch (Exception e) {
                         if (e instanceof DBException) {
                             throw e;
@@ -338,13 +348,10 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
             throw new DBException("Invalid processor. " + IStreamDataExporter.class.getSimpleName() + " expected");
         }
 
-        Map<String, Object> processorProperties = parameters.getProcessorProperties();
-        if (processorProperties == null) processorProperties = Collections.emptyMap();
-        Map<String, Object> properties = new HashMap<>();
-        for (DBPPropertyDescriptor prop : processor.getProperties()) {
-            Object propValue = processorProperties.get(CommonUtils.toString(prop.getId()));
-            properties.put(prop.getId(), propValue != null ? propValue : prop.getDefaultValue());
-        }
+        Map<String, Object> properties = WebDataTransferUtils.makeProcessorProperties(
+            processor,
+            parameters.getProcessorProperties()
+        );
         // Remove extension property (we specify file name directly)
         properties.remove(StreamConsumerSettings.PROP_FILE_EXTENSION);
 
@@ -392,7 +399,8 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
         @NotNull DataTransferProcessorDescriptor processor,
         @NotNull DBSDataManipulator dataContainer,
         @NotNull Path path,
-        @Nullable Map<String, Object> settings
+        @Nullable Map<String, Object> settings,
+        @NotNull Map<String, Object> processorProperties
     ) throws DBException {
         IDataTransferProcessor processorInstance = processor.getInstance();
 
@@ -408,16 +416,12 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
             consumer.setSettings(databaseConsumerSettings);
 
             StreamProducerSettings producerSettings = new StreamProducerSettings();
-            Map<String, Object> properties = new HashMap<>();
-            for (DBPPropertyDescriptor prop : processor.getProperties()) {
-                properties.put(prop.getId(), prop.getDefaultValue());
-            }
-            producerSettings.setProcessorProperties(properties);
+            producerSettings.setProcessorProperties(processorProperties);
             producerSettings.updateProducerSettingsFromStream(
                 monitor,
                 producer,
                 processorInstance,
-                properties
+                processorProperties
             );
             DatabaseMappingContainer databaseMappingContainer =
                 new DatabaseMappingContainer(monitor, databaseConsumerSettings, producer.getDatabaseObject(), consumer.getTargetObject());
