@@ -63,20 +63,13 @@ export const AIProfileCredentialsDialog: DialogComponent<IAIProfileCredentialsDi
 
     try {
       state.processing = true;
-      if (state.token) {
-        await aiProfilesResource.saveCredentials(payload.profileId, state.token);
+      await aiProfilesResource.saveCredentials(payload.profileId, state.token);
 
-        state.token = '';
-        notificationService.logSuccess({
-          title: 'plugin_ai_credentials_saved',
-          message: payload.profileName,
-        });
-      }
-
-      if (!credentialsSaved) {
-        return;
-      }
-
+      state.token = '';
+      notificationService.logSuccess({
+        title: 'plugin_ai_credentials_saved',
+        message: payload.profileName,
+      });
       resolveDialog();
     } catch (exception: any) {
       notificationService.logException(exception, 'plugin_ai_credentials_save_failed');
