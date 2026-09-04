@@ -55,6 +55,7 @@ export interface ElementsTreeProps extends IElementsTreeOptions, React.PropsWith
   emptyPlaceholder?: React.FC;
   className?: string;
   settingsElements?: PlaceholderElement<IElementsTreeSettingsProps>[];
+  limit?: (nodeId: string) => number;
   navNodeFilterCompare?: NavNodeFilterCompareFn;
   onClick?: (node: NavNode) => Promise<void> | void;
   onOpen?: (node: NavNode, folder: boolean) => Promise<void> | void;
@@ -76,6 +77,7 @@ export const ElementsTree = observer(
       renderers = [],
       expandStateGetters,
       settingsElements,
+      limit,
       className,
       getChildren,
       loadChildren,
@@ -122,6 +124,7 @@ export const ElementsTree = observer(
       filters: [nameFilter, ...filters, limitFilter],
       renderers: [...renderers, elementsTreeLimitRenderer],
       expandStateGetters,
+      limit,
       getChildren,
       loadChildren,
       isGroup,
