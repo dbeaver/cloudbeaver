@@ -156,7 +156,6 @@ public class DataTransferImportTest extends CloudbeaverMockTest {
     private JDBCSession databaseSession;
     private WebSessionProjectImpl project;
     private WebConnectionInfo webConnectionInfo;
-    private WebSession webSession;
     private WebSQLContextInfo sqlContext;
     private String resultsId;
     private List<Map<String, Object>> importProcessors;
@@ -165,7 +164,7 @@ public class DataTransferImportTest extends CloudbeaverMockTest {
     @BeforeEach
     public void prepareImportTarget() throws Exception {
         CEAppStarter.authenticateTestUser(client);
-        webSession = resolveWebSession();
+        WebSession webSession = resolveWebSession();
         project = webSession.getSingletonProject();
         Assertions.assertNotNull(project, "Active project not found");
         databaseContainer = WebDBTestUtils.createH2DataSource(monitor, project);
