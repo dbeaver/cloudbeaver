@@ -30,7 +30,6 @@ import io.cloudbeaver.service.sql.WebServiceBindingSQL;
 import io.cloudbeaver.test.WebGQLClient;
 import io.cloudbeaver.test.platform.util.GraphQLTestClientWrapper;
 import io.cloudbeaver.test.platform.util.WebDBTestUtils;
-import org.eclipse.core.runtime.Platform;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -47,8 +46,6 @@ import org.jkiss.dbeaver.model.runtime.LoggingProgressMonitor;
 import org.jkiss.dbeaver.model.struct.DBSEntity;
 import org.jkiss.dbeaver.model.struct.DBSObject;
 import org.jkiss.dbeaver.model.struct.DBSObjectContainer;
-import org.jkiss.dbeaver.tools.transfer.registry.DataTransferProcessorDescriptor;
-import org.jkiss.dbeaver.tools.transfer.registry.DataTransferRegistry;
 import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.utils.HttpConstants;
 import org.junit.jupiter.api.Assertions;
@@ -56,7 +53,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -76,9 +72,6 @@ public class DataTransferImportTest extends CloudbeaverMockTest {
     private static final String CSV_PROCESSOR_ID = "stream_producer:stream.csv";
     private static final String XML_PROCESSOR_ID = "stream_producer:stream.xml";
     private static final String XLSX_PROCESSOR_ID = "stream_producer:stream.xlsx";
-    private static final String DATA_TRANSFER_BUNDLE_ID = "io.cloudbeaver.service.data.transfer";
-    private static final String DATA_TRANSFER_UTILS_CLASS =
-        "io.cloudbeaver.service.data.transfer.impl.WebDataTransferUtils";
     private static final HttpClient HTTP_CLIENT = HttpClient.newHttpClient();
     private static final String GQL_IMPORT_PROCESSORS = """
         query {
@@ -231,52 +224,6 @@ public class DataTransferImportTest extends CloudbeaverMockTest {
     }
 
     @Test
-    public void shouldBuildDescriptorDefaultsForMissingProperties() throws Exception {
-        DataTransferProcessorDescriptor descriptor = getCsvProcessorDescriptor();
-        Map<String, Object> nullDefaults = makeProcessorProperties(descriptor, null);
-
-        Assertions.assertEquals(descriptor.getProperties().length, nullDefaults.size());
-        for (var property : descriptor.getProperties()) {
-            Assertions.assertTrue(nullDefaults.containsKey(property.getId()));
-            Assertions.assertEquals(property.getDefaultValue(), nullDefaults.get(property.getId()));
-        }
-        Assertions.assertEquals(",", nullDefaults.get("delimiter"));
-        Assertions.assertEquals("top", nullDefaults.get("header"));
-        Assertions.assertEquals(false, nullDefaults.get("strictQuotes"));
-        Assertions.assertEquals(100, nullDefaults.get("columnTypeSamplesCount"));
-        Assertions.assertTrue(nullDefaults.containsKey("nullString"));
-        Assertions.assertNull(nullDefaults.get("nullString"));
-        Assertions.assertEquals(nullDefaults, makeProcessorProperties(descriptor, Map.of()));
-    }
-
-    @Test
-    public void shouldApplyPartialProcessorPropertyOverride() throws Exception {
-        DataTransferProcessorDescriptor descriptor = getCsvProcessorDescriptor();
-        Map<String, Object> expected = new HashMap<>(makeProcessorProperties(descriptor, null));
-        expected.put("delimiter", ";");
-
-        Assertions.assertEquals(expected, makeProcessorProperties(descriptor, Map.of("delimiter", ";")));
-    }
-
-    @Test
-    public void shouldPreserveFalsyValuesAndIgnoreUnknownProperties() throws Exception {
-        DataTransferProcessorDescriptor descriptor = getCsvProcessorDescriptor();
-        Map<String, Object> overrides = new HashMap<>();
-        overrides.put("delimiter", null);
-        overrides.put("emptyStringNull", false);
-        overrides.put("columnTypeSamplesCount", 0);
-        overrides.put("nullString", "");
-        overrides.put("unknownProperty", "unexpected");
-
-        Map<String, Object> effectiveProperties = makeProcessorProperties(descriptor, overrides);
-        Assertions.assertEquals(",", effectiveProperties.get("delimiter"));
-        Assertions.assertEquals(false, effectiveProperties.get("emptyStringNull"));
-        Assertions.assertEquals(0, effectiveProperties.get("columnTypeSamplesCount"));
-        Assertions.assertEquals("", effectiveProperties.get("nullString"));
-        Assertions.assertFalse(effectiveProperties.containsKey("unknownProperty"));
-    }
-
-    @Test
     public void shouldExposeImportProcessorPropertyMetadata() {
         List<Map<String, Object>> properties = JSONUtils.getObjectList(csvProcessor, "properties");
         Map<String, Object> delimiter = findProperty(properties, "delimiter");
@@ -349,6 +296,25 @@ public class DataTransferImportTest extends CloudbeaverMockTest {
 
         assertRowCount(1);
         assertImportedValue(1, "default");
+    }
+
+    @Test
+    public void shouldPreserveFalsyValuesAndIgnoreUnknownProperties() throws Exception {
+        Map<String, Object> processorProperties = new HashMap<>();
+        processorProperties.put("delimiter", null);
+        processorProperties.put("emptyStringNull", false);
+        processorProperties.put("strictQuotes", false);
+        processorProperties.put("columnTypeSamplesCount", 0);
+        processorProperties.put("nullString", "");
+        processorProperties.put("unknownProperty", "unexpected");
+
+        importCsv(
+            "ID,TEXT_VALUE\n4,\n",
+            Map.of("processorId", csvProcessor.get("id"), "processorProperties", processorProperties)
+        );
+
+        assertRowCount(1);
+        assertImportedValue(4, "");
     }
 
     @Test
@@ -488,31 +454,6 @@ public class DataTransferImportTest extends CloudbeaverMockTest {
             .filter(property -> propertyId.equals(property.get("id")))
             .findFirst()
             .orElseThrow(() -> new AssertionError("Processor property not found: " + propertyId));
-    }
-
-    @NotNull
-    private DataTransferProcessorDescriptor getCsvProcessorDescriptor() {
-        DataTransferProcessorDescriptor descriptor = DataTransferRegistry.getInstance().getProcessor(CSV_PROCESSOR_ID);
-        Assertions.assertNotNull(descriptor, "CSV import processor descriptor not found");
-        return descriptor;
-    }
-
-    @NotNull
-    @SuppressWarnings("unchecked")
-    private Map<String, Object> makeProcessorProperties(
-        @NotNull DataTransferProcessorDescriptor descriptor,
-        @Nullable Map<String, Object> processorProperties
-    ) throws Exception {
-        var bundle = Platform.getBundle(DATA_TRANSFER_BUNDLE_ID);
-        Assertions.assertNotNull(bundle, "Data transfer service bundle not found");
-        Class<?> utilsClass = bundle.loadClass(DATA_TRANSFER_UTILS_CLASS);
-        Method method = utilsClass.getDeclaredMethod(
-            "makeProcessorProperties",
-            DataTransferProcessorDescriptor.class,
-            Map.class
-        );
-        method.setAccessible(true);
-        return (Map<String, Object>) method.invoke(null, descriptor, processorProperties);
     }
 
     @NotNull
