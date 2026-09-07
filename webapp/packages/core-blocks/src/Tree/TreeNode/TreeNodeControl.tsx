@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -19,10 +19,6 @@ import type { ITreeNodeState } from './ITreeNodeState.js';
 import { TreeNodeContext } from './TreeNodeContext.js';
 import style from './TreeNodeControl.module.css';
 import { useMergeRefs } from '../../useMergeRefs.js';
-
-const KEY = {
-  ENTER: 'Enter',
-};
 
 interface Props extends ITreeNodeState {
   title?: string;
@@ -74,19 +70,6 @@ export const TreeNodeControl = observer<Props & React.HTMLAttributes<HTMLDivElem
       context.externalExpanded = externalExpanded;
     }
 
-    async function handleEnter(event: React.KeyboardEvent<HTMLDivElement>) {
-      if (EventContext.has(event, EventTreeNodeExpandFlag, EventTreeNodeSelectFlag, EventStopPropagationFlag)) {
-        return;
-      }
-
-      EventContext.set(event, EventTreeNodeSelectFlag);
-      switch ((event as unknown as KeyboardEvent).code) {
-        case KEY.ENTER:
-          await context.select(event.ctrlKey || event.metaKey);
-          break;
-      }
-      return true;
-    }
     async function handleClick(event: React.MouseEvent<HTMLDivElement>) {
       if (onClick) {
         onClick(event);
@@ -115,16 +98,14 @@ export const TreeNodeControl = observer<Props & React.HTMLAttributes<HTMLDivElem
     return (
       <div
         ref={mergedRef}
-        tabIndex={context.selected ? 0 : -1}
         title={title}
-        aria-selected={context.selected}
+        data-selected={context.selected}
         className={s(styles, { treeNodeControl: true }, className)}
-        data-tree-node-control
         onClick={handleClick}
         onMouseDown={handleMouseDown}
-        onKeyDown={handleEnter}
         onDoubleClick={handleDbClick}
         {...rest}
+        data-tree-node-content
       >
         {children}
       </div>

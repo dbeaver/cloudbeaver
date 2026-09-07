@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -19,13 +19,13 @@ import {
   Translate,
   TreeNodeNested,
   TreeNodeNestedMessage,
-  useListKeyboardNavigation,
   useMergeRefs,
   useS,
+  useTranslate,
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
-import { EObjectFeature, type NavNode, NavNodeInfoResource, NavTreeResource, ROOT_NODE_PATH } from '@cloudbeaver/core-navigation-tree';
+import { EObjectFeature, isProjectNode, type NavNode, NavNodeInfoResource, NavTreeResource, ROOT_NODE_PATH } from '@cloudbeaver/core-navigation-tree';
 import { DNDScrollContainer } from '@cloudbeaver/core-ui';
 
 import { useNavTreeDropBox } from '../useNavTreeDropBox.js';
@@ -44,6 +44,7 @@ import { elementsTreeLimitRenderer } from './NavTreeLimitFilter/elementsTreeLimi
 import { useDropOutside } from './useDropOutside.js';
 import { type IElementsTree, type IElementsTreeOptions, useElementsTree } from './useElementsTree.js';
 import { useElementsTreeFolderExplorer } from './useElementsTreeFolderExplorer.js';
+import { useTreeKeyboardNavigation } from '../../useTreeKeyboardNavigation.js';
 
 export interface ElementsTreeProps extends IElementsTreeOptions, React.PropsWithChildren {
   /** Specifies the root path for the tree. ROOT_NODE_PATH will be used if not defined */
@@ -92,12 +93,11 @@ export const ElementsTree = observer(
     ref,
   ) {
     const styles = useS(style);
+    const translate = useTranslate();
     const navTreeResource = useService(NavTreeResource);
     const navNodeInfoResource = useService(NavNodeInfoResource);
     const [treeRootRef, setTreeRootRef] = useState<HTMLDivElement | null>(null);
     const folderExplorer = useElementsTreeFolderExplorer(baseRoot, settings);
-    const listRef = useListKeyboardNavigation('[data-tree-node-control][tabindex]:not(:disabled)');
-    const treeMergedRef = useMergeRefs<HTMLDivElement>(setTreeRootRef, listRef);
 
     const root = folderExplorer.state.folder;
 
@@ -134,6 +134,51 @@ export const ElementsTree = observer(
       onOpen,
       onClick,
     });
+    const treeKeyboardNavigation = useTreeKeyboardNavigation({
+      getParent(nodeId) {
+        if (nodeId === root) {
+          return null;
+        }
+
+        return navNodeInfoResource.get(nodeId)?.parentId ?? null;
+      },
+      getChildren: nodeId => tree.getNodeChildren(nodeId),
+      isExpanded: nodeId => tree.isNodeExpanded(nodeId),
+      isLeaf(nodeId) {
+        const node = navNodeInfoResource.get(nodeId);
+        const children = navTreeResource.get(nodeId);
+        const outdated = navNodeInfoResource.isOutdated(nodeId) || navTreeResource.isOutdated(nodeId);
+
+        return (
+          !node ||
+          !node.hasChildren ||
+          (!tree.settings?.showTableContents && node.objectFeatures.includes(EObjectFeature.entity)) ||
+          (children?.length === 0 && !outdated)
+        );
+      },
+      isFocusable(nodeId) {
+        const node = navNodeInfoResource.get(nodeId);
+        return nodeId !== root && !!node && (tree.settings?.projects !== false || !isProjectNode(node));
+      },
+      disabled: tree.disabled,
+      async setExpanded(nodeId, expanded) {
+        const node = navNodeInfoResource.get(nodeId);
+
+        if (node) {
+          await tree.expand(node, expanded);
+        }
+      },
+      activateNode: onOpen
+        ? async nodeId => {
+            const node = navNodeInfoResource.get(nodeId);
+
+            if (node) {
+              await tree.open(node, [], false);
+            }
+          }
+        : undefined,
+    });
+    const treeMergedRef = useMergeRefs<HTMLDivElement>(setTreeRootRef);
 
     useImperativeHandle(ref, () => tree, [tree]);
 
@@ -175,7 +220,13 @@ export const ElementsTree = observer(
         <ElementsTreeTools tree={tree} settingsElements={settingsElements} />
         <DNDScrollContainer ref={treeMergedRef} className={s(styles, { treeBox: true })} isDragging={!!dndBox.state.context}>
           <ElementsTreeContext.Provider value={context}>
-            <div className={s(styles, { box: true }, className)}>
+            <div
+              role="tree"
+              aria-label={navNodeInfoResource.get(root)?.name ?? translate('plugin_navigation_tree_explorer_tab_title')}
+              className={s(styles, { box: true }, className)}
+              {...treeKeyboardNavigation}
+              aria-multiselectable
+            >
               <FolderExplorer state={folderExplorer}>
                 <div ref={dropOutside.mouse.reference} className={s(styles, { tree: true })} onClick={handleClick}>
                   {settings?.showFolderExplorerPath && (

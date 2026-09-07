@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ interface IPrivate extends ITreeVirtualization {
 export interface ITreeVirtualization {
   viewPort: { from: number; to: number };
   setRootRef(element: HTMLElement | null): void;
+  reveal(offset: number, height: number): void;
 }
 
 export function useTreeVirtualization(): ITreeVirtualization {
@@ -50,6 +51,19 @@ export function useTreeVirtualization(): ITreeVirtualization {
           });
         }
       },
+      reveal(offset, height) {
+        if (!this.element) {
+          return;
+        }
+
+        if (offset < this.element.scrollTop) {
+          this.element.scrollTop = offset;
+        } else if (offset + height > this.element.scrollTop + this.element.clientHeight) {
+          this.element.scrollTop = offset + height - this.element.clientHeight;
+        }
+
+        this.handleResize();
+      },
       dispose() {
         if (this.element) {
           this.element.removeEventListener('scroll', this.handleScroll);
@@ -78,7 +92,7 @@ export function useTreeVirtualization(): ITreeVirtualization {
       },
     }),
     false,
-    ['setRootRef', 'dispose', 'handleScroll', 'handleResize'],
+    ['setRootRef', 'reveal', 'dispose', 'handleScroll', 'handleResize'],
   );
 
   useEffect(() => () => mountOptimization.dispose(), []);

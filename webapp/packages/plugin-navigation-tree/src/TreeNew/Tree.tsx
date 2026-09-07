@@ -7,6 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 
+import { useMergeRefs } from '@cloudbeaver/core-blocks';
 import { clsx } from '@dbeaver/ui-kit';
 
 import { NodeSizeCacheContext } from './contexts/NodeSizeCacheContext.js';
@@ -26,6 +27,7 @@ import type { ITreeDnD } from './useTreeDnD.js';
 import { useTreeVirtualization } from './useTreeVirtualization.js';
 import { TreeMenuContextProvider } from './contexts/TreeMenuContext/TreeMenuContextProvider.js';
 import type { ITreeMenu } from './useTreeMenu.js';
+import { useTreeKeyboardNavigation } from '../useTreeKeyboardNavigation.js';
 
 export interface NavigationTreeNewProps {
   data: ITreeData;
@@ -62,6 +64,27 @@ export const Tree = observer<React.PropsWithChildren<NavigationTreeNewProps>>(fu
   });
   const mountOptimization = useTreeVirtualization();
   const elementsSizeCache = useNodeSizeCache(tree, data);
+  let activateNode: ((nodeId: string) => Promise<void>) | undefined;
+
+  if (onNodeDoubleClick) {
+    activateNode = tree.openNode;
+  } else if (onNodeClick) {
+    activateNode = tree.clickNode;
+  }
+
+  const treeKeyboardNavigation = useTreeKeyboardNavigation({
+    getParent: nodeId => (nodeId === data.rootId ? null : data.getParent(nodeId)),
+    getChildren: nodeId => data.getChildren(nodeId),
+    isExpanded: nodeId => data.getState(nodeId).expanded,
+    isLeaf: nodeId => !!data.getNode(nodeId).leaf,
+    isFocusable: nodeId => nodeId !== data.rootId,
+    setExpanded: tree.expandNode,
+    activateNode,
+    revealNode(nodeId) {
+      mountOptimization.reveal(elementsSizeCache.getOffset(nodeId), tree.getNodeHeight(nodeId));
+    },
+  });
+  const treeRootRef = useMergeRefs<HTMLDivElement>(mountOptimization.setRootRef, treeKeyboardNavigation.ref);
   return (
     <NodeSizeCacheContext.Provider value={elementsSizeCache}>
       <TreeDataContext.Provider value={data}>
@@ -70,7 +93,14 @@ export const Tree = observer<React.PropsWithChildren<NavigationTreeNewProps>>(fu
             <TreeDnDContext.Provider value={dnd ?? null}>
               <TreeMenuContextProvider menu={menu ?? null}>
                 {children}
-                <div ref={mountOptimization.setRootRef} className={clsx('tw:relative tw:overflow-auto', className)}>
+                <div
+                  {...treeKeyboardNavigation}
+                  ref={treeRootRef}
+                  role="tree"
+                  aria-label={data.rootId}
+                  className={clsx('tw:relative tw:overflow-auto', className)}
+                  aria-multiselectable
+                >
                   <TreeVirtualizationContext.Provider value={mountOptimization}>
                     <NodeChildren nodeId={data.rootId} offsetHeight={0} emptyPlaceholder={emptyPlaceholder} root />
                   </TreeVirtualizationContext.Provider>

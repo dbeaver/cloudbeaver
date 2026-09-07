@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -67,6 +67,9 @@ export const Settings = observer<ISettingsProps>(function Settings({ resolver, s
         .filter(filterExistsGroups)
         .sort((a, b) => a.order - b.order)
         .map(group => group.id);
+    },
+    getParent(id) {
+      return ROOT_SETTINGS_GROUP.get(id)?.parent?.id ?? null;
     },
     load() {
       return Promise.resolve();
