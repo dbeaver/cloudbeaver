@@ -224,19 +224,33 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
     connectionInfoEventHandler.onEvent<ResourceKeyList<IConnectionInfoParams>>(
       ServerEventId.CbDatasourceUpdated,
       key => {
-        if (this.isConnected(key) && !this.isOutdated(key)) {
-          const connection = this.get(key);
+        const connectedKey = resourceKeyList<IConnectionInfoParams>([]);
+        const disconnectedKey = resourceKeyList<IConnectionInfoParams>([]);
 
-          this.dataSynchronizationService
-            .requestSynchronization('connection', connection.map(connection => connection?.name).join('\n'))
-            .then(state => {
-              if (state) {
-                this.updateFromEvent(key);
-              }
-            });
-        } else {
-          this.updateFromEvent(key);
+        for (const connectionKey of key) {
+          if (this.isConnected(connectionKey)) {
+            connectedKey.push(connectionKey);
+          } else {
+            disconnectedKey.push(connectionKey);
+          }
         }
+
+        if (disconnectedKey.length > 0) {
+          this.updateFromEvent(disconnectedKey);
+        }
+
+        if (connectedKey.length === 0) {
+          return;
+        }
+
+        const connection = this.get(connectedKey);
+        this.dataSynchronizationService
+          .requestSynchronization('connection', connection.map(connection => connection?.name).join('\n'))
+          .then(state => {
+            if (state) {
+              this.updateFromEvent(connectedKey);
+            }
+          });
       },
       data =>
         resourceKeyList(
