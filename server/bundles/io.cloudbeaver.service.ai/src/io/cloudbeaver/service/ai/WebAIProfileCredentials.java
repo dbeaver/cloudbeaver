@@ -32,7 +32,10 @@ import org.jkiss.dbeaver.runtime.properties.ObjectPropertyDescriptor;
 import org.jkiss.dbeaver.runtime.properties.PropertySourceEditable;
 import org.jkiss.utils.CommonUtils;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Set;
 
 public final class WebAIProfileCredentials {
     private static final String SECRET_ID_PREFIX = "ai.profile.";
@@ -93,7 +96,7 @@ public final class WebAIProfileCredentials {
         AIConfigurationProfile source = AISettingsManager.getStaticSettings()
             .getConfigurationOrNull(profile.getProfileId());
         if (source == null) {
-            throw new DBWebException("AI profile does not exist");
+            source = AISettingsManager.getStaticSettings().getDefaultConfiguration();
         }
         if (source.isGlobal()) {
             return source;
