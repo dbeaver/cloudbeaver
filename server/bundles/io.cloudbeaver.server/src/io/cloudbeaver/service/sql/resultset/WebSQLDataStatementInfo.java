@@ -23,16 +23,16 @@ import org.jkiss.dbeaver.model.struct.DBSEntity;
 public class WebSQLDataStatementInfo extends DBDDataStatementInfo {
 
     @NotNull
-    private final Object[] finalRow;
+    private final Object[] resultRowValues;
 
-    public WebSQLDataStatementInfo(@NotNull DBSEntity entity, @NotNull Object[] finalRow) {
+    public WebSQLDataStatementInfo(@NotNull DBSEntity entity, @NotNull Object[] resultRowValues) {
         super(entity);
-        this.finalRow = finalRow;
+        this.resultRowValues = resultRowValues;
     }
 
     @NotNull
-    public Object[] getFinalRow() {
-        return finalRow;
+    public Object[] getResultRowValues() {
+        return resultRowValues;
     }
 
 }

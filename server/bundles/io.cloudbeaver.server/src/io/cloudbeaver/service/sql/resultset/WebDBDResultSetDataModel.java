@@ -26,12 +26,14 @@ import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.data.DBDAttributeBinding;
 import org.jkiss.dbeaver.model.data.DBDValueRow;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class WebDBDResultSetDataModel extends WebAbstractDBDResultSetModel {
     private final List<WebSQLResultsRow> addedRows;
     private final List<WebSQLResultsRow> updatedRows;
     private final List<WebSQLResultsRow> deletedRows;
+    private final List<WebSQLResultsRow> allRows;
 
     public WebDBDResultSetDataModel(
         @NotNull WebSQLContextInfo contextInfo,
@@ -44,12 +46,22 @@ public class WebDBDResultSetDataModel extends WebAbstractDBDResultSetModel {
         this.addedRows = addedRows == null ? List.of() : addedRows;
         this.updatedRows = updatedRows == null ? List.of() : updatedRows;
         this.deletedRows = deletedRows == null ? List.of() : deletedRows;
+        List<WebSQLResultsRow> rows = new ArrayList<>(
+            this.addedRows.size() + this.updatedRows.size() + this.deletedRows.size()
+        );
+        rows.addAll(this.addedRows);
+        rows.addAll(this.updatedRows);
+        rows.addAll(this.deletedRows);
+        for (int i = 0; i < rows.size(); i++) {
+            rows.get(i).setRowNumber(i);
+        }
+        this.allRows = List.copyOf(rows);
     }
 
     @NotNull
     @Override
     public List<WebSQLResultsRow> getAllRows() {
-        return List.of();
+        return allRows;
     }
 
     @NotNull
@@ -70,10 +82,10 @@ public class WebDBDResultSetDataModel extends WebAbstractDBDResultSetModel {
     @Nullable
     @Override
     public Object getCellValue(@NotNull DBDAttributeBinding attribute, @NotNull DBDValueRow row) throws DBException {
-        if (row instanceof WebSQLResultsRow webSQLResultsRow && webSQLResultsRow.getFinalRow() != null) {
+        if (row instanceof WebSQLResultsRow webSQLResultsRow && webSQLResultsRow.getResultRowValues() != null) {
             int position = resultsInfo.getAttributePosition(attribute);
             if (position >= 0) {
-                return webSQLResultsRow.getFinalRow()[position];
+                return webSQLResultsRow.getResultRowValues()[position];
             }
         }
         return super.getCellValue(attribute, row);

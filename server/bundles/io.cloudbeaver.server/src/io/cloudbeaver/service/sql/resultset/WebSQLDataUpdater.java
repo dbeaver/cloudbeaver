@@ -79,7 +79,7 @@ public class WebSQLDataUpdater extends DBDResultSetDataUpdater<WebSQLDataStateme
 
     @NotNull
     private static WebSQLQueryResultSetRow toResultSetRow(@NotNull WebSQLResultsRow row) {
-        Object[] values = row.getFinalRow() == null ? row.getValues() : row.getFinalRow();
+        Object[] values = row.getResultRowValues() == null ? row.getValues() : row.getResultRowValues();
         return new WebSQLQueryResultSetRow(values, row.getMetaData());
     }
 
@@ -90,8 +90,11 @@ public class WebSQLDataUpdater extends DBDResultSetDataUpdater<WebSQLDataStateme
         @NotNull WebSQLResultsRow row,
         @NotNull DBSEntity entity
     ) {
-        Object[] finalRow = Objects.requireNonNull(row.getFinalRow(), "Final row values were not loaded");
-        return new WebSQLDataStatementInfo(entity, finalRow);
+        Object[] resultRowValues = Objects.requireNonNull(
+            row.getResultRowValues(),
+            "Result row values were not loaded"
+        );
+        return new WebSQLDataStatementInfo(entity, resultRowValues);
     }
 
     @Nullable
@@ -110,10 +113,10 @@ public class WebSQLDataUpdater extends DBDResultSetDataUpdater<WebSQLDataStateme
 
     @Override
     protected void loadFinalRowValues(@NotNull WebSQLResultsRow row) throws DBException {
-        if (row.getFinalRow() != null) {
+        if (row.getResultRowValues() != null) {
             return;
         }
-        Object[] finalRow = getFinalRow(row);
+        Object[] resultRowValues = getResultRowValues(row);
         boolean added = addedRows.contains(row);
         Map<Integer, Object> originalValues = new HashMap<>();
         try (
@@ -126,23 +129,23 @@ public class WebSQLDataUpdater extends DBDResultSetDataUpdater<WebSQLDataStateme
             Map<Integer, DBDAttributeBinding> identifierAttributes = added
                 ? Collections.emptyMap()
                 : resolveIdentifierAttributes(session, row);
-            convertRowValues(session, row, finalRow, added, identifierAttributes, originalValues);
+            convertRowValues(session, row, resultRowValues, added, identifierAttributes, originalValues);
             DBDAttributeBinding documentAttribute = resultsInfo.getDocumentAttribute();
             if (added && documentAttribute != null && resultsInfo.getAttributePosition(documentAttribute) < 0) {
-                insertDocumentValues.put(row, createDocumentValue(session, documentAttribute, finalRow));
+                insertDocumentValues.put(row, createDocumentValue(session, documentAttribute, resultRowValues));
             }
         }
         row.setOriginalKeyValues(originalValues);
-        row.setFinalRow(finalRow);
+        row.setResultRowValues(resultRowValues);
     }
 
     @NotNull
-    private static Object[] getFinalRow(@NotNull WebSQLResultsRow row) {
-        Object[] finalRow = Arrays.copyOf(row.getValues(), row.getValues().length);
+    private static Object[] getResultRowValues(@NotNull WebSQLResultsRow row) {
+        Object[] resultRowValues = Arrays.copyOf(row.getValues(), row.getValues().length);
         for (Map.Entry<String, Object> entry : row.getUpdateValues().entrySet()) {
-            finalRow[CommonUtils.toInt(entry.getKey())] = entry.getValue();
+            resultRowValues[CommonUtils.toInt(entry.getKey())] = entry.getValue();
         }
-        return finalRow;
+        return resultRowValues;
     }
 
     @NotNull
@@ -225,7 +228,7 @@ public class WebSQLDataUpdater extends DBDResultSetDataUpdater<WebSQLDataStateme
     private void convertRowValues(
         @NotNull DBCSession session,
         @NotNull WebSQLResultsRow row,
-        @NotNull Object[] finalRow,
+        @NotNull Object[] resultRowValues,
         boolean added,
         @NotNull Map<Integer, DBDAttributeBinding> identifierAttributes,
         @NotNull Map<Integer, Object> originalValues
@@ -233,7 +236,7 @@ public class WebSQLDataUpdater extends DBDResultSetDataUpdater<WebSQLDataStateme
         BitSet positionsToConvert = new BitSet();
         identifierAttributes.keySet().forEach(positionsToConvert::set);
         if (added) {
-            positionsToConvert.set(0, finalRow.length);
+            positionsToConvert.set(0, resultRowValues.length);
         } else {
             for (String indexValue : row.getUpdateValues().keySet()) {
                 positionsToConvert.set(CommonUtils.toInt(indexValue));
@@ -247,7 +250,7 @@ public class WebSQLDataUpdater extends DBDResultSetDataUpdater<WebSQLDataStateme
             if (!added && attribute.getDataKind() == DBPDataKind.DOCUMENT
                 && attribute.getDataContainer() instanceof DBSDocumentLocator documentLocator) {
                 DBDDocument document = resolveDocumentValue(session, row, documentLocator);
-                finalRow[position] = document;
+                resultRowValues[position] = document;
                 if (identifierAttribute != null) {
                     originalValues.put(position, document);
                 }
@@ -259,11 +262,11 @@ public class WebSQLDataUpdater extends DBDResultSetDataUpdater<WebSQLDataStateme
                     }
                     originalValues.put(position, identifierValue);
                     if (!row.getUpdateValues().containsKey(String.valueOf(position))) {
-                        finalRow[position] = identifierValue;
+                        resultRowValues[position] = identifierValue;
                         continue;
                     }
                 }
-                finalRow[position] = convertInputCellValue(session, attribute, finalRow[position]);
+                resultRowValues[position] = convertInputCellValue(session, attribute, resultRowValues[position]);
             }
         }
     }

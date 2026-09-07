@@ -29,10 +29,11 @@ import java.util.Map;
  */
 public class WebSQLResultsRow implements DBDValueRow {
 
-    private Object[] data;
+    private Object[] data = new Object[0];
     private Map<String, Object> updateValues = Collections.emptyMap();
-    private Object[] finalRow;
+    private Object[] resultRowValues;
     private Map<Integer, Object> originalKeyValues = Collections.emptyMap();
+    private int rowNumber;
 
     @Nullable
     private Map<String, Object> metaData;
@@ -61,7 +62,11 @@ public class WebSQLResultsRow implements DBDValueRow {
 
     @Override
     public int getRowNumber() {
-        return 0;
+        return rowNumber;
+    }
+
+    public void setRowNumber(int rowNumber) {
+        this.rowNumber = rowNumber;
     }
 
     @NotNull
@@ -71,12 +76,12 @@ public class WebSQLResultsRow implements DBDValueRow {
     }
 
     @Nullable
-    public Object[] getFinalRow() {
-        return finalRow;
+    public Object[] getResultRowValues() {
+        return resultRowValues;
     }
 
-    public void setFinalRow(@NotNull Object[] finalRow) {
-        this.finalRow = finalRow;
+    public void setResultRowValues(@NotNull Object[] resultRowValues) {
+        this.resultRowValues = resultRowValues;
     }
 
     @Nullable

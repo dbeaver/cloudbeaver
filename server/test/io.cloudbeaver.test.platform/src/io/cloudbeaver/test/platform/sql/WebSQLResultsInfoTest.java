@@ -7,14 +7,40 @@
  */
 package io.cloudbeaver.test.platform.sql;
 
+import io.cloudbeaver.service.sql.WebSQLContextInfo;
 import io.cloudbeaver.service.sql.WebSQLResultsInfo;
+import io.cloudbeaver.service.sql.WebSQLResultsRow;
+import io.cloudbeaver.service.sql.resultset.WebDBDResultSetDataModel;
 import org.jkiss.dbeaver.model.data.DBDAttributeBinding;
 import org.jkiss.dbeaver.model.struct.DBSDataContainer;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import java.util.List;
+
 public class WebSQLResultsInfoTest {
+
+    @Test
+    public void updateModelPreservesRowsAndAssignsTheirOrder() {
+        WebSQLResultsRow addedRow = new WebSQLResultsRow();
+        WebSQLResultsRow updatedRow = new WebSQLResultsRow();
+        WebSQLResultsRow deletedRow = new WebSQLResultsRow();
+
+        WebDBDResultSetDataModel model = new WebDBDResultSetDataModel(
+            Mockito.mock(WebSQLContextInfo.class),
+            Mockito.mock(WebSQLResultsInfo.class),
+            List.of(addedRow),
+            List.of(updatedRow),
+            List.of(deletedRow)
+        );
+
+        Assertions.assertEquals(List.of(addedRow, updatedRow, deletedRow), model.getAllRows());
+        Assertions.assertEquals(0, addedRow.getRowNumber());
+        Assertions.assertEquals(1, updatedRow.getRowNumber());
+        Assertions.assertEquals(2, deletedRow.getRowNumber());
+        Assertions.assertEquals(0, new WebSQLResultsRow().getValues().length);
+    }
 
     @Test
     public void rowPositionDoesNotDependOnBindingOrdinal() throws Exception {
