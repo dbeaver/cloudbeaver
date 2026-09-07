@@ -43,6 +43,24 @@ jobs:
     uses: ./.github/workflows/frontend-lint.yml
     secrets: inherit
 
+  required-builds:
+    name: Required Builds
+    if: ${{ always() && github.event.pull_request.draft != true }}
+    needs: [build-server, build-frontend]
+    runs-on: ubuntu-latest
+    permissions: {}
+    steps:
+      - name: Verify required builds
+        env:
+          SERVER_RESULT: ${{ needs.build-server.result }}
+          FRONTEND_RESULT: ${{ needs.build-frontend.result }}
+        run: |
+          if [[ "$SERVER_RESULT" != "success" || "$FRONTEND_RESULT" != "success" ]]; then
+            echo "Server build: $SERVER_RESULT"
+            echo "Frontend build: $FRONTEND_RESULT"
+            exit 1
+          fi
+
   # call-frontend-tests:
   #   name: Frontend Unit Tests
   #   needs: call-frontend-build

@@ -1,24 +1,19 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 
-.coloredContainer {
-  flex: 1;
-  overflow: auto;
-}
-
-.group {
-  max-height: 100%;
-}
-
 .propertiesTable {
-  padding-top: 8px;
+  composes: theme-border-color-background from global;
   max-height: 100%;
+  overflow: hidden;
   box-sizing: border-box;
+  border: 1px solid;
+  border-radius: 8px;
+  padding-block: 8px;
 }
 
 .propertiesList {

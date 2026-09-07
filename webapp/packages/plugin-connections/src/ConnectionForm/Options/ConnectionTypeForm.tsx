@@ -8,7 +8,7 @@
 
 import { observer } from 'mobx-react-lite';
 
-import { Container, Group, GroupTitle, Select, useResource, useTranslate } from '@cloudbeaver/core-blocks';
+import { GroupTitle, Select, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import { useService } from '@cloudbeaver/core-di';
 import { isNotNullDefined } from '@dbeaver/js-helpers';
@@ -28,21 +28,19 @@ export const ConnectionTypeForm = observer<Props>(function ConnectionTypeForm({ 
   const types = connectionTypeResource.data.filter(isNotNullDefined);
 
   return (
-    <Group form gap>
+    <div className="tw:flex tw:flex-col tw:gap-2">
       <GroupTitle>{translate('plugin_connections_connection_type_label')}</GroupTitle>
-      <Container gap dense>
-        <Select
-          items={types}
-          name="connectionType"
-          state={config}
-          keySelector={t => t.id}
-          valueSelector={t => (t.id === DEFAULT_TYPE_ID ? `${t.name} (${translate('ui_default')})` : t.name)}
-          iconSelector={t => {
-            const color = connectionTypeService.getTypeColor(t.id);
-            return <ColorIndicator className="tw:w-3.5! tw:h-3.5!" color={color ?? MAPPED_PREDEFINED_UNSET_COLOR} />;
-          }}
-        />
-      </Container>
-    </Group>
+      <Select
+        items={types}
+        name="connectionType"
+        state={config}
+        keySelector={t => t.id}
+        valueSelector={t => (t.id === DEFAULT_TYPE_ID ? `${t.name} (${translate('ui_default')})` : t.name)}
+        iconSelector={t => {
+          const color = connectionTypeService.getTypeColor(t.id);
+          return <ColorIndicator className="tw:w-3.5! tw:h-3.5!" color={color ?? MAPPED_PREDEFINED_UNSET_COLOR} />;
+        }}
+      />
+    </div>
   );
 });

@@ -9,14 +9,11 @@ import React from 'react';
 
 import { AdministrationItemService, type IAdministrationItem } from '@cloudbeaver/core-administration';
 import { type AdminUser, TeamsResource, UsersResource } from '@cloudbeaver/core-authentication';
-import { ConfirmationDialog, PlaceholderContainer } from '@cloudbeaver/core-blocks';
+import { PlaceholderContainer } from '@cloudbeaver/core-blocks';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { TabsContainer } from '@cloudbeaver/core-ui';
-import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 
-import { CreateTeamService } from './Teams/TeamsTable/CreateTeamService.js';
 import { EUsersAdministrationSub, UsersAdministrationNavigationService } from './UsersAdministrationNavigationService.js';
-import { CreateUserService } from './UsersTable/CreateUserService.js';
 import type { IUserFilters } from './UsersTable/Filters/useUsersTableFilters.js';
 
 const UserCredentialsList = React.lazy(async () => {
@@ -47,7 +44,7 @@ export interface IUsersActionButtonProps {
   filters: IUserFilters;
 }
 
-@injectable(() => [AdministrationItemService, CreateUserService, TeamsResource, CreateTeamService, UsersResource, CommonDialogService])
+@injectable(() => [AdministrationItemService, TeamsResource, UsersResource])
 export class UsersAdministrationService extends Bootstrap {
   readonly tabsContainer: TabsContainer;
   readonly userDetailsInfoPlaceholder: PlaceholderContainer<IUserDetailsInfoProps>;
@@ -57,11 +54,8 @@ export class UsersAdministrationService extends Bootstrap {
 
   constructor(
     private readonly administrationItemService: AdministrationItemService,
-    private readonly createUserService: CreateUserService,
     private readonly teamsResource: TeamsResource,
-    private readonly createTeamService: CreateTeamService,
     private readonly usersResource: UsersResource,
-    private readonly commonDialogService: CommonDialogService,
   ) {
     super();
     this.userDetailsInfoPlaceholder = new PlaceholderContainer();
@@ -80,14 +74,11 @@ export class UsersAdministrationService extends Bootstrap {
         },
         {
           name: EUsersAdministrationSub.Users,
-          canDeActivate: () => this.handleDeactivate(EUsersAdministrationSub.Users),
-          onDeActivate: this.cancelUserCreate.bind(this),
+          onDeActivate: this.handleUsersDeactivate.bind(this),
         },
         {
           name: EUsersAdministrationSub.Teams,
-          canDeActivate: () => this.handleDeactivate(EUsersAdministrationSub.Teams),
-          onActivate: this.loadTeams.bind(this),
-          onDeActivate: this.cancelTeamCreate.bind(this),
+          onDeActivate: this.handleTeamsDeactivate.bind(this),
         },
       ],
       defaultSub: EUsersAdministrationSub.Users,
@@ -98,53 +89,15 @@ export class UsersAdministrationService extends Bootstrap {
     this.actionButtonsPlaceholder.add(UsersTableFilterButton, 0);
   }
 
-  private async handleDeactivate(sub: EUsersAdministrationSub) {
-    if (sub === EUsersAdministrationSub.Users || sub === EUsersAdministrationSub.Teams) {
-      const users = sub === EUsersAdministrationSub.Users;
-      const edited = users ? this.createUserService.state?.isChanged : this.createTeamService.data?.isChanged;
-
-      if (edited) {
-        const { status } = await this.commonDialogService.open(ConfirmationDialog, {
-          title: 'ui_discard_changes',
-          message: 'ui_discard_changes_message',
-          confirmActionText: 'ui_discard',
-          cancelActionText: 'ui_keep_editing',
-        });
-
-        if (status === DialogueStateResult.Rejected) {
-          return false;
-        }
-      }
-
-      return true;
-    }
-
-    return true;
-  }
-
-  private cancelUserCreate(param: string | null, configurationWizard: boolean, outside: boolean) {
-    if (param === 'create') {
-      this.createUserService.close();
-    }
-
+  private handleUsersDeactivate(param: string | null, configurationWizard: boolean, outside: boolean) {
     if (outside) {
       this.usersResource.cleanNewFlags();
     }
   }
 
-  private cancelTeamCreate(param: string | null, configurationWizard: boolean, outside: boolean) {
-    if (param === 'create') {
-      this.createTeamService.dispose();
-    }
-
+  private handleTeamsDeactivate(param: string | null, configurationWizard: boolean, outside: boolean) {
     if (outside) {
       this.teamsResource.cleanNewFlags();
-    }
-  }
-
-  private loadTeams(param: string | null) {
-    if (param === 'create') {
-      this.createTeamService.fillData();
     }
   }
 }

@@ -10,8 +10,6 @@ import { observer } from 'mobx-react-lite';
 import { useMemo, useState } from 'react';
 
 import {
-  ColoredContainer,
-  Group,
   type IProperty,
   PropertiesTable,
   PropertiesTableStyles,
@@ -26,6 +24,7 @@ import { type TabContainerPanelComponent, useTab } from '@cloudbeaver/core-ui';
 import { uuid } from '@cloudbeaver/core-utils';
 
 import styles from './DriverProperties.module.css';
+import { ConnectionSectionWrapper } from '../ConnectionSectionWrapper.js';
 import { getConnectionFormDriverPropertiesPart } from './getConnectionFormDriverPropertiesPart.js';
 import type { IConnectionFormProps } from '../IConnectionFormState.js';
 import { getConnectionFormOptionsPart } from '../Options/getConnectionFormOptionsPart.js';
@@ -110,8 +109,8 @@ export const DriverProperties: TabContainerPanelComponent<IConnectionFormProps> 
   useAutoLoad(DriverProperties, propertiesState, selected, undefined, true);
 
   return (
-    <ColoredContainer className={s(style, { coloredContainer: true })} parent>
-      <Group className={s(style, { group: true })} box large>
+    <div className="tw:flex tw:flex-1 tw:overflow-auto">
+      <ConnectionSectionWrapper className="tw:max-w-3xl!">
         <SContext registry={registry}>
           <PropertiesTable
             className={s(style, { propertiesTable: true })}
@@ -123,7 +122,7 @@ export const DriverProperties: TabContainerPanelComponent<IConnectionFormProps> 
             onRemove={state.remove}
           />
         </SContext>
-      </Group>
-    </ColoredContainer>
+      </ConnectionSectionWrapper>
+    </div>
   );
 });

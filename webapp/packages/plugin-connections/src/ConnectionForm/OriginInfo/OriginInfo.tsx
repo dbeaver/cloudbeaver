@@ -11,7 +11,6 @@ import { AUTH_PROVIDER_LOCAL_ID, AuthProvidersResource, UserInfoResource } from 
 import {
   ColoredContainer,
   ExceptionMessage,
-  Group,
   Loader,
   ObjectPropertyInfoForm,
   s,
@@ -75,7 +74,7 @@ export const OriginInfo: TabContainerPanelComponent<IConnectionFormProps> = obse
 
   if (connection.isLoading()) {
     return (
-      <ColoredContainer className={s(style, { coloredContainer: true })}>
+      <ColoredContainer className={s(style, { coloredContainer: true })} surface>
         <Loader key="static" className={s(style, { loader: true })} />
       </ColoredContainer>
     );
@@ -83,7 +82,7 @@ export const OriginInfo: TabContainerPanelComponent<IConnectionFormProps> = obse
 
   if (connection.exception) {
     return (
-      <ColoredContainer className={s(style, { coloredContainer: true })}>
+      <ColoredContainer className={s(style, { coloredContainer: true })} surface>
         <ExceptionMessage exception={connection.exception} onRetry={connection.reload} />
       </ColoredContainer>
     );
@@ -91,7 +90,7 @@ export const OriginInfo: TabContainerPanelComponent<IConnectionFormProps> = obse
 
   if (!isAuthenticated) {
     return (
-      <ColoredContainer className={s(style, { coloredContainer: true })} parent>
+      <ColoredContainer className={s(style, { coloredContainer: true })} parent surface>
         <TextPlaceholder>
           {translate('plugin_connections_connection_cloud_auth_required', undefined, {
             providerLabel: providerLoader.data?.label,
@@ -103,22 +102,22 @@ export const OriginInfo: TabContainerPanelComponent<IConnectionFormProps> = obse
 
   if (!connectionOriginDetailsResource.data?.origin.details || connectionOriginDetailsResource.data?.origin.details.length === 0) {
     return (
-      <ColoredContainer className={s(style, { coloredContainer: true })} parent>
+      <ColoredContainer className={s(style, { coloredContainer: true })} parent surface>
         <TextPlaceholder>{translate('core_connections_connection_no_information')}</TextPlaceholder>
       </ColoredContainer>
     );
   }
 
   return (
-    <ColoredContainer className={s(style, { coloredContainer: true })} parent>
-      <Group large gap>
+    <ColoredContainer className={s(style, { coloredContainer: true })} parent surface>
+      <div className="tw:flex tw:w-full tw:max-w-xl tw:flex-col tw:p-6">
         <ObjectPropertyInfoForm
           properties={connectionOriginDetailsResource.data.origin.details}
           readOnly
           small
           autoHide
         />
-      </Group>
+      </div>
       <Loader key="overlay" className={s(style, { loader: true })} loading={connection.isLoading()} overlay />
     </ColoredContainer>
   );
