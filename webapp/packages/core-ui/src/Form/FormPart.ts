@@ -46,6 +46,7 @@ export abstract class FormPart<TPartState extends object, TFormState = any> impl
     this.schema = schema;
 
     this.formState.submitTask.addHandler(executorHandlerFilter(() => this.isLoaded(), this.save.bind(this)));
+    this.formState.prepareTask.addHandler(executorHandlerFilter(() => this.isLoaded(), this.prepare.bind(this)));
     this.formState.formatTask.addHandler(executorHandlerFilter(() => this.isLoaded() && this.isChanged, this.format.bind(this)));
     this.formState.validationTask.addHandler(executorHandlerFilter(() => this.isLoaded(), this.handleValidation.bind(this)));
 
@@ -203,6 +204,7 @@ export abstract class FormPart<TPartState extends object, TFormState = any> impl
     this.state = state;
   }
 
+  protected prepare(data: IFormState<TFormState>, contexts: IExecutionContextProvider<IFormState<TFormState>>): void | Promise<void> {}
   protected format(data: IFormState<TFormState>, contexts: IExecutionContextProvider<IFormState<TFormState>>): void | Promise<void> {}
   protected validate(data: IFormState<TFormState>, contexts: IExecutionContextProvider<IFormState<TFormState>>): void | Promise<void> {}
 
