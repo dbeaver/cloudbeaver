@@ -542,20 +542,20 @@ public class WebSQLUtils {
         @NotNull Object cellRawValue,
         boolean justGenerateScript
     ) throws DBCException {
-        cellRawValue = makePlainCellValue(session, updateAttribute, cellRawValue);
-        Object realCellValue = cellRawValue;
+        Object plainCellValue = makePlainCellValue(session, updateAttribute, cellRawValue);
+        Object realCellValue = plainCellValue;
         // In some cases we already have final value here
         if (!(realCellValue instanceof DBDValue)) {
             try {
                 realCellValue = updateAttribute.getValueHandler().getValueFromObject(
                     session,
                     updateAttribute,
-                    cellRawValue,
+                    plainCellValue,
                     false,
                     true
                 );
                 //FIXME: fix array editing for nosql databases
-                if (realCellValue == null && cellRawValue != null && updateAttribute.getDataKind() == DBPDataKind.ARRAY) {
+                if (realCellValue == null && plainCellValue != null && updateAttribute.getDataKind() == DBPDataKind.ARRAY) {
                     throw new DBCException("Array update is not supported");
                 }
             } catch (DBCException e) {
@@ -585,13 +585,11 @@ public class WebSQLUtils {
         for (int j = 0; j < attributes.length; j++) {
             DBDAttributeBinding attr = attributes[j];
             Object plainValue = makePlainCellValue(session, attr, row.getValues()[j]);
-            if (plainValue instanceof DBDDocument dbdDocument) {
+            if (plainValue instanceof DBDDocument dbdDocument && dataContainer.isDocumentValid(dbdDocument)) {
                 // FIXME: Hack for DynamoDB. We pass entire document as a key
                 // FIXME: Let's just return it back for now
-                if (dataContainer.isDocumentValid(dbdDocument)) {
-                    document = dbdDocument;
-                    break;
-                }
+                document = dbdDocument;
+                break;
             }
             keyMap.put(attr.getName(), plainValue);
         }

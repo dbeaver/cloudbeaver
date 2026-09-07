@@ -110,10 +110,10 @@ class WebSQLQueryDataReceiver implements DBDDataReceiver {
                 }
             }
         }
-        if (realAttr != null) {
-            if (realAttr.getDataKind() == DBPDataKind.DOCUMENT || realAttr.getDataKind() == DBPDataKind.CONTENT) {
-                documentAttribute = realAttr;
-            }
+        if (realAttr != null &&
+            (realAttr.getDataKind() == DBPDataKind.DOCUMENT || realAttr.getDataKind() == DBPDataKind.CONTENT)
+        ) {
+            documentAttribute = realAttr;
         }
         if (dbResult instanceof DBCResultSetTrace resultSetTrace) {
             this.trace = resultSetTrace.getExecutionTrace();

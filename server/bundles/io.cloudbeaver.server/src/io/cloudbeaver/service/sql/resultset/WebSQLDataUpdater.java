@@ -338,7 +338,12 @@ public class WebSQLDataUpdater extends DBDResultSetDataUpdater<WebSQLDataStateme
                 throw new DBException("File ID is invalid");
             }
             try {
-                value = Files.newInputStream(path);
+                return WebSQLUtils.convertInputCellValue(
+                    session,
+                    attribute,
+                    Files.newInputStream(path),
+                    generateScript
+                );
             } catch (IOException e) {
                 throw new DBException("Error reading uploaded file", e);
             }
@@ -372,7 +377,7 @@ public class WebSQLDataUpdater extends DBDResultSetDataUpdater<WebSQLDataStateme
     @Override
     protected DBDDataReceiver getKeyReceiver(@NotNull DBDDataStatementInfo statement) {
         if (statement instanceof WebSQLDataStatementInfo webStatement) {
-            return new KeyDataReceiver(model.getAttributes(), webStatement.getFinalRow());
+            return new KeyDataReceiver(model.getAttributes(), webStatement);
         }
         return null;
     }
