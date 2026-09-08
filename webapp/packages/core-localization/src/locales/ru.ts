@@ -98,7 +98,7 @@ export default [
   ['ui_discard_changes', 'Отменить изменения'],
   ['ui_discard_changes_message', 'Вы собираетесь отменить несохраненные изменения. Вы уверены?'],
   ['ui_discard', 'Отменить'],
-  ['ui_keep_editing', 'Продолжить редактирование'],
+  ['ui_keep_editing', 'Продолжить'],
   ['ui_yes', 'Да'],
   ['ui_no', 'Нет'],
   ['ui_select_all', 'Выбрать все'],

@@ -29,7 +29,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.Part;
 import org.eclipse.jetty.ee11.servlet.ServletContextRequest;
-import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
@@ -42,7 +41,6 @@ import org.jkiss.utils.IOUtils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
-import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.Map;
 
@@ -104,7 +102,7 @@ public class WebFSServlet extends WebServiceServletBase {
                 if (CommonUtils.isEmpty(fileName)) {
                     continue;
                 }
-                Path safeTarget = resolveSafeChild(path, fileName);
+                Path safeTarget = WebFSUtils.resolveSafeChild(path, fileName);
                 try (InputStream is = part.getInputStream()) {
                     Files.copy(is, safeTarget);
                     node.addChildResource(safeTarget);
@@ -113,33 +111,6 @@ public class WebFSServlet extends WebServiceServletBase {
         } catch (Exception e) {
             throw new DBWebException("File Upload Failed: Unable to Save File to the File System",
                 CommonUtils.getRootCause(e));
-        }
-    }
-
-    @NotNull
-    private Path resolveSafeChild(@NotNull Path parent, @NotNull String submittedFileName) throws DBException {
-        Path candidate;
-        try {
-            candidate = Path.of(submittedFileName);
-        } catch (InvalidPathException e) {
-            throw new DBException("Invalid file name");
-        }
-        Path baseName = candidate.getFileName();
-        if (baseName == null || baseName.toString().isBlank()) {
-            throw new DBException("Invalid file name");
-        }
-        if (submittedFileName.isBlank()
-            || ".".equals(submittedFileName)
-            || "..".equals(submittedFileName)
-            || submittedFileName.indexOf('/') >= 0
-            || submittedFileName.indexOf('\\') >= 0
-        ) {
-            throw new DBException("Invalid file name");
-        }
-        try {
-            return parent.normalize().resolve(submittedFileName).normalize();
-        } catch (InvalidPathException e) {
-            throw new DBException("Invalid file name");
         }
     }
 

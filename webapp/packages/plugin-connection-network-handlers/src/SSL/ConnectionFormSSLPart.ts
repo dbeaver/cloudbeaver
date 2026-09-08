@@ -14,7 +14,6 @@ import { getSSLDriverHandler } from './getSSLDriverHandler.js';
 import { ConnectionInfoNetworkHandlersResource, type DBDriverResource } from '@cloudbeaver/core-connections';
 import { type INetworkHandlerConfig, type NetworkHandlerResource } from '@cloudbeaver/plugin-network-handlers';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
-import { trimObjectValues } from '@cloudbeaver/core-utils';
 import { makeObservable, observable, toJS } from 'mobx';
 import { ConnectionFormOptionsPart, PROPERTY_FEATURE_SECURED, type IConnectionFormState } from '@cloudbeaver/plugin-connections';
 import { SSL_CODE_NAME } from './SSL_CODE_NAME.js';
@@ -96,7 +95,7 @@ export class ConnectionFormSSLPart extends FormPart<INetworkHandlerConfig, IConn
     this.setInitialState(initialConfig ?? getDefaultState());
   }
 
-  protected override async prepare(
+  protected override async format(
     data: IFormState<IConnectionFormState>,
     contexts: IExecutionContextProvider<IFormState<IConnectionFormState>>,
   ): Promise<void> {
@@ -159,15 +158,10 @@ export class ConnectionFormSSLPart extends FormPart<INetworkHandlerConfig, IConn
       this.formState.state.requiredNetworkHandlersIds = this.formState.state.requiredNetworkHandlersIds.filter(id => id !== this.state.id);
     }
 
-    this.optionsPart.state.networkHandlersConfig!.push(handlerConfig);
-  }
-
-  protected override format(): void {
-    trimSSLConfig(this.state);
-
-    const handlerConfig = this.optionsPart.state.networkHandlersConfig?.find(config => config.id === this.state.id);
     if (handlerConfig) {
       trimSSLConfig(handlerConfig);
+
+      this.optionsPart.state.networkHandlersConfig!.push(handlerConfig);
     }
   }
 
@@ -184,7 +178,15 @@ function trimSSLConfig(input: INetworkHandlerConfig): INetworkHandlerConfig {
     return input;
   }
 
-  trimObjectValues(secureProperties);
+  if (!Object.keys(secureProperties).length) {
+    return input;
+  }
+
+  for (const key in secureProperties) {
+    if (typeof secureProperties[key] === 'string') {
+      secureProperties[key] = secureProperties[key]?.trim();
+    }
+  }
 
   return input;
 }

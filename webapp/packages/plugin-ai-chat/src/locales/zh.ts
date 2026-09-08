@@ -1,7 +1,7 @@
 export default [
   ['plugin_ai_chat_label', 'AI Chat'],
   ['plugin_ai_chat_tooltip', 'Activate AI Database assistant'],
-  ['plugin_ai_chat_no_messages_placeholder', 'What can I help with?'],
+  ['plugin_ai_chat_no_messages_placeholder', '从数据中获取洞察。让 AI 为您的数据库生成查询。'],
   ['plugin_ai_chat_genegate_message_placeholder', 'Thinking...'],
   ['plugin_ai_chat_submit_message_placeholder', 'Press {arg:symbol}↵ to submit your message, press Enter to add a new line'],
   ['plugin_ai_chat_current_conversation_hint', 'Current'],

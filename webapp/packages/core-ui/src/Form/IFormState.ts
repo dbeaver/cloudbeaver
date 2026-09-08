@@ -33,7 +33,6 @@ export interface IFormState<TState> {
   readonly loadedTask: IExecutor<IFormState<TState>>;
   readonly formStateTask: IExecutor<TState>;
   readonly submitTask: IExecutor<IFormState<TState>>;
-  readonly prepareTask: IExecutor<IFormState<TState>>;
   readonly formatTask: IExecutor<IFormState<TState>>;
   readonly validationTask: IExecutor<IFormState<TState>>;
 
