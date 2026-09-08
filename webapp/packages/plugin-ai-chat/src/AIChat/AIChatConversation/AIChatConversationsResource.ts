@@ -48,9 +48,8 @@ export class AIChatConversationsResource extends CachedMapResource<string, AICha
 
     aiProfilesResource.onItemDelete.addHandler(key => {
       const deletedProfileIds = ResourceKeyUtils.toArray(key);
-      const conversationIds = this.values
-        .filter(conversation => conversation.profile && deletedProfileIds.includes(conversation.profile))
-        .map(conversation => conversation.id);
+      const conversations = this.values.filter(conversation => conversation.profile && deletedProfileIds.includes(conversation.profile));
+      const conversationIds = conversations.map(conversation => conversation.id);
 
       this.markOutdated(resourceKeyList(conversationIds));
     });

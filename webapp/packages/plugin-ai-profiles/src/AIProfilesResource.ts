@@ -16,16 +16,18 @@ import {
   type AiConfigurationProfileInput,
   GraphQLService,
 } from '@cloudbeaver/core-sdk';
+import { AISettingsResource } from '@cloudbeaver/plugin-ai';
 
 export type AIProfile = AiConfigurationProfileInfo;
 
-@injectable(() => [GraphQLService, ServerConfigResource, WorkspaceConfigEventHandler, UserInfoResource])
+@injectable(() => [GraphQLService, ServerConfigResource, WorkspaceConfigEventHandler, UserInfoResource, AISettingsResource])
 export class AIProfilesResource extends CachedMapResource<string, AIProfile> {
   constructor(
     private readonly graphQLService: GraphQLService,
     serverConfigResource: ServerConfigResource,
     workspaceConfigEventHandler: WorkspaceConfigEventHandler,
     userInfoResource: UserInfoResource,
+    private readonly aiSettingsResource: AISettingsResource,
   ) {
     super();
 
@@ -40,8 +42,12 @@ export class AIProfilesResource extends CachedMapResource<string, AIProfile> {
   }
 
   async createProfile(config: AiConfigurationProfileInput): Promise<AiAdminConfigurationProfileInfo> {
+    const firstProfile = this.values.length === 0;
     const { profile } = await this.graphQLService.sdk.createAiProfile({ config });
     this.set(profile.id, { ...profile, credentialsSaved: false });
+    if (firstProfile) {
+      this.aiSettingsResource.markOutdated();
+    }
     return profile;
   }
 
