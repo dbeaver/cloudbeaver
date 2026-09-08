@@ -10,11 +10,11 @@ import { act, useCallback, useMemo } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { INode } from './INode.js';
-import type { INodeState } from './INodeState.js';
-import type { ITreeData } from './ITreeData.js';
-import type { ITree } from './useTree.js';
-import { type ITreeKeyboardNavigation, useTreeKeyboardNavigation } from '../useTreeKeyboardNavigation.js';
+import type { INode } from './TreeNew/INode.js';
+import type { INodeState } from './TreeNew/INodeState.js';
+import type { ITreeData } from './TreeNew/ITreeData.js';
+import type { ITree } from './TreeNew/useTree.js';
+import { type ITreeKeyboardNavigation, useTreeKeyboardNavigation } from './useTreeKeyboardNavigation.js';
 
 interface ITestTree {
   data: ITreeData;
