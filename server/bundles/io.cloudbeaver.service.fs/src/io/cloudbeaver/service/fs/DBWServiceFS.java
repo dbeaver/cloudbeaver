@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package io.cloudbeaver.service.fs;
 
 import io.cloudbeaver.DBWebException;
+import io.cloudbeaver.WebAction;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.service.DBWService;
 import io.cloudbeaver.service.fs.model.FSFile;
@@ -27,11 +28,13 @@ import org.jkiss.code.NotNull;
  * Web service API
  */
 public interface DBWServiceFS extends DBWService {
+    @WebAction
     @NotNull
     FSFileSystem[] getAvailableFileSystems(@NotNull WebSession webSession, @NotNull String projectId)
         throws DBWebException;
 
 
+    @WebAction
     @NotNull
     FSFileSystem getFileSystem(
         @NotNull WebSession webSession,
@@ -39,24 +42,28 @@ public interface DBWServiceFS extends DBWService {
         @NotNull String fileSystemId
     ) throws DBWebException;
 
+    @WebAction
     @NotNull
     FSFile getFile(
         @NotNull WebSession webSession,
         @NotNull String nodePath
     ) throws DBWebException;
 
+    @WebAction
     @NotNull
     FSFile[] getFiles(
         @NotNull WebSession webSession,
         @NotNull String nodePath
     ) throws DBWebException;
 
+    @WebAction
     @NotNull
     String readFileContent(
         @NotNull WebSession webSession,
         @NotNull String nodePath
     ) throws DBWebException;
 
+    @WebAction
     FSFile writeFileContent(
         @NotNull WebSession webSession,
         @NotNull String nodePath,
@@ -64,6 +71,7 @@ public interface DBWServiceFS extends DBWService {
         boolean forceOverwrite
     ) throws DBWebException;
 
+    @WebAction
     @NotNull
     FSFile createFile(
         @NotNull WebSession webSession,
@@ -71,24 +79,28 @@ public interface DBWServiceFS extends DBWService {
         @NotNull String fileName
     ) throws DBWebException;
 
+    @WebAction
     FSFile moveFile(
         @NotNull WebSession webSession,
         @NotNull String nodePath,
         @NotNull String parentNodePath
     ) throws DBWebException;
 
+    @WebAction
     FSFile renameFile(
         @NotNull WebSession webSession,
         @NotNull String nodePath,
         @NotNull String newName
     ) throws DBWebException;
 
+    @WebAction
     FSFile copyFile(
         @NotNull WebSession webSession,
         @NotNull String nodePath,
         @NotNull String parentNodePath
     ) throws DBWebException;
 
+    @WebAction
     @NotNull
     FSFile createFolder(
         @NotNull WebSession webSession,
@@ -96,6 +108,7 @@ public interface DBWServiceFS extends DBWService {
         @NotNull String folderName
     ) throws DBWebException;
 
+    @WebAction
     boolean deleteFile(
         @NotNull WebSession webSession,
         @NotNull String nodePath
