@@ -26,6 +26,7 @@ interface ITreeRovingFocus {
 export function useTreeRovingFocus(options: ITreeRovingFocusOptions = {}): ITreeRovingFocus {
   const optionsRef = useObjectRef(options);
   const rootRef = useRef<HTMLElement | null>(null);
+  const activeNodeIdRef = useRef<string | null>(null);
   const pendingNodeIdRef = useRef<string | null>(null);
   const focusedWithinRef = useRef(false);
   const observerRef = useRef<MutationObserver | null>(null);
@@ -60,6 +61,7 @@ export function useTreeRovingFocus(options: ITreeRovingFocusOptions = {}): ITree
     const activeElement = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     return (
       controls.find(element => element === activeElement) ??
+      controls.find(element => element.dataset['treeNodeId'] === activeNodeIdRef.current) ??
       controls.find(element => element.tabIndex === 0) ??
       controls.find(element => element.getAttribute('aria-selected') === 'true') ??
       controls[0]
@@ -73,6 +75,7 @@ export function useTreeRovingFocus(options: ITreeRovingFocusOptions = {}): ITree
       return false;
     }
 
+    activeNodeIdRef.current = nodeId;
     pendingNodeIdRef.current = null;
     setTabStop(root, control);
     control.focus();
@@ -92,7 +95,17 @@ export function useTreeRovingFocus(options: ITreeRovingFocusOptions = {}): ITree
       return;
     }
 
+    const activeElement = document.activeElement;
+    const activeControl = activeElement instanceof HTMLElement ? activeElement.closest<HTMLElement>(TREE_NODE_CONTROL_SELECTOR) : null;
+
+    if (activeControl && activeElement !== activeControl && root.contains(activeControl)) {
+      activeNodeIdRef.current = activeControl.dataset['treeNodeId'] ?? null;
+      setTabStop(root, undefined);
+      return;
+    }
+
     const tabStop = chooseTabStop(root);
+    activeNodeIdRef.current = tabStop?.dataset['treeNodeId'] ?? null;
     setTabStop(root, tabStop);
 
     if (focusedWithinRef.current && !root.contains(document.activeElement)) {
@@ -137,15 +150,17 @@ export function useTreeRovingFocus(options: ITreeRovingFocusOptions = {}): ITree
   function handleFocus(event: React.FocusEvent<HTMLElement>): void {
     focusedWithinRef.current = true;
     const target = event.target;
+    const control = target instanceof HTMLElement ? target.closest<HTMLElement>(TREE_NODE_CONTROL_SELECTOR) : null;
 
     if (
-      target instanceof HTMLElement &&
-      target.matches(TREE_NODE_CONTROL_SELECTOR) &&
-      target.dataset['treeNodeId'] &&
-      optionsRef.isFocusable?.(target.dataset['treeNodeId']) !== false
+      control &&
+      event.currentTarget.contains(control) &&
+      control.dataset['treeNodeId'] &&
+      optionsRef.isFocusable?.(control.dataset['treeNodeId']) !== false
     ) {
+      activeNodeIdRef.current = control.dataset['treeNodeId'];
       pendingNodeIdRef.current = null;
-      setTabStop(event.currentTarget, target);
+      setTabStop(event.currentTarget, target === control ? control : undefined);
     }
   }
 

@@ -14,6 +14,7 @@ import { useTreeRovingFocus } from './useTreeRovingFocus.js';
 interface IControl {
   id: string;
   selected?: boolean;
+  nestedFocusable?: boolean;
 }
 
 describe('useTreeRovingFocus', () => {
@@ -51,13 +52,17 @@ describe('useTreeRovingFocus', () => {
       'div',
       rovingFocus,
       controls.map(control =>
-        createElement('div', {
-          key: control.id,
-          'aria-selected': !!control.selected,
-          'data-tree-node-control': true,
-          'data-tree-node-id': control.id,
-          tabIndex: control.selected ? 0 : -1,
-        }),
+        createElement(
+          'div',
+          {
+            key: control.id,
+            'aria-selected': !!control.selected,
+            'data-tree-node-control': true,
+            'data-tree-node-id': control.id,
+            tabIndex: control.selected ? 0 : -1,
+          },
+          control.nestedFocusable ? createElement('button') : null,
+        ),
       ),
     );
   }
@@ -101,6 +106,20 @@ describe('useTreeRovingFocus', () => {
     expect(document.activeElement?.getAttribute('data-tree-node-id')).toBe('second');
     expect(container.querySelector<HTMLElement>('[data-tree-node-id="first"]')?.tabIndex).toBe(-1);
     expect(container.querySelector<HTMLElement>('[data-tree-node-id="second"]')?.tabIndex).toBe(0);
+  });
+
+  it('removes the tree item tab stop while tabbing through its nested controls', async () => {
+    await act(() => root.render(createElement(Navigation, { controls: [{ id: 'first' }, { id: 'second', nestedFocusable: true }] })));
+    const second = container.querySelector<HTMLElement>('[data-tree-node-id="second"]')!;
+
+    second.querySelector('button')!.focus();
+
+    expect(container.querySelector<HTMLElement>('[data-tree-node-id="first"]')?.tabIndex).toBe(-1);
+    expect(second.tabIndex).toBe(-1);
+
+    outside.focus();
+
+    expect(second.tabIndex).toBe(0);
   });
 
   it('focuses a node after reveal mounts it', async () => {

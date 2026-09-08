@@ -39,18 +39,26 @@ export function useTreeKeyboardNavigation(options: ITreeKeyboardNavigationOption
 
   async function handleKeyDownCapture(event: React.KeyboardEvent<HTMLElement>): Promise<void> {
     const arrowKey = ARROW_KEYS.includes(event.key);
+    let control: HTMLElement | null = null;
+
+    if (event.target instanceof HTMLElement) {
+      if (arrowKey) {
+        control = event.target.closest<HTMLElement>(TREE_NODE_CONTROL_SELECTOR);
+      } else if (event.target.matches(TREE_NODE_CONTROL_SELECTOR)) {
+        control = event.target;
+      }
+    }
 
     if (
       optionsRef.disabled ||
-      !(event.target instanceof HTMLElement) ||
-      !event.target.matches(TREE_NODE_CONTROL_SELECTOR) ||
+      !control ||
       (event.key === 'Enter' && (event.ctrlKey || event.metaKey)) ||
       (arrowKey && (event.altKey || event.ctrlKey || event.metaKey))
     ) {
       return;
     }
 
-    const nodeId = event.target.dataset['treeNodeId'];
+    const nodeId = control.dataset['treeNodeId'];
 
     if (!nodeId) {
       return;

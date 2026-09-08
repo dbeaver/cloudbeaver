@@ -90,6 +90,55 @@ describe('useTreeKeyboardNavigation', () => {
     expect(onKeyDown).not.toHaveBeenCalled();
   });
 
+  it('resumes arrow navigation from a focusable element inside a tree item', async () => {
+    const options = createOptions();
+    options.getParent = nodeId => (nodeId === 'root' ? null : 'root');
+    options.getChildren = nodeId => (nodeId === 'root' ? ['first', 'second'] : []);
+    options.isLeaf = () => true;
+    options.isFocusable = nodeId => nodeId !== 'root';
+
+    function Navigation() {
+      const handlers = useTreeKeyboardNavigation(options);
+      return createElement(
+        'div',
+        handlers,
+        createElement('div', { 'data-tree-node-control': true, 'data-tree-node-id': 'first', tabIndex: 0 }, createElement('button')),
+        createElement('div', { 'data-tree-node-control': true, 'data-tree-node-id': 'second', tabIndex: -1 }),
+      );
+    }
+
+    await act(() => root.render(createElement(Navigation)));
+    const nestedButton = container.querySelector('button')!;
+    nestedButton.focus();
+
+    expect(container.querySelector<HTMLElement>('[data-tree-node-id="first"]')?.tabIndex).toBe(-1);
+
+    nestedButton.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'ArrowDown' }));
+
+    expect(document.activeElement?.getAttribute('data-tree-node-id')).toBe('second');
+  });
+
+  it('does not intercept Enter on a focusable element inside a tree item', async () => {
+    const options = createOptions();
+    const onKeyDown = vi.fn();
+
+    function Navigation() {
+      const handlers = useTreeKeyboardNavigation(options);
+      return createElement(
+        'div',
+        handlers,
+        createElement('div', { 'data-tree-node-control': true, 'data-tree-node-id': 'child', tabIndex: 0 }, createElement('button', { onKeyDown })),
+      );
+    }
+
+    await act(() => root.render(createElement(Navigation)));
+    container.querySelector('button')!.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'Enter' }));
+
+    expect(onKeyDown).toHaveBeenCalledOnce();
+    expect(options.activateNode).not.toHaveBeenCalled();
+    expect(options.setExpanded).not.toHaveBeenCalled();
+  });
+
   it('does not handle keys when navigation is disabled', async () => {
     const options = createOptions();
     options.disabled = true;
