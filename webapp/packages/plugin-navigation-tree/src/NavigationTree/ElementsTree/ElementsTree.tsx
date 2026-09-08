@@ -19,7 +19,6 @@ import {
   Translate,
   TreeNodeNested,
   TreeNodeNestedMessage,
-  useMergeRefs,
   useS,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
@@ -28,6 +27,8 @@ import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events
 import { EObjectFeature, isProjectNode, type NavNode, NavNodeInfoResource, NavTreeResource, ROOT_NODE_PATH } from '@cloudbeaver/core-navigation-tree';
 import { DNDScrollContainer } from '@cloudbeaver/core-ui';
 
+import { TreeKeyboardNavigationContext } from '../../TreeKeyboardNavigationContext.js';
+import { useTreeKeyboardNavigation } from '../../useTreeKeyboardNavigation.js';
 import { useNavTreeDropBox } from '../useNavTreeDropBox.js';
 import style from './ElementsTree.module.css';
 import { ElementsTreeContentLoader } from './ElementsTreeContentLoader.js';
@@ -44,7 +45,6 @@ import { elementsTreeLimitRenderer } from './NavTreeLimitFilter/elementsTreeLimi
 import { useDropOutside } from './useDropOutside.js';
 import { type IElementsTree, type IElementsTreeOptions, useElementsTree } from './useElementsTree.js';
 import { useElementsTreeFolderExplorer } from './useElementsTreeFolderExplorer.js';
-import { useTreeKeyboardNavigation } from '../../useTreeKeyboardNavigation.js';
 
 export interface ElementsTreeProps extends IElementsTreeOptions, React.PropsWithChildren {
   /** Specifies the root path for the tree. ROOT_NODE_PATH will be used if not defined */
@@ -135,6 +135,7 @@ export const ElementsTree = observer(
       onClick,
     });
     const treeKeyboardNavigation = useTreeKeyboardNavigation({
+      rootId: root,
       getParent(nodeId) {
         if (nodeId === root) {
           return null;
@@ -160,25 +161,9 @@ export const ElementsTree = observer(
         const node = navNodeInfoResource.get(nodeId);
         return nodeId !== root && !!node && (tree.settings?.projects !== false || !isProjectNode(node));
       },
+      isSelected: nodeId => tree.isNodeSelected(nodeId),
       disabled: tree.disabled,
-      async setExpanded(nodeId, expanded) {
-        const node = navNodeInfoResource.get(nodeId);
-
-        if (node) {
-          await tree.expand(node, expanded);
-        }
-      },
-      activateNode: onOpen
-        ? async nodeId => {
-            const node = navNodeInfoResource.get(nodeId);
-
-            if (node) {
-              await tree.open(node, [], false);
-            }
-          }
-        : undefined,
     });
-    const treeMergedRef = useMergeRefs<HTMLDivElement>(setTreeRootRef);
 
     useImperativeHandle(ref, () => tree, [tree]);
 
@@ -218,49 +203,54 @@ export const ElementsTree = observer(
     return (
       <>
         <ElementsTreeTools tree={tree} settingsElements={settingsElements} />
-        <DNDScrollContainer ref={treeMergedRef} className={s(styles, { treeBox: true })} isDragging={!!dndBox.state.context}>
+        <DNDScrollContainer ref={setTreeRootRef} className={s(styles, { treeBox: true })} isDragging={!!dndBox.state.context}>
           <ElementsTreeContext.Provider value={context}>
-            <div
-              role="tree"
-              aria-label={navNodeInfoResource.get(root)?.name ?? translate('plugin_navigation_tree_explorer_tab_title')}
-              className={s(styles, { box: true }, className)}
-              {...treeKeyboardNavigation}
-              aria-multiselectable
-            >
-              <FolderExplorer state={folderExplorer}>
-                <div ref={dropOutside.mouse.reference} className={s(styles, { tree: true })} onClick={handleClick}>
-                  {settings?.showFolderExplorerPath && (
-                    <FolderExplorerPath className={s(styles, { folderExplorerPath: true })} getName={getName} canSkip={canSkip} />
-                  )}
-                  <div
-                    ref={dndBox.setRef}
-                    className={s(styles, {
-                      dropOutside: true,
-                      showDropOutside: dropOutside.showDropOutside,
-                      active: !!dropOutside.zoneActive,
-                      bottom: dropOutside.bottom,
-                    })}
-                  >
-                    <TreeNodeNested root>
-                      <TreeNodeNestedMessage>
-                        <Translate token="app_navigationTree_drop_here" />
-                      </TreeNodeNestedMessage>
-                    </TreeNodeNested>
-                  </div>
-                  <ElementsTreeContentLoader context={context} emptyPlaceholder={emptyPlaceholder} childrenState={tree}>
-                    <div className={s(styles, { treeElements: true })}>
-                      <NavigationNodeNested
-                        ref={dropOutside.nestedRef}
-                        nodeId={root}
-                        component={NavigationNodeElement}
-                        path={folderExplorer.state.path}
-                        root
-                      />
+            <TreeKeyboardNavigationContext.Provider value={treeKeyboardNavigation}>
+              <div
+                ref={treeKeyboardNavigation.setRootRef}
+                role="tree"
+                aria-label={navNodeInfoResource.get(root)?.name ?? translate('plugin_navigation_tree_explorer_tab_title')}
+                tabIndex={treeKeyboardNavigation.activeNodeMounted ? -1 : 0}
+                className={s(styles, { box: true }, className)}
+                onFocusCapture={treeKeyboardNavigation.onFocusCapture}
+                onKeyDown={treeKeyboardNavigation.onKeyDown}
+                aria-multiselectable
+              >
+                <FolderExplorer state={folderExplorer}>
+                  <div ref={dropOutside.mouse.reference} className={s(styles, { tree: true })} onClick={handleClick}>
+                    {settings?.showFolderExplorerPath && (
+                      <FolderExplorerPath className={s(styles, { folderExplorerPath: true })} getName={getName} canSkip={canSkip} />
+                    )}
+                    <div
+                      ref={dndBox.setRef}
+                      className={s(styles, {
+                        dropOutside: true,
+                        showDropOutside: dropOutside.showDropOutside,
+                        active: !!dropOutside.zoneActive,
+                        bottom: dropOutside.bottom,
+                      })}
+                    >
+                      <TreeNodeNested root>
+                        <TreeNodeNestedMessage>
+                          <Translate token="app_navigationTree_drop_here" />
+                        </TreeNodeNestedMessage>
+                      </TreeNodeNested>
                     </div>
-                  </ElementsTreeContentLoader>
-                </div>
-              </FolderExplorer>
-            </div>
+                    <ElementsTreeContentLoader context={context} emptyPlaceholder={emptyPlaceholder} childrenState={tree}>
+                      <div className={s(styles, { treeElements: true })}>
+                        <NavigationNodeNested
+                          ref={dropOutside.nestedRef}
+                          nodeId={root}
+                          component={NavigationNodeElement}
+                          path={folderExplorer.state.path}
+                          root
+                        />
+                      </div>
+                    </ElementsTreeContentLoader>
+                  </div>
+                </FolderExplorer>
+              </div>
+            </TreeKeyboardNavigationContext.Provider>
           </ElementsTreeContext.Provider>
         </DNDScrollContainer>
       </>

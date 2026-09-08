@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@ interface IOptions {
   nodeRenderers?: INodeRenderer[];
   onNodeClick?(id: string): void | Promise<void>;
   onNodeDoubleClick?(id: string): void | Promise<void>;
+  onNodeActivate?(id: string): void | Promise<void>;
   getNodeHeight(id: string): number;
 }
 
@@ -26,6 +27,7 @@ export interface ITree {
 
   openNode(id: string): Promise<void>;
   clickNode(id: string): Promise<void>;
+  activateNode(id: string): Promise<void>;
   expandNode(id: string, state: boolean): Promise<void>;
   selectNode(id: string, selected?: boolean): void;
 }
@@ -36,6 +38,7 @@ export function useTree(options: IOptions): ITree {
     nodeRenderers: observable.ref,
     onNodeClick: observable.ref,
     onNodeDoubleClick: observable.ref,
+    onNodeActivate: observable.ref,
     getNodeHeight: observable.ref,
   });
 
@@ -64,6 +67,9 @@ export function useTree(options: IOptions): ITree {
       },
       async openNode(id: string) {
         await options.onNodeDoubleClick?.(id);
+      },
+      async activateNode(id: string) {
+        await options.onNodeActivate?.(id);
       },
       async expandNode(id: string, state: boolean) {
         try {

@@ -38,6 +38,7 @@ export const SettingsGroups = observer<Props>(function SettingsGroups({ treeData
       nodeRenderers={[groupNodeRenderer]}
       emptyPlaceholder={SettingsGroupsEmpty}
       onNodeClick={handleClick}
+      onNodeActivate={onClick}
     />
   );
 });

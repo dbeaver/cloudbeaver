@@ -22,6 +22,7 @@
 }
 
 .treeNodeControl:hover > .portal,
+.treeNodeControl[aria-selected='true'] > .portal,
 .treeNodeControl[data-selected='true'] > .portal,
 .portal:focus-within {
   visibility: visible;

@@ -9,19 +9,17 @@ import { action, computed, observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { forwardRef } from 'react';
 
-import { EventContext } from '@cloudbeaver/core-events';
-
 import { s } from '../../s.js';
 import { useObjectRef } from '../../useObjectRef.js';
 import { useObservableRef } from '../../useObservableRef.js';
 import { useS } from '../../useS.js';
-import { EventTreeNodeSelectFlag } from './EventTreeNodeSelectFlag.js';
 import type { ITreeNodeState } from './ITreeNodeState.js';
 import componentStyle from './TreeNode.module.css';
 import { type ITreeNodeContext, TreeNodeContext } from './TreeNodeContext.js';
 
 interface Props extends ITreeNodeState {
   nodeId?: string;
+  tabIndex?: number;
   className?: string;
   style?: React.CSSProperties;
   children?: React.ReactNode;
@@ -40,6 +38,7 @@ export const TreeNode = observer<Props, HTMLDivElement | null>(
     {
       group = false,
       nodeId,
+      tabIndex,
       loading = false,
       selected = false,
       indeterminateSelected = false,
@@ -64,6 +63,7 @@ export const TreeNode = observer<Props, HTMLDivElement | null>(
           return this.inProgress > 0;
         },
         inProgress: 0,
+        treeItem: !!nodeId,
         async processAction(action: () => Promise<void>) {
           this.inProgress++;
 
@@ -96,6 +96,7 @@ export const TreeNode = observer<Props, HTMLDivElement | null>(
       }),
       {
         group: observable.ref,
+        treeItem: observable.ref,
         disabled: observable.ref,
         processing: computed,
         inProgress: observable.ref,
@@ -110,6 +111,7 @@ export const TreeNode = observer<Props, HTMLDivElement | null>(
       },
       {
         group,
+        treeItem: !!nodeId,
         disabled,
         loading,
         selected,
@@ -120,23 +122,6 @@ export const TreeNode = observer<Props, HTMLDivElement | null>(
         leaf,
       },
     );
-    let tabIndex: number | undefined;
-
-    if (nodeId) {
-      tabIndex = selected ? 0 : -1;
-    }
-
-    async function handleKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
-      if (event.target !== event.currentTarget || EventContext.has(event, EventTreeNodeSelectFlag)) {
-        return;
-      }
-
-      if (event.code === 'Enter') {
-        EventContext.set(event, EventTreeNodeSelectFlag);
-        await nodeContext.select(event.ctrlKey || event.metaKey);
-      }
-    }
-
     return (
       <div
         ref={ref}
@@ -147,8 +132,6 @@ export const TreeNode = observer<Props, HTMLDivElement | null>(
         className={s(styles, { node: true }, className)}
         style={style}
         data-tree-node-id={nodeId}
-        data-tree-node-control={nodeId ? true : undefined}
-        onKeyDown={handleKeyDown}
       >
         <TreeNodeContext.Provider value={nodeContext}>{children}</TreeNodeContext.Provider>
       </div>

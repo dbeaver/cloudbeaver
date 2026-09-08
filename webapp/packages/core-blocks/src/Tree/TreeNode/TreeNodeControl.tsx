@@ -20,6 +20,10 @@ import { TreeNodeContext } from './TreeNodeContext.js';
 import style from './TreeNodeControl.module.css';
 import { useMergeRefs } from '../../useMergeRefs.js';
 
+const KEY = {
+  ENTER: 'Enter',
+};
+
 interface Props extends ITreeNodeState {
   title?: string;
   onClick?: (event: React.MouseEvent<HTMLDivElement>) => void;
@@ -70,6 +74,17 @@ export const TreeNodeControl = observer<Props & React.HTMLAttributes<HTMLDivElem
       context.externalExpanded = externalExpanded;
     }
 
+    async function handleEnter(event: React.KeyboardEvent<HTMLDivElement>) {
+      if (context.treeItem || EventContext.has(event, EventTreeNodeExpandFlag, EventTreeNodeSelectFlag, EventStopPropagationFlag)) {
+        return;
+      }
+
+      EventContext.set(event, EventTreeNodeSelectFlag);
+      if ((event as unknown as KeyboardEvent).code === KEY.ENTER) {
+        await context.select(event.ctrlKey || event.metaKey);
+      }
+      return true;
+    }
     async function handleClick(event: React.MouseEvent<HTMLDivElement>) {
       if (onClick) {
         onClick(event);
@@ -94,18 +109,27 @@ export const TreeNodeControl = observer<Props & React.HTMLAttributes<HTMLDivElem
         onMouseDown(event);
       }
     }
+    let tabIndex: number | undefined;
+
+    if (!context.treeItem) {
+      tabIndex = context.selected ? 0 : -1;
+    }
 
     return (
       <div
         ref={mergedRef}
+        tabIndex={tabIndex}
         title={title}
-        data-selected={context.selected}
+        aria-selected={context.treeItem ? undefined : context.selected}
+        data-selected={context.treeItem ? context.selected : undefined}
         className={s(styles, { treeNodeControl: true }, className)}
+        data-tree-node-control={context.treeItem ? undefined : true}
         onClick={handleClick}
         onMouseDown={handleMouseDown}
+        onKeyDown={handleEnter}
         onDoubleClick={handleDbClick}
         {...rest}
-        data-tree-node-content
+        data-tree-node-content={context.treeItem ? true : undefined}
       >
         {children}
       </div>

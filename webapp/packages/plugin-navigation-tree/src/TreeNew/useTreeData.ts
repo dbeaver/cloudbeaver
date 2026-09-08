@@ -27,20 +27,18 @@ interface IOptions {
   getChildren: (node: string) => string[];
   load(nodeId: string, manual: boolean): Promise<void>;
 
-  getParent?: (node: string) => string | null;
+  getParent: (node: string) => string | null;
   childrenTransformers?: TreeDataTransformer<string[]>[];
   nodeTransformers?: TreeDataTransformer<INode>[];
   parentTransformers?: TreeDataTransformer<string | null>[];
   stateTransformers?: TreeDataTransformer<INodeState>[];
 }
 
-const DEFAULT_PARENT_GETTER = () => null;
-
 export function useTreeData(options: IOptions): ITreeData {
   options = useObservableRef(
     {
       ...options,
-      getParent: options.getParent ?? DEFAULT_PARENT_GETTER,
+      getParent: options.getParent,
       childrenTransformers: [...(options.childrenTransformers || [])],
       nodeTransformers: [...(options.nodeTransformers || [])],
       stateTransformers: [...(options.stateTransformers || [])],
@@ -77,7 +75,7 @@ export function useTreeData(options: IOptions): ITreeData {
   const [parentCache] = useState(
     () =>
       new MetadataMap<string, IComputedValue<string | null>>(id =>
-        computed(() => applyTransforms(treeData, id, options.getParent?.(id) ?? null, options.parentTransformers)),
+        computed(() => applyTransforms(treeData, id, options.getParent(id), options.parentTransformers)),
       ),
   );
   const [stateCache] = useState(

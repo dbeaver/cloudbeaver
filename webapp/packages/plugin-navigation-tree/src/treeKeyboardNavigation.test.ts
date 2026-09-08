@@ -26,6 +26,7 @@ const parents: Record<string, string | null> = {
 
 function createModel(expanded: string[] = []): ITreeKeyboardNavigationModel {
   return {
+    rootId: 'root',
     getParent: nodeId => parents[nodeId] ?? null,
     getChildren: nodeId => children[nodeId] ?? [],
     isExpanded: nodeId => expanded.includes(nodeId),
@@ -58,43 +59,49 @@ describe('getTreeKeyboardAction', () => {
         return ['parent', 'section', 'sibling'];
       }
       if (nodeId === 'section') {
-        return ['nested'];
+        return ['section-child'];
       }
       return children[nodeId] ?? [];
     };
     model.getParent = nodeId => {
+      if (nodeId === 'section-child') {
+        return 'section';
+      }
       if (nodeId === 'section') {
         return 'root';
-      }
-      if (nodeId === 'nested') {
-        return 'section';
       }
       return parents[nodeId] ?? null;
     };
     model.isExpanded = nodeId => nodeId === 'parent' || nodeId === 'section';
     model.isFocusable = nodeId => nodeId !== 'root' && nodeId !== 'section';
 
-    expect(getTreeKeyboardAction(model, 'child-2', 'ArrowDown')).toEqual({ type: 'focus', nodeId: 'nested' });
-    expect(getTreeKeyboardAction(model, 'sibling', 'ArrowUp')).toEqual({ type: 'focus', nodeId: 'nested' });
-    expect(getTreeKeyboardAction(model, 'nested', 'ArrowLeft')).toBeNull();
+    expect(getTreeKeyboardAction(model, 'child-2', 'ArrowDown')).toEqual({ type: 'focus', nodeId: 'section-child' });
+    expect(getTreeKeyboardAction(model, 'section-child', 'ArrowDown')).toEqual({ type: 'focus', nodeId: 'sibling' });
   });
 
-  it('expands a collapsed branch or moves into an expanded branch', () => {
+  it('expands or enters a branch and activates a leaf with ArrowRight', () => {
     expect(getTreeKeyboardAction(createModel(), 'parent', 'ArrowRight')).toEqual({ type: 'expand', expanded: true });
     expect(getTreeKeyboardAction(createModel(['parent']), 'parent', 'ArrowRight')).toEqual({ type: 'focus', nodeId: 'child' });
-    expect(getTreeKeyboardAction(createModel(), 'child', 'ArrowRight')).toBeNull();
+    expect(getTreeKeyboardAction(createModel(), 'child', 'ArrowRight')).toEqual({ type: 'activate' });
   });
 
-  it('collapses an expanded branch or moves to its nearest focusable parent', () => {
+  it('does not leave an expanded branch without focusable descendants with ArrowRight', () => {
+    const model = createModel(['parent']);
+    model.isFocusable = nodeId => nodeId !== 'root' && !nodeId.startsWith('child');
+
+    expect(getTreeKeyboardAction(model, 'parent', 'ArrowRight')).toBeNull();
+  });
+
+  it('collapses a branch or returns to its parent with ArrowLeft', () => {
     expect(getTreeKeyboardAction(createModel(['parent']), 'parent', 'ArrowLeft')).toEqual({ type: 'expand', expanded: false });
-    expect(getTreeKeyboardAction(createModel(), 'child', 'ArrowLeft')).toEqual({ type: 'focus', nodeId: 'parent' });
-    expect(getTreeKeyboardAction(createModel(), 'parent', 'ArrowLeft')).toBeNull();
+    expect(getTreeKeyboardAction(createModel(['parent']), 'child', 'ArrowLeft')).toEqual({ type: 'focus', nodeId: 'parent' });
   });
 
-  it('toggles branches and activates leaves on Enter', () => {
-    expect(getTreeKeyboardAction(createModel(), 'parent', 'Enter')).toEqual({ type: 'expand', expanded: true });
-    expect(getTreeKeyboardAction(createModel(['parent']), 'parent', 'Enter')).toEqual({ type: 'expand', expanded: false });
-    expect(getTreeKeyboardAction(createModel(), 'child', 'Enter')).toEqual({ type: 'activate' });
+  it('moves to the first and last visible node with Home and End', () => {
+    const model = createModel(['parent']);
+
+    expect(getTreeKeyboardAction(model, 'child', 'Home')).toEqual({ type: 'focus', nodeId: 'parent' });
+    expect(getTreeKeyboardAction(model, 'child', 'End')).toEqual({ type: 'focus', nodeId: 'sibling' });
   });
 
   it('ignores unrelated keys', () => {

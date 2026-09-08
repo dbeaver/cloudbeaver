@@ -7,6 +7,7 @@
  */
 
 export interface ITreeKeyboardNavigationModel {
+  rootId: string;
   getParent(nodeId: string): string | null;
   getChildren(nodeId: string): string[];
   isExpanded(nodeId: string): boolean;
@@ -14,120 +15,57 @@ export interface ITreeKeyboardNavigationModel {
   isFocusable?(nodeId: string): boolean;
 }
 
-type TreeKeyboardAction = { type: 'focus'; nodeId: string } | { type: 'expand'; expanded: boolean } | { type: 'activate' };
+export type TreeKeyboardAction = { type: 'focus'; nodeId: string } | { type: 'expand'; expanded: boolean } | { type: 'activate' };
 
-function isFocusable(model: ITreeKeyboardNavigationModel, nodeId: string): boolean {
-  return model.isFocusable?.(nodeId) !== false;
-}
+export function getVisibleNodeIds(model: ITreeKeyboardNavigationModel): string[] {
+  const visibleNodeIds: string[] = [];
 
-function findFirstFocusable(model: ITreeKeyboardNavigationModel, nodeIds: string[]): string | null {
-  for (const nodeId of nodeIds) {
-    if (isFocusable(model, nodeId)) {
-      return nodeId;
-    }
+  function appendChildren(parentId: string): void {
+    for (const nodeId of model.getChildren(parentId)) {
+      if (model.isFocusable?.(nodeId) !== false) {
+        visibleNodeIds.push(nodeId);
+      }
 
-    if (model.isExpanded(nodeId)) {
-      const child = findFirstFocusable(model, model.getChildren(nodeId));
-
-      if (child) {
-        return child;
+      if (model.isExpanded(nodeId)) {
+        appendChildren(nodeId);
       }
     }
   }
 
-  return null;
+  appendChildren(model.rootId);
+  return visibleNodeIds;
 }
 
-function findDeepestFocusable(model: ITreeKeyboardNavigationModel, nodeId: string): string | null {
-  if (model.isExpanded(nodeId)) {
-    const children = model.getChildren(nodeId);
+export function getTreeKeyboardAction(
+  model: ITreeKeyboardNavigationModel,
+  nodeId: string,
+  key: string,
+  visibleNodeIds = getVisibleNodeIds(model),
+): TreeKeyboardAction | null {
+  const nodeIndex = visibleNodeIds.indexOf(nodeId);
 
-    for (let i = children.length - 1; i >= 0; i--) {
-      const child = findDeepestFocusable(model, children[i]!);
-
-      if (child) {
-        return child;
-      }
-    }
-  }
-
-  return isFocusable(model, nodeId) ? nodeId : null;
-}
-
-function getNextTreeNode(model: ITreeKeyboardNavigationModel, nodeId: string): string | null {
-  if (model.isExpanded(nodeId)) {
-    const child = findFirstFocusable(model, model.getChildren(nodeId));
-
-    if (child) {
-      return child;
-    }
-  }
-
-  let currentId = nodeId;
-  let parentId = model.getParent(currentId);
-
-  while (parentId) {
-    const siblings = model.getChildren(parentId);
-    const nextSibling = findFirstFocusable(model, siblings.slice(siblings.indexOf(currentId) + 1));
-
-    if (nextSibling) {
-      return nextSibling;
-    }
-
-    currentId = parentId;
-    parentId = model.getParent(currentId);
-  }
-
-  return null;
-}
-
-function getPreviousTreeNode(model: ITreeKeyboardNavigationModel, nodeId: string): string | null {
-  let currentId = nodeId;
-  let parentId = model.getParent(currentId);
-
-  while (parentId) {
-    const siblings = model.getChildren(parentId);
-
-    for (let i = siblings.indexOf(currentId) - 1; i >= 0; i--) {
-      const previousSibling = findDeepestFocusable(model, siblings[i]!);
-
-      if (previousSibling) {
-        return previousSibling;
-      }
-    }
-
-    if (isFocusable(model, parentId)) {
-      return parentId;
-    }
-
-    currentId = parentId;
-    parentId = model.getParent(currentId);
-  }
-
-  return null;
-}
-
-export function getTreeKeyboardAction(model: ITreeKeyboardNavigationModel, nodeId: string, key: string): TreeKeyboardAction | null {
   switch (key) {
-    case 'ArrowDown': {
-      const nextNode = getNextTreeNode(model, nodeId);
-      return nextNode ? { type: 'focus', nodeId: nextNode } : null;
-    }
-    case 'ArrowUp': {
-      const previousNode = getPreviousTreeNode(model, nodeId);
-      return previousNode ? { type: 'focus', nodeId: previousNode } : null;
+    case 'ArrowDown':
+      return nodeIndex >= 0 && nodeIndex < visibleNodeIds.length - 1 ? { type: 'focus', nodeId: visibleNodeIds[nodeIndex + 1]! } : null;
+    case 'ArrowUp':
+      return nodeIndex > 0 ? { type: 'focus', nodeId: visibleNodeIds[nodeIndex - 1]! } : null;
+    case 'Home':
+      return visibleNodeIds[0] && visibleNodeIds[0] !== nodeId ? { type: 'focus', nodeId: visibleNodeIds[0] } : null;
+    case 'End': {
+      const lastNodeId = visibleNodeIds.at(-1);
+      return lastNodeId && lastNodeId !== nodeId ? { type: 'focus', nodeId: lastNodeId } : null;
     }
     case 'ArrowRight': {
       if (model.isLeaf(nodeId)) {
-        return null;
+        return { type: 'activate' };
       }
 
       if (!model.isExpanded(nodeId)) {
         return { type: 'expand', expanded: true };
       }
 
-      const child = findFirstFocusable(model, model.getChildren(nodeId));
-      return child ? { type: 'focus', nodeId: child } : null;
+      const childId = getFirstVisibleFocusableChild(model, nodeId);
+      return childId ? { type: 'focus', nodeId: childId } : null;
     }
     case 'ArrowLeft': {
       if (model.isExpanded(nodeId) && !model.isLeaf(nodeId)) {
@@ -135,20 +73,29 @@ export function getTreeKeyboardAction(model: ITreeKeyboardNavigationModel, nodeI
       }
 
       let parentId = model.getParent(nodeId);
-
-      while (parentId && !isFocusable(model, parentId)) {
+      while (parentId && parentId !== model.rootId && model.isFocusable?.(parentId) === false) {
         parentId = model.getParent(parentId);
       }
-
-      return parentId ? { type: 'focus', nodeId: parentId } : null;
+      return parentId && parentId !== model.rootId ? { type: 'focus', nodeId: parentId } : null;
     }
-    case 'Enter':
-      if (!model.isLeaf(nodeId)) {
-        return { type: 'expand', expanded: !model.isExpanded(nodeId) };
-      }
-
-      return { type: 'activate' };
     default:
       return null;
   }
+}
+
+function getFirstVisibleFocusableChild(model: ITreeKeyboardNavigationModel, parentId: string): string | null {
+  for (const nodeId of model.getChildren(parentId)) {
+    if (model.isFocusable?.(nodeId) !== false) {
+      return nodeId;
+    }
+
+    if (model.isExpanded(nodeId)) {
+      const childId = getFirstVisibleFocusableChild(model, nodeId);
+      if (childId) {
+        return childId;
+      }
+    }
+  }
+
+  return null;
 }

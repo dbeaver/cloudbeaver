@@ -14,15 +14,16 @@ import style from './TreeNodeNested.module.css';
 
 interface Props extends React.PropsWithChildren {
   root?: boolean;
+  role?: React.AriaRole;
   className?: string;
 }
 
 export const TreeNodeNested = observer(
-  forwardRef<HTMLDivElement, Props>(function TreeNodeNested({ root, className, children }, ref) {
+  forwardRef<HTMLDivElement, Props>(function TreeNodeNested({ root, role, className, children }, ref) {
     const styles = useS(style);
 
     return (
-      <div ref={ref} role="group" className={s(styles, { treeNodeNested: true, root }, className)}>
+      <div ref={ref} role={role} className={s(styles, { treeNodeNested: true, root }, className)}>
         {children}
       </div>
     );

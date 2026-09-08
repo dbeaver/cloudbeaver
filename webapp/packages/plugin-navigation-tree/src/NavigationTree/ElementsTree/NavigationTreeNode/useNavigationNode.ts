@@ -34,6 +34,7 @@ export interface INavigationNode {
   leaf: boolean;
   empty: boolean;
   expand: () => Promise<void>;
+  setExpanded: (expanded: boolean) => Promise<void>;
   open: (leaf: boolean) => Promise<void>;
   click: (leaf: boolean) => Promise<void>;
   select: (isMultiple?: boolean, nested?: boolean) => Promise<void>;
@@ -68,6 +69,7 @@ export function useNavigationNode(node: NavNode, path: string[]): INavigationNod
   const handleClick = async (leaf: boolean) => await contextRef.context?.tree.click(node, path, leaf);
   const handleOpen = async (leaf: boolean) => await contextRef.context?.tree.open(node, path, leaf);
   const handleExpand = async () => await contextRef.context?.tree.expand(node, !expanded);
+  const setExpanded = async (expanded: boolean) => await contextRef.context?.tree.expand(node, expanded);
   const handleSelect = async (multiple = false, nested = false) => await contextRef.context?.tree.select(node, multiple, nested);
 
   function setDnDState(data: IDNDData, dragging: boolean): void {
@@ -123,6 +125,7 @@ export function useNavigationNode(node: NavNode, path: string[]): INavigationNod
     expanded,
     leaf,
     expand: handleExpand,
+    setExpanded,
     click: handleClick,
     open: handleOpen,
     select: handleSelect,

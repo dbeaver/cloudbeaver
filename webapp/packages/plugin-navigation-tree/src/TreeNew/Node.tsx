@@ -6,11 +6,12 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { useContext, useEffect } from 'react';
+import { useCallback, useContext, useEffect } from 'react';
 
-import { getComputed, TreeNode, useStateDelay } from '@cloudbeaver/core-blocks';
+import { getComputed, TreeNode, useObjectRef, useStateDelay } from '@cloudbeaver/core-blocks';
 import { clsx } from '@dbeaver/ui-kit';
 
+import { TreeKeyboardNavigationContext } from '../TreeKeyboardNavigationContext.js';
 import { TreeContext } from './contexts/TreeContext.js';
 import { TreeDataContext } from './contexts/TreeDataContext.js';
 import { TreeSelectionContext } from './contexts/TreeSelectionContext.js';
@@ -23,6 +24,7 @@ export const Node: NodeComponent = observer(function Node({ nodeId, offsetHeight
   const tree = useContext(TreeContext)!;
   const data = useContext(TreeDataContext)!;
   const selection = useContext(TreeSelectionContext);
+  const keyboardNavigation = useContext(TreeKeyboardNavigationContext)!;
 
   const { expanded, selected: stateSelected } = data.getState(nodeId);
   const selected = selection ? selection.isSelected(nodeId) : stateSelected;
@@ -50,14 +52,11 @@ export const Node: NodeComponent = observer(function Node({ nodeId, offsetHeight
   function handleSelect(multiple?: boolean, nested?: boolean) {
     switch (selection?.type) {
       case 'checkbox':
-        selection.select(nodeId);
-        break;
+        return selection.select(nodeId);
       case 'click':
-        selection.select(nodeId, multiple, nested);
-        break;
+        return selection.select(nodeId, multiple, nested);
       default:
-        tree.selectNode(nodeId, !stateSelected);
-        break;
+        return tree.selectNode(nodeId, !stateSelected);
     }
   }
 
@@ -65,12 +64,28 @@ export const Node: NodeComponent = observer(function Node({ nodeId, offsetHeight
     tree.clickNode(nodeId);
   }
 
+  const keyboardActions = useObjectRef({
+    async activate() {
+      await handleSelect();
+      await tree.activateNode(nodeId);
+    },
+    setExpanded(state: boolean) {
+      return tree.expandNode(nodeId, state);
+    },
+  });
+  const setNodeRef = useCallback(
+    (element: HTMLDivElement | null) => keyboardNavigation.registerNode(nodeId, element, keyboardActions),
+    [keyboardActions, keyboardNavigation, nodeId],
+  );
+
   const ControlRenderer = controlRenderer || NodeControl;
   const ChildrenRenderer = childrenRenderer;
 
   return (
     <TreeNode
+      ref={setNodeRef}
       nodeId={nodeId}
+      tabIndex={keyboardNavigation.activeNodeId === nodeId ? 0 : -1}
       selected={selected}
       expanded={expanded}
       leaf={isNodeLeaf}

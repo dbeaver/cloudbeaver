@@ -54,6 +54,8 @@
     "@dbeaver/react-tests": "workspace:*",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "mobx": "^6",
+    "mobx-react-lite": "^4",
     "react": "^19",
     "react-dom": "^19",
     "rimraf": "^6",
