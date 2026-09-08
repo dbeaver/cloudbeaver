@@ -28,6 +28,7 @@ import io.cloudbeaver.service.ai.WebAIProfileCredentialsTest;
 import io.cloudbeaver.test.platform.admin.AdminCreateUserTest;
 import io.cloudbeaver.test.platform.admin.AdminImportUsersTest;
 import io.cloudbeaver.test.platform.admin.AdminLastLoginTimeTest;
+import io.cloudbeaver.test.platform.fs.FileSystemSecurityTest;
 import io.cloudbeaver.test.platform.sql.*;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -45,6 +46,7 @@ import org.junit.platform.suite.api.Suite;
         RMNIOTest.class,
         LocalResourceControllerTest.class,
         NoSessionTest.class,
+        FileSystemSecurityTest.class,
         WebSessionTest.class,
         WebSessionProjectTest.class,
         WebNavigatorNodeInfoTest.class,
