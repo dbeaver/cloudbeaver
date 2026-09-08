@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ describe('GlobalConstants', () => {
   beforeEach(() => {
     (globalThis as any)._DEV_ = true;
     (globalThis as any)._VERSION_ = '1.0.0';
+    (globalThis as any)._ICON_SPRITE_URI_ = 'icons/preload/icons.0123456789ab.svg';
     (globalThis as any)._ROOT_URI_ = '{ROOT_URI}';
 
     windowSpy.mockImplementation(
@@ -45,6 +46,10 @@ describe('GlobalConstants', () => {
 
   it('should return correct version value', () => {
     expect(GlobalConstants.version).toBe('1.0.0');
+  });
+
+  it('should return the absolute icon sprite URL', () => {
+    expect(GlobalConstants.iconSpriteUrl).toBe('/icons/preload/icons.0123456789ab.svg');
   });
 
   it('should return correct protocol value', () => {
