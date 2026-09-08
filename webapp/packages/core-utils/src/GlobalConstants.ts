@@ -9,7 +9,7 @@ import { isValidUrl } from './isValidUrl.js';
 import { pathJoin } from './pathJoin.js';
 
 declare const _VERSION_: string | undefined;
-declare const _ICON_SPRITE_URI_: string;
+declare const _ICON_SPRITE_URI_: string | undefined;
 declare const _DEV_: boolean | undefined;
 declare const _ROOT_URI_: string | undefined;
 
@@ -23,7 +23,8 @@ export const GlobalConstants = {
   },
 
   get iconSpriteUrl(): string {
-    return this.absoluteUrl(_ICON_SPRITE_URI_);
+    const iconSpriteUri = typeof _ICON_SPRITE_URI_ === 'undefined' ? 'icons/preload/icons.svg' : _ICON_SPRITE_URI_;
+    return this.absoluteUrl(iconSpriteUri);
   },
 
   get protocol(): 'http:' | 'https:' {

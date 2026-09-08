@@ -9,7 +9,7 @@ import { createHash } from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 // import { fileURLToPath } from 'node:url';
-import type { Plugin } from 'vite';
+import type { Plugin, PluginOption } from 'vite';
 // @ts-ignore
 import { DynamicPublicDirectory } from 'vite-multiple-assets';
 
@@ -37,7 +37,7 @@ export function getIconSpriteAsset(): IIconSpriteAsset {
   };
 }
 
-export function copyAssetsPlugin(iconSprite = getIconSpriteAsset()): Plugin {
+export function copyAssetsPlugin(iconSprite = getIconSpriteAsset()): PluginOption {
   // let rootPath = fileURLToPath(import.meta.url);
   const assets = getAssets(path.join(process.cwd(), 'package.json'));
   const normalizedAssets = assets.map(asset =>
@@ -80,7 +80,7 @@ export function copyAssetsPlugin(iconSprite = getIconSpriteAsset()): Plugin {
       ignore: [normalizedIconSpritePath],
     }),
     iconSpritePlugin,
-  ] as unknown as Plugin;
+  ];
   // return {
   //   name: 'copy-assets',
   //   configResolved(config) {

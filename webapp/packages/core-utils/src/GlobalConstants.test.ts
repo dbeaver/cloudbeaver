@@ -52,6 +52,12 @@ describe('GlobalConstants', () => {
     expect(GlobalConstants.iconSpriteUrl).toBe('/icons/preload/icons.0123456789ab.svg');
   });
 
+  it('should return the legacy icon sprite URL when the build constant is not defined', () => {
+    (globalThis as any)._ICON_SPRITE_URI_ = undefined;
+
+    expect(GlobalConstants.iconSpriteUrl).toBe('/icons/preload/icons.svg');
+  });
+
   it('should return correct protocol value', () => {
     expect(GlobalConstants.protocol).toBe('http:');
   });
