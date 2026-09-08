@@ -55,6 +55,16 @@ public class ConfigurationModeAccessTest {
     }
 
     @Test
+    public void objectMethodsAreAvailableInConfigurationMode() {
+        DBWServiceCore service = createService(false);
+        Assertions.assertAll(
+            () -> Assertions.assertDoesNotThrow(service::toString),
+            () -> Assertions.assertDoesNotThrow(service::hashCode),
+            () -> Assertions.assertDoesNotThrow(() -> service.equals(service))
+        );
+    }
+
+    @Test
     public void initializationCheckIsAppliedToConfigurationModeActions() {
         DBWServiceCore service = createService(true);
         Assertions.assertThrows(

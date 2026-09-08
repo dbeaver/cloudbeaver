@@ -205,6 +205,9 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
         public Object invoke(@NotNull Object proxy, @NotNull Method method, @Nullable Object[] args) throws Throwable {
             try {
                 try {
+                    if (method.getDeclaringClass() == Object.class) {
+                        return method.invoke(impl, args);
+                    }
                     WebAction webAction = method.getAnnotation(WebAction.class);
                     WebApplication application = getApplication();
                     checkConfigurationModeAccess(webAction, application);
