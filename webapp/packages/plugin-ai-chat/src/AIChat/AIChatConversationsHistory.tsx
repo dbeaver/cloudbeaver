@@ -82,7 +82,7 @@ export const AIChatConversationsHistory = observer<Props>(function AIChatConvers
           />
         }
       />
-      <Menu modal>
+      <Menu modal fitViewport>
         {conversationGroups.map(([group, groupConversations]) => (
           <MenuGroup key={group}>
             <MenuGroupLabel>{translate(getGroupLabel(group as EConversationGroup))}</MenuGroupLabel>
