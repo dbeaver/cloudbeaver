@@ -21,6 +21,7 @@ import io.cloudbeaver.app.CEAppStarter;
 import io.cloudbeaver.service.sql.WebSQLResultSetRowIdentifier;
 import io.cloudbeaver.test.WebGQLClient;
 import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -166,7 +167,7 @@ public class PostgreSQLDataSourceIntegrationTest extends CloudbeaverMockTest {
         );
 
         List<Map<String, Object>> columns = JSONUtils.getObjectList(resultSet, "columns");
-        Assertions.assertEquals(List.of("id", "name", "note"), columns.stream()
+        Assertions.assertEquals(List.of("id", "\"name\"", "note"), columns.stream()
             .map(column -> JSONUtils.getString(column, "name"))
             .toList());
         Assertions.assertEquals("NUMERIC", JSONUtils.getString(columns.getFirst(), "dataKind"));
@@ -252,7 +253,7 @@ public class PostgreSQLDataSourceIntegrationTest extends CloudbeaverMockTest {
         );
         Map<String, Map<String, Object>> columns = columnsByName(resultSet);
         assertType(columns, "uuid_value", "uuid", "OBJECT");
-        assertType(columns, "json_value", "jsonb", "CONTENT");
+        assertType(columns, "\"json_value\"", "jsonb", "CONTENT");
         assertType(columns, "bytes_value", "bytea", "BINARY");
         assertType(columns, "timestamp_value", "timestamptz", "DATETIME");
         assertType(columns, "numeric_value", "numeric", "NUMERIC");
@@ -344,6 +345,7 @@ public class PostgreSQLDataSourceIntegrationTest extends CloudbeaverMockTest {
         return JSONUtils.getObjectList(resultSet, "rowsWithMetaData");
     }
 
+    @Nullable
     private static Object cell(@NotNull Map<String, Object> row, int position) {
         return ((List<?>) row.get("data")).get(position);
     }
@@ -367,7 +369,7 @@ public class PostgreSQLDataSourceIntegrationTest extends CloudbeaverMockTest {
     }
 
     @NotNull
-    private static String contentText(Object value) {
+    private static String contentText(@Nullable Object value) {
         if (value instanceof Map<?, ?> content) {
             return String.valueOf(content.get("text"));
         }

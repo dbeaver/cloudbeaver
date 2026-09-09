@@ -289,7 +289,10 @@ public final class PostgreSQLDataSourceTestFixture implements AutoCloseable {
                     null_value TEXT
                 )
                 """.formatted(quotedSchema()));
-            statement.execute("INSERT INTO " + quotedSchema() + ".parent_table(code, note) VALUES ('parent_a', NULL), ('parent_b', 'note')");
+            statement.execute(
+                "INSERT INTO " + quotedSchema() +
+                    ".parent_table(code, note) VALUES ('parent_a', NULL), ('parent_b', 'note')"
+            );
             statement.execute("""
                 INSERT INTO %s.child_table(parent_id, name, note)
                 VALUES (1, 'alpha', NULL), (2, 'beta', 'present'), (1, 'excluded', 'filtered')
