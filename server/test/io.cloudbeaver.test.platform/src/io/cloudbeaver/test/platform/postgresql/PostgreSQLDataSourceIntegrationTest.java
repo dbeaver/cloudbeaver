@@ -93,7 +93,8 @@ public class PostgreSQLDataSourceIntegrationTest extends CloudbeaverMockTest {
             "edit_rows",
             "type_values"
         )));
-        Assertions.assertTrue(childNames(tables).stream().allMatch(name -> name.equals(name.toLowerCase())));
+        Assertions.assertTrue(childNames(tables).stream()
+            .noneMatch(name -> name.chars().anyMatch(Character::isUpperCase)));
 
         Map<String, Object> parentTable = findChild(tables, "parent_table");
         Map<String, Object> childTable = findChild(tables, "child_table");

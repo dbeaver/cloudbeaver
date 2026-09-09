@@ -48,7 +48,7 @@ jobs:
           persist-credentials: false
 
       - name: Clone dependency repositories
-        uses: dbeaver/github-actions/clone-repositories@devel
+        uses: dbeaver/github-actions/clone-repositories@3379c533739ec10da510d75608963bfc382283b6 # devel
         with:
           project_deps_path: ./cloudbeaver/project.deps
 
@@ -70,7 +70,7 @@ jobs:
           cache-dependency-path: "**/pom.xml"
 
       - name: Install Maven
-        uses: dbeaver/github-actions/install-maven@devel
+        uses: dbeaver/github-actions/install-maven@3379c533739ec10da510d75608963bfc382283b6 # devel
 
       - name: Run PostgreSQL datasource tests
         working-directory: ./cloudbeaver

@@ -58,6 +58,7 @@ public final class PostgreSQLDataSourceTestFixture implements AutoCloseable {
     private static final String ENV_PORT = "CLOUDBEAVER_TEST_POSTGRES_PORT";
     private static final String ENV_DATABASE = "CLOUDBEAVER_TEST_POSTGRES_DATABASE";
     private static final String ENV_USER = "CLOUDBEAVER_TEST_POSTGRES_USER";
+    // nosemgrep: codacy.java.security.hard-coded-password
     private static final String ENV_PASSWORD = "CLOUDBEAVER_TEST_POSTGRES_PASSWORD";
     private static final List<String> REQUIRED_ENVIRONMENT = List.of(
         ENV_HOST,
@@ -515,7 +516,18 @@ public final class PostgreSQLDataSourceTestFixture implements AutoCloseable {
     public void close() throws Exception {
         List<Exception> failures = new ArrayList<>();
         closeGraphQLResources(failures);
+        closeDataSourceResources(failures);
+        dropSchema(failures);
+        closeOwnedSession(failures);
 
+        if (!failures.isEmpty()) {
+            Exception failure = new Exception("Failed to clean up PostgreSQL datasource test fixture");
+            failures.forEach(failure::addSuppressed);
+            throw failure;
+        }
+    }
+
+    private void closeDataSourceResources(@NotNull List<Exception> failures) {
         if (globalProject != null && dataSourceContainer != null) {
             try {
                 globalProject.removeConnection(dataSourceContainer);
@@ -533,7 +545,9 @@ public final class PostgreSQLDataSourceTestFixture implements AutoCloseable {
                 failures.add(e);
             }
         }
+    }
 
+    private void dropSchema(@NotNull List<Exception> failures) {
         if (jdbcDriver != null && config != null && schemaName != null) {
             try (Connection connection = openJdbcConnection(); Statement statement = connection.createStatement()) {
                 connection.setAutoCommit(false);
@@ -543,19 +557,15 @@ public final class PostgreSQLDataSourceTestFixture implements AutoCloseable {
                 failures.add(e);
             }
         }
+    }
 
+    private void closeOwnedSession(@NotNull List<Exception> failures) {
         if (ownsSession && sessionId != null) {
             try {
                 WebAppUtils.getWebApplication().getSessionManager().closeSession(sessionId);
             } catch (Exception e) {
                 failures.add(e);
             }
-        }
-
-        if (!failures.isEmpty()) {
-            Exception failure = new Exception("Failed to clean up PostgreSQL datasource test fixture");
-            failures.forEach(failure::addSuppressed);
-            throw failure;
         }
     }
 
