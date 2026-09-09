@@ -34,6 +34,7 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.time.Instant;
 import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
@@ -48,6 +49,8 @@ import java.util.stream.Collectors;
 
 public class PostgreSQLDataSourceIntegrationTest extends CloudbeaverMockTest {
     private static final Pattern INTEGER_PATTERN = Pattern.compile("-?\\d+");
+    private static final DateTimeFormatter TIMESTAMP_FORMATTER =
+        DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ss.SSS xx");
 
     private final WebGQLClient client = CEAppStarter.createClient();
     private PostgreSQLDataSourceTestFixture fixture;
@@ -282,7 +285,7 @@ public class PostgreSQLDataSourceIntegrationTest extends CloudbeaverMockTest {
         );
         Assertions.assertEquals(
             Instant.parse("2024-02-03T04:05:06Z"),
-            OffsetDateTime.parse(cell(row, 3).toString()).toInstant()
+            OffsetDateTime.parse(cell(row, 3).toString(), TIMESTAMP_FORMATTER).toInstant()
         );
         Assertions.assertEquals(
             0,
