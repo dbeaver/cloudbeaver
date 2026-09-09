@@ -24,6 +24,7 @@ export class ConnectionDetailsTabService extends Bootstrap {
     this.connectionFormService.parts.add({
       key: 'connection_details',
       name: 'plugin_connections_connection_form_connection_details',
+      title: 'plugin_connections_connection_form_connection_details',
       icon: '/icons/plugin_connection_key.svg',
       order: 8,
       tab: () => ConnectionDetailsTab,

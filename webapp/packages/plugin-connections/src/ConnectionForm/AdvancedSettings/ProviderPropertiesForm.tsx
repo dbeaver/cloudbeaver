@@ -11,7 +11,8 @@ import { Container, GroupTitle, ObjectPropertyInfoForm, useObjectPropertyCategor
 import { type DriverPropertyInfoFragment, getObjectPropertyType } from '@cloudbeaver/core-sdk';
 import type { IFormState } from '@cloudbeaver/core-ui';
 import type { IConnectionFormState } from '../IConnectionFormState.js';
-import { getConnectionFormOptionsPart } from './getConnectionFormOptionsPart.js';
+import { getConnectionFormOptionsPart } from '../Options/getConnectionFormOptionsPart.js';
+import { isProviderPropertySupported } from './isProviderPropertySupported.js';
 
 type DriverPropertyInfo = DriverPropertyInfoFragment;
 
@@ -25,7 +26,13 @@ export const ProviderPropertiesForm = observer<Props>(function ProviderPropertie
   const translate = useTranslate();
   const config = getConnectionFormOptionsPart(formState).state;
   const disabled = formState.isDisabled;
-  const supportedProperties = properties.filter(property => property.supportedConfigurationTypes?.some(type => type === config.configurationType));
+  const configurationType = config.configurationType;
+
+  let supportedProperties: DriverPropertyInfo[] = [];
+
+  if (configurationType !== undefined) {
+    supportedProperties = properties.filter(property => isProviderPropertySupported(property, configurationType));
+  }
 
   const { categories, isUncategorizedExists } = useObjectPropertyCategories(supportedProperties);
 
