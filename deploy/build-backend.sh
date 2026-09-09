@@ -18,6 +18,7 @@ cd ../..
 echo "Pull dbeaver platform"
 [ ! -d dbeaver ] && git clone --depth 1 https://github.com/dbeaver/dbeaver.git
 [ ! -d dbeaver-common ] && git clone --depth 1 https://github.com/dbeaver/dbeaver-common.git
+[ ! -d datadam-api ] && git clone --depth 1 https://github.com/dbeaver/datadam-api.git
 
 
 cd cloudbeaver/deploy

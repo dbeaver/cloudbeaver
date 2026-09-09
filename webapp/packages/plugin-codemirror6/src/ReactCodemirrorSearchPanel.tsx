@@ -21,7 +21,7 @@ import {
 import { observer } from 'mobx-react-lite';
 import { useContext, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { SearchPanel, type SearchPanelRef } from '@dbeaver/ui-kit';
+import { SearchPanel, type ISearchPanelRef } from '@dbeaver/ui-kit';
 
 import { ReactCodemirrorContext } from './ReactCodemirrorContext.js';
 
@@ -68,7 +68,7 @@ export const ReactCodemirrorSearchPanel: React.FC<Props> = observer(function Rea
   const compartment = useMemo(() => new Compartment(), []);
   const context = useContext(ReactCodemirrorContext);
   const view = incomingView ? context?.incomingView : context?.view;
-  const searchPanelRef = useRef<SearchPanelRef>(null);
+  const searchPanelRef = useRef<ISearchPanelRef>(null);
   const [searchMatchesCount, setSearchMatchesCount] = useState({ count: 0, current: 1 });
   const [queryState, setQueryState] = useState<SearchQuery>(() => (view ? getSearchQuery(view?.state) : new SearchQuery({ search: '' })));
 

@@ -20,11 +20,15 @@ package io.cloudbeaver.test.platform;
 import io.cloudbeaver.app.CEAppStarter;
 import io.cloudbeaver.model.navigator.WebNavigatorNodeInfoTest;
 import io.cloudbeaver.model.rm.RMNIOTest;
+import io.cloudbeaver.model.rm.local.LocalResourceControllerTest;
 import io.cloudbeaver.model.rm.lock.RMLockTest;
 import io.cloudbeaver.model.session.WebSessionProjectTest;
 import io.cloudbeaver.model.session.WebSessionTest;
+import io.cloudbeaver.server.events.WSEventHandlerWorkspaceConfigUpdateTest;
 import io.cloudbeaver.test.platform.admin.AdminCreateUserTest;
+import io.cloudbeaver.test.platform.admin.AdminImportUsersTest;
 import io.cloudbeaver.test.platform.admin.AdminLastLoginTimeTest;
+import io.cloudbeaver.test.platform.fs.FileSystemSecurityTest;
 import io.cloudbeaver.test.platform.sql.*;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -40,11 +44,15 @@ import org.junit.platform.suite.api.Suite;
         ResourceManagerTest.class,
         RMLockTest.class,
         RMNIOTest.class,
+        LocalResourceControllerTest.class,
         NoSessionTest.class,
+        FileSystemSecurityTest.class,
         WebSessionTest.class,
         WebSessionProjectTest.class,
+        WSEventHandlerWorkspaceConfigUpdateTest.class,
         WebNavigatorNodeInfoTest.class,
         AdminCreateUserTest.class,
+        AdminImportUsersTest.class,
         AdminLastLoginTimeTest.class,
         GenerateSQLResultSetTest.class,
         RowIdResultSetTest.class,

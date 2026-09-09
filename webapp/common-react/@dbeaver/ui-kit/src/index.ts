@@ -32,10 +32,10 @@ export { normalizeColorToRgb } from './ColorPicker/colorUtils.js';
 export { Input, InputBase, type InputProps } from './Input/Input.js';
 export {
   SearchPanel,
-  type SearchPanelProps,
-  type SearchPanelRef,
-  type SearchPanelQuery,
-  type SearchPanelStrings,
+  type ISearchPanelProps,
+  type ISearchPanelRef,
+  type ISearchPanelQuery,
+  type ISearchPanelStrings,
 } from './SearchPanel/SearchPanel.js';
 export {
   Select,

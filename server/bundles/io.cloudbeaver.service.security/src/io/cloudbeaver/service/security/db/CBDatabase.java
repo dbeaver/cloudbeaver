@@ -51,13 +51,17 @@ import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.dbeaver.utils.RuntimeUtils;
 import org.jkiss.utils.CommonUtils;
-import org.jkiss.utils.IOUtils;
 import org.jkiss.utils.SecurityUtils;
 
-import java.io.*;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.Driver;
 import java.sql.PreparedStatement;
@@ -197,11 +201,11 @@ public class CBDatabase extends InternalDB<WebDatabaseConfig> {
         if (driver.isAnonymousAccess()) {
             return;
         }
-        File pwdFile = application.getDataDirectory(true).resolve(DEFAULT_DB_PWD_FILE).toFile();
+        Path pwdFile = application.getDataDirectory(true).resolve(DEFAULT_DB_PWD_FILE);
         // Load or generate random password
-        if (pwdFile.exists()) {
-            try (FileReader fr = new FileReader(pwdFile)) {
-                databaseConfig.setPassword(IOUtils.readToString(fr));
+        if (Files.exists(pwdFile)) {
+            try {
+                databaseConfig.setPassword(Files.readString(pwdFile));
             } catch (Exception e) {
                 log.error(e);
             }
@@ -209,7 +213,7 @@ public class CBDatabase extends InternalDB<WebDatabaseConfig> {
         if (CommonUtils.isEmpty(databaseConfig.getPassword())) {
             databaseConfig.setPassword(SecurityUtils.generatePassword(8));
             try {
-                IOUtils.writeFileFromString(pwdFile, databaseConfig.getPassword());
+                Files.writeString(pwdFile, databaseConfig.getPassword());
             } catch (IOException e) {
                 log.error(e);
             }

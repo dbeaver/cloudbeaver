@@ -3,13 +3,11 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Cloudbeaver Web Service - LDAP
 Bundle-Vendor: DBeaver Corp
 Bundle-SymbolicName: io.cloudbeaver.service.ldap.auth;singleton:=true
-Bundle-Version: 1.0.35.qualifier
-Bundle-Release-Date: 20260831
+Bundle-Version: 1.0.36.qualifier
+Bundle-Release-Date: 20260921
 Bundle-RequiredExecutionEnvironment: JavaSE-21
 Bundle-ActivationPolicy: lazy
-Require-Bundle: org.jkiss.dbeaver.model;visibility:=reexport,
- org.jkiss.dbeaver.registry;visibility:=reexport,
- io.cloudbeaver.model
+Require-Bundle: io.cloudbeaver.model;visibility:=reexport
 Bundle-Localization: OSGI-INF/l10n/bundle
 Export-Package: io.cloudbeaver.service.ldap.auth,
  io.cloudbeaver.service.ldap.auth.ssl

@@ -10,10 +10,8 @@ import { observer } from 'mobx-react-lite';
 import React from 'react';
 
 import {
-  ColoredContainer,
   FieldCheckbox,
   Form,
-  Group,
   GroupTitle,
   IconOrImage,
   ObjectPropertyInfoForm,
@@ -36,7 +34,7 @@ import { WEBSITE_LINKS } from '@cloudbeaver/core-links';
 
 import styles from './SSL.module.css';
 import { ConnectionInfoNetworkHandlersResource } from '@cloudbeaver/core-connections';
-import { getConnectionFormOptionsPart, type IConnectionFormProps } from '@cloudbeaver/plugin-connections';
+import { ConnectionSectionWrapper, getConnectionFormOptionsPart, type IConnectionFormProps } from '@cloudbeaver/plugin-connections';
 import { SSLDescription } from './SSLDescription.js';
 
 interface Props extends IConnectionFormProps {
@@ -71,70 +69,66 @@ export const SSL: TabContainerPanelComponent<Props> = observer(function SSL({ fo
 
   return (
     <Form className={s(style, { form: true })}>
-      <ColoredContainer parent>
-        <Group gap form large vertical>
-          <Switch id="ssl-enable-switch" name="enabled" state={handlerState} description={<SSLDescription />} mod={['primary']} disabled={disabled}>
-            {translate('plugin_connection_network_handlers_connection_ssl_enable')}
-          </Switch>
-          {isUncategorizedExists && (
+      <ConnectionSectionWrapper>
+        <Switch id="ssl-enable-switch" name="enabled" state={handlerState} description={<SSLDescription />} mod={['primary']} disabled={disabled}>
+          {translate('plugin_connection_network_handlers_connection_ssl_enable')}
+        </Switch>
+        {isUncategorizedExists && (
+          <ObjectPropertyInfoForm
+            state={handlerState.properties}
+            properties={handler.properties}
+            category={null}
+            disabled={disabled || !enabled}
+            isSaved={p => !!p.id && initialHandler?.secureProperties[p.id] === SAVED_VALUE_INDICATOR}
+            autocompleteSectionName="section-ssl"
+            hideEmptyPlaceholder
+            showRememberTip
+          />
+        )}
+        {categories.map(category => (
+          <React.Fragment key={category}>
+            <GroupTitle keepSize>{category}</GroupTitle>
             <ObjectPropertyInfoForm
               state={handlerState.properties}
               properties={handler.properties}
-              category={null}
+              category={category}
               disabled={disabled || !enabled}
               isSaved={p => !!p.id && initialHandler?.secureProperties[p.id] === SAVED_VALUE_INDICATOR}
               autocompleteSectionName="section-ssl"
               hideEmptyPlaceholder
               showRememberTip
-              small
             />
-          )}
-          {categories.map(category => (
-            <React.Fragment key={category}>
-              <GroupTitle keepSize>{category}</GroupTitle>
-              <ObjectPropertyInfoForm
-                state={handlerState.properties}
-                properties={handler.properties}
-                category={category}
-                disabled={disabled || !enabled}
-                isSaved={p => !!p.id && initialHandler?.secureProperties[p.id] === SAVED_VALUE_INDICATOR}
-                autocompleteSectionName="section-ssl"
-                hideEmptyPlaceholder
-                showRememberTip
-                small
-              />
-            </React.Fragment>
-          ))}
-          {canSave && !optionsPart.state.sharedCredentials && (
-            <FieldCheckbox
-              id={handler.id + '_savePassword'}
-              name="savePassword"
-              state={handlerState}
-              disabled={disabled || !enabled || optionsPart.state.sharedCredentials}
-              title={translate(
-                !isSharedProject || serverConfigResource.data?.distributed
-                  ? 'plugin_connection_network_handlers_save_credentials_for_user_tooltip'
-                  : 'plugin_connection_network_handlers_save_credentials_shared_tooltip',
-              )}
-            >
-              {translate(
-                !isSharedProject || serverConfigResource.data?.distributed
-                  ? 'plugin_connection_network_handlers_save_credentials_for_user'
-                  : 'plugin_connection_network_handlers_save_credentials_shared',
-              )}
-            </FieldCheckbox>
-          )}
-
-          <a
-            className="tw:flex tw:items-center tw:gap-2 tw:text-balance"
-            href={WEBSITE_LINKS.SSL_CONFIGURATION_DOCUMENTATION_PAGE}
-            target="_blank"
-            rel="noreferrer"
+          </React.Fragment>
+        ))}
+        {canSave && !optionsPart.state.sharedCredentials && (
+          <FieldCheckbox
+            id={handler.id + '_savePassword'}
+            name="savePassword"
+            state={handlerState}
+            disabled={disabled || !enabled || optionsPart.state.sharedCredentials}
+            title={translate(
+              !isSharedProject || serverConfigResource.data?.distributed
+                ? 'plugin_connection_network_handlers_save_credentials_for_user_tooltip'
+                : 'plugin_connection_network_handlers_save_credentials_shared_tooltip',
+            )}
           >
-            <IconOrImage width={16} icon="/icons/documentation_link_sm.svg" /> {translate('plugin_connection_network_handlers_connection_ssl_docs')}
-          </a>
-        </Group>
-      </ColoredContainer>
+            {translate(
+              !isSharedProject || serverConfigResource.data?.distributed
+                ? 'plugin_connection_network_handlers_save_credentials_for_user'
+                : 'plugin_connection_network_handlers_save_credentials_shared',
+            )}
+          </FieldCheckbox>
+        )}
+
+        <a
+          className="tw:flex tw:items-center tw:gap-2 tw:text-balance"
+          href={WEBSITE_LINKS.SSL_CONFIGURATION_DOCUMENTATION_PAGE}
+          target="_blank"
+          rel="noreferrer"
+        >
+          <IconOrImage width={16} icon="/icons/documentation_link_sm.svg" /> {translate('plugin_connection_network_handlers_connection_ssl_docs')}
+        </a>
+      </ConnectionSectionWrapper>
     </Form>
   );
 });

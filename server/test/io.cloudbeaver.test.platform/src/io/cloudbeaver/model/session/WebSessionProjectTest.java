@@ -29,6 +29,7 @@ import org.jkiss.dbeaver.model.rm.RMProjectType;
 import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceEvent;
 import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceProperty;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
+import org.jkiss.dbeaver.registry.DataSourceNavigatorSettings;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -178,9 +179,60 @@ public class WebSessionProjectTest extends CloudbeaverMockTest {
         Assertions.assertNotNull(info);
         Assertions.assertEquals("ds1", info.getDataSourceContainer().getId());
 
+        Mockito.when(ds.isConnected()).thenReturn(true);
+        Mockito.when(event.getProperty()).thenReturn(WSDataSourceProperty.NAVIGATION);
+        Assertions.assertTrue(project.updateProjectDataSources(event));
+        Mockito.verify(ds, Mockito.never()).disconnect(Mockito.any());
+
         Mockito.when(event.getProperty()).thenReturn(WSDataSourceProperty.INTERNAL);
         Assertions.assertFalse(project.updateProjectDataSources(event));
 
+    }
+
+    @Test
+    public void testUpdateProjectDataSourcesIgnoresIneffectiveUpdate() {
+        DBPDataSourceRegistry registry = Mockito.mock(DBPDataSourceRegistry.class);
+        DataSourceDescriptor ds = Mockito.mock(DataSourceDescriptor.class);
+        DataSourceDescriptor snapshot = Mockito.mock(DataSourceDescriptor.class);
+        Mockito.when(registry.getDataSource("ds1")).thenReturn(ds);
+        Mockito.when(registry.createDataSource(ds)).thenReturn(snapshot);
+        Mockito.when(snapshot.equalConfiguration(ds)).thenReturn(true);
+
+        WebSessionProjectImpl project = new WebSessionProjectImpl(webSession, rmProject) {
+            @NotNull
+            @Override
+            public DBPDataSourceRegistry getDataSourceRegistry() {
+                return registry;
+            }
+        };
+
+        WSDataSourceEvent event = Mockito.mock(WSDataSourceEvent.class);
+        Mockito.when(event.getId()).thenReturn(WSDataSourceEvent.UPDATED);
+        Mockito.when(event.getDataSourceIds()).thenReturn(List.of("ds1"));
+        Mockito.when(event.getProperty()).thenReturn(WSDataSourceProperty.CONFIGURATION);
+
+        Assertions.assertFalse(project.updateProjectDataSources(event));
+        Mockito.verify(registry).refreshConfig(List.of("ds1"));
+    }
+
+    @Test
+    public void testNavigatorSettingsIgnoreOriginalSettingsWhenComparingEffectiveSettings() {
+        DataSourceNavigatorSettings oldSettings = new DataSourceNavigatorSettings();
+        oldSettings.setShowOnlyEntities(true);
+        DataSourceNavigatorSettings oldOriginalSettings = new DataSourceNavigatorSettings();
+        oldOriginalSettings.setShowSystemObjects(true);
+        oldSettings.setOriginalSettings(oldOriginalSettings);
+
+        DataSourceNavigatorSettings newSettings = new DataSourceNavigatorSettings();
+        newSettings.setShowOnlyEntities(true);
+        DataSourceNavigatorSettings newOriginalSettings = new DataSourceNavigatorSettings();
+        newOriginalSettings.setHideFolders(true);
+        newSettings.setOriginalSettings(newOriginalSettings);
+
+        Assertions.assertTrue(oldSettings.isUserSettings());
+        Assertions.assertTrue(newSettings.isUserSettings());
+        Assertions.assertNotEquals(oldSettings.getOriginalSettings(), newSettings.getOriginalSettings());
+        Assertions.assertEquals(oldSettings, newSettings);
     }
 
     @Test
