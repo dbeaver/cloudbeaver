@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -83,7 +83,12 @@ export function MenuButtonArrow({ className, ...props }: MenuArrowProps): ReactE
 
 export function Menu({ children, className, ...props }: MenuProps): ReactElement {
   return (
-    <AriaMenu className={clsx('dbv-kit-menu__popover', className)} portal={props.portal ?? true} gutter={props.gutter ?? 4} {...props}>
+    <AriaMenu
+      className={clsx('dbv-kit-menu__popover', props.fitViewport && 'dbv-kit-menu__popover--fit-viewport', className)}
+      portal={props.portal ?? true}
+      gutter={props.gutter ?? 4}
+      {...props}
+    >
       {children}
     </AriaMenu>
   );
