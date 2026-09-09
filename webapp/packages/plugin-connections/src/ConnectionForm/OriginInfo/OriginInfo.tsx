@@ -20,10 +20,17 @@ import {
   useS,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
-import { ConnectionInfoAuthPropertiesResource, ConnectionInfoOriginDetailsResource, ConnectionInfoResource, DatabaseAuthModelsResource, DBDriverResource } from '@cloudbeaver/core-connections';
+import {
+  ConnectionInfoAuthPropertiesResource,
+  ConnectionInfoOriginDetailsResource,
+  ConnectionInfoResource,
+  DatabaseAuthModelsResource,
+  DBDriverResource,
+} from '@cloudbeaver/core-connections';
 import { type TabContainerPanelComponent, useTab } from '@cloudbeaver/core-ui';
 
 import styles from './OriginInfo.module.css';
+import { ConnectionSectionWrapper } from '../ConnectionSectionWrapper.js';
 import type { IConnectionFormProps } from '../IConnectionFormState.js';
 
 import { getConnectionFormOriginInfoFormPart } from './getConnectionFormOriginInfoFormPart.js';
@@ -109,15 +116,10 @@ export const OriginInfo: TabContainerPanelComponent<IConnectionFormProps> = obse
   }
 
   return (
-    <ColoredContainer className={s(style, { coloredContainer: true })} parent surface>
-      <div className="tw:flex tw:w-full tw:max-w-xl tw:flex-col tw:p-6">
-        <ObjectPropertyInfoForm
-          properties={connectionOriginDetailsResource.data.origin.details}
-          readOnly
-          small
-          autoHide
-        />
-      </div>
+    <ColoredContainer className={s(style, { coloredContainer: true })} surface>
+      <ConnectionSectionWrapper className="tw:block! tw:space-y-4">
+        <ObjectPropertyInfoForm properties={connectionOriginDetailsResource.data.origin.details} readOnly small autoHide />
+      </ConnectionSectionWrapper>
       <Loader key="overlay" className={s(style, { loader: true })} loading={connection.isLoading()} overlay />
     </ColoredContainer>
   );

@@ -19,7 +19,7 @@ import { ConnectionSectionWrapper } from '../ConnectionSectionWrapper.js';
 import type { IConnectionFormProps } from '../IConnectionFormState.js';
 import { isConnectionFormReadOnly } from '../isConnectionFormReadOnly.js';
 import { getConnectionFormOptionsPart } from '../Options/getConnectionFormOptionsPart.js';
-import { ProviderPropertiesForm } from '../Options/ProviderPropertiesForm.js';
+import { ProviderPropertiesForm } from './ProviderPropertiesForm.js';
 
 export const AdvancedSettings: TabContainerPanelComponent<IConnectionFormProps> = observer(function AdvancedSettings({ formState }) {
   const formRef = useRef<HTMLFormElement>(null);
