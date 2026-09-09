@@ -56,7 +56,7 @@ export const SlideDialog = observer<SlideDialogProps>(function SlideDialog({ ope
           className="dbv-slide-dialog__close-btn"
           onClick={onClose}
         >
-          <Icon name="cross" viewBox="0 0 24 24" />
+          <Icon className="tw:size-4.5" name="cross" viewBox="0 0 24 24" />
         </IconButton>
         <Loader className="dbv-slide-dialog__loader" suspense>
           {children}
