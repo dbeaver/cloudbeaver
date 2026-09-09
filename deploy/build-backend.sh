@@ -19,6 +19,7 @@ echo "Pull dbeaver platform"
 [ ! -d dbeaver ] && git clone --depth 1 https://github.com/dbeaver/dbeaver.git
 [ ! -d dbeaver-common ] && git clone --depth 1 https://github.com/dbeaver/dbeaver-common.git
 [ ! -d datadam-api ] && git clone --depth 1 https://github.com/dbeaver/datadam-api.git
+MVNW="$PWD/dbeaver-common/mvnw"
 
 
 cd cloudbeaver/deploy
@@ -26,14 +27,17 @@ cd cloudbeaver/deploy
 echo "Build CloudBeaver server"
 
 cd ../server/product/aggregate
-mvn clean verify $MAVEN_COMMON_OPTS -Dheadless-platform
-if [[ "$?" -ne 0 ]] ; then
-  echo 'Could not perform package'; exit $rc
+if "$MVNW" clean verify $MAVEN_COMMON_OPTS -Dheadless-platform; then
+  :
+else
+  rc=$?
+  echo 'Could not perform package'
+  exit "$rc"
 fi
 cd ../../../deploy
 
 echo "Generate cloudbeaver.conf file"
-mvn -f ../apps/config-generator compile exec:java -Dconfig.output="cloudbeaver/conf/cloudbeaver.conf"
+"$MVNW" -f ../apps/config-generator compile exec:java -Dconfig.output="cloudbeaver/conf/cloudbeaver.conf"
 
 echo "Copy server packages"
 

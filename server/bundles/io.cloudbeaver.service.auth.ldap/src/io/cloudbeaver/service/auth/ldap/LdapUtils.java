@@ -1,4 +1,4 @@
-package io.cloudbeaver.service.ldap.auth;
+package io.cloudbeaver.service.auth.ldap;
 
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
