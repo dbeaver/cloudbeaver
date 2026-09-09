@@ -20,8 +20,8 @@ export const ConnectionName = observer<Props>(function ConnectionName({ driverId
   const driver = driverResource.data;
 
   return (
-    <div className="tw:ml-6 tw:flex tw:max-w-60 tw:min-w-0 tw:items-center tw:gap-2" title={name}>
-      {driver?.icon && <IconOrImage className="tw:size-5 tw:shrink-0" icon={driver.icon} />}
+    <div className="tw:ml-6 tw:flex tw:min-w-0 tw:items-center tw:gap-2 tw:pr-2" title={name}>
+      {driver?.icon && <IconOrImage className="tw:size-5 tw:min-w-5 tw:shrink-0" icon={driver.icon} />}
       <span className="tw:truncate tw:text-sm tw:font-medium">{name}</span>
     </div>
   );
