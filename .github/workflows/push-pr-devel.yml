@@ -30,6 +30,63 @@ jobs:
     uses: ./.github/workflows/frontend-build.yml
     secrets: inherit
 
+  postgres-datasource-tests:
+    name: CE / PostgreSQL Datasource Tests
+    if: github.event.pull_request.draft != true
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    env:
+      MAVEN_OPTS: -Xmx2048m
+
+    steps:
+      - name: Checkout CloudBeaver
+        uses: actions/checkout@v4
+        with:
+          path: cloudbeaver
+          persist-credentials: false
+
+      - name: Clone dependency repositories
+        uses: dbeaver/github-actions/clone-repositories@devel
+        with:
+          project_deps_path: ./cloudbeaver/project.deps
+
+      - name: Remove credentials from dependency remotes
+        shell: bash
+        run: |
+          while IFS= read -r repo || [[ -n "$repo" ]]; do
+            if [[ -d "$repo/.git" ]]; then
+              git -C "$repo" remote set-url origin "https://github.com/dbeaver/$repo.git"
+            fi
+          done < ./cloudbeaver/project.deps
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+          cache-dependency-path: "**/pom.xml"
+
+      - name: Install Maven
+        uses: dbeaver/github-actions/install-maven@devel
+
+      - name: Run PostgreSQL datasource tests
+        working-directory: ./cloudbeaver
+        run: ./deploy/test-postgres-datasource.sh
+
+      - name: Upload PostgreSQL test diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ce-postgres-datasource-test-reports
+          retention-days: 7
+          if-no-files-found: warn
+          path: |
+            cloudbeaver/server/test/**/target/surefire-reports/**
+            cloudbeaver/server/test/postgres/target/**
+
   lint-server:
     name: Server
     uses: dbeaver/dbeaver-common/.github/workflows/java-checkstyle.yml@devel
@@ -46,7 +103,7 @@ jobs:
   required-builds:
     name: Required Builds
     if: ${{ always() && github.event.pull_request.draft != true }}
-    needs: [build-server, build-frontend]
+    needs: [build-server, build-frontend, postgres-datasource-tests]
     runs-on: ubuntu-latest
     permissions: {}
     steps:
@@ -54,10 +111,12 @@ jobs:
         env:
           SERVER_RESULT: ${{ needs.build-server.result }}
           FRONTEND_RESULT: ${{ needs.build-frontend.result }}
+          POSTGRES_RESULT: ${{ needs.postgres-datasource-tests.result }}
         run: |
-          if [[ "$SERVER_RESULT" != "success" || "$FRONTEND_RESULT" != "success" ]]; then
+          if [[ "$SERVER_RESULT" != "success" || "$FRONTEND_RESULT" != "success" || "$POSTGRES_RESULT" != "success" ]]; then
             echo "Server build: $SERVER_RESULT"
             echo "Frontend build: $FRONTEND_RESULT"
+            echo "PostgreSQL datasource tests: $POSTGRES_RESULT"
             exit 1
           fi
 
