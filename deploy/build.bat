@@ -21,13 +21,14 @@ echo Pull dbeaver platform
 IF NOT EXIST dbeaver git clone https://github.com/dbeaver/dbeaver.git
 IF NOT EXIST dbeaver-common git clone https://github.com/dbeaver/dbeaver-common.git
 IF NOT EXIST datadam-api git clone https://github.com/dbeaver/datadam-api.git
+SET MVNW=%CD%\dbeaver-common\mvnw.cmd
 
 cd cloudbeaver\deploy
 
 echo Build cloudbeaver server
 
 cd ..\server\product\aggregate
-call mvn clean verify -Dheadless-platform
+call "%MVNW%" clean verify -Dheadless-platform
 
 cd ..\..\..\deploy
 
@@ -44,7 +45,7 @@ copy ..\config\DefaultConfiguration\GlobalConfiguration\.dbeaver\data-sources.js
 move drivers cloudbeaver >NUL
 
 echo Generate cloudbeaver.conf file
-call mvn -f ..\apps\config-generator compile exec:java -Dconfig.output="cloudbeaver\conf\cloudbeaver.conf" || goto :error
+call "%MVNW%" -f ..\apps\config-generator compile exec:java -Dconfig.output="cloudbeaver\conf\cloudbeaver.conf" || goto :error
 
 echo "Build static content"
 
