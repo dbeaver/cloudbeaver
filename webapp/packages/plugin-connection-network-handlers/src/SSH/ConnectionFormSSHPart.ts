@@ -98,6 +98,10 @@ export class ConnectionFormSSHPart extends FormPart<INetworkHandlerConfig, IConn
       return;
     }
 
+    if (!this.isChanged && !this.isReadOnly) {
+      return;
+    }
+
     const config = prepareSSHHandlerConfig(this.state, this.initialState, this.optionsPart.state.sharedCredentials);
 
     if (this.state.enabled && !this.state.savePassword) {

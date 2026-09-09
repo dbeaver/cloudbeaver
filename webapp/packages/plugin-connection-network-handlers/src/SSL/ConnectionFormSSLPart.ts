@@ -103,6 +103,10 @@ export class ConnectionFormSSLPart extends FormPart<INetworkHandlerConfig, IConn
       return;
     }
 
+    if (!this.isChanged && !this.isReadOnly) {
+      return;
+    }
+
     const handlers = await this.networkHandlerResource.load(CachedMapAllKey);
     const descriptor = handlers.find(h => h.id === this.state?.id);
 
