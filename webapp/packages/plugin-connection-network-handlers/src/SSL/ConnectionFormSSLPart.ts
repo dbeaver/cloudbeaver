@@ -103,13 +103,6 @@ export class ConnectionFormSSLPart extends FormPart<INetworkHandlerConfig, IConn
       return;
     }
 
-    // Unchanged connection handlers must not be sent because their configuration is already stored on the backend.
-    // Readonly handlers from saved network profiles are prepared only to detect missing credentials; otherwise,
-    // ConnectionFormNetworkProfilePart omits them because the profile configuration is also stored on the backend.
-    if (!this.isChanged && !this.isReadOnly) {
-      return;
-    }
-
     const handlers = await this.networkHandlerResource.load(CachedMapAllKey);
     const descriptor = handlers.find(h => h.id === this.state?.id);
 
