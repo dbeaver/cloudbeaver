@@ -124,7 +124,7 @@ describe('FormPart', () => {
     expect(part.isError()).toBe(false);
   });
 
-  it('prepares unchanged loaded parts without formatting them', async () => {
+  it('validates unchanged loaded parts without preparing or formatting them', async () => {
     const calls: string[] = [];
     const formState = new TestFormState();
     const part = new TestFormPart(formState, calls);
@@ -133,7 +133,7 @@ describe('FormPart', () => {
 
     await formState.validationTask.execute(formState.asFormState());
 
-    expect(calls).toEqual(['prepare', 'validate']);
+    expect(calls).toEqual(['validate']);
   });
 
   it('prepares changed parts before formatting and validating them', async () => {
@@ -166,7 +166,7 @@ describe('FormPart', () => {
     expect(part.isError()).toBe(false);
   });
 
-  it('prepares and validates unchanged parts without formatting or saving them', async () => {
+  it('validates unchanged parts without preparing, formatting, or saving them', async () => {
     const calls: string[] = [];
     const formState = new TestFormState();
     const part = new TestFormPart(formState, calls);
@@ -175,7 +175,7 @@ describe('FormPart', () => {
 
     await expect(formState.save()).resolves.toBe(true);
 
-    expect(calls).toEqual(['prepare', 'validate', 'load']);
+    expect(calls).toEqual(['validate', 'load']);
     expect(part.isLoaded()).toBe(true);
   });
 
@@ -191,9 +191,9 @@ describe('FormPart', () => {
     const contexts = await formState.validationTask.execute(formState.asFormState());
 
     expect(contexts.getContext(formValidationContext).valid).toBe(false);
-    expect(calls).toEqual(['prepare']);
+    expect(calls).toEqual([]);
     await expect(formState.save()).resolves.toBe(false);
-    expect(calls).toEqual(['prepare', 'prepare']);
+    expect(calls).toEqual([]);
   });
 
   it('resets changes to the initial state', async () => {
