@@ -13,7 +13,7 @@ import type { PluginOption } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
 import { baseHtmlPlugin } from './baseHtmlPlugin.js';
-import { copyAssetsPlugin } from './copy-assets/copyAssetsPlugin.js';
+import { copyAssetsPlugin, getIconSpriteAsset } from './copy-assets/copyAssetsPlugin.js';
 import { manualChunks } from './manualChunks.js';
 import tailwindcss from '@tailwindcss/vite';
 import legacy from '@vitejs/plugin-legacy';
@@ -22,6 +22,7 @@ export function baseConfigurationPlugin(mode: string, packageJson: any): PluginO
   const isProduction = mode === 'production';
   const envServer = process.env['server'];
   const productVersion = isProduction ? withTimestamp(packageJson.version) : packageJson.version;
+  const iconSprite = getIconSpriteAsset();
 
   return [
     tscPlugin({
@@ -35,8 +36,9 @@ export function baseConfigurationPlugin(mode: string, packageJson: any): PluginO
       version: productVersion,
       title: packageJson.product?.name || 'CloudBeaver',
       rootUri: '/',
+      iconSpriteUri: iconSprite.uri,
     }),
-    copyAssetsPlugin(),
+    copyAssetsPlugin(iconSprite),
     legacy({
       modernTargets: 'last 3 years, not dead',
       modernPolyfills: true,
@@ -52,6 +54,7 @@ export function baseConfigurationPlugin(mode: string, packageJson: any): PluginO
           define: {
             ...config.define,
             _VERSION_: JSON.stringify(productVersion),
+            _ICON_SPRITE_URI_: JSON.stringify(iconSprite.uri),
             _DEV_: !isProduction,
           },
           server: {
@@ -128,7 +131,6 @@ export function baseConfigurationPlugin(mode: string, packageJson: any): PluginO
                 '**/*.{ts,tsx}',
                 '**/*.tsbuildinfo',
                 '**/.DS_Store',
-                '**/*.{svg,png,jpg,gif,jpeg}',
                 '**/*.{woff,woff2,eot,ttf,otf}',
               ],
             },
