@@ -7,7 +7,7 @@
  */
 
 import { Subject } from 'rxjs';
-import { webSocket, type WebSocketSubjectConfig } from 'rxjs/webSocket';
+import { webSocket } from 'rxjs/webSocket';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { EnvironmentService } from '@cloudbeaver/core-sdk';
@@ -30,23 +30,14 @@ interface ITestEvent {
 describe('TransportSubject', () => {
   let websocketSubject: Subject<ITestEvent>;
   let pollingSubject: Subject<ITestEvent>;
-  let websocketConfig: WebSocketSubjectConfig<ITestEvent>;
-  let startPolling: () => void;
 
   beforeEach(() => {
     (globalThis as any)._ROOT_URI_ = '{ROOT_URI}';
     websocketSubject = new Subject();
     pollingSubject = new Subject();
 
-    vi.mocked(webSocket).mockImplementation(config => {
-      websocketConfig = config as WebSocketSubjectConfig<ITestEvent>;
-      return websocketSubject as never;
-    });
-
-    vi.mocked(longPolling).mockImplementation(options => {
-      startPolling = () => options.startObserver?.next();
-      return pollingSubject as never;
-    });
+    vi.mocked(webSocket).mockReturnValue(websocketSubject as never);
+    vi.mocked(longPolling).mockReturnValue(pollingSubject as never);
 
     vi.spyOn(console, 'warn').mockImplementation(() => undefined);
   });
