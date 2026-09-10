@@ -21,6 +21,7 @@
     "validate-dependencies": "core-cli-validate-dependencies"
   },
   "dependencies": {
+    "@cloudbeaver/core-administration": "workspace:*",
     "@cloudbeaver/core-authentication": "workspace:*",
     "@cloudbeaver/core-blocks": "workspace:*",
     "@cloudbeaver/core-di": "workspace:*",
@@ -44,7 +45,6 @@
     "@cloudbeaver/tsconfig": "workspace:*",
     "@types/react": "^19",
     "rimraf": "^6",
-    "typescript": "^5",
-    "typescript-plugin-css-modules": "^5"
+    "typescript": "^5"
   }
 }

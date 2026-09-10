@@ -55,8 +55,16 @@ export const AIProfileOptions: TabContainerPanelComponent<IAIProfileFormProps> =
   const propertiesInfo = propertiesLoader.data ?? [];
   const usesUserCredentials = !part.state.global;
   const configurableProperties = propertiesInfo
-    .filter(property => property.id !== 'global' && (!usesUserCredentials || property.id !== 'token'))
-    .map(property => (part.state.global && property.id === 'token' ? { ...property, required: true } : property));
+    .filter(({ id }) => {
+      if (id === 'global') {
+        return false;
+      }
+      if (id === 'token') {
+        return !usesUserCredentials;
+      }
+      return true;
+    })
+    .map(property => (property.id === 'token' ? { ...property, required: true } : property));
   const isEditMode = formState.mode === FormMode.Edit;
   const [isLoading, setIsLoading] = useState(false);
   const [models, setModels] = useState<AiModelInfo[] | null>(null);
@@ -104,9 +112,9 @@ export const AIProfileOptions: TabContainerPanelComponent<IAIProfileFormProps> =
     try {
       setIsLoading(true);
       const profileId = formState.mode === FormMode.Edit ? formState.state.profileId : undefined;
-      const loadedModels = (
-        await aiEnginePropertiesResource.loadModels(engineId, profileId, part.getCurrentEngineSettings())
-      ).toSorted((a, b) => a.id.localeCompare(b.id));
+      const loadedModels = (await aiEnginePropertiesResource.loadModels(engineId, profileId, part.getCurrentEngineSettings())).toSorted((a, b) =>
+        a.id.localeCompare(b.id),
+      );
       setModels(loadedModels);
       return loadedModels;
     } catch (error: any) {
@@ -245,11 +253,7 @@ export const AIProfileOptions: TabContainerPanelComponent<IAIProfileFormProps> =
                   )}
                 </Container>
               )}
-              <AIProfilePropertiesForm
-                disabled={isLoading || formState.isDisabled}
-                state={part.state.properties}
-                properties={propertiesAfterModel}
-              />
+              <AIProfilePropertiesForm disabled={isLoading || formState.isDisabled} state={part.state.properties} properties={propertiesAfterModel} />
             </Container>
           </Group>
         )}

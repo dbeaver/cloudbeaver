@@ -47,8 +47,8 @@ export const AIChatConversationScope = observer<Props>(function AIChatConversati
 
   const { data: container } = useResource(AIChatConversationScope, ContainerResource, conversation.dataSourceId ?? null);
   const { data: currentScope } = useResource(AIChatConversationScope, AIChatConversationScopeResource, conversation.id);
-  const { data: profileList } = useResource(AIChatConversationScope, AIProfilesResource, CachedMapAllKey);
-  const profiles = profileList.filter(isNotNullDefined);
+  const aiProfilesResource = useResource(AIChatConversationScope, AIProfilesResource, CachedMapAllKey);
+  const profiles = aiProfilesResource.data.filter(isNotNullDefined);
 
   async function selectScope(scope: AiDatabaseScope) {
     if (!conversation.dataSourceId) {

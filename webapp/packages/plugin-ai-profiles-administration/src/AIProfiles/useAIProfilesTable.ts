@@ -62,8 +62,8 @@ export function useAIProfilesTable(selection: ITableSelection): Readonly<State> 
         }
 
         const names = deletionList.map(id => `"${this.aiProfilesResource.get(id)?.name ?? id}"`).join(', ');
-        const deletesUserCredentials = deletionList.some(id => this.aiProfilesResource.get(id)?.global === false);
-        const credentialsWarning = deletesUserCredentials
+        const shouldDeleteUserCredentials = deletionList.some(id => this.aiProfilesResource.get(id)?.global === false);
+        const credentialsWarning = shouldDeleteUserCredentials
           ? `\n\n${translate('plugin_ai_administration_profile_delete_user_credentials_warning')}`
           : '';
         const message = `${translate('plugin_ai_administration_profile_delete_confirmation')}${names}.${credentialsWarning}\n\n${translate('ui_are_you_sure')}`;

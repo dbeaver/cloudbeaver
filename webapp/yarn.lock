@@ -2585,6 +2585,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-ai-profiles@workspace:packages/plugin-ai-profiles"
   dependencies:
+    "@cloudbeaver/core-administration": "workspace:*"
     "@cloudbeaver/core-authentication": "workspace:*"
     "@cloudbeaver/core-blocks": "workspace:*"
     "@cloudbeaver/core-cli": "workspace:*"
@@ -2607,7 +2608,6 @@ __metadata:
     rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
-    typescript-plugin-css-modules: "npm:^5"
   languageName: unknown
   linkType: soft
 

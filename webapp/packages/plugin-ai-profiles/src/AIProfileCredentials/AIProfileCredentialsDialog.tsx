@@ -6,8 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
+import { useState } from 'react';
 
 import {
   Button,
@@ -23,19 +23,20 @@ import {
   SAVED_VALUE_INDICATOR,
   useFocus,
   useForm,
-  useObservableRef,
+  useResource,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult, type DialogComponent } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 
-import type { IAIProfileCredentialsDialogPayload } from './IAIProfileCredentialsDialogPayload.js';
 import { AIProfilesResource } from '../AIProfilesResource.js';
 
-interface CredentialsDialogState {
-  token: string;
-  processing: boolean;
+export interface IAIProfileCredentialsDialogPayload {
+  profileId: string;
+  profileName: string;
+  engineName: string;
+  engineIcon?: string;
 }
 
 export const AIProfileCredentialsDialog: DialogComponent<IAIProfileCredentialsDialogPayload> = observer(function AIProfileCredentialsDialog({
@@ -46,26 +47,23 @@ export const AIProfileCredentialsDialog: DialogComponent<IAIProfileCredentialsDi
   const translate = useTranslate();
   const commonDialogService = useService(CommonDialogService);
   const notificationService = useService(NotificationService);
-  const aiProfilesResource = useService(AIProfilesResource);
+  const aiProfilesResource = useResource(AIProfileCredentialsDialog, AIProfilesResource, payload.profileId);
   const [tokenRef] = useFocus<HTMLInputElement>({ autofocus: true });
-  const state = useObservableRef<CredentialsDialogState>(
-    () => ({ token: '', processing: false }),
-    { token: observable.ref, processing: observable.ref },
-    false,
-  );
-  const credentialsSaved = aiProfilesResource.get(payload.profileId)?.credentialsSaved ?? false;
+  const [token, setToken] = useState('');
+  const [processing, setProcessing] = useState(false);
+  const credentialsSaved = aiProfilesResource.data?.credentialsSaved ?? false;
   const form = useForm({ onSubmit: save });
 
   async function save(): Promise<void> {
-    if (state.processing || !state.token) {
+    if (processing || !token) {
       return;
     }
 
     try {
-      state.processing = true;
-      await aiProfilesResource.saveCredentials(payload.profileId, state.token);
+      setProcessing(true);
+      await aiProfilesResource.resource.saveCredentials(payload.profileId, token);
 
-      state.token = '';
+      setToken('');
       notificationService.logSuccess({
         title: 'plugin_ai_credentials_saved',
         message: payload.profileName,
@@ -74,7 +72,7 @@ export const AIProfileCredentialsDialog: DialogComponent<IAIProfileCredentialsDi
     } catch (exception: any) {
       notificationService.logException(exception, 'plugin_ai_credentials_save_failed');
     } finally {
-      state.processing = false;
+      setProcessing(false);
     }
   }
 
@@ -87,10 +85,10 @@ export const AIProfileCredentialsDialog: DialogComponent<IAIProfileCredentialsDi
 
     if (status === DialogueStateResult.Resolved) {
       try {
-        state.processing = true;
-        await aiProfilesResource.resetCredentials(payload.profileId);
+        setProcessing(true);
+        await aiProfilesResource.resource.resetCredentials(payload.profileId);
 
-        state.token = '';
+        setToken('');
         notificationService.logSuccess({
           title: 'plugin_ai_credentials_reset_success',
           message: payload.profileName,
@@ -98,7 +96,7 @@ export const AIProfileCredentialsDialog: DialogComponent<IAIProfileCredentialsDi
       } catch (exception: any) {
         notificationService.logException(exception, 'plugin_ai_credentials_reset_failed');
       } finally {
-        state.processing = false;
+        setProcessing(false);
       }
     }
   }
@@ -110,26 +108,27 @@ export const AIProfileCredentialsDialog: DialogComponent<IAIProfileCredentialsDi
           title="plugin_ai_credentials_dialog_title"
           subTitle="plugin_ai_credentials_dialog_description"
           icon={payload.engineIcon}
-          onReject={state.processing ? undefined : rejectDialog}
+          onReject={processing ? undefined : rejectDialog}
         />
         <CommonDialogBody>
           <Container gap>
-            <InputField value={payload.profileName} disabled={state.processing} readOnly>
+            <InputField value={payload.profileName} disabled={processing} readOnly>
               {translate('plugin_ai_credentials_profile')}
             </InputField>
-            <InputField value={payload.engineName} disabled={state.processing} readOnly>
+            <InputField value={payload.engineName} disabled={processing} readOnly>
               {translate('plugin_ai_credentials_engine')}
             </InputField>
             <InputField
               ref={tokenRef}
-              state={state}
+              value={token}
               type="password"
               name="token"
               autoComplete="new-password"
               required={!credentialsSaved}
-              disabled={state.processing}
+              disabled={processing}
               placeholder={credentialsSaved ? SAVED_VALUE_INDICATOR : undefined}
               description={credentialsSaved ? translate('ui_processing_saved') : undefined}
+              onChange={setToken}
             >
               {translate('plugin_ai_credentials_token')}
             </InputField>
@@ -137,15 +136,15 @@ export const AIProfileCredentialsDialog: DialogComponent<IAIProfileCredentialsDi
         </CommonDialogBody>
         <CommonDialogFooter>
           {credentialsSaved && (
-            <Button type="button" variant="secondary" disabled={state.processing} onClick={resetCredentials}>
+            <Button type="button" variant="secondary" disabled={processing} onClick={resetCredentials}>
               {translate('plugin_ai_credentials_reset')}
             </Button>
           )}
           <Fill />
-          <Button type="button" variant="secondary" disabled={state.processing} onClick={() => rejectDialog()}>
+          <Button type="button" variant="secondary" disabled={processing} onClick={() => rejectDialog()}>
             {translate('ui_processing_cancel')}
           </Button>
-          <Button type="submit" disabled={state.processing || !state.token} onClick={() => form.submit()}>
+          <Button type="submit" disabled={processing || !token} onClick={() => form.submit()}>
             {translate('ui_processing_save')}
           </Button>
         </CommonDialogFooter>

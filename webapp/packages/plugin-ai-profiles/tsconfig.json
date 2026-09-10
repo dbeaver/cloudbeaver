@@ -11,6 +11,9 @@
       "path": "../../common-react/@dbeaver/ui-kit"
     },
     {
+      "path": "../core-administration"
+    },
+    {
       "path": "../core-authentication"
     },
     {

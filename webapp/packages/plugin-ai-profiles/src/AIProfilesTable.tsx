@@ -11,13 +11,13 @@ import { observer } from 'mobx-react-lite';
 import type { ReactNode } from 'react';
 
 import { IconOrImage, Link, s, TextPlaceholder, useResource, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { AdministrationTableStyles } from '@cloudbeaver/core-administration';
 import { AiEnginesResource } from '@cloudbeaver/plugin-ai';
 import { DataGrid, TableRowSelect, useCreateGridReactiveValue } from '@cloudbeaver/plugin-data-grid';
 import { Command } from '@dbeaver/ui-kit';
 
 import { AI_PROFILES_TABLE_ROW_HEIGHT } from './AI_PROFILES_TABLE_ROW_HEIGHT.js';
 import type { AIProfile } from './AIProfilesResource.js';
-import AIProfilesTableStyles from './AIProfilesTable.module.css';
 
 export interface IAIProfilesTableColumn {
   key: string;
@@ -62,7 +62,7 @@ export const AIProfilesTable = observer<IAIProfilesTableProps>(function AIProfil
   onProfileClick,
 }) {
   const translate = useTranslate();
-  const styles = useS(AIProfilesTableStyles);
+  const styles = useS(AdministrationTableStyles);
   const enginesLoader = useResource(AIProfilesTable, AiEnginesResource, undefined);
   const selectable = !!isProfileSelectable;
   const columns: TableColumn[] = [

@@ -10,7 +10,7 @@ import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { AIAdministrationBootstrap, AIAdministrationTabsService, EAIAdministrationSub } from '@cloudbeaver/plugin-ai-administration';
 
-const AIProfilesTabPanel = importLazyComponent(() => import('./AIProfilesTabPanel.js').then(module => module.AIProfilesTabPanel));
+const AIProfilesPanel = importLazyComponent(() => import('./AIProfiles/AIProfilesPanel.js').then(module => module.AIProfilesPanel));
 
 @injectable(() => [AIAdministrationBootstrap, AIAdministrationTabsService])
 export class AIProfilesAdministrationBootstrap extends Bootstrap {
@@ -26,7 +26,7 @@ export class AIProfilesAdministrationBootstrap extends Bootstrap {
       key: EAIAdministrationSub.Profiles,
       name: 'plugin_ai_administration_profiles_title',
       order: 2,
-      panel: () => AIProfilesTabPanel,
+      panel: () => AIProfilesPanel,
     });
     this.aiAdministrationBootstrap.administrationItem.sub.push({ name: EAIAdministrationSub.Profiles });
   }

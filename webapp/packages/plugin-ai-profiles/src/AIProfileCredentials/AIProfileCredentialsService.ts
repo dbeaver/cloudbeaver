@@ -12,7 +12,6 @@ import { NotificationService } from '@cloudbeaver/core-events';
 
 import { AiEnginesResource } from '@cloudbeaver/plugin-ai';
 import { AIProfileCredentialsDialog } from './AIProfileCredentialsDialogLazy.js';
-import { requiresUserCredentials, supportsUserCredentials } from './AIProfileCredentialsUtils.js';
 import { AIProfilesResource, type AIProfile } from '../AIProfilesResource.js';
 
 @injectable(() => [CommonDialogService, NotificationService, AIProfilesResource, AiEnginesResource])
@@ -25,14 +24,16 @@ export class AIProfileCredentialsService {
   ) {}
 
   async open(profileId: string): Promise<DialogResult<void>> {
-    const [profile] = await Promise.all([this.aiProfilesResource.load(profileId), this.aiEnginesResource.load()]);
+    const profile = await this.aiProfilesResource.load(profileId);
 
     if (!profile) {
       this.notificationService.logError({ title: 'plugin_ai_credentials_profile_not_found' });
       return { status: DialogueStateResult.Rejected };
     }
 
-    const engine = this.aiEnginesResource.data.find(engine => engine.id === profile.engineId);
+    const engines = await this.aiEnginesResource.load();
+    const engine = engines.find(engine => engine.id === profile.engineId);
+
     return this.commonDialogService.open(AIProfileCredentialsDialog, {
       profileId: profile.id,
       profileName: profile.name,
@@ -42,10 +43,10 @@ export class AIProfileCredentialsService {
   }
 
   isSupported(properties: ReadonlyArray<{ id?: string; features: readonly string[] }>): boolean {
-    return supportsUserCredentials(properties);
+    return properties.some(property => property.id === 'token' && property.features.includes('password'));
   }
 
   isRequired(profile: Pick<AIProfile, 'global' | 'credentialsSaved'>): boolean {
-    return requiresUserCredentials(profile);
+    return !profile.global && !profile.credentialsSaved;
   }
 }
