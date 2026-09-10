@@ -280,7 +280,7 @@ export class ConnectionNavNodeService {
       this.navTreeResource.insertToNode(parentId, insertIndex, connection.nodePath);
     } finally {
       await this.navNodeInfoResource.loadNodeParents(connection.nodePath);
-      await this.navigationTreeService.showNode(connection.nodePath, this.navNodeInfoResource.getParents(connection.nodePath));
+      await this.navigationTreeService.showNode(connection.nodePath);
     }
   }
 
