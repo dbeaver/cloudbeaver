@@ -141,6 +141,21 @@ public final class PostgreSQLDataSourceTestFixture implements AutoCloseable {
           }
         }
         """;
+    private static final String GQL_ASYNC_GENERATE_ENTITY_QUERY = """
+        mutation asyncSqlGenerateEntityQuery(
+          $generatorId: String!,
+          $nodePathList: [String!]!,
+          $generatorOptions: SQLQueryGeneratorOptions
+        ) {
+          result: asyncSqlGenerateEntityQuery(
+            generatorId: $generatorId,
+            nodePathList: $nodePathList,
+            generatorOptions: $generatorOptions
+          ) {
+            id
+          }
+        }
+        """;
 
     @NotNull
     private final WebGQLClient client;
@@ -299,6 +314,13 @@ public final class PostgreSQLDataSourceTestFixture implements AutoCloseable {
                 VALUES (1, 'alpha', NULL), (2, 'beta', 'present'), (1, 'excluded', 'filtered')
                 """.formatted(quotedSchema()));
             statement.execute("INSERT INTO " + quotedSchema() + ".edit_rows(name, note) VALUES ('update_me', NULL), ('delete_me', 'old')");
+            statement.execute(
+                "COMMENT ON TABLE " + quotedSchema() + ".parent_table IS 'PostgreSQL full DDL table'"
+            );
+            statement.execute(
+                "COMMENT ON COLUMN " + quotedSchema() + ".parent_table.note IS 'Optional parent note'"
+            );
+            statement.execute("GRANT SELECT ON TABLE " + quotedSchema() + ".parent_table TO PUBLIC");
             statement.execute("""
                 INSERT INTO %s.type_values(
                     id, uuid_value, json_value, bytes_value, timestamp_value,
@@ -416,6 +438,36 @@ public final class PostgreSQLDataSourceTestFixture implements AutoCloseable {
             throw new DBException("asyncSqlExplainExecutionPlanResult did not return a plan");
         }
         return plan;
+    }
+
+    @NotNull
+    public String generateEntityDdl(@NotNull String nodePath, boolean showFullDdl) throws Exception {
+        Map<String, Object> task = client.sendQuery(
+            GQL_ASYNC_GENERATE_ENTITY_QUERY,
+            Map.of(
+                "generatorId", "tableDDL",
+                "nodePathList", List.of(nodePath),
+                "generatorOptions", Map.of(
+                    "useFullyQualifiedNames", true,
+                    "compactSql", false,
+                    "showFullDdl", showFullDdl
+                )
+            )
+        );
+        String taskId = registerTask(task, "asyncSqlGenerateEntityQuery");
+        clientWrapper.waitTaskCompleted(taskId);
+        Map<String, Object> taskInfo = client.sendQuery(
+            GraphQLTestConstant.GQL_ASYNC_TASK_INFO,
+            Map.of("id", taskId, "removeOnFinish", false)
+        );
+        if (taskInfo == null) {
+            throw new DBException("asyncSqlGenerateEntityQuery task info is not available");
+        }
+        String ddl = JSONUtils.getString(taskInfo, "taskResult");
+        if (ddl == null) {
+            throw new DBException("asyncSqlGenerateEntityQuery did not return generated DDL");
+        }
+        return ddl;
     }
 
     @NotNull

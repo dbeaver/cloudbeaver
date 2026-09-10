@@ -299,6 +299,33 @@ public class PostgreSQLDataSourceIntegrationTest extends CloudbeaverMockTest {
     }
 
     @Test
+    public void fullDdlIsGeneratedAsynchronouslyWithCommentsAndPermissions() throws Exception {
+        Map<String, Object> parentTable = findTable("parent_table");
+        Map<String, Object> tableObject = JSONUtils.getObject(parentTable, "object");
+        Assertions.assertTrue(
+            JSONUtils.getStringList(tableObject, "features").contains("supportsFullDdl")
+        );
+        String qualifiedTableName = fixture.getSchemaName() + ".parent_table";
+
+        String regularDdl = fixture.generateEntityDdl(nodePath(parentTable), false);
+        Assertions.assertTrue(regularDdl.contains("CREATE TABLE " + qualifiedTableName), regularDdl);
+        Assertions.assertFalse(regularDdl.contains("ALTER TABLE " + qualifiedTableName + " OWNER TO "), regularDdl);
+        Assertions.assertFalse(regularDdl.contains("GRANT SELECT ON TABLE " + qualifiedTableName), regularDdl);
+
+        String fullDdl = fixture.generateEntityDdl(nodePath(parentTable), true);
+        Assertions.assertTrue(fullDdl.contains(
+            "COMMENT ON TABLE " + qualifiedTableName + " IS 'PostgreSQL full DDL table'"
+        ), fullDdl);
+        Assertions.assertTrue(fullDdl.contains(
+            "COMMENT ON COLUMN " + qualifiedTableName + ".note IS 'Optional parent note'"
+        ), fullDdl);
+        Assertions.assertTrue(fullDdl.contains(
+            "ALTER TABLE " + qualifiedTableName + " OWNER TO " + fixture.getConfig().user()
+        ), fullDdl);
+        Assertions.assertTrue(fullDdl.contains("GRANT SELECT ON TABLE " + qualifiedTableName + " TO public"), fullDdl);
+    }
+
+    @Test
     public void executionPlanIncludesCostsRowsAndAnalyzeDuration() throws Exception {
         String contextId = fixture.createSqlContext();
         String query = "SELECT * FROM child_table WHERE parent_id = 1";
@@ -314,6 +341,28 @@ public class PostgreSQLDataSourceIntegrationTest extends CloudbeaverMockTest {
         Assertions.assertTrue(nodes.stream().anyMatch(node -> node.get("cost") instanceof Number));
         Assertions.assertTrue(nodes.stream().anyMatch(node -> node.get("rowCount") instanceof Number));
         Assertions.assertTrue(nodes.stream().anyMatch(node -> node.get("duration") instanceof Number));
+    }
+
+    @NotNull
+    private Map<String, Object> findTable(@NotNull String tableName) throws Exception {
+        Map<String, Object> databasesFolder = findChild(
+            fixture.getNavigatorChildren(fixture.getConnectionNodePath()),
+            "Databases"
+        );
+        Map<String, Object> database = findChild(
+            fixture.getNavigatorChildren(nodePath(databasesFolder)),
+            fixture.getConfig().database()
+        );
+        Map<String, Object> schemasFolder = findChild(
+            fixture.getNavigatorChildren(nodePath(database)),
+            "Schemas"
+        );
+        Map<String, Object> schema = findChild(
+            fixture.getNavigatorChildren(nodePath(schemasFolder)),
+            fixture.getSchemaName()
+        );
+        Map<String, Object> tablesFolder = findChild(fixture.getNavigatorChildren(nodePath(schema)), "Tables");
+        return findChild(fixture.getNavigatorChildren(nodePath(tablesFolder)), tableName);
     }
 
     @NotNull
