@@ -20,11 +20,10 @@ import type { TeamsAdministrationFormState } from './TeamsAdministrationFormStat
 interface Props {
   state: TeamsAdministrationFormState;
   onCancel?: () => void;
-  onSave?: VoidFunction;
   className?: string;
 }
 
-export const TeamForm = observer<Props>(function TeamForm({ state, onCancel, onSave = () => {}, className }) {
+export const TeamForm = observer<Props>(function TeamForm({ state, onCancel, className }) {
   const styles = useS(style);
   const service = useService(TeamsAdministrationFormService);
   const notificationService = useService(NotificationService);
@@ -43,7 +42,6 @@ export const TeamForm = observer<Props>(function TeamForm({ state, onCancel, onS
 
         notificationService.logSuccess({ title, message });
 
-        onSave?.();
         if (initialMode === FormMode.Create) {
           onCancel?.();
         }

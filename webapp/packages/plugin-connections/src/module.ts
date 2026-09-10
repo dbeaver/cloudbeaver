@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,9 @@ import { ConnectionOptionsTabService } from './ConnectionForm/Options/Connection
 import { ConnectionDriverPropertiesTabService } from './ConnectionForm/DriverProperties/ConnectionDriverPropertiesTabService.js';
 import { ConnectionFormService } from './ConnectionForm/ConnectionFormService.js';
 import { ConnectionAuthService } from './ConnectionAuthService.js';
+import { AdvancedSettingsTabService } from './ConnectionForm/AdvancedSettings/AdvancedSettingsTabService.js';
+import { ConnectionDetailsTabService } from './ConnectionForm/ConnectionDetails/ConnectionDetailsTabService.js';
+import { InitializationSettingsTabService } from './ConnectionForm/InitializationSettings/InitializationSettingsTabService.js';
 
 export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-connections',
@@ -30,6 +33,9 @@ export default ModuleRegistry.add({
       .addSingleton(Bootstrap, proxy(ConnectionFoldersBootstrap))
       .addSingleton(Bootstrap, proxy(ConnectionMenuBootstrap))
       .addSingleton(Bootstrap, proxy(ConnectionOptionsTabService))
+      .addSingleton(Bootstrap, proxy(ConnectionDetailsTabService))
+      .addSingleton(Bootstrap, proxy(AdvancedSettingsTabService))
+      .addSingleton(Bootstrap, proxy(InitializationSettingsTabService))
       .addSingleton(Bootstrap, proxy(ConnectionOriginInfoTabService))
       .addSingleton(Bootstrap, proxy(ConnectionsExplorerBootstrap))
       .addSingleton(Bootstrap, LocaleService)
@@ -46,6 +52,9 @@ export default ModuleRegistry.add({
       .addSingleton(ConnectionMenuBootstrap)
       .addSingleton(ConnectionOriginInfoTabService)
       .addSingleton(ConnectionOptionsTabService)
+      .addSingleton(ConnectionDetailsTabService)
+      .addSingleton(AdvancedSettingsTabService)
+      .addSingleton(InitializationSettingsTabService)
       .addSingleton(ConnectionDriverPropertiesTabService)
       .addSingleton(ConnectionFormService);
   },

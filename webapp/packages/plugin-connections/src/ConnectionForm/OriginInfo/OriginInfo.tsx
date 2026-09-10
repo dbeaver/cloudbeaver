@@ -11,7 +11,6 @@ import { AUTH_PROVIDER_LOCAL_ID, AuthProvidersResource, UserInfoResource } from 
 import {
   ColoredContainer,
   ExceptionMessage,
-  Group,
   Loader,
   ObjectPropertyInfoForm,
   s,
@@ -21,10 +20,17 @@ import {
   useS,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
-import { ConnectionInfoAuthPropertiesResource, ConnectionInfoOriginDetailsResource, ConnectionInfoResource, DatabaseAuthModelsResource, DBDriverResource } from '@cloudbeaver/core-connections';
+import {
+  ConnectionInfoAuthPropertiesResource,
+  ConnectionInfoOriginDetailsResource,
+  ConnectionInfoResource,
+  DatabaseAuthModelsResource,
+  DBDriverResource,
+} from '@cloudbeaver/core-connections';
 import { type TabContainerPanelComponent, useTab } from '@cloudbeaver/core-ui';
 
 import styles from './OriginInfo.module.css';
+import { ConnectionSectionWrapper } from '../ConnectionSectionWrapper.js';
 import type { IConnectionFormProps } from '../IConnectionFormState.js';
 
 import { getConnectionFormOriginInfoFormPart } from './getConnectionFormOriginInfoFormPart.js';
@@ -75,7 +81,7 @@ export const OriginInfo: TabContainerPanelComponent<IConnectionFormProps> = obse
 
   if (connection.isLoading()) {
     return (
-      <ColoredContainer className={s(style, { coloredContainer: true })}>
+      <ColoredContainer className={s(style, { coloredContainer: true })} surface>
         <Loader key="static" className={s(style, { loader: true })} />
       </ColoredContainer>
     );
@@ -83,7 +89,7 @@ export const OriginInfo: TabContainerPanelComponent<IConnectionFormProps> = obse
 
   if (connection.exception) {
     return (
-      <ColoredContainer className={s(style, { coloredContainer: true })}>
+      <ColoredContainer className={s(style, { coloredContainer: true })} surface>
         <ExceptionMessage exception={connection.exception} onRetry={connection.reload} />
       </ColoredContainer>
     );
@@ -91,7 +97,7 @@ export const OriginInfo: TabContainerPanelComponent<IConnectionFormProps> = obse
 
   if (!isAuthenticated) {
     return (
-      <ColoredContainer className={s(style, { coloredContainer: true })} parent>
+      <ColoredContainer className={s(style, { coloredContainer: true })} parent surface>
         <TextPlaceholder>
           {translate('plugin_connections_connection_cloud_auth_required', undefined, {
             providerLabel: providerLoader.data?.label,
@@ -103,22 +109,17 @@ export const OriginInfo: TabContainerPanelComponent<IConnectionFormProps> = obse
 
   if (!connectionOriginDetailsResource.data?.origin.details || connectionOriginDetailsResource.data?.origin.details.length === 0) {
     return (
-      <ColoredContainer className={s(style, { coloredContainer: true })} parent>
+      <ColoredContainer className={s(style, { coloredContainer: true })} parent surface>
         <TextPlaceholder>{translate('core_connections_connection_no_information')}</TextPlaceholder>
       </ColoredContainer>
     );
   }
 
   return (
-    <ColoredContainer className={s(style, { coloredContainer: true })} parent>
-      <Group large gap>
-        <ObjectPropertyInfoForm
-          properties={connectionOriginDetailsResource.data.origin.details}
-          readOnly
-          small
-          autoHide
-        />
-      </Group>
+    <ColoredContainer className={s(style, { coloredContainer: true })} surface>
+      <ConnectionSectionWrapper className="tw:block! tw:space-y-4">
+        <ObjectPropertyInfoForm properties={connectionOriginDetailsResource.data.origin.details} readOnly small autoHide />
+      </ConnectionSectionWrapper>
       <Loader key="overlay" className={s(style, { loader: true })} loading={connection.isLoading()} overlay />
     </ColoredContainer>
   );

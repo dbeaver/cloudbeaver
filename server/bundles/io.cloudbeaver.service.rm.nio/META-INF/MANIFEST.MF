@@ -7,9 +7,7 @@ Bundle-Version: 1.0.71.qualifier
 Bundle-Release-Date: 20260921
 Bundle-RequiredExecutionEnvironment: JavaSE-21
 Bundle-ActivationPolicy: lazy
-Require-Bundle: io.cloudbeaver.model,
- org.jkiss.dbeaver.model,
- org.jkiss.dbeaver.model.nio
+Require-Bundle: io.cloudbeaver.model;visibility:=reexport
 Export-Package: io.cloudbeaver.service.rm.nio,
  io.cloudbeaver.service.rm.fs
 Automatic-Module-Name: io.cloudbeaver.service.rm.nio

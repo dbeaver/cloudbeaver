@@ -1,0 +1,100 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2026 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+import { observer } from 'mobx-react-lite';
+
+import { Container, GroupTitle, ObjectPropertyInfoForm, useObjectPropertyCategories, useTranslate } from '@cloudbeaver/core-blocks';
+import { type DriverPropertyInfoFragment, getObjectPropertyType } from '@cloudbeaver/core-sdk';
+import type { IFormState } from '@cloudbeaver/core-ui';
+import type { IConnectionFormState } from '../IConnectionFormState.js';
+import { getConnectionFormOptionsPart } from '../Options/getConnectionFormOptionsPart.js';
+import { isProviderPropertySupported } from './isProviderPropertySupported.js';
+
+type DriverPropertyInfo = DriverPropertyInfoFragment;
+
+interface Props {
+  formState: IFormState<IConnectionFormState>;
+  properties: DriverPropertyInfo[];
+  readonly?: boolean;
+}
+
+export const ProviderPropertiesForm = observer<Props>(function ProviderPropertiesForm({ properties, readonly, formState }) {
+  const translate = useTranslate();
+  const config = getConnectionFormOptionsPart(formState).state;
+  const disabled = formState.isDisabled;
+  const configurationType = config.configurationType;
+
+  let supportedProperties: DriverPropertyInfo[] = [];
+
+  if (configurationType !== undefined) {
+    supportedProperties = properties.filter(property => isProviderPropertySupported(property, configurationType));
+  }
+
+  const { categories, isUncategorizedExists } = useObjectPropertyCategories(supportedProperties);
+
+  if (!supportedProperties.length) {
+    return null;
+  }
+
+  const booleanProperties = supportedProperties.filter(property => !property.category && property.dataType === 'Boolean');
+  const nonBooleanProperties = supportedProperties.filter(property => !property.category && property.dataType !== 'Boolean');
+
+  return (
+    <section className="tw:flex tw:min-w-0 tw:flex-col tw:gap-4">
+      {isUncategorizedExists && (
+        <>
+          <GroupTitle>{translate('ui_settings')}</GroupTitle>
+          {booleanProperties.length > 0 && (
+            <Container gap wrap dense>
+              <ObjectPropertyInfoForm
+                properties={booleanProperties}
+                state={config.providerProperties}
+                disabled={disabled}
+                readOnly={readonly}
+                maximum
+                hideEmptyPlaceholder
+              />
+            </Container>
+          )}
+          {nonBooleanProperties.length > 0 && (
+            <Container wrap gap>
+              <ObjectPropertyInfoForm
+                properties={nonBooleanProperties}
+                state={config.providerProperties}
+                disabled={disabled}
+                readOnly={readonly}
+                tiny
+                hideEmptyPlaceholder
+              />
+            </Container>
+          )}
+        </>
+      )}
+
+      {categories.map(category => (
+        <Container key={`${category}_${config.driverId}`} gap>
+          <GroupTitle>{category}</GroupTitle>
+          <Container dense={isOnlyBooleans(supportedProperties, category)} wrap gap>
+            <ObjectPropertyInfoForm
+              properties={supportedProperties}
+              state={config.providerProperties}
+              category={category}
+              disabled={disabled}
+              readOnly={readonly}
+              getLayoutSize={property => (getObjectPropertyType(property) === 'checkbox' ? { maximum: true } : { small: true, noGrow: true })}
+              hideEmptyPlaceholder
+            />
+          </Container>
+        </Container>
+      ))}
+    </section>
+  );
+});
+
+function isOnlyBooleans(properties: DriverPropertyInfo[], category?: string): boolean {
+  return properties.filter(property => !category || property.category === category).every(property => property.dataType === 'Boolean');
+}
