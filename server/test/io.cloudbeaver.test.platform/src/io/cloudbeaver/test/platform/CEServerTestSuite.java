@@ -48,6 +48,7 @@ import org.junit.platform.suite.api.Suite;
         LocalResourceControllerTest.class,
         NoSessionTest.class,
         FileSystemSecurityTest.class,
+        CBSecretControllerEmbeddedTest.class,
         WebSessionTest.class,
         WebSessionProjectTest.class,
         WSEventHandlerWorkspaceConfigUpdateTest.class,

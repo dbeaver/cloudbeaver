@@ -29,7 +29,10 @@ import org.jkiss.dbeaver.model.DBFileController;
 import org.jkiss.dbeaver.model.app.DBPWorkspace;
 import org.jkiss.dbeaver.model.auth.SMAuthConfiguration;
 import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
+import org.jkiss.dbeaver.model.auth.SMSessionContext;
 import org.jkiss.dbeaver.model.rm.RMController;
+import org.jkiss.dbeaver.model.secret.DBSSecretController;
+import org.jkiss.dbeaver.model.secret.SecretControllerRegistry;
 import org.jkiss.dbeaver.model.security.SMAdminController;
 import org.jkiss.dbeaver.model.security.SMController;
 import org.jkiss.dbeaver.registry.LocalFileController;
@@ -72,6 +75,17 @@ public class CBApplicationCE extends CBApplication<CBServerConfig> {
             getServerConfiguration().getDatabaseConfiguration(),
             new NoAuthCredentialsProvider(),
             getServerConfiguration().getSecurityManagerConfiguration()
+        );
+    }
+
+    @NotNull
+    @Override
+    public DBSSecretController getSecretController(
+        @NotNull SMCredentialsProvider credentialsProvider,
+        SMSessionContext smSessionContext
+    ) throws DBException {
+        return SecretControllerRegistry.getInstance().getAuthorizedSecretController(
+            getServerConfiguration().getSecretControllerId(), credentialsProvider, smSessionContext
         );
     }
 
