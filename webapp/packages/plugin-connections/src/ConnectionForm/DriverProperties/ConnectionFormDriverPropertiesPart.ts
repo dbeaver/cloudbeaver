@@ -74,10 +74,7 @@ export class ConnectionFormDriverPropertiesPart extends FormPart<ConnectionPrope
     contexts: IExecutionContextProvider<IFormState<IConnectionFormState>>,
   ): Promise<void> {}
 
-  protected override async format(
-    data: IFormState<IConnectionFormState>,
-    contexts: IExecutionContextProvider<IFormState<IConnectionFormState>>,
-  ): Promise<void> {
+  protected override format(): void {
     runInAction(() => {
       for (const key of Object.keys(this.state!)) {
         if (typeof this.state[key] === 'string') {
@@ -85,7 +82,9 @@ export class ConnectionFormDriverPropertiesPart extends FormPart<ConnectionPrope
         }
       }
     });
+  }
 
+  protected override async prepare(): Promise<void> {
     this.optionsPart.state.properties = await this.getPropertiesConfig();
   }
 
@@ -98,9 +97,10 @@ export class ConnectionFormDriverPropertiesPart extends FormPart<ConnectionPrope
 
     const properties = await this.connectionInfoResource.getConnectionDriverProperties(this.formState.state.projectId, this.optionsPart.state);
 
-    /* Default property values must not be returned. If they are included in the request, the backend will send them back with modified values (e.g., null converted to an empty string).
-    To avoid this behavior, only properties that were explicitly changed should be sent. Any properties that still contain default values must be removed from the object before sending the request
-    */
+    /*
+     * Default values must not be submitted because the backend may return them in a modified form.
+     * Only explicitly changed properties should remain in the request.
+     */
     for (const [key, value] of Object.entries(config)) {
       const property = properties?.find(property => property.id === key);
       if (property && value === getObjectPropertyOptionValue(property.defaultValue)) {
