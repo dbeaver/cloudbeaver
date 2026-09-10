@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { catchError, EMPTY, Observable, shareReplay, Subject, Subscriber, Subscription, throwError } from 'rxjs';
+import { catchError, EMPTY, Observable, shareReplay, Subject, Subscriber, Subscription, take, throwError } from 'rxjs';
 import { webSocket } from 'rxjs/webSocket';
 
 import type { EnvironmentService } from '@cloudbeaver/core-sdk';
@@ -32,7 +32,7 @@ export class TransportSubject<T> extends Subject<T> {
     this.output = new Subject();
     this.ready = new Subject();
 
-    this.ready$ = this.ready.pipe(shareReplay(1));
+    this.ready$ = this.ready.pipe(take(1), shareReplay(1));
 
     this.sub = null;
 

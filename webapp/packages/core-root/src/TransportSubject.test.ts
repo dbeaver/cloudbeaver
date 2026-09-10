@@ -23,14 +23,14 @@ vi.mock('./longPolling.js', () => ({
   longPolling: vi.fn(),
 }));
 
-interface TestEvent {
+interface ITestEvent {
   id: string;
 }
 
 describe('TransportSubject', () => {
-  let websocketSubject: Subject<TestEvent>;
-  let pollingSubject: Subject<TestEvent>;
-  let websocketConfig: WebSocketSubjectConfig<TestEvent>;
+  let websocketSubject: Subject<ITestEvent>;
+  let pollingSubject: Subject<ITestEvent>;
+  let websocketConfig: WebSocketSubjectConfig<ITestEvent>;
   let startPolling: () => void;
 
   beforeEach(() => {
@@ -39,7 +39,7 @@ describe('TransportSubject', () => {
     pollingSubject = new Subject();
 
     vi.mocked(webSocket).mockImplementation(config => {
-      websocketConfig = config as WebSocketSubjectConfig<TestEvent>;
+      websocketConfig = config as WebSocketSubjectConfig<ITestEvent>;
       return websocketSubject as never;
     });
 
@@ -52,6 +52,7 @@ describe('TransportSubject', () => {
   });
 
   afterEach(() => {
+    (globalThis as any)._ROOT_URI_ = undefined;
     vi.restoreAllMocks();
   });
 
@@ -98,20 +99,6 @@ describe('TransportSubject', () => {
     expect(pollingNext).toHaveBeenCalledWith(event);
   });
 
-  it('reports readiness for each activated transport', () => {
-    const transport = createTransport();
-    const ready = vi.fn();
-
-    transport.ready$.subscribe(ready);
-    transport.subscribe();
-
-    websocketConfig.openObserver?.next(new Event('open'));
-    websocketSubject.complete();
-    startPolling();
-
-    expect(ready).toHaveBeenCalledTimes(2);
-  });
-
   it('does not activate polling during explicit teardown', () => {
     const transport = createTransport();
 
@@ -134,6 +121,6 @@ describe('TransportSubject', () => {
   });
 });
 
-function createTransport(): TransportSubject<TestEvent> {
-  return new TransportSubject<TestEvent>({ wsEndpoint: 'ws://localhost/api/ws' } as EnvironmentService);
+function createTransport(): TransportSubject<ITestEvent> {
+  return new TransportSubject<ITestEvent>({ wsEndpoint: 'ws://localhost/api/ws' } as EnvironmentService);
 }
