@@ -38,6 +38,10 @@
     }
   }
 
+  .dbv-kit-menu__popover--fit-viewport {
+    max-height: var(--popover-available-height, var(--dbv-kit-menu-popover-max-height));
+  }
+
   .dbv-kit-menu__item,
   .dbv-kit-menu__dismiss {
     display: block;
