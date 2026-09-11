@@ -82,7 +82,7 @@ public class CBApplicationCE extends CBApplication<CBServerConfig> {
     @Override
     public DBSSecretController getSecretController(
         @NotNull SMCredentialsProvider credentialsProvider,
-        SMSessionContext smSessionContext
+        @Nullable SMSessionContext smSessionContext
     ) throws DBException {
         return SecretControllerRegistry.getInstance().getAuthorizedSecretController(
             getServerConfiguration().getSecretControllerId(), credentialsProvider, smSessionContext

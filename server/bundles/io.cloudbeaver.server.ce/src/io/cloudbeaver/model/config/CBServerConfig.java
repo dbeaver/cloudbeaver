@@ -47,6 +47,7 @@ public class CBServerConfig implements WebServerConfiguration {
     private long maxSessionIdleTime = CBAuthConstants.MAX_SESSION_IDLE_TIME;
     private boolean develMode = false;
     private boolean enableSecurityManager = false;
+    @NotNull
     protected String secretController = "cb-embedded";
     private final Map<String, Object> productSettings = new HashMap<>();
 
@@ -148,11 +149,12 @@ public class CBServerConfig implements WebServerConfiguration {
         this.enableSecurityManager = enableSecurityManager;
     }
 
+    @NotNull
     public String getSecretControllerId() {
         return secretController;
     }
 
-    public void setSecretControllerId(String secretControllerId) {
+    public void setSecretControllerId(@NotNull String secretControllerId) {
         this.secretController = secretControllerId;
     }
 

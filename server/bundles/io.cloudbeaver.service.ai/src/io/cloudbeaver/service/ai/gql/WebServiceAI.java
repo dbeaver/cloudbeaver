@@ -23,7 +23,7 @@ import io.cloudbeaver.model.WebPropertyInfo;
 import io.cloudbeaver.model.session.WebAsyncTaskProcessor;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.CBApplication;
-import io.cloudbeaver.service.ai.WebAIProfileCredentials;
+import io.cloudbeaver.service.ai.WebAIProfileUtils;
 import io.cloudbeaver.service.ai.WebAIUtils;
 import io.cloudbeaver.service.ai.model.*;
 import io.cloudbeaver.service.ai.model.events.WSAiChatMessageEvent;
@@ -240,7 +240,7 @@ public class WebServiceAI implements DBWServiceAI {
             AISettings settings = AISettingsManager.getInstance().getSettings();
             AIConfigurationProfile profile = settings.getConfiguration(profileId);
             profile.setConfiguration(toEngineConfiguration(webSession.getProgressMonitor(), profile, engineSettingsInput));
-            WebAIProfileCredentials.prepareGlobalProfile(webSession, profile);
+            WebAIProfileUtils.prepareGlobalProfile(webSession, profile);
             AISettingsManager.getInstance().saveSettings();
             addAISettingsChangedEvent(webSession);
             return true;
@@ -274,7 +274,7 @@ public class WebServiceAI implements DBWServiceAI {
                         .build();
 
                     AIAssistant assistant = AIAssistantRegistry.getInstance().getAssistant(webSession.getWorkspace());
-                    AIConfigurationProfile profile = WebAIProfileCredentials.getEffectiveProfile(
+                    AIConfigurationProfile profile = WebAIProfileUtils.getEffectiveProfile(
                         webSession,
                         AISettingsManager.getStaticSettings().getDefaultConfiguration()
                     );
@@ -555,9 +555,9 @@ public class WebServiceAI implements DBWServiceAI {
                 profile.setConfiguration(toEngineConfiguration(webSession.getProgressMonitor(), profile, input.configuration()));
             }
             if (!profile.isGlobal()) {
-                WebAIProfileCredentials.validateCredentialsSupport(webSession, profile.getConfiguration());
+                WebAIProfileUtils.validateCredentialsSupport(webSession, profile.getConfiguration());
             }
-            WebAIProfileCredentials.prepareGlobalProfile(webSession, profile);
+            WebAIProfileUtils.prepareGlobalProfile(webSession, profile);
             AISettingsManager.getInstance().saveSettings();
             addAISettingsChangedEvent(webSession);
             return new WebAIConfigurationProfile(webSession, settings.getConfiguration(input.profileId()));
@@ -585,12 +585,12 @@ public class WebServiceAI implements DBWServiceAI {
                 profile.setConfiguration(toEngineConfiguration(webSession.getProgressMonitor(), profile, input.configuration()));
             }
             if (!wasGlobal && profile.isGlobal()) {
-                WebAIProfileCredentials.deleteCredentials(webSession, profile);
+                WebAIProfileUtils.deleteCredentials(webSession, profile);
             }
             if (!profile.isGlobal()) {
-                WebAIProfileCredentials.validateCredentialsSupport(webSession, profile.getConfiguration());
+                WebAIProfileUtils.validateCredentialsSupport(webSession, profile.getConfiguration());
             }
-            WebAIProfileCredentials.prepareGlobalProfile(webSession, profile);
+            WebAIProfileUtils.prepareGlobalProfile(webSession, profile);
             AISettingsManager.getInstance().saveSettings();
             addAISettingsChangedEvent(webSession);
             return new WebAIConfigurationProfile(webSession, profile);
@@ -605,7 +605,7 @@ public class WebServiceAI implements DBWServiceAI {
         try {
             AISettings settings = AISettingsManager.getInstance().getSettings();
             AIConfigurationProfile profile = settings.getConfiguration(profileId);
-            WebAIProfileCredentials.deleteCredentials(webSession, profile);
+            WebAIProfileUtils.deleteCredentials(webSession, profile);
             settings.removeConfiguration(profile);
             AISettingsManager.getInstance().saveSettings();
             addAISettingsChangedEvent(webSession);
@@ -624,7 +624,7 @@ public class WebServiceAI implements DBWServiceAI {
         WebAIUtils.validateAiPluginEnabled();
         try {
             AIConfigurationProfile profile = AISettingsManager.getInstance().getSettings().getConfiguration(profileId);
-            WebAIProfileCredentials.saveCredentials(webSession, profile, credentials.properties());
+            WebAIProfileUtils.saveCredentials(webSession, profile, credentials.properties());
             return true;
         } catch (DBException e) {
             throw new DBWebException("Error saving credentials for AI profile " + profileId, e);

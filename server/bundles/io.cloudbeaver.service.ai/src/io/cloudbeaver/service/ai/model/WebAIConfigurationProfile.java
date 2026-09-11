@@ -19,7 +19,7 @@ package io.cloudbeaver.service.ai.model;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.model.WebPropertyInfo;
 import io.cloudbeaver.model.session.WebSession;
-import io.cloudbeaver.service.ai.WebAIProfileCredentials;
+import io.cloudbeaver.service.ai.WebAIProfileUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.ai.AIConfigurationProfile;
@@ -56,7 +56,7 @@ public class WebAIConfigurationProfile {
     }
 
     public boolean isCredentialsSaved() throws DBException {
-        return WebAIProfileCredentials.areCredentialsSaved(webSession, profile);
+        return WebAIProfileUtils.areCredentialsSaved(webSession, profile);
     }
 
     @NotNull

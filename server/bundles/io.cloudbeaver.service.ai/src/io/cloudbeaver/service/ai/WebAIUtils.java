@@ -151,7 +151,7 @@ public class WebAIUtils {
                     if (selectedProfile == null) {
                         selectedProfile = AISettingsManager.getStaticSettings().getDefaultConfiguration();
                     }
-                    AIConfigurationProfile effectiveProfile = WebAIProfileCredentials.getEffectiveProfile(
+                    AIConfigurationProfile effectiveProfile = WebAIProfileUtils.getEffectiveProfile(
                         webSession,
                         selectedProfile
                     );
@@ -286,7 +286,7 @@ public class WebAIUtils {
         if (selectedProfile == null) {
             selectedProfile = AISettingsManager.getStaticSettings().getDefaultConfiguration();
         }
-        AIConfigurationProfile effectiveProfile = WebAIProfileCredentials.getEffectiveProfile(webSession, selectedProfile);
+        AIConfigurationProfile effectiveProfile = WebAIProfileUtils.getEffectiveProfile(webSession, selectedProfile);
         if (!effectiveProfile.getConfiguration().isValidConfiguration()) {
             throw new DBWebException("Invalid AI configuration");
         }

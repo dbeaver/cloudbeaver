@@ -33,7 +33,7 @@ import org.mockito.Mockito;
 import java.util.HashMap;
 import java.util.Map;
 
-public class WebAIProfileCredentialsTest {
+public class WebAIProfileUtilsTest {
     private final Map<String, String> secrets = new HashMap<>();
     private final Map<String, Object> sessionAttributes = new HashMap<>();
     private DBSSecretController secretController;
@@ -102,22 +102,22 @@ public class WebAIProfileCredentialsTest {
 
     @Test
     public void savesUpdatesAndClearsCredentials() throws DBException {
-        WebAIProfileCredentials.saveCredentials(webSession, profile, Map.of(credentialPropertyId, "first"));
-        Assertions.assertTrue(WebAIProfileCredentials.areCredentialsSaved(webSession, profile));
+        WebAIProfileUtils.saveCredentials(webSession, profile, Map.of(credentialPropertyId, "first"));
+        Assertions.assertTrue(WebAIProfileUtils.areCredentialsSaved(webSession, profile));
 
-        WebAIProfileCredentials.saveCredentials(webSession, profile, Map.of(credentialPropertyId, "updated"));
+        WebAIProfileUtils.saveCredentials(webSession, profile, Map.of(credentialPropertyId, "updated"));
         Assertions.assertTrue(secrets.containsValue("updated"));
         Assertions.assertFalse(secrets.containsValue("first"));
 
-        WebAIProfileCredentials.saveCredentials(webSession, profile, Map.of(credentialPropertyId, ""));
-        Assertions.assertFalse(WebAIProfileCredentials.areCredentialsSaved(webSession, profile));
+        WebAIProfileUtils.saveCredentials(webSession, profile, Map.of(credentialPropertyId, ""));
+        Assertions.assertFalse(WebAIProfileUtils.areCredentialsSaved(webSession, profile));
     }
 
     @Test
     public void rejectsNonCredentialProperties() {
         Assertions.assertThrows(
             DBException.class,
-            () -> WebAIProfileCredentials.saveCredentials(webSession, profile, Map.of("model", "invalid"))
+            () -> WebAIProfileUtils.saveCredentials(webSession, profile, Map.of("model", "invalid"))
         );
     }
 
@@ -125,7 +125,7 @@ public class WebAIProfileCredentialsTest {
     public void removesCredentialsFromNonGlobalConfiguration() throws DBException {
         properties.setToken("global-token");
 
-        WebAIProfileCredentials.prepareGlobalProfile(webSession, profile);
+        WebAIProfileUtils.prepareGlobalProfile(webSession, profile);
 
         Assertions.assertNull(properties.getToken());
     }
@@ -134,12 +134,12 @@ public class WebAIProfileCredentialsTest {
     public void storesCredentialsInSessionWithoutPrivateSecretStorage() throws DBException {
         Mockito.when(secretController.getSupportedFeatures()).thenReturn(0L);
 
-        WebAIProfileCredentials.saveCredentials(webSession, profile, Map.of(credentialPropertyId, "session-token"));
+        WebAIProfileUtils.saveCredentials(webSession, profile, Map.of(credentialPropertyId, "session-token"));
 
-        Assertions.assertTrue(WebAIProfileCredentials.areCredentialsSaved(webSession, profile));
+        Assertions.assertTrue(WebAIProfileUtils.areCredentialsSaved(webSession, profile));
         Assertions.assertTrue(secrets.isEmpty());
 
-        WebAIProfileCredentials.saveCredentials(webSession, profile, Map.of(credentialPropertyId, ""));
-        Assertions.assertFalse(WebAIProfileCredentials.areCredentialsSaved(webSession, profile));
+        WebAIProfileUtils.saveCredentials(webSession, profile, Map.of(credentialPropertyId, ""));
+        Assertions.assertFalse(WebAIProfileUtils.areCredentialsSaved(webSession, profile));
     }
 }

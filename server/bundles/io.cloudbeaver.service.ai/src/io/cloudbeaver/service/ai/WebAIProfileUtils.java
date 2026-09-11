@@ -37,12 +37,12 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
-public final class WebAIProfileCredentials {
+public final class WebAIProfileUtils {
     private static final String SECRET_ID_PREFIX = "ai.profile.";
     private static final String SECRET_OBJECT_TYPE = "aiProfile";
     private static final String SESSION_CREDENTIALS_ATTRIBUTE_PREFIX = "ai.profile.credentials.";
 
-    private WebAIProfileCredentials() {
+    private WebAIProfileUtils() {
     }
 
     public static boolean areCredentialsSaved(

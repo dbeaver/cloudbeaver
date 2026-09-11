@@ -17,6 +17,7 @@
 package io.cloudbeaver.test.platform;
 
 import io.cloudbeaver.app.CEAppStarter;
+import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.auth.SMCredentials;
 import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
@@ -32,16 +33,19 @@ import java.util.Set;
 public class CBSecretControllerEmbeddedTest {
     private static final String TEST_USER_ID = "test";
     private static final DBSSecretObject TEST_OBJECT = new DBSSecretObject() {
+        @NotNull
         @Override
         public String getProjectId() {
             return "test-project";
         }
 
+        @NotNull
         @Override
         public String getSecretObjectId() {
             return "test-object";
         }
 
+        @NotNull
         @Override
         public String getSecretObjectType() {
             return "test-type";
@@ -71,7 +75,8 @@ public class CBSecretControllerEmbeddedTest {
         }
     }
 
-    private static DBSSecretController createController(String userId) throws DBException {
+    @NotNull
+    private static DBSSecretController createController(@NotNull String userId) throws DBException {
         SMCredentialsProvider credentialsProvider = () -> new SMCredentials(
             "test-token",
             userId,

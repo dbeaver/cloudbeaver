@@ -43,6 +43,7 @@ public class CBSecretControllerEmbedded implements DBSSecretControllerAuthorized
     private static final Log log = Log.getLog(CBSecretControllerEmbedded.class);
     private static final String ENCODING_PLAINTEXT = "PLAINTEXT";
 
+    @Nullable
     private SMCredentialsProvider credentialsProvider;
 
     @Override
