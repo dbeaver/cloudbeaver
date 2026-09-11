@@ -23,7 +23,7 @@ import org.junit.platform.suite.api.SelectClasses;
 import org.junit.platform.suite.api.Suite;
 
 @Suite
-@SelectClasses(PostgreSQLDataSourceIntegrationTest.class)
+@SelectClasses({PostgreSQLDataSourceIntegrationTest.class, PostgreSQLDdlIntegrationTest.class})
 public class PostgreSQLDataSourceTestSuite {
     @BeforeAll
     public static void startServer() throws Exception {
