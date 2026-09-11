@@ -24,6 +24,7 @@ import io.cloudbeaver.model.rm.local.LocalResourceControllerTest;
 import io.cloudbeaver.model.rm.lock.RMLockTest;
 import io.cloudbeaver.model.session.WebSessionProjectTest;
 import io.cloudbeaver.model.session.WebSessionTest;
+import io.cloudbeaver.service.ai.WebAIProfileUtilsTest;
 import io.cloudbeaver.server.events.WSEventHandlerWorkspaceConfigUpdateTest;
 import io.cloudbeaver.test.platform.admin.AdminCreateUserTest;
 import io.cloudbeaver.test.platform.admin.AdminImportUsersTest;
@@ -47,10 +48,12 @@ import org.junit.platform.suite.api.Suite;
         LocalResourceControllerTest.class,
         NoSessionTest.class,
         FileSystemSecurityTest.class,
+        CBSecretControllerEmbeddedTest.class,
         WebSessionTest.class,
         WebSessionProjectTest.class,
         WSEventHandlerWorkspaceConfigUpdateTest.class,
         WebNavigatorNodeInfoTest.class,
+        WebAIProfileUtilsTest.class,
         AdminCreateUserTest.class,
         AdminImportUsersTest.class,
         AdminLastLoginTimeTest.class,

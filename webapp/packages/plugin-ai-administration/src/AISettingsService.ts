@@ -28,7 +28,7 @@ export class AISettingsService {
     this.formState.setMode(FormMode.Edit);
   }
 
-  dispose() {
+  dispose(): void {
     this.formState?.dispose();
     this.formState = null;
   }

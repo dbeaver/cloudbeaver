@@ -120,6 +120,10 @@ type AIConfigurationProfileInfo @since(version: "26.1.3") {
     name: String!
     "ID of the AI engine that this profile belongs to."
     engineId: ID!
+    "Whether this profile uses global administrator-managed credentials."
+    global: Boolean! @since(version: "26.2.0")
+    "Whether the current user has saved credentials for this profile."
+    credentialsSaved: Boolean! @since(version: "26.2.0")
 }
 
 type AIAdminConfigurationProfileInfo @since(version: "26.1.3") {
@@ -129,6 +133,8 @@ type AIAdminConfigurationProfileInfo @since(version: "26.1.3") {
     name: String!
     "ID of the AI engine that this profile belongs to."
     engineId: ID!
+    "Whether this profile uses global administrator-managed credentials."
+    global: Boolean! @since(version: "26.2.0")
     "Configuration of the AI engine profile."
     configuration: [ObjectPropertyInfo!]!
 }
@@ -226,13 +232,18 @@ input AIConfigurationProfileInput @since(version: "26.1.3") {
     configuration: AIEngineConfig
 }
 
+input AIProfileCredentialsInput @since(version: "26.2.0") {
+    "Credential property values keyed by AI engine property ID."
+    properties: Object!
+}
+
 extend type Query @since(version: "23.2.2") {
     "Returns the list of available AI engines."
     aiListEngines: [AIEngineInfo!]
     "Returns the global AI settings."
     aiSettings: AISettingsInfo!
     "Returns the properties of the specified AI engine for displaying it in the UI. In case settings are passed, fills it with defaults and returns back."
-    aiListEngineProperties(engineId: ID!, profileId: ID, settings : AIEngineConfig): [ObjectPropertyInfo!]!
+    aiListEngineProperties(engineId: ID!, profileId: ID, settings: AIEngineConfig): [ObjectPropertyInfo!]!
     "Returns models available for the specified AI engine configuration."
     aiListEngineModels(engineId: ID!, profileId: ID, settings: AIEngineConfig): [AIModelInfo!]! @since(version: "26.2.0")
 
@@ -267,6 +278,8 @@ extend type Mutation @since(version: "23.2.2") {
     aiUpdateProfile(config: AIConfigurationProfileInput!): AIAdminConfigurationProfileInfo! @since(version: "26.1.3")
     "Deletes the specified AI engine configuration profile."
     aiDeleteProfile(profileId: ID!): Boolean! @since(version: "26.1.3")
+    "Saves or updates the current user's credentials for a non-global profile. Empty values clear credentials."
+    aiSaveProfileCredentials(profileId: ID!, credentials: AIProfileCredentialsInput!): Boolean! @since(version: "26.2.0")
 
     """
     Creates a new AI chat conversation.

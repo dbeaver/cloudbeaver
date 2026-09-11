@@ -31,13 +31,11 @@
     "@cloudbeaver/core-localization": "workspace:*",
     "@cloudbeaver/core-resource": "workspace:*",
     "@cloudbeaver/core-root": "workspace:*",
-    "@cloudbeaver/core-sdk": "workspace:*",
     "@cloudbeaver/core-ui": "workspace:*",
     "@cloudbeaver/core-utils": "workspace:*",
     "@cloudbeaver/plugin-ai": "workspace:*",
-    "@cloudbeaver/plugin-data-grid": "workspace:*",
+    "@cloudbeaver/plugin-ai-profiles": "workspace:*",
     "@dbeaver/js-helpers": "workspace:*",
-    "@dbeaver/ui-kit": "workspace:*",
     "mobx": "^6",
     "mobx-react-lite": "^4",
     "react": "^19",
@@ -49,6 +47,7 @@
     "@cloudbeaver/tsconfig": "workspace:*",
     "@types/react": "^19",
     "rimraf": "^6",
-    "typescript": "^5"
+    "typescript": "^5",
+    "typescript-plugin-css-modules": "^5"
   }
 }

@@ -3,6 +3,7 @@ mutation updateAiProfile($config: AIConfigurationProfileInput!) {
     id
     name
     engineId
+    global
     configuration {
       ...ObjectPropertyInfo
     }
