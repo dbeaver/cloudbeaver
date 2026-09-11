@@ -38,11 +38,13 @@ export interface ICellPosition {
   colIdx: number;
 }
 
+// eslint-disable-next-line @typescript-eslint/naming-convention -- Preserve the public API name.
 export interface DataGridCellKeyboardEvent extends React.KeyboardEvent<HTMLDivElement> {
   preventGridDefault: () => void;
   isGridDefaultPrevented: () => boolean;
 }
 
+// eslint-disable-next-line @typescript-eslint/naming-convention -- Preserve the public API name.
 export interface DataGridProps extends IDataGridCellContext, IDataGridRowContext, IDataGridHeaderCellContext, React.PropsWithChildren {
   getRowHeight?: (rowIdx: number) => number;
   getRowId?: (rowIdx: number) => React.Key;
@@ -61,6 +63,7 @@ export interface DataGridProps extends IDataGridCellContext, IDataGridRowContext
   };
 }
 
+// eslint-disable-next-line @typescript-eslint/naming-convention -- Preserve the public API name.
 export interface DataGridRef {
   selectCell: (position: ICellPosition, options?: { deferred?: boolean }) => boolean;
   scrollToCell: (position: Partial<ICellPosition>) => void;
