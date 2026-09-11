@@ -53,13 +53,16 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.InputStream;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.sql.ResultSet;
+import java.sql.Timestamp;
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -69,6 +72,8 @@ import java.util.UUID;
 public class DataTransferImportTest extends CloudbeaverMockTest {
 
     private static final String TABLE_NAME = "DATA_TRANSFER_IMPORT_TEST";
+    private static final String HEADER_NONE_TABLE_NAME = "DATA_TRANSFER_HEADER_NONE";
+    private static final String CSV_RESOURCE_PATH = "data-transfer-import/";
     private static final String CSV_PROCESSOR_ID = "stream_producer:stream.csv";
     private static final String XML_PROCESSOR_ID = "stream_producer:stream.xml";
     private static final String XLSX_PROCESSOR_ID = "stream_producer:stream.xlsx";
@@ -174,27 +179,36 @@ public class DataTransferImportTest extends CloudbeaverMockTest {
         webConnectionInfo = project.addConnection(databaseContainer);
         try (JDBCStatement statement = databaseSession.createStatement()) {
             Assertions.assertFalse(statement.execute(
-                "CREATE TABLE " + TABLE_NAME + " (ID INTEGER NOT NULL, TEXT_VALUE VARCHAR(100))"
+                "CREATE TABLE " + TABLE_NAME +
+                    " (ID INTEGER NOT NULL, TEXT_VALUE VARCHAR(100), TS_VALUE TIMESTAMP)"
+            ));
+            Assertions.assertFalse(statement.execute(
+                "CREATE TABLE " + HEADER_NONE_TABLE_NAME + " (Column1 INTEGER NOT NULL, Column2 VARCHAR(100))"
             ));
         }
 
         WebSQLProcessor sqlProcessor = WebServiceBindingSQL.getSQLProcessor(webConnectionInfo);
         sqlContext = sqlProcessor.createContext(null, "PUBLIC", project.getId());
+        resultsId = openImportTarget(webSession, TABLE_NAME);
+        importProcessors = getImportProcessors();
+        csvProcessor = findProcessor(importProcessors, CSV_PROCESSOR_ID);
+    }
+
+    @NotNull
+    private String openImportTarget(@NotNull WebSession webSession, @NotNull String tableName) throws Exception {
         Map<String, Object> readTask = client.sendQuery(
             GQL_READ_DATA,
             Map.of(
                 "projectId", project.getId(),
                 "connectionId", databaseContainer.getId(),
                 "contextId", sqlContext.getId(),
-                "containerNodePath", resolveNodePath(webSession),
+                "containerNodePath", resolveNodePath(webSession, tableName),
                 "filter", Map.of("limit", 200, "offset", 0)
             )
         );
         String taskId = readTask.get("id").toString();
         clientWrapper.waitTaskCompleted(taskId);
-        resultsId = clientWrapper.readTaskResultSet(taskId).get("id").toString();
-        importProcessors = getImportProcessors();
-        csvProcessor = findProcessor(importProcessors, CSV_PROCESSOR_ID);
+        return clientWrapper.readTaskResultSet(taskId).get("id").toString();
     }
 
     @AfterEach
@@ -270,7 +284,7 @@ public class DataTransferImportTest extends CloudbeaverMockTest {
 
     @Test
     public void shouldImportWithLegacyProcessorDefaults() throws Exception {
-        importCsv("ID,TEXT_VALUE\n1,legacy\n", Map.of("processorId", csvProcessor.get("id")));
+        importCsvResource("01-legacy-defaults.csv", Map.of("processorId", csvProcessor.get("id")));
 
         assertRowCount(1);
         assertImportedValue(1, "legacy");
@@ -318,8 +332,8 @@ public class DataTransferImportTest extends CloudbeaverMockTest {
 
     @Test
     public void shouldUseOverridesForDiscoveryAndTransfer() throws Exception {
-        importCsv(
-            "ID;TEXT_VALUE\n2;semicolon\n3;\n",
+        importCsvResource(
+            "02-semicolon-empty.csv",
             Map.of(
                 "processorId", csvProcessor.get("id"),
                 "processorProperties", Map.of("delimiter", ";", "emptyStringNull", true)
@@ -329,6 +343,117 @@ public class DataTransferImportTest extends CloudbeaverMockTest {
         assertRowCount(2);
         assertImportedValue(2, "semicolon");
         assertImportedValue(3, null);
+    }
+
+    @Test
+    public void shouldImportEmptyNullMatrixWithEmptyStringsPreserved() throws Exception {
+        importCsvResource(
+            "03-empty-null-matrix.csv",
+            Map.of(
+                "processorId", csvProcessor.get("id"),
+                "processorProperties", Map.of(
+                    "emptyStringNull", false,
+                    "nullString", "NULL",
+                    "trimWhitespaces", true
+                )
+            )
+        );
+
+        assertRowCount(6);
+        assertImportedValue(10, "");
+        assertImportedValue(11, "");
+        assertImportedValue(12, null);
+        assertImportedValue(13, null);
+        assertImportedValue(14, null);
+        assertImportedValue(15, "value");
+    }
+
+    @Test
+    public void shouldImportEmptyNullMatrixWithEmptyStringsAsNulls() throws Exception {
+        importCsvResource(
+            "03-empty-null-matrix.csv",
+            Map.of(
+                "processorId", csvProcessor.get("id"),
+                "processorProperties", Map.of(
+                    "emptyStringNull", true,
+                    "nullString", "NULL",
+                    "trimWhitespaces", true
+                )
+            )
+        );
+
+        assertRowCount(6);
+        for (int id = 10; id <= 14; id++) {
+            assertImportedValue(id, null);
+        }
+        assertImportedValue(15, "value");
+    }
+
+    @Test
+    public void shouldImportCustomTimestamps() throws Exception {
+        importCsvResource(
+            "04-custom-timestamp.csv",
+            Map.of(
+                "processorId", csvProcessor.get("id"),
+                "processorProperties", Map.of("delimiter", ";", "timestampFormat", "dd.MM.yyyy HH:mm:ss")
+            )
+        );
+
+        assertRowCount(2);
+        assertImportedTimestamp(30, LocalDateTime.of(2025, 12, 31, 23, 59, 58));
+        assertImportedTimestamp(31, LocalDateTime.of(2026, 1, 1, 0, 0));
+    }
+
+    @Test
+    public void shouldImportWithCustomQuote() throws Exception {
+        importCsvResource(
+            "05-custom-quote.csv",
+            Map.of(
+                "processorId", csvProcessor.get("id"),
+                "processorProperties", Map.of("delimiter", ";", "quoteChar", "'", "trimWhitespaces", false)
+            )
+        );
+
+        assertRowCount(3);
+        assertImportedValue(40, "text;with;delimiter");
+        assertImportedValue(41, " leading and trailing ");
+        assertImportedValue(42, "plain");
+    }
+
+    @Test
+    public void shouldImportWithoutHeader() throws Exception {
+        WebSession webSession = resolveWebSession();
+        resultsId = openImportTarget(webSession, HEADER_NONE_TABLE_NAME);
+        importCsvResource(
+            "06-header-none.csv",
+            Map.of(
+                "processorId", csvProcessor.get("id"),
+                "processorProperties", Map.of("header", "none")
+            ),
+            HEADER_NONE_TABLE_NAME
+        );
+
+        assertRowCount(HEADER_NONE_TABLE_NAME, 2);
+        assertImportedValue(HEADER_NONE_TABLE_NAME, "Column1", "Column2", 60, "no-header-first-row");
+        assertImportedValue(HEADER_NONE_TABLE_NAME, "Column1", "Column2", 61, "no-header-second-row");
+    }
+
+    @Test
+    public void shouldImportUtf8Text() throws Exception {
+        importCsvResource(
+            "07-utf8-text.csv",
+            Map.of(
+                "processorId", csvProcessor.get("id"),
+                "processorProperties", Map.of("encoding", "utf-8")
+            )
+        );
+
+        assertRowCount(5);
+        assertImportedValue(50, "Привет");
+        assertImportedValue(51, "幸");
+        assertImportedValue(52, "Ä");
+        assertImportedValue(53, "مرحبا");
+        assertImportedValue(54, "Добрый день");
     }
 
     @Test
@@ -352,8 +477,27 @@ public class DataTransferImportTest extends CloudbeaverMockTest {
     }
 
     private void importCsv(@NotNull String contents, @NotNull Map<String, Object> parameters) throws Exception {
+        assertRowCount(0);
         String taskId = createImportTask(GQL_IMPORT_DATA, parameters);
         uploadCsv(taskId, contents);
+        clientWrapper.waitTaskCompleted(taskId);
+    }
+
+    private void importCsvResource(
+        @NotNull String resourceName,
+        @NotNull Map<String, Object> parameters
+    ) throws Exception {
+        importCsvResource(resourceName, parameters, TABLE_NAME);
+    }
+
+    private void importCsvResource(
+        @NotNull String resourceName,
+        @NotNull Map<String, Object> parameters,
+        @NotNull String tableName
+    ) throws Exception {
+        assertRowCount(tableName, 0);
+        String taskId = createImportTask(GQL_IMPORT_DATA, parameters);
+        uploadCsv(taskId, resourceName, readCsvResource(resourceName));
         clientWrapper.waitTaskCompleted(taskId);
     }
 
@@ -375,22 +519,29 @@ public class DataTransferImportTest extends CloudbeaverMockTest {
     }
 
     private void uploadCsv(@NotNull String taskId, @NotNull String contents) throws Exception {
+        uploadCsv(taskId, "import.csv", contents.getBytes(StandardCharsets.UTF_8));
+    }
+
+    private void uploadCsv(
+        @NotNull String taskId,
+        @NotNull String fileName,
+        @NotNull byte[] contents
+    ) throws Exception {
         String boundary = "----CloudBeaverTest" + UUID.randomUUID();
-        String body = "--" + boundary + "\r\n" +
+        byte[] prefix = ("--" + boundary + "\r\n" +
             "Content-Disposition: form-data; name=\"variables\"\r\n\r\n" +
             "{\"taskId\":\"" + taskId + "\"}\r\n" +
             "--" + boundary + "\r\n" +
-            "Content-Disposition: form-data; name=\"fileData\"; filename=\"import.csv\"\r\n" +
-            "Content-Type: text/csv\r\n\r\n" +
-            contents + "\r\n" +
-            "--" + boundary + "--\r\n";
+            "Content-Disposition: form-data; name=\"fileData\"; filename=\"" + fileName + "\"\r\n" +
+            "Content-Type: text/csv\r\n\r\n").getBytes(StandardCharsets.UTF_8);
+        byte[] suffix = ("\r\n--" + boundary + "--\r\n").getBytes(StandardCharsets.UTF_8);
         HttpRequest request = HttpRequest.newBuilder()
             .uri(URI.create(CEAppStarter.SERVER_URL + "/api/data/import"))
             .timeout(Duration.ofSeconds(30))
             .header(HttpConstants.HEADER_CONTENT_TYPE, "multipart/form-data; boundary=" + boundary)
             .header("TE-Client-Version", GeneralUtils.getMajorVersion())
             .header("Cookie", CBConstants.CB_SESSION_COOKIE_NAME + "=" + client.getSessionIdCookie())
-            .POST(HttpRequest.BodyPublishers.ofString(body, StandardCharsets.UTF_8))
+            .POST(HttpRequest.BodyPublishers.ofByteArrays(List.of(prefix, contents, suffix)))
             .build();
 
         HttpResponse<String> response = HTTP_CLIENT.send(
@@ -400,10 +551,31 @@ public class DataTransferImportTest extends CloudbeaverMockTest {
         Assertions.assertEquals(200, response.statusCode(), response.body());
     }
 
+    @NotNull
+    private byte[] readCsvResource(@NotNull String resourceName) throws Exception {
+        InputStream resource = DataTransferImportTest.class.getResourceAsStream(CSV_RESOURCE_PATH + resourceName);
+        Assertions.assertNotNull(resource, "CSV test resource not found: " + resourceName);
+        try (resource) {
+            return resource.readAllBytes();
+        }
+    }
+
     private void assertImportedValue(int id, @Nullable String expectedValue) throws Exception {
+        assertImportedValue(TABLE_NAME, "ID", "TEXT_VALUE", id, expectedValue);
+    }
+
+    private void assertImportedValue(
+        @NotNull String tableName,
+        @NotNull String idColumn,
+        @NotNull String valueColumn,
+        int id,
+        @Nullable String expectedValue
+    ) throws Exception {
         try (
             JDBCStatement statement = databaseSession.createStatement();
-            ResultSet resultSet = statement.executeQuery("SELECT TEXT_VALUE FROM " + TABLE_NAME + " WHERE ID = " + id)
+            ResultSet resultSet = statement.executeQuery(
+                "SELECT " + valueColumn + " FROM " + tableName + " WHERE " + idColumn + " = " + id
+            )
         ) {
             Assertions.assertTrue(resultSet.next(), "Imported row not found: " + id);
             String actualValue = resultSet.getString(1);
@@ -417,10 +589,27 @@ public class DataTransferImportTest extends CloudbeaverMockTest {
         }
     }
 
-    private void assertRowCount(int expectedCount) throws Exception {
+    private void assertImportedTimestamp(int id, @NotNull LocalDateTime expectedValue) throws Exception {
         try (
             JDBCStatement statement = databaseSession.createStatement();
-            ResultSet resultSet = statement.executeQuery("SELECT COUNT(*) FROM " + TABLE_NAME)
+            ResultSet resultSet = statement.executeQuery("SELECT TS_VALUE FROM " + TABLE_NAME + " WHERE ID = " + id)
+        ) {
+            Assertions.assertTrue(resultSet.next(), "Imported row not found: " + id);
+            Timestamp actualValue = resultSet.getTimestamp(1);
+            Assertions.assertFalse(resultSet.wasNull(), "Unexpected SQL NULL for row: " + id);
+            Assertions.assertEquals(expectedValue, actualValue.toLocalDateTime());
+            Assertions.assertFalse(resultSet.next());
+        }
+    }
+
+    private void assertRowCount(int expectedCount) throws Exception {
+        assertRowCount(TABLE_NAME, expectedCount);
+    }
+
+    private void assertRowCount(@NotNull String tableName, int expectedCount) throws Exception {
+        try (
+            JDBCStatement statement = databaseSession.createStatement();
+            ResultSet resultSet = statement.executeQuery("SELECT COUNT(*) FROM " + tableName)
         ) {
             Assertions.assertTrue(resultSet.next());
             Assertions.assertEquals(expectedCount, resultSet.getInt(1));
@@ -456,7 +645,7 @@ public class DataTransferImportTest extends CloudbeaverMockTest {
     }
 
     @NotNull
-    private String resolveNodePath(@NotNull WebSession session) throws Exception {
+    private String resolveNodePath(@NotNull WebSession session, @NotNull String tableName) throws Exception {
         DBRProgressMonitor progressMonitor = session.getProgressMonitor();
         DBNModel navigatorModel = session.getNavigatorModelOrThrow();
         DBNProject projectNode = navigatorModel.getRoot().getProjectNode(project);
@@ -465,11 +654,11 @@ public class DataTransferImportTest extends CloudbeaverMockTest {
 
         DBSObjectContainer rootContainer = DBUtils.getAdapter(DBSObjectContainer.class, webConnectionInfo.getDataSource());
         Assertions.assertNotNull(rootContainer, "Connection is not a database object container");
-        DBSEntity table = findEntity(progressMonitor, rootContainer, TABLE_NAME, 4);
-        Assertions.assertNotNull(table, TABLE_NAME + " entity not found");
+        DBSEntity table = findEntity(progressMonitor, rootContainer, tableName, 4);
+        Assertions.assertNotNull(table, tableName + " entity not found");
 
         DBNDatabaseNode tableNode = navigatorModel.getNodeByObject(progressMonitor, table, true);
-        Assertions.assertNotNull(tableNode, "Navigator node for " + TABLE_NAME + " not found");
+        Assertions.assertNotNull(tableNode, "Navigator node for " + tableName + " not found");
         return tableNode.getNodeUri();
     }
 
