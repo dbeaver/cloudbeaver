@@ -3,10 +3,10 @@
 set -Eeuo pipefail
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
-REPO_ROOT="$(cd -- "$SCRIPT_DIR/.." && pwd)"
-COMPOSE_FILE="$REPO_ROOT/server/test/postgres/compose.yml"
+REPO_ROOT="$(cd -- "$SCRIPT_DIR/../../.." && pwd)"
+COMPOSE_FILE="$SCRIPT_DIR/compose.yml"
 PROJECT_NAME="cloudbeaver-pg-${UID:-0}-$$-${RANDOM}"
-LOG_DIR="${CLOUDBEAVER_TEST_POSTGRES_LOG_DIR:-$REPO_ROOT/server/test/postgres/target}"
+LOG_DIR="${CLOUDBEAVER_TEST_POSTGRES_LOG_DIR:-$SCRIPT_DIR/target}"
 LOG_FILE="$LOG_DIR/postgres.log"
 
 compose() {
