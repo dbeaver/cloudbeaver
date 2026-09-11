@@ -10,38 +10,29 @@ import { act } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import * as coreDi from '@cloudbeaver/core-di';
+
 import type { INodeState } from './INodeState.js';
 import type { ITreeData } from './ITreeData.js';
 import { Tree } from './Tree.js';
-
-vi.mock('@cloudbeaver/core-ui', async importOriginal => {
-  const data = { state: { isDragging: false }, setTargetRef: () => {} };
-  const box = { state: { isOverCurrent: false, canDrop: false }, setRef: () => {} };
-  return {
-    ...(await importOriginal<typeof import('@cloudbeaver/core-ui')>()),
-    useDNDData: () => data,
-    useDNDBox: () => box,
-  };
-});
-
-vi.mock('@cloudbeaver/core-di', async importOriginal => {
-  const original = await importOriginal<typeof import('@cloudbeaver/core-di')>();
-  return {
-    ...original,
-    useService(service: { name: string }) {
-      if (service.name === 'LocalizationService') {
-        return { translate: (key: string) => key };
-      }
-      return original.useService(service as Parameters<typeof original.useService>[0]);
-    },
-  };
-});
+import * as nodeDnDModule from './useNodeDnD.js';
 
 describe('Tree keyboard activation', () => {
   let container: HTMLDivElement;
   let root: Root;
 
   beforeEach(() => {
+    vi.spyOn(nodeDnDModule, 'useNodeDnD').mockReturnValue({
+      state: { isDragging: false, isOverCurrent: false, canDrop: false },
+      setRef: () => {},
+    });
+    const useService = coreDi.useService;
+    vi.spyOn(coreDi, 'useService').mockImplementation(service => {
+      if (service.name === 'LocalizationService') {
+        return { translate: (key: string) => key };
+      }
+      return useService(service);
+    });
     vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', true);
     vi.stubGlobal('_ROOT_URI_', '/');
     container = document.createElement('div');
@@ -52,6 +43,7 @@ describe('Tree keyboard activation', () => {
   afterEach(() => {
     act(() => root.unmount());
     container.remove();
+    vi.restoreAllMocks();
     vi.unstubAllGlobals();
   });
 
