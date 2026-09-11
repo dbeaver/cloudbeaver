@@ -1,48 +1,30 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { afterEach, beforeEach, describe, expect, test, vitest } from 'vitest';
+import { afterEach, beforeEach, describe, expect, test, vitest, type MockInstance } from 'vitest';
 import { renderHook } from '@testing-library/react';
 
 import { EAdminPermission, type ServerConfigResource } from '@cloudbeaver/core-root';
 
 import { useAdministrationSettings } from './useAdministrationSettings.js';
-
-vitest.mock('./ResourcesHooks/useResource', () => ({
-  useResource: vitest.fn(),
-}));
-
-vitest.mock('./usePermission', () => ({
-  usePermission: vitest.fn(),
-}));
-
-vitest.mock('@cloudbeaver/core-root', async importOriginal => {
-  const actual = (await importOriginal()) as object;
-
-  return {
-    ...actual,
-    ServerConfigResource: vitest.fn(),
-  };
-});
+import * as resource from './ResourcesHooks/useResource.js';
+import * as permission from './usePermission.js';
 
 describe('useAdministrationSettings', () => {
-  let mockUsePermission: ReturnType<typeof vitest.fn>;
-  let mockUseResource: ReturnType<typeof vitest.fn>;
+  let mockUsePermission: MockInstance<typeof permission.usePermission>;
+  let mockUseResource: MockInstance<typeof resource.useResource>;
 
-  beforeEach(async () => {
-    const { usePermission } = await import('./usePermission.js');
-    const { useResource } = await import('./ResourcesHooks/useResource.js');
-
-    mockUsePermission = usePermission as ReturnType<typeof vitest.fn>;
-    mockUseResource = useResource as ReturnType<typeof vitest.fn>;
+  beforeEach(() => {
+    mockUsePermission = vitest.spyOn(permission, 'usePermission');
+    mockUseResource = vitest.spyOn(resource, 'useResource');
   });
 
   afterEach(() => {
-    vitest.clearAllMocks();
+    vitest.restoreAllMocks();
   });
 
   test('should return credentialsSavingEnabled as true for admin users with admin save enabled', () => {

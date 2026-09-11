@@ -1,58 +1,31 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 
-import { renderHook } from '@testing-library/react';
-import { beforeEach, describe, expect, test, vi } from 'vitest';
+import { act, cleanup, renderHook } from '@testing-library/react';
+import { isObservableProp } from 'mobx';
+import { afterEach, describe, expect, test } from 'vitest';
 
 import { useFuzzySearch } from './useFuzzySearch.js';
 
-interface TestItem {
+interface ITestItem {
   name: string;
   description: string;
   category: string;
 }
 
-const mockSearchResults = vi.fn();
-const mockIsIndexing = vi.fn();
-const mockRemoveAll = vi.fn();
-const mockAddAll = vi.fn();
-const mockSearch = vi.fn();
-const mockClearSearch = vi.fn();
-
-vi.mock('react-minisearch', () => ({
-  useMiniSearch: vi.fn(() => ({
-    searchResults: mockSearchResults(),
-    isIndexing: mockIsIndexing(),
-    removeAll: mockRemoveAll,
-    addAll: mockAddAll,
-    search: mockSearch,
-    clearSearch: mockClearSearch,
-  })),
-}));
-
 describe('useFuzzySearch', () => {
-  const testData: TestItem[] = [
+  const testData: ITestItem[] = [
     { name: 'Apple', description: 'A red fruit', category: 'fruit' },
     { name: 'Apricot', description: 'A sweet fruit', category: 'fruit' },
     { name: 'Carrot', description: 'An orange vegetable', category: 'vegetable' },
   ];
 
-  beforeEach(() => {
-    mockSearchResults.mockClear();
-    mockIsIndexing.mockClear();
-    mockRemoveAll.mockClear();
-    mockAddAll.mockClear();
-    mockSearch.mockClear();
-    mockClearSearch.mockClear();
-
-    mockSearchResults.mockReturnValue(null);
-    mockIsIndexing.mockReturnValue(false);
-  });
+  afterEach(cleanup);
 
   test('should initialize with empty search results', () => {
     const { result } = renderHook(() =>
@@ -66,7 +39,7 @@ describe('useFuzzySearch', () => {
     expect(result.current.isIndexing).toBe(false);
   });
 
-  test('should call search method with correct query', () => {
+  test('should return matching proposals for a search query', () => {
     const { result } = renderHook(() =>
       useFuzzySearch({
         sourceProposals: testData,
@@ -74,10 +47,9 @@ describe('useFuzzySearch', () => {
       }),
     );
 
-    result.current.search('Apple');
+    act(() => result.current.search('Apple'));
 
-    expect(mockSearch).toHaveBeenCalledWith('Apple');
-    expect(mockSearch).toHaveBeenCalledTimes(1);
+    expect(result.current.searchResult).toEqual([expect.objectContaining(testData[0]!)]);
   });
 
   test('should support searching across multiple fields', () => {
@@ -88,12 +60,12 @@ describe('useFuzzySearch', () => {
       }),
     );
 
-    result.current.search('orange');
+    act(() => result.current.search('orange'));
 
-    expect(mockSearch).toHaveBeenCalledWith('orange');
+    expect(result.current.searchResult).toEqual([expect.objectContaining(testData[2]!)]);
   });
 
-  test('should call search with prefix query', () => {
+  test('should match proposals by prefix', () => {
     const { result } = renderHook(() =>
       useFuzzySearch({
         sourceProposals: testData,
@@ -102,12 +74,12 @@ describe('useFuzzySearch', () => {
       }),
     );
 
-    result.current.search('Ap');
+    act(() => result.current.search('Ap'));
 
-    expect(mockSearch).toHaveBeenCalledWith('Ap');
+    expect(result.current.searchResult).toEqual([expect.objectContaining(testData[0]!), expect.objectContaining(testData[1]!)]);
   });
 
-  test('should call clearSearch method', () => {
+  test('should clear search results', () => {
     const { result } = renderHook(() =>
       useFuzzySearch({
         sourceProposals: testData,
@@ -115,15 +87,15 @@ describe('useFuzzySearch', () => {
       }),
     );
 
-    result.current.search('Apple');
-    result.current.clearSearch();
+    act(() => result.current.search('Apple'));
+    expect(result.current.searchResult).not.toBeNull();
+    act(() => result.current.clearSearch());
 
-    expect(mockClearSearch).toHaveBeenCalled();
-    expect(mockClearSearch).toHaveBeenCalledTimes(1);
+    expect(result.current.searchResult).toBeNull();
   });
 
-  test('should call removeAll and addAll when source proposals change', () => {
-    const { rerender } = renderHook(
+  test('should replace indexed proposals when the source changes', () => {
+    const { result, rerender } = renderHook(
       ({ proposals }) =>
         useFuzzySearch({
           sourceProposals: proposals,
@@ -136,15 +108,14 @@ describe('useFuzzySearch', () => {
       },
     );
 
-    mockRemoveAll.mockClear();
-    mockAddAll.mockClear();
-
-    const newData: TestItem[] = [...testData, { name: 'Grape', description: 'A purple fruit', category: 'fruit' }];
+    const newData: ITestItem[] = [{ name: 'Grape', description: 'A purple fruit', category: 'fruit' }];
 
     rerender({ proposals: newData });
 
-    expect(mockRemoveAll).toHaveBeenCalled();
-    expect(mockAddAll).toHaveBeenCalled();
+    act(() => result.current.search('Carrot'));
+    expect(result.current.searchResult).toEqual([]);
+    act(() => result.current.search('Grape'));
+    expect(result.current.searchResult).toEqual([expect.objectContaining(newData[0]!)]);
   });
 
   test('should handle empty source proposals', () => {
@@ -155,9 +126,9 @@ describe('useFuzzySearch', () => {
       }),
     );
 
-    result.current.search('test');
+    act(() => result.current.search('test'));
 
-    expect(mockSearch).toHaveBeenCalledWith('test');
+    expect(result.current.searchResult).toEqual([]);
   });
 
   test('should handle search with empty query', () => {
@@ -168,9 +139,9 @@ describe('useFuzzySearch', () => {
       }),
     );
 
-    result.current.search('');
+    act(() => result.current.search(''));
 
-    expect(mockSearch).toHaveBeenCalledWith('');
+    expect(result.current.searchResult).toEqual([]);
   });
 
   test('should use useObservableRef to make state observable', () => {
@@ -181,9 +152,8 @@ describe('useFuzzySearch', () => {
       }),
     );
 
-    // Verify the returned state has all required properties
-    expect(result.current).toHaveProperty('searchResult');
-    expect(result.current).toHaveProperty('isIndexing');
+    expect(isObservableProp(result.current, 'searchResult')).toBe(true);
+    expect(isObservableProp(result.current, 'isIndexing')).toBe(true);
     expect(result.current).toHaveProperty('removeAll');
     expect(result.current).toHaveProperty('addAll');
     expect(result.current).toHaveProperty('search');

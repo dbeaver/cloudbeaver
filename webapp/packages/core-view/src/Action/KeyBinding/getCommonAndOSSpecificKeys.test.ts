@@ -5,24 +5,19 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { describe, expect, it, vi, beforeEach } from 'vitest';
+import { afterEach, describe, expect, it, vi, beforeEach } from 'vitest';
 import { OperatingSystem, getOS } from '@cloudbeaver/core-utils';
+import * as coreUtils from '@cloudbeaver/core-utils';
 
 import { getCommonAndOSSpecificKeys } from './getCommonAndOSSpecificKeys.js';
 import type { IKeyBinding } from './IKeyBinding.js';
 
-vi.mock('@cloudbeaver/core-utils', async () => {
-  const actual = await vi.importActual('@cloudbeaver/core-utils');
-  return {
-    ...actual,
-    getOS: vi.fn(),
-  };
-});
-
 describe('getCommonAndOSSpecificKeys', () => {
   beforeEach(() => {
-    vi.clearAllMocks();
+    vi.spyOn(coreUtils, 'getOS');
   });
+
+  afterEach(() => vi.restoreAllMocks());
 
   it('should return empty array when keyBinding is undefined', () => {
     const result = getCommonAndOSSpecificKeys(undefined);

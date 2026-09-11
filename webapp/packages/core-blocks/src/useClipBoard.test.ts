@@ -1,29 +1,17 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { beforeEach, describe, expect, it, vitest } from 'vitest';
+import { afterEach, describe, expect, it, vitest } from 'vitest';
 import { renderHook } from '@testing-library/react';
 
 import * as coreDi from '@cloudbeaver/core-di';
 import * as coreUtils from '@cloudbeaver/core-utils';
 
 import { useClipboard } from './useClipboard.js';
-
-vitest.mock('@cloudbeaver/core-utils', () => ({
-  copyToClipboard: vitest.fn(),
-}));
-
-vitest.mock('@cloudbeaver/core-di', () => ({
-  useService: vitest.fn(),
-}));
-
-vitest.mock('@cloudbeaver/core-events', () => ({
-  NotificationService: {},
-}));
 
 class NotificationService {
   logSuccess = vitest.fn();
@@ -46,9 +34,7 @@ const getMocks = () => {
 describe('useClipboard', () => {
   const VALUE_TO_COPY = 'test';
 
-  beforeEach(() => {
-    vitest.clearAllMocks();
-  });
+  afterEach(() => vitest.restoreAllMocks());
 
   it('should copy without notification', () => {
     const { notificationServiceMock, copyToClipboardMock } = getMocks();

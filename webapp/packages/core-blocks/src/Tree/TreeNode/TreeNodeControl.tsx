@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -75,15 +75,13 @@ export const TreeNodeControl = observer<Props & React.HTMLAttributes<HTMLDivElem
     }
 
     async function handleEnter(event: React.KeyboardEvent<HTMLDivElement>) {
-      if (EventContext.has(event, EventTreeNodeExpandFlag, EventTreeNodeSelectFlag, EventStopPropagationFlag)) {
+      if (context.treeItem || EventContext.has(event, EventTreeNodeExpandFlag, EventTreeNodeSelectFlag, EventStopPropagationFlag)) {
         return;
       }
 
       EventContext.set(event, EventTreeNodeSelectFlag);
-      switch ((event as unknown as KeyboardEvent).code) {
-        case KEY.ENTER:
-          await context.select(event.ctrlKey || event.metaKey);
-          break;
+      if ((event as unknown as KeyboardEvent).code === KEY.ENTER) {
+        await context.select(event.ctrlKey || event.metaKey);
       }
       return true;
     }
@@ -111,20 +109,27 @@ export const TreeNodeControl = observer<Props & React.HTMLAttributes<HTMLDivElem
         onMouseDown(event);
       }
     }
+    let tabIndex: number | undefined;
+
+    if (!context.treeItem) {
+      tabIndex = context.selected ? 0 : -1;
+    }
 
     return (
       <div
         ref={mergedRef}
-        tabIndex={context.selected ? 0 : -1}
+        tabIndex={tabIndex}
         title={title}
-        aria-selected={context.selected}
+        aria-selected={context.treeItem ? undefined : context.selected}
+        data-selected={context.treeItem ? context.selected : undefined}
         className={s(styles, { treeNodeControl: true }, className)}
-        data-tree-node-control
+        data-tree-node-control={context.treeItem ? undefined : true}
         onClick={handleClick}
         onMouseDown={handleMouseDown}
         onKeyDown={handleEnter}
         onDoubleClick={handleDbClick}
         {...rest}
+        data-tree-node-content={context.treeItem ? true : undefined}
       >
         {children}
       </div>

@@ -1,14 +1,15 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 
 import { renderHook } from '@testing-library/react';
-import { beforeEach, describe, expect, test, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
+import * as fuzzySearch from './useFuzzySearch.js';
 import { useSearch } from './useSearch.js';
 
 interface TestItem {
@@ -21,18 +22,6 @@ const useFuzzySearchSpy = vi.fn();
 
 const mockFuzzySearch = vi.fn();
 let mockSearchResult: any = null;
-
-vi.mock('./useFuzzySearch', () => ({
-  useFuzzySearch: vi.fn((config: any) => {
-    useFuzzySearchSpy(config);
-    return {
-      search: mockFuzzySearch,
-      get searchResult() {
-        return mockSearchResult;
-      },
-    };
-  }),
-}));
 
 describe('useSearch', () => {
   const testData: TestItem[] = [
@@ -48,7 +37,22 @@ describe('useSearch', () => {
     useFuzzySearchSpy.mockClear();
     mockFuzzySearch.mockClear();
     mockSearchResult = null;
+    vi.spyOn(fuzzySearch, 'useFuzzySearch').mockImplementation(config => {
+      useFuzzySearchSpy(config);
+      return {
+        search: mockFuzzySearch,
+        get searchResult() {
+          return mockSearchResult;
+        },
+        isIndexing: false,
+        removeAll: vi.fn(),
+        addAll: vi.fn(),
+        clearSearch: vi.fn(),
+      };
+    });
   });
+
+  afterEach(() => vi.restoreAllMocks());
 
   describe('Initialization', () => {
     test('should initialize with correct default values and observed state', () => {

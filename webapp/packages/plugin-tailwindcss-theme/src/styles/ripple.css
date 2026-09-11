@@ -31,7 +31,8 @@
   }
 
   .theme-ripple-selectable {
-    &[aria-selected='true']::before {
+    &[aria-selected='true']::before,
+    &[data-selected='true']::before {
       opacity: 0.15;
     }
   }

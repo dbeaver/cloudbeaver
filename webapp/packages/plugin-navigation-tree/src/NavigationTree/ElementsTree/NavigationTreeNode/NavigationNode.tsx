@@ -1,19 +1,20 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { useDeferredValue, useEffect } from 'react';
+import { useCallback, useContext, useDeferredValue, useEffect } from 'react';
 
-import { getComputed, s, TreeNode, useMergeRefs, useS } from '@cloudbeaver/core-blocks';
+import { getComputed, s, TreeNode, useMergeRefs, useObjectRef, useS } from '@cloudbeaver/core-blocks';
 import { useDataContext, useDataContextLink } from '@cloudbeaver/core-data-context';
 import { useService } from '@cloudbeaver/core-di';
 import { DATA_CONTEXT_NAV_NODE, DATA_CONTEXT_NAV_NODES, NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
 import { useDNDData } from '@cloudbeaver/core-ui';
 
+import { TreeKeyboardNavigationContext } from '../../../TreeKeyboardNavigationContext.js';
 import { useNavTreeDropBox } from '../../useNavTreeDropBox.js';
 import type { NavigationNodeComponent } from '../NavigationNodeComponent.js';
 import componentStyle from './NavigationNode.module.css';
@@ -35,6 +36,7 @@ export const NavigationNode: NavigationNodeComponent = observer(function Navigat
   const navNodeManagerService = useService(NavNodeManagerService);
   const navNode = useNavigationNode(node, path);
   const context = useDataContext();
+  const keyboardNavigation = useContext(TreeKeyboardNavigationContext)!;
 
   const dndData = useDNDData(context, {
     canDrag: () => {
@@ -64,6 +66,22 @@ export const NavigationNode: NavigationNodeComponent = observer(function Navigat
     expanded: navNode.expanded,
     expand: navNode.expand,
   });
+  const keyboardActions = useObjectRef({
+    async activate() {
+      if (navNode.leaf) {
+        await navNode.select();
+        await navNode.open(true);
+      } else {
+        await navNode.setExpanded(!navNode.expanded);
+      }
+    },
+    setExpanded: navNode.setExpanded,
+  });
+  const setNodeRef = useCallback(
+    (element: HTMLDivElement | null) => keyboardNavigation.registerNode(node.uri, element, keyboardActions),
+    [keyboardActions, keyboardNavigation, node.uri],
+  );
+  const treeNodeRef = useMergeRefs(dndBox.setRef, setNodeRef);
 
   useDataContextLink(context, (context, id) => {
     context.set(DATA_CONTEXT_NAV_NODE, node, id);
@@ -86,7 +104,9 @@ export const NavigationNode: NavigationNodeComponent = observer(function Navigat
 
   return (
     <TreeNode
-      ref={dndBox.setRef}
+      ref={treeNodeRef}
+      nodeId={node.uri}
+      tabIndex={keyboardNavigation.activeNodeId === node.uri ? 0 : -1}
       group={navNode.group}
       loading={navNode.loading}
       disabled={navNode.disabled}

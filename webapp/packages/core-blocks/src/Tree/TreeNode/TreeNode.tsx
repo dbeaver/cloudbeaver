@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,8 @@ import componentStyle from './TreeNode.module.css';
 import { type ITreeNodeContext, TreeNodeContext } from './TreeNodeContext.js';
 
 interface Props extends ITreeNodeState {
+  nodeId?: string;
+  tabIndex?: number;
   className?: string;
   style?: React.CSSProperties;
   children?: React.ReactNode;
@@ -35,6 +37,8 @@ export const TreeNode = observer<Props, HTMLDivElement | null>(
   forwardRef(function TreeNode(
     {
       group = false,
+      nodeId,
+      tabIndex,
       loading = false,
       selected = false,
       indeterminateSelected = false,
@@ -59,6 +63,7 @@ export const TreeNode = observer<Props, HTMLDivElement | null>(
           return this.inProgress > 0;
         },
         inProgress: 0,
+        treeItem: !!nodeId,
         async processAction(action: () => Promise<void>) {
           this.inProgress++;
 
@@ -91,6 +96,7 @@ export const TreeNode = observer<Props, HTMLDivElement | null>(
       }),
       {
         group: observable.ref,
+        treeItem: observable.ref,
         disabled: observable.ref,
         processing: computed,
         inProgress: observable.ref,
@@ -105,6 +111,7 @@ export const TreeNode = observer<Props, HTMLDivElement | null>(
       },
       {
         group,
+        treeItem: !!nodeId,
         disabled,
         loading,
         selected,
@@ -115,9 +122,17 @@ export const TreeNode = observer<Props, HTMLDivElement | null>(
         leaf,
       },
     );
-
     return (
-      <div ref={ref} className={s(styles, { node: true }, className)} style={style}>
+      <div
+        ref={ref}
+        role={nodeId ? 'treeitem' : undefined}
+        aria-selected={nodeId ? selected : undefined}
+        aria-expanded={nodeId && !leaf ? Boolean(expanded || externalExpanded) : undefined}
+        tabIndex={tabIndex}
+        className={s(styles, { node: true }, className)}
+        style={style}
+        data-tree-node-id={nodeId}
+      >
         <TreeNodeContext.Provider value={nodeContext}>{children}</TreeNodeContext.Provider>
       </div>
     );
