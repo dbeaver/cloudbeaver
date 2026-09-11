@@ -162,6 +162,8 @@ export class ConnectionFormSSLPart extends FormPart<INetworkHandlerConfig, IConn
   }
 
   protected override format(): void {
+    trimSSLConfig(this.state);
+
     const handlerConfig = this.optionsPart.state.networkHandlersConfig?.find(config => config.id === this.state.id);
     if (handlerConfig) {
       trimSSLConfig(handlerConfig);

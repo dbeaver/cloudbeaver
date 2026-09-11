@@ -74,23 +74,24 @@ export class ConnectionFormDriverPropertiesPart extends FormPart<ConnectionPrope
     contexts: IExecutionContextProvider<IFormState<IConnectionFormState>>,
   ): Promise<void> {}
 
+  protected override async prepare(
+    data: IFormState<IConnectionFormState>,
+    contexts: IExecutionContextProvider<IFormState<IConnectionFormState>>,
+  ): Promise<void> {
+    this.optionsPart.state.properties = await this.getPropertiesConfig();
+  }
+
   protected override async format(
     data: IFormState<IConnectionFormState>,
     contexts: IExecutionContextProvider<IFormState<IConnectionFormState>>,
   ): Promise<void> {
     runInAction(() => {
-      for (const key of Object.keys(this.state!)) {
-        if (typeof this.state[key] === 'string') {
-          this.state[key] = this.state[key].trim();
-        }
-      }
+      this.state = trimProperties(this.state);
     });
-
-    this.optionsPart.state.properties = await this.getPropertiesConfig();
   }
 
   private async getPropertiesConfig() {
-    const config = toJS(this.state);
+    const config = trimProperties(toJS(this.state));
 
     if (!this.optionsPart.state.driverId) {
       return config;
@@ -130,4 +131,16 @@ export class ConnectionFormDriverPropertiesPart extends FormPart<ConnectionPrope
 
     return config;
   }
+}
+
+function trimProperties(config: Record<string, any>): Record<string, any> {
+  config = { ...config };
+
+  for (const key of Object.keys(config)) {
+    if (typeof config[key] === 'string') {
+      config[key] = config[key].trim();
+    }
+  }
+
+  return config;
 }
