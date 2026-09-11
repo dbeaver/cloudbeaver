@@ -1,0 +1,19 @@
+services:
+  postgres:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: cloudbeaver_test
+      POSTGRES_USER: cloudbeaver_test
+      POSTGRES_PASSWORD: cloudbeaver_test
+    ports:
+      - target: 5432
+        published: "${CLOUDBEAVER_TEST_POSTGRES_PORT:-5432}"
+        host_ip: 127.0.0.1
+        protocol: tcp
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cloudbeaver_test -d cloudbeaver_test"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+    tmpfs:
+      - /var/lib/postgresql/data

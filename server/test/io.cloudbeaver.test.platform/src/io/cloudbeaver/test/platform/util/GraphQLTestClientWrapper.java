@@ -78,7 +78,7 @@ public class GraphQLTestClientWrapper {
         taskInfoVars.put("removeOnFinish", false);
         String taskStatus = null;
         int attempts = 0;
-        int maxAttempts = 20;
+        int maxAttempts = 300;
         while (attempts++ < maxAttempts) {
             Map<String, Object> taskInfo = client.sendQuery(GQL_ASYNC_TASK_INFO, taskInfoVars);
             if (taskInfo != null) {
@@ -86,18 +86,17 @@ public class GraphQLTestClientWrapper {
                 if (st != null) {
                     taskStatus = String.valueOf(st);
                 }
-                if (taskStatus != null) {
-                    if (taskStatus.equalsIgnoreCase("FINISHED")) {
-                        break;
-                    }
-                    Object error = taskInfo.get("error");
-                    if (error != null && CommonUtils.isNotEmpty(error.toString())) {
-                        throw new IllegalStateException("Async task failed: " + error);
-                    }
+                Object error = taskInfo.get("error");
+                if (error != null && CommonUtils.isNotEmpty(error.toString())) {
+                    throw new IllegalStateException("Async task failed: " + error);
+                }
+                if (taskStatus != null && taskStatus.equalsIgnoreCase("FINISHED")) {
+                    return;
                 }
             }
             Thread.sleep(200);
         }
+        throw new IllegalStateException("Async task did not finish: " + taskId);
     }
 
     @NotNull
