@@ -19,6 +19,7 @@ const ServerConfigurationFormPartStateConfigSchema = schema.looseObject({
   enabledAuthProviders: schema.array(schema.string()).optional(),
   enabledFeatures: schema.array(schema.string()).optional(),
   publicCredentialsSaveEnabled: schema.boolean().optional(),
+  dbUserPasswordChangeEnabled: schema.boolean().optional(),
   resourceManagerEnabled: schema.boolean().optional(),
   secretManagerEnabled: schema.boolean().optional(),
   serverName: schema.string().trim().optional(),

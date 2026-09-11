@@ -41,6 +41,16 @@ export const ServerConfigurationSecurityForm: PlaceholderComponent<IConfiguratio
         >
           {translate('administration_configuration_wizard_configuration_security_public_credentials')}
         </Switch>
+        <Switch
+          name="dbUserPasswordChangeEnabled"
+          state={serverConfig}
+          description={translate('administration_configuration_wizard_configuration_security_db_user_password_change_description')}
+          mod={['primary']}
+          small
+          autoHide
+        >
+          {translate('administration_configuration_wizard_configuration_security_db_user_password_change')}
+        </Switch>
         <Placeholder container={serverConfigurationService.securitySettingsContainer} configurationWizard={configurationWizard} state={state} />
       </Group>
     );

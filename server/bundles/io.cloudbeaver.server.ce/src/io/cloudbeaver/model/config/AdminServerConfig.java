@@ -44,6 +44,7 @@ public class AdminServerConfig {
     private final boolean customConnectionsEnabled;
     private final boolean publicCredentialsSaveEnabled;
     private final boolean adminCredentialsSaveEnabled;
+    private final boolean dbUserPasswordChangeEnabled;
     private final List<String> enabledFeatures;
     private final List<String> enabledAuthProviders;
     private final String[] enabledDrivers;
@@ -74,6 +75,11 @@ public class AdminServerConfig {
             params,
             "adminCredentialsSaveEnabled",
             appConfig.isAdminCredentialsSaveEnabled()
+        );
+        this.dbUserPasswordChangeEnabled = JSONUtils.getBoolean(
+            params,
+            "dbUserPasswordChangeEnabled",
+            appConfig.isDbUserPasswordChangeEnabled()
         );
         this.resourceManagerEnabled = JSONUtils.getBoolean(params, "resourceManagerEnabled", appConfig.isResourceManagerEnabled());
         this.secretManagerEnabled = JSONUtils.getBoolean(params, "secretManagerEnabled", appConfig.isSecretManagerEnabled());
@@ -161,6 +167,10 @@ public class AdminServerConfig {
 
     public boolean isAdminCredentialsSaveEnabled() {
         return adminCredentialsSaveEnabled;
+    }
+
+    public boolean isDbUserPasswordChangeEnabled() {
+        return dbUserPasswordChangeEnabled;
     }
 
     public long getSessionExpireTime() {

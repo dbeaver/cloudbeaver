@@ -15,6 +15,7 @@ fragment ServerConfig on ServerConfig {
 
   adminCredentialsSaveEnabled
   publicCredentialsSaveEnabled
+  dbUserPasswordChangeEnabled
 
   resourceManagerEnabled
   secretManagerEnabled
