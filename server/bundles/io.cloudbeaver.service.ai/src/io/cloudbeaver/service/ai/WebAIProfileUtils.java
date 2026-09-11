@@ -102,7 +102,7 @@ public final class WebAIProfileUtils {
     }
 
     @NotNull
-    static AIConfigurationProfile getEffectiveProfile(
+    public static AIConfigurationProfile getEffectiveProfile(
         @NotNull WebSession webSession,
         @NotNull AIConfigurationProfile profile,
         @NotNull AISettings settings

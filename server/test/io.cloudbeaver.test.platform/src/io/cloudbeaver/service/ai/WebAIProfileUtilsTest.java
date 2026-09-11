@@ -155,7 +155,8 @@ public class WebAIProfileUtilsTest {
         Mockito.when(secretController.getSupportedFeatures()).thenReturn(0L);
         WebAIProfileUtils.saveCredentials(webSession, profile, Map.of(credentialPropertyId, "session-token"));
         AIConfigurationProfile sameProfile = Mockito.mock(AIConfigurationProfile.class);
-        Mockito.when(sameProfile.getProfileId()).thenReturn(profile.getProfileId());
+        String profileId = profile.getProfileId();
+        Mockito.when(sameProfile.getProfileId()).thenReturn(profileId);
         Mockito.when(sameProfile.getConfiguration()).thenReturn(properties);
         Mockito.when(sameProfile.isGlobal()).thenReturn(false);
 
