@@ -18,8 +18,11 @@ package io.cloudbeaver.service.ai;
 
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.session.WebUserContext;
+import io.cloudbeaver.model.user.WebUser;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.ai.AIConfigurationProfile;
+import org.jkiss.dbeaver.model.ai.AISettings;
+import org.jkiss.dbeaver.model.ai.engine.openai.OpenAIConstants;
 import org.jkiss.dbeaver.model.ai.engine.openai.OpenAIProperties;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.secret.DBSSecretController;
@@ -37,6 +40,7 @@ public class WebAIProfileUtilsTest {
     private final Map<String, String> secrets = new HashMap<>();
     private final Map<String, Object> sessionAttributes = new HashMap<>();
     private DBSSecretController secretController;
+    private WebUser user;
     private WebSession webSession;
     private AIConfigurationProfile profile;
     private OpenAIProperties properties;
@@ -71,6 +75,9 @@ public class WebAIProfileUtilsTest {
 
         WebUserContext userContext = Mockito.mock(WebUserContext.class);
         Mockito.when(userContext.getSecretController()).thenReturn(secretController);
+        user = Mockito.mock(WebUser.class);
+        Mockito.when(user.isSecretStorage()).thenReturn(true);
+        Mockito.when(userContext.getUser()).thenReturn(user);
 
         webSession = Mockito.mock(WebSession.class);
         Mockito.when(webSession.getUserId()).thenReturn("test-user");
@@ -140,6 +147,76 @@ public class WebAIProfileUtilsTest {
         Assertions.assertTrue(secrets.isEmpty());
 
         WebAIProfileUtils.saveCredentials(webSession, profile, Map.of(credentialPropertyId, ""));
+        Assertions.assertFalse(WebAIProfileUtils.areCredentialsSaved(webSession, profile));
+    }
+
+    @Test
+    public void usesSessionCredentialsAcrossProfileInstances() throws DBException {
+        Mockito.when(secretController.getSupportedFeatures()).thenReturn(0L);
+        WebAIProfileUtils.saveCredentials(webSession, profile, Map.of(credentialPropertyId, "session-token"));
+        AIConfigurationProfile sameProfile = Mockito.mock(AIConfigurationProfile.class);
+        Mockito.when(sameProfile.getProfileId()).thenReturn(profile.getProfileId());
+        Mockito.when(sameProfile.getConfiguration()).thenReturn(properties);
+        Mockito.when(sameProfile.isGlobal()).thenReturn(false);
+
+        Assertions.assertTrue(WebAIProfileUtils.areCredentialsSaved(webSession, sameProfile));
+    }
+
+    @Test
+    public void fallsBackToSessionWhenSubjectSecretStorageIsDisabled() throws DBException {
+        Mockito.when(user.isSecretStorage()).thenReturn(false);
+
+        WebAIProfileUtils.saveCredentials(webSession, profile, Map.of(credentialPropertyId, "session-token"));
+
+        Assertions.assertTrue(WebAIProfileUtils.areCredentialsSaved(webSession, profile));
+        Assertions.assertTrue(secrets.isEmpty());
+    }
+
+    @Test
+    public void createsEffectiveProfileWithoutMutatingSource() throws DBException {
+        AIConfigurationProfile source = new AIConfigurationProfile();
+        source.setProfileId("test-effective-profile");
+        source.setProfileName("Effective profile test");
+        source.setEngineId(OpenAIConstants.OPENAI_ENGINE);
+        source.setGlobal(false);
+        OpenAIProperties sourceProperties = new OpenAIProperties();
+        sourceProperties.setGlobal(false);
+        source.setConfiguration(sourceProperties);
+        AISettings settings = Mockito.mock(AISettings.class);
+        Mockito.when(settings.getConfigurationOrNull(source.getProfileId())).thenReturn(source);
+
+        WebAIProfileUtils.saveCredentials(webSession, source, Map.of(credentialPropertyId, "effective-token"));
+
+        AIConfigurationProfile effective = WebAIProfileUtils.getEffectiveProfile(webSession, source, settings);
+
+        Assertions.assertNotSame(source, effective);
+        Assertions.assertNotSame(sourceProperties, effective.getConfiguration());
+        Assertions.assertEquals("effective-token", ((OpenAIProperties) effective.getConfiguration()).getToken());
+        Assertions.assertNull(sourceProperties.getToken());
+    }
+
+    @Test
+    public void clearsPersistentCredentialsWhenSwitchingToSessionStorage() throws DBException {
+        WebAIProfileUtils.saveCredentials(webSession, profile, Map.of(credentialPropertyId, "persistent-token"));
+        Mockito.when(user.isSecretStorage()).thenReturn(false);
+
+        WebAIProfileUtils.saveCredentials(webSession, profile, Map.of(credentialPropertyId, "session-token"));
+
+        Assertions.assertTrue(secrets.isEmpty());
+        Assertions.assertTrue(WebAIProfileUtils.areCredentialsSaved(webSession, profile));
+    }
+
+    @Test
+    public void clearsSessionCredentialsWhenSwitchingToPersistentStorage() throws DBException {
+        Mockito.when(secretController.getSupportedFeatures()).thenReturn(0L);
+        WebAIProfileUtils.saveCredentials(webSession, profile, Map.of(credentialPropertyId, "session-token"));
+        Mockito.when(secretController.getSupportedFeatures()).thenReturn(
+            DBSSecretController.FEATURE_PRIVATE_SECRETS_VIEW | DBSSecretController.FEATURE_PRIVATE_SECRETS_EDIT
+        );
+
+        WebAIProfileUtils.saveCredentials(webSession, profile, Map.of(credentialPropertyId, "persistent-token"));
+        Mockito.when(secretController.getSupportedFeatures()).thenReturn(0L);
+
         Assertions.assertFalse(WebAIProfileUtils.areCredentialsSaved(webSession, profile));
     }
 }

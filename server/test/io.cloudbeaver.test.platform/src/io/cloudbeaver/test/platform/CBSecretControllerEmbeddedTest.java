@@ -53,6 +53,11 @@ public class CBSecretControllerEmbeddedTest {
     };
 
     @Test
+    public void doesNotAdvertisePlaintextSecretStorage() throws DBException {
+        Assertions.assertEquals(0, createController(TEST_USER_ID).getSupportedFeatures());
+    }
+
+    @Test
     public void testPrivateSecretsPersistBetweenControllers() throws DBException {
         String secretId = "ce_private_secret_test";
         DBSSecretController firstController = createController(TEST_USER_ID);

@@ -21,6 +21,7 @@ import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.ai.AIConfigurationProfile;
+import org.jkiss.dbeaver.model.ai.AISettings;
 import org.jkiss.dbeaver.model.ai.engine.AIEngineProperties;
 import org.jkiss.dbeaver.model.ai.registry.AISettingsManager;
 import org.jkiss.dbeaver.model.auth.AuthProperty;
@@ -54,7 +55,7 @@ public final class WebAIProfileUtils {
         }
         DBSSecretController secretController = webSession.getUserContext().getSecretController();
         Set<String> credentialProperties = getCredentialPropertyIds(profile.getConfiguration());
-        Map<String, String> storedCredentials = isPersistentStorageAvailable(secretController)
+        Map<String, String> storedCredentials = isPersistentStorageAvailable(webSession, secretController)
             ? getStoredCredentials(secretController, profile, credentialProperties)
             : getSessionCredentials(webSession, profile, false);
         return !storedCredentials.isEmpty();
@@ -68,12 +69,15 @@ public final class WebAIProfileUtils {
         validateUserProfile(webSession, profile);
         DBSSecretController secretController = webSession.getUserContext().getSecretController();
         Set<String> credentialProperties = getCredentialPropertyIds(profile.getConfiguration());
-        if (!isPersistentStorageAvailable(secretController)) {
+        validateCredentialProperties(credentialProperties, credentials.keySet());
+        if (!isPersistentStorageAvailable(webSession, secretController)) {
+            if (isPersistentStorageSupported(secretController)) {
+                clearPersistentCredentials(secretController, profile, credentialProperties);
+            }
             Map<String, String> sessionCredentials = getSessionCredentials(webSession, profile, true);
             updateCredentials(sessionCredentials, credentialProperties, credentials);
             return;
         }
-        validateCredentialProperties(credentialProperties, credentials.keySet());
         for (Map.Entry<String, Object> credential : credentials.entrySet()) {
             String value = credential.getValue() == null ? null : credential.getValue().toString();
             String secretId = getSecretId(profile, credential.getKey());
@@ -86,6 +90,7 @@ public final class WebAIProfileUtils {
                 );
             }
         }
+        webSession.removeAttribute(getSessionCredentialsAttribute(profile));
     }
 
     @NotNull
@@ -93,10 +98,18 @@ public final class WebAIProfileUtils {
         @NotNull WebSession webSession,
         @NotNull AIConfigurationProfile profile
     ) throws DBException {
-        AIConfigurationProfile source = AISettingsManager.getStaticSettings()
-            .getConfigurationOrNull(profile.getProfileId());
+        return getEffectiveProfile(webSession, profile, AISettingsManager.getStaticSettings());
+    }
+
+    @NotNull
+    static AIConfigurationProfile getEffectiveProfile(
+        @NotNull WebSession webSession,
+        @NotNull AIConfigurationProfile profile,
+        @NotNull AISettings settings
+    ) throws DBException {
+        AIConfigurationProfile source = settings.getConfigurationOrNull(profile.getProfileId());
         if (source == null) {
-            source = AISettingsManager.getStaticSettings().getDefaultConfiguration();
+            source = settings.getDefaultConfiguration();
         }
         if (source.isGlobal()) {
             return source;
@@ -104,7 +117,7 @@ public final class WebAIProfileUtils {
 
         validateUserProfile(webSession, source);
         DBSSecretController secretController = webSession.getUserContext().getSecretController();
-        Map<String, String> credentials = isPersistentStorageAvailable(secretController)
+        Map<String, String> credentials = isPersistentStorageAvailable(webSession, secretController)
             ? getStoredCredentials(secretController, source, getCredentialPropertyIds(source.getConfiguration()))
             : getSessionCredentials(webSession, source, false);
         if (credentials.isEmpty()) {
@@ -154,10 +167,9 @@ public final class WebAIProfileUtils {
         @NotNull AIConfigurationProfile profile
     ) throws DBException {
         DBSSecretController secretController = webSession.getUserContext().getSecretController();
-        if (isPersistentStorageAvailable(secretController)) {
-            secretController.deleteObjectSecrets(getSecretObject(profile));
-        } else {
-            webSession.removeAttribute(getSessionCredentialsAttribute(profile));
+        webSession.removeAttribute(getSessionCredentialsAttribute(profile));
+        if (isPersistentStorageSupported(secretController)) {
+            clearPersistentCredentials(secretController, profile, getCredentialPropertyIds(profile.getConfiguration()));
         }
     }
 
@@ -205,10 +217,31 @@ public final class WebAIProfileUtils {
         }
     }
 
-    private static boolean isPersistentStorageAvailable(@NotNull DBSSecretController secretController) throws DBException {
+    private static boolean isPersistentStorageAvailable(
+        @NotNull WebSession webSession,
+        @NotNull DBSSecretController secretController
+    ) throws DBException {
+        if (!isPersistentStorageSupported(secretController)) {
+            return false;
+        }
+        var user = webSession.getUserContext().getUser();
+        return user != null && user.isSecretStorage();
+    }
+
+    private static boolean isPersistentStorageSupported(@NotNull DBSSecretController secretController) throws DBException {
         long features = secretController.getSupportedFeatures();
         return (features & DBSSecretController.FEATURE_PRIVATE_SECRETS_VIEW) != 0 &&
             (features & DBSSecretController.FEATURE_PRIVATE_SECRETS_EDIT) != 0;
+    }
+
+    private static void clearPersistentCredentials(
+        @NotNull DBSSecretController secretController,
+        @NotNull AIConfigurationProfile profile,
+        @NotNull Set<String> credentialProperties
+    ) throws DBException {
+        for (String property : credentialProperties) {
+            secretController.setPrivateSecretValue(getSecretId(profile, property), null);
+        }
     }
 
     @NotNull
@@ -220,7 +253,7 @@ public final class WebAIProfileUtils {
         String attribute = getSessionCredentialsAttribute(profile);
         synchronized (webSession) {
             SessionCredentials sessionCredentials = webSession.getAttribute(attribute);
-            if (sessionCredentials != null && sessionCredentials.profile() == profile) {
+            if (sessionCredentials != null) {
                 if (create) {
                     return sessionCredentials.credentials();
                 }
@@ -231,7 +264,7 @@ public final class WebAIProfileUtils {
             if (!create) {
                 return Map.of();
             }
-            SessionCredentials newCredentials = new SessionCredentials(profile, new HashMap<>());
+            SessionCredentials newCredentials = new SessionCredentials(new HashMap<>());
             webSession.setAttribute(attribute, newCredentials);
             return newCredentials.credentials();
         }
@@ -355,7 +388,6 @@ public final class WebAIProfileUtils {
     }
 
     private record SessionCredentials(
-        @NotNull AIConfigurationProfile profile,
         @NotNull Map<String, String> credentials
     ) {
     }
