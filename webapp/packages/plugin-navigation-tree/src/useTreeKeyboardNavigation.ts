@@ -10,7 +10,7 @@ import { action, observable, runInAction } from 'mobx';
 import { useObjectRef, useObservableRef } from '@cloudbeaver/core-blocks';
 
 import { getTreeKeyboardAction, getVisibleNodeIds, type ITreeKeyboardNavigationModel } from './treeKeyboardNavigation.js';
-import { getFallbackNodeId, getKeyboardEventTreeItem, TREE_ITEM_SELECTOR } from './treeKeyboardNavigationUtils.js';
+import { focusTreeItem, getFallbackNodeId, getKeyboardEventTreeItem, TREE_ITEM_SELECTOR } from './treeKeyboardNavigationUtils.js';
 
 const NAVIGATION_KEYS = ['ArrowDown', 'ArrowUp', 'ArrowRight', 'ArrowLeft', 'Home', 'End'];
 
@@ -89,9 +89,9 @@ export function useTreeKeyboardNavigation(options: IOptions): ITreeKeyboardNavig
           }
           if (nodeId === this.pendingFocusNodeId) {
             this.pendingFocusNodeId = null;
-            queueMicrotask(() => element.focus());
+            queueMicrotask(() => focusTreeItem(element));
           } else if (nodeId === this.activeNodeId && document.activeElement === this.rootElement) {
-            queueMicrotask(() => element.focus());
+            queueMicrotask(() => focusTreeItem(element));
           } else if (shouldInitializeFocus && this.activeNodeId) {
             const activeNodeId = this.activeNodeId;
             queueMicrotask(() => void this.focusNode(activeNodeId));
@@ -194,7 +194,7 @@ export function useTreeKeyboardNavigation(options: IOptions): ITreeKeyboardNavig
 
           if (isNestedButtonEvent) {
             this.setActiveNode(nodeId, visibleNodeIds);
-            treeItem.focus();
+            focusTreeItem(treeItem);
           }
 
           if (!keyboardAction) {
@@ -254,8 +254,7 @@ export function useTreeKeyboardNavigation(options: IOptions): ITreeKeyboardNavig
           const element = this.elements.get(targetNodeId);
           if (element) {
             this.pendingFocusNodeId = null;
-            element.focus();
-            element.scrollIntoView?.({ block: 'nearest' });
+            focusTreeItem(element);
             return;
           }
 
@@ -272,7 +271,7 @@ export function useTreeKeyboardNavigation(options: IOptions): ITreeKeyboardNavig
               this.pendingFocusNodeId = null;
               this.activeNodeMounted = true;
             });
-            revealedElement.focus();
+            focusTreeItem(revealedElement);
           }
         },
         setActiveNode(nodeId, visibleNodeIds = getVisibleNodeIds(optionsRef)) {

@@ -163,6 +163,7 @@ describe('useTreeKeyboardNavigation', () => {
   afterEach(() => {
     act(() => root.unmount());
     container.remove();
+    vi.restoreAllMocks();
   });
 
   async function renderTree(model: ITestTree, mountedNodeIds = ['parent', 'child', 'sibling'], revealNode?: (nodeId: string) => void) {
@@ -214,6 +215,29 @@ describe('useTreeKeyboardNavigation', () => {
     expect(actions).toEqual(['select', 'activate']);
     finishActivation();
     await act(() => activation);
+  });
+
+  it.each([true, false])('scrolls only the expanded node row (content marker: %s)', async hasContentMarker => {
+    const model = createTestTree();
+    await renderTree(model);
+    const parent = getNode('parent');
+    const row = document.createElement('div');
+    if (hasContentMarker) {
+      row.dataset['treeNodeContent'] = 'true';
+    }
+    parent.prepend(row);
+    const focus = vi.spyOn(parent, 'focus');
+    const scrollBranch = vi.spyOn(parent, 'scrollIntoView');
+    const scrollRow = vi.spyOn(row, 'scrollIntoView');
+
+    getNode('child').focus();
+    getNode('child').dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'ArrowLeft' }));
+    await act(() => Promise.resolve());
+
+    expect(focus).toHaveBeenCalledWith({ preventScroll: true });
+    expect(scrollBranch).not.toHaveBeenCalled();
+    expect(scrollRow).toHaveBeenCalledWith({ block: 'nearest', inline: 'nearest' });
+    expect(document.activeElement).toBe(parent);
   });
 
   it('navigates from nested buttons but preserves their Enter and input keys', async () => {
@@ -317,6 +341,7 @@ describe('useTreeKeyboardNavigation', () => {
   });
 
   it('reveals and focuses a virtualized node', async () => {
+    const focus = vi.spyOn(HTMLElement.prototype, 'focus');
     const model = createTestTree();
     model.states['parent']!.expanded = false;
     const revealNode = vi.fn((nodeId: string) => {
@@ -331,6 +356,7 @@ describe('useTreeKeyboardNavigation', () => {
 
     expect(revealNode).toHaveBeenCalledWith('sibling');
     expect(document.activeElement).toBe(getNode('sibling'));
+    expect(focus).toHaveBeenLastCalledWith({ preventScroll: true });
   });
 
   it('moves focus to the parent when the active child disappears after collapse', async () => {

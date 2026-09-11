@@ -8,6 +8,13 @@
 
 export const TREE_ITEM_SELECTOR = '[role="treeitem"][data-tree-node-id]';
 
+export function focusTreeItem(element: HTMLElement): void {
+  element.focus({ preventScroll: true });
+  // A tree item includes its expanded children; reveal only the row or its loading placeholder.
+  const row = element.querySelector<HTMLElement>(':scope > [data-tree-node-content]') ?? element.firstElementChild ?? element;
+  row.scrollIntoView?.({ block: 'nearest', inline: 'nearest' });
+}
+
 export function getFallbackNodeId(
   nodeId: string,
   parentId: string | null | undefined,
