@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2025 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -132,7 +132,8 @@ public interface DBWServiceAdmin extends DBWService {
     ////////////////////////////////////////////////////////////////////
     // Features
 
-    @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
+    @NotNull
+    @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN, configurationModeAllowed = true)
     List<DBWFeatureSet> listFeatureSets(@NotNull WebSession webSession) throws DBWebException;
 
     ////////////////////////////////////////////////////////////////////
@@ -160,9 +161,10 @@ public interface DBWServiceAdmin extends DBWService {
     ////////////////////////////////////////////////////////////////////
     // Server configuration
 
-    @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
+    @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN, configurationModeAllowed = true)
     boolean configureServer(@NotNull WebSession webSession, @NotNull Map<String, Object> params) throws DBWebException;
-    @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
+
+    @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN, configurationModeAllowed = true)
     boolean setDefaultNavigatorSettings(@NotNull WebSession webSession, @NotNull DBNBrowseSettings settings) throws DBWebException;
 
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)

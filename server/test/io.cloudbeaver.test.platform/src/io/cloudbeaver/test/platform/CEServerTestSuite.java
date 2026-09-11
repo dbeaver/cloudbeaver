@@ -31,6 +31,7 @@ import io.cloudbeaver.test.platform.admin.AdminLastLoginTimeTest;
 import io.cloudbeaver.test.platform.fs.FileSystemSecurityTest;
 import io.cloudbeaver.test.platform.sql.*;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.platform.suite.api.SelectClasses;
 import org.junit.platform.suite.api.Suite;
@@ -46,6 +47,7 @@ import org.junit.platform.suite.api.Suite;
         RMNIOTest.class,
         LocalResourceControllerTest.class,
         NoSessionTest.class,
+        ConfigurationModeAccessTest.class,
         FileSystemSecurityTest.class,
         WebSessionTest.class,
         WebSessionProjectTest.class,
@@ -66,6 +68,7 @@ public class CEServerTestSuite {
     @BeforeAll
     public static void startServer() throws Exception {
         CEAppStarter.startServerIfNotStarted();
+        Assertions.assertFalse(CEAppStarter.getTestApp().isConfigurationMode());
     }
 
     @AfterAll

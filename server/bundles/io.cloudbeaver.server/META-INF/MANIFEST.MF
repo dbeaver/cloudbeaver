@@ -25,6 +25,7 @@ Export-Package: io.cloudbeaver,
  io.cloudbeaver.server.servlets,
  io.cloudbeaver.server.websockets,
  io.cloudbeaver.service,
+ io.cloudbeaver.service.core,
  io.cloudbeaver.service.navigator,
  io.cloudbeaver.service.sql
 Import-Package: org.slf4j
