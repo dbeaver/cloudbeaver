@@ -64,6 +64,8 @@ public final class PostgreSQLDataSourceTestFixture implements AutoCloseable {
     private static final String DEFAULT_PORT = "5432";
     private static final String DEFAULT_DATABASE = "cloudbeaver_test";
     private static final String DEFAULT_USER = "cloudbeaver_test";
+    // Test-only credential matching the local PostgreSQL Compose configuration.
+    // nosemgrep: codacy.java.security.hard-coded-password
     private static final String DEFAULT_PASSWORD = DEFAULT_USER;
 
     private static final String GQL_NAV_NODE_CHILDREN = """
