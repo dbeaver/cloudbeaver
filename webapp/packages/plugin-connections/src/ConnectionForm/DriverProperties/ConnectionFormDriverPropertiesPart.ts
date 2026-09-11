@@ -74,10 +74,11 @@ export class ConnectionFormDriverPropertiesPart extends FormPart<ConnectionPrope
     contexts: IExecutionContextProvider<IFormState<IConnectionFormState>>,
   ): Promise<void> {}
 
-  protected override async format(
-    data: IFormState<IConnectionFormState>,
-    contexts: IExecutionContextProvider<IFormState<IConnectionFormState>>,
-  ): Promise<void> {
+  protected override async prepare(): Promise<void> {
+    this.optionsPart.state.properties = await this.getPropertiesConfig();
+  }
+
+  protected override format(): void {
     runInAction(() => {
       for (const key of Object.keys(this.state!)) {
         if (typeof this.state[key] === 'string') {
@@ -85,8 +86,6 @@ export class ConnectionFormDriverPropertiesPart extends FormPart<ConnectionPrope
         }
       }
     });
-
-    this.optionsPart.state.properties = await this.getPropertiesConfig();
   }
 
   private async getPropertiesConfig() {

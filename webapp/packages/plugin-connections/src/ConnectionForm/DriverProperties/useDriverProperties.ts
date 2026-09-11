@@ -57,10 +57,10 @@ export function useDriverProperties(payload: Payload) {
         try {
           this.exception = null;
 
-          // We are executing a format task, so the config was fully updated with defaults.
+          // Prepare the config with defaults before requesting config-dependent driver properties.
           // We need to guarantee that the config is the same as the one sent to the test connection function;
           // otherwise, the backend will return only partial data.
-          await this.payload.formState.formatTask.execute(this.payload.formState);
+          await this.payload.formState.prepareTask.execute(this.payload.formState);
           this.promise = this.connectionInfoResource.getConnectionDriverProperties(this.payload.formState.state.projectId, this.payload.config);
           const properties = await this.promise;
           this.properties = properties;
