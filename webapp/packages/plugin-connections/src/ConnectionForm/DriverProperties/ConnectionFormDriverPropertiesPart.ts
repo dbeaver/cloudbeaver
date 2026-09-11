@@ -86,18 +86,12 @@ export class ConnectionFormDriverPropertiesPart extends FormPart<ConnectionPrope
     contexts: IExecutionContextProvider<IFormState<IConnectionFormState>>,
   ): Promise<void> {
     runInAction(() => {
-      for (const config of [this.state, this.optionsPart.state.properties ?? {}]) {
-        for (const key of Object.keys(config)) {
-          if (typeof config[key] === 'string') {
-            config[key] = config[key].trim();
-          }
-        }
-      }
+      this.state = trimProperties(this.state);
     });
   }
 
   private async getPropertiesConfig() {
-    const config = toJS(this.state);
+    const config = trimProperties(toJS(this.state));
 
     if (!this.optionsPart.state.driverId) {
       return config;
@@ -137,4 +131,16 @@ export class ConnectionFormDriverPropertiesPart extends FormPart<ConnectionPrope
 
     return config;
   }
+}
+
+function trimProperties(config: Record<string, any>): Record<string, any> {
+  config = { ...config };
+
+  for (const key of Object.keys(config)) {
+    if (typeof config[key] === 'string') {
+      config[key] = config[key].trim();
+    }
+  }
+
+  return config;
 }
