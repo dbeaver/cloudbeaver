@@ -3904,6 +3904,7 @@ __metadata:
     "@cloudbeaver/core-utils": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
     "@dbeaver/cli": "workspace:*"
+    "@dbeaver/react-tests": "workspace:^"
     "@types/react": "npm:^19"
     mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
@@ -3912,6 +3913,7 @@ __metadata:
     rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
+    vitest: "npm:^4"
   languageName: unknown
   linkType: soft
 
