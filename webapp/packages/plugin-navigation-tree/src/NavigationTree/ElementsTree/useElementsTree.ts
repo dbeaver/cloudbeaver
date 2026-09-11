@@ -233,8 +233,9 @@ export function useElementsTree(options: IOptions): IElementsTree {
       const pageInfo = navTreeResource.offsetPagination.getPageInfo(
         CachedResourceOffsetPageKey(0, 0).setParent(CachedResourceOffsetPageTargetKey(nodeId)),
       );
+      const hasMorePages = pageInfo && pageInfo.end === undefined;
 
-      if (pageInfo) {
+      if (hasMorePages) {
         const lastOffset = getNextPageOffset(pageInfo);
         for (let offset = 0; offset < lastOffset; offset += navTreeResource.childrenLimit) {
           await navTreeResource.load(

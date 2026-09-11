@@ -87,7 +87,7 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
     private readonly sessionDataResource: SessionDataResource,
     private readonly userInfoResource: UserInfoResource,
     private readonly projectInfoResource: ProjectInfoResource,
-    appAuthService: AppAuthService,
+    private readonly appAuthService: AppAuthService,
   ) {
     super();
 
@@ -119,7 +119,13 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
       () => CachedMapAllKey,
       () => CachedMapAllKey,
     );
-    this.projectInfoResource.onDataOutdated.addHandler(() => this.markTreeOutdated(resourceKeyList(this.keys)));
+    this.projectInfoResource.onDataOutdated.addHandler(data => {
+      if (isResourceAlias(data)) {
+        return;
+      } else {
+        this.markTreeOutdated(data);
+      }
+    });
     this.sessionDataResource.onDataOutdated.addHandler(() => this.markTreeOutdated(resourceKeyList(this.keys)));
     this.userInfoResource.onUserChange.addHandler(
       action(() => {
@@ -551,7 +557,7 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
     return nestedChildren;
   }
 
-  private setNavObject(data: NavNodeChildrenQuery | NavNodeChildrenQuery[], offset: number, limit: number): void {
+  private setNavObject(data: NavNodeChildrenQuery | NavNodeChildrenQuery[], offset: number, limit: number | undefined): void {
     if (Array.isArray(data)) {
       if (data.length === 0) {
         return;
@@ -589,12 +595,12 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
     }
   }
 
-  private insertSlice(data: NavNodeChildrenQuery, offset: number, limit: number): string[] {
+  private insertSlice(data: NavNodeChildrenQuery, offset: number, limit: number | undefined): string[] {
     let children = [...(this.get(data.parentPath) || [])];
 
-    children.splice(offset, limit, ...data.navNodeChildren.map(node => node.uri));
+    children.splice(offset, limit ?? children.length, ...data.navNodeChildren.map(node => node.uri));
 
-    if (data.navNodeChildren.length < limit) {
+    if (limit !== undefined && data.navNodeChildren.length < limit) {
       children.splice(offset + data.navNodeChildren.length, children.length - offset - data.navNodeChildren.length);
     }
 
@@ -603,7 +609,36 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
     return children;
   }
 
-  private async loadNodeChildren(parentPath: string, offset: number, limit: number): Promise<NavNodeChildrenQuery> {
+  async loadAllChildren(nodeId: string): Promise<void> {
+    if (!this.appAuthService.authenticated || this.isLoading(nodeId)) {
+      return;
+    }
+
+    const pageKey = CachedResourceOffsetPageKey(0, 0).setParent(CachedResourceOffsetPageTargetKey(nodeId));
+    const hasPage = this.offsetPagination.getPageInfo(pageKey) !== undefined;
+
+    if (hasPage && !this.isOutdated(nodeId)) {
+      return;
+    }
+
+    this.markLoading(nodeId, true);
+    try {
+      const navNodeChildren = await this.loadNodeChildren(nodeId, 0, undefined);
+      const uris = navNodeChildren.navNodeChildren.map(node => node.uri);
+
+      runInAction(() => {
+        this.setNavObject(navNodeChildren, 0, undefined);
+        this.offsetPagination.setPage(CachedResourceOffsetPageKey(0, uris.length).setParent(CachedResourceOffsetPageTargetKey(nodeId)), uris, false);
+        this.markLoaded(nodeId);
+        this.markUpdated(nodeId);
+        this.markUpdated(resourceKeyList(uris));
+      });
+    } finally {
+      this.markLoading(nodeId, false);
+    }
+  }
+
+  private async loadNodeChildren(parentPath: string, offset: number, limit: number | undefined): Promise<NavNodeChildrenQuery> {
     const metadata = this.metadata.get(parentPath);
     const { navNodeChildren, navNodeInfo } = await this.graphQLService.sdk.navNodeChildren({
       parentPath,
