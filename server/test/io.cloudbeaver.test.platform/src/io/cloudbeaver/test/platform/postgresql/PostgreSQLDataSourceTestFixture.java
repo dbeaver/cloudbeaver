@@ -60,13 +60,11 @@ public final class PostgreSQLDataSourceTestFixture implements AutoCloseable {
     private static final String ENV_USER = "CLOUDBEAVER_TEST_POSTGRES_USER";
     // nosemgrep: codacy.java.security.hard-coded-password
     private static final String ENV_PASSWORD = "CLOUDBEAVER_TEST_POSTGRES_PASSWORD";
-    private static final List<String> REQUIRED_ENVIRONMENT = List.of(
-        ENV_HOST,
-        ENV_PORT,
-        ENV_DATABASE,
-        ENV_USER,
-        ENV_PASSWORD
-    );
+    private static final String DEFAULT_HOST = "127.0.0.1";
+    private static final String DEFAULT_PORT = "5432";
+    private static final String DEFAULT_DATABASE = "cloudbeaver_test";
+    private static final String DEFAULT_USER = "cloudbeaver_test";
+    private static final String DEFAULT_PASSWORD = DEFAULT_USER;
 
     private static final String GQL_NAV_NODE_CHILDREN = """
         query navNodeChildren($parentPath: ID!) {
@@ -686,16 +684,7 @@ public final class PostgreSQLDataSourceTestFixture implements AutoCloseable {
     ) {
         @NotNull
         public static PostgreSQLConnectionConfig fromEnvironment() throws DBException {
-            List<String> missing = REQUIRED_ENVIRONMENT.stream()
-                .filter(name -> {
-                    String value = System.getenv(name);
-                    return value == null || value.isBlank();
-                })
-                .toList();
-            if (!missing.isEmpty()) {
-                throw new DBException("Missing PostgreSQL datasource test environment variables: " + String.join(", ", missing));
-            }
-            String port = System.getenv(ENV_PORT);
+            String port = environmentOrDefault(ENV_PORT, DEFAULT_PORT);
             try {
                 int portNumber = Integer.parseInt(port);
                 if (portNumber < 1 || portNumber > 65535) {
@@ -705,12 +694,18 @@ public final class PostgreSQLDataSourceTestFixture implements AutoCloseable {
                 throw new DBException(ENV_PORT + " must be a valid TCP port");
             }
             return new PostgreSQLConnectionConfig(
-                System.getenv(ENV_HOST),
+                environmentOrDefault(ENV_HOST, DEFAULT_HOST),
                 port,
-                System.getenv(ENV_DATABASE),
-                System.getenv(ENV_USER),
-                System.getenv(ENV_PASSWORD)
+                environmentOrDefault(ENV_DATABASE, DEFAULT_DATABASE),
+                environmentOrDefault(ENV_USER, DEFAULT_USER),
+                environmentOrDefault(ENV_PASSWORD, DEFAULT_PASSWORD)
             );
+        }
+
+        @NotNull
+        private static String environmentOrDefault(@NotNull String name, @NotNull String defaultValue) {
+            String value = System.getenv(name);
+            return value == null || value.isBlank() ? defaultValue : value;
         }
 
         @NotNull
