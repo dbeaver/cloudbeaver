@@ -162,6 +162,8 @@ export class ConnectionFormSSLPart extends FormPart<INetworkHandlerConfig, IConn
   }
 
   protected override format(): void {
+    trimSSLConfig(this.state);
+
     const handlerConfig = this.optionsPart.state.networkHandlersConfig?.find(config => config.id === this.state.id);
     if (handlerConfig) {
       trimSSLConfig(handlerConfig);
@@ -175,19 +177,11 @@ export class ConnectionFormSSLPart extends FormPart<INetworkHandlerConfig, IConn
 }
 
 function trimSSLConfig(input: INetworkHandlerConfig): INetworkHandlerConfig {
-  const { secureProperties } = input;
-
-  if (!secureProperties) {
-    return input;
-  }
-
-  if (!Object.keys(secureProperties).length) {
-    return input;
-  }
-
-  for (const key in secureProperties) {
-    if (typeof secureProperties[key] === 'string') {
-      secureProperties[key] = secureProperties[key]?.trim();
+  for (const properties of [input.properties, input.secureProperties]) {
+    for (const key in properties ?? {}) {
+      if (typeof properties[key] === 'string') {
+        properties[key] = properties[key].trim();
+      }
     }
   }
 

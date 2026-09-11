@@ -80,9 +80,11 @@ export class ConnectionFormDriverPropertiesPart extends FormPart<ConnectionPrope
 
   protected override format(): void {
     runInAction(() => {
-      for (const key of Object.keys(this.state!)) {
-        if (typeof this.state[key] === 'string') {
-          this.state[key] = this.state[key].trim();
+      for (const properties of [this.state, this.optionsPart.state.properties ?? {}]) {
+        for (const key of Object.keys(properties)) {
+          if (typeof properties[key] === 'string') {
+            properties[key] = properties[key].trim();
+          }
         }
       }
     });
@@ -97,12 +99,11 @@ export class ConnectionFormDriverPropertiesPart extends FormPart<ConnectionPrope
 
     const properties = await this.connectionInfoResource.getConnectionDriverProperties(this.formState.state.projectId, this.optionsPart.state);
 
-    /* Default property values must not be returned. If they are included in the request, the backend will send them back with modified values (e.g., null converted to an empty string).
-    To avoid this behavior, only properties that were explicitly changed should be sent. Any properties that still contain default values must be removed from the object before sending the request
-    */
+    // Omit defaults using the value that format() will submit; the backend can otherwise return modified defaults.
     for (const [key, value] of Object.entries(config)) {
       const property = properties?.find(property => property.id === key);
-      if (property && value === getObjectPropertyOptionValue(property.defaultValue)) {
+      const formattedValue = typeof value === 'string' ? value.trim() : value;
+      if (property && formattedValue === getObjectPropertyOptionValue(property.defaultValue)) {
         delete config[key];
       }
     }
