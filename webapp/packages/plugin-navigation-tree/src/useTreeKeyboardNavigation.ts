@@ -10,8 +10,8 @@ import { action, observable, runInAction } from 'mobx';
 import { useObjectRef, useObservableRef } from '@cloudbeaver/core-blocks';
 
 import { getTreeKeyboardAction, getVisibleNodeIds, type ITreeKeyboardNavigationModel } from './treeKeyboardNavigation.js';
+import { getFallbackNodeId, getKeyboardEventTreeItem, TREE_ITEM_SELECTOR } from './treeKeyboardNavigationUtils.js';
 
-const TREE_ITEM_SELECTOR = '[role="treeitem"][data-tree-node-id]';
 const NAVIGATION_KEYS = ['ArrowDown', 'ArrowUp', 'ArrowRight', 'ArrowLeft', 'Home', 'End'];
 
 interface IOptions extends ITreeKeyboardNavigationModel {
@@ -25,13 +25,15 @@ interface IPrivateTreeKeyboardNavigation extends ITreeKeyboardNavigation {
   nodeActions: Map<string, ITreeNodeKeyboardActions>;
   parents: Map<string, string | null>;
   pendingFocusNodeId: string | null;
-  pendingActionNodeIds: Set<string>;
+  pendingActivationNodeIds: Set<string>;
   pendingExpansionNodeIds: Set<string>;
   rootElement: HTMLElement | null;
   visibleNodeIds: string[];
   activateNode(nodeId: string): Promise<void>;
+  setNodeExpanded(nodeId: string, expanded: boolean): Promise<void>;
+  unregisterNode(nodeId: string): void;
   focusNode(nodeId: string, visibleNodeIds?: string[]): Promise<void>;
-  setActiveNode(nodeId: string, visibleNodeIds?: string[]): void;
+  setActiveNode(nodeId: string | null, visibleNodeIds?: string[]): void;
 }
 
 export interface ITreeNodeKeyboardActions {
@@ -62,39 +64,41 @@ export function useTreeKeyboardNavigation(options: IOptions): ITreeKeyboardNavig
         nodeActions: new Map(),
         parents: new Map(),
         pendingFocusNodeId: null,
-        pendingActionNodeIds: new Set(),
+        pendingActivationNodeIds: new Set(),
         pendingExpansionNodeIds: new Set(),
         rootElement: null,
         visibleNodeIds,
         registerNode(nodeId, element, actions) {
-          const previousElement = this.elements.get(nodeId);
-
-          if (element) {
-            const initializeWhileFocused = !this.activeNodeId && document.activeElement === this.rootElement;
-            this.elements.set(nodeId, element);
-            this.nodeActions.set(nodeId, actions);
-            this.parents.set(nodeId, optionsRef.getParent(nodeId));
-
-            if (!this.activeNodeId) {
-              this.visibleNodeIds = getVisibleNodeIds(optionsRef);
-              this.activeNodeId = getInitialActiveNodeId(optionsRef, this.visibleNodeIds);
-            }
-
-            if (nodeId === this.activeNodeId) {
-              this.activeNodeMounted = true;
-            }
-            if (nodeId === this.pendingFocusNodeId) {
-              this.pendingFocusNodeId = null;
-              queueMicrotask(() => element.focus());
-            } else if (nodeId === this.activeNodeId && document.activeElement === this.rootElement) {
-              queueMicrotask(() => element.focus());
-            } else if (initializeWhileFocused && this.activeNodeId) {
-              const activeNodeId = this.activeNodeId;
-              queueMicrotask(() => void this.focusNode(activeNodeId));
-            }
+          if (!element) {
+            this.unregisterNode(nodeId);
             return;
           }
 
+          const shouldInitializeFocus = !this.activeNodeId && document.activeElement === this.rootElement;
+          this.elements.set(nodeId, element);
+          this.nodeActions.set(nodeId, actions);
+          this.parents.set(nodeId, optionsRef.getParent(nodeId));
+
+          if (!this.activeNodeId) {
+            this.visibleNodeIds = getVisibleNodeIds(optionsRef);
+            this.activeNodeId = getInitialActiveNodeId(optionsRef, this.visibleNodeIds);
+          }
+
+          if (nodeId === this.activeNodeId) {
+            this.activeNodeMounted = true;
+          }
+          if (nodeId === this.pendingFocusNodeId) {
+            this.pendingFocusNodeId = null;
+            queueMicrotask(() => element.focus());
+          } else if (nodeId === this.activeNodeId && document.activeElement === this.rootElement) {
+            queueMicrotask(() => element.focus());
+          } else if (shouldInitializeFocus && this.activeNodeId) {
+            const activeNodeId = this.activeNodeId;
+            queueMicrotask(() => void this.focusNode(activeNodeId));
+          }
+        },
+        unregisterNode(nodeId) {
+          const previousElement = this.elements.get(nodeId);
           if (previousElement) {
             this.elements.delete(nodeId);
             this.nodeActions.delete(nodeId);
@@ -107,6 +111,7 @@ export function useTreeKeyboardNavigation(options: IOptions): ITreeKeyboardNavig
           this.activeNodeMounted = false;
           const visibleNodeIds = getVisibleNodeIds(optionsRef);
 
+          // Virtualization can unmount a node without removing it from navigation.
           if (visibleNodeIds.includes(nodeId)) {
             return;
           }
@@ -149,34 +154,23 @@ export function useTreeKeyboardNavigation(options: IOptions): ITreeKeyboardNavig
           }
         },
         async onKeyDown(event) {
-          const eventTarget = event.target instanceof HTMLElement ? event.target : null;
-          let treeItem: HTMLElement | null = null;
-
-          if (eventTarget?.matches(TREE_ITEM_SELECTOR)) {
-            treeItem = eventTarget;
-          } else if (eventTarget && isTreeItemButton(eventTarget)) {
-            treeItem = eventTarget.closest<HTMLElement>(TREE_ITEM_SELECTOR);
-          }
-
-          if (
-            optionsRef.disabled ||
-            event.altKey ||
-            event.ctrlKey ||
-            event.metaKey ||
-            event.shiftKey ||
-            !treeItem ||
-            treeItem.closest('[role="tree"]') !== event.currentTarget
-          ) {
+          const hasModifier = event.altKey || event.ctrlKey || event.metaKey || event.shiftKey;
+          if (optionsRef.disabled || hasModifier) {
             return;
           }
 
+          const treeItem = getKeyboardEventTreeItem(event);
+          if (!treeItem) {
+            return;
+          }
           const nodeId = treeItem.dataset['treeNodeId'];
           if (!nodeId) {
             return;
           }
 
+          const isNestedButtonEvent = event.target !== treeItem;
           if (event.key === 'Enter') {
-            if (eventTarget !== treeItem) {
+            if (isNestedButtonEvent) {
               return;
             }
 
@@ -198,7 +192,7 @@ export function useTreeKeyboardNavigation(options: IOptions): ITreeKeyboardNavig
           event.preventDefault();
           event.stopPropagation();
 
-          if (eventTarget !== treeItem) {
+          if (isNestedButtonEvent) {
             this.setActiveNode(nodeId, visibleNodeIds);
             treeItem.focus();
           }
@@ -216,33 +210,32 @@ export function useTreeKeyboardNavigation(options: IOptions): ITreeKeyboardNavig
             }
             return;
           }
-          if (this.pendingExpansionNodeIds.has(nodeId)) {
+          await this.setNodeExpanded(nodeId, keyboardAction.expanded);
+        },
+        async activateNode(nodeId) {
+          const nodeActions = this.nodeActions.get(nodeId);
+          if (!nodeActions || this.pendingActivationNodeIds.has(nodeId)) {
             return;
           }
 
+          this.pendingActivationNodeIds.add(nodeId);
+          try {
+            await nodeActions.activate();
+          } finally {
+            this.pendingActivationNodeIds.delete(nodeId);
+          }
+        },
+        async setNodeExpanded(nodeId, expanded) {
           const nodeActions = this.nodeActions.get(nodeId);
-          if (!nodeActions) {
+          if (!nodeActions || this.pendingExpansionNodeIds.has(nodeId)) {
             return;
           }
 
           this.pendingExpansionNodeIds.add(nodeId);
           try {
-            await nodeActions.setExpanded(keyboardAction.expanded);
+            await nodeActions.setExpanded(expanded);
           } finally {
             this.pendingExpansionNodeIds.delete(nodeId);
-          }
-        },
-        async activateNode(nodeId) {
-          const nodeActions = this.nodeActions.get(nodeId);
-          if (!nodeActions || this.pendingActionNodeIds.has(nodeId)) {
-            return;
-          }
-
-          this.pendingActionNodeIds.add(nodeId);
-          try {
-            await nodeActions.activate();
-          } finally {
-            this.pendingActionNodeIds.delete(nodeId);
           }
         },
         async focusNode(nodeId, visibleNodeIds) {
@@ -251,25 +244,12 @@ export function useTreeKeyboardNavigation(options: IOptions): ITreeKeyboardNavig
             ? nodeId
             : getFallbackNodeId(nodeId, this.parents.get(nodeId), optionsRef.rootId, this.visibleNodeIds, currentVisibleNodeIds);
 
+          this.setActiveNode(targetNodeId || null, currentVisibleNodeIds);
           if (!targetNodeId) {
-            if (this.activeNodeId && !this.elements.has(this.activeNodeId)) {
-              this.parents.delete(this.activeNodeId);
-            }
-            this.activeNodeId = null;
-            this.activeNodeMounted = false;
-            this.pendingFocusNodeId = null;
-            this.visibleNodeIds = currentVisibleNodeIds;
             return;
           }
 
-          if (this.activeNodeId && this.activeNodeId !== targetNodeId && !this.elements.has(this.activeNodeId)) {
-            this.parents.delete(this.activeNodeId);
-          }
-          this.activeNodeId = targetNodeId;
-          this.activeNodeMounted = this.elements.has(targetNodeId);
           this.pendingFocusNodeId = targetNodeId;
-          this.parents.set(targetNodeId, optionsRef.getParent(targetNodeId));
-          this.visibleNodeIds = currentVisibleNodeIds;
 
           const element = this.elements.get(targetNodeId);
           if (element) {
@@ -300,9 +280,11 @@ export function useTreeKeyboardNavigation(options: IOptions): ITreeKeyboardNavig
             this.parents.delete(this.activeNodeId);
           }
           this.activeNodeId = nodeId;
-          this.activeNodeMounted = this.elements.has(nodeId);
+          this.activeNodeMounted = nodeId !== null && this.elements.has(nodeId);
           this.pendingFocusNodeId = null;
-          this.parents.set(nodeId, optionsRef.getParent(nodeId));
+          if (nodeId !== null) {
+            this.parents.set(nodeId, optionsRef.getParent(nodeId));
+          }
           this.visibleNodeIds = visibleNodeIds;
         },
       };
@@ -311,8 +293,10 @@ export function useTreeKeyboardNavigation(options: IOptions): ITreeKeyboardNavig
       activeNodeId: observable.ref,
       activeNodeMounted: observable.ref,
       registerNode: action.bound,
+      unregisterNode: action.bound,
       setRootRef: action.bound,
       activateNode: action.bound,
+      setNodeExpanded: action.bound,
       focusNode: action.bound,
       setActiveNode: action.bound,
     },
@@ -323,36 +307,4 @@ export function useTreeKeyboardNavigation(options: IOptions): ITreeKeyboardNavig
 
 function getInitialActiveNodeId(options: IOptions, visibleNodeIds: string[]): string | null {
   return visibleNodeIds.find(nodeId => options.isSelected?.(nodeId)) ?? visibleNodeIds[0] ?? null;
-}
-
-function getFallbackNodeId(
-  nodeId: string,
-  parentId: string | null | undefined,
-  rootId: string,
-  previousVisibleNodeIds: string[],
-  visibleNodeIds: string[],
-): string | null {
-  if (parentId && parentId !== rootId && visibleNodeIds.includes(parentId)) {
-    return parentId;
-  }
-
-  const previousIndex = previousVisibleNodeIds.indexOf(nodeId);
-  return (
-    previousVisibleNodeIds.slice(previousIndex + 1).find(id => visibleNodeIds.includes(id)) ??
-    previousVisibleNodeIds
-      .slice(0, Math.max(previousIndex, 0))
-      .reverse()
-      .find(id => visibleNodeIds.includes(id)) ??
-    visibleNodeIds[0] ??
-    null
-  );
-}
-
-function isTreeItemButton(element: HTMLElement): boolean {
-  if (element.closest('[role="menu"]') || element.matches('input,textarea,select,[role="checkbox"],[role="radio"],[role="menuitem"]')) {
-    return false;
-  }
-
-  const role = element.getAttribute('role');
-  return (element instanceof HTMLButtonElement && (!role || role === 'button')) || role === 'button';
 }
