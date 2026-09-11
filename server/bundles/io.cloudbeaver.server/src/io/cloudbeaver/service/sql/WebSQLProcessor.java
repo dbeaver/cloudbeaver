@@ -22,9 +22,10 @@ import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.session.WebSessionPreferenceStore;
 import io.cloudbeaver.model.session.WebSessionProvider;
-import io.cloudbeaver.server.WebAppUtils;
 import io.cloudbeaver.server.jobs.SqlOutputLogReaderJob;
 import io.cloudbeaver.service.sql.messages.WebSQLMessages;
+import io.cloudbeaver.service.sql.resultset.WebDBDResultSetDataModel;
+import io.cloudbeaver.service.sql.resultset.WebSQLDataUpdater;
 import io.cloudbeaver.utils.WebEventUtils;
 import io.cloudbeaver.websocket.event.task.WSSessionTaskConfirmationRequestEvent;
 import io.cloudbeaver.websocket.event.task.WSSessionTaskQueryConfirmationRequestEvent;
@@ -37,6 +38,8 @@ import org.jkiss.dbeaver.model.DBPDataKind;
 import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.DBUtils;
 import org.jkiss.dbeaver.model.data.*;
+import org.jkiss.dbeaver.model.data.resultset.DBDResultSetDataUpdater;
+import org.jkiss.dbeaver.model.data.resultset.ResultSetSaveSettings;
 import org.jkiss.dbeaver.model.edit.DBEPersistAction;
 import org.jkiss.dbeaver.model.exec.*;
 import org.jkiss.dbeaver.model.exec.output.DBCServerOutputReader;
@@ -60,13 +63,9 @@ import org.jkiss.dbeaver.registry.confirmation.ConfirmationConstants;
 import org.jkiss.dbeaver.registry.confirmation.ConfirmationDescriptor;
 import org.jkiss.dbeaver.registry.confirmation.ConfirmationRegistry;
 import org.jkiss.dbeaver.utils.GeneralUtils;
-import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
 
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.text.MessageFormat;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -81,9 +80,6 @@ public class WebSQLProcessor implements WebSessionProvider {
     private static final Log log = Log.getLog(WebSQLProcessor.class);
 
     private static final int MAX_RESULTS_COUNT = 100;
-
-    private static final String FILE_ID = "fileId";
-    private static final String TEMP_FILE_FOLDER = "temp-sql-upload-files";
 
     private final WebSession webSession;
     private final WebConnectionInfo connection;
@@ -382,6 +378,7 @@ public class WebSQLProcessor implements WebSessionProvider {
         return executeInfo;
     }
 
+    @NotNull
     public WebSQLExecuteInfo updateResultsDataBatch(
         @NotNull DBRProgressMonitor monitor,
         @NotNull WebSQLContextInfo contextInfo,
@@ -389,95 +386,49 @@ public class WebSQLProcessor implements WebSessionProvider {
         @Nullable List<WebSQLResultsRow> updatedRows,
         @Nullable List<WebSQLResultsRow> deletedRows,
         @Nullable List<WebSQLResultsRow> addedRows,
-        @Nullable WebDataFormat dataFormat) throws DBException
-    {
-        // we don't need to add same row several times
-        // (it can be when we update the row from RS with several tables)
-        Set<WebSQLQueryResultSetRow> newResultSetRows = new LinkedHashSet<>();
-        KeyDataReceiver keyReceiver = new KeyDataReceiver(contextInfo.getResults(resultsId));
+        @Nullable WebDataFormat dataFormat
+    ) throws DBException {
         WebSQLResultsInfo resultsInfo = contextInfo.getResults(resultsId);
+        Set<DBDRowIdentifier> rowIdentifierList = getRowIdentifiers(
+            resultsInfo,
+            updatedRows,
+            deletedRows,
+            addedRows
+        );
+        validateRowIdentifiers(resultsInfo, rowIdentifierList, updatedRows, deletedRows, addedRows);
 
-        Set<DBDRowIdentifier> rowIdentifierList = new HashSet<>();
-        // several row identifiers could be if we update result set table with join
-        // we can't add or delete rows from result set table with join
-        if (!CommonUtils.isEmpty(deletedRows) || !CommonUtils.isEmpty(addedRows)) {
-            rowIdentifierList.add(resultsInfo.getDefaultRowIdentifier());
-        } else if (!CommonUtils.isEmpty(updatedRows)) {
-            rowIdentifierList = resultsInfo.getRowIdentifiers();
+        DBCExecutionContext executionContext = getExecutionContext(resultsInfo.getDataContainer());
+
+        WebDBDResultSetDataModel dataProvider = new WebDBDResultSetDataModel(
+            contextInfo,
+            resultsInfo,
+            addedRows,
+            updatedRows,
+            deletedRows
+        );
+
+        WebSQLDataUpdater updater = new WebSQLDataUpdater(
+            webSession,
+            dataProvider,
+            resultsInfo,
+            executionContext,
+            false
+        );
+
+        ResultSetSaveSettings settings = new ResultSetSaveSettings();
+        updater.prepareStatements(monitor, settings);
+        DBDResultSetDataUpdater.ExecutionResult executionResult =
+            updater.executeSynchronously(monitor, false, settings, null);
+        if (!executionResult.isSuccess()) {
+            throw new DBCException(
+                "Error persisting data changes",
+                executionResult.error()
+            );
         }
 
-        long totalUpdateCount = 0;
+        getUpdatedRowsInfo(resultsInfo, updater.getUpdatedResultSetRows(), dataFormat, monitor);
 
-        WebSQLExecuteInfo result = new WebSQLExecuteInfo();
-        List<WebSQLQueryResults> queryResults = new ArrayList<>();
-        boolean isAutoCommitEnabled = true;
-
-        for (var rowIdentifier : rowIdentifierList) {
-            Map<DBSDataManipulator.ExecuteBatch, Object[]> resultBatches = new LinkedHashMap<>();
-            DBSDataManipulator dataManipulator = generateUpdateResultsDataBatch(
-                monitor, resultsInfo, rowIdentifier, updatedRows, deletedRows, addedRows, resultBatches, keyReceiver);
-
-            DBCExecutionContext executionContext = getExecutionContext(dataManipulator);
-            try (DBCSession session = executionContext.openSession(monitor, DBCExecutionPurpose.USER, "Update data in container")) {
-                DBCTransactionManager txnManager = DBUtils.getTransactionManager(executionContext);
-                boolean revertToAutoCommit = false;
-                DBCSavepoint savepoint = null;
-                if (txnManager != null) {
-                    isAutoCommitEnabled = txnManager.isAutoCommit();
-                    if (txnManager.isSupportsTransactions() && isAutoCommitEnabled) {
-                        txnManager.setAutoCommit(monitor, false);
-                        revertToAutoCommit = true;
-                    }
-                    if (!txnManager.isAutoCommit() && txnManager.supportsSavepoints()) {
-                        try {
-                            savepoint = txnManager.setSavepoint(monitor, null);
-                        } catch (Throwable e) {
-                            // May be savepoints not supported
-                            log.debug("Can't set savepoint", e);
-                        }
-                    }
-                }
-                try {
-                    Map<String, Object> options = Collections.emptyMap();
-                    for (Map.Entry<DBSDataManipulator.ExecuteBatch, Object[]> rb : resultBatches.entrySet()) {
-                        DBSDataManipulator.ExecuteBatch batch = rb.getKey();
-                        Object[] rowValues = rb.getValue();
-                        keyReceiver.setRow(rowValues);
-                        DBCStatistics statistics = batch.execute(session, options);
-
-                        totalUpdateCount += statistics.getRowsUpdated();
-                        result.setDuration(result.getDuration() + statistics.getExecuteTime());
-                        newResultSetRows.add(new WebSQLQueryResultSetRow(rowValues, null));
-                    }
-
-                    if (txnManager != null && txnManager.isSupportsTransactions() && isAutoCommitEnabled) {
-                        txnManager.commit(session);
-                    }
-                } catch (Exception e) {
-                    if (txnManager != null && txnManager.isSupportsTransactions()) {
-                        txnManager.rollback(session, savepoint);
-                    }
-                    throw new DBCException("Error persisting data changes", e);
-                } finally {
-                    if (txnManager != null) {
-                        if (revertToAutoCommit) {
-                            txnManager.setAutoCommit(monitor, true);
-                        }
-                        try {
-                            if (savepoint != null) {
-                                txnManager.releaseSavepoint(monitor, savepoint);
-                            }
-                        } catch (Throwable e) {
-                            // Maybe savepoints not supported
-                            log.debug("Can't release savepoint", e);
-                        }
-                    }
-                }
-            }
-        }
-        getUpdatedRowsInfo(resultsInfo, newResultSetRows, dataFormat, monitor);
-
-        if (!isAutoCommitEnabled) {
+        if (!updater.isAutoCommitEnabled()) {
             sendTransactionalEvent(contextInfo);
         }
 
@@ -486,15 +437,68 @@ public class WebSQLProcessor implements WebSessionProvider {
         updatedResultSet.setColumns(resultsInfo.getAttributes());
 
         WebSQLQueryResults updateResults = new WebSQLQueryResults(webSession, dataFormat);
-        updateResults.setUpdateRowCount(totalUpdateCount);
+        updateResults.setUpdateRowCount(updater.getUpdatedRowsCount());
         updateResults.setResultSet(updatedResultSet);
-        updatedResultSet.setRows(List.of(newResultSetRows.toArray(new WebSQLQueryResultSetRow[0])));
+        updatedResultSet.setRows(List.of(updater.getUpdatedResultSetRows().toArray(new WebSQLQueryResultSetRow[0])));
 
+        WebSQLExecuteInfo result = new WebSQLExecuteInfo();
+        result.setDuration(updater.getExecutionDuration());
+        List<WebSQLQueryResults> queryResults = new ArrayList<>();
         queryResults.add(updateResults);
-
         result.setResults(queryResults.toArray(new WebSQLQueryResults[0]));
 
         return result;
+    }
+
+    private void validateRowIdentifiers(
+        @NotNull WebSQLResultsInfo resultsInfo,
+        @NotNull Set<DBDRowIdentifier> rowIdentifiers,
+        @Nullable List<WebSQLResultsRow> updatedRows,
+        @Nullable List<WebSQLResultsRow> deletedRows,
+        @Nullable List<WebSQLResultsRow> addedRows
+    ) throws DBCException {
+        if (!CommonUtils.isEmpty(deletedRows) || !CommonUtils.isEmpty(addedRows)) {
+            for (DBDRowIdentifier identifier : rowIdentifiers) {
+                if (identifier == null || !identifier.isValidIdentifier()) {
+                    throw new DBCException("Can't detect a valid row identifier for data update");
+                }
+            }
+        }
+        if (!CommonUtils.isEmpty(updatedRows)) {
+            DBDAttributeBinding[] attributes = resultsInfo.getAttributes();
+            for (WebSQLResultsRow row : updatedRows) {
+                for (String indexValue : row.getUpdateValues().keySet()) {
+                    int index = CommonUtils.toInt(indexValue, -1);
+                    if (index < 0 || index >= attributes.length) {
+                        throw new DBCException("Invalid updated attribute index: " + indexValue);
+                    }
+                    DBDRowIdentifier identifier = attributes[index].getRowIdentifier();
+                    if (identifier == null || !identifier.isValidIdentifier()) {
+                        throw new DBCException(
+                            "Attribute '" + attributes[index].getName() + "' has no valid row identifier"
+                        );
+                    }
+                }
+            }
+        }
+    }
+
+    @NotNull
+    private Set<DBDRowIdentifier> getRowIdentifiers(
+        @NotNull WebSQLResultsInfo resultsInfo,
+        @Nullable List<WebSQLResultsRow> updatedRows,
+        @Nullable List<WebSQLResultsRow> deletedRows,
+        @Nullable List<WebSQLResultsRow> addedRows
+    ) {
+        Set<DBDRowIdentifier> rowIdentifierList = new HashSet<>();
+        // several row identifiers could be if we update result set table with join
+        // we can't add or delete rows from result set table with join
+        if (!CommonUtils.isEmpty(deletedRows) || !CommonUtils.isEmpty(addedRows)) {
+            rowIdentifierList.add(resultsInfo.getDefaultRowIdentifier());
+        } else if (!CommonUtils.isEmpty(updatedRows)) {
+            rowIdentifierList = resultsInfo.getRowIdentifiers();
+        }
+        return rowIdentifierList;
     }
 
     private void sendTransactionalEvent(@NotNull WebSQLContextInfo contextInfo) {
@@ -515,8 +519,8 @@ public class WebSQLProcessor implements WebSessionProvider {
         @NotNull WebSQLResultsInfo resultsInfo,
         @NotNull Set<WebSQLQueryResultSetRow> newResultSetRows,
         @Nullable WebDataFormat dataFormat,
-        @NotNull DBRProgressMonitor monitor)
-        throws DBException {
+        @NotNull DBRProgressMonitor monitor
+    ) throws DBException {
         try (DBCSession session = getExecutionContext().openSession(
             monitor,
             DBCExecutionPurpose.UTIL,
@@ -541,7 +545,12 @@ public class WebSQLProcessor implements WebSessionProvider {
                     if (attr.getRowIdentifier() == null) {
                         continue;
                     }
-                    final Object keyValue = row.getData()[attr.getOrdinalPosition()];
+                    int position = resultsInfo.getAttributePosition(attr);
+                    if (position < 0) {
+                        hasKey = false;
+                        break;
+                    }
+                    final Object keyValue = row.getData()[position];
                     if (DBUtils.isNullValue(keyValue)) {
                         hasKey = false;
                         break;
@@ -586,6 +595,7 @@ public class WebSQLProcessor implements WebSessionProvider {
         }
     }
 
+    @NotNull
     public String generateResultsDataUpdateScript(
         @NotNull DBRProgressMonitor monitor,
         @NotNull WebSQLContextInfo contextInfo,
@@ -594,298 +604,46 @@ public class WebSQLProcessor implements WebSessionProvider {
         @Nullable List<WebSQLResultsRow> deletedRows,
         @Nullable List<WebSQLResultsRow> addedRows
     ) throws DBException {
-        Map<DBSDataManipulator.ExecuteBatch, Object[]> resultBatches = new LinkedHashMap<>();
-
-
         WebSQLResultsInfo resultsInfo = contextInfo.getResults(resultsId);
-        Set<DBDRowIdentifier> rowIdentifierList = new HashSet<>();
-        // several row identifiers could be if we update result set table with join
-        // we can't add or delete rows from result set table with join
-        if (!CommonUtils.isEmpty(deletedRows) || !CommonUtils.isEmpty(addedRows)) {
-            rowIdentifierList.add(resultsInfo.getDefaultRowIdentifier());
-        } else if (!CommonUtils.isEmpty(updatedRows)) {
-            rowIdentifierList = resultsInfo.getRowIdentifiers();
-        }
+        Set<DBDRowIdentifier> rowIdentifierList = getRowIdentifiers(
+            resultsInfo,
+            updatedRows,
+            deletedRows,
+            addedRows
+        );
+        validateRowIdentifiers(resultsInfo, rowIdentifierList, updatedRows, deletedRows, addedRows);
+
+        DBCExecutionContext executionContext = getExecutionContext(resultsInfo.getDataContainer());
+        WebDBDResultSetDataModel dataProvider = new WebDBDResultSetDataModel(
+            contextInfo,
+            resultsInfo,
+            addedRows,
+            updatedRows,
+            deletedRows
+        );
+
+        WebSQLDataUpdater updater = new WebSQLDataUpdater(
+            webSession,
+            dataProvider,
+            resultsInfo,
+            executionContext,
+            true
+        );
+
         StringBuilder sqlBuilder = new StringBuilder();
-        for (var rowIdentifier : rowIdentifierList) {
-            DBSDataManipulator dataManipulator = generateUpdateResultsDataBatch(
-                monitor, resultsInfo, rowIdentifier, updatedRows, deletedRows, addedRows, resultBatches, null);
-
-            List<DBEPersistAction> actions = new ArrayList<>();
-
-            DBCExecutionContext executionContext = getExecutionContext(dataManipulator);
-            try (DBCSession session = executionContext.openSession(monitor, DBCExecutionPurpose.USER, "Update data in container")) {
-                Map<String, Object> options = Collections.emptyMap();
-                for (DBSDataManipulator.ExecuteBatch batch : resultBatches.keySet()) {
-                    batch.generatePersistActions(session, actions, options);
-                }
-            }
-
-            sqlBuilder.append(
-                SQLUtils.generateScript(executionContext.getDataSource(), actions.toArray(new DBEPersistAction[0]), false)
+        updater.prepareStatements(monitor, new ResultSetSaveSettings());
+        DBDResultSetDataUpdater.ExecutionResult executionResult =
+            updater.executeSynchronously(monitor, true, new ResultSetSaveSettings(), null);
+        if (!executionResult.isSuccess()) {
+            throw new DBCException(
+                "Error generating data update script",
+                executionResult.error()
             );
         }
+        sqlBuilder.append(
+            SQLUtils.generateScript(executionContext.getDataSource(), updater.getActions().toArray(new DBEPersistAction[0]), false)
+        );
         return sqlBuilder.toString();
-    }
-
-    private DBSDataManipulator generateUpdateResultsDataBatch(
-        @NotNull DBRProgressMonitor monitor,
-        @NotNull WebSQLResultsInfo resultsInfo,
-        @NotNull DBDRowIdentifier rowIdentifier,
-        @Nullable List<WebSQLResultsRow> updatedRows,
-        @Nullable List<WebSQLResultsRow> deletedRows,
-        @Nullable List<WebSQLResultsRow> addedRows,
-        @NotNull Map<DBSDataManipulator.ExecuteBatch, Object[]> resultBatches,
-        @Nullable DBDDataReceiver keyReceiver)
-        throws DBException
-    {
-
-        DBSEntity dataContainer = rowIdentifier.getEntity();
-        checkDataEditAllowed(dataContainer);
-        DBSDataManipulator dataManipulator = (DBSDataManipulator) dataContainer;
-        //only script generation (without execution)
-        boolean withoutExecution = keyReceiver == null;
-
-        DBCExecutionContext executionContext = getExecutionContext(dataManipulator);
-        try (DBCSession session = executionContext.openSession(monitor, DBCExecutionPurpose.USER, "Generate data update batches")) {
-            WebExecutionSource executionSource = new WebExecutionSource(dataManipulator, executionContext, this);
-
-            DBDAttributeBinding[] allAttributes = resultsInfo.getAttributes();
-            DBDAttributeBinding[] keyAttributes = rowIdentifier.getAttributes().toArray(new DBDAttributeBinding[0]);
-
-            WebSQLQueryResultSet updatedResultSet = new WebSQLQueryResultSet();
-            updatedResultSet.setResultsInfo(resultsInfo);
-            updatedResultSet.setColumns(resultsInfo.getAttributes());
-
-            if (!CommonUtils.isEmpty(updatedRows)) {
-
-                for (WebSQLResultsRow row : updatedRows) {
-                    Object[] finalRow = row.getData();
-                    Map<String, Object> updateValues = row.getUpdateValues().entrySet().stream()
-                        .filter(x -> CommonUtils.equalObjects(allAttributes[CommonUtils.toInt(x.getKey())].getRowIdentifier(), rowIdentifier))
-                        .collect(HashMap::new, (m,v) -> m.put(v.getKey(), v.getValue()), HashMap::putAll);
-
-                    Map<String, Object> metaData;
-                    if (row.getMetaData() != null) {
-                        metaData = new HashMap<>(row.getMetaData());
-                    } else {
-                        metaData = new HashMap<>();
-                    }
-
-                    if (finalRow.length == 0 || CommonUtils.isEmpty(updateValues)) {
-                        continue;
-                    }
-                    DBDAttributeBinding[] updateAttributes = new DBDAttributeBinding[updateValues.size()];
-                    // Final row is what we return back
-
-                    int index = 0;
-                    for (String indexStr : updateValues.keySet()) {
-                        int attrIndex = CommonUtils.toInt(indexStr, -1);
-                        updateAttributes[index++] = allAttributes[attrIndex];
-                    }
-
-                    Object[] rowValues = new Object[updateAttributes.length + keyAttributes.length];
-                    // put key values first in case of updating them
-                    DBDDocument document = null;
-                    for (int i = 0; i < keyAttributes.length; i++) {
-                        DBDAttributeBinding keyAttribute = keyAttributes[i];
-                        boolean isDocumentValue = keyAttributes.length == 1 && keyAttribute.getDataKind() == DBPDataKind.DOCUMENT && dataContainer instanceof DBSDocumentLocator;
-                        if (isDocumentValue) {
-                            document = makeDocumentInputValue(
-                                session,
-                                (DBSDocumentLocator) dataContainer,
-                                resultsInfo,
-                                row,
-                                metaData
-                            );
-                            rowValues[updateAttributes.length + i] = document;
-                        } else {
-                            rowValues[updateAttributes.length + i] = keyAttribute.getValueHandler().getValueFromObject(
-                                session,
-                                keyAttribute,
-                                convertInputCellValue(session, keyAttribute,
-                                    row.getData()[(keyAttribute.getOrdinalPosition())], withoutExecution),
-                                false,
-                                true);
-                        }
-                        if (ArrayUtils.contains(updateAttributes, keyAttribute)) {
-                            // Key attribute is already updated
-                        } else if (!isDocumentValue) {
-                            finalRow[keyAttribute.getOrdinalPosition()] = rowValues[updateAttributes.length + i];
-                        }
-                    }
-                    for (int i = 0; i < updateAttributes.length; i++) {
-                        DBDAttributeBinding updateAttribute = updateAttributes[i];
-                        Object value = updateValues.get(String.valueOf(updateAttribute.getOrdinalPosition()));
-                        Object realCellValue = setCellRowValue(value, webSession, session, updateAttribute, withoutExecution);
-                        if (document instanceof DBDComposite compositeDoc) {
-                            compositeDoc.setAttributeValue(updateAttribute, realCellValue);
-                        }
-                        rowValues[i] = realCellValue;
-                        finalRow[updateAttribute.getOrdinalPosition()] = realCellValue;
-                    }
-
-                    DBSDataManipulator.ExecuteBatch updateBatch = dataManipulator.updateData(
-                        session, updateAttributes, keyAttributes, null, executionSource);
-                    updateBatch.add(rowValues);
-                    resultBatches.put(updateBatch, finalRow);
-                }
-            }
-
-            // Add new rows
-            if (!CommonUtils.isEmpty(addedRows)) {
-                for (WebSQLResultsRow row : addedRows) {
-                    Object[] addedValues = row.getData();
-                    if (addedValues.length == 0) {
-                        continue;
-                    }
-                    Map<DBDAttributeBinding, Object> insertAttributes = new LinkedHashMap<>();
-                    // Final row is what we return back
-
-                    for (int i = 0; i < allAttributes.length; i++) {
-                        if (addedValues[i] != null) {
-                            Object realCellValue;
-                            if (addedValues[i] instanceof Map<?, ?> variables) {
-                                realCellValue = setCellRowValue(variables, webSession, session, allAttributes[i], withoutExecution);
-                            } else {
-                                realCellValue = convertInputCellValue(session, allAttributes[i],
-                                    addedValues[i], withoutExecution);
-                            }
-                            insertAttributes.put(allAttributes[i], realCellValue);
-                            addedValues[i] = realCellValue;
-                        }
-                    }
-
-                    DBSDataManipulator.ExecuteBatch insertBatch = dataManipulator.insertData(
-                        session,
-                        insertAttributes.keySet().toArray(new DBDAttributeBinding[0]),
-                        needKeys(keyAttributes, addedValues) ? keyReceiver : null,
-                        executionSource,
-                        new LinkedHashMap<>());
-                    insertBatch.add(insertAttributes.values().toArray());
-                    resultBatches.put(insertBatch, addedValues);
-                }
-            }
-
-            if (keyAttributes.length > 0 && !CommonUtils.isEmpty(deletedRows)) {
-                for (WebSQLResultsRow row : deletedRows) {
-                    Object[] keyData = row.getData();
-                    Map<String, Object> keyMetaData = row.getMetaData();
-                    if (keyData.length == 0) {
-                        continue;
-                    }
-                    Map<DBDAttributeBinding, Object> delKeyAttributes = new LinkedHashMap<>();
-
-                    boolean isDocumentKey = keyAttributes.length == 1 && keyAttributes[0].getDataKind() == DBPDataKind.DOCUMENT;
-
-                    if (dataContainer instanceof DBSDocumentLocator dataLocator) {
-                        Map<String, Object> keyMap = new LinkedHashMap<>();
-                        DBDAttributeBinding[] attributes = resultsInfo.getAttributes();
-                        for (int j = 0; j < attributes.length; j++) {
-                            DBDAttributeBinding attr = attributes[j];
-                            Object plainValue = WebSQLUtils.makePlainCellValue(session, attr, row.getData()[j]);
-                            keyMap.put(attr.getName(), plainValue);
-                        }
-                        DBDDocument document = dataLocator.findDocument(session, keyMap, keyMetaData);
-
-                        DBSDataManipulator.ExecuteBatch deleteBatch = dataManipulator.deleteData(
-                                session,
-                                keyAttributes,
-                                executionSource);
-                        deleteBatch.add(new Object[] {document});
-                        resultBatches.put(deleteBatch, new Object[0]);
-                    } else {
-                        for (int i = 0; i < allAttributes.length; i++) {
-                            if (isDocumentKey || ArrayUtils.contains(keyAttributes, allAttributes[i])) {
-                                Object realCellValue = convertInputCellValue(session, allAttributes[i],
-                                        keyData[i], withoutExecution);
-                                delKeyAttributes.put(allAttributes[i], realCellValue);
-                            }
-                        }
-                        DBSDataManipulator.ExecuteBatch deleteBatch = dataManipulator.deleteData(
-                                session,
-                                delKeyAttributes.keySet().toArray(new DBSAttributeBase[0]),
-                                executionSource);
-                        deleteBatch.add(delKeyAttributes.values().toArray());
-                        resultBatches.put(deleteBatch, new Object[0]);
-                    }
-                }
-            }
-        }
-
-        return dataManipulator;
-    }
-
-    private boolean needKeys(DBDAttributeBinding[] keyAttributes, Object[] finalRow) {
-        for (var col : keyAttributes) {
-            if (col.getAttribute().isAutoGenerated() && DBUtils.isNullValue(finalRow[col.getOrdinalPosition()])) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    @NotNull
-    public DBDDocument makeDocumentInputValue(
-        DBCSession session,
-        DBSDocumentLocator dataContainer,
-        WebSQLResultsInfo resultsInfo,
-        WebSQLResultsRow row,
-        Map<String, Object> metaData) throws DBException
-    {
-        // Document reference
-        DBDDocument document = null;
-        Map<String, Object> keyMap = new LinkedHashMap<>();
-        DBDAttributeBinding[] attributes = resultsInfo.getAttributes();
-        for (int j = 0; j < attributes.length; j++) {
-            DBDAttributeBinding attr = attributes[j];
-            Object plainValue = WebSQLUtils.makePlainCellValue(session, attr, row.getData()[j]);
-            if (plainValue instanceof DBDDocument dbdDocument) {
-                // FIXME: Hack for DynamoDB. We pass entire document as a key
-                // FIXME: Let's just return it back for now
-                if (dataContainer.isDocumentValid(dbdDocument)) {
-                    document = (DBDDocument) plainValue;
-                    break;
-                }
-            }
-            keyMap.put(attr.getName(), plainValue);
-        }
-        if (document == null) {
-            document = dataContainer.findDocument(session, keyMap, metaData);
-            if (document == null) {
-                throw new DBCException("Error finding document by key " + keyMap);
-            }
-        }
-        return document;
-    }
-
-    @Nullable
-    public Object convertInputCellValue(DBCSession session, DBDAttributeBinding updateAttribute, Object cellRawValue, boolean justGenerateScript) throws DBCException {
-        cellRawValue = WebSQLUtils.makePlainCellValue(session, updateAttribute, cellRawValue);
-        Object realCellValue = cellRawValue;
-        // In some cases we already have final value here
-        if (!(realCellValue instanceof DBDValue)) {
-            try {
-                realCellValue = updateAttribute.getValueHandler().getValueFromObject(
-                    session,
-                    updateAttribute,
-                    cellRawValue,
-                    false,
-                    true);
-                //FIXME: fix array editing for nosql databases
-                if (realCellValue == null && cellRawValue != null && updateAttribute.getDataKind() == DBPDataKind.ARRAY) {
-                    throw new DBCException("Array update is not supported");
-                }
-            } catch (DBCException e) {
-                //checks if this function is used only for script generation
-                if (justGenerateScript) {
-                    return null;
-                } else {
-                    throw e;
-                }
-            }
-        }
-        return realCellValue;
     }
 
     ////////////////////////////////////////////////
@@ -927,7 +685,7 @@ public class WebSQLProcessor implements WebSessionProvider {
         return new WebSQLExecutionPlan(webSession, dbcPlan[0]);
     }
 
-
+    @NotNull
     public String readLobValue(
         @NotNull DBRProgressMonitor monitor,
         @NotNull WebSQLContextInfo contextInfo,
@@ -998,14 +756,18 @@ public class WebSQLProcessor implements WebSessionProvider {
                                       && dataContainer instanceof DBSDocumentLocator;
             if (isDocumentValue) {
                 rowValues[i] =
-                    makeDocumentInputValue(session, (DBSDocumentLocator) dataContainer, resultsInfo, row, null);
+                    WebSQLUtils.makeDocumentInputValue(session, (DBSDocumentLocator) dataContainer, resultsInfo, row, null);
             } else {
-                Object inputCellValue = row.getData()[keyAttribute.getOrdinalPosition()];
-
+                int position = resultsInfo.getAttributePosition(keyAttribute);
+                if (position < 0) {
+                    throw new DBCException("Result key attribute '" + keyAttribute.getName() + "' is not present in the row");
+                }
+                Object inputCellValue = row.getValues()[position];
                 rowValues[i] = keyAttribute.getValueHandler().getValueFromObject(
                     session,
                     keyAttribute,
-                    convertInputCellValue(session, keyAttribute,
+                    WebSQLUtils.convertInputCellValue(
+                        session, keyAttribute,
                         inputCellValue, false),
                     false,
                     true);
@@ -1163,72 +925,6 @@ public class WebSQLProcessor implements WebSessionProvider {
         }
     }
 
-    /**
-     * Key data receiver
-     */
-    static class KeyDataReceiver implements DBDDataReceiver {
-
-        private final WebSQLResultsInfo results;
-        private Object[] row;
-
-        public KeyDataReceiver(WebSQLResultsInfo results) {
-            this.results = results;
-        }
-
-        void setRow(Object[] row) {
-            this.row = row;
-        }
-
-        @Override
-        public void fetchStart(@NotNull DBCSession session, @NotNull DBCResultSet resultSet, long offset, long maxRows) {
-
-        }
-
-        @Override
-        public void fetchRow(@NotNull DBCSession session, @NotNull DBCResultSet resultSet)
-            throws DBCException {
-            DBDAttributeBinding[] resultsAttributes = results.getAttributes();
-
-            DBCResultSetMetaData rsMeta = resultSet.getMeta();
-            List<? extends DBCAttributeMetaData> keyAttributes = rsMeta.getAttributes();
-            for (int i = 0; i < keyAttributes.size(); i++) {
-                DBCAttributeMetaData keyAttribute = keyAttributes.get(i);
-                DBDValueHandler valueHandler = DBUtils.findValueHandler(session, keyAttribute);
-                Object keyValue = valueHandler.fetchValueObject(session, resultSet, keyAttribute, i);
-                if (keyValue == null) {
-                    continue;
-                }
-                if (!CommonUtils.isEmpty(keyAttribute.getName())) {
-                    DBDAttributeBinding binding = DBUtils.findObject(resultsAttributes, keyAttribute.getName());
-                    if (binding != null) {
-                        // Got it. Just update column oldValue
-                        row[binding.getOrdinalPosition()] = keyValue;
-                        continue;
-                    }
-                }
-                // Key not found
-                // Try to find and update auto-increment column
-                for (int k = 0; k < resultsAttributes.length; k++) {
-                    DBDAttributeBinding column = resultsAttributes[k];
-                    if (column.isAutoGenerated()) {
-                        // Got it
-                        row[k] = keyValue;
-                        break;
-                    }
-                }
-            }
-        }
-
-        @Override
-        public void fetchEnd(@NotNull DBCSession session, @NotNull DBCResultSet resultSet) {
-
-        }
-
-        @Override
-        public void close() {
-        }
-    }
-
     public class WebRowDataReceiver extends RowDataReceiver {
         private final WebDataFormat dataFormat;
 
@@ -1264,39 +960,6 @@ public class WebSQLProcessor implements WebSessionProvider {
 
     private static DBCExecutionPurpose resolveQueryPurpose(DBDDataFilter filter) {
         return filter.hasFilters() ? DBCExecutionPurpose.USER_FILTERED : DBCExecutionPurpose.USER;
-    }
-
-    private Object setCellRowValue(Object cellRow, WebSession webSession, DBCSession dbcSession, DBDAttributeBinding allAttributes, boolean withoutExecution)
-        throws DBException {
-        if (cellRow instanceof Map<?, ?> variables) {
-            if (variables.get(FILE_ID) != null) {
-                String fileId = variables.get(FILE_ID).toString();
-                try {
-                    // file id must be UUID
-                    UUID.fromString(fileId);
-                } catch (IllegalArgumentException e) {
-                    throw new DBException("File ID is invalid");
-                }
-
-                Path uploadFolder = WebAppUtils.getWebPlatform()
-                    .getTempFolder(webSession.getProgressMonitor(), TEMP_FILE_FOLDER)
-                    .resolve(webSession.getSessionId())
-                    .normalize();
-                Path path = uploadFolder.resolve(fileId).normalize();
-                // ensure the resolved path stays within the session upload directory
-                if (!path.startsWith(uploadFolder)) {
-                    throw new DBException("File ID is invalid");
-                }
-
-                try {
-                    var file = Files.newInputStream(path);
-                    return convertInputCellValue(dbcSession, allAttributes, file, withoutExecution);
-                } catch (IOException | DBCException e) {
-                    throw new DBException(e.getMessage());
-                }
-            }
-        }
-        return convertInputCellValue(dbcSession, allAttributes, cellRow, withoutExecution);
     }
 
     private boolean confirmDangerousQueryIfNeeded(

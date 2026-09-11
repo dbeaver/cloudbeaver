@@ -27,6 +27,7 @@ import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.session.WebSessionProvider;
 import io.cloudbeaver.utils.WebEventUtils;
 import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBConstants;
@@ -170,7 +171,9 @@ public class WebSQLContextInfo implements WebSessionProvider {
         @NotNull DBSDataContainer dataContainer,
         @NotNull DBCTrace trace,
         @NotNull DBDAttributeBinding[] attributes,
-        boolean singleRow) {
+        @Nullable DBDAttributeBinding documentAttribute,
+        boolean singleRow
+    ) {
         WebSQLResultsInfo resultInfo = new WebSQLResultsInfo(
             dataContainer,
             String.valueOf(resultId.incrementAndGet())
@@ -178,6 +181,7 @@ public class WebSQLContextInfo implements WebSessionProvider {
         resultInfo.setAttributes(attributes);
         resultInfo.setSingleRow(singleRow);
         resultInfo.setTrace(trace);
+        resultInfo.setDocumentAttribute(documentAttribute);
         resultInfoMap.put(resultInfo.getId(), resultInfo);
         return resultInfo;
     }
