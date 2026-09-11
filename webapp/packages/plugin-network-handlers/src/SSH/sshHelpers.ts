@@ -48,6 +48,14 @@ export function getSSHHandlerConfig(
   initialState?: NetworkHandlerConfigInput | null,
   savePassword?: boolean,
 ): NetworkHandlerConfigInput {
+  return trimSSHConfig(prepareSSHHandlerConfig(state, initialState, savePassword));
+}
+
+export function prepareSSHHandlerConfig(
+  state: NetworkHandlerConfigInput,
+  initialState?: NetworkHandlerConfigInput | null,
+  savePassword?: boolean,
+): NetworkHandlerConfigInput {
   const passwordChanged = isSSHPasswordChanged(state, initialState);
   const keyChanged = isSSHKeyChanged(state, initialState);
 
@@ -60,10 +68,10 @@ export function getSSHHandlerConfig(
 
   delete handlerConfig.secureProperties;
 
-  return trimSSHConfig(handlerConfig);
+  return handlerConfig;
 }
 
-function trimSSHConfig(input: NetworkHandlerConfigInput): NetworkHandlerConfigInput {
+export function trimSSHConfig(input: NetworkHandlerConfigInput): NetworkHandlerConfigInput {
   const trimmedInput = toJS(input);
   const attributesToTrim = Object.keys(input) as (keyof NetworkHandlerConfigInput)[];
 
