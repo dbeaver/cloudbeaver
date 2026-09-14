@@ -7,21 +7,13 @@
  */
 
 import { Subject } from 'rxjs';
-import { webSocket } from 'rxjs/webSocket';
+import * as websocket from 'rxjs/webSocket';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { EnvironmentService } from '@cloudbeaver/core-sdk';
 
-import { longPolling } from './longPolling.js';
+import * as polling from './longPolling.js';
 import { TransportSubject } from './TransportSubject.js';
-
-vi.mock('rxjs/webSocket', () => ({
-  webSocket: vi.fn(),
-}));
-
-vi.mock('./longPolling.js', () => ({
-  longPolling: vi.fn(),
-}));
 
 interface ITestEvent {
   id: string;
@@ -30,20 +22,25 @@ interface ITestEvent {
 describe('TransportSubject', () => {
   let websocketSubject: Subject<ITestEvent>;
   let pollingSubject: Subject<ITestEvent>;
+  let transport: TransportSubject<ITestEvent>;
 
   beforeEach(() => {
-    (globalThis as any)._ROOT_URI_ = '{ROOT_URI}';
+    vi.stubGlobal('_ROOT_URI_', '{ROOT_URI}');
     websocketSubject = new Subject();
     pollingSubject = new Subject();
 
-    vi.mocked(webSocket).mockReturnValue(websocketSubject as never);
-    vi.mocked(longPolling).mockReturnValue(pollingSubject as never);
+    // Spy on the existing exports because other suites can cache TransportSubject with isolate: false.
+    vi.spyOn(websocket, 'webSocket').mockReturnValue(websocketSubject as never);
+    vi.spyOn(polling, 'longPolling').mockReturnValue(pollingSubject as never);
 
     vi.spyOn(console, 'warn').mockImplementation(() => undefined);
   });
 
   afterEach(() => {
-    (globalThis as any)._ROOT_URI_ = undefined;
+    transport?.unsubscribe();
+    websocketSubject.unsubscribe();
+    pollingSubject.unsubscribe();
+    vi.unstubAllGlobals();
     vi.restoreAllMocks();
   });
 
@@ -110,8 +107,9 @@ describe('TransportSubject', () => {
 
     expect(error).toHaveBeenCalledWith(pollingError);
   });
-});
 
-function createTransport(): TransportSubject<ITestEvent> {
-  return new TransportSubject<ITestEvent>({ wsEndpoint: 'ws://localhost/api/ws' } as EnvironmentService);
-}
+  function createTransport(): TransportSubject<ITestEvent> {
+    transport = new TransportSubject<ITestEvent>({ wsEndpoint: 'ws://localhost/api/ws' } as EnvironmentService);
+    return transport;
+  }
+});
