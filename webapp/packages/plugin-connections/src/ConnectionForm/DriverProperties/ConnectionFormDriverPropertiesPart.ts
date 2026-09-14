@@ -87,7 +87,11 @@ export class ConnectionFormDriverPropertiesPart extends FormPart<ConnectionPrope
 
   protected override format(): void {
     runInAction(() => {
-      this.state = trimProperties(this.state);
+      for (const key of Object.keys(this.state)) {
+        if (typeof this.state[key] === 'string') {
+          this.state[key] = this.state[key].trim();
+        }
+      }
     });
   }
 
@@ -131,16 +135,4 @@ export class ConnectionFormDriverPropertiesPart extends FormPart<ConnectionPrope
 
     return config;
   }
-}
-
-function trimProperties(config: Record<string, any>): Record<string, any> {
-  config = { ...config };
-
-  for (const key of Object.keys(config)) {
-    if (typeof config[key] === 'string') {
-      config[key] = config[key].trim();
-    }
-  }
-
-  return config;
 }

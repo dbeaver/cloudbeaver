@@ -163,20 +163,18 @@ export class ConnectionFormSSLPart extends FormPart<INetworkHandlerConfig, IConn
     this.optionsPart.state.networkHandlersConfig!.push(handlerConfig);
   }
 
-  protected override async format(): Promise<void> {
-    if (!this.optionsPart.state.driverId) {
-      return;
+  protected override format(): void {
+    const descriptor = this.networkHandlerResource.get(this.state.id);
+    const properties = this.state.properties;
+
+    for (const property of descriptor?.properties ?? []) {
+      const key = property.id;
+      if (key && property.features.includes(PROPERTY_FEATURE_SECURED) && typeof properties?.[key] === 'string') {
+        properties[key] = properties[key].trim();
+      }
     }
 
-    const handlers = await this.networkHandlerResource.load(CachedMapAllKey);
-    const descriptor = handlers.find(handler => handler.id === this.state.id);
-    const securedPropertyIds =
-      descriptor?.properties
-        .filter(property => property.features.includes(PROPERTY_FEATURE_SECURED))
-        .map(property => property.id)
-        .filter(isNotNullDefined) ?? [];
-
-    trimSSLConfig(this.state, securedPropertyIds);
+    trimSSLConfig(this.state);
   }
 
   protected override async saveChanges(
@@ -185,16 +183,20 @@ export class ConnectionFormSSLPart extends FormPart<INetworkHandlerConfig, IConn
   ): Promise<void> {}
 }
 
-function trimSSLConfig(input: INetworkHandlerConfig, securedPropertyIds: readonly string[]): INetworkHandlerConfig {
-  // Editable secured values live in properties until preparation moves them into secureProperties.
-  for (const [properties, keys] of [
-    [input.properties, securedPropertyIds],
-    [input.secureProperties, Object.keys(input.secureProperties ?? {})],
-  ] as const) {
-    for (const key of keys) {
-      if (typeof properties?.[key] === 'string') {
-        properties[key] = properties[key].trim();
-      }
+function trimSSLConfig(input: INetworkHandlerConfig): INetworkHandlerConfig {
+  const { secureProperties } = input;
+
+  if (!secureProperties) {
+    return input;
+  }
+
+  if (!Object.keys(secureProperties).length) {
+    return input;
+  }
+
+  for (const key in secureProperties) {
+    if (typeof secureProperties[key] === 'string') {
+      secureProperties[key] = secureProperties[key]?.trim();
     }
   }
 
