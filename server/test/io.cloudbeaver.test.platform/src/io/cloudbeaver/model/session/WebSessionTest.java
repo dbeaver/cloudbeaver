@@ -107,6 +107,18 @@ public class WebSessionTest extends CloudbeaverMockTest {
         Assertions.assertSame(updatedFirstConfig, session.getAuthInfo("ldap", "ldap-1"));
     }
 
+    @Test
+    public void providerOnlyRemovalKeepsSingleTargetBehavior() throws Exception {
+        WebAuthInfo firstConfig = mockAuthInfo("ldap", "ldap-1");
+        WebAuthInfo secondConfig = mockAuthInfo("ldap", "ldap-2");
+        session.addAuthInfo(firstConfig);
+        session.addAuthInfo(secondConfig);
+
+        Assertions.assertEquals(List.of(firstConfig), session.removeAuthInfo("ldap"));
+        Assertions.assertNull(session.getAuthInfo("ldap", "ldap-1"));
+        Assertions.assertSame(secondConfig, session.getAuthInfo("ldap", "ldap-2"));
+    }
+
     private WebHttpRequestInfo getFakeRequestInfo() {
         return new WebHttpRequestInfo(
             "test-session-id",

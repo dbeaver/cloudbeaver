@@ -875,14 +875,13 @@ public class WebSession extends BaseWebSession
         if (providerId == null) {
             return clearAuthTokens();
         }
+        WebAuthInfo authInfo = getAuthInfo(providerId);
         List<WebAuthInfo> oldInfo;
-        synchronized (authTokens) {
-            oldInfo = authTokens.stream()
-                .filter(authInfo -> authInfo.getAuthProvider().equals(providerId))
-                .toList();
-        }
-        for (WebAuthInfo authInfo : oldInfo) {
+        if (authInfo != null) {
             removeAuthInfo(authInfo);
+            oldInfo = List.of(authInfo);
+        } else {
+            oldInfo = List.of();
         }
         if (authTokens.isEmpty()) {
             resetUserState();
