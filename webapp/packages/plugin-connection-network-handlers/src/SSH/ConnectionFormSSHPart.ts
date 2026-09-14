@@ -109,12 +109,7 @@ export class ConnectionFormSSHPart extends FormPart<INetworkHandlerConfig, IConn
   }
 
   protected override format(): void {
-    const externalState = this.optionsPart.state.networkHandlersConfig?.find(config => config.id === this.state.id);
-    for (const state of [this.state, externalState]) {
-      if (state) {
-        Object.assign(state, trimSSHConfig(state));
-      }
-    }
+    Object.assign(this.state, trimSSHConfig(this.state));
   }
 
   protected override validate(

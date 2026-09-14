@@ -163,12 +163,7 @@ export class ConnectionFormSSLPart extends FormPart<INetworkHandlerConfig, IConn
   }
 
   protected override format(): void {
-    const externalState = this.optionsPart.state.networkHandlersConfig?.find(config => config.id === this.state.id);
-    for (const state of [this.state, externalState]) {
-      if (state) {
-        trimSSLConfig(state);
-      }
-    }
+    trimSSLConfig(this.state);
   }
 
   protected override async saveChanges(
