@@ -32,7 +32,7 @@ import type { ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { action, computed, makeObservable, observable, reaction, toJS } from 'mobx';
+import { action, computed, makeObservable, observable, reaction, runInAction, toJS } from 'mobx';
 import { getUniqueName } from '@cloudbeaver/core-utils';
 import { getObjectPropertyDefaults } from '@cloudbeaver/core-blocks';
 import { isNotNullDefined } from '@dbeaver/js-helpers';
@@ -40,7 +40,6 @@ import { parseJdbcUri } from '@dbeaver/jdbc-uri-parser';
 
 import { getDefaultConfigurationType } from './getDefaultConfigurationType.js';
 import { getConnectionName } from './getConnectionName.js';
-import { trimConnectionConfig } from './trimConnectionConfig.js';
 import type { IConnectionFormOptionsState } from './IConnectionFormOptionsState.js';
 import type { IConnectionFormState } from '../IConnectionFormState.js';
 import { ConnectionAuthenticationDialogLoader } from '../../ConnectionAuthentication/ConnectionAuthenticationDialogLoader.js';
@@ -379,15 +378,15 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
 
     // databaseName, host, port, serverName only saves on backend like this
     if (this.state.configurationType === DriverConfigurationType.Manual && !driver.useCustomPage) {
-      this.state.mainPropertyValues![MAIN_PROPERTY_DATABASE_KEY] = this.state.databaseName?.trim();
+      this.state.mainPropertyValues![MAIN_PROPERTY_DATABASE_KEY] = this.state.databaseName;
 
       if (!driver.embedded) {
-        this.state.mainPropertyValues![MAIN_PROPERTY_HOST_KEY] = this.state.host?.trim();
-        this.state.mainPropertyValues![MAIN_PROPERTY_PORT_KEY] = this.state.port?.trim();
+        this.state.mainPropertyValues![MAIN_PROPERTY_HOST_KEY] = this.state.host;
+        this.state.mainPropertyValues![MAIN_PROPERTY_PORT_KEY] = this.state.port;
       }
 
       if (driver.requiresServerName) {
-        this.state.mainPropertyValues![MAIN_PROPERTY_SERVER_KEY] = this.state.serverName?.trim();
+        this.state.mainPropertyValues![MAIN_PROPERTY_SERVER_KEY] = this.state.serverName;
       }
     }
 
@@ -436,8 +435,42 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     }
   }
 
-  protected override format(): void {
-    trimConnectionConfig(this.state);
+  protected override async format(): Promise<void> {
+    runInAction(() => {
+      this.state.name = this.state.name?.trim();
+      this.state.description = this.state.description?.trim();
+      this.state.url = this.state.url?.trim();
+      this.state.host = this.state.host?.trim();
+      this.state.port = this.state.port?.trim();
+      this.state.databaseName = this.state.databaseName?.trim();
+      this.state.serverName = this.state.serverName?.trim();
+
+      for (const properties of [
+        this.state.credentials,
+        this.state.providerProperties,
+        this.state.mainPropertyValues,
+        this.state.expertSettingsValues,
+      ]) {
+        if (!properties) {
+          continue;
+        }
+        for (const key of Object.keys(properties)) {
+          if (typeof properties[key] === 'string') {
+            properties[key] = properties[key].trim();
+          }
+        }
+      }
+    });
+
+    if (this.formState.mode === FormMode.Create && this.state.name && this.formState.state.projectId) {
+      const connections = await this.connectionInfoResource.load(ConnectionInfoProjectKey(this.formState.state.projectId));
+      runInAction(() => {
+        this.state.name = getUniqueName(
+          this.state.name || '',
+          connections.map(connection => connection.name),
+        );
+      });
+    }
   }
 
   private async getConnectionAuthModelProperties(authModelId: string, connectionInfo?: ConnectionInfoAuthProperties): Promise<IObjectPropertyInfo[]> {
@@ -523,13 +556,7 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
       if (this.formState.mode === 'edit') {
         await this.connectionInfoResource.update(this.connectionKey!, this.state);
       } else {
-        const connections = await this.connectionInfoResource.load(ConnectionInfoProjectKey(this.formState.state.projectId));
-        const connectionNames = connections.map(connection => connection.name);
-
-        const uniqueName = getUniqueName(this.state.name || '', connectionNames);
-        const connection = await this.connectionInfoResource.create(this.formState.state.projectId, { ...this.state, name: uniqueName });
-
-        this.state.name = uniqueName;
+        const connection = await this.connectionInfoResource.create(this.formState.state.projectId, this.state);
         this.state.connectionId = connection.id;
         this.initialState.connectionId = connection.id;
         this.formState.setMode(FormMode.Edit);
@@ -584,12 +611,6 @@ function prepareDynamicProperties(
       if (!(propertyInfo.id in result) && isDefault) {
         result[propertyInfo.id] = getObjectPropertyDefaultValue(propertyInfo);
       }
-    }
-  }
-
-  for (const key of Object.keys(result)) {
-    if (typeof result[key] === 'string') {
-      result[key] = result[key]?.trim();
     }
   }
 

@@ -13,6 +13,7 @@ import { ConnectionInfoNetworkHandlersResource } from '@cloudbeaver/core-connect
 import {
   getNetworkHandlerDefaultProperties,
   getSSHHandlerConfig,
+  prepareSSHHandlerConfig,
   NetworkHandlerResource,
   SSH_DEFAULT_HANDLER_CONFIG,
   SSH_TUNNEL_ID,
@@ -93,11 +94,11 @@ export class ConnectionFormSSHPart extends FormPart<INetworkHandlerConfig, IConn
   ): void | Promise<void> {
     const urlType = this.optionsPart.state.configurationType === DriverConfigurationType.Url;
 
-    if (urlType) {
+    if (urlType || this.isReadOnly) {
       return;
     }
 
-    const config = this.getConfig();
+    const config = prepareSSHHandlerConfig(this.state, this.initialState, this.optionsPart.state.sharedCredentials);
 
     if (this.state.enabled && !this.state.savePassword) {
       this.formState.state.requiredNetworkHandlersIds.push(this.state.id);

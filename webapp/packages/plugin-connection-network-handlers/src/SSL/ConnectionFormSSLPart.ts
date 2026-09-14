@@ -109,7 +109,9 @@ export class ConnectionFormSSLPart extends FormPart<INetworkHandlerConfig, IConn
     const handlerConfig: NetworkHandlerConfigInput = toJS(this.state);
     handlerConfig.savePassword = this.state.savePassword || this.optionsPart.state.sharedCredentials;
 
-    if (this.isChanged && descriptor) {
+    if (descriptor) {
+      handlerConfig.properties ??= {};
+      handlerConfig.secureProperties ??= {};
       for (const descriptorProperty of descriptor.properties) {
         if (!descriptorProperty.id) {
           continue;
@@ -158,12 +160,23 @@ export class ConnectionFormSSLPart extends FormPart<INetworkHandlerConfig, IConn
       this.formState.state.requiredNetworkHandlersIds = this.formState.state.requiredNetworkHandlersIds.filter(id => id !== this.state.id);
     }
 
-    trimSSLConfig(handlerConfig);
     this.optionsPart.state.networkHandlersConfig!.push(handlerConfig);
   }
 
-  protected override format(): void {
-    trimSSLConfig(this.state);
+  protected override async format(): Promise<void> {
+    if (!this.optionsPart.state.driverId) {
+      return;
+    }
+
+    const handlers = await this.networkHandlerResource.load(CachedMapAllKey);
+    const descriptor = handlers.find(handler => handler.id === this.state.id);
+    const securedPropertyIds =
+      descriptor?.properties
+        .filter(property => property.features.includes(PROPERTY_FEATURE_SECURED))
+        .map(property => property.id)
+        .filter(isNotNullDefined) ?? [];
+
+    trimSSLConfig(this.state, securedPropertyIds);
   }
 
   protected override async saveChanges(
@@ -172,20 +185,16 @@ export class ConnectionFormSSLPart extends FormPart<INetworkHandlerConfig, IConn
   ): Promise<void> {}
 }
 
-function trimSSLConfig(input: INetworkHandlerConfig): INetworkHandlerConfig {
-  const { secureProperties } = input;
-
-  if (!secureProperties) {
-    return input;
-  }
-
-  if (!Object.keys(secureProperties).length) {
-    return input;
-  }
-
-  for (const key in secureProperties) {
-    if (typeof secureProperties[key] === 'string') {
-      secureProperties[key] = secureProperties[key]?.trim();
+function trimSSLConfig(input: INetworkHandlerConfig, securedPropertyIds: readonly string[]): INetworkHandlerConfig {
+  // Editable secured values live in properties until preparation moves them into secureProperties.
+  for (const [properties, keys] of [
+    [input.properties, securedPropertyIds],
+    [input.secureProperties, Object.keys(input.secureProperties ?? {})],
+  ] as const) {
+    for (const key of keys) {
+      if (typeof properties?.[key] === 'string') {
+        properties[key] = properties[key].trim();
+      }
     }
   }
 

@@ -48,6 +48,7 @@ export function getSSHHandlerConfig(
   initialState?: NetworkHandlerConfigInput | null,
   savePassword?: boolean,
 ): NetworkHandlerConfigInput {
+  // Select credentials before trimming, keeping raw state intact for validation and repeated preparation.
   return trimSSHConfig(prepareSSHHandlerConfig(state, initialState, savePassword));
 }
 

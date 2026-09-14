@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { FormPart, type IFormState } from '@cloudbeaver/core-ui';
-import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
+import { executionExceptionContext, executorHandlerFilter, ExecutorInterrupter, type IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { ConnectionInfoPropertiesResource, ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import type { IConnectionFormState } from '../IConnectionFormState.js';
 import { runInAction, toJS } from 'mobx';
@@ -14,7 +14,6 @@ import type { ConnectionFormOptionsPart } from '../Options/ConnectionFormOptions
 import type { schema } from '@cloudbeaver/core-utils';
 import { getObjectPropertyDefaultValue, getObjectPropertyOptionValue, getObjectPropertyValue } from '@cloudbeaver/core-sdk';
 import type { CONNECTION_PROPERTIES_SCHEMA } from '../CONNECTION_CONFIG_SCHEMA.js';
-import { trimConnectionConfig } from '../Options/trimConnectionConfig.js';
 
 type ConnectionProperties = schema.infer<typeof CONNECTION_PROPERTIES_SCHEMA>;
 
@@ -32,6 +31,13 @@ export class ConnectionFormDriverPropertiesPart extends FormPart<ConnectionPrope
     super(formState, getDefaultState());
 
     this.optionsPart.onDriverIdChange.addHandler(this.onDriverIdChangeHandler.bind(this));
+    // Driver defaults depend on the complete config, including other parts' prepared values.
+    formState.prepareTask.addPostHandler(
+      executorHandlerFilter(
+        (_, contexts) => !ExecutorInterrupter.isInterrupted(contexts) && !contexts.getContext(executionExceptionContext).exception && this.isLoaded(),
+        this.prepareProperties.bind(this),
+      ),
+    );
   }
 
   private async onDriverIdChangeHandler(driverId: string | undefined) {
@@ -75,10 +81,7 @@ export class ConnectionFormDriverPropertiesPart extends FormPart<ConnectionPrope
     contexts: IExecutionContextProvider<IFormState<IConnectionFormState>>,
   ): Promise<void> {}
 
-  protected override async prepare(
-    data: IFormState<IConnectionFormState>,
-    contexts: IExecutionContextProvider<IFormState<IConnectionFormState>>,
-  ): Promise<void> {
+  private async prepareProperties(): Promise<void> {
     this.optionsPart.state.properties = await this.getPropertiesConfig();
   }
 
@@ -89,13 +92,13 @@ export class ConnectionFormDriverPropertiesPart extends FormPart<ConnectionPrope
   }
 
   private async getPropertiesConfig() {
-    const config = trimProperties(toJS(this.state));
+    const config = toJS(this.state);
 
     if (!this.optionsPart.state.driverId) {
       return config;
     }
 
-    const properties = await this.getDriverProperties();
+    const properties = await this.connectionInfoResource.getConnectionDriverProperties(this.formState.state.projectId, this.optionsPart.state);
 
     // Omit defaults: the backend can otherwise return modified values (e.g. null as an empty string).
     // Keep only explicitly changed properties in the outgoing config.
@@ -111,7 +114,7 @@ export class ConnectionFormDriverPropertiesPart extends FormPart<ConnectionPrope
 
   private async getDefaultConfig() {
     const config: ConnectionProperties = {};
-    const properties = await this.getDriverProperties();
+    const properties = await this.connectionInfoResource.getConnectionDriverProperties(this.formState.state.projectId, this.optionsPart.state);
 
     for (const property of properties) {
       const value = getObjectPropertyValue(property);
@@ -127,12 +130,6 @@ export class ConnectionFormDriverPropertiesPart extends FormPart<ConnectionPrope
     }
 
     return config;
-  }
-
-  private getDriverProperties() {
-    const options = { ...toJS(this.optionsPart.state) };
-    trimConnectionConfig(options);
-    return this.connectionInfoResource.getConnectionDriverProperties(this.formState.state.projectId, options);
   }
 }
 
