@@ -776,9 +776,9 @@ public class WebSession extends BaseWebSession
         return action == null ? null : action.getParameters();
     }
 
+    @Nullable
     public WebAuthInfo getAuthInfo(@Nullable String providerID) {
         synchronized (authTokens) {
-
             if (providerID != null) {
                 for (WebAuthInfo ai : authTokens) {
                     if (ai.getAuthProvider().equals(providerID)) {
@@ -788,6 +788,19 @@ public class WebSession extends BaseWebSession
                 return null;
             }
             return authTokens.isEmpty() ? null : authTokens.getFirst();
+        }
+    }
+
+    @Nullable
+    public WebAuthInfo getAuthInfo(@NotNull String providerId, @Nullable String configurationId) {
+        synchronized (authTokens) {
+            for (WebAuthInfo authInfo : authTokens) {
+                if (authInfo.getAuthProvider().equals(providerId) &&
+                    Objects.equals(authInfo.getAuthConfiguration(), configurationId)) {
+                    return authInfo;
+                }
+            }
+            return null;
         }
     }
 
@@ -826,7 +839,7 @@ public class WebSession extends BaseWebSession
         }
 
         for (WebAuthInfo authInfo : tokens) {
-            WebAuthInfo oldAuthInfo = getAuthInfo(authInfo.getAuthProviderDescriptor().getId());
+            WebAuthInfo oldAuthInfo = getAuthInfo(authInfo.getAuthProvider(), authInfo.getAuthConfiguration());
             if (oldAuthInfo != null) {
                 removeAuthInfo(oldAuthInfo);
             }
@@ -857,23 +870,40 @@ public class WebSession extends BaseWebSession
         }
     }
 
-    public List<WebAuthInfo> removeAuthInfo(String providerId) throws DBException {
-        List<WebAuthInfo> oldInfo;
+    @NotNull
+    public List<WebAuthInfo> removeAuthInfo(@Nullable String providerId) throws DBException {
         if (providerId == null) {
-            oldInfo = clearAuthTokens();
-        } else {
-            WebAuthInfo authInfo = getAuthInfo(providerId);
-            if (authInfo != null) {
-                removeAuthInfo(authInfo);
-                oldInfo = List.of(authInfo);
-            } else {
-                oldInfo = List.of();
-            }
+            return clearAuthTokens();
+        }
+        List<WebAuthInfo> oldInfo;
+        synchronized (authTokens) {
+            oldInfo = authTokens.stream()
+                .filter(authInfo -> authInfo.getAuthProvider().equals(providerId))
+                .toList();
+        }
+        for (WebAuthInfo authInfo : oldInfo) {
+            removeAuthInfo(authInfo);
         }
         if (authTokens.isEmpty()) {
             resetUserState();
         }
         return oldInfo;
+    }
+
+    @NotNull
+    public List<WebAuthInfo> removeAuthInfo(
+        @NotNull String providerId,
+        @Nullable String configurationId
+    ) throws DBException {
+        WebAuthInfo authInfo = getAuthInfo(providerId, configurationId);
+        if (authInfo == null) {
+            return List.of();
+        }
+        removeAuthInfo(authInfo);
+        if (authTokens.isEmpty()) {
+            resetUserState();
+        }
+        return List.of(authInfo);
     }
 
     @Nullable

@@ -19,6 +19,7 @@ package io.cloudbeaver.model.session;
 import io.cloudbeaver.CloudbeaverMockTest;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.app.ServletAuthApplication;
+import org.jkiss.dbeaver.model.auth.SMSession;
 import org.jkiss.dbeaver.model.websocket.event.WSEventController;
 import org.jkiss.utils.function.ThrowableConsumer;
 import org.jkiss.utils.function.ThrowableFunction;
@@ -28,6 +29,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -80,6 +82,31 @@ public class WebSessionTest extends CloudbeaverMockTest {
         );
     }
 
+    @Test
+    public void authInfoIsIdentifiedByProviderAndConfiguration() throws Exception {
+        WebAuthInfo firstConfig = mockAuthInfo("ldap", "ldap-1");
+        WebAuthInfo secondConfig = mockAuthInfo("ldap", "ldap-2");
+        WebAuthInfo updatedFirstConfig = mockAuthInfo("ldap", "ldap-1");
+
+        session.addAuthInfo(firstConfig);
+        session.addAuthInfo(secondConfig);
+
+        Assertions.assertEquals(2, session.getAllAuthInfo().size());
+        Assertions.assertSame(firstConfig, session.getAuthInfo("ldap", "ldap-1"));
+        Assertions.assertSame(secondConfig, session.getAuthInfo("ldap", "ldap-2"));
+        Assertions.assertNull(session.getAuthInfo("ldap", "ldap-3"));
+
+        session.addAuthInfo(updatedFirstConfig);
+
+        Assertions.assertEquals(2, session.getAllAuthInfo().size());
+        Assertions.assertSame(updatedFirstConfig, session.getAuthInfo("ldap", "ldap-1"));
+        Assertions.assertSame(secondConfig, session.getAuthInfo("ldap", "ldap-2"));
+
+        Assertions.assertEquals(List.of(secondConfig), session.removeAuthInfo("ldap", "ldap-2"));
+        Assertions.assertNull(session.getAuthInfo("ldap", "ldap-2"));
+        Assertions.assertSame(updatedFirstConfig, session.getAuthInfo("ldap", "ldap-1"));
+    }
+
     private WebHttpRequestInfo getFakeRequestInfo() {
         return new WebHttpRequestInfo(
             "test-session-id",
@@ -97,5 +124,13 @@ public class WebSessionTest extends CloudbeaverMockTest {
         Mockito.when(app.isAnonymousAccessEnabled()).thenReturn(false);
         Mockito.when(app.getEventController()).thenReturn(eventController);
         return app;
+    }
+
+    private WebAuthInfo mockAuthInfo(String providerId, String configurationId) {
+        WebAuthInfo authInfo = Mockito.mock(WebAuthInfo.class);
+        Mockito.when(authInfo.getAuthProvider()).thenReturn(providerId);
+        Mockito.when(authInfo.getAuthConfiguration()).thenReturn(configurationId);
+        Mockito.when(authInfo.getAuthSession()).thenReturn(Mockito.mock(SMSession.class));
+        return authInfo;
     }
 }

@@ -267,11 +267,11 @@ export class AuthenticationService extends Bootstrap {
       return;
     }
 
-    if (!this.userInfoResource.hasToken(data.providerId)) {
+    if (!this.userInfoResource.hasToken(data.providerId, data.configurationId)) {
       await this.auth(false, { providerId: data.providerId, configurationId: data.configurationId });
     }
 
-    if (this.userInfoResource.hasToken(data.providerId)) {
+    if (this.userInfoResource.hasToken(data.providerId, data.configurationId)) {
       const provider = contexts.getContext(AuthProviderContext);
       provider.auth();
     }
