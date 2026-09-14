@@ -355,7 +355,7 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     data: IFormState<IConnectionFormState>,
     contexts: IExecutionContextProvider<IFormState<IConnectionFormState>>,
   ): Promise<void> {
-    if (!this.state.driverId || !this.formState.state.projectId) {
+    if (!this.state.driverId || !this.formState.state.projectId || !this.isChanged) {
       return;
     }
 
