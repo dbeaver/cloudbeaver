@@ -1,0 +1,101 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2026 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+
+.driverPropertiesTable {
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: 8px;
+  container-type: inline-size;
+}
+
+.toolbar {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.filter {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  align-items: center;
+  gap: 8px;
+
+  & > * {
+    min-width: 0;
+    flex: 1;
+  }
+}
+
+.addButton {
+  flex-shrink: 0;
+}
+
+.gridContainer {
+  composes: theme-border-color-background from global;
+  min-height: 0;
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+  border: 1px solid;
+  border-radius: 4px;
+}
+
+.dataGrid {
+  :global(.rdg-header-row) {
+    font-size: 12px;
+    text-transform: uppercase;
+  }
+
+  :global(.rdg-cell) {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    padding-inline: 12px;
+  }
+
+  :global(.rdg-cell:last-child) {
+    position: sticky;
+    z-index: 1;
+    inset-inline-end: 0;
+    justify-content: center;
+    padding-inline: 4px;
+    border-inline-start: 1px solid var(--rdg-border-color);
+  }
+
+  :global(.rdg-header-row > .rdg-cell:last-child) {
+    z-index: 3;
+  }
+
+  :global(.rdg-cell:focus-within) {
+    z-index: 1;
+    overflow: visible;
+  }
+}
+
+.customRow {
+  background-color: color-mix(in srgb, var(--theme-primary) 4%, var(--theme-surface));
+}
+
+@container (max-width: 400px) {
+  .toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .filter {
+    width: 100%;
+    flex: none;
+    justify-content: space-between;
+  }
+}

@@ -3055,6 +3055,7 @@ __metadata:
     "@cloudbeaver/core-utils": "workspace:*"
     "@cloudbeaver/core-view": "workspace:*"
     "@cloudbeaver/plugin-authentication": "workspace:*"
+    "@cloudbeaver/plugin-data-grid": "workspace:*"
     "@cloudbeaver/plugin-navigation-tree": "workspace:*"
     "@cloudbeaver/plugin-network-handlers": "workspace:*"
     "@cloudbeaver/plugin-projects": "workspace:*"
