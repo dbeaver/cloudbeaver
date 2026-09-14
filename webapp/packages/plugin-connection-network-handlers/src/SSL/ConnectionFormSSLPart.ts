@@ -8,7 +8,7 @@
 import { FormPart, formSubmitContext, type IFormState } from '@cloudbeaver/core-ui';
 
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
-import { getObjectPropertyDefaultValue, type NetworkHandlerConfigInput, type NetworkHandlerDescriptor } from '@cloudbeaver/core-sdk';
+import { getObjectPropertyDefaultValue, type NetworkHandlerConfigInput } from '@cloudbeaver/core-sdk';
 import { isNotNullDefined } from '@dbeaver/js-helpers';
 import { getSSLDriverHandler } from './getSSLDriverHandler.js';
 import { ConnectionInfoNetworkHandlersResource, type DBDriverResource } from '@cloudbeaver/core-connections';
@@ -163,11 +163,10 @@ export class ConnectionFormSSLPart extends FormPart<INetworkHandlerConfig, IConn
   }
 
   protected override format(): void {
-    const descriptor = this.networkHandlerResource.get(this.state.id);
     const externalState = this.optionsPart.state.networkHandlersConfig?.find(config => config.id === this.state.id);
     for (const state of [this.state, externalState]) {
       if (state) {
-        trimSSLConfig(state, descriptor);
+        trimSSLConfig(state);
       }
     }
   }
@@ -178,17 +177,22 @@ export class ConnectionFormSSLPart extends FormPart<INetworkHandlerConfig, IConn
   ): Promise<void> {}
 }
 
-function trimSSLConfig(input: INetworkHandlerConfig, descriptor?: NetworkHandlerDescriptor): void {
-  // Editable secured fields live in properties; prepared values live in secureProperties.
-  const securedKeys = new Set([
-    ...Object.keys(input.secureProperties ?? {}),
-    ...(descriptor?.properties.filter(property => property.features.includes(PROPERTY_FEATURE_SECURED)).map(property => property.id) ?? []),
-  ]);
-  for (const properties of [input.properties, input.secureProperties]) {
-    for (const key of securedKeys) {
-      if (key && typeof properties?.[key] === 'string') {
-        properties[key] = properties[key].trim();
-      }
+function trimSSLConfig(input: INetworkHandlerConfig): INetworkHandlerConfig {
+  const { secureProperties } = input;
+
+  if (!secureProperties) {
+    return input;
+  }
+
+  if (!Object.keys(secureProperties).length) {
+    return input;
+  }
+
+  for (const key in secureProperties) {
+    if (typeof secureProperties[key] === 'string') {
+      secureProperties[key] = secureProperties[key]?.trim();
     }
   }
+
+  return input;
 }
