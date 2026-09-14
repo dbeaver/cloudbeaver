@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -82,8 +82,7 @@ export class TransportSubject<T> extends Subject<T> {
           if (this.active === this.ws) {
             console.warn('WebSocket failed, switching to polling');
 
-            this.active = this.poll;
-            this.connect();
+            this.switchToPolling();
             return EMPTY;
           }
 
@@ -93,8 +92,21 @@ export class TransportSubject<T> extends Subject<T> {
       .subscribe({
         next: value => this.output.next(value),
         error: err => this.output.error(err),
-        complete: () => this.output.complete(),
+        complete: () => {
+          if (this.active === this.ws) {
+            console.warn('WebSocket closed, switching to polling');
+            this.switchToPolling();
+            return;
+          }
+
+          this.output.complete();
+        },
       });
+  }
+
+  private switchToPolling(): void {
+    this.active = this.poll;
+    this.connect();
   }
 
   override unsubscribe(): void {
