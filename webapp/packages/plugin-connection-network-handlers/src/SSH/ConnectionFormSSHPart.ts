@@ -8,11 +8,10 @@
 import { FormPart, formValidationContext, type IFormState } from '@cloudbeaver/core-ui';
 
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
-import { DriverConfigurationType, type NetworkHandlerConfigInput, type NetworkHandlerDescriptor } from '@cloudbeaver/core-sdk';
+import { DriverConfigurationType, type NetworkHandlerDescriptor } from '@cloudbeaver/core-sdk';
 import { ConnectionInfoNetworkHandlersResource } from '@cloudbeaver/core-connections';
 import {
   getNetworkHandlerDefaultProperties,
-  getSSHHandlerConfig,
   prepareSSHHandlerConfig,
   NetworkHandlerResource,
   SSH_DEFAULT_HANDLER_CONFIG,
@@ -42,10 +41,6 @@ export class ConnectionFormSSHPart extends FormPart<INetworkHandlerConfig, IConn
     // probably in the future when we will supposed different network handlers for profiles we
     // may want to move this logic in FormPart level for all readonly parts
     return super.isChanged && !this.isReadOnly;
-  }
-
-  getConfig(): NetworkHandlerConfigInput {
-    return getSSHHandlerConfig(this.state, this.initialState, this.optionsPart.state.sharedCredentials);
   }
 
   override isOutdated(): boolean {

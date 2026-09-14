@@ -43,15 +43,6 @@ export function isSSHKeyChanged(handler: NetworkHandlerConfigInput, initial?: Ne
   return (((initial?.key === null && handler.key !== null) || initial?.key === '') && handler.key !== '') || !!handler.key?.length;
 }
 
-export function getSSHHandlerConfig(
-  state: NetworkHandlerConfigInput,
-  initialState?: NetworkHandlerConfigInput | null,
-  savePassword?: boolean,
-): NetworkHandlerConfigInput {
-  // Select credentials before trimming, keeping raw state intact for validation and repeated preparation.
-  return trimSSHConfig(prepareSSHHandlerConfig(state, initialState, savePassword));
-}
-
 export function prepareSSHHandlerConfig(
   state: NetworkHandlerConfigInput,
   initialState?: NetworkHandlerConfigInput | null,
