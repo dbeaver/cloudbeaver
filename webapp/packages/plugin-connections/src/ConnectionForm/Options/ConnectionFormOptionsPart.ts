@@ -351,7 +351,7 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     return config;
   }
 
-  protected override async format(
+  protected override async prepare(
     data: IFormState<IConnectionFormState>,
     contexts: IExecutionContextProvider<IFormState<IConnectionFormState>>,
   ): Promise<void> {
@@ -367,16 +367,11 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     this.formState.state.requiredNetworkHandlersIds = observable([]);
     this.state.networkHandlersConfig = observable([]);
 
-    this.state.name = this.state.name?.trim();
-    this.state.description = this.state.description?.trim();
-
     if (!this.state.folder) {
       delete this.state.folder;
     }
 
-    if (this.state.configurationType === DriverConfigurationType.Url) {
-      this.state.url = this.state.url?.trim();
-    } else {
+    if (this.state.configurationType !== DriverConfigurationType.Url) {
       // if manual type configuration set, it helps to keep host, port, etc. properties (not saved on backend)
       delete this.state.url;
     }
@@ -438,6 +433,12 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     if (expertSettings.length > 0) {
       this.state.expertSettingsValues = prepareDynamicProperties(expertSettings, this.state.expertSettingsValues!);
     }
+  }
+
+  protected override format(): void {
+    this.state.name = this.state.name?.trim();
+    this.state.description = this.state.description?.trim();
+    this.state.url = this.state.url?.trim();
   }
 
   private async getConnectionAuthModelProperties(authModelId: string, connectionInfo?: ConnectionInfoAuthProperties): Promise<IObjectPropertyInfo[]> {
