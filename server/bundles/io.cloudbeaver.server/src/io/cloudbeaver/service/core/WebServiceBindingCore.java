@@ -148,7 +148,10 @@ public class WebServiceBindingCore extends WebServiceBindingBase<DBWServiceCore>
                 }
             )
             .dataFetcher("testConnection", env -> getService(env).testConnection(
-                getWebSession(env), getProjectReference(env), getArgumentVal(env, "config")
+                getWebSession(env),
+                getProjectReference(env),
+                getArgumentVal(env, "config"),
+                getArgument(env, "extensions")
             ))
             .dataFetcher("testNetworkHandler", env -> getService(env).testNetworkHandler(
                 getWebSession(env),

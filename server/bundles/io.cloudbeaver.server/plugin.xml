@@ -6,6 +6,7 @@
     <extension-point id="io.cloudbeaver.driver" name="Web drivers" schema="schema/io.cloudbeaver.driver.exsd"/>
     <extension-point id="io.cloudbeaver.handler" name="Web handlers" schema="schema/io.cloudbeaver.handler.exsd"/>
     <extension-point id="io.cloudbeaver.object.feature.provider" name="Object feature providers" schema="schema/io.cloudbeaver.object.feature.provider.exsd"/>
+    <extension-point id="io.cloudbeaver.connectionTestConfigurator" name="Connection test configurators" schema="schema/io.cloudbeaver.connectionTestConfigurator.exsd"/>
 
     <!-- Needed to instantiate connections thru navigator model -->
     <extension point="org.jkiss.dbeaver.service">

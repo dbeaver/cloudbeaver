@@ -50,20 +50,28 @@ public class WebConnectionConfigInputHandler<T extends WebConnectionConfig, C ex
         DBPDriver driver = WebDataSourceUtils.getDriverById(driverId);
 
         C newDataSource = createDataSourceContainerFromInput(driver);
+        try {
+            if (ServletAppUtils.getServletApplication().getAppConfiguration() instanceof WebAppConfiguration webAppConfiguration) {
+                newDataSource.setNavigatorSettings(webAppConfiguration.getDefaultNavigatorSettings());
+            }
 
-        if (ServletAppUtils.getServletApplication().getAppConfiguration() instanceof WebAppConfiguration webAppConfiguration) {
-            newDataSource.setNavigatorSettings(webAppConfiguration.getDefaultNavigatorSettings());
+            WebDataSourceUtils.saveAuthProperties(
+                webSession.getProgressMonitor(),
+                newDataSource,
+                newDataSource.getConnectionConfiguration(),
+                input.getCredentials(),
+                input.isSaveCredentials(),
+                input.isSharedCredentials()
+            );
+            return newDataSource;
+        } catch (RuntimeException | Error e) {
+            try {
+                newDataSource.dispose();
+            } catch (RuntimeException | Error cleanupError) {
+                e.addSuppressed(cleanupError);
+            }
+            throw e;
         }
-
-        WebDataSourceUtils.saveAuthProperties(
-            webSession.getProgressMonitor(),
-            newDataSource,
-            newDataSource.getConnectionConfiguration(),
-            input.getCredentials(),
-            input.isSaveCredentials(),
-            input.isSharedCredentials()
-        );
-        return newDataSource;
     }
 
     public void updateDataSource(@NotNull C dataSource) throws DBWebException {
@@ -102,15 +110,23 @@ public class WebConnectionConfigInputHandler<T extends WebConnectionConfig, C ex
         DBPConnectionConfiguration dsConfig = new DBPConnectionConfiguration();
         WebDataSourceUtils.setConnectionConfiguration(driver, dsConfig, input);
         C newDataSource = registry.createDataSource(driver, dsConfig);
-
-        newDataSource.setSavePassword(true);
-        newDataSource.setName(CommonUtils.notNull(input.getName(), "NewConnection"));
-        newDataSource.setDescription(input.getDescription());
-        newDataSource.setConnectionReadOnly(input.isReadOnly());
-        if (input.getFolder() != null) {
-            newDataSource.setFolder(registry.getFolder(input.getFolder()));
+        try {
+            newDataSource.setSavePassword(true);
+            newDataSource.setName(CommonUtils.notNull(input.getName(), "NewConnection"));
+            newDataSource.setDescription(input.getDescription());
+            newDataSource.setConnectionReadOnly(input.isReadOnly());
+            if (input.getFolder() != null) {
+                newDataSource.setFolder(registry.getFolder(input.getFolder()));
+            }
+            return newDataSource;
+        } catch (RuntimeException | Error e) {
+            try {
+                newDataSource.dispose();
+            } catch (RuntimeException | Error cleanupError) {
+                e.addSuppressed(cleanupError);
+            }
+            throw e;
         }
-        return newDataSource;
     }
 
 
