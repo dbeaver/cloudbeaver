@@ -109,9 +109,7 @@ export class ConnectionFormSSLPart extends FormPart<INetworkHandlerConfig, IConn
     const handlerConfig: NetworkHandlerConfigInput = toJS(this.state);
     handlerConfig.savePassword = this.state.savePassword || this.optionsPart.state.sharedCredentials;
 
-    if (descriptor) {
-      handlerConfig.properties ??= {};
-      handlerConfig.secureProperties ??= {};
+    if (this.isChanged && descriptor) {
       for (const descriptorProperty of descriptor.properties) {
         if (!descriptorProperty.id) {
           continue;
@@ -164,16 +162,6 @@ export class ConnectionFormSSLPart extends FormPart<INetworkHandlerConfig, IConn
   }
 
   protected override format(): void {
-    const descriptor = this.networkHandlerResource.get(this.state.id);
-    const properties = this.state.properties;
-
-    for (const property of descriptor?.properties ?? []) {
-      const key = property.id;
-      if (key && property.features.includes(PROPERTY_FEATURE_SECURED) && typeof properties?.[key] === 'string') {
-        properties[key] = properties[key].trim();
-      }
-    }
-
     trimSSLConfig(this.state);
   }
 
