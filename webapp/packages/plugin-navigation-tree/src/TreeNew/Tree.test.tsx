@@ -12,12 +12,22 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import * as coreDi from '@cloudbeaver/core-di';
 
-import type { INodeState } from './INodeState.js';
-import type { ITreeData } from './ITreeData.js';
 import { Tree } from './Tree.js';
 import * as nodeDnDModule from './useNodeDnD.js';
+import { useTreeClickSelection } from './useTreeClickSelection.js';
+import { useTreeData } from './useTreeData.js';
 
-describe('Tree keyboard activation', () => {
+function deferred() {
+  let resolve!: () => void;
+  let reject!: (error: Error) => void;
+  const promise = new Promise<void>((resolvePromise, rejectPromise) => {
+    resolve = resolvePromise;
+    reject = rejectPromise;
+  });
+  return { promise, resolve, reject };
+}
+
+describe('Tree interactions', () => {
   let container: HTMLDivElement;
   let root: Root;
 
@@ -47,76 +57,182 @@ describe('Tree keyboard activation', () => {
     vi.unstubAllGlobals();
   });
 
-  it('activates the last leaf after moving past a collapsed branch without expanding it', async () => {
-    const children: Record<string, string[]> = {
+  async function renderTree(loadBranch: () => Promise<void> = async () => {}) {
+    const children = observable<Record<string, string[]>>({
       root: ['first', 'branch', 'last'],
       first: [],
-      branch: ['child-1', 'child-2'],
+      branch: [],
       'child-1': [],
       'child-2': [],
       last: [],
-    };
-    const states = observable<Record<string, INodeState>>(
-      Object.fromEntries(Object.keys(children).map(id => [id, { expanded: id === 'root', selected: id === 'first' }])),
-    );
-    const data: ITreeData = {
-      rootId: 'root',
-      getNode: id => ({ name: id, leaf: children[id]!.length === 0 }),
-      getChildren: id => children[id]!,
-      getUnfilteredChildren: id => children[id]!,
-      getParent(id) {
-        if (id === 'root') {
-          return null;
-        }
-        return id.startsWith('child-') ? 'branch' : 'root';
-      },
-      getState: id => states[id]!,
-      updateState: vi.fn((id, state) => runInAction(() => Object.assign(states[id]!, state))),
-      updateAllState: vi.fn(),
-      load: vi.fn(async () => {}),
-      update: vi.fn(async () => {}),
-    };
-    const activate = vi.fn((id: string) => {
-      expect(data.getState(id).selected).toBe(true);
     });
-    await act(() => root.render(<Tree data={data} getNodeHeight={() => 24} onNodeActivate={activate} />));
-
-    function getNode(id: string) {
-      const node = container.querySelector<HTMLElement>(`[data-tree-node-id="${id}"]`);
-      expect(node).not.toBeNull();
-      return node!;
-    }
-
-    async function pressKey(key: string) {
-      await act(() => {
-        document.activeElement!.dispatchEvent(new KeyboardEvent('keydown', { key, code: key, bubbles: true, cancelable: true }));
+    const load = vi.fn<(id: string, manual: boolean) => Promise<void>>(async id => {
+      if (id !== 'branch') {
+        return;
+      }
+      await loadBranch();
+      runInAction(() => {
+        children['branch'] = ['child-1', 'child-2'];
       });
-      // Arrow navigation can change focus between keydown and keyup.
-      await act(() => {
-        document.activeElement!.dispatchEvent(new KeyboardEvent('keyup', { key, code: key, bubbles: true, cancelable: true }));
+    });
+    const activate = vi.fn();
+    function TestTree() {
+      const data = useTreeData({
+        rootId: 'root',
+        getNode: id => ({ name: id, leaf: id !== 'root' && id !== 'branch' }),
+        getChildren: id => children[id]!,
+        getParent(id) {
+          if (id === 'root') {
+            return null;
+          }
+          return id.startsWith('child-') ? 'branch' : 'root';
+        },
+        load,
       });
+      const selection = useTreeClickSelection(data);
+      return (
+        <Tree
+          data={data}
+          selection={selection}
+          getNodeHeight={() => 24}
+          onNodeActivate={id => {
+            expect(selection.isSelected(id)).toBe(true);
+            activate(id);
+          }}
+        />
+      );
     }
+    await act(() => root.render(<TestTree />));
+    expect(load).toHaveBeenCalledExactlyOnceWith('root', false);
+    load.mockClear();
+    return { load, activate };
+  }
 
+  function getNode(id: string) {
+    const node = container.querySelector<HTMLElement>(`[data-tree-node-id="${id}"]`);
+    expect(node).not.toBeNull();
+    return node!;
+  }
+
+  function visibleNodeIds() {
+    return Array.from(container.querySelectorAll<HTMLElement>('[role="treeitem"]'), node => node.dataset['treeNodeId']);
+  }
+
+  async function pressKey(key: string) {
+    await act(() => {
+      document.activeElement!.dispatchEvent(new KeyboardEvent('keydown', { key, code: key, bubbles: true, cancelable: true }));
+    });
+    // Arrow navigation can change focus between keydown and keyup.
+    await act(() => {
+      document.activeElement!.dispatchEvent(new KeyboardEvent('keyup', { key, code: key, bubbles: true, cancelable: true }));
+    });
+  }
+
+  it('activates the last leaf after moving past a collapsed branch and deselects the prior leaf', async () => {
+    const { load, activate } = await renderTree();
     expect(container.querySelectorAll('[role="treeitem"]')).toHaveLength(3);
     expect(getNode('branch').querySelector('[data-tree-node-content] [role="button"]')).not.toBeNull();
     expect(getNode('branch').getAttribute('aria-expanded')).toBe('false');
     await act(() => getNode('first').focus());
+    await pressKey('Enter');
+    expect(getNode('first').getAttribute('aria-selected')).toBe('true');
+    expect(activate).toHaveBeenCalledExactlyOnceWith('first');
+    activate.mockClear();
     await pressKey('ArrowDown');
     expect(document.activeElement).toBe(getNode('branch'));
     await pressKey('ArrowDown');
     expect(document.activeElement).toBe(getNode('last'));
-    expect(data.updateState).not.toHaveBeenCalled();
+    expect(getNode('first').getAttribute('aria-selected')).toBe('true');
+    expect(getNode('last').getAttribute('aria-selected')).toBe('false');
     expect(activate).not.toHaveBeenCalled();
 
     await pressKey('Enter');
 
     expect(document.activeElement).toBe(getNode('last'));
-    expect(data.updateState).toHaveBeenCalledExactlyOnceWith('last', { selected: true });
     expect(activate).toHaveBeenCalledExactlyOnceWith('last');
     expect(getNode('last').getAttribute('aria-selected')).toBe('true');
-    expect(data.getState('branch').expanded).toBe(false);
+    expect(getNode('first').getAttribute('aria-selected')).toBe('false');
+    expect(container.querySelectorAll('[aria-selected="true"]')).toHaveLength(1);
     expect(getNode('branch').getAttribute('aria-expanded')).toBe('false');
-    expect(data.load).not.toHaveBeenCalled();
+    expect(load).not.toHaveBeenCalled();
     expect(container.querySelectorAll('[role="treeitem"]')).toHaveLength(3);
+  });
+
+  it('loads a branch once while expansion is pending and navigates to children after success', async () => {
+    const pending = deferred();
+    const { load, activate } = await renderTree(() => pending.promise);
+    await act(() => getNode('branch').focus());
+    await pressKey('ArrowRight');
+
+    expect(load).toHaveBeenCalledExactlyOnceWith('branch', true);
+    expect(getNode('branch').getAttribute('aria-expanded')).toBe('true');
+    expect(visibleNodeIds()).toEqual(['first', 'branch', 'last']);
+    expect(document.activeElement).toBe(getNode('branch'));
+
+    await pressKey('ArrowLeft');
+    await pressKey('ArrowRight');
+    expect(getNode('branch').getAttribute('aria-expanded')).toBe('true');
+    expect(load).toHaveBeenCalledTimes(1);
+    expect(visibleNodeIds()).toEqual(['first', 'branch', 'last']);
+
+    await act(() => pending.resolve());
+    expect(getNode('branch').getAttribute('aria-expanded')).toBe('true');
+    expect(visibleNodeIds()).toEqual(['first', 'branch', 'child-1', 'child-2', 'last']);
+    expect(document.activeElement).toBe(getNode('branch'));
+    await pressKey('ArrowRight');
+    expect(document.activeElement).toBe(getNode('child-1'));
+    expect(getNode('child-1').getAttribute('aria-selected')).toBe('false');
+    expect(activate).not.toHaveBeenCalled();
+    expect(load).toHaveBeenCalledTimes(1);
+  });
+
+  it('collapses after a rejected load and allows a successful retry', async () => {
+    const firstAttempt = deferred();
+    const retry = deferred();
+    let attempt = firstAttempt;
+    const { load } = await renderTree(() => attempt.promise);
+    await act(() => getNode('branch').focus());
+    await pressKey('ArrowRight');
+    expect(getNode('branch').getAttribute('aria-expanded')).toBe('true');
+
+    await act(() => firstAttempt.reject(new Error('Branch load failed')));
+    expect(getNode('branch').getAttribute('aria-expanded')).toBe('false');
+    expect(visibleNodeIds()).toEqual(['first', 'branch', 'last']);
+    expect(document.activeElement).toBe(getNode('branch'));
+    expect(load).toHaveBeenCalledExactlyOnceWith('branch', true);
+
+    attempt = retry;
+    await pressKey('ArrowRight');
+    expect(load).toHaveBeenCalledTimes(2);
+    expect(load).toHaveBeenLastCalledWith('branch', true);
+    expect(getNode('branch').getAttribute('aria-expanded')).toBe('true');
+    expect(visibleNodeIds()).toEqual(['first', 'branch', 'last']);
+    await act(() => retry.resolve());
+
+    expect(getNode('branch').getAttribute('aria-expanded')).toBe('true');
+    expect(visibleNodeIds()).toEqual(['first', 'branch', 'child-1', 'child-2', 'last']);
+    await pressKey('ArrowRight');
+    expect(document.activeElement).toBe(getNode('child-1'));
+  });
+
+  it('returns focus to the parent when its focused child is removed by collapse', async () => {
+    const { load } = await renderTree();
+    await act(() => getNode('branch').focus());
+    await pressKey('ArrowRight');
+    await pressKey('ArrowRight');
+    expect(document.activeElement).toBe(getNode('child-1'));
+    expect(visibleNodeIds()).toEqual(['first', 'branch', 'child-1', 'child-2', 'last']);
+
+    // A programmatic click leaves focus on the child until collapse removes it.
+    const expander = getNode('branch').querySelector<HTMLElement>('[data-tree-node-content] [role="button"]')!;
+    await act(() => expander.click());
+
+    expect(getNode('branch').getAttribute('aria-expanded')).toBe('false');
+    expect(visibleNodeIds()).toEqual(['first', 'branch', 'last']);
+    expect(document.activeElement).toBe(getNode('branch'));
+    expect(getNode('branch').tabIndex).toBe(0);
+    expect(load).toHaveBeenCalledExactlyOnceWith('branch', true);
+    await pressKey('ArrowDown');
+    expect(document.activeElement).toBe(getNode('last'));
   });
 });

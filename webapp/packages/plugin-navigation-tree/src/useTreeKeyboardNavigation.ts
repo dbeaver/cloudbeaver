@@ -259,7 +259,6 @@ export function useTreeKeyboardNavigation(options: IOptions): ITreeKeyboardNavig
           }
 
           await optionsRef.revealNode?.(targetNodeId);
-          await Promise.resolve();
 
           if (this.pendingFocusNodeId !== targetNodeId) {
             return;
