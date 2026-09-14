@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2025 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,10 +18,13 @@ package io.cloudbeaver.service.data.transfer.impl;
 
 import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
 import org.jkiss.dbeaver.tools.transfer.registry.DataTransferProcessorDescriptor;
 import org.jkiss.utils.CommonUtils;
 
+import java.util.HashMap;
 import java.util.Map;
 
 class WebDataTransferUtils {
@@ -42,6 +45,20 @@ class WebDataTransferUtils {
         return processor.getProcessorFileExtension();
     }
 
+    @NotNull
+    static Map<String, Object> makeProcessorProperties(
+        @NotNull DataTransferProcessorDescriptor processor,
+        @Nullable Map<String, Object> processorProperties
+    ) {
+        Map<String, Object> properties = new HashMap<>();
+        for (DBPPropertyDescriptor property : processor.getProperties()) {
+            Object value = processorProperties == null ? null : processorProperties.get(property.getId());
+            properties.put(property.getId(), value != null ? value : property.getDefaultValue());
+        }
+        return properties;
+    }
+
+    @NotNull
     public static String normalizeFileName(
         @NotNull String fileName,
         @NotNull WebDataTransferOutputSettings outputSettings
@@ -49,7 +66,12 @@ class WebDataTransferUtils {
         return outputSettings.isCompress() ? fileName + ".zip" : fileName;
     }
 
-    public static WebDataTransferSessionConfig getSessionDataTransferConfig(WebSession session) {
-        return session.getAttribute("dataTransfer", x -> new WebDataTransferSessionConfig(), WebDataTransferSessionConfig::deleteExportFiles);
+    @NotNull
+    public static WebDataTransferSessionConfig getSessionDataTransferConfig(@NotNull WebSession session) {
+        return session.getAttribute(
+            "dataTransfer",
+            x -> new WebDataTransferSessionConfig(),
+            WebDataTransferSessionConfig::deleteExportFiles
+        );
     }
 }
